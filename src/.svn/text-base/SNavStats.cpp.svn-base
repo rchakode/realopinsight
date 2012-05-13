@@ -1,0 +1,38 @@
+/*
+ * SNavStats.cpp
+ *
+ *  Created on: 26 sept. 2010
+ *      Author: chakode
+ */
+
+#include "../include/SNavStats.hpp"
+
+
+SNavStats::SNavStats()
+: QWidget(),
+pieChart(new SNavPieChart(QRectF(2, 2, 125, 125), this))
+{
+
+	resize(pieChart->size()) ;
+	setStyleSheet("background:transparent") ;
+}
+
+SNavStats::~SNavStats()
+{
+	delete pieChart ;
+}
+
+QSize SNavStats::minimumSizeHint() const
+		{
+	return QSize(200, 100) ;
+		}
+
+ QSize SNavStats::sizeHint() const
+		{
+	return QSize(250, 150) ;
+		}
+
+void SNavStats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count, QString & _tool_tip )
+{
+	pieChart->update(_check_status_count, _check_count, _tool_tip) ;
+}

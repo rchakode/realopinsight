@@ -1,0 +1,53 @@
+/*
+ * SNavMsgPanel.hpp
+ *
+ *  Created on: 19 sept. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVMSGPANEL_HPP_
+#define SNAVMSGPANEL_HPP_
+#include "SNavBase.hpp"
+
+
+
+class SNavMsgPanel : public QTableWidget
+{
+	Q_OBJECT
+
+public:
+
+	SNavMsgPanel(QWidget * parent = 0 );
+	virtual ~SNavMsgPanel() {};
+
+
+	static const qint16 msgPanelColumnCount;
+
+	void addMsg(const NodeListT::iterator &);
+	void resizeFields( const QSize & ,  const bool & = false );
+
+
+public slots:
+	void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
+	void sortEventConsole(void) {sortItems(SNavMsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;}
+
+signals:
+	void acknowledgeChanged(void) ;
+
+protected :
+void showEvent ( QShowEvent * ) ;
+
+private:
+
+QPoint charSize;
+QSize windowSize ;
+
+static const QStringList msgPanelHeaderLabels;
+
+inline QCheckBox* msgItem(const qint32 & _row, const qint32 & _column) 	{
+	return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
+}
+
+};
+
+#endif /* SNAVMSGPANEL_HPP_ */

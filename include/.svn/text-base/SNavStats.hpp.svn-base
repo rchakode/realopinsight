@@ -1,0 +1,30 @@
+/*
+ * SNavStats.hpp
+ *
+ *  Created on: 26 sept. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVSTATS_HPP_
+#define SNAVSTATS_HPP_
+
+#include "SNavPieChart.hpp"
+
+
+class SNavStats : public QWidget
+{
+public:
+	SNavStats();
+	virtual ~SNavStats();
+
+	void update(const CheckStatusCountT & _check_status_count, const qint32 & check_count, QString & ) ;
+	QSize minimumSizeHint() const;
+	QSize sizeHint() const;
+
+
+private:
+
+	SNavPieChart * pieChart ;
+};
+
+#endif /* SNAVSTATS_HPP_ */

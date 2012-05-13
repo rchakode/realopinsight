@@ -1,0 +1,40 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/firewall.png</file>
+        <file>images/hypervisor.png</file>
+        <file>images/linux.png</file>
+        <file>images/log.png</file>
+        <file>images/service.png</file>
+        <file>images/switch.png</file>
+        <file>images/windows.png</file>
+        <file>images/critical.png</file>
+        <file>images/normal.png</file>
+        <file>images/unknown.png</file>
+        <file>images/warning.png</file>
+        <file>images/minus.png</file>
+        <file>images/plus.png</file>
+        <file>images/router.png</file>
+        <file>images/appicon.png</file>
+        <file>images/camera.png</file>
+        <file>images/zoomout.png</file>
+        <file>images/zoomin.png</file>
+        <file>images/refresh.png</file>
+        <file>images/disket.png</file>
+        <file>images/folder.png</file>
+        <file>images/check.png</file>
+        <file>images/network.png</file>
+        <file>images/filer.png</file>
+        <file>images/db-server.png</file>
+        <file>images/harddisk.png</file>
+        <file>images/application.png</file>
+        <file>images/server.png</file>
+        <file>images/web-server.png</file>
+        <file>images/storage.png</file>
+        <file>images/solaris.png</file>
+        <file>images/cloud.png</file>
+        <file>images/process.png</file>
+        <file>images/db.png</file>
+        <file>images/business-process.png</file>
+        <file>images/web.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,70 @@
+/*
+ * SNavPreferenceDialog.hpp
+ *
+ *  Created on: 30 juil. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVPREFERENCESDIALOG_HPP_
+#define SNAVPREFERENCESDIALOG_HPP_
+
+#include "SNavBase.hpp"
+
+
+class SNavPreferencesDialog : public QDialog
+{
+	Q_OBJECT
+
+public:
+	SNavPreferencesDialog( const bool & = false, const qint32 & = OP_USER_ROLE );
+	virtual ~SNavPreferencesDialog();
+
+
+public slots:
+	void browse(void);
+	void applySettings(void);
+	void changePasswd(void);
+
+signals:
+	void urlChanged( QString );
+
+
+
+protected:
+	void showEvent ( QShowEvent *) ;
+
+
+private:
+	qint32 userRole ;
+	SNavSettings* settings;
+	QLineEdit* nagiosHomeField ;
+	QLineEdit* statusFileField ;
+	QSpinBox* updateIntervalField ;
+	QPushButton *bBrowse ;
+	qint32 updateInterval ;
+	QString nagiosUrl ;
+	QString statusFile ;
+
+
+	QLineEdit* passwdField ;
+	QLineEdit* newPasswdField ;
+	QLineEdit* RenewPasswdField ;
+
+	QPushButton* cancelButton ;
+	QPushButton* applySettingButton ;
+	QPushButton* changePasswdButton ;
+
+	QGridLayout* layout ;
+
+	struct settingParams{
+		QString status_file ;
+		qint32 update_interval ;
+	};
+
+
+	void setContent(void) ;
+	void addEvents(void) ;
+
+};
+
+#endif /* SNAVPREFERENCESDIALOG_HPP_ */

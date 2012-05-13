@@ -1,0 +1,445 @@
+<ServiceView id="root">
+	<Name>Hosting Platform</Name>
+	<SubServices>S044014198,S044105216,S231853830</SubServices>
+	<Service id="S230727734" type="1" statusCalcRule="-1">
+		<Name>/srv/cloud</Name>
+		<Icon>--> Hard disk</Icon>
+		<Description>The NFS mountpoint serving as cloud repository</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen01/Mountpoint /srv/cloud</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S154545828" type="0" statusCalcRule="0">
+		<Name>itsoftbyrc.com</Name>
+		<Icon>--> Web Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S154643802,S154659138,S073824371</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S205551217" type="1" statusCalcRule="0">
+		<Name>Backbone Router</Name>
+		<Icon>--> Switch</Icon>
+		<Description>Backend switch. Cisco Nexus 1000V</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232250597" type="0" statusCalcRule="0">
+		<Name>nebula-server</Name>
+		<Icon>Server</Icon>
+		<Description>OpenNebula Frontend server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232630635,S232705693,S231920128</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181551014" type="1" statusCalcRule="0">
+		<Name>Avalability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S073757810" type="1" statusCalcRule="-1">
+		<Name>mysql</Name>
+		<Icon>--> Database Engine</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/Mysql</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S153201106" type="0" statusCalcRule="0">
+		<Name>OS</Name>
+		<Icon>--> Linux OS</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S181349742,S181426068,S181448973</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S003801812" type="1" statusCalcRule="-1">
+		<Name>ssh</Name>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+		<NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+		<SubServices>kvm02/SSH</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232540042" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen01/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S003842685" type="1" statusCalcRule="-1">
+		<Name>ssh</Name>
+		<Icon>--> Process</Icon>
+		<Description>Connection to SSH server at xen02</Description>
+		<AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+		<NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+		<SubServices>xen02/SSH</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S003820357" type="1" statusCalcRule="-1">
+		<Name>ssh</Name>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+		<NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+		<SubServices>kvm01/SSH</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S181611135" type="1" statusCalcRule="0">
+		<Name>Memory Usage</Name>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com/Memory Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232601251" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen02/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232630635" type="1" statusCalcRule="0">
+		<Name>oned</Name>
+		<Icon>--> Process</Icon>
+		<Description>OpenNebula daemon process</Description>
+		<AlarmMsg>The OpenNebula daemon is down</AlarmMsg>
+		<NotificationMsg>The OpenNebula daemon is now up</NotificationMsg>
+		<SubServices>nebula-front/oned alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S153132715" type="0" statusCalcRule="0">
+		<Name>ngrt4n.com</Name>
+		<Icon>--> Web Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S153201106,S153210146,S073757810</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232705693" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nebula-front/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S181426068" type="1" statusCalcRule="-1">
+		<Name>Load</Name>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/Current Load</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232616083" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm02/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S073824371" type="1" statusCalcRule="-1">
+		<Name>sqlserver</Name>
+		<Icon>--> Database Engine</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com/SQL Server</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S044014198" type="0" statusCalcRule="0">
+		<Name>Web</Name>
+		<Icon>--> Web Accessibility</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S153132715,S154545828</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181448973" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S230718077" type="1" statusCalcRule="-1">
+		<Name>/srv/cloud</Name>
+		<Icon>--> Hard disk</Icon>
+		<Description>The NFS mountpoint serving as cloud repository</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm01/Mountpoint /srv/cloud</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S233042914" type="1" statusCalcRule="0">
+		<Name>NFS Badcalls</Name>
+		<Icon>--> Logfile</Icon>
+		<Description>Number of NFS badcalls on 30 mins</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nebula-front/NFS badcalls</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S154659138" type="1" statusCalcRule="0">
+		<Name>www</Name>
+		<Icon>Other Check</Icon>
+		<Description>Microsoft IIS server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S231920128" type="0" statusCalcRule="0">
+		<Name>NFS</Name>
+		<Icon>Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232842975,S233025410,S233042914,S020232626</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S020232626" type="1" statusCalcRule="-1">
+		<Name>Disk Space</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish</SubServices>
+		<Status>3</Status>
+	</Service>
+	<Service id="S232031777" type="0" statusCalcRule="0">
+		<Name>kvm01</Name>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232512298,S232612395,S230718077,S003820357</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232038066" type="0" statusCalcRule="0">
+		<Name>kvm02</Name>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232525850,S232616083,S230632845,S003801812</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S154643802" type="0" statusCalcRule="0">
+		<Name>OS</Name>
+		<Icon>--> Windows OS</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S181551014,S181611135,S181629167</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S230632845" type="1" statusCalcRule="-1">
+		<Name>/srv/cloud</Name>
+		<Icon>--> Hard disk</Icon>
+		<Description>The NFS mountpoint serving as cloud repository</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm02/Mountpoint /srv/cloud</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232605330" type="1" statusCalcRule="0">
+		<Name>xend</Name>
+		<Icon>--> Process</Icon>
+		<Description>Xen daemon</Description>
+		<AlarmMsg>The process xend is down</AlarmMsg>
+		<NotificationMsg>The process xend is now up</NotificationMsg>
+		<SubServices>xen02/xend alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="root" type="0" statusCalcRule="0">
+		<Name>Hosting Platform</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S044014198,S044105216,S231853830</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S231948216" type="0" statusCalcRule="0">
+		<Name>xen01</Name>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232532458,S232540042,S230727734,S003857309</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232525850" type="1" statusCalcRule="0">
+		<Name>libvirtd</Name>
+		<Icon>--> Process</Icon>
+		<Description>libvirt daemon</Description>
+		<AlarmMsg>The process libvirtd is down</AlarmMsg>
+		<NotificationMsg>The process libvirtd is running</NotificationMsg>
+		<SubServices>kvm02/libvirtd alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S220857086" type="0" statusCalcRule="1">
+		<Name>VMM Hosts</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232038066,S232031777,S232019113,S231948216</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S153210146" type="1" statusCalcRule="0">
+		<Name>www</Name>
+		<Icon>Other Check</Icon>
+		<Description>check apache response time</Description>
+		<AlarmMsg>The response time of the web server {hostname} is more than {threshold}</AlarmMsg>
+		<NotificationMsg>The response time of the web server is normal</NotificationMsg>
+		<SubServices>www.ngrt4n.com/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232019113" type="0" statusCalcRule="0">
+		<Name>xen02</Name>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232601251,S232605330,S230723319,S003842685</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232612395" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm01/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S233025410" type="1" statusCalcRule="0">
+		<Name>SAN Device</Name>
+		<Icon>--> Storage Area</Icon>
+		<Description>The virtual infrastructure root file system containing virtual machine images and data shared among VMs</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nebula-front/Root Partition</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S044105216" type="0" statusCalcRule="0">
+		<Name>Network</Name>
+		<Icon>Network</Icon>
+		<Description>Network devices</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S205551217,S005813829</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181349742" type="1" statusCalcRule="-1">
+		<Name>Swap Usage</Name>
+		<Icon>Other Check</Icon>
+		<Description>Check swap usage</Description>
+		<AlarmMsg>The free swap space </AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/Swap Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232512298" type="1" statusCalcRule="0">
+		<Name>libvirtd</Name>
+		<Icon>--> Process</Icon>
+		<Description>libvirt daemon</Description>
+		<AlarmMsg>The process libvirtd is down</AlarmMsg>
+		<NotificationMsg>The process libvirtd is running</NotificationMsg>
+		<SubServices>kvm01/libvirtd alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232532458" type="1" statusCalcRule="0">
+		<Name>xend</Name>
+		<Icon>--> Process</Icon>
+		<Description>Xen daemon</Description>
+		<AlarmMsg>The process xend is down</AlarmMsg>
+		<NotificationMsg>The process xend is now up</NotificationMsg>
+		<SubServices>xen01/xend alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232842975" type="1" statusCalcRule="0">
+		<Name>nfsd</Name>
+		<Icon>--> Process</Icon>
+		<Description>NFS server daemon</Description>
+		<AlarmMsg>The NFS daemon is down</AlarmMsg>
+		<NotificationMsg>The NFS daemon is now up</NotificationMsg>
+		<SubServices>nebula-front/nfsd alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S005813829" type="1" statusCalcRule="-1">
+		<Name>Firewall</Name>
+		<Icon>--> Firewall</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S181629167" type="1" statusCalcRule="-1">
+		<Name>Load</Name>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com/Uptime</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S231853830" type="0" statusCalcRule="0">
+		<Name>Virtual Infrastructure</Name>
+		<Icon>Cloud</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232250597,S220857086</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S003857309" type="1" statusCalcRule="-1">
+		<Name>ssh</Name>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+		<NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+		<SubServices>xen01/SSH</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S230723319" type="1" statusCalcRule="-1">
+		<Name>/srv/cloud</Name>
+		<Icon>--> Hard disk</Icon>
+		<Description>The NFS mountpoint serving as cloud repository</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen02/Mountpoint /srv/cloud</SubServices>
+		<Status>4</Status>
+	</Service>
+</ServiceView>

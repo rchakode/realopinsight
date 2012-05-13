@@ -1,0 +1,25 @@
+/*
+ * SNavWebKit.h
+ *
+ *  Created on: 24 août 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVWEBKIT_H_
+#define SNAVWEBKIT_H_
+
+#include "SNavBase.hpp"
+
+class SNavWebKit : public QWebView
+{
+	Q_OBJECT
+
+public:
+	SNavWebKit( const QString & = "http://localhost/nagios", QWidget* = 0 );
+	virtual ~SNavWebKit() ;
+
+public slots:
+	void setUrl( QString );
+};
+
+#endif /* SNAVWEBKIT_H_ */

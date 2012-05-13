@@ -1,0 +1,24 @@
+/*
+ * SNavWebKit.cpp
+ *
+ *  Created on: 24 août 2010
+ *      Author: chakode
+ */
+
+#include "../include/SNavWebKit.hpp"
+
+SNavWebKit::SNavWebKit(const QString& url, QWidget* _parent)
+:QWebView(_parent)
+{
+	settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+	settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+	settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+	load(QUrl(url));
+}
+
+SNavWebKit::~SNavWebKit() {}
+
+void SNavWebKit::setUrl(QString url)
+{
+	load(QUrl(url));
+}

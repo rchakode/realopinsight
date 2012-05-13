@@ -1,0 +1,655 @@
+/*
+ * SNav.h
+ *
+ *  Created on: 10 juin 2010
+ *      Author: chakode
+ */
+
+#include "../include/SNavSvNavigator.hpp"
+
+
+SNavSvNavigator::SNavSvNavigator( const qint32 & _user_role, const QString & _config_file, QWidget* parent)
+: QMainWindow(parent) ,
+  configFile(_config_file) ,
+  userRole (_user_role) , //TODO change implementation
+  settings( new SNavSettings()) ,
+  snavStruct( new SNavStruct()) ,
+  statsPanel( new SNavStats( ) ) ,
+  filteredMsgPanel (NULL),
+  mainSplitter( new QSplitter( this ) ) ,
+  rightSplitter( new QSplitter() ) ,
+  topRightPanel( new QTabWidget()) ,
+  bottomRightPanel( new QTabWidget() ) ,
+  webBrowser( new SNavWebKit() ) ,
+  graphView( new SNavGraphView() ) ,
+  navigationTree( new SNavSvNavigatorTree() ) ,
+  monPrefWindow( new SNavPreferencesDialog( false, _user_role ) ) ,
+  changePasswdWindow( new SNavPreferencesDialog( true, _user_role ) ) ,
+  msgPanel( new SNavMsgPanel() )
+  {
+
+	loadMenus();
+
+	topRightPanel->addTab(graphView, "Dashboard") ;
+	topRightPanel->addTab(webBrowser, "Native Web UI") ;
+	bottomRightPanel->addTab(msgPanel, "Event Console") ;
+	mainSplitter->addWidget( navigationTree ) ;
+	mainSplitter->addWidget( rightSplitter ) ;
+	rightSplitter->addWidget( topRightPanel ) ;
+	rightSplitter->addWidget( bottomRightPanel ) ;
+	rightSplitter->setOrientation( Qt::Vertical ) ;
+
+	addEvents();
+
+	setCentralWidget( mainSplitter ) ;
+	setWindowTitle(configFile + " - " + APP_SHORT_NAME + " | Dashboard") ;
+  }
+
+SNavSvNavigator::~SNavSvNavigator()
+{
+	delete msgPanel ;
+	delete statsPanel ;
+	delete navigationTree ;
+	delete webBrowser ;
+	delete graphView ;
+	delete snavStruct ;
+	delete topRightPanel ;
+	delete bottomRightPanel ;
+	delete rightSplitter ;
+	delete mainSplitter ;
+	delete monPrefWindow ;
+	delete changePasswdWindow ;
+	if( filteredMsgPanel )
+		delete filteredMsgPanel ;
+	unloadMenus();
+}
+
+void SNavSvNavigator::closeEvent(QCloseEvent * event)
+{
+	if( filteredMsgPanel )
+	{
+		filteredMsgPanel->close() ;
+	}
+
+	QMainWindow::closeEvent( event ) ;
+}
+
+
+void SNavSvNavigator::contextMenuEvent(QContextMenuEvent * event)
+{
+	QPoint global_pos ;
+	QList<QTreeWidgetItem*> tree_nodes ;
+	QGraphicsItem* graph_node ;
+	QString graph_item_id ;
+
+	global_pos = event->globalPos() ;
+	tree_nodes = navigationTree->selectedItems() ;
+	graph_node = graphView->nodeAtGlobalPos( global_pos ) ;
+
+	if ( tree_nodes.length() || graph_node )
+	{
+		if( graph_node )
+		{
+			graph_item_id = graph_node->data(NODE_ID_DATA_INDEX).toString() ;
+			selectedNodeId =  graph_item_id.left( graph_item_id.indexOf(":") ) ;
+		}
+		else
+		{
+			selectedNodeId = tree_nodes[0]->text(TREE_NODE_ID_COLUMN) ;
+		}
+
+		nodeContextMenu->exec( global_pos ) ;
+	}
+}
+
+void SNavSvNavigator::timerEvent(QTimerEvent *)
+{
+	monitor() ;
+}
+
+void SNavSvNavigator::load(void)
+{
+	SNavParser config_parser ;
+
+	openedFile = configFile ;
+	config_parser.parseSvConfig(configFile, *snavStruct) ;
+
+	navigationTree->clear() ;
+	navigationTree->addTopLevelItem(snavStruct->tree_item_list[snavStruct->root_id]) ;
+	graphView->load(config_parser.getDotGraphFile(), snavStruct->node_list) ;
+
+	webUIUrl = settings->value( NAGIOS_URL_KEY ).toString() ;
+	webBrowser->setUrl( webUIUrl ) ;
+
+	resize() ;
+
+	monitor();
+
+	show() ;
+
+	graphView->scaleToFitViewPort( ) ;
+
+	updateInterval = settings->value( UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
+	if ( updateInterval <= 0 ) updateInterval = DEFAULT_UPDATE_INTERVAL * 1000 ;
+	timerId = startTimer( updateInterval ) ;
+}
+
+void SNavSvNavigator::unloadMenus(void)
+{
+	subMenuList.clear() ;
+	menuList.clear() ;
+	delete menuBar ;
+	delete nodeContextMenu ;
+}
+
+void SNavSvNavigator::handleChangePasswordAction(void)
+{
+	changePasswdWindow->exec() ;
+}
+
+void SNavSvNavigator::handleChangeMonitoringSettingsAction(void)
+{
+	monPrefWindow->exec() ;
+
+	killTimer( timerId ) ;
+
+	updateInterval = settings->value( UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
+
+	if ( updateInterval <= 0 ) updateInterval = DEFAULT_UPDATE_INTERVAL * 1000 ;
+
+	timerId = startTimer( updateInterval ) ;
+}
+
+
+int SNavSvNavigator::monitor(void)
+{
+	NodeListT::iterator node_it ;
+	NagiosChecksT nagios_checks;
+	SNavParser config_parser;
+	QStringList::const_iterator check_id_it, node_id_it ;
+	QStringList child_nodes_list ;
+	qint32 ok_count, warning_count, critical_count, unknown_count, all_checks_count ;
+	if( config_parser.parseServiceStatus(settings->value( STATUS_FILE_KEY ).toString(), nagios_checks) )
+	{
+		ok_count = warning_count = critical_count = unknown_count = 0 ;
+		snavStruct->check_status_count.clear() ;
+
+		for(check_id_it = snavStruct->check_list.begin(); check_id_it != snavStruct->check_list.end(); check_id_it++)
+		{
+			node_it = snavStruct->node_list.find( (*check_id_it).trimmed() ) ;
+			if( node_it == snavStruct->node_list.end())
+			{
+				continue ;
+			}
+			if( node_it->child_nodes == "" )
+			{
+				node_it->status = NAGIOS_UNKNOWN;
+				unknown_count += 1 ;
+				continue;
+			}
+
+			child_nodes_list = node_it->child_nodes.split( CHILD_NODES_SEP );
+
+			for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++)
+			{
+				NagiosChecksT::iterator check_it ;
+
+				check_it = nagios_checks.find( (*node_id_it).trimmed() ) ;
+				if( check_it == nagios_checks.end() )
+				{
+					unknown_count += 1 ;
+					continue ;
+				}
+
+				switch( check_it->status )
+				{
+				case NAGIOS_OK:
+					ok_count += 1 ;
+					break;
+
+				case NAGIOS_WARNING:
+					warning_count += 1 ;
+					break;
+
+				case NAGIOS_CRITICAL:
+					critical_count += 1 ;
+					break;
+
+				default:
+					unknown_count += 1 ;
+					break;
+				}
+
+				if ( node_it->status != check_it->status )
+				{
+					QString tool_tip ;
+
+					node_it->status = check_it->status;
+					node_it->check = (*check_it) ;
+					setNodeToolTip(tool_tip, node_it) ;
+					updateAlarmMsg(node_it) ;
+					updateNavTreeItemStatus(node_it, tool_tip) ;
+					msgPanel->addMsg(node_it) ;
+					graphView->updateNode(node_it, tool_tip) ;
+
+					emit hasToBeUpdate( node_it->parent ) ;
+				}
+			}
+		}
+
+		all_checks_count = snavStruct->check_list.size() ;
+		snavStruct->check_status_count[NAGIOS_OK] = ok_count ;
+		snavStruct->check_status_count[NAGIOS_WARNING] = warning_count ;
+		snavStruct->check_status_count[NAGIOS_CRITICAL] = critical_count ;
+		snavStruct->check_status_count[NAGIOS_UNKNOWN] = unknown_count ;
+
+		if( all_checks_count )
+		{
+			SNavStats *  stats ;
+
+			stats = new  SNavStats() ;
+
+			stats->update(snavStruct->check_status_count, all_checks_count, statsPanelTooltip) ;
+			graphView->updateStatsPanel( stats, statsPanelTooltip ) ;
+
+			if( statsPanel ) delete statsPanel ;
+
+			statsPanel = stats ;
+
+			msgPanel->sortItems(SNavMsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
+			msgPanel->resizeFields( msgPanelSize ) ;
+		}
+	}
+	else
+	{
+		QMessageBox::warning(this, "Error | " + APP_SHORT_NAME,
+				"A error occured when accessing Nagios status file!\n\n"
+				"WARNING! Your Console will be not longer updated if the problem persists.\n", QMessageBox::Ok) ;
+
+		return 1 ;
+	}
+
+	return 0 ;
+}
+
+void SNavSvNavigator::setNodeToolTip(QString & _tool_tip, const NodeListT::iterator & _node)
+{
+
+	_tool_tip = "Name: " + _node->name  +
+			"\nDescription: " + static_cast<QString>(_node->description).replace("\n", " ") +
+			"\nStatus: " + Utils::statusToString(_node->status);
+
+	if ( _node->type == ALARM_NODE )
+	{
+
+		if( _node->status == NAGIOS_OK )
+		{
+			_tool_tip += "\nMessage: " + static_cast<QString>(_node->notification_msg).replace("\n", " ");
+		}
+		else
+		{
+			_tool_tip += "\nMessage: " + static_cast<QString>(_node->alarm_msg).replace("\n", " ");
+		}
+
+		_tool_tip += "\nCheck Ouput: " +  static_cast<QString>(_node->check.alarm_msg).replace("\n", " ");
+		_tool_tip += "\nCheck Id: " + _node->child_nodes ;
+	}
+}
+
+void SNavSvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
+{
+	QRegExp regexp ;
+	QStringList splited_check_id ;
+	QStringList splited_check_command ;
+	QString  msg ;
+	qint32 len ;
+
+	splited_check_id = _node->check.id.split("/") ;
+	len =  splited_check_id.length() ;
+
+	if( _node->status == NAGIOS_OK )
+	{
+		msg = _node->notification_msg ;
+	}
+	else
+	{
+		msg = _node->alarm_msg ;
+	}
+
+	if( len )
+	{
+		regexp.setPattern( HOSTNAME_META_MSG_PATERN ) ;
+		msg.replace(regexp, splited_check_id[0]) ;
+
+		if( len == 2 )
+		{
+			regexp.setPattern( SERVICE_META_MSG_PATERN ) ;
+			msg.replace(regexp, splited_check_id[1]) ;
+		}
+	}
+
+	splited_check_command = _node->check.check_command.split("!") ;
+	if( splited_check_command.length() >= 3)
+	{
+		regexp.setPattern( THERESHOLD_META_MSG_PATERN ) ;
+		msg.replace(regexp, splited_check_command[1]) ;
+
+		if(_node->status == NAGIOS_WARNING )
+		{
+			msg.replace(regexp, splited_check_command[2]) ;
+		}
+
+	}
+
+	if( _node->status == NAGIOS_OK )
+	{
+		_node->notification_msg = msg  ;
+	}
+	else
+	{
+		_node->alarm_msg = msg ;
+	}
+}
+
+void SNavSvNavigator::updateNodeStatus(QString _node_id)
+{
+	NodeListT::iterator node_it, child_node_it ;
+	QStringList node_ids_list;
+	QStringList::const_iterator it ;
+	qint32 normal_count, warning_count, unknown_count, critical_count, sum_counts ;
+	QString tool_tip ;
+
+	normal_count = warning_count = unknown_count = critical_count = 0 ;
+
+	node_it = snavStruct->node_list.find( _node_id ) ;
+
+	if (node_it != snavStruct->node_list.end() )
+	{
+		node_ids_list = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
+		sum_counts = node_ids_list.size() ;
+
+		for(it = node_ids_list.begin(); it != node_ids_list.end(); it++)
+		{
+			child_node_it = snavStruct->node_list.find( *it ) ;
+			if ( child_node_it == snavStruct->node_list.end() )
+				continue ;
+
+			switch(child_node_it->status)
+			{
+			case NAGIOS_CRITICAL:
+				node_it->status = NAGIOS_CRITICAL ;
+				critical_count ++ ;
+
+				break;
+
+			case NAGIOS_WARNING:
+				if(node_it->status != NAGIOS_CRITICAL) node_it->status = NAGIOS_WARNING;
+				warning_count ++ ;
+
+				break;
+
+			case NAGIOS_UNKNOWN:
+				if(node_it->status != NAGIOS_CRITICAL
+						&& node_it->status != NAGIOS_WARNING) node_it->status = NAGIOS_UNKNOWN ;
+				unknown_count ++ ;
+
+				break ;
+
+			case NAGIOS_OK:
+				normal_count ++ ;
+
+				break ;
+
+			default:
+				break ;
+			}
+		}
+
+		if ( normal_count == sum_counts )
+		{
+			node_it->status = NAGIOS_OK ;
+		}
+		else if ( node_it->status_calc_rule == WEIGHTED_CALC_RULE_INDEX )
+		{
+			node_it->status = NAGIOS_WARNING ;
+			if ( critical_count == sum_counts ) node_it->status = NAGIOS_CRITICAL ;
+			else if ( unknown_count == sum_counts ) node_it->status = NAGIOS_UNKNOWN ;
+		}
+
+		setNodeToolTip(tool_tip, node_it) ;
+		graphView->updateNode(node_it, tool_tip ) ;
+		updateNavTreeItemStatus(node_it, tool_tip) ;
+		emit hasToBeUpdate(node_it->parent);
+	}
+}
+
+
+void SNavSvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tool_tip)
+{
+	QIcon icon;
+	TreeNodeItemListT::iterator tnode_it ;
+	switch(_node->status)
+	{
+	case NAGIOS_OK:
+		icon.addFile(":/images/normal.png") ;
+		break;
+
+	case NAGIOS_WARNING:
+		icon.addFile(":/images/warning.png") ;
+		break;
+
+	case NAGIOS_CRITICAL:
+		icon.addFile(":/images/critical.png") ;
+		break;
+
+	default:
+		icon.addFile(":/images/unknown.png") ;
+		break;
+	}
+
+	tnode_it = snavStruct->tree_item_list.find(_node->id) ;
+	if(tnode_it != snavStruct->tree_item_list.end() )
+	{
+		(*tnode_it)->setIcon(0, icon) ;
+		(*tnode_it)->setToolTip(0, _tool_tip) ;
+	}
+}
+
+void SNavSvNavigator::expandNode(const QString & _node_id, const bool & _expand, const qint32 & _level)
+{
+	QStringList child_nodes_list ;
+	QStringList::iterator uds_it ;
+	NodeT& node = snavStruct->node_list[_node_id] ;
+
+	if( node.type == SERVICE_NODE && node.child_nodes != "")
+	{
+		child_nodes_list = node.child_nodes.split( CHILD_NODES_SEP ) ;
+		for (uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++)
+		{
+			graphView->setNodeVisible(* uds_it, _node_id, _expand, _level) ;
+		}
+	}
+}
+
+void SNavSvNavigator::centerGraphOnNode( const QString & _node_id )
+{
+	if( _node_id != "") selectedNodeId =  _node_id ;
+	graphView->centerOnNode( selectedNodeId ) ;
+}
+
+void SNavSvNavigator::filterNodeRelatedMsg(void)
+{
+	QString window_title ;
+	NodeListT::iterator node_it ;
+
+	if( filteredMsgPanel ) delete filteredMsgPanel ;
+	filteredMsgPanel = new SNavMsgPanel() ;
+	node_it = snavStruct->node_list.find(selectedNodeId) ;
+
+	if( node_it != snavStruct->node_list.end())
+	{
+		filterNodeRelatedMsg( selectedNodeId ) ;
+		window_title = "Filtered messages from the component '" + snavStruct->node_list[selectedNodeId].name + "' - " + APP_SHORT_NAME ;
+		filteredMsgPanel->resizeFields( msgPanelSize, true );
+		filteredMsgPanel->setWindowTitle( window_title ) ;
+	}
+
+	filteredMsgPanel->show() ;
+}
+
+void SNavSvNavigator::filterNodeRelatedMsg( const QString & _node_id )
+{
+	NodeListT::iterator node_it = snavStruct->node_list.find(_node_id) ;
+
+	if(node_it == snavStruct->node_list.end() || node_it->child_nodes == "" )
+		return ;
+
+	if ( node_it->type == ALARM_NODE )
+	{
+		filteredMsgPanel->addMsg(node_it) ;
+	}
+	else
+	{
+		QStringList u_servs ;
+		QStringList::iterator it ;
+
+		u_servs = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
+
+		for(it = u_servs.begin() ; it != u_servs.end() ; it ++)
+		{
+			filterNodeRelatedMsg( *it ) ;
+		}
+	}
+}
+
+
+void SNavSvNavigator::acknowledge(void)
+{
+	//TODO
+}
+
+void SNavSvNavigator::tabChanged(int _tab_index)
+{
+	if ( _tab_index != 0 )
+	{
+		subMenuList["ZoomIn"]->setEnabled( false ) ;
+		subMenuList["ZoomOut"]->setEnabled( false ) ;
+	}
+	else
+	{
+		subMenuList["ZoomIn"]->setEnabled( true ) ;
+		subMenuList["ZoomOut"]->setEnabled( true ) ;
+	}
+}
+
+void SNavSvNavigator::hideChart(void)
+{
+	if ( graphView->hideChart() )
+	{
+		subMenuList["HideChart"]->setIcon( QIcon(":images/check.png"));
+	}
+	else
+	{
+		subMenuList["HideChart"]->setIcon(QIcon("")) ;
+	}
+}
+
+void SNavSvNavigator::centerGraphOnNode( QTreeWidgetItem * _item )
+{
+	centerGraphOnNode( _item->text(TREE_NODE_ID_COLUMN) ) ;
+}
+
+void SNavSvNavigator::resize(void)
+{
+	QSize screen_size, msg_panel_size, graph_port_view ;
+	QList<qint32> frames_size ;
+	const qreal GRAPH_HEIGHT_RATE = 0.50  ;
+
+	screen_size = qApp->desktop()->screen(0)->size() ;
+	graph_port_view =  QSize( screen_size.width() * 0.80, screen_size.height() * GRAPH_HEIGHT_RATE ) ;
+
+	msgPanelSize = QSize( screen_size.width() * 0.80, screen_size.height() * (1.0 - GRAPH_HEIGHT_RATE) ) ;
+
+	frames_size.push_back( screen_size.width() * 0.20 ) ;
+	frames_size.push_back( msgPanelSize.width() ) ;
+	mainSplitter->setSizes( frames_size ) ;
+
+	frames_size[0] = ( screen_size.height() * GRAPH_HEIGHT_RATE ),
+			frames_size[1] = ( msgPanelSize.height() ),
+			rightSplitter->setSizes( frames_size );
+
+	mainSplitter->resize(screen_size.width(), screen_size.height() * 0.85);
+
+	QMainWindow::resize(screen_size.width(),  screen_size.height());
+}
+
+
+void SNavSvNavigator::loadMenus(void)
+{
+	QIcon camera_icon, zoomin_icon, zoomout_icon, refresh_icon ;
+
+	refresh_icon.addFile(":images/refresh.png");
+	camera_icon.addFile(":images/camera.png");
+	zoomin_icon.addFile(":images/zoomin.png");
+	zoomout_icon.addFile(":images/zoomout.png");
+
+	menuBar = new QMenuBar();
+	menuList["MENU1"] = menuBar->addMenu("&File"),
+			subMenuList["Refresh"] = menuList["MENU1"]->addAction(refresh_icon, "&Refresh Dashboard") ,
+			subMenuList["Capture"] = menuList["MENU1"]->addAction(camera_icon, "&Save Graph as Image") ,
+			menuList["MENU1"]->addSeparator(),
+			subMenuList["Quit"] = menuList["MENU1"]->addAction("&Quit");
+
+	menuList["MENU2"] = menuBar->addMenu("&Graph"),
+			subMenuList["ZoomIn"] = menuList["MENU2"]->addAction(zoomin_icon, "Zoom &In"),
+			subMenuList["ZoomOut"] = menuList["MENU2"]->addAction(zoomout_icon, "Zoom &Out"),
+			subMenuList["HideChart"] = menuList["MENU2"]->addAction("Hide &Chart") ;
+
+	menuList["MENU3"] = menuBar->addMenu("&Preferences"),
+			subMenuList["ChangePassword"] = menuList["MENU3"]->addAction("Change &Password"),
+			subMenuList["ChangeMonitoringSettings"] = menuList["MENU3"]->addAction("&Monitoring Settings");
+
+	menuList["MENU4"] = menuBar->addMenu("&Help"),
+			subMenuList["Help"] = menuList["MENU4"]->addAction("Online &Help"),
+			menuList["MENU4"]->addSeparator(),
+			subMenuList["About"] = menuList["MENU4"]->addAction("&About " + APP_SHORT_NAME);
+
+	setMenuBar( menuBar ) ;
+
+	nodeContextMenu = new QMenu() ;
+	contextMenuList["FilterNodeRelatedMessages"] = nodeContextMenu->addAction("&Filter related messages") ;
+	contextMenuList["CenterOnNode"] = nodeContextMenu->addAction("Center Graph &On") ;
+	contextMenuList["Cancel"] = nodeContextMenu->addAction("&Cancel") ;
+
+	toolBar = addToolBar(APP_SHORT_NAME) ;
+	toolBar->addAction(subMenuList["Refresh"]) ;
+	toolBar->addAction(subMenuList["ZoomIn"]) ;
+	toolBar->addAction(subMenuList["ZoomOut"]) ;
+	toolBar->addAction(subMenuList["Capture"]) ;
+
+}
+
+
+void SNavSvNavigator::addEvents(void)
+{
+	connect( this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()) );
+	connect( this, SIGNAL( hasToBeUpdate( QString ) ), this, SLOT( updateNodeStatus( QString ) ));
+	connect( subMenuList["Capture"], SIGNAL( triggered(bool) ), graphView, SLOT( capture() ));
+	connect( subMenuList["ZoomIn"], SIGNAL( triggered(bool) ), graphView, SLOT( zoomIn() ) );
+	connect( subMenuList["ZoomOut"], SIGNAL( triggered(bool) ), graphView, SLOT( zoomOut() ));
+	connect( subMenuList["HideChart"], SIGNAL( triggered(bool) ), this, SLOT( hideChart() ));
+	connect( subMenuList["Refresh"], SIGNAL( triggered(bool) ), this, SLOT( monitor() ));
+	connect( subMenuList["ChangePassword"], SIGNAL( triggered(bool) ), this, SLOT(handleChangePasswordAction(void) ));
+	connect( subMenuList["ChangeMonitoringSettings"], SIGNAL( triggered(bool) ), this, SLOT(handleChangeMonitoringSettingsAction(void) ));
+	connect( subMenuList["Quit"], SIGNAL( triggered(bool) ), qApp, SLOT( quit() ));
+	connect( contextMenuList["FilterNodeRelatedMessages"], SIGNAL( triggered(bool) ), this, SLOT( filterNodeRelatedMsg()) );
+	connect( contextMenuList["CenterOnNode"], SIGNAL( triggered(bool) ), this, SLOT( centerGraphOnNode() ));
+	connect( monPrefWindow, SIGNAL( urlChanged(QString) ), webBrowser, SLOT(setUrl( QString ) ));
+	connect( topRightPanel, SIGNAL(currentChanged (int)), this, SLOT( tabChanged( int ) ));
+	connect( graphView, SIGNAL( expandNode(QString, bool, qint32)), this, SLOT( expandNode(const QString &, const bool &, const qint32 &) ));
+	connect( navigationTree, SIGNAL( itemDoubleClicked(QTreeWidgetItem *, int) ), this, SLOT( centerGraphOnNode(QTreeWidgetItem *) ));
+}
+
+
+
+

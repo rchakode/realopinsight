@@ -1,0 +1,70 @@
+#include "../include/SNavAuth.hpp"
+#include "../include/SNavSvNavigator.hpp"
+#include "../include/SNavSvConfigCreator.hpp"
+
+int main(int argc, char **argv)
+{
+	QString  module, file, usage ;
+	int c, user_role ;
+	QApplication* app = new QApplication(argc, argv) ;
+
+	usage = "usage:\n" + APP_SHORT_NAME.toLower() + " -e |-d <config file>" ;
+
+	QIcon app_icon (":images/appicon.png") ;
+	app->setWindowIcon( app_icon ) ;
+	app->setApplicationName( APP_NAME ) ;
+
+	SNavAuth authentification;
+	user_role = authentification.exec() ;
+
+	if( user_role != ADM_USER_ROLE && user_role != OP_USER_ROLE ) exit( 1 ) ;
+
+	if(argc > 3)
+	{
+		qDebug() << usage ;
+		exit (1) ;
+	}
+
+	module = "dashboard" ;
+	file = argv[1] ;
+	if ( (c = getopt(argc, argv, "edh") ) != -1)
+	{
+		switch (c)
+		{
+		case 'e':
+			module = "editor" ;
+			file = argv[2] ;
+			break ;
+
+		case 'd':
+			module = "dashboard" ;
+			file = argv[2] ;
+			break ;
+
+		default: // -h for get help
+			qDebug() << usage ;
+			exit (1) ;
+			break ;
+		}
+	}
+
+	if(module == "dashboard")
+	{
+		if(file == "")
+		{
+			qDebug() << "invalid file !" ;
+			QMessageBox::warning(0, "Error | " + APP_SHORT_NAME,
+					"No file specified to load. The system will exit !", QMessageBox::Ok);
+			exit (1) ;
+		}
+		SNavSvNavigator* sv_nav = new SNavSvNavigator( user_role, file ) ;
+		sv_nav->load() ;
+	}
+	else
+	{
+		SNavSvCreator* svc = new SNavSvCreator() ;
+		svc->load( file ) ;
+	}
+
+	return app->exec() ;
+}

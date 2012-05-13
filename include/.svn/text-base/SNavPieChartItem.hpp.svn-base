@@ -1,0 +1,45 @@
+/*
+ * SNavChartItem.hpp
+ *
+ *  Created on: 25 sept. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNavPieChartItem_HPP_
+#define SNavPieChartItem_HPP_
+
+#include "SNavBase.hpp"
+
+
+class SNavPieChartItem : public QWidget
+{
+	Q_OBJECT
+
+public:
+	SNavPieChartItem(const QRectF & _bounding_rect = QRectF(10.0, 10.0, 100.0, 80.0),
+			const qreal & _start_angle = 0, const qreal & _proportion = 0,
+			const QColor & _color = Qt::green, QWidget * _parent = 0);
+
+	QSize minimumSizeHint() const;
+	QSize sizeHint() const;
+
+public slots:
+void setFillRule(Qt::FillRule rule);
+void setFillGradient(const QColor &color1, const QColor &color2);
+
+protected:
+void paintEvent(QPaintEvent *event);
+
+private:
+QPainterPath path;
+QRectF pieChartBoundingRect ;
+qreal startAngle ;
+qreal proportion ;
+QColor fillColor1;
+QColor fillColor2;
+
+void setPath(void) ;
+
+};
+
+#endif /* SNavPieChartItem_HPP_ */

@@ -1,0 +1,77 @@
+\documentclass[a4paper,10pt]{book}
+\usepackage[utf8x]{inputenc}
+\usepackage[dvips]{graphicx}
+% declare the path(s) where your graphic files are
+\graphicspath{{./images/}}
+
+%opening
+\title{NGRT4N Concept Guide}
+\author{(c) ITSoftbyrc.com, Inc.}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{About This Document}
+This document describes the concepts that underly NGRT4N, provides resources to help to set it up and use it. The different sections are intended for various user profiles. At the begin of each section, the target users will be stated. If not, it will be assumed that the section can be useful for all users.
+
+\section{Getting Started with NGRT4N}
+%For web site home
+%
+%NGRT4N is a smartly-though enterprise-class software that provides dashboards for operational IT monitoring. It allows to build dashboards and view them, according to various things such as business processes,  the technical profiles of  operators, or whatever is relevant for your monitoring environment. The features it enables allow you to significantly improve the productivity of operators within data centers and network operating centers (NOC). NGRT4N can work upon various monitoring solutions, which currently include Nagios, Groundwork, Centreon, Icinga, and most of Nagios-derived solutions. 
+NGRT4N is a X-based GUI application that allows to build operational monitoring views upon most of popular monitoring solutions including Nagios, Groundwork, Centreon, Icinga, and most of Nagios-derived monitoring products. It is intended for monitoring in critical environments such as data-centers and network operations centers (NOC).
+
+
+\subsubsection{Why NGRT4N}
+NGRT4N aims at permitting an easy highlighting of critical events that can occur on a monitored infrastructure. Indeed, when the monitored infrastructure grows, the amount of components to check/monitor along with the number of items to observe grow with. Ideally, when those events occurred you should quickly evaluate their impact on your businesses so to prioritize the recovery of events that have higher impacts. Furthermore, it is often useful that some events be shown to certain users or operators that can address them quickly. This requires that the monitoring solution enables such advance monitoring views capabilities. Unfortunately, despite their good performances and qualities most of monitoring solutions such as those introduced above do not seem to provide the capabilities to build such advanced views. NGRT4N is intended to overcome this lack.
+
+\subsection{Features and Benefits}
+The following list describes the major features and/or benefits of NGRT4N:
+
+\begin{description}
+\item [Support of Various Monitoring Solutions] 
+NGRT4N is tailored to be loosely coupled with the underlying monitoring solution so to permit the support of various monitoring solutions. It currently supports Nagios, Groundwork, Centreon, Icinga, and most of Nagios-derived solutions.
+\item [Interactive Dashboard at a Glance]
+NGRT4N provides intuitive, friendly and easy to use graphical user interfaces (GUI). A dashboard consist of graphs, event console, and a statistics that allow operators to get real-time overview views on the health of the monitored systems along with their related business processes. The dashboard items which can represent a systems, devices, business processes, etc., are interactive so to allow operators to quickly get more detailed information on their statuses. 
+\item [Comprehensive Monitoring]
+NGRT4N permits to customize the messages that are shown on the console when events appeared. This allows operators to get more comprehensive messages, against the approach consisting in showing the native plug-in output which can be crabbed. For example, instead of getting a message like \emph{"DISK CRITICAL - free space: / 5483 MB (28\% inode=67\%)"} on your console (according to the Nagios plug-in), you can have a more comprehensive message like \emph{"The free space available in the server <hostname/IP> root partition is less than 30\%"}. 
+\item [Dashboards Builder] 
+NGRT4N allows you to build custom dashboards according to your business process, your operator user-role, and whatever is relevant to you. You can select what of the data collected by the monitoring system should be retrieved and shown on each dashboard. The content of the dashboard and all messages shown on event console are fully customizable through a build-in WYSIWYG editor. 
+\item [Secure Access to Monitoring Data]
+On the one hand, the access to the NGRT4N console is subjected to two authentication mechanisms. On the other hand, operator workstations communicate with the monitoring server through a valid ssh connexion, thereby leveraging the strong security capabilities enabled by SSH.  On the other hand NGRT4N provides a built-in authentication mechanism. 
+\end{description}
+
+
+\subsection{User Interfaces}
+A dashboard consists of four main components: an Event Console, a Tree and a Graph Explorers (that enable in-depth exploration), a Statistics Pane that allow you to get a quick overview on the health monitored system, while being able to access more detailed information concerning the health of each monitored components (systems, devices, business processes, etc.).  
+
+
+\section{Integration Concepts}
+Here, we present the design NGRT4N of how it fits within a operational monitoring environment. This is primarily intended for administrators, but may be useful for operators and decisional staffs.
+ 
+\subsection{Design}
+In order to reduce the integration dependencies and constraints, NGRT4N has been designed to be loosely coupled with the monitoring solutions and any other tool.  As introduced on the Figure below, it relies on the database or file in which the status data collected by the monitoring engine are stored . In the case of Nagios-derived solutions including Nagios it self, Centreon, Groundwork Monitor, Icinga, etc., NGRT4N relies on the file named \emph{status.dat}.
+
+The dashboards shown on operator consoles are based on XML configuration files. Each console and its related dashboard depend on a single XML file that specifies what data will be retrieved and shown the dashboard. 
+
+NGRT4N is coupled with the monitoring solution through an internal solution-aware \emph{Broker}. The broker is in charge to access the status database periodically to retrieve the items specified through the configuration file. It is the only component that depends on the internal structure of the monitoring solution. The interval of retrieving data is five minutes by default, but can be changed by administrators to fill your monitoring needs. 
+
+When NGRT4N is suitably configured with the monitoring system, the dashboard builder can extract data in the status database to easy the selection of the data to show on dashboards. This features is useful to avoid erroneous selections due invalid references to the  data collected by the underlying monitoring system.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=6in,height=4in]{images/software-integration.png}
+\caption{Architecture of NGRT4N fiting with the monitoring solution}
+\end{figure} 
+
+\subsection{Integration in a Monitoring Environment}
+A typical model of integrating NGRT4N within a monitoring environment is shown on the Figure below. In this model, the NGRT4N stack is installed on the monitoring server and is accessible to users (on workstations) via a X forwarding mechanism. The X forwarding mechanism works upon a ssh tunnel connection between the server and the workstation. This requires to activate the X forwarding either in the ssh daemon (by setting \emph{ForwardX11 yes} in \emph{/etc/ssh/ssh_config}) or in the ssh connection command (\emph{ssh -X @server} or alternatively by setting \emph{ForwardX11 yes} in \emph{\$HOME/.ssh/config} ).   
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=5.5in]{images/physical-integration.png}
+\caption{Typical use case for integreting NGRT4N within a monitoring environment}
+\end{figure}
+

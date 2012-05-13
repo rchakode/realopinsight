@@ -1,0 +1,40 @@
+/*
+ * SNavSvNavigatorTree.h
+ *
+ *  Created on: 10 juin 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVSVNAVIGATORTREE_H_
+#define SNAVSVNAVIGATORTREE_H_
+
+#include "SNavBase.hpp"
+
+
+
+class SNavSvNavigatorTree : public QTreeWidget
+{
+	Q_OBJECT
+
+public:
+	SNavSvNavigatorTree(const bool & =false, QWidget* = 0 );
+    static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
+	void update(SNavStruct * & _snav_struct) ;
+
+	static const QString rootID ;
+	SNavStruct* ptr2MainStruct ;
+
+signals:
+	void treeNodeMoved( QString _node_id ) ;
+
+protected:
+	void showEvent(QShowEvent *) ;
+	void dropEvent(QDropEvent *) ;
+	void startDrag(Qt::DropActions)  ;
+
+private:
+	QString selectedNode ;
+
+};
+
+#endif /* SNAVSVNAVIGATORTREE_H_ */

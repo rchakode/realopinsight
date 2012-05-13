@@ -1,0 +1,42 @@
+#!/bin/bash
+# -------------------------------------------------------------------------- #
+# Copyright 2011, The NGRT4N Development Team (support@ngrt4n.com)           #
+#                                                                            #
+# Licensed by The NGRT4N Development Team; you may this software except in   #
+# compliance with the Terms of USE. You may obtain a up-to-date copy of  	 #
+# these terms at http://ngrt4n.com                                			 #
+#                                                                            #
+#                                                                            #
+# Unless required by applicable law or agreed to in writing, software        #
+# distributed under the License is distributed 'AS IS' with NO WARRANTY OF   #
+# ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS   #
+# FOR A PARTICULAR PURPOSE.  												 #
+#                            							 					 #
+# You may use, copy, print, and distribute the software a subject to the     #
+# following conditions:												         #
+#																			 #
+#   1. The software may be used, modified or altered solely for personal,    #
+#	   informational, non-commercial purposes;		 						 #
+#   3. Any copy of the software or part thereof must include all appro-	     #
+#      priate copyright and trademark notices.								 #
+#   4. The NGRT4N Development Team reserves the right to revoke such autho-  #
+#      rization at any time, and any such use shall be discontinued immedia- #
+#	   tely upon written notice from The NGRT4N Development Team.			 #
+#																			 #
+# Except as specifically set forth above, no part of this software may be    #
+# reproduced in any form or by any means without the prior written permission#
+# from The NGRT4N Development Team.				 							 #
+#----------------------------------------------------------------------------# 
+
+DOT=`which dot`
+
+if [ -z "${NGRT4N_HOME}" ]; then
+   NGRT4N_HOME=/opt/ngrt4n 
+fi
+
+if [ ! -z "$DOT" ] &&  [ -x $DOT ] ; then
+  	appname=`basename $0 | sed s,\.sh$,,`
+  	${NGRT4N_HOME}/bin/$appname\.bin $@
+else
+ echo "ERROR: graphviz binaries not found"
+fi

@@ -1,0 +1,90 @@
+/*
+ * SNavSvCreator.h
+ *
+ *  Created on: 10 juin 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVSVCREATOR_H_
+#define SNAVSVCREATOR_H_
+
+#include "SNavBase.hpp"
+#include "SNavParser.hpp"
+#include "SNavServiceEditor.hpp"
+#include "SNavSvNavigatorTree.hpp"
+#include "SNavSvConfigCreator.hpp"
+
+
+
+class SNavSvCreator: public QMainWindow
+{
+	Q_OBJECT
+
+public:
+	SNavSvCreator();
+	virtual ~SNavSvCreator( );
+
+	void load( const QString& );
+	QSize minimumSizeHint() const { 	return QSize(796, 640) ; }
+	QSize sizeHint() const { return QSize(796, 640) ; }
+
+
+public slots:
+	void newBusinessView(void);
+	void newNode(void);
+	void deleteNode(void);
+	void deleteNode(const QString & );
+	void open(void);
+	void save(void);
+	void saveAs(void);
+	int close( const bool & = true );
+	void fillEditorFromService( QTreeWidgetItem*);
+	void handleReturnPressed(void) ;
+	void handleSelectedNodeChanged( void ) ;
+	void handleTreeNodeMoved(QString) ;
+	void handleNodeTypeActivated(qint32) ;
+
+
+protected:
+	void contextMenuEvent( QContextMenuEvent * );
+	void closeEvent( QCloseEvent * ) ;
+
+
+private:
+
+qint32 hasToBeSaved ;
+QString openedFile ;
+QString selectedNode ;
+
+//QString statusFile ;
+QString selectedNodeId ;
+
+SNavSettings* settings ;
+SNavStruct* snavStruct ;
+QSplitter* mainSplitter ;
+MenuListT menuList ;
+SubMenuListT subMenuList ;
+
+SNavSvNavigatorTree* navigationTree;
+SNavServiceEditor* editor;
+QMenuBar* menuBar ;
+QToolBar* toolBar ;
+QMenu* nodeContextMenu ;
+
+void loadFile(const QString & );
+
+void saveInFile(const QString & ) ;
+
+bool updateServiceNode(NodeListT & , const QString & ) ;
+
+void loadMenu(void) ;
+
+void unloadMenu(void) ;
+
+void addEvents(void);
+
+void resize(const qint32 & , const qint32 &, const qint32 &, const qint32 &);
+
+};
+
+#endif /* SNAVSVCREATOR_H_ */

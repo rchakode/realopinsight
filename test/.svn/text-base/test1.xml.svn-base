@@ -1,0 +1,138 @@
+<ServiceView id="root">
+	<Name>E-Commerce</Name>
+	<UnderlyingServices>billing,S005746719,web</UnderlyingServices>
+	<Service id="jboss" type="0" priority="0">
+		<Name>JBoss Server</Name>
+		<Icon>Application server</Icon>
+		<Parent>application</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>jbossRespTime,jbossCacheLoad</UnderlyingServices>
+	</Service>
+	<Service id="jbossRespTime" type="1" priority="1">
+		<Name>Response Time</Name>
+		<Icon>Business Service (default)</Icon>
+		<Parent>jboss</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description></Description>
+		<AlarmMsg>The response time of JBoss Server is too high, risking to generate a poor quality of service</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>localhost/PING</UnderlyingServices>
+	</Service>
+	<Service id="hardware" type="0" priority="0">
+		<Name>Hardware</Name>
+		<Icon>Business Service (default)</Icon>
+		<Parent>billing</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description>Healthy of servers, routers, switches, load-balancers, etc.
+		</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>router42UnAvail,S095151751</UnderlyingServices>
+	</Service>
+	<Service id="router42UnAvail" type="1" priority="0">
+		<Name>Frontend</Name>
+		<Icon>Linux</Icon>
+		<Parent>hardware</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description></Description>
+		<AlarmMsg>The Router 42 is not Accessible</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>localhost</UnderlyingServices>
+	</Service>
+	<Service id="billing" type="0" priority="0">
+		<Name>Billing</Name>
+		<Icon>Business Service (default)</Icon>
+		<Parent>root</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description>All process of billing</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>hardware,application</UnderlyingServices>
+	</Service>
+	<Service id="S005746719" type="0" priority="1">
+		<Name>Finance</Name>
+		<Icon>Business Service (default)</Icon>
+		<Parent>root</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description>Infrastructure require to make financial accounting</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices></UnderlyingServices>
+	</Service>
+	<Service id="apacheDown" type="1" priority="0">
+		<Name>Apache Server</Name>
+		<Icon>Web server</Icon>
+		<Parent>web</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description></Description>
+		<AlarmMsg>The Apache Service is down. The web access to the billing platform is therefore unavailable</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>localhost/Root Partition</UnderlyingServices>
+	</Service>
+	<Service id="S095151751" type="1" priority="0">
+		<Name>Switch 2</Name>
+		<Icon>Switch</Icon>
+		<Parent>hardware</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description>Backbone switch</Description>
+		<AlarmMsg>There is issue on the backbone swicth </AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>localhost/Total Processes</UnderlyingServices>
+	</Service>
+	<Service id="apacheUnAvail" type="1" priority="0">
+		<Name>MySQL Server</Name>
+		<Icon>Database server</Icon>
+		<Parent>web</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description></Description>
+		<AlarmMsg>The Apache Server does not response. The web access to the billing platform is could be not possible.</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>localhost/Current Load</UnderlyingServices>
+	</Service>
+	<Service id="application" type="0" priority="0">
+		<Name>Application</Name>
+		<Icon>Business Service (default)</Icon>
+		<Parent>billing</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description>Healthy of the application platform require to provide billing
+		</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>jboss</UnderlyingServices>
+	</Service>
+	<Service id="jbossCacheLoad" type="1" priority="0">
+		<Name>JBoss Cache</Name>
+		<Icon>Log file</Icon>
+		<Parent>jboss</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description></Description>
+		<AlarmMsg>The JBoss Server's cache is too loaded</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>localhost/Current Load</UnderlyingServices>
+	</Service>
+	<Service id="web" type="0" priority="0">
+		<Name>web</Name>
+		<Icon>Business Service (default)</Icon>
+		<Parent>root</Parent>
+		<Status>3</Status>
+		<PropagationRule></PropagationRule>
+		<Description>Web Accessibility to the billing platform</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<UnderlyingServices>apacheDown,apacheUnAvail</UnderlyingServices>
+	</Service>
+</ServiceView>

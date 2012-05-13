@@ -1,0 +1,30 @@
+/*
+ * SNavPieChart.hpp
+ *
+ *  Created on: 25 sept. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNavPieChart_HPP_
+#define SNavPieChart_HPP_
+
+#include "SNavPieChartItem.hpp"
+#include "SNavStatsLegend.hpp"
+
+class SNavPieChart : public  QWidget
+{
+public:
+
+	SNavPieChart(const QRectF &  = QRectF(50, 50, 150, 100), QWidget* = 0 );
+	virtual ~SNavPieChart();
+
+	void update(const CheckStatusCountT & _check_status_count, const qint32 _check_count, QString & ) ;
+
+private:
+	QRectF boundingRect ;
+	QMap<qint32, SNavPieChartItem*> slices ;
+
+	SNavStatsLegend* legend ;
+};
+
+#endif /* SNavPieChart_HPP_ */

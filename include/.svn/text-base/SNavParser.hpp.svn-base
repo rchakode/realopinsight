@@ -1,0 +1,45 @@
+/*
+ * SNavParseSVConfig.h
+ *
+ *  Created on: 9 juin 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVPARSESVCONFIG_H_
+#define SNAVPARSESVCONFIG_H_
+
+#include "SNavBase.hpp"
+#include "SNavSvNavigatorTree.hpp"
+
+
+
+class SNavParser
+{
+
+public:
+	SNavParser() ;
+	~SNavParser() ;
+
+	bool parseSvConfig(const QString &, SNavStruct &) ;
+
+	bool parseServiceStatus(const QString &, NagiosChecksT &);
+
+	QString getDotGraphFile(void) const { return graphFilename; }
+
+
+private:
+	static const QString dotFileHeader;
+	static const QString dotFileFooter;
+
+	QString graphFilename;
+
+	void buildNodeTree( NodeListT &, TreeNodeItemListT & ) ;
+
+	void updateNodeHierachy( NodeListT &, QString & ) ;
+
+	void saveCoordinatesDotFile(const QString& );
+
+	bool checkWhetherHasToContinue(const QString &, QString & );
+};
+
+#endif /* SNAVPARSESVCONFIG_H_ */

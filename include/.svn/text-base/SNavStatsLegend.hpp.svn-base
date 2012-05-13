@@ -1,0 +1,33 @@
+/*
+ * SNavStats.hpp
+ *
+ *  Created on: 26 sept. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVSTATSLEGEND_HPP_
+#define SNAVSTATSLEGEND_HPP_
+#include "SNavBase.hpp"
+
+class SNavStatsLegend : public QWidget
+{
+public:
+	SNavStatsLegend(const QPoint & _top_corner =  QPoint(0, 0), QWidget * _parent = 0);
+
+	QSize minimumSizeHint() const;
+	QSize sizeHint() const;
+
+
+protected:
+void paintEvent(QPaintEvent *event);
+
+
+private :
+	QPainterPath normal ;
+	QPainterPath warning ;
+	QPainterPath critical ;
+	QPainterPath unknown ;
+	QPoint leftTopCorner ;
+};
+
+#endif /* SNAVSTATSLEGEND_HPP_ */

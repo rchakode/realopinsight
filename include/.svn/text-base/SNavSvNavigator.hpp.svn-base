@@ -1,0 +1,102 @@
+/*
+ * SNav.h
+ *
+ *  Created on: 10 juin 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAV_H_
+#define SNAV_H_
+
+#include "SNavBase.hpp"
+#include "SNavStats.hpp"
+#include "SNavParser.hpp"
+#include "SNavWebKit.hpp"
+#include "SNavMsgPanel.hpp"
+#include "SNavGraphView.hpp"
+#include "SNavSvNavigatorTree.hpp"
+#include "SNavPreferencesDialog.hpp"
+
+
+class SNavSvNavigator : public QMainWindow
+{
+	Q_OBJECT
+
+public:
+	SNavSvNavigator( const qint32 & _user_role = OP_USER_ROLE, const QString & = "", QWidget* = 0);
+
+	virtual ~SNavSvNavigator();
+
+	void load( void );
+	void resize(void);
+
+
+public slots:
+	int monitor(void) ;
+	void updateNodeStatus( QString ) ;
+	void expandNode( const QString &, const bool &, const qint32 &) ;
+	void centerGraphOnNode( const QString & _node_id = "") ;
+	void filterNodeRelatedMsg(void) ;
+	void filterNodeRelatedMsg( const QString & ) ;
+	void acknowledge(void) ;
+	void tabChanged( int ) ;
+	void hideChart(void) ;
+	void centerGraphOnNode( QTreeWidgetItem * ) ;
+	void handleChangePasswordAction(void) ;
+	void handleChangeMonitoringSettingsAction(void) ;
+
+
+signals:
+	void hasToBeUpdate( QString ) ;
+	void sortEventConsole(void) ;
+
+
+protected :
+	void closeEvent(QCloseEvent * ) ;
+	void contextMenuEvent(QContextMenuEvent * ) ;
+	void timerEvent(QTimerEvent *) ;
+
+
+private:
+
+QString configFile ;
+QString openedFile ;
+QString webUIUrl ;
+QString selectedNodeId ;
+QString statsPanelTooltip ;
+qint32 userRole ;
+qint32 updateInterval ;
+qint32 timerId ;
+SNavSettings* settings ;
+SNavStruct* snavStruct ;
+SNavStats* statsPanel ;
+SNavMsgPanel* filteredMsgPanel ;
+QSplitter* mainSplitter ;
+QSplitter* rightSplitter ;
+QTabWidget * topRightPanel ;
+QTabWidget* bottomRightPanel ;
+SNavWebKit* webBrowser ;
+SNavGraphView* graphView ;
+SNavSvNavigatorTree* navigationTree ;
+SNavPreferencesDialog* monPrefWindow ;
+SNavPreferencesDialog* changePasswdWindow ;
+SNavMsgPanel* msgPanel ;
+QSize msgPanelSize ;
+QMenuBar* menuBar;
+QToolBar* toolBar ;
+QMenu* nodeContextMenu;
+MenuListT menuList;
+SubMenuListT subMenuList;
+SubMenuListT contextMenuList;
+
+
+void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );
+void setNodeToolTip(QString & _tool_tip, const NodeListT::iterator & _node) ;
+void updateAlarmMsg(NodeListT::iterator &);
+void loadMenus(void);
+void unloadMenus(void);
+void addEvents(void);
+
+};
+
+#endif /* SNAV_H_ */

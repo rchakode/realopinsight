@@ -1,0 +1,38 @@
+/*
+ * SNavAuth.hpp
+ *
+ *  Created on: 9 sept. 2010
+ *      Author: chakode
+ */
+
+#ifndef SNAVAUTH_HPP_
+#define SNAVAUTH_HPP_
+#include "SNavBase.hpp"
+
+
+class SNavAuth : public QDialog
+{
+
+	Q_OBJECT
+
+public:
+	SNavAuth();
+	virtual ~SNavAuth();
+
+public slots:
+void cancel(void) ;
+void authentificate(void) ;
+
+
+private:
+	QDialogButtonBox* buttonBox;
+	QLineEdit* login;
+	QLineEdit* password;
+	QGridLayout* layout;
+	SNavSettings* settings;
+
+	void addEvents(void);
+
+};
+
+#endif /* SNAVAUTH_HPP_ */

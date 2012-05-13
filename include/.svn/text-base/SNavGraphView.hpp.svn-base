@@ -1,0 +1,93 @@
+/*
+ * GraphView.h
+ *
+ *  Created on: 7 juin 2010
+ *      Author: chakode
+ */
+
+#ifndef GRAPHVIEW_H_
+#define GRAPHVIEW_H_
+
+#include "SNavBase.hpp"
+#include "SNavStats.hpp"
+#include "SNavSvNavigatorTree.hpp"
+
+
+class SNavGraphView : public QGraphicsView
+{
+	Q_OBJECT
+
+public:
+	SNavGraphView(qreal = 72, QWidget* = 0 ) ;
+	virtual ~SNavGraphView() ;
+
+	bool load( const QString&, const NodeListT& ) ;
+	void updateNode(const NodeListT::iterator &, const QString & _tool_tip) ;
+	void updateNodeColor(const NodeListT::iterator & ) ;
+	void setNodeToolTip( const NodeT &  ) ;
+	void setNodeVisible( const QString &, const QString &, const bool &, const qint32 &) ;
+	void scaleToFitViewPort(void) ;
+	void updateStatsPanel(SNavStats * _stats_panel, const QString &  ) ;
+	void setStatsPanelPos(void) ;
+
+	inline void centerOnNode( const QString & _node_id ) {
+		if (! _node_id.isEmpty() ) centerOn( gnodesList[_node_id].label ) ;
+	}
+
+	inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){
+		return graphScene->itemAt( mapToScene( mapFromGlobal(pos) ) ) ;
+	}
+
+	inline QGraphicsItem* nodeAt(QPoint pos){
+		return graphScene->itemAt( mapToScene( pos ) ) ;
+	}
+
+
+public slots:
+void capture(void) ;
+void zoomIn();
+void zoomOut();
+bool hideChart(void) ;
+
+signals:
+void mouseIsOverNode( QString ) ;
+void expandNode( QString, bool, qint32 ) ;
+void rightClickOnItem( QGraphicsItem *, QPoint pos ) ;
+
+
+protected:
+void mouseReleaseEvent( QMouseEvent * ) ;
+void mouseDoubleClickEvent( QMouseEvent * ) ;
+void wheelEvent( QWheelEvent * ) ;
+void resizeEvent ( QResizeEvent * ) ;
+void showEvent(QShowEvent * ) ;
+void scrollContentsBy ( int dx, int dy ) ;
+
+
+private:
+
+QGraphicsScene* graphScene ;
+QGraphicsProxyWidget* statsPanelItem ;
+QPoint statsPanelPos ;
+
+QString svgGraphFile ;
+QString coodinatesGraphFile ;
+
+GNodeListT gnodesList ;
+GEdgeListT edgesList ;
+
+IconMapT iconMap ;
+
+qreal scalingRatio ;
+qreal portViewScalingRatio ;
+qreal statsPanelScaleRatio ;
+bool isAjustedStatsPanelSize ;
+
+void drawGraph(const NodeListT &) ;
+void drawNode(const NodeT & ) ;
+void setEdgePath(const QString &, const QString &, QPainterPath & ) ;
+void setNodePos(const QString & , const QPointF & ) ;
+void ajustStatsPanelSize(void) ;
+};
+
+#endif /* GRAPHVIEW_H_ */

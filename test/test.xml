@@ -1,0 +1,247 @@
+<ServiceView id="root">
+	<Name>E-Commerce</Name>
+	<SubServices>S204554238,S204749162</SubServices>
+	<Service id="S210039203" type="1" priority="-1">
+		<Name>JavaBeans</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Swap Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S210023770" type="1" priority="-1">
+		<Name>Memory Usage</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Swap Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S211323875" type="1" priority="-1">
+		<Name>Requests/Minute</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S205810590" type="0" priority="-1">
+		<Name>Oracle</Name>
+		<Icon>Database server</Icon>
+		<Description>Orable 10G database</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S210417722,S210532196,S210549517</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S211353580" type="1" priority="-1">
+		<Name>IdleWorkers/Server</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Current Users</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S204942501" type="0" priority="-1">
+		<Name>Application</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S205810590,S205846311</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S205035687" type="0" priority="-1">
+		<Name>linksys-srw224p</Name>
+		<Icon>Router</Icon>
+		<Description>Backbone Router. Cisco 12000 Series Internet Routers</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S210829634,S210843930,S211043934</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S210829634" type="1" priority="-1">
+		<Name>Avalaibility</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="root" type="0" priority="-1">
+		<Name>E-Commerce</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S204554238,S204749162</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S211422069" type="1" priority="-1">
+		<Name>Requests/minute</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Total Processes</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S204554238" type="0" priority="2">
+		<Name>Billing</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description>Service de facturation et de paiment par carte bancaire</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S204942501,S205025927,S211231218</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S215043711" type="1" priority="0">
+		<Name>Avalaibility</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>win-server01</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S211231218" type="0" priority="-1">
+		<Name>Apache</Name>
+		<Icon>Web server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S211323875,S211353580,S211422069,S221252318</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S205025927" type="0" priority="-1">
+		<Name>Hardware</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S205035687,S205142473</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S215159093" type="1" priority="0">
+		<Name>Memory Used</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>win-server01/Memory Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S210549517" type="1" priority="-1">
+		<Name>Cpu Usage</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Current Load</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S210417722" type="1" priority="-1">
+		<Name>Disk Space Used</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg>The free space available on the root partition of the server {hostname} is less than {threshold}</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Root Partition</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S210843930" type="1" priority="-1">
+		<Name>Response Time</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S204749162" type="0" priority="0">
+		<Name>Customer Portal</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S213839994</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S205142473" type="0" priority="-1">
+		<Name>win-server01</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description>Active Directory Server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S215043711,S215112435,S215159093</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S210127884" type="1" priority="-1">
+		<Name>JDBC connectivity</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S205846311" type="0" priority="-1">
+		<Name>JBoss</Name>
+		<Icon>Application server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S210023770,S210039203,S210127884</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S215112435" type="1" priority="0">
+		<Name>Disk Space Used</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>win-server01/C:\ Drive Space</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S211043934" type="1" priority="-1">
+		<Name>Load</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p/Port 1 Bandwidth Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S221252318" type="1" priority="-1">
+		<Name>Avalaibility</Name>
+		<Icon>Log file</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S213839994" type="1" priority="-1">
+		<Name>Firewall</Name>
+		<Icon>Firewall</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p/Port 1 Bandwidth Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S210532196" type="1" priority="-1">
+		<Name>Virtual Memory</Name>
+		<Icon>Business Service (default)</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>songish/Swap Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+</ServiceView>
