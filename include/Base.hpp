@@ -37,7 +37,7 @@ const QString ABOUT_MSG = "NGRT4N\n\n"
 const QString COMPAGNY_NAME = "ITSoftbyrc.com";
 const QString APP_SHORT_NAME = "NGRT4N";
 const QString APP_NAME = APP_SHORT_NAME + " :: New Generation Reporting Tool For Nagios";
-const QString CONFIG_FILE = "/etc/" + APP_SHORT_NAME.toLower() + ".cfg" ;
+const QString CONFIG_FILE = "/var/lib/" + APP_SHORT_NAME.toLower() + "/db" ;
 
 const qint32 TREE_NODE_ID_COLUMN = 1 ;
 const qint32 NODE_ID_DATA_INDEX = 0;			// Id of data field used to stored nodes ids in the graph

@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = build/bin/ngrt4n.bin 
+TARGET = build/usr/bin/ngrt4n
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc

@@ -1,0 +1,27 @@
+This file gives an overview of how to setup NGRT4N.
+
+First, It's important to note that NGRT4N is released under the terms 
+the GPL License (version 3). Prior to the installation, you may need 
+to read the LICENSE file. 
+
+REQUIREMENTS
+Build Dependencies
+ - g++
+ - Qt >= 4.6.3. qmake and at least the following modules must be installed
+   * QtCore
+   * QtGui
+   * QtSvg
+   * QtWebKit
+   * QtXml
+
+Runtime Librairies
+ - graphviz
+ 
+INSTALLATION
+  $ tar zxf ngrt4n-X.Y.Y.tar.gz  # when X.Y.Z refers to the version
+  $ cd ngrt4n-X.Y
+  $ sudo ./install.sh
+  
+When the installation is completed, check the documentation located in the 
+"doc" directory for further processing. A fresh version of this documentation 
+with lastest updates is also available online (http://ngrt4n.com).
