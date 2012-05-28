@@ -31,7 +31,7 @@
 #include "MsgPanel.hpp"
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
-#include "PreferencesDialog.hpp"
+#include "Preferences.hpp"
 
 
 class SvNavigator : public QMainWindow
@@ -39,7 +39,7 @@ class SvNavigator : public QMainWindow
 	Q_OBJECT
 
 public:
-	SvNavigator( const qint32 & _user_role = OP_USER_ROLE, const QString & = "", QWidget* = 0);
+	SvNavigator( const qint32 & _user_role = Auth::OP_USER_ROLE, const QString & = "", QWidget* = 0);
 
 	virtual ~SvNavigator();
 
@@ -96,8 +96,8 @@ QTabWidget* bottomRightPanel ;
 WebKit* webBrowser ;
 GraphView* graphView ;
 SvNavigatorTree* navigationTree ;
-PreferencesDialog* monPrefWindow ;
-PreferencesDialog* changePasswdWindow ;
+Preferences* monPrefWindow ;
+Preferences* changePasswdWindow ;
 MsgPanel* msgPanel ;
 QMenuBar* menuBar;
 QToolBar* toolBar ;
@@ -106,10 +106,12 @@ QSize msgPanelSize ;
 MenuListT menuList;
 SubMenuListT subMenuList;
 SubMenuListT contextMenuList;
+string rpcServerUrl ;
+string getServiceInfoMethod ;
 
 
 void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );
-void setNodeToolTip(QString & _tool_tip, const NodeListT::iterator & _node) ;
+QString getNodeToolTip(const NodeT & _node) ;
 void updateAlarmMsg(NodeListT::iterator &);
 void loadMenus(void);
 void unloadMenus(void);

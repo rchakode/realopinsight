@@ -21,7 +21,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/Stats.hpp"
+#include "Stats.hpp"
 
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)

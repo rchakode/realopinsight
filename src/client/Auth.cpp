@@ -21,7 +21,14 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/Auth.hpp"
+#include "Auth.hpp"
+#include "Preferences.hpp"
+#include "ns.hpp"
+
+const QString Auth::ADM_USER_NAME = QString(ngrt4n::APP_NAME.c_str()).toLower() + "_adm" ;
+const QString Auth::OP_USER_NAME = QString(ngrt4n::APP_NAME.c_str()).toLower()+ "_op" ;
+const qint32 Auth::ADM_USER_ROLE = 100 ;
+const qint32 Auth::OP_USER_ROLE = 101 ;
 
 Auth::Auth()
 {
@@ -43,7 +50,7 @@ Auth::Auth()
 			layout->addWidget(buttonBox, line, 1);
 
 	addEvents();
-	setWindowTitle( "Authentification - " + APP_SHORT_NAME );
+	setWindowTitle( "Authentification - " + QString(ngrt4n::APP_NAME.c_str()) );
 
 	settings = new Settings();
 }
@@ -70,7 +77,7 @@ void Auth::authentificate(void)
 	user_passwd = QCryptographicHash::hash(password->text().toAscii(),
 			QCryptographicHash::Md5) ;
 
-	root_passwd =  settings->value(ADM_PASSWD_KEY).toString() ;
+	root_passwd =  settings->value(Preferences::ADM_PASSWD_KEY).toString() ;
 
 	if(	! root_passwd.isEmpty()
 			&& user_name == ADM_USER_NAME
@@ -81,7 +88,7 @@ void Auth::authentificate(void)
 	}
 	else
 	{
-		op_passwd =  settings->value(OP_PASSWD_KEY).toString() ;
+		op_passwd =  settings->value(Preferences::OP_PASSWD_KEY).toString() ;
 
 		if( ! op_passwd.isEmpty()
 				&& user_name == OP_USER_NAME
@@ -92,7 +99,7 @@ void Auth::authentificate(void)
 		else
 		{
 			QMessageBox::warning(this,
-					APP_SHORT_NAME,
+					QString(ngrt4n::APP_NAME.c_str()),
 					tr("Authentifcation failed. Wrong username or password"),
 	                QMessageBox::Ok) ;
 		}

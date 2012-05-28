@@ -21,7 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/ServiceEditor.hpp"
+#include "ServiceEditor.hpp"
+#include "Preferences.hpp"
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
 : QWidget( _parent ),
@@ -102,14 +103,15 @@ ServiceEditor::~ServiceEditor()
 void ServiceEditor::loadStatusFile(void)
 {
 	Parser parser ;
-	NagiosChecksT nagios_checks ;
-	parser.parseServiceStatus(settings->value(STATUS_FILE_KEY).toString(), nagios_checks);
-	setCheckListField( nagios_checks );
+	MonitorBroker::NagiosChecksT checks ;
+	//TODO
+	//parser.parseServiceStatus(settings->value(Preferences::STATUS_FILE_KEY).toString(), checks);
+	setCheckListField( checks );
 }
 
-void ServiceEditor::setCheckListField(const NagiosChecksT& _nagios_checks)
+void ServiceEditor::setCheckListField(const MonitorBroker::NagiosChecksT& _nagios_checks)
 {
-	NagiosChecksT::const_iterator check_it ;
+	MonitorBroker::NagiosChecksT::const_iterator check_it ;
 	QStringList check_id_list ;
 
 	checkField()->clear() ;
@@ -118,7 +120,7 @@ void ServiceEditor::setCheckListField(const NagiosChecksT& _nagios_checks)
 
 	for(check_it = _nagios_checks.begin(); check_it != _nagios_checks.end(); check_it++)
 	{
-		check_id_list.push_back( check_it->id ) ;
+		check_id_list.push_back( QString(check_it->second.id.c_str()) ) ;
 	}
 
 	check_id_list.sort() ;

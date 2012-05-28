@@ -29,7 +29,7 @@
 #include "ServiceEditor.hpp"
 #include "SvNavigatorTree.hpp"
 #include "SvConfigCreator.hpp"
-#include "PreferencesDialog.hpp"
+#include "Preferences.hpp"
 
 
 
@@ -38,7 +38,7 @@ class SvCreator: public QMainWindow
 	Q_OBJECT
 
 public:
-	SvCreator(const qint32 & _user_role = OP_USER_ROLE);
+	SvCreator(const qint32 & _user_role = Auth::OP_USER_ROLE);
 	virtual ~SvCreator( );
 
 	void load( const QString& );

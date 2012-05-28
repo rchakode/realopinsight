@@ -27,6 +27,8 @@
 #include <QtXml>
 #include <QtGui>
 #include <QtWebKit>
+#include <QSettings>
+#include "core/MonitorBroker.hpp"
 
 const QString ABOUT_MSG = "NGRT4N\n\n"
 		"Version: 1.0\n"
@@ -34,39 +36,12 @@ const QString ABOUT_MSG = "NGRT4N\n\n"
 		"(c) Copyright 2011 NGRT4N Development Team.\n"
 		"Visit http://www.ngrt4n.com";
 
-const QString COMPAGNY_NAME = "ITSoftbyrc.com";
-const QString APP_SHORT_NAME = "NGRT4N";
-const QString APP_NAME = APP_SHORT_NAME + " :: New Generation Reporting Tool For Nagios";
-const QString CONFIG_FILE = "/var/lib/" + APP_SHORT_NAME.toLower() + "/db" ;
-
 const qint32 TREE_NODE_ID_COLUMN = 1 ;
 const qint32 NODE_ID_DATA_INDEX = 0;			// Id of data field used to stored nodes ids in the graph
 
-const QString ADM_USER_NAME = APP_SHORT_NAME.toLower() + "_adm" ;
-const QString OP_USER_NAME = APP_SHORT_NAME.toLower()+ "_op" ;
-
-const QString NAGIOS_URL_KEY = "/Monitor/nagiosHome" ;
-const QString UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
-const QString STATUS_FILE_KEY = "/Monitor/statusFile" ;
-const QString ADM_UNSERNAME_KEY = "/Auth/rootUsername" ;
-const QString OP_UNSERNAME_KEY = "/Auth/opUsername" ;
-const QString ADM_PASSWD_KEY = "/Auth/rootPasswd" ;
-const QString OP_PASSWD_KEY = "/Auth/opPasswd" ;
-
-const qint32 ADM_USER_ROLE = 100 ;
-const qint32 OP_USER_ROLE = 101 ;
-
 const qint32 SERVICE_NODE = 0 ;
 const qint32 ALARM_NODE = 1 ;
-
-const qint32 DEFAULT_UPDATE_INTERVAL = 60 ;
 const qint32 MAX_NODE_NAME = 24 ;
-
-const qint32 NAGIOS_OK = 0 ;
-const qint32 NAGIOS_WARNING = 1 ;
-const qint32 NAGIOS_CRITICAL = 2 ;
-const qint32 NAGIOS_UNKNOWN = 3 ;
-const qint32 UNSET_STATUS = 4 ;
 
 const QColor OK_COLOR =  Qt::green ;
 const QColor WARNING_COLOR = Qt::yellow ;
@@ -141,14 +116,6 @@ typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
 
-typedef struct _NagiosCheckT{
-	QString id;
-	QString check_command ;
-	QString last_state_change ;
-	QString alarm_msg ;
-	qint32 status ;
-}NagiosCheckT;
-
 typedef struct _NodeT {
 	QString id;
 	QString name ;
@@ -162,10 +129,8 @@ typedef struct _NodeT {
 	QString notification_msg ;
 	qint32 status ;
 	QString child_nodes ;
-	NagiosCheckT check ;
+	MonitorBroker::NagiosCheckT check ;
 } NodeT;
-
-typedef QHash<QString, NagiosCheckT> NagiosChecksT ;
 
 typedef QHash<QString, NodeT> NodeListT ;
 

@@ -21,7 +21,7 @@
  */
 
 
-#include "../include/PieChartItem.hpp"
+#include "PieChartItem.hpp"
 
 PieChartItem::PieChartItem(const QRectF & _bounding_rect,
 		const qreal & _start_angle, const qreal & _proportion, const QColor & _color, QWidget * _parent)

@@ -20,18 +20,20 @@
 # along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.		   #
 #--------------------------------------------------------------------------#
  */
-
-#include "../include/Auth.hpp"
-#include "../include/SvNavigator.hpp"
-#include "../include/SvConfigCreator.hpp"
+#include "core/ns.hpp"
+#include "client/Auth.hpp"
+#include "client/SvNavigator.hpp"
+#include "client/SvConfigCreator.hpp"
 
 int main(int argc, char **argv)
 {
+	ngrt4n::initApp() ;
+
 	QString  module, file, usage ;
 	int c, user_role ;
 	QApplication* app = new QApplication(argc, argv) ;
 
-	usage = "usage: " + APP_SHORT_NAME.toLower() + " [OPTION] [view_config]\n"
+	usage = "usage: " + QString(ngrt4n::APP_NAME.c_str()).toLower() + " [OPTION] [view_config]\n"
 			"Options: \n"
 			"	-c\n"
 			"	   Launch the configuration utility\n"
@@ -44,7 +46,7 @@ int main(int argc, char **argv)
 
 	QIcon app_icon (":images/appicon.png") ;
 	app->setWindowIcon( app_icon ) ;
-	app->setApplicationName( APP_NAME ) ;
+	app->setApplicationName( QString(ngrt4n::APP_NAME.c_str()) ) ;
 
 	if(argc > 3)
 	{
@@ -81,14 +83,17 @@ int main(int argc, char **argv)
 
 	Auth authentification;
 	user_role = authentification.exec() ;
-	if( user_role != ADM_USER_ROLE && user_role != OP_USER_ROLE ) exit( 1 ) ;
+	if( user_role != Auth::ADM_USER_ROLE && user_role != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
 	if(module == "dashboard")
 	{
 		if(file == "")
 		{
 			qDebug() << "invalid file !" ;
-			QMessageBox::warning(0, "Error | " + APP_SHORT_NAME, "No file specified to load. The system will exit !", QMessageBox::Ok);
+			QMessageBox::warning(0,
+					"Error | " + QString(ngrt4n::APP_NAME.c_str()),
+					"No file specified to load. The system will exit !",
+					QMessageBox::Ok);
 			exit (1) ;
 		}
 		SvNavigator* sv_nav = new SvNavigator( user_role, file ) ;
@@ -101,8 +106,8 @@ int main(int argc, char **argv)
 	}
 	else if(module == "config")
 	{
-		PreferencesDialog* update_settings = new PreferencesDialog(user_role, PreferencesDialog::ChangeMonitoringSettings) ;
-		PreferencesDialog* change_passwd = new PreferencesDialog(user_role, PreferencesDialog::ChangePassword) ;
+		Preferences* update_settings = new Preferences(user_role, Preferences::ChangeMonitoringSettings) ;
+		Preferences* change_passwd = new Preferences(user_role, Preferences::ChangePassword) ;
 		update_settings->exec() ;
 		change_passwd->exec() ;
 		exit(0) ;

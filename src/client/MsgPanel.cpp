@@ -21,7 +21,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/MsgPanel.hpp"
+#include "MsgPanel.hpp"
 
 const qint16 MsgPanel::msgPanelColumnCount = 7;
 
@@ -63,23 +63,23 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	setSortingEnabled( false ) ;
 
-	i_time = _node_it->check.last_state_change.toLong(), s_time = ctime(&i_time) ;
-	str_list = _node_it->check.id.split("/") ;
+	i_time = atol(_node_it->check.last_state_change.c_str()) ; s_time = ctime(&i_time) ;
+	str_list = QString(_node_it->check.id.c_str()).split("/") ;
 
 	line[0] = s_time.replace("\n", "") ;
 	line[1] = Utils::statusToString(_node_it->status) ;
 	line[2] = ( str_list.length() )?  str_list[0] : "" ;
 	line[3] = " " + _node_it->name ;
 
-	if( _node_it->status == NAGIOS_OK ){
-		line[4] = _node_it->notification_msg.length() ? _node_it->notification_msg :  _node_it->check.alarm_msg ;
+	if( _node_it->status == MonitorBroker::NAGIOS_OK ){
+		line[4] = ( _node_it->notification_msg.trimmed().length() != 0) ? _node_it->notification_msg : QString(_node_it->check.alarm_msg.c_str()) ;
 	}
 	else {
-		line[4] = _node_it->alarm_msg.length() ? _node_it->alarm_msg :  _node_it->check.alarm_msg ;
+		line[4] = ( _node_it->alarm_msg.trimmed().length() != 0 )? _node_it->alarm_msg :  QString(_node_it->check.alarm_msg.c_str()) ;
 	}
 
 	line[id_column] = _node_it->id ;
-	line[date_column] = _node_it->check.last_state_change ;
+	line[date_column] = "";
 
 	i = 0 ;
 	row_count = rowCount();
@@ -103,7 +103,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 		setCellWidget(0, i, new QLabel( "" ) ) ;
 		row_items[i] = new QTableWidgetItem(line[i]) ;
 		setItem(0, i, row_items[i]) ;
-		if( _node_it->status != NAGIOS_OK )
+		if( _node_it->status != MonitorBroker::NAGIOS_OK )
 		{
 			item(0, i)->setBackground(HIGHLIGHT_COLOR) ;
 		}
@@ -111,22 +111,22 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	switch(_node_it->status)
 	{
-	case NAGIOS_OK:
+	case MonitorBroker::NAGIOS_OK:
 		item(0, 1)->setBackground(QBrush(OK_COLOR)) ;
 		break;
 
-	case NAGIOS_WARNING:
-		item(0, date_column)->setText(QString::number(-1 * NAGIOS_WARNING)) ;
+	case MonitorBroker::NAGIOS_WARNING:
+		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_WARNING)) ;
 		item(0, 1)->setBackground(QBrush(WARNING_COLOR)) ;
 		break;
 
-	case NAGIOS_CRITICAL:
-		item(0, date_column)->setText(QString::number(-1 * NAGIOS_CRITICAL)) ;
+	case MonitorBroker::NAGIOS_CRITICAL:
+		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_CRITICAL)) ;
 		item(0, 1)->setBackground(QBrush(CRITICAL_COLOR)) ;
 		break;
 
-	case NAGIOS_UNKNOWN:
-		item(0, date_column)->setText(QString::number(-1 * NAGIOS_UNKNOWN)) ;
+	case MonitorBroker::NAGIOS_UNKNOWN:
+		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_UNKNOWN)) ;
 		item(0, 1)->setBackground(QBrush(UNKNOWN_COLOR)) ;
 		break;
 

@@ -1,8 +1,8 @@
 /*
- * Webkit.cpp
+ * ns.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 13-05-2012												   #
+# Last Update : 28 mai 2012												   #
 #																		   #
 # This file is part of NGRT4N (http://ngrt4n.com).						   #
 #																		   #
@@ -21,20 +21,21 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/WebKit.hpp"
 
-WebKit::WebKit(const QString& url, QWidget* _parent)
-:QWebView(_parent)
-{
-	settings()->setAttribute(QWebSettings::PluginsEnabled, true);
-	settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-	settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-	load(QUrl(url));
+#ifndef NS_HPP_
+#define NS_HPP_
+
+#include<stdlib.h>
+#include <string>
+
+using namespace std;
+namespace ngrt4n {
+const string COMPAGNY_NAME = "ngrt4n.com";
+const string APP_NAME = "ngrt4n" ;
+const string APP_HOME = string(getenv("HOME")) + "/." + APP_NAME ;
+const string SETTINGS_FILE =  APP_HOME + "/db" ;
+
+void initApp() ;
 }
 
-WebKit::~WebKit() {}
-
-void WebKit::setUrl(QString url)
-{
-	load(QUrl(url));
-}
+#endif /* NS_HPP_ */

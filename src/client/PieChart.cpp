@@ -22,7 +22,7 @@
  */
 
 
-#include "../include/PieChart.hpp"
+#include "PieChart.hpp"
 
 PieChart::PieChart(const QRectF & _bounding_rect, QWidget * _parent)
 : QWidget( _parent ), boundingRect( _bounding_rect ),
@@ -45,20 +45,20 @@ void PieChart::update(const CheckStatusCountT & _check_status_count, const qint3
 
 	_tool_tip = "" ;
 
-	critical_count = _check_status_count[NAGIOS_CRITICAL] ;
-	warning_count = _check_status_count[NAGIOS_WARNING] ;
-	unknown_count = _check_status_count[NAGIOS_UNKNOWN] ;
-	ok_count =  _check_status_count[NAGIOS_OK] ;
+	critical_count = _check_status_count[MonitorBroker::NAGIOS_CRITICAL] ;
+	warning_count = _check_status_count[MonitorBroker::NAGIOS_WARNING] ;
+	unknown_count = _check_status_count[MonitorBroker::NAGIOS_UNKNOWN] ;
+	ok_count =  _check_status_count[MonitorBroker::NAGIOS_OK] ;
 
 	critical_ratio= ( 100.0 * critical_count ) / _check_count ;
 	warning_ratio = ( 100.0 * warning_count ) / _check_count ;
 	unknown_ratio = ( 100.0 * unknown_count ) / _check_count ;
 	ok_ratio = ( 100.0 * ok_count ) / _check_count ;
 
-	slices[NAGIOS_CRITICAL] = new PieChartItem(boundingRect, 0, 3.6 * critical_ratio, CRITICAL_COLOR, this) ;
-	slices[NAGIOS_WARNING] = new PieChartItem(boundingRect, 3.6 * critical_ratio, 3.6 * warning_ratio, WARNING_COLOR, this) ;
-	slices[NAGIOS_UNKNOWN] = new PieChartItem(boundingRect, 3.6 * (critical_ratio + warning_ratio), 3.6 * unknown_ratio, UNKNOWN_COLOR, this) ;
-	slices[NAGIOS_OK] = new PieChartItem(boundingRect, 3.6 * (unknown_ratio + warning_ratio + critical_ratio), 3.6 * ok_ratio, OK_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_CRITICAL] = new PieChartItem(boundingRect, 0, 3.6 * critical_ratio, CRITICAL_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_WARNING] = new PieChartItem(boundingRect, 3.6 * critical_ratio, 3.6 * warning_ratio, WARNING_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_UNKNOWN] = new PieChartItem(boundingRect, 3.6 * (critical_ratio + warning_ratio), 3.6 * unknown_ratio, UNKNOWN_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_OK] = new PieChartItem(boundingRect, 3.6 * (unknown_ratio + warning_ratio + critical_ratio), 3.6 * ok_ratio, OK_COLOR, this) ;
 
 	_tool_tip +=  "Critical: " + QString::number(critical_count) + "/"
 			"" + QString::number(_check_count) + " (" + QString::number(critical_ratio, 'f', 0) +

@@ -50,7 +50,7 @@ public:
 
 	bool updateNode(NodeListT::iterator & _node_it) ;
 
-	void setCheckListField( const NagiosChecksT& );
+	void setCheckListField( const MonitorBroker::NagiosChecksT& );
 
 	void setEnableFields( const bool& );
 

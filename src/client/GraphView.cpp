@@ -19,10 +19,10 @@
 # You should have received a copy of the GNU General Public License		   #
 # along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.		   #
 #--------------------------------------------------------------------------#
-*/
+ */
 
-
-#include "../include/GraphView.hpp"
+#include "core/ns.hpp"
+#include "GraphView.hpp"
 
 const qreal GraphView::XScalingRatio = 75.0 ;
 const qreal GraphView::YScalingRatio = 100.0 ;
@@ -352,15 +352,15 @@ void GraphView::updateNodeColor(const NodeListT::iterator & _node)
 
 	switch (_node->status)
 	{
-	case NAGIOS_OK:
+	case MonitorBroker::NAGIOS_OK:
 		color = OK_COLOR ;
 		break;
 
-	case NAGIOS_WARNING:
+	case MonitorBroker::NAGIOS_WARNING:
 		color = WARNING_COLOR ;
 		break;
 
-	case NAGIOS_CRITICAL:
+	case MonitorBroker::NAGIOS_CRITICAL:
 		color = CRITICAL_COLOR ;
 		break;
 
@@ -386,15 +386,15 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 
 	switch (_node_it->status)
 	{
-	case NAGIOS_OK:
+	case MonitorBroker::NAGIOS_OK:
 		color = OK_COLOR ;
 		break;
 
-	case NAGIOS_WARNING:
+	case MonitorBroker::NAGIOS_WARNING:
 		color = WARNING_COLOR ;
 		break;
 
-	case NAGIOS_CRITICAL:
+	case MonitorBroker::NAGIOS_CRITICAL:
 		color = CRITICAL_COLOR ;
 		break;
 
@@ -472,7 +472,7 @@ void GraphView::setNodeToolTip(const NodeT & _node)
 	if ( _node.type == ALARM_NODE )
 	{
 
-		if( _node.status == NAGIOS_OK )
+		if( _node.status == MonitorBroker::NAGIOS_OK )
 		{
 			msg += "\nMessage: " + static_cast<QString>(_node.notification_msg).replace("\n", " ");
 		}
@@ -481,8 +481,9 @@ void GraphView::setNodeToolTip(const NodeT & _node)
 			msg += "\nMessage: " + static_cast<QString>(_node.alarm_msg).replace("\n", " ");
 		}
 
-		msg += "\nCheck Ouput: " +  static_cast<QString>(_node.check.alarm_msg).replace("\n", " ");
-		msg += "\nCheck Id: " + _node.child_nodes ;
+		msg += "\nCheck Ouput: "
+				+ QString(_node.check.alarm_msg.c_str()).replace("\n", " ")
+				+ "\nCheck Id: " + _node.child_nodes ;
 	}
 
 	gnodesList[_node.id].icon->setToolTip(msg);
@@ -570,7 +571,10 @@ void GraphView::capture(void)
 	QPixmap pixmap( size() ) ;
 	QPainter painter( &pixmap ) ;
 
-	file_name= QFileDialog::getSaveFileName(this, "Select the image destination - " + APP_SHORT_NAME, ".", tr("PNG files (*.png)"));
+	file_name= QFileDialog::getSaveFileName(this,
+			"Select the image destination - " + QString(ngrt4n::APP_NAME.c_str()),
+			".",
+			tr("PNG files (*.png)"));
 	file_info.setFile(file_name) ;
 
 	if(file_info.suffix() == "" )

@@ -22,7 +22,7 @@
  */
 
 
-#include "../include/SvConfigCreator.hpp"
+#include "SvConfigCreator.hpp"
 
 
 SvCreator::SvCreator(const qint32 & _user_role)
@@ -91,7 +91,10 @@ void SvCreator::load(const QString& _filename)
 	mainSplitter->addWidget( navigationTree ) ;
 	mainSplitter->addWidget( editor ) ;
 	setCentralWidget( mainSplitter ) ;
-	setWindowTitle(openedFile + " - " + APP_SHORT_NAME + " | Monitoring View Configuration Editor") ;
+	setWindowTitle(openedFile
+			+ " - "
+			+ QString(ngrt4n::APP_NAME.c_str())
+			+ " | Monitoring View Configuration Editor") ;
 	show();
 }
 
@@ -101,8 +104,9 @@ void SvCreator::open(void)
 	QString root_id, config_file;
 
 	config_file = QFileDialog::getOpenFileName(this,
-			"Select view configuration file - " + APP_SHORT_NAME,
-			".", "Xml files (*.xml)");
+			"Select view configuration file - " + QString(ngrt4n::APP_NAME.c_str()),
+			".",
+			"Xml files (*.xml)");
 
 	loadFile( config_file );
 }
@@ -133,7 +137,7 @@ void SvCreator::newBusinessView(void)
 		node.id = snavStruct->root_id  = SvNavigatorTree::rootID ;
 		node.name = "New Business view" ;
 		node.child_nodes.clear() ;
-		node.status = NAGIOS_UNKNOWN ;  // TODO no acknowledged
+		node.status = MonitorBroker::NAGIOS_UNKNOWN ;  // TODO no acknowledged
 		node.icon = DEFAULT_ICON ;
 		node.type = SERVICE_NODE ;
 		node.parent.clear() ;  				//root has not parent
@@ -161,8 +165,10 @@ void SvCreator::newNode(void)
 	p_node_it = snavStruct->node_list.find( selectedNodeId ) ;
 	if(p_node_it == snavStruct->node_list.end() || p_node_it->type == ALARM_NODE )
 	{
-		QMessageBox::warning(this, "Warning! | " + APP_SHORT_NAME,
-				"Action not allowed on the target node", QMessageBox::Ok) ;
+		QMessageBox::warning(this, "Warning! | "
+				+ QString(ngrt4n::APP_NAME.c_str()),
+				"Action not allowed on the target node",
+				QMessageBox::Ok) ;
 		return ;
 	}
 
@@ -170,7 +176,7 @@ void SvCreator::newNode(void)
 	node.parent = selectedNodeId ;
 	node.name = "sub service " + QString::number(count) , count ++ ;
 	node.type = SERVICE_NODE ;
-	node.status = NAGIOS_UNKNOWN ; // TODO no acknowledged
+	node.status = MonitorBroker::NAGIOS_UNKNOWN ; // TODO no acknowledged
 	node.icon = DEFAULT_ICON ;
 	node.child_nodes = "" ;
 
@@ -188,7 +194,7 @@ void SvCreator::deleteNode(void)
 	QMessageBox msg_box ;
 
 	msg_box.setText("Would you really want to delete the service and (possibly) its sub services?");
-	msg_box.setWindowTitle("Delete service ? - " + APP_SHORT_NAME);
+	msg_box.setWindowTitle("Delete service ? - " + QString(ngrt4n::APP_NAME.c_str()));
 
 	msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
 
@@ -272,9 +278,9 @@ void SvCreator::save(void)
 void SvCreator::saveAs(void)
 {
 	QString config_file;
-	config_file = QFileDialog::getSaveFileName(this, "Select view configuration destination path - " + APP_SHORT_NAME, ".", "Xml files (*.xml)");
+	config_file = QFileDialog::getSaveFileName(this, "Select view configuration destination path - " + QString(ngrt4n::APP_NAME.c_str()), ".", "Xml files (*.xml)");
 	saveInFile(config_file);
-	setWindowTitle(openedFile + " - " + APP_SHORT_NAME + " | Monitoring View Builder") ;
+	setWindowTitle(openedFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Monitoring View Builder") ;
 }
 
 int SvCreator::close( const bool & _close_windows )
@@ -283,7 +289,7 @@ int SvCreator::close( const bool & _close_windows )
 
 	if ( hasToBeSaved )
 	{
-		msg_box.setWindowTitle("Save change? - " + APP_SHORT_NAME);
+		msg_box.setWindowTitle("Save change? - " + QString(ngrt4n::APP_NAME.c_str()));
 		msg_box.setText("The document has been modified.\n "
 				"Do you want to save your changes?");
 
@@ -408,7 +414,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 		{
 			if ( node_it->type == SERVICE_NODE && ! node_it->child_nodes.isEmpty() )
 			{
-				QMessageBox::warning(this, "Warning! | " + APP_SHORT_NAME,
+				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
 						"This action required that the service has no sub service", QMessageBox::Ok) ;
 				editor->typeField()->setCurrentIndex( 0 ) ;
 			}
@@ -432,7 +438,7 @@ void SvCreator::handleShowOnlineResources(void)
 
 void SvCreator::handleShowAbout(void)
 {
-	PreferencesDialog about(userRole, PreferencesDialog::ShowAbout) ;
+	Preferences about(userRole, Preferences::ShowAbout) ;
 	about.exec() ;
 }
 
@@ -564,7 +570,7 @@ void SvCreator::loadMenu(void)
 	menuList["MENU2"] = menuBar->addMenu(tr("&Help")),
 			subMenuList["ShowOnlineResources"] = menuList["MENU2"]->addAction("Online &Resources"),
 			menuList["MENU2"]->addSeparator(),
-	subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + APP_SHORT_NAME);
+	subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()));
 
 	subMenuList["NewFile"]->setShortcut(QKeySequence::New) ;
 	subMenuList["Open"]->setShortcut(QKeySequence::Open) ;

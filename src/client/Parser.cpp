@@ -21,7 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/Parser.hpp"
+#include "core/ns.hpp"
+#include "Parser.hpp"
 
 
 const QString Parser::dotFileHeader = "strict graph   \n{\n//Nodes declaration\n\tnode[shape=plaintext]\n\n";
@@ -70,7 +71,7 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	node.id = _snav_struct.root_id = rootElt.attribute("id");
 	node.name = rootElt.firstChildElement("Name").text();
 	node.child_nodes = rootElt.firstChildElement("SubServices").text();
-	node.status = UNSET_STATUS ;  // TODO Acknowledge status,
+	node.status = MonitorBroker::UNSET_STATUS ;  // TODO Acknowledge status,
 	node.icon = DEFAULT_ICON ;
 	node.type = SERVICE_NODE ;
 	node.parent = "NULL" ;  // By convention
@@ -158,102 +159,11 @@ void Parser::buildNodeTree( NodeListT & _nodes_list, TreeNodeItemListT & _tree)
 	}
 }
 
-bool Parser::parseServiceStatus(const QString& _status_file, NagiosChecksT & _nagios_checks)
-{
-	const qint32 LINE_MAX_LEN = 500 ;
-	QFile file;
-	QTextStream file_s;
-	QString line, check_type, param, snapshoted_status_file ;
-	NagiosCheckT check;
-	qint32 pos;
-
-	_nagios_checks.clear() ;
-
-	snapshoted_status_file = "/tmp/" + APP_SHORT_NAME.toLower() + "-nstatus.snap" ;
-
-	if ( file.remove(snapshoted_status_file),
-			! file.copy( _status_file, snapshoted_status_file ) )
-	{
-		qDebug() << "Unable to access to status database " << _status_file << endl;
-		return false;
-	}
-
-	if ( file.setFileName(snapshoted_status_file),
-			! file.open(QIODevice::ReadOnly) )
-	{
-		qDebug() << "An unknown error appeared when opening Nagios status file" << endl;
-		return false;
-	}
-
-	file_s.setDevice( & file );
-	while (line = file_s.readLine(LINE_MAX_LEN).trimmed(), !line.isNull())
-	{
-		if (checkWhetherHasToContinue(line, check_type))
-			continue;
-
-		if( check_type != "hoststatus" && check_type != "servicestatus" )
-			continue;
-
-		check.status = UNSET_STATUS ;
-		while (line = file_s.readLine(LINE_MAX_LEN).trimmed(), !line.isNull() && line[0] != '}')
-		{
-			pos = line.indexOf("=");
-			param = line.left(pos);
-
-			if(pos < 0)
-				continue;
-
-			pos++;
-			if(param == "host_name"){
-				check.id = line.mid(pos, -1).trimmed() ;
-			}
-			else if(param == "service_description"){
-				check.id += "/" + line.mid(pos, -1).trimmed() ;
-			}
-			else if(param == "check_command"){
-				check.check_command = line.mid(pos, -1).trimmed() ;
-			}
-			else if(param == "current_state"){
-				check.status = line.mid(pos, -1).trimmed().toInt() ;
-			}
-			else if(param == "last_state_change"){
-				check.last_state_change = line.mid(pos, -1).trimmed();
-			}
-			else if(param == "plugin_output")
-			{
-				check.alarm_msg = line.mid(pos, -1).trimmed();
-			}
-		}
-
-		_nagios_checks[check.id] = check;
-	}
-
-	return true;
-}
-
-bool Parser::checkWhetherHasToContinue(const QString& _line, QString& _check_type)
-{
-	QRegExp sep_regex;
-	QStringList splited_line;
-
-	sep_regex.setPattern("[ ]+\\{");
-
-	if( ! _line.length() || _line[0] == '#')
-		return true;
-
-	if( splited_line = _line.split(sep_regex), ! splited_line.length() )
-		return true;
-
-	_check_type = splited_line[0];
-
-	return false;
-}
-
 void Parser::saveCoordinatesDotFile(const QString& _graph_content)
 {
 	QFile file;
 
-	graphFilename = "/tmp/" + APP_SHORT_NAME.toLower() + "-bv-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
+	graphFilename = "/tmp/" + QString(ngrt4n::APP_NAME.c_str()) + "-bv-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
 	file.setFileName(graphFilename);
 	if(! file.open(QIODevice::WriteOnly))
 	{

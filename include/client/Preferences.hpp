@@ -1,5 +1,5 @@
 /*
- * PreferenceDialog.hpp
+ * Preferences.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 13-05-2012												   #
@@ -24,26 +24,35 @@
 #ifndef SNAVPREFERENCESDIALOG_HPP_
 #define SNAVPREFERENCESDIALOG_HPP_
 
+#include "core/ns.hpp"
+#include "Auth.hpp"
 #include "Base.hpp"
 
 
-class PreferencesDialog : public QDialog
+class Preferences : public QDialog
 {
 	Q_OBJECT
 
 public:
-	PreferencesDialog(const qint32 & _user_role = OP_USER_ROLE, const qint32 & _action = PreferencesDialog::ChangePassword);
-	virtual ~PreferencesDialog();
+	Preferences(const qint32 & _user_role = Auth::OP_USER_ROLE, const qint32 & _action = Preferences::ChangePassword);
+	virtual ~Preferences();
 
 	static const qint32 ChangePassword ;
 	static const qint32 ForceChangePassword ;
 	static const  qint32 ChangeMonitoringSettings ;
 	static const  qint32 ShowHelp ;
 	static const  qint32 ShowAbout ;
+	static const QString NAGIOS_URL_KEY ;
+	static const QString UPDATE_INTERVAL_KEY ;
+	static const QString SERVER_ADDR_KEY ;
+	static const QString SERVER_PORT_KEY ;
+	static const QString ADM_UNSERNAME_KEY ;
+	static const QString OP_UNSERNAME_KEY ;
+	static const QString ADM_PASSWD_KEY ;
+	static const QString OP_PASSWD_KEY ;
 
 
 public slots:
-	void browse(void);
 	void applySettings(void);
 	void changePasswd(void);
 
@@ -57,23 +66,21 @@ protected :
 private:
 	qint32 userRole ;
 	Settings* settings;
-	QLineEdit* nagiosHomeField ;
-	QLineEdit* statusFileField ;
+	QLineEdit* monitorHomeField ;
 	QSpinBox* updateIntervalField ;
 	QPushButton *bBrowse ;
 	qint32 updateInterval ;
-	QString nagiosUrl ;
-	QString statusFile ;
-
-
+	QString monitorUrl ;
+	QString serverAddr ;
+	QString serverPort ;
+	QLineEdit* oldPasswdField ;
 	QLineEdit* passwdField ;
-	QLineEdit* newPasswdField ;
-	QLineEdit* RenewPasswdField ;
-
+	QLineEdit* rePasswdField ;
+	QLineEdit* serverAddrField ;
+	QLineEdit* serverPortField ;
 	QPushButton* cancelButton ;
 	QPushButton* applySettingButton ;
 	QPushButton* changePasswdButton ;
-
 	QGridLayout* layout ;
 
 	struct settingParams{
@@ -83,7 +90,6 @@ private:
 
 	void setContent(void) ;
 	void addEvents(void) ;
-
 };
 
 #endif /* SNAVPREFERENCESDIALOG_HPP_ */

@@ -21,7 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/SvNavigatorTree.hpp"
+#include "core/ns.hpp"
+#include "SvNavigatorTree.hpp"
 #include <QtGui>
 
 const QString SvNavigatorTree::rootID = "root";
@@ -62,7 +63,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
 			}
 			else
 			{
-				QMessageBox::warning(this, "Warning! | " + APP_SHORT_NAME,
+				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
 						"Dropping not allowed on the target node", QMessageBox::Ok) ;
 			}
 		}

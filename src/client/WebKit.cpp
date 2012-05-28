@@ -1,5 +1,5 @@
 /*
- * ParseSVConfig.hpp
+ * Webkit.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 13-05-2012												   #
@@ -21,41 +21,20 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVPARSESVCONFIG_H_
-#define SNAVPARSESVCONFIG_H_
+#include "WebKit.hpp"
 
-#include "Base.hpp"
-#include "SvNavigatorTree.hpp"
-
-
-
-class Parser
+WebKit::WebKit(const QString& url, QWidget* _parent)
+:QWebView(_parent)
 {
+	settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+	settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+	settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+	load(QUrl(url));
+}
 
-public:
-	Parser() ;
-	~Parser() ;
+WebKit::~WebKit() {}
 
-	bool parseSvConfig(const QString &, Struct &) ;
-
-	bool parseServiceStatus(const QString &, NagiosChecksT &);
-
-	QString getDotGraphFile(void) const { return graphFilename; }
-
-
-private:
-	static const QString dotFileHeader;
-	static const QString dotFileFooter;
-
-	QString graphFilename;
-
-	void buildNodeTree( NodeListT &, TreeNodeItemListT & ) ;
-
-	void updateNodeHierachy( NodeListT &, QString & ) ;
-
-	void saveCoordinatesDotFile(const QString& );
-
-	bool checkWhetherHasToContinue(const QString &, QString & );
-};
-
-#endif /* SNAVPARSESVCONFIG_H_ */
+void WebKit::setUrl(QString url)
+{
+	load(QUrl(url));
+}

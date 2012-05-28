@@ -1,8 +1,8 @@
 /*
- * Stats.cpp
+ * ngrt4n.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 13-05-2012												   #
+# Last Update : 24-05-2012												   #
 #																		   #
 # This file is part of NGRT4N (http://ngrt4n.com).						   #
 #																		   #
@@ -21,34 +21,49 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "../include/Stats.hpp"
+#ifndef MONITORBROKER_HPP_
+#define MONITORBROKER_HPP_
+#include<string>
+#include<iostream>
+#include <boost/unordered_map.hpp>
+
+using namespace std ;
+
+class MonitorBroker {
+public:
+	enum NagiosStatus
+	{
+	  NAGIOS_OK = 0,
+	  NAGIOS_WARNING = 1,
+	  NAGIOS_CRITICAL = 2,
+	  NAGIOS_UNKNOWN = 3,
+	  UNSET_STATUS = 4
+	} ;
+
+	typedef struct _NagiosCheckT{
+		string id;
+		string host ;
+		string check_command ;
+		string last_state_change ;
+		string alarm_msg ;
+		int status ;
+	}NagiosCheckT;
+	typedef boost::unordered_map<string, NagiosCheckT> NagiosChecksT ;
+
+	MonitorBroker(const string & _sfile);
+	virtual ~MonitorBroker();
+
+	string getInfOfService(const string & _sid) ;
+	static bool loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks) ;
+
+	static const int DEFAULT_PORT ;
+	static const int DEFAULT_UPDATE_INTERVAL ;
 
 
-Stats::Stats()
-: QWidget(),
-pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
-{
+private:
+	int lastUpdate ;
+	string statusFile ;
+	NagiosChecksT services ;
+};
 
-	resize(pieChart->size()) ;
-	setStyleSheet("background:transparent") ;
-}
-
-Stats::~Stats()
-{
-	delete pieChart ;
-}
-
-QSize Stats::minimumSizeHint() const
-		{
-	return QSize(200, 100) ;
-		}
-
- QSize Stats::sizeHint() const
-		{
-	return QSize(250, 150) ;
-		}
-
-void Stats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count, QString & _tool_tip )
-{
-	pieChart->update(_check_status_count, _check_count, _tool_tip) ;
-}
+#endif /* MONITORBROKER_HPP_ */

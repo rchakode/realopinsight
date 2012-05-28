@@ -1,8 +1,8 @@
 /*
- * Auth.hpp
+ * utils.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 13-05-2012												   #
+# Last Update : 24-05-2012												   #
 #																		   #
 # This file is part of NGRT4N (http://ngrt4n.com).						   #
 #																		   #
@@ -21,34 +21,23 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include "Base.hpp"
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <exception>
+#include <string>
+#include "ns.hpp"
+#include <iostream>
+using namespace std ;
 
-
-class Auth : public QDialog
+void ngrt4n::initApp()
 {
+    int ret = mkdir(ngrt4n::APP_HOME.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH ) ;
 
-	Q_OBJECT
+    if(ret == -1 && errno != EEXIST) {
+    	cerr << "Unable to set the application files" ;
+    	EXIT_FAILURE ;
+    }
+}
 
-public:
-	Auth();
-	virtual ~Auth();
-
-public slots:
-void cancel(void) ;
-void authentificate(void) ;
-
-
-private:
-	QDialogButtonBox* buttonBox;
-	QLineEdit* login;
-	QLineEdit* password;
-	QGridLayout* layout;
-	Settings* settings;
-
-	void addEvents(void);
-
-};
-
-#endif /* SNAVAUTH_HPP_ */
