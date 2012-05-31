@@ -238,7 +238,7 @@ int SvNavigator::monitor(void)
 				string const sinfo = xmlrpc_c::value_string(result);
 				QRegExp sepRgx;
 				QStringList sInfoVec ;
-				sepRgx.setPattern("<==>");
+				sepRgx.setPattern("#");
 				sInfoVec = QString(sinfo.c_str()).split(sepRgx) ;
 
 				if( sInfoVec.length() != 6) {
@@ -246,11 +246,11 @@ int SvNavigator::monitor(void)
 					continue ;
 				}
 
-				check.status = sInfoVec[1].toInt() ;
-				check.host = sInfoVec[2].toStdString() ;
-				check.last_state_change = sInfoVec[3].toStdString() ;
+				check.status = sInfoVec[0].toInt() ;
+				check.host = sInfoVec[1].toStdString() ;
+				check.last_state_change = sInfoVec[2].toStdString() ;
+				node_it->check.check_command = sInfoVec[3].toStdString() ;
 				check.alarm_msg = sInfoVec[4].toStdString() ;
-				node_it->check.check_command = sInfoVec[5].toStdString() ;
 
 			} catch (exception const& e) {
 				cerr << "Client threw error: " << e.what() << endl;

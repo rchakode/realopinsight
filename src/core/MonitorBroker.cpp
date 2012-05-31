@@ -48,16 +48,15 @@ string MonitorBroker::getInfOfService(const string & _sid)
 	NagiosChecksT::iterator it = services.find(_sid) ;
 
 	if (it == services.end() ) {
-		return "-1<==>Unknow service : " + _sid ;
+		return "-1#Unknow service : " + _sid ;
 	}
 
 	ostringstream ret ;
-	ret << _sid
-			<<"<==>" << it->second.status
-			<< "<==>" << it->second.host
-			<< "<==>" << it->second.last_state_change
-			<< "<==>" << it->second.alarm_msg
-			<< "<==>" << it->second.check_command;
+	ret << it->second.status
+			<< "#" << it->second.host
+			<< "#" << it->second.last_state_change
+			<< "#" << it->second.check_command
+			<< "#" << it->second.alarm_msg;
 	return ret.str() ;
 }
 
