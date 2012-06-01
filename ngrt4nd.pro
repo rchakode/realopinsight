@@ -13,7 +13,7 @@ HEADERS   += include/core/MonitorBroker.hpp
 SOURCES   += src/core/MonitorBroker.cpp \
 			src/server/ngrt4nd.cpp
 			
-LIBS += -lcrypt -L/usr/local/lib64 -lxmlrpc_server++ -lxmlrpc_server_abyss++
+LIBS += -lcrypt -lzmq
 
 FORMS	  +=
 RESOURCES += ngrt4n.qrc

@@ -73,39 +73,27 @@ void Auth::authentificate(void)
 {
 	QString user_name, user_passwd, root_passwd, op_passwd;
 
-	user_name = login->text() ;
-	user_passwd = QCryptographicHash::hash(password->text().toAscii(),
-			QCryptographicHash::Md5) ;
+	QString userName = login->text() ;
+	QString userPasswd = QCryptographicHash::hash(password->text().toAscii(), QCryptographicHash::Md5) ;
+	QString rootPasswd =  settings->value(Preferences::ADM_PASSWD_KEY).toString() ;
+	QString opPasswd =  settings->value(Preferences::OP_PASSWD_KEY).toString() ;
 
-	root_passwd =  settings->value(Preferences::ADM_PASSWD_KEY).toString() ;
-
-	if(	! root_passwd.isEmpty()
-			&& user_name == ADM_USER_NAME
-			&& user_passwd == root_passwd )
-	{
+	if(	! rootPasswd.isEmpty()
+			&& userName == ADM_USER_NAME
+			&& userPasswd == rootPasswd ) {
 
 		done( ADM_USER_ROLE );
-	}
-	else
-	{
-		op_passwd =  settings->value(Preferences::OP_PASSWD_KEY).toString() ;
-
-		if( ! op_passwd.isEmpty()
-				&& user_name == OP_USER_NAME
-				&& user_passwd == op_passwd )
-		{
-			done(OP_USER_ROLE);
-		}
-		else
-		{
-			QMessageBox::warning(this,
-					QString(ngrt4n::APP_NAME.c_str()),
-					tr("Authentifcation failed. Wrong username or password"),
-	                QMessageBox::Ok) ;
-		}
+	} else if( ! op_passwd.isEmpty()
+			&& userName == OP_USER_NAME
+			&& userPasswd == opPasswd ) {
+		done(OP_USER_ROLE);
+	} else {
+		QMessageBox::warning(this,
+				QString(ngrt4n::APP_NAME.c_str()),
+				tr("Authentifcation failed. Wrong username or password"),
+				QMessageBox::Ok) ;
 	}
 }
-
 
 
 void Auth::addEvents(void)

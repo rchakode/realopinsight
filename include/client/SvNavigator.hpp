@@ -106,8 +106,7 @@ QSize msgPanelSize ;
 MenuListT menuList;
 SubMenuListT subMenuList;
 SubMenuListT contextMenuList;
-string rpcServerUrl ;
-string getServiceInfoMethod ;
+string serverUrl ;
 
 
 void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );

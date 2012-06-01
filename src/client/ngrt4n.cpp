@@ -30,7 +30,6 @@ int main(int argc, char **argv)
 	ngrt4n::initApp() ;
 
 	QString  module, file, usage ;
-	int c, user_role ;
 	QApplication* app = new QApplication(argc, argv) ;
 
 	usage = "usage: " + QString(ngrt4n::APP_NAME.c_str()).toLower() + " [OPTION] [view_config]\n"
@@ -56,9 +55,10 @@ int main(int argc, char **argv)
 
 	module = "dashboard" ;
 	file = argv[1] ;
-	if ( (c = getopt(argc, argv, "cdeh") ) != -1)
+	int opt ;
+	if ( (opt = getopt(argc, argv, "cdeh") ) != -1)
 	{
-		switch (c)
+		switch (opt)
 		{
 		case 'c':
 			module = "config" ;
@@ -82,13 +82,11 @@ int main(int argc, char **argv)
 	}
 
 	Auth authentification;
-	user_role = authentification.exec() ;
-	if( user_role != Auth::ADM_USER_ROLE && user_role != Auth::OP_USER_ROLE ) exit( 1 ) ;
+	userRole = authentification.exec() ;
+	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
-	if(module == "dashboard")
-	{
-		if(file == "")
-		{
+	if(module == "dashboard") {
+		if(file == "") {
 			qDebug() << "invalid file !" ;
 			QMessageBox::warning(0,
 					"Error | " + QString(ngrt4n::APP_NAME.c_str()),
@@ -96,23 +94,19 @@ int main(int argc, char **argv)
 					QMessageBox::Ok);
 			exit (1) ;
 		}
-		SvNavigator* sv_nav = new SvNavigator( user_role, file ) ;
+		SvNavigator* sv_nav = new SvNavigator(userRole, file) ;
 		sv_nav->load() ;
-	}
-	else if(module == "editor")
-	{
-		SvCreator* svc = new SvCreator(user_role) ;
+	} else if(module == "editor") {
+		SvCreator* svc = new SvCreator(userRole) ;
 		svc->load( file ) ;
 	}
-	else if(module == "config")
-	{
-		Preferences* update_settings = new Preferences(user_role, Preferences::ChangeMonitoringSettings) ;
-		Preferences* change_passwd = new Preferences(user_role, Preferences::ChangePassword) ;
+	else if(module == "config") {
+		Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings) ;
+		Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword) ;
 		update_settings->exec() ;
 		change_passwd->exec() ;
 		exit(0) ;
 	}
-
 
 	return app->exec() ;
 }

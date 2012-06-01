@@ -27,48 +27,41 @@
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
-#include <xmlrpc-c/base.hpp>
-#include <xmlrpc-c/registry.hpp>
-#include <xmlrpc-c/server_abyss.hpp>
+#include <zmq.hpp>
 #include <crypt.h>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
+int numWorkers = 2 ;
+string statusFile = "/usr/local/nagios/var/status.dat" ;
 
-class GetServiceInfo : public xmlrpc_c::method {
-public:
-	GetServiceInfo(const string& _sfile, const string& _authchain)
-	: monitor(new MonitorBroker(_sfile)),
-	  authChain (_authchain) {
-		this->_signature = "s:ss";
-		this->_help = "This method gets the status of a given service through a string";
+void *worker_routine (void *arg)
+{
+	zmq::context_t *ctx = (zmq::context_t*) arg;
+	zmq::socket_t s (*ctx, ZMQ_REP);
+	s.connect ("inproc://workers");
+
+	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
+
+	while (true) {
+		zmq::message_t request;
+		s.recv (&request);
+
+		//TODO
+		string result =  monitor->getInfOfService(static_cast<char*>(request.data())) ;
+
+		zmq::message_t reply (10);
+		memset (reply.data (), 0, result.size ());
+		s.send (reply);
 	}
-	void
-	execute(xmlrpc_c::paramList const& paramList, xmlrpc_c::value * const retvalP) {
 
-		string const sid(paramList.getString(0));
-		string const auth(paramList.getString(1));
-		paramList.verifyEnd(2);
-
-		if(auth == authChain) {
-			*retvalP = xmlrpc_c::value_string( monitor->getInfOfService(sid) );
-		}else {
-			*retvalP = xmlrpc_c::value_string( "-2<==>Unauthenticated request" );
-			cerr << "Unauthenticated request " << endl ;
-		}
-	}
-	~GetServiceInfo(){ delete monitor ;}
-
-private:
-	MonitorBroker* monitor ;
-	string authChain ;
-};
+	return NULL ;
+}
 
 
-
-int
-main(int argc, char ** argv) {
+int main(int argc, char ** argv) {
 
 	if( getuid() != 0) {
 		cerr << "The program must be run as root" << endl;
@@ -77,7 +70,6 @@ main(int argc, char ** argv) {
 
 	string passwordFile = string(getenv("HOME")) + "/.ngrt4nd_auth" ;
 	string salt = "$1$$";
-	string statusFile = "/usr/local/nagios/var/status.dat" ;
 	bool foreground = false;
 	static const char *shotOpt="dpc:l:" ;
 	int port = 0 ;
@@ -132,25 +124,21 @@ main(int argc, char ** argv) {
 		}
 		setsid();
 	}
+	ostringstream tcpAddr;  tcpAddr << "tcp://*:" << port ;
+	zmq::context_t ctx(1);
+	zmq::socket_t workers(ctx, ZMQ_XREQ);
+	workers.bind("inproc://workers");
+	zmq::socket_t clients(ctx, ZMQ_XREP);
+	clients.bind(tcpAddr.str().c_str());
 
-	try {
-		xmlrpc_c::registry registry;
-
-		xmlrpc_c::methodPtr const getServiceInfoP(new GetServiceInfo(statusFile, authChain));
-
-		registry.addMethod("get.service.info", getServiceInfoP);
-
-		if ( port <= 0 ) port = MonitorBroker::DEFAULT_PORT ;
-		xmlrpc_c::serverAbyss server(
-				xmlrpc_c::serverAbyss::constrOpt()
-		        .registryP(&registry)
-		        .portNumber(port)
-		        .logFileName("/tmp/xmlrpc.log"));
-
-		server.run();
-		assert(false);
-	} catch (exception const& e) {
-		cerr << "Failure when starting the server : " << e.what() << endl;
+	for (int i = 0; i < numWorkers; i++) {
+		pthread_t worker;
+		int rc = pthread_create (&worker, NULL, worker_routine, (void*) &ctx);
+		assert (rc == 0);
 	}
+
+	zmq::device (ZMQ_QUEUE, clients, workers);
+
+
 	return 0;
 }

@@ -23,9 +23,7 @@
 
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
-#include <xmlrpc-c/girerr.hpp>
-#include <xmlrpc-c/base.hpp>
-#include <xmlrpc-c/client_simple.hpp>
+#include <zmq.hpp>
 #include <crypt.h>
 #include "core/ns.hpp"
 
@@ -48,8 +46,7 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
   monPrefWindow( new Preferences(_user_role, Preferences::ChangeMonitoringSettings) ) ,
   changePasswdWindow( new Preferences(_user_role, Preferences::ChangePassword ) ) ,
   msgPanel( new MsgPanel() ),
-  rpcServerUrl ("http://localhost:8080/RPC2"),
-  getServiceInfoMethod("get.service.info")
+  serverUrl ("tcp://localhost:1983")
 {
 
 	loadMenus();
@@ -227,36 +224,29 @@ int SvNavigator::monitor(void)
 
 		for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
 			MonitorBroker::NagiosCheckT check ;
-			try {
-				xmlrpc_c::clientSimple rpcClient;
-				xmlrpc_c::value result;
 
-				rpcClient.call(rpcServerUrl, getServiceInfoMethod, "ss", &result,
-						(*node_id_it).trimmed().toStdString().c_str(),
-						crypt("c", "$1$$"));
+			//TODO
+			//				rpcClient.call(rpcServerUrl, getServiceInfoMethod, "ss", &result,
+			//						(*node_id_it).trimmed().toStdString().c_str(),
+			//						crypt("c", "$1$$"));
+			//
+			//				string const sinfo = xmlrpc_c::value_string(result);
+			string const sinfo = "" ;
+			QRegExp sepRgx;
+			QStringList sInfoVec ;
+			sepRgx.setPattern("#");
+			sInfoVec = QString(sinfo.c_str()).split(sepRgx) ;
 
-				string const sinfo = xmlrpc_c::value_string(result);
-				QRegExp sepRgx;
-				QStringList sInfoVec ;
-				sepRgx.setPattern("#");
-				sInfoVec = QString(sinfo.c_str()).split(sepRgx) ;
-
-				if( sInfoVec.length() != 6) {
-					unknown_count += 1 ;
-					continue ;
-				}
-
-				check.status = sInfoVec[0].toInt() ;
-				check.host = sInfoVec[1].toStdString() ;
-				check.last_state_change = sInfoVec[2].toStdString() ;
-				node_it->check.check_command = sInfoVec[3].toStdString() ;
-				check.alarm_msg = sInfoVec[4].toStdString() ;
-
-			} catch (exception const& e) {
-				cerr << "Client threw error: " << e.what() << endl;
-			} catch (...) {
-				cerr << "Client threw unexpected error." << endl;
+			if( sInfoVec.length() != 6) {
+				unknown_count += 1 ;
+				continue ;
 			}
+
+			check.status = sInfoVec[0].toInt() ;
+			check.host = sInfoVec[1].toStdString() ;
+			check.last_state_change = sInfoVec[2].toStdString() ;
+			node_it->check.check_command = sInfoVec[3].toStdString() ;
+			check.alarm_msg = sInfoVec[4].toStdString() ;
 
 			switch( node_it->check.status ) {
 			case MonitorBroker::NAGIOS_OK:
