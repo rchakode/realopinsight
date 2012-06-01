@@ -21,7 +21,6 @@
 #--------------------------------------------------------------------------#
  */
 
-
 #include "core/MonitorBroker.hpp"
 #include <cassert>
 #include <stdexcept>
@@ -49,6 +48,7 @@ void *worker_routine (void *arg)
 		zmq::message_t request;
 		s.recv (&request);
 
+		cout << "received :" << request.data() << endl ;
 		//TODO
 		string result =  monitor->getInfOfService(static_cast<char*>(request.data())) ;
 
@@ -124,12 +124,17 @@ int main(int argc, char ** argv) {
 		}
 		setsid();
 	}
-	ostringstream tcpAddr;  tcpAddr << "tcp://*:" << port ;
 	zmq::context_t ctx(1);
-	zmq::socket_t workers(ctx, ZMQ_XREQ);
-	workers.bind("inproc://workers");
-	zmq::socket_t clients(ctx, ZMQ_XREP);
-	clients.bind(tcpAddr.str().c_str());
+	zmq::socket_t workersComChannel(ctx, ZMQ_XREQ);
+	workersComChannel.bind("inproc://workers");
+
+	ostringstream tcpAddr;
+	tcpAddr << "tcp://*:" << (port ? port : MonitorBroker::DEFAULT_PORT) ;
+
+	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
+	clientsComChannel.bind(tcpAddr.str().c_str());
+
+	cout << "server started successfully : " << tcpAddr.str() << endl ;
 
 	for (int i = 0; i < numWorkers; i++) {
 		pthread_t worker;
@@ -137,8 +142,7 @@ int main(int argc, char ** argv) {
 		assert (rc == 0);
 	}
 
-	zmq::device (ZMQ_QUEUE, clients, workers);
-
+	zmq::device (ZMQ_QUEUE, clientsComChannel, workersComChannel);
 
 	return 0;
 }

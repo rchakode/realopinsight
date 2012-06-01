@@ -45,7 +45,7 @@ SOURCES   += src/client/ngrt4n.cpp \
             src/client/SvNavigatorTree.cpp \
             src/client/WebKit.cpp 
             
-LIBS += -lcrypt  -L/usr/local/lib64 -lxmlrpc_client++
+LIBS += -lcrypt  -lzmq
 
 FORMS	  +=
 RESOURCES += ngrt4n.qrc

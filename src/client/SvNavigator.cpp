@@ -21,9 +21,9 @@
 #--------------------------------------------------------------------------#
  */
 
+
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
-#include <zmq.hpp>
 #include <crypt.h>
 #include "core/ns.hpp"
 
@@ -32,23 +32,23 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 : QMainWindow(parent) ,
   configFile(_config_file) ,
   userRole (_user_role) , //TODO change implementation
-  settings( new Settings()) ,
-  snavStruct( new Struct()) ,
-  statsPanel( new Stats( ) ) ,
+  settings ( new Settings()) ,
+  snavStruct ( new Struct()) ,
+  statsPanel ( new Stats( ) ) ,
   filteredMsgPanel (NULL),
-  mainSplitter( new QSplitter( this ) ) ,
-  rightSplitter( new QSplitter() ) ,
-  topRightPanel( new QTabWidget()) ,
-  bottomRightPanel( new QTabWidget() ) ,
-  webBrowser( new WebKit() ) ,
-  graphView( new GraphView() ) ,
-  navigationTree( new SvNavigatorTree() ) ,
-  monPrefWindow( new Preferences(_user_role, Preferences::ChangeMonitoringSettings) ) ,
-  changePasswdWindow( new Preferences(_user_role, Preferences::ChangePassword ) ) ,
+  mainSplitter ( new QSplitter( this ) ) ,
+  rightSplitter ( new QSplitter() ) ,
+  topRightPanel ( new QTabWidget()) ,
+  bottomRightPanel ( new QTabWidget() ) ,
+  webBrowser ( new WebKit() ) ,
+  graphView ( new GraphView() ) ,
+  navigationTree ( new SvNavigatorTree() ) ,
+  monPrefWindow (new Preferences(_user_role, Preferences::ChangeMonitoringSettings)) ,
+  changePasswdWindow (new Preferences(_user_role, Preferences::ChangePassword )) ,
   msgPanel( new MsgPanel() ),
   serverUrl ("tcp://localhost:1983")
 {
-
+	setWindowTitle(configFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Dashboard") ;
 	loadMenus();
 	topRightPanel->addTab(graphView, "Dashboard") ;
 	topRightPanel->addTab(webBrowser, "Native Web UI") ;
@@ -58,11 +58,10 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 	rightSplitter->addWidget( topRightPanel ) ;
 	rightSplitter->addWidget( bottomRightPanel ) ;
 	rightSplitter->setOrientation( Qt::Vertical ) ;
-
-	addEvents();
-
 	setCentralWidget( mainSplitter ) ;
-	setWindowTitle(configFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Dashboard") ;
+
+    // Activate Qt's event handler on widget
+    addEvents();
 }
 
 SvNavigator::~SvNavigator()
@@ -79,15 +78,14 @@ SvNavigator::~SvNavigator()
 	delete mainSplitter ;
 	delete monPrefWindow ;
 	delete changePasswdWindow ;
-	if( filteredMsgPanel )
-		delete filteredMsgPanel ;
+	delete comChannel ;
+	if( filteredMsgPanel ) delete filteredMsgPanel ;
 	unloadMenus();
 }
 
 void SvNavigator::closeEvent(QCloseEvent * event)
 {
-	if( filteredMsgPanel )
-	{
+	if( filteredMsgPanel ) {
 		filteredMsgPanel->close() ;
 	}
 
@@ -192,8 +190,6 @@ void SvNavigator::handleShowAbout(void)
 	about.exec() ;
 }
 
-
-
 int SvNavigator::monitor(void)
 {
 	NodeListT::iterator node_it ;
@@ -216,26 +212,41 @@ int SvNavigator::monitor(void)
 
 		if( node_it->child_nodes == "" ) {
 			node_it->status = MonitorBroker::NAGIOS_UNKNOWN;
-			unknown_count += 1 ;
+
+		    // Activate Qt's event handler on widget
+		    addEvents();
+	unknown_count += 1 ;
 			continue;
 		}
 
 		child_nodes_list = node_it->child_nodes.split( CHILD_NODES_SEP );
 
+
+		cout << "H0 " << endl ;
+		//Initialize the communication channel with the server
+	    zmq::context_t ctx(1);
+	    comChannel = new zmq::socket_t (ctx, ZMQ_REQ);
+	    comChannel->connect(serverUrl.c_str());
+
 		for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
 			MonitorBroker::NagiosCheckT check ;
 
-			//TODO
-			//				rpcClient.call(rpcServerUrl, getServiceInfoMethod, "ss", &result,
-			//						(*node_id_it).trimmed().toStdString().c_str(),
-			//						crypt("c", "$1$$"));
-			//
-			//				string const sinfo = xmlrpc_c::value_string(result);
-			string const sinfo = "" ;
+	        //Request the current status of the service to the server
+	        cout << "H1"<< endl ;
+			string sid = (*node_id_it).trimmed().toStdString() ;
+			zmq::message_t request(10);
+	        memcpy(request.data(), sid.c_str(), sid.size());
+	        comChannel->send(request);
+
+	        cout << "here1"<< endl ;
+	        //  Get the reply.
+	        zmq::message_t reply;
+	        comChannel->recv(&reply);
+
 			QRegExp sepRgx;
 			QStringList sInfoVec ;
 			sepRgx.setPattern("#");
-			sInfoVec = QString(sinfo.c_str()).split(sepRgx) ;
+			sInfoVec = QString(static_cast<char*>(reply.data())).split(sepRgx) ;
 
 			if( sInfoVec.length() != 6) {
 				unknown_count += 1 ;
@@ -339,46 +350,38 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 	splited_check_id = QString(_node->check.id.c_str()).split("/") ;
 	len =  splited_check_id.length() ;
 
-	if( _node->status == MonitorBroker::NAGIOS_OK )
-	{
+	if( _node->status == MonitorBroker::NAGIOS_OK ) {
 		msg = _node->notification_msg ;
 	}
-	else
-	{
+	else {
 		msg = _node->alarm_msg ;
 	}
 
-	if( len )
-	{
+	if( len ) {
 		regexp.setPattern( HOSTNAME_META_MSG_PATERN ) ;
 		msg.replace(regexp, splited_check_id[0]) ;
 
-		if( len == 2 )
-		{
+		if( len == 2 ) {
 			regexp.setPattern( SERVICE_META_MSG_PATERN ) ;
 			msg.replace(regexp, splited_check_id[1]) ;
 		}
 	}
 
 	splited_check_command = QString(_node->check.check_command.c_str()).split("!") ;
-	if( splited_check_command.length() >= 3)
-	{
+	if( splited_check_command.length() >= 3) {
 		regexp.setPattern( THERESHOLD_META_MSG_PATERN ) ;
 		msg.replace(regexp, splited_check_command[1]) ;
 
-		if(_node->status == MonitorBroker::NAGIOS_WARNING )
-		{
+		if(_node->status == MonitorBroker::NAGIOS_WARNING ) {
 			msg.replace(regexp, splited_check_command[2]) ;
 		}
 
 	}
 
-	if( _node->status == MonitorBroker::NAGIOS_OK )
-	{
+	if( _node->status == MonitorBroker::NAGIOS_OK ) {
 		_node->notification_msg = msg  ;
 	}
-	else
-	{
+	else {
 		_node->alarm_msg = msg ;
 	}
 }
@@ -394,19 +397,16 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 
 	node_it = snavStruct->node_list.find( _node_id ) ;
 
-	if (node_it != snavStruct->node_list.end() )
-	{
+	if (node_it != snavStruct->node_list.end() ) {
 		node_ids_list = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
 		sum_counts = node_ids_list.size() ;
 
-		for(it = node_ids_list.begin(); it != node_ids_list.end(); it++)
-		{
+		for(it = node_ids_list.begin(); it != node_ids_list.end(); it++) {
 			child_node_it = snavStruct->node_list.find( *it ) ;
 			if ( child_node_it == snavStruct->node_list.end() )
 				continue ;
 
-			switch(child_node_it->status)
-			{
+			switch(child_node_it->status) {
 			case MonitorBroker::NAGIOS_CRITICAL:
 				node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
 				critical_count ++ ;
@@ -436,12 +436,10 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 			}
 		}
 
-		if ( normal_count == sum_counts )
-		{
+		if ( normal_count == sum_counts ) {
 			node_it->status = MonitorBroker::NAGIOS_OK ;
 		}
-		else if ( node_it->status_calc_rule == WEIGHTED_CALC_RULE_INDEX )
-		{
+		else if ( node_it->status_calc_rule == WEIGHTED_CALC_RULE_INDEX ) {
 			node_it->status = MonitorBroker::NAGIOS_WARNING ;
 			if ( critical_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
 			else if ( unknown_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
@@ -459,8 +457,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, con
 {
 	QIcon icon;
 	TreeNodeItemListT::iterator tnode_it ;
-	switch(_node->status)
-	{
+	switch(_node->status) {
 	case MonitorBroker::NAGIOS_OK:
 		icon.addFile(":/images/normal.png") ;
 		break;
@@ -479,8 +476,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, con
 	}
 
 	tnode_it = snavStruct->tree_item_list.find(_node->id) ;
-	if(tnode_it != snavStruct->tree_item_list.end() )
-	{
+	if(tnode_it != snavStruct->tree_item_list.end() ) {
 		(*tnode_it)->setIcon(0, icon) ;
 		(*tnode_it)->setToolTip(0, _tool_tip) ;
 	}
@@ -492,11 +488,9 @@ void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, con
 	QStringList::iterator uds_it ;
 	NodeT& node = snavStruct->node_list[_node_id] ;
 
-	if( node.type == SERVICE_NODE && node.child_nodes != "")
-	{
+	if( node.type == SERVICE_NODE && node.child_nodes != "") {
 		child_nodes_list = node.child_nodes.split( CHILD_NODES_SEP ) ;
-		for (uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++)
-		{
+		for (uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++) {
 			graphView->setNodeVisible(* uds_it, _node_id, _expand, _level) ;
 		}
 	}
@@ -517,8 +511,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
 	filteredMsgPanel = new MsgPanel() ;
 	node_it = snavStruct->node_list.find(selectedNodeId) ;
 
-	if( node_it != snavStruct->node_list.end())
-	{
+	if( node_it != snavStruct->node_list.end()) {
 		filterNodeRelatedMsg( selectedNodeId ) ;
 		window_title = "Filtered messages from the component '"
 				+ snavStruct->node_list[selectedNodeId].name
@@ -534,22 +527,17 @@ void SvNavigator::filterNodeRelatedMsg( const QString & _node_id )
 {
 	NodeListT::iterator node_it = snavStruct->node_list.find(_node_id) ;
 
-	if(node_it == snavStruct->node_list.end() || node_it->child_nodes == "" )
+	if(node_it == snavStruct->node_list.end()
+			|| node_it->child_nodes == "" )
 		return ;
 
-	if ( node_it->type == ALARM_NODE )
-	{
+	if ( node_it->type == ALARM_NODE ) {
 		filteredMsgPanel->addMsg(node_it) ;
 	}
-	else
-	{
-		QStringList u_servs ;
-		QStringList::iterator it ;
+	else {
+		QStringList u_servs = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
 
-		u_servs = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
-
-		for(it = u_servs.begin() ; it != u_servs.end() ; it ++)
-		{
+		for(QStringList::iterator it = u_servs.begin() ; it != u_servs.end() ; it ++) {
 			filterNodeRelatedMsg( *it ) ;
 		}
 	}
@@ -691,7 +679,3 @@ void SvNavigator::addEvents(void)
 	connect( graphView, SIGNAL( expandNode(QString, bool, qint32)), this, SLOT( expandNode(const QString &, const bool &, const qint32 &) ));
 	connect( navigationTree, SIGNAL( itemDoubleClicked(QTreeWidgetItem *, int) ), this, SLOT( centerGraphOnNode(QTreeWidgetItem *) ));
 }
-
-
-
-
