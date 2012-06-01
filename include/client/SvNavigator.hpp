@@ -32,6 +32,7 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
+#include <zmq.hpp>
 
 
 class SvNavigator : public QMainWindow
@@ -107,6 +108,7 @@ MenuListT menuList;
 SubMenuListT subMenuList;
 SubMenuListT contextMenuList;
 string serverUrl ;
+zmq::socket_t* comChannel ;
 
 
 void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );

@@ -56,10 +56,9 @@ int main(int argc, char **argv)
 	module = "dashboard" ;
 	file = argv[1] ;
 	int opt ;
-	if ( (opt = getopt(argc, argv, "cdeh") ) != -1)
-	{
-		switch (opt)
-		{
+
+	if ( (opt = getopt(argc, argv, "cdeh") ) != -1) {
+		switch (opt) {
 		case 'c':
 			module = "config" ;
 			break ;
@@ -82,7 +81,7 @@ int main(int argc, char **argv)
 	}
 
 	Auth authentification;
-	userRole = authentification.exec() ;
+	int userRole = authentification.exec() ;
 	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
 	if(module == "dashboard") {
