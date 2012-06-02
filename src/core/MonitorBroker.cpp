@@ -30,6 +30,7 @@
 
 const int MonitorBroker::DEFAULT_PORT = 1983 ;
 const int MonitorBroker::DEFAULT_UPDATE_INTERVAL = 300 ;
+const int MonitorBroker::MAX_MSG = 512 ;
 
 MonitorBroker::MonitorBroker(const string & _sfile)
 : lastUpdate(0),

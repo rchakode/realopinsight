@@ -42,6 +42,7 @@ MsgPanel::MsgPanel(QWidget * _parent)
 	hideColumn( msgPanelColumnCount - 1 ) ;
 	setHorizontalHeaderLabels( msgPanelHeaderLabels );
 	setAlternatingRowColors( true ) ;
+	setSelectionBehavior(QAbstractItemView::SelectRows);
   }
 
 
@@ -58,17 +59,13 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	time_t i_time ;
 	qint32 i, row_count ;
 	QString line[ msgPanelColumnCount ], s_time ;
-	QStringList str_list ;
 	QTableWidgetItem* row_items[msgPanelColumnCount] ;
 
 	setSortingEnabled( false ) ;
-
 	i_time = atol(_node_it->check.last_state_change.c_str()) ; s_time = ctime(&i_time) ;
-	str_list = QString(_node_it->check.id.c_str()).split("/") ;
-
 	line[0] = s_time.replace("\n", "") ;
 	line[1] = Utils::statusToString(_node_it->status) ;
-	line[2] = ( str_list.length() )?  str_list[0] : "" ;
+	line[2] = QString(_node_it->check.host.c_str()) ;
 	line[3] = " " + _node_it->name ;
 
 	if( _node_it->status == MonitorBroker::NAGIOS_OK ){

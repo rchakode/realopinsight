@@ -21,6 +21,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "core/ns.hpp"
 #include "core/MonitorBroker.hpp"
 #include <cassert>
 #include <stdexcept>
@@ -30,49 +31,72 @@
 #include <crypt.h>
 #include <fstream>
 #include <sstream>
+#include <zmq.h>
 
 using namespace std;
 
+
+pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
 int numWorkers = 2 ;
 string statusFile = "/usr/local/nagios/var/status.dat" ;
+ostringstream help(""
+		"SYNOPSIS\n"
+		"	ngrt4nd [OPTIONS]\n"
+		"\n"
+		"DESCRIPTION\n"
+		"	Start the " + ngrt4n::APP_NAME + " server.\n"
+		"	-c FILE\n"
+		"	  specifies the path of the status file. Default : " + statusFile + ".\n"
+		"	-d\n"
+		"	  start the server like a daemon.\n"
+		"	-p\n"
+		"	  sets the port of listening. Default : 1983.\n"
+		"	-a\n"
+		"	  change the authentification passphrase.\n"
+		"	-h\n"
+		"	  print this help.\n") ;
 
 void *worker_routine (void *arg)
 {
 	zmq::context_t *ctx = (zmq::context_t*) arg;
-	zmq::socket_t s (*ctx, ZMQ_REP);
-	s.connect ("inproc://workers");
+	zmq::socket_t comChannel (*ctx, ZMQ_REP);
+	comChannel.connect ("inproc://workers");
 
 	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
-
 	while (true) {
+		//TODO Authentificate request
+
 		zmq::message_t request;
-		s.recv (&request);
+		request.rebuild() ;
+		comChannel.recv(&request) ;
+		size_t msize = request.size() ;
+		char* sid = (char*)malloc(msize * sizeof(char)) ;
+		memcpy(sid, request.data(), msize) ;
 
-		cout << "received :" << request.data() << endl ;
-		//TODO
-		string result =  monitor->getInfOfService(static_cast<char*>(request.data())) ;
-
-		zmq::message_t reply (10);
-		memset (reply.data (), 0, result.size ());
-		s.send (reply);
+		string result =  monitor->getInfOfService(sid) + "\0" ;
+		free(sid) ;
+		msize = result.size() ;
+		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
+		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;
+		memcpy(reply.data(), result.c_str(), msize);
+		comChannel.send(reply);
 	}
 
+	comChannel.close() ;
 	return NULL ;
 }
 
 
-int main(int argc, char ** argv) {
+int main(int argc, char ** argv)
+{
 
-	if( getuid() != 0) {
-		cerr << "The program must be run as root" << endl;
-		exit(1) ;
-	}
 
 	string passwordFile = string(getenv("HOME")) + "/.ngrt4nd_auth" ;
 	string salt = "$1$$";
 	bool foreground = false;
-	static const char *shotOpt="dpc:l:" ;
-	int port = 0 ;
+	static const char *shotOpt="dahc:p:" ;
+	int port = MonitorBroker::DEFAULT_PORT ;
 	char opt ;
 	while ((opt = getopt(argc, argv, shotOpt)) != -1) {
 		switch (opt) {
@@ -82,15 +106,20 @@ int main(int argc, char ** argv) {
 		case 'c':		// alternative location of status.dat
 			statusFile = optarg ;
 			break;
-		case 'l':		// alternative location of status.dat
+		case 'p': {	// alternative location of status.dat
 			port = atoi(optarg) ;
+			if(port <= 0 ) {
+				cerr << "ERROR : Bad port number." << endl ;
+				exit(1) ;
+			}
 			break;
-		case 'p': {		// force to remove existing semaphore
-			char* password = getpass("Ngrt4n Password:");
-			char* rePassword = getpass("Confirm the Password:");
+		}
+		case 'a': {		// force to remove existing semaphore
+			char* password = getpass("Type the passphrase:");
+			char* rePassword = getpass("Retype the passphrase:");
 
 			if( static_cast<string>(password) != static_cast<string>(rePassword) ) {
-				cerr << "The two password are different. Retry." << endl ;
+				cerr << "ERROR : The two passphrases are different." << endl ;
 				exit(1) ;
 			}
 			ofstream ofpass;
@@ -101,10 +130,19 @@ int main(int argc, char ** argv) {
 			exit(0) ;
 			break;
 		}
+		case 'h':		// alternative location of status.dat
+			cout << help.str() << endl ;
+			exit(0) ;
 		default:
 			cerr << "Unknow option : " << opt << endl;
-			break;
+			cout << help.str() << endl ;
+			exit(0) ;
 		}
+	}
+
+	if( getuid() != 0) {
+		cerr << "The program must be run as root" << endl;
+		exit(1) ;
 	}
 
 	string authChain ;
@@ -124,17 +162,19 @@ int main(int argc, char ** argv) {
 		}
 		setsid();
 	}
+
 	zmq::context_t ctx(1);
 	zmq::socket_t workersComChannel(ctx, ZMQ_XREQ);
 	workersComChannel.bind("inproc://workers");
 
 	ostringstream tcpAddr;
-	tcpAddr << "tcp://*:" << (port ? port : MonitorBroker::DEFAULT_PORT) ;
+	tcpAddr << "tcp://*:" << port ;
 
 	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
 	clientsComChannel.bind(tcpAddr.str().c_str());
 
 	cout << "server started successfully : " << tcpAddr.str() << endl ;
+	cout << "Status file : " << statusFile << endl ;
 
 	for (int i = 0; i < numWorkers; i++) {
 		pthread_t worker;

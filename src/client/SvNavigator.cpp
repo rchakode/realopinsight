@@ -46,7 +46,7 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
   monPrefWindow (new Preferences(_user_role, Preferences::ChangeMonitoringSettings)) ,
   changePasswdWindow (new Preferences(_user_role, Preferences::ChangePassword )) ,
   msgPanel( new MsgPanel() ),
-  serverUrl ("tcp://localhost:1983")
+  serverUrl ("tcp://localhost:1983") //TODO Set the url dynamically from config file
 {
 	setWindowTitle(configFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Dashboard") ;
 	loadMenus();
@@ -60,8 +60,8 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 	rightSplitter->setOrientation( Qt::Vertical ) ;
 	setCentralWidget( mainSplitter ) ;
 
-    // Activate Qt's event handler on widget
-    addEvents();
+	// Activate Qt's event handler on widget
+	addEvents();
 }
 
 SvNavigator::~SvNavigator()
@@ -202,6 +202,11 @@ int SvNavigator::monitor(void)
 	qint32 critical_count = 0 ;
 	qint32 unknown_count = 0 ;
 
+	//Initialize the communication channel with the server
+	zmq::context_t comContext(1);
+	comChannel = new zmq::socket_t (comContext, ZMQ_REQ);
+	comChannel->connect(serverUrl.c_str());
+
 	qint32 all_checks_count = 0 ;
 	snavStruct->check_status_count.clear() ;
 	for(check_id_it = snavStruct->check_list.begin();
@@ -212,43 +217,33 @@ int SvNavigator::monitor(void)
 
 		if( node_it->child_nodes == "" ) {
 			node_it->status = MonitorBroker::NAGIOS_UNKNOWN;
-
-		    // Activate Qt's event handler on widget
-		    addEvents();
-	unknown_count += 1 ;
+			unknown_count += 1 ;
 			continue;
 		}
 
 		child_nodes_list = node_it->child_nodes.split( CHILD_NODES_SEP );
-
-
-		cout << "H0 " << endl ;
-		//Initialize the communication channel with the server
-	    zmq::context_t ctx(1);
-	    comChannel = new zmq::socket_t (ctx, ZMQ_REQ);
-	    comChannel->connect(serverUrl.c_str());
-
 		for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
+
 			MonitorBroker::NagiosCheckT check ;
-
-	        //Request the current status of the service to the server
-	        cout << "H1"<< endl ;
 			string sid = (*node_id_it).trimmed().toStdString() ;
-			zmq::message_t request(10);
-	        memcpy(request.data(), sid.c_str(), sid.size());
-	        comChannel->send(request);
 
-	        cout << "here1"<< endl ;
-	        //  Get the reply.
-	        zmq::message_t reply;
-	        comChannel->recv(&reply);
+			// Prepare and send request
+			zmq::message_t request( MonitorBroker::MAX_MSG );
+			memset(request.data(), 0, MonitorBroker::MAX_MSG) ;
+			memcpy(request.data(), sid.c_str(), sid.size());
+			comChannel->send(request);
 
-			QRegExp sepRgx;
-			QStringList sInfoVec ;
-			sepRgx.setPattern("#");
-			sInfoVec = QString(static_cast<char*>(reply.data())).split(sepRgx) ;
+			//  Get reply.
+			zmq::message_t reply ;
+			comChannel->recv(&reply);
+			int msize = reply.size() ;
+			char* result = (char*)malloc(msize *  sizeof(char)) ;
+			memcpy(result, reply.data(), msize) ;
 
-			if( sInfoVec.length() != 6) {
+			QRegExp sepRgx; QStringList sInfoVec ; sepRgx.setPattern("#");
+			sInfoVec = QString(result).split(sepRgx) ; free(result) ;
+
+			if( sInfoVec.length() != 5) {
 				unknown_count += 1 ;
 				continue ;
 			}
@@ -288,6 +283,9 @@ int SvNavigator::monitor(void)
 
 				emit hasToBeUpdate( node_it->parent ) ;
 			}
+
+//			if( result ) free(result) ;
+//			if( reply.data() ) free(reply.data()) ;
 		}
 	}
 
@@ -313,6 +311,7 @@ int SvNavigator::monitor(void)
 		msgPanel->resizeFields( msgPanelSize ) ;
 	}
 
+	comChannel->close() ;
 	return 0 ;
 }
 
@@ -654,7 +653,6 @@ void SvNavigator::loadMenus(void)
 	toolBar->addAction(subMenuList["Capture"]) ;
 
 	setMenuBar( menuBar ) ;
-
 }
 
 

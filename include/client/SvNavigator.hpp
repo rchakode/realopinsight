@@ -34,7 +34,6 @@
 #include "Preferences.hpp"
 #include <zmq.hpp>
 
-
 class SvNavigator : public QMainWindow
 {
 	Q_OBJECT

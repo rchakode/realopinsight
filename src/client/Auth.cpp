@@ -71,8 +71,6 @@ void Auth::cancel(void)
 
 void Auth::authentificate(void)
 {
-	QString user_name, user_passwd, root_passwd, op_passwd;
-
 	QString userName = login->text() ;
 	QString userPasswd = QCryptographicHash::hash(password->text().toAscii(), QCryptographicHash::Md5) ;
 	QString rootPasswd =  settings->value(Preferences::ADM_PASSWD_KEY).toString() ;
@@ -83,7 +81,7 @@ void Auth::authentificate(void)
 			&& userPasswd == rootPasswd ) {
 
 		done( ADM_USER_ROLE );
-	} else if( ! op_passwd.isEmpty()
+	} else if( ! opPasswd.isEmpty()
 			&& userName == OP_USER_NAME
 			&& userPasswd == opPasswd ) {
 		done(OP_USER_ROLE);

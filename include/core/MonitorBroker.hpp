@@ -58,6 +58,7 @@ public:
 
 	static const int DEFAULT_PORT ;
 	static const int DEFAULT_UPDATE_INTERVAL ;
+	static const int MAX_MSG ;
 
 
 private:
