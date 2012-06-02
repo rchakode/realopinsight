@@ -55,10 +55,14 @@ void PieChart::update(const CheckStatusCountT & _check_status_count, const qint3
 	unknown_ratio = ( 100.0 * unknown_count ) / _check_count ;
 	ok_ratio = ( 100.0 * ok_count ) / _check_count ;
 
-	slices[MonitorBroker::NAGIOS_CRITICAL] = new PieChartItem(boundingRect, 0, 3.6 * critical_ratio, CRITICAL_COLOR, this) ;
-	slices[MonitorBroker::NAGIOS_WARNING] = new PieChartItem(boundingRect, 3.6 * critical_ratio, 3.6 * warning_ratio, WARNING_COLOR, this) ;
-	slices[MonitorBroker::NAGIOS_UNKNOWN] = new PieChartItem(boundingRect, 3.6 * (critical_ratio + warning_ratio), 3.6 * unknown_ratio, UNKNOWN_COLOR, this) ;
-	slices[MonitorBroker::NAGIOS_OK] = new PieChartItem(boundingRect, 3.6 * (unknown_ratio + warning_ratio + critical_ratio), 3.6 * ok_ratio, OK_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_CRITICAL] = new PieChartItem(
+			boundingRect, 0, 3.6 * critical_ratio, StatsLegend::CRITICAL_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_WARNING] = new PieChartItem(
+			boundingRect, 3.6 * critical_ratio, 3.6 * warning_ratio, StatsLegend::WARNING_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_UNKNOWN] = new PieChartItem(
+			boundingRect, 3.6 * (critical_ratio + warning_ratio), 3.6 * unknown_ratio, StatsLegend::UNKNOWN_COLOR, this) ;
+	slices[MonitorBroker::NAGIOS_OK] = new PieChartItem(
+			boundingRect, 3.6 * (unknown_ratio + warning_ratio + critical_ratio), 3.6 * ok_ratio, StatsLegend::OK_COLOR, this) ;
 
 	_tool_tip +=  "Critical: " + QString::number(critical_count) + "/"
 			"" + QString::number(_check_count) + " (" + QString::number(critical_ratio, 'f', 0) +

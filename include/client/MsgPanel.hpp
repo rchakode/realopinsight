@@ -36,12 +36,15 @@ public:
 	MsgPanel(QWidget * parent = 0 );
 	virtual ~MsgPanel() {};
 
-
 	static const qint16 msgPanelColumnCount;
-
 	void addMsg(const NodeListT::iterator &);
 	void resizeFields( const QSize & ,  const bool & = false );
 
+	//EVENT CONSOLE META-MESSAGES
+	static const QString HOSTNAME_META_MSG_PATERN ;
+	static const QString SERVICE_META_MSG_PATERN ;
+	static const QString THERESHOLD_META_MSG_PATERN  ;
+	static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
 
 public slots:
 	void acknowledgeMsg(void) { emit acknowledgeChanged() ;}

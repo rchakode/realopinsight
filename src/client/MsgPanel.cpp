@@ -22,8 +22,15 @@
  */
 
 #include "MsgPanel.hpp"
+#include "StatsLegend.hpp"
 
 const qint16 MsgPanel::msgPanelColumnCount = 7;
+
+//EVENT CONSOLE META-MESSAGES
+const QString MsgPanel::HOSTNAME_META_MSG_PATERN = "\\{hostname\\}" ;
+const QString MsgPanel::SERVICE_META_MSG_PATERN = "\\{check_name\\}" ;
+const QString MsgPanel::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}" ;
+const QString MsgPanel::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}" ;
 
 const QStringList MsgPanel::msgPanelHeaderLabels =
 		QStringList() <<"Date & Hour"
@@ -68,7 +75,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	line[2] = QString(_node_it->check.host.c_str()) ;
 	line[3] = " " + _node_it->name ;
 
-	if( _node_it->status == MonitorBroker::NAGIOS_OK ){
+	if( _node_it->status == MonitorBroker::NAGIOS_OK ) {
 		line[4] = ( _node_it->notification_msg.trimmed().length() != 0) ? _node_it->notification_msg : QString(_node_it->check.alarm_msg.c_str()) ;
 	}
 	else {
@@ -80,10 +87,8 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	i = 0 ;
 	row_count = rowCount();
-	while( i < row_count )
-	{
-		if ( item(i, id_column)->text() != _node_it->id )
-		{
+	while( i < row_count ) {
+		if ( item(i, id_column)->text() != _node_it->id ) {
 			i ++ ;
 			continue ;
 		}
@@ -95,36 +100,33 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	setRowCount( row_count + 1) ;
 	setRowHeight(0, charSize.y() + 3) ;
 
-	for(i = 0; i < msgPanelColumnCount ; i ++)
-	{
+	for(i = 0; i < msgPanelColumnCount ; i ++) {
 		setCellWidget(0, i, new QLabel( "" ) ) ;
 		row_items[i] = new QTableWidgetItem(line[i]) ;
 		setItem(0, i, row_items[i]) ;
-		if( _node_it->status != MonitorBroker::NAGIOS_OK )
-		{
-			item(0, i)->setBackground(HIGHLIGHT_COLOR) ;
+		if( _node_it->status != MonitorBroker::NAGIOS_OK ) {
+			item(0, i)->setBackground(StatsLegend::HIGHLIGHT_COLOR) ;
 		}
 	}
 
-	switch(_node_it->status)
-	{
+	switch(_node_it->status) {
 	case MonitorBroker::NAGIOS_OK:
-		item(0, 1)->setBackground(QBrush(OK_COLOR)) ;
+		item(0, 1)->setBackground(QBrush(StatsLegend::OK_COLOR)) ;
 		break;
 
 	case MonitorBroker::NAGIOS_WARNING:
 		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_WARNING)) ;
-		item(0, 1)->setBackground(QBrush(WARNING_COLOR)) ;
+		item(0, 1)->setBackground(QBrush(StatsLegend::WARNING_COLOR)) ;
 		break;
 
 	case MonitorBroker::NAGIOS_CRITICAL:
 		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_CRITICAL)) ;
-		item(0, 1)->setBackground(QBrush(CRITICAL_COLOR)) ;
+		item(0, 1)->setBackground(QBrush(StatsLegend::CRITICAL_COLOR)) ;
 		break;
 
 	case MonitorBroker::NAGIOS_UNKNOWN:
 		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_UNKNOWN)) ;
-		item(0, 1)->setBackground(QBrush(UNKNOWN_COLOR)) ;
+		item(0, 1)->setBackground(QBrush(StatsLegend::UNKNOWN_COLOR)) ;
 		break;
 
 	default:
@@ -139,8 +141,7 @@ void MsgPanel::resizeFields( const QSize & _window_size, const bool & _resize_wi
 
 	resizeColumnsToContents() ;
 
-	if( rowCount() )
-	{
+	if( rowCount() ) {
 		msg_width = (_window_size.width() - cellWidget(0, 4)->pos().x() ) ;
 		setColumnWidth(4, msg_width ) ;
 	}

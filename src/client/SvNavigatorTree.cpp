@@ -24,6 +24,7 @@
 #include "core/ns.hpp"
 #include "SvNavigatorTree.hpp"
 #include <QtGui>
+#include "Parser.hpp"
 
 const QString SvNavigatorTree::rootID = "root";
 
@@ -48,21 +49,17 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
 	QString dest_tnode_id ;
 
 	tnode = itemAt( _event->pos() ) ;
-	if( tnode && ptr2MainStruct )
-	{
+	if( tnode && ptr2MainStruct ) {
 		node_it = ptr2MainStruct->node_list.find( tnode->text(TREE_NODE_ID_COLUMN) ) ;
-		if( node_it != ptr2MainStruct->node_list.end() )
-		{
-			if( node_it->type != ALARM_NODE )
-			{
+		if( node_it != ptr2MainStruct->node_list.end() ) {
+			if( node_it->type != ALARM_NODE ) {
 				_event->setDropAction( Qt::MoveAction ) ;
 
 				QTreeWidget::dropEvent( _event ) ;
 
 				emit treeNodeMoved(selectedNode) ;
 			}
-			else
-			{
+			else {
 				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
 						"Dropping not allowed on the target node", QMessageBox::Ok) ;
 			}
@@ -90,47 +87,39 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _service_tree,
 	QTreeWidgetItem * item ;
 
 	node_it = _service_tree.find( _node.id ) ;
-	if( node_it == _service_tree.end() )
-	{
+	if( node_it == _service_tree.end() ) {
 		item = new QTreeWidgetItem( QTreeWidgetItem::UserType ) ;
 		item->setIcon(0, QIcon(":/images/unknown.png")) ;
 		item->setText(0, _node.name) ;
 		item->setText(1, _node.id) ; // Not show in UI,  useful for handling events
 
-		if( _first_insertion )
-		{
+		if( _first_insertion ) {
 			parent_node_it = _service_tree.find( _node.parent ) ;
-			if( parent_node_it != _service_tree.end() )
-			{
+			if( parent_node_it != _service_tree.end() ) {
 				_service_tree[_node.parent]->addChild(item);
 			}
 		}
 
 		_service_tree[_node.id] = item ;
 	}
-	else
-	{
+	else {
 		(*node_it)->setIcon(0, QIcon(":/images/unknown.png")) ;
 		(*node_it)->setText(0, _node.name) ;
 		(*node_it)->setText(1, _node.id) ; // Not show in UI,  useful for handling events
 	}
 
-	if( _node.type != ALARM_NODE && _node.child_nodes != "" )
-	{
-		child_nodes_list = _node.child_nodes.split( CHILD_NODES_SEP );
+	if( _node.type != ALARM_NODE && _node.child_nodes != "" ) {
+		child_nodes_list = _node.child_nodes.split( Parser::CHILD_NODES_SEP );
 
-		for( uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++ )
-		{
+		for( uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++ ) {
 			child_node_id = (*uds_it).trimmed() ;
 			child_node_it = _service_tree.find( child_node_id ) ;
 
-			if( child_node_it == _service_tree.end() )
-			{
+			if( child_node_it == _service_tree.end() ) {
 				_service_tree[child_node_id] = new QTreeWidgetItem(QTreeWidgetItem::UserType) ;
 				_service_tree[_node.id]->addChild( _service_tree[child_node_id] ) ;
 			}
-			else
-			{
+			else {
 				_service_tree[_node.id]->addChild( *child_node_it ) ;
 			}
 		}

@@ -28,6 +28,7 @@
 #include "core/ns.hpp"
 
 
+
 SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_file, QWidget* parent)
 : QMainWindow(parent) ,
   configFile(_config_file) ,
@@ -221,7 +222,7 @@ int SvNavigator::monitor(void)
 			continue;
 		}
 
-		child_nodes_list = node_it->child_nodes.split( CHILD_NODES_SEP );
+		child_nodes_list = node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
 		for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
 
 			MonitorBroker::NagiosCheckT check ;
@@ -357,18 +358,18 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 	}
 
 	if( len ) {
-		regexp.setPattern( HOSTNAME_META_MSG_PATERN ) ;
+		regexp.setPattern( MsgPanel::HOSTNAME_META_MSG_PATERN ) ;
 		msg.replace(regexp, splited_check_id[0]) ;
 
 		if( len == 2 ) {
-			regexp.setPattern( SERVICE_META_MSG_PATERN ) ;
+			regexp.setPattern( MsgPanel::SERVICE_META_MSG_PATERN ) ;
 			msg.replace(regexp, splited_check_id[1]) ;
 		}
 	}
 
 	splited_check_command = QString(_node->check.check_command.c_str()).split("!") ;
 	if( splited_check_command.length() >= 3) {
-		regexp.setPattern( THERESHOLD_META_MSG_PATERN ) ;
+		regexp.setPattern( MsgPanel::THERESHOLD_META_MSG_PATERN ) ;
 		msg.replace(regexp, splited_check_command[1]) ;
 
 		if(_node->status == MonitorBroker::NAGIOS_WARNING ) {
@@ -397,7 +398,7 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 	node_it = snavStruct->node_list.find( _node_id ) ;
 
 	if (node_it != snavStruct->node_list.end() ) {
-		node_ids_list = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
+		node_ids_list = node_it->child_nodes.split( Parser::CHILD_NODES_SEP ) ;
 		sum_counts = node_ids_list.size() ;
 
 		for(it = node_ids_list.begin(); it != node_ids_list.end(); it++) {
@@ -488,7 +489,7 @@ void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, con
 	NodeT& node = snavStruct->node_list[_node_id] ;
 
 	if( node.type == SERVICE_NODE && node.child_nodes != "") {
-		child_nodes_list = node.child_nodes.split( CHILD_NODES_SEP ) ;
+		child_nodes_list = node.child_nodes.split( Parser::CHILD_NODES_SEP ) ;
 		for (uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++) {
 			graphView->setNodeVisible(* uds_it, _node_id, _expand, _level) ;
 		}
@@ -534,7 +535,7 @@ void SvNavigator::filterNodeRelatedMsg( const QString & _node_id )
 		filteredMsgPanel->addMsg(node_it) ;
 	}
 	else {
-		QStringList u_servs = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
+		QStringList u_servs = node_it->child_nodes.split( Parser::CHILD_NODES_SEP ) ;
 
 		for(QStringList::iterator it = u_servs.begin() ; it != u_servs.end() ; it ++) {
 			filterNodeRelatedMsg( *it ) ;

@@ -23,7 +23,9 @@
 
 #include "core/ns.hpp"
 #include "Parser.hpp"
+#include "GraphView.hpp"
 
+const QString Parser::CHILD_NODES_SEP = "," ;
 
 const QString Parser::dotFileHeader = "strict graph   \n{\n//Nodes declaration\n\tnode[shape=plaintext]\n\n";
 const QString Parser::dotFileFooter = "}";
@@ -72,7 +74,7 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	node.name = rootElt.firstChildElement("Name").text();
 	node.child_nodes = rootElt.firstChildElement("SubServices").text();
 	node.status = MonitorBroker::UNSET_STATUS ;  // TODO Acknowledge status,
-	node.icon = DEFAULT_ICON ;
+	node.icon = GraphView::DEFAULT_ICON ;
 	node.type = SERVICE_NODE ;
 	node.parent = "NULL" ;  // By convention
 

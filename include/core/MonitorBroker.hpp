@@ -60,7 +60,6 @@ public:
 	static const int DEFAULT_UPDATE_INTERVAL ;
 	static const int MAX_MSG ;
 
-
 private:
 	int lastUpdate ;
 	string statusFile ;

@@ -23,6 +23,7 @@
 
 
 #include "SvConfigCreator.hpp"
+#include "GraphView.hpp"
 
 
 SvCreator::SvCreator(const qint32 & _user_role)
@@ -138,7 +139,7 @@ void SvCreator::newBusinessView(void)
 		node.name = "New Business view" ;
 		node.child_nodes.clear() ;
 		node.status = MonitorBroker::NAGIOS_UNKNOWN ;  // TODO no acknowledged
-		node.icon = DEFAULT_ICON ;
+		node.icon = GraphView::DEFAULT_ICON ;
 		node.type = SERVICE_NODE ;
 		node.parent.clear() ;  				//root has not parent
 
@@ -177,12 +178,12 @@ void SvCreator::newNode(void)
 	node.name = "sub service " + QString::number(count) , count ++ ;
 	node.type = SERVICE_NODE ;
 	node.status = MonitorBroker::NAGIOS_UNKNOWN ; // TODO no acknowledged
-	node.icon = DEFAULT_ICON ;
+	node.icon = GraphView::DEFAULT_ICON ;
 	node.child_nodes = "" ;
 
 	SvNavigatorTree::addNode(snavStruct->tree_item_list, node, true) ;
 	snavStruct->node_list[node.id] = node ;
-	p_node_it->child_nodes += (p_node_it->child_nodes != "")? CHILD_NODES_SEP + node.id : node.id ;
+	p_node_it->child_nodes += (p_node_it->child_nodes != "")? Parser::CHILD_NODES_SEP + node.id : node.id ;
 
 	navigationTree->setCurrentItem(snavStruct->tree_item_list[node.id]) ;
 	fillEditorFromService(snavStruct->tree_item_list[node.id]);
@@ -223,7 +224,7 @@ void SvCreator::deleteNode(const QString & _node_id)
 	{
 		if( node_it->type != ALARM_NODE &&  node_it->child_nodes != "" )
 		{
-			ud_services = node_it->child_nodes.split( CHILD_NODES_SEP );
+			ud_services = node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
 
 			for( uds_it = ud_services.begin(); uds_it != ud_services.end(); uds_it++ )
 			{
@@ -241,9 +242,9 @@ void SvCreator::deleteNode(const QString & _node_id)
 		{
 			QRegExp regex ;
 			regex.setPattern(
-					"|^" + _node_id + CHILD_NODES_SEP +
+					"|^" + _node_id + Parser::CHILD_NODES_SEP +
 					"|^" + _node_id + "$" +
-					"|" + CHILD_NODES_SEP  + _node_id
+					"|" + Parser::CHILD_NODES_SEP  + _node_id
 			) ;
 			p_node_it = snavStruct->node_list.find( node_it->parent ) ;
 			if (p_node_it != snavStruct->node_list.end() ) p_node_it->child_nodes.remove( regex ) ;
@@ -362,9 +363,9 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 				/* Remove the node on its old parent's child list */
 
 				regex.setPattern(
-						"|^" + _node_id + CHILD_NODES_SEP +
+						"|^" + _node_id + Parser::CHILD_NODES_SEP +
 						"|^" + _node_id + "$" +
-						"|" + CHILD_NODES_SEP  + _node_id
+						"|" + Parser::CHILD_NODES_SEP  + _node_id
 				) ;
 				p_node_it = snavStruct->node_list.find( node_it->parent ) ;
 				if( p_node_it != snavStruct->node_list.end() )
@@ -379,7 +380,7 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 				if( p_node_it != snavStruct->node_list.end() )
 				{
 					p_node_it->child_nodes += (p_node_it->child_nodes != "")?
-							CHILD_NODES_SEP + _node_id : _node_id ;
+							Parser::CHILD_NODES_SEP + _node_id : _node_id ;
 				}
 			}
 		}

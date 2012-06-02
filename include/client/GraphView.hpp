@@ -58,6 +58,32 @@ public:
 		return graphScene->itemAt( mapToScene( pos ) ) ;
 	}
 
+	//ICON-RELATED META DATA
+	static const QString PLUS ;
+	static const QString MINUS ;
+	static const QString DEFAULT_ICON ;
+	static const QString NETWORK_ICON ;
+	static const QString ROUTER_ICON ;
+	static const QString SWITCH_ICON ;
+	static const QString FIREWALL_ICON  ;
+	static const QString STORAGE_ICON ;
+	static const QString FILER_ICON ;
+	static const QString HARDDISK_ICON ;
+	static const QString SERVER_ICON  ;
+	static const QString LINUX_ICON ;
+	static const QString WINDOWS_ICON ;
+	static const QString SOLARIS_ICON  ;
+	static const QString WEBSERVER_ICON ;
+	static const QString DBSERVER_ICON ;
+	static const QString APP_ICON ;
+	static const QString WEB_ICON ;
+	static const QString DB_ICON ;
+	static const QString PROCESS_ICON ;
+	static const QString LOG_ICON ;
+	static const QString CLOUD_ICON ;
+	static const QString HYPERVISOR_ICON ;
+	static const QString OTH_CHECK_ICON ;
+
 
 public slots:
 void capture(void) ;
@@ -105,6 +131,12 @@ void drawNode(const NodeT & ) ;
 void setEdgePath(const QString &, const QString &, QPainterPath & ) ;
 void setNodePos(const QString & , const QPointF & ) ;
 void ajustStatsPanelSize(void) ;
+
+
+// GRAPHVIEW ICON EXTENTION, FOR SUITABLE IDENTIFATION
+static const QString NODE_LABEL_ID_SFX ;
+static const QString  NODE_ICON_ID_SFX ;
+static const QString  NODE_EXP_ICON_ID_SFX ;
 };
 
 #endif /* GRAPHVIEW_H_ */

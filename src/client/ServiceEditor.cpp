@@ -23,6 +23,20 @@
 
 #include "ServiceEditor.hpp"
 #include "Preferences.hpp"
+#include "GraphView.hpp"
+
+//EDITOR FIELDS
+const QString ServiceEditor::NAME_FIELD = "name";
+const QString ServiceEditor::TYPE_FIELD = "type";
+const QString ServiceEditor::STATUS_CALC_RULE_FIELD = "Status Calc. Rule";
+const QString ServiceEditor::ICON_FIELD = "icon";
+const QString ServiceEditor::DESCRIPTION_FIELD = "description";
+const QString ServiceEditor::ALARM_MSG_FIELD = "alarmMsg" ;
+const QString ServiceEditor::NOTIFICATION_MSG_FIELD = "notificationMsg";
+const QString ServiceEditor::CHECK_LIST_FIELD = "ChecksField";
+const QString ServiceEditor::CHECK_FIELD = "CheckField";
+const QString ServiceEditor::HIGH_CRITICITY_CALC_RULE = "Higher Criticity";
+const QString ServiceEditor::WEIGHTED_CALC_RULE = "Equal-weighted Criticity";
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
 : QWidget( _parent ),
@@ -226,13 +240,12 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node_it)
 
 	lla_widget = checkListField();
 
-	child_nodes_list = _node_it->child_nodes.split( CHILD_NODES_SEP );
+	child_nodes_list = _node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
 	child_node_it = child_nodes_list.begin();
 
 	// TODO
 
-	if ( child_node_it != child_nodes_list.end() )
-	{
+	if ( child_node_it != child_nodes_list.end() ) {
 		checkField()->setCurrentIndex(checkField()->findText((*child_node_it).trimmed(), Qt::MatchExactly)) ;
 
 		child_node_items = lla_widget->findItems((*child_node_it).trimmed(), Qt::MatchExactly);
@@ -324,33 +337,30 @@ void ServiceEditor::loadIconFields()
 	QIcon icon("images/normal.png");
 	QComboBox* iconsBox = iconField() ;
 
-	iconsBox->addItem(DEFAULT_ICON) ;
-	iconsBox->addItem(NETWORK_ICON) ;
-	iconsBox->addItem(ROUTER_ICON) ;
-	iconsBox->addItem(SWITCH_ICON) ;
-	iconsBox->addItem(FIREWALL_ICON) ;
+	iconsBox->addItem(GraphView::DEFAULT_ICON) ;
+	iconsBox->addItem(GraphView::NETWORK_ICON) ;
+	iconsBox->addItem(GraphView::ROUTER_ICON) ;
+	iconsBox->addItem(GraphView::SWITCH_ICON) ;
+	iconsBox->addItem(GraphView::FIREWALL_ICON) ;
+	iconsBox->addItem(GraphView::SERVER_ICON) ;
+	iconsBox->addItem(GraphView::LINUX_ICON) ;
+	iconsBox->addItem(GraphView::WINDOWS_ICON) ;
+	iconsBox->addItem(GraphView::SOLARIS_ICON) ;
+	iconsBox->addItem(GraphView::WEBSERVER_ICON) ;
+	iconsBox->addItem(GraphView::DBSERVER_ICON) ;
+	iconsBox->addItem(GraphView::STORAGE_ICON) ;
+	iconsBox->addItem(GraphView::FILER_ICON) ;
+	iconsBox->addItem(GraphView::HARDDISK_ICON) ;
+	iconsBox->addItem(GraphView::APP_ICON) ;
+	iconsBox->addItem(GraphView::WEB_ICON) ;
+	iconsBox->addItem(GraphView::DB_ICON) ;
+	iconsBox->addItem(GraphView::PROCESS_ICON) ;
+	iconsBox->addItem(GraphView::LOG_ICON) ;
 
-	iconsBox->addItem(SERVER_ICON) ;
-	iconsBox->addItem(LINUX_ICON) ;
-	iconsBox->addItem(WINDOWS_ICON) ;
-	iconsBox->addItem(SOLARIS_ICON) ;
-	iconsBox->addItem(WEBSERVER_ICON) ;
-	iconsBox->addItem(DBSERVER_ICON) ;
+	iconsBox->addItem(GraphView::CLOUD_ICON) ;
+	iconsBox->addItem(GraphView::HYPERVISOR_ICON) ;
 
-	iconsBox->addItem(STORAGE_ICON) ;
-	iconsBox->addItem(FILER_ICON) ;
-	iconsBox->addItem(HARDDISK_ICON) ;
-
-	iconsBox->addItem(APP_ICON) ;
-	iconsBox->addItem(WEB_ICON) ;
-	iconsBox->addItem(DB_ICON) ;
-	iconsBox->addItem(PROCESS_ICON) ;
-	iconsBox->addItem(LOG_ICON) ;
-
-	iconsBox->addItem(CLOUD_ICON) ;
-	iconsBox->addItem(HYPERVISOR_ICON) ;
-
-	iconsBox->addItem(OTH_CHECK_ICON) ;
+	iconsBox->addItem(GraphView::OTH_CHECK_ICON) ;
 
 	layout->addWidget(editorItemsList["iconNameLabel"], currentLine, 0);
 	layout->addWidget(iconsBox, currentLine, 1);

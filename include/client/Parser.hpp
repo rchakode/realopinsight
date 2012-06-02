@@ -38,7 +38,7 @@ public:
 
 	bool parseSvConfig(const QString &, Struct &) ;
 	QString getDotGraphFile(void) const { return graphFilename; }
-
+	static const QString CHILD_NODES_SEP ;
 
 private:
 	static const QString dotFileHeader;

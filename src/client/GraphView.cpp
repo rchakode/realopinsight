@@ -23,9 +23,43 @@
 
 #include "core/ns.hpp"
 #include "GraphView.hpp"
+#include "StatsLegend.hpp"
 
 const qreal GraphView::XScalingRatio = 75.0 ;
 const qreal GraphView::YScalingRatio = 100.0 ;
+
+//ICON-RELATED META DATA
+const QString GraphView::PLUS = "plus" ;
+const QString GraphView::MINUS = "minus" ;
+const QString GraphView::DEFAULT_ICON = BUSINESS_PROCESS_NODE ;
+const QString GraphView::NETWORK_ICON = "Network" ;
+const QString GraphView::ROUTER_ICON = "--> Router" ;
+const QString GraphView::SWITCH_ICON = "--> Switch" ;
+const QString GraphView::FIREWALL_ICON = "--> Firewall" ;
+const QString GraphView::STORAGE_ICON = "Storage" ;
+const QString GraphView::FILER_ICON = "--> Storage Area" ;
+const QString GraphView::HARDDISK_ICON = "--> Hard disk" ;
+const QString GraphView::SERVER_ICON = "Server" ;
+const QString GraphView::LINUX_ICON = "--> Linux OS" ;
+const QString GraphView::WINDOWS_ICON = "--> Windows OS" ;
+const QString GraphView::SOLARIS_ICON = "--> Solaris OS" ;
+const QString GraphView::WEBSERVER_ICON = "--> Web Server" ;
+const QString GraphView::DBSERVER_ICON = "--> Database Server" ;
+const QString GraphView::APP_ICON = "Application" ;
+const QString GraphView::WEB_ICON = "--> Web Accessibility" ;
+const QString GraphView::DB_ICON = "--> Database Engine" ;
+const QString GraphView::PROCESS_ICON = "--> Process" ;
+const QString GraphView::LOG_ICON = "--> Logfile" ;
+const QString GraphView::CLOUD_ICON = "Cloud" ;
+const QString GraphView::HYPERVISOR_ICON = "--> Hypervisor" ;
+const QString GraphView::OTH_CHECK_ICON = "Other Check" ;
+
+
+
+// GRAPHVIEW ICON EXTENTION, FOR SUITABLE IDENTIFATION
+const QString GraphView::NODE_LABEL_ID_SFX = ":LABEL" ;
+const QString  GraphView::NODE_ICON_ID_SFX = ":ICON" ;
+const QString  GraphView::NODE_EXP_ICON_ID_SFX = ":EXPICON" ;
 
 GraphView::GraphView(QWidget* _parent)
 : QGraphicsView(_parent),
@@ -267,7 +301,7 @@ void GraphView::drawGraph(const NodeListT & _node_list)
 	if (cood_graph_file.setFileName(coodinatesGraphFile),
 			cood_graph_file.open(QFile::ReadOnly))
 	{
-		pen.setColor( UNKNOWN_COLOR );
+		pen.setColor( StatsLegend::UNKNOWN_COLOR );
 
 		sep_regex.setPattern("[ ]+");
 		cood_graph_file_s.setDevice(& cood_graph_file );
@@ -353,19 +387,19 @@ void GraphView::updateNodeColor(const NodeListT::iterator & _node)
 	switch (_node->status)
 	{
 	case MonitorBroker::NAGIOS_OK:
-		color = OK_COLOR ;
+		color = StatsLegend::OK_COLOR ;
 		break;
 
 	case MonitorBroker::NAGIOS_WARNING:
-		color = WARNING_COLOR ;
+		color = StatsLegend::WARNING_COLOR ;
 		break;
 
 	case MonitorBroker::NAGIOS_CRITICAL:
-		color = CRITICAL_COLOR ;
+		color = StatsLegend::CRITICAL_COLOR ;
 		break;
 
 	default:
-		color = UNKNOWN_COLOR ;
+		color = StatsLegend::UNKNOWN_COLOR ;
 		break;
 	}
 
@@ -387,19 +421,19 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 	switch (_node_it->status)
 	{
 	case MonitorBroker::NAGIOS_OK:
-		color = OK_COLOR ;
+		color = StatsLegend::OK_COLOR ;
 		break;
 
 	case MonitorBroker::NAGIOS_WARNING:
-		color = WARNING_COLOR ;
+		color = StatsLegend::WARNING_COLOR ;
 		break;
 
 	case MonitorBroker::NAGIOS_CRITICAL:
-		color = CRITICAL_COLOR ;
+		color = StatsLegend::CRITICAL_COLOR ;
 		break;
 
 	default:
-		color = UNKNOWN_COLOR ;
+		color = StatsLegend::UNKNOWN_COLOR ;
 		break;
 	}
 	html_n_label = "<span style=\"background: '" + color.name() + "'\">&nbsp;" +_node_it->name + "&nbsp;</span>";

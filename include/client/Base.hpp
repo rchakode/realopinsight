@@ -28,6 +28,7 @@
 #include <QtGui>
 #include <QtWebKit>
 #include <QSettings>
+#include <bitset>
 #include "core/MonitorBroker.hpp"
 
 const QString ABOUT_MSG = "NGRT4N\n\n"
@@ -43,79 +44,18 @@ const qint32 SERVICE_NODE = 0 ;
 const qint32 ALARM_NODE = 1 ;
 const qint32 MAX_NODE_NAME = 24 ;
 
-const QColor OK_COLOR =  Qt::green ;
-const QColor WARNING_COLOR = Qt::yellow ;
-const QColor CRITICAL_COLOR = Qt::red ;
-const QColor UNKNOWN_COLOR = Qt::lightGray ;
-const QColor HIGHLIGHT_COLOR = QColor(255, 255, 200) ;
-
-//EDITOR FIELDS
-const QString NAME_FIELD = "name" ;
-const QString TYPE_FIELD = "type" ;
-const QString STATUS_CALC_RULE_FIELD = "Status Calc. Rule" ;
-const QString ICON_FIELD = "icon" ;
-const QString DESCRIPTION_FIELD = "description" ;
-const QString ALARM_MSG_FIELD = "alarmMsg" ;
-const QString NOTIFICATION_MSG_FIELD = "notificationMsg" ;
-const QString CHECK_LIST_FIELD = "ChecksField" ;
-const QString CHECK_FIELD = "CheckField" ;
-const QString CHILD_NODES_SEP = "," ;
-
 //RELATED TO COMBOBOXes
-const QString HIGH_CRITICITY_CALC_RULE = "Higher Criticity";
-const QString WEIGHTED_CALC_RULE = "Equal-weighted Criticity";
-
 const QString BUSINESS_PROCESS_NODE = "Business Process" ;
 const QString NATIVE_CHECK_NODE = "Native Check" ;
-
 const qint32 HIGH_CRITICITY_CALC_RULE_INDEX = 0 ;
 const qint32 WEIGHTED_CALC_RULE_INDEX = 1 ;
-
-//ICON-RELATED META DATA
-const QString PLUS = "plus" ;
-const QString MINUS = "minus" ;
-const QString DEFAULT_ICON = BUSINESS_PROCESS_NODE ;
-const QString NETWORK_ICON = "Network" ;
-const QString ROUTER_ICON = "--> Router" ;
-const QString SWITCH_ICON = "--> Switch" ;
-const QString FIREWALL_ICON = "--> Firewall" ;
-const QString STORAGE_ICON = "Storage" ;
-const QString FILER_ICON = "--> Storage Area" ;
-const QString HARDDISK_ICON = "--> Hard disk" ;
-const QString SERVER_ICON = "Server" ;
-const QString LINUX_ICON = "--> Linux OS" ;
-const QString WINDOWS_ICON = "--> Windows OS" ;
-const QString SOLARIS_ICON = "--> Solaris OS" ;
-const QString WEBSERVER_ICON = "--> Web Server" ;
-const QString DBSERVER_ICON = "--> Database Server" ;
-const QString APP_ICON = "Application" ;
-const QString WEB_ICON = "--> Web Accessibility" ;
-const QString DB_ICON = "--> Database Engine" ;
-const QString PROCESS_ICON = "--> Process" ;
-const QString LOG_ICON = "--> Logfile" ;
-const QString CLOUD_ICON = "Cloud" ;
-const QString HYPERVISOR_ICON = "--> Hypervisor" ;
-const QString OTH_CHECK_ICON = "Other Check" ;
-
-
-// GRAPHVIEW ICON EXTENTION, FOR SUITABLE IDENTIFATION
-const QString NODE_LABEL_ID_SFX = ":LABEL" ;
-const QString  NODE_ICON_ID_SFX = ":ICON" ;
-const QString  NODE_EXP_ICON_ID_SFX = ":EXPICON" ;
-
-
-//EVENT CONSOLE META-MESSAGES
-const QString HOSTNAME_META_MSG_PATERN = "\\{hostname\\}" ;
-const QString SERVICE_META_MSG_PATERN = "\\{check_name\\}" ;
-const QString THERESHOLD_META_MSG_PATERN = "\\{threshold\\}" ;
-const QString PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}" ;
-
 
 //GLOBAL DATA STRUCTURES
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
 
+typedef bitset<4> StatusInfoT ;
 typedef struct _NodeT {
 	QString id;
 	QString name ;
@@ -128,12 +68,12 @@ typedef struct _NodeT {
 	QString alarm_msg ;
 	QString notification_msg ;
 	qint32 status ;
+	StatusInfoT status_info ;
 	QString child_nodes ;
 	MonitorBroker::NagiosCheckT check ;
 } NodeT;
 
 typedef QHash<QString, NodeT> NodeListT ;
-
 typedef QMap<qint32, qint32> CheckStatusCountT ;
 
 typedef struct _GNode {

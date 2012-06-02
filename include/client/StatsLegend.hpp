@@ -33,6 +33,11 @@ public:
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
 
+	static const QColor OK_COLOR ;
+	static const QColor WARNING_COLOR ;
+	static const QColor CRITICAL_COLOR ;
+	static const QColor UNKNOWN_COLOR ;
+	static const QColor HIGHLIGHT_COLOR ;
 
 protected:
 void paintEvent(QPaintEvent *event);

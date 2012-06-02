@@ -106,13 +106,11 @@ public slots:
 	void handleNodeTypeChanged(const QString &) ;
 	void handleNodeTypeActivated( const QString & _text) ;
 
-
 	signals:
 	void saveClicked(void) ;
 	void closeClicked(void) ;
 	void returnPressed(void) ;
 	void nodeTypeActivated(qint32) ;
-
 
 private:
 	Settings* settings ;
@@ -123,30 +121,30 @@ private:
 	QGridLayout* layout;
 	QDialogButtonBox* buttonBox;
 
-
 	void addEvent(void) ;
-
 	void loadStatusFile( void ) ;
-
 	void loadLabelFields(void);
-
 	void loadDescriptionFields(void);
-
 	void loadTypeFields(void);
-
 	void loadPriorityFields(void);
-
 	void loadAlarmMsgFields(void);
-
 	void loadNotificationMsgFields(void);
-
 	void loadIconFields(void);
-
 	void loadCheckField(void);
-
 	void loadButtonBox(void);
 
-
+	//EDITOR FIELDS
+	static const QString NAME_FIELD;
+	static const QString TYPE_FIELD;
+	static const QString STATUS_CALC_RULE_FIELD;
+	static const QString ICON_FIELD;
+	static const QString DESCRIPTION_FIELD;
+	static const QString ALARM_MSG_FIELD;
+	static const QString NOTIFICATION_MSG_FIELD;
+	static const QString CHECK_LIST_FIELD;
+	static const QString CHECK_FIELD;
+	static const QString HIGH_CRITICITY_CALC_RULE;
+	static const QString WEIGHTED_CALC_RULE;
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */
