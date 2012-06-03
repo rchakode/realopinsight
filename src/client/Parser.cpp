@@ -75,7 +75,7 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	node.child_nodes = rootElt.firstChildElement("SubServices").text();
 	node.status = MonitorBroker::UNSET_STATUS ;  // TODO Acknowledge status,
 	node.icon = GraphView::DEFAULT_ICON ;
-	node.type = SERVICE_NODE ;
+	node.type = NodeTypeT::SERVICE_NODE ;
 	node.parent = "NULL" ;  // By convention
 
 	_snav_struct.node_list[node.id] = node;
@@ -96,7 +96,7 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 		node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed() ;
 		node.child_nodes = service.firstChildElement("SubServices").text().trimmed() ;
 
-		if( node.type == ALARM_NODE )
+		if( node.type == NodeTypeT::ALARM_NODE )
 		{
 			_snav_struct.check_list << node.id;
 		}

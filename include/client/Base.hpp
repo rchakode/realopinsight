@@ -32,30 +32,40 @@
 #include "core/MonitorBroker.hpp"
 
 const QString ABOUT_MSG = "NGRT4N\n\n"
-		"Version: 1.0\n"
+		"Version: 2.0\n"
 		"Build id: 20111001 1100\n\n"
-		"(c) Copyright 2011 NGRT4N Development Team.\n"
+		"(c) Copyright 2012 NGRT4N Development Team.\n"
 		"Visit http://www.ngrt4n.com";
 
-const qint32 TREE_NODE_ID_COLUMN = 1 ;
-const qint32 NODE_ID_DATA_INDEX = 0;			// Id of data field used to stored nodes ids in the graph
-
-const qint32 SERVICE_NODE = 0 ;
-const qint32 ALARM_NODE = 1 ;
-const qint32 MAX_NODE_NAME = 24 ;
-
-//RELATED TO COMBOBOXes
-const QString BUSINESS_PROCESS_NODE = "Business Process" ;
-const QString NATIVE_CHECK_NODE = "Native Check" ;
-const qint32 HIGH_CRITICITY_CALC_RULE_INDEX = 0 ;
-const qint32 WEIGHTED_CALC_RULE_INDEX = 1 ;
-
-//GLOBAL DATA STRUCTURES
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
-
 typedef bitset<4> StatusInfoT ;
+
+enum TreeColumDescT{
+	NODE_ID_DATA_INDEX = 0,			// Id of data field used to stored nodes ids in the graph
+	TREE_NODE_ID_COLUMN = 1
+};
+
+enum StatusCalRuleT {
+	HIGH_CRITICITY_CALC_RULE = 0,
+	WEIGHTED_CRITICITY_CALC_RULE = 1
+};
+
+class NodeTypeT {
+public :
+	static const int SERVICE_NODE = 0 ;
+	static const int ALARM_NODE = 1 ;
+	static QString typeToString(int _type ) {
+
+		if (_type == ALARM_NODE ) return "Native Check" ;
+
+		return  "Business Process" ;
+	}
+
+};
+
+
 typedef struct _NodeT {
 	QString id;
 	QString name ;
@@ -97,7 +107,6 @@ typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 
 
-//UTILITY CLASSES
 class Struct
 {
 

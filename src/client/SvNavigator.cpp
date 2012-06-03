@@ -323,7 +323,7 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
 			"\nDescription: " + const_cast<QString&>(_node.description).replace("\n", " ") +
 			"\nStatus: " + Utils::statusToString(_node.status);
 
-	if ( _node.type == ALARM_NODE ) {
+	if ( _node.type == NodeTypeT::ALARM_NODE ) {
 
 		if( _node.status == MonitorBroker::NAGIOS_OK ) {
 			toolTip += "\nMessage: " + const_cast<QString&>(_node.notification_msg).replace("\n", " ");
@@ -439,7 +439,7 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 		if ( normal_count == sum_counts ) {
 			node_it->status = MonitorBroker::NAGIOS_OK ;
 		}
-		else if ( node_it->status_calc_rule == WEIGHTED_CALC_RULE_INDEX ) {
+		else if ( node_it->status_calc_rule == WEIGHTED_CRITICITY_CALC_RULE ) {
 			node_it->status = MonitorBroker::NAGIOS_WARNING ;
 			if ( critical_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
 			else if ( unknown_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
@@ -488,7 +488,7 @@ void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, con
 	QStringList::iterator uds_it ;
 	NodeT& node = snavStruct->node_list[_node_id] ;
 
-	if( node.type == SERVICE_NODE && node.child_nodes != "") {
+	if( node.type == NodeTypeT::SERVICE_NODE && node.child_nodes != "") {
 		child_nodes_list = node.child_nodes.split( Parser::CHILD_NODES_SEP ) ;
 		for (uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++) {
 			graphView->setNodeVisible(* uds_it, _node_id, _expand, _level) ;
@@ -531,7 +531,7 @@ void SvNavigator::filterNodeRelatedMsg( const QString & _node_id )
 			|| node_it->child_nodes == "" )
 		return ;
 
-	if ( node_it->type == ALARM_NODE ) {
+	if ( node_it->type == NodeTypeT::ALARM_NODE ) {
 		filteredMsgPanel->addMsg(node_it) ;
 	}
 	else {

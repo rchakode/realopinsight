@@ -28,6 +28,19 @@
 #include "Parser.hpp"
 
 
+const qint32 MAX_NODE_NAME = 24 ;
+const QString NAME_FIELD = "name";
+const QString TYPE_FIELD = "type";
+const QString STATUS_CALC_RULE_FIELD = "Status Calc. Rule";
+const QString ICON_FIELD = "icon";
+const QString DESCRIPTION_FIELD = "description";
+const QString ALARM_MSG_FIELD = "alarmMsg" ;
+const QString NOTIFICATION_MSG_FIELD = "notificationMsg";
+const QString CHECK_LIST_FIELD = "ChecksField";
+const QString CHECK_FIELD = "CheckField";
+const QString HIGH_CRITICITY_CALC_RULE_FIELD = "Higher Criticity";
+const QString WEIGHTED_CALC_RULE_FIELD = "Equal-weighted Criticity";
+
 class ServiceEditor : public QWidget
 {
 	Q_OBJECT
@@ -132,19 +145,6 @@ private:
 	void loadIconFields(void);
 	void loadCheckField(void);
 	void loadButtonBox(void);
-
-	//EDITOR FIELDS
-	static const QString NAME_FIELD;
-	static const QString TYPE_FIELD;
-	static const QString STATUS_CALC_RULE_FIELD;
-	static const QString ICON_FIELD;
-	static const QString DESCRIPTION_FIELD;
-	static const QString ALARM_MSG_FIELD;
-	static const QString NOTIFICATION_MSG_FIELD;
-	static const QString CHECK_LIST_FIELD;
-	static const QString CHECK_FIELD;
-	static const QString HIGH_CRITICITY_CALC_RULE;
-	static const QString WEIGHTED_CALC_RULE;
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */

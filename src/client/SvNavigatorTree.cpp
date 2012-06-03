@@ -52,7 +52,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
 	if( tnode && ptr2MainStruct ) {
 		node_it = ptr2MainStruct->node_list.find( tnode->text(TREE_NODE_ID_COLUMN) ) ;
 		if( node_it != ptr2MainStruct->node_list.end() ) {
-			if( node_it->type != ALARM_NODE ) {
+			if( node_it->type != NodeTypeT::ALARM_NODE ) {
 				_event->setDropAction( Qt::MoveAction ) ;
 
 				QTreeWidget::dropEvent( _event ) ;
@@ -108,7 +108,7 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _service_tree,
 		(*node_it)->setText(1, _node.id) ; // Not show in UI,  useful for handling events
 	}
 
-	if( _node.type != ALARM_NODE && _node.child_nodes != "" ) {
+	if( _node.type != NodeTypeT::ALARM_NODE && _node.child_nodes != "" ) {
 		child_nodes_list = _node.child_nodes.split( Parser::CHILD_NODES_SEP );
 
 		for( uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++ ) {

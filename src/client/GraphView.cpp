@@ -31,7 +31,7 @@ const qreal GraphView::YScalingRatio = 100.0 ;
 //ICON-RELATED META DATA
 const QString GraphView::PLUS = "plus" ;
 const QString GraphView::MINUS = "minus" ;
-const QString GraphView::DEFAULT_ICON = BUSINESS_PROCESS_NODE ;
+const QString GraphView::DEFAULT_ICON = NodeTypeT::typeToString(NodeTypeT::SERVICE_NODE) ;
 const QString GraphView::NETWORK_ICON = "Network" ;
 const QString GraphView::ROUTER_ICON = "--> Router" ;
 const QString GraphView::SWITCH_ICON = "--> Switch" ;
@@ -373,7 +373,7 @@ void GraphView::drawNode(const NodeT & _node )
 			graphScene->addItem(gnodesList[_node.id].exp_icon),
 			gnodesList[_node.id].exp_icon->setZValue(0) ;
 
-	if(gnodesList[_node.id].type == ALARM_NODE) 	gnodesList[_node.id].exp_icon->setVisible(false);
+	if(gnodesList[_node.id].type == NodeTypeT::ALARM_NODE) 	gnodesList[_node.id].exp_icon->setVisible(false);
 
 	setNodeToolTip( _node ) ;
 }
@@ -503,7 +503,7 @@ void GraphView::setNodeToolTip(const NodeT & _node)
 			"\nDescription: " + static_cast<QString>(_node.description).replace("\n", " ") +
 			"\nStatus: " + Utils::statusToString(_node.status);
 
-	if ( _node.type == ALARM_NODE )
+	if ( _node.type == NodeTypeT::ALARM_NODE )
 	{
 
 		if( _node.status == MonitorBroker::NAGIOS_OK )
@@ -542,7 +542,7 @@ void GraphView::setNodeVisible(const QString & _node_id,
 		gnode->icon->setVisible(_visible);
 		edgesList[e_id].edge->setVisible(_visible);
 
-		if( gnode->type == SERVICE_NODE )
+		if( gnode->type == NodeTypeT::SERVICE_NODE )
 		{
 			gnode->exp_icon->setVisible(_visible);
 		}

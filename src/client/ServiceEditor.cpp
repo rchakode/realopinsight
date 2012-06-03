@@ -25,18 +25,6 @@
 #include "Preferences.hpp"
 #include "GraphView.hpp"
 
-//EDITOR FIELDS
-const QString ServiceEditor::NAME_FIELD = "name";
-const QString ServiceEditor::TYPE_FIELD = "type";
-const QString ServiceEditor::STATUS_CALC_RULE_FIELD = "Status Calc. Rule";
-const QString ServiceEditor::ICON_FIELD = "icon";
-const QString ServiceEditor::DESCRIPTION_FIELD = "description";
-const QString ServiceEditor::ALARM_MSG_FIELD = "alarmMsg" ;
-const QString ServiceEditor::NOTIFICATION_MSG_FIELD = "notificationMsg";
-const QString ServiceEditor::CHECK_LIST_FIELD = "ChecksField";
-const QString ServiceEditor::CHECK_FIELD = "CheckField";
-const QString ServiceEditor::HIGH_CRITICITY_CALC_RULE = "Higher Criticity";
-const QString ServiceEditor::WEIGHTED_CALC_RULE = "Equal-weighted Criticity";
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
 : QWidget( _parent ),
@@ -173,7 +161,7 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 
 		it->notification_msg = notificationMsgField()->toPlainText();
 
-		if( it->type == ALARM_NODE ) it->child_nodes =  checkField()->currentText() ;
+		if( it->type == NodeTypeT::ALARM_NODE ) it->child_nodes =  checkField()->currentText() ;
 
 		return true;
 	}
@@ -198,7 +186,7 @@ bool ServiceEditor::updateNode(NodeListT::iterator & _node_it)
 
 	_node_it->notification_msg = notificationMsgField()->toPlainText();
 
-	if( _node_it->type == ALARM_NODE ) _node_it->child_nodes =  checkField()->currentText() ;
+	if( _node_it->type == NodeTypeT::ALARM_NODE ) _node_it->child_nodes =  checkField()->currentText() ;
 
 	return true;
 }
@@ -299,8 +287,8 @@ void ServiceEditor::loadDescriptionFields()
 
 void ServiceEditor::loadTypeFields()
 {
-	typeField()->addItem( BUSINESS_PROCESS_NODE );
-	typeField()->addItem( NATIVE_CHECK_NODE );
+	typeField()->addItem( NodeTypeT::typeToString(NodeTypeT::SERVICE_NODE) );
+	typeField()->addItem( NodeTypeT::typeToString(NodeTypeT::ALARM_NODE) );
 
 	layout->addWidget(editorItemsList["typeLabel"], currentLine, 0);
 	layout->addWidget(typeField(), currentLine, 1);
@@ -309,8 +297,8 @@ void ServiceEditor::loadTypeFields()
 
 void ServiceEditor::loadPriorityFields(void)
 {
-	statusCalcRuleField()->addItem(HIGH_CRITICITY_CALC_RULE);
-	statusCalcRuleField()->addItem(WEIGHTED_CALC_RULE);
+	statusCalcRuleField()->addItem(HIGH_CRITICITY_CALC_RULE_FIELD);
+	statusCalcRuleField()->addItem(WEIGHTED_CALC_RULE_FIELD);
 	statusCalcRuleField()->setCurrentIndex( 0 ) ;
 
 	layout->addWidget(editorItemsList["priorityLabel"], currentLine, 0);
@@ -399,7 +387,7 @@ void ServiceEditor::handleReturnPressed(void)
 
 void ServiceEditor::handleNodeTypeChanged( const QString & _text)
 {
-	if( _text == NATIVE_CHECK_NODE )
+	if( _text == NodeTypeT::typeToString(NodeTypeT::ALARM_NODE) )
 	{
 		setEnableFields(true);
 	}
@@ -413,13 +401,13 @@ void ServiceEditor::handleNodeTypeChanged( const QString & _text)
 
 void ServiceEditor::handleNodeTypeActivated( const QString & _text)
 {
-	if( _text == NATIVE_CHECK_NODE )
+	if( _text == NodeTypeT::typeToString(NodeTypeT::ALARM_NODE) )
 	{
-		emit nodeTypeActivated( ALARM_NODE ) ;
+		emit nodeTypeActivated( NodeTypeT::ALARM_NODE ) ;
 	}
 	else
 	{
-		emit nodeTypeActivated( SERVICE_NODE ) ;
+		emit nodeTypeActivated( NodeTypeT::SERVICE_NODE ) ;
 	}
 }
 
