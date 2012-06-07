@@ -4,13 +4,15 @@ OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
 
-QT        += 
+QMAKE_CXXFLAGS += -std=c++0x
+QT        +=
 
-INCLUDEPATH = include
+INCLUDEPATH = include include/core
 
 HEADERS   += include/core/MonitorBroker.hpp
 			 
 SOURCES   += src/core/MonitorBroker.cpp \
+		src/core/utils.cpp \
 			src/server/ngrt4nd.cpp
 			
 LIBS += -lcrypt -lzmq

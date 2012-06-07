@@ -2,22 +2,22 @@
  * SvNavigator.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 13-05-2012												   #
-#																		   #
-# This file is part of NGRT4N (http://ngrt4n.com).						   #
-#																		   #
-# NGRT4N is free software: you can redistribute it and/or modify		   #
+# Last Update : 24-05-2012                                                 #
+#                                                                          #
+# This file is part of NGRT4N (http://ngrt4n.com).                         #
+#                                                                          #
+# NGRT4N is free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
-# (at your option) any later version.									   #
-#																		   #
+# (at your option) any later version.                                      #
+#                                                                          #
 # NGRT4N is distributed in the hope that it will be useful,                #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of		   #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
-# GNU General Public License for more details.							   #
-#																		   #
-# You should have received a copy of the GNU General Public License		   #
-# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.		   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+# GNU General Public License for more details.                             #
+#                                                                          #
+# You should have received a copy of the GNU General Public License        #
+# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.          #
 #--------------------------------------------------------------------------#
  */
 
@@ -157,7 +157,6 @@ void SvNavigator::unloadMenus(void)
 {
 	subMenuList.clear() ;
 	menuList.clear() ;
-	delete menuBar ;
 	delete nodeContextMenu ;
 }
 
@@ -226,7 +225,7 @@ int SvNavigator::monitor(void)
 		for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
 
 			MonitorBroker::NagiosCheckT check ;
-			string sid = (*node_id_it).trimmed().toStdString() ;
+			string sid = "$1$$2buz9IzkVLweFQeOPcuS61:"+(*node_id_it).trimmed().toStdString() ;
 
 			// Prepare and send request
 			zmq::message_t request( MonitorBroker::MAX_MSG );
@@ -245,6 +244,7 @@ int SvNavigator::monitor(void)
 			sInfoVec = QString(result).split(sepRgx) ; free(result) ;
 
 			if( sInfoVec.length() != 5) {
+				cerr << "ERROR :: " << sInfoVec[1].toStdString() << endl ;
 				unknown_count += 1 ;
 				continue ;
 			}
@@ -608,13 +608,12 @@ void SvNavigator::resize(void)
 void SvNavigator::loadMenus(void)
 {
 	QIcon camera_icon, zoomin_icon, zoomout_icon, refresh_icon ;
-
 	refresh_icon.addFile(":images/refresh.png");
 	camera_icon.addFile(":images/camera.png");
 	zoomin_icon.addFile(":images/zoomin.png");
 	zoomout_icon.addFile(":images/zoomout.png");
 
-	menuBar = new QMenuBar();
+	QMenuBar* menuBar = new QMenuBar();
 	menuList["MENU1"] = menuBar->addMenu("&File"),
 			subMenuList["Refresh"] = menuList["MENU1"]->addAction(refresh_icon, "&Refresh Screen") ,
 			subMenuList["Capture"] = menuList["MENU1"]->addAction(camera_icon, "&Save Map as Image") ,
@@ -647,12 +646,12 @@ void SvNavigator::loadMenus(void)
 	contextMenuList["CenterOnNode"] = nodeContextMenu->addAction("Center Graph &On") ;
 	contextMenuList["Cancel"] = nodeContextMenu->addAction("&Cancel") ;
 
-	toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str())) ;
+	QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str())) ;
 	toolBar->addAction(subMenuList["Refresh"]) ;
 	toolBar->addAction(subMenuList["ZoomIn"]) ;
 	toolBar->addAction(subMenuList["ZoomOut"]) ;
 	toolBar->addAction(subMenuList["Capture"]) ;
-
+	toolBar->setIconSize(QSize(16,16)) ;
 	setMenuBar( menuBar ) ;
 }
 

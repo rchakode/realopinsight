@@ -6,12 +6,15 @@ RCC_DIR = build/rcc
 
 QT        += core gui xml svg webkit 
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 INCLUDEPATH = include  include/client include/core 
 
 HEADERS   += include/core/ns.hpp \
 			 include/core/MonitorBroker.hpp \
 			 include/client/Auth.hpp \
 			 include/client/Base.hpp \
+			 include/client/Style.hpp \
 			 include/client/GraphView.hpp \
 			 include/client/MsgPanel.hpp \
 			 include/client/Parser.hpp \

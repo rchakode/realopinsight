@@ -2,25 +2,27 @@
  * ngrt4n.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 13-05-2012												   #
-#																		   #
-# This file is part of NGRT4N (http://ngrt4n.com).						   #
-#																		   #
-# NGRT4N is free software: you can redistribute it and/or modify		   #
+# Last Update : 24-05-2012                                                 #
+#                                                                          #
+# This file is part of NGRT4N (http://ngrt4n.com).                         #
+#                                                                          #
+# NGRT4N is free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
-# (at your option) any later version.									   #
-#																		   #
+# (at your option) any later version.                                      #
+#                                                                          #
 # NGRT4N is distributed in the hope that it will be useful,                #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of		   #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
-# GNU General Public License for more details.							   #
-#																		   #
-# You should have received a copy of the GNU General Public License		   #
-# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.		   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+# GNU General Public License for more details.                             #
+#                                                                          #
+# You should have received a copy of the GNU General Public License        #
+# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.          #
 #--------------------------------------------------------------------------#
  */
+
 #include "core/ns.hpp"
+#include "client/Style.hpp"
 #include "client/Auth.hpp"
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
@@ -29,10 +31,13 @@ int main(int argc, char **argv)
 {
 	ngrt4n::initApp() ;
 
-	QString  module, file, usage ;
 	QApplication* app = new QApplication(argc, argv) ;
+	QIcon app_icon (":images/appicon.png") ;
+	app->setWindowIcon( app_icon ) ;
+	app->setApplicationName( QString(ngrt4n::APP_NAME.c_str()) ) ;
+	app->setStyleSheet(client::styleSheet);
 
-	usage = "usage: " + QString(ngrt4n::APP_NAME.c_str()).toLower() + " [OPTION] [view_config]\n"
+	QString  usage = "usage: " + QString(ngrt4n::APP_NAME.c_str()).toLower() + " [OPTION] [view_config]\n"
 			"Options: \n"
 			"	-c\n"
 			"	   Launch the configuration utility\n"
@@ -43,9 +48,6 @@ int main(int argc, char **argv)
 			"	-h \n"
 			"	   Print this help" ;
 
-	QIcon app_icon (":images/appicon.png") ;
-	app->setWindowIcon( app_icon ) ;
-	app->setApplicationName( QString(ngrt4n::APP_NAME.c_str()) ) ;
 
 	if(argc > 3)
 	{
@@ -53,8 +55,8 @@ int main(int argc, char **argv)
 		exit (1) ;
 	}
 
-	module = "dashboard" ;
-	file = argv[1] ;
+	QString module = "dashboard" ;
+	QString file = argv[1] ;
 	int opt ;
 
 	if ( (opt = getopt(argc, argv, "cdeh") ) != -1) {
