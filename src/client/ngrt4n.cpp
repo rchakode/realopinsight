@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 			break ;
 
 		case 'v': {
-			cout << appName << "(UI Module) " << packageVersion << endl ;
+			cout << appName << " (UI Module) " << packageVersion << endl ;
 			cout << "Copyright (c) 2010-"<< releaseYear << " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." << endl;
 			cout << "Visit "<< packageUrl << " for further information." << endl;
 			exit(0) ;

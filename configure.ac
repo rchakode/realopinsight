@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([ngrt4nd], [2.0], [rodrigue.chakode@ngrt4n.com])
+AC_INIT([ngrt4nd], [2.0], [Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>], [ngrt4nd], [http://ngrt4n.com])
 AM_INIT_AUTOMAKE([ngrt4nd], [2.0])
 
 AC_PREREQ([2.68])
