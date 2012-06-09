@@ -105,6 +105,7 @@ MenuListT menuList;
 SubMenuListT subMenuList;
 SubMenuListT contextMenuList;
 string serverUrl ;
+string serverAuthChain ;
 zmq::socket_t* comChannel ;
 
 

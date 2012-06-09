@@ -38,6 +38,7 @@ public:
 	Preferences(const qint32 & _user_role = Auth::OP_USER_ROLE, const qint32 & _action = Preferences::ChangePassword);
 	virtual ~Preferences();
 
+	static QString style() ;
 	static const qint32 ChangePassword ;
 	static const qint32 ForceChangePassword ;
 	static const  qint32 ChangeMonitoringSettings ;
@@ -51,7 +52,7 @@ public:
 	static const QString OP_UNSERNAME_KEY ;
 	static const QString ADM_PASSWD_KEY ;
 	static const QString OP_PASSWD_KEY ;
-
+	static const QString SERVER_PASS_KEY ;
 
 public slots:
 	void applySettings(void);
@@ -74,11 +75,13 @@ private:
 	QString monitorUrl ;
 	QString serverAddr ;
 	QString serverPort ;
+	QString serverPass ;
 	QLineEdit* oldPasswdField ;
 	QLineEdit* passwdField ;
 	QLineEdit* rePasswdField ;
 	QLineEdit* serverAddrField ;
 	QLineEdit* serverPortField ;
+	QLineEdit* serverPassField ;
 	QPushButton* cancelButton ;
 	QPushButton* applySettingButton ;
 	QPushButton* changePasswdButton ;

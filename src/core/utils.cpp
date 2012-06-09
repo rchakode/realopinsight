@@ -29,7 +29,6 @@
 #include <exception>
 #include <string>
 #include <iostream>
-#include <crypt.h>
 #include <fstream>
 using namespace std ;
 
@@ -39,7 +38,6 @@ void ngrt4n::initApp()
 
 	if(ret == -1 && errno != EEXIST) {
 		cerr << "Unable to set the application files" ;
-		EXIT_FAILURE ;
 	}
 }
 
@@ -50,37 +48,4 @@ void ngrt4n::checkUser() {
 		exit(1) ;
 	}
 }
-
-
-void ngrt4n::setPassChain(char* authChain) {
-
-	ofstream ofpass;
-
-	ofpass.open( ngrt4n::AUTH_FILE.c_str() );
-	if( ! ofpass.good()) {
-		cerr << "Unable to set the password :  perhaps the application's settings file is not well configured." << endl;
-		exit(1) ;
-	}
-
-	ofpass << crypt(authChain, salt.c_str());
-	ofpass.close();
-	cout << "Password reseted"<< endl ;
-}
-
-string ngrt4n::getPassChain() {
-
-	string authChain ;
-	ifstream pfile;
-
-	pfile.open ( ngrt4n::AUTH_FILE.c_str() );
-	if( ! pfile.good()) {
-		cerr << "Unable to get application's settings" << endl;
-		exit(1) ;
-	}
-
-	pfile >> authChain ;
-	pfile.close();
-	return authChain ;
-}
-
 

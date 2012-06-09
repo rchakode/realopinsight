@@ -1,0 +1,40 @@
+.TH ngrt4nd 1  "Juin 08, 2012" "version 2.0" "ADMIN COMMANDS"
+.SH NAME
+ngrt4nd \- The utility to manage the broker module of NGRT4N.
+.SH SYNOPSIS
+.B ngrt4nd
+[OPTIONS]
+.SH DESCRIPTION
+This program allows to manage the broker module of NGRT4N. 
+.PP
+It must sit on the same server than Nagios.
+.SH OPTIONS
+.TP
+\-h
+Print a brief help about the program.
+.TP
+\-c <path>
+Set an alternative location for the status.dat file. By default, the program looks at /usr/local/var/nagios/status.dat. 
+.TP
+\-D
+Run ngrt4nd in the foreground. This option is useful for debuging since error and debug messages will be shown to stderr.
+.TP
+\-P 
+Reset the passphrase that authentificates clients' requests.
+.TP
+\-p <port>
+Set the listening port. Default is 1983.
+.SH EXAMPLES
+.TP
+$ ngrt4nd -p 2345
+.SH EXIT STATUS
+ngrt4nd returns a zero exist status if it succeeds. Non zero is returned in case of failure.
+.SH AUTHOR
+This page has been written by Rodrigue Chakode <rodrigue.chakode (at) ngrt4n.com>
+.SH COPYRIGHT
+Copyright (c) 2010-2012 Rodrigue Chakode <rodrigue.chakode (at) ngrt4n.com>.
+.PP
+NGRT4N (http://ngrt4n.com) is a free software released under the terms of GNU GPL-v3 license.
+.SH SEE ALSO
+.BR ngrt4n(1)
+

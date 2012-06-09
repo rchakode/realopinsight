@@ -30,12 +30,11 @@
 
 using namespace std;
 namespace ngrt4n {
-const string COMPAGNY_NAME = "ngrt4n.com";
 const string APP_NAME = "ngrt4n" ;
 const string APP_HOME = string(getenv("HOME")) + "/." + APP_NAME ;
 const string SETTINGS_FILE =  APP_HOME + "/db" ;
 const string AUTH_FILE =  APP_HOME + "/auth" ;
-const string salt = "$1$$";
+const string salt = "$1$" + APP_NAME + "$";
 
 void initApp() ;
 void checkUser() ;

@@ -26,34 +26,35 @@
 #include "Preferences.hpp"
 #include "ns.hpp"
 
-const QString Auth::ADM_USER_NAME = QString(ngrt4n::APP_NAME.c_str()).toLower() + "_adm" ;
-const QString Auth::OP_USER_NAME = QString(ngrt4n::APP_NAME.c_str()).toLower()+ "_op" ;
+const string appName = APPLICATION_NAME ;
+const QString Auth::ADM_USER_NAME = QString(appName.c_str()).toLower() + "_adm" ;
+const QString Auth::OP_USER_NAME = QString(appName.c_str()).toLower()+ "_op" ;
 const qint32 Auth::ADM_USER_ROLE = 100 ;
 const qint32 Auth::OP_USER_ROLE = 101 ;
 
 Auth::Auth()
+: QDialog(),
+  settings (new Settings())
 {
-	login = new QLineEdit(OP_USER_NAME);
-	password = new QLineEdit(), password->setEchoMode( QLineEdit::Password );
-	buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
-
-	qint32 line;
+	setWindowTitle( "Authentification - " + QString(appName.c_str()) );
 	layout = new QGridLayout(this);
-	line = 0,
-			layout->addWidget(new QLabel("Login"), line, 0),
-			layout->addWidget(login, line, 1);
 
-	line += 1,
-			layout->addWidget(new QLabel("Password"), line, 0),
-			layout->addWidget(password, line, 1);
+	qint32 line = 0 ;
+	login = new QLineEdit(OP_USER_NAME) ;
+	layout->addWidget(new QLabel("Login"), line, 0) ;
+	layout->addWidget(login, line, 1);
 
-	line += 1,
-			layout->addWidget(buttonBox, line, 1);
+	line += 1 ;
+	password = new QLineEdit();
+	password->setEchoMode(QLineEdit::Password);
+	layout->addWidget(new QLabel("Password"), line, 0) ;
+	layout->addWidget(password, line, 1);
+
+	line += 1 ;
+	buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok) ;
+	layout->addWidget(buttonBox, line, 1);
 
 	addEvents();
-	setWindowTitle( "Authentification - " + QString(ngrt4n::APP_NAME.c_str()) );
-
-	settings = new Settings();
 }
 
 Auth::~Auth()

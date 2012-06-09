@@ -22,22 +22,27 @@
  */
 
 #include "core/ns.hpp"
-#include "client/Style.hpp"
 #include "client/Auth.hpp"
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
 
+
+const string appName = APPLICATION_NAME ;
+const string releaseYear = RELEASE_YEAR;
+const string packageName = PACKAGE_NAME ;
+const string packageVersion = PACKAGE_VERSION;
+const string packageUrl = PACKAGE_URL;
+
+
 int main(int argc, char **argv)
 {
-	ngrt4n::initApp() ;
-
 	QApplication* app = new QApplication(argc, argv) ;
 	QIcon app_icon (":images/appicon.png") ;
 	app->setWindowIcon( app_icon ) ;
-	app->setApplicationName( QString(ngrt4n::APP_NAME.c_str()) ) ;
-	app->setStyleSheet(client::styleSheet);
+	app->setApplicationName(  QString(appName.c_str()) ) ;
+	app->setStyleSheet(Preferences::style());
 
-	QString  usage = "usage: " + QString(ngrt4n::APP_NAME.c_str()).toLower() + " [OPTION] [view_config]\n"
+	QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
 			"Options: \n"
 			"	-c\n"
 			"	   Launch the configuration utility\n"
@@ -45,21 +50,24 @@ int main(int argc, char **argv)
 			"	   Run the VE utility and load the file view_config if specified\n"
 			"	-d view_config\n"
 			"	   Run the OC utility and load the file view_config\n"
+			"	-v\n"
+			"	  Print the version.\n"
 			"	-h \n"
 			"	   Print this help" ;
 
 
-	if(argc > 3)
-	{
+	if(argc > 3) {
 		qDebug() << usage ;
 		exit (1) ;
 	}
+
+	ngrt4n::initApp() ;
 
 	QString module = "dashboard" ;
 	QString file = argv[1] ;
 	int opt ;
 
-	if ( (opt = getopt(argc, argv, "cdeh") ) != -1) {
+	if ( (opt = getopt(argc, argv, "cdehv") ) != -1) {
 		switch (opt) {
 		case 'c':
 			module = "config" ;
@@ -74,6 +82,13 @@ int main(int argc, char **argv)
 			module = "editor" ;
 			file = argv[2] ;
 			break ;
+
+		case 'v': {
+			cout << appName << "(UI Module) " << packageVersion << endl ;
+			cout << "Copyright (c) 2010-"<< releaseYear << " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." << endl;
+			cout << "Visit "<< packageUrl << " for further information." << endl;
+			exit(0) ;
+		}
 
 		default: // -h for get help
 			qDebug() << usage ;
@@ -90,13 +105,12 @@ int main(int argc, char **argv)
 		if(file == "") {
 			qDebug() << "invalid file !" ;
 			QMessageBox::warning(0,
-					"Error | " + QString(ngrt4n::APP_NAME.c_str()),
+					"Error | " + QString(packageName.c_str()),
 					"No file specified to load. The system will exit !",
 					QMessageBox::Ok);
 			exit (1) ;
 		}
-		SvNavigator* sv_nav = new SvNavigator(userRole, file) ;
-		sv_nav->load() ;
+		new SvNavigator(userRole, file) ;
 	} else if(module == "editor") {
 		SvCreator* svc = new SvCreator(userRole) ;
 		svc->load( file ) ;

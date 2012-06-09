@@ -27,8 +27,6 @@
 #include <crypt.h>
 #include "core/ns.hpp"
 
-
-
 SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_file, QWidget* parent)
 : QMainWindow(parent) ,
   configFile(_config_file) ,
@@ -46,11 +44,11 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
   navigationTree ( new SvNavigatorTree() ) ,
   monPrefWindow (new Preferences(_user_role, Preferences::ChangeMonitoringSettings)) ,
   changePasswdWindow (new Preferences(_user_role, Preferences::ChangePassword )) ,
-  msgPanel( new MsgPanel() ),
-  serverUrl ("tcp://localhost:1983") //TODO Set the url dynamically from config file
+  msgPanel( new MsgPanel() )
 {
 	setWindowTitle(configFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Dashboard") ;
 	loadMenus();
+
 	topRightPanel->addTab(graphView, "Dashboard") ;
 	topRightPanel->addTab(webBrowser, "Native Web UI") ;
 	bottomRightPanel->addTab(msgPanel, "Event Console") ;
@@ -63,6 +61,17 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 
 	// Activate Qt's event handler on widget
 	addEvents();
+
+	// Get application settings
+	webUIUrl = settings->value(Preferences::NAGIOS_URL_KEY ).toString() ;
+	serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString().toStdString() ;
+	serverUrl = "tcp://"
+			+ settings->value(Preferences::SERVER_ADDR_KEY).toString().toStdString()
+			+ ":"
+			+ settings->value(Preferences::SERVER_PORT_KEY).toString().toStdString();
+
+	// Load the configuration
+	load() ;
 }
 
 SvNavigator::~SvNavigator()
@@ -136,8 +145,6 @@ void SvNavigator::load(void)
 	navigationTree->clear() ;
 	navigationTree->addTopLevelItem(snavStruct->tree_item_list[snavStruct->root_id]) ;
 	graphView->load(config_parser.getDotGraphFile(), snavStruct->node_list) ;
-
-	webUIUrl = settings->value(Preferences::NAGIOS_URL_KEY ).toString() ;
 	webBrowser->setUrl( webUIUrl ) ;
 
 	resize() ;
@@ -169,12 +176,11 @@ void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
 	monPrefWindow->exec() ;
 
-	killTimer( timerId ) ;
-
-	updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
-
+	serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString().toStdString() ;
+	updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000 ;
 	if ( updateInterval <= 0 ) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000 ;
 
+	killTimer( timerId ) ;
 	timerId = startTimer( updateInterval ) ;
 }
 
@@ -209,8 +215,7 @@ int SvNavigator::monitor(void)
 
 	qint32 all_checks_count = 0 ;
 	snavStruct->check_status_count.clear() ;
-	for(check_id_it = snavStruct->check_list.begin();
-			check_id_it != snavStruct->check_list.end(); check_id_it++) {
+	for(check_id_it = snavStruct->check_list.begin(); check_id_it != snavStruct->check_list.end(); check_id_it++) {
 
 		node_it = snavStruct->node_list.find( (*check_id_it).trimmed() ) ;
 		if( node_it == snavStruct->node_list.end()) continue ;
@@ -225,7 +230,7 @@ int SvNavigator::monitor(void)
 		for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
 
 			MonitorBroker::NagiosCheckT check ;
-			string sid = "$1$$2buz9IzkVLweFQeOPcuS61:"+(*node_id_it).trimmed().toStdString() ;
+			string sid = serverAuthChain + ":"+(*node_id_it).trimmed().toStdString() ; //TODO
 
 			// Prepare and send request
 			zmq::message_t request( MonitorBroker::MAX_MSG );
@@ -243,17 +248,24 @@ int SvNavigator::monitor(void)
 			QRegExp sepRgx; QStringList sInfoVec ; sepRgx.setPattern("#");
 			sInfoVec = QString(result).split(sepRgx) ; free(result) ;
 
-			if( sInfoVec.length() != 5) {
-				cerr << "ERROR :: " << sInfoVec[1].toStdString() << endl ;
-				unknown_count += 1 ;
-				continue ;
-			}
+			switch(sInfoVec.length())
+			{
+			case 5 :
+				check.status = sInfoVec[0].toInt() ;
+				check.host = sInfoVec[1].toStdString() ;
+				check.last_state_change = sInfoVec[2].toStdString() ;
+				node_it->check.check_command = sInfoVec[3].toStdString() ;
+				check.alarm_msg = sInfoVec[4].toStdString() ;
+				break ;
 
-			check.status = sInfoVec[0].toInt() ;
-			check.host = sInfoVec[1].toStdString() ;
-			check.last_state_change = sInfoVec[2].toStdString() ;
-			node_it->check.check_command = sInfoVec[3].toStdString() ;
-			check.alarm_msg = sInfoVec[4].toStdString() ;
+			default :
+				check.status = MonitorBroker::NAGIOS_UNKNOWN ;
+				check.alarm_msg = "ERROR :: " + sInfoVec[1].toStdString();
+				check.host = "Unknown" ;
+				check.last_state_change = "Unknown" ;
+				node_it->check.check_command = "Unknown" ;
+				break ;
+			}
 
 			switch( node_it->check.status ) {
 			case MonitorBroker::NAGIOS_OK:
@@ -285,8 +297,8 @@ int SvNavigator::monitor(void)
 				emit hasToBeUpdate( node_it->parent ) ;
 			}
 
-//			if( result ) free(result) ;
-//			if( reply.data() ) free(reply.data()) ;
+			//			if( result ) free(result) ;
+			//			if( reply.data() ) free(reply.data()) ;
 		}
 	}
 

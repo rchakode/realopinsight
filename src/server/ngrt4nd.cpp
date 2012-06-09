@@ -21,6 +21,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "config.h"
 #include "core/ns.hpp"
 #include "core/MonitorBroker.hpp"
 #include <cassert>
@@ -37,26 +38,61 @@ using namespace std;
 
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
-int numWorkers = 2 ;
+int numWorkers = 1 ;
+
 string statusFile = "/usr/local/nagios/var/status.dat" ;
 string authChain = "" ; // Suitably set later
+string packageName = PACKAGE_NAME ;
 
 ostringstream help(""
 		"SYNOPSIS\n"
-		"	ngrt4nd [OPTIONS]\n"
+		"	" + packageName +" [OPTIONS]\n"
 		"\n"
-		"DESCRIPTION\n"
-		"	Start the " + ngrt4n::APP_NAME + " server.\n"
+		"OPTIONS\n"
 		"	-c FILE\n"
-		"	  specifies the path of the status file. Default : " + statusFile + ".\n"
+		"	 specifies the path of the status file. Default : " + statusFile + ".\n"
 		"	-d\n"
-		"	  start the server like a daemon.\n"
+		"	 start the server like a daemon.\n"
 		"	-p\n"
-		"	  sets the port of listening. Default : 1983.\n"
-		"	-a\n"
-		"	  change the authentification passphrase.\n"
+		"	 sets the port of listening. Default : 1983.\n"
+		"	-P\n"
+		"	 change the authentification passphrase.\n"
+		"	-v\n"
+		"	 print the version.\n"
 		"	-h\n"
-		"	  print this help.\n") ;
+		"	 print this help.\n") ;
+
+void ngrt4n::setPassChain(char* authChain) {
+
+	ofstream ofpass;
+
+	ofpass.open( ngrt4n::AUTH_FILE.c_str() );
+	if( ! ofpass.good()) {
+		cerr << "Unable to set the password :  perhaps the application's settings file is not well configured." << endl;
+		exit(1) ;
+	}
+
+	ofpass << crypt(authChain, salt.c_str());
+	ofpass.close();
+	cout << "Password reseted"<< endl ;
+}
+
+string ngrt4n::getPassChain() {
+
+	string authChain ;
+	ifstream pfile;
+
+	pfile.open ( ngrt4n::AUTH_FILE.c_str() );
+	if( ! pfile.good()) {
+		cerr << "Unable to get application's settings" << endl;
+		exit(1) ;
+	}
+
+	pfile >> authChain ;
+	pfile.close();
+	return authChain ;
+}
+
 
 void *worker_routine (void *arg)
 {
@@ -96,17 +132,20 @@ void *worker_routine (void *arg)
 int main(int argc, char ** argv)
 {
 	bool foreground = true;
-	static const char *shotOpt="DPhc:p:n:" ;
+	static const char *shotOpt="DPhvc:p:n:" ;
 	int port = MonitorBroker::DEFAULT_PORT ;
 	char opt ;
 	while ((opt = getopt(argc, argv, shotOpt)) != -1) {
-		switch (opt) {
+		switch (opt)
+		{
 		case 'D':		// daemon mode
 			foreground = false ;
 			break;
+
 		case 'c':		// alternative location of status.dat
 			statusFile = optarg ;
 			break;
+
 		case 'p': {	// alternative location of status.dat
 			port = atoi(optarg) ;
 			if(port <= 0 ) {
@@ -115,6 +154,7 @@ int main(int argc, char ** argv)
 			}
 			break;
 		}
+
 		case 'n': {	// alternative location of status.dat
 			numWorkers = atoi(optarg) ;
 			if(numWorkers <= 0 ) {
@@ -123,6 +163,7 @@ int main(int argc, char ** argv)
 			}
 			break;
 		}
+
 		case 'P': {		// force to remove existing semaphore
 			ngrt4n::checkUser() ;
 			ngrt4n::initApp() ;
@@ -136,15 +177,25 @@ int main(int argc, char ** argv)
 			}
 			ngrt4n::setPassChain(pass) ;
 			exit(0) ;
-			break;
 		}
-		case 'h':		// alternative location of status.dat
+
+		case 'v': {
+			cout << PACKAGE_STRING << "."<< endl
+					<< "This is a free software released under the terms of GPL-v3 License." << endl
+					<< "Copyright (c) 2010-2012 " << PACKAGE_BUGREPORT << "." << endl
+					<< "Visit " << PACKAGE_URL << " for further details." << endl;
+			exit(0) ;
+		}
+
+		case 'h': {		// alternative location of status.dat
 			cout << help.str() << endl ;
 			exit(0) ;
-		default:
+		}
+		default: {
 			cerr << "Unknow option : " << opt << endl;
 			cout << help.str() << endl ;
 			exit(0) ;
+		}
 		}
 	}
 
@@ -174,9 +225,6 @@ int main(int argc, char ** argv)
 	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
 	clientsComChannel.bind(tcpAddr.str().c_str());
 
-	cout << "server started successfully : " << tcpAddr.str() << endl ;
-	cout << "Status file : " << statusFile << endl ;
-
 	for (int i = 0; i < numWorkers; i++) {
 		pthread_t worker;
 		int rc = pthread_create (&worker, NULL, worker_routine, (void*) &ctx);
@@ -185,5 +233,7 @@ int main(int argc, char ** argv)
 
 	zmq::device (ZMQ_QUEUE, clientsComChannel, workersComChannel);
 
+	cout << "server started successfully on " << tcpAddr.str() << endl ;
+	cout << "Status file : " << statusFile << endl ;
 	return 0;
 }

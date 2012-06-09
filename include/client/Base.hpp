@@ -31,12 +31,6 @@
 #include <bitset>
 #include "core/MonitorBroker.hpp"
 
-const QString ABOUT_MSG = "NGRT4N\n\n"
-		"Version: 2.0\n"
-		"Build id: 20111001 1100\n\n"
-		"(c) Copyright 2012 NGRT4N Development Team.\n"
-		"Visit http://www.ngrt4n.com";
-
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;

@@ -25,7 +25,7 @@
 #include "core/MonitorBroker.hpp"
 #include "Preferences.hpp"
 #include "Auth.hpp"
-
+#include <sstream>
 
 const qint32 Preferences::ChangePassword = 0 ;
 const qint32 Preferences::ForceChangePassword = 1 ;
@@ -40,6 +40,7 @@ const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser" ;
 const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername" ;
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd" ;
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd" ;
+const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain" ;
 
 Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 : userRole(_user_role),
@@ -52,6 +53,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
   rePasswdField( new QLineEdit() ) ,
   serverAddrField (new QLineEdit() ) ,
   serverPortField( new QLineEdit() ) ,
+  serverPassField( new QLineEdit() ) ,
   cancelButton( new QPushButton("&Close") ) ,
   applySettingButton( new QPushButton("&Apply settings")) ,
   changePasswdButton( new QPushButton("C&hange password")) ,
@@ -61,11 +63,11 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 	oldPasswdField->setEchoMode( QLineEdit::Password ) ;
 	passwdField->setEchoMode( QLineEdit::Password ) ;
 	rePasswdField->setEchoMode( QLineEdit::Password ) ;
+	serverPassField->setEchoMode(QLineEdit::Password) ;
 
 	switch (_action)
 	{
 	case Preferences::ChangeMonitoringSettings:
-
 		line += 1,
 		layout->addWidget(new QLabel("Web Interface"), line, 0),
 		layout->addWidget(monitorHomeField, line, 1, 1, 4) ;
@@ -78,6 +80,9 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 				layout->addWidget(serverAddrField, line, 1),
 				layout->addWidget(new QLabel("Port"), line, 2, Qt::AlignRight),
 				layout->addWidget(serverPortField, line, 3) ;
+		line += 1,
+				layout->addWidget(new QLabel("Server Passphrase"), line, 0),
+				layout->addWidget(serverPassField, line, 1, 1, 4) ;
 		line += 1,
 				layout->addWidget(cancelButton, line, 1, 1, 2, Qt::AlignRight),
 				layout->addWidget(applySettingButton, line, 3, 1, 2);
@@ -93,6 +98,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 			applySettingButton->setEnabled(false) ;
 			serverAddrField->setEnabled(false) ;
 			serverPortField->setEnabled(false) ;
+			serverPassField->setEnabled(false) ;
 		}
 		setWindowTitle("Preferences - Monitoring Settings | " + QString(ngrt4n::APP_NAME.c_str())) ;
 
@@ -121,12 +127,17 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 		setWindowTitle("Preferences - Change User Password | " + QString(ngrt4n::APP_NAME.c_str())) ;
 		break;
 
-	case Preferences::ShowAbout:
-		line += 1,
-		layout->addWidget(new QLabel(ABOUT_MSG), line, 0) ;
+	case Preferences::ShowAbout: {
+		ostringstream about ;
+		about << PACKAGE_NAME << "(UI Module) " << PACKAGE_VERSION << endl ;
+		about << "Copyright (c) 2010-"<< RELEASE_YEAR << " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." << endl;
+		about << "Visit "<< PACKAGE_URL << " for further information." << endl;
+		line += 1 ,
+				layout->addWidget(new QLabel(QString(about.str().c_str())), line, 0) ;
 		line += 1,
 				layout->addWidget(cancelButton, line, 0) ;
 		break ;
+	}
 	}
 
 	setContent() ;
@@ -144,6 +155,7 @@ Preferences::~Preferences()
 	delete applySettingButton ;
 	delete serverAddrField ;
 	delete serverPortField ;
+	delete serverPassField ;
 	delete layout;
 }
 
@@ -164,11 +176,9 @@ void Preferences::applySettings(void)
 	settings->setValue(NAGIOS_URL_KEY, nagios_home) ;
 	settings->setValue(UPDATE_INTERVAL_KEY, updateIntervalField->text()) ;
 	settings->setValue(SERVER_ADDR_KEY, serverAddrField->text()) ;
-
-	if(serverPortField->text().toInt() <= 0) {
-		serverPortField->setText(QString::number(MonitorBroker::DEFAULT_PORT)) ;
-	}
+	if(serverPortField->text().toInt() <= 0) serverPortField->setText(QString::number(MonitorBroker::DEFAULT_PORT)) ;
 	settings->setValue(SERVER_PORT_KEY, serverPortField->text()) ;
+	settings->setValue(SERVER_PASS_KEY, serverPassField->text()) ;
 	settings->sync() ;
 
 	close() ;
@@ -231,15 +241,14 @@ void Preferences::setContent(void)
 	monitorUrl = settings->value(NAGIOS_URL_KEY).toString() ;
 	monitorHomeField->setText(monitorUrl) ;
 
-
-
 	serverAddr = settings->value(SERVER_ADDR_KEY).toString() ;
 	serverAddrField->setText(serverAddr) ;
 
 	serverPort = settings->value(SERVER_PORT_KEY).toString() ;
 	serverPortField->setText(serverPort) ;
 
-
+	serverPass = settings->value(SERVER_PASS_KEY).toString() ;
+	serverPassField->setText(serverPass) ;
 }
 
 void Preferences::addEvents(void)
@@ -247,4 +256,63 @@ void Preferences::addEvents(void)
 	connect(applySettingButton, SIGNAL(clicked()),  this, SLOT(applySettings()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(changePasswdButton, SIGNAL(clicked()),  this, SLOT(changePasswd()));
+}
+
+QString Preferences::style() {
+	QString styleSheet =
+			"QMenuBar, QMenu {"
+			"	background: #2d2d2d ; "
+			"	color : white; "
+			"}"
+			"QMenuBar {"
+			"	font-weight : bold ;"
+			"}"
+			"QToolBar {"
+			"	background: #9dc6dd;"
+			"	padding: 0px;"
+			"	height: 16px;"
+			"	"
+			"}"
+			"QHeaderView::section {"
+			"	background: #2d2d2d;"
+			"	color : white; "
+			"	font-weight : bold ;"
+			"}"
+			"QTableView {"
+			"	background:  lightgray;"
+			"}"
+			"QTabWidget::pane { /* The tab widget frame */"
+			"	border-top: 2px solid #C2C7CB;"
+			"	background-color: #9dc6dd;"
+			"}"
+			"QTabWidget::tab-bar {"
+			"	background-color: #9dc6dd;"
+			"}"
+			"QTabBar::tab {"
+			"	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+			"	stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,"
+			"	stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);"
+			"	border: 2px solid #C4C4C3;"
+			"	border-bottom-color: #C2C7CB; /* same as the pane color */"
+			"	border-top-left-radius: 4px;"
+			"	border-top-right-radius: 4px;"
+			"	min-width: 8ex;"
+			"	padding: 2px;"
+			"}"
+			"QTabBar::tab:selected {"
+			"	background: #9dc6dd;"
+			"}"
+			"QTabBar::tab:hover {"
+			"	background: #3589b9;"
+			"}"
+			"QTabBar::tab:selected {"
+			"	border-color: #9B9B9B;"
+			"	border-bottom-color: #C2C7CB; /* same as pane color */"
+			"}"
+			"QTabBar::tab:!selected {"
+			"	margin-top: 2px; /* make non-selected tabs look smaller */"
+			"}"
+			;
+
+	return styleSheet ;
 }
