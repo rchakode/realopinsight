@@ -140,7 +140,7 @@ void SvCreator::newBusinessView(void)
 		node.child_nodes.clear() ;
 		node.status = MonitorBroker::NAGIOS_UNKNOWN ;  // TODO no acknowledged
 		node.icon = GraphView::DEFAULT_ICON ;
-		node.type = NodeTypeT::SERVICE_NODE ;
+		node.type = NodeType::SERVICE_NODE ;
 		node.parent.clear() ;  				//root has not parent
 
 		snavStruct->node_list[SvNavigatorTree::rootID] = node;
@@ -164,7 +164,7 @@ void SvCreator::newNode(void)
 	NodeT node;
 
 	p_node_it = snavStruct->node_list.find( selectedNodeId ) ;
-	if(p_node_it == snavStruct->node_list.end() || p_node_it->type == NodeTypeT::ALARM_NODE )
+	if(p_node_it == snavStruct->node_list.end() || p_node_it->type == NodeType::ALARM_NODE )
 	{
 		QMessageBox::warning(this, "Warning! | "
 				+ QString(ngrt4n::APP_NAME.c_str()),
@@ -176,7 +176,7 @@ void SvCreator::newNode(void)
 	node.id = "S" + QTime().currentTime().toString("HHmmsszzz");
 	node.parent = selectedNodeId ;
 	node.name = "sub service " + QString::number(count) , count ++ ;
-	node.type = NodeTypeT::SERVICE_NODE ;
+	node.type = NodeType::SERVICE_NODE ;
 	node.status = MonitorBroker::NAGIOS_UNKNOWN ; // TODO no acknowledged
 	node.icon = GraphView::DEFAULT_ICON ;
 	node.child_nodes = "" ;
@@ -222,7 +222,7 @@ void SvCreator::deleteNode(const QString & _node_id)
 	node_it =  snavStruct->node_list.find( _node_id ) ;
 	if( node_it != snavStruct->node_list.end() )
 	{
-		if( node_it->type != NodeTypeT::ALARM_NODE &&  node_it->child_nodes != "" )
+		if( node_it->type != NodeType::ALARM_NODE &&  node_it->child_nodes != "" )
 		{
 			ud_services = node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
 
@@ -397,9 +397,9 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 
 	if( node_it != snavStruct->node_list.end() )
 	{
-		if( _type == NodeTypeT::SERVICE_NODE )
+		if( _type == NodeType::SERVICE_NODE )
 		{
-			if ( node_it->type == NodeTypeT::ALARM_NODE )
+			if ( node_it->type == NodeType::ALARM_NODE )
 			{
 				//TODO a bug exists. To be debuged
 				node_it->child_nodes.clear() ;
@@ -413,7 +413,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 		}
 		else
 		{
-			if ( node_it->type == NodeTypeT::SERVICE_NODE && ! node_it->child_nodes.isEmpty() )
+			if ( node_it->type == NodeType::SERVICE_NODE && ! node_it->child_nodes.isEmpty() )
 			{
 				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
 						"This action required that the service has no sub service", QMessageBox::Ok) ;
@@ -513,13 +513,11 @@ void SvCreator::saveInFile(const QString& _filename)
 								<< "\t\t<NotificationMsg>" <<  node_it->notification_msg << "</NotificationMsg>" << endl
 								<< "\t\t<SubServices>" << node_it->child_nodes << "</SubServices>" << endl ;
 
-						if(node_it->type == NodeTypeT::ALARM_NODE )
-						{
+						if(node_it->type == NodeType::ALARM_NODE ){
 
 							file_stream << "\t\t<Status>" <<  node_it->status << "</Status>" << endl ;
 						}
-						else
-						{
+						else {
 
 							file_stream << "\t\t<PropagationRule>" <<  node_it->propagation_rule << "</PropagationRule>" << endl ;
 						}

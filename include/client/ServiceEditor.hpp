@@ -32,7 +32,8 @@
 const qint32 MAX_NODE_NAME = 24 ;
 const QString NAME_FIELD = "name";
 const QString TYPE_FIELD = "type";
-const QString STATUS_CALC_RULE_FIELD = "Status Calc. Rule";
+const QString STATUS_CALC_RULE_FIELD = "StatusCalcRules";
+const QString STATUS_PROP_RULE_FIELD = "StatusPropRules";
 const QString ICON_FIELD = "icon";
 const QString DESCRIPTION_FIELD = "description";
 const QString ALARM_MSG_FIELD = "alarmMsg" ;
@@ -88,6 +89,10 @@ public:
 		return dynamic_cast<QComboBox*>(editorItemsList[STATUS_CALC_RULE_FIELD]);
 	}
 
+	QComboBox* statusPropRuleField(void) const {
+		return dynamic_cast<QComboBox*>(editorItemsList[STATUS_PROP_RULE_FIELD]);
+	}
+
 	inline QComboBox* iconField(void) const {
 		return dynamic_cast<QComboBox*>(editorItemsList[ICON_FIELD]);
 	}
@@ -140,7 +145,7 @@ private:
 	void loadLabelFields(void);
 	void loadDescriptionFields(void);
 	void loadTypeFields(void);
-	void loadPriorityFields(void);
+	void loadStatusHandlingFields(void);
 	void loadAlarmMsgFields(void);
 	void loadNotificationMsgFields(void);
 	void loadIconFields(void);

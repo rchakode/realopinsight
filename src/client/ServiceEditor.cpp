@@ -25,6 +25,7 @@
 #include "ServiceEditor.hpp"
 #include "Preferences.hpp"
 #include "GraphView.hpp"
+#include "SvNavigator.hpp"
 
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
@@ -42,8 +43,9 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
 	editorItemsList["iconNameLabel"] = new QLabel("Icon");
 	editorItemsList[ICON_FIELD] = new QComboBox();
 
-	editorItemsList["priorityLabel"] = new QLabel("Status Aggregation Rule") ;
+	editorItemsList["priorityLabel"] = new QLabel("Status Handling") ;
 	editorItemsList[STATUS_CALC_RULE_FIELD] = new QComboBox() ;
+	editorItemsList[STATUS_PROP_RULE_FIELD] = new QComboBox() ;
 
 	editorItemsList["descriptionLabel"] = new QLabel("Description") ;
 	editorItemsList[DESCRIPTION_FIELD] = new QTextEdit() ;
@@ -162,7 +164,7 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 
 		it->notification_msg = notificationMsgField()->toPlainText();
 
-		if( it->type == NodeTypeT::ALARM_NODE ) it->child_nodes =  checkField()->currentText() ;
+		if( it->type == NodeType::ALARM_NODE ) it->child_nodes =  checkField()->currentText() ;
 
 		return true;
 	}
@@ -187,7 +189,7 @@ bool ServiceEditor::updateNode(NodeListT::iterator & _node_it)
 
 	_node_it->notification_msg = notificationMsgField()->toPlainText();
 
-	if( _node_it->type == NodeTypeT::ALARM_NODE ) _node_it->child_nodes =  checkField()->currentText() ;
+	if( _node_it->type == NodeType::ALARM_NODE ) _node_it->child_nodes =  checkField()->currentText() ;
 
 	return true;
 }
@@ -260,7 +262,7 @@ void ServiceEditor::layoutEditorComponents(void)
 	currentLine = 0;
 	loadLabelFields(), currentLine++ ;
 	loadTypeFields(), currentLine++ ;
-	loadPriorityFields(), currentLine++ ;
+	loadStatusHandlingFields(), currentLine++ ;
 	loadIconFields(), currentLine++ ;
 	loadDescriptionFields(), currentLine++ ;
 	loadAlarmMsgFields(), currentLine++ ;
@@ -275,49 +277,58 @@ void ServiceEditor::loadLabelFields()
 {
 	nameField()->setMaxLength( MAX_NODE_NAME ) ;
 	layout->addWidget(editorItemsList["nameLabel"], currentLine, 0);
-	layout->addWidget(nameField(), currentLine, 1);
+	layout->addWidget(nameField(),currentLine,1,1,2);
 }
 
 
 void ServiceEditor::loadDescriptionFields()
 {
 	layout->addWidget(editorItemsList["descriptionLabel"], currentLine, 0);
-	layout->addWidget(descriptionField(), currentLine, 1);
+	layout->addWidget(descriptionField(),currentLine,1,1,2);
 }
 
 
 void ServiceEditor::loadTypeFields()
 {
-	typeField()->addItem( NodeTypeT::typeToString(NodeTypeT::SERVICE_NODE) );
-	typeField()->addItem( NodeTypeT::typeToString(NodeTypeT::ALARM_NODE) );
+	typeField()->addItem( NodeType::toString(NodeType::SERVICE_NODE) );
+	typeField()->addItem( NodeType::toString(NodeType::ALARM_NODE) );
 
 	layout->addWidget(editorItemsList["typeLabel"], currentLine, 0);
-	layout->addWidget(typeField(), currentLine, 1);
+	layout->addWidget(typeField(),currentLine,1,1,2);
 }
 
-
-void ServiceEditor::loadPriorityFields(void)
+void ServiceEditor::loadStatusHandlingFields(void)
 {
-	statusCalcRuleField()->addItem(HIGH_CRITICITY_CALC_RULE_FIELD);
-	statusCalcRuleField()->addItem(WEIGHTED_CALC_RULE_FIELD);
-	statusCalcRuleField()->setCurrentIndex( 0 ) ;
+	ComboBoxItemsT crules = SvNavigator::calcRules();
+	QString defaultRule = StatusCalcRules::label(StatusCalcRules::HighCriticity) ;
+	statusCalcRuleField()->addItem("Calculation rule (Default is " +defaultRule+")", StatusCalcRules::HighCriticity);
+	foreach(const QString & rule, crules.keys()) {
+		statusCalcRuleField()->addItem(rule, crules.value(rule));
+	}
 
+	ComboBoxItemsT prules = SvNavigator::propRules();
+	defaultRule = StatusPropRules::label(StatusPropRules::Unchanged) ;
+	statusPropRuleField()->addItem("Propagation rule (Default is " +defaultRule+")", StatusPropRules::Unchanged);
+	foreach(const QString & rule, prules.keys()) {
+		statusPropRuleField()->addItem(rule, prules.value(rule));
+	}
 	layout->addWidget(editorItemsList["priorityLabel"], currentLine, 0);
-	layout->addWidget(statusCalcRuleField(), currentLine, 1);
+	layout->addWidget(statusCalcRuleField(),currentLine,1);
+	layout->addWidget(statusPropRuleField(),currentLine,2);
 }
 
 
 void ServiceEditor::loadAlarmMsgFields()
 {
 	layout->addWidget(editorItemsList["alarmMsgLabel"], currentLine, 0);
-	layout->addWidget(alarmMsgField(), currentLine, 1);
+	layout->addWidget(alarmMsgField(),currentLine,1,1,2);
 }
 
 
 void ServiceEditor::loadNotificationMsgFields()
 {
 	layout->addWidget(editorItemsList["notificationMsgLabel"], currentLine, 0);
-	layout->addWidget(notificationMsgField(), currentLine, 1);
+	layout->addWidget(notificationMsgField(),currentLine,1,1,2);
 }
 
 
@@ -326,6 +337,7 @@ void ServiceEditor::loadIconFields()
 	QIcon icon("images/normal.png");
 	QComboBox* iconsBox = iconField() ;
 
+	// TODO Use map
 	iconsBox->addItem(GraphView::DEFAULT_ICON) ;
 	iconsBox->addItem(GraphView::NETWORK_ICON) ;
 	iconsBox->addItem(GraphView::ROUTER_ICON) ;
@@ -352,7 +364,7 @@ void ServiceEditor::loadIconFields()
 	iconsBox->addItem(GraphView::OTH_CHECK_ICON) ;
 
 	layout->addWidget(editorItemsList["iconNameLabel"], currentLine, 0);
-	layout->addWidget(iconsBox, currentLine, 1);
+	layout->addWidget(iconsBox,currentLine,1,1,2);
 }
 
 
@@ -388,7 +400,7 @@ void ServiceEditor::handleReturnPressed(void)
 
 void ServiceEditor::handleNodeTypeChanged( const QString & _text)
 {
-	if( _text == NodeTypeT::typeToString(NodeTypeT::ALARM_NODE) )
+	if( _text == NodeType::toString(NodeType::ALARM_NODE) )
 	{
 		setEnableFields(true);
 	}
@@ -402,13 +414,13 @@ void ServiceEditor::handleNodeTypeChanged( const QString & _text)
 
 void ServiceEditor::handleNodeTypeActivated( const QString & _text)
 {
-	if( _text == NodeTypeT::typeToString(NodeTypeT::ALARM_NODE) )
+	if( _text == NodeType::toString(NodeType::ALARM_NODE) )
 	{
-		emit nodeTypeActivated( NodeTypeT::ALARM_NODE ) ;
+		emit nodeTypeActivated( NodeType::ALARM_NODE ) ;
 	}
 	else
 	{
-		emit nodeTypeActivated( NodeTypeT::SERVICE_NODE ) ;
+		emit nodeTypeActivated( NodeType::SERVICE_NODE ) ;
 	}
 }
 

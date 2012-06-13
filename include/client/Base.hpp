@@ -36,21 +36,61 @@ typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
 typedef bitset<4> StatusInfoT ;
 
-enum TreeColumDescT{
+enum TreeColumnsDesc{
 	NODE_ID_DATA_INDEX = 0,			// Id of data field used to stored nodes ids in the graph
 	TREE_NODE_ID_COLUMN = 1
 };
 
-enum StatusCalRuleT {
-	HIGH_CRITICITY_CALC_RULE = 0,
-	WEIGHTED_CRITICITY_CALC_RULE = 1
+
+class StatusPropRules {
+public :
+	enum StatusPropRulesT{
+		Unchanged = 0,
+		Decreased = 1,
+		Increased = 2
+	};
+
+	static QString toString(StatusPropRulesT rule) {
+		return QString::number(rule) ;
+	}
+
+	static QString label(StatusPropRulesT rule) {
+		switch(rule) {
+		case Unchanged: return "Unchanged" ;
+		case Decreased: return "Decreased" ;
+		case Increased: return "Increased" ;
+		}
+	}
 };
 
-class NodeTypeT {
+
+class StatusCalcRules {
 public :
-	static const int SERVICE_NODE = 0 ;
-	static const int ALARM_NODE = 1 ;
-	static QString typeToString(int _type ) {
+	enum StatusCalcRulesT{
+		HighCriticity = 0,
+		WeightedCriticity = 1
+	};
+
+	static QString toString(StatusCalcRulesT rule) {
+		return QString::number(rule) ;
+	}
+
+	static QString label(StatusCalcRulesT rule) {
+		switch(rule) {
+		case HighCriticity: return "High Criticity" ;
+		case WeightedCriticity: return "Weighted Criticity" ;
+		}
+	}
+};
+
+
+class NodeType {
+public :
+	enum {
+		SERVICE_NODE = 0,
+		ALARM_NODE = 1,
+	} ;
+	static QString toString(int _type ) {
 
 		if (_type == ALARM_NODE ) return "Native Check" ;
 
@@ -72,6 +112,7 @@ typedef struct _NodeT {
 	QString alarm_msg ;
 	QString notification_msg ;
 	qint32 status ;
+	qint32 prop_status ;
 	StatusInfoT status_info ;
 	QString child_nodes ;
 	MonitorBroker::NagiosCheckT check ;
@@ -92,13 +133,11 @@ typedef struct _GEdge {
 	QGraphicsPathItem* edge ;
 }GEdgeT;
 
-typedef QHash <QString, GNodeT> GNodeListT;
-
-typedef QHash <QString, GEdgeT> GEdgeListT;
-
-typedef QMap<QString, QMenu*> MenuListT;
-
-typedef QMap<QString, QAction*> SubMenuListT;
+typedef QHash<QString,GNodeT> GNodeListT;
+typedef QHash<QString,GEdgeT> GEdgeListT;
+typedef QMap<QString,QMenu*> MenuListT;
+typedef QMap<QString,QAction*> SubMenuListT;
+typedef QMap<QString,QString> ComboBoxItemsT;
 
 
 class Struct

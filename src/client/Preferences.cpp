@@ -278,9 +278,6 @@ QString Preferences::style() {
 			"	color : white; "
 			"	font-weight : bold ;"
 			"}"
-			"QTableView {"
-			"	background:  lightgray;"
-			"}"
 			"QTabWidget::pane { /* The tab widget frame */"
 			"	border-top: 2px solid #C2C7CB;"
 			"	background-color: #9dc6dd;"
@@ -312,7 +309,15 @@ QString Preferences::style() {
 			"QTabBar::tab:!selected {"
 			"	margin-top: 2px; /* make non-selected tabs look smaller */"
 			"}"
-			;
+			" QTreeView {"
+			"	background: #f1f1f1;"
+			"   alternate-background-color: yellow;"
+			"}"
+			"QTableView {"
+			"	background: #f1f1f1;"
+			"	alternate-background-color: #F8F8FF;"
+			"}"
+;
 
-	return styleSheet ;
+return styleSheet ;
 }

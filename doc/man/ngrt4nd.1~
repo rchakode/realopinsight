@@ -20,7 +20,7 @@ Set an alternative location for the status.dat file. By default, the program loo
 Run ngrt4nd in the foreground. This option is useful for debuging since error and debug messages will be shown to stderr.
 .TP
 \-n
-Sets the number of threads to start. Default is 1.
+sets the number of threads to start. Default is 1.
 .TP
 \-P 
 Reset the passphrase that authentificates clients' requests.

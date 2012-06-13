@@ -34,18 +34,22 @@
 #include "Preferences.hpp"
 #include <zmq.hpp>
 
+using namespace std;
+
+
 class SvNavigator : public QMainWindow
 {
 	Q_OBJECT
 
 public:
 	SvNavigator( const qint32 & _user_role = Auth::OP_USER_ROLE, const QString & = "", QWidget* = 0);
-
 	virtual ~SvNavigator();
 
 	void load( void );
 	void resize(void);
 
+	static ComboBoxItemsT propRules();
+	static ComboBoxItemsT calcRules() ;
 
 public slots:
 	int monitor(void) ;
@@ -107,7 +111,6 @@ SubMenuListT contextMenuList;
 string serverUrl ;
 string serverAuthChain ;
 zmq::socket_t* comChannel ;
-
 
 void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );
 QString getNodeToolTip(const NodeT & _node) ;

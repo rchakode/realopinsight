@@ -27,6 +27,21 @@
 #include <crypt.h>
 #include "core/ns.hpp"
 
+ComboBoxItemsT SvNavigator::propRules() {
+	ComboBoxItemsT map;
+	map.insert(StatusPropRules::label(StatusPropRules::Unchanged),StatusPropRules::toString(StatusPropRules::Unchanged));
+	map.insert(StatusPropRules::label(StatusPropRules::Decreased),StatusPropRules::toString(StatusPropRules::Decreased));
+	map.insert(StatusPropRules::label(StatusPropRules::Increased),StatusPropRules::toString(StatusPropRules::Increased)) ;
+	return map;
+}
+
+ComboBoxItemsT SvNavigator::calcRules() {
+	ComboBoxItemsT map;
+	map.insert(StatusCalcRules::label(StatusCalcRules::HighCriticity),StatusCalcRules::toString(StatusCalcRules::HighCriticity));
+	map.insert(StatusCalcRules::label(StatusCalcRules::WeightedCriticity),StatusCalcRules::toString(StatusCalcRules::WeightedCriticity));
+	return map;
+}
+
 SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_file, QWidget* parent)
 : QMainWindow(parent) ,
   configFile(_config_file) ,
@@ -286,19 +301,20 @@ int SvNavigator::monitor(void)
 			}
 
 			if ( node_it->status != check.status ) {
-				node_it->status = check.status ;
+				QString toolTip = getNodeToolTip(*node_it) ;
+
 				node_it->check = check ;
 				updateAlarmMsg(node_it) ;
-				QString toolTip = getNodeToolTip(*node_it) ;
 				updateNavTreeItemStatus(node_it, toolTip) ;
 				graphView->updateNode(node_it, toolTip) ;
 				msgPanel->addMsg(node_it) ;
 
+				node_it->status = node_it->prop_status =  check.status ;
+				node_it->status_info.reset() ;
+				node_it->status_info[node_it->prop_status] = true ;
+
 				emit hasToBeUpdate( node_it->parent ) ;
 			}
-
-			//			if( result ) free(result) ;
-			//			if( reply.data() ) free(reply.data()) ;
 		}
 	}
 
@@ -335,7 +351,7 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
 			"\nDescription: " + const_cast<QString&>(_node.description).replace("\n", " ") +
 			"\nStatus: " + Utils::statusToString(_node.status);
 
-	if ( _node.type == NodeTypeT::ALARM_NODE ) {
+	if ( _node.type == NodeType::ALARM_NODE ) {
 
 		if( _node.status == MonitorBroker::NAGIOS_OK ) {
 			toolTip += "\nMessage: " + const_cast<QString&>(_node.notification_msg).replace("\n", " ");
@@ -400,68 +416,68 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 
 void SvNavigator::updateNodeStatus(QString _node_id)
 {
-	NodeListT::iterator node_it, child_node_it ;
-	QStringList node_ids_list;
-	QStringList::const_iterator it ;
-	qint32 normal_count, warning_count, unknown_count, critical_count, sum_counts ;
+	qint32 normal_count = 0 ;
+	qint32 warning_count = 0 ;
+	qint32 unknown_count = 0 ;
+	qint32 critical_count = 0 ;
 
-	normal_count = warning_count = unknown_count = critical_count = 0 ;
+	NodeListT::iterator node_it = snavStruct->node_list.find( _node_id ) ;
+	if (node_it == snavStruct->node_list.end() ) return  ;
 
-	node_it = snavStruct->node_list.find( _node_id ) ;
+	node_it->status_info.reset() ;
 
-	if (node_it != snavStruct->node_list.end() ) {
-		node_ids_list = node_it->child_nodes.split( Parser::CHILD_NODES_SEP ) ;
-		sum_counts = node_ids_list.size() ;
+	QStringList node_ids = node_it->child_nodes.split( Parser::CHILD_NODES_SEP ) ;
+	for(QStringList::const_iterator it = node_ids.begin(); it != node_ids.end(); it++) {
 
-		for(it = node_ids_list.begin(); it != node_ids_list.end(); it++) {
-			child_node_it = snavStruct->node_list.find( *it ) ;
-			if ( child_node_it == snavStruct->node_list.end() )
-				continue ;
+		NodeListT::iterator child_it = snavStruct->node_list.find( *it ) ;
+		if ( child_it == snavStruct->node_list.end() ) continue ;
 
-			switch(child_node_it->status) {
-			case MonitorBroker::NAGIOS_CRITICAL:
-				node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
-				critical_count ++ ;
+		node_it->status_info |= child_it->status_info ;
+		switch(child_it->status)
+		{
+		case MonitorBroker::NAGIOS_CRITICAL:
+			node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
+			critical_count ++ ;
+			break;
 
-				break;
-
-			case MonitorBroker::NAGIOS_WARNING:
-				if(node_it->status != MonitorBroker::NAGIOS_CRITICAL) node_it->status = MonitorBroker::NAGIOS_WARNING;
-				warning_count ++ ;
-
-				break;
-
-			case MonitorBroker::NAGIOS_UNKNOWN:
-				if(node_it->status != MonitorBroker::NAGIOS_CRITICAL
-						&& node_it->status != MonitorBroker::NAGIOS_WARNING) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
-				unknown_count ++ ;
-
-				break ;
-
-			case MonitorBroker::NAGIOS_OK:
-				normal_count ++ ;
-
-				break ;
-
-			default:
-				break ;
+		case MonitorBroker::NAGIOS_WARNING:
+			if(node_it->status != MonitorBroker::NAGIOS_CRITICAL) {
+				node_it->status = MonitorBroker::NAGIOS_WARNING;
 			}
-		}
+			warning_count ++ ;
+			break;
 
-		if ( normal_count == sum_counts ) {
-			node_it->status = MonitorBroker::NAGIOS_OK ;
-		}
-		else if ( node_it->status_calc_rule == WEIGHTED_CRITICITY_CALC_RULE ) {
-			node_it->status = MonitorBroker::NAGIOS_WARNING ;
-			if ( critical_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
-			else if ( unknown_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
-		}
+		case MonitorBroker::NAGIOS_UNKNOWN:
+			if(node_it->status != MonitorBroker::NAGIOS_CRITICAL
+					&& node_it->status != MonitorBroker::NAGIOS_WARNING) {
+				node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
+			}
+			unknown_count ++ ;
+			break ;
 
-		QString toolTip = getNodeToolTip(*node_it) ;
-		graphView->updateNode(node_it, toolTip) ;
-		updateNavTreeItemStatus(node_it, toolTip) ;
-		emit hasToBeUpdate(node_it->parent);
+		case MonitorBroker::NAGIOS_OK:
+			normal_count ++ ;
+			break ;
+
+		default:
+			break ;
+		}
 	}
+
+	qint32 sum_counts = node_ids.size() ;
+	if ( normal_count == sum_counts ) {
+		node_it->status = MonitorBroker::NAGIOS_OK ;
+	}
+	else if ( node_it->status_calc_rule == StatusCalcRules::WeightedCriticity ) {
+		node_it->status = MonitorBroker::NAGIOS_WARNING ;
+		if ( critical_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
+		else if ( unknown_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
+	}
+
+	QString toolTip = getNodeToolTip(*node_it) ;
+	graphView->updateNode(node_it, toolTip) ;
+	updateNavTreeItemStatus(node_it, toolTip) ;
+	emit hasToBeUpdate(node_it->parent);
 }
 
 
@@ -500,7 +516,7 @@ void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, con
 	QStringList::iterator uds_it ;
 	NodeT& node = snavStruct->node_list[_node_id] ;
 
-	if( node.type == NodeTypeT::SERVICE_NODE && node.child_nodes != "") {
+	if( node.type == NodeType::SERVICE_NODE && node.child_nodes != "") {
 		child_nodes_list = node.child_nodes.split( Parser::CHILD_NODES_SEP ) ;
 		for (uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++) {
 			graphView->setNodeVisible(* uds_it, _node_id, _expand, _level) ;
@@ -543,7 +559,7 @@ void SvNavigator::filterNodeRelatedMsg( const QString & _node_id )
 			|| node_it->child_nodes == "" )
 		return ;
 
-	if ( node_it->type == NodeTypeT::ALARM_NODE ) {
+	if ( node_it->type == NodeType::ALARM_NODE ) {
 		filteredMsgPanel->addMsg(node_it) ;
 	}
 	else {
@@ -671,7 +687,7 @@ void SvNavigator::loadMenus(void)
 void SvNavigator::addEvents(void)
 {
 	connect( this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()) );
-	connect( this, SIGNAL( hasToBeUpdate( QString ) ), this, SLOT( updateNodeStatus( QString ) ));
+	connect( this, SIGNAL( hasToBeUpdate(QString) ), this, SLOT( updateNodeStatus(QString) ));
 	connect( subMenuList["Capture"], SIGNAL( triggered(bool) ), graphView, SLOT( capture() ));
 	connect( subMenuList["ZoomIn"], SIGNAL( triggered(bool) ), graphView, SLOT( zoomIn() ) );
 	connect( subMenuList["ZoomOut"], SIGNAL( triggered(bool) ), graphView, SLOT( zoomOut() ));

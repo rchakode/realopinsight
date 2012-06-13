@@ -54,14 +54,12 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	NodeT node;
 	qint32 s, xml_service_node_count ;
 
-	if ( ! file.open(QIODevice::ReadOnly) )
-	{
+	if ( ! file.open(QIODevice::ReadOnly) ) {
 		qDebug() << "Unable to open the file " << _sv_config_file ;
 		return false;
 	}
 
-	if (! sv_config_doc.setContent(&file) )
-	{
+	if (! sv_config_doc.setContent(&file) ) {
 		file.close();
 		qDebug() << "Error when parsing the file " << _sv_config_file ;
 		return false;
@@ -75,16 +73,15 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	node.child_nodes = rootElt.firstChildElement("SubServices").text();
 	node.status = MonitorBroker::UNSET_STATUS ;  // TODO Acknowledge status,
 	node.icon = GraphView::DEFAULT_ICON ;
-	node.type = NodeTypeT::SERVICE_NODE ;
+	node.type = NodeType::SERVICE_NODE ;
 	node.parent = "NULL" ;  // By convention
 
 	_snav_struct.node_list[node.id] = node;
 
 	xml_service_node_count = xml_service_node_list.length();
-	for (s = 0; s < xml_service_node_count; s++)
-	{
-		QDomElement service = xml_service_node_list.item(s).toElement();
+	for (s = 0; s < xml_service_node_count; s++) {
 
+		QDomElement service = xml_service_node_list.item(s).toElement();
 		node.id = service.attribute("id").trimmed() ;
 		node.type = service.attribute("type").toInt() ;
 		node.status_calc_rule = service.attribute("statusCalcRule").toInt() ;
@@ -96,8 +93,7 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 		node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed() ;
 		node.child_nodes = service.firstChildElement("SubServices").text().trimmed() ;
 
-		if( node.type == NodeTypeT::ALARM_NODE )
-		{
+		if( node.type == NodeType::ALARM_NODE ) {
 			_snav_struct.check_list << node.id;
 		}
 
@@ -118,28 +114,22 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 
 void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_content )
 {
-	QString child_node_id ;
-	NodeListT::iterator node_it, child_node_it ;
 	QStringList node_ids_list ;
 	QStringList::iterator node_id_it ;
 	QString g_node_label ;
 
 	_graph_content = "\n//Edges delcaration\n" ;
 
-	for( node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++)
-	{
+	for(NodeListT::iterator node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++) {
 		g_node_label = node_it->name ;
 		_graph_content = "\t" + node_it->id + "[label=\"" + g_node_label.replace(' ', '#') + "\"];\n" + _graph_content;
 
-		if( node_it->child_nodes != "" )
-		{
+		if( node_it->child_nodes != "" ) {
 			node_ids_list = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
 
-			for(node_id_it = node_ids_list.begin(); node_id_it != node_ids_list.end(); node_id_it ++)
-			{
-				child_node_it = _nodes_list.find( (*node_id_it).trimmed() );
-				if( child_node_it != _nodes_list.end() )
-				{
+			for(QStringList::iterator node_id_it = node_ids_list.begin(); node_id_it != node_ids_list.end(); node_id_it ++) {
+				NodeListT::iterator child_node_it = _nodes_list.find( (*node_id_it).trimmed() );
+				if( child_node_it != _nodes_list.end() ) {
 					child_node_it->parent = node_it->id ;
 					_graph_content += "\t" + node_it->id + "--" + child_node_it->id + "\n";
 				}
@@ -150,12 +140,8 @@ void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_conte
 
 void Parser::buildNodeTree( NodeListT & _nodes_list, TreeNodeItemListT & _tree)
 {
-	NodeListT::iterator node_it ;
-
-	for( node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++)
-	{
-		if(node_it->parent != "" && node_it->id != "")
-		{
+	for(NodeListT::iterator node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++) {
+		if(node_it->parent != "" && node_it->id != "") {
 			SvNavigatorTree::addNode(_tree, (*node_it));
 		}
 	}
@@ -165,10 +151,9 @@ void Parser::saveCoordinatesDotFile(const QString& _graph_content)
 {
 	QFile file;
 
-	graphFilename = "/tmp/" + QString(ngrt4n::APP_NAME.c_str()) + "-bv-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
+	graphFilename = "/tmp/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
 	file.setFileName(graphFilename);
-	if(! file.open(QIODevice::WriteOnly))
-	{
+	if(! file.open(QIODevice::WriteOnly)) {
 		qDebug() << "Unable to write the file " << graphFilename ;
 		exit (1);
 	}

@@ -45,15 +45,15 @@ int main(int argc, char **argv)
 	QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
 			"Options: \n"
 			"	-c\n"
-			"	   Launch the configuration utility\n"
+			"	   Launches the configuration utility\n"
 			"	-e [view_config]\n"
-			"	   Run the VE utility and load the file view_config if specified\n"
+			"	   Runs the VE utility and load the file view_config if specified\n"
 			"	-d view_config\n"
-			"	   Run the OC utility and load the file view_config\n"
+			"	   Runs the OC utility and load the file view_config\n"
 			"	-v\n"
-			"	  Print the version.\n"
+			"	  Prints the version and license information.\n"
 			"	-h \n"
-			"	   Print this help" ;
+			"	   Prints this help" ;
 
 
 	if(argc > 3) {

@@ -50,17 +50,19 @@ ostringstream help(""
 		"\n"
 		"OPTIONS\n"
 		"	-c FILE\n"
-		"	 specifies the path of the status file. Default : " + statusFile + ".\n"
-		"	-d\n"
-		"	 start the server like a daemon.\n"
+		"	 Specifies the path of the status file. Default is " + statusFile + ".\n"
+		"	-D\n"
+		"	 Runs ngrt4nd in the foreground. \n"
+		"	-n\n"
+		"	 Sets the number of threads to start. Default is 1.\n"
 		"	-p\n"
-		"	 sets the port of listening. Default : 1983.\n"
+		"	 Sets the port of listening. Default is 1983.\n"
 		"	-P\n"
-		"	 change the authentification passphrase.\n"
+		"	 Changes the authentification passphrase.\n"
 		"	-v\n"
-		"	 print the version.\n"
+		"	 Prints the version and license information.\n"
 		"	-h\n"
-		"	 print this help.\n") ;
+		"	 Prints this help.\n") ;
 
 void ngrt4n::setPassChain(char* authChain) {
 
@@ -131,7 +133,7 @@ void *worker_routine (void *arg)
 
 int main(int argc, char ** argv)
 {
-	bool foreground = true;
+	bool foreground = false;
 	static const char *shotOpt="DPhvc:p:n:" ;
 	int port = MonitorBroker::DEFAULT_PORT ;
 	char opt ;
@@ -139,7 +141,7 @@ int main(int argc, char ** argv)
 		switch (opt)
 		{
 		case 'D':		// daemon mode
-			foreground = false ;
+			foreground = true ;
 			break;
 
 		case 'c':		// alternative location of status.dat
@@ -203,7 +205,7 @@ int main(int argc, char ** argv)
 	ngrt4n::initApp() ;
 	authChain = ngrt4n::getPassChain() ;
 
-	if( foreground ) {
+	if( ! foreground ) {
 		pid_t pid = fork();
 		if(pid <= -1) {
 			cerr << "Can not fork process" << endl;
