@@ -148,20 +148,14 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 
 	it = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
 
-	if( it != _node_map.end())
-	{
+	if( it != _node_map.end()) {
 		it->name = nameField()->text() ;
-
 		it->type = typeField()->currentIndex();
-
-		it->status_calc_rule = statusCalcRuleField()->currentIndex();
-
+		it->status_crule = statusCalcRuleField()->currentIndex();
+		it->status_prule = statusPropRuleField()->currentIndex();
 		it->icon = iconField()->currentText();
-
 		it->description = descriptionField()->toPlainText();
-
 		it->alarm_msg  = alarmMsgField()->toPlainText();
-
 		it->notification_msg = notificationMsgField()->toPlainText();
 
 		if( it->type == NodeType::ALARM_NODE ) it->child_nodes =  checkField()->currentText() ;
@@ -176,19 +170,13 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 bool ServiceEditor::updateNode(NodeListT::iterator & _node_it)
 {
 	_node_it->name = nameField()->text() ;
-
 	_node_it->type = typeField()->currentIndex();
-
-	_node_it->status_calc_rule = statusCalcRuleField()->currentIndex();
-
+	_node_it->status_crule = statusCalcRuleField()->currentIndex();
+	_node_it->status_prule = statusPropRuleField()->currentIndex();
 	_node_it->icon = iconField()->currentText();
-
 	_node_it->description = descriptionField()->toPlainText();
-
 	_node_it->alarm_msg  = alarmMsgField()->toPlainText();
-
 	_node_it->notification_msg = notificationMsgField()->toPlainText();
-
 	if( _node_it->type == NodeType::ALARM_NODE ) _node_it->child_nodes =  checkField()->currentText() ;
 
 	return true;
@@ -213,42 +201,29 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node_it)
 	QStringList::iterator child_node_it;
 	CheckItemList::const_iterator _it;
 
-
 	nameField()->setText(_node_it->name) ;
-
 	typeField()->setCurrentIndex(_node_it->type) ;
-
-	statusCalcRuleField()->setCurrentIndex(_node_it->status_calc_rule) ;
-
+	statusCalcRuleField()->setCurrentIndex(_node_it->status_crule);
+	statusPropRuleField()->setCurrentIndex(_node_it->status_prule) ;
 	iconField()->setCurrentIndex(iconField()->findText((_node_it->icon))) ;
-
 	descriptionField()->setText(_node_it->description) ;
-
 	alarmMsgField()->setText(_node_it->alarm_msg) ;
-
 	notificationMsgField()->setText(_node_it->notification_msg) ;
-
-
 	lla_widget = checkListField();
-
 	child_nodes_list = _node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
 	child_node_it = child_nodes_list.begin();
 
 	// TODO
-
 	if ( child_node_it != child_nodes_list.end() ) {
 		checkField()->setCurrentIndex(checkField()->findText((*child_node_it).trimmed(), Qt::MatchExactly)) ;
-
 		child_node_items = lla_widget->findItems((*child_node_it).trimmed(), Qt::MatchExactly);
 		_it = child_node_items.begin();
 
-		if( _it != child_node_items.end() )
-		{
+		if( _it != child_node_items.end() ) {
 			// Retrieve the selected check item
 			// after this the itemSelectionChanged signal is emited by lla_widget.
 			// this signal is intercepted by a function (see addEvent)
 			// for filling host- and check- fields
-
 			lla_widget->setItemSelected(*_it, true) ;
 		}
 	}
@@ -317,7 +292,6 @@ void ServiceEditor::loadStatusHandlingFields(void)
 	layout->addWidget(statusPropRuleField(),currentLine,2);
 }
 
-
 void ServiceEditor::loadAlarmMsgFields()
 {
 	layout->addWidget(editorItemsList["alarmMsgLabel"], currentLine, 0);
@@ -334,37 +308,16 @@ void ServiceEditor::loadNotificationMsgFields()
 
 void ServiceEditor::loadIconFields()
 {
-	QIcon icon("images/normal.png");
-	QComboBox* iconsBox = iconField() ;
+	IconMapT icons = GraphView::nodeIcons() ;
 
-	// TODO Use map
-	iconsBox->addItem(GraphView::DEFAULT_ICON) ;
-	iconsBox->addItem(GraphView::NETWORK_ICON) ;
-	iconsBox->addItem(GraphView::ROUTER_ICON) ;
-	iconsBox->addItem(GraphView::SWITCH_ICON) ;
-	iconsBox->addItem(GraphView::FIREWALL_ICON) ;
-	iconsBox->addItem(GraphView::SERVER_ICON) ;
-	iconsBox->addItem(GraphView::LINUX_ICON) ;
-	iconsBox->addItem(GraphView::WINDOWS_ICON) ;
-	iconsBox->addItem(GraphView::SOLARIS_ICON) ;
-	iconsBox->addItem(GraphView::WEBSERVER_ICON) ;
-	iconsBox->addItem(GraphView::DBSERVER_ICON) ;
-	iconsBox->addItem(GraphView::STORAGE_ICON) ;
-	iconsBox->addItem(GraphView::FILER_ICON) ;
-	iconsBox->addItem(GraphView::HARDDISK_ICON) ;
-	iconsBox->addItem(GraphView::APP_ICON) ;
-	iconsBox->addItem(GraphView::WEB_ICON) ;
-	iconsBox->addItem(GraphView::DB_ICON) ;
-	iconsBox->addItem(GraphView::PROCESS_ICON) ;
-	iconsBox->addItem(GraphView::LOG_ICON) ;
-
-	iconsBox->addItem(GraphView::CLOUD_ICON) ;
-	iconsBox->addItem(GraphView::HYPERVISOR_ICON) ;
-
-	iconsBox->addItem(GraphView::OTH_CHECK_ICON) ;
-
+	QString header = "-->Select a icon (Default is " + GraphView::DEFAULT_ICON + ")" ;
+	iconField()->addItem(header, icons.value(GraphView::DEFAULT_ICON));
+	foreach(const QString & label, icons.keys()) {
+		QString path = icons.value(label) ;
+		iconField()->addItem(QIcon(path), label, icons.value(path));
+	}
 	layout->addWidget(editorItemsList["iconNameLabel"], currentLine, 0);
-	layout->addWidget(iconsBox,currentLine,1,1,2);
+	layout->addWidget(iconField(),currentLine,1,1,2);
 }
 
 
@@ -376,17 +329,15 @@ void ServiceEditor::loadCheckField(void)
 	loadStatusFile() ;
 }
 
-
 void ServiceEditor::loadButtonBox(void)
 {
-	layout->addWidget(buttonBox, currentLine, 1);
+	layout->addWidget(buttonBox, currentLine, 2);
 }
 
 void ServiceEditor::handleCloseClick(void)
 {
 	emit closeClicked();
 }
-
 
 void ServiceEditor::handleSaveClick(void)
 {

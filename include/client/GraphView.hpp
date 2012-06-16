@@ -46,44 +46,14 @@ public:
 	void updateStatsPanel(Stats * _stats_panel, const QString &  ) ;
 	void setStatsPanelPos(void) ;
 
-	inline void centerOnNode( const QString & _node_id ) {
-		if (! _node_id.isEmpty() ) centerOn( gnodesList[_node_id].label ) ;
-	}
+	inline void centerOnNode( const QString & id) { if (! id.isEmpty() ) centerOn( gnodesList[id].label ) ; }
+	inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){return graphScene->itemAt(mapToScene(mapFromGlobal(pos))); }
+	inline QGraphicsItem* nodeAt(QPoint pos){return graphScene->itemAt( mapToScene(pos) );}
 
-	inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){
-		return graphScene->itemAt( mapToScene( mapFromGlobal(pos) ) ) ;
-	}
-
-	inline QGraphicsItem* nodeAt(QPoint pos){
-		return graphScene->itemAt( mapToScene( pos ) ) ;
-	}
-
-	//ICON-RELATED META DATA
+	static IconMapT nodeIcons();
 	static const QString PLUS ;
 	static const QString MINUS ;
 	static const QString DEFAULT_ICON ;
-	static const QString NETWORK_ICON ;
-	static const QString ROUTER_ICON ;
-	static const QString SWITCH_ICON ;
-	static const QString FIREWALL_ICON  ;
-	static const QString STORAGE_ICON ;
-	static const QString FILER_ICON ;
-	static const QString HARDDISK_ICON ;
-	static const QString SERVER_ICON  ;
-	static const QString LINUX_ICON ;
-	static const QString WINDOWS_ICON ;
-	static const QString SOLARIS_ICON  ;
-	static const QString WEBSERVER_ICON ;
-	static const QString DBSERVER_ICON ;
-	static const QString APP_ICON ;
-	static const QString WEB_ICON ;
-	static const QString DB_ICON ;
-	static const QString PROCESS_ICON ;
-	static const QString LOG_ICON ;
-	static const QString CLOUD_ICON ;
-	static const QString HYPERVISOR_ICON ;
-	static const QString OTH_CHECK_ICON ;
-
 
 public slots:
 void capture(void) ;
@@ -107,7 +77,6 @@ void scrollContentsBy ( int dx, int dy ) ;
 
 
 private:
-
 QGraphicsScene* graphScene ;
 QGraphicsProxyWidget* statsPanelItem ;
 QPoint statsPanelPos ;

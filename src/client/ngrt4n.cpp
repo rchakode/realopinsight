@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 		new SvNavigator(userRole, file) ;
 	} else if(module == "editor") {
 		SvCreator* svc = new SvCreator(userRole) ;
-		svc->load( file ) ;
+		svc->load(file) ;
 	}
 	else if(module == "config") {
 		Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings) ;

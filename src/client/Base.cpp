@@ -32,7 +32,6 @@ void Struct::clear(void)
 	tree_item_list.clear() ;
 	check_list.clear() ;
 	node_list.clear() ;
-	root_id.clear() ;
 }
 
 Settings::Settings(): QSettings(QString(ngrt4n::SETTINGS_FILE.c_str()), QSettings::NativeFormat )

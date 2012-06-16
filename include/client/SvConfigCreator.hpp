@@ -92,18 +92,12 @@ QToolBar* toolBar ;
 QMenu* nodeContextMenu ;
 
 void loadFile(const QString & );
-
 void saveInFile(const QString & ) ;
-
 bool updateServiceNode(NodeListT & , const QString & ) ;
-
 void loadMenu(void) ;
-
 void unloadMenu(void) ;
-
 void addEvents(void);
-
-void resize(const qint32 & , const qint32 &, const qint32 &, const qint32 &);
+void resize(void);
 
 };
 

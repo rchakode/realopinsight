@@ -68,23 +68,20 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	rootElt = sv_config_doc.documentElement();
 	xml_service_node_list = rootElt.elementsByTagName("Service");
 
-	node.id = _snav_struct.root_id = rootElt.attribute("id");
-	node.name = rootElt.firstChildElement("Name").text();
-	node.child_nodes = rootElt.firstChildElement("SubServices").text();
-	node.status = MonitorBroker::UNSET_STATUS ;  // TODO Acknowledge status,
-	node.icon = GraphView::DEFAULT_ICON ;
-	node.type = NodeType::SERVICE_NODE ;
-	node.parent = "NULL" ;  // By convention
-
-	_snav_struct.node_list[node.id] = node;
+	//	node.id = _snav_struct.root_id = rootElt.attribute("id");
+	//	node.name = rootElt.firstChildElement("Name").text();
+	//	node.child_nodes = rootElt.firstChildElement("SubServices").text();
+	//
+	//	_snav_struct.node_list.insert(SvNavigatorTree::rootID, node);
 
 	xml_service_node_count = xml_service_node_list.length();
 	for (s = 0; s < xml_service_node_count; s++) {
-
+		// get the service node information
 		QDomElement service = xml_service_node_list.item(s).toElement();
 		node.id = service.attribute("id").trimmed() ;
 		node.type = service.attribute("type").toInt() ;
-		node.status_calc_rule = service.attribute("statusCalcRule").toInt() ;
+		node.status_crule = service.attribute("statusCalcRule").toInt() ;
+		node.status_prule = service.attribute("statusPropRule").toInt() ;
 		node.icon = service.firstChildElement("Icon").text().trimmed() ;
 		node.name = service.firstChildElement("Name").text().trimmed() ;
 		node.description = service.firstChildElement("Description").text().trimmed() ;
@@ -93,21 +90,22 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 		node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed() ;
 		node.child_nodes = service.firstChildElement("SubServices").text().trimmed() ;
 
-		if( node.type == NodeType::ALARM_NODE ) {
-			_snav_struct.check_list << node.id;
-		}
+		if(node.icon.length() == 0) node.icon = GraphView::DEFAULT_ICON ;
+		node.icon.remove("--> ") ; //For backward compatibility
+		node.status = MonitorBroker::UNSET_STATUS ;
+		node.parent = "NULL" ;  // By convention : the parent is not set yet
+		if(node.status_crule < 0) node.status_crule = StatusCalcRules::HighCriticity ;  //For backward compatibility
+		if(node.status_prule < 0) node.status_prule = StatusPropRules::Unchanged ;
 
-		_snav_struct.node_list[node.id] = node ;
+		_snav_struct.node_list.insert(node.id, node) ;
+		if( node.type == NodeType::ALARM_NODE ) _snav_struct.check_list << node.id;
 	}
 	file.close();
-
-	updateNodeHierachy( _snav_struct.node_list, graph_content ) ;
+	updateNodeHierachy(_snav_struct.node_list, graph_content) ;
 	buildNodeTree(_snav_struct.node_list, _snav_struct.tree_item_list) ;
-
 	graph_content = dotFileHeader + graph_content ;
 	graph_content += dotFileFooter;
-
-	saveCoordinatesDotFile( graph_content );
+	saveCoordinatesDotFile(graph_content);
 
 	return true;
 }
@@ -125,7 +123,7 @@ void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_conte
 		_graph_content = "\t" + node_it->id + "[label=\"" + g_node_label.replace(' ', '#') + "\"];\n" + _graph_content;
 
 		if( node_it->child_nodes != "" ) {
-			node_ids_list = node_it->child_nodes.split( CHILD_NODES_SEP ) ;
+			node_ids_list = node_it->child_nodes.split(CHILD_NODES_SEP) ;
 
 			for(QStringList::iterator node_id_it = node_ids_list.begin(); node_id_it != node_ids_list.end(); node_id_it ++) {
 				NodeListT::iterator child_node_it = _nodes_list.find( (*node_id_it).trimmed() );
@@ -138,11 +136,33 @@ void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_conte
 	}
 }
 
-void Parser::buildNodeTree( NodeListT & _nodes_list, TreeNodeItemListT & _tree)
+void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
 {
-	for(NodeListT::iterator node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++) {
-		if(node_it->parent != "" && node_it->id != "") {
-			SvNavigatorTree::addNode(_tree, (*node_it));
+	for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
+
+		QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType) ;
+		item->setIcon(0, QIcon(":/images/unknown.png")) ;
+		item->setText(0, node->name) ;
+		item->setData(0, QTreeWidgetItem::UserType, node->id) ;  //TODO handle later
+
+		_tree.insert(node->id, item) ;
+	}
+
+	for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
+
+		if( (node->type == NodeType::ALARM_NODE) || (node->child_nodes.length() == 0) ) continue ;
+
+		QStringList childs = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+		for(QStringList::iterator child_id = childs.begin(); child_id != childs.end(); child_id++ ) {
+
+			TreeNodeItemListT::iterator nitem = _tree.find(node->id) ;
+			if ( nitem == _tree.end()) {
+				qDebug() << "not found " << node->name << endl ;
+				continue ;
+			}
+
+			TreeNodeItemListT::iterator child = _tree.find(*child_id) ;
+			if( child != _tree.end() ) _tree[node->id]->addChild(*child) ;
 		}
 	}
 }

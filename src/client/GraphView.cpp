@@ -28,39 +28,39 @@
 
 const qreal GraphView::XScalingRatio = 72.0 ;
 const qreal GraphView::YScalingRatio = 100.0 ;
-
-//ICON-RELATED META DATA
+const QString GraphView::NODE_LABEL_ID_SFX = ":LABEL" ;
+const QString GraphView::NODE_ICON_ID_SFX = ":ICON" ;
+const QString GraphView::NODE_EXP_ICON_ID_SFX = ":EXPICON" ;
 const QString GraphView::PLUS = "plus" ;
 const QString GraphView::MINUS = "minus" ;
 const QString GraphView::DEFAULT_ICON = NodeType::toString(NodeType::SERVICE_NODE) ;
-const QString GraphView::NETWORK_ICON = "Network" ;
-const QString GraphView::ROUTER_ICON = "--> Router" ;
-const QString GraphView::SWITCH_ICON = "--> Switch" ;
-const QString GraphView::FIREWALL_ICON = "--> Firewall" ;
-const QString GraphView::STORAGE_ICON = "Storage" ;
-const QString GraphView::FILER_ICON = "--> Storage Area" ;
-const QString GraphView::HARDDISK_ICON = "--> Hard disk" ;
-const QString GraphView::SERVER_ICON = "Server" ;
-const QString GraphView::LINUX_ICON = "--> Linux OS" ;
-const QString GraphView::WINDOWS_ICON = "--> Windows OS" ;
-const QString GraphView::SOLARIS_ICON = "--> Solaris OS" ;
-const QString GraphView::WEBSERVER_ICON = "--> Web Server" ;
-const QString GraphView::DBSERVER_ICON = "--> Database Server" ;
-const QString GraphView::APP_ICON = "Application" ;
-const QString GraphView::WEB_ICON = "--> Web Accessibility" ;
-const QString GraphView::DB_ICON = "--> Database Engine" ;
-const QString GraphView::PROCESS_ICON = "--> Process" ;
-const QString GraphView::LOG_ICON = "--> Logfile" ;
-const QString GraphView::CLOUD_ICON = "Cloud" ;
-const QString GraphView::HYPERVISOR_ICON = "--> Hypervisor" ;
-const QString GraphView::OTH_CHECK_ICON = "Other Check" ;
 
-
-
-// GRAPHVIEW ICON EXTENTION, FOR SUITABLE IDENTIFATION
-const QString GraphView::NODE_LABEL_ID_SFX = ":LABEL" ;
-const QString  GraphView::NODE_ICON_ID_SFX = ":ICON" ;
-const QString  GraphView::NODE_EXP_ICON_ID_SFX = ":EXPICON" ;
+IconMapT GraphView::nodeIcons() {
+	IconMapT icons ;
+	icons[GraphView::DEFAULT_ICON]= ":/images/business-process.png";
+	icons["Other Check"] = ":/images/check.png";
+	icons["Server"] = ":/images/server.png";
+	icons["Firewall"] = ":/images/firewall.png";
+	icons["Router"] = ":/images/router.png";
+	icons["Network"] = ":/images/network.png";
+	icons["Swicth"] = ":/images/switch.png";
+	icons["Filer"] = ":/images/filer.png";
+	icons["Hard disk"] = ":/images/harddisk.png";
+	icons["Storage Area"] = ":/images/storage.png";
+	icons["Linux"] = ":/images/linux.png" ;
+	icons["Windows OS"] = ":/images/windows.png" ;
+	icons["Solaris"] = ":/images/solaris.png" ;
+	icons["Cloud"] = ":/images/cloud.png" ;
+	icons["Hypervisor"] = ":/images/hypervisor.png" ;
+	icons["Application"] = ":/images/application.png" ;
+	icons["Web Accessibility"] = ":/images/web.png";
+	icons["Web server"] = ":/images/web-server.png";
+	icons["Database Engine"] = ":/images/db.png";
+	icons["Database Server"] = ":/images/db-server.png" ;
+	icons["Process"] = ":/images/process.png";
+	icons["Logfile"] = ":/images/log.png";
+	return icons ;
+}
 
 GraphView::GraphView(QWidget* _parent)
 : QGraphicsView(_parent),
@@ -71,35 +71,7 @@ GraphView::GraphView(QWidget* _parent)
 {
 	statsPanelItem = NULL ;
 	graphScene = new QGraphicsScene() , setScene(graphScene);
-
-	iconMap[DEFAULT_ICON] = ":/images/business-process.png";
-	iconMap[OTH_CHECK_ICON] = ":/images/check.png";
-
-	iconMap[SERVER_ICON] = ":/images/server.png";
-	iconMap[FIREWALL_ICON] = ":/images/firewall.png";
-	iconMap[ROUTER_ICON] = ":/images/router.png";
-	iconMap[NETWORK_ICON] = ":/images/network.png";
-	iconMap[SWITCH_ICON] = ":/images/switch.png";
-	iconMap[FILER_ICON] = ":/images/filer.png";
-	iconMap[HARDDISK_ICON] = ":/images/harddisk.png";
-	iconMap[STORAGE_ICON] = ":/images/storage.png";
-
-	iconMap[LINUX_ICON] = ":/images/linux.png" ;
-	iconMap[WINDOWS_ICON] = ":/images/windows.png" ;
-	iconMap[SOLARIS_ICON] = ":/images/solaris.png" ;
-	iconMap[CLOUD_ICON] = ":/images/cloud.png" ;
-	iconMap[HYPERVISOR_ICON] = ":/images/hypervisor.png" ;
-
-	iconMap[APP_ICON] = ":/images/application.png" ;
-	iconMap[WEB_ICON] = ":/images/web.png";
-	iconMap[WEBSERVER_ICON] = ":/images/web-server.png";
-	iconMap[DB_ICON] = ":/images/db.png";
-	iconMap[DBSERVER_ICON] = ":/images/db-server.png" ;
-	iconMap[PROCESS_ICON] = ":/images/process.png";
-	iconMap[LOG_ICON] = ":/images/log.png";
-
-	iconMap[PLUS] = ":/images/plus.png";
-	iconMap[MINUS] = ":/images/minus.png";
+	iconMap = nodeIcons() ;
 }
 
 GraphView::~GraphView()
@@ -127,7 +99,7 @@ void GraphView::mouseReleaseEvent( QMouseEvent * _event)
 			return ;
 		}
 
-		list = item->data(NODE_ID_DATA_INDEX).toString().split(":");
+		list = item->data(0).toString().split(":");
 		if(list.length() == 2)
 		{
 			n_id = list[0];
@@ -360,17 +332,17 @@ void GraphView::drawNode(const NodeT & _node )
 
 	gnodesList[_node.id].label = new QGraphicsTextItem(),
 			gnodesList[_node.id].label->setHtml(html_n_label),
-			gnodesList[_node.id].label->setData(NODE_ID_DATA_INDEX, _node.id + NODE_LABEL_ID_SFX),
+			gnodesList[_node.id].label->setData(0, _node.id + NODE_LABEL_ID_SFX),
 			graphScene->addItem(gnodesList[_node.id].label),
 			gnodesList[_node.id].label->setZValue(-5);
 
 	gnodesList[_node.id].icon = new QGraphicsPixmapItem(icon),
-			gnodesList[_node.id].icon->setData(NODE_ID_DATA_INDEX, _node.id + NODE_ICON_ID_SFX),
+			gnodesList[_node.id].icon->setData(0, _node.id + NODE_ICON_ID_SFX),
 			graphScene->addItem(gnodesList[_node.id].icon),
 			gnodesList[_node.id].icon->setZValue(-10);
 
 	gnodesList[_node.id].exp_icon = new QGraphicsPixmapItem(exp_icon),
-			gnodesList[_node.id].exp_icon->setData(NODE_ID_DATA_INDEX, _node.id + NODE_EXP_ICON_ID_SFX),
+			gnodesList[_node.id].exp_icon->setData(0, _node.id + NODE_EXP_ICON_ID_SFX),
 			graphScene->addItem(gnodesList[_node.id].exp_icon),
 			gnodesList[_node.id].exp_icon->setZValue(0) ;
 

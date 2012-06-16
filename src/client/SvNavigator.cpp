@@ -44,7 +44,7 @@ ComboBoxItemsT SvNavigator::calcRules() {
 
 SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_file, QWidget* parent)
 : QMainWindow(parent) ,
-  configFile(_config_file) ,
+  configFile(_config_file),
   userRole (_user_role) , //TODO change implementation
   settings ( new Settings()) ,
   snavStruct ( new Struct()) ,
@@ -67,12 +67,12 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 	topRightPanel->addTab(graphView, "Dashboard") ;
 	topRightPanel->addTab(webBrowser, "Native Web UI") ;
 	bottomRightPanel->addTab(msgPanel, "Event Console") ;
-	mainSplitter->addWidget( navigationTree ) ;
-	mainSplitter->addWidget( rightSplitter ) ;
-	rightSplitter->addWidget( topRightPanel ) ;
-	rightSplitter->addWidget( bottomRightPanel ) ;
-	rightSplitter->setOrientation( Qt::Vertical ) ;
-	setCentralWidget( mainSplitter ) ;
+	mainSplitter->addWidget(navigationTree) ;
+	mainSplitter->addWidget(rightSplitter) ;
+	rightSplitter->addWidget(topRightPanel) ;
+	rightSplitter->addWidget(bottomRightPanel) ;
+	rightSplitter->setOrientation(Qt::Vertical) ;
+	setCentralWidget(mainSplitter) ;
 
 	// Activate Qt's event handler on widget
 	addEvents();
@@ -133,12 +133,12 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 	{
 		if( graph_node )
 		{
-			graph_item_id = graph_node->data(NODE_ID_DATA_INDEX).toString() ;
+			graph_item_id = graph_node->data(0).toString() ;
 			selectedNodeId =  graph_item_id.left( graph_item_id.indexOf(":") ) ;
 		}
 		else
 		{
-			selectedNodeId = tree_nodes[0]->text(TREE_NODE_ID_COLUMN) ;
+			selectedNodeId = tree_nodes[0]->data(0, QTreeWidgetItem::UserType).toString() ;
 		}
 
 		nodeContextMenu->exec( global_pos ) ;
@@ -152,24 +152,17 @@ void SvNavigator::timerEvent(QTimerEvent *)
 
 void SvNavigator::load(void)
 {
-	Parser config_parser ;
-
 	openedFile = configFile ;
+	Parser config_parser ;
 	config_parser.parseSvConfig(configFile, *snavStruct) ;
-
 	navigationTree->clear() ;
-	navigationTree->addTopLevelItem(snavStruct->tree_item_list[snavStruct->root_id]) ;
+	navigationTree->addTopLevelItem(snavStruct->tree_item_list[SvNavigatorTree::rootID]) ;
 	graphView->load(config_parser.getDotGraphFile(), snavStruct->node_list) ;
 	webBrowser->setUrl( webUIUrl ) ;
-
 	resize() ;
-
 	monitor();
-
 	show() ;
-
 	graphView->scaleToFitViewPort( ) ;
-
 	updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
 	if ( updateInterval <= 0 ) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000 ;
 	timerId = startTimer( updateInterval ) ;
@@ -468,7 +461,7 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 	if ( normal_count == sum_counts ) {
 		node_it->status = MonitorBroker::NAGIOS_OK ;
 	}
-	else if ( node_it->status_calc_rule == StatusCalcRules::WeightedCriticity ) {
+	else if ( node_it->status_crule == StatusCalcRules::WeightedCriticity ) {
 		node_it->status = MonitorBroker::NAGIOS_WARNING ;
 		if ( critical_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
 		else if ( unknown_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
@@ -605,30 +598,26 @@ void SvNavigator::hideChart(void)
 
 void SvNavigator::centerGraphOnNode( QTreeWidgetItem * _item )
 {
-	centerGraphOnNode( _item->text(TREE_NODE_ID_COLUMN) ) ;
+	centerGraphOnNode( _item->data(0, QTreeWidgetItem::UserType).toString() ) ;
 }
 
 void SvNavigator::resize(void)
 {
-	QSize screen_size, msg_panel_size, graph_port_view ;
 	QList<qint32> frames_size ;
 	const qreal GRAPH_HEIGHT_RATE = 0.50  ;
 
-	screen_size = qApp->desktop()->screen(0)->size() ;
-	graph_port_view =  QSize( screen_size.width() * 0.80, screen_size.height() * GRAPH_HEIGHT_RATE ) ;
+	QSize screen_size = qApp->desktop()->screen(0)->size() ;
 
-	msgPanelSize = QSize( screen_size.width() * 0.80, screen_size.height() * (1.0 - GRAPH_HEIGHT_RATE) ) ;
+	msgPanelSize = QSize(screen_size.width() * 0.80, screen_size.height() * (1.0 - GRAPH_HEIGHT_RATE)) ;
 
-	frames_size.push_back( screen_size.width() * 0.20 ) ;
-	frames_size.push_back( msgPanelSize.width() ) ;
-	mainSplitter->setSizes( frames_size ) ;
-
+	frames_size.push_back(screen_size.width() * 0.20) ;
+	frames_size.push_back(msgPanelSize.width()) ;
+	mainSplitter->setSizes(frames_size) ;
 	frames_size[0] = ( screen_size.height() * GRAPH_HEIGHT_RATE ),
-			frames_size[1] = ( msgPanelSize.height() ),
-			rightSplitter->setSizes( frames_size );
+			frames_size[1] = (msgPanelSize.height()),
+			rightSplitter->setSizes(frames_size);
 
 	mainSplitter->resize(screen_size.width(), screen_size.height() * 0.85);
-
 	QMainWindow::resize(screen_size.width(),  screen_size.height());
 }
 

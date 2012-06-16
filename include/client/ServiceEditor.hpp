@@ -52,71 +52,28 @@ public:
 	typedef QMap<QString, QWidget*> ItemsList ;
 
 	ServiceEditor( QWidget* = 0);
-
 	virtual ~ServiceEditor();
 
 	void layoutEditorComponents(void) ;
-
 	void setContent( const NodeListT &, const QString & ) ;
-
 	void setContent( NodeListT::const_iterator ) ;
-
 	bool updateNode( NodeListT &, const QString& ) ;
-
 	bool updateNode(NodeListT::iterator & _node_it) ;
-
 	void setCheckListField( const MonitorBroker::NagiosChecksT& );
-
 	void setEnableFields( const bool& );
+	void setLowLevelAlarmComponentEnabled(bool enable){editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);}
 
-	void setLowLevelAlarmComponentEnabled(bool enable){
-		editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);
-	}
-
-	ItemsList* itemList( void ) {
-		return &editorItemsList;
-	}
-
-	QLineEdit* nameField(void){
-		return dynamic_cast<QLineEdit*>(editorItemsList[NAME_FIELD]) ;
-	}
-
-	QComboBox* typeField(void) const {
-		return dynamic_cast<QComboBox*>(editorItemsList[TYPE_FIELD]);
-	}
-
-	QComboBox* statusCalcRuleField(void) const {
-		return dynamic_cast<QComboBox*>(editorItemsList[STATUS_CALC_RULE_FIELD]);
-	}
-
-	QComboBox* statusPropRuleField(void) const {
-		return dynamic_cast<QComboBox*>(editorItemsList[STATUS_PROP_RULE_FIELD]);
-	}
-
-	inline QComboBox* iconField(void) const {
-		return dynamic_cast<QComboBox*>(editorItemsList[ICON_FIELD]);
-	}
-
-	inline QTextEdit* descriptionField(void) const {
-		return dynamic_cast<QTextEdit*>(editorItemsList[DESCRIPTION_FIELD]);
-	}
-
-	inline QTextEdit* alarmMsgField(void){
-		return dynamic_cast<QTextEdit*>(editorItemsList[ALARM_MSG_FIELD]) ;
-	}
-
-	inline QTextEdit* notificationMsgField(void){
-		return dynamic_cast<QTextEdit*>(editorItemsList[NOTIFICATION_MSG_FIELD]) ;
-	}
-
-	inline QComboBox* checkField(void){
-		return dynamic_cast<QComboBox*>(editorItemsList[CHECK_FIELD]) ;
-	}
-
-	inline QListWidget* checkListField(void){
-		return dynamic_cast<QListWidget*>(editorItemsList[CHECK_LIST_FIELD]) ;
-	}
-
+	ItemsList* itemList( void ) {return &editorItemsList;}
+	QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(editorItemsList[NAME_FIELD]);}
+	QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[TYPE_FIELD]);}
+	QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_CALC_RULE_FIELD]);}
+	QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_PROP_RULE_FIELD]);}
+	inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[ICON_FIELD]);}
+	inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(editorItemsList[DESCRIPTION_FIELD]);}
+	inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[ALARM_MSG_FIELD]) ;}
+	inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[NOTIFICATION_MSG_FIELD]);}
+	inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(editorItemsList[CHECK_FIELD]) ;}
+	inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(editorItemsList[CHECK_LIST_FIELD]);}
 
 public slots:
 	void handleSaveClick(void) ;

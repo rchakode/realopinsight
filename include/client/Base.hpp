@@ -36,12 +36,6 @@ typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
 typedef bitset<4> StatusInfoT ;
 
-enum TreeColumnsDesc{
-	NODE_ID_DATA_INDEX = 0,			// Id of data field used to stored nodes ids in the graph
-	TREE_NODE_ID_COLUMN = 1
-};
-
-
 class StatusPropRules {
 public :
 	enum StatusPropRulesT{
@@ -60,6 +54,8 @@ public :
 		case Decreased: return "Decreased" ;
 		case Increased: return "Increased" ;
 		}
+
+		return "Unchanged" ;
 	}
 };
 
@@ -76,10 +72,10 @@ public :
 	}
 
 	static QString label(StatusCalcRulesT rule) {
-		switch(rule) {
-		case HighCriticity: return "High Criticity" ;
-		case WeightedCriticity: return "Weighted Criticity" ;
-		}
+
+		if (rule == WeightedCriticity) return "Weighted Criticity" ;
+
+		return "High Criticity" ;
 	}
 };
 
@@ -104,7 +100,8 @@ typedef struct _NodeT {
 	QString id;
 	QString name ;
 	qint32 type ;
-	qint32 status_calc_rule ;
+	qint32 status_crule ;
+	qint32 status_prule ;
 	QString icon ;
 	QString description ;
 	QString parent ;
@@ -144,7 +141,6 @@ class Struct
 {
 
 public:
-	QString root_id ;
 	TreeNodeItemListT tree_item_list ;
 	NodeListT node_list ;
 	QStringList check_list ;

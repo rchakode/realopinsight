@@ -40,8 +40,12 @@ SvCreator::SvCreator(const qint32 & _user_role)
   menuBar( new QMenuBar(this) ),
   toolBar( new QToolBar("toolBar") ),
   nodeContextMenu( new QMenu() )
-  {
-  }
+{
+	mainSplitter->addWidget(navigationTree) ;
+	mainSplitter->addWidget(editor) ;
+	setCentralWidget(mainSplitter) ;
+	resize() ;
+}
 
 SvCreator::~SvCreator()
 {
@@ -56,15 +60,11 @@ SvCreator::~SvCreator()
 
 void SvCreator::contextMenuEvent(QContextMenuEvent *_event)
 {
-	QPoint global_pos ;
-	QList<QTreeWidgetItem*> tnodes ;
+	QPoint global_pos = _event->globalPos() ;
+	QList<QTreeWidgetItem*> tnodes = navigationTree->selectedItems() ;
 
-	global_pos = _event->globalPos() ;
-	tnodes = navigationTree->selectedItems() ;
-
-	if ( tnodes.length())
-	{
-		selectedNodeId = tnodes[0]->text(TREE_NODE_ID_COLUMN) ;
+	if ( tnodes.length()) {
+		selectedNodeId = tnodes[0]->data(0, QTreeWidgetItem::UserType).toString() ;
 		nodeContextMenu->exec( global_pos ) ;
 	}
 }
@@ -85,26 +85,18 @@ void SvCreator::unloadMenu(void)
 
 void SvCreator::load(const QString& _filename)
 {
+	setWindowTitle(openedFile + " - " + QString(ngrt4n::APP_NAME.c_str())
+			+ " | Monitoring View Configuration Editor") ;
 	loadMenu();
 	addEvents() ;
 	loadFile(_filename);
-
-	mainSplitter->addWidget( navigationTree ) ;
-	mainSplitter->addWidget( editor ) ;
-	setCentralWidget( mainSplitter ) ;
-	setWindowTitle(openedFile
-			+ " - "
-			+ QString(ngrt4n::APP_NAME.c_str())
-			+ " | Monitoring View Configuration Editor") ;
 	show();
 }
 
 
 void SvCreator::open(void)
 {
-	QString root_id, config_file;
-
-	config_file = QFileDialog::getOpenFileName(this,
+	QString config_file = QFileDialog::getOpenFileName(this,
 			"Select view configuration file - " + QString(ngrt4n::APP_NAME.c_str()),
 			".",
 			"Xml files (*.xml)");
@@ -115,16 +107,15 @@ void SvCreator::open(void)
 
 void SvCreator::loadFile(const QString& _filename)
 {
-	QString root_id;
-	Parser config_parser;
-
-	if(_filename != NULL)
-	{
-		snavStruct->clear() ;
-		config_parser.parseSvConfig( _filename, (*snavStruct) );
-		navigationTree->update( snavStruct ) ;
-		openedFile = _filename ;
+	Parser parser;
+	if(_filename == NULL) return ;
+	snavStruct->clear() ;
+	if (! parser.parseSvConfig(_filename, *snavStruct) ) {
+		qDebug() << "Unable to open the file " << _filename << endl ;
+		exit(1) ;
 	}
+	navigationTree->update(snavStruct) ;
+	openedFile = _filename ;
 }
 
 
@@ -132,10 +123,8 @@ void SvCreator::newBusinessView(void)
 {
 	NodeT node;
 
-	if( ! close(false) )
-	{
+	if( ! close(false) ) {
 		snavStruct->clear() ;
-		node.id = snavStruct->root_id  = SvNavigatorTree::rootID ;
 		node.name = "New Business view" ;
 		node.child_nodes.clear() ;
 		node.status = MonitorBroker::NAGIOS_UNKNOWN ;  // TODO no acknowledged
@@ -164,8 +153,8 @@ void SvCreator::newNode(void)
 	NodeT node;
 
 	p_node_it = snavStruct->node_list.find( selectedNodeId ) ;
-	if(p_node_it == snavStruct->node_list.end() || p_node_it->type == NodeType::ALARM_NODE )
-	{
+	if(p_node_it == snavStruct->node_list.end() || p_node_it->type == NodeType::ALARM_NODE ) {
+
 		QMessageBox::warning(this, "Warning! | "
 				+ QString(ngrt4n::APP_NAME.c_str()),
 				"Action not allowed on the target node",
@@ -220,14 +209,12 @@ void SvCreator::deleteNode(const QString & _node_id)
 
 
 	node_it =  snavStruct->node_list.find( _node_id ) ;
-	if( node_it != snavStruct->node_list.end() )
-	{
+	if( node_it != snavStruct->node_list.end() ) {
 		if( node_it->type != NodeType::ALARM_NODE &&  node_it->child_nodes != "" )
 		{
 			ud_services = node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
 
-			for( uds_it = ud_services.begin(); uds_it != ud_services.end(); uds_it++ )
-			{
+			for( uds_it = ud_services.begin(); uds_it != ud_services.end(); uds_it++ ) {
 				deleteNode (*uds_it) ;
 			}
 
@@ -238,8 +225,7 @@ void SvCreator::deleteNode(const QString & _node_id)
 		item = snavStruct->tree_item_list.find( _node_id ) ;
 		p_item = snavStruct->tree_item_list.find( node_it->parent ) ;
 
-		if( p_item != end_item_list && item != end_item_list )
-		{
+		if( p_item != end_item_list && item != end_item_list ) {
 			QRegExp regex ;
 			regex.setPattern(
 					"|^" + _node_id + Parser::CHILD_NODES_SEP +
@@ -260,17 +246,14 @@ void SvCreator::deleteNode(const QString & _node_id)
 
 void SvCreator::save(void)
 {
-	if( selectedNode != "" )
-	{
+	if( selectedNode != "" ) {
 		fillEditorFromService(snavStruct->tree_item_list[selectedNode]);
 	}
 
-	if ( openedFile == "" )
-	{
+	if ( openedFile == "" ) {
 		saveAs();
 	}
-	else
-	{
+	else {
 		saveInFile( openedFile );
 	}
 
@@ -288,19 +271,16 @@ int SvCreator::close( const bool & _close_windows )
 {
 	QMessageBox msg_box;
 
-	if ( hasToBeSaved )
-	{
+	if ( hasToBeSaved ) {
 		msg_box.setWindowTitle("Save change? - " + QString(ngrt4n::APP_NAME.c_str()));
 		msg_box.setText("The document has been modified.\n "
 				"Do you want to save your changes?");
 
-		if( _close_windows )
-		{
+		if( _close_windows ) {
 			msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::Discard);
 		}
 
-		else
-		{
+		else {
 			msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No);
 		}
 
@@ -321,10 +301,8 @@ int SvCreator::close( const bool & _close_windows )
 			break;
 		}
 	}
-	else
-	{
-		if( _close_windows )
-			qApp->quit();
+	else {
+		if( _close_windows ) qApp->quit();
 	}
 
 	return 0;
@@ -337,7 +315,7 @@ void SvCreator::handleSelectedNodeChanged(void)
 
 	items = navigationTree->selectedItems() ;
 
-	if( items.length() ) fillEditorFromService( *(items.begin()) );
+	if( items.length() ) fillEditorFromService(*(items.begin()));
 }
 
 
@@ -350,35 +328,28 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 
 	tnode_it =  snavStruct->tree_item_list.find(_node_id) ;
 
-	if( tnode_it != snavStruct->tree_item_list.end() )
-	{
-		tnode_p = (*tnode_it)->parent() ;
+	if( tnode_it != snavStruct->tree_item_list.end() ) {
 
-		if( tnode_p )
-		{
+		tnode_p = (*tnode_it)->parent() ;
+		if( tnode_p ) {
 			node_it = snavStruct->node_list.find(_node_id) ;
 
-			if( node_it != snavStruct->node_list.end() )
-			{
+			if( node_it != snavStruct->node_list.end() ) {
 				/* Remove the node on its old parent's child list */
-
 				regex.setPattern(
 						"|^" + _node_id + Parser::CHILD_NODES_SEP +
 						"|^" + _node_id + "$" +
 						"|" + Parser::CHILD_NODES_SEP  + _node_id
 				) ;
 				p_node_it = snavStruct->node_list.find( node_it->parent ) ;
-				if( p_node_it != snavStruct->node_list.end() )
-				{
+				if( p_node_it != snavStruct->node_list.end() ) {
 					p_node_it->child_nodes.remove( regex ) ;
 				}
 
 				/* Add the node on its new parent's child list */
-
-				node_it->parent = tnode_p->text(TREE_NODE_ID_COLUMN) ;
+				node_it->parent = tnode_p->data(0, QTreeWidgetItem::UserType).toString() ;
 				p_node_it = snavStruct->node_list.find( node_it->parent ) ;
-				if( p_node_it != snavStruct->node_list.end() )
-				{
+				if(p_node_it != snavStruct->node_list.end()) {
 					p_node_it->child_nodes += (p_node_it->child_nodes != "")?
 							Parser::CHILD_NODES_SEP + _node_id : _node_id ;
 				}
@@ -395,34 +366,27 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 
 	node_it = snavStruct->node_list.find( selectedNode ) ;
 
-	if( node_it != snavStruct->node_list.end() )
-	{
-		if( _type == NodeType::SERVICE_NODE )
-		{
-			if ( node_it->type == NodeType::ALARM_NODE )
-			{
+	if(node_it != snavStruct->node_list.end()) {
+		if(_type == NodeType::SERVICE_NODE){
+			if ( node_it->type == NodeType::ALARM_NODE ) {
 				//TODO a bug exists. To be debuged
 				node_it->child_nodes.clear() ;
-				if( editor->updateNode(node_it) )
-				{
+				if( editor->updateNode(node_it) ) {
 					snavStruct->tree_item_list[selectedNode]->setText(0, node_it->name);
 					hasToBeSaved = 1 ;
 				}
 			}
 
 		}
-		else
-		{
-			if ( node_it->type == NodeType::SERVICE_NODE && ! node_it->child_nodes.isEmpty() )
-			{
+		else {
+			if ( node_it->type == NodeType::SERVICE_NODE && ! node_it->child_nodes.isEmpty() ) {
 				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
 						"This action required that the service has no sub service", QMessageBox::Ok) ;
 				editor->typeField()->setCurrentIndex( 0 ) ;
 			}
 			else
 			{
-				if( editor->updateNode(node_it) )
-				{
+				if(editor->updateNode(node_it)) {
 					snavStruct->tree_item_list[selectedNode]->setText(0, node_it->name);
 					hasToBeSaved = 1 ;
 				}
@@ -449,15 +413,13 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem * _service_item )
 
 	node_it = snavStruct->node_list.find(selectedNode) ;
 
-	if( node_it != snavStruct->node_list.end() )
-	{
-		if( editor->updateNode(node_it) )
-		{
+	if(node_it != snavStruct->node_list.end()) {
+		if(editor->updateNode(node_it)) {
 			snavStruct->tree_item_list[selectedNode]->setText(0, node_it->name);
 			hasToBeSaved = 1 ;
 		}
 	}
-	selectedNode = _service_item->text( TREE_NODE_ID_COLUMN ) ;
+	selectedNode = _service_item->data(0, QTreeWidgetItem::UserType).toString() ;
 
 	node_it = snavStruct->node_list.find(selectedNode) ;
 
@@ -471,10 +433,8 @@ void SvCreator::handleReturnPressed(void)
 
 	node_it = snavStruct->node_list.find(selectedNode) ;
 
-	if( node_it != snavStruct->node_list.end() )
-	{
-		if( editor->updateNode(node_it) )
-		{
+	if( node_it != snavStruct->node_list.end() ) {
+		if( editor->updateNode(node_it) ) {
 			snavStruct->tree_item_list[selectedNode]->setText(0, node_it->name);
 			hasToBeSaved = 1 ;
 		}
@@ -483,71 +443,69 @@ void SvCreator::handleReturnPressed(void)
 
 void SvCreator::saveInFile(const QString& _filename)
 {
-	if( _filename != NULL)
-	{
-		QTextStream file_stream;
-		NodeListT::const_iterator node_it;
-		QFile file(_filename);
-		if( file.open(QIODevice::WriteOnly) )
-		{
-			file_stream.setDevice(&file);
+	if( _filename == NULL) return ;
+	QTextStream ofile;
+	QFile file(_filename);
+	if( file.open(QIODevice::WriteOnly) ) {
+		ofile.setDevice(&file);
 
-			node_it = snavStruct->node_list.find(SvNavigatorTree::rootID);
+		NodeListT::const_iterator node = snavStruct->node_list.find(SvNavigatorTree::rootID);
+		if( node == snavStruct->node_list.end() ) return ;
 
-			if( node_it != snavStruct->node_list.end() )
-			{
-				file_stream << "<ServiceView id=\"" << SvNavigatorTree::rootID  << "\">" << endl
-						<< "\t<Name>" <<  node_it->name << "</Name>" << endl
-						<< "\t<SubServices>" << node_it->child_nodes << "</SubServices>" << endl;
+		ofile << "<ServiceView compat=\"2.0\">" << endl ;
+		ofile << "\t<Service id=\""<<node->id<<"\" type=\""<<node->type
+				<< "\" statusCalcRule=\""<<node->status_crule<< "\" statusPropRule=\""<<node->status_prule<< "\">"<< endl
+				<< "\t\t<Name>"<<node->name<<"</Name>"<<endl
+				<< "\t\t<Icon>"<<node->icon<<"</Icon>"<<endl
+				<< "\t\t<Description>"<<node->description<<"</Description>"<<endl
+				<< "\t\t<AlarmMsg>"<< node->alarm_msg<<"</AlarmMsg>" << endl
+				<< "\t\t<NotificationMsg>"<<node->notification_msg<<"</NotificationMsg>" << endl
+				<< "\t\t<SubServices>"<<node->child_nodes<<"</SubServices>" << endl
+				<< "\t</Service>"<<endl;
+		//
+		//			ofile << "<ServiceView id=\"" << SvNavigatorTree::rootID  << "\">" << endl
+		//					<< "\t<Name>" <<  node->name << "</Name>" << endl
+		//					<< "\t<SubServices>" << node->child_nodes << "</SubServices>" << endl;
 
-				for( node_it = snavStruct->node_list.begin();  node_it !=  snavStruct->node_list.end();  node_it++)
-				{
-					if(  node_it->id != SvNavigatorTree::rootID ||  !  node_it->parent.isEmpty() )
-					{
-						file_stream << "\t<Service id=\""<<  node_it->id << "\"" << " type=\""<<  node_it->type
-								<< "\" statusCalcRule=\""<<  node_it->status_calc_rule << "\">"<< endl
-								<< "\t\t<Name>" <<  node_it->name << "</Name>" << endl
-								<< "\t\t<Icon>" <<  node_it->icon << "</Icon>" << endl
-								<< "\t\t<Description>" <<  node_it->description << "</Description>" << endl
-								<< "\t\t<AlarmMsg>" <<  node_it->alarm_msg << "</AlarmMsg>" << endl
-								<< "\t\t<NotificationMsg>" <<  node_it->notification_msg << "</NotificationMsg>" << endl
-								<< "\t\t<SubServices>" << node_it->child_nodes << "</SubServices>" << endl ;
-
-						if(node_it->type == NodeType::ALARM_NODE ){
-
-							file_stream << "\t\t<Status>" <<  node_it->status << "</Status>" << endl ;
-						}
-						else {
-
-							file_stream << "\t\t<PropagationRule>" <<  node_it->propagation_rule << "</PropagationRule>" << endl ;
-						}
-
-						file_stream << "\t</Service>"<< endl;
-					}
-				}
-
-				file_stream << "</ServiceView>" << endl;
-				hasToBeSaved = 0;
-				openedFile = _filename;
-				qDebug() << _filename <<" writed.";
-			}
+		for( node = snavStruct->node_list.begin();  node !=  snavStruct->node_list.end(); node++) {
+			if(  node->id == SvNavigatorTree::rootID ||  node->parent.isEmpty() ) continue ;
+			//add to xml node related to the service
+			ofile << "\t<Service id=\""<<node->id<<"\" type=\""<<node->type
+					<< "\" statusCalcRule=\""<<node->status_crule<< "\" statusPropRule=\""<<node->status_prule<< "\">"<< endl
+					<< "\t\t<Name>"<<node->name<<"</Name>"<<endl
+					<< "\t\t<Icon>"<<node->icon<<"</Icon>"<<endl
+					<< "\t\t<Description>"<<node->description<<"</Description>"<<endl
+					<< "\t\t<AlarmMsg>"<< node->alarm_msg<<"</AlarmMsg>" << endl
+					<< "\t\t<NotificationMsg>"<<node->notification_msg<<"</NotificationMsg>" << endl
+					<< "\t\t<SubServices>"<<node->child_nodes<<"</SubServices>" << endl
+					<< "\t</Service>"<<endl;
+			//						if(node->type == NodeType::ALARM_NODE){
+			//							ofile << "\t\t<Status>" <<  node->status << "</Status>" << endl ;
+			//						} else {
+			//
+			//							ofile << "\t\t<PropagationRule>" <<  node->propagation_rule << "</PropagationRule>" << endl ;
+			//						}
+			//
+			//ofile<< "\t</Service>"<< endl;
 		}
-		file.close();
+
+		ofile << "</ServiceView>" << endl;
+		hasToBeSaved = 0;
+		openedFile = _filename;
+		qDebug() << _filename <<" writed.";
 	}
+	file.close();
 }
 
-
-
-void SvCreator::resize(const qint32 & _windows_width,
-		const qint32 & _windows_height,
-		const qint32 & _nav_tree_width,
-		const qint32 & _editor_width)
+void SvCreator::resize()
 {
+	QSize ui_size = qApp->desktop()->screen(0)->size() * 0.80;
 	QList<qint32> frames_size;
-	frames_size.push_back(_nav_tree_width);
-	frames_size.push_back(_editor_width);
+	frames_size.push_back(ui_size.width() * 0.3);
+	frames_size.push_back(ui_size.width() * 0.7);
 	mainSplitter->setSizes(frames_size);
-	mainSplitter->resize(_windows_width, _windows_height);
+	mainSplitter->resize(ui_size);
+	QMainWindow::resize(ui_size) ;
 }
 
 void SvCreator::loadMenu(void)
@@ -569,7 +527,7 @@ void SvCreator::loadMenu(void)
 	menuList["MENU2"] = menuBar->addMenu(tr("&Help")),
 			subMenuList["ShowOnlineResources"] = menuList["MENU2"]->addAction("Online &Resources"),
 			menuList["MENU2"]->addSeparator(),
-	subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()));
+			subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()));
 
 	subMenuList["NewFile"]->setShortcut(QKeySequence::New) ;
 	subMenuList["Open"]->setShortcut(QKeySequence::Open) ;

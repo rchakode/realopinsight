@@ -45,12 +45,11 @@ void SvNavigatorTree::showEvent(QShowEvent*)
 void SvNavigatorTree::dropEvent(QDropEvent * _event )
 {
 	NodeListT::iterator node_it ;
-	QTreeWidgetItem* tnode ;
 	QString dest_tnode_id ;
 
-	tnode = itemAt( _event->pos() ) ;
+	QTreeWidgetItem* tnode = itemAt( _event->pos() ) ;
 	if( tnode && ptr2MainStruct ) {
-		node_it = ptr2MainStruct->node_list.find( tnode->text(TREE_NODE_ID_COLUMN) ) ;
+		node_it = ptr2MainStruct->node_list.find(tnode->data(0, QTreeWidgetItem::UserType).toString()) ;
 		if( node_it != ptr2MainStruct->node_list.end() ) {
 			if( node_it->type != NodeType::ALARM_NODE ) {
 				_event->setDropAction( Qt::MoveAction ) ;
@@ -72,7 +71,7 @@ void SvNavigatorTree::startDrag(Qt::DropActions _drag_action)
 	QList<QTreeWidgetItem*> items ;
 
 	items = selectedItems() ;
-	if( items.length() ) selectedNode = items[0]->text(TREE_NODE_ID_COLUMN) ;
+	if( items.length() ) selectedNode = items[0]->data(0, QTreeWidgetItem::UserType).toString() ;
 	QTreeWidget::startDrag(_drag_action) ;
 }
 
@@ -128,12 +127,11 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _service_tree,
 	}
 }
 
-
 void SvNavigatorTree::update(Struct* & _snav_struct)
 {
 	clear() ;
-	addTopLevelItem( _snav_struct->tree_item_list[_snav_struct->root_id] ) ;
-	setCurrentItem( _snav_struct->tree_item_list[_snav_struct->root_id] ) ;
+	addTopLevelItem(_snav_struct->tree_item_list[rootID]) ;
+	setCurrentItem(_snav_struct->tree_item_list[rootID]) ;
 	expandAll() ;
 	ptr2MainStruct = _snav_struct ;
 }
