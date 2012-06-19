@@ -96,6 +96,62 @@ public :
 };
 
 
+class Status{
+
+public:
+
+	Status(MonitorBroker::StatusT value=MonitorBroker::OK) {this->value = value ;}
+	MonitorBroker::StatusT getValue() const{return value ;} ;
+
+	Status operator *(Status& st) const {
+		switch(value) {
+		case MonitorBroker::CRITICAL : return Status(MonitorBroker::CRITICAL) ;
+		case MonitorBroker::OK : return st ;
+		case MonitorBroker::WARNING: {
+			if(st.value == MonitorBroker::CRITICAL || st.value == MonitorBroker::UNKNOWN) return st ;
+			return Status(MonitorBroker::WARNING) ;
+		}
+		default : { //UNKNOWN
+			if(st.value == MonitorBroker::CRITICAL) return st ;
+			return Status(MonitorBroker::UNKNOWN) ;
+		}
+		}
+	}
+
+	Status operator /(Status& st) const {
+		if((value == MonitorBroker::CRITICAL) || (st.value == MonitorBroker::CRITICAL))
+			return Status(MonitorBroker::CRITICAL) ;
+		if((value == MonitorBroker::UNKNOWN) || (st.value == MonitorBroker::UNKNOWN))
+			return Status(MonitorBroker::UNKNOWN) ;
+		if(value == st.value) return  st;
+
+		return Status(MonitorBroker::WARNING) ;
+	}
+
+	Status operator ++(int) {
+		switch(value) {
+		case MonitorBroker::WARNING: return Status(MonitorBroker::CRITICAL) ;
+		case MonitorBroker::UNKNOWN : return Status(MonitorBroker::WARNING) ;
+		default : break ;
+		}
+
+		return Status(value) ;
+	}
+
+	Status operator --(int) {
+		switch(value) {
+		case MonitorBroker::CRITICAL: return Status(MonitorBroker::WARNING) ;
+		default : break ;
+		}
+
+		return Status(value) ;
+	}
+private:
+
+	MonitorBroker::StatusT value ;
+} ;
+
+
 typedef struct _NodeT {
 	QString id;
 	QString name ;
@@ -110,7 +166,6 @@ typedef struct _NodeT {
 	QString notification_msg ;
 	qint32 status ;
 	qint32 prop_status ;
-	StatusInfoT status_info ;
 	QString child_nodes ;
 	MonitorBroker::NagiosCheckT check ;
 } NodeT;

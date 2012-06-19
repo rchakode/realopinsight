@@ -45,11 +45,13 @@ MsgPanel::MsgPanel(QWidget * _parent)
   charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0), QFontMetrics(QFont()).height()))
   {
 	verticalHeader()->hide() ;
-	hideColumn( msgPanelColumnCount - 2 ) ;
-	hideColumn( msgPanelColumnCount - 1 ) ;
-	setHorizontalHeaderLabels( msgPanelHeaderLabels );
+	hideColumn(msgPanelColumnCount - 2) ;
+	hideColumn(msgPanelColumnCount - 1) ;
+	setHorizontalHeaderLabels(msgPanelHeaderLabels);
 	setAlternatingRowColors( true ) ;
 	setSelectionBehavior(QAbstractItemView::SelectRows);
+
+	connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
   }
 
 
@@ -66,7 +68,6 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	time_t i_time ;
 	qint32 i, row_count ;
 	QString line[ msgPanelColumnCount ], s_time ;
-	QTableWidgetItem* row_items[msgPanelColumnCount] ;
 
 	setSortingEnabled( false ) ;
 	i_time = atol(_node_it->check.last_state_change.c_str()) ; s_time = ctime(&i_time) ;
@@ -75,7 +76,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	line[2] = QString(_node_it->check.host.c_str()) ;
 	line[3] = " " + _node_it->name ;
 
-	if( _node_it->status == MonitorBroker::NAGIOS_OK ) {
+	if( _node_it->status == MonitorBroker::OK ) {
 		line[4] = ( _node_it->notification_msg.trimmed().length() != 0) ? _node_it->notification_msg : QString(_node_it->check.alarm_msg.c_str()) ;
 	}
 	else {
@@ -100,32 +101,35 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	setRowCount( row_count + 1) ;
 	setRowHeight(0, charSize.y() + 3) ;
 
+	//TODO deal with data for sorting
+	QTableWidgetItem* items[msgPanelColumnCount] ;
 	for(i = 0; i < msgPanelColumnCount ; i ++) {
 		setCellWidget(0, i, new QLabel( "" ) ) ;
-		row_items[i] = new QTableWidgetItem(line[i]) ;
-		setItem(0, i, row_items[i]) ;
-		if( _node_it->status != MonitorBroker::NAGIOS_OK ) {
+		items[i] = new QTableWidgetItem(line[i]) ;
+		items[i]->setData(Qt::UserRole, line[i]) ;
+		setItem(0, i, items[i]) ;
+		if( _node_it->status != MonitorBroker::OK ) {
 			item(0, i)->setBackground(StatsLegend::HIGHLIGHT_COLOR) ;
 		}
 	}
 
 	switch(_node_it->status) {
-	case MonitorBroker::NAGIOS_OK:
+	case MonitorBroker::OK:
 		item(0, 1)->setBackground(QBrush(StatsLegend::OK_COLOR)) ;
 		break;
 
-	case MonitorBroker::NAGIOS_WARNING:
-		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_WARNING)) ;
+	case MonitorBroker::WARNING:
+		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::WARNING)) ;
 		item(0, 1)->setBackground(QBrush(StatsLegend::WARNING_COLOR)) ;
 		break;
 
-	case MonitorBroker::NAGIOS_CRITICAL:
-		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_CRITICAL)) ;
+	case MonitorBroker::CRITICAL:
+		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::CRITICAL)) ;
 		item(0, 1)->setBackground(QBrush(StatsLegend::CRITICAL_COLOR)) ;
 		break;
 
-	case MonitorBroker::NAGIOS_UNKNOWN:
-		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::NAGIOS_UNKNOWN)) ;
+	case MonitorBroker::UNKNOWN:
+		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::UNKNOWN)) ;
 		item(0, 1)->setBackground(QBrush(StatsLegend::UNKNOWN_COLOR)) ;
 		break;
 

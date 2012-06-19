@@ -72,6 +72,8 @@ GraphView::GraphView(QWidget* _parent)
 	statsPanelItem = NULL ;
 	graphScene = new QGraphicsScene() , setScene(graphScene);
 	iconMap = nodeIcons() ;
+	iconMap[PLUS] = ":/images/plus.png";
+	iconMap[MINUS] = ":/images/minus.png";
 }
 
 GraphView::~GraphView()
@@ -359,15 +361,15 @@ void GraphView::updateNodeColor(const NodeListT::iterator & _node)
 
 	switch (_node->status)
 	{
-	case MonitorBroker::NAGIOS_OK:
+	case MonitorBroker::OK:
 		color = StatsLegend::OK_COLOR ;
 		break;
 
-	case MonitorBroker::NAGIOS_WARNING:
+	case MonitorBroker::WARNING:
 		color = StatsLegend::WARNING_COLOR ;
 		break;
 
-	case MonitorBroker::NAGIOS_CRITICAL:
+	case MonitorBroker::CRITICAL:
 		color = StatsLegend::CRITICAL_COLOR ;
 		break;
 
@@ -393,15 +395,15 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 
 	switch (_node_it->status)
 	{
-	case MonitorBroker::NAGIOS_OK:
+	case MonitorBroker::OK:
 		color = StatsLegend::OK_COLOR ;
 		break;
 
-	case MonitorBroker::NAGIOS_WARNING:
+	case MonitorBroker::WARNING:
 		color = StatsLegend::WARNING_COLOR ;
 		break;
 
-	case MonitorBroker::NAGIOS_CRITICAL:
+	case MonitorBroker::CRITICAL:
 		color = StatsLegend::CRITICAL_COLOR ;
 		break;
 
@@ -479,7 +481,7 @@ void GraphView::setNodeToolTip(const NodeT & _node)
 	if ( _node.type == NodeType::ALARM_NODE )
 	{
 
-		if( _node.status == MonitorBroker::NAGIOS_OK )
+		if( _node.status == MonitorBroker::OK )
 		{
 			msg += "\nMessage: " + static_cast<QString>(_node.notification_msg).replace("\n", " ");
 		}

@@ -25,6 +25,7 @@
 #include "client/Auth.hpp"
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
+#include <sstream>
 
 
 const string appName = APPLICATION_NAME ;
@@ -33,6 +34,23 @@ const string packageName = PACKAGE_NAME ;
 const string packageVersion = PACKAGE_VERSION;
 const string packageUrl = PACKAGE_URL;
 
+QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
+		"Options: \n"
+		"	-c\n"
+		"	   Launches the configuration utility\n"
+		"	-e [view_config]\n"
+		"	   Runs the VE utility and load the file view_config if specified\n"
+		"	-d view_config\n"
+		"	   Runs the OC utility and load the file view_config\n"
+		"	-v\n"
+		"	  Prints the version and license information.\n"
+		"	-h \n"
+		"	   Prints this help" ;
+
+
+ostringstream versionMsg(appName + " (UI Module) " + packageVersion + "\n"
+		"Copyright (c) 2010-" + releaseYear + " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." + "\n"
+		+"Visit "+ packageUrl + " for further information.") ;
 
 int main(int argc, char **argv)
 {
@@ -41,20 +59,6 @@ int main(int argc, char **argv)
 	app->setWindowIcon( app_icon ) ;
 	app->setApplicationName(  QString(appName.c_str()) ) ;
 	app->setStyleSheet(Preferences::style());
-
-	QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
-			"Options: \n"
-			"	-c\n"
-			"	   Launches the configuration utility\n"
-			"	-e [view_config]\n"
-			"	   Runs the VE utility and load the file view_config if specified\n"
-			"	-d view_config\n"
-			"	   Runs the OC utility and load the file view_config\n"
-			"	-v\n"
-			"	  Prints the version and license information.\n"
-			"	-h \n"
-			"	   Prints this help" ;
-
 
 	if(argc > 3) {
 		qDebug() << usage ;
@@ -84,9 +88,7 @@ int main(int argc, char **argv)
 			break ;
 
 		case 'v': {
-			cout << appName << " (UI Module) " << packageVersion << endl ;
-			cout << "Copyright (c) 2010-"<< releaseYear << " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." << endl;
-			cout << "Visit "<< packageUrl << " for further information." << endl;
+			cout << versionMsg.str() << endl;
 			exit(0) ;
 		}
 
@@ -96,6 +98,9 @@ int main(int argc, char **argv)
 			break ;
 		}
 	}
+
+	// Print starting msg
+	cout << "Launching...\n" << versionMsg.str() << endl;
 
 	Auth authentification;
 	int userRole = authentification.exec() ;

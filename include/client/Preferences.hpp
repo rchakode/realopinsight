@@ -44,7 +44,7 @@ public:
 	static const  qint32 ChangeMonitoringSettings ;
 	static const  qint32 ShowHelp ;
 	static const  qint32 ShowAbout ;
-	static const QString NAGIOS_URL_KEY ;
+	static const QString URL_KEY ;
 	static const QString UPDATE_INTERVAL_KEY ;
 	static const QString SERVER_ADDR_KEY ;
 	static const QString SERVER_PORT_KEY ;

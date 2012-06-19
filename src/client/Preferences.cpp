@@ -32,7 +32,7 @@ const qint32 Preferences::ForceChangePassword = 1 ;
 const  qint32 Preferences::ChangeMonitoringSettings = 2 ;
 const  qint32 Preferences::ShowHelp = 3 ;
 const  qint32 Preferences::ShowAbout = 4 ;
-const QString Preferences::NAGIOS_URL_KEY = "/Monitor/nagiosHome" ;
+const QString Preferences::URL_KEY = "/Monitor/nagiosHome" ;
 const QString Preferences::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Preferences::SERVER_ADDR_KEY = "/Monitor/serverAddr" ;
 const QString Preferences::SERVER_PORT_KEY = "/Monitor/serverPort" ;
@@ -173,7 +173,7 @@ void Preferences::applySettings(void)
 
 	nagios_home = monitorHomeField->text();
 
-	settings->setValue(NAGIOS_URL_KEY, nagios_home) ;
+	settings->setValue(URL_KEY, nagios_home) ;
 	settings->setValue(UPDATE_INTERVAL_KEY, updateIntervalField->text()) ;
 	settings->setValue(SERVER_ADDR_KEY, serverAddrField->text()) ;
 	if(serverPortField->text().toInt() <= 0) serverPortField->setText(QString::number(MonitorBroker::DEFAULT_PORT)) ;
@@ -238,7 +238,7 @@ void Preferences::setContent(void)
 	updateInterval = settings->value(UPDATE_INTERVAL_KEY).toInt() ;
 	updateIntervalField->setValue(updateInterval) ;
 
-	monitorUrl = settings->value(NAGIOS_URL_KEY).toString() ;
+	monitorUrl = settings->value(URL_KEY).toString() ;
 	monitorHomeField->setText(monitorUrl) ;
 
 	serverAddr = settings->value(SERVER_ADDR_KEY).toString() ;

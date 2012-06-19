@@ -127,7 +127,7 @@ void SvCreator::newBusinessView(void)
 		snavStruct->clear() ;
 		node.name = "New Business view" ;
 		node.child_nodes.clear() ;
-		node.status = MonitorBroker::NAGIOS_UNKNOWN ;  // TODO no acknowledged
+		node.status = MonitorBroker::UNKNOWN ;  // TODO no acknowledged
 		node.icon = GraphView::DEFAULT_ICON ;
 		node.type = NodeType::SERVICE_NODE ;
 		node.parent.clear() ;  				//root has not parent
@@ -166,7 +166,7 @@ void SvCreator::newNode(void)
 	node.parent = selectedNodeId ;
 	node.name = "sub service " + QString::number(count) , count ++ ;
 	node.type = NodeType::SERVICE_NODE ;
-	node.status = MonitorBroker::NAGIOS_UNKNOWN ; // TODO no acknowledged
+	node.status = MonitorBroker::UNKNOWN ; // TODO no acknowledged
 	node.icon = GraphView::DEFAULT_ICON ;
 	node.child_nodes = "" ;
 

@@ -31,12 +31,12 @@ using namespace std ;
 
 class MonitorBroker {
 public:
-	enum NagiosStatus
+	enum StatusT
 	{
-	  NAGIOS_OK = 0,
-	  NAGIOS_WARNING = 1,
-	  NAGIOS_CRITICAL = 2,
-	  NAGIOS_UNKNOWN = 3,
+	  OK = 0,
+	  WARNING = 1,
+	  CRITICAL = 2,
+	  UNKNOWN = 3,
 	  UNSET_STATUS = 4
 	} ;
 

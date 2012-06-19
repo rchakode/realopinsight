@@ -55,9 +55,9 @@
 		<NotificationMsg></NotificationMsg>
 		<SubServices>www.ngrt4n.com/Mysql</SubServices>
 	</Service>
-	<Service id="S153201106" type="0" statusCalcRule="0" statusPropRule="0">
+	<Service id="S153201106" type="0" statusCalcRule="0" statusPropRule="1">
 		<Name>OS</Name>
-		<Icon>Linux OS</Icon>
+		<Icon></Icon>
 		<Description></Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
@@ -119,9 +119,9 @@
 		<NotificationMsg>The OpenNebula daemon is now up</NotificationMsg>
 		<SubServices>nebula-front/oned alive</SubServices>
 	</Service>
-	<Service id="S153132715" type="0" statusCalcRule="0" statusPropRule="0">
+	<Service id="S153132715" type="0" statusCalcRule="2" statusPropRule="1">
 		<Name>ngrt4n.com</Name>
-		<Icon>Web Server</Icon>
+		<Icon>Business Process</Icon>
 		<Description></Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>

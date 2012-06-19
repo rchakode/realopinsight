@@ -78,7 +78,7 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 	addEvents();
 
 	// Get application settings
-	webUIUrl = settings->value(Preferences::NAGIOS_URL_KEY ).toString() ;
+	webUIUrl = settings->value(Preferences::URL_KEY ).toString() ;
 	serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString().toStdString() ;
 	serverUrl = "tcp://"
 			+ settings->value(Preferences::SERVER_ADDR_KEY).toString().toStdString()
@@ -129,15 +129,12 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 	tree_nodes = navigationTree->selectedItems() ;
 	graph_node = graphView->nodeAtGlobalPos( global_pos ) ;
 
-	if ( tree_nodes.length() || graph_node )
-	{
-		if( graph_node )
-		{
+	if ( tree_nodes.length() || graph_node ) {
+		if( graph_node ) {
 			graph_item_id = graph_node->data(0).toString() ;
 			selectedNodeId =  graph_item_id.left( graph_item_id.indexOf(":") ) ;
 		}
-		else
-		{
+		else {
 			selectedNodeId = tree_nodes[0]->data(0, QTreeWidgetItem::UserType).toString() ;
 		}
 
@@ -160,12 +157,12 @@ void SvNavigator::load(void)
 	graphView->load(config_parser.getDotGraphFile(), snavStruct->node_list) ;
 	webBrowser->setUrl( webUIUrl ) ;
 	resize() ;
-	monitor();
 	show() ;
 	graphView->scaleToFitViewPort( ) ;
 	updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
 	if ( updateInterval <= 0 ) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000 ;
-	timerId = startTimer( updateInterval ) ;
+	timerId = startTimer(updateInterval) ;
+	monitor();
 }
 
 void SvNavigator::unloadMenus(void)
@@ -216,12 +213,11 @@ int SvNavigator::monitor(void)
 	qint32 critical_count = 0 ;
 	qint32 unknown_count = 0 ;
 
-	//Initialize the communication channel with the server
+	//Initialize the communication channel with the broker module
 	zmq::context_t comContext(1);
 	comChannel = new zmq::socket_t (comContext, ZMQ_REQ);
 	comChannel->connect(serverUrl.c_str());
 
-	qint32 all_checks_count = 0 ;
 	snavStruct->check_status_count.clear() ;
 	for(check_id_it = snavStruct->check_list.begin(); check_id_it != snavStruct->check_list.end(); check_id_it++) {
 
@@ -229,7 +225,7 @@ int SvNavigator::monitor(void)
 		if( node_it == snavStruct->node_list.end()) continue ;
 
 		if( node_it->child_nodes == "" ) {
-			node_it->status = MonitorBroker::NAGIOS_UNKNOWN;
+			node_it->status = MonitorBroker::UNKNOWN;
 			unknown_count += 1 ;
 			continue;
 		}
@@ -267,7 +263,7 @@ int SvNavigator::monitor(void)
 				break ;
 
 			default :
-				check.status = MonitorBroker::NAGIOS_UNKNOWN ;
+				check.status = MonitorBroker::UNKNOWN ;
 				check.alarm_msg = "ERROR :: " + sInfoVec[1].toStdString();
 				check.host = "Unknown" ;
 				check.last_state_change = "Unknown" ;
@@ -276,15 +272,15 @@ int SvNavigator::monitor(void)
 			}
 
 			switch( node_it->check.status ) {
-			case MonitorBroker::NAGIOS_OK:
+			case MonitorBroker::OK:
 				ok_count += 1 ;
 				break;
 
-			case MonitorBroker::NAGIOS_WARNING:
+			case MonitorBroker::WARNING:
 				warning_count += 1 ;
 				break;
 
-			case MonitorBroker::NAGIOS_CRITICAL:
+			case MonitorBroker::CRITICAL:
 				critical_count += 1 ;
 				break;
 
@@ -294,36 +290,36 @@ int SvNavigator::monitor(void)
 			}
 
 			if ( node_it->status != check.status ) {
-				QString toolTip = getNodeToolTip(*node_it) ;
+				QString toolTip = "" ;
 
 				node_it->check = check ;
+				node_it->status = check.status ;
 				updateAlarmMsg(node_it) ;
+				toolTip = getNodeToolTip(*node_it) ;
+
 				updateNavTreeItemStatus(node_it, toolTip) ;
 				graphView->updateNode(node_it, toolTip) ;
 				msgPanel->addMsg(node_it) ;
 
 				node_it->status = node_it->prop_status =  check.status ;
-				node_it->status_info.reset() ;
-				node_it->status_info[node_it->prop_status] = true ;
-
 				emit hasToBeUpdate( node_it->parent ) ;
 			}
 		}
 	}
 
-	all_checks_count = snavStruct->check_list.size() ;
-	snavStruct->check_status_count[MonitorBroker::NAGIOS_OK] = ok_count ;
-	snavStruct->check_status_count[MonitorBroker::NAGIOS_WARNING] = warning_count ;
-	snavStruct->check_status_count[MonitorBroker::NAGIOS_CRITICAL] = critical_count ;
-	snavStruct->check_status_count[MonitorBroker::NAGIOS_UNKNOWN] = unknown_count ;
+	qint32 all_checks_count = snavStruct->check_list.size() ;
+	snavStruct->check_status_count[MonitorBroker::OK] = ok_count ;
+	snavStruct->check_status_count[MonitorBroker::WARNING] = warning_count ;
+	snavStruct->check_status_count[MonitorBroker::CRITICAL] = critical_count ;
+	snavStruct->check_status_count[MonitorBroker::UNKNOWN] = unknown_count ;
 
-	if( all_checks_count ) {
+	if( all_checks_count>0) {
 		Stats *  stats ;
 
-		stats = new  Stats() ;
+		stats = new Stats() ;
 
 		stats->update(snavStruct->check_status_count, all_checks_count, statsPanelTooltip) ;
-		graphView->updateStatsPanel( stats, statsPanelTooltip ) ;
+		graphView->updateStatsPanel(stats, statsPanelTooltip) ;
 
 		if( statsPanel ) delete statsPanel ;
 
@@ -346,7 +342,7 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
 
 	if ( _node.type == NodeType::ALARM_NODE ) {
 
-		if( _node.status == MonitorBroker::NAGIOS_OK ) {
+		if( _node.status == MonitorBroker::OK ) {
 			toolTip += "\nMessage: " + const_cast<QString&>(_node.notification_msg).replace("\n", " ");
 		}
 		else {
@@ -371,7 +367,7 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 	splited_check_id = QString(_node->check.id.c_str()).split("/") ;
 	len =  splited_check_id.length() ;
 
-	if( _node->status == MonitorBroker::NAGIOS_OK ) {
+	if( _node->status == MonitorBroker::OK ) {
 		msg = _node->notification_msg ;
 	}
 	else {
@@ -393,13 +389,13 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 		regexp.setPattern( MsgPanel::THERESHOLD_META_MSG_PATERN ) ;
 		msg.replace(regexp, splited_check_command[1]) ;
 
-		if(_node->status == MonitorBroker::NAGIOS_WARNING ) {
+		if(_node->status == MonitorBroker::WARNING ) {
 			msg.replace(regexp, splited_check_command[2]) ;
 		}
 
 	}
 
-	if( _node->status == MonitorBroker::NAGIOS_OK ) {
+	if( _node->status == MonitorBroker::OK ) {
 		_node->notification_msg = msg  ;
 	}
 	else {
@@ -414,41 +410,39 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 	qint32 unknown_count = 0 ;
 	qint32 critical_count = 0 ;
 
-	NodeListT::iterator node_it = snavStruct->node_list.find( _node_id ) ;
-	if (node_it == snavStruct->node_list.end() ) return  ;
+	NodeListT::iterator node = snavStruct->node_list.find( _node_id ) ;
+	if (node == snavStruct->node_list.end() ) return  ;
 
-	node_it->status_info.reset() ;
-
-	QStringList node_ids = node_it->child_nodes.split( Parser::CHILD_NODES_SEP ) ;
+	Status status;
+	QStringList node_ids = node->child_nodes.split( Parser::CHILD_NODES_SEP ) ;
 	for(QStringList::const_iterator it = node_ids.begin(); it != node_ids.end(); it++) {
 
-		NodeListT::iterator child_it = snavStruct->node_list.find( *it ) ;
-		if ( child_it == snavStruct->node_list.end() ) continue ;
+		NodeListT::iterator child = snavStruct->node_list.find( *it ) ;
+		if ( child == snavStruct->node_list.end() ) continue ;
 
-		node_it->status_info |= child_it->status_info ;
-		switch(child_it->status)
-		{
-		case MonitorBroker::NAGIOS_CRITICAL:
-			node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
+		Status cst(static_cast<MonitorBroker::StatusT>(child->prop_status)) ;
+
+		if(node->status_crule == StatusCalcRules::WeightedCriticity) {
+			status = status / cst ;
+		} else {
+			status = status *  cst ;
+		}
+
+		switch(child->status) {
+
+		case MonitorBroker::CRITICAL:
 			critical_count ++ ;
 			break;
 
-		case MonitorBroker::NAGIOS_WARNING:
-			if(node_it->status != MonitorBroker::NAGIOS_CRITICAL) {
-				node_it->status = MonitorBroker::NAGIOS_WARNING;
-			}
+		case MonitorBroker::WARNING:
 			warning_count ++ ;
 			break;
 
-		case MonitorBroker::NAGIOS_UNKNOWN:
-			if(node_it->status != MonitorBroker::NAGIOS_CRITICAL
-					&& node_it->status != MonitorBroker::NAGIOS_WARNING) {
-				node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
-			}
+		case MonitorBroker::UNKNOWN:
 			unknown_count ++ ;
 			break ;
 
-		case MonitorBroker::NAGIOS_OK:
+		case MonitorBroker::OK:
 			normal_count ++ ;
 			break ;
 
@@ -457,37 +451,37 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 		}
 	}
 
-	qint32 sum_counts = node_ids.size() ;
-	if ( normal_count == sum_counts ) {
-		node_it->status = MonitorBroker::NAGIOS_OK ;
-	}
-	else if ( node_it->status_crule == StatusCalcRules::WeightedCriticity ) {
-		node_it->status = MonitorBroker::NAGIOS_WARNING ;
-		if ( critical_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_CRITICAL ;
-		else if ( unknown_count == sum_counts ) node_it->status = MonitorBroker::NAGIOS_UNKNOWN ;
-	}
+	node->status = status.getValue() ;
 
-	QString toolTip = getNodeToolTip(*node_it) ;
-	graphView->updateNode(node_it, toolTip) ;
-	updateNavTreeItemStatus(node_it, toolTip) ;
-	emit hasToBeUpdate(node_it->parent);
+	switch(node->status_prule) {
+	case StatusPropRules::Increased: node->prop_status = (status++).getValue() ;
+		break ;
+	case StatusPropRules::Decreased: node->prop_status = (status--).getValue() ;
+		break ;
+	default : node->prop_status = node->status ;
+		break ;
+
+	}
+	QString toolTip = getNodeToolTip(*node) ;
+	graphView->updateNode(node, toolTip) ;
+	updateNavTreeItemStatus(node, toolTip) ;
+	emit hasToBeUpdate(node->parent);
 }
 
 
 void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tool_tip)
 {
 	QIcon icon;
-	TreeNodeItemListT::iterator tnode_it ;
 	switch(_node->status) {
-	case MonitorBroker::NAGIOS_OK:
+	case MonitorBroker::OK:
 		icon.addFile(":/images/normal.png") ;
 		break;
 
-	case MonitorBroker::NAGIOS_WARNING:
+	case MonitorBroker::WARNING:
 		icon.addFile(":/images/warning.png") ;
 		break;
 
-	case MonitorBroker::NAGIOS_CRITICAL:
+	case MonitorBroker::CRITICAL:
 		icon.addFile(":/images/critical.png") ;
 		break;
 
@@ -496,7 +490,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, con
 		break;
 	}
 
-	tnode_it = snavStruct->tree_item_list.find(_node->id) ;
+	TreeNodeItemListT::iterator tnode_it = snavStruct->tree_item_list.find(_node->id) ;
 	if(tnode_it != snavStruct->tree_item_list.end() ) {
 		(*tnode_it)->setIcon(0, icon) ;
 		(*tnode_it)->setToolTip(0, _tool_tip) ;
@@ -572,33 +566,28 @@ void SvNavigator::acknowledge(void)
 
 void SvNavigator::tabChanged(int _tab_index)
 {
-	if ( _tab_index != 0 )
-	{
+	if ( _tab_index != 0 ) {
 		subMenuList["ZoomIn"]->setEnabled( false ) ;
 		subMenuList["ZoomOut"]->setEnabled( false ) ;
+		return ;
 	}
-	else
-	{
-		subMenuList["ZoomIn"]->setEnabled( true ) ;
-		subMenuList["ZoomOut"]->setEnabled( true ) ;
-	}
+
+	subMenuList["ZoomIn"]->setEnabled( true ) ;
+	subMenuList["ZoomOut"]->setEnabled( true ) ;
 }
 
 void SvNavigator::hideChart(void)
 {
-	if ( graphView->hideChart() )
-	{
-		subMenuList["HideChart"]->setIcon( QIcon(":images/check.png"));
+	if ( graphView->hideChart() ) {
+		subMenuList["HideChart"]->setIcon(QIcon(":images/check.png"));
+		return ;
 	}
-	else
-	{
-		subMenuList["HideChart"]->setIcon(QIcon("")) ;
-	}
+	subMenuList["HideChart"]->setIcon(QIcon("")) ;
 }
 
 void SvNavigator::centerGraphOnNode( QTreeWidgetItem * _item )
 {
-	centerGraphOnNode( _item->data(0, QTreeWidgetItem::UserType).toString() ) ;
+	centerGraphOnNode(_item->data(0, QTreeWidgetItem::UserType).toString() ) ;
 }
 
 void SvNavigator::resize(void)
@@ -676,17 +665,17 @@ void SvNavigator::loadMenus(void)
 void SvNavigator::addEvents(void)
 {
 	connect( this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()) );
-	connect( this, SIGNAL( hasToBeUpdate(QString) ), this, SLOT( updateNodeStatus(QString) ));
-	connect( subMenuList["Capture"], SIGNAL( triggered(bool) ), graphView, SLOT( capture() ));
-	connect( subMenuList["ZoomIn"], SIGNAL( triggered(bool) ), graphView, SLOT( zoomIn() ) );
-	connect( subMenuList["ZoomOut"], SIGNAL( triggered(bool) ), graphView, SLOT( zoomOut() ));
-	connect( subMenuList["HideChart"], SIGNAL( triggered(bool) ), this, SLOT( hideChart() ));
-	connect( subMenuList["Refresh"], SIGNAL( triggered(bool) ), this, SLOT( monitor() ));
+	connect( this, SIGNAL(hasToBeUpdate(QString)), this, SLOT( updateNodeStatus(QString) ));
+	connect( subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT( capture() ));
+	connect( subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT( zoomIn() ) );
+	connect( subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT( zoomOut() ));
+	connect( subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT( hideChart() ));
+	connect( subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(monitor()));
 	connect( subMenuList["ChangePassword"], SIGNAL( triggered(bool) ), this, SLOT(handleChangePasswordAction(void) ));
-	connect( subMenuList["ChangeMonitoringSettings"], SIGNAL( triggered(bool) ), this, SLOT(handleChangeMonitoringSettingsAction(void) ));
-	connect( subMenuList["ShowAbout"], SIGNAL( triggered(bool) ), this, SLOT( handleShowAbout() ));
-	connect( subMenuList["ShowOnlineResources"], SIGNAL( triggered(bool) ), this, SLOT( handleShowOnlineResources() ));
-	connect( subMenuList["Quit"], SIGNAL( triggered(bool) ), qApp, SLOT( quit() ));
+	connect( subMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void) ));
+	connect( subMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
+	connect( subMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT( handleShowOnlineResources() ));
+	connect( subMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT( quit() ));
 	connect( contextMenuList["FilterNodeRelatedMessages"], SIGNAL( triggered(bool) ), this, SLOT( filterNodeRelatedMsg()) );
 	connect( contextMenuList["CenterOnNode"], SIGNAL( triggered(bool) ), this, SLOT( centerGraphOnNode() ));
 	connect( monPrefWindow, SIGNAL( urlChanged(QString) ), webBrowser, SLOT(setUrl( QString ) ));

@@ -39,7 +39,7 @@ Settings::Settings(): QSettings(QString(ngrt4n::SETTINGS_FILE.c_str()), QSetting
 	Q_INIT_RESOURCE(ngrt4n);
 
 	QString updateInterval = value(Preferences::UPDATE_INTERVAL_KEY).toString();
-	QString monitorHome = value(Preferences::NAGIOS_URL_KEY).toString() ;
+	QString monitorHome = value(Preferences::URL_KEY).toString() ;
 	QString admUser = value(Preferences::ADM_UNSERNAME_KEY).toString();
 	QString admPasswd = value(Preferences::ADM_PASSWD_KEY).toString();
 	QString opUser = value(Preferences::OP_UNSERNAME_KEY).toString();
@@ -60,7 +60,7 @@ Settings::Settings(): QSettings(QString(ngrt4n::SETTINGS_FILE.c_str()), QSetting
 	}
 
 	if ( monitorHome.isEmpty() ) {
-		setValue(Preferences::NAGIOS_URL_KEY, "http://localhost/nagios");
+		setValue(Preferences::URL_KEY, "http://localhost/nagios");
 	}
 
 	if ( admUser.isEmpty() ) {
@@ -95,15 +95,15 @@ QString Utils::statusToString(qint32 _status)
 {
 	switch(_status)
 	{
-	case MonitorBroker::NAGIOS_OK:
+	case MonitorBroker::OK:
 		return "Normal";
 		break;
 
-	case MonitorBroker::NAGIOS_WARNING:
+	case MonitorBroker::WARNING:
 		return  "Warning";
 		break;
 
-	case MonitorBroker::NAGIOS_CRITICAL:
+	case MonitorBroker::CRITICAL:
 		return  "Critical";
 		break;
 

@@ -27,7 +27,7 @@
 
 
 const QColor StatsLegend::OK_COLOR =  Qt::green ;
-const QColor StatsLegend::WARNING_COLOR = Qt::yellow ;
+const QColor StatsLegend::WARNING_COLOR = QColor("#FF8C00") ; //Qt::yellow ;
 const QColor StatsLegend::CRITICAL_COLOR = Qt::red ;
 const QColor StatsLegend::UNKNOWN_COLOR = Qt::lightGray ;
 const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200) ;
