@@ -48,14 +48,14 @@ QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_con
 		"	   Prints this help" ;
 
 
-ostringstream versionMsg(appName + " (UI Module) " + packageVersion + "\n"
+ostringstream versionMsg(appName + " - UI Module, version " + packageVersion + ".\n"
 		"Copyright (c) 2010-" + releaseYear + " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." + "\n"
 		+"Visit "+ packageUrl + " for further information.") ;
 
 int main(int argc, char **argv)
 {
 	QApplication* app = new QApplication(argc, argv) ;
-	QIcon app_icon (":images/appicon.png") ;
+	QIcon app_icon (":images/built-in/icon.png") ;
 	app->setWindowIcon( app_icon ) ;
 	app->setApplicationName(  QString(appName.c_str()) ) ;
 	app->setStyleSheet(Preferences::style());
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 					QMessageBox::Ok);
 			exit (1) ;
 		}
-		new SvNavigator(userRole, file) ;
+		SvNavigator *monitor= new SvNavigator(userRole, file) ; monitor->startMonitor() ;
 	} else if(module == "editor") {
 		SvCreator* svc = new SvCreator(userRole) ;
 		svc->load(file) ;

@@ -48,7 +48,7 @@ QSize Stats::minimumSizeHint() const
 	return QSize(250, 150) ;
 		}
 
-void Stats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count, QString & _tool_tip )
+void Stats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count)
 {
-	pieChart->update(_check_status_count, _check_count, _tool_tip) ;
+	pieChart->update(_check_status_count, _check_count) ;
 }

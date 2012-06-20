@@ -47,6 +47,7 @@ public:
 
 	void load( void );
 	void resize(void);
+	void startMonitor();
 
 	static ComboBoxItemsT propRules();
 	static ComboBoxItemsT calcRules() ;

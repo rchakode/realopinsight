@@ -14,7 +14,8 @@
         <file>images/minus.png</file>
         <file>images/plus.png</file>
         <file>images/router.png</file>
-        <file>images/appicon.png</file>
+        <file>images/built-in/icon.png</file>
+        <file>images/built-in/logo.png</file>
         <file>images/camera.png</file>
         <file>images/zoomout.png</file>
         <file>images/zoomin.png</file>

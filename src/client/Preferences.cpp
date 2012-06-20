@@ -129,7 +129,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 
 	case Preferences::ShowAbout: {
 		ostringstream about ;
-		about << PACKAGE_NAME << "(UI Module) " << PACKAGE_VERSION << endl ;
+		about << QString::fromStdString(PACKAGE_NAME).toUpper().toStdString() << " (UI Module) " << PACKAGE_VERSION << endl ;
 		about << "Copyright (c) 2010-"<< RELEASE_YEAR << " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." << endl;
 		about << "Visit "<< PACKAGE_URL << " for further information." << endl;
 		line += 1 ,
@@ -317,7 +317,16 @@ QString Preferences::style() {
 			"	background: #f1f1f1;"
 			"	alternate-background-color: #F8F8FF;"
 			"}"
-;
-
+			"QToolTip {"
+			"	border: 2px solid darkkhaki;"
+			"	padding: 5px;"
+			"	border-radius: 3px;"
+			"	opacity: 200;"
+			"}"
+			"QDialog {"
+			"	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,"
+            "		stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
+            "		stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
+			"}";
 return styleSheet ;
 }

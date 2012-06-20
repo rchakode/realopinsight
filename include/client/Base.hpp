@@ -48,6 +48,9 @@ public :
 		return QString::number(rule) ;
 	}
 
+	static QString label(qint32 rule) {
+		return label(static_cast<StatusPropRulesT>(rule)) ;
+	}
 	static QString label(StatusPropRulesT rule) {
 		switch(rule) {
 		case Unchanged: return "Unchanged" ;
@@ -69,6 +72,10 @@ public :
 
 	static QString toString(StatusCalcRulesT rule) {
 		return QString::number(rule) ;
+	}
+
+	static QString label(qint32 rule) {
+		return label(static_cast<StatusCalcRulesT>(rule)) ;
 	}
 
 	static QString label(StatusCalcRulesT rule) {
@@ -100,7 +107,7 @@ class Status{
 
 public:
 
-	Status(MonitorBroker::StatusT value=MonitorBroker::OK) {this->value = value ;}
+	Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {} ;
 	MonitorBroker::StatusT getValue() const{return value ;} ;
 
 	Status operator *(Status& st) const {

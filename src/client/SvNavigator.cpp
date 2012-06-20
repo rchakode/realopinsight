@@ -26,6 +26,7 @@
 #include "core/MonitorBroker.hpp"
 #include <crypt.h>
 #include "core/ns.hpp"
+#include <sstream>
 
 ComboBoxItemsT SvNavigator::propRules() {
 	ComboBoxItemsT map;
@@ -84,9 +85,6 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
 			+ settings->value(Preferences::SERVER_ADDR_KEY).toString().toStdString()
 			+ ":"
 			+ settings->value(Preferences::SERVER_PORT_KEY).toString().toStdString();
-
-	// Load the configuration
-	load() ;
 }
 
 SvNavigator::~SvNavigator()
@@ -142,6 +140,15 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 	}
 }
 
+void SvNavigator::startMonitor()
+{
+	load() ;
+	monitor();
+	updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
+	if ( updateInterval <= 0 ) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000 ;
+	timerId = startTimer(updateInterval);
+}
+
 void SvNavigator::timerEvent(QTimerEvent *)
 {
 	monitor() ;
@@ -159,10 +166,6 @@ void SvNavigator::load(void)
 	resize() ;
 	show() ;
 	graphView->scaleToFitViewPort( ) ;
-	updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
-	if ( updateInterval <= 0 ) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000 ;
-	timerId = startTimer(updateInterval) ;
-	monitor();
 }
 
 void SvNavigator::unloadMenus(void)
@@ -237,14 +240,14 @@ int SvNavigator::monitor(void)
 			string sid = serverAuthChain + ":"+(*node_id_it).trimmed().toStdString() ; //TODO
 
 			// Prepare and send request
-			zmq::message_t request( MonitorBroker::MAX_MSG );
+			zmq::message_t request(MonitorBroker::MAX_MSG);
 			memset(request.data(), 0, MonitorBroker::MAX_MSG) ;
 			memcpy(request.data(), sid.c_str(), sid.size());
-			comChannel->send(request);
+			comChannel->send(request) ;
 
 			//  Get reply.
 			zmq::message_t reply ;
-			comChannel->recv(&reply);
+			comChannel->recv(&reply) ;
 			int msize = reply.size() ;
 			char* result = (char*)malloc(msize *  sizeof(char)) ;
 			memcpy(result, reply.data(), msize) ;
@@ -271,7 +274,7 @@ int SvNavigator::monitor(void)
 				break ;
 			}
 
-			switch( node_it->check.status ) {
+			switch( check.status ) {
 			case MonitorBroker::OK:
 				ok_count += 1 ;
 				break;
@@ -314,19 +317,16 @@ int SvNavigator::monitor(void)
 	snavStruct->check_status_count[MonitorBroker::UNKNOWN] = unknown_count ;
 
 	if( all_checks_count>0) {
-		Stats *  stats ;
 
-		stats = new Stats() ;
-
-		stats->update(snavStruct->check_status_count, all_checks_count, statsPanelTooltip) ;
-		graphView->updateStatsPanel(stats, statsPanelTooltip) ;
-
-		if( statsPanel ) delete statsPanel ;
+		Stats *stats = new Stats() ;
+//		stats->setToolTip(statsPanelTooltip) ;
+		stats->update(snavStruct->check_status_count, all_checks_count) ;
+		graphView->updateStatsPanel(stats) ;
+		if(statsPanel) delete statsPanel ;
 
 		statsPanel = stats ;
-
 		msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
-		msgPanel->resizeFields( msgPanelSize ) ;
+		msgPanel->resizeFields(msgPanelSize) ;
 	}
 
 	comChannel->close() ;
@@ -335,22 +335,22 @@ int SvNavigator::monitor(void)
 
 QString SvNavigator::getNodeToolTip(const NodeT & _node)
 {
-
-	QString toolTip = "Name: " + _node.name  +
-			"\nDescription: " + const_cast<QString&>(_node.description).replace("\n", " ") +
-			"\nStatus: " + Utils::statusToString(_node.status);
+	QString toolTip="Service Name : "+_node.name + "\n"
+			+"Description : " + const_cast<QString&>(_node.description).replace("\n", " ") + "\n"
+			+"Status : "+Utils::statusToString(_node.status) + "\n"
+			+"  Calc. rule : " + StatusCalcRules::label(_node.status_crule) + "\n"
+			+"  Prop. rule : " + StatusPropRules::label(_node.status_prule);
 
 	if ( _node.type == NodeType::ALARM_NODE ) {
-
+		toolTip+= + "\n";
+		toolTip+="Host : "+ QString(_node.check.host.c_str()).replace("\n", " ") + "\n";
+		toolTip+="Service ID : "+_node.child_nodes + "\n";
 		if( _node.status == MonitorBroker::OK ) {
-			toolTip += "\nMessage: " + const_cast<QString&>(_node.notification_msg).replace("\n", " ");
+			toolTip+="Message : "+const_cast<QString&>(_node.notification_msg).replace("\n", " ") + "\n";
+		} else {
+			toolTip+="Message : "+QString(_node.check.alarm_msg.c_str()).replace("\n", " ") + "\n";
 		}
-		else {
-			toolTip += "\nMessage: " + QString(_node.check.alarm_msg.c_str()).replace("\n", " ");
-		}
-
-		toolTip += "\nCheck Ouput: " +  QString(_node.check.alarm_msg.c_str()).replace("\n", " ");
-		toolTip += "\nCheck Id: " + _node.child_nodes ;
+		toolTip+="Check Output : "+ QString(_node.check.alarm_msg.c_str()).replace("\n", " ");
 	}
 
 	return toolTip ;
@@ -369,8 +369,7 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 
 	if( _node->status == MonitorBroker::OK ) {
 		msg = _node->notification_msg ;
-	}
-	else {
+	} else {
 		msg = _node->alarm_msg ;
 	}
 
@@ -455,11 +454,11 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 
 	switch(node->status_prule) {
 	case StatusPropRules::Increased: node->prop_status = (status++).getValue() ;
-		break ;
+	break ;
 	case StatusPropRules::Decreased: node->prop_status = (status--).getValue() ;
-		break ;
+	break ;
 	default : node->prop_status = node->status ;
-		break ;
+	break ;
 
 	}
 	QString toolTip = getNodeToolTip(*node) ;
@@ -469,7 +468,7 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 }
 
 
-void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tool_tip)
+void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tip)
 {
 	QIcon icon;
 	switch(_node->status) {
@@ -493,7 +492,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, con
 	TreeNodeItemListT::iterator tnode_it = snavStruct->tree_item_list.find(_node->id) ;
 	if(tnode_it != snavStruct->tree_item_list.end() ) {
 		(*tnode_it)->setIcon(0, icon) ;
-		(*tnode_it)->setToolTip(0, _tool_tip) ;
+		(*tnode_it)->setToolTip(0, _tip) ;
 	}
 }
 

@@ -43,7 +43,7 @@ public:
 	void setNodeToolTip( const NodeT &  ) ;
 	void setNodeVisible( const QString &, const QString &, const bool &, const qint32 &) ;
 	void scaleToFitViewPort(void) ;
-	void updateStatsPanel(Stats * _stats_panel, const QString &  ) ;
+	void updateStatsPanel(Stats * _stats_panel) ;
 	void setStatsPanelPos(void) ;
 
 	inline void centerOnNode( const QString & id) { if (! id.isEmpty() ) centerOn( gnodesList[id].label ) ; }

@@ -26,9 +26,12 @@
 #include "Preferences.hpp"
 #include "ns.hpp"
 
-const string appName = APPLICATION_NAME ;
-const QString Auth::ADM_USER_NAME = QString(appName.c_str()).toLower() + "_adm" ;
-const QString Auth::OP_USER_NAME = QString(appName.c_str()).toLower()+ "_op" ;
+const QString appName = APPLICATION_NAME ;
+const QString packageVersion = PACKAGE_VERSION;
+const QString packageName = PACKAGE_NAME ;
+
+const QString Auth::ADM_USER_NAME = appName.toLower() + "_adm" ;
+const QString Auth::OP_USER_NAME = appName.toLower()+ "_op" ;
 const qint32 Auth::ADM_USER_ROLE = 100 ;
 const qint32 Auth::OP_USER_ROLE = 101 ;
 
@@ -36,23 +39,31 @@ Auth::Auth()
 : QDialog(),
   settings (new Settings())
 {
-	setWindowTitle( "Authentification - " + QString(appName.c_str()) );
+	setWindowTitle( "Authentification - " + appName);
 	layout = new QGridLayout(this);
 
 	qint32 line = 0 ;
-	login = new QLineEdit(OP_USER_NAME) ;
-	layout->addWidget(new QLabel("Login"), line, 0) ;
-	layout->addWidget(login, line, 1);
+	QPixmap logo(":images/built-in/logo.png") ;
+	QLabel* llogo =  new QLabel() ; llogo->setPixmap(logo) ;
+	layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft) ;
 
-	line += 1 ;
-	password = new QLineEdit();
+	line++ ;
+	layout->addWidget(new QLabel(QString("UI Module, Version "+packageVersion+".")), line, 0, 2, 1, Qt::AlignLeft) ;
+
+	line++;
+	layout->addWidget(new QLabel("Login"),line,1,Qt::AlignRight) ;
+	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignLeft);
+
+	line++;
+	layout->addWidget(new QLabel("Password"),line,1,Qt::AlignRight) ;
+	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignLeft);
 	password->setEchoMode(QLineEdit::Password);
-	layout->addWidget(new QLabel("Password"), line, 0) ;
-	layout->addWidget(password, line, 1);
 
-	line += 1 ;
-	buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok) ;
-	layout->addWidget(buttonBox, line, 1);
+	line++;
+	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
+
+	line++;
+	layout->addWidget(new QLabel("Copyright (c) 2010-2012, Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>"), line, 0, 1, 3, Qt::AlignLeft) ;
 
 	addEvents();
 }

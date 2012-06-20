@@ -190,23 +190,18 @@ void GraphView::zoomOut()
 	}
 }
 
-void GraphView::updateStatsPanel(Stats * _stats_panel, const QString & _tool_tip )
+void GraphView::updateStatsPanel(Stats * _stats_panel)
 {
 	bool visible ;
-	if( statsPanelItem )
-	{
+	if( statsPanelItem ) {
 		visible = statsPanelItem->isVisible() ;
-		statsPanelItem->setWidget( _stats_panel ) ;
+		statsPanelItem->setWidget(_stats_panel) ;
 		statsPanelItem->setVisible( visible ) ;
-	}
-	else
-	{
+	} else {
 		statsPanelItem = graphScene->addWidget( _stats_panel ) ;
 	}
 
-	if( statsPanelItem )
-	{
-		statsPanelItem->setToolTip( _tool_tip ) ;
+	if( statsPanelItem ) {
 		setStatsPanelPos() ;
 		if ( ! isAjustedStatsPanelSize ) ajustStatsPanelSize() ;
 	}
@@ -414,15 +409,35 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 	html_n_label = "<span style=\"background: '" + color.name() + "'\">&nbsp;" +_node_it->name + "&nbsp;</span>";
 
 	GNodeListT::iterator gnode_it =  gnodesList.find(_node_it->id);
-	if (gnode_it != gnodesList.end() )
-	{
+	if (gnode_it != gnodesList.end() )	{
+
 		gnode_it->label->setHtml(html_n_label);
 		gnode_it->icon->setToolTip(_tool_tip);
 		gnode_it->label->setToolTip(_tool_tip);
 
 		edge_it = edgesList.find( _node_it->parent + ":" + _node_it->id ) ;
-		if( edge_it != edgesList.end() )
-			edge_it->edge->setPen( color );
+		if( edge_it == edgesList.end() ) return ;
+
+		switch (_node_it->prop_status)
+		{
+		case MonitorBroker::OK:
+			color = StatsLegend::OK_COLOR ;
+			break;
+
+		case MonitorBroker::WARNING:
+			color = StatsLegend::WARNING_COLOR ;
+			break;
+
+		case MonitorBroker::CRITICAL:
+			color = StatsLegend::CRITICAL_COLOR ;
+			break;
+
+		default:
+			color = StatsLegend::UNKNOWN_COLOR ;
+			break;
+		}
+
+		edge_it->edge->setPen( color );
 	}
 }
 
@@ -442,8 +457,7 @@ void GraphView::setEdgePath(const QString& _parent_vertex, const QString& _child
 	path.moveTo(parent_anchor_point),
 			path.lineTo(child_anchor_point);
 
-	if( ! p_gnode.exp_icon->isVisible() )
-	{
+	if( ! p_gnode.exp_icon->isVisible() ) {
 		p_gnode.exp_icon->setVisible(true);
 	}
 }
@@ -478,15 +492,12 @@ void GraphView::setNodeToolTip(const NodeT & _node)
 			"\nDescription: " + static_cast<QString>(_node.description).replace("\n", " ") +
 			"\nStatus: " + Utils::statusToString(_node.status);
 
-	if ( _node.type == NodeType::ALARM_NODE )
-	{
+	if ( _node.type == NodeType::ALARM_NODE ) {
 
-		if( _node.status == MonitorBroker::OK )
-		{
+		if( _node.status == MonitorBroker::OK ) {
 			msg += "\nMessage: " + static_cast<QString>(_node.notification_msg).replace("\n", " ");
 		}
-		else
-		{
+		else {
 			msg += "\nMessage: " + static_cast<QString>(_node.alarm_msg).replace("\n", " ");
 		}
 
