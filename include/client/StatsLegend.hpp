@@ -38,6 +38,8 @@ public:
 	static const QColor CRITICAL_COLOR ;
 	static const QColor UNKNOWN_COLOR ;
 	static const QColor HIGHLIGHT_COLOR ;
+	static const qint32 DefaultWidth ;
+	static const qint32 DefaultHeight ;
 
 protected:
 void paintEvent(QPaintEvent *event);

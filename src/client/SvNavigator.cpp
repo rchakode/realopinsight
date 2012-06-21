@@ -239,13 +239,11 @@ int SvNavigator::monitor(void)
 			MonitorBroker::NagiosCheckT check ;
 			string sid = serverAuthChain + ":"+(*node_id_it).trimmed().toStdString() ; //TODO
 
-			// Prepare and send request
 			zmq::message_t request(MonitorBroker::MAX_MSG);
 			memset(request.data(), 0, MonitorBroker::MAX_MSG) ;
 			memcpy(request.data(), sid.c_str(), sid.size());
 			comChannel->send(request) ;
 
-			//  Get reply.
 			zmq::message_t reply ;
 			comChannel->recv(&reply) ;
 			int msize = reply.size() ;
@@ -319,8 +317,8 @@ int SvNavigator::monitor(void)
 	if( all_checks_count>0) {
 
 		Stats *stats = new Stats() ;
-//		stats->setToolTip(statsPanelTooltip) ;
-		stats->update(snavStruct->check_status_count, all_checks_count) ;
+		QString info = stats->update(snavStruct->check_status_count, all_checks_count) ;
+		stats->setToolTip(info) ;
 		graphView->updateStatsPanel(stats) ;
 		if(statsPanel) delete statsPanel ;
 

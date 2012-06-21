@@ -24,11 +24,13 @@
 #include "Stats.hpp"
 
 
+const qint32 Stats::DefaultWidth=300 ;
+const qint32 Stats::DefaultHeight=175 ;
+
 Stats::Stats()
 : QWidget(),
 pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
 {
-
 	resize(pieChart->size()) ;
 	setStyleSheet("background:transparent") ;
 }
@@ -45,10 +47,10 @@ QSize Stats::minimumSizeHint() const
 
  QSize Stats::sizeHint() const
 		{
-	return QSize(250, 150) ;
+	return QSize(DefaultWidth, DefaultHeight) ;
 		}
 
-void Stats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count)
+QString Stats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count)
 {
-	pieChart->update(_check_status_count, _check_count) ;
+	return pieChart->update(_check_status_count, _check_count) ;
 }

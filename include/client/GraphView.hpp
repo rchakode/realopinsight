@@ -48,7 +48,7 @@ public:
 
 	inline void centerOnNode( const QString & id) { if (! id.isEmpty() ) centerOn( gnodesList[id].label ) ; }
 	inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){return graphScene->itemAt(mapToScene(mapFromGlobal(pos))); }
-	inline QGraphicsItem* nodeAt(QPoint pos){return graphScene->itemAt( mapToScene(pos) );}
+	inline QGraphicsItem* nodeAt(QPoint pos){return graphScene->itemAt(mapToScene(pos));}
 
 	static IconMapT nodeIcons();
 	static const QString PLUS ;
@@ -79,6 +79,7 @@ void scrollContentsBy ( int dx, int dy ) ;
 private:
 QGraphicsScene* graphScene ;
 QGraphicsProxyWidget* statsPanelItem ;
+QGraphicsRectItem* statsArea ;
 QPoint statsPanelPos ;
 
 QString svgGraphFile ;
@@ -101,8 +102,6 @@ void setEdgePath(const QString &, const QString &, QPainterPath & ) ;
 void setNodePos(const QString & , const QPointF & ) ;
 void ajustStatsPanelSize(void) ;
 
-
-// GRAPHVIEW ICON EXTENTION, FOR SUITABLE IDENTIFATION
 static const QString NODE_LABEL_ID_SFX ;
 static const QString  NODE_ICON_ID_SFX ;
 static const QString  NODE_EXP_ICON_ID_SFX ;

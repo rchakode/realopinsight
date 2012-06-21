@@ -34,10 +34,12 @@ public:
 	Stats();
 	virtual ~Stats();
 
-	void update(const CheckStatusCountT & _check_status_count, const qint32 & check_count) ;
+	QString update(const CheckStatusCountT & _check_status_count, const qint32 & check_count) ;
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
 
+	static const qint32 DefaultWidth ;
+	static const qint32 DefaultHeight ;
 
 private:
 

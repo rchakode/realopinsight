@@ -172,8 +172,7 @@ void GraphView::scrollContentsBy ( int dx, int dy )
 void GraphView::zoomIn()
 {
 	scale(1.1, 1.1) ;
-	if(statsPanelItem)
-	{
+	if(statsPanelItem) {
 		setStatsPanelPos() ;
 		statsPanelItem->scale(1 / 1.1, 1 / 1.1) ;
 	}
@@ -183,38 +182,68 @@ void GraphView::zoomOut()
 {
 	scale(1 / 1.1, 1 / 1.1) ;
 
-	if(statsPanelItem)
-	{
+	if(statsPanelItem) {
 		statsPanelItem->scale(1.1, 1.1) ;
 		setStatsPanelPos() ;
 	}
 }
 
-void GraphView::updateStatsPanel(Stats * _stats_panel)
+void GraphView::updateStatsPanel(Stats * _statsPanel)
 {
 	bool visible ;
 	if( statsPanelItem ) {
 		visible = statsPanelItem->isVisible() ;
-		statsPanelItem->setWidget(_stats_panel) ;
-		statsPanelItem->setVisible( visible ) ;
+		statsPanelItem->setWidget(_statsPanel) ;
+		statsPanelItem->setVisible(visible) ;
 	} else {
-		statsPanelItem = graphScene->addWidget( _stats_panel ) ;
+		statsPanelItem = graphScene->addWidget(_statsPanel) ;
+		statsPanelItem->setToolTip(_statsPanel->toolTip()) ;
+		statsArea = new QGraphicsRectItem();
+		statsArea->setBrush(Qt::transparent);
+		statsArea->setPen(QColor(Qt::transparent));
+		statsArea->setToolTip(_statsPanel->toolTip()) ;
+		graphScene->addItem(statsArea) ;
 	}
 
-	if( statsPanelItem ) {
+	if( statsPanelItem ) { //Necessary
 		setStatsPanelPos() ;
 		if ( ! isAjustedStatsPanelSize ) ajustStatsPanelSize() ;
 	}
 }
 
+
+void GraphView::ajustStatsPanelSize(void)
+{
+	QSizeF stat_panel_size, view_size ;
+
+	if( statsPanelItem ) {
+		//
+		view_size = size() ;
+		stat_panel_size = statsPanelItem->size() ;
+
+		statsPanelScaleRatio = qMin(view_size.width() / stat_panel_size.width(),
+				view_size.height() / stat_panel_size.height()) / 4 ;
+
+		if( statsPanelScaleRatio < 1 ) {
+			//TODO
+			if( portViewScalingRatio < 1 ) 	statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio) ;
+			statsPanelItem->scale(statsPanelScaleRatio, statsPanelScaleRatio) ;
+		}
+
+		isAjustedStatsPanelSize = true ;
+		setStatsPanelPos() ;
+	}
+}
+
 void GraphView::setStatsPanelPos(void)
 {
-	qreal xp ;
 
-	if( statsPanelItem )
-	{
-		xp = size().width() - statsPanelItem->size().width() *  statsPanelScaleRatio - 2 ;
-		statsPanelItem->setPos( mapToScene(QPoint(xp, 0)) ) ;
+	if( statsPanelItem ) {
+		qreal xp = size().width() - statsPanelItem->size().width() *  statsPanelScaleRatio - 2;
+		QPointF pos = mapToScene(QPoint(xp, 0));
+		statsPanelItem->setPos(pos);
+		Stats* w = dynamic_cast<Stats*>(statsPanelItem->widget());
+		statsArea->setRect(w->x(), w->y(), Stats::DefaultWidth, Stats::DefaultHeight);
 	}
 }
 
@@ -549,40 +578,16 @@ void GraphView::scaleToFitViewPort(void)
 	scene_size = graphScene->itemsBoundingRect().size() ;
 
 	portViewScalingRatio = qMin(view_size.width() / scene_size.width(), view_size.height() / scene_size.height() )  ;
-	if ( portViewScalingRatio < 1.0 )
-	{
+	if ( portViewScalingRatio < 1.0 ) {
+		//
 		if( statsPanelItem ) statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio) ;
 		scale( portViewScalingRatio, portViewScalingRatio ) ;
-	}
-	else
-	{
+	} else {
+		//
 		portViewScalingRatio = 1 ;
 	}
 }
 
-void GraphView::ajustStatsPanelSize(void)
-{
-	QSizeF stat_panel_size, view_size ;
-
-	if( statsPanelItem )
-	{
-		view_size = size() ;
-		stat_panel_size = statsPanelItem->size() ;
-
-		statsPanelScaleRatio = qMin(view_size.width() / stat_panel_size.width(),
-				view_size.height() / stat_panel_size.height()) / 4 ;
-
-		if( statsPanelScaleRatio < 1 )
-		{
-			//TODO
-			if( portViewScalingRatio < 1 ) 	statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio) ;
-			statsPanelItem->scale(statsPanelScaleRatio, statsPanelScaleRatio) ;
-		}
-
-		isAjustedStatsPanelSize = true ;
-		setStatsPanelPos() ;
-	}
-}
 
 void GraphView::capture(void)
 {

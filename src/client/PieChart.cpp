@@ -38,7 +38,7 @@ PieChart::~PieChart()
 	slices.clear() ;
 }
 
-void PieChart::update(const CheckStatusCountT & _check_status_count, const qint32 _check_count)
+QString PieChart::update(const CheckStatusCountT & _check_status_count, const qint32 _check_count)
 {
 	qint32 ok_count, warning_count, critical_count, unknown_count ;
 	qreal ok_ratio, warning_ratio, critical_ratio, unknown_ratio ;
@@ -63,7 +63,7 @@ void PieChart::update(const CheckStatusCountT & _check_status_count, const qint3
 	slices[MonitorBroker::OK] = new PieChartItem(
 			boundingRect, 3.6 * (unknown_ratio + warning_ratio + critical_ratio), 3.6 * ok_ratio, StatsLegend::OK_COLOR, this) ;
 
-	QString tip =  "Critical: " + QString::number(critical_count) + "/"
+	QString info =  "Critical: " + QString::number(critical_count) + "/"
 			"" + QString::number(_check_count) + " (" + QString::number(critical_ratio, 'f', 0) +
 			"%)" + "\nWarning: " + QString::number(warning_count) +
 			"/" + QString::number(_check_count) + " (" + QString::number(warning_ratio, 'f', 0) +
@@ -72,9 +72,6 @@ void PieChart::update(const CheckStatusCountT & _check_status_count, const qint3
 			"%)" + "\nNormal: " + QString::number(ok_count) +
 			"/" + QString::number(_check_count) + " (" + QString::number(ok_ratio, 'f', 0) +
 			"%)" ;
-	slices[MonitorBroker::CRITICAL]->setToolTip(tip) ;
-	slices[MonitorBroker::WARNING]->setToolTip(tip) ;
-	slices[MonitorBroker::UNKNOWN]->setToolTip(tip) ;
-	slices[MonitorBroker::OK]->setToolTip(tip) ;
-	//setToolTip(tip) ;
+
+	return info ;
 }

@@ -36,7 +36,7 @@ PieChartItem::PieChartItem(const QRectF & _bounding_rect,
 	path.moveTo( pieChartBoundingRect.center() );
 	path.arcTo(pieChartBoundingRect, startAngle, proportion);
 	path.closeSubpath();
-	setStyleSheet("background:transparent") ;
+	//setStyleSheet("background:transparent") ;
 }
 
 QSize PieChartItem::minimumSizeHint() const
@@ -76,6 +76,7 @@ void PieChartItem::paintEvent(QPaintEvent *)
 	QLinearGradient gradient(0, 0, 0, 100) ;
 	gradient.setColorAt(0.0, fillColor1) ;
 	gradient.setColorAt(1.0, fillColor2) ;
+	painter.setPen(QColor(Qt::transparent)) ;
 	painter.setBrush(gradient) ;
 	painter.drawPath(path) ;
 }

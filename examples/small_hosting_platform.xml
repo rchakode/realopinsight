@@ -17,7 +17,7 @@
 	</Service>
 	<Service id="S154545828" type="0" statusCalcRule="0" statusPropRule="0">
 		<Name>itsoftbyrc.com</Name>
-		<Icon>Web Server</Icon>
+		<Icon>Business Process</Icon>
 		<Description></Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
@@ -57,7 +57,7 @@
 	</Service>
 	<Service id="S153201106" type="0" statusCalcRule="0" statusPropRule="1">
 		<Name>OS</Name>
-		<Icon></Icon>
+		<Icon>Business Process</Icon>
 		<Description></Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>

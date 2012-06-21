@@ -319,14 +319,17 @@ QString Preferences::style() {
 			"}"
 			"QToolTip {"
 			"	border: 2px solid darkkhaki;"
-			"	padding: 5px;"
+			"	padding: 1px;"
 			"	border-radius: 3px;"
-			"	opacity: 200;"
+			"	opacity: 500;"
 			"}"
 			"QDialog {"
 			"	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,"
             "		stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
             "		stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
+			"}"
+			"QGraphicsView{"
+			"	background:#f1f1f1;"
 			"}";
 return styleSheet ;
 }

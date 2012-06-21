@@ -31,6 +31,7 @@
 #include <zmq.hpp>
 #include <crypt.h>
 #include <sstream>
+#include <fstream>
 #include <zmq.h>
 
 using namespace std;
@@ -133,6 +134,12 @@ void *worker_routine (void *arg)
 
 int main(int argc, char ** argv)
 {
+	ostringstream versionMsg;
+	versionMsg << PACKAGE_STRING << "."<< endl
+			<< "This is a free software released under the terms of GPL-v3 License." << endl
+			<< "Copyright (c) 2010-2012 " << PACKAGE_BUGREPORT << "." << endl
+			<< "Visit " << PACKAGE_URL << " for further details." << endl ;
+
 	bool foreground = false;
 	static const char *shotOpt="DPhvc:p:n:" ;
 	int port = MonitorBroker::DEFAULT_PORT ;
@@ -182,10 +189,7 @@ int main(int argc, char ** argv)
 		}
 
 		case 'v': {
-			cout << PACKAGE_STRING << "."<< endl
-					<< "This is a free software released under the terms of GPL-v3 License." << endl
-					<< "Copyright (c) 2010-2012 " << PACKAGE_BUGREPORT << "." << endl
-					<< "Visit " << PACKAGE_URL << " for further details." << endl;
+			cout << versionMsg.str() ;
 			exit(0) ;
 		}
 
@@ -217,12 +221,17 @@ int main(int argc, char ** argv)
 		setsid();
 	}
 
+	ostringstream tcpAddr;
+	tcpAddr << "tcp://*:" << port ;
+
+	cout << versionMsg.str() ;
+	cout << "Starting the program ..." << endl ;
+	cout << "Listening address => " << tcpAddr.str() << endl ;
+	cout << "Nagios status file => " << statusFile << endl ;
+
 	zmq::context_t ctx(1);
 	zmq::socket_t workersComChannel(ctx, ZMQ_XREQ);
 	workersComChannel.bind("inproc://ngrt4ndwkrs");
-
-	ostringstream tcpAddr;
-	tcpAddr << "tcp://*:" << port ;
 
 	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
 	clientsComChannel.bind(tcpAddr.str().c_str());
@@ -235,7 +244,5 @@ int main(int argc, char ** argv)
 
 	zmq::device (ZMQ_QUEUE, clientsComChannel, workersComChannel);
 
-	cout << "server started successfully on " << tcpAddr.str() << endl ;
-	cout << "Status file : " << statusFile << endl ;
 	return 0;
 }

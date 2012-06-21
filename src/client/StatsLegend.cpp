@@ -31,6 +31,8 @@ const QColor StatsLegend::WARNING_COLOR = QColor("#FF8C00") ; //Qt::yellow ;
 const QColor StatsLegend::CRITICAL_COLOR = Qt::red ;
 const QColor StatsLegend::UNKNOWN_COLOR = Qt::lightGray ;
 const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200) ;
+const qint32 StatsLegend::DefaultWidth=250 ;
+const qint32 StatsLegend::DefaultHeight=300 ;
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
 : QWidget(_parent)
@@ -79,10 +81,10 @@ void StatsLegend::paintEvent(QPaintEvent *)
 
 QSize StatsLegend::minimumSizeHint() const
 		{
-	return QSize(250, 300) ;
+	return QSize(DefaultWidth, DefaultHeight) ;
 		}
 
  QSize StatsLegend::sizeHint() const
 		{
-	return QSize(250, 300) ;
+	return QSize(DefaultWidth, DefaultHeight) ;
 		}
