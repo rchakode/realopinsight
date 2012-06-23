@@ -3,4 +3,6 @@ AM_LDFLAGS=$(SUBLIBS) -lcrypt -lzmq -lpthread
 
 man1_MANS = doc/man/ngrt4nd.1
 sbin_PROGRAMS = ngrt4nd
-ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp src/core/utils.cpp src/server/ngrt4nd.cpp
+ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp src/core/utils.cpp src/server/ngrt4nd.cpp include/core/MonitorBroker.hpp include/core/ns.hpp
+
+dist_man_MANS =  doc/man/ngrt4nd.1

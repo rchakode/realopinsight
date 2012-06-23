@@ -135,10 +135,10 @@ void *worker_routine (void *arg)
 int main(int argc, char ** argv)
 {
 	ostringstream versionMsg;
-	versionMsg << PACKAGE_STRING << "."<< endl
-			<< "This is a free software released under the terms of GPL-v3 License." << endl
-			<< "Copyright (c) 2010-2012 " << PACKAGE_BUGREPORT << "." << endl
-			<< "Visit " << PACKAGE_URL << " for further details." << endl ;
+	versionMsg<<PACKAGE_TARNAME <<" ("<< PACKAGE_NAME <<")"<<", version "<<PACKAGE_VERSION<< "."<< endl
+			<<"Part of NGRT4N Software and released under the terms of GPLv3 License." << endl
+			<<"Copyright (c) NGRT4N Project <contact@ngrt4n.com>" << "." << endl
+			<<"Visit "<<PACKAGE_URL<<" for further details."<< endl ;
 
 	bool foreground = false;
 	static const char *shotOpt="DPhvc:p:n:" ;
