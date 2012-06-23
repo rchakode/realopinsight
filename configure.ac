@@ -1,12 +1,12 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([ngrt4nd], [2.0], [Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>], [ngrt4nd], [http://ngrt4n.com])
-AM_INIT_AUTOMAKE([ngrt4nd], [2.0])
+AC_INIT([ngrt4nd], [1.0], [Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>], [ngrt4n-broker], [http://ngrt4n.com])
+#AM_INIT_AUTOMAKE([ngrt4n-broker], [1.0])
+AM_INIT_AUTOMAKE
 
 AC_PREREQ([2.68])
 AC_CONFIG_HEADERS([config.h])
-#AC_CONFIG_SRCDIR([src/core/utils.cpp])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -17,15 +17,9 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lcrypt':
 AC_CHECK_LIB(crypt, crypt, [], [
 	      echo "libcrypt is required" 
 	      exit 1])
-# FIXME: Replace `main' with a function in `-lpthread':
-AC_CHECK_LIB(pthread, pthread_create, [], [
-	                    echo "phtread is required" 
-			    exit 1])
-# FIXME: Replace `main' with a function in `-lzmq':
 AC_CHECK_LIB(zmq, zmq_init, [], [
 	                    echo "zmq is required" 
 			    exit 1])

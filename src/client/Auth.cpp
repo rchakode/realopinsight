@@ -29,6 +29,7 @@
 const QString appName = APPLICATION_NAME ;
 const QString packageVersion = PACKAGE_VERSION;
 const QString packageName = PACKAGE_NAME ;
+const QString releaseYear = RELEASE_YEAR;
 
 const QString Auth::ADM_USER_NAME = appName.toLower() + "_adm" ;
 const QString Auth::OP_USER_NAME = appName.toLower()+ "_op" ;
@@ -62,8 +63,8 @@ Auth::Auth()
 	line++;
 	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
 
-	line++;
-	layout->addWidget(new QLabel("Copyright (c) 2010-2012, Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>"), line, 0, 1, 3, Qt::AlignLeft) ;
+	line++; QString copying = QString("Copyright (c) 2010-"+releaseYear +", NGRT4N Project <contact@ngrt4n.com>");
+	layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft) ;
 
 	addEvents();
 }

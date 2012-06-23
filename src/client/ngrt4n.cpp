@@ -49,7 +49,7 @@ QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_con
 
 
 ostringstream versionMsg(appName + " - UI Module, version " + packageVersion + ".\n"
-		"Copyright (c) 2010-" + releaseYear + " Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>." + "\n"
+		"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
 		+"Visit "+ packageUrl + " for further information.") ;
 
 int main(int argc, char **argv)

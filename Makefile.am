@@ -1,5 +1,5 @@
 AM_CXXFLAGS=-std=c++0x -Wall -I$(top_srcdir)/include  -I$(top_srcdir)  -I$(top_srcdir)/include/core -DVERSION=\"$(VERSION)\" -DPROG="\"$(PACKAGE)\""
-AM_LDFLAGS=$(SUBLIBS) -lcrypt -lzmq -lpthread
+AM_LDFLAGS=$(SUBLIBS) -lcrypt -lzmq
 
 man1_MANS = doc/man/ngrt4nd.1
 sbin_PROGRAMS = ngrt4nd

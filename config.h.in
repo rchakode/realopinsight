@@ -12,9 +12,6 @@
 /* Define to 1 if you have the `crypt' library (-lcrypt). */
 #undef HAVE_LIBCRYPT
 
-/* Define to 1 if you have the `pthread' library (-lpthread). */
-#undef HAVE_LIBPTHREAD
-
 /* Define to 1 if you have the `zmq' library (-lzmq). */
 #undef HAVE_LIBZMQ
 

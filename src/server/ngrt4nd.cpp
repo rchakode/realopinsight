@@ -36,13 +36,10 @@
 
 using namespace std;
 
-
-pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-
 int numWorkers = 1 ;
 
 string statusFile = "/usr/local/nagios/var/status.dat" ;
-string authChain = "" ; // Suitably set later
+string authChain = "" ;
 string packageName = PACKAGE_NAME ;
 
 ostringstream help(""
@@ -96,49 +93,13 @@ string ngrt4n::getPassChain() {
 	return authChain ;
 }
 
-
-void *worker_routine (void *arg)
-{
-	zmq::context_t *ctx = (zmq::context_t*) arg;
-	zmq::socket_t comChannel (*ctx, ZMQ_REP);
-	comChannel.connect ("inproc://ngrt4ndwkrs");
-
-	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
-	while (true) {
-		zmq::message_t request;
-		request.rebuild() ;
-		comChannel.recv(&request) ;
-		size_t msize = request.size() ;
-
-		char* msg = (char*)malloc(msize * sizeof(char)) ;
-		memcpy(msg, request.data(), msize) ;
-
-		char* _pass = strtok(msg, ":") ;
-		string pass = (_pass == NULL) ? "" : _pass ;
-		char* _sid = strtok(NULL, ":") ;
-		string sid = (_sid == NULL) ? "" : _sid ;
-
-		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentification" ;
-		msize = result.size() ;
-		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
-		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;
-		memcpy(reply.data(), result.c_str(), msize);
-		comChannel.send(reply);
-
-		free(msg) ;
-	}
-
-	comChannel.close() ;
-	return NULL ;
-}
-
 int main(int argc, char ** argv)
 {
 	ostringstream versionMsg;
-	versionMsg << PACKAGE_STRING << "."<< endl
-			<< "This is a free software released under the terms of GPL-v3 License." << endl
-			<< "Copyright (c) 2010-2012 " << PACKAGE_BUGREPORT << "." << endl
-			<< "Visit " << PACKAGE_URL << " for further details." << endl ;
+	versionMsg<<PACKAGE_TARNAME <<" ("<< PACKAGE_NAME <<")"<<", version "<<PACKAGE_VERSION<< "."<< endl
+			<<"Part of NGRT4N Software and released under the terms of GPLv3 License." << endl
+			<<"Copyright (c) NGRT4N Project <contact@ngrt4n.com>" << "." << endl
+			<<"Visit "<<PACKAGE_URL<<" for further details."<< endl ;
 
 	bool foreground = false;
 	static const char *shotOpt="DPhvc:p:n:" ;
@@ -230,19 +191,35 @@ int main(int argc, char ** argv)
 	cout << "Nagios status file => " << statusFile << endl ;
 
 	zmq::context_t ctx(1);
-	zmq::socket_t workersComChannel(ctx, ZMQ_XREQ);
-	workersComChannel.bind("inproc://ngrt4ndwkrs");
+	zmq::socket_t comChannel(ctx, ZMQ_REP);
+	comChannel.bind(tcpAddr.str().c_str());
 
-	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
-	clientsComChannel.bind(tcpAddr.str().c_str());
+	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
+	while (true) {
+		zmq::message_t request;
+		request.rebuild() ;
+		comChannel.recv(&request) ;
+		size_t msize = request.size() ;
 
-	for (int i = 0; i < numWorkers; i++) {
-		pthread_t worker;
-		int rc = pthread_create (&worker, NULL, worker_routine, (void*) &ctx);
-		assert (rc == 0);
+		char* msg = (char*)malloc(msize * sizeof(char)) ;
+		memcpy(msg, request.data(), msize) ;
+
+		char* _pass = strtok(msg, ":") ;
+		string pass = (_pass == NULL) ? "" : _pass ;
+		char* _sid = strtok(NULL, ":") ;
+		string sid = (_sid == NULL) ? "" : _sid ;
+
+		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentification" ;
+		msize = result.size() ;
+		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
+		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;
+		memcpy(reply.data(), result.c_str(), msize);
+		comChannel.send(reply);
+
+		free(msg) ;
 	}
 
-	zmq::device (ZMQ_QUEUE, clientsComChannel, workersComChannel);
+	comChannel.close() ;
 
 	return 0;
 }
