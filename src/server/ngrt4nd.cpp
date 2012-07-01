@@ -98,7 +98,7 @@ int main(int argc, char ** argv)
 	ostringstream versionMsg;
 	versionMsg<<PACKAGE_TARNAME <<" ("<< PACKAGE_NAME <<")"<<", version "<<PACKAGE_VERSION<< "."<< endl
 			<<"Part of NGRT4N Software and released under the terms of GPLv3 License." << endl
-			<<"Copyright (c) NGRT4N Project <contact@ngrt4n.com>" << "." << endl
+			<<"Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>" << "." << endl
 			<<"Visit "<<PACKAGE_URL<<" for further details."<< endl ;
 
 	bool foreground = false;

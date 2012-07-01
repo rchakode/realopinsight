@@ -21,106 +21,119 @@
 set -e
 
 APP="ngrt4n"
-APP_UID="${APP}"
-APP_GID="${APP}"
 APP_PREFIX="/usr/local"
-APP_BIN="${APP_PREFIX}/bin/${APP}"
-APP_HOME="/var/lib/${APP}"
-APP_DB="db"
-
-mkdir -p ${APP_PREFIX}/bin
-rm -rf ${APP_HOME} && mkdir -p ${APP_HOME}
+#mkdir -p ${APP_PREFIX}/bin
 
 # Print help
 #
 usage(){
   echo
-  echo "Usage: ./install.sh [OPTION]"
-  echo 
-  echo "       -d <install_dir>
-  echo "          Sets the installation directory. Default is /usr/local
-  echo "       -h"
-  echo "          Shows this help"
+  echo "Usage: `basename $0` [OPTION]"
+  echo "OPTIONS"
+  echo "	-module=broker"
+  echo "	  Installs the broker module"
+  echo "	-module=ui"
+  echo "	  Installs the ui module"
+#  echo "	-d <install_dir>"
+#  echo "	  Sets the installation directory. Default is /usr"
+  echo "	-h"
+  echo "	  Shows this help"
 }
 
-# First read input 
-while true ; do
-    [ -z "$1" ] && break ;
-    case "$1" in
-        -h) usage; exit 0;;
-        -d)
-            if [ ! -z "$2" ]; then
-               case $2 in
-                    /*) 
-                    	APP_PREFIX="$2" 
-                    	APP_BIN="${APP_PREFIX}/bin/${APP}"
-                    ;;
-                    *) 
-                    	echo "ERROR: The installation directory must be an absolute path" 
-                    ;;
-               esac
-            else
-               echo "ERROR: The option -d required an argument"
- 	       usage
-            fi
-            shift 2 
-        ;;
-        *)  echo "ERROR : wrong argument $1" ; usage; exit 1 ;;
-    esac
-done
+install_broker(){
+  make clean 1>/dev/null
+  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
+  
+  echo -n "Checking prerequises..." 
+  ./configure --prefix=/usr 1>/dev/null
+  echo done
+  
+  echo -n "Compiling..."
+  make -j${ncpu} 1>/dev/null
+  echo done
+  
+  echo -n "Installation..."
+  make install 1>/dev/null
+  echo done
+}
 
-# Cheking prerequises
+checking_uipreq(){
+  echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
+  [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
+  echo "done"
+ 
+  echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "
+  [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
+  echo "done"
+ 
+  echo -n "DEGUG : Checking c++ compiler => ${CXX:=`which g++`}... "
+  [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
+  echo "done"
+ 
+  echo -n "DEGUG : Checking graphviz's dot utility => ${DOT:=`which dot`}... "
+  [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
+  echo "done"
+}
+
+install_default(){
+  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
+  make clean 1>/dev/null
+  
+  echo -n "Checking prerequises..." 
+  qmake -config release ngrt4n.pro CONFIG+=config-default
+  echo done
+  
+  echo -n "Compiling..."
+  make -j${ncpu} 1>/dev/null
+  echo done
+  
+  echo -n "Installation..."
+  make install 1>/dev/null
+  echo done
+}
+
+install_editor(){
+  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
+  make clean 1>/dev/null
+
+  echo -n "Compiling..."
+  qmake -config release ngrt4n.pro CONFIG+=config-editor
+  make -j${ncpu} 1>/dev/null
+  echo done
+  
+  echo -n "Installation..."
+  make install 1>/dev/null
+  echo done
+}
+
+install_oc(){
+  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
+  make clean 1>/dev/null
+
+  echo -n "Compiling..."
+  qmake -config release ngrt4n.pro CONFIG+=config-oc
+  make -j${ncpu} 1>/dev/null
+  echo done
+  
+  echo -n "Installation..."
+  make install 1>/dev/null
+  echo done
+}
+
+install_ui() {
+  checking_uipreq
+  install_default
+  install_editor
+  install_oc
+}
+
 [ `id -u` -ne 0 ] && echo "ERROR : the installation must be carried out as root" && exit 1 
 
-# Installation
-#
-echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
-[ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
-echo "done"
-
-echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "
-[ -z $MAKE ] && echo "ERROR : make not found." && exit 1
-echo "done"
-
-echo -n "DEGUG : Checking c++ compiler => ${CXX:=`which g++`}... "
-[ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
-echo "done"
-
-echo -n "DEGUG : Checking graphviz's dot utility => ${DOT:=`which dot`}... "
-[ -z $DOT ] && echo "ERROR : dot not found." && exit 1
-echo "done"
-
-echo -n "Compiling ${APP}... "
-${QMAKE} -config release && make 1>/dev/null
-echo done
-
-echo -n "Installing ${APP}... "  
-cp -f --preserve=mode build/usr/bin/${APP} ${APP_BIN}
-echo "done"
-
-echo "Setting ${APP}... "
-if [ -z `grep "^${APP_GID}" /etc/group` ] ; then
-   groupadd ${APP_GID} && echo "DEBUG : groud created => ${APP_GID}"
-else  
-   echo "DEBUG : the ${APP_GID} group already exists"
-fi
-if [ -z `grep "^${APP_UID}" /etc/passwd` ]; then
-   useradd -g ${APP_GID} ${APP_UID} && echo "DEBUG : user created => ${APP_UID}"
-else 
-   echo "DEBUG : the ${APP_UID} user already exists"
-fi
-
-chown ${APP_UID}:${APP_GID} ${APP_BIN}
-chmod 2755 ${APP_BIN}
-
-touch ${APP_HOME}/${APP_DB}
-chmod 664 ${APP_HOME}/${APP_DB}
-  
-usermod -s /bin/false -d ${APP_HOME} ${APP_UID} 
-chown -R ${APP_UID}:${APP_GID} ${APP_HOME}
-
-
-
-echo "Installation done."
+case $1 in
+  -module=broker) install_broker ;;
+  -module=ui) install_ui ;;
+  -h) usage; exit 0;;
+  *) echo "ERROR :: Bad usage" ; usage; exit 1 ;;
+esac
 
 exit 0

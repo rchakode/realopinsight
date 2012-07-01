@@ -61,6 +61,7 @@ public:
 	bool updateNode(NodeListT::iterator & _node_it) ;
 	void setCheckListField( const MonitorBroker::NagiosChecksT& );
 	void setEnableFields( const bool& );
+	void loadStatusFile(const QString &) ;
 	void setLowLevelAlarmComponentEnabled(bool enable){editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);}
 
 	ItemsList* itemList( void ) {return &editorItemsList;}
@@ -98,7 +99,6 @@ private:
 	QDialogButtonBox* buttonBox;
 
 	void addEvent(void) ;
-	void loadStatusFile( void ) ;
 	void loadLabelFields(void);
 	void loadDescriptionFields(void);
 	void loadTypeFields(void);

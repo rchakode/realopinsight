@@ -575,7 +575,7 @@ void SvNavigator::tabChanged(int _tab_index)
 
 void SvNavigator::hideChart(void)
 {
-	if ( graphView->hideChart() ) {
+	if (graphView->hideChart()) {
 		subMenuList["HideChart"]->setIcon(QIcon(":images/check.png"));
 		return ;
 	}
@@ -611,10 +611,10 @@ void SvNavigator::resize(void)
 void SvNavigator::loadMenus(void)
 {
 	QIcon camera_icon, zoomin_icon, zoomout_icon, refresh_icon ;
-	refresh_icon.addFile(":images/refresh.png");
-	camera_icon.addFile(":images/camera.png");
-	zoomin_icon.addFile(":images/zoomin.png");
-	zoomout_icon.addFile(":images/zoomout.png");
+	refresh_icon.addFile(":images/built-in/refresh.png");
+	camera_icon.addFile(":images/built-in/camera.png");
+	zoomin_icon.addFile(":images/built-in/zoomin.png");
+	zoomout_icon.addFile(":images/built-in/zoomout.png");
 
 	QMenuBar* menuBar = new QMenuBar();
 	menuList["MENU1"] = menuBar->addMenu("&File"),

@@ -7,3 +7,4 @@ NGRT4N, version 1.0.1
  - event consolidation through status calculation rules
  - custom propagaration rules for event
  - authenfication mecanism
+ - Don't longer require to create neither a group nor a user 

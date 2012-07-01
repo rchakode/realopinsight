@@ -1,5 +1,14 @@
 <RCC>
     <qresource prefix="/">
+        <file>images/built-in/icon.png</file>
+        <file>images/built-in/logo.png</file>
+        <file>images/built-in/disket.png</file>
+        <file>images/built-in/camera.png</file>
+        <file>images/built-in/zoomout.png</file>
+        <file>images/built-in/zoomin.png</file>
+        <file>images/built-in/refresh.png</file>
+        <file>images/built-in/folder.png</file>
+        <file>images/built-in/import.png</file>
         <file>images/firewall.png</file>
         <file>images/hypervisor.png</file>
         <file>images/linux.png</file>
@@ -14,14 +23,6 @@
         <file>images/minus.png</file>
         <file>images/plus.png</file>
         <file>images/router.png</file>
-        <file>images/built-in/icon.png</file>
-        <file>images/built-in/logo.png</file>
-        <file>images/camera.png</file>
-        <file>images/zoomout.png</file>
-        <file>images/zoomin.png</file>
-        <file>images/refresh.png</file>
-        <file>images/disket.png</file>
-        <file>images/folder.png</file>
         <file>images/check.png</file>
         <file>images/network.png</file>
         <file>images/filer.png</file>

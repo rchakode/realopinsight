@@ -72,7 +72,7 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT
 	FILE* fSnapshot =  fopen(snapshot.c_str(), "wt") ;
 
 	if( stFile == NULL || fSnapshot == NULL ){
-		cerr << "Unable to access to check the status file : " << _sfile << endl;
+		cerr << "Unable to open the file : " << _sfile << endl;
 		return false ;
 	}
 
@@ -99,7 +99,7 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT
 	ifstream stFileStream ;
 	stFileStream.open(snapshot.c_str(), std::ios_base::in) ;
 	if (! stFileStream.good() ) {
-		cerr << "Unable to access the snapshot of the the status file " << endl ;
+		cerr << "Unable to open the file " << endl ;
 		return false ;
 	}
 

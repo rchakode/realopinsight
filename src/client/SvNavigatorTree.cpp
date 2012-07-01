@@ -75,55 +75,49 @@ void SvNavigatorTree::startDrag(Qt::DropActions _drag_action)
 	QTreeWidget::startDrag(_drag_action) ;
 }
 
-void SvNavigatorTree::addNode(TreeNodeItemListT & _service_tree,
+void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
 		const NodeT & _node, const bool & _first_insertion)
 {
 	//TODO add tooltips
-	QString child_node_id ;
-	QStringList child_nodes_list ;
-	QStringList::iterator uds_it ;
-	TreeNodeItemListT::iterator node_it, child_node_it, parent_node_it ;
 	QTreeWidgetItem * item ;
-
-	node_it = _service_tree.find( _node.id ) ;
-	if( node_it == _service_tree.end() ) {
+	TreeNodeItemListT::iterator nit = _tree.find( _node.id ) ;
+	if( nit == _tree.end() ) {
 		item = new QTreeWidgetItem( QTreeWidgetItem::UserType ) ;
 		item->setIcon(0, QIcon(":/images/unknown.png")) ;
 		item->setText(0, _node.name) ;
-		item->setText(1, _node.id) ; // Not show in UI,  useful for handling events
-
+		item->setData(0, QTreeWidgetItem::UserType, _node.id) ;
 		if( _first_insertion ) {
-			parent_node_it = _service_tree.find( _node.parent ) ;
-			if( parent_node_it != _service_tree.end() ) {
-				_service_tree[_node.parent]->addChild(item);
+			TreeNodeItemListT::iterator pit = _tree.find( _node.parent ) ;
+			if( pit != _tree.end() ) {
+				_tree[_node.parent]->addChild(item);
 			}
 		}
 
-		_service_tree[_node.id] = item ;
+		_tree[_node.id] = item ;
 	}
 	else {
-		(*node_it)->setIcon(0, QIcon(":/images/unknown.png")) ;
-		(*node_it)->setText(0, _node.name) ;
-		(*node_it)->setText(1, _node.id) ; // Not show in UI,  useful for handling events
+		(*nit)->setIcon(0, QIcon(":/images/unknown.png")) ;
+		(*nit)->setText(0, _node.name) ;
+		(*nit)->setText(1, _node.id) ; // Not show in UI,  useful for handling events
 	}
 
 	if( _node.type != NodeType::ALARM_NODE && _node.child_nodes != "" ) {
-		child_nodes_list = _node.child_nodes.split( Parser::CHILD_NODES_SEP );
+		QStringList childs = _node.child_nodes.split( Parser::CHILD_NODES_SEP );
 
-		for( uds_it = child_nodes_list.begin(); uds_it != child_nodes_list.end(); uds_it++ ) {
-			child_node_id = (*uds_it).trimmed() ;
-			child_node_it = _service_tree.find( child_node_id ) ;
+		for(QStringList::iterator uds_it = childs.begin(); uds_it != childs.end(); uds_it++ ) {
+			QString cid = (*uds_it).trimmed() ;
+			TreeNodeItemListT::iterator cit = _tree.find( cid) ;
 
-			if( child_node_it == _service_tree.end() ) {
-				_service_tree[child_node_id] = new QTreeWidgetItem(QTreeWidgetItem::UserType) ;
-				_service_tree[_node.id]->addChild( _service_tree[child_node_id] ) ;
+			if( cit == _tree.end() ) {
+				_tree[cid] = new QTreeWidgetItem(QTreeWidgetItem::UserType) ;
+				_tree[_node.id]->addChild( _tree[cid] ) ;
 			}
 			else {
-				_service_tree[_node.id]->addChild( *child_node_it ) ;
+				_tree[_node.id]->addChild( *cit ) ;
 			}
 		}
 
-		child_nodes_list.clear();
+		childs.clear();
 	}
 }
 

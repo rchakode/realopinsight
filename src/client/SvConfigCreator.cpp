@@ -32,14 +32,14 @@ SvCreator::SvCreator(const qint32 & _user_role)
   openedFile(""),
   selectedNode(""),
   selectedNodeId(""),
-  settings( new Settings() ),
-  snavStruct( new Struct() ),
-  mainSplitter( new QSplitter(this) ),
-  navigationTree( new SvNavigatorTree( true ) ),
-  editor( new ServiceEditor() ),
-  menuBar( new QMenuBar(this) ),
-  toolBar( new QToolBar("toolBar") ),
-  nodeContextMenu( new QMenu() )
+  settings(new Settings()),
+  snavStruct(new Struct()),
+  mainSplitter(new QSplitter(this)),
+  navigationTree(new SvNavigatorTree(true)),
+  editor(new ServiceEditor()),
+  menuBar(new QMenuBar(this)),
+  toolBar(new QToolBar("toolBar")),
+  nodeContextMenu(new QMenu())
 {
 	mainSplitter->addWidget(navigationTree) ;
 	mainSplitter->addWidget(editor) ;
@@ -49,7 +49,7 @@ SvCreator::SvCreator(const qint32 & _user_role)
 
 SvCreator::~SvCreator()
 {
-	// do not delete settings. Otherwise, the associated will be removed
+	/*Don't destroy settings. Otherwise the associated file will be removed*/
 	delete snavStruct ;
 	delete navigationTree ;
 	delete editor ;
@@ -96,12 +96,12 @@ void SvCreator::load(const QString& _filename)
 
 void SvCreator::open(void)
 {
-	QString config_file = QFileDialog::getOpenFileName(this,
+	QString path = QFileDialog::getOpenFileName(this,
 			"Select view configuration file - " + QString(ngrt4n::APP_NAME.c_str()),
 			".",
-			"Xml files (*.xml)");
+			"Xml files (*.xml);;All files (*)");
 
-	loadFile( config_file );
+	if(path.length()) loadFile(path);
 }
 
 
@@ -118,13 +118,20 @@ void SvCreator::loadFile(const QString& _filename)
 	openedFile = _filename ;
 }
 
+void SvCreator::import(){
+	QString path = QFileDialog::getOpenFileName(this,
+			"Select the Status File - " + QString(ngrt4n::APP_NAME.c_str()),
+			".",
+			"Data files (*.dat);;All files (*)");
+	if(path.length()) editor->loadStatusFile(path) ;
+}
 
 void SvCreator::newBusinessView(void)
 {
 	NodeT node;
-
 	if( ! close(false) ) {
 		snavStruct->clear() ;
+		node.id = SvNavigatorTree::rootID ;
 		node.name = "New Business view" ;
 		node.child_nodes.clear() ;
 		node.status = MonitorBroker::UNKNOWN ;  // TODO no acknowledged
@@ -132,17 +139,15 @@ void SvCreator::newBusinessView(void)
 		node.type = NodeType::SERVICE_NODE ;
 		node.parent.clear() ;  				//root has not parent
 
-		snavStruct->node_list[SvNavigatorTree::rootID] = node;
+		snavStruct->node_list[node.id] = node;
 		SvNavigatorTree::addNode(snavStruct->tree_item_list, node);
-		navigationTree->update( snavStruct ) ;
+		navigationTree->update(snavStruct) ;
 
-		fillEditorFromService( snavStruct->tree_item_list[node.id] );
-
+		fillEditorFromService(snavStruct->tree_item_list[node.id]);
 		openedFile = "";
 		selectedNode = SvNavigatorTree::rootID ;
 		hasToBeSaved = 1;
 	}
-
 }
 
 
@@ -162,7 +167,7 @@ void SvCreator::newNode(void)
 		return ;
 	}
 
-	node.id = "S" + QTime().currentTime().toString("HHmmsszzz");
+	node.id = QTime().currentTime().toString("HHmmsszzz");
 	node.parent = selectedNodeId ;
 	node.name = "sub service " + QString::number(count) , count ++ ;
 	node.type = NodeType::SERVICE_NODE ;
@@ -206,7 +211,6 @@ void SvCreator::deleteNode(const QString & _node_id)
 	NodeListT::iterator node_it, p_node_it ;
 	QStringList::iterator uds_it ;
 	TreeNodeItemListT::iterator p_item, item, end_item_list ;
-
 
 	node_it =  snavStruct->node_list.find( _node_id ) ;
 	if( node_it != snavStruct->node_list.end() ) {
@@ -252,8 +256,7 @@ void SvCreator::save(void)
 
 	if ( openedFile == "" ) {
 		saveAs();
-	}
-	else {
+	} else {
 		saveInFile( openedFile );
 	}
 
@@ -262,47 +265,46 @@ void SvCreator::save(void)
 void SvCreator::saveAs(void)
 {
 	QString config_file;
-	config_file = QFileDialog::getSaveFileName(this, "Select view configuration destination path - " + QString(ngrt4n::APP_NAME.c_str()), ".", "Xml files (*.xml)");
+	config_file = QFileDialog::getSaveFileName(this,
+			"Select view configuration destination path - " + QString(ngrt4n::APP_NAME.c_str()),
+			".",
+			"Xml files (*.xml)");
 	saveInFile(config_file);
 	setWindowTitle(openedFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Monitoring View Builder") ;
 }
 
 int SvCreator::close( const bool & _close_windows )
 {
-	QMessageBox msg_box;
-
-	if ( hasToBeSaved ) {
-		msg_box.setWindowTitle("Save change? - " + QString(ngrt4n::APP_NAME.c_str()));
-		msg_box.setText("The document has been modified.\n "
-				"Do you want to save your changes?");
-
-		if( _close_windows ) {
-			msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::Discard);
-		}
-
-		else {
-			msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No);
-		}
-
-		switch ( msg_box.exec() )
-		{
-		case QMessageBox::Yes:
-			save( );
-
-		case QMessageBox::Discard:
-			qApp->quit();
-			break;
-
-		case QMessageBox::Cancel:
-			return 1;
-			break;
-
-		default:
-			break;
-		}
-	}
-	else {
+	if ( ! hasToBeSaved ) {
 		if( _close_windows ) qApp->quit();
+	}
+
+	QMessageBox mbox;
+	mbox.setWindowTitle("Save change? - " + QString(ngrt4n::APP_NAME.c_str()));
+	mbox.setText("The document has been modified.\n "
+			"Do you want to save your changes?");
+
+	if( _close_windows ) {
+		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::Discard);
+	} else {
+		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No);
+	}
+
+	switch ( mbox.exec() )
+	{
+	case QMessageBox::Yes:
+		save();
+
+	case QMessageBox::Discard:
+		qApp->quit();
+		break;
+
+	case QMessageBox::Cancel:
+		return 1;
+		break;
+
+	default:
+		break;
 	}
 
 	return 0;
@@ -397,8 +399,8 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 
 void SvCreator::handleShowOnlineResources(void)
 {
-	QDesktopServices app_launcher ;
-	app_launcher.openUrl(QUrl("http://www.ngrt4n.com/docs/")) ;
+	QDesktopServices launcher ;
+	launcher.openUrl(QUrl("http://www.ngrt4n.com/docs/")) ;
 }
 
 void SvCreator::handleShowAbout(void)
@@ -407,35 +409,28 @@ void SvCreator::handleShowAbout(void)
 	about.exec() ;
 }
 
-void SvCreator::fillEditorFromService(QTreeWidgetItem * _service_item )
+void SvCreator::fillEditorFromService(QTreeWidgetItem * _item )
 {
-	NodeListT::iterator node_it ;
-
-	node_it = snavStruct->node_list.find(selectedNode) ;
-
-	if(node_it != snavStruct->node_list.end()) {
-		if(editor->updateNode(node_it)) {
-			snavStruct->tree_item_list[selectedNode]->setText(0, node_it->name);
+	NodeListT::iterator node = snavStruct->node_list.find(selectedNode) ;
+	if(node != snavStruct->node_list.end()) {
+		if(editor->updateNode(node)) {
+			snavStruct->tree_item_list[selectedNode]->setText(0, node->name);
 			hasToBeSaved = 1 ;
 		}
 	}
-	selectedNode = _service_item->data(0, QTreeWidgetItem::UserType).toString() ;
-
-	node_it = snavStruct->node_list.find(selectedNode) ;
-
-	if( node_it != snavStruct->node_list.end() ) editor->setContent(node_it);
+	selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString() ;
+	node = snavStruct->node_list.find(selectedNode) ;
+	if( node != snavStruct->node_list.end() ) editor->setContent(node);
 }
 
 
 void SvCreator::handleReturnPressed(void)
 {
-	NodeListT::iterator node_it ;
+	NodeListT::iterator node = snavStruct->node_list.find(selectedNode) ;
 
-	node_it = snavStruct->node_list.find(selectedNode) ;
-
-	if( node_it != snavStruct->node_list.end() ) {
-		if( editor->updateNode(node_it) ) {
-			snavStruct->tree_item_list[selectedNode]->setText(0, node_it->name);
+	if( node != snavStruct->node_list.end() ) {
+		if( editor->updateNode(node) ) {
+			snavStruct->tree_item_list[selectedNode]->setText(0, node->name);
 			hasToBeSaved = 1 ;
 		}
 	}
@@ -462,14 +457,10 @@ void SvCreator::saveInFile(const QString& _filename)
 				<< "\t\t<NotificationMsg>"<<node->notification_msg<<"</NotificationMsg>" << endl
 				<< "\t\t<SubServices>"<<node->child_nodes<<"</SubServices>" << endl
 				<< "\t</Service>"<<endl;
-		//
-		//			ofile << "<ServiceView id=\"" << SvNavigatorTree::rootID  << "\">" << endl
-		//					<< "\t<Name>" <<  node->name << "</Name>" << endl
-		//					<< "\t<SubServices>" << node->child_nodes << "</SubServices>" << endl;
 
 		for( node = snavStruct->node_list.begin();  node !=  snavStruct->node_list.end(); node++) {
+
 			if(  node->id == SvNavigatorTree::rootID ||  node->parent.isEmpty() ) continue ;
-			//add to xml node related to the service
 			ofile << "\t<Service id=\""<<node->id<<"\" type=\""<<node->type
 					<< "\" statusCalcRule=\""<<node->status_crule<< "\" statusPropRule=\""<<node->status_prule<< "\">"<< endl
 					<< "\t\t<Name>"<<node->name<<"</Name>"<<endl
@@ -479,14 +470,6 @@ void SvCreator::saveInFile(const QString& _filename)
 					<< "\t\t<NotificationMsg>"<<node->notification_msg<<"</NotificationMsg>" << endl
 					<< "\t\t<SubServices>"<<node->child_nodes<<"</SubServices>" << endl
 					<< "\t</Service>"<<endl;
-			//						if(node->type == NodeType::ALARM_NODE){
-			//							ofile << "\t\t<Status>" <<  node->status << "</Status>" << endl ;
-			//						} else {
-			//
-			//							ofile << "\t\t<PropagationRule>" <<  node->propagation_rule << "</PropagationRule>" << endl ;
-			//						}
-			//
-			//ofile<< "\t</Service>"<< endl;
 		}
 
 		ofile << "</ServiceView>" << endl;
@@ -510,19 +493,17 @@ void SvCreator::resize()
 
 void SvCreator::loadMenu(void)
 {
-	QIcon disket_icon, folder_icon ;
-	disket_icon.addFile(":images/disket.png");
-	folder_icon.addFile(":images/folder.png");
-
 	subMenuList["NewNode"] = nodeContextMenu->addAction("&Add service") ;
 	subMenuList["DeleteNode"] = nodeContextMenu->addAction("&Delete") ;
 
 	menuList["MENU1"] = menuBar->addMenu(tr("&File")),
 			subMenuList["NewFile"] = menuList["MENU1"]->addAction("New &File"),
-			subMenuList["Open"] = menuList["MENU1"]->addAction(folder_icon, "&Open"),
-			subMenuList["Save"] = menuList["MENU1"]->addAction(disket_icon, "&Save"),
-			subMenuList["SaveAs"] = menuList["MENU1"]->addAction(disket_icon, "Save &As...") ,
-			menuList["MENU1"]->addSeparator(),
+			subMenuList["Open"] = menuList["MENU1"]->addAction(QIcon(":images/built-in/folder.png"), "&Open"),
+			subMenuList["Save"] = menuList["MENU1"]->addAction(QIcon(":images/built-in/disket.png"), "&Save"),
+			subMenuList["SaveAs"] = menuList["MENU1"]->addAction(QIcon(":images/built-in/disket.png"), "Save &As...") ;
+	menuList["MENU1"]->addSeparator(),
+			subMenuList["Import"] = menuList["MENU1"]->addAction(QIcon(":images/built-in/import.png"), "&Import Status File");
+	menuList["MENU1"]->addSeparator(),
 			subMenuList["Quit"] = menuList["MENU1"]->addAction("&Quit") ;
 	menuList["MENU2"] = menuBar->addMenu(tr("&Help")),
 			subMenuList["ShowOnlineResources"] = menuList["MENU2"]->addAction("Online &Resources"),
@@ -538,28 +519,29 @@ void SvCreator::loadMenu(void)
 
 	toolBar->addAction(subMenuList["Save"]) ;
 	toolBar->addAction(subMenuList["Open"]) ;
+	toolBar->addAction(subMenuList["Import"]) ;
 
-	setMenuBar( menuBar ) ;
-	addToolBar( toolBar ) ;
+	setMenuBar(menuBar) ;
+	addToolBar(toolBar) ;
 }
 
 void SvCreator::addEvents(void)
 {
-	connect( subMenuList["NewFile"], SIGNAL(triggered(bool)), this, SLOT( newBusinessView() ));
-	connect( subMenuList["NewNode"], SIGNAL(triggered(bool)), this, SLOT( newNode() ));
-	connect( subMenuList["DeleteNode"], SIGNAL(triggered(bool)), this, SLOT( deleteNode() ));
-	connect( subMenuList["Open"], SIGNAL(triggered(bool)), this, SLOT( open() ) );
-	connect( subMenuList["Save"], SIGNAL(triggered(bool)), this, SLOT( save() ) );
-	connect( subMenuList["SaveAs"], SIGNAL(triggered(bool)), this, SLOT( saveAs() ) );
-	connect( subMenuList["Quit"], SIGNAL(triggered(bool)), this, SLOT( close() ) );
-	connect( subMenuList["ShowAbout"], SIGNAL( triggered(bool) ), this, SLOT( handleShowAbout() ));
-	connect( subMenuList["ShowOnlineResources"], SIGNAL( triggered(bool) ), this, SLOT( handleShowOnlineResources() ));
-	connect( editor, SIGNAL(saveClicked()), this, SLOT(save()));
-	connect( editor, SIGNAL(closeClicked()), this, SLOT(close()));
-	connect( editor, SIGNAL(returnPressed()), this, SLOT(handleReturnPressed()));
-	connect( editor, SIGNAL(nodeTypeActivated(qint32)), this, SLOT(handleNodeTypeActivated(qint32)));
-	connect(navigationTree, SIGNAL(itemSelectionChanged()), this, SLOT(handleSelectedNodeChanged()) );
-	connect(navigationTree, SIGNAL(treeNodeMoved(QString)), this, SLOT(handleTreeNodeMoved(QString)));
-
+	connect( subMenuList["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newBusinessView()));
+	connect( subMenuList["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
+	connect( subMenuList["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
+	connect( subMenuList["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
+	connect( subMenuList["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
+	connect( subMenuList["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
+	connect( subMenuList["Import"],SIGNAL(triggered(bool)),this,SLOT(import()));
+	connect( subMenuList["Quit"],SIGNAL(triggered(bool)),this,SLOT(close()));
+	connect( subMenuList["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
+	connect( subMenuList["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
+	connect( editor,SIGNAL(saveClicked()),this,SLOT(save()));
+	connect( editor,SIGNAL(closeClicked()),this,SLOT(close()));
+	connect( editor,SIGNAL(returnPressed()),this,SLOT(handleReturnPressed()));
+	connect( editor,SIGNAL(nodeTypeActivated(qint32)),this,SLOT(handleNodeTypeActivated(qint32)));
+	connect(navigationTree,SIGNAL(itemSelectionChanged()),this,SLOT(handleSelectedNodeChanged()) );
+	connect(navigationTree,SIGNAL(treeNodeMoved(QString)),this,SLOT(handleTreeNodeMoved(QString)));
 }
 
