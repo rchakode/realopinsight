@@ -30,13 +30,12 @@ usage(){
   echo
   echo "Usage: `basename $0` [OPTION]"
   echo "OPTIONS"
-  echo "	-module=broker"
-  echo "	  Installs the broker module"
-  echo "	-module=ui"
-  echo "	  Installs the ui module"
-#  echo "	-d <install_dir>"
+  echo "	--module=<module>"
+  echo "	  --module=broker : Installs the broker module"
+  echo "	  --module=ui : Installs the ui module"
+#  echo "	--prefix=<install_dir>"
 #  echo "	  Sets the installation directory. Default is /usr"
-  echo "	-h"
+  echo "	--help or -h"
   echo "	  Shows this help"
 }
 
@@ -44,15 +43,15 @@ install_broker(){
   make clean 1>/dev/null
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
   
-  echo -n "Checking prerequises..." 
+  echo -n "DEGUG : Checking prerequises..." 
   ./configure --prefix=/usr 1>/dev/null
   echo done
   
-  echo -n "Compiling..."
+  echo -n "DEGUG : Compiling..."
   make -j${ncpu} 1>/dev/null
   echo done
   
-  echo -n "Installation..."
+  echo -n "DEGUG : Installation..."
   make install 1>/dev/null
   echo done
 }
@@ -66,74 +65,67 @@ checking_uipreq(){
   [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking c++ compiler => ${CXX:=`which g++`}... "
+  echo -n "DEGUG : Checking C++ compiler => ${CXX:=`which g++`}... "
   [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking graphviz's dot utility => ${DOT:=`which dot`}... "
+  echo -n "DEGUG : Checking Graphviz's dot utility => ${DOT:=`which dot`}... "
   [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
   echo "done"
 }
 
 install_default(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  make clean 1>/dev/null
-  
-  echo -n "Checking prerequises..." 
   qmake -config release ngrt4n.pro CONFIG+=config-default
-  echo done
-  
-  echo -n "Compiling..."
   make -j${ncpu} 1>/dev/null
-  echo done
-  
-  echo -n "Installation..."
   make install 1>/dev/null
-  echo done
 }
 
 install_editor(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  make clean 1>/dev/null
-
-  echo -n "Compiling..."
   qmake -config release ngrt4n.pro CONFIG+=config-editor
   make -j${ncpu} 1>/dev/null
-  echo done
-  
-  echo -n "Installation..."
   make install 1>/dev/null
-  echo done
 }
 
 install_oc(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  make clean 1>/dev/null
-
-  echo -n "Compiling..."
   qmake -config release ngrt4n.pro CONFIG+=config-oc
   make -j${ncpu} 1>/dev/null
-  echo done
-  
-  echo -n "Installation..."
   make install 1>/dev/null
-  echo done
 }
 
 install_ui() {
+  make clean 1>/dev/null
   checking_uipreq
+  
+  echo -n "DEGUG : Current component => Default..."
   install_default
+  echo done
+  
+  echo -n "DEGUG : Current component => Editor..."
   install_editor
+  echo done
+  
+  echo -n "DEGUG : Current component => Operator Console..."
   install_oc
+  echo done
+  echo "Installation completed"
 }
 
 [ `id -u` -ne 0 ] && echo "ERROR : the installation must be carried out as root" && exit 1 
 
 case $1 in
-  -module=broker) install_broker ;;
-  -module=ui) install_ui ;;
-  -h) usage; exit 0;;
-  *) echo "ERROR :: Bad usage" ; usage; exit 1 ;;
-esac
+  --module=broker) install_broker
+  	;;
+  --module=ui) install_ui 
+  	;;
+  --help|-h) usage
+  	;;
+  *) echo "ERROR :: Bad usage" ; 
+    usage; 
+    exit 1 
+    ;;
+esac 
 
 exit 0

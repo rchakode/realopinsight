@@ -49,7 +49,8 @@ QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_con
 
 
 ostringstream versionMsg(appName + " - UI Module, version " + packageVersion + ".\n"
-		"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
+		+"This program is part of the NGRT4N Software Suite.\n"
+		+"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
 		+"Visit "+ packageUrl + " for further information.") ;
 
 int main(int argc, char **argv)
@@ -88,23 +89,22 @@ int main(int argc, char **argv)
 			break ;
 
 		case 'v': {
-			qDebug() << QString::fromStdString(versionMsg.str()) << endl;
+			cout << usage.toStdString() ;
 			exit(0) ;
 		}
 
 		case 'h': {
-			qDebug() << usage ;
+			cout << usage.toStdString() ;
 			exit(0) ;
 		}
 
 		default:
-			qDebug() << usage ;
+			cout << "Syntax Error :: " << usage.toStdString() ;
 			exit (1) ;
 			break ;
 		}
 	}
-	qDebug() << "Launching..." << endl
-			<< QString::fromStdString(versionMsg.str()) << endl;
+	cout << "Launching..." << endl << versionMsg.str() << endl;
 	Auth authentification;
 	int userRole = authentification.exec() ;
 	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;

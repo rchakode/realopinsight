@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit
 TEMPLATE = app
-VERSION = 2.0
+VERSION = 2.0-beta1
 LIBS += -lzmq
 FORMS	  +=
 config-default{
