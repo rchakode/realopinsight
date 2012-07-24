@@ -36,7 +36,7 @@ void ngrt4n::initApp()
 	int ret = mkdir(ngrt4n::APP_HOME.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH ) ;
 
 	if(ret == -1 && errno != EEXIST) {
-		cerr << "Unable to set the application files" ;
+		cerr << "You need to set the authentication token first" ;
 	}
 }
 
@@ -46,5 +46,18 @@ void ngrt4n::checkUser() {
 		cerr << "The program must be run as root" << endl;
 		exit(1) ;
 	}
+}
+
+string ngrt4n::trim(const string& str, const string& enclosingChar)
+{
+	size_t first = str.find_first_not_of(enclosingChar);
+
+	if (first != string::npos) {
+		size_t last = str.find_last_not_of(enclosingChar);
+
+		return str.substr(first, last - first + 1);
+	}
+
+	return "";
 }
 

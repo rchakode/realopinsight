@@ -15,9 +15,12 @@ config-editor{
 SOURCES	+= src/client/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
-TARGET.path = /usr/bin
-TARGET.files = build/usr/bin/$${TARGET}
-DESTDIR = build/usr/bin
+dflag{
+TARGET.path=$$(INSTALL_PREFIX)/bin
+}else{
+TARGET.path=/usr/local/bin
+}
+TARGET.files = $${TARGET}
 MAN.path = /usr/share/man/man1
 MAN.files = doc/man/ngrt4n.1.gz
 INSTALLS += TARGET MAN
@@ -72,18 +75,12 @@ DISTFILES += README \
 			 NEWS \
 			 ChangeLog \
 			 AUTHORS \
-			 missing \
-			 depcomp \
-			 configure \
 			 install-sh \
-			 Makefile.am \
-			 Makefile.in \
-			 config.h.in \
-			 configure.ac \
 			 images/*.png \
 			 images/built-in/*.png \
 			 examples/{*.xml,*.dat} \
 			 src/client/ngrt4n-oc.cpp \
 			 src/client/ngrt4n-editor.cpp \
 			 src/server/ngrt4nd.cpp \
-			 doc/man/*.gz
+			 doc/man/*.gz \
+			 dm-1.0-beta1.tar.gz

@@ -37,15 +37,15 @@ const string packageUrl = PACKAGE_URL;
 QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
 		"Options: \n"
 		"	-c\n"
-		"	   Launches the configuration utility\n"
+		"	   Launch the configuration utility\n"
 		"	-v\n"
-		"	  Prints the version and license information.\n"
+		"	  Print the version and license information.\n"
 		"	-h \n"
-		"	   Prints this help" ;
+		"	   Print this help.\n" ;
 
 
-ostringstream versionMsg(appName + " Operator Console, version " + packageVersion + ".\n"
-		+"This program is part of the NGRT4N Software Suite.\n"
+ostringstream versionMsg(appName + " Operations Console, version " + packageVersion + ".\n"
+		+"This program is part of the NGRT4N Software.\n"
 		+"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
 		+"Visit "+ packageUrl + " for further information.") ;
 

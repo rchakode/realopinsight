@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([ngrt4nd], [1.0-beta1], [Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>], [ngrt4n-broker], [http://ngrt4n.com])
+AC_INIT([ngrt4nd], [1.0-beta1], [Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>], [dm], [http://ngrt4n.com])
 #AM_INIT_AUTOMAKE([ngrt4n-broker], [1.0])
 AM_INIT_AUTOMAKE
 

@@ -1,10 +1,28 @@
-NGRT4N, version 1.0.1
- - 10-05-2012 : Become open source under GPL3 License
-* 31-06-2012 Rodrigue Chakode
- - Distributed architecture
- - General relooking of user interfaces for better experience
- - Chart refined
- - event consolidation through status calculation rules
- - custom propagaration rules for event
- - authenfication mecanism
- - Don't longer require to create neither a group nor a user 
+#####################
+NGRT4N ChangeLog
+#####################
+
+2.0-beta1
+-------------
+ENHANCEMENTS
+ * Enabled a distributed architecture based on a messaging system
+   - Added a daemon module between Nagios and the UI Modules
+   - Changed authentication mechanism
+   - Removed requirements on X Forwarding
+   - Removed requirements for specific user and group
+ * Provided the editor utility and the operator console utility as separated programs  
+   - Kept backward compatibility support from the ngrt4n utility 
+   - Added a menu for importing the Nagios status.dat from the editor
+ * Added custom event propagation rules
+ * Optimized code and algorithms
+ * Improved user interfaces
+ * Refined chart
+
+1.0.1
+-------------
+ * Improved algorithms
+ * Add GPL License
+
+1.0
+-------------
+ * First release

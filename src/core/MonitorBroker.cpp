@@ -22,7 +22,7 @@
  */
 
 #include "core/MonitorBroker.hpp"
-#include <boost/algorithm/string.hpp>
+#include "core/ns.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
@@ -115,14 +115,11 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT
 
 			size_t pos = line.find("}") ; if( pos != string::npos ) break ;
 			pos = line.find("=") ; if(pos == string::npos) continue ;
-
-			string param = boost::trim_copy(line.substr(0, pos));
-			string value = boost::trim_copy(line.substr(pos+1, string::npos)) ;
-
+			string param = ngrt4n::trim(line.substr(0, pos));
+			string value = ngrt4n::trim(line.substr(pos+1, string::npos)) ;
 			if(param == "host_name") {
-				info.host =
-						info.id =
-								boost::trim_copy(line.substr(pos+1)) ;
+				info.host = info.id =
+						ngrt4n::trim(line.substr(pos+1)) ;
 			}
 			else if(param == "service_description") {
 				info.id += "/" + value ;

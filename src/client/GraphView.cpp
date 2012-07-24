@@ -466,7 +466,7 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 			break;
 		}
 
-		edge_it->edge->setPen( color );
+		edge_it->edge->setPen(color);
 	}
 }
 

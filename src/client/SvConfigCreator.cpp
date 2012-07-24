@@ -508,7 +508,7 @@ void SvCreator::loadMenu(void)
 	menuList["MENU2"] = menuBar->addMenu(tr("&Help")),
 			subMenuList["ShowOnlineResources"] = menuList["MENU2"]->addAction("Online &Resources"),
 			menuList["MENU2"]->addSeparator(),
-			subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()));
+			subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()).toUpper());
 
 	subMenuList["NewFile"]->setShortcut(QKeySequence::New) ;
 	subMenuList["Open"]->setShortcut(QKeySequence::Open) ;

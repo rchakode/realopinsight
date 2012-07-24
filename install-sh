@@ -1,28 +1,28 @@
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 13-05-2012												   #
-#																		   #
-# This file is part of NGRT4N (http://ngrt4n.com).						   #
-#																		   #
-# NGRT4N is free software: you can redistribute it and/or modify		   #
+# Last Update : 24-05-2012						   #
+#									   #
+# This file is part of NGRT4N (http://ngrt4n.com).			   #
+#									   #
+# NGRT4N is free software: you can redistribute it and/or modify	   #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
-# (at your option) any later version.									   #
-#																		   #
+# (at your option) any later version.					   #
+#									   #
 # NGRT4N is distributed in the hope that it will be useful,                #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of		   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of	   #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
-# GNU General Public License for more details.							   #
-#																		   #
-# You should have received a copy of the GNU General Public License		   #
-# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.		   #
-#--------------------------------------------------------------------------# 
+# GNU General Public License for more details.				   #
+#									   #
+# You should have received a copy of the GNU General Public License	   #
+# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.	   #
+#--------------------------------------------------------------------------#
 
 set -e
 
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
-#mkdir -p ${APP_PREFIX}/bin
+VERSION_BKR="1.0-beta1"
 
 # Print help
 #
@@ -30,30 +30,53 @@ usage(){
   echo
   echo "Usage: `basename $0` [OPTION]"
   echo "OPTIONS"
-  echo "	--module=<module>"
-  echo "	  --module=broker : Installs the broker module"
-  echo "	  --module=ui : Installs the ui module"
-#  echo "	--prefix=<install_dir>"
-#  echo "	  Sets the installation directory. Default is /usr"
-  echo "	--help or -h"
+  echo "	-m <daemon|ui|all>"
+  echo "	  daemon : Installs the daemon module."
+  echo "	  ui : Installs the ui module."
+  echo "	  all : Installs all the modules."
+  echo "	-d <install_dir>"
+  echo "	  Sets the installation directory,  default is /usr/local."
+  echo "	-h"
   echo "	  Shows this help"
 }
 
-install_broker(){
-  make clean 1>/dev/null
+prompt_copyright(){ 
+echo
+echo "Welcome to NGRT4N Software Suite."
+echo
+echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
+echo
+echo "Type 'y' to accept this license offer."
+echo "Type 'n' to decline this license offer."
+echo "Type 'r' to view this license offer."
+echo
+while true; do
+read -p "Do you accept the terms of the License ? y/N/r " rep
+  case $rep in
+	r) more COPYING ; echo ;;
+	y) break ;;
+	*) exit 0 ;; 
+  esac
+done
+}
+install_daemon(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
   
+  echo "==>Starting the installation of the Daemon Module..."  
   echo -n "DEGUG : Checking prerequises..." 
-  ./configure --prefix=/usr 1>/dev/null
+  tar zxf dm-${VERSION_BKR}.tar.gz && cd dm-${VERSION_BKR}
+  ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
   echo done
   
   echo -n "DEGUG : Compiling..."
-  make -j${ncpu} 1>/dev/null
+  make -Bj${ncpu} 1>>install.log
   echo done
   
   echo -n "DEGUG : Installation..."
-  make install 1>/dev/null
-  echo done
+  make install 1>>install.log
+  cd ..
+  echo "done" 
+  echo "==>Completed"
 }
 
 checking_uipreq(){
@@ -76,29 +99,30 @@ checking_uipreq(){
 
 install_default(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  qmake -config release ngrt4n.pro CONFIG+=config-default
-  make -j${ncpu} 1>/dev/null
-  make install 1>/dev/null
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-default ${dflag}
+  make -Bj${ncpu} 1>>install.log
+  make install 1>>install.log
 }
 
 install_editor(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  qmake -config release ngrt4n.pro CONFIG+=config-editor
-  make -j${ncpu} 1>/dev/null
-  make install 1>/dev/null
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-editor ${dflag}
+  make -j${ncpu} 1>>install.log
+  make install 1>>install.log
 }
 
 install_oc(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  qmake -config release ngrt4n.pro CONFIG+=config-oc
-  make -j${ncpu} 1>/dev/null
-  make install 1>/dev/null
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-oc ${dflag}
+  make -j${ncpu} 1>>install.log
+  make install 1>>install.log
 }
 
 install_ui() {
-  make clean 1>/dev/null
+  echo "==>Starting the installation of the UI Module..."  
   checking_uipreq
-  
+  echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
+#  install -d ${INSTALL_PREFIX}/bin
   echo -n "DEGUG : Current component => Default..."
   install_default
   echo done
@@ -110,22 +134,48 @@ install_ui() {
   echo -n "DEGUG : Current component => Operator Console..."
   install_oc
   echo done
-  echo "Installation completed"
+  echo "==>Completed"
 }
 
-[ `id -u` -ne 0 ] && echo "ERROR : the installation must be carried out as root" && exit 1 
+mflag=
+flag=
+while getopts m:d:h name ; do
+  case $name in
+    m) mflag=1
+       module="$OPTARG" ;;
+    d) dflag=1
+       install_prefix="$OPTARG";;
+    h) usage 
+       exit 0;;       
+    ?) usage
+     exit 1;;
+  esac
+done
 
-case $1 in
-  --module=broker) install_broker
-  	;;
-  --module=ui) install_ui 
-  	;;
-  --help|-h) usage
-  	;;
-  *) echo "ERROR :: Bad usage" ; 
-    usage; 
-    exit 1 
-    ;;
+[ `id -u` -ne 0 ] && echo "ERROR : the installation requires root privileges" && exit 1 
+
+prompt_copyright
+
+if [ -z ${install_prefix} ] ; then
+  export INSTALL_PREFIX=/usr/local
+else
+  case ${install_prefix} in
+  /*) export INSTALL_PREFIX=${install_prefix}
+      export dflag="CONFIG+=dflag"
+     ;;
+  *) echo "This is not an absolute path : ${install_prefix}"
+     exit 2 ;;
+ esac
+fi
+
+case ${module} in
+  daemon|ui) install_${module} 
+     ;;
+  all) install_daemon
+  	   install_ui
+     ;;     
+  *)echo "Unknown module : ${module}" ; 
+     exit 2;;
 esac 
 
 exit 0

@@ -40,6 +40,7 @@ void initApp() ;
 void checkUser() ;
 void setPassChain(char* authChain) ;
 string getPassChain() ;
+string trim(const string& str, const string& enclosingChar=" \t");
 }
 
 #endif /* NS_HPP_ */

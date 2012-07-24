@@ -62,7 +62,7 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
   changePasswdWindow (new Preferences(_user_role, Preferences::ChangePassword )) ,
   msgPanel( new MsgPanel() )
 {
-	setWindowTitle(configFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Dashboard") ;
+	setWindowTitle(configFile + " - " + QString(ngrt4n::APP_NAME.c_str()).toUpper() + " | Operations Console") ;
 	loadMenus();
 
 	topRightPanel->addTab(graphView, "Dashboard") ;
@@ -295,14 +295,13 @@ int SvNavigator::monitor(void)
 
 				node_it->check = check ;
 				node_it->status = check.status ;
+				node_it->prop_status = check.status ;
 				updateAlarmMsg(node_it) ;
 				toolTip = getNodeToolTip(*node_it) ;
 
 				updateNavTreeItemStatus(node_it, toolTip) ;
 				graphView->updateNode(node_it, toolTip) ;
 				msgPanel->addMsg(node_it) ;
-
-				node_it->status = node_it->prop_status =  check.status ;
 				emit hasToBeUpdate( node_it->parent ) ;
 			}
 		}
@@ -635,7 +634,7 @@ void SvNavigator::loadMenus(void)
 	menuList["MENU4"] = menuBar->addMenu("&Help"),
 			subMenuList["ShowOnlineResources"] = menuList["MENU4"]->addAction("Online &Resources"),
 			menuList["MENU4"]->addSeparator(),
-			subMenuList["ShowAbout"] = menuList["MENU4"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()));
+			subMenuList["ShowAbout"] = menuList["MENU4"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()).toUpper());
 
 	subMenuList["Capture"]->setShortcut(QKeySequence::Save) ;
 	subMenuList["Refresh"]->setShortcut(QKeySequence::Refresh) ;

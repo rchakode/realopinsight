@@ -48,19 +48,19 @@ ostringstream help(""
 		"\n"
 		"OPTIONS\n"
 		"	-c FILE\n"
-		"	 Specifies the path of the status file. Default is " + statusFile + ".\n"
+		"	 Specify the path of the status file. Default is " + statusFile + ".\n"
 		"	-D\n"
-		"	 Runs ngrt4nd in the foreground. \n"
-		"	-n\n"
-		"	 Sets the number of threads to start. Default is 1.\n"
+		"	 Run ngrt4nd in foreground mode. \n"
 		"	-p\n"
-		"	 Sets the port of listening. Default is 1983.\n"
+		"	 Set the port of listening. Default is 1983.\n"
 		"	-P\n"
-		"	 Changes the authentification passphrase.\n"
+		"	 Change the authentication token.\n"
+		"	-T\n"
+		"	 Print the authentication token.\n"
 		"	-v\n"
-		"	 Prints the version and license information.\n"
+		"	 Print the version and license information.\n"
 		"	-h\n"
-		"	 Prints this help.\n") ;
+		"	 Print this help.\n") ;
 
 void ngrt4n::setPassChain(char* authChain) {
 
@@ -74,7 +74,6 @@ void ngrt4n::setPassChain(char* authChain) {
 
 	ofpass << crypt(authChain, salt.c_str());
 	ofpass.close();
-	cout << "Password reseted"<< endl ;
 }
 
 string ngrt4n::getPassChain() {
@@ -96,13 +95,13 @@ string ngrt4n::getPassChain() {
 int main(int argc, char ** argv)
 {
 	ostringstream versionMsg;
-	versionMsg<<PACKAGE_TARNAME <<" ("<< PACKAGE_NAME <<")"<<", version "<<PACKAGE_VERSION<< "."<< endl
-			<<"This program is part of the NGRT4N Software Suite." << endl
+	versionMsg<< "NGRT4N Broker - " << PACKAGE_NAME <<" "<<PACKAGE_VERSION<< "."<< endl
+			<<"This program is part of the NGRT4N Software." << endl
 			<<"Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>" << "." << endl
 			<<"Visit "<<PACKAGE_URL<<" for further details."<< endl ;
 
 	bool foreground = false;
-	static const char *shotOpt="DPhvc:p:n:" ;
+	static const char *shotOpt="DTPhvc:p:n:" ;
 	int port = MonitorBroker::DEFAULT_PORT ;
 	char opt ;
 	while ((opt = getopt(argc, argv, shotOpt)) != -1) {
@@ -134,18 +133,21 @@ int main(int argc, char ** argv)
 			break;
 		}
 
-		case 'P': {		// force to remove existing semaphore
+		case 'P': {
 			ngrt4n::checkUser() ;
 			ngrt4n::initApp() ;
 
 			char* pass = getpass("Type the passphrase:");
-			char* rePass = getpass("Retype the passphrase:");
-
-			if( static_cast<string>(pass) != static_cast<string>(rePass) ) {
-				cerr << "ERROR : The two passphrases are different." << endl ;
-				exit(1) ;
-			}
 			ngrt4n::setPassChain(pass) ;
+			cout << ngrt4n::getPassChain() << endl ;
+
+			exit(0) ;
+		}
+
+		case 'T': {
+			ngrt4n::checkUser() ;
+			cout << ngrt4n::getPassChain() << endl ;
+
 			exit(0) ;
 		}
 
