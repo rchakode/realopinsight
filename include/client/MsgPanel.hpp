@@ -34,7 +34,7 @@ class MsgPanel : public QTableWidget
 public:
 
 	MsgPanel(QWidget * parent = 0 );
-	virtual ~MsgPanel() {};
+    virtual ~MsgPanel() {}
 
 	static const qint16 msgPanelColumnCount;
 	void addMsg(const NodeListT::iterator &);

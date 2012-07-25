@@ -26,90 +26,96 @@
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
 #include <sstream>
+#include <getopt.h>
+
+QString cmdName = "" ;
+QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
+        "Options: \n"
+        "	-c\n"
+        "	   Launch the configuration utility\n"
+        "	-v\n"
+        "	  Print the version and license information.\n"
+        "	-h \n"
+        "	   Print this help.\n" ;
 
 
-const string appName = APPLICATION_NAME ;
-const string releaseYear = RELEASE_YEAR;
-const string packageName = PACKAGE_NAME ;
-const string packageVersion = PACKAGE_VERSION;
-const string packageUrl = PACKAGE_URL;
-
-QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
-		"Options: \n"
-		"	-c\n"
-		"	   Launch the configuration utility\n"
-		"	-v\n"
-		"	  Print the version and license information.\n"
-		"	-h \n"
-		"	   Print this help.\n" ;
-
-
-ostringstream versionMsg(appName + " Operations Console, version " + packageVersion + ".\n"
-		+"This program is part of the NGRT4N Software.\n"
-		+"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
-		+"Visit "+ packageUrl + " for further information.") ;
+ostringstream versionMsg(appName.toStdString() + " Operations Console, Version " + packageVersion.toStdString() + ".\n\n"
+		+"Copyright (c) 2010-"+releaseYear.toStdString()+", NGRT4N Project <contact@ngrt4n.com>.\n"
+		+"All rights reserved. Visit "+packageUrl.toStdString()+" for further information.");
 
 int main(int argc, char **argv)
 {
-	QApplication* app = new QApplication(argc, argv) ;
-	QIcon app_icon (":images/built-in/icon.png") ;
-	app->setWindowIcon( app_icon ) ;
-	app->setApplicationName(  QString(appName.c_str()) ) ;
-	app->setStyleSheet(Preferences::style());
+    QApplication* app = new QApplication(argc, argv) ;
+    app->setWindowIcon(QIcon (":images/built-in/icon.png")) ;
+    app->setApplicationName(appName) ;
+    app->setStyleSheet(Preferences::style());
+    cmdName=argv[0];
 
-	if(argc > 3) {
-		qDebug() << usage ;
-		exit (1) ;
-	}
-	ngrt4n::initApp() ;
-	bool config = false ;
-	QString file = argv[1] ;
-	int opt ;
+    if(argc > 3) {
+        qDebug() << usage ;
+        exit (1) ;
+    }
 
-	if ( (opt = getopt(argc, argv, "chv") ) != -1) {
-		switch (opt) {
-		case 'c':
-			config = true ;
-			break ;
+    bool config = false ;
+    QString file = argv[1] ;
+    int opt ;
 
-		case 'v': {
-			cout << versionMsg.str() << endl;
-			exit(0) ;
-		}
+    if ( (opt = getopt(argc, argv, "chv") ) != -1) {
+        switch (opt) {
+        case 'c':
+            config = true ;
+            break ;
 
-		case 'h': {
-			cout << usage.toStdString() ;
-			exit(0) ;
-		}
+        case 'v': {
+            cout << versionMsg.str() << endl;
+            exit(0) ;
+        }
 
-		default:
-			cout << "Syntax Error :: " << usage.toStdString() ;
-			exit (1) ;
-			break ;
-		}
-	}
-	cout << "Launching..." << endl << versionMsg.str() << endl;
-	Auth authentification;
-	int userRole = authentification.exec() ;
-	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
+        case 'h': {
+            cout << usage.toStdString() ;
+            exit(0) ;
+        }
 
-	if( config ) {
-		Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings) ;
-		Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword) ;
-		update_settings->exec() ;
-		change_passwd->exec() ;
-		exit(0) ;
-	}
+        default:
+            cout << "Syntax Error :: " << usage.toStdString() ;
+            exit (1) ;
+            break ;
+        }
+    }
+	cout <<"Launching "<<versionMsg.str()<<endl;
+    Auth authentication;
+    int userRole = authentication.exec() ;
+    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit(1) ;
 
-	if(file == "") {
-		qDebug() << "invalid file !" ;
-		QMessageBox::warning(0,
-				"Error | " + QString(packageName.c_str()),
-				" :: You need to specify a configuration file !!",
-				QMessageBox::Ok);
-		exit (1) ;
-	}
-	SvNavigator *monitor= new SvNavigator(userRole, file) ; monitor->startMonitor() ;
+    if( config ) {
+        Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings) ;
+        Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword) ;
+        update_settings->exec() ;
+        change_passwd->exec() ;
+        exit(0) ;
+    }
 
-	return app->exec() ;
+    QSplashScreen* info = Preferences::infoScreen("Welcome to "+QString::fromStdString(versionMsg.str()));
+    sleep(2);
+    if(file == "") {
+        info->clearMessage();
+        info->showMessage("You need to select a configuration file!", Qt::AlignCenter|Qt::AlignCenter);
+        sleep(1); info->finish(0);
+        file = QFileDialog::getOpenFileName(0,
+                                            appName.toUpper()+" :: Select a configuration file",
+                                            ".",
+                                            "Xml files (*.xml);;All files (*)");
+
+        if(! file.length()){
+            QMessageBox::critical(0,
+                                  appName.toUpper() + " :: Info",
+                                  "No configuration file has been selected and the program will exit.",
+                                  QMessageBox::Ok);
+            exit (1) ;
+        }
+    }
+    info->finish(0);
+    SvNavigator *monitor= new SvNavigator(userRole, file) ; monitor->startMonitor() ;
+
+    return app->exec() ;
 }

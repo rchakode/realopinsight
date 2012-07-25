@@ -211,7 +211,7 @@ int main(int argc, char ** argv)
 		char* _sid = strtok(NULL, ":") ;
 		string sid = (_sid == NULL) ? "" : _sid ;
 
-		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentification" ;
+		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentication" ;
 		msize = result.size() ;
 		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
 		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;

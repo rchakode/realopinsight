@@ -32,7 +32,7 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include <zmq.hpp>
+#include "zmq.hpp"
 
 using namespace std;
 

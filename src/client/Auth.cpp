@@ -26,11 +26,6 @@
 #include "Preferences.hpp"
 #include "ns.hpp"
 
-const QString appName = APPLICATION_NAME ;
-const QString packageVersion = PACKAGE_VERSION;
-const QString packageName = PACKAGE_NAME ;
-const QString releaseYear = RELEASE_YEAR;
-
 const QString Auth::ADM_USER_NAME = appName.toLower() + "_adm" ;
 const QString Auth::OP_USER_NAME = appName.toLower()+ "_op" ;
 const qint32 Auth::ADM_USER_ROLE = 100 ;
@@ -63,7 +58,7 @@ Auth::Auth()
 	line++;
 	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
 
-	line++; QString copying = QString("Copyright (c) 2010-"+releaseYear +", NGRT4N Project <contact@ngrt4n.com>");
+	line++; QString copying = QString("Copyright (c) 2010-"+releaseYear +", NGRT4N Project <"+packageUrl+">. All rights reserved.\n");
 	layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft) ;
 
 	addEvents();
@@ -101,7 +96,7 @@ void Auth::authentificate(void)
 		done(OP_USER_ROLE);
 	} else {
 		QMessageBox::warning(this,
-				QString(ngrt4n::APP_NAME.c_str()),
+                appName.toUpper(),
 				tr("Authentifcation failed. Wrong username or password"),
 				QMessageBox::Ok) ;
 	}

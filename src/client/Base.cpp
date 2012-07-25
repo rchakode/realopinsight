@@ -34,7 +34,7 @@ void Struct::clear(void)
 	node_list.clear() ;
 }
 
-Settings::Settings(): QSettings(QString(ngrt4n::SETTINGS_FILE.c_str()), QSettings::NativeFormat )
+Settings::Settings(): QSettings(appName.toLower(), packageName.toLower().replace(" ", "-"))
 {
 	Q_INIT_RESOURCE(ngrt4n);
 

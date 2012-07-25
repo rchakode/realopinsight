@@ -38,5 +38,6 @@
         <file>images/db.png</file>
         <file>images/business-process.png</file>
         <file>images/web.png</file>
+        <file>images/built-in/loading-screen.png</file>
     </qresource>
 </RCC>
