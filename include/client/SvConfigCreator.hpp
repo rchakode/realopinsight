@@ -62,6 +62,7 @@ public slots:
 	void handleNodeTypeActivated(qint32) ;
 	void handleShowOnlineResources(void) ;
 	void handleShowAbout(void) ;
+	void import(void);
 
 
 protected:

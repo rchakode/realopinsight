@@ -31,6 +31,12 @@
 #include <bitset>
 #include "core/MonitorBroker.hpp"
 
+const QString appName=APPLICATION_NAME ;
+const QString packageName=PACKAGE_NAME;
+const QString packageVersion=PACKAGE_VERSION;
+const QString packageUrl=PACKAGE_URL;
+const QString releaseYear=RELEASE_YEAR;
+
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
@@ -91,7 +97,7 @@ class NodeType {
 public :
 	enum {
 		SERVICE_NODE = 0,
-		ALARM_NODE = 1,
+        ALARM_NODE = 1
 	} ;
 	static QString toString(int _type ) {
 
@@ -107,8 +113,8 @@ class Status{
 
 public:
 
-	Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {} ;
-	MonitorBroker::StatusT getValue() const{return value ;} ;
+    Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {}
+    MonitorBroker::StatusT getValue() const{return value ;}
 
 	Status operator *(Status& st) const {
 		switch(value) {

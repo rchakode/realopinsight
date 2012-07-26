@@ -1,8 +1,8 @@
 /*
- * ngrt4nd.cpp
+ * ngrt4nd-mt.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -36,8 +36,13 @@
 
 using namespace std;
 
+
+pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
+int numWorkers = 1 ;
+
 string statusFile = "/usr/local/nagios/var/status.dat" ;
-string authChain = "" ;
+string authChain = "" ; // Suitably set later
 string packageName = PACKAGE_NAME ;
 
 ostringstream help(""
@@ -46,19 +51,19 @@ ostringstream help(""
 		"\n"
 		"OPTIONS\n"
 		"	-c FILE\n"
-		"	 Specify the path of the status file. Default is " + statusFile + ".\n"
+		"	 Specifies the path of the status file. Default is " + statusFile + ".\n"
 		"	-D\n"
-		"	 Run ngrt4nd in foreground mode. \n"
+		"	 Runs ngrt4nd in the foreground. \n"
+		"	-n\n"
+		"	 Sets the number of threads to start. Default is 1.\n"
 		"	-p\n"
-		"	 Set the port of listening. Default is 1983.\n"
+		"	 Sets the port of listening. Default is 1983.\n"
 		"	-P\n"
-		"	 Change the authentication token.\n"
-		"	-T\n"
-		"	 Print the authentication token.\n"
+		"	 Changes the authentification passphrase.\n"
 		"	-v\n"
-		"	 Print the version and license information.\n"
+		"	 Prints the version and license information.\n"
 		"	-h\n"
-		"	 Print this help.\n") ;
+		"	 Prints this help.\n") ;
 
 void ngrt4n::setPassChain(char* authChain) {
 
@@ -66,12 +71,13 @@ void ngrt4n::setPassChain(char* authChain) {
 
 	ofpass.open( ngrt4n::AUTH_FILE.c_str() );
 	if( ! ofpass.good()) {
-		cerr << "Unable to set the password :  perhaps the application's settings file is not well configured." << endl;
+		cerr << "Unable to set the password:  perhaps the application's settings file is not well configured." << endl;
 		exit(1) ;
 	}
 
 	ofpass << crypt(authChain, salt.c_str());
 	ofpass.close();
+	cout << "Password reseted"<< endl ;
 }
 
 string ngrt4n::getPassChain() {
@@ -90,6 +96,42 @@ string ngrt4n::getPassChain() {
 	return authChain ;
 }
 
+
+void *worker_routine (void *arg)
+{
+	zmq::context_t *ctx = (zmq::context_t*) arg;
+	zmq::socket_t comChannel (*ctx, ZMQ_REP);
+	comChannel.connect ("inproc://ngrt4ndwkrs");
+
+	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
+	while (true) {
+		zmq::message_t request;
+		request.rebuild() ;
+		comChannel.recv(&request) ;
+		size_t msize = request.size() ;
+
+		char* msg = (char*)malloc(msize * sizeof(char)) ;
+		memcpy(msg, request.data(), msize) ;
+
+		char* _pass = strtok(msg, ":") ;
+		string pass = (_pass == NULL) ? "" : _pass ;
+		char* _sid = strtok(NULL, ":") ;
+		string sid = (_sid == NULL) ? "" : _sid ;
+
+		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentification" ;
+		msize = result.size() ;
+		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
+		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;
+		memcpy(reply.data(), result.c_str(), msize);
+		comChannel.send(reply);
+
+		free(msg) ;
+	}
+
+	comChannel.close() ;
+	return NULL ;
+}
+
 int main(int argc, char ** argv)
 {
 	ostringstream versionMsg;
@@ -98,7 +140,7 @@ int main(int argc, char ** argv)
 			<< "All rights reserved. Visit "<< PACKAGE_URL<< " for further information.";
 
 	bool foreground = false;
-	static const char *shotOpt="DTPhvc:p:" ;
+	static const char *shotOpt="DPhvc:p:n:" ;
 	int port = MonitorBroker::DEFAULT_PORT ;
 	char opt ;
 	while ((opt = getopt(argc, argv, shotOpt)) != -1) {
@@ -115,7 +157,16 @@ int main(int argc, char ** argv)
 		case 'p': {
 			port = atoi(optarg) ;
 			if(port <= 0 ) {
-				cerr << "ERROR : Bad port number." << endl ;
+				cerr << "ERROR: Bad port number." << endl ;
+				exit(1) ;
+			}
+			break;
+		}
+
+		case 'n': {
+			numWorkers = atoi(optarg) ;
+			if(numWorkers <= 0 ) {
+				cerr << "ERROR: Bad number of instances." << endl ;
 				exit(1) ;
 			}
 			break;
@@ -124,18 +175,9 @@ int main(int argc, char ** argv)
 		case 'P': {
 			ngrt4n::checkUser() ;
 			ngrt4n::initApp() ;
-
 			char* pass = getpass("Type the passphrase:");
 			ngrt4n::setPassChain(pass) ;
 			cout << ngrt4n::getPassChain() << endl ;
-
-			exit(0) ;
-		}
-
-		case 'T': {
-			ngrt4n::checkUser() ;
-			cout << ngrt4n::getPassChain() << endl ;
-
 			exit(0) ;
 		}
 
@@ -149,7 +191,7 @@ int main(int argc, char ** argv)
 			exit(0) ;
 		}
 		default: {
-			cerr << "Unknown option : " << opt << endl;
+			cerr << "Unknown option: " << opt << endl;
 			cout << help.str() << endl ;
 			exit(0) ;
 		}
@@ -180,35 +222,19 @@ int main(int argc, char ** argv)
 	cout << "Nagios status file => " << statusFile << endl ;
 
 	zmq::context_t ctx(1);
-	zmq::socket_t comChannel(ctx, ZMQ_REP);
-	comChannel.bind(tcpAddr.str().c_str());
+	zmq::socket_t workersComChannel(ctx, ZMQ_XREQ);
+	workersComChannel.bind("inproc://ngrt4ndwkrs");
 
-	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
-	while (true) {
-		zmq::message_t request;
-		request.rebuild() ;
-		comChannel.recv(&request) ;
-		size_t msize = request.size() ;
+	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
+	clientsComChannel.bind(tcpAddr.str().c_str());
 
-		char* msg = (char*)malloc(msize * sizeof(char)) ;
-		memcpy(msg, request.data(), msize) ;
-
-		char* _pass = strtok(msg, ":") ;
-		string pass = (_pass == NULL) ? "" : _pass ;
-		char* _sid = strtok(NULL, ":") ;
-		string sid = (_sid == NULL) ? "" : _sid ;
-
-		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentication" ;
-		msize = result.size() ;
-		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
-		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;
-		memcpy(reply.data(), result.c_str(), msize);
-		comChannel.send(reply);
-
-		free(msg) ;
+	for (int i = 0; i < numWorkers; i++) {
+		pthread_t worker;
+		int rc = pthread_create (&worker, NULL, worker_routine, (void*) &ctx);
+		assert (rc == 0);
 	}
 
-	comChannel.close() ;
+	zmq::device (ZMQ_QUEUE, clientsComChannel, workersComChannel);
 
 	return 0;
 }

@@ -32,8 +32,19 @@ When monitoring in large NOC or data center, it is important that IT organizatio
 In order to build relevant hierarchical views, you need to identify the main business process or end-user service along with business processes that will comprise it. Then, you have to link the business processes among them within a hierarchy. Finally, at the bottom level business processes should be related to operating systems, applications, devices, etc. An example of such an organization is illustrated on the figure below. 
 In the hierarchy, we differentiate two kinds of nodes according to their relation with native monitoring data collected by the monitoring engine:
 \begin{itemize}
- \item {\bf Native Check (NC)}: Such nodes are directly linked to a basis check (process check, load check, http check, etc), and are located at bottom of the hierarchy (sheet nodes).
- \item {\bf Business Process (BP):} This kind of nodes consists of structural nodes that you or your administrator can define in order to meet monitoring requirements. They consist of high level systems (e.g. operating system, device, application tier, etc.), business processes (e.g. notification, authentication, smtp, etc.), services provided to end-users (hosting, download, SMS, MMS, etc.) and so forth. Located at a higher level than native-check nodes within the hierarchy, they can have one of more child items which can be both native-check or business-process nodes. {\bf IMPORTANT:} All the sheet nodes of a hierarchy have to be native checks in order to ensure the consistency of the related monitoring view.   
+ \item {\bf Native Check}: Such nodes are directly linked to a basis check
+(process check, load check, http check, etc), and are located at bottom of the
+hierarchy (sheet nodes).
+ \item {\bf Business Process:} This kind of nodes consists of structural nodes
+that you or your administrator can define in order to meet monitoring
+requirements. They consist of high level systems (e.g. operating system, device,
+application tier, etc.), business processes (e.g. notification, authentication,
+smtp, etc.), services provided to end-users (hosting, download, SMS, MMS, etc.)
+and so forth. Located at a higher level than native-check nodes within the
+hierarchy, they can have one of more child items which can be both native-check
+or business-process nodes. {\bf IMPORTANT:} All the sheet nodes of a hierarchy
+have to be native checks in order to ensure the consistency of the related
+monitoring view.   
 \end{itemize}
 %The items retrieve to monitoring database are located on the bottom of the hierarchy and can not have any sub-item. Other items located in a higher level in the hierarchy are business process, application service, service provided to end-users, etc. %Their statuses are updated according to the status of the status data collected by the monitoring engine. 
 \begin{figure}

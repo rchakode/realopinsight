@@ -2,7 +2,7 @@
  * Auth.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -25,10 +25,6 @@
 #include "Auth.hpp"
 #include "Preferences.hpp"
 #include "ns.hpp"
-
-const QString appName = APPLICATION_NAME ;
-const QString packageVersion = PACKAGE_VERSION;
-const QString packageName = PACKAGE_NAME ;
 
 const QString Auth::ADM_USER_NAME = appName.toLower() + "_adm" ;
 const QString Auth::OP_USER_NAME = appName.toLower()+ "_op" ;
@@ -62,8 +58,8 @@ Auth::Auth()
 	line++;
 	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
 
-	line++;
-	layout->addWidget(new QLabel("Copyright (c) 2010-2012, Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>"), line, 0, 1, 3, Qt::AlignLeft) ;
+	line++; QString copying = QString("\nCopyright (c) 2010-"+releaseYear +", NGRT4N Project<"+packageUrl+">. All rights reserved.");
+	layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft) ;
 
 	addEvents();
 }
@@ -100,7 +96,7 @@ void Auth::authentificate(void)
 		done(OP_USER_ROLE);
 	} else {
 		QMessageBox::warning(this,
-				QString(ngrt4n::APP_NAME.c_str()),
+                appName.toUpper(),
 				tr("Authentifcation failed. Wrong username or password"),
 				QMessageBox::Ok) ;
 	}

@@ -2,7 +2,7 @@
  * GraphView.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -466,7 +466,7 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 			break;
 		}
 
-		edge_it->edge->setPen( color );
+		edge_it->edge->setPen(color);
 	}
 }
 
@@ -597,7 +597,7 @@ void GraphView::capture(void)
 	QPainter painter( &pixmap ) ;
 
 	file_name= QFileDialog::getSaveFileName(this,
-			"Select the image destination - " + QString(ngrt4n::APP_NAME.c_str()),
+            "Select the image destination - " + appName.toUpper(),
 			".",
 			tr("PNG files (*.png)"));
 	file_info.setFile(file_name) ;

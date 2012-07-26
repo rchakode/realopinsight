@@ -105,12 +105,10 @@ ServiceEditor::~ServiceEditor()
 
 }
 
-void ServiceEditor::loadStatusFile(void)
+void ServiceEditor::loadStatusFile(const QString & path)
 {
-	Parser parser ;
 	MonitorBroker::NagiosChecksT checks ;
-	//TODO
-	//parser.parseServiceStatus(settings->value(Preferences::STATUS_FILE_KEY).toString(), checks);
+    MonitorBroker::loadNagiosCollectedData(path.toStdString(), checks);
 	setCheckListField( checks );
 }
 
@@ -120,11 +118,9 @@ void ServiceEditor::setCheckListField(const MonitorBroker::NagiosChecksT& _nagio
 	QStringList check_id_list ;
 
 	checkField()->clear() ;
-	check_id_list.clear() ;
-	check_id_list.push_back("") ;
+	check_id_list.clear() ; check_id_list.push_back("") ;
 
-	for(check_it = _nagios_checks.begin(); check_it != _nagios_checks.end(); check_it++)
-	{
+	for(check_it = _nagios_checks.begin(); check_it != _nagios_checks.end(); check_it++) {
 		check_id_list.push_back( QString(check_it->second.id.c_str()) ) ;
 	}
 
@@ -167,17 +163,18 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 }
 
 
-bool ServiceEditor::updateNode(NodeListT::iterator & _node_it)
+bool ServiceEditor::updateNode(NodeListT::iterator & _node)
 {
-	_node_it->name = nameField()->text() ;
-	_node_it->type = typeField()->currentIndex();
-	_node_it->status_crule = statusCalcRuleField()->currentIndex();
-	_node_it->status_prule = statusPropRuleField()->currentIndex();
-	_node_it->icon = iconField()->currentText();
-	_node_it->description = descriptionField()->toPlainText();
-	_node_it->alarm_msg  = alarmMsgField()->toPlainText();
-	_node_it->notification_msg = notificationMsgField()->toPlainText();
-	if( _node_it->type == NodeType::ALARM_NODE ) _node_it->child_nodes =  checkField()->currentText() ;
+	_node->name = nameField()->text() ;
+	_node->type = typeField()->currentIndex();
+	_node->status_crule = statusCalcRuleField()->currentIndex();
+	_node->status_prule = statusPropRuleField()->currentIndex();
+	_node->icon = iconField()->currentText();
+	_node->description = descriptionField()->toPlainText();
+	_node->alarm_msg  = alarmMsgField()->toPlainText();
+	_node->notification_msg = notificationMsgField()->toPlainText();
+
+	if( _node->type == NodeType::ALARM_NODE ) _node->child_nodes =  checkField()->currentText() ;
 
 	return true;
 }
@@ -326,7 +323,7 @@ void ServiceEditor::loadCheckField(void)
 	layout->addWidget(editorItemsList["lowLevelAlarmsLabel"], currentLine, 0, 2, 1);
 	layout->addWidget(checkField(), currentLine, 1) , currentLine++ ;
 	checkField()->setEditable( true ) ;
-	loadStatusFile() ;
+//TODO	loadStatusFile() ;
 }
 
 void ServiceEditor::loadButtonBox(void)

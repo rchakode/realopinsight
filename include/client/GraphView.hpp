@@ -28,7 +28,6 @@
 #include "Stats.hpp"
 #include "SvNavigatorTree.hpp"
 
-
 class GraphView : public QGraphicsView
 {
 	Q_OBJECT

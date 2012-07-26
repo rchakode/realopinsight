@@ -171,7 +171,7 @@ void Parser::saveCoordinatesDotFile(const QString& _graph_content)
 {
 	QFile file;
 
-	graphFilename = "/tmp/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
+    graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
 	file.setFileName(graphFilename);
 	if(! file.open(QIODevice::WriteOnly)) {
 		qDebug() << "Unable to write the file " << graphFilename ;
