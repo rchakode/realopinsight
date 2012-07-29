@@ -35,7 +35,7 @@ Auth::Auth()
 : QDialog(),
   settings (new Settings())
 {
-	setWindowTitle( "Authentification - " + appName);
+	setWindowTitle( "Login - " + appName);
 	layout = new QGridLayout(this);
 
 	qint32 line = 0 ;
@@ -47,18 +47,18 @@ Auth::Auth()
 	layout->addWidget(new QLabel(QString("UI Module, Version "+packageVersion+".")), line, 0, 2, 1, Qt::AlignLeft) ;
 
 	line++;
-	layout->addWidget(new QLabel("Login"),line,1,Qt::AlignRight) ;
+	layout->addWidget(new QLabel("Login"), line, 1, Qt::AlignRight) ;
 	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignLeft);
 
 	line++;
-	layout->addWidget(new QLabel("Password"),line,1,Qt::AlignRight) ;
+	layout->addWidget(new QLabel("Password"), line, 1, Qt::AlignRight) ;
 	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignLeft);
 	password->setEchoMode(QLineEdit::Password);
 
 	line++;
 	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
 
-	line++; QString copying = QString("\nCopyright (c) 2010-"+releaseYear +", NGRT4N Project<"+packageUrl+">. All rights reserved.");
+	line++; QString copying = QString("\nCopyright (c) 2010-"+releaseYear +" NGRT4N Project. All rights reserved.");
 	layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft) ;
 
 	addEvents();
@@ -96,8 +96,8 @@ void Auth::authentificate(void)
 		done(OP_USER_ROLE);
 	} else {
 		QMessageBox::warning(this,
-                appName.toUpper(),
-				tr("Authentifcation failed. Wrong username or password"),
+				appName.toUpper(),
+				tr("Authentication failed: wrong username or password"),
 				QMessageBox::Ok) ;
 	}
 }

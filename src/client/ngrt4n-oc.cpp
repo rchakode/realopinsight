@@ -40,8 +40,8 @@ QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
 
 
 ostringstream versionMsg(appName.toStdString() + " Operations Console, Version " + packageVersion.toStdString() + ".\n\n"
-		+"Copyright (c) 2010-"+releaseYear.toStdString()+", NGRT4N Project <contact@ngrt4n.com>.\n"
-		+"All rights reserved. Visit "+packageUrl.toStdString()+" for further information.");
+		+"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
+		+"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
 
 int main(int argc, char **argv)
 {

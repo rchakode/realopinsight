@@ -137,7 +137,7 @@ int main(int argc, char ** argv)
 	ostringstream versionMsg;
 	versionMsg<< PACKAGE_NAME<< ", version " << PACKAGE_VERSION <<  ".\n\n"
 			<< "Copyright (c) 2010-2012, NGRT4N Project <contact@ngrt4n.com>.\n"
-			<< "All rights reserved. Visit "<< PACKAGE_URL<< " for further information.";
+			<< "All rights reserved. Visit "<< PACKAGE_URL<< " for more information.";
 
 	bool foreground = false;
 	static const char *shotOpt="DPhvc:p:n:" ;

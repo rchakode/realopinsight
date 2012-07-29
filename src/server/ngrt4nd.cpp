@@ -67,9 +67,9 @@ string help() {
 }
 
 string version(){
-	ostringstream versionMsg(progName + " (" + packageName + ") version " + packageVersion +  ".\n\n"
-	      + "Copyright (c) 2010-2012, NGRT4N Project <contact@ngrt4n.com>.\n"
-	      + "All rights reserved. Visit "+ packageUrl + " for further information.");
+	ostringstream versionMsg(progName + " (" + packageName + "), Version " + packageVersion +  ".\n"
+	      + "Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>.\n"
+	      + "All rights reserved. Visit "+ packageUrl + " for more information.");
 
 return versionMsg.str();
 }
@@ -185,13 +185,15 @@ int main(int argc, char ** argv)
 	ostringstream tcpAddr;
 	tcpAddr << "tcp://*:" << port ;
 
-	cout << "Starting "<< version() << endl ;
+	cout << "Starting "<< version() << endl << endl ;
 	cout << "Listening address => " << tcpAddr.str() << endl ;
 	cout << "Nagios status file => " << statusFile << endl ;
 
 	zmq::context_t ctx(1);
 	zmq::socket_t comChannel(ctx, ZMQ_REP);
 	comChannel.bind(tcpAddr.str().c_str());
+        
+	cout << "Service started." << endl ;
 
 	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
 	while (true) {

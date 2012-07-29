@@ -130,8 +130,8 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 	case Preferences::ShowAbout:
 		ostringstream about ;
 		about << appName.toUpper().toStdString()<<" ("<<packageName.toStdString()<<") Version "<< packageVersion.toStdString();
-		about << "\n\nCopyright (c) 2010-"<<releaseYear.toStdString()<<", NGRT4N Project <contact@ngrt4n.com>.";
-		about << "\nAll rights reserved. Visit "<<packageUrl.toStdString()<<" for further information.";
+		about << "\n\nCopyright (c) 2010-"<<releaseYear.toStdString()<<" NGRT4N Project <contact@ngrt4n.com>.";
+		about << "\nAll rights reserved. Visit "<<packageUrl.toStdString()<<" for more information.";
 		about << "\n\nReport Bugs : bugs@ngrt4n.com"<<endl;
 		line += 1 ,
 				layout->addWidget(new QLabel(QString(about.str().c_str())), line, 0) ;
