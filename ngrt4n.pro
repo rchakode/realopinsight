@@ -83,4 +83,4 @@ DISTFILES += README \
 			 src/client/ngrt4n-editor.cpp \
 			 src/server/ngrt4nd.cpp \
 			 doc/man/*.gz \
-			 dm-1.0-beta1.tar.gz
+			 dm-1.0.tar.gz
