@@ -1,19 +1,19 @@
-QT	+= core gui xml svg webkit
+QT	+= core gui xml svg webkit network script
 TEMPLATE = app
 VERSION = 2.0
 LIBS += -lzmq
-FORMS	  +=
+QMAKE_TARGET=row
 config-default{
 SOURCES	+= src/client/ngrt4n.cpp
-TARGET = ngrt4n
+TARGET = row-manager
 }
 config-oc{
 SOURCES	+= src/client/ngrt4n-oc.cpp
-TARGET = ngrt4n-oc
+TARGET = row-oc
 }
 config-editor{
 SOURCES	+= src/client/ngrt4n-editor.cpp
-TARGET = ngrt4n-editor
+TARGET = row-editor
 }
 dflag{
 TARGET.path=$$(INSTALL_PREFIX)/bin
@@ -22,13 +22,14 @@ TARGET.path=/usr/local/bin
 }
 TARGET.files = $${TARGET}
 MAN.path = /usr/share/man/man1
-MAN.files = doc/man/ngrt4n.1.gz
+MAN.files = doc/man/row-manager.1.gz
 INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc
-DEFINES += "APPLICATION_NAME='\"NGRT4N\"'"
+DEFINES += "BUILTIN_USER_PREFIX='\"row\"'"
+DEFINES += "APPLICATION_NAME='\"RealOpWatcher\"'"
 DEFINES += "PACKAGE_NAME='\"UI Module\"'"
 DEFINES += "PACKAGE_VERSION='\"$$VERSION\"'"
-DEFINES += "PACKAGE_URL='\"http://ngrt4n.com\"'"
+DEFINES += "PACKAGE_URL='\"http://realopwatcher.com\"'"
 DEFINES += "RELEASE_YEAR='\"2012\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR 	= build/moc
@@ -37,6 +38,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 INCLUDEPATH = include include/client include/core 
 HEADERS	+= include/core/ns.hpp \
 			 include/core/MonitorBroker.hpp \
+                         include/core/ZmqHelper.hpp \
 			 include/client/Auth.hpp \
 			 include/client/Base.hpp \
 			 include/client/GraphView.hpp \
@@ -51,9 +53,11 @@ HEADERS	+= include/core/ns.hpp \
 			 include/client/SvConfigCreator.hpp \
 			 include/client/SvNavigator.hpp \
 			 include/client/SvNavigatorTree.hpp \
-			 include/client/WebKit.hpp 			 
+			 include/client/WebKit.hpp \ 			 
+    include/client/JsonRpcHelper.hpp
 SOURCES	+= src/core/utils.cpp \
 			src/core/MonitorBroker.cpp \
+                        src/core/ZmqHelper.cpp \
 			src/client/Auth.cpp \
 			src/client/Base.cpp \
 			src/client/GraphView.cpp \
@@ -68,7 +72,8 @@ SOURCES	+= src/core/utils.cpp \
             src/client/SvConfigCreator.cpp \
             src/client/SvNavigator.cpp \
             src/client/SvNavigatorTree.cpp \
-            src/client/WebKit.cpp 
+            src/client/WebKit.cpp \ 
+    src/client/JsonRpcHelper.cpp
 DISTFILES += README \
 			 INSTALL \
 			 COPYING \

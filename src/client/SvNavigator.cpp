@@ -24,6 +24,7 @@
 
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
+#include "core/ZmqHelper.hpp"
 #include "core/ns.hpp"
 #include <sstream>
 
@@ -206,8 +207,6 @@ void SvNavigator::handleShowAbout(void)
 int SvNavigator::monitor(void)
 {
     NodeListT::iterator node_it ;
-    MonitorBroker::NagiosChecksT nagios_checks;
-    Parser config_parser;
     QStringList::const_iterator check_id_it, node_id_it ;
     QStringList child_nodes_list ;
     qint32 ok_count = 0 ;
@@ -217,12 +216,10 @@ int SvNavigator::monitor(void)
 
     //Initialize the communication channel with the broker module
     zmq::context_t comContext(1);
-    comChannel = new zmq::socket_t (comContext, ZMQ_REQ);
-    comChannel->connect(serverUrl.c_str());
-
+    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl);
     snavStruct->check_status_count.clear() ;
-    for(check_id_it = snavStruct->check_list.begin(); check_id_it != snavStruct->check_list.end(); check_id_it++) {
 
+    for(check_id_it = snavStruct->check_list.begin(); check_id_it != snavStruct->check_list.end(); check_id_it++) {
         node_it = snavStruct->node_list.find( (*check_id_it).trimmed() ) ;
         if( node_it == snavStruct->node_list.end()) continue ;
 
@@ -236,21 +233,12 @@ int SvNavigator::monitor(void)
         for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
 
             MonitorBroker::NagiosCheckT check ;
-            string sid = serverAuthChain + ":"+(*node_id_it).trimmed().toStdString() ; //TODO
 
-            zmq::message_t request(MonitorBroker::MAX_MSG);
-            memset(request.data(), 0, MonitorBroker::MAX_MSG) ;
-            memcpy(request.data(), sid.c_str(), sid.size());
-            comChannel->send(request) ;
-
-            zmq::message_t reply ;
-            comChannel->recv(&reply) ;
-            int msize = reply.size() ;
-            char* result = (char*)malloc(msize *  sizeof(char)) ;
-            memcpy(result, reply.data(), msize) ;
-
-            QRegExp sepRgx; QStringList sInfoVec ; sepRgx.setPattern("#");
-            sInfoVec = QString(result).split(sepRgx) ; free(result) ;
+            string msg = serverAuthChain + ":"+(*node_id_it).trimmed().toStdString() ; //TODO
+            ZmqHelper::sendFromSocket(*comChannel, msg) ;
+            msg = ZmqHelper::recvFromSocket(*comChannel) ;
+            QRegExp sepRgx("#");
+            QStringList sInfoVec = QString::fromStdString(msg).split(sepRgx);
 
             switch(sInfoVec.length())
             {

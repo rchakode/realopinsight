@@ -28,6 +28,10 @@
 #include <sstream>
 #include <getopt.h>
 
+
+#include "core/ZmqHelper.hpp"
+#include "client/JsonRpcHelper.hpp"
+
 QString cmdName = "" ;
 QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
 		"Options: \n"
@@ -59,6 +63,8 @@ int main(int argc, char **argv)
 		exit (1) ;
 	}
 
+ //   JsonRpcHelper jsonHelper ;
+ //   ZmqHelper::init() ;
 	QString module = "config" ;
 	QString file = argv[1] ;
 	int opt ;

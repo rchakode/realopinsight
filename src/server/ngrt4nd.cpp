@@ -24,6 +24,7 @@
 #include "config.h"
 #include "core/ns.hpp"
 #include "core/MonitorBroker.hpp"
+#include "core/ZmqHelper.hpp"
 #include <cassert>
 #include <stdexcept>
 #include <iostream>
@@ -190,37 +191,38 @@ int main(int argc, char ** argv)
 	cout << "Nagios status file => " << statusFile << endl ;
 
 	zmq::context_t ctx(1);
-	zmq::socket_t comChannel(ctx, ZMQ_REP);
-	comChannel.bind(tcpAddr.str().c_str());
+    zmq::socket_t* comChannel = new zmq::socket_t(ctx, ZMQ_REP);
+    comChannel->bind(tcpAddr.str().c_str());
         
 	cout << "Service started." << endl ;
 
 	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
-	while (true) {
-		zmq::message_t request;
-		request.rebuild() ;
-		comChannel.recv(&request) ;
-		size_t msize = request.size() ;
+    while (true) {
 
-		char* msg = (char*)malloc(msize * sizeof(char)) ;
-		memcpy(msg, request.data(), msize) ;
+        string msg = ZmqHelper::recvFromSocket(*comChannel) ;
+        string reply = "" ;
+        if(msg == "PING") {
+            reply = "ALIVE";
+        } else {
+            size_t pos = msg.find(":") ;
+            string pass = "";
+            string sid = "";
+            if(pos != string::npos) {
+                pass = msg.substr(0, pos);
+                sid = msg.substr(pos+1, string::npos);
+            }
+            if(pass == authChain) {
+                reply = monitor->getInfOfService(sid) ;
+            } else {
+                reply = "-2#Wrong authentication";
+            }
+        }
 
-		char* _pass = strtok(msg, ":") ;
-		string pass = (_pass == NULL) ? "" : _pass ;
-		char* _sid = strtok(NULL, ":") ;
-		string sid = (_sid == NULL) ? "" : _sid ;
-
-		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentication" ;
-		msize = result.size() ;
-		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
-		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;
-		memcpy(reply.data(), result.c_str(), msize);
-		comChannel.send(reply);
-
-		free(msg) ;
+        ZmqHelper::sendFromSocket(*comChannel, reply) ;
 	}
 
-	comChannel.close() ;
+    comChannel->close() ;
+    delete comChannel ;
 
 	return 0;
 }

@@ -26,8 +26,8 @@
 #include "Preferences.hpp"
 #include "ns.hpp"
 
-const QString Auth::ADM_USER_NAME = appName.toLower() + "_adm" ;
-const QString Auth::OP_USER_NAME = appName.toLower()+ "_op" ;
+const QString Auth::ADM_USER_NAME = userPfx.toLower() + "_adm" ;
+const QString Auth::OP_USER_NAME = userPfx.toLower()+ "_op" ;
 const qint32 Auth::ADM_USER_ROLE = 100 ;
 const qint32 Auth::OP_USER_ROLE = 101 ;
 
@@ -39,7 +39,7 @@ Auth::Auth()
 	layout = new QGridLayout(this);
 
 	qint32 line = 0 ;
-	QPixmap logo(":images/built-in/logo.png") ;
+	QPixmap logo(":images/built-in/logo-row.png") ;
 	QLabel* llogo =  new QLabel() ; llogo->setPixmap(logo) ;
 	layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft) ;
 
@@ -48,11 +48,11 @@ Auth::Auth()
 
 	line++;
 	layout->addWidget(new QLabel("Login"), line, 1, Qt::AlignRight) ;
-	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignLeft);
+	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignJustify);
 
 	line++;
 	layout->addWidget(new QLabel("Password"), line, 1, Qt::AlignRight) ;
-	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignLeft);
+	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignJustify);
 	password->setEchoMode(QLineEdit::Password);
 
 	line++;
