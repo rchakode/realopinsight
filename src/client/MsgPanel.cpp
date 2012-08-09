@@ -88,7 +88,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	i = 0 ;
 	row_count = rowCount();
-    setSortingEnabled( false ) ;
+//    setSortingEnabled(false) ;
 	while( i < row_count ) {
 		if ( item(i, id_column)->text() != _node_it->id ) {
 			i ++ ;
@@ -137,7 +137,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 	default:
 		break;
 	}
-	sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
+//	sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
 }
 
 void MsgPanel::resizeFields( const QSize & _window_size, const bool & _resize_window )

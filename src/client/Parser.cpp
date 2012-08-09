@@ -26,7 +26,6 @@
 #include "GraphView.hpp"
 
 const QString Parser::CHILD_NODES_SEP = "," ;
-
 const QString Parser::dotFileHeader = "strict graph   \n{\n//Nodes declaration\n\tnode[shape=plaintext]\n\n";
 const QString Parser::dotFileFooter = "}";
 
@@ -51,8 +50,7 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	QDomElement rootElt;
 	QDomNodeList xml_service_node_list;
 	QFile file(_sv_config_file);
-	NodeT node;
-	qint32 s, xml_service_node_count ;
+    NodeT node;
 
 	if ( ! file.open(QIODevice::ReadOnly) ) {
 		qDebug() << "Unable to open the file " << _sv_config_file ;
@@ -66,18 +64,12 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 	}
 
 	rootElt = sv_config_doc.documentElement();
-	xml_service_node_list = rootElt.elementsByTagName("Service");
+    xml_service_node_list = rootElt.elementsByTagName("Service");
 
-	//	node.id = _snav_struct.root_id = rootElt.attribute("id");
-	//	node.name = rootElt.firstChildElement("Name").text();
-	//	node.child_nodes = rootElt.firstChildElement("SubServices").text();
-	//
-	//	_snav_struct.node_list.insert(SvNavigatorTree::rootID, node);
-
-	xml_service_node_count = xml_service_node_list.length();
-	for (s = 0; s < xml_service_node_count; s++) {
+    qint32 serviceCount = xml_service_node_list.length();
+    for (qint32 srv = 0; srv < serviceCount; srv++) {
 		// get the service node information
-		QDomElement service = xml_service_node_list.item(s).toElement();
+        QDomElement service = xml_service_node_list.item(srv).toElement();
 		node.id = service.attribute("id").trimmed() ;
 		node.type = service.attribute("type").toInt() ;
 		node.status_crule = service.attribute("statusCalcRule").toInt() ;
@@ -112,18 +104,13 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & _snav_struc
 
 void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_content )
 {
-	QStringList node_ids_list ;
-	QStringList::iterator node_id_it ;
-	QString g_node_label ;
-
 	_graph_content = "\n//Edges delcaration\n" ;
 
-	for(NodeListT::iterator node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++) {
-		g_node_label = node_it->name ;
-		_graph_content = "\t" + node_it->id + "[label=\"" + g_node_label.replace(' ', '#') + "\"];\n" + _graph_content;
+    for(NodeListT::iterator node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++) {
+        _graph_content = "\t" + node_it->id + "[label=\"" + node_it->name.replace(' ', '#') + "\"];\n" + _graph_content;
 
 		if( node_it->child_nodes != "" ) {
-			node_ids_list = node_it->child_nodes.split(CHILD_NODES_SEP) ;
+            QStringList node_ids_list = node_it->child_nodes.split(CHILD_NODES_SEP) ;
 
 			for(QStringList::iterator node_id_it = node_ids_list.begin(); node_id_it != node_ids_list.end(); node_id_it ++) {
 				NodeListT::iterator child_node_it = _nodes_list.find( (*node_id_it).trimmed() );

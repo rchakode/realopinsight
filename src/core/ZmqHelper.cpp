@@ -10,8 +10,19 @@ ZmqHelper::ZmqHelper() {}
 
 zmq::socket_t * ZmqHelper::initCliChannel(zmq::context_t & context, const std::string & uri) {
 
-    pingSocket(context, uri) ;
-    return createCliSocket(context, uri);
+    zmq::socket_t * socket = NULL ;
+    if (pingSocket(context, uri)) {
+        socket = createCliSocket(context, uri);
+    }
+    return socket;
+}
+
+void
+ZmqHelper::endCliChannel(zmq::socket_t* & socket) {
+    if(socket) {
+        socket->close();
+        delete socket ;
+    }
 }
 
 zmq::socket_t * ZmqHelper::createCliSocket(zmq::context_t & context, const std::string & uri) {
@@ -44,7 +55,7 @@ ZmqHelper::recvFromSocket(zmq::socket_t & socket) {
 	return std::string(static_cast<char*>(message.data()), message.size());
 }
 
-void ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
+bool ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
 
     zmq::socket_t * client = createCliSocket(context, uri);
 
@@ -64,9 +75,9 @@ void ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
             if (items[0].revents & ZMQ_POLLIN) {
                 std::string reply = recvFromSocket(*client);
                 if(reply=="ALIVE") {
-                    std::cout << "I: connexion etablished" << std::endl;
+                    std::cout << "I: connection etablished" << std::endl;
                     delete client;
-                    return ;
+                    return true;
                 } else {
                     std::cout << "E: Unexpected response : " << reply << "" << std::endl;
                 }
@@ -75,11 +86,8 @@ void ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
                 if (--retriesLeft == 0) {
                     std::cout << "E: server seems to be offline, abandoning" << std::endl;
                     expectReply = false;
-
-                    exit(1);
                 }
                 else {
-                    std::cout << retriesLeft<<std::endl;
                     std::cout << "W: no response from server, retrying…" << std::endl;
                     delete client;
                     client = createCliSocket(context);
@@ -88,4 +96,6 @@ void ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
         }
     }
     delete client;
+
+    return false ;
 }

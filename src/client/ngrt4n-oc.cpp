@@ -95,7 +95,7 @@ int main(int argc, char **argv)
         exit(0) ;
     }
 
-    QSplashScreen* info = Preferences::infoScreen("Welcome to "+QString::fromStdString(versionMsg.str()));
+    QSplashScreen* info = Preferences::infoScreen(QString("Welcome to %1").arg(QString::fromStdString(versionMsg.str())));
     sleep(2);
     if(file == "") {
         info->clearMessage();

@@ -25,12 +25,13 @@ MAN.path = /usr/share/man/man1
 MAN.files = doc/man/row-manager.1.gz
 INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc
-DEFINES += "BUILTIN_USER_PREFIX='\"row\"'"
-DEFINES += "APPLICATION_NAME='\"RealOpWatcher\"'"
-DEFINES += "PACKAGE_NAME='\"UI Module\"'"
-DEFINES += "PACKAGE_VERSION='\"$$VERSION\"'"
-DEFINES += "PACKAGE_URL='\"http://realopwatcher.com\"'"
-DEFINES += "RELEASE_YEAR='\"2012\"'"
+DEFINES *= QT_USE_QSTRINGBUILDER
+DEFINES *= "BUILTIN_USER_PREFIX='\"row\"'"
+DEFINES *= "APPLICATION_NAME='\"RealOpWatcher\"'"
+DEFINES *= "PACKAGE_NAME='\"UI Module\"'"
+DEFINES *= "PACKAGE_VERSION='\"$$VERSION\"'"
+DEFINES *= "PACKAGE_URL='\"http://realopwatcher.com\"'"
+DEFINES *= "RELEASE_YEAR='\"2012\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR 	= build/moc
 RCC_DIR 	= build/rcc 
@@ -53,8 +54,8 @@ HEADERS	+= include/core/ns.hpp \
 			 include/client/SvConfigCreator.hpp \
 			 include/client/SvNavigator.hpp \
 			 include/client/SvNavigatorTree.hpp \
-			 include/client/WebKit.hpp \ 			 
-    include/client/JsonRpcHelper.hpp
+			 include/client/WebKit.hpp \  			 
+    include/client/ZabbixHelper.hpp
 SOURCES	+= src/core/utils.cpp \
 			src/core/MonitorBroker.cpp \
                         src/core/ZmqHelper.cpp \
@@ -72,8 +73,8 @@ SOURCES	+= src/core/utils.cpp \
             src/client/SvConfigCreator.cpp \
             src/client/SvNavigator.cpp \
             src/client/SvNavigatorTree.cpp \
-            src/client/WebKit.cpp \ 
-    src/client/JsonRpcHelper.cpp
+            src/client/WebKit.cpp \  
+    src/client/ZabbixHelper.cpp
 DISTFILES += README \
 			 INSTALL \
 			 COPYING \

@@ -11,10 +11,13 @@ public:
     static zmq::socket_t *
     initCliChannel(zmq::context_t & context, const std::string & uri="tcp://localhost:1983");
 
+    static void
+    endCliChannel(zmq::socket_t* & socket);
+
 	static zmq::socket_t *
     createCliSocket(zmq::context_t & context, const std::string & uri="tcp://localhost:1983");
 
-    static void
+    static bool
     pingSocket(zmq::context_t & context, const std::string & uri="tcp://localhost:1983");
 
 	static bool

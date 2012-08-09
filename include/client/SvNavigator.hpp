@@ -32,10 +32,10 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include "zmq.hpp"
+#include "core/ZmqHelper.hpp"
+#include "ZabbixHelper.hpp"
 
 using namespace std;
-
 
 class SvNavigator : public QMainWindow
 {
@@ -53,7 +53,8 @@ public:
 	static ComboBoxItemsT calcRules() ;
 
 public slots:
-	int monitor(void) ;
+    int runNagiosMonitor(void) ;
+    int runZabbixMonitor(void) ;
 	void updateNodeStatus( QString ) ;
 	void expandNode( const QString &, const bool &, const qint32 &) ;
 	void centerGraphOnNode( const QString & _node_id = "") ;
@@ -67,6 +68,7 @@ public slots:
 	void handleChangeMonitoringSettingsAction(void) ;
 	void handleShowOnlineResources(void) ;
 	void handleShowAbout(void) ;
+    void processZabbixReply(QNetworkReply* reply);
 
 
 signals:
@@ -81,7 +83,7 @@ protected :
 
 
 private:
-
+const static QString serverOfflineMsg;
 QString configFile ;
 QString openedFile ;
 QString webUIUrl ;
@@ -109,17 +111,22 @@ QSize msgPanelSize ;
 MenuListT menuList;
 SubMenuListT subMenuList;
 SubMenuListT contextMenuList;
+QString serverAddr ;
+QString serverPort ;
 string serverUrl ;
 string serverAuthChain ;
 zmq::socket_t* comChannel ;
+ZabbixHelper* zabbixHelper ;
+QString zabbixAuthToken ;
 
+
+void addEvents(void);
+void loadMenus(void);
+void unloadMenus(void);
 void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );
 QString getNodeToolTip(const NodeT & _node) ;
 void updateAlarmMsg(NodeListT::iterator &);
-void loadMenus(void);
-void unloadMenus(void);
-void addEvents(void);
-
+void openZabbixSession(void);
 };
 
 #endif /* SNAV_H_ */

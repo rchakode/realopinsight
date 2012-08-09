@@ -411,7 +411,7 @@ void GraphView::updateNodeColor(const NodeListT::iterator & _node)
 	if( edge_it != edgesList.end() ) edge_it->edge->setPen( color );
 }
 
-void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString & _tool_tip)
+void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString & _toolTip)
 {
 	QString n_label, html_n_label ;
 	GEdgeListT::iterator edge_it ;
@@ -441,8 +441,8 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
 	if (gnode_it != gnodesList.end() )	{
 
 		gnode_it->label->setHtml(html_n_label);
-		gnode_it->icon->setToolTip(_tool_tip);
-		gnode_it->label->setToolTip(_tool_tip);
+        gnode_it->icon->setToolTip(_toolTip);
+        gnode_it->label->setToolTip(_toolTip);
 
 		edge_it = edgesList.find( _node_it->parent + ":" + _node_it->id ) ;
 		if( edge_it == edgesList.end() ) return ;

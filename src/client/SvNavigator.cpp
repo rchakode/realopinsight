@@ -24,9 +24,11 @@
 
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
-#include "core/ZmqHelper.hpp"
 #include "core/ns.hpp"
 #include <sstream>
+
+
+const QString SvNavigator::serverOfflineMsg = "unable to reach the server";
 
 ComboBoxItemsT SvNavigator::propRules() {
     ComboBoxItemsT map;
@@ -44,23 +46,24 @@ ComboBoxItemsT SvNavigator::calcRules() {
 }
 
 SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_file, QWidget* parent)
-: QMainWindow(parent) ,
-  configFile(_config_file),
-  userRole (_user_role) , //TODO change implementation
-  settings ( new Settings()) ,
-  snavStruct ( new Struct()) ,
-  statsPanel ( new Stats( ) ) ,
-  filteredMsgPanel (NULL),
-  mainSplitter ( new QSplitter( this ) ) ,
-  rightSplitter ( new QSplitter() ) ,
-  topRightPanel ( new QTabWidget()) ,
-  bottomRightPanel ( new QTabWidget() ) ,
-  webBrowser ( new WebKit() ) ,
-  graphView ( new GraphView() ) ,
-  navigationTree ( new SvNavigatorTree() ) ,
-  monPrefWindow (new Preferences(_user_role, Preferences::ChangeMonitoringSettings)) ,
-  changePasswdWindow (new Preferences(_user_role, Preferences::ChangePassword )) ,
-  msgPanel( new MsgPanel() )
+    : QMainWindow(parent) ,
+      configFile(_config_file),
+      userRole (_user_role) , //TODO change implementation
+      settings ( new Settings()) ,
+      snavStruct ( new Struct()) ,
+      statsPanel ( new Stats( ) ) ,
+      filteredMsgPanel (NULL),
+      mainSplitter ( new QSplitter( this ) ) ,
+      rightSplitter ( new QSplitter() ) ,
+      topRightPanel ( new QTabWidget()) ,
+      bottomRightPanel ( new QTabWidget() ) ,
+      webBrowser ( new WebKit() ) ,
+      graphView ( new GraphView() ) ,
+      navigationTree ( new SvNavigatorTree() ) ,
+      monPrefWindow (new Preferences(_user_role, Preferences::ChangeMonitoringSettings)) ,
+      changePasswdWindow (new Preferences(_user_role, Preferences::ChangePassword )) ,
+      msgPanel( new MsgPanel() ),
+      zabbixHelper( new ZabbixHelper() )
 {
     setWindowTitle(configFile + " - " + appName.toUpper() + " :: Operations Console") ;
     loadMenus();
@@ -75,16 +78,36 @@ SvNavigator::SvNavigator( const qint32 & _user_role, const QString & _config_fil
     rightSplitter->setOrientation(Qt::Vertical) ;
     setCentralWidget(mainSplitter) ;
 
-    // Activate Qt's event handler on widget
-    addEvents();
-
-    // Get application settings
     webUIUrl = settings->value(Preferences::URL_KEY ).toString() ;
     serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString().toStdString() ;
-    serverUrl = "tcp://"
-            + settings->value(Preferences::SERVER_ADDR_KEY).toString().toStdString()
-            + ":"
-            + settings->value(Preferences::SERVER_PORT_KEY).toString().toStdString();
+    serverAddr = settings->value(Preferences::SERVER_ADDR_KEY).toString() ;
+    serverPort = settings->value(Preferences::SERVER_PORT_KEY).toString() ;
+    serverUrl = QString("tcp://%1:%2").arg(serverAddr).arg(serverPort).toStdString();
+    addEvents();
+}
+
+
+void SvNavigator::addEvents(void)
+{
+    connect(this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()) );
+    connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateNodeStatus(QString) ));
+    connect(subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT(capture() ));
+    connect(subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT(zoomIn() ) );
+    connect(subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT(zoomOut() ));
+    connect(subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart() ));
+    connect(subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(runNagiosMonitor()));
+    connect(subMenuList["ChangePassword"], SIGNAL(triggered(bool) ), this, SLOT(handleChangePasswordAction(void) ));
+    connect(subMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void) ));
+    connect(subMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
+    connect(subMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources() ));
+    connect(subMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit() ));
+    connect(contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool) ), this, SLOT(filterNodeRelatedMsg()) );
+    connect(contextMenuList["CenterOnNode"], SIGNAL(triggered(bool) ), this, SLOT(centerGraphOnNode() ));
+    connect(monPrefWindow, SIGNAL(urlChanged(QString) ), webBrowser, SLOT(setUrl(QString ) ));
+    connect(topRightPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int ) ));
+    connect(graphView, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
+    connect(navigationTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int) ), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)) );
+    connect(zabbixHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZabbixReply(QNetworkReply*)));
 }
 
 SvNavigator::~SvNavigator()
@@ -101,7 +124,7 @@ SvNavigator::~SvNavigator()
     delete mainSplitter ;
     delete monPrefWindow ;
     delete changePasswdWindow ;
-    delete comChannel ;
+    delete zabbixHelper ;
     if( filteredMsgPanel ) delete filteredMsgPanel ;
     unloadMenus();
 }
@@ -143,7 +166,7 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 void SvNavigator::startMonitor()
 {
     load() ;
-    monitor();
+    runNagiosMonitor();
     updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY ).toInt() * 1000 ;
     if ( updateInterval <= 0 ) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000 ;
     timerId = startTimer(updateInterval);
@@ -151,7 +174,7 @@ void SvNavigator::startMonitor()
 
 void SvNavigator::timerEvent(QTimerEvent *)
 {
-    monitor() ;
+    runNagiosMonitor() ;
 }
 
 void SvNavigator::load(void)
@@ -204,23 +227,24 @@ void SvNavigator::handleShowAbout(void)
     about.exec() ;
 }
 
-int SvNavigator::monitor(void)
+int SvNavigator::runNagiosMonitor(void)
 {
-    NodeListT::iterator node_it ;
-    QStringList::const_iterator check_id_it, node_id_it ;
-    QStringList child_nodes_list ;
+    zmq::context_t comContext(1);
+    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl);
+
+    if(! comChannel) {
+        QMessageBox::warning(this, + "Warning | " + appName, serverOfflineMsg, QMessageBox::Yes) ;
+    }
+
     qint32 ok_count = 0 ;
     qint32 warning_count = 0;
     qint32 critical_count = 0 ;
     qint32 unknown_count = 0 ;
-
-    //Initialize the communication channel with the broker module
-    zmq::context_t comContext(1);
-    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl);
     snavStruct->check_status_count.clear() ;
+    msgPanel->setSortingEnabled(false) ;
 
-    for(check_id_it = snavStruct->check_list.begin(); check_id_it != snavStruct->check_list.end(); check_id_it++) {
-        node_it = snavStruct->node_list.find( (*check_id_it).trimmed() ) ;
+    foreach(const QString & checkId, snavStruct->check_list) {
+        NodeListT::iterator node_it = snavStruct->node_list.find(checkId.trimmed()) ;
         if( node_it == snavStruct->node_list.end()) continue ;
 
         if( node_it->child_nodes == "" ) {
@@ -229,16 +253,120 @@ int SvNavigator::monitor(void)
             continue;
         }
 
-        child_nodes_list = node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
-        for(node_id_it = child_nodes_list.begin(); node_id_it != child_nodes_list.end(); node_id_it++) 	{
-
+        QStringList childNodes = node_it->child_nodes.split(Parser::CHILD_NODES_SEP);
+        foreach(const QString & nodeId, childNodes) {
             MonitorBroker::NagiosCheckT check ;
 
-            string msg = serverAuthChain + ":"+(*node_id_it).trimmed().toStdString() ; //TODO
-            ZmqHelper::sendFromSocket(*comChannel, msg) ;
-            msg = ZmqHelper::recvFromSocket(*comChannel) ;
-            QRegExp sepRgx("#");
-            QStringList sInfoVec = QString::fromStdString(msg).split(sepRgx);
+            string msg = serverAuthChain + ":"+nodeId.trimmed().toStdString() ; //TODO
+            if(comChannel) {
+                ZmqHelper::sendFromSocket(*comChannel, msg) ;
+                msg = ZmqHelper::recvFromSocket(*comChannel) ;
+            } else {
+                msg = "-1#"+serverOfflineMsg.toStdString() ;
+            }
+            QStringList sInfoVec = QString::fromStdString(msg).split(QRegExp("#"));
+
+            switch(sInfoVec.length())
+            {
+            case 5 :
+                check.status = sInfoVec[0].toInt() ;
+                check.host = sInfoVec[1].toStdString() ;
+                check.last_state_change = sInfoVec[2].toStdString() ;
+                node_it->check.check_command = sInfoVec[3].toStdString() ;
+                check.alarm_msg = sInfoVec[4].toStdString() ;
+                break ;
+
+            default :
+                check.status = MonitorBroker::CRITICAL ;
+                check.alarm_msg = "ERROR: " + sInfoVec[1].toStdString();
+                check.host = "Unknown" ;
+                check.last_state_change = "Unknown" ;
+                node_it->check.check_command = "Unknown" ;
+                break ;
+            }
+
+            switch( check.status ) {
+            case MonitorBroker::OK:
+                ok_count += 1 ;
+                break;
+
+            case MonitorBroker::WARNING:
+                warning_count += 1 ;
+                break;
+
+            case MonitorBroker::CRITICAL:
+                critical_count += 1 ;
+                break;
+
+            default:
+                unknown_count += 1 ;
+                break;
+            }
+
+            if ( node_it->status != check.status ) {
+                QString toolTip = "" ;
+
+                node_it->check = check ;
+                node_it->status = check.status ;
+                node_it->prop_status = check.status ;
+                updateAlarmMsg(node_it) ;
+                toolTip = getNodeToolTip(*node_it) ;
+
+                updateNavTreeItemStatus(node_it, toolTip) ;
+                graphView->updateNode(node_it, toolTip) ;
+                msgPanel->addMsg(node_it) ;
+                emit hasToBeUpdate( node_it->parent ) ;
+            }
+        }
+    }
+
+    qint32 all_checks_count = snavStruct->check_list.size() ;
+    snavStruct->check_status_count[MonitorBroker::OK] = ok_count ;
+    snavStruct->check_status_count[MonitorBroker::WARNING] = warning_count ;
+    snavStruct->check_status_count[MonitorBroker::CRITICAL] = critical_count ;
+    snavStruct->check_status_count[MonitorBroker::UNKNOWN] = unknown_count ;
+
+    if( all_checks_count>0) {
+
+        Stats *stats = new Stats() ;
+        QString info = stats->update(snavStruct->check_status_count, all_checks_count) ;
+        stats->setToolTip(info) ;
+        graphView->updateStatsPanel(stats) ;
+        if(statsPanel) delete statsPanel ;
+
+        statsPanel = stats ;
+        msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
+        msgPanel->resizeFields(msgPanelSize) ;
+    }
+
+    ZmqHelper::endCliChannel(comChannel);
+    return 0 ;
+}
+
+int SvNavigator::runZabbixMonitor(void)
+{
+    openZabbixSession();
+
+    qint32 ok_count = 0 ;
+    qint32 warning_count = 0;
+    qint32 critical_count = 0 ;
+    qint32 unknown_count = 0 ;
+
+    foreach(const QString & checkId, snavStruct->check_list) {
+        NodeListT::iterator node_it = snavStruct->node_list.find(checkId.trimmed()) ;
+        if( node_it == snavStruct->node_list.end()) continue ;
+
+        if( node_it->child_nodes == "" ) {
+            node_it->status = MonitorBroker::UNKNOWN;
+            unknown_count += 1 ;
+            continue;
+        }
+
+        QStringList childNodes = node_it->child_nodes.split(Parser::CHILD_NODES_SEP);
+        foreach(const QString & nodeId, childNodes) {
+            MonitorBroker::NagiosCheckT check ;
+            string msg = ""; //ZmqHelper::recvFromSocket(*comChannel) ;
+            QStringList sInfoVec = QString::fromStdString(msg).split(QRegExp("#"));
 
             switch(sInfoVec.length())
             {
@@ -312,8 +440,6 @@ int SvNavigator::monitor(void)
         msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
         msgPanel->resizeFields(msgPanelSize) ;
     }
-
-    comChannel->close() ;
     return 0 ;
 }
 
@@ -380,8 +506,7 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
 
     if( _node->status == MonitorBroker::OK ) {
         _node->notification_msg = msg  ;
-    }
-    else {
+    } else {
         _node->alarm_msg = msg ;
     }
 }
@@ -438,11 +563,11 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 
     switch(node->status_prule) {
     case StatusPropRules::Increased: node->prop_status = (status++).getValue() ;
-    break ;
+        break ;
     case StatusPropRules::Decreased: node->prop_status = (status--).getValue() ;
-    break ;
+        break ;
     default : node->prop_status = node->status ;
-    break ;
+        break ;
 
     }
     QString toolTip = getNodeToolTip(*node) ;
@@ -645,24 +770,27 @@ void SvNavigator::loadMenus(void)
 }
 
 
-void SvNavigator::addEvents(void)
+void SvNavigator::processZabbixReply(QNetworkReply* reply)
 {
-    connect( this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()) );
-    connect( this, SIGNAL(hasToBeUpdate(QString)), this, SLOT( updateNodeStatus(QString) ));
-    connect( subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT( capture() ));
-    connect( subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT( zoomIn() ) );
-    connect( subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT( zoomOut() ));
-    connect( subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT( hideChart() ));
-    connect( subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(monitor()));
-    connect( subMenuList["ChangePassword"], SIGNAL( triggered(bool) ), this, SLOT(handleChangePasswordAction(void) ));
-    connect( subMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void) ));
-    connect( subMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
-    connect( subMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT( handleShowOnlineResources() ));
-    connect( subMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT( quit() ));
-    connect( contextMenuList["FilterNodeRelatedMessages"], SIGNAL( triggered(bool) ), this, SLOT( filterNodeRelatedMsg()) );
-    connect( contextMenuList["CenterOnNode"], SIGNAL( triggered(bool) ), this, SLOT( centerGraphOnNode() ));
-    connect( monPrefWindow, SIGNAL( urlChanged(QString) ), webBrowser, SLOT(setUrl( QString ) ));
-    connect( topRightPanel, SIGNAL(currentChanged (int)), this, SLOT( tabChanged( int ) ));
-    connect( graphView, SIGNAL( expandNode(QString, bool, qint32)), this, SLOT( expandNode(const QString &, const bool &, const qint32 &) ));
-    connect( navigationTree, SIGNAL( itemDoubleClicked(QTreeWidgetItem *, int) ), this, SLOT( centerGraphOnNode(QTreeWidgetItem *) ));
+    if (reply->error() != QNetworkReply::NoError)
+        return;
+
+    QString data = (QString) reply->readAll();
+    qDebug() << data << endl;
+    QScriptEngine engine;
+    QScriptValue result = engine.evaluate("(" + data + ")");
+    QString content = result.property("result").toString() ;
+    QString id = result.property("id").toString() ;
+    if(id == "0") {
+        zabbixAuthToken = content ;
+        //zabbixHelper->submit(genericTriggerReq.arg(serverAuthChain).toAscii());
+    }
+}
+
+
+void SvNavigator::openZabbixSession()
+{
+    zabbixHelper->setServer(serverAddr);
+    QStringList params = QString::fromStdString(serverAuthChain).split(QRegExp(":"));
+    zabbixHelper->get(ZabbixHelper::LOGIN, params) ;
 }

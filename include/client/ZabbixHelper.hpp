@@ -1,5 +1,5 @@
 /*
- * JsonRpcHelper.hpp
+ * ZABBIXHelper.hpp
  # ------------------------------------------------------------------------ #
  # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
  # Last Update : 4 août 2012                                                #
@@ -21,25 +21,43 @@
  #--------------------------------------------------------------------------#
  */
 
-#ifndef JSONRPCHELPER_HPP_
-#define JSONRPCHELPER_HPP_
+#ifndef ZABBIXHELPER_HPP_
+#define ZABBIXHELPER_HPP_
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
-class JsonRpcHelper : public QNetworkAccessManager {
-
+class ZabbixHelper : public QNetworkAccessManager {
     Q_OBJECT
 
 public:
-	JsonRpcHelper();
-	virtual ~JsonRpcHelper();
+    enum {
+        LOGIN=0,
+        TRIGGER=1
+    };
+
+public:
+    ZabbixHelper(const QString & zserver="localhost", const QString & protocol="http");
+    virtual ~ZabbixHelper();
+    void
+    setServer(const QString & server) ;
+    void
+    setProtocol(const QString & protocol) ;
 
 public slots:
-void onResult(QNetworkReply* reply) ;
-
+void
+get(const qint32 & reqId, const QStringList & params) ;
 
 private :
-QNetworkReply* currentReply ;
+typedef QMap<qint32, QString> RequestListT;
+
+QString server ;
+QString protocol ;
+QString uriPattern ;
+QNetworkRequest* requestHandler;
+RequestListT requestsPatterns ;
+
+void
+setRequestsPatterns();
 };
 
-#endif /* JSONRPCHELPER_HPP_ */
+#endif /* ZABBIXHELPER_HPP_ */

@@ -30,7 +30,7 @@
 
 
 #include "core/ZmqHelper.hpp"
-#include "client/JsonRpcHelper.hpp"
+#include "client/ZabbixHelper.hpp"
 
 QString cmdName = "" ;
 QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
@@ -63,8 +63,6 @@ int main(int argc, char **argv)
 		exit (1) ;
 	}
 
- //   JsonRpcHelper jsonHelper ;
- //   ZmqHelper::init() ;
 	QString module = "config" ;
 	QString file = argv[1] ;
 	int opt ;
@@ -101,13 +99,15 @@ int main(int argc, char **argv)
 			break ;
 		}
 	}
+    //ZabbixHelper* jhelper = new ZabbixHelper("192.168.135.6");
+    //jhelper->login("admin", "zabbix");
 	cout <<"Launching "<<versionMsg.str()<<endl;
 	Auth authentication;
 	int userRole = authentication.exec() ;
 	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
 	if(module == "dashboard") {
-		QSplashScreen* info = Preferences::infoScreen("Welcome to NGRT4N Operations Concole..."+QString::fromStdString(versionMsg.str()));
+        QSplashScreen* info = Preferences::infoScreen(QString("Welcome to %1").arg(QString::fromStdString(versionMsg.str())));
 		sleep(1);
 		if(file == "") {
 			info->clearMessage();
