@@ -1,8 +1,8 @@
 /*
- * SvNavigatorTree.hpp
+ * JsonHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 15-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,36 +21,21 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVSVNAVIGATORTREE_H_
-#define SNAVSVNAVIGATORTREE_H_
+#include <string>
+#include <QString>
+#include <QtScript/QScriptEngine>
 
-#include "Base.hpp"
+#ifndef JSONHELPER_HPP
+#define JSONHELPER_HPP
 
-
-
-class SvNavigatorTree : public QTreeWidget
+class JsonHelper : public QScriptEngine
 {
-	Q_OBJECT
-
 public:
-	SvNavigatorTree(const bool & =false, QWidget* = 0 );
-    static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
-	void update(Struct * & _snav_struct) ;
-
-	static const QString rootID ;
-    Struct* ptr2Data ;
-
-signals:
-	void treeNodeMoved( QString _node_id ) ;
-
-protected:
-	void showEvent(QShowEvent *) ;
-	void dropEvent(QDropEvent *) ;
-	void startDrag(Qt::DropActions)  ;
-
-private:
-	QString selectedNode ;
-
+    JsonHelper(const std::string & jsonStr = "");
+    void setData(const std::string& jsonStr);
+    QScriptValue getProperty(const std::string& key);
+private :
+    QScriptValue data;
 };
 
-#endif /* SNAVSVNAVIGATORTREE_H_ */
+#endif // JSONHELPER_HPP

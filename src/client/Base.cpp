@@ -27,12 +27,7 @@
 #include "Preferences.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
-void Struct::clear(void)
-{
-	tree_item_list.clear() ;
-	check_list.clear() ;
-	node_list.clear() ;
-}
+#include <QtScript/QScriptEngine>
 
 Settings::Settings(): QSettings(appName.toLower(), packageName.toLower().replace(" ", "-"))
 {
@@ -91,28 +86,5 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 }
 
 
-QString Utils::statusToString(qint32 _status)
-{
-	switch(_status)
-	{
-	case MonitorBroker::OK:
-		return "Normal";
-		break;
-
-	case MonitorBroker::WARNING:
-		return  "Warning";
-		break;
-
-	case MonitorBroker::CRITICAL:
-		return  "Critical";
-		break;
-
-	default:
-		return "Unknown";
-		break;
-	}
-
-	return "Unknown";
-}
 
 

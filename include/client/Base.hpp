@@ -45,67 +45,67 @@ typedef bitset<4> StatusInfoT ;
 
 class StatusPropRules {
 public :
-	enum StatusPropRulesT{
-		Unchanged = 0,
-		Decreased = 1,
-		Increased = 2
-	};
+    enum StatusPropRulesT{
+        Unchanged = 0,
+        Decreased = 1,
+        Increased = 2
+    };
 
-	static QString toString(StatusPropRulesT rule) {
-		return QString::number(rule) ;
-	}
+    static QString toString(StatusPropRulesT rule) {
+        return QString::number(rule) ;
+    }
 
-	static QString label(qint32 rule) {
-		return label(static_cast<StatusPropRulesT>(rule)) ;
-	}
-	static QString label(StatusPropRulesT rule) {
-		switch(rule) {
-		case Unchanged: return "Unchanged" ;
-		case Decreased: return "Decreased" ;
-		case Increased: return "Increased" ;
-		}
+    static QString label(qint32 rule) {
+        return label(static_cast<StatusPropRulesT>(rule)) ;
+    }
+    static QString label(StatusPropRulesT rule) {
+        switch(rule) {
+        case Unchanged: return "Unchanged" ;
+        case Decreased: return "Decreased" ;
+        case Increased: return "Increased" ;
+        }
 
-		return "Unchanged" ;
-	}
+        return "Unchanged" ;
+    }
 };
 
 
 class StatusCalcRules {
 public :
-	enum StatusCalcRulesT{
-		HighCriticity = 0,
-		WeightedCriticity = 1
-	};
+    enum StatusCalcRulesT{
+        HighCriticity = 0,
+        WeightedCriticity = 1
+    };
 
-	static QString toString(StatusCalcRulesT rule) {
-		return QString::number(rule) ;
-	}
+    static QString toString(StatusCalcRulesT rule) {
+        return QString::number(rule) ;
+    }
 
-	static QString label(qint32 rule) {
-		return label(static_cast<StatusCalcRulesT>(rule)) ;
-	}
+    static QString label(qint32 rule) {
+        return label(static_cast<StatusCalcRulesT>(rule)) ;
+    }
 
-	static QString label(StatusCalcRulesT rule) {
+    static QString label(StatusCalcRulesT rule) {
 
-		if (rule == WeightedCriticity) return "Weighted Criticity" ;
+        if (rule == WeightedCriticity) return "Weighted Criticity" ;
 
-		return "High Criticity" ;
-	}
+        return "High Criticity" ;
+    }
 };
 
 
 class NodeType {
 public :
-	enum {
-		SERVICE_NODE = 0,
+    enum {
+        SERVICE_NODE = 0,
         ALARM_NODE = 1
-	} ;
-	static QString toString(int _type ) {
+    } ;
+    static QString toString(int _type ) {
 
-		if (_type == ALARM_NODE ) return "Native Check" ;
+        if (_type == ALARM_NODE ) return "Native Check" ;
 
-		return  "Business Process" ;
-	}
+        return  "Business Process" ;
+    }
 
 };
 
@@ -117,119 +117,109 @@ public:
     Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {}
     MonitorBroker::StatusT getValue() const{return value ;}
 
-	Status operator *(Status& st) const {
-		switch(value) {
-		case MonitorBroker::CRITICAL : return Status(MonitorBroker::CRITICAL) ;
-		case MonitorBroker::OK : return st ;
-		case MonitorBroker::WARNING: {
-			if(st.value == MonitorBroker::CRITICAL || st.value == MonitorBroker::UNKNOWN) return st ;
-			return Status(MonitorBroker::WARNING) ;
-		}
-		default : { //UNKNOWN
-			if(st.value == MonitorBroker::CRITICAL) return st ;
-			return Status(MonitorBroker::UNKNOWN) ;
-		}
-		}
-	}
+    Status operator *(Status& st) const {
+        switch(value) {
+        case MonitorBroker::CRITICAL : return Status(MonitorBroker::CRITICAL) ;
+        case MonitorBroker::OK : return st ;
+        case MonitorBroker::WARNING: {
+            if(st.value == MonitorBroker::CRITICAL || st.value == MonitorBroker::UNKNOWN) return st ;
+            return Status(MonitorBroker::WARNING) ;
+        }
+        default : { //UNKNOWN
+            if(st.value == MonitorBroker::CRITICAL) return st ;
+            return Status(MonitorBroker::UNKNOWN) ;
+        }
+        }
+    }
 
-	Status operator /(Status& st) const {
-		if((value == MonitorBroker::CRITICAL) || (st.value == MonitorBroker::CRITICAL))
-			return Status(MonitorBroker::CRITICAL) ;
-		if((value == MonitorBroker::UNKNOWN) || (st.value == MonitorBroker::UNKNOWN))
-			return Status(MonitorBroker::UNKNOWN) ;
-		if(value == st.value) return  st;
+    Status operator /(Status& st) const {
+        if((value == MonitorBroker::CRITICAL) || (st.value == MonitorBroker::CRITICAL))
+            return Status(MonitorBroker::CRITICAL) ;
+        if((value == MonitorBroker::UNKNOWN) || (st.value == MonitorBroker::UNKNOWN))
+            return Status(MonitorBroker::UNKNOWN) ;
+        if(value == st.value) return  st;
 
-		return Status(MonitorBroker::WARNING) ;
-	}
+        return Status(MonitorBroker::WARNING) ;
+    }
 
-	Status operator ++(int) {
-		switch(value) {
-		case MonitorBroker::WARNING: return Status(MonitorBroker::CRITICAL) ;
-		case MonitorBroker::UNKNOWN : return Status(MonitorBroker::WARNING) ;
-		default : break ;
-		}
+    Status operator ++(int) {
+        switch(value) {
+        case MonitorBroker::WARNING: return Status(MonitorBroker::CRITICAL) ;
+        case MonitorBroker::UNKNOWN : return Status(MonitorBroker::WARNING) ;
+        default : break ;
+        }
 
-		return Status(value) ;
-	}
+        return Status(value) ;
+    }
 
-	Status operator --(int) {
-		switch(value) {
-		case MonitorBroker::CRITICAL: return Status(MonitorBroker::WARNING) ;
-		default : break ;
-		}
+    Status operator --(int) {
+        switch(value) {
+        case MonitorBroker::CRITICAL: return Status(MonitorBroker::WARNING) ;
+        default : break ;
+        }
 
-		return Status(value) ;
-	}
+        return Status(value) ;
+    }
 private:
 
-	MonitorBroker::StatusT value ;
+    MonitorBroker::StatusT value ;
 } ;
 
 
 typedef struct _NodeT {
-	QString id;
-	QString name ;
-	qint32 type ;
-	qint32 status_crule ;
-	qint32 status_prule ;
-	QString icon ;
-	QString description ;
-	QString parent ;
-	QString propagation_rule ;
-	QString alarm_msg ;
-	QString notification_msg ;
-	qint32 status ;
-	qint32 prop_status ;
-	QString child_nodes ;
-	MonitorBroker::NagiosCheckT check ;
+    QString id;
+    QString name ;
+    qint32 type ;
+    qint32 status_crule ;
+    qint32 status_prule ;
+    QString icon ;
+    QString description ;
+    QString parent ;
+    QString propagation_rule ;
+    QString alarm_msg ;
+    QString notification_msg ;
+    qint32 status ;
+    qint32 prop_status ;
+    QString child_nodes ;
+    MonitorBroker::NagiosCheckT check ;
 } NodeT;
 
 typedef QHash<QString, NodeT> NodeListT ;
 typedef QMap<qint32, qint32> CheckStatusCountT ;
 
 typedef struct _GNode {
-	QGraphicsTextItem* label ;
-	QGraphicsPixmapItem* icon ;
-	QGraphicsPixmapItem* exp_icon ;
-	qint32 type ;
-	bool expand ;
+    QGraphicsTextItem* label ;
+    QGraphicsPixmapItem* icon ;
+    QGraphicsPixmapItem* exp_icon ;
+    qint32 type ;
+    bool expand ;
 }GNodeT;
 
 typedef struct _GEdge {
-	QGraphicsPathItem* edge ;
+    QGraphicsPathItem* edge ;
 }GEdgeT;
 
 typedef QHash<QString,GNodeT> GNodeListT;
 typedef QHash<QString,GEdgeT> GEdgeListT;
+typedef QHash<QString,QStringList> HostChecksT;
 typedef QMap<QString,QMenu*> MenuListT;
 typedef QMap<QString,QAction*> SubMenuListT;
 typedef QMap<QString,QString> ComboBoxItemsT;
 
 
-class Struct
-{
-
-public:
-	TreeNodeItemListT tree_item_list ;
-	NodeListT node_list ;
-	QStringList check_list ;
-	CheckStatusCountT check_status_count ;
-
-	void clear(void) ;
+struct Struct {
+    TreeNodeItemListT tree_items ;
+    NodeListT nodes ;
+    QStringList checks ;
+    CheckStatusCountT check_status_count ;
+    HostChecksT host_checks;
 };
 
 class Settings : public QSettings
 {
 public:
-	Settings() ;
-	void setKeyValue(const QString & _key, const QString & _value) ;
-};
-
-
-class Utils
-{
-public :
-	static QString statusToString(qint32 _status) ;
+    Settings() ;
+    void setKeyValue(const QString & _key, const QString & _value) ;
 };
 
 #endif /* SNAV_HPP_ */

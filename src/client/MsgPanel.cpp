@@ -24,6 +24,7 @@
 #include "MsgPanel.hpp"
 #include "StatsLegend.hpp"
 #include <ctime>
+#include "Utils.hpp"
 
 const qint16 MsgPanel::msgPanelColumnCount = 7;
 

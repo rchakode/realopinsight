@@ -55,7 +55,9 @@ HEADERS	+= include/core/ns.hpp \
 			 include/client/SvNavigator.hpp \
 			 include/client/SvNavigatorTree.hpp \
 			 include/client/WebKit.hpp \  			 
-    include/client/ZabbixHelper.hpp
+    include/client/ZabbixHelper.hpp \
+    include/client/Utils.hpp \
+    include/client/JsonHelper.hpp
 SOURCES	+= src/core/utils.cpp \
 			src/core/MonitorBroker.cpp \
                         src/core/ZmqHelper.cpp \
@@ -74,7 +76,9 @@ SOURCES	+= src/core/utils.cpp \
             src/client/SvNavigator.cpp \
             src/client/SvNavigatorTree.cpp \
             src/client/WebKit.cpp \  
-    src/client/ZabbixHelper.cpp
+    src/client/ZabbixHelper.cpp \
+    src/client/Utils.cpp \
+    src/client/JsonHelper.cpp
 DISTFILES += README \
 			 INSTALL \
 			 COPYING \

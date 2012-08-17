@@ -26,38 +26,41 @@
 #include <QDebug>
 #include <QMessageBox>
 
-ZabbixHelper::ZabbixHelper(const QString & server, const QString & protocol)
-: QNetworkAccessManager(),
-  uriPattern("%1://%2/zabbix/api_jsonrpc.php"),
-  requestHandler(new QNetworkRequest()){
+const QString apiContext = "/api_jsonrpc.php";
 
-    this->server = server ;
-    this->protocol = protocol ;
+ZabbixHelper::ZabbixHelper(const QString & baseUrl)
+    : QNetworkAccessManager(),
+      apiUri(baseUrl + apiContext),
+      requestHandler(new QNetworkRequest()) {
     requestHandler->setRawHeader("Content-Type", "application/json");
-    requestHandler->setUrl(QUrl(uriPattern.arg(protocol).arg(server)));
+    requestHandler->setUrl(QUrl(apiUri));
     setRequestsPatterns();
 }
 
 ZabbixHelper::~ZabbixHelper() {
-	delete requestHandler;
+    delete requestHandler;
 }
 
-void ZabbixHelper::setServer(const QString &server) {
-    this->server = server ;
-    requestHandler->setUrl(QUrl(uriPattern.arg(protocol).arg(server)));
+void ZabbixHelper::setBaseUrl(const QString & url) {
+    apiUri = url + apiContext ;
+    requestHandler->setUrl(QUrl(apiUri));
 }
 
-void ZabbixHelper::setProtocol(const QString &protocol) {
-    this->protocol = protocol ;
-    requestHandler->setUrl(QUrl(uriPattern.arg(protocol).arg(server)));
+QString ZabbixHelper::getApiUri(void) const {
+    return apiUri ;
 }
 
 void ZabbixHelper::get(const qint32 & reqId, const QStringList & params) {
     QString request = requestsPatterns[reqId];
     foreach(const QString &param, params) {
-        request=request.arg(param) ;
+        request = request.arg(param) ;
     }
-    this->post(*requestHandler, request.toAscii());
+    QNetworkReply* reply = this->post(*requestHandler, request.toAscii()); //Handle error
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+}
+
+void ZabbixHelper::processError(QNetworkReply::NetworkError code) {
+    emit propagateError(code);
 }
 
 void ZabbixHelper::setRequestsPatterns(){
@@ -69,17 +72,13 @@ void ZabbixHelper::setRequestsPatterns(){
             \"id\": 0}" ;
 
     requestsPatterns[TRIGGER] = "{\"jsonrpc\": \"2.0\", \
+            \"auth\": \"%1\", \
             \"method\": \"trigger.get\", \
             \"params\": { \
-               \"filter\": { \
-                   \"host\": [\"Zabbix server\"] \
-               }, \
-               \"selectHosts\": \"extend\", \
-               \"selectItems\": \"extend\", \
-               \"output\": \"extend\", \
-               \"limit\": 1 \
-             }, \
-            \"auth\": \"%1\", \
-             \"id\": 2 \
-            }";
+            \"filter\": { \"host\":[\"%2\"]}, \
+            \"selectHosts\": [\"host\"], \
+            \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+            \"output\": [\"description\",\"value\",\"error\",\"comments\"], \
+            \"limit\": -1}, \
+            \"id\": 1}";
 }

@@ -33,116 +33,119 @@ const int MonitorBroker::DEFAULT_UPDATE_INTERVAL = 300 ;
 const int MonitorBroker::MAX_MSG = 512 ;
 
 MonitorBroker::MonitorBroker(const string & _sfile)
-: lastUpdate(0),
-  statusFile(_sfile) {}
+    : lastUpdate(0),
+      statusFile(_sfile) {}
 
 MonitorBroker::~MonitorBroker() {}
 
 string MonitorBroker::getInfOfService(const string & _sid)
 {
-	long curTime = time(NULL) ;
-	if( (curTime - lastUpdate) >= DEFAULT_UPDATE_INTERVAL) {
-		loadNagiosCollectedData(statusFile, services) ;
-		lastUpdate = curTime ;
-	}
+    long curTime = time(NULL) ;
+    if( (curTime - lastUpdate) >= DEFAULT_UPDATE_INTERVAL) {
+        loadNagiosCollectedData(statusFile, services) ;
+        lastUpdate = curTime ;
+    }
 
-	NagiosChecksT::iterator it = services.find(_sid) ;
+    NagiosChecksT::iterator it = services.find(_sid) ;
 
-	if (it == services.end() ) {
-		return "-1#Unknow service : " + _sid ;
-	}
+    if (it == services.end() ) {
+        return "{\"return_code\":\"-1\",\"message\":\"Error: unknow service :" + _sid + "\"}" ;
+    }
 
-	ostringstream ret ;
-	ret << it->second.status
-			<< "#" << it->second.host
-			<< "#" << it->second.last_state_change
-			<< "#" << it->second.check_command
-			<< "#" << it->second.alarm_msg;
-	return ret.str() ;
+    ostringstream ret ;
+    ret << "{"
+        << "\"return_code\":0,"
+        << "\"status\":"<< it->second.status<<","
+        << "\"host\":\"" << it->second.host<<"\","
+        << "\"lastchange\":\"" << it->second.last_state_change << "\","
+        << "\"command\":\"" << it->second.check_command<<"\","
+        << "\"message\":\"" << it->second.alarm_msg <<"\""
+        << "}";
+    return ret.str();
 }
 
 bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks)
 {
-	string line, check_type;
-	NagiosCheckT info;
 
-	/* First make a snapshot of the status file before treat it ; */
-	string snapshot = "/tmp/status.dat.snap" ;
-	FILE* stFile = fopen(_sfile.c_str(), "rt") ;
-	FILE* fSnapshot =  fopen(snapshot.c_str(), "wt") ;
+//    /* First make a snapshot of the status file before treat it ; */
+//    string snapshot = "/tmp/status.dat.snap" ;
+//    FILE* stFile = fopen(_sfile.c_str(), "rt") ;
+//    FILE* fSnapshot =  fopen(snapshot.c_str(), "wt") ;
 
-	if( stFile == NULL || fSnapshot == NULL ){
-		cerr << "Unable to open the file : " << _sfile << endl;
-		return false ;
-	}
+//    if( stFile == NULL || fSnapshot == NULL ){
+//        cerr << "Unable to open the file : " << _sfile << endl;
+//        return false ;
+//    }
 
-	fseek(stFile, 0, SEEK_END) ; size_t size = ftell(stFile) ; rewind(stFile) ;
+//    fseek(stFile, 0, SEEK_END) ; size_t size = ftell(stFile) ; rewind(stFile) ;
 
-	char* buffer = (char*)malloc(size * sizeof(char)) ;
+//    char* buffer = (char*)malloc(size * sizeof(char)) ;
 
-	size_t nbRead = fread(buffer, 1, size, stFile);
-	if(nbRead != size){
-		cerr << "Error while reading the status file : " << _sfile << endl;
-		return false ;
-	}
+//    size_t nbRead = fread(buffer, 1, size, stFile);
+//    if(nbRead != size){
+//        cerr << "Error while reading the status file : " << _sfile << endl;
+//        return false ;
+//    }
 
-	size_t nbWrite = fwrite(buffer, 1, size, fSnapshot);
+//    size_t nbWrite = fwrite(buffer, 1, size, fSnapshot);
 
-	if(nbWrite != size){
-		cerr << "Error while creating a snapshot of the status file : " << endl;
-		return false ;
-	}
+//    if(nbWrite != size){
+//        cerr << "Error while creating a snapshot of the status file : " << endl;
+//        return false ;
+//    }
 
-	fcloseall() ; // End of the copy
+//    fcloseall() ; // End of the copy
 
-	/* Now start parsing */
-	ifstream stFileStream ;
-	stFileStream.open(snapshot.c_str(), std::ios_base::in) ;
-	if (! stFileStream.good() ) {
-		cerr << "Unable to open the file " << endl ;
-		return false ;
-	}
+    /* Now start parsing */
+    ifstream stFileStream ;
+    stFileStream.open(_sfile.c_str(), std::ios_base::in) ;
+    if (! stFileStream.good() ) {
+        cerr << "Unable to open the file " << _sfile << endl ;
+        return false ;
+    }
 
-	while (getline(stFileStream, line) , ! stFileStream.eof()) {
+    string line;
+    while (getline(stFileStream, line) , ! stFileStream.eof()) {
 
-		if(line.find("#") != string::npos ) continue ;
+        if(line.find("#") != string::npos ) continue ;
 
-		if( line.find("hoststatus") == string::npos &&
-				line.find("servicestatus") == string::npos ) continue ;
+        if( line.find("hoststatus") == string::npos &&
+                line.find("servicestatus") == string::npos ) continue ;
 
-		info.status = UNSET_STATUS ;
-		while (getline(stFileStream, line), ! stFileStream.eof()) {
+        NagiosCheckT info;
+        info.status = UNSET_STATUS ;
+        while (getline(stFileStream, line), ! stFileStream.eof()) {
 
-			size_t pos = line.find("}") ; if( pos != string::npos ) break ;
-			pos = line.find("=") ; if(pos == string::npos) continue ;
-			string param = ngrt4n::trim(line.substr(0, pos));
-			string value = ngrt4n::trim(line.substr(pos+1, string::npos)) ;
-			if(param == "host_name") {
-				info.host = info.id =
-						ngrt4n::trim(line.substr(pos+1)) ;
-			}
-			else if(param == "service_description") {
-				info.id += "/" + value ;
-			}
-			else if(param == "check_command") {
-				info.check_command = value ;
-			}
-			else if(param == "current_state") {
-				info.status = atoi(value.c_str()) ;
-			}
-			else if(param == "last_state_change") {
-				info.last_state_change = value ;
-			}
-			else if(param == "plugin_output")
-			{
-				info.alarm_msg = value;
-			}
-		}
-		_checks[info.id] = info;
+            size_t pos = line.find("}") ; if( pos != string::npos ) break ;
+            pos = line.find("=") ; if(pos == string::npos) continue ;
+            string param = ngrt4n::trim(line.substr(0, pos));
+            string value = ngrt4n::trim(line.substr(pos+1, string::npos)) ;
+            if(param == "host_name") {
+                info.host = info.id =
+                        ngrt4n::trim(line.substr(pos+1)) ;
+            }
+            else if(param == "service_description") {
+                info.id += "/" + value ;
+            }
+            else if(param == "check_command") {
+                info.check_command = value ;
+            }
+            else if(param == "current_state") {
+                info.status = atoi(value.c_str()) ;
+            }
+            else if(param == "last_state_change") {
+                info.last_state_change = value ;
+            }
+            else if(param == "plugin_output")
+            {
+                info.alarm_msg = value;
+            }
+        }
+        _checks[info.id] = info;
 
-	}
-	stFileStream.close() ;
+    }
+    stFileStream.close() ;
 
-	return true;
+    return true;
 }
 

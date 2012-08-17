@@ -1,8 +1,8 @@
 /*
- * SvNavigatorTree.hpp
+ * Utils.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update : 11-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,36 +21,35 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVSVNAVIGATORTREE_H_
-#define SNAVSVNAVIGATORTREE_H_
+#include "Utils.hpp"
 
-#include "Base.hpp"
-
-
-
-class SvNavigatorTree : public QTreeWidget
+QString Utils::statusToString(const qint32 & _status)
 {
-	Q_OBJECT
+    switch(_status)
+    {
+    case MonitorBroker::OK:
+        return "Normal";
+        break;
 
-public:
-	SvNavigatorTree(const bool & =false, QWidget* = 0 );
-    static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
-	void update(Struct * & _snav_struct) ;
+    case MonitorBroker::WARNING:
+        return  "Warning";
+        break;
 
-	static const QString rootID ;
-    Struct* ptr2Data ;
+    case MonitorBroker::CRITICAL:
+        return  "Critical";
+        break;
 
-signals:
-	void treeNodeMoved( QString _node_id ) ;
+    default:
+        return "Unknown";
+        break;
+    }
 
-protected:
-	void showEvent(QShowEvent *) ;
-	void dropEvent(QDropEvent *) ;
-	void startDrag(Qt::DropActions)  ;
+    return "Unknown";
+}
 
-private:
-	QString selectedNode ;
 
-};
-
-#endif /* SNAVSVNAVIGATORTREE_H_ */
+void Utils::clear(Struct& data) {
+    data.checks.clear();
+    data.nodes.clear();
+    data.tree_items.clear();
+}

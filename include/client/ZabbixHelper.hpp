@@ -36,28 +36,24 @@ public:
     };
 
 public:
-    ZabbixHelper(const QString & zserver="localhost", const QString & protocol="http");
+    ZabbixHelper(const QString & baseUrl="http://localhost/zabbix");
     virtual ~ZabbixHelper();
-    void
-    setServer(const QString & server) ;
-    void
-    setProtocol(const QString & protocol) ;
+    void setBaseUrl(const QString & url) ;
+    QString getApiUri(void) const ;
 
 public slots:
-void
-get(const qint32 & reqId, const QStringList & params) ;
+    void get(const qint32 & reqId, const QStringList & params) ;
+    void processError(QNetworkReply::NetworkError code) ;
+
+signals:
+    void propagateError(QNetworkReply::NetworkError);
 
 private :
-typedef QMap<qint32, QString> RequestListT;
-
-QString server ;
-QString protocol ;
-QString uriPattern ;
-QNetworkRequest* requestHandler;
-RequestListT requestsPatterns ;
-
-void
-setRequestsPatterns();
+    typedef QMap<qint32, QString> RequestListT;
+    QString apiUri ;
+    QNetworkRequest* requestHandler;
+    RequestListT requestsPatterns ;
+    void setRequestsPatterns();
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

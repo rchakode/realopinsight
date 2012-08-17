@@ -45,158 +45,158 @@ string progName = "";
 string authChain= "" ;
 
 string help() {
-	ostringstream msg("SYNOPSIS\n"
-			"	" + progName +" [OPTIONS]\n"
-			"\n"
-			"OPTIONS\n"
-			"	-c FILE\n"
-			"	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
-			"	-D\n"
-			"	 Run the program in foreground mode. \n"
-			"	-p\n"
-			"	 Set the listening port. Default is 1983.\n"
-			"	-P\n"
-			"	 Change the authentication token.\n"
-			"	-T\n"
-			"	 Print the authentication token.\n"
-			"	-v\n"
-			"	 Print the version and copyright information.\n"
-			"	-h\n"
-			"	 Print this help.\n") ;
+    ostringstream msg("SYNOPSIS\n"
+                      "	" + progName +" [OPTIONS]\n"
+                      "\n"
+                      "OPTIONS\n"
+                      "	-c FILE\n"
+                      "	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
+                      "	-D\n"
+                      "	 Run the program in foreground mode. \n"
+                      "	-p\n"
+                      "	 Set the listening port. Default is 1983.\n"
+                      "	-P\n"
+                      "	 Change the authentication token.\n"
+                      "	-T\n"
+                      "	 Print the authentication token.\n"
+                      "	-v\n"
+                      "	 Print the version and copyright information.\n"
+                      "	-h\n"
+                      "	 Print this help.\n") ;
 
-	return msg.str();
+    return msg.str();
 }
 
 string version(){
-	ostringstream versionMsg(progName + " (" + packageName + "), Version " + packageVersion +  ".\n"
-	      + "Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>.\n"
-	      + "All rights reserved. Visit "+ packageUrl + " for more information.");
+    ostringstream versionMsg(progName + " (" + packageName + "), Version " + packageVersion +  ".\n"
+                             + "Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>.\n"
+                             + "All rights reserved. Visit "+ packageUrl + " for more information.");
 
-return versionMsg.str();
+    return versionMsg.str();
 }
 
 void ngrt4n::setPassChain(char* authChain) {
 
-	ofstream ofpass;
+    ofstream ofpass;
 
-	ofpass.open( ngrt4n::AUTH_FILE.c_str() );
-	if( ! ofpass.good()) {
-		cerr << "Unable to set the authentication token." << endl;
-		exit(1) ;
-	}
+    ofpass.open( ngrt4n::AUTH_FILE.c_str() );
+    if( ! ofpass.good()) {
+        cerr << "Unable to set the authentication token." << endl;
+        exit(1) ;
+    }
 
-	ofpass << crypt(authChain, salt.c_str());
-	ofpass.close();
+    ofpass << crypt(authChain, salt.c_str());
+    ofpass.close();
 }
 
 string ngrt4n::getPassChain() {
 
-	string authChain ;
-	ifstream pfile;
+    string authChain ;
+    ifstream pfile;
 
-	pfile.open ( ngrt4n::AUTH_FILE.c_str() );
-	if( ! pfile.good()) {
-		cerr << "Unable to load the application's settings" << endl;
-		exit(1) ;
-	}
+    pfile.open ( ngrt4n::AUTH_FILE.c_str() );
+    if( ! pfile.good()) {
+        cerr << "Unable to load the application's settings" << endl;
+        exit(1) ;
+    }
 
-	pfile >> authChain ;
-	pfile.close();
-	return authChain ;
+    pfile >> authChain ;
+    pfile.close();
+    return authChain ;
 }
 
 int main(int argc, char ** argv)
 {
-	progName = basename(argv[0]);
+    progName = basename(argv[0]);
 
-	bool foreground = false;
-	static const char *shotOpt="DTPhvc:p:" ;
-	int port = MonitorBroker::DEFAULT_PORT ;
-	char opt ;
-	while ((opt = getopt(argc, argv, shotOpt)) != -1) {
-		switch (opt)
-		{
-		case 'D':
-			foreground = true ;
-			break;
+    bool foreground = false;
+    static const char *shotOpt="DTPhvc:p:" ;
+    int port = MonitorBroker::DEFAULT_PORT ;
+    char opt ;
+    while ((opt = getopt(argc, argv, shotOpt)) != -1) {
+        switch (opt)
+        {
+        case 'D':
+            foreground = true ;
+            break;
 
-		case 'c':
-			statusFile = optarg ;
-			break;
+        case 'c':
+            statusFile = optarg ;
+            break;
 
-		case 'p': {
-			port = atoi(optarg) ;
-			if(port <= 0 ) {
-				cerr << "ERROR: Bad port number." << endl ;
-				exit(1) ;
-			}
-			break;
-		}
+        case 'p': {
+            port = atoi(optarg) ;
+            if(port <= 0 ) {
+                cerr << "Error: bad port number." << endl ;
+                exit(1) ;
+            }
+            break;
+        }
 
-		case 'P': {
-			ngrt4n::checkUser() ;
-			ngrt4n::initApp() ;
+        case 'P': {
+            ngrt4n::checkUser() ;
+            ngrt4n::initApp() ;
 
-			char* pass = getpass("Type a passphrase:");
-			ngrt4n::setPassChain(pass) ;
-			cout << ngrt4n::getPassChain() << endl ;
+            char* pass = getpass("Type a passphrase:");
+            ngrt4n::setPassChain(pass) ;
+            cout << ngrt4n::getPassChain() << endl ;
 
-			exit(0) ;
-		}
+            exit(0) ;
+        }
 
-		case 'T': {
-			ngrt4n::checkUser() ;
-			cout << ngrt4n::getPassChain() << endl ;
+        case 'T': {
+            ngrt4n::checkUser() ;
+            cout << ngrt4n::getPassChain() << endl ;
 
-			exit(0) ;
-		}
+            exit(0) ;
+        }
 
-		case 'v': {
-			cout << version() << endl ;
-			exit(0) ;
-		}
+        case 'v': {
+            cout << version() << endl ;
+            exit(0) ;
+        }
 
-		case 'h': {
-			cout << help() << endl ;
-			exit(0) ;
-		}
-		default: {
-			cout << help() << endl ;
-			exit(1) ;
-		}
-		}
-	}
+        case 'h': {
+            cout << help() << endl ;
+            exit(0) ;
+        }
+        default: {
+            cout << help() << endl ;
+            exit(1) ;
+        }
+        }
+    }
 
-	ngrt4n::checkUser() ;
-	ngrt4n::initApp() ;
-	authChain = ngrt4n::getPassChain() ;
+    ngrt4n::checkUser() ;
+    ngrt4n::initApp() ;
+    authChain = ngrt4n::getPassChain() ;
 
-	if( ! foreground ) {
-		pid_t pid = fork();
-		if(pid <= -1) {
-			cerr << "Failure while starting the program in daemon mode" << endl;
-			exit(1);
-		}
-		else if(pid > 0) {
-			exit (0);
-		}
-		setsid();
-	}
+    if( ! foreground ) {
+        pid_t pid = fork();
+        if(pid <= -1) {
+            cerr << "Error: failed while starting the program in daemon mode" << endl;
+            exit(1);
+        }
+        else if(pid > 0) {
+            exit (0);
+        }
+        setsid();
+    }
 
-	ostringstream tcpAddr;
-	tcpAddr << "tcp://*:" << port ;
+    ostringstream tcpAddr;
+    tcpAddr << "tcp://*:" << port ;
 
-	cout << "Starting "<< version() << endl << endl ;
-	cout << "Listening address => " << tcpAddr.str() << endl ;
-	cout << "Nagios status file => " << statusFile << endl ;
+    cout << "Starting "<< version() << endl << endl ;
+    cout << "Listening address => " << tcpAddr.str() << endl ;
+    cout << "Nagios status file => " << statusFile << endl ;
 
-	zmq::context_t ctx(1);
+    zmq::context_t ctx(1);
     zmq::socket_t* comChannel = new zmq::socket_t(ctx, ZMQ_REP);
     comChannel->bind(tcpAddr.str().c_str());
-        
-	cout << "Service started." << endl ;
 
-	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
+    cout << "Service started." << endl ;
+
+    MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
     while (true) {
 
         string msg = ZmqHelper::recvFromSocket(*comChannel) ;
@@ -214,15 +214,15 @@ int main(int argc, char ** argv)
             if(pass == authChain) {
                 reply = monitor->getInfOfService(sid) ;
             } else {
-                reply = "-2#Wrong authentication";
+                reply = "{\"return_code\" : \"-2\", \"message\" : \"Error: wrong authentication\"}";
             }
         }
 
         ZmqHelper::sendFromSocket(*comChannel, reply) ;
-	}
+    }
 
     comChannel->close() ;
     delete comChannel ;
 
-	return 0;
+    return 0;
 }

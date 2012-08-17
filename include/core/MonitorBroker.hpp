@@ -31,8 +31,7 @@ using namespace std ;
 
 class MonitorBroker {
 public:
-	enum StatusT
-	{
+    enum StatusT {
 	  OK = 0,
 	  WARNING = 1,
 	  CRITICAL = 2,
@@ -40,14 +39,20 @@ public:
 	  UNSET_STATUS = 4
 	} ;
 
-	typedef struct _NagiosCheckT{
+    enum MonirorTypeT {
+      NAGIOS = 0,
+      ZABBIX = 1
+    } ;
+
+    typedef struct _CheckT{
 		string id;
 		string host ;
 		string check_command ;
 		string last_state_change ;
 		string alarm_msg ;
 		int status ;
-	}NagiosCheckT;
+    }CheckT;
+    typedef CheckT NagiosCheckT;
 	typedef unordered_map<string, NagiosCheckT> NagiosChecksT ;
 
 	MonitorBroker(const string & _sfile);
