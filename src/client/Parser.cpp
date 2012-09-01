@@ -24,6 +24,9 @@
 #include "core/ns.hpp"
 #include "Parser.hpp"
 #include "GraphView.hpp"
+#include <QObject>
+
+using namespace std;
 
 const QString Parser::CHILD_NODES_SEP = "," ;
 const QString Parser::dotFileHeader = "strict graph\n{\n node[shape=plaintext]\n";
@@ -43,31 +46,30 @@ Parser::~Parser()
         dotFile.remove(graphFilename + ".plain");
 }
 
-bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & data)
+bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
 {
     QString graph_content;
-    QDomDocument sv_config_doc;
-    QDomElement rootElt;
-    QFile file(_sv_config_file);
-    NodeT node;
+    QDomDocument xmlDoc;
+    QDomElement xmlRoot;
+    QFile file(_configFile);
 
     if ( ! file.open(QIODevice::ReadOnly) ) {
-        qDebug() << "Unable to open the file " << _sv_config_file ;
+        qDebug() << QObject::tr("Unable to open the file %1").arg(_configFile);
         return false;
     }
 
-    if (! sv_config_doc.setContent(&file) ) {
+    if (! xmlDoc.setContent(&file) ) {
         file.close();
-        qDebug() << "Error when parsing the file " << _sv_config_file ;
+        qDebug() << QObject::tr("Error while parsing the file %1").arg(_configFile);
         return false;
     }
 
-    rootElt = sv_config_doc.documentElement();
-    QDomNodeList services = rootElt.elementsByTagName("Service");
+    xmlRoot = xmlDoc.documentElement();
+    QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
     qint32 serviceCount = services.length();
     for (qint32 srv = 0; srv < serviceCount; srv++) {
-        // get the service node information
+        NodeT node;
         QDomElement service = services.item(srv).toElement();
         node.id = service.attribute("id").trimmed() ;
         node.type = service.attribute("type").toInt() ;
@@ -88,16 +90,17 @@ bool Parser::parseSvConfig(const QString & _sv_config_file, Struct & data)
         if(node.status_crule < 0) node.status_crule = StatusCalcRules::HighCriticity ;  //For backward compatibility
         if(node.status_prule < 0) node.status_prule = StatusPropRules::Unchanged ;
 
-        data.nodes.insert(node.id, node) ;
+        _coreData.nodes.insert(node.id, node) ;
         if( node.type == NodeType::ALARM_NODE ) {
             QString host = (node.child_nodes.split("/")).at(0) ;
-            data.host_checks[host] << node.id ;
-            data.checks << node.id;
+            _coreData.hosts[host] << node.id;
+            _coreData.checks << node.id;
+            _coreData.cnodes.insert(node.id, node) ;
         }
     }
     file.close();
-    updateNodeHierachy(data.nodes, graph_content) ;
-    buildNodeTree(data.nodes, data.tree_items) ;
+    updateNodeHierachy(_coreData.nodes, graph_content) ;
+    buildNodeTree(_coreData.nodes, _coreData.tree_items) ;
     graph_content = dotFileHeader + graph_content ;
     graph_content += dotFileFooter;
     saveCoordinatesDotFile(graph_content);
@@ -148,7 +151,7 @@ void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
 
             TreeNodeItemListT::iterator nitem = _tree.find(node->id) ;
             if ( nitem == _tree.end()) {
-                qDebug() << "not found " << node->name << endl ;
+                qDebug() << QObject::tr("service not found %1").arg(node->name);
                 continue ;
             }
 
@@ -165,7 +168,7 @@ void Parser::saveCoordinatesDotFile(const QString& _graph_content)
     graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
     file.setFileName(graphFilename);
     if(! file.open(QIODevice::WriteOnly)) {
-        qDebug() << "Unable to write the file " << graphFilename ;
+        qDebug() << QObject::tr("Unable into write the file %1").arg(graphFilename) ;
         exit (1);
     }
 

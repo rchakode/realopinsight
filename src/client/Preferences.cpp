@@ -27,6 +27,7 @@
 #include "Auth.hpp"
 #include <sstream>
 #include "Base.hpp"
+#include "Utils.hpp"
 
 const qint32 Preferences::ChangePassword = 0 ;
 const qint32 Preferences::ForceChangePassword = 1 ;
@@ -70,19 +71,19 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 	{
 	case Preferences::ChangeMonitoringSettings:
 		line += 1,
-		layout->addWidget(new QLabel("Web Interface"), line, 0),
+        layout->addWidget(new QLabel(tr("Web Interface")), line, 0),
 		layout->addWidget(monitorHomeField, line, 1, 1, 4) ;
 		line += 1,
-				layout->addWidget(new QLabel("Update Interval"), line, 0),
+                layout->addWidget(new QLabel(tr("Update Interval")), line, 0),
 				layout->addWidget(updateIntervalField, line, 1, 1, 2),
 				layout->addWidget(new QLabel("seconds"), line, 3) ;
 		line += 1,
-				layout->addWidget(new QLabel("Server Address"), line, 0),
+                layout->addWidget(new QLabel(tr("Server Address")), line, 0),
 				layout->addWidget(serverAddrField, line, 1),
-				layout->addWidget(new QLabel("Port"), line, 2, Qt::AlignRight),
+                layout->addWidget(new QLabel(tr("Port")), line, 2, Qt::AlignRight),
 				layout->addWidget(serverPortField, line, 3) ;
 		line += 1,
-				layout->addWidget(new QLabel("Passphrase"), line, 0),
+                layout->addWidget(new QLabel(tr("Passphrase")), line, 0),
 				layout->addWidget(serverPassField, line, 1, 1, 4) ;
 		line += 1,
 				layout->addWidget(cancelButton, line, 1, 1, 2, Qt::AlignRight),
@@ -101,21 +102,21 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 			serverPortField->setEnabled(false) ;
 			serverPassField->setEnabled(false) ;
 		}
-		setWindowTitle("Monitoring Settings | " + appName.toUpper()) ;
+        setWindowTitle(tr("Monitoring Settings")%" | "%appName.toUpper()) ;
 		break;
 
 	case Preferences::ChangePassword:
 	case Preferences::ForceChangePassword:
 		line += 1,
-		layout->addWidget(new QLabel("Current Password"), line, 0),
+        layout->addWidget(new QLabel(tr("Current Password")), line, 0),
 		layout->addWidget(oldPasswdField, line, 1, 1, 2) ;
 
 		line += 1,
-				layout->addWidget(new QLabel("New password"), line, 0),
+                layout->addWidget(new QLabel(tr("New password")), line, 0),
 				layout->addWidget(passwdField, line, 1, 1, 2) ;
 
 		line += 1,
-				layout->addWidget(new QLabel("Retype new password"), line, 0),
+                layout->addWidget(new QLabel(tr("Retype new password")), line, 0),
 				layout->addWidget(rePasswdField, line, 1, 1, 2) ;
 
 		line += 1,
@@ -124,7 +125,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 
 		if(_action == Preferences::ForceChangePassword) cancelButton->setEnabled(false) ;
 
-		setWindowTitle("Change Password | " + appName.toUpper()) ;
+        setWindowTitle(tr("Change Password")%" | "%appName.toUpper()) ;
 		break;
 
 	case Preferences::ShowAbout:
@@ -206,29 +207,21 @@ void Preferences::changePasswd(void)
 	new_passwd = QCryptographicHash::hash(passwdField->text().toAscii(), QCryptographicHash::Md5);
 	renew_passwd = QCryptographicHash::hash(rePasswdField->text().toAscii(), QCryptographicHash::Md5);
 
-	if( user_passwd == passwd )
-	{
-		if( new_passwd == renew_passwd )
-		{
+    if( user_passwd == passwd ) {
+        if( new_passwd == renew_passwd ) {
 			settings->setKeyValue( key, new_passwd ) ;
 			QMessageBox::information(this,
 					appName.toUpper().toUpper(),
-					"Password updated",
+                    tr("Password updated"),
 					QMessageBox::Ok) ;
 
 			done(0) ;
-		}
-		else
-		{
-			QMessageBox::warning(this,
-					appName.toUpper(),
-					"Sorry, passwords do not match",
-					QMessageBox::Ok) ;
-		}
+        } else {
+            Utils::alert(tr("Sorry the passwords do not match"));
+        }
 	}
-	else
-	{
-		QMessageBox::warning(this, appName.toUpper(), "Authentication failed", QMessageBox::Ok) ;
+    else {
+        Utils::alert(tr("Authentication failed"));
 	}
 }
 

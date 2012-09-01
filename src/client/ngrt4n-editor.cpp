@@ -29,59 +29,59 @@
 #include "Base.hpp"
 
 QString cmdName = "" ;
-QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
-		"Options: \n"
-		"	-v\n"
-		"	  Print the version and license information.\n"
-		"	-h \n"
-		"	   Print this help.\n" ;
+QString  usage = "usage: %1 [OPTION] [view_config]\n"
+        "Options: \n"
+        "	-v\n"
+        "	  Print the version and license information.\n"
+        "	-h \n"
+        "	   Print this help.\n" ;
 
 
 ostringstream versionMsg(appName.toStdString()+"Editor, Version "+packageVersion.toStdString()+".\n\n"
-		+"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
-		+"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
+                         +"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
+                         +"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
 
 int main(int argc, char **argv)
 {
-	QApplication* app = new QApplication(argc, argv) ;
-	app->setWindowIcon(QIcon(":images/built-in/icon.png")) ;
-	app->setApplicationName(appName) ;
-	app->setStyleSheet(Preferences::style());
-	cmdName=argv[0];
-	if(argc > 3) {
-		qDebug() << usage ;
-		exit (1) ;
-	}
+    QApplication* app = new QApplication(argc, argv) ;
+    app->setWindowIcon(QIcon(":images/built-in/icon.png")) ;
+    app->setApplicationName(appName) ;
+    app->setStyleSheet(Preferences::style());
+    cmdName= basename(argv[0]);
+    if(argc > 3) {
+        qDebug() << usage ;
+        exit (1) ;
+    }
 
-	QString file = argv[1] ;
-	int opt ;
+    QString file = argv[1] ;
+    int opt ;
 
-	if ( (opt = getopt(argc, argv, "hv") ) != -1) {
-		switch (opt) {
+    if ( (opt = getopt(argc, argv, "hv") ) != -1) {
+        switch (opt) {
 
-		case 'v': {
-			cout << versionMsg.str() << endl;
-			exit(0) ;
-		}
+        case 'v': {
+            cout << versionMsg.str() << endl;
+            exit(0) ;
+        }
 
-		case 'h': {
-			cout << usage.toStdString() ;
-			exit(0) ;
-		}
+        case 'h': {
+            cout << usage.arg(cmdName).toStdString() ;
+            exit(0) ;
+        }
 
-		default: // -h for get help
-			cout << "Syntax Error :: " << usage.toStdString() ;
-			exit (1) ;
-			break ;
-		}
-	}
-	cout <<"Launching "<<versionMsg.str()<<endl;
-	Auth authentication;
-	int userRole = authentication.exec() ;
-	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
+        default: // -h for get help
+            cout << usage.arg(cmdName).toStdString() ;
+            exit (1) ;
+            break ;
+        }
+    }
+    cout <<tr("Launching")<< " "<<versionMsg.str()<<endl;
+    Auth authentication;
+    int userRole = authentication.exec() ;
+    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
-	SvCreator* svc = new SvCreator(userRole) ;
-	svc->load(file) ;
+    SvCreator* svc = new SvCreator(userRole) ;
+    svc->load(file) ;
 
-	return app->exec() ;
+    return app->exec() ;
 }

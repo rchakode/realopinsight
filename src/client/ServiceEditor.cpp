@@ -34,29 +34,29 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
       layout (new QGridLayout( this ) ),
       buttonBox(  new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close))
 {
-    editorItemsList["nameLabel"] = new QLabel("Name") ;
+    editorItemsList["nameLabel"] = new QLabel(tr("Name")) ;
     editorItemsList[NAME_FIELD] = new QLineEdit() ;
 
-    editorItemsList["typeLabel"] = new QLabel("Type") ;
+    editorItemsList["typeLabel"] = new QLabel(tr("Type")) ;
     editorItemsList[TYPE_FIELD] = new QComboBox() ;
 
-    editorItemsList["iconNameLabel"] = new QLabel("Icon");
+    editorItemsList["iconNameLabel"] = new QLabel(tr("Icon"));
     editorItemsList[ICON_FIELD] = new QComboBox();
 
-    editorItemsList["priorityLabel"] = new QLabel("Status Handling") ;
+    editorItemsList["priorityLabel"] = new QLabel(tr("Status Handling")) ;
     editorItemsList[STATUS_CALC_RULE_FIELD] = new QComboBox() ;
     editorItemsList[STATUS_PROP_RULE_FIELD] = new QComboBox() ;
 
-    editorItemsList["descriptionLabel"] = new QLabel("Description") ;
+    editorItemsList["descriptionLabel"] = new QLabel(tr("Description")) ;
     editorItemsList[DESCRIPTION_FIELD] = new QTextEdit() ;
 
-    editorItemsList["alarmMsgLabel"] = new QLabel("Alarm Message") ;
+    editorItemsList["alarmMsgLabel"] = new QLabel(tr("Alarm Message")) ;
     editorItemsList[ALARM_MSG_FIELD]  = new QTextEdit() ;
 
-    editorItemsList["notificationMsgLabel"] = new QLabel("Notification Message") ;
+    editorItemsList["notificationMsgLabel"] = new QLabel(tr("Notification Message")) ;
     editorItemsList[NOTIFICATION_MSG_FIELD] = new QTextEdit() ;
 
-    editorItemsList["lowLevelAlarmsLabel"] = new QLabel("Related Check") ;
+    editorItemsList["lowLevelAlarmsLabel"] = new QLabel(tr("Check ID")) ;
     editorItemsList[CHECK_FIELD] = new QComboBox() ;
     editorItemsList[CHECK_LIST_FIELD] = new QListWidget() ;
 
@@ -249,7 +249,7 @@ void ServiceEditor::loadStatusHandlingFields(void)
 {
     ComboBoxItemsT crules = SvNavigator::calcRules();
     QString defaultRule = StatusCalcRules::label(StatusCalcRules::HighCriticity) ;
-    statusCalcRuleField()->addItem("Calculation rule (Default is " +defaultRule+")", StatusCalcRules::HighCriticity);
+    statusCalcRuleField()->addItem(tr("Calculation rule (Default is")%" "%defaultRule+")", StatusCalcRules::HighCriticity);
 
     foreach(const QString & rule, crules.keys()) {
         statusCalcRuleField()->addItem(rule, crules.value(rule));
@@ -257,7 +257,7 @@ void ServiceEditor::loadStatusHandlingFields(void)
 
     ComboBoxItemsT prules = SvNavigator::propRules();
     defaultRule = StatusPropRules::label(StatusPropRules::Unchanged) ;
-    statusPropRuleField()->addItem("Propagation rule (Default is " +defaultRule+")", StatusPropRules::Unchanged);
+    statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", StatusPropRules::Unchanged);
     foreach(const QString & rule, prules.keys()) {
         statusPropRuleField()->addItem(rule, prules.value(rule));
     }

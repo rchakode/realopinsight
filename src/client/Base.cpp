@@ -32,7 +32,6 @@
 Settings::Settings(): QSettings(appName.toLower(), packageName.toLower().replace(" ", "-"))
 {
 	Q_INIT_RESOURCE(ngrt4n);
-
 	QString updateInterval = value(Preferences::UPDATE_INTERVAL_KEY).toString();
 	QString monitorHome = value(Preferences::URL_KEY).toString() ;
 	QString admUser = value(Preferences::ADM_UNSERNAME_KEY).toString();
@@ -75,6 +74,10 @@ Settings::Settings(): QSettings(appName.toLower(), packageName.toLower().replace
 		QString passwd = QCryptographicHash::hash(Auth::OP_USER_NAME.toAscii(), QCryptographicHash::Md5) ;
 		setValue(Preferences::OP_PASSWD_KEY, passwd);
 	}
+
+    translator = new QTranslator();
+    translator->load("ngrt4n_en");
+    qApp->installTranslator(translator);
 
 	sync();
  }

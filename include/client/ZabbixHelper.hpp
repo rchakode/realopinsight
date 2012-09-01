@@ -31,8 +31,9 @@ class ZabbixHelper : public QNetworkAccessManager {
 
 public:
     enum {
-        LOGIN=0,
-        TRIGGER=1
+        LOGIN=1,
+        TRIGGER=2,
+        LOGOUT=3
     };
 
 public:

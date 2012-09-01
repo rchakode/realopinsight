@@ -21,8 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef GRAPHVIEW_H_
-#define GRAPHVIEW_H_
+#ifndef GRAPHVIEW_HPP
+#define GRAPHVIEW_HPP
 
 #include "Base.hpp"
 #include "Stats.hpp"
@@ -105,4 +105,4 @@ private:
     static const QString  NODE_EXP_ICON_ID_SFX ;
 };
 
-#endif /* GRAPHVIEW_H_ */
+#endif /* GRAPHVIEW_HPP */

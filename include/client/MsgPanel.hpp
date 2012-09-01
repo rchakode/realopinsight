@@ -21,8 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVMSGPANEL_HPP_
-#define SNAVMSGPANEL_HPP_
+#ifndef SNAVMSGPANEL_HPP
+#define SNAVMSGPANEL_HPP
 #include "Base.hpp"
 
 
@@ -32,7 +32,6 @@ class MsgPanel : public QTableWidget
     Q_OBJECT
 
 public:
-
     MsgPanel(QWidget * parent = 0 );
     virtual ~MsgPanel() {}
 
@@ -40,7 +39,6 @@ public:
     void addMsg(const NodeListT::iterator &);
     void resizeFields( const QSize & ,  const bool & = false );
 
-    //EVENT CONSOLE META-MESSAGES
     static const QString HOSTNAME_META_MSG_PATERN ;
     static const QString SERVICE_META_MSG_PATERN ;
     static const QString THERESHOLD_META_MSG_PATERN  ;
@@ -57,16 +55,14 @@ protected :
     void showEvent ( QShowEvent * ) ;
 
 private:
-
     QPoint charSize;
     QSize windowSize ;
 
     static const QStringList msgPanelHeaderLabels;
-
     inline QCheckBox* msgItem(const qint32 & _row, const qint32 & _column) 	{
         return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
     }
 
 };
 
-#endif /* SNAVMSGPANEL_HPP_ */
+#endif /* SNAVMSGPANEL_HPP */

@@ -79,6 +79,10 @@ SOURCES	+= src/core/utils.cpp \
     src/client/ZabbixHelper.cpp \
     src/client/Utils.cpp \
     src/client/JsonHelper.cpp
+
+
+TRANSLATIONS = ngrt4n_en.ts
+
 DISTFILES += README \
 			 INSTALL \
 			 COPYING \
@@ -94,3 +98,6 @@ DISTFILES += README \
 			 src/server/ngrt4nd.cpp \
 			 doc/man/*.gz \
 			 dm-1.0.tar.gz
+
+OTHER_FILES = \
+    ngrt4n_en.ts

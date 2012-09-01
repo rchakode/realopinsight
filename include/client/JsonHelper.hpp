@@ -21,12 +21,12 @@
 #--------------------------------------------------------------------------#
  */
 
+#ifndef JSONHELPER_HPP
+#define JSONHELPER_HPP
+
 #include <string>
 #include <QString>
 #include <QtScript/QScriptEngine>
-
-#ifndef JSONHELPER_HPP
-#define JSONHELPER_HPP
 
 class JsonHelper : public QScriptEngine
 {

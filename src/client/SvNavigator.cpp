@@ -28,21 +28,15 @@
 #include "Utils.hpp"
 #include "client/JsonHelper.hpp"
 #include <sstream>
-#include <QScriptValueIterator>
+#include <QStatusBar>
+#include <QObject>
 
 
-const QString DefaultTip = "Service: %1 \
-        \nDescription: %2 \
-        \nStatus: %3 \
-        \nStatus Calc. Rule: %4 \
-        \nStatus Prop. Rule: %5" ;
-
-        const QString AlarmSpecificTip = "Host: %6 \
-        \nCheck/Trigger: %7 \
-        \nMessage: %8 \
-        \nCheck Output: %9";
-        const QString ServiceOfficeMsg = "ERROR: failed to connect to %1";
-const QString JsonError = "{\"return_code\": \"-1\", \"message\": \""+ServiceOfficeMsg+"\"}";
+const QString DEFAULT_TIP_PATTERN = "Service: %1\nDescription: %2\nStatus: %3\nStatus Calc. Rule: %4\nStatus Prop. Rule: %5";
+const QString ALARM_SPECIFIC_TIP_PATTERN = "Host: %6\nCheck/Trigger: %7\nMessage: %8\nCheck Output: %9";
+const QString SERVICE_OFFLINE_MSG = QObject::tr("ERROR: failed to connect to %1");
+const QString DEFAULT_ERROR_MSG = "{\"return_code\": \"-1\", \"message\": %1\""%SERVICE_OFFLINE_MSG%"\"}";
+const QString ID_PATTERN = "%1/%2";
 
 ComboBoxItemsT SvNavigator::propRules() {
     ComboBoxItemsT map;
@@ -82,21 +76,20 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
       msgPanel(new MsgPanel()),
       nodeContextMenu (new QMenu()),
       zabbixHelper(new ZabbixHelper()),
-      monitorType(_monitorType)
+      monitorType(_monitorType),
+      hLeft(0)
 {
-    setWindowTitle(configFile + " | " + appName.toUpper() + " Operations Console");
+    setWindowTitle(tr("%1 Operations Console").arg(appName));
     loadMenus();
-
-    topRightPanel->addTab(graphView, "Dashboard");
-    topRightPanel->addTab(browser, "Native Web UI");
-    bottomRightPanel->addTab(msgPanel, "Event Console");
+    topRightPanel->addTab(graphView, tr("Dashboard"));
+    topRightPanel->addTab(browser, tr("Native Web UI"));
+    bottomRightPanel->addTab(msgPanel, tr("Event Console"));
     mainSplitter->addWidget(navigationTree);
     mainSplitter->addWidget(rightSplitter);
     rightSplitter->addWidget(topRightPanel);
     rightSplitter->addWidget(bottomRightPanel);
     rightSplitter->setOrientation(Qt::Vertical);
     setCentralWidget(mainSplitter);
-
     updateMonitoringSettings();
     addEvents();
 }
@@ -145,54 +138,46 @@ SvNavigator::~SvNavigator()
     unloadMenus();
 }
 
-
-void SvNavigator::alert(const QString & msg) {
-    QMessageBox::warning(0, + "Warning | " + appName, msg, QMessageBox::Yes);
-}
-
 void SvNavigator::closeEvent(QCloseEvent * event)
 {
-    if(filteredMsgPanel) {
+    if(filteredMsgPanel)
         filteredMsgPanel->close();
-    }
-
     QMainWindow::closeEvent(event);
 }
 
 
 void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 {
-    QPoint global_pos;
-    QList<QTreeWidgetItem*> tree_nodes;
-    QGraphicsItem* graph_node;
-    QString graph_item_id;
+    QPoint pos = event->globalPos();
+    QList<QTreeWidgetItem*> treeNodes = navigationTree->selectedItems();
+    QGraphicsItem* graphNode = graphView->nodeAtGlobalPos(pos);
 
-    global_pos = event->globalPos();
-    tree_nodes = navigationTree->selectedItems();
-    graph_node = graphView->nodeAtGlobalPos(global_pos);
-
-    if (tree_nodes.length() || graph_node) {
-        if(graph_node) {
-            graph_item_id = graph_node->data(0).toString();
-            selectedNodeId =  graph_item_id.left(graph_item_id.indexOf(":"));
+    if (treeNodes.length() || graphNode) {
+        if(graphNode) {
+            QString itemId = graphNode->data(0).toString();
+            selectedNodeId =  itemId.left(itemId.indexOf(":"));
         }  else {
-            selectedNodeId = tree_nodes[0]->data(0, QTreeWidgetItem::UserType).toString();
+            selectedNodeId = treeNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
         }
 
-        nodeContextMenu->exec(global_pos);
+        nodeContextMenu->exec(pos);
     }
 }
 
 void SvNavigator::startMonitor()
 {
+    updateStatusBar(tr("Connecting to the server..."));
+    success = true ;
+    setEnabled(false);
     switch(monitorType){
-    case MonitorBroker::ZABBIX : openZabbixSession();
-        break ;
-    case MonitorBroker::NAGIOS :
+    case MonitorBroker::ZABBIX: openZabbixSession();
+        break;
+    case MonitorBroker::NAGIOS:
     default : runNagiosMonitor();
         break;
     }
-    updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
+    setEnabled(true);
+    updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
     updateInterval = 1000 * ((updateInterval > 0)? updateInterval : MonitorBroker::DEFAULT_UPDATE_INTERVAL);
     timerId = startTimer(updateInterval);
 }
@@ -205,7 +190,7 @@ void SvNavigator::timerEvent(QTimerEvent *)
 void SvNavigator::load(const QString & _file)
 {
     if( ! _file.isEmpty()) {
-        configFile = _file ;
+        configFile = _file;
     }
     openedFile = configFile;
     Parser parser;
@@ -214,8 +199,10 @@ void SvNavigator::load(const QString & _file)
     navigationTree->addTopLevelItem(coreData->tree_items[SvNavigatorTree::rootID]);
     graphView->load(parser.getDotGraphFile(), coreData->nodes);
     browser->setUrl(monitorBaseUrl);
-    resize(); show();
+    resize();
+    show();
     graphView->scaleToFitViewPort();
+    setWindowTitle(configFile + " | " + appName + " Operations Console");
 }
 
 void SvNavigator::unloadMenus(void)
@@ -256,151 +243,119 @@ int SvNavigator::runNagiosMonitor(void)
     comChannel = ZmqHelper::initCliChannel(comContext, serverUrl);
 
     if(! comChannel) {
-        QString msg = ServiceOfficeMsg.arg("the Daemon Module on "+QString::fromStdString(serverUrl));
-        alert(msg);
+        QString msg = SERVICE_OFFLINE_MSG.arg(QString::fromStdString(serverUrl));
+        Utils::alert(msg);
+        updateStatusBar(msg);
+        success = false ;
+    } else {
+        updateStatusBar(tr("Updating..."));
     }
-    qint32 ok_count = 0;
-    qint32 warning_count = 0;
-    qint32 critical_count = 0;
-    qint32 unknown_count = 0;
-    coreData->check_status_count.clear();
+    resetStatData();
     msgPanel->setSortingEnabled(false);
-
     foreach(const QString & checkId, coreData->checks) {
-        NodeListT::iterator node_it = coreData->nodes.find(checkId.trimmed());
-        if(node_it == coreData->nodes.end()) continue;
 
-        if(node_it->child_nodes == "") {
-            node_it->status = MonitorBroker::UNKNOWN;
-            unknown_count += 1;
+        NodeListT::iterator node = coreData->nodes.find(checkId.trimmed());
+        if(node == coreData->nodes.end())
+            continue;
+
+        if(node->child_nodes == "") {
+            node->status = MonitorBroker::UNKNOWN;
+            coreData->check_status_count[node->status]++;
             continue;
         }
 
-        QStringList childNodes = node_it->child_nodes.split(Parser::CHILD_NODES_SEP);
+        QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
             MonitorBroker::NagiosCheckT check;
-
             string msg = serverAuthChain + ":"+nodeId.trimmed().toStdString(); //TODO
             if(comChannel) {
                 ZmqHelper::sendFromSocket(*comChannel, msg);
                 msg = ZmqHelper::recvFromSocket(*comChannel);
             } else {
-                msg = JsonError.arg(QString::fromStdString((serverUrl))).toStdString();
+                msg = DEFAULT_ERROR_MSG.arg(QString::fromStdString((serverUrl))).toStdString();
             }
-
             JsonHelper jsHelper(msg);
             if(jsHelper.getProperty("return_code").toInt32() == 0 && comChannel) {
                 check.status = jsHelper.getProperty("status").toInt32();
                 check.host = jsHelper.getProperty("host").toString().toStdString();
                 check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
-                node_it->check.check_command = jsHelper.getProperty("command").toString().toStdString() ;
-                check.alarm_msg = jsHelper.getProperty("message").toString().toStdString() ;
+                node->check.check_command = jsHelper.getProperty("command").toString().toStdString();
+                check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
                 check.status = MonitorBroker::UNKNOWN;
                 check.host = "Unknown";
                 check.last_state_change = "0";
-                node_it->check.check_command = "Unknown"  ;
-                check.alarm_msg = jsHelper.getProperty("message").toString().toStdString() ;
+                node->check.check_command = "Unknown" ;
+                check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
-
-            switch(check.status) {
-            case MonitorBroker::OK:
-                ok_count += 1;
-                break;
-
-            case MonitorBroker::WARNING:
-                warning_count += 1;
-                break;
-
-            case MonitorBroker::CRITICAL:
-                critical_count += 1;
-                break;
-
-            default:
-                unknown_count += 1;
-                break;
-            }
-
-            if (node_it->status != check.status) {
-
-                node_it->check = check;
-                node_it->status = check.status;
-                node_it->prop_status = check.status;
-                updateAlarmMsg(node_it);
-                QString toolTip = getNodeToolTip(*node_it);
-
-                updateNavTreeItemStatus(node_it, toolTip);
-                graphView->updateNode(node_it, toolTip);
-                msgPanel->addMsg(node_it);
-                emit hasToBeUpdate(node_it->parent);
-            }
+            coreData->check_status_count[check.status]++;
+            updateNode(node, check);
         }
     }
-
-    coreData->check_status_count[MonitorBroker::OK] = ok_count;
-    coreData->check_status_count[MonitorBroker::WARNING] = warning_count;
-    coreData->check_status_count[MonitorBroker::CRITICAL] = critical_count;
-    coreData->check_status_count[MonitorBroker::UNKNOWN] = unknown_count;
     updateStats();
-
     ZmqHelper::endCliChannel(comChannel);
     return 0;
 }
 
-int SvNavigator::runZabbixMonitor(void)
+void SvNavigator::resetStatData(void)
 {
-    qint32 ok_count = 0;
-    qint32 warning_count = 0;
-    qint32 critical_count = 0;
-    qint32 unknown_count = 0;
-
-    foreach(const QString & host, coreData->host_checks.keys()) {
-        retrieveZabbixTriggers(host);
-    }
-
-    coreData->check_status_count[MonitorBroker::OK] = ok_count;
-    coreData->check_status_count[MonitorBroker::WARNING] = warning_count;
-    coreData->check_status_count[MonitorBroker::CRITICAL] = critical_count;
-    coreData->check_status_count[MonitorBroker::UNKNOWN] = unknown_count;
-    updateStats();
-    return 0;
+    coreData->check_status_count[MonitorBroker::OK] = 0;
+    coreData->check_status_count[MonitorBroker::WARNING] = 0;
+    coreData->check_status_count[MonitorBroker::CRITICAL] = 0;
+    coreData->check_status_count[MonitorBroker::UNKNOWN] = 0;
+    hLeft = coreData->hosts.size();
+    iter = 0;
 }
+
 
 QString SvNavigator::getNodeToolTip(const NodeT & _node)
 {
-    QString toolTip = DefaultTip.arg(_node.name)
+    QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
             .arg(const_cast<QString&>(_node.description).replace("\n", " "))
             .arg(Utils::statusToString(_node.status))
             .arg(StatusCalcRules::label(_node.status_crule))
             .arg(StatusPropRules::label(_node.status_prule));
     if (_node.type == NodeType::ALARM_NODE) {
-        QString msg = "" ;
+        QString msg = "";
         if(_node.status == MonitorBroker::OK) {
             msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
         } else {
             msg = QString(_node.check.alarm_msg.c_str()).replace("\n", " ");
         }
-        toolTip += AlarmSpecificTip.arg(QString(_node.check.host.c_str()).replace("\n", " "))
+        toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString(_node.check.host.c_str()).replace("\n", " "))
                 .arg(_node.child_nodes)
                 .arg(msg)
-                .arg(QString(_node.check.alarm_msg.c_str()).replace("\n", " ")) ;
+                .arg(QString(_node.check.alarm_msg.c_str()).replace("\n", " "));
     }
 
     return toolTip;
 }
 
+void SvNavigator::updateNode(NodeListT::iterator & _node, const MonitorBroker::CheckT & _check) {
+
+    QString toolTip;
+    _node->check = _check;
+    _node->status = _node->prop_status = _check.status;
+    updateAlarmMsg(_node);
+    toolTip = getNodeToolTip(*_node);
+    updateNavTreeItemStatus(_node, toolTip);
+    graphView->updateNode(_node, toolTip);
+    msgPanel->addMsg(_node);
+    emit hasToBeUpdate(_node->parent);
+}
+
 void SvNavigator::updateStats() {
 
-    qint32 all_checks_count = coreData->checks.size();
-    if(all_checks_count == 0) return ;
-    Stats *stats = new Stats();
-    QString info = stats->update(coreData->check_status_count, all_checks_count);
+    if(coreData->checks.size() == 0) return;
+    Stats *stats = new Stats;
+    QString info = stats->update(coreData->check_status_count, coreData->checks.size());
     stats->setToolTip(info);
     graphView->updateStatsPanel(stats);
-    if(statsPanel) {delete statsPanel;}
+    if(statsPanel) delete statsPanel;
     statsPanel = stats;
     msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
     msgPanel->resizeFields(msgPanelSize);
+    if(success) updateStatusBar("Update completed");
 }
 
 void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
@@ -442,7 +397,7 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
     }
 
     if(_node->status == MonitorBroker::OK) {
-        _node->notification_msg = msg ;
+        _node->notification_msg = msg;
     } else {
         _node->alarm_msg = msg;
     }
@@ -456,7 +411,7 @@ void SvNavigator::updateNodeStatus(QString _node_id)
     qint32 critical_count = 0;
 
     NodeListT::iterator node = coreData->nodes.find(_node_id);
-    if (node == coreData->nodes.end()) return ;
+    if (node == coreData->nodes.end()) return;
 
     Status status;
     QStringList node_ids = node->child_nodes.split(Parser::CHILD_NODES_SEP);
@@ -644,22 +599,21 @@ void SvNavigator::centerGraphOnNode(QTreeWidgetItem * _item)
 
 void SvNavigator::resize(void)
 {
-    QList<qint32> frames_size;
-    const qreal GRAPH_HEIGHT_RATE = 0.50 ;
+    const qreal GRAPH_HEIGHT_RATE = 0.50;
+    QSize screenSize = qApp->desktop()->screen(0)->size();
+    msgPanelSize = QSize(screenSize.width() * 0.80, screenSize.height() * (1.0 - GRAPH_HEIGHT_RATE));
 
-    QSize screen_size = qApp->desktop()->screen(0)->size();
+    QList<qint32> framesSize;
+    framesSize.push_back(screenSize.width() * 0.20);
+    framesSize.push_back(msgPanelSize.width());
+    mainSplitter->setSizes(framesSize);
 
-    msgPanelSize = QSize(screen_size.width() * 0.80, screen_size.height() * (1.0 - GRAPH_HEIGHT_RATE));
+    framesSize[0] = (screenSize.height() * GRAPH_HEIGHT_RATE);
+    framesSize[1] = (msgPanelSize.height());
+    rightSplitter->setSizes(framesSize);
 
-    frames_size.push_back(screen_size.width() * 0.20);
-    frames_size.push_back(msgPanelSize.width());
-    mainSplitter->setSizes(frames_size);
-    frames_size[0] = (screen_size.height() * GRAPH_HEIGHT_RATE),
-            frames_size[1] = (msgPanelSize.height()),
-            rightSplitter->setSizes(frames_size);
-
-    mainSplitter->resize(screen_size.width(), screen_size.height() * 0.85);
-    QMainWindow::resize(screen_size.width(),  screen_size.height());
+    mainSplitter->resize(screenSize.width(), screenSize.height() * 0.85);
+    QMainWindow::resize(screenSize.width(),  screenSize.height());
 }
 
 
@@ -672,24 +626,24 @@ void SvNavigator::loadMenus(void)
 
     QMenuBar* menuBar = new QMenuBar();
     menuList["MENU1"] = menuBar->addMenu("&File"),
-            subMenuList["Refresh"] = menuList["MENU1"]->addAction(refreshIcon, "&Refresh Screen"),
-            subMenuList["Capture"] = menuList["MENU1"]->addAction(cameraIcon, "&Save Map as Image"),
+            subMenuList["Refresh"] = menuList["MENU1"]->addAction(refreshIcon, tr("&Refresh Screen")),
+            subMenuList["Capture"] = menuList["MENU1"]->addAction(cameraIcon, tr("&Save Map as Image")),
             menuList["MENU1"]->addSeparator(),
-            subMenuList["Quit"] = menuList["MENU1"]->addAction("&Quit");
+            subMenuList["Quit"] = menuList["MENU1"]->addAction(tr("&Quit"));
 
     menuList["MENU2"] = menuBar->addMenu("&Map"),
-            subMenuList["ZoomIn"] = menuList["MENU2"]->addAction(zoominIcon, "Zoom &In"),
-            subMenuList["ZoomOut"] = menuList["MENU2"]->addAction(zoomoutIcon, "Zoom &Out"),
-            subMenuList["HideChart"] = menuList["MENU2"]->addAction("Hide &Chart");
+            subMenuList["ZoomIn"] = menuList["MENU2"]->addAction(zoominIcon, tr("Zoom &In")),
+            subMenuList["ZoomOut"] = menuList["MENU2"]->addAction(zoomoutIcon, tr("Zoom &Out")),
+            subMenuList["HideChart"] = menuList["MENU2"]->addAction(tr("Hide &Chart"));
 
     menuList["MENU3"] = menuBar->addMenu("&Preferences"),
-            subMenuList["ChangePassword"] = menuList["MENU3"]->addAction("Change &Password"),
-            subMenuList["ChangeMonitoringSettings"] = menuList["MENU3"]->addAction("&Monitoring Settings");
+            subMenuList["ChangePassword"] = menuList["MENU3"]->addAction(tr("Change &Password")),
+            subMenuList["ChangeMonitoringSettings"] = menuList["MENU3"]->addAction(tr("&Monitoring Settings"));
 
     menuList["MENU4"] = menuBar->addMenu("&Help"),
-            subMenuList["ShowOnlineResources"] = menuList["MENU4"]->addAction("Online &Resources"),
+            subMenuList["ShowOnlineResources"] = menuList["MENU4"]->addAction(tr("Online &Resources")),
             menuList["MENU4"]->addSeparator(),
-            subMenuList["ShowAbout"] = menuList["MENU4"]->addAction("&About " + appName.toUpper());
+            subMenuList["ShowAbout"] = menuList["MENU4"]->addAction(tr("&About")%" "%appName.toUpper());
 
     subMenuList["Capture"]->setShortcut(QKeySequence::Save);
     subMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
@@ -698,9 +652,9 @@ void SvNavigator::loadMenus(void)
     subMenuList["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
     subMenuList["Quit"]->setShortcut(QKeySequence::Quit);
 
-    contextMenuList["FilterNodeRelatedMessages"] = nodeContextMenu->addAction("&Filter related messages");
-    contextMenuList["CenterOnNode"] = nodeContextMenu->addAction("Center Graph &On");
-    contextMenuList["Cancel"] = nodeContextMenu->addAction("&Cancel");
+    contextMenuList["FilterNodeRelatedMessages"] = nodeContextMenu->addAction(tr("&Filter related messages"));
+    contextMenuList["CenterOnNode"] = nodeContextMenu->addAction(tr("Center Graph &On"));
+    contextMenuList["Cancel"] = nodeContextMenu->addAction(tr("&Cancel"));
 
     QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str()));
     toolBar->addAction(subMenuList["Refresh"]);
@@ -712,11 +666,20 @@ void SvNavigator::loadMenus(void)
 }
 
 
-void SvNavigator::openZabbixSession()
+void SvNavigator::openZabbixSession(void)
 {
     zabbixHelper->setBaseUrl(monitorBaseUrl);
     QStringList params = QString::fromStdString("admin:zabbix").split(":");
+    params.push_back(QString::number(ZabbixHelper::LOGIN));
     zabbixHelper->get(ZabbixHelper::LOGIN, params);
+}
+
+void SvNavigator::closeZabbixSession(void)
+{
+    QStringList params;
+    params.push_back(zabbixAuthToken);
+    params.push_back(QString::number(ZabbixHelper::LOGOUT));
+    zabbixHelper->get(ZabbixHelper::LOGOUT, params);
 }
 
 void SvNavigator::retrieveZabbixTriggers(const QString & host)
@@ -724,53 +687,85 @@ void SvNavigator::retrieveZabbixTriggers(const QString & host)
     QStringList params;
     params.push_back(zabbixAuthToken);
     params.push_back(host);
+    params.push_back(QString::number(ZabbixHelper::TRIGGER));
     zabbixHelper->get(ZabbixHelper::TRIGGER, params);
 }
 
 void SvNavigator::processZabbixReply(QNetworkReply* reply)
 {
-    if (reply->error() != QNetworkReply::NoError)
-        return;
-
+    if (reply->error() != QNetworkReply::NoError) return;
     string data = static_cast<QString>(reply->readAll()).toStdString();
     JsonHelper jsHelper(data);
-    QScriptValue content = jsHelper.getProperty("result");
-    QString dataId = jsHelper.getProperty("id").toString();
-    if(dataId == "0") {
-        zabbixAuthToken = content.toString();
-        runZabbixMonitor();
-    } else {
-        QScriptValueIterator trigger(content);
+
+    qint32 dataId = jsHelper.getProperty("id").toInt32();
+    switch(dataId) {
+    case ZabbixHelper::LOGIN :
+        zabbixAuthToken = jsHelper.getProperty("result").toString();
+        resetStatData();
+        updateStatusBar(tr("Updating..."));
+        foreach(const QString & host, coreData->hosts.keys()) {
+            retrieveZabbixTriggers(host);
+        }
+        break;
+
+    case ZabbixHelper::TRIGGER: {
+        QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
-
             trigger.next();
+            if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue triggerData = trigger.value();
-
-            MonitorBroker::CheckT check ;
-            check.check_command = triggerData.property("description").toString().toStdString() ;
-            check.status = triggerData.property("value").toInt32() ;
-
+            MonitorBroker::CheckT check;
+            QString triggerName = triggerData.property("description").toString();
+            check.check_command = triggerName.toStdString();
+            check.status = triggerData.property("value").toInt32();
+            if(check.status != MonitorBroker::OK) {
+                check.alarm_msg = triggerData.property("error").toString().toStdString();
+            } else {
+                check.alarm_msg = triggerName.toStdString(); //TODO
+            }
+            QString targetHost = "";
             QScriptValueIterator host(triggerData.property("hosts"));
             if(host.hasNext()) {
                 host.next();
                 QScriptValue hostData = host.value();
-                check.host = hostData.property("host").toString().toStdString() ;
+                targetHost = hostData.property("host").toString();
+                check.host = targetHost.toStdString();
             }
-
             QScriptValueIterator item(triggerData.property("items"));
             if(item.hasNext()) {
                 item.next();
                 QScriptValue itemData = item.value();
-                check.last_state_change = itemData.property("lastclock").toString().toStdString() ;
+                check.last_state_change = itemData.property("lastclock").toString().toStdString();
             }
-            cout << check.host << " status: " << check.status<< " lastchange:" << check.last_state_change << endl;
+            QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
+            check.id = key.toStdString();
+            coreData->checks_[key] = check;
         }
+        if(hLeft--, hLeft == 0){
+            foreach(const QString & c, coreData->cnodes.keys()) {
+                NodeListT::iterator node = coreData->nodes.find(c);
+                if(node == coreData->nodes.end()) continue;
+                CheckListT::Iterator check = coreData->checks_.find(node->child_nodes);
+                if(check == coreData->checks_.end()) continue;
+                updateNode(node, *check);
+                coreData->check_status_count[check->status]++;
+            }
+            updateStats();
+        }
+        break;
+    }
+    default : break;
     }
 }
 
 void SvNavigator::processZabbixError(QNetworkReply::NetworkError code){
 
-    QString msg = ServiceOfficeMsg.arg("ZABBIX API on "+zabbixHelper->getApiUri()+".\n"
-                                       +"Error code: "+QString::number(code));
-    alert(msg);
+    QString msg = SERVICE_OFFLINE_MSG.arg(zabbixHelper->getApiUri()%tr(" (error code %1)").arg(code));
+    Utils::alert(msg);
+    updateStatusBar(msg);
+    success = false ;
+}
+
+void  SvNavigator::updateStatusBar(const QString & msg) {
+    statusBar()->showMessage(msg);
 }

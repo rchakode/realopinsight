@@ -53,3 +53,8 @@ void Utils::clear(Struct& data) {
     data.nodes.clear();
     data.tree_items.clear();
 }
+
+void Utils::alert(const QString  & msg) {
+        QMessageBox::warning(0, + "Warning | " + appName, msg, QMessageBox::Yes);
+}
+

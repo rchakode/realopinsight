@@ -63,14 +63,14 @@ QString PieChart::update(const CheckStatusCountT & _check_status_count, const qi
 	slices[MonitorBroker::OK] = new PieChartItem(
 			boundingRect, 3.6 * (unknown_ratio + warning_ratio + critical_ratio), 3.6 * ok_ratio, StatsLegend::OK_COLOR, this) ;
 
-	QString info =  "Critical: " + QString::number(critical_count) + "/"
-			"" + QString::number(_check_count) + " (" + QString::number(critical_ratio, 'f', 0) +
-			"%)" + "\nWarning: " + QString::number(warning_count) +
-			"/" + QString::number(_check_count) + " (" + QString::number(warning_ratio, 'f', 0) +
-			"%)" + "\nUnknown: " + QString::number(unknown_count) +
-			"/" + QString::number(_check_count) + " (" + QString::number(unknown_ratio, 'f', 0) +
-			"%)" + "\nNormal: " + QString::number(ok_count) +
-			"/" + QString::number(_check_count) + " (" + QString::number(ok_ratio, 'f', 0) +
+    QString info =  tr("Critical")%": "%QString::number(critical_count)%"/"
+            %QString::number(_check_count)%" ("%QString::number(critical_ratio, 'f', 0) %
+            "%)"%"\n"%tr("Warning")%": "%QString::number(warning_count)%
+            "/"%QString::number(_check_count)%" ("%QString::number(warning_ratio, 'f', 0)%
+            "%)"%"\n"%tr("Unknown")%": "%QString::number(unknown_count)%
+            "/"%QString::number(_check_count)%" ("%QString::number(unknown_ratio, 'f', 0)%
+            "%)"%"\n"%tr("Normal")%": "%QString::number(ok_count)%
+            "/"%QString::number(_check_count)%" ("%QString::number(ok_ratio, 'f', 0)%
 			"%)" ;
 
 	return info ;

@@ -21,8 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAV_H_
-#define SNAV_H_
+#ifndef SVNAVIGATOR_HPP
+#define SVNAVIGATOR_HPP
 
 #include "Base.hpp"
 #include "Stats.hpp"
@@ -34,8 +34,7 @@
 #include "Preferences.hpp"
 #include "core/ZmqHelper.hpp"
 #include "ZabbixHelper.hpp"
-
-using namespace std;
+#include <QScriptValueIterator>
 
 class SvNavigator : public QMainWindow
 {
@@ -59,7 +58,7 @@ public:
 public slots:
     void startMonitor();
     int runNagiosMonitor(void);
-    int runZabbixMonitor(void);
+    void resetStatData(void);
     void updateNodeStatus(QString);
     void expandNode(const QString &, const bool &, const qint32 &);
     void centerGraphOnNode(const QString & _node_id = "");
@@ -116,24 +115,29 @@ private:
     SubMenuListT contextMenuList;
     QString serverAddr;
     QString serverPort;
-    string serverUrl;
-    string serverAuthChain;
+    std::string serverUrl;
+    std::string serverAuthChain;
     zmq::socket_t* comChannel;
     ZabbixHelper* zabbixHelper;
     QString zabbixAuthToken;
     qint8 monitorType;
+    qint32 hLeft;
+    qint32 iter;
+    bool success;
 
 
     void addEvents(void);
     void loadMenus(void);
     void unloadMenus(void);
-    void alert(const QString & msg);
     void updateMonitoringSettings();
     void updateNavTreeItemStatus(const NodeListT::iterator &, const QString &);
     void updateAlarmMsg(NodeListT::iterator &);
+    void updateNode(NodeListT::iterator & _node, const MonitorBroker::CheckT & _check) ;
     void updateStats();
     void openZabbixSession(void);
+    void closeZabbixSession(void);
     void retrieveZabbixTriggers(const QString & host);
+    void updateStatusBar(const QString & msg);
 };
 
-#endif /* SNAV_H_ */
+#endif /* SVNAVIGATOR_HPP */

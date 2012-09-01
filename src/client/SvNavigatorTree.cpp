@@ -25,13 +25,14 @@
 #include "SvNavigatorTree.hpp"
 #include <QtGui>
 #include "Parser.hpp"
+#include "Utils.hpp"
 
 const QString SvNavigatorTree::rootID = "root";
 
 SvNavigatorTree::SvNavigatorTree(const bool & _enable_drag, QWidget* _parent)
     : QTreeWidget(_parent), ptr2Data(NULL)
 {
-    setHeaderLabel("TV Explorer") ;
+    setHeaderLabel(tr("TV Explorer")) ;
     setColumnCount(1) ;
     setDragDropMode(QAbstractItemView::DragDrop) ;
     setDragEnabled( _enable_drag ) ;
@@ -55,8 +56,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
                 QTreeWidget::dropEvent( _event ) ;
                 emit treeNodeMoved(selectedNode) ;
             }else {
-                QMessageBox::warning(this, "Warning! | " +appName.toUpper(),
-                                     "Dropping not allowed on the target node", QMessageBox::Ok) ;
+                Utils::alert(tr("Dropping is not allowed on the target node"));
             }
         }
     }
@@ -94,7 +94,7 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
     else {
         (*nit)->setIcon(0, QIcon(":/images/unknown.png")) ;
         (*nit)->setText(0, _node.name) ;
-        (*nit)->setText(1, _node.id) ; // Not show in UI,  useful for handling events
+        (*nit)->setData(0, QTreeWidgetItem::UserType, _node.id) ;
     }
 
     if( _node.type != NodeType::ALARM_NODE && _node.child_nodes != "" ) {

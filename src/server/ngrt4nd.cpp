@@ -127,7 +127,7 @@ int main(int argc, char ** argv)
         case 'p': {
             port = atoi(optarg) ;
             if(port <= 0 ) {
-                cerr << "Error: bad port number." << endl ;
+                cerr << "ERROR: bad port number." << endl ;
                 exit(1) ;
             }
             break;
@@ -174,7 +174,7 @@ int main(int argc, char ** argv)
     if( ! foreground ) {
         pid_t pid = fork();
         if(pid <= -1) {
-            cerr << "Error: failed while starting the program in daemon mode" << endl;
+            cerr << "ERROR: failed while starting the program in daemon mode" << endl;
             exit(1);
         }
         else if(pid > 0) {
@@ -214,7 +214,7 @@ int main(int argc, char ** argv)
             if(pass == authChain) {
                 reply = monitor->getInfOfService(sid) ;
             } else {
-                reply = "{\"return_code\" : \"-2\", \"message\" : \"Error: wrong authentication\"}";
+                reply = "{\"return_code\" : \"-2\", \"message\" : \"ERROR: Wrong authentication\"}";
             }
         }
 

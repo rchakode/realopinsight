@@ -259,14 +259,11 @@ bool GraphView::load(const QString & _dot_file, const NodeListT & _service_list)
     int exitCode = dot_parser->execute("dot", arguments);
     dot_parser->waitForFinished(60000);
 
-    if ( ! exitCode )
-    {
+    if ( ! exitCode ) {
         drawGraph( _service_list ) ;
         graphScene->setSceneRect(graphScene->itemsBoundingRect()) ;
-    }
-    else
-    {
-        qDebug() << "The graph engine exited with the code: " << exitCode;
+    } else {
+        qDebug() << tr("The graph engine exited with the code %1").arg(exitCode);
         exit( exitCode ) ;
     }
 
@@ -546,7 +543,7 @@ void GraphView::capture(void)
     QPixmap pixmap(size()) ;
     QPainter painter(&pixmap) ;
     QString fileName= QFileDialog::getSaveFileName(this,
-                                                   "Select the image destination - " + appName.toUpper(),
+                                                   tr("Select the image destination - ") + appName.toUpper(),
                                                    ".",
                                                    tr("PNG files (*.png);; All files (*)"));
     QFileInfo fileInfo(fileName) ;

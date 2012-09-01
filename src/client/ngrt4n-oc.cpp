@@ -27,9 +27,12 @@
 #include "client/SvConfigCreator.hpp"
 #include <sstream>
 #include <getopt.h>
+#include <QObject>
+#include "Utils.hpp"
+
 
 QString cmdName = "" ;
-QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
+QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "Options: \n"
         "	-c\n"
         "	   Launch the configuration utility\n"
@@ -39,9 +42,9 @@ QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
         "	   Print this help.\n" ;
 
 
-ostringstream versionMsg(appName.toStdString() + " Operations Console, Version " + packageVersion.toStdString() + ".\n\n"
-		+"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
-		+"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
+ostringstream versionMsg(appName.toStdString()+" "+QObject::tr("Operations Console, Version")+" "+packageVersion.toStdString()+".\n\n"
+                         +"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
+                         +"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
 
 int main(int argc, char **argv)
 {
@@ -49,7 +52,7 @@ int main(int argc, char **argv)
     app->setWindowIcon(QIcon (":images/built-in/icon.png")) ;
     app->setApplicationName(appName) ;
     app->setStyleSheet(Preferences::style());
-    cmdName=argv[0];
+    cmdName= basename(argv[0]);
 
     if(argc > 3) {
         qDebug() << usage ;
@@ -72,17 +75,17 @@ int main(int argc, char **argv)
         }
 
         case 'h': {
-            cout << usage.toStdString() ;
+            cout << usage.arg(cmdName).toStdString() ;
             exit(0) ;
         }
 
         default:
-            cout << "Syntax Error :: " << usage.toStdString() ;
+            cout << usage.arg(cmdName).toStdString() ;
             exit (1) ;
             break ;
         }
     }
-	cout <<"Launching "<<versionMsg.str()<<endl;
+    cout <<"Launching "<<versionMsg.str()<<endl;
     Auth authentication;
     int userRole = authentication.exec() ;
     if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit(1) ;
@@ -95,22 +98,19 @@ int main(int argc, char **argv)
         exit(0) ;
     }
 
-    QSplashScreen* info = Preferences::infoScreen(QString("Welcome to %1").arg(QString::fromStdString(versionMsg.str())));
+    QSplashScreen* info = Preferences::infoScreen(QString(tr("Welcome to %1")).arg(QString::fromStdString(versionMsg.str())));
     sleep(2);
     if(file == "") {
         info->clearMessage();
-        info->showMessage("You need to select a configuration file!", Qt::AlignCenter|Qt::AlignCenter);
+        info->showMessage(tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
         sleep(1); info->finish(0);
         file = QFileDialog::getOpenFileName(0,
-                                            appName.toUpper()+" :: Select a configuration file",
+                                            QObject::tr("%1 | Select a configuration file").arg(appName),
                                             ".",
                                             "Xml files (*.xml);;All files (*)");
 
         if(! file.length()){
-            QMessageBox::critical(0,
-                                  appName.toUpper() + " :: Info",
-                                  "No configuration file has been selected and the program will exit.",
-                                  QMessageBox::Ok);
+            Utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
             exit (1) ;
         }
     }

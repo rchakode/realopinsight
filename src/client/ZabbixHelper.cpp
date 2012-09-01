@@ -55,7 +55,7 @@ void ZabbixHelper::get(const qint32 & reqId, const QStringList & params) {
     foreach(const QString &param, params) {
         request = request.arg(param) ;
     }
-    QNetworkReply* reply = this->post(*requestHandler, request.toAscii()); //Handle error
+    QNetworkReply* reply = this->post(*requestHandler, request.toAscii());
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
@@ -66,10 +66,10 @@ void ZabbixHelper::processError(QNetworkReply::NetworkError code) {
 void ZabbixHelper::setRequestsPatterns(){
 
     requestsPatterns[LOGIN] = "{\"jsonrpc\": \"2.0\", \
+            \"auth\": null, \
             \"method\": \"user.login\", \
             \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-            \"auth\": null, \
-            \"id\": 0}" ;
+            \"id\": %9}" ;
 
     requestsPatterns[TRIGGER] = "{\"jsonrpc\": \"2.0\", \
             \"auth\": \"%1\", \
@@ -78,7 +78,13 @@ void ZabbixHelper::setRequestsPatterns(){
             \"filter\": { \"host\":[\"%2\"]}, \
             \"selectHosts\": [\"host\"], \
             \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-            \"output\": [\"description\",\"value\",\"error\",\"comments\"], \
+            \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
             \"limit\": -1}, \
-            \"id\": 1}";
+            \"id\": %9}";
+
+    requestsPatterns[LOGOUT] = "{\"jsonrpc\": \"2.0\", \
+            \"method\": \"user.logout\", \
+            \"params\": {\"sessionid\": \"%1\"}, \
+            \"auth\": \"%1\", \
+            \"id\": %9}";
 }

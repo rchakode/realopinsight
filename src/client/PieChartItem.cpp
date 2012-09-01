@@ -35,8 +35,7 @@ PieChartItem::PieChartItem(const QRectF & _bounding_rect,
 {
 	path.moveTo( pieChartBoundingRect.center() );
 	path.arcTo(pieChartBoundingRect, startAngle, proportion);
-	path.closeSubpath();
-	//setStyleSheet("background:transparent") ;
+    path.closeSubpath();
 }
 
 QSize PieChartItem::minimumSizeHint() const

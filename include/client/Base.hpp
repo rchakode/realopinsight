@@ -21,8 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAV_HPP_
-#define SNAV_HPP_
+#ifndef BASE_HPP
+#define BASE_HPP
 #include <QtCore>
 #include <QtXml>
 #include <QtGui>
@@ -30,18 +30,19 @@
 #include <QSettings>
 #include <bitset>
 #include "core/MonitorBroker.hpp"
+#include <QTranslator>
 
-const QString appName=APPLICATION_NAME ;
+const QString appName=APPLICATION_NAME;
 const QString packageName=PACKAGE_NAME;
 const QString packageVersion=PACKAGE_VERSION;
 const QString packageUrl=PACKAGE_URL;
 const QString releaseYear=RELEASE_YEAR;
-const QString userPfx=BUILTIN_USER_PREFIX ;
+const QString userPfx=BUILTIN_USER_PREFIX;
 
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
-typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT ;
-typedef bitset<4> StatusInfoT ;
+typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
+typedef bitset<4> StatusInfoT;
 
 class StatusPropRules {
 public :
@@ -52,20 +53,20 @@ public :
     };
 
     static QString toString(StatusPropRulesT rule) {
-        return QString::number(rule) ;
+        return QString::number(rule);
     }
 
     static QString label(qint32 rule) {
-        return label(static_cast<StatusPropRulesT>(rule)) ;
+        return label(static_cast<StatusPropRulesT>(rule));
     }
     static QString label(StatusPropRulesT rule) {
         switch(rule) {
-        case Unchanged: return "Unchanged" ;
-        case Decreased: return "Decreased" ;
-        case Increased: return "Increased" ;
+        case Unchanged: return "Unchanged";
+        case Decreased: return "Decreased";
+        case Increased: return "Increased";
         }
 
-        return "Unchanged" ;
+        return "Unchanged";
     }
 };
 
@@ -78,18 +79,18 @@ public :
     };
 
     static QString toString(StatusCalcRulesT rule) {
-        return QString::number(rule) ;
+        return QString::number(rule);
     }
 
     static QString label(qint32 rule) {
-        return label(static_cast<StatusCalcRulesT>(rule)) ;
+        return label(static_cast<StatusCalcRulesT>(rule));
     }
 
     static QString label(StatusCalcRulesT rule) {
 
-        if (rule == WeightedCriticity) return "Weighted Criticity" ;
+        if (rule == WeightedCriticity) return "Weighted Criticity";
 
-        return "High Criticity" ;
+        return "High Criticity";
     }
 };
 
@@ -99,12 +100,12 @@ public :
     enum {
         SERVICE_NODE = 0,
         ALARM_NODE = 1
-    } ;
+    };
     static QString toString(int _type ) {
 
-        if (_type == ALARM_NODE ) return "Native Check" ;
+        if (_type == ALARM_NODE ) return "Native Check";
 
-        return  "Business Process" ;
+        return  "Business Process";
     }
 
 };
@@ -115,111 +116,117 @@ class Status{
 public:
 
     Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {}
-    MonitorBroker::StatusT getValue() const{return value ;}
+    MonitorBroker::StatusT getValue() const{return value;}
 
     Status operator *(Status& st) const {
         switch(value) {
-        case MonitorBroker::CRITICAL : return Status(MonitorBroker::CRITICAL) ;
-        case MonitorBroker::OK : return st ;
+        case MonitorBroker::CRITICAL : return Status(MonitorBroker::CRITICAL);
+        case MonitorBroker::OK : return st;
         case MonitorBroker::WARNING: {
-            if(st.value == MonitorBroker::CRITICAL || st.value == MonitorBroker::UNKNOWN) return st ;
-            return Status(MonitorBroker::WARNING) ;
+            if(st.value == MonitorBroker::CRITICAL || st.value == MonitorBroker::UNKNOWN) return st;
+            return Status(MonitorBroker::WARNING);
         }
         default : { //UNKNOWN
-            if(st.value == MonitorBroker::CRITICAL) return st ;
-            return Status(MonitorBroker::UNKNOWN) ;
+            if(st.value == MonitorBroker::CRITICAL) return st;
+            return Status(MonitorBroker::UNKNOWN);
         }
         }
     }
 
     Status operator /(Status& st) const {
         if((value == MonitorBroker::CRITICAL) || (st.value == MonitorBroker::CRITICAL))
-            return Status(MonitorBroker::CRITICAL) ;
+            return Status(MonitorBroker::CRITICAL);
         if((value == MonitorBroker::UNKNOWN) || (st.value == MonitorBroker::UNKNOWN))
-            return Status(MonitorBroker::UNKNOWN) ;
+            return Status(MonitorBroker::UNKNOWN);
         if(value == st.value) return  st;
 
-        return Status(MonitorBroker::WARNING) ;
+        return Status(MonitorBroker::WARNING);
     }
 
     Status operator ++(int) {
         switch(value) {
-        case MonitorBroker::WARNING: return Status(MonitorBroker::CRITICAL) ;
-        case MonitorBroker::UNKNOWN : return Status(MonitorBroker::WARNING) ;
-        default : break ;
+        case MonitorBroker::WARNING: return Status(MonitorBroker::CRITICAL);
+        case MonitorBroker::UNKNOWN : return Status(MonitorBroker::WARNING);
+        default : break;
         }
 
-        return Status(value) ;
+        return Status(value);
     }
 
     Status operator --(int) {
         switch(value) {
-        case MonitorBroker::CRITICAL: return Status(MonitorBroker::WARNING) ;
-        default : break ;
+        case MonitorBroker::CRITICAL: return Status(MonitorBroker::WARNING);
+        default : break;
         }
 
-        return Status(value) ;
+        return Status(value);
     }
 private:
 
-    MonitorBroker::StatusT value ;
-} ;
+    MonitorBroker::StatusT value;
+};
 
 
 typedef struct _NodeT {
     QString id;
-    QString name ;
-    qint32 type ;
-    qint32 status_crule ;
-    qint32 status_prule ;
-    QString icon ;
-    QString description ;
-    QString parent ;
-    QString propagation_rule ;
-    QString alarm_msg ;
-    QString notification_msg ;
-    qint32 status ;
-    qint32 prop_status ;
-    QString child_nodes ;
-    MonitorBroker::NagiosCheckT check ;
+    QString name;
+    qint32 type;
+    qint32 status_crule;
+    qint32 status_prule;
+    QString icon;
+    QString description;
+    QString parent;
+    QString propagation_rule;
+    QString alarm_msg;
+    QString notification_msg;
+    qint32 status;
+    qint32 prop_status;
+    QString child_nodes;
+    MonitorBroker::NagiosCheckT check;
 } NodeT;
 
-typedef QHash<QString, NodeT> NodeListT ;
-typedef QMap<qint32, qint32> CheckStatusCountT ;
+typedef QHash<QString, NodeT> NodeListT;
+typedef QMap<qint32, qint32> CheckStatusCountT;
+typedef QHash<QString, MonitorBroker::CheckT> CheckListT;
 
 typedef struct _GNode {
-    QGraphicsTextItem* label ;
-    QGraphicsPixmapItem* icon ;
-    QGraphicsPixmapItem* exp_icon ;
-    qint32 type ;
-    bool expand ;
+    QGraphicsTextItem* label;
+    QGraphicsPixmapItem* icon;
+    QGraphicsPixmapItem* exp_icon;
+    qint32 type;
+    bool expand;
 }GNodeT;
 
 typedef struct _GEdge {
-    QGraphicsPathItem* edge ;
+    QGraphicsPathItem* edge;
 }GEdgeT;
 
 typedef QHash<QString,GNodeT> GNodeListT;
 typedef QHash<QString,GEdgeT> GEdgeListT;
-typedef QHash<QString,QStringList> HostChecksT;
+typedef QHash<QString,QStringList> HostListT;
 typedef QMap<QString,QMenu*> MenuListT;
 typedef QMap<QString,QAction*> SubMenuListT;
 typedef QMap<QString,QString> ComboBoxItemsT;
 
 
 struct Struct {
-    TreeNodeItemListT tree_items ;
-    NodeListT nodes ;
-    QStringList checks ;
-    CheckStatusCountT check_status_count ;
-    HostChecksT host_checks;
+    TreeNodeItemListT tree_items;
+    NodeListT nodes;
+    NodeListT cnodes;
+    QStringList checks;
+    CheckListT checks_;
+    CheckStatusCountT check_status_count;
+    HostListT hosts;
 };
 
 class Settings : public QSettings
 {
 public:
-    Settings() ;
-    void setKeyValue(const QString & _key, const QString & _value) ;
+    Settings();
+    void setKeyValue(const QString & _key, const QString & _value);
+
+private:
+    QTranslator* translator ;
 };
 
-#endif /* SNAV_HPP_ */
+#endif /* BASE_HPP */

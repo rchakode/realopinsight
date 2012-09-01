@@ -49,7 +49,7 @@ string MonitorBroker::getInfOfService(const string & _sid)
     NagiosChecksT::iterator it = services.find(_sid) ;
 
     if (it == services.end() ) {
-        return "{\"return_code\":\"-1\",\"message\":\"Error: unknow service :" + _sid + "\"}" ;
+        return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}" ;
     }
 
     ostringstream ret ;
@@ -67,40 +67,10 @@ string MonitorBroker::getInfOfService(const string & _sid)
 bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks)
 {
 
-//    /* First make a snapshot of the status file before treat it ; */
-//    string snapshot = "/tmp/status.dat.snap" ;
-//    FILE* stFile = fopen(_sfile.c_str(), "rt") ;
-//    FILE* fSnapshot =  fopen(snapshot.c_str(), "wt") ;
-
-//    if( stFile == NULL || fSnapshot == NULL ){
-//        cerr << "Unable to open the file : " << _sfile << endl;
-//        return false ;
-//    }
-
-//    fseek(stFile, 0, SEEK_END) ; size_t size = ftell(stFile) ; rewind(stFile) ;
-
-//    char* buffer = (char*)malloc(size * sizeof(char)) ;
-
-//    size_t nbRead = fread(buffer, 1, size, stFile);
-//    if(nbRead != size){
-//        cerr << "Error while reading the status file : " << _sfile << endl;
-//        return false ;
-//    }
-
-//    size_t nbWrite = fwrite(buffer, 1, size, fSnapshot);
-
-//    if(nbWrite != size){
-//        cerr << "Error while creating a snapshot of the status file : " << endl;
-//        return false ;
-//    }
-
-//    fcloseall() ; // End of the copy
-
-    /* Now start parsing */
     ifstream stFileStream ;
     stFileStream.open(_sfile.c_str(), std::ios_base::in) ;
     if (! stFileStream.good() ) {
-        cerr << "Unable to open the file " << _sfile << endl ;
+        cerr << "ERROR: Unable to open the file " << _sfile << endl ;
         return false ;
     }
 
