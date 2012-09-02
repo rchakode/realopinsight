@@ -100,4 +100,4 @@ DISTFILES += README \
 			 dm-1.0.tar.gz
 
 OTHER_FILES = \
-    ngrt4n_en.ts
+    ngrt4n_la.ts

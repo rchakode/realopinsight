@@ -86,7 +86,7 @@ void SvCreator::unloadMenu(void)
 
 void SvCreator::load(const QString& _filename)
 {
-    setWindowTitle(openedFile + " | "%appName.toUpper()%" "%tr("Editor"));
+    setWindowTitle(tr("%1 Editor | %2").arg(appName).arg(openedFile));
     loadMenu();
     addEvents();
     loadFile(_filename);
@@ -97,7 +97,7 @@ void SvCreator::load(const QString& _filename)
 void SvCreator::open(void)
 {
     QString path = QFileDialog::getOpenFileName(this,
-                                                appName.toUpper()%"| "%tr("Select a configuration file"),
+                                                tr("%1 | Select a configuration file").arg(appName),
                                                 ".",
                                                 tr("Xml files (*.xml);;All files (*)"));
 
@@ -111,7 +111,7 @@ void SvCreator::loadFile(const QString& _filename)
     if(_filename == NULL) return;
     Utils::clear(*data);
     if (! parser.parseSvConfig(_filename, *data) ) {
-        qDebug() << tr("Unable to open the file")%" "%_filename << endl;
+        Utils::alert(tr("Unable to open the file %1").arg(_filename));
         exit(1);
     }
     navigationTree->update(data);
@@ -120,7 +120,7 @@ void SvCreator::loadFile(const QString& _filename)
 
 void SvCreator::import(){
     QString path = QFileDialog::getOpenFileName(this,
-                                                tr("Select the Status File")%" | "%appName.toUpper(),
+                                                tr("Select the Status File %").arg(appName),
                                                 ".",
                                                 tr("Data files (*.dat);;All files (*)"));
     if(path.length()) editor->loadStatusFile(path);
@@ -185,10 +185,9 @@ void SvCreator::deleteNode(void)
     QMessageBox msg_box;
 
     msg_box.setText(tr("Do you really want to delete the service and its sub services?"));
-    msg_box.setWindowTitle(tr("Deleting service")%" | "%appName.toUpper());
+    msg_box.setWindowTitle(tr("%1 Editor | Deleting service").arg(appName));
 
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-
     switch ( msg_box.exec() )
     {
     case QMessageBox::Yes:
@@ -262,11 +261,11 @@ void SvCreator::saveAs(void)
 {
     QString config_file;
     config_file = QFileDialog::getSaveFileName(this,
-                                               tr("Select the destination path")%" | "%appName.toUpper(),
+                                               tr("Select the destination path %1").arg(appName),
                                                ".",
                                                tr("Xml files (*.xml);; All files (*)"));
     saveInFile(config_file);
-    setWindowTitle(openedFile%" | "%appName.toUpper()%" "%tr("Editor"));
+    setWindowTitle(tr("%1 Editor | %2").arg(appName).arg(openedFile));
 }
 
 int SvCreator::close( const bool & _close_windows )
@@ -276,7 +275,7 @@ int SvCreator::close( const bool & _close_windows )
     }
 
     QMessageBox mbox;
-    mbox.setWindowTitle(tr("Save change?")%" | "%appName.toUpper());
+    mbox.setWindowTitle(tr("%1 | Save change?").arg(appName));
     mbox.setText(tr("The document has been modified.\nDo you want to save your changes?"));
 
     if( _close_windows ) {
@@ -466,7 +465,7 @@ void SvCreator::saveInFile(const QString& _filename)
         ofile << "</ServiceView>" << endl;
         hasToBeSaved = 0;
         openedFile = _filename;
-        qDebug() << _filename%" "%tr("writed");
+        statusBar()->showMessage(_filename%" "%tr("writed"));
     }
     file.close();
 }
@@ -499,7 +498,7 @@ void SvCreator::loadMenu(void)
     menuList["MENU2"] = menuBar->addMenu(tr("&Help")),
             subMenuList["ShowOnlineResources"] = menuList["MENU2"]->addAction(tr("Online &Resources")),
             menuList["MENU2"]->addSeparator(),
-            subMenuList["ShowAbout"] = menuList["MENU2"]->addAction(tr("&About")%" "%appName.toUpper());
+            subMenuList["ShowAbout"] = menuList["MENU2"]->addAction(tr("&About %1").arg(appName));
 
     subMenuList["NewFile"]->setShortcut(QKeySequence::New);
     subMenuList["Open"]->setShortcut(QKeySequence::Open);

@@ -24,6 +24,7 @@
 #include "core/ns.hpp"
 #include "Parser.hpp"
 #include "GraphView.hpp"
+#include "Utils.hpp"
 #include <QObject>
 
 using namespace std;
@@ -54,17 +55,17 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
     QFile file(_configFile);
 
     if ( ! file.open(QIODevice::ReadOnly) ) {
-        qDebug() << QObject::tr("Unable to open the file %1").arg(_configFile);
+        Utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
         return false;
     }
 
     if (! xmlDoc.setContent(&file) ) {
         file.close();
-        qDebug() << QObject::tr("Error while parsing the file %1").arg(_configFile);
+        Utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
         return false;
     }
-
     xmlRoot = xmlDoc.documentElement();
+    _coreData.monType = xmlRoot.attribute("monType").toInt();
     QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
     qint32 serviceCount = services.length();
@@ -94,7 +95,6 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
         if( node.type == NodeType::ALARM_NODE ) {
             QString host = (node.child_nodes.split("/")).at(0) ;
             _coreData.hosts[host] << node.id;
-            _coreData.checks << node.id;
             _coreData.cnodes.insert(node.id, node) ;
         }
     }
@@ -151,7 +151,7 @@ void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
 
             TreeNodeItemListT::iterator nitem = _tree.find(node->id) ;
             if ( nitem == _tree.end()) {
-                qDebug() << QObject::tr("service not found %1").arg(node->name);
+                Utils::alert(QObject::tr("service not found %1").arg(node->name));
                 continue ;
             }
 
@@ -163,15 +163,12 @@ void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
 
 void Parser::saveCoordinatesDotFile(const QString& _graph_content)
 {
-    QFile file;
-
     graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
-    file.setFileName(graphFilename);
+    QFile file(graphFilename);
     if(! file.open(QIODevice::WriteOnly)) {
-        qDebug() << QObject::tr("Unable into write the file %1").arg(graphFilename) ;
+        Utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
         exit (1);
     }
-
     QTextStream file_stream(&file);
     file_stream << _graph_content;
     file.close();

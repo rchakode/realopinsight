@@ -43,7 +43,6 @@ class SvNavigator : public QMainWindow
 public:
     SvNavigator(const qint32 & _userRole = Auth::OP_USER_ROLE,
                 const QString & _config = "",
-                const qint8 & _monitorType = MonitorBroker::NAGIOS,
                 QWidget* = 0);
     virtual ~SvNavigator();
     void load(const QString & _file = "");
@@ -120,7 +119,6 @@ private:
     zmq::socket_t* comChannel;
     ZabbixHelper* zabbixHelper;
     QString zabbixAuthToken;
-    qint8 monitorType;
     qint32 hLeft;
     qint32 iter;
     bool success;

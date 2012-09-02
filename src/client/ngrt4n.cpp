@@ -26,16 +26,13 @@
 #include "client/Auth.hpp"
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
+#include "core/ZmqHelper.hpp"
+#include "client/ZabbixHelper.hpp"
 #include <sstream>
 #include <getopt.h>
 #include <QTranslator>
 #include <QObject>
 
-
-#include "core/ZmqHelper.hpp"
-#include "client/ZabbixHelper.hpp"
-
-QString cmdName = "" ;
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "Options: \n"
         "	-c\n"
@@ -47,7 +44,7 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "	-v\n"
         "	  Print the version and license information.\n"
         "	-h \n"
-        "	   Print this help.\n" ;
+        "	   Print this help.\n";
 
 
 ostringstream versionMsg(appName.toStdString()+" "+packageName.toStdString()+", Version "+packageVersion.toStdString()+".\n\n"
@@ -56,62 +53,51 @@ ostringstream versionMsg(appName.toStdString()+" "+packageName.toStdString()+", 
 
 int main(int argc, char **argv)
 {
-    QApplication* app = new QApplication(argc, argv) ;
-    app->setWindowIcon(QIcon(":images/built-in/icon.png")) ;
-    app->setApplicationName(appName.toUpper() ) ;
+    QApplication* app = new QApplication(argc, argv);
+    app->setWindowIcon(QIcon(":images/built-in/icon.png"));
+    app->setApplicationName(appName.toUpper() );
     app->setStyleSheet(Preferences::style());
-    cmdName= basename(argv[0]);;
-    if(argc > 3) {
-        qDebug() << usage ;
-        exit (1) ;
-    }
+    QString cmdName= basename(argv[0]);
 
-    QTranslator translator;
-    if(translator.load("ngrt4n_en"))
-        qDebug() << "OK";
-    app->installTranslator(&translator);
-
-    QString module = "config" ;
-    QString file = argv[1] ;
-    int opt ;
-
-    if ( (opt = getopt(argc, argv, "cdehv") ) != -1) {
+    QString module = "config";
+    QString file = (argc >= 2)? argv[1] : "";
+    int opt;
+    if ( (opt = getopt(argc, argv, "chvd:e:") ) != -1) {
         switch (opt) {
         case 'c':
-            module = "config" ;
-            break ;
+            module = "config";
+            break;
 
         case 'd':
-            module = "dashboard" ;
-            file = argv[2] ;
-            break ;
+            module = "dashboard";
+            file = optarg;
+            break;
 
         case 'e':
-            module = "editor" ;
-            file = argv[2] ;
-            break ;
+            module = "editor";
+            file = optarg;
+            break;
 
-        case 'v': {
+        case 'v':
             cout << versionMsg.str()<<endl;
-            exit(0) ;
-        }
+            exit(0);
 
         case 'h': {
-            cout << usage.arg(cmdName).toStdString() ;
-            exit(0) ;
+            cout << usage.arg(cmdName).toStdString();
+            exit(0);
         }
 
         default:
-            cout << usage.arg(cmdName).toStdString() ;
-            exit (1) ;
-            break ;
+            cout << usage.arg(cmdName).toStdString();
+            exit(1);
+            break;
         }
     }
 
     cout <<"Launching "<<versionMsg.str()<<endl;
     Auth authentication;
-    int userRole = authentication.exec() ;
-    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
+    int userRole = authentication.exec();
+    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 );
 
     if(module == "dashboard") {
         QSplashScreen* info = Preferences::infoScreen(QObject::tr("Welcome to %1").arg(QString::fromStdString(versionMsg.str())));
@@ -127,24 +113,24 @@ int main(int argc, char **argv)
 
             if(! file.length()){
                 Utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
-                exit (1) ;
+                exit (1);
             }
 
         }
         info->finish(0);
-        SvNavigator *console= new SvNavigator(userRole, "", MonitorBroker::NAGIOS) ;
-        console->load(file) ;
-        console->startMonitor() ;
+        SvNavigator *console= new SvNavigator(userRole);
+        console->load(file);
+        console->startMonitor();
     } else if(module == "editor") {
-        SvCreator* editor = new SvCreator(userRole) ;
-        editor->load(file) ;
+        SvCreator* editor = new SvCreator(userRole);
+        editor->load(file);
     } else if(module == "config") {
-        Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings) ;
-        Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword) ;
-        update_settings->exec() ;
-        change_passwd->exec() ;
-        exit(0) ;
+        Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
+        Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
+        update_settings->exec();
+        change_passwd->exec();
+        exit(0);
     }
 
-    return app->exec() ;
+    return app->exec();
 }

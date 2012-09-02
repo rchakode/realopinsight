@@ -28,13 +28,12 @@
 #include <getopt.h>
 #include "Base.hpp"
 
-QString cmdName = "" ;
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "Options: \n"
         "	-v\n"
         "	  Print the version and license information.\n"
         "	-h \n"
-        "	   Print this help.\n" ;
+        "	   Print this help.\n";
 
 
 ostringstream versionMsg(appName.toStdString()+"Editor, Version "+packageVersion.toStdString()+".\n\n"
@@ -43,45 +42,37 @@ ostringstream versionMsg(appName.toStdString()+"Editor, Version "+packageVersion
 
 int main(int argc, char **argv)
 {
-    QApplication* app = new QApplication(argc, argv) ;
-    app->setWindowIcon(QIcon(":images/built-in/icon.png")) ;
-    app->setApplicationName(appName) ;
+    QApplication* app = new QApplication(argc, argv);
+    app->setWindowIcon(QIcon(":images/built-in/icon.png"));
+    app->setApplicationName(appName);
     app->setStyleSheet(Preferences::style());
-    cmdName= basename(argv[0]);
-    if(argc > 3) {
-        qDebug() << usage ;
-        exit (1) ;
-    }
+    QString cmdName= basename(argv[0]);
 
-    QString file = argv[1] ;
-    int opt ;
-
+    QString file = (argc >= 2)? argv[1] : "";
+    int opt;
     if ( (opt = getopt(argc, argv, "hv") ) != -1) {
         switch (opt) {
-
-        case 'v': {
+        case 'v':
             cout << versionMsg.str() << endl;
-            exit(0) ;
-        }
+            exit(0);
 
-        case 'h': {
-            cout << usage.arg(cmdName).toStdString() ;
-            exit(0) ;
-        }
+        case 'h':
+            cout << usage.arg(cmdName).toStdString();
+            exit(0);
 
-        default: // -h for get help
-            cout << usage.arg(cmdName).toStdString() ;
-            exit (1) ;
-            break ;
+        default:
+            cout << usage.arg(cmdName).toStdString();
+            exit (1);
+            break;
         }
     }
     cout <<tr("Launching")<< " "<<versionMsg.str()<<endl;
     Auth authentication;
-    int userRole = authentication.exec() ;
-    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
+    int userRole = authentication.exec();
+    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 );
 
-    SvCreator* svc = new SvCreator(userRole) ;
-    svc->load(file) ;
+    SvCreator* svc = new SvCreator(userRole);
+    svc->load(file);
 
-    return app->exec() ;
+    return app->exec();
 }

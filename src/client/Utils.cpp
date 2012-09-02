@@ -49,7 +49,7 @@ QString Utils::statusToString(const qint32 & _status)
 
 
 void Utils::clear(Struct& data) {
-    data.checks.clear();
+    data.cnodes.clear();
     data.nodes.clear();
     data.tree_items.clear();
 }

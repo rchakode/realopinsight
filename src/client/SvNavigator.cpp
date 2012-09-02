@@ -32,10 +32,10 @@
 #include <QObject>
 
 
-const QString DEFAULT_TIP_PATTERN = "Service: %1\nDescription: %2\nStatus: %3\nStatus Calc. Rule: %4\nStatus Prop. Rule: %5";
-const QString ALARM_SPECIFIC_TIP_PATTERN = "Host: %6\nCheck/Trigger: %7\nMessage: %8\nCheck Output: %9";
+const QString DEFAULT_TIP_PATTERN = QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5");
+const QString ALARM_SPECIFIC_TIP_PATTERN = QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9");
 const QString SERVICE_OFFLINE_MSG = QObject::tr("ERROR: failed to connect to %1");
-const QString DEFAULT_ERROR_MSG = "{\"return_code\": \"-1\", \"message\": %1\""%SERVICE_OFFLINE_MSG%"\"}";
+const QString DEFAULT_ERROR_MSG = "{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}";
 const QString ID_PATTERN = "%1/%2";
 
 ComboBoxItemsT SvNavigator::propRules() {
@@ -55,7 +55,6 @@ ComboBoxItemsT SvNavigator::calcRules() {
 
 SvNavigator::SvNavigator(const qint32 & _userRole,
                          const QString & _config,
-                         const qint8 & _monitorType,
                          QWidget* parent)
     : QMainWindow(parent),
       coreData (new Struct()),
@@ -76,7 +75,6 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
       msgPanel(new MsgPanel()),
       nodeContextMenu (new QMenu()),
       zabbixHelper(new ZabbixHelper()),
-      monitorType(_monitorType),
       hLeft(0)
 {
     setWindowTitle(tr("%1 Operations Console").arg(appName));
@@ -169,7 +167,7 @@ void SvNavigator::startMonitor()
     updateStatusBar(tr("Connecting to the server..."));
     success = true ;
     setEnabled(false);
-    switch(monitorType){
+    switch(coreData->monType){
     case MonitorBroker::ZABBIX: openZabbixSession();
         break;
     case MonitorBroker::NAGIOS:
@@ -202,7 +200,7 @@ void SvNavigator::load(const QString & _file)
     resize();
     show();
     graphView->scaleToFitViewPort();
-    setWindowTitle(configFile + " | " + appName + " Operations Console");
+    setWindowTitle(tr("%1 Operations Console | %2").arg(appName).arg(configFile));
 }
 
 void SvNavigator::unloadMenus(void)
@@ -252,9 +250,9 @@ int SvNavigator::runNagiosMonitor(void)
     }
     resetStatData();
     msgPanel->setSortingEnabled(false);
-    foreach(const QString & checkId, coreData->checks) {
+    foreach(const QString & checkId, coreData->cnodes.keys()) {
 
-        NodeListT::iterator node = coreData->nodes.find(checkId.trimmed());
+        NodeListT::iterator node = coreData->cnodes.find(checkId);
         if(node == coreData->nodes.end())
             continue;
 
@@ -267,12 +265,12 @@ int SvNavigator::runNagiosMonitor(void)
         QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
             MonitorBroker::NagiosCheckT check;
-            string msg = serverAuthChain + ":"+nodeId.trimmed().toStdString(); //TODO
+            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO
             if(comChannel) {
                 ZmqHelper::sendFromSocket(*comChannel, msg);
                 msg = ZmqHelper::recvFromSocket(*comChannel);
             } else {
-                msg = DEFAULT_ERROR_MSG.arg(QString::fromStdString((serverUrl))).toStdString();
+                msg = DEFAULT_ERROR_MSG.arg(QString::fromStdString(serverUrl)).toStdString();
             }
             JsonHelper jsHelper(msg);
             if(jsHelper.getProperty("return_code").toInt32() == 0 && comChannel) {
@@ -320,12 +318,12 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
         if(_node.status == MonitorBroker::OK) {
             msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
         } else {
-            msg = QString(_node.check.alarm_msg.c_str()).replace("\n", " ");
+            msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
         }
-        toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString(_node.check.host.c_str()).replace("\n", " "))
+        toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "))
                 .arg(_node.child_nodes)
-                .arg(msg)
-                .arg(QString(_node.check.alarm_msg.c_str()).replace("\n", " "));
+                .arg(QString::fromStdString(_node.check.alarm_msg).replace("\n", " "))
+                .arg(msg);
     }
 
     return toolTip;
@@ -346,9 +344,10 @@ void SvNavigator::updateNode(NodeListT::iterator & _node, const MonitorBroker::C
 
 void SvNavigator::updateStats() {
 
-    if(coreData->checks.size() == 0) return;
+    qint64 nbChecks = coreData->cnodes.size();
+    if(nbChecks == 0) return;
     Stats *stats = new Stats;
-    QString info = stats->update(coreData->check_status_count, coreData->checks.size());
+    QString info = stats->update(coreData->check_status_count, nbChecks);
     stats->setToolTip(info);
     graphView->updateStatsPanel(stats);
     if(statsPanel) delete statsPanel;
@@ -537,9 +536,9 @@ void SvNavigator::filterNodeRelatedMsg(void)
 
     if(node_it != coreData->nodes.end()) {
         filterNodeRelatedMsg(selectedNodeId);
-        window_title = "Filtered messages from the component '"
-                + coreData->nodes[selectedNodeId].name
-                + "' - " + appName.toUpper();
+        window_title = tr("%1 | Filtered messages from the service '%2'")
+                .arg(appName)
+                .arg(coreData->nodes[selectedNodeId].name);
         filteredMsgPanel->resizeFields(msgPanelSize, true);
         filteredMsgPanel->setWindowTitle(window_title);
     }
@@ -643,7 +642,7 @@ void SvNavigator::loadMenus(void)
     menuList["MENU4"] = menuBar->addMenu("&Help"),
             subMenuList["ShowOnlineResources"] = menuList["MENU4"]->addAction(tr("Online &Resources")),
             menuList["MENU4"]->addSeparator(),
-            subMenuList["ShowAbout"] = menuList["MENU4"]->addAction(tr("&About")%" "%appName.toUpper());
+            subMenuList["ShowAbout"] = menuList["MENU4"]->addAction(tr("&About %1").arg(appName));
 
     subMenuList["Capture"]->setShortcut(QKeySequence::Save);
     subMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
@@ -754,7 +753,10 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
         }
         break;
     }
-    default : break;
+    default :
+        Utils::alert(tr("Bad response received from the server"));
+        exit(10);
+        break;
     }
 }
 

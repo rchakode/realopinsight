@@ -210,13 +210,13 @@ typedef QMap<QString,QString> ComboBoxItemsT;
 
 
 struct Struct {
-    TreeNodeItemListT tree_items;
+    qint8 monType;
     NodeListT nodes;
     NodeListT cnodes;
-    QStringList checks;
     CheckListT checks_;
     CheckStatusCountT check_status_count;
     HostListT hosts;
+    TreeNodeItemListT tree_items;
 };
 
 class Settings : public QSettings

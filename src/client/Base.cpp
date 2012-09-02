@@ -76,7 +76,7 @@ Settings::Settings(): QSettings(appName.toLower(), packageName.toLower().replace
 	}
 
     translator = new QTranslator();
-    translator->load("ngrt4n_en");
+    translator->load("ngrt4n_la");
     qApp->installTranslator(translator);
 
 	sync();

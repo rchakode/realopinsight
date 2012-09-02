@@ -102,7 +102,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 			serverPortField->setEnabled(false) ;
 			serverPassField->setEnabled(false) ;
 		}
-        setWindowTitle(tr("Monitoring Settings")%" | "%appName.toUpper()) ;
+        setWindowTitle(tr("Monitoring Settings | %1").arg(appName)) ;
 		break;
 
 	case Preferences::ChangePassword:
@@ -125,7 +125,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 
 		if(_action == Preferences::ForceChangePassword) cancelButton->setEnabled(false) ;
 
-        setWindowTitle(tr("Change Password")%" | "%appName.toUpper()) ;
+        setWindowTitle(tr("Change Password| %1").arg(appName)) ;
 		break;
 
 	case Preferences::ShowAbout:
@@ -138,7 +138,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 				layout->addWidget(new QLabel(QString(about.str().c_str())), line, 0) ;
 		line += 1,
 				layout->addWidget(cancelButton, line, 0) ;
-		setWindowTitle("About " + appName.toUpper()) ;
+        setWindowTitle(tr("About %1").arg(appName)) ;
 		break ;
 	}
 
