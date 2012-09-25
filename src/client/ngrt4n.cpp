@@ -27,7 +27,7 @@
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
 #include "core/ZmqHelper.hpp"
-#include "client/ZabbixHelper.hpp"
+#include "client/ZbxHelper.hpp"
 #include <sstream>
 #include <getopt.h>
 #include <QTranslator>
@@ -47,9 +47,9 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "	   Print this help.\n";
 
 
-ostringstream versionMsg(appName.toStdString()+" "+packageName.toStdString()+", Version "+packageVersion.toStdString()+".\n\n"
-                         +"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
-                         +"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
+ostringstream versionMsg(appName.toStdString()+" Operations Console, Version "+packageVersion.toStdString()+".\n\n"
+                         +"Copyright (c) 2010-"+releaseYear.toStdString()+" by NGRT4N Project. All rights reserved.\n"
+                         +"Visit "+packageUrl.toStdString()+" for more information.");
 
 int main(int argc, char **argv)
 {
@@ -100,12 +100,13 @@ int main(int argc, char **argv)
     if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 );
 
     if(module == "dashboard") {
-        QSplashScreen* info = Preferences::infoScreen(QObject::tr("Welcome to %1").arg(QString::fromStdString(versionMsg.str())));
-        sleep(1);
+        QSplashScreen* info = Preferences::infoScreen(QObject::tr("Loading...\n\n%1")
+                                                      .arg(QString::fromStdString(versionMsg.str())));
+        Utils::delay(1);
         if(file == "") {
             info->clearMessage();
             info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
-            sleep(1); info->finish(0);
+            Utils::delay(1); info->finish(0);
             file = QFileDialog::getOpenFileName(0,
                                                 QObject::tr("%1 | Select a configuration file").arg(appName),
                                                 ".",

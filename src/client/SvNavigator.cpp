@@ -26,17 +26,17 @@
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
 #include "Utils.hpp"
-#include "client/JsonHelper.hpp"
+#include "client/JsHelper.hpp"
 #include <sstream>
 #include <QStatusBar>
 #include <QObject>
 
 
-const QString DEFAULT_TIP_PATTERN = QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5");
-const QString ALARM_SPECIFIC_TIP_PATTERN = QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9");
-const QString SERVICE_OFFLINE_MSG = QObject::tr("ERROR: failed to connect to %1");
-const QString DEFAULT_ERROR_MSG = "{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}";
-const QString ID_PATTERN = "%1/%2";
+const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
+const QString SERVICE_OFFLINE_MSG(QObject::tr("ERROR: Failed to connect to %1"));
+const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
+const QString ID_PATTERN("%1/%2");
 
 ComboBoxItemsT SvNavigator::propRules() {
     ComboBoxItemsT map;
@@ -74,7 +74,8 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
       changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
       msgPanel(new MsgPanel()),
       nodeContextMenu (new QMenu()),
-      zabbixHelper(new ZabbixHelper()),
+      zxHelper(new ZbxHelper()),
+      zxAuthToken(""),
       hLeft(0)
 {
     setWindowTitle(tr("%1 Operations Console").arg(appName));
@@ -92,31 +93,6 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
     addEvents();
 }
 
-
-void SvNavigator::addEvents(void)
-{
-    connect(this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()));
-    connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateNodeStatus(QString)));
-    connect(subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT(capture()));
-    connect(subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT(zoomIn()));
-    connect(subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT(zoomOut()));
-    connect(subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
-    connect(subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
-    connect(subMenuList["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
-    connect(subMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
-    connect(subMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
-    connect(subMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources()));
-    connect(subMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
-    connect(contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
-    connect(contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
-    connect(monPrefWindow, SIGNAL(urlChanged(QString)), browser, SLOT(setUrl(QString)));
-    connect(topRightPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
-    connect(graphView, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
-    connect(navigationTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
-    connect(zabbixHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZabbixReply(QNetworkReply*)));
-    connect(zabbixHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processZabbixError(QNetworkReply::NetworkError)));
-}
-
 SvNavigator::~SvNavigator()
 {
     delete msgPanel;
@@ -131,7 +107,7 @@ SvNavigator::~SvNavigator()
     delete mainSplitter;
     delete monPrefWindow;
     delete changePasswdWindow;
-    delete zabbixHelper;
+    delete zxHelper;
     if(filteredMsgPanel) delete filteredMsgPanel;
     unloadMenus();
 }
@@ -167,11 +143,13 @@ void SvNavigator::startMonitor()
     updateStatusBar(tr("Connecting to the server..."));
     success = true ;
     setEnabled(false);
-    switch(coreData->monType){
-    case MonitorBroker::ZABBIX: openZabbixSession();
+    switch(coreData->monitor){
+    case MonitorBroker::ZABBIX:
+        zxAuthToken.isEmpty()? openZabbixSession() : requestZabbixChecks();
         break;
     case MonitorBroker::NAGIOS:
-    default : runNagiosMonitor();
+    default :
+        runNagiosMonitor();
         break;
     }
     setEnabled(true);
@@ -188,7 +166,7 @@ void SvNavigator::timerEvent(QTimerEvent *)
 void SvNavigator::load(const QString & _file)
 {
     if( ! _file.isEmpty()) {
-        configFile = _file;
+        configFile = Utils::getAbsolutePath(_file);
     }
     openedFile = configFile;
     Parser parser;
@@ -200,7 +178,7 @@ void SvNavigator::load(const QString & _file)
     resize();
     show();
     graphView->scaleToFitViewPort();
-    setWindowTitle(tr("%1 Operations Console | %2").arg(appName).arg(configFile));
+    setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(configFile));
 }
 
 void SvNavigator::unloadMenus(void)
@@ -221,12 +199,14 @@ void SvNavigator::handleChangeMonitoringSettingsAction(void)
     updateMonitoringSettings();
     killTimer(timerId);
     timerId = startTimer(updateInterval);
+    zxAuthToken.clear();
+    startMonitor();
 }
 
 void SvNavigator::handleShowOnlineResources(void)
 {
-    QDesktopServices app_launcher;
-    app_launcher.openUrl(QUrl("http://ngrt4n.com/docs/"));
+    QDesktopServices appLauncher;
+    appLauncher.openUrl(QUrl("http://ngrt4n.com/docs/"));
 }
 
 void SvNavigator::handleShowAbout(void)
@@ -238,8 +218,8 @@ void SvNavigator::handleShowAbout(void)
 int SvNavigator::runNagiosMonitor(void)
 {
     zmq::context_t comContext(1);
-    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl);
-
+    string srvVer;
+    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl, srvVer);
     if(! comChannel) {
         QString msg = SERVICE_OFFLINE_MSG.arg(QString::fromStdString(serverUrl));
         Utils::alert(msg);
@@ -264,7 +244,6 @@ int SvNavigator::runNagiosMonitor(void)
 
         QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
-            MonitorBroker::NagiosCheckT check;
             string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO
             if(comChannel) {
                 ZmqHelper::sendFromSocket(*comChannel, msg);
@@ -274,20 +253,20 @@ int SvNavigator::runNagiosMonitor(void)
             }
             JsonHelper jsHelper(msg);
             if(jsHelper.getProperty("return_code").toInt32() == 0 && comChannel) {
-                check.status = jsHelper.getProperty("status").toInt32();
-                check.host = jsHelper.getProperty("host").toString().toStdString();
-                check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
+                node->check.status = jsHelper.getProperty("status").toInt32();
+                node->check.host = jsHelper.getProperty("host").toString().toStdString();
+                node->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
                 node->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-                check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+                node->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-                check.status = MonitorBroker::UNKNOWN;
-                check.host = "Unknown";
-                check.last_state_change = "0";
+                node->check.status = MonitorBroker::UNKNOWN;
+                node->check.host = "Unknown";
+                node->check.last_state_change = "0";
                 node->check.check_command = "Unknown" ;
-                check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+                node->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
-            coreData->check_status_count[check.status]++;
-            updateNode(node, check);
+            coreData->check_status_count[node->check.status]++;
+            updateNode(node);
         }
     }
     updateStats();
@@ -329,11 +308,9 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
     return toolTip;
 }
 
-void SvNavigator::updateNode(NodeListT::iterator & _node, const MonitorBroker::CheckT & _check) {
-
+void SvNavigator::updateNode(NodeListT::iterator & _node) {
     QString toolTip;
-    _node->check = _check;
-    _node->status = _node->prop_status = _check.status;
+    _node->status = _node->prop_status = _node->check.status;
     updateAlarmMsg(_node);
     toolTip = getNodeToolTip(*_node);
     updateNavTreeItemStatus(_node, toolTip);
@@ -527,22 +504,18 @@ void SvNavigator::centerGraphOnNode(const QString & _node_id)
 
 void SvNavigator::filterNodeRelatedMsg(void)
 {
-    QString window_title;
-    NodeListT::iterator node_it;
-
     if(filteredMsgPanel) delete filteredMsgPanel;
     filteredMsgPanel = new MsgPanel();
-    node_it = coreData->nodes.find(selectedNodeId);
+    NodeListT::iterator node = coreData->nodes.find(selectedNodeId);
 
-    if(node_it != coreData->nodes.end()) {
+    if(node != coreData->nodes.end()) {
         filterNodeRelatedMsg(selectedNodeId);
-        window_title = tr("%1 | Filtered messages from the service '%2'")
+        QString title = tr("Messages related to '%2' - %1")
                 .arg(appName)
                 .arg(coreData->nodes[selectedNodeId].name);
         filteredMsgPanel->resizeFields(msgPanelSize, true);
-        filteredMsgPanel->setWindowTitle(window_title);
+        filteredMsgPanel->setWindowTitle(title);
     }
-
     filteredMsgPanel->show();
 }
 
@@ -667,51 +640,50 @@ void SvNavigator::loadMenus(void)
 
 void SvNavigator::openZabbixSession(void)
 {
-    zabbixHelper->setBaseUrl(monitorBaseUrl);
-    QStringList params = QString::fromStdString("admin:zabbix").split(":");
-    params.push_back(QString::number(ZabbixHelper::LOGIN));
-    zabbixHelper->get(ZabbixHelper::LOGIN, params);
+    zxHelper->setBaseUrl(monitorBaseUrl);
+    QStringList params = QString::fromStdString(serverAuthChain).split(":");
+    params.push_back(QString::number(ZbxHelper::LOGIN));
+    zxHelper->get(ZbxHelper::LOGIN, params);
 }
 
 void SvNavigator::closeZabbixSession(void)
 {
     QStringList params;
-    params.push_back(zabbixAuthToken);
-    params.push_back(QString::number(ZabbixHelper::LOGOUT));
-    zabbixHelper->get(ZabbixHelper::LOGOUT, params);
+    params.push_back(zxAuthToken);
+    params.push_back(QString::number(ZbxHelper::LOGOUT));
+    zxHelper->get(ZbxHelper::LOGOUT, params);
 }
 
 void SvNavigator::retrieveZabbixTriggers(const QString & host)
 {
     QStringList params;
-    params.push_back(zabbixAuthToken);
+    params.push_back(zxAuthToken);
     params.push_back(host);
-    params.push_back(QString::number(ZabbixHelper::TRIGGER));
-    zabbixHelper->get(ZabbixHelper::TRIGGER, params);
+    params.push_back(QString::number(ZbxHelper::TRIGGER));
+    zxHelper->get(ZbxHelper::TRIGGER, params);
 }
 
 void SvNavigator::processZabbixReply(QNetworkReply* reply)
 {
-    if (reply->error() != QNetworkReply::NoError) return;
+    if (reply->error() != QNetworkReply::NoError)
+        return;
     string data = static_cast<QString>(reply->readAll()).toStdString();
     JsonHelper jsHelper(data);
 
     qint32 dataId = jsHelper.getProperty("id").toInt32();
     switch(dataId) {
-    case ZabbixHelper::LOGIN :
-        zabbixAuthToken = jsHelper.getProperty("result").toString();
+    case ZbxHelper::LOGIN :
+        zxAuthToken = jsHelper.getProperty("result").toString();
         resetStatData();
-        updateStatusBar(tr("Updating..."));
-        foreach(const QString & host, coreData->hosts.keys()) {
-            retrieveZabbixTriggers(host);
-        }
+        requestZabbixChecks();
         break;
 
-    case ZabbixHelper::TRIGGER: {
+    case ZbxHelper::TRIGGER: {
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next();
-            if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+            if (trigger.flags()&QScriptValue::SkipInEnumeration)
+                continue;
             QScriptValue triggerData = trigger.value();
             MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
@@ -746,28 +718,74 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
                 if(node == coreData->nodes.end()) continue;
                 CheckListT::Iterator check = coreData->checks_.find(node->child_nodes);
                 if(check == coreData->checks_.end()) continue;
-                updateNode(node, *check);
+                node->check = *check;
+                updateNode(node);
                 coreData->check_status_count[check->status]++;
             }
+            success = true;
             updateStats();
         }
         break;
     }
     default :
-        Utils::alert(tr("Bad response received from the server"));
-        exit(10);
+        Utils::alert(tr("ERROR: Weird response received from the server"));
+        exit(1);
         break;
     }
 }
 
+void SvNavigator::requestZabbixChecks(void) {
+    updateStatusBar(tr("Updating..."));
+    foreach(const QString & host, coreData->hosts.keys()) {
+        retrieveZabbixTriggers(host);
+    }
+}
+
+
 void SvNavigator::processZabbixError(QNetworkReply::NetworkError code){
 
-    QString msg = SERVICE_OFFLINE_MSG.arg(zabbixHelper->getApiUri()%tr(" (error code %1)").arg(code));
+    QString msg = SERVICE_OFFLINE_MSG.arg(zxHelper->getApiUri()%tr(" (error code %1)").arg(code));
     Utils::alert(msg);
     updateStatusBar(msg);
+    foreach(const QString & c, coreData->cnodes.keys()) {
+        NodeListT::iterator node = coreData->nodes.find(c);
+        if(node == coreData->nodes.end()) continue;
+        node->check.status = MonitorBroker::UNKNOWN;
+        node->check.host = "Unknown";
+        node->check.last_state_change = "0";
+        node->check.check_command = "Unknown" ;
+        node->check.alarm_msg = msg.toStdString();
+        updateNode(node);
+        coreData->check_status_count[MonitorBroker::UNKNOWN]++;
+    }
     success = false ;
+    updateStats();
 }
 
 void  SvNavigator::updateStatusBar(const QString & msg) {
     statusBar()->showMessage(msg);
+}
+
+void SvNavigator::addEvents(void)
+{
+    connect(this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()));
+    connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateNodeStatus(QString)));
+    connect(subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT(capture()));
+    connect(subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT(zoomIn()));
+    connect(subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT(zoomOut()));
+    connect(subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
+    connect(subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
+    connect(subMenuList["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
+    connect(subMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
+    connect(subMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
+    connect(subMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources()));
+    connect(subMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    connect(contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
+    connect(contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
+    connect(monPrefWindow, SIGNAL(urlChanged(QString)), browser, SLOT(setUrl(QString)));
+    connect(topRightPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
+    connect(graphView, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
+    connect(navigationTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
+    connect(zxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZabbixReply(QNetworkReply*)));
+    connect(zxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processZabbixError(QNetworkReply::NetworkError)));
 }

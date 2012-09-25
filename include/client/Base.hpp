@@ -32,12 +32,14 @@
 #include "core/MonitorBroker.hpp"
 #include <QTranslator>
 
-const QString appName=APPLICATION_NAME;
-const QString packageName=PACKAGE_NAME;
-const QString packageVersion=PACKAGE_VERSION;
-const QString packageUrl=PACKAGE_URL;
-const QString releaseYear=RELEASE_YEAR;
-const QString userPfx=BUILTIN_USER_PREFIX;
+const QString PROJECT = "NGRT4N";
+const QString USER_BASE_NAME = BUILTIN_USER_PREFIX;
+const QString projectName = PROJECT;
+const QString appName = APPLICATION_NAME;
+const QString packageName = PACKAGE_NAME;
+const QString packageVersion = PACKAGE_VERSION;
+const QString packageUrl = PACKAGE_URL;
+const QString releaseYear = RELEASE_YEAR;
 
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
@@ -210,7 +212,7 @@ typedef QMap<QString,QString> ComboBoxItemsT;
 
 
 struct Struct {
-    qint8 monType;
+    qint8 monitor;
     NodeListT nodes;
     NodeListT cnodes;
     CheckListT checks_;

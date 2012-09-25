@@ -1,8 +1,8 @@
 /*
- * Utils.cpp
+ * JsonHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 11-08-2012                                                 #
+# Last Update: 15-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,50 +21,21 @@
 #--------------------------------------------------------------------------#
  */
 
-#include <QFileInfo>
-#include "Utils.hpp"
+#ifndef JSHELPER_HPP
+#define JSHELPER_HPP
 
-QString Utils::statusToString(const qint32 & _status)
+#include <string>
+#include <QString>
+#include <QtScript/QScriptEngine>
+
+class JsonHelper : public QScriptEngine
 {
-    switch(_status)
-    {
-    case MonitorBroker::OK:
-        return "Normal";
-        break;
+public:
+    JsonHelper(const std::string & jsonStr = "");
+    void setData(const std::string& jsonStr);
+    QScriptValue getProperty(const std::string& key);
+private :
+    QScriptValue data;
+};
 
-    case MonitorBroker::WARNING:
-        return  "Warning";
-        break;
-
-    case MonitorBroker::CRITICAL:
-        return  "Critical";
-        break;
-
-    default:
-        return "Unknown";
-        break;
-    }
-
-    return "Unknown";
-}
-
-void Utils::clear(Struct& data) {
-    data.cnodes.clear();
-    data.nodes.clear();
-    data.tree_items.clear();
-}
-
-void Utils::alert(const QString  & msg) {
-    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
-}
-
-QString Utils::getAbsolutePath(const QString & _path) {
-    QFileInfo fileInfo(_path);
-    return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
-}
-
-void Utils::delay(const qint32 & d) {
-    sleep(d);
-}
-
-
+#endif // JSHELPER_HPP

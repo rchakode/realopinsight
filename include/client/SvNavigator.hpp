@@ -33,7 +33,7 @@
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
 #include "core/ZmqHelper.hpp"
-#include "ZabbixHelper.hpp"
+#include "ZbxHelper.hpp"
 #include <QScriptValueIterator>
 
 class SvNavigator : public QMainWindow
@@ -117,8 +117,8 @@ private:
     std::string serverUrl;
     std::string serverAuthChain;
     zmq::socket_t* comChannel;
-    ZabbixHelper* zabbixHelper;
-    QString zabbixAuthToken;
+    ZbxHelper* zxHelper;
+    QString zxAuthToken;
     qint32 hLeft;
     qint32 iter;
     bool success;
@@ -130,12 +130,13 @@ private:
     void updateMonitoringSettings();
     void updateNavTreeItemStatus(const NodeListT::iterator &, const QString &);
     void updateAlarmMsg(NodeListT::iterator &);
-    void updateNode(NodeListT::iterator & _node, const MonitorBroker::CheckT & _check) ;
+    void updateNode(NodeListT::iterator & _node) ;
     void updateStats();
     void openZabbixSession(void);
     void closeZabbixSession(void);
     void retrieveZabbixTriggers(const QString & host);
     void updateStatusBar(const QString & msg);
+    void requestZabbixChecks(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

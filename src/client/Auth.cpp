@@ -25,9 +25,10 @@
 #include "Auth.hpp"
 #include "Preferences.hpp"
 #include "ns.hpp"
+#include "Utils.hpp"
 
-const QString Auth::ADM_USER_NAME = userPfx.toLower() + "_adm" ;
-const QString Auth::OP_USER_NAME = userPfx.toLower()+ "_op" ;
+const QString Auth::ADM_USER_NAME = USER_BASE_NAME%"_adm" ;
+const QString Auth::OP_USER_NAME = USER_BASE_NAME%"_op" ;
 const qint32 Auth::ADM_USER_ROLE = 100 ;
 const qint32 Auth::OP_USER_ROLE = 101 ;
 
@@ -35,32 +36,25 @@ Auth::Auth()
 : QDialog(),
   settings (new Settings())
 {
-	setWindowTitle( "Login - " + appName);
+    setWindowTitle(tr("%1 - Login").arg(appName));
 	layout = new QGridLayout(this);
-
 	qint32 line = 0 ;
-	QPixmap logo(":images/built-in/logo-row.png") ;
-	QLabel* llogo =  new QLabel() ; llogo->setPixmap(logo) ;
+    QPixmap logo(":images/built-in/logo.png") ;
+    QLabel* llogo =  new QLabel(); llogo->setPixmap(logo) ;
 	layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft) ;
-
 	line++ ;
-	layout->addWidget(new QLabel(QString("UI Module, Version "+packageVersion+".")), line, 0, 2, 1, Qt::AlignLeft) ;
-
+    layout->addWidget(new QLabel(QString("Version "+packageVersion)), line, 0, 2, 1, Qt::AlignLeft) ;
 	line++;
 	layout->addWidget(new QLabel("Login"), line, 1, Qt::AlignRight) ;
 	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignJustify);
-
 	line++;
 	layout->addWidget(new QLabel("Password"), line, 1, Qt::AlignRight) ;
 	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignJustify);
 	password->setEchoMode(QLineEdit::Password);
-
 	line++;
 	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
-
-	line++; QString copying = QString("\nCopyright (c) 2010-"+releaseYear +" NGRT4N Project. All rights reserved.");
+    line++; QString copying = QString("\nCopyright (c) 2010-"+releaseYear +" by NGRT4N Project. All rights reserved.");
 	layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft) ;
-
 	addEvents();
 }
 
@@ -84,21 +78,16 @@ void Auth::authentificate(void)
 	QString userPasswd = QCryptographicHash::hash(password->text().toAscii(), QCryptographicHash::Md5) ;
 	QString rootPasswd =  settings->value(Preferences::ADM_PASSWD_KEY).toString() ;
 	QString opPasswd =  settings->value(Preferences::OP_PASSWD_KEY).toString() ;
-
-	if(	! rootPasswd.isEmpty()
-			&& userName == ADM_USER_NAME
+    if(	! rootPasswd.isEmpty()
+            && userName == ADM_USER_NAME
 			&& userPasswd == rootPasswd ) {
-
-		done( ADM_USER_ROLE );
-	} else if( ! opPasswd.isEmpty()
+        done(ADM_USER_ROLE);
+    } else if( !opPasswd.isEmpty()
 			&& userName == OP_USER_NAME
 			&& userPasswd == opPasswd ) {
 		done(OP_USER_ROLE);
 	} else {
-		QMessageBox::warning(this,
-				appName.toUpper(),
-				tr("Authentication failed: wrong username or password"),
-				QMessageBox::Ok) ;
+        Utils::alert(tr("Authentication failed: wrong username or password"));
 	}
 }
 

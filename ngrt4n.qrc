@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>images/built-in/icon.png</file>
-        <file>images/built-in/logo-row.png</file>
         <file>images/built-in/disket.png</file>
         <file>images/built-in/camera.png</file>
         <file>images/built-in/zoomout.png</file>
@@ -39,5 +38,7 @@
         <file>images/business-process.png</file>
         <file>images/web.png</file>
         <file>images/built-in/loading-screen.png</file>
+        <file>images/built-in/logo.png</file>
+        <file>images/built-in/donate.gif</file>
     </qresource>
 </RCC>

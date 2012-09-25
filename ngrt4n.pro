@@ -1,19 +1,19 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION = 2.0
+VERSION = 2.1.0beta1
 LIBS += -lzmq
-QMAKE_TARGET=row
+QMAKE_TARGET=RealOpInsight
 config-default{
 SOURCES	+= src/client/ngrt4n.cpp
-TARGET = row-manager
+TARGET = ngrt4n-manager
 }
 config-oc{
 SOURCES	+= src/client/ngrt4n-oc.cpp
-TARGET = row-oc
+TARGET = ngrt4n-oc
 }
 config-editor{
 SOURCES	+= src/client/ngrt4n-editor.cpp
-TARGET = row-editor
+TARGET = ngrt4n-editor
 }
 dflag{
 TARGET.path=$$(INSTALL_PREFIX)/bin
@@ -26,11 +26,11 @@ MAN.files = doc/man/row-manager.1.gz
 INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc
 DEFINES *= QT_USE_QSTRINGBUILDER
-DEFINES *= "BUILTIN_USER_PREFIX='\"row\"'"
-DEFINES *= "APPLICATION_NAME='\"RealOpWatcher\"'"
-DEFINES *= "PACKAGE_NAME='\"UI Module\"'"
+DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
+DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
+DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$$VERSION\"'"
-DEFINES *= "PACKAGE_URL='\"http://realopwatcher.com\"'"
+DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_YEAR='\"2012\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR 	= build/moc
@@ -55,9 +55,9 @@ HEADERS	+= include/core/ns.hpp \
 			 include/client/SvNavigator.hpp \
 			 include/client/SvNavigatorTree.hpp \
 			 include/client/WebKit.hpp \  			 
-    include/client/ZabbixHelper.hpp \
     include/client/Utils.hpp \
-    include/client/JsonHelper.hpp
+    include/client/ZbxHelper.hpp \
+    include/client/JsHelper.hpp
 SOURCES	+= src/core/utils.cpp \
 			src/core/MonitorBroker.cpp \
                         src/core/ZmqHelper.cpp \
@@ -76,9 +76,9 @@ SOURCES	+= src/core/utils.cpp \
             src/client/SvNavigator.cpp \
             src/client/SvNavigatorTree.cpp \
             src/client/WebKit.cpp \  
-    src/client/ZabbixHelper.cpp \
     src/client/Utils.cpp \
-    src/client/JsonHelper.cpp
+    src/client/ZbxHelper.cpp \
+    src/client/JsHelper.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts
@@ -96,8 +96,7 @@ DISTFILES += README \
 			 src/client/ngrt4n-oc.cpp \
 			 src/client/ngrt4n-editor.cpp \
 			 src/server/ngrt4nd.cpp \
-			 doc/man/*.gz \
-			 dm-1.0.tar.gz
+                         doc/man/*.gz
 
 OTHER_FILES = \
     ngrt4n_la.ts

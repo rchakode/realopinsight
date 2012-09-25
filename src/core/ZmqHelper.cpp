@@ -8,10 +8,10 @@ const int NUM_RETRIES = 3 ;
 
 ZmqHelper::ZmqHelper() {}
 
-zmq::socket_t * ZmqHelper::initCliChannel(zmq::context_t & context, const std::string & uri) {
+zmq::socket_t * ZmqHelper::initCliChannel(zmq::context_t & context, const std::string & uri, string & srvVer) {
 
-    zmq::socket_t * socket = NULL ;
-    if (pingSocket(context, uri)) {
+    zmq::socket_t * socket = NULL;
+    if (pingServer(context, uri, srvVer)) {
         socket = createCliSocket(context, uri);
     }
     return socket;
@@ -26,12 +26,12 @@ ZmqHelper::endCliChannel(zmq::socket_t* & socket) {
 }
 
 zmq::socket_t * ZmqHelper::createCliSocket(zmq::context_t & context, const std::string & uri) {
-	std::cout << "I: connecting to server…" << std::endl;
-	zmq::socket_t * client = new zmq::socket_t(context, ZMQ_REQ);
-	client->connect(uri.c_str());
+    std::cout << "INFO: Connecting to server…" << std::endl;
+    zmq::socket_t * client = new zmq::socket_t(context, ZMQ_REQ);
+    client->connect(uri.c_str());
 
-	//  Configure socket to not wait at close time
-	int linger = 0;
+    //  Configure socket to not wait at close time
+    int linger = 0;
     client->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
 
     return client;
@@ -40,22 +40,22 @@ zmq::socket_t * ZmqHelper::createCliSocket(zmq::context_t & context, const std::
 bool
 ZmqHelper::sendFromSocket(zmq::socket_t & socket, const std::string & mcontent) {
 
-	zmq::message_t message(mcontent.size());
-	memcpy(message.data(), mcontent.data(), mcontent.size());
-	bool rc = socket.send(message);
+    zmq::message_t message(mcontent.size());
+    memcpy(message.data(), mcontent.data(), mcontent.size());
+    bool rc = socket.send(message);
 
-	return (rc);
+    return (rc);
 }
 
 std::string
 ZmqHelper::recvFromSocket(zmq::socket_t & socket) {
 
-	zmq::message_t message;
-	socket.recv(&message);
-	return std::string(static_cast<char*>(message.data()), message.size());
+    zmq::message_t message;
+    socket.recv(&message);
+    return std::string(static_cast<char*>(message.data()), message.size());
 }
 
-bool ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
+bool ZmqHelper::pingServer(zmq::context_t & context, const std::string & uri, string & srvVer) {
 
     zmq::socket_t * client = createCliSocket(context, uri);
 
@@ -74,27 +74,32 @@ bool ZmqHelper::pingSocket(zmq::context_t & context, const std::string & uri) {
 
             if (items[0].revents & ZMQ_POLLIN) {
                 std::string reply = recvFromSocket(*client);
-                if(reply=="ALIVE") {
-                    std::cout << "I: connection etablished" << std::endl;
+                size_t pos = reply.find(":");
+                string respType = reply.substr(0, pos);
+                if(respType == "ALIVE") {
+                    srvVer = reply.substr(pos+1, string::npos);
+                    std::cout << "INFO: Connection etablished with server " << srvVer <<"\n";
                     delete client;
                     return true;
                 } else {
-                    std::cout << "E: Unexpected response : " << reply << "" << std::endl;
+                    std::cout << "ERROR: Weird response from the server\n";
                 }
             }
-            else
+            else {
                 if (--retriesLeft == 0) {
-                    std::cout << "E: server seems to be offline, abandoning" << std::endl;
+                    std::cout << "ERROR: Server seems to be offline, abandoning\n";
                     expectReply = false;
                 }
                 else {
-                    std::cout << "W: no response from server, retrying…" << std::endl;
+                    std::cout << "WARNING: No response from server, retrying…\n";
                     delete client;
                     client = createCliSocket(context);
                     sendFromSocket(*client, msg.str());
                 }
+            }
         }
     }
+    srvVer="0.0.0";
     delete client;
 
     return false ;

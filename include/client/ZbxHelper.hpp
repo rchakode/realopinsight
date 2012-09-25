@@ -26,7 +26,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
-class ZabbixHelper : public QNetworkAccessManager {
+class ZbxHelper : public QNetworkAccessManager {
     Q_OBJECT
 
 public:
@@ -37,8 +37,8 @@ public:
     };
 
 public:
-    ZabbixHelper(const QString & baseUrl="http://localhost/zabbix");
-    virtual ~ZabbixHelper();
+    ZbxHelper(const QString & baseUrl="http://localhost/zabbix");
+    virtual ~ZbxHelper();
     void setBaseUrl(const QString & url) ;
     QString getApiUri(void) const ;
 

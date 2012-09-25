@@ -56,7 +56,7 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
     editorItemsList["notificationMsgLabel"] = new QLabel(tr("Notification Message")) ;
     editorItemsList[NOTIFICATION_MSG_FIELD] = new QTextEdit() ;
 
-    editorItemsList["lowLevelAlarmsLabel"] = new QLabel(tr("Check ID")) ;
+    editorItemsList["lowLevelAlarmsLabel"] = new QLabel(tr("Alarm (Check/Trigger)")) ;
     editorItemsList[CHECK_FIELD] = new QComboBox() ;
     editorItemsList[CHECK_LIST_FIELD] = new QListWidget() ;
 
@@ -109,7 +109,7 @@ void ServiceEditor::setCheckListField(const MonitorBroker::NagiosChecksT& _nagio
 {
     checkField()->clear() ;
     for(MonitorBroker::NagiosChecksT::const_iterator it = _nagios_checks.begin(); it != _nagios_checks.end(); it++) {
-         checkField()->addItem(QString::fromStdString(it->second.id)) ;
+        checkField()->addItem(QString::fromStdString(it->second.id)) ;
     }
 }
 
@@ -123,21 +123,17 @@ void ServiceEditor::setEnableFields(const bool& _enable)
 
 bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 {
-    NodeListT::iterator it = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
-
-    if( it != _node_map.end()) {
-
-        it->name = nameField()->text() ;
-        it->type = typeField()->currentIndex();
-        it->status_crule = statusCalcRuleField()->currentIndex();
-        it->status_prule = statusPropRuleField()->currentIndex();
-        it->icon = iconField()->currentText();
-        it->description = descriptionField()->toPlainText();
-        it->alarm_msg  = alarmMsgField()->toPlainText();
-        it->notification_msg = notificationMsgField()->toPlainText();
-
-        if( it->type == NodeType::ALARM_NODE ) it->child_nodes =  checkField()->currentText() ;
-
+    NodeListT::iterator node = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
+    if( node != _node_map.end()) {
+        node->name = nameField()->text() ;
+        node->type = typeField()->currentIndex();
+        node->status_crule = statusCalcRuleField()->currentIndex();
+        node->status_prule = statusPropRuleField()->currentIndex();
+        node->icon = iconField()->currentText();
+        node->description = descriptionField()->toPlainText();
+        node->alarm_msg  = alarmMsgField()->toPlainText();
+        node->notification_msg = notificationMsgField()->toPlainText();
+        if( node->type == NodeType::ALARM_NODE ) node->child_nodes = checkField()->currentText() ;
         return true;
     }
 
@@ -155,53 +151,50 @@ bool ServiceEditor::updateNode(NodeListT::iterator & _node)
     _node->description = descriptionField()->toPlainText();
     _node->alarm_msg  = alarmMsgField()->toPlainText();
     _node->notification_msg = notificationMsgField()->toPlainText();
-
-    if( _node->type == NodeType::ALARM_NODE ) _node->child_nodes =  checkField()->currentText() ;
+    if( _node->type == NodeType::ALARM_NODE ) _node->child_nodes = checkField()->currentText() ;
 
     return true;
 }
 
-void ServiceEditor::setContent(const NodeListT & _node_map, const QString& _node_id)
+void ServiceEditor::setContent(const NodeListT & _node_map, const QString& _nodeId)
 {
-    NodeListT::const_iterator it = _node_map.find(_node_id);
-
-    if( it != _node_map.end()) {
-        setContent( it );
-    }
+    NodeListT::const_iterator node = _node_map.find(_nodeId);
+    if( node != _node_map.end()) setContent(node);
 }
 
 
-void ServiceEditor::setContent(NodeListT::const_iterator _node_it)
+void ServiceEditor::setContent(NodeListT::const_iterator _node)
 {
-    nameField()->setText(_node_it->name) ;
-    typeField()->setCurrentIndex(_node_it->type) ;
-    statusCalcRuleField()->setCurrentIndex(_node_it->status_crule);
-    statusPropRuleField()->setCurrentIndex(_node_it->status_prule) ;
-    iconField()->setCurrentIndex(iconField()->findText((_node_it->icon))) ;
-    descriptionField()->setText(_node_it->description) ;
-    alarmMsgField()->setText(_node_it->alarm_msg) ;
-    notificationMsgField()->setText(_node_it->notification_msg) ;
+    nameField()->setText(_node->name) ;
+    typeField()->setCurrentIndex(_node->type) ;
+    statusCalcRuleField()->setCurrentIndex(_node->status_crule);
+    statusPropRuleField()->setCurrentIndex(_node->status_prule) ;
+    iconField()->setCurrentIndex(iconField()->findText((_node->icon))) ;
+    descriptionField()->setText(_node->description) ;
+    alarmMsgField()->setText(_node->alarm_msg) ;
+    notificationMsgField()->setText(_node->notification_msg) ;
 
-    QListWidget* checks = checkListField();
-    QStringList childNodes = _node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
-    QStringList::iterator childNodeIt = childNodes.begin();
-    if ( childNodeIt != childNodes.end() ) {
-        QString checkId = (*childNodeIt).trimmed();
-        CheckItemList checkItems = checks->findItems(checkId, Qt::MatchExactly);
-        CheckItemList::const_iterator _it = checkItems.begin();
-
-        if( _it == checkItems.end() ) {
-            checkField()->addItem(checkId);
-            QListWidgetItem* item = new QListWidgetItem(checkId);
-            checks->addItem(item);
-            checks->setItemSelected(item, true) ;
-        } else {
-            checks->setItemSelected(*_it, true) ;
+    QString checkId = "";
+    if(_node->type == NodeType::ALARM_NODE) {
+        QListWidget* checks = checkListField();
+        QStringList childNodes = _node->child_nodes.split(Parser::CHILD_NODES_SEP);
+        QStringList::iterator childNodeIt = childNodes.begin();
+        if (childNodeIt != childNodes.end()) {
+            checkId = (*childNodeIt).trimmed();
+            CheckItemList checkItems = checks->findItems(checkId, Qt::MatchExactly);
+            CheckItemList::const_iterator _it = checkItems.begin();
+            if(_it == checkItems.end()) {
+                checkField()->addItem(checkId);
+                QListWidgetItem* item = new QListWidgetItem(checkId);
+                checks->addItem(item);
+                checks->setItemSelected(item, true) ;
+            } else {
+                checks->setItemSelected(*_it, true) ;
+            }
         }
-        checkField()->setCurrentIndex(checkField()->findText(checkId, Qt::MatchExactly)) ;
+        childNodes.clear();
     }
-
-    childNodes.clear();
+    checkField()->setCurrentIndex(checkField()->findText(checkId, Qt::MatchExactly)) ;
 }
 
 
@@ -299,7 +292,7 @@ void ServiceEditor::loadCheckField(void)
 {
     layout->addWidget(editorItemsList["lowLevelAlarmsLabel"], currentLine, 0, 2, 1);
     layout->addWidget(checkField(), currentLine, 1, 1, 2);
-    checkField()->setEditable( true ) ;
+    checkField()->setEditable(true) ;
     //TODO	loadStatusFile() ;
 }
 

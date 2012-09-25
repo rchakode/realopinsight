@@ -39,11 +39,6 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "	-h \n"
         "	   Print this help.\n";
 
-
-ostringstream versionMsg(appName.toStdString()+" "+QObject::tr("Operations Console, Version")+" "+packageVersion.toStdString()+".\n\n"
-                         +"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
-                         +"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
-
 int main(int argc, char **argv)
 {
     QApplication* app = new QApplication(argc, argv);
@@ -51,7 +46,11 @@ int main(int argc, char **argv)
     app->setApplicationName(appName);
     app->setStyleSheet(Preferences::style());
 
-    QString cmdName= basename(argv[0]);
+    ostringstream versionMsg(appName.toStdString()+QObject::tr(" Operations Console, Version").toStdString()+" "+packageVersion.toStdString()+".\n"
+                             +"Copyright (c) 2010-"+releaseYear.toStdString()+" by NGRT4N Project. All rights reserved.\n"
+                             +"Visit "+packageUrl.toStdString()+" for more information.");
+
+    QString cmdName = basename(argv[0]);
 
     bool config = false;
     int opt;
@@ -88,17 +87,19 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    QSplashScreen* info = Preferences::infoScreen(QString(tr("Welcome to %1")).arg(QString::fromStdString(versionMsg.str())));
-    sleep(2);
+    QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("Loading...\n\n%1"))
+                                                  .arg(QString::fromStdString(versionMsg.str())));
+    Utils::delay(2);
     QString file = (argc >= 2)? argv[1] : "";
     if(file == "") {
         info->clearMessage();
-        info->showMessage(tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
-        sleep(1); info->finish(0);
+        info->showMessage(QObject::tr("You need to select a configuration file!"),
+                          Qt::AlignCenter|Qt::AlignCenter);
+        Utils::delay(1); info->finish(0);
         file = QFileDialog::getOpenFileName(0,
                                             QObject::tr("%1 | Select a configuration file").arg(appName),
                                             ".",
-                                            tr("Xml files (*.xml);;All files (*)"));
+                                            QObject::tr("Xml files (*.xml);;All files (*)"));
 
         if(! file.length()){
             Utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));

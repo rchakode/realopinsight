@@ -32,7 +32,6 @@
 #include "Preferences.hpp"
 
 
-
 class SvCreator: public QMainWindow
 {
 	Q_OBJECT
@@ -44,7 +43,8 @@ public:
     void load( const QString&);
     QSize minimumSizeHint() const { return QSize(796, 640); }
     QSize sizeHint() const { return QSize(796, 640); }
-
+    static const QString NagiosCompatibleFormat;
+    static const QString ZabbixCompatibleFormat;
 
 public slots:
 	void newBusinessView(void);
@@ -81,7 +81,7 @@ QString selectedNode;
 QString selectedNodeId;
 
 Settings* settings;
-Struct* data;
+Struct* coreData;
 QSplitter* mainSplitter;
 MenuListT menuList;
 SubMenuListT subMenuList;

@@ -1,8 +1,8 @@
 /*
- * JsonHelper.cpp
+ * Utils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 15-08-2012                                                 #
+# Last Update : 11-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,19 +21,24 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "JsonHelper.hpp"
+#ifndef UTILS_HPP
+#define UTILS_HPP
 
-using namespace std;
+#include "Base.hpp"
+#include "QString"
 
-JsonHelper::JsonHelper(const string & jsonStr) : QScriptEngine()
-{
-    setData(jsonStr);
-}
+namespace Utils {
+QString
+statusToString(const qint32 & _status);
+void
+clear(Struct& data);
+void
+alert(const QString  & msg);
+QString
+getAbsolutePath(const QString & _path);
+void
+delay(const qint32 & d) ;
 
+} //NAMESPACE
 
-void JsonHelper::setData(const string& jsonStr) {
-    data = evaluate("(" + QString::fromStdString(jsonStr) + ")");
-}
-QScriptValue JsonHelper::getProperty(const string& key) {
-    return data.property(QString::fromStdString(key)) ;
-}
+#endif // UTILS_HPP

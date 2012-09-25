@@ -161,14 +161,13 @@ void GraphView::zoomIn()
     scale(1.1, 1.1) ;
     if(statsPanelItem) {
         setStatsPanelPos() ;
-        statsPanelItem->scale(1 / 1.1, 1 / 1.1) ;
+        statsPanelItem->scale(1/1.1, 1/1.1) ;
     }
 }
 
 void GraphView::zoomOut()
 {
-    scale(1 / 1.1, 1 / 1.1) ;
-
+    scale(1/1.1, 1/1.1) ;
     if(statsPanelItem) {
         statsPanelItem->scale(1.1, 1.1) ;
         setStatsPanelPos() ;
@@ -201,22 +200,14 @@ void GraphView::updateStatsPanel(Stats * _statsPanel)
 
 void GraphView::ajustStatsPanelSize(void)
 {
-    QSizeF stat_panel_size, view_size ;
-
     if( statsPanelItem ) {
-        //
-        view_size = size() ;
-        stat_panel_size = statsPanelItem->size() ;
-
-        statsPanelScaleRatio = qMin(view_size.width() / stat_panel_size.width(),
-                                    view_size.height() / stat_panel_size.height()) / 4 ;
-
-        if( statsPanelScaleRatio < 1 ) {
-            //TODO
-            if( portViewScalingRatio < 1 ) 	statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio) ;
+        QSizeF viewSize = size() ;
+        QSizeF statPanelSize = statsPanelItem->size() ;
+        statsPanelScaleRatio = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4 ;
+        if(statsPanelScaleRatio < 1) {
+            if(portViewScalingRatio < 1) 	statsPanelItem->scale(1/portViewScalingRatio, 1/portViewScalingRatio) ;
             statsPanelItem->scale(statsPanelScaleRatio, statsPanelScaleRatio) ;
         }
-
         isAjustedStatsPanelSize = true ;
         setStatsPanelPos() ;
     }
@@ -504,18 +495,16 @@ void GraphView::setNodeVisible(const QString & _nodeId,
                                const bool & _visible, const qint32 & _level)
 {
     GNodeListT::iterator gnode = gnodesList.find(_nodeId);
-
     if(gnode != gnodesList.end()) {
         QString edgeId = _parent + ":" + _nodeId;
+        edgesList[edgeId].edge->setVisible(_visible);
         gnode->expand = _visible;
         gnode->label->setVisible(_visible);
         gnode->icon->setVisible(_visible);
-        edgesList[edgeId].edge->setVisible(_visible);
-
-        if( gnode->type == NodeType::SERVICE_NODE ) {
+        if(gnode->type == NodeType::SERVICE_NODE) {
             gnode->exp_icon->setVisible(_visible);
         }
-        if( _visible ) {
+        if(_visible) {
             QPixmap expandIcon(iconMap[PLUS], 0, Qt::AutoColor);
             gnodesList[_nodeId].exp_icon->setPixmap(expandIcon);
         }
@@ -527,10 +516,9 @@ void GraphView::scaleToFitViewPort(void)
 {
     QSizeF viewSize = size() ;
     QSizeF sceneSize = graphScene->itemsBoundingRect().size() ;
-
-    portViewScalingRatio = qMin(viewSize.width() / sceneSize.width(), viewSize.height() / sceneSize.height() )  ;
-    if ( portViewScalingRatio < 1.0 ) {
-        if( statsPanelItem ) statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio) ;
+    portViewScalingRatio = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height() )  ;
+    if (portViewScalingRatio < 1.0) {
+        if(statsPanelItem) statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio) ;
         scale( portViewScalingRatio, portViewScalingRatio ) ;
     } else {
         portViewScalingRatio = 1 ;
@@ -543,16 +531,16 @@ void GraphView::capture(void)
     QPixmap pixmap(size()) ;
     QPainter painter(&pixmap) ;
     QString fileName= QFileDialog::getSaveFileName(this,
-                                                   tr("Select the image destination - ") + appName.toUpper(),
+                                                   tr("Select the image destination - ") + appName,
                                                    ".",
                                                    tr("PNG files (*.png);; All files (*)"));
     QFileInfo fileInfo(fileName) ;
-    if(fileInfo.suffix() == "" ) {
+    if(fileInfo.suffix().isEmpty()) {
         fileName.append(".png") ;
     }
     setBackgroundBrush( Qt::white ) ;
     painter.setRenderHint(QPainter::Antialiasing) ;
-    render( &painter ) ;
+    render(&painter) ;
     painter.end() ;
-    pixmap.save( fileName ) ;
+    pixmap.save(fileName) ;
 }

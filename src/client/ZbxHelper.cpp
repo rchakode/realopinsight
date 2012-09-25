@@ -1,5 +1,5 @@
 /*
- * ZabbixHelper.cpp
+ * ZbxHelper.cpp
  # ------------------------------------------------------------------------ #
  # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
  # Last Update : 4 août 2012                                                #
@@ -21,14 +21,14 @@
  #--------------------------------------------------------------------------#
  */
 
-#include "ZabbixHelper.hpp"
+#include "ZbxHelper.hpp"
 #include <QtScript/QScriptEngine>
 #include <QDebug>
 #include <QMessageBox>
 
 const QString apiContext = "/api_jsonrpc.php";
 
-ZabbixHelper::ZabbixHelper(const QString & baseUrl)
+ZbxHelper::ZbxHelper(const QString & baseUrl)
     : QNetworkAccessManager(),
       apiUri(baseUrl + apiContext),
       requestHandler(new QNetworkRequest()) {
@@ -37,20 +37,20 @@ ZabbixHelper::ZabbixHelper(const QString & baseUrl)
     setRequestsPatterns();
 }
 
-ZabbixHelper::~ZabbixHelper() {
+ZbxHelper::~ZbxHelper() {
     delete requestHandler;
 }
 
-void ZabbixHelper::setBaseUrl(const QString & url) {
+void ZbxHelper::setBaseUrl(const QString & url) {
     apiUri = url + apiContext ;
     requestHandler->setUrl(QUrl(apiUri));
 }
 
-QString ZabbixHelper::getApiUri(void) const {
+QString ZbxHelper::getApiUri(void) const {
     return apiUri ;
 }
 
-void ZabbixHelper::get(const qint32 & reqId, const QStringList & params) {
+void ZbxHelper::get(const qint32 & reqId, const QStringList & params) {
     QString request = requestsPatterns[reqId];
     foreach(const QString &param, params) {
         request = request.arg(param) ;
@@ -59,11 +59,11 @@ void ZabbixHelper::get(const qint32 & reqId, const QStringList & params) {
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
-void ZabbixHelper::processError(QNetworkReply::NetworkError code) {
+void ZbxHelper::processError(QNetworkReply::NetworkError code) {
     emit propagateError(code);
 }
 
-void ZabbixHelper::setRequestsPatterns(){
+void ZbxHelper::setRequestsPatterns(){
 
     requestsPatterns[LOGIN] = "{\"jsonrpc\": \"2.0\", \
             \"auth\": null, \

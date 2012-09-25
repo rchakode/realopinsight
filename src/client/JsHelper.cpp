@@ -1,5 +1,5 @@
 /*
- * JsonHelper.hpp
+ * JsonHelper.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 15-08-2012                                                 #
@@ -21,21 +21,19 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef JSONHELPER_HPP
-#define JSONHELPER_HPP
+#include "JsHelper.hpp"
 
-#include <string>
-#include <QString>
-#include <QtScript/QScriptEngine>
+using namespace std;
 
-class JsonHelper : public QScriptEngine
+JsonHelper::JsonHelper(const string & jsonStr) : QScriptEngine()
 {
-public:
-    JsonHelper(const std::string & jsonStr = "");
-    void setData(const std::string& jsonStr);
-    QScriptValue getProperty(const std::string& key);
-private :
-    QScriptValue data;
-};
+    setData(jsonStr);
+}
 
-#endif // JSONHELPER_HPP
+
+void JsonHelper::setData(const string& jsonStr) {
+    data = evaluate("(" + QString::fromStdString(jsonStr) + ")");
+}
+QScriptValue JsonHelper::getProperty(const string& key) {
+    return data.property(QString::fromStdString(key)) ;
+}

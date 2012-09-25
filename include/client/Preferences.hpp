@@ -22,8 +22,8 @@
  */
 
 
-#ifndef SNAVPREFERENCESDIALOG_HPP_
-#define SNAVPREFERENCESDIALOG_HPP_
+#ifndef SNAVPREFERENCES_HPP_
+#define SNAVPREFERENCES_HPP_
 
 #include "core/ns.hpp"
 #include "Auth.hpp"
@@ -31,71 +31,84 @@
 #include<QSplashScreen>
 
 
-class Preferences : public QDialog
-{
-	Q_OBJECT
-
-public:
-	Preferences(const qint32 & _user_role = Auth::OP_USER_ROLE, const qint32 & _action = Preferences::ChangePassword);
-	virtual ~Preferences();
-	static QString style() ;
-    static QSplashScreen* infoScreen(const QString & msg="");
-
-	static const qint32 ChangePassword ;
-	static const qint32 ForceChangePassword ;
-	static const  qint32 ChangeMonitoringSettings ;
-	static const  qint32 ShowHelp ;
-	static const  qint32 ShowAbout ;
-	static const QString URL_KEY ;
-	static const QString UPDATE_INTERVAL_KEY ;
-	static const QString SERVER_ADDR_KEY ;
-	static const QString SERVER_PORT_KEY ;
-	static const QString ADM_UNSERNAME_KEY ;
-	static const QString OP_UNSERNAME_KEY ;
-	static const QString ADM_PASSWD_KEY ;
-	static const QString OP_PASSWD_KEY ;
-	static const QString SERVER_PASS_KEY ;
-
-public slots:
-	void applySettings(void);
-	void changePasswd(void);
-
-signals:
-	void urlChanged( QString );
-
-protected :
-	void showEvent (QShowEvent * ) ;
-
-
+class ImageButton : public QAbstractButton {
+    Q_OBJECT
 private:
-	qint32 userRole ;
-	Settings* settings;
-	QLineEdit* monitorHomeField ;
-	QSpinBox* updateIntervalField ;
-	QPushButton *bBrowse ;
-	qint32 updateInterval ;
-	QString monitorUrl ;
-	QString serverAddr ;
-	QString serverPort ;
-	QString serverPass ;
-	QLineEdit* oldPasswdField ;
-	QLineEdit* passwdField ;
-	QLineEdit* rePasswdField ;
-	QLineEdit* serverAddrField ;
-	QLineEdit* serverPortField ;
-	QLineEdit* serverPassField ;
-	QPushButton* cancelButton ;
-	QPushButton* applySettingButton ;
-	QPushButton* changePasswdButton ;
-	QGridLayout* layout ;
-
-	struct settingParams{
-		QString status_file ;
-		qint32 update_interval ;
-	};
-
-	void setContent(void) ;
-	void addEvents(void) ;
+QPixmap pixmap;
+public:
+    ImageButton(const QString & ipath) {this->pixmap = QPixmap(ipath); update();}
+    ~ImageButton(){}
+    void setPixmap(const QPixmap& pm ) {pixmap = pm; update(); }
+    QSize sizeHint() const {return pixmap.size();}
+protected:
+    void paintEvent( QPaintEvent*) {
+        QPainter p( this );
+        p.drawPixmap(0, 0, pixmap );
+    }
 };
 
-#endif /* SNAVPREFERENCESDIALOG_HPP_ */
+class Preferences : public QDialog
+{
+    Q_OBJECT
+
+public:
+    Preferences(const qint32 & _userRole = Auth::OP_USER_ROLE, const qint32 & _action = Preferences::ChangePassword);
+    virtual ~Preferences();
+    static QString style();
+    static QSplashScreen* infoScreen(const QString & msg="");
+
+    static const qint32 ChangePassword;
+    static const qint32 ForceChangePassword;
+    static const qint32 ChangeMonitoringSettings;
+    static const qint32 ShowHelp;
+    static const qint32 ShowAbout;
+    static const QString URL_KEY;
+    static const QString UPDATE_INTERVAL_KEY;
+    static const QString SERVER_ADDR_KEY;
+    static const QString SERVER_PORT_KEY;
+    static const QString ADM_UNSERNAME_KEY;
+    static const QString OP_UNSERNAME_KEY;
+    static const QString ADM_PASSWD_KEY;
+    static const QString OP_PASSWD_KEY;
+    static const QString SERVER_PASS_KEY;
+
+public slots:
+    void applySettings(void);
+    void changePasswd(void);
+    void donate(void);
+
+signals:
+    void urlChanged( QString );
+
+protected :
+    void showEvent (QShowEvent * );
+
+private:
+    qint32 userRole;
+    Settings* settings;
+    QLineEdit* monitorHomeField;
+    QSpinBox* updateIntervalField;
+    QPushButton *bBrowse;
+    qint32 updateInterval;
+    QString monitorUrl;
+    QString serverAddr;
+    QString serverPort;
+    QString serverPass;
+    QLineEdit* oldPasswdField;
+    QLineEdit* passwdField;
+    QLineEdit* rePasswdField;
+    QLineEdit* serverAddrField;
+    QLineEdit* serverPortField;
+    QLineEdit* serverPassField;
+    QPushButton* cancelButton;
+    QPushButton* applySettingButton;
+    QPushButton* changePasswdButton;
+    ImageButton* donateButton;
+    QGridLayout* layout;
+
+    void setContent(void);
+    void addEvents(void);
+};
+
+
+#endif /* SNAVPREFERENCES_HPP_ */
