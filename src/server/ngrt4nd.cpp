@@ -202,7 +202,7 @@ int main(int argc, char ** argv)
         string msg = ZmqHelper::recvFromSocket(*comChannel) ;
         string reply = "" ;
         if(msg == "PING") {
-            reply = "ALIVE";
+            reply = "ALIVE:"+packageVersion;
         } else {
             size_t pos = msg.find(":") ;
             string pass = "";
