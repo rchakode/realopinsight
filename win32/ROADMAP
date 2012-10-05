@@ -1,0 +1,40 @@
+New features
+- Mouse event handling
+- Graph's nodes decoration (tooltip)
+- embeded icons
+- misc
+- bug fixes
+- rewritting of the event handling within the editor
+- code clean of miscellaneous miss programming
+- built-in authentification system: 
+	**two user profiles: administrator (user: hilena_adm) & operator (user: hilena_op)
+	NOTE: For that the authentification system works normaly and securely, the application has to be executed under the identity of a user that has suitable access on the settings file. Then the SEUID bit will be set on the application binary file, while the Xserver ACL has to be set to enable a local access to the Xserver for that user.
+- Other icons added (router, cloud, etc.)
+- filter message panel
+- resizing of navigator windows rewrited to be more adaptable to windows
+- acknowledge removed and planned for the next version
+- statistics (pie chart, etc.)
+- tools bar
+- delete service, context menu for adding and deleting service
+- bug fixes (use iterator instead of direct access to hash table and map)
+- use meta data (hostname, service, threshold, plugin_output) for customizing messages
+- suitable console message objects 
+- Bug fixes, use of initialization in classes
+- Drad-and-drop added in the editor
+- more image icons
+$ xhost +local:user
+
+
+
+TODO LIST
+- NOUVEAU BUG, lorsque le fichier status.dat n'existe pas
+
+PLANNED TO THE NEXT VERSION
+- events correlation
+- events acknowledge
+- Authentification against nagios htaccess file, groundwork database, etc.
+- Two modes of rendering graph: service hierachy mode (using dot) and mapping mode (using neato)
+
+COMMERCIALISATION MODEL
+- Update/upgrade ?
+- license ?

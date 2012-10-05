@@ -1,0 +1,248 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2010.10.24)  30 DEC 2010 12:06
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./images.tex
+(./images.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+
+(/usr/share/texmf-texlive/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (/usr/share/texmf-texlive/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+) (/usr/share/texmf-texlive/tex/latex/base/inputenc.sty
+Package: inputenc 2008/03/30 v1.1d Input encoding file
+\inpenc@prehook=\toks14
+\inpenc@posthook=\toks15
+(/usr/share/texmf-texlive/tex/latex/ucs/utf8x.def
+File: utf8x.def 2004/10/17 UCS: Input encoding UTF-8
+)) (/usr/share/texmf-texlive/tex/latex/ucs/ucs.sty
+Package: ucs 2004/10/17 UCS: Unicode input support
+(/usr/share/texmf-texlive/tex/latex/ucs/data/uni-global.def
+File: uni-global.def 2004/10/17 UCS: Unicode global data
+)
+\uc@secondtry=\count87
+\uc@combtoks=\toks16
+\uc@combtoksb=\toks17
+\uc@temptokena=\toks18
+) (/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks19
+) (/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+) (/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: dvips.def on input line 91.
+(/usr/share/texmf-texlive/tex/latex/graphics/dvips.def
+File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+) (/usr/share/texmf-texlive/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip43
+) (/home/chakode/SNav_Doc/doc/simplemargins.sty
+Simplemargins margin control commands <15 Mar 93>.
+\smpagewidth=\skip44
+\smpageheight=\skip45
+) (/usr/share/texmf-texlive/tex/latex/graphics/color.sty
+Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
+(/etc/texmf/tex/latex/config/color.cfg
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package color Info: Driver file: dvips.def on input line 130.
+(/usr/share/texmf-texlive/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\sizebox=\box26
+\lthtmlwrite=\write3
+
+LaTeX Warning: Unused global option(s):
+    [9pt].
+
+No file images.aux.
+\openout1 = `images.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 123.
+LaTeX Font Info:    ... okay on input line 123.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 123.
+LaTeX Font Info:    ... okay on input line 123.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 123.
+LaTeX Font Info:    ... okay on input line 123.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 123.
+LaTeX Font Info:    ... okay on input line 123.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 123.
+LaTeX Font Info:    ... okay on input line 123.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 123.
+LaTeX Font Info:    ... okay on input line 123.
+(/usr/share/texmf-texlive/tex/latex/ucs/ucsencs.def
+File: ucsencs.def 2003/11/29 Fixes to fontencodings LGR, T3
+)
+
+latex2htmlLength hsize=349.0pt
+
+latex2htmlLength vsize=700.50687pt
+
+latex2htmlLength hoffset=0.0pt
+
+latex2htmlLength voffset=0.0pt
+
+latex2htmlLength topmargin=0.0pt
+
+latex2htmlLength topskip=0.00003pt
+
+latex2htmlLength headheight=0.0pt
+
+latex2htmlLength headsep=0.0pt
+
+latex2htmlLength parskip=0.0pt plus 1.0pt
+
+latex2htmlLength oddsidemargin=0.0pt
+
+latex2htmlLength evensidemargin=0.0pt
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.147 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.148 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.149 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.150 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.156 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.157 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.160 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
+! LaTeX Error: No counter 'chapter' defined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.161 \stepcounter{chapter}
+                           
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 173.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 173.
+l2hSize :tex2html_wrap_inline120:8.0pt::8.0pt::110.19041pt.
+[1
+
+
+
+] (./images.aux) ) 
+Here is how much of TeX's memory you used:
+ 1092 strings out of 495062
+ 15835 string characters out of 1182643
+ 68515 words of memory out of 3000000
+ 4302 multiletter control sequences out of 15000+50000
+ 3640 words of font info for 14 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 25i,5n,21p,336b,147s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on images.dvi (1 page, 444 bytes).

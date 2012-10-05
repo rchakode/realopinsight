@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT ServiceView (Name, DefaultPropagationRules, PropagationRules*, Service+)>
+
+<!ELEMENT Name (#PCDATA)>
+
+<!ELEMENT Service (Name, Parent, Status, PropagationRule?, Description, 
+	CriticalAlarmMsg?, WarningAlarmMsg?, UnreachableAlarmMsg?, LowLevelAlarms?)>
+<!ELEMENT Parent (#PCDATA)>
+<!ELEMENT Status (#PCDATA)>
+<!ELEMENT PropagationRule (#PCDATA)>
+<!ELEMENT Description (#PCDATA)>
+<!ELEMENT CriticalAlarmMsg (#PCDATA)>
+<!ELEMENT WarningAlarmMsg (#PCDATA)>
+<!ELEMENT UnreachableAlarmMsg (#PCDATA)>
+<!ELEMENT LowLevelAlarms (#PCDATA)>
+
+<!ELEMENT DefaultPropagationRules (Rule+)>
+<!ELEMENT PropagationRules (Rule+)>
+<!ELEMENT Rule (#PCDATA)>
+
+<!ATTLIST ServiceView id  ID  #REQUIRED>
+
+<!ATTLIST Service id ID #REQUIRED >
+<!ATTLIST Service type CDATA #REQUIRED>
+<!ATTLIST Service icon CDATA #REQUIRED>
+
+<!ATTLIST DefaultPropagationRules id ID #REQUIRED>
+
+<!ATTLIST PropagationRules id ID #REQUIRED>

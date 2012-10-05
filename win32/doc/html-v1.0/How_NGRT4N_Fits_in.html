@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>How NGRT4N Fits in a Monitoring Environment</TITLE>
+<META NAME="description" CONTENT="How NGRT4N Fits in a Monitoring Environment">
+<META NAME="keywords" CONTENT="documentation">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="documentation.css">
+
+<LINK REL="next" HREF="Getting_Started_with_NGRT4N.html">
+<LINK REL="previous" HREF="Overview_NGRT4N.html">
+<LINK REL="up" HREF="documentation.html">
+<LINK REL="next" HREF="Getting_Started_with_NGRT4N.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html65"
+  HREF="Getting_Started_with_NGRT4N.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html63"
+  HREF="documentation.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html57"
+  HREF="Overview_NGRT4N.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html66"
+  HREF="Getting_Started_with_NGRT4N.html">Getting Started with NGRT4N</A>
+<B> Up:</B> <A NAME="tex2html64"
+  HREF="documentation.html">NGRT4N Documentation</A>
+<B> Previous:</B> <A NAME="tex2html58"
+  HREF="Overview_NGRT4N.html">Overview of NGRT4N</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html67"
+  HREF="How_NGRT4N_Fits_in.html#SECTION00310000000000000000">Architecture of Integration</A>
+<LI><A NAME="tex2html68"
+  HREF="How_NGRT4N_Fits_in.html#SECTION00320000000000000000">Access to User Interfaces</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00300000000000000000">
+How NGRT4N Fits in a Monitoring Environment</A>
+</H1>
+In this section we briefly introduce the design of NGRT4N to show a suitable architecture for integration in a preexisting or new monitoring environment. 
+
+<P>
+
+<H1><A NAME="SECTION00310000000000000000">
+Architecture of Integration</A>
+</H1>
+In order to reduce the integration constraints, NGRT4N is designed to be loosely coupled with the monitoring solutions and any other tool. As introduced on the Figure below, it architecture relies upon the database of status data collected by the monitoring engine. In the case of Nagios-derived solutions such as Nagios it self, Centreon, Groundwork Monitor, Icinga, etc., NGRT4N only needs to get access to the file named <I>status.dat</I>.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="64"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Architecture of NGRT4N fiting with the monitoring solution</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER"><IMG
+  WIDTH="394" HEIGHT="312" ALIGN="BOTTOM" BORDER="0"
+ SRC="./software-integration.png"
+ ALT="Image software-integration">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+NGRT4N is coupled with the monitoring solution through an internal solution-aware <I>Broker</I>. The broker is in charge to access the status database periodically to retrieve the status data in order to update monitoring views. The default value of the updating interval is five minutes, but it can be changed by administrators to suit your monitoring needs. 
+
+<P>
+When the coupling with the monitoring database is suitable configured, the MVB (Monitoring View Builder) can retrieve the list of checks from this database in order to ease the selection of items to link to monitoring view. This is useful to avoid erroneous selections due to invalid references to check identifiers.
+
+<P>
+
+<H1><A NAME="SECTION00320000000000000000">
+Access to User Interfaces</A>
+</H1>
+NGRT4N assumes that your physical infrastructure adopts a classical monitoring architecture with a monitoring server, a set of monitored systems and devices, and workstation where user operates). 
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="70"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Typical architecture for integrating NGRT4N within a monitoring environment</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER"><IMG
+  WIDTH="473" HEIGHT="200" ALIGN="BOTTOM" BORDER="0"
+ SRC="./physical-integration.png"
+ ALT="Image physical-integration">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+In this architecture, the NGRT4N stack is installed on the monitoring server and is accessible to users (on workstations) via a X forwarding mechanism. In order to be secure, the X forwarding has to work through a ssh tunnel between the monitoring server and the operator workstation. This requires to activate X forwarding either in the ssh daemon (by setting <I>ForwardX11 yes</I> in <I>/etc/ssh/ssh_config</I>) or from the ssh connection command (<I>ssh -X @server</I> or alternatively by setting <I>ForwardX11 yes</I> in <I>$HOME/.ssh/config</I>) from the workstation.   
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html65"
+  HREF="Getting_Started_with_NGRT4N.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html63"
+  HREF="documentation.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html57"
+  HREF="Overview_NGRT4N.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html66"
+  HREF="Getting_Started_with_NGRT4N.html">Getting Started with NGRT4N</A>
+<B> Up:</B> <A NAME="tex2html64"
+  HREF="documentation.html">NGRT4N Documentation</A>
+<B> Previous:</B> <A NAME="tex2html58"
+  HREF="Overview_NGRT4N.html">Overview of NGRT4N</A>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

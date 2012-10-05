@@ -241,15 +241,13 @@ bool GraphView::hideChart(void)
 bool GraphView::load(const QString & _dot_file, const NodeListT & _service_list)
 {
     QStringList arguments;
-    QProcess* dot_parser = new QProcess();
-    QProcess p;
+    QProcess* dotParser = new QProcess();
 
     coodinatesGraphFile = _dot_file + ".plain";
     arguments << "-Tplain"<< "-o" << coodinatesGraphFile << _dot_file;
 
-    int exitCode = dot_parser->execute("dot", arguments);
-    dot_parser->waitForFinished(60000);
-
+    int exitCode = dotParser->execute("dot", arguments);
+    dotParser->waitForFinished(60000);
     if ( ! exitCode ) {
         drawGraph( _service_list ) ;
         graphScene->setSceneRect(graphScene->itemsBoundingRect()) ;
@@ -258,7 +256,7 @@ bool GraphView::load(const QString & _dot_file, const NodeListT & _service_list)
         exit( exitCode ) ;
     }
 
-    delete dot_parser;
+    delete dotParser;
     return false;
 }
 
@@ -276,46 +274,36 @@ void GraphView::drawGraph(const NodeListT & _nodes)
             cood_graph_file.open(QFile::ReadOnly))
     {
         pen.setColor( StatsLegend::UNKNOWN_COLOR );
-
         sep_regex.setPattern("[ ]+");
         cood_graph_file_s.setDevice(& cood_graph_file );
 
-        while (line = cood_graph_file_s.readLine(0), ! line.isNull())
-        {
+        while (line = cood_graph_file_s.readLine(0), ! line.isNull()) {
             splited_line = line.split (sep_regex);
-
-            if (splited_line[0] == "node")
-            {
+            if (splited_line[0] == "node") {
                 QString n_id = splited_line[1].trimmed() ;
                 qreal x_corner = splited_line[2].trimmed().toFloat() ;
                 qreal y_corner = -1 * splited_line[3].trimmed().toFloat() ;
 
                 node_it = _nodes.find( n_id ) ;
-
                 if( node_it == _nodes.end() )
                     continue ;
-
                 gnodesList[n_id].type = node_it->type ;
                 gnodesList[n_id].expand = true;
 
                 QPointF n_label_origin = QPointF(x_corner * XScalingRatio, y_corner * YScalingRatio);
-
                 drawNode( *node_it) ;
                 setNodePos(n_id, n_label_origin);
             }
-            else if (splited_line[0] == "edge")
-            {
+            else if (splited_line[0] == "edge") {
                 QString edge_name; 	QPainterPath path;
                 setEdgePath(splited_line[1], splited_line[2], path);
                 edge_name =  splited_line[1] + ":" + splited_line[2];
-
                 edgesList[edge_name].edge = new QGraphicsPathItem(path),
                         edgesList[edge_name].edge->setPen(pen),
                         graphScene->addItem(edgesList[edge_name].edge),
                         edgesList[edge_name].edge->setZValue(-20);
             }
-            else if(splited_line[0] == "stop")
-            {
+            else if(splited_line[0] == "stop") {
                 break;
             }
         }
@@ -324,15 +312,14 @@ void GraphView::drawGraph(const NodeListT & _nodes)
 
 void GraphView::drawNode(const NodeT & _node )
 {
-    QString html_n_label ;
     QPixmap icon, exp_icon ;
-
     icon.load(iconMap[_node.icon], 0, Qt::AutoColor);  // TODO
     exp_icon.load(iconMap[PLUS], 0, Qt::AutoColor);
-    html_n_label = "<span style=\"background: 'lightgray'\">&nbsp;" + _node.name + "&nbsp;</span>";
+
+    QString label = "<span style=\"background: 'lightgray'\">&nbsp;" + _node.name + "&nbsp;</span>";
 
     gnodesList[_node.id].label = new QGraphicsTextItem(),
-            gnodesList[_node.id].label->setHtml(html_n_label),
+            gnodesList[_node.id].label->setHtml(label),
             gnodesList[_node.id].label->setData(0, _node.id + NODE_LABEL_ID_SFX),
             graphScene->addItem(gnodesList[_node.id].label),
             gnodesList[_node.id].label->setZValue(-5);
@@ -347,8 +334,9 @@ void GraphView::drawNode(const NodeT & _node )
             graphScene->addItem(gnodesList[_node.id].exp_icon),
             gnodesList[_node.id].exp_icon->setZValue(0) ;
 
-    if(gnodesList[_node.id].type == NodeType::ALARM_NODE) 	gnodesList[_node.id].exp_icon->setVisible(false);
-
+    if(gnodesList[_node.id].type == NodeType::ALARM_NODE) {
+        gnodesList[_node.id].exp_icon->setVisible(false);
+    }
     QString msg =  SvNavigator::getNodeToolTip(_node) ;
     gnodesList[_node.id].icon->setToolTip(msg);
     gnodesList[_node.id].label->setToolTip(msg);
@@ -356,12 +344,8 @@ void GraphView::drawNode(const NodeT & _node )
 
 void GraphView::updateNodeColor(const NodeListT::iterator & _node)
 {
-    QString n_label, html_n_label ;
-    GEdgeListT::iterator edge_it ;
     QColor color ;
-
-    switch (_node->status)
-    {
+    switch (_node->status) {
     case MonitorBroker::OK:
         color = StatsLegend::OK_COLOR ;
         break;
@@ -378,19 +362,14 @@ void GraphView::updateNodeColor(const NodeListT::iterator & _node)
         color = StatsLegend::UNKNOWN_COLOR ;
         break;
     }
-
-    html_n_label = "<span style=\"background: '" + color.name() + "'\">&nbsp;" +_node->name + "&nbsp;</span>";
-
-    gnodesList[_node->id].label->setHtml(html_n_label);
-
-    edge_it = edgesList.find( _node->parent + ":" + _node->id ) ;
-
-    if( edge_it != edgesList.end() ) edge_it->edge->setPen( color );
+    QString label = "<span style=\"background: '"%color.name()%"'\">&nbsp;"%_node->name%"&nbsp;</span>";
+    gnodesList[_node->id].label->setHtml(label);
+    GEdgeListT::iterator edge = edgesList.find( _node->parent + ":" + _node->id ) ;
+    if(edge != edgesList.end()) edge->edge->setPen( color );
 }
 
 void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString & _toolTip)
 {
-    QString n_label, html_n_label ;
     GEdgeListT::iterator edge_it ;
     QColor color ;
 
@@ -412,18 +391,16 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
         color = StatsLegend::UNKNOWN_COLOR ;
         break;
     }
-    html_n_label = "<span style=\"background: '" + color.name() + "'\">&nbsp;" +_node_it->name + "&nbsp;</span>";
-
+    QString label = "<span style=\"background: '" + color.name() + "'\">&nbsp;" +_node_it->name + "&nbsp;</span>";
     GNodeListT::iterator gnode_it =  gnodesList.find(_node_it->id);
     if (gnode_it != gnodesList.end() )	{
-
-        gnode_it->label->setHtml(html_n_label);
+        gnode_it->label->setHtml(label);
         gnode_it->icon->setToolTip(_toolTip);
         gnode_it->label->setToolTip(_toolTip);
-
         edge_it = edgesList.find( _node_it->parent + ":" + _node_it->id ) ;
-        if( edge_it == edgesList.end() ) return ;
-
+        if( edge_it == edgesList.end() ) {
+            return ;
+        }
         switch (_node_it->prop_status)
         {
         case MonitorBroker::OK:
@@ -442,7 +419,6 @@ void GraphView::updateNode(const NodeListT::iterator & _node_it, const QString &
             color = StatsLegend::UNKNOWN_COLOR ;
             break;
         }
-
         edge_it->edge->setPen(color);
     }
 }

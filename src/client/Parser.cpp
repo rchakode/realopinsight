@@ -84,7 +84,7 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
         if(node.icon.length() == 0) node.icon = GraphView::DEFAULT_ICON;
         node.icon.remove("--> "); //FBWC
         node.status = MonitorBroker::UNSET_STATUS;
-        node.parent = "NULL";
+        node.parent = "";
         if(node.status_crule < 0) node.status_crule = StatusCalcRules::HighCriticity; //FBWC
         if(node.status_prule < 0) node.status_prule = StatusPropRules::Unchanged;
         _coreData.nodes.insert(node.id, node);
@@ -104,22 +104,21 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
     return true;
 }
 
-void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_content )
+void Parser::updateNodeHierachy(NodeListT & _nodes, QString & _gcontent)
 {
-    _graph_content = "\n";
-    for(NodeListT::iterator node_it = _nodes_list.begin(); node_it != _nodes_list.end(); node_it ++) {
+    _gcontent = "\n";
+    for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
+        QString nname = node->name;
+        _gcontent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_gcontent;
 
-        QString nname = node_it->name;
-        _graph_content = "\t" + node_it->id + "[label=\"" + nname.replace(' ', '#') + "\"];\n" + _graph_content;
+        if(node->child_nodes != "") {
+            QStringList nodeIds = node->child_nodes.split(CHILD_NODES_SEP);
+            for(QStringList::iterator nodeId = nodeIds.begin(); nodeId != nodeIds.end(); nodeId ++) {
+                NodeListT::iterator childNode = _nodes.find((*nodeId).trimmed());
 
-        if( node_it->child_nodes != "" ) {
-            QStringList node_ids_list = node_it->child_nodes.split(CHILD_NODES_SEP);
-
-            for(QStringList::iterator node_id_it = node_ids_list.begin(); node_id_it != node_ids_list.end(); node_id_it ++) {
-                NodeListT::iterator child_node_it = _nodes_list.find( (*node_id_it).trimmed() );
-                if( child_node_it != _nodes_list.end() ) {
-                    child_node_it->parent = node_it->id;
-                    _graph_content += "\t" + node_it->id + "--" + child_node_it->id + "\n";
+                if(childNode != _nodes.end()) {
+                    childNode->parent = node->id;
+                    _gcontent += "\t" + node->id%"--"%childNode->id%"\n";
                 }
             }
         }
@@ -129,12 +128,10 @@ void Parser::updateNodeHierachy( NodeListT & _nodes_list, QString & _graph_conte
 void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
 {
     for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
-
         QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType);
         item->setIcon(0, QIcon(":/images/unknown.png"));
         item->setText(0, node->name);
         item->setData(0, QTreeWidgetItem::UserType, node->id);
-
         _tree.insert(node->id, item);
     }
 
@@ -152,7 +149,7 @@ void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
             }
 
             TreeNodeItemListT::iterator child = _tree.find(*child_id);
-            if( child != _tree.end() ) _tree[node->id]->addChild(*child);
+            if(child != _tree.end()) _tree[node->id]->addChild(*child);
         }
     }
 }

@@ -220,21 +220,27 @@ int SvNavigator::runNagiosMonitor(void)
     zmq::context_t comContext(1);
     string srvVer;
     comChannel = ZmqHelper::initCliChannel(comContext, serverUrl, srvVer);
-    if(! comChannel) {
+    if(!comChannel) {
         QString msg = SERVICE_OFFLINE_MSG.arg(QString::fromStdString(serverUrl));
         Utils::alert(msg);
         updateStatusBar(msg);
         success = false ;
     } else {
+        if(QString::fromStdString(srvVer).remove(".").toInt() < 110) {
+            Utils::alert(tr("ERROR: The server %1 is not supported").arg(QString::fromStdString(srvVer)));
+            success = false;
+        }
         updateStatusBar(tr("Updating..."));
     }
     resetStatData();
     msgPanel->setSortingEnabled(false);
+
     foreach(const QString & checkId, coreData->cnodes.keys()) {
 
-        NodeListT::iterator node = coreData->cnodes.find(checkId);
-        if(node == coreData->nodes.end())
+        NodeListT::iterator node = coreData->nodes.find(checkId); //TODO
+        if(node == coreData->nodes.end()) {
             continue;
+        }
 
         if(node->child_nodes == "") {
             node->status = MonitorBroker::UNKNOWN;
@@ -244,8 +250,8 @@ int SvNavigator::runNagiosMonitor(void)
 
         QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
-            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO
-            if(comChannel) {
+            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO à mettre au propre avec la nouvelle organization => cnodes
+            if(success) {
                 ZmqHelper::sendFromSocket(*comChannel, msg);
                 msg = ZmqHelper::recvFromSocket(*comChannel);
             } else {

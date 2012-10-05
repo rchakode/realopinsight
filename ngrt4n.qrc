@@ -39,6 +39,5 @@
         <file>images/web.png</file>
         <file>images/built-in/loading-screen.png</file>
         <file>images/built-in/logo.png</file>
-        <file>images/built-in/donate.gif</file>
     </qresource>
 </RCC>

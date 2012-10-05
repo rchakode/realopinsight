@@ -12,3 +12,5 @@ ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp \
 		   src/core/ZmqHelper.cpp
 
 dist_man_MANS =  doc/man/ngrt4nd.1.gz
+
+EXTRA_DIST=install-sh examples/status.dat

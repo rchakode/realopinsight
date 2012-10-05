@@ -1,8 +1,13 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION = 2.1.0beta1
+VERSION_=2.1.0beta1
+VERSION = "-$${VERSION_}"
 LIBS += -lzmq
-QMAKE_TARGET=RealOpInsight
+#QMAKE_TARGET=RealOpInsight
+config-dist{
+SOURCES	+= src/client/ngrt4n.cpp
+TARGET = RealOpInsight
+}
 config-default{
 SOURCES	+= src/client/ngrt4n.cpp
 TARGET = ngrt4n-manager
@@ -29,7 +34,7 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "PACKAGE_NAME='\"\"'"
-DEFINES *= "PACKAGE_VERSION='\"$$VERSION\"'"
+DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_YEAR='\"2012\"'"
 OBJECTS_DIR = build/obj
@@ -92,10 +97,9 @@ DISTFILES += README \
 			 install-sh \
 			 images/*.png \
 			 images/built-in/*.png \
-			 examples/{*.xml,*.dat} \
+                         examples/{*.ngrt4n.xml,*.dat} \
 			 src/client/ngrt4n-oc.cpp \
-			 src/client/ngrt4n-editor.cpp \
-			 src/server/ngrt4nd.cpp \
+                         src/client/ngrt4n-editor.cpp \
                          doc/man/*.gz
 
 OTHER_FILES = \

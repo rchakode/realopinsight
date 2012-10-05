@@ -43,14 +43,11 @@ public:
 private:
     static const QString dotFileHeader;
     static const QString dotFileFooter;
-
     QString graphFilename;
 
-    void buildNodeTree( NodeListT &, TreeNodeItemListT & ) ;
-
-    void updateNodeHierachy( NodeListT &, QString & ) ;
-
-    void saveCoordinatesDotFile(const QString& );
+    void buildNodeTree(NodeListT &, TreeNodeItemListT &) ;
+    void updateNodeHierachy(NodeListT &, QString &) ;
+    void saveCoordinatesDotFile(const QString&);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

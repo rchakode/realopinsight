@@ -1,0 +1,374 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Getting Started with NGRT4N</TITLE>
+<META NAME="description" CONTENT="Getting Started with NGRT4N">
+<META NAME="keywords" CONTENT="documentation">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="documentation.css">
+
+<LINK REL="previous" HREF="How_NGRT4N_Fits_in.html">
+<LINK REL="up" HREF="documentation.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive" SRC="nx_grp_g.png"> 
+<A NAME="tex2html73"
+  HREF="documentation.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html71"
+  HREF="How_NGRT4N_Fits_in.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Up:</B> <A NAME="tex2html74"
+  HREF="documentation.html">NGRT4N Documentation</A>
+<B> Previous:</B> <A NAME="tex2html72"
+  HREF="How_NGRT4N_Fits_in.html">How NGRT4N Fits in</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html75"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00410000000000000000">How to Get NGRT4N</A>
+<LI><A NAME="tex2html76"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00420000000000000000">System Requirements</A>
+<UL>
+<LI><A NAME="tex2html77"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00421000000000000000">Monitoring Server</A>
+<LI><A NAME="tex2html78"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00422000000000000000">Operator Workstation</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html79"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00430000000000000000">Hardware Requirements</A>
+<UL>
+<LI><A NAME="tex2html80"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00431000000000000000">Disk Requirements</A>
+<LI><A NAME="tex2html81"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00432000000000000000">Memory Requirements</A>
+<LI><A NAME="tex2html82"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00433000000000000000">CPU Requirements</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html83"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440000000000000000">Installation</A>
+<UL>
+<LI><A NAME="tex2html84"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440010000000000000">Installing Runtime Pre-requisites</A>
+<LI><A NAME="tex2html85"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440020000000000000">Download NGRT4N</A>
+<LI><A NAME="tex2html86"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440030000000000000">Install NGRT4N</A>
+<LI><A NAME="tex2html87"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440040000000000000">User Information</A>
+<LI><A NAME="tex2html88"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440050000000000000">Configuring NGRT4N</A>
+<LI><A NAME="tex2html89"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00440060000000000000">You're Done</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html90"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00450000000000000000">Tutorial</A>
+<UL>
+<LI><A NAME="tex2html91"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00451000000000000000">Case Study</A>
+<LI><A NAME="tex2html92"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00452000000000000000">Use the OC Utility</A>
+<LI><A NAME="tex2html93"
+  HREF="Getting_Started_with_NGRT4N.html#SECTION00453000000000000000">Use the VCE Utility</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00400000000000000000">
+Getting Started with NGRT4N</A>
+</H1>
+This section is intended to provide you with simple instruction on how to install and use NGRT4N.
+
+<P>
+
+<H1><A NAME="SECTION00410000000000000000">
+How to Get NGRT4N</A>
+</H1>
+Check the NGRT4N Home Page at http://www.ngrt4n.com for information about the current version and for downloading instructions.
+
+<P>
+NGRT4N is distributed as pre-compiled binary packages. 
+
+<P>
+
+<H1><A NAME="SECTION00420000000000000000"></A>
+<A NAME="systemreq"></A>
+<BR>
+System Requirements
+</H1>
+
+<H2><A NAME="SECTION00421000000000000000">
+Monitoring Server</A>
+</H2>
+NGRT4N is designed to work on Linux systems. 
+Its installation does not have additional requirements, but it requires some third-party libraries at runtime:
+
+<UL>
+<LI><B>Qt &gt;= 4.6</B>. At least the following modules should be installed: <B>QtCore, QtGui, QtNetwork, QtWebkit, QtXml, QtXmlPatterns</B>. 
+</LI>
+<LI><B>Graphviz &gt;= 2.20.2</B>. At least the <B>dot</B> utility should be installed. NGRT4N has been tested with graphviz 2.20.2, but it may work on former versions.
+</LI>
+<LI><B>ssh</B>
+</LI>
+<LI><B>xauth</B>
+</LI>
+</UL>
+
+<P>
+Most of Linux distributions provide these libraries as pre-compiled packages. They may be already installed on your system, check before proceeding to a new installation. If there are not installed, you can install them from the package manager (yum, apt-get, synaptic, etc.).  
+You don't need to care about qt dependencies if you have downloaded one of the large distribution packages of NGRT4N.
+
+<P>
+
+<H2><A NAME="SECTION00422000000000000000">
+Operator Workstation</A>
+</H2>
+NGRT4N can be run from any system having the following software installed:
+
+<UL>
+<LI><B>ssh client</B>. On Linux and MAC OS systems, a ssh client should be already installed. On Windows, you may need to install a ssh client such as <B>PuTTY</B>
+</LI>
+<LI><B>X Server</B>. On Linux and MAC OS systems with graphical interfaces, a X server should be already installed. On Windows, you may need to install a X server such as <B>Xming</B>
+</LI>
+</UL>
+
+<P>
+
+<H1><A NAME="SECTION00430000000000000000">
+Hardware Requirements</A>
+</H1>
+
+<H2><A NAME="SECTION00431000000000000000">
+Disk Requirements</A>
+</H2>
+The installation of NGRT4N requires a small disk footprint, less than less than 50MB of free disk space is required for installing a large distribution along with its dependencies (Qt libraries and graphviz binaries). A small amount of disk space is required to store the configuration of monitoring views. E.g. Less than 100KB are required for a view with more than 500 components. 
+
+<P>
+
+<H2><A NAME="SECTION00432000000000000000">
+Memory Requirements</A>
+</H2>
+256 MB of free space in physical memory and could be a good starting point. However the amount of required memory at runtime obviously depends on the number of operator consoles running in parallel, as well as on the amount of nodes that constitute the views loaded on those consoles. However, we recommend to continuously check your server to ensure that it still responds well after changing one or more of these parameters.
+
+<P>
+
+<H2><A NAME="SECTION00433000000000000000">
+CPU Requirements</A>
+</H2>
+The CPU requirements depend on the number of operator consoles running in parallel, the intervals of updating those consoles, and the amount of items to retrieve to the monitoring database at each update. E.g. For an update interval of 5 minutes, 1 CPU core can be sufficient to update up to 5 operator consoles, which each deals with about 100 items retrieved from monitoring database at each update. However, we recommend to continuously check your server to ensure that it still responds well after changing one or more of these parameters.
+
+<P>
+
+<H1><A NAME="SECTION00440000000000000000">
+Installation</A>
+</H1>
+The installation of NGRT4N is a straightforward task. In most of cases, less than 10 minutes are required to make it ready to use.
+
+<P>
+During the installation you'll need to have <B>root</B> access to your machine.
+
+<P>
+
+<H4><A NAME="SECTION00440010000000000000">
+Installing Runtime Pre-requisites</A>
+</H4>
+
+<P>
+On the monitoring server and operator workstations, make sure that all runtime pre-requisites (<A HREF="#systemreq"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]" SRC="crossref.png"></A>) are installed.
+
+<P>
+
+<H4><A NAME="SECTION00440020000000000000">
+Download NGRT4N</A>
+</H4>
+
+<P>
+Check the NGRT4N Home Page at http://www.ngrt4n.com for information about the current version and for downloading instructions.
+
+<P>
+NGRT4N is distributed as pre-compiled binary packages. 
+
+<P>
+
+<H4><A NAME="SECTION00440030000000000000">
+Install NGRT4N</A>
+</H4>
+
+<P>
+Extract the NGRT4N binary tarball.
+
+<P>
+tar zxf ngrt4n-X.Y.Z.tar.gz
+
+<P>
+cd  ngrt4n-X.Y.Z
+
+<P>
+Run the NGRT4N install script. 
+
+<P>
+./install.sh 
+
+<P>
+NGRT4N works in a self-contained directory, by default /opt/ngrt4n. You can change this location using the -d switch (./install.sh -d &lt;destination_folder&gt;. 
+
+<P>
+
+<H4><A NAME="SECTION00440040000000000000">
+User Information</A>
+</H4>
+NGRT4N distinguishes two types of user profiles: a <I>operator profile</I> and a <I>administrator profile</I>. An operator can create, edit, and view monitoring views, whereas an administrator can have more control such as defining monitoring settings (update interval, path to status database, etc.).
+
+<P>
+There are two predefined users associated to these profiles.
+
+<P>
+Operator User
+
+<P>
+<B>Login:</B> ngrt4n_op
+
+<P>
+<B>Password:</B> nrt4n_op     (You need to change this as soon as possible)
+
+<P>
+Administrator User
+
+<P>
+<B>Login:</B> ngrt4n_adm
+
+<P>
+<B>Password:</B> ngrt4n_adm     (url for accessing to the native web interface of monitoring)
+
+<P>
+
+<H4><A NAME="SECTION00440050000000000000">
+Configuring NGRT4N</A>
+</H4>
+
+<P>
+Once installed NGRT4N users should have the following environments variables set as follows:
+
+<P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=113>NGRT4N_HOME</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>This variable must be set to <I>/opt/ngrt4n</I> or <I>&lt;destination_folder&gt;</I> if have used the -d option at installation time.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=113>PATH</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>$NGRT4N_HOME/bin:$PATH</TD>
+</TR>
+</TABLE>
+</DIV>
+
+<P>
+Run the configuration wizard and log on as administrator to set suitable monitoring settings, and change the default password.
+
+<P>
+ngrt4n -c
+
+<P>
+We mention that NGRT4N is a command line tool consisting of one main program named <I>ngrt4n</I>. There are options to launch its different modules. Run ngrt4n -h to have the list of available options and their usage. 
+
+<P>
+
+<H4><A NAME="SECTION00440060000000000000">
+You're Done</A>
+</H4>
+Congratulations! You successfully installed NGRT4N. You'll no doubt want to see it in action, so check out the following tutorials.
+
+<P>
+
+<H1><A NAME="SECTION00450000000000000000">
+Tutorial</A>
+</H1>
+This tutorial describe how you can use NGRT4N to create the configuration of a view based on hierarchical business processes to monitor a given service platform. You will first use the VCE utility to edit the view configuration file and then, load this file with the OC utility.
+
+<P>
+In order to make this tutorial fluid, we will proceed by showing NGRT4N in action from a case study example. 
+
+<P>
+
+<H2><A NAME="SECTION00451000000000000000">
+Case Study</A>
+</H2>
+Once NGRT4N installed, you should have example files located in <B>$NGRT4N_HOME/share/examples</B>. The configuration of view are stored in xml files (.xml). We will use the example named <B>small_hosting_platform.xml</B>, which works with the status database <B>status.dat</B> located in the same directory. This is an illustration of a platform monitored by Nagios. The platform is used to provide web hosting to end users. It relies on virtualized resources and provides web access from two servers.
+
+<P>
+Connect to the server where is installed NGRT4N, and run the configuration utility.
+
+<P>
+ssh -X user@server
+
+<P>
+ngrt4n -c
+
+<P>
+Log on as administrator, and point the status database to $NGRT4N_HOME/share/examples/status.dat. You can also change the update interval. Leave the url of the web interface unchanged, or point it to your monitoring web interface. 
+
+<P>
+Apply change and quit the utility.
+
+<P>
+
+<H2><A NAME="SECTION00452000000000000000">
+Use the OC Utility</A>
+</H2>
+In order to show the view with the OC utility, run the ngrt4n program with the -d switch while specifying the configuration file to load. 
+
+<P>
+ngrt4n -d $NGRT4N_HOME/share/examples/small_hosting_platform.xml
+
+<P>
+The example show a case where a critical event has arose on a web server. According to its criticality on the platform the hierarchy has been configured so to propagate the criticality unchanged until the top of the hierarchy. However, as we will show in the next sub section this behavior can be changed by modifying the <I>Status Aggregation Rule</I> property of one or more of its ascendant nodes when editing the view.
+
+<P>
+You can play with the view to see the powerful of NGRT4N. Each item in the hierarchy map and the three view explorer has a context menu and a tooltip. You can zoom the hierarchy map using the suitable menu from either the toolbar or the menu Map. Alternatively you can use the mouse wheel. Go through menu to test other functionalities, such as capture an image of the current view of the hierarchy map, hide the statistics chart, change the user password, show monitoring settings and change them if needed (only administrator), etc.
+
+<P>
+
+<H2><A NAME="SECTION00453000000000000000">
+Use the VCE Utility</A>
+</H2>
+We have shown how hierarchical view could be relevant to manage incidents in monitoring environments. Now we will show how such a view can be easily created and edited from the NGRT4N's VCE utility, which is executed using the -d option. 
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive" SRC="nx_grp_g.png"> 
+<A NAME="tex2html73"
+  HREF="documentation.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html71"
+  HREF="How_NGRT4N_Fits_in.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Up:</B> <A NAME="tex2html74"
+  HREF="documentation.html">NGRT4N Documentation</A>
+<B> Previous:</B> <A NAME="tex2html72"
+  HREF="How_NGRT4N_Fits_in.html">How NGRT4N Fits in</A>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

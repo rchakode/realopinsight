@@ -65,8 +65,6 @@ bool ZmqHelper::pingServer(zmq::context_t & context, const std::string & uri, st
         std::stringstream msg("PING");
         sendFromSocket(*client, msg.str());
 
-        sleep (1);
-
         bool expectReply = true;
         while (expectReply) {
             zmq::pollitem_t items[] = { { *client, 0, ZMQ_POLLIN, 0 } };
@@ -77,7 +75,11 @@ bool ZmqHelper::pingServer(zmq::context_t & context, const std::string & uri, st
                 size_t pos = reply.find(":");
                 string respType = reply.substr(0, pos);
                 if(respType == "ALIVE") {
-                    srvVer = reply.substr(pos+1, string::npos);
+                    if(pos==string::npos){
+                        srvVer = "1.0.0";
+                    } else {
+                        srvVer = reply.substr(pos+1, string::npos);
+                    }
                     std::cout << "INFO: Connection etablished with server " << srvVer <<"\n";
                     delete client;
                     return true;
@@ -99,7 +101,7 @@ bool ZmqHelper::pingServer(zmq::context_t & context, const std::string & uri, st
             }
         }
     }
-    srvVer="0.0.0";
+    srvVer="1.0.0";
     delete client;
 
     return false ;

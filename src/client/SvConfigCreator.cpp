@@ -27,7 +27,7 @@
 #include "Utils.hpp"
 
 const QString SvCreator::NagiosCompatibleFormat="Nagios compatible data format(*.nag.ngrt4n.xml)";
-const QString SvCreator::ZabbixCompatibleFormat="Zabbix compatible data format(*.zab.ngrt4n.xml)";
+const QString SvCreator::ZabbixCompatibleFormat="Zabbix compatible data format(*.zbx.ngrt4n.xml)";
 
 SvCreator::SvCreator(const qint32 & _user_role)
     : userRole (_user_role),

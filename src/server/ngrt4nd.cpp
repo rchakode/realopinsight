@@ -68,9 +68,9 @@ string help() {
 }
 
 string version(){
-    ostringstream versionMsg(progName + " (" + packageName + "), Version " + packageVersion +  ".\n"
-                             + "Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>.\n"
-                             + "All rights reserved. Visit "+ packageUrl + " for more information.");
+    ostringstream versionMsg(packageName + " (" + progName + ")\nVersion " + packageVersion + ".\n"
+                             + "Copyright (c) 2010-2012 by NGRT4N Project <contact@ngrt4n.com>. All rights reserved.\n"
+			     + "Visit " + packageUrl + " for more information.\n");
 
     return versionMsg.str();
 }

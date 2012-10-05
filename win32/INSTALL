@@ -1,0 +1,37 @@
+This file gives an overview of how to setup NGRT4N.
+
+First, note that NGRT4N Software is released under the terms the GPL License (version 3). 
+Prior to the installation, you may need to read this license offer. See the COPYING file. 
+ 
+INSTALL THE DAEMON MODULE
+---------------
+Dependencies
+ - gcc-c++ >= 4.6.3
+ - make
+ - libzmq (librairies and development files)
+ 
+Installation
+  $ tar zxf ngrt4nX.Y.Y.tar.gz  # X.Y.Z refers to the version
+  $ cd ngrt4nX.Y
+  $ sudo ./install-sh -m daemon 
+
+ 
+INSTALL THE UI MODULE
+-------------
+Dependencies
+ - gcc-c++ >= 4.6.3
+ - Qt >= 4.6.3 (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml)
+ - libzmq (librairies and development files)
+ - graphviz
+ 
+Installation
+  $ tar zxf ngrt4nX.Y.Y.tar.gz  # X.Y.Z refers to the version
+  $ cd ngrt4nX.Y 
+  $ sudo ./install-sh -m ui
+  
+INSTALL ALL THE MODULES
+  $ tar zxf ngrt4nX.Y.Y.tar.gz  # X.Y.Z refers to the version
+  $ cd ngrt4nX.Y 
+  $ sudo ./install-sh -m all
+  
+After the installation, check the online documentation for further processing (http://ngrt4n.com).

@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Overview of NGRT4N</TITLE>
+<META NAME="description" CONTENT="Overview of NGRT4N">
+<META NAME="keywords" CONTENT="documentation">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="documentation.css">
+
+<LINK REL="next" HREF="How_NGRT4N_Fits_in.html">
+<LINK REL="previous" HREF="Introduction.html">
+<LINK REL="up" HREF="documentation.html">
+<LINK REL="next" HREF="How_NGRT4N_Fits_in.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html50"
+  HREF="How_NGRT4N_Fits_in.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html48"
+  HREF="documentation.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html42"
+  HREF="Introduction.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html51"
+  HREF="How_NGRT4N_Fits_in.html">How NGRT4N Fits in</A>
+<B> Up:</B> <A NAME="tex2html49"
+  HREF="documentation.html">NGRT4N Documentation</A>
+<B> Previous:</B> <A NAME="tex2html43"
+  HREF="Introduction.html">Introduction</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html52"
+  HREF="Overview_NGRT4N.html#SECTION00210000000000000000">Prioritized Incident Recovery</A>
+<LI><A NAME="tex2html53"
+  HREF="Overview_NGRT4N.html#SECTION00220000000000000000">Features and Benefits</A>
+<LI><A NAME="tex2html54"
+  HREF="Overview_NGRT4N.html#SECTION00230000000000000000">User Interfaces</A>
+<UL>
+<LI><A NAME="tex2html55"
+  HREF="Overview_NGRT4N.html#SECTION00231000000000000000">Operator Console</A>
+<LI><A NAME="tex2html56"
+  HREF="Overview_NGRT4N.html#SECTION00232000000000000000">Monitoring View Builder</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00200000000000000000">
+Overview of NGRT4N</A>
+</H1>
+NGRT4N comes to cover the difficulty to effectively highlight critical events when monitoring in operational environments. Indeed, when the monitored infrastructure grows, the amount of components to check/monitor along with the number of items to observe grow too. When critical events occurred, you have to be able to quickly evaluate their impact on your businesses so to prioritize the recovery of events that have higher impacts. Additionally, it may be useful to show some events to certain users or operators that can address them quickly.  This requires that the monitoring solution enables capabilities of building and manipulating synthetic and dynamic monitoring views. NGRT4N is intended to provide such capabilities.
+
+<P>
+
+<H1><A NAME="SECTION00210000000000000000">
+Prioritized Incident Recovery</A>
+</H1> When monitoring in large NOC or data center, it is important that IT organization be able to prioritize incidents based on business impact and more quickly restore services to operation. Using hierarchical views would be a tangible way to effectively achieve such a goal by monitoring high level components such as business processes and services provided to end-users. Indeed, given a service platform consisting of a set of physical and applicative components, a hierarchical organization provides operators with maps that permit them to have a dynamic-consistent view on the health of the platform along with each of its components. 
+
+<P>
+In order to build relevant hierarchical views, you need to identify the main business process or end-user service along with business processes that will comprise it. Then, you have to link the business processes among them within a hierarchy. Finally, at the bottom level business processes should be related to operating systems, applications, devices, etc. An example of such an organization is illustrated on the figure below. 
+In the hierarchy, we differentiate two kinds of nodes according to their relation with native monitoring data collected by the monitoring engine:
+
+<UL>
+<LI><B>Native Check (NC)</B>: Such nodes are directly linked to a basis check (process check, load check, http check, etc), and are located at bottom of the hierarchy (sheet nodes).
+</LI>
+<LI><B>Business Process (BP):</B> This kind of nodes consists of structural nodes that you or your administrator can define in order to meet monitoring requirements. They consist of high level systems (e.g. operating system, device, application tier, etc.), business processes (e.g. notification, authentication, smtp, etc.), services provided to end-users (hosting, download, SMS, MMS, etc.) and so forth. Located at a higher level than native-check nodes within the hierarchy, they can have one of more child items which can be both native-check or business-process nodes. <B>IMPORTANT:</B> All the sheet nodes of a hierarchy have to be native checks in order to ensure the consistency of the related monitoring view.   
+</LI>
+</UL>
+
+<DIV ALIGN="CENTER"><A NAME="23"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+An illustration of hierarchical organization to monitor a given business process or service</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER"><IMG
+  WIDTH="473" HEIGHT="216" ALIGN="BOTTOM" BORDER="0"
+ SRC="./hierarchical-mv.png"
+ ALT="Image hierarchical-mv">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+Each monitoring view hierarchy is defined through a configuration file, in which each node is defined by a set of properties that permit to identify it along with its possible child nodes. The MVB utility of NGRT4N provides functionally that ease the creation and the edition of such  configuration files. It maintains the structure of the hierarchy (relationship among nodes) internally and transparently to user. The following list describes the properties that user has to edit when editing a node.  
+
+<P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85><B>Property</B></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85><B>Applicability</B></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567><B>Description</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Name</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>ALL</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>REQUIRED, this parameter provides a short name to the node. Used like label when representing or referencing the node on the operator console, its value can be for example, the name of device, system, application, business process, end-user service, etc.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Type</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>ALL</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>REQUIRED, the type property can be either <I>Native Check</I> or <I>Business Process</I> (default value).</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Status Aggregation Rule</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Business Process</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>REQUIRED, this parameter specifies the rule to use to update the status of the node according to the statuses of its child nodes.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Icon</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>ALL</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>REQUIRED, the icon property specifies the name of to use to represent the the node on the hierarchy map. The user has to select an images among a list of built-in icons, otherwise the default icon (representing a business process) will be used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Description</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>ALL</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>OPTIONAL, this field holds a text that provides a more-descriptive information about the node.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Alarm Message</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Native Check</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>OPTIONAL, this field holds a text message to show on event console when the state of the node becomes abnormal (when a critical or major event arises on the node). If there is not any message specified, the default message provided by the monitoring engine will be used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Notification Message</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Native Check</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>OPTIONAL, this field holds a text message to show on event console when the state of the node (is) becomes normal. If there is not any message specified, the default message provided by the monitoring engine will be used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Related Native Check</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=85>Native Check</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=567>REQUIRED, this property holds the identifier of the monitoring data (collected  by the monitoring engine) to link to the node.</TD>
+</TR>
+</TABLE>
+</DIV>
+
+<P>
+
+<H1><A NAME="SECTION00220000000000000000">
+Features and Benefits</A>
+</H1>
+The following list describes the major features and benefits of NGRT4N:
+
+<P>
+<DL>
+<DT><STRONG>Hierarchical Business Process Monitoring</STRONG></DT>
+<DD>Using NGRT4N, your network administrators can build hierarchical monitoring views to monitor platforms consisting of individual (or set of) business process(es) or end-user service(s). Such monitoring views allow operators to quickly evaluate the real impacts (on your business activities) of critical events that can arise on systems, applications, devices, etc.     
+        
+</DD>
+<DT><STRONG>Comprehensive Monitoring</STRONG></DT>
+<DD>NGRT4N permits the customization of messages shown on operator console. This enables operators to get more comprehensive messages when needed, instead of the monitoring engine native output which can be crabbed. For example, instead of getting a message like <I>"DISK CRITICAL - free space: / 5483 MB (28% inode=67%)"</I> on your console (according to the Nagios plug-in), you can have a more comprehensive message like <I>"The free space available in the server &lt;hostname/IP&gt; root partition is less than 30%"</I>.
+        
+</DD>
+<DT><STRONG>Interactive Dashboard at a Glance</STRONG></DT>
+<DD>NGRT4N provides intuitive, friendly and easy to use graphical user interfaces (GUI). Being interactive, they allows operators to get real-time overview on the health of the monitored platform, while being able to quickly get more detailed information on the collected monitoring data (metrics or checks on systems, applications, devices, etc).  
+        
+</DD>
+<DT><STRONG>Monitoring View Builder</STRONG></DT>
+<DD>NGRT4N provides an utility that enables administrators to build the configuration of monitoring views. They can easily select the data to retrieve from the whole ones collected by the monitoring engine, set (when needed) the messages to show on event console upon the appearance of a given event, etc. Thank to "drag-and-drop" that enables hierarchy reorganization advanced-capabilities.
+        
+</DD>
+<DT><STRONG>Secure Access to Monitoring Data</STRONG></DT>
+<DD>The access to monitoring data through NGRT4N is subjected to two authentication mechanisms. Being a X application, NGRT4N is typically deployed on the monitoring server and used through a ssh-tunneled X forwarding mechanism. This permits to leverage the improved security capabilities enabled by SSH, in addition to its built-in authentication mechanism . 
+        
+</DD>
+<DT><STRONG>Support of Various Monitoring Solutions</STRONG></DT>
+<DD>NGRT4N has been tailored to be loosely coupled with the underlying monitoring solution so to adapt to  various monitoring solutions. It currently supports Nagios, Groundwork, Centreon, Icinga, and most of Nagios-derived solutions.
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION00230000000000000000">
+User Interfaces</A>
+</H1>
+NGRT4N consists of two main utilities or programs: the <I>Operator Console</I> and the <I>Monitoring View Builder</I>.
+
+<P>
+
+<H2><A NAME="SECTION00231000000000000000">
+Operator Console</A>
+</H2>
+The GUI of the Operator Console (OC) is depicted on the Figure below. This interface is easy to use and provide the following functionality:
+
+<UL>
+<LI>An event console shows the messages specific to the monitored platform.
+</LI>
+<LI>The Explorer Pane and the Dashboard Tab respectively contain a tree and a map of the monitoring view hierarchy. These different representations permit to view, explore, and manipulate the view in friendly and interactive way without limit on its hierarchy's depth.
+</LI>
+<LI>The Chart Panel gives an overview on the health of the monitored platform.
+</LI>
+<LI>Menus (tool-bar and context menus) along with mouse-wheel event handling permit to easily explore the graph in order to get detailed information. It is possible to zoom (out and in) to reach a given item or region, jump to a given item, or filter messages related to a given item and its sub items. 
+</LI>
+<LI>The Native Web UI Tab is an embedded web browser that allows operators to get access to the default web interface of the monitoring solution, if any. 
+</LI>
+<LI>User is also able to change the url loaded in the web tab, change the interval of updating the console, capture a picture of the dashboard, change its password, get the online documentation, etc.
+</LI>
+</UL>
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="50"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+NGRT4N's Operator Console showing an example of monitoring view</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER"><IMG
+  WIDTH="709" HEIGHT="401" ALIGN="BOTTOM" BORDER="0"
+ SRC="./annotated-dashboard.png"
+ ALT="Image annotated-dashboard">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+
+<H2><A NAME="SECTION00232000000000000000">
+Monitoring View Builder</A>
+</H2>
+The GUI of the Monitoring View Builder (MVB), depicted on the Figure below, is powerful interface that allows users to easily create or edit the configuration of monitoring views. It consists of two main panes (the Explorer Pane and the Edition Pane) and provides the following functionality: 
+
+<UL>
+<LI>On-the-fly adding of sub items (child node-items) of a given monitoring view hierarchy node-item.
+</LI>
+<LI>Drag-and-drop alteration of the hierarchy without limit on the depth of the hierarchy.
+</LI>
+<LI>Easy selection of the monitoring data (check or metric) to link to a given node item. They can be selected either directly through their identifiers or from a selection list.
+</LI>
+<LI>Set custom messages to show on event console upon events appearance. Each message can have specific tags that will be replaced in order to contextualize the message (with the associated component name) before showing it on console.   
+</LI>
+</UL>
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="57"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+NGRT4N's View Builder showing the editing of a given monitoring view item</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER"><IMG
+  WIDTH="709" HEIGHT="493" ALIGN="BOTTOM" BORDER="0"
+ SRC="./annotated-editor.png"
+ ALT="Image annotated-editor">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html50"
+  HREF="How_NGRT4N_Fits_in.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html48"
+  HREF="documentation.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html42"
+  HREF="Introduction.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html51"
+  HREF="How_NGRT4N_Fits_in.html">How NGRT4N Fits in</A>
+<B> Up:</B> <A NAME="tex2html49"
+  HREF="documentation.html">NGRT4N Documentation</A>
+<B> Previous:</B> <A NAME="tex2html43"
+  HREF="Introduction.html">Introduction</A>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
