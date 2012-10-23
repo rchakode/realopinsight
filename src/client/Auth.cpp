@@ -43,12 +43,12 @@ Auth::Auth()
     QLabel* llogo =  new QLabel(); llogo->setPixmap(logo) ;
 	layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft) ;
 	line++ ;
-    layout->addWidget(new QLabel(QString("Version "+packageVersion)), line, 0, 2, 1, Qt::AlignLeft) ;
+    layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(packageVersion).arg(releaseName)), line, 0, 2, 1, Qt::AlignLeft) ;
 	line++;
-	layout->addWidget(new QLabel("Login"), line, 1, Qt::AlignRight) ;
+    layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight) ;
 	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignJustify);
 	line++;
-	layout->addWidget(new QLabel("Password"), line, 1, Qt::AlignRight) ;
+    layout->addWidget(new QLabel(tr("Password")), line, 1, Qt::AlignRight) ;
 	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignJustify);
 	password->setEchoMode(QLineEdit::Password);
 	line++;

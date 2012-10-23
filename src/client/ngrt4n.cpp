@@ -47,17 +47,17 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
         "	   Print this help.\n";
 
 
-ostringstream versionMsg(appName.toStdString()+"\nVersion "+packageVersion.toStdString()+"\n"
-                         +"Copyright (c) 2010-"+releaseYear.toStdString()+" by NGRT4N Project. All rights reserved.\n"
-                         +"Visit "+packageUrl.toStdString()+" for more information.\n");
-
 int main(int argc, char **argv)
 {
     QApplication* app = new QApplication(argc, argv);
     app->setWindowIcon(QIcon(":images/built-in/icon.png"));
     app->setApplicationName(appName.toUpper() );
     app->setStyleSheet(Preferences::style());
-    QString cmdName= basename(argv[0]);
+
+    QString cmdName = basename(argv[0]);
+    ostringstream versionMsg(QObject::tr("%1\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
+                             +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
+                             +QObject::tr("Visit %1  for more information.").arg(packageUrl).toStdString());
 
     QString module = "config";
     QString file = (argc >= 2)? argv[1] : "";

@@ -46,9 +46,9 @@ const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
 
 
-const QString AboutPattern = QObject::tr("\n%1 Version %2\n \
-                        \nCopyright (c) 2010-%3 by NGRT4N Project. All rights reserved. \
-                        \nVisit %4 for more information.\n \
+const QString AboutPattern = QObject::tr("\n%1\nVersion %2 (%3)\n \
+                        \nCopyright (c) 2010-%4 by NGRT4N Project. All rights reserved. \
+                        \nVisit %5 for more information.\n \
                         \nReport Bugs: bugs@ngrt4n.com\n");
 
 
@@ -139,6 +139,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
         setWindowTitle(tr("About %1").arg(appName));
         QString about = AboutPattern.arg(appName)
                 .arg(packageVersion)
+                .arg(releaseName)
                 .arg(releaseYear)
                 .arg(packageUrl);
 

@@ -40,6 +40,7 @@ const QString packageName = PACKAGE_NAME;
 const QString packageVersion = PACKAGE_VERSION;
 const QString packageUrl = PACKAGE_URL;
 const QString releaseYear = RELEASE_YEAR;
+const QString releaseName = RELEASE_NAME;
 
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
