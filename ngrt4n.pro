@@ -3,7 +3,6 @@ TEMPLATE = app
 VERSION_=2.1.0beta1
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
-#QMAKE_TARGET=RealOpInsight
 config-dist{
 SOURCES	+= src/client/ngrt4n.cpp
 TARGET = RealOpInsight

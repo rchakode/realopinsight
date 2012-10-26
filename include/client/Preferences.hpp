@@ -28,7 +28,7 @@
 #include "core/ns.hpp"
 #include "Auth.hpp"
 #include "Base.hpp"
-#include<QSplashScreen>
+#include <QSplashScreen>
 
 
 class ImageButton : public QAbstractButton {

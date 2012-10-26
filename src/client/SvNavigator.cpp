@@ -206,7 +206,7 @@ void SvNavigator::handleChangeMonitoringSettingsAction(void)
 void SvNavigator::handleShowOnlineResources(void)
 {
     QDesktopServices appLauncher;
-    appLauncher.openUrl(QUrl("http://ngrt4n.com/docs/"));
+    appLauncher.openUrl(QUrl("http://RealOpInsight.com/"));
 }
 
 void SvNavigator::handleShowAbout(void)
