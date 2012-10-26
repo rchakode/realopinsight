@@ -51,7 +51,7 @@ Settings::Settings(): QSettings(PROJECT.toLower(), appName.toLower().replace(" "
 		setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DEFAULT_PORT));
 	}
 	if ( monitorHome.isEmpty() ) {
-		setValue(Preferences::URL_KEY, "http://localhost/nagios");
+        setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");
 	}
 	if ( admUser.isEmpty() ) {
 		setValue(Preferences::ADM_UNSERNAME_KEY, Auth::ADM_USER_NAME);
