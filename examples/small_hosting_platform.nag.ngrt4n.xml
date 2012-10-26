@@ -141,7 +141,7 @@
 		<Description></Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>www.ngrt4n.com/Current Load</SubServices>
+		<SubServices>vsphere01/Current Load</SubServices>
 	</Service>
 	<Service id="S232616083" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>Availability</Name>

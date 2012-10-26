@@ -226,7 +226,7 @@ int SvNavigator::runNagiosMonitor(void)
         updateStatusBar(msg);
         success = false ;
     } else {
-        if(QString::fromStdString(srvVer).remove(".").toInt() < 110) {
+        if(atoi(QString::fromStdString(srvVer).remove(".").toAscii()) < 110) {
             Utils::alert(tr("ERROR: The server %1 is not supported").arg(QString::fromStdString(srvVer)));
             success = false;
         }
@@ -250,7 +250,7 @@ int SvNavigator::runNagiosMonitor(void)
 
         QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
-            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO
+            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO à mettre au propre avec la nouvelle organization => cnodes
             if(success) {
                 ZmqHelper::sendFromSocket(*comChannel, msg);
                 msg = ZmqHelper::recvFromSocket(*comChannel);

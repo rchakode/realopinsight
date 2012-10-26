@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     QString cmdName = basename(argv[0]);
     ostringstream versionMsg(QObject::tr("%1 Operations Console\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
                              +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
-                             +QObject::tr("Visit %1  for more information.").arg(packageUrl).toStdString());
+                             +QObject::tr("Visit %1 for more information.").arg(packageUrl).toStdString());
 
     bool config = false;
     int opt;

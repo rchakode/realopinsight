@@ -226,7 +226,7 @@ int SvNavigator::runNagiosMonitor(void)
         updateStatusBar(msg);
         success = false ;
     } else {
-        if(QString::fromStdString(srvVer).remove(".").toInt() < 110) {
+        if(atoi(QString::fromStdString(srvVer).remove(".").toAscii()) < 110) {
             Utils::alert(tr("ERROR: The server %1 is not supported").arg(QString::fromStdString(srvVer)));
             success = false;
         }
