@@ -68,7 +68,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
       cancelButton(new QPushButton("&Close")),
       applySettingButton(new QPushButton("&Apply settings")),
       changePasswdButton(new QPushButton("C&hange password")),
-      donateButton(new ImageButton("images/built-in/donate.png")),
+      donateButton(new ImageButton(":images/built-in/donate.png")),
       layout(new QGridLayout(this))
 {
     qint32 line = -1;
