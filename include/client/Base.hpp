@@ -119,20 +119,30 @@ class Status{
 public:
 
     Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {}
+
+    Status(MonitorBroker::StatusT _status,
+           MonitorBroker::SeverityT _severity): value(_status) {
+        applySeverity(_severity);
+    }
     MonitorBroker::StatusT getValue() const{return value;}
 
     Status operator *(Status& st) const {
         switch(value) {
-        case MonitorBroker::CRITICAL : return Status(MonitorBroker::CRITICAL);
-        case MonitorBroker::OK : return st;
-        case MonitorBroker::WARNING: {
-            if(st.value == MonitorBroker::CRITICAL || st.value == MonitorBroker::UNKNOWN) return st;
+        case MonitorBroker::CRITICAL :
+            return Status(MonitorBroker::CRITICAL);
+        case MonitorBroker::OK :
+            return st;
+        case MonitorBroker::WARNING:
+            if(st.value == MonitorBroker::CRITICAL
+                    || st.value == MonitorBroker::UNKNOWN) {
+                return st;
+            }
             return Status(MonitorBroker::WARNING);
-        }
-        default : { //UNKNOWN
-            if(st.value == MonitorBroker::CRITICAL) return st;
+        default : //UNKNOWN
+            if(st.value == MonitorBroker::CRITICAL) {
+                return st;
+            }
             return Status(MonitorBroker::UNKNOWN);
-        }
         }
     }
 
@@ -148,8 +158,12 @@ public:
 
     Status operator ++(int) {
         switch(value) {
-        case MonitorBroker::WARNING: return Status(MonitorBroker::CRITICAL);
-        case MonitorBroker::UNKNOWN : return Status(MonitorBroker::WARNING);
+        case MonitorBroker::WARNING:
+            return Status(MonitorBroker::CRITICAL);
+
+        case MonitorBroker::UNKNOWN :
+            return Status(MonitorBroker::WARNING);
+
         default : break;
         }
 
@@ -157,12 +171,41 @@ public:
     }
 
     Status operator --(int) {
+
         switch(value) {
-        case MonitorBroker::CRITICAL: return Status(MonitorBroker::WARNING);
+        case MonitorBroker::CRITICAL:
+            return Status(MonitorBroker::WARNING);
+
         default : break;
         }
-
         return Status(value);
+    }
+
+
+    void applySeverity(MonitorBroker::SeverityT & severity) {
+
+        if(value == MonitorBroker::OK) {
+            return ;
+        }
+
+        switch(severity) {
+        case MonitorBroker::UNSET:
+        case MonitorBroker::INFO:
+            value =  MonitorBroker::OK;
+            break;
+
+        case MonitorBroker::WARN:
+            value = MonitorBroker::WARNING;
+            break;
+
+        case MonitorBroker::AVERAGE:
+        case MonitorBroker::HIGH:
+        case MonitorBroker::DISASTER:
+            value = MonitorBroker::CRITICAL;
+            break;
+
+        default: break;
+        }
     }
 private:
 

@@ -37,7 +37,16 @@ public:
 	  CRITICAL = 2,
 	  UNKNOWN = 3,
 	  UNSET_STATUS = 4
-	} ;
+    };
+
+    enum SeverityT {
+      UNSET = 0,
+      INFO = 1,
+      WARN = 2,
+      AVERAGE = 3,
+      HIGH = 4,
+      DISASTER = 5
+    };
 
     enum MonirorTypeT {
       NAGIOS = 0,

@@ -58,17 +58,18 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
       settings(new Settings()),
       monitorHomeField(new QLineEdit()),
       updateIntervalField(new QSpinBox()),
-      bBrowse(new QPushButton("&Browse...")),
+      bBrowse(new QPushButton(tr("&Browse..."))),
       oldPasswdField(new QLineEdit()),
       passwdField(new QLineEdit()),
       rePasswdField(new QLineEdit()),
       serverAddrField (new QLineEdit()),
       serverPortField(new QLineEdit()),
       serverPassField(new QLineEdit()),
-      cancelButton(new QPushButton("&Close")),
+      cancelButton(new QPushButton(tr("&Close"))),
       applySettingButton(new QPushButton("&Apply settings")),
       changePasswdButton(new QPushButton("C&hange password")),
       donateButton(new ImageButton(":images/built-in/donate.png")),
+      showAuthChain(new QCheckBox(tr("&Show in clear"))),
       layout(new QGridLayout(this))
 {
     qint32 line = -1;
@@ -82,23 +83,28 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     case Preferences::ChangeMonitoringSettings:
         setWindowTitle(tr("Monitoring Settings | %1").arg(appName));
         line++,
-                layout->addWidget(new QLabel(tr("Web Interface")), line, 0),
+                layout->addWidget(new QLabel(tr("Web Interface*")), line, 0),
                 layout->addWidget(monitorHomeField, line, 1, 1, 4);
+        line++,
+                layout->addWidget(new QLabel(tr("Server Address**")), line, 0),
+                layout->addWidget(serverAddrField, line, 1),
+                layout->addWidget(new QLabel(tr("Port")), line, 2, Qt::AlignRight),
+                layout->addWidget(serverPortField, line, 3);
+        line++,
+                layout->addWidget(new QLabel(tr("Auth chain")), line, 0),
+                layout->addWidget(serverPassField, line, 1, 1, 4);
+        line++,
+                layout->addWidget(new QLabel(tr("")), line, 0),
+                layout->addWidget(showAuthChain, line, 1, 1, 4);
         line++,
                 layout->addWidget(new QLabel(tr("Update Interval")), line, 0),
                 layout->addWidget(updateIntervalField, line, 1, 1, 2),
                 layout->addWidget(new QLabel("seconds"), line, 3);
         line++,
-                layout->addWidget(new QLabel(tr("Server Address")), line, 0),
-                layout->addWidget(serverAddrField, line, 1),
-                layout->addWidget(new QLabel(tr("Port")), line, 2, Qt::AlignRight),
-                layout->addWidget(serverPortField, line, 3);
-        line++,
-                layout->addWidget(new QLabel(tr("Passphrase")), line, 0),
-                layout->addWidget(serverPassField, line, 1, 1, 4);
-        line++,
                 layout->addWidget(cancelButton, line, 1, 1, 2, Qt::AlignRight),
                 layout->addWidget(applySettingButton, line, 3, 1, 2);
+        line++,
+                layout->addWidget(new QLabel(tr("(*) Required for Zabbix. (**) Required for Nagios.")), line, 0, 1, 5);
         layout->setColumnStretch(0, 0);
         layout->setColumnStretch(1, 6);
         layout->setColumnStretch(2, 0);
@@ -111,6 +117,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
             serverAddrField->setEnabled(false);
             serverPortField->setEnabled(false);
             serverPassField->setEnabled(false);
+            showAuthChain->setEnabled(false);
         }
         break;
 
@@ -168,6 +175,7 @@ Preferences::~Preferences()
     delete serverPortField;
     delete serverPassField;
     delete donateButton;
+    delete showAuthChain;
     delete layout;
 }
 
@@ -235,6 +243,15 @@ void Preferences::donate(void)
 {
     QDesktopServices appLauncher;
     appLauncher.openUrl(QUrl("http://realopinsight.com/en/index.php?page=contribute"));
+}
+
+
+void Preferences::setAuthChainVisibility(const int & state) {
+    if(state == Qt::Checked) {
+        serverPassField->setEchoMode(QLineEdit::Normal);
+    } else {
+        serverPassField->setEchoMode(QLineEdit::Password);
+    }
 }
 
 void Preferences::setContent(void)
@@ -316,11 +333,11 @@ QString Preferences::style() {
             "	margin-top: 2px; /* make non-selected tabs look smaller */"
             "}"
             " QTreeView {"
-            "	background: #f1f1f1;"
+            "	background: #F8F8FF;"
             "   alternate-background-color: yellow;"
             "}"
             "QTableView {"
-            "	background: #f1f1f1;"
+            "	background: #F8F8FF;" // #f1f1f1
             "	alternate-background-color: #F8F8FF;"
             "}"
             "QToolTip {"
@@ -336,7 +353,7 @@ QString Preferences::style() {
             "		stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
             "}"
             "QGraphicsView {"
-            "	background:#f1f1f1;"
+            "	background: #F8F8FF;"
             "}"
             ;
     return styleSheet;
@@ -349,4 +366,5 @@ void Preferences::addEvents(void)
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect(changePasswdButton, SIGNAL(clicked()),  this, SLOT(changePasswd()));
     connect(donateButton, SIGNAL(clicked()),  this, SLOT(donate()));
+    connect(showAuthChain, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
 }
