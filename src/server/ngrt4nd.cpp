@@ -33,7 +33,6 @@
 #include <crypt.h>
 #include <sstream>
 #include <fstream>
-#include <zmq.h>
 
 using namespace std;
 
@@ -68,9 +67,9 @@ string help() {
 }
 
 string version(){
-    ostringstream versionMsg(packageName + " (" + progName + ")\nVersion " + packageVersion + ".\n"
+    ostringstream versionMsg("\n" + packageName + " (" + progName + ")\nVersion " + packageVersion + "\n"
                              + "Copyright (c) 2010-2012 by NGRT4N Project <contact@ngrt4n.com>. All rights reserved.\n"
-			     + "Visit " + packageUrl + " for more information.\n");
+			     + "Visit " + packageUrl + " for more information.");
 
     return versionMsg.str();
 }

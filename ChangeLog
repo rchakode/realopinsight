@@ -2,11 +2,16 @@
 NGRT4N/RealOpInsight ChangeLog
 ###############################
 
-2.1.0 - Stable
+2.1.1
+--------------
+  * Updated man pages
+  * Fixed compilation problems with c++11
+
+2.1.0
 --------------
   * Added option for hiding/showing the auth chain
-  * Bug fix (ticket #1): The severities of Zabbix triggers are now supported
-  * Updated the preferences window for easing the configuration of monitoring settings
+  * Fixed bug #1: The severities of Zabbix triggers are now supported.
+  * Updated the preferences window for easing the setting of monitoring settings
 
 2.1.0beta1
 --------------

@@ -29,6 +29,8 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include <unistd.h>
+
 using namespace std ;
 
 void ngrt4n::initApp()

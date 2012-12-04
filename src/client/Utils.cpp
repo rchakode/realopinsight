@@ -23,6 +23,7 @@
 
 #include <QFileInfo>
 #include "Utils.hpp"
+#include <unistd.h>
 
 QString Utils::statusToString(const qint32 & _status)
 {

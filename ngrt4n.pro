@@ -26,7 +26,7 @@ TARGET.path=/usr/local/bin
 }
 TARGET.files = $${TARGET}
 MAN.path = /usr/share/man/man1
-MAN.files = doc/man/row-manager.1.gz
+MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-editor.1.gz
 INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc
 DEFINES *= QT_USE_QSTRINGBUILDER

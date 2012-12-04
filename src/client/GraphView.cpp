@@ -318,19 +318,20 @@ void GraphView::drawNode(const NodeT & _node )
 
     QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;" + _node.name + "&nbsp;</span>";
 
+    QString nodeData = _node.id+NODE_LABEL_ID_SFX;
     gnodesList[_node.id].label = new QGraphicsTextItem(),
             gnodesList[_node.id].label->setHtml(label),
-            gnodesList[_node.id].label->setData(0, _node.id + NODE_LABEL_ID_SFX),
+            gnodesList[_node.id].label->setData(0, nodeData),
             graphScene->addItem(gnodesList[_node.id].label),
             gnodesList[_node.id].label->setZValue(-5);
 
     gnodesList[_node.id].icon = new QGraphicsPixmapItem(icon),
-            gnodesList[_node.id].icon->setData(0, _node.id + NODE_ICON_ID_SFX),
+            gnodesList[_node.id].icon->setData(0, nodeData),
             graphScene->addItem(gnodesList[_node.id].icon),
             gnodesList[_node.id].icon->setZValue(-10);
 
     gnodesList[_node.id].exp_icon = new QGraphicsPixmapItem(exp_icon),
-            gnodesList[_node.id].exp_icon->setData(0, _node.id + NODE_EXP_ICON_ID_SFX),
+            gnodesList[_node.id].exp_icon->setData(0, nodeData),
             graphScene->addItem(gnodesList[_node.id].exp_icon),
             gnodesList[_node.id].exp_icon->setZValue(0) ;
 
