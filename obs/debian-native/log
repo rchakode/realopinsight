@@ -1,0 +1,315 @@
++ scp -p prepare.sh input.dat ../x64_86/realopinsight-2.1.0.orig.tar.gz ubs-1:
++ ssh ubs-1 'sh prepare.sh realopinsight-2.1.0 < input.dat'
+Copyright type "glpv3" is not gpl, gpl2, gpl3, lgpl, lgpl2, lgpl3, apache, artistic, bsd, blank or x11.
++ scp -rp debian/ ubs-1:realopinsight-2.1.0/
++ ssh ubs-1 'cd realopinsight-2.1.0 && debuild -us -uc'
+ dpkg-buildpackage -rfakeroot -D -us -uc
+dpkg-buildpackage: export CFLAGS from dpkg-buildflags (origin: vendor): -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security
+dpkg-buildpackage: export CPPFLAGS from dpkg-buildflags (origin: vendor): -D_FORTIFY_SOURCE=2
+dpkg-buildpackage: export CXXFLAGS from dpkg-buildflags (origin: vendor): -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security
+dpkg-buildpackage: export FFLAGS from dpkg-buildflags (origin: vendor): -g -O2
+dpkg-buildpackage: export LDFLAGS from dpkg-buildflags (origin: vendor): -Wl,-Bsymbolic-functions -Wl,-z,relro
+dpkg-buildpackage: paquet source realopinsight
+dpkg-buildpackage: version source 2.1.0
+dpkg-buildpackage: source changé par Rodrigue Chakode <bugs@ngrt4n.com>
+ dpkg-source --before-build realopinsight-2.1.0
+dpkg-buildpackage: architecture hôte i386
+ fakeroot debian/rules clean
+dh_testdir
+dh_testroot
+rm -f build-stamp
+dh_clean
+	rm -f debian/realopinsight.substvars
+	rm -f debian/realopinsight.*.debhelper
+	rm -rf debian/realopinsight/
+	rm -f debian/*.debhelper.log
+	rm -f debian/files
+	find .  \( \( -type f -a \
+	        \( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \
+		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \
+		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \
+		 -o -name TAGS -o \( -path '*/.deps/*' -a -name '*.P' \) \
+		\) -exec rm -f {} \; \) -o \
+		\( -type d -a -name autom4te.cache -prune -exec rm -rf {} \; \) \)
+	rm -f *-stamp
+ dpkg-source -b realopinsight-2.1.0
+dpkg-source: info: utilisation du format source « 1.0 »
+dpkg-source: info: construction de realopinsight dans realopinsight_2.1.0.tar.gz
+dpkg-source: info: construction de realopinsight dans realopinsight_2.1.0.dsc
+ debian/rules build
+dh_testdir
+touch build-stamp
+ fakeroot debian/rules binary
+dh_testdir
+dh_testroot
+dh_prep
+	rm -f debian/realopinsight.substvars
+	rm -f debian/realopinsight.*.debhelper
+	rm -rf debian/realopinsight/
+dh_installdirs
+	install -d debian/realopinsight
+./install-sh -d debian/realopinsight/usr
+==>Installing RealOpInsight...
+DEGUG : Checking qmake => /usr/bin/qmake... done
+DEGUG : Checking make => /usr/bin/make... done
+DEGUG : Checking C++ compiler => /usr/bin/g++... done
+DEBUG : Installation directory => debian/realopinsight/usr
+DEGUG : Current component => Manager.../usr/bin/ld: i386:x86-64 architecture of input file `build/obj/ngrt4n.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/utils.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/MonitorBroker.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/ZmqHelper.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/Auth.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/Base.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/GraphView.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/MsgPanel.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/Parser.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/PieChart.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/PieChartItem.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/Preferences.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/ServiceEditor.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/Stats.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/StatsLegend.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/SvConfigCreator.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/SvNavigator.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/SvNavigatorTree.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/WebKit.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/Utils.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/ZbxHelper.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/JsHelper.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_Auth.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_GraphView.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_MsgPanel.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_PieChartItem.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_Preferences.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_ServiceEditor.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_SvConfigCreator.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_SvNavigator.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_SvNavigatorTree.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_WebKit.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/moc_ZbxHelper.o' is incompatible with i386 output
+/usr/bin/ld: i386:x86-64 architecture of input file `build/obj/qrc_ngrt4n.o' is incompatible with i386 output
+build/obj/ngrt4n.o: In function `main':
+ngrt4n.cpp:(.text.startup+0x16): undefined reference to `operator new(unsigned long)'
+ngrt4n.cpp:(.text.startup+0x770): undefined reference to `operator new(unsigned long)'
+ngrt4n.cpp:(.text.startup+0x82a): undefined reference to `operator new(unsigned long)'
+ngrt4n.cpp:(.text.startup+0x876): undefined reference to `operator new(unsigned long)'
+ngrt4n.cpp:(.text.startup+0x898): undefined reference to `operator new(unsigned long)'
+build/obj/ngrt4n.o: In function `_GLOBAL__sub_I_usage':
+ngrt4n.cpp:(.text.startup+0xeec): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+ngrt4n.cpp:(.text.startup+0xf00): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/utils.o: In function `_GLOBAL__sub_I__ZN6ngrt4n7initAppEv':
+utils.cpp:(.text.startup+0x11c): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+utils.cpp:(.text.startup+0x130): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/Auth.o: In function `_GLOBAL__sub_I__ZN4Auth13ADM_USER_NAMEE':
+Auth.cpp:(.text.startup+0x277): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+Auth.cpp:(.text.startup+0x28b): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/Base.o: In function `_GLOBAL__sub_I__ZN8SettingsC2Ev':
+Base.cpp:(.text.startup+0x27a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+Base.cpp:(.text.startup+0x28e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/GraphView.o: In function `_GLOBAL__sub_I__ZN9GraphView13XScalingRatioE':
+GraphView.cpp:(.text.startup+0x11c): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+GraphView.cpp:(.text.startup+0x130): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/Parser.o: In function `_GLOBAL__sub_I__ZN6Parser15CHILD_NODES_SEPE':
+Parser.cpp:(.text.startup+0x11c): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+Parser.cpp:(.text.startup+0x130): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/Preferences.o: In function `_GLOBAL__sub_I__ZN11Preferences14ChangePasswordE':
+Preferences.cpp:(.text.startup+0x13a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+Preferences.cpp:(.text.startup+0x14e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/ServiceEditor.o: In function `_GLOBAL__sub_I__ZN13ServiceEditorC2EP7QWidget':
+ServiceEditor.cpp:(.text.startup+0x41e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+ServiceEditor.cpp:(.text.startup+0x432): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/SvConfigCreator.o: In function `_GLOBAL__sub_I__ZN9SvCreator22NagiosCompatibleFormatE':
+SvConfigCreator.cpp:(.text.startup+0x41e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+SvConfigCreator.cpp:(.text.startup+0x432): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/SvNavigator.o: In function `_GLOBAL__sub_I__ZN11SvNavigator9propRulesEv':
+SvNavigator.cpp:(.text.startup+0x27a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+SvNavigator.cpp:(.text.startup+0x28e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/SvNavigatorTree.o: In function `_GLOBAL__sub_I__ZN15SvNavigatorTree6rootIDE':
+SvNavigatorTree.cpp:(.text.startup+0x11c): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+SvNavigatorTree.cpp:(.text.startup+0x130): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/moc_Preferences.o: In function `_GLOBAL__sub_I__ZN11ImageButton18qt_static_metacallEP7QObjectN11QMetaObject4CallEiPPv':
+moc_Preferences.cpp:(.text.startup+0x11c): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+moc_Preferences.cpp:(.text.startup+0x130): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/moc_SvConfigCreator.o: In function `_GLOBAL__sub_I__ZN9SvCreator18qt_static_metacallEP7QObjectN11QMetaObject4CallEiPPv':
+moc_SvConfigCreator.cpp:(.text.startup+0x41e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+moc_SvConfigCreator.cpp:(.text.startup+0x432): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/moc_SvNavigator.o: In function `_GLOBAL__sub_I__ZN11SvNavigator18qt_static_metacallEP7QObjectN11QMetaObject4CallEiPPv':
+moc_SvNavigator.cpp:(.text.startup+0x27a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+moc_SvNavigator.cpp:(.text.startup+0x28e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/ngrt4n.o: In function `QString::toStdString() const':
+ngrt4n.cpp:(.text._ZNK7QString11toStdStringEv[QString::toStdString() const]+0x25): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/ngrt4n.o: In function `std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)':
+ngrt4n.cpp:(.text._ZStplIcSt11char_traitsIcESaIcEESbIT_T0_T1_ERKS6_PKS3_[std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)]+0x2b): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/ngrt4n.o: In function `std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)':
+ngrt4n.cpp:(.text._ZStplIcSt11char_traitsIcESaIcEESbIT_T0_T1_EOS6_S7_[std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)]+0x4e): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::insert(unsigned long, char const*, unsigned long)'
+build/obj/utils.o: In function `ngrt4n::trim(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)':
+utils.cpp:(.text+0xbe): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find_first_not_of(char const*, unsigned long, unsigned long) const'
+utils.cpp:(.text+0xde): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find_last_not_of(char const*, unsigned long, unsigned long) const'
+utils.cpp:(.text+0xfd): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)'
+build/obj/utils.o: In function `ngrt4n::initApp()':
+utils.cpp:(.text+0x3e): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+build/obj/MonitorBroker.o: In function `std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true>::_M_allocate_buckets(unsigned long) [clone .isra.74]':
+MonitorBroker.cpp:(.text+0x6c): undefined reference to `operator new(unsigned long)'
+build/obj/MonitorBroker.o: In function `MonitorBroker::loadNagiosCollectedData(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::unordered_map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, MonitorBroker::_CheckT, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> > >&)':
+MonitorBroker.cpp:(.text+0x681): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const'
+MonitorBroker.cpp:(.text+0x6e2): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const'
+MonitorBroker.cpp:(.text+0x788): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const'
+MonitorBroker.cpp:(.text+0x7a8): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const'
+MonitorBroker.cpp:(.text+0x7e0): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)'
+MonitorBroker.cpp:(.text+0x869): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)'
+MonitorBroker.cpp:(.text+0x911): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)'
+MonitorBroker.cpp:(.text+0xd62): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const'
+MonitorBroker.cpp:(.text+0xd85): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+MonitorBroker.cpp:(.text+0xd96): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+build/obj/MonitorBroker.o: In function `MonitorBroker::getInfOfService(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)':
+MonitorBroker.cpp:(.text+0x13e7): undefined reference to `std::_Hash_bytes(void const*, unsigned long, unsigned long)'
+MonitorBroker.cpp:(.text+0x1533): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+MonitorBroker.cpp:(.text+0x1545): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+MonitorBroker.cpp:(.text+0x1557): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+MonitorBroker.cpp:(.text+0x1577): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+MonitorBroker.cpp:(.text+0x1589): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+build/obj/MonitorBroker.o:MonitorBroker.cpp:(.text+0x1599): more undefined references to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)' follow
+build/obj/MonitorBroker.o: In function `MonitorBroker::getInfOfService(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)':
+MonitorBroker.cpp:(.text+0x1808): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/MonitorBroker.o: In function `std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)':
+MonitorBroker.cpp:(.text._ZStplIcSt11char_traitsIcESaIcEESbIT_T0_T1_EPKS3_RKS6_[std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)]+0x42): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)'
+MonitorBroker.cpp:(.text._ZStplIcSt11char_traitsIcESaIcEESbIT_T0_T1_EPKS3_RKS6_[std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)]+0x50): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+build/obj/MonitorBroker.o: In function `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<char*>(char*, char*, std::allocator<char> const&)':
+MonitorBroker.cpp:(.text._ZNSsC2IPcEET_S1_RKSaIcE[_ZNSsC5IPcEET_S1_RKSaIcE]+0x3c): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&)'
+MonitorBroker.cpp:(.text._ZNSsC2IPcEET_S1_RKSaIcE[_ZNSsC5IPcEET_S1_RKSaIcE]+0xb8): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&)'
+build/obj/MonitorBroker.o: In function `std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true>::_M_rehash(unsigned long)':
+MonitorBroker.cpp:(.text._ZNSt10_HashtableISsSt4pairIKSsN13MonitorBroker7_CheckTEESaIS4_ESt10_Select1stIS4_ESt8equal_toISsESt4hashISsENSt8__detail18_Mod_range_hashingENSC_20_Default_ranged_hashENSC_20_Prime_rehash_policyELb0ELb0ELb1EE9_M_rehashEm[std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true>::_M_rehash(unsigned long)]+0x62): undefined reference to `std::_Hash_bytes(void const*, unsigned long, unsigned long)'
+build/obj/MonitorBroker.o: In function `std::__detail::_Hashtable_iterator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, false, false> std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true>::_M_insert_bucket<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, MonitorBroker::_CheckT> >(std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, MonitorBroker::_CheckT>&&, unsigned long, unsigned long)':
+MonitorBroker.cpp:(.text._ZNSt10_HashtableISsSt4pairIKSsN13MonitorBroker7_CheckTEESaIS4_ESt10_Select1stIS4_ESt8equal_toISsESt4hashISsENSt8__detail18_Mod_range_hashingENSC_20_Default_ranged_hashENSC_20_Prime_rehash_policyELb0ELb0ELb1EE16_M_insert_bucketIS0_ISsS3_EEENSC_19_Hashtable_iteratorIS4_Lb0ELb0EEEOT_mm[std::__detail::_Hashtable_iterator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, false, false> std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true>::_M_insert_bucket<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, MonitorBroker::_CheckT> >(std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, MonitorBroker::_CheckT>&&, unsigned long, unsigned long)]+0x184): undefined reference to `operator new(unsigned long)'
+build/obj/MonitorBroker.o: In function `std::__detail::_Map_base<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, true, std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true> >::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)':
+MonitorBroker.cpp:(.text._ZNSt8__detail9_Map_baseISsSt4pairIKSsN13MonitorBroker7_CheckTEESt10_Select1stIS5_ELb1ESt10_HashtableISsS5_SaIS5_ES7_St8equal_toISsESt4hashISsENS_18_Mod_range_hashingENS_20_Default_ranged_hashENS_20_Prime_rehash_policyELb0ELb0ELb1EEEixERS2_[std::__detail::_Map_base<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, true, std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true> >::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)]+0x33): undefined reference to `std::_Hash_bytes(void const*, unsigned long, unsigned long)'
+build/obj/ZmqHelper.o: In function `ZmqHelper::createCliSocket(zmq::context_t&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)':
+ZmqHelper.cpp:(.text+0x10e): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0x156): undefined reference to `operator new(unsigned long)'
+build/obj/ZmqHelper.o: In function `ZmqHelper::recvFromSocket(zmq::socket_t&)':
+ZmqHelper.cpp:(.text+0x466): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/ZmqHelper.o: In function `ZmqHelper::pingServer(zmq::context_t&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)':
+ZmqHelper.cpp:(.text+0x6ab): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+ZmqHelper.cpp:(.text+0x6c6): undefined reference to `std::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::_M_sync(char*, unsigned long, unsigned long)'
+ZmqHelper.cpp:(.text+0x7ff): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0x8bd): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+ZmqHelper.cpp:(.text+0x903): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0xa6d): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(char const*, unsigned long, unsigned long) const'
+ZmqHelper.cpp:(.text+0xa8a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)'
+ZmqHelper.cpp:(.text+0xab8): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0xc79): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)'
+ZmqHelper.cpp:(.text+0xcb8): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0xcce): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0xce0): undefined reference to `std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)'
+ZmqHelper.cpp:(.text+0xe25): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+build/obj/Auth.o: In function `Auth::Auth()':
+Auth.cpp:(.text+0x61f): undefined reference to `operator new(unsigned long)'
+Auth.cpp:(.text+0x6a9): undefined reference to `operator new(unsigned long)'
+Auth.cpp:(.text+0x71b): undefined reference to `operator new(unsigned long)'
+Auth.cpp:(.text+0x802): undefined reference to `operator new(unsigned long)'
+Auth.cpp:(.text+0x8bf): undefined reference to `operator new(unsigned long)'
+build/obj/Auth.o:Auth.cpp:(.text+0x925): more undefined references to `operator new(unsigned long)' follow
+build/obj/ServiceEditor.o: In function `ServiceEditor::loadStatusFile(QString const&)':
+ServiceEditor.cpp:(.text+0x846d): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/ServiceEditor.o: In function `ServiceEditor::setContent(QHash<QString, _NodeT>::const_iterator)':
+ServiceEditor.cpp:(.text+0x984f): undefined reference to `operator new(unsigned long)'
+build/obj/ServiceEditor.o: In function `std::_Hashtable<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> >, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, false, false, true>::_Hashtable(unsigned long, std::hash<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::__detail::_Mod_range_hashing const&, std::__detail::_Default_ranged_hash const&, std::equal_to<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> > const&, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, MonitorBroker::_CheckT> > const&)':
+ServiceEditor.cpp:(.text._ZNSt10_HashtableISsSt4pairIKSsN13MonitorBroker7_CheckTEESaIS4_ESt10_Select1stIS4_ESt8equal_toISsESt4hashISsENSt8__detail18_Mod_range_hashingENSC_20_Default_ranged_hashENSC_20_Prime_rehash_policyELb0ELb0ELb1EEC2EmRKSB_RKSD_RKSE_RKS9_RKS7_RKS5_[_ZNSt10_HashtableISsSt4pairIKSsN13MonitorBroker7_CheckTEESaIS4_ESt10_Select1stIS4_ESt8equal_toISsESt4hashISsENSt8__detail18_Mod_range_hashingENSC_20_Default_ranged_hashENSC_20_Prime_rehash_policyELb0ELb0ELb1EEC5EmRKSB_RKSD_RKSE_RKS9_RKS7_RKS5_]+0xd1): undefined reference to `operator new(unsigned long)'
+build/obj/Stats.o: In function `Stats::Stats()':
+Stats.cpp:(.text+0x11f): undefined reference to `operator new(unsigned long)'
+build/obj/SvConfigCreator.o: In function `SvCreator::SvCreator(int const&)':
+SvConfigCreator.cpp:(.text+0x516d): undefined reference to `operator new(unsigned long)'
+SvConfigCreator.cpp:(.text+0x5186): undefined reference to `operator new(unsigned long)'
+build/obj/SvConfigCreator.o:SvConfigCreator.cpp:(.text+0x5210): more undefined references to `operator new(unsigned long)' follow
+build/obj/SvNavigator.o: In function `SvNavigator::updateMonitoringSettings()':
+SvNavigator.cpp:(.text+0xc9f): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0xeb0): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/SvNavigator.o: In function `SvNavigator::updateStats()':
+SvNavigator.cpp:(.text+0x11b6): undefined reference to `operator new(unsigned long)'
+build/obj/SvNavigator.o: In function `SvNavigator::processZabbixError(QNetworkReply::NetworkError)':
+SvNavigator.cpp:(.text+0x3b90): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x3bae): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x3bcc): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x3c06): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/SvNavigator.o: In function `SvNavigator::runNagiosMonitor()':
+SvNavigator.cpp:(.text+0x47ed): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::insert(unsigned long, char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x49e4): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x4ac8): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x4baf): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x4c96): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x4e1a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x4e5b): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::append(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x4fd7): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x5059): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x5077): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x5095): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::assign(char const*, unsigned long)'
+SvNavigator.cpp:(.text+0x5116): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/SvNavigator.o: In function `SvNavigator::filterNodeRelatedMsg()':
+SvNavigator.cpp:(.text+0x5a59): undefined reference to `operator new(unsigned long)'
+build/obj/SvNavigator.o: In function `SvNavigator::loadMenus()':
+SvNavigator.cpp:(.text+0x71de): undefined reference to `operator new(unsigned long)'
+build/obj/SvNavigator.o: In function `SvNavigator::SvNavigator(int const&, QString const&, QWidget*)':
+SvNavigator.cpp:(.text+0x9180): undefined reference to `operator new(unsigned long)'
+SvNavigator.cpp:(.text+0x9267): undefined reference to `operator new(unsigned long)'
+SvNavigator.cpp:(.text+0x9280): undefined reference to `operator new(unsigned long)'
+build/obj/SvNavigator.o:SvNavigator.cpp:(.text+0x92a1): more undefined references to `operator new(unsigned long)' follow
+build/obj/SvNavigator.o: In function `SvNavigator::processZabbixReply(QNetworkReply*)':
+SvNavigator.cpp:(.text+0x98f9): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x9be2): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0x9d35): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0xa01d): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+SvNavigator.cpp:(.text+0xa19a): undefined reference to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)'
+build/obj/SvNavigator.o:SvNavigator.cpp:(.text+0xa29e): more undefined references to `std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, unsigned long, std::allocator<char> const&)' follow
+build/obj/SvNavigatorTree.o: In function `SvNavigatorTree::addNode(QHash<QString, QTreeWidgetItem*>&, _NodeT const&, bool const&)':
+SvNavigatorTree.cpp:(.text+0xb5e): undefined reference to `operator new(unsigned long)'
+SvNavigatorTree.cpp:(.text+0xe90): undefined reference to `operator new(unsigned long)'
+build/obj/ZbxHelper.o: In function `ZbxHelper::ZbxHelper(QString const&)':
+ZbxHelper.cpp:(.text+0xacb): undefined reference to `operator new(unsigned long)'
+build/obj/PieChart.o:(.rodata._ZTV8PieChart[vtable for PieChart]+0x1e0): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/PieChart.o:(.rodata._ZTV8PieChart[vtable for PieChart]+0x1e8): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/PieChart.o:(.rodata._ZTV8PieChart[vtable for PieChart]+0x1f0): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/Stats.o:(.rodata._ZTV5Stats[vtable for Stats]+0x1e0): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/Stats.o:(.rodata._ZTV5Stats[vtable for Stats]+0x1e8): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/Stats.o:(.rodata._ZTV5Stats[vtable for Stats]+0x1f0): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/StatsLegend.o:(.rodata._ZTV11StatsLegend[vtable for StatsLegend]+0x1e0): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/StatsLegend.o:(.rodata._ZTV11StatsLegend[vtable for StatsLegend]+0x1e8): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/StatsLegend.o:(.rodata._ZTV11StatsLegend[vtable for StatsLegend]+0x1f0): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_Auth.o:(.rodata._ZTV4Auth[vtable for Auth]+0x1f8): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_Auth.o:(.rodata._ZTV4Auth[vtable for Auth]+0x200): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_Auth.o:(.rodata._ZTV4Auth[vtable for Auth]+0x208): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_GraphView.o:(.rodata._ZTV9GraphView[vtable for GraphView]+0x208): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_GraphView.o:(.rodata._ZTV9GraphView[vtable for GraphView]+0x210): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_GraphView.o:(.rodata._ZTV9GraphView[vtable for GraphView]+0x218): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_MsgPanel.o:(.rodata._ZTV8MsgPanel[vtable for MsgPanel]+0x340): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_MsgPanel.o:(.rodata._ZTV8MsgPanel[vtable for MsgPanel]+0x348): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_MsgPanel.o:(.rodata._ZTV8MsgPanel[vtable for MsgPanel]+0x350): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_PieChartItem.o:(.rodata._ZTV12PieChartItem[vtable for PieChartItem]+0x1e0): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_PieChartItem.o:(.rodata._ZTV12PieChartItem[vtable for PieChartItem]+0x1e8): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_PieChartItem.o:(.rodata._ZTV12PieChartItem[vtable for PieChartItem]+0x1f0): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_Preferences.o:(.rodata._ZTV11ImageButton[vtable for ImageButton]+0x1f8): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_Preferences.o:(.rodata._ZTV11ImageButton[vtable for ImageButton]+0x200): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_Preferences.o:(.rodata._ZTV11ImageButton[vtable for ImageButton]+0x208): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_Preferences.o:(.rodata._ZTV11Preferences[vtable for Preferences]+0x1f8): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_Preferences.o:(.rodata._ZTV11Preferences[vtable for Preferences]+0x200): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_Preferences.o:(.rodata._ZTV11Preferences[vtable for Preferences]+0x208): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_ServiceEditor.o:(.rodata._ZTV13ServiceEditor[vtable for ServiceEditor]+0x1e0): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_ServiceEditor.o:(.rodata._ZTV13ServiceEditor[vtable for ServiceEditor]+0x1e8): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_ServiceEditor.o:(.rodata._ZTV13ServiceEditor[vtable for ServiceEditor]+0x1f0): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_SvConfigCreator.o:(.rodata._ZTV9SvCreator[vtable for SvCreator]+0x1e8): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_SvConfigCreator.o:(.rodata._ZTV9SvCreator[vtable for SvCreator]+0x1f0): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_SvConfigCreator.o:(.rodata._ZTV9SvCreator[vtable for SvCreator]+0x1f8): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_SvNavigator.o:(.rodata._ZTV11SvNavigator[vtable for SvNavigator]+0x1e8): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_SvNavigator.o:(.rodata._ZTV11SvNavigator[vtable for SvNavigator]+0x1f0): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_SvNavigator.o:(.rodata._ZTV11SvNavigator[vtable for SvNavigator]+0x1f8): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_SvNavigatorTree.o:(.rodata._ZTV15SvNavigatorTree[vtable for SvNavigatorTree]+0x350): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_SvNavigatorTree.o:(.rodata._ZTV15SvNavigatorTree[vtable for SvNavigatorTree]+0x358): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_SvNavigatorTree.o:(.rodata._ZTV15SvNavigatorTree[vtable for SvNavigatorTree]+0x360): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+build/obj/moc_WebKit.o:(.rodata._ZTV6WebKit[vtable for WebKit]+0x1e8): undefined reference to `non-virtual thunk to QWidget::devType() const'
+build/obj/moc_WebKit.o:(.rodata._ZTV6WebKit[vtable for WebKit]+0x1f0): undefined reference to `non-virtual thunk to QWidget::paintEngine() const'
+build/obj/moc_WebKit.o:(.rodata._ZTV6WebKit[vtable for WebKit]+0x1f8): undefined reference to `non-virtual thunk to QWidget::metric(QPaintDevice::PaintDeviceMetric) const'
+collect2: ld a retourné 1 code d'état d'exécution
+make[1]: *** [ngrt4n-manager] Erreur 1
+make: *** [install] Erreur 2
+dpkg-buildpackage: erreur: fakeroot debian/rules binary a produit une erreur de sortie de type 2
+debuild: fatal error at line 1350:
+dpkg-buildpackage -rfakeroot -D -us -uc failed

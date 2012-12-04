@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BASE_NAME=RealOpInsight-2.1.0
+MACHINE=ubs-1
+SOURCE_TARBALL="../${BASE_NAME}.orig.tar.gz"
+
+set -e 
+set -x
+scp ${SOURCE_TARBALL} ${MACHINE}
+ssh ${MACHINE} "./dh_make.sh ${BASE_NAME} < input"
+scp -rp debian/  ubs-1:${BASE_NAME}/
+ssh ${MACHINE} "cd ${BASE_NAME} && debuild -us -uc"
