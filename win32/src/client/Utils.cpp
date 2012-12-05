@@ -23,7 +23,7 @@
 
 #include <QFileInfo>
 #include "Utils.hpp"
-#include <windows.h>
+#include <unistd.h>
 
 QString Utils::statusToString(const qint32 & _status)
 {
@@ -65,16 +65,7 @@ QString Utils::getAbsolutePath(const QString & _path) {
 }
 
 void Utils::delay(const qint32 & d) {
-//#ifdef WIN32
-    Sleep(uint(d));
-//#else
-//    sleep(d);
-//#endif
+    sleep(d);
 }
 
-QString Utils::basename(const char* path) {
-    char* name = strrchr(path, '/');
-    name = name ? name + 1 : const_cast<char*>(path);
-    return QString(name);
-}
 

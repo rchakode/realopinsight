@@ -6,9 +6,9 @@
 
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
-export app_name=realopinsight
-export install_root=debian/${app_name}
-export prefix_dir=${debian}/usr
+export app_name=ngrt4n-d4n
+export install_root=${PWD}/debian/${app_name}
+export prefix_dir=${install_root}/usr
 export bin_prefix=ngrt4n
 
 build: build-stamp

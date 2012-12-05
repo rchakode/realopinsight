@@ -40,16 +40,21 @@ const QString ID_PATTERN("%1/%2");
 
 ComboBoxItemsT SvNavigator::propRules() {
     ComboBoxItemsT map;
-    map.insert(StatusPropRules::label(StatusPropRules::Unchanged),StatusPropRules::toString(StatusPropRules::Unchanged));
-    map.insert(StatusPropRules::label(StatusPropRules::Decreased),StatusPropRules::toString(StatusPropRules::Decreased));
-    map.insert(StatusPropRules::label(StatusPropRules::Increased),StatusPropRules::toString(StatusPropRules::Increased));
+    map.insert(StatusPropRules::label(StatusPropRules::Unchanged),
+               StatusPropRules::toString(StatusPropRules::Unchanged));
+    map.insert(StatusPropRules::label(StatusPropRules::Decreased),
+               StatusPropRules::toString(StatusPropRules::Decreased));
+    map.insert(StatusPropRules::label(StatusPropRules::Increased),
+               StatusPropRules::toString(StatusPropRules::Increased));
     return map;
 }
 
 ComboBoxItemsT SvNavigator::calcRules() {
     ComboBoxItemsT map;
-    map.insert(StatusCalcRules::label(StatusCalcRules::HighCriticity),StatusCalcRules::toString(StatusCalcRules::HighCriticity));
-    map.insert(StatusCalcRules::label(StatusCalcRules::WeightedCriticity),StatusCalcRules::toString(StatusCalcRules::WeightedCriticity));
+    map.insert(StatusCalcRules::label(StatusCalcRules::HighCriticity),
+               StatusCalcRules::toString(StatusCalcRules::HighCriticity));
+    map.insert(StatusCalcRules::label(StatusCalcRules::WeightedCriticity),
+               StatusCalcRules::toString(StatusCalcRules::WeightedCriticity));
     return map;
 }
 
