@@ -47,9 +47,9 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
 {
     QTreeWidgetItem* tnode = itemAt( _event->pos() ) ;
     if( tnode && ptr2Data ) {
-        NodeListT::iterator  node_it = ptr2Data->nodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString()) ;
+        NodeListT::iterator  node_it = ptr2Data->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString()) ;
 
-        if( node_it != ptr2Data->nodes.end() ) {
+        if( node_it != ptr2Data->bpnodes.end() ) {
 
             if( node_it->type != NodeType::ALARM_NODE ) {
                 _event->setDropAction( Qt::MoveAction ) ;
@@ -72,17 +72,17 @@ void SvNavigatorTree::startDrag(Qt::DropActions _action)
 }
 
 void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
-                              const NodeT & _node, const bool & _first_insertion)
+                              const NodeT & _node, const bool & _isFirstInsertion)
 {
-    //TODO add tooltips
-    QTreeWidgetItem * item ;
+    QTreeWidgetItem * item = NULL;
     TreeNodeItemListT::iterator nit = _tree.find( _node.id ) ;
     if( nit == _tree.end() ) {
+
         item = new QTreeWidgetItem( QTreeWidgetItem::UserType ) ;
         item->setIcon(0, QIcon(":/images/unknown.png")) ;
         item->setText(0, _node.name) ;
         item->setData(0, QTreeWidgetItem::UserType, _node.id) ;
-        if( _first_insertion ) {
+        if( _isFirstInsertion ) {
             TreeNodeItemListT::iterator pit = _tree.find( _node.parent ) ;
             if( pit != _tree.end() ) {
                 _tree[_node.parent]->addChild(item);
@@ -90,17 +90,20 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
         }
 
         _tree[_node.id] = item ;
-    }
-    else {
+
+    } else {
         (*nit)->setIcon(0, QIcon(":/images/unknown.png")) ;
         (*nit)->setText(0, _node.name) ;
         (*nit)->setData(0, QTreeWidgetItem::UserType, _node.id) ;
     }
 
-    if( _node.type != NodeType::ALARM_NODE && _node.child_nodes != "" ) {
+    if( _node.type != NodeType::ALARM_NODE &&
+            _node.child_nodes != "" ) {
+
         QStringList childs = _node.child_nodes.split( Parser::CHILD_NODES_SEP );
 
         for(QStringList::iterator uds_it = childs.begin(); uds_it != childs.end(); uds_it++ ) {
+
             QString cid = (*uds_it).trimmed() ;
             TreeNodeItemListT::iterator cit = _tree.find( cid) ;
 

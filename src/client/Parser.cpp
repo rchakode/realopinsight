@@ -49,15 +49,15 @@ Parser::~Parser()
 
 bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
 {
-    QString graph_content;
+    QString graphContent;
     QDomDocument xmlDoc;
     QDomElement xmlRoot;
     QFile file(_configFile);
-    if ( !file.open(QIODevice::ReadOnly|QIODevice::Text) ) {
+    if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
         Utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
         return false;
     }
-    if (! xmlDoc.setContent(&file) ) {
+    if (! xmlDoc.setContent(&file)) {
         file.close();
         Utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
         return false;
@@ -81,75 +81,109 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
         node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
         node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
         node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-        if(node.icon.length() == 0) node.icon = GraphView::DEFAULT_ICON;
-        node.icon.remove("--> "); //FBWC
         node.status = MonitorBroker::UNSET_STATUS;
         node.parent = "";
-        if(node.status_crule < 0) node.status_crule = StatusCalcRules::HighCriticity; //FBWC
-        if(node.status_prule < 0) node.status_prule = StatusPropRules::Unchanged;
-        _coreData.nodes.insert(node.id, node);
-        if( node.type == NodeType::ALARM_NODE ) {
-            QString host = (node.child_nodes.split("/")).at(0);
+
+        node.icon.remove("--> "); //FBWC
+
+        if(node.icon.length() == 0) {
+            node.icon = GraphView::DEFAULT_ICON;
+        }
+
+        if(node.status_crule < 0) {
+            node.status_crule = StatusCalcRules::HighCriticity; //FBWC
+        }
+
+        if(node.status_prule < 0) {
+            node.status_prule = StatusPropRules::Unchanged;
+        }
+
+        if(node.type == NodeType::ALARM_NODE) {
+            QString host = node.child_nodes.left(node.child_nodes.indexOf("/"));
             _coreData.hosts[host] << node.id;
             _coreData.cnodes.insert(node.id, node);
+        } else {
+            _coreData.bpnodes.insert(node.id, node);
         }
     }
     file.close();
-    updateNodeHierachy(_coreData.nodes, graph_content);
-    buildNodeTree(_coreData.nodes, _coreData.tree_items);
-    graph_content = dotFileHeader + graph_content;
-    graph_content += dotFileFooter;
-    saveCoordinatesDotFile(graph_content);
+    updateNodeHierachy(_coreData.bpnodes, _coreData.cnodes, graphContent);
+    buildNodeTree(_coreData.bpnodes, _coreData.cnodes, _coreData.tree_items);
+    graphContent = dotFileHeader + graphContent;
+    graphContent += dotFileFooter;
+    saveCoordinatesDotFile(graphContent);
 
     return true;
 }
 
-void Parser::updateNodeHierachy(NodeListT & _nodes, QString & _gcontent)
+void Parser::updateNodeHierachy(NodeListT & _bpnodes,
+                                NodeListT & _cnodes,
+                                QString & _graphContent)
 {
-    _gcontent = "\n";
-    for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
+    _graphContent = "\n";
+
+    for(NodeListT::iterator node = _bpnodes.begin(); node != _bpnodes.end(); node++) {
         QString nname = node->name;
-        _gcontent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_gcontent;
+        _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
 
         if(node->child_nodes != "") {
+
             QStringList nodeIds = node->child_nodes.split(CHILD_NODES_SEP);
             for(QStringList::iterator nodeId = nodeIds.begin(); nodeId != nodeIds.end(); nodeId ++) {
-                NodeListT::iterator childNode = _nodes.find((*nodeId).trimmed());
 
-                if(childNode != _nodes.end()) {
+                QString nidTrimmed = (*nodeId).trimmed();
+                NodeListT::iterator childNode = _cnodes.find(nidTrimmed);
+                if(childNode != _cnodes.end()) {
                     childNode->parent = node->id;
-                    _gcontent += "\t" + node->id%"--"%childNode->id%"\n";
+                    _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
+                } else {
+                    childNode = _bpnodes.find(nidTrimmed);
+                    if(childNode != _bpnodes.end()) {
+                        childNode->parent = node->id;
+                        _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
+                    }
                 }
             }
         }
     }
+
+    for(NodeListT::iterator node = _cnodes.begin(); node != _cnodes.end(); node++) {
+        QString nname = node->name;
+        _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+    }
 }
 
-void Parser::buildNodeTree( NodeListT & _nodes, TreeNodeItemListT & _tree)
+void Parser::buildNodeTree(NodeListT & _bpnodes,
+                            NodeListT & _cnodes,
+                            TreeNodeItemListT & _tree)
 {
-    for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
-        QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType);
-        item->setIcon(0, QIcon(":/images/unknown.png"));
-        item->setText(0, node->name);
-        item->setData(0, QTreeWidgetItem::UserType, node->id);
-        _tree.insert(node->id, item);
+    for(NodeListT::iterator node = _bpnodes.begin(); node != _bpnodes.end(); node++) {
+        _tree.insert(node->id, createTreeItem(*node));
+    }
+    for(NodeListT::iterator node = _cnodes.begin(); node != _cnodes.end(); node++) {
+        _tree.insert(node->id, createTreeItem(*node));
     }
 
-    for(NodeListT::iterator node = _nodes.begin(); node != _nodes.end(); node++) {
+    for(NodeListT::iterator node = _bpnodes.begin(); node != _bpnodes.end(); node++) {
 
-        if( (node->type == NodeType::ALARM_NODE) || (node->child_nodes.length() == 0) ) continue;
+        if(node->type == NodeType::ALARM_NODE ||
+                node->child_nodes.length() == 0) {
+            continue;
+        }
 
         QStringList childs = node->child_nodes.split(Parser::CHILD_NODES_SEP);
-        for(QStringList::iterator child_id = childs.begin(); child_id != childs.end(); child_id++ ) {
+        for(QStringList::iterator childId = childs.begin(); childId != childs.end(); childId++) {
 
             TreeNodeItemListT::iterator nitem = _tree.find(node->id);
-            if ( nitem == _tree.end()) {
+            if (nitem == _tree.end()) {
                 Utils::alert(QObject::tr("service not found %1").arg(node->name));
                 continue;
             }
 
-            TreeNodeItemListT::iterator child = _tree.find(*child_id);
-            if(child != _tree.end()) _tree[node->id]->addChild(*child);
+            TreeNodeItemListT::iterator child = _tree.find(*childId);
+            if(child != _tree.end()) {
+                _tree[node->id]->addChild(*child);
+            }
         }
     }
 }
@@ -158,11 +192,20 @@ void Parser::saveCoordinatesDotFile(const QString& _graph_content)
 {
     graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
     QFile file(graphFilename);
-    if( !file.open(QIODevice::WriteOnly|QIODevice::Text) ) {
+    if(!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
         Utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
         exit(1);
     }
     QTextStream file_stream(&file);
     file_stream << _graph_content;
     file.close();
+}
+
+QTreeWidgetItem * Parser::createTreeItem(const NodeT & _node){
+    QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType);
+    item->setIcon(0, QIcon(":/images/unknown.png"));
+    item->setText(0, _node.name);
+    item->setData(0, QTreeWidgetItem::UserType, _node.id);
+
+    return item;
 }

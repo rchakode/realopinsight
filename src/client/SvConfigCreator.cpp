@@ -140,7 +140,7 @@ void SvCreator::newBusinessView(void)
         node.type = NodeType::SERVICE_NODE;
         node.parent.clear();
 
-        coreData->nodes[node.id] = node;
+        coreData->bpnodes[node.id] = node;
         SvNavigatorTree::addNode(coreData->tree_items, node);
         navigationTree->update(coreData);
 
@@ -155,8 +155,8 @@ void SvCreator::newBusinessView(void)
 void SvCreator::newNode(void)
 {
     static int count = 1;
-    NodeListT::iterator pNode = coreData->nodes.find( selectedNodeId );
-    if(pNode == coreData->nodes.end() || pNode->type == NodeType::ALARM_NODE ) {
+    NodeListT::iterator pNode = coreData->bpnodes.find( selectedNodeId );
+    if(pNode == coreData->bpnodes.end() || pNode->type == NodeType::ALARM_NODE ) {
         Utils::alert(tr("This action not allowed on the target node"));
         return;
     }
@@ -170,7 +170,7 @@ void SvCreator::newNode(void)
     node.child_nodes = "";
 
     SvNavigatorTree::addNode(coreData->tree_items, node, true);
-    coreData->nodes[node.id] = node;
+    coreData->bpnodes[node.id] = node;
     pNode->child_nodes += (pNode->child_nodes != "")? Parser::CHILD_NODES_SEP + node.id : node.id;
 
     navigationTree->setCurrentItem(coreData->tree_items[node.id]);
@@ -204,8 +204,8 @@ void SvCreator::deleteNode(const QString & _node_id)
     QStringList::iterator uds_it;
     TreeNodeItemListT::iterator p_item, item, end_items;
 
-    node_it =  coreData->nodes.find( _node_id );
-    if( node_it != coreData->nodes.end() ) {
+    node_it =  coreData->bpnodes.find( _node_id );
+    if( node_it != coreData->bpnodes.end() ) {
         if( node_it->type != NodeType::ALARM_NODE &&  node_it->child_nodes != "" )
         {
             ud_services = node_it->child_nodes.split( Parser::CHILD_NODES_SEP );
@@ -228,10 +228,10 @@ void SvCreator::deleteNode(const QString & _node_id)
                         "|^" + _node_id + "$" +
                         "|" + Parser::CHILD_NODES_SEP  + _node_id
                         );
-            p_node_it = coreData->nodes.find( node_it->parent );
-            if (p_node_it != coreData->nodes.end() ) p_node_it->child_nodes.remove( regex );
+            p_node_it = coreData->bpnodes.find( node_it->parent );
+            if (p_node_it != coreData->bpnodes.end() ) p_node_it->child_nodes.remove( regex );
 
-            coreData->nodes.remove( _node_id );
+            coreData->bpnodes.remove( _node_id );
             coreData->tree_items.remove( _node_id );
             (*p_item)->takeChild( (*p_item)->indexOfChild( (*item) ) );
         }
@@ -329,24 +329,24 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 
         tnode_p = (*tnode_it)->parent();
         if( tnode_p ) {
-            node_it = coreData->nodes.find(_node_id);
+            node_it = coreData->bpnodes.find(_node_id);
 
-            if( node_it != coreData->nodes.end() ) {
+            if( node_it != coreData->bpnodes.end() ) {
                 /* Remove the node on its old parent's child list */
                 regex.setPattern(
                             "|^" + _node_id + Parser::CHILD_NODES_SEP +
                             "|^" + _node_id + "$" +
                             "|" + Parser::CHILD_NODES_SEP  + _node_id
                             );
-                p_node_it = coreData->nodes.find( node_it->parent );
-                if( p_node_it != coreData->nodes.end() ) {
+                p_node_it = coreData->bpnodes.find( node_it->parent );
+                if( p_node_it != coreData->bpnodes.end() ) {
                     p_node_it->child_nodes.remove( regex );
                 }
 
                 /* Add the node on its new parent's child list */
                 node_it->parent = tnode_p->data(0, QTreeWidgetItem::UserType).toString();
-                p_node_it = coreData->nodes.find( node_it->parent );
-                if(p_node_it != coreData->nodes.end()) {
+                p_node_it = coreData->bpnodes.find( node_it->parent );
+                if(p_node_it != coreData->bpnodes.end()) {
                     p_node_it->child_nodes += (p_node_it->child_nodes != "")?
                                 Parser::CHILD_NODES_SEP + _node_id : _node_id;
                 }
@@ -358,8 +358,8 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 
 void SvCreator::handleNodeTypeActivated(qint32 _type)
 {
-    NodeListT::iterator node = coreData->nodes.find( selectedNode );
-    if(node != coreData->nodes.end()) {
+    NodeListT::iterator node = coreData->bpnodes.find( selectedNode );
+    if(node != coreData->bpnodes.end()) {
         if(_type == NodeType::SERVICE_NODE){
             if ( node->type == NodeType::ALARM_NODE ) {
                 //TODO A bug has been reported
@@ -397,23 +397,23 @@ void SvCreator::handleShowAbout(void)
 
 void SvCreator::fillEditorFromService(QTreeWidgetItem * _item )
 {
-    NodeListT::iterator node = coreData->nodes.find(selectedNode);
-    if(node != coreData->nodes.end()) {
+    NodeListT::iterator node = coreData->bpnodes.find(selectedNode);
+    if(node != coreData->bpnodes.end()) {
         if(editor->updateNode(node)) {
             coreData->tree_items[selectedNode]->setText(0, node->name);
             hasToBeSaved = 1;
         }
     }
     selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-    node = coreData->nodes.find(selectedNode);
-    if(node != coreData->nodes.end()) editor->setContent(node);
+    node = coreData->bpnodes.find(selectedNode);
+    if(node != coreData->bpnodes.end()) editor->setContent(node);
 }
 
 
 void SvCreator::handleReturnPressed(void)
 {
-    NodeListT::iterator node = coreData->nodes.find(selectedNode);
-    if( node != coreData->nodes.end() ) {
+    NodeListT::iterator node = coreData->bpnodes.find(selectedNode);
+    if( node != coreData->bpnodes.end() ) {
         if( editor->updateNode(node) ) {
             coreData->tree_items[selectedNode]->setText(0, node->name);
             hasToBeSaved = 1;
@@ -430,8 +430,8 @@ void SvCreator::saveInFile(const QString& _path)
         statusBar()->showMessage(tr("ERROR: unable to open the file '%1'").arg(_path));
         return ;
     }
-    NodeListT::const_iterator node = coreData->nodes.find(SvNavigatorTree::rootID);
-    if( node == coreData->nodes.end() ) return ;
+    NodeListT::const_iterator node = coreData->bpnodes.find(SvNavigatorTree::rootID);
+    if( node == coreData->bpnodes.end() ) return ;
 
     statusBar()->showMessage(tr("saving %1").arg(_path));
     QTextStream ofile(&file);
@@ -446,7 +446,7 @@ void SvCreator::saveInFile(const QString& _path)
           << "\t\t<SubServices>"<<node->child_nodes<<"</SubServices>\n"
           << "\t</Service>\n";
 
-    for( node = coreData->nodes.begin(); node!= coreData->nodes.end(); node++) {
+    for( node = coreData->bpnodes.begin(); node!= coreData->bpnodes.end(); node++) {
         if (node->id == SvNavigatorTree::rootID || node->parent.isEmpty()) continue;
         ofile << "\t<Service id=\""<<node->id<<"\" type=\""<<node->type
               << "\" statusCalcRule=\""<<node->status_crule<< "\" statusPropRule=\""<<node->status_prule<< "\">\n"

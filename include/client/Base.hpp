@@ -247,17 +247,17 @@ typedef struct _GEdge {
     QGraphicsPathItem* edge;
 }GEdgeT;
 
-typedef QHash<QString,GNodeT> GNodeListT;
-typedef QHash<QString,GEdgeT> GEdgeListT;
-typedef QHash<QString,QStringList> HostListT;
-typedef QMap<QString,QMenu*> MenuListT;
-typedef QMap<QString,QAction*> SubMenuListT;
-typedef QMap<QString,QString> ComboBoxItemsT;
+typedef QHash<QString, GNodeT> GNodeListT;
+typedef QHash<QString, GEdgeT> GEdgeListT;
+typedef QHash<QString, QStringList> HostListT;
+typedef QMap<QString, QMenu*> MenuListT;
+typedef QMap<QString, QAction*> SubMenuListT;
+typedef QMap<QString, QString> ComboBoxItemsT;
 
 
 struct Struct {
     qint8 monitor;
-    NodeListT nodes;
+    NodeListT bpnodes;
     NodeListT cnodes;
     CheckListT checks_;
     CheckStatusCountT check_status_count;

@@ -73,8 +73,8 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
       topRightPanel (new QTabWidget()),
       bottomRightPanel (new QTabWidget()),
       browser (new WebKit()),
-      graphView (new GraphView()),
-      navigationTree (new SvNavigatorTree()),
+      map (new GraphView()),
+      tree (new SvNavigatorTree()),
       monPrefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
       changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
       msgPanel(new MsgPanel()),
@@ -85,10 +85,10 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
 {
     setWindowTitle(tr("%1 Operations Console").arg(appName));
     loadMenus();
-    topRightPanel->addTab(graphView, tr("Dashboard"));
+    topRightPanel->addTab(map, tr("Dashboard"));
     topRightPanel->addTab(browser, tr("Native Web UI"));
     bottomRightPanel->addTab(msgPanel, tr("Event Console"));
-    mainSplitter->addWidget(navigationTree);
+    mainSplitter->addWidget(tree);
     mainSplitter->addWidget(rightSplitter);
     rightSplitter->addWidget(topRightPanel);
     rightSplitter->addWidget(bottomRightPanel);
@@ -102,9 +102,9 @@ SvNavigator::~SvNavigator()
 {
     delete msgPanel;
     delete statsPanel;
-    delete navigationTree;
+    delete tree;
     delete browser;
-    delete graphView;
+    delete map;
     delete coreData;
     delete topRightPanel;
     delete bottomRightPanel;
@@ -128,8 +128,8 @@ void SvNavigator::closeEvent(QCloseEvent * event)
 void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 {
     QPoint pos = event->globalPos();
-    QList<QTreeWidgetItem*> treeNodes = navigationTree->selectedItems();
-    QGraphicsItem* graphNode = graphView->nodeAtGlobalPos(pos);
+    QList<QTreeWidgetItem*> treeNodes = tree->selectedItems();
+    QGraphicsItem* graphNode = map->nodeAtGlobalPos(pos);
 
     if (treeNodes.length() || graphNode) {
         if(graphNode) {
@@ -159,7 +159,8 @@ void SvNavigator::startMonitor()
     }
     setEnabled(true);
     updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
-    updateInterval = 1000 * ((updateInterval > 0)? updateInterval : MonitorBroker::DEFAULT_UPDATE_INTERVAL);
+    updateInterval = 1000 * ((updateInterval > 0)? updateInterval :
+                                                   MonitorBroker::DEFAULT_UPDATE_INTERVAL);
     timerId = startTimer(updateInterval);
 }
 
@@ -176,13 +177,13 @@ void SvNavigator::load(const QString & _file)
     openedFile = configFile;
     Parser parser;
     parser.parseSvConfig(configFile, *coreData);
-    navigationTree->clear();
-    navigationTree->addTopLevelItem(coreData->tree_items[SvNavigatorTree::rootID]);
-    graphView->load(parser.getDotGraphFile(), coreData->nodes);
+    tree->clear();
+    tree->addTopLevelItem(coreData->tree_items[SvNavigatorTree::rootID]);
+    map->load(parser.getDotGraphFile(), coreData->bpnodes, coreData->cnodes);
     browser->setUrl(monitorBaseUrl);
     resize();
     show();
-    graphView->scaleToFitViewPort();
+    map->scaleToFitViewPort();
     setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(configFile));
 }
 
@@ -242,18 +243,18 @@ int SvNavigator::runNagiosMonitor(void)
 
     foreach(const QString & checkId, coreData->cnodes.keys()) {
 
-        NodeListT::iterator node = coreData->nodes.find(checkId); //TODO
-        if(node == coreData->nodes.end()) {
+        NodeListT::iterator cnode = coreData->cnodes.find(checkId); //TODO
+        if(cnode == coreData->cnodes.end()) {
             continue;
         }
 
-        if(node->child_nodes == "") {
-            node->status = MonitorBroker::UNKNOWN;
-            coreData->check_status_count[node->status]++;
+        if(cnode->child_nodes == "") {
+            cnode->status = MonitorBroker::UNKNOWN;
+            coreData->check_status_count[cnode->status]++;
             continue;
         }
 
-        QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+        QStringList childNodes = cnode->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
             string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO à mettre au propre avec la nouvelle organization => cnodes
             if(success) {
@@ -264,20 +265,20 @@ int SvNavigator::runNagiosMonitor(void)
             }
             JsonHelper jsHelper(msg);
             if(jsHelper.getProperty("return_code").toInt32() == 0 && comChannel) {
-                node->check.status = jsHelper.getProperty("status").toInt32();
-                node->check.host = jsHelper.getProperty("host").toString().toStdString();
-                node->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
-                node->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-                node->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+                cnode->check.status = jsHelper.getProperty("status").toInt32();
+                cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
+                cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
+                cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
+                cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-                node->check.status = MonitorBroker::UNKNOWN;
-                node->check.host = "Unknown";
-                node->check.last_state_change = "0";
-                node->check.check_command = "Unknown" ;
-                node->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+                cnode->check.status = MonitorBroker::UNKNOWN;
+                cnode->check.host = "Unknown";
+                cnode->check.last_state_change = "0";
+                cnode->check.check_command = "Unknown" ;
+                cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
-            coreData->check_status_count[node->check.status]++;
-            updateNode(node);
+            coreData->check_status_count[cnode->check.status]++;
+            updateNode(cnode);
         }
     }
     updateStats();
@@ -320,13 +321,14 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
 }
 
 void SvNavigator::updateNode(NodeListT::iterator & _node) {
-    QString toolTip;
+
     _node->status = _node->prop_status = _node->check.status;
     updateAlarmMsg(_node);
-    toolTip = getNodeToolTip(*_node);
+    QString toolTip = getNodeToolTip(*_node);
     updateNavTreeItemStatus(_node, toolTip);
-    graphView->updateNode(_node, toolTip);
+    map->updateNode(_node, toolTip);
     msgPanel->addMsg(_node);
+
     emit hasToBeUpdate(_node->parent);
 }
 
@@ -337,7 +339,7 @@ void SvNavigator::updateStats() {
     Stats *stats = new Stats;
     QString info = stats->update(coreData->check_status_count, nbChecks);
     stats->setToolTip(info);
-    graphView->updateStatsPanel(stats);
+    map->updateStatsPanel(stats);
     if(statsPanel) delete statsPanel;
     statsPanel = stats;
     msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
@@ -390,22 +392,32 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
     }
 }
 
-void SvNavigator::updateNodeStatus(QString _node_id)
+void SvNavigator::updateNodeStatus(QString _nodeId)
 {
     qint32 normal_count = 0;
     qint32 warning_count = 0;
     qint32 unknown_count = 0;
     qint32 critical_count = 0;
 
-    NodeListT::iterator node = coreData->nodes.find(_node_id);
-    if (node == coreData->nodes.end()) return;
+    NodeListT::iterator node = coreData->bpnodes.find(_nodeId);
+    if (node == coreData->bpnodes.end()) {
+        node = coreData->cnodes.find(_nodeId);
+        if (node == coreData->cnodes.end()) {
+            return ;
+        }
+    }
 
     Status status;
-    QStringList node_ids = node->child_nodes.split(Parser::CHILD_NODES_SEP);
-    for(QStringList::const_iterator it = node_ids.begin(); it != node_ids.end(); it++) {
+    QStringList nodeIds = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+    for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++) {
 
-        NodeListT::iterator child = coreData->nodes.find(*it);
-        if (child == coreData->nodes.end()) continue;
+        NodeListT::iterator child = coreData->cnodes.find(*it);
+        if (child == coreData->cnodes.end()) {
+            child = coreData->bpnodes.find(*it);
+            if (child == coreData->bpnodes.end()) {
+                continue;
+            }
+        }
 
         Status cst(static_cast<MonitorBroker::StatusT>(child->prop_status));
 
@@ -450,7 +462,7 @@ void SvNavigator::updateNodeStatus(QString _node_id)
 
     }
     QString toolTip = getNodeToolTip(*node);
-    graphView->updateNode(node, toolTip);
+    map->updateNode(node, toolTip);
     updateNavTreeItemStatus(node, toolTip);
     emit hasToBeUpdate(node->parent);
 }
@@ -494,15 +506,19 @@ void SvNavigator::updateMonitoringSettings(){
     if (updateInterval <= 0) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000;
 }
 
-void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, const qint32 & _level)
+void SvNavigator::expandNode(const QString & _nodeId,
+                             const bool & _expand,
+                             const qint32 & _level)
 {
-    QStringList::iterator uds_it;
-    NodeT& node = coreData->nodes[_node_id];
+    NodeListT::iterator node = coreData->bpnodes.find(_nodeId);
+    if(node == coreData->bpnodes.end()) {
+        return ;
+    }
 
-    if(node.type == NodeType::SERVICE_NODE && node.child_nodes != "") {
-        QStringList  childNodes = node.child_nodes.split(Parser::CHILD_NODES_SEP);
-        for (uds_it = childNodes.begin(); uds_it != childNodes.end(); uds_it++) {
-            graphView->setNodeVisible(*uds_it, _node_id, _expand, _level);
+    if(node->child_nodes != "") {
+        QStringList  childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+        for (QStringList::iterator udsIt = childNodes.begin(); udsIt != childNodes.end(); udsIt++) {
+            map->setNodeVisible(*udsIt, _nodeId, _expand, _level);
         }
     }
 }
@@ -510,31 +526,52 @@ void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, con
 void SvNavigator::centerGraphOnNode(const QString & _node_id)
 {
     if(_node_id != "") selectedNodeId =  _node_id;
-    graphView->centerOnNode(selectedNodeId);
+    map->centerOnNode(selectedNodeId);
 }
 
 void SvNavigator::filterNodeRelatedMsg(void)
 {
-    if(filteredMsgPanel) delete filteredMsgPanel;
+    bool process = true;
+    if(filteredMsgPanel) {
+        delete filteredMsgPanel;
+    }
     filteredMsgPanel = new MsgPanel();
-    NodeListT::iterator node = coreData->nodes.find(selectedNodeId);
+    NodeListT::iterator node = coreData->bpnodes.find(selectedNodeId);
 
-    if(node != coreData->nodes.end()) {
+    if(node == coreData->bpnodes.end()) {
+        node = coreData->cnodes.find(selectedNodeId);
+        if(node == coreData->bpnodes.end()) {
+           process = false;
+        }
+    }
+
+    if(process) {
         filterNodeRelatedMsg(selectedNodeId);
         QString title = tr("Messages related to '%2' - %1")
                 .arg(appName)
-                .arg(coreData->nodes[selectedNodeId].name);
+                .arg(node->name);
         filteredMsgPanel->resizeFields(msgPanelSize, true);
         filteredMsgPanel->setWindowTitle(title);
     }
+
     filteredMsgPanel->show();
 }
 
 void SvNavigator::filterNodeRelatedMsg(const QString & _nodeId)
 {
-    NodeListT::iterator nodeIt = coreData->nodes.find(_nodeId);
-
-    if(nodeIt == coreData->nodes.end() || nodeIt->child_nodes == "") {
+    bool quick = false;
+    NodeListT::iterator nodeIt = coreData->bpnodes.find(_nodeId);
+    if(nodeIt == coreData->bpnodes.end() || nodeIt->child_nodes == "") {
+        if(nodeIt == coreData->bpnodes.end()) {
+            nodeIt = coreData->cnodes.find(_nodeId);
+            if(nodeIt == coreData->cnodes.end()) {
+                quick = true;
+            }
+        } else {
+            quick = true;
+        }
+    }
+    if(quick) {
         return;
     }
 
@@ -568,7 +605,7 @@ void SvNavigator::tabChanged(int _tab_index)
 
 void SvNavigator::hideChart(void)
 {
-    if (graphView->hideChart()) {
+    if (map->hideChart()) {
         subMenuList["HideChart"]->setIcon(QIcon(":images/check.png"));
         return;
     }
@@ -733,11 +770,18 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
             coreData->checks_[key] = check;
         }
         if(hLeft--, hLeft == 0){
-            foreach(const QString & c, coreData->cnodes.keys()) {
-                NodeListT::iterator node = coreData->nodes.find(c);
-                if(node == coreData->nodes.end()) continue;
+
+            foreach(const QString & checkId, coreData->cnodes.keys()) {
+
+                NodeListT::iterator node = coreData->bpnodes.find(checkId);
+                if(node == coreData->bpnodes.end()) {
+                    continue;
+                }
                 CheckListT::Iterator check = coreData->checks_.find(node->child_nodes);
-                if(check == coreData->checks_.end()) continue;
+                if(check == coreData->checks_.end()) {
+                    continue;
+                }
+
                 node->check = *check;
                 updateNode(node);
                 coreData->check_status_count[check->status]++;
@@ -769,8 +813,8 @@ void SvNavigator::processZabbixError(QNetworkReply::NetworkError code){
     Utils::alert(msg);
     updateStatusBar(msg);
     foreach(const QString & c, coreData->cnodes.keys()) {
-        NodeListT::iterator node = coreData->nodes.find(c);
-        if(node == coreData->nodes.end()) continue;
+        NodeListT::iterator node = coreData->bpnodes.find(c);
+        if(node == coreData->bpnodes.end()) continue;
         node->check.status = MonitorBroker::UNKNOWN;
         node->check.host = "Unknown";
         node->check.last_state_change = "0";
@@ -791,9 +835,9 @@ void SvNavigator::addEvents(void)
 {
     connect(this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()));
     connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateNodeStatus(QString)));
-    connect(subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT(capture()));
-    connect(subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT(zoomIn()));
-    connect(subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT(zoomOut()));
+    connect(subMenuList["Capture"], SIGNAL(triggered(bool)), map, SLOT(capture()));
+    connect(subMenuList["ZoomIn"], SIGNAL(triggered(bool)), map, SLOT(zoomIn()));
+    connect(subMenuList["ZoomOut"], SIGNAL(triggered(bool)), map, SLOT(zoomOut()));
     connect(subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
     connect(subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
     connect(subMenuList["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
@@ -805,8 +849,8 @@ void SvNavigator::addEvents(void)
     connect(contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
     connect(monPrefWindow, SIGNAL(urlChanged(QString)), browser, SLOT(setUrl(QString)));
     connect(topRightPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
-    connect(graphView, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
-    connect(navigationTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
+    connect(map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
+    connect(tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
     connect(zxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZabbixReply(QNetworkReply*)));
     connect(zxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processZabbixError(QNetworkReply::NetworkError)));
 }

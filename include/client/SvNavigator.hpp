@@ -59,7 +59,9 @@ public slots:
     int runNagiosMonitor(void);
     void resetStatData(void);
     void updateNodeStatus(QString);
-    void expandNode(const QString &, const bool &, const qint32 &);
+    void expandNode(const QString & _nodeId,
+                    const bool & _expand,
+                    const qint32 & _level);
     void centerGraphOnNode(const QString & _node_id = "");
     void filterNodeRelatedMsg(void);
     void filterNodeRelatedMsg(const QString &);
@@ -102,8 +104,8 @@ private:
     QTabWidget * topRightPanel;
     QTabWidget* bottomRightPanel;
     WebKit* browser;
-    GraphView* graphView;
-    SvNavigatorTree* navigationTree;
+    GraphView* map;
+    SvNavigatorTree* tree;
     Preferences* monPrefWindow;
     Preferences* changePasswdWindow;
     MsgPanel* msgPanel;
