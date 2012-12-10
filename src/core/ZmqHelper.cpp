@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-const int TIMEOUT = 2500 ;
+const int TIMEOUT = 15000 ;
 const int NUM_RETRIES = 3 ;
 
 ZmqHelper::ZmqHelper() {}
