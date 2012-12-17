@@ -32,7 +32,8 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include "core/ZmqHelper.hpp"
+//#include "core/ZmqHelper.hpp"
+#include "Socket.hpp"
 #include "ZbxHelper.hpp"
 #include <QScriptValueIterator>
 
@@ -116,9 +117,10 @@ private:
     SubMenuListT contextMenuList;
     QString serverAddr;
     QString serverPort;
-    std::string serverUrl;
-    std::string serverAuthChain;
-    zmq::socket_t* comChannel;
+    QString serverUrl;
+    QString serverAuthChain;
+//    zmq::socket_t* comChannel;
+    Socket* msocket;
     ZbxHelper* zxHelper;
     QString zxAuthToken;
     qint32 hLeft;

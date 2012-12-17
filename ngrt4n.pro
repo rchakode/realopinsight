@@ -38,69 +38,72 @@ DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_YEAR='\"2012\"'"
 DEFINES *= "RELEASE_NAME='\"M-Sylvie\"'"
 OBJECTS_DIR = build/obj
-MOC_DIR 	= build/moc
-RCC_DIR 	= build/rcc 
+MOC_DIR = build/moc
+RCC_DIR = build/rcc
 QMAKE_CXXFLAGS += -std=c++0x
-INCLUDEPATH = include include/client include/core 
+INCLUDEPATH = include include/client include/core
 HEADERS	+= include/core/ns.hpp \
-			 include/core/MonitorBroker.hpp \
-                         include/core/ZmqHelper.hpp \
-			 include/client/Auth.hpp \
-			 include/client/Base.hpp \
-			 include/client/GraphView.hpp \
-			 include/client/MsgPanel.hpp \
-			 include/client/Parser.hpp \
-			 include/client/PieChart.hpp \
-			 include/client/PieChartItem.hpp \
-			 include/client/Preferences.hpp \
-			 include/client/ServiceEditor.hpp \
-			 include/client/Stats.hpp \
-			 include/client/StatsLegend.hpp \
-			 include/client/SvConfigCreator.hpp \
-			 include/client/SvNavigator.hpp \
-			 include/client/SvNavigatorTree.hpp \
-			 include/client/WebKit.hpp \  			 
+    include/core/MonitorBroker.hpp \
+    include/client/Auth.hpp \
+    include/client/Base.hpp \
+    include/client/GraphView.hpp \
+    include/client/MsgPanel.hpp \
+    include/client/Parser.hpp \
+    include/client/PieChart.hpp \
+    include/client/PieChartItem.hpp \
+    include/client/Preferences.hpp \
+    include/client/ServiceEditor.hpp \
+    include/client/Stats.hpp \
+    include/client/StatsLegend.hpp \
+    include/client/SvConfigCreator.hpp \
+    include/client/SvNavigator.hpp \
+    include/client/SvNavigatorTree.hpp \
+    include/client/WebKit.hpp \
     include/client/Utils.hpp \
     include/client/ZbxHelper.hpp \
-    include/client/JsHelper.hpp
+    include/client/JsHelper.hpp \
+    include/core/Socket.hpp \
+    include/core/ZmqHelper.hpp
+
 SOURCES	+= src/core/utils.cpp \
-			src/core/MonitorBroker.cpp \
-                        src/core/ZmqHelper.cpp \
-			src/client/Auth.cpp \
-			src/client/Base.cpp \
-			src/client/GraphView.cpp \
-			src/client/MsgPanel.cpp \ 
-            src/client/Parser.cpp \
-            src/client/PieChart.cpp \
-            src/client/PieChartItem.cpp \
-            src/client/Preferences.cpp \
-            src/client/ServiceEditor.cpp \
-            src/client/Stats.cpp \
-            src/client/StatsLegend.cpp \
-            src/client/SvConfigCreator.cpp \
-            src/client/SvNavigator.cpp \
-            src/client/SvNavigatorTree.cpp \
-            src/client/WebKit.cpp \  
+    src/core/MonitorBroker.cpp \
+    src/core/ZmqHelper.cpp \
+    src/client/Auth.cpp \
+    src/client/Base.cpp \
+    src/client/GraphView.cpp \
+    src/client/MsgPanel.cpp \
+    src/client/Parser.cpp \
+    src/client/PieChart.cpp \
+    src/client/PieChartItem.cpp \
+    src/client/Preferences.cpp \
+    src/client/ServiceEditor.cpp \
+    src/client/Stats.cpp \
+    src/client/StatsLegend.cpp \
+    src/client/SvConfigCreator.cpp \
+    src/client/SvNavigator.cpp \
+    src/client/SvNavigatorTree.cpp \
+    src/client/WebKit.cpp \
     src/client/Utils.cpp \
     src/client/ZbxHelper.cpp \
-    src/client/JsHelper.cpp
+    src/client/JsHelper.cpp \
+    src/core/Socket.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts
 
 DISTFILES += README \
-			 INSTALL \
-			 COPYING \
-			 NEWS \
-			 ChangeLog \
-			 AUTHORS \
-			 install-sh \
-			 images/*.png \
-			 images/built-in/*.png \
-                         examples/{*.ngrt4n.xml,*.dat} \
-			 src/client/ngrt4n-oc.cpp \
-                         src/client/ngrt4n-editor.cpp \
-                         doc/man/*.gz
+    INSTALL \
+    COPYING \
+    NEWS \
+    ChangeLog \
+    AUTHORS \
+    install-sh \
+    images/*.png \
+    images/built-in/*.png \
+    examples/{*.ngrt4n.xml,*.dat} \
+    src/client/ngrt4n-oc.cpp \
+    src/client/ngrt4n-editor.cpp \
+    doc/man/*.gz
 
 OTHER_FILES = \
     ngrt4n_la.ts

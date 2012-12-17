@@ -7,8 +7,8 @@ ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp \
 		   src/server/ngrt4nd.cpp \
 		   include/core/MonitorBroker.hpp \
 		   include/core/ns.hpp \
-		   include/core/ZmqHelper.hpp \
-		   src/core/ZmqHelper.cpp
+		   include/core/Socket.hpp \
+		   src/core/Socket.cpp
 
 man1_MANS = doc/man/ngrt4nd.1
 

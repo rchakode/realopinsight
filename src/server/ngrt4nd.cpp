@@ -24,52 +24,53 @@
 #include "config.h"
 #include "core/ns.hpp"
 #include "core/MonitorBroker.hpp"
-#include "core/ZmqHelper.hpp"
+#include "core/Socket.hpp"
+#include <zmq.h>
 #include <cassert>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
-#include <zmq.hpp>
 #include <crypt.h>
 #include <sstream>
 #include <fstream>
+#include <libgen.h>
 
-using namespace std;
 
-string packageName = PACKAGE_NAME ;
-string packageVersion = PACKAGE_VERSION ;
-string packageUrl = PACKAGE_URL ;
-string statusFile = "/usr/local/nagios/var/status.dat" ;
-string progName = "";
-string authChain= "" ;
+std::string packageName = PACKAGE_NAME ;
+std::string packageVersion = PACKAGE_VERSION ;
+std::string packageUrl = PACKAGE_URL ;
+std::string statusFile = "/usr/local/nagios/var/status.dat" ;
+std::string progName = "";
+std::string authChain= "" ;
 
-string help() {
-    ostringstream msg("SYNOPSIS\n"
-                      "	" + progName +" [OPTIONS]\n"
-                      "\n"
-                      "OPTIONS\n"
-                      "	-c FILE\n"
-                      "	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
-                      "	-D\n"
-                      "	 Run the program in foreground mode. \n"
-                      "	-p\n"
-                      "	 Set the listening port. Default is 1983.\n"
-                      "	-P\n"
-                      "	 Change the authentication token.\n"
-                      "	-T\n"
-                      "	 Print the authentication token.\n"
-                      "	-v\n"
-                      "	 Print the version and copyright information.\n"
-                      "	-h\n"
-                      "	 Print this help.\n") ;
+std::string help() {
+    std::ostringstream msg("SYNOPSIS\n"
+                           "	" + progName +" [OPTIONS]\n"
+                           "\n"
+                           "OPTIONS\n"
+                           "	-c FILE\n"
+                           "	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
+                           "	-D\n"
+                           "	 Run the program in foreground mode. \n"
+                           "	-p\n"
+                           "	 Set the listening port. Default is 1983.\n"
+                           "	-P\n"
+                           "	 Change the authentication token.\n"
+                           "	-T\n"
+                           "	 Print the authentication token.\n"
+                           "	-v\n"
+                           "	 Print the version and copyright information.\n"
+                           "	-h\n"
+                           "	 Print this help.\n") ;
 
     return msg.str();
 }
 
-string version(){
-    ostringstream versionMsg("\n" + packageName + " (" + progName + ")\nVersion " + packageVersion + "\n"
-                             + "Copyright (c) 2010-2012 by NGRT4N Project <contact@ngrt4n.com>. All rights reserved.\n"
-			     + "Visit " + packageUrl + " for more information.");
+std::string version(){
+    std::ostringstream versionMsg(packageName + " (" + progName + ")"
+                                  + "\nVersion " + packageVersion
+                                  + "\nCopyright (c) 2010-2013 by NGRT4N Project. All rights reserved."
+                                  + "\nEmail: contact@ngrt4n.com. Web: "+packageUrl);
 
     return versionMsg.str();
 }
@@ -78,7 +79,7 @@ void ngrt4n::setPassChain(char* authChain) {
 
     ofstream ofpass;
 
-    ofpass.open( ngrt4n::AUTH_FILE.c_str() );
+    ofpass.open(ngrt4n::AUTH_FILE.c_str());
     if( ! ofpass.good()) {
         cerr << "Unable to set the authentication token." << endl;
         exit(1) ;
@@ -88,9 +89,9 @@ void ngrt4n::setPassChain(char* authChain) {
     ofpass.close();
 }
 
-string ngrt4n::getPassChain() {
+std::string ngrt4n::getPassChain() {
 
-    string authChain ;
+    std::string authChain ;
     ifstream pfile;
 
     pfile.open ( ngrt4n::AUTH_FILE.c_str() );
@@ -182,33 +183,30 @@ int main(int argc, char ** argv)
         setsid();
     }
 
-    ostringstream tcpAddr;
-    tcpAddr << "tcp://*:" << port ;
+    cout << "Starting "<< version() << "\n";
 
-    cout << "Starting "<< version() << endl << endl ;
-    cout << "Listening address => " << tcpAddr.str() << endl ;
-    cout << "Nagios status file => " << statusFile << endl ;
+    std::ostringstream uri;
+    uri << "tcp://*:" << port ;
+    Socket socket(ZMQ_REP);
+    socket.bind(uri.str());
 
-    zmq::context_t ctx(1);
-    zmq::socket_t* comChannel = new zmq::socket_t(ctx, ZMQ_REP);
-    comChannel->bind(tcpAddr.str().c_str());
-
-    cout << "Service started." << endl ;
+    cout << "Listening address => " << uri.str()
+         << "\nNagios status file => " << statusFile
+         << "\n============>started\n";
 
     MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
     while (true) {
-
-        string msg = ZmqHelper::recvFromSocket(*comChannel) ;
-        string reply = "" ;
+        std::string msg = socket.recv();
+        std::string reply;
         if(msg == "PING") {
             reply = "ALIVE:"+packageVersion;
         } else {
             size_t pos = msg.find(":") ;
-            string pass = "";
-            string sid = "";
-            if(pos != string::npos) {
+            std::string pass = "";
+            std::string sid = "";
+            if(pos != std::string::npos) {
                 pass = msg.substr(0, pos);
-                sid = msg.substr(pos+1, string::npos);
+                sid = msg.substr(pos+1, std::string::npos);
             }
             if(pass == authChain) {
                 reply = monitor->getInfOfService(sid) ;
@@ -216,12 +214,10 @@ int main(int argc, char ** argv)
                 reply = "{\"return_code\" : \"-2\", \"message\" : \"ERROR: Wrong authentication\"}";
             }
         }
-
-        ZmqHelper::sendFromSocket(*comChannel, reply) ;
+        socket.send(reply);
     }
 
-    comChannel->close() ;
-    delete comChannel ;
+    socket.disconnect();
 
     return 0;
 }

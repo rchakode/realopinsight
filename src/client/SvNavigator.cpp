@@ -30,6 +30,8 @@
 #include <sstream>
 #include <QStatusBar>
 #include <QObject>
+#include <zmq.h>
+#include<iostream>
 
 
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
@@ -223,17 +225,19 @@ void SvNavigator::handleShowAbout(void)
 
 int SvNavigator::runNagiosMonitor(void)
 {
-    zmq::context_t comContext(1);
-    string srvVer;
-    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl, srvVer);
-    if(!comChannel) {
-        QString msg = SERVICE_OFFLINE_MSG.arg(QString::fromStdString(serverUrl));
+    msocket = new Socket(ZMQ_REQ);
+    msocket->connect(serverUrl.toStdString());
+    msocket->makeHandShake();
+
+    if(! msocket->isConnected2Server()) {
+        QString msg = SERVICE_OFFLINE_MSG.arg(serverUrl);
         Utils::alert(msg);
         updateStatusBar(msg);
         success = false ;
     } else {
-        if(atoi(QString::fromStdString(srvVer).remove(".").toAscii()) < 110) {
-            Utils::alert(tr("ERROR: The server %1 is not supported").arg(QString::fromStdString(srvVer)));
+        if(msocket->getServerSerial() < 110) {
+            Utils::alert(tr("ERROR: The server %1 is not supported")
+                         .arg(msocket->getServerSerial()));
             success = false;
         }
         updateStatusBar(tr("Updating..."));
@@ -243,7 +247,7 @@ int SvNavigator::runNagiosMonitor(void)
 
     foreach(const QString & checkId, coreData->cnodes.keys()) {
 
-        NodeListT::iterator cnode = coreData->cnodes.find(checkId); //TODO
+        NodeListT::iterator cnode = coreData->cnodes.find(checkId);
         if(cnode == coreData->cnodes.end()) {
             continue;
         }
@@ -256,15 +260,16 @@ int SvNavigator::runNagiosMonitor(void)
 
         QStringList childNodes = cnode->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
-            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO à mettre au propre avec la nouvelle organization => cnodes
+            QString msg = serverAuthChain%":"%nodeId;
             if(success) {
-                ZmqHelper::sendFromSocket(*comChannel, msg);
-                msg = ZmqHelper::recvFromSocket(*comChannel);
+                msocket->send(msg.toStdString());
+                msg = QString::fromStdString(msocket->recv());
             } else {
-                msg = DEFAULT_ERROR_MSG.arg(QString::fromStdString(serverUrl)).toStdString();
+                msg = DEFAULT_ERROR_MSG.arg(serverUrl);
             }
-            JsonHelper jsHelper(msg);
-            if(jsHelper.getProperty("return_code").toInt32() == 0 && comChannel) {
+            JsonHelper jsHelper(msg.toStdString());
+            if(jsHelper.getProperty("return_code").toInt32() == 0
+                    && msocket->isConnected2Server()) {
                 cnode->check.status = jsHelper.getProperty("status").toInt32();
                 cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
                 cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
@@ -282,7 +287,7 @@ int SvNavigator::runNagiosMonitor(void)
         }
     }
     updateStats();
-    ZmqHelper::endCliChannel(comChannel);
+    msocket->disconnect();
     return 0;
 }
 
@@ -498,10 +503,10 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, con
 
 void SvNavigator::updateMonitoringSettings(){
     monitorBaseUrl = settings->value(Preferences::URL_KEY).toString();
-    serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString().toStdString();
+    serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString();
     serverAddr = settings->value(Preferences::SERVER_ADDR_KEY).toString();
     serverPort = settings->value(Preferences::SERVER_PORT_KEY).toString();
-    serverUrl = QString("tcp://%1:%2").arg(serverAddr).arg(serverPort).toStdString();
+    serverUrl = QString("tcp://%1:%2").arg(serverAddr).arg(serverPort);
     updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
     if (updateInterval <= 0) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000;
 }
@@ -541,7 +546,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
     if(node == coreData->bpnodes.end()) {
         node = coreData->cnodes.find(selectedNodeId);
         if(node == coreData->bpnodes.end()) {
-           process = false;
+            process = false;
         }
     }
 
@@ -689,7 +694,7 @@ void SvNavigator::loadMenus(void)
 void SvNavigator::openZabbixSession(void)
 {
     zxHelper->setBaseUrl(monitorBaseUrl);
-    QStringList params = QString::fromStdString(serverAuthChain).split(":");
+    QStringList params = serverAuthChain.split(":");
     params.push_back(QString::number(ZbxHelper::LOGIN));
     zxHelper->get(ZbxHelper::LOGIN, params);
 }
