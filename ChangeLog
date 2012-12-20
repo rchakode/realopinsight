@@ -4,8 +4,9 @@ NGRT4N/RealOpInsight ChangeLog
 
 2.1.1
 --------------
-  * Updated man pages
-  * Fixed compilation problems with c++11
+  * Added support for zeromq 3.x (ticket #3)
+  * Fixed compilation problems on c++11 (ticket #4)
+  * Update man pages
 
 2.1.0
 --------------
