@@ -82,8 +82,10 @@ SvNavigator::SvNavigator(const qint32 & _userRole,
       msgPanel(new MsgPanel()),
       nodeContextMenu (new QMenu()),
       zxHelper(new ZbxHelper()),
-      zxAuthToken(""),
-      hLeft(0)
+      zbxAuthToken(""),
+      hLeft(0),
+      znsHelper(new ZnsHelper()),
+      isLoggedOnZenoss(false)
 {
     setWindowTitle(tr("%1 Operations Console").arg(appName));
     loadMenus();
@@ -115,6 +117,7 @@ SvNavigator::~SvNavigator()
     delete monPrefWindow;
     delete changePasswdWindow;
     delete zxHelper;
+    delete znsHelper;
     if(filteredMsgPanel) delete filteredMsgPanel;
     unloadMenus();
 }
@@ -148,11 +151,15 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 void SvNavigator::startMonitor()
 {
     updateStatusBar(tr("Connecting to the server..."));
-    success = true ;
+    updateSucceed = true ;
     setEnabled(false);
     switch(coreData->monitor){
+    case MonitorBroker::ZENOSS:
+        isLoggedOnZenoss ? requestZenossEvents() : openZenossSession() ;
+        break;
+
     case MonitorBroker::ZABBIX:
-        zxAuthToken.isEmpty()? openZabbixSession() : requestZabbixChecks();
+        zbxAuthToken.isEmpty()? openZabbixSession() : requestZabbixTriggers();
         break;
     case MonitorBroker::NAGIOS:
     default :
@@ -170,6 +177,11 @@ void SvNavigator::timerEvent(QTimerEvent *)
 {
     startMonitor();
 }
+
+void  SvNavigator::updateStatusBar(const QString & msg) {
+    statusBar()->showMessage(msg);
+}
+
 
 void SvNavigator::load(const QString & _file)
 {
@@ -207,7 +219,7 @@ void SvNavigator::handleChangeMonitoringSettingsAction(void)
     updateMonitoringSettings();
     killTimer(timerId);
     timerId = startTimer(updateInterval);
-    zxAuthToken.clear();
+    zbxAuthToken.clear();
     startMonitor();
 }
 
@@ -233,12 +245,12 @@ int SvNavigator::runNagiosMonitor(void)
         QString msg = SERVICE_OFFLINE_MSG.arg(serverUrl);
         Utils::alert(msg);
         updateStatusBar(msg);
-        success = false ;
+        updateSucceed = false ;
     } else {
         if(msocket->getServerSerial() < 110) {
             Utils::alert(tr("ERROR: The server %1 is not supported")
                          .arg(msocket->getServerSerial()));
-            success = false;
+            updateSucceed = false;
         }
         updateStatusBar(tr("Updating..."));
     }
@@ -261,7 +273,7 @@ int SvNavigator::runNagiosMonitor(void)
         QStringList childNodes = cnode->child_nodes.split(Parser::CHILD_NODES_SEP);
         foreach(const QString & nodeId, childNodes) {
             QString msg = serverAuthChain%":"%nodeId;
-            if(success) {
+            if(updateSucceed) {
                 msocket->send(msg.toStdString());
                 msg = QString::fromStdString(msocket->recv());
             } else {
@@ -349,7 +361,7 @@ void SvNavigator::updateStats() {
     statsPanel = stats;
     msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
     msgPanel->resizeFields(msgPanelSize);
-    if(success) updateStatusBar("Update completed");
+    if(updateSucceed) updateStatusBar("Update completed");
 }
 
 void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
@@ -702,15 +714,15 @@ void SvNavigator::openZabbixSession(void)
 void SvNavigator::closeZabbixSession(void)
 {
     QStringList params;
-    params.push_back(zxAuthToken);
+    params.push_back(zbxAuthToken);
     params.push_back(QString::number(ZbxHelper::LOGOUT));
     zxHelper->get(ZbxHelper::LOGOUT, params);
 }
 
-void SvNavigator::retrieveZabbixTriggers(const QString & host)
+void SvNavigator::retrieveZabbixHostTriggers(const QString & host)
 {
     QStringList params;
-    params.push_back(zxAuthToken);
+    params.push_back(zbxAuthToken);
     params.push_back(host);
     params.push_back(QString::number(ZbxHelper::TRIGGER));
     zxHelper->get(ZbxHelper::TRIGGER, params);
@@ -718,8 +730,9 @@ void SvNavigator::retrieveZabbixTriggers(const QString & host)
 
 void SvNavigator::processZabbixReply(QNetworkReply* reply)
 {
+    reply->deleteLater();
+
     if (reply->error() != QNetworkReply::NoError) {
-        //reply->deleteLater();
         return;
     }
 
@@ -729,9 +742,9 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
 
     switch(dataId) {
     case ZbxHelper::LOGIN :
-        zxAuthToken = jsHelper.getProperty("result").toString();
+        zbxAuthToken = jsHelper.getProperty("result").toString();
         resetStatData();
-        requestZabbixChecks();
+        requestZabbixTriggers();
         break;
 
     case ZbxHelper::TRIGGER: {
@@ -791,7 +804,7 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
                 updateNode(node);
                 coreData->check_status_count[check->status]++;
             }
-            success = true;
+            updateSucceed = true;
             updateStats();
         }
         break;
@@ -801,20 +814,24 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
         exit(1);
         break;
     }
-    //reply->deleteLater();
 }
 
-void SvNavigator::requestZabbixChecks(void) {
+void SvNavigator::requestZabbixTriggers(void) {
     updateStatusBar(tr("Updating..."));
     foreach(const QString & host, coreData->hosts.keys()) {
-        retrieveZabbixTriggers(host);
+        retrieveZabbixHostTriggers(host);
     }
 }
 
+void SvNavigator::processPostError(QNetworkReply::NetworkError code){
 
-void SvNavigator::processZabbixError(QNetworkReply::NetworkError code){
-
-    QString msg = SERVICE_OFFLINE_MSG.arg(zxHelper->getApiUri()%tr(" (error code %1)").arg(code));
+    QString apiUrl = "";
+    if(coreData->monitor == MonitorBroker::ZABBIX) {
+        apiUrl = zxHelper->getApiUri();
+    } else if(coreData->monitor == MonitorBroker::ZENOSS){
+        apiUrl =  znsHelper->getRequestUrl();
+    }
+    QString msg = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(code));
     Utils::alert(msg);
     updateStatusBar(msg);
     foreach(const QString & c, coreData->cnodes.keys()) {
@@ -828,13 +845,71 @@ void SvNavigator::processZabbixError(QNetworkReply::NetworkError code){
         updateNode(node);
         coreData->check_status_count[MonitorBroker::UNKNOWN]++;
     }
-    success = false ;
+    updateSucceed = false ;
     updateStats();
 }
 
-void  SvNavigator::updateStatusBar(const QString & msg) {
-    statusBar()->showMessage(msg);
+
+void SvNavigator::openZenossSession(void)
+{
+    QUrl urlParams;
+    QStringList authInfo = QString::fromStdString(serverAuthChain).split(":");
+    znsHelper->setBaseUrl(monitorBaseUrl);  //Must be set before setting the came_from parameter
+    urlParams.addQueryItem("__ac_name", authInfo[0]);
+    urlParams.addQueryItem("__ac_password", authInfo[1]);
+    urlParams.addQueryItem("submitted", "true");
+    urlParams.addQueryItem("came_from", znsHelper->getApiContextUrl());
+    znsHelper->performPostRequest(ZnsHelper::LOGIN_REQUEST, urlParams.encodedQuery());
 }
+
+void SvNavigator::requestZenossEvents(void) {
+    updateStatusBar(tr("Updating..."));
+    foreach(const QString & host, coreData->hosts.keys()) {
+        //TODO
+    }
+}
+
+void SvNavigator::processZenossReply(QNetworkReply* reply)
+{
+    reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        return;
+    }
+
+    int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QString data = reply->readAll();
+    if ((code >= 200 && code < 300) ||  //Success
+            (code >= 300 && code < 400)) { // Redirection
+        QVariant cookiesContainer = reply->header(QNetworkRequest::SetCookieHeader);
+        QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
+        qDebug() << data;
+        if(znsHelper->cookieJar()->setCookiesFromUrl(cookies, znsHelper->getApiBaseUrl())){
+            if(data.endsWith("submitted=true")) {
+                isLoggedOnZenoss = true;
+                QString jsonReq = "{\"action\": \"EventsRouter\", \
+                        \"method\": \"query\", \
+                        \"data\": [{ \
+                           \"limit\": 100, \
+                           \"sort\": \"severity\", \
+                           \"dir\": \"DESC\", \
+                           \"start\": 0, \
+                           \"params\": { \
+                               \"device\": \"tchieudjie\", \
+                               \"eventState\": [0,1], \
+                               \"severity\": [5,4,3,2,1,0]} }], \
+                        \"type\": \"rpc\", \
+                        \"tid\": 1}";
+                QUrl eventsRouterUrl = QUrl(znsHelper->getApiContextUrl().toAscii()+"/evconsole_router");
+                znsHelper->setRequestUrl(eventsRouterUrl);
+                znsHelper->performPostRequest(ZnsHelper::EVENT_REQUEST, jsonReq.toAscii());
+            }
+        }
+    } else {
+        Utils::alert("Can't connect to the Zenoss API: " + data);
+    }
+}
+
 
 void SvNavigator::addEvents(void)
 {
@@ -857,5 +932,7 @@ void SvNavigator::addEvents(void)
     connect(map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
     connect(tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
     connect(zxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZabbixReply(QNetworkReply*)));
-    connect(zxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processZabbixError(QNetworkReply::NetworkError)));
+    connect(zxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processPostError(QNetworkReply::NetworkError)));
+    connect(znsHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZenossReply(QNetworkReply*)));
+    connect(znsHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processPostError(QNetworkReply::NetworkError)));
 }

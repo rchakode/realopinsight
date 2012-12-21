@@ -26,11 +26,11 @@
 #include <QDebug>
 #include <QMessageBox>
 
-const QString apiContext = "/api_jsonrpc.php";
+const QString API_CONTEXT = "/api_jsonrpc.php";
 
 ZbxHelper::ZbxHelper(const QString & baseUrl)
     : QNetworkAccessManager(),
-      apiUri(baseUrl + apiContext),
+      apiUri(baseUrl + API_CONTEXT),
       requestHandler(new QNetworkRequest()) {
     requestHandler->setRawHeader("Content-Type", "application/json");
     requestHandler->setUrl(QUrl(apiUri));
@@ -42,7 +42,7 @@ ZbxHelper::~ZbxHelper() {
 }
 
 void ZbxHelper::setBaseUrl(const QString & url) {
-    apiUri = url + apiContext ;
+    apiUri = url + API_CONTEXT ;
     requestHandler->setUrl(QUrl(apiUri));
 }
 

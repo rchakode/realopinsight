@@ -1,8 +1,8 @@
 #!/bin/bash
 
-BASE_NAME=ngrt4n-d4n-1.1.0
+BASE_NAME=realopinsight-2.1.0
 MACHINE=ubs-1
-SOURCE_TARBALL="../${BASE_NAME}.orig.tar.gz"
+SOURCE_TARBALL="/opt/dev/ngrt4n-qt/obs/${BASE_NAME}.orig.tar.gz"
 
 set -e 
 set -x

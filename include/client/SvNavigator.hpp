@@ -32,9 +32,9 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-//#include "core/ZmqHelper.hpp"
 #include "Socket.hpp"
 #include "ZbxHelper.hpp"
+#include "ZnsHelper.hpp"
 #include <QScriptValueIterator>
 
 class SvNavigator : public QMainWindow
@@ -75,7 +75,8 @@ public slots:
     void handleShowOnlineResources(void);
     void handleShowAbout(void);
     void processZabbixReply(QNetworkReply* reply);
-    void processZabbixError(QNetworkReply::NetworkError code);
+    void processPostError(QNetworkReply::NetworkError code);
+    void processZenossReply(QNetworkReply* reply);
 
 signals:
     void hasToBeUpdate(QString);
@@ -122,10 +123,12 @@ private:
 //    zmq::socket_t* comChannel;
     Socket* msocket;
     ZbxHelper* zxHelper;
-    QString zxAuthToken;
+    QString zbxAuthToken;
     qint32 hLeft;
     qint32 iter;
-    bool success;
+    bool updateSucceed;
+    ZnsHelper* znsHelper;
+    bool isLoggedOnZenoss;
 
 
     void addEvents(void);
@@ -136,11 +139,15 @@ private:
     void updateAlarmMsg(NodeListT::iterator &);
     void updateNode(NodeListT::iterator & _node) ;
     void updateStats();
+    void updateStatusBar(const QString & msg);
+
     void openZabbixSession(void);
     void closeZabbixSession(void);
-    void retrieveZabbixTriggers(const QString & host);
-    void updateStatusBar(const QString & msg);
-    void requestZabbixChecks(void);
+    void requestZabbixTriggers(void);
+    void retrieveZabbixHostTriggers(const QString & host);
+
+    void openZenossSession(void);
+    void requestZenossEvents(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

@@ -32,52 +32,53 @@ using namespace std ;
 class MonitorBroker {
 public:
     enum StatusT {
-	  OK = 0,
-	  WARNING = 1,
-	  CRITICAL = 2,
-	  UNKNOWN = 3,
-	  UNSET_STATUS = 4
+        OK = 0,
+        WARNING = 1,
+        CRITICAL = 2,
+        UNKNOWN = 3,
+        UNSET_STATUS = 4
     };
 
     enum SeverityT {
-      UNSET = 0,
-      INFO = 1,
-      WARN = 2,
-      AVERAGE = 3,
-      HIGH = 4,
-      DISASTER = 5
+        UNSET = 0,
+        INFO = 1,
+        WARN = 2,
+        AVERAGE = 3,
+        HIGH = 4,
+        DISASTER = 5
     };
 
     enum MonirorTypeT {
-      NAGIOS = 0,
-      ZABBIX = 1
+        NAGIOS = 0,
+        ZABBIX = 1,
+        ZENOSS = 2
     } ;
 
     typedef struct _CheckT{
-		string id;
-		string host ;
-		string check_command ;
-		string last_state_change ;
-		string alarm_msg ;
-		int status ;
+        string id;
+        string host ;
+        string check_command ;
+        string last_state_change ;
+        string alarm_msg ;
+        int status ;
     }CheckT;
     typedef CheckT NagiosCheckT;
-	typedef unordered_map<string, NagiosCheckT> NagiosChecksT ;
+    typedef unordered_map<string, NagiosCheckT> NagiosChecksT ;
 
-	MonitorBroker(const string & _sfile);
-	virtual ~MonitorBroker();
+    MonitorBroker(const string & _sfile);
+    virtual ~MonitorBroker();
 
-	string getInfOfService(const string & _sid) ;
-	static bool loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks) ;
+    string getInfOfService(const string & _sid) ;
+    static bool loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks) ;
 
-	static const int DEFAULT_PORT ;
-	static const int DEFAULT_UPDATE_INTERVAL ;
-	static const int MAX_MSG ;
+    static const int DEFAULT_PORT ;
+    static const int DEFAULT_UPDATE_INTERVAL ;
+    static const int MAX_MSG ;
 
 private:
-	int lastUpdate ;
-	string statusFile ;
-	NagiosChecksT services ;
+    int lastUpdate ;
+    string statusFile ;
+    NagiosChecksT services ;
 };
 
 #endif /* MONITORBROKER_HPP_ */

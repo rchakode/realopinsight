@@ -6,7 +6,7 @@
 class ZmqHelper
 {
 public:
-	ZmqHelper();
+    ZmqHelper();
 
     static zmq::socket_t *
     initCliChannel(zmq::context_t & context, const std::string & uri, std::string & srvVer);
@@ -24,7 +24,7 @@ public:
 	sendFromSocket(zmq::socket_t & socket, const std::string & string) ;
 
 	static std::string
-	recvFromSocket (zmq::socket_t & socket);
+    recvFromSocket (zmq::socket_t & socket);
 
 };
 
