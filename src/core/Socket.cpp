@@ -143,7 +143,7 @@ int Socket::getServerSerial() const {
 
 int Socket::convert2ServerSerial(const std::string & versionStr){
     std::string str = "";
-    for(int i = 0; i < versionStr.size(); i++) {
+    for(size_t i = 0; i < versionStr.size(); i++) {
         if(versionStr[i] >= '0' &&
                 versionStr[i]<= '9') {
             str += versionStr[i];

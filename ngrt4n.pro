@@ -62,12 +62,10 @@ HEADERS	+= include/core/ns.hpp \
     include/client/Utils.hpp \
     include/client/ZbxHelper.hpp \
     include/client/JsHelper.hpp \
-    include/core/Socket.hpp \
-    include/core/ZmqHelper.hpp
+    include/core/Socket.hpp
 
 SOURCES	+= src/core/utils.cpp \
     src/core/MonitorBroker.cpp \
-    src/core/ZmqHelper.cpp \
     src/client/Auth.cpp \
     src/client/Base.cpp \
     src/client/GraphView.cpp \

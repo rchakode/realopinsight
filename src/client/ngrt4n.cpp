@@ -26,7 +26,6 @@
 #include "client/Auth.hpp"
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
-#include "core/ZmqHelper.hpp"
 #include "client/ZbxHelper.hpp"
 #include <sstream>
 #include <getopt.h>
