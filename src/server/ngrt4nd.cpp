@@ -34,6 +34,8 @@
 #include <sstream>
 #include <fstream>
 #include <libgen.h>
+#include <iostream>
+#include "Logger.hpp"
 
 
 std::string packageName = PACKAGE_NAME ;
@@ -81,7 +83,7 @@ void ngrt4n::setPassChain(char* authChain) {
 
     ofpass.open(ngrt4n::AUTH_FILE.c_str());
     if( ! ofpass.good()) {
-        cerr << "Unable to set the authentication token." << endl;
+        clog << "Unable to set the authentication token." << endl;
         exit(1) ;
     }
 
@@ -96,7 +98,7 @@ std::string ngrt4n::getPassChain() {
 
     pfile.open ( ngrt4n::AUTH_FILE.c_str() );
     if( ! pfile.good()) {
-        cerr << "Unable to load the application's settings" << endl;
+        std::clog << "Unable to load the application's settings" << endl;
         exit(1) ;
     }
 
@@ -107,6 +109,7 @@ std::string ngrt4n::getPassChain() {
 
 int main(int argc, char ** argv)
 {
+    std::clog.rdbuf(new Logger("ngrt4nd", LOG_LOCAL0));
     progName = basename(argv[0]);
 
     bool foreground = false;
@@ -127,7 +130,7 @@ int main(int argc, char ** argv)
         case 'p': {
             port = atoi(optarg) ;
             if(port <= 0 ) {
-                cerr << "ERROR: bad port number." << endl ;
+                cerr << "ERROR: bad port number.\n";
                 exit(1) ;
             }
             break;
@@ -171,10 +174,16 @@ int main(int argc, char ** argv)
     ngrt4n::initApp() ;
     authChain = ngrt4n::getPassChain() ;
 
+    if(foreground) {
+        std::cerr << "Starting "<< version() << "\n";
+    } else {
+        std::clog << kLogNotice<< "Starting "<< version() << "\n";
+    }
+
     if( ! foreground ) {
         pid_t pid = fork();
         if(pid <= -1) {
-            cerr << "ERROR: failed while starting the program in daemon mode" << endl;
+            std::clog << "ERROR: failed while starting the program in daemon mode" << endl;
             exit(1);
         }
         else if(pid > 0) {
@@ -183,16 +192,21 @@ int main(int argc, char ** argv)
         setsid();
     }
 
-    cout << "Starting "<< version() << "\n";
 
     std::ostringstream uri;
     uri << "tcp://*:" << port ;
     Socket socket(ZMQ_REP);
     socket.bind(uri.str());
 
-    cout << "Listening address => " << uri.str()
-         << "\nNagios status file => " << statusFile
-         << "\n============>started\n";
+    if(foreground) {
+        std::cerr << "Listening address => " << uri.str()
+             << "\nNagios status file => " << statusFile
+             << "\n============>started\n";
+    } else {
+        std::clog << kLogNotice << "Listening address => " << uri.str()
+             << "\nNagios status file => " << statusFile
+             << "\n============>started\n";
+    }
 
     MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
     while (true) {
