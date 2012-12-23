@@ -81,7 +81,7 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
         node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
         node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
         node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-        node.status = MonitorBroker::UNSET_STATUS;
+        node.criticity = MonitorBroker::NAGIOS_UNKNOWN;
         node.parent = "";
 
         node.icon.remove("--> "); //FBWC

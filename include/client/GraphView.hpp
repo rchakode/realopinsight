@@ -41,7 +41,6 @@ public:
               const NodeListT & _cnodes);
     void updateNode(const NodeListT::iterator & _nodeIt,
                     const QString & _toolTip);
-    void updateNodeColor(const NodeListT::iterator & _node);
     void setNodeVisible(const QString & _nodeId,
                         const QString & _parent,
                         const bool & _visible, const qint32 & _level);

@@ -100,15 +100,15 @@ ServiceEditor::~ServiceEditor()
 
 void ServiceEditor::loadStatusFile(const QString & path)
 {
-    MonitorBroker::NagiosChecksT checks ;
+    MonitorBroker::ChecksT checks ;
     MonitorBroker::loadNagiosCollectedData(path.toStdString(), checks);
     setCheckListField( checks );
 }
 
-void ServiceEditor::setCheckListField(const MonitorBroker::NagiosChecksT& _nagios_checks)
+void ServiceEditor::setCheckListField(const MonitorBroker::ChecksT& _nagios_checks)
 {
     checkField()->clear() ;
-    for(MonitorBroker::NagiosChecksT::const_iterator it = _nagios_checks.begin(); it != _nagios_checks.end(); it++) {
+    for(MonitorBroker::ChecksT::const_iterator it = _nagios_checks.begin(); it != _nagios_checks.end(); it++) {
         checkField()->addItem(QString::fromStdString(it->second.id)) ;
     }
 }

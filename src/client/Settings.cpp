@@ -24,6 +24,7 @@
 
 #include "Base.hpp"
 #include "Auth.hpp"
+#include "Settings.hpp"
 #include "Preferences.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"

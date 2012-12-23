@@ -270,7 +270,7 @@ void GraphView::drawMap(const NodeListT & _bpnodes,
     if (coodFile.setFileName(coodinatesGraphFile),
             coodFile.open(QFile::ReadOnly)) {
 
-        pen.setColor(StatsLegend::UNKNOWN_COLOR);
+        pen.setColor(StatsLegend::COLOR_UNKNOWN);
         regexSep.setPattern("[ ]+");
         coodFileStream.setDevice(& coodFile);
 
@@ -349,61 +349,9 @@ void GraphView::drawNode(const NodeT & _node)
     gnodesList[_node.id].label->setToolTip(msg);
 }
 
-void GraphView::updateNodeColor(const NodeListT::iterator & _node)
-{
-    QColor color;
-    switch (_node->status) {
-    case MonitorBroker::OK:
-        color = StatsLegend::OK_COLOR;
-        break;
-
-    case MonitorBroker::WARNING:
-        color = StatsLegend::WARNING_COLOR;
-        break;
-
-    case MonitorBroker::CRITICAL:
-        color = StatsLegend::CRITICAL_COLOR;
-        break;
-
-    default:
-        color = StatsLegend::UNKNOWN_COLOR;
-        break;
-    }
-
-    QString label = "<span style=\"background: '"
-            %color.name()%"'\">&nbsp;"%_node->name%"&nbsp;</span>";
-    gnodesList[_node->id].label->setHtml(label);
-
-    GEdgeListT::iterator edge = edgesList.find(_node->parent + ":" + _node->id);
-    if(edge != edgesList.end()) {
-        edge->edge->setPen(color);
-    }
-}
-
 void GraphView::updateNode(const NodeListT::iterator & _node, const QString & _toolTip)
 {
-    QColor color;
-
-    switch (_node->status) {
-
-    case MonitorBroker::OK:
-        color = StatsLegend::OK_COLOR;
-        break;
-
-    case MonitorBroker::WARNING:
-        color = StatsLegend::WARNING_COLOR;
-        break;
-
-    case MonitorBroker::CRITICAL:
-        color = StatsLegend::CRITICAL_COLOR;
-        break;
-
-    default:
-        color = StatsLegend::UNKNOWN_COLOR;
-        break;
-    }
-
-    QString label = "<span style=\"background: '"%color.name()
+    QString label = "<span style=\"background: '"%Utils::getColor(_node->criticity).name()
             %"'\">&nbsp;" %_node->name%"&nbsp;</span>";
 
     GNodeListT::iterator gnodeIt =  gnodesList.find(_node->id);
@@ -418,25 +366,7 @@ void GraphView::updateNode(const NodeListT::iterator & _node, const QString & _t
             return;
         }
 
-        switch (_node->prop_status)
-        {
-        case MonitorBroker::OK:
-            color = StatsLegend::OK_COLOR;
-            break;
-
-        case MonitorBroker::WARNING:
-            color = StatsLegend::WARNING_COLOR;
-            break;
-
-        case MonitorBroker::CRITICAL:
-            color = StatsLegend::CRITICAL_COLOR;
-            break;
-
-        default:
-            color = StatsLegend::UNKNOWN_COLOR;
-            break;
-        }
-        edge->edge->setPen(color);
+        edge->edge->setPen(Utils::getColor(_node->prop_status));
     }
 }
 

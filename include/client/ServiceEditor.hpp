@@ -27,6 +27,7 @@
 
 #include "Base.hpp"
 #include "Parser.hpp"
+#include "Settings.hpp"
 
 
 const qint32 MAX_NODE_NAME = 24 ;
@@ -59,7 +60,7 @@ public:
 	void setContent( NodeListT::const_iterator ) ;
 	bool updateNode( NodeListT &, const QString& ) ;
 	bool updateNode(NodeListT::iterator & _node_it) ;
-	void setCheckListField( const MonitorBroker::NagiosChecksT& );
+	void setCheckListField( const MonitorBroker::ChecksT& );
 	void setEnableFields( const bool& );
 	void loadStatusFile(const QString &) ;
 	void setLowLevelAlarmComponentEnabled(bool enable){editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);}

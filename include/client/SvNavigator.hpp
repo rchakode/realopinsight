@@ -24,6 +24,7 @@
 #ifndef SVNAVIGATOR_HPP
 #define SVNAVIGATOR_HPP
 
+#include <QString>
 #include "Base.hpp"
 #include "Stats.hpp"
 #include "Parser.hpp"
@@ -59,7 +60,7 @@ public slots:
     void startMonitor();
     int runNagiosMonitor(void);
     void resetStatData(void);
-    void updateNodeStatus(QString);
+    void updateBpNode(QString);
     void expandNode(const QString & _nodeId,
                     const bool & _expand,
                     const qint32 & _level);
@@ -120,7 +121,6 @@ private:
     QString serverPort;
     QString serverUrl;
     QString serverAuthChain;
-//    zmq::socket_t* comChannel;
     Socket* msocket;
     ZbxHelper* zxHelper;
     QString zbxAuthToken;
@@ -135,17 +135,15 @@ private:
     void loadMenus(void);
     void unloadMenus(void);
     void updateMonitoringSettings();
-    void updateNavTreeItemStatus(const NodeListT::iterator &, const QString &);
-    void updateAlarmMsg(NodeListT::iterator &);
-    void updateNode(NodeListT::iterator & _node) ;
-    void updateStats();
+    void updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tip);
+    void updateAlarmMsg(NodeListT::iterator & _node);
+    void updateCNode(NodeListT::iterator & _node);
+    void updateStats(void);
     void updateStatusBar(const QString & msg);
-
     void openZabbixSession(void);
     void closeZabbixSession(void);
     void requestZabbixTriggers(void);
     void retrieveZabbixHostTriggers(const QString & host);
-
     void openZenossSession(void);
     void requestZenossEvents(void);
 };

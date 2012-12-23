@@ -20,29 +20,32 @@
 # along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.          #
 #--------------------------------------------------------------------------#
  */
-
-#include <QFileInfo>
+#include "StatsLegend.hpp"
 #include "Utils.hpp"
+#include <QFileInfo>
 #include <unistd.h>
 
 QString Utils::statusToString(const qint32 & _status)
 {
-    switch(_status)
+    switch(static_cast<MonitorBroker::CriticityT>(_status))
     {
-    case MonitorBroker::OK:
+    case MonitorBroker::CRITICITY_NORMAL:
         return "Normal";
         break;
 
-    case MonitorBroker::WARNING:
+    case MonitorBroker::CRITICITY_MINOR:
+        return  "Info";
+        break;
+
+    case MonitorBroker::CRITICITY_MAJOR:
         return  "Warning";
         break;
 
-    case MonitorBroker::CRITICAL:
+    case MonitorBroker::CRITICITY_HIGH:
         return  "Critical";
         break;
 
     default:
-        return "Unknown";
         break;
     }
 
@@ -69,3 +72,138 @@ void Utils::delay(const qint32 & d) {
 }
 
 
+MonitorBroker::CriticityT Utils::getCriticity(const int& _monitor, const int & _statusOrSeverity) {
+
+    int criticity = MonitorBroker::CRITICITY_UNKNOWN;
+
+    if(_monitor == MonitorBroker::NAGIOS) {
+
+        switch(_statusOrSeverity) {
+        case MonitorBroker::NAGIOS_OK:
+            criticity = MonitorBroker::CRITICITY_NORMAL;
+            break;
+
+        case MonitorBroker::NAGIOS_WARNING:
+            criticity = MonitorBroker::CRITICITY_MAJOR;
+            break;
+
+        case MonitorBroker::NAGIOS_CRITICAL:
+            criticity = MonitorBroker::CRITICITY_HIGH;
+            break;
+
+        default:
+            // MonitorBroker::NAGIOS_UNKNOWN
+            // keep the default criticity
+            break;
+        }
+
+    } else if (_monitor == MonitorBroker::ZABBIX) {
+
+        switch(_statusOrSeverity) {
+        case MonitorBroker::ZABBIX_INFO:
+            criticity = MonitorBroker::CRITICITY_NORMAL;
+            break;
+
+        case MonitorBroker::ZABBIX_WARN:
+            criticity = MonitorBroker::CRITICITY_MINOR;
+            break;
+
+        case MonitorBroker::ZABBIX_AVERAGE:
+            criticity = MonitorBroker::CRITICITY_MAJOR;
+            break;
+
+        case MonitorBroker::ZABBIX_HIGH:
+        case MonitorBroker::ZABBIX_DISASTER:
+            criticity = MonitorBroker::CRITICITY_HIGH;
+            break;
+        default:
+            // MonitorBroker::ZABBIX_UNCLASSIFIED
+            // keep the default criticity
+            break;
+        }
+
+    } else if (_monitor == MonitorBroker::ZENOSS){
+
+        switch(_statusOrSeverity) {
+        case MonitorBroker::ZENOSS_CLEAR:
+            criticity = MonitorBroker::CRITICITY_NORMAL;
+            break;
+
+        case MonitorBroker::ZENOSS_DEBUG:
+            criticity = MonitorBroker::CRITICITY_MINOR;
+            break;
+
+        case MonitorBroker::ZENOSS_WARNING:
+            criticity = MonitorBroker::CRITICITY_MAJOR;
+            break;
+
+        case MonitorBroker::ZENOSS_ERROR:
+        case MonitorBroker::ZENOSS_CRITICAL:
+            criticity = MonitorBroker::CRITICITY_HIGH;
+            break;
+        default:
+            // keep the default criticity
+            break;
+        }
+    }
+
+    return static_cast<MonitorBroker::CriticityT>(criticity);
+}
+
+
+QColor Utils::getColor(const int & _criticity) {
+
+    QColor color(StatsLegend::COLOR_UNKNOWN);
+    switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
+    case MonitorBroker::CRITICITY_NORMAL:
+        color = StatsLegend::COLOR_NORMAL;
+        break;
+
+    case MonitorBroker::CRITICITY_MINOR:
+        color = StatsLegend::COLOR_MINOR;
+        break;
+
+    case MonitorBroker::CRITICITY_MAJOR:
+        color = StatsLegend::COLOR_MAJOR;
+        break;
+
+    case MonitorBroker::CRITICITY_HIGH:
+        color = StatsLegend::COLOR_CRITICAL;
+        break;
+
+    default:
+        // color = StatsLegend::COLOR_UNKNOWN;
+        break;
+    }
+
+    return color;
+}
+
+
+QIcon Utils::getTreeIcon(const int & _criticity) {
+
+    QString ipath(":/images/unknown.png");
+    switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
+    case MonitorBroker::CRITICITY_NORMAL:
+        ipath = ":/images/normal.png";
+        break;
+
+    case MonitorBroker::CRITICITY_MINOR:
+        ipath = ":/images/info.png";  //TODO create approproate icon
+        break;
+
+    case MonitorBroker::CRITICITY_MAJOR:
+        ipath = ":/images/warning.png";
+        break;
+
+    case MonitorBroker::CRITICITY_HIGH:
+        ipath = ":/images/critical.png";
+        break;
+
+    default:
+        // color = ":/images/unknown.png";
+        break;
+    }
+
+    return QIcon(ipath);
+}

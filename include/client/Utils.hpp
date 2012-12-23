@@ -25,7 +25,7 @@
 #define UTILS_HPP
 
 #include "Base.hpp"
-#include "QString"
+#include <QString>
 
 namespace Utils {
 QString
@@ -37,7 +37,7 @@ alert(const QString  & msg);
 QString
 getAbsolutePath(const QString & _path);
 void
-delay(const qint32 & d) ;
+delay(const qint32 & d);
 }
 
 #endif // UTILS_HPP

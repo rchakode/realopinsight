@@ -25,20 +25,18 @@
 #define UTILS_HPP
 
 #include "Base.hpp"
-#include "QString"
+#include <QString>
+#include <QIcon>
 
 namespace Utils {
-QString
-statusToString(const qint32 & _status);
-void
-clear(Struct& data);
-void
-alert(const QString  & msg);
-QString
-getAbsolutePath(const QString & _path);
-void
-delay(const qint32 & d) ;
-
+QString statusToString(const qint32 & _status);
+void clear(Struct& data);
+void alert(const QString  & msg);
+QString getAbsolutePath(const QString & _path);
+void delay(const qint32 & d);
+MonitorBroker::CriticityT getCriticity(const int& _monitor, const int & _statusOrSeverity);
+QColor getColor(const int &_criticity);
+QIcon getTreeIcon(const int &_criticity);
 } //NAMESPACE
 
 #endif // UTILS_HPP

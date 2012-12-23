@@ -26,65 +26,74 @@
 
 
 
-const QColor StatsLegend::OK_COLOR =  Qt::green ;
-const QColor StatsLegend::WARNING_COLOR = QColor("#FF8C00") ; //Qt::yellow ;
-const QColor StatsLegend::CRITICAL_COLOR = Qt::red ;
-const QColor StatsLegend::UNKNOWN_COLOR = Qt::lightGray ;
-const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200) ;
-const qint32 StatsLegend::DefaultWidth=250 ;
-const qint32 StatsLegend::DefaultHeight=300 ;
+const QColor StatsLegend::COLOR_NORMAL =  Qt::green;
+const QColor StatsLegend::COLOR_MINOR = Qt::yellow;
+const QColor StatsLegend::COLOR_MAJOR = QColor("#FF8C00");
+const QColor StatsLegend::COLOR_CRITICAL = Qt::red;
+const QColor StatsLegend::COLOR_UNKNOWN = Qt::lightGray;
+const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200);
+const qint32 StatsLegend::DefaultWidth=250;
+const qint32 StatsLegend::DefaultHeight=300;
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
 : QWidget(_parent)
 {
 	QFont font("Times", 10, QFont::NoAntialias);
-	QFontMetrics font_metrics(font) ;
+    QFontMetrics font_metrics(font);
 
-	qint32 x_top_corner = _left_top_corner.x() ;
-	qint32 y_top_corner = _left_top_corner.y() ;
-	qint32 x_label = x_top_corner + 15 ;
-	qint32 char_w = font_metrics.charWidth("c", 0) ;
+    qint32 x_top_corner = _left_top_corner.x();
+    qint32 y_top_corner = _left_top_corner.y();
+    qint32 x_label = x_top_corner + 15;
+    qint32 char_w = font_metrics.charWidth("c", 0);
 
-	normal.addRect(x_top_corner, y_top_corner, 10, 10) ;
-    normal.addText(x_label, y_top_corner + 10, font, tr("normal")) ;
+    //FIXME: to be adapted
+    normal.addRect(x_top_corner, y_top_corner, 10, 10);
+    normal.addText(x_label, y_top_corner + 10, font, tr("normal"));
 
-	warning.addRect(x_top_corner, y_top_corner + 15 , 10, 10) ;
-    warning.addText(x_label, y_top_corner + 25, font, tr("warning")) ;
+    minor.addRect(x_top_corner, y_top_corner + 15 , 10, 10);
+    minor.addText(x_label, y_top_corner + 25, font, tr("minor"));
 
-	critical.addRect(x_top_corner, y_top_corner + 30, 10, 10) ;
-    critical.addText(x_label, y_top_corner + 40, font, tr("critical")) ;
+    major.addRect(x_top_corner, y_top_corner + 30 , 10, 10);
+    major.addText(x_label, y_top_corner + 40, font, tr("major"));
 
-	unknown.addRect(x_top_corner, y_top_corner + 45, 10, 10) ;
-    unknown.addText(x_label, y_top_corner + 55, font, tr("unknown")) ;
+    critical.addRect(x_top_corner, y_top_corner + 45, 10, 10);
+    critical.addText(x_label, y_top_corner + 55, font, tr("critical"));
 
-	resize(x_label + 10 * char_w, y_top_corner + 65) ;
-	setStyleSheet("background:transparent") ;
+    unknown.addRect(x_top_corner, y_top_corner + 60, 10, 10);
+    unknown.addText(x_label, y_top_corner + 70, font, tr("unknown"));
+
+    resize(x_label + 10 * char_w, y_top_corner + 80);
+    setStyleSheet("background:transparent");
 }
 
 void StatsLegend::paintEvent(QPaintEvent *)
 {
-	QPainter painter(this) ;
-	painter.setRenderHint(QPainter::Antialiasing) ;
+    //FIXME: to be adapted
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
 
-	painter.setBrush( OK_COLOR ) ;
-	painter.drawPath(normal) ;
+    painter.setBrush(COLOR_NORMAL);
+    painter.drawPath(normal);
 
-	painter.setBrush( WARNING_COLOR ) ;
-	painter.drawPath(warning) ;
+    painter.setBrush(COLOR_MINOR);
+    painter.drawPath(minor);
 
-	painter.setBrush( CRITICAL_COLOR) ;
-	painter.drawPath(critical) ;
+    painter.setBrush(COLOR_MAJOR);
+    painter.drawPath(major);
 
-	painter.setBrush( UNKNOWN_COLOR ) ;
-	painter.drawPath(unknown) ;
+    painter.setBrush(COLOR_CRITICAL);
+    painter.drawPath(critical);
+
+    painter.setBrush(COLOR_UNKNOWN);
+    painter.drawPath(unknown);
 }
 
 QSize StatsLegend::minimumSizeHint() const
 		{
-	return QSize(DefaultWidth, DefaultHeight) ;
+    return QSize(DefaultWidth, DefaultHeight);
 		}
 
  QSize StatsLegend::sizeHint() const
 		{
-	return QSize(DefaultWidth, DefaultHeight) ;
+    return QSize(DefaultWidth, DefaultHeight);
 		}

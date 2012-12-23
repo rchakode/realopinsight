@@ -46,7 +46,7 @@ string MonitorBroker::getInfOfService(const string & _sid)
         lastUpdate = curTime ;
     }
 
-    NagiosChecksT::iterator it = services.find(_sid) ;
+    ChecksT::iterator it = services.find(_sid) ;
 
     if (it == services.end() ) {
         return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}" ;
@@ -64,7 +64,7 @@ string MonitorBroker::getInfOfService(const string & _sid)
     return ret.str();
 }
 
-bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks)
+bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _checks)
 {
 
     ifstream stFileStream ;
@@ -82,8 +82,8 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, NagiosChecksT
         if( line.find("hoststatus") == string::npos &&
                 line.find("servicestatus") == string::npos ) continue ;
 
-        NagiosCheckT info;
-        info.status = UNSET_STATUS ;
+        CheckT info;
+        info.status = NAGIOS_UNKNOWN ;
         while (getline(stFileStream, line), ! stFileStream.eof()) {
 
             size_t pos = line.find("}") ; if( pos != string::npos ) break ;

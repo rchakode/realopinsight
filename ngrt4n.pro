@@ -62,12 +62,13 @@ HEADERS	+= include/core/ns.hpp \
     include/client/Utils.hpp \
     include/client/ZbxHelper.hpp \
     include/client/JsHelper.hpp \
-    include/core/Socket.hpp
+    include/core/Socket.hpp \
+    include/client/ZnsHelper.hpp \
+    include/client/Settings.hpp
 
 SOURCES	+= src/core/utils.cpp \
     src/core/MonitorBroker.cpp \
     src/client/Auth.cpp \
-    src/client/Base.cpp \
     src/client/GraphView.cpp \
     src/client/MsgPanel.cpp \
     src/client/Parser.cpp \
@@ -84,7 +85,9 @@ SOURCES	+= src/core/utils.cpp \
     src/client/Utils.cpp \
     src/client/ZbxHelper.cpp \
     src/client/JsHelper.cpp \
-    src/core/Socket.cpp
+    src/core/Socket.cpp \
+    src/client/ZnsHelper.cpp \
+    src/client/Settings.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts

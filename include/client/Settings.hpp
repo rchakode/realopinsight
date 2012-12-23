@@ -1,8 +1,8 @@
 /*
- * Auth.hpp
+ * Utils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update : 11-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,44 +21,20 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
+#ifndef SETTINGS_HPP
+#define SETTINGS_HPP
+#include <QString>
 #include <QSettings>
-#include "Base.hpp"
-#include "Settings.hpp"
 
-class Auth : public QDialog
+class Settings : public QSettings
 {
-
-	Q_OBJECT
-
 public:
-	Auth();
-	virtual ~Auth();
-
-	static const QString ADM_USER_NAME ;
-	static const QString OP_USER_NAME ;
-	static const qint32 ADM_USER_ROLE ;
-	static const qint32 OP_USER_ROLE ;
-
-public slots:
-void cancel(void) ;
-void authentificate(void) ;
-
+    Settings();
+    void setKeyValue(const QString & _key, const QString & _value);
 
 private:
-	QDialogButtonBox* buttonBox;
-	QLineEdit* login;
-	QLineEdit* password;
-	QGridLayout* layout;
-	Settings* settings;
-
-	void addEvents(void);
-
+    QTranslator* translator ;
 };
 
-#endif /* SNAVAUTH_HPP_ */
+
+#endif // SETTINGS_HPP
