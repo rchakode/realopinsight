@@ -248,7 +248,7 @@ bool GraphView::load(const QString & _dotFile,
         drawMap(_bpnodes, _cnodes);
         graphScene->setSceneRect(graphScene->itemsBoundingRect());
     } else {
-        Utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
+        utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
         qDebug() << tr("The graph engine exited with the code %1").arg(exitCode);
         exit(exitCode);
     }
@@ -351,7 +351,7 @@ void GraphView::drawNode(const NodeT & _node)
 
 void GraphView::updateNode(const NodeListT::iterator & _node, const QString & _toolTip)
 {
-    QString label = "<span style=\"background: '"%Utils::getColor(_node->criticity).name()
+    QString label = "<span style=\"background: '"%utils::getColor(_node->criticity).name()
             %"'\">&nbsp;" %_node->name%"&nbsp;</span>";
 
     GNodeListT::iterator gnodeIt =  gnodesList.find(_node->id);
@@ -366,7 +366,7 @@ void GraphView::updateNode(const NodeListT::iterator & _node, const QString & _t
             return;
         }
 
-        edge->edge->setPen(Utils::getColor(_node->prop_status));
+        edge->edge->setPen(utils::getColor(_node->prop_status));
     }
 }
 

@@ -54,12 +54,12 @@ bool Parser::parseSvConfig(const QString & _configFile, Struct & _coreData)
     QDomElement xmlRoot;
     QFile file(_configFile);
     if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-        Utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
+        utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
         return false;
     }
     if (! xmlDoc.setContent(&file)) {
         file.close();
-        Utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
+        utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
         return false;
     }
     xmlRoot = xmlDoc.documentElement();
@@ -176,7 +176,7 @@ void Parser::buildNodeTree(NodeListT & _bpnodes,
 
             TreeNodeItemListT::iterator nitem = _tree.find(node->id);
             if (nitem == _tree.end()) {
-                Utils::alert(QObject::tr("service not found %1").arg(node->name));
+                utils::alert(QObject::tr("service not found %1").arg(node->name));
                 continue;
             }
 
@@ -193,7 +193,7 @@ void Parser::saveCoordinatesDotFile(const QString& _graph_content)
     graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
     QFile file(graphFilename);
     if(!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-        Utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
+        utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
         exit(1);
     }
     QTextStream file_stream(&file);

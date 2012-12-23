@@ -232,10 +232,10 @@ void Preferences::changePasswd(void)
 
             done(0);
         } else {
-            Utils::alert(tr("Sorry the passwords do not match"));
+            utils::alert(tr("Sorry the passwords do not match"));
         }
     } else {
-        Utils::alert(tr("Authentication failed"));
+        utils::alert(tr("Authentication failed"));
     }
 }
 

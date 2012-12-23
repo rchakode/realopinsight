@@ -66,7 +66,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node)
     QString time_ = ctime(&time);
     QString line[msgPanelColumnCount];
     line[0] = time_.remove("\n");
-    line[1] = Utils::statusToString(_node->criticity);
+    line[1] = utils::statusToString(_node->criticity);
     line[2] = QString(_node->check.host.c_str());
     line[3] = " " + _node->name;
 
@@ -107,7 +107,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node)
         }
     }
 
-    item(0, 1)->setBackground(QBrush(Utils::getColor(_node->criticity)));
+    item(0, 1)->setBackground(QBrush(utils::getColor(_node->criticity)));
     //TODO: check the default sorting
     //SortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
 }

@@ -186,7 +186,7 @@ void  SvNavigator::updateStatusBar(const QString & msg) {
 void SvNavigator::load(const QString & _file)
 {
     if( ! _file.isEmpty()) {
-        configFile = Utils::getAbsolutePath(_file);
+        configFile = utils::getAbsolutePath(_file);
     }
     openedFile = configFile;
     Parser parser;
@@ -243,12 +243,12 @@ int SvNavigator::runNagiosMonitor(void)
 
     if(! msocket->isConnected2Server()) {
         QString msg = SERVICE_OFFLINE_MSG.arg(serverUrl);
-        Utils::alert(msg);
+        utils::alert(msg);
         updateStatusBar(msg);
         updateSucceed = false ;
     } else {
         if(msocket->getServerSerial() < 110) {
-            Utils::alert(tr("ERROR: The server %1 is not supported")
+            utils::alert(tr("ERROR: The server %1 is not supported")
                          .arg(msocket->getServerSerial()));
             updateSucceed = false;
         }
@@ -319,7 +319,7 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
 {
     QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
             .arg(const_cast<QString&>(_node.description).replace("\n", " "))
-            .arg(Utils::statusToString(_node.criticity))
+            .arg(utils::statusToString(_node.criticity))
             .arg(StatusCalcRules::label(_node.status_crule))
             .arg(StatusPropRules::label(_node.status_prule));
     if (_node.type == NodeType::ALARM_NODE) {
@@ -343,7 +343,7 @@ void SvNavigator::updateCNode(NodeListT::iterator & _node) {
 
     _node->criticity =
             _node->prop_status =
-            Utils::getCriticity(coreData->monitor, _node->check.status);
+            utils::getCriticity(coreData->monitor, _node->check.status);
     updateAlarmMsg(_node);
     QString toolTip = getNodeToolTip(*_node);
     updateNavTreeItemStatus(_node, toolTip);
@@ -457,7 +457,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, con
 
     TreeNodeItemListT::iterator tnode_it = coreData->tree_items.find(_node->id);
     if(tnode_it != coreData->tree_items.end()) {
-        (*tnode_it)->setIcon(0, Utils::getTreeIcon(_node->criticity));
+        (*tnode_it)->setIcon(0, utils::getTreeIcon(_node->criticity));
         (*tnode_it)->setToolTip(0, _tip);
     }
 }
@@ -713,7 +713,7 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
             if(check.status != MonitorBroker::NAGIOS_OK) {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
                 int sev = triggerData.property("priority").toInteger();
-                Criticity st(Utils::getCriticity(coreData->monitor, sev));
+                Criticity st(utils::getCriticity(coreData->monitor, sev));
                 check.status = st.getValue();
             } else {
                 check.alarm_msg = triggerName.toStdString(); //TODO
@@ -759,7 +759,7 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
         break;
     }
     default :
-        Utils::alert(tr("ERROR: Weird response received from the server"));
+        utils::alert(tr("ERROR: Weird response received from the server"));
         exit(1);
         break;
     }
@@ -781,7 +781,7 @@ void SvNavigator::processPostError(QNetworkReply::NetworkError code){
         apiUrl =  znsHelper->getRequestUrl();
     }
     QString msg = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(code));
-    Utils::alert(msg);
+    utils::alert(msg);
     updateStatusBar(msg);
     foreach(const QString & c, coreData->cnodes.keys()) {
         NodeListT::iterator node = coreData->bpnodes.find(c);
@@ -855,7 +855,7 @@ void SvNavigator::processZenossReply(QNetworkReply* reply)
             }
         }
     } else {
-        Utils::alert("Can't connect to the Zenoss API: " + data);
+        utils::alert("Can't connect to the Zenoss API: " + data);
     }
 }
 

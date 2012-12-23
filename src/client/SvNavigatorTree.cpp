@@ -56,7 +56,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
                 QTreeWidget::dropEvent( _event ) ;
                 emit treeNodeMoved(selectedNode) ;
             }else {
-                Utils::alert(tr("Dropping is not allowed on the target node"));
+                utils::alert(tr("Dropping is not allowed on the target node"));
             }
         }
     }

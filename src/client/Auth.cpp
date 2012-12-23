@@ -87,7 +87,7 @@ void Auth::authentificate(void)
 			&& userPasswd == opPasswd ) {
 		done(OP_USER_ROLE);
 	} else {
-        Utils::alert(tr("Authentication failed: wrong username or password"));
+        utils::alert(tr("Authentication failed: wrong username or password"));
 	}
 }
 

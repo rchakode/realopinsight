@@ -88,20 +88,20 @@ int main(int argc, char **argv)
 
     QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("Loading...\n\n%1"))
                                                   .arg(QString::fromStdString(versionMsg.str())));
-    Utils::delay(2);
+    utils::delay(2);
     QString file = (argc >= 2)? argv[1] : "";
     if(file == "") {
         info->clearMessage();
         info->showMessage(QObject::tr("You need to select a configuration file!"),
                           Qt::AlignCenter|Qt::AlignCenter);
-        Utils::delay(1); info->finish(0);
+        utils::delay(1); info->finish(0);
         file = QFileDialog::getOpenFileName(0,
                                             QObject::tr("%1 | Select a configuration file").arg(appName),
                                             ".",
                                             QObject::tr("Xml files (*.xml);;All files (*)"));
 
         if(! file.length()){
-            Utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
+            utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
             exit (1);
         }
     }

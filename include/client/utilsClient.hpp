@@ -21,13 +21,13 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef UTILS_CLIENT_HPP
+#define UTILS_CLIENT_HPP
 
 #include "Base.hpp"
 #include <QString>
 
-namespace Utils {
+namespace utils {
 QString
 statusToString(const qint32 & _status);
 void
@@ -40,4 +40,4 @@ void
 delay(const qint32 & d);
 }
 
-#endif // UTILS_HPP
+#endif // UTILS_CLIENT_HPP

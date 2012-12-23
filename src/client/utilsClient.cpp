@@ -25,7 +25,7 @@
 #include <QFileInfo>
 #include <unistd.h>
 
-QString Utils::statusToString(const qint32 & _status)
+QString utils::statusToString(const qint32 & _status)
 {
     switch(static_cast<MonitorBroker::CriticityT>(_status))
     {
@@ -52,27 +52,27 @@ QString Utils::statusToString(const qint32 & _status)
     return "Unknown";
 }
 
-void Utils::clear(Struct& data) {
+void utils::clear(Struct& data) {
     data.cnodes.clear();
     data.bpnodes.clear();
     data.tree_items.clear();
 }
 
-void Utils::alert(const QString  & msg) {
+void utils::alert(const QString  & msg) {
     QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
 }
 
-QString Utils::getAbsolutePath(const QString & _path) {
+QString utils::getAbsolutePath(const QString & _path) {
     QFileInfo fileInfo(_path);
     return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
 }
 
-void Utils::delay(const qint32 & d) {
+void utils::delay(const qint32 & d) {
     sleep(d);
 }
 
 
-MonitorBroker::CriticityT Utils::getCriticity(const int& _monitor, const int & _statusOrSeverity) {
+MonitorBroker::CriticityT utils::getCriticity(const int& _monitor, const int & _statusOrSeverity) {
 
     int criticity = MonitorBroker::CRITICITY_UNKNOWN;
 
@@ -151,7 +151,7 @@ MonitorBroker::CriticityT Utils::getCriticity(const int& _monitor, const int & _
 }
 
 
-QColor Utils::getColor(const int & _criticity) {
+QColor utils::getColor(const int & _criticity) {
 
     QColor color(StatsLegend::COLOR_UNKNOWN);
     switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
@@ -180,7 +180,7 @@ QColor Utils::getColor(const int & _criticity) {
 }
 
 
-QIcon Utils::getTreeIcon(const int & _criticity) {
+QIcon utils::getTreeIcon(const int & _criticity) {
 
     QString ipath(":/images/unknown.png");
     switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {

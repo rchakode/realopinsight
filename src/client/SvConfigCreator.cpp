@@ -110,13 +110,13 @@ void SvCreator::loadFile(const QString& _path)
 {
     Parser parser;
     if(_path == NULL) return;
-    Utils::clear(*coreData);
+    utils::clear(*coreData);
     if (! parser.parseSvConfig(_path, *coreData) ) {
-        Utils::alert(tr("Unable to open the file '%1'").arg(_path));
+        utils::alert(tr("Unable to open the file '%1'").arg(_path));
         exit(1);
     }
     navigationTree->update(coreData);
-    openedFile = Utils::getAbsolutePath(_path);
+    openedFile = utils::getAbsolutePath(_path);
 }
 
 void SvCreator::import(){
@@ -131,7 +131,7 @@ void SvCreator::newBusinessView(void)
 {
     NodeT node;
     if( ! close(false) ) {
-        Utils::clear(*coreData);
+        utils::clear(*coreData);
         node.id = SvNavigatorTree::rootID;
         node.name = "New Business view";
         node.child_nodes.clear();
@@ -157,7 +157,7 @@ void SvCreator::newNode(void)
     static int count = 1;
     NodeListT::iterator pNode = coreData->bpnodes.find( selectedNodeId );
     if(pNode == coreData->bpnodes.end() || pNode->type == NodeType::ALARM_NODE ) {
-        Utils::alert(tr("This action not allowed on the target node"));
+        utils::alert(tr("This action not allowed on the target node"));
         return;
     }
     NodeT node;
@@ -372,7 +372,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         } else {
             if ( node->type == NodeType::SERVICE_NODE && ! node->child_nodes.isEmpty() ) {
                 editor->typeField()->setCurrentIndex( 0 );
-                Utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
+                utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
             } else {
                 if(editor->updateNode(node)) {
                     coreData->tree_items[selectedNode]->setText(0, node->name);
@@ -460,7 +460,7 @@ void SvCreator::saveInFile(const QString& _path)
     }
     ofile << "</ServiceView>\n";
     hasToBeSaved = 0;
-    openedFile = openedFile = Utils::getAbsolutePath(_path);
+    openedFile = openedFile = utils::getAbsolutePath(_path);
     statusBar()->showMessage(tr("saved"));
     setWindowTitle(tr("%1 Editor - %2").arg(appName).arg(openedFile));
     file.close();

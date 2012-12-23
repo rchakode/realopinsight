@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.1.1
+VERSION_=2.1.2
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
@@ -36,7 +36,7 @@ DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_YEAR='\"2013\"'"
-DEFINES *= "RELEASE_NAME='\"M-Sylvie\"'"
+DEFINES *= "RELEASE_NAME='\"T-Lucia\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
@@ -59,14 +59,14 @@ HEADERS	+= include/core/ns.hpp \
     include/client/SvNavigator.hpp \
     include/client/SvNavigatorTree.hpp \
     include/client/WebKit.hpp \
-    include/client/Utils.hpp \
     include/client/ZbxHelper.hpp \
     include/client/JsHelper.hpp \
     include/core/Socket.hpp \
     include/client/ZnsHelper.hpp \
-    include/client/Settings.hpp
+    include/client/Settings.hpp \
+    include/client/utilsClient.hpp
 
-SOURCES	+= src/core/utils.cpp \
+SOURCES	+= \
     src/core/MonitorBroker.cpp \
     src/client/Auth.cpp \
     src/client/GraphView.cpp \
@@ -82,12 +82,13 @@ SOURCES	+= src/core/utils.cpp \
     src/client/SvNavigator.cpp \
     src/client/SvNavigatorTree.cpp \
     src/client/WebKit.cpp \
-    src/client/Utils.cpp \
     src/client/ZbxHelper.cpp \
     src/client/JsHelper.cpp \
     src/core/Socket.cpp \
     src/client/ZnsHelper.cpp \
-    src/client/Settings.cpp
+    src/client/Settings.cpp \
+    src/client/utilsClient.cpp \
+    src/core/utilsCore.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts

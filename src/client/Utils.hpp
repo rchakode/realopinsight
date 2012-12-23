@@ -28,7 +28,7 @@
 #include <QString>
 #include <QIcon>
 
-namespace Utils {
+namespace utils {
 QString statusToString(const qint32 & _status);
 void clear(Struct& data);
 void alert(const QString  & msg);
