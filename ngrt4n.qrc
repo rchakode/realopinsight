@@ -8,6 +8,11 @@
         <file>images/built-in/refresh.png</file>
         <file>images/built-in/folder.png</file>
         <file>images/built-in/import.png</file>
+        <file>images/built-in/normal.png</file>
+        <file>images/built-in/major.png</file>
+        <file>images/built-in/minor.png</file>
+        <file>images/built-in/critical.png</file>
+        <file>images/built-in/unknown.png</file>
         <file>images/firewall.png</file>
         <file>images/hypervisor.png</file>
         <file>images/linux.png</file>
@@ -15,10 +20,6 @@
         <file>images/service.png</file>
         <file>images/switch.png</file>
         <file>images/windows.png</file>
-        <file>images/critical.png</file>
-        <file>images/normal.png</file>
-        <file>images/unknown.png</file>
-        <file>images/warning.png</file>
         <file>images/minus.png</file>
         <file>images/plus.png</file>
         <file>images/router.png</file>

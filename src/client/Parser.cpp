@@ -203,7 +203,7 @@ void Parser::saveCoordinatesDotFile(const QString& _graph_content)
 
 QTreeWidgetItem * Parser::createTreeItem(const NodeT & _node){
     QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType);
-    item->setIcon(0, QIcon(":/images/unknown.png"));
+    item->setIcon(0, QIcon(":/images/built-in/unknown.png"));
     item->setText(0, _node.name);
     item->setData(0, QTreeWidgetItem::UserType, _node.id);
 

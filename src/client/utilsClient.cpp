@@ -182,26 +182,26 @@ QColor utils::getColor(const int & _criticity) {
 
 QIcon utils::getTreeIcon(const int & _criticity) {
 
-    QString ipath(":/images/unknown.png");
+    QString ipath(":/images/built-in/unknown.png");
     switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
     case MonitorBroker::CRITICITY_NORMAL:
-        ipath = ":/images/normal.png";
+        ipath = ":/images/built-in/normal.png";
         break;
 
     case MonitorBroker::CRITICITY_MINOR:
-        ipath = ":/images/info.png";  //TODO create approproate icon
+        ipath = ":/images/built-in/minor.png";
         break;
 
     case MonitorBroker::CRITICITY_MAJOR:
-        ipath = ":/images/warning.png";
+        ipath = ":/images/built-in/major.png";
         break;
 
     case MonitorBroker::CRITICITY_HIGH:
-        ipath = ":/images/critical.png";
+        ipath = ":/images/built-in/critical.png";
         break;
 
     default:
-        // color = ":/images/unknown.png";
+        // color = ":/images/built-in/unknown.png";
         break;
     }
 

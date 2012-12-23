@@ -79,7 +79,7 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
     if( nit == _tree.end() ) {
 
         item = new QTreeWidgetItem( QTreeWidgetItem::UserType ) ;
-        item->setIcon(0, QIcon(":/images/unknown.png")) ;
+        item->setIcon(0, QIcon(":/images/built-in/unknown.png")) ;
         item->setText(0, _node.name) ;
         item->setData(0, QTreeWidgetItem::UserType, _node.id) ;
         if( _isFirstInsertion ) {
@@ -92,7 +92,7 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
         _tree[_node.id] = item ;
 
     } else {
-        (*nit)->setIcon(0, QIcon(":/images/unknown.png")) ;
+        (*nit)->setIcon(0, QIcon(":/images/built-in/unknown.png")) ;
         (*nit)->setText(0, _node.name) ;
         (*nit)->setData(0, QTreeWidgetItem::UserType, _node.id) ;
     }
