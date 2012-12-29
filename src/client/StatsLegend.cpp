@@ -36,64 +36,64 @@ const qint32 StatsLegend::DefaultWidth=250;
 const qint32 StatsLegend::DefaultHeight=300;
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
-: QWidget(_parent)
+  : QWidget(_parent)
 {
-	QFont font("Times", 10, QFont::NoAntialias);
-    QFontMetrics font_metrics(font);
+  QFont font("Times", 10, QFont::NoAntialias);
+  QFontMetrics font_metrics(font);
 
-    qint32 x_top_corner = _left_top_corner.x();
-    qint32 y_top_corner = _left_top_corner.y();
-    qint32 x_label = x_top_corner + 15;
-    qint32 char_w = font_metrics.charWidth("c", 0);
+  qint32 x_top_corner = _left_top_corner.x();
+  qint32 y_top_corner = _left_top_corner.y();
+  qint32 x_label = x_top_corner + 15;
+  qint32 char_w = font_metrics.charWidth("c", 0);
 
-    //FIXME: to be adapted
-    normal.addRect(x_top_corner, y_top_corner, 10, 10);
-    normal.addText(x_label, y_top_corner + 10, font, tr("normal"));
+  //FIXME: to be adapted
+  normal.addRect(x_top_corner, y_top_corner, 10, 10);
+  normal.addText(x_label, y_top_corner + 10, font, tr("normal"));
 
-    minor.addRect(x_top_corner, y_top_corner + 15 , 10, 10);
-    minor.addText(x_label, y_top_corner + 25, font, tr("minor"));
+  minor.addRect(x_top_corner, y_top_corner + 15 , 10, 10);
+  minor.addText(x_label, y_top_corner + 25, font, tr("minor"));
 
-    major.addRect(x_top_corner, y_top_corner + 30 , 10, 10);
-    major.addText(x_label, y_top_corner + 40, font, tr("major"));
+  major.addRect(x_top_corner, y_top_corner + 30 , 10, 10);
+  major.addText(x_label, y_top_corner + 40, font, tr("major"));
 
-    critical.addRect(x_top_corner, y_top_corner + 45, 10, 10);
-    critical.addText(x_label, y_top_corner + 55, font, tr("critical"));
+  critical.addRect(x_top_corner, y_top_corner + 45, 10, 10);
+  critical.addText(x_label, y_top_corner + 55, font, tr("critical"));
 
-    unknown.addRect(x_top_corner, y_top_corner + 60, 10, 10);
-    unknown.addText(x_label, y_top_corner + 70, font, tr("unknown"));
+  unknown.addRect(x_top_corner, y_top_corner + 60, 10, 10);
+  unknown.addText(x_label, y_top_corner + 70, font, tr("unknown"));
 
-    resize(x_label + 10 * char_w, y_top_corner + 80);
-    setStyleSheet("background:transparent");
+  resize(x_label + 10 * char_w, y_top_corner + 80);
+  setStyleSheet("background:transparent");
 }
 
 void StatsLegend::paintEvent(QPaintEvent *)
 {
-    //FIXME: to be adapted
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+  //FIXME: to be adapted
+  QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing);
 
-    painter.setBrush(COLOR_NORMAL);
-    painter.drawPath(normal);
+  painter.setBrush(COLOR_NORMAL);
+  painter.drawPath(normal);
 
-    painter.setBrush(COLOR_MINOR);
-    painter.drawPath(minor);
+  painter.setBrush(COLOR_MINOR);
+  painter.drawPath(minor);
 
-    painter.setBrush(COLOR_MAJOR);
-    painter.drawPath(major);
+  painter.setBrush(COLOR_MAJOR);
+  painter.drawPath(major);
 
-    painter.setBrush(COLOR_CRITICAL);
-    painter.drawPath(critical);
+  painter.setBrush(COLOR_CRITICAL);
+  painter.drawPath(critical);
 
-    painter.setBrush(COLOR_UNKNOWN);
-    painter.drawPath(unknown);
+  painter.setBrush(COLOR_UNKNOWN);
+  painter.drawPath(unknown);
 }
 
 QSize StatsLegend::minimumSizeHint() const
-		{
-    return QSize(DefaultWidth, DefaultHeight);
-		}
+{
+  return QSize(DefaultWidth, DefaultHeight);
+}
 
- QSize StatsLegend::sizeHint() const
-		{
-    return QSize(DefaultWidth, DefaultHeight);
-		}
+QSize StatsLegend::sizeHint() const
+{
+  return QSize(DefaultWidth, DefaultHeight);
+}

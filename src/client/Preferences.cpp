@@ -27,7 +27,7 @@
 #include "Auth.hpp"
 #include <sstream>
 #include "Base.hpp"
-#include "Utils.hpp"
+#include "utilsClient.hpp"
 #include <QWebView>
 
 const qint32 Preferences::ChangePassword = 0;

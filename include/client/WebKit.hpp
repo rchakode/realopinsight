@@ -28,14 +28,14 @@
 
 class WebKit : public QWebView
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-    WebKit( const QString & = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0 );
-	virtual ~WebKit() ;
+  WebKit( const QString & = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0 );
+  virtual ~WebKit() ;
 
 public slots:
-	void setUrl( QString );
+  void setUrl( QString );
 };
 
 #endif /* SNAVWEBKIT_H_ */

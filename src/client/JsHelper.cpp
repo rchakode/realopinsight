@@ -27,13 +27,13 @@ using namespace std;
 
 JsonHelper::JsonHelper(const string & jsonStr) : QScriptEngine()
 {
-    setData(jsonStr);
+  setData(jsonStr);
 }
 
 
 void JsonHelper::setData(const string& jsonStr) {
-    data = evaluate("(" + QString::fromStdString(jsonStr) + ")");
+  data = evaluate("(" + QString::fromStdString(jsonStr) + ")");
 }
 QScriptValue JsonHelper::getProperty(const string& key) {
-    return data.property(QString::fromStdString(key)) ;
+  return data.property(QString::fromStdString(key)) ;
 }

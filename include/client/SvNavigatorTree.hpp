@@ -30,26 +30,28 @@
 
 class SvNavigatorTree : public QTreeWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	SvNavigatorTree(const bool & =false, QWidget* = 0 );
-    static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
-	void update(Struct * & _snav_struct) ;
+  SvNavigatorTree(const bool & =false, QWidget* = 0 );
+  static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
+  void update(CoreDataT * & _snav_struct) ;
 
-	static const QString rootID ;
-    Struct* ptr2Data ;
+  static const QString rootID ;
+  CoreDataT* coreData ;
+
+  static QTreeWidgetItem * createTreeItem(const NodeT & _node);
 
 signals:
-	void treeNodeMoved( QString _node_id ) ;
+  void treeNodeMoved( QString _node_id ) ;
 
 protected:
-	void showEvent(QShowEvent *) ;
-	void dropEvent(QDropEvent *) ;
-	void startDrag(Qt::DropActions)  ;
+  void showEvent(QShowEvent *) ;
+  void dropEvent(QDropEvent *) ;
+  void startDrag(Qt::DropActions)  ;
 
 private:
-	QString selectedNode ;
+  QString selectedNode ;
 
 };
 

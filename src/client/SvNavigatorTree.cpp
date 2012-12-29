@@ -25,38 +25,38 @@
 #include "SvNavigatorTree.hpp"
 #include <QtGui>
 #include "Parser.hpp"
-#include "Utils.hpp"
+#include "utilsClient.hpp"
 
 const QString SvNavigatorTree::rootID = "root";
 
 SvNavigatorTree::SvNavigatorTree(const bool & _enable_drag, QWidget* _parent)
-    : QTreeWidget(_parent), ptr2Data(NULL)
+  : QTreeWidget(_parent), coreData(NULL)
 {
-    setHeaderLabel(tr("TV Explorer")) ;
-    setColumnCount(1) ;
-    setDragDropMode(QAbstractItemView::DragDrop) ;
-    setDragEnabled( _enable_drag ) ;
+  setHeaderLabel(tr("TV Explorer")) ;
+  setColumnCount(1) ;
+  setDragDropMode(QAbstractItemView::DragDrop) ;
+  setDragEnabled(_enable_drag) ;
 }
 
 void SvNavigatorTree::showEvent(QShowEvent*)
 {
-    expandAll() ;
+  expandAll() ;
 }
 
-void SvNavigatorTree::dropEvent(QDropEvent * _event )
+void SvNavigatorTree::dropEvent(QDropEvent * _event)
 {
-    QTreeWidgetItem* tnode = itemAt( _event->pos() ) ;
-    if( tnode && ptr2Data ) {
-        NodeListT::iterator  node_it = ptr2Data->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString()) ;
+  QTreeWidgetItem* tnode = itemAt(_event->pos()) ;
+  if(tnode && coreData) {
+      NodeListT::iterator  node_it = coreData->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString()) ;
 
-        if( node_it != ptr2Data->bpnodes.end() ) {
+      if(node_it != coreData->bpnodes.end()) {
 
-            if( node_it->type != NodeType::ALARM_NODE ) {
-                _event->setDropAction( Qt::MoveAction ) ;
-                QTreeWidget::dropEvent( _event ) ;
-                emit treeNodeMoved(selectedNode) ;
+          if(node_it->type != NodeType::ALARM_NODE) {
+              _event->setDropAction(Qt::MoveAction) ;
+              QTreeWidget::dropEvent(_event) ;
+              emit treeNodeMoved(selectedNode) ;
             }else {
-                utils::alert(tr("Dropping is not allowed on the target node"));
+              utils::alert(tr("Dropping is not allowed on the target node"));
             }
         }
     }
@@ -64,68 +64,74 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
 
 void SvNavigatorTree::startDrag(Qt::DropActions _action)
 {
-    QList<QTreeWidgetItem*> items ;
+  QList<QTreeWidgetItem*> items ;
 
-    items = selectedItems() ;
-    if( items.length() ) selectedNode = items[0]->data(0, QTreeWidgetItem::UserType).toString() ;
-    QTreeWidget::startDrag(_action) ;
+  items = selectedItems() ;
+  if(items.length()) selectedNode = items[0]->data(0, QTreeWidgetItem::UserType).toString() ;
+  QTreeWidget::startDrag(_action) ;
 }
 
 void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
-                              const NodeT & _node, const bool & _isFirstInsertion)
+                              const NodeT & _node,
+                              const bool & _isFirstInsertion)
 {
-    QTreeWidgetItem * item = NULL;
-    TreeNodeItemListT::iterator nit = _tree.find( _node.id ) ;
-    if( nit == _tree.end() ) {
+  TreeNodeItemListT::iterator itemIt = _tree.find(_node.id) ;
+  if(itemIt == _tree.end()) {
 
-        item = new QTreeWidgetItem( QTreeWidgetItem::UserType ) ;
-        item->setIcon(0, QIcon(":/images/built-in/unknown.png")) ;
-        item->setText(0, _node.name) ;
-        item->setData(0, QTreeWidgetItem::UserType, _node.id) ;
-        if( _isFirstInsertion ) {
-            TreeNodeItemListT::iterator pit = _tree.find( _node.parent ) ;
-            if( pit != _tree.end() ) {
-                _tree[_node.parent]->addChild(item);
+      QTreeWidgetItem * item = SvNavigatorTree::createTreeItem(_node);
+      if(_isFirstInsertion) {
+          TreeNodeItemListT::iterator pit = _tree.find(_node.parent) ;
+          if(pit != _tree.end()) {
+              _tree[_node.parent]->addChild(item);
             }
         }
 
-        _tree[_node.id] = item ;
+      _tree.insert(_node.id, item);
 
     } else {
-        (*nit)->setIcon(0, QIcon(":/images/built-in/unknown.png")) ;
-        (*nit)->setText(0, _node.name) ;
-        (*nit)->setData(0, QTreeWidgetItem::UserType, _node.id) ;
+      (*itemIt)->setIcon(0, QIcon(":/images/built-in/unknown.png")) ;
+      (*itemIt)->setText(0, _node.name) ;
+      (*itemIt)->setData(0, QTreeWidgetItem::UserType, _node.id) ;
     }
 
-    if( _node.type != NodeType::ALARM_NODE &&
-            _node.child_nodes != "" ) {
+  if(_node.type != NodeType::ALARM_NODE &&
+     _node.child_nodes != "") {
 
-        QStringList childs = _node.child_nodes.split( Parser::CHILD_NODES_SEP );
+      QStringList childs = _node.child_nodes.split(Parser::CHILD_NODES_SEP);
 
-        for(QStringList::iterator uds_it = childs.begin(); uds_it != childs.end(); uds_it++ ) {
+      for(QStringList::iterator uds_it = childs.begin(); uds_it != childs.end(); uds_it++) {
 
-            QString cid = (*uds_it).trimmed() ;
-            TreeNodeItemListT::iterator cit = _tree.find( cid) ;
+          QString cid = (*uds_it).trimmed() ;
+          TreeNodeItemListT::iterator cit = _tree.find(cid) ;
 
-            if( cit == _tree.end() ) {
-                _tree[cid] = new QTreeWidgetItem(QTreeWidgetItem::UserType) ;
-                _tree[_node.id]->addChild( _tree[cid] ) ;
+          if(cit == _tree.end()) {
+              _tree[cid] = new QTreeWidgetItem(QTreeWidgetItem::UserType) ;
+              _tree[_node.id]->addChild(_tree[cid]) ;
             }
-            else {
-                _tree[_node.id]->addChild( *cit ) ;
+          else {
+              _tree[_node.id]->addChild(*cit) ;
             }
         }
 
-        childs.clear();
+      childs.clear();
     }
 }
 
-void SvNavigatorTree::update(Struct* & _data)
+void SvNavigatorTree::update(CoreDataT* & _data)
 {
-    clear() ;
-    addTopLevelItem(_data->tree_items[rootID]) ;
-    setCurrentItem(_data->tree_items[rootID]) ;
-    expandAll() ;
-    ptr2Data = _data ;
+  clear() ;
+  addTopLevelItem(_data->tree_items[rootID]) ;
+  setCurrentItem(_data->tree_items[rootID]) ;
+  expandAll() ;
+  coreData = _data ;
 }
 
+
+QTreeWidgetItem * SvNavigatorTree::createTreeItem(const NodeT & _node){
+  QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType);
+  item->setIcon(0, QIcon(":/images/built-in/unknown.png"));
+  item->setText(0, _node.name);
+  item->setData(0, QTreeWidgetItem::UserType, _node.id);
+
+  return item;
+}

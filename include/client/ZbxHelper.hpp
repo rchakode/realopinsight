@@ -23,38 +23,39 @@
 
 #ifndef ZABBIXHELPER_HPP_
 #define ZABBIXHELPER_HPP_
+#include "Base.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
 class ZbxHelper : public QNetworkAccessManager {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    enum {
-        LOGIN=1,
-        TRIGGER=2,
-        LOGOUT=3
-    };
+  enum {
+    LOGIN=1,
+    TRIGGER=2,
+    LOGOUT=3
+  };
 
 public:
-    ZbxHelper(const QString & baseUrl="http://localhost/zabbix");
-    virtual ~ZbxHelper();
-    void setBaseUrl(const QString & url) ;
-    QString getApiUri(void) const ;
+  ZbxHelper(const QString & baseUrl="http://localhost/zabbix");
+  virtual ~ZbxHelper();
+  void setBaseUrl(const QString & url);
+  QString getApiUri(void) const;
 
 public slots:
-    void get(const qint32 & reqId, const QStringList & params) ;
-    void processError(QNetworkReply::NetworkError code) ;
+  void postRequest(const qint32 & reqId, const QStringList & params);
+  void processError(QNetworkReply::NetworkError code);
 
 signals:
-    void propagateError(QNetworkReply::NetworkError);
+  void propagateError(QNetworkReply::NetworkError);
 
 private :
-    typedef QMap<qint32, QString> RequestListT;
-    QString apiUri ;
-    QNetworkRequest* requestHandler;
-    RequestListT requestsPatterns ;
-    void setRequestsPatterns();
+  QString apiUri;
+  QNetworkRequest* requestHandler;
+  RequestListT requestsPatterns;
+
+  void setRequestsPatterns();
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

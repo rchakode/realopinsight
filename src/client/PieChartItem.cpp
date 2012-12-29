@@ -25,57 +25,60 @@
 #include "PieChartItem.hpp"
 
 PieChartItem::PieChartItem(const QRectF & _bounding_rect,
-		const qreal & _start_angle, const qreal & _proportion, const QColor & _color, QWidget * _parent)
-:  QWidget(_parent),
-   pieChartBoundingRect(_bounding_rect),
-   startAngle(_start_angle),
-   proportion(_proportion),
-   fillColor1(_color),
-   fillColor2(_color)
+                           const qreal & _start_angle,
+                           const qreal & _proportion,
+                           const QColor & _color,
+                           QWidget * _parent)
+  : QWidget(_parent),
+    pieChartBoundingRect(_bounding_rect),
+    startAngle(_start_angle),
+    proportion(_proportion),
+    fillColor1(_color),
+    fillColor2(_color)
 {
-	path.moveTo( pieChartBoundingRect.center() );
-	path.arcTo(pieChartBoundingRect, startAngle, proportion);
-    path.closeSubpath();
+  path.moveTo( pieChartBoundingRect.center() );
+  path.arcTo(pieChartBoundingRect, startAngle, proportion);
+  path.closeSubpath();
 }
 
 QSize PieChartItem::minimumSizeHint() const
-		{
-	return QSize(350, 200) ;
-		}
+{
+  return QSize(350, 200) ;
+}
 
- QSize PieChartItem::sizeHint() const
-		{
-	return QSize(500, 300) ;
-		}
+QSize PieChartItem::sizeHint() const
+{
+  return QSize(500, 300) ;
+}
 
 void PieChartItem::setFillRule(Qt::FillRule rule)
 {
-	path.setFillRule(rule) ;
-	update() ;
+  path.setFillRule(rule) ;
+  update() ;
 }
 
 void PieChartItem::setFillGradient(const QColor &color1, const QColor &color2)
 {
-	fillColor1 = color1;
-	fillColor2 = color2;
-	update() ;
+  fillColor1 = color1;
+  fillColor2 = color2;
+  update() ;
 }
 
 void PieChartItem::setPath(void)
 {
-	path.moveTo( pieChartBoundingRect.center() );
-	path.arcTo(pieChartBoundingRect, startAngle, proportion);
-	path.closeSubpath();
+  path.moveTo( pieChartBoundingRect.center() );
+  path.arcTo(pieChartBoundingRect, startAngle, proportion);
+  path.closeSubpath();
 }
 
 void PieChartItem::paintEvent(QPaintEvent *)
 {
-	QPainter painter(this) ;
-	painter.setRenderHint(QPainter::Antialiasing) ;
-	QLinearGradient gradient(0, 0, 0, 100) ;
-	gradient.setColorAt(0.0, fillColor1) ;
-	gradient.setColorAt(1.0, fillColor2) ;
-	painter.setPen(QColor(Qt::transparent)) ;
-	painter.setBrush(gradient) ;
-	painter.drawPath(path) ;
+  QPainter painter(this) ;
+  painter.setRenderHint(QPainter::Antialiasing) ;
+  QLinearGradient gradient(0, 0, 0, 100) ;
+  gradient.setColorAt(0.0, fillColor1) ;
+  gradient.setColorAt(1.0, fillColor2) ;
+  painter.setPen(QColor(Qt::transparent)) ;
+  painter.setBrush(gradient) ;
+  painter.drawPath(path) ;
 }

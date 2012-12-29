@@ -23,42 +23,46 @@
 
 #ifndef ZENOSSHELPER_HPP_
 #define ZENOSSHELPER_HPP_
+#include "Base.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
 class ZnsHelper : public QNetworkAccessManager {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    enum {
-        LOGIN_REQUEST=1,
-        EVENT_REQUEST=2
-    };
+  enum RequesT{
+    LOGIN=1,
+    RETRIEVE_COMP=2,
+    RETRIEVE_DEV=3
+  };
+  const static RequestListT ReQPatterns;
+  const static RequestListT ContentTypes;
+  const static RequestListT Routers;
 
-public:
-    ZnsHelper(const QString & baseUrl="http://localhost/zenoss");
-    virtual ~ZnsHelper();
-    void setBaseUrl(const QString & url);
-    QString getApiBaseUrl(void) const;
-    QString getApiContextUrl(void) const;
-
-    void setRequestUrl(const QUrl & url);
-    QString getRequestUrl(void) const;
-    void performPostRequest(const qint32 & reqId,  const QByteArray & params);
-    void performGetRequest(const qint32 & reqId);
+  ZnsHelper(const QString & baseUrl="http://localhost/zenoss");
+  virtual ~ZnsHelper();
+  void setBaseUrl(const QString & url);
+  QString getApiBaseUrl(void) const;
+  QString getApiContextUrl(void) const;
+  void setRequestUrl(const QUrl & url);
+  void setRequestUrl(const QString & url);
+  QString getRequestUrl(void) const;
+  void postRequest(const qint32 & reqId,  const QByteArray & data);
+  void setRouter(const int & reqType);
+  static RequestListT getContentTypes();
+  static RequestListT getRequestsPatterns();
+  static RequestListT getRouters();
 
 public slots:
-    void processError(QNetworkReply::NetworkError code);
+  void processError(QNetworkReply::NetworkError code);
 
 signals:
-    void propagateError(QNetworkReply::NetworkError);
+  void propagateError(QNetworkReply::NetworkError);
 
 private :
-    typedef QMap<qint32, QByteArray> RequestListT;
-    QString apiBaseUrl;
-    QNetworkRequest* requestHandler;
-    RequestListT contentTypes;
-    void setRequestsPatterns();
+  QString apiBaseUrl;
+  QNetworkRequest* requestHandler;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

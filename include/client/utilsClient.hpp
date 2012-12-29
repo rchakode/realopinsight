@@ -26,18 +26,18 @@
 
 #include "Base.hpp"
 #include <QString>
+#include <QIcon>
 
 namespace utils {
-QString
-statusToString(const qint32 & _status);
-void
-clear(Struct& data);
-void
-alert(const QString  & msg);
-QString
-getAbsolutePath(const QString & _path);
-void
-delay(const qint32 & d);
-}
+  QString statusToString(const qint32 & _status);
+  void clear(CoreDataT& data);
+  void alert(const QString  & msg);
+  QString getAbsolutePath(const QString & _path);
+  void delay(const qint32 & d);
+  MonitorBroker::CriticityT getCriticity(const int& _monitor, const int & _statusOrSeverity);
+  QColor getColor(const int &_criticity);
+  QIcon getTreeIcon(const int &_criticity);
+  bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
+} //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

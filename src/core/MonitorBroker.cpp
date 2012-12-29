@@ -33,89 +33,89 @@ const int MonitorBroker::DEFAULT_UPDATE_INTERVAL = 300 ;
 const int MonitorBroker::MAX_MSG = 512 ;
 
 MonitorBroker::MonitorBroker(const string & _sfile)
-    : lastUpdate(0),
-      statusFile(_sfile) {}
+  : lastUpdate(0),
+    statusFile(_sfile) {}
 
 MonitorBroker::~MonitorBroker() {}
 
 string MonitorBroker::getInfOfService(const string & _sid)
 {
-    long curTime = time(NULL) ;
-    if( (curTime - lastUpdate) >= DEFAULT_UPDATE_INTERVAL) {
-        loadNagiosCollectedData(statusFile, services) ;
-        lastUpdate = curTime ;
+  long curTime = time(NULL) ;
+  if( (curTime - lastUpdate) >= DEFAULT_UPDATE_INTERVAL) {
+      loadNagiosCollectedData(statusFile, services) ;
+      lastUpdate = curTime ;
     }
 
-    ChecksT::iterator it = services.find(_sid) ;
+  ChecksT::iterator it = services.find(_sid) ;
 
-    if (it == services.end() ) {
-        return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}" ;
+  if (it == services.end() ) {
+      return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}" ;
     }
 
-    ostringstream ret ;
-    ret << "{"
-        << "\"return_code\":0,"
-        << "\"status\":"<< it->second.status<<","
-        << "\"host\":\"" << it->second.host<<"\","
-        << "\"lastchange\":\"" << it->second.last_state_change << "\","
-        << "\"command\":\"" << it->second.check_command<<"\","
-        << "\"message\":\"" << it->second.alarm_msg <<"\""
-        << "}";
-    return ret.str();
+  ostringstream ret ;
+  ret << "{"
+      << "\"return_code\":0,"
+      << "\"status\":"<< it->second.status<<","
+      << "\"host\":\"" << it->second.host<<"\","
+      << "\"lastchange\":\"" << it->second.last_state_change << "\","
+      << "\"command\":\"" << it->second.check_command<<"\","
+      << "\"message\":\"" << it->second.alarm_msg <<"\""
+      << "}";
+  return ret.str();
 }
 
 bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _checks)
 {
 
-    ifstream stFileStream ;
-    stFileStream.open(_sfile.c_str(), std::ios_base::in) ;
-    if (! stFileStream.good() ) {
-        cerr << "ERROR: Unable to open the file " << _sfile << endl ;
-        return false ;
+  ifstream stFileStream ;
+  stFileStream.open(_sfile.c_str(), std::ios_base::in) ;
+  if (! stFileStream.good() ) {
+      cerr << "ERROR: Unable to open the file " << _sfile << endl ;
+      return false ;
     }
 
-    string line;
-    while (getline(stFileStream, line) , ! stFileStream.eof()) {
+  string line;
+  while (getline(stFileStream, line) , ! stFileStream.eof()) {
 
-        if(line.find("#") != string::npos ) continue ;
+      if(line.find("#") != string::npos ) continue ;
 
-        if( line.find("hoststatus") == string::npos &&
-                line.find("servicestatus") == string::npos ) continue ;
+      if( line.find("hoststatus") == string::npos &&
+          line.find("servicestatus") == string::npos ) continue ;
 
-        CheckT info;
-        info.status = NAGIOS_UNKNOWN ;
-        while (getline(stFileStream, line), ! stFileStream.eof()) {
+      CheckT info;
+      info.status = NAGIOS_UNKNOWN ;
+      while (getline(stFileStream, line), ! stFileStream.eof()) {
 
-            size_t pos = line.find("}") ; if( pos != string::npos ) break ;
-            pos = line.find("=") ; if(pos == string::npos) continue ;
-            string param = ngrt4n::trim(line.substr(0, pos));
-            string value = ngrt4n::trim(line.substr(pos+1, string::npos)) ;
-            if(param == "host_name") {
-                info.host = info.id =
-                        ngrt4n::trim(line.substr(pos+1)) ;
+          size_t pos = line.find("}") ; if( pos != string::npos ) break ;
+          pos = line.find("=") ; if(pos == string::npos) continue ;
+          string param = ngrt4n::trim(line.substr(0, pos));
+          string value = ngrt4n::trim(line.substr(pos+1, string::npos)) ;
+          if(param == "host_name") {
+              info.host = info.id =
+                  ngrt4n::trim(line.substr(pos+1)) ;
             }
-            else if(param == "service_description") {
-                info.id += "/" + value ;
+          else if(param == "service_description") {
+              info.id += "/" + value ;
             }
-            else if(param == "check_command") {
-                info.check_command = value ;
+          else if(param == "check_command") {
+              info.check_command = value ;
             }
-            else if(param == "current_state") {
-                info.status = atoi(value.c_str()) ;
+          else if(param == "current_state") {
+              info.status = atoi(value.c_str()) ;
             }
-            else if(param == "last_state_change") {
-                info.last_state_change = value ;
+          else if(param == "last_state_change") {
+              info.last_state_change = value ;
             }
-            else if(param == "plugin_output")
+          else if(param == "plugin_output")
             {
-                info.alarm_msg = value;
+              info.alarm_msg = value;
             }
         }
-        _checks[info.id] = info;
+      _checks[info.id] = info;
 
     }
-    stFileStream.close() ;
+  stFileStream.close() ;
 
-    return true;
+  return true;
 }
 

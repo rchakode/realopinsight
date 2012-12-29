@@ -21,189 +21,204 @@
 #--------------------------------------------------------------------------#
  */
 #include "StatsLegend.hpp"
-#include "Utils.hpp"
+#include "utilsClient.hpp"
 #include <QFileInfo>
 #include <unistd.h>
 
 QString utils::statusToString(const qint32 & _status)
 {
-    switch(static_cast<MonitorBroker::CriticityT>(_status))
+  switch(static_cast<MonitorBroker::CriticityT>(_status))
     {
     case MonitorBroker::CRITICITY_NORMAL:
-        return "Normal";
-        break;
+      return "Normal";
+      break;
 
     case MonitorBroker::CRITICITY_MINOR:
-        return  "Info";
-        break;
+      return  "Info";
+      break;
 
     case MonitorBroker::CRITICITY_MAJOR:
-        return  "Warning";
-        break;
+      return  "Warning";
+      break;
 
     case MonitorBroker::CRITICITY_HIGH:
-        return  "Critical";
-        break;
+      return  "Critical";
+      break;
 
     default:
-        break;
+      break;
     }
 
-    return "Unknown";
+  return "Unknown";
 }
 
-void utils::clear(Struct& data) {
-    data.cnodes.clear();
-    data.bpnodes.clear();
-    data.tree_items.clear();
+void utils::clear(CoreDataT& data) {
+  data.cnodes.clear();
+  data.bpnodes.clear();
+  data.tree_items.clear();
 }
 
 void utils::alert(const QString  & msg) {
-    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
+  QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
 }
 
 QString utils::getAbsolutePath(const QString & _path) {
-    QFileInfo fileInfo(_path);
-    return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
+  QFileInfo fileInfo(_path);
+  return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
 }
 
 void utils::delay(const qint32 & d) {
-    sleep(d);
+  sleep(d);
 }
 
 
 MonitorBroker::CriticityT utils::getCriticity(const int& _monitor, const int & _statusOrSeverity) {
 
-    int criticity = MonitorBroker::CRITICITY_UNKNOWN;
+  int criticity = MonitorBroker::CRITICITY_UNKNOWN;
 
-    if(_monitor == MonitorBroker::NAGIOS) {
+  if(_monitor == MonitorBroker::NAGIOS) {
 
-        switch(_statusOrSeverity) {
+      switch(_statusOrSeverity) {
         case MonitorBroker::NAGIOS_OK:
-            criticity = MonitorBroker::CRITICITY_NORMAL;
-            break;
+          criticity = MonitorBroker::CRITICITY_NORMAL;
+          break;
 
         case MonitorBroker::NAGIOS_WARNING:
-            criticity = MonitorBroker::CRITICITY_MAJOR;
-            break;
+          criticity = MonitorBroker::CRITICITY_MAJOR;
+          break;
 
         case MonitorBroker::NAGIOS_CRITICAL:
-            criticity = MonitorBroker::CRITICITY_HIGH;
-            break;
+          criticity = MonitorBroker::CRITICITY_HIGH;
+          break;
 
         default:
-            // MonitorBroker::NAGIOS_UNKNOWN
-            // keep the default criticity
-            break;
+          // MonitorBroker::NAGIOS_UNKNOWN
+          // keep the default criticity
+          break;
         }
 
     } else if (_monitor == MonitorBroker::ZABBIX) {
 
-        switch(_statusOrSeverity) {
+      switch(_statusOrSeverity) {
         case MonitorBroker::ZABBIX_INFO:
-            criticity = MonitorBroker::CRITICITY_NORMAL;
-            break;
+          criticity = MonitorBroker::CRITICITY_NORMAL;
+          break;
 
         case MonitorBroker::ZABBIX_WARN:
-            criticity = MonitorBroker::CRITICITY_MINOR;
-            break;
+          criticity = MonitorBroker::CRITICITY_MINOR;
+          break;
 
         case MonitorBroker::ZABBIX_AVERAGE:
-            criticity = MonitorBroker::CRITICITY_MAJOR;
-            break;
+          criticity = MonitorBroker::CRITICITY_MAJOR;
+          break;
 
         case MonitorBroker::ZABBIX_HIGH:
         case MonitorBroker::ZABBIX_DISASTER:
-            criticity = MonitorBroker::CRITICITY_HIGH;
-            break;
+          criticity = MonitorBroker::CRITICITY_HIGH;
+          break;
         default:
-            // MonitorBroker::ZABBIX_UNCLASSIFIED
-            // keep the default criticity
-            break;
+          // MonitorBroker::ZABBIX_UNCLASSIFIED
+          // keep the default criticity
+          break;
         }
 
     } else if (_monitor == MonitorBroker::ZENOSS){
 
-        switch(_statusOrSeverity) {
+      switch(_statusOrSeverity) {
         case MonitorBroker::ZENOSS_CLEAR:
-            criticity = MonitorBroker::CRITICITY_NORMAL;
-            break;
+          criticity = MonitorBroker::CRITICITY_NORMAL;
+          break;
 
         case MonitorBroker::ZENOSS_DEBUG:
-            criticity = MonitorBroker::CRITICITY_MINOR;
-            break;
+          criticity = MonitorBroker::CRITICITY_MINOR;
+          break;
 
         case MonitorBroker::ZENOSS_WARNING:
-            criticity = MonitorBroker::CRITICITY_MAJOR;
-            break;
+          criticity = MonitorBroker::CRITICITY_MAJOR;
+          break;
 
         case MonitorBroker::ZENOSS_ERROR:
         case MonitorBroker::ZENOSS_CRITICAL:
-            criticity = MonitorBroker::CRITICITY_HIGH;
-            break;
+          criticity = MonitorBroker::CRITICITY_HIGH;
+          break;
         default:
-            // keep the default criticity
-            break;
+          // keep the default criticity
+          break;
         }
     }
 
-    return static_cast<MonitorBroker::CriticityT>(criticity);
+  return static_cast<MonitorBroker::CriticityT>(criticity);
 }
 
 
 QColor utils::getColor(const int & _criticity) {
 
-    QColor color(StatsLegend::COLOR_UNKNOWN);
-    switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
+  QColor color(StatsLegend::COLOR_UNKNOWN);
+  switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
     case MonitorBroker::CRITICITY_NORMAL:
-        color = StatsLegend::COLOR_NORMAL;
-        break;
+      color = StatsLegend::COLOR_NORMAL;
+      break;
 
     case MonitorBroker::CRITICITY_MINOR:
-        color = StatsLegend::COLOR_MINOR;
-        break;
+      color = StatsLegend::COLOR_MINOR;
+      break;
 
     case MonitorBroker::CRITICITY_MAJOR:
-        color = StatsLegend::COLOR_MAJOR;
-        break;
+      color = StatsLegend::COLOR_MAJOR;
+      break;
 
     case MonitorBroker::CRITICITY_HIGH:
-        color = StatsLegend::COLOR_CRITICAL;
-        break;
+      color = StatsLegend::COLOR_CRITICAL;
+      break;
 
     default:
-        // color = StatsLegend::COLOR_UNKNOWN;
-        break;
+      // color = StatsLegend::COLOR_UNKNOWN;
+      break;
     }
 
-    return color;
+  return color;
 }
 
 
 QIcon utils::getTreeIcon(const int & _criticity) {
 
-    QString ipath(":/images/built-in/unknown.png");
-    switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
+  QString ipath(":/images/built-in/unknown.png");
+  switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
     case MonitorBroker::CRITICITY_NORMAL:
-        ipath = ":/images/built-in/normal.png";
-        break;
+      ipath = ":/images/built-in/normal.png";
+      break;
 
     case MonitorBroker::CRITICITY_MINOR:
-        ipath = ":/images/built-in/minor.png";
-        break;
+      ipath = ":/images/built-in/minor.png";
+      break;
 
     case MonitorBroker::CRITICITY_MAJOR:
-        ipath = ":/images/built-in/major.png";
-        break;
+      ipath = ":/images/built-in/major.png";
+      break;
 
     case MonitorBroker::CRITICITY_HIGH:
-        ipath = ":/images/built-in/critical.png";
-        break;
+      ipath = ":/images/built-in/critical.png";
+      break;
 
     default:
-        // color = ":/images/built-in/unknown.png";
-        break;
+      // color = ":/images/built-in/unknown.png";
+      break;
     }
 
-    return QIcon(ipath);
+  return QIcon(ipath);
+}
+
+bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node) {
+  bool found = false;
+  node = coreData->bpnodes.find(nodeId);
+  if(node != coreData->bpnodes.end()) {
+      found = true;
+    } else {
+      node = coreData->cnodes.find(nodeId);
+      if(node != coreData->cnodes.end()) {
+          found = true;
+        }
+    }
+
+  return found;
 }

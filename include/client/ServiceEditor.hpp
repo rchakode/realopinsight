@@ -46,69 +46,69 @@ const QString WEIGHTED_CALC_RULE_FIELD = "Equal-weighted Criticity";
 
 class ServiceEditor : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
 
-	typedef QMap<QString, QWidget*> ItemsList ;
+  typedef QMap<QString, QWidget*> ItemsList ;
 
-	ServiceEditor( QWidget* = 0);
-	virtual ~ServiceEditor();
+  ServiceEditor( QWidget* = 0);
+  virtual ~ServiceEditor();
 
-	void layoutEditorComponents(void) ;
-	void setContent( const NodeListT &, const QString & ) ;
-	void setContent( NodeListT::const_iterator ) ;
-	bool updateNode( NodeListT &, const QString& ) ;
-	bool updateNode(NodeListT::iterator & _node_it) ;
-	void setCheckListField( const MonitorBroker::ChecksT& );
-	void setEnableFields( const bool& );
-	void loadStatusFile(const QString &) ;
-	void setLowLevelAlarmComponentEnabled(bool enable){editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);}
+  void layoutEditorComponents(void) ;
+  void setContent( const NodeListT &, const QString & ) ;
+  void setContent( NodeListT::const_iterator ) ;
+  bool updateNode( NodeListT &, const QString& ) ;
+  bool updateNode(NodeListT::iterator & _node_it) ;
+  void setCheckListField( const MonitorBroker::ChecksT& );
+  void setEnableFields( const bool& );
+  void loadStatusFile(const QString &) ;
+  void setLowLevelAlarmComponentEnabled(bool enable){editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);}
 
-	ItemsList* itemList( void ) {return &editorItemsList;}
-	QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(editorItemsList[NAME_FIELD]);}
-	QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[TYPE_FIELD]);}
-	QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_CALC_RULE_FIELD]);}
-	QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_PROP_RULE_FIELD]);}
-	inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[ICON_FIELD]);}
-	inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(editorItemsList[DESCRIPTION_FIELD]);}
-	inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[ALARM_MSG_FIELD]) ;}
-	inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[NOTIFICATION_MSG_FIELD]);}
-	inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(editorItemsList[CHECK_FIELD]) ;}
-	inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(editorItemsList[CHECK_LIST_FIELD]);}
+  ItemsList* itemList( void ) {return &editorItemsList;}
+  QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(editorItemsList[NAME_FIELD]);}
+  QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[TYPE_FIELD]);}
+  QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_CALC_RULE_FIELD]);}
+  QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_PROP_RULE_FIELD]);}
+  inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[ICON_FIELD]);}
+  inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(editorItemsList[DESCRIPTION_FIELD]);}
+  inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[ALARM_MSG_FIELD]) ;}
+  inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[NOTIFICATION_MSG_FIELD]);}
+  inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(editorItemsList[CHECK_FIELD]) ;}
+  inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(editorItemsList[CHECK_LIST_FIELD]);}
 
 public slots:
-	void handleSaveClick(void) ;
-	void handleCloseClick(void ) ;
-	void handleReturnPressed(void) ;
-	void handleNodeTypeChanged(const QString &) ;
-	void handleNodeTypeActivated( const QString & _text) ;
+  void handleSaveClick(void) ;
+  void handleCloseClick(void ) ;
+  void handleReturnPressed(void) ;
+  void handleNodeTypeChanged(const QString &) ;
+  void handleNodeTypeActivated( const QString & _text) ;
 
-	signals:
-	void saveClicked(void) ;
-	void closeClicked(void) ;
-	void returnPressed(void) ;
-	void nodeTypeActivated(qint32) ;
+signals:
+  void saveClicked(void) ;
+  void closeClicked(void) ;
+  void returnPressed(void) ;
+  void nodeTypeActivated(qint32) ;
 
 private:
-	Settings* settings ;
-	qint32 editorLayoutRowCount;
-	qint32 editorLayoutColumnCount;
-	qint16 currentLine;
-	ItemsList editorItemsList;
-	QGridLayout* layout;
-	QDialogButtonBox* buttonBox;
+  Settings* settings ;
+  qint32 editorLayoutRowCount;
+  qint32 editorLayoutColumnCount;
+  qint16 currentLine;
+  ItemsList editorItemsList;
+  QGridLayout* layout;
+  QDialogButtonBox* buttonBox;
 
-	void addEvent(void) ;
-	void loadLabelFields(void);
-	void loadDescriptionFields(void);
-	void loadTypeFields(void);
-	void loadStatusHandlingFields(void);
-	void loadAlarmMsgFields(void);
-	void loadNotificationMsgFields(void);
-	void loadIconFields(void);
-	void loadCheckField(void);
-	void loadButtonBox(void);
+  void addEvent(void) ;
+  void loadLabelFields(void);
+  void loadDescriptionFields(void);
+  void loadTypeFields(void);
+  void loadStatusHandlingFields(void);
+  void loadAlarmMsgFields(void);
+  void loadNotificationMsgFields(void);
+  void loadIconFields(void);
+  void loadCheckField(void);
+  void loadButtonBox(void);
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */

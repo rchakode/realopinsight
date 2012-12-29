@@ -30,17 +30,17 @@
 
 using namespace std;
 namespace ngrt4n {
-const string APP_NAME = "ngrt4n" ;
-const string APP_HOME = string(getenv("HOME")) + "/." + APP_NAME ;
-const string SETTINGS_FILE =  APP_HOME + "/db" ;
-const string AUTH_FILE =  APP_HOME + "/auth" ;
-const string salt = "$1$" + APP_NAME + "$";
+  const string APP_NAME = "ngrt4n" ;
+  const string APP_HOME = string(getenv("HOME")) + "/." + APP_NAME ;
+  const string SETTINGS_FILE =  APP_HOME + "/db" ;
+  const string AUTH_FILE =  APP_HOME + "/auth" ;
+  const string salt = "$1$" + APP_NAME + "$";
 
-void initApp() ;
-void checkUser() ;
-void setPassChain(char* authChain) ;
-string getPassChain() ;
-string trim(const string& str, const string& enclosingChar=" \t");
+  void initApp() ;
+  void checkUser() ;
+  void setPassChain(char* authChain) ;
+  string getPassChain() ;
+  string trim(const string& str, const string& enclosingChar=" \t");
 }
 
 #endif /* NS_HPP_ */

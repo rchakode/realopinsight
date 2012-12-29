@@ -25,17 +25,17 @@
 #include "WebKit.hpp"
 
 WebKit::WebKit(const QString& url, QWidget* _parent)
-:QWebView(_parent)
+  :QWebView(_parent)
 {
-	settings()->setAttribute(QWebSettings::PluginsEnabled, true);
-	settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-	settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-	load(QUrl(url));
+  settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+  settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+  settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+  load(QUrl(url));
 }
 
 WebKit::~WebKit() {}
 
 void WebKit::setUrl(QString url)
 {
-	load(QUrl(url));
+  load(QUrl(url));
 }

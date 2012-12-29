@@ -29,11 +29,11 @@
 class Settings : public QSettings
 {
 public:
-    Settings();
-    void setKeyValue(const QString & _key, const QString & _value);
+  Settings();
+  void setKeyValue(const QString & _key, const QString & _value);
 
 private:
-    QTranslator* translator ;
+  QTranslator* translator ;
 };
 
 

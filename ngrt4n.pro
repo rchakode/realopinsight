@@ -36,7 +36,7 @@ DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_YEAR='\"2013\"'"
-DEFINES *= "RELEASE_NAME='\"T-Lucia\"'"
+DEFINES *= "RELEASE_NAME='\"Lucia\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc

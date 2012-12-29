@@ -28,87 +28,86 @@
 #include <sstream>
 #include <getopt.h>
 #include <QObject>
-#include "Utils.hpp"
 
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
-        "Options: \n"
-        "	-c\n"
-        "	   Launch the configuration utility\n"
-        "	-v\n"
-        "	  Print the version and license information.\n"
-        "	-h \n"
-        "	   Print this help.\n";
+    "Options: \n"
+    "	-c\n"
+    "	   Launch the configuration utility\n"
+    "	-v\n"
+    "	  Print the version and license information.\n"
+    "	-h \n"
+    "	   Print this help.\n";
 
 int main(int argc, char **argv)
 {
-    QApplication* app = new QApplication(argc, argv);
-    app->setWindowIcon(QIcon (":images/built-in/icon.png"));
-    app->setApplicationName(appName);
-    app->setStyleSheet(Preferences::style());
+  QApplication* app = new QApplication(argc, argv);
+  app->setWindowIcon(QIcon (":images/built-in/icon.png"));
+  app->setApplicationName(appName);
+  app->setStyleSheet(Preferences::style());
 
-    QString cmdName = basename(argv[0]);
-    ostringstream versionMsg(QObject::tr("%1 Operations Console\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
-                             +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
-                             +QObject::tr("%1").arg(packageUrl).toStdString());
+  QString cmdName = basename(argv[0]);
+  ostringstream versionMsg(QObject::tr("%1 Operations Console\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
+                           +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
+                           +QObject::tr("%1").arg(packageUrl).toStdString());
 
-    bool config = false;
-    int opt;
-    if ( (opt = getopt(argc, argv, "chv") ) != -1) {
-        switch (opt) {
+  bool config = false;
+  int opt;
+  if ( (opt = getopt(argc, argv, "chv") ) != -1) {
+      switch (opt) {
         case 'c':
-            config = true;
-            break;
+          config = true;
+          break;
 
         case 'v':
-            cout << versionMsg.str() << endl;
-            exit(0);
+          cout << versionMsg.str() << endl;
+          exit(0);
 
         case 'h':
-            cout << usage.arg(cmdName).toStdString();
-            exit(0);
+          cout << usage.arg(cmdName).toStdString();
+          exit(0);
 
         default:
-            cout << usage.arg(cmdName).toStdString();
-            exit(1);
-            break;
+          cout << usage.arg(cmdName).toStdString();
+          exit(1);
+          break;
         }
     }
-    cout <<"Launching "<<versionMsg.str()<<endl;
-    Auth authentication;
-    int userRole = authentication.exec();
-    if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit(1);
+  cout <<"Launching "<<versionMsg.str()<<endl;
+  Auth authentication;
+  int userRole = authentication.exec();
+  if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit(1);
 
-    if( config ) {
-        Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-        Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
-        update_settings->exec();
-        change_passwd->exec();
-        exit(0);
+  if( config ) {
+      Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
+      Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
+      update_settings->exec();
+      change_passwd->exec();
+      exit(0);
     }
 
-    QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("Loading...\n\n%1"))
-                                                  .arg(QString::fromStdString(versionMsg.str())));
-    utils::delay(2);
-    QString file = (argc >= 2)? argv[1] : "";
-    if(file == "") {
-        info->clearMessage();
-        info->showMessage(QObject::tr("You need to select a configuration file!"),
-                          Qt::AlignCenter|Qt::AlignCenter);
-        utils::delay(1); info->finish(0);
-        file = QFileDialog::getOpenFileName(0,
-                                            QObject::tr("%1 | Select a configuration file").arg(appName),
-                                            ".",
-                                            QObject::tr("Xml files (*.xml);;All files (*)"));
+  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("Loading...\n\n%1"))
+                                                .arg(QString::fromStdString(versionMsg.str())));
+  utils::delay(2);
+  QString file = (argc >= 2)? argv[1] : "";
+  if(file == "") {
+      info->clearMessage();
+      info->showMessage(QObject::tr("You need to select a configuration file!"),
+                        Qt::AlignCenter|Qt::AlignCenter);
+      utils::delay(1); info->finish(0);
+      file = QFileDialog::getOpenFileName(0,
+                                          QObject::tr("%1 | Select a configuration file").arg(appName),
+                                          ".",
+                                          QObject::tr("Xml files (*.xml);;All files (*)"));
 
-        if(! file.length()){
-            utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
-            exit (1);
+      if(! file.length()){
+          utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
+          exit (1);
         }
     }
-    info->finish(0);
-    SvNavigator *console= new SvNavigator(userRole);
-    console->load(file);
-    console->startMonitor();
+  info->finish(0);
+  SvNavigator *console= new SvNavigator(userRole);
+  console->load(file);
+  console->startMonitor();
 
-    return app->exec();
+  return app->exec();
 }

@@ -28,29 +28,29 @@ const qint32 Stats::DefaultWidth=300 ;
 const qint32 Stats::DefaultHeight=175 ;
 
 Stats::Stats()
-: QWidget(),
-pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
+  : QWidget(),
+    pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
 {
-	resize(pieChart->size()) ;
-	setStyleSheet("background:transparent") ;
+  resize(pieChart->size()) ;
+  setStyleSheet("background:transparent") ;
 }
 
 Stats::~Stats()
 {
-	delete pieChart ;
+  delete pieChart ;
 }
 
 QSize Stats::minimumSizeHint() const
-		{
-	return QSize(200, 100) ;
-		}
+{
+  return QSize(200, 100) ;
+}
 
- QSize Stats::sizeHint() const
-		{
-	return QSize(DefaultWidth, DefaultHeight) ;
-		}
+QSize Stats::sizeHint() const
+{
+  return QSize(DefaultWidth, DefaultHeight) ;
+}
 
 QString Stats::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count)
 {
-	return pieChart->update(_check_status_count, _check_count) ;
+  return pieChart->update(_check_status_count, _check_count) ;
 }

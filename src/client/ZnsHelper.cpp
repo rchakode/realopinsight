@@ -27,71 +27,112 @@
 #include <QMessageBox>
 #include <QNetworkCookieJar>
 
-const QString API_CONTEXT = "/zport/dmd";
-const QString API_LOGIN_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+const QString ZNS_API_CONTEXT = "/zport/dmd";
+const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+const RequestListT ZnsHelper::ReQPatterns = ZnsHelper::getRequestsPatterns();
+const RequestListT ZnsHelper::ContentTypes = ZnsHelper::getContentTypes();
+const RequestListT ZnsHelper::Routers = ZnsHelper::getRouters();
 
 ZnsHelper::ZnsHelper(const QString & baseUrl)
-    : QNetworkAccessManager(),
-      apiBaseUrl(baseUrl),
-      requestHandler(new QNetworkRequest())
+  : QNetworkAccessManager(),
+    apiBaseUrl(baseUrl),
+    requestHandler(new QNetworkRequest())
 {
-    requestHandler->setUrl(QUrl(apiBaseUrl+API_CONTEXT));
-    setRequestsPatterns();
+  requestHandler->setUrl(QUrl(apiBaseUrl+ZNS_API_CONTEXT));
 }
 
 ZnsHelper::~ZnsHelper()
 {
-    delete requestHandler;
+  delete requestHandler;
 }
 
 QString ZnsHelper::getApiBaseUrl(void) const
 {
-    return apiBaseUrl;
+  return apiBaseUrl;
 }
 
 QString ZnsHelper::getApiContextUrl(void) const
 {
-    return apiBaseUrl+API_CONTEXT;
+  return apiBaseUrl+ZNS_API_CONTEXT;
 }
 
 void ZnsHelper::setBaseUrl(const QString & url)
 {
-    apiBaseUrl = url;
-    requestHandler->setUrl(QUrl(apiBaseUrl+API_LOGIN_CONTEXT));
+  apiBaseUrl = url;
+  requestHandler->setUrl(QUrl(apiBaseUrl+ZNS_LOGIN_API_CONTEXT));
 }
 
 
 void ZnsHelper::setRequestUrl(const QUrl & url)
 {
-    requestHandler->setUrl(url);
+  requestHandler->setUrl(url);
+}
+
+void ZnsHelper::setRequestUrl(const QString & url)
+{
+  requestHandler->setUrl(QUrl(url));
 }
 
 QString ZnsHelper::getRequestUrl(void) const
 {
-    return requestHandler->url().toString();
+  return requestHandler->url().toString();
 }
 
-void ZnsHelper::performPostRequest(const qint32 & reqId, const QByteArray & params)
+void ZnsHelper::postRequest(const qint32 & reqType, const QByteArray & data)
 {
-    requestHandler->setRawHeader("Content-Type", contentTypes[reqId]);
-    QNetworkReply* reply = this->post(*requestHandler, params);
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
-}
-
-void ZnsHelper::performGetRequest(const qint32 & reqId)
-{
-    requestHandler->setRawHeader("Content-Type", contentTypes[reqId]);
-    QNetworkReply* reply = this->get(*requestHandler);
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+  requestHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
+  QNetworkReply* reply = QNetworkAccessManager::post(*requestHandler, data);
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
+          this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
 void ZnsHelper::processError(QNetworkReply::NetworkError code)
 {
-    emit propagateError(code);
+  emit propagateError(code);
 }
 
-void ZnsHelper::setRequestsPatterns()
+void ZnsHelper::setRouter(const int & reqType) {
+  QString url = apiBaseUrl+ZNS_API_CONTEXT + "/" + Routers[reqType];
+  setRequestUrl(url);
+}
+
+RequestListT ZnsHelper::getContentTypes()
 {
-    contentTypes[LOGIN_REQUEST] = "application/x-www-form-urlencoded";
-    contentTypes[EVENT_REQUEST] = "application/json; charset=utf-8";
+  RequestListT list;
+  list[LOGIN] = "application/x-www-form-urlencoded";
+  list[RETRIEVE_COMP] = "application/json; charset=utf-8";
+  list[RETRIEVE_DEV] = "application/json; charset=utf-8";
+  return list;
+}
+
+
+RequestListT ZnsHelper::getRequestsPatterns()
+{
+  RequestListT list;
+  list[RETRIEVE_DEV] = "{\"action\": \"DeviceRouter\", \
+      \"method\": \"getDevices\", \
+      \"data\": [{\
+      \"uid\": \"/zport/dmd/Devices\", \
+      \"params\": {\"name\": \"%1\"},  \
+      \"keys\":[\"name\", \"uid\"] }], \
+      \"type\": \"rpc\", \
+      \"tid\": %2}";
+  list[RETRIEVE_COMP] = "{\"action\": \"DeviceRouter\", \
+      \"method\": \"getComponents\", \
+      \"data\": [{\
+      \"uid\": \"%1\", \
+      \"limit\": \"1000\", \
+      \"keys\":[\"name\", \"status\", \"severity\", \"pingStatus\"] }], \
+      \"type\": \"rpc\", \
+      \"tid\": %2}";
+
+  return list;
+}
+
+RequestListT ZnsHelper::getRouters()
+{
+  RequestListT list;
+  list[RETRIEVE_COMP] = "device_router";
+  list[RETRIEVE_DEV] = "device_router";
+  return list;
 }

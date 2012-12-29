@@ -32,70 +32,70 @@ using namespace std ;
 class MonitorBroker {
 public:
 
-    enum MonirorTypeT {
-        NAGIOS = 0,
-        ZABBIX = 1,
-        ZENOSS = 2
-    };
+  enum MonirorTypeT {
+    NAGIOS = 0,
+    ZABBIX = 1,
+    ZENOSS = 2
+  };
 
-    enum CriticityT {
-        CRITICITY_NORMAL = 0,
-        CRITICITY_MINOR = 1,
-        CRITICITY_MAJOR = 2,
-        CRITICITY_HIGH = 3,
-        CRITICITY_UNKNOWN = 4
-    };
+  enum CriticityT {
+    CRITICITY_NORMAL = 0,
+    CRITICITY_MINOR = 1,
+    CRITICITY_MAJOR = 2,
+    CRITICITY_HIGH = 3,
+    CRITICITY_UNKNOWN = 4
+  };
 
-    enum NAGIOS_StatusT {
-        NAGIOS_OK = 0,
-        NAGIOS_WARNING = 1,
-        NAGIOS_CRITICAL = 2,
-        NAGIOS_UNKNOWN = 3
-    };
+  enum NAGIOS_StatusT {
+    NAGIOS_OK = 0,
+    NAGIOS_WARNING = 1,
+    NAGIOS_CRITICAL = 2,
+    NAGIOS_UNKNOWN = 3
+  };
 
-    enum ZABBIX_SeverityT {
-        ZABBIX_UNCLASSIFIED = 0,
-        ZABBIX_INFO = 1,
-        ZABBIX_WARN = 2,
-        ZABBIX_AVERAGE = 3,
-        ZABBIX_HIGH = 4,
-        ZABBIX_DISASTER = 5
-    };
+  enum ZABBIX_SeverityT {
+    ZABBIX_UNCLASSIFIED = 0,
+    ZABBIX_INFO = 1,
+    ZABBIX_WARN = 2,
+    ZABBIX_AVERAGE = 3,
+    ZABBIX_HIGH = 4,
+    ZABBIX_DISASTER = 5
+  };
 
-    enum ZENOSS_SeverityT {
-        ZENOSS_CLEAR = 0,
-        ZENOSS_DEBUG = 1,
-        ZENOSS_INFO = 2,
-        ZENOSS_WARNING = 3,
-        ZENOSS_ERROR = 4,
-        ZENOSS_CRITICAL = 5
-    };
+  enum ZENOSS_SeverityT {
+    ZENOSS_CLEAR = 0,
+    ZENOSS_DEBUG = 1,
+    ZENOSS_INFO = 2,
+    ZENOSS_WARNING = 3,
+    ZENOSS_ERROR = 4,
+    ZENOSS_CRITICAL = 5
+  };
 
 
-    typedef struct _CheckT{
-        string id;
-        string host ;
-        string check_command ;
-        string last_state_change ;
-        string alarm_msg ;
-        int status ;
-    }CheckT;
-    typedef unordered_map<string, CheckT> ChecksT ;
+  typedef struct _CheckT{
+    string id;
+    string host ;
+    string check_command ;
+    string last_state_change ;
+    string alarm_msg ;
+    int status ;
+  }CheckT;
+  typedef unordered_map<string, CheckT> ChecksT ;
 
-    MonitorBroker(const string & _sfile);
-    virtual ~MonitorBroker();
+  MonitorBroker(const string & _sfile);
+  virtual ~MonitorBroker();
 
-    string getInfOfService(const string & _sid) ;
-    static bool loadNagiosCollectedData(const string & _sfile, ChecksT & _checks) ;
+  string getInfOfService(const string & _sid) ;
+  static bool loadNagiosCollectedData(const string & _sfile, ChecksT & _checks) ;
 
-    static const int DEFAULT_PORT ;
-    static const int DEFAULT_UPDATE_INTERVAL ;
-    static const int MAX_MSG ;
+  static const int DEFAULT_PORT ;
+  static const int DEFAULT_UPDATE_INTERVAL ;
+  static const int MAX_MSG ;
 
 private:
-    int lastUpdate ;
-    string statusFile ;
-    ChecksT services ;
+  int lastUpdate ;
+  string statusFile ;
+  ChecksT services ;
 };
 
 #endif /* MONITORBROKER_HPP_ */
