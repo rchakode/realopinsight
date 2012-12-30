@@ -155,11 +155,8 @@ void SvNavigator::startMonitor()
   setEnabled(false);
   switch(mcoreData->monitor){
     case MonitorBroker::ZENOSS:
-      !misLogged ? openZnsSession(): retrieveDataFromZns();
-      break;
-
     case MonitorBroker::ZABBIX:
-      !misLogged ? openZbxSession() : retrieveDataFromZbx();
+      !misLogged ? openRpcSession(): postRpcDataRequest();
       break;
     case MonitorBroker::NAGIOS:
     default:
@@ -169,7 +166,7 @@ void SvNavigator::startMonitor()
   setEnabled(true);
   mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
   mupdateInterval = 1000 * ((mupdateInterval > 0)? mupdateInterval :
-                                                 MonitorBroker::DEFAULT_UPDATE_INTERVAL);
+                                                   MonitorBroker::DEFAULT_UPDATE_INTERVAL);
   mtimer = startTimer(mupdateInterval);
 }
 
@@ -524,7 +521,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
   if(utils::findNode(mcoreData, _nodeId, node) &&
-     node->child_nodes != "") {  // NOTE: take care in short-circuit evaluation!!!
+     node->child_nodes != "") {  // Warning: take care in short-circuit evaluation!!!
       if (node->type == NodeType::ALARM_NODE) {
           mfilteredMsgPanel->addMsg(node);
         } else {
@@ -636,34 +633,12 @@ void SvNavigator::loadMenus(void)
   setMenuBar(menuBar);
 }
 
-
-void SvNavigator::openZbxSession(void)
-{
-  mzbxHelper->setBaseUrl(mmonitorBaseUrl);
-  QStringList params = getAuthInfo();
-  if(params.size() != 2) {
-      utils::alert("Invalid authentication chain!\nMust be in the form login:password");
-      return ;
-    }
-  params.push_back(QString::number(ZbxHelper::LOGIN));
-  mzbxHelper->postRequest(ZbxHelper::LOGIN, params);
-}
-
 void SvNavigator::closeZbxSession(void)
 {
   QStringList params;
   params.push_back(mzbxAuthToken);
   params.push_back(QString::number(ZbxHelper::LOGOUT));
   mzbxHelper->postRequest(ZbxHelper::LOGOUT, params);
-}
-
-void SvNavigator::retrieveZbxHostData(const QString& _host)
-{
-  QStringList params;
-  params.push_back(mzbxAuthToken);
-  params.push_back(_host);
-  params.push_back(QString::number(ZbxHelper::TRIGGER));
-  mzbxHelper->postRequest(ZbxHelper::TRIGGER, params);
 }
 
 void SvNavigator::processZbxReply(QNetworkReply* _reply)
@@ -681,21 +656,19 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
   switch(dataId) {
     case ZbxHelper::LOGIN :
       mzbxAuthToken = jsHelper.getProperty("result").toString();
-      resetStatData();
-      retrieveDataFromZbx();
       if(! mzbxAuthToken.isEmpty())
         misLogged = true;
+      resetStatData();
+      postRpcDataRequest();
       break;
 
     case ZbxHelper::TRIGGER: {
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
-
             trigger.next();
             if (trigger.flags()&QScriptValue::SkipInEnumeration) {
                 continue;
               }
-
             QScriptValue triggerData = trigger.value();
             MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
@@ -728,9 +701,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             mcoreData->checks_[key] = check;
           }
         if(mhostLeft--, mhostLeft == 0){
-
             foreach(const QString& checkId, mcoreData->cnodes.keys()) {
-
                 NodeListT::iterator node = mcoreData->bpnodes.find(checkId);
                 if(node == mcoreData->bpnodes.end()) {
                     continue;
@@ -756,14 +727,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
     }
 }
 
-void SvNavigator::retrieveDataFromZbx(void) {
-  updateStatusBar(tr("Updating..."));
-  foreach(const QString& host, mcoreData->hosts.keys()) {
-      retrieveZbxHostData(host);
-    }
-}
-
-void SvNavigator::processPostError(QNetworkReply::NetworkError _code){
+void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
 
   QString apiUrl = "";
   if(mcoreData->monitor == MonitorBroker::ZABBIX) {
@@ -790,45 +754,75 @@ void SvNavigator::processPostError(QNetworkReply::NetworkError _code){
 }
 
 
-void SvNavigator::openZnsSession(void)
+void SvNavigator::openRpcSession(void)
 {
-  QStringList authInfo = getAuthInfo();
-  if(authInfo.size() != 2) {
+
+  QStringList authParams = getAuthInfo();
+  QUrl znsUrlParams;
+  if(authParams.size() != 2) {
       utils::alert("Invalid authentication chain!\nMust be in the form login:password");
       return ;
     }
 
-  // Set this before doing anything
-  mznsHelper->setBaseUrl(mmonitorBaseUrl);
+  switch(mcoreData->monitor) {
+    case MonitorBroker::ZABBIX:
+      mzbxHelper->setBaseUrl(mmonitorBaseUrl);
+      authParams.push_back(QString::number(ZbxHelper::LOGIN));
+      mzbxHelper->postRequest(ZbxHelper::LOGIN, authParams);
+      break;
 
-  QUrl urlParams;
-  urlParams.addQueryItem("__ac_name", authInfo[0]);
-  urlParams.addQueryItem("__ac_password", authInfo[1]);
-  urlParams.addQueryItem("submitted", "true");
-  urlParams.addQueryItem("came_from", mznsHelper->getApiContextUrl());
-  mznsHelper->postRequest(ZnsHelper::LOGIN, urlParams.encodedQuery());
+    case MonitorBroker::ZENOSS:
+      mznsHelper->setBaseUrl(mmonitorBaseUrl);
+      znsUrlParams.addQueryItem("__ac_name", authParams[0]);
+      znsUrlParams.addQueryItem("__ac_password", authParams[1]);
+      znsUrlParams.addQueryItem("submitted", "true");
+      znsUrlParams.addQueryItem("came_from", mznsHelper->getApiContextUrl());
+      mznsHelper->postRequest(ZnsHelper::LOGIN, znsUrlParams.encodedQuery());
+      break;
+
+    default:
+      break;
+
+    }
 }
 
-void SvNavigator::retrieveDataFromZns(void) {
+void SvNavigator::postRpcDataRequest(void) {
+
   updateStatusBar(tr("Updating..."));
-  mznsHelper->setRouter(ZnsHelper::RETRIEVE_DEV);
-  foreach(const QString& host, mcoreData->hosts.keys()) {
-      mznsHelper->postRequest(ZnsHelper::RETRIEVE_DEV,
-                             ZnsHelper::ReQPatterns[ZnsHelper::RETRIEVE_DEV]
-                             .arg(host)
-                             .arg(ZnsHelper::RETRIEVE_DEV)
-                             .toAscii());
+
+  switch(mcoreData->monitor) {
+    case MonitorBroker::ZABBIX:
+      foreach(const QString& host, mcoreData->hosts.keys()) {
+          QStringList params;
+          params.push_back(mzbxAuthToken);
+          params.push_back(host);
+          params.push_back(QString::number(ZbxHelper::TRIGGER));
+          mzbxHelper->postRequest(ZbxHelper::TRIGGER, params);
+        }
+      break;
+
+    case MonitorBroker::ZENOSS:
+      mznsHelper->setRouter(ZnsHelper::RETRIEVE_DEV);
+      foreach(const QString& host, mcoreData->hosts.keys()) {
+          mznsHelper->postRequest(ZnsHelper::RETRIEVE_DEV,
+                                  ZnsHelper::ReQPatterns[ZnsHelper::RETRIEVE_DEV]
+                                  .arg(host)
+                                  .arg(ZnsHelper::RETRIEVE_DEV)
+                                  .toAscii());
+        }
+      break;
+
+    default:
+      break;
     }
 }
 
 void SvNavigator::processZnsReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
-
   if (_reply->error() != QNetworkReply::NoError) {
       return;
     }
-
   int code = _reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
   QString data = _reply->readAll();
   if ((code >= 200 && code < 300) ||  //Success
@@ -839,7 +833,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       if(mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl())){
           if(data.endsWith("submitted=true")) {
               misLogged = true;
-              retrieveDataFromZns();
+              postRpcDataRequest();
             }
         }
     } else {
@@ -881,7 +875,7 @@ void SvNavigator::addEvents(void)
   connect(mmap, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(mtree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
   connect(mzbxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZbxReply(QNetworkReply*)));
-  connect(mzbxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processPostError(QNetworkReply::NetworkError)));
+  connect(mzbxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processRpcError(QNetworkReply::NetworkError)));
   connect(mznsHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZnsReply(QNetworkReply*)));
-  connect(mznsHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processPostError(QNetworkReply::NetworkError)));
+  connect(mznsHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processRpcError(QNetworkReply::NetworkError)));
 }

@@ -76,7 +76,7 @@ public slots:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void processZbxReply(QNetworkReply* reply);
-  void processPostError(QNetworkReply::NetworkError code);
+  void processRpcError(QNetworkReply::NetworkError code);
   void processZnsReply(QNetworkReply* reply);
 
 signals:
@@ -139,12 +139,9 @@ private:
   void updateCNode(NodeListT::iterator& _node);
   void updateStats(void);
   void updateStatusBar(const QString& msg);
-  void openZbxSession(void);
   void closeZbxSession(void);
-  void retrieveDataFromZbx(void);
-  void retrieveZbxHostData(const QString& host);
-  void openZnsSession(void);
-  void retrieveDataFromZns(void);
+  void openRpcSession(void);
+  void postRpcDataRequest(void);
   QStringList getAuthInfo(void);
 };
 
