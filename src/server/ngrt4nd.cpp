@@ -130,7 +130,7 @@ int main(int argc, char ** argv)
         case 'p': {
             port = atoi(optarg) ;
             if(port <= 0 ) {
-                cerr << "ERROR: bad port number.\n";
+                cerr << "Bad port number.\n";
                 exit(1) ;
             }
             break;
@@ -183,7 +183,7 @@ int main(int argc, char ** argv)
     if( ! foreground ) {
         pid_t pid = fork();
         if(pid <= -1) {
-            std::clog << "ERROR: failed while starting the program in daemon mode" << endl;
+            std::clog << "Failed while starting the program in daemon mode\n";
             exit(1);
         }
         else if(pid > 0) {
@@ -225,7 +225,7 @@ int main(int argc, char ** argv)
             if(pass == authChain) {
                 reply = monitor->getInfOfService(sid) ;
             } else {
-                reply = "{\"return_code\" : \"-2\", \"message\" : \"ERROR: Wrong authentication\"}";
+                reply = "{\"return_code\" : \"-2\", \"message\" : \"Authentication failed\"}";
             }
         }
         socket.send(reply);

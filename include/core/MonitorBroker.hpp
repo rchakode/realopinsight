@@ -43,7 +43,7 @@ public:
     CRITICITY_MINOR = 1,
     CRITICITY_MAJOR = 2,
     CRITICITY_HIGH = 3,
-    CRITICITY_UNKNOWN = 4
+    CRITICITY_UNKNOWN = 100
   };
 
   enum NAGIOS_StatusT {

@@ -3,13 +3,13 @@ AM_LDFLAGS=$(SUBLIBS) -lcrypt -lzmq
 
 sbin_PROGRAMS = ngrt4nd
 ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp \
-		   src/core/utils.cpp \
+		   src/core/utilsCore.cpp \
 		   src/server/ngrt4nd.cpp \
 		   include/core/MonitorBroker.hpp \
 		   include/core/ns.hpp \
 		   include/core/Socket.hpp \
 		   src/core/Socket.cpp \
-		   src/server/Logger.hpp
+		   src/server/Logger.hpp \
 		   src/server/Logger.cpp
 
 man1_MANS = doc/man/ngrt4nd.1

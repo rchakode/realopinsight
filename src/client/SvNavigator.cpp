@@ -36,7 +36,7 @@
 
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
-const QString SERVICE_OFFLINE_MSG(QObject::tr("ERROR: Failed to connect to %1"));
+const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const QString ID_PATTERN("%1/%2");
 
@@ -245,7 +245,7 @@ int SvNavigator::runNagiosMonitor(void)
       mupdateSucceed = false ;
     } else {
       if(msocket->getServerSerial() < 110) {
-          utils::alert(tr("ERROR: The server %1 is not supported")
+          utils::alert(tr("The server %1 is not supported")
                        .arg(msocket->getServerSerial()));
           mupdateSucceed = false;
         }
@@ -259,7 +259,6 @@ int SvNavigator::runNagiosMonitor(void)
       NodeListT::iterator cnode = mcoreData->cnodes.find(checkId);
       if(cnode == mcoreData->cnodes.end())
         continue;
-
       if(cnode->child_nodes == "") {
           cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
           mcoreData->check_status_count[cnode->criticity]++;
@@ -338,9 +337,7 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
 
 void SvNavigator::updateCNode(NodeListT::iterator& _node) {
 
-  _node->criticity =
-      _node->prop_status =
-      utils::getCriticity(mcoreData->monitor, _node->check.status);
+  _node->criticity = _node->prop_status = utils::getCriticity(mcoreData->monitor, _node->check.status);
   updateAlarmMsg(_node);
   QString toolTip = getNodeToolTip(*_node);
   updateNavTreeItemStatus(_node, toolTip);
@@ -409,26 +406,15 @@ void SvNavigator::updateAlarmMsg(NodeListT::iterator&  _node)
 
 void SvNavigator::updateBpNode(QString _nodeId)
 {
-  NodeListT::iterator node = mcoreData->bpnodes.find(_nodeId);
-  if (node == mcoreData->bpnodes.end()) {
-      node = mcoreData->cnodes.find(_nodeId);
-      if (node == mcoreData->cnodes.end()) {
-          return ;
-        }
-    }
-
+  NodeListT::iterator node;
+  if(!utils::findNode(mcoreData, _nodeId, node))
+    return;
   Criticity criticity;
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++) {
-
-      NodeListT::iterator child = mcoreData->cnodes.find(*it);
-      if (child == mcoreData->cnodes.end()) {
-          child = mcoreData->bpnodes.find(*it);
-          if (child == mcoreData->bpnodes.end()) {
-              continue;
-            }
-        }
-
+      NodeListT::iterator child;
+      if(! utils::findNode(mcoreData, *it, child))
+        continue;
       Criticity cst(static_cast<MonitorBroker::CriticityT>(child->prop_status));
       if(node->status_crule == StatusCalcRules::WeightedCriticity) {
           criticity = criticity / cst;
@@ -436,9 +422,7 @@ void SvNavigator::updateBpNode(QString _nodeId)
           criticity = criticity * cst;
         }
     }
-
   node->criticity = criticity.getValue();
-
   switch(node->status_prule) {
     case StatusPropRules::Increased: node->prop_status = (criticity++).getValue();
       break;
@@ -661,7 +645,6 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
       resetStatData();
       postRpcDataRequest();
       break;
-
     case ZbxHelper::TRIGGER: {
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
@@ -677,8 +660,8 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             if(check.status != MonitorBroker::NAGIOS_OK) {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
                 int sev = triggerData.property("priority").toInteger();
-                Criticity st(utils::getCriticity(mcoreData->monitor, sev));
-                check.status = st.getValue();
+                Criticity criticity(utils::getCriticity(mcoreData->monitor, sev));
+                check.status = criticity.getValue();
               } else {
                 check.alarm_msg = triggerName.toStdString(); //TODO: user another parameter?
               }
@@ -702,14 +685,14 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
           }
         if(mhostLeft--, mhostLeft == 0){
             foreach(const QString& checkId, mcoreData->cnodes.keys()) {
-                NodeListT::iterator node = mcoreData->bpnodes.find(checkId);
-                if(node == mcoreData->bpnodes.end()) {
-                    continue;
-                  }
+
+                NodeListT::iterator node = mcoreData->cnodes.find(checkId);
+                if(node == mcoreData->cnodes.end())
+                  continue;
+
                 CheckListT::Iterator check = mcoreData->checks_.find(node->child_nodes);
-                if(check == mcoreData->checks_.end()) {
-                    continue;
-                  }
+                if(check == mcoreData->checks_.end())
+                  continue;
 
                 node->check = *check;
                 updateCNode(node);
@@ -721,7 +704,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         break;
       }
     default :
-      utils::alert(tr("ERROR: Weird response received from the server"));
+      utils::alert(tr("Weird response received from the server"));
       exit(1);
       break;
     }
@@ -739,15 +722,17 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
   utils::alert(msg);
   updateStatusBar(msg);
   foreach(const QString& c, mcoreData->cnodes.keys()) {
-      NodeListT::iterator node = mcoreData->bpnodes.find(c);
-      if(node == mcoreData->bpnodes.end()) continue;
+      NodeListT::iterator node = mcoreData->cnodes.find(c);
+      if(node == mcoreData->cnodes.end())
+        continue;
+
       node->check.status = MonitorBroker::CRITICITY_UNKNOWN;
       node->check.host = "Unknown";
       node->check.last_state_change = "0";
       node->check.check_command = "Unknown" ;
       node->check.alarm_msg = msg.toStdString();
       updateCNode(node);
-      mcoreData->check_status_count[node->check.status]++;
+      mcoreData->check_status_count[node->criticity]++;
     }
   mupdateSucceed = false ;
   updateStats();
@@ -761,6 +746,7 @@ void SvNavigator::openRpcSession(void)
   QUrl znsUrlParams;
   if(authParams.size() != 2) {
       utils::alert("Invalid authentication chain!\nMust be in the form login:password");
+      //TODO: fill console with unknown status?
       return ;
     }
 
@@ -789,7 +775,6 @@ void SvNavigator::openRpcSession(void)
 void SvNavigator::postRpcDataRequest(void) {
 
   updateStatusBar(tr("Updating..."));
-
   switch(mcoreData->monitor) {
     case MonitorBroker::ZABBIX:
       foreach(const QString& host, mcoreData->hosts.keys()) {
@@ -800,7 +785,6 @@ void SvNavigator::postRpcDataRequest(void) {
           mzbxHelper->postRequest(ZbxHelper::TRIGGER, params);
         }
       break;
-
     case MonitorBroker::ZENOSS:
       mznsHelper->setRouter(ZnsHelper::RETRIEVE_DEV);
       foreach(const QString& host, mcoreData->hosts.keys()) {
@@ -811,7 +795,6 @@ void SvNavigator::postRpcDataRequest(void) {
                                   .toAscii());
         }
       break;
-
     default:
       break;
     }
