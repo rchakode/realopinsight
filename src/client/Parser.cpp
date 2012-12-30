@@ -30,7 +30,7 @@
 
 using namespace std;
 
-const QString Parser::CHILD_NODES_SEP = ",";
+const QString Parser::CHILD_SEP = ",";
 const QString Parser::dotFileHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::dotFileFooter = "}";
 
@@ -48,7 +48,7 @@ Parser::~Parser()
     dotFile.remove(graphFilename + ".plain");
 }
 
-bool Parser::parseSvConfig(const QString & _configFile, CoreDataT & _coreData)
+bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
 {
   QString graphContent;
   QDomDocument xmlDoc;
@@ -112,84 +112,67 @@ bool Parser::parseSvConfig(const QString & _configFile, CoreDataT & _coreData)
   buildNodeTree(_coreData.bpnodes, _coreData.cnodes, _coreData.tree_items);
   graphContent = dotFileHeader + graphContent;
   graphContent += dotFileFooter;
-  saveCoordinatesDotFile(graphContent);
+  saveCoordinatesFile(graphContent);
 
   return true;
 }
 
-void Parser::updateNodeHierachy(NodeListT & _bpnodes,
-                                NodeListT & _cnodes,
-                                QString & _graphContent)
+void Parser::updateNodeHierachy(NodeListT& _bpnodes,
+                                NodeListT& _cnodes,
+                                QString& _graphContent)
 {
   _graphContent = "\n";
+  foreach(const NodeT& node, _bpnodes) {
+      QString nname = node.name;
+      _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
 
-  for(NodeListT::iterator node = _bpnodes.begin(); node != _bpnodes.end(); node++) {
-      QString nname = node->name;
-      _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
-
-      if(node->child_nodes != "") {
-
-          QStringList nodeIds = node->child_nodes.split(CHILD_NODES_SEP);
-          for(QStringList::iterator nodeId = nodeIds.begin(); nodeId != nodeIds.end(); nodeId ++) {
-
-              QString nidTrimmed = (*nodeId).trimmed();
+      if(node.child_nodes != "") {
+          QStringList nodeIds = node.child_nodes.split(CHILD_SEP);
+          foreach(const QString& nodeId, nodeIds) {
+              QString nidTrimmed = nodeId.trimmed();
               NodeListT::iterator childNode = _cnodes.find(nidTrimmed);
-              if(childNode != _cnodes.end()) {
-                  childNode->parent = node->id;
-                  _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
-                } else {
-                  childNode = _bpnodes.find(nidTrimmed);
-                  if(childNode != _bpnodes.end()) {
-                      childNode->parent = node->id;
-                      _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
-                    }
+              if(utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
+                  childNode->parent = node.id;
+                  _graphContent += "\t" + node.id%"--"%childNode->id%"\n";
                 }
             }
         }
     }
 
-  for(NodeListT::iterator node = _cnodes.begin(); node != _cnodes.end(); node++) {
-      QString nname = node->name;
-      _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+  foreach(const NodeT& node, _cnodes) {
+      QString nname = node.name;
+      _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     }
 }
 
-void Parser::buildNodeTree(NodeListT & _bpnodes,
-                           NodeListT & _cnodes,
-                           TreeNodeItemListT & _tree)
+void Parser::buildNodeTree(const NodeListT& _bpnodes,
+                           const NodeListT& _cnodes,
+                           TreeNodeItemListT& _tree)
 {
-  for(NodeListT::iterator node = _bpnodes.begin(); node != _bpnodes.end(); node++) {
-      _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
+  foreach(const NodeT& node, _bpnodes) {
+      _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
     }
-  for(NodeListT::iterator node = _cnodes.begin(); node != _cnodes.end(); node++) {
-      _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
+  foreach(const NodeT& node, _cnodes) {
+      _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
     }
+  foreach(const NodeT& node, _bpnodes) {
+      if(node.child_nodes.isEmpty())
+        continue;
 
-  for(NodeListT::iterator node = _bpnodes.begin(); node != _bpnodes.end(); node++) {
-
-      if(node->type == NodeType::ALARM_NODE ||
-         node->child_nodes.length() == 0) {
-          continue;
-        }
-
-      QStringList childs = node->child_nodes.split(Parser::CHILD_NODES_SEP);
-      for(QStringList::iterator childId = childs.begin(); childId != childs.end(); childId++) {
-
-          TreeNodeItemListT::iterator nitem = _tree.find(node->id);
-          if (nitem == _tree.end()) {
-              utils::alert(QObject::tr("service not found %1").arg(node->name));
+      foreach(const QString& childId, node.child_nodes.split(Parser::CHILD_SEP)) {
+          TreeNodeItemListT::iterator treeItem = _tree.find(node.id);
+          if (treeItem == _tree.end()) {
+              utils::alert(QObject::tr("Service not found %1").arg(node.name));
               continue;
             }
-
-          TreeNodeItemListT::iterator child = _tree.find(*childId);
-          if(child != _tree.end()) {
-              _tree[node->id]->addChild(*child);
-            }
+          TreeNodeItemListT::iterator child = _tree.find(childId);
+          if(child != _tree.end())
+            (*treeItem)->addChild(*child);
         }
     }
 }
 
-void Parser::saveCoordinatesDotFile(const QString& _graph_content)
+void Parser::saveCoordinatesFile(const QString& _graph_content)
 {
   graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
   QFile file(graphFilename);

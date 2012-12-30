@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.1.2
+VERSION_=2.2.0
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{

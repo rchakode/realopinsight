@@ -25,7 +25,7 @@
 #include <QFileInfo>
 #include <unistd.h>
 
-QString utils::statusToString(const qint32 & _status)
+QString utils::statusToString(const qint32& _status)
 {
   switch(static_cast<MonitorBroker::CriticityT>(_status))
     {
@@ -58,21 +58,21 @@ void utils::clear(CoreDataT& data) {
   data.tree_items.clear();
 }
 
-void utils::alert(const QString  & msg) {
+void utils::alert(const QString & msg) {
   QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
 }
 
-QString utils::getAbsolutePath(const QString & _path) {
+QString utils::getAbsolutePath(const QString& _path) {
   QFileInfo fileInfo(_path);
   return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
 }
 
-void utils::delay(const qint32 & d) {
+void utils::delay(const qint32& d) {
   sleep(d);
 }
 
 
-MonitorBroker::CriticityT utils::getCriticity(const int& _monitor, const int & _statusOrSeverity) {
+MonitorBroker::CriticityT utils::getCriticity(const int& _monitor, const int& _statusOrSeverity) {
 
   int criticity = MonitorBroker::CRITICITY_UNKNOWN;
 
@@ -151,7 +151,7 @@ MonitorBroker::CriticityT utils::getCriticity(const int& _monitor, const int & _
 }
 
 
-QColor utils::getColor(const int & _criticity) {
+QColor utils::getColor(const int& _criticity) {
 
   QColor color(StatsLegend::COLOR_UNKNOWN);
   switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
@@ -180,7 +180,7 @@ QColor utils::getColor(const int & _criticity) {
 }
 
 
-QIcon utils::getTreeIcon(const int & _criticity) {
+QIcon utils::getTreeIcon(const int& _criticity) {
 
   QString ipath(":/images/built-in/unknown.png");
   switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
@@ -208,17 +208,24 @@ QIcon utils::getTreeIcon(const int & _criticity) {
   return QIcon(ipath);
 }
 
-bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node) {
+bool utils::findNode(NodeListT& bpnodes,
+                     NodeListT& cnodes,
+                     const QString& nodeId,
+                     NodeListT::iterator& node) {
   bool found = false;
-  node = coreData->bpnodes.find(nodeId);
-  if(node != coreData->bpnodes.end()) {
+  node = bpnodes.find(nodeId);
+  if(node != bpnodes.end()) {
       found = true;
     } else {
-      node = coreData->cnodes.find(nodeId);
-      if(node != coreData->cnodes.end()) {
+      node = cnodes.find(nodeId);
+      if(node != cnodes.end()) {
           found = true;
         }
     }
 
   return found;
+}
+
+bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node) {
+  return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
 }

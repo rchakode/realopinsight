@@ -29,7 +29,7 @@
 
 const QString SvNavigatorTree::rootID = "root";
 
-SvNavigatorTree::SvNavigatorTree(const bool & _enable_drag, QWidget* _parent)
+SvNavigatorTree::SvNavigatorTree(const bool& _enable_drag, QWidget* _parent)
   : QTreeWidget(_parent), coreData(NULL)
 {
   setHeaderLabel(tr("TV Explorer")) ;
@@ -71,9 +71,9 @@ void SvNavigatorTree::startDrag(Qt::DropActions _action)
   QTreeWidget::startDrag(_action) ;
 }
 
-void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
-                              const NodeT & _node,
-                              const bool & _isFirstInsertion)
+void SvNavigatorTree::addNode(TreeNodeItemListT& _tree,
+                              const NodeT& _node,
+                              const bool& _isFirstInsertion)
 {
   TreeNodeItemListT::iterator itemIt = _tree.find(_node.id) ;
   if(itemIt == _tree.end()) {
@@ -97,7 +97,7 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
   if(_node.type != NodeType::ALARM_NODE &&
      _node.child_nodes != "") {
 
-      QStringList childs = _node.child_nodes.split(Parser::CHILD_NODES_SEP);
+      QStringList childs = _node.child_nodes.split(Parser::CHILD_SEP);
 
       for(QStringList::iterator uds_it = childs.begin(); uds_it != childs.end(); uds_it++) {
 
@@ -117,7 +117,7 @@ void SvNavigatorTree::addNode(TreeNodeItemListT & _tree,
     }
 }
 
-void SvNavigatorTree::update(CoreDataT* & _data)
+void SvNavigatorTree::update(CoreDataT*& _data)
 {
   clear() ;
   addTopLevelItem(_data->tree_items[rootID]) ;
@@ -127,11 +127,11 @@ void SvNavigatorTree::update(CoreDataT* & _data)
 }
 
 
-QTreeWidgetItem * SvNavigatorTree::createTreeItem(const NodeT & _node){
+QTreeWidgetItem * SvNavigatorTree::createTreeItem(const NodeT& _node) {
+
   QTreeWidgetItem *item = new QTreeWidgetItem(QTreeWidgetItem::UserType);
   item->setIcon(0, QIcon(":/images/built-in/unknown.png"));
   item->setText(0, _node.name);
   item->setData(0, QTreeWidgetItem::UserType, _node.id);
-
   return item;
 }

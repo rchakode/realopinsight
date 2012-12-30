@@ -37,7 +37,7 @@ class SvCreator: public QMainWindow
   Q_OBJECT
 
 public:
-  SvCreator(const qint32 & _user_role = Auth::OP_USER_ROLE);
+  SvCreator(const qint32& _user_role = Auth::OP_USER_ROLE);
   virtual ~SvCreator();
 
   void load( const QString&);
@@ -55,7 +55,7 @@ public slots:
   void open(void);
   void save(void);
   void saveAs(void);
-  int close( const bool & = true);
+  int close( const bool& = true);
   void fillEditorFromService( QTreeWidgetItem*);
   void handleReturnPressed(void);
   void handleSelectedNodeChanged( void);
@@ -73,29 +73,25 @@ protected:
 
 private:
 
-  qint32 userRole;
-  qint32 hasToBeSaved;
-  QString openedFile;
-  QString selectedNode;
-
-  //QString statusFile;
-  QString selectedNodeId;
-
-  Settings* settings;
-  CoreDataT* coreData;
+  qint32 muserRole;
+  qint32 mhasLeftUpdates;
+  QString mactiveFile;
+  QString mselectedNode;
+  Settings* msettings;
+  CoreDataT* mcoreData;
   QSplitter* mainSplitter;
-  MenuListT menuList;
-  SubMenuListT subMenuList;
-
-  SvNavigatorTree* navigationTree;
-  ServiceEditor* editor;
-  QMenuBar* menuBar;
-  QToolBar* toolBar;
-  QMenu* nodeContextMenu;
+  MenuListT mmenuList;
+  SubMenuListT msubMenuList;
+  SvNavigatorTree* mtree;
+  ServiceEditor* meditor;
+  QMenuBar* mmenuBar;
+  QToolBar* mtoolBar;
+  QMenu* mnodeContextMenu;
 
   void loadFile(const QString &);
-  void saveInFile(const QString &);
-  bool updateServiceNode(NodeListT & , const QString &);
+  void recordData(const QString &);
+  void recordNode(QTextStream& stream, const NodeT & node);
+  bool updateServiceNode(NodeListT& , const QString &);
   void loadMenu(void);
   void unloadMenu(void);
   void addEvents(void);

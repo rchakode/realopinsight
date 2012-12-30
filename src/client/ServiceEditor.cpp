@@ -180,7 +180,7 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node)
   QString checkId = "";
   if(_node->type == NodeType::ALARM_NODE) {
       QListWidget* checks = checkListField();
-      QStringList childNodes = _node->child_nodes.split(Parser::CHILD_NODES_SEP);
+      QStringList childNodes = _node->child_nodes.split(Parser::CHILD_SEP);
       QStringList::iterator childNodeIt = childNodes.begin();
       if (childNodeIt != childNodes.end()) {
           checkId = (*childNodeIt).trimmed();

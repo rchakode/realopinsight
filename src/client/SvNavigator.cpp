@@ -60,8 +60,8 @@ ComboBoxItemsT SvNavigator::calcRules() {
   return map;
 }
 
-SvNavigator::SvNavigator(const qint32 & _userRole,
-                         const QString & _config,
+SvNavigator::SvNavigator(const qint32& _userRole,
+                         const QString& _config,
                          QWidget* parent)
   : QMainWindow(parent),
     mcoreData (new CoreDataT()),
@@ -178,17 +178,17 @@ void SvNavigator::timerEvent(QTimerEvent *)
   startMonitor();
 }
 
-void  SvNavigator::updateStatusBar(const QString & msg) {
+void  SvNavigator::updateStatusBar(const QString& msg) {
   statusBar()->showMessage(msg);
 }
 
 
-void SvNavigator::load(const QString & _file)
+void SvNavigator::load(const QString& _file)
 {
   if( ! _file.isEmpty()) {
       mconfigFile = utils::getAbsolutePath(_file);
     }
-  mopenedFile = mconfigFile;
+  mactiveFile = mconfigFile;
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
@@ -257,7 +257,7 @@ int SvNavigator::runNagiosMonitor(void)
   resetStatData();
   mmsgPanel->setSortingEnabled(false);
 
-  foreach(const QString & checkId, mcoreData->cnodes.keys()) {
+  foreach(const QString& checkId, mcoreData->cnodes.keys()) {
 
       NodeListT::iterator cnode = mcoreData->cnodes.find(checkId);
       if(cnode == mcoreData->cnodes.end())
@@ -269,8 +269,8 @@ int SvNavigator::runNagiosMonitor(void)
           continue;
         }
 
-      QStringList checks = cnode->child_nodes.split(Parser::CHILD_NODES_SEP);
-      foreach(const QString & cid, checks) {
+      QStringList checks = cnode->child_nodes.split(Parser::CHILD_SEP);
+      foreach(const QString& cid, checks) {
           QString msg = mserverAuthChain%":"%cid;
           if(mupdateSucceed) {
               msocket->send(msg.toStdString());
@@ -314,7 +314,7 @@ void SvNavigator::resetStatData(void)
 }
 
 
-QString SvNavigator::getNodeToolTip(const NodeT & _node)
+QString SvNavigator::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
       .arg(const_cast<QString&>(_node.description).replace("\n", " "))
@@ -339,7 +339,7 @@ QString SvNavigator::getNodeToolTip(const NodeT & _node)
 }
 
 
-void SvNavigator::updateCNode(NodeListT::iterator & _node) {
+void SvNavigator::updateCNode(NodeListT::iterator& _node) {
 
   _node->criticity =
       _node->prop_status =
@@ -374,7 +374,7 @@ void SvNavigator::updateStats() {
     updateStatusBar(tr("Update completed"));
 }
 
-void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
+void SvNavigator::updateAlarmMsg(NodeListT::iterator&  _node)
 {
   QString msg = "";
   if(_node->criticity == MonitorBroker::CRITICITY_NORMAL) {
@@ -421,7 +421,7 @@ void SvNavigator::updateBpNode(QString _nodeId)
     }
 
   Criticity criticity;
-  QStringList nodeIds = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+  QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++) {
 
       NodeListT::iterator child = mcoreData->cnodes.find(*it);
@@ -458,7 +458,7 @@ void SvNavigator::updateBpNode(QString _nodeId)
 }
 
 
-void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tip)
+void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
 {
 
   TreeNodeItemListT::iterator tnode_it = mcoreData->tree_items.find(_node->id);
@@ -478,9 +478,9 @@ void SvNavigator::updateMonitoringSettings(){
   if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000;
 }
 
-void SvNavigator::expandNode(const QString & _nodeId,
-                             const bool & _expand,
-                             const qint32 & _level)
+void SvNavigator::expandNode(const QString& _nodeId,
+                             const bool& _expand,
+                             const qint32& _level)
 {
   NodeListT::iterator node = mcoreData->bpnodes.find(_nodeId);
   if(node == mcoreData->bpnodes.end()) {
@@ -488,14 +488,14 @@ void SvNavigator::expandNode(const QString & _nodeId,
     }
 
   if(node->child_nodes != "") {
-      QStringList  childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+      QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
       for (QStringList::iterator udsIt = childNodes.begin(); udsIt != childNodes.end(); udsIt++) {
           mmap->setNodeVisible(*udsIt, _nodeId, _expand, _level);
         }
     }
 }
 
-void SvNavigator::centerGraphOnNode(const QString & _node_id)
+void SvNavigator::centerGraphOnNode(const QString& _node_id)
 {
   if(_node_id != "") mselectedNode =  _node_id;
   mmap->centerOnNode(mselectedNode);
@@ -520,7 +520,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
   mfilteredMsgPanel->show();
 }
 
-void SvNavigator::filterNodeRelatedMsg(const QString & _nodeId)
+void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
   if(utils::findNode(mcoreData, _nodeId, node) &&
@@ -528,7 +528,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString & _nodeId)
       if (node->type == NodeType::ALARM_NODE) {
           mfilteredMsgPanel->addMsg(node);
         } else {
-          QStringList childIds = node->child_nodes.split(Parser::CHILD_NODES_SEP);
+          QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
           foreach(QString checkId, childIds) {
               filterNodeRelatedMsg(checkId);
             }
@@ -539,7 +539,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString & _nodeId)
 
 void SvNavigator::acknowledge(void)
 {
-  //TODO
+  //TODO: To be implemented
 }
 
 void SvNavigator::tabChanged(int _index)
@@ -657,7 +657,7 @@ void SvNavigator::closeZbxSession(void)
   mzbxHelper->postRequest(ZbxHelper::LOGOUT, params);
 }
 
-void SvNavigator::retrieveZbxHostData(const QString & _host)
+void SvNavigator::retrieveZbxHostData(const QString& _host)
 {
   QStringList params;
   params.push_back(mzbxAuthToken);
@@ -707,7 +707,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                 Criticity st(utils::getCriticity(mcoreData->monitor, sev));
                 check.status = st.getValue();
               } else {
-                check.alarm_msg = triggerName.toStdString(); //TODO
+                check.alarm_msg = triggerName.toStdString(); //TODO: user another parameter?
               }
             QString targetHost = "";
             QScriptValueIterator host(triggerData.property("hosts"));
@@ -729,7 +729,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
           }
         if(mhostLeft--, mhostLeft == 0){
 
-            foreach(const QString & checkId, mcoreData->cnodes.keys()) {
+            foreach(const QString& checkId, mcoreData->cnodes.keys()) {
 
                 NodeListT::iterator node = mcoreData->bpnodes.find(checkId);
                 if(node == mcoreData->bpnodes.end()) {
@@ -758,7 +758,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
 
 void SvNavigator::retrieveDataFromZbx(void) {
   updateStatusBar(tr("Updating..."));
-  foreach(const QString & host, mcoreData->hosts.keys()) {
+  foreach(const QString& host, mcoreData->hosts.keys()) {
       retrieveZbxHostData(host);
     }
 }
@@ -774,7 +774,7 @@ void SvNavigator::processPostError(QNetworkReply::NetworkError _code){
   QString msg = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code));
   utils::alert(msg);
   updateStatusBar(msg);
-  foreach(const QString & c, mcoreData->cnodes.keys()) {
+  foreach(const QString& c, mcoreData->cnodes.keys()) {
       NodeListT::iterator node = mcoreData->bpnodes.find(c);
       if(node == mcoreData->bpnodes.end()) continue;
       node->check.status = MonitorBroker::CRITICITY_UNKNOWN;
@@ -812,7 +812,7 @@ void SvNavigator::openZnsSession(void)
 void SvNavigator::retrieveDataFromZns(void) {
   updateStatusBar(tr("Updating..."));
   mznsHelper->setRouter(ZnsHelper::RETRIEVE_DEV);
-  foreach(const QString & host, mcoreData->hosts.keys()) {
+  foreach(const QString& host, mcoreData->hosts.keys()) {
       mznsHelper->postRequest(ZnsHelper::RETRIEVE_DEV,
                              ZnsHelper::ReQPatterns[ZnsHelper::RETRIEVE_DEV]
                              .arg(host)

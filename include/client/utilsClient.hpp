@@ -29,14 +29,15 @@
 #include <QIcon>
 
 namespace utils {
-  QString statusToString(const qint32 & _status);
+  QString statusToString(const qint32& _status);
   void clear(CoreDataT& data);
-  void alert(const QString  & msg);
-  QString getAbsolutePath(const QString & _path);
-  void delay(const qint32 & d);
-  MonitorBroker::CriticityT getCriticity(const int& _monitor, const int & _statusOrSeverity);
+  void alert(const QString & msg);
+  QString getAbsolutePath(const QString& _path);
+  void delay(const qint32& d);
+  MonitorBroker::CriticityT getCriticity(const int& _monitor, const int& _statusOrSeverity);
   QColor getColor(const int &_criticity);
   QIcon getTreeIcon(const int &_criticity);
+  bool findNode(NodeListT& bpnodes, NodeListT& cnodes, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
 } //NAMESPACE
 

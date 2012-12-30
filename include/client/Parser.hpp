@@ -38,22 +38,22 @@ public:
 
   bool parseSvConfig(const QString &, CoreDataT &);
   QString getDotGraphFile(void) const { return graphFilename; }
-  static const QString CHILD_NODES_SEP;
+  static const QString CHILD_SEP;
 
 private:
   static const QString dotFileHeader;
   static const QString dotFileFooter;
   QString graphFilename;
 
-  void buildNodeTree(NodeListT & _bpnodes,
-                     NodeListT & _cnodes,
+  void buildNodeTree(const NodeListT & _bpnodes,
+                     const NodeListT & _cnodes,
                      TreeNodeItemListT & _tree);
 
   void updateNodeHierachy(NodeListT & _bpnodes,
                           NodeListT & _cnodes,
                           QString & _graphContent);
 
-  void saveCoordinatesDotFile(const QString&);
+  void saveCoordinatesFile(const QString&);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

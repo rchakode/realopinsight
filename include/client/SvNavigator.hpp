@@ -43,28 +43,28 @@ class SvNavigator : public QMainWindow
   Q_OBJECT
 
 public:
-  SvNavigator(const qint32 & _userRole = Auth::OP_USER_ROLE,
-              const QString & _config = "",
+  SvNavigator(const qint32& _userRole = Auth::OP_USER_ROLE,
+              const QString& _config = "",
               QWidget* = 0);
   virtual ~SvNavigator();
-  void load(const QString & _file = "");
+  void load(const QString& _file = "");
 
   void resize(void);
 
   static ComboBoxItemsT propRules();
   static ComboBoxItemsT calcRules();
 
-  static QString getNodeToolTip(const NodeT & _node);
+  static QString getNodeToolTip(const NodeT& _node);
 
 public slots:
   void startMonitor();
   int runNagiosMonitor(void);
   void resetStatData(void);
   void updateBpNode(QString);
-  void expandNode(const QString & _nodeId,
-                  const bool & _expand,
-                  const qint32 & _level);
-  void centerGraphOnNode(const QString & _node_id = "");
+  void expandNode(const QString& _nodeId,
+                  const bool& _expand,
+                  const qint32& _level);
+  void centerGraphOnNode(const QString& _node_id = "");
   void filterNodeRelatedMsg(void);
   void filterNodeRelatedMsg(const QString &);
   void acknowledge(void);
@@ -92,7 +92,7 @@ protected:
 private:
   CoreDataT* mcoreData;
   QString mconfigFile;
-  QString mopenedFile;
+  QString mactiveFile;
   QString mmonitorBaseUrl;
   QString mselectedNode;
   QString mstatsInfo;
@@ -134,15 +134,15 @@ private:
   void loadMenus(void);
   void unloadMenus(void);
   void updateMonitoringSettings();
-  void updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tip);
-  void updateAlarmMsg(NodeListT::iterator & _node);
-  void updateCNode(NodeListT::iterator & _node);
+  void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  void updateAlarmMsg(NodeListT::iterator& _node);
+  void updateCNode(NodeListT::iterator& _node);
   void updateStats(void);
-  void updateStatusBar(const QString & msg);
+  void updateStatusBar(const QString& msg);
   void openZbxSession(void);
   void closeZbxSession(void);
   void retrieveDataFromZbx(void);
-  void retrieveZbxHostData(const QString & host);
+  void retrieveZbxHostData(const QString& host);
   void openZnsSession(void);
   void retrieveDataFromZns(void);
   QStringList getAuthInfo(void);
