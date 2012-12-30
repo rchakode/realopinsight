@@ -211,12 +211,10 @@ void SvCreator::deleteNode(const QString& _nodeId)
           deleteNode(checkId);
         }
     }
-
   TreeNodeItemListT::iterator item = mcoreData->tree_items.find(_nodeId);
   TreeNodeItemListT::iterator pItem = mcoreData->tree_items.find(node->parent);
   if(pItem != mcoreData->tree_items.end() &&
-     item != mcoreData->tree_items.end())
-    {
+     item != mcoreData->tree_items.end()) {
       QRegExp regex("|^" + _nodeId + Parser::CHILD_SEP +
                     "|^" + _nodeId + "$" +
                     "|" + Parser::CHILD_SEP  + _nodeId);
@@ -225,9 +223,6 @@ void SvCreator::deleteNode(const QString& _nodeId)
       if(pNode != mcoreData->bpnodes.end()) {
           pNode->child_nodes.remove(regex);
         }
-
-      qDebug() << (*pItem)->indexOfChild(*item) << " " << (*item)->text(0);
-      qDebug() << (*pItem)->childCount();
       if(node->type == NodeType::ALARM_NODE) {
           mcoreData->cnodes.remove(_nodeId);
         } else {
