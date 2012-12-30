@@ -71,7 +71,6 @@ public:
     ZENOSS_CRITICAL = 5
   };
 
-
   typedef struct _CheckT{
     string id;
     string host ;

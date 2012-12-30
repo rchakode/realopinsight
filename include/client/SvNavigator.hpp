@@ -51,8 +51,8 @@ public:
 
   void resize(void);
 
-  static ComboBoxItemsT propRules();
-  static ComboBoxItemsT calcRules();
+  static StringMapT propRules();
+  static StringMapT calcRules();
 
   static QString getNodeToolTip(const NodeT& _node);
 
@@ -76,8 +76,8 @@ public slots:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void processZbxReply(QNetworkReply* reply);
-  void processRpcError(QNetworkReply::NetworkError code);
   void processZnsReply(QNetworkReply* reply);
+  void processRpcError(QNetworkReply::NetworkError code);
 
 signals:
   void hasToBeUpdate(QString);
@@ -128,6 +128,7 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
+ StringMapT mhostUid2Name;
 
 
   void addEvents(void);

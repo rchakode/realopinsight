@@ -100,8 +100,8 @@ RequestListT ZnsHelper::getContentTypes()
 {
   RequestListT list;
   list[LOGIN] = "application/x-www-form-urlencoded";
-  list[RETRIEVE_COMP] = "application/json; charset=utf-8";
-  list[RETRIEVE_DEV] = "application/json; charset=utf-8";
+  list[COMPONENT] = "application/json; charset=utf-8";
+  list[DEVICE] = "application/json; charset=utf-8";
   return list;
 }
 
@@ -109,30 +109,30 @@ RequestListT ZnsHelper::getContentTypes()
 RequestListT ZnsHelper::getRequestsPatterns()
 {
   RequestListT list;
-  list[RETRIEVE_DEV] = "{\"action\": \"DeviceRouter\", \
+  list[DEVICE] = "{\"action\": \"DeviceRouter\", \
       \"method\": \"getDevices\", \
       \"data\": [{\
       \"uid\": \"/zport/dmd/Devices\", \
+      \"sort\": \"name\", \
       \"params\": {\"name\": \"%1\"},  \
-      \"keys\":[\"name\", \"uid\"] }], \
+      \"keys\":[\"name\",\"uid\"] }], \
       \"type\": \"rpc\", \
       \"tid\": %2}";
-  list[RETRIEVE_COMP] = "{\"action\": \"DeviceRouter\", \
+  list[COMPONENT] = "{\"action\": \"DeviceRouter\", \
       \"method\": \"getComponents\", \
       \"data\": [{\
       \"uid\": \"%1\", \
-      \"limit\": \"1000\", \
-      \"keys\":[\"name\", \"status\", \"severity\", \"pingStatus\"] }], \
+      \"limit\": 1000, \
+      \"keys\":[\"name\", \"status\", \"severity\", \"pingStatus\"]}], \
       \"type\": \"rpc\", \
       \"tid\": %2}";
-
   return list;
 }
 
 RequestListT ZnsHelper::getRouters()
 {
   RequestListT list;
-  list[RETRIEVE_COMP] = "device_router";
-  list[RETRIEVE_DEV] = "device_router";
+  list[COMPONENT] = "device_router";
+  list[DEVICE] = "device_router";
   return list;
 }

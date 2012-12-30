@@ -243,7 +243,7 @@ void ServiceEditor::loadTypeFields()
 
 void ServiceEditor::loadStatusHandlingFields(void)
 {
-  ComboBoxItemsT crules = SvNavigator::calcRules();
+  StringMapT crules = SvNavigator::calcRules();
   QString defaultRule = StatusCalcRules::label(StatusCalcRules::HighCriticity);
   statusCalcRuleField()->addItem(tr("Calculation rule (Default is")%" "%defaultRule+")", StatusCalcRules::HighCriticity);
 
@@ -251,7 +251,7 @@ void ServiceEditor::loadStatusHandlingFields(void)
       statusCalcRuleField()->addItem(rule, crules.value(rule));
     }
 
-  ComboBoxItemsT prules = SvNavigator::propRules();
+  StringMapT prules = SvNavigator::propRules();
   defaultRule = StatusPropRules::label(StatusPropRules::Unchanged);
   statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", StatusPropRules::Unchanged);
   foreach(const QString & rule, prules.keys()) {

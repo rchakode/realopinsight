@@ -40,8 +40,8 @@ const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const QString ID_PATTERN("%1/%2");
 
-ComboBoxItemsT SvNavigator::propRules() {
-  ComboBoxItemsT map;
+StringMapT SvNavigator::propRules() {
+  StringMapT map;
   map.insert(StatusPropRules::label(StatusPropRules::Unchanged),
              StatusPropRules::toString(StatusPropRules::Unchanged));
   map.insert(StatusPropRules::label(StatusPropRules::Decreased),
@@ -51,8 +51,8 @@ ComboBoxItemsT SvNavigator::propRules() {
   return map;
 }
 
-ComboBoxItemsT SvNavigator::calcRules() {
-  ComboBoxItemsT map;
+StringMapT SvNavigator::calcRules() {
+  StringMapT map;
   map.insert(StatusCalcRules::label(StatusCalcRules::HighCriticity),
              StatusCalcRules::toString(StatusCalcRules::HighCriticity));
   map.insert(StatusCalcRules::label(StatusCalcRules::WeightedCriticity),
@@ -120,6 +120,55 @@ SvNavigator::~SvNavigator()
   delete mznsHelper;
   if(mfilteredMsgPanel) delete mfilteredMsgPanel;
   unloadMenus();
+}
+
+
+void SvNavigator::loadMenus(void)
+{
+  QIcon refreshIcon(":images/built-in/refresh.png");
+  QIcon cameraIcon(":images/built-in/camera.png");
+  QIcon zoominIcon(":images/built-in/zoomin.png");
+  QIcon zoomoutIcon(":images/built-in/zoomout.png");
+
+  QMenuBar* menuBar = new QMenuBar();
+  mmenuList["MENU1"] = menuBar->addMenu("&File"),
+      msubMenuList["Refresh"] = mmenuList["MENU1"]->addAction(refreshIcon, tr("&Refresh Screen")),
+      msubMenuList["Capture"] = mmenuList["MENU1"]->addAction(cameraIcon, tr("&Save Map as Image")),
+      mmenuList["MENU1"]->addSeparator(),
+      msubMenuList["Quit"] = mmenuList["MENU1"]->addAction(tr("&Quit"));
+
+  mmenuList["MENU2"] = menuBar->addMenu("&Map"),
+      msubMenuList["ZoomIn"] = mmenuList["MENU2"]->addAction(zoominIcon, tr("Zoom &In")),
+      msubMenuList["ZoomOut"] = mmenuList["MENU2"]->addAction(zoomoutIcon, tr("Zoom &Out")),
+      msubMenuList["HideChart"] = mmenuList["MENU2"]->addAction(tr("Hide &Chart"));
+
+  mmenuList["MENU3"] = menuBar->addMenu("&Preferences"),
+      msubMenuList["ChangePassword"] = mmenuList["MENU3"]->addAction(tr("Change &Password")),
+      msubMenuList["ChangeMonitoringSettings"] = mmenuList["MENU3"]->addAction(tr("&Monitoring Settings"));
+
+  mmenuList["MENU4"] = menuBar->addMenu("&Help"),
+      msubMenuList["ShowOnlineResources"] = mmenuList["MENU4"]->addAction(tr("Online &Resources")),
+      mmenuList["MENU4"]->addSeparator(),
+      msubMenuList["ShowAbout"] = mmenuList["MENU4"]->addAction(tr("&About %1").arg(appName));
+
+  msubMenuList["Capture"]->setShortcut(QKeySequence::Save);
+  msubMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
+  msubMenuList["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
+  msubMenuList["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
+  msubMenuList["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  msubMenuList["Quit"]->setShortcut(QKeySequence::Quit);
+
+  mcontextMenuList["FilterNodeRelatedMessages"] = mnodeContextMenu->addAction(tr("&Filter related messages"));
+  mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
+  mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
+
+  QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str()));
+  toolBar->addAction(msubMenuList["Refresh"]);
+  toolBar->addAction(msubMenuList["ZoomIn"]);
+  toolBar->addAction(msubMenuList["ZoomOut"]);
+  toolBar->addAction(msubMenuList["Capture"]);
+  toolBar->setIconSize(QSize(16,16));
+  setMenuBar(menuBar);
 }
 
 void SvNavigator::closeEvent(QCloseEvent * event)
@@ -569,54 +618,6 @@ void SvNavigator::resize(void)
 }
 
 
-void SvNavigator::loadMenus(void)
-{
-  QIcon refreshIcon(":images/built-in/refresh.png");
-  QIcon cameraIcon(":images/built-in/camera.png");
-  QIcon zoominIcon(":images/built-in/zoomin.png");
-  QIcon zoomoutIcon(":images/built-in/zoomout.png");
-
-  QMenuBar* menuBar = new QMenuBar();
-  mmenuList["MENU1"] = menuBar->addMenu("&File"),
-      msubMenuList["Refresh"] = mmenuList["MENU1"]->addAction(refreshIcon, tr("&Refresh Screen")),
-      msubMenuList["Capture"] = mmenuList["MENU1"]->addAction(cameraIcon, tr("&Save Map as Image")),
-      mmenuList["MENU1"]->addSeparator(),
-      msubMenuList["Quit"] = mmenuList["MENU1"]->addAction(tr("&Quit"));
-
-  mmenuList["MENU2"] = menuBar->addMenu("&Map"),
-      msubMenuList["ZoomIn"] = mmenuList["MENU2"]->addAction(zoominIcon, tr("Zoom &In")),
-      msubMenuList["ZoomOut"] = mmenuList["MENU2"]->addAction(zoomoutIcon, tr("Zoom &Out")),
-      msubMenuList["HideChart"] = mmenuList["MENU2"]->addAction(tr("Hide &Chart"));
-
-  mmenuList["MENU3"] = menuBar->addMenu("&Preferences"),
-      msubMenuList["ChangePassword"] = mmenuList["MENU3"]->addAction(tr("Change &Password")),
-      msubMenuList["ChangeMonitoringSettings"] = mmenuList["MENU3"]->addAction(tr("&Monitoring Settings"));
-
-  mmenuList["MENU4"] = menuBar->addMenu("&Help"),
-      msubMenuList["ShowOnlineResources"] = mmenuList["MENU4"]->addAction(tr("Online &Resources")),
-      mmenuList["MENU4"]->addSeparator(),
-      msubMenuList["ShowAbout"] = mmenuList["MENU4"]->addAction(tr("&About %1").arg(appName));
-
-  msubMenuList["Capture"]->setShortcut(QKeySequence::Save);
-  msubMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
-  msubMenuList["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
-  msubMenuList["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
-  msubMenuList["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  msubMenuList["Quit"]->setShortcut(QKeySequence::Quit);
-
-  mcontextMenuList["FilterNodeRelatedMessages"] = mnodeContextMenu->addAction(tr("&Filter related messages"));
-  mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
-  mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
-
-  QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str()));
-  toolBar->addAction(msubMenuList["Refresh"]);
-  toolBar->addAction(msubMenuList["ZoomIn"]);
-  toolBar->addAction(msubMenuList["ZoomOut"]);
-  toolBar->addAction(msubMenuList["Capture"]);
-  toolBar->setIconSize(QSize(16,16));
-  setMenuBar(menuBar);
-}
-
 void SvNavigator::closeZbxSession(void)
 {
   QStringList params;
@@ -629,15 +630,13 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
 
-  if (_reply->error() != QNetworkReply::NoError) {
-      return;
-    }
+  if (_reply->error() != QNetworkReply::NoError)
+    return;
 
   string data = static_cast<QString>(_reply->readAll()).toStdString();
   JsonHelper jsHelper(data);
-  qint32 dataId = jsHelper.getProperty("id").toInt32();
-
-  switch(dataId) {
+  qint32 transaction = jsHelper.getProperty("id").toInt32();
+  switch(transaction) {
     case ZbxHelper::LOGIN :
       mzbxAuthToken = jsHelper.getProperty("result").toString();
       if(! mzbxAuthToken.isEmpty())
@@ -649,15 +648,14 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next();
-            if (trigger.flags()&QScriptValue::SkipInEnumeration) {
-                continue;
-              }
+            if(trigger.flags()&QScriptValue::SkipInEnumeration)
+              continue;
             QScriptValue triggerData = trigger.value();
             MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
-            check.check_command = triggerName.toStdString();
+            check.check_command = triggerName.toStdString(); //TODO: it's corrected?
             check.status = triggerData.property("value").toInt32();
-            if(check.status != MonitorBroker::NAGIOS_OK) {
+            if(check.status != MonitorBroker::ZABBIX_UNCLASSIFIED) {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
                 int sev = triggerData.property("priority").toInteger();
                 Criticity criticity(utils::getCriticity(mcoreData->monitor, sev));
@@ -685,15 +683,12 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
           }
         if(mhostLeft--, mhostLeft == 0){
             foreach(const QString& checkId, mcoreData->cnodes.keys()) {
-
                 NodeListT::iterator node = mcoreData->cnodes.find(checkId);
                 if(node == mcoreData->cnodes.end())
                   continue;
-
                 CheckListT::Iterator check = mcoreData->checks_.find(node->child_nodes);
                 if(check == mcoreData->checks_.end())
                   continue;
-
                 node->check = *check;
                 updateCNode(node);
                 mcoreData->check_status_count[check->status]++;
@@ -707,6 +702,86 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
       utils::alert(tr("Weird response received from the server"));
       exit(1);
       break;
+    }
+}
+
+
+void SvNavigator::processZnsReply(QNetworkReply* _reply)
+{
+  _reply->deleteLater();
+  if (_reply->error() != QNetworkReply::NoError) {
+      return;
+    }
+
+  QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
+  QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
+
+  QString data = _reply->readAll();
+  qDebug() << data; //TODO: clean
+
+  if(mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl())){
+      if(data.endsWith("submitted=true")) {
+          misLogged = true;
+          postRpcDataRequest();
+        } else {
+          misLogged = false;
+        }
+    } else {
+      JsonHelper jsonHelper(data.toStdString());
+      qint32 transaction = jsonHelper.getProperty("tid").toInt32();
+      QScriptValue result = jsonHelper.getProperty("result");
+      QString successMsg = result.property("success").toString();
+
+      if(successMsg.compare("true") != 0) {
+          utils::alert(result.property("msg").toString());
+          mupdateSucceed = false;
+          //TODO: fill the message console before returning
+          return;
+        }
+
+      if(transaction == ZnsHelper::DEVICE) {
+          QScriptValueIterator devices(result.property("devices"));
+          while(devices.hasNext()) {
+              devices.next();
+              if (devices.flags()&QScriptValue::SkipInEnumeration)
+                continue;
+              QScriptValue item = devices.value();
+              QString name = item.property("name").toString();
+              QString uid = item.property("uid").toString();
+              mhostUid2Name[uid] = name;
+              mznsHelper->postRequest(ZnsHelper::COMPONENT,
+                                      ZnsHelper::ReQPatterns[ZnsHelper::COMPONENT]
+                                      .arg(uid)
+                                      .arg(ZnsHelper::COMPONENT)
+                                      .toAscii());
+            }
+        } else if(transaction == ZnsHelper::COMPONENT) {
+          QScriptValueIterator components(result.property("data"));
+          while(components.hasNext()) {
+              components.next();
+              if (components.flags()&QScriptValue::SkipInEnumeration)
+                continue;
+              QScriptValue item = components.value();
+              QString name = item.property("name").toString();
+              MonitorBroker::CheckT check;
+              check.check_command = "";
+              check.status = item.property("status").toInt32();
+              if(check.status != MonitorBroker::NAGIOS_OK) {
+                  //                  check.alarm_msg = content.property("error").toString().toStdString();
+                  //                  int sev = content.property("priority").toInteger();
+                  //                  Criticity criticity(utils::getCriticity(mcoreData->monitor, sev));
+                  //                  check.status = criticity.getValue();
+                } else {
+                  //                  check.alarm_msg = name.toStdString(); //TODO: user another parameter?
+                }
+              QString key = ID_PATTERN.arg(name).arg(name);
+              check.id = key.toStdString();
+              mcoreData->checks_[key] = check;
+            }
+        } else {
+        utils::alert("Unexpected response received from the server");
+        return;
+      }
     }
 }
 
@@ -786,12 +861,12 @@ void SvNavigator::postRpcDataRequest(void) {
         }
       break;
     case MonitorBroker::ZENOSS:
-      mznsHelper->setRouter(ZnsHelper::RETRIEVE_DEV);
+      mznsHelper->setRouter(ZnsHelper::DEVICE);
       foreach(const QString& host, mcoreData->hosts.keys()) {
-          mznsHelper->postRequest(ZnsHelper::RETRIEVE_DEV,
-                                  ZnsHelper::ReQPatterns[ZnsHelper::RETRIEVE_DEV]
+          mznsHelper->postRequest(ZnsHelper::DEVICE,
+                                  ZnsHelper::ReQPatterns[ZnsHelper::DEVICE]
                                   .arg(host)
-                                  .arg(ZnsHelper::RETRIEVE_DEV)
+                                  .arg(ZnsHelper::DEVICE)
                                   .toAscii());
         }
       break;
@@ -800,29 +875,6 @@ void SvNavigator::postRpcDataRequest(void) {
     }
 }
 
-void SvNavigator::processZnsReply(QNetworkReply* _reply)
-{
-  _reply->deleteLater();
-  if (_reply->error() != QNetworkReply::NoError) {
-      return;
-    }
-  int code = _reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-  QString data = _reply->readAll();
-  if ((code >= 200 && code < 300) ||  //Success
-      (code >= 300 && code < 400)) { // Redirection
-      QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
-      QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
-      qDebug() << data;
-      if(mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl())){
-          if(data.endsWith("submitted=true")) {
-              misLogged = true;
-              postRpcDataRequest();
-            }
-        }
-    } else {
-      utils::alert("Can't connect to the Zenoss API: " + data);
-    }
-}
 
 QStringList SvNavigator::getAuthInfo(void) {
 

@@ -275,7 +275,7 @@ typedef QHash<QString, GNodeT> GNodeListT;
 typedef QHash<QString, GEdgeT> GEdgeListT;
 typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
-typedef QMap<QString, QString> ComboBoxItemsT;
+typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 
 #endif /* BASE_HPP */
