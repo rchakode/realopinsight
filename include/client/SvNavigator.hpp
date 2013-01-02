@@ -36,7 +36,8 @@
 #include "Socket.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
-#include <QScriptValueIterator>
+
+class QScriptValueIterator;
 
 class SvNavigator : public QMainWindow
 {
@@ -128,7 +129,6 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
- StringMapT mhostUid2Name;
 
 
   void addEvents(void);
@@ -136,8 +136,12 @@ private:
   void unloadMenus(void);
   void updateMonitoringSettings();
   void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
-  void updateAlarmMsg(NodeListT::iterator& _node);
-  void updateCNode(NodeListT::iterator& _node);
+  void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  void setStatusInfo(NodeListT::iterator& _node);
+  void setStatusInfo(NodeT& _node);
+  void updateDashboard(NodeListT::iterator& _node);
+  void updateDashboard(const NodeT & _node);
+  void updateCNodes(const MonitorBroker::CheckT & check);
   void updateStats(void);
   void updateStatusBar(const QString& msg);
   void closeZbxSession(void);

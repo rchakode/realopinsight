@@ -232,9 +232,9 @@ bool GraphView::hideChart(void)
 }
 
 
-bool GraphView::load(const QString & _dotFile,
-                     const NodeListT & _bpnodes,
-                     const NodeListT & _cnodes)
+bool GraphView::load(const QString& _dotFile,
+                     const NodeListT& _bpnodes,
+                     const NodeListT& _cnodes)
 {
   QStringList arguments;
   QProcess* dotParser = new QProcess();
@@ -257,8 +257,8 @@ bool GraphView::load(const QString & _dotFile,
   return false;
 }
 
-void GraphView::drawMap(const NodeListT & _bpnodes,
-                        const NodeListT & _cnodes)
+void GraphView::drawMap(const NodeListT& _bpnodes,
+                        const NodeListT& _cnodes)
 {
   QFile coodFile;
   QTextStream coodFileStream;
@@ -314,7 +314,7 @@ void GraphView::drawMap(const NodeListT & _bpnodes,
     }
 }
 
-void GraphView::drawNode(const NodeT & _node)
+void GraphView::drawNode(const NodeT& _node)
 {
   QPixmap icon, expIcon;
   icon.load(iconMap[_node.icon], 0, Qt::AutoColor);  // TODO
@@ -349,24 +349,46 @@ void GraphView::drawNode(const NodeT & _node)
   gnodesList[_node.id].label->setToolTip(msg);
 }
 
-void GraphView::updateNode(const NodeListT::iterator & _node, const QString & _toolTip)
+void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _toolTip)
 {
-  QString label = "<span style=\"background: '"%utils::getColor(_node->criticity).name()
-      %"'\">&nbsp;" %_node->name%"&nbsp;</span>";
+  updateNode(*_node, _toolTip);
+  //TODO Clean
+//  QString label = "<span style=\"background: '"%utils::getColor(_node->criticity).name()
+//      %"'\">&nbsp;" %_node->name%"&nbsp;</span>";
 
-  GNodeListT::iterator gnodeIt =  gnodesList.find(_node->id);
+//  GNodeListT::iterator gnodeIt =  gnodesList.find(_node->id);
+//  if (gnodeIt != gnodesList.end())	{
+
+//      gnodeIt->label->setHtml(label);
+//      gnodeIt->icon->setToolTip(_toolTip);
+//      gnodeIt->label->setToolTip(_toolTip);
+
+//      GEdgeListT::iterator edge = edgesList.find(_node->parent + ":" + _node->id);
+//      if(edge == edgesList.end()) {
+//          return;
+//        }
+
+//      edge->edge->setPen(utils::getColor(_node->prop_status));
+//    }
+}
+
+void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
+{
+  QString label = "<span style=\"background: '"%utils::getColor(_node.criticity).name()
+      %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
+
+  GNodeListT::iterator gnodeIt =  gnodesList.find(_node.id);
   if (gnodeIt != gnodesList.end())	{
 
       gnodeIt->label->setHtml(label);
       gnodeIt->icon->setToolTip(_toolTip);
       gnodeIt->label->setToolTip(_toolTip);
 
-      GEdgeListT::iterator edge = edgesList.find(_node->parent + ":" + _node->id);
+      GEdgeListT::iterator edge = edgesList.find(_node.parent + ":" + _node.id);
       if(edge == edgesList.end()) {
           return;
         }
-
-      edge->edge->setPen(utils::getColor(_node->prop_status));
+      edge->edge->setPen(utils::getColor(_node.prop_status));
     }
 }
 
@@ -377,8 +399,8 @@ void GraphView::setEdgePath(const QString& _parentVertex,
   QPointF parentAnchor, childAnchor;
   QSizeF p_size, c_size;
 
-  _GNode & p_gnode = gnodesList[_parentVertex];
-  _GNode & c_gnode = gnodesList[_childVertex];
+  _GNode& p_gnode = gnodesList[_parentVertex];
+  _GNode& c_gnode = gnodesList[_childVertex];
 
   p_size = p_gnode.exp_icon->boundingRect().size();
   c_size = c_gnode.icon->boundingRect().size();
@@ -393,7 +415,7 @@ void GraphView::setEdgePath(const QString& _parentVertex,
     }
 }
 
-void GraphView::setNodePos(const QString & _nodeId, const QPointF & _pos)
+void GraphView::setNodePos(const QString& _nodeId, const QPointF& _pos)
 {
   QSizeF l_size, i_size, ei_size;
   qreal xi, xl, yi, yl, xei, yei;
@@ -415,9 +437,9 @@ void GraphView::setNodePos(const QString & _nodeId, const QPointF & _pos)
 }
 
 
-void GraphView::setNodeVisible(const QString & _nodeId,
-                               const QString & _parent,
-                               const bool & _visible, const qint32 & _level)
+void GraphView::setNodeVisible(const QString& _nodeId,
+                               const QString& _parent,
+                               const bool& _visible, const qint32& _level)
 {
   GNodeListT::iterator gnode = gnodesList.find(_nodeId);
   if(gnode != gnodesList.end()) {

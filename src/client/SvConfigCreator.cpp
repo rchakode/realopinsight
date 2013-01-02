@@ -153,6 +153,8 @@ void SvCreator::newBusinessView(void)
       mactiveFile = "";
       mselectedNode = SvNavigatorTree::rootID;
       mhasLeftUpdates = 1;
+      setWindowTitle(tr("%1 Editor - unsaved document*").arg(appName));
+      //TODO: when select yes don't close the editor
     }
 }
 
@@ -166,7 +168,8 @@ void SvCreator::newNode(void)
       return;
     }
   NodeT node;
-  node.id = QTime().currentTime().toString("HHmmsszzz");
+  node.id = "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz");
+
   node.parent = mselectedNode;
   node.name = "sub service " + QString::number(count), count ++;
   node.type = NodeType::SERVICE_NODE;
@@ -261,6 +264,7 @@ void SvCreator::saveAs(void)
                                               &filter);
   if (filter == ZabbixCompatibleFormat) {
       mcoreData->monitor = MonitorBroker::ZABBIX;
+      //TODO: add extension if don't exist
     } else if (filter == ZenossCompatibleFormat) {
       mcoreData->monitor = MonitorBroker::ZENOSS;
     } else if(!path.isNull()) {

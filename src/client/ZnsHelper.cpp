@@ -123,7 +123,7 @@ RequestListT ZnsHelper::getRequestsPatterns()
       \"data\": [{\
       \"uid\": \"%1\", \
       \"limit\": 1000, \
-      \"keys\":[\"name\", \"status\", \"severity\", \"pingStatus\"]}], \
+      \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\"]}], \
       \"type\": \"rpc\", \
       \"tid\": %2}";
   return list;
@@ -135,4 +135,8 @@ RequestListT ZnsHelper::getRouters()
   list[COMPONENT] = "device_router";
   list[DEVICE] = "device_router";
   return list;
+}
+
+QString ZnsHelper::getDeviceName(const QString& uid) {
+  return uid.mid(uid.lastIndexOf("/")+1, -1);
 }

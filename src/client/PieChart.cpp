@@ -38,19 +38,22 @@ PieChart::~PieChart()
   slices.clear();
 }
 
-QString PieChart::update(const CheckStatusCountT & _check_status_count, const qint32 _check_count)
+QString PieChart::update(const CheckStatusCountT & _check_status_count, const qint32 _count)
 {
   qint32 critical_count = _check_status_count[MonitorBroker::CRITICITY_HIGH];
   qint32 major_count = _check_status_count[MonitorBroker::CRITICITY_MAJOR];
   qint32 minor_count = _check_status_count[MonitorBroker::CRITICITY_MINOR];
-  qint32 unknown_count = _check_status_count[MonitorBroker::CRITICITY_UNKNOWN];
   qint32 ok_count =  _check_status_count[MonitorBroker::CRITICITY_NORMAL];
+  qint32 unknown_count = _count - (critical_count + major_count + minor_count + ok_count);
 
-  qint32 critical_ratio= ( 100.0 * critical_count ) / _check_count;
-  qint32 major_ratio = ( 100.0 * major_count ) / _check_count;
-  qint32  minor_ratio = ( 100.0 * minor_count ) / _check_count;
-  qint32 unknown_ratio = ( 100.0 * unknown_count ) / _check_count;
-  qint32 ok_ratio = ( 100.0 * ok_count ) / _check_count;
+
+  //FIXME: chart could be not completely filled
+  qint32 critical_ratio= (100.0 * critical_count)/_count;
+  qint32 major_ratio = (100.0 * major_count)/_count;
+  qint32  minor_ratio = (100.0 * minor_count)/_count;
+  qint32 unknown_ratio = (100.0 * unknown_count) / _count;
+  qint32 ok_ratio = (100.0 * ok_count)/_count;
+
 
   slices[MonitorBroker::CRITICITY_HIGH] =
       new PieChartItem(boundingRect,
@@ -88,15 +91,15 @@ QString PieChart::update(const CheckStatusCountT & _check_status_count, const qi
                        this);
 
   QString info = tr("Normal")%": "%QString::number(ok_count)%
-      "/"%QString::number(_check_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
+      "/"%QString::number(_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
       %"\n"%tr("Minor")%": "%QString::number(minor_count)%
-      "/"%QString::number(_check_count)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"
+      "/"%QString::number(_count)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"
       %"\n"%tr("Major")%": "%QString::number(major_count)%
-      "/"%QString::number(_check_count)%" ("%QString::number(major_ratio, 'f', 0)%"%)"
+      "/"%QString::number(_count)%" ("%QString::number(major_ratio, 'f', 0)%"%)"
       %"\n"%tr("Critical")%": "%QString::number(critical_count)%"/"
-      %QString::number(_check_count)%" ("%QString::number(critical_ratio, 'f', 0) %"%)"
+      %QString::number(_count)%" ("%QString::number(critical_ratio, 'f', 0) %"%)"
       %"\n"%tr("Unknown")%": "%QString::number(unknown_count)%
-      "/"%QString::number(_check_count)%" ("%QString::number(unknown_ratio, 'f', 0)%"%)"
+      "/"%QString::number(_count)%" ("%QString::number(unknown_ratio, 'f', 0)%"%)"
       ;
 
   return info;

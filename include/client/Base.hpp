@@ -23,14 +23,13 @@
 
 #ifndef BASE_HPP
 #define BASE_HPP
+#include "core/MonitorBroker.hpp"
 #include <QtCore>
 #include <QtXml>
 #include <QtGui>
 #include <QtWebKit>
 #include <QSettings>
 #include <bitset>
-#include "core/MonitorBroker.hpp"
-#include <QTranslator>
 
 const QString PROJECT = "NGRT4N";
 const QString USER_BASE_NAME = BUILTIN_USER_PREFIX;
@@ -64,12 +63,12 @@ public:
   }
   static QString label(StatusPropRulesT rule) {
     switch(rule) {
-      case Unchanged: return "Unchanged";
-      case Decreased: return "Decreased";
-      case Increased: return "Increased";
+      case Unchanged: return QObject::tr("Unchanged");
+      case Decreased: return QObject::tr("Decreased");
+      case Increased: return QObject::tr("Increased");
       }
 
-    return "Unchanged";
+    return QObject::tr("Unchanged");
   }
 };
 
@@ -90,10 +89,9 @@ public:
   }
 
   static QString label(StatusCalcRulesT rule) {
-
-    if (rule == WeightedCriticity) return "Weighted Criticity";
-
-    return "High Criticity";
+    if (rule == WeightedCriticity)
+      return QObject::tr("Weighted Criticity");
+    return QObject::tr("High Criticity");
   }
 };
 
@@ -248,12 +246,12 @@ typedef QHash<QString, NodeT> NodeListT;
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, MonitorBroker::CheckT> CheckListT;
 typedef QHash<QString, QStringList> HostListT;
+typedef NodeListT::Iterator NodeListIteratorT;
 
 typedef struct _CoreDataT {
   qint8 monitor;
   NodeListT bpnodes;
   NodeListT cnodes;
-  CheckListT checks_;
   CheckStatusCountT check_status_count;
   HostListT hosts;
   TreeNodeItemListT tree_items;

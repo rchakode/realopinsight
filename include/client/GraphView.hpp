@@ -36,19 +36,19 @@ public:
   GraphView(QWidget* = 0 );
   virtual ~GraphView();
 
-  bool load(const QString & _dotFile,
-            const NodeListT & _bpnodes,
-            const NodeListT & _cnodes);
-  void updateNode(const NodeListT::iterator & _nodeIt,
-                  const QString & _toolTip);
-  void setNodeVisible(const QString & _nodeId,
-                      const QString & _parent,
-                      const bool & _visible, const qint32 & _level);
+  bool load(const QString& _dotFile,
+            const NodeListT& _bpnodes,
+            const NodeListT& _cnodes);
+  void updateNode(const NodeListT::iterator& _nodeIt, const QString& _toolTip);
+  void updateNode(const NodeT& _nodeIt, const QString& _toolTip);
+  void setNodeVisible(const QString& _nodeId,
+                      const QString& _parent,
+                      const bool& _visible, const qint32& _level);
   void scaleToFitViewPort(void);
   void setStatsPanelPos(void);
   void updateStatsPanel(Stats * _stats_panel);
 
-  inline void centerOnNode( const QString & id) {
+  inline void centerOnNode( const QString& id) {
     if (! id.isEmpty() )
       centerOn(gnodesList[id].label);
   }
@@ -106,12 +106,12 @@ private:
   bool isAjustedStatsPanelSize;
 
   void drawMap(const NodeListT &_bpnodes,
-               const NodeListT & _cnodes);
-  void drawNode(const NodeT & );
+               const NodeListT& _cnodes);
+  void drawNode(const NodeT& );
   void setEdgePath(const QString& _parentVertex,
                    const QString& _childVertex,
                    QPainterPath& path);
-  void setNodePos(const QString & , const QPointF & );
+  void setNodePos(const QString& , const QPointF& );
   void ajustStatsPanelSize(void);
 
   static const QString LABEL_NODE;

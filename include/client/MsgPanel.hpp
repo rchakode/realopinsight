@@ -37,6 +37,7 @@ public:
 
   static const qint16 msgPanelColumnCount;
   void addMsg(const NodeListT::iterator &);
+  void addMsg(const NodeT &);
   void resizeFields( const QSize & ,  const bool & = false );
 
   static const QString HOSTNAME_META_MSG_PATERN ;

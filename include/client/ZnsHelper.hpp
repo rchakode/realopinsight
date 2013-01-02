@@ -53,6 +53,7 @@ public:
   static RequestListT getContentTypes();
   static RequestListT getRequestsPatterns();
   static RequestListT getRouters();
+  static QString getDeviceName(const QString& uid);
 
 public slots:
   void processError(QNetworkReply::NetworkError code);

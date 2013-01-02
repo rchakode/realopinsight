@@ -26,8 +26,6 @@
 
 #include "Base.hpp"
 
-
-
 class SvNavigatorTree : public QTreeWidget
 {
   Q_OBJECT
