@@ -434,7 +434,7 @@ QString Preferences::style() {
             "}"
             ;
 
-    return styleSheetBlack;
+    return styleSheet;
 }
 
 

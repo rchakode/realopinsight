@@ -417,13 +417,12 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
 void SvNavigator::updateStats()
 {
-  qint64 nbChecks = mcoreData->cnodes.size();
-  if(nbChecks == 0)
+  if(mcoreData->cnodes.size() == 0)
     return;
   Stats *stats = new Stats;
-  QString info = stats->update(mcoreData->check_status_count, nbChecks);
-  stats->setToolTip(info);
+  QString info = stats->update(mcoreData->check_status_count, mcoreData->cnodes.size());
   mmap->updateStatsPanel(stats);
+  stats->setToolTip(info);
   if(mstatsPanel)
     delete mstatsPanel;
   mstatsPanel = stats;
