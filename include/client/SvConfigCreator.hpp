@@ -37,15 +37,15 @@ class SvCreator: public QMainWindow
   Q_OBJECT
 
 public:
-  SvCreator(const qint32& _user_role = Auth::OP_USER_ROLE);
-  virtual ~SvCreator();
-
-  void load( const QString&);
-  QSize minimumSizeHint() const { return QSize(796, 640); }
-  QSize sizeHint() const { return QSize(796, 640); }
   static const QString NagiosCompatibleFormat;
   static const QString ZabbixCompatibleFormat;
   static const QString ZenossCompatibleFormat;
+
+  SvCreator(const qint32& _user_role = Auth::OP_USER_ROLE);
+  virtual ~SvCreator();
+  void load( const QString&);
+  QSize minimumSizeHint() const { return QSize(796, 640);}
+  QSize sizeHint() const { return QSize(796, 640);}
 
 public slots:
   void newBusinessView(void);
@@ -65,14 +65,11 @@ public slots:
   void handleShowAbout(void);
   void import(void);
 
-
 protected:
   void contextMenuEvent( QContextMenuEvent *);
   void closeEvent( QCloseEvent *);
 
-
 private:
-
   qint32 muserRole;
   qint32 mhasLeftUpdates;
   QString mactiveFile;
@@ -96,7 +93,6 @@ private:
   void unloadMenu(void);
   void addEvents(void);
   void resize(void);
-
 };
 
 #endif /* SNAVSVCREATOR_H_ */

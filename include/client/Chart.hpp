@@ -31,18 +31,16 @@
 class Chart : public QWidget
 {
 public:
+  static const qint32 DefaultWidth ;
+  static const qint32 DefaultHeight ;
+
   Chart();
   virtual ~Chart();
-
   QString update(const CheckStatusCountT & _check_status_count, const qint32 & check_count) ;
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 
-  static const qint32 DefaultWidth ;
-  static const qint32 DefaultHeight ;
-
 private:
-
   PieChart * pieChart ;
 };
 

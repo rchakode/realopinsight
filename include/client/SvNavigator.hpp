@@ -49,12 +49,9 @@ public:
               QWidget* = 0);
   virtual ~SvNavigator();
   void load(const QString& _file = "");
-
   void resize(void);
-
   static StringMapT propRules();
   static StringMapT calcRules();
-
   static QString getNodeToolTip(const NodeT& _node);
 
 public slots:
@@ -62,9 +59,7 @@ public slots:
   int runNagiosMonitor(void);
   void prepareDashboardUpdate(void);
   void updateBpNode(QString);
-  void expandNode(const QString& _nodeId,
-                  const bool& _expand,
-                  const qint32& _level);
+  void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
   void centerGraphOnNode(const QString& _node_id = "");
   void filterNodeRelatedMsg(void);
   void filterNodeRelatedMsg(const QString &);
@@ -130,7 +125,6 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
-
 
   void addEvents(void);
   void loadMenus(void);

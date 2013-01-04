@@ -66,38 +66,32 @@ int main(int argc, char **argv)
         case 'c':
           module = "config";
           break;
-
         case 'd':
           module = "dashboard";
           file = optarg;
           break;
-
         case 'e':
           module = "editor";
           file = optarg;
           break;
-
         case 'v':
           cout << versionMsg.str()<<endl;
           exit(0);
-
         case 'h': {
             cout << usage.arg(cmdName).toStdString();
             exit(0);
           }
-
         default:
           cout << usage.arg(cmdName).toStdString();
           exit(1);
           break;
         }
     }
-
   cout <<"Launching "<<versionMsg.str()<<endl;
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 );
-
+  if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE )
+    exit(1);
   if(module == "dashboard") {
       QSplashScreen* info = Preferences::infoScreen(QObject::tr("Loading...\n\n%1")
                                                     .arg(QString::fromStdString(versionMsg.str())));
@@ -111,7 +105,7 @@ int main(int argc, char **argv)
                                               ".",
                                               QObject::tr("Xml files (*.xml);;All files (*)"));
 
-          if(! file.length()){
+          if(!file.length()){
               utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
               exit (1);
             }
@@ -131,6 +125,5 @@ int main(int argc, char **argv)
       change_passwd->exec();
       exit(0);
     }
-
   return app->exec();
 }

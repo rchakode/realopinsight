@@ -21,12 +21,44 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVMSGPANEL_HPP
-#define SNAVMSGPANEL_HPP
+#ifndef MSGPANEL_HPP
+#define MSGPANEL_HPP
 #include "Base.hpp"
 
+class MsgPanel : public QTableWidget
+{
+  Q_OBJECT
 
-//TODO: test or remove
+public:
+  static const QString HOSTNAME_META_MSG_PATERN ;
+  static const QString SERVICE_META_MSG_PATERN ;
+  static const QString THERESHOLD_META_MSG_PATERN  ;
+  static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
+
+  MsgPanel(QWidget * parent = 0 );
+  virtual ~MsgPanel() {}
+  static const qint16 NUM_COLUMNS;
+  void addMsg(const NodeListT::iterator &);
+  void addMsg(const NodeT &);
+  void resizeFields( const QSize& ,  const bool& = false );
+
+public slots:
+  void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
+  void sortEventConsole(void) {sortItems(MsgPanel::NUM_COLUMNS - 1, Qt::DescendingOrder) ;}
+
+signals:
+  void acknowledgeChanged(void) ;
+
+private:
+  QPoint charSize;
+  QSize windowSize ;
+
+  static const QStringList HeaderLabels;
+  inline QCheckBox* msgItem(const qint32& _row, const qint32& _column){
+    return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
+  }
+};
+
 class MsgProxyModel: public QSortFilterProxyModel
 {
   Q_OBJECT
@@ -47,40 +79,4 @@ protected:
   }
 };
 
-
-class MsgPanel : public QTableWidget
-{
-  Q_OBJECT
-
-public:
-  MsgPanel(QWidget * parent = 0 );
-  virtual ~MsgPanel() {}
-
-  static const qint16 NUM_COLUMNS;
-  void addMsg(const NodeListT::iterator &);
-  void addMsg(const NodeT &);
-  void resizeFields( const QSize& ,  const bool& = false );
-
-  static const QString HOSTNAME_META_MSG_PATERN ;
-  static const QString SERVICE_META_MSG_PATERN ;
-  static const QString THERESHOLD_META_MSG_PATERN  ;
-  static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
-
-public slots:
-  void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
-  void sortEventConsole(void) {sortItems(MsgPanel::NUM_COLUMNS - 1, Qt::DescendingOrder) ;}
-
-signals:
-  void acknowledgeChanged(void) ;
-
-private:
-  QPoint charSize;
-  QSize windowSize ;
-
-  static const QStringList HeaderLabels;
-  inline QCheckBox* msgItem(const qint32& _row, const qint32& _column) 	{
-    return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
-  }
-};
-
-#endif /* SNAVMSGPANEL_HPP */
+#endif /* MSGPANEL_HPP */
