@@ -25,35 +25,28 @@
 #include "StatsLegend.hpp"
 #include <ctime>
 #include "utilsClient.hpp"
+#include<QTableWidget>
+#include <QSortFilterProxyModel>
 
-const qint16 MsgPanel::msgPanelColumnCount = 7;
-
-//EVENT CONSOLE META-MESSAGES
 const QString MsgPanel::HOSTNAME_META_MSG_PATERN = "\\{hostname\\}";
 const QString MsgPanel::SERVICE_META_MSG_PATERN = "\\{check_name\\}";
 const QString MsgPanel::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}";
 const QString MsgPanel::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}";
-
-const QStringList MsgPanel::msgPanelHeaderLabels = QStringList() <<"Date& Hour"<<"Status"<<"Host"<<"Service"<<"Message";
+const qint16 MsgPanel::NUM_COLUMNS = 6;
+const qint32 ID_COLUMN = MsgPanel::NUM_COLUMNS - 1;
+const QStringList MsgPanel::HeaderLabels = QStringList() <<"Date& Hour"<<"Status"<<"Host"<<"Service"<<"Message";
 
 MsgPanel::MsgPanel(QWidget * _parent)
-  : QTableWidget(0, msgPanelColumnCount, _parent),
+  : QTableWidget(0, NUM_COLUMNS, _parent),
     charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0),
                     QFontMetrics(QFont()).height()))
 {
-  verticalHeader()->hide();
-  hideColumn(msgPanelColumnCount - 2);
-  hideColumn(msgPanelColumnCount - 1);
-  setHorizontalHeaderLabels(msgPanelHeaderLabels);
-  setAlternatingRowColors(true);
-  setSelectionBehavior(QAbstractItemView::SelectRows);
+  QTableView::verticalHeader()->hide();
+  QTableView::hideColumn(NUM_COLUMNS - 1);
+  QTableWidget::setHorizontalHeaderLabels(HeaderLabels);
+  QTableView::setAlternatingRowColors(true);
+  QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
-}
-
-
-void MsgPanel::showEvent (QShowEvent *)
-{
-  sortItems(1, Qt::AscendingOrder); //TODO
 }
 
 void MsgPanel::addMsg(const NodeListT::iterator& _node)
@@ -64,13 +57,9 @@ void MsgPanel::addMsg(const NodeListT::iterator& _node)
 
 void MsgPanel::addMsg(const NodeT& _node)
 {
-  const qint32 idColumn = msgPanelColumnCount - 2;
-  const qint32 dateColumn = msgPanelColumnCount - 1;
-
-
   time_t time = atol(_node.check.last_state_change.c_str());
   QString time_ = ctime(&time);
-  QString line[msgPanelColumnCount];
+  QString line[NUM_COLUMNS];
   line[0] = time_.remove("\n");
   line[1] = utils::statusToString(_node.criticity);
   line[2] = QString(_node.check.host.c_str());
@@ -80,44 +69,36 @@ void MsgPanel::addMsg(const NodeT& _node)
       line[4] = (_node.notification_msg.trimmed().length() != 0)?
             _node.notification_msg : QString(_node.check.alarm_msg.c_str());
     } else {
-      line[4] = (_node.alarm_msg.trimmed().length() != 0 && _node.criticity != MonitorBroker::NAGIOS_UNKNOWN)?
-            _node.alarm_msg :  QString(_node.check.alarm_msg.c_str());
+      line[4] = (_node.alarm_msg.trimmed().length() != 0 &&
+          _node.criticity != MonitorBroker::CRITICITY_UNKNOWN)?
+            _node.alarm_msg :
+            QString(_node.check.alarm_msg.c_str());
     }
-
-  line[idColumn] = _node.id;
-  line[dateColumn] = "";
-
+  line[ID_COLUMN] = _node.id;
   qint32 i = 0;
-  qint32 nbRows = this->rowCount();
-  //    setSortingEnabled(false);
+  qint32 nbRows = QTableWidget::rowCount();
   while(i < nbRows) {
-      if(item(i, idColumn)->text() != _node.id) {
-          i++;
-          continue;
+      if(item(i, ID_COLUMN)->text() == _node.id) {
+          QTableWidget::removeRow(i);
+          nbRows--;
+          break;
         }
-      removeRow(i);
-      nbRows--;
+      i++;
     }
-
-  insertRow(0);
-  setRowCount(nbRows + 1);
-  setRowHeight(0, charSize.y() + 3);
-
-  //TODO deal with data for sorting
-  QTableWidgetItem* items[msgPanelColumnCount];
-  for(i = 0; i < msgPanelColumnCount; i ++) {
-      setCellWidget(0, i, new QLabel(""));
+  QTableWidget::insertRow(0);
+  QTableWidget::setRowCount(nbRows + 1);
+  QTableWidget::setRowHeight(0, charSize.y() + 3);
+  QTableWidgetItem* items[NUM_COLUMNS];
+  for(i = 0; i < NUM_COLUMNS; i ++) {
+      QTableWidget::setCellWidget(0, i, new QLabel(""));
       items[i] = new QTableWidgetItem(line[i]);
       items[i]->setData(Qt::UserRole, line[i]);
-      setItem(0, i, items[i]);
+      QTableWidget::setItem(0, i, items[i]);
       if(_node.criticity != MonitorBroker::CRITICITY_NORMAL) {
           item(0, i)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
         }
     }
-
   item(0, 1)->setBackground(QBrush(utils::getColor(_node.criticity)));
-  //TODO: check the default sorting
-  //SortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
 }
 
 

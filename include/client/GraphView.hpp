@@ -25,7 +25,7 @@
 #define GRAPHVIEW_HPP
 
 #include "Base.hpp"
-#include "Stats.hpp"
+#include "Chart.hpp"
 #include "SvNavigatorTree.hpp"
 
 class GraphView : public QGraphicsView
@@ -46,7 +46,7 @@ public:
                       const bool& _visible, const qint32& _level);
   void scaleToFitViewPort(void);
   void setStatsPanelPos(void);
-  void updateStatsPanel(Stats * _stats_panel);
+  void updateStatsPanel(Chart * _stats_panel);
 
   inline void centerOnNode( const QString& id) {
     if (! id.isEmpty() )

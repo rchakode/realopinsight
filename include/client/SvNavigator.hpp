@@ -26,7 +26,7 @@
 
 #include <QString>
 #include "Base.hpp"
-#include "Stats.hpp"
+#include "Chart.hpp"
 #include "Parser.hpp"
 #include "WebKit.hpp"
 #include "MsgPanel.hpp"
@@ -60,7 +60,7 @@ public:
 public slots:
   void startMonitor();
   int runNagiosMonitor(void);
-  void resetStatData(void);
+  void prepareDashboardUpdate(void);
   void updateBpNode(QString);
   void expandNode(const QString& _nodeId,
                   const bool& _expand,
@@ -101,7 +101,7 @@ private:
   qint32 mupdateInterval;
   qint32 mtimer;
   Settings* msettings;
-  Stats* mstatsPanel;
+  Chart* mchart;
   MsgPanel* mfilteredMsgPanel;
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
@@ -129,6 +129,7 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
+  ProxyModel* mproxyModel;
 
 
   void addEvents(void);
@@ -142,7 +143,7 @@ private:
   void updateDashboard(NodeListT::iterator& _node);
   void updateDashboard(const NodeT & _node);
   void updateCNodes(const MonitorBroker::CheckT & check);
-  void updateStats(void);
+  void finalizeDashboardUpdate(void);
   void updateStatusBar(const QString& msg);
   void closeZbxSession(void);
   void openRpcSession(void);

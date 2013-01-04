@@ -26,6 +26,38 @@
 #include "Base.hpp"
 
 
+//TODO: test or remove
+class ProxyModel: public QSortFilterProxyModel
+{
+  Q_OBJECT
+public:
+  ProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent){}
+
+protected:
+  bool lessThan(const QModelIndex &left,
+                const QModelIndex &right) const
+  {
+    QVariant leftData = sourceModel()->data(left, Qt::UserRole);
+    QVariant rightData = sourceModel()->data(right, Qt::UserRole);
+
+    if (leftData.type() == QVariant::DateTime) {
+        return leftData.toDateTime() < rightData.toDateTime();
+      } else {
+        //          QRegExp *emailPattern = new QRegExp("([\\w\\.]*@[\\w\\.]*)");
+
+        QString leftString = leftData.toString();
+        //          if(left.column() == 1 && emailPattern->indexIn(leftString) != -1)
+        //            leftString = emailPattern->cap(1);
+
+        QString rightString = rightData.toString();
+        //          if(right.column() == 1 && emailPattern->indexIn(rightString) != -1)
+        //            rightString = emailPattern->cap(1);
+
+        return QString::localeAwareCompare(leftString, rightString) < 0;
+      }
+  }
+};
+
 
 class MsgPanel : public QTableWidget
 {
@@ -35,10 +67,10 @@ public:
   MsgPanel(QWidget * parent = 0 );
   virtual ~MsgPanel() {}
 
-  static const qint16 msgPanelColumnCount;
+  static const qint16 NUM_COLUMNS;
   void addMsg(const NodeListT::iterator &);
   void addMsg(const NodeT &);
-  void resizeFields( const QSize & ,  const bool & = false );
+  void resizeFields( const QSize& ,  const bool& = false );
 
   static const QString HOSTNAME_META_MSG_PATERN ;
   static const QString SERVICE_META_MSG_PATERN ;
@@ -47,23 +79,19 @@ public:
 
 public slots:
   void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
-  void sortEventConsole(void) {sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;}
+  void sortEventConsole(void) {sortItems(MsgPanel::NUM_COLUMNS - 1, Qt::DescendingOrder) ;}
 
 signals:
   void acknowledgeChanged(void) ;
-
-protected :
-  void showEvent ( QShowEvent * ) ;
 
 private:
   QPoint charSize;
   QSize windowSize ;
 
-  static const QStringList msgPanelHeaderLabels;
-  inline QCheckBox* msgItem(const qint32 & _row, const qint32 & _column) 	{
+  static const QStringList HeaderLabels;
+  inline QCheckBox* msgItem(const qint32& _row, const qint32& _column) 	{
     return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
   }
-
 };
 
 #endif /* SNAVMSGPANEL_HPP */

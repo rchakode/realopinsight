@@ -20,11 +20,7 @@
 # along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.          #
 #--------------------------------------------------------------------------#
  */
-
-
-#include "Stats.hpp"
-
-
+#include "Chart.hpp"
 
 const QColor StatsLegend::COLOR_NORMAL =  Qt::green;
 const QColor StatsLegend::COLOR_MINOR = Qt::yellow;
@@ -40,25 +36,19 @@ StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
 {
   QFont font("Times", 10, QFont::NoAntialias);
   QFontMetrics font_metrics(font);
-
   qint32 x_top_corner = _left_top_corner.x();
   qint32 y_top_corner = _left_top_corner.y();
   qint32 x_label = x_top_corner + 15;
   qint32 char_w = font_metrics.charWidth("c", 0);
 
-  //FIXME: to be adapted
   normal.addRect(x_top_corner, y_top_corner, 10, 10);
   normal.addText(x_label, y_top_corner + 10, font, tr("normal"));
-
   minor.addRect(x_top_corner, y_top_corner + 15 , 10, 10);
   minor.addText(x_label, y_top_corner + 25, font, tr("minor"));
-
   major.addRect(x_top_corner, y_top_corner + 30 , 10, 10);
   major.addText(x_label, y_top_corner + 40, font, tr("major"));
-
   critical.addRect(x_top_corner, y_top_corner + 45, 10, 10);
   critical.addText(x_label, y_top_corner + 55, font, tr("critical"));
-
   unknown.addRect(x_top_corner, y_top_corner + 60, 10, 10);
   unknown.addText(x_label, y_top_corner + 70, font, tr("unknown"));
 
@@ -68,7 +58,6 @@ StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
 
 void StatsLegend::paintEvent(QPaintEvent *)
 {
-  //FIXME: to be adapted
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 

@@ -53,7 +53,6 @@ HEADERS	+= include/core/ns.hpp \
     include/client/PieChartItem.hpp \
     include/client/Preferences.hpp \
     include/client/ServiceEditor.hpp \
-    include/client/Stats.hpp \
     include/client/StatsLegend.hpp \
     include/client/SvConfigCreator.hpp \
     include/client/SvNavigator.hpp \
@@ -64,7 +63,8 @@ HEADERS	+= include/core/ns.hpp \
     include/core/Socket.hpp \
     include/client/ZnsHelper.hpp \
     include/client/Settings.hpp \
-    include/client/utilsClient.hpp
+    include/client/utilsClient.hpp \
+    include/client/Chart.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -76,7 +76,6 @@ SOURCES	+= \
     src/client/PieChartItem.cpp \
     src/client/Preferences.cpp \
     src/client/ServiceEditor.cpp \
-    src/client/Stats.cpp \
     src/client/StatsLegend.cpp \
     src/client/SvConfigCreator.cpp \
     src/client/SvNavigator.cpp \
@@ -88,7 +87,8 @@ SOURCES	+= \
     src/client/ZnsHelper.cpp \
     src/client/Settings.cpp \
     src/client/utilsClient.cpp \
-    src/core/utilsCore.cpp
+    src/core/utilsCore.cpp \
+    src/client/Chart.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts

@@ -70,7 +70,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mconfigFile(_config),
     muserRole (_userRole),
     msettings (new Settings()),
-    mstatsPanel (new Stats()),
+    mchart (new Chart()),
     mfilteredMsgPanel (NULL),
     mmainSplitter (new QSplitter(this)),
     mrightSplitter (new QSplitter()),
@@ -101,13 +101,19 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   mrightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(mmainSplitter);
   updateMonitoringSettings();
+
+  //TODO: clean
+  mproxyModel = new ProxyModel(this);
+  mproxyModel->setDynamicSortFilter(false);
+  mproxyModel->setSourceModel(mmsgPanel->model());
+
   addEvents();
 }
 
 SvNavigator::~SvNavigator()
 {
   delete mmsgPanel;
-  delete mstatsPanel;
+  delete mchart;
   delete mtree;
   delete mbrowser;
   delete mmap;
@@ -120,7 +126,9 @@ SvNavigator::~SvNavigator()
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
-  if(mfilteredMsgPanel) delete mfilteredMsgPanel;
+  delete mproxyModel;
+  if(mfilteredMsgPanel)
+    delete mfilteredMsgPanel;
   unloadMenus();
 }
 
@@ -138,21 +146,17 @@ void SvNavigator::loadMenus(void)
       msubMenuList["Capture"] = mmenuList["MENU1"]->addAction(cameraIcon, tr("&Save Map as Image")),
       mmenuList["MENU1"]->addSeparator(),
       msubMenuList["Quit"] = mmenuList["MENU1"]->addAction(tr("&Quit"));
-
   mmenuList["MENU2"] = menuBar->addMenu("&Map"),
       msubMenuList["ZoomIn"] = mmenuList["MENU2"]->addAction(zoominIcon, tr("Zoom &In")),
       msubMenuList["ZoomOut"] = mmenuList["MENU2"]->addAction(zoomoutIcon, tr("Zoom &Out")),
       msubMenuList["HideChart"] = mmenuList["MENU2"]->addAction(tr("Hide &Chart"));
-
   mmenuList["MENU3"] = menuBar->addMenu("&Preferences"),
       msubMenuList["ChangePassword"] = mmenuList["MENU3"]->addAction(tr("Change &Password")),
       msubMenuList["ChangeMonitoringSettings"] = mmenuList["MENU3"]->addAction(tr("&Monitoring Settings"));
-
   mmenuList["MENU4"] = menuBar->addMenu("&Help"),
       msubMenuList["ShowOnlineResources"] = mmenuList["MENU4"]->addAction(tr("Online &Resources")),
       mmenuList["MENU4"]->addSeparator(),
       msubMenuList["ShowAbout"] = mmenuList["MENU4"]->addAction(tr("&About %1").arg(appName));
-
   msubMenuList["Capture"]->setShortcut(QKeySequence::Save);
   msubMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
   msubMenuList["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
@@ -201,10 +205,7 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 
 void SvNavigator::startMonitor()
 {
-  updateStatusBar(tr("Connecting to the server..."));
-  mupdateSucceed = true ;
-  resetStatData();
-  setEnabled(false);
+  prepareDashboardUpdate();
   switch(mcoreData->monitor){
     case MonitorBroker::ZENOSS:
     case MonitorBroker::ZABBIX:
@@ -215,11 +216,6 @@ void SvNavigator::startMonitor()
       runNagiosMonitor();
       break;
     }
-  setEnabled(true);
-  mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
-  mupdateInterval = 1000 * ((mupdateInterval > 0)? mupdateInterval :
-                                                   MonitorBroker::DEFAULT_UPDATE_INTERVAL);
-  mtimer = startTimer(mupdateInterval);
 }
 
 void SvNavigator::timerEvent(QTimerEvent *)
@@ -345,19 +341,23 @@ int SvNavigator::runNagiosMonitor(void)
         }
     }
   msocket->disconnect();
-  updateStats();
+  finalizeDashboardUpdate();
 
   return 0;
 }
 
-void SvNavigator::resetStatData(void)
+void SvNavigator::prepareDashboardUpdate(void)
 {
+  QMainWindow::setEnabled(false);
+  mmsgPanel->setSortingEnabled(false);
   mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_MINOR] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_MAJOR] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_HIGH] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_UNKNOWN] = 0;
   mhostLeft = mcoreData->hosts.size();
+  mupdateSucceed = true ;
+  updateStatusBar(tr("Connecting to the server..."));
 }
 
 
@@ -402,34 +402,35 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 }
 
 void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
+
   for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
       cnode != mcoreData->cnodes.end();
       cnode++) {
-
-      if(cnode->child_nodes.toStdString().compare(check.id) != 0)
-        continue;
-      cnode->check = check;
-      setStatusInfo(cnode);
-      mcoreData->check_status_count[cnode->criticity]++;
-      updateDashboard(cnode);
+      if(cnode->child_nodes.toStdString().compare(check.id) == 0) {
+          cnode->check = check;
+          setStatusInfo(cnode);
+          mcoreData->check_status_count[cnode->criticity]++;
+          updateDashboard(cnode);
+        }
     }
 }
 
-void SvNavigator::updateStats()
+void SvNavigator::finalizeDashboardUpdate()
 {
-  if(mcoreData->cnodes.size() == 0)
-    return;
-  Stats *stats = new Stats;
-  QString info = stats->update(mcoreData->check_status_count, mcoreData->cnodes.size());
-  mmap->updateStatsPanel(stats);
-  stats->setToolTip(info);
-  if(mstatsPanel)
-    delete mstatsPanel;
-  mstatsPanel = stats;
-  mmsgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
+  if(mcoreData->cnodes.size() == 0) return;
+  Chart *chart = new Chart;
+  QString chartdDetails = chart->update(mcoreData->check_status_count, mcoreData->cnodes.size());
+  mmap->updateStatsPanel(chart);
+  chart->setToolTip(chartdDetails);
+  if(mchart) delete mchart; mchart = chart;
   mmsgPanel->resizeFields(mmsgPanelSize);
-  if(mupdateSucceed)
-    updateStatusBar(tr("Update completed"));
+  mmsgPanel->setSortingEnabled(true);
+  mproxyModel->sourceModel()->sort(1, Qt::AscendingOrder);
+  mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
+  mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
+  mtimer = startTimer(mupdateInterval);
+  if(mupdateSucceed) updateStatusBar(tr("Update completed"));
+  QMainWindow::setEnabled(true);
 }
 
 void SvNavigator::setStatusInfo(NodeListT::iterator&  _node)
@@ -485,7 +486,8 @@ void SvNavigator::updateBpNode(QString _nodeId)
     return;
   Criticity criticity;
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
-  for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++) {
+  for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++)
+    {
       NodeListT::iterator child;
       if(! utils::findNode(mcoreData, *it, child))
         continue;
@@ -712,7 +714,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
           }
         if(--mhostLeft == 0){
             mupdateSucceed = true;
-            updateStats();
+            finalizeDashboardUpdate();
           }
         break;
       }
@@ -796,7 +798,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
             }
           if(--mhostLeft== 0){
               mupdateSucceed = true;
-              updateStats();
+              finalizeDashboardUpdate();
             }
         } else {
           utils::alert("Unexpected response received from the server");
@@ -830,7 +832,7 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
       mcoreData->check_status_count[node->criticity]++;
     }
   mupdateSucceed = false ;
-  updateStats();
+  finalizeDashboardUpdate();
 }
 
 

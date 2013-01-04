@@ -1,5 +1,5 @@
 /*
- * Stats.hpp
+ * Stats.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -21,29 +21,36 @@
 #--------------------------------------------------------------------------#
  */
 
-
-#ifndef SNAVSTATS_HPP_
-#define SNAVSTATS_HPP_
-
-#include "PieChart.hpp"
+#include "Chart.hpp"
 
 
-class Stats : public QWidget
+const qint32 Chart::DefaultWidth=300 ;
+const qint32 Chart::DefaultHeight=175 ;
+
+Chart::Chart()
+  : QWidget(),
+    pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
 {
-public:
-  Stats();
-  virtual ~Stats();
+  resize(pieChart->size()) ;
+  setStyleSheet("background:transparent") ;
+}
 
-  QString update(const CheckStatusCountT & _check_status_count, const qint32 & check_count) ;
-  QSize minimumSizeHint() const;
-  QSize sizeHint() const;
+Chart::~Chart()
+{
+  delete pieChart ;
+}
 
-  static const qint32 DefaultWidth ;
-  static const qint32 DefaultHeight ;
+QSize Chart::minimumSizeHint() const
+{
+  return QSize(200, 100) ;
+}
 
-private:
+QSize Chart::sizeHint() const
+{
+  return QSize(DefaultWidth, DefaultHeight) ;
+}
 
-  PieChart * pieChart ;
-};
-
-#endif /* SNAVSTATS_HPP_ */
+QString Chart::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count)
+{
+  return pieChart->update(_check_status_count, _check_count) ;
+}

@@ -170,7 +170,7 @@ void GraphView::zoomOut()
     }
 }
 
-void GraphView::updateStatsPanel(Stats * _statsPanel)
+void GraphView::updateStatsPanel(Chart * _statsPanel)
 {
   bool visible = true;
   if(statsPanelItem) {
@@ -218,8 +218,8 @@ void GraphView::setStatsPanelPos(void)
       qreal xp = size().width() - statsPanelItem->size().width() *  statsPanelScaleRatio - 2;
       QPointF pos = mapToScene(QPoint(xp, 0));
       statsPanelItem->setPos(pos);
-      Stats* w = dynamic_cast<Stats*>(statsPanelItem->widget());
-      statsArea->setRect(w->x(), w->y(), Stats::DefaultWidth, Stats::DefaultHeight);
+      Chart* w = dynamic_cast<Chart*>(statsPanelItem->widget());
+      statsArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
     }
 }
 
