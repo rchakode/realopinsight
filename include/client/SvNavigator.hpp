@@ -113,6 +113,7 @@ private:
   Preferences* mprefWindow;
   Preferences* mchangePasswdWindow;
   MsgPanel* mmsgPanel;
+  MsgProxyModel* mmsgProxyModel;
   QMenu* mnodeContextMenu;
   QSize mmsgPanelSize;
   MenuListT mmenuList;
@@ -129,7 +130,6 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
-  ProxyModel* mproxyModel;
 
 
   void addEvents(void);

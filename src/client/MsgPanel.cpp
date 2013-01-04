@@ -57,14 +57,11 @@ void MsgPanel::addMsg(const NodeListT::iterator& _node)
 
 void MsgPanel::addMsg(const NodeT& _node)
 {
-  time_t time = atol(_node.check.last_state_change.c_str());
-  QString time_ = ctime(&time);
   QString line[NUM_COLUMNS];
-  line[0] = time_.remove("\n");
+  line[0] = QString::fromStdString(_node.check.last_state_change);
   line[1] = utils::statusToString(_node.criticity);
   line[2] = QString(_node.check.host.c_str());
   line[3] = " " + _node.name;
-
   if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
       line[4] = (_node.notification_msg.trimmed().length() != 0)?
             _node.notification_msg : QString(_node.check.alarm_msg.c_str());
@@ -105,7 +102,6 @@ void MsgPanel::addMsg(const NodeT& _node)
 void MsgPanel::resizeFields(const QSize& _window_size, const bool& _resize_window)
 {
   resizeColumnsToContents();
-
   if(rowCount()) {
       qint32  msgWidth = (_window_size.width() - cellWidget(0, 4)->pos().x());
       setColumnWidth(4, msgWidth);

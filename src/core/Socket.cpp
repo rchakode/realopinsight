@@ -19,6 +19,8 @@ const int MAX_MSG_SIZE=8192;
 const int TIMEOUT = 2500 ; //15000
 const int NUM_RETRIES = 3 ;
 
+//TODO: changed assert with suitable error handling
+
 Socket::Socket(const int & _type)
   : mtype(_type),
     mconnected2Server(false),
@@ -68,32 +70,23 @@ void Socket::send(const std::string & _msg) {
 }
 
 std::string Socket::recv() const{
-
   int received = -1;
   zmq_msg_t msg;
   received = zmq_msg_init_size(&msg, MAX_MSG_SIZE);
   assert (received == 0);
   memset(zmq_msg_data(&msg), 0, MAX_MSG_SIZE);
-
 #if ZMQ_VERSION_MAJOR == 2
   received = zmq_recv(msocket, &msg, 0);
 #elif ZMQ_VERSION_MAJOR == 3
   received = zmq_recv(msocket, zmq_msg_data(&msg), MAX_MSG_SIZE, 0);
 #endif
-
   assert (received >= 0);
   char *retBuffer = (char*)zmq_msg_data(&msg);
   return std::string(retBuffer, zmq_msg_size(&msg));
 }
 
-bool Socket::isConnected2Server() const {
-
-  return mconnected2Server;
-}
-
 void Socket::makeHandShake() {
   int retriesLeft = NUM_RETRIES;
-
   Socket *socket = new Socket(ZMQ_REQ);
   std::string msg("PING");
   while (retriesLeft) {
@@ -139,10 +132,6 @@ void Socket::makeHandShake() {
   delete socket;
 }
 
-int Socket::getServerSerial() const {
-  return mserverSerial;
-}
-
 int Socket::convert2ServerSerial(const std::string & versionStr){
   std::string str = "";
   for(size_t i = 0; i < versionStr.size(); i++) {
@@ -154,8 +143,4 @@ int Socket::convert2ServerSerial(const std::string & versionStr){
         }
     }
   return atoi(str.c_str());
-}
-
-void* Socket::getSocket() const {
-  return msocket;
 }

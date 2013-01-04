@@ -77,11 +77,12 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mtopRightPanel (new QTabWidget()),
     mbottomRightPanel (new QTabWidget()),
     mbrowser (new WebKit()),
-    mmap (new GraphView()),
+    mmap (new GraphView(this)),
     mtree (new SvNavigatorTree()),
     mprefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     mchangePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
-    mmsgPanel(new MsgPanel()),
+    mmsgPanel(new MsgPanel(this)),
+    mmsgProxyModel(new MsgProxyModel(this)),
     mnodeContextMenu (new QMenu()),
     mzbxHelper(new ZbxHelper()),
     mzbxAuthToken(""),
@@ -101,12 +102,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   mrightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(mmainSplitter);
   updateMonitoringSettings();
-
-  //TODO: clean
-  mproxyModel = new ProxyModel(this);
-  mproxyModel->setDynamicSortFilter(false);
-  mproxyModel->setSourceModel(mmsgPanel->model());
-
+  mmsgProxyModel->setDynamicSortFilter(false);
+  mmsgProxyModel->setSourceModel(mmsgPanel->model());
   addEvents();
 }
 
@@ -126,7 +123,7 @@ SvNavigator::~SvNavigator()
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
-  delete mproxyModel;
+  delete mmsgProxyModel;
   if(mfilteredMsgPanel)
     delete mfilteredMsgPanel;
   unloadMenus();
@@ -325,13 +322,13 @@ int SvNavigator::runNagiosMonitor(void)
              && msocket->isConnected2Server()) {
               cnode->check.status = jsHelper.getProperty("status").toInt32();
               cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-              cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
+              cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toString());
               cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
               cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
               cnode->check.status = MonitorBroker::NAGIOS_UNKNOWN;
               cnode->check.host = "Unknown";
-              cnode->check.last_state_change = "0";
+              cnode->check.last_state_change = utils::getCtime("0");
               cnode->check.check_command = "Unknown" ;
               cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
@@ -425,7 +422,7 @@ void SvNavigator::finalizeDashboardUpdate()
   if(mchart) delete mchart; mchart = chart;
   mmsgPanel->resizeFields(mmsgPanelSize);
   mmsgPanel->setSortingEnabled(true);
-  mproxyModel->sourceModel()->sort(1, Qt::AscendingOrder);
+  mmsgProxyModel->sort(0, Qt::AscendingOrder);
   mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
   mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
   mtimer = startTimer(mupdateInterval);
@@ -441,50 +438,45 @@ void SvNavigator::setStatusInfo(NodeListT::iterator&  _node)
 
 void SvNavigator::setStatusInfo(NodeT&  _node)
 {
-
   _node.criticity = utils::getCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_status = _node.criticity;
-
-  QString statusMsg = "";
+  QString statusText = "";
   if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
-      statusMsg = _node.notification_msg;
+      statusText = _node.notification_msg;
     } else {
-      statusMsg = _node.alarm_msg;
+      statusText = _node.alarm_msg;
     }
-
   QRegExp regexp(MsgPanel::HOSTNAME_META_MSG_PATERN);
   QStringList chkids = QString(_node.check.id.c_str()).split("/");
   qint32 nbChecks =  chkids.length();
   if(nbChecks) {
-      statusMsg.replace(regexp, chkids[0]);
+      statusText.replace(regexp, chkids[0]);
       if(nbChecks == 2) {
           regexp.setPattern(MsgPanel::SERVICE_META_MSG_PATERN);
-          statusMsg.replace(regexp, chkids[1]);
+          statusText.replace(regexp, chkids[1]);
         }
     }
   // FIXME: Test and generalize it to other monitor
   QStringList splitedCcommand = QString(_node.check.check_command.c_str()).split("!");
   if(splitedCcommand.length() >= 3) {
       regexp.setPattern(MsgPanel::THERESHOLD_META_MSG_PATERN);
-      statusMsg.replace(regexp, splitedCcommand[1]);
-
+      statusText.replace(regexp, splitedCcommand[1]);
       if(_node.criticity == MonitorBroker::CRITICITY_MAJOR)
-        statusMsg.replace(regexp, splitedCcommand[2]);
+        statusText.replace(regexp, splitedCcommand[2]);
     }
-
   if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
-      _node.notification_msg = statusMsg;
+      _node.notification_msg = statusText;
     } else {
-      _node.alarm_msg = statusMsg;
+      _node.alarm_msg = statusText;
     }
 }
 
 void SvNavigator::updateBpNode(QString _nodeId)
 {
-  NodeListT::iterator node;
-  if(!utils::findNode(mcoreData, _nodeId, node))
-    return;
   Criticity criticity;
+  NodeListT::iterator node;
+  if(!utils::findNode(mcoreData, _nodeId, node)) return;
+
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++)
     {
@@ -706,6 +698,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             if(item.hasNext()) {
                 item.next();
                 QScriptValue itemData = item.value();
+                //TODO: check.last_state_change to be tested with Zabbix
                 check.last_state_change = itemData.property("lastclock").toString().toStdString();
               }
             QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
@@ -822,10 +815,9 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
       NodeListT::iterator node = mcoreData->cnodes.find(c);
       if(node == mcoreData->cnodes.end())
         continue;
-
       node->check.status = MonitorBroker::CRITICITY_UNKNOWN;
       node->check.host = "Unknown";
-      node->check.last_state_change = "0";
+      node->check.last_state_change = utils::getCtime("0");
       node->check.check_command = "Unknown" ;
       node->check.alarm_msg = msg.toStdString();
       updateDashboard(node);
@@ -843,6 +835,7 @@ void SvNavigator::openRpcSession(void)
   QUrl znsUrlParams;
   if(authParams.size() != 2) {
       utils::alert("Invalid authentication chain!\nMust be in the form login:password");
+      finalizeDashboardUpdate();
       //TODO: fill console with unknown status?
       return ;
     }

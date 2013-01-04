@@ -13,10 +13,10 @@ public:
   void disconnect();
   void send(const std::string & _msg);
   std::string recv() const;
-  bool isConnected2Server() const;
   void makeHandShake();
-  int getServerSerial() const;
-  void* getSocket() const;
+  inline bool isConnected2Server() const {return mconnected2Server;}
+  inline void* getSocket() const {return msocket;}
+  inline int getServerSerial() const {return mserverSerial;}
 
 
 private:

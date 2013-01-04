@@ -27,11 +27,11 @@
 
 
 //TODO: test or remove
-class ProxyModel: public QSortFilterProxyModel
+class MsgProxyModel: public QSortFilterProxyModel
 {
   Q_OBJECT
 public:
-  ProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent){}
+  MsgProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent){}
 
 protected:
   bool lessThan(const QModelIndex &left,
@@ -40,6 +40,7 @@ protected:
     QVariant leftData = sourceModel()->data(left, Qt::UserRole);
     QVariant rightData = sourceModel()->data(right, Qt::UserRole);
 
+    //qDebug() << leftData.toString() << "< " << rightData.toString();
     if (leftData.type() == QVariant::DateTime) {
         return leftData.toDateTime() < rightData.toDateTime();
       } else {

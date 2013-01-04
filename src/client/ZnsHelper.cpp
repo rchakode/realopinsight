@@ -123,7 +123,7 @@ RequestListT ZnsHelper::getRequestsPatterns()
       \"data\": [{\
       \"uid\": \"%1\", \
       \"limit\": 1000, \
-      \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\"]}], \
+      \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\"]}], \
       \"type\": \"rpc\", \
       \"tid\": %2}";
   return list;
