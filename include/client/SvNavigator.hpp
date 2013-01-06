@@ -100,7 +100,7 @@ private:
   MsgConsole* mfilteredMsgPanel;
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
-  QTabWidget* mtopRightPanel;
+  QTabWidget* mviewPanel;
   QTabWidget* mbottomRightPanel;
   WebKit* mbrowser;
   GraphView* mmap;
@@ -110,8 +110,8 @@ private:
   MsgConsole* mmsgConsole;
   QMenu* mnodeContextMenu;
   QSize mmsgConsoleSize;
-  MenuListT mmenuList;
-  SubMenuListT msubMenuList;
+  MenuListT mmenus;
+  SubMenuListT msubMenus;
   SubMenuListT mcontextMenuList;
   QString mserverAddr;
   QString mserverPort;
@@ -142,6 +142,7 @@ private:
   void openRpcSession(void);
   void postRpcDataRequest(void);
   QStringList getAuthInfo(void);
+  void updateDashboardOnError(const QString& msg);
 };
 
 #endif /* SVNAVIGATOR_HPP */

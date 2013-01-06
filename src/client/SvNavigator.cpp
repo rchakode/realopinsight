@@ -74,7 +74,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mfilteredMsgPanel (NULL),
     mmainSplitter (new QSplitter(this)),
     mrightSplitter (new QSplitter()),
-    mtopRightPanel (new QTabWidget()),
+    mviewPanel (new QTabWidget()),
     mbottomRightPanel (new QTabWidget()),
     mbrowser (new WebKit()),
     mmap (new GraphView(this)),
@@ -91,16 +91,17 @@ SvNavigator::SvNavigator(const qint32& _userRole,
 {
   setWindowTitle(tr("%1 Operations Console").arg(appName));
   loadMenus();
-  mtopRightPanel->addTab(mmap, tr("Dashboard"));
-  mtopRightPanel->addTab(mbrowser, tr("Native Web UI"));
+  mviewPanel->addTab(mmap, tr("Dashboard"));
+  mviewPanel->addTab(mbrowser, tr("Native Web UI"));
   mbottomRightPanel->addTab(mmsgConsole, tr("Event Console"));
   mmainSplitter->addWidget(mtree);
   mmainSplitter->addWidget(mrightSplitter);
-  mrightSplitter->addWidget(mtopRightPanel);
+  mrightSplitter->addWidget(mviewPanel);
   mrightSplitter->addWidget(mbottomRightPanel);
   mrightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(mmainSplitter);
   updateMonitoringSettings();
+  tabChanged(0);
   addEvents();
 }
 
@@ -112,7 +113,7 @@ SvNavigator::~SvNavigator()
   delete mbrowser;
   delete mmap;
   delete mcoreData;
-  delete mtopRightPanel;
+  delete mviewPanel;
   delete mbottomRightPanel;
   delete mrightSplitter;
   delete mmainSplitter;
@@ -128,45 +129,47 @@ SvNavigator::~SvNavigator()
 
 void SvNavigator::loadMenus(void)
 {
-  QIcon refreshIcon(":images/built-in/refresh.png");
-  QIcon cameraIcon(":images/built-in/camera.png");
-  QIcon zoominIcon(":images/built-in/zoomin.png");
-  QIcon zoomoutIcon(":images/built-in/zoomout.png");
-
   QMenuBar* menuBar = new QMenuBar();
-  mmenuList["MENU1"] = menuBar->addMenu("&File"),
-      msubMenuList["Refresh"] = mmenuList["MENU1"]->addAction(refreshIcon, tr("&Refresh Screen")),
-      msubMenuList["Capture"] = mmenuList["MENU1"]->addAction(cameraIcon, tr("&Save Map as Image")),
-      mmenuList["MENU1"]->addSeparator(),
-      msubMenuList["Quit"] = mmenuList["MENU1"]->addAction(tr("&Quit"));
-  mmenuList["MENU2"] = menuBar->addMenu("&Map"),
-      msubMenuList["ZoomIn"] = mmenuList["MENU2"]->addAction(zoominIcon, tr("Zoom &In")),
-      msubMenuList["ZoomOut"] = mmenuList["MENU2"]->addAction(zoomoutIcon, tr("Zoom &Out")),
-      msubMenuList["HideChart"] = mmenuList["MENU2"]->addAction(tr("Hide &Chart"));
-  mmenuList["MENU3"] = menuBar->addMenu("&Preferences"),
-      msubMenuList["ChangePassword"] = mmenuList["MENU3"]->addAction(tr("Change &Password")),
-      msubMenuList["ChangeMonitoringSettings"] = mmenuList["MENU3"]->addAction(tr("&Monitoring Settings"));
-  mmenuList["MENU4"] = menuBar->addMenu("&Help"),
-      msubMenuList["ShowOnlineResources"] = mmenuList["MENU4"]->addAction(tr("Online &Resources")),
-      mmenuList["MENU4"]->addSeparator(),
-      msubMenuList["ShowAbout"] = mmenuList["MENU4"]->addAction(tr("&About %1").arg(appName));
-  msubMenuList["Capture"]->setShortcut(QKeySequence::Save);
-  msubMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
-  msubMenuList["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
-  msubMenuList["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
-  msubMenuList["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  msubMenuList["Quit"]->setShortcut(QKeySequence::Quit);
+  mmenus["FILE"] = menuBar->addMenu("&File"),
+      msubMenus["Refresh"] = mmenus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
+      msubMenus["Capture"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/camera.png"),tr("&Save Map as Image")),
+      mmenus["FILE"]->addSeparator(),
+      msubMenus["Quit"] = mmenus["FILE"]->addAction(tr("&Quit"));
+  mmenus["MAP"] = menuBar->addMenu("&Map"),
+      msubMenus["ZoomIn"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Zoom &In")),
+      msubMenus["ZoomOut"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Zoom &Out")),
+      msubMenus["HideChart"] = mmenus["MAP"]->addAction(tr("Hide &Chart"));
+  mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
+      msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
+      msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(tr("&Monitoring Settings"));
+  mmenus["BROWSER"] = menuBar->addMenu("&Browser"),
+      msubMenus["BrowserBack"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-back.png"),tr("Bac&k")),
+      msubMenus["BrowserForward"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-forward.png"),tr("For&ward"));
+  msubMenus["BrowserStop"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-stop.png"),tr("Sto&p"));
+  mmenus["HELP"] = menuBar->addMenu("&Help"),
+      msubMenus["ShowOnlineResources"] = mmenus["HELP"]->addAction(tr("Online &Resources")),
+      mmenus["HELP"]->addSeparator(),
+      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(appName));
+  msubMenus["Capture"]->setShortcut(QKeySequence::Save);
+  msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh);
+  msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
+  msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
+  msubMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
 
   mcontextMenuList["FilterNodeRelatedMessages"] = mnodeContextMenu->addAction(tr("&Filter related messages"));
   mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
   mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
 
   QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str()));
-  toolBar->addAction(msubMenuList["Refresh"]);
-  toolBar->addAction(msubMenuList["ZoomIn"]);
-  toolBar->addAction(msubMenuList["ZoomOut"]);
-  toolBar->addAction(msubMenuList["Capture"]);
   toolBar->setIconSize(QSize(16,16));
+  toolBar->addAction(msubMenus["Refresh"]);
+  toolBar->addAction(msubMenus["ZoomIn"]);
+  toolBar->addAction(msubMenus["ZoomOut"]);
+  toolBar->addAction(msubMenus["Capture"]);
+  toolBar->addAction(msubMenus["BrowserBack"]);
+  toolBar->addAction(msubMenus["BrowserForward"]);
+  toolBar->addAction(msubMenus["BrowserStop"]);
   setMenuBar(menuBar);
 }
 
@@ -191,13 +194,13 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
         }  else {
           mselectedNode = treeNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
         }
-
       mnodeContextMenu->exec(pos);
     }
 }
 
 void SvNavigator::startMonitor()
 {
+  //FIXME: refresh don't work with zenoss, zabbix also??
   prepareDashboardUpdate();
   switch(mcoreData->monitor){
     case MonitorBroker::ZENOSS:
@@ -241,8 +244,8 @@ void SvNavigator::load(const QString& _file)
 
 void SvNavigator::unloadMenus(void)
 {
-  msubMenuList.clear();
-  mmenuList.clear();
+  msubMenus.clear();
+  mmenus.clear();
   delete mnodeContextMenu;
 }
 
@@ -295,8 +298,8 @@ int SvNavigator::runNagiosMonitor(void)
 
   for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
       cnode != mcoreData->cnodes.end();
-      cnode++) {
-
+      cnode++)
+    {
       if(cnode->child_nodes == "") {
           cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
           mcoreData->check_status_count[cnode->criticity]++;
@@ -314,7 +317,8 @@ int SvNavigator::runNagiosMonitor(void)
             }
           JsonHelper jsHelper(msg.toStdString());
           if(jsHelper.getProperty("return_code").toInt32() == 0
-             && msocket->isConnected2Server()) {
+             && msocket->isConnected2Server())
+            {
               cnode->check.status = jsHelper.getProperty("status").toInt32();
               cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
               cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toString());
@@ -334,14 +338,12 @@ int SvNavigator::runNagiosMonitor(void)
     }
   msocket->disconnect();
   finalizeDashboardUpdate();
-
   return 0;
 }
 
 void SvNavigator::prepareDashboardUpdate(void)
 {
   QMainWindow::setEnabled(false);
-  //  mmsgPanel->setSortingEnabled(false);
   mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_MINOR] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_MAJOR] = 0;
@@ -397,7 +399,8 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
   for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
       cnode != mcoreData->cnodes.end();
-      cnode++) {
+      cnode++)
+    {
       if(cnode->child_nodes.toStdString().compare(check.id) == 0) {
           cnode->check = check;
           setStatusInfo(cnode);
@@ -414,7 +417,7 @@ void SvNavigator::finalizeDashboardUpdate()
       QString chartdDetails = chart->update(mcoreData->check_status_count, mcoreData->cnodes.size());
       mmap->updateStatsPanel(chart);
       if(mchart) delete mchart; mchart = chart; mchart->setToolTip(chartdDetails);
-      mmsgConsole->sort(1);
+      mmsgConsole->sortByColumn(1, Qt::AscendingOrder);
       mmsgConsole->updateColumnWidths(mmsgConsoleSize);
       mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
       mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
@@ -572,7 +575,8 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
   if(utils::findNode(mcoreData, _nodeId, node) &&
-     node->child_nodes != "") {  // Warning: take care in short-circuit evaluation!!!
+     node->child_nodes != "")  // Warning: take care in short-circuit evaluation!!!
+    {
       if (node->type == NodeType::ALARM_NODE) {
           mfilteredMsgPanel->addMsg(node);
         } else {
@@ -592,23 +596,42 @@ void SvNavigator::acknowledge(void)
 
 void SvNavigator::tabChanged(int _index)
 {
-  if (_index != 0) {
-      msubMenuList["ZoomIn"]->setEnabled(false);
-      msubMenuList["ZoomOut"]->setEnabled(false);
-      return;
-    }
+  switch(_index){
+    case 0:
+      mmenus["FILE"]->setEnabled(true);
+      msubMenus["Refresh"]->setVisible(true);
+      msubMenus["Capture"]->setVisible(true);
+      msubMenus["ZoomIn"]->setVisible(true);
+      msubMenus["ZoomOut"]->setVisible(true);
+      mmenus["BROWSER"]->setEnabled(false);
+      msubMenus["BrowserBack"]->setVisible(false);
+      msubMenus["BrowserForward"]->setVisible(false);
+      msubMenus["BrowserStop"]->setVisible(false);
+      break;
+    case 1:
+      mmenus["BROWSER"]->setEnabled(true);
+      msubMenus["BrowserBack"]->setVisible(true);
+      msubMenus["BrowserForward"]->setVisible(true);
+      msubMenus["BrowserStop"]->setVisible(true);
+      mmenus["FILE"]->setEnabled(false);
+      msubMenus["Refresh"]->setVisible(false);
+      msubMenus["Capture"]->setVisible(false);
+      msubMenus["ZoomIn"]->setVisible(false);
+      msubMenus["ZoomOut"]->setVisible(false);
+      break;
+    default:
+      break;
 
-  msubMenuList["ZoomIn"]->setEnabled(true);
-  msubMenuList["ZoomOut"]->setEnabled(true);
+    }
 }
 
 void SvNavigator::hideChart(void)
 {
   if (mmap->hideChart()) {
-      msubMenuList["HideChart"]->setIcon(QIcon(":images/check.png"));
+      msubMenus["HideChart"]->setIcon(QIcon(":images/check.png"));
       return;
     }
-  msubMenuList["HideChart"]->setIcon(QIcon(""));
+  msubMenus["HideChart"]->setIcon(QIcon(""));
 }
 
 void SvNavigator::centerGraphOnNode(QTreeWidgetItem * _item)
@@ -735,10 +758,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           qDebug() << data;
           QString msg = result.property("msg").toString();
           if(msg.isEmpty()) msg = "Authentication failed!";
-          utils::alert(msg);
-          mupdateSucceed = false;
-          //TODO: fill the message console before returning. If the finalize function?
-          finalizeDashboardUpdate();
+          updateDashboardOnError(msg);
           return;
         }
       if(transaction == ZnsHelper::DEVICE) {
@@ -785,72 +805,36 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               finalizeDashboardUpdate();
             }
         } else {
-          utils::alert("Unexpected response received from the server");
-          mupdateSucceed = false;
-          finalizeDashboardUpdate();
+          updateDashboardOnError(tr("Unexpected response received from the server"));
         }
     }
 }
 
-void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
-
-  QString apiUrl = "";
-  if(mcoreData->monitor == MonitorBroker::ZABBIX) {
-      apiUrl = mzbxHelper->getApiUri();
-    } else if(mcoreData->monitor == MonitorBroker::ZENOSS){
-      apiUrl =  mznsHelper->getRequestUrl();
-    }
-  QString msg = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code));
-  utils::alert(msg);
-  updateStatusBar(msg);
-  foreach(const QString& c, mcoreData->cnodes.keys()) {
-      NodeListT::iterator node = mcoreData->cnodes.find(c);
-      if(node == mcoreData->cnodes.end())
-        continue;
-      node->check.status = MonitorBroker::CRITICITY_UNKNOWN;
-      node->check.host = "Unknown";
-      node->check.last_state_change = utils::getCtime("0");
-      node->check.check_command = "Unknown" ;
-      node->check.alarm_msg = msg.toStdString();
-      updateDashboard(node);
-      mcoreData->check_status_count[node->criticity]++;
-    }
-  mupdateSucceed = false ;
-  finalizeDashboardUpdate();
-}
-
-
 void SvNavigator::openRpcSession(void)
 {
-
   QStringList authParams = getAuthInfo();
-  QUrl znsUrlParams;
-  if(authParams.size() != 2) {
-      utils::alert("Invalid authentication chain!\nMust be in the form login:password");
-      finalizeDashboardUpdate();
-      //TODO: fill console with unknown status?
-      return ;
-    }
-
-  switch(mcoreData->monitor) {
-    case MonitorBroker::ZABBIX:
-      mzbxHelper->setBaseUrl(mmonitorBaseUrl);
-      authParams.push_back(QString::number(ZbxHelper::LOGIN));
-      mzbxHelper->postRequest(ZbxHelper::LOGIN, authParams);
-      break;
-
-    case MonitorBroker::ZENOSS:
-      mznsHelper->setBaseUrl(mmonitorBaseUrl);
-      znsUrlParams.addQueryItem("__ac_name", authParams[0]);
-      znsUrlParams.addQueryItem("__ac_password", authParams[1]);
-      znsUrlParams.addQueryItem("submitted", "true");
-      znsUrlParams.addQueryItem("came_from", mznsHelper->getApiContextUrl());
-      mznsHelper->postRequest(ZnsHelper::LOGIN, znsUrlParams.encodedQuery());
-      break;
-
-    default:
-      break;
-
+  if(authParams.size() == 2) {
+      QUrl znsUrlParams;
+      switch(mcoreData->monitor) {
+        case MonitorBroker::ZABBIX:
+          mzbxHelper->setBaseUrl(mmonitorBaseUrl);
+          authParams.push_back(QString::number(ZbxHelper::LOGIN));
+          mzbxHelper->postRequest(ZbxHelper::LOGIN, authParams);
+          break;
+        case MonitorBroker::ZENOSS:
+          mznsHelper->setBaseUrl(mmonitorBaseUrl);
+          znsUrlParams.addQueryItem("__ac_name", authParams[0]);
+          znsUrlParams.addQueryItem("__ac_password", authParams[1]);
+          znsUrlParams.addQueryItem("submitted", "true");
+          znsUrlParams.addQueryItem("came_from", mznsHelper->getApiContextUrl());
+          mznsHelper->postRequest(ZnsHelper::LOGIN, znsUrlParams.encodedQuery());
+          break;
+        default:
+          break;
+        }
+    } else {
+      updateDashboardOnError(tr("Invalid authentication chain!\n"
+                                "Must be in the form login:password"));
     }
 }
 
@@ -883,6 +867,38 @@ void SvNavigator::postRpcDataRequest(void) {
 }
 
 
+void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
+
+  QString apiUrl = "";
+  if(mcoreData->monitor == MonitorBroker::ZABBIX) {
+      apiUrl = mzbxHelper->getApiUri();
+    } else if(mcoreData->monitor == MonitorBroker::ZENOSS){
+      apiUrl =  mznsHelper->getRequestUrl();
+    }
+  updateDashboardOnError(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code)));
+}
+
+void SvNavigator::updateDashboardOnError(const QString& msg)
+{
+  mupdateSucceed = false ;
+  utils::alert(msg);
+  updateStatusBar(msg);
+  for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
+      cnode != mcoreData->cnodes.end();
+      cnode++)
+    {
+      cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
+      cnode->check.status = MonitorBroker::CRITICITY_UNKNOWN;
+      cnode->check.host = "Unknown";
+      cnode->check.last_state_change = utils::getCtime("0");
+      cnode->check.check_command = "Unknown" ;
+      cnode->check.alarm_msg = msg.toStdString();
+      updateDashboard(cnode);
+    }
+  mcoreData->check_status_count[MonitorBroker::CRITICITY_UNKNOWN] = mcoreData->cnodes.size();
+  finalizeDashboardUpdate();
+}
+
 QStringList SvNavigator::getAuthInfo(void) {
 
   QStringList authInfo = QStringList();
@@ -901,20 +917,23 @@ void SvNavigator::addEvents(void)
   //TODO: clean
   //connect(this, SIGNAL(sortEventConsole()), mmsgConsole, SLOT(sortEventConsole()));
   connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
-  connect(msubMenuList["Capture"], SIGNAL(triggered(bool)), mmap, SLOT(capture()));
-  connect(msubMenuList["ZoomIn"], SIGNAL(triggered(bool)), mmap, SLOT(zoomIn()));
-  connect(msubMenuList["ZoomOut"], SIGNAL(triggered(bool)), mmap, SLOT(zoomOut()));
-  connect(msubMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
-  connect(msubMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
-  connect(msubMenuList["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
-  connect(msubMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
-  connect(msubMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
-  connect(msubMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources()));
-  connect(msubMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+  connect(msubMenus["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+  connect(msubMenus["Capture"], SIGNAL(triggered(bool)), mmap, SLOT(capture()));
+  connect(msubMenus["ZoomIn"], SIGNAL(triggered(bool)), mmap, SLOT(zoomIn()));
+  connect(msubMenus["ZoomOut"], SIGNAL(triggered(bool)), mmap, SLOT(zoomOut()));
+  connect(msubMenus["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
+  connect(msubMenus["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
+  connect(msubMenus["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
+  connect(msubMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
+  connect(msubMenus["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
+  connect(msubMenus["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources()));
+  connect(msubMenus["BrowserBack"], SIGNAL(triggered(bool)), mbrowser, SLOT(back()));
+  connect(msubMenus["BrowserForward"], SIGNAL(triggered(bool)), mbrowser, SLOT(forward()));
+  connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
   connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
   connect(mprefWindow, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));
-  connect(mtopRightPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
+  connect(mviewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
   connect(mmap, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(mtree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
   connect(mzbxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZbxReply(QNetworkReply*)));

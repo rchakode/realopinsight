@@ -61,7 +61,6 @@ public:
   void addMsg(const NodeListT::iterator &);
   void addMsg(const NodeT &);
   void updateColumnWidths( const QSize& ,  const bool& = false );
-  inline void sort(const int& column) { mproxyModel->sort(column, Qt::AscendingOrder); }
 
 public slots:
   inline void acknowledgeMsg(void) { emit acknowledgeChanged(); }

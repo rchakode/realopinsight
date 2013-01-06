@@ -24,6 +24,7 @@
 
 #include "WebKit.hpp"
 
+//TODO: added navigation buttons
 WebKit::WebKit(const QString& url, QWidget* _parent)
   :QWebView(_parent)
 {
