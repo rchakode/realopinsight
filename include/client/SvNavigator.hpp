@@ -29,7 +29,7 @@
 #include "Chart.hpp"
 #include "Parser.hpp"
 #include "WebKit.hpp"
-#include "MsgPanel.hpp"
+#include "MsgConsole.hpp"
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
@@ -97,7 +97,7 @@ private:
   qint32 mtimer;
   Settings* msettings;
   Chart* mchart;
-  MsgPanel* mfilteredMsgPanel;
+  MsgConsole* mfilteredMsgPanel;
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
   QTabWidget* mtopRightPanel;
@@ -107,10 +107,9 @@ private:
   SvNavigatorTree* mtree;
   Preferences* mprefWindow;
   Preferences* mchangePasswdWindow;
-  MsgPanel* mmsgPanel;
-  MsgProxyModel* mmsgProxyModel;
+  MsgConsole* mmsgConsole;
   QMenu* mnodeContextMenu;
-  QSize mmsgPanelSize;
+  QSize mmsgConsoleSize;
   MenuListT mmenuList;
   SubMenuListT msubMenuList;
   SubMenuListT mcontextMenuList;

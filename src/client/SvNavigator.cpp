@@ -81,8 +81,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mtree (new SvNavigatorTree()),
     mprefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     mchangePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
-    mmsgPanel(new MsgPanel(this)),
-    mmsgProxyModel(new MsgProxyModel(this)),
+    mmsgConsole(new MsgConsole(this)),
     mnodeContextMenu (new QMenu()),
     mzbxHelper(new ZbxHelper()),
     mzbxAuthToken(""),
@@ -94,7 +93,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   loadMenus();
   mtopRightPanel->addTab(mmap, tr("Dashboard"));
   mtopRightPanel->addTab(mbrowser, tr("Native Web UI"));
-  mbottomRightPanel->addTab(mmsgPanel, tr("Event Console"));
+  mbottomRightPanel->addTab(mmsgConsole, tr("Event Console"));
   mmainSplitter->addWidget(mtree);
   mmainSplitter->addWidget(mrightSplitter);
   mrightSplitter->addWidget(mtopRightPanel);
@@ -102,14 +101,12 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   mrightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(mmainSplitter);
   updateMonitoringSettings();
-  mmsgProxyModel->setDynamicSortFilter(false);
-  mmsgProxyModel->setSourceModel(mmsgPanel->model());
   addEvents();
 }
 
 SvNavigator::~SvNavigator()
 {
-  delete mmsgPanel;
+  delete mmsgConsole;
   delete mchart;
   delete mtree;
   delete mbrowser;
@@ -123,7 +120,6 @@ SvNavigator::~SvNavigator()
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
-  delete mmsgProxyModel;
   if(mfilteredMsgPanel)
     delete mfilteredMsgPanel;
   unloadMenus();
@@ -296,7 +292,6 @@ int SvNavigator::runNagiosMonitor(void)
         }
       updateStatusBar(tr("Updating..."));
     }
-  mmsgPanel->setSortingEnabled(false);
 
   for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
       cnode != mcoreData->cnodes.end();
@@ -346,7 +341,7 @@ int SvNavigator::runNagiosMonitor(void)
 void SvNavigator::prepareDashboardUpdate(void)
 {
   QMainWindow::setEnabled(false);
-  mmsgPanel->setSortingEnabled(false);
+  //  mmsgPanel->setSortingEnabled(false);
   mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_MINOR] = 0;
   mcoreData->check_status_count[MonitorBroker::CRITICITY_MAJOR] = 0;
@@ -393,7 +388,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   QString toolTip = getNodeToolTip(_node);
   updateNavTreeItemStatus(_node, toolTip);
   mmap->updateNode(_node, toolTip);
-  mmsgPanel->addMsg(_node);
+  mmsgConsole->addMsg(_node);
 
   emit hasToBeUpdate(_node.parent);
 }
@@ -414,19 +409,18 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
 void SvNavigator::finalizeDashboardUpdate()
 {
-  if(mcoreData->cnodes.size() == 0) return;
-  Chart *chart = new Chart;
-  QString chartdDetails = chart->update(mcoreData->check_status_count, mcoreData->cnodes.size());
-  mmap->updateStatsPanel(chart);
-  chart->setToolTip(chartdDetails);
-  if(mchart) delete mchart; mchart = chart;
-  mmsgPanel->resizeFields(mmsgPanelSize);
-  mmsgPanel->setSortingEnabled(true);
-  mmsgProxyModel->sort(0, Qt::AscendingOrder);
-  mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
-  mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
-  mtimer = startTimer(mupdateInterval);
-  if(mupdateSucceed) updateStatusBar(tr("Update completed"));
+  if(mcoreData->cnodes.size() != 0) {
+      Chart *chart = new Chart;
+      QString chartdDetails = chart->update(mcoreData->check_status_count, mcoreData->cnodes.size());
+      mmap->updateStatsPanel(chart);
+      if(mchart) delete mchart; mchart = chart; mchart->setToolTip(chartdDetails);
+      mmsgConsole->sort(1);
+      mmsgConsole->resizeFields(mmsgConsoleSize);
+      mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
+      mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
+      mtimer = startTimer(mupdateInterval);
+      if(mupdateSucceed) updateStatusBar(tr("Update completed"));
+    }
   QMainWindow::setEnabled(true);
 }
 
@@ -446,23 +440,23 @@ void SvNavigator::setStatusInfo(NodeT&  _node)
     } else {
       statusText = _node.alarm_msg;
     }
-  QRegExp regexp(MsgPanel::HOSTNAME_META_MSG_PATERN);
+  QRegExp regexp(MsgConsole::HOSTNAME_META_MSG_PATERN);
   QStringList chkids = QString(_node.check.id.c_str()).split("/");
   qint32 nbChecks =  chkids.length();
   if(nbChecks) {
       statusText.replace(regexp, chkids[0]);
       if(nbChecks == 2) {
-          regexp.setPattern(MsgPanel::SERVICE_META_MSG_PATERN);
+          regexp.setPattern(MsgConsole::SERVICE_META_MSG_PATERN);
           statusText.replace(regexp, chkids[1]);
         }
     }
   // FIXME: Test and generalize it to other monitor
-  QStringList splitedCcommand = QString(_node.check.check_command.c_str()).split("!");
-  if(splitedCcommand.length() >= 3) {
-      regexp.setPattern(MsgPanel::THERESHOLD_META_MSG_PATERN);
-      statusText.replace(regexp, splitedCcommand[1]);
+  QStringList cmdData = QString(_node.check.check_command.c_str()).split("!");
+  if(cmdData.length() >= 3) {
+      regexp.setPattern(MsgConsole::THERESHOLD_META_MSG_PATERN);
+      statusText.replace(regexp, cmdData[1]);
       if(_node.criticity == MonitorBroker::CRITICITY_MAJOR)
-        statusText.replace(regexp, splitedCcommand[2]);
+        statusText.replace(regexp, cmdData[2]);
     }
   if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
       _node.notification_msg = statusText;
@@ -560,14 +554,14 @@ void SvNavigator::filterNodeRelatedMsg(void)
   if(mfilteredMsgPanel)
     delete mfilteredMsgPanel;
 
-  mfilteredMsgPanel = new MsgPanel();
+  mfilteredMsgPanel = new MsgConsole();
   NodeListT::iterator node;
   if(utils::findNode(mcoreData, mselectedNode, node)) {
       filterNodeRelatedMsg(mselectedNode);
       QString title = tr("Messages related to '%2' - %1")
           .arg(appName)
           .arg(node->name);
-      mfilteredMsgPanel->resizeFields(mmsgPanelSize, true);
+      mfilteredMsgPanel->resizeFields(mmsgConsoleSize, true);
       mfilteredMsgPanel->setWindowTitle(title);
     }
 
@@ -626,15 +620,15 @@ void SvNavigator::resize(void)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
   QSize screenSize = qApp->desktop()->screen(0)->size();
-  mmsgPanelSize = QSize(screenSize.width() * 0.80, screenSize.height() * (1.0 - GRAPH_HEIGHT_RATE));
+  mmsgConsoleSize = QSize(screenSize.width() * 0.80, screenSize.height() * (1.0 - GRAPH_HEIGHT_RATE));
 
   QList<qint32> framesSize;
   framesSize.push_back(screenSize.width() * 0.20);
-  framesSize.push_back(mmsgPanelSize.width());
+  framesSize.push_back(mmsgConsoleSize.width());
   mmainSplitter->setSizes(framesSize);
 
   framesSize[0] = (screenSize.height() * GRAPH_HEIGHT_RATE);
-  framesSize[1] = (mmsgPanelSize.height());
+  framesSize[1] = (mmsgConsoleSize.height());
   mrightSplitter->setSizes(framesSize);
 
   mmainSplitter->resize(screenSize.width(), screenSize.height() * 0.85);
@@ -699,7 +693,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                 item.next();
                 QScriptValue itemData = item.value();
                 //TODO: check.last_state_change to be tested with Zabbix
-                check.last_state_change = itemData.property("lastclock").toString().toStdString();
+                check.last_state_change = utils::getCtime(itemData.property("lastclock").toString());
               }
             QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
             check.id = key.toStdString();
@@ -725,31 +719,28 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
   if (_reply->error() != QNetworkReply::NoError) {
       return;
     }
-
   QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
   QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
-
   QString data = _reply->readAll();
-  if(mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl())){
-      if(data.endsWith("submitted=true")) {
-          misLogged = true;
-          postRpcDataRequest();
-        } else {
-          misLogged = false;
-        }
+  if(data.endsWith("submitted=true")) {
+      misLogged = true;
+      postRpcDataRequest();
+      mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl()) ;
     } else {
       JsonHelper jsonHelper(data.toStdString());
       qint32 transaction = jsonHelper.getProperty("tid").toInt32();
       QScriptValue result = jsonHelper.getProperty("result");
       QString successMsg = result.property("success").toString();
-
       if(successMsg.compare("true") != 0) {
-          utils::alert(result.property("msg").toString());
+          qDebug() << data;
+          QString msg = result.property("msg").toString();
+          if(msg.isEmpty()) msg = "Authentication failed!";
+          utils::alert(msg);
           mupdateSucceed = false;
-          //TODO: fill the message console before returning
+          //TODO: fill the message console before returning. If the finalize function?
+          finalizeDashboardUpdate();
           return;
         }
-
       if(transaction == ZnsHelper::DEVICE) {
           QScriptValueIterator devices(result.property("devices"));
           while(devices.hasNext()) {
@@ -795,7 +786,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
             }
         } else {
           utils::alert("Unexpected response received from the server");
-          return;
+          mupdateSucceed = false;
+          finalizeDashboardUpdate();
         }
     }
 }
@@ -906,7 +898,8 @@ QStringList SvNavigator::getAuthInfo(void) {
 
 void SvNavigator::addEvents(void)
 {
-  connect(this, SIGNAL(sortEventConsole()), mmsgPanel, SLOT(sortEventConsole()));
+  //TODO: clean
+  //connect(this, SIGNAL(sortEventConsole()), mmsgConsole, SLOT(sortEventConsole()));
   connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
   connect(msubMenuList["Capture"], SIGNAL(triggered(bool)), mmap, SLOT(capture()));
   connect(msubMenuList["ZoomIn"], SIGNAL(triggered(bool)), mmap, SLOT(zoomIn()));

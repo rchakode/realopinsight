@@ -21,62 +21,66 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MSGPANEL_HPP
-#define MSGPANEL_HPP
+#ifndef MSGCONSOLE_HPP
+#define MSGCONSOLE_HPP
 #include "Base.hpp"
 
-class MsgPanel : public QTableWidget
+class MsgConsoleProxyModel: public QSortFilterProxyModel
+{
+  Q_OBJECT
+public:
+  MsgConsoleProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent){}
+
+protected:
+  bool lessThan(const QModelIndex &left, const QModelIndex &right) const
+  {
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+    if (leftData.type() == QVariant::DateTime) {
+        return leftData.toDateTime() < rightData.toDateTime();
+      }
+    //return leftData.toString() < rightData.toString();
+    return QString::localeAwareCompare(leftData.toString(), rightData.toString()) < 0;
+  }
+};
+
+class MsgConsole : public QTableWidget
 {
   Q_OBJECT
 
 public:
-  static const QString HOSTNAME_META_MSG_PATERN ;
-  static const QString SERVICE_META_MSG_PATERN ;
-  static const QString THERESHOLD_META_MSG_PATERN  ;
-  static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
+  static const QString HOSTNAME_META_MSG_PATERN;
+  static const QString SERVICE_META_MSG_PATERN;
+  static const QString THERESHOLD_META_MSG_PATERN ;
+  static const QString PLUGIN_OUTPUT_META_MSG_PATERN;
 
-  MsgPanel(QWidget * parent = 0 );
-  virtual ~MsgPanel() {}
+  MsgConsole(QWidget * parent = 0 );
+  virtual ~MsgConsole() {}
   static const qint16 NUM_COLUMNS;
   void addMsg(const NodeListT::iterator &);
   void addMsg(const NodeT &);
   void resizeFields( const QSize& ,  const bool& = false );
+  inline void sort(const int& column) {
+    mmsgConsoleProxy->setSourceModel(model());
+    mmsgConsoleProxy->sort(column, Qt::AscendingOrder);
+  }
 
 public slots:
-  void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
-  void sortEventConsole(void) {sortItems(MsgPanel::NUM_COLUMNS - 1, Qt::DescendingOrder) ;}
+  inline void acknowledgeMsg(void) { emit acknowledgeChanged();}
+  inline void sortEventConsole(void) {sortItems(1, Qt::DescendingOrder); }
 
 signals:
-  void acknowledgeChanged(void) ;
+  void acknowledgeChanged(void);
 
 private:
   QPoint charSize;
-  QSize windowSize ;
+  QSize windowSize;
+  MsgConsoleProxyModel* mmsgConsoleProxy;
 
   static const QStringList HeaderLabels;
   inline QCheckBox* msgItem(const qint32& _row, const qint32& _column){
-    return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
+    return dynamic_cast<QCheckBox*>(cellWidget(_row, _column) );
   }
 };
 
-class MsgProxyModel: public QSortFilterProxyModel
-{
-  Q_OBJECT
-public:
-  MsgProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent){}
-
-protected:
-  bool lessThan(const QModelIndex &left,
-                const QModelIndex &right) const
-  {
-    QVariant leftData = sourceModel()->data(left, Qt::UserRole);
-    QVariant rightData = sourceModel()->data(right, Qt::UserRole);
-    if (leftData.type() == QVariant::DateTime) {
-        return leftData.toDateTime() < rightData.toDateTime();
-      } else {
-        return QString::localeAwareCompare(leftData.toString(), rightData.toString()) < 0;
-      }
-  }
-};
-
-#endif /* MSGPANEL_HPP */
+#endif /* MSGCONSOLE_HPP */

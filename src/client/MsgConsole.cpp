@@ -21,41 +21,41 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "MsgPanel.hpp"
+#include "MsgConsole.hpp"
 #include "StatsLegend.hpp"
 #include <ctime>
 #include "utilsClient.hpp"
 #include<QTableWidget>
-#include <QSortFilterProxyModel>
 
-const QString MsgPanel::HOSTNAME_META_MSG_PATERN = "\\{hostname\\}";
-const QString MsgPanel::SERVICE_META_MSG_PATERN = "\\{check_name\\}";
-const QString MsgPanel::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}";
-const QString MsgPanel::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}";
-const qint16 MsgPanel::NUM_COLUMNS = 6;
-const qint32 ID_COLUMN = MsgPanel::NUM_COLUMNS - 1;
-const QStringList MsgPanel::HeaderLabels = QStringList() <<"Date& Hour"<<"Status"<<"Host"<<"Service"<<"Message";
+const QString MsgConsole::HOSTNAME_META_MSG_PATERN = "\\{hostname\\}";
+const QString MsgConsole::SERVICE_META_MSG_PATERN = "\\{check_name\\}";
+const QString MsgConsole::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}";
+const QString MsgConsole::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}";
+const qint16 MsgConsole::NUM_COLUMNS = 6;
+const qint32 ID_COLUMN = MsgConsole::NUM_COLUMNS - 1;
+const QStringList MsgConsole::HeaderLabels = QStringList()<<"Date & Hour"<<"Status"<<"Host"<<"Service"<<"Message";
 
-MsgPanel::MsgPanel(QWidget * _parent)
+MsgConsole::MsgConsole(QWidget * _parent)
   : QTableWidget(0, NUM_COLUMNS, _parent),
-    charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0),
-                    QFontMetrics(QFont()).height()))
+    charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0),QFontMetrics(QFont()).height())),
+    mmsgConsoleProxy(new MsgConsoleProxyModel)
 {
   QTableView::verticalHeader()->hide();
   QTableView::hideColumn(NUM_COLUMNS - 1);
   QTableWidget::setHorizontalHeaderLabels(HeaderLabels);
   QTableView::setAlternatingRowColors(true);
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
+  //QTableView::setSortingEnabled(true);
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
 }
 
-void MsgPanel::addMsg(const NodeListT::iterator& _node)
+void MsgConsole::addMsg(const NodeListT::iterator& _node)
 {
   addMsg(*_node);
 }
 
 
-void MsgPanel::addMsg(const NodeT& _node)
+void MsgConsole::addMsg(const NodeT& _node)
 {
   QString line[NUM_COLUMNS];
   line[0] = QString::fromStdString(_node.check.last_state_change);
@@ -98,8 +98,7 @@ void MsgPanel::addMsg(const NodeT& _node)
   item(0, 1)->setBackground(QBrush(utils::getColor(_node.criticity)));
 }
 
-
-void MsgPanel::resizeFields(const QSize& _window_size, const bool& _resize_window)
+void MsgConsole::resizeFields(const QSize& _window_size, const bool& _resize_window)
 {
   resizeColumnsToContents();
   if(rowCount()) {

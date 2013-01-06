@@ -47,7 +47,6 @@ HEADERS	+= include/core/ns.hpp \
     include/client/Auth.hpp \
     include/client/Base.hpp \
     include/client/GraphView.hpp \
-    include/client/MsgPanel.hpp \
     include/client/Parser.hpp \
     include/client/PieChart.hpp \
     include/client/PieChartItem.hpp \
@@ -64,13 +63,13 @@ HEADERS	+= include/core/ns.hpp \
     include/client/ZnsHelper.hpp \
     include/client/Settings.hpp \
     include/client/utilsClient.hpp \
-    include/client/Chart.hpp
+    include/client/Chart.hpp \
+    include/client/MsgConsole.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
     src/client/Auth.cpp \
     src/client/GraphView.cpp \
-    src/client/MsgPanel.cpp \
     src/client/Parser.cpp \
     src/client/PieChart.cpp \
     src/client/PieChartItem.cpp \
@@ -88,7 +87,8 @@ SOURCES	+= \
     src/client/Settings.cpp \
     src/client/utilsClient.cpp \
     src/core/utilsCore.cpp \
-    src/client/Chart.cpp
+    src/client/Chart.cpp \
+    src/client/MsgConsole.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts
