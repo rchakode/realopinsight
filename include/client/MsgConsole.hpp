@@ -34,17 +34,18 @@ public:
 protected:
   bool lessThan(const QModelIndex &left, const QModelIndex &right) const
   {
-    QVariant leftData = sourceModel()->data(left);
-    QVariant rightData = sourceModel()->data(right);
+    QVariant leftData = sourceModel()->data(left, Qt::UserRole);
+    QVariant rightData = sourceModel()->data(right, Qt::UserRole);
     if (leftData.type() == QVariant::DateTime) {
         return leftData.toDateTime() < rightData.toDateTime();
+      } else if (leftData.type() == QVariant::Int) {
+        return leftData.toInt() < rightData.toInt();
       }
-    //return leftData.toString() < rightData.toString();
     return QString::localeAwareCompare(leftData.toString(), rightData.toString()) < 0;
   }
 };
 
-class MsgConsole : public QTableWidget
+class MsgConsole : public QTableView  //TODO see style for QtableView
 {
   Q_OBJECT
 
@@ -55,32 +56,25 @@ public:
   static const QString PLUGIN_OUTPUT_META_MSG_PATERN;
 
   MsgConsole(QWidget * parent = 0 );
-  virtual ~MsgConsole() {}
+  virtual ~MsgConsole();
   static const qint16 NUM_COLUMNS;
   void addMsg(const NodeListT::iterator &);
   void addMsg(const NodeT &);
   void resizeFields( const QSize& ,  const bool& = false );
-  inline void sort(const int& column) {
-    mmsgConsoleProxy->setSourceModel(model());
-    mmsgConsoleProxy->sort(column, Qt::AscendingOrder);
-  }
+  inline void sort(const int& column) { mproxyModel->sort(column, Qt::AscendingOrder); }
 
 public slots:
-  inline void acknowledgeMsg(void) { emit acknowledgeChanged();}
-  inline void sortEventConsole(void) {sortItems(1, Qt::DescendingOrder); }
+  inline void acknowledgeMsg(void) { emit acknowledgeChanged(); }
+  inline void sortEventConsole(void) { mproxyModel->sort(1); }
 
 signals:
   void acknowledgeChanged(void);
 
 private:
+  QStandardItemModel* mmodel;
+  MsgConsoleProxyModel* mproxyModel;
   QPoint charSize;
   QSize windowSize;
-  MsgConsoleProxyModel* mmsgConsoleProxy;
-
-  static const QStringList HeaderLabels;
-  inline QCheckBox* msgItem(const qint32& _row, const qint32& _column){
-    return dynamic_cast<QCheckBox*>(cellWidget(_row, _column) );
-  }
 };
 
 #endif /* MSGCONSOLE_HPP */

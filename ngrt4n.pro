@@ -4,11 +4,11 @@ VERSION_=2.2.0
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
-SOURCES	+= src/client/ngrt4n.cpp
+SOURCES	+=
 TARGET = RealOpInsight
 }
 config-default{
-SOURCES	+= src/client/ngrt4n.cpp
+SOURCES	+=
 TARGET = ngrt4n-manager
 }
 config-oc{
@@ -88,7 +88,8 @@ SOURCES	+= \
     src/client/utilsClient.cpp \
     src/core/utilsCore.cpp \
     src/client/Chart.cpp \
-    src/client/MsgConsole.cpp
+    src/client/MsgConsole.cpp \
+    src/client/ngrt4n-manager.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts

@@ -25,7 +25,6 @@
 #include "StatsLegend.hpp"
 #include <ctime>
 #include "utilsClient.hpp"
-#include<QTableWidget>
 
 const QString MsgConsole::HOSTNAME_META_MSG_PATERN = "\\{hostname\\}";
 const QString MsgConsole::SERVICE_META_MSG_PATERN = "\\{check_name\\}";
@@ -33,20 +32,33 @@ const QString MsgConsole::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}";
 const QString MsgConsole::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}";
 const qint16 MsgConsole::NUM_COLUMNS = 6;
 const qint32 ID_COLUMN = MsgConsole::NUM_COLUMNS - 1;
-const QStringList MsgConsole::HeaderLabels = QStringList()<<"Date & Hour"<<"Status"<<"Host"<<"Service"<<"Message";
 
 MsgConsole::MsgConsole(QWidget * _parent)
-  : QTableWidget(0, NUM_COLUMNS, _parent),
-    charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0),QFontMetrics(QFont()).height())),
-    mmsgConsoleProxy(new MsgConsoleProxyModel)
+  : QTableView(_parent),
+    mmodel(new QStandardItemModel(0, NUM_COLUMNS, this)),
+    mproxyModel(new MsgConsoleProxyModel),
+    charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0), QFontMetrics(QFont()).height()))
 {
+  mmodel->setHeaderData(0, Qt::Horizontal, QObject::tr("Date & Hour"), Qt::DisplayRole);
+  mmodel->setHeaderData(1, Qt::Horizontal, QObject::tr("Severity"), Qt::DisplayRole);
+  mmodel->setHeaderData(2, Qt::Horizontal, QObject::tr("Host"), Qt::DisplayRole);
+  mmodel->setHeaderData(3, Qt::Horizontal, QObject::tr("Service"), Qt::DisplayRole);
+  mmodel->setHeaderData(4, Qt::Horizontal, QObject::tr("Message"), Qt::DisplayRole);
+  mproxyModel->setSourceModel(mmodel);
+  QTableView::setModel(mproxyModel);
   QTableView::verticalHeader()->hide();
   QTableView::hideColumn(NUM_COLUMNS - 1);
-  QTableWidget::setHorizontalHeaderLabels(HeaderLabels);
   QTableView::setAlternatingRowColors(true);
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
-  //QTableView::setSortingEnabled(true);
+  QTableView::setSortingEnabled(true);
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
+}
+
+
+MsgConsole::~MsgConsole()
+{
+  delete mmodel;
+  delete mproxyModel;
 }
 
 void MsgConsole::addMsg(const NodeListT::iterator& _node)
@@ -57,53 +69,76 @@ void MsgConsole::addMsg(const NodeListT::iterator& _node)
 
 void MsgConsole::addMsg(const NodeT& _node)
 {
-  QString line[NUM_COLUMNS];
-  line[0] = QString::fromStdString(_node.check.last_state_change);
-  line[1] = utils::statusToString(_node.criticity);
-  line[2] = QString(_node.check.host.c_str());
-  line[3] = " " + _node.name;
-  if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
-      line[4] = (_node.notification_msg.trimmed().length() != 0)?
-            _node.notification_msg : QString(_node.check.alarm_msg.c_str());
-    } else {
-      line[4] = (_node.alarm_msg.trimmed().length() != 0 &&
-          _node.criticity != MonitorBroker::CRITICITY_UNKNOWN)?
-            _node.alarm_msg :
-            QString(_node.check.alarm_msg.c_str());
-    }
-  line[ID_COLUMN] = _node.id;
-  qint32 i = 0;
-  qint32 nbRows = QTableWidget::rowCount();
-  while(i < nbRows) {
-      if(item(i, ID_COLUMN)->text() == _node.id) {
-          QTableWidget::removeRow(i);
+  const MonitorBroker::CheckT& check = _node.check;
+  qint32 index = 0;
+  QString itemText = "";
+  qint32 nbRows = mmodel->rowCount();
+  while(index < nbRows) {
+      if(mmodel->item(index, ID_COLUMN) &&
+         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) == _node.id)
+        {
+          mmodel->removeRow(index);
           nbRows--;
           break;
         }
-      i++;
+      index++;
     }
-  QTableWidget::insertRow(0);
-  QTableWidget::setRowCount(nbRows + 1);
-  QTableWidget::setRowHeight(0, charSize.y() + 3);
-  QTableWidgetItem* items[NUM_COLUMNS];
-  for(i = 0; i < NUM_COLUMNS; i ++) {
-      QTableWidget::setCellWidget(0, i, new QLabel(""));
-      items[i] = new QTableWidgetItem(line[i]);
-      items[i]->setData(Qt::UserRole, line[i]);
-      QTableWidget::setItem(0, i, items[i]);
-      if(_node.criticity != MonitorBroker::CRITICITY_NORMAL) {
-          item(0, i)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-        }
+
+  if(index >= nbRows) {
+      index = 0;
+      mmodel->insertRow(index);
+      mmodel->setRowCount(nbRows + 1);
+      QTableView::setRowHeight(index, charSize.y() + 3);
+      mmodel->setItem(index, 0, new QStandardItem(itemText));
+      mmodel->setItem(index, 1, new QStandardItem(itemText));
+      mmodel->setItem(index, 2, new QStandardItem(itemText));
+      mmodel->setItem(index, 3, new QStandardItem(itemText));
+      mmodel->setItem(index, 4, new QStandardItem(itemText));
+      mmodel->setItem(index, ID_COLUMN, new QStandardItem(itemText));
     }
-  item(0, 1)->setBackground(QBrush(utils::getColor(_node.criticity)));
+  mmodel->item(index, ID_COLUMN)->setData(_node.id, Qt::UserRole);
+  itemText = QString(check.last_state_change.c_str());
+  mmodel->item(index, 0)->setText(itemText);
+  mmodel->item(index, 0)->setData(QDateTime::fromString(itemText), Qt::UserRole);
+
+  mmodel->item(index, 1)->setText(utils::statusToString(_node.criticity));
+  mmodel->item(index, 1)->setData(-1*_node.criticity, Qt::UserRole);
+  mmodel->item(index, 1)->setBackground(QBrush(utils::getColor(_node.criticity)));
+
+  itemText = QString(check.host.c_str());
+  mmodel->item(index, 2)->setText(itemText);
+  mmodel->item(index, 2)->setData(itemText, Qt::UserRole);
+
+  mmodel->item(index, 3)->setText(_node.name);
+  mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
+
+  if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
+      itemText = (_node.notification_msg.trimmed().length() != 0)?
+            _node.notification_msg:QString(_node.check.alarm_msg.c_str());
+      mmodel->item(index, 0)->setBackground(Qt::transparent);
+      mmodel->item(index, 2)->setBackground(Qt::transparent);
+      mmodel->item(index, 3)->setBackground(Qt::transparent);
+      mmodel->item(index, 4)->setBackground(Qt::transparent);
+    } else {
+      itemText = (_node.alarm_msg.trimmed().length() &&
+                  _node.criticity != MonitorBroker::CRITICITY_UNKNOWN)?
+            _node.alarm_msg: QString(_node.check.alarm_msg.c_str());
+      mmodel->item(index, 0)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+      mmodel->item(index, 2)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+      mmodel->item(index, 3)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+      mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+
+    }
+  mmodel->item(index, 4)->setText(itemText);
+  mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
 }
 
 void MsgConsole::resizeFields(const QSize& _window_size, const bool& _resize_window)
 {
-  resizeColumnsToContents();
-  if(rowCount()) {
-      qint32  msgWidth = (_window_size.width() - cellWidget(0, 4)->pos().x());
-      setColumnWidth(4, msgWidth);
+  QTableView::resizeColumnsToContents();
+  if(mmodel->rowCount()) {
+      //FIXME: qint32  msgWidth = (_window_size.width() - cellWidget(0, 4)->pos().x());
+      //QTableView::setColumnWidth(4, msgWidth);
     }
   if (_resize_window) window()->resize(_window_size);
 }
