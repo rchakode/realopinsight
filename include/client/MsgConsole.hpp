@@ -60,7 +60,7 @@ public:
   static const qint16 NUM_COLUMNS;
   void addMsg(const NodeListT::iterator &);
   void addMsg(const NodeT &);
-  void resizeFields( const QSize& ,  const bool& = false );
+  void updateColumnWidths( const QSize& ,  const bool& = false );
   inline void sort(const int& column) { mproxyModel->sort(column, Qt::AscendingOrder); }
 
 public slots:

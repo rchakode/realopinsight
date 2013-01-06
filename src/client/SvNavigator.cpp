@@ -415,7 +415,7 @@ void SvNavigator::finalizeDashboardUpdate()
       mmap->updateStatsPanel(chart);
       if(mchart) delete mchart; mchart = chart; mchart->setToolTip(chartdDetails);
       mmsgConsole->sort(1);
-      mmsgConsole->resizeFields(mmsgConsoleSize);
+      mmsgConsole->updateColumnWidths(mmsgConsoleSize);
       mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
       mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
       mtimer = startTimer(mupdateInterval);
@@ -561,7 +561,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
       QString title = tr("Messages related to '%2' - %1")
           .arg(appName)
           .arg(node->name);
-      mfilteredMsgPanel->resizeFields(mmsgConsoleSize, true);
+      mfilteredMsgPanel->updateColumnWidths(mmsgConsoleSize, true);
       mfilteredMsgPanel->setWindowTitle(title);
     }
 

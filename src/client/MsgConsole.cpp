@@ -133,12 +133,15 @@ void MsgConsole::addMsg(const NodeT& _node)
   mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
 }
 
-void MsgConsole::resizeFields(const QSize& _window_size, const bool& _resize_window)
+void MsgConsole::updateColumnWidths(const QSize& _window_size, const bool& _resize_window)
 {
   QTableView::resizeColumnsToContents();
   if(mmodel->rowCount()) {
-      //FIXME: qint32  msgWidth = (_window_size.width() - cellWidget(0, 4)->pos().x());
-      //QTableView::setColumnWidth(4, msgWidth);
+      qint32 msgWidth = QTableView::width() - (QTableView::columnWidth(0)
+                                               +QTableView::columnWidth(1)
+                                               +QTableView::columnWidth(2)
+                                               +QTableView::columnWidth(3));
+      QTableView::setColumnWidth(4, msgWidth);
     }
   if (_resize_window) window()->resize(_window_size);
 }
