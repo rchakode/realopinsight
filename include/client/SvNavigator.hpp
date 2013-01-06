@@ -101,7 +101,7 @@ private:
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
   QTabWidget* mviewPanel;
-  QTabWidget* mbottomRightPanel;
+  QTabWidget* mmsgConsolePanel;
   WebKit* mbrowser;
   GraphView* mmap;
   SvNavigatorTree* mtree;

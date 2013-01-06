@@ -75,7 +75,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mmainSplitter (new QSplitter(this)),
     mrightSplitter (new QSplitter()),
     mviewPanel (new QTabWidget()),
-    mbottomRightPanel (new QTabWidget()),
+    mmsgConsolePanel (new QTabWidget()),
     mbrowser (new WebKit()),
     mmap (new GraphView(this)),
     mtree (new SvNavigatorTree()),
@@ -93,11 +93,11 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   loadMenus();
   mviewPanel->addTab(mmap, tr("Dashboard"));
   mviewPanel->addTab(mbrowser, tr("Native Web UI"));
-  mbottomRightPanel->addTab(mmsgConsole, tr("Event Console"));
+  mmsgConsolePanel->addTab(mmsgConsole, tr("Event Console"));
   mmainSplitter->addWidget(mtree);
   mmainSplitter->addWidget(mrightSplitter);
   mrightSplitter->addWidget(mviewPanel);
-  mrightSplitter->addWidget(mbottomRightPanel);
+  mrightSplitter->addWidget(mmsgConsolePanel);
   mrightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(mmainSplitter);
   updateMonitoringSettings();
@@ -114,7 +114,7 @@ SvNavigator::~SvNavigator()
   delete mmap;
   delete mcoreData;
   delete mviewPanel;
-  delete mbottomRightPanel;
+  delete mmsgConsolePanel;
   delete mrightSplitter;
   delete mmainSplitter;
   delete mprefWindow;
