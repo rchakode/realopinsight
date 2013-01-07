@@ -58,8 +58,8 @@ public:
   MsgConsole(QWidget * parent = 0 );
   virtual ~MsgConsole();
   static const qint16 NUM_COLUMNS;
-  void addMsg(const NodeListT::iterator &);
-  void addMsg(const NodeT &);
+  void updateNodeMsg(const NodeListT::iterator &);
+  void updateNodeMsg(const NodeT &);
   void updateColumnWidths( const QSize& ,  const bool& = false );
 
 public slots:

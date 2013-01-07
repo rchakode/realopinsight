@@ -36,7 +36,7 @@
 #include <locale>
 
 
-const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
@@ -390,7 +390,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   QString toolTip = getNodeToolTip(_node);
   updateNavTreeItemStatus(_node, toolTip);
   mmap->updateNode(_node, toolTip);
-  mmsgConsole->addMsg(_node);
+  mmsgConsole->updateNodeMsg(_node);
 
   emit hasToBeUpdate(_node.parent);
 }
@@ -436,7 +436,7 @@ void SvNavigator::setStatusInfo(NodeListT::iterator&  _node)
 void SvNavigator::setStatusInfo(NodeT&  _node)
 {
   _node.criticity = utils::getCriticity(mcoreData->monitor, _node.check.status);
-  _node.prop_status = _node.criticity;
+  _node.prop_status = _node.criticity; //FIXME: take prop_rule into account?
   QString statusText = "";
   if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
       statusText = _node.notification_msg;
@@ -495,7 +495,6 @@ void SvNavigator::updateBpNode(QString _nodeId)
       break;
     default: node->prop_status = node->criticity;
       break;
-
     }
   QString toolTip = getNodeToolTip(*node);
   mmap->updateNode(node, toolTip);
@@ -578,7 +577,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
      node->child_nodes != "")  // Warning: take care in short-circuit evaluation!!!
     {
       if (node->type == NodeType::ALARM_NODE) {
-          mfilteredMsgPanel->addMsg(node);
+          mfilteredMsgPanel->updateNodeMsg(node);
         } else {
           QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
           foreach(QString chkid, childIds) {
@@ -887,12 +886,14 @@ void SvNavigator::updateDashboardOnError(const QString& msg)
       cnode != mcoreData->cnodes.end();
       cnode++)
     {
-      cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
+      //FIXME: check undefined services
       cnode->check.status = MonitorBroker::CRITICITY_UNKNOWN;
       cnode->check.host = "Unknown";
       cnode->check.last_state_change = utils::getCtime("0");
       cnode->check.check_command = "Unknown" ;
       cnode->check.alarm_msg = msg.toStdString();
+      cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
+      setStatusInfo(cnode);
       updateDashboard(cnode);
     }
   mcoreData->check_status_count[MonitorBroker::CRITICITY_UNKNOWN] = mcoreData->cnodes.size();

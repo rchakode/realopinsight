@@ -61,29 +61,24 @@ MsgConsole::~MsgConsole()
   delete mproxyModel;
 }
 
-void MsgConsole::addMsg(const NodeListT::iterator& _node)
+void MsgConsole::updateNodeMsg(const NodeListT::iterator& _node)
 {
-  addMsg(*_node);
+  updateNodeMsg(*_node);
 }
 
 
-void MsgConsole::addMsg(const NodeT& _node)
+void MsgConsole::updateNodeMsg(const NodeT& _node)
 {
   const MonitorBroker::CheckT& check = _node.check;
   qint32 index = 0;
   QString itemText = "";
   qint32 nbRows = mmodel->rowCount();
-  while(index < nbRows) {
-      if(mmodel->item(index, ID_COLUMN) &&
-         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) == _node.id)
-        {
-          mmodel->removeRow(index);
-          nbRows--;
-          break;
-        }
+  while(index < nbRows &&
+        mmodel->item(index, ID_COLUMN) &&
+         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id)
+    {
       index++;
     }
-
   if(index >= nbRows) {
       index = 0;
       mmodel->insertRow(index);
