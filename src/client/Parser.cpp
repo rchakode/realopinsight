@@ -73,8 +73,8 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
       QDomElement service = services.item(srv).toElement();
       node.id = service.attribute("id").trimmed();
       node.type = service.attribute("type").toInt();
-      node.status_crule = service.attribute("statusCalcRule").toInt();
-      node.status_prule = service.attribute("statusPropRule").toInt();
+      node.criticity_crule = service.attribute("statusCalcRule").toInt();
+      node.criticity_prule = service.attribute("statusPropRule").toInt();
       node.icon = service.firstChildElement("Icon").text().trimmed();
       node.name = service.firstChildElement("Name").text().trimmed();
       node.description = service.firstChildElement("Description").text().trimmed();
@@ -91,12 +91,12 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
           node.icon = GraphView::DEFAULT_ICON;
         }
 
-      if(node.status_crule < 0) {
-          node.status_crule = StatusCalcRules::HighCriticity; //FBWC
+      if(node.criticity_crule < 0) {
+          node.criticity_crule = CalcRules::HighCriticity; //FBWC
         }
 
-      if(node.status_prule < 0) {
-          node.status_prule = StatusPropRules::Unchanged;
+      if(node.criticity_prule < 0) {
+          node.criticity_prule = PropRules::Unchanged;
         }
 
       if(node.type == NodeType::ALARM_NODE) {

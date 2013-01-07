@@ -126,18 +126,16 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
   if( node != _node_map.end()) {
       node->name = nameField()->text();
       node->type = typeField()->currentIndex();
-      node->status_crule = statusCalcRuleField()->currentIndex();
-      node->status_prule = statusPropRuleField()->currentIndex();
+      node->criticity_crule = statusCalcRuleField()->currentIndex();
+      node->criticity_prule = statusPropRuleField()->currentIndex();
       node->icon = iconField()->currentText();
       node->description = descriptionField()->toPlainText();
       node->alarm_msg  = alarmMsgField()->toPlainText();
       node->notification_msg = notificationMsgField()->toPlainText();
       if(node->type == NodeType::ALARM_NODE)
         node->child_nodes = checkField()->currentText();
-
       return true;
     }
-
   return false;
 }
 
@@ -146,8 +144,8 @@ bool ServiceEditor::updateNode(NodeListT::iterator & _node)
 {
   _node->name = nameField()->text();
   _node->type = typeField()->currentIndex();
-  _node->status_crule = statusCalcRuleField()->currentIndex();
-  _node->status_prule = statusPropRuleField()->currentIndex();
+  _node->criticity_crule = statusCalcRuleField()->currentIndex();
+  _node->criticity_prule = statusPropRuleField()->currentIndex();
   _node->icon = iconField()->currentText();
   _node->description = descriptionField()->toPlainText();
   _node->alarm_msg  = alarmMsgField()->toPlainText();
@@ -170,8 +168,8 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node)
 {
   nameField()->setText(_node->name);
   typeField()->setCurrentIndex(_node->type);
-  statusCalcRuleField()->setCurrentIndex(_node->status_crule);
-  statusPropRuleField()->setCurrentIndex(_node->status_prule);
+  statusCalcRuleField()->setCurrentIndex(_node->criticity_crule);
+  statusPropRuleField()->setCurrentIndex(_node->criticity_prule);
   iconField()->setCurrentIndex(iconField()->findText((_node->icon)));
   descriptionField()->setText(_node->description);
   alarmMsgField()->setText(_node->alarm_msg);
@@ -244,16 +242,16 @@ void ServiceEditor::loadTypeFields()
 void ServiceEditor::loadStatusHandlingFields(void)
 {
   StringMapT crules = SvNavigator::calcRules();
-  QString defaultRule = StatusCalcRules::label(StatusCalcRules::HighCriticity);
-  statusCalcRuleField()->addItem(tr("Calculation rule (Default is")%" "%defaultRule+")", StatusCalcRules::HighCriticity);
+  QString defaultRule = CalcRules::label(CalcRules::HighCriticity);
+  statusCalcRuleField()->addItem(tr("Calculation rule (Default is")%" "%defaultRule+")", CalcRules::HighCriticity);
 
   foreach(const QString & rule, crules.keys()) {
       statusCalcRuleField()->addItem(rule, crules.value(rule));
     }
 
   StringMapT prules = SvNavigator::propRules();
-  defaultRule = StatusPropRules::label(StatusPropRules::Unchanged);
-  statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", StatusPropRules::Unchanged);
+  defaultRule = PropRules::label(PropRules::Unchanged);
+  statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", PropRules::Unchanged);
   foreach(const QString & rule, prules.keys()) {
       statusPropRuleField()->addItem(rule, prules.value(rule));
     }

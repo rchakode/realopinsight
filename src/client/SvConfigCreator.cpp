@@ -468,7 +468,7 @@ void SvCreator::recordData(const QString& _path)
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
 {
   stream << "\t<Service id=\""<<node.id<<"\" type=\""<<node.type
-         << "\" statusCalcRule=\""<<node.status_crule<< "\" statusPropRule=\""<<node.status_prule<< "\">\n"
+         << "\" statusCalcRule=\""<<node.criticity_crule<< "\" statusPropRule=\""<<node.criticity_prule<< "\">\n"
          << "\t\t<Name>"<<node.name<<"</Name>\n"
          << "\t\t<Icon>"<<node.icon<<"</Icon>\n"
          << "\t\t<Description>"<<node.description<<"</Description>\n"

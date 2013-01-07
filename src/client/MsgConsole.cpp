@@ -40,7 +40,7 @@ MsgConsole::MsgConsole(QWidget * _parent)
     charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0), QFontMetrics(QFont()).height()))
 {
   mmodel->setHeaderData(0, Qt::Horizontal, QObject::tr("Date & Hour"), Qt::DisplayRole);
-  mmodel->setHeaderData(1, Qt::Horizontal, QObject::tr("Severity"), Qt::DisplayRole);
+  mmodel->setHeaderData(1, Qt::Horizontal, QObject::tr("Criticity"), Qt::DisplayRole);
   mmodel->setHeaderData(2, Qt::Horizontal, QObject::tr("Host"), Qt::DisplayRole);
   mmodel->setHeaderData(3, Qt::Horizontal, QObject::tr("Service"), Qt::DisplayRole);
   mmodel->setHeaderData(4, Qt::Horizontal, QObject::tr("Message"), Qt::DisplayRole);

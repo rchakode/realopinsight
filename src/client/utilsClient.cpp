@@ -70,7 +70,7 @@ QString utils::getAbsolutePath(const QString& _path)
   return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
 }
 
-MonitorBroker::CriticityT utils::getCriticity(const int& _monitor, const int& _statusOrSeverity)
+MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int& _statusOrSeverity)
 {
   int criticity = MonitorBroker::CRITICITY_UNKNOWN;
   if(_monitor == MonitorBroker::NAGIOS) {
@@ -206,9 +206,18 @@ bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iter
   return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
 }
 
-std::string utils::getCtime(const QString& timeIntStr)
+int utils::computePCriticity(const qint8& _critValue, const qint8& propRule)
 {
-  time_t time = atol(timeIntStr.toAscii());
-  QString timeStr = ctime(&time);
-  return timeStr.remove("\n").toStdString();
+  MonitorBroker::CriticityT propCriticity = static_cast<MonitorBroker::CriticityT>(_critValue);
+  Criticity criticity(static_cast<MonitorBroker::CriticityT>(_critValue));
+  switch(propRule) {
+    case PropRules::Increased: propCriticity = (criticity++).getValue();
+      break;
+    case PropRules::Decreased: propCriticity = (criticity--).getValue();
+      break;
+    default:
+      // propCriticity = _critValue; =>see initilization
+      break;
+    }
+  return propCriticity;
 }

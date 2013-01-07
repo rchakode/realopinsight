@@ -9,6 +9,7 @@ NGRT4N/RealOpInsight ChangeLog
   * Added back, forward and stop buttons for improving the navigation through the embedded browser
   * Added support for zeromq 3.x (ticket #3)
   * Fixed compilation problems on c++11 (tickets #4 and #5)
+	* Fixed bug #6 when the Operations Console crashes when the colon is ommited is the Zabbix authchain
   * Added man pages for the commands ngrt4n-manager, ngrt4n-oc and ngrt4n-editor
 
 2.1.0

@@ -36,29 +36,30 @@
 #include <locale>
 
 
-const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nCriticity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const QString ID_PATTERN("%1/%2");
+const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 
 StringMapT SvNavigator::propRules() {
   StringMapT map;
-  map.insert(StatusPropRules::label(StatusPropRules::Unchanged),
-             StatusPropRules::toString(StatusPropRules::Unchanged));
-  map.insert(StatusPropRules::label(StatusPropRules::Decreased),
-             StatusPropRules::toString(StatusPropRules::Decreased));
-  map.insert(StatusPropRules::label(StatusPropRules::Increased),
-             StatusPropRules::toString(StatusPropRules::Increased));
+  map.insert(PropRules::label(PropRules::Unchanged),
+             PropRules::toString(PropRules::Unchanged));
+  map.insert(PropRules::label(PropRules::Decreased),
+             PropRules::toString(PropRules::Decreased));
+  map.insert(PropRules::label(PropRules::Increased),
+             PropRules::toString(PropRules::Increased));
   return map;
 }
 
 StringMapT SvNavigator::calcRules() {
   StringMapT map;
-  map.insert(StatusCalcRules::label(StatusCalcRules::HighCriticity),
-             StatusCalcRules::toString(StatusCalcRules::HighCriticity));
-  map.insert(StatusCalcRules::label(StatusCalcRules::WeightedCriticity),
-             StatusCalcRules::toString(StatusCalcRules::WeightedCriticity));
+  map.insert(CalcRules::label(CalcRules::HighCriticity),
+             CalcRules::toString(CalcRules::HighCriticity));
+  map.insert(CalcRules::label(CalcRules::WeightedCriticity),
+             CalcRules::toString(CalcRules::WeightedCriticity));
   return map;
 }
 
@@ -321,13 +322,13 @@ int SvNavigator::runNagiosMonitor(void)
             {
               cnode->check.status = jsHelper.getProperty("status").toInt32();
               cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-              cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toString());
+              cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32()); //TODO: to be tested
               cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
               cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
               cnode->check.status = MonitorBroker::NAGIOS_UNKNOWN;
               cnode->check.host = "Unknown";
-              cnode->check.last_state_change = utils::getCtime("0");
+              cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
               cnode->check.check_command = "Unknown" ;
               cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
@@ -360,8 +361,8 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
       .arg(const_cast<QString&>(_node.description).replace("\n", " "))
       .arg(utils::statusToString(_node.criticity))
-      .arg(StatusCalcRules::label(_node.status_crule))
-      .arg(StatusPropRules::label(_node.status_prule));
+      .arg(CalcRules::label(_node.criticity_crule))
+      .arg(PropRules::label(_node.criticity_prule));
 
   if (_node.type == NodeType::ALARM_NODE) {
       QString msg = "";
@@ -435,14 +436,9 @@ void SvNavigator::setStatusInfo(NodeListT::iterator&  _node)
 
 void SvNavigator::setStatusInfo(NodeT&  _node)
 {
-  _node.criticity = utils::getCriticity(mcoreData->monitor, _node.check.status);
-  _node.prop_status = _node.criticity; //FIXME: take prop_rule into account?
-  QString statusText = "";
-  if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
-      statusText = _node.notification_msg;
-    } else {
-      statusText = _node.alarm_msg;
-    }
+  _node.criticity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
+  _node.prop_criticity = utils::computePCriticity(_node.criticity, _node.criticity_prule);
+  QString statusText = (_node.criticity == MonitorBroker::CRITICITY_NORMAL)? _node.notification_msg : _node.alarm_msg;
   QRegExp regexp(MsgConsole::HOSTNAME_META_MSG_PATERN);
   QStringList chkids = QString(_node.check.id.c_str()).split("/");
   qint32 nbChecks =  chkids.length();
@@ -470,30 +466,30 @@ void SvNavigator::setStatusInfo(NodeT&  _node)
 
 void SvNavigator::updateBpNode(QString _nodeId)
 {
-  Criticity criticity;
   NodeListT::iterator node;
   if(!utils::findNode(mcoreData, _nodeId, node)) return;
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
+  Criticity criticity;
   for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++)
     {
       NodeListT::iterator child;
       if(! utils::findNode(mcoreData, *it, child))
         continue;
-      Criticity cst(static_cast<MonitorBroker::CriticityT>(child->prop_status));
-      if(node->status_crule == StatusCalcRules::WeightedCriticity) {
+      Criticity cst(static_cast<MonitorBroker::CriticityT>(child->prop_criticity));
+      if(node->criticity_crule == CalcRules::WeightedCriticity) {
           criticity = criticity / cst;
         } else {
           criticity = criticity * cst;
         }
     }
   node->criticity = criticity.getValue();
-  switch(node->status_prule) {
-    case StatusPropRules::Increased: node->prop_status = (criticity++).getValue();
+  switch(node->criticity_prule) {
+    case PropRules::Increased: node->prop_criticity = (criticity++).getValue();
       break;
-    case StatusPropRules::Decreased: node->prop_status = (criticity--).getValue();
+    case PropRules::Decreased: node->prop_criticity = (criticity--).getValue();
       break;
-    default: node->prop_status = node->criticity;
+    default: node->prop_criticity = node->criticity;
       break;
     }
   QString toolTip = getNodeToolTip(*node);
@@ -697,7 +693,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             if(check.status != MonitorBroker::ZABBIX_UNCLASSIFIED) {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
                 int sev = triggerData.property("priority").toInteger();
-                Criticity criticity(utils::getCriticity(mcoreData->monitor, sev));
+                Criticity criticity(utils::computeCriticity(mcoreData->monitor, sev));
                 check.status = criticity.getValue();
               } else {
                 check.alarm_msg = triggerName.toStdString(); //TODO: user another parameter?
@@ -715,7 +711,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                 item.next();
                 QScriptValue itemData = item.value();
                 //TODO: check.last_state_change to be tested with Zabbix
-                check.last_state_change = utils::getCtime(itemData.property("lastclock").toString());
+                check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
             QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
             check.id = key.toStdString();
@@ -788,7 +784,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid)).arg(name);
               check.id = chkid.toStdString();
               check.host = device.property("name").toString().toStdString();
-              check.last_state_change = device.property("lastChanged").toString().toStdString();
+              check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
+                                                              "yyyy/MM/dd hh:mm:ss");
               QString severity =item.property("severity").toString();
               if(severity.toLower().compare("clear") == 0) {
                   check.status = MonitorBroker::ZENOSS_CLEAR;
@@ -889,7 +886,7 @@ void SvNavigator::updateDashboardOnError(const QString& msg)
       //FIXME: check undefined services
       cnode->check.status = MonitorBroker::CRITICITY_UNKNOWN;
       cnode->check.host = "Unknown";
-      cnode->check.last_state_change = utils::getCtime("0");
+      cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
       cnode->check.check_command = "Unknown" ;
       cnode->check.alarm_msg = msg.toStdString();
       cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;

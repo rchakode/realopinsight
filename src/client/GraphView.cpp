@@ -388,7 +388,7 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
       if(edge == edgesList.end()) {
           return;
         }
-      edge->edge->setPen(utils::getColor(_node.prop_status));
+      edge->edge->setPen(utils::getColor(_node.prop_criticity));
     }
 }
 

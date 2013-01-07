@@ -46,22 +46,22 @@ typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
 typedef bitset<4> StatusInfoT;
 
-class StatusPropRules {
+class PropRules {
 public:
-  enum StatusPropRulesT{
+  enum PropRulesT{
     Unchanged = 0,
     Decreased = 1,
     Increased = 2
   };
 
-  static QString toString(StatusPropRulesT rule) {
+  static QString toString(PropRulesT rule) {
     return QString::number(rule);
   }
 
   static QString label(qint32 rule) {
-    return label(static_cast<StatusPropRulesT>(rule));
+    return label(static_cast<PropRulesT>(rule));
   }
-  static QString label(StatusPropRulesT rule) {
+  static QString label(PropRulesT rule) {
     switch(rule) {
       case Unchanged: return QObject::tr("Unchanged");
       case Decreased: return QObject::tr("Decreased");
@@ -73,22 +73,22 @@ public:
 };
 
 
-class StatusCalcRules {
+class CalcRules {
 public:
-  enum StatusCalcRulesT{
+  enum CalcRulesT{
     HighCriticity = 0,
     WeightedCriticity = 1
   };
 
-  static QString toString(StatusCalcRulesT rule) {
+  static QString toString(CalcRulesT rule) {
     return QString::number(rule);
   }
 
   static QString label(qint32 rule) {
-    return label(static_cast<StatusCalcRulesT>(rule));
+    return label(static_cast<CalcRulesT>(rule));
   }
 
-  static QString label(StatusCalcRulesT rule) {
+  static QString label(CalcRulesT rule) {
     if (rule == WeightedCriticity)
       return QObject::tr("Weighted Criticity");
     return QObject::tr("High Criticity");
@@ -228,16 +228,16 @@ typedef struct _NodeT {
   QString id;
   QString name;
   qint32 type;
-  qint32 status_crule;
-  qint32 status_prule;
+  qint32 criticity_crule;
+  qint32 criticity_prule;
   QString icon;
   QString description;
   QString parent;
-  QString propagation_rule;
+  QString propagation_rule; //No yet used
   QString alarm_msg;
   QString notification_msg;
   qint32 criticity;
-  qint32 prop_status;
+  qint32 prop_criticity;
   QString child_nodes;
   MonitorBroker::CheckT check;
 } NodeT;

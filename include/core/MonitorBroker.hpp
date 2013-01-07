@@ -27,17 +27,13 @@
 #include<iostream>
 #include <unordered_map>
 
-using namespace std ;
-
 class MonitorBroker {
 public:
-
   enum MonirorTypeT {
     NAGIOS = 0,
     ZABBIX = 1,
     ZENOSS = 2
   };
-
   enum CriticityT {
     CRITICITY_NORMAL = 0,
     CRITICITY_MINOR = 1,
@@ -45,14 +41,12 @@ public:
     CRITICITY_HIGH = 3,
     CRITICITY_UNKNOWN = 100
   };
-
   enum NAGIOS_StatusT {
     NAGIOS_OK = 0,
     NAGIOS_WARNING = 1,
     NAGIOS_CRITICAL = 2,
     NAGIOS_UNKNOWN = 3
   };
-
   enum ZABBIX_SeverityT {
     ZABBIX_UNCLASSIFIED = 0,
     ZABBIX_INFO = 1,
@@ -61,7 +55,6 @@ public:
     ZABBIX_HIGH = 4,
     ZABBIX_DISASTER = 5
   };
-
   enum ZENOSS_SeverityT {
     ZENOSS_CLEAR = 0,
     ZENOSS_DEBUG = 1,
@@ -70,31 +63,28 @@ public:
     ZENOSS_ERROR = 4,
     ZENOSS_CRITICAL = 5
   };
+  struct CheckT{
+    std::string id;
+    std::string host;
+    std::string check_command;
+    std::string last_state_change;
+    std::string alarm_msg;
+    int status;
+  };
+  typedef std::unordered_map<std::string, CheckT> ChecksT;
+  static const int DEFAULT_PORT;
+  static const int DEFAULT_UPDATE_INTERVAL;
+  static const int MAX_MSG;
 
-  typedef struct _CheckT{
-    string id;
-    string host ;
-    string check_command ;
-    string last_state_change ;
-    string alarm_msg ;
-    int status ;
-  }CheckT;
-  typedef unordered_map<string, CheckT> ChecksT ;
-
-  MonitorBroker(const string & _sfile);
+  MonitorBroker(const std::string& _sfile);
   virtual ~MonitorBroker();
 
-  string getInfOfService(const string & _sid) ;
-  static bool loadNagiosCollectedData(const string & _sfile, ChecksT & _checks) ;
-
-  static const int DEFAULT_PORT ;
-  static const int DEFAULT_UPDATE_INTERVAL ;
-  static const int MAX_MSG ;
+  std::string getInfOfService(const std::string& _sid);
+  static bool loadNagiosCollectedData(const std::string& _sfile, ChecksT& _checks);
 
 private:
-  int lastUpdate ;
-  string statusFile ;
-  ChecksT services ;
+  int lastUpdate;
+  std::string statusFile;
+  ChecksT services;
 };
-
 #endif /* MONITORBROKER_HPP_ */

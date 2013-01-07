@@ -29,17 +29,21 @@
 #include <QIcon>
 
 namespace utils {
-  inline void delay(const qint32& d) {sleep(d);}
+  inline void delay(const qint32& d){ sleep(d);}
+  inline std::string getCtime(const QString& dt, const QString& format){
+    return QDateTime::fromString(dt, format).toString().toStdString();}
+  inline std::string getCtime(const quint32& tt){
+    return QDateTime::fromTime_t(tt).toString().toStdString();}
   QString statusToString(const qint32& _status);
   void clear(CoreDataT& data);
   void alert(const QString & msg);
   QString getAbsolutePath(const QString& _path);
-  MonitorBroker::CriticityT getCriticity(const int& _monitor, const int& _statusOrSeverity);
+  MonitorBroker::CriticityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
   QColor getColor(const int &_criticity);
   QIcon getTreeIcon(const int &_criticity);
   bool findNode(NodeListT& bpnodes, NodeListT& cnodes, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
-  std::string getCtime(const QString& timeIntStr);
+  int computePCriticity(const qint8& _criticity, const qint8& propRule);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP
