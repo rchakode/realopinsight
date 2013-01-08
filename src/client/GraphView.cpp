@@ -89,7 +89,7 @@ GraphView::~GraphView()
 void GraphView::mouseReleaseEvent(QMouseEvent * _event)
 {
   QGraphicsItem* item = nodeAt(_event->pos());
-  if(item) {
+  if (item) {
 
       if (_event->button() == Qt::RightButton) {
           emit rightClickOnItem(item, _event->globalPos());
@@ -97,10 +97,10 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
         }
 
       QStringList list  = item->data(0).toString().split(":");
-      if(list.length() == 2) {
+      if (list.length() == 2) {
           QString nodeId = list[0];
           QString sfx = ":" + list[1];
-          if(sfx == EXPICON_NODE) {
+          if (sfx == EXPICON_NODE) {
               QPixmap exp_icon;
               if (gnodesList[nodeId].expand) {
                   exp_icon.load(iconMap[MINUS], 0, Qt::AutoColor);
@@ -120,7 +120,7 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
 {
   QPointF pos = mapToScene(QPoint(_event->pos()));
   QGraphicsItem* item = graphScene->itemAt(pos);
-  if(item) {
+  if (item) {
       centerOn(pos);
     }
 }
@@ -128,7 +128,7 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
 
 void GraphView::wheelEvent(QWheelEvent * _event)
 {
-  if(_event->delta() > 0) {
+  if (_event->delta() > 0) {
       zoomIn();
     } else {
       zoomOut();
@@ -155,7 +155,7 @@ void GraphView::scrollContentsBy (int dx, int dy)
 void GraphView::zoomIn()
 {
   scale(1.1, 1.1);
-  if(statsPanelItem) {
+  if (statsPanelItem) {
       setStatsPanelPos();
       statsPanelItem->scale(1/1.1, 1/1.1);
     }
@@ -164,7 +164,7 @@ void GraphView::zoomIn()
 void GraphView::zoomOut()
 {
   scale(1/1.1, 1/1.1);
-  if(statsPanelItem) {
+  if (statsPanelItem) {
       statsPanelItem->scale(1.1, 1.1);
       setStatsPanelPos();
     }
@@ -173,7 +173,7 @@ void GraphView::zoomOut()
 void GraphView::updateStatsPanel(Chart * _statsPanel)
 {
   bool visible = true;
-  if(statsPanelItem) {
+  if (statsPanelItem) {
       visible = statsPanelItem->isVisible();
       statsPanelItem->setWidget(_statsPanel);
       statsPanelItem->setVisible(visible);
@@ -187,7 +187,7 @@ void GraphView::updateStatsPanel(Chart * _statsPanel)
       graphScene->addItem(statsArea);
     }
 
-  if(statsPanelItem) { //Mandatory
+  if (statsPanelItem) { //Mandatory
       setStatsPanelPos();
       if (! isAjustedStatsPanelSize) {
           ajustStatsPanelSize();
@@ -198,12 +198,12 @@ void GraphView::updateStatsPanel(Chart * _statsPanel)
 
 void GraphView::ajustStatsPanelSize(void)
 {
-  if(statsPanelItem) {
+  if (statsPanelItem) {
       QSizeF viewSize = size();
       QSizeF statPanelSize = statsPanelItem->size();
       statsPanelScaleRatio = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
-      if(statsPanelScaleRatio < 1) {
-          if(portViewScalingRatio < 1) 	statsPanelItem->scale(1/portViewScalingRatio, 1/portViewScalingRatio);
+      if (statsPanelScaleRatio < 1) {
+          if (portViewScalingRatio < 1) 	statsPanelItem->scale(1/portViewScalingRatio, 1/portViewScalingRatio);
           statsPanelItem->scale(statsPanelScaleRatio, statsPanelScaleRatio);
         }
       isAjustedStatsPanelSize = true;
@@ -214,7 +214,7 @@ void GraphView::ajustStatsPanelSize(void)
 void GraphView::setStatsPanelPos(void)
 {
 
-  if(statsPanelItem) {
+  if (statsPanelItem) {
       qreal xp = size().width() - statsPanelItem->size().width() *  statsPanelScaleRatio - 2;
       QPointF pos = mapToScene(QPoint(xp, 0));
       statsPanelItem->setPos(pos);
@@ -284,9 +284,9 @@ void GraphView::drawMap(const NodeListT& _bpnodes,
               qreal y_corner = -1 * splitedLine[3].trimmed().toFloat();
 
               NodeListT::const_iterator nodeIt = _bpnodes.find(nid);
-              if(nodeIt == _bpnodes.end()) {
+              if (nodeIt == _bpnodes.end()) {
                   nodeIt = _cnodes.find(nid);
-                  if(nodeIt == _cnodes.end()) {
+                  if (nodeIt == _cnodes.end()) {
                       continue;
                     }
                 }
@@ -307,7 +307,7 @@ void GraphView::drawMap(const NodeListT& _bpnodes,
                   graphScene->addItem(edgesList[edge_name].edge),
                   edgesList[edge_name].edge->setZValue(-20);
 
-            } else if(splitedLine[0] == "stop") {
+            } else if (splitedLine[0] == "stop") {
               break;
             }
         }
@@ -341,7 +341,7 @@ void GraphView::drawNode(const NodeT& _node)
       graphScene->addItem(gnodesList[_node.id].exp_icon),
       gnodesList[_node.id].exp_icon->setZValue(0);
 
-  if(gnodesList[_node.id].type == NodeType::ALARM_NODE) {
+  if (gnodesList[_node.id].type == NodeType::ALARM_NODE) {
       gnodesList[_node.id].exp_icon->setVisible(false);
     }
   QString msg =  SvNavigator::getNodeToolTip(_node);
@@ -364,7 +364,7 @@ void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _too
 //      gnodeIt->label->setToolTip(_toolTip);
 
 //      GEdgeListT::iterator edge = edgesList.find(_node->parent + ":" + _node->id);
-//      if(edge == edgesList.end()) {
+//      if (edge == edgesList.end()) {
 //          return;
 //        }
 
@@ -385,7 +385,7 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
       gnodeIt->label->setToolTip(_toolTip);
 
       GEdgeListT::iterator edge = edgesList.find(_node.parent + ":" + _node.id);
-      if(edge == edgesList.end()) {
+      if (edge == edgesList.end()) {
           return;
         }
       edge->edge->setPen(utils::getColor(_node.prop_criticity));
@@ -410,7 +410,7 @@ void GraphView::setEdgePath(const QString& _parentVertex,
   path.moveTo(parentAnchor),
       path.lineTo(childAnchor);
 
-  if(! p_gnode.exp_icon->isVisible()) {
+  if (! p_gnode.exp_icon->isVisible()) {
       p_gnode.exp_icon->setVisible(true);
     }
 }
@@ -442,7 +442,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
                                const bool& _visible, const qint32& _level)
 {
   GNodeListT::iterator gnode = gnodesList.find(_nodeId);
-  if(gnode != gnodesList.end()) {
+  if (gnode != gnodesList.end()) {
 
       QString edgeId = _parent + ":" + _nodeId;
       edgesList[edgeId].edge->setVisible(_visible);
@@ -450,11 +450,11 @@ void GraphView::setNodeVisible(const QString& _nodeId,
       gnode->label->setVisible(_visible);
       gnode->icon->setVisible(_visible);
 
-      if(gnode->type == NodeType::SERVICE_NODE) {
+      if (gnode->type == NodeType::SERVICE_NODE) {
           gnode->exp_icon->setVisible(_visible);
         }
 
-      if(_visible) {
+      if (_visible) {
           QPixmap expandIcon(iconMap[PLUS], 0, Qt::AutoColor);
           gnodesList[_nodeId].exp_icon->setPixmap(expandIcon);
         }
@@ -468,7 +468,7 @@ void GraphView::scaleToFitViewPort(void)
   QSizeF sceneSize = graphScene->itemsBoundingRect().size();
   portViewScalingRatio = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
   if (portViewScalingRatio < 1.0) {
-      if(statsPanelItem) statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio);
+      if (statsPanelItem) statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio);
       scale(portViewScalingRatio, portViewScalingRatio);
     } else {
       portViewScalingRatio = 1;
@@ -485,7 +485,7 @@ void GraphView::capture(void)
                                                  ".",
                                                  tr("PNG files (*.png);; All files (*)"));
   QFileInfo fileInfo(fileName);
-  if(fileInfo.suffix().isEmpty()) {
+  if (fileInfo.suffix().isEmpty()) {
       fileName.append(".png");
     }
   setBackgroundBrush(Qt::white);
