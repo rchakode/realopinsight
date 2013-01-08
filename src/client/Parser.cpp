@@ -35,16 +35,16 @@ const QString Parser::dotFileHeader = "strict graph\n{\n node[shape=plaintext]\n
 const QString Parser::dotFileFooter = "}";
 
 
-Parser::Parser(){}
+Parser::Parser() {}
 
 Parser::~Parser()
 {
   QFile dotFile;
 
-  if(dotFile.exists(graphFilename))
+  if (dotFile.exists(graphFilename))
     dotFile.remove(graphFilename);
 
-  if(dotFile.exists(graphFilename + ".plain"))
+  if (dotFile.exists(graphFilename + ".plain"))
     dotFile.remove(graphFilename + ".plain");
 }
 
@@ -87,19 +87,19 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
 
       node.icon.remove("--> "); //FBWC
 
-      if(node.icon.length() == 0) {
+      if (node.icon.length() == 0) {
           node.icon = GraphView::DEFAULT_ICON;
         }
 
-      if(node.criticity_crule < 0) {
+      if (node.criticity_crule < 0) {
           node.criticity_crule = CalcRules::HighCriticity; //FBWC
         }
 
-      if(node.criticity_prule < 0) {
+      if (node.criticity_prule < 0) {
           node.criticity_prule = PropRules::Unchanged;
         }
 
-      if(node.type == NodeType::ALARM_NODE) {
+      if (node.type == NodeType::ALARM_NODE) {
           QString host = node.child_nodes.left(node.child_nodes.indexOf("/"));
           _coreData.hosts[host] << node.id;
           _coreData.cnodes.insert(node.id, node);
@@ -126,12 +126,12 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
       QString nname = node.name;
       _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
 
-      if(node.child_nodes != "") {
+      if (node.child_nodes != "") {
           QStringList nodeIds = node.child_nodes.split(CHILD_SEP);
           foreach(const QString& nodeId, nodeIds) {
               QString nidTrimmed = nodeId.trimmed();
               auto childNode = _cnodes.find(nidTrimmed);
-              if(utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
+              if (utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
                   childNode->parent = node.id;
                   _graphContent += "\t" + node.id%"--"%childNode->id%"\n";
                 }

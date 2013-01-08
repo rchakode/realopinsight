@@ -55,7 +55,7 @@ public slots:
   void open(void);
   void save(void);
   void saveAs(void);
-  int close( const bool& = true);
+  int treatCloseAction(const bool& = true);
   void fillEditorFromService( QTreeWidgetItem*);
   void handleReturnPressed(void);
   void handleSelectedNodeChanged( void);
@@ -71,7 +71,7 @@ protected:
 
 private:
   qint32 muserRole;
-  qint32 mhasLeftUpdates;
+  bool mhasLeftUpdates;
   QString mactiveFile;
   QString mselectedNode;
   Settings* msettings;
