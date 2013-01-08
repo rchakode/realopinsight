@@ -89,7 +89,6 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
           // keep the default criticity
           break;
         }
-
     } else if (_monitor == MonitorBroker::ZABBIX) {
       switch(_statusOrSeverity) {
         case MonitorBroker::ZABBIX_INFO:
@@ -110,7 +109,6 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
           // keep the default criticity
           break;
         }
-
     } else if (_monitor == MonitorBroker::ZENOSS){
       switch(_statusOrSeverity) {
         case MonitorBroker::ZENOSS_CLEAR:
@@ -131,8 +129,23 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
           break;
         }
     }
-
   return static_cast<MonitorBroker::CriticityT>(criticity);
+}
+
+int utils::computePropCriticity(const qint8& _critValue, const qint8& propRule)
+{
+  MonitorBroker::CriticityT propCriticity = static_cast<MonitorBroker::CriticityT>(_critValue);
+  Criticity criticity(static_cast<MonitorBroker::CriticityT>(_critValue));
+  switch(propRule) {
+    case PropRules::Increased: propCriticity = (criticity++).getValue();
+      break;
+    case PropRules::Decreased: propCriticity = (criticity--).getValue();
+      break;
+    default:
+      // propCriticity = _critValue; =>see initilization
+      break;
+    }
+  return propCriticity;
 }
 
 
@@ -204,20 +217,4 @@ bool utils::findNode(NodeListT& bpnodes,
 bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)
 {
   return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
-}
-
-int utils::computePCriticity(const qint8& _critValue, const qint8& propRule)
-{
-  MonitorBroker::CriticityT propCriticity = static_cast<MonitorBroker::CriticityT>(_critValue);
-  Criticity criticity(static_cast<MonitorBroker::CriticityT>(_critValue));
-  switch(propRule) {
-    case PropRules::Increased: propCriticity = (criticity++).getValue();
-      break;
-    case PropRules::Decreased: propCriticity = (criticity--).getValue();
-      break;
-    default:
-      // propCriticity = _critValue; =>see initilization
-      break;
-    }
-  return propCriticity;
 }

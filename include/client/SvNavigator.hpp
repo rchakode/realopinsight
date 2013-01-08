@@ -142,7 +142,7 @@ private:
   void openRpcSession(void);
   void postRpcDataRequest(void);
   QStringList getAuthInfo(void);
-  void updateDashboardOnError(const QString& msg);
+  void updateDashboardOnUnknown(const QString& msg);
 };
 
 #endif /* SVNAVIGATOR_HPP */

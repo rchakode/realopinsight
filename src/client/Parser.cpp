@@ -130,7 +130,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
           QStringList nodeIds = node.child_nodes.split(CHILD_SEP);
           foreach(const QString& nodeId, nodeIds) {
               QString nidTrimmed = nodeId.trimmed();
-              NodeListT::iterator childNode = _cnodes.find(nidTrimmed);
+              auto childNode = _cnodes.find(nidTrimmed);
               if(utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
                   childNode->parent = node.id;
                   _graphContent += "\t" + node.id%"--"%childNode->id%"\n";
@@ -152,21 +152,21 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
   foreach(const NodeT& node, _bpnodes) {
       _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
     }
-  foreach(const NodeT& node, _cnodes) {
+  foreach (const NodeT& node, _cnodes) {
       _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
     }
-  foreach(const NodeT& node, _bpnodes) {
-      if(node.child_nodes.isEmpty())
+  foreach (const NodeT& node, _bpnodes) {
+      if (node.child_nodes.isEmpty())
         continue;
 
-      foreach(const QString& childId, node.child_nodes.split(Parser::CHILD_SEP)) {
-          TreeNodeItemListT::iterator treeItem = _tree.find(node.id);
+      foreach (const QString& childId, node.child_nodes.split(Parser::CHILD_SEP)) {
+          auto treeItem = _tree.find(node.id);
           if (treeItem == _tree.end()) {
               utils::alert(QObject::tr("Service not found %1").arg(node.name));
               continue;
             }
-          TreeNodeItemListT::iterator child = _tree.find(childId);
-          if(child != _tree.end())
+          auto child = _tree.find(childId);
+          if (child != _tree.end())
             (*treeItem)->addChild(*child);
         }
     }
@@ -176,7 +176,7 @@ void Parser::saveCoordinatesFile(const QString& _graph_content)
 {
   graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
   QFile file(graphFilename);
-  if(!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
+  if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
       utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
       exit(1);
     }

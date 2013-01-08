@@ -206,6 +206,7 @@ void SvNavigator::startMonitor()
   switch(mcoreData->monitor){
     case MonitorBroker::ZENOSS:
     case MonitorBroker::ZABBIX:
+      updateDashboardOnUnknown("");
       !misLogged ? openRpcSession(): postRpcDataRequest();
       break;
     case MonitorBroker::NAGIOS:
@@ -297,10 +298,9 @@ int SvNavigator::runNagiosMonitor(void)
       updateStatusBar(tr("Updating..."));
     }
 
-  for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
+  for(auto cnode = mcoreData->cnodes.begin();
       cnode != mcoreData->cnodes.end();
-      cnode++)
-    {
+      cnode++) {
       if(cnode->child_nodes == "") {
           cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
           mcoreData->check_status_count[cnode->criticity]++;
@@ -398,7 +398,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 
 void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
-  for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
+  for(auto cnode = mcoreData->cnodes.begin();
       cnode != mcoreData->cnodes.end();
       cnode++)
     {
@@ -437,7 +437,7 @@ void SvNavigator::setStatusInfo(NodeListT::iterator&  _node)
 void SvNavigator::setStatusInfo(NodeT&  _node)
 {
   _node.criticity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
-  _node.prop_criticity = utils::computePCriticity(_node.criticity, _node.criticity_prule);
+  _node.prop_criticity = utils::computePropCriticity(_node.criticity, _node.criticity_prule);
   QString statusText = (_node.criticity == MonitorBroker::CRITICITY_NORMAL)? _node.notification_msg : _node.alarm_msg;
   QRegExp regexp(MsgConsole::HOSTNAME_META_MSG_PATERN);
   QStringList chkids = QString(_node.check.id.c_str()).split("/");
@@ -471,7 +471,7 @@ void SvNavigator::updateBpNode(QString _nodeId)
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   Criticity criticity;
-  for(QStringList::const_iterator it = nodeIds.begin(); it != nodeIds.end(); it++)
+  for(auto it = nodeIds.begin(); it != nodeIds.end(); it++)
     {
       NodeListT::iterator child;
       if(! utils::findNode(mcoreData, *it, child))
@@ -507,7 +507,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, cons
 void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
 {
 
-  TreeNodeItemListT::iterator tnode_it = mcoreData->tree_items.find(_node.id);
+  auto tnode_it = mcoreData->tree_items.find(_node.id);
   if(tnode_it != mcoreData->tree_items.end()) {
       (*tnode_it)->setIcon(0, utils::getTreeIcon(_node.criticity));
       (*tnode_it)->setToolTip(0, _tip);
@@ -528,14 +528,14 @@ void SvNavigator::expandNode(const QString& _nodeId,
                              const bool& _expand,
                              const qint32& _level)
 {
-  NodeListT::iterator node = mcoreData->bpnodes.find(_nodeId);
+  auto node = mcoreData->bpnodes.find(_nodeId);
   if(node == mcoreData->bpnodes.end()) {
       return ;
     }
 
   if(node->child_nodes != "") {
       QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
-      for (QStringList::iterator udsIt = childNodes.begin(); udsIt != childNodes.end(); udsIt++) {
+      for (auto udsIt = childNodes.begin(); udsIt != childNodes.end(); udsIt++) {
           mmap->setNodeVisible(*udsIt, _nodeId, _expand, _level);
         }
     }
@@ -753,7 +753,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           qDebug() << data;
           QString msg = result.property("msg").toString();
           if(msg.isEmpty()) msg = "Authentication failed!";
-          updateDashboardOnError(msg);
+          updateDashboardOnUnknown(msg);
           return;
         }
       if(transaction == ZnsHelper::DEVICE) {
@@ -785,7 +785,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               check.id = chkid.toStdString();
               check.host = device.property("name").toString().toStdString();
               check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
-                                                              "yyyy/MM/dd hh:mm:ss");
+                                                        "yyyy/MM/dd hh:mm:ss");
               QString severity =item.property("severity").toString();
               if(severity.toLower().compare("clear") == 0) {
                   check.status = MonitorBroker::ZENOSS_CLEAR;
@@ -801,7 +801,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               finalizeDashboardUpdate();
             }
         } else {
-          updateDashboardOnError(tr("Unexpected response received from the server"));
+          updateDashboardOnUnknown(tr("Unexpected response received from the server"));
         }
     }
 }
@@ -829,8 +829,8 @@ void SvNavigator::openRpcSession(void)
           break;
         }
     } else {
-      updateDashboardOnError(tr("Invalid authentication chain!\n"
-                                "Must be in the form login:password"));
+      updateDashboardOnUnknown(tr("Invalid authentication chain!\n"
+                                  "Must be in the form login:password"));
     }
 }
 
@@ -871,18 +871,19 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code){
     } else if(mcoreData->monitor == MonitorBroker::ZENOSS){
       apiUrl =  mznsHelper->getRequestUrl();
     }
-  updateDashboardOnError(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code)));
+  updateDashboardOnUnknown(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code)));
 }
 
-void SvNavigator::updateDashboardOnError(const QString& msg)
+void SvNavigator::updateDashboardOnUnknown(const QString& msg)
 {
-  mupdateSucceed = false ;
-  utils::alert(msg);
-  updateStatusBar(msg);
-  for(NodeListIteratorT cnode = mcoreData->cnodes.begin();
-      cnode != mcoreData->cnodes.end();
-      cnode++)
-    {
+  mupdateSucceed = false;
+  if (!msg.isEmpty()) {
+      utils::alert(msg);
+      updateStatusBar(msg);
+    }
+  for (auto cnode = mcoreData->cnodes.begin();
+       cnode != mcoreData->cnodes.end();
+       cnode++) {
       //FIXME: check undefined services
       cnode->check.status = MonitorBroker::CRITICITY_UNKNOWN;
       cnode->check.host = "Unknown";

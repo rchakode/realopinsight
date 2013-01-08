@@ -39,11 +39,11 @@ namespace utils {
   void alert(const QString & msg);
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::CriticityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
+  int computePropCriticity(const qint8& _criticity, const qint8& propRule);
   QColor getColor(const int &_criticity);
   QIcon getTreeIcon(const int &_criticity);
   bool findNode(NodeListT& bpnodes, NodeListT& cnodes, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
-  int computePCriticity(const qint8& _criticity, const qint8& propRule);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

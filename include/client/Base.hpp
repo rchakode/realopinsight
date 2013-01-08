@@ -29,7 +29,6 @@
 #include <QtGui>
 #include <QtWebKit>
 #include <QSettings>
-#include <bitset>
 
 const QString PROJECT = "NGRT4N";
 const QString USER_BASE_NAME = BUILTIN_USER_PREFIX;
@@ -44,7 +43,6 @@ const QString releaseName = RELEASE_NAME;
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
-typedef bitset<4> StatusInfoT;
 
 class PropRules {
 public:
