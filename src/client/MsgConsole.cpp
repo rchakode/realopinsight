@@ -26,10 +26,10 @@
 #include <ctime>
 #include "utilsClient.hpp"
 
-const QString MsgConsole::HOSTNAME_META_MSG_PATERN = "\\{hostname\\}";
-const QString MsgConsole::SERVICE_META_MSG_PATERN = "\\{check_name\\}";
-const QString MsgConsole::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}";
-const QString MsgConsole::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}";
+const QString MsgConsole::TAG_HOSTNAME = "\\{hostname\\}";
+const QString MsgConsole::TAG_CHECK = "\\{check_name\\}";
+const QString MsgConsole::TAG_THERESHOLD = "\\{threshold\\}";
+const QString MsgConsole::TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
 const qint16 MsgConsole::NUM_COLUMNS = 6;
 const qint32 ID_COLUMN = MsgConsole::NUM_COLUMNS - 1;
 

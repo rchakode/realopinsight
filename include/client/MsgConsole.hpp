@@ -50,10 +50,10 @@ class MsgConsole : public QTableView  //TODO see style for QtableView
   Q_OBJECT
 
 public:
-  static const QString HOSTNAME_META_MSG_PATERN;
-  static const QString SERVICE_META_MSG_PATERN;
-  static const QString THERESHOLD_META_MSG_PATERN ;
-  static const QString PLUGIN_OUTPUT_META_MSG_PATERN;
+  static const QString TAG_HOSTNAME;
+  static const QString TAG_CHECK;
+  static const QString TAG_THERESHOLD ;
+  static const QString TAG_PLUGIN_OUTPUT;
 
   MsgConsole(QWidget * parent = 0 );
   virtual ~MsgConsole();

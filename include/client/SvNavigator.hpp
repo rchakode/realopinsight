@@ -124,7 +124,7 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
-  QSplashScreen* mloadingScreen;
+  QString mlastError;
 
   void addEvents(void);
   void loadMenus(void);
@@ -132,8 +132,8 @@ private:
   void updateMonitoringSettings();
   void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
   void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  void setStatusInfo(NodeListT::iterator& _node);
-  void setStatusInfo(NodeT& _node);
+  void computeStatusInfo(NodeListT::iterator& _node);
+  void computeStatusInfo(NodeT& _node);
   void updateDashboard(NodeListT::iterator& _node);
   void updateDashboard(const NodeT & _node);
   void updateCNodes(const MonitorBroker::CheckT & check);
