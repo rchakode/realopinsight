@@ -263,24 +263,23 @@ void SvCreator::saveAs(void)
                                               &filter);
 
   if (path.isNull()) {
-      QString msg = tr("The path is invalid");
+      QString msg = tr("The path is not valid!");
       utils::alert(msg);
       statusBar()->showMessage(msg);
-      return;
-    }
-
-  QFileInfo fileInfo(path);
-  if (filter == ZabbixCompatibleFormat) {
-      mcoreData->monitor = MonitorBroker::ZABBIX;
-      if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
-    } else if (filter == ZenossCompatibleFormat) {
-      mcoreData->monitor = MonitorBroker::ZENOSS;
-      if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else {
-      mcoreData->monitor = MonitorBroker::NAGIOS;
-      if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
+      QFileInfo fileInfo(path);
+      if (filter == ZabbixCompatibleFormat) {
+          mcoreData->monitor = MonitorBroker::ZABBIX;
+          if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
+        } else if (filter == ZenossCompatibleFormat) {
+          mcoreData->monitor = MonitorBroker::ZENOSS;
+          if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
+        } else {
+          mcoreData->monitor = MonitorBroker::NAGIOS;
+          if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
+        }
+      recordData(path);
     }
-  recordData(path);
 }
 
 int SvCreator::treatCloseAction(const bool& _close)
