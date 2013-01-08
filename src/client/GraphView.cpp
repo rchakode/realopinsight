@@ -485,9 +485,7 @@ void GraphView::capture(void)
                                                  ".",
                                                  tr("PNG files (*.png);; All files (*)"));
   QFileInfo fileInfo(fileName);
-  if (fileInfo.suffix().isEmpty()) {
-      fileName.append(".png");
-    }
+  if (fileInfo.suffix().isEmpty()) fileName.append(".png");
   setBackgroundBrush(Qt::white);
   painter.setRenderHint(QPainter::Antialiasing);
   render(&painter);

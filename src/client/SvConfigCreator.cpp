@@ -216,7 +216,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
   TreeNodeItemListT::iterator item = mcoreData->tree_items.find(_nodeId);
   TreeNodeItemListT::iterator pItem = mcoreData->tree_items.find(node->parent);
   if (pItem != mcoreData->tree_items.end() &&
-     item != mcoreData->tree_items.end()) {
+      item != mcoreData->tree_items.end()) {
       QRegExp regex("|^" + _nodeId + Parser::CHILD_SEP +
                     "|^" + _nodeId + "$" +
                     "|" + Parser::CHILD_SEP  + _nodeId);
@@ -261,13 +261,24 @@ void SvCreator::saveAs(void)
                                               .arg(ZabbixCompatibleFormat)
                                               .arg(ZenossCompatibleFormat),
                                               &filter);
+
+  if (path.isNull()) {
+      QString msg = tr("The path is invalid");
+      utils::alert(msg);
+      statusBar()->showMessage(msg);
+      return;
+    }
+
+  QFileInfo fileInfo(path);
   if (filter == ZabbixCompatibleFormat) {
       mcoreData->monitor = MonitorBroker::ZABBIX;
-      //TODO: add extension if don't exist
+      if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
     } else if (filter == ZenossCompatibleFormat) {
       mcoreData->monitor = MonitorBroker::ZENOSS;
-    } else if (!path.isNull()) {
+      if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
+    } else {
       mcoreData->monitor = MonitorBroker::NAGIOS;
+      if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     }
   recordData(path);
 }
@@ -416,13 +427,6 @@ void SvCreator::handleReturnPressed(void)
 void SvCreator::recordData(const QString& _path)
 {
   statusBar()->showMessage(tr("saving %1").arg(_path));
-
-  if (_path.isNull()) {
-      QString msg =  tr("The file path is invalid");
-      utils::alert(msg);
-      statusBar()->showMessage(msg);
-      return;
-    }
 
   QFile file(_path);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
