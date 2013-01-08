@@ -124,6 +124,7 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
+  QSplashScreen* mloadingScreen;
 
   void addEvents(void);
   void loadMenus(void);

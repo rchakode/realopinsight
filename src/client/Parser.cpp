@@ -158,7 +158,6 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
   foreach (const NodeT& node, _bpnodes) {
       if (node.child_nodes.isEmpty())
         continue;
-
       foreach (const QString& childId, node.child_nodes.split(Parser::CHILD_SEP)) {
           auto treeItem = _tree.find(node.id);
           if (treeItem == _tree.end()) {

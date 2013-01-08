@@ -88,7 +88,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mzbxAuthToken(""),
     mhostLeft(0),
     mznsHelper(new ZnsHelper()),
-    misLogged(false)
+    misLogged(false),
+    mloadingScreen(Preferences::infoScreen(""))
 {
   setWindowTitle(tr("%1 Operations Console").arg(appName));
   loadMenus();
@@ -108,6 +109,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
 
 SvNavigator::~SvNavigator()
 {
+  if(mfilteredMsgPanel)
+    delete mfilteredMsgPanel;
   delete mmsgConsole;
   delete mchart;
   delete mtree;
@@ -122,8 +125,7 @@ SvNavigator::~SvNavigator()
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
-  if(mfilteredMsgPanel)
-    delete mfilteredMsgPanel;
+  delete mloadingScreen;
   unloadMenus();
 }
 
@@ -201,7 +203,6 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 
 void SvNavigator::startMonitor()
 {
-  //FIXME: refresh don't work with zenoss, zabbix also??
   prepareDashboardUpdate();
   switch(mcoreData->monitor){
     case MonitorBroker::ZENOSS:
@@ -282,7 +283,12 @@ int SvNavigator::runNagiosMonitor(void)
 {
   msocket = new Socket(ZMQ_REQ);
   msocket->connect(mserverUrl.toStdString());
+
+  mloadingScreen->showMessage(QObject::tr("Connecting to the server (%1)...").arg(mserverUrl),
+                              Qt::AlignJustify|Qt::AlignCenter);
+  mloadingScreen->show();
   msocket->makeHandShake();
+  mloadingScreen->finish(0);
 
   if(! msocket->isConnected2Server()) {
       QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl);
