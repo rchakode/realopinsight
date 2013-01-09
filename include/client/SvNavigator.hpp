@@ -117,7 +117,6 @@ private:
   QString mserverPort;
   QString mserverUrl;
   QString mserverAuthChain;
-  Socket* msocket;
   ZbxHelper* mzbxHelper;
   QString mzbxAuthToken;
   qint32 mhostLeft;
@@ -137,7 +136,7 @@ private:
   void updateDashboard(NodeListT::iterator& _node);
   void updateDashboard(const NodeT & _node);
   void updateCNodes(const MonitorBroker::CheckT & check);
-  void finalizeDashboardUpdate(void);
+  void finalizeDashboardUpdate(const bool& enable=true);
   void updateStatusBar(const QString& msg);
   void closeZbxSession(void);
   void openRpcSession(void);

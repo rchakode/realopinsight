@@ -34,6 +34,7 @@
 #include <zmq.h>
 #include <iostream>
 #include <locale>
+#include <memory>
 
 
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nCriticity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
@@ -279,21 +280,20 @@ void SvNavigator::handleShowAbout(void)
 
 int SvNavigator::runNagiosMonitor(void)
 {
-  msocket = new Socket(ZMQ_REQ);
-  msocket->connect(mserverUrl.toStdString());
-  msocket->makeHandShake();
-  if (! msocket->isConnected2Server()) {
-      QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl);
-      utils::alert(msg);
-      updateStatusBar(msg);
-      mupdateSucceed = false;
-    } else {
-      if (msocket->getServerSerial() < 110) {
-          utils::alert(tr("The server %1 is not supported")
-                       .arg(msocket->getServerSerial()));
+  auto socket = std::unique_ptr<Socket>(new Socket(ZMQ_REQ));
+  socket->connect(mserverUrl.toStdString());
+  socket->makeHandShake();
+  if (socket->isConnected2Server()) {
+      if (socket->getServerSerial() < 110) {
+          utils::alert(tr("The server %1 is not supported").arg(socket->getServerSerial()));
           mupdateSucceed = false;
         }
       updateStatusBar(tr("Updating..."));
+    } else {
+      mupdateSucceed = false;
+      QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl);
+      utils::alert(msg);
+      updateStatusBar(msg);
     }
 
   for (auto cnode = mcoreData->cnodes.begin();
@@ -309,14 +309,14 @@ int SvNavigator::runNagiosMonitor(void)
       foreach(const QString& cid, checks) {
           QString msg = mserverAuthChain%":"%cid;
           if (mupdateSucceed) {
-              msocket->send(msg.toStdString());
-              msg = QString::fromStdString(msocket->recv());
+              socket->send(msg.toStdString());
+              msg = QString::fromStdString(socket->recv());
             } else {
               msg = DEFAULT_ERROR_MSG.arg(mserverUrl);
             }
           JsonHelper jsHelper(msg.toStdString());
           if (jsHelper.getProperty("return_code").toInt32() == 0
-              && msocket->isConnected2Server())
+              && socket->isConnected2Server())
             {
               cnode->check.status = jsHelper.getProperty("status").toInt32();
               cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
@@ -335,7 +335,8 @@ int SvNavigator::runNagiosMonitor(void)
           mcoreData->check_status_count[cnode->criticity]++;
         }
     }
-  msocket->disconnect();
+  socket->disconnect();
+  socket.reset(nullptr);
   finalizeDashboardUpdate();
   return 0;
 }
@@ -418,7 +419,7 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
     }
 }
 
-void SvNavigator::finalizeDashboardUpdate()
+void SvNavigator::finalizeDashboardUpdate(const bool& enable)
 {
   if (mcoreData->cnodes.size() != 0) {
       Chart *chart = new Chart;
@@ -432,7 +433,7 @@ void SvNavigator::finalizeDashboardUpdate()
       mtimer = startTimer(mupdateInterval);
       if (mupdateSucceed) updateStatusBar(tr("Update completed"));
     }
-  QMainWindow::setEnabled(true);
+  QMainWindow::setEnabled(enable);
 }
 
 void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node)
@@ -590,7 +591,6 @@ void SvNavigator::tabChanged(int _index)
 {
   switch(_index) {
     case 0:
-      mmenus["FILE"]->setEnabled(true);
       msubMenus["Refresh"]->setVisible(true);
       msubMenus["Capture"]->setVisible(true);
       msubMenus["ZoomIn"]->setVisible(true);
@@ -605,7 +605,6 @@ void SvNavigator::tabChanged(int _index)
       msubMenus["BrowserBack"]->setVisible(true);
       msubMenus["BrowserForward"]->setVisible(true);
       msubMenus["BrowserStop"]->setVisible(true);
-      mmenus["FILE"]->setEnabled(false);
       msubMenus["Refresh"]->setVisible(false);
       msubMenus["Capture"]->setVisible(false);
       msubMenus["ZoomIn"]->setVisible(false);
@@ -870,7 +869,9 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
 void SvNavigator::updateDashboardOnUnknown(const QString& msg)
 {
   mupdateSucceed = false;
+  bool enable = false;
   if (!msg.isEmpty()) {
+      enable = true;
       utils::alert(msg);
       updateStatusBar(msg);
       mlastError = msg;
@@ -887,7 +888,7 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       updateDashboard(cnode);
     }
   mcoreData->check_status_count[MonitorBroker::CRITICITY_UNKNOWN] = mcoreData->cnodes.size();
-  finalizeDashboardUpdate();
+  finalizeDashboardUpdate(enable);
 }
 
 QStringList SvNavigator::getAuthInfo(void) {
