@@ -126,8 +126,9 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
 }
 
-void MsgConsole::updateColumnWidths(const QSize& _window_size, const bool& _resize_window)
+void MsgConsole::updateColumnWidths(const QSize& _windowSize, const bool& _resizeWindow)
 {
+  if (_resizeWindow) window()->resize(_windowSize);
   QTableView::resizeColumnsToContents();
   if(mmodel->rowCount()) {
       qint32 msgWidth = QTableView::width() - (QTableView::columnWidth(0)
@@ -136,5 +137,5 @@ void MsgConsole::updateColumnWidths(const QSize& _window_size, const bool& _resi
                                                +QTableView::columnWidth(3));
       QTableView::setColumnWidth(4, msgWidth);
     }
-  if (_resize_window) window()->resize(_window_size);
+
 }

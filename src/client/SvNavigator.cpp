@@ -178,8 +178,7 @@ void SvNavigator::loadMenus(void)
 
 void SvNavigator::closeEvent(QCloseEvent * event)
 {
-  if (mfilteredMsgPanel)
-    mfilteredMsgPanel->close();
+  if (mfilteredMsgPanel) mfilteredMsgPanel->close();
   QMainWindow::closeEvent(event);
 }
 
@@ -565,7 +564,6 @@ void SvNavigator::filterNodeRelatedMsg(void)
       mfilteredMsgPanel->updateColumnWidths(mmsgConsoleSize, true);
       mfilteredMsgPanel->setWindowTitle(title);
     }
-
   mfilteredMsgPanel->show();
 }
 
@@ -573,8 +571,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
   if (utils::findNode(mcoreData, _nodeId, node) &&
-      node->child_nodes != "")  // Warning: take care in short-circuit evaluation!!!
-    {
+      node->child_nodes != "") {
       if (node->type == NodeType::ALARM_NODE) {
           mfilteredMsgPanel->updateNodeMsg(node);
         } else {
@@ -674,8 +671,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
   switch(transaction) {
     case ZbxHelper::LOGIN :
       mzbxAuthToken = jsHelper.getProperty("result").toString();
-      if (! mzbxAuthToken.isEmpty())
-        misLogged = true;
+      if (!mzbxAuthToken.isEmpty()) misLogged = true;
       postRpcDataRequest();
       break;
     case ZbxHelper::TRIGGER: {
@@ -855,7 +851,6 @@ void SvNavigator::postRpcDataRequest(void) {
       break;
     }
 }
-
 
 void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
 {
