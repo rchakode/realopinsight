@@ -51,6 +51,8 @@ void Socket::bind(const std::string & _uri) {
 void Socket::disconnect() {
   int rc = zmq_close (msocket);
   assert (rc == 0);
+  rc = zmq_term(mcontext);
+  assert (rc == 0);
 }
 
 void Socket::send(const std::string & _msg) {
@@ -99,6 +101,8 @@ void Socket::makeHandShake() {
 
           if (items[0].revents & ZMQ_POLLIN) {
               std::string reply = socket->recv();
+              socket->disconnect();
+              delete socket;
               size_t pos = reply.find(":");
               std::string respType = reply.substr(0, pos);
               if(respType == "ALIVE") {
@@ -109,7 +113,6 @@ void Socket::makeHandShake() {
                       mserverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
                     }
                   std::cerr << "INFO: Connection etablished; server serial: " << mserverSerial <<"\n";
-                  delete socket;
                   return ;
                 } else {
                   std::cerr << "ERROR: Weird response from the server\n";
@@ -122,14 +125,12 @@ void Socket::makeHandShake() {
                 }
               else {
                   std::cerr << "WARNING: No response from server, retrying…\n";
-                  delete socket;
                   socket = new Socket(ZMQ_REQ);
                   socket->send(msg);
                 }
             }
         }
     }
-  delete socket;
 }
 
 int Socket::convert2ServerSerial(const std::string & versionStr){
