@@ -36,6 +36,7 @@
 #include <locale>
 #include <memory>
 
+//FIXME: the system crashes on two many file opened
 
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nCriticity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));

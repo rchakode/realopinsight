@@ -40,12 +40,9 @@ Parser::Parser() {}
 Parser::~Parser()
 {
   QFile dotFile;
-
-  if (dotFile.exists(graphFilename))
-    dotFile.remove(graphFilename);
-
-  if (dotFile.exists(graphFilename + ".plain"))
-    dotFile.remove(graphFilename + ".plain");
+  if (dotFile.exists(graphFilename)) dotFile.remove(graphFilename);
+  if (dotFile.exists(graphFilename+".plain")) dotFile.remove(graphFilename+".plain");
+  dotFile.close(); //FIXME: test dotFile.close() here
 }
 
 bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
@@ -53,16 +50,20 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
   QString graphContent;
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
+
   QFile file(_configFile);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
       utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
+      file.close();
       return false;
     }
-  if (! xmlDoc.setContent(&file)) {
+  if (!xmlDoc.setContent(&file)) {
       file.close();
       utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
       return false;
     }
+  file.close(); // The content of the file is already in memory
+
   xmlRoot = xmlDoc.documentElement();
   _coreData.monitor = xmlRoot.attribute("monitor").toInt();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
@@ -107,7 +108,6 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
           _coreData.bpnodes.insert(node.id, node);
         }
     }
-  file.close();
   updateNodeHierachy(_coreData.bpnodes, _coreData.cnodes, graphContent);
   buildNodeTree(_coreData.bpnodes, _coreData.cnodes, _coreData.tree_items);
   graphContent = dotFileHeader + graphContent;
@@ -173,10 +173,11 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
 
 void Parser::saveCoordinatesFile(const QString& _graph_content)
 {
-  graphFilename = QDir::tempPath() + "/graphviz-" + QTime().currentTime().toString("hhmmsszzz") + ".dot";
+  graphFilename = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(graphFilename);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
       utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
+      file.close();
       exit(1);
     }
   QTextStream file_stream(&file);

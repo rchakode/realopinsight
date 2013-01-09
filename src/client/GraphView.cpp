@@ -95,7 +95,6 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
           emit rightClickOnItem(item, _event->globalPos());
           return;
         }
-
       QStringList list  = item->data(0).toString().split(":");
       if (list.length() == 2) {
           QString nodeId = list[0];
@@ -257,32 +256,23 @@ bool GraphView::load(const QString& _dotFile,
   return false;
 }
 
-void GraphView::drawMap(const NodeListT& _bpnodes,
-                        const NodeListT& _cnodes)
+void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
 {
-  QFile coodFile;
-  QTextStream coodFileStream;
   QString line;
   QRegExp regexSep;
   QStringList splitedLine;
   QPen pen;
-
-  if (coodFile.setFileName(coodinatesGraphFile),
-      coodFile.open(QFile::ReadOnly)) {
-
+  QFile coodFile(coodinatesGraphFile);
+  if (coodFile.open(QFile::ReadOnly)) {
       pen.setColor(StatsLegend::COLOR_UNKNOWN);
       regexSep.setPattern("[ ]+");
-      coodFileStream.setDevice(& coodFile);
-
+      QTextStream coodFileStream(& coodFile);
       while (line = coodFileStream.readLine(0), ! line.isNull()) {
-
           splitedLine = line.split (regexSep);
-
           if (splitedLine[0] == "node") {
               QString nid = splitedLine[1].trimmed();
               qreal x_corner = splitedLine[2].trimmed().toFloat();
               qreal y_corner = -1 * splitedLine[3].trimmed().toFloat();
-
               NodeListT::const_iterator nodeIt = _bpnodes.find(nid);
               if (nodeIt == _bpnodes.end()) {
                   nodeIt = _cnodes.find(nid);
@@ -292,13 +282,10 @@ void GraphView::drawMap(const NodeListT& _bpnodes,
                 }
               gnodesList[nid].type = nodeIt->type;
               gnodesList[nid].expand = true;
-
               QPointF labelOrigin = QPointF(x_corner * XScalingRatio, y_corner * YScalingRatio);
               drawNode(*nodeIt);
               setNodePos(nid, labelOrigin);
-
             } else if (splitedLine[0] == "edge") {
-
               QString edge_name; 	QPainterPath path;
               setEdgePath(splitedLine[1], splitedLine[2], path);
               edge_name =  splitedLine[1] + ":" + splitedLine[2];
@@ -306,11 +293,11 @@ void GraphView::drawMap(const NodeListT& _bpnodes,
                   edgesList[edge_name].edge->setPen(pen),
                   graphScene->addItem(edgesList[edge_name].edge),
                   edgesList[edge_name].edge->setZValue(-20);
-
             } else if (splitedLine[0] == "stop") {
               break;
             }
         }
+      coodFile.close();
     }
 }
 
@@ -319,28 +306,23 @@ void GraphView::drawNode(const NodeT& _node)
   QPixmap icon, expIcon;
   icon.load(iconMap[_node.icon], 0, Qt::AutoColor);  // TODO
   expIcon.load(iconMap[PLUS], 0, Qt::AutoColor);
-
   QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;"%_node.name%"&nbsp;</span>";
-
   QString nodeData = _node.id%LABEL_NODE;
   gnodesList[_node.id].label = new QGraphicsTextItem(),
       gnodesList[_node.id].label->setHtml(label),
       gnodesList[_node.id].label->setData(0, nodeData),
       graphScene->addItem(gnodesList[_node.id].label),
       gnodesList[_node.id].label->setZValue(-5);
-
   nodeData = _node.id%ICON_NODE;
   gnodesList[_node.id].icon = new QGraphicsPixmapItem(icon),
       gnodesList[_node.id].icon->setData(0, nodeData),
       graphScene->addItem(gnodesList[_node.id].icon),
       gnodesList[_node.id].icon->setZValue(-10);
-
   nodeData = _node.id%EXPICON_NODE;
   gnodesList[_node.id].exp_icon = new QGraphicsPixmapItem(expIcon),
       gnodesList[_node.id].exp_icon->setData(0, nodeData),
       graphScene->addItem(gnodesList[_node.id].exp_icon),
       gnodesList[_node.id].exp_icon->setZValue(0);
-
   if (gnodesList[_node.id].type == NodeType::ALARM_NODE) {
       gnodesList[_node.id].exp_icon->setVisible(false);
     }
@@ -352,38 +334,17 @@ void GraphView::drawNode(const NodeT& _node)
 void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _toolTip)
 {
   updateNode(*_node, _toolTip);
-  //TODO Clean
-//  QString label = "<span style=\"background: '"%utils::getColor(_node->criticity).name()
-//      %"'\">&nbsp;" %_node->name%"&nbsp;</span>";
-
-//  GNodeListT::iterator gnodeIt =  gnodesList.find(_node->id);
-//  if (gnodeIt != gnodesList.end())	{
-
-//      gnodeIt->label->setHtml(label);
-//      gnodeIt->icon->setToolTip(_toolTip);
-//      gnodeIt->label->setToolTip(_toolTip);
-
-//      GEdgeListT::iterator edge = edgesList.find(_node->parent + ":" + _node->id);
-//      if (edge == edgesList.end()) {
-//          return;
-//        }
-
-//      edge->edge->setPen(utils::getColor(_node->prop_status));
-//    }
 }
 
 void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
 {
   QString label = "<span style=\"background: '"%utils::getColor(_node.criticity).name()
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
-
   GNodeListT::iterator gnodeIt =  gnodesList.find(_node.id);
-  if (gnodeIt != gnodesList.end())	{
-
+  if (gnodeIt != gnodesList.end()) {
       gnodeIt->label->setHtml(label);
       gnodeIt->icon->setToolTip(_toolTip);
       gnodeIt->label->setToolTip(_toolTip);
-
       GEdgeListT::iterator edge = edgesList.find(_node.parent + ":" + _node.id);
       if (edge == edgesList.end()) {
           return;
@@ -398,39 +359,29 @@ void GraphView::setEdgePath(const QString& _parentVertex,
 {
   QPointF parentAnchor, childAnchor;
   QSizeF p_size, c_size;
-
   _GNode& p_gnode = gnodesList[_parentVertex];
   _GNode& c_gnode = gnodesList[_childVertex];
-
   p_size = p_gnode.exp_icon->boundingRect().size();
   c_size = c_gnode.icon->boundingRect().size();
   parentAnchor = p_gnode.exp_icon->pos() + QPointF(0.5 * p_size.width(), p_size.height());
   childAnchor = c_gnode.icon->pos() + QPointF(0.5 * c_size.width(), 0);
-
-  path.moveTo(parentAnchor),
-      path.lineTo(childAnchor);
-
-  if (! p_gnode.exp_icon->isVisible()) {
-      p_gnode.exp_icon->setVisible(true);
-    }
+  path.moveTo(parentAnchor), path.lineTo(childAnchor);
+  if (! p_gnode.exp_icon->isVisible())p_gnode.exp_icon->setVisible(true);
 }
 
 void GraphView::setNodePos(const QString& _nodeId, const QPointF& _pos)
 {
   QSizeF l_size, i_size, ei_size;
   qreal xi, xl, yi, yl, xei, yei;
-
   l_size = gnodesList[_nodeId].label->boundingRect().size();
   i_size = gnodesList[_nodeId].icon->boundingRect().size();
   ei_size = gnodesList[_nodeId].exp_icon->boundingRect().size();
-
   xi = _pos.x() + 0.5 * (l_size.width() - i_size.width());
   yi = _pos.y();
   xei = _pos.x() + 0.5 * (l_size.width() - ei_size.width());
   xl = _pos.x();
   yl = _pos.y() + 0.75 * i_size.height();
   yei = yl + 0.75 * l_size.height();
-
   gnodesList[_nodeId].label->setPos(xl, yl);
   gnodesList[_nodeId].icon->setPos(xi, yi);
   gnodesList[_nodeId].exp_icon->setPos(xei, yei);
@@ -443,17 +394,13 @@ void GraphView::setNodeVisible(const QString& _nodeId,
 {
   GNodeListT::iterator gnode = gnodesList.find(_nodeId);
   if (gnode != gnodesList.end()) {
-
       QString edgeId = _parent + ":" + _nodeId;
       edgesList[edgeId].edge->setVisible(_visible);
       gnode->expand = _visible;
       gnode->label->setVisible(_visible);
       gnode->icon->setVisible(_visible);
-
-      if (gnode->type == NodeType::SERVICE_NODE) {
-          gnode->exp_icon->setVisible(_visible);
-        }
-
+      if (gnode->type == NodeType::SERVICE_NODE)
+        gnode->exp_icon->setVisible(_visible);
       if (_visible) {
           QPixmap expandIcon(iconMap[PLUS], 0, Qt::AutoColor);
           gnodesList[_nodeId].exp_icon->setPixmap(expandIcon);

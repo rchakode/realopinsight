@@ -40,6 +40,7 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 
 int main(int argc, char **argv)
 {
+  //FIXME: test ngrt4n-oc
   QApplication* app = new QApplication(argc, argv);
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
   app->setApplicationName(appName);
