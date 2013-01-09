@@ -67,7 +67,7 @@ QString PieChart::update(const CheckStatusCountT & _check_status_count, const qi
   slices[MonitorBroker::CRITICITY_MINOR] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio),
-                       3.6 * major_ratio,
+                       3.6 * minor_ratio,
                        StatsLegend::COLOR_MINOR,
                        this);
   slices[MonitorBroker::CRITICITY_UNKNOWN] =

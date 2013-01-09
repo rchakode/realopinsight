@@ -51,6 +51,7 @@ class MsgConsole : public QTableView  //TODO see style for QtableView
 
 public:
   static const QString TAG_HOSTNAME;
+  static const QString TAG_HOSTNAME_ZABBIX;
   static const QString TAG_CHECK;
   static const QString TAG_THERESHOLD ;
   static const QString TAG_PLUGIN_OUTPUT;

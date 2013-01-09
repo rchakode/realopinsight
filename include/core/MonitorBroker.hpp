@@ -48,7 +48,7 @@ public:
     NAGIOS_UNKNOWN = 3
   };
   enum ZABBIX_SeverityT {
-    ZABBIX_UNCLASSIFIED = 0,
+    ZABBIX_CLEAR = 0,
     ZABBIX_INFO = 1,
     ZABBIX_WARN = 2,
     ZABBIX_AVERAGE = 3,

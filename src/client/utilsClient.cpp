@@ -32,23 +32,18 @@ QString utils::statusToString(const qint32& _status)
     case MonitorBroker::CRITICITY_NORMAL:
       return "Normal";
       break;
-
     case MonitorBroker::CRITICITY_MINOR:
-      return  "Info";
+      return  "Minor";
       break;
-
     case MonitorBroker::CRITICITY_MAJOR:
-      return  "Warning";
+      return  "Major";
       break;
-
     case MonitorBroker::CRITICITY_HIGH:
       return  "Critical";
       break;
-
     default:
       break;
     }
-
   return "Unknown";
 }
 
@@ -57,11 +52,6 @@ void utils::clear(CoreDataT& data)
   data.cnodes.clear();
   data.bpnodes.clear();
   data.tree_items.clear();
-}
-
-void utils::alert(const QString & msg)
-{
-  QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
 }
 
 QString utils::getAbsolutePath(const QString& _path)
@@ -85,15 +75,14 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
           criticity = MonitorBroker::CRITICITY_HIGH;
           break;
         default:
-          // MonitorBroker::NAGIOS_UNKNOWN
-          // keep the default criticity
           break;
         }
     } else if (_monitor == MonitorBroker::ZABBIX) {
       switch(_statusOrSeverity) {
-        case MonitorBroker::ZABBIX_INFO:
+        case MonitorBroker::ZABBIX_CLEAR:
           criticity = MonitorBroker::CRITICITY_NORMAL;
           break;
+        case MonitorBroker::ZABBIX_INFO:
         case MonitorBroker::ZABBIX_WARN:
           criticity = MonitorBroker::CRITICITY_MINOR;
           break;
@@ -105,8 +94,6 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
           criticity = MonitorBroker::CRITICITY_HIGH;
           break;
         default:
-          // MonitorBroker::ZABBIX_UNCLASSIFIED
-          // keep the default criticity
           break;
         }
     } else if (_monitor == MonitorBroker::ZENOSS){
@@ -125,7 +112,6 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
           criticity = MonitorBroker::CRITICITY_HIGH;
           break;
         default:
-          // keep the default criticity
           break;
         }
     }
@@ -142,7 +128,6 @@ int utils::computePropCriticity(const qint8& _critValue, const qint8& propRule)
     case PropRules::Decreased: propCriticity = (criticity--).getValue();
       break;
     default:
-      // propCriticity = _critValue; =>see initilization
       break;
     }
   return propCriticity;
@@ -166,7 +151,6 @@ QColor utils::getColor(const int& _criticity)
       color = StatsLegend::COLOR_CRITICAL;
       break;
     default:
-      // color = StatsLegend::COLOR_UNKNOWN;
       break;
     }
   return color;
@@ -190,7 +174,6 @@ QIcon utils::getTreeIcon(const int& _criticity)
       ipath = ":/images/built-in/critical.png";
       break;
     default:
-      // color = ":/images/built-in/unknown.png";
       break;
     }
   return QIcon(ipath);

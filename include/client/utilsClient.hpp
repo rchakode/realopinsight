@@ -34,9 +34,10 @@ namespace utils {
     return QDateTime::fromString(dt, format).toString().toStdString();}
   inline std::string getCtime(const quint32& tt){
     return QDateTime::fromTime_t(tt).toString().toStdString();}
+  inline void alert(const QString & msg) {
+    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);}
   QString statusToString(const qint32& _status);
   void clear(CoreDataT& data);
-  void alert(const QString & msg);
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::CriticityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
   int computePropCriticity(const qint8& _criticity, const qint8& propRule);

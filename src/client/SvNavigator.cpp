@@ -207,7 +207,6 @@ void SvNavigator::startMonitor()
   switch(mcoreData->monitor) {
     case MonitorBroker::ZENOSS:
     case MonitorBroker::ZABBIX:
-      updateDashboardOnUnknown("");
       !misLogged ? openRpcSession(): postRpcDataRequest();
       break;
     case MonitorBroker::NAGIOS:
@@ -465,6 +464,11 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
             statusText.replace(regexp, info[2]);
         }
     }
+  if (mcoreData->monitor == MonitorBroker::ZABBIX) {
+      regexp.setPattern(MsgConsole::TAG_HOSTNAME_ZABBIX); //FIXME: do it only for Zabbix
+      statusText.replace(regexp, _node.check.host.c_str());
+      _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
+    }
   if (_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
       _node.notification_msg = statusText;
     } else {
@@ -664,8 +668,8 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
   _reply->deleteLater();
   if (_reply->error() != QNetworkReply::NoError) return;
 
-  string data = static_cast<QString>(_reply->readAll()).toStdString();
-  JsonHelper jsHelper(data);
+  QString data = _reply->readAll();
+  JsonHelper jsHelper(data.toStdString());
   qint32 transaction = jsHelper.getProperty("id").toInt32();
   switch(transaction) {
     case ZbxHelper::LOGIN :
@@ -678,20 +682,17 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next();
-            if (trigger.flags()&QScriptValue::SkipInEnumeration)
-              continue;
+            if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue triggerData = trigger.value();
             MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
-            check.check_command = triggerName.toStdString(); //TODO: it's corrected?
+            check.check_command = triggerName.toStdString();
             check.status = triggerData.property("value").toInt32();
-            if (check.status != MonitorBroker::ZABBIX_UNCLASSIFIED) {
-                check.alarm_msg = triggerData.property("error").toString().toStdString();
-                int sev = triggerData.property("priority").toInteger();
-                Criticity criticity(utils::computeCriticity(mcoreData->monitor, sev));
-                check.status = criticity.getValue();
+            if (check.status == MonitorBroker::ZABBIX_CLEAR) {
+                check.alarm_msg = triggerName.toStdString(); //FIXME: use another parameter?
               } else {
-                check.alarm_msg = triggerName.toStdString(); //TODO: user another parameter?
+                check.alarm_msg = triggerData.property("error").toString().toStdString();
+                check.status = triggerData.property("priority").toInteger();
               }
             QString targetHost = "";
             QScriptValueIterator host(triggerData.property("hosts"));
@@ -705,7 +706,6 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             if (item.hasNext()) {
                 item.next();
                 QScriptValue itemData = item.value();
-                //TODO: check.last_state_change to be tested with Zabbix
                 check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
             QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
@@ -802,6 +802,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
 
 void SvNavigator::openRpcSession(void)
 {
+  updateDashboardOnUnknown("");
   QStringList authParams = getAuthInfo();
   if (authParams.size() == 2) {
       QUrl znsUrlParams;

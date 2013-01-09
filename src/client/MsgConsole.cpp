@@ -27,6 +27,7 @@
 #include "utilsClient.hpp"
 
 const QString MsgConsole::TAG_HOSTNAME = "\\{hostname\\}";
+const QString MsgConsole::TAG_HOSTNAME_ZABBIX = "\\{HOST.NAME\\}";
 const QString MsgConsole::TAG_CHECK = "\\{check_name\\}";
 const QString MsgConsole::TAG_THERESHOLD = "\\{threshold\\}";
 const QString MsgConsole::TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
@@ -75,10 +76,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   qint32 nbRows = mmodel->rowCount();
   while(index < nbRows &&
         mmodel->item(index, ID_COLUMN) &&
-         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id)
-    {
-      index++;
-    }
+         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) { index++;}
   if(index >= nbRows) {
       index = 0;
       mmodel->insertRow(index);

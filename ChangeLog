@@ -8,6 +8,7 @@ NGRT4N/RealOpInsight ChangeLog
     with Zenoss 3.x
   * Brings a new criticity model introducing a high manageability of incidents
     (UNKNOWN, CRITICAL, MAJOR, MINOR, NORMAL)
+  * Support some Zabbix's meta tag (e.g. {HOST.NAME}) in alarm messages
   * Brings new and optimized data structures and algorithms for better
     performances and a reduced memory footprint
   * Added buttons for back, forward and stop actions through the embedded browser
