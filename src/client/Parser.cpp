@@ -47,7 +47,7 @@ Parser::~Parser()
 
 bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
 {
-  QString graphContent;
+  QString graphContent ="";
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
@@ -122,13 +122,13 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
                                 QString& _graphContent)
 {
   _graphContent = "\n";
-  foreach(const NodeT& node, _bpnodes) {
+  for (auto node : _bpnodes) {
       QString nname = node.name;
       _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
 
       if (node.child_nodes != "") {
           QStringList nodeIds = node.child_nodes.split(CHILD_SEP);
-          foreach(const QString& nodeId, nodeIds) {
+          for (auto nodeId : nodeIds) {
               QString nidTrimmed = nodeId.trimmed();
               auto childNode = _cnodes.find(nidTrimmed);
               if (utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
@@ -139,7 +139,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
         }
     }
 
-  foreach(const NodeT& node, _cnodes) {
+  for (auto node : _cnodes) {
       QString nname = node.name;
       _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     }
@@ -149,16 +149,12 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
                            const NodeListT& _cnodes,
                            TreeNodeItemListT& _tree)
 {
-  foreach(const NodeT& node, _bpnodes) {
-      _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
-    }
-  foreach (const NodeT& node, _cnodes) {
-      _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
-    }
-  foreach (const NodeT& node, _bpnodes) {
+  for (auto node : _bpnodes) _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
+  for (auto node : _cnodes) _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
+  for (auto node : _bpnodes) {
       if (node.child_nodes.isEmpty())
         continue;
-      foreach (const QString& childId, node.child_nodes.split(Parser::CHILD_SEP)) {
+      for (auto childId : node.child_nodes.split(Parser::CHILD_SEP)) {
           auto treeItem = _tree.find(node.id);
           if (treeItem == _tree.end()) {
               utils::alert(QObject::tr("Service not found %1").arg(node.name));

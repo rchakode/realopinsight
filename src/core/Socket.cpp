@@ -4,6 +4,7 @@
 #include <cassert>
 #include <string.h>
 #include <iostream>
+#include <memory>
 
 // Emulate zeromq 3.x over zeromq 2.x
 #ifndef ZMQ_DONTWAIT
@@ -89,7 +90,7 @@ std::string Socket::recv() const{
 
 void Socket::makeHandShake() {
   int retriesLeft = NUM_RETRIES;
-  Socket *socket = new Socket(ZMQ_REQ);
+  auto socket = std::unique_ptr<Socket>(new Socket(ZMQ_REQ));
   std::string msg("PING");
   while (retriesLeft) {
       socket->connect(mserverUri);
@@ -102,7 +103,7 @@ void Socket::makeHandShake() {
           if (items[0].revents & ZMQ_POLLIN) {
               std::string reply = socket->recv();
               socket->disconnect();
-              delete socket;
+              socket.reset(nullptr);
               size_t pos = reply.find(":");
               std::string respType = reply.substr(0, pos);
               if(respType == "ALIVE") {
@@ -117,15 +118,14 @@ void Socket::makeHandShake() {
                 } else {
                   std::cerr << "ERROR: Weird response from the server\n";
                 }
-            }
-          else {
+            } else {
               if (--retriesLeft == 0) {
                   std::cerr << "ERROR: Server seems to be offline, abandoning\n";
                   expectReply = false;
-                }
-              else {
+                } else {
                   std::cerr << "WARNING: No response from server, retrying…\n";
-                  socket = new Socket(ZMQ_REQ);
+                  socket.reset(nullptr);
+                  socket.reset(new Socket(ZMQ_REQ));
                   socket->send(msg);
                 }
             }

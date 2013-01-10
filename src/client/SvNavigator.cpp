@@ -295,17 +295,15 @@ int SvNavigator::runNagiosMonitor(void)
       updateStatusBar(msg);
     }
 
-  for (auto cnode = mcoreData->cnodes.begin();
-       cnode != mcoreData->cnodes.end();
-       cnode++) {
-      if (cnode->child_nodes == "") {
-          cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
-          mcoreData->check_status_count[cnode->criticity]++;
+  for (auto& cnode : mcoreData->cnodes) {
+      if (cnode.child_nodes == "") {
+          cnode.criticity = MonitorBroker::CRITICITY_UNKNOWN;
+          mcoreData->check_status_count[cnode.criticity]++;
           continue;
         }
 
-      QStringList checks = cnode->child_nodes.split(Parser::CHILD_SEP);
-      foreach(const QString& cid, checks) {
+      QStringList checks = cnode.child_nodes.split(Parser::CHILD_SEP);
+      for(auto cid : checks) {
           QString msg = mserverAuthChain%":"%cid;
           if (mupdateSucceed) {
               socket->send(msg.toStdString());
@@ -317,21 +315,21 @@ int SvNavigator::runNagiosMonitor(void)
           if (jsHelper.getProperty("return_code").toInt32() == 0
               && socket->isConnected2Server())
             {
-              cnode->check.status = jsHelper.getProperty("status").toInt32();
-              cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-              cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32()); //TODO: to be tested
-              cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-              cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+              cnode.check.status = jsHelper.getProperty("status").toInt32();
+              cnode.check.host = jsHelper.getProperty("host").toString().toStdString();
+              cnode.check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32()); //TODO: to be tested
+              cnode.check.check_command = jsHelper.getProperty("command").toString().toStdString();
+              cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-              cnode->check.status = MonitorBroker::NAGIOS_UNKNOWN;
-              cnode->check.host = "Unknown";
-              cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-              cnode->check.check_command = "Unknown";
-              cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+              cnode.check.status = MonitorBroker::NAGIOS_UNKNOWN;
+              cnode.check.host = "Unknown";
+              cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
+              cnode.check.check_command = "Unknown";
+              cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
           computeStatusInfo(cnode);
           updateDashboard(cnode);
-          mcoreData->check_status_count[cnode->criticity]++;
+          mcoreData->check_status_count[cnode.criticity]++;
         }
     }
   socket->disconnect();
@@ -408,11 +406,11 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 
 void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
-  for (auto cnode = mcoreData->cnodes.begin(); cnode != mcoreData->cnodes.end(); cnode++) {
-      if (cnode->child_nodes.toStdString().compare(check.id) == 0) {
-          cnode->check = check;
+  for (auto& cnode : mcoreData->cnodes) {
+      if (cnode.child_nodes.toStdString().compare(check.id) == 0) {
+          cnode.check = check;
           computeStatusInfo(cnode);
-          mcoreData->check_status_count[cnode->criticity]++;
+          mcoreData->check_status_count[cnode.criticity]++;
           updateDashboard(cnode);
         }
     }
@@ -482,9 +480,9 @@ void SvNavigator::updateBpNode(QString _nodeId)
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   Criticity criticity;
-  for (auto it = nodeIds.begin(); it != nodeIds.end(); it++) {
+  for (auto nodeId : nodeIds) {
       NodeListT::iterator child;
-      if (! utils::findNode(mcoreData, *it, child))
+      if (! utils::findNode(mcoreData, nodeId, child))
         continue;
       Criticity cst(static_cast<MonitorBroker::CriticityT>(child->prop_criticity));
       if (node->criticity_crule == CalcRules::WeightedCriticity) {
@@ -539,8 +537,8 @@ void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const 
   if (node == mcoreData->bpnodes.end()) return;
   if (node->child_nodes != "") {
       QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
-      for (auto udsIt = childNodes.begin(); udsIt != childNodes.end(); udsIt++) {
-          mmap->setNodeVisible(*udsIt, _nodeId, _expand, _level);
+      for (auto cid : childNodes) {
+          mmap->setNodeVisible(cid, _nodeId, _expand, _level);
         }
     }
 }
@@ -576,7 +574,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
           mfilteredMsgPanel->updateNodeMsg(node);
         } else {
           QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
-          foreach(QString chkid, childIds) {
+          for (auto chkid : childIds) {
               filterNodeRelatedMsg(chkid);
             }
         }
@@ -685,7 +683,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             check.check_command = triggerName.toStdString();
             check.status = triggerData.property("value").toInt32();
             if (check.status == MonitorBroker::ZABBIX_CLEAR) {
-                check.alarm_msg = triggerName.toStdString(); //FIXME: use another parameter?
+                check.alarm_msg = "OK";//triggerName.toStdString(); //FIXME: use another parameter?
               } else {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
                 check.status = triggerData.property("priority").toInteger();
@@ -829,7 +827,7 @@ void SvNavigator::postRpcDataRequest(void) {
   updateStatusBar(tr("Updating..."));
   switch(mcoreData->monitor) {
     case MonitorBroker::ZABBIX:
-      foreach(const QString& host, mcoreData->hosts.keys()) {
+      for (auto host : mcoreData->hosts.keys()) {
           QStringList params;
           params.push_back(mzbxAuthToken);
           params.push_back(host);
@@ -839,7 +837,7 @@ void SvNavigator::postRpcDataRequest(void) {
       break;
     case MonitorBroker::ZENOSS:
       mznsHelper->setRouter(ZnsHelper::DEVICE);
-      foreach(const QString& host, mcoreData->hosts.keys()) {
+      for (auto host : mcoreData->hosts.keys()) {
           mznsHelper->postRequest(ZnsHelper::DEVICE,
                                   ZnsHelper::ReQPatterns[ZnsHelper::DEVICE]
                                   .arg(host)
@@ -873,14 +871,14 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       updateStatusBar(msg);
       mlastError = msg;
     }
-  for (auto cnode = mcoreData->cnodes.begin(); cnode != mcoreData->cnodes.end(); cnode++) {
+  for (auto& cnode : mcoreData->cnodes) {
       //FIXME: clean undefined services on console when the server recome on service
-      cnode->check.status = MonitorBroker::CRITICITY_UNKNOWN;
-      cnode->check.host = "Unknown";
-      cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-      cnode->check.check_command = "Unknown";
-      cnode->check.alarm_msg = mlastError.toStdString();
-      cnode->criticity = MonitorBroker::CRITICITY_UNKNOWN;
+      cnode.check.status = MonitorBroker::CRITICITY_UNKNOWN;
+      cnode.check.host = "Unknown";
+      cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
+      cnode.check.check_command = "Unknown";
+      cnode.check.alarm_msg = mlastError.toStdString();
+      cnode.criticity = MonitorBroker::CRITICITY_UNKNOWN;
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }
