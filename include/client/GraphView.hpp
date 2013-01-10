@@ -92,7 +92,7 @@ private:
   QPoint statsPanelPos;
 
   QString svgGraphFile;
-  QString coodinatesGraphFile;
+  QString coodinatesFile;
 
   GNodeListT gnodesList;
   GEdgeListT edgesList;

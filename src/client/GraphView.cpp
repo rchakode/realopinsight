@@ -27,6 +27,7 @@
 #include "StatsLegend.hpp"
 #include "SvNavigator.hpp"
 #include "utilsClient.hpp"
+#include <memory>
 
 const qreal GraphView::XScalingRatio = 72.0;
 const qreal GraphView::YScalingRatio = 100.0;
@@ -188,9 +189,7 @@ void GraphView::updateStatsPanel(Chart * _statsPanel)
 
   if (statsPanelItem) { //Mandatory
       setStatsPanelPos();
-      if (! isAjustedStatsPanelSize) {
-          ajustStatsPanelSize();
-        }
+      if (!isAjustedStatsPanelSize) ajustStatsPanelSize();
     }
 }
 
@@ -235,12 +234,10 @@ bool GraphView::load(const QString& _dotFile,
                      const NodeListT& _bpnodes,
                      const NodeListT& _cnodes)
 {
-  QStringList arguments;
-  QProcess* dotParser = new QProcess();
 
-  coodinatesGraphFile = _dotFile + ".plain";
-  arguments << "-Tplain"<< "-o" << coodinatesGraphFile << _dotFile;
-
+  auto dotParser = std::unique_ptr<QProcess>(new QProcess());
+  coodinatesFile = _dotFile%".plain";
+  QStringList arguments = QStringList() << "-Tplain"<< "-o" << coodinatesFile << _dotFile;
   int exitCode = dotParser->execute("dot", arguments);
   dotParser->waitForFinished(60000);
   if (! exitCode) {
@@ -252,7 +249,7 @@ bool GraphView::load(const QString& _dotFile,
       exit(exitCode);
     }
 
-  delete dotParser;
+  dotParser.reset(nullptr);
   return false;
 }
 
@@ -262,7 +259,7 @@ void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
   QRegExp regexSep;
   QStringList splitedLine;
   QPen pen;
-  QFile coodFile(coodinatesGraphFile);
+  QFile coodFile(coodinatesFile);
   if (coodFile.open(QFile::ReadOnly)) {
       pen.setColor(StatsLegend::COLOR_UNKNOWN);
       regexSep.setPattern("[ ]+");
@@ -308,6 +305,7 @@ void GraphView::drawNode(const NodeT& _node)
   expIcon.load(iconMap[PLUS], 0, Qt::AutoColor);
   QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;"%_node.name%"&nbsp;</span>";
   QString nodeData = _node.id%LABEL_NODE;
+
   gnodesList[_node.id].label = new QGraphicsTextItem(),
       gnodesList[_node.id].label->setHtml(label),
       gnodesList[_node.id].label->setData(0, nodeData),
@@ -323,9 +321,9 @@ void GraphView::drawNode(const NodeT& _node)
       gnodesList[_node.id].exp_icon->setData(0, nodeData),
       graphScene->addItem(gnodesList[_node.id].exp_icon),
       gnodesList[_node.id].exp_icon->setZValue(0);
-  if (gnodesList[_node.id].type == NodeType::ALARM_NODE) {
-      gnodesList[_node.id].exp_icon->setVisible(false);
-    }
+  if (gnodesList[_node.id].type == NodeType::ALARM_NODE)
+    gnodesList[_node.id].exp_icon->setVisible(false);
+
   QString msg =  SvNavigator::getNodeToolTip(_node);
   gnodesList[_node.id].icon->setToolTip(msg);
   gnodesList[_node.id].label->setToolTip(msg);
@@ -346,10 +344,8 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
       gnodeIt->icon->setToolTip(_toolTip);
       gnodeIt->label->setToolTip(_toolTip);
       GEdgeListT::iterator edge = edgesList.find(_node.parent + ":" + _node.id);
-      if (edge == edgesList.end()) {
-          return;
-        }
-      edge->edge->setPen(utils::getColor(_node.prop_criticity));
+      if (edge != edgesList.end())
+        edge->edge->setPen(utils::getColor(_node.prop_criticity));
     }
 }
 
@@ -366,7 +362,7 @@ void GraphView::setEdgePath(const QString& _parentVertex,
   parentAnchor = p_gnode.exp_icon->pos() + QPointF(0.5 * p_size.width(), p_size.height());
   childAnchor = c_gnode.icon->pos() + QPointF(0.5 * c_size.width(), 0);
   path.moveTo(parentAnchor), path.lineTo(childAnchor);
-  if (! p_gnode.exp_icon->isVisible())p_gnode.exp_icon->setVisible(true);
+  if (! p_gnode.exp_icon->isVisible()) p_gnode.exp_icon->setVisible(true);
 }
 
 void GraphView::setNodePos(const QString& _nodeId, const QPointF& _pos)
@@ -415,7 +411,8 @@ void GraphView::scaleToFitViewPort(void)
   QSizeF sceneSize = graphScene->itemsBoundingRect().size();
   portViewScalingRatio = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
   if (portViewScalingRatio < 1.0) {
-      if (statsPanelItem) statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio);
+      if (statsPanelItem)
+        statsPanelItem->scale(1 / portViewScalingRatio, 1 / portViewScalingRatio);
       scale(portViewScalingRatio, portViewScalingRatio);
     } else {
       portViewScalingRatio = 1;
@@ -433,6 +430,7 @@ void GraphView::capture(void)
                                                  tr("PNG files (*.png);; All files (*)"));
   QFileInfo fileInfo(fileName);
   if (fileInfo.suffix().isEmpty()) fileName.append(".png");
+
   setBackgroundBrush(Qt::white);
   painter.setRenderHint(QPainter::Antialiasing);
   render(&painter);
