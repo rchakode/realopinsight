@@ -28,6 +28,7 @@
 #include "utilsClient.hpp"
 #include "client/JsHelper.hpp"
 #include <QScriptValueIterator>
+#include <QSystemTrayIcon>
 #include <sstream>
 #include <QStatusBar>
 #include <QObject>
@@ -91,7 +92,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mhostLeft(0),
     mznsHelper(new ZnsHelper()),
     misLogged(false),
-    mlastError("")
+    mlastError(""),
+    mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png")))
 {
   setWindowTitle(tr("%1 Operations Console").arg(appName));
   loadMenus();
@@ -126,6 +128,7 @@ SvNavigator::~SvNavigator()
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
+  delete mtrayIcon;
   unloadMenus();
 }
 
@@ -202,6 +205,7 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 
 void SvNavigator::startMonitor()
 {
+  mtrayIcon->showMessage(tr("Loaded"), tr("Loaded"));//FIXME: trayIcon message
   prepareDashboardUpdate();
   switch(mcoreData->monitor) {
     case MonitorBroker::ZENOSS:
@@ -227,20 +231,21 @@ void  SvNavigator::updateStatusBar(const QString& msg) {
 
 void SvNavigator::load(const QString& _file)
 {
-  if ( ! _file.isEmpty()) {
+  if (!_file.isEmpty()) {
       mconfigFile = utils::getAbsolutePath(_file);
     }
   mactiveFile = mconfigFile;
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(mconfigFile));
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
   mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::rootID]);
   mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
   mbrowser->setUrl(mmonitorBaseUrl);
-  resize();
-  show();
+  this->resize();
+  QMainWindow::show();
   mmap->scaleToFitViewPort();
-  setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(mconfigFile));
+  mtrayIcon->show();
 }
 
 void SvNavigator::unloadMenus(void)
@@ -661,7 +666,10 @@ void SvNavigator::closeZbxSession(void)
 void SvNavigator::processZbxReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
-  if (_reply->error() != QNetworkReply::NoError) return;
+  if (_reply->error() != QNetworkReply::NoError) {
+      updateDashboardOnUnknown(_reply->errorString());
+      return;
+    }
 
   QString data = _reply->readAll();
   JsonHelper jsHelper(data.toStdString());
@@ -683,7 +691,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             check.check_command = triggerName.toStdString();
             check.status = triggerData.property("value").toInt32();
             if (check.status == MonitorBroker::ZABBIX_CLEAR) {
-                check.alarm_msg = "OK";//triggerName.toStdString(); //FIXME: use another parameter?
+                check.alarm_msg = "OK ("+triggerName.toStdString()+")";
               } else {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
                 check.status = triggerData.property("priority").toInteger();
@@ -723,7 +731,10 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
 void SvNavigator::processZnsReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
-  if (_reply->error() != QNetworkReply::NoError) return;
+  if (_reply->error() != QNetworkReply::NoError) {
+      updateDashboardOnUnknown(_reply->errorString());
+      return;
+    }
 
   QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
   QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
@@ -878,7 +889,6 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
       cnode.check.check_command = "Unknown";
       cnode.check.alarm_msg = mlastError.toStdString();
-      cnode.criticity = MonitorBroker::CRITICITY_UNKNOWN;
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }

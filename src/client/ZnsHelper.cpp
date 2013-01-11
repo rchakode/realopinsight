@@ -27,13 +27,12 @@
 #include <QMessageBox>
 #include <QNetworkCookieJar>
 
-const QString ZNS_API_CONTEXT = "/zport/dmd";
-const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+
 const RequestListT ZnsHelper::ReQPatterns = ZnsHelper::getRequestsPatterns();
 const RequestListT ZnsHelper::ContentTypes = ZnsHelper::getContentTypes();
 const RequestListT ZnsHelper::Routers = ZnsHelper::getRouters();
 
-ZnsHelper::ZnsHelper(const QString & baseUrl)
+ZnsHelper::ZnsHelper(const QString& baseUrl)
   : QNetworkAccessManager(),
     apiBaseUrl(baseUrl),
     requestHandler(new QNetworkRequest())
@@ -46,39 +45,13 @@ ZnsHelper::~ZnsHelper()
   delete requestHandler;
 }
 
-QString ZnsHelper::getApiBaseUrl(void) const
-{
-  return apiBaseUrl;
-}
-
-QString ZnsHelper::getApiContextUrl(void) const
-{
-  return apiBaseUrl+ZNS_API_CONTEXT;
-}
-
-void ZnsHelper::setBaseUrl(const QString & url)
+void ZnsHelper::setBaseUrl(const QString& url)
 {
   apiBaseUrl = url;
   requestHandler->setUrl(QUrl(apiBaseUrl+ZNS_LOGIN_API_CONTEXT));
 }
 
-
-void ZnsHelper::setRequestUrl(const QUrl & url)
-{
-  requestHandler->setUrl(url);
-}
-
-void ZnsHelper::setRequestUrl(const QString & url)
-{
-  requestHandler->setUrl(QUrl(url));
-}
-
-QString ZnsHelper::getRequestUrl(void) const
-{
-  return requestHandler->url().toString();
-}
-
-void ZnsHelper::postRequest(const qint32 & reqType, const QByteArray & data)
+void ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
 {
   requestHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
   QNetworkReply* reply = QNetworkAccessManager::post(*requestHandler, data);
@@ -86,12 +59,7 @@ void ZnsHelper::postRequest(const qint32 & reqType, const QByteArray & data)
           this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
-void ZnsHelper::processError(QNetworkReply::NetworkError code)
-{
-  emit propagateError(code);
-}
-
-void ZnsHelper::setRouter(const int & reqType) {
+void ZnsHelper::setRouter(const int& reqType) {
   QString url = apiBaseUrl+ZNS_API_CONTEXT + "/" + Routers[reqType];
   setRequestUrl(url);
 }
@@ -137,6 +105,3 @@ RequestListT ZnsHelper::getRouters()
   return list;
 }
 
-QString ZnsHelper::getDeviceName(const QString& uid) {
-  return uid.mid(uid.lastIndexOf("/")+1, -1);
-}

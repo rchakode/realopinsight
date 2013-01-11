@@ -152,8 +152,7 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
   for (auto node : _bpnodes) _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
   for (auto node : _cnodes) _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
   for (auto node : _bpnodes) {
-      if (node.child_nodes.isEmpty())
-        continue;
+      if (node.child_nodes.isEmpty()) continue;
       for (auto childId : node.child_nodes.split(Parser::CHILD_SEP)) {
           auto treeItem = _tree.find(node.id);
           if (treeItem == _tree.end()) {

@@ -28,7 +28,7 @@
 
 const QString SvCreator::NagiosCompatibleFormat="Nagios specific format(*.nag.ngrt4n.xml)";
 const QString SvCreator::ZabbixCompatibleFormat="Zabbix specific format(*.zbx.ngrt4n.xml)";
-const QString SvCreator::ZenossCompatibleFormat="Zenoss specific format(*.zns.ngrt4n.xml)";
+const QString SvCreator::ZenossCompatibleFormat="Zenoss specific format(*.zns.ngrt4n.xml)"; //FIXME: test this extention
 
 SvCreator::SvCreator(const qint32& _user_role)
   : muserRole (_user_role),

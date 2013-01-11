@@ -27,6 +27,10 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
+
+
+const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+
 class ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
 
@@ -38,14 +42,14 @@ public:
   };
 
 public:
-  ZbxHelper(const QString & baseUrl="http://localhost/zabbix");
+  ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
-  void setBaseUrl(const QString & url);
-  QString getApiUri(void) const;
+  void postRequest(const qint32& reqId, const QStringList& params);
+  void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; requestHandler->setUrl(QUrl(apiUri));}
+  inline QString getApiUri(void) const {return apiUri;}
 
 public slots:
-  void postRequest(const qint32 & reqId, const QStringList & params);
-  void processError(QNetworkReply::NetworkError code);
+  inline void processError(const QNetworkReply::NetworkError& code) {if(code <200 && code >=599) emit propagateError(code);}
 
 signals:
   void propagateError(QNetworkReply::NetworkError);

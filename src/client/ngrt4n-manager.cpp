@@ -57,7 +57,6 @@ int main(int argc, char **argv)
   ostringstream versionMsg(QObject::tr("%1\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
                            +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
                            +QObject::tr("%1").arg(packageUrl).toStdString());
-
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;

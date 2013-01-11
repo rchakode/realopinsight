@@ -31,11 +31,11 @@ class WebKit : public QWebView
   Q_OBJECT
 
 public:
-  WebKit( const QString & = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0 );
+  WebKit(const QString& = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0);
   virtual ~WebKit() ;
 
 public slots:
-  void setUrl( QString );
+  inline void setUrl(const QString& url ) {load(QUrl(url));}
 };
 
 #endif /* SNAVWEBKIT_H_ */

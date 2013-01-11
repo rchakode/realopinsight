@@ -34,8 +34,3 @@ WebKit::WebKit(const QString& url, QWidget* _parent)
 }
 
 WebKit::~WebKit() {}
-
-void WebKit::setUrl(QString url)
-{
-  load(QUrl(url));
-}

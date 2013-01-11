@@ -38,6 +38,7 @@
 #include "ZnsHelper.hpp"
 
 class QScriptValueIterator;
+class QSystemTrayIcon;
 
 class SvNavigator : public QMainWindow
 {
@@ -124,6 +125,7 @@ private:
   ZnsHelper* mznsHelper;
   bool misLogged;
   QString mlastError;
+  QSystemTrayIcon* mtrayIcon;
 
   void addEvents(void);
   void loadMenus(void);
