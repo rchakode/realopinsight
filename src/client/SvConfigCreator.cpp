@@ -137,7 +137,7 @@ void SvCreator::newBusinessView(void)
   if (treatCloseAction(false) == 0) {
       utils::clear(*mcoreData);
       NodeT node;
-      node.id = SvNavigatorTree::rootID;
+      node.id = SvNavigatorTree::ROOT_ID;
       node.name = "New Business view";
       node.child_nodes.clear();
       node.criticity = MonitorBroker::CRITICITY_UNKNOWN;
@@ -151,7 +151,7 @@ void SvCreator::newBusinessView(void)
 
       fillEditorFromService(mcoreData->tree_items[node.id]);
       mactiveFile.clear();
-      mselectedNode = SvNavigatorTree::rootID;
+      mselectedNode = SvNavigatorTree::ROOT_ID;
       mhasLeftUpdates = true;
       setWindowTitle(tr("%1 Editor - unsaved document*").arg(appName));
     }
@@ -432,7 +432,7 @@ void SvCreator::recordData(const QString& _path)
       statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
       return;
     }
-  NodeListT::const_iterator root = mcoreData->bpnodes.find(SvNavigatorTree::rootID);
+  NodeListT::const_iterator root = mcoreData->bpnodes.find(SvNavigatorTree::ROOT_ID);
   if (root == mcoreData->bpnodes.end()) {
       file.close();
       QString msg =  tr("The hierarchy does not have root");
@@ -445,7 +445,7 @@ void SvCreator::recordData(const QString& _path)
   ofile << "<ServiceView compat=\"2.0\" monitor=\""<< mcoreData->monitor<< "\">\n";
   recordNode(ofile, *root);
   foreach(const NodeT& service, mcoreData->bpnodes) {
-      if (service.id == SvNavigatorTree::rootID || service.parent.isEmpty())
+      if (service.id == SvNavigatorTree::ROOT_ID || service.parent.isEmpty())
         continue;
       recordNode(ofile, service);
     }

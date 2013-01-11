@@ -37,8 +37,6 @@
 #include <locale>
 #include <memory>
 
-//FIXME: the system crashes on two many file opened
-
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nCriticity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
@@ -132,7 +130,6 @@ SvNavigator::~SvNavigator()
   unloadMenus();
 }
 
-
 void SvNavigator::loadMenus(void)
 {
   QMenuBar* menuBar = new QMenuBar();
@@ -185,7 +182,6 @@ void SvNavigator::closeEvent(QCloseEvent * event)
   QMainWindow::closeEvent(event);
 }
 
-
 void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 {
   QPoint pos = event->globalPos();
@@ -205,7 +201,6 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 
 void SvNavigator::startMonitor()
 {
-  mtrayIcon->showMessage(tr("Loaded"), tr("Loaded"));//FIXME: trayIcon message
   prepareDashboardUpdate();
   switch(mcoreData->monitor) {
     case MonitorBroker::ZENOSS:
@@ -224,22 +219,21 @@ void SvNavigator::timerEvent(QTimerEvent *)
   startMonitor();
 }
 
-void  SvNavigator::updateStatusBar(const QString& msg) {
+void  SvNavigator::updateStatusBar(const QString& msg)
+{
   statusBar()->showMessage(msg);
 }
 
-
 void SvNavigator::load(const QString& _file)
 {
-  if (!_file.isEmpty()) {
-      mconfigFile = utils::getAbsolutePath(_file);
-    }
+  if (!_file.isEmpty())
+    mconfigFile = utils::getAbsolutePath(_file);
   mactiveFile = mconfigFile;
   QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(mconfigFile));
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
-  mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::rootID]);
+  mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::ROOT_ID]);
   mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
   mbrowser->setUrl(mmonitorBaseUrl);
   this->resize();
@@ -370,12 +364,11 @@ void SvNavigator::prepareDashboardUpdate(void)
   updateStatusBar(msg);
 }
 
-
 QString SvNavigator::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
       .arg(const_cast<QString&>(_node.description).replace("\n", " "))
-      .arg(utils::statusToString(_node.criticity))
+      .arg(utils::criticityToText(_node.criticity))
       .arg(CalcRules::label(_node.criticity_crule))
       .arg(PropRules::label(_node.criticity_prule));
 
@@ -393,7 +386,6 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
     }
   return toolTip;
 }
-
 
 void SvNavigator::updateDashboard(NodeListT::iterator& _node)
 {
@@ -443,7 +435,6 @@ void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node)
   computeStatusInfo(*_node);
 }
 
-
 void SvNavigator::computeStatusInfo(NodeT& _node)
 {
   _node.criticity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
@@ -478,7 +469,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
     }
 }
 
-void SvNavigator::updateBpNode(QString _nodeId)
+void SvNavigator::updateBpNode(const QString& _nodeId)
 {
   NodeListT::iterator node;
   if (!utils::findNode(mcoreData, _nodeId, node)) return;
@@ -487,8 +478,7 @@ void SvNavigator::updateBpNode(QString _nodeId)
   Criticity criticity;
   for (auto nodeId : nodeIds) {
       NodeListT::iterator child;
-      if (! utils::findNode(mcoreData, nodeId, child))
-        continue;
+      if (!utils::findNode(mcoreData, nodeId, child)) continue;
       Criticity cst(static_cast<MonitorBroker::CriticityT>(child->prop_criticity));
       if (node->criticity_crule == CalcRules::WeightedCriticity) {
           criticity = criticity / cst;
@@ -508,9 +498,12 @@ void SvNavigator::updateBpNode(QString _nodeId)
   QString toolTip = getNodeToolTip(*node);
   mmap->updateNode(node, toolTip);
   updateNavTreeItemStatus(node, toolTip);
-  emit hasToBeUpdate(node->parent);
+  if (node->id == SvNavigatorTree::ROOT_ID) {
+      updateSystemTray(*node);
+    } else {
+      emit hasToBeUpdate(node->parent);
+    }
 }
-
 
 void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
 {
@@ -521,7 +514,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
 {
   auto tnode_it = mcoreData->tree_items.find(_node.id);
   if (tnode_it != mcoreData->tree_items.end()) {
-      (*tnode_it)->setIcon(0, utils::getTreeIcon(_node.criticity));
+      (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.criticity));
       (*tnode_it)->setToolTip(0, _tip);
     }
 }
@@ -548,9 +541,9 @@ void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const 
     }
 }
 
-void SvNavigator::centerGraphOnNode(const QString& _node_id)
+void SvNavigator::centerGraphOnNode(const QString& _nodeId)
 {
-  if (_node_id != "") mselectedNode =  _node_id;
+  if (_nodeId != "") mselectedNode =  _nodeId;
   mmap->centerOnNode(mselectedNode);
 }
 
@@ -585,7 +578,6 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
         }
     }
 }
-
 
 void SvNavigator::acknowledge(void)
 {
@@ -654,8 +646,7 @@ void SvNavigator::resize(void)
   QMainWindow::resize(screenSize.width(),  screenSize.height());
 }
 
-
-void SvNavigator::closeZbxSession(void)
+void SvNavigator::closeRpcSession(void)
 {
   QStringList params;
   params.push_back(mzbxAuthToken);
@@ -726,7 +717,6 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
       break;
     }
 }
-
 
 void SvNavigator::processZnsReply(QNetworkReply* _reply)
 {
@@ -803,6 +793,17 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           updateDashboardOnUnknown(tr("Unexpected response received from the server"));
         }
     }
+}
+
+QStringList SvNavigator::getAuthInfo(void) {
+
+  QStringList authInfo = QStringList();
+  int pos = mserverAuthChain.indexOf(":");
+  if (pos != -1) {
+      authInfo.push_back(mserverAuthChain.left(pos));
+      authInfo.push_back(mserverAuthChain.mid(pos+1, -1));
+    }
+  return authInfo;
 }
 
 void SvNavigator::openRpcSession(void)
@@ -896,17 +897,22 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
   finalizeDashboardUpdate(enable);
 }
 
-QStringList SvNavigator::getAuthInfo(void) {
-
-  QStringList authInfo = QStringList();
-  int pos = mserverAuthChain.indexOf(":");
-  if (pos != -1) {
-      authInfo.push_back(mserverAuthChain.left(pos));
-      authInfo.push_back(mserverAuthChain.mid(pos+1, -1));
+void SvNavigator::updateSystemTray(const NodeT& _node)
+{
+  if(!QMainWindow::isActiveWindow()) {
+      QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
+      if (_node.criticity == MonitorBroker::CRITICITY_HIGH ||
+          _node.criticity == MonitorBroker::CRITICITY_UNKNOWN) {
+          icon = QSystemTrayIcon::Critical;
+        } else if (_node.criticity == MonitorBroker::CRITICITY_MINOR ||
+                   _node.criticity == MonitorBroker::CRITICITY_MAJOR) {
+          icon = QSystemTrayIcon::Warning;
+        }
+      mtrayIcon->showMessage(appName%" - "%_node.name,
+                             tr("The Criticity of the Platform is %1").arg(utils::criticityToText(_node.criticity).toUpper()),
+                             icon);
     }
-  return authInfo;
 }
-
 
 void SvNavigator::addEvents(void)
 {

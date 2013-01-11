@@ -94,9 +94,9 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 0)->setText(itemText);
   mmodel->item(index, 0)->setData(QDateTime::fromString(itemText), Qt::UserRole);
 
-  mmodel->item(index, 1)->setText(utils::statusToString(_node.criticity));
+  mmodel->item(index, 1)->setText(utils::criticityToText(_node.criticity));
   mmodel->item(index, 1)->setData(-1*_node.criticity, Qt::UserRole);
-  mmodel->item(index, 1)->setBackground(QBrush(utils::getColor(_node.criticity)));
+  mmodel->item(index, 1)->setBackground(QBrush(utils::computeColor(_node.criticity)));
 
   itemText = QString(check.host.c_str());
   mmodel->item(index, 2)->setText(itemText);

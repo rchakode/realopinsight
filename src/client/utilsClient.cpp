@@ -25,7 +25,7 @@
 #include <QFileInfo>
 #include <unistd.h>
 
-QString utils::statusToString(const qint32& _status)
+QString utils::criticityToText(const qint32& _status)
 {
   switch(static_cast<MonitorBroker::CriticityT>(_status))
     {
@@ -134,7 +134,7 @@ int utils::computePropCriticity(const qint8& _critValue, const qint8& propRule)
 }
 
 
-QColor utils::getColor(const int& _criticity)
+QColor utils::computeColor(const int& _criticity)
 {
   QColor color(StatsLegend::COLOR_UNKNOWN);
   switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
@@ -157,7 +157,7 @@ QColor utils::getColor(const int& _criticity)
 }
 
 
-QIcon utils::getTreeIcon(const int& _criticity)
+QIcon utils::computeCriticityIcon(const int& _criticity)
 {
   QString ipath(":/images/built-in/unknown.png");
   switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {

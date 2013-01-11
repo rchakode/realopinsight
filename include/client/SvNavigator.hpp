@@ -59,9 +59,9 @@ public slots:
   void startMonitor();
   int runNagiosMonitor(void);
   void prepareDashboardUpdate(void);
-  void updateBpNode(QString);
+  void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
-  void centerGraphOnNode(const QString& _node_id = "");
+  void centerGraphOnNode(const QString& _nodeId = "");
   void filterNodeRelatedMsg(void);
   void filterNodeRelatedMsg(const QString &);
   void acknowledge(void);
@@ -140,11 +140,12 @@ private:
   void updateCNodes(const MonitorBroker::CheckT & check);
   void finalizeDashboardUpdate(const bool& enable=true);
   void updateStatusBar(const QString& msg);
-  void closeZbxSession(void);
-  void openRpcSession(void);
-  void postRpcDataRequest(void);
   QStringList getAuthInfo(void);
+  void openRpcSession(void);
+  void closeRpcSession(void);
+  void postRpcDataRequest(void);
   void updateDashboardOnUnknown(const QString& msg);
+  void updateSystemTray(const NodeT& _node);
 };
 
 #endif /* SVNAVIGATOR_HPP */

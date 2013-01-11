@@ -35,7 +35,7 @@ public:
   static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
   void update(CoreDataT * & _snav_struct) ;
 
-  static const QString rootID ;
+  static const QString ROOT_ID ;
   CoreDataT* coreData ;
 
   static QTreeWidgetItem * createTreeItem(const NodeT & _node);

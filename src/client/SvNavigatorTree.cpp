@@ -27,7 +27,7 @@
 #include "Parser.hpp"
 #include "utilsClient.hpp"
 
-const QString SvNavigatorTree::rootID = "root";
+const QString SvNavigatorTree::ROOT_ID = "root";
 
 SvNavigatorTree::SvNavigatorTree(const bool& _enable_drag, QWidget* _parent)
   : QTreeWidget(_parent), coreData(NULL)
@@ -120,8 +120,8 @@ void SvNavigatorTree::addNode(TreeNodeItemListT& _tree,
 void SvNavigatorTree::update(CoreDataT*& _data)
 {
   clear() ;
-  addTopLevelItem(_data->tree_items[rootID]) ;
-  setCurrentItem(_data->tree_items[rootID]) ;
+  addTopLevelItem(_data->tree_items[ROOT_ID]) ;
+  setCurrentItem(_data->tree_items[ROOT_ID]) ;
   expandAll() ;
   coreData = _data ;
 }
