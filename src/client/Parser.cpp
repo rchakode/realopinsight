@@ -42,7 +42,7 @@ Parser::~Parser()
   QFile dotFile;
   if (dotFile.exists(graphFilename)) dotFile.remove(graphFilename);
   if (dotFile.exists(graphFilename+".plain")) dotFile.remove(graphFilename+".plain");
-  dotFile.close(); //FIXME: test dotFile.close() here
+  dotFile.close();
 }
 
 bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)

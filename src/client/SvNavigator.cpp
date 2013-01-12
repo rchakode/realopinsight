@@ -317,7 +317,7 @@ int SvNavigator::runNagiosMonitor(void)
             {
               cnode.check.status = jsHelper.getProperty("status").toInt32();
               cnode.check.host = jsHelper.getProperty("host").toString().toStdString();
-              cnode.check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32()); //TODO: to be tested
+              cnode.check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
               cnode.check.check_command = jsHelper.getProperty("command").toString().toStdString();
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
@@ -449,7 +449,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
       regexp.setPattern(MsgConsole::TAG_CHECK);
       statusText.replace(regexp, info[1]);
     }
-  if (mcoreData->monitor == MonitorBroker::Nagios) { // FIXME: Generalize this to the other monitors
+  if (mcoreData->monitor == MonitorBroker::Nagios) { // FIXME: Threshold tag don't work for other monitors
       info = QString(_node.check.check_command.c_str()).split("!");
       if (info.length() >= 3) {
           regexp.setPattern(MsgConsole::TAG_THERESHOLD);
@@ -459,7 +459,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
         }
     }
   if (mcoreData->monitor == MonitorBroker::Zabbix) {
-      regexp.setPattern(MsgConsole::TAG_HOSTNAME_ZABBIX); //FIXME: do it only for Zabbix
+      regexp.setPattern(MsgConsole::TAG_HOSTNAME_ZABBIX);
       statusText.replace(regexp, _node.check.host.c_str());
       _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
     }
@@ -901,17 +901,17 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
 void SvNavigator::updateSystemTray(const NodeT& _node)
 {
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-  if (_node.criticity == MonitorBroker::CriticityHigh || _node.criticity == MonitorBroker::CriticityUnknown) {
+  if (_node.criticity == MonitorBroker::CriticityHigh ||
+      _node.criticity == MonitorBroker::CriticityUnknown) {
       icon = QSystemTrayIcon::Critical;
-    } else if (_node.criticity == MonitorBroker::CriticityMinor || _node.criticity == MonitorBroker::CriticityMajor) {
+    } else if (_node.criticity == MonitorBroker::CriticityMinor ||
+               _node.criticity == MonitorBroker::CriticityMajor) {
       icon = QSystemTrayIcon::Warning;
     }
   qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
   QString title = AppName%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
-                   " - Platform Severity: %3")
-      .arg(pbCount)
-      .arg(pbCount>1?tr("s"):"")
+                   " - Platform Severity: %3").arg(pbCount).arg(pbCount>1?tr("s"):"")
       .arg(utils::criticityToText(_node.criticity).toUpper());
 
   mtrayIcon->showMessage(title, msg, icon);
