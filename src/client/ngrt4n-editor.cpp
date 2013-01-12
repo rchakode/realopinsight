@@ -43,37 +43,34 @@ int main(int argc, char **argv)
   app->setStyleSheet(Preferences::style());
 
   QString cmdName= basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("%1 Editor %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
-                           +QObject::tr("\nCopyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
-                           +QObject::tr("\nLicense GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\nFor bug reporting, see: <%1>").arg(PackageUrl).toStdString());
+  ostringstream versionMsg(QObject::tr("> %1 Editor %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
+                           +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\n>> For bug reporting, see: <%1>").arg(PackageUrl).toStdString());
 
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
-  if ( (opt = getopt(argc, argv, "hv") ) != -1) {
+  if ((opt = getopt(argc, argv, "hv")) != -1) {
       switch (opt) {
         case 'v':
           cout << versionMsg.str() << endl;
           exit(0);
-
+          break;
         case 'h':
           cout << usage.arg(cmdName).toStdString();
           exit(0);
-
+          break;
         default:
           cout << usage.arg(cmdName).toStdString();
           exit (1);
           break;
         }
     }
-  cout <<versionMsg.str()
-      <<"\nLoading...\n";
+  cout <<versionMsg.str() <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole ) exit( 1 );
-
+  if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
   SvCreator* svc = new SvCreator(userRole);
   svc->load(file);
-
   return app->exec();
 }

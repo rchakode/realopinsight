@@ -47,40 +47,39 @@ int main(int argc, char **argv)
   app->setStyleSheet(Preferences::style());
 
   QString cmdName = basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("%1 Operations Console %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
-                           +QObject::tr("\nCopyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
-                           +QObject::tr("\nLicense GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\nFor bug reporting, see: <%1>").arg(PackageUrl).toStdString());
+  ostringstream versionMsg(QObject::tr("> %1 Operations Console %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
+                           +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\n>> For bug reporting, see: <%1>").arg(PackageUrl).toStdString());
 
-  bool config = false;
+  bool runConfig = false;
   int opt;
-  if ( (opt = getopt(argc, argv, "chv") ) != -1) {
+  if ((opt = getopt(argc, argv, "chv")) != -1) {
       switch (opt) {
         case 'c':
-          config = true;
+          runConfig = true;
           break;
-
         case 'v':
-          cout << versionMsg.str() << endl;
+          cout<<versionMsg.str()<<"\n";
           exit(0);
-
+          break;
         case 'h':
-          cout << usage.arg(cmdName).toStdString();
+          cout<<usage.arg(cmdName).toStdString();
           exit(0);
-
+          break;
         default:
-          cout << usage.arg(cmdName).toStdString();
+          cout<<usage.arg(cmdName).toStdString();
           exit(1);
           break;
         }
     }
-  cout <<versionMsg.str()
-      <<"\nLoading...\n";
+  cout<<versionMsg.str()
+     <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole ) exit(1);
+  if ( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
 
-  if( config ) {
+  if (runConfig) {
       Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
       Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
       update_settings->exec();
@@ -92,7 +91,7 @@ int main(int argc, char **argv)
                                                 .arg(QString::fromStdString(versionMsg.str())));
   utils::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
-  if(file == "") {
+  if (file.isEmpty()) {
       info->clearMessage();
       info->showMessage(QObject::tr("You need to select a configuration file!"),
                         Qt::AlignCenter|Qt::AlignCenter);
@@ -102,9 +101,9 @@ int main(int argc, char **argv)
                                           ".",
                                           QObject::tr("Xml files (*.xml);;All files (*)"));
 
-      if(! file.length()){
-          utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
-          exit (1);
+      if (!file.length()) {
+          utils::alert(QObject::tr("No configuration file selected, the program will exit!"));
+          exit(1);
         }
     }
   info->finish(0);

@@ -50,14 +50,14 @@ int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
-  app->setApplicationName(AppName.toUpper() );
+  app->setApplicationName(AppName.toUpper());
   app->setStyleSheet(Preferences::style());
 
   QString cmdName = basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("\n%1 %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
-                           +QObject::tr("\nCopyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
-                           +QObject::tr("\nLicense GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\nFor bug reporting, see: <%1>").arg(PackageUrl).toStdString());
+  ostringstream versionMsg(QObject::tr("\n> %1 %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
+                           +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\n>> For bug reporting, see: <%1>").arg(PackageUrl).toStdString());
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
@@ -91,13 +91,12 @@ int main(int argc, char **argv)
       <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole )
-    exit(1);
-  if(module == "dashboard") {
+  if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
+  if (module == "dashboard") {
       QSplashScreen* info = Preferences::infoScreen(QObject::tr("%1\nLoading...")
                                                     .arg(QString::fromStdString(versionMsg.str())));
       utils::delay(1);
-      if(file == "") {
+      if (file == "") {
           info->clearMessage();
           info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
           utils::delay(1); info->finish(0);
@@ -106,7 +105,7 @@ int main(int argc, char **argv)
                                               ".",
                                               QObject::tr("Xml files (*.xml);;All files (*)"));
 
-          if(!file.length()){
+          if (!file.length()){
               utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
               exit (1);
             }
@@ -116,10 +115,10 @@ int main(int argc, char **argv)
       SvNavigator *console= new SvNavigator(userRole);
       console->load(file);
       console->startMonitor();
-    } else if(module == "editor") {
+    } else if (module == "editor") {
       SvCreator* editor = new SvCreator(userRole);
       editor->load(file);
-    } else if(module == "config") {
+    } else if (module == "config") {
       Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
       Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
       update_settings->exec();

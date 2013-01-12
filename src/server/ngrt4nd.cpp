@@ -35,201 +35,173 @@
 #include <fstream>
 #include <libgen.h>
 #include <iostream>
+#include <stdio.h>
 
 
-std::string packageName = PACKAGE_NAME ;
-std::string packageVersion = PACKAGE_VERSION ;
-std::string packageUrl = PACKAGE_URL ;
-std::string statusFile = "/usr/local/nagios/var/status.dat" ;
+std::string packageName = PACKAGE_NAME;
+std::string packageVersion = PACKAGE_VERSION;
+std::string packageUrl = PACKAGE_URL;
+std::string statusFile = "/usr/local/nagios/var/status.dat";
 std::string progName = "";
-std::string authChain= "" ;
+std::string authChain= "";
 
 std::string help() {
-    std::ostringstream msg("SYNOPSIS\n"
-                           "	" + progName +" [OPTIONS]\n"
-                           "\n"
-                           "OPTIONS\n"
-                           "	-c FILE\n"
-                           "	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
-                           "	-D\n"
-                           "	 Run the program in foreground mode. \n"
-                           "	-p\n"
-                           "	 Set the listening port. Default is 1983.\n"
-                           "	-P\n"
-                           "	 Change the authentication token.\n"
-                           "	-T\n"
-                           "	 Print the authentication token.\n"
-                           "	-v\n"
-                           "	 Print the version and copyright information.\n"
-                           "	-h\n"
-                           "	 Print this help.\n") ;
-
-    return msg.str();
+  std::ostringstream msg("SYNOPSIS\n"
+                         "	" + progName +" [OPTIONS]\n"
+                         "\n"
+                         "OPTIONS\n"
+                         "	-c FILE\n"
+                         "	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
+                         "	-D\n"
+                         "	 Run the program in foreground mode. \n"
+                         "	-p\n"
+                         "	 Set the listening port. Default is 1983.\n"
+                         "	-P\n"
+                         "	 Change the authentication token.\n"
+                         "	-T\n"
+                         "	 Print the authentication token.\n"
+                         "	-v\n"
+                         "	 Print the version and copyright information.\n"
+                         "	-h\n"
+                         "	 Print this help.\n\n");
+  return msg.str();
 }
 
-std::string version(){
-    std::ostringstream versionMsg(packageName + " (" + progName + ")"
-                                  + "\nVersion " + packageVersion
-                                  + "\nCopyright (c) 2010-2013 by NGRT4N Project. All rights reserved."
-                                  + "\nEmail: contact@ngrt4n.com. Web: "+packageUrl);
-
-    return versionMsg.str();
+std::string getVersionMsg(const std::string& progName)
+{
+  char msg[1024];
+  sprintf(msg, "> %s (%s) version %s"
+          "\n>> Belongs to NGRT4N Dashboard Monitoring Suite"
+          "\n>> Copyright (c) 2010-2013 NGRT4N Project. All rights reserved"
+          "\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>"
+          "\n>> For bug reporting, see: <%s>",
+          packageName.c_str(), progName.c_str(), packageVersion.c_str(), packageUrl.c_str());
+  return std::string(msg);
 }
 
-void ngrt4n::setPassChain(char* authChain) {
+void ngrt4n::setPassChain(char* authChain)
+{
+  ofstream ofpass;
+  ofpass.open(ngrt4n::AUTH_FILE.c_str());
+  if(!ofpass.good()) {
+      clog << "Unable to set the authentication token." << "\n";
+      exit(1);
+    }
+  ofpass << crypt(authChain, salt.c_str());
+  ofpass.close();
+}
 
-    ofstream ofpass;
-
-    ofpass.open(ngrt4n::AUTH_FILE.c_str());
-    if( ! ofpass.good()) {
-        clog << "Unable to set the authentication token." << endl;
-        exit(1) ;
+std::string ngrt4n::getPassChain()
+{
+  std::string authChain;
+  ifstream pfile;
+  pfile.open (ngrt4n::AUTH_FILE.c_str());
+  if(!pfile.good()) {
+      std::clog << "Unable to load the application's settings" << "\n";
+      exit(1);
     }
 
-    ofpass << crypt(authChain, salt.c_str());
-    ofpass.close();
-}
-
-std::string ngrt4n::getPassChain() {
-
-    std::string authChain ;
-    ifstream pfile;
-
-    pfile.open ( ngrt4n::AUTH_FILE.c_str() );
-    if( ! pfile.good()) {
-        std::clog << "Unable to load the application's settings" << endl;
-        exit(1) ;
-    }
-
-    pfile >> authChain ;
-    pfile.close();
-    return authChain ;
+  pfile >> authChain;
+  pfile.close();
+  return authChain;
 }
 
 int main(int argc, char ** argv)
 {
-    progName = basename(argv[0]);
-
-    bool foreground = false;
-    static const char *shotOpt="DTPhvc:p:" ;
-    int port = MonitorBroker::DefaultPort ;
-    char opt ;
-    while ((opt = getopt(argc, argv, shotOpt)) != -1) {
-        switch (opt)
-        {
+  progName = basename(argv[0]);
+  bool foreground = false;
+  static const char *shotOpt="DTPhvc:p:";
+  int port = MonitorBroker::DefaultPort;
+  char opt;
+  while ((opt = getopt(argc, argv, shotOpt)) != -1) {
+      switch (opt){
         case 'D':
-            foreground = true ;
-            break;
-
+          foreground = true;
+          break;
         case 'c':
-            statusFile = optarg ;
-            break;
-
-        case 'p': {
-            port = atoi(optarg) ;
-            if(port <= 0 ) {
-                cerr << "Bad port number.\n";
-                exit(1) ;
+          statusFile = optarg;
+          break;
+        case 'p':
+          port = atoi(optarg);
+          if(port <= 0 ) {
+              cerr << "Bad port number\n";
+              exit(1);
             }
-            break;
-        }
-
-        case 'P': {
-            ngrt4n::checkUser() ;
-            ngrt4n::initApp() ;
-
+          break;
+        case 'P':
+          {
+            ngrt4n::checkUser();
+            ngrt4n::initApp();
             char* pass = getpass("Type a passphrase:");
-            ngrt4n::setPassChain(pass) ;
-            cout << ngrt4n::getPassChain() << endl ;
-
-            exit(0) ;
-        }
-
-        case 'T': {
-            ngrt4n::checkUser() ;
-            cout << ngrt4n::getPassChain() << endl ;
-
-            exit(0) ;
-        }
-
-        case 'v': {
-            cout << version() << endl ;
-            exit(0) ;
-        }
-
-        case 'h': {
-            cout << help() << endl ;
-            exit(0) ;
-        }
-        default: {
-            cout << help() << endl ;
-            exit(1) ;
-        }
+            ngrt4n::setPassChain(pass);
+            cout << ngrt4n::getPassChain()<<"\n";
+            exit(0);
+          }
+        case 'T':
+          ngrt4n::checkUser();
+          cout << ngrt4n::getPassChain()<<"\n";
+          exit(0);
+        case 'v':
+          cout << getVersionMsg(progName)<<"\n";
+          exit(0);
+        case 'h':
+          cout << help();
+          exit(0);
+        default:
+          cout << help();
+          exit(1);
         }
     }
-
-    ngrt4n::checkUser() ;
-    ngrt4n::initApp() ;
-    authChain = ngrt4n::getPassChain() ;
-
-    if(foreground) {
-        std::cerr << "Starting "<< version() << "\n";
-    } else {
-        std::clog << "Starting "<< version() << "\n";
-    }
-
-    if( ! foreground ) {
-        pid_t pid = fork();
-        if(pid <= -1) {
-            std::clog << "Failed while starting the program in daemon mode\n";
-            exit(1);
+  ngrt4n::checkUser();
+  ngrt4n::initApp();
+  authChain = ngrt4n::getPassChain();
+  std::clog << getVersionMsg(progName)
+            << "\nStarting...\n";
+  if(!foreground) {
+      pid_t pid = fork();
+      if(pid <= -1) {
+          std::clog << "Failed while starting the program in daemon mode\n";
+          exit(1);
         }
-        else if(pid > 0) {
-            exit (0);
+      else if(pid > 0) {
+          exit (0);
         }
-        setsid();
+      setsid();
     }
 
 
-    std::ostringstream uri;
-    uri << "tcp://*:" << port ;
-    Socket socket(ZMQ_REP);
-    socket.bind(uri.str());
+  std::ostringstream uri;
+  uri << "tcp://0.0.0.0:" << port;
+  Socket socket(ZMQ_REP);
+  socket.bind(uri.str());
 
-    if(foreground) {
-        std::cerr << "Listening address => " << uri.str()
-             << "\nNagios status file => " << statusFile
-             << "\n============>started\n";
-    } else {
-        std::clog << "Listening address => " << uri.str()
-             << "\nNagios status file => " << statusFile
-             << "\n============>started\n";
-    }
-
-    MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
-    while (true) {
-        std::string msg = socket.recv();
-        std::string reply;
-        if(msg == "PING") {
-            reply = "ALIVE:"+packageVersion;
+  std::clog << "Listening address => "<<uri.str()
+            << "\nNagios status file => "<<statusFile
+            << "\n============>started\n";
+  MonitorBroker* monitor = new MonitorBroker( statusFile );
+  while (true) {
+      std::string msg = socket.recv();
+      std::string reply;
+      if(msg == "PING") {
+          reply = "ALIVE:"+packageVersion;
         } else {
-            size_t pos = msg.find(":") ;
-            std::string pass = "";
-            std::string sid = "";
-            if(pos != std::string::npos) {
-                pass = msg.substr(0, pos);
-                sid = msg.substr(pos+1, std::string::npos);
+          size_t pos = msg.find(":");
+          std::string pass = "";
+          std::string sid = "";
+          if(pos != std::string::npos) {
+              pass = msg.substr(0, pos);
+              sid = msg.substr(pos+1, std::string::npos);
             }
-            if(pass == authChain) {
-                reply = monitor->getInfOfService(sid) ;
+          if(pass == authChain) {
+              reply = monitor->getInfOfService(sid);
             } else {
-                reply = "{\"return_code\" : \"-2\", \"message\" : \"Authentication failed\"}";
+              reply = "{\"return_code\" : \"-2\", \"message\" : \"Authentication failed\"}";
             }
         }
-        socket.send(reply);
+      socket.send(reply);
     }
 
-    socket.disconnect();
+  socket.disconnect();
 
-    return 0;
+  return 0;
 }
