@@ -901,17 +901,19 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
 void SvNavigator::updateSystemTray(const NodeT& _node)
 {
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-  if (_node.criticity == MonitorBroker::CRITICITY_HIGH ||
-      _node.criticity == MonitorBroker::CRITICITY_UNKNOWN) {
+  if (_node.criticity == MonitorBroker::CRITICITY_HIGH || _node.criticity == MonitorBroker::CRITICITY_UNKNOWN) {
       icon = QSystemTrayIcon::Critical;
-    } else if (_node.criticity == MonitorBroker::CRITICITY_MINOR ||
-               _node.criticity == MonitorBroker::CRITICITY_MAJOR) {
+    } else if (_node.criticity == MonitorBroker::CRITICITY_MINOR || _node.criticity == MonitorBroker::CRITICITY_MAJOR) {
       icon = QSystemTrayIcon::Warning;
     }
-  qint32 countPb = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL];
+  qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL];
   QString title = appName%" - "%_node.name;
-  QString msg = tr("%1 Problem(s)\n"
-                   "Platform Criticity: %2").arg(countPb).arg(utils::criticityToText(_node.criticity).toUpper());
+  QString msg = tr("%1 Problem%2\n"
+                   "Platform Criticity: %3")
+      .arg(pbCount)
+      .arg(pbCount>1?tr("s"):"")
+      .arg(utils::criticityToText(_node.criticity).toUpper());
+
   mtrayIcon->showMessage(title, msg, icon);
   mtrayIcon->setToolTip(title%"\n"%msg);
 }
