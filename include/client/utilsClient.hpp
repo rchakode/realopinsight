@@ -35,7 +35,7 @@ namespace utils {
   inline std::string getCtime(const quint32& tt){
     return QDateTime::fromTime_t(tt).toString().toStdString();}
   inline void alert(const QString & msg) {
-    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);}
+    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(AppName), msg, QMessageBox::Yes);}
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
   QString getAbsolutePath(const QString& _path);

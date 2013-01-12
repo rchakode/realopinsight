@@ -30,15 +30,15 @@
 #include <QtWebKit>
 #include <QSettings>
 
-const QString PROJECT = "NGRT4N";
-const QString USER_BASE_NAME = BUILTIN_USER_PREFIX;
-const QString projectName = PROJECT;
-const QString appName = APPLICATION_NAME;
+const QString Project = "NGRT4N";
+const QString UserBasename = BUILTIN_USER_PREFIX;
+const QString ProjectName = Project;
+const QString AppName = APPLICATION_NAME;
 const QString packageName = PACKAGE_NAME;
-const QString packageVersion = PACKAGE_VERSION;
-const QString packageUrl = PACKAGE_URL;
-const QString releaseYear = RELEASE_YEAR;
-const QString releaseName = RELEASE_NAME;
+const QString PackageVersion = PACKAGE_VERSION;
+const QString PackageUrl = PACKAGE_URL;
+const QString ReleaseYear = RELEASE_YEAR;
+const QString ReleaseName = RELEASE_NAME;
 
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem  *> CheckItemList;
@@ -77,22 +77,12 @@ public:
     HighCriticity = 0,
     WeightedCriticity = 1
   };
-
-  static QString toString(CalcRulesT rule) {
-    return QString::number(rule);
-  }
-
-  static QString label(qint32 rule) {
-    return label(static_cast<CalcRulesT>(rule));
-  }
-
+  static QString toString(CalcRulesT rule) { return QString::number(rule);}
+  static QString label(qint32 rule) { return label(static_cast<CalcRulesT>(rule));}
   static QString label(CalcRulesT rule) {
-    if (rule == WeightedCriticity)
-      return QObject::tr("Weighted Criticity");
-    return QObject::tr("High Criticity");
-  }
+    if (rule == WeightedCriticity) return QObject::tr("Average");
+    return QObject::tr("High Severity");}
 };
-
 
 class NodeType {
 public:

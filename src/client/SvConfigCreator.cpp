@@ -30,8 +30,8 @@ const QString SvCreator::NagiosCompatibleFormat="Nagios specific format(*.nag.ng
 const QString SvCreator::ZabbixCompatibleFormat="Zabbix specific format(*.zbx.ngrt4n.xml)";
 const QString SvCreator::ZenossCompatibleFormat="Zenoss specific format(*.zns.ngrt4n.xml)"; //FIXME: test this extention
 
-SvCreator::SvCreator(const qint32& _user_role)
-  : muserRole (_user_role),
+SvCreator::SvCreator(const qint32& _userRole)
+  : muserRole (_userRole),
     mhasLeftUpdates (false),
     mactiveFile(""),
     mselectedNode(""),
@@ -48,6 +48,7 @@ SvCreator::SvCreator(const qint32& _user_role)
   mainSplitter->addWidget(meditor);
   setCentralWidget(mainSplitter);
   resize();
+  statusBar()->showMessage(tr("Open or edit a file via the File menu"));
 }
 
 SvCreator::~SvCreator()
@@ -85,12 +86,13 @@ void SvCreator::unloadMenu(void)
   delete mmenuBar;
 }
 
-void SvCreator::load(const QString& _filename)
+void SvCreator::load(const QString& _path)
 {
   loadMenu();
   addEvents();
-  loadFile(_filename);
-  setWindowTitle(tr("%1 Editor - %2").arg(appName).arg(mactiveFile));
+  loadFile(_path);
+  setWindowTitle(tr("%1 Editor - %2").arg(AppName).arg(mactiveFile));
+  statusBar()->showMessage(tr("Loaded."));
   show();
 }
 
@@ -98,7 +100,7 @@ void SvCreator::load(const QString& _filename)
 void SvCreator::open(void)
 {
   QString path = QFileDialog::getOpenFileName(this,
-                                              tr("%1 | Select a configuration file").arg(appName),
+                                              tr("%1 | Select a configuration file").arg(AppName),
                                               ".",
                                               tr("%1;;%2;;%3;;Xml files(*.xml);;All files(*)")
                                               .arg(NagiosCompatibleFormat)
@@ -125,7 +127,7 @@ void SvCreator::loadFile(const QString& _path)
 
 void SvCreator::import() {
   QString path = QFileDialog::getOpenFileName(this,
-                                              tr("Select the Status File %").arg(appName),
+                                              tr("Select the Status File %").arg(AppName),
                                               ".",
                                               tr("Data files (*.dat);;All files (*)"));
   if (path.length())
@@ -153,7 +155,7 @@ void SvCreator::newBusinessView(void)
       mactiveFile.clear();
       mselectedNode = SvNavigatorTree::RootId;
       mhasLeftUpdates = true;
-      setWindowTitle(tr("%1 Editor - unsaved document*").arg(appName));
+      setWindowTitle(tr("%1 Editor - unsaved document*").arg(AppName));
     }
 }
 
@@ -190,7 +192,7 @@ void SvCreator::deleteNode(void)
   QMessageBox msgBox;
 
   msgBox.setText(tr("Do you really want to delete the service and its sub services?"));
-  msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(appName));
+  msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(AppName));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec())
     {
@@ -254,7 +256,7 @@ void SvCreator::saveAs(void)
 {
   QString filter;
   QString path = QFileDialog::getSaveFileName(this,
-                                              tr("Select the destination file | %1").arg(appName),
+                                              tr("Select the destination file | %1").arg(AppName),
                                               mactiveFile,
                                               QString("%1;;%2;;%3;;")
                                               .arg(NagiosCompatibleFormat)
@@ -287,8 +289,8 @@ int SvCreator::treatCloseAction(const bool& _close)
   if (!mhasLeftUpdates && _close) qApp->quit();
 
   QMessageBox mbox;
-  mbox.setWindowTitle(tr("Save change? - %1").arg(appName));
-  mbox.setText(tr("The document has been modified.\nDo you want to save your changes?"));
+  mbox.setWindowTitle(tr("Save change? - %1").arg(AppName));
+  mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
 
   bool enforceClose = _close;
   int ret = 0;
@@ -362,7 +364,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
                   mcoreData->tree_items[mselectedNode]->setText(0, node->name);
                   mhasLeftUpdates = true;
                   statusBar()->showMessage(mactiveFile%"*");
-                  setWindowTitle(tr("%1 Editor - %2*").arg(appName).arg(mactiveFile));
+                  setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
                 }
             }
         } else {
@@ -374,7 +376,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
                   mcoreData->tree_items[mselectedNode]->setText(0, node->name);
                   mhasLeftUpdates = true;
                   statusBar()->showMessage(mactiveFile%"*");
-                  setWindowTitle(tr("%1 Editor - %2*").arg(appName).arg(mactiveFile));
+                  setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
                 }
             }
         }
@@ -384,7 +386,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 void SvCreator::handleShowOnlineResources(void)
 {
   QDesktopServices launcher;
-  launcher.openUrl(QUrl(packageUrl));
+  launcher.openUrl(QUrl(PackageUrl));
 }
 
 void SvCreator::handleShowAbout(void)
@@ -401,7 +403,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem * _item)
           mcoreData->tree_items[mselectedNode]->setText(0, node->name);
           mhasLeftUpdates = true;
           statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(appName).arg(mactiveFile));
+          setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
         }
     }
   mselectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
@@ -418,7 +420,7 @@ void SvCreator::handleReturnPressed(void)
           mcoreData->tree_items[mselectedNode]->setText(0, node->name);
           mhasLeftUpdates = true;
           statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(appName).arg(mactiveFile));
+          setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
         }
     }
 }
@@ -461,7 +463,7 @@ void SvCreator::recordData(const QString& _path)
   statusBar()->clearMessage();
   mactiveFile = utils::getAbsolutePath(_path);
   statusBar()->showMessage(tr("saved %1").arg(mactiveFile));
-  setWindowTitle(tr("%1 Editor - %2").arg(appName).arg(mactiveFile));
+  setWindowTitle(tr("%1 Editor - %2").arg(AppName).arg(mactiveFile));
 }
 
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
@@ -504,7 +506,7 @@ void SvCreator::loadMenu(void)
   mmenuList["MENU2"] = mmenuBar->addMenu(tr("&Help")),
       msubMenuList["ShowOnlineResources"] = mmenuList["MENU2"]->addAction(tr("Online &Resources"));
   mmenuList["MENU2"]->addSeparator(),
-      msubMenuList["ShowAbout"] = mmenuList["MENU2"]->addAction(tr("&About %1").arg(appName));
+      msubMenuList["ShowAbout"] = mmenuList["MENU2"]->addAction(tr("&About %1").arg(AppName));
   msubMenuList["NewFile"]->setShortcut(QKeySequence::New);
   msubMenuList["Open"]->setShortcut(QKeySequence::Open);
   msubMenuList["Save"]->setShortcut(QKeySequence::Save);

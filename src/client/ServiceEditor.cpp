@@ -43,7 +43,7 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
   editorItemsList["iconNameLabel"] = new QLabel(tr("Icon"));
   editorItemsList[ICON_FIELD] = new QComboBox();
 
-  editorItemsList["priorityLabel"] = new QLabel(tr("Status Handling"));
+  editorItemsList["priorityLabel"] = new QLabel(tr("Severity Handling"));
   editorItemsList[STATUS_CALC_RULE_FIELD] = new QComboBox();
   editorItemsList[STATUS_PROP_RULE_FIELD] = new QComboBox();
 

@@ -81,7 +81,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     switch (_action)
     {
     case Preferences::ChangeMonitoringSettings:
-        setWindowTitle(tr("Monitoring Settings | %1").arg(appName));
+        setWindowTitle(tr("Monitoring Settings | %1").arg(AppName));
         line++,
                 layout->addWidget(new QLabel(tr("Web Interface*")), line, 0),
                 layout->addWidget(monitorHomeField, line, 1, 1, 4);
@@ -109,7 +109,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
         layout->setColumnStretch(1, 6);
         layout->setColumnStretch(2, 0);
         layout->setColumnStretch(3, 1);
-        if(_userRole == Auth::OP_USER_ROLE) {
+        if(_userRole == Auth::OpUserRole) {
             monitorHomeField->setEnabled(false);
             bBrowse->setEnabled(false);
             updateIntervalField->setEnabled(false);
@@ -123,7 +123,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
 
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
-        setWindowTitle(tr("Change Password| %1").arg(appName));
+        setWindowTitle(tr("Change Password| %1").arg(AppName));
         line++,
                 layout->addWidget(new QLabel(tr("Current Password")), line, 0),
                 layout->addWidget(oldPasswdField, line, 1, 1, 2);
@@ -143,12 +143,12 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
         break;
 
     case Preferences::ShowAbout:
-        setWindowTitle(tr("About %1").arg(appName));
-        QString about = AboutPattern.arg(appName)
-                .arg(packageVersion)
-                .arg(releaseName)
-                .arg(releaseYear)
-                .arg(packageUrl);
+        setWindowTitle(tr("About %1").arg(AppName));
+        QString about = AboutPattern.arg(AppName)
+                .arg(PackageVersion)
+                .arg(ReleaseName)
+                .arg(ReleaseYear)
+                .arg(PackageUrl);
 
                 line++,
                 layout->addWidget(new QLabel(about), line, 0, 1, 2);
@@ -211,7 +211,7 @@ void Preferences::changePasswd(void)
 {
     QString userPasswd, passwd, newPasswd, renewPasswd, key;
 
-    if (userRole == Auth::ADM_USER_ROLE) {
+    if (userRole == Auth::AdmUserRole) {
         key = ADM_PASSWD_KEY;
         userPasswd = settings->value(key).toString();
     } else {
@@ -226,7 +226,7 @@ void Preferences::changePasswd(void)
         if(newPasswd == renewPasswd) {
             settings->setKeyValue(key, newPasswd);
             QMessageBox::information(this,
-                                     appName,
+                                     AppName,
                                      tr("Password updated"),
                                      QMessageBox::Ok);
 

@@ -52,7 +52,7 @@ class Preferences : public QDialog
   Q_OBJECT
 
 public:
-  Preferences(const qint32 & _userRole = Auth::OP_USER_ROLE, const qint32 & _action = Preferences::ChangePassword);
+  Preferences(const qint32 & _userRole = Auth::OpUserRole, const qint32 & _action = Preferences::ChangePassword);
   virtual ~Preferences();
   static QString style();
   static QSplashScreen* infoScreen(const QString & msg="");

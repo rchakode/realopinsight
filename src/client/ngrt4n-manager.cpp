@@ -50,17 +50,18 @@ int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
-  app->setApplicationName(appName.toUpper() );
+  app->setApplicationName(AppName.toUpper() );
   app->setStyleSheet(Preferences::style());
 
   QString cmdName = basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("%1\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
-                           +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
-                           +QObject::tr("%1").arg(packageUrl).toStdString());
+  ostringstream versionMsg(QObject::tr("\n%1 %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
+                           +QObject::tr("\nCopyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+                           +QObject::tr("\nLicense GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\nFor bug reporting, see: <%1>").arg(PackageUrl).toStdString());
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
-  if ( (opt = getopt(argc, argv, "chvd:e:") ) != -1) {
+  if ((opt = getopt(argc, argv, "chvd:e:")) != -1) {
       switch (opt) {
         case 'c':
           module = "config";
@@ -86,13 +87,14 @@ int main(int argc, char **argv)
           break;
         }
     }
-  cout <<"Launching "<<versionMsg.str()<<endl;
+  cout <<versionMsg.str()
+      <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE )
+  if( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole )
     exit(1);
   if(module == "dashboard") {
-      QSplashScreen* info = Preferences::infoScreen(QObject::tr("Loading...\n\n%1")
+      QSplashScreen* info = Preferences::infoScreen(QObject::tr("%1\nLoading...")
                                                     .arg(QString::fromStdString(versionMsg.str())));
       utils::delay(1);
       if(file == "") {
@@ -100,7 +102,7 @@ int main(int argc, char **argv)
           info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
           utils::delay(1); info->finish(0);
           file = QFileDialog::getOpenFileName(0,
-                                              QObject::tr("%1 | Select a configuration file").arg(appName),
+                                              QObject::tr("%1 | Select a configuration file").arg(AppName),
                                               ".",
                                               QObject::tr("Xml files (*.xml);;All files (*)"));
 

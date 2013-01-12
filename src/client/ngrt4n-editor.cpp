@@ -37,16 +37,17 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 
 int main(int argc, char **argv)
 {
-  //FIXME: test ngrt4n-oc
+  //FIXME: test ngrt4n-editor
   QApplication* app = new QApplication(argc, argv);
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
-  app->setApplicationName(appName);
+  app->setApplicationName(AppName);
   app->setStyleSheet(Preferences::style());
 
   QString cmdName= basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("%1 Editor\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
-                           +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
-                           +QObject::tr("%1").arg(packageUrl).toStdString());
+  ostringstream versionMsg(QObject::tr("%1 Editor %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
+                           +QObject::tr("\nCopyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+                           +QObject::tr("\nLicense GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\nFor bug reporting, see: <%1>").arg(PackageUrl).toStdString());
 
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
@@ -66,10 +67,11 @@ int main(int argc, char **argv)
           break;
         }
     }
-  cout <<QObject::tr("Launching").toStdString()<< " "<<versionMsg.str()<<endl;
+  cout <<versionMsg.str()
+      <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 );
+  if( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole ) exit( 1 );
 
   SvCreator* svc = new SvCreator(userRole);
   svc->load(file);

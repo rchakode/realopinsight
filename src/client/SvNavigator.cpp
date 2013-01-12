@@ -37,8 +37,8 @@
 #include <locale>
 #include <memory>
 
-const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nCriticity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
-const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
+const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck: %7\nCheck Output: %8\nMore info: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const QString ID_PATTERN("%1/%2");
@@ -93,7 +93,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mlastError(""),
     mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png")))
 {
-  setWindowTitle(tr("%1 Operations Console").arg(appName));
+  setWindowTitle(tr("%1 Operations Console").arg(AppName));
   loadMenus();
   mviewPanel->addTab(mmap, tr("Dashboard"));
   mviewPanel->addTab(mbrowser, tr("Native Web UI"));
@@ -152,7 +152,7 @@ void SvNavigator::loadMenus(void)
   mmenus["HELP"] = menuBar->addMenu("&Help"),
       msubMenus["ShowOnlineResources"] = mmenus["HELP"]->addAction(tr("Online &Resources")),
       mmenus["HELP"]->addSeparator(),
-      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(appName));
+      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(AppName));
   msubMenus["Capture"]->setShortcut(QKeySequence::Save);
   msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh);
   msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
@@ -229,7 +229,7 @@ void SvNavigator::load(const QString& _file)
   if (!_file.isEmpty())
     mconfigFile = utils::getAbsolutePath(_file);
   mactiveFile = mconfigFile;
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(mconfigFile));
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(AppName).arg(mconfigFile));
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
@@ -240,7 +240,7 @@ void SvNavigator::load(const QString& _file)
   QMainWindow::show();
   mmap->scaleToFitViewPort();
   mtrayIcon->show();
-  mtrayIcon->setToolTip(appName);
+  mtrayIcon->setToolTip(AppName);
 }
 
 void SvNavigator::unloadMenus(void)
@@ -556,7 +556,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
   if (utils::findNode(mcoreData, mselectedNode, node)) {
       filterNodeRelatedMsg(mselectedNode);
       QString title = tr("Messages related to '%2' - %1")
-          .arg(appName)
+          .arg(AppName)
           .arg(node->name);
       mfilteredMsgPanel->updateColumnWidths(mmsgConsoleSize, true);
       mfilteredMsgPanel->setWindowTitle(title);
@@ -764,8 +764,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           QScriptValueIterator components(result.property("data"));
           while(components.hasNext()) {
               components.next();
-              if (components.flags()&QScriptValue::SkipInEnumeration)
-                continue;
+              if (components.flags()&QScriptValue::SkipInEnumeration) continue;
+
               MonitorBroker::CheckT check;
               QScriptValue item = components.value();
               QString name = item.property("name").toString();
@@ -779,7 +779,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               QString severity =item.property("severity").toString();
               if (severity.toLower().compare("clear") == 0) {
                   check.status = MonitorBroker::ZenossClear;
-                  check.alarm_msg = "Up";
+                  check.alarm_msg = tr("%1 is Up").arg(name).toStdString();
                 } else {
                   check.status = item.property("failSeverity").toInt32();
                   check.alarm_msg = item.property("status").toString().toStdString();
@@ -907,9 +907,9 @@ void SvNavigator::updateSystemTray(const NodeT& _node)
       icon = QSystemTrayIcon::Warning;
     }
   qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
-  QString title = appName%" - "%_node.name;
-  QString msg = tr("%1 Problem%2\n"
-                   "Platform Criticity: %3")
+  QString title = AppName%" - "%_node.name;
+  QString msg = tr(" - %1 Problem%2\n"
+                   " - Platform Severity: %3")
       .arg(pbCount)
       .arg(pbCount>1?tr("s"):"")
       .arg(utils::criticityToText(_node.criticity).toUpper());

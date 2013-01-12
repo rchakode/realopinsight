@@ -41,11 +41,11 @@ public:
   static const QString ZabbixCompatibleFormat;
   static const QString ZenossCompatibleFormat;
 
-  SvCreator(const qint32& _user_role = Auth::OP_USER_ROLE);
+  SvCreator(const qint32& _userRole = Auth::OpUserRole);
   virtual ~SvCreator();
   void load( const QString&);
-  QSize minimumSizeHint() const { return QSize(796, 640);}
-  QSize sizeHint() const { return QSize(796, 640);}
+  QSize minimumSizeHint() const {return QSize(796, 640);}
+  QSize sizeHint() const {return QSize(796, 640);}
 
 public slots:
   void newBusinessView(void);

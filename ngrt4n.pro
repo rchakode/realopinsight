@@ -7,8 +7,8 @@ config-dist{
 SOURCES	+=
 TARGET = RealOpInsight
 }
-config-default{
-SOURCES	+=
+config-manager{
+SOURCES	+= src/client/ngrt4n-manager.cpp
 TARGET = ngrt4n-manager
 }
 config-oc{
@@ -88,8 +88,7 @@ SOURCES	+= \
     src/client/utilsClient.cpp \
     src/core/utilsCore.cpp \
     src/client/Chart.cpp \
-    src/client/MsgConsole.cpp \
-    src/client/ngrt4n-manager.cpp
+    src/client/MsgConsole.cpp
 
 
 TRANSLATIONS = ngrt4n_en.ts

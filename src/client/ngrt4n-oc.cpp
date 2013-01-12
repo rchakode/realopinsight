@@ -25,6 +25,7 @@
 #include "client/Auth.hpp"
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
+#include "client/utilsClient.hpp"
 #include <sstream>
 #include <getopt.h>
 #include <QObject>
@@ -40,16 +41,16 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 
 int main(int argc, char **argv)
 {
-  //FIXME: test ngrt4n-oc
   QApplication* app = new QApplication(argc, argv);
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
-  app->setApplicationName(appName);
+  app->setApplicationName(AppName);
   app->setStyleSheet(Preferences::style());
 
   QString cmdName = basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("%1 Operations Console\nVersion %2 (%3)\n").arg(appName).arg(packageVersion).arg(releaseName).toStdString()
-                           +QObject::tr("Copyright (c) 2010-%1 by NGRT4N Project. All rights reserved.\n").arg(releaseYear).toStdString()
-                           +QObject::tr("%1").arg(packageUrl).toStdString());
+  ostringstream versionMsg(QObject::tr("%1 Operations Console %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
+                           +QObject::tr("\nCopyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+                           +QObject::tr("\nLicense GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\nFor bug reporting, see: <%1>").arg(PackageUrl).toStdString());
 
   bool config = false;
   int opt;
@@ -73,10 +74,11 @@ int main(int argc, char **argv)
           break;
         }
     }
-  cout <<"Launching "<<versionMsg.str()<<endl;
+  cout <<versionMsg.str()
+      <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit(1);
+  if( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole ) exit(1);
 
   if( config ) {
       Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
@@ -86,7 +88,7 @@ int main(int argc, char **argv)
       exit(0);
     }
 
-  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("Loading...\n\n%1"))
+  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("%1\n\nLoading..."))
                                                 .arg(QString::fromStdString(versionMsg.str())));
   utils::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
@@ -96,7 +98,7 @@ int main(int argc, char **argv)
                         Qt::AlignCenter|Qt::AlignCenter);
       utils::delay(1); info->finish(0);
       file = QFileDialog::getOpenFileName(0,
-                                          QObject::tr("%1 | Select a configuration file").arg(appName),
+                                          QObject::tr("%1 | Select a configuration file").arg(AppName),
                                           ".",
                                           QObject::tr("Xml files (*.xml);;All files (*)"));
 

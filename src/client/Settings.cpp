@@ -30,7 +30,7 @@
 #include "core/ns.hpp"
 #include <QtScript/QScriptEngine>
 
-Settings::Settings(): QSettings(PROJECT.toLower(), appName.toLower().replace(" ", "-"))
+Settings::Settings(): QSettings(Project.toLower(), AppName.toLower().replace(" ", "-"))
 {
   Q_INIT_RESOURCE(ngrt4n);
   QString updateInterval = value(Preferences::UPDATE_INTERVAL_KEY).toString();
@@ -55,17 +55,17 @@ Settings::Settings(): QSettings(PROJECT.toLower(), appName.toLower().replace(" "
       setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");
     }
   if ( admUser.isEmpty() ) {
-      setValue(Preferences::ADM_UNSERNAME_KEY, Auth::ADM_USER_NAME);
+      setValue(Preferences::ADM_UNSERNAME_KEY, Auth::AdmUser);
     }
   if ( admPasswd.isEmpty() ) {
-      QString passwd = QCryptographicHash::hash(Auth::ADM_USER_NAME.toAscii(), QCryptographicHash::Md5) ;
+      QString passwd = QCryptographicHash::hash(Auth::AdmUser.toAscii(), QCryptographicHash::Md5) ;
       setValue(Preferences::ADM_PASSWD_KEY, passwd );
     }
   if ( opUser.isEmpty() ) {
-      setValue(Preferences::OP_UNSERNAME_KEY, Auth::OP_USER_NAME);
+      setValue(Preferences::OP_UNSERNAME_KEY, Auth::OpUser);
     }
   if ( opPasswd.isEmpty() ) {
-      QString passwd = QCryptographicHash::hash(Auth::OP_USER_NAME.toAscii(), QCryptographicHash::Md5) ;
+      QString passwd = QCryptographicHash::hash(Auth::OpUser.toAscii(), QCryptographicHash::Md5) ;
       setValue(Preferences::OP_PASSWD_KEY, passwd);
     }
   translator = new QTranslator();

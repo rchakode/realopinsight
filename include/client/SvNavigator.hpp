@@ -45,7 +45,7 @@ class SvNavigator : public QMainWindow
   Q_OBJECT
 
 public:
-  SvNavigator(const qint32& _userRole = Auth::OP_USER_ROLE,
+  SvNavigator(const qint32& _userRole = Auth::OpUserRole,
               const QString& _config = "",
               QWidget* = 0);
   virtual ~SvNavigator();
