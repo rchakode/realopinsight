@@ -35,9 +35,9 @@ class ZnsHelper : public QNetworkAccessManager {
 
 public:
   enum RequesT{
-    LOGIN = 1,
-    COMPONENT = 2,
-    DEVICE = 3
+    Login = 1,
+    Component = 2,
+    Device = 3
   };
   const static RequestListT ReQPatterns;
   const static RequestListT ContentTypes;

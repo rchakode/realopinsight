@@ -48,12 +48,12 @@ void ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
 
 void ZbxHelper::setRequestsPatterns()
 {
-  mrequestsPatterns[LOGIN] = "{\"jsonrpc\": \"2.0\", \
+  mrequestsPatterns[Login] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": null, \
       \"method\": \"user.login\", \
       \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
       \"id\": %9}";
-  mrequestsPatterns[TRIGGER] = "{\"jsonrpc\": \"2.0\", \
+  mrequestsPatterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
@@ -63,7 +63,7 @@ void ZbxHelper::setRequestsPatterns()
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
       \"limit\": -1}, \
       \"id\": %9}";
-  mrequestsPatterns[LOGOUT] = "{\"jsonrpc\": \"2.0\", \
+  mrequestsPatterns[Logout] = "{\"jsonrpc\": \"2.0\", \
       \"method\": \"user.logout\", \
       \"params\": {\"sessionid\": \"%1\"}, \
       \"auth\": \"%1\", \

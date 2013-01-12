@@ -105,7 +105,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 3)->setText(_node.name);
   mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
 
-  if(_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
+  if(_node.criticity == MonitorBroker::CriticityNormal) {
       itemText = (_node.notification_msg.trimmed().length() != 0)?
             _node.notification_msg:QString(_node.check.alarm_msg.c_str());
       mmodel->item(index, 0)->setBackground(Qt::transparent);
@@ -114,7 +114,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
       mmodel->item(index, 4)->setBackground(Qt::transparent);
     } else {
       itemText = (_node.alarm_msg.trimmed().length() &&
-                  _node.criticity != MonitorBroker::CRITICITY_UNKNOWN)?
+                  _node.criticity != MonitorBroker::CriticityUnknown)?
             _node.alarm_msg: QString(_node.check.alarm_msg.c_str());
       mmodel->item(index, 0)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
       mmodel->item(index, 2)->setBackground(StatsLegend::HIGHLIGHT_COLOR);

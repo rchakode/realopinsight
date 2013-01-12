@@ -196,7 +196,7 @@ void Preferences::applySettings(void)
     settings->setValue(URL_KEY, nagios_home);
     settings->setValue(UPDATE_INTERVAL_KEY, updateIntervalField->text());
     settings->setValue(SERVER_ADDR_KEY, serverAddrField->text());
-    if(serverPortField->text().toInt() <= 0) serverPortField->setText(QString::number(MonitorBroker::DEFAULT_PORT));
+    if(serverPortField->text().toInt() <= 0) serverPortField->setText(QString::number(MonitorBroker::DefaultPort));
     settings->setValue(SERVER_PORT_KEY, serverPortField->text());
     settings->setValue(SERVER_PASS_KEY, serverPassField->text());
     settings->sync();

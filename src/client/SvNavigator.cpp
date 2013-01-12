@@ -203,11 +203,11 @@ void SvNavigator::startMonitor()
 {
   prepareDashboardUpdate();
   switch(mcoreData->monitor) {
-    case MonitorBroker::ZENOSS:
-    case MonitorBroker::ZABBIX:
+    case MonitorBroker::Zenoss:
+    case MonitorBroker::Zabbix:
       !misLogged ? openRpcSession(): postRpcDataRequest();
       break;
-    case MonitorBroker::NAGIOS:
+    case MonitorBroker::Nagios:
     default:
       runNagiosMonitor();
       break;
@@ -297,7 +297,7 @@ int SvNavigator::runNagiosMonitor(void)
 
   for (auto& cnode : mcoreData->cnodes) {
       if (cnode.child_nodes == "") {
-          cnode.criticity = MonitorBroker::CRITICITY_UNKNOWN;
+          cnode.criticity = MonitorBroker::CriticityUnknown;
           mcoreData->check_status_count[cnode.criticity]++;
           continue;
         }
@@ -321,7 +321,7 @@ int SvNavigator::runNagiosMonitor(void)
               cnode.check.check_command = jsHelper.getProperty("command").toString().toStdString();
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-              cnode.check.status = MonitorBroker::NAGIOS_UNKNOWN;
+              cnode.check.status = MonitorBroker::NagiosUnknown;
               cnode.check.host = "Unknown";
               cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
               cnode.check.check_command = "Unknown";
@@ -341,22 +341,22 @@ int SvNavigator::runNagiosMonitor(void)
 void SvNavigator::prepareDashboardUpdate(void)
 {
   QMainWindow::setEnabled(false);
-  mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL] = 0;
-  mcoreData->check_status_count[MonitorBroker::CRITICITY_MINOR] = 0;
-  mcoreData->check_status_count[MonitorBroker::CRITICITY_MAJOR] = 0;
-  mcoreData->check_status_count[MonitorBroker::CRITICITY_HIGH] = 0;
-  mcoreData->check_status_count[MonitorBroker::CRITICITY_UNKNOWN] = 0;
+  mcoreData->check_status_count[MonitorBroker::CriticityNormal] = 0;
+  mcoreData->check_status_count[MonitorBroker::CriticityMinor] = 0;
+  mcoreData->check_status_count[MonitorBroker::CriticityMajor] = 0;
+  mcoreData->check_status_count[MonitorBroker::CriticityHigh] = 0;
+  mcoreData->check_status_count[MonitorBroker::CriticityUnknown] = 0;
   mhostLeft = mcoreData->hosts.size();
   mupdateSucceed = true;
   QString msg = QObject::tr("Connecting to the server (%1)...");
   switch(mcoreData->monitor) {
-    case MonitorBroker::NAGIOS:
+    case MonitorBroker::Nagios:
       msg = msg.arg(mserverUrl);
       break;
-    case MonitorBroker::ZABBIX:
+    case MonitorBroker::Zabbix:
       msg = msg.arg(mzbxHelper->getApiUri());
       break;
-    case MonitorBroker::ZENOSS:
+    case MonitorBroker::Zenoss:
       msg = msg.arg(mznsHelper->getApiBaseUrl()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
       break;
     default:
@@ -375,7 +375,7 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
 
   if (_node.type == NodeType::ALARM_NODE) {
       QString msg = "";
-      if (_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
+      if (_node.criticity == MonitorBroker::CriticityNormal) {
           msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
         } else {
           msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
@@ -424,7 +424,7 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       mmsgConsole->sortByColumn(1, Qt::AscendingOrder);
       mmsgConsole->updateColumnWidths(mmsgConsoleSize);
       mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
-      mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DEFAULT_UPDATE_INTERVAL);
+      mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DefaultUpdateInterval);
       mtimer = startTimer(mupdateInterval);
       if (mupdateSucceed) updateStatusBar(tr("Update completed"));
     }
@@ -440,7 +440,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
 {
   _node.criticity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_criticity = utils::computePropCriticity(_node.criticity, _node.criticity_prule);
-  QString statusText = (_node.criticity == MonitorBroker::CRITICITY_NORMAL)? _node.notification_msg : _node.alarm_msg;
+  QString statusText = (_node.criticity == MonitorBroker::CriticityNormal)? _node.notification_msg : _node.alarm_msg;
   QRegExp regexp(MsgConsole::TAG_HOSTNAME);
   statusText.replace(regexp, _node.check.host.c_str());
 
@@ -449,21 +449,21 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
       regexp.setPattern(MsgConsole::TAG_CHECK);
       statusText.replace(regexp, info[1]);
     }
-  if (mcoreData->monitor == MonitorBroker::NAGIOS) { // FIXME: Generalize this to the other monitors
+  if (mcoreData->monitor == MonitorBroker::Nagios) { // FIXME: Generalize this to the other monitors
       info = QString(_node.check.check_command.c_str()).split("!");
       if (info.length() >= 3) {
           regexp.setPattern(MsgConsole::TAG_THERESHOLD);
           statusText.replace(regexp, info[1]);
-          if (_node.criticity == MonitorBroker::CRITICITY_MAJOR)
+          if (_node.criticity == MonitorBroker::CriticityMajor)
             statusText.replace(regexp, info[2]);
         }
     }
-  if (mcoreData->monitor == MonitorBroker::ZABBIX) {
+  if (mcoreData->monitor == MonitorBroker::Zabbix) {
       regexp.setPattern(MsgConsole::TAG_HOSTNAME_ZABBIX); //FIXME: do it only for Zabbix
       statusText.replace(regexp, _node.check.host.c_str());
       _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
     }
-  if (_node.criticity == MonitorBroker::CRITICITY_NORMAL) {
+  if (_node.criticity == MonitorBroker::CriticityNormal) {
       _node.notification_msg = statusText;
     } else {
       _node.alarm_msg = statusText;
@@ -527,7 +527,7 @@ void SvNavigator::updateMonitoringSettings() {
   mserverPort = msettings->value(Preferences::SERVER_PORT_KEY).toString();
   mserverUrl = QString("tcp://%1:%2").arg(mserverAddr).arg(mserverPort);
   mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
-  if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000;
+  if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DefaultUpdateInterval * 1000;
 }
 
 void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
@@ -651,8 +651,8 @@ void SvNavigator::closeRpcSession(void)
 {
   QStringList params;
   params.push_back(mzbxAuthToken);
-  params.push_back(QString::number(ZbxHelper::LOGOUT));
-  mzbxHelper->postRequest(ZbxHelper::LOGOUT, params);
+  params.push_back(QString::number(ZbxHelper::Logout));
+  mzbxHelper->postRequest(ZbxHelper::Logout, params);
 }
 
 void SvNavigator::processZbxReply(QNetworkReply* _reply)
@@ -667,12 +667,12 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
   JsonHelper jsHelper(data.toStdString());
   qint32 transaction = jsHelper.getProperty("id").toInt32();
   switch(transaction) {
-    case ZbxHelper::LOGIN :
+    case ZbxHelper::Login :
       mzbxAuthToken = jsHelper.getProperty("result").toString();
       if (!mzbxAuthToken.isEmpty()) misLogged = true;
       postRpcDataRequest();
       break;
-    case ZbxHelper::TRIGGER: {
+    case ZbxHelper::Trigger: {
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next();
@@ -682,7 +682,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             QString triggerName = triggerData.property("description").toString();
             check.check_command = triggerName.toStdString();
             check.status = triggerData.property("value").toInt32();
-            if (check.status == MonitorBroker::ZABBIX_CLEAR) {
+            if (check.status == MonitorBroker::ZabbixClear) {
                 check.alarm_msg = "OK ("+triggerName.toStdString()+")";
               } else {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
@@ -746,7 +746,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           updateDashboardOnUnknown(msg);
           return;
         }
-      if (transaction == ZnsHelper::DEVICE) {
+      if (transaction == ZnsHelper::Device) {
           QScriptValueIterator devices(result.property("devices"));
           while(devices.hasNext()) {
               devices.next();
@@ -754,13 +754,13 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                 continue;
               QScriptValue item = devices.value();
               QString uid = item.property("uid").toString();
-              mznsHelper->postRequest(ZnsHelper::COMPONENT,
-                                      ZnsHelper::ReQPatterns[ZnsHelper::COMPONENT]
+              mznsHelper->postRequest(ZnsHelper::Component,
+                                      ZnsHelper::ReQPatterns[ZnsHelper::Component]
                                       .arg(uid)
-                                      .arg(ZnsHelper::COMPONENT)
+                                      .arg(ZnsHelper::Component)
                                       .toAscii());
             }
-        } else if (transaction == ZnsHelper::COMPONENT) {
+        } else if (transaction == ZnsHelper::Component) {
           QScriptValueIterator components(result.property("data"));
           while(components.hasNext()) {
               components.next();
@@ -778,7 +778,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                                                         "yyyy/MM/dd hh:mm:ss");
               QString severity =item.property("severity").toString();
               if (severity.toLower().compare("clear") == 0) {
-                  check.status = MonitorBroker::ZENOSS_CLEAR;
+                  check.status = MonitorBroker::ZenossClear;
                   check.alarm_msg = "Up";
                 } else {
                   check.status = item.property("failSeverity").toInt32();
@@ -814,18 +814,18 @@ void SvNavigator::openRpcSession(void)
   if (authParams.size() == 2) {
       QUrl znsUrlParams;
       switch(mcoreData->monitor) {
-        case MonitorBroker::ZABBIX:
+        case MonitorBroker::Zabbix:
           mzbxHelper->setBaseUrl(mmonitorBaseUrl);
-          authParams.push_back(QString::number(ZbxHelper::LOGIN));
-          mzbxHelper->postRequest(ZbxHelper::LOGIN, authParams);
+          authParams.push_back(QString::number(ZbxHelper::Login));
+          mzbxHelper->postRequest(ZbxHelper::Login, authParams);
           break;
-        case MonitorBroker::ZENOSS:
+        case MonitorBroker::Zenoss:
           mznsHelper->setBaseUrl(mmonitorBaseUrl);
           znsUrlParams.addQueryItem("__ac_name", authParams[0]);
           znsUrlParams.addQueryItem("__ac_password", authParams[1]);
           znsUrlParams.addQueryItem("submitted", "true");
           znsUrlParams.addQueryItem("came_from", mznsHelper->getApiContextUrl());
-          mznsHelper->postRequest(ZnsHelper::LOGIN, znsUrlParams.encodedQuery());
+          mznsHelper->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
           break;
         default:
           break;
@@ -839,22 +839,22 @@ void SvNavigator::openRpcSession(void)
 void SvNavigator::postRpcDataRequest(void) {
   updateStatusBar(tr("Updating..."));
   switch(mcoreData->monitor) {
-    case MonitorBroker::ZABBIX:
+    case MonitorBroker::Zabbix:
       for (auto host : mcoreData->hosts.keys()) {
           QStringList params;
           params.push_back(mzbxAuthToken);
           params.push_back(host);
-          params.push_back(QString::number(ZbxHelper::TRIGGER));
-          mzbxHelper->postRequest(ZbxHelper::TRIGGER, params);
+          params.push_back(QString::number(ZbxHelper::Trigger));
+          mzbxHelper->postRequest(ZbxHelper::Trigger, params);
         }
       break;
-    case MonitorBroker::ZENOSS:
-      mznsHelper->setRouter(ZnsHelper::DEVICE);
+    case MonitorBroker::Zenoss:
+      mznsHelper->setRouter(ZnsHelper::Device);
       for (auto host : mcoreData->hosts.keys()) {
-          mznsHelper->postRequest(ZnsHelper::DEVICE,
-                                  ZnsHelper::ReQPatterns[ZnsHelper::DEVICE]
+          mznsHelper->postRequest(ZnsHelper::Device,
+                                  ZnsHelper::ReQPatterns[ZnsHelper::Device]
                                   .arg(host)
-                                  .arg(ZnsHelper::DEVICE)
+                                  .arg(ZnsHelper::Device)
                                   .toAscii());
         }
       break;
@@ -866,9 +866,9 @@ void SvNavigator::postRpcDataRequest(void) {
 void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
 {
   QString apiUrl = "";
-  if (mcoreData->monitor == MonitorBroker::ZABBIX) {
+  if (mcoreData->monitor == MonitorBroker::Zabbix) {
       apiUrl = mzbxHelper->getApiUri();
-    } else if (mcoreData->monitor == MonitorBroker::ZENOSS) {
+    } else if (mcoreData->monitor == MonitorBroker::Zenoss) {
       apiUrl =  mznsHelper->getRequestUrl();
     }
   updateDashboardOnUnknown(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code)));
@@ -886,7 +886,7 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
     }
   for (auto& cnode : mcoreData->cnodes) {
       //FIXME: clean undefined services on console when the server recome on service
-      cnode.check.status = MonitorBroker::CRITICITY_UNKNOWN;
+      cnode.check.status = MonitorBroker::CriticityUnknown;
       cnode.check.host = "Unknown";
       cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
       cnode.check.check_command = "Unknown";
@@ -894,19 +894,19 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }
-  mcoreData->check_status_count[MonitorBroker::CRITICITY_UNKNOWN] = mcoreData->cnodes.size();
+  mcoreData->check_status_count[MonitorBroker::CriticityUnknown] = mcoreData->cnodes.size();
   finalizeDashboardUpdate(enable);
 }
 
 void SvNavigator::updateSystemTray(const NodeT& _node)
 {
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-  if (_node.criticity == MonitorBroker::CRITICITY_HIGH || _node.criticity == MonitorBroker::CRITICITY_UNKNOWN) {
+  if (_node.criticity == MonitorBroker::CriticityHigh || _node.criticity == MonitorBroker::CriticityUnknown) {
       icon = QSystemTrayIcon::Critical;
-    } else if (_node.criticity == MonitorBroker::CRITICITY_MINOR || _node.criticity == MonitorBroker::CRITICITY_MAJOR) {
+    } else if (_node.criticity == MonitorBroker::CriticityMinor || _node.criticity == MonitorBroker::CriticityMajor) {
       icon = QSystemTrayIcon::Warning;
     }
-  qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CRITICITY_NORMAL];
+  qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
   QString title = appName%" - "%_node.name;
   QString msg = tr("%1 Problem%2\n"
                    "Platform Criticity: %3")

@@ -140,7 +140,7 @@ void SvCreator::newBusinessView(void)
       node.id = SvNavigatorTree::ROOT_ID;
       node.name = "New Business view";
       node.child_nodes.clear();
-      node.criticity = MonitorBroker::CRITICITY_UNKNOWN;
+      node.criticity = MonitorBroker::CriticityUnknown;
       node.icon = GraphView::DEFAULT_ICON;
       node.type = NodeType::SERVICE_NODE;
       node.parent.clear();
@@ -172,7 +172,7 @@ void SvCreator::newNode(void)
   node.parent = mselectedNode;
   node.name = "sub service " + QString::number(count), count ++;
   node.type = NodeType::SERVICE_NODE;
-  node.criticity = MonitorBroker::CRITICITY_UNKNOWN;
+  node.criticity = MonitorBroker::CriticityUnknown;
   node.icon = GraphView::DEFAULT_ICON;
   node.child_nodes = "";
 
@@ -269,13 +269,13 @@ void SvCreator::saveAs(void)
     } else {
       QFileInfo fileInfo(path);
       if (filter == ZabbixCompatibleFormat) {
-          mcoreData->monitor = MonitorBroker::ZABBIX;
+          mcoreData->monitor = MonitorBroker::Zabbix;
           if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
         } else if (filter == ZenossCompatibleFormat) {
-          mcoreData->monitor = MonitorBroker::ZENOSS;
+          mcoreData->monitor = MonitorBroker::Zenoss;
           if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
         } else {
-          mcoreData->monitor = MonitorBroker::NAGIOS;
+          mcoreData->monitor = MonitorBroker::Nagios;
           if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
         }
       recordData(path);

@@ -28,9 +28,9 @@
 #include <stdlib.h>
 
 
-const int MonitorBroker::DEFAULT_PORT = 1983 ;
-const int MonitorBroker::DEFAULT_UPDATE_INTERVAL = 300 ;
-const int MonitorBroker::MAX_MSG = 512 ;
+const int MonitorBroker::DefaultPort = 1983 ;
+const int MonitorBroker::DefaultUpdateInterval = 300 ;
+const int MonitorBroker::MaxMsg = 512 ;
 
 MonitorBroker::MonitorBroker(const string & _sfile)
   : lastUpdate(0),
@@ -41,7 +41,7 @@ MonitorBroker::~MonitorBroker() {}
 string MonitorBroker::getInfOfService(const string & _sid)
 {
   long curTime = time(NULL) ;
-  if( (curTime - lastUpdate) >= DEFAULT_UPDATE_INTERVAL) {
+  if( (curTime - lastUpdate) >= DefaultUpdateInterval) {
       loadNagiosCollectedData(statusFile, services) ;
       lastUpdate = curTime ;
     }
@@ -83,7 +83,7 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _ch
           line.find("servicestatus") == string::npos ) continue ;
 
       CheckT info;
-      info.status = NAGIOS_UNKNOWN ;
+      info.status = NagiosUnknown ;
       while (getline(stFileStream, line), ! stFileStream.eof()) {
 
           size_t pos = line.find("}") ; if( pos != string::npos ) break ;

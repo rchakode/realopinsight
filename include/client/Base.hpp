@@ -114,41 +114,41 @@ public:
 class Criticity {
 
 public:
-  Criticity(MonitorBroker::CriticityT _value=MonitorBroker::CRITICITY_NORMAL): value(_value) {}
+  Criticity(MonitorBroker::CriticityT _value=MonitorBroker::CriticityNormal): value(_value) {}
   void setValue(MonitorBroker::CriticityT _value) {value = _value;}
   MonitorBroker::CriticityT getValue() const {return value;}
 
   Criticity operator *(Criticity& _criticity) const {
     switch(value) {
-      case MonitorBroker::CRITICITY_HIGH:
+      case MonitorBroker::CriticityHigh:
         return Criticity(value);
         break;
-      case MonitorBroker::CRITICITY_NORMAL:
+      case MonitorBroker::CriticityNormal:
         return _criticity;
         break;
-      case MonitorBroker::CRITICITY_MINOR:
-        if(_criticity.value == MonitorBroker::CRITICITY_HIGH ||
-           _criticity.value == MonitorBroker::CRITICITY_MAJOR ||
-           _criticity.value == MonitorBroker::CRITICITY_UNKNOWN)
+      case MonitorBroker::CriticityMinor:
+        if(_criticity.value == MonitorBroker::CriticityHigh ||
+           _criticity.value == MonitorBroker::CriticityMajor ||
+           _criticity.value == MonitorBroker::CriticityUnknown)
           return _criticity;
 
         return Criticity(value);
         break;
-      case MonitorBroker::CRITICITY_MAJOR:
-        if(_criticity.value == MonitorBroker::CRITICITY_HIGH ||
-           _criticity.value == MonitorBroker::CRITICITY_UNKNOWN)
+      case MonitorBroker::CriticityMajor:
+        if(_criticity.value == MonitorBroker::CriticityHigh ||
+           _criticity.value == MonitorBroker::CriticityUnknown)
           return _criticity;
 
         return Criticity(value);
         break;
       default:
         // MonitorBroker::CRITICITY_UNKNOWN
-        if(_criticity.value == MonitorBroker::CRITICITY_HIGH)
+        if(_criticity.value == MonitorBroker::CriticityHigh)
           return _criticity;
         break;
       }  //end switch
 
-    return Criticity(MonitorBroker::CRITICITY_UNKNOWN);
+    return Criticity(MonitorBroker::CriticityUnknown);
   }
 
 
@@ -156,33 +156,33 @@ public:
     if(value == st.value)
       return  st;
 
-    if(value == MonitorBroker::CRITICITY_HIGH ||
-       st.value == MonitorBroker::CRITICITY_HIGH)
-      return Criticity(MonitorBroker::CRITICITY_HIGH);
+    if(value == MonitorBroker::CriticityHigh ||
+       st.value == MonitorBroker::CriticityHigh)
+      return Criticity(MonitorBroker::CriticityHigh);
 
-    if(value == MonitorBroker::CRITICITY_UNKNOWN ||
-       st.value == MonitorBroker::CRITICITY_UNKNOWN)
-      return Criticity(MonitorBroker::CRITICITY_UNKNOWN);
+    if(value == MonitorBroker::CriticityUnknown ||
+       st.value == MonitorBroker::CriticityUnknown)
+      return Criticity(MonitorBroker::CriticityUnknown);
 
-    if(value == MonitorBroker::CRITICITY_MAJOR ||
-       st.value == MonitorBroker::CRITICITY_MAJOR)
-      return Criticity(MonitorBroker::CRITICITY_MAJOR);
+    if(value == MonitorBroker::CriticityMajor ||
+       st.value == MonitorBroker::CriticityMajor)
+      return Criticity(MonitorBroker::CriticityMajor);
 
-    if(value == MonitorBroker::CRITICITY_MINOR ||
-       st.value == MonitorBroker::CRITICITY_MINOR)
-      return Criticity(MonitorBroker::CRITICITY_MINOR);
+    if(value == MonitorBroker::CriticityMinor ||
+       st.value == MonitorBroker::CriticityMinor)
+      return Criticity(MonitorBroker::CriticityMinor);
 
-    return Criticity(MonitorBroker::CRITICITY_NORMAL);
+    return Criticity(MonitorBroker::CriticityNormal);
   }
 
   Criticity operator ++(int) {
     switch(value) {
-      case MonitorBroker::CRITICITY_MINOR:
-        return Criticity(MonitorBroker::CRITICITY_MAJOR);
+      case MonitorBroker::CriticityMinor:
+        return Criticity(MonitorBroker::CriticityMajor);
         break;
 
-      case MonitorBroker::CRITICITY_MAJOR:
-        return Criticity(MonitorBroker::CRITICITY_HIGH);
+      case MonitorBroker::CriticityMajor:
+        return Criticity(MonitorBroker::CriticityHigh);
         break;
 
       default:
@@ -198,12 +198,12 @@ public:
   Criticity operator --(int) {
 
     switch(value) {
-      case MonitorBroker::CRITICITY_HIGH:
-        return Criticity(MonitorBroker::CRITICITY_MAJOR);
+      case MonitorBroker::CriticityHigh:
+        return Criticity(MonitorBroker::CriticityMajor);
         break;
 
-      case MonitorBroker::CRITICITY_MAJOR:
-        return Criticity(MonitorBroker::CRITICITY_MINOR);
+      case MonitorBroker::CriticityMajor:
+        return Criticity(MonitorBroker::CriticityMinor);
         break;
 
       default:

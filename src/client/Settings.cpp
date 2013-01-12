@@ -43,13 +43,13 @@ Settings::Settings(): QSettings(PROJECT.toLower(), appName.toLower().replace(" "
   QString serverPort = value(Preferences::SERVER_PORT_KEY).toString();
 
   if (updateInterval.isEmpty()) {
-      setValue(Preferences::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DEFAULT_UPDATE_INTERVAL));
+      setValue(Preferences::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
     }
   if ( serverAddr.isEmpty() ) {
       setValue(Preferences::SERVER_ADDR_KEY, "localhost");
     }
   if ( serverPort.isEmpty() )	{
-      setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DEFAULT_PORT));
+      setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DefaultPort));
     }
   if ( monitorHome.isEmpty() ) {
       setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");

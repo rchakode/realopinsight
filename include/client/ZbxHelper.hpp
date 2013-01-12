@@ -36,9 +36,9 @@ class ZbxHelper : public QNetworkAccessManager {
 
 public:
   enum {
-    LOGIN=1,
-    TRIGGER=2,
-    LOGOUT=3
+    Login=1,
+    Trigger=2,
+    Logout=3
   };
 
 public:

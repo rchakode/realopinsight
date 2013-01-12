@@ -66,9 +66,9 @@ void ZnsHelper::setRouter(const int& reqType) {
 RequestListT ZnsHelper::getContentTypes()
 {
   RequestListT list;
-  list[LOGIN] = "application/x-www-form-urlencoded";
-  list[COMPONENT] = "application/json; charset=utf-8";
-  list[DEVICE] = "application/json; charset=utf-8";
+  list[Login] = "application/x-www-form-urlencoded";
+  list[Component] = "application/json; charset=utf-8";
+  list[Device] = "application/json; charset=utf-8";
   return list;
 }
 
@@ -76,7 +76,7 @@ RequestListT ZnsHelper::getContentTypes()
 RequestListT ZnsHelper::getRequestsPatterns()
 {
   RequestListT list;
-  list[DEVICE] = "{\"action\": \"DeviceRouter\", \
+  list[Device] = "{\"action\": \"DeviceRouter\", \
       \"method\": \"getDevices\", \
       \"data\": [{\
       \"uid\": \"/zport/dmd/Devices\", \
@@ -85,7 +85,7 @@ RequestListT ZnsHelper::getRequestsPatterns()
       \"keys\":[\"name\",\"uid\"] }], \
       \"type\": \"rpc\", \
       \"tid\": %2}";
-  list[COMPONENT] = "{\"action\": \"DeviceRouter\", \
+  list[Component] = "{\"action\": \"DeviceRouter\", \
       \"method\": \"getComponents\", \
       \"data\": [{\
       \"uid\": \"%1\", \
@@ -99,8 +99,8 @@ RequestListT ZnsHelper::getRequestsPatterns()
 RequestListT ZnsHelper::getRouters()
 {
   RequestListT list;
-  list[COMPONENT] = "device_router";
-  list[DEVICE] = "device_router";
+  list[Component] = "device_router";
+  list[Device] = "device_router";
   return list;
 }
 

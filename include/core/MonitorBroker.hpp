@@ -30,38 +30,38 @@
 class MonitorBroker {
 public:
   enum MonirorTypeT {
-    NAGIOS = 0,
-    ZABBIX = 1,
-    ZENOSS = 2
+    Nagios = 0,
+    Zabbix = 1,
+    Zenoss = 2
   };
   enum CriticityT {
-    CRITICITY_NORMAL = 0,
-    CRITICITY_MINOR = 1,
-    CRITICITY_MAJOR = 2,
-    CRITICITY_HIGH = 3,
-    CRITICITY_UNKNOWN = 100
+    CriticityNormal = 0,
+    CriticityMinor = 1,
+    CriticityMajor = 2,
+    CriticityHigh = 3,
+    CriticityUnknown = 100
   };
-  enum NAGIOS_StatusT {
-    NAGIOS_OK = 0,
-    NAGIOS_WARNING = 1,
-    NAGIOS_CRITICAL = 2,
-    NAGIOS_UNKNOWN = 3
+  enum NagiosStatusT {
+    NagiosOk = 0,
+    NagiosWarning = 1,
+    NagiosCritical = 2,
+    NagiosUnknown = 3
   };
-  enum ZABBIX_SeverityT {
-    ZABBIX_CLEAR = 0,
-    ZABBIX_INFO = 1,
-    ZABBIX_WARN = 2,
-    ZABBIX_AVERAGE = 3,
-    ZABBIX_HIGH = 4,
-    ZABBIX_DISASTER = 5
+  enum ZabbixSeverityT {
+    ZabbixClear = 0,
+    ZabbixInfo = 1,
+    ZabbixWarn = 2,
+    ZabbixAverage = 3,
+    ZabbixHigh = 4,
+    ZabbixDisaster = 5
   };
-  enum ZENOSS_SeverityT {
-    ZENOSS_CLEAR = 0,
-    ZENOSS_DEBUG = 1,
-    ZENOSS_INFO = 2,
-    ZENOSS_WARNING = 3,
-    ZENOSS_ERROR = 4,
-    ZENOSS_CRITICAL = 5
+  enum ZenossSeverityT {
+    ZenossClear = 0,
+    ZenossDebug = 1,
+    ZenossInfo = 2,
+    ZenossWarning = 3,
+    ZenossError = 4,
+    ZenossCritical = 5
   };
   struct CheckT{
     std::string id;
@@ -72,13 +72,13 @@ public:
     int status;
   };
   typedef std::unordered_map<std::string, CheckT> ChecksT;
-  static const int DEFAULT_PORT;
-  static const int DEFAULT_UPDATE_INTERVAL;
-  static const int MAX_MSG;
+
+  static const int DefaultPort;
+  static const int DefaultUpdateInterval;
+  static const int MaxMsg;
 
   MonitorBroker(const std::string& _sfile);
   virtual ~MonitorBroker();
-
   std::string getInfOfService(const std::string& _sid);
   static bool loadNagiosCollectedData(const std::string& _sfile, ChecksT& _checks);
 
