@@ -233,7 +233,7 @@ void SvNavigator::load(const QString& _file)
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
-  mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::ROOT_ID]);
+  mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::RootId]);
   mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
   mbrowser->setUrl(mmonitorBaseUrl);
   this->resize();
@@ -499,7 +499,7 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   mmap->updateNode(node, toolTip);
   updateNavTreeItemStatus(node, toolTip);
-  if (node->id == SvNavigatorTree::ROOT_ID) {
+  if (node->id == SvNavigatorTree::RootId) {
       updateSystemTray(*node);
     } else {
       emit hasToBeUpdate(node->parent);
