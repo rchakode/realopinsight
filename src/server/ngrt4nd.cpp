@@ -35,7 +35,6 @@
 #include <fstream>
 #include <libgen.h>
 #include <iostream>
-#include "Logger.hpp"
 
 
 std::string packageName = PACKAGE_NAME ;
@@ -109,12 +108,11 @@ std::string ngrt4n::getPassChain() {
 
 int main(int argc, char ** argv)
 {
-    std::clog.rdbuf(new Logger("ngrt4nd", LOG_LOCAL0));
     progName = basename(argv[0]);
 
     bool foreground = false;
     static const char *shotOpt="DTPhvc:p:" ;
-    int port = MonitorBroker::DEFAULT_PORT ;
+    int port = MonitorBroker::DefaultPort ;
     char opt ;
     while ((opt = getopt(argc, argv, shotOpt)) != -1) {
         switch (opt)
@@ -177,7 +175,7 @@ int main(int argc, char ** argv)
     if(foreground) {
         std::cerr << "Starting "<< version() << "\n";
     } else {
-        std::clog << kLogNotice<< "Starting "<< version() << "\n";
+        std::clog << "Starting "<< version() << "\n";
     }
 
     if( ! foreground ) {
@@ -203,7 +201,7 @@ int main(int argc, char ** argv)
              << "\nNagios status file => " << statusFile
              << "\n============>started\n";
     } else {
-        std::clog << kLogNotice << "Listening address => " << uri.str()
+        std::clog << "Listening address => " << uri.str()
              << "\nNagios status file => " << statusFile
              << "\n============>started\n";
     }
