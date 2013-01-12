@@ -29,32 +29,31 @@
 ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
     apiUri(baseUrl%ZBX_API_CONTEXT),
-    requestHandler(new QNetworkRequest()) {
-  requestHandler->setRawHeader("Content-Type", "application/json");
-  requestHandler->setUrl(QUrl(apiUri));
+    mrequestHandler(new QNetworkRequest()) {
+  mrequestHandler->setRawHeader("Content-Type", "application/json");
+  mrequestHandler->setUrl(QUrl(apiUri));
   setRequestsPatterns();
 }
 
 ZbxHelper::~ZbxHelper() {
-  delete requestHandler;
+  delete mrequestHandler;
 }
 
 void ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
-  QString request = requestsPatterns[reqId];
+  QString request = mrequestsPatterns[reqId];
   foreach(const QString &param, params) {request = request.arg(param);}
-  QNetworkReply* reply = QNetworkAccessManager::post(*requestHandler, request.toAscii());
-  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
-          this, SLOT(processError(QNetworkReply::NetworkError)));
+  QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, request.toAscii());
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
 void ZbxHelper::setRequestsPatterns()
 {
-  requestsPatterns[LOGIN] = "{\"jsonrpc\": \"2.0\", \
+  mrequestsPatterns[LOGIN] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": null, \
       \"method\": \"user.login\", \
       \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
       \"id\": %9}";
-  requestsPatterns[TRIGGER] = "{\"jsonrpc\": \"2.0\", \
+  mrequestsPatterns[TRIGGER] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
@@ -64,7 +63,7 @@ void ZbxHelper::setRequestsPatterns()
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
       \"limit\": -1}, \
       \"id\": %9}";
-  requestsPatterns[LOGOUT] = "{\"jsonrpc\": \"2.0\", \
+  mrequestsPatterns[LOGOUT] = "{\"jsonrpc\": \"2.0\", \
       \"method\": \"user.logout\", \
       \"params\": {\"sessionid\": \"%1\"}, \
       \"auth\": \"%1\", \

@@ -52,11 +52,11 @@ public:
   void setBaseUrl(const QString & url);
   void postRequest(const qint32 & reqId,  const QByteArray & data);
   void setRouter(const int & reqType);
-  inline QString getRequestUrl(void) const {return requestHandler->url().toString();}
-  inline void setRequestUrl(const QString & url) {requestHandler->setUrl(QUrl(url));}
-  inline void setRequestUrl(const QUrl & url) {requestHandler->setUrl(url);}
-  inline QString getApiContextUrl(void) const {return apiBaseUrl+ZNS_API_CONTEXT;}
-  inline QString getApiBaseUrl(void) const {return apiBaseUrl;}
+  inline QString getRequestUrl(void) const {return mrequestHandler->url().toString();}
+  inline void setRequestUrl(const QString & url) {mrequestHandler->setUrl(QUrl(url));}
+  inline void setRequestUrl(const QUrl & url) {mrequestHandler->setUrl(url);}
+  inline QString getApiContextUrl(void) const {return mapiBaseUrl+ZNS_API_CONTEXT;}
+  inline QString getApiBaseUrl(void) const {return mapiBaseUrl;}
   inline static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
 
 public slots:
@@ -66,8 +66,8 @@ signals:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
-  QString apiBaseUrl;
-  QNetworkRequest* requestHandler;
+  QString mapiBaseUrl;
+  QNetworkRequest* mrequestHandler;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

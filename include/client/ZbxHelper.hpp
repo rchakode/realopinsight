@@ -45,7 +45,7 @@ public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
   void postRequest(const qint32& reqId, const QStringList& params);
-  void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; requestHandler->setUrl(QUrl(apiUri));}
+  void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; mrequestHandler->setUrl(QUrl(apiUri));}
   inline QString getApiUri(void) const {return apiUri;}
 
 public slots:
@@ -56,8 +56,8 @@ signals:
 
 private :
   QString apiUri;
-  QNetworkRequest* requestHandler;
-  RequestListT requestsPatterns;
+  QNetworkRequest* mrequestHandler;
+  RequestListT mrequestsPatterns;
 
   void setRequestsPatterns();
 };
