@@ -50,7 +50,7 @@ int main(int argc, char **argv)
   ostringstream versionMsg(QObject::tr("> %1 Operations Console %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
                            +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
                            +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\n>> For bug reporting, see: <%1>").arg(PackageUrl).toStdString());
+                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PackageUrl).toStdString());
 
   bool runConfig = false;
   int opt;

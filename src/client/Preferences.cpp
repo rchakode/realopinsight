@@ -104,7 +104,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
                 layout->addWidget(cancelButton, line, 1, 1, 2, Qt::AlignRight),
                 layout->addWidget(applySettingButton, line, 3, 1, 2);
         line++,
-                layout->addWidget(new QLabel(tr("(*) Required for Zabbix. (**) Required for Nagios.")), line, 0, 1, 5);
+                layout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss. (**) Required for Nagios.")), line, 0, 1, 5);
         layout->setColumnStretch(0, 0);
         layout->setColumnStretch(1, 6);
         layout->setColumnStretch(2, 0);

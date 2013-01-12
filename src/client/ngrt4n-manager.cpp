@@ -57,7 +57,7 @@ int main(int argc, char **argv)
   ostringstream versionMsg(QObject::tr("\n> %1 %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
                            +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
                            +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\n>> For bug reporting, see: <%1>").arg(PackageUrl).toStdString());
+                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PackageUrl).toStdString());
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
@@ -112,17 +112,17 @@ int main(int argc, char **argv)
 
         }
       info->finish(0);
-      SvNavigator *console= new SvNavigator(userRole);
+      SvNavigator* console= new SvNavigator(userRole);
       console->load(file);
       console->startMonitor();
     } else if (module == "editor") {
       SvCreator* editor = new SvCreator(userRole);
       editor->load(file);
     } else if (module == "config") {
-      Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-      Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
-      update_settings->exec();
-      change_passwd->exec();
+      Preferences* monPref = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
+      Preferences* passwdPref = new Preferences(userRole, Preferences::ChangePassword);
+      monPref->exec();
+      passwdPref->exec();
       exit(0);
     }
   return app->exec();

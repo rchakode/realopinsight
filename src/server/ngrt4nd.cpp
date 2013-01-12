@@ -36,6 +36,7 @@
 #include <libgen.h>
 #include <iostream>
 #include <stdio.h>
+#include <memory>
 
 
 std::string packageName = PACKAGE_NAME;
@@ -74,7 +75,7 @@ std::string getVersionMsg(const std::string& progName)
           "\n>> Belongs to NGRT4N Dashboard Monitoring Suite"
           "\n>> Copyright (c) 2010-2013 NGRT4N Project. All rights reserved"
           "\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>"
-          "\n>> For bug reporting, see: <%s>",
+          "\n>> For bug reporting instructions, see: <%s>",
           packageName.c_str(), progName.c_str(), packageVersion.c_str(), packageUrl.c_str());
   return std::string(msg);
 }
@@ -109,10 +110,10 @@ std::string ngrt4n::getPassChain()
 int main(int argc, char ** argv)
 {
   progName = basename(argv[0]);
-  bool foreground = false;
-  static const char *shotOpt="DTPhvc:p:";
   int port = MonitorBroker::DefaultPort;
+  bool foreground = false;
   char opt;
+  static const char *shotOpt="DTPhvc:p:";
   while ((opt = getopt(argc, argv, shotOpt)) != -1) {
       switch (opt){
         case 'D':
@@ -155,20 +156,17 @@ int main(int argc, char ** argv)
   ngrt4n::checkUser();
   ngrt4n::initApp();
   authChain = ngrt4n::getPassChain();
-  std::clog << getVersionMsg(progName)
-            << "\nStarting...\n";
+  std::clog << getVersionMsg(progName)<< "\nStarting...\n";
   if(!foreground) {
       pid_t pid = fork();
       if(pid <= -1) {
           std::clog << "Failed while starting the program in daemon mode\n";
           exit(1);
-        }
-      else if(pid > 0) {
+        } else if(pid > 0) {
           exit (0);
         }
       setsid();
     }
-
 
   std::ostringstream uri;
   uri << "tcp://0.0.0.0:" << port;
@@ -178,7 +176,8 @@ int main(int argc, char ** argv)
   std::clog << "Listening address => "<<uri.str()
             << "\nNagios status file => "<<statusFile
             << "\n============>started\n";
-  MonitorBroker* monitor = new MonitorBroker( statusFile );
+
+  auto monitor = std::unique_ptr<MonitorBroker>(new MonitorBroker(statusFile));
   while (true) {
       std::string msg = socket.recv();
       std::string reply;
@@ -202,6 +201,6 @@ int main(int argc, char ** argv)
     }
 
   socket.disconnect();
-
+  monitor.reset(nullptr);
   return 0;
 }

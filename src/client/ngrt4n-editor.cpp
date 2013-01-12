@@ -27,6 +27,7 @@
 #include <sstream>
 #include <getopt.h>
 #include "Base.hpp"
+#include <memory>
 
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "Options: \n"
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
   ostringstream versionMsg(QObject::tr("> %1 Editor %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
                            +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
                            +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\n>> For bug reporting, see: <%1>").arg(PackageUrl).toStdString());
+                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PackageUrl).toStdString());
 
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
