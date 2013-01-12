@@ -68,9 +68,9 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
   _coreData.monitor = xmlRoot.attribute("monitor").toInt();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
+  NodeT node;
   qint32 serviceCount = services.length();
   for (qint32 srv = 0; srv < serviceCount; srv++) {
-      NodeT node;
       QDomElement service = services.item(srv).toElement();
       node.id = service.attribute("id").trimmed();
       node.type = service.attribute("type").toInt();
@@ -85,21 +85,16 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
       node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
       node.criticity = MonitorBroker::NagiosUnknown;
       node.parent = "";
-
       node.icon.remove("--> "); //FBWC
-
       if (node.icon.length() == 0) {
           node.icon = GraphView::DEFAULT_ICON;
         }
-
       if (node.criticity_crule < 0) {
           node.criticity_crule = CalcRules::HighCriticity; //FBWC
         }
-
       if (node.criticity_prule < 0) {
           node.criticity_prule = PropRules::Unchanged;
         }
-
       if (node.type == NodeType::ALARM_NODE) {
           QString host = node.child_nodes.left(node.child_nodes.indexOf("/"));
           _coreData.hosts[host] << node.id;
@@ -125,7 +120,6 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
   for (auto node : _bpnodes) {
       QString nname = node.name;
       _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
-
       if (node.child_nodes != "") {
           QStringList nodeIds = node.child_nodes.split(CHILD_SEP);
           for (auto nodeId : nodeIds) {
@@ -166,7 +160,7 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
     }
 }
 
-void Parser::saveCoordinatesFile(const QString& _graph_content)
+void Parser::saveCoordinatesFile(const QString& _graphContent)
 {
   graphFilename = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(graphFilename);
@@ -175,7 +169,7 @@ void Parser::saveCoordinatesFile(const QString& _graph_content)
       file.close();
       exit(1);
     }
-  QTextStream file_stream(&file);
-  file_stream << _graph_content;
+  QTextStream fstream(&file);
+  fstream << _graphContent;
   file.close();
 }

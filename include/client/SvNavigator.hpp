@@ -145,7 +145,7 @@ private:
   void closeRpcSession(void);
   void postRpcDataRequest(void);
   void updateDashboardOnUnknown(const QString& msg);
-  void updateSystemTray(const NodeT& _node);
+  void updateTrayInfo(const NodeT& _node);
 };
 
 #endif /* SVNAVIGATOR_HPP */

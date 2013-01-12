@@ -416,7 +416,7 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
 void SvNavigator::finalizeDashboardUpdate(const bool& enable)
 {
-  if (mcoreData->cnodes.size() != 0) {
+  if (!mcoreData->cnodes.isEmpty()) {
       Chart *chart = new Chart;
       QString chartdDetails = chart->update(mcoreData->check_status_count, mcoreData->cnodes.size());
       mmap->updateStatsPanel(chart);
@@ -428,6 +428,8 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       mtimer = startTimer(mupdateInterval);
       if (mupdateSucceed) updateStatusBar(tr("Update completed"));
     }
+  if (!mcoreData->bpnodes.isEmpty())
+    updateTrayInfo(mcoreData->bpnodes[SvNavigatorTree::RootId]); //FIXME: avoid searching at each update
   QMainWindow::setEnabled(enable);
 }
 
@@ -499,11 +501,8 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   mmap->updateNode(node, toolTip);
   updateNavTreeItemStatus(node, toolTip);
-  if (node->id == SvNavigatorTree::RootId) {
-      updateSystemTray(*node);
-    } else {
-      emit hasToBeUpdate(node->parent);
-    }
+  if (node->id != SvNavigatorTree::RootId)
+    emit hasToBeUpdate(node->parent);
 }
 
 void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
@@ -898,8 +897,9 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
   finalizeDashboardUpdate(enable);
 }
 
-void SvNavigator::updateSystemTray(const NodeT& _node)
+void SvNavigator::updateTrayInfo(const NodeT& _node)
 {
+  //FIXME: update once;
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
   if (_node.criticity == MonitorBroker::CriticityHigh ||
       _node.criticity == MonitorBroker::CriticityUnknown) {
