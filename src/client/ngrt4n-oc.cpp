@@ -47,7 +47,7 @@ int main(int argc, char **argv)
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
-  QString cmdName = basename(argv[0]);
+  QString cmdName = utils::basename(argv[0]);
   QString versionMsg = utils::getWelcomeMsg(QObject::tr("Operations Console"));
   bool runConfig = false;
   int opt;

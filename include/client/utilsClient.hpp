@@ -28,7 +28,7 @@
 #include "Base.hpp"
 #include <QString>
 #include <QIcon>
-#include <unistd.h>
+#include <windows.h>
 
 namespace {
   const QString SRC_BASENAME = "Source";
@@ -37,7 +37,7 @@ namespace {
 namespace utils {
 
   inline void delay(const qint32& d)
-  { sleep(d); }
+  { Sleep(uint(800*d)); }
 
   inline std::string getCtime(const QString& dt, const QString& format)
   { return QDateTime::fromString(dt, format).toString().toStdString(); }
@@ -65,6 +65,7 @@ namespace utils {
 
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
+  QString basename(const char* path);
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
   int computePropCriticity(const qint8& _criticity, const qint8& propRule);

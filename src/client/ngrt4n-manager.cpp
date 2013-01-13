@@ -54,7 +54,7 @@ int main(int argc, char **argv)
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(Preferences::style());
-  QString cmdName = basename(argv[0]);
+  QString cmdName = utils::basename(argv[0]);
   QString versionMsg = utils::getWelcomeMsg("");
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";

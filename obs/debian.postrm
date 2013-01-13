@@ -1,6 +1,0 @@
-#!/bin/sh -e
-#
-app_name=ngrt4n
-userdel -r ${app_name}
-
-#DEBHELPER#

@@ -34,9 +34,7 @@
 
 class Auth : public QDialog
 {
-
   Q_OBJECT
-
 public:
   Auth();
   virtual ~Auth();

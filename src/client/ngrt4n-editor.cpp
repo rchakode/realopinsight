@@ -30,6 +30,7 @@
 #include <getopt.h>
 #include "Base.hpp"
 #include <memory>
+#include "client/utilsClient.hpp"
 
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "Options: \n"
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
 
-  QString cmdName= basename(argv[0]);
+  QString cmdName= utils::basename(argv[0]);
   QString versionMsg = utils::getWelcomeMsg(QObject::tr("Editor"));
   QString file = (argc >= 2)? argv[1] : "";
   int opt;

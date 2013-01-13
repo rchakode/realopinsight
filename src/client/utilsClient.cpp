@@ -56,6 +56,14 @@ void utils::clear(CoreDataT& data)
   data.tree_items.clear();
 }
 
+QString utils::basename(const char* path)
+{
+    char* name = strrchr(path, '/');
+    name = name ? name + 1 : const_cast<char*>(path);
+    return QString(name);
+}
+
+
 QString utils::getAbsolutePath(const QString& _path)
 {
   QFileInfo fileInfo(_path);

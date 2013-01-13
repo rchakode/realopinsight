@@ -2,7 +2,6 @@ QT	+= core gui xml svg webkit network script
 TEMPLATE = app
 VERSION_=2.4.0beta1
 VERSION = "-$${VERSION_}"
-LIBS += -lzmq
 config-dist{
 SOURCES	+=
 TARGET = RealOpInsight
@@ -112,3 +111,8 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 CODECFORSRC = UTF-8
 
 #include(QsLog/QsLog.pri)
+
+LIBS += -L$$PWD/../ZeroMQ-2.2.0/lib/ -llibzmq-v100-mt
+
+INCLUDEPATH += $$PWD/../ZeroMQ-2.2.0/include
+DEPENDPATH += $$PWD/../ZeroMQ-2.2.0/include

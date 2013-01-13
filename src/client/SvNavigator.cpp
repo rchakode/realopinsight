@@ -340,7 +340,6 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
       m_cdata->check_status_count[cnode->severity]+=1;
       continue;
     }
-
     QPair<QString, QString> info = utils::splitSourceHostInfo(cnode->child_nodes);
     if (info.first != src.id) {
       continue;
