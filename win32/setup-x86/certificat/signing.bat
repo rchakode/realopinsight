@@ -1,1 +1,0 @@
-"c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\signtool.exe" sign /f c:\Dev\ngrt4n-ui-wininst-x86\certificat\ngrt4nCert.pfx /p A1Z2E3R4T5Y6U7I8O9P0 c:\Dev\ngrt4n-ui-wininst-x86\output\ngrt4n2.0-ui-wininst.exe > sign.out

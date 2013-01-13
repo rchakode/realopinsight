@@ -164,7 +164,7 @@ void SvNavigator::loadMenus(void)
   mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
   mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
 
-  QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str()));
+  QToolBar* toolBar = addToolBar(AppName);
   toolBar->setIconSize(QSize(16,16));
   toolBar->addAction(msubMenus["Refresh"]);
   toolBar->addAction(msubMenus["ZoomIn"]);
@@ -911,7 +911,7 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
   qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
   QString title = AppName%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
-                   " - Platform Severity: %3").arg(pbCount).arg(pbCount>1?tr("s"):"")
+                   " - Level of Impact: %3").arg(pbCount).arg(pbCount>1?tr("s"):"")
       .arg(utils::criticityToText(_node.criticity).toUpper());
 
   mtrayIcon->showMessage(title, msg, icon);

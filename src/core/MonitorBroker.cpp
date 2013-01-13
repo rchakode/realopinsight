@@ -25,8 +25,8 @@
 #include "core/ns.hpp"
 #include <fstream>
 #include <sstream>
-#include <stdlib.h>
-
+#include <cstdlib>
+#include <ctime>
 
 const int MonitorBroker::DefaultPort = 1983 ;
 const int MonitorBroker::DefaultUpdateInterval = 300 ;

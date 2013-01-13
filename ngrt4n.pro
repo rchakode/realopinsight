@@ -91,7 +91,7 @@ SOURCES	+= \
     src/client/MsgConsole.cpp
 
 
-TRANSLATIONS = ngrt4n_en.ts
+TRANSLATIONS += ngrt4n_en.ts
 
 DISTFILES += README \
     INSTALL \
