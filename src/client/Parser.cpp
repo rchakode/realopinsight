@@ -28,13 +28,11 @@
 #include "SvNavigatorTree.hpp"
 #include "utilsClient.hpp"
 #include <QObject>
-
-using namespace std;
+#include <algorithm>
 
 const QString Parser::CHILD_SEP = ",";
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
-
 
 Parser::Parser(const QString& _config) : m_config(_config) {}
 
@@ -126,7 +124,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
                                 QString& _graphContent)
 {
   _graphContent = "\n";
-  for (NodeListT::ConstIterator node = _bpnodes.begin();
+  for (auto node = _bpnodes.begin(), end = _bpnodes.end();
        node != _bpnodes.end(); ++node)
   {
     QString nname = node->name;
@@ -144,7 +142,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
     }
   }
 
-  for (NodeListT::ConstIterator node = _cnodes.begin();
+  for (auto node = _cnodes.begin(), end = _cnodes.end();
        node != _cnodes.end(); ++node)
   {
     QString nname = node->name;
