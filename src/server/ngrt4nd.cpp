@@ -171,7 +171,7 @@ int main(int argc, char ** argv)
   std::ostringstream uri;
   uri << "tcp://0.0.0.0:" << port;
   Socket socket(ZMQ_REP);
-  socket.bind(uri.str());
+  if(!socket.bind(uri.str())) {std::clog << "ERROOR\n";exit(1);} 
 
   std::clog << "Listening address => "<<uri.str()
             << "\nNagios status file => "<<statusFile

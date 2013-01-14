@@ -1,7 +1,6 @@
 
 #include "Socket.hpp"
 #include <zmq.h>
-#include <cassert>
 #include <string.h>
 #include <iostream>
 #include <memory>
@@ -17,43 +16,44 @@
 #endif
 
 const int MAX_MSG_SIZE=8192;
-const int TIMEOUT = 2500 ; //15000
-const int NUM_RETRIES = 3 ;
-
-//TODO: changed assert with suitable error handling
+const int TIMEOUT = 2500; //15000
+const int NUM_RETRIES = 3;
 
 Socket::Socket(const int & _type)
   : mtype(_type),
     mconnected2Server(false),
-    mserverSerial(-1) {
+    mserverSerial(-1) { }
+
+Socket::~Socket()
+{
+  disconnect();
 }
 
-void Socket::init() {
+bool Socket::disconnect()
+{
+  if (zmq_close(msocket) != 0) return false;
+  return (zmq_term(mcontext) == 0);
+}
+
+bool Socket::init()
+{
   mcontext = zmq_init(1);
-  assert (mcontext);
-  msocket = zmq_socket(mcontext, mtype);
-  assert (msocket);
+  if (!mcontext) return false;
+  return (msocket = zmq_socket(mcontext, mtype)) != NULL;
 }
 
-void Socket::connect(const std::string & _uri) {
-  init();
-  int connected = zmq_connect (msocket, _uri.c_str());
-  assert (connected == 0);
+bool Socket::connect(const std::string & _uri)
+{
   mserverUri = _uri;
+  if (!init()) return false;
+  return zmq_connect(msocket, mserverUri.c_str()) == 0;
 }
 
-void Socket::bind(const std::string & _uri) {
-  init();
-  int bound = zmq_bind(msocket, _uri.c_str());
-  assert (bound == 0);
+bool Socket::bind(const std::string & _uri)
+{
   mserverUri = _uri;
-}
-
-void Socket::disconnect() {
-  int rc = zmq_close (msocket);
-  assert (rc == 0);
-  rc = zmq_term(mcontext);
-  assert (rc == 0);
+  if (!init()) return false;
+  return zmq_bind(msocket, mserverUri.c_str()) == 0;
 }
 
 void Socket::send(const std::string & _msg) {
@@ -68,22 +68,22 @@ void Socket::send(const std::string & _msg) {
   sent = zmq_send(msocket, _msg.c_str(), _msg.size(), 0);
 #endif
   if(sent <= 0) {
-      //TODO
+      //TODO: deal with error
     }
 }
 
 std::string Socket::recv() const{
-  int received = -1;
+  int ret = -1;
   zmq_msg_t msg;
-  received = zmq_msg_init_size(&msg, MAX_MSG_SIZE);
-  assert (received == 0);
+  ret = zmq_msg_init_size(&msg, MAX_MSG_SIZE);
+  if (ret != 0) return "";
   memset(zmq_msg_data(&msg), 0, MAX_MSG_SIZE);
 #if ZMQ_VERSION_MAJOR == 2
-  received = zmq_recv(msocket, &msg, 0);
+  ret = zmq_recv(msocket, &msg, 0);
 #elif ZMQ_VERSION_MAJOR == 3
   received = zmq_recv(msocket, zmq_msg_data(&msg), MAX_MSG_SIZE, 0);
 #endif
-  assert (received >= 0);
+  if (ret < 0) return "";
   char *retBuffer = (char*)zmq_msg_data(&msg);
   return std::string(retBuffer, zmq_msg_size(&msg));
 }
@@ -93,7 +93,7 @@ void Socket::makeHandShake() {
   auto socket = std::unique_ptr<Socket>(new Socket(ZMQ_REQ));
   std::string msg("PING");
   while (retriesLeft) {
-      socket->connect(mserverUri);
+      if(!socket->connect(mserverUri)) break;
       socket->send(msg);
       bool expectReply = true;
       while (expectReply) {
@@ -114,7 +114,7 @@ void Socket::makeHandShake() {
                       mserverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
                     }
                   std::cerr << "INFO: Connection etablished; server serial: " << mserverSerial <<"\n";
-                  return ;
+                  return;
                 } else {
                   std::cerr << "ERROR: Weird response from the server\n";
                 }

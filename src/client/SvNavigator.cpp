@@ -280,8 +280,8 @@ void SvNavigator::handleShowAbout(void)
 int SvNavigator::runNagiosMonitor(void)
 {
   auto socket = std::unique_ptr<Socket>(new Socket(ZMQ_REQ));
-  socket->connect(mserverUrl.toStdString());
-  socket->makeHandShake();
+  if(socket->connect(mserverUrl.toStdString()))
+    socket->makeHandShake();
   if (socket->isConnected2Server()) {
       if (socket->getServerSerial() < 110) {
           utils::alert(tr("The server %1 is not supported").arg(socket->getServerSerial()));
