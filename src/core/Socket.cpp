@@ -4,6 +4,7 @@
 #include <string.h>
 #include <iostream>
 #include <memory>
+#include <ctime>
 
 // Emulate zeromq 3.x over zeromq 2.x
 #ifndef ZMQ_DONTWAIT
@@ -26,13 +27,13 @@ Socket::Socket(const int & _type)
 
 Socket::~Socket()
 {
-  disconnect();
+  //  disconnect();
 }
 
-bool Socket::disconnect()
+void Socket::disconnect()
 {
-  if (zmq_close(msocket) != 0) return false;
-  return (zmq_term(mcontext) == 0);
+  zmq_close(msocket);
+  zmq_term(mcontext);
 }
 
 bool Socket::init()
@@ -97,13 +98,15 @@ void Socket::makeHandShake() {
       socket->send(msg);
       bool expectReply = true;
       while (expectReply) {
+          time_t curTime = time(NULL);
+          std::cerr << std::string(ctime(&curTime));
+
           zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };
           zmq_poll(&items[0], 1, TIMEOUT * ZMQ_POLL_MSEC);  //TODO in zeromq 3.x the unit is different
 
           if (items[0].revents & ZMQ_POLLIN) {
               std::string reply = socket->recv();
               socket->disconnect();
-              socket.reset(nullptr);
               size_t pos = reply.find(":");
               std::string respType = reply.substr(0, pos);
               if(respType == "ALIVE") {
@@ -113,7 +116,7 @@ void Socket::makeHandShake() {
                     } else {
                       mserverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
                     }
-                  std::cerr << "INFO: Connection etablished; server serial: " << mserverSerial <<"\n";
+                  std::cerr  <<"INFO: Connection etablished; server serial: " << mserverSerial <<"\n";
                   return;
                 } else {
                   std::cerr << "ERROR: Weird response from the server\n";
@@ -123,7 +126,7 @@ void Socket::makeHandShake() {
                   std::cerr << "ERROR: Server seems to be offline, abandoning\n";
                   expectReply = false;
                 } else {
-                  std::cerr << "WARNING: No response from server, retrying…\n";
+                  std::cerr << "WARNING: No response from server, retrying...\n";
                   socket.reset(nullptr);
                   socket.reset(new Socket(ZMQ_REQ));
                   socket->send(msg);
