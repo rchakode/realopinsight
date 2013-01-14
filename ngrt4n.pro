@@ -107,5 +107,4 @@ DISTFILES += README \
     src/client/ngrt4n-editor.cpp \
     doc/man/*.gz
 
-OTHER_FILES = \
-    ngrt4n_la.ts
+OTHER_FILES += ngrt4n_la.ts
