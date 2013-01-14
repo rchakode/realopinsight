@@ -28,7 +28,6 @@
 #include "SvNavigatorTree.hpp"
 #include "utilsClient.hpp"
 #include <QObject>
-#include <algorithm>
 const QString Parser::CHILD_SEP = ",";
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
