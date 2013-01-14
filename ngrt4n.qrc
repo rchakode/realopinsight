@@ -44,5 +44,7 @@
         <file>images/built-in/browser-back.png</file>
         <file>images/built-in/browser-forward.png</file>
         <file>images/built-in/browser-stop.png</file>
+        <file>images/built-in/help.png</file>
+        <file>images/built-in/help-info.png</file>
     </qresource>
 </RCC>

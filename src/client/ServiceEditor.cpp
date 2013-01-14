@@ -30,35 +30,35 @@
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
-    settings(new Settings()),
-    layout(new QGridLayout( this ) ),
+    msettings(new Settings()),
+    mlayout(new QGridLayout( this ) ),
     buttonBox(new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close))
 {
-  editorItemsList["nameLabel"] = new QLabel(tr("Name"));
-  editorItemsList[NAME_FIELD] = new QLineEdit();
+  mitems["nameLabel"] = new QLabel(tr("Name"));
+  mitems[NAME_FIELD] = new QLineEdit();
 
-  editorItemsList["typeLabel"] = new QLabel(tr("Type"));
-  editorItemsList[TYPE_FIELD] = new QComboBox();
+  mitems["typeLabel"] = new QLabel(tr("Type"));
+  mitems[TYPE_FIELD] = new QComboBox();
 
-  editorItemsList["iconNameLabel"] = new QLabel(tr("Icon"));
-  editorItemsList[ICON_FIELD] = new QComboBox();
+  mitems["iconNameLabel"] = new QLabel(tr("Icon"));
+  mitems[ICON_FIELD] = new QComboBox();
 
-  editorItemsList["priorityLabel"] = new QLabel(tr("Severity Handling"));
-  editorItemsList[STATUS_CALC_RULE_FIELD] = new QComboBox();
-  editorItemsList[STATUS_PROP_RULE_FIELD] = new QComboBox();
+  mitems["priorityLabel"] = new QLabel(tr("Severity Handling Rules"));
+  mitems[STATUS_CALC_RULE_FIELD] = new QComboBox();
+  mitems[STATUS_PROP_RULE_FIELD] = new QComboBox();
 
-  editorItemsList["descriptionLabel"] = new QLabel(tr("Description"));
-  editorItemsList[DESCRIPTION_FIELD] = new QTextEdit();
+  mitems["descriptionLabel"] = new QLabel(tr("Description"));
+  mitems[DESCRIPTION_FIELD] = new QTextEdit();
 
-  editorItemsList["alarmMsgLabel"] = new QLabel(tr("Alarm Message"));
-  editorItemsList[ALARM_MSG_FIELD]  = new QTextEdit();
+  mitems["alarmMsgLabel"] = new QLabel(tr("Alarm Message"));
+  mitems[ALARM_MSG_FIELD]  = new QTextEdit();
 
-  editorItemsList["notificationMsgLabel"] = new QLabel(tr("Notification Message"));
-  editorItemsList[NOTIFICATION_MSG_FIELD] = new QTextEdit();
+  mitems["notificationMsgLabel"] = new QLabel(tr("Notification Message"));
+  mitems[NOTIFICATION_MSG_FIELD] = new QTextEdit();
 
-  editorItemsList["lowLevelAlarmsLabel"] = new QLabel(tr("Alarm (Check/Trigger)"));
-  editorItemsList[CHECK_FIELD] = new QComboBox();
-  editorItemsList[CHECK_LIST_FIELD] = new QListWidget();
+  mitems["lowLevelAlarmsLabel"] = new QLabel(tr("Data Point"));
+  mitems[CHECK_FIELD] = new QComboBox();
+  mitems[CHECK_LIST_FIELD] = new QListWidget();
 
   layoutEditorComponents();
 
@@ -67,11 +67,11 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
 
 ServiceEditor::~ServiceEditor()
 {
-  QMap<QString, QWidget*>::iterator iter = editorItemsList.begin();
+  QMap<QString, QWidget*>::iterator iter = mitems.begin();
 
-  while (iter != editorItemsList.end()) {
+  while (iter != mitems.end()) {
       QString key = iter.key();
-      QWidget* widget = editorItemsList[key];
+      QWidget* widget = mitems[key];
       QLabel* labelPtr = dynamic_cast<QLabel*>(widget);
       QLineEdit* lineEditPtr = dynamic_cast<QLineEdit*>(widget);
       QTextBlock* textBlockPtr = dynamic_cast<QTextBlock*>(widget);
@@ -86,14 +86,14 @@ ServiceEditor::~ServiceEditor()
         } else if (comboBoxPtr){
           delete comboBoxPtr;
         }
-      editorItemsList.remove(key);
+      mitems.remove(key);
 
-      iter = editorItemsList.begin();
+      iter = mitems.begin();
     }
-  editorItemsList.clear();
+  mitems.clear();
 
   delete buttonBox;
-  delete layout;
+  delete mlayout;
 
 }
 
@@ -114,10 +114,10 @@ void ServiceEditor::setCheckListField(const MonitorBroker::ChecksT& _nagios_chec
 
 void ServiceEditor::setEnableFields(const bool& _enable)
 {
-  editorItemsList[CHECK_FIELD]->setEnabled(_enable);
-  editorItemsList[CHECK_LIST_FIELD]->setEnabled(_enable);
-  editorItemsList[ALARM_MSG_FIELD]->setEnabled(_enable);
-  editorItemsList[NOTIFICATION_MSG_FIELD]->setEnabled(_enable);
+  mitems[CHECK_FIELD]->setEnabled(_enable);
+  mitems[CHECK_LIST_FIELD]->setEnabled(_enable);
+  mitems[ALARM_MSG_FIELD]->setEnabled(_enable);
+  mitems[NOTIFICATION_MSG_FIELD]->setEnabled(_enable);
 }
 
 bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
@@ -201,16 +201,16 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node)
 
 void ServiceEditor::layoutEditorComponents(void)
 {
-  currentLine = 0;
-  loadLabelFields(); currentLine++;
-  loadTypeFields(); currentLine++;
-  loadStatusHandlingFields(); currentLine++;
-  loadIconFields(); currentLine++;
-  loadDescriptionFields(); currentLine++;
-  loadAlarmMsgFields(); currentLine++;
-  loadNotificationMsgFields(); currentLine++;
-  loadCheckField(); currentLine++;
-  loadButtonBox(); currentLine++;
+  mlayoutRowIndex = 0;
+  loadLabelFields(); mlayoutRowIndex++;
+  loadTypeFields(); mlayoutRowIndex++;
+  loadStatusHandlingFields(); mlayoutRowIndex++;
+  loadIconFields(); mlayoutRowIndex++;
+  loadDescriptionFields(); mlayoutRowIndex++;
+  loadAlarmMsgFields(); mlayoutRowIndex++;
+  loadNotificationMsgFields(); mlayoutRowIndex++;
+  loadCheckField(); mlayoutRowIndex++;
+  loadButtonBox(); mlayoutRowIndex++;
   setEnableFields(false);
 }
 
@@ -218,15 +218,15 @@ void ServiceEditor::layoutEditorComponents(void)
 void ServiceEditor::loadLabelFields()
 {
   nameField()->setMaxLength( MAX_NODE_NAME );
-  layout->addWidget(editorItemsList["nameLabel"], currentLine, 0);
-  layout->addWidget(nameField(),currentLine,1,1,2);
+  mlayout->addWidget(mitems["nameLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(nameField(),mlayoutRowIndex,1,1,2);
 }
 
 
 void ServiceEditor::loadDescriptionFields()
 {
-  layout->addWidget(editorItemsList["descriptionLabel"], currentLine, 0);
-  layout->addWidget(descriptionField(),currentLine,1,1,2);
+  mlayout->addWidget(mitems["descriptionLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(descriptionField(),mlayoutRowIndex,1,1,2);
 }
 
 
@@ -234,9 +234,8 @@ void ServiceEditor::loadTypeFields()
 {
   typeField()->addItem( NodeType::toString(NodeType::SERVICE_NODE) );
   typeField()->addItem( NodeType::toString(NodeType::ALARM_NODE) );
-
-  layout->addWidget(editorItemsList["typeLabel"], currentLine, 0);
-  layout->addWidget(typeField(),currentLine,1,1,2);
+  mlayout->addWidget(mitems["typeLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(typeField(),mlayoutRowIndex,1,1,2);
 }
 
 void ServiceEditor::loadStatusHandlingFields(void)
@@ -248,72 +247,71 @@ void ServiceEditor::loadStatusHandlingFields(void)
   foreach(const QString & rule, crules.keys()) {
       statusCalcRuleField()->addItem(rule, crules.value(rule));
     }
-
   StringMapT prules = SvNavigator::propRules();
   defaultRule = PropRules::label(PropRules::Unchanged);
   statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", PropRules::Unchanged);
   foreach(const QString & rule, prules.keys()) {
       statusPropRuleField()->addItem(rule, prules.value(rule));
     }
-  layout->addWidget(editorItemsList["priorityLabel"], currentLine, 0);
-  layout->addWidget(statusCalcRuleField(),currentLine,1);
-  layout->addWidget(statusPropRuleField(),currentLine,2);
+  mlayout->addWidget(mitems["priorityLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(statusCalcRuleField(),mlayoutRowIndex,1);
+  mlayout->addWidget(statusPropRuleField(),mlayoutRowIndex,2);
 }
 
 void ServiceEditor::loadAlarmMsgFields()
 {
-  layout->addWidget(editorItemsList["alarmMsgLabel"], currentLine, 0);
-  layout->addWidget(alarmMsgField(),currentLine,1,1,2);
+  mlayout->addWidget(mitems["alarmMsgLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(alarmMsgField(),mlayoutRowIndex,1,1,2);
 }
 
 
 void ServiceEditor::loadNotificationMsgFields()
 {
-  layout->addWidget(editorItemsList["notificationMsgLabel"], currentLine, 0);
-  layout->addWidget(notificationMsgField(),currentLine,1,1,2);
+  mlayout->addWidget(mitems["notificationMsgLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(notificationMsgField(),mlayoutRowIndex,1,1,2);
 }
 
 
 void ServiceEditor::loadIconFields()
 {
   IconMapT icons = GraphView::nodeIcons();
-
   QString header = "-->Select a icon (Default is " + GraphView::DEFAULT_ICON + ")";
   iconField()->addItem(header, icons.value(GraphView::DEFAULT_ICON));
   foreach(const QString & label, icons.keys()) {
       QString path = icons.value(label);
       iconField()->addItem(QIcon(path), label, icons.value(path));
     }
-  layout->addWidget(editorItemsList["iconNameLabel"], currentLine, 0);
-  layout->addWidget(iconField(),currentLine, 1, 1, 2);
+  mlayout->addWidget(mitems["iconNameLabel"], mlayoutRowIndex, 0);
+  mlayout->addWidget(iconField(),mlayoutRowIndex, 1, 1, 2);
 }
 
 
 void ServiceEditor::loadCheckField(void)
 {
-  layout->addWidget(editorItemsList["lowLevelAlarmsLabel"], currentLine, 0, 2, 1);
-  layout->addWidget(checkField(), currentLine, 1, 1, 2);
+  QLabel* help = new QLabel();
+  help->setPixmap(QPixmap(":images/built-in/help.png"));
+  QHBoxLayout* llayout =  new QHBoxLayout();
+  llayout->addWidget(mitems["lowLevelAlarmsLabel"]);
+  llayout->addWidget(help);
+  mlayout->addLayout(llayout, mlayoutRowIndex, 0, 2, 1);
+  mlayout->addWidget(checkField(), mlayoutRowIndex, 1, 1, 2);
   checkField()->setEditable(true);
+  help->setToolTip(tr("\nThe format of data points is in the form of 'hostid/point', without the quotes."
+                      "\n\nEvery data point should correspond to a data collected by the monitoring system."
+                      "\n - 'hostid' should correspond to a valid host in your monitoring configuration and "
+                      "\n - 'point' to a valid monitoring item associated to the host:"
+                      "\n   * For Nagios and its derived, 'point' corresponds to a check name."
+                      "\n     E.g. of data point: mysql-server.example.com/PING"
+                      "\n   * For Zabbix, 'point' corresponds to a trigger name."
+                      "\n     E.g. of data point: Zabbix server/Zabbix http poller processes more than 75% busy"
+                      "\n   * For Zenoss, 'point' corresponds to a component name."
+                      "\n     E.g. of data point: localhost/httpd"
+                      ));
 }
 
 void ServiceEditor::loadButtonBox(void)
 {
-  layout->addWidget(buttonBox, currentLine, 2);
-}
-
-void ServiceEditor::handleCloseClick(void)
-{
-  emit closeClicked();
-}
-
-void ServiceEditor::handleSaveClick(void)
-{
-  emit saveClicked();
-}
-
-void ServiceEditor::handleReturnPressed(void)
-{
-  emit returnPressed();
+  mlayout->addWidget(buttonBox, mlayoutRowIndex, 2);
 }
 
 void ServiceEditor::handleNodeTypeChanged( const QString & _text)

@@ -41,8 +41,8 @@ const QString ALARM_MSG_FIELD = "alarmMsg" ;
 const QString NOTIFICATION_MSG_FIELD = "notificationMsg";
 const QString CHECK_LIST_FIELD = "ChecksField";
 const QString CHECK_FIELD = "CheckField";
-const QString HIGH_CRITICITY_CALC_RULE_FIELD = "Higher Criticity";
-const QString WEIGHTED_CALC_RULE_FIELD = "Equal-weighted Criticity";
+const QString HIGH_CRITICITY_CALC_RULE_FIELD = "Higher Severity";
+const QString WEIGHTED_CALC_RULE_FIELD = "Equal-weighted Severity";
 
 class ServiceEditor : public QWidget
 {
@@ -50,7 +50,7 @@ class ServiceEditor : public QWidget
 
 public:
 
-  typedef QMap<QString, QWidget*> ItemsList ;
+  typedef QMap<QString, QWidget*> WidgetMapT ;
 
   ServiceEditor( QWidget* = 0);
   virtual ~ServiceEditor();
@@ -63,24 +63,24 @@ public:
   void setCheckListField( const MonitorBroker::ChecksT& );
   void setEnableFields( const bool& );
   void loadStatusFile(const QString &) ;
-  void setLowLevelAlarmComponentEnabled(bool enable){editorItemsList[CHECK_LIST_FIELD]->setEnabled(enable);}
+  void setLowLevelAlarmComponentEnabled(bool enable){mitems[CHECK_LIST_FIELD]->setEnabled(enable);}
 
-  ItemsList* itemList( void ) {return &editorItemsList;}
-  QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(editorItemsList[NAME_FIELD]);}
-  QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[TYPE_FIELD]);}
-  QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_CALC_RULE_FIELD]);}
-  QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[STATUS_PROP_RULE_FIELD]);}
-  inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(editorItemsList[ICON_FIELD]);}
-  inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(editorItemsList[DESCRIPTION_FIELD]);}
-  inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[ALARM_MSG_FIELD]) ;}
-  inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(editorItemsList[NOTIFICATION_MSG_FIELD]);}
-  inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(editorItemsList[CHECK_FIELD]) ;}
-  inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(editorItemsList[CHECK_LIST_FIELD]);}
+  WidgetMapT* itemList( void ) {return &mitems;}
+  QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(mitems[NAME_FIELD]);}
+  QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(mitems[TYPE_FIELD]);}
+  QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(mitems[STATUS_CALC_RULE_FIELD]);}
+  QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(mitems[STATUS_PROP_RULE_FIELD]);}
+  inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(mitems[ICON_FIELD]);}
+  inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(mitems[DESCRIPTION_FIELD]);}
+  inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(mitems[ALARM_MSG_FIELD]) ;}
+  inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(mitems[NOTIFICATION_MSG_FIELD]);}
+  inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(mitems[CHECK_FIELD]) ;}
+  inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(mitems[CHECK_LIST_FIELD]);}
 
 public slots:
-  void handleSaveClick(void) ;
-  void handleCloseClick(void ) ;
-  void handleReturnPressed(void) ;
+  inline void handleSaveClick(void) { emit saveClicked(); }
+  void handleCloseClick(void){ emit closeClicked(); }
+  inline void handleReturnPressed(void) { emit returnPressed(); }
   void handleNodeTypeChanged(const QString &) ;
   void handleNodeTypeActivated( const QString & _text) ;
 
@@ -91,12 +91,12 @@ signals:
   void nodeTypeActivated(qint32) ;
 
 private:
-  Settings* settings ;
+  Settings* msettings ;
   qint32 editorLayoutRowCount;
-  qint32 editorLayoutColumnCount;
-  qint16 currentLine;
-  ItemsList editorItemsList;
-  QGridLayout* layout;
+  qint32 mlayoutColumnCount;
+  qint16 mlayoutRowIndex;
+  WidgetMapT mitems;
+  QGridLayout* mlayout;
   QDialogButtonBox* buttonBox;
 
   void addEvent(void) ;
