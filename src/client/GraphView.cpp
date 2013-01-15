@@ -179,11 +179,9 @@ void GraphView::updateStatsPanel(Chart * _statsPanel)
       statsPanelItem->setVisible(visible);
     } else {
       statsPanelItem = graphScene->addWidget(_statsPanel);
-      statsPanelItem->setToolTip(_statsPanel->toolTip());
       statsArea = new QGraphicsRectItem();
       statsArea->setBrush(Qt::transparent);
       statsArea->setPen(QColor(Qt::transparent));
-      statsArea->setToolTip(_statsPanel->toolTip());
       graphScene->addItem(statsArea);
     }
 
