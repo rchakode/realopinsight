@@ -73,7 +73,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     muserRole (_userRole),
     msettings (new Settings()),
     mchart (new Chart()),
-    mfilteredMsgPanel (NULL),
+    mfilteredMsgConsole (NULL),
     mmainSplitter (new QSplitter(this)),
     mrightSplitter (new QSplitter()),
     mviewPanel (new QTabWidget()),
@@ -111,7 +111,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
 
 SvNavigator::~SvNavigator()
 {
-  if (mfilteredMsgPanel) delete mfilteredMsgPanel;
+  if (mfilteredMsgConsole) delete mfilteredMsgConsole;
   delete mmsgConsole;
   delete mchart;
   delete mtree;
@@ -178,7 +178,7 @@ void SvNavigator::loadMenus(void)
 
 void SvNavigator::closeEvent(QCloseEvent * event)
 {
-  if (mfilteredMsgPanel) mfilteredMsgPanel->close();
+  if (mfilteredMsgConsole) mfilteredMsgConsole->close();
   QMainWindow::closeEvent(event);
 }
 
@@ -549,18 +549,20 @@ void SvNavigator::centerGraphOnNode(const QString& _nodeId)
 
 void SvNavigator::filterNodeRelatedMsg(void)
 {
-  if (mfilteredMsgPanel) delete mfilteredMsgPanel;
-  mfilteredMsgPanel = new MsgConsole();
+  if (mfilteredMsgConsole) delete mfilteredMsgConsole;
+  mfilteredMsgConsole = new MsgConsole();
   NodeListT::iterator node;
   if (utils::findNode(mcoreData, mselectedNode, node)) {
       filterNodeRelatedMsg(mselectedNode);
       QString title = tr("Messages related to '%2' - %1")
           .arg(AppName)
           .arg(node->name);
-      mfilteredMsgPanel->updateColumnWidths(mmsgConsoleSize, true);
-      mfilteredMsgPanel->setWindowTitle(title);
+      mfilteredMsgConsole->updateColumnWidths(mmsgConsoleSize, true);
+      mfilteredMsgConsole->setWindowTitle(title);
     }
-  mfilteredMsgPanel->show();
+  qint32 rh = qMax(mfilteredMsgConsole->getRowCount() * mfilteredMsgConsole->getRowHeight() + 50, 100);
+  if (mfilteredMsgConsole->height() > rh) mfilteredMsgConsole->resize(mmsgConsoleSize.width(), rh);
+  mfilteredMsgConsole->show();
 }
 
 void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
@@ -569,7 +571,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
   if (utils::findNode(mcoreData, _nodeId, node) &&
       node->child_nodes != "") {
       if (node->type == NodeType::ALARM_NODE) {
-          mfilteredMsgPanel->updateNodeMsg(node);
+          mfilteredMsgConsole->updateNodeMsg(node);
         } else {
           QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
           for (auto chkid : childIds) {

@@ -55,13 +55,17 @@ public:
   static const QString TAG_CHECK;
   static const QString TAG_THERESHOLD ;
   static const QString TAG_PLUGIN_OUTPUT;
+  static const qint16 NUM_COLUMNS;
+  static const qint16 ROW_MARGIN;
 
   MsgConsole(QWidget * parent = 0 );
   virtual ~MsgConsole();
-  static const qint16 NUM_COLUMNS;
   void updateNodeMsg(const NodeListT::iterator &);
   void updateNodeMsg(const NodeT &);
   void updateColumnWidths( const QSize& ,  const bool& = false );
+//  inline QPoint getEmFontSize() const { return memFontSize; }
+  inline qint32 getRowCount() const { return model()->rowCount();}
+  inline qint32 getRowHeight() const {return mrHeight;}
 
 public slots:
   inline void acknowledgeMsg(void) { emit acknowledgeChanged(); }
@@ -73,8 +77,8 @@ signals:
 private:
   QStandardItemModel* mmodel;
   MsgConsoleProxyModel* mproxyModel;
-  QPoint charSize;
-  QSize windowSize;
+  QPoint memFontSize;
+  qint32 mrHeight;
 };
 
 #endif /* MSGCONSOLE_HPP */

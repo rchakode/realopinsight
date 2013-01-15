@@ -26,6 +26,7 @@
 #include <ctime>
 #include "utilsClient.hpp"
 
+const qint16 MsgConsole::ROW_MARGIN = 3;
 const QString MsgConsole::TAG_HOSTNAME = "\\{hostname\\}";
 const QString MsgConsole::TAG_HOSTNAME_ZABBIX = "\\{HOST.NAME\\}";
 const QString MsgConsole::TAG_CHECK = "\\{check_name\\}";
@@ -37,8 +38,9 @@ const qint32 ID_COLUMN = MsgConsole::NUM_COLUMNS - 1;
 MsgConsole::MsgConsole(QWidget * _parent)
   : QTableView(_parent),
     mmodel(new QStandardItemModel(0, NUM_COLUMNS, this)),
-    mproxyModel(new MsgConsoleProxyModel),
-    charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0), QFontMetrics(QFont()).height()))
+    mproxyModel(new MsgConsoleProxyModel)
+  //,
+  //  memFontSize(QPoint(QFontMetrics(QFont()).charWidth("m", 0), QFontMetrics(QFont()).height()))
 {
   mmodel->setHeaderData(0, Qt::Horizontal, QObject::tr("Date & Hour"), Qt::DisplayRole);
   mmodel->setHeaderData(1, Qt::Horizontal, QObject::tr("Severity"), Qt::DisplayRole);
@@ -52,6 +54,8 @@ MsgConsole::MsgConsole(QWidget * _parent)
   QTableView::setAlternatingRowColors(true);
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
   QTableView::setSortingEnabled(true);
+  QPoint emFontSize(QPoint(QFontMetrics(QFont()).charWidth("m", 0), QFontMetrics(QFont()).height()));
+  mrHeight = emFontSize.y() + ROW_MARGIN;
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
 }
 
@@ -81,7 +85,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
       index = 0;
       mmodel->insertRow(index);
       mmodel->setRowCount(nbRows + 1);
-      QTableView::setRowHeight(index, charSize.y() + 3);
+      QTableView::setRowHeight(index, mrHeight);
       mmodel->setItem(index, 0, new QStandardItem(itemText));
       mmodel->setItem(index, 1, new QStandardItem(itemText));
       mmodel->setItem(index, 2, new QStandardItem(itemText));

@@ -98,7 +98,7 @@ private:
   qint32 mtimer;
   Settings* msettings;
   Chart* mchart;
-  MsgConsole* mfilteredMsgPanel;
+  MsgConsole* mfilteredMsgConsole;
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
   QTabWidget* mviewPanel;
