@@ -54,7 +54,6 @@ bool Socket::connect(const std::string & _uri)
 {
   mserverUri = _uri;
   if (!init()) return false;
-  int l = -1;
   return zmq_connect(msocket, mserverUri.c_str()) == 0;
 }
 
