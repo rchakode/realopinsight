@@ -332,7 +332,7 @@ int SvNavigator::runNagiosMonitor(void)
           mcoreData->check_status_count[cnode.criticity]++;
         }
     }
-  socket->disconnect();
+  socket->finalize();
   socket.reset(nullptr);
   finalizeDashboardUpdate();
   return 0;
@@ -405,7 +405,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
   for (auto& cnode : mcoreData->cnodes) {
-      if (cnode.child_nodes.toStdString().compare(check.id) == 0) {
+      if (cnode.child_nodes.toStdString() == check.id) {
           cnode.check = check;
           computeStatusInfo(cnode);
           mcoreData->check_status_count[cnode.criticity]++;

@@ -11,7 +11,8 @@ public:
   bool init();
   bool connect(const std::string & _uri);
   bool bind(const std::string & _uri);
-  void disconnect();
+  void finalize();
+  void reset();
   void send(const std::string & _msg);
   std::string recv() const;
   void makeHandShake();
