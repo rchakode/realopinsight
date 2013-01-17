@@ -332,7 +332,6 @@ int SvNavigator::runNagiosMonitor(void)
           mcoreData->check_status_count[cnode.criticity]++;
         }
     }
-  socket->finalize();
   socket.reset(nullptr);
   finalizeDashboardUpdate();
   return 0;
