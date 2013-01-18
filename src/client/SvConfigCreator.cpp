@@ -91,7 +91,7 @@ void SvCreator::load(const QString& _path)
   loadMenu();
   addEvents();
   loadFile(_path);
-  setWindowTitle(tr("%1 Editor - %2").arg(AppName).arg(mactiveFile));
+  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
   statusBar()->showMessage(tr("Loaded."));
   show();
 }
@@ -100,7 +100,7 @@ void SvCreator::load(const QString& _path)
 void SvCreator::open(void)
 {
   QString path = QFileDialog::getOpenFileName(this,
-                                              tr("%1 | Select a configuration file").arg(AppName),
+                                              tr("%1 | Select a configuration file").arg(APP_NAME),
                                               ".",
                                               tr("%1;;%2;;%3;;Xml files(*.xml);;All files(*)")
                                               .arg(NagiosCompatibleFormat)
@@ -127,7 +127,7 @@ void SvCreator::loadFile(const QString& _path)
 
 void SvCreator::import() {
   QString path = QFileDialog::getOpenFileName(this,
-                                              tr("Select the Status File %").arg(AppName),
+                                              tr("Select the Status File %").arg(APP_NAME),
                                               ".",
                                               tr("Data files (*.dat);;All files (*)"));
   if (path.length())
@@ -155,7 +155,7 @@ void SvCreator::newBusinessView(void)
       mactiveFile.clear();
       mselectedNode = SvNavigatorTree::RootId;
       mhasLeftUpdates = true;
-      setWindowTitle(tr("%1 Editor - unsaved document*").arg(AppName));
+      setWindowTitle(tr("%1 Editor - unsaved document*").arg(APP_NAME));
     }
 }
 
@@ -192,7 +192,7 @@ void SvCreator::deleteNode(void)
   QMessageBox msgBox;
 
   msgBox.setText(tr("Do you really want to delete the service and its sub services?"));
-  msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(AppName));
+  msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(APP_NAME));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec())
     {
@@ -256,7 +256,7 @@ void SvCreator::saveAs(void)
 {
   QString filter;
   QString path = QFileDialog::getSaveFileName(this,
-                                              tr("Select the destination file | %1").arg(AppName),
+                                              tr("Select the destination file | %1").arg(APP_NAME),
                                               mactiveFile,
                                               QString("%1;;%2;;%3;;")
                                               .arg(NagiosCompatibleFormat)
@@ -289,7 +289,7 @@ int SvCreator::treatCloseAction(const bool& _close)
   if (!mhasLeftUpdates && _close) qApp->quit();
 
   QMessageBox mbox;
-  mbox.setWindowTitle(tr("Save change? - %1").arg(AppName));
+  mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
   mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
 
   bool enforceClose = _close;
@@ -364,7 +364,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
                   mcoreData->tree_items[mselectedNode]->setText(0, node->name);
                   mhasLeftUpdates = true;
                   statusBar()->showMessage(mactiveFile%"*");
-                  setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
+                  setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
                 }
             }
         } else {
@@ -376,7 +376,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
                   mcoreData->tree_items[mselectedNode]->setText(0, node->name);
                   mhasLeftUpdates = true;
                   statusBar()->showMessage(mactiveFile%"*");
-                  setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
+                  setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
                 }
             }
         }
@@ -386,7 +386,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 void SvCreator::handleShowOnlineResources(void)
 {
   QDesktopServices launcher;
-  launcher.openUrl(QUrl(PackageUrl));
+  launcher.openUrl(QUrl(PKG_URL));
 }
 
 void SvCreator::handleShowAbout(void)
@@ -403,7 +403,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem * _item)
           mcoreData->tree_items[mselectedNode]->setText(0, node->name);
           mhasLeftUpdates = true;
           statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
+          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
         }
     }
   mselectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
@@ -420,7 +420,7 @@ void SvCreator::handleReturnPressed(void)
           mcoreData->tree_items[mselectedNode]->setText(0, node->name);
           mhasLeftUpdates = true;
           statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(AppName).arg(mactiveFile));
+          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
         }
     }
 }
@@ -463,7 +463,7 @@ void SvCreator::recordData(const QString& _path)
   statusBar()->clearMessage();
   mactiveFile = utils::getAbsolutePath(_path);
   statusBar()->showMessage(tr("saved %1").arg(mactiveFile));
-  setWindowTitle(tr("%1 Editor - %2").arg(AppName).arg(mactiveFile));
+  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
 }
 
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
@@ -506,7 +506,7 @@ void SvCreator::loadMenu(void)
   mmenuList["MENU2"] = mmenuBar->addMenu(tr("&Help")),
       msubMenuList["ShowOnlineResources"] = mmenuList["MENU2"]->addAction(tr("Online &Resources"));
   mmenuList["MENU2"]->addSeparator(),
-      msubMenuList["ShowAbout"] = mmenuList["MENU2"]->addAction(tr("&About %1").arg(AppName));
+      msubMenuList["ShowAbout"] = mmenuList["MENU2"]->addAction(tr("&About %1").arg(APP_NAME));
   msubMenuList["NewFile"]->setShortcut(QKeySequence::New);
   msubMenuList["Open"]->setShortcut(QKeySequence::Open);
   msubMenuList["Save"]->setShortcut(QKeySequence::Save);

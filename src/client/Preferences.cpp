@@ -46,9 +46,10 @@ const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
 
 
-const QString AboutPattern = QObject::tr("\n%1\nVersion %2 (%3)\n \
-                        \nCopyright (c) 2010-%4 by NGRT4N Project. All rights reserved. \
-                        \nVisit %5 for more information.\n \
+const QString AboutPattern = QObject::tr("\n%1 %2 (codename: %3)\n \
+                        \nRelease ID: %4\n \
+                        \nCopyright (c) 2010 NGRT4N Project. All rights reserved \
+                        \nVisit %5 for more information\n \
                         \nReport Bugs: bugs@ngrt4n.com\n");
 
 
@@ -81,7 +82,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     switch (_action)
     {
     case Preferences::ChangeMonitoringSettings:
-        setWindowTitle(tr("Monitoring Settings | %1").arg(AppName));
+        setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
         line++,
                 layout->addWidget(new QLabel(tr("Web Interface*")), line, 0),
                 layout->addWidget(monitorHomeField, line, 1, 1, 4);
@@ -123,7 +124,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
 
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
-        setWindowTitle(tr("Change Password| %1").arg(AppName));
+        setWindowTitle(tr("Change Password| %1").arg(APP_NAME));
         line++,
                 layout->addWidget(new QLabel(tr("Current Password")), line, 0),
                 layout->addWidget(oldPasswdField, line, 1, 1, 2);
@@ -143,12 +144,12 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
         break;
 
     case Preferences::ShowAbout:
-        setWindowTitle(tr("About %1").arg(AppName));
-        QString about = AboutPattern.arg(AppName)
-                .arg(PackageVersion)
-                .arg(ReleaseName)
-                .arg(ReleaseYear)
-                .arg(PackageUrl);
+        setWindowTitle(tr("About %1").arg(APP_NAME));
+        QString about = AboutPattern.arg(APP_NAME)
+                .arg(PKG_VERSION)
+                .arg(RELEASE_NAME)
+                .arg(REL_INFO)
+                .arg(PKG_URL);
 
                 line++,
                 layout->addWidget(new QLabel(about), line, 0, 1, 2);
@@ -226,7 +227,7 @@ void Preferences::changePasswd(void)
         if(newPasswd == renewPasswd) {
             settings->setKeyValue(key, newPasswd);
             QMessageBox::information(this,
-                                     AppName,
+                                     APP_NAME,
                                      tr("Password updated"),
                                      QMessageBox::Ok);
 

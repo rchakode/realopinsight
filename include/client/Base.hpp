@@ -30,18 +30,18 @@
 #include <QtWebKit>
 #include <QSettings>
 
-const QString Project = "NGRT4N";
-const QString UserBasename = BUILTIN_USER_PREFIX;
-const QString ProjectName = Project;
-const QString AppName = APPLICATION_NAME;
-const QString packageName = PACKAGE_NAME;
-const QString PackageVersion = PACKAGE_VERSION;
-const QString PackageUrl = PACKAGE_URL;
-const QString ReleaseYear = RELEASE_YEAR;
-const QString ReleaseName = RELEASE_NAME;
+const QString PROJECT = "NGRT4N";
+const QString USER_BN = BUILTIN_USER_PREFIX;
+const QString PJT_NAME = PROJECT;
+const QString APP_NAME = APPLICATION_NAME;
+const QString PKG_NAME = PACKAGE_NAME;
+const QString PKG_VERSION = PACKAGE_VERSION;
+const QString PKG_URL = PACKAGE_URL;
+const QString REL_INFO = RELEASE_INFO;
+const QString REL_NAME = RELEASE_NAME;
 
 typedef QMap<QString, QString> IconMapT;
-typedef QList<QListWidgetItem  *> CheckItemList;
+typedef QList<QListWidgetItem*> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
 
 class PropRules {

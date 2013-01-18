@@ -93,7 +93,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mlastError(""),
     mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png")))
 {
-  setWindowTitle(tr("%1 Operations Console").arg(AppName));
+  setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
   loadMenus();
   mviewPanel->addTab(mmap, tr("Dashboard"));
   mviewPanel->addTab(mbrowser, tr("Native Web UI"));
@@ -152,7 +152,7 @@ void SvNavigator::loadMenus(void)
   mmenus["HELP"] = menuBar->addMenu("&Help"),
       msubMenus["ShowOnlineResources"] = mmenus["HELP"]->addAction(tr("Online &Resources")),
       mmenus["HELP"]->addSeparator(),
-      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(AppName));
+      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
   msubMenus["Capture"]->setShortcut(QKeySequence::Save);
   msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh);
   msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
@@ -164,7 +164,7 @@ void SvNavigator::loadMenus(void)
   mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
   mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
 
-  QToolBar* toolBar = addToolBar(AppName);
+  QToolBar* toolBar = addToolBar(APP_NAME);
   toolBar->setIconSize(QSize(16,16));
   toolBar->addAction(msubMenus["Refresh"]);
   toolBar->addAction(msubMenus["ZoomIn"]);
@@ -229,7 +229,7 @@ void SvNavigator::load(const QString& _file)
   if (!_file.isEmpty())
     mconfigFile = utils::getAbsolutePath(_file);
   mactiveFile = mconfigFile;
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(AppName).arg(mconfigFile));
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME).arg(mconfigFile));
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
@@ -240,7 +240,7 @@ void SvNavigator::load(const QString& _file)
   QMainWindow::show();
   mmap->scaleToFitViewPort();
   mtrayIcon->show();
-  mtrayIcon->setToolTip(AppName);
+  mtrayIcon->setToolTip(APP_NAME);
 }
 
 void SvNavigator::unloadMenus(void)
@@ -554,7 +554,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
   if (utils::findNode(mcoreData, mselectedNode, node)) {
       filterNodeRelatedMsg(mselectedNode);
       QString title = tr("Messages related to '%2' - %1")
-          .arg(AppName)
+          .arg(APP_NAME)
           .arg(node->name);
       mfilteredMsgConsole->updateColumnWidths(mmsgConsoleSize, true);
       mfilteredMsgConsole->setWindowTitle(title);
@@ -910,7 +910,7 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
       icon = QSystemTrayIcon::Warning;
     }
   qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
-  QString title = AppName%" - "%_node.name;
+  QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(pbCount).arg(pbCount>1?tr("s"):"")
       .arg(utils::criticityToText(_node.criticity).toUpper());

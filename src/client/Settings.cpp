@@ -30,7 +30,7 @@
 #include "core/ns.hpp"
 #include <QtScript/QScriptEngine>
 
-Settings::Settings(): QSettings(Project.toLower(), AppName.toLower().replace(" ", "-"))
+Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
   Q_INIT_RESOURCE(ngrt4n);
   QString updateInterval = value(Preferences::UPDATE_INTERVAL_KEY).toString();

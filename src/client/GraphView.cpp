@@ -423,7 +423,7 @@ void GraphView::capture(void)
   QPixmap pixmap(size());
   QPainter painter(&pixmap);
   QString fileName= QFileDialog::getSaveFileName(this,
-                                                 tr("Select the image destination - ") + AppName,
+                                                 tr("Select the image destination - ") + APP_NAME,
                                                  ".",
                                                  tr("PNG files (*.png);; All files (*)"));
   QFileInfo fileInfo(fileName);

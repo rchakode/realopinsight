@@ -27,21 +27,21 @@
 #include "ns.hpp"
 #include "utilsClient.hpp"
 
-const QString Auth::AdmUser = UserBasename%"_adm";
-const QString Auth::OpUser = UserBasename%"_op";
+const QString Auth::AdmUser = USER_BN%"_adm";
+const QString Auth::OpUser = USER_BN%"_op";
 
 Auth::Auth()
   : QDialog(),
     settings (new Settings())
 {
-  setWindowTitle(tr("%1 - Login").arg(AppName));
+  setWindowTitle(tr("%1 - Login").arg(APP_NAME));
   layout = new QGridLayout(this);
   qint32 line = 0;
   QPixmap logo(":images/built-in/logo.png");
   QLabel* llogo =  new QLabel(); llogo->setPixmap(logo);
   layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft);
   line++;
-  layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PackageVersion).arg(ReleaseName)), line, 0, 2, 1, Qt::AlignLeft);
+  layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PKG_VERSION).arg(RELEASE_NAME)), line, 0, 2, 1, Qt::AlignLeft);
   line++;
   layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight);
   layout->addWidget(login = new QLineEdit(OpUser), line, 2, Qt::AlignJustify);
@@ -51,7 +51,7 @@ Auth::Auth()
   password->setEchoMode(QLineEdit::Password);
   line++;
   layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
-  line++; QString copying = QString("\nCopyright (c) 2010-"+ReleaseYear +" by NGRT4N Project. All rights reserved.");
+  line++; QString copying = QString("\nCopyright (c) 2010 NGRT4N Project. All rights reserved.");
   layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft);
   addEvents();
 }

@@ -50,14 +50,15 @@ int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
-  app->setApplicationName(AppName.toUpper());
+  app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(Preferences::style());
 
   QString cmdName = basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("\n> %1 %2 (codename: %3)").arg(AppName).arg(PackageVersion).arg(ReleaseName).toStdString()
-                           +QObject::tr("\n>> Copyright (C) 2010-%1 NGRT4N Project. All rights reserved.").arg(ReleaseYear).toStdString()
+  ostringstream versionMsg(QObject::tr("\n> %1 %2 (codename: %3)").arg(APP_NAME).arg(PKG_VERSION).arg(RELEASE_NAME).toStdString()
+                           +QObject::tr("\n>> Realease ID: %1").arg(REL_INFO).toStdString()
+                           +QObject::tr("\n>> Copyright (C) 2010 NGRT4N Project. All rights reserved").toStdString()
                            +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PackageUrl).toStdString());
+                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PKG_URL).toStdString());
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
@@ -101,7 +102,7 @@ int main(int argc, char **argv)
           info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
           utils::delay(1); info->finish(0);
           file = QFileDialog::getOpenFileName(0,
-                                              QObject::tr("%1 | Select a configuration file").arg(AppName),
+                                              QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
                                               ".",
                                               QObject::tr("Xml files (*.xml);;All files (*)"));
 
