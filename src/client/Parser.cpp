@@ -122,7 +122,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
                                 QString& _graphContent)
 {
   _graphContent = "\n";
-  for (auto node = _bpnodes.begin(), end = _bpnodes.end();
+  for (NodeListT::ConstIterator node = _bpnodes.begin();
        node != _bpnodes.end(); ++node)
   {
     QString nname = node->name;
@@ -140,7 +140,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
     }
   }
 
-  for (auto node = _cnodes.begin(), end = _cnodes.end();
+  for (NodeListT::ConstIterator node = _cnodes.begin();
        node != _cnodes.end(); ++node)
   {
     QString nname = node->name;
@@ -162,8 +162,6 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
        node!=end; ++node)
   {
     if (node->child_nodes.isEmpty()) continue;
-    auto treeItem = _tree.find(node->id);
-      foreach (const QString& id, ids) {
           auto treeItem = _tree.find(node->id);
     if (treeItem == _tree.end()) {
       utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
