@@ -162,7 +162,7 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
        node!=end; ++node)
   {
     if (node->child_nodes.isEmpty()) continue;
-          auto treeItem = _tree.find(node->id);
+      auto treeItem = _tree.find(node->id);
     if (treeItem == _tree.end()) {
       utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
       continue;
