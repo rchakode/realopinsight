@@ -123,7 +123,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
                                 QString& _graphContent)
 {
   _graphContent = "\n";
-  for (auto node = _bpnodes.begin(), end = _bpnodes.end();
+  for (NodeListT::ConstIterator node = _bpnodes.begin();
        node != _bpnodes.end(); ++node)
   {
     QString nname = node->name;
@@ -141,7 +141,7 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
     }
   }
 
-  for (auto node = _cnodes.begin(), end = _cnodes.end();
+  for (NodeListT::ConstIterator node = _cnodes.begin();
        node != _cnodes.end(); ++node)
   {
     QString nname = node->name;
