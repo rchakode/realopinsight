@@ -44,9 +44,9 @@ const QString USER_BN = "ngrt4n";
 const QString PJT_NAME = PROJECT;
 const QString APP_NAME = "RealOpInsight";
 const QString PKG_NAME = "";
-const QString PKG_VERSION = "2.2.0"
-const QString PKG_URL = "http://RealOpInsight.com"
-const QString REL_NAME = "Lucia"
+const QString PKG_VERSION = "2.2.0";
+const QString PKG_URL = "http://RealOpInsight.com";
+const QString REL_NAME = "Lucia";
 const QString REL_YEAR = RELEASE_YEAR;
 const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
 const QString ID_PATTERN("%1/%2");
