@@ -126,8 +126,7 @@ void Socket::makeHandShake() {
         } else {
           if (--retriesLeft != 0) {
               std::cerr << timeStr << "WARNING: No response from server, retrying...\n";
-              socket.reset(nullptr);
-              socket.reset(new Socket(ZMQ_REQ));
+              socket->reset();
             } else {
               std::cerr << timeStr<< "ERROR: Server seems to be offline, abandoning\n";
             }
