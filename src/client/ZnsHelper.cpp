@@ -93,6 +93,13 @@ RequestListT ZnsHelper::getRequestsPatterns()
       \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\"]}], \
       \"type\": \"rpc\", \
       \"tid\": %2}";
+  list[DeviceInfo] = "{\"action\": \"DeviceRouter\", \
+      \"method\": \"getInfo\", \
+      \"data\": [{\
+      \"uid\": \"%1\", \
+      \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\"] }], \
+      \"type\": \"rpc\", \
+      \"tid\": %2}";
   return list;
 }
 

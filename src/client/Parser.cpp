@@ -98,6 +98,9 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
         }
       if (node.type == NodeType::ALARM_NODE) {
           QString host = node.child_nodes.left(node.child_nodes.indexOf("/"));
+          if (host == node.child_nodes) {
+              node.child_nodes += "/ping";
+            }
           _coreData.hosts[host] << node.id;
           _coreData.cnodes.insert(node.id, node);
         } else {

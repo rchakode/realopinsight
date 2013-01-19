@@ -686,12 +686,12 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
       postRpcDataRequest();
       break;
     case ZbxHelper::Trigger: {
+        MonitorBroker::CheckT check;
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next();
             if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue triggerData = trigger.value();
-            MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
             check.check_command = triggerName.toStdString();
             check.status = triggerData.property("value").toInt32();
@@ -726,8 +726,9 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         break;
       }
     default :
-      utils::alert(tr("Weird response received from the server"));
-      exit(1);
+      QString msg = tr("Weird response received from the server");
+      utils::alert(msg);
+      updateDashboardOnUnknown(msg);
       break;
     }
 }
@@ -749,53 +750,57 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl());
     } else {
       JsonHelper jsonHelper(data.toStdString());
-      qint32 transaction = jsonHelper.getProperty("tid").toInt32();
+      qint32 tid = jsonHelper.getProperty("tid").toInt32();
       QScriptValue result = jsonHelper.getProperty("result");
-      QString successMsg = result.property("success").toString();
-      if (successMsg.compare("true") != 0) {
-          qDebug() << data;
+      bool successMsg = result.property("success").toBool();
+      if (!successMsg) {
           QString msg = result.property("msg").toString();
           if (msg.isEmpty()) msg = "Authentication failed!";
           updateDashboardOnUnknown(msg);
           return;
         }
-      if (transaction == ZnsHelper::Device) {
+      if (tid == ZnsHelper::Device) {
           QScriptValueIterator devices(result.property("devices"));
           while(devices.hasNext()) {
               devices.next();
-              if (devices.flags()&QScriptValue::SkipInEnumeration)
-                continue;
-              QScriptValue item = devices.value();
-              QString uid = item.property("uid").toString();
+              if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
+
+              QScriptValue ditem = devices.value();
+              QString duid = ditem.property("uid").toString();
               mznsHelper->postRequest(ZnsHelper::Component,
                                       ZnsHelper::ReQPatterns[ZnsHelper::Component]
-                                      .arg(uid)
+                                      .arg(duid)
                                       .arg(ZnsHelper::Component)
                                       .toAscii());
+               //FIXME: make this request only when necessary
+              mznsHelper->postRequest(ZnsHelper::Device,
+                                      ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
+                                      .arg(duid)
+                                      .arg(ZnsHelper::DeviceInfo)
+                                      .toAscii());
             }
-        } else if (transaction == ZnsHelper::Component) {
+        } else if (tid == ZnsHelper::Component) {
+          MonitorBroker::CheckT check;
           QScriptValueIterator components(result.property("data"));
-          while(components.hasNext()) {
+          while (components.hasNext()) {
               components.next();
               if (components.flags()&QScriptValue::SkipInEnumeration) continue;
-
-              MonitorBroker::CheckT check;
-              QScriptValue item = components.value();
-              QString name = item.property("name").toString();
-              QScriptValue device = item.property("device");
+              QScriptValue citem = components.value();
+              QString cname = citem.property("name").toString();
+              QScriptValue device = citem.property("device");
               QString duid = device.property("uid").toString();
-              QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid)).arg(name);
+              QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid)).arg(cname);
               check.id = chkid.toStdString();
               check.host = device.property("name").toString().toStdString();
               check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
-              QString severity =item.property("severity").toString();
-              if (severity.toLower().compare("clear") == 0) {
+              QString severity =citem.property("severity").toString();
+              if (severity.toLower() == "clear") {
                   check.status = MonitorBroker::ZenossClear;
-                  check.alarm_msg = tr("%1 is Up").arg(name).toStdString();
+                  check.alarm_msg = tr("The component '%1' is Up").arg(cname).toStdString();
                 } else {
-                  check.status = item.property("failSeverity").toInt32();
-                  check.alarm_msg = item.property("status").toString().toStdString();
+                  check.status = citem.property("failSeverity").toInt32();
+                  check.alarm_msg = citem.property("status").toString().toStdString();
                 }
               updateCNodes(check);
             }
@@ -803,8 +808,27 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               mupdateSucceed = true;
               finalizeDashboardUpdate();
             }
+        } else if (tid == ZnsHelper::DeviceInfo) {
+          MonitorBroker::CheckT check;
+          QScriptValue devInfo(result.property("data"));
+          QString dname = devInfo.property("name").toString();
+          check.id = ID_PATTERN.arg(dname).arg("ping").toStdString();
+          check.host = dname.toStdString();
+          check.status = devInfo.property("status").toBool();
+          check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
+                                                    "yyyy/MM/dd hh:mm:ss");
+          if (check.status) {
+              check.status = MonitorBroker::ZenossClear;
+              check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
+            } else {
+              check.status = devInfo.property("severity").toInt32(); //FIXME: severity is a string
+              check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
+            }
+          updateCNodes(check);
         } else {
-          updateDashboardOnUnknown(tr("Unexpected response received from the server"));
+          QString msg = tr("Weird response received from the server");
+          utils::alert(msg);
+          updateDashboardOnUnknown(msg);
         }
     }
 }

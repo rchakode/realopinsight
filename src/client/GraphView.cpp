@@ -182,7 +182,6 @@ void GraphView::ajustStatsPanelSize(void)
 
 void GraphView::setStatsPanelPos(void)
 {
-
   if (mchart) {
       qreal xp = size().width() - mchart->size().width() *  mchartScalFactor - 2;
       QPointF pos = mapToScene(QPoint(xp, 0));
@@ -191,7 +190,6 @@ void GraphView::setStatsPanelPos(void)
       mchartArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
     }
 }
-
 
 bool GraphView::hideChart(void)
 {
@@ -205,7 +203,6 @@ bool GraphView::load(const QString& _dotFile,
                      const NodeListT& _bpnodes,
                      const NodeListT& _cnodes)
 {
-
   auto dotParser = std::unique_ptr<QProcess>(new QProcess());
   mgphCoordFile = _dotFile%".plain";
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << mgphCoordFile << _dotFile;
