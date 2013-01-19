@@ -179,6 +179,11 @@ QIcon utils::computeCriticityIcon(const int& _criticity)
   return QIcon(ipath);
 }
 
+bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)
+{
+  return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
+}
+
 bool utils::findNode(NodeListT& bpnodes,
                      NodeListT& cnodes,
                      const QString& nodeId,
@@ -197,7 +202,21 @@ bool utils::findNode(NodeListT& bpnodes,
   return found;
 }
 
-bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)
+bool utils::findNode(const NodeListT& bpnodes,
+                     const NodeListT& cnodes,
+                     const QString& nodeId,
+                     NodeListT::const_iterator& node)
 {
-  return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
+  bool found = false;
+  node = bpnodes.find(nodeId);
+  if(node != bpnodes.end()) {
+      found = true;
+    } else {
+      node = cnodes.find(nodeId);
+      if(node != cnodes.end()) {
+          found = true;
+        }
+    }
+  return found;
 }
+

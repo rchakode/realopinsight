@@ -43,8 +43,15 @@ namespace utils {
   int computePropCriticity(const qint8& _criticity, const qint8& propRule);
   QColor computeColor(const int &_criticity);
   QIcon computeCriticityIcon(const int &_criticity);
-  bool findNode(NodeListT& bpnodes, NodeListT& cnodes, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
+  bool findNode(NodeListT& bpnodes,
+                NodeListT& cnodes,
+                const QString& nodeId,
+                NodeListT::iterator& node);
+  bool findNode(const NodeListT& bpnodes,
+                const NodeListT& cnodes,
+                const QString& nodeId,
+                NodeListT::const_iterator& node);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP
