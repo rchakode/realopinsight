@@ -73,6 +73,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
   for (qint32 srv = 0; srv < serviceCount; srv++) {
       QDomElement service = services.item(srv).toElement();
       node.id = service.attribute("id").trimmed();
+      node.monitored = false;
       node.type = service.attribute("type").toInt();
       node.criticity_crule = service.attribute("statusCalcRule").toInt();
       node.criticity_prule = service.attribute("statusPropRule").toInt();

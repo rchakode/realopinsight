@@ -187,7 +187,6 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
   QPoint pos = event->globalPos();
   QList<QTreeWidgetItem*> treeNodes = mtree->selectedItems();
   QGraphicsItem* graphNode = mmap->nodeAtGlobalPos(pos);
-
   if (treeNodes.length() || graphNode) {
       if (graphNode) {
           QString itemId = graphNode->data(0).toString();
@@ -322,9 +321,9 @@ int SvNavigator::runNagiosMonitor(void)
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
               cnode.check.status = MonitorBroker::NagiosUnknown;
-              cnode.check.host = "Unknown";
               cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-              cnode.check.check_command = "Unknown";
+              cnode.check.host = "-";
+              cnode.check.check_command = "-";
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
           computeStatusInfo(cnode);
@@ -409,6 +408,7 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
           computeStatusInfo(cnode);
           mcoreData->check_status_count[cnode.criticity]++;
           updateDashboard(cnode);
+          cnode.monitored = true;
         }
     }
 }
@@ -426,6 +426,19 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DefaultUpdateInterval);
       mtimer = startTimer(mupdateInterval);
       if (mupdateSucceed) updateStatusBar(tr("Update completed"));
+      for (auto& cnode : mcoreData->cnodes) {
+          if (!cnode.monitored) {
+              cnode.check.status = MonitorBroker::CriticityUnknown;
+              cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
+              cnode.check.host = "-";
+              cnode.check.alarm_msg = tr("Unknown service %1").arg(cnode.child_nodes).toStdString();
+              computeStatusInfo(cnode);
+              mcoreData->check_status_count[cnode.criticity]++;
+              updateDashboard(cnode);
+              cnode.monitored = true;
+            }
+          cnode.monitored = false;
+        }
     }
   if (!mcoreData->bpnodes.isEmpty())
     updateTrayInfo(mcoreData->bpnodes[SvNavigatorTree::RootId]); //FIXME: avoid searching at each update
@@ -887,9 +900,9 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
   for (auto& cnode : mcoreData->cnodes) {
       //FIXME: clean undefined services on console when the server recome on service
       cnode.check.status = MonitorBroker::CriticityUnknown;
-      cnode.check.host = "Unknown";
       cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-      cnode.check.check_command = "Unknown";
+      cnode.check.host = "-";
+      cnode.check.check_command = "-";
       cnode.check.alarm_msg = mlastError.toStdString();
       computeStatusInfo(cnode);
       updateDashboard(cnode);

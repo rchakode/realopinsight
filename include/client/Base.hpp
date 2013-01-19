@@ -228,6 +228,7 @@ typedef struct _NodeT {
   qint32 prop_criticity;
   QString child_nodes;
   MonitorBroker::CheckT check;
+  bool monitored;
 } NodeT;
 
 typedef QHash<QString, NodeT> NodeListT;
