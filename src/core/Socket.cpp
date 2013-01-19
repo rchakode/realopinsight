@@ -25,6 +25,12 @@ Socket::Socket(const int & _type)
     mconnected2Server(false),
     mserverSerial(-1) { }
 
+Socket::Socket(const std::string& uri, const int & _type)
+  : mserverUri(uri),
+    mtype(_type),
+    mconnected2Server(false),
+    mserverSerial(-1) { }
+
 Socket::~Socket()
 {
   finalize();
@@ -50,11 +56,16 @@ void Socket::reset()
   init();
 }
 
+bool Socket::connect()
+{
+  if (!init()) return false;
+  return zmq_connect(msocket, mserverUri.c_str()) == 0;
+}
+
 bool Socket::connect(const std::string & _uri)
 {
   mserverUri = _uri;
-  if (!init()) return false;
-  return zmq_connect(msocket, mserverUri.c_str()) == 0;
+  return connect();
 }
 
 bool Socket::bind(const std::string & _uri)
@@ -98,10 +109,10 @@ std::string Socket::recv() const{
 
 void Socket::makeHandShake() {
   int retriesLeft = NUM_RETRIES;
-  auto socket = std::unique_ptr<Socket>(new Socket(ZMQ_REQ));
+  auto socket = std::unique_ptr<Socket>(new Socket(mserverUri, ZMQ_REQ));
   std::string msg("PING");
   while (retriesLeft) {
-      if(!socket->connect(mserverUri)) break;
+      if(!socket->connect()) break;
       socket->send(msg);
       time_t curTime = time(NULL); std::string timeStr = std::string(ctime(&curTime));
       zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };

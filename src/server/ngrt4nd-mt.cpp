@@ -222,10 +222,10 @@ int main(int argc, char ** argv)
 	cout << "Nagios status file => " << statusFile << endl ;
 
 	zmq::context_t ctx(1);
-	zmq::socket_t workersComChannel(ctx, ZMQ_XREQ);
+	zmq::socket_t workersComChannel(ctx, ZMQ_DEALER);
 	workersComChannel.bind("inproc://ngrt4ndwkrs");
 
-	zmq::socket_t clientsComChannel(ctx, ZMQ_XREP);
+	zmq::socket_t clientsComChannel(ctx, ZMQ_ROUTER);
 	clientsComChannel.bind(tcpAddr.str().c_str());
 
 	for (int i = 0; i < numWorkers; i++) {

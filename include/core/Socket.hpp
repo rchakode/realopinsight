@@ -7,8 +7,10 @@ class Socket
 {
 public:
   Socket(const int & _type);
+  Socket(const std::string& uri, const int & _type);
   ~Socket();
   bool init();
+  bool connect();
   bool connect(const std::string & _uri);
   bool bind(const std::string & _uri);
   void finalize();
