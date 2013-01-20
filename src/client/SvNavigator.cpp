@@ -228,7 +228,7 @@ void SvNavigator::load(const QString& _file)
   if (!_file.isEmpty())
     mconfigFile = utils::getAbsolutePath(_file);
   mactiveFile = mconfigFile;
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME).arg(mconfigFile));
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, mconfigFile));
   Parser parser;
   parser.parseSvConfig(mconfigFile, *mcoreData);
   mtree->clear();
@@ -365,11 +365,11 @@ void SvNavigator::prepareDashboardUpdate(void)
 
 QString SvNavigator::getNodeToolTip(const NodeT& _node)
 {
-  QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
-      .arg(const_cast<QString&>(_node.description).replace("\n", " "))
-      .arg(utils::criticityToText(_node.criticity))
-      .arg(CalcRules::label(_node.criticity_crule))
-      .arg(PropRules::label(_node.criticity_prule));
+  QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
+                                            const_cast<QString&>(_node.description).replace("\n", " "),
+                                            utils::criticityToText(_node.criticity),
+                                            CalcRules::label(_node.criticity_crule),
+                                            PropRules::label(_node.criticity_prule));
 
   if (_node.type == NodeType::ALARM_NODE) {
       QString msg = "";
@@ -378,10 +378,10 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
         } else {
           msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
         }
-      toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "))
-          .arg(_node.child_nodes)
-          .arg(QString::fromStdString(_node.check.alarm_msg).replace("\n", " "))
-          .arg(msg);
+      toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
+                                                _node.child_nodes,
+                                                QString::fromStdString(_node.check.alarm_msg).replace("\n", " "),
+                                                msg);
     }
   return toolTip;
 }
@@ -536,7 +536,7 @@ void SvNavigator::updateMonitoringSettings() {
   mserverAuthChain = msettings->value(Preferences::SERVER_PASS_KEY).toString();
   mserverAddr = msettings->value(Preferences::SERVER_ADDR_KEY).toString();
   mserverPort = msettings->value(Preferences::SERVER_PORT_KEY).toString();
-  mserverUrl = QString("tcp://%1:%2").arg(mserverAddr).arg(mserverPort);
+  mserverUrl = QString("tcp://%1:%2").arg(mserverAddr, mserverPort);
   mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
   if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DefaultUpdateInterval * 1000;
 }
@@ -566,9 +566,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
   NodeListT::iterator node;
   if (utils::findNode(mcoreData, mselectedNode, node)) {
       filterNodeRelatedMsg(mselectedNode);
-      QString title = tr("Messages related to '%2' - %1")
-          .arg(APP_NAME)
-          .arg(node->name);
+      QString title = tr("Messages related to '%2' - %1").arg(APP_NAME, node->name);
       mfilteredMsgConsole->updateColumnWidths(mmsgConsoleSize, true);
       mfilteredMsgConsole->setWindowTitle(title);
     }
@@ -715,7 +713,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                 QScriptValue itemData = item.value();
                 check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
-            QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
+            QString key = ID_PATTERN.arg(targetHost, triggerName);
             check.id = key.toStdString();
             updateCNodes(check);
           }
@@ -769,14 +767,12 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               QString duid = ditem.property("uid").toString();
               mznsHelper->postRequest(ZnsHelper::Component,
                                       ZnsHelper::ReQPatterns[ZnsHelper::Component]
-                                      .arg(duid)
-                                      .arg(ZnsHelper::Component)
+                                      .arg(duid, ZnsHelper::Component)
                                       .toAscii());
                //FIXME: make this request only when necessary
               mznsHelper->postRequest(ZnsHelper::Device,
                                       ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
-                                      .arg(duid)
-                                      .arg(ZnsHelper::DeviceInfo)
+                                      .arg(duid, ZnsHelper::DeviceInfo)
                                       .toAscii());
             }
         } else if (tid == ZnsHelper::Component) {
@@ -789,7 +785,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               QString cname = citem.property("name").toString();
               QScriptValue device = citem.property("device");
               QString duid = device.property("uid").toString();
-              QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid)).arg(cname);
+              QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid), cname);
               check.id = chkid.toStdString();
               check.host = device.property("name").toString().toStdString();
               check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
@@ -812,7 +808,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           MonitorBroker::CheckT check;
           QScriptValue devInfo(result.property("data"));
           QString dname = devInfo.property("name").toString();
-          check.id = ID_PATTERN.arg(dname).arg("ping").toStdString();
+          check.id = ID_PATTERN.arg(dname, "ping").toStdString();
           check.host = dname.toStdString();
           check.status = devInfo.property("status").toBool();
           check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
@@ -890,8 +886,7 @@ void SvNavigator::postRpcDataRequest(void) {
       for (auto host : mcoreData->hosts.keys()) {
           mznsHelper->postRequest(ZnsHelper::Device,
                                   ZnsHelper::ReQPatterns[ZnsHelper::Device]
-                                  .arg(host)
-                                  .arg(ZnsHelper::Device)
+                                  .arg(host, ZnsHelper::Device)
                                   .toAscii());
         }
       break;
@@ -908,7 +903,7 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
     } else if (mcoreData->monitor == MonitorBroker::Zenoss) {
       apiUrl =  mznsHelper->getRequestUrl();
     }
-  updateDashboardOnUnknown(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)").arg(_code)));
+  updateDashboardOnUnknown(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code));
 }
 
 void SvNavigator::updateDashboardOnUnknown(const QString& msg)
@@ -922,7 +917,7 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       mlastError = msg;
     }
   for (auto& cnode : mcoreData->cnodes) {
-      //FIXME: clean undefined services on console when the server recome on service
+      cnode.monitored = true;
       cnode.check.status = MonitorBroker::CriticityUnknown;
       cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
       cnode.check.host = "-";
@@ -949,8 +944,8 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
   qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
-                   " - Level of Impact: %3").arg(pbCount).arg(pbCount>1?tr("s"):"")
-      .arg(utils::criticityToText(_node.criticity).toUpper());
+                   " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
+                                                 utils::criticityToText(_node.criticity)).toUpper();
 
   mtrayIcon->showMessage(title, msg, icon);
   mtrayIcon->setToolTip(title%"\n"%msg);
