@@ -97,12 +97,15 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
           node.criticity_prule = PropRules::Unchanged;
         }
       if (node.type == NodeType::ALARM_NODE) {
-          QString host = node.child_nodes.left(node.child_nodes.indexOf("/"));
-          if (host == node.child_nodes) {
-              node.child_nodes += "/ping";
-            }
-          _coreData.hosts[host] << node.id;
           _coreData.cnodes.insert(node.id, node);
+          int pos = node.child_nodes.indexOf("/");
+          QString host = node.child_nodes.left(pos);
+          if (pos == -1) {
+              node.child_nodes += "/ping";
+              _coreData.hosts[host] << "ping";
+            } else {
+              _coreData.hosts[host] << node.child_nodes.mid(pos+1);
+            }
         } else {
           _coreData.bpnodes.insert(node.id, node);
         }
