@@ -39,8 +39,6 @@ MsgConsole::MsgConsole(QWidget * _parent)
   : QTableView(_parent),
     mmodel(new QStandardItemModel(0, NUM_COLUMNS, this)),
     mproxyModel(new MsgConsoleProxyModel)
-  //,
-  //  memFontSize(QPoint(QFontMetrics(QFont()).charWidth("m", 0), QFontMetrics(QFont()).height()))
 {
   mmodel->setHeaderData(0, Qt::Horizontal, QObject::tr("Date & Hour"), Qt::DisplayRole);
   mmodel->setHeaderData(1, Qt::Horizontal, QObject::tr("Severity"), Qt::DisplayRole);
@@ -54,6 +52,7 @@ MsgConsole::MsgConsole(QWidget * _parent)
   QTableView::setAlternatingRowColors(true);
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
   QTableView::setSortingEnabled(true);
+  QTableView::setEditTriggers(QAbstractItemView::NoEditTriggers);
   QPoint emFontSize(QPoint(QFontMetrics(QFont()).charWidth("m", 0), QFontMetrics(QFont()).height()));
   mrHeight = emFontSize.y() + ROW_MARGIN;
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));

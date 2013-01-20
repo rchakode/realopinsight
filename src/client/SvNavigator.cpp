@@ -346,7 +346,7 @@ void SvNavigator::prepareDashboardUpdate(void)
   mcoreData->check_status_count[MonitorBroker::Unknown] = 0;
   mhostLeft = mcoreData->hosts.size();
   mupdateSucceed = true;
-  QString msg = QObject::tr("Connecting to the server (%1)...");
+  QString msg = QObject::tr("Connecting to %1...");
   switch(mcoreData->monitor) {
     case MonitorBroker::Nagios:
       msg = msg.arg(mserverUrl);
@@ -763,20 +763,21 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               devices.next();
               if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
 
+
               QScriptValue ditem = devices.value();
               QString duid = ditem.property("uid").toString();
               mznsHelper->postRequest(ZnsHelper::Component,
                                       ZnsHelper::ReQPatterns[ZnsHelper::Component]
-                                      .arg(duid, ZnsHelper::Component)
+                                      .arg(duid, QString::number(ZnsHelper::Component))
                                       .toAscii());
 
               QString dname = ditem.property("name").toString();
-              if (mcoreData->hosts[dname].contains("ping"), Qt::CaseInsensitive) { //FIXME: To be tested
+            //  if (mcoreData->hosts[dname].contains("ping"), Qt::CaseInsensitive) { //FIXME: Don't work
                   mznsHelper->postRequest(ZnsHelper::Device,
                                           ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
-                                          .arg(duid, ZnsHelper::DeviceInfo)
+                                          .arg(duid, QString::number(ZnsHelper::DeviceInfo))
                                           .toAscii());
-                }
+             //   }
             }
         } else if (tid == ZnsHelper::Component) {
           MonitorBroker::CheckT check;
@@ -796,7 +797,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               QString severity =citem.property("severity").toString();
               if (!severity.compare("clear", Qt::CaseInsensitive)) {
                   check.status = MonitorBroker::ZenossClear;
-                  check.alarm_msg = tr("The component '%1' is Up").arg(cname).toStdString();
+                  check.alarm_msg = tr("The %1 component  is Up").arg(cname).toStdString();
                 } else {
                   check.status = citem.property("failSeverity").toInt32();
                   check.alarm_msg = citem.property("status").toString().toStdString();
@@ -889,7 +890,7 @@ void SvNavigator::postRpcDataRequest(void) {
       for (auto host : mcoreData->hosts.keys()) {
           mznsHelper->postRequest(ZnsHelper::Device,
                                   ZnsHelper::ReQPatterns[ZnsHelper::Device]
-                                  .arg(host, ZnsHelper::Device)
+                                  .arg(host, QString::number(ZnsHelper::Device))
                                   .toAscii());
         }
       break;
@@ -948,7 +949,7 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
-                                                 utils::criticityToText(_node.severity)).toUpper();
+                                                 utils::criticityToText(_node.severity).toUpper());
 
   mtrayIcon->showMessage(title, msg, icon);
   mtrayIcon->setToolTip(title%"\n"%msg);

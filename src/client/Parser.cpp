@@ -96,15 +96,15 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
           node.sev_prule = PropRules::Unchanged;
         }
       if (node.type == NodeType::ALARM_NODE) {
-          _coreData.cnodes.insert(node.id, node);
           int pos = node.child_nodes.indexOf("/");
           QString host = node.child_nodes.left(pos);
           if (pos == -1) {
               node.child_nodes += "/ping";
-              _coreData.hosts[host] << "ping";
+              qDebug() << node.child_nodes;
             } else {
               _coreData.hosts[host] << node.child_nodes.mid(pos+1);
             }
+          _coreData.cnodes.insert(node.id, node);
         } else {
           _coreData.bpnodes.insert(node.id, node);
         }
