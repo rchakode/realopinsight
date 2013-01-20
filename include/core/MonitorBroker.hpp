@@ -34,12 +34,12 @@ public:
     Zabbix = 1,
     Zenoss = 2
   };
-  enum CriticityT {
-    CriticityNormal = 0,
-    CriticityMinor = 1,
-    CriticityMajor = 2,
-    CriticityHigh = 3,
-    CriticityUnknown = 100
+  enum SeverityT {
+    Normal = 0,
+    Minor = 1,
+    Major = 2,
+    Critical = 3,
+    Unknown = 100
   };
   enum NagiosStatusT {
     NagiosOk = 0,

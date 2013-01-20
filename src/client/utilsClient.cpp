@@ -27,18 +27,18 @@
 
 QString utils::criticityToText(const qint32& _status)
 {
-  switch(static_cast<MonitorBroker::CriticityT>(_status))
+  switch(static_cast<MonitorBroker::SeverityT>(_status))
     {
-    case MonitorBroker::CriticityNormal:
+    case MonitorBroker::Normal:
       return "Normal";
       break;
-    case MonitorBroker::CriticityMinor:
+    case MonitorBroker::Minor:
       return  "Minor";
       break;
-    case MonitorBroker::CriticityMajor:
+    case MonitorBroker::Major:
       return  "Major";
       break;
-    case MonitorBroker::CriticityHigh:
+    case MonitorBroker::Critical:
       return  "Critical";
       break;
     default:
@@ -60,19 +60,19 @@ QString utils::getAbsolutePath(const QString& _path)
   return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
 }
 
-MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int& _statusOrSeverity)
+MonitorBroker::SeverityT utils::computeCriticity(const int& _monitor, const int& _statusOrSeverity)
 {
-  int criticity = MonitorBroker::CriticityUnknown;
+  int criticity = MonitorBroker::Unknown;
   if(_monitor == MonitorBroker::Nagios) {
       switch(_statusOrSeverity) {
         case MonitorBroker::NagiosOk:
-          criticity = MonitorBroker::CriticityNormal;
+          criticity = MonitorBroker::Normal;
           break;
         case MonitorBroker::NagiosWarning:
-          criticity = MonitorBroker::CriticityMajor;
+          criticity = MonitorBroker::Major;
           break;
         case MonitorBroker::NagiosCritical:
-          criticity = MonitorBroker::CriticityHigh;
+          criticity = MonitorBroker::Critical;
           break;
         default:
           break;
@@ -80,18 +80,18 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
     } else if (_monitor == MonitorBroker::Zabbix) {
       switch(_statusOrSeverity) {
         case MonitorBroker::ZabbixClear:
-          criticity = MonitorBroker::CriticityNormal;
+          criticity = MonitorBroker::Normal;
           break;
         case MonitorBroker::ZabbixInfo:
         case MonitorBroker::ZabbixWarn:
-          criticity = MonitorBroker::CriticityMinor;
+          criticity = MonitorBroker::Minor;
           break;
         case MonitorBroker::ZabbixAverage:
-          criticity = MonitorBroker::CriticityMajor;
+          criticity = MonitorBroker::Major;
           break;
         case MonitorBroker::ZabbixHigh:
         case MonitorBroker::ZabbixDisaster:
-          criticity = MonitorBroker::CriticityHigh;
+          criticity = MonitorBroker::Critical;
           break;
         default:
           break;
@@ -99,29 +99,29 @@ MonitorBroker::CriticityT utils::computeCriticity(const int& _monitor, const int
     } else if (_monitor == MonitorBroker::Zenoss){
       switch(_statusOrSeverity) {
         case MonitorBroker::ZenossClear:
-          criticity = MonitorBroker::CriticityNormal;
+          criticity = MonitorBroker::Normal;
           break;
         case MonitorBroker::ZenossDebug:
-          criticity = MonitorBroker::CriticityMinor;
+          criticity = MonitorBroker::Minor;
           break;
         case MonitorBroker::ZenossWarning:
-          criticity = MonitorBroker::CriticityMajor;
+          criticity = MonitorBroker::Major;
           break;
         case MonitorBroker::ZenossError:
         case MonitorBroker::ZenossCritical:
-          criticity = MonitorBroker::CriticityHigh;
+          criticity = MonitorBroker::Critical;
           break;
         default:
           break;
         }
     }
-  return static_cast<MonitorBroker::CriticityT>(criticity);
+  return static_cast<MonitorBroker::SeverityT>(criticity);
 }
 
 int utils::computePropCriticity(const qint8& _critValue, const qint8& propRule)
 {
-  MonitorBroker::CriticityT propCriticity = static_cast<MonitorBroker::CriticityT>(_critValue);
-  Criticity criticity(static_cast<MonitorBroker::CriticityT>(_critValue));
+  MonitorBroker::SeverityT propCriticity = static_cast<MonitorBroker::SeverityT>(_critValue);
+  Criticity criticity(static_cast<MonitorBroker::SeverityT>(_critValue));
   switch(propRule) {
     case PropRules::Increased: propCriticity = (criticity++).getValue();
       break;
@@ -137,17 +137,17 @@ int utils::computePropCriticity(const qint8& _critValue, const qint8& propRule)
 QColor utils::computeColor(const int& _criticity)
 {
   QColor color(StatsLegend::COLOR_UNKNOWN);
-  switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
-    case MonitorBroker::CriticityNormal:
+  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
+    case MonitorBroker::Normal:
       color = StatsLegend::COLOR_NORMAL;
       break;
-    case MonitorBroker::CriticityMinor:
+    case MonitorBroker::Minor:
       color = StatsLegend::COLOR_MINOR;
       break;
-    case MonitorBroker::CriticityMajor:
+    case MonitorBroker::Major:
       color = StatsLegend::COLOR_MAJOR;
       break;
-    case MonitorBroker::CriticityHigh:
+    case MonitorBroker::Critical:
       color = StatsLegend::COLOR_CRITICAL;
       break;
     default:
@@ -160,17 +160,17 @@ QColor utils::computeColor(const int& _criticity)
 QIcon utils::computeCriticityIcon(const int& _criticity)
 {
   QString ipath(":/images/built-in/unknown.png");
-  switch (static_cast<MonitorBroker::CriticityT>(_criticity)) {
-    case MonitorBroker::CriticityNormal:
+  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
+    case MonitorBroker::Normal:
       ipath = ":/images/built-in/normal.png";
       break;
-    case MonitorBroker::CriticityMinor:
+    case MonitorBroker::Minor:
       ipath = ":/images/built-in/minor.png";
       break;
-    case MonitorBroker::CriticityMajor:
+    case MonitorBroker::Major:
       ipath = ":/images/built-in/major.png";
       break;
-    case MonitorBroker::CriticityHigh:
+    case MonitorBroker::Critical:
       ipath = ":/images/built-in/critical.png";
       break;
     default:

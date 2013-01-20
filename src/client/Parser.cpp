@@ -75,26 +75,25 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
       node.id = service.attribute("id").trimmed();
       node.monitored = false;
       node.type = service.attribute("type").toInt();
-      node.criticity_crule = service.attribute("statusCalcRule").toInt();
-      node.criticity_prule = service.attribute("statusPropRule").toInt();
+      node.sev_crule = service.attribute("statusCalcRule").toInt();
+      node.sev_prule = service.attribute("statusPropRule").toInt();
       node.icon = service.firstChildElement("Icon").text().trimmed();
       node.name = service.firstChildElement("Name").text().trimmed();
       node.description = service.firstChildElement("Description").text().trimmed();
-      node.propagation_rule = service.firstChildElement("PropagationRule").text().trimmed();
       node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
       node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
       node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-      node.criticity = MonitorBroker::NagiosUnknown;
+      node.severity = MonitorBroker::NagiosUnknown;
       node.parent = "";
       node.icon.remove("--> "); //FBWC
       if (node.icon.length() == 0) {
           node.icon = GraphView::DEFAULT_ICON;
         }
-      if (node.criticity_crule < 0) {
-          node.criticity_crule = CalcRules::HighCriticity; //FBWC
+      if (node.sev_crule < 0) {
+          node.sev_crule = CalcRules::HighCriticity; //FBWC
         }
-      if (node.criticity_prule < 0) {
-          node.criticity_prule = PropRules::Unchanged;
+      if (node.sev_prule < 0) {
+          node.sev_prule = PropRules::Unchanged;
         }
       if (node.type == NodeType::ALARM_NODE) {
           _coreData.cnodes.insert(node.id, node);

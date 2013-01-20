@@ -39,7 +39,7 @@ namespace utils {
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
   QString getAbsolutePath(const QString& _path);
-  MonitorBroker::CriticityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
+  MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
   int computePropCriticity(const qint8& _criticity, const qint8& propRule);
   QColor computeColor(const int &_criticity);
   QIcon computeCriticityIcon(const int &_criticity);

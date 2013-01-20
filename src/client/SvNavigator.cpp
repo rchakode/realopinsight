@@ -296,8 +296,8 @@ int SvNavigator::runNagiosMonitor(void)
 
   for (auto& cnode : mcoreData->cnodes) {
       if (cnode.child_nodes == "") {
-          cnode.criticity = MonitorBroker::CriticityUnknown;
-          mcoreData->check_status_count[cnode.criticity]++;
+          cnode.severity = MonitorBroker::Unknown;
+          mcoreData->check_status_count[cnode.severity]++;
           continue;
         }
 
@@ -328,7 +328,7 @@ int SvNavigator::runNagiosMonitor(void)
             }
           computeStatusInfo(cnode);
           updateDashboard(cnode);
-          mcoreData->check_status_count[cnode.criticity]++;
+          mcoreData->check_status_count[cnode.severity]++;
         }
     }
   socket.reset(nullptr);
@@ -339,11 +339,11 @@ int SvNavigator::runNagiosMonitor(void)
 void SvNavigator::prepareDashboardUpdate(void)
 {
   QMainWindow::setEnabled(false);
-  mcoreData->check_status_count[MonitorBroker::CriticityNormal] = 0;
-  mcoreData->check_status_count[MonitorBroker::CriticityMinor] = 0;
-  mcoreData->check_status_count[MonitorBroker::CriticityMajor] = 0;
-  mcoreData->check_status_count[MonitorBroker::CriticityHigh] = 0;
-  mcoreData->check_status_count[MonitorBroker::CriticityUnknown] = 0;
+  mcoreData->check_status_count[MonitorBroker::Normal] = 0;
+  mcoreData->check_status_count[MonitorBroker::Minor] = 0;
+  mcoreData->check_status_count[MonitorBroker::Major] = 0;
+  mcoreData->check_status_count[MonitorBroker::Critical] = 0;
+  mcoreData->check_status_count[MonitorBroker::Unknown] = 0;
   mhostLeft = mcoreData->hosts.size();
   mupdateSucceed = true;
   QString msg = QObject::tr("Connecting to the server (%1)...");
@@ -367,13 +367,13 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            utils::criticityToText(_node.criticity),
-                                            CalcRules::label(_node.criticity_crule),
-                                            PropRules::label(_node.criticity_prule));
+                                            utils::criticityToText(_node.severity),
+                                            CalcRules::label(_node.sev_crule),
+                                            PropRules::label(_node.sev_prule));
 
   if (_node.type == NodeType::ALARM_NODE) {
       QString msg = "";
-      if (_node.criticity == MonitorBroker::CriticityNormal) {
+      if (_node.severity == MonitorBroker::Normal) {
           msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
         } else {
           msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
@@ -406,7 +406,7 @@ void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
       if (cnode.child_nodes.toStdString() == check.id) {
           cnode.check = check;
           computeStatusInfo(cnode);
-          mcoreData->check_status_count[cnode.criticity]++;
+          mcoreData->check_status_count[cnode.severity]++;
           updateDashboard(cnode);
           cnode.monitored = true;
         }
@@ -428,12 +428,12 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       if (mupdateSucceed) updateStatusBar(tr("Update completed"));
       for (auto& cnode : mcoreData->cnodes) {
           if (!cnode.monitored) {
-              cnode.check.status = MonitorBroker::CriticityUnknown;
+              cnode.check.status = MonitorBroker::Unknown;
               cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
               cnode.check.host = "-";
               cnode.check.alarm_msg = tr("Unknown service %1").arg(cnode.child_nodes).toStdString();
               computeStatusInfo(cnode);
-              mcoreData->check_status_count[cnode.criticity]++;
+              mcoreData->check_status_count[cnode.severity]++;
               updateDashboard(cnode);
               cnode.monitored = true;
             }
@@ -452,9 +452,9 @@ void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node)
 
 void SvNavigator::computeStatusInfo(NodeT& _node)
 {
-  _node.criticity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
-  _node.prop_criticity = utils::computePropCriticity(_node.criticity, _node.criticity_prule);
-  QString statusText = (_node.criticity == MonitorBroker::CriticityNormal)? _node.notification_msg : _node.alarm_msg;
+  _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
+  _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
+  QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
   QRegExp regexp(MsgConsole::TAG_HOSTNAME);
   statusText.replace(regexp, _node.check.host.c_str());
 
@@ -468,7 +468,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
       if (info.length() >= 3) {
           regexp.setPattern(MsgConsole::TAG_THERESHOLD);
           statusText.replace(regexp, info[1]);
-          if (_node.criticity == MonitorBroker::CriticityMajor)
+          if (_node.severity == MonitorBroker::Major)
             statusText.replace(regexp, info[2]);
         }
     }
@@ -477,7 +477,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
       statusText.replace(regexp, _node.check.host.c_str());
       _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
     }
-  if (_node.criticity == MonitorBroker::CriticityNormal) {
+  if (_node.severity == MonitorBroker::Normal) {
       _node.notification_msg = statusText;
     } else {
       _node.alarm_msg = statusText;
@@ -494,20 +494,20 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
   for (auto nodeId : nodeIds) {
       NodeListT::iterator child;
       if (!utils::findNode(mcoreData, nodeId, child)) continue;
-      Criticity cst(static_cast<MonitorBroker::CriticityT>(child->prop_criticity));
-      if (node->criticity_crule == CalcRules::WeightedCriticity) {
+      Criticity cst(static_cast<MonitorBroker::SeverityT>(child->prop_sev));
+      if (node->sev_crule == CalcRules::WeightedCriticity) {
           criticity = criticity / cst;
         } else {
           criticity = criticity * cst;
         }
     }
-  node->criticity = criticity.getValue();
-  switch(node->criticity_prule) {
-    case PropRules::Increased: node->prop_criticity = (criticity++).getValue();
+  node->severity = criticity.getValue();
+  switch(node->sev_prule) {
+    case PropRules::Increased: node->prop_sev = (criticity++).getValue();
       break;
-    case PropRules::Decreased: node->prop_criticity = (criticity--).getValue();
+    case PropRules::Decreased: node->prop_sev = (criticity--).getValue();
       break;
-    default: node->prop_criticity = node->criticity;
+    default: node->prop_sev = node->severity;
       break;
     }
   QString toolTip = getNodeToolTip(*node);
@@ -526,7 +526,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
 {
   auto tnode_it = mcoreData->tree_items.find(_node.id);
   if (tnode_it != mcoreData->tree_items.end()) {
-      (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.criticity));
+      (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.severity));
       (*tnode_it)->setToolTip(0, _tip);
     }
 }
@@ -921,7 +921,7 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
     }
   for (auto& cnode : mcoreData->cnodes) {
       cnode.monitored = true;
-      cnode.check.status = MonitorBroker::CriticityUnknown;
+      cnode.check.status = MonitorBroker::Unknown;
       cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
       cnode.check.host = "-";
       cnode.check.check_command = "-";
@@ -929,7 +929,7 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }
-  mcoreData->check_status_count[MonitorBroker::CriticityUnknown] = mcoreData->cnodes.size();
+  mcoreData->check_status_count[MonitorBroker::Unknown] = mcoreData->cnodes.size();
   finalizeDashboardUpdate(enable);
 }
 
@@ -937,18 +937,18 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
 {
   //FIXME: update once;
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-  if (_node.criticity == MonitorBroker::CriticityHigh ||
-      _node.criticity == MonitorBroker::CriticityUnknown) {
+  if (_node.severity == MonitorBroker::Critical ||
+      _node.severity == MonitorBroker::Unknown) {
       icon = QSystemTrayIcon::Critical;
-    } else if (_node.criticity == MonitorBroker::CriticityMinor ||
-               _node.criticity == MonitorBroker::CriticityMajor) {
+    } else if (_node.severity == MonitorBroker::Minor ||
+               _node.severity == MonitorBroker::Major) {
       icon = QSystemTrayIcon::Warning;
     }
-  qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::CriticityNormal];
+  qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::Normal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
-                                                 utils::criticityToText(_node.criticity)).toUpper();
+                                                 utils::criticityToText(_node.severity)).toUpper();
 
   mtrayIcon->showMessage(title, msg, icon);
   mtrayIcon->setToolTip(title%"\n"%msg);

@@ -300,7 +300,7 @@ void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _too
 
 void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
 {
-  QString label = "<span style=\"background: '"%utils::computeColor(_node.criticity).name()
+  QString label = "<span style=\"background: '"%utils::computeColor(_node.severity).name()
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
   GNodeListT::iterator gnodeIt =  mgnodes.find(_node.id);
   if (gnodeIt != mgnodes.end()) {
@@ -309,7 +309,7 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
       gnodeIt->label->setToolTip(_toolTip);
       GEdgeListT::iterator edge = medges.find(_node.parent + ":" + _node.id);
       if (edge != medges.end())
-        edge->edge->setPen(utils::computeColor(_node.prop_criticity));
+        edge->edge->setPen(utils::computeColor(_node.prop_sev));
     }
 }
 

@@ -104,41 +104,41 @@ public:
 class Criticity {
 
 public:
-  Criticity(MonitorBroker::CriticityT _value=MonitorBroker::CriticityNormal): value(_value) {}
-  void setValue(MonitorBroker::CriticityT _value) {value = _value;}
-  MonitorBroker::CriticityT getValue() const {return value;}
+  Criticity(MonitorBroker::SeverityT _value=MonitorBroker::Normal): value(_value) {}
+  void setValue(MonitorBroker::SeverityT _value) {value = _value;}
+  MonitorBroker::SeverityT getValue() const {return value;}
 
   Criticity operator *(Criticity& _criticity) const {
     switch(value) {
-      case MonitorBroker::CriticityHigh:
+      case MonitorBroker::Critical:
         return Criticity(value);
         break;
-      case MonitorBroker::CriticityNormal:
+      case MonitorBroker::Normal:
         return _criticity;
         break;
-      case MonitorBroker::CriticityMinor:
-        if(_criticity.value == MonitorBroker::CriticityHigh ||
-           _criticity.value == MonitorBroker::CriticityMajor ||
-           _criticity.value == MonitorBroker::CriticityUnknown)
+      case MonitorBroker::Minor:
+        if(_criticity.value == MonitorBroker::Critical ||
+           _criticity.value == MonitorBroker::Major ||
+           _criticity.value == MonitorBroker::Unknown)
           return _criticity;
 
         return Criticity(value);
         break;
-      case MonitorBroker::CriticityMajor:
-        if(_criticity.value == MonitorBroker::CriticityHigh ||
-           _criticity.value == MonitorBroker::CriticityUnknown)
+      case MonitorBroker::Major:
+        if(_criticity.value == MonitorBroker::Critical ||
+           _criticity.value == MonitorBroker::Unknown)
           return _criticity;
 
         return Criticity(value);
         break;
       default:
         // MonitorBroker::CRITICITY_UNKNOWN
-        if(_criticity.value == MonitorBroker::CriticityHigh)
+        if(_criticity.value == MonitorBroker::Critical)
           return _criticity;
         break;
       }  //end switch
 
-    return Criticity(MonitorBroker::CriticityUnknown);
+    return Criticity(MonitorBroker::Unknown);
   }
 
 
@@ -146,33 +146,33 @@ public:
     if(value == st.value)
       return  st;
 
-    if(value == MonitorBroker::CriticityHigh ||
-       st.value == MonitorBroker::CriticityHigh)
-      return Criticity(MonitorBroker::CriticityHigh);
+    if(value == MonitorBroker::Critical ||
+       st.value == MonitorBroker::Critical)
+      return Criticity(MonitorBroker::Critical);
 
-    if(value == MonitorBroker::CriticityUnknown ||
-       st.value == MonitorBroker::CriticityUnknown)
-      return Criticity(MonitorBroker::CriticityUnknown);
+    if(value == MonitorBroker::Unknown ||
+       st.value == MonitorBroker::Unknown)
+      return Criticity(MonitorBroker::Unknown);
 
-    if(value == MonitorBroker::CriticityMajor ||
-       st.value == MonitorBroker::CriticityMajor)
-      return Criticity(MonitorBroker::CriticityMajor);
+    if(value == MonitorBroker::Major ||
+       st.value == MonitorBroker::Major)
+      return Criticity(MonitorBroker::Major);
 
-    if(value == MonitorBroker::CriticityMinor ||
-       st.value == MonitorBroker::CriticityMinor)
-      return Criticity(MonitorBroker::CriticityMinor);
+    if(value == MonitorBroker::Minor ||
+       st.value == MonitorBroker::Minor)
+      return Criticity(MonitorBroker::Minor);
 
-    return Criticity(MonitorBroker::CriticityNormal);
+    return Criticity(MonitorBroker::Normal);
   }
 
   Criticity operator ++(int) {
     switch(value) {
-      case MonitorBroker::CriticityMinor:
-        return Criticity(MonitorBroker::CriticityMajor);
+      case MonitorBroker::Minor:
+        return Criticity(MonitorBroker::Major);
         break;
 
-      case MonitorBroker::CriticityMajor:
-        return Criticity(MonitorBroker::CriticityHigh);
+      case MonitorBroker::Major:
+        return Criticity(MonitorBroker::Critical);
         break;
 
       default:
@@ -188,12 +188,12 @@ public:
   Criticity operator --(int) {
 
     switch(value) {
-      case MonitorBroker::CriticityHigh:
-        return Criticity(MonitorBroker::CriticityMajor);
+      case MonitorBroker::Critical:
+        return Criticity(MonitorBroker::Major);
         break;
 
-      case MonitorBroker::CriticityMajor:
-        return Criticity(MonitorBroker::CriticityMinor);
+      case MonitorBroker::Major:
+        return Criticity(MonitorBroker::Minor);
         break;
 
       default:
@@ -208,7 +208,7 @@ public:
 
 private:
 
-  MonitorBroker::CriticityT value;
+  MonitorBroker::SeverityT value;
 };
 
 
@@ -216,16 +216,15 @@ typedef struct _NodeT {
   QString id;
   QString name;
   qint32 type;
-  qint32 criticity_crule;
-  qint32 criticity_prule;
+  qint32 sev_crule;
+  qint32 sev_prule;
   QString icon;
   QString description;
   QString parent;
-  QString propagation_rule; //No yet used
   QString alarm_msg;
   QString notification_msg;
-  qint32 criticity;
-  qint32 prop_criticity;
+  qint32 severity;
+  qint32 prop_sev;
   QString child_nodes;
   MonitorBroker::CheckT check;
   bool monitored;

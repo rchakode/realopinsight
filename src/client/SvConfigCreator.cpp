@@ -142,7 +142,7 @@ void SvCreator::newBusinessView(void)
       node.id = SvNavigatorTree::RootId;
       node.name = "New Business view";
       node.child_nodes.clear();
-      node.criticity = MonitorBroker::CriticityUnknown;
+      node.severity = MonitorBroker::Unknown;
       node.icon = GraphView::DEFAULT_ICON;
       node.type = NodeType::SERVICE_NODE;
       node.parent.clear();
@@ -174,7 +174,7 @@ void SvCreator::newNode(void)
   node.parent = mselectedNode;
   node.name = "sub service " + QString::number(count), count ++;
   node.type = NodeType::SERVICE_NODE;
-  node.criticity = MonitorBroker::CriticityUnknown;
+  node.severity = MonitorBroker::Unknown;
   node.icon = GraphView::DEFAULT_ICON;
   node.child_nodes = "";
 
@@ -469,7 +469,7 @@ void SvCreator::recordData(const QString& _path)
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
 {
   stream << "\t<Service id=\""<<node.id<<"\" type=\""<<node.type
-         << "\" statusCalcRule=\""<<node.criticity_crule<< "\" statusPropRule=\""<<node.criticity_prule<< "\">\n"
+         << "\" statusCalcRule=\""<<node.sev_crule<< "\" statusPropRule=\""<<node.sev_prule<< "\">\n"
          << "\t\t<Name>"<<node.name<<"</Name>\n"
          << "\t\t<Icon>"<<node.icon<<"</Icon>\n"
          << "\t\t<Description>"<<node.description<<"</Description>\n"

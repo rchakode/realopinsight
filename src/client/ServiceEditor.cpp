@@ -126,8 +126,8 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
   if( node != _node_map.end()) {
       node->name = nameField()->text();
       node->type = typeField()->currentIndex();
-      node->criticity_crule = statusCalcRuleField()->currentIndex();
-      node->criticity_prule = statusPropRuleField()->currentIndex();
+      node->sev_crule = statusCalcRuleField()->currentIndex();
+      node->sev_prule = statusPropRuleField()->currentIndex();
       node->icon = iconField()->currentText();
       node->description = descriptionField()->toPlainText();
       node->alarm_msg  = alarmMsgField()->toPlainText();
@@ -144,8 +144,8 @@ bool ServiceEditor::updateNode(NodeListT::iterator & _node)
 {
   _node->name = nameField()->text();
   _node->type = typeField()->currentIndex();
-  _node->criticity_crule = statusCalcRuleField()->currentIndex();
-  _node->criticity_prule = statusPropRuleField()->currentIndex();
+  _node->sev_crule = statusCalcRuleField()->currentIndex();
+  _node->sev_prule = statusPropRuleField()->currentIndex();
   _node->icon = iconField()->currentText();
   _node->description = descriptionField()->toPlainText();
   _node->alarm_msg  = alarmMsgField()->toPlainText();
@@ -168,8 +168,8 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node)
 {
   nameField()->setText(_node->name);
   typeField()->setCurrentIndex(_node->type);
-  statusCalcRuleField()->setCurrentIndex(_node->criticity_crule);
-  statusPropRuleField()->setCurrentIndex(_node->criticity_prule);
+  statusCalcRuleField()->setCurrentIndex(_node->sev_crule);
+  statusPropRuleField()->setCurrentIndex(_node->sev_prule);
   iconField()->setCurrentIndex(iconField()->findText((_node->icon)));
   descriptionField()->setText(_node->description);
   alarmMsgField()->setText(_node->alarm_msg);
