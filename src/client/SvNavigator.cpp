@@ -769,11 +769,14 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                                       ZnsHelper::ReQPatterns[ZnsHelper::Component]
                                       .arg(duid, ZnsHelper::Component)
                                       .toAscii());
-               //FIXME: make this request only when necessary
-              mznsHelper->postRequest(ZnsHelper::Device,
-                                      ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
-                                      .arg(duid, ZnsHelper::DeviceInfo)
-                                      .toAscii());
+
+              QString dname = ditem.property("name").toString();
+              if (mcoreData->hosts[dname].contains("ping"), Qt::CaseInsensitive) { //FIXME: To be tested
+                  mznsHelper->postRequest(ZnsHelper::Device,
+                                          ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
+                                          .arg(duid, ZnsHelper::DeviceInfo)
+                                          .toAscii());
+                }
             }
         } else if (tid == ZnsHelper::Component) {
           MonitorBroker::CheckT check;
@@ -791,7 +794,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
               QString severity =citem.property("severity").toString();
-              if (severity.toLower() == "clear") {
+              if (!severity.compare("clear", Qt::CaseInsensitive)) {
                   check.status = MonitorBroker::ZenossClear;
                   check.alarm_msg = tr("The component '%1' is Up").arg(cname).toStdString();
                 } else {
@@ -817,7 +820,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               check.status = MonitorBroker::ZenossClear;
               check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
             } else {
-              check.status = devInfo.property("severity").toInt32(); //FIXME: severity is a string
+              check.status = MonitorBroker::ZenossCritical;
               check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
             }
           updateCNodes(check);
