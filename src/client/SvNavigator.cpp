@@ -739,7 +739,6 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       updateDashboardOnUnknown(_reply->errorString());
       return;
     }
-
   QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
   QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
   QString data = _reply->readAll();
@@ -812,8 +811,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           MonitorBroker::CheckT check;
           QScriptValue devInfo(result.property("data"));
           QString dname = devInfo.property("name").toString();
-          check.id = ID_PATTERN.arg(dname, "ping").toStdString();
-          check.host = dname.toStdString();
+          check.id = check.host = dname.toStdString();
           check.status = devInfo.property("status").toBool();
           check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
                                                     "yyyy/MM/dd hh:mm:ss");
@@ -833,8 +831,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
     }
 }
 
-QStringList SvNavigator::getAuthInfo(void) {
-
+QStringList SvNavigator::getAuthInfo(void)
+{
   QStringList authInfo = QStringList();
   int pos = mserverAuthChain.indexOf(":");
   if (pos != -1) {
