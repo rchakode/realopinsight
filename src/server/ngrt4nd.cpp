@@ -200,7 +200,7 @@ int main(int argc, char ** argv)
       socket.send(reply);
     }
 
-  socket.disconnect();
+  socket.finalize();
   monitor.reset(nullptr);
   return 0;
 }
