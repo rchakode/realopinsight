@@ -326,6 +326,7 @@ int SvNavigator::runNagiosMonitor(void)
               cnode.check.check_command = "-";
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
+          cnode.monitored = true;
           computeStatusInfo(cnode);
           updateDashboard(cnode);
           mcoreData->check_status_count[cnode.severity]++;
