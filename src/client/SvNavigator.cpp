@@ -763,7 +763,6 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
               devices.next();
               if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
 
-
               QScriptValue ditem = devices.value();
               QString duid = ditem.property("uid").toString();
               mznsHelper->postRequest(ZnsHelper::Component,
@@ -772,12 +771,12 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                                       .toAscii());
 
               QString dname = ditem.property("name").toString();
-            //  if (mcoreData->hosts[dname].contains("ping"), Qt::CaseInsensitive) { //FIXME: Don't work
+              if (mcoreData->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
                   mznsHelper->postRequest(ZnsHelper::Device,
                                           ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
                                           .arg(duid, QString::number(ZnsHelper::DeviceInfo))
                                           .toAscii());
-             //   }
+                }
             }
         } else if (tid == ZnsHelper::Component) {
           MonitorBroker::CheckT check;

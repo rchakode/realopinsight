@@ -100,7 +100,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
           QString host = node.child_nodes.left(pos);
           if (pos == -1) {
               node.child_nodes += "/ping";
-              qDebug() << node.child_nodes;
+              _coreData.hosts[host] << "ping";
             } else {
               _coreData.hosts[host] << node.child_nodes.mid(pos+1);
             }
