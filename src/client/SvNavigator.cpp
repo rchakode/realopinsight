@@ -304,14 +304,12 @@ int SvNavigator::runNagiosMonitor(void)
       QStringList checks = cnode.child_nodes.split(Parser::CHILD_SEP);
       for(auto cid : checks) {
           QString msg = mserverAuthChain%":"%cid;
-          qDebug() << msg;
           if (mupdateSucceed) {
               socket->send(msg.toStdString());
               msg = QString::fromStdString(socket->recv());
             } else {
               msg = DEFAULT_ERROR_MSG.arg(mserverUrl);
             }
-          qDebug() << msg;
           JsonHelper jsHelper(msg.toStdString());
           if (jsHelper.getProperty("return_code").toInt32() == 0
               && socket->isConnected2Server())
