@@ -674,16 +674,23 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
       updateDashboardOnUnknown(_reply->errorString());
       return;
     }
-
   QString data = _reply->readAll();
   JsonHelper jsHelper(data.toStdString());
-  qint32 transaction = jsHelper.getProperty("id").toInt32();
-  switch(transaction) {
-    case ZbxHelper::Login :
-      mzbxAuthToken = jsHelper.getProperty("result").toString();
-      if (!mzbxAuthToken.isEmpty()) misLogged = true;
-      postRpcDataRequest();
-      break;
+  qint32 tid = jsHelper.getProperty("id").toInt32();
+  switch(tid) {
+    case ZbxHelper::Login : {
+        mzbxAuthToken = jsHelper.getProperty("result").toString();
+        if(mzbxAuthToken.isEmpty()) {
+            QString errMsg = jsHelper.getProperty("error").property("data").toString();
+            if (errMsg.isEmpty()) errMsg = jsHelper.getProperty("error").property("message").toString();
+            QString msg = tr("Authentication failed: %1").arg(errMsg);
+            updateDashboardOnUnknown(msg);
+          } else {
+            misLogged = true;
+            postRpcDataRequest();
+          }
+        break;
+      }
     case ZbxHelper::Trigger: {
         MonitorBroker::CheckT check;
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
@@ -752,8 +759,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       QScriptValue result = jsonHelper.getProperty("result");
       bool successMsg = result.property("success").toBool();
       if (!successMsg) {
-          QString msg = result.property("msg").toString();
-          if (msg.isEmpty()) msg = "Authentication failed!";
+          QString msg = tr("Authentication failed: %1").arg(result.property("msg").toString());
           updateDashboardOnUnknown(msg);
           return;
         }
