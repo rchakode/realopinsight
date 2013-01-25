@@ -296,16 +296,16 @@ void ServiceEditor::loadCheckField(void)
   mlayout->addLayout(llayout, mlayoutRowIndex, 0, 2, 1);
   mlayout->addWidget(checkField(), mlayoutRowIndex, 1, 1, 2);
   checkField()->setEditable(true);
-  help->setToolTip(tr("\nThe format of data points is in the form of 'hostid/point', without the quotes."
-                      "\n\nEvery data point should correspond to a data collected by the monitoring system."
-                      "\n - 'hostid' should correspond to a valid host in your monitoring configuration and "
-                      "\n - 'point' to a valid monitoring item associated to the host:"
-                      "\n   * For Nagios and its derived, 'point' corresponds to a check name."
-                      "\n     E.g. of data point: mysql-server.example.com/PING"
-                      "\n   * For Zabbix, 'point' corresponds to a trigger name."
-                      "\n     E.g. of data point: Zabbix server/Zabbix http poller processes more than 75% busy"
-                      "\n   * For Zenoss, 'point' corresponds to a component name."
-                      "\n     E.g. of data point: localhost/httpd"
+  help->setToolTip(tr("This depends on your monitoring configuration:"
+                      "\n * For Nagios this follows the patterns 'host_name/service_name' or 'host_name'"
+                      "\n    E.g. mysql-server.example.com/Current Load, mysql-server.example.com"
+                      "\n    NOTE: When only host_name is set, the data point is associated to ping status."
+                      "\n * For Zabbix it follows the pattern 'host_name/trigger_name'"
+                      "\n    E.g. Zabbix server/Zabbix http poller processes more than 75% busy"
+                      "\n * For Zenoss it follows the patterns 'device_name/component_name' or 'device_name'"
+                      "\n    E.g. localhost/httpd, localhost"
+                      "\n    NOTE: When only device_name is set, the data point is associated to ping status."
+                      "\nSee the online documentation for further details."
                       ));
 }
 

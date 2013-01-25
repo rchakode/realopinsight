@@ -141,7 +141,7 @@
 		<Description>Host availability</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>localhost/ssh</SubServices>
+		<SubServices>localhost</SubServices>
 	</Service>
 	<Service id="S003801812" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>ssh</Name>
@@ -221,7 +221,7 @@
 		<Description>Host availability</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>localhost/ssh</SubServices>
+		<SubServices>localhost</SubServices>
 	</Service>
 	<Service id="S073757810" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>mysql</Name>
@@ -237,7 +237,7 @@
 		<Description>Host availability</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>localhost/ssh</SubServices>
+		<SubServices>localhost</SubServices>
 	</Service>
 	<Service id="S181448973" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>Availability</Name>
@@ -277,7 +277,7 @@
 		<Description>Host availability</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>localhost/ssh</SubServices>
+		<SubServices>localhost</SubServices>
 	</Service>
 	<Service id="S003857309" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>ssh</Name>
@@ -317,7 +317,7 @@
 		<Description>Host availability</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>localhost/ssh</SubServices>
+		<SubServices>localhost</SubServices>
 	</Service>
 	<Service id="S232605330" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>xend</Name>
@@ -339,7 +339,7 @@
 		<Name>Swap Usage</Name>
 		<Icon>Other Check</Icon>
 		<Description>Check swap usage</Description>
-		<AlarmMsg>The free swap space</AlarmMsg>
+		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
 		<SubServices>localhost/ssh</SubServices>
 	</Service>

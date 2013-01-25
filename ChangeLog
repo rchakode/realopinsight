@@ -19,6 +19,7 @@ NGRT4N/RealOpInsight ChangeLog
   * Fixed compilation problems on c++11 (tickets #4 and #5)
   * Fixed bug #6 when the Operations Console crashes when the colon is ommited
     on the authchain for Zabbix
+  * Changed tooltip font
 
 2.1.0
 --------------
