@@ -42,7 +42,8 @@ Auth::Auth()
   QLabel* llogo =  new QLabel(); llogo->setPixmap(logo);
   layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft);
   line++;
-  layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PKG_VERSION).arg(RELEASE_NAME)), line, 0, 2, 1, Qt::AlignLeft);
+  layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PKG_VERSION, REL_NAME)),
+                    line, 0, 2, 1, Qt::AlignLeft);
   line++;
   layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight);
   layout->addWidget(login = new QLineEdit(OpUser), line, 2, Qt::AlignJustify);

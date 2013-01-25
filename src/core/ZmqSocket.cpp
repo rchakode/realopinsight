@@ -40,7 +40,7 @@
 const int ZERO_LINGER = 0;
 const int TIMEOUT_MSEC = 2500;
 const int MAX_MSG_SIZE = 8192;
-const int NUM_RETRIES = 1;
+const int NUM_RETRIES = 3;
 const int TIMEOUT =  TIMEOUT_MSEC * ZMQ_POLL_MSEC;
 
 ZmqSocket::ZmqSocket(const int & _type)
