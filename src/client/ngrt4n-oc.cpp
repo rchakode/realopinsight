@@ -45,14 +45,8 @@ int main(int argc, char **argv)
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
-
   QString cmdName = basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("> %1 Operations Console %2 (codename: %3)").arg(APP_NAME).arg(PKG_VERSION).arg(RELEASE_NAME).toStdString()
-                           +QObject::tr("\n>> Realease ID: %1").arg(REL_INFO).toStdString()
-                           +QObject::tr("\n>> Copyright (C) 2010 NGRT4N Project. All rights reserved").toStdString()
-                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PKG_URL).toStdString());
-
+  QString versionMsg = APP_INFO.arg(QObject::tr("Operations Console"));
   bool runConfig = false;
   int opt;
   if ((opt = getopt(argc, argv, "chv")) != -1) {
@@ -61,7 +55,7 @@ int main(int argc, char **argv)
           runConfig = true;
           break;
         case 'v':
-          cout<<versionMsg.str()<<"\n";
+          cout<<versionMsg.toStdString()<<"\n";
           exit(0);
           break;
         case 'h':
@@ -74,7 +68,7 @@ int main(int argc, char **argv)
           break;
         }
     }
-  cout<<versionMsg.str()
+  std::clog<<versionMsg.toStdString()
      <<"\nLoading...\n";
   Auth authentication;
   int userRole = authentication.exec();
@@ -87,9 +81,7 @@ int main(int argc, char **argv)
       change_passwd->exec();
       exit(0);
     }
-
-  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("%1\n\nLoading..."))
-                                                .arg(QString::fromStdString(versionMsg.str())));
+  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("%1\n\nLoading...")).arg(versionMsg));
   utils::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
   if (file.isEmpty()) {

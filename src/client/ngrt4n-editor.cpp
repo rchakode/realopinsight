@@ -44,18 +44,13 @@ int main(int argc, char **argv)
   app->setStyleSheet(Preferences::style());
 
   QString cmdName= basename(argv[0]);
-  ostringstream versionMsg(QObject::tr("> %1 Editor %2 (codename: %3)").arg(APP_NAME).arg(PKG_VERSION).arg(RELEASE_NAME).toStdString()
-                           +QObject::tr("\n>> Realease ID: %1").arg(REL_INFO).toStdString()
-                           +QObject::tr("\n>> Copyright (C) 2010 NGRT4N Project. All rights reserved").toStdString()
-                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
-                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PKG_URL).toStdString());
-
+  QString versionMsg = APP_INFO.arg(QObject::tr("Editor"));
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
   if ((opt = getopt(argc, argv, "hv")) != -1) {
       switch (opt) {
         case 'v':
-          cout << versionMsg.str() << endl;
+          cout << versionMsg.toStdString() << endl;
           exit(0);
           break;
         case 'h':
@@ -68,7 +63,7 @@ int main(int argc, char **argv)
           break;
         }
     }
-  cout <<versionMsg.str() <<"\nLoading...\n";
+  std::clog <<versionMsg.toStdString() <<"\n                  Loading...\n";
   Auth authentication;
   int userRole = authentication.exec();
   if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);

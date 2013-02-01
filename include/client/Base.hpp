@@ -40,6 +40,14 @@ const QString PKG_URL = PACKAGE_URL;
 const QString REL_INFO = RELEASE_INFO;
 const QString REL_NAME = RELEASE_NAME;
 
+const QString APP_INFO = QObject::tr("                  > %1 %6 %2 (codename: %3)"
+                                     "\n                  >> Realease ID: %4"
+                                     "\n                  >> Copyright (C) 2010 NGRT4N Project. All rights reserved"
+                                     "\n                  >> For bug reporting instructions, see: <%5>").arg(APP_NAME,
+                                                                                                             PKG_VERSION,
+                                                                                                             REL_NAME,
+                                                                                                             REL_INFO,
+                                                                                                             PKG_URL);
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem*> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
