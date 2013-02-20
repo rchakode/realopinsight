@@ -99,7 +99,7 @@ checking_uipreq(){
 
 install_default(){
   ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-default ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-manager ${dflag}
   make -Bj${ncpu} 1>>install.log
   make install 1>>install.log
 }

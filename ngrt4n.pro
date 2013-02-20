@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.2.0
+VERSION_=2.2.0beta1
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
@@ -103,8 +103,7 @@ DISTFILES += README \
     images/*.png \
     images/built-in/*.png \
     examples/{*.ngrt4n.xml,*.dat} \
-    src/client/ngrt4n-oc.cpp \
-    src/client/ngrt4n-editor.cpp \
+    src/client/ngrt4n-*.cpp \
     doc/man/*.gz
 
 OTHER_FILES += ngrt4n_la.ts

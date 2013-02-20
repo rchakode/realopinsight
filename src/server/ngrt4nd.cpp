@@ -201,6 +201,6 @@ int main(int argc, char ** argv)
     }
 
   socket.finalize();
-  monitor.reset(nullptr);
+  monitor.reset(NULL);
   return 0;
 }

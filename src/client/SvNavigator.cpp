@@ -311,9 +311,7 @@ int SvNavigator::runNagiosMonitor(void)
               msg = DEFAULT_ERROR_MSG.arg(mserverUrl);
             }
           JsonHelper jsHelper(msg.toStdString());
-          if (jsHelper.getProperty("return_code").toInt32() == 0
-              && socket->isConnected2Server())
-            {
+          if (!jsHelper.getProperty("return_code").toInt32() && socket->isConnected2Server()) {
               cnode.check.status = jsHelper.getProperty("status").toInt32();
               cnode.check.host = jsHelper.getProperty("host").toString().toStdString();
               cnode.check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
@@ -332,7 +330,7 @@ int SvNavigator::runNagiosMonitor(void)
           mcoreData->check_status_count[cnode.severity]++;
         }
     }
-  socket.reset(nullptr);
+  socket.reset(NULL);
   finalizeDashboardUpdate();
   return 0;
 }
@@ -401,8 +399,8 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   emit hasToBeUpdate(_node.parent);
 }
 
-void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
-
+void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check)
+{
   for (auto& cnode : mcoreData->cnodes) {
       if (cnode.child_nodes.toStdString() == check.id) {
           cnode.check = check;
@@ -457,7 +455,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
   QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
   QRegExp regexp(MsgConsole::TAG_HOSTNAME);
-  statusText.replace(regexp, _node.check.host.c_str());
+  statusText.replace(regexp, _node.check.host.c_str()); //FIXME: problem with '-' host
 
   auto info = QString(_node.check.id.c_str()).split("/");
   if (info.length() > 1) {
@@ -514,8 +512,7 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   mmap->updateNode(node, toolTip);
   updateNavTreeItemStatus(node, toolTip);
-  if (node->id != SvNavigatorTree::RootId)
-    emit hasToBeUpdate(node->parent);
+  if (node->id != SvNavigatorTree::RootId) emit hasToBeUpdate(node->parent);
 }
 
 void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
@@ -757,8 +754,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       JsonHelper jsonHelper(data.toStdString());
       qint32 tid = jsonHelper.getProperty("tid").toInt32();
       QScriptValue result = jsonHelper.getProperty("result");
-      bool successMsg = result.property("success").toBool();
-      if (!successMsg) {
+      bool reqSucceed = result.property("success").toBool();
+      if (!reqSucceed) {
           QString msg = tr("Authentication failed: %1").arg(result.property("msg").toString());
           updateDashboardOnUnknown(msg);
           return;
@@ -784,55 +781,57 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                                           .toAscii());
                 }
             }
-        } else if (tid == ZnsHelper::Component) {
+        } else {
           MonitorBroker::CheckT check;
-          QScriptValueIterator components(result.property("data"));
-          while (components.hasNext()) {
-              components.next();
-              if (components.flags()&QScriptValue::SkipInEnumeration) continue;
-              QScriptValue citem = components.value();
-              QString cname = citem.property("name").toString();
-              QScriptValue device = citem.property("device");
-              QString duid = device.property("uid").toString();
-              QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid), cname);
-              check.id = chkid.toStdString();
-              check.host = device.property("name").toString().toStdString();
-              check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
+          if (tid == ZnsHelper::Component) {
+              QScriptValueIterator components(result.property("data"));
+              while (components.hasNext()) {
+                  components.next();
+                  if (components.flags()&QScriptValue::SkipInEnumeration) continue;
+                  QScriptValue citem = components.value();
+                  QString cname = citem.property("name").toString();
+                  QScriptValue device = citem.property("device");
+                  QString duid = device.property("uid").toString();
+                  QString dname = ZnsHelper::getDeviceName(duid);
+                  QString chkid = ID_PATTERN.arg(dname, cname);
+                  check.id = chkid.toStdString();
+                  check.host = dname.toStdString();
+                  check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
+                                                            "yyyy/MM/dd hh:mm:ss");
+                  QString severity =citem.property("severity").toString();
+                  if (!severity.compare("clear", Qt::CaseInsensitive)) {
+                      check.status = MonitorBroker::ZenossClear;
+                      check.alarm_msg = tr("The %1 component  is Up").arg(cname).toStdString();
+                    } else {
+                      check.status = citem.property("failSeverity").toInt32();
+                      check.alarm_msg = citem.property("status").toString().toStdString();
+                    }
+                  updateCNodes(check);
+                }
+              if (--mhostLeft == 0) { // FIXME: could be not sufficiant?
+                  mupdateSucceed = true;
+                  finalizeDashboardUpdate();
+                }
+            } else if (tid == ZnsHelper::DeviceInfo) {
+              QScriptValue devInfo(result.property("data"));
+              QString dname = devInfo.property("name").toString();
+              check.id = check.host = dname.toStdString();
+              check.status = devInfo.property("status").toBool();
+              check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
-              QString severity =citem.property("severity").toString();
-              if (!severity.compare("clear", Qt::CaseInsensitive)) {
+              if (check.status) {
                   check.status = MonitorBroker::ZenossClear;
-                  check.alarm_msg = tr("The %1 component  is Up").arg(cname).toStdString();
+                  check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
                 } else {
-                  check.status = citem.property("failSeverity").toInt32();
-                  check.alarm_msg = citem.property("status").toString().toStdString();
+                  check.status = MonitorBroker::ZenossCritical;
+                  check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
                 }
               updateCNodes(check);
-            }
-          if (--mhostLeft== 0) {
-              mupdateSucceed = true;
-              finalizeDashboardUpdate();
-            }
-        } else if (tid == ZnsHelper::DeviceInfo) {
-          MonitorBroker::CheckT check;
-          QScriptValue devInfo(result.property("data"));
-          QString dname = devInfo.property("name").toString();
-          check.id = check.host = dname.toStdString();
-          check.status = devInfo.property("status").toBool();
-          check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
-                                                    "yyyy/MM/dd hh:mm:ss");
-          if (check.status) {
-              check.status = MonitorBroker::ZenossClear;
-              check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
             } else {
-              check.status = MonitorBroker::ZenossCritical;
-              check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
+              QString msg = tr("Weird response received from the server");
+              utils::alert(msg);
+              updateDashboardOnUnknown(msg);
             }
-          updateCNodes(check);
-        } else {
-          QString msg = tr("Weird response received from the server");
-          utils::alert(msg);
-          updateDashboardOnUnknown(msg);
         }
     }
 }
@@ -873,7 +872,7 @@ void SvNavigator::openRpcSession(void)
         }
     } else {
       updateDashboardOnUnknown(tr("Invalid authentication chain!\n"
-                                  "Must be in the form login:password"));
+                                  "Must follow the pattern login:password"));
     }
 }
 

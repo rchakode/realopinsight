@@ -179,15 +179,15 @@
 		<Name>www</Name>
 		<Icon>Other Check</Icon>
 		<Description>check apache response time</Description>
-		<AlarmMsg>The response time of the web server {hostname} is more than {threshold}</AlarmMsg>
-		<NotificationMsg>The response time of the web server is normal</NotificationMsg>
+		<AlarmMsg>The http service does not response on server {hostname}</AlarmMsg>
+		<NotificationMsg></NotificationMsg>
 		<SubServices>localhost/http</SubServices>
 	</Service>
 	<Service id="S154659138" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>www</Name>
 		<Icon>Other Check</Icon>
 		<Description>Microsoft IIS server</Description>
-		<AlarmMsg></AlarmMsg>
+		<AlarmMsg>The https service does not response on server {hostname}</AlarmMsg>
 		<NotificationMsg></NotificationMsg>
 		<SubServices>localhost/https</SubServices>
 	</Service>
