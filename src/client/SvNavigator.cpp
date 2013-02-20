@@ -706,14 +706,15 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             QString targetHost = "";
             QScriptValueIterator host(triggerData.property("hosts"));
             if (host.hasNext()) {
-                host.next(); //FIXME: if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+                host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+
                 QScriptValue hostData = host.value();
                 targetHost = hostData.property("host").toString();
                 check.host = targetHost.toStdString();
               }
             QScriptValueIterator item(triggerData.property("items"));
             if (item.hasNext()) {
-                item.next(); //FIXME: if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+                item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
                 QScriptValue itemData = item.value();
                 check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
