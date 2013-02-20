@@ -79,7 +79,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   qint32 nbRows = mmodel->rowCount();
   while(index < nbRows &&
         mmodel->item(index, ID_COLUMN) &&
-         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) { index++;}
+        mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) { index++;}
   if(index >= nbRows) {
       index = 0;
       mmodel->insertRow(index);

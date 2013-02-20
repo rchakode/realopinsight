@@ -320,7 +320,7 @@ int SvNavigator::runNagiosMonitor(void)
             } else {
               cnode.check.status = MonitorBroker::NagiosUnknown;
               cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-//              cnode.check.host = "-";
+              cnode.check.host = "-";
               cnode.check.check_command = "-";
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
