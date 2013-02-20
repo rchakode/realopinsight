@@ -320,7 +320,7 @@ int SvNavigator::runNagiosMonitor(void)
             } else {
               cnode.check.status = MonitorBroker::NagiosUnknown;
               cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-              cnode.check.host = "-";
+//              cnode.check.host = "-";
               cnode.check.check_command = "-";
               cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
@@ -692,8 +692,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         MonitorBroker::CheckT check;
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
-            trigger.next();
-            if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+            trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue triggerData = trigger.value();
             QString triggerName = triggerData.property("description").toString();
             check.check_command = triggerName.toStdString();
@@ -707,14 +706,14 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             QString targetHost = "";
             QScriptValueIterator host(triggerData.property("hosts"));
             if (host.hasNext()) {
-                host.next();
+                host.next(); //FIXME: if (host.flags()&QScriptValue::SkipInEnumeration) continue;
                 QScriptValue hostData = host.value();
                 targetHost = hostData.property("host").toString();
                 check.host = targetHost.toStdString();
               }
             QScriptValueIterator item(triggerData.property("items"));
             if (item.hasNext()) {
-                item.next();
+                item.next(); //FIXME: if (item.flags()&QScriptValue::SkipInEnumeration) continue;
                 QScriptValue itemData = item.value();
                 check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
@@ -763,8 +762,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       if (tid == ZnsHelper::Device) {
           QScriptValueIterator devices(result.property("devices"));
           while(devices.hasNext()) {
-              devices.next();
-              if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
+              devices.next(); if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
 
               QScriptValue ditem = devices.value();
               QString duid = ditem.property("uid").toString();
@@ -786,8 +784,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
           if (tid == ZnsHelper::Component) {
               QScriptValueIterator components(result.property("data"));
               while (components.hasNext()) {
-                  components.next();
-                  if (components.flags()&QScriptValue::SkipInEnumeration) continue;
+                  components.next(); if (components.flags()&QScriptValue::SkipInEnumeration) continue;
                   QScriptValue citem = components.value();
                   QString cname = citem.property("name").toString();
                   QScriptValue device = citem.property("device");
@@ -801,7 +798,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                   QString severity =citem.property("severity").toString();
                   if (!severity.compare("clear", Qt::CaseInsensitive)) {
                       check.status = MonitorBroker::ZenossClear;
-                      check.alarm_msg = tr("The %1 component  is Up").arg(cname).toStdString();
+                      check.alarm_msg = tr("The %1 component is Up").arg(cname).toStdString();
                     } else {
                       check.status = citem.property("failSeverity").toInt32();
                       check.alarm_msg = citem.property("status").toString().toStdString();
