@@ -454,9 +454,13 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
   QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
+  if (statusText.trimmed().isEmpty()) {
+      return;
+    }
   QRegExp regexp(MsgConsole::TAG_HOSTNAME);
   statusText.replace(regexp, _node.check.host.c_str()); //FIXME: problem with '-' host
 
+  //FIXME: avoid replacing meta data
   auto info = QString(_node.check.id.c_str()).split("/");
   if (info.length() > 1) {
       regexp.setPattern(MsgConsole::TAG_CHECK);
@@ -476,11 +480,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
       statusText.replace(regexp, _node.check.host.c_str());
       _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
     }
-  if (_node.severity == MonitorBroker::Normal) {
-      _node.notification_msg = statusText;
-    } else {
-      _node.alarm_msg = statusText;
-    }
+  _node.check.alarm_msg = statusText.toStdString();
 }
 
 void SvNavigator::updateBpNode(const QString& _nodeId)
