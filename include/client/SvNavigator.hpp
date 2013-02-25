@@ -33,7 +33,7 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include "Socket.hpp"
+#include "ZmqSocket.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
 

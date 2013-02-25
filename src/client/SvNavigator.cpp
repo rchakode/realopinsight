@@ -278,7 +278,7 @@ void SvNavigator::handleShowAbout(void)
 
 int SvNavigator::runNagiosMonitor(void)
 {
-  auto socket = std::unique_ptr<Socket>(new Socket(mserverUrl.toStdString(), ZMQ_REQ));
+  auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(mserverUrl.toStdString(), ZMQ_REQ));
   if(socket->connect())
     socket->makeHandShake();
   if (socket->isConnected2Server()) {

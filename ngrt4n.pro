@@ -59,12 +59,12 @@ HEADERS	+= include/core/ns.hpp \
     include/client/WebKit.hpp \
     include/client/ZbxHelper.hpp \
     include/client/JsHelper.hpp \
-    include/core/Socket.hpp \
     include/client/ZnsHelper.hpp \
     include/client/Settings.hpp \
     include/client/utilsClient.hpp \
     include/client/Chart.hpp \
-    include/client/MsgConsole.hpp
+    include/client/MsgConsole.hpp \
+    include/core/ZmqSocket.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -82,13 +82,13 @@ SOURCES	+= \
     src/client/WebKit.cpp \
     src/client/ZbxHelper.cpp \
     src/client/JsHelper.cpp \
-    src/core/Socket.cpp \
     src/client/ZnsHelper.cpp \
     src/client/Settings.cpp \
     src/client/utilsClient.cpp \
     src/core/utilsCore.cpp \
     src/client/Chart.cpp \
-    src/client/MsgConsole.cpp
+    src/client/MsgConsole.cpp \
+    src/core/ZmqSocket.cpp
 
 
 TRANSLATIONS += ngrt4n_en.ts
