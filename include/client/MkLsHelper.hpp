@@ -17,7 +17,7 @@ public:
   ~MkLsHelper();
 
   bool connect(void);
-  bool disconnect(void);
+  bool disconnectSocket(void);
   bool requestData(const QString& host, const ReqTypeT& reqType);
   bool recvData(const ReqTypeT& reqType);
   void loadHostData(const QString& host);

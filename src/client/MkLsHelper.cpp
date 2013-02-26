@@ -27,7 +27,7 @@ bool MkLsHelper::connect()
 }
 
 
-bool MkLsHelper::disconnect()
+bool MkLsHelper::disconnectSocket()
 {
   msocket->disconnectFromHost();
   if (!msocket->waitForDisconnected(DefaultTimeout)) {
@@ -40,7 +40,8 @@ bool MkLsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 {
   qint32 nb = msocket->write(mrequestMap[reqType].arg(host).toAscii());
   if (nb <= 0) {
-      qDebug() << "Unable to write to socket";
+      qDebug() << msocket->errorString();
+      qDebug() << "Unable to write the socket";
       return false;
     }
   return true;
@@ -61,9 +62,11 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
       if (entry.isEmpty()) continue;
       QStringList fields = entry.split(";");
       chkid.clear();
+      qDebug()<<entry;
       if (reqType == Host) {
-          if (fields.size() != 5)
-            return false;
+          if (fields.size() != 5) {
+              return false;
+            }
           chkid = fields[0].toLower();
           check.id = check.host = fields[0].toStdString();
           check.status = fields[1].toInt();

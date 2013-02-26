@@ -23,7 +23,7 @@
 
 #ifndef BASE_HPP
 #define BASE_HPP
-#include "core/MonitorBroker.hpp"
+
 #include <QtCore>
 #include <QtXml>
 #include <QtGui>
