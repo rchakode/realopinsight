@@ -39,7 +39,7 @@ const QString PKG_VERSION = PACKAGE_VERSION;
 const QString PKG_URL = PACKAGE_URL;
 const QString REL_INFO = RELEASE_INFO;
 const QString REL_NAME = RELEASE_NAME;
-
+const QString ID_PATTERN("%1/%2");
 const QString APP_INFO = QObject::tr("                  > %1 %6 %2 (codename: %3)"
                                      "\n                  >> Realease ID: %4"
                                      "\n                  >> Copyright (C) 2010 NGRT4N Project. All rights reserved"
@@ -238,11 +238,14 @@ typedef struct _NodeT {
   bool monitored;
 } NodeT;
 
-typedef QHash<QString, NodeT> NodeListT;
 typedef QMap<qint32, qint32> CheckStatusCountT;
-typedef QHash<QString, MonitorBroker::CheckT> CheckListT;
-typedef QHash<QString, QStringList> HostListT;
+typedef QHash<QString, NodeT> NodeListT;
 typedef NodeListT::Iterator NodeListIteratorT;
+typedef MonitorBroker::CheckT CheckT;
+typedef QHash<QString, CheckT> CheckListT;
+typedef CheckListT::Iterator CheckListIterT;
+typedef CheckListT::ConstIterator CheckListCstIterT;
+typedef QHash<QString, QStringList> HostListT;
 
 typedef struct _CoreDataT {
   qint8 monitor;

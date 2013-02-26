@@ -41,7 +41,6 @@ const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSev
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-const QString ID_PATTERN("%1/%2");
 const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 
 StringMapT SvNavigator::propRules() {
