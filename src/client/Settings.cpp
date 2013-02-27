@@ -45,26 +45,26 @@ Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" 
   if (updateInterval.isEmpty()) {
       setValue(Preferences::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
     }
-  if ( serverAddr.isEmpty() ) {
+  if (serverAddr.isEmpty()) {
       setValue(Preferences::SERVER_ADDR_KEY, "localhost");
     }
-  if ( serverPort.isEmpty() )	{
+  if (serverPort.isEmpty() || serverPort.toInt() <=0)	{
       setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DefaultPort));
     }
-  if ( monitorHome.isEmpty() ) {
+  if (monitorHome.isEmpty()) {
       setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");
     }
-  if ( admUser.isEmpty() ) {
+  if (admUser.isEmpty()) {
       setValue(Preferences::ADM_UNSERNAME_KEY, Auth::AdmUser);
     }
-  if ( admPasswd.isEmpty() ) {
+  if (admPasswd.isEmpty()) {
       QString passwd = QCryptographicHash::hash(Auth::AdmUser.toAscii(), QCryptographicHash::Md5) ;
-      setValue(Preferences::ADM_PASSWD_KEY, passwd );
+      setValue(Preferences::ADM_PASSWD_KEY, passwd);
     }
-  if ( opUser.isEmpty() ) {
+  if (opUser.isEmpty()) {
       setValue(Preferences::OP_UNSERNAME_KEY, Auth::OpUser);
     }
-  if ( opPasswd.isEmpty() ) {
+  if (opPasswd.isEmpty()) {
       QString passwd = QCryptographicHash::hash(Auth::OpUser.toAscii(), QCryptographicHash::Md5) ;
       setValue(Preferences::OP_PASSWD_KEY, passwd);
     }
@@ -76,6 +76,6 @@ Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" 
 
 void Settings::setKeyValue(const QString & _key, const QString & _value)
 {
-  setValue(_key, _value ) ;
+  setValue(_key, _value) ;
   sync() ;
 }
