@@ -1,10 +1,16 @@
 #include "MkLsHelper.hpp"
 #include "utilsClient.hpp"
 
-MkLsHelper::MkLsHelper(const QString& host, const QString& port)
+#include "QsLog.h"
+#include "QsLogDest.h"
+#include <QDir>
+#include <iostream>
+
+MkLsHelper::MkLsHelper(const QString& host, const int& port)
   : msocket(new QTcpSocket()), mhost(host), mport(port)
 {
   setRequestPatterns();
+  SETUP_LOGGING(); //FIXME: logging
 }
 
 MkLsHelper::~MkLsHelper()
@@ -17,10 +23,12 @@ MkLsHelper::~MkLsHelper()
 
 bool MkLsHelper::connect()
 {
-  qDebug() << mhost << mport;
-  msocket->connectToHost(mhost, mport.toInt(), QAbstractSocket::ReadWrite);
+  msocket->connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
+  QObject::connect(msocket, SIGNAL(error(QAbstractSocket::SocketError)),
+                   this, SLOT(displayError(QAbstractSocket::SocketError)));
+
   if (!msocket->waitForConnected(DefaultTimeout)) {
-      displayError(msocket->error());
+      displayError();
       return false;
     }
   return true;
@@ -40,8 +48,7 @@ bool MkLsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 {
   qint32 nb = msocket->write(mrequestMap[reqType].arg(host).toAscii());
   if (nb <= 0) {
-      qDebug() << msocket->errorString();
-      qDebug() << "Unable to write the socket";
+      displayError();
       return false;
     }
   return true;
@@ -51,7 +58,7 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
 {
   mldchecks.clear();
   if (!msocket->waitForReadyRead()) {
-      qDebug() << "Nothing to read";
+      displayError();
       return false;
     }
   QString chkid = "";
@@ -62,7 +69,6 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
       if (entry.isEmpty()) continue;
       QStringList fields = entry.split(";");
       chkid.clear();
-      qDebug()<<entry;
       if (reqType == Host) {
           if (fields.size() != 5) {
               return false;
@@ -85,7 +91,7 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
           check.check_command = fields[4].toStdString();
           check.alarm_msg = fields[5].toStdString();
         } else {
-          qDebug() << "Bad request type " << reqType;
+          QLOG_ERROR() << "Bad request type " << reqType;
           return false;
         }
       mldchecks.insert(chkid, check);
@@ -102,23 +108,38 @@ bool MkLsHelper::findCheck(const QString& id, CheckListCstIterT& check)
   return false;
 }
 
-void MkLsHelper::displayError(QAbstractSocket::SocketError socketError)
+void MkLsHelper::displayError()
 {
-  switch (socketError) {
+  displayError(msocket->error());
+}
+
+void MkLsHelper::displayError(QAbstractSocket::SocketError error)
+{
+  QString msg;
+  switch (error) {
     case QAbstractSocket::RemoteHostClosedError:
+      msg = tr("The connection has been closed by the remote host.");
+      QLOG_ERROR()<< msg;
+      utils::alert(msg);
       break;
     case QAbstractSocket::HostNotFoundError:
-      utils::alert(tr("The host was not found. Please check the "
-                      "host name and port settings."));
+      msg = tr("The host was not found. Please check the "
+               "host name and port settings.");
+      QLOG_ERROR()<< msg;
+      utils::alert(msg);
       break;
     case QAbstractSocket::ConnectionRefusedError:
-      utils::alert(tr("The connection was refused by the peer. "
-                      "Make sure the fortune server is running, "
-                      "and check that the host name and port "
-                      "settings are correct."));
+      msg = tr("The connection was refused by the peer. "
+               "Make sure the fortune server is running, "
+               "and check that the host name and port "
+               "settings are correct.");
+      QLOG_ERROR()<< msg;
+      utils::alert(msg);
       break;
     default:
-      utils::alert(tr("The following error occurred: %1.").arg(msocket->errorString()));
+      msg = tr("The following error occurred: %1.").arg(msocket->errorString());
+      QLOG_ERROR()<< msg;
+      utils::alert(msg);
     }
 }
 

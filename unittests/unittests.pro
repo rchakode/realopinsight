@@ -29,3 +29,5 @@ DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_INFO='\"02/2013\"'"
 DEFINES *= "RELEASE_NAME='\"Lucia\"'"
+
+include(../QsLog/QsLog.pri)

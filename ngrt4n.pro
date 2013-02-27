@@ -110,3 +110,4 @@ DISTFILES += README \
 
 OTHER_FILES += ngrt4n_la.ts
 
+include(QsLog/QsLog.pri)

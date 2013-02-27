@@ -13,7 +13,7 @@ public:
     Service = 1
   };
 
-  explicit MkLsHelper(const QString& host, const QString& port);
+  explicit MkLsHelper(const QString& host, const int& port);
   ~MkLsHelper();
 
   bool connect(void);
@@ -22,19 +22,22 @@ public:
   bool recvData(const ReqTypeT& reqType);
   void loadHostData(const QString& host);
   bool findCheck(const QString& id, CheckListCstIterT& check);
+  void setHost(const QString& host) {mhost = host;}
+  void setPort(const int& port) {mport = port;}
 signals:
   
 public slots:
+  void displayError(QAbstractSocket::SocketError error);
 
 private:
   const static int DefaultTimeout = 50000; /* 5 seconds */
   QTcpSocket* msocket;
   QString mhost;
-  QString mport;
+  qint32 mport;
   RequestListT mrequestMap;
   CheckListT mldchecks;
 
-  void displayError(QAbstractSocket::SocketError socketError);
+  void displayError();
   void setRequestPatterns();
 };
 

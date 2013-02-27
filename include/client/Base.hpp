@@ -23,12 +23,23 @@
 
 #ifndef BASE_HPP
 #define BASE_HPP
-
+#include "core/MonitorBroker.hpp"
 #include <QtCore>
 #include <QtXml>
 #include <QtGui>
 #include <QtWebKit>
 #include <QSettings>
+
+#define LOGFILE "/tmp/realopinsight.log"
+#define SETUP_LOGGING() {\
+  QsLogging::Logger& logger = QsLogging::Logger::instance(); \
+  logger.setLoggingLevel(QsLogging::TraceLevel); \
+  const QString sLogPath = LOGFILE; \
+  QsLogging::DestinationPtr fileDestination(QsLogging::DestinationFactory::MakeFileDestination(sLogPath)); \
+  QsLogging::DestinationPtr debugDestination(QsLogging::DestinationFactory::MakeDebugOutputDestination()); \
+  logger.addDestination(debugDestination.get()); \
+  logger.addDestination(fileDestination.get()); \
+  }
 
 const QString PROJECT = "NGRT4N";
 const QString USER_BN = BUILTIN_USER_PREFIX;

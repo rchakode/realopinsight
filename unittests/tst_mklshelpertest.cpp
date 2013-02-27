@@ -3,7 +3,7 @@
 #include "MkLsHelper.hpp"
 
 CheckListCstIterT check;
-MkLsHelper mkhelper("ubs-1", "50000");
+MkLsHelper mkhelper("ubs-1", 50000);
 
 class MkLsHelperTest : public QObject
 {
@@ -17,6 +17,7 @@ private Q_SLOTS:
   void testCase1();
   void testBadRecvingDataType();
   void testCaseService();
+  void testBadHostBadPort();
 };
 
 MkLsHelperTest::MkLsHelperTest()
@@ -61,6 +62,14 @@ void MkLsHelperTest::testCaseService()
   mkhelper.disconnectSocket();
 }
 
+
+void MkLsHelperTest::testBadHostBadPort()
+{
+  mkhelper.setHost("localhost");
+  mkhelper.setPort(50000);
+  QEXPECT_FAIL("", "Connection on bad host failed", Continue);
+  QVERIFY2(false == mkhelper.connect(), "Test connection");
+}
 QTEST_APPLESS_MAIN(MkLsHelperTest)
 
 #include "tst_mklshelpertest.moc"
