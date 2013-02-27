@@ -25,12 +25,9 @@ bool MkLsHelper::connect()
 {
   msocket->connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
   QObject::connect(msocket, SIGNAL(error(QAbstractSocket::SocketError)),
-                   this, SLOT(displayError(QAbstractSocket::SocketError)));
-
-  if (!msocket->waitForConnected(DefaultTimeout)) {
-      displayError();
-      return false;
-    }
+                   this, SLOT(handleConnectionFailed(QAbstractSocket::SocketError)));
+  QObject::connect(msocket, SIGNAL(connected()),
+                   this, SLOT(handleSuccessfulConnection));
   return true;
 }
 
@@ -48,7 +45,7 @@ bool MkLsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 {
   qint32 nb = msocket->write(mrequestMap[reqType].arg(host).toAscii());
   if (nb <= 0) {
-      displayError();
+      handleConnectionFailed();
       return false;
     }
   return true;
@@ -58,7 +55,7 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
 {
   mldchecks.clear();
   if (!msocket->waitForReadyRead()) {
-      displayError();
+      handleConnectionFailed();
       return false;
     }
   QString chkid = "";
@@ -108,12 +105,13 @@ bool MkLsHelper::findCheck(const QString& id, CheckListCstIterT& check)
   return false;
 }
 
-void MkLsHelper::displayError()
+void MkLsHelper::handleSuccessfulConnection()
 {
-  displayError(msocket->error());
+  QLOG_INFO() << "Connection successful!!!!!!!!!!!!!!!";
+  //TODO
 }
 
-void MkLsHelper::displayError(QAbstractSocket::SocketError error)
+void MkLsHelper::handleConnectionFailed(QAbstractSocket::SocketError error)
 {
   QString msg;
   switch (error) {
@@ -141,6 +139,11 @@ void MkLsHelper::displayError(QAbstractSocket::SocketError error)
       QLOG_ERROR()<< msg;
       utils::alert(msg);
     }
+}
+
+void MkLsHelper::handleConnectionFailed()
+{
+  handleConnectionFailed(msocket->error());
 }
 
 void MkLsHelper::setRequestPatterns()

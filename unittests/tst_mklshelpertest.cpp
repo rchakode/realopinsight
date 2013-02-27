@@ -69,6 +69,9 @@ void MkLsHelperTest::testBadHostBadPort()
   mkhelper.setPort(50000);
   QEXPECT_FAIL("", "Connection on bad host failed", Continue);
   QVERIFY2(false == mkhelper.connect(), "Test connection");
+  mkhelper.setHost("localhast");
+  QEXPECT_FAIL("", "Connection on bad host failed", Continue);
+  QVERIFY2(false == mkhelper.connect(), "Test connection");
 }
 QTEST_APPLESS_MAIN(MkLsHelperTest)
 

@@ -27,7 +27,8 @@ public:
 signals:
   
 public slots:
-  void displayError(QAbstractSocket::SocketError error);
+  void handleConnectionFailed(QAbstractSocket::SocketError error);
+  void handleSuccessfulConnection(void);
 
 private:
   const static int DefaultTimeout = 50000; /* 5 seconds */
@@ -37,7 +38,7 @@ private:
   RequestListT mrequestMap;
   CheckListT mldchecks;
 
-  void displayError();
+  void handleConnectionFailed();
   void setRequestPatterns();
 };
 
