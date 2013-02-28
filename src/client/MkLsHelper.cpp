@@ -66,16 +66,7 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
 {
   if (!QAbstractSocket::waitForReadyRead(DefaultTimeout)) {
       handleFailure();
-      return false;/*
-      if (error() == QAbstractSocket::RemoteHostClosedError) {
-          if (!connectToService()) {
-              handleFailure();
-              return false;
-            }
-        } else {
-          handleFailure();
-          return false;
-        }*/
+      return false;
     }
   QString chkid = "";
   MonitorBroker::CheckT check;
