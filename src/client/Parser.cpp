@@ -85,24 +85,13 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
       node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
       node.severity = MonitorBroker::NagiosUnknown;
       node.parent = "";
-      node.icon.remove("--> "); //FBWC
-      if (node.icon.length() == 0) {
+      if (node.icon.isEmpty()) {
           node.icon = GraphView::DEFAULT_ICON;
-        }
-      if (node.sev_crule < 0) {
-          node.sev_crule = CalcRules::HighCriticity; //FBWC
-        }
-      if (node.sev_prule < 0) {
-          node.sev_prule = PropRules::Unchanged;
         }
       if (node.type == NodeType::ALARM_NODE) {
           int pos = node.child_nodes.indexOf("/");
           QString host = node.child_nodes.left(pos);
-          if (pos == -1) {
-              _coreData.hosts[host] << "ping";
-            } else {
-              _coreData.hosts[host] << node.child_nodes.mid(pos+1);
-            }
+          _coreData.hosts[host] << ((pos == -1)?"ping" : node.child_nodes.mid(pos+1));
           _coreData.cnodes.insert(node.id, node);
         } else {
           _coreData.bpnodes.insert(node.id, node);
