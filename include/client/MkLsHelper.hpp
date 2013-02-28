@@ -12,34 +12,29 @@ public:
     Host = 0,
     Service = 1
   };
-
-  explicit MkLsHelper(const QString& host, const int& port);
+  MkLsHelper(const QString& host, const int& port);
   ~MkLsHelper();
 
-  bool connect(void);
-  bool disconnectSocket(void);
+  bool connectToService(void);
+  void disconnectFromService(void);
   bool requestData(const QString& host, const ReqTypeT& reqType);
   bool recvData(const ReqTypeT& reqType);
-  void loadHostData(const QString& host);
+  bool loadHostData(const QString& host);
   bool findCheck(const QString& id, CheckListCstIterT& check);
+  void clearData(void) {mldchecks.clear();}
   void setHost(const QString& host) {mhost = host;}
   void setPort(const int& port) {mport = port;}
-signals:
-  
-public slots:
-  void handleConnectionFailed(QAbstractSocket::SocketError error);
-  void handleSuccessfulConnection(void);
+  bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
 
 private:
   const static int DefaultTimeout = 50000; /* 5 seconds */
-  QTcpSocket* msocket;
   QString mhost;
   qint32 mport;
   RequestListT mrequestMap;
   CheckListT mldchecks;
-
-  void handleConnectionFailed();
   void setRequestPatterns();
+  void handleFailure() {handleFailure(QAbstractSocket::error());}
+  void handleFailure(QAbstractSocket::SocketError error);
 };
 
 #endif // MKLSHELPER_HPP

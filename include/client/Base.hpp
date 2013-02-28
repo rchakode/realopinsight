@@ -30,7 +30,7 @@
 #include <QtWebKit>
 #include <QSettings>
 
-#define LOGFILE "/tmp/realopinsight.log"
+#define LOGFILE QDir::tempPath()%"/realopinsight.log"
 #define SETUP_LOGGING() {\
   QsLogging::Logger& logger = QsLogging::Logger::instance(); \
   logger.setLoggingLevel(QsLogging::TraceLevel); \

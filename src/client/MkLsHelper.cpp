@@ -7,61 +7,80 @@
 #include <iostream>
 
 MkLsHelper::MkLsHelper(const QString& host, const int& port)
-  : msocket(new QTcpSocket()), mhost(host), mport(port)
+  : mhost(host), mport(port)
 {
+  setSocketOption(QAbstractSocket::KeepAliveOption, 1);
   setRequestPatterns();
   SETUP_LOGGING(); //FIXME: logging
 }
 
 MkLsHelper::~MkLsHelper()
 {
-  msocket->disconnect();
-  msocket->waitForDisconnected();
-  delete msocket;
+  QAbstractSocket::disconnect();
 }
 
-
-bool MkLsHelper::connect()
+void MkLsHelper::setRequestPatterns()
 {
-  msocket->connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
-  QObject::connect(msocket, SIGNAL(error(QAbstractSocket::SocketError)),
-                   this, SLOT(handleConnectionFailed(QAbstractSocket::SocketError)));
-  QObject::connect(msocket, SIGNAL(connected()),
-                   this, SLOT(handleSuccessfulConnection));
-  return true;
+  mrequestMap[Host] = "GET hosts\n"
+      "Columns: name state last_state_change check_command plugin_output\n"
+      "Filter: name = %1\n\n";
+  mrequestMap[Service] = "GET services\n"
+      "Columns: host_name service_description state last_state_change check_command plugin_output\n"
+      "Filter: host_name = %1\n\n";
 }
 
-
-bool MkLsHelper::disconnectSocket()
+bool MkLsHelper::connectToService()
 {
-  msocket->disconnectFromHost();
-  if (!msocket->waitForDisconnected(DefaultTimeout)) {
+  qDebug() << tr("Connecting to %1:%2...").arg(mhost).arg(mport);
+  QAbstractSocket::connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
+  if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
+      handleFailure();
       return false;
     }
   return true;
+}
+
+
+void MkLsHelper::disconnectFromService()
+{
+  QAbstractSocket::disconnectFromHost();
 }
 
 bool MkLsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 {
-  qint32 nb = msocket->write(mrequestMap[reqType].arg(host).toAscii());
-  if (nb <= 0) {
-      handleConnectionFailed();
+  qint32 nb;
+  if (!isConnected()) {
+      connectToService();
+    }
+  if (!isConnected() ||
+      (nb = QAbstractSocket::write(mrequestMap[reqType].arg(host).toAscii())) <= 0 ||
+      !QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
+      handleFailure();
       return false;
     }
+  qDebug() << tr("%1 bytes written").arg(nb);
   return true;
 }
 
 bool MkLsHelper::recvData(const ReqTypeT& reqType)
 {
-  mldchecks.clear();
-  if (!msocket->waitForReadyRead()) {
-      handleConnectionFailed();
-      return false;
+  if (!QAbstractSocket::waitForReadyRead(DefaultTimeout)) {
+      handleFailure();
+      return false;/*
+      if (error() == QAbstractSocket::RemoteHostClosedError) {
+          if (!connectToService()) {
+              handleFailure();
+              return false;
+            }
+        } else {
+          handleFailure();
+          return false;
+        }*/
     }
   QString chkid = "";
   MonitorBroker::CheckT check;
   QString entry;
-  QTextStream buffer(msocket);
+  QTextStream buffer(this);
   while (!((entry = buffer.readLine()).isNull())) {
       if (entry.isEmpty()) continue;
       QStringList fields = entry.split(";");
@@ -88,11 +107,27 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
           check.check_command = fields[4].toStdString();
           check.alarm_msg = fields[5].toStdString();
         } else {
-          QLOG_ERROR() << "Bad request type " << reqType;
+          qDebug() << tr("Bad request type: %1").arg(reqType);
           return false;
         }
       mldchecks.insert(chkid, check);
     }
+  return true;
+}
+
+bool MkLsHelper::loadHostData(const QString& host)
+{
+  mldchecks.clear();
+  bool succeed;
+  succeed = connectToService() &&
+      requestData(host, Host) &&
+      recvData(Host);
+  disconnectFromService();
+
+  succeed = succeed && connectToService() &&
+      requestData(host, Service)&&
+      recvData(Service);
+  disconnectFromService();
   return true;
 }
 
@@ -105,53 +140,28 @@ bool MkLsHelper::findCheck(const QString& id, CheckListCstIterT& check)
   return false;
 }
 
-void MkLsHelper::handleSuccessfulConnection()
+void MkLsHelper::handleFailure(QAbstractSocket::SocketError error)
 {
-  QLOG_INFO() << "Connection successful!!!!!!!!!!!!!!!";
-  //TODO
-}
-
-void MkLsHelper::handleConnectionFailed(QAbstractSocket::SocketError error)
-{
-  QString msg;
   switch (error) {
     case QAbstractSocket::RemoteHostClosedError:
-      msg = tr("The connection has been closed by the remote host.");
-      QLOG_ERROR()<< msg;
-      utils::alert(msg);
+      qDebug() << tr("The connection has been closed by the remote host.\n"
+                     "Socket state: %1").arg(state());
       break;
     case QAbstractSocket::HostNotFoundError:
-      msg = tr("The host was not found. Please check the "
-               "host name and port settings.");
-      QLOG_ERROR()<< msg;
-      utils::alert(msg);
+      qDebug() << tr("The host was not found. Please check the "
+                     "host name and port settings.\n"
+                     "Socket state: %1").arg(state());
       break;
     case QAbstractSocket::ConnectionRefusedError:
-      msg = tr("The connection was refused by the peer. "
-               "Make sure the fortune server is running, "
-               "and check that the host name and port "
-               "settings are correct.");
-      QLOG_ERROR()<< msg;
-      utils::alert(msg);
+      qDebug() << tr("The connection was refused by the peer. "
+                     "Make sure the fortune server is running, "
+                     "and check that the host name and port "
+                     "settings are correct.\n"
+                     "Socket state: %1").arg(state());
       break;
     default:
-      msg = tr("The following error occurred: %1.").arg(msocket->errorString());
-      QLOG_ERROR()<< msg;
-      utils::alert(msg);
+      qDebug() << tr("The following error occurred: %1.\n"
+                     "Socket state %2").arg(QAbstractSocket::errorString()).arg(state());
     }
 }
 
-void MkLsHelper::handleConnectionFailed()
-{
-  handleConnectionFailed(msocket->error());
-}
-
-void MkLsHelper::setRequestPatterns()
-{
-  mrequestMap[Host] = "GET hosts\n"
-      "Columns: name state last_state_change check_command plugin_output\n"
-      "Filter: name = %1\n\n";
-  mrequestMap[Service] = "GET services\n"
-      "Columns: host_name service_description state last_state_change check_command plugin_output\n"
-      "Filter: host_name = %1\n\n";
-}
