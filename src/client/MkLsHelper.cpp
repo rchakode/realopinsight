@@ -31,6 +31,7 @@ void MkLsHelper::setRequestPatterns()
 
 bool MkLsHelper::connectToService()
 {
+  disconnectFromHost();
   qDebug() << tr("Connecting to %1:%2...").arg(mhost).arg(mport);
   QAbstractSocket::connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
   if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
@@ -98,7 +99,7 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
           check.check_command = fields[4].toStdString();
           check.alarm_msg = fields[5].toStdString();
         } else {
-          qDebug() << tr("Bad request type: %1").arg(reqType);
+          QAbstractSocket::setErrorString(tr("Bad request type: %1").arg(reqType));
           return false;
         }
       mldchecks.insert(chkid, check);
@@ -135,24 +136,19 @@ void MkLsHelper::handleFailure(QAbstractSocket::SocketError error)
 {
   switch (error) {
     case QAbstractSocket::RemoteHostClosedError:
-      qDebug() << tr("The connection has been closed by the remote host.\n"
-                     "Socket state: %1").arg(state());
+      QAbstractSocket::setErrorString(tr("The connection has been closed by the remote host.\n"));
       break;
     case QAbstractSocket::HostNotFoundError:
-      qDebug() << tr("The host was not found. Please check the "
-                     "host name and port settings.\n"
-                     "Socket state: %1").arg(state());
+      QAbstractSocket::setErrorString(tr("The host not found: %1. Please check the "
+                                         "host name and port settings.\n").arg(mhost));
       break;
     case QAbstractSocket::ConnectionRefusedError:
-      qDebug() << tr("The connection was refused by the peer. "
-                     "Make sure the fortune server is running, "
-                     "and check that the host name and port "
-                     "settings are correct.\n"
-                     "Socket state: %1").arg(state());
+      QAbstractSocket::setErrorString(tr("The connection was refused by the server. "
+                                         "Make sure that Mk Livestatus is running on %1:%2.\n").arg(mhost).arg(mport));
       break;
     default:
-      qDebug() << tr("The following error occurred: %1.\n"
-                     "Socket state %2").arg(QAbstractSocket::errorString()).arg(state());
+      QAbstractSocket::setErrorString(tr("The following error occurred: %1.\n")
+                                      .arg(QAbstractSocket::errorString()));
     }
 }
 

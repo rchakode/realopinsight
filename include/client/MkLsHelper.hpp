@@ -32,6 +32,7 @@ private:
   qint32 mport;
   RequestListT mrequestMap;
   CheckListT mldchecks;
+  QString merrorMsg;
   void setRequestPatterns();
   void handleFailure() {handleFailure(QAbstractSocket::error());}
   void handleFailure(QAbstractSocket::SocketError error);

@@ -25,8 +25,9 @@
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
-#include "utilsClient.hpp"
+#include "client/utilsClient.hpp"
 #include "client/JsHelper.hpp"
+#include "client/MkLsHelper.hpp"
 #include <QScriptValueIterator>
 #include <QSystemTrayIcon>
 #include <sstream>
@@ -207,7 +208,8 @@ void SvNavigator::startMonitor()
       break;
     case MonitorBroker::Nagios:
     default:
-      runNagiosMonitor();
+      //FIXME: runNagiosMonitor();
+      runMkLsMonitor();
       break;
     }
 }
@@ -234,7 +236,7 @@ void SvNavigator::load(const QString& _file)
   mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::RootId]);
   mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
   mbrowser->setUrl(mmonitorBaseUrl);
-  this->resize();
+  this->resizeDashboard();
   QMainWindow::show();
   mmap->scaleToFitViewPort();
   mtrayIcon->show();
@@ -334,6 +336,46 @@ int SvNavigator::runNagiosMonitor(void)
   return 0;
 }
 
+int SvNavigator::runMkLsMonitor(void)
+{
+  MkLsHelper mklsHelper(mserverAddr, mserverPort.toInt());
+  if (!mklsHelper.connectToService()) {
+      mupdateSucceed = false;
+      updateDashboardOnUnknown(mklsHelper.errorString());
+      return 1;
+    }
+  CheckT invalidCheck;
+  invalidCheck.status = MonitorBroker::NagiosUnknown;
+  invalidCheck.last_state_change = UNKNOWN_UPDATE_TIME;
+  invalidCheck.host = "-";
+  invalidCheck.check_command = "-";
+  invalidCheck.alarm_msg = "Service not found";
+  QHashIterator<QString, QStringList> hit(mcoreData->hosts);
+  while (hit.hasNext()) {
+      hit.next();
+      QString host = hit.key();
+      if (mklsHelper.loadHostData(host)) {
+          foreach (const QString& item, hit.value()) {
+              QString cid;
+              if (item == "ping") {
+                  cid = host;
+                } else {
+                  cid = ID_PATTERN.arg(host).arg(item);
+                }
+              CheckListCstIterT chkit;
+              if (mklsHelper.findCheck(cid, chkit)) {
+                  updateCNodes(*chkit);
+                } else {
+                  invalidCheck.alarm_msg = tr("Service not found: %1").arg(cid).toStdString();
+                  updateCNodes(invalidCheck);
+                }
+            }
+        }
+    }
+  finalizeDashboardUpdate();
+  return 0;
+}
+
 void SvNavigator::prepareDashboardUpdate(void)
 {
   QMainWindow::setEnabled(false);
@@ -398,7 +440,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   emit hasToBeUpdate(_node.parent);
 }
 
-void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check)
+void SvNavigator::updateCNodes(const CheckT& check)
 {
   for (auto& cnode : mcoreData->cnodes) {
       if (cnode.child_nodes.toStdString() == check.id) {
@@ -636,7 +678,7 @@ void SvNavigator::centerGraphOnNode(QTreeWidgetItem * _item)
   centerGraphOnNode(_item->data(0, QTreeWidgetItem::UserType).toString());
 }
 
-void SvNavigator::resize(void)
+void SvNavigator::resizeDashboard(void)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
   QSize screenSize = qApp->desktop()->screen(0)->size();
@@ -688,7 +730,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         break;
       }
     case ZbxHelper::Trigger: {
-        MonitorBroker::CheckT check;
+        CheckT check;
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
@@ -780,7 +822,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                 }
             }
         } else {
-          MonitorBroker::CheckT check;
+          CheckT check;
           if (tid == ZnsHelper::Component) {
               QScriptValueIterator components(result.property("data"));
               while (components.hasNext()) {
