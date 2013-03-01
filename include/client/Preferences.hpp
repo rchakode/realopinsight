@@ -85,22 +85,22 @@ protected :
   void showEvent (QShowEvent *);
 
 private:
-  qint32 userRole;
-  Settings* settings;
-  QLineEdit* monitorHomeField;
-  QSpinBox* updateIntervalField;
-  QPushButton *bBrowse;
-  qint32 updateInterval;
-  QString monitorUrl;
-  QString serverAddr;
-  QString serverPort;
-  QString serverPass;
-  QLineEdit* oldPasswdField;
-  QLineEdit* passwdField;
-  QLineEdit* rePasswdField;
+  qint32 muserRole;
+  Settings* msettings;
+  QLineEdit* monitorUrlField;
+  QSpinBox* mupdateIntervalField;
+  QPushButton *mbrwBtn;
+  qint32 mupdateInterval;
+  QString mmonitorUrl;
+  QString mserverAddr;
+  QString mserverPort;
+  QString mserverPass;
+  QLineEdit* moldPwdField;
+  QLineEdit* mpwdField;
+  QLineEdit* mrePwdField;
   QLineEdit* msockAddrField;
   QLineEdit* msockPortField;
-  QLineEdit* serverPassField;
+  QLineEdit* mserverPassField;
   QPushButton* cancelButton;
   QPushButton* applySettingButton;
   QPushButton* changePasswdButton;
@@ -109,7 +109,9 @@ private:
   QCheckBox* museMkLs;
   QGridLayout* mmainLayout;
 
-  QGroupBox* createScktCfgBox(void);
+  QGroupBox* createBaseGrp(void);
+  QGroupBox* createScktGrp(void);
+  QGroupBox* createCommonGrp(void);
   void setContent(void);
   void addEvents(void);
 };

@@ -54,17 +54,17 @@ const QString AboutPattern = QObject::tr("\n%1 %2 (codename: %3)\n"
 
 Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
   : QDialog(),
-    userRole(_userRole),
-    settings(new Settings()),
-    monitorHomeField(new QLineEdit()),
-    updateIntervalField(new QSpinBox()),
-    bBrowse(new QPushButton(tr("&Browse..."))),
-    oldPasswdField(new QLineEdit()),
-    passwdField(new QLineEdit()),
-    rePasswdField(new QLineEdit()),
+    muserRole(_userRole),
+    msettings(new Settings()),
+    monitorUrlField(new QLineEdit()),
+    mupdateIntervalField(new QSpinBox()),
+    mbrwBtn(new QPushButton(tr("&Browse..."))),
+    moldPwdField(new QLineEdit()),
+    mpwdField(new QLineEdit()),
+    mrePwdField(new QLineEdit()),
     msockAddrField (new QLineEdit()),
     msockPortField(new QLineEdit()),
-    serverPassField(new QLineEdit()),
+    mserverPassField(new QLineEdit()),
     cancelButton(new QPushButton(tr("&Close"))),
     applySettingButton(new QPushButton("&Apply settings")),
     changePasswdButton(new QPushButton("C&hange password")),
@@ -74,29 +74,20 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     mmainLayout (new QGridLayout(this))
 {
   qint32 line = -1;
-  oldPasswdField->setEchoMode(QLineEdit::Password);
-  passwdField->setEchoMode(QLineEdit::Password);
-  rePasswdField->setEchoMode(QLineEdit::Password);
-  serverPassField->setEchoMode(QLineEdit::Password);
+  moldPwdField->setEchoMode(QLineEdit::Password);
+  mpwdField->setEchoMode(QLineEdit::Password);
+  mrePwdField->setEchoMode(QLineEdit::Password);
+  mserverPassField->setEchoMode(QLineEdit::Password);
   switch (_action)
     {
     case Preferences::ChangeMonitoringSettings:
       setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
       line++,
-          mmainLayout->addWidget(new QLabel(tr("Web Interface*")), line, 0),
-          mmainLayout->addWidget(monitorHomeField, line, 1, 1, 2);
+          mmainLayout->addWidget(createBaseGrp(), line, 0, 1, 3);
       line++,
-          mmainLayout->addWidget(createScktCfgBox(), line, 0, 1, 3);
+          mmainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
       line++,
-          mmainLayout->addWidget(new QLabel(tr("Auth chain")), line, 0),
-          mmainLayout->addWidget(serverPassField, line, 1, 1, 2);
-      line++,
-          mmainLayout->addWidget(new QLabel(tr("")), line, 0),
-          mmainLayout->addWidget(mshowAuthInfo, line, 1, 1, 2);
-      line++,
-          mmainLayout->addWidget(new QLabel(tr("Update Interval")), line, 0),
-          mmainLayout->addWidget(updateIntervalField, line, 1),
-          mmainLayout->addWidget(new QLabel("seconds"), line, 2);
+          mmainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
       line++,
           mmainLayout->addWidget(cancelButton, line, 1, Qt::AlignRight),
           mmainLayout->addWidget(applySettingButton, line, 2);
@@ -106,13 +97,13 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
       mmainLayout->setColumnStretch(1, 6);
       mmainLayout->setColumnStretch(2, 0);
       if(_userRole == Auth::OpUserRole) {
-          monitorHomeField->setEnabled(false);
-          bBrowse->setEnabled(false);
-          updateIntervalField->setEnabled(false);
+          monitorUrlField->setEnabled(false);
+          mbrwBtn->setEnabled(false);
+          mupdateIntervalField->setEnabled(false);
           applySettingButton->setEnabled(false);
           msockAddrField->setEnabled(false);
           msockPortField->setEnabled(false);
-          serverPassField->setEnabled(false);
+          mserverPassField->setEnabled(false);
           mshowAuthInfo->setEnabled(false);
           museMkLs->setEnabled(false);
         }
@@ -123,13 +114,13 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
       setWindowTitle(tr("Change Password| %1").arg(APP_NAME));
       line++,
           mmainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
-          mmainLayout->addWidget(oldPasswdField, line, 1, 1, 2);
+          mmainLayout->addWidget(moldPwdField, line, 1, 1, 2);
       line++,
           mmainLayout->addWidget(new QLabel(tr("New password")), line, 0),
-          mmainLayout->addWidget(passwdField, line, 1, 1, 2);
+          mmainLayout->addWidget(mpwdField, line, 1, 1, 2);
       line++,
           mmainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
-          mmainLayout->addWidget(rePasswdField, line, 1, 1, 2);
+          mmainLayout->addWidget(mrePwdField, line, 1, 1, 2);
       line++,
           mmainLayout->addWidget(cancelButton, line, 1),
           mmainLayout->addWidget(changePasswdButton, line, 2);
@@ -161,16 +152,16 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
 
 Preferences::~Preferences()
 {
-  delete updateIntervalField;
-  delete oldPasswdField;
-  delete passwdField;
-  delete rePasswdField;
+  delete mupdateIntervalField;
+  delete moldPwdField;
+  delete mpwdField;
+  delete mrePwdField;
   delete changePasswdButton;
   delete cancelButton;
   delete applySettingButton;
   delete msockAddrField;
   delete msockPortField;
-  delete serverPassField;
+  delete mserverPassField;
   delete donateButton;
   delete mshowAuthInfo;
   delete museMkLs;
@@ -180,49 +171,48 @@ Preferences::~Preferences()
 
 void Preferences::showEvent (QShowEvent *)
 {
-  oldPasswdField->setText("");
-  passwdField->setText("");
-  rePasswdField->setText("");
+  moldPwdField->setText("");
+  mpwdField->setText("");
+  mrePwdField->setText("");
 }
 
 void Preferences::applySettings(void)
 {
-  QString nagios_home;
-
-  nagios_home = monitorHomeField->text();
-
-  settings->setValue(URL_KEY, nagios_home);
-  settings->setValue(UPDATE_INTERVAL_KEY, updateIntervalField->text());
-  settings->setValue(SERVER_ADDR_KEY, msockAddrField->text());
+  QString homeUrl = monitorUrlField->text();
+  msettings->setValue(URL_KEY, homeUrl);
+  msettings->setValue(UPDATE_INTERVAL_KEY, mupdateIntervalField->text());
+  msettings->setValue(SERVER_ADDR_KEY, msockAddrField->text());
   if(msockPortField->text().toInt() <= 0) msockPortField->setText(QString::number(MonitorBroker::DefaultPort));
-  settings->setValue(SERVER_PORT_KEY, msockPortField->text());
-  settings->setValue(SERVER_PASS_KEY, serverPassField->text());
-  settings->sync();
-
+  msettings->setValue(SERVER_PORT_KEY, msockPortField->text());
+  msettings->setValue(SERVER_PASS_KEY, mserverPassField->text());
+  msettings->sync();
   close();
-
-  emit urlChanged(nagios_home);
+  emit urlChanged(homeUrl);
 }
 
 
 void Preferences::changePasswd(void)
 {
-  QString userPasswd, passwd, newPasswd, renewPasswd, key;
+  QString userPasswd;
+  QString passwd;
+  QString newPasswd;
+  QString renewPasswd;
+  QString key;
 
-  if (userRole == Auth::AdmUserRole) {
+  if (muserRole == Auth::AdmUserRole) {
       key = ADM_PASSWD_KEY;
-      userPasswd = settings->value(key).toString();
+      userPasswd = msettings->value(key).toString();
     } else {
       key = OP_PASSWD_KEY;
-      userPasswd = settings->value(key).toString();
+      userPasswd = msettings->value(key).toString();
     }
-  passwd = QCryptographicHash::hash(oldPasswdField->text().toAscii(), QCryptographicHash::Md5);
-  newPasswd = QCryptographicHash::hash(passwdField->text().toAscii(), QCryptographicHash::Md5);
-  renewPasswd = QCryptographicHash::hash(rePasswdField->text().toAscii(), QCryptographicHash::Md5);
+  passwd = QCryptographicHash::hash(moldPwdField->text().toAscii(), QCryptographicHash::Md5);
+  newPasswd = QCryptographicHash::hash(mpwdField->text().toAscii(), QCryptographicHash::Md5);
+  renewPasswd = QCryptographicHash::hash(mrePwdField->text().toAscii(), QCryptographicHash::Md5);
 
   if(userPasswd == passwd) {
       if(newPasswd == renewPasswd) {
-          settings->setKeyValue(key, newPasswd);
+          msettings->setKeyValue(key, newPasswd);
           QMessageBox::information(this,
                                    APP_NAME,
                                    tr("Password updated"),
@@ -246,14 +236,28 @@ void Preferences::donate(void)
 
 void Preferences::setAuthChainVisibility(const int & state) {
   if(state == Qt::Checked) {
-      serverPassField->setEchoMode(QLineEdit::Normal);
+      mserverPassField->setEchoMode(QLineEdit::Normal);
     } else {
-      serverPassField->setEchoMode(QLineEdit::Password);
+      mserverPassField->setEchoMode(QLineEdit::Password);
     }
 }
-QGroupBox* Preferences::createScktCfgBox(void)
+
+QGroupBox* Preferences::createBaseGrp(void)
 {
-  QGroupBox* bx(new QGroupBox(tr("Specific for ngrt4nd/Mk Livestatus")));
+  QGroupBox* bx(new QGroupBox());
+  QHBoxLayout* lyt(new QHBoxLayout());
+  lyt->addWidget(new QLabel(tr("Web Interface*")));
+  lyt->addWidget(monitorUrlField);
+  lyt->setStretch(0, 0);
+  lyt->setStretch(1, 1);
+  bx->setLayout(lyt);
+  bx->setAlignment(Qt::AlignLeft);
+  return bx;
+}
+
+QGroupBox* Preferences::createScktGrp(void)
+{
+  QGroupBox* bx(new QGroupBox(tr("Mk Livestatus/ngrt4nd Settings")));
   QHBoxLayout* lyt(new QHBoxLayout());
   lyt->addWidget(new QLabel(tr("Server Address")));
   lyt->addWidget(msockAddrField);
@@ -270,24 +274,46 @@ QGroupBox* Preferences::createScktCfgBox(void)
   return bx;
 }
 
+QGroupBox* Preferences::createCommonGrp(void)
+{
+  QGroupBox* bx(new QGroupBox(tr("Common Settings")));
+  QGridLayout* lyt(new QGridLayout());
+  int line;
+  line = 0,
+      lyt->addWidget(new QLabel(tr("Auth chain")), line, 0),
+      lyt->addWidget(mserverPassField, line, 1, 1, 2);
+  line++,
+      lyt->addWidget(new QLabel(tr("")), line, 0),
+      lyt->addWidget(mshowAuthInfo, line, 1, 1, 2);
+  line++,
+      lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
+      lyt->addWidget(mupdateIntervalField, line, 1),
+      lyt->addWidget(new QLabel("seconds"), line, 2);
+  lyt->setColumnStretch(0, 0);
+  lyt->setColumnStretch(1, 1);
+  bx->setLayout(lyt);
+  bx->setAlignment(Qt::AlignLeft);
+  return bx;
+}
+
 void Preferences::setContent(void)
 {
-  updateIntervalField->setMinimum(5);
-  updateIntervalField->setMaximum(600);
-  updateInterval = settings->value(UPDATE_INTERVAL_KEY).toInt();
-  updateIntervalField->setValue(updateInterval);
+  mupdateIntervalField->setMinimum(5);
+  mupdateIntervalField->setMaximum(600);
+  mupdateInterval = msettings->value(UPDATE_INTERVAL_KEY).toInt();
+  mupdateIntervalField->setValue(mupdateInterval);
 
-  monitorUrl = settings->value(URL_KEY).toString();
-  monitorHomeField->setText(monitorUrl);
+  mmonitorUrl = msettings->value(URL_KEY).toString();
+  monitorUrlField->setText(mmonitorUrl);
 
-  serverAddr = settings->value(SERVER_ADDR_KEY).toString();
-  msockAddrField->setText(serverAddr);
+  mserverAddr = msettings->value(SERVER_ADDR_KEY).toString();
+  msockAddrField->setText(mserverAddr);
 
-  serverPort = settings->value(SERVER_PORT_KEY).toString();
-  msockPortField->setText(serverPort);
+  mserverPort = msettings->value(SERVER_PORT_KEY).toString();
+  msockPortField->setText(mserverPort);
 
-  serverPass = settings->value(SERVER_PASS_KEY).toString();
-  serverPassField->setText(serverPass);
+  mserverPass = msettings->value(SERVER_PASS_KEY).toString();
+  mserverPassField->setText(mserverPass);
 }
 
 QSplashScreen* Preferences::infoScreen(const QString & msg) {
