@@ -24,7 +24,7 @@
 #include "config.h"
 #include "core/ns.hpp"
 #include "core/MonitorBroker.hpp"
-#include "core/Socket.hpp"
+#include "core/ZmqSocket.hpp"
 #include <zmq.h>
 #include <cassert>
 #include <stdexcept>
@@ -160,7 +160,7 @@ int main(int argc, char ** argv)
   if(!foreground) {
       pid_t pid = fork();
       if(pid <= -1) {
-          std::clog << "Failed while starting the program in daemon mode\n";
+          std::clog << "Failed while starting the daemon service\n";
           exit(1);
         } else if(pid > 0) {
           exit (0);
@@ -170,9 +170,10 @@ int main(int argc, char ** argv)
 
   std::ostringstream uri;
   uri << "tcp://0.0.0.0:" << port;
-  Socket socket(ZMQ_REP);
-  if(!socket.bind(uri.str())) {std::clog << "ERROOR\n";exit(1);} 
-
+  ZmqSocket socket(ZMQ_REP);
+  if(!socket.bind(uri.str())) {
+      std::clog << "ERROR\n";exit(1);
+    }
   std::clog << "Listening address => "<<uri.str()
             << "\nNagios status file => "<<statusFile
             << "\n============>started\n";
