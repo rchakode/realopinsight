@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.2.0beta1
+VERSION_=2.2.1
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
@@ -36,7 +36,7 @@ DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_INFO='\"02/2013\"'"
-DEFINES *= "RELEASE_NAME='\"Lucia\"'"
+DEFINES *= "RELEASE_NAME='\"Briator\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
