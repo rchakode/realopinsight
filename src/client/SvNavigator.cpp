@@ -38,6 +38,8 @@
 #include <locale>
 #include <memory>
 
+//FIXME: test case unsensitive check id with Nagios, Zabbix, and Zenoss
+
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
@@ -209,7 +211,8 @@ void SvNavigator::startMonitor()
     case MonitorBroker::Nagios:
     default:
       //FIXME: runNagiosMonitor();
-      runMkLsMonitor();
+      runNagiosMonitor();
+      //runMkLsMonitor();
       break;
     }
 }
@@ -283,8 +286,8 @@ int SvNavigator::runNagiosMonitor(void)
   if(socket->connect())
     socket->makeHandShake();
   if (socket->isConnected2Server()) {
-      if (socket->getServerSerial() < 110) {
-          utils::alert(tr("The server %1 is not supported").arg(socket->getServerSerial()));
+      if (socket->getServerSerial() < 111) {
+          utils::alert(tr("The server serial %1 is not supported").arg(socket->getServerSerial()));
           mupdateSucceed = false;
         }
       updateStatusBar(tr("Updating..."));
@@ -362,8 +365,10 @@ int SvNavigator::runMkLsMonitor(void)
                 } else {
                   cid = ID_PATTERN.arg(host).arg(item);
                 }
+              //qDebug() << "FINDDDDDDDDDD>> "<<cid;
               CheckListCstIterT chkit;
               if (mklsHelper.findCheck(cid, chkit)) {
+                  qDebug() << cid;
                   updateCNodes(*chkit);
                 } else {
                   invalidCheck.alarm_msg = tr("Service not found: %1").arg(cid).toStdString();
@@ -501,7 +506,6 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   QRegExp regexp(MsgConsole::TAG_HOSTNAME);
   statusText.replace(regexp, _node.check.host.c_str()); //FIXME: problem with '-' host
 
-  //FIXME: avoid replacing meta data
   auto info = QString(_node.check.id.c_str()).split("/");
   if (info.length() > 1) {
       regexp.setPattern(MsgConsole::TAG_CHECK);
@@ -760,7 +764,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                 check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
             QString key = ID_PATTERN.arg(targetHost, triggerName);
-            check.id = key.toStdString();
+            check.id = key.toLower().toStdString();
             updateCNodes(check);
           }
         if (--mhostLeft == 0) {
@@ -833,7 +837,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                   QString duid = device.property("uid").toString();
                   QString dname = ZnsHelper::getDeviceName(duid);
                   QString chkid = ID_PATTERN.arg(dname, cname);
-                  check.id = chkid.toStdString();
+                  check.id = chkid.toLower().toStdString();
                   check.host = dname.toStdString();
                   check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
                                                             "yyyy/MM/dd hh:mm:ss");
@@ -854,7 +858,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
             } else if (tid == ZnsHelper::DeviceInfo) {
               QScriptValue devInfo(result.property("data"));
               QString dname = devInfo.property("name").toString();
-              check.id = check.host = dname.toStdString();
+              check.id = check.host = dname.toLower().toStdString();
               check.status = devInfo.property("status").toBool();
               check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
