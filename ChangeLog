@@ -1,6 +1,10 @@
 ###############################
 NGRT4N/RealOpInsight ChangeLog
 ###############################
+2.2.0 (beta)
+--------------
+  * Fixed compilation problems on nullptr. See Ticket #8
+  * Fixed metadata handling. See ticket #9
 
 2.2.0 (beta)
 --------------
