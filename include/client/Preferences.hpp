@@ -98,16 +98,18 @@ private:
   QLineEdit* oldPasswdField;
   QLineEdit* passwdField;
   QLineEdit* rePasswdField;
-  QLineEdit* serverAddrField;
-  QLineEdit* serverPortField;
+  QLineEdit* msockAddrField;
+  QLineEdit* msockPortField;
   QLineEdit* serverPassField;
   QPushButton* cancelButton;
   QPushButton* applySettingButton;
   QPushButton* changePasswdButton;
   ImageButton* donateButton;
-  QCheckBox* showAuthChain;
-  QGridLayout* layout;
+  QCheckBox* mshowAuthInfo;
+  QCheckBox* museMkLs;
+  QGridLayout* mmainLayout;
 
+  QGroupBox* createScktCfgBox(void);
   void setContent(void);
   void addEvents(void);
 };
