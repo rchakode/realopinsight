@@ -220,3 +220,9 @@ bool utils::findNode(const NodeListT& bpnodes,
   return found;
 }
 
+QSplashScreen* utils::infoScreen(const QString & msg) {
+  QSplashScreen* screen = new QSplashScreen(QPixmap(":images/built-in/loading-screen.png"));
+  screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
+  screen->show();
+  return  screen;
+}

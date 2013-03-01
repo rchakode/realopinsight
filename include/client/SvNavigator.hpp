@@ -58,7 +58,7 @@ public:
 public slots:
   void startMonitor();
   int runNagiosMonitor(void);
-  int runMkLsMonitor(void);
+  int runMklsMonitor(void);
   void prepareDashboardUpdate(void);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
@@ -107,7 +107,7 @@ private:
   WebKit* mbrowser;
   GraphView* mmap;
   SvNavigatorTree* mtree;
-  Preferences* mprefWindow;
+  Preferences* mpreferences;
   Preferences* mchangePasswdWindow;
   MsgConsole* mmsgConsole;
   QMenu* mnodeContextMenu;

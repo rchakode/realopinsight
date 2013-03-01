@@ -83,7 +83,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mbrowser (new WebKit()),
     mmap (new GraphView(this)),
     mtree (new SvNavigatorTree()),
-    mprefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
+    mpreferences (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     mchangePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     mmsgConsole(new MsgConsole(this)),
     mnodeContextMenu (new QMenu()),
@@ -124,7 +124,7 @@ SvNavigator::~SvNavigator()
   delete mmsgConsolePanel;
   delete mrightSplitter;
   delete mmainSplitter;
-  delete mprefWindow;
+  delete mpreferences;
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
@@ -210,9 +210,7 @@ void SvNavigator::startMonitor()
       break;
     case MonitorBroker::Nagios:
     default:
-      //FIXME: runNagiosMonitor();
-      runNagiosMonitor();
-      //runMkLsMonitor();
+      mpreferences->useMkls()? runMklsMonitor() : runNagiosMonitor();
       break;
     }
 }
@@ -260,7 +258,7 @@ void SvNavigator::handleChangePasswordAction(void)
 
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
-  mprefWindow->exec();
+  mpreferences->exec();
   updateMonitoringSettings();
   killTimer(mtimer);
   mtimer = startTimer(mupdateInterval);
@@ -339,7 +337,7 @@ int SvNavigator::runNagiosMonitor(void)
   return 0;
 }
 
-int SvNavigator::runMkLsMonitor(void)
+int SvNavigator::runMklsMonitor(void)
 {
   MkLsHelper mklsHelper(mserverAddr, mserverPort.toInt());
   if (!mklsHelper.connectToService()) {
@@ -1019,7 +1017,7 @@ void SvNavigator::addEvents(void)
   connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
   connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
-  connect(mprefWindow, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));
+  connect(mpreferences, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));
   connect(mviewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
   connect(mmap, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(mtree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));

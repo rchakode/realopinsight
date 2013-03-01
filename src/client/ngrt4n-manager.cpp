@@ -90,7 +90,7 @@ int main(int argc, char **argv)
   int userRole = authentication.exec();
   if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
   if (module == "dashboard") {
-      QSplashScreen* info = Preferences::infoScreen(QObject::tr("%1\n                  Loading...").arg(versionMsg));
+      QSplashScreen* info = utils::infoScreen(QObject::tr("%1\n                  Loading...").arg(versionMsg));
       utils::delay(1);
       if (file == "") {
           info->clearMessage();
