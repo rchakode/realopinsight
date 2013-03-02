@@ -1,7 +1,7 @@
 ###############################
-NGRT4N/RealOpInsight ChangeLog
+RealOpInsight ChangeLog
 ###############################
-2.2.0 (beta)
+2.2.0
 --------------
   * Fixed compilation problems on nullptr. See Ticket #8
   * Fixed metadata handling. See ticket #9
@@ -88,11 +88,11 @@ ENHANCEMENTS
  * Improved user interfaces
  * Refined chart
 
-1.0.1
+1.0.1 (NGRT4N)
 -------------
  * Improved algorithms
  * Add GPL License
 
-1.0
+1.0  (NGRT4N)
 -------------
  * First release
