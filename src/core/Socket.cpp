@@ -100,7 +100,7 @@ std::string Socket::recv() const{
 #if ZMQ_VERSION_MAJOR == 2
   ret = zmq_recv(msocket, &msg, 0);
 #elif ZMQ_VERSION_MAJOR == 3
-  received = zmq_recv(msocket, zmq_msg_data(&msg), MAX_MSG_SIZE, 0);
+  ret = zmq_recv(msocket, zmq_msg_data(&msg), MAX_MSG_SIZE, 0);
 #endif
   if (ret < 0) return "";
   char *retBuffer = (char*)zmq_msg_data(&msg);
