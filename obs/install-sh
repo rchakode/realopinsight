@@ -102,9 +102,9 @@ checking_uipreq(){
 #  echo "done"
 }
 
-install_default(){
+install_manager(){
 #  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-default ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-manager ${dflag}
 #  make -Bj${ncpu} 1>>install.log
   make -B 1>>install.log
   make install 1>>install.log
@@ -136,7 +136,7 @@ install_ui() {
   checking_uipreq
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
   echo -n "DEGUG : Current component => Manager..."
-  install_default
+  install_manager
   echo done
   
   echo -n "DEGUG : Current component => Editor..."
