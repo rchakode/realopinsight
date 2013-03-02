@@ -7,8 +7,8 @@ ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp \
 		   src/server/ngrt4nd.cpp \
 		   include/core/MonitorBroker.hpp \
 		   include/core/ns.hpp \
-		   include/core/Socket.hpp \
-		   src/core/Socket.cpp \
+		   include/core/ZmqSocket.hpp \
+		   src/core/ZmqSocket.cpp \
 		   src/server/Logger.hpp \
 		   src/server/Logger.cpp
 

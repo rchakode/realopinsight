@@ -52,11 +52,6 @@ class Preferences : public QDialog
   Q_OBJECT
 
 public:
-  Preferences(const qint32 & _userRole = Auth::OpUserRole, const qint32 & _action = Preferences::ChangePassword);
-  virtual ~Preferences();
-  static QString style();
-  static QSplashScreen* infoScreen(const QString & msg="");
-
   static const qint32 ChangePassword;
   static const qint32 ForceChangePassword;
   static const qint32 ChangeMonitoringSettings;
@@ -71,6 +66,12 @@ public:
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
   static const QString SERVER_PASS_KEY;
+  static const QString USE_MKLS_KEY;
+
+  Preferences(const qint32 & _userRole = Auth::OpUserRole, const qint32 & _action = Preferences::ChangePassword);
+  virtual ~Preferences();
+  static QString style();
+  bool useMkls(void) const {return museMkls == Qt::Checked;}
 
 public slots:
   void applySettings(void);
@@ -85,29 +86,29 @@ protected :
   void showEvent (QShowEvent *);
 
 private:
-  qint32 userRole;
-  Settings* settings;
-  QLineEdit* monitorHomeField;
-  QSpinBox* updateIntervalField;
-  QPushButton *bBrowse;
-  qint32 updateInterval;
-  QString monitorUrl;
-  QString serverAddr;
-  QString serverPort;
-  QString serverPass;
-  QLineEdit* oldPasswdField;
-  QLineEdit* passwdField;
-  QLineEdit* rePasswdField;
-  QLineEdit* serverAddrField;
-  QLineEdit* serverPortField;
-  QLineEdit* serverPassField;
-  QPushButton* cancelButton;
-  QPushButton* applySettingButton;
-  QPushButton* changePasswdButton;
-  ImageButton* donateButton;
-  QCheckBox* showAuthChain;
-  QGridLayout* layout;
+  qint32 muserRole;
+  Qt::CheckState museMkls;
+  Settings* msettings;
+  QLineEdit* monitorUrlField;
+  QSpinBox* mupdateIntervalField;
+  QPushButton *mbrwBtn;
+  QLineEdit* moldPwdField;
+  QLineEdit* mpwdField;
+  QLineEdit* mrePwdField;
+  QLineEdit* msockAddrField;
+  QLineEdit* msockPortField;
+  QLineEdit* mserverPassField;
+  QPushButton* mcancelBtn;
+  QPushButton* mapplySettingBtn;
+  QPushButton* mchangePwdBtn;
+  ImageButton* mdonateBtn;
+  QCheckBox* mshowAuthInfoChkbx;
+  QCheckBox* museMklsChkbx;
+  QGridLayout* mmainLayout;
 
+  QGroupBox* createBaseGrp(void);
+  QGroupBox* createScktGrp(void);
+  QGroupBox* createCommonGrp(void);
   void setContent(void);
   void addEvents(void);
 };

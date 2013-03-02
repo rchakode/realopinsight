@@ -25,8 +25,9 @@
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
-#include "utilsClient.hpp"
+#include "client/utilsClient.hpp"
 #include "client/JsHelper.hpp"
+#include "client/MkLsHelper.hpp"
 #include <QScriptValueIterator>
 #include <QSystemTrayIcon>
 #include <sstream>
@@ -37,11 +38,12 @@
 #include <locale>
 #include <memory>
 
+//FIXME: test case unsensitive check id with Nagios, Zabbix, and Zenoss
+
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-const QString ID_PATTERN("%1/%2");
 const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 
 StringMapT SvNavigator::propRules() {
@@ -81,7 +83,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mbrowser (new WebKit()),
     mmap (new GraphView(this)),
     mtree (new SvNavigatorTree()),
-    mprefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
+    mpreferences (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     mchangePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     mmsgConsole(new MsgConsole(this)),
     mnodeContextMenu (new QMenu()),
@@ -122,7 +124,7 @@ SvNavigator::~SvNavigator()
   delete mmsgConsolePanel;
   delete mrightSplitter;
   delete mmainSplitter;
-  delete mprefWindow;
+  delete mpreferences;
   delete mchangePasswdWindow;
   delete mzbxHelper;
   delete mznsHelper;
@@ -209,7 +211,7 @@ void SvNavigator::startMonitor()
       break;
     case MonitorBroker::Nagios:
     default:
-      runNagiosMonitor();
+      mpreferences->useMkls()? runMklsMonitor() : runNagiosMonitor();
       break;
     }
 }
@@ -236,7 +238,7 @@ void SvNavigator::load(const QString& _file)
   mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::RootId]);
   mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
   mbrowser->setUrl(mmonitorBaseUrl);
-  this->resize();
+  this->resizeDashboard();
   QMainWindow::show();
   mmap->scaleToFitViewPort();
   mtrayIcon->show();
@@ -257,7 +259,7 @@ void SvNavigator::handleChangePasswordAction(void)
 
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
-  mprefWindow->exec();
+  mpreferences->exec();
   updateMonitoringSettings();
   killTimer(mtimer);
   mtimer = startTimer(mupdateInterval);
@@ -279,12 +281,12 @@ void SvNavigator::handleShowAbout(void)
 
 int SvNavigator::runNagiosMonitor(void)
 {
-  auto socket = std::unique_ptr<Socket>(new Socket(mserverUrl.toStdString(), ZMQ_REQ));
+  auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(mserverUrl.toStdString(), ZMQ_REQ));
   if(socket->connect())
     socket->makeHandShake();
   if (socket->isConnected2Server()) {
-      if (socket->getServerSerial() < 110) {
-          utils::alert(tr("The server %1 is not supported").arg(socket->getServerSerial()));
+      if (socket->getServerSerial() < 111) {
+          utils::alert(tr("The server serial %1 is not supported").arg(socket->getServerSerial()));
           mupdateSucceed = false;
         }
       updateStatusBar(tr("Updating..."));
@@ -332,6 +334,48 @@ int SvNavigator::runNagiosMonitor(void)
         }
     }
   socket.reset(NULL);
+  finalizeDashboardUpdate();
+  return 0;
+}
+
+int SvNavigator::runMklsMonitor(void)
+{
+  MkLsHelper mklsHelper(mserverAddr, mserverPort.toInt());
+  if (!mklsHelper.connectToService()) {
+      mupdateSucceed = false;
+      updateDashboardOnUnknown(mklsHelper.errorString());
+      return 1;
+    }
+  CheckT invalidCheck;
+  invalidCheck.status = MonitorBroker::NagiosUnknown;
+  invalidCheck.last_state_change = UNKNOWN_UPDATE_TIME;
+  invalidCheck.host = "-";
+  invalidCheck.check_command = "-";
+  invalidCheck.alarm_msg = "Service not found";
+  QHashIterator<QString, QStringList> hit(mcoreData->hosts);
+  while (hit.hasNext()) {
+      hit.next();
+      QString host = hit.key();
+      if (mklsHelper.loadHostData(host)) {
+          foreach (const QString& item, hit.value()) {
+              QString cid;
+              if (item == "ping") {
+                  cid = host;
+                } else {
+                  cid = ID_PATTERN.arg(host).arg(item);
+                }
+              //qDebug() << "FINDDDDDDDDDD>> "<<cid;
+              CheckListCstIterT chkit;
+              if (mklsHelper.findCheck(cid, chkit)) {
+                  qDebug() << cid;
+                  updateCNodes(*chkit);
+                } else {
+                  invalidCheck.alarm_msg = tr("Service not found: %1").arg(cid).toStdString();
+                  updateCNodes(invalidCheck);
+                }
+            }
+        }
+    }
   finalizeDashboardUpdate();
   return 0;
 }
@@ -400,7 +444,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   emit hasToBeUpdate(_node.parent);
 }
 
-void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check)
+void SvNavigator::updateCNodes(const CheckT& check)
 {
   for (auto& cnode : mcoreData->cnodes) {
       if (cnode.child_nodes.toStdString() == check.id) {
@@ -461,7 +505,6 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   QRegExp regexp(MsgConsole::TAG_HOSTNAME);
   statusText.replace(regexp, _node.check.host.c_str()); //FIXME: problem with '-' host
 
-  //FIXME: avoid replacing meta data
   auto info = QString(_node.check.id.c_str()).split("/");
   if (info.length() > 1) {
       regexp.setPattern(MsgConsole::TAG_CHECK);
@@ -638,7 +681,7 @@ void SvNavigator::centerGraphOnNode(QTreeWidgetItem * _item)
   centerGraphOnNode(_item->data(0, QTreeWidgetItem::UserType).toString());
 }
 
-void SvNavigator::resize(void)
+void SvNavigator::resizeDashboard(void)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
   QSize screenSize = qApp->desktop()->screen(0)->size();
@@ -690,7 +733,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         break;
       }
     case ZbxHelper::Trigger: {
-        MonitorBroker::CheckT check;
+        CheckT check;
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
             trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
@@ -720,7 +763,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                 check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
               }
             QString key = ID_PATTERN.arg(targetHost, triggerName);
-            check.id = key.toStdString();
+            check.id = key.toLower().toStdString();
             updateCNodes(check);
           }
         if (--mhostLeft == 0) {
@@ -782,7 +825,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                 }
             }
         } else {
-          MonitorBroker::CheckT check;
+          CheckT check;
           if (tid == ZnsHelper::Component) {
               QScriptValueIterator components(result.property("data"));
               while (components.hasNext()) {
@@ -793,7 +836,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                   QString duid = device.property("uid").toString();
                   QString dname = ZnsHelper::getDeviceName(duid);
                   QString chkid = ID_PATTERN.arg(dname, cname);
-                  check.id = chkid.toStdString();
+                  check.id = chkid.toLower().toStdString();
                   check.host = dname.toStdString();
                   check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
                                                             "yyyy/MM/dd hh:mm:ss");
@@ -814,7 +857,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
             } else if (tid == ZnsHelper::DeviceInfo) {
               QScriptValue devInfo(result.property("data"));
               QString dname = devInfo.property("name").toString();
-              check.id = check.host = dname.toStdString();
+              check.id = check.host = dname.toLower().toStdString();
               check.status = devInfo.property("status").toBool();
               check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
@@ -975,7 +1018,7 @@ void SvNavigator::addEvents(void)
   connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
   connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
-  connect(mprefWindow, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));
+  connect(mpreferences, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));
   connect(mviewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
   connect(mmap, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(mtree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
