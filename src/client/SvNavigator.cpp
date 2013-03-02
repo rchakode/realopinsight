@@ -97,7 +97,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   loadMenus();
   mviewPanel->addTab(mmap, tr("Dashboard"));
   mviewPanel->addTab(mbrowser, tr("Native Web UI"));
-  mmsgConsolePanel->addTab(mmsgConsole, tr("Event Console"));
+  mmsgConsolePanel->addTab(mmsgConsole, tr("Message Console"));
   mmainSplitter->addWidget(mtree);
   mmainSplitter->addWidget(mrightSplitter);
   mrightSplitter->addWidget(mviewPanel);
