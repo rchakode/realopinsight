@@ -170,6 +170,7 @@ void SvNavigator::loadMenus(void)
   toolBar->addAction(msubMenus["ZoomIn"]);
   toolBar->addAction(msubMenus["ZoomOut"]);
   toolBar->addAction(msubMenus["Capture"]);
+  toolBar->addSeparator();
   toolBar->addAction(msubMenus["BrowserBack"]);
   toolBar->addAction(msubMenus["BrowserForward"]);
   toolBar->addAction(msubMenus["BrowserStop"]);
@@ -598,24 +599,24 @@ void SvNavigator::tabChanged(int _index)
 {
   switch(_index) {
     case 0:
-      msubMenus["Refresh"]->setVisible(true);
-      msubMenus["Capture"]->setVisible(true);
-      msubMenus["ZoomIn"]->setVisible(true);
-      msubMenus["ZoomOut"]->setVisible(true);
+      msubMenus["Refresh"]->setEnabled(true);
+      msubMenus["Capture"]->setEnabled(true);
+      msubMenus["ZoomIn"]->setEnabled(true);
+      msubMenus["ZoomOut"]->setEnabled(true);
       mmenus["BROWSER"]->setEnabled(false);
-      msubMenus["BrowserBack"]->setVisible(false);
-      msubMenus["BrowserForward"]->setVisible(false);
-      msubMenus["BrowserStop"]->setVisible(false);
+      msubMenus["BrowserBack"]->setEnabled(false);
+      msubMenus["BrowserForward"]->setEnabled(false);
+      msubMenus["BrowserStop"]->setEnabled(false);
       break;
     case 1:
       mmenus["BROWSER"]->setEnabled(true);
-      msubMenus["BrowserBack"]->setVisible(true);
-      msubMenus["BrowserForward"]->setVisible(true);
-      msubMenus["BrowserStop"]->setVisible(true);
-      msubMenus["Refresh"]->setVisible(false);
-      msubMenus["Capture"]->setVisible(false);
-      msubMenus["ZoomIn"]->setVisible(false);
-      msubMenus["ZoomOut"]->setVisible(false);
+      msubMenus["BrowserBack"]->setEnabled(true);
+      msubMenus["BrowserForward"]->setEnabled(true);
+      msubMenus["BrowserStop"]->setEnabled(true);
+      msubMenus["Refresh"]->setEnabled(false);
+      msubMenus["Capture"]->setEnabled(false);
+      msubMenus["ZoomIn"]->setEnabled(false);
+      msubMenus["ZoomOut"]->setEnabled(false);
       break;
     default:
       break;
