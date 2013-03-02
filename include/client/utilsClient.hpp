@@ -27,6 +27,7 @@
 #include "Base.hpp"
 #include <QString>
 #include <QIcon>
+#include <unistd.h>
 
 namespace utils {
   inline void delay(const qint32& d){ sleep(d);}
