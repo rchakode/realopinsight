@@ -79,7 +79,6 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mmainSplitter (new QSplitter(this)),
     mrightSplitter (new QSplitter()),
     mviewPanel (new QTabWidget()),
-    mmsgConsolePanel (new QTabWidget()),
     mbrowser (new WebKit()),
     mmap (new GraphView(this)),
     mtree (new SvNavigatorTree()),
@@ -99,11 +98,10 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   loadMenus();
   mviewPanel->addTab(mmap, tr("Dashboard"));
   mviewPanel->addTab(mbrowser, tr("Native Web UI"));
-  mmsgConsolePanel->addTab(mmsgConsole, tr("Message Console"));
   mmainSplitter->addWidget(mtree);
   mmainSplitter->addWidget(mrightSplitter);
   mrightSplitter->addWidget(mviewPanel);
-  mrightSplitter->addWidget(mmsgConsolePanel);
+  mrightSplitter->addWidget(createMsgConsole());
   mrightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(mmainSplitter);
   updateMonitoringSettings();
@@ -121,7 +119,6 @@ SvNavigator::~SvNavigator()
   delete mmap;
   delete mcoreData;
   delete mviewPanel;
-  delete mmsgConsolePanel;
   delete mrightSplitter;
   delete mmainSplitter;
   delete mpreferences;
@@ -138,21 +135,23 @@ void SvNavigator::loadMenus(void)
   QToolBar* toolBar = addToolBar(APP_NAME);
   mmenus["FILE"] = menuBar->addMenu("&File"),
       msubMenus["Refresh"] = mmenus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
-      msubMenus["Capture"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/camera.png"),tr("&Save Map as Image")),
-      mmenus["FILE"]->addSeparator(),
-      msubMenus["FullScreen"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
-      msubMenus["FullScreen"]->setCheckable(true),
-      mmenus["FILE"]->addSeparator(),
+      msubMenus["Capture"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/camera.png"),tr("&Save Map as Image"));
+  mmenus["FILE"]->addSeparator(),
       msubMenus["Quit"] = mmenus["FILE"]->addAction(tr("&Quit")),
       msubMenus["Capture"]->setShortcut(QKeySequence::Save),
       msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh),
       msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
-  mmenus["MAP"] = menuBar->addMenu("&Map"),
-      msubMenus["ZoomIn"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Zoom &In")),
-      msubMenus["ZoomOut"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Zoom &Out")),
-      msubMenus["HideChart"] = mmenus["MAP"]->addAction(tr("Hide &Chart")),
+  mmenus["CONSOLE"] = menuBar->addMenu("&Console"),
+      msubMenus["ZoomIn"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Zoom &In")),
+      msubMenus["ZoomOut"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Zoom &Out")),
+      msubMenus["HideChart"] = mmenus["CONSOLE"]->addAction(tr("Hide &Chart")),
       msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn),
       msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
+  mmenus["CONSOLE"]->addSeparator(),
+      msubMenus["FullScreen"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
+      msubMenus["FullScreen"]->setCheckable(true),
+      msubMenus["TroubleView"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/alert-circle.png"),tr("&Display only trouble messages")),
+      msubMenus["TroubleView"]->setCheckable(true);
   mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
       msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
       msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(tr("&Monitoring Settings"));
@@ -1009,6 +1008,22 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
 
   mtrayIcon->showMessage(title, msg, icon);
   mtrayIcon->setToolTip(title%"\n"%msg);
+}
+
+QTabWidget* SvNavigator::createMsgConsole()
+{
+  QTabWidget* msgConsole(new QTabWidget());
+  QHBoxLayout* lyt(new QHBoxLayout());
+  QToolBar* tlbar (new QToolBar());
+  QGroupBox* wdgsGrp(new QGroupBox());
+  tlbar->addAction(msubMenus["TroubleView"]);
+  tlbar->setOrientation(Qt::Vertical);
+  lyt->addWidget(mmsgConsole, Qt::AlignLeft);
+  lyt->addWidget(tlbar, Qt::AlignRight);
+  lyt->setMargin(0);
+  wdgsGrp->setLayout(lyt);
+  msgConsole->addTab(wdgsGrp, tr("Message Console"));
+  return msgConsole;
 }
 
 void SvNavigator::addEvents(void)

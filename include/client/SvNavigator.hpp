@@ -104,7 +104,6 @@ private:
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
   QTabWidget* mviewPanel;
-  QTabWidget* mmsgConsolePanel;
   WebKit* mbrowser;
   GraphView* mmap;
   SvNavigatorTree* mtree;
@@ -148,6 +147,7 @@ private:
   void postRpcDataRequest(void);
   void updateDashboardOnUnknown(const QString& msg);
   void updateTrayInfo(const NodeT& _node);
+  QTabWidget* createMsgConsole();
 };
 
 #endif /* SVNAVIGATOR_HPP */
