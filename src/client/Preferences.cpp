@@ -253,6 +253,7 @@ QGroupBox* Preferences::createBaseGrp(void)
   lyt->addWidget(monitorUrlField);
   lyt->setStretch(0, 0);
   lyt->setStretch(1, 1);
+  lyt->setMargin(0);
   bx->setLayout(lyt);
   bx->setAlignment(Qt::AlignLeft);
   return bx;
@@ -272,6 +273,7 @@ QGroupBox* Preferences::createScktGrp(void)
   lyt->setStretch(2, 0);
   lyt->setStretch(3, 0);
   lyt->setStretch(4, 0);
+  lyt->setMargin(0);
   bx->setLayout(lyt);
   bx->setAlignment(Qt::AlignLeft);
   return bx;
