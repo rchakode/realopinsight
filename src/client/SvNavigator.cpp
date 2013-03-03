@@ -135,15 +135,24 @@ SvNavigator::~SvNavigator()
 void SvNavigator::loadMenus(void)
 {
   QMenuBar* menuBar = new QMenuBar();
+  QToolBar* toolBar = addToolBar(APP_NAME);
   mmenus["FILE"] = menuBar->addMenu("&File"),
       msubMenus["Refresh"] = mmenus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
       msubMenus["Capture"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/camera.png"),tr("&Save Map as Image")),
       mmenus["FILE"]->addSeparator(),
-      msubMenus["Quit"] = mmenus["FILE"]->addAction(tr("&Quit"));
+      msubMenus["FullScreen"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
+      msubMenus["FullScreen"]->setCheckable(true),
+      mmenus["FILE"]->addSeparator(),
+      msubMenus["Quit"] = mmenus["FILE"]->addAction(tr("&Quit")),
+      msubMenus["Capture"]->setShortcut(QKeySequence::Save),
+      msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh),
+      msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
   mmenus["MAP"] = menuBar->addMenu("&Map"),
       msubMenus["ZoomIn"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Zoom &In")),
       msubMenus["ZoomOut"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Zoom &Out")),
-      msubMenus["HideChart"] = mmenus["MAP"]->addAction(tr("Hide &Chart"));
+      msubMenus["HideChart"] = mmenus["MAP"]->addAction(tr("Hide &Chart")),
+      msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn),
+      msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
   mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
       msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
       msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(tr("&Monitoring Settings"));
@@ -154,29 +163,23 @@ void SvNavigator::loadMenus(void)
   mmenus["HELP"] = menuBar->addMenu("&Help"),
       msubMenus["ShowOnlineResources"] = mmenus["HELP"]->addAction(tr("Online &Resources")),
       mmenus["HELP"]->addSeparator(),
-      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
-  msubMenus["Capture"]->setShortcut(QKeySequence::Save);
-  msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh);
-  msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
-  msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
-  msubMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
-
-  mcontextMenuList["FilterNodeRelatedMessages"] = mnodeContextMenu->addAction(tr("&Filter related messages"));
-  mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
-  mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
-
-  QToolBar* toolBar = addToolBar(APP_NAME);
-  toolBar->setIconSize(QSize(16,16));
-  toolBar->addAction(msubMenus["Refresh"]);
-  toolBar->addAction(msubMenus["ZoomIn"]);
-  toolBar->addAction(msubMenus["ZoomOut"]);
-  toolBar->addAction(msubMenus["Capture"]);
-  toolBar->addSeparator();
-  toolBar->addAction(msubMenus["BrowserBack"]);
-  toolBar->addAction(msubMenus["BrowserForward"]);
-  toolBar->addAction(msubMenus["BrowserStop"]);
-  setMenuBar(menuBar);
+      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(APP_NAME)),
+      msubMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  mcontextMenuList["FilterNodeRelatedMessages"] = mnodeContextMenu->addAction(tr("&Filter related messages")),
+      mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On")),
+      mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
+  toolBar->setIconSize(QSize(16,16)),
+      toolBar->addAction(msubMenus["Refresh"]),
+      toolBar->addAction(msubMenus["ZoomIn"]),
+      toolBar->addAction(msubMenus["ZoomOut"]),
+      toolBar->addAction(msubMenus["Capture"]),
+      toolBar->addSeparator(),
+      toolBar->addAction(msubMenus["BrowserBack"]),
+      toolBar->addAction(msubMenus["BrowserForward"]),
+      toolBar->addAction(msubMenus["BrowserStop"]),
+      toolBar->addSeparator(),
+      toolBar->addAction(msubMenus["FullScreen"]);
+  QMainWindow::setMenuBar(menuBar);
 }
 
 void SvNavigator::closeEvent(QCloseEvent * event)
@@ -277,6 +280,14 @@ void SvNavigator::handleShowAbout(void)
 {
   Preferences about(muserRole, Preferences::ShowAbout);
   about.exec();
+}
+
+void SvNavigator::toggleFullScreen(bool _toggled)
+{
+  if (_toggled)
+    showFullScreen();
+  else
+    showNormal();
 }
 
 int SvNavigator::runNagiosMonitor(void)
@@ -1016,6 +1027,7 @@ void SvNavigator::addEvents(void)
   connect(msubMenus["BrowserBack"], SIGNAL(triggered(bool)), mbrowser, SLOT(back()));
   connect(msubMenus["BrowserForward"], SIGNAL(triggered(bool)), mbrowser, SLOT(forward()));
   connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
+  connect(msubMenus["FullScreen"], SIGNAL(toggled(bool)), this, SLOT(toggleFullScreen(bool)));
   connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
   connect(mpreferences, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));

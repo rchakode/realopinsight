@@ -46,5 +46,7 @@
         <file>images/built-in/browser-stop.png</file>
         <file>images/built-in/help.png</file>
         <file>images/built-in/help-info.png</file>
+        <file>images/built-in/fullscreen.png</file>
+        <file>images/built-in/alert-circle.png</file>
     </qresource>
 </RCC>

@@ -71,7 +71,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     mchangePwdBtn(new QPushButton("C&hange password")),
     mdonateBtn(new ImageButton(":images/built-in/donate.png")),
     mshowAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
-    museMklsChkbx(new QCheckBox(tr("Use Mk &Livestatus"))),
+    museMklsChkbx(new QCheckBox(tr("Use &Livestatus"))),
     mmainLayout (new QGridLayout(this))
 {
   qint32 line = -1;
@@ -260,7 +260,7 @@ QGroupBox* Preferences::createBaseGrp(void)
 
 QGroupBox* Preferences::createScktGrp(void)
 {
-  QGroupBox* bx(new QGroupBox(tr("Mk Livestatus/ngrt4nd Settings")));
+  QGroupBox* bx(new QGroupBox(tr("Livestatus/ngrt4nd Settings")));
   QHBoxLayout* lyt(new QHBoxLayout());
   lyt->addWidget(new QLabel(tr("Server Address")));
   lyt->addWidget(msockAddrField);

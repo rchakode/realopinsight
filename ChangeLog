@@ -1,7 +1,13 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
-2.2.0
+2.2.1 (Briator)
+--------------
+  * Added support for MK Livestatus remote socket
+  * Added support for handling full screen
+  * Updated toolbar
+
+2.2.0 (Lucia)
 --------------
   * Fixed compilation problems on nullptr. See Ticket #8
   * Fixed metadata handling. See ticket #9
@@ -25,7 +31,7 @@ RealOpInsight ChangeLog
     on the authchain for Zabbix
   * Changed tooltip font
 
-2.1.0
+2.1.0 (M-Sylvie)
 --------------
   * Added option for hiding/showing the auth chain
   * Fixed bug #1: The severities of Zabbix triggers are now supported.

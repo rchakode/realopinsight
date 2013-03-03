@@ -73,6 +73,7 @@ public slots:
   void handleChangeMonitoringSettingsAction(void);
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
+  void toggleFullScreen(bool _toggled);
   void processZbxReply(QNetworkReply* reply);
   void processZnsReply(QNetworkReply* reply);
   void processRpcError(QNetworkReply::NetworkError code);
