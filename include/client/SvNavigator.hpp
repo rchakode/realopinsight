@@ -145,7 +145,7 @@ private:
   void openRpcSession(void);
   void closeRpcSession(void);
   void postRpcDataRequest(void);
-  void updateDashboardOnUnknown(const QString& msg);
+  void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* createMsgConsole();
 };

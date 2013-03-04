@@ -353,7 +353,8 @@ int SvNavigator::runMklsMonitor(void)
   MkLsHelper mklsHelper(mserverAddr, mserverPort.toInt());
   if (!mklsHelper.connectToService()) {
       mupdateSucceed = false;
-      updateDashboardOnUnknown(mklsHelper.errorString());
+      mlastError = mklsHelper.errorString();
+      updateDashboardOnUnknown();
       return 1;
     }
   CheckT invalidCheck;
@@ -722,7 +723,8 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
   if (_reply->error() != QNetworkReply::NoError) {
-      updateDashboardOnUnknown(_reply->errorString());
+      mlastError = _reply->errorString();
+      updateDashboardOnUnknown();
       return;
     }
   QString data = _reply->readAll();
@@ -734,8 +736,8 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         if(mzbxAuthToken.isEmpty()) {
             QString errMsg = jsHelper.getProperty("error").property("data").toString();
             if (errMsg.isEmpty()) errMsg = jsHelper.getProperty("error").property("message").toString();
-            QString msg = tr("Authentication failed: %1").arg(errMsg);
-            updateDashboardOnUnknown(msg);
+            mlastError = tr("Authentication failed: %1").arg(errMsg);
+            updateDashboardOnUnknown();
           } else {
             misLogged = true;
             postRpcDataRequest();
@@ -783,9 +785,8 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         break;
       }
     default :
-      QString msg = tr("Weird response received from the server");
-      utils::alert(msg);
-      updateDashboardOnUnknown(msg);
+      mlastError = tr("Weird response received from the server");
+      updateDashboardOnUnknown();
       break;
     }
 }
@@ -794,7 +795,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
   if (_reply->error() != QNetworkReply::NoError) {
-      updateDashboardOnUnknown(_reply->errorString());
+      mlastError = _reply->errorString();
+      updateDashboardOnUnknown();
       return;
     }
   QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
@@ -810,8 +812,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       QScriptValue result = jsonHelper.getProperty("result");
       bool reqSucceed = result.property("success").toBool();
       if (!reqSucceed) {
-          QString msg = tr("Authentication failed: %1").arg(result.property("msg").toString());
-          updateDashboardOnUnknown(msg);
+          mlastError = tr("Authentication failed: %1").arg(result.property("msg").toString());
+          updateDashboardOnUnknown();
           return;
         }
       if (tid == ZnsHelper::Device) {
@@ -880,9 +882,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                 }
               updateCNodes(check);
             } else {
-              QString msg = tr("Weird response received from the server");
-              utils::alert(msg);
-              updateDashboardOnUnknown(msg);
+              mlastError = tr("Weird response received from the server");
+              updateDashboardOnUnknown();
             }
         }
     }
@@ -901,7 +902,7 @@ QStringList SvNavigator::getAuthInfo(void)
 
 void SvNavigator::openRpcSession(void)
 {
-  updateDashboardOnUnknown("");
+  updateDashboardOnUnknown();
   QStringList authParams = getAuthInfo();
   if (authParams.size() == 2) {
       QUrl znsUrlParams;
@@ -923,8 +924,8 @@ void SvNavigator::openRpcSession(void)
           break;
         }
     } else {
-      updateDashboardOnUnknown(tr("Invalid authentication chain!\n"
-                                  "Must follow the pattern login:password"));
+      mlastError = tr("Invalid authentication chain!\nMust follow the pattern login:password");
+      updateDashboardOnUnknown();
     }
 }
 
@@ -962,18 +963,18 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
     } else if (mcoreData->monitor == MonitorBroker::Zenoss) {
       apiUrl =  mznsHelper->getRequestUrl();
     }
-  updateDashboardOnUnknown(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code));
+  mlastError = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code);
+  updateDashboardOnUnknown();
 }
 
-void SvNavigator::updateDashboardOnUnknown(const QString& msg)
+void SvNavigator::updateDashboardOnUnknown()
 {
   mupdateSucceed = false;
   bool enable = false;
-  if (!msg.isEmpty()) {
+  if (!mlastError.isEmpty()) {
       enable = true;
-      utils::alert(msg);
-      updateStatusBar(msg);
-      mlastError = msg;
+      utils::alert(mlastError);
+      updateStatusBar(mlastError);
     }
   for (auto& cnode : mcoreData->cnodes) {
       cnode.monitored = true;
@@ -985,6 +986,7 @@ void SvNavigator::updateDashboardOnUnknown(const QString& msg)
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }
+  mlastError.clear();
   mcoreData->check_status_count[MonitorBroker::Unknown] = mcoreData->cnodes.size();
   finalizeDashboardUpdate(enable);
 }
@@ -1021,6 +1023,7 @@ QTabWidget* SvNavigator::createMsgConsole()
   lyt->addWidget(mmsgConsole, Qt::AlignLeft);
   lyt->addWidget(tlbar, Qt::AlignRight);
   lyt->setMargin(0);
+  lyt->setContentsMargins(QMargins(0, 0, 0, 0));
   wdgsGrp->setLayout(lyt);
   msgConsole->addTab(wdgsGrp, tr("Message Console"));
   return msgConsole;
