@@ -65,12 +65,16 @@ public:
   void updateColumnWidths( const QSize& ,  const bool& = false );
   void clearMsg(const NodeT &);
   void clearNormalMsg(void);
-  inline qint32 getRowCount() const { return model()->rowCount();}
-  inline qint32 getRowHeight() const {return mrHeight;}
+  inline qint32 getRowCount() const
+  {return model()->rowCount();}
+  inline qint32 getRowHeight() const
+  {return mrHeight;}
 
 public slots:
-  inline void acknowledgeMsg(void) { emit acknowledgeChanged(); }
-  inline void sortEventConsole(void) { mproxyModel->sort(1); }
+  inline void acknowledgeMsg(void)
+  {emit acknowledgeChanged();}
+  inline void sortEventConsole(void)
+  {mproxyModel->sort(1);}
 
 signals:
   void acknowledgeChanged(void);
