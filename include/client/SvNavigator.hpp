@@ -75,6 +75,7 @@ public slots:
   void handleShowAbout(void);
   void toggleFullScreen(bool _toggled);
   void toggleTroubleView(bool _toggled);
+  void toggleIncreaseMsgFont(bool _toggled);
   void processZbxReply(QNetworkReply* reply);
   void processZnsReply(QNetworkReply* reply);
   void processRpcError(QNetworkReply::NetworkError code);

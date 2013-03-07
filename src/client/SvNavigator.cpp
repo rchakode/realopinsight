@@ -143,16 +143,19 @@ void SvNavigator::loadMenus(void)
       msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh),
       msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
   mmenus["CONSOLE"] = menuBar->addMenu("&Console"),
-      msubMenus["ZoomIn"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Zoom &In")),
-      msubMenus["ZoomOut"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Zoom &Out")),
+      msubMenus["ZoomIn"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Map Zoom &In")),
+      msubMenus["ZoomOut"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Map Zoom &Out")),
       msubMenus["HideChart"] = mmenus["CONSOLE"]->addAction(tr("Hide &Chart")),
       msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn),
       msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
   mmenus["CONSOLE"]->addSeparator(),
       msubMenus["FullScreen"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
-      msubMenus["FullScreen"]->setCheckable(true),
-      msubMenus["TroubleView"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/alert-circle.png"),tr("&Display only trouble messages")),
-      msubMenus["TroubleView"]->setCheckable(true);
+      msubMenus["FullScreen"]->setCheckable(true);
+  mmenus["CONSOLE"]->addSeparator(),
+      msubMenus["TroubleView"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/alert-circle.png"),tr("&Show only trouble messages")),
+      msubMenus["TroubleView"]->setCheckable(true),
+      msubMenus["IncreaseMsgFont"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/incr-font-size.png"),tr("&Increase message &font")),
+      msubMenus["IncreaseMsgFont"]->setCheckable(true);
   mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
       msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
       msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(tr("&Monitoring Settings"));
@@ -297,9 +300,18 @@ void SvNavigator::toggleTroubleView(bool _toggled)
   if (mshowOnlyTroubles) {
       mmsgConsole->clearNormalMsg();
     } else {
-      startMonitor(); // FIXME: not necessary. Just refill the dashbaord
+      for (auto it = mcoreData->cnodes.begin(), end = mcoreData->cnodes.end();
+           it != end; it++) mmsgConsole->updateNodeMsg(it);
+      mmsgConsole->sortByColumn(1);
     }
   mmsgConsole->setEnabled(true);
+}
+
+void SvNavigator::toggleIncreaseMsgFont(bool _toggled)
+{
+  QFont df =  mmsgConsole->font();
+  mmsgConsole->setFont(QFont(df.family(), 16));
+  mmsgConsole->setRowHeight(0, 32);
 }
 
 int SvNavigator::runNagiosMonitor(void)
@@ -1032,6 +1044,7 @@ QTabWidget* SvNavigator::createMsgConsole()
   QToolBar* tlbar (new QToolBar());
   QGroupBox* wdgsGrp(new QGroupBox());
   tlbar->addAction(msubMenus["TroubleView"]);
+  tlbar->addAction(msubMenus["IncreaseMsgFont"]);
   tlbar->setOrientation(Qt::Vertical);
   lyt->addWidget(mmsgConsole, Qt::AlignLeft);
   lyt->addWidget(tlbar, Qt::AlignRight);
@@ -1060,6 +1073,7 @@ void SvNavigator::addEvents(void)
   connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
   connect(msubMenus["FullScreen"], SIGNAL(toggled(bool)), this, SLOT(toggleFullScreen(bool)));
   connect(msubMenus["TroubleView"], SIGNAL(toggled(bool)), this, SLOT(toggleTroubleView(bool)));
+  connect(msubMenus["IncreaseMsgFont"], SIGNAL(toggled(bool)), this, SLOT(toggleIncreaseMsgFont(bool)));
   connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
   connect(mpreferences, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));

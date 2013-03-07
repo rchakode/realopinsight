@@ -48,5 +48,6 @@
         <file>images/built-in/help-info.png</file>
         <file>images/built-in/fullscreen.png</file>
         <file>images/built-in/alert-circle.png</file>
+        <file>images/built-in/incr-font-size.png</file>
     </qresource>
 </RCC>
