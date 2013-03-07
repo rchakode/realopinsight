@@ -74,6 +74,7 @@ public slots:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void toggleFullScreen(bool _toggled);
+  void toggleTroubleView(bool _toggled);
   void processZbxReply(QNetworkReply* reply);
   void processZnsReply(QNetworkReply* reply);
   void processRpcError(QNetworkReply::NetworkError code);
@@ -127,6 +128,7 @@ private:
   bool misLogged;
   QString mlastError;
   QSystemTrayIcon* mtrayIcon;
+  bool mshowOnlyTroubles;
 
   void addEvents(void);
   void loadMenus(void);

@@ -125,16 +125,38 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
 }
 
+void MsgConsole::clearMsg(const NodeT& _node)
+{
+  qint32 index = 0;
+  qint32 nbRows = mmodel->rowCount();
+  while (index < nbRows &&
+         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) index++;
+  if (index < nbRows)
+    mmodel->removeRow(index);
+}
+
+void MsgConsole::clearNormalMsg(void)
+{
+  qint32 index = 0;
+  qint32 nbRows = mmodel->rowCount();
+  while (index < nbRows) {
+      if (mmodel->item(index, 1)->text() == utils::criticityToText(MonitorBroker::Normal)) {
+          mmodel->removeRow(index);
+          nbRows--;
+        } else {
+          index++;
+        }
+    }
+}
+
 void MsgConsole::updateColumnWidths(const QSize& _windowSize, const bool& _resizeWindow)
 {
   if (_resizeWindow) window()->resize(_windowSize);
   QTableView::resizeColumnsToContents();
   if(mmodel->rowCount()) {
-      qint32 msgWidth = QTableView::width() - (QTableView::columnWidth(0)
-                                               +QTableView::columnWidth(1)
-                                               +QTableView::columnWidth(2)
-                                               +QTableView::columnWidth(3));
-      QTableView::setColumnWidth(4, msgWidth);
+      QTableView::setColumnWidth(4, QTableView::width() - (QTableView::columnWidth(0)
+                                                           +QTableView::columnWidth(1)
+                                                           +QTableView::columnWidth(2)
+                                                           +QTableView::columnWidth(3)));
     }
-
 }

@@ -92,7 +92,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mznsHelper(new ZnsHelper()),
     misLogged(false),
     mlastError(""),
-    mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png")))
+    mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
+    mshowOnlyTroubles(false)
 {
   setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
   loadMenus();
@@ -289,6 +290,18 @@ void SvNavigator::toggleFullScreen(bool _toggled)
     showNormal();
 }
 
+void SvNavigator::toggleTroubleView(bool _toggled)
+{
+  mmsgConsole->setEnabled(false);
+  mshowOnlyTroubles = _toggled;
+  if (mshowOnlyTroubles) {
+      mmsgConsole->clearNormalMsg();
+    } else {
+      startMonitor(); // FIXME: not necessary. Just refill the dashbaord
+    }
+  mmsgConsole->setEnabled(true);
+}
+
 int SvNavigator::runNagiosMonitor(void)
 {
   auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(mserverUrl.toStdString(), ZMQ_REQ));
@@ -375,10 +388,8 @@ int SvNavigator::runMklsMonitor(void)
                 } else {
                   cid = ID_PATTERN.arg(host).arg(item);
                 }
-              //qDebug() << "FINDDDDDDDDDD>> "<<cid;
               CheckListCstIterT chkit;
               if (mklsHelper.findCheck(cid, chkit)) {
-                  qDebug() << cid;
                   updateCNodes(*chkit);
                 } else {
                   invalidCheck.alarm_msg = tr("Service not found: %1").arg(cid).toStdString();
@@ -451,7 +462,9 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   QString toolTip = getNodeToolTip(_node);
   updateNavTreeItemStatus(_node, toolTip);
   mmap->updateNode(_node, toolTip);
-  mmsgConsole->updateNodeMsg(_node);
+  if (!mshowOnlyTroubles ||
+      (mshowOnlyTroubles && _node.severity != MonitorBroker::Normal))
+    mmsgConsole->updateNodeMsg(_node);
   emit hasToBeUpdate(_node.parent);
 }
 
@@ -1046,6 +1059,7 @@ void SvNavigator::addEvents(void)
   connect(msubMenus["BrowserForward"], SIGNAL(triggered(bool)), mbrowser, SLOT(forward()));
   connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
   connect(msubMenus["FullScreen"], SIGNAL(toggled(bool)), this, SLOT(toggleFullScreen(bool)));
+  connect(msubMenus["TroubleView"], SIGNAL(toggled(bool)), this, SLOT(toggleTroubleView(bool)));
   connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
   connect(mpreferences, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));

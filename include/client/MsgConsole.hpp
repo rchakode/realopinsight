@@ -63,7 +63,8 @@ public:
   void updateNodeMsg(const NodeListT::iterator &);
   void updateNodeMsg(const NodeT &);
   void updateColumnWidths( const QSize& ,  const bool& = false );
-//  inline QPoint getEmFontSize() const { return memFontSize; }
+  void clearMsg(const NodeT &);
+  void clearNormalMsg(void);
   inline qint32 getRowCount() const { return model()->rowCount();}
   inline qint32 getRowHeight() const {return mrHeight;}
 
