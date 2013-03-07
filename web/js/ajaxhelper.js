@@ -53,9 +53,10 @@ $.xmlrpc({
 // For stats
 $.getJSON('sfstats/data/total.json',
   function(data) {
-    $('#totaldlds').html("<b>" + data.total + '+</b> downloads from <b>'+ data.countries.length + '+</b> countries!!!');
-    $('#start_date').html(data.start_date.substr(0, 10));
-    $('#end_date').html(data.stats_updated);
+	var totaldlds = parseInt(data.total) + parseInt($('#obs-fedora').html()) + parseInt($('#obs-opensuse').html());
+	$('#totaldlds').html("<b>" + totaldlds + '+</b> downloads from <b>'+ data.countries.length + '+</b> countries!!!');
+    	$('#start_date').html(data.start_date.substr(0, 10));
+    	$('#end_date').html(data.stats_updated);
   });
 
 // For G+ button
