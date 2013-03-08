@@ -4,7 +4,7 @@ RealOpInsight ChangeLog
 2.2.1
 -------------
   * Added support for Zabbix 1.8.x. Fixed ticket #11
-  * Minor changes on meta tag handling
+  * Minor upates on metadata handling
 
 2.2.0
 --------------
