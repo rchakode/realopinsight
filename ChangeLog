@@ -6,6 +6,11 @@ RealOpInsight ChangeLog
   * Fixed compilation problems on nullptr. See Ticket #8
   * Fixed metadata handling. See ticket #9
 
+2.2.1
+-------------
+  * Added support for Zabbix 1.8.x. Fixed ticket #11
+  * Minor changes on meta tag handling
+
 2.2.0 (beta)
 --------------
   * Added support for Zenoss. Has been tested with Zenoss 4.x but would work
