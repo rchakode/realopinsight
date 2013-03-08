@@ -673,16 +673,18 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
     }
   QString data = _reply->readAll();
   JsonHelper jsHelper(data.toStdString());
+
+  QString errMsg = jsHelper.getProperty("error").property("data").toString();
+  if (errMsg.isEmpty()) errMsg = jsHelper.getProperty("error").property("message").toString();
+  if (!errMsg.isEmpty()) {
+      updateDashboardOnUnknown(errMsg);
+      return;
+    }
   qint32 tid = jsHelper.getProperty("id").toInt32();
   switch(tid) {
     case ZbxHelper::Login : {
         mzbxAuthToken = jsHelper.getProperty("result").toString();
-        if(mzbxAuthToken.isEmpty()) {
-            QString errMsg = jsHelper.getProperty("error").property("data").toString();
-            if (errMsg.isEmpty()) errMsg = jsHelper.getProperty("error").property("message").toString();
-            QString msg = tr("Authentication failed: %1").arg(errMsg);
-            updateDashboardOnUnknown(msg);
-          } else {
+        if (!mzbxAuthToken.isEmpty()) {
             misLogged = true;
             postRpcDataRequest();
           }

@@ -63,6 +63,16 @@ void ZbxHelper::setRequestsPatterns()
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
       \"limit\": -1}, \
       \"id\": %9}";
+  mrequestsPatterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
+      \"auth\": \"%1\", \
+      \"method\": \"trigger.get\", \
+      \"params\": { \
+      \"filter\": { \"host\":[\"%2\"]}, \
+      \"select_hosts\": [\"host\"], \
+      \"select_items\": [\"key_\",\"name\",\"lastclock\"], \
+      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+      \"limit\": -1}, \
+      \"id\": %9}";
   mrequestsPatterns[Logout] = "{\"jsonrpc\": \"2.0\", \
       \"method\": \"user.logout\", \
       \"params\": {\"sessionid\": \"%1\"}, \
