@@ -54,8 +54,6 @@ MsgConsole::MsgConsole(QWidget * _parent)
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
   QTableView::setSortingEnabled(true);
   QTableView::setEditTriggers(QAbstractItemView::NoEditTriggers);
-  QPoint emFontSize(QPoint(QFontMetrics(QFont()).charWidth("m", 0), QFontMetrics(QFont()).height()));
-  mrHeight = emFontSize.y() + ROW_MARGIN;
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
 }
 
@@ -85,7 +83,6 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
       index = 0;
       mmodel->insertRow(index);
       mmodel->setRowCount(nbRows + 1);
-      QTableView::setRowHeight(index, mrHeight);
       mmodel->setItem(index, 0, new QStandardItem(itemText));
       mmodel->setItem(index, 1, new QStandardItem(itemText));
       mmodel->setItem(index, 2, new QStandardItem(itemText));
@@ -150,10 +147,11 @@ void MsgConsole::clearNormalMsg(void)
     }
 }
 
-void MsgConsole::updateColumnWidths(const QSize& _windowSize, const bool& _resizeWindow)
+void MsgConsole::updateEntriesSize(const QSize& _windowSize, const bool& _resizeWindow)
 {
   if (_resizeWindow) window()->resize(_windowSize);
   QTableView::resizeColumnsToContents();
+  QTableView::resizeRowsToContents();
   if(mmodel->rowCount()) {
       QTableView::setColumnWidth(4, QTableView::width() - (QTableView::columnWidth(0)
                                                            +QTableView::columnWidth(1)

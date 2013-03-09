@@ -5,7 +5,7 @@
 		<Description></Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>S044014198,S044105216,S231853830,ngrt4nsrv20134408214435081</SubServices>
+		<SubServices>S044014198,S044105216,S231853830</SubServices>
 	</Service>
 	<Service id="S232038066" type="0" statusCalcRule="0" statusPropRule="0">
 		<Name>kvm02</Name>
@@ -119,14 +119,6 @@
 		<NotificationMsg></NotificationMsg>
 		<SubServices>S153132715,S154545828</SubServices>
 	</Service>
-	<Service id="ngrt4nsrv20134408214435081" type="1" statusCalcRule="-1" statusPropRule="-1">
-		<Name>Nb opened file</Name>
-		<Icon>Business Process</Icon>
-		<Description></Description>
-		<AlarmMsg></AlarmMsg>
-		<NotificationMsg></NotificationMsg>
-		<SubServices>Zabbix server/Configured max number of opened files is too low on {HOSTNAME}</SubServices>
-	</Service>
 	<Service id="S230727734" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>/srv/cloud</Name>
 		<Icon>Hard disk</Icon>
@@ -175,10 +167,10 @@
 		<NotificationMsg></NotificationMsg>
 		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 	</Service>
-	<Service id="S154659138" type="1" statusCalcRule="0" statusPropRule="0">
-		<Name>www</Name>
-		<Icon>Other Check</Icon>
-		<Description>Microsoft IIS server</Description>
+	<Service id="S233025410" type="1" statusCalcRule="0" statusPropRule="0">
+		<Name>SAN Device</Name>
+		<Icon>Storage Area</Icon>
+		<Description>The virtual infrastructure root file system containing virtual machine images and data shared among VMs</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
 		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
@@ -191,10 +183,10 @@
 		<NotificationMsg>The response time of the web server is normal</NotificationMsg>
 		<SubServices>Zabbix server/Zabbix http poller processes more than 75% busy</SubServices>
 	</Service>
-	<Service id="S233025410" type="1" statusCalcRule="0" statusPropRule="0">
-		<Name>SAN Device</Name>
-		<Icon>Storage Area</Icon>
-		<Description>The virtual infrastructure root file system containing virtual machine images and data shared among VMs</Description>
+	<Service id="S154659138" type="1" statusCalcRule="0" statusPropRule="0">
+		<Name>www</Name>
+		<Icon>Other Check</Icon>
+		<Description>Microsoft IIS server</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
 		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
@@ -223,6 +215,14 @@
 		<NotificationMsg></NotificationMsg>
 		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 	</Service>
+	<Service id="S232612395" type="1" statusCalcRule="0" statusPropRule="0">
+		<Name>Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description>Host availability</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+	</Service>
 	<Service id="S073757810" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>mysql</Name>
 		<Icon>Database Engine</Icon>
@@ -240,14 +240,6 @@
 		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 	</Service>
 	<Service id="S181448973" type="1" statusCalcRule="0" statusPropRule="0">
-		<Name>Availability</Name>
-		<Icon>Other Check</Icon>
-		<Description>Host availability</Description>
-		<AlarmMsg></AlarmMsg>
-		<NotificationMsg></NotificationMsg>
-		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
-	</Service>
-	<Service id="S232612395" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>Availability</Name>
 		<Icon>Other Check</Icon>
 		<Description>Host availability</Description>

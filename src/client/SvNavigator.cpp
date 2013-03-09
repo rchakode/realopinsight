@@ -309,9 +309,14 @@ void SvNavigator::toggleTroubleView(bool _toggled)
 
 void SvNavigator::toggleIncreaseMsgFont(bool _toggled)
 {
-  QFont df =  mmsgConsole->font();
-  mmsgConsole->setFont(QFont(df.family(), 16));
-  mmsgConsole->setRowHeight(0, 32);
+  if (_toggled) {
+      QFont df =  mmsgConsole->font();
+      mmsgConsole->setFont(QFont(df.family(), 16));
+    } else {
+      mmsgConsole->setFont(QFont());
+    }
+  mmsgConsole->updateEntriesSize(mmsgConsoleSize);
+  mmsgConsole->resizeRowsToContents();
 }
 
 int SvNavigator::runNagiosMonitor(void)
@@ -501,7 +506,7 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       mmap->updateStatsPanel(chart);
       if (mchart) delete mchart; mchart = chart; mchart->setToolTip(chartdDetails);
       mmsgConsole->sortByColumn(1, Qt::AscendingOrder);
-      mmsgConsole->updateColumnWidths(mmsgConsoleSize);
+      mmsgConsole->updateEntriesSize(mmsgConsoleSize);
       mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
       mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DefaultUpdateInterval);
       mtimer = startTimer(mupdateInterval);
@@ -520,8 +525,8 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
           cnode.monitored = false;
         }
     }
-  if (!mcoreData->bpnodes.isEmpty())
-    updateTrayInfo(mcoreData->bpnodes[SvNavigatorTree::RootId]); //FIXME: avoid searching at each update
+  //FIXME: Do this while avoiding searching at each update
+  if (!mcoreData->bpnodes.isEmpty()) updateTrayInfo(mcoreData->bpnodes[SvNavigatorTree::RootId]);
   QMainWindow::setEnabled(enable);
 }
 
@@ -536,7 +541,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
 
- // if (_node.check.host == "-") return;
+  if (_node.check.host == "-") return;
   QString alarmMsg = QString::fromStdString(_node.check.alarm_msg);
   if (mcoreData->monitor == MonitorBroker::Zabbix) {
       regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME);
@@ -650,11 +655,12 @@ void SvNavigator::filterNodeRelatedMsg(void)
   if (utils::findNode(mcoreData, mselectedNode, node)) {
       filterNodeRelatedMsg(mselectedNode);
       QString title = tr("Messages related to '%2' - %1").arg(APP_NAME, node->name);
-      mfilteredMsgConsole->updateColumnWidths(mmsgConsoleSize, true);
+      mfilteredMsgConsole->updateEntriesSize(mmsgConsoleSize, true);
       mfilteredMsgConsole->setWindowTitle(title);
     }
-  qint32 rh = qMax(mfilteredMsgConsole->getRowCount() * mfilteredMsgConsole->getRowHeight() + 50, 100);
+  qint32 rh = qMax(mfilteredMsgConsole->getRowCount() * mfilteredMsgConsole->rowHeight(0) + 50, 100);
   if (mfilteredMsgConsole->height() > rh) mfilteredMsgConsole->resize(mmsgConsoleSize.width(), rh);
+  mfilteredMsgConsole->sortByColumn(1, Qt::AscendingOrder);
   mfilteredMsgConsole->show();
 }
 
