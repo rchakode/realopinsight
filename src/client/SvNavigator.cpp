@@ -506,7 +506,7 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       mmap->updateStatsPanel(chart);
       if (mchart) delete mchart; mchart = chart; mchart->setToolTip(chartdDetails);
       mmsgConsole->sortByColumn(1, Qt::AscendingOrder);
-      mmsgConsole->updateEntriesSize(mmsgConsoleSize);
+      mmsgConsole->updateEntriesSize(mmsgConsoleSize); //FIXME: Take care of message wrapping
       mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
       mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DefaultUpdateInterval);
       mtimer = startTimer(mupdateInterval);
