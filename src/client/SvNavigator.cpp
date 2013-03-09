@@ -483,7 +483,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 void SvNavigator::updateCNodes(const CheckT& check)
 {
   for (auto& cnode : mcoreData->cnodes) {
-      if (cnode.child_nodes.toStdString() == check.id) {
+      if (cnode.child_nodes.toLower() == QString::fromStdString(check.id).toLower()) {
           cnode.check = check;
           computeStatusInfo(cnode);
           mcoreData->check_status_count[cnode.severity]++;
@@ -536,6 +536,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
 
+ // if (_node.check.host == "-") return;
   QString alarmMsg = QString::fromStdString(_node.check.alarm_msg);
   if (mcoreData->monitor == MonitorBroker::Zabbix) {
       regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME);
@@ -817,7 +818,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
                   }
               }
             QString key = ID_PATTERN.arg(targetHost, triggerName);
-            check.id = key.toLower().toStdString();
+            check.id = key.toStdString();
             updateCNodes(check);
           }
         if (--mhostLeft == 0) {
@@ -891,7 +892,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                   QString duid = device.property("uid").toString();
                   QString dname = ZnsHelper::getDeviceName(duid);
                   QString chkid = ID_PATTERN.arg(dname, cname);
-                  check.id = chkid.toLower().toStdString();
+                  check.id = chkid.toStdString();
                   check.host = dname.toStdString();
                   check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
                                                             "yyyy/MM/dd hh:mm:ss");
@@ -912,7 +913,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
             } else if (tid == ZnsHelper::DeviceInfo) {
               QScriptValue devInfo(result.property("data"));
               QString dname = devInfo.property("name").toString();
-              check.id = check.host = dname.toLower().toStdString();
+              check.id = check.host = dname.toStdString();
               check.status = devInfo.property("status").toBool();
               check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");

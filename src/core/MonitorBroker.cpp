@@ -110,7 +110,7 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _ch
               info.alarm_msg = value;
             }
         }
-      std::transform(info.id.begin(), info.id.end(), info.id.begin(), ::tolower);
+     //std::transform(info.id.begin(), info.id.end(), info.id.begin(), ::tolower);
       _checks[info.id] = info;
     }
   stFileStream.close() ;

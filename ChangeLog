@@ -6,6 +6,7 @@ RealOpInsight ChangeLog
   * Added support for MK Livestatus remote socket
   * Added support for handling full screen
   * Updated toolbar
+  * Data points are not case insensitive
   
 2.2.1 (Lucia, p1)
 -------------

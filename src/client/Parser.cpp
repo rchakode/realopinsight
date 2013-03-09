@@ -89,7 +89,6 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
           node.icon = GraphView::DEFAULT_ICON;
         }
       if (node.type == NodeType::ALARM_NODE) {
-          node.child_nodes = node.child_nodes.toLower();
           int pos = node.child_nodes.indexOf("/");
           QString host = node.child_nodes.left(pos);
           _coreData.hosts[host] << ((pos == -1)?"ping" : node.child_nodes.mid(pos+1));
