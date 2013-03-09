@@ -127,7 +127,7 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
-  QString mlastError;
+  QString mlastErrorMsg;
   QSystemTrayIcon* mtrayIcon;
   bool mshowOnlyTroubles;
 

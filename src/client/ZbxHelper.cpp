@@ -29,13 +29,16 @@
 ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
     apiUri(baseUrl%ZBX_API_CONTEXT),
-    mrequestHandler(new QNetworkRequest()) {
+    mrequestHandler(new QNetworkRequest()),
+    mtrid(Trigger)
+{
   mrequestHandler->setRawHeader("Content-Type", "application/json");
   mrequestHandler->setUrl(QUrl(apiUri));
   setRequestsPatterns();
 }
 
-ZbxHelper::~ZbxHelper() {
+ZbxHelper::~ZbxHelper()
+{
   delete mrequestHandler;
 }
 
@@ -53,6 +56,11 @@ void ZbxHelper::setRequestsPatterns()
       \"method\": \"user.login\", \
       \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
       \"id\": %9}";
+  mrequestsPatterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
+      \"method\": \"apiinfo.version\", \
+      \"params\": [], \
+      \"auth\": \"%1\", \
+      \"id\": %9}";
   mrequestsPatterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
@@ -61,6 +69,15 @@ void ZbxHelper::setRequestsPatterns()
       \"selectHosts\": [\"host\"], \
       \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+      \"limit\": -1}, \
+      \"id\": %9}";
+  mrequestsPatterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
+      \"auth\": \"%1\", \
+      \"method\": \"trigger.get\", \
+      \"params\": { \
+      \"filter\": { \"host\":[\"%2\"]}, \
+      \"select_hosts\": [\"host\"], \
+      \"output\":  \"extend\", \
       \"limit\": -1}, \
       \"id\": %9}";
   mrequestsPatterns[Logout] = "{\"jsonrpc\": \"2.0\", \

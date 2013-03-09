@@ -91,7 +91,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     mhostLeft(0),
     mznsHelper(new ZnsHelper()),
     misLogged(false),
-    mlastError(""),
+    mlastErrorMsg(""),
     mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     mshowOnlyTroubles(false)
 {
@@ -378,7 +378,7 @@ int SvNavigator::runMklsMonitor(void)
   MkLsHelper mklsHelper(mserverAddr, mserverPort.toInt());
   if (!mklsHelper.connectToService()) {
       mupdateSucceed = false;
-      mlastError = mklsHelper.errorString();
+      mlastErrorMsg = mklsHelper.errorString();
       updateDashboardOnUnknown();
       return 1;
     }
@@ -511,7 +511,7 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
               cnode.check.status = MonitorBroker::Unknown;
               cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
               cnode.check.host = "-";
-              cnode.check.alarm_msg = tr("Unknown service %1").arg(cnode.child_nodes).toStdString();
+              cnode.check.alarm_msg = tr("Unknown service (%1)").arg(cnode.child_nodes).toStdString();
               computeStatusInfo(cnode);
               mcoreData->check_status_count[cnode.severity]++;
               updateDashboard(cnode);
@@ -532,15 +532,24 @@ void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node)
 
 void SvNavigator::computeStatusInfo(NodeT& _node)
 {
+  QRegExp regexp;
   _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
-  QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
-  if (statusText.trimmed().isEmpty()) {
-      return;
-    }
-  QRegExp regexp(MsgConsole::TAG_HOSTNAME);
-  statusText.replace(regexp, _node.check.host.c_str()); //FIXME: problem with '-' host
 
+  QString alarmMsg = QString::fromStdString(_node.check.alarm_msg);
+  if (mcoreData->monitor == MonitorBroker::Zabbix) {
+      regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME);
+      alarmMsg.replace(regexp, _node.check.host.c_str());
+      regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME2);
+      alarmMsg.replace(regexp, _node.check.host.c_str());
+      _node.check.alarm_msg = alarmMsg.toStdString();
+    }
+
+  QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
+  if (statusText.trimmed().isEmpty()) return;
+
+  regexp.setPattern(MsgConsole::TAG_HOSTNAME);
+  statusText.replace(regexp, _node.check.host.c_str());
   auto info = QString(_node.check.id.c_str()).split("/");
   if (info.length() > 1) {
       regexp.setPattern(MsgConsole::TAG_CHECK);
@@ -554,11 +563,6 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
           if (_node.severity == MonitorBroker::Major)
             statusText.replace(regexp, info[2]);
         }
-    }
-  if (mcoreData->monitor == MonitorBroker::Zabbix) {
-      regexp.setPattern(MsgConsole::TAG_HOSTNAME_ZABBIX);
-      statusText.replace(regexp, _node.check.host.c_str());
-      _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
     }
   _node.check.alarm_msg = statusText.toStdString();
 }
@@ -748,30 +752,40 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
   if (_reply->error() != QNetworkReply::NoError) {
-      mlastError = _reply->errorString();
+      mlastErrorMsg = _reply->errorString();
       updateDashboardOnUnknown();
       return;
     }
   QString data = _reply->readAll();
   JsonHelper jsHelper(data.toStdString());
+  mlastErrorMsg = jsHelper.getProperty("error").property("data").toString();
+  if (mlastErrorMsg.isEmpty()) mlastErrorMsg = jsHelper.getProperty("error").property("message").toString();
+  if (!mlastErrorMsg.isEmpty()) {
+      updateDashboardOnUnknown();
+      return;
+    }
   qint32 tid = jsHelper.getProperty("id").toInt32();
+  QStringList params;
   switch(tid) {
-    case ZbxHelper::Login : {
+    case ZbxHelper::Login: {
         mzbxAuthToken = jsHelper.getProperty("result").toString();
-        if(mzbxAuthToken.isEmpty()) {
-            QString errMsg = jsHelper.getProperty("error").property("data").toString();
-            if (errMsg.isEmpty()) errMsg = jsHelper.getProperty("error").property("message").toString();
-            mlastError = tr("Authentication failed: %1").arg(errMsg);
-            updateDashboardOnUnknown();
-          } else {
+        if (!mzbxAuthToken.isEmpty()) {
             misLogged = true;
-            postRpcDataRequest();
+            params.push_back(mzbxAuthToken);
+            params.push_back(QString::number(ZbxHelper::ApiVersion));
+            mzbxHelper->postRequest(ZbxHelper::ApiVersion, params);
           }
         break;
       }
-    case ZbxHelper::Trigger: {
-        CheckT check;
+    case ZbxHelper::ApiVersion: {
+        mzbxHelper->updateTrid(jsHelper.getProperty("result").toString());
+        postRpcDataRequest();
+        break;
+      }
+    case ZbxHelper::Trigger:
+    case ZbxHelper::TriggerV18: {
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
+        CheckT check;
         while (trigger.hasNext()) {
             trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue triggerData = trigger.value();
@@ -788,16 +802,19 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
             QScriptValueIterator host(triggerData.property("hosts"));
             if (host.hasNext()) {
                 host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
-
                 QScriptValue hostData = host.value();
                 targetHost = hostData.property("host").toString();
                 check.host = targetHost.toStdString();
               }
-            QScriptValueIterator item(triggerData.property("items"));
-            if (item.hasNext()) {
-                item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
-                QScriptValue itemData = item.value();
-                check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
+            if (tid == ZbxHelper::TriggerV18) {
+                check.last_state_change = utils::getCtime(triggerData.property("lastchange").toUInt32());
+              } else {
+                QScriptValueIterator item(triggerData.property("items"));
+                if (item.hasNext()) {
+                    item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+                    QScriptValue itemData = item.value();
+                    check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
+                  }
               }
             QString key = ID_PATTERN.arg(targetHost, triggerName);
             check.id = key.toLower().toStdString();
@@ -810,8 +827,9 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
         break;
       }
     default :
-      mlastError = tr("Weird response received from the server");
+      mlastErrorMsg = tr("Weird response received from the server");
       updateDashboardOnUnknown();
+      qDebug() << data;
       break;
     }
 }
@@ -820,7 +838,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
   if (_reply->error() != QNetworkReply::NoError) {
-      mlastError = _reply->errorString();
+      mlastErrorMsg = _reply->errorString();
       updateDashboardOnUnknown();
       return;
     }
@@ -837,7 +855,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
       QScriptValue result = jsonHelper.getProperty("result");
       bool reqSucceed = result.property("success").toBool();
       if (!reqSucceed) {
-          mlastError = tr("Authentication failed: %1").arg(result.property("msg").toString());
+          mlastErrorMsg = tr("Authentication failed: %1").arg(result.property("msg").toString());
           updateDashboardOnUnknown();
           return;
         }
@@ -907,7 +925,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
                 }
               updateCNodes(check);
             } else {
-              mlastError = tr("Weird response received from the server");
+              mlastErrorMsg = tr("Weird response received from the server");
               updateDashboardOnUnknown();
             }
         }
@@ -949,7 +967,7 @@ void SvNavigator::openRpcSession(void)
           break;
         }
     } else {
-      mlastError = tr("Invalid authentication chain!\nMust follow the pattern login:password");
+      mlastErrorMsg = tr("Invalid authentication chain!\nMust follow the pattern login:password");
       updateDashboardOnUnknown();
     }
 }
@@ -957,15 +975,17 @@ void SvNavigator::openRpcSession(void)
 void SvNavigator::postRpcDataRequest(void) {
   updateStatusBar(tr("Updating..."));
   switch(mcoreData->monitor) {
-    case MonitorBroker::Zabbix:
-      for (auto host : mcoreData->hosts.keys()) {
-          QStringList params;
-          params.push_back(mzbxAuthToken);
-          params.push_back(host);
-          params.push_back(QString::number(ZbxHelper::Trigger));
-          mzbxHelper->postRequest(ZbxHelper::Trigger, params);
-        }
-      break;
+    case MonitorBroker::Zabbix: {
+        int trid = mzbxHelper->getTrid();
+        for (auto host : mcoreData->hosts.keys()) {
+            QStringList params;
+            params.push_back(mzbxAuthToken);
+            params.push_back(host);
+            params.push_back(QString::number(trid));
+            mzbxHelper->postRequest(trid, params);
+          }
+        break;
+      }
     case MonitorBroker::Zenoss:
       mznsHelper->setRouter(ZnsHelper::Device);
       for (auto host : mcoreData->hosts.keys()) {
@@ -988,7 +1008,7 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
     } else if (mcoreData->monitor == MonitorBroker::Zenoss) {
       apiUrl =  mznsHelper->getRequestUrl();
     }
-  mlastError = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code);
+  mlastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code);
   updateDashboardOnUnknown();
 }
 
@@ -996,10 +1016,10 @@ void SvNavigator::updateDashboardOnUnknown()
 {
   mupdateSucceed = false;
   bool enable = false;
-  if (!mlastError.isEmpty()) {
+  if (!mlastErrorMsg.isEmpty()) {
       enable = true;
-      utils::alert(mlastError);
-      updateStatusBar(mlastError);
+      utils::alert(mlastErrorMsg);
+      updateStatusBar(mlastErrorMsg);
     }
   for (auto& cnode : mcoreData->cnodes) {
       cnode.monitored = true;
@@ -1007,11 +1027,11 @@ void SvNavigator::updateDashboardOnUnknown()
       cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
       cnode.check.host = "-";
       cnode.check.check_command = "-";
-      cnode.check.alarm_msg = mlastError.toStdString();
+      cnode.check.alarm_msg = mlastErrorMsg.toStdString();
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }
-  mlastError.clear();
+  mlastErrorMsg.clear();
   mcoreData->check_status_count[MonitorBroker::Unknown] = mcoreData->cnodes.size();
   finalizeDashboardUpdate(enable);
 }
