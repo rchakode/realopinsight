@@ -58,7 +58,7 @@ public:
 public slots:
   void startMonitor();
   int runNagiosMonitor(void);
-  int runMklsMonitor(void);
+  int runLsMonitor(void);
   void prepareDashboardUpdate(void);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);

@@ -67,7 +67,7 @@ HEADERS	+= include/core/ns.hpp \
     include/client/Chart.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
-    include/client/MkLsHelper.hpp
+    include/client/LsHelper.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -92,7 +92,7 @@ SOURCES	+= \
     src/client/Chart.cpp \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
-    src/client/MkLsHelper.cpp
+    src/client/LsHelper.cpp
 
 
 TRANSLATIONS += ngrt4n_en.ts

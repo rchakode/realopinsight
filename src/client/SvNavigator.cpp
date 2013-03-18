@@ -27,7 +27,7 @@
 #include "core/ns.hpp"
 #include "client/utilsClient.hpp"
 #include "client/JsHelper.hpp"
-#include "client/MkLsHelper.hpp"
+#include "client/LsHelper.hpp"
 #include <QScriptValueIterator>
 #include <QSystemTrayIcon>
 #include <sstream>
@@ -217,7 +217,7 @@ void SvNavigator::startMonitor()
       break;
     case MonitorBroker::Nagios:
     default:
-      mpreferences->useMkls()? runMklsMonitor() : runNagiosMonitor();
+      mpreferences->useLs()? runLsMonitor() : runNagiosMonitor();
       break;
     }
 }
@@ -378,9 +378,9 @@ int SvNavigator::runNagiosMonitor(void)
   return 0;
 }
 
-int SvNavigator::runMklsMonitor(void)
+int SvNavigator::runLsMonitor(void)
 {
-  MkLsHelper mklsHelper(mserverAddr, mserverPort.toInt());
+  LsHelper mklsHelper(mserverAddr, mserverPort.toInt());
   if (!mklsHelper.connectToService()) {
       mupdateSucceed = false;
       mlastErrorMsg = mklsHelper.errorString();

@@ -4,7 +4,7 @@
 #include "Base.hpp"
 #include <QTcpSocket>
 
-class MkLsHelper : public QTcpSocket
+class LsHelper : public QTcpSocket
 {
   Q_OBJECT
 public:
@@ -12,8 +12,8 @@ public:
     Host = 0,
     Service = 1
   };
-  MkLsHelper(const QString& host, const int& port);
-  ~MkLsHelper();
+  LsHelper(const QString& host, const int& port);
+  ~LsHelper();
 
   bool connectToService(void);
   void disconnectFromService(void);

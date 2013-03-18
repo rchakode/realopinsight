@@ -71,7 +71,7 @@ public:
   Preferences(const qint32 & _userRole = Auth::OpUserRole, const qint32 & _action = Preferences::ChangePassword);
   virtual ~Preferences();
   static QString style();
-  bool useMkls(void) const {return museMkls == Qt::Checked;}
+  bool useLs(void) const {return museMkls == Qt::Checked;}
 
 public slots:
   void applySettings(void);

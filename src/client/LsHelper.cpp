@@ -1,4 +1,4 @@
-#include "MkLsHelper.hpp"
+#include "LsHelper.hpp"
 #include "utilsClient.hpp"
 
 #include "QsLog.h"
@@ -6,7 +6,7 @@
 #include <QDir>
 #include <iostream>
 
-MkLsHelper::MkLsHelper(const QString& host, const int& port)
+LsHelper::LsHelper(const QString& host, const int& port)
   : mhost(host), mport(port)
 {
   setSocketOption(QAbstractSocket::KeepAliveOption, 1);
@@ -14,12 +14,12 @@ MkLsHelper::MkLsHelper(const QString& host, const int& port)
   SETUP_LOGGING(); //FIXME: logging
 }
 
-MkLsHelper::~MkLsHelper()
+LsHelper::~LsHelper()
 {
   QAbstractSocket::disconnect();
 }
 
-void MkLsHelper::setRequestPatterns()
+void LsHelper::setRequestPatterns()
 {
   mrequestMap[Host] = "GET hosts\n"
       "Columns: name state last_state_change check_command plugin_output\n"
@@ -29,7 +29,7 @@ void MkLsHelper::setRequestPatterns()
       "Filter: host_name = %1\n\n";
 }
 
-bool MkLsHelper::connectToService()
+bool LsHelper::connectToService()
 {
   disconnectFromHost();
   qDebug() << tr("Connecting to %1:%2...").arg(mhost).arg(mport);
@@ -42,12 +42,12 @@ bool MkLsHelper::connectToService()
 }
 
 
-void MkLsHelper::disconnectFromService()
+void LsHelper::disconnectFromService()
 {
   QAbstractSocket::disconnectFromHost();
 }
 
-bool MkLsHelper::requestData(const QString& host, const ReqTypeT& reqType)
+bool LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 {
   qint32 nb;
   if (!isConnected()) {
@@ -63,7 +63,7 @@ bool MkLsHelper::requestData(const QString& host, const ReqTypeT& reqType)
   return true;
 }
 
-bool MkLsHelper::recvData(const ReqTypeT& reqType)
+bool LsHelper::recvData(const ReqTypeT& reqType)
 {
   if (!QAbstractSocket::waitForReadyRead(DefaultTimeout)) {
       handleFailure();
@@ -107,7 +107,7 @@ bool MkLsHelper::recvData(const ReqTypeT& reqType)
   return true;
 }
 
-bool MkLsHelper::loadHostData(const QString& host)
+bool LsHelper::loadHostData(const QString& host)
 {
   mldchecks.clear();
   bool succeed;
@@ -123,7 +123,7 @@ bool MkLsHelper::loadHostData(const QString& host)
   return true;
 }
 
-bool MkLsHelper::findCheck(const QString& id, CheckListCstIterT& check)
+bool LsHelper::findCheck(const QString& id, CheckListCstIterT& check)
 {
   check = mldchecks.find(id.toLower());
   if (check != mldchecks.end()) {
@@ -132,22 +132,22 @@ bool MkLsHelper::findCheck(const QString& id, CheckListCstIterT& check)
   return false;
 }
 
-void MkLsHelper::handleFailure(QAbstractSocket::SocketError error)
+void LsHelper::handleFailure(QAbstractSocket::SocketError error)
 {
   switch (error) {
     case QAbstractSocket::RemoteHostClosedError:
-      QAbstractSocket::setErrorString(tr("The connection has been closed by the remote host.\n"));
+      QAbstractSocket::setErrorString(tr("The connection has been closed by the remote host"));
       break;
     case QAbstractSocket::HostNotFoundError:
       QAbstractSocket::setErrorString(tr("The host not found: %1. Please check the "
-                                         "host name and port settings.\n").arg(mhost));
+                                         "host name and port settings").arg(mhost));
       break;
     case QAbstractSocket::ConnectionRefusedError:
-      QAbstractSocket::setErrorString(tr("The connection was refused by the server. "
-                                         "Make sure that Mk Livestatus is running on %1:%2.\n").arg(mhost).arg(mport));
+      QAbstractSocket::setErrorString(tr("Connection refused by the server. "
+                                         "Make sure that Livestatus API is listening on tcp://%1:%2").arg(mhost).arg(mport));
       break;
     default:
-      QAbstractSocket::setErrorString(tr("The following error occurred: %1.\n")
+      QAbstractSocket::setErrorString(tr("The following error occurred: %1")
                                       .arg(QAbstractSocket::errorString()));
     }
 }
