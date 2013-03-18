@@ -50,6 +50,7 @@ const QString PKG_VERSION = PACKAGE_VERSION;
 const QString PKG_URL = PACKAGE_URL;
 const QString REL_INFO = RELEASE_INFO;
 const QString REL_NAME = RELEASE_NAME;
+const QString REL_YEAR = RELEASE_YEAR;
 const QString ID_PATTERN("%1/%2");
 const QString APP_INFO = QObject::tr("                  > %1 %6 %2 (codename: %3)"
                                      "\n                  >> Realease ID: %4"

@@ -106,7 +106,6 @@ private:
   QCheckBox* museMklsChkbx;
   QGridLayout* mmainLayout;
 
-  QGroupBox* createBaseGrp(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
   void setContent(void);

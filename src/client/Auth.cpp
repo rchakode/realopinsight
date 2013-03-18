@@ -51,7 +51,7 @@ Auth::Auth()
   password->setEchoMode(QLineEdit::Password);
   line++;
   layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
-  line++; QString copying = QString("\nCopyright (c) 2010 NGRT4N Project. All rights reserved.");
+  line++; QString copying = tr("\nCopyright (c) 2010-%1 NGRT4N Project. All rights reserved.").arg(REL_YEAR);
   layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft);
   addEvents();
 }

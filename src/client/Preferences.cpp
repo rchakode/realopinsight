@@ -1,7 +1,7 @@
 /*
  * Preferences.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Copyright (c) 2010 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)        #
 # Last Update : 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
@@ -45,12 +45,10 @@ const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
-
-
-const QString AboutPattern = QObject::tr("\n%1 %2 (codename: %3)\n"
+const QString ABOUT_PATTERN = QObject::tr("\n%1 %2 (codename: %3)\n"
                                          "\nRelease ID: %4\n"
-                                         "\nCopyright (c) 2010 NGRT4N Project. All rights reserved"
-                                         "\nVisit %5 for more information\n"
+                                         "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
+                                         "\nVisit %6 for more information\n"
                                          "\nReport Bugs: bugs@ngrt4n.com\n");
 
 Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
@@ -84,11 +82,9 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     case Preferences::ChangeMonitoringSettings:
       setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
       line++,
-          mmainLayout->addWidget(createBaseGrp(), line, 0, 1, 3);
+          mmainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
       line++,
           mmainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
-      line++,
-          mmainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
       line++,
           mmainLayout->addWidget(mcancelBtn, line, 1, Qt::AlignRight),
           mmainLayout->addWidget(mapplySettingBtn, line, 2);
@@ -133,10 +129,11 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
 
     case Preferences::ShowAbout:
       setWindowTitle(tr("About %1").arg(APP_NAME));
-      QString about = AboutPattern.arg(APP_NAME)
+      QString about = ABOUT_PATTERN.arg(APP_NAME)
           .arg(PKG_VERSION)
           .arg(RELEASE_NAME)
           .arg(REL_INFO)
+          .arg(REL_YEAR)
           .arg(PKG_URL);
 
       line++,
@@ -245,23 +242,9 @@ void Preferences::setAuthChainVisibility(const int & state) {
     }
 }
 
-QGroupBox* Preferences::createBaseGrp(void)
-{
-  QGroupBox* bx(new QGroupBox());
-  QHBoxLayout* lyt(new QHBoxLayout());
-  lyt->addWidget(new QLabel(tr("Web Interface*")));
-  lyt->addWidget(monitorUrlField);
-  lyt->setStretch(0, 0);
-  lyt->setStretch(1, 1);
-  lyt->setMargin(0);
-  bx->setLayout(lyt);
-  bx->setAlignment(Qt::AlignLeft);
-  return bx;
-}
-
 QGroupBox* Preferences::createScktGrp(void)
 {
-  QGroupBox* bx(new QGroupBox(tr("Livestatus/ngrt4nd Settings")));
+  QGroupBox* bx(new QGroupBox(tr("Livestatus/ngrt4nd Endpoint")));
   QHBoxLayout* lyt(new QHBoxLayout());
   lyt->addWidget(new QLabel(tr("Server Address")));
   lyt->addWidget(msockAddrField);
@@ -273,6 +256,7 @@ QGroupBox* Preferences::createScktGrp(void)
   lyt->setStretch(2, 0);
   lyt->setStretch(3, 0);
   lyt->setStretch(4, 0);
+  bx->setFlat(false);
   lyt->setMargin(0);
   bx->setLayout(lyt);
   bx->setAlignment(Qt::AlignLeft);
@@ -285,17 +269,19 @@ QGroupBox* Preferences::createCommonGrp(void)
   QGridLayout* lyt(new QGridLayout());
   int line;
   line = 0,
-      lyt->addWidget(new QLabel(tr("Auth chain")), line, 0),
-      lyt->addWidget(mserverPassField, line, 1, 1, 2);
+      lyt->addWidget(new QLabel(tr("Web Interface*")), line, 0),
+      lyt->addWidget(monitorUrlField, line, 1, 1, 2);
   line++,
-      lyt->addWidget(new QLabel(tr("")), line, 0),
-      lyt->addWidget(mshowAuthInfoChkbx, line, 1, 1, 2);
+      lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
+      lyt->addWidget(mserverPassField, line, 1),
+      lyt->addWidget(mshowAuthInfoChkbx, line, 2);
   line++,
       lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
       lyt->addWidget(mupdateIntervalField, line, 1),
       lyt->addWidget(new QLabel("seconds"), line, 2);
   lyt->setColumnStretch(0, 0);
   lyt->setColumnStretch(1, 1);
+  bx->setFlat(false);
   bx->setLayout(lyt);
   bx->setAlignment(Qt::AlignLeft);
   return bx;
