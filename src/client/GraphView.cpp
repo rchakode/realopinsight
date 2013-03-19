@@ -64,6 +64,13 @@ IconMapT GraphView::nodeIcons() {
   icons["Database Server"] = ":/images/db-server.png";
   icons["Process"] = ":/images/process.png";
   icons["Logfile"] = ":/images/log.png";
+  icons["Network Bandwith"] = ":/images/network-usage.png";
+  icons["CPU"] = ":/images/cpu.png";
+  icons["CPU Load"] = ":/images/performance-level.png";
+  icons["Memory"] = ":/images/memory.png";
+  icons["Memory Usage"] = ":/images/memory-usage.png";
+  icons["Resource Utilization"] = ":/images/resource-usage.png";
+  icons["Performance"] = ":/images/performance.png";
   return icons;
 }
 

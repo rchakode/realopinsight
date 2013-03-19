@@ -136,7 +136,7 @@ void SvNavigator::loadMenus(void)
   QToolBar* toolBar = addToolBar(APP_NAME);
   mmenus["FILE"] = menuBar->addMenu("&File"),
       msubMenus["Refresh"] = mmenus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
-      msubMenus["Capture"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/camera.png"),tr("&Save Map as Image"));
+      msubMenus["Capture"] = mmenus["FILE"]->addAction(QIcon(":images/built-in/camera.png"),tr("&Save Map as Image"));
   mmenus["FILE"]->addSeparator(),
       msubMenus["Quit"] = mmenus["FILE"]->addAction(tr("&Quit")),
       msubMenus["Capture"]->setShortcut(QKeySequence::Save),
@@ -149,16 +149,16 @@ void SvNavigator::loadMenus(void)
       msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn),
       msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
   mmenus["CONSOLE"]->addSeparator(),
-      msubMenus["FullScreen"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
+      msubMenus["FullScreen"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
       msubMenus["FullScreen"]->setCheckable(true);
   mmenus["CONSOLE"]->addSeparator(),
-      msubMenus["TroubleView"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/alert-circle.png"),tr("&Show only trouble messages")),
+      msubMenus["TroubleView"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/alert-circle.png"),tr("&Show only trouble messages")),
       msubMenus["TroubleView"]->setCheckable(true),
-      msubMenus["IncreaseMsgFont"] = mmenus["CONSOLE"]->addAction( QIcon(":images/built-in/incr-font-size.png"),tr("&Increase message &font")),
+      msubMenus["IncreaseMsgFont"] = mmenus["CONSOLE"]->addAction(QIcon(":images/built-in/incr-font-size.png"),tr("&Increase message &font")),
       msubMenus["IncreaseMsgFont"]->setCheckable(true);
   mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
       msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
-      msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(tr("&Monitoring Settings"));
+      msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(QIcon(":images/built-in/system-preferences.png"),tr("&Monitoring Settings"));
   mmenus["BROWSER"] = menuBar->addMenu("&Browser"),
       msubMenus["BrowserBack"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-back.png"),tr("Bac&k")),
       msubMenus["BrowserForward"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-forward.png"),tr("For&ward"));

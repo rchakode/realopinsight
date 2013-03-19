@@ -5,6 +5,7 @@
 #include "QsLogDest.h"
 #include <QDir>
 #include <iostream>
+#include "client/utilsClient.hpp"
 
 LsHelper::LsHelper(const QString& host, const int& port)
   : mhost(host), mport(port)
@@ -95,7 +96,7 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
           check.host = hostname.toStdString();
           check.id = chkid.toStdString();
           check.status = fields[2].toInt();
-          check.last_state_change = fields[3].toStdString();
+          check.last_state_change = utils::getCtime(fields[3].toUInt());
           check.check_command = fields[4].toStdString();
           check.alarm_msg = fields[5].toStdString();
         } else {

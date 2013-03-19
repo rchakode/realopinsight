@@ -49,5 +49,12 @@
         <file>images/built-in/fullscreen.png</file>
         <file>images/built-in/alert-circle.png</file>
         <file>images/built-in/incr-font-size.png</file>
+        <file>images/resource-usage.png</file>
+        <file>images/network-usage.png</file>
+        <file>images/performance-level.png</file>
+        <file>images/built-in/system-preferences.png</file>
+        <file>images/memory-usage.png</file>
+        <file>images/cpu.png</file>
+        <file>images/performance.png</file>
     </qresource>
 </RCC>
