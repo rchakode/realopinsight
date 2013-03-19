@@ -54,12 +54,12 @@ public:
   void setStatsPanelPos(void);
   void updateStatsPanel(Chart * _stats_panel);
 
-  inline void centerOnNode(const QString& id){
-    if (!id.isEmpty())centerOn(mgnodes[id].label);}
-  inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){
-    return mscene->itemAt(mapToScene(mapFromGlobal(pos)));}
-  inline QGraphicsItem* nodeAt(QPoint pos){
-    return mscene->itemAt(mapToScene(pos));}
+  inline void centerOnNode(const QString& id)
+  { if (!id.isEmpty())centerOn(mgnodes[id].label); }
+  inline QGraphicsItem* nodeAtGlobalPos(QPoint pos)
+  { return mscene->itemAt(mapToScene(mapFromGlobal(pos))); }
+  inline QGraphicsItem* nodeAt(QPoint pos)
+  { return mscene->itemAt(mapToScene(pos)); }
 
 public slots:
   void capture(void);
@@ -78,8 +78,7 @@ protected:
   void wheelEvent(QWheelEvent * _event) { (_event->delta() > 0)? zoomIn() : zoomOut();}
   void resizeEvent(QResizeEvent *) {setStatsPanelPos();}
   void showEvent(QShowEvent *) {setStatsPanelPos();}
-  void scrollContentsBy(int dx, int dy) {QGraphicsView::scrollContentsBy (dx, dy);
-                                           setStatsPanelPos();}
+  void scrollContentsBy(int dx, int dy) {QGraphicsView::scrollContentsBy (dx, dy); setStatsPanelPos();}
 
 private:
   static const qreal XSCAL_FACTOR;
