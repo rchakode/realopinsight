@@ -41,7 +41,7 @@ public:
   GraphView(QWidget* = 0);
   virtual ~GraphView();
 
-  bool load(const QString& _dotFile,
+  void load(const QString& _dotFile,
             const NodeListT& _bpnodes,
             const NodeListT& _cnodes);
   void setNodeVisible(const QString& _nodeId,

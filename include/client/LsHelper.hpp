@@ -34,8 +34,8 @@ private:
   CheckListT mldchecks;
   QString merrorMsg;
   void setRequestPatterns();
-  void handleFailure() {handleFailure(QAbstractSocket::error());}
-  void handleFailure(QAbstractSocket::SocketError error);
+  void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}
+  void handleNetworkFailure(QAbstractSocket::SocketError error);
 };
 
 #endif // MKLSHELPER_HPP

@@ -206,7 +206,7 @@ bool GraphView::hideChart(void)
 }
 
 
-bool GraphView::load(const QString& _dotFile,
+void GraphView::load(const QString& _dotFile,
                      const NodeListT& _bpnodes,
                      const NodeListT& _cnodes)
 {
@@ -220,12 +220,10 @@ bool GraphView::load(const QString& _dotFile,
       mscene->setSceneRect(mscene->itemsBoundingRect());
     } else {
       utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
-      qDebug() << tr("The graph engine exited with the code %1").arg(exitCode);
       exit(exitCode);
     }
 
   dotParser.reset(NULL);
-  return false;
 }
 
 void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)

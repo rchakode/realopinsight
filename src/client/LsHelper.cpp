@@ -36,7 +36,7 @@ bool LsHelper::connectToService()
   qDebug() << tr("Connecting to %1:%2...").arg(mhost).arg(mport);
   QAbstractSocket::connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
   if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
-      handleFailure();
+      handleNetworkFailure();
       return false;
     }
   return true;
@@ -57,7 +57,7 @@ bool LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
   if (!isConnected() ||
       (nb = QAbstractSocket::write(mrequestMap[reqType].arg(host).toAscii())) <= 0 ||
       !QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
-      handleFailure();
+      handleNetworkFailure();
       return false;
     }
   qDebug() << tr("%1 bytes written").arg(nb);
@@ -67,7 +67,7 @@ bool LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 bool LsHelper::recvData(const ReqTypeT& reqType)
 {
   if (!QAbstractSocket::waitForReadyRead(DefaultTimeout)) {
-      handleFailure();
+      handleNetworkFailure();
       return false;
     }
   QString chkid = "";
@@ -133,18 +133,17 @@ bool LsHelper::findCheck(const QString& id, CheckListCstIterT& check)
   return false;
 }
 
-void LsHelper::handleFailure(QAbstractSocket::SocketError error)
+void LsHelper::handleNetworkFailure(QAbstractSocket::SocketError error)
 {
   switch (error) {
     case QAbstractSocket::RemoteHostClosedError:
       QAbstractSocket::setErrorString(tr("The connection has been closed by the remote host"));
       break;
     case QAbstractSocket::HostNotFoundError:
-      QAbstractSocket::setErrorString(tr("The host not found: %1. Please check the "
-                                         "host name and port settings").arg(mhost));
+      QAbstractSocket::setErrorString(tr("The host not found (%1).").arg(mhost));
       break;
     case QAbstractSocket::ConnectionRefusedError:
-      QAbstractSocket::setErrorString(tr("Connection refused by the server. "
+      QAbstractSocket::setErrorString(tr("Connection refused. "
                                          "Make sure that Livestatus API is listening on tcp://%1:%2").arg(mhost).arg(mport));
       break;
     default:

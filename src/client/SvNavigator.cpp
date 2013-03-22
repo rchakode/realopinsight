@@ -42,7 +42,7 @@
 
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
-const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
+const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 
@@ -332,7 +332,7 @@ int SvNavigator::runNagiosMonitor(void)
       updateStatusBar(tr("Updating..."));
     } else {
       mupdateSucceed = false;
-      QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl);
+      QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl, tr("Unknown error"));
       utils::alert(msg);
       updateStatusBar(msg);
     }
@@ -758,9 +758,10 @@ void SvNavigator::closeRpcSession(void)
 void SvNavigator::processZbxReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
-  if (_reply->error() != QNetworkReply::NoError) {
+  QNetworkReply::NetworkError errcode = _reply->error();
+  if (errcode != QNetworkReply::NoError) {
       mlastErrorMsg = _reply->errorString();
-      updateDashboardOnUnknown();
+      processRpcError(errcode);
       return;
     }
   QString data = _reply->readAll();
@@ -844,9 +845,10 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
 void SvNavigator::processZnsReply(QNetworkReply* _reply)
 {
   _reply->deleteLater();
+  QNetworkReply::NetworkError errcode = _reply->error();
   if (_reply->error() != QNetworkReply::NoError) {
       mlastErrorMsg = _reply->errorString();
-      updateDashboardOnUnknown();
+      processRpcError(errcode);
       return;
     }
   QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
@@ -1015,7 +1017,19 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
     } else if (mcoreData->monitor == MonitorBroker::Zenoss) {
       apiUrl =  mznsHelper->getRequestUrl();
     }
-  mlastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code);
+  switch (_code) {
+    case QNetworkReply::RemoteHostClosedError:
+      mlastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("The connection has been closed by the remote host"));
+      break;
+    case QNetworkReply::HostNotFoundError:
+      mlastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Host not found"));
+      break;
+    case QNetworkReply::ConnectionRefusedError:
+      mlastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Connection refused"));
+      break;
+    default:
+      mlastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Unknown error: code %1").arg(_code));
+    }
   updateDashboardOnUnknown();
 }
 
