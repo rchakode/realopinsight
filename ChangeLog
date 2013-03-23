@@ -4,10 +4,11 @@ RealOpInsight ChangeLog
 2.3.0 (Briator)
 --------------
   * Added support for MK Livestatus remote socket
-  * Added support for handling full screen
-  * Updated toolbar
-  * Data points are not case insensitive
-  * New icons and update
+  * Added new menus for handling full screen, filtering trouble messages, and
+    for changing font size from the operations console
+  * Added support for copy/paste as well as more menu shortcuts within the editor
+  * Added new icons
+  * Changes: the id of data points are now not case sensitive
   
 2.2.1 (Lucia, p1)
 -------------
