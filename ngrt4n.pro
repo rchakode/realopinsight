@@ -94,9 +94,6 @@ SOURCES	+= \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp
 
-
-TRANSLATIONS += ngrt4n_en.ts
-
 DISTFILES += README \
     INSTALL \
     COPYING \
@@ -110,6 +107,9 @@ DISTFILES += README \
     src/client/ngrt4n-*.cpp \
     doc/man/*.gz
 
-OTHER_FILES += ngrt4n_la.ts
+TRANSLATIONS += ngrt4n_en.ts \
+                ngrt4n_fr.ts
+
+CODECFORTR = UTF-8
 
 include(QsLog/QsLog.pri)

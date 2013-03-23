@@ -49,10 +49,10 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
+  INIT_TRANSLATION
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(Preferences::style());
-
   QString cmdName = basename(argv[0]);
   QString versionMsg = APP_INFO.arg("");
   QString module = "config";

@@ -41,6 +41,13 @@
   logger.addDestination(fileDestination.get()); \
   }
 
+#define INIT_TRANSLATION \
+  QString locale = QLocale::system().name(); \
+  QTranslator translator; \
+  translator.load(QString("ngrt4n_%1").arg(locale)); \
+  app->installTranslator(&translator); \
+  QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+
 const QString PROJECT = "NGRT4N";
 const QString USER_BN = BUILTIN_USER_PREFIX;
 const QString PJT_NAME = PROJECT;
