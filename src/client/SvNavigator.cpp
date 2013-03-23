@@ -158,7 +158,8 @@ void SvNavigator::loadMenus(void)
       msubMenus["IncreaseMsgFont"]->setCheckable(true);
   mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
       msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
-      msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(QIcon(":images/built-in/system-preferences.png"),tr("&Monitoring Settings"));
+      msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(QIcon(":images/built-in/system-preferences.png"),tr("&Monitoring Settings")),
+      msubMenus["ChangeMonitoringSettings"]->setShortcut(QKeySequence::Preferences);
   mmenus["BROWSER"] = menuBar->addMenu("&Browser"),
       msubMenus["BrowserBack"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-back.png"),tr("Bac&k")),
       msubMenus["BrowserForward"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-forward.png"),tr("For&ward"));
