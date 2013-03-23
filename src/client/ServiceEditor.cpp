@@ -97,7 +97,7 @@ ServiceEditor::~ServiceEditor()
 
 }
 
-void ServiceEditor::loadStatusFile(const QString & path)
+void ServiceEditor::loadStatusFile(const QString& path)
 {
   MonitorBroker::ChecksT checks;
   MonitorBroker::loadNagiosCollectedData(path.toStdString(), checks);
@@ -120,7 +120,7 @@ void ServiceEditor::setEnableFields(const bool& _enable)
   mitems[NOTIFICATION_MSG_FIELD]->setEnabled(_enable);
 }
 
-bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
+bool ServiceEditor::updateNode(NodeListT& _node_map, const QString& _node_id)
 {
   NodeListT::iterator node = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
   if( node != _node_map.end()) {
@@ -140,7 +140,7 @@ bool ServiceEditor::updateNode(NodeListT & _node_map, const QString& _node_id)
 }
 
 
-bool ServiceEditor::updateNode(NodeListT::iterator & _node)
+bool ServiceEditor::updateNode(NodeListT::iterator& _node)
 {
   _node->name = nameField()->text();
   _node->type = typeField()->currentIndex();
@@ -156,7 +156,7 @@ bool ServiceEditor::updateNode(NodeListT::iterator & _node)
   return true;
 }
 
-void ServiceEditor::setContent(const NodeListT & _node_map, const QString& _nodeId)
+void ServiceEditor::setContent(const NodeListT& _node_map, const QString& _nodeId)
 {
   NodeListT::const_iterator node = _node_map.find(_nodeId);
   if( node != _node_map.end())
@@ -164,21 +164,22 @@ void ServiceEditor::setContent(const NodeListT & _node_map, const QString& _node
 }
 
 
-void ServiceEditor::setContent(NodeListT::const_iterator _node)
+
+void ServiceEditor::setContent(const NodeT& _node)
 {
-  nameField()->setText(_node->name);
-  typeField()->setCurrentIndex(_node->type);
-  statusCalcRuleField()->setCurrentIndex(_node->sev_crule);
-  statusPropRuleField()->setCurrentIndex(_node->sev_prule);
-  iconField()->setCurrentIndex(iconField()->findText((_node->icon)));
-  descriptionField()->setText(_node->description);
-  alarmMsgField()->setText(_node->alarm_msg);
-  notificationMsgField()->setText(_node->notification_msg);
+  nameField()->setText(_node.name);
+  typeField()->setCurrentIndex(_node.type);
+  statusCalcRuleField()->setCurrentIndex(_node.sev_crule);
+  statusPropRuleField()->setCurrentIndex(_node.sev_prule);
+  iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
+  descriptionField()->setText(_node.description);
+  alarmMsgField()->setText(_node.alarm_msg);
+  notificationMsgField()->setText(_node.notification_msg);
 
   QString checkId = "";
-  if(_node->type == NodeType::ALARM_NODE) {
+  if(_node.type == NodeType::ALARM_NODE) {
       QListWidget* checks = checkListField();
-      QStringList childNodes = _node->child_nodes.split(Parser::CHILD_SEP);
+      QStringList childNodes = _node.child_nodes.split(Parser::CHILD_SEP);
       QStringList::iterator childNodeIt = childNodes.begin();
       if (childNodeIt != childNodes.end()) {
           checkId = (*childNodeIt).trimmed();
@@ -197,7 +198,6 @@ void ServiceEditor::setContent(NodeListT::const_iterator _node)
     }
   checkField()->setCurrentIndex(checkField()->findText(checkId, Qt::MatchExactly));
 }
-
 
 void ServiceEditor::layoutEditorComponents(void)
 {
@@ -244,13 +244,13 @@ void ServiceEditor::loadStatusHandlingFields(void)
   QString defaultRule = CalcRules::label(CalcRules::HighCriticity);
   statusCalcRuleField()->addItem(tr("Calculation rule (Default is")%" "%defaultRule+")", CalcRules::HighCriticity);
 
-  foreach(const QString & rule, crules.keys()) {
+  foreach(const QString& rule, crules.keys()) {
       statusCalcRuleField()->addItem(rule, crules.value(rule));
     }
   StringMapT prules = SvNavigator::propRules();
   defaultRule = PropRules::label(PropRules::Unchanged);
   statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", PropRules::Unchanged);
-  foreach(const QString & rule, prules.keys()) {
+  foreach(const QString& rule, prules.keys()) {
       statusPropRuleField()->addItem(rule, prules.value(rule));
     }
   mlayout->addWidget(mitems["priorityLabel"], mlayoutRowIndex, 0);
@@ -277,7 +277,7 @@ void ServiceEditor::loadIconFields()
   IconMapT icons = GraphView::nodeIcons();
   QString header = "-->Select a icon (Default is " + GraphView::DEFAULT_ICON + ")";
   iconField()->addItem(header, icons.value(GraphView::DEFAULT_ICON));
-  foreach(const QString & label, icons.keys()) {
+  foreach(const QString& label, icons.keys()) {
       QString path = icons.value(label);
       iconField()->addItem(QIcon(path), label, icons.value(path));
     }
@@ -314,7 +314,7 @@ void ServiceEditor::loadButtonBox(void)
   mlayout->addWidget(buttonBox, mlayoutRowIndex, 2);
 }
 
-void ServiceEditor::handleNodeTypeChanged( const QString & _text)
+void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 {
   if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
       setEnableFields(true);
@@ -325,7 +325,7 @@ void ServiceEditor::handleNodeTypeChanged( const QString & _text)
     }
 }
 
-void ServiceEditor::handleNodeTypeActivated( const QString & _text)
+void ServiceEditor::handleNodeTypeActivated( const QString& _text)
 {
   if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
       emit nodeTypeActivated( NodeType::ALARM_NODE );
@@ -340,6 +340,6 @@ void ServiceEditor::addEvent(void)
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
   connect(nameField(), SIGNAL(returnPressed ()), this, SLOT(handleReturnPressed() ) );
-  connect(typeField(), SIGNAL(currentIndexChanged(const QString &)), this, SLOT(handleNodeTypeChanged( const QString & ) ) );
-  connect(typeField(), SIGNAL(activated(const QString &)), this, SLOT(handleNodeTypeActivated( const QString & ) ) );
+  connect(typeField(), SIGNAL(currentIndexChanged(const QString&)), this, SLOT(handleNodeTypeChanged( const QString& ) ) );
+  connect(typeField(), SIGNAL(activated(const QString&)), this, SLOT(handleNodeTypeActivated( const QString& ) ) );
 }

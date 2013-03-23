@@ -1,5 +1,5 @@
 /*
- * SvConfigCreator.cpp
+* SvConfigCreator.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License        #
 # along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.          #
 #--------------------------------------------------------------------------#
- */
+*/
 
 
 #include "SvConfigCreator.hpp"
@@ -42,7 +42,8 @@ SvCreator::SvCreator(const qint32& _userRole)
     meditor(new ServiceEditor()),
     mmenuBar(new QMenuBar(this)),
     mtoolBar(new QToolBar("Tool Bar")),
-    mnodeContextMenu(new QMenu())
+    mnodeContextMenu(new QMenu()),
+    mclipboardData(NULL)
 {
   mainSplitter->addWidget(mtree);
   mainSplitter->addWidget(meditor);
@@ -57,11 +58,12 @@ SvCreator::~SvCreator()
   delete mtree;
   delete meditor;
   delete mainSplitter;
+  if (mclipboardData) delete mclipboardData;
   unloadMenu();
 }
 
 
-void SvCreator::contextMenuEvent(QContextMenuEvent *_event)
+void SvCreator::contextMenuEvent(QContextMenuEvent*_event)
 {
   QPoint pos = _event->globalPos();
   QList<QTreeWidgetItem*> selectedNodes = mtree->selectedItems();
@@ -72,7 +74,7 @@ void SvCreator::contextMenuEvent(QContextMenuEvent *_event)
     }
 }
 
-void SvCreator::closeEvent(QCloseEvent * event)
+void SvCreator::closeEvent(QCloseEvent* event)
 {
   treatCloseAction(true);
   QMainWindow::closeEvent(event);
@@ -81,7 +83,7 @@ void SvCreator::closeEvent(QCloseEvent * event)
 void SvCreator::unloadMenu(void)
 {
   mmenuList.clear();
-  msubMenuList.clear();
+  msubMenus.clear();
   delete mnodeContextMenu;
   delete mmenuBar;
 }
@@ -106,23 +108,25 @@ void SvCreator::open(void)
                                               .arg(NagiosCompatibleFormat)
                                               .arg(ZabbixCompatibleFormat)
                                               .arg(ZenossCompatibleFormat));
-
-  if (path.length())
-    loadFile(path);
+  if (!path.isNull() && !path.isEmpty()) loadFile(path);
 }
 
 
 void SvCreator::loadFile(const QString& _path)
 {
-  Parser parser;
-  if (_path == NULL) return;
-  utils::clear(*mcoreData);
-  if (! parser.parseSvConfig(_path, *mcoreData)) {
-      utils::alert(tr("Unable to open the file '%1'").arg(_path));
-      exit(1);
+  if (_path == NULL) {
+      newView();
+    } else {
+      utils::clear(*mcoreData);
+      Parser parser;
+      if (!parser.parseSvConfig(_path,*mcoreData)) {
+          utils::alert(tr("Unable to open the file '%1'").arg(_path));
+          exit(1);
+        }
+      mtree->update(mcoreData);
+      mactiveFile = utils::getAbsolutePath(_path);
+      setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
     }
-  mtree->update(mcoreData);
-  mactiveFile = utils::getAbsolutePath(_path);
 }
 
 void SvCreator::import() {
@@ -130,31 +134,21 @@ void SvCreator::import() {
                                               tr("Select the Status File %").arg(APP_NAME),
                                               ".",
                                               tr("Data files (*.dat);;All files (*)"));
-  if (path.length())
-    meditor->loadStatusFile(path);
+  if (!path.isNull() && !path.isEmpty()) meditor->loadStatusFile(path);
 }
 
-void SvCreator::newBusinessView(void)
+void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
       utils::clear(*mcoreData);
-      NodeT node;
-      node.id = SvNavigatorTree::RootId;
-      node.name = "New Business view";
-      node.child_nodes.clear();
-      node.severity = MonitorBroker::Unknown;
-      node.icon = GraphView::DEFAULT_ICON;
-      node.type = NodeType::SERVICE_NODE;
-      node.parent.clear();
-
-      mcoreData->bpnodes[node.id] = node;
-      SvNavigatorTree::addNode(mcoreData->tree_items, node);
+      NodeT* node = createNode(SvNavigatorTree::RootId, tr("New View"), "");
+      mcoreData->bpnodes.insert(node->id,*node);
+      SvNavigatorTree::addNode(mcoreData->tree_items,*node);
       mtree->update(mcoreData);
-
-      fillEditorFromService(mcoreData->tree_items[node.id]);
-      mactiveFile.clear();
-      mselectedNode = SvNavigatorTree::RootId;
+      meditor->setContent(*node);
+      mselectedNode = node->id;
       mhasLeftUpdates = true;
+      mactiveFile.clear();
       setWindowTitle(tr("%1 Editor - unsaved document*").arg(APP_NAME));
     }
 }
@@ -163,25 +157,45 @@ void SvCreator::newBusinessView(void)
 void SvCreator::newNode(void)
 {
   static int count = 1;
-  NodeListT::iterator pNode = mcoreData->bpnodes.find(mselectedNode);
-  if (pNode == mcoreData->bpnodes.end() || pNode->type == NodeType::ALARM_NODE) {
+  NodeT* node = createNode(utils::genNodeId(),
+                           tr("sub service %1").arg(QString::number(count)),
+                           mselectedNode);
+  insertFromSelected(*node);
+  count++;
+}
+
+NodeT* SvCreator::createNode(const QString& id,
+                             const QString& label,
+                             const QString& parent)
+{
+  NodeT* node = new NodeT;
+  if (!node) {
+      utils::alert(tr("Out of memory. the application will exit"));
+      exit(1);
+    }
+  node->id = id;
+  node->name = label;
+  node->parent = parent;
+  node->type = NodeType::SERVICE_NODE;
+  node->severity = MonitorBroker::Unknown;
+  node->sev_crule = CalcRules::HighCriticity;
+  node->sev_prule = PropRules::Unchanged;
+  node->icon = GraphView::DEFAULT_ICON;
+  node->child_nodes = QString();
+  return node;
+}
+
+void SvCreator::insertFromSelected(const NodeT& node)
+{
+  NodeListT::iterator pnode = mcoreData->bpnodes.find(mselectedNode);
+  if (pnode == mcoreData->bpnodes.end() ||
+      pnode->type == NodeType::ALARM_NODE) {
       utils::alert(tr("This action not allowed on the target node"));
       return;
     }
-  NodeT node;
-  node.id = "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz");
-
-  node.parent = mselectedNode;
-  node.name = "sub service " + QString::number(count), count ++;
-  node.type = NodeType::SERVICE_NODE;
-  node.severity = MonitorBroker::Unknown;
-  node.icon = GraphView::DEFAULT_ICON;
-  node.child_nodes = "";
-
+  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? Parser::CHILD_SEP%node.id : node.id;
   SvNavigatorTree::addNode(mcoreData->tree_items, node, true);
-  mcoreData->bpnodes[node.id] = node;
-  pNode->child_nodes += (pNode->child_nodes != "")? Parser::CHILD_SEP + node.id : node.id;
-
+  mcoreData->bpnodes.insert(node.id, node);
   mtree->setCurrentItem(mcoreData->tree_items[node.id]);
   fillEditorFromService(mcoreData->tree_items[node.id]);
 }
@@ -190,7 +204,6 @@ void SvCreator::newNode(void)
 void SvCreator::deleteNode(void)
 {
   QMessageBox msgBox;
-
   msgBox.setText(tr("Do you really want to delete the service and its sub services?"));
   msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(APP_NAME));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
@@ -236,6 +249,29 @@ void SvCreator::deleteNode(const QString& _nodeId)
       QTreeWidgetItem* obsolete = NULL;
       if ((obsolete = (*pItem)->takeChild((*pItem)->indexOfChild(*item))))
         delete obsolete;
+    }
+}
+
+
+void SvCreator::copySelected(void)
+{
+  NodeListIteratorT node;
+  if (utils::findNode(mcoreData, mselectedNode, node)) {
+      if (!mclipboardData) mclipboardData = new NodeT;
+     *mclipboardData =*node;
+      mclipboardData->name+=" (Copy)";
+      mclipboardData->child_nodes.clear();
+    }
+}
+
+void SvCreator::pasteFromSelected(void)
+{
+  if (mclipboardData) {
+      mclipboardData->id = utils::genNodeId();
+      mclipboardData->parent = mselectedNode;
+      insertFromSelected(*mclipboardData);
+    } else {
+      utils::alert(tr("There is no data in the clipboard!"));
     }
 }
 
@@ -286,28 +322,29 @@ void SvCreator::saveAs(void)
 
 int SvCreator::treatCloseAction(const bool& _close)
 {
-  if (!mhasLeftUpdates && _close) qApp->quit();
-
-  QMessageBox mbox;
-  mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
-  mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
-
-  bool enforceClose = _close;
   int ret = 0;
-  mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
-  switch (mbox.exec()) {
-    case QMessageBox::Yes:
-      save();
-      break;
-    case QMessageBox::Cancel:
-      enforceClose = false;
-      ret = 1;
-      break;
-    case QMessageBox::Discard:
-    default:
-      break;
+  if (_close || mhasLeftUpdates) {
+      bool enforceClose = _close;
+      if (mhasLeftUpdates) {
+          QMessageBox mbox;
+          mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
+          mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
+          mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
+          switch (mbox.exec()) {
+            case QMessageBox::Yes:
+              save();
+              break;
+            case QMessageBox::Cancel:
+              enforceClose = false;
+              ret = 1;
+              break;
+            case QMessageBox::Discard:
+            default:
+              break;
+            }
+        }
+      if (enforceClose) qApp->quit();
     }
-  if (enforceClose) qApp->quit();
   return ret;
 }
 
@@ -330,7 +367,7 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
           NodeListT::iterator nodeIt = mcoreData->bpnodes.find(_node_id);
 
           if (nodeIt != mcoreData->bpnodes.end()) {
-              /* Remove the node on its old parent's child list */
+              /* Remove the node on its old parent's child list*/
               QRegExp regex ("|^" + _node_id + Parser::CHILD_SEP +
                              "|^" + _node_id + "$" +
                              "|" + Parser::CHILD_SEP  + _node_id);
@@ -339,7 +376,7 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
                   pNodeIt->child_nodes.remove(regex);
                 }
 
-              /* Add the node on its new parent's child list */
+              /* Add the node on its new parent's child list*/
               nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
               pNodeIt = mcoreData->bpnodes.find(nodeIt->parent);
               if (pNodeIt != mcoreData->bpnodes.end()) {
@@ -395,7 +432,7 @@ void SvCreator::handleShowAbout(void)
   about.exec();
 }
 
-void SvCreator::fillEditorFromService(QTreeWidgetItem * _item)
+void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (utils::findNode(mcoreData, mselectedNode, node)) {
@@ -407,8 +444,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem * _item)
         }
     }
   mselectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-  if (utils::findNode(mcoreData, mselectedNode, node))
-    meditor->setContent(node);
+  if (utils::findNode(mcoreData, mselectedNode, node)) meditor->setContent(node);
 }
 
 
@@ -445,7 +481,7 @@ void SvCreator::recordData(const QString& _path)
 
   QTextStream ofile(&file);
   ofile << "<ServiceView compat=\"2.0\" monitor=\""<< mcoreData->monitor<< "\">\n";
-  recordNode(ofile, *root);
+  recordNode(ofile,*root);
   foreach(const NodeT& service, mcoreData->bpnodes) {
       if (service.id == SvNavigatorTree::RootId || service.parent.isEmpty())
         continue;
@@ -468,23 +504,23 @@ void SvCreator::recordData(const QString& _path)
 
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
 {
-  stream << "\t<Service id=\""<<node.id<<"\" type=\""<<node.type
+  stream << "<Service id=\""<<node.id<<"\" type=\""<<node.type
          << "\" statusCalcRule=\""<<node.sev_crule<< "\" statusPropRule=\""<<node.sev_prule<< "\">\n"
-         << "\t\t<Name>"<<node.name<<"</Name>\n"
-         << "\t\t<Icon>"<<node.icon<<"</Icon>\n"
-         << "\t\t<Description>"<<node.description<<"</Description>\n"
-         << "\t\t<AlarmMsg>"<< node.alarm_msg<<"</AlarmMsg>\n"
-         << "\t\t<NotificationMsg>"<<node.notification_msg<<"</NotificationMsg>\n"
-         << "\t\t<SubServices>"<<node.child_nodes<<"</SubServices>\n"
-         << "\t</Service>\n";
+         << " <Name>"<<node.name<<"</Name>\n"
+         << " <Icon>"<<node.icon<<"</Icon>\n"
+         << " <Description>"<<node.description<<"</Description>\n"
+         << " <AlarmMsg>"<< node.alarm_msg<<"</AlarmMsg>\n"
+         << " <NotificationMsg>"<<node.notification_msg<<"</NotificationMsg>\n"
+         << " <SubServices>"<<node.child_nodes<<"</SubServices>\n"
+         << "</Service>\n";
 }
 
 void SvCreator::resize()
 {
-  QSize ui_size = qApp->desktop()->screen(0)->size() * 0.80;
+  QSize ui_size = qApp->desktop()->screen(0)->size()* 0.80;
   QList<qint32> frames_size;
-  frames_size.push_back(ui_size.width() * 0.3);
-  frames_size.push_back(ui_size.width() * 0.7);
+  frames_size.push_back(ui_size.width()* 0.3);
+  frames_size.push_back(ui_size.width()* 0.7);
   mainSplitter->setSizes(frames_size);
   mainSplitter->resize(ui_size);
   QMainWindow::resize(ui_size);
@@ -492,46 +528,59 @@ void SvCreator::resize()
 
 void SvCreator::loadMenu(void)
 {
-  msubMenuList["NewNode"] = mnodeContextMenu->addAction("&Add service");
-  msubMenuList["DeleteNode"] = mnodeContextMenu->addAction("&Delete");
-  mmenuList["MENU1"] = mmenuBar->addMenu(tr("&File")),
-      msubMenuList["NewFile"] = mmenuList["MENU1"]->addAction("New &File"),
-      msubMenuList["Open"] = mmenuList["MENU1"]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
-      msubMenuList["Save"] = mmenuList["MENU1"]->addAction(QIcon(":images/built-in/disket.png"), tr("&Save")),
-      msubMenuList["SaveAs"] = mmenuList["MENU1"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As..."));
-  mmenuList["MENU1"]->addSeparator(),
-      msubMenuList["Import"] = mmenuList["MENU1"]->addAction(QIcon(":images/built-in/import.png"), tr("&Import Status File"));
-  mmenuList["MENU1"]->addSeparator(),
-      msubMenuList["Quit"] = mmenuList["MENU1"]->addAction(tr("&Quit"));
-  mmenuList["MENU2"] = mmenuBar->addMenu(tr("&Help")),
-      msubMenuList["ShowOnlineResources"] = mmenuList["MENU2"]->addAction(tr("Online &Resources"));
-  mmenuList["MENU2"]->addSeparator(),
-      msubMenuList["ShowAbout"] = mmenuList["MENU2"]->addAction(tr("&About %1").arg(APP_NAME));
-  msubMenuList["NewFile"]->setShortcut(QKeySequence::New);
-  msubMenuList["Open"]->setShortcut(QKeySequence::Open);
-  msubMenuList["Save"]->setShortcut(QKeySequence::Save);
-  msubMenuList["SaveAs"]->setShortcut(QKeySequence::SaveAs);
-  msubMenuList["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  msubMenuList["Quit"]->setShortcut(QKeySequence::Quit);
-  mtoolBar->addAction(msubMenuList["Save"]);
-  mtoolBar->addAction(msubMenuList["Open"]);
-  mtoolBar->addAction(msubMenuList["Import"]);
+  mmenuList["FILE"] = mmenuBar->addMenu(tr("&File"));
+  msubMenus["NewFile"] = mmenuList["FILE"]->addAction("New &File"),
+      msubMenus["NewFile"]->setShortcut(QKeySequence::New);
+  msubMenus["Open"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
+      msubMenus["Open"]->setShortcut(QKeySequence::Open);
+  msubMenus["Save"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("&Save")),
+      msubMenus["Save"]->setShortcut(QKeySequence::Save);
+  msubMenus["SaveAs"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
+      msubMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
+  mmenuList["FILE"]->addSeparator(),
+      msubMenus["Import"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/import.png"), tr("&Import Status File"));
+  mmenuList["FILE"]->addSeparator(),
+      msubMenus["Quit"] = mmenuList["FILE"]->addAction(tr("&Quit")),
+      msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
+  mmenuList["EDITION"] = mmenuBar->addMenu(tr("&Edition"));
+  msubMenus["NewNode"] = mmenuList["EDITION"]->addAction("&Add service"),
+      mnodeContextMenu->addAction(msubMenus["NewNode"]),
+      msubMenus["NewNode"]->setShortcut(QKeySequence::AddTab);
+  msubMenus["CopySelected"] = mmenuList["EDITION"]->addAction("&Copy"),
+      mnodeContextMenu->addAction(msubMenus["CopySelected"]),
+      msubMenus["CopySelected"]->setShortcut(QKeySequence::Copy);
+  msubMenus["PasteFromSelected"] = mmenuList["EDITION"]->addAction("&Paste"),
+      mnodeContextMenu->addAction(msubMenus["PasteFromSelected"]),
+      msubMenus["PasteFromSelected"]->setShortcut(QKeySequence::Paste);
+  msubMenus["DeleteNode"] = mmenuList["EDITION"]->addAction("&Delete"),
+      msubMenus["DeleteNode"]->setShortcut(QKeySequence::Delete),
+      mnodeContextMenu->addAction(msubMenus["DeleteNode"]);
+  mmenuList["HELP"] = mmenuBar->addMenu(tr("&Help"));
+  msubMenus["ShowOnlineResources"] = mmenuList["HELP"]->addAction(tr("Online &Resources")),
+      msubMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  mmenuList["HELP"]->addSeparator(),
+      msubMenus["ShowAbout"] = mmenuList["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
+  mtoolBar->addAction(msubMenus["Save"]);
+  mtoolBar->addAction(msubMenus["Open"]);
+  mtoolBar->addAction(msubMenus["Import"]);
   setMenuBar(mmenuBar);
   addToolBar(mtoolBar);
 }
 
 void SvCreator::addEvents(void)
 {
-  connect(msubMenuList["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newBusinessView()));
-  connect(msubMenuList["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
-  connect(msubMenuList["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
-  connect(msubMenuList["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
-  connect(msubMenuList["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
-  connect(msubMenuList["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
-  connect(msubMenuList["Import"],SIGNAL(triggered(bool)),this,SLOT(import()));
-  connect(msubMenuList["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
-  connect(msubMenuList["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
-  connect(msubMenuList["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
+  connect(msubMenus["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newView()));
+  connect(msubMenus["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
+  connect(msubMenus["CopySelected"],SIGNAL(triggered(bool)),this,SLOT(copySelected()));
+  connect(msubMenus["PasteFromSelected"],SIGNAL(triggered(bool)),this,SLOT(pasteFromSelected()));
+  connect(msubMenus["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
+  connect(msubMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
+  connect(msubMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
+  connect(msubMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
+  connect(msubMenus["Import"],SIGNAL(triggered(bool)),this,SLOT(import()));
+  connect(msubMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
+  connect(msubMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
+  connect(msubMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
   connect(meditor,SIGNAL(saveClicked()),this,SLOT(save()));
   connect(meditor,SIGNAL(closeClicked()),this,SLOT(treatCloseAction()));
   connect(meditor,SIGNAL(returnPressed()),this,SLOT(handleReturnPressed()));
