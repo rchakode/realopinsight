@@ -21,6 +21,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "utilsClient.hpp"
 #include "core/ns.hpp"
 #include "client/Auth.hpp"
 #include "client/SvConfigCreator.hpp"
