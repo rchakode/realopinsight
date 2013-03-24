@@ -29,21 +29,21 @@ QString utils::criticityToText(const qint32& _status)
   switch(static_cast<MonitorBroker::SeverityT>(_status))
     {
     case MonitorBroker::Normal:
-      return "Normal";
+      return QObject::tr("Normal");
       break;
     case MonitorBroker::Minor:
-      return  "Minor";
+      return  QObject::tr("Minor");
       break;
     case MonitorBroker::Major:
-      return  "Major";
+      return  QObject::tr("Major");
       break;
     case MonitorBroker::Critical:
-      return  "Critical";
+      return  QObject::tr("Critical");
       break;
     default:
       break;
     }
-  return "Unknown";
+  return QObject::tr("Unknown");
 }
 
 void utils::clear(CoreDataT& data)

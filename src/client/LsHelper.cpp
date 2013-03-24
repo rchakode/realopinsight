@@ -1,8 +1,5 @@
 #include "LsHelper.hpp"
 #include "utilsClient.hpp"
-
-#include "QsLog.h"
-#include "QsLogDest.h"
 #include <QDir>
 #include <iostream>
 #include "client/utilsClient.hpp"
@@ -12,7 +9,6 @@ LsHelper::LsHelper(const QString& host, const int& port)
 {
   setSocketOption(QAbstractSocket::KeepAliveOption, 1);
   setRequestPatterns();
-  SETUP_LOGGING(); //FIXME: logging
 }
 
 LsHelper::~LsHelper()

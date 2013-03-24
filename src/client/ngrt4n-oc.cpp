@@ -47,7 +47,13 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
   QString cmdName = basename(argv[0]);
-  QString versionMsg = APP_INFO.arg(QObject::tr("Operations Console"));
+  QString versionMsg = APP_INFO.arg(APP_NAME,
+                                    QObject::tr("Operations Console"),
+                                    PKG_VERSION,
+                                    REL_NAME,
+                                    REL_INFO,
+                                    REL_YEAR,
+                                    PKG_URL);
   bool runConfig = false;
   int opt;
   if ((opt = getopt(argc, argv, "chv")) != -1) {

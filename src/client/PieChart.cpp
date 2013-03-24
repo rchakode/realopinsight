@@ -82,14 +82,14 @@ QString PieChart::update(const CheckStatusCountT & _check_status_count, const qi
                        3.6 * ok_ratio,
                        StatsLegend::COLOR_NORMAL,
                        this);
-  return tr("Normal")%": "%QString::number(ok_count)%
+  return QObject::tr("Normal: ")%QString::number(ok_count)%
       "/"%QString::number(_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
-      %"\n"%tr("Minor")%": "%QString::number(minor_count)%
+      %"\n"%QObject::tr("Minor: ")%QString::number(minor_count)%
       "/"%QString::number(_count)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"
-      %"\n"%tr("Major")%": "%QString::number(major_count)%
+      %"\n"%QObject::tr("Major: ")%QString::number(major_count)%
       "/"%QString::number(_count)%" ("%QString::number(major_ratio, 'f', 0)%"%)"
-      %"\n"%tr("Critical")%": "%QString::number(critical_count)%"/"
+      %"\n"%QObject::tr("Critical: ")%QString::number(critical_count)%"/"
       %QString::number(_count)%" ("%QString::number(critical_ratio, 'f', 0) %"%)"
-      %"\n"%tr("Unknown")%": "%QString::number(unknown_count)%
+      %"\n"%QObject::tr("Unknown: ")%QString::number(unknown_count)%
       "/"%QString::number(_count)%" ("%QString::number(unknown_ratio, 'f', 0)%"%)";
 }

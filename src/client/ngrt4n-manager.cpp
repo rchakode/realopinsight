@@ -54,7 +54,13 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(Preferences::style());
   QString cmdName = basename(argv[0]);
-  QString versionMsg = APP_INFO.arg("");
+  QString versionMsg = APP_INFO.arg(APP_NAME,
+                                    "",
+                                    PKG_VERSION,
+                                    REL_NAME,
+                                    REL_INFO,
+                                    REL_YEAR,
+                                    PKG_URL);
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;

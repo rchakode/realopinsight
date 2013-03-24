@@ -45,7 +45,13 @@ int main(int argc, char **argv)
   app->setStyleSheet(Preferences::style());
 
   QString cmdName= basename(argv[0]);
-  QString versionMsg = APP_INFO.arg(QObject::tr("Editor"));
+  QString versionMsg = APP_INFO.arg(APP_NAME,
+                                     QObject::tr("Editor"),
+                                     PKG_VERSION,
+                                     REL_NAME,
+                                     REL_INFO,
+                                     REL_YEAR,
+                                     PKG_URL);
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
   if ((opt = getopt(argc, argv, "hv")) != -1) {

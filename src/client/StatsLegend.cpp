@@ -42,15 +42,15 @@ StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
   qint32 char_w = font_metrics.charWidth("c", 0);
 
   normal.addRect(x_top_corner, y_top_corner, 10, 10);
-  normal.addText(x_label, y_top_corner + 10, font, tr("normal"));
+  normal.addText(x_label, y_top_corner + 10, font, QObject::tr("normal"));
   minor.addRect(x_top_corner, y_top_corner + 15 , 10, 10);
-  minor.addText(x_label, y_top_corner + 25, font, tr("minor"));
+  minor.addText(x_label, y_top_corner + 25, font, QObject::tr("minor"));
   major.addRect(x_top_corner, y_top_corner + 30 , 10, 10);
-  major.addText(x_label, y_top_corner + 40, font, tr("major"));
+  major.addText(x_label, y_top_corner + 40, font, QObject::tr("major"));
   critical.addRect(x_top_corner, y_top_corner + 45, 10, 10);
-  critical.addText(x_label, y_top_corner + 55, font, tr("critical"));
+  critical.addText(x_label, y_top_corner + 55, font, QObject::tr("critical"));
   unknown.addRect(x_top_corner, y_top_corner + 60, 10, 10);
-  unknown.addText(x_label, y_top_corner + 70, font, tr("unknown"));
+  unknown.addText(x_label, y_top_corner + 70, font, QObject::tr("unknown"));
 
   resize(x_label + 10 * char_w, y_top_corner + 80);
   setStyleSheet("background:transparent");
