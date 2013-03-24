@@ -111,25 +111,27 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
                                 QString& _graphContent)
 {
   _graphContent = "\n";
-  for (auto node : _bpnodes) {
-      QString nname = node.name;
-      _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
-      if (node.child_nodes != "") {
-          QStringList nodeIds = node.child_nodes.split(CHILD_SEP);
-          for (auto nodeId : nodeIds) {
-              QString nidTrimmed = nodeId.trimmed();
+  for (NodeListT::ConstIterator node = _bpnodes.begin();
+       node != _bpnodes.end(); node++) {
+      QString nname = node->name;
+      _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+      if (node->child_nodes != "") {
+          QStringList ids = node->child_nodes.split(CHILD_SEP);
+          foreach (const QString& nid, ids) {
+              QString nidTrimmed = nid.trimmed();
               auto childNode = _cnodes.find(nidTrimmed);
               if (utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
-                  childNode->parent = node.id;
-                  _graphContent += "\t" + node.id%"--"%childNode->id%"\n";
+                  childNode->parent = node->id;
+                  _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
                 }
             }
         }
     }
 
-  for (auto node : _cnodes) {
-      QString nname = node.name;
-      _graphContent = "\t"%node.id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+  for (NodeListT::ConstIterator node = _cnodes.begin();
+       node != _cnodes.end(); node++) {
+      QString nname = node->name;
+      _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     }
 }
 
@@ -137,17 +139,21 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
                            const NodeListT& _cnodes,
                            TreeNodeItemListT& _tree)
 {
-  for (auto node : _bpnodes) _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
-  for (auto node : _cnodes) _tree.insert(node.id, SvNavigatorTree::createTreeItem(node));
-  for (auto node : _bpnodes) {
-      if (node.child_nodes.isEmpty()) continue;
-      for (auto childId : node.child_nodes.split(Parser::CHILD_SEP)) {
-          auto treeItem = _tree.find(node.id);
-          if (treeItem == _tree.end()) {
-              utils::alert(QObject::tr("Service not found %1").arg(node.name));
-              continue;
-            }
-          auto child = _tree.find(childId);
+  for (NodeListT::ConstIterator node = _bpnodes.begin();
+       node != _bpnodes.end(); node++) _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
+  for (NodeListT::ConstIterator node = _cnodes.begin();
+       node != _cnodes.end(); node++) _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
+  for (NodeListT::ConstIterator node = _bpnodes.begin();
+       node != _bpnodes.end(); node++) {
+      if (node->child_nodes.isEmpty()) continue;
+      auto treeItem = _tree.find(node->id);
+      if (treeItem == _tree.end()) {
+          utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
+          continue;
+        }
+      QStringList ids = node->child_nodes.split(CHILD_SEP);
+      foreach (const QString& id, ids) {
+          auto child = _tree.find(id);
           if (child != _tree.end())
             (*treeItem)->addChild(*child);
         }

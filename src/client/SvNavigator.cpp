@@ -338,15 +338,16 @@ int SvNavigator::runNagiosMonitor(void)
       updateStatusBar(msg);
     }
 
-  for (auto& cnode : mcoreData->cnodes) {
-      if (cnode.child_nodes == "") {
-          cnode.severity = MonitorBroker::Unknown;
-          mcoreData->check_status_count[cnode.severity]++;
+  for (NodeListIteratorT cnode = mcoreData->cnodes.begin();
+       cnode != mcoreData->cnodes.end(); cnode++) {
+      if (cnode->child_nodes == "") {
+          cnode->severity = MonitorBroker::Unknown;
+          mcoreData->check_status_count[cnode->severity]++;
           continue;
         }
 
-      QStringList checks = cnode.child_nodes.split(Parser::CHILD_SEP);
-      for(auto cid : checks) {
+      QStringList ids = cnode->child_nodes.split(Parser::CHILD_SEP);
+      foreach (const QString& cid, ids) {
           QString msg = mserverAuthChain%":"%cid;
           if (mupdateSucceed) {
               socket->send(msg.toStdString());
@@ -356,22 +357,22 @@ int SvNavigator::runNagiosMonitor(void)
             }
           JsonHelper jsHelper(msg.toStdString());
           if (!jsHelper.getProperty("return_code").toInt32() && socket->isConnected2Server()) {
-              cnode.check.status = jsHelper.getProperty("status").toInt32();
-              cnode.check.host = jsHelper.getProperty("host").toString().toStdString();
-              cnode.check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
-              cnode.check.check_command = jsHelper.getProperty("command").toString().toStdString();
-              cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+              cnode->check.status = jsHelper.getProperty("status").toInt32();
+              cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
+              cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
+              cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
+              cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-              cnode.check.status = MonitorBroker::NagiosUnknown;
-              cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-              cnode.check.host = "-";
-              cnode.check.check_command = "-";
-              cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+              cnode->check.status = MonitorBroker::NagiosUnknown;
+              cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
+              cnode->check.host = "-";
+              cnode->check.check_command = "-";
+              cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
-          cnode.monitored = true;
+          cnode->monitored = true;
           computeStatusInfo(cnode);
           updateDashboard(cnode);
-          mcoreData->check_status_count[cnode.severity]++;
+          mcoreData->check_status_count[cnode->severity]++;
         }
     }
   socket.reset(NULL);
@@ -488,13 +489,14 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 
 void SvNavigator::updateCNodes(const CheckT& check)
 {
-  for (auto& cnode : mcoreData->cnodes) {
-      if (cnode.child_nodes.toLower() == QString::fromStdString(check.id).toLower()) {
-          cnode.check = check;
+  for (NodeListIteratorT cnode = mcoreData->cnodes.begin();
+       cnode != mcoreData->cnodes.end(); cnode++) {
+      if (cnode->child_nodes.toLower() == QString::fromStdString(check.id).toLower()) {
+          cnode->check = check;
           computeStatusInfo(cnode);
-          mcoreData->check_status_count[cnode.severity]++;
+          mcoreData->check_status_count[cnode->severity]++;
           updateDashboard(cnode);
-          cnode.monitored = true;
+          cnode->monitored = true;
         }
     }
 }
@@ -512,18 +514,19 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DefaultUpdateInterval);
       mtimer = startTimer(mupdateInterval);
       if (mupdateSucceed) updateStatusBar(tr("Update completed"));
-      for (auto& cnode : mcoreData->cnodes) {
-          if (!cnode.monitored) {
-              cnode.check.status = MonitorBroker::Unknown;
-              cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-              cnode.check.host = "-";
-              cnode.check.alarm_msg = tr("Unknown service (%1)").arg(cnode.child_nodes).toStdString();
+      for (NodeListIteratorT cnode = mcoreData->cnodes.begin(), end = mcoreData->cnodes.end();
+           cnode != end; cnode++) {
+          if (!cnode->monitored) {
+              cnode->check.status = MonitorBroker::Unknown;
+              cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
+              cnode->check.host = "-";
+              cnode->check.alarm_msg = tr("Unknown service (%1)").arg(cnode->child_nodes).toStdString();
               computeStatusInfo(cnode);
-              mcoreData->check_status_count[cnode.severity]++;
+              mcoreData->check_status_count[cnode->severity]++;
               updateDashboard(cnode);
-              cnode.monitored = true;
+              cnode->monitored = true;
             }
-          cnode.monitored = false;
+          cnode->monitored = false;
         }
     }
   //FIXME: Do this while avoiding searching at each update
@@ -581,7 +584,7 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   Criticity criticity;
-  for (auto nodeId : nodeIds) {
+  foreach (const QString& nodeId, nodeIds) {
       NodeListT::iterator child;
       if (!utils::findNode(mcoreData, nodeId, child)) continue;
       Criticity cst(static_cast<MonitorBroker::SeverityT>(child->prop_sev));
@@ -636,7 +639,7 @@ void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const 
   if (node == mcoreData->bpnodes.end()) return;
   if (node->child_nodes != "") {
       QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
-      for (auto cid : childNodes) {
+      foreach (const auto& cid, childNodes) {
           mmap->setNodeVisible(cid, _nodeId, _expand, _level);
         }
     }
@@ -674,7 +677,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
           mfilteredMsgConsole->updateNodeMsg(node);
         } else {
           QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
-          for (auto chkid : childIds) {
+          foreach (const QString& chkid, childIds) {
               filterNodeRelatedMsg(chkid);
             }
         }
@@ -987,7 +990,7 @@ void SvNavigator::postRpcDataRequest(void) {
   switch(mcoreData->monitor) {
     case MonitorBroker::Zabbix: {
         int trid = mzbxHelper->getTrid();
-        for (auto host : mcoreData->hosts.keys()) {
+        foreach (const QString& host, mcoreData->hosts.keys()) {
             QStringList params;
             params.push_back(mzbxAuthToken);
             params.push_back(host);
@@ -998,7 +1001,7 @@ void SvNavigator::postRpcDataRequest(void) {
       }
     case MonitorBroker::Zenoss:
       mznsHelper->setRouter(ZnsHelper::Device);
-      for (auto host : mcoreData->hosts.keys()) {
+      foreach (const QString& host, mcoreData->hosts.keys()) {
           mznsHelper->postRequest(ZnsHelper::Device,
                                   ZnsHelper::ReQPatterns[ZnsHelper::Device]
                                   .arg(host, QString::number(ZnsHelper::Device))
@@ -1043,13 +1046,14 @@ void SvNavigator::updateDashboardOnUnknown()
       utils::alert(mlastErrorMsg);
       updateStatusBar(mlastErrorMsg);
     }
-  for (auto& cnode : mcoreData->cnodes) {
-      cnode.monitored = true;
-      cnode.check.status = MonitorBroker::Unknown;
-      cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
-      cnode.check.host = "-";
-      cnode.check.check_command = "-";
-      cnode.check.alarm_msg = mlastErrorMsg.toStdString();
+  for (NodeListIteratorT cnode = mcoreData->cnodes.begin();
+       cnode != mcoreData->cnodes.end(); cnode++) {
+      cnode->monitored = true;
+      cnode->check.status = MonitorBroker::Unknown;
+      cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
+      cnode->check.host = "-";
+      cnode->check.check_command = "-";
+      cnode->check.alarm_msg = mlastErrorMsg.toStdString();
       computeStatusInfo(cnode);
       updateDashboard(cnode);
     }
