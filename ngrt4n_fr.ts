@@ -134,9 +134,19 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation type="unfinished">&amp;Fermer</translation>
     </message>
     <message>
+        <location filename="src/client/Preferences.cpp" line="68"/>
+        <source>&amp;Apply settings</source>
+        <translation type="unfinished">&amp;Appliquer les changements</translation>
+    </message>
+    <message>
+        <location filename="src/client/Preferences.cpp" line="69"/>
+        <source>C&amp;hange password</source>
+        <translation type="unfinished">C&amp;hanger mot de passe</translation>
+    </message>
+    <message>
         <location filename="src/client/Preferences.cpp" line="71"/>
         <source>&amp;Show in clear</source>
-        <translation type="unfinished">&amp;Afficher en clair</translation>
+        <translation type="unfinished">Afficher en &amp;clair</translation>
     </message>
     <message>
         <location filename="src/client/Preferences.cpp" line="72"/>
@@ -157,7 +167,7 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <location filename="src/client/Preferences.cpp" line="111"/>
         <source>Change Password | %1</source>
         <oldsource>Change Password| %1</oldsource>
-        <translation type="unfinished">Changer de mot de passe | %1</translation>
+        <translation type="unfinished">Changer mot de passe | %1</translation>
     </message>
     <message>
         <location filename="src/client/Preferences.cpp" line="113"/>
@@ -808,7 +818,7 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="139"/>
         <source>&amp;Save Map as Image</source>
-        <translation type="unfinished">Enregi&amp;strer la carte comme une image</translation>
+        <translation type="unfinished">Enregi&amp;strer la cartographie sous forme d&apos;image</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="141"/>
@@ -823,12 +833,12 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="146"/>
         <source>Map Zoom &amp;In</source>
-        <translation type="unfinished">Zoomer &amp;avant la carte</translation>
+        <translation type="unfinished">Zoom &amp;avant sur la cartographie</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="147"/>
         <source>Map Zoom &amp;Out</source>
-        <translation type="unfinished">Zoomer en a&amp;rrière la carte</translation>
+        <translation type="unfinished">Zoom a&amp;rrière sur la cartographie</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="148"/>
@@ -918,7 +928,7 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="241"/>
         <source>%1 Operations Console - %2</source>
-        <translation type="unfinished">%1 Console des opérations- %2</translation>
+        <translation type="unfinished">Console des opérations %1 - %2</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="330"/>

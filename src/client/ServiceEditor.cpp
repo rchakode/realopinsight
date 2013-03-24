@@ -242,14 +242,14 @@ void ServiceEditor::loadStatusHandlingFields(void)
 {
   StringMapT crules = SvNavigator::calcRules();
   QString defaultRule = CalcRules::label(CalcRules::HighCriticity);
-  statusCalcRuleField()->addItem(tr("Calculation rule (Default is")%" "%defaultRule+")", CalcRules::HighCriticity);
+  statusCalcRuleField()->addItem(tr("Calculation rule (Default is %1)").arg(defaultRule), CalcRules::HighCriticity);
 
   foreach(const QString& rule, crules.keys()) {
       statusCalcRuleField()->addItem(rule, crules.value(rule));
     }
   StringMapT prules = SvNavigator::propRules();
   defaultRule = PropRules::label(PropRules::Unchanged);
-  statusPropRuleField()->addItem(tr("Propagation rule (Default is")%" "%defaultRule+")", PropRules::Unchanged);
+  statusPropRuleField()->addItem(tr("Propagation rule (Default is %1)").arg(defaultRule), PropRules::Unchanged);
   foreach(const QString& rule, prules.keys()) {
       statusPropRuleField()->addItem(rule, prules.value(rule));
     }
@@ -304,7 +304,7 @@ void ServiceEditor::loadCheckField(void)
                       "\n    E.g. Zabbix server/Zabbix http poller processes more than 75% busy"
                       "\n * For Zenoss it follows the patterns 'device_name/component_name' or just 'device_name'"
                       "\n    E.g. localhost/httpd, localhost"
-                      "\n    NOTE: When only device_name is set, the data point is associated to ping status."
+                      "\n    When only device_name is set, the data point is associated to ping status."
                       "\nSee the online documentation for further details."
                       ));
 }

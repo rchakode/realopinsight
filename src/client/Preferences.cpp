@@ -65,8 +65,8 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     msockPortField(new QLineEdit()),
     mserverPassField(new QLineEdit()),
     mcancelBtn(new QPushButton(tr("&Close"))),
-    mapplySettingBtn(new QPushButton("&Apply settings")),
-    mchangePwdBtn(new QPushButton("C&hange password")),
+    mapplySettingBtn(new QPushButton(tr("&Apply settings"))),
+    mchangePwdBtn(new QPushButton(tr("C&hange password"))),
     mdonateBtn(new ImageButton(":images/built-in/donate.png")),
     mshowAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     museMklsChkbx(new QCheckBox(tr("Use &Livestatus"))),
@@ -108,7 +108,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
 
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
-      setWindowTitle(tr("Change Password| %1").arg(APP_NAME));
+      setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
       line++,
           mmainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
           mmainLayout->addWidget(moldPwdField, line, 1, 1, 2);
@@ -269,7 +269,7 @@ QGroupBox* Preferences::createCommonGrp(void)
   QGridLayout* lyt(new QGridLayout());
   int line;
   line = 0,
-      lyt->addWidget(new QLabel(tr("Web Interface*")), line, 0),
+      lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
       lyt->addWidget(monitorUrlField, line, 1, 1, 2);
   line++,
       lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
@@ -278,7 +278,7 @@ QGroupBox* Preferences::createCommonGrp(void)
   line++,
       lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
       lyt->addWidget(mupdateIntervalField, line, 1),
-      lyt->addWidget(new QLabel("seconds"), line, 2);
+      lyt->addWidget(new QLabel(tr("seconds")), line, 2);
   lyt->setColumnStretch(0, 0);
   lyt->setColumnStretch(1, 1);
   bx->setFlat(false);

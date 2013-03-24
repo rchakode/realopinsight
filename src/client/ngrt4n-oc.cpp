@@ -82,7 +82,7 @@ int main(int argc, char **argv)
       change_passwd->exec();
       exit(0);
     }
-  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("%1\n\nLoading...")).arg(versionMsg));
+  QSplashScreen* info = utils::infoScreen(QString(QObject::tr("%1\n\nLoading...")).arg(versionMsg));
   utils::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
   if (file.isEmpty()) {

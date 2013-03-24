@@ -61,11 +61,12 @@ const QString REL_YEAR = RELEASE_YEAR;
 const QString ID_PATTERN("%1/%2");
 const QString APP_INFO = QObject::tr("                  > %1 %6 %2 (codename: %3)"
                                      "\n                  >> Realease ID: %4"
-                                     "\n                  >> Copyright (C) 2010 NGRT4N Project. All rights reserved"
-                                     "\n                  >> For bug reporting instructions, see: <%5>").arg(APP_NAME,
+                                     "\n                  >> Copyright (C) 2010 - %5 NGRT4N Project. All rights reserved"
+                                     "\n                  >> For bug reporting instructions, see: <%6>").arg(APP_NAME,
                                                                                                              PKG_VERSION,
                                                                                                              REL_NAME,
                                                                                                              REL_INFO,
+                                                                                                             REL_YEAR,
                                                                                                              PKG_URL);
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem*> CheckItemList;

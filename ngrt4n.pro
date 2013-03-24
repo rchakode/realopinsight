@@ -107,8 +107,8 @@ DISTFILES += README \
     src/client/ngrt4n-*.cpp \
     doc/man/*.gz
 
-TRANSLATIONS += ngrt4n_en.ts \
-                ngrt4n_fr.ts
+TRANSLATIONS += ngrt4n_fr.ts \
+                ngrt4n_fr.qm
 
 CODECFORTR = UTF-8
 

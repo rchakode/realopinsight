@@ -543,16 +543,16 @@ void SvCreator::loadMenu(void)
       msubMenus["Quit"] = mmenuList["FILE"]->addAction(tr("&Quit")),
       msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
   mmenuList["EDITION"] = mmenuBar->addMenu(tr("&Edition"));
-  msubMenus["NewNode"] = mmenuList["EDITION"]->addAction("&Add service"),
+  msubMenus["NewNode"] = mmenuList["EDITION"]->addAction(tr("&Add sub service")),
       mnodeContextMenu->addAction(msubMenus["NewNode"]),
       msubMenus["NewNode"]->setShortcut(QKeySequence::AddTab);
-  msubMenus["CopySelected"] = mmenuList["EDITION"]->addAction("&Copy"),
+  msubMenus["CopySelected"] = mmenuList["EDITION"]->addAction(tr("&Copy")),
       mnodeContextMenu->addAction(msubMenus["CopySelected"]),
       msubMenus["CopySelected"]->setShortcut(QKeySequence::Copy);
-  msubMenus["PasteFromSelected"] = mmenuList["EDITION"]->addAction("&Paste"),
+  msubMenus["PasteFromSelected"] = mmenuList["EDITION"]->addAction(tr("&Paste")),
       mnodeContextMenu->addAction(msubMenus["PasteFromSelected"]),
       msubMenus["PasteFromSelected"]->setShortcut(QKeySequence::Paste);
-  msubMenus["DeleteNode"] = mmenuList["EDITION"]->addAction("&Delete"),
+  msubMenus["DeleteNode"] = mmenuList["EDITION"]->addAction(tr("&Delete")),
       msubMenus["DeleteNode"]->setShortcut(QKeySequence::Delete),
       mnodeContextMenu->addAction(msubMenus["DeleteNode"]);
   mmenuList["HELP"] = mmenuBar->addMenu(tr("&Help"));
