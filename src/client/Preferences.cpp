@@ -45,11 +45,6 @@ const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
-const QString ABOUT_PATTERN = QObject::tr("\n%1 %2 (codename: %3)\n"
-                                         "\nRelease ID: %4\n"
-                                         "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
-                                         "\nVisit %6 for more information\n"
-                                         "\nReport Bugs: bugs@ngrt4n.com\n");
 
 Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
   : QDialog(),
@@ -129,12 +124,11 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
 
     case Preferences::ShowAbout:
       setWindowTitle(tr("About %1").arg(APP_NAME));
-      QString about = ABOUT_PATTERN.arg(APP_NAME)
-          .arg(PKG_VERSION)
-          .arg(RELEASE_NAME)
-          .arg(REL_INFO)
-          .arg(REL_YEAR)
-          .arg(PKG_URL);
+      QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
+                                  "\nRelease ID: %4\n"
+                                  "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
+                                  "\nVisit %6 for more information\n"
+                                  "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
 
       line++,
           mmainLayout->addWidget(new QLabel(about), line, 0, 1, 2);

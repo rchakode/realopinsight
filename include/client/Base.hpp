@@ -46,7 +46,8 @@
 #define INIT_TRANSLATION \
   QTranslator translator; \
   translator.load(QString("ngrt4n_%1").arg(QLocale::system().name())); \
-  app->installTranslator(&translator);
+  app->installTranslator(&translator); \
+  QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
 
 const QString PROJECT = "NGRT4N";
 const QString USER_BN = BUILTIN_USER_PREFIX;
@@ -59,10 +60,6 @@ const QString REL_INFO = RELEASE_INFO;
 const QString REL_NAME = RELEASE_NAME;
 const QString REL_YEAR = RELEASE_YEAR;
 const QString ID_PATTERN("%1/%2");
-const QString APP_INFO = QObject::tr("                  > %1 %2 %3 (codename: %4)"
-                                     "\n                  >> Realease ID: %5"
-                                     "\n                  >> Copyright (C) 2010 - %6 NGRT4N Project. All rights reserved"
-                                     "\n                  >> For bug reporting instructions, see: <%7>");
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem*> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;

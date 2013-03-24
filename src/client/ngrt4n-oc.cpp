@@ -42,18 +42,12 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
-  INIT_TRANSLATION
+  INIT_TRANSLATION;
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
   QString cmdName = basename(argv[0]);
-  QString versionMsg = APP_INFO.arg(APP_NAME,
-                                    QObject::tr("Operations Console"),
-                                    PKG_VERSION,
-                                    REL_NAME,
-                                    REL_INFO,
-                                    REL_YEAR,
-                                    PKG_URL);
+  QString versionMsg = utils::getWelcomeMsg(QObject::tr("Operations Console"));
   bool runConfig = false;
   int opt;
   if ((opt = getopt(argc, argv, "chv")) != -1) {
@@ -75,8 +69,7 @@ int main(int argc, char **argv)
           break;
         }
     }
-  std::clog<<versionMsg.toStdString()
-     <<"\nLoading...\n";
+  std::clog<<versionMsg.toStdString()<<"\n";
   Auth authentication;
   int userRole = authentication.exec();
   if ( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);

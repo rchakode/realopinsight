@@ -225,3 +225,17 @@ QSplashScreen* utils::infoScreen(const QString & msg) {
   screen->show();
   return  screen;
 }
+
+QString utils::getWelcomeMsg(const QString& utility)
+{
+  return QObject::tr("                  > %1 %2 %3 (codename: %4)"
+                     "\n                  >> Realease ID: %5"
+                     "\n                  >> Copyright (C) 2010 - %6 NGRT4N Project. All rights reserved"
+                     "\n                  >> For bug reporting instructions, see: <%7>").arg(APP_NAME,
+                                                                                             utility,
+                                                                                             PKG_VERSION,
+                                                                                             REL_NAME,
+                                                                                             REL_INFO,
+                                                                                             REL_YEAR,
+                                                                                             PKG_URL);
+}

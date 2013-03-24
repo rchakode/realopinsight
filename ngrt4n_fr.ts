@@ -389,7 +389,7 @@ Report Bugs: bugs@ngrt4n.com
 Numéro de série : %4
 
 Copyright (c) 2010-%5 Projet NGRT4N. Tous droits réservés
-Visiter le site web %6 pour plus de détails
+Visiter notre site web %6 pour plus d&apos;informations
 
 Reporter des bugs : bugs@ngrt4n.com</translation>
     </message>
