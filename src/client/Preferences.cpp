@@ -29,6 +29,8 @@
 #include "Base.hpp"
 #include "utilsClient.hpp"
 #include <QWebView>
+#include <QIntValidator>
+#include <QRegExpValidator>
 
 const qint32 Preferences::ChangePassword = 0;
 const qint32 Preferences::ForceChangePassword = 1;
@@ -72,6 +74,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
   mpwdField->setEchoMode(QLineEdit::Password);
   mrePwdField->setEchoMode(QLineEdit::Password);
   mserverPassField->setEchoMode(QLineEdit::Password);
+  msockPortField->setValidator(new QIntValidator(1, 65535, msockPortField));
   switch (_action)
     {
     case Preferences::ChangeMonitoringSettings:
@@ -100,7 +103,6 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
           museMklsChkbx->setEnabled(false);
         }
       break;
-
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
       setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
@@ -121,7 +123,6 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
           mcancelBtn->setEnabled(false);
         }
       break;
-
     case Preferences::ShowAbout:
       setWindowTitle(tr("About %1").arg(APP_NAME));
       QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
@@ -137,7 +138,6 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
           mmainLayout->addWidget(mcancelBtn, line, 1, 1, 1, Qt::AlignRight);
       break;
     }
-
   setContent();
   addEvents();
 }
