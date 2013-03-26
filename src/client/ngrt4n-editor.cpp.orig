@@ -23,17 +23,15 @@
 
 #include "core/ns.hpp"
 #include "client/Auth.hpp"
-#include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
-#include "client/utilsClient.hpp"
 #include <sstream>
 #include <getopt.h>
-#include <QObject>
+#include "Base.hpp"
+#include <memory>
+#include "client/utilsClient.hpp"
 
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "Options: \n"
-    "	-c\n"
-    "	   Launch the configuration utility\n"
     "	-v\n"
     "	  Print the version and license information.\n"
     "	-h \n"
@@ -42,67 +40,45 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
-  INIT_TRANSLATION;
-  app->setWindowIcon(QIcon (":images/built-in/icon.png"));
+  app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
-  QString cmdName = basename(argv[0]);
-  QString versionMsg = utils::getWelcomeMsg(QObject::tr("Operations Console"));
-  bool runConfig = false;
+
+<<<<<<< HEAD
+  QString cmdName= basename(argv[0]);
+  QString versionMsg = APP_INFO.arg(QObject::tr("Editor"));
+=======
+  QString cmdName= utils::basename(argv[0]);
+  ostringstream versionMsg(QObject::tr("> %1 Editor %2 (codename: %3)").arg(APP_NAME).arg(PKG_VERSION).arg(RELEASE_NAME).toStdString()
+                           +QObject::tr("\n>> Realease ID: %1").arg(REL_INFO).toStdString()
+                           +QObject::tr("\n>> Copyright (C) 2010 NGRT4N Project. All rights reserved").toStdString()
+                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PKG_URL).toStdString());
+
+>>>>>>> port to windows and cleaning of old files
+  QString file = (argc >= 2)? argv[1] : "";
   int opt;
-  if ((opt = getopt(argc, argv, "chv")) != -1) {
+  if ((opt = getopt(argc, argv, "hv")) != -1) {
       switch (opt) {
-        case 'c':
-          runConfig = true;
-          break;
         case 'v':
-          cout<<versionMsg.toStdString()<<"\n";
+          cout << versionMsg.toStdString() << endl;
           exit(0);
           break;
         case 'h':
-          cout<<usage.arg(cmdName).toStdString();
+          cout << usage.arg(cmdName).toStdString();
           exit(0);
           break;
         default:
-          cout<<usage.arg(cmdName).toStdString();
-          exit(1);
+          cout << usage.arg(cmdName).toStdString();
+          exit (1);
           break;
         }
     }
-  std::clog<<versionMsg.toStdString()<<"\n";
+  std::clog <<versionMsg.toStdString() <<"\n                  Loading...\n";
   Auth authentication;
   int userRole = authentication.exec();
-  if ( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
-
-  if (runConfig) {
-      Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-      Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
-      update_settings->exec();
-      change_passwd->exec();
-      exit(0);
-    }
-  QSplashScreen* info = utils::infoScreen(versionMsg);
-  utils::delay(2);
-  QString file = (argc >= 2)? argv[1] : "";
-  if (file.isEmpty()) {
-      info->clearMessage();
-      info->showMessage(QObject::tr("You need to select a configuration file!"),
-                        Qt::AlignCenter|Qt::AlignCenter);
-      utils::delay(1); info->finish(0);
-      file = QFileDialog::getOpenFileName(0,
-                                          QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
-                                          ".",
-                                          QObject::tr("Xml files (*.xml);;All files (*)"));
-
-      if (!file.length()) {
-          utils::alert(QObject::tr("No configuration file selected, the program will exit!"));
-          exit(1);
-        }
-    }
-  info->finish(0);
-  SvNavigator *console= new SvNavigator(userRole);
-  console->load(file);
-  console->startMonitor();
-
+  if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
+  SvCreator* svc = new SvCreator(userRole);
+  svc->load(file);
   return app->exec();
 }

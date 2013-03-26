@@ -49,12 +49,20 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
-  INIT_TRANSLATION;
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(Preferences::style());
-  QString cmdName = basename(argv[0]);
-  QString versionMsg = utils::getWelcomeMsg("");
+
+  QString cmdName = utils::basename(argv[0]);
+<<<<<<< HEAD
+  QString versionMsg = APP_INFO.arg("");
+=======
+  ostringstream versionMsg(QObject::tr("\n> %1 %2 (codename: %3)").arg(APP_NAME).arg(PKG_VERSION).arg(REL_NAME).toStdString()
+                           +QObject::tr("\n>> Realease ID: %1").arg(REL_INFO).toStdString()
+                           +QObject::tr("\n>> Copyright (C) 2010 NGRT4N Project. All rights reserved").toStdString()
+                           +QObject::tr("\n>> License GNU GPLv3 or later <http://gnu.org/licenses/gpl.html>").toStdString()
+                           +QObject::tr("\n>> For bug reporting instructions, see: <%1>").arg(PKG_URL).toStdString());
+>>>>>>> fixed compilation
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
@@ -84,12 +92,13 @@ int main(int argc, char **argv)
           break;
         }
     }
-  std::clog << versionMsg.toStdString()<<"\n";
+  std::clog << versionMsg.toStdString()
+            <<"\n                  Loading...\n";
   Auth authentication;
   int userRole = authentication.exec();
   if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
   if (module == "dashboard") {
-      QSplashScreen* info = utils::infoScreen(versionMsg);
+      QSplashScreen* info = Preferences::infoScreen(QObject::tr("%1\n                  Loading...").arg(versionMsg));
       utils::delay(1);
       if (file == "") {
           info->clearMessage();

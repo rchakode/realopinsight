@@ -223,7 +223,7 @@ QSplashScreen* utils::infoScreen(const QString & msg) {
   QSplashScreen* screen = new QSplashScreen(QPixmap(":images/built-in/loading-screen.png"));
   screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
   screen->show();
-  return  screen;
+  return screen;
 }
 
 QString utils::getWelcomeMsg(const QString& utility)
