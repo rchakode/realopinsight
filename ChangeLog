@@ -9,6 +9,7 @@ RealOpInsight ChangeLog
   * Added support for copy/paste as well as more menu shortcuts within the editor
   * Added new icons
   * Added french translation
+  * added validator for the Port field
   * Changes: the id of data points are now not case sensitive
   
 2.2.1 (Lucia, p1)
