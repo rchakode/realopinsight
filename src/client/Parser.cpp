@@ -28,6 +28,9 @@
 #include "SvNavigatorTree.hpp"
 #include "utilsClient.hpp"
 #include <QObject>
+
+using namespace std;
+
 const QString Parser::CHILD_SEP = ",";
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
@@ -162,7 +165,7 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
        node!=end; ++node)
   {
     if (node->child_nodes.isEmpty()) continue;
-          auto treeItem = _tree.find(node->id);
+      auto treeItem = _tree.find(node->id);
     if (treeItem == _tree.end()) {
       utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
       continue;

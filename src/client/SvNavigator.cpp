@@ -1,5 +1,5 @@
 /*
-* SvNavigator.cpp
+ * SvNavigator.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 24-05-2012                                                  #
@@ -20,7 +20,7 @@
 # You should have received a copy of the GNU General Public License        #
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
-*/
+ */
 
 
 #include "SvNavigator.hpp"
@@ -336,7 +336,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
-      cnode->severity = MonitorBroker::Unknown;
+          cnode->severity = MonitorBroker::Unknown;
       m_cdata->check_status_count[cnode->severity]+=1;
       continue;
     }
