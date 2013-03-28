@@ -326,7 +326,7 @@ int SvNavigator::runNagiosMonitor(void)
   if(socket->connect())
     socket->makeHandShake();
   if (socket->isConnected2Server()) {
-      if (socket->getServerSerial() < 111) {
+      if (socket->getServerSerial() < 110) {
           utils::alert(tr("The server serial %1 is not supported").arg(socket->getServerSerial()));
           mupdateSucceed = false;
         }
