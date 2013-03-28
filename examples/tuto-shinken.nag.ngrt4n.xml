@@ -1,0 +1,50 @@
+<ServiceView compat="2.0" monitor="0">
+	<Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
+		<Name>Hosting Platform</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>ngrt4nsrv20130318220302035,ngrt4nsrv20130318220320807</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20130318220320807" type="0" statusCalcRule="0" statusPropRule="-1">
+		<Name>Performance</Name>
+		<Icon>Performance</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>ngrt4nsrv20130518220545216,ngrt4nsrv20130618220624429,ngrt4nsrv20130918220908253</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20130618220624429" type="1" statusCalcRule="0" statusPropRule="-1">
+		<Name>Memory usage</Name>
+		<Icon>Resource Utilization</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>localhost/memory</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20130518220545216" type="1" statusCalcRule="0" statusPropRule="-1">
+		<Name>CPU Load</Name>
+		<Icon>CPU Load</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>localhost/load</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20130318220302035" type="1" statusCalcRule="0" statusPropRule="-1">
+		<Name>Server Availability</Name>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>localhost</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20130918220908253" type="1" statusCalcRule="0" statusPropRule="-1">
+		<Name>Nework Bandwith</Name>
+		<Icon>Network Bandwith</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>localhost/NetworkUsage</SubServices>
+	</Service>
+</ServiceView>
