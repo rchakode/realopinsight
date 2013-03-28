@@ -932,7 +932,7 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="148"/>
         <source>Hide &amp;Chart</source>
-        <translation>Masquer la &amp;charte</translation>
+        <translation>Masquer/afficher la &amp;charte</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="152"/>
@@ -972,17 +972,17 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="164"/>
         <source>Bac&amp;k</source>
-        <translation>Pré&amp;cédent</translation>
+        <translation>&amp;Précédent</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="165"/>
         <source>For&amp;ward</source>
-        <translation>Sui&amp;vant</translation>
+        <translation>&amp;Suivant</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="166"/>
         <source>Sto&amp;p</source>
-        <translation>Ar&amp;rêter</translation>
+        <translation>&amp;Arrêter</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="167"/>
@@ -1002,12 +1002,12 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="172"/>
         <source>&amp;Filter related messages</source>
-        <translation>&amp;Filter les messages relatifs</translation>
+        <translation>&amp;Filtrer les messages associés</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="173"/>
         <source>Center Graph &amp;On</source>
-        <translation>Center la carte sur le &amp;noeud</translation>
+        <translation>&amp;Centrer la carte sur le noeud</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="174"/>
