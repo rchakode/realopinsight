@@ -43,7 +43,7 @@
 const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
 const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
 const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
-const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
+const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 
 StringMapT SvNavigator::propRules() {
@@ -322,6 +322,13 @@ void SvNavigator::toggleIncreaseMsgFont(bool _toggled)
 
 int SvNavigator::runNagiosMonitor(void)
 {
+  CheckT invalidCheck;
+  invalidCheck.status = MonitorBroker::NagiosUnknown;
+  invalidCheck.last_state_change = UNKNOWN_UPDATE_TIME;
+  invalidCheck.host = "-";
+  invalidCheck.check_command = "-";
+  invalidCheck.alarm_msg = "Error occured";
+
   auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(mserverUrl.toStdString(), ZMQ_REQ));
   if(socket->connect())
     socket->makeHandShake();
@@ -333,9 +340,10 @@ int SvNavigator::runNagiosMonitor(void)
       updateStatusBar(tr("Updating..."));
     } else {
       mupdateSucceed = false;
-      QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl, tr("Unknown error"));
-      utils::alert(msg);
-      updateStatusBar(msg);
+      invalidCheck.alarm_msg = socket->getErrorMsg();
+      QString socketError(invalidCheck.alarm_msg.c_str());
+      utils::alert(socketError);
+      updateStatusBar(socketError);
     }
 
   for (NodeListIteratorT cnode = mcoreData->cnodes.begin();
@@ -351,23 +359,14 @@ int SvNavigator::runNagiosMonitor(void)
           QString msg = mserverAuthChain%":"%cid;
           if (mupdateSucceed) {
               socket->send(msg.toStdString());
-              msg = QString::fromStdString(socket->recv());
-            } else {
-              msg = DEFAULT_ERROR_MSG.arg(mserverUrl);
-            }
-          JsonHelper jsHelper(msg.toStdString());
-          if (!jsHelper.getProperty("return_code").toInt32() && socket->isConnected2Server()) {
+              JsonHelper jsHelper(socket->recv());
               cnode->check.status = jsHelper.getProperty("status").toInt32();
               cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
               cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
               cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
               cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-              cnode->check.status = MonitorBroker::NagiosUnknown;
-              cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-              cnode->check.host = "-";
-              cnode->check.check_command = "-";
-              cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+              cnode->check = invalidCheck;
             }
           cnode->monitored = true;
           computeStatusInfo(cnode);

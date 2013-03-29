@@ -104,13 +104,16 @@ std::string ZmqSocket::recv() const{
 #endif
   if (ret < 0) return "";
   char *retBuffer = (char*)zmq_msg_data(&msg);
-  return std::string(retBuffer, zmq_msg_size(&msg));
+  return std::string(retBuffer, ret);
 }
 
 void ZmqSocket::makeHandShake() {
   int retriesLeft = NUM_RETRIES;
+  std::string reply("");
   auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(mserverUri, ZMQ_REQ));
   std::string msg("PING");
+  mconnected2Server = false;
+
   while (retriesLeft) {
       if(!socket->connect()) break;
       socket->send(msg);
@@ -118,7 +121,8 @@ void ZmqSocket::makeHandShake() {
       zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };
       zmq_poll(&items[0], 1, TIMEOUT);
       if (items[0].revents & ZMQ_POLLIN) {
-          std::string reply = socket->recv();
+          reply.clear();
+          reply = socket->recv();
           socket->finalize();
           size_t pos = reply.find(":");
           std::string respType = reply.substr(0, pos);
@@ -129,18 +133,25 @@ void ZmqSocket::makeHandShake() {
                 } else {
                   mserverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
                 }
-              std::cerr  << timeStr << "INFO: Connection etablished; server serial: " << mserverSerial <<"\n";
+              std::ostringstream oss;
+              oss << "Connection etablished; server serial: " << mserverSerial;
+              merrorMsg = oss.str();
+              std::cerr << timeStr << "INFO:" << merrorMsg <<"\n";
               return;
             } else {
-              std::cerr << timeStr << "ERROR: Weird response from the server\n";
+              //FIXME: sometimes this could be due to authentication failed
+              merrorMsg = "Weird response from the server ("+reply+")";
+              std::cerr << timeStr << "ERROR:" << merrorMsg <<"\n";
+              break;
             }
         } else {
-          if (--retriesLeft != 0) {
-              std::cerr << timeStr << "WARNING: No response from server, retrying...\n";
-              socket->reset();
-            } else {
-              std::cerr << timeStr<< "ERROR: Server seems to be offline, abandoning\n";
-            }
+          merrorMsg = "No response from server, retrying...";
+          std::cerr << timeStr << "WARNING:" << merrorMsg <<"\n";
+          socket->reset();
+        }
+      if (--retriesLeft != 0) {
+          merrorMsg = "Server seems to be offline, abandoning";
+          std::cerr << timeStr << "ERROR:" << merrorMsg <<"\n";
         }
     }
 }

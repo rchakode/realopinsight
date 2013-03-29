@@ -2,6 +2,7 @@
 #define ZMQSOCKET_HPP
 
 #include <string>
+#include <sstream>
 
 class ZmqSocket
 {
@@ -21,10 +22,12 @@ public:
   inline bool isConnected2Server() const {return mconnected2Server;}
   inline void* getSocket() const {return msocket;}
   inline int getServerSerial() const {return mserverSerial;}
+  inline std::string getErrorMsg() const {return merrorMsg;}
 
 
 private:
   std::string mserverUri;
+  std::string merrorMsg;
   void *msocket;
   void *mcontext;
   int mtype;
