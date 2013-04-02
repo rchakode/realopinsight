@@ -149,8 +149,8 @@ void ZmqSocket::makeHandShake() {
           std::cerr << timeStr << "WARNING:" << merrorMsg <<"\n";
           socket->reset();
         }
-      if (--retriesLeft != 0) {
-          merrorMsg = "Server seems to be offline, abandoning";
+      if (--retriesLeft == 0) {
+          merrorMsg = "Unable to connect to the service from this address ("+mserverUri+")";
           std::cerr << timeStr << "ERROR:" << merrorMsg <<"\n";
         }
     }

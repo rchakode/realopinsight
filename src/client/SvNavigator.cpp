@@ -410,7 +410,8 @@ int SvNavigator::runLsMonitor(void)
               if (mklsHelper.findCheck(cid, chkit)) {
                   updateCNodes(*chkit);
                 } else {
-                  invalidCheck.alarm_msg = tr("Service not found: %1").arg(cid).toStdString();
+                  invalidCheck.id = cid.toStdString();
+                  invalidCheck.alarm_msg = tr("Service not found (%1)").arg(cid).toStdString();
                   updateCNodes(invalidCheck);
                 }
             }

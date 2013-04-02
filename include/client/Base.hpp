@@ -45,7 +45,7 @@
 
 #define INIT_TRANSLATION \
   QTranslator translator; \
-  translator.load(QString("ngrt4n_%1").arg(QLocale::system().name())); \
+  translator.load(QString(":ngrt4n_%1").arg(QLocale::system().name())); \
   app->installTranslator(&translator); \
   QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
 

@@ -119,108 +119,108 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="src/client/Preferences.cpp" line="60"/>
+        <location filename="src/client/Preferences.cpp" line="57"/>
         <source>&amp;Browse...</source>
         <translation>&amp;Parcourir...</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="67"/>
+        <location filename="src/client/Preferences.cpp" line="64"/>
         <source>&amp;Close</source>
         <translation>&amp;Fermer</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="68"/>
+        <location filename="src/client/Preferences.cpp" line="65"/>
         <source>&amp;Apply settings</source>
         <translation>&amp;Appliquer les changements</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="69"/>
+        <location filename="src/client/Preferences.cpp" line="66"/>
         <source>C&amp;hange password</source>
         <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="71"/>
+        <location filename="src/client/Preferences.cpp" line="68"/>
         <source>&amp;Show in clear</source>
         <translation>Afficher en &amp;clair</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="72"/>
+        <location filename="src/client/Preferences.cpp" line="69"/>
         <source>Use &amp;Livestatus</source>
         <translation>Utiliser &amp;Livestatus</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="83"/>
+        <location filename="src/client/Preferences.cpp" line="81"/>
         <source>Monitoring Settings | %1</source>
         <translation>Paramètres de la console | %1</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="92"/>
+        <location filename="src/client/Preferences.cpp" line="90"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
         <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="111"/>
+        <location filename="src/client/Preferences.cpp" line="108"/>
         <source>Change Password | %1</source>
         <oldsource>Change Password| %1</oldsource>
         <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="113"/>
+        <location filename="src/client/Preferences.cpp" line="110"/>
         <source>Current Password</source>
         <translation>Mot de passe actuel</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="116"/>
+        <location filename="src/client/Preferences.cpp" line="113"/>
         <source>New password</source>
         <translation>Nouveau mot de passe</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="119"/>
+        <location filename="src/client/Preferences.cpp" line="116"/>
         <source>Retype new password</source>
         <translation>Confirmation</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="131"/>
+        <location filename="src/client/Preferences.cpp" line="127"/>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="218"/>
+        <location filename="src/client/Preferences.cpp" line="212"/>
         <source>Password updated</source>
         <translation>Mot de passe mis à jour</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="223"/>
+        <location filename="src/client/Preferences.cpp" line="217"/>
         <source>Sorry the passwords do not match</source>
         <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="226"/>
+        <location filename="src/client/Preferences.cpp" line="220"/>
         <source>Authentication failed</source>
         <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="247"/>
+        <location filename="src/client/Preferences.cpp" line="241"/>
         <source>Livestatus/ngrt4nd Endpoint</source>
         <translation>Point d&apos;accès à Livestatus ou à ngrt4nd</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="249"/>
+        <location filename="src/client/Preferences.cpp" line="243"/>
         <source>Server Address</source>
         <translation>Adresse du serveur</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="251"/>
+        <location filename="src/client/Preferences.cpp" line="245"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="268"/>
+        <location filename="src/client/Preferences.cpp" line="262"/>
         <source>Common Settings</source>
         <translation>Paramètres généraux</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="272"/>
+        <location filename="src/client/Preferences.cpp" line="266"/>
         <source>Monitor Web URL*</source>
         <translation>Adresse web du moniteur*</translation>
     </message>
@@ -229,17 +229,17 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation type="obsolete">Interface Web</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="275"/>
+        <location filename="src/client/Preferences.cpp" line="269"/>
         <source>Auth String</source>
         <translation>Chaine d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="279"/>
+        <location filename="src/client/Preferences.cpp" line="273"/>
         <source>Update Interval</source>
         <translation>Intervalle de mise à jour</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="281"/>
+        <location filename="src/client/Preferences.cpp" line="275"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
@@ -271,7 +271,7 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
                   &gt;&gt; Pour reporter des bugs, voir &lt;%6&gt;</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="62"/>
+        <location filename="src/client/utilsClient.cpp" line="231"/>
         <source>                  &gt; %1 %2 %3 (codename: %4)
                   &gt;&gt; Realease ID: %5
                   &gt;&gt; Copyright (C) 2010 - %6 NGRT4N Project. All rights reserved
@@ -282,38 +282,38 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
                   &gt;&gt; Pour reporter des bugs, consulter les instructions en ligne : &lt;%7&gt;</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="87"/>
-        <location filename="include/client/Base.hpp" line="92"/>
+        <location filename="include/client/Base.hpp" line="84"/>
+        <location filename="include/client/Base.hpp" line="89"/>
         <source>Unchanged</source>
         <translation>Inchangé</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="88"/>
+        <location filename="include/client/Base.hpp" line="85"/>
         <source>Decreased</source>
         <translation>Décrémenté</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="89"/>
+        <location filename="include/client/Base.hpp" line="86"/>
         <source>Increased</source>
         <translation>Incrémenté</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="106"/>
+        <location filename="include/client/Base.hpp" line="103"/>
         <source>Average</source>
         <translation>Moyenne</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="107"/>
+        <location filename="include/client/Base.hpp" line="104"/>
         <source>High Severity</source>
         <translation>Sévérité forte</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="119"/>
+        <location filename="include/client/Base.hpp" line="116"/>
         <source>Native Check</source>
         <translation>Check natif</translation>
     </message>
     <message>
-        <location filename="include/client/Base.hpp" line="121"/>
+        <location filename="include/client/Base.hpp" line="118"/>
         <source>Business Process</source>
         <translation>Processus métier</translation>
     </message>
@@ -372,7 +372,7 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation>Impossible d&apos;écrire dans le fichier %1</translation>
     </message>
     <message>
-        <location filename="src/client/Preferences.cpp" line="48"/>
+        <location filename="src/client/Preferences.cpp" line="128"/>
         <source>
 %1 %2 (codename: %3)
 
@@ -435,51 +435,49 @@ Autres détails : %9</translation>
         <translation>Editeur</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-manager.cpp" line="99"/>
         <source>%1
                   Loading...</source>
-        <translation>%1
+        <translation type="obsolete">%1
                   Chargement...</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-manager.cpp" line="103"/>
-        <location filename="src/client/ngrt4n-oc.cpp" line="96"/>
+        <location filename="src/client/ngrt4n-manager.cpp" line="96"/>
+        <location filename="src/client/ngrt4n-oc.cpp" line="89"/>
         <source>You need to select a configuration file!</source>
         <translation>Vous devez sélectionner un fichier de configuration!</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-manager.cpp" line="106"/>
-        <location filename="src/client/ngrt4n-oc.cpp" line="100"/>
+        <location filename="src/client/ngrt4n-manager.cpp" line="99"/>
+        <location filename="src/client/ngrt4n-oc.cpp" line="93"/>
         <source>%1 | Select a configuration file</source>
         <translation>%1 | Sélectionner un fichier de configuration</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-manager.cpp" line="108"/>
-        <location filename="src/client/ngrt4n-oc.cpp" line="102"/>
+        <location filename="src/client/ngrt4n-manager.cpp" line="101"/>
+        <location filename="src/client/ngrt4n-oc.cpp" line="95"/>
         <source>Xml files (*.xml);;All files (*)</source>
         <translation>Fichiers Xml (*.xml);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-manager.cpp" line="111"/>
+        <location filename="src/client/ngrt4n-manager.cpp" line="104"/>
         <source>No configuration file has been selected and the program will exit!</source>
         <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-oc.cpp" line="51"/>
+        <location filename="src/client/ngrt4n-oc.cpp" line="50"/>
         <source>Operations Console</source>
         <translation>Console des opérations</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-oc.cpp" line="91"/>
         <source>%1
 
 Loading...</source>
-        <translation>%1
+        <translation type="obsolete">%1
 
 Chargement...</translation>
     </message>
     <message>
-        <location filename="src/client/ngrt4n-oc.cpp" line="105"/>
+        <location filename="src/client/ngrt4n-oc.cpp" line="98"/>
         <source>No configuration file selected, the program will exit!</source>
         <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
     </message>
@@ -1020,25 +1018,25 @@ Voulez-vous enregistrer les mises à jour?</translation>
         <translation>Console des opérations %1 - %2</translation>
     </message>
     <message>
-        <location filename="src/client/SvNavigator.cpp" line="330"/>
+        <location filename="src/client/SvNavigator.cpp" line="337"/>
         <source>The server serial %1 is not supported</source>
         <translation>Les serveurs de série %1 sont imcompatibles avec cette version</translation>
     </message>
     <message>
-        <location filename="src/client/SvNavigator.cpp" line="333"/>
+        <location filename="src/client/SvNavigator.cpp" line="340"/>
         <location filename="src/client/SvNavigator.cpp" line="989"/>
         <source>Updating...</source>
         <translation>Miseà jour...</translation>
     </message>
     <message>
-        <location filename="src/client/SvNavigator.cpp" line="336"/>
         <source>Unknown error</source>
-        <translation>Erreur inconnue</translation>
+        <translation type="obsolete">Erreur inconnue</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="414"/>
-        <source>Service not found: %1</source>
-        <translation>Service invalide : %1</translation>
+        <source>Service not found (%1)</source>
+        <oldsource>Service not found: %1</oldsource>
+        <translation>Service non trouvé (%1)</translation>
     </message>
     <message>
         <location filename="src/client/SvNavigator.cpp" line="516"/>
