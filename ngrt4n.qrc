@@ -56,6 +56,6 @@
         <file>images/memory-usage.png</file>
         <file>images/cpu.png</file>
         <file>images/performance.png</file>
-        <file>ngrt4n_fr.qm</file>
+        <file>i18n/ngrt4n_fr.qm</file>
     </qresource>
 </RCC>

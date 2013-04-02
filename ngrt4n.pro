@@ -106,8 +106,8 @@ DISTFILES += README \
     src/client/ngrt4n-*.cpp \
     doc/man/*.gz
 
-TRANSLATIONS += ngrt4n_fr.ts \
-                ngrt4n_fr.qm
+TRANSLATIONS += i18n/ngrt4n_fr.ts
+
 CODECFORSRC = UTF-8
 
 #include(QsLog/QsLog.pri)
