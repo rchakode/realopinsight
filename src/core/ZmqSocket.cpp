@@ -86,25 +86,25 @@ void ZmqSocket::send(const std::string & _msg) {
 #elif ZMQ_VERSION_MAJOR == 3
   sent = zmq_send(msocket, _msg.c_str(), _msg.size(), 0);
 #endif
-  if(sent <= 0) {
-      //TODO: deal with error
-    }
+  if(sent <= 0) { /* TODO: deal with error */}
 }
 
 std::string ZmqSocket::recv() const{
   int ret = -1;
   zmq_msg_t msg;
-  ret = zmq_msg_init_size(&msg, MAX_MSG_SIZE);
-  if (ret != 0) return "";
-  memset(zmq_msg_data(&msg), 0, MAX_MSG_SIZE);
 #if ZMQ_VERSION_MAJOR == 2
+  ret = zmq_msg_init(&msg);
+  if (ret != 0) return "";
   ret = zmq_recv(msocket, &msg, 0);
+  if (ret == 0) ret = zmq_msg_size(&msg);
 #elif ZMQ_VERSION_MAJOR == 3
+  ret = zmq_msg_init_size(&msg, MAX_MSG_SIZE);
+  memset(zmq_msg_data(&msg), '\0', MAX_MSG_SIZE);
   ret = zmq_recv(msocket, zmq_msg_data(&msg), MAX_MSG_SIZE, 0);
 #endif
-  if (ret < 0) return "";
+  if (ret <= 0) return "";
   char *retBuffer = (char*)zmq_msg_data(&msg);
-  return std::string(retBuffer, strlen(retBuffer)); //FIXME: don't work on windows return std::string(retBuffer, strlen(retBuffer))
+  return std::string(retBuffer, ret);
 }
 
 void ZmqSocket::makeHandShake() {

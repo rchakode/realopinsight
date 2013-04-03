@@ -198,6 +198,7 @@ int main(int argc, char ** argv)
               reply = "{\"return_code\" : \"-2\", \"message\" : \"Authentication failed\"}";
             }
         }
+      std::cerr << reply << "\n";
       socket.send(reply);
     }
 
