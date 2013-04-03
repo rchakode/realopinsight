@@ -360,7 +360,8 @@ int SvNavigator::runNagiosMonitor(void)
           if (mupdateSucceed) {
               socket->send(msg.toStdString());
               JsonHelper jsHelper(socket->recv());
-              cnode->check.status = jsHelper.getProperty("status").toInt32();
+              cnode->check.status = (jsHelper.getProperty("return_code").toInt32()!=0)? MonitorBroker::NagiosUnknown:
+                                                                                        jsHelper.getProperty("status").toInt32();
               cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
               cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
               cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
