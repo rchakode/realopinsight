@@ -538,19 +538,25 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   QRegExp regexp;
   _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
-
-  if (_node.check.host == "-") return;
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
+  if (_node.check.host == "-") return;
   if (mcoreData->monitor == MonitorBroker::Zabbix) {
       regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME);
       _node.actual_msg.replace(regexp, _node.check.host.c_str());
       regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME2);
       _node.actual_msg.replace(regexp, _node.check.host.c_str());
     }
-
-  _node.actual_msg = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
-  if (_node.actual_msg.trimmed().isEmpty()) return;
-
+  if (_node.severity == MonitorBroker::Normal) {
+      if (_node.notification_msg.isEmpty())  {
+          return ;
+        } else {
+          _node.actual_msg = _node.notification_msg;
+        }
+    } else if (_node.alarm_msg.isEmpty())  {
+      return ;
+    } else {
+      _node.actual_msg = _node.alarm_msg;
+    }
   regexp.setPattern(MsgConsole::TAG_HOSTNAME);
   _node.actual_msg.replace(regexp, _node.check.host.c_str());
   auto info = QString(_node.check.id.c_str()).split("/");

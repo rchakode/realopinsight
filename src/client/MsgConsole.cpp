@@ -118,9 +118,8 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
       mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
 
     }
-  itemText =QString(_node.check.alarm_msg.c_str());
-  mmodel->item(index, 4)->setText(itemText);
-  mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
+  mmodel->item(index, 4)->setText(_node.actual_msg);
+  mmodel->item(index, 4)->setData(_node.actual_msg, Qt::UserRole);
 }
 
 void MsgConsole::clearMsg(const NodeT& _node)
