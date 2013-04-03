@@ -81,7 +81,7 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
           chkid = fields[0].toLower();
           check.id = check.host = fields[0].toStdString();
           check.status = fields[1].toInt();
-          check.last_state_change = fields[2].toStdString();
+          check.last_state_change = utils::getCtime(fields[2].toUInt());
           check.check_command = fields[3].toStdString();
           check.alarm_msg = fields[4].toStdString();
         } else if (reqType == Service) {
