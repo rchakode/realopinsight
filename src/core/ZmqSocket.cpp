@@ -104,7 +104,7 @@ std::string ZmqSocket::recv() const{
 #endif
   if (ret < 0) return "";
   char *retBuffer = (char*)zmq_msg_data(&msg);
-  return std::string(retBuffer, strlen(retBuffer));
+  return std::string(retBuffer, strlen(retBuffer)); //FIXME: don't work on windows return std::string(retBuffer, strlen(retBuffer))
 }
 
 void ZmqSocket::makeHandShake() {

@@ -456,18 +456,11 @@ QString SvNavigator::getNodeToolTip(const NodeT& _node)
                                             utils::criticityToText(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
-
   if (_node.type == NodeType::ALARM_NODE) {
-      QString msg = "";
-      if (_node.severity == MonitorBroker::Normal) {
-          msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
-        } else {
-          msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
-        }
       toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
                                                 _node.child_nodes,
-                                                QString::fromStdString(_node.check.alarm_msg).replace("\n", " "),
-                                                msg);
+                                                QString::fromStdString(_node.check.alarm_msg),
+                                                _node.actual_msg);
     }
   return toolTip;
 }
@@ -547,35 +540,33 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
 
   if (_node.check.host == "-") return;
-  QString alarmMsg = QString::fromStdString(_node.check.alarm_msg);
+  _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
   if (mcoreData->monitor == MonitorBroker::Zabbix) {
       regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME);
-      alarmMsg.replace(regexp, _node.check.host.c_str());
+      _node.actual_msg.replace(regexp, _node.check.host.c_str());
       regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME2);
-      alarmMsg.replace(regexp, _node.check.host.c_str());
-      _node.check.alarm_msg = alarmMsg.toStdString();
+      _node.actual_msg.replace(regexp, _node.check.host.c_str());
     }
 
-  QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
-  if (statusText.trimmed().isEmpty()) return;
+  _node.actual_msg = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
+  if (_node.actual_msg.trimmed().isEmpty()) return;
 
   regexp.setPattern(MsgConsole::TAG_HOSTNAME);
-  statusText.replace(regexp, _node.check.host.c_str());
+  _node.actual_msg.replace(regexp, _node.check.host.c_str());
   auto info = QString(_node.check.id.c_str()).split("/");
   if (info.length() > 1) {
       regexp.setPattern(MsgConsole::TAG_CHECK);
-      statusText.replace(regexp, info[1]);
+      _node.actual_msg.replace(regexp, info[1]);
     }
-  if (mcoreData->monitor == MonitorBroker::Nagios) { // FIXME: Threshold tag don't work for other monitors
+  if (mcoreData->monitor == MonitorBroker::Nagios) {
       info = QString(_node.check.check_command.c_str()).split("!");
       if (info.length() >= 3) {
           regexp.setPattern(MsgConsole::TAG_THERESHOLD);
-          statusText.replace(regexp, info[1]);
+          _node.actual_msg.replace(regexp, info[1]);
           if (_node.severity == MonitorBroker::Major)
-            statusText.replace(regexp, info[2]);
+            _node.actual_msg.replace(regexp, info[2]);
         }
     }
-  _node.check.alarm_msg = statusText.toStdString();
 }
 
 void SvNavigator::updateBpNode(const QString& _nodeId)

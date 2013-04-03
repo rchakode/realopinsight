@@ -243,6 +243,7 @@ typedef struct _NodeT {
   QString parent;
   QString alarm_msg;
   QString notification_msg;
+  QString actual_msg;
   qint32 severity;
   qint32 prop_sev;
   QString child_nodes;
