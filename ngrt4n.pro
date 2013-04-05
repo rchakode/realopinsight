@@ -104,7 +104,8 @@ DISTFILES += README \
     images/built-in/*.png \
     examples/{*.ngrt4n.xml,*.dat} \
     src/client/ngrt4n-*.cpp \
-    doc/man/*.gz
+    doc/man/*.gz \
+    i18n/ngrt4n_*.qm
 
 TRANSLATIONS += i18n/ngrt4n_fr.ts
 

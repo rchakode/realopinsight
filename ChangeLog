@@ -10,7 +10,8 @@ RealOpInsight ChangeLog
   * Added new icons
   * Added french translation
   * added validator for the Port field
-  * Changes: the id of data points are now not case sensitive
+  * Make the IDs of data points case insensitive
+  * Minor bug fixes
   
 2.2.1 (Lucia, p1)
 -------------
