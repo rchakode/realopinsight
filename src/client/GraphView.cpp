@@ -324,8 +324,8 @@ void GraphView::setEdgePath(const QString& _parentVertex,
 {
   QPointF parentAnchor, childAnchor;
   QSizeF p_size, c_size;
-  _GNode& p_gnode = mgnodes[_parentVertex];
-  _GNode& c_gnode = mgnodes[_childVertex];
+  GNodeT& p_gnode = mgnodes[_parentVertex];
+  GNodeT& c_gnode = mgnodes[_childVertex];
   p_size = p_gnode.exp_icon->boundingRect().size();
   c_size = c_gnode.icon->boundingRect().size();
   parentAnchor = p_gnode.exp_icon->pos() + QPointF(0.5 * p_size.width(), p_size.height());

@@ -111,10 +111,8 @@ public:
     ALARM_NODE = 1
   };
   static QString toString(int _type ) {
-
     if (_type == ALARM_NODE )
       return QObject::tr("Native Check");
-
     return QObject::tr("Business Process");
   }
 
@@ -122,7 +120,6 @@ public:
 
 
 class Criticity {
-
 public:
   Criticity(MonitorBroker::SeverityT _value=MonitorBroker::Normal): value(_value) {}
   void setValue(MonitorBroker::SeverityT _value) {value = _value;}
@@ -164,7 +161,7 @@ public:
 
   Criticity operator / (Criticity& st) const {
     if(value == st.value)
-      return  st;
+      return st;
 
     if(value == MonitorBroker::Critical ||
        st.value == MonitorBroker::Critical)
@@ -227,12 +224,10 @@ public:
   }
 
 private:
-
   MonitorBroker::SeverityT value;
 };
 
-
-typedef struct _NodeT {
+struct NodeT {
   QString id;
   QString name;
   qint32 type;
@@ -249,7 +244,7 @@ typedef struct _NodeT {
   QString child_nodes;
   MonitorBroker::CheckT check;
   bool monitored;
-} NodeT;
+};
 
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, NodeT> NodeListT;
@@ -260,32 +255,29 @@ typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
 typedef QHash<QString, QStringList> HostListT;
 
-typedef struct _CoreDataT {
+struct CoreDataT {
   qint8 monitor;
   NodeListT bpnodes;
   NodeListT cnodes;
   CheckStatusCountT check_status_count;
   HostListT hosts;
   TreeNodeItemListT tree_items;
-}CoreDataT;
-
-typedef struct _GNode {
+};
+struct GNodeT {
   QGraphicsTextItem* label;
   QGraphicsPixmapItem* icon;
   QGraphicsPixmapItem* exp_icon;
   qint32 type;
   bool expand;
-}GNodeT;
+};
 
-typedef struct _GEdge {
+struct GEdgeT {
   QGraphicsPathItem* edge;
-}GEdgeT;
-
+};
 typedef QHash<QString, GNodeT> GNodeListT;
 typedef QHash<QString, GEdgeT> GEdgeListT;
 typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
-
 #endif /* BASE_HPP */
