@@ -239,3 +239,35 @@ QString utils::getWelcomeMsg(const QString& utility)
                                                                                              REL_YEAR,
                                                                                              PKG_URL);
 }
+
+QString utils::source2Str(const SourceT& src)
+{
+  return QString("{\"sid\":\"%1\","
+                 "\"mon_type\":\"%2\","
+                 "\"use_ls\":\"%3\","
+                 "\"mon_url\":\"%4\","
+                 "\"ls_addr\":\"%5\","
+                 "\"ls_port\":\"%6\","
+                 "\"auth\":\"%7\"}").arg(src.id,
+                                         QString::number(src.mon_type),
+                                         QString::number(src.use_ls),
+                                         src.mon_url,
+                                         src.ls_addr,
+                                         QString::number(src.ls_port),
+                                         src.auth);
+}
+
+qint32 utils::convert2ApiType(const QString& str)
+{
+  int type;
+  if (str == "Livestatus/ngrt4nd")
+    type = MonitorBroker::Nagios;
+  else if (str == "Zabbix")
+    type = MonitorBroker::Zabbix;
+  else if (str == "Zenoss")
+    type = MonitorBroker::Zenoss;
+  else
+    type = MonitorBroker::Undefined;
+
+  return type;
+}

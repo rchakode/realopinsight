@@ -274,6 +274,17 @@ struct GNodeT {
 struct GEdgeT {
   QGraphicsPathItem* edge;
 };
+
+struct SourceT {
+  QString id;
+  qint32 mon_type;
+  QString mon_url;
+  qint32 use_ls;
+  QString ls_addr;
+  qint32 ls_port;
+  QString auth;
+};
+
 typedef QHash<QString, GNodeT> GNodeListT;
 typedef QHash<QString, GEdgeT> GEdgeListT;
 typedef QMap<QString, QMenu*> MenuListT;

@@ -29,10 +29,11 @@
 
 class MonitorBroker {
 public:
-  enum MonirorTypeT {
+  enum ApiTypeT {
     Nagios = 0,
     Zabbix = 1,
-    Zenoss = 2
+    Zenoss = 2,
+    Undefined=99
   };
   enum SeverityT {
     Normal = 0,

@@ -36,7 +36,7 @@ class ImageButton : public QAbstractButton {
 private:
   QPixmap pixmap;
 public:
-  ImageButton(const QString & ipath) {this->pixmap = QPixmap(ipath); update();}
+  ImageButton(const QString& ipath) {this->pixmap = QPixmap(ipath); update();}
   ~ImageButton(){}
   void setPixmap(const QPixmap& pm ) {pixmap = pm; update(); }
   QSize sizeHint() const {return pixmap.size();}
@@ -69,16 +69,17 @@ public:
   static const QString USE_MKLS_KEY;
   static const QString DONT_VERIFY_SSL_PEER_KEY;
 
-  Preferences(const qint32 & _userRole = Auth::OpUserRole, const qint32 & _action = Preferences::ChangePassword);
+  Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();
   static QString style();
   bool useLs(void) const {return museMkls == Qt::Checked;}
 
 public slots:
   void applySettings(void);
+  void addAsSource(void);
   void changePasswd(void);
   void donate(void);
-  void setAuthChainVisibility(const int & state);
+  void setAuthChainVisibility(const int& state);
 
 signals:
   void urlChanged(QString);
@@ -105,6 +106,7 @@ private:
   QLineEdit* mserverPassField;
   QPushButton* mcancelBtn;
   QPushButton* mapplySettingBtn;
+  QPushButton* maddAsSourceBtn;
   QPushButton* mchangePwdBtn;
   ImageButton* mdonateBtn;
   QCheckBox* mshowAuthInfoChkbx;

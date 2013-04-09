@@ -58,6 +58,8 @@ namespace utils {
                 NodeListT::const_iterator& node);
   QSplashScreen* infoScreen(const QString & msg="");
   QString getWelcomeMsg(const QString& utility);
+  QString source2Str(const SourceT& src);
+  qint32 convert2ApiType(const QString& str);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

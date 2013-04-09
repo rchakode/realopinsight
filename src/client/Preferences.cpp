@@ -48,8 +48,11 @@ const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
+const QStringList Preferences::SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
+                                                         << "Zabbix"
+                                                         << "Zenoss";
 
-Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
+Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
     muserRole(_userRole),
     msettings(new Settings()),
@@ -65,10 +68,11 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     mserverPassField(new QLineEdit()),
     mcancelBtn(new QPushButton(tr("&Close"))),
     mapplySettingBtn(new QPushButton(tr("&Apply settings"))),
+    maddAsSourceBtn(new QPushButton(tr("Add as &Source"))),
     mchangePwdBtn(new QPushButton(tr("C&hange password"))),
     mdonateBtn(new ImageButton(":images/built-in/donate.png")),
     mshowAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
-    museMklsChkbx(new QCheckBox(tr("Use &Livestatus"))),
+    museMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
     mverifyPeerChkBx(new QCheckBox(tr("Don't verify SSL peer")))
 {
   qint32 line = -1;
@@ -86,8 +90,9 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
       line++,
           mmainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
       line++,
-          mmainLayout->addWidget(mcancelBtn, line, 1, Qt::AlignRight),
-          mmainLayout->addWidget(mapplySettingBtn, line, 2);
+          mmainLayout->addWidget(mcancelBtn, line, 0, Qt::AlignLeft),
+          mmainLayout->addWidget(mapplySettingBtn, line, 1, Qt::AlignRight),
+          mmainLayout->addWidget(maddAsSourceBtn, line, 2, Qt::AlignRight);
       line++,
           mmainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
       mmainLayout->setColumnStretch(0, 0);
@@ -98,6 +103,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
         mbrwBtn->setEnabled(false);
         mupdateIntervalField->setEnabled(false);
         mapplySettingBtn->setEnabled(false);
+          maddAsSourceBtn->setEnabled(false);
         msockAddrField->setEnabled(false);
         msockPortField->setEnabled(false);
         mserverPassField->setEnabled(false);
@@ -154,6 +160,7 @@ Preferences::~Preferences()
   delete mchangePwdBtn;
   delete mcancelBtn;
   delete mapplySettingBtn;
+  delete maddAsSourceBtn;
   delete msockAddrField;
   delete msockPortField;
   delete mserverPassField;
@@ -174,11 +181,10 @@ void Preferences::showEvent (QShowEvent *)
 
 void Preferences::applySettings(void)
 {
-  QString homeUrl = monitorUrlField->text();
-  msettings->setValue(URL_KEY, homeUrl);
+  QString monitorUrl = monitorUrlField->text();
+  msettings->setValue(URL_KEY, monitorUrl);
   msettings->setValue(UPDATE_INTERVAL_KEY, mupdateIntervalField->text());
   msettings->setValue(SERVER_ADDR_KEY, msockAddrField->text());
-  if(msockPortField->text().toInt() <= 0) msockPortField->setText(QString::number(MonitorBroker::DefaultPort));
   msettings->setValue(SERVER_PORT_KEY, msockPortField->text());
   msettings->setValue(SERVER_PASS_KEY, mserverPassField->text());
   museMkls = static_cast<Qt::CheckState>(museMklsChkbx->checkState()),
@@ -187,9 +193,32 @@ void Preferences::applySettings(void)
       msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
   msettings->sync();
   close();
-  emit urlChanged(homeUrl);
+  emit urlChanged(monitorUrl);
 }
 
+void Preferences::addAsSource(void)
+{
+  bool ok;
+  QString selected = QInputDialog::getItem(this,
+                                           tr("Select the type of the Remote API | %1").arg(APP_NAME),
+                                           tr("Please select the type of the remote API"),
+                                           SRC_TYPES, 0,
+                                           false,
+                                          &ok);
+  if (ok&& !selected.isEmpty()) {
+      SourceT src;
+      src.id = selected;
+      src.mon_type = utils::convert2ApiType(selected);
+      src.mon_url = monitorUrlField->text();
+      src.ls_addr = msockAddrField->text();
+      src.ls_port = msockPortField->text().toInt();
+      src.auth = mserverPassField->text();
+      src.use_ls = museMklsChkbx->checkState();
+      qDebug()<< utils::source2Str(src);
+    } else {
+      utils::alert(tr("Failed. No source selected."));
+    }
+}
 
 void Preferences::changePasswd(void)
 {
@@ -234,7 +263,7 @@ void Preferences::donate(void)
 }
 
 
-void Preferences::setAuthChainVisibility(const int & state) {
+void Preferences::setAuthChainVisibility(const int& state) {
   if(state == Qt::Checked) {
     mserverPassField->setEchoMode(QLineEdit::Normal);
   } else {
@@ -244,7 +273,7 @@ void Preferences::setAuthChainVisibility(const int & state) {
 
 QGroupBox* Preferences::createScktGrp(void)
 {
-  QGroupBox* bx(new QGroupBox(tr("Livestatus/ngrt4nd Endpoint")));
+  QGroupBox* bx(new QGroupBox(tr("Livestatus/Ngrt4nd Endpoint")));
   QHBoxLayout* lyt(new QHBoxLayout());
   lyt->addWidget(new QLabel(tr("Server Address")));
   lyt->addWidget(msockAddrField);
@@ -386,6 +415,7 @@ QString Preferences::style() {
 void Preferences::addEvents(void)
 {
   connect(mapplySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
+  connect(maddAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
   connect(mcancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   connect(mchangePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
   connect(mdonateBtn, SIGNAL(clicked()),  this, SLOT(donate()));
