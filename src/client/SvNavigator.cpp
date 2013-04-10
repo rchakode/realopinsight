@@ -771,7 +771,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
     return;
   }
   QString data = _reply->readAll();
-  JsonHelper jsHelper(data.toStdString());
+  JsonHelper jsHelper(data);
   mlastErrorMsg = jsHelper.getProperty("error").property("data").toString();
   if (mlastErrorMsg.isEmpty()) mlastErrorMsg = jsHelper.getProperty("error").property("message").toString();
   if (!mlastErrorMsg.isEmpty()) {
@@ -865,7 +865,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
     postRpcDataRequest();
     mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl());
   } else {
-    JsonHelper jsonHelper(data.toStdString());
+      JsonHelper jsonHelper(data);
     qint32 tid = jsonHelper.getProperty("tid").toInt32();
     QScriptValue result = jsonHelper.getProperty("result");
     bool reqSucceed = result.property("success").toBool();

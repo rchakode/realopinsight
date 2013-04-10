@@ -25,15 +25,27 @@
 
 using namespace std;
 
-JsonHelper::JsonHelper(const string & jsonStr) : QScriptEngine()
+JsonHelper::JsonHelper(const string & _data) : QScriptEngine()
 {
-  setData(jsonStr);
+  setData(_data);
 }
 
-
-void JsonHelper::setData(const string& jsonStr) {
-  data = evaluate("(" + QString::fromStdString(jsonStr) + ")");
+JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
+{
+  setData(_data);
 }
-QScriptValue JsonHelper::getProperty(const string& key) {
-  return data.property(QString::fromStdString(key)) ;
+
+void JsonHelper::setData(const string& data)
+{
+  mdata = evaluate("(" + QString::fromStdString(data) + ")");
+}
+
+void JsonHelper::setData(const QString& data)
+{
+  mdata = evaluate("("+data+")");
+}
+
+QScriptValue JsonHelper::getProperty(const string& key)
+{
+  return mdata.property(QString::fromStdString(key)) ;
 }
