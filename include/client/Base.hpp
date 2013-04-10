@@ -270,10 +270,12 @@ struct GNodeT {
   qint32 type;
   bool expand;
 };
+typedef QHash<QString, GNodeT> GNodeListT;
 
 struct GEdgeT {
   QGraphicsPathItem* edge;
 };
+typedef QHash<QString, GEdgeT> GEdgeListT;
 
 struct SourceT {
   QString id;
@@ -284,9 +286,8 @@ struct SourceT {
   qint32 ls_port;
   QString auth;
 };
+typedef QHash<QString, SourceT> SourceListT;
 
-typedef QHash<QString, GNodeT> GNodeListT;
-typedef QHash<QString, GEdgeT> GEdgeListT;
 typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;

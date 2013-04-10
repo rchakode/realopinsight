@@ -31,6 +31,7 @@ class Settings : public QSettings
 public:
   Settings();
   void setKeyValue(const QString & _key, const QString & _value);
+  void loadSource(const qint32& _idx, SourceT& _src);
 
 private:
   QTranslator* translator ;

@@ -30,7 +30,6 @@
 #include "Base.hpp"
 #include <QSplashScreen>
 
-
 class ImageButton : public QAbstractButton {
   Q_OBJECT
 private:
@@ -57,16 +56,11 @@ public:
   static const qint32 ChangeMonitoringSettings;
   static const qint32 ShowHelp;
   static const qint32 ShowAbout;
-  static const QString URL_KEY;
   static const QString UPDATE_INTERVAL_KEY;
-  static const QString SERVER_ADDR_KEY;
-  static const QString SERVER_PORT_KEY;
   static const QString ADM_UNSERNAME_KEY;
   static const QString OP_UNSERNAME_KEY;
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
-  static const QString SERVER_PASS_KEY;
-  static const QString USE_MKLS_KEY;
   static const QString DONT_VERIFY_SSL_PEER_KEY;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
@@ -113,10 +107,11 @@ private:
   QCheckBox* museMklsChkbx;
   QCheckBox* mverifyPeerChkBx;
 
+  void addEvents(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
   void setContent(void);
-  void addEvents(void);
+  void saveAsSource(const qint32& idx, const QString& _stype = "auto");
 };
 
 

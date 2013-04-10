@@ -267,7 +267,8 @@ qint32 utils::convert2ApiType(const QString& str)
   else if (str == "Zenoss")
     type = MonitorBroker::Zenoss;
   else
-    type = MonitorBroker::Undefined;
+    type = MonitorBroker::Auto;
 
   return type;
 }
+

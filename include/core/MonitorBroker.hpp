@@ -33,7 +33,7 @@ public:
     Nagios = 0,
     Zabbix = 1,
     Zenoss = 2,
-    Undefined=99
+    Auto=99
   };
   enum SeverityT {
     Normal = 0,

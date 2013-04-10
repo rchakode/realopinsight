@@ -28,31 +28,33 @@
 #include "Preferences.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
+#include "utilsClient.hpp"
+#include "JsHelper.hpp"
 #include <QtScript/QScriptEngine>
 
 Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
   Q_INIT_RESOURCE(ngrt4n);
+  SourceT src; loadSource(0, src);
   QString updateInterval = value(Preferences::UPDATE_INTERVAL_KEY).toString();
-  QString monitorHome = value(Preferences::URL_KEY).toString() ;
   QString admUser = value(Preferences::ADM_UNSERNAME_KEY).toString();
   QString admPasswd = value(Preferences::ADM_PASSWD_KEY).toString();
   QString opUser = value(Preferences::OP_UNSERNAME_KEY).toString();
   QString opPasswd = value(Preferences::OP_PASSWD_KEY).toString();
-  QString serverAddr = value(Preferences::SERVER_ADDR_KEY).toString();
-  QString serverPort = value(Preferences::SERVER_PORT_KEY).toString();
+
+  //FIXME: Check default values for url, server and port
+  //  if (src.ls_addr.isEmpty()) {
+  //      setValue(Preferences::SERVER_ADDR_KEY, "localhost");
+  //    }
+  //  if (src.ls_port <=0)	{
+  //      setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DefaultPort));
+  //    }
+  //  if (src.mon_url.isEmpty()) {
+  //      setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");
+  //    }
 
   if (updateInterval.isEmpty()) {
       setValue(Preferences::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
-    }
-  if (serverAddr.isEmpty()) {
-      setValue(Preferences::SERVER_ADDR_KEY, "localhost");
-    }
-  if (serverPort.isEmpty() || serverPort.toInt() <=0)	{
-      setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DefaultPort));
-    }
-  if (monitorHome.isEmpty()) {
-      setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");
     }
   if (admUser.isEmpty()) {
       setValue(Preferences::ADM_UNSERNAME_KEY, Auth::AdmUser);
@@ -78,4 +80,16 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 {
   setValue(_key, _value) ;
   sync() ;
+}
+
+
+void Settings::loadSource(const qint32& _idx, SourceT& _src)
+{
+  QString srcInfo = QSettings::value(utils::sourceKey(_idx)).toString();
+  JsonHelper jsHelper(srcInfo);
+  _src.mon_url = jsHelper.getProperty("mon_url").toString();
+  _src.auth = jsHelper.getProperty("auth").toString();
+  _src.use_ls = jsHelper.getProperty("use_ls").toInt32();
+  _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
+  _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
 }

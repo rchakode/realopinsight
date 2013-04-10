@@ -246,7 +246,7 @@ void SvNavigator::load(const QString& _file)
   mtree->clear();
   mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::RootId]);
   mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
-  mbrowser->setUrl(mmonitorBaseUrl);
+  mbrowser->setUrl(msources[0].mon_url);
   this->resizeDashboard();
   QMainWindow::show();
   mmap->scaleToFitViewPort();
@@ -330,8 +330,9 @@ int SvNavigator::runNagiosMonitor(void)
   invalidCheck.host = "-";
   invalidCheck.check_command = "-";
   invalidCheck.alarm_msg = "Error occured";
-
-  auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(mserverUrl.toStdString(), ZMQ_REQ));
+  std::string uri = QString("tcp://%1:%2").arg(msources[0].ls_addr,
+                                               QString::number(msources[0].ls_port)).toStdString();
+  auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(uri, ZMQ_REQ));
   if(socket->connect())
     socket->makeHandShake();
   if (socket->isConnected2Server()) {
@@ -358,7 +359,7 @@ int SvNavigator::runNagiosMonitor(void)
 
     QStringList ids = cnode->child_nodes.split(Parser::CHILD_SEP);
     foreach (const QString& cid, ids) {
-      QString msg = mserverAuthChain%":"%cid;
+          QString msg = msources[0].auth%":"%cid;
       if (mupdateSucceed) {
         socket->send(msg.toStdString());
         JsonHelper jsHelper(socket->recv());
@@ -384,7 +385,7 @@ int SvNavigator::runNagiosMonitor(void)
 
 int SvNavigator::runLsMonitor(void)
 {
-  LsHelper mklsHelper(mserverAddr, mserverPort.toInt());
+  LsHelper mklsHelper(msources[0].ls_addr, msources[0].ls_port);
   if (!mklsHelper.connectToService()) {
     mupdateSucceed = false;
     mlastErrorMsg = mklsHelper.errorString();
@@ -437,7 +438,8 @@ void SvNavigator::prepareDashboardUpdate(void)
   QString msg = QObject::tr("Connecting to %1...");
   switch(mcoreData->monitor) {
     case MonitorBroker::Nagios:
-      msg = msg.arg(mserverUrl);
+      msg = msg.arg(QString("tcp://%1:%2").arg(msources[0].ls_addr,
+                                               QString::number(msources[0].ls_port)));
       break;
     case MonitorBroker::Zabbix:
       msg = msg.arg(mzbxHelper->getApiUri());
@@ -623,16 +625,21 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
   }
 }
 
-void SvNavigator::updateMonitoringSettings() {
-  mmonitorBaseUrl = msettings->value(Preferences::URL_KEY).toString();
-  mserverAuthChain = msettings->value(Preferences::SERVER_PASS_KEY).toString();
-  mserverAddr = msettings->value(Preferences::SERVER_ADDR_KEY).toString();
-  mserverPort = msettings->value(Preferences::SERVER_PORT_KEY).toString();
-  mserverUrl = QString("tcp://%1:%2").arg(mserverAddr, mserverPort);
+void SvNavigator::updateMonitoringSettings()
+{
   mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
   mznsHelper->setSslConf(!msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool());
   mzbxHelper->setSslConf(!msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool());
   if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DefaultUpdateInterval * 1000;
+  QString srcInfo = msettings->value(utils::sourceKey(0)).toString();
+  JsonHelper jsHelper(srcInfo);
+  SourceT src;
+  src.mon_url = jsHelper.getProperty("mon_url").toString();
+  src.auth = jsHelper.getProperty("auth").toString();
+  src.use_ls = jsHelper.getProperty("use_ls").toInt32();
+  src.ls_addr = jsHelper.getProperty("ls_addr").toString();
+  src.ls_port = jsHelper.getProperty("ls_port").toInt32();
+  msources[0] = src;
 }
 
 void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
@@ -950,10 +957,11 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
 QStringList SvNavigator::getAuthInfo(void)
 {
   QStringList authInfo = QStringList();
-  int pos = mserverAuthChain.indexOf(":");
+  QString authString = msources[0].auth;
+  int pos = authString.indexOf(":");
   if (pos != -1) {
-    authInfo.push_back(mserverAuthChain.left(pos));
-    authInfo.push_back(mserverAuthChain.mid(pos+1, -1));
+      authInfo.push_back(authString.left(pos));
+      authInfo.push_back(authString.mid(pos+1, -1));
   }
   return authInfo;
 }
@@ -962,16 +970,17 @@ void SvNavigator::openRpcSession(void)
 {
   updateDashboardOnUnknown();
   QStringList authParams = getAuthInfo();
+  QString monitorUrl = msources[0].mon_url;
   if (authParams.size() == 2) {
     QUrl znsUrlParams;
     switch(mcoreData->monitor) {
       case MonitorBroker::Zabbix:
-        mzbxHelper->setBaseUrl(mmonitorBaseUrl);
+          mzbxHelper->setBaseUrl(monitorUrl);
         authParams.push_back(QString::number(ZbxHelper::Login));
         mzbxHelper->postRequest(ZbxHelper::Login, authParams);
         break;
       case MonitorBroker::Zenoss:
-        mznsHelper->setBaseUrl(mmonitorBaseUrl);
+          mznsHelper->setBaseUrl(monitorUrl);
         znsUrlParams.addQueryItem("__ac_name", authParams[0]);
         znsUrlParams.addQueryItem("__ac_password", authParams[1]);
         znsUrlParams.addQueryItem("submitted", "true");

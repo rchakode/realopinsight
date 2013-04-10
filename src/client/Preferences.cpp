@@ -25,9 +25,10 @@
 #include "core/MonitorBroker.hpp"
 #include "Preferences.hpp"
 #include "Auth.hpp"
-#include <sstream>
 #include "Base.hpp"
 #include "utilsClient.hpp"
+#include "JsHelper.hpp"
+#include <sstream>
 #include <QWebView>
 #include <QIntValidator>
 #include <QRegExpValidator>
@@ -37,17 +38,12 @@ const qint32 Preferences::ForceChangePassword = 1;
 const qint32 Preferences::ChangeMonitoringSettings = 2;
 const qint32 Preferences::ShowHelp = 3;
 const qint32 Preferences::ShowAbout = 4;
-const QString Preferences::URL_KEY = "/Monitor/nagiosHome";
 const QString Preferences::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
-const QString Preferences::SERVER_ADDR_KEY = "/Monitor/serverAddr";
-const QString Preferences::SERVER_PORT_KEY = "/Monitor/serverPort";
-const QString Preferences::USE_MKLS_KEY = "/Monitor/UseMkLs";
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
 const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser";
 const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
-const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
 const QStringList Preferences::SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
                                                          << "Zabbix"
                                                          << "Zenoss";
@@ -181,19 +177,9 @@ void Preferences::showEvent (QShowEvent *)
 
 void Preferences::applySettings(void)
 {
-  QString monitorUrl = monitorUrlField->text();
-  msettings->setValue(URL_KEY, monitorUrl);
-  msettings->setValue(UPDATE_INTERVAL_KEY, mupdateIntervalField->text());
-  msettings->setValue(SERVER_ADDR_KEY, msockAddrField->text());
-  msettings->setValue(SERVER_PORT_KEY, msockPortField->text());
-  msettings->setValue(SERVER_PASS_KEY, mserverPassField->text());
-  museMkls = static_cast<Qt::CheckState>(museMklsChkbx->checkState()),
-      msettings->setValue(USE_MKLS_KEY, museMkls);
+  saveAsSource(0);
   mverifyPeer = static_cast<Qt::CheckState>(mverifyPeerChkBx->checkState()),
       msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
-  msettings->sync();
-  close();
-  emit urlChanged(monitorUrl);
 }
 
 void Preferences::addAsSource(void)
@@ -204,19 +190,30 @@ void Preferences::addAsSource(void)
                                            tr("Please select the type of the remote API"),
                                            SRC_TYPES, 0,
                                            false,
-                                          &ok);
+                                           &ok);
   if (ok&& !selected.isEmpty()) {
-      SourceT src;
-      src.id = selected;
-      src.mon_type = utils::convert2ApiType(selected);
-      src.mon_url = monitorUrlField->text();
-      src.ls_addr = msockAddrField->text();
-      src.ls_port = msockPortField->text().toInt();
-      src.auth = mserverPassField->text();
-      src.use_ls = museMklsChkbx->checkState();
-      qDebug()<< utils::source2Str(src);
+      saveAsSource(0, selected);
     } else {
       utils::alert(tr("Failed. No source selected."));
+    }
+}
+
+void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
+{
+  SourceT src;
+  src.id = utils::sourceId(_idx);
+  src.mon_type = utils::convert2ApiType(_stype);
+  src.mon_url = monitorUrlField->text();
+  src.ls_addr = msockAddrField->text();
+  src.ls_port = msockPortField->text().toInt();
+  src.auth = mserverPassField->text();
+  src.use_ls = museMklsChkbx->checkState();
+  msettings->setValue(utils::sourceKey(_idx), utils::source2Str(src));
+  msettings->setValue(UPDATE_INTERVAL_KEY, mupdateIntervalField->text());
+  msettings->sync();
+  if (_idx == 0) {
+      close();
+      emit urlChanged(src.mon_url);
     }
 }
 
@@ -322,11 +319,13 @@ void Preferences::setContent(void)
   mupdateIntervalField->setMinimum(5);
   mupdateIntervalField->setMaximum(600);
   mupdateIntervalField->setValue(msettings->value(UPDATE_INTERVAL_KEY).toInt());
-  monitorUrlField->setText(msettings->value(URL_KEY).toString());
-  msockAddrField->setText(msettings->value(SERVER_ADDR_KEY).toString());
-  msockPortField->setText(msettings->value(SERVER_PORT_KEY).toString());
-  mserverPassField->setText(msettings->value(SERVER_PASS_KEY).toString());
-  museMkls = static_cast<Qt::CheckState>(msettings->value(USE_MKLS_KEY).toInt()),
+  SourceT src;
+  msettings->loadSource(0, src);
+  monitorUrlField->setText(src.mon_url);
+  msockAddrField->setText(src.ls_addr);
+  msockPortField->setText(QString::number(src.ls_port));
+  mserverPassField->setText(src.auth);
+  museMkls = static_cast<Qt::CheckState>(src.use_ls);
       museMklsChkbx->setCheckState(museMkls);
   mverifyPeer = static_cast<Qt::CheckState>(msettings->value(DONT_VERIFY_SSL_PEER_KEY).toInt()),
       mverifyPeerChkBx->setCheckState(mverifyPeer);
@@ -410,7 +409,6 @@ QString Preferences::style() {
       ;
   return styleSheet;
 }
-
 
 void Preferences::addEvents(void)
 {

@@ -94,7 +94,6 @@ private:
   CoreDataT* mcoreData;
   QString mconfigFile;
   QString mactiveFile;
-  QString mmonitorBaseUrl;
   QString mselectedNode;
   QString mstatsInfo;
   qint32 muserRole;
@@ -117,10 +116,6 @@ private:
   MenuListT mmenus;
   SubMenuListT msubMenus;
   SubMenuListT mcontextMenuList;
-  QString mserverAddr;
-  QString mserverPort;
-  QString mserverUrl;
-  QString mserverAuthChain;
   ZbxHelper* mzbxHelper;
   QString mzbxAuthToken;
   qint32 mhostLeft;
@@ -130,6 +125,7 @@ private:
   QString mlastErrorMsg;
   QSystemTrayIcon* mtrayIcon;
   bool mshowOnlyTroubles;
+  SourceListT msources;
 
   void addEvents(void);
   void loadMenus(void);
