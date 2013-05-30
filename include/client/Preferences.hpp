@@ -66,7 +66,7 @@ public:
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();
   static QString style();
-  bool useLs(void) const {return museMkls == Qt::Checked;}
+  bool useLs(void) const {return m_useMkls == Qt::Checked;}
 
 public slots:
   void applySettings(void);
@@ -82,29 +82,28 @@ protected :
   void showEvent (QShowEvent *);
 
 private:
-  qint32 muserRole;
-  Qt::CheckState museMkls;
+  qint32 m_userRole;
+  Qt::CheckState m_useMkls;
   Qt::CheckState mverifyPeer;
 
-  Settings* msettings;
-
-  QGridLayout* mmainLayout;
-  QLineEdit* monitorUrlField;
-  QSpinBox* mupdateIntervalField;
-  QPushButton *mbrwBtn;
-  QLineEdit* moldPwdField;
-  QLineEdit* mpwdField;
-  QLineEdit* mrePwdField;
-  QLineEdit* msockAddrField;
-  QLineEdit* msockPortField;
-  QLineEdit* mserverPassField;
-  QPushButton* mcancelBtn;
-  QPushButton* mapplySettingBtn;
-  QPushButton* maddAsSourceBtn;
-  QPushButton* mchangePwdBtn;
-  ImageButton* mdonateBtn;
-  QCheckBox* mshowAuthInfoChkbx;
-  QCheckBox* museMklsChkbx;
+  Settings* m_settings;
+  QLineEdit* m_onitorUrlField;
+  QSpinBox* m_updateIntervalField;
+  QPushButton *m_brwBtn;
+  QLineEdit* m_oldPwdField;
+  QLineEdit* m_pwdField;
+  QLineEdit* m_rePwdField;
+  QLineEdit* m_sockAddrField;
+  QLineEdit* m_sockPortField;
+  QLineEdit* m_serverPassField;
+  QPushButton* m_cancelBtn;
+  QPushButton* m_applySettingBtn;
+  QPushButton* m_addAsSourceBtn;
+  QPushButton* m_changePwdBtn;
+  ImageButton* m_donateBtn;
+  QCheckBox* m_showAuthInfoChkbx;
+  QCheckBox* m_useMklsChkbx;
+  QGridLayout* m_mainLayout;
   QCheckBox* mverifyPeerChkBx;
 
   void addEvents(void);
