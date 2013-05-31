@@ -38,7 +38,6 @@
 #include <locale>
 #include <memory>
 
-//FIXME: test case unsensitive check id with Nagios, Zabbix, and Zenoss
 
 namespace {
   const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));

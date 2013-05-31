@@ -44,12 +44,15 @@ const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser";
 const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
+const QString Preferences::SRC_BUCKET_KEY = "/Sources/buckets";
+const qint32 Preferences::MAX_SRCS = 10;
 const QStringList Preferences::SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
                                                          << "Zabbix"
                                                          << "Zenoss";
 
 Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
+    m_mainLayout (new QGridLayout(this)),
     m_userRole(_userRole),
     m_settings(new Settings()),
     m_onitorUrlField(new QLineEdit()),
@@ -68,7 +71,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_donateBtn(new ImageButton(":images/built-in/donate.png")),
     m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     m_useMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
-    m_mainLayout (new QGridLayout(this))
+    m_sourceBuckets(new QBitArray())
     mverifyPeerChkBx(new QCheckBox(tr("Don't verify SSL peer")))
 {
   qint32 line = -1;
@@ -143,7 +146,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
           m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
       break;
   }
-  setContent();
+  loadProperties();
   addEvents();
 }
 
@@ -165,6 +168,7 @@ Preferences::~Preferences()
   delete m_useMklsChkbx; 
   delete mverifyPeerChkBx;
   delete m_mainLayout;
+  delete m_sourceBuckets;
 }
 
 
@@ -178,23 +182,29 @@ void Preferences::showEvent (QShowEvent *)
 void Preferences::applySettings(void)
 {
   saveAsSource(0);
-  mverifyPeer = static_cast<Qt::CheckState>(mverifyPeerChkBx->checkState()),
+  m_sourceBuckets->setBit(0, true);
       msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
 }
 
 void Preferences::addAsSource(void)
 {
-  bool ok;
-  QString selected = QInputDialog::getItem(this,
-                                           tr("Select the type of the Remote API | %1").arg(APP_NAME),
-                                           tr("Please select the type of the remote API"),
-                                           SRC_TYPES, 0,
-                                           false,
-                                           &ok);
-  if (ok&& !selected.isEmpty()) {
-      saveAsSource(0, selected);
+  int bucket = 1;
+  while (bucket < MAX_SRCS && m_sourceBuckets->at(bucket)) { bucket++; }
+  if (bucket < MAX_SRCS) {
+      bool ok;
+      QString selected = QInputDialog::getItem(this,
+                                               tr("Select the type of the Remote API | %1").arg(APP_NAME),
+                                               tr("Please select the type of the remote API"),
+                                               SRC_TYPES, 0,
+                                               false,
+                                               &ok);
+      if (ok && !selected.isEmpty()) {
+          saveAsSource(bucket, selected);
+        } else {
+          utils::alert(tr("Failed. No source selected."));
+        }
     } else {
-      utils::alert(tr("Failed. No source selected."));
+      utils::alert("The maximum number of sources is reached");
     }
 }
 
@@ -210,6 +220,8 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.use_ls = m_useMklsChkbx->checkState();
   m_settings->setValue(utils::sourceKey(_idx), utils::source2Str(src));
   m_settings->setValue(UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  m_sourceBuckets->setBit(_idx, true);
+  m_settings->setValue(SRC_BUCKET_KEY, getSourceBucketsserialized());
   m_settings->sync();
   if (_idx == 0) {
       close();
@@ -314,11 +326,13 @@ QGroupBox* Preferences::createCommonGrp(void)
   return bx;
 }
 
-void Preferences::setContent(void)
+void Preferences::loadProperties(void)
 {
   m_updateIntervalField->setMinimum(5);
   m_updateIntervalField->setMaximum(600);
   m_updateIntervalField->setValue(m_settings->value(UPDATE_INTERVAL_KEY, MonitorBroker::DefaultUpdateInterval).toInt());
+
+  loadSourceBuckets();
   SourceT src;
   m_settings->loadSource(0, src);
   m_onitorUrlField->setText(src.mon_url);
@@ -409,6 +423,29 @@ QString Preferences::style() {
       "}"
       ;
   return styleSheet;
+}
+
+QString Preferences::getSourceBucketsserialized(void)
+{
+  QString str = "";
+  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceBuckets->at(i)? "1" : "0";
+  return str;
+}
+
+void Preferences::loadSourceBuckets()
+{
+  QString str = m_settings->value(SRC_BUCKET_KEY).toString();
+  setSourceBuckets(str);
+}
+
+void Preferences::setSourceBuckets(const QString& str)
+{
+  if (!str.isEmpty()) {
+      for (int i = 0; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, str.at(i).digitValue());
+    } else {
+      m_sourceBuckets->setBit(0, true);
+      for (int i=1; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, false);
+    }
 }
 
 void Preferences::addEvents(void)

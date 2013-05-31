@@ -62,6 +62,8 @@ public:
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
   static const QString DONT_VERIFY_SSL_PEER_KEY;
+  static const QString SRC_BUCKET_KEY;
+  static const qint32 MAX_SRCS;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();
@@ -82,6 +84,7 @@ protected :
   void showEvent (QShowEvent *);
 
 private:
+  QGridLayout* m_mainLayout;
   qint32 m_userRole;
   Qt::CheckState m_useMkls;
   Qt::CheckState mverifyPeer;
@@ -103,14 +106,17 @@ private:
   ImageButton* m_donateBtn;
   QCheckBox* m_showAuthInfoChkbx;
   QCheckBox* m_useMklsChkbx;
-  QGridLayout* m_mainLayout;
+  QBitArray* m_sourceBuckets;
   QCheckBox* mverifyPeerChkBx;
 
   void addEvents(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
-  void setContent(void);
+  void loadProperties(void);
   void saveAsSource(const qint32& idx, const QString& _stype = "auto");
+  QString getSourceBucketsserialized(void);
+  void loadSourceBuckets();
+  void setSourceBuckets(const QString& str);
 };
 
 
