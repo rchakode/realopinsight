@@ -42,17 +42,6 @@ Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" 
   QString opUser = value(Preferences::OP_UNSERNAME_KEY).toString();
   QString opPasswd = value(Preferences::OP_PASSWD_KEY).toString();
 
-  //FIXME: Check default values for url, server and port
-  //  if (src.ls_addr.isEmpty()) {
-  //      setValue(Preferences::SERVER_ADDR_KEY, "localhost");
-  //    }
-  //  if (src.ls_port <=0)	{
-  //      setValue(Preferences::SERVER_PORT_KEY, QString::number(MonitorBroker::DefaultPort));
-  //    }
-  //  if (src.mon_url.isEmpty()) {
-  //      setValue(Preferences::URL_KEY, "http://realopinsight.com/en/index.php?page=contribute");
-  //    }
-
   if (updateInterval.isEmpty()) {
       setValue(Preferences::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
     }
@@ -86,10 +75,19 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 void Settings::loadSource(const qint32& _idx, SourceT& _src)
 {
   QString srcInfo = QSettings::value(utils::sourceKey(_idx)).toString();
-  JsonHelper jsHelper(srcInfo);
-  _src.mon_url = jsHelper.getProperty("mon_url").toString(); if (_src.mon_url.isEmpty()) _src.mon_url = "http://localhost/monitor/";
-  _src.auth = jsHelper.getProperty("auth").toString(); if (_src.auth.isEmpty()) _src.auth = "*******";
-  _src.use_ls = jsHelper.getProperty("use_ls").toInt32();
-  _src.ls_addr = jsHelper.getProperty("ls_addr").toString(); if (_src.ls_addr.isEmpty()) _src.ls_addr = "localhost";
-  _src.ls_port = jsHelper.getProperty("ls_port").toInt32();  if (_src.ls_port == 0) _src.ls_port = MonitorBroker::DefaultPort;
+  if (srcInfo.isEmpty()) {
+      _src.mon_url = "http://localhost/monitor/";
+      _src.auth = "*******";
+      _src.ls_addr = "localhost";
+      _src.ls_port = MonitorBroker::DefaultPort;
+      _src.isSet = false;
+    } else {
+      JsonHelper jsHelper(srcInfo);
+      _src.mon_url = jsHelper.getProperty("mon_url").toString();
+      _src.auth = jsHelper.getProperty("auth").toString();
+      _src.use_ls = jsHelper.getProperty("use_ls").toInt32();
+      _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
+      _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
+      _src.isSet = true;
+    }
 }

@@ -182,14 +182,14 @@ void Preferences::showEvent (QShowEvent *)
 void Preferences::applySettings(void)
 {
   saveAsSource(0);
-  m_sourceBuckets->setBit(0, true);
       msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
 }
 
 void Preferences::addAsSource(void)
 {
   int bucket = 1;
-  while (bucket < MAX_SRCS && m_sourceBuckets->at(bucket)) { bucket++; }
+  while (bucket < MAX_SRCS && m_sourceBuckets->at(bucket)) {bucket++;}
+
   if (bucket < MAX_SRCS) {
       bool ok;
       QString selected = QInputDialog::getItem(this,
@@ -440,11 +440,10 @@ void Preferences::loadSourceBuckets()
 
 void Preferences::setSourceBuckets(const QString& str)
 {
-  if (!str.isEmpty()) {
-      for (int i = 0; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, str.at(i).digitValue());
-    } else {
-      m_sourceBuckets->setBit(0, true);
+  if (str.isEmpty()) {
       for (int i=1; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, false);
+    } else {
+      for (int i = 0; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, str.at(i).digitValue());
     }
 }
 

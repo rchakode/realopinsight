@@ -285,8 +285,9 @@ struct SourceT {
   QString ls_addr;
   qint32 ls_port;
   QString auth;
+  bool isSet;
 };
-typedef QHash<QString, SourceT> SourceListT;
+typedef QHash<int, SourceT> SourceListT;
 
 typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;

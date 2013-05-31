@@ -49,7 +49,7 @@ public:
               const QString& _config = "",
               QWidget* = 0);
   virtual ~SvNavigator();
-  void load(const QString& _file = "");
+  void load(const QString& _file, int srcId=0);
   void resizeDashboard(void);
   static StringMapT propRules();
   static StringMapT calcRules();
@@ -57,9 +57,9 @@ public:
 
 public slots:
   void startMonitor();
-  int runNagiosMonitor(void);
-  int runLsMonitor(void);
-  void prepareDashboardUpdate(void);
+  int runNagiosMonitor(int srcId=0);
+  int runLsMonitor(int srcId=0);
+  void prepareDashboardUpdate(int srcId=0);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
   void centerGraphOnNode(const QString& _nodeId = "");
@@ -91,41 +91,41 @@ protected:
 
 
 private:
-  CoreDataT* mcoreData;
-  QString mconfigFile;
-  QString mactiveFile;
-  QString mselectedNode;
-  QString mstatsInfo;
-  qint32 muserRole;
-  qint32 mupdateInterval;
-  qint32 mtimer;
-  Settings* msettings;
-  Chart* mchart;
-  MsgConsole* mfilteredMsgConsole;
-  QSplitter* mmainSplitter;
-  QSplitter* mrightSplitter;
-  QTabWidget* mviewPanel;
-  WebKit* mbrowser;
-  GraphView* mmap;
-  SvNavigatorTree* mtree;
-  Preferences* mpreferences;
-  Preferences* mchangePasswdWindow;
-  MsgConsole* mmsgConsole;
-  QMenu* mnodeContextMenu;
-  QSize mmsgConsoleSize;
-  MenuListT mmenus;
-  SubMenuListT msubMenus;
-  SubMenuListT mcontextMenuList;
-  ZbxHelper* mzbxHelper;
-  QString mzbxAuthToken;
-  qint32 mhostLeft;
-  bool mupdateSucceed;
-  ZnsHelper* mznsHelper;
-  bool misLogged;
-  QString mlastErrorMsg;
-  QSystemTrayIcon* mtrayIcon;
-  bool mshowOnlyTroubles;
-  SourceListT msources;
+  CoreDataT* m_coreData;
+  QString m_configFile;
+  QString m_activeFile;
+  QString m_selectedNode;
+  QString m_statsInfo;
+  qint32 m_userRole;
+  qint32 m_updateInterval;
+  qint32 m_timer;
+  Settings* m_settings;
+  Chart* m_chart;
+  MsgConsole* m_filteredMsgConsole;
+  QSplitter* m_mainSplitter;
+  QSplitter* m_rightSplitter;
+  QTabWidget* m_viewPanel;
+  WebKit* m_browser;
+  GraphView* m_map;
+  SvNavigatorTree* m_tree;
+  Preferences* m_preferences;
+  Preferences* m_changePasswdWindow;
+  MsgConsole* m_msgConsole;
+  QMenu* m_nodeContextMenu;
+  QSize m_msgConsoleSize;
+  MenuListT m_menus;
+  SubMenuListT m_subMenus;
+  SubMenuListT m_contextMenuList;
+  ZbxHelper* m_zbxHelper;
+  QString m_zbxAuthToken;
+  qint32 m_hostLeft;
+  bool m_updateSucceed;
+  ZnsHelper* m_znsHelper;
+  bool m_isLogged;
+  QString m_lastErrorMsg;
+  QSystemTrayIcon* m_trayIcon;
+  bool m_showOnlyTroubles;
+  SourceListT m_sources;
 
   void addEvents(void);
   void loadMenus(void);
@@ -140,8 +140,8 @@ private:
   void updateCNodes(const CheckT & check);
   void finalizeDashboardUpdate(const bool& enable=true);
   void updateStatusBar(const QString& msg);
-  QStringList getAuthInfo(void);
-  void openRpcSession(void);
+  QStringList getAuthInfo(int srcId=0);
+  void openRpcSession(int srcId=0);
   void closeRpcSession(void);
   void postRpcDataRequest(void);
   void updateDashboardOnUnknown();
