@@ -28,12 +28,12 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 
-
-const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+namespace {
+  const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+}
 
 class ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
-
 public:
   enum {
     Login=1,
@@ -42,13 +42,14 @@ public:
     TriggerV18=4,
     Logout=5
   };
+  static const RequestListT ReqPatterns;
 
 public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
   void postRequest(const qint32& reqId, const QStringList& params);
   void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; mrequestHandler->setUrl(QUrl(apiUri));}
-  inline QString getApiUri(void) const {return apiUri;}
+  inline QString getApiEndpoint(void) const {return apiUri;}
   inline void updateTrid(const QString& apiv) {mtrid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
   inline int getTrid(void) const {return mtrid;}
   void setSslConf(bool verifyPeer);
@@ -62,10 +63,9 @@ signals:
 private :
   QString apiUri;
   QNetworkRequest* mrequestHandler;
-  RequestListT mrequestsPatterns;
   int mtrid;
+  static RequestListT requestsPatterns();
   QSslConfiguration* sslConf;
-  void setRequestsPatterns();
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

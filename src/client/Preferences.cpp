@@ -38,6 +38,7 @@ const qint32 Preferences::ForceChangePassword = 1;
 const qint32 Preferences::ChangeMonitoringSettings = 2;
 const qint32 Preferences::ShowHelp = 3;
 const qint32 Preferences::ShowAbout = 4;
+
 const QString Preferences::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
 const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser";
@@ -45,6 +46,7 @@ const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SRC_BUCKET_KEY = "/Sources/buckets";
+
 const qint32 Preferences::MAX_SRCS = 10;
 const QStringList Preferences::SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
                                                          << "Zabbix"

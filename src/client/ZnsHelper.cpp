@@ -28,9 +28,9 @@
 #include <QNetworkCookieJar>
 
 
-const RequestListT ZnsHelper::ReQPatterns = ZnsHelper::getRequestsPatterns();
-const RequestListT ZnsHelper::ContentTypes = ZnsHelper::getContentTypes();
-const RequestListT ZnsHelper::Routers = ZnsHelper::getRouters();
+const RequestListT ZnsHelper::ReqPatterns = ZnsHelper::requestsPatterns();
+const RequestListT ZnsHelper::ContentTypes = ZnsHelper::contentTypes();
+const RequestListT ZnsHelper::Routers = ZnsHelper::routers();
 
 ZnsHelper::ZnsHelper(const QString& baseUrl)
   : QNetworkAccessManager(),
@@ -61,12 +61,12 @@ void ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
-void ZnsHelper::setRouter(const int& reqType) {
+void ZnsHelper::setRouterEndpoint(const int& reqType) {
   QString url = mapiBaseUrl+ZNS_API_CONTEXT + "/" + Routers[reqType];
-  setRequestUrl(url);
+  setRequestEndpoint(url);
 }
 
-RequestListT ZnsHelper::getContentTypes()
+RequestListT ZnsHelper::contentTypes()
 {
   RequestListT list;
   list[Login] = "application/x-www-form-urlencoded";
@@ -76,7 +76,7 @@ RequestListT ZnsHelper::getContentTypes()
 }
 
 
-RequestListT ZnsHelper::getRequestsPatterns()
+RequestListT ZnsHelper::requestsPatterns()
 {
   RequestListT list;
   list[Device] = "{\"action\": \"DeviceRouter\", \
@@ -106,7 +106,7 @@ RequestListT ZnsHelper::getRequestsPatterns()
   return list;
 }
 
-RequestListT ZnsHelper::getRouters()
+RequestListT ZnsHelper::routers()
 {
   RequestListT list;
   list[Component] = "device_router";

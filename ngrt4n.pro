@@ -66,7 +66,8 @@ HEADERS	+= include/core/ns.hpp \
     include/client/Chart.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
-    include/client/LsHelper.hpp
+    include/client/LsHelper.hpp \
+    include/client/MonitorFactory.hp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \

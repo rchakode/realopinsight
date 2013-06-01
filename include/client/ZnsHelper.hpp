@@ -27,8 +27,10 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
-const QString ZNS_API_CONTEXT = "/zport/dmd";
-const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+namespace {
+  const QString ZNS_API_CONTEXT = "/zport/dmd";
+  const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+}
 
 class ZnsHelper : public QNetworkAccessManager {
   Q_OBJECT
@@ -40,24 +42,24 @@ public:
     Device=3,
     DeviceInfo=4
   };
-  const static RequestListT ReQPatterns;
+  const static RequestListT ReqPatterns;
   const static RequestListT ContentTypes;
   const static RequestListT Routers;
 
   ZnsHelper(const QString & baseUrl="http://localhost:8080");
   virtual ~ZnsHelper();
 
-  static RequestListT getContentTypes();
-  static RequestListT getRequestsPatterns();
-  static RequestListT getRouters();
+  static RequestListT contentTypes();
+  static RequestListT requestsPatterns();
+  static RequestListT routers();
   void setBaseUrl(const QString & url);
   void postRequest(const qint32 & reqId,  const QByteArray & data);
-  void setRouter(const int & reqType);
-  inline QString getRequestUrl(void) const {return mrequestHandler->url().toString();}
-  inline void setRequestUrl(const QString & url) {mrequestHandler->setUrl(QUrl(url));}
-  inline void setRequestUrl(const QUrl & url) {mrequestHandler->setUrl(url);}
-  inline QString getApiContextUrl(void) const {return mapiBaseUrl+ZNS_API_CONTEXT;}
-  inline QString getApiBaseUrl(void) const {return mapiBaseUrl;}
+  void setRouterEndpoint(const int & reqType);
+  inline QString getRequestEndpoint(void) const {return mrequestHandler->url().toString();}
+  inline void setRequestEndpoint(const QString & url) {mrequestHandler->setUrl(QUrl(url));}
+  inline void setRequestEndpoint(const QUrl & url) {mrequestHandler->setUrl(url);}
+  inline QString getApiContextEndpoint(void) const {return mapiBaseUrl+ZNS_API_CONTEXT;}
+  inline QString getApiBaseEndpoint(void) const {return mapiBaseUrl;}
   inline static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
   void setSslConf(bool verifyPeer);
 

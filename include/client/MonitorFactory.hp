@@ -1,0 +1,18 @@
+#ifndef MONITORFACTORY_HP
+#define MONITORFACTORY_HP
+
+#include <QNetworkAccessManager>
+
+class MonitorFactory : public QNetworkAccessManager
+{
+  Q_OBJECT
+public:
+  explicit MonitorFactory(QObject *parent = 0);
+  
+signals:
+  
+public slots:
+  
+};
+
+#endif // MONITORFACTORY_HP

@@ -26,6 +26,10 @@
 #include <QDebug>
 #include <QMessageBox>
 
+
+const RequestListT ZbxHelper::ReqPatterns = ZbxHelper::requestsPatterns();
+
+
 ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
     apiUri(baseUrl%ZBX_API_CONTEXT),
@@ -35,7 +39,6 @@ ZbxHelper::ZbxHelper(const QString & baseUrl)
 {
   mrequestHandler->setRawHeader("Content-Type", "application/json");
   mrequestHandler->setUrl(QUrl(apiUri));
-  setRequestsPatterns();
 
 }
 
@@ -46,26 +49,27 @@ ZbxHelper::~ZbxHelper()
 }
 
 void ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
-  QString request = mrequestsPatterns[reqId];
+  QString request = ReqPatterns[reqId];
   foreach(const QString &param, params) {request = request.arg(param);}
   QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, request.toAscii());
   reply->setSslConfiguration(*sslConf);
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
-void ZbxHelper::setRequestsPatterns()
+RequestListT ZbxHelper::requestsPatterns()
 {
-  mrequestsPatterns[Login] = "{\"jsonrpc\": \"2.0\", \
+  RequestListT patterns;
+  patterns[Login] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": null, \
       \"method\": \"user.login\", \
       \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
       \"id\": %9}";
-  mrequestsPatterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
+  patterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
       \"method\": \"apiinfo.version\", \
       \"params\": [], \
       \"auth\": \"%1\", \
       \"id\": %9}";
-  mrequestsPatterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
+  patterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
@@ -75,7 +79,7 @@ void ZbxHelper::setRequestsPatterns()
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
       \"limit\": -1}, \
       \"id\": %9}";
-  mrequestsPatterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
+  patterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
@@ -84,13 +88,13 @@ void ZbxHelper::setRequestsPatterns()
       \"output\":  \"extend\", \
       \"limit\": -1}, \
       \"id\": %9}";
-  mrequestsPatterns[Logout] = "{\"jsonrpc\": \"2.0\", \
+  patterns[Logout] = "{\"jsonrpc\": \"2.0\", \
       \"method\": \"user.logout\", \
       \"params\": {\"sessionid\": \"%1\"}, \
       \"auth\": \"%1\", \
       \"id\": %9}";
-}
 
+  return patterns;
 
 void ZbxHelper::setSslConf(bool verifyPeer)
 {

@@ -440,10 +440,10 @@ void SvNavigator::prepareDashboardUpdate(int srcId)
                                                QString::number(m_sources[srcId].ls_port)));
       break;
     case MonitorBroker::Zabbix:
-      msg = msg.arg(m_zbxHelper->getApiUri());
+      msg = msg.arg(m_zbxHelper->getApiEndpoint());
       break;
     case MonitorBroker::Zenoss:
-      msg = msg.arg(m_znsHelper->getApiBaseUrl()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
+      msg = msg.arg(m_znsHelper->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
       break;
     default:
       break;
@@ -858,7 +858,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
   if (data.endsWith("submitted=true")) {
       m_isLogged = true;
     postRpcDataRequest();
-      m_znsHelper->cookieJar()->setCookiesFromUrl(cookies, m_znsHelper->getApiBaseUrl());
+      m_znsHelper->cookieJar()->setCookiesFromUrl(cookies, m_znsHelper->getApiBaseEndpoint());
   } else {
       JsonHelper jsonHelper(data);
     qint32 tid = jsonHelper.getProperty("tid").toInt32();
@@ -877,14 +877,14 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
         QScriptValue ditem = devices.value();
         QString duid = ditem.property("uid").toString();
               m_znsHelper->postRequest(ZnsHelper::Component,
-                                ZnsHelper::ReQPatterns[ZnsHelper::Component]
+                                      ZnsHelper::ReqPatterns[ZnsHelper::Component]
                                 .arg(duid, QString::number(ZnsHelper::Component))
                                 .toAscii());
 
         QString dname = ditem.property("name").toString();
               if (m_coreData->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
                   m_znsHelper->postRequest(ZnsHelper::Device,
-                                  ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
+                                          ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
                                   .arg(duid, QString::number(ZnsHelper::DeviceInfo))
                                   .toAscii());
         }
@@ -972,7 +972,7 @@ void SvNavigator::openRpcSession(int srcId)
         znsUrlParams.addQueryItem("__ac_name", authParams[0]);
         znsUrlParams.addQueryItem("__ac_password", authParams[1]);
         znsUrlParams.addQueryItem("submitted", "true");
-          znsUrlParams.addQueryItem("came_from", m_znsHelper->getApiContextUrl());
+          znsUrlParams.addQueryItem("came_from", m_znsHelper->getApiContextEndpoint());
           m_znsHelper->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
         break;
       default:
@@ -999,10 +999,10 @@ void SvNavigator::postRpcDataRequest(void) {
       break;
     }
     case MonitorBroker::Zenoss:
-      m_znsHelper->setRouter(ZnsHelper::Device);
+      m_znsHelper->setRouterEndpoint(ZnsHelper::Device);
       foreach (const QString& host, m_coreData->hosts.keys()) {
           m_znsHelper->postRequest(ZnsHelper::Device,
-                                ZnsHelper::ReQPatterns[ZnsHelper::Device]
+                                  ZnsHelper::ReqPatterns[ZnsHelper::Device]
                                 .arg(host, QString::number(ZnsHelper::Device))
                                 .toAscii());
       }
@@ -1016,9 +1016,9 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
 {
   QString apiUrl = "";
   if (m_coreData->monitor == MonitorBroker::Zabbix) {
-      apiUrl = m_zbxHelper->getApiUri();
+      apiUrl = m_zbxHelper->getApiEndpoint();
     } else if (m_coreData->monitor == MonitorBroker::Zenoss) {
-      apiUrl =  m_znsHelper->getRequestUrl();
+      apiUrl =  m_znsHelper->getRequestEndpoint();
   }
   switch (_code) {
     case QNetworkReply::RemoteHostClosedError:
