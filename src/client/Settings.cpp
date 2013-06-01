@@ -32,32 +32,39 @@
 #include "JsHelper.hpp"
 #include <QtScript/QScriptEngine>
 
+const QString Settings::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
+const QString Settings::ADM_UNSERNAME_KEY = "/Auth/admUser";
+const QString Settings::OP_UNSERNAME_KEY = "/Auth/opUsername";
+const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
+const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
+const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
+
 Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
   Q_INIT_RESOURCE(ngrt4n);
   SourceT src; loadSource(0, src);
-  QString updateInterval = value(Preferences::UPDATE_INTERVAL_KEY).toString();
-  QString admUser = value(Preferences::ADM_UNSERNAME_KEY).toString();
-  QString admPasswd = value(Preferences::ADM_PASSWD_KEY).toString();
-  QString opUser = value(Preferences::OP_UNSERNAME_KEY).toString();
-  QString opPasswd = value(Preferences::OP_PASSWD_KEY).toString();
+  QString updateInterval = QSettings::value(Settings::UPDATE_INTERVAL_KEY).toString();
+  QString admUser = QSettings::value(Settings::ADM_UNSERNAME_KEY).toString();
+  QString admPasswd = QSettings::value(Settings::ADM_PASSWD_KEY).toString();
+  QString opUser = QSettings::value(Settings::OP_UNSERNAME_KEY).toString();
+  QString opPasswd = QSettings::value(Settings::OP_PASSWD_KEY).toString();
 
   if (updateInterval.isEmpty()) {
-      setValue(Preferences::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
+      QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
     }
   if (admUser.isEmpty()) {
-      setValue(Preferences::ADM_UNSERNAME_KEY, Auth::AdmUser);
+      QSettings::setValue(Settings::ADM_UNSERNAME_KEY, Auth::AdmUser);
     }
   if (admPasswd.isEmpty()) {
       QString passwd = QCryptographicHash::hash(Auth::AdmUser.toAscii(), QCryptographicHash::Md5) ;
-      setValue(Preferences::ADM_PASSWD_KEY, passwd);
+      QSettings::setValue(Settings::ADM_PASSWD_KEY, passwd);
     }
   if (opUser.isEmpty()) {
-      setValue(Preferences::OP_UNSERNAME_KEY, Auth::OpUser);
+      QSettings::setValue(Settings::OP_UNSERNAME_KEY, Auth::OpUser);
     }
   if (opPasswd.isEmpty()) {
       QString passwd = QCryptographicHash::hash(Auth::OpUser.toAscii(), QCryptographicHash::Md5) ;
-      setValue(Preferences::OP_PASSWD_KEY, passwd);
+      QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
     }
   translator = new QTranslator();
   translator->load("ngrt4n_la");
@@ -71,6 +78,23 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
   sync() ;
 }
 
+
+qint32 Settings::getUpdateInterval()
+{
+  qint32 interval = QSettings::value(UPDATE_INTERVAL_KEY).toInt();
+  return (interval > 0)? interval : MonitorBroker::DefaultUpdateInterval;
+}
+
+void Settings::setEntry(const QString& key, const QString& value)
+{
+  QSettings::setValue(key, value);
+}
+
+
+QString Settings::getEntry(const QString& key)
+{
+  return QSettings::value(key).toString();
+}
 
 void Settings::loadSource(const qint32& _idx, SourceT& _src)
 {
@@ -91,3 +115,4 @@ void Settings::loadSource(const qint32& _idx, SourceT& _src)
       _src.isSet = true;
     }
 }
+

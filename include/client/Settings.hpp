@@ -31,7 +31,18 @@ class Settings : public QSettings
 public:
   Settings();
   void setKeyValue(const QString & _key, const QString & _value);
+  qint32 getUpdateInterval();
+  void setEntry(const QString& key, const QString& value);
+  QString getEntry(const QString& key);
   void loadSource(const qint32& _idx, SourceT& _src);
+
+
+  static const QString UPDATE_INTERVAL_KEY;
+  static const QString ADM_UNSERNAME_KEY;
+  static const QString OP_UNSERNAME_KEY;
+  static const QString ADM_PASSWD_KEY;
+  static const QString OP_PASSWD_KEY;
+  static const QString SRC_BUCKET_KEY;
 
 private:
   QTranslator* translator ;

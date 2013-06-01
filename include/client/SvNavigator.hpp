@@ -126,6 +126,7 @@ private:
   QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
+  QBitArray* m_sourceStates;
 
   void addEvents(void);
   void loadMenus(void);
@@ -147,6 +148,8 @@ private:
   void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* createMsgConsole();
+  void initSources(void);
+  qint32 setUdpateInterval(void) { m_updateInterval = 1000 * m_settings->getUpdateInterval();}
 };
 
 #endif /* SVNAVIGATOR_HPP */

@@ -506,8 +506,7 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       if (m_chart) delete m_chart; m_chart = chart; m_chart->setToolTip(chartdDetails);
       m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
       m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
-      m_updateInterval = m_settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
-      m_updateInterval = 1000*((m_updateInterval > 0)? m_updateInterval:MonitorBroker::DefaultUpdateInterval);
+      setUdpateInterval();
       m_timer = startTimer(m_updateInterval);
       if (m_updateSucceed) updateStatusBar(tr("Update completed"));
       for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
@@ -625,8 +624,7 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
 
 void SvNavigator::updateMonitoringSettings()
 {
-  m_updateInterval = m_settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
-  if (m_updateInterval <= 0) m_updateInterval = MonitorBroker::DefaultUpdateInterval * 1000;
+  setUdpateInterval();
   for (int i=0; i < Preferences::MAX_SRCS; i++) m_settings->loadSource(i, m_sources[i]);
 }
 
@@ -877,16 +875,16 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
         QScriptValue ditem = devices.value();
         QString duid = ditem.property("uid").toString();
               m_znsHelper->postRequest(ZnsHelper::Component,
-                                      ZnsHelper::ReqPatterns[ZnsHelper::Component]
-                                .arg(duid, QString::number(ZnsHelper::Component))
-                                .toAscii());
+                                       ZnsHelper::ReqPatterns[ZnsHelper::Component]
+                                       .arg(duid, QString::number(ZnsHelper::Component))
+                                       .toAscii());
 
         QString dname = ditem.property("name").toString();
               if (m_coreData->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
                   m_znsHelper->postRequest(ZnsHelper::Device,
-                                          ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
-                                  .arg(duid, QString::number(ZnsHelper::DeviceInfo))
-                                  .toAscii());
+                                           ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
+                                           .arg(duid, QString::number(ZnsHelper::DeviceInfo))
+                                           .toAscii());
         }
       }
     } else {
@@ -1002,9 +1000,9 @@ void SvNavigator::postRpcDataRequest(void) {
       m_znsHelper->setRouterEndpoint(ZnsHelper::Device);
       foreach (const QString& host, m_coreData->hosts.keys()) {
           m_znsHelper->postRequest(ZnsHelper::Device,
-                                  ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                                .arg(host, QString::number(ZnsHelper::Device))
-                                .toAscii());
+                                   ZnsHelper::ReqPatterns[ZnsHelper::Device]
+                                   .arg(host, QString::number(ZnsHelper::Device))
+                                   .toAscii());
       }
       break;
     default:
@@ -1104,6 +1102,11 @@ QTabWidget* SvNavigator::createMsgConsole()
   wdgsGrp->setLayout(lyt);
   msgConsole->addTab(wdgsGrp, tr("Message Console"));
   return msgConsole;
+}
+
+void SvNavigator::initSources(void)
+{
+
 }
 
 void SvNavigator::addEvents(void)

@@ -38,15 +38,7 @@ const qint32 Preferences::ForceChangePassword = 1;
 const qint32 Preferences::ChangeMonitoringSettings = 2;
 const qint32 Preferences::ShowHelp = 3;
 const qint32 Preferences::ShowAbout = 4;
-
-const QString Preferences::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
-const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser";
-const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
-const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
-const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
-const QString Preferences::SRC_BUCKET_KEY = "/Sources/buckets";
-
 const qint32 Preferences::MAX_SRCS = 10;
 const QStringList Preferences::SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
                                                          << "Zabbix"
@@ -73,7 +65,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_donateBtn(new ImageButton(":images/built-in/donate.png")),
     m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     m_useMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
-    m_sourceBuckets(new QBitArray())
+    m_sourceStates(new QBitArray(MAX_SRCS))
     mverifyPeerChkBx(new QCheckBox(tr("Don't verify SSL peer")))
 {
   qint32 line = -1;
@@ -170,7 +162,7 @@ Preferences::~Preferences()
   delete m_useMklsChkbx; 
   delete mverifyPeerChkBx;
   delete m_mainLayout;
-  delete m_sourceBuckets;
+  delete m_sourceStates;
 }
 
 
@@ -190,7 +182,7 @@ void Preferences::applySettings(void)
 void Preferences::addAsSource(void)
 {
   int bucket = 1;
-  while (bucket < MAX_SRCS && m_sourceBuckets->at(bucket)) {bucket++;}
+  while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {bucket++;}
 
   if (bucket < MAX_SRCS) {
       bool ok;
@@ -220,10 +212,10 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
   src.use_ls = m_useMklsChkbx->checkState();
-  m_settings->setValue(utils::sourceKey(_idx), utils::source2Str(src));
-  m_settings->setValue(UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
-  m_sourceBuckets->setBit(_idx, true);
-  m_settings->setValue(SRC_BUCKET_KEY, getSourceBucketsserialized());
+  m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
+  m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  m_sourceStates->setBit(_idx, true);
+  m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
   if (_idx == 0) {
       close();
@@ -240,10 +232,10 @@ void Preferences::changePasswd(void)
   QString key;
 
   if (m_userRole == Auth::AdmUserRole) {
-    key = ADM_PASSWD_KEY;
+      key = Settings::ADM_PASSWD_KEY;
       userPasswd = m_settings->value(key, Auth::AdmUser).toString();
   } else {
-    key = OP_PASSWD_KEY;
+      key = Settings::OP_PASSWD_KEY;
       userPasswd = m_settings->value(key, Auth::OpUser).toString();
   }
   passwd = QCryptographicHash::hash(m_oldPwdField->text().toAscii(), QCryptographicHash::Md5);
@@ -331,10 +323,10 @@ QGroupBox* Preferences::createCommonGrp(void)
 void Preferences::loadProperties(void)
 {
   m_updateIntervalField->setMinimum(5);
-  m_updateIntervalField->setMaximum(600);
-  m_updateIntervalField->setValue(m_settings->value(UPDATE_INTERVAL_KEY, MonitorBroker::DefaultUpdateInterval).toInt());
+  m_updateIntervalField->setMaximum(1200);
+  m_updateIntervalField->setValue(m_settings->getUpdateInterval());
 
-  loadSourceBuckets();
+  initSourceStates();
   SourceT src;
   m_settings->loadSource(0, src);
   m_onitorUrlField->setText(src.mon_url);
@@ -427,25 +419,25 @@ QString Preferences::style() {
   return styleSheet;
 }
 
-QString Preferences::getSourceBucketsserialized(void)
+QString Preferences::getSourceStatesSerialized(void)
 {
   QString str = "";
-  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceBuckets->at(i)? "1" : "0";
+  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";
   return str;
 }
 
-void Preferences::loadSourceBuckets()
+void Preferences::initSourceStates()
 {
-  QString str = m_settings->value(SRC_BUCKET_KEY).toString();
-  setSourceBuckets(str);
+  QString str = m_settings->value(Settings::SRC_BUCKET_KEY).toString();
+  initSourceStates(str);
 }
 
-void Preferences::setSourceBuckets(const QString& str)
+void Preferences::initSourceStates(const QString& str)
 {
   if (str.isEmpty()) {
-      for (int i=1; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, false);
+      for (int i=1; i < MAX_SRCS; i++) m_sourceStates->setBit(i, false);
     } else {
-      for (int i = 0; i < MAX_SRCS; i++) m_sourceBuckets->setBit(i, str.at(i).digitValue());
+      for (int i = 0; i < MAX_SRCS; i++) m_sourceStates->setBit(i, str.at(i).digitValue());
     }
 }
 

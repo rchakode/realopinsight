@@ -56,13 +56,7 @@ public:
   static const qint32 ChangeMonitoringSettings;
   static const qint32 ShowHelp;
   static const qint32 ShowAbout;
-  static const QString UPDATE_INTERVAL_KEY;
-  static const QString ADM_UNSERNAME_KEY;
-  static const QString OP_UNSERNAME_KEY;
-  static const QString ADM_PASSWD_KEY;
-  static const QString OP_PASSWD_KEY;
   static const QString DONT_VERIFY_SSL_PEER_KEY;
-  static const QString SRC_BUCKET_KEY;
   static const qint32 MAX_SRCS;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
@@ -106,7 +100,7 @@ private:
   ImageButton* m_donateBtn;
   QCheckBox* m_showAuthInfoChkbx;
   QCheckBox* m_useMklsChkbx;
-  QBitArray* m_sourceBuckets;
+  QBitArray* m_sourceStates;
   QCheckBox* mverifyPeerChkBx;
 
   void addEvents(void);
@@ -114,9 +108,9 @@ private:
   QGroupBox* createCommonGrp(void);
   void loadProperties(void);
   void saveAsSource(const qint32& idx, const QString& _stype = "auto");
-  QString getSourceBucketsserialized(void);
-  void loadSourceBuckets();
-  void setSourceBuckets(const QString& str);
+  QString getSourceStatesSerialized(void);
+  void initSourceStates();
+  void initSourceStates(const QString& str);
 };
 
 
