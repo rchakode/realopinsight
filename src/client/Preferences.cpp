@@ -39,10 +39,6 @@ const qint32 Preferences::ChangeMonitoringSettings = 2;
 const qint32 Preferences::ShowHelp = 3;
 const qint32 Preferences::ShowAbout = 4;
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
-const qint32 Preferences::MAX_SRCS = 10;
-const QStringList Preferences::SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
-                                                         << "Zabbix"
-                                                         << "Zenoss";
 
 Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
@@ -242,7 +238,7 @@ void Preferences::changePasswd(void)
   newPasswd = QCryptographicHash::hash(m_pwdField->text().toAscii(), QCryptographicHash::Md5);
   renewPasswd = QCryptographicHash::hash(m_rePwdField->text().toAscii(), QCryptographicHash::Md5);
 
-  if(userPasswd == passwd) {
+  if (userPasswd == passwd) {
     if(newPasswd == renewPasswd) {
           m_settings->setKeyValue(key, newPasswd);
       QMessageBox::information(this,

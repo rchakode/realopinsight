@@ -79,7 +79,7 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 }
 
 
-qint32 Settings::getUpdateInterval()
+qint32 Settings::getUpdateInterval() const
 {
   qint32 interval = QSettings::value(UPDATE_INTERVAL_KEY).toInt();
   return (interval > 0)? interval : MonitorBroker::DefaultUpdateInterval;
@@ -90,12 +90,6 @@ void Settings::setEntry(const QString& key, const QString& value)
   QSettings::setValue(key, value);
 }
 
-
-QString Settings::getEntry(const QString& key)
-{
-  return QSettings::value(key).toString();
-}
-
 void Settings::loadSource(const qint32& _idx, SourceT& _src)
 {
   QString srcInfo = QSettings::value(utils::sourceKey(_idx)).toString();
@@ -104,7 +98,6 @@ void Settings::loadSource(const qint32& _idx, SourceT& _src)
       _src.auth = "*******";
       _src.ls_addr = "localhost";
       _src.ls_port = MonitorBroker::DefaultPort;
-      _src.isSet = false;
     } else {
       JsonHelper jsHelper(srcInfo);
       _src.mon_url = jsHelper.getProperty("mon_url").toString();
@@ -112,7 +105,6 @@ void Settings::loadSource(const qint32& _idx, SourceT& _src)
       _src.use_ls = jsHelper.getProperty("use_ls").toInt32();
       _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
       _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
-      _src.isSet = true;
     }
 }
 

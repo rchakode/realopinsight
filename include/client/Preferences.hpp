@@ -57,12 +57,14 @@ public:
   static const qint32 ShowHelp;
   static const qint32 ShowAbout;
   static const QString DONT_VERIFY_SSL_PEER_KEY;
-  static const qint32 MAX_SRCS;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();
   static QString style();
   bool useLs(void) const {return m_useMkls == Qt::Checked;}
+  QBitArray* getSourceStates() const {return m_sourceStates;}
+  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;}
+
 
 public slots:
   void applySettings(void);

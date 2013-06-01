@@ -49,6 +49,7 @@
   app->installTranslator(&translator); \
   QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
 
+
 const QString PROJECT = "NGRT4N";
 const QString USER_BN = BUILTIN_USER_PREFIX;
 const QString PJT_NAME = PROJECT;
@@ -60,9 +61,11 @@ const QString REL_NAME = RELEASE_NAME;
 const QString REL_YEAR = RELEASE_YEAR;
 const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
 const QString ID_PATTERN("%1/%2");
-typedef QMap<QString, QString> IconMapT;
-typedef QList<QListWidgetItem*> CheckItemList;
-typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
+
+const qint32 MAX_SRCS = 10;
+const QStringList SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
+                                                         << "Zabbix"
+                                                         << "Zenoss";
 
 class PropRules {
 public:
@@ -255,6 +258,7 @@ typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
 typedef QHash<QString, QStringList> HostListT;
 
+typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
 struct CoreDataT {
   qint8 monitor;
   NodeListT bpnodes;
@@ -263,6 +267,7 @@ struct CoreDataT {
   HostListT hosts;
   TreeNodeItemListT tree_items;
 };
+
 struct GNodeT {
   QGraphicsTextItem* label;
   QGraphicsPixmapItem* icon;
@@ -285,10 +290,13 @@ struct SourceT {
   QString ls_addr;
   qint32 ls_port;
   QString auth;
-  bool isSet;
 };
 typedef QHash<int, SourceT> SourceListT;
 
+
+
+typedef QMap<QString, QString> IconMapT;
+typedef QList<QListWidgetItem*> CheckItemList;
 typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;

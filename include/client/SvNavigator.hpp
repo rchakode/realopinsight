@@ -97,7 +97,7 @@ private:
   QString m_selectedNode;
   QString m_statsInfo;
   qint32 m_userRole;
-  qint32 m_updateInterval;
+  qint32 m_interval;
   qint32 m_timer;
   Settings* m_settings;
   Chart* m_chart;
@@ -126,12 +126,10 @@ private:
   QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
-  QBitArray* m_sourceStates;
 
   void addEvents(void);
   void loadMenus(void);
   void unloadMenus(void);
-  void updateMonitoringSettings();
   void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
   void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
   void computeStatusInfo(NodeListT::iterator& _node);
@@ -143,13 +141,12 @@ private:
   void updateStatusBar(const QString& msg);
   QStringList getAuthInfo(int srcId=0);
   void openRpcSession(int srcId=0);
-  void closeRpcSession(void);
   void postRpcDataRequest(void);
   void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* createMsgConsole();
-  void initSources(void);
-  qint32 setUdpateInterval(void) { m_updateInterval = 1000 * m_settings->getUpdateInterval();}
+  void refreshSettings(void);
+  void udpateInterval(void) { m_interval = 1000 * m_settings->getUpdateInterval();}
 };
 
 #endif /* SVNAVIGATOR_HPP */

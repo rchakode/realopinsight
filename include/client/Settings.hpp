@@ -31,9 +31,9 @@ class Settings : public QSettings
 public:
   Settings();
   void setKeyValue(const QString & _key, const QString & _value);
-  qint32 getUpdateInterval();
+  qint32 getUpdateInterval() const;
   void setEntry(const QString& key, const QString& value);
-  QString getEntry(const QString& key);
+  QString getEntry(const QString& key) const {return QSettings::value(key).toString();}
   void loadSource(const qint32& _idx, SourceT& _src);
 
 

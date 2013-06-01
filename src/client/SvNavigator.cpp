@@ -106,7 +106,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
   m_rightSplitter->addWidget(createMsgConsole());
   m_rightSplitter->setOrientation(Qt::Vertical);
   setCentralWidget(m_mainSplitter);
-  updateMonitoringSettings();
+  refreshSettings();
   tabChanged(0);
   addEvents();
 }
@@ -267,9 +267,9 @@ void SvNavigator::handleChangePasswordAction(void)
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
   m_preferences->exec();
-  updateMonitoringSettings();
+  refreshSettings();
   killTimer(m_timer);
-  m_timer = startTimer(m_updateInterval);
+  m_timer = startTimer(m_interval);
   m_isLogged = false;
   startMonitor();
 }
@@ -506,8 +506,8 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
       if (m_chart) delete m_chart; m_chart = chart; m_chart->setToolTip(chartdDetails);
       m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
       m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
-      setUdpateInterval();
-      m_timer = startTimer(m_updateInterval);
+      udpateInterval();
+      m_timer = startTimer(m_interval);
       if (m_updateSucceed) updateStatusBar(tr("Update completed"));
       for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
          cnode != end; cnode++) {
@@ -620,12 +620,6 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
     (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.severity));
     (*tnode_it)->setToolTip(0, _tip);
   }
-}
-
-void SvNavigator::updateMonitoringSettings()
-{
-  setUdpateInterval();
-  for (int i=0; i < Preferences::MAX_SRCS; i++) m_settings->loadSource(i, m_sources[i]);
 }
 
 void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
@@ -744,14 +738,6 @@ void SvNavigator::resizeDashboard(void)
 
   m_mainSplitter->resize(screenSize.width(), screenSize.height() * 0.85);
   QMainWindow::resize(screenSize.width(),  screenSize.height());
-}
-
-void SvNavigator::closeRpcSession(void)
-{
-  QStringList params;
-  params.push_back(m_zbxAuthToken);
-  params.push_back(QString::number(ZbxHelper::Logout));
-  m_zbxHelper->postRequest(ZbxHelper::Logout, params);
 }
 
 void SvNavigator::processZbxReply(QNetworkReply* _reply)
@@ -1104,9 +1090,17 @@ QTabWidget* SvNavigator::createMsgConsole()
   return msgConsole;
 }
 
-void SvNavigator::initSources(void)
+void SvNavigator::refreshSettings(void)
 {
-
+  SourceT src;
+  m_sources.clear();
+  for (int i=0; i< MAX_SRCS; i++) {
+      if (m_preferences->isSetSource(i)) {
+          m_settings->loadSource(i, src);
+          m_sources.insert(i, src);
+        }
+    }
+  udpateInterval();
 }
 
 void SvNavigator::addEvents(void)
