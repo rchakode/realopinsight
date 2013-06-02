@@ -53,26 +53,27 @@ public:
   static RequestListT requestsPatterns();
   static RequestListT routers();
   void setBaseUrl(const QString & url);
-  void postRequest(const qint32 & reqId,  const QByteArray & data);
+  QNetworkReply* postRequest(const qint32 & reqId,  const QByteArray & data);
   void setRouterEndpoint(const int & reqType);
-  inline QString getRequestEndpoint(void) const {return mrequestHandler->url().toString();}
-  inline void setRequestEndpoint(const QString & url) {mrequestHandler->setUrl(QUrl(url));}
-  inline void setRequestEndpoint(const QUrl & url) {mrequestHandler->setUrl(url);}
-  inline QString getApiContextEndpoint(void) const {return mapiBaseUrl+ZNS_API_CONTEXT;}
-  inline QString getApiBaseEndpoint(void) const {return mapiBaseUrl;}
-  inline static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
+  QString getRequestEndpoint(void) const {return m_reqHandler->url().toString();}
+  void setRequestEndpoint(const QString & url) {m_reqHandler->setUrl(QUrl(url));}
+  void setRequestEndpoint(const QUrl & url) {m_reqHandler->setUrl(url);}
+  QString getApiContextEndpoint(void) const {return m_apiBaseUrl+ZNS_API_CONTEXT;}
+  QString getApiBaseEndpoint(void) const {return m_apiBaseUrl;}
+  static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
   void setSslConf(bool verifyPeer);
 
 public slots:
-  inline void processError(const QNetworkReply::NetworkError& code) {if(code <200 && code >599) emit propagateError(code);}
+  void processError(const QNetworkReply::NetworkError& code) {m_evlHandler->exit(code);}
 
 signals:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
-  QString mapiBaseUrl;
-  QNetworkRequest* mrequestHandler;
+  QString m_apiBaseUrl;
+  QNetworkRequest* m_reqHandler;
   QSslConfiguration* sslConf;
+  QEventLoop* m_evlHandler;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

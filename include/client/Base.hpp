@@ -29,6 +29,7 @@
 #include <QtGui>
 #include <QtWebKit>
 #include <QSettings>
+#include <memory>
 
 /* TODO: Logging
 #define LOGFILE QDir::tempPath()%"/realopinsight.log"
@@ -64,8 +65,13 @@ const QString ID_PATTERN("%1/%2");
 
 const qint32 MAX_SRCS = 10;
 const QStringList SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
-                                                         << "Zabbix"
-                                                         << "Zenoss";
+                                            << "Zabbix"
+                                            << "Zenoss";
+
+class LsHelper;
+class ZbxHelper;
+class ZnsHelper;
+class ZmqSocket;
 
 class PropRules {
 public:
@@ -290,10 +296,12 @@ struct SourceT {
   QString ls_addr;
   qint32 ls_port;
   QString auth;
+  ZmqSocket* d4n_handler;
+  LsHelper* ls_handler;
+  ZbxHelper* zbx_handler;
+  ZnsHelper* zns_handler;
 };
 typedef QHash<int, SourceT> SourceListT;
-
-
 
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem*> CheckItemList;

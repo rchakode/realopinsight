@@ -32,28 +32,32 @@ const RequestListT ZbxHelper::ReqPatterns = ZbxHelper::requestsPatterns();
 
 ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
-    apiUri(baseUrl%ZBX_API_CONTEXT),
-    mrequestHandler(new QNetworkRequest()),
-    mtrid(Trigger),
-    sslConf(new QSslConfiguration)
+    m_apiUri(baseUrl%ZBX_API_CONTEXT),
+    m_reqHandler(new QNetworkRequest()),
+    m_trid(-1),
+    m_evlHandler(new QEventLoop(this))
 {
-  mrequestHandler->setRawHeader("Content-Type", "application/json");
-  mrequestHandler->setUrl(QUrl(apiUri));
+  m_reqHandler->setRawHeader("Content-Type", "application/json");
+  m_reqHandler->setUrl(QUrl(m_apiUri));
 
 }
 
 ZbxHelper::~ZbxHelper()
 {
-  delete mrequestHandler;
+  delete m_reqHandler;
+  delete m_evlHandler;
   delete sslConf;
 }
 
-void ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
+QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
   QString request = ReqPatterns[reqId];
   foreach(const QString &param, params) {request = request.arg(param);}
-  QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, request.toAscii());
+  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, request.toAscii());
   reply->setSslConfiguration(*sslConf);
+  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+  m_evlHandler->exec();
+  return reply;
 }
 
 RequestListT ZbxHelper::requestsPatterns()

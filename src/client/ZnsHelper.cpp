@@ -34,35 +34,39 @@ const RequestListT ZnsHelper::Routers = ZnsHelper::routers();
 
 ZnsHelper::ZnsHelper(const QString& baseUrl)
   : QNetworkAccessManager(),
-    mapiBaseUrl(baseUrl),
-    mrequestHandler(new QNetworkRequest()),
-    sslConf(new QSslConfiguration)
+    m_apiBaseUrl(baseUrl),
+    m_reqHandler(new QNetworkRequest()),
+    m_evlHandler(new QEventLoop(this))
 {
-  mrequestHandler->setUrl(QUrl(mapiBaseUrl+ZNS_API_CONTEXT));
+  m_reqHandler->setUrl(QUrl(m_apiBaseUrl+ZNS_API_CONTEXT));
 }
 
 ZnsHelper::~ZnsHelper()
 {
-  delete mrequestHandler;
+  delete m_reqHandler;
+  delete m_evlHandler;
   delete sslConf;
 }
 
 void ZnsHelper::setBaseUrl(const QString& url)
 {
-  mapiBaseUrl = url;
-  mrequestHandler->setUrl(QUrl(mapiBaseUrl+ZNS_LOGIN_API_CONTEXT));
+  m_apiBaseUrl = url;
+  m_reqHandler->setUrl(QUrl(m_apiBaseUrl+ZNS_LOGIN_API_CONTEXT));
 }
 
-void ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
+QNetworkReply* ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
 {
-  mrequestHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
-  QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, data);
+  m_reqHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
+  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, data);
   reply->setSslConfiguration(*sslConf);
+  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+  m_evlHandler->exec();
+  return reply;
 }
 
 void ZnsHelper::setRouterEndpoint(const int& reqType) {
-  QString url = mapiBaseUrl+ZNS_API_CONTEXT + "/" + Routers[reqType];
+  QString url = m_apiBaseUrl+ZNS_API_CONTEXT + "/" + Routers[reqType];
   setRequestEndpoint(url);
 }
 

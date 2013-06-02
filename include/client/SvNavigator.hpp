@@ -49,7 +49,7 @@ public:
               const QString& _config = "",
               QWidget* = 0);
   virtual ~SvNavigator();
-  void load(const QString& _file, int srcId=0);
+  void load(const QString& _file, int srcId);
   void resizeDashboard(void);
   static StringMapT propRules();
   static StringMapT calcRules();
@@ -57,9 +57,10 @@ public:
 
 public slots:
   void startMonitor();
-  int runNagiosMonitor(int srcId=0);
-  int runLsMonitor(int srcId=0);
-  void prepareDashboardUpdate(int srcId=0);
+  void runNagiosUpdate(int srcId);
+  void runLivestatusUpdate(int srcId);
+  void runZabbixZenossUpdate(int srcId);
+  void prepareUpdate(int srcId);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
   void centerGraphOnNode(const QString& _nodeId = "");
@@ -139,14 +140,17 @@ private:
   void updateCNodes(const CheckT & check);
   void finalizeDashboardUpdate(const bool& enable=true);
   void updateStatusBar(const QString& msg);
-  QStringList getAuthInfo(int srcId=0);
-  void openRpcSession(int srcId=0);
-  void postRpcDataRequest(void);
+  QStringList getAuthInfo(int srcId);
+  QStringList getAuthInfo(const QString& authString);
+  void openRpcSession(int srcId);
+  void openRpcSession(const SourceT& src);
+  void requestRpcData(void);
   void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
-  QTabWidget* createMsgConsole();
-  void refreshSettings(void);
-  void udpateInterval(void) { m_interval = 1000 * m_settings->getUpdateInterval();}
+  QTabWidget* newMsgConsole();
+  void resetSettings(void);
+  void resetInterval(void);
+  void checkSourcesAvailability(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

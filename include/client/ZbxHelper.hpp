@@ -47,24 +47,24 @@ public:
 public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
-  void postRequest(const qint32& reqId, const QStringList& params);
-  void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; mrequestHandler->setUrl(QUrl(apiUri));}
-  inline QString getApiEndpoint(void) const {return apiUri;}
-  inline void updateTrid(const QString& apiv) {mtrid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
-  inline int getTrid(void) const {return mtrid;}
+  QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
+  void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
+  QString getApiEndpoint(void) const {return m_apiUri;}
+  void updateTrid(const QString& apiv) {m_trid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
+  int getTrid(void) const {return m_trid;}
   void setSslConf(bool verifyPeer);
 
 public slots:
-  inline void processError(const QNetworkReply::NetworkError& code) {if(code <200 && code >=599) emit propagateError(code);}
-
+  void processError(const QNetworkReply::NetworkError& code) { m_evlHandler->exit(code);}
 signals:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
-  QString apiUri;
-  QNetworkRequest* mrequestHandler;
-  int mtrid;
+  QString m_apiUri;
+  QNetworkRequest* m_reqHandler;
+  int m_trid;
   static RequestListT requestsPatterns();
+  QEventLoop* m_evlHandler;
   QSslConfiguration* sslConf;
 };
 
