@@ -77,9 +77,9 @@ public slots:
   void toggleFullScreen(bool _toggled);
   void toggleTroubleView(bool _toggled);
   void toggleIncreaseMsgFont(bool _toggled);
-  void processZbxReply(QNetworkReply* reply);
-  void processZnsReply(QNetworkReply* reply);
-  void processRpcError(QNetworkReply::NetworkError code);
+  void processZbxReply(QNetworkReply* reply, const SourceT& src);
+  void processZnsReply(QNetworkReply* reply, const SourceT& src);
+  void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
 
 signals:
   void hasToBeUpdate(QString);
@@ -117,11 +117,9 @@ private:
   MenuListT m_menus;
   SubMenuListT m_subMenus;
   SubMenuListT m_contextMenuList;
-  ZbxHelper* m_zbxHelper;
   QString m_zbxAuthToken;
   qint32 m_hostLeft;
   bool m_updateSucceed;
-  ZnsHelper* m_znsHelper;
   bool m_isLogged;
   QString m_lastErrorMsg;
   QSystemTrayIcon* m_trayIcon;
@@ -144,7 +142,7 @@ private:
   QStringList getAuthInfo(const QString& authString);
   void openRpcSession(int srcId);
   void openRpcSession(const SourceT& src);
-  void requestRpcData(void);
+  void requestRpcData(const SourceT& src);
   void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();

@@ -87,10 +87,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     m_msgConsole(new MsgConsole(this)),
     m_nodeContextMenu (new QMenu()),
-    m_zbxHelper(new ZbxHelper()),
     m_zbxAuthToken(""),
     m_hostLeft(0),
-    m_znsHelper(new ZnsHelper()),
     m_isLogged(false),
     m_lastErrorMsg(""),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
@@ -124,8 +122,6 @@ SvNavigator::~SvNavigator()
   delete m_mainSplitter;
   delete m_preferences;
   delete m_changePasswdWindow;
-  delete m_zbxHelper;
-  delete m_znsHelper;
   delete m_trayIcon;
   unloadMenus();
 }
@@ -214,7 +210,8 @@ void SvNavigator::startMonitor()
   switch(m_coreData->monitor) {
     case MonitorBroker::Zenoss:
     case MonitorBroker::Zabbix:
-      !m_isLogged ? openRpcSession(0): requestRpcData();
+      //FIXME: !m_isLogged ? openRpcSession(0): requestRpcData();
+      runZabbixZenossUpdate(0);
       break;
     case MonitorBroker::Nagios:
     default:
@@ -425,8 +422,12 @@ void SvNavigator::runLivestatusUpdate(int srcId)
 void SvNavigator::runZabbixZenossUpdate(int srcId)
 {
   updateDashboardOnUnknown();
-  openRpcSession(srcId);
-  if (m_isLogged) requestRpcData();
+
+  SourceListT::Iterator src = m_sources.find(srcId);
+  if (src != m_sources.end()) {
+      openRpcSession(*src);
+      requestRpcData(*src);
+    }
 }
 
 
@@ -751,13 +752,13 @@ void SvNavigator::resizeDashboard(void)
   QMainWindow::resize(screenSize.width(),  screenSize.height());
 }
 
-void SvNavigator::processZbxReply(QNetworkReply* _reply)
+void SvNavigator::processZbxReply(QNetworkReply* _reply, const SourceT& src)
 {
   _reply->deleteLater();
   QNetworkReply::NetworkError errcode = _reply->error();
   if (errcode != QNetworkReply::NoError) {
       m_lastErrorMsg = _reply->errorString();
-    processRpcError(errcode);
+      processRpcError(errcode, src);
     return;
   }
   QString data = _reply->readAll();
@@ -778,7 +779,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
       break;
     }
     case ZbxHelper::ApiVersion: {
-        m_zbxHelper->updateTrid(jsHelper.getProperty("result").toString());
+        src.zbx_handler->updateTrid(jsHelper.getProperty("result").toString());
       break;
     }
     case ZbxHelper::Trigger:
@@ -833,13 +834,13 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply)
   }
 }
 
-void SvNavigator::processZnsReply(QNetworkReply* _reply)
+void SvNavigator::processZnsReply(QNetworkReply* _reply, const SourceT& src)
 {
   _reply->deleteLater();
 
   if (_reply->error() != QNetworkReply::NoError) {
       m_lastErrorMsg = _reply->errorString();
-      processRpcError(_reply->error());
+      processRpcError(_reply->error(), src);
     return;
   }
 
@@ -847,7 +848,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
   QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
   QString data = _reply->readAll();
   if (data.endsWith("submitted=true")) {
-      m_znsHelper->cookieJar()->setCookiesFromUrl(cookies, m_znsHelper->getApiBaseEndpoint());
+      src.zns_handler->cookieJar()->setCookiesFromUrl(cookies, src.zns_handler->getApiBaseEndpoint());
       m_isLogged = true;
   } else {
       JsonHelper jsonHelper(data);
@@ -866,19 +867,19 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply)
 
         QScriptValue ditem = devices.value();
         QString duid = ditem.property("uid").toString();
-              QNetworkReply* reply = m_znsHelper->postRequest(ZnsHelper::Component,
+              QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Component,
                                                               ZnsHelper::ReqPatterns[ZnsHelper::Component]
                                                               .arg(duid, QString::number(ZnsHelper::Component))
                                                               .toAscii());
-              processZnsReply(reply);
+              processZnsReply(reply, src);
 
         QString dname = ditem.property("name").toString();
               if (m_coreData->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
-                  reply = m_znsHelper->postRequest(ZnsHelper::Device,
+                  reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                    ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
                                                    .arg(duid, QString::number(ZnsHelper::DeviceInfo))
                                                    .toAscii());
-                  processZnsReply(reply);
+                  processZnsReply(reply, src);
         }
       }
     } else {
@@ -992,15 +993,15 @@ void SvNavigator::openRpcSession(const SourceT& src)
     case MonitorBroker::Zabbix: {
         src.zbx_handler->setBaseUrl(src.mon_url);
         authParams.push_back(QString::number(ZbxHelper::Login));
-        QNetworkReply* reply = m_zbxHelper->postRequest(ZbxHelper::Login, authParams);
-        processZbxReply(reply);
+        QNetworkReply* reply = src.zbx_handler->postRequest(ZbxHelper::Login, authParams);
+        processZbxReply(reply, src);
         if (m_isLogged) {
             // Get API version
             QStringList params;
             params.push_back(m_zbxAuthToken);
             params.push_back(QString::number(ZbxHelper::ApiVersion));
             reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
-            processZbxReply(reply);
+            processZbxReply(reply, src);
             if (src.zbx_handler->getTrid() == -1) m_isLogged = false; // Means problem while retrieving API version
           }
         break;
@@ -1012,7 +1013,7 @@ void SvNavigator::openRpcSession(const SourceT& src)
         znsUrlParams.addQueryItem("submitted", "true");
         znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
         QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
-        processZnsReply(reply);
+        processZnsReply(reply, src);
       }
       break;
     default:
@@ -1021,29 +1022,29 @@ void SvNavigator::openRpcSession(const SourceT& src)
 }
 
 
-void SvNavigator::requestRpcData(void) {
+void SvNavigator::requestRpcData(const SourceT& src) {
   updateStatusBar(tr("Updating..."));
   switch(m_coreData->monitor) {
     case MonitorBroker::Zabbix: {
-        int trid = m_zbxHelper->getTrid();
+        int trid = src.zbx_handler->getTrid();
         foreach (const QString& host, m_coreData->hosts.keys()) {
         QStringList params;
-            params.push_back(m_zbxAuthToken);
+            params.push_back(src.auth); //FIXME: params.push_back(m_zbxAuthToken);
         params.push_back(host);
         params.push_back(QString::number(trid));
-            QNetworkReply* reply = m_zbxHelper->postRequest(trid, params);
-            processZbxReply(reply);
+            QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
+            processZbxReply(reply, src);
       }
       break;
     }
     case MonitorBroker::Zenoss: {
-        m_znsHelper->setRouterEndpoint(ZnsHelper::Device);
+        src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
         foreach (const QString& host, m_coreData->hosts.keys()) {
-            QNetworkReply* reply = m_znsHelper->postRequest(ZnsHelper::Device,
+            QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                             ZnsHelper::ReqPatterns[ZnsHelper::Device]
                                                             .arg(host, QString::number(ZnsHelper::Device))
                                                             .toAscii());
-            processZbxReply(reply);
+            processZbxReply(reply, src);
           }
       }
       break;
@@ -1052,13 +1053,13 @@ void SvNavigator::requestRpcData(void) {
   }
 }
 
-void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
+void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const SourceT& src)
 {
   QString apiUrl = "";
   if (m_coreData->monitor == MonitorBroker::Zabbix) {
-      apiUrl = m_zbxHelper->getApiEndpoint();
+      apiUrl = src.zbx_handler->getApiEndpoint();
     } else if (m_coreData->monitor == MonitorBroker::Zenoss) {
-      apiUrl =  m_znsHelper->getRequestEndpoint();
+      apiUrl =  src.zns_handler->getRequestEndpoint();
   }
   switch (_code) {
     case QNetworkReply::RemoteHostClosedError:
@@ -1149,8 +1150,7 @@ QTabWidget* SvNavigator::newMsgConsole()
 void SvNavigator::resetSettings(void)
 {
   m_isLogged = false;
-  for (SourceListT::Iterator it = m_sources.begin(), end = m_sources.end();
-       it != end; it++) {
+  for (SourceListT::Iterator it = m_sources.begin(), end = m_sources.end(); it != end; it++) {
       if (it->d4n_handler) delete it->d4n_handler;
       if (it->ls_handler) delete it->ls_handler;
       if (it->zbx_handler) delete it->zbx_handler;
