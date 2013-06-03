@@ -19,7 +19,7 @@ public:
   void send(const std::string & _msg);
   std::string recv() const;
   void makeHandShake();
-  inline bool isConnected2Server() const {return mconnected2Server;}
+  inline bool isConnected() const {return mconnected2Server;}
   inline void* getSocket() const {return msocket;}
   inline int getServerSerial() const {return mserverSerial;}
   inline std::string getErrorMsg() const {return merrorMsg;}

@@ -44,7 +44,6 @@ namespace {
   const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
   const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-  const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 }
 
 StringMapT SvNavigator::propRules() {
@@ -327,19 +326,20 @@ void SvNavigator::runNagiosUpdate(int srcId)
 
 void SvNavigator::runNagiosUpdate(const SourceT& src)
 {
-  CheckT invalidCheck;
-  invalidCheck.status = MonitorBroker::NagiosUnknown;
-  invalidCheck.last_state_change = UNKNOWN_UPDATE_TIME;
-  invalidCheck.host = "-";
-  invalidCheck.check_command = "-";
-  invalidCheck.alarm_msg = "Error occured";
+  CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
 
+  /* Check that the API handler is not null */
   if (src.d4n_handler) {
     updateDashboardOnUnknown();
     return;
   }
+
+  /* Check that the server responses well */
   if (src.d4n_handler->connect()) {
     src.d4n_handler->makeHandShake();
+  }
+
+  if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
       utils::alert(tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial()));
       m_updateSucceed = false;
@@ -353,8 +353,9 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
     updateStatusBar(socketError);
   }
 
-  for (NodeListIteratorT cnode = m_coreData->cnodes.begin();
-       cnode != m_coreData->cnodes.end(); cnode++) {
+  /* Now start doing the job */
+  for (NodeListIteratorT cnode = m_coreData->cnodes.begin(); cnode != m_coreData->cnodes.end(); cnode++)
+  {
     if (cnode->child_nodes == "") {
       cnode->severity = MonitorBroker::Unknown;
       m_coreData->check_status_count[cnode->severity]++;
@@ -367,8 +368,8 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
       if (m_updateSucceed) {
         src.d4n_handler->send(msg.toStdString());
         JsonHelper jsHelper(src.d4n_handler->recv());
-        cnode->check.status = (jsHelper.getProperty("return_code").toInt32()!=0)? MonitorBroker::NagiosUnknown:
-                                                                                  jsHelper.getProperty("status").toInt32();
+        qint32 ret = jsHelper.getProperty("return_code").toInt32();
+        cnode->check.status = (ret!=0)? MonitorBroker::NagiosUnknown : jsHelper.getProperty("status").toInt32();
         cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
         cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
         cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
@@ -399,22 +400,23 @@ void SvNavigator::runLivestatusUpdate(int srcId)
 
 void SvNavigator::runLivestatusUpdate(const SourceT& src)
 {
-  CheckT invalidCheck;
-  invalidCheck.status = MonitorBroker::NagiosUnknown;
-  invalidCheck.last_state_change = UNKNOWN_UPDATE_TIME;
-  invalidCheck.host = "-";
-  invalidCheck.check_command = "-";
-  invalidCheck.alarm_msg = "Service not found";
 
-
-  // FIXME:use isLogged?
-  if (src.ls_handler) {
-    m_updateSucceed = false;
-    m_lastErrorMsg = src.ls_handler->errorString();
+  if (!src.ls_handler) {
+    m_updateSucceed = false;  // FIXME: m_lastErrorMsg = "Could get pointer to livestatus client";
+    m_lastErrorMsg = "Could get pointer to livestatus client";
     updateDashboardOnUnknown();
     return;
   }
 
+  /* Connect to the service */
+  if (!src.ls_handler->connectToService()) {
+    m_updateSucceed = false;
+    m_lastErrorMsg = src.ls_handler->errorString(); // FIXME: m_lastErrorMsg = src.ls_handler->errorString()
+    updateDashboardOnUnknown();
+    return;
+  }
+
+  CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
   QHashIterator<QString, QStringList> hit(m_coreData->hosts);
   while (hit.hasNext()) {
     hit.next();
@@ -550,10 +552,11 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
     for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
          cnode != end; cnode++) {
       if (!cnode->monitored) {
-        cnode->check.status = MonitorBroker::Unknown;
-        cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-        cnode->check.host = "-";
-        cnode->check.alarm_msg = tr("Unknown service (%1)").arg(cnode->child_nodes).toStdString();
+        cnode->check = utils::getUnknownService(MonitorBroker::Unknown, cnode->child_nodes);
+//        cnode->check.status = MonitorBroker::Unknown;
+//        cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
+//        cnode->check.host = "-";
+//        cnode->check.alarm_msg = tr("Unknown service (%1)").arg(cnode->child_nodes).toStdString();
         computeStatusInfo(cnode);
         m_coreData->check_status_count[cnode->severity]++;
         updateDashboard(cnode);
@@ -1010,7 +1013,7 @@ void SvNavigator::openRpcSession(const SourceT& src)
     } else {
       if(src.d4n_handler->connect()) {
         src.d4n_handler->makeHandShake();
-        m_isLogged = src.d4n_handler->isConnected2Server();
+        m_isLogged = src.d4n_handler->isConnected();
       } else {
         m_isLogged = false;
       }
@@ -1121,11 +1124,12 @@ void SvNavigator::updateDashboardOnUnknown()
   for (NodeListIteratorT cnode = m_coreData->cnodes.begin();
        cnode != m_coreData->cnodes.end(); cnode++) {
     cnode->monitored = true;
-    cnode->check.status = MonitorBroker::Unknown;
-    cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-    cnode->check.host = "-";
-    cnode->check.check_command = "-";
-    cnode->check.alarm_msg = m_lastErrorMsg.toStdString();
+    cnode->check = utils::getUnknownService(MonitorBroker::Unknown, m_lastErrorMsg);
+//    cnode->check.status = MonitorBroker::Unknown;
+//    cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
+//    cnode->check.host = "-";
+//    cnode->check.check_command = "-";
+//    cnode->check.alarm_msg = m_lastErrorMsg.toStdString();
     computeStatusInfo(cnode);
     updateDashboard(cnode);
   }

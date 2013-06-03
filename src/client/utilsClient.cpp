@@ -272,3 +272,14 @@ qint32 utils::convert2ApiType(const QString& str)
   return type;
 }
 
+
+CheckT utils::getUnknownService(int status, const QString& sid)
+{
+  CheckT invalidCheck;
+  invalidCheck.status = status;
+  invalidCheck.last_state_change = getCtime(0);
+  invalidCheck.host = "-";
+  invalidCheck.check_command = "-";
+  invalidCheck.alarm_msg = QObject::tr("Unknown service (%1)").arg(sid).toStdString();;
+  return invalidCheck;
+}

@@ -72,6 +72,7 @@ namespace utils {
   QString getWelcomeMsg(const QString& utility);
   QString source2Str(const SourceT& src);
   qint32 convert2ApiType(const QString& str);
+  CheckT getUnknownService(int status, const QString& sid);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP
