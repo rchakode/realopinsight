@@ -51,54 +51,54 @@ int main(int argc, char **argv)
   bool runConfig = false;
   int opt;
   if ((opt = getopt(argc, argv, "chv")) != -1) {
-      switch (opt) {
-        case 'c':
-          runConfig = true;
-          break;
-        case 'v':
-          cout<<versionMsg.toStdString()<<"\n";
-          exit(0);
-          break;
-        case 'h':
-          cout<<usage.arg(cmdName).toStdString();
-          exit(0);
-          break;
-        default:
-          cout<<usage.arg(cmdName).toStdString();
-          exit(1);
-          break;
-        }
+    switch (opt) {
+    case 'c':
+      runConfig = true;
+      break;
+    case 'v':
+      cout<<versionMsg.toStdString()<<"\n";
+      exit(0);
+      break;
+    case 'h':
+      cout<<usage.arg(cmdName).toStdString();
+      exit(0);
+      break;
+    default:
+      cout<<usage.arg(cmdName).toStdString();
+      exit(1);
+      break;
     }
+  }
   std::clog<<versionMsg.toStdString()<<"\n";
   Auth authentication;
   int userRole = authentication.exec();
   if ( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
 
   if (runConfig) {
-      Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-      Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
-      update_settings->exec();
-      change_passwd->exec();
-      exit(0);
-    }
+    Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
+    Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
+    update_settings->exec();
+    change_passwd->exec();
+    exit(0);
+  }
   QSplashScreen* info = utils::infoScreen(versionMsg);
   utils::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
   if (file.isEmpty()) {
-      info->clearMessage();
-      info->showMessage(QObject::tr("You need to select a configuration file!"),
-                        Qt::AlignCenter|Qt::AlignCenter);
-      utils::delay(1); info->finish(0);
-      file = QFileDialog::getOpenFileName(0,
-                                          QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
-                                          ".",
-                                          QObject::tr("Xml files (*.xml);;All files (*)"));
+    info->clearMessage();
+    info->showMessage(QObject::tr("You need to select a configuration file!"),
+                      Qt::AlignCenter|Qt::AlignCenter);
+    utils::delay(1); info->finish(0);
+    file = QFileDialog::getOpenFileName(0,
+                                        QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
+                                        ".",
+                                        QObject::tr("Xml files (*.xml);;All files (*)"));
 
-      if (!file.length()) {
-          utils::alert(QObject::tr("No configuration file selected, the program will exit!"));
-          exit(1);
-        }
+    if (!file.length()) {
+      utils::alert(QObject::tr("No configuration file selected, the program will exit!"));
+      exit(1);
     }
+  }
   info->finish(0);
   SvNavigator *console= new SvNavigator(userRole);
   console->load(file, 0);

@@ -70,26 +70,26 @@ ServiceEditor::~ServiceEditor()
   QMap<QString, QWidget*>::iterator iter = mitems.begin();
 
   while (iter != mitems.end()) {
-      QString key = iter.key();
-      QWidget* widget = mitems[key];
-      QLabel* labelPtr = dynamic_cast<QLabel*>(widget);
-      QLineEdit* lineEditPtr = dynamic_cast<QLineEdit*>(widget);
-      QTextBlock* textBlockPtr = dynamic_cast<QTextBlock*>(widget);
-      QComboBox* comboBoxPtr = dynamic_cast<QComboBox*>(widget);
+    QString key = iter.key();
+    QWidget* widget = mitems[key];
+    QLabel* labelPtr = dynamic_cast<QLabel*>(widget);
+    QLineEdit* lineEditPtr = dynamic_cast<QLineEdit*>(widget);
+    QTextBlock* textBlockPtr = dynamic_cast<QTextBlock*>(widget);
+    QComboBox* comboBoxPtr = dynamic_cast<QComboBox*>(widget);
 
-      if(labelPtr) {
-          delete labelPtr;
-        } else if(lineEditPtr) {
-          delete  lineEditPtr;
-        } else if (textBlockPtr) {
-          delete textBlockPtr;
-        } else if (comboBoxPtr){
-          delete comboBoxPtr;
-        }
-      mitems.remove(key);
-
-      iter = mitems.begin();
+    if(labelPtr) {
+      delete labelPtr;
+    } else if(lineEditPtr) {
+      delete  lineEditPtr;
+    } else if (textBlockPtr) {
+      delete textBlockPtr;
+    } else if (comboBoxPtr){
+      delete comboBoxPtr;
     }
+    mitems.remove(key);
+
+    iter = mitems.begin();
+  }
   mitems.clear();
 
   delete buttonBox;
@@ -108,8 +108,8 @@ void ServiceEditor::setCheckListField(const MonitorBroker::ChecksT& _nagios_chec
 {
   checkField()->clear();
   for(MonitorBroker::ChecksT::const_iterator it = _nagios_checks.begin(); it != _nagios_checks.end(); it++) {
-      checkField()->addItem(QString::fromStdString(it->second.id));
-    }
+    checkField()->addItem(QString::fromStdString(it->second.id));
+  }
 }
 
 void ServiceEditor::setEnableFields(const bool& _enable)
@@ -124,18 +124,18 @@ bool ServiceEditor::updateNode(NodeListT& _node_map, const QString& _node_id)
 {
   NodeListT::iterator node = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
   if( node != _node_map.end()) {
-      node->name = nameField()->text();
-      node->type = typeField()->currentIndex();
-      node->sev_crule = statusCalcRuleField()->currentIndex();
-      node->sev_prule = statusPropRuleField()->currentIndex();
-      node->icon = iconField()->currentText();
-      node->description = descriptionField()->toPlainText();
-      node->alarm_msg  = alarmMsgField()->toPlainText();
-      node->notification_msg = notificationMsgField()->toPlainText();
-      if(node->type == NodeType::ALARM_NODE)
-        node->child_nodes = checkField()->currentText();
-      return true;
-    }
+    node->name = nameField()->text();
+    node->type = typeField()->currentIndex();
+    node->sev_crule = statusCalcRuleField()->currentIndex();
+    node->sev_prule = statusPropRuleField()->currentIndex();
+    node->icon = iconField()->currentText();
+    node->description = descriptionField()->toPlainText();
+    node->alarm_msg  = alarmMsgField()->toPlainText();
+    node->notification_msg = notificationMsgField()->toPlainText();
+    if(node->type == NodeType::ALARM_NODE)
+      node->child_nodes = checkField()->currentText();
+    return true;
+  }
   return false;
 }
 
@@ -178,24 +178,24 @@ void ServiceEditor::setContent(const NodeT& _node)
 
   QString checkId = "";
   if(_node.type == NodeType::ALARM_NODE) {
-      QListWidget* checks = checkListField();
-      QStringList childNodes = _node.child_nodes.split(Parser::CHILD_SEP);
-      QStringList::iterator childNodeIt = childNodes.begin();
-      if (childNodeIt != childNodes.end()) {
-          checkId = (*childNodeIt).trimmed();
-          CheckItemList checkItems = checks->findItems(checkId, Qt::MatchExactly);
-          CheckItemList::const_iterator _it = checkItems.begin();
-          if(_it == checkItems.end()) {
-              checkField()->addItem(checkId);
-              QListWidgetItem* item = new QListWidgetItem(checkId);
-              checks->addItem(item);
-              checks->setItemSelected(item, true);
-            } else {
-              checks->setItemSelected(*_it, true);
-            }
-        }
-      childNodes.clear();
+    QListWidget* checks = checkListField();
+    QStringList childNodes = _node.child_nodes.split(Parser::CHILD_SEP);
+    QStringList::iterator childNodeIt = childNodes.begin();
+    if (childNodeIt != childNodes.end()) {
+      checkId = (*childNodeIt).trimmed();
+      CheckItemList checkItems = checks->findItems(checkId, Qt::MatchExactly);
+      CheckItemList::const_iterator _it = checkItems.begin();
+      if(_it == checkItems.end()) {
+        checkField()->addItem(checkId);
+        QListWidgetItem* item = new QListWidgetItem(checkId);
+        checks->addItem(item);
+        checks->setItemSelected(item, true);
+      } else {
+        checks->setItemSelected(*_it, true);
+      }
     }
+    childNodes.clear();
+  }
   checkField()->setCurrentIndex(checkField()->findText(checkId, Qt::MatchExactly));
 }
 
@@ -245,14 +245,14 @@ void ServiceEditor::loadStatusHandlingFields(void)
   statusCalcRuleField()->addItem(tr("Calculation rule (Default is %1)").arg(defaultRule), CalcRules::HighCriticity);
 
   foreach(const QString& rule, crules.keys()) {
-      statusCalcRuleField()->addItem(rule, crules.value(rule));
-    }
+    statusCalcRuleField()->addItem(rule, crules.value(rule));
+  }
   StringMapT prules = SvNavigator::propRules();
   defaultRule = PropRules::label(PropRules::Unchanged);
   statusPropRuleField()->addItem(tr("Propagation rule (Default is %1)").arg(defaultRule), PropRules::Unchanged);
   foreach(const QString& rule, prules.keys()) {
-      statusPropRuleField()->addItem(rule, prules.value(rule));
-    }
+    statusPropRuleField()->addItem(rule, prules.value(rule));
+  }
   mlayout->addWidget(mitems["priorityLabel"], mlayoutRowIndex, 0);
   mlayout->addWidget(statusCalcRuleField(),mlayoutRowIndex,1);
   mlayout->addWidget(statusPropRuleField(),mlayoutRowIndex,2);
@@ -278,9 +278,9 @@ void ServiceEditor::loadIconFields()
   QString header = "-->Select a icon (Default is " + GraphView::DEFAULT_ICON + ")";
   iconField()->addItem(header, icons.value(GraphView::DEFAULT_ICON));
   foreach(const QString& label, icons.keys()) {
-      QString path = icons.value(label);
-      iconField()->addItem(QIcon(path), label, icons.value(path));
-    }
+    QString path = icons.value(label);
+    iconField()->addItem(QIcon(path), label, icons.value(path));
+  }
   mlayout->addWidget(mitems["iconNameLabel"], mlayoutRowIndex, 0);
   mlayout->addWidget(iconField(),mlayoutRowIndex, 1, 1, 2);
 }
@@ -317,21 +317,21 @@ void ServiceEditor::loadButtonBox(void)
 void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 {
   if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
-      setEnableFields(true);
-    } else {
-      setEnableFields(false);
-      checkListField()->clearSelection();
-      checkField()->setCurrentIndex(0);
-    }
+    setEnableFields(true);
+  } else {
+    setEnableFields(false);
+    checkListField()->clearSelection();
+    checkField()->setCurrentIndex(0);
+  }
 }
 
 void ServiceEditor::handleNodeTypeActivated( const QString& _text)
 {
   if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
-      emit nodeTypeActivated( NodeType::ALARM_NODE );
-    } else {
-      emit nodeTypeActivated( NodeType::SERVICE_NODE );
-    }
+    emit nodeTypeActivated( NodeType::ALARM_NODE );
+  } else {
+    emit nodeTypeActivated( NodeType::SERVICE_NODE );
+  }
 }
 
 

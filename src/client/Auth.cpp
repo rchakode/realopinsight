@@ -77,16 +77,16 @@ void Auth::authentificate(void)
   QString rootPasswd =  settings->getEntry(Settings::ADM_PASSWD_KEY);
   QString opPasswd =  settings->getEntry(Settings::OP_PASSWD_KEY);
   if(	! rootPasswd.isEmpty()
-        && userName == AdmUser
-        && userPasswd == rootPasswd ) {
-      done(AdmUserRole);
-    } else if( !opPasswd.isEmpty()
-               && userName == OpUser
-               && userPasswd == opPasswd ) {
-      done(OpUserRole);
-    } else {
-      utils::alert(tr("Authentication failed: wrong username or password"));
-    }
+      && userName == AdmUser
+      && userPasswd == rootPasswd ) {
+    done(AdmUserRole);
+  } else if( !opPasswd.isEmpty()
+             && userName == OpUser
+             && userPasswd == opPasswd ) {
+    done(OpUserRole);
+  } else {
+    utils::alert(tr("Authentication failed: wrong username or password"));
+  }
 }
 
 

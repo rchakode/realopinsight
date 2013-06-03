@@ -69,9 +69,9 @@ void SvCreator::contextMenuEvent(QContextMenuEvent*_event)
   QList<QTreeWidgetItem*> selectedNodes = mtree->selectedItems();
 
   if (selectedNodes.length()) {
-      mselectedNode = selectedNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
-      mnodeContextMenu->exec(pos);
-    }
+    mselectedNode = selectedNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
+    mnodeContextMenu->exec(pos);
+  }
 }
 
 void SvCreator::closeEvent(QCloseEvent* event)
@@ -115,18 +115,18 @@ void SvCreator::open(void)
 void SvCreator::loadFile(const QString& _path)
 {
   if (_path == NULL) {
-      newView();
-    } else {
-      utils::clear(*mcoreData);
-      Parser parser;
-      if (!parser.parseSvConfig(_path,*mcoreData)) {
-          utils::alert(tr("Unable to open the file '%1'").arg(_path));
-          exit(1);
-        }
-      mtree->update(mcoreData);
-      mactiveFile = utils::getAbsolutePath(_path);
-      setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
+    newView();
+  } else {
+    utils::clear(*mcoreData);
+    Parser parser;
+    if (!parser.parseSvConfig(_path,*mcoreData)) {
+      utils::alert(tr("Unable to open the file '%1'").arg(_path));
+      exit(1);
     }
+    mtree->update(mcoreData);
+    mactiveFile = utils::getAbsolutePath(_path);
+    setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
+  }
 }
 
 void SvCreator::import() {
@@ -140,17 +140,17 @@ void SvCreator::import() {
 void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
-      utils::clear(*mcoreData);
-      NodeT* node = createNode(SvNavigatorTree::RootId, tr("New View"), "");
-      mcoreData->bpnodes.insert(node->id,*node);
-      SvNavigatorTree::addNode(mcoreData->tree_items,*node);
-      mtree->update(mcoreData);
-      meditor->setContent(*node);
-      mselectedNode = node->id;
-      mhasLeftUpdates = true;
-      mactiveFile.clear();
-      setWindowTitle(tr("%1 Editor - unsaved document*").arg(APP_NAME));
-    }
+    utils::clear(*mcoreData);
+    NodeT* node = createNode(SvNavigatorTree::RootId, tr("New View"), "");
+    mcoreData->bpnodes.insert(node->id,*node);
+    SvNavigatorTree::addNode(mcoreData->tree_items,*node);
+    mtree->update(mcoreData);
+    meditor->setContent(*node);
+    mselectedNode = node->id;
+    mhasLeftUpdates = true;
+    mactiveFile.clear();
+    setWindowTitle(tr("%1 Editor - unsaved document*").arg(APP_NAME));
+  }
 }
 
 
@@ -170,9 +170,9 @@ NodeT* SvCreator::createNode(const QString& id,
 {
   NodeT* node = new NodeT;
   if (!node) {
-      utils::alert(tr("Out of memory. the application will exit"));
-      exit(1);
-    }
+    utils::alert(tr("Out of memory. the application will exit"));
+    exit(1);
+  }
   node->id = id;
   node->name = label;
   node->parent = parent;
@@ -190,9 +190,9 @@ void SvCreator::insertFromSelected(const NodeT& node)
   NodeListT::iterator pnode = mcoreData->bpnodes.find(mselectedNode);
   if (pnode == mcoreData->bpnodes.end() ||
       pnode->type == NodeType::ALARM_NODE) {
-      utils::alert(tr("This action not allowed on the target node"));
-      return;
-    }
+    utils::alert(tr("This action not allowed on the target node"));
+    return;
+  }
   pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? Parser::CHILD_SEP%node.id : node.id;
   SvNavigatorTree::addNode(mcoreData->tree_items, node, true);
   mcoreData->bpnodes.insert(node.id, node);
@@ -208,13 +208,13 @@ void SvCreator::deleteNode(void)
   msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(APP_NAME));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec())
-    {
-    case QMessageBox::Yes:
-      deleteNode(mselectedNode);
-      break;
-    default:
-      break;
-    }
+  {
+  case QMessageBox::Yes:
+    deleteNode(mselectedNode);
+    break;
+  default:
+    break;
+  }
 }
 
 void SvCreator::deleteNode(const QString& _nodeId)
@@ -224,32 +224,32 @@ void SvCreator::deleteNode(const QString& _nodeId)
     return;
 
   if (node->type == NodeType::SERVICE_NODE && node->child_nodes != "") {
-      foreach(const QString& checkId, node->child_nodes.split(Parser::CHILD_SEP)) {
-          deleteNode(checkId);
-        }
+    foreach(const QString& checkId, node->child_nodes.split(Parser::CHILD_SEP)) {
+      deleteNode(checkId);
     }
+  }
   TreeNodeItemListT::iterator item = mcoreData->tree_items.find(_nodeId);
   TreeNodeItemListT::iterator pItem = mcoreData->tree_items.find(node->parent);
   if (pItem != mcoreData->tree_items.end() &&
       item != mcoreData->tree_items.end()) {
-      QRegExp regex("|^" + _nodeId + Parser::CHILD_SEP +
-                    "|^" + _nodeId + "$" +
-                    "|" + Parser::CHILD_SEP  + _nodeId);
+    QRegExp regex("|^" + _nodeId + Parser::CHILD_SEP +
+                  "|^" + _nodeId + "$" +
+                  "|" + Parser::CHILD_SEP  + _nodeId);
 
-      NodeListT::iterator pNode = mcoreData->bpnodes.find(node->parent);
-      if (pNode != mcoreData->bpnodes.end()) {
-          pNode->child_nodes.remove(regex);
-        }
-      if (node->type == NodeType::ALARM_NODE) {
-          mcoreData->cnodes.remove(_nodeId);
-        } else {
-          mcoreData->bpnodes.remove(_nodeId);
-        }
-      mcoreData->tree_items.remove(_nodeId);
-      QTreeWidgetItem* obsolete = NULL;
-      if ((obsolete = (*pItem)->takeChild((*pItem)->indexOfChild(*item))))
-        delete obsolete;
+    NodeListT::iterator pNode = mcoreData->bpnodes.find(node->parent);
+    if (pNode != mcoreData->bpnodes.end()) {
+      pNode->child_nodes.remove(regex);
     }
+    if (node->type == NodeType::ALARM_NODE) {
+      mcoreData->cnodes.remove(_nodeId);
+    } else {
+      mcoreData->bpnodes.remove(_nodeId);
+    }
+    mcoreData->tree_items.remove(_nodeId);
+    QTreeWidgetItem* obsolete = NULL;
+    if ((obsolete = (*pItem)->takeChild((*pItem)->indexOfChild(*item))))
+      delete obsolete;
+  }
 }
 
 
@@ -257,35 +257,35 @@ void SvCreator::copySelected(void)
 {
   NodeListIteratorT node;
   if (utils::findNode(mcoreData, mselectedNode, node)) {
-      if (!mclipboardData) mclipboardData = new NodeT;
-     *mclipboardData =*node;
-      mclipboardData->name+=" (Copy)";
-      mclipboardData->child_nodes.clear();
-    }
+    if (!mclipboardData) mclipboardData = new NodeT;
+    *mclipboardData =*node;
+    mclipboardData->name+=" (Copy)";
+    mclipboardData->child_nodes.clear();
+  }
 }
 
 void SvCreator::pasteFromSelected(void)
 {
   if (mclipboardData) {
-      mclipboardData->id = utils::genNodeId();
-      mclipboardData->parent = mselectedNode;
-      insertFromSelected(*mclipboardData);
-    } else {
-      utils::alert(tr("There is no data in the clipboard!"));
-    }
+    mclipboardData->id = utils::genNodeId();
+    mclipboardData->parent = mselectedNode;
+    insertFromSelected(*mclipboardData);
+  } else {
+    utils::alert(tr("There is no data in the clipboard!"));
+  }
 }
 
 
 void SvCreator::save(void)
 {
   if (!mselectedNode.isEmpty()) {
-      fillEditorFromService(mcoreData->tree_items[mselectedNode]);
-    }
+    fillEditorFromService(mcoreData->tree_items[mselectedNode]);
+  }
   if (mactiveFile.isEmpty()) {
-      saveAs();
-    } else {
-      recordData(mactiveFile);
-    }
+    saveAs();
+  } else {
+    recordData(mactiveFile);
+  }
 }
 
 void SvCreator::saveAs(void)
@@ -301,50 +301,50 @@ void SvCreator::saveAs(void)
                                               &filter);
 
   if (path.isNull()) {
-      QString msg = tr("The path is not valid!");
-      utils::alert(msg);
-      statusBar()->showMessage(msg);
+    QString msg = tr("The path is not valid!");
+    utils::alert(msg);
+    statusBar()->showMessage(msg);
+  } else {
+    QFileInfo fileInfo(path);
+    if (filter == ZabbixCompatibleFormat) {
+      mcoreData->monitor = MonitorBroker::Zabbix;
+      if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
+    } else if (filter == ZenossCompatibleFormat) {
+      mcoreData->monitor = MonitorBroker::Zenoss;
+      if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else {
-      QFileInfo fileInfo(path);
-      if (filter == ZabbixCompatibleFormat) {
-          mcoreData->monitor = MonitorBroker::Zabbix;
-          if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
-        } else if (filter == ZenossCompatibleFormat) {
-          mcoreData->monitor = MonitorBroker::Zenoss;
-          if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
-        } else {
-          mcoreData->monitor = MonitorBroker::Nagios;
-          if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
-        }
-      recordData(path);
+      mcoreData->monitor = MonitorBroker::Nagios;
+      if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     }
+    recordData(path);
+  }
 }
 
 int SvCreator::treatCloseAction(const bool& _close)
 {
   int ret = 0;
   if (_close || mhasLeftUpdates) {
-      bool enforceClose = _close;
-      if (mhasLeftUpdates) {
-          QMessageBox mbox;
-          mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
-          mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
-          mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
-          switch (mbox.exec()) {
-            case QMessageBox::Yes:
-              save();
-              break;
-            case QMessageBox::Cancel:
-              enforceClose = false;
-              ret = 1;
-              break;
-            case QMessageBox::Discard:
-            default:
-              break;
-            }
-        }
-      if (enforceClose) qApp->quit();
+    bool enforceClose = _close;
+    if (mhasLeftUpdates) {
+      QMessageBox mbox;
+      mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
+      mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
+      mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
+      switch (mbox.exec()) {
+      case QMessageBox::Yes:
+        save();
+        break;
+      case QMessageBox::Cancel:
+        enforceClose = false;
+        ret = 1;
+        break;
+      case QMessageBox::Discard:
+      default:
+        break;
+      }
     }
+    if (enforceClose) qApp->quit();
+  }
   return ret;
 }
 
@@ -362,30 +362,30 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
   TreeNodeItemListT::iterator tnodeIt =  mcoreData->tree_items.find(_node_id);
   if (tnodeIt != mcoreData->tree_items.end()) {
 
-      QTreeWidgetItem* tnodeP = (*tnodeIt)->parent();
-      if (tnodeP) {
-          NodeListT::iterator nodeIt = mcoreData->bpnodes.find(_node_id);
+    QTreeWidgetItem* tnodeP = (*tnodeIt)->parent();
+    if (tnodeP) {
+      NodeListT::iterator nodeIt = mcoreData->bpnodes.find(_node_id);
 
-          if (nodeIt != mcoreData->bpnodes.end()) {
-              /* Remove the node on its old parent's child list*/
-              QRegExp regex ("|^" + _node_id + Parser::CHILD_SEP +
-                             "|^" + _node_id + "$" +
-                             "|" + Parser::CHILD_SEP  + _node_id);
-              NodeListT::iterator pNodeIt = mcoreData->bpnodes.find(nodeIt->parent);
-              if (pNodeIt != mcoreData->bpnodes.end()) {
-                  pNodeIt->child_nodes.remove(regex);
-                }
-
-              /* Add the node on its new parent's child list*/
-              nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
-              pNodeIt = mcoreData->bpnodes.find(nodeIt->parent);
-              if (pNodeIt != mcoreData->bpnodes.end()) {
-                  pNodeIt->child_nodes += (pNodeIt->child_nodes != "")?
-                        Parser::CHILD_SEP + _node_id : _node_id;
-                }
-            }
+      if (nodeIt != mcoreData->bpnodes.end()) {
+        /* Remove the node on its old parent's child list*/
+        QRegExp regex ("|^" + _node_id + Parser::CHILD_SEP +
+                       "|^" + _node_id + "$" +
+                       "|" + Parser::CHILD_SEP  + _node_id);
+        NodeListT::iterator pNodeIt = mcoreData->bpnodes.find(nodeIt->parent);
+        if (pNodeIt != mcoreData->bpnodes.end()) {
+          pNodeIt->child_nodes.remove(regex);
         }
+
+        /* Add the node on its new parent's child list*/
+        nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
+        pNodeIt = mcoreData->bpnodes.find(nodeIt->parent);
+        if (pNodeIt != mcoreData->bpnodes.end()) {
+          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")?
+                Parser::CHILD_SEP + _node_id : _node_id;
+        }
+      }
     }
+  }
 }
 
 
@@ -393,31 +393,31 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 {
   NodeListT::iterator node = mcoreData->bpnodes.find(mselectedNode);
   if (node != mcoreData->bpnodes.end()) {
-      if (_type == NodeType::SERVICE_NODE) {
-          if (node->type == NodeType::ALARM_NODE) {
-              //TODO: A bug has been reported
-              node->child_nodes.clear();
-              if (meditor->updateNode(node)) {
-                  mcoreData->tree_items[mselectedNode]->setText(0, node->name);
-                  mhasLeftUpdates = true;
-                  statusBar()->showMessage(mactiveFile%"*");
-                  setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
-                }
-            }
-        } else {
-          if (node->type == NodeType::SERVICE_NODE && ! node->child_nodes.isEmpty()) {
-              meditor->typeField()->setCurrentIndex(0);
-              utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
-            } else {
-              if (meditor->updateNode(node)) {
-                  mcoreData->tree_items[mselectedNode]->setText(0, node->name);
-                  mhasLeftUpdates = true;
-                  statusBar()->showMessage(mactiveFile%"*");
-                  setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
-                }
-            }
+    if (_type == NodeType::SERVICE_NODE) {
+      if (node->type == NodeType::ALARM_NODE) {
+        //TODO: A bug has been reported
+        node->child_nodes.clear();
+        if (meditor->updateNode(node)) {
+          mcoreData->tree_items[mselectedNode]->setText(0, node->name);
+          mhasLeftUpdates = true;
+          statusBar()->showMessage(mactiveFile%"*");
+          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
         }
+      }
+    } else {
+      if (node->type == NodeType::SERVICE_NODE && ! node->child_nodes.isEmpty()) {
+        meditor->typeField()->setCurrentIndex(0);
+        utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
+      } else {
+        if (meditor->updateNode(node)) {
+          mcoreData->tree_items[mselectedNode]->setText(0, node->name);
+          mhasLeftUpdates = true;
+          statusBar()->showMessage(mactiveFile%"*");
+          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
+        }
+      }
     }
+  }
 }
 
 void SvCreator::handleShowOnlineResources(void)
@@ -436,13 +436,13 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (utils::findNode(mcoreData, mselectedNode, node)) {
-      if (meditor->updateNode(node)) {
-          mcoreData->tree_items[mselectedNode]->setText(0, node->name);
-          mhasLeftUpdates = true;
-          statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
-        }
+    if (meditor->updateNode(node)) {
+      mcoreData->tree_items[mselectedNode]->setText(0, node->name);
+      mhasLeftUpdates = true;
+      statusBar()->showMessage(mactiveFile%"*");
+      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
     }
+  }
   mselectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
   if (utils::findNode(mcoreData, mselectedNode, node)) meditor->setContent(node);
 }
@@ -452,13 +452,13 @@ void SvCreator::handleReturnPressed(void)
 {
   NodeListT::iterator node = mcoreData->bpnodes.find(mselectedNode);
   if (node != mcoreData->bpnodes.end()) {
-      if (meditor->updateNode(node)) {
-          mcoreData->tree_items[mselectedNode]->setText(0, node->name);
-          mhasLeftUpdates = true;
-          statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
-        }
+    if (meditor->updateNode(node)) {
+      mcoreData->tree_items[mselectedNode]->setText(0, node->name);
+      mhasLeftUpdates = true;
+      statusBar()->showMessage(mactiveFile%"*");
+      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
     }
+  }
 }
 
 void SvCreator::recordData(const QString& _path)
@@ -467,31 +467,31 @@ void SvCreator::recordData(const QString& _path)
 
   QFile file(_path);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-      statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
-      return;
-    }
+    statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
+    return;
+  }
   NodeListT::const_iterator root = mcoreData->bpnodes.find(SvNavigatorTree::RootId);
   if (root == mcoreData->bpnodes.end()) {
-      file.close();
-      QString msg =  tr("The hierarchy does not have root");
-      utils::alert(msg);
-      statusBar()->showMessage(msg);
-      return;
-    }
+    file.close();
+    QString msg =  tr("The hierarchy does not have root");
+    utils::alert(msg);
+    statusBar()->showMessage(msg);
+    return;
+  }
 
   QTextStream ofile(&file);
   ofile << "<ServiceView compat=\"2.0\" monitor=\""<< mcoreData->monitor<< "\">\n";
   recordNode(ofile,*root);
   foreach(const NodeT& service, mcoreData->bpnodes) {
-      if (service.id == SvNavigatorTree::RootId || service.parent.isEmpty())
-        continue;
-      recordNode(ofile, service);
-    }
+    if (service.id == SvNavigatorTree::RootId || service.parent.isEmpty())
+      continue;
+    recordNode(ofile, service);
+  }
   foreach(const NodeT& service, mcoreData->cnodes) {
-      if (service.parent.isEmpty())
-        continue;
-      recordNode(ofile, service);
-    }
+    if (service.parent.isEmpty())
+      continue;
+    recordNode(ofile, service);
+  }
   ofile << "</ServiceView>\n";
   file.close();
 

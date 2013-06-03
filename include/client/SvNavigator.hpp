@@ -58,9 +58,12 @@ public:
 public slots:
   void startMonitor();
   void runNagiosUpdate(int srcId);
+  void runNagiosUpdate(const SourceT& src);
   void runLivestatusUpdate(int srcId);
+  void runLivestatusUpdate(const SourceT& src);
   void runZabbixZenossUpdate(int srcId);
-  void prepareUpdate(int srcId);
+  void prepareUpdate(void);
+  void prepareUpdate(const SourceT& src);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
   void centerGraphOnNode(const QString& _nodeId = "");
@@ -121,7 +124,7 @@ private:
   qint32 m_hostLeft;
   bool m_updateSucceed;
   bool m_isLogged;
-  QString m_lastErrorMsg;
+  QString m_lastErrorMsg; //FIXME: see source
   QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
   SourceListT m_sources;

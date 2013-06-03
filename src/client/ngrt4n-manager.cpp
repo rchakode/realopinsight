@@ -59,66 +59,66 @@ int main(int argc, char **argv)
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
   if ((opt = getopt(argc, argv, "chvd:e:")) != -1) {
-      switch (opt) {
-        case 'c':
-          module = "config";
-          break;
-        case 'd':
-          module = "dashboard";
-          file = optarg;
-          break;
-        case 'e':
-          module = "editor";
-          file = optarg;
-          break;
-        case 'v':
-          cout << versionMsg.toStdString()<<endl;
-          exit(0);
-        case 'h': {
-            cout << usage.arg(cmdName).toStdString();
-            exit(0);
-          }
-        default:
-          cout << usage.arg(cmdName).toStdString();
-          exit(1);
-          break;
-        }
+    switch (opt) {
+    case 'c':
+      module = "config";
+      break;
+    case 'd':
+      module = "dashboard";
+      file = optarg;
+      break;
+    case 'e':
+      module = "editor";
+      file = optarg;
+      break;
+    case 'v':
+      cout << versionMsg.toStdString()<<endl;
+      exit(0);
+    case 'h': {
+      cout << usage.arg(cmdName).toStdString();
+      exit(0);
     }
+    default:
+      cout << usage.arg(cmdName).toStdString();
+      exit(1);
+      break;
+    }
+  }
   std::clog << versionMsg.toStdString()<<"\n";
   Auth authentication;
   int userRole = authentication.exec();
   if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
   if (module == "dashboard") {
-      QSplashScreen* info = utils::infoScreen(versionMsg);
-      utils::delay(1);
-      if (file == "") {
-          info->clearMessage();
-          info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
-          utils::delay(1); info->finish(0);
-          file = QFileDialog::getOpenFileName(0,
-                                              QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
-                                              ".",
-                                              QObject::tr("Xml files (*.xml);;All files (*)"));
+    QSplashScreen* info = utils::infoScreen(versionMsg);
+    utils::delay(1);
+    if (file == "") {
+      info->clearMessage();
+      info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
+      utils::delay(1); info->finish(0);
+      file = QFileDialog::getOpenFileName(0,
+                                          QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
+                                          ".",
+                                          QObject::tr("Xml files (*.xml);;All files (*)"));
 
-          if (!file.length()){
-              utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
-              exit (1);
-            }
+      if (!file.length()){
+        utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
+        exit (1);
+      }
 
-        }
-      info->finish(0);
-      SvNavigator* console= new SvNavigator(userRole);
-      console->load(file);
-      console->startMonitor();
-    } else if (module == "editor") {
-      SvCreator* editor = new SvCreator(userRole);
-      editor->load(file);
-    } else if (module == "config") {
-      Preferences* monPref = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-      Preferences* passwdPref = new Preferences(userRole, Preferences::ChangePassword);
-      monPref->exec();
-      passwdPref->exec();
-      exit(0);
     }
+    info->finish(0);
+    SvNavigator* console= new SvNavigator(userRole);
+    console->load(file);
+    console->startMonitor();
+  } else if (module == "editor") {
+    SvCreator* editor = new SvCreator(userRole);
+    editor->load(file);
+  } else if (module == "config") {
+    Preferences* monPref = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
+    Preferences* passwdPref = new Preferences(userRole, Preferences::ChangePassword);
+    monPref->exec();
+    passwdPref->exec();
+    exit(0);
+  }
   return app->exec();
 }

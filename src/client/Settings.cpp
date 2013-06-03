@@ -50,22 +50,22 @@ Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" 
   QString opPasswd = QSettings::value(Settings::OP_PASSWD_KEY).toString();
 
   if (updateInterval.isEmpty()) {
-      QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
-    }
+    QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
+  }
   if (admUser.isEmpty()) {
-      QSettings::setValue(Settings::ADM_UNSERNAME_KEY, Auth::AdmUser);
-    }
+    QSettings::setValue(Settings::ADM_UNSERNAME_KEY, Auth::AdmUser);
+  }
   if (admPasswd.isEmpty()) {
-      QString passwd = QCryptographicHash::hash(Auth::AdmUser.toAscii(), QCryptographicHash::Md5) ;
-      QSettings::setValue(Settings::ADM_PASSWD_KEY, passwd);
-    }
+    QString passwd = QCryptographicHash::hash(Auth::AdmUser.toAscii(), QCryptographicHash::Md5) ;
+    QSettings::setValue(Settings::ADM_PASSWD_KEY, passwd);
+  }
   if (opUser.isEmpty()) {
-      QSettings::setValue(Settings::OP_UNSERNAME_KEY, Auth::OpUser);
-    }
+    QSettings::setValue(Settings::OP_UNSERNAME_KEY, Auth::OpUser);
+  }
   if (opPasswd.isEmpty()) {
-      QString passwd = QCryptographicHash::hash(Auth::OpUser.toAscii(), QCryptographicHash::Md5) ;
-      QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
-    }
+    QString passwd = QCryptographicHash::hash(Auth::OpUser.toAscii(), QCryptographicHash::Md5) ;
+    QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
+  }
   translator = new QTranslator();
   translator->load("ngrt4n_la");
   qApp->installTranslator(translator);
@@ -93,18 +93,20 @@ void Settings::setEntry(const QString& key, const QString& value)
 void Settings::loadSource(const qint32& _idx, SourceT& _src)
 {
   QString srcInfo = QSettings::value(utils::sourceKey(_idx)).toString();
-  if (srcInfo.isEmpty()) {
-      _src.mon_url = "http://localhost/monitor/";
-      _src.auth = "*******";
-      _src.ls_addr = "localhost";
-      _src.ls_port = MonitorBroker::DefaultPort;
-    } else {
-      JsonHelper jsHelper(srcInfo);
-      _src.mon_url = jsHelper.getProperty("mon_url").toString();
-      _src.auth = jsHelper.getProperty("auth").toString();
-      _src.use_ls = jsHelper.getProperty("use_ls").toInt32();
-      _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
-      _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
-    }
+  if (!srcInfo.isEmpty()) {
+    JsonHelper jsHelper(srcInfo);
+    _src.mon_type = jsHelper.getProperty("mon_type").toInt32();
+    _src.mon_url = jsHelper.getProperty("mon_url").toString();
+    _src.auth = jsHelper.getProperty("auth").toString();
+    _src.use_ls = jsHelper.getProperty("use_ls").toInt32();
+    _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
+    _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
+  } else {
+    _src.mon_type = -1;
+    _src.mon_url = "http://localhost/monitor/";
+    _src.auth = "*******";
+    _src.ls_addr = "localhost";
+    _src.ls_port = MonitorBroker::DefaultPort;
+  }
 }
 

@@ -53,15 +53,15 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
 
   QFile file(_configFile);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-      utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
-      file.close();
-      return false;
-    }
+    utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
+    file.close();
+    return false;
+  }
   if (!xmlDoc.setContent(&file)) {
-      file.close();
-      utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
-      return false;
-    }
+    file.close();
+    utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
+    return false;
+  }
   file.close(); // The content of the file is already in memory
 
   xmlRoot = xmlDoc.documentElement();
@@ -71,32 +71,32 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
   NodeT node;
   qint32 serviceCount = services.length();
   for (qint32 srv = 0; srv < serviceCount; srv++) {
-      QDomElement service = services.item(srv).toElement();
-      node.id = service.attribute("id").trimmed();
-      node.monitored = false;
-      node.type = service.attribute("type").toInt();
-      node.sev_crule = service.attribute("statusCalcRule").toInt();
-      node.sev_prule = service.attribute("statusPropRule").toInt();
-      node.icon = service.firstChildElement("Icon").text().trimmed();
-      node.name = service.firstChildElement("Name").text().trimmed();
-      node.description = service.firstChildElement("Description").text().trimmed();
-      node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
-      node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
-      node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-      node.severity = MonitorBroker::NagiosUnknown;
-      node.parent = "";
-      if (node.icon.isEmpty()) {
-          node.icon = GraphView::DEFAULT_ICON;
-        }
-      if (node.type == NodeType::ALARM_NODE) {
-          int pos = node.child_nodes.indexOf("/");
-          QString host = node.child_nodes.left(pos);
-          _coreData.hosts[host] << ((pos == -1)?"ping" : node.child_nodes.mid(pos+1));
-          _coreData.cnodes.insert(node.id, node);
-        } else {
-          _coreData.bpnodes.insert(node.id, node);
-        }
+    QDomElement service = services.item(srv).toElement();
+    node.id = service.attribute("id").trimmed();
+    node.monitored = false;
+    node.type = service.attribute("type").toInt();
+    node.sev_crule = service.attribute("statusCalcRule").toInt();
+    node.sev_prule = service.attribute("statusPropRule").toInt();
+    node.icon = service.firstChildElement("Icon").text().trimmed();
+    node.name = service.firstChildElement("Name").text().trimmed();
+    node.description = service.firstChildElement("Description").text().trimmed();
+    node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
+    node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
+    node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
+    node.severity = MonitorBroker::NagiosUnknown;
+    node.parent = "";
+    if (node.icon.isEmpty()) {
+      node.icon = GraphView::DEFAULT_ICON;
     }
+    if (node.type == NodeType::ALARM_NODE) {
+      int pos = node.child_nodes.indexOf("/");
+      QString host = node.child_nodes.left(pos);
+      _coreData.hosts[host] << ((pos == -1)?"ping" : node.child_nodes.mid(pos+1));
+      _coreData.cnodes.insert(node.id, node);
+    } else {
+      _coreData.bpnodes.insert(node.id, node);
+    }
+  }
   updateNodeHierachy(_coreData.bpnodes, _coreData.cnodes, graphContent);
   buildNodeTree(_coreData.bpnodes, _coreData.cnodes, _coreData.tree_items);
   graphContent = dotFileHeader + graphContent;
@@ -113,26 +113,26 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
   _graphContent = "\n";
   for (NodeListT::ConstIterator node = _bpnodes.begin();
        node != _bpnodes.end(); node++) {
-      QString nname = node->name;
-      _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
-      if (node->child_nodes != "") {
-          QStringList ids = node->child_nodes.split(CHILD_SEP);
-          foreach (const QString& nid, ids) {
-              QString nidTrimmed = nid.trimmed();
-              auto childNode = _cnodes.find(nidTrimmed);
-              if (utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
-                  childNode->parent = node->id;
-                  _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
-                }
-            }
+    QString nname = node->name;
+    _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+    if (node->child_nodes != "") {
+      QStringList ids = node->child_nodes.split(CHILD_SEP);
+      foreach (const QString& nid, ids) {
+        QString nidTrimmed = nid.trimmed();
+        auto childNode = _cnodes.find(nidTrimmed);
+        if (utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
+          childNode->parent = node->id;
+          _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
         }
+      }
     }
+  }
 
   for (NodeListT::ConstIterator node = _cnodes.begin();
        node != _cnodes.end(); node++) {
-      QString nname = node->name;
-      _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
-    }
+    QString nname = node->name;
+    _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+  }
 }
 
 void Parser::buildNodeTree(const NodeListT& _bpnodes,
@@ -145,19 +145,19 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
        node != _cnodes.end(); node++) _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
   for (NodeListT::ConstIterator node = _bpnodes.begin();
        node != _bpnodes.end(); node++) {
-      if (node->child_nodes.isEmpty()) continue;
-      auto treeItem = _tree.find(node->id);
-      if (treeItem == _tree.end()) {
-          utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
-          continue;
-        }
-      QStringList ids = node->child_nodes.split(CHILD_SEP);
-      foreach (const QString& id, ids) {
-          auto child = _tree.find(id);
-          if (child != _tree.end())
-            (*treeItem)->addChild(*child);
-        }
+    if (node->child_nodes.isEmpty()) continue;
+    auto treeItem = _tree.find(node->id);
+    if (treeItem == _tree.end()) {
+      utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
+      continue;
     }
+    QStringList ids = node->child_nodes.split(CHILD_SEP);
+    foreach (const QString& id, ids) {
+      auto child = _tree.find(id);
+      if (child != _tree.end())
+        (*treeItem)->addChild(*child);
+    }
+  }
 }
 
 void Parser::saveCoordinatesFile(const QString& _graphContent)
@@ -165,10 +165,10 @@ void Parser::saveCoordinatesFile(const QString& _graphContent)
   graphFilename = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(graphFilename);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-      utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
-      file.close();
-      exit(1);
-    }
+    utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
+    file.close();
+    exit(1);
+  }
   QTextStream fstream(&file);
   fstream << _graphContent;
   file.close();

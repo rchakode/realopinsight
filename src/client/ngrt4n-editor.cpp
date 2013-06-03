@@ -50,21 +50,21 @@ int main(int argc, char **argv)
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
   if ((opt = getopt(argc, argv, "hv")) != -1) {
-      switch (opt) {
-        case 'v':
-          cout << versionMsg.toStdString() << endl;
-          exit(0);
-          break;
-        case 'h':
-          cout << usage.arg(cmdName).toStdString();
-          exit(0);
-          break;
-        default:
-          cout << usage.arg(cmdName).toStdString();
-          exit (1);
-          break;
-        }
+    switch (opt) {
+    case 'v':
+      cout << versionMsg.toStdString() << endl;
+      exit(0);
+      break;
+    case 'h':
+      cout << usage.arg(cmdName).toStdString();
+      exit(0);
+      break;
+    default:
+      cout << usage.arg(cmdName).toStdString();
+      exit (1);
+      break;
     }
+  }
   std::clog <<versionMsg.toStdString()<<"\n";
   Auth authentication;
   int userRole = authentication.exec();

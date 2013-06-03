@@ -80,16 +80,16 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
         mmodel->item(index, ID_COLUMN) &&
         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) { index++;}
   if(index >= nbRows) {
-      index = 0;
-      mmodel->insertRow(index);
-      mmodel->setRowCount(nbRows + 1);
-      mmodel->setItem(index, 0, new QStandardItem(itemText));
-      mmodel->setItem(index, 1, new QStandardItem(itemText));
-      mmodel->setItem(index, 2, new QStandardItem(itemText));
-      mmodel->setItem(index, 3, new QStandardItem(itemText));
-      mmodel->setItem(index, 4, new QStandardItem(itemText));
-      mmodel->setItem(index, ID_COLUMN, new QStandardItem(itemText));
-    }
+    index = 0;
+    mmodel->insertRow(index);
+    mmodel->setRowCount(nbRows + 1);
+    mmodel->setItem(index, 0, new QStandardItem(itemText));
+    mmodel->setItem(index, 1, new QStandardItem(itemText));
+    mmodel->setItem(index, 2, new QStandardItem(itemText));
+    mmodel->setItem(index, 3, new QStandardItem(itemText));
+    mmodel->setItem(index, 4, new QStandardItem(itemText));
+    mmodel->setItem(index, ID_COLUMN, new QStandardItem(itemText));
+  }
   mmodel->item(index, ID_COLUMN)->setData(_node.id, Qt::UserRole);
   itemText = QString(check.last_state_change.c_str());
   mmodel->item(index, 0)->setText(itemText);
@@ -107,17 +107,17 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
 
   if(_node.severity == MonitorBroker::Normal) {
-      mmodel->item(index, 0)->setBackground(Qt::transparent);
-      mmodel->item(index, 2)->setBackground(Qt::transparent);
-      mmodel->item(index, 3)->setBackground(Qt::transparent);
-      mmodel->item(index, 4)->setBackground(Qt::transparent);
-    } else {
-      mmodel->item(index, 0)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-      mmodel->item(index, 2)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-      mmodel->item(index, 3)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-      mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+    mmodel->item(index, 0)->setBackground(Qt::transparent);
+    mmodel->item(index, 2)->setBackground(Qt::transparent);
+    mmodel->item(index, 3)->setBackground(Qt::transparent);
+    mmodel->item(index, 4)->setBackground(Qt::transparent);
+  } else {
+    mmodel->item(index, 0)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+    mmodel->item(index, 2)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+    mmodel->item(index, 3)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+    mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
 
-    }
+  }
   mmodel->item(index, 4)->setText(_node.actual_msg);
   mmodel->item(index, 4)->setData(_node.actual_msg, Qt::UserRole);
 }
@@ -137,13 +137,13 @@ void MsgConsole::clearNormalMsg(void)
   qint32 index = 0;
   qint32 nbRows = mmodel->rowCount();
   while (index < nbRows) {
-      if (mmodel->item(index, 1)->text() == utils::criticityToText(MonitorBroker::Normal)) {
-          mmodel->removeRow(index);
-          nbRows--;
-        } else {
-          index++;
-        }
+    if (mmodel->item(index, 1)->text() == utils::criticityToText(MonitorBroker::Normal)) {
+      mmodel->removeRow(index);
+      nbRows--;
+    } else {
+      index++;
     }
+  }
 }
 
 void MsgConsole::updateEntriesSize(const QSize& _windowSize, const bool& _resizeWindow)
@@ -152,9 +152,9 @@ void MsgConsole::updateEntriesSize(const QSize& _windowSize, const bool& _resize
   QTableView::resizeColumnsToContents();
   QTableView::resizeRowsToContents();
   if(mmodel->rowCount()) {
-      QTableView::setColumnWidth(4, QTableView::width() - (QTableView::columnWidth(0)
-                                                           +QTableView::columnWidth(1)
-                                                           +QTableView::columnWidth(2)
-                                                           +QTableView::columnWidth(3)));
-    }
+    QTableView::setColumnWidth(4, QTableView::width() - (QTableView::columnWidth(0)
+                                                         +QTableView::columnWidth(1)
+                                                         +QTableView::columnWidth(2)
+                                                         +QTableView::columnWidth(3)));
+  }
 }

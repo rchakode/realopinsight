@@ -100,28 +100,28 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
 {
   QGraphicsItem* item = nodeAt(_event->pos());
   if (item) {
-      if (_event->button() == Qt::RightButton) {
-          emit rightClickOnItem(item, _event->globalPos());
-          return;
-        }
-      QStringList list  = item->data(0).toString().split(":");
-      if (list.length() == 2) {
-          QString nodeId = list[0];
-          QString sfx = ":" + list[1];
-          if (sfx == EXPICON_NODE) {
-              QPixmap exp_icon;
-              if (mgnodes[nodeId].expand) {
-                  exp_icon.load(micons[MINUS], 0, Qt::AutoColor);
-                  mgnodes[nodeId].expand = false;
-                } else {
-                  exp_icon.load(micons[PLUS], 0, Qt::AutoColor);
-                  mgnodes[nodeId].expand = true;
-                }
-              mgnodes[nodeId].exp_icon->setPixmap(exp_icon);
-              emit expandNode(nodeId, mgnodes[nodeId].expand, 1);
-            }
-        }
+    if (_event->button() == Qt::RightButton) {
+      emit rightClickOnItem(item, _event->globalPos());
+      return;
     }
+    QStringList list  = item->data(0).toString().split(":");
+    if (list.length() == 2) {
+      QString nodeId = list[0];
+      QString sfx = ":" + list[1];
+      if (sfx == EXPICON_NODE) {
+        QPixmap exp_icon;
+        if (mgnodes[nodeId].expand) {
+          exp_icon.load(micons[MINUS], 0, Qt::AutoColor);
+          mgnodes[nodeId].expand = false;
+        } else {
+          exp_icon.load(micons[PLUS], 0, Qt::AutoColor);
+          mgnodes[nodeId].expand = true;
+        }
+        mgnodes[nodeId].exp_icon->setPixmap(exp_icon);
+        emit expandNode(nodeId, mgnodes[nodeId].expand, 1);
+      }
+    }
+  }
 }
 
 void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
@@ -136,66 +136,66 @@ void GraphView::zoomIn()
 {
   scale(SCALIN_FACTOR, SCALIN_FACTOR);
   if (mchart) {
-      setStatsPanelPos();
-      mchart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
-    }
+    setStatsPanelPos();
+    mchart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
+  }
 }
 
 void GraphView::zoomOut()
 {
   scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
   if (mchart) {
-      mchart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
-      setStatsPanelPos();
-    }
+    mchart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
+    setStatsPanelPos();
+  }
 }
 
 void GraphView::updateStatsPanel(Chart * _statsPanel)
 {
   bool visible = true;
   if (mchart) {
-      visible = mchart->isVisible();
-      mchart->setWidget(_statsPanel);
-      mchart->setVisible(visible);
-    } else {
-      mchart = mscene->addWidget(_statsPanel);
-      mchartArea = new QGraphicsRectItem();
-      mchartArea->setBrush(Qt::transparent);
-      mchartArea->setPen(QColor(Qt::transparent));
-      mscene->addItem(mchartArea);
-    }
+    visible = mchart->isVisible();
+    mchart->setWidget(_statsPanel);
+    mchart->setVisible(visible);
+  } else {
+    mchart = mscene->addWidget(_statsPanel);
+    mchartArea = new QGraphicsRectItem();
+    mchartArea->setBrush(Qt::transparent);
+    mchartArea->setPen(QColor(Qt::transparent));
+    mscene->addItem(mchartArea);
+  }
 
   if (mchart) { //Mandatory
-      setStatsPanelPos();
-      if (!misAjustedChartSize) ajustStatsPanelSize();
-    }
+    setStatsPanelPos();
+    if (!misAjustedChartSize) ajustStatsPanelSize();
+  }
 }
 
 
 void GraphView::ajustStatsPanelSize(void)
 {
   if (mchart) {
-      QSizeF viewSize = size();
-      QSizeF statPanelSize = mchart->size();
-      mchartScalFactor = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
-      if (mchartScalFactor < 1) {
-          if (mviewScalFactor < 1) 	mchart->scale(1/mviewScalFactor, 1/mviewScalFactor);
-          mchart->scale(mchartScalFactor, mchartScalFactor);
-        }
-      misAjustedChartSize = true;
-      setStatsPanelPos();
+    QSizeF viewSize = size();
+    QSizeF statPanelSize = mchart->size();
+    mchartScalFactor = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
+    if (mchartScalFactor < 1) {
+      if (mviewScalFactor < 1) 	mchart->scale(1/mviewScalFactor, 1/mviewScalFactor);
+      mchart->scale(mchartScalFactor, mchartScalFactor);
     }
+    misAjustedChartSize = true;
+    setStatsPanelPos();
+  }
 }
 
 void GraphView::setStatsPanelPos(void)
 {
   if (mchart) {
-      qreal xp = size().width() - mchart->size().width() *  mchartScalFactor - 2;
-      QPointF pos = mapToScene(QPoint(xp, 0));
-      mchart->setPos(pos);
-      Chart* w = dynamic_cast<Chart*>(mchart->widget());
-      mchartArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
-    }
+    qreal xp = size().width() - mchart->size().width() *  mchartScalFactor - 2;
+    QPointF pos = mapToScene(QPoint(xp, 0));
+    mchart->setPos(pos);
+    Chart* w = dynamic_cast<Chart*>(mchart->widget());
+    mchartArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
+  }
 }
 
 bool GraphView::hideChart(void)
@@ -216,12 +216,12 @@ void GraphView::load(const QString& _dotFile,
   int exitCode = dotParser->execute("dot", arguments);
   dotParser->waitForFinished(60000);
   if (!exitCode) {
-      drawMap(_bpnodes, _cnodes);
-      mscene->setSceneRect(mscene->itemsBoundingRect());
-    } else {
-      utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
-      exit(exitCode);
-    }
+    drawMap(_bpnodes, _cnodes);
+    mscene->setSceneRect(mscene->itemsBoundingRect());
+  } else {
+    utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
+    exit(exitCode);
+  }
 
   dotParser.reset(NULL);
 }
@@ -234,36 +234,36 @@ void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
   QPen pen;
   QFile coodFile(mgphCoordFile);
   if (coodFile.open(QFile::ReadOnly)) {
-      pen.setColor(StatsLegend::COLOR_UNKNOWN);
-      regexSep.setPattern("[ ]+");
-      QTextStream coodFileStream(& coodFile);
-      while (line = coodFileStream.readLine(0), ! line.isNull()) {
-          splitedLine = line.split (regexSep);
-          if (splitedLine[0] == "node") {
-              QString nid = splitedLine[1].trimmed();
-              qreal x_corner = splitedLine[2].trimmed().toFloat();
-              qreal y_corner = -1 * splitedLine[3].trimmed().toFloat();
-              NodeListT::const_iterator node;
-              if (!utils::findNode(_bpnodes, _cnodes, nid, node)) continue;
-              mgnodes[nid].type = node->type;
-              mgnodes[nid].expand = true;
-              QPointF labelOrigin = QPointF(x_corner * XSCAL_FACTOR, y_corner * YSCAL_FACTOR);
-              drawNode(*node);
-              setNodePos(nid, labelOrigin);
-            } else if (splitedLine[0] == "edge") {
-              QPainterPath path;
-              setEdgePath(splitedLine[1], splitedLine[2], path);
-              QString eid =  splitedLine[1]%":"%splitedLine[2];
-              medges[eid].edge = new QGraphicsPathItem(path),
-                  medges[eid].edge->setPen(pen),
-                  mscene->addItem(medges[eid].edge),
-                  medges[eid].edge->setZValue(-20);
-            } else if (splitedLine[0] == "stop") {
-              break;
-            }
-        }
-      coodFile.close();
+    pen.setColor(StatsLegend::COLOR_UNKNOWN);
+    regexSep.setPattern("[ ]+");
+    QTextStream coodFileStream(& coodFile);
+    while (line = coodFileStream.readLine(0), ! line.isNull()) {
+      splitedLine = line.split (regexSep);
+      if (splitedLine[0] == "node") {
+        QString nid = splitedLine[1].trimmed();
+        qreal x_corner = splitedLine[2].trimmed().toFloat();
+        qreal y_corner = -1 * splitedLine[3].trimmed().toFloat();
+        NodeListT::const_iterator node;
+        if (!utils::findNode(_bpnodes, _cnodes, nid, node)) continue;
+        mgnodes[nid].type = node->type;
+        mgnodes[nid].expand = true;
+        QPointF labelOrigin = QPointF(x_corner * XSCAL_FACTOR, y_corner * YSCAL_FACTOR);
+        drawNode(*node);
+        setNodePos(nid, labelOrigin);
+      } else if (splitedLine[0] == "edge") {
+        QPainterPath path;
+        setEdgePath(splitedLine[1], splitedLine[2], path);
+        QString eid =  splitedLine[1]%":"%splitedLine[2];
+        medges[eid].edge = new QGraphicsPathItem(path),
+            medges[eid].edge->setPen(pen),
+            mscene->addItem(medges[eid].edge),
+            medges[eid].edge->setZValue(-20);
+      } else if (splitedLine[0] == "stop") {
+        break;
+      }
     }
+    coodFile.close();
+  }
 }
 
 void GraphView::drawNode(const NodeT& _node)
@@ -309,13 +309,13 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
   GNodeListT::iterator gnodeIt =  mgnodes.find(_node.id);
   if (gnodeIt != mgnodes.end()) {
-      gnodeIt->label->setHtml(label);
-      gnodeIt->icon->setToolTip(_toolTip);
-      gnodeIt->label->setToolTip(_toolTip);
-      GEdgeListT::iterator edge = medges.find(_node.parent + ":" + _node.id);
-      if (edge != medges.end())
-        edge->edge->setPen(utils::computeColor(_node.prop_sev));
-    }
+    gnodeIt->label->setHtml(label);
+    gnodeIt->icon->setToolTip(_toolTip);
+    gnodeIt->label->setToolTip(_toolTip);
+    GEdgeListT::iterator edge = medges.find(_node.parent + ":" + _node.id);
+    if (edge != medges.end())
+      edge->edge->setPen(utils::computeColor(_node.prop_sev));
+  }
 }
 
 void GraphView::setEdgePath(const QString& _parentVertex,
@@ -359,19 +359,19 @@ void GraphView::setNodeVisible(const QString& _nodeId,
 {
   GNodeListT::iterator gnode = mgnodes.find(_nodeId);
   if (gnode != mgnodes.end()) {
-      QString edgeId = _parent + ":" + _nodeId;
-      medges[edgeId].edge->setVisible(_visible);
-      gnode->expand = _visible;
-      gnode->label->setVisible(_visible);
-      gnode->icon->setVisible(_visible);
-      if (gnode->type == NodeType::SERVICE_NODE)
-        gnode->exp_icon->setVisible(_visible);
-      if (_visible) {
-          QPixmap expandIcon(micons[PLUS], 0, Qt::AutoColor);
-          mgnodes[_nodeId].exp_icon->setPixmap(expandIcon);
-        }
-      emit expandNode(_nodeId, _visible, _level + 1);
+    QString edgeId = _parent + ":" + _nodeId;
+    medges[edgeId].edge->setVisible(_visible);
+    gnode->expand = _visible;
+    gnode->label->setVisible(_visible);
+    gnode->icon->setVisible(_visible);
+    if (gnode->type == NodeType::SERVICE_NODE)
+      gnode->exp_icon->setVisible(_visible);
+    if (_visible) {
+      QPixmap expandIcon(micons[PLUS], 0, Qt::AutoColor);
+      mgnodes[_nodeId].exp_icon->setPixmap(expandIcon);
     }
+    emit expandNode(_nodeId, _visible, _level + 1);
+  }
 }
 
 void GraphView::scaleToFitViewPort(void)
@@ -380,12 +380,12 @@ void GraphView::scaleToFitViewPort(void)
   QSizeF sceneSize = mscene->itemsBoundingRect().size();
   mviewScalFactor = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
   if (mviewScalFactor < 1.0) {
-      if (mchart)
-        mchart->scale(1 / mviewScalFactor, 1 / mviewScalFactor);
-      scale(mviewScalFactor, mviewScalFactor);
-    } else {
-      mviewScalFactor = 1;
-    }
+    if (mchart)
+      mchart->scale(1 / mviewScalFactor, 1 / mviewScalFactor);
+    scale(mviewScalFactor, mviewScalFactor);
+  } else {
+    mviewScalFactor = 1;
+  }
 }
 
 
