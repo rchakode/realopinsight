@@ -50,9 +50,12 @@ public:
   QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
   void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
   QString getApiEndpoint(void) const {return m_apiUri;}
-  void updateTrid(const QString& apiv) {m_trid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
+  void setTrid(const QString& apiv) {m_trid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
   int getTrid(void) const {return m_trid;}
+  void setIsLogged(bool state) {m_isLogged = state;}
+  bool getIsLogged(void) const {return m_isLogged;}  
   void setSslConf(bool verifyPeer);
+
 
 public slots:
   void processError(const QNetworkReply::NetworkError& code) { m_evlHandler->exit(code);}
@@ -65,6 +68,7 @@ private :
   int m_trid;
   static RequestListT requestsPatterns();
   QEventLoop* m_evlHandler;
+  bool m_isLogged;
   QSslConfiguration* sslConf;
 };
 

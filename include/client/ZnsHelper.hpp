@@ -28,8 +28,8 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 namespace {
-  const QString ZNS_API_CONTEXT = "/zport/dmd";
-  const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+const QString ZNS_API_CONTEXT = "/zport/dmd";
+const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
 }
 
 class ZnsHelper : public QNetworkAccessManager {
@@ -61,7 +61,10 @@ public:
   QString getApiContextEndpoint(void) const {return m_apiBaseUrl+ZNS_API_CONTEXT;}
   QString getApiBaseEndpoint(void) const {return m_apiBaseUrl;}
   static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
+  void setIsLogged(bool state) {m_isLogged = state;}
+  bool getIsLogged(void) const {return m_isLogged;}  
   void setSslConf(bool verifyPeer);
+
 
 public slots:
   void processError(const QNetworkReply::NetworkError& code) {m_evlHandler->exit(code);}
@@ -74,6 +77,7 @@ private :
   QNetworkRequest* m_reqHandler;
   QSslConfiguration* sslConf;
   QEventLoop* m_evlHandler;
+  bool m_isLogged;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

@@ -36,7 +36,8 @@ ZnsHelper::ZnsHelper(const QString& baseUrl)
   : QNetworkAccessManager(),
     m_apiBaseUrl(baseUrl),
     m_reqHandler(new QNetworkRequest()),
-    m_evlHandler(new QEventLoop(this))
+    m_evlHandler(new QEventLoop(this)),
+    m_isLogged(false)
 {
   m_reqHandler->setUrl(QUrl(m_apiBaseUrl+ZNS_API_CONTEXT));
 }

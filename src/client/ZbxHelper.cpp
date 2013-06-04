@@ -35,7 +35,8 @@ ZbxHelper::ZbxHelper(const QString & baseUrl)
     m_apiUri(baseUrl%ZBX_API_CONTEXT),
     m_reqHandler(new QNetworkRequest()),
     m_trid(-1),
-    m_evlHandler(new QEventLoop(this))
+    m_evlHandler(new QEventLoop(this)),
+    m_isLogged(false)
 {
   m_reqHandler->setRawHeader("Content-Type", "application/json");
   m_reqHandler->setUrl(QUrl(m_apiUri));

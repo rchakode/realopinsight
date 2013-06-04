@@ -88,8 +88,6 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_nodeContextMenu (new QMenu()),
     m_zbxAuthToken(""),
     m_hostLeft(0),
-    m_isLogged(false),
-    m_lastErrorMsg(""),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     m_showOnlyTroubles(false)
 {
@@ -207,15 +205,15 @@ void SvNavigator::startMonitor()
 {
   prepareUpdate();
   switch(m_coreData->monitor) {
-  case MonitorBroker::Zenoss:
-  case MonitorBroker::Zabbix:
-    //FIXME: !m_isLogged ? openRpcSession(0): requestRpcData();
-    runZabbixZenossUpdate(0);
-    break;
-  case MonitorBroker::Nagios:
-  default:
-    m_preferences->useLs()? runLivestatusUpdate(0) : runNagiosUpdate(0);
-    break;
+    case MonitorBroker::Zenoss:
+    case MonitorBroker::Zabbix:
+      //FIXME: !m_isLogged ? openRpcSession(0): requestRpcData();
+      runZabbixZenossUpdate(0);
+      break;
+    case MonitorBroker::Nagios:
+    default:
+      m_preferences->useLs()? runLivestatusUpdate(0) : runNagiosUpdate(0);
+      break;
   }
 }
 
@@ -334,11 +332,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
     return;
   }
 
-  /* Check that the server responses well */
-  if (src.d4n_handler->connect()) {
-    src.d4n_handler->makeHandShake();
-  }
-
+  /* connection is carried out in open session */
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
       utils::alert(tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial()));
@@ -408,8 +402,8 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
     return;
   }
 
-  /* Connect to the service */
-  if (!src.ls_handler->connectToService()) {
+  /* connection is carried out in open session */
+  if (!src.ls_handler->isConnected()) {
     m_updateSucceed = false;
     m_lastErrorMsg = src.ls_handler->errorString(); // FIXME: m_lastErrorMsg = src.ls_handler->errorString()
     updateDashboardOnUnknown();
@@ -475,18 +469,18 @@ void SvNavigator::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("Connecting to %1...");
   switch(src.mon_type) {
-  case MonitorBroker::Nagios:
-    msg = msg.arg(QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
-    break;
-  case MonitorBroker::Zabbix:
-    msg = msg.arg(src.zbx_handler->getApiEndpoint());
-    break;
-  case MonitorBroker::Zenoss:
-    msg = msg.arg(src.zns_handler->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
-    break;
-  default:
-    msg = "Unknown source type";
-    break;
+    case MonitorBroker::Nagios:
+      msg = msg.arg(QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
+      break;
+    case MonitorBroker::Zabbix:
+      msg = msg.arg(src.zbx_handler->getApiEndpoint());
+      break;
+    case MonitorBroker::Zenoss:
+      msg = msg.arg(src.zns_handler->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
+      break;
+    default:
+      msg = "Unknown source type";
+      break;
   }
   updateStatusBar(msg);
 }
@@ -553,10 +547,6 @@ void SvNavigator::finalizeDashboardUpdate(const bool& enable)
          cnode != end; cnode++) {
       if (!cnode->monitored) {
         cnode->check = utils::getUnknownService(MonitorBroker::Unknown, cnode->child_nodes);
-//        cnode->check.status = MonitorBroker::Unknown;
-//        cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-//        cnode->check.host = "-";
-//        cnode->check.alarm_msg = tr("Unknown service (%1)").arg(cnode->child_nodes).toStdString();
         computeStatusInfo(cnode);
         m_coreData->check_status_count[cnode->severity]++;
         updateDashboard(cnode);
@@ -636,12 +626,12 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
   }
   node->severity = criticity.getValue();
   switch(node->sev_prule) {
-  case PropRules::Increased: node->prop_sev = (criticity++).getValue();
-    break;
-  case PropRules::Decreased: node->prop_sev = (criticity--).getValue();
-    break;
-  default: node->prop_sev = node->severity;
-    break;
+    case PropRules::Increased: node->prop_sev = (criticity++).getValue();
+      break;
+    case PropRules::Decreased: node->prop_sev = (criticity--).getValue();
+      break;
+    default: node->prop_sev = node->severity;
+      break;
   }
   QString toolTip = getNodeToolTip(*node);
   m_map->updateNode(node, toolTip);
@@ -722,28 +712,28 @@ void SvNavigator::acknowledge(void)
 void SvNavigator::tabChanged(int _index)
 {
   switch(_index) {
-  case 0:
-    m_subMenus["Refresh"]->setEnabled(true);
-    m_subMenus["Capture"]->setEnabled(true);
-    m_subMenus["ZoomIn"]->setEnabled(true);
-    m_subMenus["ZoomOut"]->setEnabled(true);
-    m_menus["BROWSER"]->setEnabled(false);
-    m_subMenus["BrowserBack"]->setEnabled(false);
-    m_subMenus["BrowserForward"]->setEnabled(false);
-    m_subMenus["BrowserStop"]->setEnabled(false);
-    break;
-  case 1:
-    m_menus["BROWSER"]->setEnabled(true);
-    m_subMenus["BrowserBack"]->setEnabled(true);
-    m_subMenus["BrowserForward"]->setEnabled(true);
-    m_subMenus["BrowserStop"]->setEnabled(true);
-    m_subMenus["Refresh"]->setEnabled(false);
-    m_subMenus["Capture"]->setEnabled(false);
-    m_subMenus["ZoomIn"]->setEnabled(false);
-    m_subMenus["ZoomOut"]->setEnabled(false);
-    break;
-  default:
-    break;
+    case 0:
+      m_subMenus["Refresh"]->setEnabled(true);
+      m_subMenus["Capture"]->setEnabled(true);
+      m_subMenus["ZoomIn"]->setEnabled(true);
+      m_subMenus["ZoomOut"]->setEnabled(true);
+      m_menus["BROWSER"]->setEnabled(false);
+      m_subMenus["BrowserBack"]->setEnabled(false);
+      m_subMenus["BrowserForward"]->setEnabled(false);
+      m_subMenus["BrowserStop"]->setEnabled(false);
+      break;
+    case 1:
+      m_menus["BROWSER"]->setEnabled(true);
+      m_subMenus["BrowserBack"]->setEnabled(true);
+      m_subMenus["BrowserForward"]->setEnabled(true);
+      m_subMenus["BrowserStop"]->setEnabled(true);
+      m_subMenus["Refresh"]->setEnabled(false);
+      m_subMenus["Capture"]->setEnabled(false);
+      m_subMenus["ZoomIn"]->setEnabled(false);
+      m_subMenus["ZoomOut"]->setEnabled(false);
+      break;
+    default:
+      break;
 
   }
 }
@@ -800,66 +790,66 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, const SourceT& src)
   }
   qint32 tid = jsHelper.getProperty("id").toInt32();
   switch(tid) {
-  case ZbxHelper::Login: {
-    m_zbxAuthToken = jsHelper.getProperty("result").toString();
-    if (!m_zbxAuthToken.isEmpty()) {
-      m_isLogged = true;
+    case ZbxHelper::Login: {
+      m_zbxAuthToken = jsHelper.getProperty("result").toString();
+      if (!m_zbxAuthToken.isEmpty()) {
+        src.zbx_handler->setIsLogged(true);
+      }
+      break;
     }
-    break;
-  }
-  case ZbxHelper::ApiVersion: {
-    src.zbx_handler->updateTrid(jsHelper.getProperty("result").toString());
-    break;
-  }
-  case ZbxHelper::Trigger:
-  case ZbxHelper::TriggerV18: {
-    QScriptValueIterator trigger(jsHelper.getProperty("result"));
-    CheckT check;
-    while (trigger.hasNext()) {
-      trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
-      QScriptValue triggerData = trigger.value();
-      QString triggerName = triggerData.property("description").toString();
-      check.check_command = triggerName.toStdString();
-      check.status = triggerData.property("value").toInt32();
-      if (check.status == MonitorBroker::ZabbixClear) {
-        check.alarm_msg = "OK ("+triggerName.toStdString()+")";
-      } else {
-        check.alarm_msg = triggerData.property("error").toString().toStdString();
-        check.status = triggerData.property("priority").toInteger();
-      }
-      QString targetHost = "";
-      QScriptValueIterator host(triggerData.property("hosts"));
-      if (host.hasNext()) {
-        host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
-        QScriptValue hostData = host.value();
-        targetHost = hostData.property("host").toString();
-        check.host = targetHost.toStdString();
-      }
-      if (tid == ZbxHelper::TriggerV18) {
-        check.last_state_change = utils::getCtime(triggerData.property("lastchange").toUInt32());
-      } else {
-        QScriptValueIterator item(triggerData.property("items"));
-        if (item.hasNext()) {
-          item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
-          QScriptValue itemData = item.value();
-          check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
+    case ZbxHelper::ApiVersion: {
+      src.zbx_handler->setTrid(jsHelper.getProperty("result").toString());
+      break;
+    }
+    case ZbxHelper::Trigger:
+    case ZbxHelper::TriggerV18: {
+      QScriptValueIterator trigger(jsHelper.getProperty("result"));
+      CheckT check;
+      while (trigger.hasNext()) {
+        trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+        QScriptValue triggerData = trigger.value();
+        QString triggerName = triggerData.property("description").toString();
+        check.check_command = triggerName.toStdString();
+        check.status = triggerData.property("value").toInt32();
+        if (check.status == MonitorBroker::ZabbixClear) {
+          check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+        } else {
+          check.alarm_msg = triggerData.property("error").toString().toStdString();
+          check.status = triggerData.property("priority").toInteger();
         }
+        QString targetHost = "";
+        QScriptValueIterator host(triggerData.property("hosts"));
+        if (host.hasNext()) {
+          host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+          QScriptValue hostData = host.value();
+          targetHost = hostData.property("host").toString();
+          check.host = targetHost.toStdString();
+        }
+        if (tid == ZbxHelper::TriggerV18) {
+          check.last_state_change = utils::getCtime(triggerData.property("lastchange").toUInt32());
+        } else {
+          QScriptValueIterator item(triggerData.property("items"));
+          if (item.hasNext()) {
+            item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+            QScriptValue itemData = item.value();
+            check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
+          }
+        }
+        QString key = ID_PATTERN.arg(targetHost, triggerName);
+        check.id = key.toStdString();
+        updateCNodes(check);
       }
-      QString key = ID_PATTERN.arg(targetHost, triggerName);
-      check.id = key.toStdString();
-      updateCNodes(check);
+      if (--m_hostLeft == 0) {
+        m_updateSucceed = true;
+        finalizeDashboardUpdate();
+      }
+      break;
     }
-    if (--m_hostLeft == 0) {
-      m_updateSucceed = true;
-      finalizeDashboardUpdate();
-    }
-    break;
-  }
-  default :
-    m_lastErrorMsg = tr("Weird response received from the server");
-    updateDashboardOnUnknown();
-    qDebug() << data;
-    break;
+    default :
+      m_lastErrorMsg = tr("Weird response received from the server");
+      updateDashboardOnUnknown();
+      qDebug() << data;
+      break;
   }
 }
 
@@ -878,7 +868,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, const SourceT& src)
   QString data = _reply->readAll();
   if (data.endsWith("submitted=true")) {
     src.zns_handler->cookieJar()->setCookiesFromUrl(cookies, src.zns_handler->getApiBaseEndpoint());
-    m_isLogged = true;
+    src.zns_handler->setIsLogged(true);
   } else {
     JsonHelper jsonHelper(data);
     qint32 tid = jsonHelper.getProperty("tid").toInt32();
@@ -988,12 +978,21 @@ QStringList SvNavigator::getAuthInfo(const QString& authString)
 
 void SvNavigator::openRpcSession(int srcId)
 {
-  SourceListT::Iterator source = m_sources.find(srcId);
-  if (source == m_sources.end()) {
-    m_isLogged = false;
+  SourceListT::Iterator src = m_sources.find(srcId);
+  if (src == m_sources.end()) {
+    switch (src->mon_type) {
+      case MonitorBroker::Zabbix:
+        src->zbx_handler->setIsLogged(false);
+        break;
+      case MonitorBroker::Zenoss:
+        src->zns_handler->setIsLogged(false);
+        break;
+      default:
+        break;
+    }
     return;
   }
-  openRpcSession(*source);
+  openRpcSession(*src);
 }
 
 
@@ -1007,46 +1006,40 @@ void SvNavigator::openRpcSession(const SourceT& src)
   }
   QUrl znsUrlParams;
   switch(m_coreData->monitor) {
-  case MonitorBroker::Nagios:
-    if (m_preferences->useLs()) {
-      m_isLogged = src.ls_handler->connectToService();
-    } else {
-      if(src.d4n_handler->connect()) {
+    case MonitorBroker::Nagios:
+      if (m_preferences->useLs()) {
+        src.ls_handler->connectToService();
+      } else if(src.d4n_handler->connect()) {
         src.d4n_handler->makeHandShake();
-        m_isLogged = src.d4n_handler->isConnected();
-      } else {
-        m_isLogged = false;
       }
-    }
-    break;
-  case MonitorBroker::Zabbix: {
-    src.zbx_handler->setBaseUrl(src.mon_url);
-    authParams.push_back(QString::number(ZbxHelper::Login));
-    QNetworkReply* reply = src.zbx_handler->postRequest(ZbxHelper::Login, authParams);
-    processZbxReply(reply, src);
-    if (m_isLogged) {
-      // Get API version
-      QStringList params;
-      params.push_back(m_zbxAuthToken);
-      params.push_back(QString::number(ZbxHelper::ApiVersion));
-      reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
+      break;
+    case MonitorBroker::Zabbix: {
+      src.zbx_handler->setBaseUrl(src.mon_url);
+      authParams.push_back(QString::number(ZbxHelper::Login));
+      QNetworkReply* reply = src.zbx_handler->postRequest(ZbxHelper::Login, authParams);
       processZbxReply(reply, src);
-      if (src.zbx_handler->getTrid() == -1) m_isLogged = false; // Means problem while retrieving API version
+      if (src.zbx_handler->getIsLogged()) {
+        // Get API version
+        QStringList params;
+        params.push_back(m_zbxAuthToken);
+        params.push_back(QString::number(ZbxHelper::ApiVersion));
+        reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
+        processZbxReply(reply, src);
+      }
+      break;
     }
-    break;
-  }
-  case MonitorBroker::Zenoss: {
-    src.zns_handler->setBaseUrl(src.mon_url);
-    znsUrlParams.addQueryItem("__ac_name", authParams[0]);
-    znsUrlParams.addQueryItem("__ac_password", authParams[1]);
-    znsUrlParams.addQueryItem("submitted", "true");
-    znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
-    QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
-    processZnsReply(reply, src);
-  }
-    break;
-  default:
-    break;
+    case MonitorBroker::Zenoss: {
+      src.zns_handler->setBaseUrl(src.mon_url);
+      znsUrlParams.addQueryItem("__ac_name", authParams[0]);
+      znsUrlParams.addQueryItem("__ac_password", authParams[1]);
+      znsUrlParams.addQueryItem("submitted", "true");
+      znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
+      QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
+      processZnsReply(reply, src);
+    }
+      break;
+    default:
+      break;
   }
 }
 
@@ -1054,31 +1047,31 @@ void SvNavigator::openRpcSession(const SourceT& src)
 void SvNavigator::requestRpcData(const SourceT& src) {
   updateStatusBar(tr("Updating..."));
   switch(m_coreData->monitor) {
-  case MonitorBroker::Zabbix: {
-    int trid = src.zbx_handler->getTrid();
-    foreach (const QString& host, m_coreData->hosts.keys()) {
-      QStringList params;
-      params.push_back(src.auth); //FIXME: params.push_back(m_zbxAuthToken);
-      params.push_back(host);
-      params.push_back(QString::number(trid));
-      QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
-      processZbxReply(reply, src);
+    case MonitorBroker::Zabbix: {
+      int trid = src.zbx_handler->getTrid();
+      foreach (const QString& host, m_coreData->hosts.keys()) {
+        QStringList params;
+        params.push_back(src.auth); //FIXME: params.push_back(m_zbxAuthToken);
+        params.push_back(host);
+        params.push_back(QString::number(trid));
+        QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
+        processZbxReply(reply, src);
+      }
+      break;
     }
-    break;
-  }
-  case MonitorBroker::Zenoss: {
-    src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
-    foreach (const QString& host, m_coreData->hosts.keys()) {
-      QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
-                                                          ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                                                          .arg(host, QString::number(ZnsHelper::Device))
-                                                          .toAscii());
-      processZbxReply(reply, src);
+    case MonitorBroker::Zenoss: {
+      src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
+      foreach (const QString& host, m_coreData->hosts.keys()) {
+        QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
+                                                            ZnsHelper::ReqPatterns[ZnsHelper::Device]
+                                                            .arg(host, QString::number(ZnsHelper::Device))
+                                                            .toAscii());
+        processZbxReply(reply, src);
+      }
     }
-  }
-    break;
-  default:
-    break;
+      break;
+    default:
+      break;
   }
 }
 
@@ -1091,23 +1084,23 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
     apiUrl =  src.zns_handler->getRequestEndpoint();
   }
   switch (_code) {
-  case QNetworkReply::RemoteHostClosedError:
-    m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("The connection has been closed by the remote host"));
-    break;
-  case QNetworkReply::HostNotFoundError:
-    m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Host not found"));
-    break;
-  case QNetworkReply::ConnectionRefusedError:
-    m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Connection refused"));
-    break;
+    case QNetworkReply::RemoteHostClosedError:
+      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("The connection has been closed by the remote host"));
+      break;
+    case QNetworkReply::HostNotFoundError:
+      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Host not found"));
+      break;
+    case QNetworkReply::ConnectionRefusedError:
+      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Connection refused"));
+      break;
     case QNetworkReply::SslHandshakeFailedError:
       mlastErrorMsg = tr("SSL Handshake failed");
       break;
     case QNetworkReply::TimeoutError:
       mlastErrorMsg = tr("Timeout exceeded");
       break;
-  default:
-    m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Unknown error: code %1").arg(_code));
+    default:
+      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Unknown error: code %1").arg(_code));
   }
   updateDashboardOnUnknown();
 }
@@ -1125,11 +1118,6 @@ void SvNavigator::updateDashboardOnUnknown()
        cnode != m_coreData->cnodes.end(); cnode++) {
     cnode->monitored = true;
     cnode->check = utils::getUnknownService(MonitorBroker::Unknown, m_lastErrorMsg);
-//    cnode->check.status = MonitorBroker::Unknown;
-//    cnode->check.last_state_change = UNKNOWN_UPDATE_TIME;
-//    cnode->check.host = "-";
-//    cnode->check.check_command = "-";
-//    cnode->check.alarm_msg = m_lastErrorMsg.toStdString();
     computeStatusInfo(cnode);
     updateDashboard(cnode);
   }
@@ -1179,7 +1167,6 @@ QTabWidget* SvNavigator::newMsgConsole()
 
 void SvNavigator::resetSettings(void)
 {
-  m_isLogged = false;
   for (SourceListT::Iterator it = m_sources.begin(), end = m_sources.end(); it != end; it++) {
     if (it->d4n_handler) delete it->d4n_handler;
     if (it->ls_handler) delete it->ls_handler;
@@ -1195,23 +1182,23 @@ void SvNavigator::resetSettings(void)
         src.mon_type = m_coreData->monitor;
       }
       switch (src.mon_type) {
-      case MonitorBroker::Nagios:
-        if (m_preferences->useLs()) {
-          src.ls_handler = new LsHelper(src.ls_addr, src.ls_port);
-        } else {
-          QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
-          src.d4n_handler = new ZmqSocket(uri.toStdString(), ZMQ_REQ);
-        }
-        break;
-      case MonitorBroker::Zabbix:
-        src.zbx_handler = new ZbxHelper();
-        break;
-      case MonitorBroker::Zenoss:
-        src.zns_handler = new ZnsHelper();
-        break;
-      default:
-        utils::alert(tr("Unknown monitor type %1").arg(src.mon_type));
-        break;
+        case MonitorBroker::Nagios:
+          if (m_preferences->useLs()) {
+            src.ls_handler = new LsHelper(src.ls_addr, src.ls_port);
+          } else {
+            QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
+            src.d4n_handler = new ZmqSocket(uri.toStdString(), ZMQ_REQ);
+          }
+          break;
+        case MonitorBroker::Zabbix:
+          src.zbx_handler = new ZbxHelper();
+          break;
+        case MonitorBroker::Zenoss:
+          src.zns_handler = new ZnsHelper();
+          break;
+        default:
+          utils::alert(tr("Unknown monitor type %1").arg(src.mon_type));
+          break;
       }
       m_sources.insert(i, src);
     }
@@ -1232,14 +1219,14 @@ void SvNavigator::checkSourcesAvailability()
        src != end; src++) {
     switch (src->mon_type)
     {
-    case MonitorBroker::Nagios:
-      break;
-    case MonitorBroker::Zabbix:
-      break;
-    case MonitorBroker::Zenoss:
-      break;
-    default:
-      break;
+      case MonitorBroker::Nagios:
+        break;
+      case MonitorBroker::Zabbix:
+        break;
+      case MonitorBroker::Zenoss:
+        break;
+      default:
+        break;
     }
   }
 }

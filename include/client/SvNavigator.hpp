@@ -123,7 +123,6 @@ private:
   QString m_zbxAuthToken;
   qint32 m_hostLeft;
   bool m_updateSucceed;
-  bool m_isLogged;
   QString m_lastErrorMsg; //FIXME: see source
   QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
