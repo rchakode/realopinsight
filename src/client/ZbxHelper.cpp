@@ -51,8 +51,14 @@ ZbxHelper::~ZbxHelper()
 }
 
 QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
-  QString request = ReqPatterns[reqId];
-  foreach(const QString &param, params) {request = request.arg(param);}
+  QString request;
+  if (reqId == Login) {
+    request = ReqPatterns[reqId];
+  } else {
+    request = ReqPatterns[reqId].arg(m_auth);
+  }
+  foreach(const QString &param, params) { request = request.arg(param); }
+
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, request.toAscii());
   reply->setSslConfiguration(*sslConf);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
@@ -92,11 +98,6 @@ RequestListT ZbxHelper::requestsPatterns()
       \"select_hosts\": [\"host\"], \
       \"output\":  \"extend\", \
       \"limit\": -1}, \
-      \"id\": %9}";
-  patterns[Logout] = "{\"jsonrpc\": \"2.0\", \
-      \"method\": \"user.logout\", \
-      \"params\": {\"sessionid\": \"%1\"}, \
-      \"auth\": \"%1\", \
       \"id\": %9}";
 
   return patterns;

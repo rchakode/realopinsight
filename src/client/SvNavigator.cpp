@@ -86,7 +86,6 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     m_msgConsole(new MsgConsole(this)),
     m_nodeContextMenu (new QMenu()),
-    m_zbxAuthToken(""),
     m_hostLeft(0),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     m_showOnlyTroubles(false)
@@ -325,13 +324,6 @@ void SvNavigator::runNagiosUpdate(int srcId)
 void SvNavigator::runNagiosUpdate(const SourceT& src)
 {
   CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
-
-  /* Check that the API handler is not null */
-  if (src.d4n_handler) {
-    updateDashboardOnUnknown();
-    return;
-  }
-
   /* connection is carried out in open session */
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
@@ -394,15 +386,7 @@ void SvNavigator::runLivestatusUpdate(int srcId)
 
 void SvNavigator::runLivestatusUpdate(const SourceT& src)
 {
-
-  if (!src.ls_handler) {
-    m_updateSucceed = false;  // FIXME: m_lastErrorMsg = "Could get pointer to livestatus client";
-    m_lastErrorMsg = "Could get pointer to livestatus client";
-    updateDashboardOnUnknown();
-    return;
-  }
-
-  /* connection is carried out in open session */
+  /* Note that connection is achieved in open session */
   if (!src.ls_handler->isConnected()) {
     m_updateSucceed = false;
     m_lastErrorMsg = src.ls_handler->errorString(); // FIXME: m_lastErrorMsg = src.ls_handler->errorString()
@@ -771,7 +755,7 @@ void SvNavigator::resizeDashboard(void)
   QMainWindow::resize(screenSize.width(),  screenSize.height());
 }
 
-void SvNavigator::processZbxReply(QNetworkReply* _reply, const SourceT& src)
+void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
 {
   _reply->deleteLater();
   QNetworkReply::NetworkError errcode = _reply->error();
@@ -791,8 +775,9 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, const SourceT& src)
   qint32 tid = jsHelper.getProperty("id").toInt32();
   switch(tid) {
     case ZbxHelper::Login: {
-      m_zbxAuthToken = jsHelper.getProperty("result").toString();
-      if (!m_zbxAuthToken.isEmpty()) {
+      QString auth = jsHelper.getProperty("result").toString();
+      if (!auth.isEmpty()) {
+        src.zbx_handler->setAuth(auth);
         src.zbx_handler->setIsLogged(true);
       }
       break;
@@ -853,7 +838,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, const SourceT& src)
   }
 }
 
-void SvNavigator::processZnsReply(QNetworkReply* _reply, const SourceT& src)
+void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
 {
   _reply->deleteLater();
 
@@ -996,7 +981,7 @@ void SvNavigator::openRpcSession(int srcId)
 }
 
 
-void SvNavigator::openRpcSession(const SourceT& src)
+void SvNavigator::openRpcSession(SourceT& src)
 {
   QStringList authParams = getAuthInfo(src.auth);
   if (authParams.size() != 2 && m_coreData->monitor != MonitorBroker::Nagios) {
@@ -1021,7 +1006,7 @@ void SvNavigator::openRpcSession(const SourceT& src)
       if (src.zbx_handler->getIsLogged()) {
         // Get API version
         QStringList params;
-        params.push_back(m_zbxAuthToken);
+        //FIXME: to be testd -> params.push_back(src.zbx_handler->getAuth());
         params.push_back(QString::number(ZbxHelper::ApiVersion));
         reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
         processZbxReply(reply, src);
@@ -1044,7 +1029,7 @@ void SvNavigator::openRpcSession(const SourceT& src)
 }
 
 
-void SvNavigator::requestRpcData(const SourceT& src) {
+void SvNavigator::requestRpcData(SourceT& src) {
   updateStatusBar(tr("Updating..."));
   switch(m_coreData->monitor) {
     case MonitorBroker::Zabbix: {
@@ -1173,7 +1158,7 @@ void SvNavigator::resetSettings(void)
     if (it->zbx_handler) delete it->zbx_handler;
     if (it->zns_handler) delete it->zns_handler;
   }
-  m_sources.clear(); //FIXME: risk of memory leak with apiHandler
+  m_sources.clear();
   SourceT src;
   for (int i=0; i< MAX_SRCS; i++) {
     if (m_preferences->isSetSource(i)) {

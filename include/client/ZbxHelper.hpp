@@ -39,8 +39,7 @@ public:
     Login=1,
     ApiVersion=2,
     Trigger=3,
-    TriggerV18=4,
-    Logout=5
+    TriggerV18=4
   };
   static const RequestListT ReqPatterns;
 
@@ -54,6 +53,8 @@ public:
   int getTrid(void) const {return m_trid;}
   void setIsLogged(bool state) {m_isLogged = state;}
   bool getIsLogged(void) const {return m_isLogged;}  
+  void setAuth(const QString& auth) {m_auth = auth;}
+  QString getAuth(void) const {return m_auth;}
   void setSslConf(bool verifyPeer);
 
 
@@ -69,6 +70,7 @@ private :
   static RequestListT requestsPatterns();
   QEventLoop* m_evlHandler;
   bool m_isLogged;
+  QString m_auth;
   QSslConfiguration* sslConf;
 };
 
