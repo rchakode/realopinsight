@@ -141,6 +141,7 @@ private:
   void updateStatusBar(const QString& msg);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
+  void openRpcSessions(void);
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
   void requestRpcData(SourceT& src);

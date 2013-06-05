@@ -203,10 +203,10 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 void SvNavigator::startMonitor()
 {
   prepareUpdate();
+  openRpcSessions();
   switch(m_coreData->monitor) {
     case MonitorBroker::Zenoss:
     case MonitorBroker::Zabbix:
-      //FIXME: !m_isLogged ? openRpcSession(0): requestRpcData();
       runZabbixZenossUpdate(0);
       break;
     case MonitorBroker::Nagios:
@@ -325,6 +325,10 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
 {
   CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
   /* connection is carried out in open session */
+  if (!src.d4n_handler) {
+    qDebug() << "Handler is null";
+  }
+
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
       utils::alert(tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial()));
@@ -332,6 +336,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
     }
     updateStatusBar(tr("Updating..."));
   } else {
+    qDebug() << "not connected" ;
     m_updateSucceed = false;
     invalidCheck.alarm_msg = src.d4n_handler->getErrorMsg();
     QString socketError(invalidCheck.alarm_msg.c_str());
@@ -960,6 +965,12 @@ QStringList SvNavigator::getAuthInfo(const QString& authString)
 }
 
 
+void SvNavigator::openRpcSessions(void)
+{
+  for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src != end; src++) {
+    openRpcSession(*src);
+  }
+}
 
 void SvNavigator::openRpcSession(int srcId)
 {
@@ -1158,6 +1169,7 @@ void SvNavigator::resetSettings(void)
     if (it->zbx_handler) delete it->zbx_handler;
     if (it->zns_handler) delete it->zns_handler;
   }
+
   m_sources.clear();
   SourceT src;
   for (int i=0; i< MAX_SRCS; i++) {

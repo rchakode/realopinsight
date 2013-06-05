@@ -50,7 +50,8 @@ ZbxHelper::~ZbxHelper()
   delete sslConf;
 }
 
-QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
+QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
+{
   QString request;
   if (reqId == Login) {
     request = ReqPatterns[reqId];

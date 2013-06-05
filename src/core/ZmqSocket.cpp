@@ -58,6 +58,7 @@ void ZmqSocket::reset()
 
 bool ZmqSocket::connect()
 {
+  qDebug() << QString::fromStdString(mserverUri);
   if (!init()) return false;
   return zmq_connect(msocket, mserverUri.c_str()) == 0;
 }

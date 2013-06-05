@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <QDebug>
 
 class ZmqSocket
 {
@@ -19,10 +20,10 @@ public:
   void send(const std::string & _msg);
   std::string recv() const;
   void makeHandShake();
-  inline bool isConnected() const {return mconnected2Server;}
-  inline void* getSocket() const {return msocket;}
-  inline int getServerSerial() const {return mserverSerial;}
-  inline std::string getErrorMsg() const {return merrorMsg;}
+  bool isConnected() const {return mconnected2Server; }
+  void* getSocket() const {return msocket;}
+  int getServerSerial() const {return mserverSerial;}
+  std::string getErrorMsg() const {return merrorMsg;}
 
 
 private:
