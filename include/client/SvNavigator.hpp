@@ -56,12 +56,12 @@ public:
   static QString getNodeToolTip(const NodeT& _node);
 
 public slots:
-  void startMonitor();
+  void runMonitor();
+  void runMonitor(SourceT& src);
   void runNagiosUpdate(int srcId);
   void runNagiosUpdate(const SourceT& src);
   void runLivestatusUpdate(int srcId);
   void runLivestatusUpdate(const SourceT& src);
-  void runZabbixZenossUpdate(int srcId);
   void prepareUpdate(void);
   void prepareUpdate(const SourceT& src);
   void updateBpNode(const QString& _node);
@@ -120,7 +120,6 @@ private:
   MenuListT m_menus;
   SubMenuListT m_subMenus;
   SubMenuListT m_contextMenuList;
-  qint32 m_hostLeft;
   bool m_updateSucceed;
   QString m_lastErrorMsg; //FIXME: see source
   QSystemTrayIcon* m_trayIcon;
@@ -137,14 +136,14 @@ private:
   void updateDashboard(NodeListT::iterator& _node);
   void updateDashboard(const NodeT & _node);
   void updateCNodes(const CheckT & check);
-  void finalizeDashboardUpdate(const bool& enable=true);
+  void finalizeUpdate(const bool& enable=true);
   void updateStatusBar(const QString& msg);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
   void openRpcSessions(void);
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
-  void requestRpcData(SourceT& src);
+  void requestZbxZnsData(SourceT& src);
   void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();

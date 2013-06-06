@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     info->finish(0);
     SvNavigator* console= new SvNavigator(userRole);
     console->load(file);
-    console->startMonitor();
+    console->runMonitor();
   } else if (module == "editor") {
     SvCreator* editor = new SvCreator(userRole);
     editor->load(file);

@@ -86,7 +86,6 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     m_msgConsole(new MsgConsole(this)),
     m_nodeContextMenu (new QMenu()),
-    m_hostLeft(0),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     m_showOnlyTroubles(false)
 {
@@ -200,26 +199,41 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
   }
 }
 
-void SvNavigator::startMonitor()
+void SvNavigator::runMonitor()
 {
   prepareUpdate();
-  openRpcSessions();
-  //FIXME:  switch(m_coreData->monitor)
-  switch(m_coreData->monitor) {
+  if (m_coreData->monitor == MonitorBroker::Auto) {
+    for (SourceListT::Iterator src=m_sources.begin(), end = m_sources.end();
+         src!=end; src++) { runMonitor(*src); }
+  } else {
+    SourceListT::Iterator src = m_sources.find(0);
+    if (src != m_sources.end()) {
+      runMonitor(*src);
+    } else {
+      utils::alert("You haven't the default parameters yet");
+    }
+  }
+  finalizeUpdate();
+}
+
+void SvNavigator::runMonitor(SourceT& src)
+{
+  openRpcSession(src);
+  switch(src.mon_type) {
     case MonitorBroker::Zenoss:
     case MonitorBroker::Zabbix:
-      runZabbixZenossUpdate(0);
+      requestZbxZnsData(src);
       break;
     case MonitorBroker::Nagios:
     default:
-      m_preferences->useLs()? runLivestatusUpdate(0) : runNagiosUpdate(0);
+      m_preferences->useLs()? runLivestatusUpdate(src) : runNagiosUpdate(src);
       break;
   }
 }
 
 void SvNavigator::timerEvent(QTimerEvent *)
 {
-  startMonitor();
+  runMonitor();
 }
 
 void  SvNavigator::updateStatusBar(const QString& msg)
@@ -261,7 +275,7 @@ void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
   m_preferences->exec();
   resetSettings(); //FIXME: reset all setting here?
-  startMonitor();
+  runMonitor();
 }
 
 void SvNavigator::handleShowOnlineResources(void)
@@ -372,7 +386,6 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
       m_coreData->check_status_count[cnode->severity]++;
     }
   }
-  finalizeDashboardUpdate();
 }
 
 
@@ -421,20 +434,6 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
       }
     }
   }
-  finalizeDashboardUpdate();
-}
-
-
-
-void SvNavigator::runZabbixZenossUpdate(int srcId)
-{
-  updateDashboardOnUnknown();
-  SourceListT::Iterator src = m_sources.find(srcId);
-  if (src != m_sources.end()) {
-    prepareUpdate(*src);
-    openRpcSession(*src);
-    requestRpcData(*src);
-  }
 }
 
 
@@ -446,7 +445,6 @@ void SvNavigator::prepareUpdate(void)
   m_coreData->check_status_count[MonitorBroker::Major] = 0;
   m_coreData->check_status_count[MonitorBroker::Critical] = 0;
   m_coreData->check_status_count[MonitorBroker::Unknown] = 0;
-  m_hostLeft = m_coreData->hosts.size();
   m_updateSucceed = true;
 }
 
@@ -517,7 +515,7 @@ void SvNavigator::updateCNodes(const CheckT& check)
   }
 }
 
-void SvNavigator::finalizeDashboardUpdate(const bool& enable)
+void SvNavigator::finalizeUpdate(const bool& enable)
 {
   if (!m_coreData->cnodes.isEmpty()) {
     Chart *chart = new Chart;
@@ -826,10 +824,6 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
         check.id = key.toStdString();
         updateCNodes(check);
       }
-      if (--m_hostLeft == 0) {
-        m_updateSucceed = true;
-        finalizeDashboardUpdate();
-      }
       break;
     }
     default :
@@ -913,10 +907,6 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
             check.alarm_msg = citem.property("status").toString().toStdString();
           }
           updateCNodes(check);
-        }
-        if (--m_hostLeft == 0) { // FIXME: could be not sufficiant?
-          m_updateSucceed = true;
-          finalizeDashboardUpdate();
         }
       } else if (tid == ZnsHelper::DeviceInfo) {
         QScriptValue devInfo(result.property("data"));
@@ -1045,7 +1035,7 @@ void SvNavigator::openRpcSession(SourceT& src)
 }
 
 
-void SvNavigator::requestRpcData(SourceT& src) {
+void SvNavigator::requestZbxZnsData(SourceT& src) {
   updateStatusBar(tr("Updating..."));
   switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
@@ -1123,7 +1113,7 @@ void SvNavigator::updateDashboardOnUnknown()
   }
   m_lastErrorMsg.clear();
   m_coreData->check_status_count[MonitorBroker::Unknown] = m_coreData->cnodes.size();
-  finalizeDashboardUpdate(enable);
+  finalizeUpdate(enable);
 }
 
 void SvNavigator::updateTrayInfo(const NodeT& _node)
@@ -1242,7 +1232,7 @@ void SvNavigator::addEvents(void)
   connect(m_subMenus["ZoomIn"], SIGNAL(triggered(bool)), m_map, SLOT(zoomIn()));
   connect(m_subMenus["ZoomOut"], SIGNAL(triggered(bool)), m_map, SLOT(zoomOut()));
   connect(m_subMenus["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
-  connect(m_subMenus["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
+  connect(m_subMenus["Refresh"], SIGNAL(triggered(bool)), this, SLOT(runMonitor()));
   connect(m_subMenus["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
   connect(m_subMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
   connect(m_subMenus["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
