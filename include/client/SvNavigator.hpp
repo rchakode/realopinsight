@@ -49,7 +49,7 @@ public:
               const QString& _config = "",
               QWidget* = 0);
   virtual ~SvNavigator();
-  void load(const QString& _file, int srcId);
+  void load(const QString& _file);
   void resizeDashboard(void);
   static StringMapT propRules();
   static StringMapT calcRules();

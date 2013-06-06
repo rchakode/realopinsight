@@ -226,7 +226,7 @@ void  SvNavigator::updateStatusBar(const QString& msg)
   statusBar()->showMessage(msg);
 }
 
-void SvNavigator::load(const QString& _file, int srcId)
+void SvNavigator::load(const QString& _file)
 {
   if (!_file.isEmpty()) m_configFile = utils::getAbsolutePath(_file);
   m_activeFile = m_configFile;
@@ -236,12 +236,12 @@ void SvNavigator::load(const QString& _file, int srcId)
   m_tree->clear();
   m_tree->addTopLevelItem(m_coreData->tree_items[SvNavigatorTree::RootId]);
   m_map->load(parser.getDotGraphFile(), m_coreData->bpnodes, m_coreData->cnodes);
-  m_browser->setUrl(m_sources[srcId].mon_url);
   this->resizeDashboard();
   QMainWindow::show();
   m_map->scaleToFitViewPort();
   m_trayIcon->show();
   m_trayIcon->setToolTip(APP_NAME);
+  resetSettings();
 }
 
 void SvNavigator::unloadMenus(void)
@@ -259,6 +259,7 @@ void SvNavigator::handleChangePasswordAction(void)
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
   m_preferences->exec();
+  resetSettings(); //FIXME: reset all setting here?
   startMonitor();
 }
 
@@ -394,7 +395,7 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
   /* Note that connection is achieved in open session */
   if (!src.ls_handler->isConnected()) {
     m_updateSucceed = false;
-    m_lastErrorMsg = src.ls_handler->errorString(); // FIXME: m_lastErrorMsg = src.ls_handler->errorString()
+    m_lastErrorMsg = src.ls_handler->errorString();
     updateDashboardOnUnknown();
     return;
   }
@@ -443,7 +444,6 @@ void SvNavigator::runZabbixZenossUpdate(int srcId)
 void SvNavigator::prepareUpdate(void)
 {
   QMainWindow::setEnabled(false);
-  resetSettings();
   m_coreData->check_status_count[MonitorBroker::Normal] = 0;
   m_coreData->check_status_count[MonitorBroker::Minor] = 0;
   m_coreData->check_status_count[MonitorBroker::Major] = 0;
@@ -1004,9 +1004,17 @@ void SvNavigator::openRpcSession(SourceT& src)
   switch(m_coreData->monitor) {
     case MonitorBroker::Nagios:
       if (m_preferences->useLs()) {
+        if (src.ls_handler->isConnected()) { //FIXME: do this???
+          src.ls_handler->disconnectFromService();
+        }
         src.ls_handler->connectToService();
-      } else if(src.d4n_handler->connect()) {
-        src.d4n_handler->makeHandShake();
+      } else {
+        if (src.d4n_handler->isConnected()) {
+          src.d4n_handler->disconnecteFromService();
+        }
+        if(src.d4n_handler->connect()) {
+          src.d4n_handler->makeHandShake();
+        }
       }
       break;
     case MonitorBroker::Zabbix: {
@@ -1047,7 +1055,6 @@ void SvNavigator::requestRpcData(SourceT& src) {
       int trid = src.zbx_handler->getTrid();
       foreach (const QString& host, m_coreData->hosts.keys()) {
         QStringList params;
-        params.push_back(src.auth); //FIXME: params.push_back(m_zbxAuthToken);
         params.push_back(host);
         params.push_back(QString::number(trid));
         QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
@@ -1172,7 +1179,7 @@ void SvNavigator::resetSettings(void)
 
   m_sources.clear();
   SourceT src;
-  for (int i=0; i< MAX_SRCS; i++) {
+  for (int i= 0; i< MAX_SRCS; i++) {
     if (m_preferences->isSetSource(i)) {
       m_settings->loadSource(i, src);
       if (src.mon_type == MonitorBroker::Auto) {
@@ -1201,6 +1208,7 @@ void SvNavigator::resetSettings(void)
     }
   }
   resetInterval();
+  m_browser->setUrl(m_sources[0].mon_url); //FIXME: mbrowser->setUrl
 }
 
 void SvNavigator::resetInterval()
