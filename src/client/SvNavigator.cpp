@@ -204,6 +204,7 @@ void SvNavigator::startMonitor()
 {
   prepareUpdate();
   openRpcSessions();
+  //FIXME:  switch(m_coreData->monitor)
   switch(m_coreData->monitor) {
     case MonitorBroker::Zenoss:
     case MonitorBroker::Zabbix:
@@ -325,11 +326,8 @@ void SvNavigator::runNagiosUpdate(int srcId)
 void SvNavigator::runNagiosUpdate(const SourceT& src)
 {
   CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
-  /* connection is carried out in open session */
-  if (!src.d4n_handler) {
-    qDebug() << "Handler is null";
-  }
 
+  /* connection is carried out in open session */
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
       utils::alert(tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial()));
@@ -337,7 +335,6 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
     }
     updateStatusBar(tr("Updating..."));
   } else {
-    qDebug() << "not connected" ;
     m_updateSucceed = false;
     invalidCheck.alarm_msg = src.d4n_handler->getErrorMsg();
     QString socketError(invalidCheck.alarm_msg.c_str());
@@ -995,13 +992,13 @@ void SvNavigator::openRpcSession(int srcId)
 void SvNavigator::openRpcSession(SourceT& src)
 {
   QStringList authParams = getAuthInfo(src.auth);
-  if (authParams.size() != 2 && m_coreData->monitor != MonitorBroker::Nagios) {
+  if (authParams.size() != 2 && src.mon_type != MonitorBroker::Nagios) {
     m_lastErrorMsg = tr("Invalid authentication chain!\nMust follow the pattern login:password");
     updateDashboardOnUnknown();
     return;
   }
   QUrl znsUrlParams;
-  switch(m_coreData->monitor) {
+  switch(src.mon_type) {
     case MonitorBroker::Nagios:
       if (m_preferences->useLs()) {
         if (src.ls_handler->isConnected()) { //FIXME: do this???
@@ -1050,7 +1047,7 @@ void SvNavigator::openRpcSession(SourceT& src)
 
 void SvNavigator::requestRpcData(SourceT& src) {
   updateStatusBar(tr("Updating..."));
-  switch(m_coreData->monitor) {
+  switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
       int trid = src.zbx_handler->getTrid();
       foreach (const QString& host, m_coreData->hosts.keys()) {
@@ -1081,9 +1078,9 @@ void SvNavigator::requestRpcData(SourceT& src) {
 void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const SourceT& src)
 {
   QString apiUrl = "";
-  if (m_coreData->monitor == MonitorBroker::Zabbix) {
+  if (src.mon_type == MonitorBroker::Zabbix) {
     apiUrl = src.zbx_handler->getApiEndpoint();
-  } else if (m_coreData->monitor == MonitorBroker::Zenoss) {
+  } else if (src.mon_type == MonitorBroker::Zenoss) {
     apiUrl =  src.zns_handler->getRequestEndpoint();
   }
   switch (_code) {
