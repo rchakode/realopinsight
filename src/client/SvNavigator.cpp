@@ -274,7 +274,7 @@ void SvNavigator::handleChangePasswordAction(void)
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
   m_preferences->exec();
-  resetSettings(); //FIXME: reset all setting here?
+  resetSettings(); //FIXME: problem on close, do it every time?
   runMonitor();
 }
 

@@ -113,6 +113,7 @@ private:
   QString getSourceStatesSerialized(void);
   void initSourceStates();
   void initSourceStates(const QString& str);
+  QString selectSourceType(void);
 };
 
 

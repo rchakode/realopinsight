@@ -64,9 +64,6 @@ const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
 const QString ID_PATTERN("%1/%2");
 
 const qint32 MAX_SRCS = 10;
-const QStringList SRC_TYPES = QStringList() << "Livestatus/ngrt4nd"
-                                            << "Zabbix"
-                                            << "Zenoss";
 
 class LsHelper;
 class ZbxHelper;

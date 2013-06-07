@@ -72,69 +72,69 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
   switch (_action)
   {
-  case Preferences::ChangeMonitoringSettings:
-    setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
-    line++,
-        m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
-    line++,
-        m_mainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
-    line++,
-        m_mainLayout->addWidget(m_cancelBtn, line, 0, Qt::AlignLeft),
-        m_mainLayout->addWidget(m_applySettingBtn, line, 1, Qt::AlignRight),
-        m_mainLayout->addWidget(m_addAsSourceBtn, line, 2, Qt::AlignRight);
-    line++,
-        m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
-    m_mainLayout->setColumnStretch(0, 0);
-    m_mainLayout->setColumnStretch(1, 6);
-    m_mainLayout->setColumnStretch(2, 0);
-    if(_userRole == Auth::OpUserRole) {
-      m_onitorUrlField->setEnabled(false);
-      m_brwBtn->setEnabled(false);
-      m_updateIntervalField->setEnabled(false);
-      m_applySettingBtn->setEnabled(false);
-      m_addAsSourceBtn->setEnabled(false);
-      m_sockAddrField->setEnabled(false);
-      m_sockPortField->setEnabled(false);
-      m_serverPassField->setEnabled(false);
-      m_showAuthInfoChkbx->setEnabled(false);
-      m_useMklsChkbx->setEnabled(false);
+    case Preferences::ChangeMonitoringSettings:
+      setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
+      line++,
+          m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
+      line++,
+          m_mainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
+      line++,
+          m_mainLayout->addWidget(m_cancelBtn, line, 0, Qt::AlignLeft),
+          m_mainLayout->addWidget(m_applySettingBtn, line, 1, Qt::AlignRight),
+          m_mainLayout->addWidget(m_addAsSourceBtn, line, 2, Qt::AlignRight);
+      line++,
+          m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
+      m_mainLayout->setColumnStretch(0, 0);
+      m_mainLayout->setColumnStretch(1, 6);
+      m_mainLayout->setColumnStretch(2, 0);
+      if(_userRole == Auth::OpUserRole) {
+        m_onitorUrlField->setEnabled(false);
+        m_brwBtn->setEnabled(false);
+        m_updateIntervalField->setEnabled(false);
+        m_applySettingBtn->setEnabled(false);
+        m_addAsSourceBtn->setEnabled(false);
+        m_sockAddrField->setEnabled(false);
+        m_sockPortField->setEnabled(false);
+        m_serverPassField->setEnabled(false);
+        m_showAuthInfoChkbx->setEnabled(false);
+        m_useMklsChkbx->setEnabled(false);
         mverifyPeerChkBx->setEnabled(false);
       }
-    break;
-  case Preferences::ChangePassword:
-  case Preferences::ForceChangePassword:
-    setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
-    line++,
-        m_mainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
-        m_mainLayout->addWidget(m_oldPwdField, line, 1, 1, 2);
-    line++,
-        m_mainLayout->addWidget(new QLabel(tr("New password")), line, 0),
-        m_mainLayout->addWidget(m_pwdField, line, 1, 1, 2);
-    line++,
-        m_mainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
-        m_mainLayout->addWidget(m_rePwdField, line, 1, 1, 2);
-    line++,
-        m_mainLayout->addWidget(m_cancelBtn, line, 1),
-        m_mainLayout->addWidget(m_changePwdBtn, line, 2);
+      break;
+    case Preferences::ChangePassword:
+    case Preferences::ForceChangePassword:
+      setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
+      line++,
+          m_mainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
+          m_mainLayout->addWidget(m_oldPwdField, line, 1, 1, 2);
+      line++,
+          m_mainLayout->addWidget(new QLabel(tr("New password")), line, 0),
+          m_mainLayout->addWidget(m_pwdField, line, 1, 1, 2);
+      line++,
+          m_mainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
+          m_mainLayout->addWidget(m_rePwdField, line, 1, 1, 2);
+      line++,
+          m_mainLayout->addWidget(m_cancelBtn, line, 1),
+          m_mainLayout->addWidget(m_changePwdBtn, line, 2);
 
-    if(_action == Preferences::ForceChangePassword) {
-      m_cancelBtn->setEnabled(false);
-    }
-    break;
-  case Preferences::ShowAbout:
-    setWindowTitle(tr("About %1").arg(APP_NAME));
-    QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
-                                "\nRelease ID: %4\n"
-                                "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
-                                "\nVisit %6 for more information\n"
-                                "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
+      if(_action == Preferences::ForceChangePassword) {
+        m_cancelBtn->setEnabled(false);
+      }
+      break;
+    case Preferences::ShowAbout:
+      setWindowTitle(tr("About %1").arg(APP_NAME));
+      QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
+                                  "\nRelease ID: %4\n"
+                                  "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
+                                  "\nVisit %6 for more information\n"
+                                  "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
 
-    line++,
-        m_mainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
-    line++,
-        m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft),
-        m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
-    break;
+      line++,
+          m_mainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
+      line++,
+          m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft),
+          m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
+      break;
   }
   loadProperties();
   addEvents();
@@ -177,25 +177,50 @@ void Preferences::applySettings(void)
 
 void Preferences::addAsSource(void)
 {
+
   int bucket = 1;
   while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {bucket++;}
 
+  QStringList items;
   if (bucket < MAX_SRCS) {
-    bool ok;
-    QString selected = QInputDialog::getItem(this,
-                                             tr("Select the type of the Remote API | %1").arg(APP_NAME),
-                                             tr("Please select the type of the remote API"),
-                                             SRC_TYPES, 0,
-                                             false,
-                                             &ok);
-    if (ok && !selected.isEmpty()) {
-      saveAsSource(bucket, selected);
-    } else {
-      utils::alert(tr("Failed. No source selected."));
+    QString srcType = selectSourceType();
+    if (!srcType.isEmpty()) {
+      saveAsSource(bucket, srcType);
     }
   } else {
-    utils::alert("The maximum number of sources is reached");
+    items = QStringList() <<"1"<<"2"<<"3"<<"4"<<"5"<<"6"<<"7"<<"8"<<"9";
+    bool ok =  false;
+    QString srcId = QInputDialog::getItem(this,
+                                          tr("Replace source | %1").arg(APP_NAME),
+                                          tr("The maximum number of sources is reached.\n"
+                                             "Replace a source?"),
+                                          items, 0,
+                                          false,
+                                          &ok);
+    if (ok && !srcId.isEmpty()) {
+      QString srcType = selectSourceType();
+      if (!srcType.isEmpty()) {
+        saveAsSource(srcId.toInt(), srcType);
+      }
+    }
   }
+}
+
+QString Preferences::selectSourceType(void)
+{
+  QStringList items = QStringList()<<"Livestatus/ngrt4nd"<<"Zabbix"<<"Zenoss";
+  bool ok = false;
+  QString srcType = QInputDialog::getItem(this,
+                                          tr("Select the source type | %1").arg(APP_NAME),
+                                          tr("Please select the source type (Remote API)"),
+                                          items, 0,
+                                          false,
+                                          &ok);
+  if (!ok || srcType.isEmpty()) {
+    srcType.clear();
+  }
+
+  return srcType;
 }
 
 void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
