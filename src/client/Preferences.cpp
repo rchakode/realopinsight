@@ -169,23 +169,32 @@ void Preferences::showEvent (QShowEvent *)
   m_rePwdField->setText("");
 }
 
+
+void Preferences::handleCancel(void)
+{
+  emit sourcesChanged(m_updatedSources);
+  reject();
+}
+
 void Preferences::applySettings(void)
 {
   saveAsSource(0);
-      msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
+  emit sourcesChanged(m_updatedSources);
 }
 
 void Preferences::addAsSource(void)
 {
-
   int bucket = 1;
   while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {bucket++;}
 
+  int target = -1;
+  QString srcType ;
   QStringList items;
+
   if (bucket < MAX_SRCS) {
-    QString srcType = selectSourceType();
+    srcType = selectSourceType();
     if (!srcType.isEmpty()) {
-      saveAsSource(bucket, srcType);
+      target = bucket;
     }
   } else {
     items = QStringList() <<"1"<<"2"<<"3"<<"4"<<"5"<<"6"<<"7"<<"8"<<"9";
@@ -198,11 +207,15 @@ void Preferences::addAsSource(void)
                                           false,
                                           &ok);
     if (ok && !srcId.isEmpty()) {
-      QString srcType = selectSourceType();
+      srcType = selectSourceType();
       if (!srcType.isEmpty()) {
-        saveAsSource(srcId.toInt(), srcType);
+        target =  srcId.toInt();
       }
     }
+  }
+
+  if (target >= 0) {
+    saveAsSource(target, srcType);
   }
 }
 
@@ -238,9 +251,13 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   m_sourceStates->setBit(_idx, true);
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
+
+  if (!m_updatedSources.contains(_idx)) {
+    m_updatedSources.push_back(_idx);
+  }
+
   if (_idx == 0) {
     close();
-    emit urlChanged(src.mon_url);
   }
 }
 
@@ -466,7 +483,7 @@ void Preferences::addEvents(void)
 {
   connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
   connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
-  connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(handleCancel()));
   connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
   connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(donate()));
   connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));

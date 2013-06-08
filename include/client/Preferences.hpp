@@ -64,9 +64,11 @@ public:
   bool useLs(void) const {return m_useMkls == Qt::Checked;}
   QBitArray* getSourceStates() const {return m_sourceStates;}
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;}
+  void clearUpdatedSources(void) { m_updatedSources.clear(); }
 
 
 public slots:
+  void handleCancel(void);
   void applySettings(void);
   void addAsSource(void);
   void changePasswd(void);
@@ -75,6 +77,7 @@ public slots:
 
 signals:
   void urlChanged(QString);
+  void sourcesChanged (QList<qint8>);
 
 protected :
   void showEvent (QShowEvent *);
@@ -103,6 +106,7 @@ private:
   QCheckBox* m_showAuthInfoChkbx;
   QCheckBox* m_useMklsChkbx;
   QBitArray* m_sourceStates;
+  QList<qint8> m_updatedSources;
   QCheckBox* mverifyPeerChkBx;
 
   void addEvents(void);

@@ -36,7 +36,6 @@
 #include <zmq.h>
 #include <iostream>
 #include <locale>
-#include <memory>
 
 
 namespace {
@@ -273,9 +272,8 @@ void SvNavigator::handleChangePasswordAction(void)
 
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
+  m_preferences->clearUpdatedSources();
   m_preferences->exec();
-  resetSettings(); //FIXME: problem on close, do it every time?
-  runMonitor();
 }
 
 void SvNavigator::handleShowOnlineResources(void)
@@ -1157,13 +1155,6 @@ QTabWidget* SvNavigator::newMsgConsole()
 
 void SvNavigator::resetSettings(void)
 {
-  for (SourceListT::Iterator it = m_sources.begin(), end = m_sources.end(); it != end; it++) {
-    if (it->d4n_handler) delete it->d4n_handler;
-    if (it->ls_handler) delete it->ls_handler;
-    if (it->zbx_handler) delete it->zbx_handler;
-    if (it->zns_handler) delete it->zns_handler;
-  }
-
   m_sources.clear();
   SourceT src;
   for (int i= 0; i< MAX_SRCS; i++) {
@@ -1175,20 +1166,20 @@ void SvNavigator::resetSettings(void)
       switch (src.mon_type) {
         case MonitorBroker::Nagios:
           if (m_preferences->useLs()) {
-            src.ls_handler = new LsHelper(src.ls_addr, src.ls_port);
+            src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
           } else {
             QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
-            src.d4n_handler = new ZmqSocket(uri.toStdString(), ZMQ_REQ);
+            src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
           }
           break;
         case MonitorBroker::Zabbix:
-          src.zbx_handler = new ZbxHelper();
+          src.zbx_handler = std::make_shared<ZbxHelper>();
           break;
         case MonitorBroker::Zenoss:
-          src.zns_handler = new ZnsHelper();
+          src.zns_handler = std::make_shared<ZnsHelper>();
           break;
         default:
-          utils::alert(tr("Unknown monitor type %1").arg(src.mon_type));
+          utils::alert(tr("Unknown monitor type (%1)").arg(src.mon_type));
           break;
       }
       m_sources.insert(i, src);
@@ -1205,24 +1196,67 @@ void SvNavigator::resetInterval()
   m_timer = startTimer(m_interval);
 }
 
-void SvNavigator::checkSourcesAvailability()
+
+void SvNavigator::handleSourcesChanged(QList<qint8> ids)
 {
-  for (SourceListT::Iterator src, end = m_sources.end();
-       src != end; src++) {
-    switch (src->mon_type)
-    {
+  qDebug() << "source: "<<ids;
+  foreach (const qint8& id, ids) {
+    SourceT newsrc;
+    m_settings->loadSource(id, newsrc);
+
+    SourceListT::Iterator olddata = m_sources.find(id);
+    if (olddata != m_sources.end()) {
+      switch (olddata->mon_type) {
+        case MonitorBroker::Nagios:
+          if (m_preferences->useLs()) {
+            olddata->ls_handler.reset();
+          } else {
+            olddata->d4n_handler.reset();
+          }
+          break;
+        case MonitorBroker::Zabbix:
+          olddata->zbx_handler.reset();
+          break;
+        case MonitorBroker::Zenoss:
+          olddata->zns_handler.reset();
+          break;
+        default:
+          utils::alert(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
+          break;
+      }
+    }
+
+    if (newsrc.mon_type == MonitorBroker::Auto) {
+      newsrc.mon_type = m_coreData->monitor;
+    }
+
+    switch (newsrc.mon_type) {
       case MonitorBroker::Nagios:
+        if (m_preferences->useLs()) {
+          newsrc.ls_handler = std::make_shared<LsHelper>(newsrc.ls_addr, newsrc.ls_port);
+        } else {
+          QString uri = QString("tcp://%1:%2").arg(newsrc.ls_addr, QString::number(newsrc.ls_port));
+          newsrc.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+        }
         break;
       case MonitorBroker::Zabbix:
+        newsrc.zbx_handler = std::make_shared<ZbxHelper>();
         break;
       case MonitorBroker::Zenoss:
+        newsrc.zns_handler = std::make_shared<ZnsHelper>();
         break;
       default:
+        utils::alert(tr("Unknown monitor type (%1").arg(newsrc.mon_type));
         break;
     }
+    m_sources[id] = newsrc;
+    if (id == 0) {
+      m_browser->setUrl(newsrc.mon_url);
+    }
   }
-}
 
+  runMonitor();
+}
 
 void SvNavigator::addEvents(void)
 {
@@ -1245,7 +1279,7 @@ void SvNavigator::addEvents(void)
   connect(m_subMenus["IncreaseMsgFont"], SIGNAL(toggled(bool)), this, SLOT(toggleIncreaseMsgFont(bool)));
   connect(m_contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(m_contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
-  connect(m_preferences, SIGNAL(urlChanged(QString)), m_browser, SLOT(setUrl(QString)));
+  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourcesChanged(QList<qint8>)));
   connect(m_viewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
   connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));

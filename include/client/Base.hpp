@@ -285,6 +285,20 @@ struct GEdgeT {
 };
 typedef QHash<QString, GEdgeT> GEdgeListT;
 
+//struct SourceT {
+//  QString id;
+//  qint32 mon_type;
+//  QString mon_url;
+//  qint32 use_ls;
+//  QString ls_addr;
+//  qint32 ls_port;
+//  QString auth;
+//  ZmqSocket* d4n_handler;
+//  LsHelper* ls_handler;
+//  ZbxHelper* zbx_handler;
+//  ZnsHelper* zns_handler;
+//};
+
 struct SourceT {
   QString id;
   qint32 mon_type;
@@ -293,11 +307,12 @@ struct SourceT {
   QString ls_addr;
   qint32 ls_port;
   QString auth;
-  ZmqSocket* d4n_handler;
-  LsHelper* ls_handler;
-  ZbxHelper* zbx_handler;
-  ZnsHelper* zns_handler;
+  std::shared_ptr<ZmqSocket> d4n_handler;
+  std::shared_ptr<LsHelper> ls_handler;
+  std::shared_ptr<ZbxHelper> zbx_handler;
+  std::shared_ptr<ZnsHelper> zns_handler;
 };
+
 typedef QHash<int, SourceT> SourceListT;
 
 typedef QMap<QString, QString> IconMapT;

@@ -24,6 +24,7 @@ public:
   void* getSocket() const {return m_socket;}
   int getServerSerial() const {return m_serverSerial;}
   std::string getErrorMsg() const {return m_errorMsg;}
+  void setServerUri (const std::string& uri) { m_serverUri = uri; }
 
 
 private:
