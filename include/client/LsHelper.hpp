@@ -21,18 +21,18 @@ public:
   bool recvData(const ReqTypeT& reqType);
   bool loadHostData(const QString& host);
   bool findCheck(const QString& id, CheckListCstIterT& check);
-  void clearData(void) {mldchecks.clear();}
-  void setHost(const QString& host) {mhost = host;}
-  void setPort(const int& port) {mport = port;}
+  void clearData(void) {m_ldchecks.clear();}
+  void setHost(const QString& host) {m_host = host;}
+  void setPort(const int& port) {m_port = port;}
   bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
 
 private:
   const static int DefaultTimeout = 50000; /* 5 seconds */
-  QString mhost;
-  qint32 mport;
+  QString m_host;
+  qint32 m_port;
   RequestListT mrequestMap;
-  CheckListT mldchecks;
-  QString merrorMsg;
+  CheckListT m_ldchecks;
+  QString m_errorMsg;
   void setRequestPatterns();
   void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}
   void handleNetworkFailure(QAbstractSocket::SocketError error);

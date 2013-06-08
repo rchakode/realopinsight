@@ -20,20 +20,20 @@ public:
   void send(const std::string & _msg);
   std::string recv() const;
   void makeHandShake();
-  bool isConnected() const {return mconnected2Server; }
-  void* getSocket() const {return msocket;}
-  int getServerSerial() const {return mserverSerial;}
-  std::string getErrorMsg() const {return merrorMsg;}
+  bool isConnected() const {return m_connected2Server; }
+  void* getSocket() const {return m_socket;}
+  int getServerSerial() const {return m_serverSerial;}
+  std::string getErrorMsg() const {return m_errorMsg;}
 
 
 private:
-  std::string mserverUri;
-  std::string merrorMsg;
-  void *msocket;
-  void *mcontext;
-  int mtype;
-  bool mconnected2Server;
-  int mserverSerial;
+  std::string m_serverUri;
+  std::string m_errorMsg;
+  void *m_socket;
+  void *m_context;
+  int m_type;
+  bool m_connected2Server;
+  int m_serverSerial;
   int convert2ServerSerial(const std::string &versionStr);
 };
 

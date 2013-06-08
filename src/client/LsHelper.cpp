@@ -5,7 +5,7 @@
 #include "client/utilsClient.hpp"
 
 LsHelper::LsHelper(const QString& host, const int& port)
-  : mhost(host), mport(port)
+  : m_host(host), m_port(port)
 {
   setSocketOption(QAbstractSocket::KeepAliveOption, 1);
   setRequestPatterns();
@@ -29,8 +29,8 @@ void LsHelper::setRequestPatterns()
 bool LsHelper::connectToService()
 {
   disconnectFromHost();
-  qDebug() << tr("Connecting to %1:%2...").arg(mhost).arg(mport);
-  QAbstractSocket::connectToHost(mhost, mport, QAbstractSocket::ReadWrite);
+  qDebug() << tr("Connecting to %1:%2...").arg(m_host).arg(m_port);
+  QAbstractSocket::connectToHost(m_host, m_port, QAbstractSocket::ReadWrite);
   if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
     handleNetworkFailure();
     return false;
@@ -99,14 +99,14 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
       QAbstractSocket::setErrorString(tr("Bad request type: %1").arg(reqType));
       return false;
     }
-    mldchecks.insert(chkid, check);
+    m_ldchecks.insert(chkid, check);
   }
   return true;
 }
 
 bool LsHelper::loadHostData(const QString& host)
 {
-  mldchecks.clear();
+  m_ldchecks.clear();
   bool succeed;
   succeed = connectToService() &&
       requestData(host, Host) &&
@@ -122,8 +122,8 @@ bool LsHelper::loadHostData(const QString& host)
 
 bool LsHelper::findCheck(const QString& id, CheckListCstIterT& check)
 {
-  check = mldchecks.find(id.toLower());
-  if (check != mldchecks.end()) {
+  check = m_ldchecks.find(id.toLower());
+  if (check != m_ldchecks.end()) {
     return true;
   }
   return false;
@@ -136,11 +136,11 @@ void LsHelper::handleNetworkFailure(QAbstractSocket::SocketError error)
     QAbstractSocket::setErrorString(tr("The connection has been closed by the remote host"));
     break;
   case QAbstractSocket::HostNotFoundError:
-    QAbstractSocket::setErrorString(tr("The host not found (%1).").arg(mhost));
+    QAbstractSocket::setErrorString(tr("The host not found (%1).").arg(m_host));
     break;
   case QAbstractSocket::ConnectionRefusedError:
     QAbstractSocket::setErrorString(tr("Connection refused. "
-                                       "Make sure that Livestatus API is listening on tcp://%1:%2").arg(mhost).arg(mport));
+                                       "Make sure that Livestatus API is listening on tcp://%1:%2").arg(m_host).arg(m_port));
     break;
   default:
     QAbstractSocket::setErrorString(tr("The following error occurred: %1")
