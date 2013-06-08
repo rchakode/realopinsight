@@ -1160,28 +1160,7 @@ void SvNavigator::resetSettings(void)
   for (int i= 0; i< MAX_SRCS; i++) {
     if (m_preferences->isSetSource(i)) {
       m_settings->loadSource(i, src);
-      if (src.mon_type == MonitorBroker::Auto) {
-        src.mon_type = m_coreData->monitor;
-      }
-      switch (src.mon_type) {
-        case MonitorBroker::Nagios:
-          if (m_preferences->useLs()) {
-            src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
-          } else {
-            QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
-            src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
-          }
-          break;
-        case MonitorBroker::Zabbix:
-          src.zbx_handler = std::make_shared<ZbxHelper>();
-          break;
-        case MonitorBroker::Zenoss:
-          src.zns_handler = std::make_shared<ZnsHelper>();
-          break;
-        default:
-          utils::alert(tr("Unknown monitor type (%1)").arg(src.mon_type));
-          break;
-      }
+      allocSourceHandler(src);
       m_sources.insert(i, src);
     }
   }
@@ -1196,10 +1175,36 @@ void SvNavigator::resetInterval()
   m_timer = startTimer(m_interval);
 }
 
+void SvNavigator::allocSourceHandler(SourceT& src)
+{
+  if (src.mon_type == MonitorBroker::Auto) {
+    src.mon_type = m_coreData->monitor;
+  }
+
+  switch (src.mon_type) {
+    case MonitorBroker::Nagios:
+      if (m_preferences->useLs()) {
+        src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
+      } else {
+        QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
+        src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+      }
+      break;
+    case MonitorBroker::Zabbix:
+      src.zbx_handler = std::make_shared<ZbxHelper>();
+      break;
+    case MonitorBroker::Zenoss:
+      src.zns_handler = std::make_shared<ZnsHelper>();
+      break;
+    default:
+      utils::alert(tr("Unknown monitor type (%1").arg(src.mon_type));
+      break;
+  }
+}
+
 
 void SvNavigator::handleSourcesChanged(QList<qint8> ids)
 {
-  qDebug() << "source: "<<ids;
   foreach (const qint8& id, ids) {
     SourceT newsrc;
     m_settings->loadSource(id, newsrc);
@@ -1225,30 +1230,7 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
           break;
       }
     }
-
-    if (newsrc.mon_type == MonitorBroker::Auto) {
-      newsrc.mon_type = m_coreData->monitor;
-    }
-
-    switch (newsrc.mon_type) {
-      case MonitorBroker::Nagios:
-        if (m_preferences->useLs()) {
-          newsrc.ls_handler = std::make_shared<LsHelper>(newsrc.ls_addr, newsrc.ls_port);
-        } else {
-          QString uri = QString("tcp://%1:%2").arg(newsrc.ls_addr, QString::number(newsrc.ls_port));
-          newsrc.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
-        }
-        break;
-      case MonitorBroker::Zabbix:
-        newsrc.zbx_handler = std::make_shared<ZbxHelper>();
-        break;
-      case MonitorBroker::Zenoss:
-        newsrc.zns_handler = std::make_shared<ZnsHelper>();
-        break;
-      default:
-        utils::alert(tr("Unknown monitor type (%1").arg(newsrc.mon_type));
-        break;
-    }
+    allocSourceHandler(newsrc);
     m_sources[id] = newsrc;
     if (id == 0) {
       m_browser->setUrl(newsrc.mon_url);
