@@ -143,22 +143,21 @@ void GraphView::scrollContentsBy(int dx, int dy)
 
 void GraphView::mouseMoveEvent(QMouseEvent * event)
 {
-  // FIXME: mouseMoveEvent(QMouseEvent * event)
-  //  if (event->buttons() == Qt::LeftButton) {
-  //    if (! m_trackingOn) {
-  //      m_lastTrackingPos = event->pos();
-  //      m_trackingOn = true;
-  //    } else {
-  //      QPoint pos = event->pos();
-  //      QPoint dt = pos - m_lastTrackingPos;
-  //      m_lastTrackingPos = pos;
+  // FIXME: mouseMoveEvent(QMouseEvent * event), leaves blank spaces
+  if (event->buttons() == Qt::LeftButton) {
+    if (! m_trackingOn) {
+      m_lastTrackingPos = event->pos();
+      m_trackingOn = true;
+    } else {
+      QPoint pos = event->pos();
+      QPoint dt = pos - m_lastTrackingPos;
+      m_lastTrackingPos = pos;
 
-  //      viewport()->move(viewport()->pos() + dt);
-  //      QGraphicsView::scale(1, 1);
-  //    }
-  //  } else {
-  //    m_trackingOn = false;
-  //  }
+      viewport()->move(viewport()->pos() + dt);
+    }
+  } else {
+    m_trackingOn = false;
+  }
 }
 
 void GraphView::zoomIn()
