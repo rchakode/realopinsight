@@ -91,9 +91,9 @@ signals:
   void sortEventConsole(void);
 
 protected:
-  void closeEvent(QCloseEvent *);
-  void contextMenuEvent(QContextMenuEvent *);
-  void timerEvent(QTimerEvent *);
+  virtual void closeEvent(QCloseEvent *);
+  virtual void contextMenuEvent(QContextMenuEvent *);
+  virtual void timerEvent(QTimerEvent *);
 
 
 private:

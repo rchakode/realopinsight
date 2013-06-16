@@ -37,8 +37,11 @@ const QString GraphView::EXPICON_NODE = ":EXPICON";
 const QString GraphView::PLUS = "plus";
 const QString GraphView::MINUS = "minus";
 const QString GraphView::DEFAULT_ICON = NodeType::toString(NodeType::SERVICE_NODE);
-const float SCALIN_FACTOR = 1.1;
-const float SCALOUT_FACTOR = 1/SCALIN_FACTOR;
+
+namespace {
+  const float SCALIN_FACTOR = 1.1;
+  const float SCALOUT_FACTOR = 1/SCALIN_FACTOR;
+}
 
 IconMapT GraphView::nodeIcons() {
   IconMapT icons;
@@ -81,13 +84,12 @@ GraphView::GraphView(QWidget* _parent)
     m_scene(new QGraphicsScene()),
     m_chart(NULL),
     m_icons(nodeIcons()),
-    m_mapScalFactor (1),
-    m_chartScalFactor (1),
-    m_isAjustedChartSize (false)
+    m_mapScalFactor(1),
+    m_chartScalFactor(1),
+    m_isAjustedChartSize(false),
+    m_trackingOn(false)
 {
   setScene(m_scene);
-//  setMouseTracking(false);
-//  this->viewport()->setMouseTracking(false);
 }
 
 GraphView::~GraphView()
@@ -135,20 +137,33 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
 
 void GraphView::scrollContentsBy(int dx, int dy)
 {
-  QGraphicsView::scrollContentsBy (dx, dy);
+  QGraphicsView::scrollContentsBy(dx, dy);
   setStatsPanelPos();
 }
 
-//void GraphView::mouseMoveEvent(QMouseEvent * event)
-//{
-//  qDebug() << QWidget::hasMouseTracking();
-//  qDebug() << event->x() << event->y();
-//  qDebug() << event->buttons() << event->button();
-//}
+void GraphView::mouseMoveEvent(QMouseEvent * event)
+{
+  // FIXME: mouseMoveEvent(QMouseEvent * event)
+  //  if (event->buttons() == Qt::LeftButton) {
+  //    if (! m_trackingOn) {
+  //      m_lastTrackingPos = event->pos();
+  //      m_trackingOn = true;
+  //    } else {
+  //      QPoint pos = event->pos();
+  //      QPoint dt = pos - m_lastTrackingPos;
+  //      m_lastTrackingPos = pos;
+
+  //      viewport()->move(viewport()->pos() + dt);
+  //      QGraphicsView::scale(1, 1);
+  //    }
+  //  } else {
+  //    m_trackingOn = false;
+  //  }
+}
 
 void GraphView::zoomIn()
 {
-  scale(SCALIN_FACTOR, SCALIN_FACTOR);
+  QGraphicsView::scale(SCALIN_FACTOR, SCALIN_FACTOR);
   if (m_chart) {
     setStatsPanelPos();
     m_chart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
@@ -157,7 +172,7 @@ void GraphView::zoomIn()
 
 void GraphView::zoomOut()
 {
-  scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
+  QGraphicsView::scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
   if (m_chart) {
     m_chart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
     setStatsPanelPos();

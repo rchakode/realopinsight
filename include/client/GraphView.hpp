@@ -76,7 +76,7 @@ protected:
   virtual void resizeEvent(QResizeEvent *) { setStatsPanelPos(); }
   virtual void showEvent(QShowEvent *) { setStatsPanelPos(); }
   virtual void scrollContentsBy(int dx, int dy);
-  //virtual void mouseMoveEvent(QMouseEvent * event);
+  virtual void mouseMoveEvent(QMouseEvent * event);
 
 private:
   static const qreal XSCAL_FACTOR;
@@ -95,6 +95,8 @@ private:
   qreal m_mapScalFactor;
   qreal m_chartScalFactor;
   bool m_isAjustedChartSize;
+  QPoint m_lastTrackingPos;
+  bool m_trackingOn;
 
   void setEdgePath(const QString& _parentVertex, const QString& _childVertex, QPainterPath& path);
   void drawMap(const NodeListT &_bpnodes, const NodeListT& _cnodes);

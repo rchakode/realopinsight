@@ -69,8 +69,8 @@ public slots:
   void import(void);
 
 protected:
-  void contextMenuEvent( QContextMenuEvent *);
-  void closeEvent( QCloseEvent *);
+  virtual void contextMenuEvent( QContextMenuEvent *);
+  virtual void closeEvent( QCloseEvent *);
 
 private:
   qint32 muserRole;
