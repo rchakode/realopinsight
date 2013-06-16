@@ -72,7 +72,7 @@ void MsgConsole::updateNodeMsg(const NodeListT::iterator& _node)
 
 void MsgConsole::updateNodeMsg(const NodeT& _node)
 {
-  const MonitorBroker::CheckT& check = _node.check;
+  const CheckT& check = _node.check;
   qint32 index = 0;
   QString itemText = "";
   qint32 nbRows = mmodel->rowCount();

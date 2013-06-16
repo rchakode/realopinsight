@@ -45,7 +45,8 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_mainLayout (new QGridLayout(this)),
     m_userRole(_userRole),
     m_settings(new Settings()),
-    m_onitorUrlField(new QLineEdit()),
+    m_monitorUrlField(new QLineEdit()),
+    m_monitorTypeField(new QComboBox()),
     m_updateIntervalField(new QSpinBox()),
     m_brwBtn(new QPushButton(tr("&Browse..."))),
     m_oldPwdField(new QLineEdit()),
@@ -88,7 +89,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
       m_mainLayout->setColumnStretch(1, 6);
       m_mainLayout->setColumnStretch(2, 0);
       if(_userRole == Auth::OpUserRole) {
-        m_onitorUrlField->setEnabled(false);
+        m_monitorUrlField->setEnabled(false);
         m_brwBtn->setEnabled(false);
         m_updateIntervalField->setEnabled(false);
         m_applySettingBtn->setEnabled(false);
@@ -142,7 +143,10 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
 
 Preferences::~Preferences()
 {
+  delete m_monitorTypeField;
+  delete m_monitorUrlField;
   delete m_updateIntervalField;
+  delete m_brwBtn;
   delete m_oldPwdField;
   delete m_pwdField;
   delete m_rePwdField;
@@ -178,7 +182,7 @@ void Preferences::handleCancel(void)
 
 void Preferences::applySettings(void)
 {
-  saveAsSource(0);
+  saveAsSource(0, selectSourceType());
   emit sourcesChanged(m_updatedSources);
 }
 
@@ -188,8 +192,7 @@ void Preferences::addAsSource(void)
   while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {bucket++;}
 
   int target = -1;
-  QString srcType ;
-  QStringList items;
+  QString srcType;
 
   if (bucket < MAX_SRCS) {
     srcType = selectSourceType();
@@ -197,13 +200,13 @@ void Preferences::addAsSource(void)
       target = bucket;
     }
   } else {
-    items = QStringList() <<"1"<<"2"<<"3"<<"4"<<"5"<<"6"<<"7"<<"8"<<"9";
     bool ok =  false;
     QString srcId = QInputDialog::getItem(this,
                                           tr("Replace source | %1").arg(APP_NAME),
                                           tr("The maximum number of sources is reached.\n"
                                              "Replace a source?"),
-                                          items, 0,
+                                          utils::sourceIndexes(),
+                                          0,
                                           false,
                                           &ok);
     if (ok && !srcId.isEmpty()) {
@@ -221,12 +224,16 @@ void Preferences::addAsSource(void)
 
 QString Preferences::selectSourceType(void)
 {
-  QStringList items = QStringList()<<"Livestatus/ngrt4nd"<<"Zabbix"<<"Zenoss";
+  if (m_monitorTypeField->currentIndex() != 0) {
+    return m_monitorTypeField->currentText();
+  }
+
   bool ok = false;
   QString srcType = QInputDialog::getItem(this,
                                           tr("Select the source type | %1").arg(APP_NAME),
                                           tr("Please select the source type (Remote API)"),
-                                          items, 0,
+                                          utils::sourceTypes(),
+                                          0,
                                           false,
                                           &ok);
   if (!ok || srcType.isEmpty()) {
@@ -241,7 +248,7 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   SourceT src;
   src.id = utils::sourceId(_idx);
   src.mon_type = utils::convert2ApiType(_stype);
-  src.mon_url = m_onitorUrlField->text();
+  src.mon_url = m_monitorUrlField->text();
   src.ls_addr = m_sockAddrField->text();
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
@@ -335,13 +342,15 @@ QGroupBox* Preferences::createScktGrp(void)
 
 QGroupBox* Preferences::createCommonGrp(void)
 {
+  m_monitorTypeField->addItems(utils::sourceTypes());
   QGroupBox* bx(new QGroupBox(tr("Common Settings")));
   QGridLayout* lyt(new QGridLayout());
   int line;
   line = 0,
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
-      lyt->addWidget(m_onitorUrlField, line, 1, 1, 2);
-  lyt->addWidget(mverifyPeerChkBx, line, 2);
+      lyt->addWidget(m_monitorUrlField, line, 1),
+      lyt->addWidget(m_monitorTypeField, line, 2);
+ // lyt->addWidget(mverifyPeerChkBx, line, 2);
   line++,
       lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
       lyt->addWidget(m_serverPassField, line, 1),
@@ -367,7 +376,7 @@ void Preferences::loadProperties(void)
   initSourceStates();
   SourceT src;
   m_settings->loadSource(0, src);
-  m_onitorUrlField->setText(src.mon_url);
+  m_monitorUrlField->setText(src.mon_url);
   m_sockAddrField->setText(src.ls_addr);
   m_sockPortField->setText(QString::number(src.ls_port));
   m_serverPassField->setText(src.auth);

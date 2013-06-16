@@ -203,7 +203,7 @@ void SvNavigator::runMonitor()
   prepareUpdate();
   if (m_coreData->monitor == MonitorBroker::Auto) {
     for (SourceListT::Iterator src=m_sources.begin(), end = m_sources.end();
-         src!=end; src++) { runMonitor(*src); }
+         src!=end; ++src) { runMonitor(*src); }
   } else {
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
@@ -304,7 +304,7 @@ void SvNavigator::toggleTroubleView(bool _toggled)
     m_msgConsole->clearNormalMsg();
   } else {
     for (auto it = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
-         it != end; it++) m_msgConsole->updateNodeMsg(it);
+         it != end; ++it) m_msgConsole->updateNodeMsg(it);
     m_msgConsole->sortByColumn(1);
   }
   m_msgConsole->setEnabled(true);
@@ -355,11 +355,12 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   }
 
   /* Now start doing the job */
-  for (NodeListIteratorT cnode = m_coreData->cnodes.begin(); cnode != m_coreData->cnodes.end(); cnode++)
+  for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
+       cnode != end; ++cnode)
   {
     if (cnode->child_nodes == "") {
       cnode->severity = MonitorBroker::Unknown;
-      m_coreData->check_status_count[cnode->severity]++;
+      ++(m_coreData->check_status_count[cnode->severity]);
       continue;
     }
 
@@ -381,7 +382,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
       cnode->monitored = true;
       computeStatusInfo(cnode);
       updateDashboard(cnode);
-      m_coreData->check_status_count[cnode->severity]++;
+      ++(m_coreData->check_status_count[cnode->severity]);
     }
   }
 }
@@ -502,11 +503,11 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 void SvNavigator::updateCNodes(const CheckT& check)
 {
   for (NodeListIteratorT cnode = m_coreData->cnodes.begin();
-       cnode != m_coreData->cnodes.end(); cnode++) {
+       cnode != m_coreData->cnodes.end(); ++cnode) {
     if (cnode->child_nodes.toLower() == QString::fromStdString(check.id).toLower()) {
       cnode->check = check;
       computeStatusInfo(cnode);
-      m_coreData->check_status_count[cnode->severity]++;
+      ++(m_coreData->check_status_count[cnode->severity]);
       updateDashboard(cnode);
       cnode->monitored = true;
     }
@@ -526,11 +527,11 @@ void SvNavigator::finalizeUpdate(const bool& enable)
     m_timer = startTimer(m_interval);
     if (m_updateSucceed) updateStatusBar(tr("Update completed"));
     for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
-         cnode != end; cnode++) {
+         cnode != end; ++cnode) {
       if (!cnode->monitored) {
         cnode->check = utils::getUnknownService(MonitorBroker::Unknown, cnode->child_nodes);
         computeStatusInfo(cnode);
-        m_coreData->check_status_count[cnode->severity]++;
+        ++(m_coreData->check_status_count[cnode->severity]);
         updateDashboard(cnode);
         cnode->monitored = true;
       }
@@ -612,7 +613,9 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
       break;
     case PropRules::Decreased: node->prop_sev = (criticity--).getValue();
       break;
-    default: node->prop_sev = node->severity;
+    case PropRules::Unchanged:
+    default:
+      node->prop_sev = node->severity;
       break;
   }
   QString toolTip = getNodeToolTip(*node);
@@ -952,7 +955,8 @@ QStringList SvNavigator::getAuthInfo(const QString& authString)
 
 void SvNavigator::openRpcSessions(void)
 {
-  for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src != end; src++) {
+  for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end();
+       src != end; ++src) {
     openRpcSession(*src);
   }
 }
@@ -1103,7 +1107,7 @@ void SvNavigator::updateDashboardOnUnknown()
     updateStatusBar(m_lastErrorMsg);
   }
   for (NodeListIteratorT cnode = m_coreData->cnodes.begin();
-       cnode != m_coreData->cnodes.end(); cnode++) {
+       cnode != m_coreData->cnodes.end(); ++cnode) {
     cnode->monitored = true;
     cnode->check = utils::getUnknownService(MonitorBroker::Unknown, m_lastErrorMsg);
     computeStatusInfo(cnode);
@@ -1157,7 +1161,7 @@ void SvNavigator::resetSettings(void)
 {
   m_sources.clear();
   SourceT src;
-  for (int i= 0; i< MAX_SRCS; i++) {
+  for (int i= 0; i< MAX_SRCS; ++i) {
     if (m_preferences->isSetSource(i)) {
       m_settings->loadSource(i, src);
       allocSourceHandler(src);
@@ -1208,7 +1212,6 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
   foreach (const qint8& id, ids) {
     SourceT newsrc;
     m_settings->loadSource(id, newsrc);
-
     SourceListT::Iterator olddata = m_sources.find(id);
     if (olddata != m_sources.end()) {
       switch (olddata->mon_type) {
@@ -1236,7 +1239,6 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
       m_browser->setUrl(newsrc.mon_url);
     }
   }
-
   runMonitor();
 }
 

@@ -67,7 +67,7 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
     return false;
   }
   QString chkid = "";
-  MonitorBroker::CheckT check;
+  CheckT check;
   QString entry;
   QTextStream buffer(this);
   while (!((entry = buffer.readLine()).isNull())) {

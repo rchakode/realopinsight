@@ -71,29 +71,31 @@ IconMapT GraphView::nodeIcons() {
   icons["Memory Usage"] = ":/images/memory-usage.png";
   icons["Resource Utilization"] = ":/images/resource-usage.png";
   icons["Performance"] = ":/images/performance.png";
+  icons[PLUS] = ":/images/plus.png";
+  icons[MINUS] = ":/images/minus.png";
   return icons;
 }
 
 GraphView::GraphView(QWidget* _parent)
   : QGraphicsView(_parent),
-    mchart (0),
-    mviewScalFactor (1),
-    mchartScalFactor (1),
-    misAjustedChartSize (false)
+    m_scene(new QGraphicsScene()),
+    m_chart(NULL),
+    m_icons(nodeIcons()),
+    m_mapScalFactor (1),
+    m_chartScalFactor (1),
+    m_isAjustedChartSize (false)
 {
-  mchart = NULL;
-  mscene = new QGraphicsScene() , setScene(mscene);
-  micons = nodeIcons();
-  micons[PLUS] = ":/images/plus.png";
-  micons[MINUS] = ":/images/minus.png";
+  setScene(m_scene);
+//  setMouseTracking(false);
+//  this->viewport()->setMouseTracking(false);
 }
 
 GraphView::~GraphView()
 {
-  delete mscene;
-  mgnodes.clear();
-  medges.clear();
-  micons.clear();
+  delete m_scene;
+  m_mnodes.clear();
+  m_medges.clear();
+  m_icons.clear();
 }
 
 void GraphView::mouseReleaseEvent(QMouseEvent * _event)
@@ -110,15 +112,15 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
       QString sfx = ":" + list[1];
       if (sfx == EXPICON_NODE) {
         QPixmap exp_icon;
-        if (mgnodes[nodeId].expand) {
-          exp_icon.load(micons[MINUS], 0, Qt::AutoColor);
-          mgnodes[nodeId].expand = false;
+        if (m_mnodes[nodeId].expand) {
+          exp_icon.load(m_icons[MINUS], 0, Qt::AutoColor);
+          m_mnodes[nodeId].expand = false;
         } else {
-          exp_icon.load(micons[PLUS], 0, Qt::AutoColor);
-          mgnodes[nodeId].expand = true;
+          exp_icon.load(m_icons[PLUS], 0, Qt::AutoColor);
+          m_mnodes[nodeId].expand = true;
         }
-        mgnodes[nodeId].exp_icon->setPixmap(exp_icon);
-        emit expandNode(nodeId, mgnodes[nodeId].expand, 1);
+        m_mnodes[nodeId].exp_icon->setPixmap(exp_icon);
+        emit expandNode(nodeId, m_mnodes[nodeId].expand, 1);
       }
     }
   }
@@ -127,25 +129,37 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
 void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
 {
   QPointF pos = mapToScene(QPoint(_event->pos()));
-  QGraphicsItem* item = mscene->itemAt(pos);
+  QGraphicsItem* item = m_scene->itemAt(pos);
   if (item) centerOn(pos);
-
 }
+
+void GraphView::scrollContentsBy(int dx, int dy)
+{
+  QGraphicsView::scrollContentsBy (dx, dy);
+  setStatsPanelPos();
+}
+
+//void GraphView::mouseMoveEvent(QMouseEvent * event)
+//{
+//  qDebug() << QWidget::hasMouseTracking();
+//  qDebug() << event->x() << event->y();
+//  qDebug() << event->buttons() << event->button();
+//}
 
 void GraphView::zoomIn()
 {
   scale(SCALIN_FACTOR, SCALIN_FACTOR);
-  if (mchart) {
+  if (m_chart) {
     setStatsPanelPos();
-    mchart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
+    m_chart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
   }
 }
 
 void GraphView::zoomOut()
 {
   scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
-  if (mchart) {
-    mchart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
+  if (m_chart) {
+    m_chart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
     setStatsPanelPos();
   }
 }
@@ -153,55 +167,55 @@ void GraphView::zoomOut()
 void GraphView::updateStatsPanel(Chart * _statsPanel)
 {
   bool visible = true;
-  if (mchart) {
-    visible = mchart->isVisible();
-    mchart->setWidget(_statsPanel);
-    mchart->setVisible(visible);
+  if (m_chart) {
+    visible = m_chart->isVisible();
+    m_chart->setWidget(_statsPanel);
+    m_chart->setVisible(visible);
   } else {
-    mchart = mscene->addWidget(_statsPanel);
-    mchartArea = new QGraphicsRectItem();
-    mchartArea->setBrush(Qt::transparent);
-    mchartArea->setPen(QColor(Qt::transparent));
-    mscene->addItem(mchartArea);
+    m_chart = m_scene->addWidget(_statsPanel);
+    m_chartArea = new QGraphicsRectItem();
+    m_chartArea->setBrush(Qt::transparent);
+    m_chartArea->setPen(QColor(Qt::transparent));
+    m_scene->addItem(m_chartArea);
   }
 
-  if (mchart) { //Mandatory
+  if (m_chart) { //Mandatory
     setStatsPanelPos();
-    if (!misAjustedChartSize) ajustStatsPanelSize();
+    if (!m_isAjustedChartSize) ajustStatsPanelSize();
   }
 }
 
 
 void GraphView::ajustStatsPanelSize(void)
 {
-  if (mchart) {
+  if (m_chart) {
     QSizeF viewSize = size();
-    QSizeF statPanelSize = mchart->size();
-    mchartScalFactor = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
-    if (mchartScalFactor < 1) {
-      if (mviewScalFactor < 1) 	mchart->scale(1/mviewScalFactor, 1/mviewScalFactor);
-      mchart->scale(mchartScalFactor, mchartScalFactor);
+    QSizeF statPanelSize = m_chart->size();
+    m_chartScalFactor = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
+    if (m_chartScalFactor < 1) {
+      if (m_mapScalFactor < 1) 	m_chart->scale(1/m_mapScalFactor, 1/m_mapScalFactor);
+      m_chart->scale(m_chartScalFactor, m_chartScalFactor);
     }
-    misAjustedChartSize = true;
+    m_isAjustedChartSize = true;
     setStatsPanelPos();
   }
 }
 
 void GraphView::setStatsPanelPos(void)
 {
-  if (mchart) {
-    qreal xp = size().width() - mchart->size().width() *  mchartScalFactor - 2;
+  if (m_chart) {
+    qreal xp = size().width() - m_chart->size().width() *  m_chartScalFactor - 2;
     QPointF pos = mapToScene(QPoint(xp, 0));
-    mchart->setPos(pos);
-    Chart* w = dynamic_cast<Chart*>(mchart->widget());
-    mchartArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
+    m_chart->setPos(pos);
+    Chart* w = dynamic_cast<Chart*>(m_chart->widget());
+    m_chartArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
   }
 }
 
 bool GraphView::hideChart(void)
 {
-  bool visible = mchart->isVisible();
-  mchart->setVisible(! visible);
+  bool visible = m_chart->isVisible();
+  m_chart->setVisible(! visible);
   return visible;
 }
 
@@ -211,13 +225,13 @@ void GraphView::load(const QString& _dotFile,
                      const NodeListT& _cnodes)
 {
   auto dotParser = std::unique_ptr<QProcess>(new QProcess());
-  mgphCoordFile = _dotFile%".plain";
-  QStringList arguments = QStringList() << "-Tplain"<< "-o" << mgphCoordFile << _dotFile;
+  m_mcoordFile = _dotFile%".plain";
+  QStringList arguments = QStringList() << "-Tplain"<< "-o" << m_mcoordFile << _dotFile;
   int exitCode = dotParser->execute("dot", arguments);
   dotParser->waitForFinished(60000);
   if (!exitCode) {
     drawMap(_bpnodes, _cnodes);
-    mscene->setSceneRect(mscene->itemsBoundingRect());
+    m_scene->setSceneRect(m_scene->itemsBoundingRect());
   } else {
     utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
     exit(exitCode);
@@ -232,7 +246,7 @@ void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
   QRegExp regexSep;
   QStringList splitedLine;
   QPen pen;
-  QFile coodFile(mgphCoordFile);
+  QFile coodFile(m_mcoordFile);
   if (coodFile.open(QFile::ReadOnly)) {
     pen.setColor(StatsLegend::COLOR_UNKNOWN);
     regexSep.setPattern("[ ]+");
@@ -245,8 +259,8 @@ void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
         qreal y_corner = -1 * splitedLine[3].trimmed().toFloat();
         NodeListT::const_iterator node;
         if (!utils::findNode(_bpnodes, _cnodes, nid, node)) continue;
-        mgnodes[nid].type = node->type;
-        mgnodes[nid].expand = true;
+        m_mnodes[nid].type = node->type;
+        m_mnodes[nid].expand = true;
         QPointF labelOrigin = QPointF(x_corner * XSCAL_FACTOR, y_corner * YSCAL_FACTOR);
         drawNode(*node);
         setNodePos(nid, labelOrigin);
@@ -254,10 +268,10 @@ void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
         QPainterPath path;
         setEdgePath(splitedLine[1], splitedLine[2], path);
         QString eid =  splitedLine[1]%":"%splitedLine[2];
-        medges[eid].edge = new QGraphicsPathItem(path),
-            medges[eid].edge->setPen(pen),
-            mscene->addItem(medges[eid].edge),
-            medges[eid].edge->setZValue(-20);
+        m_medges[eid].edge = new QGraphicsPathItem(path),
+            m_medges[eid].edge->setPen(pen),
+            m_scene->addItem(m_medges[eid].edge),
+            m_medges[eid].edge->setZValue(-20);
       } else if (splitedLine[0] == "stop") {
         break;
       }
@@ -269,33 +283,33 @@ void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
 void GraphView::drawNode(const NodeT& _node)
 {
   QPixmap icon, expIcon;
-  icon.load(micons[_node.icon], 0, Qt::AutoColor);
-  expIcon.load(micons[PLUS], 0, Qt::AutoColor);
+  icon.load(m_icons[_node.icon], 0, Qt::AutoColor);
+  expIcon.load(m_icons[PLUS], 0, Qt::AutoColor);
   //FIXME: take care with background color
   QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;"%_node.name%"&nbsp;</span>";
   QString nodeData = _node.id%LABEL_NODE;
 
-  mgnodes[_node.id].label = new QGraphicsTextItem(),
-      mgnodes[_node.id].label->setHtml(label),
-      mgnodes[_node.id].label->setData(0, nodeData),
-      mscene->addItem(mgnodes[_node.id].label),
-      mgnodes[_node.id].label->setZValue(-5);
+  m_mnodes[_node.id].label = new QGraphicsTextItem(),
+      m_mnodes[_node.id].label->setHtml(label),
+      m_mnodes[_node.id].label->setData(0, nodeData),
+      m_scene->addItem(m_mnodes[_node.id].label),
+      m_mnodes[_node.id].label->setZValue(-5);
   nodeData = _node.id%ICON_NODE;
-  mgnodes[_node.id].icon = new QGraphicsPixmapItem(icon),
-      mgnodes[_node.id].icon->setData(0, nodeData),
-      mscene->addItem(mgnodes[_node.id].icon),
-      mgnodes[_node.id].icon->setZValue(-10);
+  m_mnodes[_node.id].icon = new QGraphicsPixmapItem(icon),
+      m_mnodes[_node.id].icon->setData(0, nodeData),
+      m_scene->addItem(m_mnodes[_node.id].icon),
+      m_mnodes[_node.id].icon->setZValue(-10);
   nodeData = _node.id%EXPICON_NODE;
-  mgnodes[_node.id].exp_icon = new QGraphicsPixmapItem(expIcon),
-      mgnodes[_node.id].exp_icon->setData(0, nodeData),
-      mscene->addItem(mgnodes[_node.id].exp_icon),
-      mgnodes[_node.id].exp_icon->setZValue(0);
-  if (mgnodes[_node.id].type == NodeType::ALARM_NODE)
-    mgnodes[_node.id].exp_icon->setVisible(false);
+  m_mnodes[_node.id].exp_icon = new QGraphicsPixmapItem(expIcon),
+      m_mnodes[_node.id].exp_icon->setData(0, nodeData),
+      m_scene->addItem(m_mnodes[_node.id].exp_icon),
+      m_mnodes[_node.id].exp_icon->setZValue(0);
+  if (m_mnodes[_node.id].type == NodeType::ALARM_NODE)
+    m_mnodes[_node.id].exp_icon->setVisible(false);
 
   QString msg =  SvNavigator::getNodeToolTip(_node);
-  mgnodes[_node.id].icon->setToolTip(msg);
-  mgnodes[_node.id].label->setToolTip(msg);
+  m_mnodes[_node.id].icon->setToolTip(msg);
+  m_mnodes[_node.id].label->setToolTip(msg);
 }
 
 void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _toolTip)
@@ -307,13 +321,13 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
 {
   QString label = "<span style=\"background: '"%utils::computeColor(_node.severity).name()
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
-  GNodeListT::iterator gnodeIt =  mgnodes.find(_node.id);
-  if (gnodeIt != mgnodes.end()) {
+  GNodeListT::iterator gnodeIt =  m_mnodes.find(_node.id);
+  if (gnodeIt != m_mnodes.end()) {
     gnodeIt->label->setHtml(label);
     gnodeIt->icon->setToolTip(_toolTip);
     gnodeIt->label->setToolTip(_toolTip);
-    GEdgeListT::iterator edge = medges.find(_node.parent + ":" + _node.id);
-    if (edge != medges.end())
+    GEdgeListT::iterator edge = m_medges.find(_node.parent + ":" + _node.id);
+    if (edge != m_medges.end())
       edge->edge->setPen(utils::computeColor(_node.prop_sev));
   }
 }
@@ -324,8 +338,8 @@ void GraphView::setEdgePath(const QString& _parentVertex,
 {
   QPointF parentAnchor, childAnchor;
   QSizeF p_size, c_size;
-  GNodeT& p_gnode = mgnodes[_parentVertex];
-  GNodeT& c_gnode = mgnodes[_childVertex];
+  GNodeT& p_gnode = m_mnodes[_parentVertex];
+  GNodeT& c_gnode = m_mnodes[_childVertex];
   p_size = p_gnode.exp_icon->boundingRect().size();
   c_size = c_gnode.icon->boundingRect().size();
   parentAnchor = p_gnode.exp_icon->pos() + QPointF(0.5 * p_size.width(), p_size.height());
@@ -338,18 +352,18 @@ void GraphView::setNodePos(const QString& _nodeId, const QPointF& _pos)
 {
   QSizeF l_size, i_size, ei_size;
   qreal xi, xl, yi, yl, xei, yei;
-  l_size = mgnodes[_nodeId].label->boundingRect().size();
-  i_size = mgnodes[_nodeId].icon->boundingRect().size();
-  ei_size = mgnodes[_nodeId].exp_icon->boundingRect().size();
+  l_size = m_mnodes[_nodeId].label->boundingRect().size();
+  i_size = m_mnodes[_nodeId].icon->boundingRect().size();
+  ei_size = m_mnodes[_nodeId].exp_icon->boundingRect().size();
   xi = _pos.x() + 0.5 * (l_size.width() - i_size.width());
   yi = _pos.y();
   xei = _pos.x() + 0.5 * (l_size.width() - ei_size.width());
   xl = _pos.x();
   yl = _pos.y() + 0.75 * i_size.height();
   yei = yl + 0.75 * l_size.height();
-  mgnodes[_nodeId].label->setPos(xl, yl);
-  mgnodes[_nodeId].icon->setPos(xi, yi);
-  mgnodes[_nodeId].exp_icon->setPos(xei, yei);
+  m_mnodes[_nodeId].label->setPos(xl, yl);
+  m_mnodes[_nodeId].icon->setPos(xi, yi);
+  m_mnodes[_nodeId].exp_icon->setPos(xei, yei);
 }
 
 
@@ -357,18 +371,18 @@ void GraphView::setNodeVisible(const QString& _nodeId,
                                const QString& _parent,
                                const bool& _visible, const qint32& _level)
 {
-  GNodeListT::iterator gnode = mgnodes.find(_nodeId);
-  if (gnode != mgnodes.end()) {
+  GNodeListT::iterator gnode = m_mnodes.find(_nodeId);
+  if (gnode != m_mnodes.end()) {
     QString edgeId = _parent + ":" + _nodeId;
-    medges[edgeId].edge->setVisible(_visible);
+    m_medges[edgeId].edge->setVisible(_visible);
     gnode->expand = _visible;
     gnode->label->setVisible(_visible);
     gnode->icon->setVisible(_visible);
     if (gnode->type == NodeType::SERVICE_NODE)
       gnode->exp_icon->setVisible(_visible);
     if (_visible) {
-      QPixmap expandIcon(micons[PLUS], 0, Qt::AutoColor);
-      mgnodes[_nodeId].exp_icon->setPixmap(expandIcon);
+      QPixmap expandIcon(m_icons[PLUS], 0, Qt::AutoColor);
+      m_mnodes[_nodeId].exp_icon->setPixmap(expandIcon);
     }
     emit expandNode(_nodeId, _visible, _level + 1);
   }
@@ -377,14 +391,14 @@ void GraphView::setNodeVisible(const QString& _nodeId,
 void GraphView::scaleToFitViewPort(void)
 {
   QSizeF viewSize = size();
-  QSizeF sceneSize = mscene->itemsBoundingRect().size();
-  mviewScalFactor = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
-  if (mviewScalFactor < 1.0) {
-    if (mchart)
-      mchart->scale(1 / mviewScalFactor, 1 / mviewScalFactor);
-    scale(mviewScalFactor, mviewScalFactor);
+  QSizeF sceneSize = m_scene->itemsBoundingRect().size();
+  m_mapScalFactor = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
+  if (m_mapScalFactor < 1.0) {
+    if (m_chart)
+      m_chart->scale(1 / m_mapScalFactor, 1 / m_mapScalFactor);
+    scale(m_mapScalFactor, m_mapScalFactor);
   } else {
-    mviewScalFactor = 1;
+    m_mapScalFactor = 1;
   }
 }
 

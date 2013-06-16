@@ -89,7 +89,8 @@ private:
   Qt::CheckState mverifyPeer;
 
   Settings* m_settings;
-  QLineEdit* m_onitorUrlField;
+  QLineEdit* m_monitorUrlField;
+  QComboBox* m_monitorTypeField;
   QSpinBox* m_updateIntervalField;
   QPushButton *m_brwBtn;
   QLineEdit* m_oldPwdField;
@@ -113,7 +114,7 @@ private:
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
   void loadProperties(void);
-  void saveAsSource(const qint32& idx, const QString& _stype = "auto");
+  void saveAsSource(const qint32& idx, const QString& _stype);
   QString getSourceStatesSerialized(void);
   void initSourceStates();
   void initSourceStates(const QString& str);

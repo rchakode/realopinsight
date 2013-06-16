@@ -27,6 +27,16 @@
 #include<iostream>
 #include <unordered_map>
 
+struct CheckT{
+  std::string id;
+  std::string host;
+  std::string check_command;
+  std::string last_state_change;
+  std::string alarm_msg;
+  int status;
+};
+typedef std::unordered_map<std::string, CheckT> ChecksT;
+
 class MonitorBroker {
 public:
   enum ApiTypeT {
@@ -64,15 +74,6 @@ public:
     ZenossError = 4,
     ZenossCritical = 5
   };
-  struct CheckT{
-    std::string id;
-    std::string host;
-    std::string check_command;
-    std::string last_state_change;
-    std::string alarm_msg;
-    int status;
-  };
-  typedef std::unordered_map<std::string, CheckT> ChecksT;
 
   static const int DefaultPort;
   static const int DefaultUpdateInterval;

@@ -54,12 +54,9 @@ public:
   void setStatsPanelPos(void);
   void updateStatsPanel(Chart * _stats_panel);
 
-  inline void centerOnNode(const QString& id)
-  { if (!id.isEmpty())centerOn(mgnodes[id].label); }
-  inline QGraphicsItem* nodeAtGlobalPos(QPoint pos)
-  { return mscene->itemAt(mapToScene(mapFromGlobal(pos))); }
-  inline QGraphicsItem* nodeAt(QPoint pos)
-  { return mscene->itemAt(mapToScene(pos)); }
+  void centerOnNode(const QString& id) { if (!id.isEmpty())centerOn(m_mnodes[id].label); }
+  QGraphicsItem* nodeAtGlobalPos(QPoint pos) { return m_scene->itemAt(mapToScene(mapFromGlobal(pos))); }
+  QGraphicsItem* nodeAt(QPoint pos) { return m_scene->itemAt(mapToScene(pos)); }
 
 public slots:
   void capture(void);
@@ -73,12 +70,13 @@ signals:
   void rightClickOnItem(QGraphicsItem *, QPoint pos);
 
 protected:
-  void mouseReleaseEvent(QMouseEvent *);
-  void mouseDoubleClickEvent(QMouseEvent *);
-  void wheelEvent(QWheelEvent * _event) { (_event->delta() > 0)? zoomIn() : zoomOut();}
-  void resizeEvent(QResizeEvent *) {setStatsPanelPos();}
-  void showEvent(QShowEvent *) {setStatsPanelPos();}
-  void scrollContentsBy(int dx, int dy) {QGraphicsView::scrollContentsBy (dx, dy); setStatsPanelPos();}
+  virtual void mouseReleaseEvent(QMouseEvent *);
+  virtual void mouseDoubleClickEvent(QMouseEvent *);
+  virtual void wheelEvent(QWheelEvent * _event) { (_event->delta() > 0)? zoomIn() : zoomOut();}
+  virtual void resizeEvent(QResizeEvent *) { setStatsPanelPos(); }
+  virtual void showEvent(QShowEvent *) { setStatsPanelPos(); }
+  virtual void scrollContentsBy(int dx, int dy);
+  //virtual void mouseMoveEvent(QMouseEvent * event);
 
 private:
   static const qreal XSCAL_FACTOR;
@@ -87,18 +85,16 @@ private:
   static const QString  ICON_NODE;
   static const QString  EXPICON_NODE;
 
-  QGraphicsScene* mscene;
-  QGraphicsProxyWidget* mchart;
-  QGraphicsRectItem* mchartArea;
-  QPoint mchartPos;
-  QString msvgGphFile;
-  QString mgphCoordFile;
-  GNodeListT mgnodes;
-  GEdgeListT medges;
-  IconMapT micons;
-  qreal mviewScalFactor;
-  qreal mchartScalFactor;
-  bool misAjustedChartSize;
+  QGraphicsScene* m_scene;
+  QGraphicsProxyWidget* m_chart;
+  QGraphicsRectItem* m_chartArea;
+  QString m_mcoordFile;
+  GNodeListT m_mnodes;
+  GEdgeListT m_medges;
+  IconMapT m_icons;
+  qreal m_mapScalFactor;
+  qreal m_chartScalFactor;
+  bool m_isAjustedChartSize;
 
   void setEdgePath(const QString& _parentVertex, const QString& _childVertex, QPainterPath& path);
   void drawMap(const NodeListT &_bpnodes, const NodeListT& _cnodes);

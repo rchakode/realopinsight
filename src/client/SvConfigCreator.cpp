@@ -161,7 +161,7 @@ void SvCreator::newNode(void)
                            tr("sub service %1").arg(QString::number(count)),
                            mselectedNode);
   insertFromSelected(*node);
-  count++;
+  ++count;
 }
 
 NodeT* SvCreator::createNode(const QString& id,
@@ -209,11 +209,11 @@ void SvCreator::deleteNode(void)
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec())
   {
-  case QMessageBox::Yes:
-    deleteNode(mselectedNode);
-    break;
-  default:
-    break;
+    case QMessageBox::Yes:
+      deleteNode(mselectedNode);
+      break;
+    default:
+      break;
   }
 }
 
@@ -331,16 +331,16 @@ int SvCreator::treatCloseAction(const bool& _close)
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
       mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
       switch (mbox.exec()) {
-      case QMessageBox::Yes:
-        save();
-        break;
-      case QMessageBox::Cancel:
-        enforceClose = false;
-        ret = 1;
-        break;
-      case QMessageBox::Discard:
-      default:
-        break;
+        case QMessageBox::Yes:
+          save();
+          break;
+        case QMessageBox::Cancel:
+          enforceClose = false;
+          ret = 1;
+          break;
+        case QMessageBox::Discard:
+        default:
+          break;
       }
     }
     if (enforceClose) qApp->quit();
@@ -480,7 +480,8 @@ void SvCreator::recordData(const QString& _path)
   }
 
   QTextStream ofile(&file);
-  ofile << "<ServiceView compat=\"2.0\" monitor=\""<< mcoreData->monitor<< "\">\n";
+  ofile << "<?xml version=\"1.0\"?>\n"
+           "<ServiceView compat=\"2.0\" monitor=\""<< mcoreData->monitor<< "\">\n";
   recordNode(ofile,*root);
   foreach(const NodeT& service, mcoreData->bpnodes) {
     if (service.id == SvNavigatorTree::RootId || service.parent.isEmpty())

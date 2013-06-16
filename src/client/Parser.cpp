@@ -70,7 +70,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
 
   NodeT node;
   qint32 serviceCount = services.length();
-  for (qint32 srv = 0; srv < serviceCount; srv++) {
+  for (qint32 srv = 0; srv < serviceCount; ++srv) {
     QDomElement service = services.item(srv).toElement();
     node.id = service.attribute("id").trimmed();
     node.monitored = false;
@@ -112,7 +112,8 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
 {
   _graphContent = "\n";
   for (NodeListT::ConstIterator node = _bpnodes.begin();
-       node != _bpnodes.end(); node++) {
+       node != _bpnodes.end(); ++node)
+  {
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
@@ -129,7 +130,8 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
   }
 
   for (NodeListT::ConstIterator node = _cnodes.begin();
-       node != _cnodes.end(); node++) {
+       node != _cnodes.end(); ++node)
+  {
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
   }
@@ -139,12 +141,15 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
                            const NodeListT& _cnodes,
                            TreeNodeItemListT& _tree)
 {
-  for (NodeListT::ConstIterator node = _bpnodes.begin();
-       node != _bpnodes.end(); node++) _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
-  for (NodeListT::ConstIterator node = _cnodes.begin();
-       node != _cnodes.end(); node++) _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));
-  for (NodeListT::ConstIterator node = _bpnodes.begin();
-       node != _bpnodes.end(); node++) {
+  for (NodeListT::ConstIterator node=_bpnodes.begin(), end=_bpnodes.end();
+       node!=end; ++node) { _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node)); }
+
+  for (NodeListT::ConstIterator node=_cnodes.begin(), end = _cnodes.end();
+       node!=end; ++node) {_tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));}
+
+  for (NodeListT::ConstIterator node=_bpnodes.begin(), end=_bpnodes.end();
+       node!=end; ++node)
+  {
     if (node->child_nodes.isEmpty()) continue;
     auto treeItem = _tree.find(node->id);
     if (treeItem == _tree.end()) {

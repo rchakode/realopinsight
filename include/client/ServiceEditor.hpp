@@ -61,7 +61,7 @@ public:
   void setContent(NodeListT::const_iterator _nit) {setContent(*_nit);}
   bool updateNode(NodeListT&, const QString&);
   bool updateNode(NodeListT::iterator& _node_it);
-  void setCheckListField(const MonitorBroker::ChecksT&);
+  void setCheckListField(const ChecksT&);
   void setEnableFields(const bool&);
   void loadStatusFile(const QString&);
   void setLowLevelAlarmComponentEnabled(bool enable){mitems[CHECK_LIST_FIELD]->setEnabled(enable);}

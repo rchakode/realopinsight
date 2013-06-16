@@ -99,17 +99,16 @@ ServiceEditor::~ServiceEditor()
 
 void ServiceEditor::loadStatusFile(const QString& path)
 {
-  MonitorBroker::ChecksT checks;
+  ChecksT checks;
   MonitorBroker::loadNagiosCollectedData(path.toStdString(), checks);
   setCheckListField( checks );
 }
 
-void ServiceEditor::setCheckListField(const MonitorBroker::ChecksT& _nagios_checks)
+void ServiceEditor::setCheckListField(const ChecksT& _nagios_checks)
 {
   checkField()->clear();
-  for(MonitorBroker::ChecksT::const_iterator it = _nagios_checks.begin(); it != _nagios_checks.end(); it++) {
-    checkField()->addItem(QString::fromStdString(it->second.id));
-  }
+  for(ChecksT::const_iterator it=_nagios_checks.begin(), end=_nagios_checks.end();
+      it!=end; ++it) { checkField()->addItem(QString::fromStdString(it->second.id)); }
 }
 
 void ServiceEditor::setEnableFields(const bool& _enable)
@@ -202,15 +201,15 @@ void ServiceEditor::setContent(const NodeT& _node)
 void ServiceEditor::layoutEditorComponents(void)
 {
   mlayoutRowIndex = 0;
-  loadLabelFields(); mlayoutRowIndex++;
-  loadTypeFields(); mlayoutRowIndex++;
-  loadStatusHandlingFields(); mlayoutRowIndex++;
-  loadIconFields(); mlayoutRowIndex++;
-  loadDescriptionFields(); mlayoutRowIndex++;
-  loadAlarmMsgFields(); mlayoutRowIndex++;
-  loadNotificationMsgFields(); mlayoutRowIndex++;
-  loadCheckField(); mlayoutRowIndex++;
-  loadButtonBox(); mlayoutRowIndex++;
+  loadLabelFields(); ++mlayoutRowIndex;
+  loadTypeFields(); ++mlayoutRowIndex;
+  loadStatusHandlingFields(); ++mlayoutRowIndex;
+  loadIconFields(); ++mlayoutRowIndex;
+  loadDescriptionFields(); ++mlayoutRowIndex;
+  loadAlarmMsgFields(); ++mlayoutRowIndex;
+  loadNotificationMsgFields(); ++mlayoutRowIndex;
+  loadCheckField(); ++mlayoutRowIndex;
+  loadButtonBox(); ++mlayoutRowIndex;
   setEnableFields(false);
 }
 

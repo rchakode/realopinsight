@@ -208,7 +208,7 @@ public:
     return Criticity(value);
   }
 
-  Criticity operator --(int) {
+  Criticity operator--(int) {
 
     switch(value) {
       case MonitorBroker::Critical:
@@ -248,14 +248,14 @@ struct NodeT {
   qint32 severity;
   qint32 prop_sev;
   QString child_nodes;
-  MonitorBroker::CheckT check;
+  CheckT check;
   bool monitored;
 };
 
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, NodeT> NodeListT;
 typedef NodeListT::Iterator NodeListIteratorT;
-typedef MonitorBroker::CheckT CheckT;
+typedef CheckT CheckT;
 typedef QHash<QString, CheckT> CheckListT;
 typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
@@ -285,19 +285,6 @@ struct GEdgeT {
 };
 typedef QHash<QString, GEdgeT> GEdgeListT;
 
-//struct SourceT {
-//  QString id;
-//  qint32 mon_type;
-//  QString mon_url;
-//  qint32 use_ls;
-//  QString ls_addr;
-//  qint32 ls_port;
-//  QString auth;
-//  ZmqSocket* d4n_handler;
-//  LsHelper* ls_handler;
-//  ZbxHelper* zbx_handler;
-//  ZnsHelper* zns_handler;
-//};
 
 struct SourceT {
   QString id;
