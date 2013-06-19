@@ -90,6 +90,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
 
     case Preferences::ShowAbout:
       organizeAbortWindow();
+
       break;
   }
   addEvents();
