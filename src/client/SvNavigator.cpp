@@ -632,7 +632,6 @@ void SvNavigator::updateMonitoringSettings() {
   mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
   mznsHelper->setSslConf(!msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool());
   mzbxHelper->setSslConf(!msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool());
-  qDebug() << msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool();
   if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DefaultUpdateInterval * 1000;
 }
 

@@ -103,6 +103,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
         mserverPassField->setEnabled(false);
         mshowAuthInfoChkbx->setEnabled(false);
         museMklsChkbx->setEnabled(false);
+        mverifyPeerChkBx->setEnabled(false);
       }
       break;
     case Preferences::ChangePassword:
