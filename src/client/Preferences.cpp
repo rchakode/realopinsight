@@ -40,6 +40,7 @@ const qint32 Preferences::ChangeMonitoringSettings = 2;
 const qint32 Preferences::ShowHelp = 3;
 const qint32 Preferences::ShowAbout = 4;
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
+const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
 
 Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
@@ -137,6 +138,8 @@ void Preferences::handleCancel(void)
 void Preferences::applySettings(void)
 {
   saveAsSource(m_selectedSource, selectSourceType());
+  mverifyPeer = static_cast<Qt::CheckState>(mverifyPeerChkBx->checkState()),
+      msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
 }
 
 void Preferences::addAsSource(void)
@@ -344,6 +347,8 @@ void Preferences::loadProperties(void)
 {
   initSourceStates();
   updateFields();
+  mverifyPeer = static_cast<Qt::CheckState>(msettings->value(DONT_VERIFY_SSL_PEER_KEY).toInt()),
+      mverifyPeerChkBx->setCheckState(mverifyPeer);
 }
 
 void Preferences::updateFields(void)

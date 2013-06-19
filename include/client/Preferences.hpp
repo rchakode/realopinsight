@@ -58,6 +58,7 @@ public:
   static const qint32 ShowHelp;
   static const qint32 ShowAbout;
   static const QString DONT_VERIFY_SSL_PEER_KEY;
+  static const QString DONT_VERIFY_SSL_PEER_KEY;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();
@@ -89,6 +90,9 @@ private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   qint32 m_action;
+
+
+  QGridLayout* mmainLayout;
 
   Settings* m_settings;
   QBitArray* m_sourceStates;

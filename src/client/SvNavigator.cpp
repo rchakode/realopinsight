@@ -336,7 +336,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
-          cnode->severity = MonitorBroker::Unknown;
+      cnode->severity = MonitorBroker::Unknown;
       m_cdata->check_status_count[cnode->severity]+=1;
       continue;
     }
@@ -626,6 +626,9 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
   }
 }
 
+  mznsHelper->setSslConf(!msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool());
+  mzbxHelper->setSslConf(!msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool());
+  qDebug() << msettings->value(Preferences::DONT_VERIFY_SSL_PEER_KEY).toBool();
 void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
 {
   auto node = m_cdata->bpnodes.find(_nodeId);

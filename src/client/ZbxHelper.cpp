@@ -43,6 +43,7 @@ ZbxHelper::ZbxHelper(const QString & baseUrl)
   m_reqHandler->setRawHeader("Content-Type", "application/json");
   m_reqHandler->setUrl(QUrl(m_apiUri));
 
+
 }
 
 ZbxHelper::~ZbxHelper()
@@ -112,5 +113,9 @@ void ZbxHelper::setSslConfig(bool verifyPeer)
     m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);
   } else {
     m_sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
+  }
+    sslConf->setPeerVerifyMode(QSslSocket::VerifyPeer);
+  } else {
+    sslConf->setPeerVerifyMode(QSslSocket::QueryPeer);
   }
 }
