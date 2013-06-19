@@ -67,6 +67,7 @@ public:
   static const QString OP_PASSWD_KEY;
   static const QString SERVER_PASS_KEY;
   static const QString USE_MKLS_KEY;
+  static const QString DONT_VERIFY_SSL_PEER_KEY;
 
   Preferences(const qint32 & _userRole = Auth::OpUserRole, const qint32 & _action = Preferences::ChangePassword);
   virtual ~Preferences();
@@ -88,7 +89,11 @@ protected :
 private:
   qint32 muserRole;
   Qt::CheckState museMkls;
+  Qt::CheckState mverifyPeer;
+
   Settings* msettings;
+
+  QGridLayout* mmainLayout;
   QLineEdit* monitorUrlField;
   QSpinBox* mupdateIntervalField;
   QPushButton *mbrwBtn;
@@ -104,7 +109,7 @@ private:
   ImageButton* mdonateBtn;
   QCheckBox* mshowAuthInfoChkbx;
   QCheckBox* museMklsChkbx;
-  QGridLayout* mmainLayout;
+  QCheckBox* mverifyPeerChkBx;
 
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);

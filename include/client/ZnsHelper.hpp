@@ -59,6 +59,7 @@ public:
   inline QString getApiContextUrl(void) const {return mapiBaseUrl+ZNS_API_CONTEXT;}
   inline QString getApiBaseUrl(void) const {return mapiBaseUrl;}
   inline static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
+  void setSslConf(bool verifyPeer);
 
 public slots:
   inline void processError(const QNetworkReply::NetworkError& code) {if(code <200 && code >599) emit propagateError(code);}
@@ -69,6 +70,7 @@ signals:
 private :
   QString mapiBaseUrl;
   QNetworkRequest* mrequestHandler;
+  QSslConfiguration* sslConf;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */
