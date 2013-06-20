@@ -37,7 +37,8 @@ ZnsHelper::ZnsHelper(const QString& baseUrl)
     m_apiBaseUrl(baseUrl),
     m_reqHandler(new QNetworkRequest()),
     m_evlHandler(new QEventLoop(this)),
-    m_isLogged(false)
+    m_isLogged(false),
+    m_sslConfig(new QSslConfiguration())
 {
   m_reqHandler->setUrl(QUrl(m_apiBaseUrl+ZNS_API_CONTEXT));
 }
@@ -46,7 +47,7 @@ ZnsHelper::~ZnsHelper()
 {
   delete m_reqHandler;
   delete m_evlHandler;
-  delete sslConf;
+  delete m_sslConfig;
 }
 
 void ZnsHelper::setBaseUrl(const QString& url)
@@ -59,7 +60,7 @@ QNetworkReply* ZnsHelper::postRequest(const qint32& reqType, const QByteArray& d
 {
   m_reqHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, data);
-  reply->setSslConfiguration(*sslConf);
+  reply->setSslConfiguration(*m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
   m_evlHandler->exec();
@@ -122,9 +123,9 @@ RequestListT ZnsHelper::routers()
 void ZnsHelper::setSslConf(bool verifyPeer)
 {
   if (verifyPeer) {
-    sslConf->setPeerVerifyMode(QSslSocket::VerifyPeer);
+    m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);
   } else {
-    sslConf->setPeerVerifyMode(QSslSocket::QueryPeer);
+    m_sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
   }
 }
 

@@ -86,9 +86,11 @@ private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   Qt::CheckState m_useMkls;
-  Qt::CheckState mverifyPeer;
+  Qt::CheckState m_verifySslPeer;
 
   Settings* m_settings;
+  QBitArray* m_sourceStates;
+
   QLineEdit* m_monitorUrlField;
   QComboBox* m_monitorTypeField;
   QSpinBox* m_updateIntervalField;
@@ -106,9 +108,8 @@ private:
   ImageButton* m_donateBtn;
   QCheckBox* m_showAuthInfoChkbx;
   QCheckBox* m_useMklsChkbx;
-  QBitArray* m_sourceStates;
   QList<qint8> m_updatedSources;
-  QCheckBox* mverifyPeerChkBx;
+  QCheckBox* m_verifySslPeerChkBx;
 
   void addEvents(void);
   QGroupBox* createScktGrp(void);

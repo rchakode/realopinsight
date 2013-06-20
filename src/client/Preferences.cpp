@@ -45,6 +45,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_mainLayout (new QGridLayout(this)),
     m_userRole(_userRole),
     m_settings(new Settings()),
+    m_sourceStates(new QBitArray(MAX_SRCS)),
     m_monitorUrlField(new QLineEdit()),
     m_monitorTypeField(new QComboBox()),
     m_updateIntervalField(new QSpinBox()),
@@ -62,15 +63,15 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_donateBtn(new ImageButton(":images/built-in/donate.png")),
     m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     m_useMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
-    m_sourceStates(new QBitArray(MAX_SRCS))
-    mverifyPeerChkBx(new QCheckBox(tr("Don't verify SSL peer")))
+    m_verifySslPeerChkBx(new QCheckBox(tr("Don't verify SSL peer (https)")))
 {
-  qint32 line = -1;
   m_oldPwdField->setEchoMode(QLineEdit::Password);
   m_pwdField->setEchoMode(QLineEdit::Password);
   m_rePwdField->setEchoMode(QLineEdit::Password);
   m_serverPassField->setEchoMode(QLineEdit::Password);
   m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
+
+  qint32 line = -1;
   switch (_action)
   {
     case Preferences::ChangeMonitoringSettings:
@@ -99,7 +100,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
         m_serverPassField->setEnabled(false);
         m_showAuthInfoChkbx->setEnabled(false);
         m_useMklsChkbx->setEnabled(false);
-        mverifyPeerChkBx->setEnabled(false);
+        m_verifySslPeerChkBx->setEnabled(false);
       }
       break;
     case Preferences::ChangePassword:
@@ -143,6 +144,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
 
 Preferences::~Preferences()
 {
+  delete m_sourceStates;
   delete m_monitorTypeField;
   delete m_monitorUrlField;
   delete m_updateIntervalField;
@@ -159,10 +161,9 @@ Preferences::~Preferences()
   delete m_serverPassField;
   delete m_donateBtn;
   delete m_showAuthInfoChkbx;
-  delete m_useMklsChkbx; 
-  delete mverifyPeerChkBx;
+  delete m_useMklsChkbx;
+  delete m_verifySslPeerChkBx;
   delete m_mainLayout;
-  delete m_sourceStates;
 }
 
 
@@ -253,6 +254,8 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
   src.use_ls = m_useMklsChkbx->checkState();
+  src.verify_ssl_peer = m_verifySslPeerChkBx->checkState();
+  qDebug() << src.verify_ssl_peer;
   m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   m_sourceStates->setBit(_idx, true);
@@ -350,7 +353,8 @@ QGroupBox* Preferences::createCommonGrp(void)
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
       lyt->addWidget(m_monitorTypeField, line, 2);
- // lyt->addWidget(mverifyPeerChkBx, line, 2);
+  line++,
+      lyt->addWidget(m_verifySslPeerChkBx, line, 0, 1, 3, Qt::AlignCenter);
   line++,
       lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
       lyt->addWidget(m_serverPassField, line, 1),
@@ -380,11 +384,10 @@ void Preferences::loadProperties(void)
   m_sockAddrField->setText(src.ls_addr);
   m_sockPortField->setText(QString::number(src.ls_port));
   m_serverPassField->setText(src.auth);
-  m_useMkls = static_cast<Qt::CheckState>(src.use_ls);
-  m_useMklsChkbx->setCheckState(m_useMkls);
-      museMklsChkbx->setCheckState(museMkls);
-  mverifyPeer = static_cast<Qt::CheckState>(msettings->value(DONT_VERIFY_SSL_PEER_KEY).toInt()),
-      mverifyPeerChkBx->setCheckState(mverifyPeer);
+  m_useMkls = static_cast<Qt::CheckState>(src.use_ls),
+      m_useMklsChkbx->setCheckState(m_useMkls);
+  m_verifySslPeer = static_cast<Qt::CheckState>(src.verify_ssl_peer),
+      m_verifySslPeerChkBx->setCheckState(m_verifySslPeer);
 }
 
 QString Preferences::style() {

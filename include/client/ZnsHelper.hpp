@@ -75,9 +75,9 @@ signals:
 private :
   QString m_apiBaseUrl;
   QNetworkRequest* m_reqHandler;
-  QSslConfiguration* sslConf;
   QEventLoop* m_evlHandler;
   bool m_isLogged;
+  QSslConfiguration* m_sslConfig;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

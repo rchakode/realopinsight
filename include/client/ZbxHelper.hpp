@@ -71,7 +71,7 @@ private :
   QEventLoop* m_evlHandler;
   bool m_isLogged;
   QString m_auth;
-  QSslConfiguration* sslConf;
+  QSslConfiguration* m_sslConfig;
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

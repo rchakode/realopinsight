@@ -248,13 +248,16 @@ QString utils::source2Str(const SourceT& src)
                  "\"mon_url\":\"%4\","
                  "\"ls_addr\":\"%5\","
                  "\"ls_port\":\"%6\","
-                 "\"auth\":\"%7\"}").arg(src.id,
-                                         QString::number(src.mon_type),
-                                         QString::number(src.use_ls),
-                                         src.mon_url,
-                                         src.ls_addr,
-                                         QString::number(src.ls_port),
-                                         src.auth);
+                 "\"auth\":\"%7\","
+                 "\"verify_ssl_peer\":\"%8\""
+                 "}").arg(src.id,
+                          QString::number(src.mon_type),
+                          QString::number(src.use_ls),
+                          src.mon_url,
+                          src.ls_addr,
+                          QString::number(src.ls_port),
+                          src.auth,
+                          QString::number(src.verify_ssl_peer));
 }
 
 qint32 utils::convert2ApiType(const QString& str)

@@ -47,12 +47,9 @@ namespace {
 
 StringMapT SvNavigator::propRules() {
   StringMapT map;
-  map.insert(PropRules::label(PropRules::Unchanged),
-             PropRules::toString(PropRules::Unchanged));
-  map.insert(PropRules::label(PropRules::Decreased),
-             PropRules::toString(PropRules::Decreased));
-  map.insert(PropRules::label(PropRules::Increased),
-             PropRules::toString(PropRules::Increased));
+  map.insert(PropRules::label(PropRules::Unchanged), PropRules::toString(PropRules::Unchanged));
+  map.insert(PropRules::label(PropRules::Decreased), PropRules::toString(PropRules::Decreased));
+  map.insert(PropRules::label(PropRules::Increased), PropRules::toString(PropRules::Increased));
   return map;
 }
 
@@ -120,61 +117,6 @@ SvNavigator::~SvNavigator()
   unloadMenus();
 }
 
-void SvNavigator::loadMenus(void)
-{
-  QMenuBar* menuBar = new QMenuBar();
-  QToolBar* toolBar = addToolBar(APP_NAME);
-  m_menus["FILE"] = menuBar->addMenu(tr("&File")),
-      m_subMenus["Refresh"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
-      m_subMenus["Capture"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/camera.png"),tr("&Save Map as Image"));
-  m_menus["FILE"]->addSeparator(),
-      m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
-      m_subMenus["Capture"]->setShortcut(QKeySequence::Save),
-      m_subMenus["Refresh"]->setShortcut(QKeySequence::Refresh),
-      m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
-  m_menus["CONSOLE"] = menuBar->addMenu(tr("&Console")),
-      m_subMenus["ZoomIn"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Map Zoom &In")),
-      m_subMenus["ZoomOut"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Map Zoom &Out")),
-      m_subMenus["HideChart"] = m_menus["CONSOLE"]->addAction(tr("Hide &Chart")),
-      m_subMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn),
-      m_subMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
-  m_menus["CONSOLE"]->addSeparator(),
-      m_subMenus["FullScreen"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
-      m_subMenus["FullScreen"]->setCheckable(true);
-  m_menus["CONSOLE"]->addSeparator(),
-      m_subMenus["TroubleView"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/alert-circle.png"),tr("&Show only trouble messages")),
-      m_subMenus["TroubleView"]->setCheckable(true),
-      m_subMenus["IncreaseMsgFont"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/incr-font-size.png"),tr("&Increase message &font")),
-      m_subMenus["IncreaseMsgFont"]->setCheckable(true);
-  m_menus["PREFERENCES"] = menuBar->addMenu(tr("&Preferences")),
-      m_subMenus["ChangePassword"] = m_menus["PREFERENCES"]->addAction(tr("Change &Password")),
-      m_subMenus["ChangeMonitoringSettings"] = m_menus["PREFERENCES"]->addAction(QIcon(":images/built-in/system-preferences.png"),tr("&Monitoring Settings")),
-      m_subMenus["ChangeMonitoringSettings"]->setShortcut(QKeySequence::Preferences);
-  m_menus["BROWSER"] = menuBar->addMenu(tr("&Browser")),
-      m_subMenus["BrowserBack"] = m_menus["BROWSER"]->addAction(QIcon(":images/built-in/browser-back.png"),tr("Bac&k")),
-      m_subMenus["BrowserForward"] = m_menus["BROWSER"]->addAction(QIcon(":images/built-in/browser-forward.png"),tr("For&ward"));
-  m_subMenus["BrowserStop"] = m_menus["BROWSER"]->addAction(QIcon(":images/built-in/browser-stop.png"),tr("Sto&p"));
-  m_menus["HELP"] = menuBar->addMenu(tr("&Help")),
-      m_subMenus["ShowOnlineResources"] = m_menus["HELP"]->addAction(tr("Online &Resources")),
-      m_menus["HELP"]->addSeparator(),
-      m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME)),
-      m_subMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  m_contextMenuList["FilterNodeRelatedMessages"] = m_nodeContextMenu->addAction(tr("&Filter related messages")),
-      m_contextMenuList["CenterOnNode"] = m_nodeContextMenu->addAction(tr("Center Graph &On")),
-      m_contextMenuList["Cancel"] = m_nodeContextMenu->addAction(tr("&Cancel"));
-  toolBar->setIconSize(QSize(16,16)),
-      toolBar->addAction(m_subMenus["Refresh"]),
-      toolBar->addAction(m_subMenus["ZoomIn"]),
-      toolBar->addAction(m_subMenus["ZoomOut"]),
-      toolBar->addAction(m_subMenus["Capture"]),
-      toolBar->addSeparator(),
-      toolBar->addAction(m_subMenus["BrowserBack"]),
-      toolBar->addAction(m_subMenus["BrowserForward"]),
-      toolBar->addAction(m_subMenus["BrowserStop"]),
-      toolBar->addSeparator(),
-      toolBar->addAction(m_subMenus["FullScreen"]);
-  QMainWindow::setMenuBar(menuBar);
-}
 
 void SvNavigator::closeEvent(QCloseEvent * event)
 {
@@ -202,14 +144,15 @@ void SvNavigator::runMonitor()
 {
   prepareUpdate();
   if (m_coreData->monitor == MonitorBroker::Auto) {
-    for (SourceListT::Iterator src=m_sources.begin(), end = m_sources.end();
-         src!=end; ++src) { runMonitor(*src); }
+    for (SourceListT::Iterator src=m_sources.begin(),end=m_sources.end(); src!=end; ++src) {
+      runMonitor(*src);
+    }
   } else {
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
       runMonitor(*src);
     } else {
-      utils::alert("You haven't the default parameters yet");
+      utils::alert(tr("The default source is not yet"));
     }
   }
   finalizeUpdate();
@@ -250,7 +193,7 @@ void SvNavigator::load(const QString& _file)
   m_tree->clear();
   m_tree->addTopLevelItem(m_coreData->tree_items[SvNavigatorTree::RootId]);
   m_map->load(parser.getDotGraphFile(), m_coreData->bpnodes, m_coreData->cnodes);
-  this->resizeDashboard();
+  resizeDashboard();
   QMainWindow::show();
   m_map->scaleToFitViewPort();
   m_trayIcon->show();
@@ -964,7 +907,7 @@ void SvNavigator::openRpcSessions(void)
 void SvNavigator::openRpcSession(int srcId)
 {
   SourceListT::Iterator src = m_sources.find(srcId);
-  if (src == m_sources.end()) {
+  if (src != m_sources.end()) {
     switch (src->mon_type) {
       case MonitorBroker::Zabbix:
         src->zbx_handler->setIsLogged(false);
@@ -975,7 +918,6 @@ void SvNavigator::openRpcSession(int srcId)
       default:
         break;
     }
-    return;
   }
   openRpcSession(*src);
 }
@@ -1060,8 +1002,8 @@ void SvNavigator::requestZbxZnsData(SourceT& src) {
                                                             .toAscii());
         processZbxReply(reply, src);
       }
-    }
       break;
+    }
     default:
       break;
   }
@@ -1077,22 +1019,22 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
   }
   switch (_code) {
     case QNetworkReply::RemoteHostClosedError:
-      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("The connection has been closed by the remote host"));
+      m_lastErrorMsg = "The connection has been closed by the remote host";
       break;
     case QNetworkReply::HostNotFoundError:
-      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Host not found"));
+      m_lastErrorMsg = "Host not found";
       break;
     case QNetworkReply::ConnectionRefusedError:
-      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Connection refused"));
+      m_lastErrorMsg = "Connection refused";
       break;
     case QNetworkReply::SslHandshakeFailedError:
-      mlastErrorMsg = tr("SSL Handshake failed");
+      m_lastErrorMsg = tr("SSL Handshake failed");
       break;
     case QNetworkReply::TimeoutError:
-      mlastErrorMsg = tr("Timeout exceeded");
+      m_lastErrorMsg = tr("Timeout exceeded");
       break;
     default:
-      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Unknown error: code %1").arg(_code));
+      m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Unknown error, code %1").arg(_code));
   }
   updateDashboardOnUnknown();
 }
@@ -1161,7 +1103,7 @@ void SvNavigator::resetSettings(void)
 {
   m_sources.clear();
   SourceT src;
-  for (int i= 0; i< MAX_SRCS; ++i) {
+  for (int i=0; i< MAX_SRCS; ++i) {
     if (m_preferences->isSetSource(i)) {
       m_settings->loadSource(i, src);
       allocSourceHandler(src);
@@ -1169,7 +1111,7 @@ void SvNavigator::resetSettings(void)
     }
   }
   resetInterval();
-  m_browser->setUrl(m_sources[0].mon_url); //FIXME: mbrowser->setUrl
+  m_browser->setUrl(m_sources[0].mon_url); //FIXME: m_browser->setUrl(m_sources[0].mon_url);
 }
 
 void SvNavigator::resetInterval()
@@ -1240,6 +1182,63 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
     }
   }
   runMonitor();
+}
+
+
+void SvNavigator::loadMenus(void)
+{
+  QMenuBar* menuBar = new QMenuBar();
+  QToolBar* toolBar = addToolBar(APP_NAME);
+  m_menus["FILE"] = menuBar->addMenu(tr("&File")),
+      m_subMenus["Refresh"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
+      m_subMenus["Capture"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/camera.png"),tr("&Save Map as Image"));
+  m_menus["FILE"]->addSeparator(),
+      m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
+      m_subMenus["Capture"]->setShortcut(QKeySequence::Save),
+      m_subMenus["Refresh"]->setShortcut(QKeySequence::Refresh),
+      m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
+  m_menus["CONSOLE"] = menuBar->addMenu(tr("&Console")),
+      m_subMenus["ZoomIn"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Map Zoom &In")),
+      m_subMenus["ZoomOut"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Map Zoom &Out")),
+      m_subMenus["HideChart"] = m_menus["CONSOLE"]->addAction(tr("Hide &Chart")),
+      m_subMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn),
+      m_subMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
+  m_menus["CONSOLE"]->addSeparator(),
+      m_subMenus["FullScreen"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/fullscreen.png"),tr("&Full Screen")),
+      m_subMenus["FullScreen"]->setCheckable(true);
+  m_menus["CONSOLE"]->addSeparator(),
+      m_subMenus["TroubleView"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/alert-circle.png"),tr("&Show only trouble messages")),
+      m_subMenus["TroubleView"]->setCheckable(true),
+      m_subMenus["IncreaseMsgFont"] = m_menus["CONSOLE"]->addAction(QIcon(":images/built-in/incr-font-size.png"),tr("&Increase message &font")),
+      m_subMenus["IncreaseMsgFont"]->setCheckable(true);
+  m_menus["PREFERENCES"] = menuBar->addMenu(tr("&Preferences")),
+      m_subMenus["ChangePassword"] = m_menus["PREFERENCES"]->addAction(tr("Change &Password")),
+      m_subMenus["ChangeMonitoringSettings"] = m_menus["PREFERENCES"]->addAction(QIcon(":images/built-in/system-preferences.png"),tr("&Monitoring Settings")),
+      m_subMenus["ChangeMonitoringSettings"]->setShortcut(QKeySequence::Preferences);
+  m_menus["BROWSER"] = menuBar->addMenu(tr("&Browser")),
+      m_subMenus["BrowserBack"] = m_menus["BROWSER"]->addAction(QIcon(":images/built-in/browser-back.png"),tr("Bac&k")),
+      m_subMenus["BrowserForward"] = m_menus["BROWSER"]->addAction(QIcon(":images/built-in/browser-forward.png"),tr("For&ward"));
+  m_subMenus["BrowserStop"] = m_menus["BROWSER"]->addAction(QIcon(":images/built-in/browser-stop.png"),tr("Sto&p"));
+  m_menus["HELP"] = menuBar->addMenu(tr("&Help")),
+      m_subMenus["ShowOnlineResources"] = m_menus["HELP"]->addAction(tr("Online &Resources")),
+      m_menus["HELP"]->addSeparator(),
+      m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME)),
+      m_subMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  m_contextMenuList["FilterNodeRelatedMessages"] = m_nodeContextMenu->addAction(tr("&Filter related messages")),
+      m_contextMenuList["CenterOnNode"] = m_nodeContextMenu->addAction(tr("Center Graph &On")),
+      m_contextMenuList["Cancel"] = m_nodeContextMenu->addAction(tr("&Cancel"));
+  toolBar->setIconSize(QSize(16,16)),
+      toolBar->addAction(m_subMenus["Refresh"]),
+      toolBar->addAction(m_subMenus["ZoomIn"]),
+      toolBar->addAction(m_subMenus["ZoomOut"]),
+      toolBar->addAction(m_subMenus["Capture"]),
+      toolBar->addSeparator(),
+      toolBar->addAction(m_subMenus["BrowserBack"]),
+      toolBar->addAction(m_subMenus["BrowserForward"]),
+      toolBar->addAction(m_subMenus["BrowserStop"]),
+      toolBar->addSeparator(),
+      toolBar->addAction(m_subMenus["FullScreen"]);
+  QMainWindow::setMenuBar(menuBar);
 }
 
 void SvNavigator::addEvents(void)

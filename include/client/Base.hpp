@@ -288,12 +288,13 @@ typedef QHash<QString, GEdgeT> GEdgeListT;
 
 struct SourceT {
   QString id;
-  qint32 mon_type;
+  qint8 mon_type;
   QString mon_url;
-  qint32 use_ls;
+  qint8 use_ls;
   QString ls_addr;
   qint32 ls_port;
   QString auth;
+  qint8 verify_ssl_peer;
   std::shared_ptr<ZmqSocket> d4n_handler;
   std::shared_ptr<LsHelper> ls_handler;
   std::shared_ptr<ZbxHelper> zbx_handler;
