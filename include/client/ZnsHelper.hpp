@@ -63,7 +63,7 @@ public:
   static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
   void setIsLogged(bool state) {m_isLogged = state;}
   bool getIsLogged(void) const {return m_isLogged;}  
-  void setSslConf(bool verifyPeer);
+  void setSslConfig(bool verifyPeer);
 
 
 public slots:

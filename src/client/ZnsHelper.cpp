@@ -120,7 +120,7 @@ RequestListT ZnsHelper::routers()
   return list;
 }
 
-void ZnsHelper::setSslConf(bool verifyPeer)
+void ZnsHelper::setSslConfig(bool verifyPeer)
 {
   if (verifyPeer) {
     m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);

@@ -151,6 +151,7 @@ private:
   QTabWidget* newMsgConsole();
   void resetSettings(void);
   void resetInterval(void);
+  QString getAddrFromSourceAdrr(const QString& srcaddr, const QString& srcid);
 };
 
 #endif /* SVNAVIGATOR_HPP */

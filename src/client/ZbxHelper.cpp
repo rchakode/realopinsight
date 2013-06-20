@@ -105,7 +105,7 @@ RequestListT ZbxHelper::requestsPatterns()
   return patterns;
 }
 
-void ZbxHelper::setSslConf(bool verifyPeer)
+void ZbxHelper::setSslConfig(bool verifyPeer)
 {
   if (verifyPeer) {
     m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);

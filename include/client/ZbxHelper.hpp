@@ -55,7 +55,7 @@ public:
   bool getIsLogged(void) const {return m_isLogged;}  
   void setAuth(const QString& auth) {m_auth = auth;}
   QString getAuth(void) const {return m_auth;}
-  void setSslConf(bool verifyPeer);
+  void setSslConfig(bool verifyPeer);
 
 
 public slots:

@@ -190,17 +190,12 @@ void Preferences::applySettings(void)
 void Preferences::addAsSource(void)
 {
   int bucket = 1;
-  while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {bucket++;}
+  while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {
+    bucket++;
+  }
 
-  int target = -1;
-  QString srcType;
-
-  if (bucket < MAX_SRCS) {
-    srcType = selectSourceType();
-    if (!srcType.isEmpty()) {
-      target = bucket;
-    }
-  } else {
+  if (bucket >= MAX_SRCS) {
+    bucket = -1;
     bool ok =  false;
     QString srcId = QInputDialog::getItem(this,
                                           tr("Replace source | %1").arg(APP_NAME),
@@ -211,15 +206,13 @@ void Preferences::addAsSource(void)
                                           false,
                                           &ok);
     if (ok && !srcId.isEmpty()) {
-      srcType = selectSourceType();
-      if (!srcType.isEmpty()) {
-        target =  srcId.toInt();
-      }
+      bucket =  srcId.toInt();
     }
   }
 
-  if (target >= 0) {
-    saveAsSource(target, srcType);
+  if (bucket >= 0) {
+    QString srcType = selectSourceType();
+    saveAsSource(bucket, srcType);
   }
 }
 
@@ -254,8 +247,7 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
   src.use_ls = m_useMklsChkbx->checkState();
-  src.verify_ssl_peer = m_verifySslPeerChkBx->checkState();
-  qDebug() << src.verify_ssl_peer;
+  src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
   m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   m_sourceStates->setBit(_idx, true);
@@ -345,13 +337,13 @@ QGroupBox* Preferences::createScktGrp(void)
 
 QGroupBox* Preferences::createCommonGrp(void)
 {
-  m_monitorTypeField->addItems(utils::sourceTypes());
-  QGroupBox* bx(new QGroupBox(tr("Common Settings")));
   QGridLayout* lyt(new QGridLayout());
   int line;
   line = 0,
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
+      m_monitorTypeField->addItem(tr("Select source type")),
+      m_monitorTypeField->addItems(utils::sourceTypes()),
       lyt->addWidget(m_monitorTypeField, line, 2);
   line++,
       lyt->addWidget(m_verifySslPeerChkBx, line, 0, 1, 3, Qt::AlignCenter);
@@ -361,10 +353,14 @@ QGroupBox* Preferences::createCommonGrp(void)
       lyt->addWidget(m_showAuthInfoChkbx, line, 2);
   line++,
       lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
+      m_updateIntervalField->setMinimum(5),
+      m_updateIntervalField->setMaximum(1200),
       lyt->addWidget(m_updateIntervalField, line, 1),
       lyt->addWidget(new QLabel(tr("seconds")), line, 2);
   lyt->setColumnStretch(0, 0);
   lyt->setColumnStretch(1, 1);
+
+  QGroupBox* bx(new QGroupBox(tr("Common Settings")));
   bx->setFlat(false);
   bx->setLayout(lyt);
   bx->setAlignment(Qt::AlignLeft);
@@ -373,21 +369,21 @@ QGroupBox* Preferences::createCommonGrp(void)
 
 void Preferences::loadProperties(void)
 {
-  m_updateIntervalField->setMinimum(5);
-  m_updateIntervalField->setMaximum(1200);
-  m_updateIntervalField->setValue(m_settings->getUpdateInterval());
+  SourceT src;
 
   initSourceStates();
-  SourceT src;
+
   m_settings->loadSource(0, src);
   m_monitorUrlField->setText(src.mon_url);
   m_sockAddrField->setText(src.ls_addr);
   m_sockPortField->setText(QString::number(src.ls_port));
   m_serverPassField->setText(src.auth);
+  m_monitorTypeField->setCurrentIndex(src.mon_type+1);
   m_useMkls = static_cast<Qt::CheckState>(src.use_ls),
       m_useMklsChkbx->setCheckState(m_useMkls);
-  m_verifySslPeer = static_cast<Qt::CheckState>(src.verify_ssl_peer),
+  m_verifySslPeer = src.verify_ssl_peer? Qt::Unchecked : Qt::Checked,
       m_verifySslPeerChkBx->setCheckState(m_verifySslPeer);
+  m_updateIntervalField->setValue(m_settings->getUpdateInterval());
 }
 
 QString Preferences::style() {

@@ -144,7 +144,8 @@ void SvNavigator::runMonitor()
 {
   prepareUpdate();
   if (m_coreData->monitor == MonitorBroker::Auto) {
-    for (SourceListT::Iterator src=m_sources.begin(),end=m_sources.end(); src!=end; ++src) {
+    for (SourceListT::Iterator src=m_sources.begin(),end=m_sources.end();
+         src!=end; ++src) {
       runMonitor(*src);
     }
   } else {
@@ -469,8 +470,10 @@ void SvNavigator::finalizeUpdate(const bool& enable)
     resetInterval();
     m_timer = startTimer(m_interval);
     if (m_updateSucceed) updateStatusBar(tr("Update completed"));
-    for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
-         cnode != end; ++cnode) {
+    for (NodeListIteratorT cnode = m_coreData->cnodes.begin(),
+         end = m_coreData->cnodes.end();
+         cnode != end; ++cnode)
+    {
       if (!cnode->monitored) {
         cnode->check = utils::getUnknownService(MonitorBroker::Unknown, cnode->child_nodes);
         computeStatusInfo(cnode);
@@ -483,6 +486,7 @@ void SvNavigator::finalizeUpdate(const bool& enable)
   }
   //FIXME: Do this while avoiding searching at each update
   if (!m_coreData->bpnodes.isEmpty()) updateTrayInfo(m_coreData->bpnodes[SvNavigatorTree::RootId]);
+  m_lastErrorMsg.clear();
   QMainWindow::setEnabled(enable);
 }
 
@@ -951,13 +955,14 @@ void SvNavigator::openRpcSession(SourceT& src)
     case MonitorBroker::Zabbix: {
       src.zbx_handler->setBaseUrl(src.mon_url);
       authParams.push_back(QString::number(ZbxHelper::Login));
+      src.zbx_handler->setSslConfig(src.verify_ssl_peer);
       QNetworkReply* reply = src.zbx_handler->postRequest(ZbxHelper::Login, authParams);
       processZbxReply(reply, src);
       if (src.zbx_handler->getIsLogged()) {
-        // Get API version
+        // The get API version
         QStringList params;
-        //FIXME: to be testd -> params.push_back(src.zbx_handler->getAuth());
         params.push_back(QString::number(ZbxHelper::ApiVersion));
+        src.zbx_handler->setSslConfig(src.verify_ssl_peer);
         reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
         processZbxReply(reply, src);
       }
@@ -969,6 +974,7 @@ void SvNavigator::openRpcSession(SourceT& src)
       znsUrlParams.addQueryItem("__ac_password", authParams[1]);
       znsUrlParams.addQueryItem("submitted", "true");
       znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
+      src.zns_handler->setSslConfig(src.verify_ssl_peer);
       QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
       processZnsReply(reply, src);
     }
@@ -983,30 +989,38 @@ void SvNavigator::requestZbxZnsData(SourceT& src) {
   updateStatusBar(tr("Updating..."));
   switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
-      int trid = src.zbx_handler->getTrid();
-      foreach (const QString& host, m_coreData->hosts.keys()) {
-        QStringList params;
-        params.push_back(host);
-        params.push_back(QString::number(trid));
-        QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
-        processZbxReply(reply, src);
+      /* First check that we're logged */
+      if (src.zbx_handler->getIsLogged()) {
+        int trid = src.zbx_handler->getTrid();
+        foreach (const QString& hitem, m_coreData->hosts.keys()) {
+          QStringList params;
+          params.push_back(getAddrFromSourceAdrr(hitem, src.id));
+          params.push_back(QString::number(trid));
+          QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
+          processZbxReply(reply, src);
+        }
       }
       break;
     }
     case MonitorBroker::Zenoss: {
-      src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
-      foreach (const QString& host, m_coreData->hosts.keys()) {
-        QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
-                                                            ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                                                            .arg(host, QString::number(ZnsHelper::Device))
-                                                            .toAscii());
-        processZbxReply(reply, src);
+      /* First check that we're logged */
+      if (src.zns_handler->getIsLogged()) {
+        src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
+        foreach (const QString& hitem, m_coreData->hosts.keys()) {
+          QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
+                                                              ZnsHelper::ReqPatterns[ZnsHelper::Device]
+                                                              .arg(getAddrFromSourceAdrr(hitem, src.id),
+                                                                   QString::number(ZnsHelper::Device))
+                                                              .toAscii());
+          processZnsReply(reply, src);
+        }
       }
       break;
     }
     default:
       break;
   }
+  // finalizeUpdate();
 }
 
 void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const SourceT& src)
@@ -1057,7 +1071,6 @@ void SvNavigator::updateDashboardOnUnknown()
   }
   m_lastErrorMsg.clear();
   m_coreData->check_status_count[MonitorBroker::Unknown] = m_coreData->cnodes.size();
-  finalizeUpdate(enable);
 }
 
 void SvNavigator::updateTrayInfo(const NodeT& _node)
@@ -1184,6 +1197,17 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
   runMonitor();
 }
 
+QString SvNavigator::getAddrFromSourceAdrr(const QString& srcaddr, const QString& srcid)
+{
+  QString host;
+  int pos = srcaddr.indexOf(srcid+":");
+  if (pos == -1) {
+    host = srcaddr;
+  } else {
+    host = srcaddr.mid(pos, -1);
+  }
+  return host;
+}
 
 void SvNavigator::loadMenus(void)
 {
