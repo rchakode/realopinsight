@@ -268,7 +268,6 @@ void SvNavigator::toggleIncreaseMsgFont(bool _toggled)
 }
 
 
-
 void SvNavigator::runNagiosUpdate(int srcId)
 {
   SourceListT::Iterator src = m_sources.find(srcId);
@@ -284,7 +283,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
 {
   CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
 
-  /* connection is carried out in open session */
+  /* Check if the handler is connected */
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
       utils::alert(tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial()));
@@ -300,8 +299,9 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   }
 
   /* Now start doing the job */
-  for (NodeListIteratorT cnode = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
-       cnode != end; ++cnode)
+  for (NodeListIteratorT cnode=m_coreData->cnodes.begin(),
+       end=m_coreData->cnodes.end();
+       cnode!=end;++cnode)
   {
     if (cnode->child_nodes == "") {
       cnode->severity = MonitorBroker::Unknown;
@@ -333,7 +333,6 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
 }
 
 
-
 void SvNavigator::runLivestatusUpdate(int srcId)
 {
   SourceListT::Iterator src = m_sources.find(srcId);
@@ -346,7 +345,7 @@ void SvNavigator::runLivestatusUpdate(int srcId)
 
 void SvNavigator::runLivestatusUpdate(const SourceT& src)
 {
-  /* Note that connection is achieved in open session */
+  /* Check if the handler is connected */
   if (!src.ls_handler->isConnected()) {
     m_updateSucceed = false;
     m_lastErrorMsg = src.ls_handler->errorString();
@@ -355,24 +354,21 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
   }
 
   CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
-  QHashIterator<QString, QStringList> hit(m_coreData->hosts);
-  while (hit.hasNext()) {
-    hit.next();
-    QString host = hit.key();
-    if (src.ls_handler->loadHostData(host)) {
-      foreach (const QString& item, hit.value()) {
-        QString cid;
-        if (item == "ping") {
-          cid = host;
-        } else {
-          cid = ID_PATTERN.arg(host).arg(item);
+  QHashIterator<QString, QStringList> hostit(m_coreData->hosts);
+  while (hostit.hasNext()) {
+    hostit.next();
+    QString key = getAddrFromSourceAdrr(hostit.key(), src.id);
+    if (src.ls_handler->loadHostData(key)) {
+      foreach (const QString& value, hostit.value()) {
+        if (value != "ping") {
+          key = ID_PATTERN.arg(key).arg(value);
         }
         CheckListCstIterT chkit;
-        if (src.ls_handler->findCheck(cid, chkit)) {
+        if (src.ls_handler->findCheck(key, chkit)) {
           updateCNodes(*chkit);
         } else {
-          invalidCheck.id = cid.toStdString();
-          invalidCheck.alarm_msg = tr("Service not found (%1)").arg(cid).toStdString();
+          invalidCheck.id = key.toStdString();
+          invalidCheck.alarm_msg = tr("Service not found (%1)").arg(key).toStdString();
           updateCNodes(invalidCheck);
         }
       }
@@ -1057,9 +1053,7 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
 void SvNavigator::updateDashboardOnUnknown()
 {
   m_updateSucceed = false;
-  bool enable = false;
   if (!m_lastErrorMsg.isEmpty()) {
-    enable = true;
     utils::alert(m_lastErrorMsg);
     updateStatusBar(m_lastErrorMsg);
   }
