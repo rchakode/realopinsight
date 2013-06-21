@@ -1,0 +1,583 @@
+<ServiceView id="root">
+	<Service id="root" type="0" statusCalcRule="0">
+		<Name>Hosting Platform</Name>
+		<Parent></Parent>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S044014198,S044105216,S203346228,S231853830</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S154545828" type="0" statusCalcRule="0">
+		<Name>itsoftbyrc.com</Name>
+		<Parent>S044014198</Parent>
+		<Icon>--> Web Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S154643802,S154659138,S073824371</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232626659" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S232211380</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>vsphere02/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S000321136" type="1" statusCalcRule="0">
+		<Name>xmlrpc</Name>
+		<Parent>S232250597</Parent>
+		<Icon>Other Check</Icon>
+		<Description>OpenNebula Frontend server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S205551217" type="1" statusCalcRule="0">
+		<Name>Backbone Router</Name>
+		<Parent>S044105216</Parent>
+		<Icon>--> Switch</Icon>
+		<Description>Backend switch. Cisco Nexus 1000V</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232250597" type="0" statusCalcRule="0">
+		<Name>nebula-server</Name>
+		<Parent>S231853830</Parent>
+		<Icon>Server</Icon>
+		<Description>OpenNebula Frontend server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232630635,S232705693,S000321136</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181551014" type="1" statusCalcRule="0">
+		<Name>Avalability</Name>
+		<Parent>S154643802</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S073757810" type="1" statusCalcRule="-1">
+		<Name>database</Name>
+		<Parent>S153132715</Parent>
+		<Icon>--> Database Engine</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S153201106" type="0" statusCalcRule="0">
+		<Name>OS</Name>
+		<Parent>S153132715</Parent>
+		<Icon>--> Linux OS</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S181349742,S181426068,S181448973</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232540042" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S231948216</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen01/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S205249475" type="1" statusCalcRule="0">
+		<Name>Storage FC Fabric</Name>
+		<Parent>S044105216</Parent>
+		<Icon>--> Switch</Icon>
+		<Description>Fiber chanel storage fabric</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>linksys-srw224p/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S144743409" type="0" statusCalcRule="0">
+		<Name>mysql</Name>
+		<Parent>S144634279</Parent>
+		<Icon>--> Database Engine</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181611135" type="1" statusCalcRule="0">
+		<Name>Memory Usage</Name>
+		<Parent>S154643802</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com/Memory Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232601251" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S232019113</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen02/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S233056819" type="1" statusCalcRule="0">
+		<Name>badlen</Name>
+		<Parent>S231920128</Parent>
+		<Icon>--> Logfile</Icon>
+		<Description>number of corrupted RPC requests received by server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232630635" type="1" statusCalcRule="0">
+		<Name>oned</Name>
+		<Parent>S232250597</Parent>
+		<Icon>--> Process</Icon>
+		<Description>OpenNebula Frontend server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nebula-front/oned alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232847967" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S231920128</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nfs-serv/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S153132715" type="0" statusCalcRule="0">
+		<Name>ngrt4n.com</Name>
+		<Parent>S044014198</Parent>
+		<Icon>--> Web Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S153201106,S153210146,S073757810</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S215929662" type="0" statusCalcRule="-1">
+		<Name>fcfiler-master</Name>
+		<Parent>S215856045</Parent>
+		<Icon>--> Storage Area</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232705693" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S232250597</Parent>
+		<Icon>Other Check</Icon>
+		<Description>OpenNebula Frontend server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nfs-serv/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232622219" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S232045850</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>vsphere01/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S203346228" type="0" statusCalcRule="0">
+		<Name>Storage</Name>
+		<Parent>root</Parent>
+		<Icon>Storage</Icon>
+		<Description>Storage Systems</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S110454830,S215856045</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181426068" type="1" statusCalcRule="-1">
+		<Name>Load</Name>
+		<Parent>S153201106</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/Current Load</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232616083" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S232038066</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm02/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S073824371" type="1" statusCalcRule="-1">
+		<Name>database</Name>
+		<Parent>S154545828</Parent>
+		<Icon>--> Database Engine</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S044014198" type="0" statusCalcRule="0">
+		<Name>Web</Name>
+		<Parent>root</Parent>
+		<Icon>--> Web Accessibility</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S153132715,S154545828</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181448973" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S153201106</Parent>		
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S205210189" type="0" statusCalcRule="0">
+		<Name>Mysql Container 02</Name>
+		<Parent>S110454830</Parent>		
+		<Icon>--> Database Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S205408462,S205425078</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232045850" type="0" statusCalcRule="0">
+		<Name>vsphere01</Name>
+		<Parent>S220857086</Parent>	
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232622219</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S233042914" type="1" statusCalcRule="0">
+		<Name>timeout</Name>
+		<Parent>S231920128</Parent>
+		<Icon>--> Logfile</Icon>
+		<Description>number of calls that timed out on client</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S154659138" type="1" statusCalcRule="0">
+		<Name>www</Name>
+		<Parent>S154545828</Parent>
+		<Icon>Other Check</Icon>
+		<Description>Microsoft IIS server</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S231920128" type="0" statusCalcRule="0">
+		<Name>nfs-server</Name>
+		<Parent>S231853830s</Parent>
+		<Icon>Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232842975,S232847967,S233025410,S233042914,S233056819</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S205425078" type="0" statusCalcRule="0">
+		<Name>mysql</Name>
+		<Parent>S205210189</Parent>
+		<Icon>--> Database Engine</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232031777" type="0" statusCalcRule="0">
+		<Name>kvm01</Name>
+		<Parent>S220857086</Parent>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232512298,S232612395</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232038066" type="0" statusCalcRule="0">
+		<Name>kvm02</Name>
+		<Parent>S220857086</Parent>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232525850,S232616083</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S154643802" type="0" statusCalcRule="0">
+		<Name>OS</Name>
+		<Parent>S154545828</Parent>
+		<Icon>--> Windows OS</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S181551014,S181611135,S181629167</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S144734896" type="1" statusCalcRule="0">
+		<Name>db-host01</Name>
+		<Parent>S144634279</Parent>
+		<Icon>--> Linux OS</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232605330" type="1" statusCalcRule="0">
+		<Name>xend</Name>
+		<Parent>S232019113</Parent>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen02/xend alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232211380" type="0" statusCalcRule="0">
+		<Name>vsphere02</Name>
+		<Parent>S220857086</Parent>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232626659</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S231948216" type="0" statusCalcRule="0">
+		<Name>xen01</Name>
+		<Parent>S220857086</Parent>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232532458,S232540042</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232525850" type="1" statusCalcRule="0">
+		<Name>libvirtd</Name>
+		<Parent>S232038066</Parent>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm02/libvirtd alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S220857086" type="0" statusCalcRule="1">
+		<Name>VMM Hosts</Name>
+		<Parent>S231853830</Parent>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232211380,S232045850,S232038066,S232031777,S232019113,S231948216</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S153210146" type="1" statusCalcRule="0">
+		<Name>www</Name>
+		<Parent>S153132715</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/HTTP</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232019113" type="0" statusCalcRule="0">
+		<Name>xen02</Name>
+		<Parent>S220857086</Parent>
+		<Icon>--> Hypervisor</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S232601251,S232605330</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232612395" type="1" statusCalcRule="0">
+		<Name>Availability</Name>
+		<Parent>S232031777</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm01/PING</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S233025410" type="1" statusCalcRule="0">
+		<Name>badcalls</Name>
+		<Parent>S231920128</Parent>
+		<Icon>--> Logfile</Icon>
+		<Description>number of RPC call failures by client</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S044105216" type="0" statusCalcRule="0">
+		<Name>Network</Name>
+		<Parent>root</Parent>
+		<Icon>Network</Icon>
+		<Description>Network devices</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S205551217,S205249475</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181349742" type="1" statusCalcRule="-1">
+		<Name>Swap Usage</Name>
+		<Parent>S153201106</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.ngrt4n.com/Swap Usage</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S215943966" type="0" statusCalcRule="-1">
+		<Name>fcfiler-slave</Name>
+		<Parent>S215856045</Parent>
+		<Icon>--> Storage Area</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S232512298" type="1" statusCalcRule="0">
+		<Name>libvirtd</Name>
+		<Parent>S232031777</Parent>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>kvm01/libvirtd alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232532458" type="1" statusCalcRule="0">
+		<Name>xend</Name>
+		<Parent>S231948216</Parent>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>xen01/xend alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S232842975" type="1" statusCalcRule="0">
+		<Name>rpc.nfsd</Name>
+		<Parent>S231920128</Parent>
+		<Icon>--> Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>nfs-serv/nfsd alive</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S110454830" type="0" statusCalcRule="1">
+		<Name>Database</Name>
+		<Parent>S203346228</Parent>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S144634279,S205210189</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S181629167" type="1" statusCalcRule="-1">
+		<Name>Load</Name>
+		<Parent>S154643802</Parent>
+		<Icon>Other Check</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>www.itsoftbyrc.com/Uptime</SubServices>
+		<Status>4</Status>
+	</Service>
+	<Service id="S205408462" type="0" statusCalcRule="0">
+		<Name>db-host02</Name>
+		<Parent>S205210189</Parent>
+		<Icon>--> Linux OS</Icon>
+		<Description>Oracle database server
+OS: Linux Red-Hat 5</Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices></SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S231853830" type="0" statusCalcRule="0">
+		<Name>Virtual Infrastructure</Name>
+		<Parent>root</Parent>
+		<Icon>Cloud</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S231920128,S232250597,S220857086</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S215856045" type="0" statusCalcRule="1">
+		<Name>Filers</Name>
+		<Parent></Parent>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S215929662,S215943966</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+	<Service id="S144634279" type="0" statusCalcRule="0">
+		<Name>Mysql Container 01</Name>
+		<Parent>S110454830</Parent>
+		<Icon>--> Database Server</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>S144734896,S144743409</SubServices>
+		<PropagationRule></PropagationRule>
+	</Service>
+</ServiceView>

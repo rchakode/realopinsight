@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<messages>
+  <message id="service.tree.title">Platform Tree</message>
+  <message id="service.map.title">Platform Map</message>
+  <message id="msg.panel.title">Messages</message>
+  <message id="refresh.menu.text">Refresh</message>
+  <message id="zoom.in">Zoom in</message>
+  <message id="zoom.out">Zoom out</message>
+  <message id="save.map.menu.text">Save map</message>
+  <message id="help.text">Help</message>
+  <message id="disconnect.text">Logout</message>
+  <message id="config.file.doesnot.exist">{1} doesn't exist!!!</message>
+  <message id="invalid.config.file">Invalid configuration file!!!</message>
+  <message id="bad.definition.non.root.service"> Invalid configuration: no parent for a non-root service. </message>
+  <message id="bad.definition.non.probe.service"> Invalid configuration while defining a alarm for a non-probing service. </message>
+  <message id="unable.to.build.view">Unable to build the {1} models from the configuration.</message>
+</messages>
