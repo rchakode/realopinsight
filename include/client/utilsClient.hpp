@@ -83,7 +83,8 @@ namespace utils {
   CheckT getUnknownService(int status, const QString& sid);
   QStringList sourceTypes(void);
   QStringList sourceIndexes(void);
-  QPair<QString, QString> splitCheckInfo(const QString& chkid);
+  QPair<QString, QString> splitCheckInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
+  QPair<QString, QString> splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
   QString getHostFromSourceStr(const QString& str);
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);

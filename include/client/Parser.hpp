@@ -38,7 +38,7 @@ public:
   ~Parser();
 
   bool parseSvConfig(const QString &, CoreDataT &);
-  QString getDotGraphFile(void) const { return graphFilename; }
+  QString getDotGraphFile(void) const { return graphFilename;}
   static const QString CHILD_SEP;
 
 private:

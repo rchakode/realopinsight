@@ -311,13 +311,30 @@ QStringList utils::sourceIndexes(void)
                        << "9";
 }
 
-QPair<QString, QString> utils::splitCheckInfo(const QString& chkid)
-{
-  int pos = chkid.indexOf("/");
-  QString right = ((pos == -1)? "ping" : chkid.mid(pos+1));
 
-  return QPair<QString, QString>(chkid.left(pos), right);
+/* return <[sourcei:]hostaddr, checkid> */
+QPair<QString, QString> utils::splitCheckInfo(const QString& info)
+{
+  int pos = info.indexOf("/");
+  QString second = ((pos == -1)? "ping" : info.mid(pos+1));
+
+  return QPair<QString, QString>(info.left(pos), second);
 }
+
+
+/* return <source, hostaddr> */
+QPair<QString, QString> utils::splitSourceHostInfo(const QString& info)
+{
+  int pos = info.indexOf(":");
+  QString first;
+  if (pos == -1) {
+    first = SRC_BASENAME%"0";
+    return QPair<QString, QString>(first, info);
+  }
+
+  return QPair<QString, QString>(info.left(pos), info.mid(pos+1));
+}
+
 
 QString utils::getSourceIdFromStr(const QString& str)
 {

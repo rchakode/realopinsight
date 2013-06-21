@@ -300,7 +300,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   /* Now start doing the job */
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
        end=m_cdata->cnodes.end();
-       cnode!=end;++cnode)
+       cnode!=end; ++cnode)
   {
     if (cnode->child_nodes == "") {
       cnode->severity = MonitorBroker::Unknown;
@@ -308,26 +308,29 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
       continue;
     }
 
-    QStringList ids = cnode->child_nodes.split(Parser::CHILD_SEP);
-    foreach (const QString& cid, ids) {
-      QString msg = src.auth%":"%cid;
-      if (m_updateSucceed) {
-        src.d4n_handler->send(msg.toStdString());
-        JsonHelper jsHelper(src.d4n_handler->recv());
-        qint32 ret = jsHelper.getProperty("return_code").toInt32();
-        cnode->check.status = (ret!=0)? MonitorBroker::NagiosUnknown : jsHelper.getProperty("status").toInt32();
-        cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-        cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
-        cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-        cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
-      } else {
-        cnode->check = invalidCheck;
-      }
-      cnode->monitored = true;
-      computeStatusInfo(cnode);
-      updateDashboard(cnode);
-      ++(m_cdata->check_status_count[cnode->severity]);
+    QPair<QString, QString> info = utils::splitSourceHostInfo(cnode->child_nodes);
+    if (! info.first.isEmpty() &&
+        ! cnode->child_nodes.startsWith(src.id)) {
+      continue;
     }
+
+    QString msg = src.auth%":"%info.second;
+    if (m_updateSucceed) {
+      src.d4n_handler->send(msg.toStdString());
+      JsonHelper jsHelper(src.d4n_handler->recv());
+      qint32 ret = jsHelper.getProperty("return_code").toInt32();
+      cnode->check.status = (ret!=0)? MonitorBroker::NagiosUnknown : jsHelper.getProperty("status").toInt32();
+      cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
+      cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
+      cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
+      cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+    } else {
+      cnode->check = invalidCheck;
+    }
+    cnode->monitored = true;
+    computeStatusInfo(cnode);
+    updateDashboard(cnode);
+    ++(m_cdata->check_status_count[cnode->severity]);
   }
 }
 
@@ -356,17 +359,18 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
-    QString key = utils::getHostFromSourceStr(hostit.key());
-    if (src.ls_handler->loadHostData(key)) {
+    QPair<QString, QString> info = utils::splitSourceHostInfo(hostit.key());
+    if (src.ls_handler->loadHostData(info.second)) {
       foreach (const QString& value, hostit.value()) {
+        QString key;
         if (value != "ping") {
-          key = ID_PATTERN.arg(key).arg(value);
+          key = ID_PATTERN.arg(info.second).arg(value);
         }
         CheckListCstIterT chkit;
         if (src.ls_handler->findCheck(key, chkit)) {
           updateCNodes(*chkit);
         } else {
-          invalidCheck.id = key.toStdString();
+          invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
           invalidCheck.alarm_msg = tr("Service not found (%1)").arg(key).toStdString();
           updateCNodes(invalidCheck);
         }
