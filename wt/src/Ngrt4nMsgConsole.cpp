@@ -5,7 +5,7 @@
  *      Author: chakode
  */
 
-#include "include/Ngrt4nMsgConsole.hpp"
+#include "Ngrt4nMsgConsole.hpp"
 
 Ngrt4nMsgConsole::Ngrt4nMsgConsole()
 : WTableView(0),

@@ -15,9 +15,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include "include/Ngrt4nDashboard.hpp"
-#include "include/Ngrt4nConfigParser.hpp"
-#include "include/Ngrt4nCoreDataStructures.hpp"
+#include "Ngrt4nDashboard.hpp"
+#include "Ngrt4nConfigParser.hpp"
+#include "Ngrt4nCoreDataStructures.hpp"
 
 Ngrt4nDashboard::Ngrt4nDashboard(const WEnvironment& env)
 : WApplication(env),

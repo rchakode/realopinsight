@@ -16,9 +16,9 @@
 #include <Wt/WMenu>
 #include <Wt/WMenuItem>
 #include <Wt/WStackedWidget>
-#include "include/Ngrt4nServiceTree.hpp"
-#include "include/Ngrt4nMsgConsole.hpp"
-#include "include/Ngrt4nServiceMap.hpp"
+#include "Ngrt4nServiceTree.hpp"
+#include "Ngrt4nMsgConsole.hpp"
+#include "Ngrt4nServiceMap.hpp"
 #include <Wt/WLocalizedStrings>
 
 using namespace Wt ;

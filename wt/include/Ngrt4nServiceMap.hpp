@@ -14,7 +14,7 @@
 #include <Wt/WObject>
 #include <Wt/WLength>
 #include <Wt/WSignal>
-#include "include/Ngrt4nCoreDataStructures.hpp"
+#include "Ngrt4nCoreDataStructures.hpp"
 
 using namespace Wt ;
 

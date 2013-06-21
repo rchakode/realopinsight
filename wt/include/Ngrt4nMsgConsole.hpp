@@ -11,8 +11,8 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 #include <Wt/WSortFilterProxyModel>
-#include "include/Ngrt4nCoreDataStructures.hpp"
-#include "include/Ngrt4nConfigParser.hpp"
+#include "Ngrt4nCoreDataStructures.hpp"
+#include "Ngrt4nConfigParser.hpp"
 #include <boost/any.hpp>
 using namespace Wt ;
 

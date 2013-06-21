@@ -5,7 +5,7 @@
  *      Author: chakode
  */
 
-#include "include/Ngrt4nConfigParser.hpp"
+#include "Ngrt4nConfigParser.hpp"
 #include <fstream>
 
 

@@ -13,7 +13,7 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 #include <Wt/WModelIndex>
-#include "include/Ngrt4nCoreDataStructures.hpp"
+#include "Ngrt4nCoreDataStructures.hpp"
 
 using namespace Wt ;
 

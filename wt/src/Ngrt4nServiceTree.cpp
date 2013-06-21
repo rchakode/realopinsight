@@ -5,7 +5,7 @@
  *      Author: chakode
  */
 
-#include "include/Ngrt4nServiceTree.hpp"
+#include "Ngrt4nServiceTree.hpp"
 
 Ngrt4nServiceTree::Ngrt4nServiceTree()
 : WTreeView(0),

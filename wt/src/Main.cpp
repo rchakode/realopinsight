@@ -1,4 +1,4 @@
-#include "include/Ngrt4nDashboard.hpp"
+#include "Ngrt4nDashboard.hpp"
 
 WApplication *createApplication(const WEnvironment& env)
 {

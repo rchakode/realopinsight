@@ -15,7 +15,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
-#include <include/Ngrt4nCoreDataStructures.hpp>
+#include "Ngrt4nCoreDataStructures.hpp"
 #include <boost/lexical_cast.hpp>
 
 
