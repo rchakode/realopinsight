@@ -26,6 +26,7 @@
 #include "utilsClient.hpp"
 #include <QFileInfo>
 
+
 QString utils::criticityToText(const qint32& _status)
 {
   switch(static_cast<MonitorBroker::SeverityT>(_status))
@@ -309,3 +310,48 @@ QStringList utils::sourceIndexes(void)
                        << "8"
                        << "9";
 }
+
+QPair<QString, QString> utils::splitCheckInfo(const QString& chkid)
+{
+  int pos = chkid.indexOf("/");
+  QString right = ((pos == -1)? "ping" : chkid.mid(pos+1));
+
+  return QPair<QString, QString>(chkid.left(pos), right);
+}
+
+QString utils::getSourceIdFromStr(const QString& str)
+{
+  QString srcid = "";
+  int pos = str.indexOf(":");
+  if (pos != -1) {
+    srcid = str.mid(0, pos);
+  }
+  return srcid;
+}
+
+QString utils::getHostFromSourceStr(const QString& str)
+{
+  QString host;
+  int pos = str.indexOf(":");
+  if (pos == -1) {
+    host = str;
+  } else {
+    host = str.mid(pos+1, -1);
+  }
+  return host;
+}
+
+QPair<bool, int> utils::checkSourceId(const QString &id)
+{
+  int index = -1;
+  bool valid = false;
+  if (! id.isEmpty()) {
+    QString idStr = id.at(id.size()-1);
+    if (id == SRC_BASENAME%idStr) {
+      valid = true;
+      index = idStr.toInt();
+    }
+  }
+  return QPair<bool, int>(valid, index);
+}
+

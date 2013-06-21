@@ -38,10 +38,6 @@ class SvCreator: public QMainWindow
   Q_OBJECT
 
 public:
-  static const QString NagiosCompatibleFormat;
-  static const QString ZabbixCompatibleFormat;
-  static const QString ZenossCompatibleFormat;
-
   SvCreator(const qint32& _userRole = Auth::OpUserRole);
   virtual ~SvCreator();
   void load( const QString&);

@@ -36,7 +36,6 @@
 #include <QObject>
 #include <zmq.h>
 #include <iostream>
-#include <locale>
 
 
 namespace {
@@ -67,7 +66,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
                          const QString& _config,
                          QWidget* parent)
   : QMainWindow(parent),
-    m_coreData (new CoreDataT()),
+    m_cdata (new CoreDataT()),
     m_configFile(_config),
     m_userRole (_userRole),
     m_settings (new Settings()),
@@ -108,7 +107,7 @@ SvNavigator::~SvNavigator()
   delete m_tree;
   delete m_browser;
   delete m_map;
-  delete m_coreData;
+  delete m_cdata;
   delete m_viewPanel;
   delete m_rightSplitter;
   delete m_mainSplitter;
@@ -144,7 +143,7 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 void SvNavigator::runMonitor()
 {
   prepareUpdate();
-  if (m_coreData->monitor == MonitorBroker::Auto) {
+  if (m_cdata->monitor == MonitorBroker::Auto) {
     for (SourceListT::Iterator src=m_sources.begin(),end=m_sources.end();
          src!=end; ++src) {
       runMonitor(*src);
@@ -191,10 +190,10 @@ void SvNavigator::load(const QString& _file)
   m_activeFile = m_configFile;
   QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_configFile));
   Parser parser;
-  parser.parseSvConfig(m_configFile, *m_coreData);
+  parser.parseSvConfig(m_configFile, *m_cdata);
   m_tree->clear();
-  m_tree->addTopLevelItem(m_coreData->tree_items[SvNavigatorTree::RootId]);
-  m_map->load(parser.getDotGraphFile(), m_coreData->bpnodes, m_coreData->cnodes);
+  m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
+  m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
   resizeDashboard();
   QMainWindow::show();
   m_map->scaleToFitViewPort();
@@ -248,7 +247,7 @@ void SvNavigator::toggleTroubleView(bool _toggled)
   if (m_showOnlyTroubles) {
     m_msgConsole->clearNormalMsg();
   } else {
-    for (auto it = m_coreData->cnodes.begin(), end = m_coreData->cnodes.end();
+    for (auto it = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
          it != end; ++it) m_msgConsole->updateNodeMsg(it);
     m_msgConsole->sortByColumn(1);
   }
@@ -274,7 +273,7 @@ void SvNavigator::runNagiosUpdate(int srcId)
   if (src != m_sources.end()) {
     runNagiosUpdate(*src);
   } else {
-    updateDashboardOnUnknown();
+    updateDashboardOnUnknown(*src);
   }
 }
 
@@ -299,13 +298,13 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   }
 
   /* Now start doing the job */
-  for (NodeListIteratorT cnode=m_coreData->cnodes.begin(),
-       end=m_coreData->cnodes.end();
+  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
+       end=m_cdata->cnodes.end();
        cnode!=end;++cnode)
   {
     if (cnode->child_nodes == "") {
       cnode->severity = MonitorBroker::Unknown;
-      ++(m_coreData->check_status_count[cnode->severity]);
+      ++(m_cdata->check_status_count[cnode->severity]);
       continue;
     }
 
@@ -327,7 +326,7 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
       cnode->monitored = true;
       computeStatusInfo(cnode);
       updateDashboard(cnode);
-      ++(m_coreData->check_status_count[cnode->severity]);
+      ++(m_cdata->check_status_count[cnode->severity]);
     }
   }
 }
@@ -339,7 +338,7 @@ void SvNavigator::runLivestatusUpdate(int srcId)
   if (src != m_sources.end()) {
     runLivestatusUpdate(*src);
   } else {
-    updateDashboardOnUnknown();
+    updateDashboardOnUnknown(*src);
   }
 }
 
@@ -349,15 +348,15 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
   if (!src.ls_handler->isConnected()) {
     m_updateSucceed = false;
     m_lastErrorMsg = src.ls_handler->errorString();
-    updateDashboardOnUnknown();
+    updateDashboardOnUnknown(src);
     return;
   }
 
   CheckT invalidCheck = utils::getUnknownService(MonitorBroker::Unknown, "");
-  QHashIterator<QString, QStringList> hostit(m_coreData->hosts);
+  QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
-    QString key = getAddrFromSourceAdrr(hostit.key(), src.id);
+    QString key = utils::getHostFromSourceStr(hostit.key());
     if (src.ls_handler->loadHostData(key)) {
       foreach (const QString& value, hostit.value()) {
         if (value != "ping") {
@@ -380,11 +379,11 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
 void SvNavigator::prepareUpdate(void)
 {
   QMainWindow::setEnabled(false);
-  m_coreData->check_status_count[MonitorBroker::Normal] = 0;
-  m_coreData->check_status_count[MonitorBroker::Minor] = 0;
-  m_coreData->check_status_count[MonitorBroker::Major] = 0;
-  m_coreData->check_status_count[MonitorBroker::Critical] = 0;
-  m_coreData->check_status_count[MonitorBroker::Unknown] = 0;
+  m_cdata->check_status_count[MonitorBroker::Normal] = 0;
+  m_cdata->check_status_count[MonitorBroker::Minor] = 0;
+  m_cdata->check_status_count[MonitorBroker::Major] = 0;
+  m_cdata->check_status_count[MonitorBroker::Critical] = 0;
+  m_cdata->check_status_count[MonitorBroker::Unknown] = 0;
   m_updateSucceed = true;
 }
 
@@ -443,12 +442,12 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 
 void SvNavigator::updateCNodes(const CheckT& check)
 {
-  for (NodeListIteratorT cnode = m_coreData->cnodes.begin();
-       cnode != m_coreData->cnodes.end(); ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin();
+       cnode != m_cdata->cnodes.end(); ++cnode) {
     if (cnode->child_nodes.toLower() == QString::fromStdString(check.id).toLower()) {
       cnode->check = check;
       computeStatusInfo(cnode);
-      ++(m_coreData->check_status_count[cnode->severity]);
+      ++(m_cdata->check_status_count[cnode->severity]);
       updateDashboard(cnode);
       cnode->monitored = true;
     }
@@ -457,9 +456,9 @@ void SvNavigator::updateCNodes(const CheckT& check)
 
 void SvNavigator::finalizeUpdate(const bool& enable)
 {
-  if (!m_coreData->cnodes.isEmpty()) {
+  if (!m_cdata->cnodes.isEmpty()) {
     Chart *chart = new Chart;
-    QString chartdDetails = chart->update(m_coreData->check_status_count, m_coreData->cnodes.size());
+    QString chartdDetails = chart->update(m_cdata->check_status_count, m_cdata->cnodes.size());
     m_map->updateStatsPanel(chart);
     if (m_chart) delete m_chart; m_chart = chart; m_chart->setToolTip(chartdDetails);
     m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
@@ -467,14 +466,14 @@ void SvNavigator::finalizeUpdate(const bool& enable)
     resetInterval();
     m_timer = startTimer(m_interval);
     if (m_updateSucceed) updateStatusBar(tr("Update completed"));
-    for (NodeListIteratorT cnode = m_coreData->cnodes.begin(),
-         end = m_coreData->cnodes.end();
+    for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
+         end = m_cdata->cnodes.end();
          cnode != end; ++cnode)
     {
       if (!cnode->monitored) {
         cnode->check = utils::getUnknownService(MonitorBroker::Unknown, cnode->child_nodes);
         computeStatusInfo(cnode);
-        ++(m_coreData->check_status_count[cnode->severity]);
+        ++(m_cdata->check_status_count[cnode->severity]);
         updateDashboard(cnode);
         cnode->monitored = true;
       }
@@ -482,7 +481,7 @@ void SvNavigator::finalizeUpdate(const bool& enable)
     }
   }
   //FIXME: Do this while avoiding searching at each update
-  if (!m_coreData->bpnodes.isEmpty()) updateTrayInfo(m_coreData->bpnodes[SvNavigatorTree::RootId]);
+  if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
   m_lastErrorMsg.clear();
   QMainWindow::setEnabled(enable);
 }
@@ -495,11 +494,11 @@ void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node)
 void SvNavigator::computeStatusInfo(NodeT& _node)
 {
   QRegExp regexp;
-  _node.severity = utils::computeCriticity(m_coreData->monitor, _node.check.status);
+  _node.severity = utils::computeCriticity(m_cdata->monitor, _node.check.status);
   _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
   if (_node.check.host == "-") return;
-  if (m_coreData->monitor == MonitorBroker::Zabbix) {
+  if (m_cdata->monitor == MonitorBroker::Zabbix) {
     regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME);
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
     regexp.setPattern(MsgConsole::TAG_ZABBIX_HOSTNAME2);
@@ -523,7 +522,7 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
     regexp.setPattern(MsgConsole::TAG_CHECK);
     _node.actual_msg.replace(regexp, info[1]);
   }
-  if (m_coreData->monitor == MonitorBroker::Nagios) {
+  if (m_cdata->monitor == MonitorBroker::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
       regexp.setPattern(MsgConsole::TAG_THERESHOLD);
@@ -537,13 +536,13 @@ void SvNavigator::computeStatusInfo(NodeT& _node)
 void SvNavigator::updateBpNode(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (!utils::findNode(m_coreData, _nodeId, node)) return;
+  if (!utils::findNode(m_cdata, _nodeId, node)) return;
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
   Criticity criticity;
   foreach (const QString& nodeId, nodeIds) {
     NodeListT::iterator child;
-    if (!utils::findNode(m_coreData, nodeId, child)) continue;
+    if (!utils::findNode(m_cdata, nodeId, child)) continue;
     Criticity cst(static_cast<MonitorBroker::SeverityT>(child->prop_sev));
     if (node->sev_crule == CalcRules::WeightedCriticity) {
       criticity = criticity / cst;
@@ -575,8 +574,8 @@ void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, cons
 
 void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
 {
-  auto tnode_it = m_coreData->tree_items.find(_node.id);
-  if (tnode_it != m_coreData->tree_items.end()) {
+  auto tnode_it = m_cdata->tree_items.find(_node.id);
+  if (tnode_it != m_cdata->tree_items.end()) {
     (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.severity));
     (*tnode_it)->setToolTip(0, _tip);
   }
@@ -584,8 +583,8 @@ void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _ti
 
 void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
 {
-  auto node = m_coreData->bpnodes.find(_nodeId);
-  if (node == m_coreData->bpnodes.end()) return;
+  auto node = m_cdata->bpnodes.find(_nodeId);
+  if (node == m_cdata->bpnodes.end()) return;
   if (node->child_nodes != "") {
     QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
     foreach (const auto& cid, childNodes) {
@@ -605,7 +604,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
   if (m_filteredMsgConsole) delete m_filteredMsgConsole;
   m_filteredMsgConsole = new MsgConsole();
   NodeListT::iterator node;
-  if (utils::findNode(m_coreData, m_selectedNode, node)) {
+  if (utils::findNode(m_cdata, m_selectedNode, node)) {
     filterNodeRelatedMsg(m_selectedNode);
     QString title = tr("Messages related to '%2' - %1").arg(APP_NAME, node->name);
     m_filteredMsgConsole->updateEntriesSize(m_msgConsoleSize, true);
@@ -620,7 +619,7 @@ void SvNavigator::filterNodeRelatedMsg(void)
 void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (utils::findNode(m_coreData, _nodeId, node) &&
+  if (utils::findNode(m_cdata, _nodeId, node) &&
       node->child_nodes != "") {
     if (node->type == NodeType::ALARM_NODE) {
       m_filteredMsgConsole->updateNodeMsg(node);
@@ -714,7 +713,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
   m_lastErrorMsg = jsHelper.getProperty("error").property("data").toString();
   if (m_lastErrorMsg.isEmpty()) m_lastErrorMsg = jsHelper.getProperty("error").property("message").toString();
   if (!m_lastErrorMsg.isEmpty()) {
-    updateDashboardOnUnknown();
+    updateDashboardOnUnknown(src);
     return;
   }
   qint32 tid = jsHelper.getProperty("id").toInt32();
@@ -773,7 +772,7 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
     }
     default :
       m_lastErrorMsg = tr("Weird response received from the server");
-      updateDashboardOnUnknown();
+      updateDashboardOnUnknown(src);
       qDebug() << data;
       break;
   }
@@ -802,7 +801,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
     bool reqSucceed = result.property("success").toBool();
     if (!reqSucceed) {
       m_lastErrorMsg = tr("Authentication failed: %1").arg(result.property("msg").toString());
-      updateDashboardOnUnknown();
+      updateDashboardOnUnknown(src);
       return;
     }
     if (tid == ZnsHelper::Device) {
@@ -819,7 +818,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
         processZnsReply(reply, src);
 
         QString dname = ditem.property("name").toString();
-        if (m_coreData->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
+        if (m_cdata->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
           reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
                                                .arg(duid, QString::number(ZnsHelper::DeviceInfo))
@@ -870,7 +869,7 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
         updateCNodes(check);
       } else {
         m_lastErrorMsg = tr("Weird response received from the server");
-        updateDashboardOnUnknown();
+        updateDashboardOnUnknown(src);
       }
     }
   }
@@ -929,7 +928,7 @@ void SvNavigator::openRpcSession(SourceT& src)
   QStringList authParams = getAuthInfo(src.auth);
   if (authParams.size() != 2 && src.mon_type != MonitorBroker::Nagios) {
     m_lastErrorMsg = tr("Invalid authentication chain!\nMust follow the pattern login:password");
-    updateDashboardOnUnknown();
+    updateDashboardOnUnknown(src);
     return;
   }
   QUrl znsUrlParams;
@@ -989,9 +988,9 @@ void SvNavigator::requestZbxZnsData(SourceT& src) {
       /* First check that we're logged */
       if (src.zbx_handler->getIsLogged()) {
         int trid = src.zbx_handler->getTrid();
-        foreach (const QString& hitem, m_coreData->hosts.keys()) {
+        foreach (const QString& hitem, m_cdata->hosts.keys()) {
           QStringList params;
-          params.push_back(getAddrFromSourceAdrr(hitem, src.id));
+          params.push_back(utils::getHostFromSourceStr(hitem));
           params.push_back(QString::number(trid));
           QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
           processZbxReply(reply, src);
@@ -1003,10 +1002,10 @@ void SvNavigator::requestZbxZnsData(SourceT& src) {
       /* First check that we're logged */
       if (src.zns_handler->getIsLogged()) {
         src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
-        foreach (const QString& hitem, m_coreData->hosts.keys()) {
+        foreach (const QString& hitem, m_cdata->hosts.keys()) {
           QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                               ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                                                              .arg(getAddrFromSourceAdrr(hitem, src.id),
+                                                              .arg(utils::getHostFromSourceStr(hitem),
                                                                    QString::number(ZnsHelper::Device))
                                                               .toAscii());
           processZnsReply(reply, src);
@@ -1047,25 +1046,27 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
     default:
       m_lastErrorMsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("Unknown error, code %1").arg(_code));
   }
-  updateDashboardOnUnknown();
+  updateDashboardOnUnknown(src);
 }
 
-void SvNavigator::updateDashboardOnUnknown()
+void SvNavigator::updateDashboardOnUnknown(const SourceT& src)
 {
   m_updateSucceed = false;
   if (!m_lastErrorMsg.isEmpty()) {
     utils::alert(m_lastErrorMsg);
     updateStatusBar(m_lastErrorMsg);
   }
-  for (NodeListIteratorT cnode = m_coreData->cnodes.begin();
-       cnode != m_coreData->cnodes.end(); ++cnode) {
-    cnode->monitored = true;
-    cnode->check = utils::getUnknownService(MonitorBroker::Unknown, m_lastErrorMsg);
-    computeStatusInfo(cnode);
-    updateDashboard(cnode);
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin();
+       cnode != m_cdata->cnodes.end(); ++cnode) {
+    if (cnode->child_nodes.startsWith(src.id)) {
+      cnode->monitored = true;
+      cnode->check = utils::getUnknownService(MonitorBroker::Unknown, m_lastErrorMsg);
+      computeStatusInfo(cnode);
+      updateDashboard(cnode);
+      ++m_cdata->check_status_count[MonitorBroker::Unknown]; //FIXME: ++m_cdata->check_status_count[MonitorBroker::Unknown]
+    }
   }
   m_lastErrorMsg.clear();
-  m_coreData->check_status_count[MonitorBroker::Unknown] = m_coreData->cnodes.size();
 }
 
 void SvNavigator::updateTrayInfo(const NodeT& _node)
@@ -1079,7 +1080,7 @@ void SvNavigator::updateTrayInfo(const NodeT& _node)
              _node.severity == MonitorBroker::Major) {
     icon = QSystemTrayIcon::Warning;
   }
-  qint32 pbCount = m_coreData->cnodes.size() - m_coreData->check_status_count[MonitorBroker::Normal];
+  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[MonitorBroker::Normal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
@@ -1111,12 +1112,22 @@ void SvNavigator::resetSettings(void)
 {
   m_sources.clear();
   SourceT src;
-  for (int i=0; i< MAX_SRCS; ++i) {
-    if (m_preferences->isSetSource(i)) {
-      m_settings->loadSource(i, src);
-      allocSourceHandler(src);
-      m_sources.insert(i, src);
+  for (auto id = m_cdata->sources.begin(),
+       end = m_cdata->sources.end();
+       id!=end; ++id) {
+    QPair<bool, int> srcinfo = utils::checkSourceId(*id);
+    if (srcinfo.first) {
+      if (m_preferences->isSetSource(srcinfo.second) &&
+          m_settings->loadSource(*id, src) ) {
+        allocSourceHandler(src);
+        m_sources.insert(srcinfo.second, src);
+      } else {
+        utils::alert(tr("This source is not set (%1)").arg(*id));
+      }
+    } else {
+      utils::alert(tr("Could not handle this source (%1)").arg(*id));
     }
+
   }
   resetInterval();
   m_browser->setUrl(m_sources[0].mon_url); //FIXME: m_browser->setUrl(m_sources[0].mon_url);
@@ -1132,7 +1143,7 @@ void SvNavigator::resetInterval()
 void SvNavigator::allocSourceHandler(SourceT& src)
 {
   if (src.mon_type == MonitorBroker::Auto) {
-    src.mon_type = m_coreData->monitor;
+    src.mon_type = m_cdata->monitor;
   }
 
   switch (src.mon_type) {
@@ -1190,18 +1201,6 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
     }
   }
   runMonitor();
-}
-
-QString SvNavigator::getAddrFromSourceAdrr(const QString& srcaddr, const QString& srcid)
-{
-  QString host;
-  int pos = srcaddr.indexOf(srcid+":");
-  if (pos == -1) {
-    host = srcaddr;
-  } else {
-    host = srcaddr.mid(pos, -1);
-  }
-  return host;
 }
 
 void SvNavigator::loadMenus(void)

@@ -35,7 +35,9 @@ public:
   qint32 getUpdateInterval() const;
   void setEntry(const QString& key, const QString& value);
   QString getEntry(const QString& key) const {return QSettings::value(key).toString();}
-  void loadSource(const qint32& _idx, SourceT& _src);
+  bool loadSource(const qint32& _idx, SourceT& _src);
+  bool loadSource(const QString& _id, SourceT& _src);
+  bool setSource(const QString& _info, SourceT& _src);
 
 
   static const QString UPDATE_INTERVAL_KEY;

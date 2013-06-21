@@ -46,7 +46,7 @@ Parser::~Parser()
   dotFile.close();
 }
 
-bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
+bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
 {
   QString graphContent ="";
   QDomDocument xmlDoc;
@@ -66,7 +66,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
   file.close(); // The content of the file is already in memory
 
   xmlRoot = xmlDoc.documentElement();
-  _coreData.monitor = xmlRoot.attribute("monitor").toInt();
+  _cdata.monitor = xmlRoot.attribute("monitor").toInt();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
   NodeT node;
@@ -90,16 +90,23 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _coreData)
       node.icon = GraphView::DEFAULT_ICON;
     }
     if (node.type == NodeType::ALARM_NODE) {
-      int pos = node.child_nodes.indexOf("/");
-      QString host = node.child_nodes.left(pos);
-      _coreData.hosts[host] << ((pos == -1)?"ping" : node.child_nodes.mid(pos+1));
-      _coreData.cnodes.insert(node.id, node);
+
+      QPair<QString, QString> info = utils::splitCheckInfo(node.child_nodes);
+      QString srcid = utils::getSourceIdFromStr(info.first);
+      if (srcid.isEmpty()) {
+        _cdata.sources.insert(utils::sourceId(0));
+      } else {
+        _cdata.sources.insert(srcid);
+      }
+      _cdata.hosts[info.first] <<  info.second;
+      _cdata.cnodes.insert(node.id, node);
+
     } else {
-      _coreData.bpnodes.insert(node.id, node);
+      _cdata.bpnodes.insert(node.id, node);
     }
   }
-  updateNodeHierachy(_coreData.bpnodes, _coreData.cnodes, graphContent);
-  buildNodeTree(_coreData.bpnodes, _coreData.cnodes, _coreData.tree_items);
+  updateNodeHierachy(_cdata.bpnodes, _cdata.cnodes, graphContent);
+  buildNodeTree(_cdata.bpnodes, _cdata.cnodes, _cdata.tree_items);
   graphContent = dotFileHeader + graphContent;
   graphContent += dotFileFooter;
   saveCoordinatesFile(graphContent);

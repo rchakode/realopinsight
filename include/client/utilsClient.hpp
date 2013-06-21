@@ -30,6 +30,10 @@
 #include <QIcon>
 #include <unistd.h>
 
+namespace {
+  const QString SRC_BASENAME = "Source";
+}
+
 namespace utils {
 
   inline void delay(const qint32& d)
@@ -48,10 +52,13 @@ namespace utils {
   { return "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz"); }
 
   inline QString sourceId(const qint32& idx)
-  { return QString("Source%1").arg(QString::number(idx));}
+  { return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));}
 
   inline QString sourceKey(const qint32& idx)
   { return QString("/Sources/%1").arg(sourceId(idx));}
+
+  inline QString sourceKey(const QString& id)
+  { return QString("/Sources/%1").arg(id);}
 
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
@@ -76,6 +83,10 @@ namespace utils {
   CheckT getUnknownService(int status, const QString& sid);
   QStringList sourceTypes(void);
   QStringList sourceIndexes(void);
+  QPair<QString, QString> splitCheckInfo(const QString& chkid);
+  QString getHostFromSourceStr(const QString& str);
+  QString getSourceIdFromStr(const QString& str);
+  QPair<bool, int> checkSourceId(const QString& id);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

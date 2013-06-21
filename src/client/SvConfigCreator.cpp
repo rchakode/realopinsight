@@ -27,10 +27,12 @@
 #include "GraphView.hpp"
 #include "utilsClient.hpp"
 
-const QString SvCreator::NagiosCompatibleFormat="Nagios specific format(*.nag.ngrt4n.xml)";
-const QString SvCreator::ZabbixCompatibleFormat="Zabbix specific format(*.zbx.ngrt4n.xml)";
-const QString SvCreator::ZenossCompatibleFormat="Zenoss specific format(*.zns.ngrt4n.xml)";
-
+namespace {
+  const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
+  const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
+  const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
+  const QString MULTI_SOURCES ="Multiple sources (*.ms.ngrt4n.xml)";
+}
 SvCreator::SvCreator(const qint32& _userRole)
   : muserRole (_userRole),
     mhasLeftUpdates (false),
@@ -102,13 +104,15 @@ void SvCreator::load(const QString& _path)
 
 void SvCreator::open(void)
 {
-  QString path = QFileDialog::getOpenFileName(this,
-                                              tr("%1 | Select a configuration file").arg(APP_NAME),
-                                              ".",
-                                              tr("%1;;%2;;%3;;Xml files(*.xml);;All files(*)")
-                                              .arg(NagiosCompatibleFormat)
-                                              .arg(ZabbixCompatibleFormat)
-                                              .arg(ZenossCompatibleFormat));
+  QString path;
+  path = QFileDialog::getOpenFileName(this,
+                                      tr("%1 | Select target file").arg(APP_NAME),
+                                      ".",
+                                      tr("%1;;%2;;%3;;%4;;Xml files(*.xml);;All files(*)").arg(NAG_SOURCE,
+                                                                                               ZBX_SOURCE,
+                                                                                               ZNS_SOURCE,
+                                                                                               MULTI_SOURCES)
+                                      );
   if (!path.isNull() && !path.isEmpty()) loadFile(path);
 }
 
@@ -295,10 +299,10 @@ void SvCreator::saveAs(void)
   QString path = QFileDialog::getSaveFileName(this,
                                               tr("Select the destination file | %1").arg(APP_NAME),
                                               mactiveFile,
-                                              QString("%1;;%2;;%3;;")
-                                              .arg(NagiosCompatibleFormat)
-                                              .arg(ZabbixCompatibleFormat)
-                                              .arg(ZenossCompatibleFormat),
+                                              QString("%1;;%2;;%3;;%4;;").arg(NAG_SOURCE,
+                                                                          ZBX_SOURCE,
+                                                                          ZNS_SOURCE,
+                                                                          MULTI_SOURCES),
                                               &filter);
 
   if (path.isNull()) {
@@ -307,15 +311,18 @@ void SvCreator::saveAs(void)
     statusBar()->showMessage(msg);
   } else {
     QFileInfo fileInfo(path);
-    if (filter == ZabbixCompatibleFormat) {
+    if (filter == ZBX_SOURCE) {
       mcoreData->monitor = MonitorBroker::Zabbix;
       if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
-    } else if (filter == ZenossCompatibleFormat) {
+    } else if (filter == ZNS_SOURCE) {
       mcoreData->monitor = MonitorBroker::Zenoss;
       if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
-    } else {
+    } else if (filter == NAG_SOURCE){
       mcoreData->monitor = MonitorBroker::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
+    } else {
+      mcoreData->monitor = MonitorBroker::Auto;
+      if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
     recordData(path);
   }

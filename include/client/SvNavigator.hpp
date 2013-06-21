@@ -98,7 +98,7 @@ protected:
 
 
 private:
-  CoreDataT* m_coreData;
+  CoreDataT* m_cdata;
   QString m_configFile;
   QString m_activeFile;
   QString m_selectedNode;
@@ -147,12 +147,11 @@ private:
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
   void requestZbxZnsData(SourceT& src);
-  void updateDashboardOnUnknown();
+  void updateDashboardOnUnknown(const SourceT& src);
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();
   void resetSettings(void);
   void resetInterval(void);
-  QString getAddrFromSourceAdrr(const QString& srcaddr, const QString& srcid);
 };
 
 #endif /* SVNAVIGATOR_HPP */

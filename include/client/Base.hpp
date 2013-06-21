@@ -91,7 +91,7 @@ public:
       case Unchanged: return QObject::tr("Unchanged");
       case Decreased: return QObject::tr("Decreased");
       case Increased: return QObject::tr("Increased");
-      }
+    }
 
     return QObject::tr("Unchanged");
   }
@@ -160,7 +160,7 @@ public:
         if(_criticity.value == MonitorBroker::Critical)
           return _criticity;
         break;
-      }  //end switch
+    }  //end switch
 
     return Criticity(MonitorBroker::Unknown);
   }
@@ -204,7 +204,7 @@ public:
         //MonitorBroker::CRITICITY_UNKNOWN:
         //MonitorBroker::CRITICITY_HIGH:
         break;
-      }
+    }
 
     return Criticity(value);
   }
@@ -225,7 +225,7 @@ public:
         //MonitorBroker::CRITICITY_MINOR:
         //MonitorBroker::CRITICITY_UNKNOWN:
         break;
-      }
+    }
 
     return Criticity(value);
   }
@@ -270,6 +270,7 @@ struct CoreDataT {
   CheckStatusCountT check_status_count;
   HostListT hosts;
   TreeNodeItemListT tree_items;
+  QSet<QString> sources;
 };
 
 struct GNodeT {
