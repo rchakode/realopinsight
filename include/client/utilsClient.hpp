@@ -80,11 +80,11 @@ namespace utils {
   QString getWelcomeMsg(const QString& utility);
   QString source2Str(const SourceT& src);
   qint32 convert2ApiType(const QString& str);
-  CheckT getUnknownService(int status, const QString& sid);
+  void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
   QStringList sourceTypes(void);
   QStringList sourceIndexes(void);
-  QPair<QString, QString> splitCheckInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
-  QPair<QString, QString> splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
+  CheckIdInfoT splitHostCheckInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
+  CheckIdInfoT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
   QString getHostFromSourceStr(const QString& str);
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);

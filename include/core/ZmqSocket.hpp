@@ -27,7 +27,6 @@
 
 #include <string>
 #include <sstream>
-#include <QDebug>
 
 class ZmqSocket
 {

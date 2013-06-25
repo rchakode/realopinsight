@@ -32,19 +32,6 @@
 #include <QSettings>
 #include <memory>
 
-/* TODO: Logging
-#define LOGFILE QDir::tempPath()%"/realopinsight.log"
-#define SETUP_LOGGING() {\
-  QsLogging::Logger& logger = QsLogging::Logger::instance(); \
-  logger.setLoggingLevel(QsLogging::TraceLevel); \
-  const QString sLogPath = LOGFILE; \
-  QsLogging::DestinationPtr fileDestination(QsLogging::DestinationFactory::MakeFileDestination(sLogPath)); \
-  QsLogging::DestinationPtr debugDestination(QsLogging::DestinationFactory::MakeDebugOutputDestination()); \
-  logger.addDestination(debugDestination.get()); \
-  logger.addDestination(fileDestination.get()); \
-  }
-  */
-
 #define INIT_TRANSLATION \
   QTranslator translator; \
   translator.load(QString(":i18n/ngrt4n_%1").arg(QLocale::system().name())); \
@@ -311,4 +298,5 @@ typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
+typedef QPair<QString, QString> CheckIdInfoT;
 #endif /* BASE_HPP */

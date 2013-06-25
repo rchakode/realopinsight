@@ -91,7 +91,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
     }
     if (node.type == NodeType::ALARM_NODE) {
 
-      QPair<QString, QString> info = utils::splitCheckInfo(node.child_nodes);
+      QPair<QString, QString> info = utils::splitHostCheckInfo(node.child_nodes);
       QString srcid = utils::getSourceIdFromStr(info.first);
       if (srcid.isEmpty()) {
         _cdata.sources.insert(utils::sourceId(0));

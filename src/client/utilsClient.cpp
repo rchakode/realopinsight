@@ -280,15 +280,13 @@ qint32 utils::convert2ApiType(const QString& str)
 }
 
 
-CheckT utils::getUnknownService(int status, const QString& sid)
+void utils::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
 {
-  CheckT invalidCheck;
   invalidCheck.status = status;
   invalidCheck.last_state_change = getCtime(0);
   invalidCheck.host = "-";
   invalidCheck.check_command = "-";
-  invalidCheck.alarm_msg = QObject::tr("Unknown service (%1)").arg(sid).toStdString();;
-  return invalidCheck;
+  invalidCheck.alarm_msg = msg.toStdString();
 }
 
 QStringList utils::sourceTypes(void)
@@ -313,7 +311,7 @@ QStringList utils::sourceIndexes(void)
 
 
 /* return <[sourcei:]hostaddr, checkid> */
-QPair<QString, QString> utils::splitCheckInfo(const QString& info)
+CheckIdInfoT utils::splitHostCheckInfo(const QString& info)
 {
   int pos = info.indexOf("/");
   QString second = ((pos == -1)? "ping" : info.mid(pos+1));
@@ -323,7 +321,7 @@ QPair<QString, QString> utils::splitCheckInfo(const QString& info)
 
 
 /* return <source, hostaddr> */
-QPair<QString, QString> utils::splitSourceHostInfo(const QString& info)
+CheckIdInfoT utils::splitSourceHostInfo(const QString& info)
 {
   int pos = info.indexOf(":");
   QString first;

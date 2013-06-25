@@ -123,8 +123,6 @@ private:
   MenuListT m_menus;
   SubMenuListT m_subMenus;
   SubMenuListT m_contextMenuList;
-  bool m_updateSucceed;
-  QString m_lastErrorMsg; //FIXME: see source
   QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
@@ -134,12 +132,12 @@ private:
   void unloadMenus(void);
   void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
   void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  void computeStatusInfo(NodeListT::iterator& _node);
-  void computeStatusInfo(NodeT& _node);
+  void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
+  void computeStatusInfo(NodeT& _node, const SourceT& src);
   void updateDashboard(NodeListT::iterator& _node);
   void updateDashboard(const NodeT & _node);
-  void updateCNodes(const CheckT & check);
-  void finalizeUpdate(const bool& enable=true);
+  void updateCNodes(const CheckT & check, const SourceT& src);
+  void finalizeUpdate(const SourceT& src);
   void updateStatusBar(const QString& msg);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
@@ -147,7 +145,7 @@ private:
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
   void requestZbxZnsData(SourceT& src);
-  void updateDashboardOnUnknown(const SourceT& src);
+  void updateDashboardOnError(const SourceT& src, const QString& msg);
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();
   void resetSettings(void);
