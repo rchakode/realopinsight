@@ -94,7 +94,9 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
       QPair<QString, QString> info = utils::splitHostCheckInfo(node.child_nodes);
       QString srcid = utils::getSourceIdFromStr(info.first);
       if (srcid.isEmpty()) {
-        _cdata.sources.insert(utils::sourceId(0));
+        QString srcid = utils::sourceId(0);
+        node.child_nodes = utils::computeRealCheckId(srcid, node.child_nodes);
+        _cdata.sources.insert(srcid);
       } else {
         _cdata.sources.insert(srcid);
       }

@@ -302,17 +302,16 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   /* Now start doing the job */
   updateStatusBar(tr("Updating..."));
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
-       end=m_cdata->cnodes.end();
-       cnode!=end; ++cnode)
+       end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
       cnode->severity = MonitorBroker::Unknown;
-      ++(m_cdata->check_status_count[cnode->severity]);
+      m_cdata->check_status_count[cnode->severity]+=1;
       continue;
     }
 
     QPair<QString, QString> info = utils::splitSourceHostInfo(cnode->child_nodes);
-    if (! info.first.isEmpty() && !cnode->child_nodes.startsWith(src.id)) {
+    if (info.first != src.id) {
       continue;
     }
 
@@ -447,9 +446,9 @@ void SvNavigator::updateDashboard(const NodeT& _node)
 
 void SvNavigator::updateCNodes(const CheckT& check, const SourceT& src)
 {
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
+  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(); cnode!=m_cdata->cnodes.end(); ++cnode)
   {
-    if (cnode->child_nodes.toLower() == QString::fromStdString(check.id).toLower())
+    if (cnode->child_nodes.toLower()==utils::computeRealCheckId(src.id, QString::fromStdString(check.id)).toLower())
     {
       cnode->check = check;
       computeStatusInfo(cnode, src);
@@ -749,8 +748,10 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
     case ZbxHelper::TriggerV18: {
       QScriptValueIterator trigger(jsHelper.getProperty("result"));
       CheckT check;
-      while (trigger.hasNext()) {
+      while (trigger.hasNext())
+      {
         trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+
         QScriptValue triggerData = trigger.value();
         QString triggerName = triggerData.property("description").toString();
         check.check_command = triggerName.toStdString();
@@ -763,7 +764,8 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
         }
         QString targetHost = "";
         QScriptValueIterator host(triggerData.property("hosts"));
-        if (host.hasNext()) {
+        if (host.hasNext())
+        {
           host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
           QScriptValue hostData = host.value();
           targetHost = hostData.property("host").toString();
@@ -818,7 +820,8 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
     }
     if (tid == ZnsHelper::Device) {
       QScriptValueIterator devices(result.property("devices"));
-      while(devices.hasNext()) {
+      while(devices.hasNext())
+      {
         devices.next(); if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
 
         QScriptValue ditem = devices.value();

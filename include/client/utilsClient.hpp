@@ -60,6 +60,9 @@ namespace utils {
   inline QString sourceKey(const QString& id)
   { return QString("/Sources/%1").arg(id);}
 
+  inline QString computeRealCheckId(const QString& srcid, const QString& chkid)
+  { return QString("%1:%2").arg(srcid, chkid);}
+
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
   QString getAbsolutePath(const QString& _path);
