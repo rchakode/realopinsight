@@ -200,8 +200,6 @@ int main(int argc, char ** argv)
         }
       socket.send(reply);
     }
-
-  socket.finalize();
   monitor.reset(NULL);
   return 0;
 }
