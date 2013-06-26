@@ -148,7 +148,7 @@ private:
   void updateDashboardOnError(const SourceT& src, const QString& msg);
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();
-  void resetSettings(void);
+  void initSettings(void);
   void resetInterval(void);
 };
 

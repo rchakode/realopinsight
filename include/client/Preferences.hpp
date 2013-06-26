@@ -64,7 +64,8 @@ public:
   static QString style();
   bool useLs(void) const {return m_useMkls == Qt::Checked;}
   QBitArray* getSourceStates() const {return m_sourceStates;}
-  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;}
+  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;
+  }
   void clearUpdatedSources(void) { m_updatedSources.clear(); }
 
 

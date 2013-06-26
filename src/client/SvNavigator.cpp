@@ -145,10 +145,9 @@ void SvNavigator::runMonitor()
   QMainWindow::setEnabled(false);
   prepareUpdate();
   if (m_cdata->monitor == MonitorBroker::Auto) {
-    for (SourceListT::Iterator src=m_sources.begin(),end=m_sources.end();
-         src!=end; ++src) {
-      runMonitor(*src);
-    }
+    for (SourceListT::Iterator src=m_sources.begin(),
+         end=m_sources.end();
+         src!=end; ++src) { runMonitor(*src); }
   } else {
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
@@ -201,7 +200,8 @@ void SvNavigator::load(const QString& _file)
   m_map->scaleToFitViewPort();
   m_trayIcon->show();
   m_trayIcon->setToolTip(APP_NAME);
-  resetSettings();
+  m_sources.clear();
+  initSettings();
 }
 
 void SvNavigator::unloadMenus(void)
@@ -288,15 +288,15 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   /* Check if the handler is connected */
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
-      utils::alert(tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial()));
+      QString errmsg = tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial());
+      utils::alert(errmsg);
+      updateDashboardOnError(src, errmsg);
       return;
     }
   } else {
-    invalidCheck.alarm_msg = src.d4n_handler->getErrorMsg();
-    QString socketError(invalidCheck.alarm_msg.c_str());
-    utils::alert(socketError);
-    updateStatusBar(socketError);
-    //FIXME: update dashboard according to the current source
+    QString errmsg(src.d4n_handler->getErrorMsg().c_str());
+    utils::alert(errmsg);
+    updateDashboardOnError(src, errmsg);
     return;
   }
 
@@ -1073,14 +1073,13 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
 void SvNavigator::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (!msg.isEmpty()) {
-    utils::alert(msg);
+    //FIXME: could be heavy utils::alert(msg);
     updateStatusBar(msg);
   }
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode) {
-
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
+  {
     CheckIdInfoT info = utils::splitSourceHostInfo(cnode->child_nodes);
-    if ((info.first.isEmpty() && src.id == utils::sourceId(0)) ||
-        (!info.first.isEmpty() && info.first == src.id)) {
+    if (info.first == src.id) {
       utils::setCheckOnError(MonitorBroker::Unknown, msg, cnode->check);
       computeStatusInfo(cnode, src);
       updateDashboard(cnode);
@@ -1129,29 +1128,28 @@ QTabWidget* SvNavigator::newMsgConsole()
   return msgConsole;
 }
 
-void SvNavigator::resetSettings(void)
+void SvNavigator::initSettings(void)
 {
-  m_sources.clear();
   SourceT src;
-  for (auto id = m_cdata->sources.begin(),
-       end = m_cdata->sources.end();
-       id!=end; ++id) {
+  for (auto id = m_cdata->sources.begin(), end = m_cdata->sources.end(); id!=end; ++id)
+  {
     QPair<bool, int> srcinfo = utils::checkSourceId(*id);
     if (srcinfo.first) {
-      if (m_preferences->isSetSource(srcinfo.second) &&
-          m_settings->loadSource(*id, src) ) {
+      if (m_preferences->isSetSource(srcinfo.second) && m_settings->loadSource(*id, src)) {
         allocSourceHandler(src);
         m_sources.insert(srcinfo.second, src);
       } else {
-        utils::alert(tr("This source is not set (%1)").arg(*id));
+        src.id = *id;
+        updateDashboardOnError(src, tr("Source not set (%1)").arg(*id));
       }
     } else {
       utils::alert(tr("Could not handle this source (%1)").arg(*id));
     }
-
   }
   resetInterval();
-  m_browser->setUrl(m_sources[0].mon_url); //FIXME: m_browser->setUrl(m_sources[0].mon_url);
+  if (! m_sources.isEmpty()) {
+    m_browser->setUrl(m_sources.begin()->mon_url);
+  }
 }
 
 void SvNavigator::resetInterval()

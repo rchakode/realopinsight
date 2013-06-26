@@ -117,6 +117,5 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
   _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
   _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
   _src.verify_ssl_peer = jsHelper.getProperty("verify_ssl_peer").toInt32();
-
   return true;
 }

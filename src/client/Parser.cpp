@@ -95,6 +95,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
       QString srcid = utils::getSourceIdFromStr(info.first);
       if (srcid.isEmpty()) {
         QString srcid = utils::sourceId(0);
+        //FIXME: remove source0 inside the editor
         node.child_nodes = utils::computeRealCheckId(srcid, node.child_nodes);
         _cdata.sources.insert(srcid);
       } else {
