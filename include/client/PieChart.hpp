@@ -34,7 +34,7 @@ public:
   PieChart(const QRectF &  = QRectF(50, 50, 150, 100), QWidget* = 0 );
   virtual ~PieChart();
   QRectF getBoundingRect() {return boundingRect ; }
-  QString update(const CheckStatusCountT & _check_status_count, const qint32 _count) ;
+  void update(const CheckStatusCountT & _check_status_count, qint32 _count, QString& toolTip) ;
 
 private:
   QRectF boundingRect ;

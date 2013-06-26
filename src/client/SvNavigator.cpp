@@ -70,7 +70,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_configFile(_config),
     m_userRole (_userRole),
     m_settings (new Settings()),
-    m_chart (new Chart()),
+    m_chart (std::make_shared<Chart>()),
     m_filteredMsgConsole (NULL),
     m_mainSplitter (new QSplitter(this)),
     m_rightSplitter (new QSplitter()),
@@ -103,7 +103,7 @@ SvNavigator::~SvNavigator()
 {
   if (m_filteredMsgConsole) delete m_filteredMsgConsole;
   delete m_msgConsole;
-  delete m_chart;
+  m_chart.reset();
   delete m_tree;
   delete m_browser;
   delete m_map;
@@ -173,6 +173,7 @@ void SvNavigator::runMonitor(SourceT& src)
       m_preferences->useLs()? runLivestatusUpdate(src) : runNagiosUpdate(src);
       break;
   }
+  finalizeUpdate(src);
 }
 
 void SvNavigator::timerEvent(QTimerEvent *)
@@ -437,8 +438,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   QString toolTip = getNodeToolTip(_node);
   updateNavTreeItemStatus(_node, toolTip);
   m_map->updateNode(_node, toolTip);
-  if (!m_showOnlyTroubles || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
-  {
+  if (!m_showOnlyTroubles || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal)) {
     m_msgConsole->updateNodeMsg(_node);
   }
   emit hasToBeUpdate(_node.parent);
@@ -461,32 +461,37 @@ void SvNavigator::updateCNodes(const CheckT& check, const SourceT& src)
 
 void SvNavigator::finalizeUpdate(const SourceT& src)
 {
-  if (!m_cdata->cnodes.isEmpty())
-  {
-    Chart *chart = new Chart;
-    QString chartdDetails = chart->update(m_cdata->check_status_count, m_cdata->cnodes.size());
-    m_map->updateStatsPanel(chart);
-    if (m_chart) delete m_chart; m_chart = chart; m_chart->setToolTip(chartdDetails);
-    m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
-    m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
-    resetInterval();
-    m_timer = startTimer(m_interval);
-
-    for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
-         end = m_cdata->cnodes.end(); cnode != end; ++cnode)
-    {
-      if (!cnode->monitored) {
-        utils::setCheckOnError(MonitorBroker::Unknown,
-                               tr("Undefined service (%1)").arg(cnode->child_nodes),
-                               cnode->check);
-        computeStatusInfo(cnode, src);
-        m_cdata->check_status_count[cnode->severity]+=1;
-        updateDashboard(cnode);
-        cnode->monitored = true;
-      }
-      cnode->monitored = false;
-    }
+  if (m_cdata->cnodes.isEmpty()) {
+    if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
+    return;
   }
+
+  Chart *chart = new Chart;
+  QString chartInfo;
+  chart->update(m_cdata->check_status_count, m_cdata->cnodes.size(), chartInfo);
+  m_map->updateStatsPanel(chart);
+  m_chart.reset(chart); m_chart->setToolTip(chartInfo);
+  m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
+  resetInterval();
+  m_timer = startTimer(m_interval);
+
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
+       end = m_cdata->cnodes.end(); cnode != end; ++cnode)
+  {
+    if (! cnode->monitored &&
+        cnode->child_nodes.toLower()==utils::computeRealCheckId(src.id,
+                                                                QString::fromStdString(cnode->check.id)).toLower())
+    {
+      utils::setCheckOnError(MonitorBroker::Unknown,
+                             tr("Undefined service (%1)").arg(cnode->child_nodes),
+                             cnode->check);
+      computeStatusInfo(cnode, src);
+      m_cdata->check_status_count[cnode->severity]+=1;
+      updateDashboard(cnode);
+    }
+    cnode->monitored = false;
+  }
+  m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
   //FIXME: Do this while avoiding searching at each update
   if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
 }

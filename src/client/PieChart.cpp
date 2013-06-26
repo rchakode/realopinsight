@@ -25,7 +25,7 @@
 
 #include "PieChart.hpp"
 
-PieChart::PieChart(const QRectF & _bounding_rect, QWidget * _parent)
+PieChart::PieChart(const QRectF& _bounding_rect, QWidget * _parent)
   : QWidget( _parent ), boundingRect( _bounding_rect ),
     legend(new StatsLegend(QPoint(_bounding_rect.width() + 25, 10), this))
 {
@@ -39,7 +39,7 @@ PieChart::~PieChart()
   slices.clear();
 }
 
-QString PieChart::update(const CheckStatusCountT & _check_status_count, const qint32 _count)
+void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _count, QString& toolTip)
 {
   qint32 critical_count = _check_status_count[MonitorBroker::Critical];
   qint32 major_count = _check_status_count[MonitorBroker::Major];
@@ -83,7 +83,7 @@ QString PieChart::update(const CheckStatusCountT & _check_status_count, const qi
                        3.6 * ok_ratio,
                        StatsLegend::COLOR_NORMAL,
                        this);
-  return QObject::tr("Normal: ")%QString::number(ok_count)%
+  toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
       "/"%QString::number(_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
       %"\n"%QObject::tr("Minor: ")%QString::number(minor_count)%
       "/"%QString::number(_count)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"

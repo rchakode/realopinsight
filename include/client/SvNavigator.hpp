@@ -107,7 +107,7 @@ private:
   qint32 m_interval;
   qint32 m_timer;
   Settings* m_settings;
-  Chart* m_chart;
+  std::shared_ptr<Chart> m_chart;
   MsgConsole* m_filteredMsgConsole;
   QSplitter* m_mainSplitter;
   QSplitter* m_rightSplitter;

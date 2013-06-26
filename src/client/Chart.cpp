@@ -53,7 +53,7 @@ QSize Chart::sizeHint() const
   return QSize(DefaultWidth, DefaultHeight);
 }
 
-QString Chart::update(const CheckStatusCountT & _check_status_count, const qint32 & _check_count)
+void Chart::update(const CheckStatusCountT& _stCount, qint32 _count, QString& toolTip)
 {
-  return pieChart->update(_check_status_count, _check_count);
+  pieChart->update(_stCount, _count, toolTip);
 }
