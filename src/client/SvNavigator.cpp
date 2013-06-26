@@ -440,6 +440,9 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   m_map->updateNode(_node, toolTip);
   if (!m_showOnlyTroubles || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal)) {
     m_msgConsole->updateNodeMsg(_node);
+    if (m_msgConsole->getRowCount() == 1) {
+      m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
+    }
   }
   emit hasToBeUpdate(_node.parent);
 }
@@ -491,7 +494,6 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
     }
     cnode->monitored = false;
   }
-  m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
   //FIXME: Do this while avoiding searching at each update
   if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
 }
