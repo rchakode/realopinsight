@@ -45,6 +45,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
     m_mainLayout (new QGridLayout(this)),
     m_userRole(_userRole),
+    m_action(_action),
     m_settings(new Settings()),
     m_sourceStates(new QBitArray(MAX_SRCS)),
     m_monitorUrlField(new QLineEdit()),
@@ -59,7 +60,8 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_serverPassField(new QLineEdit()),
     m_cancelBtn(new QPushButton(tr("&Close"))),
     m_applySettingBtn(new QPushButton(tr("&Apply settings"))),
-    m_addAsSourceBtn(new QPushButton(tr("Add as &Source"))),
+    m_addAsSourceBtn(new QPushButton(tr("Add a&s Source"))),
+    m_deleteSourceBtn(new QPushButton(tr("&Delete Source"))),
     m_changePwdBtn(new QPushButton(tr("C&hange password"))),
     m_donateBtn(new ImageButton(":images/built-in/donate.png")),
     m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
@@ -67,80 +69,28 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_verifySslPeerChkBx(new QCheckBox(tr("Don't verify SSL peer (https)"))),
     m_selectedSource(0)
 {
+
   m_oldPwdField->setEchoMode(QLineEdit::Password);
   m_pwdField->setEchoMode(QLineEdit::Password);
   m_rePwdField->setEchoMode(QLineEdit::Password);
   m_serverPassField->setEchoMode(QLineEdit::Password);
   m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
 
-  qint32 line = -1;
   switch (_action)
   {
     case Preferences::ChangeMonitoringSettings:
-      setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
-      ++line,
-          m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
-      ++line,
-          m_mainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
-      ++line,
-          m_mainLayout->addWidget(m_cancelBtn, line, 0, Qt::AlignLeft),
-          m_mainLayout->addWidget(m_applySettingBtn, line, 1, Qt::AlignRight),
-          m_mainLayout->addWidget(m_addAsSourceBtn, line, 2, Qt::AlignRight);
-      ++line,
-          m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
-      m_mainLayout->setColumnStretch(0, 0);
-      m_mainLayout->setColumnStretch(1, 6);
-      m_mainLayout->setColumnStretch(2, 0);
-      if(_userRole == Auth::OpUserRole) {
-        m_monitorUrlField->setEnabled(false);
-        m_brwBtn->setEnabled(false);
-        m_updateIntervalField->setEnabled(false);
-        m_applySettingBtn->setEnabled(false);
-        m_addAsSourceBtn->setEnabled(false);
-        m_sockAddrField->setEnabled(false);
-        m_sockPortField->setEnabled(false);
-        m_serverPassField->setEnabled(false);
-        m_showAuthInfoChkbx->setEnabled(false);
-        m_useMklsChkbx->setEnabled(false);
-        m_verifySslPeerChkBx->setEnabled(false);
-      }
+      organizePrefWindow();
       break;
+
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
-      setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
-      ++line,
-          m_mainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
-          m_mainLayout->addWidget(m_oldPwdField, line, 1, 1, 2);
-      ++line,
-          m_mainLayout->addWidget(new QLabel(tr("New password")), line, 0),
-          m_mainLayout->addWidget(m_pwdField, line, 1, 1, 2);
-      ++line,
-          m_mainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
-          m_mainLayout->addWidget(m_rePwdField, line, 1, 1, 2);
-      ++line,
-          m_mainLayout->addWidget(m_cancelBtn, line, 1),
-          m_mainLayout->addWidget(m_changePwdBtn, line, 2);
-
-      if(_action == Preferences::ForceChangePassword) {
-        m_cancelBtn->setEnabled(false);
-      }
+      organizeChangePasswdWindow();
       break;
-    case Preferences::ShowAbout:
-      setWindowTitle(tr("About %1").arg(APP_NAME));
-      QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
-                                  "\nRelease ID: %4\n"
-                                  "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
-                                  "\nVisit %6 for more information\n"
-                                  "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
 
-      ++line,
-          m_mainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
-      ++line,
-          m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft),
-          m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
+    case Preferences::ShowAbout:
+      organizeAbortWindow();
       break;
   }
-  loadProperties();
   addEvents();
 }
 
@@ -158,6 +108,7 @@ Preferences::~Preferences()
   delete m_cancelBtn;
   delete m_applySettingBtn;
   delete m_addAsSourceBtn;
+  delete m_deleteSourceBtn;
   delete m_sockAddrField;
   delete m_sockPortField;
   delete m_serverPassField;
@@ -209,6 +160,19 @@ void Preferences::addAsSource(void)
   }
 }
 
+
+void Preferences::deleteSource(void)
+{
+  if (m_selectedSource>=0 && m_selectedSource < MAX_SRCS) {
+    m_sourceBtns.at(m_selectedSource)->setEnabled(false);
+    m_sourceStates->setBit(m_selectedSource, false);
+    m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    m_settings->sync();
+    updateFields();
+  }
+}
+
+
 QString Preferences::selectSourceType(void)
 {
   if (m_monitorTypeField->currentIndex() > 0) {
@@ -251,7 +215,9 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
     m_updatedSources.push_back(_idx);
   }
 
+  m_selectedSource = _idx;
   updateSourceBtnState();
+  m_sourceBtns.at(m_selectedSource)->click();
 }
 
 void Preferences::changePasswd(void)
@@ -376,13 +342,25 @@ QGroupBox* Preferences::createCommonGrp(void)
 
 void Preferences::loadProperties(void)
 {
-  //FIXME: seems that this method is called twice
   initSourceStates();
+  updateFields();
+}
+
+void Preferences::updateFields(void)
+{
   m_selectedSource = firstSourceSet();
   if (m_selectedSource >= 0) {
-    if(!m_sourceBtns.isEmpty()) {
-      m_sourceBtns.at(m_selectedSource)->click();
-    }
+    m_sourceBtns.at(m_selectedSource)->click();
+  } else {
+    // Set default value
+    m_monitorUrlField->setText("http://localhost/monitor/");
+    m_sockAddrField->setText("localhost");
+    m_sockPortField->setText("1983");
+    m_serverPassField->setText("secret");
+    m_monitorTypeField->setCurrentIndex(0);
+    m_useMkls = Qt::Unchecked, m_useMklsChkbx->setCheckState(m_useMkls);
+    m_verifySslPeer = Qt::Unchecked, m_verifySslPeerChkBx->setCheckState(m_verifySslPeer);
+    m_updateIntervalField->setValue(m_settings->getUpdateInterval());
   }
 }
 
@@ -407,7 +385,162 @@ void Preferences::fillFromSource(int _sidx)
 }
 
 
-QString Preferences::style() {
+QGroupBox* Preferences::createUpdateBtnsGrp(void)
+{
+  QGroupBox* bx(new QGroupBox(tr("Update Actions")));
+  QHBoxLayout* lyt(new QHBoxLayout());
+  lyt->addWidget(m_applySettingBtn);
+  lyt->addWidget(m_addAsSourceBtn);
+  lyt->addWidget(m_deleteSourceBtn);
+  bx->setLayout(lyt);
+  return bx;
+}
+
+
+void Preferences::organizePrefWindow(void)
+{
+  setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
+
+  qint32 line = -1;
+  ++line,
+      m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
+  ++line,
+      m_mainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
+  ++line,
+      m_mainLayout->addWidget(m_cancelBtn, line, 0, Qt::AlignLeft),
+      m_mainLayout->addWidget(createUpdateBtnsGrp(), line, 1, 1, 2, Qt::AlignRight);
+  ++line,
+      m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
+
+  m_mainLayout->setColumnStretch(0, 0);
+  m_mainLayout->setColumnStretch(1, 6);
+  m_mainLayout->setColumnStretch(2, 0);
+
+  loadProperties();
+
+  disableInputField();
+}
+
+void Preferences::organizeChangePasswdWindow(void)
+{
+  setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
+
+  int line = -1;
+
+  ++line,
+      m_mainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
+      m_mainLayout->addWidget(m_oldPwdField, line, 1, 1, 2);
+  ++line,
+      m_mainLayout->addWidget(new QLabel(tr("New password")), line, 0),
+      m_mainLayout->addWidget(m_pwdField, line, 1, 1, 2);
+  ++line,
+      m_mainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
+      m_mainLayout->addWidget(m_rePwdField, line, 1, 1, 2);
+  ++line,
+      m_mainLayout->addWidget(m_cancelBtn, line, 1),
+      m_mainLayout->addWidget(m_changePwdBtn, line, 2);
+
+  if(m_action == Preferences::ForceChangePassword) {
+    m_cancelBtn->setEnabled(false);
+  }
+}
+
+
+void Preferences::organizeAbortWindow(void)
+{
+  setWindowTitle(tr("About %1").arg(APP_NAME));
+  QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
+                              "\nRelease ID: %4\n"
+                              "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
+                              "\nVisit %6 for more information\n"
+                              "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
+
+  int line = -1;
+
+  ++line,
+      m_mainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
+  ++line,
+      m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft),
+      m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
+}
+
+
+void Preferences::disableInputField(void)
+{
+  if(m_userRole == Auth::OpUserRole) {
+    m_monitorUrlField->setEnabled(false);
+    m_monitorTypeField->setEnabled(false);
+    m_brwBtn->setEnabled(false);
+    m_updateIntervalField->setEnabled(false);
+    m_applySettingBtn->setEnabled(false);
+    m_addAsSourceBtn->setEnabled(false);
+    m_deleteSourceBtn->setEnabled(false);
+    m_sockAddrField->setEnabled(false);
+    m_sockPortField->setEnabled(false);
+    m_serverPassField->setEnabled(false);
+    m_showAuthInfoChkbx->setEnabled(false);
+    m_useMklsChkbx->setEnabled(false);
+    m_verifySslPeerChkBx->setEnabled(false);
+  }
+}
+
+QString Preferences::getSourceStatesSerialized(void)
+{
+  QString str = "";
+  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";
+  return str;
+}
+
+void Preferences::initSourceStates(void)
+{
+  initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString() );
+  updateSourceBtnState();
+}
+
+void Preferences::initSourceStates(const QString& str)
+{
+  if (str.isEmpty()) {
+    for (int i=0; i < MAX_SRCS; ++i) {
+      m_sourceStates->setBit(i, false);
+    }
+  } else {
+    for (int i=0; i < MAX_SRCS; ++i) {
+      m_sourceStates->setBit(i, str.at(i).digitValue());
+    }
+  }
+}
+
+void Preferences::handleSourceSelected()
+{
+  QVector<QRadioButton*>::iterator cur = m_sourceBtns.begin();
+  QVector<QRadioButton*>::iterator end = m_sourceBtns.end();
+  int idx = 0;
+  while (cur != end && !(*cur)->isChecked()) { ++cur; ++idx;}
+
+  if(cur != end) {
+    fillFromSource(idx);
+  }
+}
+
+
+int Preferences::firstSourceSet()
+{
+  int idx = 0;
+  while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
+
+  return ((idx < MAX_SRCS)? idx : -1);
+}
+
+void Preferences::updateSourceBtnState(void)
+{
+  int size = m_sourceBtns.size();
+  for (int i=0; i < size; ++i) {
+    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
+  }
+}
+
+QString Preferences::style()
+{
   QString styleSheet =
       "QMenuBar, QMenu {"
       "	background: #2d2d2d; "
@@ -486,67 +619,12 @@ QString Preferences::style() {
   return styleSheet;
 }
 
-QString Preferences::getSourceStatesSerialized(void)
-{
-  QString str = "";
-  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";
-  return str;
-}
-
-void Preferences::initSourceStates(void)
-{
-  QString str = m_settings->value(Settings::SRC_BUCKET_KEY).toString();
-  initSourceStates(str);
-  updateSourceBtnState();
-}
-
-void Preferences::initSourceStates(const QString& str)
-{
-
-  if (str.isEmpty()) {
-    for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, false);
-    }
-  } else {
-    for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, str.at(i).digitValue());
-    }
-  }
-}
-
-void Preferences::handleSourceSelected()
-{
-  QVector<QRadioButton*>::iterator cur = m_sourceBtns.begin();
-  QVector<QRadioButton*>::iterator end = m_sourceBtns.end();
-  int idx = 0;
-  while (cur != end && !(*cur)->isChecked()) { ++cur; ++idx;}
-
-  if(cur != end) {
-    fillFromSource(idx);
-  }
-}
-
-
-int Preferences::firstSourceSet()
-{
-  int idx = 0;
-  while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
-
-  return ((idx < MAX_SRCS)? idx : -1);
-}
-
-void Preferences::updateSourceBtnState(void)
-{
-  int size = m_sourceBtns.size();
-  for (int i=0; i < size; ++i) {
-    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
-  }
-}
 
 void Preferences::addEvents(void)
 {
   connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
   connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
+  connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
   connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(handleCancel()));
   connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
   connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(donate()));

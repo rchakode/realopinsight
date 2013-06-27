@@ -65,7 +65,7 @@ public:
   bool useLs(void) const {return m_useMkls == Qt::Checked;}
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;
-  }
+                            }
   void clearUpdatedSources(void) { m_updatedSources.clear(); }
 
 
@@ -73,6 +73,7 @@ public slots:
   void handleCancel(void);
   void applySettings(void);
   void addAsSource(void);
+  void deleteSource(void);
   void changePasswd(void);
   void donate(void);
   void setAuthChainVisibility(const int& state);
@@ -88,6 +89,7 @@ protected :
 private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
+  qint32 m_action;
   Qt::CheckState m_useMkls;
   Qt::CheckState m_verifySslPeer;
 
@@ -107,6 +109,7 @@ private:
   QPushButton* m_cancelBtn;
   QPushButton* m_applySettingBtn;
   QPushButton* m_addAsSourceBtn;
+  QPushButton* m_deleteSourceBtn;
   QPushButton* m_changePwdBtn;
   ImageButton* m_donateBtn;
   QCheckBox* m_showAuthInfoChkbx;
@@ -120,6 +123,7 @@ private:
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
   void loadProperties(void);
+  void updateFields(void);
   void fillFromSource(int _sidx);
   void saveAsSource(const qint32& idx, const QString& _stype);
   QString getSourceStatesSerialized(void);
@@ -128,6 +132,11 @@ private:
   QString selectSourceType(void);
   int firstSourceSet(void);
   void updateSourceBtnState(void);
+  QGroupBox* createUpdateBtnsGrp(void);
+  void organizePrefWindow(void);
+  void organizeChangePasswdWindow(void);
+  void organizeAbortWindow(void);
+  void disableInputField(void);
 };
 
 

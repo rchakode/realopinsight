@@ -352,8 +352,8 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
     return;
   }
 
-  CheckT badCheck;
-  utils::setCheckOnError(MonitorBroker::Unknown, "", badCheck);
+  CheckT invalidCheck;
+  utils::setCheckOnError(MonitorBroker::Unknown, "", invalidCheck);
 
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
@@ -369,9 +369,9 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
         if (src.ls_handler->findCheck(key, chkit)) {
           updateCNodes(*chkit, src);
         } else {
-          badCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
-          badCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
-          updateCNodes(badCheck, src);
+          invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
+          invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
+          updateCNodes(invalidCheck, src);
         }
       }
     }
@@ -474,7 +474,6 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
   m_chart.reset(chart); m_chart->setToolTip(chartInfo);
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
   resetInterval();
-  m_timer = startTimer(m_interval);
 
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
        end = m_cdata->cnodes.end(); cnode != end; ++cnode)
