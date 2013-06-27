@@ -131,7 +131,7 @@ void Preferences::showEvent (QShowEvent *)
 void Preferences::handleCancel(void)
 {
   emit sourcesChanged(m_updatedSources);
-  reject();
+  done(0);
 }
 
 void Preferences::applySettings(void)
@@ -358,8 +358,8 @@ void Preferences::updateFields(void)
     m_sockPortField->setText("1983");
     m_serverPassField->setText("secret");
     m_monitorTypeField->setCurrentIndex(0);
-    m_useMkls = Qt::Unchecked, m_useMklsChkbx->setCheckState(m_useMkls);
-    m_verifySslPeer = Qt::Unchecked, m_verifySslPeerChkBx->setCheckState(m_verifySslPeer);
+    m_useMklsChkbx->setCheckState(Qt::Unchecked);
+    m_verifySslPeerChkBx->setCheckState(Qt::Unchecked);
     m_updateIntervalField->setValue(m_settings->getUpdateInterval());
   }
 }
@@ -369,16 +369,13 @@ void Preferences::fillFromSource(int _sidx)
 {
   SourceT src;
   m_settings->loadSource(_sidx, src);
-
   m_monitorUrlField->setText(src.mon_url);
   m_sockAddrField->setText(src.ls_addr);
   m_sockPortField->setText(QString::number(src.ls_port));
   m_serverPassField->setText(src.auth);
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
-  m_useMkls = static_cast<Qt::CheckState>(src.use_ls),
-      m_useMklsChkbx->setCheckState(m_useMkls);
-  m_verifySslPeer = src.verify_ssl_peer? Qt::Unchecked : Qt::Checked,
-      m_verifySslPeerChkBx->setCheckState(m_verifySslPeer);
+  m_useMklsChkbx->setCheckState(static_cast<Qt::CheckState>(src.use_ls));
+  m_verifySslPeerChkBx->setCheckState(src.verify_ssl_peer? Qt::Unchecked : Qt::Checked);
   m_updateIntervalField->setValue(m_settings->getUpdateInterval());
 
   m_selectedSource = _sidx;

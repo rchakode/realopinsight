@@ -62,7 +62,6 @@ public:
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();
   static QString style();
-  bool useLs(void) const {return m_useMkls == Qt::Checked;}
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;
                             }
@@ -90,8 +89,6 @@ private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   qint32 m_action;
-  Qt::CheckState m_useMkls;
-  Qt::CheckState m_verifySslPeer;
 
   Settings* m_settings;
   QBitArray* m_sourceStates;

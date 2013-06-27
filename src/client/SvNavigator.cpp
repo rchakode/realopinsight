@@ -145,9 +145,10 @@ void SvNavigator::runMonitor()
   QMainWindow::setEnabled(false);
   prepareUpdate();
   if (m_cdata->monitor == MonitorBroker::Auto) {
-    for (SourceListT::Iterator src=m_sources.begin(),
-         end=m_sources.end();
-         src!=end; ++src) { runMonitor(*src); }
+    for (SourceListT::Iterator src=m_sources.begin(), end=m_sources.end(); src!=end; ++src)
+    {
+      runMonitor(*src);
+    }
   } else {
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
@@ -169,7 +170,7 @@ void SvNavigator::runMonitor(SourceT& src)
       break;
     case MonitorBroker::Nagios:
     default:
-      m_preferences->useLs()? runLivestatusUpdate(src) : runNagiosUpdate(src);
+      src.use_ls? runLivestatusUpdate(src) : runNagiosUpdate(src);
       break;
   }
   finalizeUpdate(src);
@@ -949,10 +950,11 @@ void SvNavigator::openRpcSession(SourceT& src)
                                    "Must follow the pattern login:password"));
     return;
   }
+
   QUrl znsUrlParams;
   switch(src.mon_type) {
     case MonitorBroker::Nagios:
-      if (m_preferences->useLs()) {
+      if (src.use_ls) {
         if (src.ls_handler->isConnected()) { //FIXME: do this???
           src.ls_handler->disconnectFromService();
         }
@@ -1164,7 +1166,7 @@ bool SvNavigator::allocSourceHandler(SourceT& src)
 
   switch (src.mon_type) {
     case MonitorBroker::Nagios:
-      if (m_preferences->useLs()) {
+      if (src.use_ls) {
         src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
       } else {
         QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
@@ -1200,7 +1202,7 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
     if (olddata != m_sources.end()) {
       switch (olddata->mon_type) {
         case MonitorBroker::Nagios:
-          if (m_preferences->useLs()) {
+          if (olddata->use_ls) {
             olddata->ls_handler.reset();
           } else {
             olddata->d4n_handler.reset();
@@ -1219,13 +1221,10 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
     }
     allocSourceHandler(newsrc);
     m_sources[id] = newsrc;
+    runMonitor(newsrc);
     if (id == 0) {
       m_browser->setUrl(newsrc.mon_url);
     }
-  }
-
-  if (!ids.isEmpty()) {
-    runMonitor();
   }
 }
 
