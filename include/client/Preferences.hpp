@@ -76,6 +76,7 @@ public slots:
   void changePasswd(void);
   void donate(void);
   void setAuthChainVisibility(const int& state);
+  void handleSourceSelected();
 
 signals:
   void urlChanged(QString);
@@ -112,17 +113,21 @@ private:
   QCheckBox* m_useMklsChkbx;
   QList<qint8> m_updatedSources;
   QCheckBox* m_verifySslPeerChkBx;
-  QVector<QPushButton*> m_sourceBtns;
+  QVector<QRadioButton*> m_sourceBtns;
+  int m_selectedSource;
 
   void addEvents(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
   void loadProperties(void);
+  void fillFromSource(int _sidx);
   void saveAsSource(const qint32& idx, const QString& _stype);
   QString getSourceStatesSerialized(void);
   void initSourceStates();
   void initSourceStates(const QString& str);
   QString selectSourceType(void);
+  int firstSourceSet(void);
+  void updateSourceBtnState(void);
 };
 
 

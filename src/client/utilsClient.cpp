@@ -298,7 +298,8 @@ QStringList utils::sourceTypes(void)
 
 QStringList utils::sourceIndexes(void)
 {
-  return QStringList() << "1"
+  return QStringList() << "0"
+                       << "1"
                        << "2"
                        << "3"
                        << "4"

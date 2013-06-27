@@ -64,7 +64,8 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     m_donateBtn(new ImageButton(":images/built-in/donate.png")),
     m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     m_useMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
-    m_verifySslPeerChkBx(new QCheckBox(tr("Don't verify SSL peer (https)")))
+    m_verifySslPeerChkBx(new QCheckBox(tr("Don't verify SSL peer (https)"))),
+    m_selectedSource(0)
 {
   m_oldPwdField->setEchoMode(QLineEdit::Password);
   m_pwdField->setEchoMode(QLineEdit::Password);
@@ -184,8 +185,7 @@ void Preferences::handleCancel(void)
 
 void Preferences::applySettings(void)
 {
-  saveAsSource(0, selectSourceType());
-  emit sourcesChanged(m_updatedSources);
+  saveAsSource(m_selectedSource, selectSourceType());
 }
 
 void Preferences::addAsSource(void)
@@ -247,13 +247,11 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
 
-  if (!m_updatedSources.contains(_idx)) {
+  if (! m_updatedSources.contains(_idx)) {
     m_updatedSources.push_back(_idx);
   }
 
-  if (_idx == 0) {
-    close();
-  }
+  updateSourceBtnState();
 }
 
 void Preferences::changePasswd(void)
@@ -336,11 +334,12 @@ QGroupBox* Preferences::createCommonGrp(void)
   sourceBtnsLyt->setMargin(0);
   for (int i=0; i<MAX_SRCS; ++i)
   {
-    QPushButton* btn(new QPushButton(QString::number(i)));
-    btn->setAutoDefault(false);
-    btn->setFixedSize(12, 14);
+    QRadioButton* btn(new QRadioButton(QString::number(i)));
+    btn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
     m_sourceBtns.push_back(btn);
-    sourceBtnsLyt->addWidget(m_sourceBtns.back());
+    connect(btn, SIGNAL(clicked()), this, SLOT(handleSourceSelected()));
+    sourceBtnsLyt->addWidget(btn);
   }
   QGridLayout* lyt(new QGridLayout());
   int line;
@@ -377,11 +376,22 @@ QGroupBox* Preferences::createCommonGrp(void)
 
 void Preferences::loadProperties(void)
 {
-  SourceT src;
-
+  //FIXME: seems that this method is called twice
   initSourceStates();
+  m_selectedSource = firstSourceSet();
+  if (m_selectedSource >= 0) {
+    if(!m_sourceBtns.isEmpty()) {
+      m_sourceBtns.at(m_selectedSource)->click();
+    }
+  }
+}
 
-  m_settings->loadSource(0, src);
+
+void Preferences::fillFromSource(int _sidx)
+{
+  SourceT src;
+  m_settings->loadSource(_sidx, src);
+
   m_monitorUrlField->setText(src.mon_url);
   m_sockAddrField->setText(src.ls_addr);
   m_sockPortField->setText(QString::number(src.ls_port));
@@ -392,7 +402,10 @@ void Preferences::loadProperties(void)
   m_verifySslPeer = src.verify_ssl_peer? Qt::Unchecked : Qt::Checked,
       m_verifySslPeerChkBx->setCheckState(m_verifySslPeer);
   m_updateIntervalField->setValue(m_settings->getUpdateInterval());
+
+  m_selectedSource = _sidx;
 }
+
 
 QString Preferences::style() {
   QString styleSheet =
@@ -480,26 +493,53 @@ QString Preferences::getSourceStatesSerialized(void)
   return str;
 }
 
-void Preferences::initSourceStates()
+void Preferences::initSourceStates(void)
 {
   QString str = m_settings->value(Settings::SRC_BUCKET_KEY).toString();
   initSourceStates(str);
-
-  int size = m_sourceBtns.size();
-  for (int i=0; i < size; ++i) {
-    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
-  }
+  updateSourceBtnState();
 }
 
 void Preferences::initSourceStates(const QString& str)
 {
-  for (int i=1; i < MAX_SRCS; ++i)
-  {
-    if (str.isEmpty()) {
+
+  if (str.isEmpty()) {
+    for (int i=0; i < MAX_SRCS; ++i) {
       m_sourceStates->setBit(i, false);
-    } else {
+    }
+  } else {
+    for (int i=0; i < MAX_SRCS; ++i) {
       m_sourceStates->setBit(i, str.at(i).digitValue());
     }
+  }
+}
+
+void Preferences::handleSourceSelected()
+{
+  QVector<QRadioButton*>::iterator cur = m_sourceBtns.begin();
+  QVector<QRadioButton*>::iterator end = m_sourceBtns.end();
+  int idx = 0;
+  while (cur != end && !(*cur)->isChecked()) { ++cur; ++idx;}
+
+  if(cur != end) {
+    fillFromSource(idx);
+  }
+}
+
+
+int Preferences::firstSourceSet()
+{
+  int idx = 0;
+  while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
+
+  return ((idx < MAX_SRCS)? idx : -1);
+}
+
+void Preferences::updateSourceBtnState(void)
+{
+  int size = m_sourceBtns.size();
+  for (int i=0; i < size; ++i) {
+    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
   }
 }
 

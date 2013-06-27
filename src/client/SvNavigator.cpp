@@ -289,13 +289,11 @@ void SvNavigator::runNagiosUpdate(const SourceT& src)
   if (src.d4n_handler->isConnected()) {
     if (src.d4n_handler->getServerSerial() < 110) {
       QString errmsg = tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial());
-      utils::alert(errmsg);
       updateDashboardOnError(src, errmsg);
       return;
     }
   } else {
     QString errmsg(src.d4n_handler->getErrorMsg().c_str());
-    utils::alert(errmsg);
     updateDashboardOnError(src, errmsg);
     return;
   }
@@ -1185,7 +1183,8 @@ bool SvNavigator::allocSourceHandler(SourceT& src)
       allocated = true;
       break;
     default:
-      utils::alert(tr("Undefined monitor (%1)").arg(src.mon_type));
+      //FIXME: undefined monitor
+      //updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
       allocated = false;
       break;
   }
