@@ -80,7 +80,6 @@ bool LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
     handleNetworkFailure();
     return false;
   }
-  qDebug() << tr("%1 bytes written").arg(nb);
   return true;
 }
 

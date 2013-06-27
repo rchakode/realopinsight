@@ -347,14 +347,13 @@ void SvNavigator::runLivestatusUpdate(int srcId)
 
 void SvNavigator::runLivestatusUpdate(const SourceT& src)
 {
-  /* Check if the handler is connected */
   if (!src.ls_handler->isConnected()) {
     updateDashboardOnError(src, src.ls_handler->errorString());
     return;
   }
 
-  CheckT invalidCheck;
-  utils::setCheckOnError(MonitorBroker::Unknown, "", invalidCheck);
+  CheckT badCheck;
+  utils::setCheckOnError(MonitorBroker::Unknown, "", badCheck);
 
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
@@ -370,9 +369,9 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
         if (src.ls_handler->findCheck(key, chkit)) {
           updateCNodes(*chkit, src);
         } else {
-          invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
-          invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
-          updateCNodes(invalidCheck, src);
+          badCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
+          badCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
+          updateCNodes(badCheck, src);
         }
       }
     }
