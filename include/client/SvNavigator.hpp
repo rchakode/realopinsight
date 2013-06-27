@@ -55,6 +55,7 @@ public:
   static StringMapT propRules();
   static StringMapT calcRules();
   static QString getNodeToolTip(const NodeT& _node);
+  void initSettings(void);
 
 public slots:
   void runMonitor();
@@ -63,7 +64,7 @@ public slots:
   void runNagiosUpdate(const SourceT& src);
   void runLivestatusUpdate(int srcId);
   void runLivestatusUpdate(const SourceT& src);
-  void prepareUpdate(void);
+  void resetStatData(void);
   void prepareUpdate(const SourceT& src);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
@@ -95,14 +96,13 @@ protected:
   virtual void closeEvent(QCloseEvent *);
   virtual void contextMenuEvent(QContextMenuEvent *);
   virtual void timerEvent(QTimerEvent *);
+  virtual void showEvent(QShowEvent *);
 
 
 private:
   CoreDataT* m_cdata;
   QString m_configFile;
-  QString m_activeFile;
   QString m_selectedNode;
-  QString m_statsInfo;
   qint32 m_userRole;
   qint32 m_interval;
   qint32 m_timer;
@@ -118,7 +118,7 @@ private:
   Preferences* m_preferences;
   Preferences* m_changePasswdWindow;
   MsgConsole* m_msgConsole;
-  QMenu* m_nodeContextMenu;
+  QMenu* m_contextMenu;
   QSize m_msgConsoleSize;
   MenuListT m_menus;
   SubMenuListT m_subMenus;
@@ -148,7 +148,6 @@ private:
   void updateDashboardOnError(const SourceT& src, const QString& msg);
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();
-  void initSettings(void);
   void resetInterval(void);
 };
 

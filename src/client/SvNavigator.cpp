@@ -81,7 +81,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_preferences (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     m_msgConsole(new MsgConsole(this)),
-    m_nodeContextMenu (new QMenu()),
+    m_contextMenu (new QMenu()),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     m_showOnlyTroubles(false)
 {
@@ -136,14 +136,14 @@ void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
     }  else {
       m_selectedNode = treeNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
     }
-    m_nodeContextMenu->exec(pos);
+    m_contextMenu->exec(pos);
   }
 }
 
 void SvNavigator::runMonitor()
 {
   QMainWindow::setEnabled(false);
-  prepareUpdate();
+  resetStatData();
   if (m_cdata->monitor == MonitorBroker::Auto) {
     for (SourceListT::Iterator src=m_sources.begin(), end=m_sources.end(); src!=end; ++src)
     {
@@ -163,6 +163,7 @@ void SvNavigator::runMonitor()
 void SvNavigator::runMonitor(SourceT& src)
 {
   openRpcSession(src);
+  prepareUpdate(src);
   switch(src.mon_type) {
     case MonitorBroker::Zenoss:
     case MonitorBroker::Zabbix:
@@ -181,6 +182,13 @@ void SvNavigator::timerEvent(QTimerEvent *)
   runMonitor();
 }
 
+
+void SvNavigator::showEvent(QShowEvent *)
+{
+  initSettings();
+  runMonitor();
+}
+
 void  SvNavigator::updateStatusBar(const QString& msg)
 {
   statusBar()->showMessage(msg);
@@ -188,28 +196,34 @@ void  SvNavigator::updateStatusBar(const QString& msg)
 
 void SvNavigator::load(const QString& _file)
 {
-  if (!_file.isEmpty()) m_configFile = utils::getAbsolutePath(_file);
-  m_activeFile = m_configFile;
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_configFile));
   Parser parser;
+
+  if (!_file.isEmpty()) {
+    m_configFile = utils::getAbsolutePath(_file);
+  }
   parser.loadConfig(m_configFile, *m_cdata, true);
+
   m_tree->clear();
   m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
   m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
+
   resizeDashboard();
   QMainWindow::show();
   m_map->scaleToFitViewPort();
+
   m_trayIcon->show();
   m_trayIcon->setToolTip(APP_NAME);
-  m_sources.clear();
-  initSettings();
+
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_configFile));
+
+  //  runMonitor();
 }
 
 void SvNavigator::unloadMenus(void)
 {
   m_subMenus.clear();
   m_menus.clear();
-  delete m_nodeContextMenu;
+  delete m_contextMenu;
 }
 
 void SvNavigator::handleChangePasswordAction(void)
@@ -360,27 +374,30 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
   while (hostit.hasNext()) {
     hostit.next();
     QPair<QString, QString> info = utils::splitSourceHostInfo(hostit.key());
-    if (src.ls_handler->loadHostData(info.second)) {
-      foreach (const QString& value, hostit.value()) {
-        QString key;
-        if (value != "ping") {
-          key = ID_PATTERN.arg(info.second).arg(value);
-        }
-        CheckListCstIterT chkit;
-        if (src.ls_handler->findCheck(key, chkit)) {
-          updateCNodes(*chkit, src);
-        } else {
-          invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
-          invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
-          updateCNodes(invalidCheck, src);
-        }
+
+    if (info.first != src.id || ! src.ls_handler->loadHostData(info.second)) continue;
+
+    foreach (const QString& value, hostit.value()) {
+      QString key;
+      if (value != "ping") {
+        key = ID_PATTERN.arg(info.second).arg(value);
+      } else {
+        key = info.second;
+      }
+      CheckListCstIterT chkit;
+      if (src.ls_handler->findCheck(key, chkit)) {
+        updateCNodes(*chkit, src);
+      } else {
+        invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
+        invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
+        updateCNodes(invalidCheck, src);
       }
     }
   }
 }
 
 
-void SvNavigator::prepareUpdate(void)
+void SvNavigator::resetStatData(void)
 {
   m_cdata->check_status_count[MonitorBroker::Normal] = 0;
   m_cdata->check_status_count[MonitorBroker::Minor] = 0;
@@ -404,7 +421,7 @@ void SvNavigator::prepareUpdate(const SourceT& src)
       msg = msg.arg(src.zns_handler->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
       break;
     default:
-      msg = "Unknown source type";
+      msg = tr("Undefined source type");
       break;
   }
   updateStatusBar(msg);
@@ -474,7 +491,6 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
   m_map->updateStatsPanel(chart);
   m_chart.reset(chart); m_chart->setToolTip(chartInfo);
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
-  resetInterval();
 
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
        end = m_cdata->cnodes.end(); cnode != end; ++cnode)
@@ -494,6 +510,8 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
   }
   //FIXME: Do this while avoiding searching at each update
   if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
+
+  updateStatusBar(tr("update completed (%1)").arg(src.id));
 }
 
 void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node, const SourceT& src)
@@ -1069,6 +1087,7 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
   updateDashboardOnError(src, errmsg);
 }
 
+
 void SvNavigator::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (!msg.isEmpty()) {
@@ -1077,13 +1096,13 @@ void SvNavigator::updateDashboardOnError(const SourceT& src, const QString& msg)
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
   {
     CheckIdInfoT info = utils::splitSourceHostInfo(cnode->child_nodes);
-    if (info.first == src.id) {
-      utils::setCheckOnError(MonitorBroker::Unknown, msg, cnode->check);
-      computeStatusInfo(cnode, src);
-      updateDashboard(cnode);
-      m_cdata->check_status_count[MonitorBroker::Unknown]+=1;
-      cnode->monitored = true;
-    }
+    if (info.first != src.id) continue;
+
+    utils::setCheckOnError(MonitorBroker::Unknown, msg, cnode->check);
+    computeStatusInfo(cnode, src);
+    updateDashboard(cnode);
+    m_cdata->check_status_count[MonitorBroker::Unknown]+=1;
+    cnode->monitored = true;
   }
 }
 
@@ -1127,8 +1146,10 @@ QTabWidget* SvNavigator::newMsgConsole()
 
 void SvNavigator::initSettings(void)
 {
+  m_sources.clear();
+
   SourceT src;
-  for (auto id = m_cdata->sources.begin(), end = m_cdata->sources.end(); id!=end; ++id)
+  for (auto id=m_cdata->sources.begin(),end = m_cdata->sources.end(); id!=end; ++id)
   {
     QPair<bool, int> srcinfo = utils::checkSourceId(*id);
     if (srcinfo.first) {
@@ -1144,10 +1165,10 @@ void SvNavigator::initSettings(void)
       utils::alert(tr("Could not handle this source (%1)").arg(*id));
     }
   }
-  resetInterval();
   if (! m_sources.isEmpty()) {
     m_browser->setUrl(m_sources.begin()->mon_url);
   }
+  resetInterval();
 }
 
 void SvNavigator::resetInterval()
@@ -1267,9 +1288,9 @@ void SvNavigator::loadMenus(void)
       m_menus["HELP"]->addSeparator(),
       m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME)),
       m_subMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  m_contextMenuList["FilterNodeRelatedMessages"] = m_nodeContextMenu->addAction(tr("&Filter related messages")),
-      m_contextMenuList["CenterOnNode"] = m_nodeContextMenu->addAction(tr("Center Graph &On")),
-      m_contextMenuList["Cancel"] = m_nodeContextMenu->addAction(tr("&Cancel"));
+  m_contextMenuList["FilterNodeRelatedMessages"] = m_contextMenu->addAction(tr("&Filter related messages")),
+      m_contextMenuList["CenterOnNode"] = m_contextMenu->addAction(tr("Center Graph &On")),
+      m_contextMenuList["Cancel"] = m_contextMenu->addAction(tr("&Cancel"));
   toolBar->setIconSize(QSize(16,16)),
       toolBar->addAction(m_subMenus["Refresh"]),
       toolBar->addAction(m_subMenus["ZoomIn"]),

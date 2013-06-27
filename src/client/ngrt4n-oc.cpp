@@ -103,7 +103,6 @@ int main(int argc, char **argv)
   info->finish(0);
   SvNavigator *console= new SvNavigator(userRole);
   console->load(file);
-  console->runMonitor();
 
   return app->exec();
 }

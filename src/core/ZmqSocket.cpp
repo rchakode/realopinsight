@@ -138,52 +138,55 @@ void ZmqSocket::makeHandShake() {
   m_connected2Server = false;
 
   while (retriesLeft) {
-      if(!socket->connect()) break;
-      socket->send(msg);
-      time_t curTime = time(NULL); std::string timeStr = std::string(ctime(&curTime));
-      zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };
-      zmq_poll(&items[0], 1, TIMEOUT);
-      if (items[0].revents & ZMQ_POLLIN) {
-          reply.clear();
-          reply = socket->recv();
-          socket->disconnecteFromService();
-          size_t pos = reply.find(":");
-          std::string respType = reply.substr(0, pos);
-          if(respType == "ALIVE") {
-              m_connected2Server = true;
-              if(pos == std::string::npos){
-                  m_serverSerial = 100;
-                } else {
-                  m_serverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
-                }
-              std::ostringstream oss;
-              oss << "Connection etablished; server serial: " << m_serverSerial;
-              m_errorMsg = oss.str();
-              return;
-            } else {
-              //FIXME: sometimes this could be due to authentication failed
-              m_errorMsg = "Weird response from the server ("+reply+")";
-              break;
-            }
+    if(!socket->connect()) break;
+    socket->send(msg);
+    time_t curTime = time(NULL); std::string timeStr = std::string(ctime(&curTime));
+    zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };
+    zmq_poll(&items[0], 1, TIMEOUT);
+    if (items[0].revents & ZMQ_POLLIN) {
+      reply.clear();
+      reply = socket->recv();
+      socket->disconnecteFromService();
+      size_t pos = reply.find(":");
+      std::string respType = reply.substr(0, pos);
+      if(respType == "ALIVE") {
+        m_connected2Server = true;
+        if(pos == std::string::npos){
+          m_serverSerial = 100;
         } else {
-          m_errorMsg = "No response from server, retrying...";
-          socket->reset();
+          m_serverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
         }
-      if (--retriesLeft == 0) {
-          m_errorMsg = "Unable to connect to the service from this address ("+m_serverUri+")";
-        }
+        std::ostringstream oss;
+        oss << "Connection etablished; server serial: " << m_serverSerial;
+        m_errorMsg = oss.str();
+        return;
+      } else {
+        //FIXME: sometimes this could be due to authentication failed
+        m_errorMsg = "Weird response from the server ("+reply+")";
+        std::cerr << m_errorMsg << "\n";
+        break;
+      }
+    } else {
+      m_errorMsg = "No response from server, retrying...";
+      std::cerr << m_errorMsg << "\n";
+      socket->reset();
     }
+    if (--retriesLeft == 0) {
+      m_errorMsg = "Unable to connect to the service from this address ("+m_serverUri+")";
+      std::cerr << m_errorMsg << "\n";
+    }
+  }
 }
 
 int ZmqSocket::convert2ServerSerial(const std::string & versionStr){
   std::string str = "";
   for(size_t i = 0; i < versionStr.size(); i++) {
-      if(versionStr[i] >= '0' &&
-         versionStr[i]<= '9') {
-          str += versionStr[i];
-        } else if(versionStr[i] != '.') {
-          break;
-        }
+    if(versionStr[i] >= '0' &&
+       versionStr[i]<= '9') {
+      str += versionStr[i];
+    } else if(versionStr[i] != '.') {
+      break;
     }
+  }
   return atoi(str.c_str());
 }

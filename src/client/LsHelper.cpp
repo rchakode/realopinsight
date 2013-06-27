@@ -53,7 +53,6 @@ void LsHelper::setRequestPatterns()
 bool LsHelper::connectToService()
 {
   disconnectFromHost();
-  qDebug() << tr("Connecting to %1:%2...").arg(m_host).arg(m_port);
   QAbstractSocket::connectToHost(m_host, m_port, QAbstractSocket::ReadWrite);
   if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
     handleNetworkFailure();
