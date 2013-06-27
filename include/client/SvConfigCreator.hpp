@@ -75,7 +75,7 @@ private:
   QString mactiveFile;
   QString mselectedNode;
   Settings* msettings;
-  CoreDataT* mcoreData;
+  CoreDataT* m_cdata;
   QSplitter* mainSplitter;
   MenuListT mmenuList;
   SubMenuListT msubMenus;

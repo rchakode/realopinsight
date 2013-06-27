@@ -77,15 +77,15 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   {
     case Preferences::ChangeMonitoringSettings:
       setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
-      line++,
+      ++line,
           m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
-      line++,
+      ++line,
           m_mainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
-      line++,
+      ++line,
           m_mainLayout->addWidget(m_cancelBtn, line, 0, Qt::AlignLeft),
           m_mainLayout->addWidget(m_applySettingBtn, line, 1, Qt::AlignRight),
           m_mainLayout->addWidget(m_addAsSourceBtn, line, 2, Qt::AlignRight);
-      line++,
+      ++line,
           m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
       m_mainLayout->setColumnStretch(0, 0);
       m_mainLayout->setColumnStretch(1, 6);
@@ -107,16 +107,16 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
       setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
-      line++,
+      ++line,
           m_mainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
           m_mainLayout->addWidget(m_oldPwdField, line, 1, 1, 2);
-      line++,
+      ++line,
           m_mainLayout->addWidget(new QLabel(tr("New password")), line, 0),
           m_mainLayout->addWidget(m_pwdField, line, 1, 1, 2);
-      line++,
+      ++line,
           m_mainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
           m_mainLayout->addWidget(m_rePwdField, line, 1, 1, 2);
-      line++,
+      ++line,
           m_mainLayout->addWidget(m_cancelBtn, line, 1),
           m_mainLayout->addWidget(m_changePwdBtn, line, 2);
 
@@ -132,9 +132,9 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
                                   "\nVisit %6 for more information\n"
                                   "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
 
-      line++,
+      ++line,
           m_mainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
-      line++,
+      ++line,
           m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft),
           m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
       break;
@@ -190,25 +190,17 @@ void Preferences::applySettings(void)
 
 void Preferences::addAsSource(void)
 {
-  int bucket = 1;
-  while (bucket < MAX_SRCS && m_sourceStates->at(bucket)) {
-    bucket++;
-  }
-
-  if (bucket >= MAX_SRCS) {
-    bucket = -1;
-    bool ok =  false;
-    QString srcId = QInputDialog::getItem(this,
-                                          tr("Replace source | %1").arg(APP_NAME),
-                                          tr("The maximum number of sources is reached.\n"
-                                             "Replace a source?"),
-                                          utils::sourceIndexes(),
-                                          0,
-                                          false,
-                                          &ok);
-    if (ok && !srcId.isEmpty()) {
-      bucket =  srcId.toInt();
-    }
+  int bucket = -1;
+  bool ok = false;
+  QString srcId = QInputDialog::getItem(this,
+                                        tr("Select source index | %1").arg(APP_NAME),
+                                        tr("Please select the index of the source"),
+                                        utils::sourceIndexes(),
+                                        0,
+                                        false,
+                                        &ok);
+  if (ok && ! srcId.isEmpty()) {
+    bucket =  srcId.toInt();
   }
 
   if (bucket >= 0) {
@@ -219,7 +211,7 @@ void Preferences::addAsSource(void)
 
 QString Preferences::selectSourceType(void)
 {
-  if (m_monitorTypeField->currentIndex() != 0) {
+  if (m_monitorTypeField->currentIndex() > 0) {
     return m_monitorTypeField->currentText();
   }
 
@@ -338,21 +330,36 @@ QGroupBox* Preferences::createScktGrp(void)
 
 QGroupBox* Preferences::createCommonGrp(void)
 {
+  QHBoxLayout* srcBtnLyt(new QHBoxLayout());
+  srcBtnLyt->setContentsMargins(0,0,0,0);
+  srcBtnLyt->setMargin(0);
+  for (int i=0; i<MAX_SRCS; ++i)
+  {
+    QPushButton* btn(new QPushButton(QString::number(i)));
+    btn->setAutoDefault(false);
+    btn->setFixedSize(12, 14);
+    btn->setEnabled(isSetSource(i));
+    srcBtnLyt->addWidget(btn);
+
+  }
   QGridLayout* lyt(new QGridLayout());
   int line;
-  line = 0,
+  line =0,
+      lyt->addWidget(new QLabel("Source"), line, 0);
+  lyt->addLayout(srcBtnLyt, line, 1, 1, 1, Qt::AlignLeft);
+  ++line,
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
       m_monitorTypeField->addItem(tr("Select source type")),
       m_monitorTypeField->addItems(utils::sourceTypes()),
       lyt->addWidget(m_monitorTypeField, line, 2);
-  line++,
+  ++line,
       lyt->addWidget(m_verifySslPeerChkBx, line, 0, 1, 3, Qt::AlignCenter);
-  line++,
+  ++line,
       lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
       lyt->addWidget(m_serverPassField, line, 1),
       lyt->addWidget(m_showAuthInfoChkbx, line, 2);
-  line++,
+  ++line,
       lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
       m_updateIntervalField->setMinimum(5),
       m_updateIntervalField->setMaximum(1200),

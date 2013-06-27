@@ -43,7 +43,6 @@ const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
 Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
   Q_INIT_RESOURCE(ngrt4n);
-  SourceT src; loadSource(0, src);
   QString updateInterval = QSettings::value(Settings::UPDATE_INTERVAL_KEY).toString();
   QString admUser = QSettings::value(Settings::ADM_UNSERNAME_KEY).toString();
   QString admPasswd = QSettings::value(Settings::ADM_PASSWD_KEY).toString();
@@ -117,5 +116,6 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
   _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
   _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
   _src.verify_ssl_peer = jsHelper.getProperty("verify_ssl_peer").toInt32();
+
   return true;
 }

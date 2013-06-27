@@ -159,22 +159,18 @@ void ZmqSocket::makeHandShake() {
               std::ostringstream oss;
               oss << "Connection etablished; server serial: " << m_serverSerial;
               m_errorMsg = oss.str();
-              std::cerr << timeStr << "INFO: " << m_errorMsg <<"\n";
               return;
             } else {
               //FIXME: sometimes this could be due to authentication failed
               m_errorMsg = "Weird response from the server ("+reply+")";
-              std::cerr << timeStr << "ERROR: " << m_errorMsg <<"\n";
               break;
             }
         } else {
           m_errorMsg = "No response from server, retrying...";
-          std::cerr << timeStr << "WARNING: " << m_errorMsg <<"\n";
           socket->reset();
         }
       if (--retriesLeft == 0) {
           m_errorMsg = "Unable to connect to the service from this address ("+m_serverUri+")";
-          std::cerr << timeStr << "ERROR: " << m_errorMsg <<"\n";
         }
     }
 }

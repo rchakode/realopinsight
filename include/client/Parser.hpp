@@ -32,13 +32,12 @@
 
 class Parser
 {
-
 public:
   Parser();
-  ~Parser();
+  virtual ~Parser();
 
-  bool parseSvConfig(const QString &, CoreDataT &);
-  QString getDotGraphFile(void) const { return graphFilename;}
+  bool loadConfig(const QString& _file, CoreDataT& _cdata, bool console);
+  QString getDotGraphFile(void) const { return graphFilename; }
   static const QString CHILD_SEP;
 
 private:

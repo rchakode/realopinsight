@@ -46,21 +46,21 @@ Parser::~Parser()
   dotFile.close();
 }
 
-bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
+bool Parser::loadConfig(const QString& _file, CoreDataT& _cdata, bool console)
 {
   QString graphContent ="";
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
-  QFile file(_configFile);
+  QFile file(_file);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    utils::alert(QObject::tr("Unable to open the file %1").arg(_configFile));
+    utils::alert(QObject::tr("Unable to open the file %1").arg(_file));
     file.close();
     return false;
   }
   if (!xmlDoc.setContent(&file)) {
     file.close();
-    utils::alert(QObject::tr("Error while parsing the file %1").arg(_configFile));
+    utils::alert(QObject::tr("Error while parsing the file %1").arg(_file));
     return false;
   }
   file.close(); // The content of the file is already in memory
@@ -95,8 +95,9 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
       QString srcid = utils::getSourceIdFromStr(info.first);
       if (srcid.isEmpty()) {
         QString srcid = utils::sourceId(0);
-        //FIXME: remove source0 inside the editor
-        node.child_nodes = utils::computeRealCheckId(srcid, node.child_nodes);
+        if (console) {
+          node.child_nodes = utils::computeRealCheckId(srcid, node.child_nodes);
+        }
         _cdata.sources.insert(srcid);
       } else {
         _cdata.sources.insert(srcid);
@@ -108,6 +109,7 @@ bool Parser::parseSvConfig(const QString& _configFile, CoreDataT& _cdata)
       _cdata.bpnodes.insert(node.id, node);
     }
   }
+
   updateNodeHierachy(_cdata.bpnodes, _cdata.cnodes, graphContent);
   buildNodeTree(_cdata.bpnodes, _cdata.cnodes, _cdata.tree_items);
   graphContent = dotFileHeader + graphContent;

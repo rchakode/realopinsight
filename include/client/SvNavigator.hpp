@@ -84,7 +84,7 @@ public slots:
   void processZbxReply(QNetworkReply* reply, SourceT& src);
   void processZnsReply(QNetworkReply* reply, SourceT& src);
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
-  void allocSourceHandler(SourceT& src);
+  bool allocSourceHandler(SourceT& src);
   void handleSourcesChanged(QList<qint8> ids);
 
 signals:

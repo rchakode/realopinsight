@@ -191,7 +191,7 @@ void SvNavigator::load(const QString& _file)
   m_activeFile = m_configFile;
   QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_configFile));
   Parser parser;
-  parser.parseSvConfig(m_configFile, *m_cdata);
+  parser.loadConfig(m_configFile, *m_cdata, true);
   m_tree->clear();
   m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
   m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
@@ -357,6 +357,7 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
 
   CheckT invalidCheck;
   utils::setCheckOnError(MonitorBroker::Unknown, "", invalidCheck);
+
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
@@ -372,7 +373,7 @@ void SvNavigator::runLivestatusUpdate(const SourceT& src)
           updateCNodes(*chkit, src);
         } else {
           invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
-          invalidCheck.alarm_msg = tr("Service not found (%1)").arg(key).toStdString();
+          invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
           updateCNodes(invalidCheck, src);
         }
       }
@@ -441,7 +442,7 @@ void SvNavigator::updateDashboard(const NodeT& _node)
   if (!m_showOnlyTroubles || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal)) {
     m_msgConsole->updateNodeMsg(_node);
     if (m_msgConsole->getRowCount() == 1) {
-      m_msgConsole->updateEntriesSize(m_msgConsoleSize); //FIXME: Take care of message wrapping
+      m_msgConsole->updateEntriesSize(m_msgConsoleSize);
     }
   }
   emit hasToBeUpdate(_node.parent);
@@ -1073,7 +1074,6 @@ void SvNavigator::processRpcError(QNetworkReply::NetworkError _code, const Sourc
 void SvNavigator::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (!msg.isEmpty()) {
-    //FIXME: could be heavy utils::alert(msg);
     updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
@@ -1091,7 +1091,6 @@ void SvNavigator::updateDashboardOnError(const SourceT& src, const QString& msg)
 
 void SvNavigator::updateTrayInfo(const NodeT& _node)
 {
-  //FIXME: update once;
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
   if (_node.severity == MonitorBroker::Critical ||
       _node.severity == MonitorBroker::Unknown) {
@@ -1135,8 +1134,9 @@ void SvNavigator::initSettings(void)
   {
     QPair<bool, int> srcinfo = utils::checkSourceId(*id);
     if (srcinfo.first) {
-      if (m_preferences->isSetSource(srcinfo.second) && m_settings->loadSource(*id, src)) {
-        allocSourceHandler(src);
+      if (m_preferences->isSetSource(srcinfo.second) &&
+          m_settings->loadSource(*id, src) &&
+          allocSourceHandler(src)) {
         m_sources.insert(srcinfo.second, src);
       } else {
         src.id = *id;
@@ -1159,8 +1159,9 @@ void SvNavigator::resetInterval()
   m_timer = startTimer(m_interval);
 }
 
-void SvNavigator::allocSourceHandler(SourceT& src)
+bool SvNavigator::allocSourceHandler(SourceT& src)
 {
+  bool allocated = false;
   if (src.mon_type == MonitorBroker::Auto) {
     src.mon_type = m_cdata->monitor;
   }
@@ -1173,17 +1174,23 @@ void SvNavigator::allocSourceHandler(SourceT& src)
         QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
         src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
       }
+      allocated = true;
       break;
     case MonitorBroker::Zabbix:
       src.zbx_handler = std::make_shared<ZbxHelper>();
+      allocated = true;
       break;
     case MonitorBroker::Zenoss:
       src.zns_handler = std::make_shared<ZnsHelper>();
+      allocated = true;
       break;
     default:
-      utils::alert(tr("Unknown monitor type (%1").arg(src.mon_type));
+      utils::alert(tr("Undefined monitor (%1)").arg(src.mon_type));
+      allocated = false;
       break;
   }
+
+  return allocated;
 }
 
 
