@@ -1226,7 +1226,10 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
       m_browser->setUrl(newsrc.mon_url);
     }
   }
-  runMonitor();
+
+  if (!ids.isEmpty()) {
+    runMonitor();
+  }
 }
 
 void SvNavigator::loadMenus(void)

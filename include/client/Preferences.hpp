@@ -63,7 +63,7 @@ public:
   virtual ~Preferences();
   static QString style();
   bool useLs(void) const {return m_useMkls == Qt::Checked;}
-  QBitArray* getSourceStates() const {return m_sourceStates;}
+  QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;
   }
   void clearUpdatedSources(void) { m_updatedSources.clear(); }
@@ -112,6 +112,7 @@ private:
   QCheckBox* m_useMklsChkbx;
   QList<qint8> m_updatedSources;
   QCheckBox* m_verifySslPeerChkBx;
+  QVector<QPushButton*> m_sourceBtns;
 
   void addEvents(void);
   QGroupBox* createScktGrp(void);

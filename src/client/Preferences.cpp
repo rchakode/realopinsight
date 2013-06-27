@@ -330,23 +330,23 @@ QGroupBox* Preferences::createScktGrp(void)
 
 QGroupBox* Preferences::createCommonGrp(void)
 {
-  QHBoxLayout* srcBtnLyt(new QHBoxLayout());
-  srcBtnLyt->setContentsMargins(0,0,0,0);
-  srcBtnLyt->setMargin(0);
+  QHBoxLayout* sourceBtnsLyt(new QHBoxLayout());
+  sourceBtnsLyt = new QHBoxLayout();
+  sourceBtnsLyt->setContentsMargins(0,0,0,0);
+  sourceBtnsLyt->setMargin(0);
   for (int i=0; i<MAX_SRCS; ++i)
   {
     QPushButton* btn(new QPushButton(QString::number(i)));
     btn->setAutoDefault(false);
     btn->setFixedSize(12, 14);
-    btn->setEnabled(isSetSource(i));
-    srcBtnLyt->addWidget(btn);
-
+    m_sourceBtns.push_back(btn);
+    sourceBtnsLyt->addWidget(m_sourceBtns.back());
   }
   QGridLayout* lyt(new QGridLayout());
   int line;
   line =0,
       lyt->addWidget(new QLabel("Source"), line, 0);
-  lyt->addLayout(srcBtnLyt, line, 1, 1, 1, Qt::AlignLeft);
+  lyt->addLayout(sourceBtnsLyt, line, 1, 1, 1, Qt::AlignLeft);
   ++line,
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
@@ -484,14 +484,22 @@ void Preferences::initSourceStates()
 {
   QString str = m_settings->value(Settings::SRC_BUCKET_KEY).toString();
   initSourceStates(str);
+
+  int size = m_sourceBtns.size();
+  for (int i=0; i < size; ++i) {
+    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
+  }
 }
 
 void Preferences::initSourceStates(const QString& str)
 {
-  if (str.isEmpty()) {
-    for (int i=1; i < MAX_SRCS; i++) m_sourceStates->setBit(i, false);
-  } else {
-    for (int i = 0; i < MAX_SRCS; i++) m_sourceStates->setBit(i, str.at(i).digitValue());
+  for (int i=1; i < MAX_SRCS; ++i)
+  {
+    if (str.isEmpty()) {
+      m_sourceStates->setBit(i, false);
+    } else {
+      m_sourceStates->setBit(i, str.at(i).digitValue());
+    }
   }
 }
 
