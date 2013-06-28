@@ -312,7 +312,7 @@ QStringList utils::sourceIndexes(void)
 
 
 /* return <[sourcei:]hostaddr, checkid> */
-CheckIdInfoT utils::splitHostCheckInfo(const QString& info)
+StringPairT utils::splitHostCheckInfo(const QString& info)
 {
   int pos = info.indexOf("/");
   QString second = ((pos == -1)? "ping" : info.mid(pos+1));
@@ -322,7 +322,7 @@ CheckIdInfoT utils::splitHostCheckInfo(const QString& info)
 
 
 /* return <source, hostaddr> */
-CheckIdInfoT utils::splitSourceHostInfo(const QString& info)
+StringPairT utils::splitSourceHostInfo(const QString& info)
 {
   int pos = info.indexOf(":");
   QString first;
@@ -343,18 +343,6 @@ QString utils::getSourceIdFromStr(const QString& str)
     srcid = str.mid(0, pos);
   }
   return srcid;
-}
-
-QString utils::getHostFromSourceStr(const QString& str)
-{
-  QString host;
-  int pos = str.indexOf(":");
-  if (pos == -1) {
-    host = str;
-  } else {
-    host = str.mid(pos+1, -1);
-  }
-  return host;
 }
 
 QPair<bool, int> utils::checkSourceId(const QString &id)

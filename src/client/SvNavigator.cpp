@@ -481,7 +481,7 @@ void SvNavigator::updateCNodes(const CheckT& check, const SourceT& src)
 {
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(); cnode!=m_cdata->cnodes.end(); ++cnode)
   {
-    if (cnode->child_nodes.toLower()==utils::computeRealCheckId(src.id, QString::fromStdString(check.id)).toLower())
+    if (cnode->child_nodes.toLower()==utils::realCheckId(src.id, QString::fromStdString(check.id)).toLower())
     {
       cnode->check = check;
       computeStatusInfo(cnode, src);
@@ -509,8 +509,8 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
        end = m_cdata->cnodes.end(); cnode != end; ++cnode)
   {
     if (! cnode->monitored &&
-        cnode->child_nodes.toLower()==utils::computeRealCheckId(src.id,
-                                                                QString::fromStdString(cnode->check.id)).toLower())
+        cnode->child_nodes.toLower()==utils::realCheckId(src.id,
+                                                         QString::fromStdString(cnode->check.id)).toLower())
     {
       utils::setCheckOnError(MonitorBroker::Unknown,
                              tr("Undefined service (%1)").arg(cnode->child_nodes),
@@ -778,14 +778,17 @@ void SvNavigator::processZbxReply(QNetworkReply* _reply, SourceT& src)
     }
     case ZbxHelper::Trigger:
     case ZbxHelper::TriggerV18: {
+
       QScriptValueIterator trigger(jsHelper.getProperty("result"));
-      CheckT check;
-      while (trigger.hasNext())
-      {
-        trigger.next(); if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+      while (trigger.hasNext()) {
+
+        trigger.next();
+        if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
 
         QScriptValue triggerData = trigger.value();
         QString triggerName = triggerData.property("description").toString();
+
+        CheckT check;
         check.check_command = triggerName.toStdString();
         check.status = triggerData.property("value").toInt32();
         if (check.status == MonitorBroker::ZabbixClear) {
@@ -851,10 +854,13 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
       return;
     }
     if (tid == ZnsHelper::Device) {
+
       QScriptValueIterator devices(result.property("devices"));
-      while(devices.hasNext())
-      {
-        devices.next(); if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
+
+      while (devices.hasNext()) {
+
+        devices.next();
+        if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
 
         QScriptValue ditem = devices.value();
         QString duid = ditem.property("uid").toString();
@@ -864,8 +870,9 @@ void SvNavigator::processZnsReply(QNetworkReply* _reply, SourceT& src)
                                                             .toAscii());
         processZnsReply(reply, src);
 
-        QString dname = ditem.property("name").toString();
-        if (m_cdata->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
+        QString did = utils::realCheckId(src.id, ditem.property("name").toString());
+        if (m_cdata->hosts[did].contains("ping", Qt::CaseInsensitive))
+        {
           reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
                                                .arg(duid, QString::number(ZnsHelper::DeviceInfo))
@@ -1032,12 +1039,16 @@ void SvNavigator::requestZbxZnsData(SourceT& src) {
   updateStatusBar(tr("Updating..."));
   switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
-      /* First check that we're logged */
       if (src.zbx_handler->getIsLogged()) {
         int trid = src.zbx_handler->getTrid();
         foreach (const QString& hitem, m_cdata->hosts.keys()) {
+
+          StringPairT info = utils::splitSourceHostInfo(hitem);
+
+          if (info.first != src.id) continue;
+
           QStringList params;
-          params.push_back(utils::getHostFromSourceStr(hitem));
+          params.push_back(info.second);
           params.push_back(QString::number(trid));
           QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
           processZbxReply(reply, src);
@@ -1046,14 +1057,17 @@ void SvNavigator::requestZbxZnsData(SourceT& src) {
       break;
     }
     case MonitorBroker::Zenoss: {
-      /* First check that we're logged */
       if (src.zns_handler->getIsLogged()) {
         src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
         foreach (const QString& hitem, m_cdata->hosts.keys()) {
+
+          StringPairT info = utils::splitSourceHostInfo(hitem);
+
+          if (info.first != src.id) continue;
+
           QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                               ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                                                              .arg(utils::getHostFromSourceStr(hitem),
-                                                                   QString::number(ZnsHelper::Device))
+                                                              .arg(info.second, QString::number(ZnsHelper::Device))
                                                               .toAscii());
           processZnsReply(reply, src);
         }
@@ -1104,7 +1118,7 @@ void SvNavigator::updateDashboardOnError(const SourceT& src, const QString& msg)
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
   {
-    CheckIdInfoT info = utils::splitSourceHostInfo(cnode->child_nodes);
+    StringPairT info = utils::splitSourceHostInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
 
     utils::setCheckOnError(MonitorBroker::Unknown, msg, cnode->check);

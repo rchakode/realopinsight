@@ -91,18 +91,20 @@ bool Parser::process(CoreDataT& _cdata, bool console)
     }
     if (node.type == NodeType::ALARM_NODE) {
 
-      QPair<QString, QString> info = utils::splitHostCheckInfo(node.child_nodes);
+      StringPairT info = utils::splitHostCheckInfo(node.child_nodes);
+      _cdata.hosts[info.first] << info.second;
+
       QString srcid = utils::getSourceIdFromStr(info.first);
+
       if (srcid.isEmpty()) {
         QString srcid = utils::sourceId(0);
         if (console) {
-          node.child_nodes = utils::computeRealCheckId(srcid, node.child_nodes);
+          node.child_nodes = utils::realCheckId(srcid, node.child_nodes);
         }
         _cdata.sources.insert(srcid);
       } else {
         _cdata.sources.insert(srcid);
       }
-      _cdata.hosts[info.first] <<  info.second;
       _cdata.cnodes.insert(node.id, node);
 
     } else {

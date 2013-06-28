@@ -60,7 +60,7 @@ namespace utils {
   inline QString sourceKey(const QString& id)
   { return QString("/Sources/%1").arg(id);}
 
-  inline QString computeRealCheckId(const QString& srcid, const QString& chkid)
+  inline QString realCheckId(const QString& srcid, const QString& chkid)
   { return QString("%1:%2").arg(srcid, chkid);}
 
   QString criticityToText(const qint32& _status);
@@ -86,9 +86,8 @@ namespace utils {
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
   QStringList sourceTypes(void);
   QStringList sourceIndexes(void);
-  CheckIdInfoT splitHostCheckInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
-  CheckIdInfoT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
-  QString getHostFromSourceStr(const QString& str);
+  StringPairT splitHostCheckInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
+  StringPairT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
 } //NAMESPACE
