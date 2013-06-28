@@ -154,19 +154,20 @@ void SvNavigator::runMonitor()
     if (src != m_sources.end()) {
       runMonitor(*src);
     } else {
-      utils::alert(tr("The default source is not yet"));
+      utils::alert(tr("default source not yet"));
     }
   }
 
   updateTrayInfo(*m_root);
+  updateStatusBar(tr("update completed"));
 
   QMainWindow::setEnabled(true);
 }
 
 void SvNavigator::runMonitor(SourceT& src)
 {
-  openRpcSession(src);
   prepareUpdate(src);
+  openRpcSession(src);
   switch(src.mon_type) {
     case MonitorBroker::Zenoss:
     case MonitorBroker::Zabbix:
@@ -189,7 +190,8 @@ void SvNavigator::timerEvent(QTimerEvent *)
 void SvNavigator::showEvent(QShowEvent *)
 {
   std::unique_ptr<QSplashScreen> info(utils::infoScreen());
-  info->showMessage("Please wait for initialization, it may take a while...", Qt::AlignCenter|Qt::AlignCenter);
+  info->showMessage(tr("Please wait for initialization, it may take a while..."),
+                    Qt::AlignCenter|Qt::AlignCenter);
 
   initSettings();
   runMonitor();
@@ -368,7 +370,7 @@ void SvNavigator::runLivestatusUpdate(int srcId)
   if (src != m_sources.end()) {
     runLivestatusUpdate(*src);
   } else {
-    updateDashboardOnError(*src, tr("Undefined sources (%1)").arg(utils::sourceId(srcId)));
+    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(utils::sourceId(srcId)));
   }
 }
 
@@ -421,19 +423,19 @@ void SvNavigator::resetStatData(void)
 
 void SvNavigator::prepareUpdate(const SourceT& src)
 {
-  QString msg = QObject::tr("Connecting to %1...");
+  QString msg = QObject::tr("updating... (%1, %2)");
   switch(src.mon_type) {
     case MonitorBroker::Nagios:
-      msg = msg.arg(QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
+      msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
       break;
     case MonitorBroker::Zabbix:
-      msg = msg.arg(src.zbx_handler->getApiEndpoint());
+      msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
       break;
     case MonitorBroker::Zenoss:
-      msg = msg.arg(src.zns_handler->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
+      msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
       break;
     default:
-      msg = tr("Undefined source type");
+      msg = msg.arg(src.id, "Undefined source type");
       break;
   }
   updateStatusBar(msg);
@@ -519,8 +521,6 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
     }
     cnode->monitored = false;
   }
-
-  updateStatusBar(tr("update completed (%1)").arg(src.id));
 }
 
 void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node, const SourceT& src)

@@ -155,17 +155,17 @@ void LsHelper::handleNetworkFailure(QAbstractSocket::SocketError error)
 {
   switch (error) {
   case QAbstractSocket::RemoteHostClosedError:
-    QAbstractSocket::setErrorString(tr("The connection has been closed by the remote host"));
+    QAbstractSocket::setErrorString(tr("Connection closed by the remote host"));
     break;
   case QAbstractSocket::HostNotFoundError:
-    QAbstractSocket::setErrorString(tr("The host not found (%1).").arg(m_host));
+    QAbstractSocket::setErrorString(tr("Host not found (%1).").arg(m_host));
     break;
   case QAbstractSocket::ConnectionRefusedError:
     QAbstractSocket::setErrorString(tr("Connection refused. "
                                        "Make sure that Livestatus API is listening on tcp://%1:%2").arg(m_host).arg(m_port));
     break;
   default:
-    QAbstractSocket::setErrorString(tr("The following error occurred: %1")
+    QAbstractSocket::setErrorString(tr("The following error occurred (%1)")
                                     .arg(QAbstractSocket::errorString()));
   }
 }
