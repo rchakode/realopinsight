@@ -16,7 +16,6 @@ RealOpInsight ChangeLog
   * Binaries are available for Fedora 17 and 18, openSUSE 12.1, 12.2 and 12.3.
   From this version, we don't longer provide binaries for Fedora 16
 
-
 2.3.0beta1 (Briator, b1)
 --------------
   * Added support for MK Livestatus remote socket
