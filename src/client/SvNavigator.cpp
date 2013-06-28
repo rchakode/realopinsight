@@ -157,6 +157,9 @@ void SvNavigator::runMonitor()
       utils::alert(tr("The default source is not yet"));
     }
   }
+
+  updateTrayInfo(*m_root);
+
   QMainWindow::setEnabled(true);
 }
 
@@ -185,8 +188,15 @@ void SvNavigator::timerEvent(QTimerEvent *)
 
 void SvNavigator::showEvent(QShowEvent *)
 {
+  std::unique_ptr<QSplashScreen> info(utils::infoScreen());
+  info->showMessage("Please wait for initialization, it may take a while...", Qt::AlignCenter|Qt::AlignCenter);
+
   initSettings();
   runMonitor();
+
+  info->finish(0);
+  m_trayIcon->show();
+  m_trayIcon->setToolTip(APP_NAME);
 }
 
 void  SvNavigator::updateStatusBar(const QString& msg)
@@ -207,16 +217,17 @@ void SvNavigator::load(const QString& _file)
   m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
   m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
 
+  m_root = m_cdata->bpnodes.find(SvNavigatorTree::RootId);
+  if (m_root == m_cdata->bpnodes.end()) {
+    utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
+    exit(1);
+  }
+
   resizeDashboard();
   QMainWindow::show();
   m_map->scaleToFitViewPort();
 
-  m_trayIcon->show();
-  m_trayIcon->setToolTip(APP_NAME);
-
   QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_configFile));
-
-  //  runMonitor();
 }
 
 void SvNavigator::unloadMenus(void)
@@ -481,7 +492,6 @@ void SvNavigator::updateCNodes(const CheckT& check, const SourceT& src)
 void SvNavigator::finalizeUpdate(const SourceT& src)
 {
   if (m_cdata->cnodes.isEmpty()) {
-    if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
     return;
   }
 
@@ -508,8 +518,6 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
     }
     cnode->monitored = false;
   }
-  //FIXME: Do this while avoiding searching at each update
-  if (!m_cdata->bpnodes.isEmpty()) updateTrayInfo(m_cdata->bpnodes[SvNavigatorTree::RootId]);
 
   updateStatusBar(tr("update completed (%1)").arg(src.id));
 }
@@ -599,7 +607,7 @@ void SvNavigator::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   m_map->updateNode(node, toolTip);
   updateNavTreeItemStatus(node, toolTip);
-  if (node->id != SvNavigatorTree::RootId) emit hasToBeUpdate(node->parent);
+  if (node->id != m_root->id) emit hasToBeUpdate(node->parent);
 }
 
 void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)

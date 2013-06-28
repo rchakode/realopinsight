@@ -126,6 +126,7 @@ private:
   QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
+  NodeListT::Iterator m_root;
 
   void addEvents(void);
   void loadMenus(void);
