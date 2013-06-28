@@ -67,7 +67,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
                          QWidget* parent)
   : QMainWindow(parent),
     m_cdata (new CoreDataT()),
-    m_configFile(_config),
+    m_config(_config),
     m_userRole (_userRole),
     m_settings (new Settings()),
     m_chart (std::make_shared<Chart>()),
@@ -206,12 +206,15 @@ void  SvNavigator::updateStatusBar(const QString& msg)
 
 void SvNavigator::load(const QString& _file)
 {
-  Parser parser;
+
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_config));
 
   if (!_file.isEmpty()) {
-    m_configFile = utils::getAbsolutePath(_file);
+    m_config = utils::getAbsolutePath(_file);
   }
-  parser.loadConfig(m_configFile, *m_cdata, true);
+
+  Parser parser(m_config);
+  parser.process(*m_cdata, true);
 
   m_tree->clear();
   m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
@@ -226,8 +229,6 @@ void SvNavigator::load(const QString& _file)
   resizeDashboard();
   QMainWindow::show();
   m_map->scaleToFitViewPort();
-
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_configFile));
 }
 
 void SvNavigator::unloadMenus(void)

@@ -1,6 +1,22 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+2.4.0beta1 (Federator)
+  * Improved support for overriding SSL peer verification
+  * Added support for multisources management, up to 10 sources supported
+  * Lot of refactoring, imporving loading and updating
+  * Added welcome screen while loading heavy configuration
+
+2.3.1 (Briator, p1)
+  * Added support for overriding SSL peer verification
+  * Private release no sufficiently tested for production
+
+2.3.0 (Briator)
+  * Minor changes from the beta version.
+  * Binaries are available for Fedora 17 and 18, openSUSE 12.1, 12.2 and 12.3.
+  From this version, we don't longer provide binaries for Fedora 16
+
+
 2.3.0beta1 (Briator, b1)
 --------------
   * Added support for MK Livestatus remote socket

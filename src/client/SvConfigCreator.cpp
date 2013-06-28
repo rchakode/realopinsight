@@ -34,23 +34,23 @@ namespace {
   const QString MULTI_SOURCES ="Multiple sources (*.ms.ngrt4n.xml)";
 }
 SvCreator::SvCreator(const qint32& _userRole)
-  : muserRole (_userRole),
-    mhasLeftUpdates (false),
-    mactiveFile(""),
-    mselectedNode(""),
-    msettings(new Settings()),
+  : m_userRole (_userRole),
+    m_hasLeftUpdates (false),
+    m_activeConfig(""),
+    m_selectedNode(""),
+    m_settings(new Settings()),
     m_cdata(new CoreDataT()),
-    mainSplitter(new QSplitter(this)),
-    mtree(new SvNavigatorTree(true)),
-    meditor(new ServiceEditor()),
-    mmenuBar(new QMenuBar(this)),
-    mtoolBar(new QToolBar("Tool Bar")),
-    mnodeContextMenu(new QMenu()),
-    mclipboardData(NULL)
+    m_mainSplitter(new QSplitter(this)),
+    m_tree(new SvNavigatorTree(true)),
+    m_editor(new ServiceEditor()),
+    m_menuBar(new QMenuBar(this)),
+    m_toolBar(new QToolBar("Tool Bar")),
+    m_nodeContextMenu(new QMenu()),
+    m_clipboardData(NULL)
 {
-  mainSplitter->addWidget(mtree);
-  mainSplitter->addWidget(meditor);
-  setCentralWidget(mainSplitter);
+  m_mainSplitter->addWidget(m_tree);
+  m_mainSplitter->addWidget(m_editor);
+  setCentralWidget(m_mainSplitter);
   resize();
   statusBar()->showMessage(tr("Open or edit a file via the File menu"));
 }
@@ -58,10 +58,10 @@ SvCreator::SvCreator(const qint32& _userRole)
 SvCreator::~SvCreator()
 {
   delete m_cdata;
-  delete mtree;
-  delete meditor;
-  delete mainSplitter;
-  if (mclipboardData) delete mclipboardData;
+  delete m_tree;
+  delete m_editor;
+  delete m_mainSplitter;
+  if (m_clipboardData) delete m_clipboardData;
   unloadMenu();
 }
 
@@ -69,11 +69,11 @@ SvCreator::~SvCreator()
 void SvCreator::contextMenuEvent(QContextMenuEvent*_event)
 {
   QPoint pos = _event->globalPos();
-  QList<QTreeWidgetItem*> selectedNodes = mtree->selectedItems();
+  QList<QTreeWidgetItem*> selectedNodes = m_tree->selectedItems();
 
   if (selectedNodes.length()) {
-    mselectedNode = selectedNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
-    mnodeContextMenu->exec(pos);
+    m_selectedNode = selectedNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
+    m_nodeContextMenu->exec(pos);
   }
 }
 
@@ -85,10 +85,10 @@ void SvCreator::closeEvent(QCloseEvent* event)
 
 void SvCreator::unloadMenu(void)
 {
-  mmenuList.clear();
-  msubMenus.clear();
-  delete mnodeContextMenu;
-  delete mmenuBar;
+  m_menus.clear();
+  m_subMenus.clear();
+  delete m_nodeContextMenu;
+  delete m_menuBar;
 }
 
 void SvCreator::load(const QString& _path)
@@ -96,7 +96,7 @@ void SvCreator::load(const QString& _path)
   loadMenu();
   addEvents();
   loadFile(_path);
-  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
+  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   statusBar()->showMessage(tr("Loaded."));
   show();
 }
@@ -123,14 +123,14 @@ void SvCreator::loadFile(const QString& _path)
     newView();
   } else {
     utils::clear(*m_cdata);
-    Parser parser;
-    if (!parser.loadConfig(_path, *m_cdata, false)) {
+    Parser parser(_path);
+    if (!parser.process(*m_cdata, false)) {
       utils::alert(tr("Unable to open the file '%1'").arg(_path));
       exit(1);
     }
-    mtree->update(m_cdata);
-    mactiveFile = utils::getAbsolutePath(_path);
-    setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
+    m_tree->update(m_cdata);
+    m_activeConfig = utils::getAbsolutePath(_path);
+    setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   }
 }
 
@@ -139,7 +139,7 @@ void SvCreator::import() {
                                               tr("Select the Status File %").arg(APP_NAME),
                                               ".",
                                               tr("Data files (*.dat);;All files (*)"));
-  if (!path.isNull() && !path.isEmpty()) meditor->loadStatusFile(path);
+  if (!path.isNull() && !path.isEmpty()) m_editor->loadStatusFile(path);
 }
 
 void SvCreator::newView(void)
@@ -149,11 +149,11 @@ void SvCreator::newView(void)
     NodeT* node = createNode(SvNavigatorTree::RootId, tr("New View"), "");
     m_cdata->bpnodes.insert(node->id,*node);
     SvNavigatorTree::addNode(m_cdata->tree_items,*node);
-    mtree->update(m_cdata);
-    meditor->setContent(*node);
-    mselectedNode = node->id;
-    mhasLeftUpdates = true;
-    mactiveFile.clear();
+    m_tree->update(m_cdata);
+    m_editor->setContent(*node);
+    m_selectedNode = node->id;
+    m_hasLeftUpdates = true;
+    m_activeConfig.clear();
     setWindowTitle(tr("%1 Editor - unsaved document*").arg(APP_NAME));
   }
 }
@@ -164,7 +164,7 @@ void SvCreator::newNode(void)
   static int count = 1;
   NodeT* node = createNode(utils::genNodeId(),
                            tr("sub service %1").arg(QString::number(count)),
-                           mselectedNode);
+                           m_selectedNode);
   insertFromSelected(*node);
   ++count;
 }
@@ -192,7 +192,7 @@ NodeT* SvCreator::createNode(const QString& id,
 
 void SvCreator::insertFromSelected(const NodeT& node)
 {
-  NodeListT::iterator pnode = m_cdata->bpnodes.find(mselectedNode);
+  NodeListT::iterator pnode = m_cdata->bpnodes.find(m_selectedNode);
   if (pnode == m_cdata->bpnodes.end() ||
       pnode->type == NodeType::ALARM_NODE) {
     utils::alert(tr("This action not allowed on the target node"));
@@ -201,7 +201,7 @@ void SvCreator::insertFromSelected(const NodeT& node)
   pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? Parser::CHILD_SEP%node.id : node.id;
   SvNavigatorTree::addNode(m_cdata->tree_items, node, true);
   m_cdata->bpnodes.insert(node.id, node);
-  mtree->setCurrentItem(m_cdata->tree_items[node.id]);
+  m_tree->setCurrentItem(m_cdata->tree_items[node.id]);
   fillEditorFromService(m_cdata->tree_items[node.id]);
 }
 
@@ -215,7 +215,7 @@ void SvCreator::deleteNode(void)
   switch (msgBox.exec())
   {
     case QMessageBox::Yes:
-      deleteNode(mselectedNode);
+      deleteNode(m_selectedNode);
       break;
     default:
       break;
@@ -261,20 +261,20 @@ void SvCreator::deleteNode(const QString& _nodeId)
 void SvCreator::copySelected(void)
 {
   NodeListIteratorT node;
-  if (utils::findNode(m_cdata, mselectedNode, node)) {
-    if (!mclipboardData) mclipboardData = new NodeT;
-    *mclipboardData =*node;
-    mclipboardData->name+=" (Copy)";
-    mclipboardData->child_nodes.clear();
+  if (utils::findNode(m_cdata, m_selectedNode, node)) {
+    if (!m_clipboardData) m_clipboardData = new NodeT;
+    *m_clipboardData =*node;
+    m_clipboardData->name+=" (Copy)";
+    m_clipboardData->child_nodes.clear();
   }
 }
 
 void SvCreator::pasteFromSelected(void)
 {
-  if (mclipboardData) {
-    mclipboardData->id = utils::genNodeId();
-    mclipboardData->parent = mselectedNode;
-    insertFromSelected(*mclipboardData);
+  if (m_clipboardData) {
+    m_clipboardData->id = utils::genNodeId();
+    m_clipboardData->parent = m_selectedNode;
+    insertFromSelected(*m_clipboardData);
   } else {
     utils::alert(tr("There is no data in the clipboard!"));
   }
@@ -283,13 +283,13 @@ void SvCreator::pasteFromSelected(void)
 
 void SvCreator::save(void)
 {
-  if (!mselectedNode.isEmpty()) {
-    fillEditorFromService(m_cdata->tree_items[mselectedNode]);
+  if (!m_selectedNode.isEmpty()) {
+    fillEditorFromService(m_cdata->tree_items[m_selectedNode]);
   }
-  if (mactiveFile.isEmpty()) {
+  if (m_activeConfig.isEmpty()) {
     saveAs();
   } else {
-    recordData(mactiveFile);
+    recordData(m_activeConfig);
   }
 }
 
@@ -298,7 +298,7 @@ void SvCreator::saveAs(void)
   QString filter;
   QString path = QFileDialog::getSaveFileName(this,
                                               tr("Select the destination file | %1").arg(APP_NAME),
-                                              mactiveFile,
+                                              m_activeConfig,
                                               QString("%1;;%2;;%3;;%4;;").arg(NAG_SOURCE,
                                                                           ZBX_SOURCE,
                                                                           ZNS_SOURCE,
@@ -331,9 +331,9 @@ void SvCreator::saveAs(void)
 int SvCreator::treatCloseAction(const bool& _close)
 {
   int ret = 0;
-  if (_close || mhasLeftUpdates) {
+  if (_close || m_hasLeftUpdates) {
     bool enforceClose = _close;
-    if (mhasLeftUpdates) {
+    if (m_hasLeftUpdates) {
       QMessageBox mbox;
       mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
@@ -359,7 +359,7 @@ int SvCreator::treatCloseAction(const bool& _close)
 
 void SvCreator::handleSelectedNodeChanged(void)
 {
-  QList<QTreeWidgetItem*> items = mtree->selectedItems();
+  QList<QTreeWidgetItem*> items = m_tree->selectedItems();
   if (items.length())
     fillEditorFromService(*(items.begin()));
 }
@@ -399,29 +399,29 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 
 void SvCreator::handleNodeTypeActivated(qint32 _type)
 {
-  NodeListT::iterator node = m_cdata->bpnodes.find(mselectedNode);
+  NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
     if (_type == NodeType::SERVICE_NODE) {
       if (node->type == NodeType::ALARM_NODE) {
         //TODO: A bug has been reported
         node->child_nodes.clear();
-        if (meditor->updateNode(node)) {
-          m_cdata->tree_items[mselectedNode]->setText(0, node->name);
-          mhasLeftUpdates = true;
-          statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
+        if (m_editor->updateNode(node)) {
+          m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+          m_hasLeftUpdates = true;
+          statusBar()->showMessage(m_activeConfig%"*");
+          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
         }
       }
     } else {
       if (node->type == NodeType::SERVICE_NODE && ! node->child_nodes.isEmpty()) {
-        meditor->typeField()->setCurrentIndex(0);
+        m_editor->typeField()->setCurrentIndex(0);
         utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
       } else {
-        if (meditor->updateNode(node)) {
-          m_cdata->tree_items[mselectedNode]->setText(0, node->name);
-          mhasLeftUpdates = true;
-          statusBar()->showMessage(mactiveFile%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
+        if (m_editor->updateNode(node)) {
+          m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+          m_hasLeftUpdates = true;
+          statusBar()->showMessage(m_activeConfig%"*");
+          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
         }
       }
     }
@@ -436,35 +436,35 @@ void SvCreator::handleShowOnlineResources(void)
 
 void SvCreator::handleShowAbout(void)
 {
-  Preferences about(muserRole, Preferences::ShowAbout);
+  Preferences about(m_userRole, Preferences::ShowAbout);
   about.exec();
 }
 
 void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
-  if (utils::findNode(m_cdata, mselectedNode, node)) {
-    if (meditor->updateNode(node)) {
-      m_cdata->tree_items[mselectedNode]->setText(0, node->name);
-      mhasLeftUpdates = true;
-      statusBar()->showMessage(mactiveFile%"*");
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
+  if (utils::findNode(m_cdata, m_selectedNode, node)) {
+    if (m_editor->updateNode(node)) {
+      m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+      m_hasLeftUpdates = true;
+      statusBar()->showMessage(m_activeConfig%"*");
+      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
     }
   }
-  mselectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-  if (utils::findNode(m_cdata, mselectedNode, node)) meditor->setContent(node);
+  m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
+  if (utils::findNode(m_cdata, m_selectedNode, node)) m_editor->setContent(node);
 }
 
 
 void SvCreator::handleReturnPressed(void)
 {
-  NodeListT::iterator node = m_cdata->bpnodes.find(mselectedNode);
+  NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
-    if (meditor->updateNode(node)) {
-      m_cdata->tree_items[mselectedNode]->setText(0, node->name);
-      mhasLeftUpdates = true;
-      statusBar()->showMessage(mactiveFile%"*");
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(mactiveFile));
+    if (m_editor->updateNode(node)) {
+      m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+      m_hasLeftUpdates = true;
+      statusBar()->showMessage(m_activeConfig%"*");
+      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
     }
   }
 }
@@ -504,11 +504,11 @@ void SvCreator::recordData(const QString& _path)
   ofile << "</ServiceView>\n";
   file.close();
 
-  mhasLeftUpdates = false;
+  m_hasLeftUpdates = false;
   statusBar()->clearMessage();
-  mactiveFile = utils::getAbsolutePath(_path);
-  statusBar()->showMessage(tr("saved %1").arg(mactiveFile));
-  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(mactiveFile));
+  m_activeConfig = utils::getAbsolutePath(_path);
+  statusBar()->showMessage(tr("saved %1").arg(m_activeConfig));
+  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
 }
 
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
@@ -530,70 +530,70 @@ void SvCreator::resize()
   QList<qint32> frames_size;
   frames_size.push_back(ui_size.width()* 0.3);
   frames_size.push_back(ui_size.width()* 0.7);
-  mainSplitter->setSizes(frames_size);
-  mainSplitter->resize(ui_size);
+  m_mainSplitter->setSizes(frames_size);
+  m_mainSplitter->resize(ui_size);
   QMainWindow::resize(ui_size);
 }
 
 void SvCreator::loadMenu(void)
 {
-  mmenuList["FILE"] = mmenuBar->addMenu(tr("&File"));
-  msubMenus["NewFile"] = mmenuList["FILE"]->addAction("New &File"),
-      msubMenus["NewFile"]->setShortcut(QKeySequence::New);
-  msubMenus["Open"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
-      msubMenus["Open"]->setShortcut(QKeySequence::Open);
-  msubMenus["Save"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("&Save")),
-      msubMenus["Save"]->setShortcut(QKeySequence::Save);
-  msubMenus["SaveAs"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
-      msubMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
-  mmenuList["FILE"]->addSeparator(),
-      msubMenus["Import"] = mmenuList["FILE"]->addAction(QIcon(":images/built-in/import.png"), tr("&Import Status File"));
-  mmenuList["FILE"]->addSeparator(),
-      msubMenus["Quit"] = mmenuList["FILE"]->addAction(tr("&Quit")),
-      msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
-  mmenuList["EDITION"] = mmenuBar->addMenu(tr("&Edition"));
-  msubMenus["NewNode"] = mmenuList["EDITION"]->addAction(tr("&Add sub service")),
-      mnodeContextMenu->addAction(msubMenus["NewNode"]),
-      msubMenus["NewNode"]->setShortcut(QKeySequence::AddTab);
-  msubMenus["CopySelected"] = mmenuList["EDITION"]->addAction(tr("&Copy")),
-      mnodeContextMenu->addAction(msubMenus["CopySelected"]),
-      msubMenus["CopySelected"]->setShortcut(QKeySequence::Copy);
-  msubMenus["PasteFromSelected"] = mmenuList["EDITION"]->addAction(tr("&Paste")),
-      mnodeContextMenu->addAction(msubMenus["PasteFromSelected"]),
-      msubMenus["PasteFromSelected"]->setShortcut(QKeySequence::Paste);
-  msubMenus["DeleteNode"] = mmenuList["EDITION"]->addAction(tr("&Delete")),
-      msubMenus["DeleteNode"]->setShortcut(QKeySequence::Delete),
-      mnodeContextMenu->addAction(msubMenus["DeleteNode"]);
-  mmenuList["HELP"] = mmenuBar->addMenu(tr("&Help"));
-  msubMenus["ShowOnlineResources"] = mmenuList["HELP"]->addAction(tr("Online &Resources")),
-      msubMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  mmenuList["HELP"]->addSeparator(),
-      msubMenus["ShowAbout"] = mmenuList["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
-  mtoolBar->addAction(msubMenus["Save"]);
-  mtoolBar->addAction(msubMenus["Open"]);
-  mtoolBar->addAction(msubMenus["Import"]);
-  setMenuBar(mmenuBar);
-  addToolBar(mtoolBar);
+  m_menus["FILE"] = m_menuBar->addMenu(tr("&File"));
+  m_subMenus["NewFile"] = m_menus["FILE"]->addAction("New &File"),
+      m_subMenus["NewFile"]->setShortcut(QKeySequence::New);
+  m_subMenus["Open"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
+      m_subMenus["Open"]->setShortcut(QKeySequence::Open);
+  m_subMenus["Save"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("&Save")),
+      m_subMenus["Save"]->setShortcut(QKeySequence::Save);
+  m_subMenus["SaveAs"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
+      m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
+  m_menus["FILE"]->addSeparator(),
+      m_subMenus["Import"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import.png"), tr("&Import Status File"));
+  m_menus["FILE"]->addSeparator(),
+      m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
+      m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
+  m_menus["EDITION"] = m_menuBar->addMenu(tr("&Edition"));
+  m_subMenus["NewNode"] = m_menus["EDITION"]->addAction(tr("&Add sub service")),
+      m_nodeContextMenu->addAction(m_subMenus["NewNode"]),
+      m_subMenus["NewNode"]->setShortcut(QKeySequence::AddTab);
+  m_subMenus["CopySelected"] = m_menus["EDITION"]->addAction(tr("&Copy")),
+      m_nodeContextMenu->addAction(m_subMenus["CopySelected"]),
+      m_subMenus["CopySelected"]->setShortcut(QKeySequence::Copy);
+  m_subMenus["PasteFromSelected"] = m_menus["EDITION"]->addAction(tr("&Paste")),
+      m_nodeContextMenu->addAction(m_subMenus["PasteFromSelected"]),
+      m_subMenus["PasteFromSelected"]->setShortcut(QKeySequence::Paste);
+  m_subMenus["DeleteNode"] = m_menus["EDITION"]->addAction(tr("&Delete")),
+      m_subMenus["DeleteNode"]->setShortcut(QKeySequence::Delete),
+      m_nodeContextMenu->addAction(m_subMenus["DeleteNode"]);
+  m_menus["HELP"] = m_menuBar->addMenu(tr("&Help"));
+  m_subMenus["ShowOnlineResources"] = m_menus["HELP"]->addAction(tr("Online &Resources")),
+      m_subMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  m_menus["HELP"]->addSeparator(),
+      m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
+  m_toolBar->addAction(m_subMenus["Save"]);
+  m_toolBar->addAction(m_subMenus["Open"]);
+  m_toolBar->addAction(m_subMenus["Import"]);
+  setMenuBar(m_menuBar);
+  addToolBar(m_toolBar);
 }
 
 void SvCreator::addEvents(void)
 {
-  connect(msubMenus["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newView()));
-  connect(msubMenus["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
-  connect(msubMenus["CopySelected"],SIGNAL(triggered(bool)),this,SLOT(copySelected()));
-  connect(msubMenus["PasteFromSelected"],SIGNAL(triggered(bool)),this,SLOT(pasteFromSelected()));
-  connect(msubMenus["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
-  connect(msubMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
-  connect(msubMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
-  connect(msubMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
-  connect(msubMenus["Import"],SIGNAL(triggered(bool)),this,SLOT(import()));
-  connect(msubMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
-  connect(msubMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
-  connect(msubMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
-  connect(meditor,SIGNAL(saveClicked()),this,SLOT(save()));
-  connect(meditor,SIGNAL(closeClicked()),this,SLOT(treatCloseAction()));
-  connect(meditor,SIGNAL(returnPressed()),this,SLOT(handleReturnPressed()));
-  connect(meditor,SIGNAL(nodeTypeActivated(qint32)),this,SLOT(handleNodeTypeActivated(qint32)));
-  connect(mtree,SIGNAL(itemSelectionChanged()),this,SLOT(handleSelectedNodeChanged()));
-  connect(mtree,SIGNAL(treeNodeMoved(QString)),this,SLOT(handleTreeNodeMoved(QString)));
+  connect(m_subMenus["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newView()));
+  connect(m_subMenus["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
+  connect(m_subMenus["CopySelected"],SIGNAL(triggered(bool)),this,SLOT(copySelected()));
+  connect(m_subMenus["PasteFromSelected"],SIGNAL(triggered(bool)),this,SLOT(pasteFromSelected()));
+  connect(m_subMenus["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
+  connect(m_subMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
+  connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
+  connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
+  connect(m_subMenus["Import"],SIGNAL(triggered(bool)),this,SLOT(import()));
+  connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
+  connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
+  connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
+  connect(m_editor,SIGNAL(saveClicked()),this,SLOT(save()));
+  connect(m_editor,SIGNAL(closeClicked()),this,SLOT(treatCloseAction()));
+  connect(m_editor,SIGNAL(returnPressed()),this,SLOT(handleReturnPressed()));
+  connect(m_editor,SIGNAL(nodeTypeActivated(qint32)),this,SLOT(handleNodeTypeActivated(qint32)));
+  connect(m_tree,SIGNAL(itemSelectionChanged()),this,SLOT(handleSelectedNodeChanged()));
+  connect(m_tree,SIGNAL(treeNodeMoved(QString)),this,SLOT(handleTreeNodeMoved(QString)));
 }

@@ -101,7 +101,7 @@ protected:
 
 private:
   CoreDataT* m_cdata;
-  QString m_configFile;
+  QString m_config;
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;

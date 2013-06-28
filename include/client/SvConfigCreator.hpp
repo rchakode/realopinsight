@@ -70,21 +70,21 @@ protected:
   virtual void closeEvent( QCloseEvent *);
 
 private:
-  qint32 muserRole;
-  bool mhasLeftUpdates;
-  QString mactiveFile;
-  QString mselectedNode;
-  Settings* msettings;
+  qint32 m_userRole;
+  bool m_hasLeftUpdates;
+  QString m_activeConfig;
+  QString m_selectedNode;
+  Settings* m_settings;
   CoreDataT* m_cdata;
-  QSplitter* mainSplitter;
-  MenuListT mmenuList;
-  SubMenuListT msubMenus;
-  SvNavigatorTree* mtree;
-  ServiceEditor* meditor;
-  QMenuBar* mmenuBar;
-  QToolBar* mtoolBar;
-  QMenu* mnodeContextMenu;
-  NodeT* mclipboardData;
+  QSplitter* m_mainSplitter;
+  MenuListT m_menus;
+  SubMenuListT m_subMenus;
+  SvNavigatorTree* m_tree;
+  ServiceEditor* m_editor;
+  QMenuBar* m_menuBar;
+  QToolBar* m_toolBar;
+  QMenu* m_nodeContextMenu;
+  NodeT* m_clipboardData;
 
   void loadFile(const QString &);
   void recordData(const QString &);

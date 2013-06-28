@@ -32,35 +32,35 @@
 using namespace std;
 
 const QString Parser::CHILD_SEP = ",";
-const QString Parser::dotFileHeader = "strict graph\n{\n node[shape=plaintext]\n";
-const QString Parser::dotFileFooter = "}";
+const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
+const QString Parser::m_dotFooter = "}";
 
 
-Parser::Parser() {}
+Parser::Parser(const QString& _config) : m_config(_config) {}
 
 Parser::~Parser()
 {
   QFile dotFile;
-  if (dotFile.exists(graphFilename)) dotFile.remove(graphFilename);
-  if (dotFile.exists(graphFilename+".plain")) dotFile.remove(graphFilename+".plain");
+  if (dotFile.exists(m_gvFile)) dotFile.remove(m_gvFile);
+  if (dotFile.exists(m_gvFile+".plain")) dotFile.remove(m_gvFile+".plain");
   dotFile.close();
 }
 
-bool Parser::loadConfig(const QString& _file, CoreDataT& _cdata, bool console)
+bool Parser::process(CoreDataT& _cdata, bool console)
 {
   QString graphContent ="";
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
-  QFile file(_file);
+  QFile file(m_config);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    utils::alert(QObject::tr("Unable to open the file %1").arg(_file));
+    utils::alert(QObject::tr("Unable to open the file %1").arg(m_config));
     file.close();
     return false;
   }
   if (!xmlDoc.setContent(&file)) {
     file.close();
-    utils::alert(QObject::tr("Error while parsing the file %1").arg(_file));
+    utils::alert(QObject::tr("Error while parsing the file %1").arg(m_config));
     return false;
   }
   file.close(); // The content of the file is already in memory
@@ -112,8 +112,8 @@ bool Parser::loadConfig(const QString& _file, CoreDataT& _cdata, bool console)
 
   updateNodeHierachy(_cdata.bpnodes, _cdata.cnodes, graphContent);
   buildNodeTree(_cdata.bpnodes, _cdata.cnodes, _cdata.tree_items);
-  graphContent = dotFileHeader + graphContent;
-  graphContent += dotFileFooter;
+  graphContent = m_dotHeader + graphContent;
+  graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
 
   return true;
@@ -180,10 +180,10 @@ void Parser::buildNodeTree(const NodeListT& _bpnodes,
 
 void Parser::saveCoordinatesFile(const QString& _graphContent)
 {
-  graphFilename = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
-  QFile file(graphFilename);
+  m_gvFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
+  QFile file(m_gvFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    utils::alert(QObject::tr("Unable into write the file %1").arg(graphFilename));
+    utils::alert(QObject::tr("Unable into write the file %1").arg(m_gvFile));
     file.close();
     exit(1);
   }

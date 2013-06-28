@@ -33,17 +33,18 @@
 class Parser
 {
 public:
-  Parser();
+  Parser(const QString& _config);
   virtual ~Parser();
 
-  bool loadConfig(const QString& _file, CoreDataT& _cdata, bool console);
-  QString getDotGraphFile(void) const { return graphFilename; }
+  bool process(CoreDataT& _cdata, bool console);
+  QString getDotGraphFile(void) const { return m_gvFile; }
   static const QString CHILD_SEP;
 
 private:
-  static const QString dotFileHeader;
-  static const QString dotFileFooter;
-  QString graphFilename;
+  static const QString m_dotHeader;
+  static const QString m_dotFooter;
+  QString m_gvFile;
+  QString m_config;
 
   void buildNodeTree(const NodeListT & _bpnodes,
                      const NodeListT & _cnodes,
