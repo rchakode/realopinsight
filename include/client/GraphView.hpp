@@ -52,7 +52,7 @@ public:
   void updateNode(const NodeListT::iterator& _nodeIt, const QString& _toolTip);
   void updateNode(const NodeT& _nodeIt, const QString& _toolTip);
   void scaleToFitViewPort(void);
-  void setStatsPanelPos(void);
+  void setChartPos(void);
   void updateStatsPanel(Chart * _stats_panel);
 
   void centerOnNode(const QString& id) { if (!id.isEmpty())centerOn(m_mnodes[id].label); }
@@ -74,9 +74,9 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *);
   virtual void mouseDoubleClickEvent(QMouseEvent *);
   virtual void wheelEvent(QWheelEvent * _event) { (_event->delta() > 0)? zoomIn() : zoomOut();}
-  virtual void resizeEvent(QResizeEvent *) { setStatsPanelPos(); }
-  virtual void showEvent(QShowEvent *) { setStatsPanelPos(); }
-  virtual void scrollContentsBy(int dx, int dy);
+  virtual void resizeEvent(QResizeEvent *) { setChartPos(); }
+  virtual void showEvent(QShowEvent *) { setChartPos(); }
+  virtual void scrollBy(int dx, int dy);
   virtual void mouseMoveEvent(QMouseEvent * event);
 
 private:

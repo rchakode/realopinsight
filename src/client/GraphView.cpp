@@ -136,15 +136,16 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
   if (item) centerOn(pos);
 }
 
-void GraphView::scrollContentsBy(int dx, int dy)
+void GraphView::scrollBy(int dx, int dy)
 {
-  QGraphicsView::scrollContentsBy(dx, dy);
-  setStatsPanelPos();
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value() + dx);
+  verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
+  setChartPos();
 }
+
 
 void GraphView::mouseMoveEvent(QMouseEvent * event)
 {
-  // FIXME: mouseMoveEvent(QMouseEvent * event), leaves blank spaces
   if (event->buttons() == Qt::LeftButton) {
     if (! m_trackingOn) {
       m_lastTrackingPos = event->pos();
@@ -152,9 +153,8 @@ void GraphView::mouseMoveEvent(QMouseEvent * event)
     } else {
       QPoint pos = event->pos();
       QPoint dt = pos - m_lastTrackingPos;
+      scrollBy(dt.x(), dt.y());
       m_lastTrackingPos = pos;
-
-      viewport()->move(viewport()->pos() + dt);
     }
   } else {
     m_trackingOn = false;
@@ -165,7 +165,7 @@ void GraphView::zoomIn()
 {
   QGraphicsView::scale(SCALIN_FACTOR, SCALIN_FACTOR);
   if (m_chart) {
-    setStatsPanelPos();
+    setChartPos();
     m_chart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
   }
 }
@@ -175,7 +175,7 @@ void GraphView::zoomOut()
   QGraphicsView::scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
   if (m_chart) {
     m_chart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
-    setStatsPanelPos();
+    setChartPos();
   }
 }
 
@@ -195,7 +195,7 @@ void GraphView::updateStatsPanel(Chart * _statsPanel)
   }
 
   if (m_chart) { //Mandatory
-    setStatsPanelPos();
+    setChartPos();
     if (!m_isAjustedChartSize) ajustStatsPanelSize();
   }
 }
@@ -212,11 +212,11 @@ void GraphView::ajustStatsPanelSize(void)
       m_chart->scale(m_chartScalFactor, m_chartScalFactor);
     }
     m_isAjustedChartSize = true;
-    setStatsPanelPos();
+    setChartPos();
   }
 }
 
-void GraphView::setStatsPanelPos(void)
+void GraphView::setChartPos(void)
 {
   if (m_chart) {
     qreal xp = size().width() - m_chart->size().width() *  m_chartScalFactor - 2;

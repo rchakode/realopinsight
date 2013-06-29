@@ -66,6 +66,7 @@ SvNavigator::SvNavigator(const qint32& _userRole,
                          const QString& _config,
                          QWidget* parent)
   : QMainWindow(parent),
+    updateCounter(0),
     m_cdata (new CoreDataT()),
     m_config(_config),
     m_userRole (_userRole),
@@ -160,7 +161,7 @@ void SvNavigator::runMonitor()
 
   updateTrayInfo(*m_root);
   updateStatusBar(tr("update completed"));
-
+  ++updateCounter;
   QMainWindow::setEnabled(true);
 }
 
@@ -189,16 +190,18 @@ void SvNavigator::timerEvent(QTimerEvent *)
 
 void SvNavigator::showEvent(QShowEvent *)
 {
-  std::unique_ptr<QSplashScreen> info(utils::infoScreen());
-  info->showMessage(tr("Please wait for initialization, it may take a while..."),
-                    Qt::AlignCenter|Qt::AlignCenter);
+  if (updateCounter==0) {
+    std::unique_ptr<QSplashScreen> info(utils::infoScreen());
+    info->showMessage(tr("Please wait for initialization, it may take a while..."),
+                      Qt::AlignCenter|Qt::AlignCenter);
 
-  initSettings();
-  runMonitor();
+    initSettings();
+    runMonitor();
 
-  info->finish(0);
-  m_trayIcon->show();
-  m_trayIcon->setToolTip(APP_NAME);
+    info->finish(0);
+    m_trayIcon->show();
+    m_trayIcon->setToolTip(APP_NAME);
+  }
 }
 
 void  SvNavigator::updateStatusBar(const QString& msg)

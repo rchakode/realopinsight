@@ -100,6 +100,7 @@ protected:
 
 
 private:
+  qint64 updateCounter;
   CoreDataT* m_cdata;
   QString m_config;
   QString m_selectedNode;
