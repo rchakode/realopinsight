@@ -37,7 +37,7 @@ public:
 
   Chart();
   virtual ~Chart();
-  void update(const CheckStatusCountT& _stCount, qint32 _count, QString& toolTip) ;
+  void update(const CheckStatusCountT& _stCount, qint32 _count) ;
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 

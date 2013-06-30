@@ -502,10 +502,9 @@ void SvNavigator::finalizeUpdate(const SourceT& src)
   }
 
   Chart *chart = new Chart;
-  QString chartInfo;
-  chart->update(m_cdata->check_status_count, m_cdata->cnodes.size(), chartInfo);
+  chart->update(m_cdata->check_status_count, m_cdata->cnodes.size());
   m_map->updateStatsPanel(chart);
-  m_chart.reset(chart); m_chart->setToolTip(chartInfo);
+  m_chart.reset(chart);
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
 
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
