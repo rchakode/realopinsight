@@ -5,7 +5,8 @@ RealOpInsight ChangeLog
   * Improved support for overriding SSL peer verification
   * Added support for multisources management, up to 10 sources supported
   * Lot of refactoring, imporving loading and updating
-  * Added welcome screen while loading heavy configuration
+  * Added splash screen when loading configuration
+  * Added support for dragging and scrolling from the map
 
 2.3.1 (Briator, p1)
   * Added support for overriding SSL peer verification
