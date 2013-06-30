@@ -53,7 +53,7 @@ public:
   void setTrid(const QString& apiv) {m_trid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
   int getTrid(void) const {return m_trid;}
   void setIsLogged(bool state) {m_isLogged = state;}
-  bool getIsLogged(void) const {return m_isLogged;}  
+  bool getIsLogged(void) const {return m_isLogged;}
   void setAuth(const QString& auth) {m_auth = auth;}
   QString getAuth(void) const {return m_auth;}
   void setSslConfig(bool verifyPeer);

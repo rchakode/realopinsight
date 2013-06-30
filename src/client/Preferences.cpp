@@ -40,7 +40,6 @@ const qint32 Preferences::ChangeMonitoringSettings = 2;
 const qint32 Preferences::ShowHelp = 3;
 const qint32 Preferences::ShowAbout = 4;
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
-const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
 
 Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
@@ -90,7 +89,6 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
 
     case Preferences::ShowAbout:
       organizeAbortWindow();
-
       break;
   }
   addEvents();
@@ -139,8 +137,6 @@ void Preferences::handleCancel(void)
 void Preferences::applySettings(void)
 {
   saveAsSource(m_selectedSource, selectSourceType());
-  mverifyPeer = static_cast<Qt::CheckState>(mverifyPeerChkBx->checkState()),
-      msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
 }
 
 void Preferences::addAsSource(void)
@@ -348,8 +344,6 @@ void Preferences::loadProperties(void)
 {
   initSourceStates();
   updateFields();
-  mverifyPeer = static_cast<Qt::CheckState>(msettings->value(DONT_VERIFY_SSL_PEER_KEY).toInt()),
-      mverifyPeerChkBx->setCheckState(mverifyPeer);
 }
 
 void Preferences::updateFields(void)
@@ -546,77 +540,77 @@ QString Preferences::style()
 {
   QString styleSheet =
       "QMenuBar, QMenu {"
-      "	background: #2d2d2d; "
-      "	color : white; "
+      " background: #2d2d2d; "
+      " color : white; "
       "}"
       "QMenuBar {"
-      "	font-weight : bold;"
+      " font-weight : bold;"
       "}"
       "QToolBar {"
-      "	background: #9dc6dd;"
-      "	padding: 0px;"
-      "	height: 16px;"
-      "	"
+      " background: #9dc6dd;"
+      " padding: 0px;"
+      " height: 16px;"
+      " "
       "}"
       "QHeaderView::section {"
-      "	background: #2d2d2d;"
-      "	color : white; "
-      "	font-weight : bold;"
+      " background: #2d2d2d;"
+      " color : white; "
+      " font-weight : bold;"
       "}"
       "QTabWidget::pane { /* The tab widget frame */"
-      "	border-top: 2px solid #C2C7CB;"
-      "	background-color: #9dc6dd;"
+      " border-top: 2px solid #C2C7CB;"
+      " background-color: #9dc6dd;"
       "}"
       "QTabWidget::tab-bar {"
-      "	background-color: #9dc6dd;"
+      " background-color: #9dc6dd;"
       "}"
       "QTabBar::tab {"
-      "	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-      "	stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,"
-      "	stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);"
-      "	border: 2px solid #C4C4C3;"
-      "	border-bottom-color: #C2C7CB; /* same as the pane color */"
-      "	border-top-left-radius: 4px;"
-      "	border-top-right-radius: 4px;"
-      "	min-width: 8ex;"
-      "	padding: 2px;"
+      " background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+      " stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,"
+      " stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);"
+      " border: 2px solid #C4C4C3;"
+      " border-bottom-color: #C2C7CB; /* same as the pane color */"
+      " border-top-left-radius: 4px;"
+      " border-top-right-radius: 4px;"
+      " min-width: 8ex;"
+      " padding: 2px;"
       "}"
       "QTabBar::tab:selected {"
-      "	background: #9dc6dd;"
+      " background: #9dc6dd;"
       "}"
       "QTabBar::tab:hover {"
-      "	background: #3589b9;"
+      " background: #3589b9;"
       "}"
       "QTabBar::tab:selected {"
-      "	border-color: #9B9B9B;"
-      "	border-bottom-color: #C2C7CB; /* same as pane color */"
+      " border-color: #9B9B9B;"
+      " border-bottom-color: #C2C7CB; /* same as pane color */"
       "}"
       "QTabBar::tab:!selected {"
-      "	margin-top: 2px; /* make non-selected tabs look smaller */"
+      " margin-top: 2px; /* make non-selected tabs look smaller */"
       "}"
       " QTreeView {"
-      "	background: #F8F8FF;"
+      " background: #F8F8FF;"
       "   alternate-background-color: yellow;"
       "}"
       "QTableView {"
-      "	background: #F8F8FF;" // #f1f1f1
-      "	alternate-background-color: #F8F8FF;"
+      " background: #F8F8FF;" // #f1f1f1
+      " alternate-background-color: #F8F8FF;"
       "}"
       "QToolTip {"
-      "	border: 2px solid darkkhaki;"
-      "	padding: 2px;"
-      "	border-radius: 3px;"
-      "	opacity: 500;"
-      "	color : #000000;"
+      " border: 2px solid darkkhaki;"
+      " padding: 2px;"
+      " border-radius: 3px;"
+      " opacity: 500;"
+      " color : #000000;"
       " font: italic large \"Times New Roman\";"
       "}"
       "QDialog {"
-      "	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,"
-      "		stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
-      "		stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
+      " background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,"
+      "         stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
+      "         stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
       "}"
       "QGraphicsView {"
-      "	background: #F8F8FF;"
+      " background: #F8F8FF;"
       "}"
       ;
   return styleSheet;

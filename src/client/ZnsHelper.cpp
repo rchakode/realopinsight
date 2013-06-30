@@ -129,4 +129,3 @@ void ZnsHelper::setSslConfig(bool verifyPeer)
     m_sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
   }
 }
-
