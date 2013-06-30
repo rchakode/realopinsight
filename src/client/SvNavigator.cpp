@@ -435,7 +435,7 @@ void SvNavigator::prepareUpdate(const SourceT& src)
       msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
       break;
     case MonitorBroker::Zenoss:
-      msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
+      msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
       break;
     default:
       msg = msg.arg(src.id, "Undefined source type");
@@ -992,7 +992,7 @@ void SvNavigator::openRpcSession(SourceT& src)
   switch(src.mon_type) {
     case MonitorBroker::Nagios:
       if (src.use_ls) {
-        if (src.ls_handler->isConnected()) { //FIXME: do this???
+        if (src.ls_handler->isConnected()) {
           src.ls_handler->disconnectFromService();
         }
         src.ls_handler->connectToService();
