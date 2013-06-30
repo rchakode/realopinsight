@@ -298,5 +298,5 @@ typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
-typedef QPair<QString, QString> CheckIdInfoT;
+typedef QPair<QString, QString> StringPairT;
 #endif /* BASE_HPP */
