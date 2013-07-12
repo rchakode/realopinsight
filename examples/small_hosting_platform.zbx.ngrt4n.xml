@@ -173,7 +173,7 @@
 		<Description>The virtual infrastructure root file system containing virtual machine images and data shared among VMs</Description>
 		<AlarmMsg></AlarmMsg>
 		<NotificationMsg></NotificationMsg>
-		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+		<SubServices>FreeBSD_4.2.i386/Lack of available memory on server {HOSTNAME}</SubServices>
 	</Service>
 	<Service id="S153210146" type="1" statusCalcRule="0" statusPropRule="0">
 		<Name>www</Name>
