@@ -47,7 +47,7 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
 
-  QString cmdName= utils::basename(argv[0]);
+  QString cmdName= basename(argv[0]);
   QString versionMsg = utils::getWelcomeMsg(QObject::tr("Editor"));
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
