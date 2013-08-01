@@ -48,8 +48,8 @@ protected:
   void startDrag(Qt::DropActions)  ;
 
 private:
-  QString mactiveNode ;
-  CoreDataT* mcoreData ;
+  QString m_selectedNode ;
+  CoreDataT* m_cdata ;
 };
 
 #endif /* SNAVSVNAVIGATORTREE_H_ */

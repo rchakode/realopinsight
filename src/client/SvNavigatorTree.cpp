@@ -31,7 +31,7 @@
 const QString SvNavigatorTree::RootId = "root";
 
 SvNavigatorTree::SvNavigatorTree(const bool& _enableDrag, QWidget* _parent)
-  : QTreeWidget(_parent), mcoreData(NULL)
+  : QTreeWidget(_parent), m_cdata(NULL)
 {
   setHeaderLabel(tr("TV Explorer"));
   setColumnCount(1);
@@ -47,13 +47,13 @@ void SvNavigatorTree::showEvent(QShowEvent*)
 void SvNavigatorTree::dropEvent(QDropEvent * _event)
 {
   QTreeWidgetItem* tnode = itemAt(_event->pos());
-  if(tnode && mcoreData) {
-    NodeListT::iterator  node = mcoreData->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString());
-    if(node != mcoreData->bpnodes.end()) {
+  if(tnode && m_cdata) {
+    NodeListT::iterator  node = m_cdata->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString());
+    if(node != m_cdata->bpnodes.end()) {
       if(node->type != NodeType::ALARM_NODE) {
         _event->setDropAction(Qt::MoveAction);
         QTreeWidget::dropEvent(_event);
-        emit treeNodeMoved(mactiveNode);
+        emit treeNodeMoved(m_selectedNode);
       } else {
         utils::alert(tr("Dropping is not allowed on the target node"));
       }
@@ -66,7 +66,7 @@ void SvNavigatorTree::startDrag(Qt::DropActions _action)
   QList<QTreeWidgetItem*> items;
   items = selectedItems();
   if(items.length())
-    mactiveNode = items[0]->data(0, QTreeWidgetItem::UserType).toString();
+    m_selectedNode = items[0]->data(0, QTreeWidgetItem::UserType).toString();
   QTreeWidget::startDrag(_action);
 }
 
@@ -108,7 +108,7 @@ void SvNavigatorTree::update(CoreDataT*& _coreData)
   QTreeWidget::addTopLevelItem(_coreData->tree_items[RootId]);
   QTreeWidget::setCurrentItem(_coreData->tree_items[RootId]);
   QTreeWidget::expandAll();
-  mcoreData = _coreData;
+  m_cdata = _coreData;
 }
 
 
