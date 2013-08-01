@@ -91,6 +91,7 @@ GraphView::GraphView(QWidget* _parent)
     m_trackingOn(false)
 {
   setScene(m_scene);
+  addEvents();
 }
 
 GraphView::~GraphView()
@@ -133,7 +134,11 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
 {
   QPointF pos = mapToScene(QPoint(_event->pos()));
   QGraphicsItem* item = m_scene->itemAt(pos);
-  if (item) centerOn(pos);
+  if (item) {
+    centerOn(pos);
+    setChartPos();
+    qDebug() <<"dd";
+  }
 }
 
 void GraphView::scrollBy(int dx, int dy)
@@ -200,6 +205,14 @@ void GraphView::updateStatsPanel(Chart * _statsPanel)
   }
 }
 
+void GraphView::centerOnNode(const QString& id)
+{
+  if (!id.isEmpty()) {
+    centerOn(m_mnodes[id].label);
+    setChartPos();
+  }
+}
+
 
 void GraphView::ajustStatsPanelSize(void)
 {
@@ -222,10 +235,11 @@ void GraphView::setChartPos(void)
     qreal xp = size().width() - m_chart->size().width() *  m_chartScalFactor - 2;
     QPointF pos = mapToScene(QPoint(xp, 0));
     m_chart->setPos(pos);
-    Chart* w = dynamic_cast<Chart*>(m_chart->widget());
-    m_chartArea->setRect(w->x(), w->y(), Chart::DefaultWidth, Chart::DefaultHeight);
+    Chart* widget = dynamic_cast<Chart*>(m_chart->widget());
+    m_chartArea->setRect(widget->x(), widget->y(), Chart::DefaultWidth, Chart::DefaultHeight);
   }
 }
+
 
 bool GraphView::hideChart(void)
 {
@@ -434,4 +448,16 @@ void GraphView::capture(void)
   render(&painter);
   painter.end();
   pixmap.save(fileName);
+}
+
+
+void GraphView::handleScrollBarMoved(void)
+{
+  setChartPos();
+}
+
+void GraphView::addEvents(void)
+{
+  connect(horizontalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(handleScrollBarMoved()));
+  connect(verticalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(handleScrollBarMoved()));
 }

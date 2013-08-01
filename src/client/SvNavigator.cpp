@@ -643,7 +643,7 @@ void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const 
 
 void SvNavigator::centerGraphOnNode(const QString& _nodeId)
 {
-  if (_nodeId != "") m_selectedNode =  _nodeId;
+  if (!_nodeId.isEmpty()) m_selectedNode =  _nodeId;
   m_map->centerOnNode(m_selectedNode);
 }
 
@@ -668,7 +668,7 @@ void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
   if (utils::findNode(m_cdata, _nodeId, node) &&
-      node->child_nodes != "") {
+      !node->child_nodes.isEmpty()) {
     if (node->type == NodeType::ALARM_NODE) {
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {

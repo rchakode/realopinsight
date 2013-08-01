@@ -54,8 +54,7 @@ public:
   void scaleToFitViewPort(void);
   void setChartPos(void);
   void updateStatsPanel(Chart * _stats_panel);
-
-  void centerOnNode(const QString& id) { if (!id.isEmpty())centerOn(m_mnodes[id].label); }
+  void centerOnNode(const QString& id);
   QGraphicsItem* nodeAtGlobalPos(QPoint pos) { return m_scene->itemAt(mapToScene(mapFromGlobal(pos))); }
   QGraphicsItem* nodeAt(QPoint pos) { return m_scene->itemAt(mapToScene(pos)); }
 
@@ -64,6 +63,7 @@ public slots:
   void zoomIn();
   void zoomOut();
   bool hideChart(void);
+  void handleScrollBarMoved(void);
 
 signals:
   void mouseIsOverNode(QString);
@@ -104,6 +104,7 @@ private:
   void drawNode(const NodeT&);
   void setNodePos(const QString& , const QPointF&);
   void ajustStatsPanelSize(void);
+  void addEvents(void);
 };
 
 #endif /* GRAPHVIEW_HPP */

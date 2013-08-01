@@ -7,6 +7,8 @@ RealOpInsight ChangeLog
   * Lot of refactoring, imporving loading and updating
   * Added splash screen when loading configuration
   * Added support for dragging and scrolling from the map
+  * Added workaround for ticket #13 adding option to override host verification
+  * Fixed ticket #14 related to chart panel repositionning
 
 2.3.1 (Briator, p1)
   * Added support for overriding SSL peer verification
