@@ -9,6 +9,7 @@ RealOpInsight ChangeLog
   * Added support for dragging and scrolling from the map
   * Added workaround for ticket #13 adding option to override host verification
   * Fixed ticket #14 related to chart panel repositionning
+  * Password manager is not longer execute through the configuration wizard
 
 2.3.1 (Briator, p1)
   * Added support for overriding SSL peer verification

@@ -310,7 +310,7 @@ QGroupBox* Preferences::createCommonGrp(void)
   QGridLayout* lyt(new QGridLayout());
   int line;
   line =0,
-      lyt->addWidget(new QLabel("Source"), line, 0);
+      lyt->addWidget(new QLabel(tr("Sources")), line, 0);
   lyt->addLayout(sourceBtnsLyt, line, 1, 1, 1, Qt::AlignLeft);
   ++line,
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),

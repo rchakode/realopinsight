@@ -116,9 +116,7 @@ int main(int argc, char **argv)
     editor->load(file);
   } else if (module == "config") {
     Preferences* monPref = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-    Preferences* passwdPref = new Preferences(userRole, Preferences::ChangePassword);
     monPref->exec();
-    passwdPref->exec();
     exit(0);
   }
   return app->exec();
