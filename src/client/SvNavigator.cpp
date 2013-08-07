@@ -155,7 +155,7 @@ void SvNavigator::runMonitor()
     if (src != m_sources.end()) {
       runMonitor(*src);
     } else {
-      utils::alert(tr("default source not yet"));
+      utils::alert(tr("The default source is not yet set"));
     }
   }
 
