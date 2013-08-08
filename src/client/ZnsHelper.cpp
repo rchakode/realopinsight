@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QNetworkCookieJar>
+#include <QSslConfiguration>
 
 
 const RequestListT ZnsHelper::ReqPatterns = ZnsHelper::requestsPatterns();

@@ -26,6 +26,7 @@
 #include <QtScript/QScriptEngine>
 #include <QDebug>
 #include <QMessageBox>
+#include <QSslConfiguration>
 
 
 const RequestListT ZbxHelper::ReqPatterns = ZbxHelper::requestsPatterns();

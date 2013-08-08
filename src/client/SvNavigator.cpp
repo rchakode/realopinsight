@@ -30,6 +30,7 @@
 #include "client/JsHelper.hpp"
 #include "client/LsHelper.hpp"
 #include <QScriptValueIterator>
+#include <QNetworkCookieJar>
 #include <QSystemTrayIcon>
 #include <sstream>
 #include <QStatusBar>
