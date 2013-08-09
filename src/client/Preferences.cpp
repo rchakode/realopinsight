@@ -96,27 +96,38 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _formType)
 
 Preferences::~Preferences()
 {
-  delete m_sourceStates;
-  delete m_monitorTypeField;
-  delete m_monitorUrlField;
-  delete m_updateIntervalField;
-  delete m_brwBtn;
-  delete m_oldPwdField;
-  delete m_pwdField;
-  delete m_rePwdField;
-  delete m_changePwdBtn;
-  delete m_cancelBtn;
-  delete m_applySettingBtn;
-  delete m_addAsSourceBtn;
-  delete m_deleteSourceBtn;
-  delete m_sockAddrField;
-  delete m_sockPortField;
-  delete m_serverPassField;
-  delete m_donateBtn;
-  delete m_showAuthInfoChkbx;
-  delete m_useMklsChkbx;
-  delete m_verifySslPeerChkBx;
-  delete m_mainLayout;
+  switch(m_formType) {
+    case ChangeMonitoringSettings:
+
+      delete m_sourceStates;
+      delete m_monitorTypeField;
+      delete m_monitorUrlField;
+      delete m_updateIntervalField;
+      delete m_brwBtn;
+      delete m_oldPwdField;
+      delete m_pwdField;
+      delete m_rePwdField;
+      delete m_changePwdBtn;
+      delete m_cancelBtn;
+      delete m_applySettingBtn;
+      delete m_addAsSourceBtn;
+      delete m_deleteSourceBtn;
+      delete m_sockAddrField;
+      delete m_sockPortField;
+      delete m_serverPassField;
+      delete m_donateBtn;
+      delete m_showAuthInfoChkbx;
+      delete m_useMklsChkbx;
+      delete m_verifySslPeerChkBx;
+      delete m_mainLayout;
+      break;
+    case BasicLoginForm:
+      delete m_realmLoginField;
+      delete m_realmPasswdField;
+      break;
+    default:
+      break;
+  }
 }
 
 

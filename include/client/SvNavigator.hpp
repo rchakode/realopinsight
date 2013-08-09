@@ -129,6 +129,7 @@ private:
   SourceListT m_sources;
   NodeListT::Iterator m_root;
   int m_firstSrcIndex;
+  QComboBox* m_bxSourceSelection;
 
   void addEvents(void);
   void loadMenus(void);
@@ -154,6 +155,7 @@ private:
   void resetInterval(void);
   void setBrowserUrl(void);
   void computeFirstSrcIndex(void);
+  void setBrowserSourceSelectionBx(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

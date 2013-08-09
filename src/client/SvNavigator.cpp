@@ -86,7 +86,8 @@ SvNavigator::SvNavigator(const qint32& _userRole,
     m_msgConsole(new MsgConsole(this)),
     m_contextMenu (new QMenu()),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
-    m_showOnlyTroubles(false)
+    m_showOnlyTroubles(false),
+    m_bxSourceSelection(new QComboBox())
 {
   setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
   loadMenus();
@@ -697,12 +698,14 @@ void SvNavigator::tabChanged(int _index)
       m_subMenus["BrowserBack"]->setEnabled(false);
       m_subMenus["BrowserForward"]->setEnabled(false);
       m_subMenus["BrowserStop"]->setEnabled(false);
+      m_subMenus["SourceSelectionBx"]->setEnabled(false);
       break;
     case 1:
       m_menus["BROWSER"]->setEnabled(true);
       m_subMenus["BrowserBack"]->setEnabled(true);
       m_subMenus["BrowserForward"]->setEnabled(true);
       m_subMenus["BrowserStop"]->setEnabled(true);
+      m_subMenus["SourceSelectionBx"]->setEnabled(true);
       m_subMenus["Refresh"]->setEnabled(false);
       m_subMenus["Capture"]->setEnabled(false);
       m_subMenus["ZoomIn"]->setEnabled(false);
@@ -1192,6 +1195,7 @@ void SvNavigator::initSettings(void)
   }
   resetInterval();
   computeFirstSrcIndex();
+  setBrowserSourceSelectionBx();
   setBrowserUrl();
 }
 
@@ -1294,6 +1298,17 @@ void SvNavigator::computeFirstSrcIndex(void)
   }
 }
 
+void SvNavigator::setBrowserSourceSelectionBx(void)
+{
+  for (SourceListT::iterator it=m_sources.begin(),
+       end = m_sources.end(); it != end; ++it)
+  {
+    if (m_cdata->sources.contains(it->id))
+      m_bxSourceSelection->addItem(it->id);
+  }
+}
+
+
 void SvNavigator::loadMenus(void)
 {
   QMenuBar* menuBar = new QMenuBar();
@@ -1347,6 +1362,7 @@ void SvNavigator::loadMenus(void)
       toolBar->addAction(m_subMenus["BrowserStop"]),
       toolBar->addSeparator(),
       toolBar->addAction(m_subMenus["FullScreen"]);
+  m_subMenus["SourceSelectionBx"] = toolBar->addWidget(m_bxSourceSelection);
   QMainWindow::setMenuBar(menuBar);
 }
 
