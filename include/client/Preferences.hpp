@@ -52,11 +52,13 @@ class Preferences : public QDialog
   Q_OBJECT
 
 public:
-  static const qint32 ChangePassword;
-  static const qint32 ForceChangePassword;
-  static const qint32 ChangeMonitoringSettings;
-  static const qint32 ShowHelp;
-  static const qint32 ShowAbout;
+  enum {
+    ChangePassword=0,
+    ForceChangePassword,
+    ChangeMonitoringSettings,
+    ShowHelp,
+    ShowAbout
+  };
   static const QString DONT_VERIFY_SSL_PEER_KEY;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);

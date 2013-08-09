@@ -34,13 +34,7 @@
 #include <QIntValidator>
 #include <QRegExpValidator>
 
-const qint32 Preferences::ChangePassword = 0;
-const qint32 Preferences::ForceChangePassword = 1;
-const qint32 Preferences::ChangeMonitoringSettings = 2;
-const qint32 Preferences::ShowHelp = 3;
-const qint32 Preferences::ShowAbout = 4;
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
-
 Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   : QDialog(),
     m_mainLayout (new QGridLayout(this)),
