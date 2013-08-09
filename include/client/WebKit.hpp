@@ -36,7 +36,7 @@ public:
   virtual ~WebKit() ;
 
 public slots:
-  void setUrl(const QString& url ) {load(QUrl(url));}
+  void setUrl(const QString& url);
   void handleLoadFinished(bool ok);
   void handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator);
 

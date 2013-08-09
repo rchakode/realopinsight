@@ -1238,12 +1238,7 @@ bool SvNavigator::allocSourceHandler(SourceT& src)
 void SvNavigator::setBrowserUrl(void)
 {
   if (! m_sources.isEmpty()) {
-    SourceListT::Iterator first = m_sources.find(0);
-    if (first != m_sources.end()){
-      m_browser->setUrl(first->mon_url);
-    } else {
-      m_browser->setUrl(m_sources.begin()->mon_url);
-    }
+    m_browser->setUrl(m_sources.begin()->mon_url);
   }
 }
 

@@ -39,6 +39,11 @@ WebKit::WebKit(const QString& _url, QWidget* _parent)
 
 WebKit::~WebKit() {}
 
+void WebKit::setUrl(const QString& url )
+{
+  load(QUrl(url));
+  m_urlpath = url;
+}
 void WebKit::handleLoadFinished(bool ok)
 {
   if (!ok) {
