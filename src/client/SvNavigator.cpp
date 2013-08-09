@@ -37,6 +37,7 @@
 #include <QObject>
 #include <zmq.h>
 #include <iostream>
+#include <algorithm>
 
 
 namespace {
@@ -1189,8 +1190,9 @@ void SvNavigator::initSettings(void)
       utils::alert(tr("Could not handle this source (%1)").arg(*id));
     }
   }
-  setBrowserUrl();
   resetInterval();
+  computeFirstSrcIndex();
+  setBrowserUrl();
 }
 
 void SvNavigator::resetInterval()
@@ -1237,8 +1239,11 @@ bool SvNavigator::allocSourceHandler(SourceT& src)
 
 void SvNavigator::setBrowserUrl(void)
 {
-  if (! m_sources.isEmpty()) {
-    m_browser->setUrl(m_sources.begin()->mon_url);
+  if (m_firstSrcIndex >=0 ) {
+    SourceListT::Iterator first = m_sources.find(m_firstSrcIndex);
+    if (first != m_sources.end()) {
+      m_browser->setUrl(first->mon_url);
+    }
   }
 }
 
@@ -1273,6 +1278,20 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
     runMonitor(newsrc);
   }
   setBrowserUrl();
+}
+
+
+void SvNavigator::computeFirstSrcIndex(void)
+{
+  m_firstSrcIndex = -1;
+  if (! m_cdata->sources.isEmpty()) {
+    SourceListT::Iterator cur = m_sources.begin();
+    SourceListT::Iterator end = m_sources.end();
+    while (cur != end && ! m_cdata->sources.contains(cur->id)) ++cur;
+    if (cur != end) {
+      m_firstSrcIndex = cur->id.at(6).digitValue();
+    }
+  }
 }
 
 void SvNavigator::loadMenus(void)

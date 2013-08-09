@@ -230,6 +230,7 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   m_settings->sync();
 
   if (! m_updatedSources.contains(_idx)) {
+    //FIXME: consider only if source is used in the loaded service view?
     m_updatedSources.push_back(_idx);
   }
 

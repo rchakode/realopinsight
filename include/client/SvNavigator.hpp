@@ -128,6 +128,7 @@ private:
   bool m_showOnlyTroubles;
   SourceListT m_sources;
   NodeListT::Iterator m_root;
+  int m_firstSrcIndex;
 
   void addEvents(void);
   void loadMenus(void);
@@ -152,6 +153,7 @@ private:
   QTabWidget* newMsgConsole();
   void resetInterval(void);
   void setBrowserUrl(void);
+  void computeFirstSrcIndex(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */
