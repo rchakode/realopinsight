@@ -1,7 +1,12 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
-2.4.0beta1 (Federator)
+
+2.4.0beta1 (Federator,b2)
+  * Fixed ticket #16: adding support for realm authentication within the browser
+  * Fixed ticket #17: file path missing in the title bar of the console
+
+2.4.0beta1 (Federator,b1)
   * Improved support for overriding SSL peer verification
   * Added support for multisources management, up to 10 sources supported
   * Lot of refactoring, imporving loading and updating

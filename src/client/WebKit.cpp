@@ -24,14 +24,17 @@
 
 
 #include "WebKit.hpp"
+#include "Preferences.hpp"
 
 WebKit::WebKit(const QString& _url, QWidget* _parent)
-  :QWebView(_parent)
+  :QWebView(_parent),
+    m_urlpath(_url)
 {
   settings()->setAttribute(QWebSettings::PluginsEnabled, true);
   settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
   settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-  load(QUrl(_url));
+  load(QUrl(m_urlpath));
+  addEvents();
 }
 
 WebKit::~WebKit() {}
@@ -39,15 +42,18 @@ WebKit::~WebKit() {}
 void WebKit::handleLoadFinished(bool ok)
 {
   if (!ok) {
-    //TODO: deal with error
+    setHtml(tr("Unable to load the url (<a href='%1'>%2</a>)").arg(m_urlpath, m_urlpath));
   }
 }
 
 void WebKit::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator)
 {
-  //TODO get user/password from user
-  authenticator->setUser("nagiosadmin");
-  authenticator->setPassword("nagiosadmin");
+  std::unique_ptr<Preferences> form(new Preferences(Auth::OpUserRole, Preferences::BasicLoginForm));
+  form->setWindowTitle(tr("Browser requires realm authentication | %1").arg(APP_NAME));
+  if (form->exec() == 0) {
+    authenticator->setUser(form->getRealmLogin());
+    authenticator->setPassword(form->getRealmPasswd());
+  }
 }
 
 

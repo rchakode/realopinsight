@@ -35,11 +35,11 @@
 #include <QRegExpValidator>
 
 const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
-Preferences::Preferences(const qint32& _userRole, const qint32& _action)
+Preferences::Preferences(const qint32& _userRole, const qint32& _formType)
   : QDialog(),
     m_mainLayout (new QGridLayout(this)),
     m_userRole(_userRole),
-    m_action(_action),
+    m_formType(_formType),
     m_settings(new Settings()),
     m_sourceStates(new QBitArray(MAX_SRCS)),
     m_monitorUrlField(new QLineEdit()),
@@ -70,7 +70,7 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
   m_serverPassField->setEchoMode(QLineEdit::Password);
   m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
 
-  switch (_action)
+  switch (_formType)
   {
     case Preferences::ChangeMonitoringSettings:
       organizePrefWindow();
@@ -83,6 +83,12 @@ Preferences::Preferences(const qint32& _userRole, const qint32& _action)
 
     case Preferences::ShowAbout:
       organizeAbortWindow();
+      break;
+
+    case Preferences::BasicLoginForm:
+      loadBasicLoginForm();
+      break;
+    default:
       break;
   }
   addEvents();
@@ -124,13 +130,31 @@ void Preferences::showEvent (QShowEvent *)
 
 void Preferences::handleCancel(void)
 {
-  emit sourcesChanged(m_updatedSources);
-  done(0);
+  switch(m_formType) {
+    case ChangeMonitoringSettings:
+      emit sourcesChanged(m_updatedSources);
+      done(0);
+      break;
+    case BasicLoginForm:
+      done(1);
+      break;
+    default:
+      break;
+  }
 }
 
 void Preferences::applySettings(void)
 {
-  saveAsSource(m_selectedSource, selectSourceType());
+  switch(m_formType) {
+    case ChangeMonitoringSettings:
+      saveAsSource(m_selectedSource, selectSourceType());
+      break;
+    case BasicLoginForm:
+      done(0);
+      break;
+    default:
+      break;
+  }
 }
 
 void Preferences::addAsSource(void)
@@ -431,7 +455,7 @@ void Preferences::organizeChangePasswdWindow(void)
       m_mainLayout->addWidget(m_cancelBtn, line, 1),
       m_mainLayout->addWidget(m_changePwdBtn, line, 2);
 
-  if(m_action == Preferences::ForceChangePassword) {
+  if(m_formType == Preferences::ForceChangePassword) {
     m_cancelBtn->setEnabled(false);
   }
 }
@@ -529,6 +553,26 @@ void Preferences::updateSourceBtnState(void)
     m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
   }
 }
+
+void Preferences::loadBasicLoginForm(void)
+{
+  setWindowTitle(tr("Basic Login Form | %1").arg(APP_NAME));
+  int line;
+  line = 0,
+      m_mainLayout->addWidget(new QLabel(tr("Login")), line, 0),
+      m_realmLoginField = new QLineEdit(),
+      m_mainLayout->addWidget(m_realmLoginField, line, 1);
+  ++line,
+      m_mainLayout->addWidget(new QLabel(tr("Password")), line, 0),
+      m_realmPasswdField = new QLineEdit(),
+      m_realmPasswdField->setEchoMode(QLineEdit::Password),
+      m_mainLayout->addWidget(m_realmPasswdField, line, 1);
+  ++line,
+      m_applySettingBtn->setText(tr("Login")),
+      m_mainLayout->addWidget(m_applySettingBtn, line, 0, Qt::AlignRight),
+      m_mainLayout->addWidget(m_cancelBtn, line, 1, Qt::AlignRight);
+}
+
 
 QString Preferences::style()
 {

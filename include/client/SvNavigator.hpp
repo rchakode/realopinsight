@@ -151,6 +151,7 @@ private:
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* newMsgConsole();
   void resetInterval(void);
+  void setBrowserUrl(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

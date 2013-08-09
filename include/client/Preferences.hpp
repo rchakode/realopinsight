@@ -52,12 +52,13 @@ class Preferences : public QDialog
   Q_OBJECT
 
 public:
-  enum {
+  enum FormTypeT {
     ChangePassword=0,
     ForceChangePassword,
     ChangeMonitoringSettings,
     ShowHelp,
-    ShowAbout
+    ShowAbout,
+    BasicLoginForm
   };
   static const QString DONT_VERIFY_SSL_PEER_KEY;
 
@@ -65,9 +66,10 @@ public:
   virtual ~Preferences();
   static QString style();
   QBitArray* getSourceStates() const { return m_sourceStates; }
-  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false;
-                            }
+  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
   void clearUpdatedSources(void) { m_updatedSources.clear(); }
+  QString getRealmLogin(void) const {return m_realmLoginField->text();}
+  QString getRealmPasswd(void) const {return m_realmPasswdField->text();}
 
 
 public slots:
@@ -90,7 +92,7 @@ protected :
 private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
-  qint32 m_action;
+  int m_formType;
 
   Settings* m_settings;
   QBitArray* m_sourceStates;
@@ -118,6 +120,9 @@ private:
   QVector<QRadioButton*> m_sourceBtns;
   int m_selectedSource;
 
+  QLineEdit* m_realmLoginField;
+  QLineEdit* m_realmPasswdField;
+
   void addEvents(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
@@ -136,6 +141,7 @@ private:
   void organizeChangePasswdWindow(void);
   void organizeAbortWindow(void);
   void disableInputField(void);
+  void loadBasicLoginForm(void);
 };
 
 

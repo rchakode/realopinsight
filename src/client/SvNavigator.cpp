@@ -212,9 +212,6 @@ void  SvNavigator::updateStatusBar(const QString& msg)
 
 void SvNavigator::load(const QString& _file)
 {
-
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_config));
-
   if (!_file.isEmpty()) {
     m_config = utils::getAbsolutePath(_file);
   }
@@ -233,6 +230,7 @@ void SvNavigator::load(const QString& _file)
   }
 
   resizeDashboard();
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_config));
   QMainWindow::show();
   m_map->scaleToFitViewPort();
 }
@@ -1191,9 +1189,7 @@ void SvNavigator::initSettings(void)
       utils::alert(tr("Could not handle this source (%1)").arg(*id));
     }
   }
-  if (! m_sources.isEmpty()) {
-    m_browser->setUrl(m_sources.begin()->mon_url);
-  }
+  setBrowserUrl();
   resetInterval();
 }
 
@@ -1239,6 +1235,17 @@ bool SvNavigator::allocSourceHandler(SourceT& src)
   return allocated;
 }
 
+void SvNavigator::setBrowserUrl(void)
+{
+  if (! m_sources.isEmpty()) {
+    SourceListT::Iterator first = m_sources.find(0);
+    if (first != m_sources.end()){
+      m_browser->setUrl(first->mon_url);
+    } else {
+      m_browser->setUrl(m_sources.begin()->mon_url);
+    }
+  }
+}
 
 void SvNavigator::handleSourcesChanged(QList<qint8> ids)
 {
@@ -1269,10 +1276,8 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
     allocSourceHandler(newsrc);
     m_sources[id] = newsrc;
     runMonitor(newsrc);
-    if (id == 0) {
-      m_browser->setUrl(newsrc.mon_url);
-    }
   }
+  setBrowserUrl();
 }
 
 void SvNavigator::loadMenus(void)

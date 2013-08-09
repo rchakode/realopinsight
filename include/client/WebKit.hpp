@@ -41,6 +41,7 @@ public slots:
   void handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator);
 
 private:
+  QString m_urlpath;
   void addEvents(void);
 };
 
