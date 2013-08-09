@@ -36,7 +36,12 @@ public:
   virtual ~WebKit() ;
 
 public slots:
-  inline void setUrl(const QString& url ) {load(QUrl(url));}
+  void setUrl(const QString& url ) {load(QUrl(url));}
+  void handleLoadFinished(bool ok);
+  void handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator);
+
+private:
+  void addEvents(void);
 };
 
 #endif /* SNAVWEBKIT_H_ */

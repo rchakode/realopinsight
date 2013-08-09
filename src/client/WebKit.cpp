@@ -25,14 +25,35 @@
 
 #include "WebKit.hpp"
 
-WebKit::WebKit(const QString& url, QWidget* _parent)
+WebKit::WebKit(const QString& _url, QWidget* _parent)
   :QWebView(_parent)
 {
   settings()->setAttribute(QWebSettings::PluginsEnabled, true);
   settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
   settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-  //FIXME: deal with error when loading the url
-  load(QUrl(url));
+  load(QUrl(_url));
 }
 
 WebKit::~WebKit() {}
+
+void WebKit::handleLoadFinished(bool ok)
+{
+  if (!ok) {
+    //TODO: deal with error
+  }
+}
+
+void WebKit::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator)
+{
+  //TODO get user/password from user
+  authenticator->setUser("nagiosadmin");
+  authenticator->setPassword("nagiosadmin");
+}
+
+
+void WebKit::addEvents(void)
+{
+  connect(this, SIGNAL(loadFinished(bool)), this, SLOT(handleLoadFinished(bool)));
+  connect(page()->networkAccessManager(), SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+          this, SLOT(handleAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+}
