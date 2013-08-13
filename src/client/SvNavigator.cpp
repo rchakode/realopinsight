@@ -1284,6 +1284,10 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
   setBrowserUrl();
 }
 
+void SvNavigator::handleSourceBxItemChanged(int index)
+{
+  m_browser->setUrl(m_bxSourceSelection->itemData(index).toString());
+}
 
 void SvNavigator::computeFirstSrcIndex(void)
 {
@@ -1304,7 +1308,23 @@ void SvNavigator::setBrowserSourceSelectionBx(void)
        end = m_sources.end(); it != end; ++it)
   {
     if (m_cdata->sources.contains(it->id))
-      m_bxSourceSelection->addItem(it->id);
+    {
+      QString icon;
+      switch(it->mon_type) {
+        case MonitorBroker::Nagios:
+          icon = ":images/built-in/nagios-logo-n.png";
+          break;
+        case MonitorBroker::Zabbix:
+          icon = ":images/built-in/zabbix-logo-z.png";
+          break;
+        case MonitorBroker::Zenoss:
+          icon = ":images/built-in/zenoss-logo-o.png";
+          break;
+        default:
+          break;
+      }
+      m_bxSourceSelection->addItem(QIcon(icon), it->id, QVariant(it->mon_url));
+    }
   }
 }
 
@@ -1391,4 +1411,5 @@ void SvNavigator::addEvents(void)
   connect(m_viewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
   connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
+  connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
 }

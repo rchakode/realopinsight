@@ -87,6 +87,7 @@ public slots:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourcesChanged(QList<qint8> ids);
+  void handleSourceBxItemChanged(int index);
 
 signals:
   void hasToBeUpdate(QString);

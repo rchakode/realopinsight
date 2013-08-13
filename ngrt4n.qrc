@@ -57,5 +57,8 @@
         <file>images/cpu.png</file>
         <file>images/performance.png</file>
         <file>i18n/ngrt4n_fr.qm</file>
+        <file>images/built-in/nagios-logo-n.png</file>
+        <file>images/built-in/zabbix-logo-z.png</file>
+        <file>images/built-in/Zenoss-logo-o.jpg</file>
     </qresource>
 </RCC>
