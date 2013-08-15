@@ -1,11 +1,11 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
-
 2.4.0beta1 (Federator,b2)
   * Fixed ticket #16: adding support for realm authentication within the browser
   * Fixed ticket #17: file path missing in the title bar of the console
-  * Fixed to make browser always load the first source used in the selected view
+  * Fixed ticket #18: Added the possibility to select the source to load within the browser
+  * Added logo and misc icons for Nagios, Zenoss, Zenoss, and hierarchy
 
 2.4.0beta1 (Federator,b1)
   * Improved support for overriding SSL peer verification
