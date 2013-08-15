@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.4.0b1
+VERSION_=2.4.0b2
 VERSION = "-$${VERSION_}"
 config-dist{
 SOURCES	+=

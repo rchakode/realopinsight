@@ -53,14 +53,13 @@ public slots:
 
 
 private:
-  QDialogButtonBox* buttonBox;
-  QLineEdit* login;
-  QLineEdit* password;
-  QGridLayout* layout;
+  QDialogButtonBox* m_buttonBox;
+  QLineEdit* m_loginField;
+  QLineEdit* m_passwordField;
+  QGridLayout* m_layout;
   Settings* settings;
 
   void addEvents(void);
-
 };
 
 #endif /* SNAVAUTH_HPP_ */

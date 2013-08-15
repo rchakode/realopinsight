@@ -26,12 +26,22 @@
     </message>
     <message>
         <location filename="../src/client/Auth.cpp" line="56"/>
+        <source>Sign in</source>
+        <translation>Connexion</translation>
+    </message>
+    <message>
+        <location filename="../src/client/Auth.cpp" line="57"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location filename="../src/client/Auth.cpp" line="58"/>
         <source>
 Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation>Copyright (c) 2010-%1 Projet NGRT4N. Tous droits réservés.</translation>
     </message>
     <message>
-        <location filename="../src/client/Auth.cpp" line="90"/>
+        <location filename="../src/client/Auth.cpp" line="92"/>
         <source>Authentication failed: wrong username or password</source>
         <translation>Echec d&apos;autentification: nom d&apos;utilisateur ou mot de passe incorrect</translation>
     </message>

@@ -36,33 +36,35 @@ Auth::Auth()
     settings (new Settings())
 {
   setWindowTitle(tr("%1 - Login").arg(APP_NAME));
-  layout = new QGridLayout(this);
+  m_layout = new QGridLayout(this);
   qint32 line = 0;
   QPixmap logo(":images/built-in/logo.png");
   QLabel* llogo =  new QLabel(); llogo->setPixmap(logo);
-  layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft);
+  m_layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft);
   line++;
-  layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PKG_VERSION, REL_NAME)),
+  m_layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PKG_VERSION, REL_NAME)),
                     line, 0, 2, 1, Qt::AlignLeft);
   line++;
-  layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight);
-  layout->addWidget(login = new QLineEdit(OpUser), line, 2, Qt::AlignJustify);
+  m_layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight);
+  m_layout->addWidget(m_loginField = new QLineEdit(OpUser), line, 2, Qt::AlignJustify);
   line++;
-  layout->addWidget(new QLabel(tr("Password")), line, 1, Qt::AlignRight);
-  layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignJustify);
-  password->setEchoMode(QLineEdit::Password);
+  m_layout->addWidget(new QLabel(tr("Password")), line, 1, Qt::AlignRight);
+  m_layout->addWidget(m_passwordField = new QLineEdit(), line, 2, Qt::AlignJustify);
+  m_passwordField->setEchoMode(QLineEdit::Password);
   line++;
-  layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
+  m_layout->addWidget(m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
+  m_buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Sign in"));
+  m_buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
   line++; QString copying = tr("\nCopyright (c) 2010-%1 NGRT4N Project. All rights reserved.").arg(REL_YEAR);
-  layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft);
+  m_layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft);
   addEvents();
 }
 
 Auth::~Auth()
 {
-  delete login;
-  delete password;
-  delete layout;
+  delete m_loginField;
+  delete m_passwordField;
+  delete m_layout;
 }
 
 
@@ -74,8 +76,8 @@ void Auth::cancel(void)
 
 void Auth::authentificate(void)
 {
-  QString userName = login->text();
-  QString userPasswd = QCryptographicHash::hash(password->text().toAscii(), QCryptographicHash::Md5);
+  QString userName = m_loginField->text();
+  QString userPasswd = QCryptographicHash::hash(m_passwordField->text().toAscii(), QCryptographicHash::Md5);
   QString rootPasswd =  settings->getEntry(Settings::ADM_PASSWD_KEY);
   QString opPasswd =  settings->getEntry(Settings::OP_PASSWD_KEY);
   if(	! rootPasswd.isEmpty()
@@ -94,6 +96,6 @@ void Auth::authentificate(void)
 
 void Auth::addEvents(void)
 {
-  connect(buttonBox, SIGNAL(rejected()), this, SLOT(cancel()));
-  connect(buttonBox, SIGNAL(accepted()), this, SLOT(authentificate()));
+  connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(cancel()));
+  connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(authentificate()));
 }
