@@ -60,7 +60,6 @@ public:
     ShowAbout,
     BasicLoginForm
   };
-  static const QString DONT_VERIFY_SSL_PEER_KEY;
 
   Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
   virtual ~Preferences();

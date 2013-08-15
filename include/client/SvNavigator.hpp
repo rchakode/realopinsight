@@ -86,7 +86,7 @@ public slots:
   void processZnsReply(QNetworkReply* reply, SourceT& src);
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
-  void handleSourcesChanged(QList<qint8> ids);
+  void handleSourceSettingsChanged(QList<qint8> ids);
   void handleSourceBxItemChanged(int index);
 
 signals:
@@ -101,6 +101,10 @@ protected:
 
 
 private:
+  enum {
+    ConsoleTab=0,
+    BrowserTab=1
+  };
   qint64 updateCounter;
   CoreDataT* m_cdata;
   QString m_config;
@@ -157,6 +161,8 @@ private:
   void setBrowserUrl(void);
   void computeFirstSrcIndex(void);
   void setBrowserSourceSelectionBx(void);
+  void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
+  int extractSourceIndex(const QString& sid) { return sid.at(6).digitValue(); }
 };
 
 #endif /* SVNAVIGATOR_HPP */

@@ -284,6 +284,7 @@ struct SourceT {
   qint32 ls_port;
   QString auth;
   qint8 verify_ssl_peer;
+  QString icon;
   std::shared_ptr<ZmqSocket> d4n_handler;
   std::shared_ptr<LsHelper> ls_handler;
   std::shared_ptr<ZbxHelper> zbx_handler;

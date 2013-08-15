@@ -34,7 +34,9 @@
 #include <QIntValidator>
 #include <QRegExpValidator>
 
-const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
+
+//FIXME: allocated objects only when required for the different kind of forms
+
 Preferences::Preferences(const qint32& _userRole, const qint32& _formType)
   : QDialog(),
     m_mainLayout (new QGridLayout(this)),
@@ -580,7 +582,7 @@ void Preferences::loadBasicLoginForm(void)
       m_realmPasswdField->setEchoMode(QLineEdit::Password),
       m_mainLayout->addWidget(m_realmPasswdField, line, 1);
   ++line,
-      m_applySettingBtn->setText(tr("Login")),
+      m_applySettingBtn->setText(tr("Submit")),
       m_mainLayout->addWidget(m_applySettingBtn, line, 0, Qt::AlignRight),
       m_mainLayout->addWidget(m_cancelBtn, line, 1, Qt::AlignRight);
 }

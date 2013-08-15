@@ -77,6 +77,11 @@ IconMapT GraphView::nodeIcons() {
   icons["Performance"] = ":/images/performance.png";
   icons[PLUS] = ":/images/plus.png";
   icons[MINUS] = ":/images/minus.png";
+  icons["Nagios Basic Logo"] = ":/images/nagios-logo-n.png";
+  icons["Zabbix Basic Logo"] = ":/images/zabbix-logo-z.png";
+  icons["Zenoss Basic Logo"] = ":/images/zenoss-logo-o.png";
+  icons["Hierarchy"] = ":/images/hierarchy.png";
+  icons[MINUS] = ":/images/minus.png";
   return icons;
 }
 

@@ -91,8 +91,10 @@ SvNavigator::SvNavigator(const qint32& _userRole,
 {
   setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
   loadMenus();
-  m_viewPanel->addTab(m_map, tr("Dashboard"));
-  m_viewPanel->addTab(m_browser, tr("Web Browser"));
+  m_viewPanel->addTab(m_map, tr("Map")),
+      m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
+  m_viewPanel->addTab(m_browser, tr("Web Browser")),
+      m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
   m_mainSplitter->addWidget(m_tree);
   m_mainSplitter->addWidget(m_rightSplitter);
   m_rightSplitter->addWidget(m_viewPanel);
@@ -1246,12 +1248,12 @@ void SvNavigator::setBrowserUrl(void)
   if (m_firstSrcIndex >=0 ) {
     SourceListT::Iterator first = m_sources.find(m_firstSrcIndex);
     if (first != m_sources.end()) {
-      m_browser->setUrl(first->mon_url);
+      changeBrowserUrl(first->id, first->mon_url, first->icon);
     }
   }
 }
 
-void SvNavigator::handleSourcesChanged(QList<qint8> ids)
+void SvNavigator::handleSourceSettingsChanged(QList<qint8> ids)
 {
   foreach (const qint8& id, ids) {
     SourceT newsrc;
@@ -1286,7 +1288,11 @@ void SvNavigator::handleSourcesChanged(QList<qint8> ids)
 
 void SvNavigator::handleSourceBxItemChanged(int index)
 {
-  m_browser->setUrl(m_bxSourceSelection->itemData(index).toString());
+  int idx = extractSourceIndex(m_bxSourceSelection->itemData(index).toString());
+  SourceListT::Iterator src = m_sources.find(idx);
+  if (src != m_sources.end()) {
+    changeBrowserUrl(src->id, src->mon_url, src->icon);
+  }
 }
 
 void SvNavigator::computeFirstSrcIndex(void)
@@ -1297,37 +1303,43 @@ void SvNavigator::computeFirstSrcIndex(void)
     SourceListT::Iterator end = m_sources.end();
     while (cur != end && ! m_cdata->sources.contains(cur->id)) ++cur;
     if (cur != end) {
-      m_firstSrcIndex = cur->id.at(6).digitValue();
+      m_firstSrcIndex = extractSourceIndex(cur->id);
     }
   }
 }
 
 void SvNavigator::setBrowserSourceSelectionBx(void)
 {
+  m_bxSourceSelection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   for (SourceListT::iterator it=m_sources.begin(),
        end = m_sources.end(); it != end; ++it)
   {
     if (m_cdata->sources.contains(it->id))
     {
-      QString icon;
       switch(it->mon_type) {
         case MonitorBroker::Nagios:
-          icon = ":images/built-in/nagios-logo-n.png";
+          it->icon = ":images/nagios-logo-n.png";
           break;
         case MonitorBroker::Zabbix:
-          icon = ":images/built-in/zabbix-logo-z.png";
+          it->icon = ":images/zabbix-logo-z.png";
           break;
         case MonitorBroker::Zenoss:
-          icon = ":images/built-in/zenoss-logo-o.png";
+          it->icon = ":images/zenoss-logo-o.png";
           break;
         default:
           break;
       }
-      m_bxSourceSelection->addItem(QIcon(icon), it->id, QVariant(it->mon_url));
+      m_bxSourceSelection->addItem(QIcon(it->icon), it->id, QVariant(it->id));
     }
   }
 }
 
+void SvNavigator::changeBrowserUrl(const QString& sid, const QString& url, const QString& icon)
+{
+  m_browser->setUrl(url);
+  m_viewPanel->setTabText(BrowserTab, tr("Web Browser (%1)").arg(sid));
+  m_viewPanel->setTabIcon(BrowserTab, QIcon(icon));
+}
 
 void SvNavigator::loadMenus(void)
 {
@@ -1380,9 +1392,9 @@ void SvNavigator::loadMenus(void)
       toolBar->addAction(m_subMenus["BrowserBack"]),
       toolBar->addAction(m_subMenus["BrowserForward"]),
       toolBar->addAction(m_subMenus["BrowserStop"]),
-      toolBar->addSeparator(),
+      m_subMenus["SourceSelectionBx"] = toolBar->addWidget(m_bxSourceSelection);
+  toolBar->addSeparator(),
       toolBar->addAction(m_subMenus["FullScreen"]);
-  m_subMenus["SourceSelectionBx"] = toolBar->addWidget(m_bxSourceSelection);
   QMainWindow::setMenuBar(menuBar);
 }
 
@@ -1407,7 +1419,7 @@ void SvNavigator::addEvents(void)
   connect(m_subMenus["IncreaseMsgFont"], SIGNAL(toggled(bool)), this, SLOT(toggleIncreaseMsgFont(bool)));
   connect(m_contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
   connect(m_contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
-  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourcesChanged(QList<qint8>)));
+  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourceSettingsChanged(QList<qint8>)));
   connect(m_viewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
   connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
