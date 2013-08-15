@@ -39,18 +39,18 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
 <context>
     <name>GraphView</name>
     <message>
-        <location filename="../src/client/GraphView.cpp" line="265"/>
+        <location filename="../src/client/GraphView.cpp" line="270"/>
         <source>The graph engine exited with the code %1</source>
         <translation>Le moteur de graphe a retourné un code d&apos;erreur %1</translation>
     </message>
     <message>
-        <location filename="../src/client/GraphView.cpp" line="440"/>
+        <location filename="../src/client/GraphView.cpp" line="445"/>
         <source>Select the image destination - %1</source>
         <oldsource>Select the image destination - </oldsource>
         <translation>Sélectionnez le fichier de destination - %1</translation>
     </message>
     <message>
-        <location filename="../src/client/GraphView.cpp" line="442"/>
+        <location filename="../src/client/GraphView.cpp" line="447"/>
         <source>PNG files (*.png);; All files (*)</source>
         <translation>Fichier PNG (*.png);; Tous les fichiers (*)</translation>
     </message>
@@ -129,37 +129,37 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="54"/>
+        <location filename="../src/client/Preferences.cpp" line="50"/>
         <source>&amp;Browse...</source>
         <translation>&amp;Parcourir...</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="61"/>
+        <location filename="../src/client/Preferences.cpp" line="57"/>
         <source>&amp;Close</source>
         <translation>&amp;Fermer</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="62"/>
+        <location filename="../src/client/Preferences.cpp" line="58"/>
         <source>&amp;Apply settings</source>
         <translation>&amp;Appliquer les changements</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="63"/>
+        <location filename="../src/client/Preferences.cpp" line="59"/>
         <source>Add a&amp;s Source</source>
         <translation>Sauver comme &amp;source</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="64"/>
+        <location filename="../src/client/Preferences.cpp" line="60"/>
         <source>&amp;Delete Source</source>
         <translation>Sup&amp;primer</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="65"/>
+        <location filename="../src/client/Preferences.cpp" line="61"/>
         <source>C&amp;hange password</source>
         <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="67"/>
+        <location filename="../src/client/Preferences.cpp" line="63"/>
         <source>&amp;Show in clear</source>
         <translation>Afficher en &amp;clair</translation>
     </message>
@@ -168,127 +168,151 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation type="obsolete">Utiliser &amp;Livestatus</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="399"/>
+        <location filename="../src/client/Preferences.cpp" line="431"/>
         <source>Monitoring Settings | %1</source>
         <translation>Paramètres de la console | %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="410"/>
+        <location filename="../src/client/Preferences.cpp" line="442"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
         <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="423"/>
+        <location filename="../src/client/Preferences.cpp" line="455"/>
         <source>Change Password | %1</source>
         <oldsource>Change Password| %1</oldsource>
         <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="428"/>
+        <location filename="../src/client/Preferences.cpp" line="460"/>
         <source>Current Password</source>
         <translation>Mot de passe actuel</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="431"/>
+        <location filename="../src/client/Preferences.cpp" line="463"/>
         <source>New password</source>
         <translation>Nouveau mot de passe</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="434"/>
+        <location filename="../src/client/Preferences.cpp" line="466"/>
         <source>Retype new password</source>
         <translation>Confirmation</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="448"/>
+        <location filename="../src/client/Preferences.cpp" line="480"/>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="247"/>
+        <location filename="../src/client/Preferences.cpp" line="279"/>
         <source>Password updated</source>
         <translation>Mot de passe mis à jour</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="68"/>
+        <location filename="../src/client/Preferences.cpp" line="64"/>
         <source>Use&amp;Livestatus</source>
         <translation>Utiliser &amp;Livestatus</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="69"/>
+        <location filename="../src/client/Preferences.cpp" line="65"/>
         <source>Don&apos;t verify SSL peer (https)</source>
         <translation>Ne pas vérifier le pair SSL</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="147"/>
+        <location filename="../src/client/Preferences.cpp" line="178"/>
         <source>Select source index | %1</source>
         <translation>Sélectionner l&apos;index de la source | %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="148"/>
+        <location filename="../src/client/Preferences.cpp" line="179"/>
         <source>Please select the index of the source</source>
         <translation>Sélectionner l&apos;index de la source</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="184"/>
+        <location filename="../src/client/Preferences.cpp" line="215"/>
         <source>Select the source type | %1</source>
         <translation>Sélectionner le type de source | %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="185"/>
+        <location filename="../src/client/Preferences.cpp" line="216"/>
         <source>Please select the source type (Remote API)</source>
         <translation>Sélectionner le type de source (API distante)</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="252"/>
+        <location filename="../src/client/Preferences.cpp" line="284"/>
         <source>Sorry the passwords do not match</source>
         <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="255"/>
+        <location filename="../src/client/Preferences.cpp" line="287"/>
         <source>Authentication failed</source>
         <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="276"/>
+        <location filename="../src/client/Preferences.cpp" line="308"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
         <translation>Point d&apos;accès à Livestatus ou à ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="313"/>
+        <location filename="../src/client/Preferences.cpp" line="345"/>
         <source>Sources</source>
         <translation>Sources</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="387"/>
+        <location filename="../src/client/Preferences.cpp" line="419"/>
         <source>Update Actions</source>
         <translation>Actions</translation>
+    </message>
+    <message>
+        <location filename="../src/client/Preferences.cpp" line="573"/>
+        <source>Basic Login Form | %1</source>
+        <translation>Login Form | %1</translation>
+    </message>
+    <message>
+        <location filename="../src/client/Preferences.cpp" line="576"/>
+        <source>Login</source>
+        <translation>Nom d&apos;utilisateur</translation>
+    </message>
+    <message>
+        <location filename="../src/client/Preferences.cpp" line="580"/>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <location filename="../src/client/Preferences.cpp" line="585"/>
+        <source>Submit</source>
+        <translation>Soumettre</translation>
+    </message>
+    <message>
+        <source>Soumettre</source>
+        <translation type="obsolete">Submit</translation>
     </message>
     <message>
         <source>Livestatus/ngrt4nd Endpoint</source>
         <translation type="obsolete">Point d&apos;accès à Livestatus ou à ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="278"/>
+        <location filename="../src/client/Preferences.cpp" line="310"/>
         <source>Server Address</source>
         <translation>Adresse du serveur</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="280"/>
+        <location filename="../src/client/Preferences.cpp" line="312"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="318"/>
+        <location filename="../src/client/Preferences.cpp" line="350"/>
         <source>Select source type</source>
         <translation>Sélectionner le type de source</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="336"/>
+        <location filename="../src/client/Preferences.cpp" line="368"/>
         <source>Common Settings</source>
         <translation>Paramètres généraux</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="316"/>
+        <location filename="../src/client/Preferences.cpp" line="348"/>
         <source>Monitor Web URL*</source>
         <translation>Adresse web du moniteur*</translation>
     </message>
@@ -297,17 +321,17 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation type="obsolete">Interface Web</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="324"/>
+        <location filename="../src/client/Preferences.cpp" line="356"/>
         <source>Auth String</source>
         <translation>Chaine d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="328"/>
+        <location filename="../src/client/Preferences.cpp" line="360"/>
         <source>Update Interval</source>
         <translation>Intervalle de mise à jour</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="332"/>
+        <location filename="../src/client/Preferences.cpp" line="364"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
@@ -439,7 +463,7 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation>Impossible d&apos;écrire dans le fichier %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="449"/>
+        <location filename="../src/client/Preferences.cpp" line="481"/>
         <source>
 %1 %2 (codename: %3)
 
@@ -461,7 +485,7 @@ Visiter notre site web %6 pour plus d&apos;informations
 Reporter des bugs : bugs@ngrt4n.com</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="42"/>
+        <location filename="../src/client/SvNavigator.cpp" line="44"/>
         <source>Service: %1
 Description: %2
 Severity: %3
@@ -474,7 +498,7 @@ Séverité : %3
    Règle de propagation : %5</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="43"/>
+        <location filename="../src/client/SvNavigator.cpp" line="45"/>
         <source>
 Target Host: %6
 Data Point: %7
@@ -487,12 +511,12 @@ Sortie du plugin : %8
 Autres détails : %9</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="44"/>
+        <location filename="../src/client/SvNavigator.cpp" line="46"/>
         <source>Failed to connect to %1 (%2)</source>
         <translation>Echec lors de la connexion à %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="429"/>
+        <location filename="../src/client/SvNavigator.cpp" line="432"/>
         <source>updating... (%1, %2)</source>
         <translation>mise à jour... (%1, %2)</translation>
     </message>
@@ -967,17 +991,16 @@ Voulez-vous enregistrer les mises à jour?</translation>
 <context>
     <name>SvNavigator</name>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="89"/>
+        <location filename="../src/client/SvNavigator.cpp" line="92"/>
         <source>%1 Operations Console</source>
         <translation>Console des operations %1</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="91"/>
         <source>Dashboard</source>
-        <translation>Tableau de bord</translation>
+        <translation type="obsolete">Tableau de bord</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="92"/>
+        <location filename="../src/client/SvNavigator.cpp" line="96"/>
         <source>Web Browser</source>
         <oldsource>Native Web UI</oldsource>
         <translation>Navigateur Web</translation>
@@ -987,19 +1010,19 @@ Voulez-vous enregistrer les mises à jour?</translation>
         <translation type="obsolete">La source par défaut n&apos;est pas définie</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="230"/>
+        <location filename="../src/client/SvNavigator.cpp" line="232"/>
         <source>The configuration seems to be invalid, there is not a root service!</source>
         <translation>Le fichier de configuration semble invalide ou corrompu!</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="310"/>
-        <location filename="../src/client/SvNavigator.cpp" line="376"/>
+        <location filename="../src/client/SvNavigator.cpp" line="313"/>
+        <location filename="../src/client/SvNavigator.cpp" line="379"/>
         <source>Undefined source (%1)</source>
         <translation>Source indéfinie (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="409"/>
-        <location filename="../src/client/SvNavigator.cpp" line="518"/>
+        <location filename="../src/client/SvNavigator.cpp" line="412"/>
+        <location filename="../src/client/SvNavigator.cpp" line="521"/>
         <source>Undefined service (%1)</source>
         <translation>Service indéfini (%1)</translation>
     </message>
@@ -1012,152 +1035,162 @@ Voulez-vous enregistrer les mises à jour?</translation>
         <translation type="obsolete">mise à jour terminée (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="158"/>
+        <location filename="../src/client/SvNavigator.cpp" line="94"/>
+        <source>Map</source>
+        <translation>Cartographie</translation>
+    </message>
+    <message>
+        <location filename="../src/client/SvNavigator.cpp" line="163"/>
         <source>The default source is not yet set</source>
         <translation>Vous n&apos;avez pas encore configuré la source par défaut</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1110"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1115"/>
         <source>error %1</source>
         <translation>erreur %1</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1187"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1192"/>
         <source>Source not set (%1)</source>
         <translation>Source non définie (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1190"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1195"/>
         <source>Could not handle this source (%1)</source>
         <translation>Oups, cette source n&apos;est pas prise en charge (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1264"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1278"/>
         <source>Unknown monitor type (%1)</source>
         <translation>Type de moniteur inconnu (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1281"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1340"/>
+        <source>Web Browser (%1)</source>
+        <translation>Navigateur Web (%1)</translation>
+    </message>
+    <message>
+        <location filename="../src/client/SvNavigator.cpp" line="1348"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1282"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1349"/>
         <source>&amp;Refresh Screen</source>
         <translation>&amp;Actualiser la console</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1283"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1350"/>
         <source>&amp;Save Map as Image</source>
         <translation>Enregi&amp;strer la cartographie sous forme d&apos;image</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1285"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1352"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1289"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1356"/>
         <source>&amp;Console</source>
         <translation>&amp;Console</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1290"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1357"/>
         <source>Map Zoom &amp;In</source>
         <translation>Zoom &amp;avant sur la cartographie</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1291"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1358"/>
         <source>Map Zoom &amp;Out</source>
         <translation>Zoom a&amp;rrière sur la cartographie</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1292"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1359"/>
         <source>Hide &amp;Chart</source>
         <translation>Masquer/afficher la &amp;charte</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1296"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1363"/>
         <source>&amp;Full Screen</source>
         <translation>Pl&amp;ein écran</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1299"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1366"/>
         <source>&amp;Show only trouble messages</source>
         <translation>N&apos;afficher que des &amp;incidents</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1301"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1368"/>
         <source>&amp;Increase message &amp;font</source>
         <translation>Activer/désactiver &amp;grande police</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1303"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1370"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Préférences</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1304"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1371"/>
         <source>Change &amp;Password</source>
         <translation>Changer de mot de &amp;passe</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1305"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1372"/>
         <source>&amp;Monitoring Settings</source>
         <translation>Para&amp;mètres de la console</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1307"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1374"/>
         <source>&amp;Browser</source>
         <translation>&amp;Navigateur</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1308"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1375"/>
         <source>Bac&amp;k</source>
         <translation>&amp;Précédent</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1309"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1376"/>
         <source>For&amp;ward</source>
         <translation>&amp;Suivant</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1310"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1377"/>
         <source>Sto&amp;p</source>
         <translation>&amp;Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1311"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1378"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1312"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1379"/>
         <source>Online &amp;Resources</source>
         <translation>&amp;Documentation en ligne</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1314"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1381"/>
         <source>&amp;About %1</source>
         <translation>&amp;A propos de %1</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1316"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1383"/>
         <source>&amp;Filter related messages</source>
         <translation>&amp;Filtrer les messages associés</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1317"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1384"/>
         <source>Center Graph &amp;On</source>
         <translation>&amp;Centrer la carte sur le noeud</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1318"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1385"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="215"/>
+        <location filename="../src/client/SvNavigator.cpp" line="237"/>
         <source>%1 Operations Console - %2</source>
         <translation>Console des opérations %1 - %2</translation>
     </message>
@@ -1166,33 +1199,33 @@ Voulez-vous enregistrer les mises à jour?</translation>
         <translation type="obsolete">source par défaut non définie</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="163"/>
+        <location filename="../src/client/SvNavigator.cpp" line="168"/>
         <source>update completed</source>
         <translation>mise à jour terminée</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="195"/>
+        <location filename="../src/client/SvNavigator.cpp" line="200"/>
         <source>Please wait for initialization, it may take a while...</source>
-        <translation>Veillez attendre la fin de l&apos;initialisation, cela peut prendre quelques secondes...</translation>
+        <translation>Veuillez attendre la fin de l&apos;initialisation, cela peut prendre quelques secondes...</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="323"/>
+        <location filename="../src/client/SvNavigator.cpp" line="326"/>
         <source>The server serial %1 is not supported</source>
         <translation>Les serveurs de série %1 sont imcompatibles avec cette version</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="334"/>
-        <location filename="../src/client/SvNavigator.cpp" line="1041"/>
+        <location filename="../src/client/SvNavigator.cpp" line="337"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1046"/>
         <source>Updating...</source>
         <translation>Miseà jour...</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1104"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1109"/>
         <source>SSL Handshake failed</source>
         <translation>Echec lors de l&apos;échange de certificat SSL </translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1107"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1112"/>
         <source>Timeout exceeded</source>
         <translation>Dépassement de délai</translation>
     </message>
@@ -1214,38 +1247,38 @@ Voulez-vous enregistrer les mises à jour?</translation>
         <translation type="obsolete">Service invalide (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="657"/>
+        <location filename="../src/client/SvNavigator.cpp" line="660"/>
         <source>Messages related to &apos;%2&apos; - %1</source>
         <translation>Messages relatifs au service &apos;%2&apos; - %1</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="828"/>
-        <location filename="../src/client/SvNavigator.cpp" line="927"/>
+        <location filename="../src/client/SvNavigator.cpp" line="833"/>
+        <location filename="../src/client/SvNavigator.cpp" line="932"/>
         <source>Weird response received from the server</source>
         <translation>Réponse bizarre reçu du serveur</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="855"/>
+        <location filename="../src/client/SvNavigator.cpp" line="860"/>
         <source>Authentication failed: %1</source>
         <translation>Echec d&apos;autentification : %1</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="904"/>
+        <location filename="../src/client/SvNavigator.cpp" line="909"/>
         <source>The %1 component is Up</source>
         <translation>Le composant %1 est actif</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="920"/>
+        <location filename="../src/client/SvNavigator.cpp" line="925"/>
         <source>The host &apos;%1&apos; is Up</source>
         <translation>La machine &apos;%1&apos; est accessible</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="923"/>
+        <location filename="../src/client/SvNavigator.cpp" line="928"/>
         <source>The host &apos;%1&apos; is Down</source>
         <translation>La machine &apos;%1&apos; est inaccessible</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="985"/>
+        <location filename="../src/client/SvNavigator.cpp" line="990"/>
         <source>Invalid authentication chain!
 Must follow the pattern login:password</source>
         <translation>Chaine d&apos;authentification invalide!
@@ -1268,19 +1301,19 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="obsolete">Erreur inattendue : code %1</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1146"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1151"/>
         <source> - %1 Problem%2
  - Level of Impact: %3</source>
         <translation> - %1 incident%2
  - Niveau d&apos;impact : %3</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1147"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1152"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../src/client/SvNavigator.cpp" line="1168"/>
+        <location filename="../src/client/SvNavigator.cpp" line="1173"/>
         <source>Message Console</source>
         <translation>Console des messages</translation>
     </message>
@@ -1296,6 +1329,19 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <location filename="../src/client/SvNavigatorTree.cpp" line="58"/>
         <source>Dropping is not allowed on the target node</source>
         <translation>Impossible de déposer : ce type de noeud ne peut pas avoir de sous services</translation>
+    </message>
+</context>
+<context>
+    <name>WebKit</name>
+    <message>
+        <location filename="../src/client/WebKit.cpp" line="50"/>
+        <source>Unable to load the url (&lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;)</source>
+        <translation>Impossible de charger l&apos;url (&lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;)</translation>
+    </message>
+    <message>
+        <location filename="../src/client/WebKit.cpp" line="57"/>
+        <source>Browser requires realm authentication | %1</source>
+        <translation>Authentification realm requise | %1</translation>
     </message>
 </context>
 <context>
