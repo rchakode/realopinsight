@@ -14,4 +14,4 @@ ngrt4nd_SOURCES =  src/core/MonitorBroker.cpp \
 
 man1_MANS = doc/man/ngrt4nd.1
 
-EXTRA_DIST=install-sh examples/status.dat
+EXTRA_DIST=install-sh examples/status.dat doc/man/ngrt4nd.1
