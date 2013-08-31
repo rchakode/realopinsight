@@ -1,6 +1,12 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+2.4.0 (Federator)
+  * Fixed compilation issue on OS X related to basename and QString (ticket #20)
+  * Fixed install script for OS X (ticket #21): removed the use of lscpu
+  and added option to set the number of CPU
+  * Improved install script enabling user mode installation
+
 2.4.0beta1 (Federator,b2)
   * Fixed ticket #16: adding support for realm authentication within the browser
   * Fixed ticket #17: file path missing in the title bar of the console
