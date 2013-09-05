@@ -53,18 +53,18 @@ int main(int argc, char **argv)
   int opt;
   if ((opt = getopt(argc, argv, "hv")) != -1) {
     switch (opt) {
-    case 'v':
-      cout << versionMsg.toStdString() << endl;
-      exit(0);
-      break;
-    case 'h':
-      cout << usage.arg(cmdName).toStdString();
-      exit(0);
-      break;
-    default:
-      cout << usage.arg(cmdName).toStdString();
-      exit (1);
-      break;
+      case 'v':
+        std::cout << versionMsg.toStdString() <<"\n";
+        exit(0);
+        break;
+      case 'h':
+        std::cout << usage.arg(cmdName).toStdString();
+        exit(0);
+        break;
+      default:
+        std::cout << usage.arg(cmdName).toStdString();
+        exit (1);
+        break;
     }
   }
   std::clog <<versionMsg.toStdString()<<"\n";
