@@ -30,29 +30,29 @@
 #include <ctime>
 #include <algorithm>
 
-const int MonitorBroker::DefaultPort = 1983 ;
-const int MonitorBroker::DefaultUpdateInterval = 300 ;
-const int MonitorBroker::MaxMsg = 512 ;
+const int MonitorBroker::DefaultPort = 1983;
+const int MonitorBroker::DefaultUpdateInterval = 300;
+const int MonitorBroker::MaxMsg = 512;
 
-MonitorBroker::MonitorBroker(const string & _sfile)
+MonitorBroker::MonitorBroker(const std::string & _sfile)
   : lastUpdate(0),
     statusFile(_sfile) {}
 
 MonitorBroker::~MonitorBroker() {}
 
-string MonitorBroker::getInfOfService(const string & _sid)
+std::string MonitorBroker::getInfOfService(const std::string & _sid)
 {
-  long curTime = time(NULL) ;
+  long curTime = time(NULL);
   if( (curTime - lastUpdate) >= DefaultUpdateInterval) {
-      loadNagiosCollectedData(statusFile, services) ;
-      lastUpdate = curTime ;
+      loadNagiosCollectedData(statusFile, services);
+      lastUpdate = curTime;
     }
-  ChecksT::iterator it = services.find(_sid) ;
+  ChecksT::iterator it = services.find(_sid);
   if (it == services.end() ) {
-      return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}" ;
+      return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}";
     }
 
-  ostringstream ret ;
+  std::ostringstream ret;
   ret << "{"
       << "\"return_code\":0,"
       << "\"status\":"<< it->second.status<<","
@@ -64,47 +64,47 @@ string MonitorBroker::getInfOfService(const string & _sid)
   return ret.str();
 }
 
-bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _checks)
+bool MonitorBroker::loadNagiosCollectedData(const std::string & _sfile, ChecksT & _checks)
 {
 
-  ifstream stFileStream ;
-  stFileStream.open(_sfile.c_str(), std::ios_base::in) ;
+  std::ifstream stFileStream;
+  stFileStream.open(_sfile.c_str(), std::ios_base::in);
   if (! stFileStream.good() ) {
-      cerr << "ERROR: Unable to open the file " << _sfile << endl ;
-      return false ;
+    std::cerr << "ERROR: Unable to open the file " << _sfile << "\n";
+      return false;
     }
 
-  string line;
+  std::string line;
   while (getline(stFileStream, line) , ! stFileStream.eof()) {
 
-      if(line.find("#") != string::npos ) continue ;
+      if(line.find("#") != std::string::npos ) continue;
 
-      if( line.find("hoststatus") == string::npos &&
-          line.find("servicestatus") == string::npos ) continue ;
+      if( line.find("hoststatus") == std::string::npos &&
+          line.find("servicestatus") == std::string::npos ) continue;
 
       CheckT info;
-      info.status = NagiosUnknown ;
+      info.status = NagiosUnknown;
       while (getline(stFileStream, line), ! stFileStream.eof()) {
 
-          size_t pos = line.find("}") ; if( pos != string::npos ) break ;
-          pos = line.find("=") ; if(pos == string::npos) continue ;
-          string param = ngrt4n::trim(line.substr(0, pos));
-          string value = ngrt4n::trim(line.substr(pos+1, string::npos)) ;
+          size_t pos = line.find("}"); if( pos != std::string::npos ) break;
+          pos = line.find("="); if(pos == std::string::npos) continue;
+          std::string param = ngrt4n::trim(line.substr(0, pos));
+          std::string value = ngrt4n::trim(line.substr(pos+1, std::string::npos));
           if(param == "host_name") {
               info.host = info.id =
-                  ngrt4n::trim(line.substr(pos+1)) ;
+                  ngrt4n::trim(line.substr(pos+1));
             }
           else if(param == "service_description") {
-              info.id += "/" + value ;
+              info.id += "/" + value;
             }
           else if(param == "check_command") {
-              info.check_command = value ;
+              info.check_command = value;
             }
           else if(param == "current_state") {
-              info.status = atoi(value.c_str()) ;
+              info.status = atoi(value.c_str());
             }
           else if(param == "last_state_change") {
-              info.last_state_change = value ;
+              info.last_state_change = value;
             }
           else if(param == "plugin_output")
             {
@@ -114,7 +114,7 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _ch
      //std::transform(info.id.begin(), info.id.end(), info.id.begin(), ::tolower);
       _checks[info.id] = info;
     }
-  stFileStream.close() ;
+  stFileStream.close();
 
   return true;
 }

@@ -57,15 +57,15 @@ int main(int argc, char **argv)
       runConfig = true;
       break;
     case 'v':
-      cout<<versionMsg.toStdString()<<"\n";
+      std::cout<<versionMsg.toStdString()<<"\n";
       exit(0);
       break;
     case 'h':
-      cout<<usage.arg(cmdName).toStdString();
+      std::cout<<usage.arg(cmdName).toStdString();
       exit(0);
       break;
     default:
-      cout<<usage.arg(cmdName).toStdString();
+      std::cout<<usage.arg(cmdName).toStdString();
       exit(1);
       break;
     }

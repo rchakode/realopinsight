@@ -32,30 +32,28 @@
 #include <iostream>
 #include <unistd.h>
 
-using namespace std ;
-
 void ngrt4n::initApp()
 {
   int ret = mkdir(ngrt4n::APP_HOME.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH ) ;
 
   if(ret == -1 && errno != EEXIST) {
-      cerr << "You need to set the authentication token first" ;
+      std::cerr << "You need to set the authentication token first !\n" ;
     }
 }
 
 
 void ngrt4n::checkUser() {
   if( getuid() != 0) {
-      cerr << "The program must be run as root" << endl;
+      std::cerr << "The program must be run as root !\n";
       exit(1) ;
     }
 }
 
-string ngrt4n::trim(const string& str, const string& enclosingChar)
+std::string ngrt4n::trim(const std::string& str, const std::string& enclosingChar)
 {
   size_t first = str.find_first_not_of(enclosingChar);
 
-  if (first != string::npos) {
+  if (first != std::string::npos) {
       size_t last = str.find_last_not_of(enclosingChar);
 
       return str.substr(first, last - first + 1);
