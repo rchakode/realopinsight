@@ -82,10 +82,10 @@ std::string getVersionMsg(const std::string& progName)
 
 void ngrt4n::setPassChain(char* authChain)
 {
-  ofstream ofpass;
+  std::ofstream ofpass;
   ofpass.open(ngrt4n::AUTH_FILE.c_str());
   if(!ofpass.good()) {
-      clog << "Unable to set the authentication token." << "\n";
+      std::clog << "Unable to set the authentication token." << "\n";
       exit(1);
     }
   ofpass << crypt(authChain, salt.c_str());
@@ -95,7 +95,7 @@ void ngrt4n::setPassChain(char* authChain)
 std::string ngrt4n::getPassChain()
 {
   std::string authChain;
-  ifstream pfile;
+  std::ifstream pfile;
   pfile.open (ngrt4n::AUTH_FILE.c_str());
   if(!pfile.good()) {
       std::clog << "Unable to load the application's settings" << "\n";
@@ -125,7 +125,7 @@ int main(int argc, char ** argv)
         case 'p':
           port = atoi(optarg);
           if(port <= 0 ) {
-              cerr << "Bad port number\n";
+              std::cerr << "Bad port number\n";
               exit(1);
             }
           break;
@@ -135,21 +135,21 @@ int main(int argc, char ** argv)
             ngrt4n::initApp();
             char* pass = getpass("Type a passphrase:");
             ngrt4n::setPassChain(pass);
-            cout << ngrt4n::getPassChain()<<"\n";
+            std::cout << ngrt4n::getPassChain()<<"\n";
             exit(0);
           }
         case 'T':
           ngrt4n::checkUser();
-          cout << ngrt4n::getPassChain()<<"\n";
+          std::cout << ngrt4n::getPassChain()<<"\n";
           exit(0);
         case 'v':
-          cout << getVersionMsg(progName)<<"\n";
+          std::cout << getVersionMsg(progName)<<"\n";
           exit(0);
         case 'h':
-          cout << help();
+          std::cout << help();
           exit(0);
         default:
-          cout << help();
+          std::cout << help();
           exit(1);
         }
     }
