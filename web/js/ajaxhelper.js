@@ -47,7 +47,7 @@ $.xmlrpc({
 });
 
 
-var totaldlds = parseInt($("#sf_downloads").html()) + parseInt($('#obs-fedora').html()) + parseInt($('#obs-opensuse').html());
+var totaldlds = parseInt($("#sf_downloads").html()) + parseInt($('#obs-fedora').html()) + parseInt($('#obs-opensuse').html())+ parseInt($('#obs-debian').html());
 $('#totaldlds').html("<b>" + totaldlds + '+</b> downloads from <b>'+ $('#sf_countries').html() + '+</b> countries!!!');
 
 (function() {
