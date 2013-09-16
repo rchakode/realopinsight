@@ -1,5 +1,7 @@
 /* Main content div */
-div#main { }
+div#main {
+    font-size: 1.2em;
+}
 
 /* **************************** TITLE ************************* */
 div#main h2 {
@@ -116,7 +118,12 @@ a:hover {
 }
 
 i, em {
-  color: #294B5F;
+  color: #ff6600;
+  font-style: normal;
+}
+
+strong {
+   color: #294B5F;
 }
 
 /* *******************MENU ************************** */
@@ -193,7 +200,8 @@ i, em {
   background:url(/en/images/tm/menu_nav3_right.gif) top right no-repeat;
 }
 
-/* The magic - set to work for up to a 3 level menu, but can be increased unlimited, for fourth level add
+/* The magic - set to work for up to a 3 level menu, but can be increased unlimited, for fourth 
+level add
 #primary-nav li:hover ul ul ul,
 #primary-nav li.menuparenth ul ul ul,
 */
@@ -207,7 +215,8 @@ i, em {
 
 
 /* Getting the new tags to behave */
-article, aside, audio, canvas, command, datalist, details, embed, figcaption, figure, footer, header, hgroup, keygen, meter, nav, output, progress, section, source, video {
+article, aside, audio, canvas, command, datalist, details, embed, figcaption, figure, footer, 
+header, hgroup, keygen, meter, nav, output, progress, section, source, video {
 display:block;
 }
 mark, rp, rt, ruby, summary, time {display:inline}
@@ -227,7 +236,8 @@ mark, rp, rt, ruby, summary, time {display:inline}
 /* Global properties */
 
 body {
-  font-family: "ApexSansBook", "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Arial, sans-serif;
+  font-family: "ApexSansBook", "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Arial, 
+sans-serif;
   color: #000; 
   line-height: 1.4em;
   font-size: 12px;
@@ -587,7 +597,12 @@ footer {
 }
 
 
-a, abbr, acronym, address, applet, article, aside, audio, b, blockquote, big, body, center, canvas, caption, cite, code, command, datalist, dd, del, details, dfn, dl, div, dt, em, embed, fieldset, figcaption, figure, font, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, html, i, iframe, img, ins, kbd, keygen, label, legend, li, meter, nav, object, ol, output, p, pre, progress, q, s, samp, section, small, span, source, strike, strong, sub, sup, table, tbody, tfoot, thead, th, tr, tdvideo, tt, u, ul, var {background:transparent; margin:0; padding:0; outline:0;vertical-align:top}
+a, abbr, acronym, address, applet, article, aside, audio, b, blockquote, big, body, center, canvas, 
+caption, cite, code, command, datalist, dd, del, details, dfn, dl, div, dt, em, embed, fieldset, 
+figcaption, figure, font, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, html, i, iframe, 
+img, ins, kbd, keygen, label, legend, li, meter, nav, object, ol, output, p, pre, progress, q, s, 
+samp, section, small, span, source, strike, strong, sub, sup, table, tbody, tfoot, thead, th, tr, 
+tdvideo, tt, u, ul, var {background:transparent; margin:0; padding:0; outline:0;vertical-align:top}
 blockquote, q {quotes:none}
 table, table td {padding:0;border:none;border-collapse:collapse}
 img {vertical-align:top}
@@ -695,13 +710,21 @@ div#righthome p.hightlight{
 
 .downloadbtn.green {
 background: rgb(65,163,23); /* Old browsers */
-background: -moz-linear-gradient(top, rgba(65,163,23,1) 0%, rgba(14,145,0,1) 24%, rgba(15,155,7,1) 50%, rgba(14,145,0,1) 79%, rgba(65,163,23,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(65,163,23,1)), color-stop(24%,rgba(14,145,0,1)), color-stop(50%,rgba(15,155,7,1)), color-stop(79%,rgba(14,145,0,1)), color-stop(100%,rgba(65,163,23,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* IE10+ */
-background: linear-gradient(to bottom, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#41a317', endColorstr='#41a317',GradientType=0 ); /* IE6-9 */
+background: -moz-linear-gradient(top, rgba(65,163,23,1) 0%, rgba(14,145,0,1) 24%, rgba(15,155,7,1) 
+50%, rgba(14,145,0,1) 79%, rgba(65,163,23,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(65,163,23,1)), 
+color-stop(24%,rgba(14,145,0,1)), color-stop(50%,rgba(15,155,7,1)), 
+color-stop(79%,rgba(14,145,0,1)), color-stop(100%,rgba(65,163,23,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 
+50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 
+50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 
+50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* IE10+ */
+background: linear-gradient(to bottom, rgba(65,163,23,1) 0%,rgba(14,145,0,1) 24%,rgba(15,155,7,1) 
+50%,rgba(14,145,0,1) 79%,rgba(65,163,23,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#41a317', 
+endColorstr='#41a317',GradientType=0 ); /* IE6-9 */
 }
 
 
@@ -710,13 +733,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#41a317', end
   text-align: center;
   font-size: 16px;
 background: rgb(255,116,0); /* Old browsers */
-background: -moz-linear-gradient(top, rgba(255,116,0,1) 0%, rgba(255,102,0,1) 24%, rgba(255,127,4,1) 50%, rgba(255,102,0,1) 79%, rgba(255,116,0,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,116,0,1)), color-stop(24%,rgba(255,102,0,1)), color-stop(50%,rgba(255,127,4,1)), color-stop(79%,rgba(255,102,0,1)), color-stop(100%,rgba(255,116,0,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* IE10+ */
-background: linear-gradient(to bottom, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff7400', endColorstr='#ff7400',GradientType=0 ); /* IE6-9 */
+background: -moz-linear-gradient(top, rgba(255,116,0,1) 0%, rgba(255,102,0,1) 24%, rgba(255,127,4,1) 
+50%, rgba(255,102,0,1) 79%, rgba(255,116,0,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,116,0,1)), 
+color-stop(24%,rgba(255,102,0,1)), color-stop(50%,rgba(255,127,4,1)), 
+color-stop(79%,rgba(255,102,0,1)), color-stop(100%,rgba(255,116,0,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 
+24%,rgba(255,127,4,1) 50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 
+50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 
+50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* IE10+ */
+background: linear-gradient(to bottom, rgba(255,116,0,1) 0%,rgba(255,102,0,1) 24%,rgba(255,127,4,1) 
+50%,rgba(255,102,0,1) 79%,rgba(255,116,0,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff7400', 
+endColorstr='#ff7400',GradientType=0 ); /* IE6-9 */
 }
 
 .downloadbtn.green a,
