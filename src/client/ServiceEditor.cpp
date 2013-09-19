@@ -26,7 +26,7 @@
 #include "ServiceEditor.hpp"
 #include "Preferences.hpp"
 #include "GraphView.hpp"
-#include "SvNavigator.hpp"
+#include "DashboardBase.hpp"
 
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
@@ -240,14 +240,14 @@ void ServiceEditor::loadTypeFields()
 
 void ServiceEditor::loadStatusHandlingFields(void)
 {
-  StringMapT crules = SvNavigator::calcRules();
+  StringMapT crules = DashboardBase::calcRules();
   QString defaultRule = CalcRules::label(CalcRules::HighCriticity);
   statusCalcRuleField()->addItem(tr("Calculation rule (Default is %1)").arg(defaultRule), CalcRules::HighCriticity);
 
   foreach(const QString& rule, crules.keys()) {
     statusCalcRuleField()->addItem(rule, crules.value(rule));
   }
-  StringMapT prules = SvNavigator::propRules();
+  StringMapT prules = DashboardBase::propRules();
   defaultRule = PropRules::label(PropRules::Unchanged);
   statusPropRuleField()->addItem(tr("Propagation rule (Default is %1)").arg(defaultRule), PropRules::Unchanged);
   foreach(const QString& rule, prules.keys()) {

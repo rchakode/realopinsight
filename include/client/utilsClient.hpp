@@ -90,6 +90,7 @@ namespace utils {
   StringPairT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
+  QString getNodeToolTip(const NodeT& _node);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

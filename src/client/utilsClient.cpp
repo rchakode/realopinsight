@@ -27,6 +27,11 @@
 #include <QFileInfo>
 
 
+namespace {
+  const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+  const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
+}
+
 QString utils::criticityToText(const qint32& _status)
 {
   switch(static_cast<MonitorBroker::SeverityT>(_status))
@@ -357,4 +362,22 @@ QPair<bool, int> utils::checkSourceId(const QString &id)
     }
   }
   return QPair<bool, int>(valid, index);
+}
+
+
+QString utils::getNodeToolTip(const NodeT& _node)
+{
+  QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
+                                            const_cast<QString&>(_node.description).replace("\n", " "),
+                                            utils::criticityToText(_node.severity),
+                                            CalcRules::label(_node.sev_crule),
+                                            PropRules::label(_node.sev_prule));
+  if (_node.type == NodeType::ALARM_NODE)
+  {
+    toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
+                                              _node.child_nodes,
+                                              QString::fromStdString(_node.check.alarm_msg),
+                                              _node.actual_msg);
+  }
+  return toolTip;
 }

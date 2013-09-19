@@ -1,13 +1,13 @@
-#include "Ngrt4nDashboard.hpp"
+#include "WebDashboard.hpp"
 
 WApplication *createApplication(const WEnvironment& env)
 {
-  Wt::WApplication *app = new Ngrt4nDashboard(env);
+  Wt::WApplication *app = new WebDashboard(env);
   app->setTwoPhaseRenderingThreshold(0);
   app->setTitle("NGRT4N Dashboard");
   app->useStyleSheet(WApplication::appRoot() + "resources/styles.css");
   app->messageResourceBundle().use(WApplication::appRoot() + "resources/messages");
-  app->setLocale("en") ;
+  app->setLocale("en");
   app->refresh();
   return app;
 }

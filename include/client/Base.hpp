@@ -300,4 +300,9 @@ typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 typedef QPair<QString, QString> StringPairT;
+
+enum {
+  XSCAL_FACTOR = 72,
+  YSCAL_FACTOR = 100
+};
 #endif /* BASE_HPP */

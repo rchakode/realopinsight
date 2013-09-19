@@ -18,6 +18,12 @@ config-editor{
 SOURCES	+= src/client/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
+config-web{
+HEADERS	+=
+SOURCES	+= \
+    wt/src/Main.cpp
+TARGET = ngrt4n-web
+}
 dflag{
 TARGET.path=$$(INSTALL_PREFIX)/bin
 MAN.path =$$(INSTALL_PREFIX)/share/man/man1
@@ -41,7 +47,11 @@ OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-local-typedefs
-INCLUDEPATH = include include/client include/core
+INCLUDEPATH = include include/client \
+              include/core \
+              wt/include \
+              /opt/install/wt-3.3.0/include \
+
 HEADERS	+= include/core/ns.hpp \
     include/core/MonitorBroker.hpp \
     include/client/Auth.hpp \
@@ -54,7 +64,7 @@ HEADERS	+= include/core/ns.hpp \
     include/client/ServiceEditor.hpp \
     include/client/StatsLegend.hpp \
     include/client/SvConfigCreator.hpp \
-    include/client/SvNavigator.hpp \
+    include/client/GuiDashboard.hpp \
     include/client/SvNavigatorTree.hpp \
     include/client/WebKit.hpp \
     include/client/ZbxHelper.hpp \
@@ -65,7 +75,12 @@ HEADERS	+= include/core/ns.hpp \
     include/client/Chart.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
-    include/client/LsHelper.hpp
+    include/client/LsHelper.hpp \
+    wt/include/WebDashboard.hpp \
+    wt/include/WebMsgConsole.hpp \
+    wt/include/WebServiceMap.hpp \
+    wt/include/WebServiceTree.hpp \
+    include/client/DashboardBase.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -78,7 +93,7 @@ SOURCES	+= \
     src/client/ServiceEditor.cpp \
     src/client/StatsLegend.cpp \
     src/client/SvConfigCreator.cpp \
-    src/client/SvNavigator.cpp \
+    src/client/GuiDashboard.cpp \
     src/client/SvNavigatorTree.cpp \
     src/client/WebKit.cpp \
     src/client/ZbxHelper.cpp \
@@ -90,7 +105,12 @@ SOURCES	+= \
     src/client/Chart.cpp \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
-    src/client/LsHelper.cpp
+    src/client/LsHelper.cpp \
+    wt/src/WebDashboard.cpp \
+    wt/src/WebMsgConsole.cpp \
+    wt/src/WebServiceMap.cpp \
+    wt/src/WebServiceTree.cpp \
+    src/client/DashboardBase.cpp
 
 DISTFILES += README \
     INSTALL \
@@ -110,7 +130,8 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-LIBS += -lzmq
+LIBS += -lzmq \
+        -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lboost_signals
 
 #include(QsLog/QsLog.pri)
 

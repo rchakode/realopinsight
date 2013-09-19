@@ -26,12 +26,10 @@
 #include "core/ns.hpp"
 #include "GraphView.hpp"
 #include "StatsLegend.hpp"
-#include "SvNavigator.hpp"
+#include "DashboardBase.hpp"
 #include "utilsClient.hpp"
 #include <memory>
 
-const qreal GraphView::XSCAL_FACTOR = 72.0;
-const qreal GraphView::YSCAL_FACTOR = 100.0;
 const QString GraphView::LABEL_NODE = ":LABEL";
 const QString GraphView::ICON_NODE = ":ICON";
 const QString GraphView::EXPICON_NODE = ":EXPICON";
@@ -341,7 +339,7 @@ void GraphView::drawNode(const NodeT& _node)
   if (m_mnodes[_node.id].type == NodeType::ALARM_NODE)
     m_mnodes[_node.id].exp_icon->setVisible(false);
 
-  QString msg =  SvNavigator::getNodeToolTip(_node);
+  QString msg =  utils::getNodeToolTip(_node);
   m_mnodes[_node.id].icon->setToolTip(msg);
   m_mnodes[_node.id].label->setToolTip(msg);
 }

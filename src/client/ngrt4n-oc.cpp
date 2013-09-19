@@ -22,11 +22,11 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "core/ns.hpp"
-#include "client/Auth.hpp"
-#include "client/SvNavigator.hpp"
-#include "client/SvConfigCreator.hpp"
-#include "client/utilsClient.hpp"
+#include "ns.hpp"
+#include "Auth.hpp"
+#include "GuiDashboard.hpp"
+#include "SvConfigCreator.hpp"
+#include "utilsClient.hpp"
 #include <sstream>
 #include <getopt.h>
 #include <QObject>

@@ -41,21 +41,19 @@
 class QScriptValueIterator;
 class QSystemTrayIcon;
 
-class SvNavigator : public QMainWindow
+class DashboardBase : public QObject
 {
   Q_OBJECT
 
 public:
-  SvNavigator(const qint32& _userRole = Auth::OpUserRole,
-              const QString& _config = "",
-              QWidget* = 0);
-  virtual ~SvNavigator();
-  void load(const QString& _file);
-  void resizeDashboard(void);
+  DashboardBase(const qint32& _userRole, const QString& _config);
+  virtual ~DashboardBase();
+
   static StringMapT propRules();
   static StringMapT calcRules();
-  static QString getNodeToolTip(const NodeT& _node);
   void initSettings(void);
+  virtual void load(const QString& _file) = 0;
+  virtual void resizeDashboard(void) = 0;
 
 public slots:
   void runMonitor();
@@ -67,38 +65,29 @@ public slots:
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
   void updateBpNode(const QString& _node);
-  void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
-  void centerGraphOnNode(const QString& _nodeId = "");
-  void filterNodeRelatedMsg(void);
-  void filterNodeRelatedMsg(const QString &);
-  void acknowledge(void);
-  void tabChanged(int);
-  void hideChart(void);
-  void centerGraphOnNode(QTreeWidgetItem *);
-  void handleChangePasswordAction(void);
-  void handleChangeMonitoringSettingsAction(void);
-  void handleShowOnlineResources(void);
-  void handleShowAbout(void);
-  void toggleFullScreen(bool _toggled);
-  void toggleTroubleView(bool _toggled);
-  void toggleIncreaseMsgFont(bool _toggled);
   void processZbxReply(QNetworkReply* reply, SourceT& src);
   void processZnsReply(QNetworkReply* reply, SourceT& src);
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleSourceBxItemChanged(int index);
+  virtual void handleShowAbout(void) = 0;
+  virtual void handleShowOnlineResources(void) = 0;
+  virtual void handleChangeMonitoringSettingsAction(void) = 0;
+  virtual void handleChangePasswordAction(void) = 0;
+  virtual void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level) = 0;
+  virtual void centerGraphOnNode(const QString& _nodeId) = 0;
+  virtual void filterNodeRelatedMsg(void) = 0;
+  virtual void filterNodeRelatedMsg(const QString& _nodeId) = 0;
+  virtual void handleTabChanged(int index) = 0;
+  virtual void handleHideChart(void) = 0;
+  virtual void toggleFullScreen(bool _toggled) = 0;
+  virtual void toggleTroubleView(bool _toggled) = 0;
+  virtual void toggleIncreaseMsgFont(bool _toggled) = 0;
 
 signals:
   void hasToBeUpdate(QString);
   void sortEventConsole(void);
-
-protected:
-  virtual void closeEvent(QCloseEvent *);
-  virtual void contextMenuEvent(QContextMenuEvent *);
-  virtual void timerEvent(QTimerEvent *);
-  virtual void showEvent(QShowEvent *);
-
 
 private:
   enum {
@@ -113,41 +102,18 @@ private:
   qint32 m_interval;
   qint32 m_timer;
   Settings* m_settings;
-  std::shared_ptr<Chart> m_chart;
-  MsgConsole* m_filteredMsgConsole;
-  QSplitter* m_mainSplitter;
-  QSplitter* m_rightSplitter;
-  QTabWidget* m_viewPanel;
-  WebKit* m_browser;
-  GraphView* m_map;
-  SvNavigatorTree* m_tree;
   Preferences* m_preferences;
   Preferences* m_changePasswdWindow;
-  MsgConsole* m_msgConsole;
-  QMenu* m_contextMenu;
   QSize m_msgConsoleSize;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  QSystemTrayIcon* m_trayIcon;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
   NodeListT::Iterator m_root;
   int m_firstSrcIndex;
   QComboBox* m_bxSourceSelection;
 
-  void addEvents(void);
-  void loadMenus(void);
-  void unloadMenus(void);
-  void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
-  void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  void updateCNodes(const CheckT & check, const SourceT& src);
   void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
   void computeStatusInfo(NodeT& _node, const SourceT& src);
-  void updateDashboard(NodeListT::iterator& _node);
-  void updateDashboard(const NodeT & _node);
-  void updateCNodes(const CheckT & check, const SourceT& src);
-  void finalizeUpdate(const SourceT& src);
-  void updateStatusBar(const QString& msg);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
   void openRpcSessions(void);
@@ -155,14 +121,21 @@ private:
   void openRpcSession(SourceT& src);
   void requestZbxZnsData(SourceT& src);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
-  void updateTrayInfo(const NodeT& _node);
-  QTabWidget* newMsgConsole();
   void resetInterval(void);
   void setBrowserUrl(void);
   void computeFirstSrcIndex(void);
   void setBrowserSourceSelectionBx(void);
-  void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
-  int extractSourceIndex(const QString& sid) { return sid.at(6).digitValue(); }
+  int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
+  virtual void addEvents(void) = 0;
+  virtual void loadMenus(void) = 0;
+  virtual void unloadMenus(void) = 0;
+  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
+  virtual void updateDashboard(const NodeT & _node) = 0;
+  virtual void finalizeUpdate(const SourceT& src) = 0;
+  virtual void updateStatusBar(const QString& msg);
+  virtual void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
+  virtual void updateDashboard(NodeListT::iterator& _node);
 };
 
 #endif /* SVNAVIGATOR_HPP */

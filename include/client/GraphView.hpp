@@ -80,8 +80,6 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent * event);
 
 private:
-  static const qreal XSCAL_FACTOR;
-  static const qreal YSCAL_FACTOR;
   static const QString LABEL_NODE;
   static const QString  ICON_NODE;
   static const QString  EXPICON_NODE;
