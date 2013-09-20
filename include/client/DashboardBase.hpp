@@ -41,7 +41,7 @@
 class QScriptValueIterator;
 class QSystemTrayIcon;
 
-class DashboardBase : public QObject
+class DashboardBase : public QWidget
 {
   Q_OBJECT
 
@@ -70,7 +70,6 @@ public slots:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
-  void handleSourceBxItemChanged(int index);
   virtual void handleShowAbout(void) = 0;
   virtual void handleShowOnlineResources(void) = 0;
   virtual void handleChangeMonitoringSettingsAction(void) = 0;
@@ -89,11 +88,7 @@ signals:
   void hasToBeUpdate(QString);
   void sortEventConsole(void);
 
-private:
-  enum {
-    ConsoleTab=0,
-    BrowserTab=1
-  };
+protected:
   qint64 updateCounter;
   CoreDataT* m_cdata;
   QString m_config;
@@ -109,7 +104,6 @@ private:
   SourceListT m_sources;
   NodeListT::Iterator m_root;
   int m_firstSrcIndex;
-  QComboBox* m_bxSourceSelection;
 
   void updateCNodes(const CheckT & check, const SourceT& src);
   void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
@@ -120,21 +114,14 @@ private:
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
   void requestZbxZnsData(SourceT& src);
-  void updateDashboardOnError(const SourceT& src, const QString& msg);
   void resetInterval(void);
-  void setBrowserUrl(void);
   void computeFirstSrcIndex(void);
-  void setBrowserSourceSelectionBx(void);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
-  virtual void addEvents(void) = 0;
-  virtual void loadMenus(void) = 0;
-  virtual void unloadMenus(void) = 0;
+  void updateDashboardOnError(const SourceT& src, const QString& msg);
   virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
   virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
   virtual void updateDashboard(const NodeT & _node) = 0;
   virtual void finalizeUpdate(const SourceT& src) = 0;
-  virtual void updateStatusBar(const QString& msg);
-  virtual void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
   virtual void updateDashboard(NodeListT::iterator& _node);
 };
 

@@ -101,8 +101,9 @@ int main(int argc, char **argv)
     }
   }
   info->finish(0);
-  SvNavigator *console= new SvNavigator(userRole);
-  console->load(file);
+  MainWindow *console= new MainWindow(userRole, file);
+  //console->load(file);
+  console->show();
 
   return app->exec();
 }

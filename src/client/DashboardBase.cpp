@@ -70,8 +70,7 @@ DashboardBase::DashboardBase(const qint32& _userRole, const QString& _config)
     m_settings (new Settings()),
     m_preferences (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
-    m_showOnlyTroubles(false),
-    m_bxSourceSelection(new QComboBox())
+    m_showOnlyTroubles(false)
 {
   //  loadMenus();
   //  addEvents();
@@ -788,8 +787,8 @@ void DashboardBase::initSettings(void)
   }
   resetInterval();
   computeFirstSrcIndex();
-  setBrowserSourceSelectionBx();
-  setBrowserUrl();
+  //  FIXME: setBrowserSourceSelectionBx();
+  //  setBrowserUrl();
 }
 
 void DashboardBase::resetInterval()
@@ -834,16 +833,6 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
   return allocated;
 }
 
-void DashboardBase::setBrowserUrl(void)
-{
-  if (m_firstSrcIndex >=0 ) {
-    SourceListT::Iterator first = m_sources.find(m_firstSrcIndex);
-    if (first != m_sources.end()) {
-      changeBrowserUrl(first->id, first->mon_url, first->icon);
-    }
-  }
-}
-
 void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
 {
   foreach (const qint8& id, ids) {
@@ -874,16 +863,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     m_sources[id] = newsrc;
     runMonitor(newsrc);
   }
-  setBrowserUrl();
-}
-
-void DashboardBase::handleSourceBxItemChanged(int index)
-{
-  int idx = extractSourceIndex(m_bxSourceSelection->itemData(index).toString());
-  SourceListT::Iterator src = m_sources.find(idx);
-  if (src != m_sources.end()) {
-    changeBrowserUrl(src->id, src->mon_url, src->icon);
-  }
+  //FIXME:  setBrowserUrl();
 }
 
 void DashboardBase::computeFirstSrcIndex(void)
@@ -899,28 +879,3 @@ void DashboardBase::computeFirstSrcIndex(void)
   }
 }
 
-void DashboardBase::setBrowserSourceSelectionBx(void)
-{
-  m_bxSourceSelection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  for (SourceListT::iterator it=m_sources.begin(),
-       end = m_sources.end(); it != end; ++it)
-  {
-    if (m_cdata->sources.contains(it->id))
-    {
-      switch(it->mon_type) {
-        case MonitorBroker::Nagios:
-          it->icon = ":images/nagios-logo-n.png";
-          break;
-        case MonitorBroker::Zabbix:
-          it->icon = ":images/zabbix-logo-z.png";
-          break;
-        case MonitorBroker::Zenoss:
-          it->icon = ":images/zenoss-logo-o.png";
-          break;
-        default:
-          break;
-      }
-      m_bxSourceSelection->addItem(QIcon(it->icon), it->id, QVariant(it->id));
-    }
-  }
-}
