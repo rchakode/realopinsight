@@ -100,7 +100,7 @@ void DashboardBase::runMonitor()
     }
   }
 
-  updateStatusBar(tr("update completed"));
+  //FIXME: updateStatusBar(tr("update completed"));
   ++updateCounter;
 }
 
@@ -150,7 +150,7 @@ void DashboardBase::runNagiosUpdate(const SourceT& src)
   }
 
   /* Now start doing the job */
-  updateStatusBar(tr("Updating..."));
+  //FIXME: updateStatusBar(tr("Updating..."));
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
@@ -260,7 +260,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
       msg = msg.arg(src.id, "Undefined source type");
       break;
   }
-  updateStatusBar(msg);
+  //FIXME: updateStatusBar(msg);
 }
 
 
@@ -670,7 +670,7 @@ void DashboardBase::openRpcSession(SourceT& src)
 
 
 void DashboardBase::requestZbxZnsData(SourceT& src) {
-  updateStatusBar(tr("Updating..."));
+  //FIXME: updateStatusBar(tr("Updating..."));
   switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
       if (src.zbx_handler->getIsLogged()) {
@@ -748,7 +748,7 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
 void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (!msg.isEmpty()) {
-    updateStatusBar(msg);
+    //FIXME: updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
   {

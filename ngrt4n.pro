@@ -65,6 +65,7 @@ HEADERS	+= include/core/ns.hpp \
     include/client/StatsLegend.hpp \
     include/client/SvConfigCreator.hpp \
     include/client/GuiDashboard.hpp \
+    include/client/MainWindow.hpp \
     include/client/SvNavigatorTree.hpp \
     include/client/WebKit.hpp \
     include/client/ZbxHelper.hpp \
@@ -94,6 +95,7 @@ SOURCES	+= \
     src/client/StatsLegend.cpp \
     src/client/SvConfigCreator.cpp \
     src/client/GuiDashboard.cpp \
+    src/client/MainWindow.cpp \
     src/client/SvNavigatorTree.cpp \
     src/client/WebKit.cpp \
     src/client/ZbxHelper.cpp \

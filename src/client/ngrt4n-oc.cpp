@@ -24,7 +24,7 @@
 
 #include "ns.hpp"
 #include "Auth.hpp"
-#include "GuiDashboard.hpp"
+#include "MainWindows.hpp"
 #include "SvConfigCreator.hpp"
 #include "utilsClient.hpp"
 #include <sstream>
