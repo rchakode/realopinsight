@@ -72,8 +72,6 @@ DashboardBase::DashboardBase(const qint32& _userRole, const QString& _config)
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
     m_showOnlyTroubles(false)
 {
-  //  loadMenus();
-  //  addEvents();
 }
 
 DashboardBase::~DashboardBase()
@@ -100,7 +98,7 @@ void DashboardBase::runMonitor()
     }
   }
 
-  //FIXME: updateStatusBar(tr("update completed"));
+  emit updateStatusBar(tr("update completed"));
   ++updateCounter;
 }
 
@@ -150,7 +148,7 @@ void DashboardBase::runNagiosUpdate(const SourceT& src)
   }
 
   /* Now start doing the job */
-  //FIXME: updateStatusBar(tr("Updating..."));
+  emit updateStatusBar(tr("Updating..."));
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
@@ -260,7 +258,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
       msg = msg.arg(src.id, "Undefined source type");
       break;
   }
-  //FIXME: updateStatusBar(msg);
+  emit updateStatusBar(msg);
 }
 
 
@@ -670,7 +668,7 @@ void DashboardBase::openRpcSession(SourceT& src)
 
 
 void DashboardBase::requestZbxZnsData(SourceT& src) {
-  //FIXME: updateStatusBar(tr("Updating..."));
+  emit updateStatusBar(tr("Updating..."));
   switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
       if (src.zbx_handler->getIsLogged()) {
@@ -748,7 +746,7 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
 void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (!msg.isEmpty()) {
-    //FIXME: updateStatusBar(msg);
+    emit updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
   {

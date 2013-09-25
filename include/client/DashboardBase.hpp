@@ -53,7 +53,8 @@ public:
   static StringMapT calcRules();
   void initSettings(void);
   virtual void load(const QString& _file) = 0;
-  virtual void resizeDashboard(void) = 0;
+  qint64 getUpdateCounter(void) const {return updateCounter;}
+  QString getConfig(void) const {return m_config;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString getSelectedNode(void) const {return m_selectedNode;}
 
@@ -80,15 +81,14 @@ public slots:
   virtual void centerGraphOnNode(const QString& _nodeId) = 0;
   virtual void filterNodeRelatedMsg(void) = 0;
   virtual void filterNodeRelatedMsg(const QString& _nodeId) = 0;
-  virtual void handleTabChanged(int index) = 0;
   virtual void handleHideChart(void) = 0;
-  virtual void toggleFullScreen(bool _toggled) = 0;
   virtual void toggleTroubleView(bool _toggled) = 0;
   virtual void toggleIncreaseMsgFont(bool _toggled) = 0;
 
 signals:
   void hasToBeUpdate(QString);
   void sortEventConsole(void);
+  void updateStatusBar(const QString& msg);
 
 protected:
   qint64 updateCounter;

@@ -103,7 +103,7 @@ int main(int argc, char **argv)
   info->finish(0);
   MainWindow *console= new MainWindow(userRole, file);
   //console->load(file);
-  console->show();
+  console->render();
 
   return app->exec();
 }
