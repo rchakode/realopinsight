@@ -54,6 +54,8 @@ public:
   void initSettings(void);
   virtual void load(const QString& _file) = 0;
   virtual void resizeDashboard(void) = 0;
+  void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
+  QString getSelectedNode(void) const {return m_selectedNode;}
 
 public slots:
   void runMonitor();
