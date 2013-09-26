@@ -64,11 +64,13 @@ public:
   virtual ~MsgConsole();
   void updateNodeMsg(const NodeListT::iterator &);
   void updateNodeMsg(const NodeT &);
-  void updateEntriesSize( const QSize& ,  const bool& = false );
+  void updateEntriesSize(bool _resizeWindow);
   void clearMsg(const NodeT &);
   void clearNormalMsg(void);
-  inline qint32 getRowCount() const
-  {return model()->rowCount();}
+  qint32 getRowCount() const {return model()->rowCount();}
+  void useLargeFont(bool _toggled);
+  void setConsoleSize(const QSize& size) {m_consoleSize = size;}
+  QSize getConsoleSize(void) const {return m_consoleSize;}
 
 public slots:
   inline void acknowledgeMsg(void)
@@ -82,6 +84,7 @@ signals:
 private:
   QStandardItemModel* mmodel;
   MsgConsoleProxyModel* mproxyModel;
+  QSize m_consoleSize;
 };
 
 #endif /* MSGCONSOLE_HPP */

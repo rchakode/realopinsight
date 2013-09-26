@@ -81,9 +81,7 @@ public slots:
   virtual void centerGraphOnNode(const QString& _nodeId) = 0;
   virtual void filterNodeRelatedMsg(void) = 0;
   virtual void filterNodeRelatedMsg(const QString& _nodeId) = 0;
-  virtual void handleHideChart(void) = 0;
   virtual void toggleTroubleView(bool _toggled) = 0;
-  virtual void toggleIncreaseMsgFont(bool _toggled) = 0;
 
 signals:
   void hasToBeUpdate(QString);
@@ -101,7 +99,7 @@ protected:
   Settings* m_settings;
   Preferences* m_preferences;
   Preferences* m_changePasswdWindow;
-  QSize m_msgConsoleSize;
+//  QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
   NodeListT::Iterator m_root;

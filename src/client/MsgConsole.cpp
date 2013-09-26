@@ -147,9 +147,9 @@ void MsgConsole::clearNormalMsg(void)
   }
 }
 
-void MsgConsole::updateEntriesSize(const QSize& _windowSize, const bool& _resizeWindow)
+void MsgConsole::updateEntriesSize(bool _resizeWindow)
 {
-  if (_resizeWindow) window()->resize(_windowSize);
+  if (_resizeWindow) window()->resize(m_consoleSize);
   QTableView::resizeColumnsToContents();
   QTableView::resizeRowsToContents();
   if(mmodel->rowCount()) {
@@ -158,4 +158,16 @@ void MsgConsole::updateEntriesSize(const QSize& _windowSize, const bool& _resize
                                                          +QTableView::columnWidth(2)
                                                          +QTableView::columnWidth(3)));
   }
+}
+
+void MsgConsole::useLargeFont(bool _toggled)
+{
+  if (_toggled) {
+    QFont df =  font();
+    setFont(QFont(df.family(), 16));
+  } else {
+    setFont(QFont());
+  }
+  updateEntriesSize(false);
+  resizeRowsToContents();
 }
