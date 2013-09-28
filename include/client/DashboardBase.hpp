@@ -73,15 +73,6 @@ public slots:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
-  virtual void handleShowAbout(void) = 0;
-  virtual void handleShowOnlineResources(void) = 0;
-  virtual void handleChangeMonitoringSettingsAction(void) = 0;
-  virtual void handleChangePasswordAction(void) = 0;
-  virtual void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level) = 0;
-  virtual void centerGraphOnNode(const QString& _nodeId) = 0;
-  virtual void filterNodeRelatedMsg(void) = 0;
-  virtual void filterNodeRelatedMsg(const QString& _nodeId) = 0;
-  virtual void toggleTroubleView(bool _toggled) = 0;
 
 signals:
   void hasToBeUpdate(QString);

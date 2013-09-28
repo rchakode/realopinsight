@@ -154,6 +154,7 @@ void Preferences::handleCancel(void)
     default:
       break;
   }
+  done(0);
 }
 
 void Preferences::applySettings(void)
