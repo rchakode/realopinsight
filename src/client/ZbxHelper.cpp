@@ -115,3 +115,13 @@ void ZbxHelper::setSslConfig(bool verifyPeer)
     m_sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
   }
 }
+
+void ZbxHelper::setTrid(const QString& apiv)
+{
+  qint32 vnum = apiv.mid(0, 3).remove(".").toInt();
+  if (vnum < 14) {
+    m_trid = TriggerV18;
+  } else {
+    m_trid = Trigger;
+  }
+}
