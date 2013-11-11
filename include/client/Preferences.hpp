@@ -61,7 +61,7 @@ public:
     BasicLoginForm
   };
 
-  Preferences(const qint32& _userRole = Auth::OpUserRole, const qint32& _action = Preferences::ChangePassword);
+  Preferences(qint32 _userRole, qint32 _formType);
   virtual ~Preferences();
   static QString style();
   QBitArray* getSourceStates() const { return m_sourceStates; }

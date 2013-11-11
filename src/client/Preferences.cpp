@@ -37,7 +37,7 @@
 
 //FIXME: allocated objects only when required for the different kind of forms
 
-Preferences::Preferences(const qint32& _userRole, const qint32& _formType)
+Preferences::Preferences(qint32 _userRole, qint32 _formType)
   : QDialog(),
     m_mainLayout (new QGridLayout(this)),
     m_userRole(_userRole),
@@ -571,7 +571,7 @@ void Preferences::updateSourceBtnState(void)
 
 void Preferences::loadBasicLoginForm(void)
 {
-  setWindowTitle(tr("Basic Login Form | %1").arg(APP_NAME));
+  setWindowTitle(tr("Browser requires realm authentication | %1").arg(APP_NAME));
   int line;
   line = 0,
       m_mainLayout->addWidget(new QLabel(tr("Login")), line, 0),

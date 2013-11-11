@@ -55,7 +55,6 @@ void WebKit::handleLoadFinished(bool ok)
 void WebKit::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator)
 {
   std::unique_ptr<Preferences> form(new Preferences(Auth::OpUserRole, Preferences::BasicLoginForm));
-  form->setWindowTitle(tr("Browser requires realm authentication | %1").arg(APP_NAME));
   if (form->exec() == 0) {
     authenticator->setUser(form->getRealmLogin());
     authenticator->setPassword(form->getRealmPasswd());
