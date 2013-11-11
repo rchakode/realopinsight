@@ -55,10 +55,12 @@ void WebKit::handleLoadFinished(bool ok)
 void WebKit::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator)
 {
   std::unique_ptr<Preferences> form(new Preferences(Auth::OpUserRole, Preferences::BasicLoginForm));
-  if (form->exec() == 0) {
+  form->exec();
+  if (! form->getCancelled()) {
     authenticator->setUser(form->getRealmLogin());
     authenticator->setPassword(form->getRealmPasswd());
   }
+  form->setCancelled(false);
 }
 
 

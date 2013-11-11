@@ -63,7 +63,8 @@ Preferences::Preferences(qint32 _userRole, qint32 _formType)
     m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     m_useMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
     m_verifySslPeerChkBx(new QCheckBox(tr("Don't verify SSL peer (https)"))),
-    m_selectedSource(0)
+    m_selectedSource(0),
+    m_cancelled(false)
 {
 
   m_oldPwdField->setEchoMode(QLineEdit::Password);
@@ -146,14 +147,13 @@ void Preferences::handleCancel(void)
   switch(m_formType) {
     case ChangeMonitoringSettings:
       emit sourcesChanged(m_updatedSources);
-      done(0);
       break;
     case BasicLoginForm:
-      done(1);
       break;
     default:
       break;
   }
+  m_cancelled = true;
   done(0);
 }
 
