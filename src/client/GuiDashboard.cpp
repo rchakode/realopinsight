@@ -128,8 +128,6 @@ void GuiDashboard::load(const QString& _file)
     utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
     exit(1);
   }
-  //resizeDashboard();
-  //emit configFileChanged(m_config);
 }
 
 void GuiDashboard::handleChangePasswordAction(void)
@@ -178,6 +176,11 @@ void GuiDashboard::toggleIncreaseMsgFont(bool _toggled)
 void GuiDashboard::updateDashboard(NodeListT::iterator& _node)
 {
   updateDashboard(*_node);
+}
+
+void GuiDashboard::updateMap(const NodeListT::iterator& _node, const QString& _tip)
+{
+  m_map->updateNode(_node, _tip);
 }
 
 void GuiDashboard::updateDashboard(const NodeT& _node)
@@ -358,7 +361,7 @@ QTabWidget* GuiDashboard::builtMsgPane(void)
   return m_msgPane;
 }
 
-void GuiDashboard::handleSettingDone(void)
+void GuiDashboard::handleSettingsLoaded(void)
 {
   m_bxSourceSelection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   for (SourceListT::iterator it=m_sources.begin(),
@@ -384,6 +387,8 @@ void GuiDashboard::handleSettingDone(void)
   }
   handleUpdateSourceUrl();
 }
+
+
 void GuiDashboard::handleSourceBxItemChanged(int index)
 {
   int idx = extractSourceIndex(m_bxSourceSelection->itemData(index).toString());
@@ -391,7 +396,6 @@ void GuiDashboard::handleSourceBxItemChanged(int index)
   if (src != m_sources.end()) {
     changeBrowserUrl(src->id, src->mon_url, src->icon);
   }
-  handleUpdateSourceUrl();
 }
 
 void GuiDashboard::handleUpdateSourceUrl(void)
@@ -429,7 +433,6 @@ void GuiDashboard::addEvents(void)
   connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
   connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
-  connect(this, SIGNAL(handleSettingDone(void)), this, SLOT(handleSettingDone(void)));
+  connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
-  connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
 }

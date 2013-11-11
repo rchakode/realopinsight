@@ -140,7 +140,6 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
   if (item) {
     centerOn(pos);
     setChartPos();
-    qDebug() <<"dd";
   }
 }
 

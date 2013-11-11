@@ -78,6 +78,8 @@ signals:
   void hasToBeUpdate(QString);
   void sortEventConsole(void);
   void updateStatusBar(const QString& msg);
+  void settingsLoaded(void);
+  void updateSourceUrl(void);
 
 protected:
   qint64 updateCounter;
@@ -96,8 +98,17 @@ protected:
   NodeListT::Iterator m_root;
   int m_firstSrcIndex;
 
-  void updateCNodes(const CheckT & check, const SourceT& src);
   void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
+  int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
+  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
+  virtual void updateDashboard(const NodeT & _node) = 0;
+  virtual void finalizeUpdate(const SourceT& src) = 0;
+  virtual void updateDashboard(NodeListT::iterator& _node);
+  virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip) = 0;
+
+private:
+  void updateCNodes(const CheckT & check, const SourceT& src);
   void computeStatusInfo(NodeT& _node, const SourceT& src);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
@@ -107,13 +118,9 @@ protected:
   void requestZbxZnsData(SourceT& src);
   void resetInterval(void);
   void computeFirstSrcIndex(void);
-  int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   void updateDashboardOnError(const SourceT& src, const QString& msg);
-  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
-  virtual void updateDashboard(const NodeT & _node) = 0;
-  virtual void finalizeUpdate(const SourceT& src) = 0;
-  virtual void updateDashboard(NodeListT::iterator& _node);
+
+  QString getNodeToolTip(const NodeT& _node);
 };
 
 #endif /* SVNAVIGATOR_HPP */

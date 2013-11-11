@@ -41,6 +41,8 @@
 
 
 namespace {
+  const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+  const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
   const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 }
@@ -97,8 +99,6 @@ void DashboardBase::runMonitor()
       utils::alert(tr("The default source is not yet set"));
     }
   }
-
-  emit updateStatusBar(tr("update completed"));
   ++updateCounter;
 }
 
@@ -148,7 +148,6 @@ void DashboardBase::runNagiosUpdate(const SourceT& src)
   }
 
   /* Now start doing the job */
-  emit updateStatusBar(tr("Updating..."));
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
@@ -243,7 +242,7 @@ void DashboardBase::resetStatData(void)
 
 void DashboardBase::prepareUpdate(const SourceT& src)
 {
-  QString msg = QObject::tr("updating... (%1, %2)");
+  QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
     case MonitorBroker::Nagios:
       msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
@@ -255,7 +254,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
       msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
       break;
     default:
-      msg = msg.arg(src.id, "Undefined source type");
+      msg = msg.arg(src.id, "undefined source type");
       break;
   }
   emit updateStatusBar(msg);
@@ -365,18 +364,16 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
       node->prop_sev = node->severity;
       break;
   }
-  //  FIXME: return pointer to manage the update?
-  //  QString toolTip = getNodeToolTip(*node);
-  //  m_map->updateNode(node, toolTip);
-  //  updateNavTreeItemStatus(node, toolTip);
-  //  if (node->id != m_root->id) emit hasToBeUpdate(node->parent);
+  QString toolTip = getNodeToolTip(*node);
+  updateMap(node, toolTip);
+  updateNavTreeItemStatus(node, toolTip);
+  if (node->id != m_root->id) emit hasToBeUpdate(node->parent);
 }
 
 void DashboardBase::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
 {
   updateNavTreeItemStatus(*_node, _tip);
 }
-
 
 void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
 {
@@ -667,8 +664,8 @@ void DashboardBase::openRpcSession(SourceT& src)
 }
 
 
-void DashboardBase::requestZbxZnsData(SourceT& src) {
-  emit updateStatusBar(tr("Updating..."));
+void DashboardBase::requestZbxZnsData(SourceT& src)
+{
   switch(src.mon_type) {
     case MonitorBroker::Zabbix: {
       if (src.zbx_handler->getIsLogged()) {
@@ -722,24 +719,23 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
   QString errmsg;
   switch (_code) {
     case QNetworkReply::RemoteHostClosedError:
-      errmsg = "The connection has been closed by the remote host";
+      updateDashboardOnError(src, tr("The connection has been closed by the remote host"));
       break;
     case QNetworkReply::HostNotFoundError:
-      errmsg = "Host not found";
+      updateDashboardOnError(src, tr("Host not found"));
       break;
     case QNetworkReply::ConnectionRefusedError:
-      errmsg = "Connection refused";
+      updateDashboardOnError(src, tr("Connection refused"));
       break;
     case QNetworkReply::SslHandshakeFailedError:
-      errmsg = tr("SSL Handshake failed");
+      updateDashboardOnError(src, tr("SSL Handshake failed"));
       break;
     case QNetworkReply::TimeoutError:
-      errmsg = tr("Timeout exceeded");
+      updateDashboardOnError(src, tr("Timeout exceeded"));
       break;
     default:
-      errmsg = SERVICE_OFFLINE_MSG.arg(apiUrl, tr("error %1").arg(_code));
+      updateDashboardOnError(src, SERVICE_OFFLINE_MSG.arg(apiUrl, tr("error %1").arg(_code)));
   }
-  updateDashboardOnError(src, errmsg);
 }
 
 
@@ -785,8 +781,7 @@ void DashboardBase::initSettings(void)
   }
   resetInterval();
   computeFirstSrcIndex();
-  //  FIXME: setBrowserSourceSelectionBx();
-  //  setBrowserUrl();
+  emit settingsLoaded();
 }
 
 void DashboardBase::resetInterval()
@@ -822,8 +817,7 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
       allocated = true;
       break;
     default:
-      //FIXME: undefined monitor
-      //updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
+      updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
       allocated = false;
       break;
   }
@@ -861,7 +855,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     m_sources[id] = newsrc;
     runMonitor(newsrc);
   }
-  //FIXME:  setBrowserUrl();
+  emit updateSourceUrl();
 }
 
 void DashboardBase::computeFirstSrcIndex(void)
@@ -875,5 +869,22 @@ void DashboardBase::computeFirstSrcIndex(void)
       m_firstSrcIndex = extractSourceIndex(cur->id);
     }
   }
+}
+
+QString DashboardBase::getNodeToolTip(const NodeT& _node)
+{
+  QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
+                                            const_cast<QString&>(_node.description).replace("\n", " "),
+                                            utils::criticityToText(_node.severity),
+                                            CalcRules::label(_node.sev_crule),
+                                            PropRules::label(_node.sev_prule));
+  if (_node.type == NodeType::ALARM_NODE)
+  {
+    toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
+                                              _node.child_nodes,
+                                              QString::fromStdString(_node.check.alarm_msg),
+                                              _node.actual_msg);
+  }
+  return toolTip;
 }
 

@@ -42,6 +42,7 @@ public slots:
   void render(void);
   void handleTabChanged(int index);
   void handleHideChart(void);
+  void handleRefresh(void);
 
 protected:
   virtual void closeEvent(QCloseEvent*);

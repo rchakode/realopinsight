@@ -83,7 +83,7 @@ public slots:
   void toggleIncreaseMsgFont(bool _toggled);
   void handleSourceBxItemChanged(int index);
   void handleUpdateSourceUrl(void);
-  void handleSettingDone(void);
+  void handleSettingsLoaded(void);
   void updateDashboard(const NodeT & _node);
 
 signals:
@@ -113,10 +113,13 @@ protected:
   QTabWidget* builtMsgPane(void);
 
   void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
-  void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
-  void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  void finalizeUpdate(const SourceT& src);
-  void updateDashboard(NodeListT::iterator& _node);
+  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  virtual void finalizeUpdate(const SourceT& src);
+  virtual void updateDashboard(NodeListT::iterator& _node);
+  virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);
+
+private:
   void addEvents(void);
   QTabWidget* newMsgConsole(void);
   void setBrowserSourceSelectionBx(void);

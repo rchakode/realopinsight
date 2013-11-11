@@ -69,6 +69,8 @@ public:
   void clearUpdatedSources(void) { m_updatedSources.clear(); }
   QString getRealmLogin(void) const {return m_realmLoginField->text();}
   QString getRealmPasswd(void) const {return m_realmPasswdField->text();}
+  void setCancelled(bool cancelled) { m_cancelled = cancelled;}
+  bool getCancelled(void) const {return m_cancelled;}
 
 
 public slots:
@@ -118,6 +120,7 @@ private:
   QCheckBox* m_verifySslPeerChkBx;
   QVector<QRadioButton*> m_sourceBtns;
   int m_selectedSource;
+  bool m_cancelled;
 
   QLineEdit* m_realmLoginField;
   QLineEdit* m_realmPasswdField;

@@ -35,7 +35,7 @@ MainWindow::MainWindow(const qint32& _userRole,
   QMainWindow::setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
   loadMenus();
   setCentralWidget(m_dashboard->get());
-  //    handleTabChanged(0);
+  handleTabChanged(0);
   addEvents();
 }
 
@@ -56,7 +56,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::contextMenuEvent(QContextMenuEvent* event)
 {
-  //FIXME: take into account when a node was selected on the tree
+  //FIXME: Fix when a node was selected on the tree
   // and the cursor is into the map
   QPoint pos = event->globalPos();
   QList<QTreeWidgetItem*> treeNodes = m_dashboard->getTreeSelectedItem();
@@ -74,7 +74,7 @@ void MainWindow::contextMenuEvent(QContextMenuEvent* event)
 
 void MainWindow::timerEvent(QTimerEvent*)
 {
-  m_dashboard->runMonitor();
+  handleRefresh();
 }
 
 void MainWindow::showEvent(QShowEvent*)
@@ -85,7 +85,7 @@ void MainWindow::showEvent(QShowEvent*)
                       Qt::AlignCenter|Qt::AlignCenter);
 
     m_dashboard->initSettings();
-    m_dashboard->runMonitor();
+    handleRefresh();
 
     info->finish(0);
     m_dashboard->showTrayIcon();
@@ -206,7 +206,6 @@ void MainWindow::handleTabChanged(int _index)
       break;
     default:
       break;
-
   }
 }
 
@@ -214,6 +213,15 @@ void MainWindow::handleHideChart(void)
 {
   m_dashboard->hideChart()? m_subMenus["HideChart"]->setIcon(QIcon(":images/check.png")):
                             m_subMenus["HideChart"]->setIcon(QIcon(""));
+}
+
+void MainWindow::handleRefresh(void)
+{
+  setEnabled(false);
+  handleUpdateStatusBar(tr("updating..."));
+  m_dashboard->runMonitor();
+  handleUpdateStatusBar(tr("update completed"));
+  setEnabled(true);
 }
 
 void MainWindow::addEvents(void)
@@ -229,7 +237,7 @@ void MainWindow::addEvents(void)
   connect(m_subMenus["ZoomIn"], SIGNAL(triggered(bool)), m_dashboard->getMap(), SLOT(zoomIn()));
   connect(m_subMenus["ZoomOut"], SIGNAL(triggered(bool)), m_dashboard->getMap(), SLOT(zoomOut()));
   connect(m_subMenus["HideChart"], SIGNAL(triggered(bool)), this, SLOT(handleHideChart()));
-  connect(m_subMenus["Refresh"], SIGNAL(triggered(bool)), m_dashboard, SLOT(runMonitor())); //FIXME: disable window
+  connect(m_subMenus["Refresh"], SIGNAL(triggered(bool)), this, SLOT(handleRefresh()));
   connect(m_subMenus["ChangePassword"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleChangePasswordAction(void)));
   connect(m_subMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleChangeMonitoringSettingsAction(void)));
   connect(m_subMenus["ShowAbout"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleShowAbout()));
@@ -241,10 +249,7 @@ void MainWindow::addEvents(void)
   connect(m_subMenus["TroubleView"], SIGNAL(toggled(bool)), m_dashboard, SLOT(toggleTroubleView(bool)));
   connect(m_subMenus["IncreaseMsgFont"], SIGNAL(toggled(bool)), m_dashboard, SLOT(toggleIncreaseMsgFont(bool)));
   connect(m_contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), m_dashboard, SLOT(filterNodeRelatedMsg()));
-  connect(m_contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
+  connect(m_contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), m_dashboard, SLOT(centerGraphOnNode()));
   connect(m_dashboard, SIGNAL(centralTabChanged(int)), this, SLOT(handleTabChanged(int)));
-  //  connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
-  //  connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
-  //  connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(m_dashboard, SIGNAL(updateStatusBar(const QString&)), this, SLOT(handleUpdateStatusBar(const QString&)));
 }
