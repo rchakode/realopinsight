@@ -115,7 +115,7 @@ public:
 
 class Criticity {
 public:
-  Criticity(MonitorBroker::SeverityT _value=MonitorBroker::Normal): value(_value) {}
+  Criticity(MonitorBroker::SeverityT _value): value(_value) {}
   void setValue(MonitorBroker::SeverityT _value) {value = _value;}
   MonitorBroker::SeverityT getValue() const {return value;}
 

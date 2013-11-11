@@ -338,11 +338,12 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 
 void DashboardBase::updateBpNode(const QString& _nodeId)
 {
+  Criticity criticity(MonitorBroker::Normal);
+
   NodeListT::iterator node;
-  if (!utils::findNode(m_cdata, _nodeId, node)) return;
+  if (! utils::findNode(m_cdata, _nodeId, node)) return;
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
-  Criticity criticity;
   foreach (const QString& nodeId, nodeIds) {
     NodeListT::iterator child;
     if (!utils::findNode(m_cdata, nodeId, child)) continue;
@@ -353,11 +354,15 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
       criticity = criticity * cst;
     }
   }
+
   node->severity = criticity.getValue();
+
   switch(node->sev_prule) {
-    case PropRules::Increased: node->prop_sev = (criticity++).getValue();
+    case PropRules::Increased:
+      node->prop_sev = (criticity++).getValue();
       break;
-    case PropRules::Decreased: node->prop_sev = (criticity--).getValue();
+    case PropRules::Decreased:
+      node->prop_sev = (criticity--).getValue();
       break;
     case PropRules::Unchanged:
     default:
@@ -367,7 +372,12 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   updateMap(node, toolTip);
   updateNavTreeItemStatus(node, toolTip);
-  if (node->id != m_root->id) emit hasToBeUpdate(node->parent);
+  //qDebug() << node->id << node->name << node->severity;
+  if (node->id != m_root->id) {
+    updateBpNode(node->parent);
+    // FIXME: emit hasToBeUpdate(node->parent);
+    // emit hasToBeUpdate(node->parent);
+  }
 }
 
 void DashboardBase::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
