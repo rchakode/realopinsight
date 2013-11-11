@@ -90,7 +90,7 @@ protected:
   Settings* m_settings;
   Preferences* m_preferences;
   Preferences* m_changePasswdWindow;
-//  QSize m_msgConsoleSize;
+  QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
   NodeListT::Iterator m_root;
