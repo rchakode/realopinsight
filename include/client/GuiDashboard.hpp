@@ -63,7 +63,7 @@ public:
   QComboBox* getSourceSelectionBox(void) const {return m_bxSourceSelection;}
   MsgConsole* getFilteredMsgConsole(void) const {return m_filteredMsgConsole;}
   bool hideChart(void) {return m_map->hideChart();}
-//FIXME:  void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
+  void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
   GraphView* getMap(void) const {return m_map;}
   WebKit* getBrowser(void) const {return m_browser;}
 
@@ -81,9 +81,9 @@ public slots:
   void handleTabChanged(int index) {emit centralTabChanged(index);}
   void toggleTroubleView(bool _toggled);
   void toggleIncreaseMsgFont(bool _toggled);
-  //FIXME: void handleSourceBxItemChanged(int index);
-  //FIXME: void handleUpdateSourceUrl(void);
-  //FIXME: void handleSettingDone(void);
+  void handleSourceBxItemChanged(int index);
+  void handleUpdateSourceUrl(void);
+  void handleSettingDone(void);
   void updateDashboard(const NodeT & _node);
 
 signals:

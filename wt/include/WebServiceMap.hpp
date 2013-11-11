@@ -54,7 +54,6 @@ private:
   double scaleY;
   double layoutWidth;
   double layoutHeight;
-//  IconMapT iconPaths;
   Wt::WPainter* painter;
   NodeListT* aservices;
   NodeListT* bservices;

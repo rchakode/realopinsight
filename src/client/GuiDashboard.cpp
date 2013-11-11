@@ -21,7 +21,6 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
 #include "GuiDashboard.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
@@ -75,7 +74,8 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_tree (new SvNavigatorTree()),
     m_msgConsole(new MsgConsole(this)),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
-    m_bxSourceSelection(new QComboBox())
+    m_bxSourceSelection(new QComboBox()),
+    m_msgPane(new QTabWidget())
 {
   m_viewPanel->addTab(m_map, tr("Map")),
       m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
@@ -84,8 +84,9 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_mainSplitter->addWidget(m_tree);
   m_mainSplitter->addWidget(m_rightSplitter);
   m_rightSplitter->addWidget(m_viewPanel);
-  m_rightSplitter->addWidget(newMsgConsole());
+  m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
+  addEvents();
   if (! m_config.isEmpty()) {
     load(m_config);
   }
@@ -106,6 +107,7 @@ GuiDashboard::~GuiDashboard()
   delete m_preferences;
   delete m_changePasswdWindow;
   delete m_trayIcon;
+  delete m_msgPane;
 }
 
 void GuiDashboard::load(const QString& _file)
@@ -170,15 +172,7 @@ void GuiDashboard::toggleTroubleView(bool _toggled)
 
 void GuiDashboard::toggleIncreaseMsgFont(bool _toggled)
 {
-  if (_toggled) {
-    QFont df =  m_msgConsole->font();
-    m_msgConsole->setFont(QFont(df.family(), 16));
-  } else {
-    m_msgConsole->setFont(QFont());
-  }
-  //FIXME: m_msgConsole->updateEntriesSize(m_msgConsoleSize);
-  m_msgConsole->updateEntriesSize(false);
-  m_msgConsole->resizeRowsToContents();
+  m_msgConsole->useLargeFont(_toggled);
 }
 
 void GuiDashboard::updateDashboard(NodeListT::iterator& _node)
@@ -194,7 +188,6 @@ void GuiDashboard::updateDashboard(const NodeT& _node)
   if (!m_showOnlyTroubles || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal)) {
     m_msgConsole->updateNodeMsg(_node);
     if (m_msgConsole->getRowCount() == 1) {
-      //FIXME: m_msgConsole->updateEntriesSize(m_msgConsoleSize);
       m_msgConsole->updateEntriesSize(false);
     }
   }
@@ -275,12 +268,13 @@ void GuiDashboard::filterNodeRelatedMsg(void)
   if (utils::findNode(m_cdata, m_selectedNode, node)) {
     filterNodeRelatedMsg(m_selectedNode);
     QString title = tr("Messages related to '%2' - %1").arg(APP_NAME, node->name);
-    //FIXME: m_filteredMsgConsole->updateEntriesSize(m_msgConsoleSize, true);
-    m_msgConsole->updateEntriesSize(true);
+    m_filteredMsgConsole->updateEntriesSize(true);
     m_filteredMsgConsole->setWindowTitle(title);
   }
   qint32 rh = qMax(m_filteredMsgConsole->getRowCount() * m_filteredMsgConsole->rowHeight(0) + 50, 100);
-  if (m_filteredMsgConsole->height() > rh) m_filteredMsgConsole->resize(m_msgConsoleSize.width(), rh);
+  if (m_filteredMsgConsole->height() > rh) {
+    m_filteredMsgConsole->resize(m_msgConsole->getConsoleSize().width(), rh);
+  }
   m_filteredMsgConsole->sortByColumn(1, Qt::AscendingOrder);
   m_filteredMsgConsole->show();
 }
@@ -309,18 +303,19 @@ void GuiDashboard::centerGraphOnNode(QTreeWidgetItem * _item)
 void GuiDashboard::resizeDashboard(qint32 width, qint32 height)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
-  m_msgConsoleSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));
+  QSize mcSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));;
 
   QList<qint32> framesSize;
   framesSize.push_back(width * 0.20);
-  framesSize.push_back(m_msgConsoleSize.width());
+  framesSize.push_back(mcSize.width());
   m_mainSplitter->setSizes(framesSize);
 
   framesSize[0] = (height * GRAPH_HEIGHT_RATE);
-  framesSize[1] = (m_msgConsoleSize.height());
+  framesSize[1] = (mcSize.height());
   m_rightSplitter->setSizes(framesSize);
 
   m_mainSplitter->resize(width, height * 0.85);
+  m_msgConsole->setConsoleSize(mcSize);
 }
 
 
@@ -350,25 +345,20 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
   m_trayIcon->setToolTip(title%"\n"%msg);
 }
 
-QTabWidget* GuiDashboard::newMsgConsole()
+QTabWidget* GuiDashboard::builtMsgPane(void)
 {
-  QTabWidget* msgConsole(new QTabWidget());
+  //  QTabWidget* msgPane(new QTabWidget());
   QHBoxLayout* lyt(new QHBoxLayout());
-  QToolBar* tlbar (new QToolBar());
   QGroupBox* wdgsGrp(new QGroupBox());
-  //  FIXME: tlbar->addAction(m_subMenus["TroubleView"]);
-  //  tlbar->addAction(m_subMenus["IncreaseMsgFont"]);
-  tlbar->setOrientation(Qt::Vertical);
   lyt->addWidget(m_msgConsole, Qt::AlignLeft);
-  lyt->addWidget(tlbar, Qt::AlignRight);
   lyt->setMargin(0);
   lyt->setContentsMargins(QMargins(0, 0, 0, 0));
   wdgsGrp->setLayout(lyt);
-  msgConsole->addTab(wdgsGrp, tr("Message Console"));
-  return msgConsole;
+  m_msgPane->addTab(wdgsGrp, tr("Message Console"));
+  return m_msgPane;
 }
 
-void GuiDashboard::setBrowserSourceSelectionBx(void)
+void GuiDashboard::handleSettingDone(void)
 {
   m_bxSourceSelection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   for (SourceListT::iterator it=m_sources.begin(),
@@ -392,12 +382,54 @@ void GuiDashboard::setBrowserSourceSelectionBx(void)
       m_bxSourceSelection->addItem(QIcon(it->icon), it->id, QVariant(it->id));
     }
   }
+  handleUpdateSourceUrl();
+}
+void GuiDashboard::handleSourceBxItemChanged(int index)
+{
+  int idx = extractSourceIndex(m_bxSourceSelection->itemData(index).toString());
+  SourceListT::Iterator src = m_sources.find(idx);
+  if (src != m_sources.end()) {
+    changeBrowserUrl(src->id, src->mon_url, src->icon);
+  }
+  handleUpdateSourceUrl();
 }
 
+void GuiDashboard::handleUpdateSourceUrl(void)
+{
+  if (m_firstSrcIndex >=0 ) {
+    SourceListT::Iterator first = m_sources.find(m_firstSrcIndex);
+    if (first != m_sources.end()) {
+      changeBrowserUrl(first->id, first->mon_url, first->icon);
+    }
+  }
+}
 
 void GuiDashboard::changeBrowserUrl(const QString& sid, const QString& url, const QString& icon)
 {
   m_browser->setUrl(url);
   m_viewPanel->setTabText(BrowserTab, tr("Web Browser (%1)").arg(sid));
   m_viewPanel->setTabIcon(BrowserTab, QIcon(icon));
+}
+
+void GuiDashboard::setMsgPaneToolBar(const QList<QAction*>& menuAtions)
+{
+  QToolBar* tlbar (new QToolBar());
+  tlbar->setOrientation(Qt::Vertical);
+  foreach (QAction* action, menuAtions) {
+    tlbar->addAction(action);
+  }
+  m_msgPane->widget(0)->layout()->addWidget(tlbar);
+}
+
+void GuiDashboard::addEvents(void)
+{
+  connect(m_viewPanel, SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
+  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourceSettingsChanged(QList<qint8>)));
+  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
+  connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
+  connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
+  connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
+  connect(this, SIGNAL(handleSettingDone(void)), this, SLOT(handleSettingDone(void)));
+  connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
+  connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
 }
