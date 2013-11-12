@@ -36,27 +36,28 @@
 #include "WebDashboard.hpp"
 #include "Base.hpp"
 
-WebDashboard::WebDashboard(const WEnvironment& env)
-  : WApplication(env),
-    navTree(new TreeNodeItemListT()),
-    map(new WebServiceMap()),
-    msgConsole(new Ngrt4nMsgConsole())
+WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
+  //FIXME: Wt::WApplication(env),
+  : DashboardBase(_userRole, _config),
+    m_tree(new TreeNodeItemListT()),
+    m_map(new WebServiceMap()),
+    m_msgConsole(new WebMsgConsole())
 {
-  WContainerWidget* mainContainer =  new WContainerWidget();
-  WContainerWidget* leftContainer = new WContainerWidget();
-  WContainerWidget* rightContainer = new WContainerWidget();
-  WContainerWidget* mapContainer = new WContainerWidget();
-  WContainerWidget* msgContainer = new WContainerWidget();
-  WVBoxLayout* mainLayout = new WVBoxLayout();
-  WHBoxLayout* centralLayout = new WHBoxLayout();
-  WVBoxLayout* leftLayout = new WVBoxLayout();
-  WVBoxLayout* rightLayout = new WVBoxLayout();
-  WVBoxLayout* mapLayout = new WVBoxLayout();
-  WVBoxLayout* msgLayout = new WVBoxLayout();
-  WScrollArea* mapScArea = new WScrollArea();
-  WPanel* treePanel = new WPanel();
-  WPanel* mapPanel = new WPanel();
-  WPanel* msgPanel = new WPanel();
+  Wt::WContainerWidget* mainContainer =  new Wt::WContainerWidget();
+  Wt::WContainerWidget* leftContainer = new Wt::WContainerWidget();
+  Wt::WContainerWidget* rightContainer = new Wt::WContainerWidget();
+  Wt::WContainerWidget* mapContainer = new Wt::WContainerWidget();
+  Wt::WContainerWidget* msgContainer = new Wt::WContainerWidget();
+  Wt::WVBoxLayout* mainLayout = new Wt::WVBoxLayout();
+  Wt::WHBoxLayout* centralLayout = new Wt::WHBoxLayout();
+  Wt::WVBoxLayout* leftLayout = new Wt::WVBoxLayout();
+  Wt::WVBoxLayout* rightLayout = new Wt::WVBoxLayout();
+  Wt::WVBoxLayout* mapLayout = new Wt::WVBoxLayout();
+  Wt::WVBoxLayout* msgLayout = new Wt::WVBoxLayout();
+  Wt::WScrollArea* mapScArea = new Wt::WScrollArea();
+  Wt::WPanel* treePanel = new Wt::WPanel();
+  Wt::WPanel* mapPanel = new Wt::WPanel();
+  Wt::WPanel* msgPanel = new Wt::WPanel();
 
   mainContainer->setStyleClass("container");
   leftContainer->setStyleClass("container");
@@ -74,24 +75,24 @@ WebDashboard::WebDashboard(const WEnvironment& env)
   centralLayout->setSpacing(1);
   rightLayout->setSpacing(1);
 
-  treePanel->setTitle(WString::tr("service.tree.title"));
+  treePanel->setTitle(Wt::WString::tr("service.tree.title"));
   //FIXME: treePanel->setCentralWidget(navTree);
   leftLayout->addWidget(treePanel);
   leftContainer->setLayout(leftLayout);
-  leftContainer->setOverflow(WContainerWidget::OverflowAuto);
+  leftContainer->setOverflow(Wt::WContainerWidget::OverflowAuto);
   leftContainer->resize(250, mainContainer->height());
 
-  mapPanel->setTitle(WString::tr("service.map.title"));
-  mapScArea->setWidget(map);
+  mapPanel->setTitle(Wt::WString::tr("service.map.title"));
+  mapScArea->setWidget(m_map);
   mapLayout->addWidget(mapScArea);
   mapContainer->setLayout(mapLayout);
   mapPanel->setCentralWidget(mapContainer);
 
-  msgPanel->setTitle(WString::tr("msg.panel.title"));
-  msgLayout->addWidget(msgConsole);
+  msgPanel->setTitle(Wt::WString::tr("msg.panel.title"));
+  msgLayout->addWidget(m_msgConsole);
   msgContainer->setLayout(msgLayout);
   msgPanel->setCentralWidget(msgContainer);
-  msgConsole->sizeChanged().connect(map,&WebServiceMap::msgPanelSizedChanged);
+  m_msgConsole->sizeChanged().connect(m_map,&WebServiceMap::msgPanelSizedChanged);
 
   rightContainer->setLayout(rightLayout);
   rightLayout->addWidget(mapPanel);
@@ -105,7 +106,7 @@ WebDashboard::WebDashboard(const WEnvironment& env)
   mainLayout->addWidget(createMenuBarWidget(), 0);
   mainLayout->addLayout(centralLayout, 2);
   mainContainer->setLayout(mainLayout);
-  root()->addWidget(mainContainer);
+  //FIXME: root()->addWidget(mainContainer); see WApplication
 
   centralLayout->setResizable(0);
   centralLayout->setResizable(1);
@@ -117,9 +118,9 @@ WebDashboard::WebDashboard(const WEnvironment& env)
 
 WebDashboard::~WebDashboard()
 {
-  delete navTree;
-  delete map;
-  delete msgConsole;
+  delete m_tree;
+  delete m_map;
+  delete m_msgConsole;
 }
 
 
@@ -131,12 +132,12 @@ void WebDashboard::loadConfig()
   if( !result ) return;  // Invalid config file
 
   if( !buildNavTreeModel() ){
-    std::cerr << WString::tr("unable.to.build.view").arg("view") << "\n";
+    std::cerr << Wt::WString::tr("unable.to.build.view").arg("view") << "\n";
     return;
   }
 
-  if(! computeMapCoordinates(data) ){
-    std::cerr << WString::tr("unable.to.build.view").arg("map") << "\n";
+  if(! computeMapCoordinates(*m_cdata) ){
+    std::cerr << Wt::WString::tr("unable.to.build.view").arg("map") << "\n";
     return;
   }
 
@@ -297,7 +298,7 @@ void WebDashboard::updateServicesStatuses()
 
 void WebDashboard::updateParentStatus(const NodeT& _service)
 {
-  NodeListT::Iterator pIt = data.bpnodes.find(_service.parent);
+  NodeListT::Iterator pIt = m_cdata->bpnodes.find(_service.parent);
   //pIt->status_info |= _service.status_info;
   if(pIt->id != "root") updateParentStatus(*pIt);
 }
@@ -332,74 +333,74 @@ void WebDashboard::updateServiceTree(void)
 }
 
 
-WLayout* WebDashboard::createMenuBar(void)
+Wt::WLayout* WebDashboard::createMenuBar(void)
 {
-  WHBoxLayout *menu_box = new WHBoxLayout();
+  Wt::WHBoxLayout *menu_box(new Wt::WHBoxLayout());
 
   menu_box->setSpacing(0); menu_box->setContentsMargins(0, 0, 0, 0);
-  WPushButton *b;
-
-  b =  new WPushButton(WString::tr("refresh.menu.text"));
+  Wt::WPushButton *b(new Wt::WPushButton(Wt::WString::tr("refresh.menu.text")));
   b->setIcon("icons/built-in/refresh.png");
   menu_box->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("zoom.in"));
+  b =  new Wt::WPushButton(Wt::WString::tr("zoom.in"));
   b->setIcon("icons/built-in/zoomin.png");
   menu_box->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("zoom.out"));
+  b =  new Wt::WPushButton(Wt::WString::tr("zoom.out"));
   b->setIcon("icons/built-in/zoomout.png");
   menu_box->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("save.map.menu.text"));
+  b =  new Wt::WPushButton(Wt::WString::tr("save.map.menu.text"));
   b->setIcon("icons/built-in/disket.png");
   menu_box->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("help.text"));
+  b =  new Wt::WPushButton(Wt::WString::tr("help.text"));
   b->setIcon("icons/built-in/help.png");
   menu_box->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("disconnect.text"));
+  b =  new Wt::WPushButton(Wt::WString::tr("disconnect.text"));
   b->setIcon("icons/built-in/logout.png");
   menu_box->addWidget(b, 0);
 
   return menu_box;
 }
 
-WContainerWidget* WebDashboard::createMenuBarWidget(void)
+Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
 {
-  WContainerWidget* menu_bar = new WContainerWidget();
-  WHBoxLayout *layout = new WHBoxLayout(); layout->setSpacing(0);
+  Wt::WContainerWidget* menu_bar(new Wt::WContainerWidget());
+  Wt::WHBoxLayout *layout(new Wt::WHBoxLayout());
+  layout->setSpacing(0);
   menu_bar->setStyleClass("menubar");
-  layout->setSpacing(0); menu_bar->setPadding(0, All); layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  menu_bar->setPadding(0, Wt::All);
+  layout->setContentsMargins(0, 0, 0, 0);
 
-  WPushButton *b;
-  b =  new WPushButton(WString::tr("refresh.menu.text"));
+  Wt::WPushButton *b(new Wt::WPushButton(Wt::WString::tr("refresh.menu.text")));
   b->setIcon("icons/built-in/refresh.png");
   b->setStyleClass("button");
   layout->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("zoom.in"));
+  b =  new Wt::WPushButton(Wt::WString::tr("zoom.in"));
   b->setIcon("icons/built-in/zoomin.png");
   b->setStyleClass("button");
   layout->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("zoom.out"));
+  b =  new Wt::WPushButton(Wt::WString::tr("zoom.out"));
   b->setIcon("icons/built-in/zoomout.png");
   b->setStyleClass("button");
   layout->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("save.map.menu.text"));
+  b =  new Wt::WPushButton(Wt::WString::tr("save.map.menu.text"));
   b->setIcon("icons/built-in/disket.png");
   b->setStyleClass("button");
   layout->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("help.text"));
+  b =  new Wt::WPushButton(Wt::WString::tr("help.text"));
   b->setIcon("icons/built-in/help.png");
   b->setStyleClass("button");
   layout->addWidget(b, 0);
 
-  b =  new WPushButton(WString::tr("disconnect.text"));
+  b =  new Wt::WPushButton(Wt::WString::tr("disconnect.text"));
   b->setIcon("icons/built-in/logout.png");
   b->setStyleClass("button");
   layout->addWidget(b, 0);

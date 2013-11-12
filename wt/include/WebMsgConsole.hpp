@@ -45,12 +45,12 @@ protected:
   }
 };
 
-class Ngrt4nMsgConsole : public Wt::WTableView
+class WebMsgConsole : public Wt::WTableView
 {
 public:
-  Ngrt4nMsgConsole();
+  WebMsgConsole();
   virtual
-  ~Ngrt4nMsgConsole();
+  ~WebMsgConsole();
 
   Wt::WStandardItemModel* getRenderingModel(void) const {return renderingModel;}
   void addMsg(const NodeT&  _node);

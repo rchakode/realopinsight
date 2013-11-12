@@ -36,33 +36,28 @@
 #include "WebMsgConsole.hpp"
 #include "WebServiceMap.hpp"
 #include <Wt/WLocalizedStrings>
+#include "DashboardBase.hpp"
 
-using namespace Wt ;
-
-class WebDashboard : public WApplication
+class WebDashboard : public DashboardBase
 {
 public:
-  WebDashboard(const WEnvironment& env);
+  WebDashboard(const qint32& _userRole, const QString& _config);
   virtual ~WebDashboard();
-  void loadConfig() ;
+  void loadConfig();
 
 private:
-  TreeNodeItemListT *navTree ;
-  WebServiceMap *map ;
-  Ngrt4nMsgConsole *msgConsole ;
-  CoreDataT data ;
-  WStandardItem* navTreeRoot ;
-  double mapWidth ;
-  double mapHeight ;
+  TreeNodeItemListT* m_tree;
+  WebServiceMap* m_map;
+  WebMsgConsole* m_msgConsole;
 
-  WLayout* createMenuBar(void) ;
-  WContainerWidget* createMenuBarWidget(void) ;
-  bool buildNavTreeModel() ;
-  bool computeMapCoordinates(CoreDataT& _cdata) ;
-  void updateViews() ;
-  void updateServicesStatuses() ;
-  void updateParentStatus(const NodeT& _service) ;
-  void updateServiceTree(void) ;
+  Wt::WLayout* createMenuBar(void);
+  Wt::WContainerWidget* createMenuBarWidget(void);
+  bool buildNavTreeModel();
+  bool computeMapCoordinates(CoreDataT& _cdata);
+  void updateViews();
+  void updateServicesStatuses();
+  void updateParentStatus(const NodeT& _service);
+  void updateServiceTree(void);
 };
 
 #endif /* WEBDASHBOOARD_HPP */

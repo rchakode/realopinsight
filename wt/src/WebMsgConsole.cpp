@@ -24,10 +24,10 @@
 
 #include "WebMsgConsole.hpp"
 
-Ngrt4nMsgConsole::Ngrt4nMsgConsole()
-: WTableView(0),
-  row(0),
-  _sizeChanged(this)
+WebMsgConsole::WebMsgConsole()
+  : WTableView(0),
+    row(0),
+    _sizeChanged(this)
 {
   setSortingEnabled(true);
   setLayoutSizeAware(true);
@@ -62,12 +62,12 @@ Ngrt4nMsgConsole::Ngrt4nMsgConsole()
   sortByColumn(3, Wt::DescendingOrder);
 }
 
-Ngrt4nMsgConsole::~Ngrt4nMsgConsole()
+WebMsgConsole::~WebMsgConsole()
 {
   delete renderingModel;
 }
 
-void  Ngrt4nMsgConsole::layoutSizeChanged (int width, int height)
+void  WebMsgConsole::layoutSizeChanged (int width, int height)
 {
   Wt::WLength em = Wt::WLength(1, Wt::WLength::FontEx);
   setColumnWidth(0, 20 * em);
@@ -79,14 +79,14 @@ void  Ngrt4nMsgConsole::layoutSizeChanged (int width, int height)
   std::cerr << height << "\n";
 }
 
-void Ngrt4nMsgConsole::update(const NodeListT& _aservices)
+void WebMsgConsole::update(const NodeListT& _aservices)
 {
   for(NodeListT::ConstIterator srvIt = _aservices.begin(); srvIt != _aservices.end(); srvIt++){
-      addMsg(*srvIt);
+    addMsg(*srvIt);
   }
 }
 
-void Ngrt4nMsgConsole::addMsg(const NodeT&  _service)
+void WebMsgConsole::addMsg(const NodeT&  _service)
 {
   renderingModel->setItem(row, 0, createDateTimeItem(_service.check.last_state_change));
   renderingModel->setItem(row, 1, new Wt::WStandardItem(_service.check.host));
@@ -97,24 +97,24 @@ void Ngrt4nMsgConsole::addMsg(const NodeT&  _service)
   ++row;
 }
 
-Wt::WStandardItem* Ngrt4nMsgConsole::createItatusItem(const int& _status)
+Wt::WStandardItem* WebMsgConsole::createItatusItem(const int& _status)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
   std::string icon = "icons/built-in/unknown.png";
   std::string style = "unknown";
   item->setData(std::string("3"), Wt::UserRole);
   if(_status == MonitorBroker::NagiosOk){
-      icon = "icons/built-in/normal.png";
-      style = "normal";
-      item->setData(std::string("0"), Wt::UserRole);
+    icon = "icons/built-in/normal.png";
+    style = "normal";
+    item->setData(std::string("0"), Wt::UserRole);
   } else  if(_status == MonitorBroker::NagiosWarning){
-      icon = "icons/built-in/warning.png";
-      style = "warning";
-      item->setData(std::string("1"), Wt::UserRole);
+    icon = "icons/built-in/warning.png";
+    style = "warning";
+    item->setData(std::string("1"), Wt::UserRole);
   }  if(_status == MonitorBroker::NagiosCritical){
-      style = "critical";
-      icon = "icons/built-in/critical.png";
-      item->setData(std::string("2"), Wt::UserRole);
+    style = "critical";
+    icon = "icons/built-in/critical.png";
+    item->setData(std::string("2"), Wt::UserRole);
   }
   item->setIcon(icon);
   //FIXME: item->setText(Ngrt4nConfigParser::statusToString(_status));
@@ -122,7 +122,7 @@ Wt::WStandardItem* Ngrt4nMsgConsole::createItatusItem(const int& _status)
   return item;
 }
 
-Wt::WStandardItem* Ngrt4nMsgConsole::createDateTimeItem(const std::string& _lastcheck)
+Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
   long time = atoi(_lastcheck.c_str());
