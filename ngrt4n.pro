@@ -81,7 +81,7 @@ HEADERS	+= include/core/ns.hpp \
     wt/include/WebServiceMap.hpp \
     wt/include/WebServiceTree.hpp \
     include/client/DashboardBase.hpp \
-    include/client/MainWebWindow.hpp
+    wt/include/MainWebWindow.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -114,7 +114,7 @@ SOURCES	+= \
     wt/src/WebServiceTree.cpp \
     src/client/DashboardBase.cpp \
     wt/src/ngrt4n-web.cpp \
-    include/client/MainWebWindow.cpp
+    wt/src/MainWebWindow.cpp
 
 DISTFILES += README \
     INSTALL \
