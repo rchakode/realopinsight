@@ -20,8 +20,7 @@ TARGET = ngrt4n-editor
 }
 config-web{
 HEADERS	+=
-SOURCES	+= \
-    wt/src/Main.cpp
+SOURCES	+=
 TARGET = ngrt4n-web
 }
 dflag{
@@ -81,7 +80,8 @@ HEADERS	+= include/core/ns.hpp \
     wt/include/WebMsgConsole.hpp \
     wt/include/WebServiceMap.hpp \
     wt/include/WebServiceTree.hpp \
-    include/client/DashboardBase.hpp
+    include/client/DashboardBase.hpp \
+    include/client/MainWebWindow.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -112,7 +112,9 @@ SOURCES	+= \
     wt/src/WebMsgConsole.cpp \
     wt/src/WebServiceMap.cpp \
     wt/src/WebServiceTree.cpp \
-    src/client/DashboardBase.cpp
+    src/client/DashboardBase.cpp \
+    wt/src/ngrt4n-web.cpp \
+    include/client/MainWebWindow.cpp
 
 DISTFILES += README \
     INSTALL \
