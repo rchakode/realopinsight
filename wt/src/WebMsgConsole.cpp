@@ -39,19 +39,19 @@ WebMsgConsole::WebMsgConsole()
   setHeaderHeight(26);
   renderingModel = new Wt::WStandardItemModel(2, 5);
   renderingModel->setHeaderData(0, Wt::Horizontal,
-                                std::string("icons/built-in/tbv-date.gif"),
+                                std::string("images/built-in/tbv-date.gif"),
                                 Wt::DecorationRole);
   renderingModel->setHeaderData(1,Wt::Horizontal,
-                                std::string("icons/built-in/tbv-host.gif"),
+                                std::string("images/built-in/tbv-host.gif"),
                                 Wt::DecorationRole);
   renderingModel->setHeaderData(2, Wt::Horizontal,
-                                std::string("icons/built-in/tbv-service.gif"),
+                                std::string("images/built-in/tbv-service.gif"),
                                 Wt::DecorationRole);
   renderingModel->setHeaderData(3, Wt::Horizontal,
-                                std::string("icons/built-in/tbv-status.gif"),
+                                std::string("images/built-in/tbv-status.gif"),
                                 Wt::DecorationRole);
   renderingModel->setHeaderData(4, Wt::Horizontal,
-                                std::string("icons/built-in/tbv-message.gif"),
+                                std::string("images/built-in/tbv-message.gif"),
                                 Wt::DecorationRole);
 
   SortingProxyModel* sortingProxy = new SortingProxyModel(this);
@@ -100,20 +100,20 @@ void WebMsgConsole::addMsg(const NodeT&  _service)
 Wt::WStandardItem* WebMsgConsole::createItatusItem(const int& _status)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
-  std::string icon = "icons/built-in/unknown.png";
+  std::string icon = "images/built-in/unknown.png";
   std::string style = "unknown";
   item->setData(std::string("3"), Wt::UserRole);
   if(_status == MonitorBroker::NagiosOk){
-    icon = "icons/built-in/normal.png";
+    icon = "images/built-in/normal.png";
     style = "normal";
     item->setData(std::string("0"), Wt::UserRole);
   } else  if(_status == MonitorBroker::NagiosWarning){
-    icon = "icons/built-in/warning.png";
+    icon = "images/built-in/warning.png";
     style = "warning";
     item->setData(std::string("1"), Wt::UserRole);
   }  if(_status == MonitorBroker::NagiosCritical){
     style = "critical";
-    icon = "icons/built-in/critical.png";
+    icon = "images/built-in/critical.png";
     item->setData(std::string("2"), Wt::UserRole);
   }
   item->setIcon(icon);

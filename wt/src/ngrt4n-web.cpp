@@ -2,19 +2,19 @@
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  MainWebUI* app = new MainWebUI(env, "config"); //FIXME:set config file
-  app->setTwoPhaseRenderingThreshold(0);
-  app->setTitle("NGRT4N Dashboard");
-  app->useStyleSheet(Wt::WApplication::appRoot() + "resources/styles.css");
-  app->messageResourceBundle().use(Wt::WApplication::appRoot() + "resources/messages");
-  app->setLocale("en");
-  app->render();
-  app->refresh();
-  return app;
+  MainWebUI* ui = new MainWebUI(env, "config"); //FIXME:set config file
+  ui->setTwoPhaseRenderingThreshold(0);
+  ui->setTitle(ui->getConfig().toStdString());
+  ui->useStyleSheet(Wt::WApplication::appRoot() + "wt/resources/styles.css");
+  ui->messageResourceBundle().use(Wt::WApplication::appRoot() + "wt/resources/messages");
+  ui->setLocale("en");
+  ui->render();
+  return ui;
 }
 
 
 int main(int argc, char **argv)
 {
-  return Wt::WRun(argc, argv, &createApplication);
+  QApplication* qtApp = new QApplication(argc, argv);
+  return Wt::WRun(argc, argv, &createApplication) | qtApp->exec();
 }

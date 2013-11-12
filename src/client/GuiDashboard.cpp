@@ -344,7 +344,6 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
 
 QTabWidget* GuiDashboard::builtMsgPane(void)
 {
-  //  QTabWidget* msgPane(new QTabWidget());
   QHBoxLayout* lyt(new QHBoxLayout());
   QGroupBox* wdgsGrp(new QGroupBox());
   lyt->addWidget(m_msgConsole, Qt::AlignLeft);

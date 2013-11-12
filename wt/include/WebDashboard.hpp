@@ -58,7 +58,6 @@ private:
   WebServiceMap* m_map;
   WebMsgConsole* m_msgConsole;
 
-  Wt::WLayout* createMenuBar(void);
   Wt::WContainerWidget* createMenuBarWidget(void);
   bool buildNavTreeModel();
   bool computeMapCoordinates(CoreDataT& _cdata);

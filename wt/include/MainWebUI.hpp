@@ -35,6 +35,7 @@ public:
   MainWebUI(const Wt::WEnvironment& env, const QString& config);
   virtual ~MainWebUI();
   void render(void);
+  QString getConfig (void) const {return m_dashboard->getConfig();}
 
 private:
   WebDashboard* m_dashboard;

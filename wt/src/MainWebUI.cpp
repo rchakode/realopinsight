@@ -37,5 +37,7 @@ MainWebUI::~MainWebUI()
 
 void MainWebUI::render(void)
 {
+  setTitle(QObject::tr("%1 Operations Console - %2").arg(APP_NAME, m_dashboard->getConfig()).toStdString());
   root()->addWidget(m_dashboard->getWidget());
+  refresh();
 }
