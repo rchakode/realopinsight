@@ -66,7 +66,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_chart (std::make_shared<Chart>()),
     m_filteredMsgConsole (NULL),
-    m_mainSplitter (new QSplitter(this)),
+    m_widget (new QSplitter(this)),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
     m_browser (new WebKit()),
@@ -81,8 +81,8 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
       m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
   m_viewPanel->addTab(m_browser, tr("Web Browser")),
       m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
-  m_mainSplitter->addWidget(m_tree);
-  m_mainSplitter->addWidget(m_rightSplitter);
+  m_widget->addWidget(m_tree);
+  m_widget->addWidget(m_rightSplitter);
   m_rightSplitter->addWidget(m_viewPanel);
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
@@ -103,7 +103,7 @@ GuiDashboard::~GuiDashboard()
   delete m_cdata;
   delete m_viewPanel;
   delete m_rightSplitter;
-  delete m_mainSplitter;
+  delete m_widget;
   delete m_preferences;
   delete m_changePasswdWindow;
   delete m_trayIcon;
@@ -173,14 +173,14 @@ void GuiDashboard::toggleIncreaseMsgFont(bool _toggled)
   m_msgConsole->useLargeFont(_toggled);
 }
 
-void GuiDashboard::updateDashboard(NodeListT::iterator& _node)
-{
-  updateDashboard(*_node);
-}
-
 void GuiDashboard::updateMap(const NodeListT::iterator& _node, const QString& _tip)
 {
   m_map->updateNode(_node, _tip);
+}
+
+void GuiDashboard::updateDashboard(NodeListT::iterator& _node)
+{
+  updateDashboard(*_node);
 }
 
 void GuiDashboard::updateDashboard(const NodeT& _node)
@@ -226,12 +226,6 @@ void GuiDashboard::finalizeUpdate(const SourceT& src)
     }
     cnode->monitored = false;
   }
-}
-
-
-void GuiDashboard::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
-{
-  updateNavTreeItemStatus(*_node, _tip);
 }
 
 void GuiDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
@@ -311,13 +305,13 @@ void GuiDashboard::resizeDashboard(qint32 width, qint32 height)
   QList<qint32> framesSize;
   framesSize.push_back(width * 0.20);
   framesSize.push_back(mcSize.width());
-  m_mainSplitter->setSizes(framesSize);
+  m_widget->setSizes(framesSize);
 
   framesSize[0] = (height * GRAPH_HEIGHT_RATE);
   framesSize[1] = (mcSize.height());
   m_rightSplitter->setSizes(framesSize);
 
-  m_mainSplitter->resize(width, height * 0.85);
+  m_widget->resize(width, height * 0.85);
   m_msgConsole->setConsoleSize(mcSize);
 }
 

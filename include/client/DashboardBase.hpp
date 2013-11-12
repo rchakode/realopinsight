@@ -100,12 +100,12 @@ protected:
 
   void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
-  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
-  virtual void updateDashboard(const NodeT & _node) = 0;
-  virtual void finalizeUpdate(const SourceT& src) = 0;
+  virtual void updateDashboard(const NodeT& _node) = 0;
   virtual void updateDashboard(NodeListT::iterator& _node);
   virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip) = 0;
+  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
+  virtual void finalizeUpdate(const SourceT& src) = 0;
 
 private:
   void updateCNodes(const CheckT & check, const SourceT& src);

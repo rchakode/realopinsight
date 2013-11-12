@@ -37,13 +37,12 @@
 #include "Base.hpp"
 
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
-  //FIXME: Wt::WApplication(env),
   : DashboardBase(_userRole, _config),
+    m_widget(new Wt::WContainerWidget()),
     m_tree(new TreeNodeItemListT()),
     m_map(new WebServiceMap()),
     m_msgConsole(new WebMsgConsole())
 {
-  Wt::WContainerWidget* mainContainer =  new Wt::WContainerWidget();
   Wt::WContainerWidget* leftContainer = new Wt::WContainerWidget();
   Wt::WContainerWidget* rightContainer = new Wt::WContainerWidget();
   Wt::WContainerWidget* mapContainer = new Wt::WContainerWidget();
@@ -59,7 +58,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   Wt::WPanel* mapPanel = new Wt::WPanel();
   Wt::WPanel* msgPanel = new Wt::WPanel();
 
-  mainContainer->setStyleClass("container");
+  m_widget->setStyleClass("container");
   leftContainer->setStyleClass("container");
   rightContainer->setStyleClass("container");
   mapContainer->setStyleClass("container");
@@ -80,7 +79,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   leftLayout->addWidget(treePanel);
   leftContainer->setLayout(leftLayout);
   leftContainer->setOverflow(Wt::WContainerWidget::OverflowAuto);
-  leftContainer->resize(250, mainContainer->height());
+  leftContainer->resize(250, m_widget->height());
 
   mapPanel->setTitle(Wt::WString::tr("service.map.title"));
   mapScArea->setWidget(m_map);
@@ -105,15 +104,15 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
   mainLayout->addWidget(createMenuBarWidget(), 0);
   mainLayout->addLayout(centralLayout, 2);
-  mainContainer->setLayout(mainLayout);
-  //FIXME: root()->addWidget(mainContainer); see WApplication
+  m_widget->setLayout(mainLayout);
 
+  //FIXME: widget alignment
   centralLayout->setResizable(0);
   centralLayout->setResizable(1);
   rightLayout->setResizable(0);
   rightLayout->setResizable(1);
 
-  loadConfig();
+  //FIXME: load(_config);
 }
 
 WebDashboard::~WebDashboard()
@@ -121,11 +120,13 @@ WebDashboard::~WebDashboard()
   delete m_tree;
   delete m_map;
   delete m_msgConsole;
+  delete m_widget;
 }
 
 
-void WebDashboard::loadConfig()
+void WebDashboard::load(const QString& _file)
 {
+  qDebug() << _file;
   //FIXME: loadConfig
   //bool result = Ngrt4nConfigParser::loadNgrt4nConfig(WApplication::appRoot()+"config/" + _cfg + ".xml", data);
   bool result = false;
@@ -145,35 +146,55 @@ void WebDashboard::loadConfig()
 }
 
 
+void WebDashboard::updateDashboard(const NodeT& _node)
+{
+  qDebug() << _node.name;
+}
+
+void WebDashboard::finalizeUpdate(const SourceT& src)
+{
+  qDebug() << src.id;
+}
+void WebDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
+{
+  qDebug() << _node.name << _tip;
+}
+
+
+void WebDashboard::updateMap(const NodeListT::iterator& _node, const QString& _tip)
+{
+  qDebug() << _node->name << _tip;
+}
+
 bool WebDashboard::buildNavTreeModel()
 {
-//  Ngrt4nViewItemListT nav_tree_items; /* Store the set of items */
+  //  Ngrt4nViewItemListT nav_tree_items; /* Store the set of items */
 
-//  /* Create a item for each individual service */
-//  for(ServiceIteratorT service  = data.bpnodes.begin(); service != data.bpnodes.end(); ++service) {
-//    service->second.navt_item = NodeTree::createItem(service->second);
-//    nav_tree_items.insert(pair<string, WStandardItem*>(service->second.id, service->second.navt_item));
-//  }
+  //  /* Create a item for each individual service */
+  //  for(ServiceIteratorT service  = data.bpnodes.begin(); service != data.bpnodes.end(); ++service) {
+  //    service->second.navt_item = NodeTree::createItem(service->second);
+  //    nav_tree_items.insert(pair<string, WStandardItem*>(service->second.id, service->second.navt_item));
+  //  }
 
-//  for(ServiceIteratorT service  = data.cnodes.begin(); service != data.cnodes.end(); ++service) {
-//    service->second.navt_item = NodeTree::createItem(service->second);
-//    nav_tree_items.insert(pair<string, WStandardItem*>(service->second.id, service->second.navt_item));
-//  }
+  //  for(ServiceIteratorT service  = data.cnodes.begin(); service != data.cnodes.end(); ++service) {
+  //    service->second.navt_item = NodeTree::createItem(service->second);
+  //    nav_tree_items.insert(pair<string, WStandardItem*>(service->second.id, service->second.navt_item));
+  //  }
 
-//  /* Organize an hierarchy according to the mapping of services */
-//  for(ServiceIteratorT service  = data.bpnodes.begin(); service != data.bpnodes.end(); ++service) {
-//    if(service->second.id == "root") {
-//      navTreeRoot = service->second.navt_item;
-//    } else {
-//      Ngrt4nViewItemListT::iterator p_it = nav_tree_items.find(service->second.parent);
-//      p_it->second->appendRow(service->second.navt_item); /* Normally the search would have succeeded, according to the parsing step */
-//    }
-//  }
+  //  /* Organize an hierarchy according to the mapping of services */
+  //  for(ServiceIteratorT service  = data.bpnodes.begin(); service != data.bpnodes.end(); ++service) {
+  //    if(service->second.id == "root") {
+  //      navTreeRoot = service->second.navt_item;
+  //    } else {
+  //      Ngrt4nViewItemListT::iterator p_it = nav_tree_items.find(service->second.parent);
+  //      p_it->second->appendRow(service->second.navt_item); /* Normally the search would have succeeded, according to the parsing step */
+  //    }
+  //  }
 
-//  for(ServiceIteratorT service  = data.cnodes.begin(); service != data.cnodes.end(); ++service) {
-//    Ngrt4nViewItemListT::iterator p_it = nav_tree_items.find(service->second.parent);
-//    p_it->second->appendRow(service->second.navt_item); /* Normally the search would have succeeded, according to the parsing step */
-//  }
+  //  for(ServiceIteratorT service  = data.cnodes.begin(); service != data.cnodes.end(); ++service) {
+  //    Ngrt4nViewItemListT::iterator p_it = nav_tree_items.find(service->second.parent);
+  //    p_it->second->appendRow(service->second.navt_item); /* Normally the search would have succeeded, according to the parsing step */
+  //  }
 
   return true;
 }
@@ -182,118 +203,118 @@ bool WebDashboard::buildNavTreeModel()
 bool WebDashboard::computeMapCoordinates(CoreDataT& _cdata)
 {
   std::cerr << _cdata.cnodes.size() << "\n";
-//  char* dotFileName = strdup("/tmp/ngrt4n-XXXXXX");
-//  int fd = mkstemp(dotFileName);
-//  if( fd == -1){
-//    cerr << "Unable to temporary file generate the graph file " << "\n";
-//    return false;
-//  }
-//  close(fd);
+  //  char* dotFileName = strdup("/tmp/ngrt4n-XXXXXX");
+  //  int fd = mkstemp(dotFileName);
+  //  if( fd == -1){
+  //    cerr << "Unable to temporary file generate the graph file " << "\n";
+  //    return false;
+  //  }
+  //  close(fd);
 
-//  ofstream ofile;
-//  ofile.open(dotFileName, ios_base::out);
-//  if (! ofile.good() ) {
-//    cerr << "Unable to generate some necessary temporary files. "
-//         << "Check that the directory tmp/ has the rights 777" << "\n";
-//    return false;
-//  }
-//  ofile<<"strict graph  ngrt4n {\n"
-//      <<"node[shape=plaintext]\n"
-//     << _cdata.graph_descr
-//     << "}";
-//  ofile.close();
+  //  ofstream ofile;
+  //  ofile.open(dotFileName, ios_base::out);
+  //  if (! ofile.good() ) {
+  //    cerr << "Unable to generate some necessary temporary files. "
+  //         << "Check that the directory tmp/ has the rights 777" << "\n";
+  //    return false;
+  //  }
+  //  ofile<<"strict graph  ngrt4n {\n"
+  //      <<"node[shape=plaintext]\n"
+  //     << _cdata.graph_descr
+  //     << "}";
+  //  ofile.close();
 
-//  ostringstream dotCoordinates;
-//  dotCoordinates << dotFileName << "_1";
+  //  ostringstream dotCoordinates;
+  //  dotCoordinates << dotFileName << "_1";
 
-//  ostringstream cmd;
-//  cmd << "dot -Tplain -o "
-//      << dotCoordinates.str()
-//      << " " << dotFileName;
+  //  ostringstream cmd;
+  //  cmd << "dot -Tplain -o "
+  //      << dotCoordinates.str()
+  //      << " " << dotFileName;
 
-//  if ( system(cmd.str().c_str()) != 0 ) {
-//    cerr << "Unable to run 'dot'" << "\n";
-//    return false;
-//  }
+  //  if ( system(cmd.str().c_str()) != 0 ) {
+  //    cerr << "Unable to run 'dot'" << "\n";
+  //    return false;
+  //  }
 
-//  ifstream ifile;
-//  ifile.open(dotCoordinates.str().c_str(), ios_base::in);
-//  if (! ifile.good() ) {
-//    cerr << "Unable to use the generated graph file " << dotCoordinates.str() << "\n";
-//    return false;
-//  }
+  //  ifstream ifile;
+  //  ifile.open(dotCoordinates.str().c_str(), ios_base::in);
+  //  if (! ifile.good() ) {
+  //    cerr << "Unable to use the generated graph file " << dotCoordinates.str() << "\n";
+  //    return false;
+  //  }
 
-//  string line;
-//  vector<string> fields;
+  //  string line;
+  //  vector<string> fields;
 
-//  if(getline(ifile, line), ! ifile.eof()) { //Parse the header of the generated dot file
-//    boost::split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
-//    if (fields[0] != "graph") {
-//      cerr << "The syntax of the generated graph file is wrong " << dotCoordinates.str() << "\n";
-//      return false;
-//    }
-//    mapWidth = atof(fields[2].c_str()) * Ngrt4nXScreenScaling + Ngrt4nXPadding;
-//    mapHeight = atof(fields[3].c_str()) * Ngrt4nYScreenScaling + Ngrt4nYpadding;
-//  }
+  //  if(getline(ifile, line), ! ifile.eof()) { //Parse the header of the generated dot file
+  //    boost::split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
+  //    if (fields[0] != "graph") {
+  //      cerr << "The syntax of the generated graph file is wrong " << dotCoordinates.str() << "\n";
+  //      return false;
+  //    }
+  //    mapWidth = atof(fields[2].c_str()) * Ngrt4nXScreenScaling + Ngrt4nXPadding;
+  //    mapHeight = atof(fields[3].c_str()) * Ngrt4nYScreenScaling + Ngrt4nYpadding;
+  //  }
 
-//  while(getline(ifile, line), ! ifile.eof()){ //Parse the rest of the generated dot file
-//    vector<string> fields;
-//    boost::split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
+  //  while(getline(ifile, line), ! ifile.eof()){ //Parse the rest of the generated dot file
+  //    vector<string> fields;
+  //    boost::split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
 
-//    if( ! fields.size() ) continue;
-//    if (fields[0] == "node") {
-//      NodeListT::Iterator service;
-//      if( service = _cdata.bpnodes.find(fields[1]),
-//          service == _cdata.bpnodes.end()) {
+  //    if( ! fields.size() ) continue;
+  //    if (fields[0] == "node") {
+  //      NodeListT::Iterator service;
+  //      if( service = _cdata.bpnodes.find(fields[1]),
+  //          service == _cdata.bpnodes.end()) {
 
-//        if( service = _cdata.cnodes.find(fields[1]),
-//            service == _cdata.cnodes.end() )  continue;
-//      }
-//      service.map_x = atof(fields[2].c_str()) * XSCAL_FACTOR;
-//      service.map_y = mapHeight
-//          - atof(fields[3].c_str()) *  - (YSCAL_FACTOR / 2)  //Coordinate transformation
-//          - 40;  //Icon size
-//      service->second.map_enable_nav_icon = (service->second.type == NodeType::ALARM_NODE)? false: true;
+  //        if( service = _cdata.cnodes.find(fields[1]),
+  //            service == _cdata.cnodes.end() )  continue;
+  //      }
+  //      service.map_x = atof(fields[2].c_str()) * XSCAL_FACTOR;
+  //      service.map_y = mapHeight
+  //          - atof(fields[3].c_str()) *  - (YSCAL_FACTOR / 2)  //Coordinate transformation
+  //          - 40;  //Icon size
+  //      service->second.map_enable_nav_icon = (service->second.type == NodeType::ALARM_NODE)? false: true;
 
-//    } else if(fields[0] == "stop") {
-//      break;
-//    }
-//    else { //edge
-//      continue;
-//    }
-//    fields.clear();
-//  }
-//  ifile.close();
-//  free(dotFileName);
+  //    } else if(fields[0] == "stop") {
+  //      break;
+  //    }
+  //    else { //edge
+  //      continue;
+  //    }
+  //    fields.clear();
+  //  }
+  //  ifile.close();
+  //  free(dotFileName);
 
   return true;
 }
 
 void WebDashboard::updateViews(void)
 {
-//  updateServicesStatuses();
-//  msgConsole->update(data.cnodes);
-//  map->update(data.bpnodes, data.cnodes, mapWidth, mapHeight);
-//  navTree->update(navTreeRoot); updateServiceTree();
+  //  updateServicesStatuses();
+  //  msgConsole->update(data.cnodes);
+  //  map->update(data.bpnodes, data.cnodes, mapWidth, mapHeight);
+  //  navTree->update(navTreeRoot); updateServiceTree();
 }
 
 void WebDashboard::updateServicesStatuses()
 {
-//  //Fixme: loadConfig
-//  //if (! Ngrt4nConfigParser::loadNagiosCollectedData("examples/status.dat", data.cnodes) ) return;
-//  return; //FIXME:
+  //  //Fixme: loadConfig
+  //  //if (! Ngrt4nConfigParser::loadNagiosCollectedData("examples/status.dat", data.cnodes) ) return;
+  //  return; //FIXME:
 
-//  for(ServiceIteratorT sIt  = data.bpnodes.begin(); sIt != data.bpnodes.end(); ++sIt) {
-//    sIt->status_info.reset();
-//  }
+  //  for(ServiceIteratorT sIt  = data.bpnodes.begin(); sIt != data.bpnodes.end(); ++sIt) {
+  //    sIt->status_info.reset();
+  //  }
 
-//  for(NodeListT::Iterator sIt  = data.cnodes.begin(); sIt != data.cnodes.end(); ++sIt) {
-//    if(sIt->id != "root") {
-//      ServiceIteratorT pIt = data.bpnodes.find(sIt->parent);
-//      pIt->status_info |= sIt->status_info;
-//      updateParentStatus(*pIt);
-//    }
-//  }
+  //  for(NodeListT::Iterator sIt  = data.cnodes.begin(); sIt != data.cnodes.end(); ++sIt) {
+  //    if(sIt->id != "root") {
+  //      ServiceIteratorT pIt = data.bpnodes.find(sIt->parent);
+  //      pIt->status_info |= sIt->status_info;
+  //      updateParentStatus(*pIt);
+  //    }
+  //  }
 }
 
 void WebDashboard::updateParentStatus(const NodeT& _service)
@@ -305,31 +326,31 @@ void WebDashboard::updateParentStatus(const NodeT& _service)
 
 void WebDashboard::updateServiceTree(void)
 {
-//  string icon;
+  //  string icon;
 
-//  for(ServiceIteratorT sIt  = data.bpnodes.begin(); sIt != data.bpnodes.end(); ++sIt) {
-//    icon = "icons/built-in/unknown.png";
-//    if( sIt->status_info[MonitorBroker::NagiosCritical] ){
-//      icon = "icons/built-in/critical.png";
-//    } else if(  sIt->status_info[MonitorBroker::NagiosWarning] ){
-//      icon = "icons/built-in/warning.png";
-//    } else if(  sIt->status_info[MonitorBroker::NagiosOk]){
-//      icon = "icons/built-in/normal.png";
-//    }
-//    sIt->navt_item->setIcon(icon);
-//  }
+  //  for(ServiceIteratorT sIt  = data.bpnodes.begin(); sIt != data.bpnodes.end(); ++sIt) {
+  //    icon = "icons/built-in/unknown.png";
+  //    if( sIt->status_info[MonitorBroker::NagiosCritical] ){
+  //      icon = "icons/built-in/critical.png";
+  //    } else if(  sIt->status_info[MonitorBroker::NagiosWarning] ){
+  //      icon = "icons/built-in/warning.png";
+  //    } else if(  sIt->status_info[MonitorBroker::NagiosOk]){
+  //      icon = "icons/built-in/normal.png";
+  //    }
+  //    sIt->navt_item->setIcon(icon);
+  //  }
 
-//  for(NodeListT::Iterator sIt  = data.cnodes.begin(); sIt != data.cnodes.end(); ++sIt) {
-//    icon = "icons/built-in/unknown.png";
-//    if(  sIt->status_info[MonitorBroker::NagiosCritical] ){
-//      icon = "icons/built-in/critical.png";
-//    } else if(  sIt->status_info[MonitorBroker::NagiosWarning] ){
-//      icon = "icons/built-in/warning.png";
-//    } else if(  sIt->status_info[MonitorBroker::NagiosOk]){
-//      icon = "icons/built-in/normal.png";
-//    }
-//    sIt->navt_item->setIcon(icon);
-//  }
+  //  for(NodeListT::Iterator sIt  = data.cnodes.begin(); sIt != data.cnodes.end(); ++sIt) {
+  //    icon = "icons/built-in/unknown.png";
+  //    if(  sIt->status_info[MonitorBroker::NagiosCritical] ){
+  //      icon = "icons/built-in/critical.png";
+  //    } else if(  sIt->status_info[MonitorBroker::NagiosWarning] ){
+  //      icon = "icons/built-in/warning.png";
+  //    } else if(  sIt->status_info[MonitorBroker::NagiosOk]){
+  //      icon = "icons/built-in/normal.png";
+  //    }
+  //    sIt->navt_item->setIcon(icon);
+  //  }
 }
 
 

@@ -43,9 +43,17 @@ class WebDashboard : public DashboardBase
 public:
   WebDashboard(const qint32& _userRole, const QString& _config);
   virtual ~WebDashboard();
-  void loadConfig();
+  virtual void load(const QString& _file);
+  Wt::WContainerWidget* getWidget(void) const {return m_widget;}
+
+protected:
+  virtual void updateDashboard(const NodeT& _node);
+  virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  virtual void finalizeUpdate(const SourceT& src);
 
 private:
+  Wt::WContainerWidget* m_widget;
   TreeNodeItemListT* m_tree;
   WebServiceMap* m_map;
   WebMsgConsole* m_msgConsole;

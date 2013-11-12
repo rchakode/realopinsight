@@ -34,7 +34,7 @@ MainWindow::MainWindow(const qint32& _userRole,
 {
   QMainWindow::setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
   loadMenus();
-  setCentralWidget(m_dashboard->get());
+  setCentralWidget(m_dashboard->getWidget());
   handleTabChanged(0);
   addEvents();
 }

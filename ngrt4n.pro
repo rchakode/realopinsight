@@ -6,27 +6,38 @@ config-dist{
 SOURCES	+=
 TARGET = RealOpInsight
 }
-config-manager{
+config-manager {
 SOURCES	+= src/client/ngrt4n-manager.cpp
 TARGET = ngrt4n-manager
 }
-config-oc{
+config-oc {
 SOURCES	+= src/client/ngrt4n-oc.cpp
 TARGET = ngrt4n-oc
 }
-config-editor{
+config-editor {
 SOURCES	+= src/client/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
-config-web{
-HEADERS	+=
-SOURCES	+=
+config-web {
+HEADERS	+= wt/include/WebDashboard.hpp \
+    wt/include/WebMsgConsole.hpp \
+    wt/include/WebServiceMap.hpp \
+    wt/include/WebServiceTree.hpp \
+    wt/include/MainWebWindow.hpp
+
+SOURCES	+= wt/src/WebDashboard.cpp \
+    wt/src/WebMsgConsole.cpp \
+    wt/src/WebServiceMap.cpp \
+    wt/src/WebServiceTree.cpp \
+    wt/src/MainWebWindow.cpp \
+    wt/src/ngrt4n-web.cpp
 TARGET = ngrt4n-web
 }
-dflag{
+
+dflag {
 TARGET.path=$$(INSTALL_PREFIX)/bin
 MAN.path =$$(INSTALL_PREFIX)/share/man/man1
-}else{
+} else {
 TARGET.path=/usr/local/bin
 MAN.path = /usr/share/man/man1
 }
@@ -76,12 +87,7 @@ HEADERS	+= include/core/ns.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
-    wt/include/WebDashboard.hpp \
-    wt/include/WebMsgConsole.hpp \
-    wt/include/WebServiceMap.hpp \
-    wt/include/WebServiceTree.hpp \
-    include/client/DashboardBase.hpp \
-    wt/include/MainWebWindow.hpp
+    include/client/DashboardBase.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -108,13 +114,7 @@ SOURCES	+= \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
-    wt/src/WebDashboard.cpp \
-    wt/src/WebMsgConsole.cpp \
-    wt/src/WebServiceMap.cpp \
-    wt/src/WebServiceTree.cpp \
-    src/client/DashboardBase.cpp \
-    wt/src/ngrt4n-web.cpp \
-    wt/src/MainWebWindow.cpp
+    src/client/DashboardBase.cpp
 
 DISTFILES += README \
     INSTALL \

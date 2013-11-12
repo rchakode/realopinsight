@@ -24,6 +24,18 @@
 
 #include "MainWebWindow.hpp"
 
-MainWebWindow::MainWebWindow()
+MainWebWindow::MainWebWindow(const Wt::WEnvironment& env, const QString& config)
+  : Wt::WApplication(env),
+    m_dashboard(new WebDashboard(Auth::OpUserRole, config))
 {
+}
+
+MainWebWindow::~MainWebWindow()
+{
+  delete m_dashboard;
+}
+
+void MainWebWindow::render(void)
+{
+  root()->addWidget(m_dashboard->getWidget());
 }

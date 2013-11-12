@@ -32,10 +32,12 @@
 class MainWebWindow : public Wt::WApplication
 {
 public:
-  MainWebWindow();
+  MainWebWindow(const Wt::WEnvironment& env, const QString& config);
+  virtual ~MainWebWindow();
+  void render(void);
 
 private:
-  WebDashboard m_webdashboard;
+  WebDashboard* m_dashboard;
 };
 
 #endif // MAINWEBWINDOW_HPP

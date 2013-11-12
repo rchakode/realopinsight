@@ -50,7 +50,7 @@ public:
   GuiDashboard(const qint32& _userRole, const QString& _config);
   virtual ~GuiDashboard();
 
-  QWidget* get(void) const {return m_mainSplitter;}
+  QWidget* getWidget(void) const {return m_widget;}
   static StringMapT propRules();
   static StringMapT calcRules();
   virtual void load(const QString& _file);
@@ -98,7 +98,7 @@ protected:
   };
   std::shared_ptr<Chart> m_chart;
   MsgConsole* m_filteredMsgConsole;
-  QSplitter* m_mainSplitter;
+  QSplitter* m_widget;
   QSplitter* m_rightSplitter;
   QTabWidget* m_viewPanel;
   WebKit* m_browser;
@@ -113,11 +113,10 @@ protected:
   QTabWidget* builtMsgPane(void);
 
   void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
-  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  virtual void finalizeUpdate(const SourceT& src);
   virtual void updateDashboard(NodeListT::iterator& _node);
   virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  virtual void finalizeUpdate(const SourceT& src);
 
 private:
   void addEvents(void);
