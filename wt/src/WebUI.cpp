@@ -1,5 +1,5 @@
 /*
- * MainWebWindow.hpp
+ * MainWebWindow.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 12-11-2013                                                  #
@@ -22,23 +22,22 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "WebUI.hpp"
 
-#ifndef MAINWEBWINDOW_HPP
-#define MAINWEBWINDOW_HPP
-
-#include <Wt/WApplication>
-#include "WebDashboard.hpp"
-
-class MainWebUI : public Wt::WApplication
+WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
+  : Wt::WApplication(env),
+    m_dashboard(new WebDashboard(Auth::OpUserRole, config))
 {
-public:
-  MainWebUI(const Wt::WEnvironment& env, const QString& config);
-  virtual ~MainWebUI();
-  void render(void);
-  QString getConfig (void) const {return m_dashboard->getConfig();}
+}
 
-private:
-  WebDashboard* m_dashboard;
-};
+WebUI::~WebUI()
+{
+  delete m_dashboard;
+}
 
-#endif // MAINWEBWINDOW_HPP
+void WebUI::render(void)
+{
+  setTitle(QObject::tr("%1 Operations Console - %2").arg(APP_NAME, m_dashboard->getConfig()).toStdString());
+  root()->addWidget(m_dashboard->getWidget());
+  refresh();
+}

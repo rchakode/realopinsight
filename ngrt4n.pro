@@ -86,7 +86,7 @@ HEADERS	+= include/core/ns.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
     include/client/DashboardBase.hpp \
-    wt/include/MainWebUI.hpp
+    wt/include/WebUI.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -114,7 +114,7 @@ SOURCES	+= \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
     src/client/DashboardBase.cpp \
-    wt/src/MainWebUI.cpp
+    wt/src/WebUI.cpp
 
 DISTFILES += README \
     INSTALL \
