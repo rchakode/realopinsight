@@ -73,10 +73,7 @@ public:
   QSize getConsoleSize(void) const {return m_consoleSize;}
 
 public slots:
-  inline void acknowledgeMsg(void)
-  {emit acknowledgeChanged();}
-  inline void sortEventConsole(void)
-  {mproxyModel->sort(1);}
+  void sortEventConsole(void) {mproxyModel->sort(1);}
 
 signals:
   void acknowledgeChanged(void);
