@@ -29,11 +29,11 @@
 #include <Wt/WApplication>
 #include "WebDashboard.hpp"
 
-class MainWebWindow : public Wt::WApplication
+class MainWebUI : public Wt::WApplication
 {
 public:
-  MainWebWindow(const Wt::WEnvironment& env, const QString& config);
-  virtual ~MainWebWindow();
+  MainWebUI(const Wt::WEnvironment& env, const QString& config);
+  virtual ~MainWebUI();
   void render(void);
 
 private:

@@ -22,20 +22,20 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "MainWebWindow.hpp"
+#include "MainWebUI.hpp"
 
-MainWebWindow::MainWebWindow(const Wt::WEnvironment& env, const QString& config)
+MainWebUI::MainWebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
     m_dashboard(new WebDashboard(Auth::OpUserRole, config))
 {
 }
 
-MainWebWindow::~MainWebWindow()
+MainWebUI::~MainWebUI()
 {
   delete m_dashboard;
 }
 
-void MainWebWindow::render(void)
+void MainWebUI::render(void)
 {
   root()->addWidget(m_dashboard->getWidget());
 }

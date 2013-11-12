@@ -22,14 +22,12 @@ config-web {
 HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebMsgConsole.hpp \
     wt/include/WebServiceMap.hpp \
-    wt/include/WebServiceTree.hpp \
-    wt/include/MainWebWindow.hpp
+    wt/include/WebServiceTree.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
     wt/src/WebServiceMap.cpp \
     wt/src/WebServiceTree.cpp \
-    wt/src/MainWebWindow.cpp \
     wt/src/ngrt4n-web.cpp
 TARGET = ngrt4n-web
 }
@@ -87,7 +85,8 @@ HEADERS	+= include/core/ns.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
-    include/client/DashboardBase.hpp
+    include/client/DashboardBase.hpp \
+    wt/include/MainWebUI.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -114,7 +113,8 @@ SOURCES	+= \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
-    src/client/DashboardBase.cpp
+    src/client/DashboardBase.cpp \
+    wt/src/MainWebUI.cpp
 
 DISTFILES += README \
     INSTALL \
