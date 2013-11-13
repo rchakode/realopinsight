@@ -367,14 +367,12 @@ void GraphView::setEdgePath(const QString& _parentVertex,
                             const QString& _childVertex,
                             QPainterPath& path)
 {
-  QPointF parentAnchor, childAnchor;
-  QSizeF p_size, c_size;
   GNodeT& p_gnode = m_mnodes[_parentVertex];
   GNodeT& c_gnode = m_mnodes[_childVertex];
-  p_size = p_gnode.exp_icon->boundingRect().size();
-  c_size = c_gnode.icon->boundingRect().size();
-  parentAnchor = p_gnode.exp_icon->pos() + QPointF(0.5 * p_size.width(), p_size.height());
-  childAnchor = c_gnode.icon->pos() + QPointF(0.5 * c_size.width(), 0);
+  QSizeF p_size = p_gnode.exp_icon->boundingRect().size();
+  QSizeF c_size = c_gnode.icon->boundingRect().size();
+  QPointF parentAnchor = p_gnode.exp_icon->pos() + QPointF(0.5 * p_size.width(), p_size.height());
+  QPointF childAnchor = c_gnode.icon->pos() + QPointF(0.5 * c_size.width(), 0);
   path.moveTo(parentAnchor), path.lineTo(childAnchor);
   if (! p_gnode.exp_icon->isVisible()) p_gnode.exp_icon->setVisible(true);
 }

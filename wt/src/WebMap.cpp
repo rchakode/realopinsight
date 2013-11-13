@@ -24,10 +24,10 @@
 
 #include <Wt/WPointF>
 #include <Wt/WRectArea>
-#include "WebServiceMap.hpp"
+#include "WebMap.hpp"
 #include "MonitorBroker.hpp"
 
-WebServiceMap::WebServiceMap()
+WebMap::WebMap()
 : WPaintedWidget(0),
   scaleX (1),
   scaleY(1),
@@ -40,9 +40,9 @@ WebServiceMap::WebServiceMap()
 }
 
 
-WebServiceMap::~WebServiceMap() {}
+WebMap::~WebMap() {}
 
-void WebServiceMap::update(const NodeListT& _bservices,
+void WebMap::update(const NodeListT& _bservices,
     const NodeListT& _aservices,
     const double& _width,
     const double& _height)
@@ -55,7 +55,7 @@ void WebServiceMap::update(const NodeListT& _bservices,
   update(); //TODO Make it dynamic
 }
 
-void WebServiceMap::update(const bool& _init)
+void WebMap::update(const bool& _init)
 {
   if( _init ) {
       scaleX = layoutWidth/width;
@@ -66,7 +66,7 @@ void WebServiceMap::update(const bool& _init)
   Wt::WPaintedWidget::resize(width * scaleX, height * scaleY );
 }
 
-void WebServiceMap::paintEvent(Wt::WPaintDevice* _pdevice)
+void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
   painter = new Wt::WPainter(_pdevice);
   painter->scale(scaleX, scaleY);  //TODO Make it dynamic
@@ -86,7 +86,7 @@ void WebServiceMap::paintEvent(Wt::WPaintDevice* _pdevice)
 /**
  * Draw edge before node to hide some details of drawing
  */
-void WebServiceMap::drawNode(const NodeT& _service)
+void WebMap::drawNode(const NodeT& _service)
 {
 //FIXME: Wt::WPointF posIcon(_service.map_x,  _service.map_y);
 //  Wt::WPointF posIcon(_service.map_x,  _service.map_y);
@@ -127,7 +127,7 @@ void WebServiceMap::drawNode(const NodeT& _service)
 //  }
 //  createLink(_service);
 }
-void WebServiceMap::createLink(const NodeT& _service)
+void WebMap::createLink(const NodeT& _service)
 {
   std::ostringstream tip;
 //  double x = _service.map_x * scaleX;

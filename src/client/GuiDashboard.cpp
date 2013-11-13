@@ -116,7 +116,7 @@ void GuiDashboard::load(const QString& _file)
     m_config = utils::getAbsolutePath(_file);
   }
 
-  Parser parser(m_config);
+  Parser parser(m_config, m_cdata);
   parser.process(*m_cdata, true);
 
   m_tree->clear();

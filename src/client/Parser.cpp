@@ -36,13 +36,15 @@ const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
 
-Parser::Parser(const QString& _config) : m_config(_config) {}
+Parser::Parser(const QString& _config, CoreDataT* _cdata)
+  : m_config(_config),
+    m_cdata(_cdata) {}
 
 Parser::~Parser()
 {
   QFile dotFile;
-  if (dotFile.exists(m_gvFile)) dotFile.remove(m_gvFile);
-  if (dotFile.exists(m_gvFile+".plain")) dotFile.remove(m_gvFile+".plain");
+  if (dotFile.exists(m_dotFile)) dotFile.remove(m_dotFile);
+  if (dotFile.exists(m_dotFile+".plain")) dotFile.remove(m_dotFile+".plain");
   dotFile.close();
 }
 
@@ -112,8 +114,8 @@ bool Parser::process(CoreDataT& _cdata, bool console)
     }
   }
 
-  updateNodeHierachy(_cdata.bpnodes, _cdata.cnodes, graphContent);
-  buildNodeTree(_cdata.bpnodes, _cdata.cnodes, _cdata.tree_items);
+  updateNodeHierachy(graphContent);
+  buildNodeTree();
   graphContent = m_dotHeader + graphContent;
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
@@ -121,13 +123,11 @@ bool Parser::process(CoreDataT& _cdata, bool console)
   return true;
 }
 
-void Parser::updateNodeHierachy(NodeListT& _bpnodes,
-                                NodeListT& _cnodes,
-                                QString& _graphContent)
+void Parser::updateNodeHierachy(QString& _graphContent)
 {
   _graphContent = "\n";
-  for (NodeListT::ConstIterator node = _bpnodes.begin();
-       node != _bpnodes.end(); ++node)
+  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin();
+       node != m_cdata->bpnodes.end(); ++node)
   {
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
@@ -135,8 +135,8 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
       QStringList ids = node->child_nodes.split(CHILD_SEP);
       foreach (const QString& nid, ids) {
         QString nidTrimmed = nid.trimmed();
-        auto childNode = _cnodes.find(nidTrimmed);
-        if (utils::findNode(_bpnodes, _cnodes, nidTrimmed, childNode)) {
+        auto childNode = m_cdata->cnodes.find(nidTrimmed);
+        if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nidTrimmed, childNode)) {
           childNode->parent = node->id;
           _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
         }
@@ -144,52 +144,94 @@ void Parser::updateNodeHierachy(NodeListT& _bpnodes,
     }
   }
 
-  for (NodeListT::ConstIterator node = _cnodes.begin();
-       node != _cnodes.end(); ++node)
+  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
+       node != end; ++node)
   {
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
   }
 }
 
-void Parser::buildNodeTree(const NodeListT& _bpnodes,
-                           const NodeListT& _cnodes,
-                           TreeNodeItemListT& _tree)
+void Parser::buildNodeTree(void)
 {
-  for (NodeListT::ConstIterator node=_bpnodes.begin(), end=_bpnodes.end();
-       node!=end; ++node) { _tree.insert(node->id, SvNavigatorTree::createTreeItem(*node)); }
+  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
+       node!=end; ++node) { m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node)); }
 
-  for (NodeListT::ConstIterator node=_cnodes.begin(), end = _cnodes.end();
-       node!=end; ++node) {_tree.insert(node->id, SvNavigatorTree::createTreeItem(*node));}
+  for (NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
+       node!=end; ++node) {m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node));}
 
-  for (NodeListT::ConstIterator node=_bpnodes.begin(), end=_bpnodes.end();
+  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
        node!=end; ++node)
   {
     if (node->child_nodes.isEmpty()) continue;
-    auto treeItem = _tree.find(node->id);
-    if (treeItem == _tree.end()) {
+    auto treeItem = m_cdata->tree_items.find(node->id);
+    if (treeItem == m_cdata->tree_items.end()) {
       utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
       continue;
     }
     QStringList ids = node->child_nodes.split(CHILD_SEP);
     foreach (const QString& id, ids) {
-      auto child = _tree.find(id);
-      if (child != _tree.end())
+      auto child = m_cdata->tree_items.find(id);
+      if (child != m_cdata->tree_items.end())
         (*treeItem)->addChild(*child);
     }
   }
 }
 
-void Parser::saveCoordinatesFile(const QString& _graphContent)
+void Parser::saveCoordinatesFile(const QString& _content)
 {
-  m_gvFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
-  QFile file(m_gvFile);
+  m_dotFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
+  QFile file(m_dotFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    utils::alert(QObject::tr("Unable into write the file %1").arg(m_gvFile));
+    utils::alert(QObject::tr("Unable into write the file %1").arg(m_dotFile));
     file.close();
     exit(1);
   }
   QTextStream fstream(&file);
-  fstream << _graphContent;
+  fstream << _content;
   file.close();
+}
+
+void Parser::computeNodeCoordinates(void)
+{
+  auto process = std::unique_ptr<QProcess>(new QProcess());
+  QString plainDotFile = m_dotFile%".plain";
+  QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
+  int exitCode = process->execute("dot", arguments);
+  process->waitForFinished(60000);
+  if (!exitCode) {
+    computeNodeCoordinates(plainDotFile);
+  } else {
+    utils::alert(QObject::tr("The graph engine exited with the code %1").arg(exitCode));
+    exit(exitCode);
+  }
+  process.reset(NULL);
+}
+
+void Parser::computeNodeCoordinates(const QString& _plainDot)
+{
+  QStringList splitedLine;
+  QFile qfile(_plainDot);
+  if (qfile.open(QFile::ReadOnly)) {
+    QRegExp regexSep("[ ]+");
+    QTextStream coodFileStream(& qfile);
+    QString line;
+    while (line = coodFileStream.readLine(0), ! line.isNull()) {
+      splitedLine = line.split (regexSep);
+      if (splitedLine[0] == "node") {
+        NodeListT::Iterator node;
+        QString nid = splitedLine[1].trimmed();
+        if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
+          node->label_x = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
+          node->label_y = -1 * splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
+        }
+      } else if (splitedLine[0] == "edge") {
+        m_cdata->edges.insert(splitedLine[1], splitedLine[2]);
+        continue;
+      } else if (splitedLine[0] == "stop") {
+        break;
+      }
+    }
+    qfile.close();
+  }
 }

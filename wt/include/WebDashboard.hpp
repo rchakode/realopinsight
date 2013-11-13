@@ -34,7 +34,7 @@
 #include <Wt/WMenuItem>
 #include <Wt/WStackedWidget>
 #include "WebMsgConsole.hpp"
-#include "WebServiceMap.hpp"
+#include "WebMap.hpp"
 #include <Wt/WLocalizedStrings>
 #include "DashboardBase.hpp"
 
@@ -55,7 +55,7 @@ protected:
 private:
   Wt::WContainerWidget* m_widget;
   TreeNodeItemListT* m_tree;
-  WebServiceMap* m_map;
+  WebMap* m_map;
   WebMsgConsole* m_msgConsole;
 
   Wt::WContainerWidget* createMenuBarWidget(void);

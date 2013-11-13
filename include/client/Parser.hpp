@@ -33,28 +33,25 @@
 class Parser
 {
 public:
-  Parser(const QString& _config);
+  Parser(const QString& _config, CoreDataT* _cdata);
   virtual ~Parser();
 
   bool process(CoreDataT& _cdata, bool console);
-  QString getDotGraphFile(void) const { return m_gvFile; }
+  QString getDotGraphFile(void) const { return m_dotFile; }
   static const QString CHILD_SEP;
 
 private:
   static const QString m_dotHeader;
   static const QString m_dotFooter;
-  QString m_gvFile;
+  QString m_dotFile;
   QString m_config;
+  CoreDataT* m_cdata;
 
-  void buildNodeTree(const NodeListT & _bpnodes,
-                     const NodeListT & _cnodes,
-                     TreeNodeItemListT & _tree);
-
-  void updateNodeHierachy(NodeListT & _bpnodes,
-                          NodeListT & _cnodes,
-                          QString & _graphContent);
-
-  void saveCoordinatesFile(const QString&);
+  void buildNodeTree(void);
+  void updateNodeHierachy(QString& _graphContent);
+  void saveCoordinatesFile(const QString& _content);
+  void computeNodeCoordinates(void);
+  void computeNodeCoordinates(const QString& dotfile);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

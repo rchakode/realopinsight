@@ -1,5 +1,5 @@
 /*
- * WebServiceTree.cpp
+ * WebServiceMap.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 19-09-2013                                                 #
@@ -22,30 +22,44 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebServiceTree.hpp"
+#ifndef WEBSERVICEMAP_HPP
+#define WEBSERVICEMAP_HPP
 
-Ngrt4nServiceTree::Ngrt4nServiceTree()
-  : Wt::WTreeView(0),
-  renderingModel (new Wt::WStandardItemModel())
+#include <Wt/WPaintedWidget>
+#include <Wt/WContainerWidget>
+#include <Wt/WPainter>
+#include <Wt/WObject>
+#include <Wt/WLength>
+#include <Wt/WSignal>
+#include "Base.hpp"
+
+class WebMap : public Wt::WPaintedWidget
 {
-  setHeaderHeight(0);
-  setSelectionMode(Wt::SingleSelection);
-  setSelectable(true);
-  setSelectionBehavior(Wt::SelectItems);
-}
+public:
+  WebMap();
+  virtual ~WebMap();
+  void setWidth(const double& _width) {width =  _width;}
+  void setHeight(const double& _height) {height =  _height;}
+  void update(const bool& _init = false);
+  void update(const NodeListT& _bservices, const NodeListT& _aservices,const double& _width, const double& _height);
+  void msgPanelSizedChanged(int width){ layoutWidth = width; update(true);}
 
-Ngrt4nServiceTree::~Ngrt4nServiceTree()
-{
-  delete renderingModel;
-}
+protected:
+  void paintEvent(Wt::WPaintDevice *paintDevice);
 
+private:
+  double width;
+  double height;
+  double scaleX;
+  double scaleY;
+  double layoutWidth;
+  double layoutHeight;
+  Wt::WPainter* painter;
+  NodeListT* aservices;
+  NodeListT* bservices;
 
-Wt::WStandardItem* Ngrt4nServiceTree::createItem(const NodeT& _service)
-{
-  Wt::WStandardItem* item = new Wt::WStandardItem();
-  item->setText(_service.name.toStdString());
-//  item->setIcon("icons/built-in/unknown.png");
-//  item->setData(_service.id, Wt::UserRole);
-  return item;
-}
+  void drawNode(const NodeT& _service);
+  void createLink(const NodeT& _service);
+};
 
+#endif /* WEBSERVICEMAP_HPP */

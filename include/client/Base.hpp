@@ -238,6 +238,8 @@ struct NodeT {
   QString child_nodes;
   CheckT check;
   bool monitored;
+  double label_x;
+  double label_y;
 };
 
 typedef QMap<qint32, qint32> CheckStatusCountT;
@@ -248,8 +250,8 @@ typedef QHash<QString, CheckT> CheckListT;
 typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
 typedef QHash<QString, QStringList> HostListT;
-
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
+typedef QHash<QString, QString> StringListT;
 struct CoreDataT {
   qint8 monitor;
   NodeListT bpnodes;
@@ -258,6 +260,7 @@ struct CoreDataT {
   HostListT hosts;
   TreeNodeItemListT tree_items;
   QSet<QString> sources;
+  StringListT edges;
 };
 
 struct GNodeT {

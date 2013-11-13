@@ -21,14 +21,16 @@ TARGET = ngrt4n-editor
 config-web {
 HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebMsgConsole.hpp \
-    wt/include/WebServiceMap.hpp \
-    wt/include/WebServiceTree.hpp
+    wt/include/WebMap.hpp \
+    wt/include/WebTree.hpp \
+    wt/include/WebUI.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
-    wt/src/WebServiceMap.cpp \
-    wt/src/WebServiceTree.cpp \
-    wt/src/ngrt4n-web.cpp
+    wt/src/ngrt4n-web.cpp \
+    wt/src/WebUI.cpp \
+    wt/src/WebMap.cpp \
+    wt/src/WebTree.cpp
 TARGET = ngrt4n-web
 }
 
@@ -85,8 +87,7 @@ HEADERS	+= include/core/ns.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
-    include/client/DashboardBase.hpp \
-    wt/include/WebUI.hpp
+    include/client/DashboardBase.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -113,8 +114,7 @@ SOURCES	+= \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
-    src/client/DashboardBase.cpp \
-    wt/src/WebUI.cpp
+    src/client/DashboardBase.cpp
 
 DISTFILES += README \
     INSTALL \

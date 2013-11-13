@@ -40,7 +40,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new TreeNodeItemListT()),
-    m_map(new WebServiceMap()),
+    m_map(new WebMap()),
     m_msgConsole(new WebMsgConsole())
 {
   Wt::WContainerWidget* leftContainer = new Wt::WContainerWidget();
@@ -91,7 +91,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   msgLayout->addWidget(m_msgConsole);
   msgContainer->setLayout(msgLayout);
   msgPanel->setCentralWidget(msgContainer);
-  m_msgConsole->sizeChanged().connect(m_map,&WebServiceMap::msgPanelSizedChanged);
+  m_msgConsole->sizeChanged().connect(m_map,&WebMap::msgPanelSizedChanged);
 
   rightContainer->setLayout(rightLayout);
   rightLayout->addWidget(mapPanel);
