@@ -52,7 +52,6 @@ public:
   static StringMapT propRules();
   static StringMapT calcRules();
   void initSettings(void);
-  virtual void load(const QString& _file) = 0;
   qint64 getUpdateCounter(void) const {return updateCounter;}
   QString getConfig(void) const {return m_config;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
@@ -98,6 +97,7 @@ protected:
   NodeListT::Iterator m_root;
   int m_firstSrcIndex;
 
+  virtual void load(const QString& _file) = 0;
   void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   virtual void updateDashboard(const NodeT& _node) = 0;

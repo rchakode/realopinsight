@@ -34,11 +34,6 @@ class GraphView : public QGraphicsView
   Q_OBJECT
 
 public:
-  static IconMapT nodeIcons();
-  static const QString PLUS;
-  static const QString MINUS;
-  static const QString DEFAULT_ICON;
-
   GraphView(CoreDataT* _cdata, QWidget* = 0);
   virtual ~GraphView();
 

@@ -2,7 +2,7 @@
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  WebUI* ui = new WebUI(env, "config"); //FIXME:set config file
+  WebUI* ui = new WebUI(env, "examples/small_hosting_platform.xml"); //FIXME:set config file
   ui->setTwoPhaseRenderingThreshold(0);
   ui->setTitle(ui->getConfig().toStdString());
   ui->useStyleSheet(Wt::WApplication::appRoot() + "wt/resources/styles.css");

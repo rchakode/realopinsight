@@ -146,7 +146,7 @@ void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
     utils::clear(*m_cdata);
-    NodeT* node = createNode(SvNavigatorTree::RootId, tr("New View"), "");
+    NodeT* node = createNode(utils::ROOT_ID, tr("New View"), "");
     m_cdata->bpnodes.insert(node->id,*node);
     SvNavigatorTree::addNode(m_cdata->tree_items,*node);
     m_tree->update(m_cdata);
@@ -185,7 +185,7 @@ NodeT* SvCreator::createNode(const QString& id,
   node->severity = MonitorBroker::Unknown;
   node->sev_crule = CalcRules::HighCriticity;
   node->sev_prule = PropRules::Unchanged;
-  node->icon = GraphView::DEFAULT_ICON;
+  node->icon = utils::DEFAULT_ICON;
   node->child_nodes = QString();
   return node;
 }
@@ -478,7 +478,7 @@ void SvCreator::recordData(const QString& _path)
     statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
     return;
   }
-  NodeListT::const_iterator root = m_cdata->bpnodes.find(SvNavigatorTree::RootId);
+  NodeListT::const_iterator root = m_cdata->bpnodes.find(utils::ROOT_ID);
   if (root == m_cdata->bpnodes.end()) {
     file.close();
     QString msg =  tr("The hierarchy does not have root");
@@ -492,7 +492,7 @@ void SvCreator::recordData(const QString& _path)
            "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
   recordNode(ofile,*root);
   foreach(const NodeT& service, m_cdata->bpnodes) {
-    if (service.id == SvNavigatorTree::RootId || service.parent.isEmpty())
+    if (service.id == utils::ROOT_ID || service.parent.isEmpty())
       continue;
     recordNode(ofile, service);
   }

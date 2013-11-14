@@ -34,7 +34,14 @@ namespace {
   const QString SRC_BASENAME = "Source";
 }
 
-namespace utils {
+
+
+namespace utils
+{
+  const QString ROOT_ID = "root";
+  const QString PLUS = "plus";
+  const QString MINUS = "minus";
+  const QString DEFAULT_ICON = NodeType::toString(NodeType::SERVICE_NODE);
 
   inline void delay(const qint32& d)
   { sleep(d); }
@@ -44,9 +51,6 @@ namespace utils {
 
   inline std::string getCtime(const quint32& tt)
   { return QDateTime::fromTime_t(tt).toString().toStdString(); }
-
-  inline void alert(const QString & msg)
-  { QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes); }
 
   inline QString genNodeId()
   { return "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz"); }
@@ -91,6 +95,9 @@ namespace utils {
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
   QString getNodeToolTip(const NodeT& _node);
+
+  IconMapT nodeIcons();
+  void alert(const QString & msg);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

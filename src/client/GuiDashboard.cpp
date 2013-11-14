@@ -121,11 +121,11 @@ void GuiDashboard::load(const QString& _file)
   parser.computeNodeCoordinates();
 
   m_tree->clear();
-  m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
+  m_tree->addTopLevelItem(m_cdata->tree_items[utils::ROOT_ID]);
   //FIXME: m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
   m_map->drawMap();
 
-  m_root = m_cdata->bpnodes.find(SvNavigatorTree::RootId);
+  m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
   if (m_root == m_cdata->bpnodes.end()) {
     utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
     exit(1);

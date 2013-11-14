@@ -25,6 +25,8 @@
 #include "StatsLegend.hpp"
 #include "utilsClient.hpp"
 #include <QFileInfo>
+//FIXME: #include <Wt/WMessageBox>
+//#include <Wt/WMessageBox>
 
 
 namespace {
@@ -380,4 +382,57 @@ QString utils::getNodeToolTip(const NodeT& _node)
                                               _node.actual_msg);
   }
   return toolTip;
+}
+
+IconMapT utils::nodeIcons() {
+  IconMapT icons;
+  icons[NodeType::toString(NodeType::SERVICE_NODE)]= ":/images/business-process.png";
+  icons["Other Check"] = ":/images/check.png";
+  icons["Server"] = ":/images/server.png";
+  icons["Firewall"] = ":/images/firewall.png";
+  icons["Router"] = ":/images/router.png";
+  icons["Network"] = ":/images/network.png";
+  icons["Swicth"] = ":/images/switch.png";
+  icons["Filer"] = ":/images/filer.png";
+  icons["Hard disk"] = ":/images/harddisk.png";
+  icons["Storage Area"] = ":/images/storage.png";
+  icons["Linux"] = ":/images/linux.png";
+  icons["Windows OS"] = ":/images/windows.png";
+  icons["Solaris"] = ":/images/solaris.png";
+  icons["Cloud"] = ":/images/cloud.png";
+  icons["Hypervisor"] = ":/images/hypervisor.png";
+  icons["Application"] = ":/images/application.png";
+  icons["Web Accessibility"] = ":/images/web.png";
+  icons["Web server"] = ":/images/web-server.png";
+  icons["Database Engine"] = ":/images/db.png";
+  icons["Database Server"] = ":/images/db-server.png";
+  icons["Process"] = ":/images/process.png";
+  icons["Logfile"] = ":/images/log.png";
+  icons["Network Bandwith"] = ":/images/network-usage.png";
+  icons["CPU"] = ":/images/cpu.png";
+  icons["CPU Load"] = ":/images/performance-level.png";
+  icons["Memory"] = ":/images/memory.png";
+  icons["Memory Usage"] = ":/images/memory-usage.png";
+  icons["Resource Utilization"] = ":/images/resource-usage.png";
+  icons["Performance"] = ":/images/performance.png";
+  icons[PLUS] = ":/images/plus.png";
+  icons[MINUS] = ":/images/minus.png";
+  icons["Nagios Basic Logo"] = ":/images/nagios-logo-n.png";
+  icons["Zabbix Basic Logo"] = ":/images/zabbix-logo-z.png";
+  icons["Zenoss Basic Logo"] = ":/images/zenoss-logo-o.png";
+  icons["Hierarchy"] = ":/images/hierarchy.png";
+  icons[MINUS] = ":/images/minus.png";
+  return icons;
+}
+
+
+
+void utils::alert(const QString & msg)
+{
+  qDebug() << msg;
+//  Wt::StandardButton
+//      result = Wt::WMessageBox::show("Confirm", "About to wreak havoc... Continue ?",
+//                                     Wt::Ok | Wt::Cancel);
+//  result.show();
+  //QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
 }

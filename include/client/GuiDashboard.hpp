@@ -53,8 +53,9 @@ public:
   QWidget* getWidget(void) const {return m_widget;}
   static StringMapT propRules();
   static StringMapT calcRules();
-  virtual void load(const QString& _file);
+
   virtual void resizeDashboard(qint32 width, qint32 height);
+
   void showTrayIcon(void) const {m_trayIcon->show();}
   void setTrayIconTooltip(const QString& msg) {m_trayIcon->setToolTip(msg);}
   void scalPaneContentsToViewPort(void) const;
@@ -112,6 +113,7 @@ protected:
   void updateTrayInfo(const NodeT& _node);
   QTabWidget* builtMsgPane(void);
 
+  virtual void load(const QString& _file);
   void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
   virtual void updateDashboard(NodeListT::iterator& _node);
   virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);

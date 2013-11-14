@@ -33,54 +33,10 @@
 const QString GraphView::LABEL_NODE = ":LABEL";
 const QString GraphView::ICON_NODE = ":ICON";
 const QString GraphView::EXPICON_NODE = ":EXPICON";
-const QString GraphView::PLUS = "plus";
-const QString GraphView::MINUS = "minus";
-const QString GraphView::DEFAULT_ICON = NodeType::toString(NodeType::SERVICE_NODE);
 
 namespace {
   const float SCALIN_FACTOR = 1.1;
   const float SCALOUT_FACTOR = 1/SCALIN_FACTOR;
-}
-
-IconMapT GraphView::nodeIcons() {
-  IconMapT icons;
-  icons[GraphView::DEFAULT_ICON]= ":/images/business-process.png";
-  icons["Other Check"] = ":/images/check.png";
-  icons["Server"] = ":/images/server.png";
-  icons["Firewall"] = ":/images/firewall.png";
-  icons["Router"] = ":/images/router.png";
-  icons["Network"] = ":/images/network.png";
-  icons["Swicth"] = ":/images/switch.png";
-  icons["Filer"] = ":/images/filer.png";
-  icons["Hard disk"] = ":/images/harddisk.png";
-  icons["Storage Area"] = ":/images/storage.png";
-  icons["Linux"] = ":/images/linux.png";
-  icons["Windows OS"] = ":/images/windows.png";
-  icons["Solaris"] = ":/images/solaris.png";
-  icons["Cloud"] = ":/images/cloud.png";
-  icons["Hypervisor"] = ":/images/hypervisor.png";
-  icons["Application"] = ":/images/application.png";
-  icons["Web Accessibility"] = ":/images/web.png";
-  icons["Web server"] = ":/images/web-server.png";
-  icons["Database Engine"] = ":/images/db.png";
-  icons["Database Server"] = ":/images/db-server.png";
-  icons["Process"] = ":/images/process.png";
-  icons["Logfile"] = ":/images/log.png";
-  icons["Network Bandwith"] = ":/images/network-usage.png";
-  icons["CPU"] = ":/images/cpu.png";
-  icons["CPU Load"] = ":/images/performance-level.png";
-  icons["Memory"] = ":/images/memory.png";
-  icons["Memory Usage"] = ":/images/memory-usage.png";
-  icons["Resource Utilization"] = ":/images/resource-usage.png";
-  icons["Performance"] = ":/images/performance.png";
-  icons[PLUS] = ":/images/plus.png";
-  icons[MINUS] = ":/images/minus.png";
-  icons["Nagios Basic Logo"] = ":/images/nagios-logo-n.png";
-  icons["Zabbix Basic Logo"] = ":/images/zabbix-logo-z.png";
-  icons["Zenoss Basic Logo"] = ":/images/zenoss-logo-o.png";
-  icons["Hierarchy"] = ":/images/hierarchy.png";
-  icons[MINUS] = ":/images/minus.png";
-  return icons;
 }
 
 GraphView::GraphView(CoreDataT* _cdata, QWidget* _parent)
@@ -88,7 +44,7 @@ GraphView::GraphView(CoreDataT* _cdata, QWidget* _parent)
     m_cdata(_cdata),
     m_scene(new QGraphicsScene()),
     m_chart(NULL),
-    m_icons(nodeIcons()),
+    m_icons(utils::nodeIcons()),
     m_mapScalFactor(1),
     m_chartScalFactor(1),
     m_isAjustedChartSize(false),
@@ -121,10 +77,10 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
       if (sfx == EXPICON_NODE) {
         QPixmap exp_icon;
         if (m_mnodes[nodeId].expand) {
-          exp_icon.load(m_icons[MINUS], 0, Qt::AutoColor);
+          exp_icon.load(m_icons[utils::MINUS], 0, Qt::AutoColor);
           m_mnodes[nodeId].expand = false;
         } else {
-          exp_icon.load(m_icons[PLUS], 0, Qt::AutoColor);
+          exp_icon.load(m_icons[utils::PLUS], 0, Qt::AutoColor);
           m_mnodes[nodeId].expand = true;
         }
         m_mnodes[nodeId].exp_icon->setPixmap(exp_icon);
@@ -283,7 +239,7 @@ void GraphView::drawNode(const NodeT& _node)
 {
   QPixmap icon, expIcon;
   icon.load(m_icons[_node.icon], 0, Qt::AutoColor);
-  expIcon.load(m_icons[PLUS], 0, Qt::AutoColor);
+  expIcon.load(m_icons[utils::PLUS], 0, Qt::AutoColor);
   //FIXME: take care with background color
   QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;"%_node.name%"&nbsp;</span>";
   QString nodeData = _node.id%LABEL_NODE;
@@ -347,7 +303,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
     if (gnode->type == NodeType::SERVICE_NODE)
       gnode->exp_icon->setVisible(_visible);
     if (_visible) {
-      QPixmap expandIcon(m_icons[PLUS], 0, Qt::AutoColor);
+      QPixmap expandIcon(m_icons[utils::PLUS], 0, Qt::AutoColor);
       m_mnodes[_nodeId].exp_icon->setPixmap(expandIcon);
     }
     emit expandNode(_nodeId, _visible, _level + 1);

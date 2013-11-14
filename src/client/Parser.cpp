@@ -89,7 +89,7 @@ bool Parser::process(bool console)
     node.severity = MonitorBroker::NagiosUnknown;
     node.parent = "";
     if (node.icon.isEmpty()) {
-      node.icon = GraphView::DEFAULT_ICON;
+      node.icon = utils::DEFAULT_ICON;
     }
     if (node.type == NodeType::ALARM_NODE) {
 
@@ -216,6 +216,19 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
     QRegExp regexSep("[ ]+");
     QTextStream coodFileStream(& qfile);
     QString line;
+
+    //First parse the header
+    if(line = coodFileStream.readLine(0), ! line.isNull()) {
+      splitedLine = line.split (regexSep);
+//      if (splitedLine[0] != "graph") {
+//        std::cerr << "The syntax of the generated graph file is wrong " << dotCoordinates.str() <<"\n" ;
+//        return false ;
+//      }
+      m_cdata->map_width = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
+      m_cdata->map_height = splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
+      qDebug() << m_cdata->map_width << m_cdata->map_height;
+    }
+
     while (line = coodFileStream.readLine(0), ! line.isNull()) {
       splitedLine = line.split (regexSep);
       if (splitedLine[0] == "node") {

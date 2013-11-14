@@ -43,10 +43,10 @@ class WebDashboard : public DashboardBase
 public:
   WebDashboard(const qint32& _userRole, const QString& _config);
   virtual ~WebDashboard();
-  virtual void load(const QString& _file);
   Wt::WContainerWidget* getWidget(void) const {return m_widget;}
 
 protected:
+  virtual void load(const QString& _file);
   virtual void updateDashboard(const NodeT& _node);
   virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);
   virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
@@ -60,7 +60,6 @@ private:
 
   Wt::WContainerWidget* createMenuBarWidget(void);
   bool buildNavTreeModel();
-  bool computeMapCoordinates(CoreDataT& _cdata);
   void updateViews();
   void updateServicesStatuses();
   void updateParentStatus(const NodeT& _service);

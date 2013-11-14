@@ -262,6 +262,8 @@ struct CoreDataT {
   TreeNodeItemListT tree_items;
   QSet<QString> sources;
   StringListT edges;
+  double map_height;
+  double map_width;
 };
 
 struct GNodeT {

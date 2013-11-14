@@ -26,8 +26,7 @@
 
 WebMsgConsole::WebMsgConsole()
   : WTableView(0),
-    row(0),
-    _sizeChanged(this)
+    m_rowCount(0)
 {
   setSortingEnabled(true);
   setLayoutSizeAware(true);
@@ -37,25 +36,25 @@ WebMsgConsole::WebMsgConsole()
   setSelectionMode(Wt::SingleSelection);
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
-  renderingModel = new Wt::WStandardItemModel(2, 5);
-  renderingModel->setHeaderData(0, Wt::Horizontal,
+  m_model = new Wt::WStandardItemModel(2, 5);
+  m_model->setHeaderData(0, Wt::Horizontal,
                                 std::string("images/built-in/tbv-date.gif"),
                                 Wt::DecorationRole);
-  renderingModel->setHeaderData(1,Wt::Horizontal,
+  m_model->setHeaderData(1,Wt::Horizontal,
                                 std::string("images/built-in/tbv-host.gif"),
                                 Wt::DecorationRole);
-  renderingModel->setHeaderData(2, Wt::Horizontal,
+  m_model->setHeaderData(2, Wt::Horizontal,
                                 std::string("images/built-in/tbv-service.gif"),
                                 Wt::DecorationRole);
-  renderingModel->setHeaderData(3, Wt::Horizontal,
+  m_model->setHeaderData(3, Wt::Horizontal,
                                 std::string("images/built-in/tbv-status.gif"),
                                 Wt::DecorationRole);
-  renderingModel->setHeaderData(4, Wt::Horizontal,
+  m_model->setHeaderData(4, Wt::Horizontal,
                                 std::string("images/built-in/tbv-message.gif"),
                                 Wt::DecorationRole);
 
   SortingProxyModel* sortingProxy = new SortingProxyModel(this);
-  sortingProxy->setSourceModel(renderingModel);
+  sortingProxy->setSourceModel(m_model);
   sortingProxy->setDynamicSortFilter(true);
   sortingProxy->setFilterRole(Wt::UserRole);
   setModel(sortingProxy);
@@ -64,10 +63,10 @@ WebMsgConsole::WebMsgConsole()
 
 WebMsgConsole::~WebMsgConsole()
 {
-  delete renderingModel;
+  delete m_model;
 }
 
-void  WebMsgConsole::layoutSizeChanged (int width, int height)
+void  WebMsgConsole::layoutSizeChanged(int width, int)
 {
   Wt::WLength em = Wt::WLength(1, Wt::WLength::FontEx);
   setColumnWidth(0, 20 * em);
@@ -75,8 +74,7 @@ void  WebMsgConsole::layoutSizeChanged (int width, int height)
   setColumnWidth(2, 20 * em);
   setColumnWidth(3, 90); /*size of the header image*/
   setColumnWidth(4, width - (65 * em.toPixels() + 90)); /*size of the header image*/
-  //sizeChanged.emit(width, height);
-  std::cerr << "FIXME: " << height << "\n";
+  //emit sizeChanged(width, height);
 }
 
 void WebMsgConsole::update(const NodeListT& _aservices)
@@ -88,13 +86,13 @@ void WebMsgConsole::update(const NodeListT& _aservices)
 
 void WebMsgConsole::addMsg(const NodeT&  _service)
 {
-  renderingModel->setItem(row, 0, createDateTimeItem(_service.check.last_state_change));
-  renderingModel->setItem(row, 1, new Wt::WStandardItem(_service.check.host));
-  renderingModel->setItem(row, 2, new Wt::WStandardItem(_service.name.toStdString()));
-  renderingModel->setItem(row, 3, createItatusItem(_service.check.status));
-  renderingModel->setItem(row, 4, new Wt::WStandardItem(_service.alarm_msg.toStdString()));
+  m_model->setItem(m_rowCount, 0, createDateTimeItem(_service.check.last_state_change));
+  m_model->setItem(m_rowCount, 1, new Wt::WStandardItem(_service.check.host));
+  m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_service.name.toStdString()));
+  m_model->setItem(m_rowCount, 3, createItatusItem(_service.check.status));
+  m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(_service.alarm_msg.toStdString()));
 
-  ++row;
+  ++m_rowCount;
 }
 
 Wt::WStandardItem* WebMsgConsole::createItatusItem(const int& _status)

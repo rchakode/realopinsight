@@ -27,6 +27,7 @@
 #include "Preferences.hpp"
 #include "GraphView.hpp"
 #include "DashboardBase.hpp"
+#include "utilsClient.hpp"
 
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
@@ -274,9 +275,9 @@ void ServiceEditor::loadNotificationMsgFields()
 
 void ServiceEditor::loadIconFields()
 {
-  IconMapT icons = GraphView::nodeIcons();
-  QString header = "-->Select a icon (Default is " + GraphView::DEFAULT_ICON + ")";
-  iconField()->addItem(header, icons.value(GraphView::DEFAULT_ICON));
+  IconMapT icons = utils::nodeIcons();
+  QString header = "-->Select a icon (Default is " + utils::DEFAULT_ICON + ")";
+  iconField()->addItem(header, icons.value(utils::DEFAULT_ICON));
   foreach(const QString& label, icons.keys()) {
     QString path = icons.value(label);
     iconField()->addItem(QIcon(path), label, icons.value(path));

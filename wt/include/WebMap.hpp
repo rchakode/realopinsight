@@ -35,19 +35,23 @@
 
 class WebMap : public Wt::WPaintedWidget
 {
+//  Q_OBJECT
+
 public:
-  WebMap();
+  WebMap(CoreDataT* _cdata);
   virtual ~WebMap();
   void setWidth(const double& _width) {width =  _width;}
   void setHeight(const double& _height) {height =  _height;}
-  void update(const bool& _init = false);
-  void update(const NodeListT& _bservices, const NodeListT& _aservices,const double& _width, const double& _height);
-  void msgPanelSizedChanged(int width){ layoutWidth = width; update(true);}
+  void drawMap(const double& _width, const double& _height, const bool& _init);
+
+//public slots:
+//  void msgPanelSizedChanged(int width);
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
 
 private:
+  CoreDataT* m_cdata;
   double width;
   double height;
   double scaleX;
@@ -55,11 +59,11 @@ private:
   double layoutWidth;
   double layoutHeight;
   Wt::WPainter* painter;
-  NodeListT* aservices;
-  NodeListT* bservices;
+  IconMapT m_icons;
 
-  void drawNode(const NodeT& _service);
-  void createLink(const NodeT& _service);
+  void drawNode(const NodeT& _node);
+  void drawEdge(const QString& _parentId, const QString& _childId);
+  void createLink(const NodeT& _node);
 };
 
 #endif /* WEBSERVICEMAP_HPP */

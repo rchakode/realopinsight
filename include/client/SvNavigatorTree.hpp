@@ -32,11 +32,9 @@ class SvNavigatorTree : public QTreeWidget
   Q_OBJECT
 
 public:
-  static const QString RootId ;
-
   SvNavigatorTree(const bool & =false, QWidget* = 0 );
   static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
-  void update(CoreDataT * & _coreData) ;
+  void update(CoreDataT * & _cdata) ;
   static QTreeWidgetItem * createTreeItem(const NodeT & _node);
 
 signals:

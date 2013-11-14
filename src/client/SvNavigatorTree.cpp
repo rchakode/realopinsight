@@ -28,8 +28,6 @@
 #include "Parser.hpp"
 #include "utilsClient.hpp"
 
-const QString SvNavigatorTree::RootId = "root";
-
 SvNavigatorTree::SvNavigatorTree(const bool& _enableDrag, QWidget* _parent)
   : QTreeWidget(_parent), m_cdata(NULL)
 {
@@ -102,13 +100,13 @@ void SvNavigatorTree::addNode(TreeNodeItemListT& _tree,
   }
 }
 
-void SvNavigatorTree::update(CoreDataT*& _coreData)
+void SvNavigatorTree::update(CoreDataT*& _cdata)
 {
   QTreeWidget::clear();
-  QTreeWidget::addTopLevelItem(_coreData->tree_items[RootId]);
-  QTreeWidget::setCurrentItem(_coreData->tree_items[RootId]);
+  QTreeWidget::addTopLevelItem(_cdata->tree_items[utils::ROOT_ID]);
+  QTreeWidget::setCurrentItem(_cdata->tree_items[utils::ROOT_ID]);
   QTreeWidget::expandAll();
-  m_cdata = _coreData;
+  m_cdata = _cdata;
 }
 
 

@@ -35,12 +35,13 @@
 #include <boost/algorithm/string/trim.hpp>
 #include "WebDashboard.hpp"
 #include "Base.hpp"
+#include "utilsClient.hpp"
 
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new TreeNodeItemListT()),
-    m_map(new WebMap()),
+    m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole())
 {
   Wt::WContainerWidget* leftContainer = new Wt::WContainerWidget();
@@ -91,7 +92,9 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   msgLayout->addWidget(m_msgConsole);
   msgContainer->setLayout(msgLayout);
   msgPanel->setCentralWidget(msgContainer);
-  m_msgConsole->sizeChanged().connect(m_map,&WebMap::msgPanelSizedChanged);
+
+  //FIXME: connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
+  //connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
 
   rightContainer->setLayout(rightLayout);
   rightLayout->addWidget(mapPanel);
@@ -112,7 +115,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   rightLayout->setResizable(0);
   rightLayout->setResizable(1);
 
-  //FIXME: load(_config);
+  load(_config);
 }
 
 WebDashboard::~WebDashboard()
@@ -126,22 +129,25 @@ WebDashboard::~WebDashboard()
 
 void WebDashboard::load(const QString& _file)
 {
+
   qDebug() << _file;
-  //FIXME: loadConfig
-  //bool result = Ngrt4nConfigParser::loadNgrt4nConfig(WApplication::appRoot()+"config/" + _cfg + ".xml", data);
-  bool result = false;
-  if( !result ) return;  // Invalid config file
-
-  if( !buildNavTreeModel() ){
-    std::cerr << Wt::WString::tr("unable.to.build.view").arg("view") << "\n";
-    return;
+  if (!_file.isEmpty()) {
+    m_config = utils::getAbsolutePath(_file);
   }
 
-  if(! computeMapCoordinates(*m_cdata) ){
-    std::cerr << Wt::WString::tr("unable.to.build.view").arg("map") << "\n";
-    return;
-  }
+  Parser parser(m_config, m_cdata);
+  parser.process(true);
+  parser.computeNodeCoordinates();
+  //FIXME: m_tree->clear();
+  //FIXM: m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
+  //FIXME: m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
+  m_map->drawMap(m_cdata->map_width, m_cdata->map_height, false);
 
+//  m_root = m_cdata->bpnodes.find(SvNavigatorTree::RootId);
+//  if (m_root == m_cdata->bpnodes.end()) {
+//    utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
+//    exit(1);
+//  }
   updateViews();
 }
 
@@ -199,96 +205,6 @@ bool WebDashboard::buildNavTreeModel()
   return true;
 }
 
-
-bool WebDashboard::computeMapCoordinates(CoreDataT& _cdata)
-{
-  std::cerr << _cdata.cnodes.size() << "\n";
-  //  char* dotFileName = strdup("/tmp/ngrt4n-XXXXXX");
-  //  int fd = mkstemp(dotFileName);
-  //  if( fd == -1){
-  //    cerr << "Unable to temporary file generate the graph file " << "\n";
-  //    return false;
-  //  }
-  //  close(fd);
-
-  //  ofstream ofile;
-  //  ofile.open(dotFileName, ios_base::out);
-  //  if (! ofile.good() ) {
-  //    cerr << "Unable to generate some necessary temporary files. "
-  //         << "Check that the directory tmp/ has the rights 777" << "\n";
-  //    return false;
-  //  }
-  //  ofile<<"strict graph  ngrt4n {\n"
-  //      <<"node[shape=plaintext]\n"
-  //     << _cdata.graph_descr
-  //     << "}";
-  //  ofile.close();
-
-  //  ostringstream dotCoordinates;
-  //  dotCoordinates << dotFileName << "_1";
-
-  //  ostringstream cmd;
-  //  cmd << "dot -Tplain -o "
-  //      << dotCoordinates.str()
-  //      << " " << dotFileName;
-
-  //  if ( system(cmd.str().c_str()) != 0 ) {
-  //    cerr << "Unable to run 'dot'" << "\n";
-  //    return false;
-  //  }
-
-  //  ifstream ifile;
-  //  ifile.open(dotCoordinates.str().c_str(), ios_base::in);
-  //  if (! ifile.good() ) {
-  //    cerr << "Unable to use the generated graph file " << dotCoordinates.str() << "\n";
-  //    return false;
-  //  }
-
-  //  string line;
-  //  vector<string> fields;
-
-  //  if(getline(ifile, line), ! ifile.eof()) { //Parse the header of the generated dot file
-  //    boost::split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
-  //    if (fields[0] != "graph") {
-  //      cerr << "The syntax of the generated graph file is wrong " << dotCoordinates.str() << "\n";
-  //      return false;
-  //    }
-  //    mapWidth = atof(fields[2].c_str()) * Ngrt4nXScreenScaling + Ngrt4nXPadding;
-  //    mapHeight = atof(fields[3].c_str()) * Ngrt4nYScreenScaling + Ngrt4nYpadding;
-  //  }
-
-  //  while(getline(ifile, line), ! ifile.eof()){ //Parse the rest of the generated dot file
-  //    vector<string> fields;
-  //    boost::split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
-
-  //    if( ! fields.size() ) continue;
-  //    if (fields[0] == "node") {
-  //      NodeListT::Iterator service;
-  //      if( service = _cdata.bpnodes.find(fields[1]),
-  //          service == _cdata.bpnodes.end()) {
-
-  //        if( service = _cdata.cnodes.find(fields[1]),
-  //            service == _cdata.cnodes.end() )  continue;
-  //      }
-  //      service.map_x = atof(fields[2].c_str()) * XSCAL_FACTOR;
-  //      service.map_y = mapHeight
-  //          - atof(fields[3].c_str()) *  - (YSCAL_FACTOR / 2)  //Coordinate transformation
-  //          - 40;  //Icon size
-  //      service->second.map_enable_nav_icon = (service->second.type == NodeType::ALARM_NODE)? false: true;
-
-  //    } else if(fields[0] == "stop") {
-  //      break;
-  //    }
-  //    else { //edge
-  //      continue;
-  //    }
-  //    fields.clear();
-  //  }
-  //  ifile.close();
-  //  free(dotFileName);
-
-  return true;
-}
 
 void WebDashboard::updateViews(void)
 {
