@@ -75,8 +75,8 @@ void  WebMsgConsole::layoutSizeChanged (int width, int height)
   setColumnWidth(2, 20 * em);
   setColumnWidth(3, 90); /*size of the header image*/
   setColumnWidth(4, width - (65 * em.toPixels() + 90)); /*size of the header image*/
-  //FIXME:_sizeChanged.emit(width, height);
-  std::cerr << height << "\n";
+  //sizeChanged.emit(width, height);
+  std::cerr << "FIXME: " << height << "\n";
 }
 
 void WebMsgConsole::update(const NodeListT& _aservices)

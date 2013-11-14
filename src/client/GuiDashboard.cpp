@@ -70,7 +70,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
     m_browser (new WebKit()),
-    m_map (new GraphView(this)),
+    m_map (new GraphView(m_cdata, this)),
     m_tree (new SvNavigatorTree()),
     m_msgConsole(new MsgConsole(this)),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
@@ -117,11 +117,13 @@ void GuiDashboard::load(const QString& _file)
   }
 
   Parser parser(m_config, m_cdata);
-  parser.process(*m_cdata, true);
+  parser.process(true);
+  parser.computeNodeCoordinates();
 
   m_tree->clear();
   m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
-  m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
+  //FIXME: m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
+  m_map->drawMap();
 
   m_root = m_cdata->bpnodes.find(SvNavigatorTree::RootId);
   if (m_root == m_cdata->bpnodes.end()) {

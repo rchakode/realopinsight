@@ -31,6 +31,8 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebUI.cpp \
     wt/src/WebMap.cpp \
     wt/src/WebTree.cpp
+
+LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lboost_signals
 TARGET = ngrt4n-web
 }
 
@@ -134,8 +136,7 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-LIBS += -lzmq \
-        -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lboost_signals
+LIBS += -lzmq
 
 #include(QsLog/QsLog.pri)
 

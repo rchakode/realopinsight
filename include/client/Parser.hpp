@@ -36,7 +36,9 @@ public:
   Parser(const QString& _config, CoreDataT* _cdata);
   virtual ~Parser();
 
-  bool process(CoreDataT& _cdata, bool console);
+  bool process(bool console);
+  void computeNodeCoordinates(void);
+  void computeNodeCoordinates(const QString& dotfile);
   QString getDotGraphFile(void) const { return m_dotFile; }
   static const QString CHILD_SEP;
 
@@ -50,8 +52,6 @@ private:
   void buildNodeTree(void);
   void updateNodeHierachy(QString& _graphContent);
   void saveCoordinatesFile(const QString& _content);
-  void computeNodeCoordinates(void);
-  void computeNodeCoordinates(const QString& dotfile);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

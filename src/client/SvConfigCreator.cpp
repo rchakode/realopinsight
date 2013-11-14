@@ -124,7 +124,7 @@ void SvCreator::loadFile(const QString& _path)
   } else {
     utils::clear(*m_cdata);
     Parser parser(_path, m_cdata);
-    if (!parser.process(*m_cdata, false)) {
+    if (!parser.process(false)) {
       utils::alert(tr("Unable to open the file '%1'").arg(_path));
       exit(1);
     }

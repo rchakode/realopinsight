@@ -251,7 +251,8 @@ typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
 typedef QHash<QString, QStringList> HostListT;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
-typedef QHash<QString, QString> StringListT;
+typedef QMultiMap<QString, QString> StringListT;
+
 struct CoreDataT {
   qint8 monitor;
   NodeListT bpnodes;

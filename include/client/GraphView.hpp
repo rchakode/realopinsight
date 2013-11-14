@@ -39,12 +39,10 @@ public:
   static const QString MINUS;
   static const QString DEFAULT_ICON;
 
-  GraphView(QWidget* = 0);
+  GraphView(CoreDataT* _cdata, QWidget* = 0);
   virtual ~GraphView();
 
-  void load(const QString& _dotFile,
-            const NodeListT& _bpnodes,
-            const NodeListT& _cnodes);
+  void drawMap(void);
   void setNodeVisible(const QString& _nodeId,
                       const QString& _parent,
                       const bool& _visible,
@@ -84,6 +82,7 @@ private:
   static const QString  ICON_NODE;
   static const QString  EXPICON_NODE;
 
+  CoreDataT* m_cdata;
   QGraphicsScene* m_scene;
   QGraphicsProxyWidget* m_chart;
   QGraphicsRectItem* m_chartArea;
@@ -97,10 +96,10 @@ private:
   QPoint m_lastTrackingPos;
   bool m_trackingOn;
 
-  void setEdgePath(const QString& _parentVertex, const QString& _childVertex, QPainterPath& path);
-  void drawMap(const NodeListT &_bpnodes, const NodeListT& _cnodes);
   void drawNode(const NodeT&);
-  void setNodePos(const QString& , const QPointF&);
+  void setNodePos(const QString& _nodeId, const QPointF& _pos);
+  void drawEdge(const QString& _headNodeId, const QString& _tailNodeId);
+  void setEdgePath(const QString& _parentVertex, const QString& _childVertex, QPainterPath& path);
   void ajustStatsPanelSize(void);
   void addEvents(void);
 };

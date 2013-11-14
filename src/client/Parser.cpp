@@ -48,7 +48,7 @@ Parser::~Parser()
   dotFile.close();
 }
 
-bool Parser::process(CoreDataT& _cdata, bool console)
+bool Parser::process(bool console)
 {
   QString graphContent ="";
   QDomDocument xmlDoc;
@@ -68,7 +68,7 @@ bool Parser::process(CoreDataT& _cdata, bool console)
   file.close(); // The content of the file is already in memory
 
   xmlRoot = xmlDoc.documentElement();
-  _cdata.monitor = xmlRoot.attribute("monitor").toInt();
+  m_cdata->monitor = xmlRoot.attribute("monitor").toInt();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
   NodeT node;
@@ -94,7 +94,7 @@ bool Parser::process(CoreDataT& _cdata, bool console)
     if (node.type == NodeType::ALARM_NODE) {
 
       StringPairT info = utils::splitHostCheckInfo(node.child_nodes);
-      _cdata.hosts[info.first] << info.second;
+      m_cdata->hosts[info.first] << info.second;
 
       QString srcid = utils::getSourceIdFromStr(info.first);
 
@@ -103,14 +103,14 @@ bool Parser::process(CoreDataT& _cdata, bool console)
         if (console) {
           node.child_nodes = utils::realCheckId(srcid, node.child_nodes);
         }
-        _cdata.sources.insert(srcid);
+        m_cdata->sources.insert(srcid);
       } else {
-        _cdata.sources.insert(srcid);
+        m_cdata->sources.insert(srcid);
       }
-      _cdata.cnodes.insert(node.id, node);
+      m_cdata->cnodes.insert(node.id, node);
 
     } else {
-      _cdata.bpnodes.insert(node.id, node);
+      m_cdata->bpnodes.insert(node.id, node);
     }
   }
 
@@ -226,8 +226,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
           node->label_y = -1 * splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
-        m_cdata->edges.insert(splitedLine[1], splitedLine[2]);
-        continue;
+        m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
       } else if (splitedLine[0] == "stop") {
         break;
       }
