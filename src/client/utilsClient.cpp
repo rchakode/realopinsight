@@ -387,7 +387,7 @@ QString utils::getNodeToolTip(const NodeT& _node)
 
 IconMapT utils::nodeIcons() {
   IconMapT icons;
-  icons[NodeType::toString(NodeType::SERVICE_NODE)]= ":/images/business-process.png";
+  icons[DEFAULT_ICON]= ":/images/business-process.png";
   icons["Other Check"] = ":/images/check.png";
   icons["Server"] = ":/images/server.png";
   icons["Firewall"] = ":/images/firewall.png";

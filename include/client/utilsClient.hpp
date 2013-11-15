@@ -41,7 +41,7 @@ namespace utils
   const QString ROOT_ID = "root";
   const QString PLUS = "plus";
   const QString MINUS = "minus";
-  const QString DEFAULT_ICON = NodeType::toString(NodeType::SERVICE_NODE);
+  const QString DEFAULT_ICON = "Business Process";
 
   inline void delay(const qint32& d)
   { sleep(d); }
