@@ -49,7 +49,7 @@ private:
   QString m_config;
   CoreDataT* m_cdata;
 
-  void buildNodeTree(void);
+  //void buildNodeTree(void);
   void updateNodeHierachy(QString& _graphContent);
   void saveCoordinatesFile(const QString& _content);
 };

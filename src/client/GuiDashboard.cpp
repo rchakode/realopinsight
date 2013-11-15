@@ -71,7 +71,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_viewPanel (new QTabWidget()),
     m_browser (new WebKit()),
     m_map (new GraphView(m_cdata, this)),
-    m_tree (new SvNavigatorTree()),
+    m_tree (new SvNavigatorTree(m_cdata)),
     m_msgConsole(new MsgConsole(this)),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     m_bxSourceSelection(new QComboBox()),
@@ -119,9 +119,9 @@ void GuiDashboard::load(const QString& _file)
   Parser parser(m_config, m_cdata);
   parser.process(true);
   parser.computeNodeCoordinates(0);
-
-  m_tree->clear();
-  m_tree->addTopLevelItem(m_cdata->tree_items[utils::ROOT_ID]);
+  m_tree->build();
+  //  m_tree->clear();
+  //  m_tree->addTopLevelItem(m_cdata->tree_items[utils::ROOT_ID]);
   //FIXME: m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
   m_map->drawMap();
 
@@ -232,10 +232,10 @@ void GuiDashboard::finalizeUpdate(const SourceT& src)
 
 void GuiDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
 {
-  auto tnode_it = m_cdata->tree_items.find(_node.id);
-  if (tnode_it != m_cdata->tree_items.end()) {
-    (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.severity));
-    (*tnode_it)->setToolTip(0, _tip);
+  QTreeWidgetItem* item = m_tree->findNodeItem(_node.id);
+  if (item) {
+    item->setIcon(0, utils::computeCriticityIcon(_node.severity));
+    item->setToolTip(0, _tip);
   }
 }
 

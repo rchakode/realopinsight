@@ -252,7 +252,7 @@ typedef QHash<QString, CheckT> CheckListT;
 typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
 typedef QHash<QString, QStringList> HostListT;
-typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
+typedef QHash<QString, QTreeWidgetItem*> GuiTreeItemListT;
 typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
@@ -261,7 +261,6 @@ struct CoreDataT {
   NodeListT cnodes;
   CheckStatusCountT check_status_count;
   HostListT hosts;
-  TreeNodeItemListT tree_items;
   QSet<QString> sources;
   StringListT edges;
   double map_height;

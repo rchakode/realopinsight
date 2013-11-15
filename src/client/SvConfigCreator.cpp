@@ -41,7 +41,7 @@ SvCreator::SvCreator(const qint32& _userRole)
     m_settings(new Settings()),
     m_cdata(new CoreDataT()),
     m_mainSplitter(new QSplitter(this)),
-    m_tree(new SvNavigatorTree(true)),
+    m_tree(new SvNavigatorTree(m_cdata, true)),
     m_editor(new ServiceEditor()),
     m_menuBar(new QMenuBar(this)),
     m_toolBar(new QToolBar("Tool Bar")),
@@ -128,7 +128,7 @@ void SvCreator::loadFile(const QString& _path)
       utils::alert(tr("Unable to open the file '%1'").arg(_path));
       exit(1);
     }
-    m_tree->update(m_cdata);
+    m_tree->update();
     m_activeConfig = utils::getAbsolutePath(_path);
     setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   }
@@ -146,10 +146,11 @@ void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
     utils::clear(*m_cdata);
+    m_tree->resetData();
     NodeT* node = createNode(utils::ROOT_ID, tr("New View"), "");
-    m_cdata->bpnodes.insert(node->id,*node);
-    SvNavigatorTree::addNode(m_cdata->tree_items,*node);
-    m_tree->update(m_cdata);
+    m_cdata->bpnodes.insert(node->id, *node);
+    m_tree->addNode(*node);
+    m_tree->update();
     m_editor->setContent(*node);
     m_selectedNode = node->id;
     m_hasLeftUpdates = true;
@@ -199,10 +200,10 @@ void SvCreator::insertFromSelected(const NodeT& node)
     return;
   }
   pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? Parser::CHILD_SEP%node.id : node.id;
-  SvNavigatorTree::addNode(m_cdata->tree_items, node, true);
+  QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
   m_cdata->bpnodes.insert(node.id, node);
-  m_tree->setCurrentItem(m_cdata->tree_items[node.id]);
-  fillEditorFromService(m_cdata->tree_items[node.id]);
+  m_tree->setCurrentItem(lastItem);
+  fillEditorFromService(lastItem);
 }
 
 
@@ -233,10 +234,10 @@ void SvCreator::deleteNode(const QString& _nodeId)
       deleteNode(checkId);
     }
   }
-  TreeNodeItemListT::iterator item = m_cdata->tree_items.find(_nodeId);
-  TreeNodeItemListT::iterator pItem = m_cdata->tree_items.find(node->parent);
-  if (pItem != m_cdata->tree_items.end() &&
-      item != m_cdata->tree_items.end()) {
+
+  QTreeWidgetItem* item = m_tree->findNodeItem(_nodeId);
+  QTreeWidgetItem* pItem = m_tree->findNodeItem(node->parent);
+  if (pItem && item) {
     QRegExp regex("|^" + _nodeId + Parser::CHILD_SEP +
                   "|^" + _nodeId + "$" +
                   "|" + Parser::CHILD_SEP  + _nodeId);
@@ -250,9 +251,9 @@ void SvCreator::deleteNode(const QString& _nodeId)
     } else {
       m_cdata->bpnodes.remove(_nodeId);
     }
-    m_cdata->tree_items.remove(_nodeId);
+    m_tree->removeNodeItem(_nodeId);
     QTreeWidgetItem* obsolete = NULL;
-    if ((obsolete = (*pItem)->takeChild((*pItem)->indexOfChild(*item))))
+    if ((obsolete = pItem->takeChild(pItem->indexOfChild(item))))
       delete obsolete;
   }
 }
@@ -284,7 +285,7 @@ void SvCreator::pasteFromSelected(void)
 void SvCreator::save(void)
 {
   if (!m_selectedNode.isEmpty()) {
-    fillEditorFromService(m_cdata->tree_items[m_selectedNode]);
+    fillEditorFromService(m_tree->findNodeItem(m_selectedNode));
   }
   if (m_activeConfig.isEmpty()) {
     saveAs();
@@ -300,9 +301,9 @@ void SvCreator::saveAs(void)
                                               tr("Select the destination file | %1").arg(APP_NAME),
                                               m_activeConfig,
                                               QString("%1;;%2;;%3;;%4;;").arg(NAG_SOURCE,
-                                                                          ZBX_SOURCE,
-                                                                          ZNS_SOURCE,
-                                                                          MULTI_SOURCES),
+                                                                              ZBX_SOURCE,
+                                                                              ZNS_SOURCE,
+                                                                              MULTI_SOURCES),
                                               &filter);
 
   if (path.isNull()) {
@@ -367,10 +368,10 @@ void SvCreator::handleSelectedNodeChanged(void)
 
 void SvCreator::handleTreeNodeMoved(QString _node_id)
 {
-  TreeNodeItemListT::iterator tnodeIt =  m_cdata->tree_items.find(_node_id);
-  if (tnodeIt != m_cdata->tree_items.end()) {
+  QTreeWidgetItem* item =  m_tree->findNodeItem(_node_id);
+  if (item) {
 
-    QTreeWidgetItem* tnodeP = (*tnodeIt)->parent();
+    QTreeWidgetItem* tnodeP = item->parent();
     if (tnodeP) {
       NodeListT::iterator nodeIt = m_cdata->bpnodes.find(_node_id);
 
@@ -406,7 +407,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         //TODO: A bug has been reported
         node->child_nodes.clear();
         if (m_editor->updateNode(node)) {
-          m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+          m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
           setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
@@ -418,7 +419,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
       } else {
         if (m_editor->updateNode(node)) {
-          m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+          m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
           setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
@@ -445,7 +446,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
   NodeListT::iterator node;
   if (utils::findNode(m_cdata, m_selectedNode, node)) {
     if (m_editor->updateNode(node)) {
-      m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+      m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");
       setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
@@ -461,7 +462,7 @@ void SvCreator::handleReturnPressed(void)
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
     if (m_editor->updateNode(node)) {
-      m_cdata->tree_items[m_selectedNode]->setText(0, node->name);
+      m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");
       setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));

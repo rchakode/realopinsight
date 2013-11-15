@@ -57,11 +57,11 @@ QString utils::criticityToText(const qint32& _status)
   return QObject::tr("Unknown");
 }
 
-void utils::clear(CoreDataT& data)
+void utils::clear(CoreDataT& _cdata)
 {
-  data.cnodes.clear();
-  data.bpnodes.clear();
-  data.tree_items.clear();
+  _cdata.cnodes.clear();
+  _cdata.bpnodes.clear();
+  _cdata.edges.clear();
 }
 
 QString utils::getAbsolutePath(const QString& _path)
@@ -438,13 +438,3 @@ void utils::alert(const QString & msg)
   //QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
 }
 
-
-
-Wt::WStandardItem* utils::createItem(const NodeT& _node)
-{
-  Wt::WStandardItem* item = new Wt::WStandardItem();
-  item->setText(Wt::WString(_node.name.toStdString()));
-  item->setIcon("images/built-in/unknown.png");
-  item->setData(_node.id, Wt::UserRole);
-  return item;
-}

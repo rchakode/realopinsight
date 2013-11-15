@@ -47,12 +47,12 @@ void WebTree::build(void)
   /* Create a item for each individual service */
   for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();
       node != end; ++node) {
-    m_items.insert(node->id, utils::createItem(*node));
+    m_items.insert(node->id, WebTree::createItem(*node));
   }
 
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();
       node != end; ++node) {
-    m_items.insert(node->id, utils::createItem(*node));
+    m_items.insert(node->id, WebTree::createItem(*node));
   }
 
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
@@ -69,3 +69,11 @@ void WebTree::build(void)
 }
 
 
+Wt::WStandardItem* WebTree::createItem(const NodeT& _node)
+{
+  Wt::WStandardItem* item = new Wt::WStandardItem();
+  item->setText(Wt::WString(_node.name.toStdString()));
+  item->setIcon("images/built-in/unknown.png");
+  item->setData(_node.id, Wt::UserRole);
+  return item;
+}

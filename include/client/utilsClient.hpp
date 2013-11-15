@@ -71,7 +71,7 @@ namespace utils
   { return qtPath.mid(1, -1).toStdString(); }
 
   QString criticityToText(const qint32& _status);
-  void clear(CoreDataT& data);
+  void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
   int computePropCriticity(const qint8& _criticity, const qint8& propRule);
@@ -103,7 +103,7 @@ namespace utils
 
 
   void alert(const QString & msg);
-  Wt::WStandardItem* createItem(const NodeT& _node);
+  QTreeWidgetItem * createItem(const NodeT & _node);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

@@ -115,7 +115,6 @@ bool Parser::process(bool console)
   }
 
   updateNodeHierachy(graphContent);
-  buildNodeTree();
   graphContent = m_dotHeader + graphContent;
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
@@ -152,31 +151,31 @@ void Parser::updateNodeHierachy(QString& _graphContent)
   }
 }
 
-void Parser::buildNodeTree(void)
-{
-  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
-       node!=end; ++node) { m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node)); }
+//void Parser::buildNodeTree(void)
+//{
+//  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
+//       node!=end; ++node) { m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node)); }
 
-  for (NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
-       node!=end; ++node) {m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node));}
+//  for (NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
+//       node!=end; ++node) {m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node));}
 
-  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
-       node!=end; ++node)
-  {
-    if (node->child_nodes.isEmpty()) continue;
-    auto treeItem = m_cdata->tree_items.find(node->id);
-    if (treeItem == m_cdata->tree_items.end()) {
-      utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
-      continue;
-    }
-    QStringList ids = node->child_nodes.split(CHILD_SEP);
-    foreach (const QString& id, ids) {
-      auto child = m_cdata->tree_items.find(id);
-      if (child != m_cdata->tree_items.end())
-        (*treeItem)->addChild(*child);
-    }
-  }
-}
+//  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
+//       node!=end; ++node)
+//  {
+//    if (node->child_nodes.isEmpty()) continue;
+//    auto treeItem = m_cdata->tree_items.find(node->id);
+//    if (treeItem == m_cdata->tree_items.end()) {
+//      utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
+//      continue;
+//    }
+//    QStringList ids = node->child_nodes.split(CHILD_SEP);
+//    foreach (const QString& id, ids) {
+//      auto child = m_cdata->tree_items.find(id);
+//      if (child != m_cdata->tree_items.end())
+//        (*treeItem)->addChild(*child);
+//    }
+//  }
+//}
 
 void Parser::saveCoordinatesFile(const QString& _content)
 {
@@ -222,7 +221,6 @@ void Parser::computeNodeCoordinates(const QString& _plainDot, int wt)
       splitedLine = line.split (regexSep);
       m_cdata->map_width = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
       m_cdata->map_height = splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
-      qDebug() << m_cdata->map_width << m_cdata->map_height;
     }
 
     while (line = coodFileStream.readLine(0), ! line.isNull()) {

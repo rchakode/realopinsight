@@ -48,18 +48,15 @@ WebMap::~WebMap()
   m_icons.clear();
 }
 
-void WebMap::drawMap(const double& _width, const double& _height, const bool& _init)
-{;
-  width = _width;
-  height = _height;
-
+void WebMap::drawMap(const bool& _init)
+{
   if(_init) {
-    scaleX = layoutWidth/width;
+    scaleX = layoutWidth/m_cdata->map_width;
     scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * scaleX;
   }
 
   Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(width * scaleX, height * scaleY );
+  Wt::WPaintedWidget::resize(m_cdata->map_width * scaleX, m_cdata->map_height * scaleY );
 }
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)

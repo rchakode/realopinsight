@@ -50,6 +50,8 @@ private:
   Wt::WStandardItemModel* m_model;
   CoreDataT* m_cdata;
   WebTreeItemsT m_items;
+
+  Wt::WStandardItem* createItem(const NodeT& _node);
 };
 
 #endif /* WEBSERVICETREE_HPP */

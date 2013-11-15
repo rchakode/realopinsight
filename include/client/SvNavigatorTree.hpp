@@ -32,10 +32,15 @@ class SvNavigatorTree : public QTreeWidget
   Q_OBJECT
 
 public:
-  SvNavigatorTree(const bool & =false, QWidget* = 0 );
-  static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
-  void update(CoreDataT * & _cdata) ;
-  static QTreeWidgetItem * createTreeItem(const NodeT & _node);
+  SvNavigatorTree(CoreDataT* _cdata, const bool& _enableDrag=false, QWidget* = 0 );
+
+  void update(void) ;
+
+  void resetData(void) {m_items.clear();}
+  void build(void);
+  QTreeWidgetItem* addNode(const NodeT &, const bool & = false );
+  QTreeWidgetItem* findNodeItem(const QString& _nodeId);
+  void removeNodeItem(const QString& _nodeId) {m_items.remove(_nodeId);}
 
 signals:
   void treeNodeMoved( QString _nodeId ) ;
@@ -48,6 +53,9 @@ protected:
 private:
   QString m_selectedNode ;
   CoreDataT* m_cdata ;
+  GuiTreeItemListT m_items;
+
+   QTreeWidgetItem * createItem(const NodeT & _node);
 };
 
 #endif /* SNAVSVNAVIGATORTREE_H_ */

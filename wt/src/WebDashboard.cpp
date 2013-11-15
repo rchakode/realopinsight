@@ -139,7 +139,7 @@ void WebDashboard::load(const QString& _file)
   parser.process(true);
   parser.computeNodeCoordinates(1);
   m_tree->build();
-  m_map->drawMap(m_cdata->map_width, m_cdata->map_height, false);
+  m_map->drawMap(false);
   updateViews();
 }
 

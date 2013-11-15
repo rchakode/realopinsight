@@ -40,9 +40,7 @@ class WebMap : public Wt::WPaintedWidget
 public:
   WebMap(CoreDataT* _cdata);
   virtual ~WebMap();
-  void setWidth(const double& _width) {width =  _width;}
-  void setHeight(const double& _height) {height =  _height;}
-  void drawMap(const double& _width, const double& _height, const bool& _init);
+  void drawMap(const bool& _init);
 
 //public slots:
 //  void msgPanelSizedChanged(int width);
@@ -52,8 +50,6 @@ protected:
 
 private:
   CoreDataT* m_cdata;
-  double width;
-  double height;
   double scaleX;
   double scaleY;
   double layoutWidth;
