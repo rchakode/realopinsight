@@ -77,20 +77,20 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
   //emit sizeChanged(width, height);
 }
 
-void WebMsgConsole::update(const NodeListT& _aservices)
+void WebMsgConsole::update(const NodeListT& _cnodes)
 {
-  for(NodeListT::ConstIterator srvIt = _aservices.begin(); srvIt != _aservices.end(); srvIt++){
-    addMsg(*srvIt);
+  for(NodeListT::ConstIterator node = _cnodes.begin(); node != _cnodes.end(); node++){
+    addMsg(*node);
   }
 }
 
-void WebMsgConsole::addMsg(const NodeT&  _service)
+void WebMsgConsole::addMsg(const NodeT&  _node)
 {
-  m_model->setItem(m_rowCount, 0, createDateTimeItem(_service.check.last_state_change));
-  m_model->setItem(m_rowCount, 1, new Wt::WStandardItem(_service.check.host));
-  m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_service.name.toStdString()));
-  m_model->setItem(m_rowCount, 3, createItatusItem(_service.check.status));
-  m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(_service.alarm_msg.toStdString()));
+  m_model->setItem(m_rowCount, 0, createDateTimeItem(_node.check.last_state_change));
+  m_model->setItem(m_rowCount, 1, new Wt::WStandardItem(_node.check.host));
+  m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_node.name.toStdString()));
+  m_model->setItem(m_rowCount, 3, createItatusItem(_node.check.status));
+  m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(_node.alarm_msg.toStdString()));
 
   ++m_rowCount;
 }

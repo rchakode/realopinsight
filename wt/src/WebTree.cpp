@@ -23,10 +23,12 @@
  */
 
 #include "WebTree.hpp"
+#include "utilsClient.hpp"
 
-Ngrt4nServiceTree::Ngrt4nServiceTree()
+WebTree::WebTree(CoreDataT* _cdata)
   : Wt::WTreeView(0),
-  renderingModel (new Wt::WStandardItemModel())
+    m_model (new Wt::WStandardItemModel()),
+    m_cdata(_cdata)
 {
   setHeaderHeight(0);
   setSelectionMode(Wt::SingleSelection);
@@ -34,18 +36,36 @@ Ngrt4nServiceTree::Ngrt4nServiceTree()
   setSelectionBehavior(Wt::SelectItems);
 }
 
-Ngrt4nServiceTree::~Ngrt4nServiceTree()
+WebTree::~WebTree()
 {
-  delete renderingModel;
+  delete m_model;
 }
 
 
-Wt::WStandardItem* Ngrt4nServiceTree::createItem(const NodeT& _service)
+void WebTree::build(void)
 {
-  Wt::WStandardItem* item = new Wt::WStandardItem();
-  item->setText(_service.name.toStdString());
-//  item->setIcon("icons/built-in/unknown.png");
-//  item->setData(_service.id, Wt::UserRole);
-  return item;
+  /* Create a item for each individual service */
+  for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();
+      node != end; ++node) {
+    m_items.insert(node->id, utils::createItem(*node));
+  }
+
+  for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();
+      node != end; ++node) {
+    m_items.insert(node->id, utils::createItem(*node));
+  }
+
+  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
+       edge != end; ++edge) {
+    WebTreeItemsT::iterator parent = m_items.find(edge.key());
+    WebTreeItemsT::iterator child = m_items.find(edge.value());
+
+    if (parent != m_items.end() && child != m_items.end()) {
+      parent.value()->appendRow(child.value());
+    }
+  }
+
+  update(m_items[utils::ROOT_ID]);
 }
+
 

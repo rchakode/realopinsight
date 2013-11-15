@@ -192,7 +192,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
   file.close();
 }
 
-void Parser::computeNodeCoordinates(void)
+void Parser::computeNodeCoordinates(int wt)
 {
   auto process = std::unique_ptr<QProcess>(new QProcess());
   QString plainDotFile = m_dotFile%".plain";
@@ -200,7 +200,7 @@ void Parser::computeNodeCoordinates(void)
   int exitCode = process->execute("dot", arguments);
   process->waitForFinished(60000);
   if (!exitCode) {
-    computeNodeCoordinates(plainDotFile);
+    computeNodeCoordinates(plainDotFile, wt);
   } else {
     utils::alert(QObject::tr("The graph engine exited with the code %1").arg(exitCode));
     exit(exitCode);
@@ -208,7 +208,7 @@ void Parser::computeNodeCoordinates(void)
   process.reset(NULL);
 }
 
-void Parser::computeNodeCoordinates(const QString& _plainDot)
+void Parser::computeNodeCoordinates(const QString& _plainDot, int wt)
 {
   QStringList splitedLine;
   QFile qfile(_plainDot);
@@ -220,10 +220,6 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
     //First parse the header
     if(line = coodFileStream.readLine(0), ! line.isNull()) {
       splitedLine = line.split (regexSep);
-//      if (splitedLine[0] != "graph") {
-//        std::cerr << "The syntax of the generated graph file is wrong " << dotCoordinates.str() <<"\n" ;
-//        return false ;
-//      }
       m_cdata->map_width = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
       m_cdata->map_height = splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
       qDebug() << m_cdata->map_width << m_cdata->map_height;
@@ -236,7 +232,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
         QString nid = splitedLine[1].trimmed();
         if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
           node->label_x = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
-          node->label_y = -1 * splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
+          node->label_y = wt * m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
         m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);

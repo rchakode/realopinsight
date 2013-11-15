@@ -118,7 +118,7 @@ void GuiDashboard::load(const QString& _file)
 
   Parser parser(m_config, m_cdata);
   parser.process(true);
-  parser.computeNodeCoordinates();
+  parser.computeNodeCoordinates(0);
 
   m_tree->clear();
   m_tree->addTopLevelItem(m_cdata->tree_items[utils::ROOT_ID]);

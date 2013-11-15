@@ -25,6 +25,7 @@
 #include "StatsLegend.hpp"
 #include "utilsClient.hpp"
 #include <QFileInfo>
+#include <Wt/WString>
 //FIXME: #include <Wt/WMessageBox>
 //#include <Wt/WMessageBox>
 
@@ -435,4 +436,15 @@ void utils::alert(const QString & msg)
 //                                     Wt::Ok | Wt::Cancel);
 //  result.show();
   //QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
+}
+
+
+
+Wt::WStandardItem* utils::createItem(const NodeT& _node)
+{
+  Wt::WStandardItem* item = new Wt::WStandardItem();
+  item->setText(Wt::WString(_node.name.toStdString()));
+  item->setIcon("images/built-in/unknown.png");
+  item->setData(_node.id, Wt::UserRole);
+  return item;
 }

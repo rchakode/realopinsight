@@ -67,6 +67,9 @@ namespace utils
   inline QString realCheckId(const QString& srcid, const QString& chkid)
   { return QString("%1:%2").arg(srcid, chkid);}
 
+  inline std::string getResourcePath(const QString& qtPath)
+  { return qtPath.mid(1, -1).toStdString(); }
+
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
   QString getAbsolutePath(const QString& _path);
@@ -97,7 +100,10 @@ namespace utils
   QString getNodeToolTip(const NodeT& _node);
 
   IconMapT nodeIcons();
+
+
   void alert(const QString & msg);
+  Wt::WStandardItem* createItem(const NodeT& _node);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

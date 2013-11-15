@@ -40,7 +40,7 @@
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
-    m_tree(new TreeNodeItemListT()),
+    m_tree(new WebTree(m_cdata)),
     m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole())
 {
@@ -76,7 +76,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   rightLayout->setSpacing(1);
 
   treePanel->setTitle(QObject::tr("Message Console").toStdString());
-  //FIXME: treePanel->setCentralWidget(navTree);
+  treePanel->setCentralWidget(m_tree);
   leftLayout->addWidget(treePanel);
   leftContainer->setLayout(leftLayout);
   leftContainer->setOverflow(Wt::WContainerWidget::OverflowAuto);
@@ -137,17 +137,9 @@ void WebDashboard::load(const QString& _file)
 
   Parser parser(m_config, m_cdata);
   parser.process(true);
-  parser.computeNodeCoordinates();
-  //FIXME: m_tree->clear();
-  //FIXM: m_tree->addTopLevelItem(m_cdata->tree_items[SvNavigatorTree::RootId]);
-  //FIXME: m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
+  parser.computeNodeCoordinates(1);
+  m_tree->build();
   m_map->drawMap(m_cdata->map_width, m_cdata->map_height, false);
-
-//  m_root = m_cdata->bpnodes.find(SvNavigatorTree::RootId);
-//  if (m_root == m_cdata->bpnodes.end()) {
-//    utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
-//    exit(1);
-//  }
   updateViews();
 }
 
@@ -172,61 +164,30 @@ void WebDashboard::updateMap(const NodeListT::iterator& _node, const QString& _t
   qDebug() << _node->name << _tip;
 }
 
-bool WebDashboard::buildNavTreeModel()
-{
-  //  Ngrt4nViewItemListT nav_tree_items; /* Store the set of items */
-
-  //  /* Create a item for each individual service */
-  //  for(ServiceIteratorT service  = data.bpnodes.begin(); service != data.bpnodes.end(); ++service) {
-  //    service->second.navt_item = NodeTree::createItem(service->second);
-  //    nav_tree_items.insert(pair<string, WStandardItem*>(service->second.id, service->second.navt_item));
-  //  }
-
-  //  for(ServiceIteratorT service  = data.cnodes.begin(); service != data.cnodes.end(); ++service) {
-  //    service->second.navt_item = NodeTree::createItem(service->second);
-  //    nav_tree_items.insert(pair<string, WStandardItem*>(service->second.id, service->second.navt_item));
-  //  }
-
-  //  /* Organize an hierarchy according to the mapping of services */
-  //  for(ServiceIteratorT service  = data.bpnodes.begin(); service != data.bpnodes.end(); ++service) {
-  //    if(service->second.id == "root") {
-  //      navTreeRoot = service->second.navt_item;
-  //    } else {
-  //      Ngrt4nViewItemListT::iterator p_it = nav_tree_items.find(service->second.parent);
-  //      p_it->second->appendRow(service->second.navt_item); /* Normally the search would have succeeded, according to the parsing step */
-  //    }
-  //  }
-
-  //  for(ServiceIteratorT service  = data.cnodes.begin(); service != data.cnodes.end(); ++service) {
-  //    Ngrt4nViewItemListT::iterator p_it = nav_tree_items.find(service->second.parent);
-  //    p_it->second->appendRow(service->second.navt_item); /* Normally the search would have succeeded, according to the parsing step */
-  //  }
-
-  return true;
-}
 
 
 void WebDashboard::updateViews(void)
 {
+  //FIXME: updateViews(void)
   //  updateServicesStatuses();
-  //  msgConsole->update(data.cnodes);
-  //  map->update(data.bpnodes, data.cnodes, mapWidth, mapHeight);
+  m_msgConsole->update(m_cdata->cnodes);
+  //  map->update(m_cdata->bpnodes, m_cdata->cnodes, mapWidth, mapHeight);
   //  navTree->update(navTreeRoot); updateServiceTree();
 }
 
-void WebDashboard::updateServicesStatuses()
+void WebDashboard::updateServicesStatuses(void)
 {
   //  //Fixme: loadConfig
-  //  //if (! Ngrt4nConfigParser::loadNagiosCollectedData("examples/status.dat", data.cnodes) ) return;
+  //  //if (! Ngrt4nConfigParser::loadNagiosCollectedData("examples/status.dat", m_cdata->cnodes) ) return;
   //  return; //FIXME:
 
-  //  for(ServiceIteratorT sIt  = data.bpnodes.begin(); sIt != data.bpnodes.end(); ++sIt) {
+  //  for(NodeListT sIt  = m_cdata->bpnodes.begin(); sIt != m_cdata->bpnodes.end(); ++sIt) {
   //    sIt->status_info.reset();
   //  }
 
-  //  for(NodeListT::Iterator sIt  = data.cnodes.begin(); sIt != data.cnodes.end(); ++sIt) {
+  //  for(NodeListT::Iterator sIt  = m_cdata->cnodes.begin(); sIt != m_cdata->cnodes.end(); ++sIt) {
   //    if(sIt->id != "root") {
-  //      ServiceIteratorT pIt = data.bpnodes.find(sIt->parent);
+  //      NodeListT pIt = m_cdata->bpnodes.find(sIt->parent);
   //      pIt->status_info |= sIt->status_info;
   //      updateParentStatus(*pIt);
   //    }
@@ -244,7 +205,7 @@ void WebDashboard::updateServiceTree(void)
 {
   //  string icon;
 
-  //  for(ServiceIteratorT sIt  = data.bpnodes.begin(); sIt != data.bpnodes.end(); ++sIt) {
+  //  for(NodeListT sIt  = m_cdata->bpnodes.begin(); sIt != m_cdata->bpnodes.end(); ++sIt) {
   //    icon = "icons/built-in/unknown.png";
   //    if( sIt->status_info[MonitorBroker::NagiosCritical] ){
   //      icon = "icons/built-in/critical.png";
@@ -256,7 +217,7 @@ void WebDashboard::updateServiceTree(void)
   //    sIt->navt_item->setIcon(icon);
   //  }
 
-  //  for(NodeListT::Iterator sIt  = data.cnodes.begin(); sIt != data.cnodes.end(); ++sIt) {
+  //  for(NodeListT::Iterator sIt  = m_cdata->cnodes.begin(); sIt != m_cdata->cnodes.end(); ++sIt) {
   //    icon = "icons/built-in/unknown.png";
   //    if(  sIt->status_info[MonitorBroker::NagiosCritical] ){
   //      icon = "icons/built-in/critical.png";

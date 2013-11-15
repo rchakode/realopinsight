@@ -32,23 +32,24 @@
 #include <Wt/WModelIndex>
 #include "Base.hpp"
 
-class Ngrt4nServiceTree : public Wt::WTreeView
+class WebTree : public Wt::WTreeView
 {
 public:
-  Ngrt4nServiceTree();
+  WebTree(CoreDataT* _cdata);
   virtual
-  ~Ngrt4nServiceTree();
+  ~WebTree();
 
-  Wt::WStandardItemModel* getRenderingModel(void) const {return renderingModel;}
-  void setRenderingModel(Wt::WStandardItem* _item) const {return renderingModel->appendRow(_item);}
-  static Wt::WStandardItem* createItem(const NodeT& _service);
+  Wt::WStandardItemModel* getRenderingModel(void) const {return m_model;}
+  void setRenderingModel(Wt::WStandardItem* _item) const {return m_model->appendRow(_item);}
 
-  void update(void) { setModel(renderingModel); expandToDepth(2);} //TODO check before
+  void build(void);
+  void update(void) { setModel(m_model); expandToDepth(2);} //TODO check before
   void update(Wt::WStandardItem * _rItem) { setRenderingModel(_rItem); update(); }
 
 private:
-  Wt::WStandardItemModel* renderingModel;
-
+  Wt::WStandardItemModel* m_model;
+  CoreDataT* m_cdata;
+  WebTreeItemsT m_items;
 };
 
 #endif /* WEBSERVICETREE_HPP */

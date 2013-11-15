@@ -37,8 +37,8 @@ public:
   virtual ~Parser();
 
   bool process(bool console);
-  void computeNodeCoordinates(void);
-  void computeNodeCoordinates(const QString& dotfile);
+  void computeNodeCoordinates(int wt);
+  void computeNodeCoordinates(const QString& dotfile, int wt);
   QString getDotGraphFile(void) const { return m_dotFile; }
   static const QString CHILD_SEP;
 

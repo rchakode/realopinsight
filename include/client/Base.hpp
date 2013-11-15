@@ -32,6 +32,8 @@
 #include <QSettings>
 #include <memory>
 
+#include <Wt/WStandardItem>
+
 #define INIT_TRANSLATION \
   QTranslator translator; \
   translator.load(QString(":i18n/ngrt4n_%1").arg(QLocale::system().name())); \
@@ -311,4 +313,7 @@ enum {
   XSCAL_FACTOR = 72,
   YSCAL_FACTOR = 100
 };
+
+
+typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
 #endif /* BASE_HPP */

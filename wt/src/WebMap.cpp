@@ -68,24 +68,23 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
   painter->scale(scaleX, scaleY);  //TODO Make it dynamic
   painter->setRenderHint(Wt::WPainter::Antialiasing);
 
+  // Draw edges
+  // Must to be drawn before the icon for hiding some technical details
+  for (StringListT::Iterator edge = m_cdata->edges.begin(), end = m_cdata->edges.end();
+       edge != end; ++edge) {
+    drawEdge(edge.key(), edge.value());
+  }
+
   /* Draw node related to business services */
-  for(NodeListT::Iterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
+  for(NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
       node != end; ++node) {
-    node->label_y += m_cdata->map_height;
     drawNode(*node);
   }
 
   /* Draw node related to alarm services */
-  for(NodeListT::Iterator node=m_cdata->cnodes.begin(),end=m_cdata->cnodes.end();
+  for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(),end=m_cdata->cnodes.end();
       node != end; ++node) {
-    node->label_y += m_cdata->map_height;
     drawNode(*node);
-  }
-
-  // Draw edges
-  for (StringListT::Iterator edge = m_cdata->edges.begin(), end = m_cdata->edges.end();
-       edge != end; ++edge) {
-    drawEdge(edge.key(), edge.value());
   }
 }
 
@@ -95,21 +94,26 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 void WebMap::drawNode(const NodeT& _node)
 {
   Wt::WPointF posIcon(_node.label_x,  _node.label_y);
-  Wt::WPointF posLabel(_node.label_x + 20, _node.label_y + 40); //20 = 40/2
-  Wt::WPointF posNavIcon(_node.label_x + 9, _node.label_y + 46); //10 + 40
+  Wt::WPointF posLabel(_node.label_x, _node.label_y); //20 = 40/2
+  Wt::WPointF posNavIcon(_node.label_x, _node.label_y); //10 + 40
 
-  // Draw icons and text
+  // Draw icon
   painter->drawImage(posIcon,
-                     Wt::WPainter::Image(m_icons[_node.icon].toStdString(),40,40)
+                     Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40)
                      );
+
+  // Draw anchor icon
+  if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
+    painter->drawImage(posNavIcon, Wt::WPainter::Image(utils::getResourcePath(m_icons[utils::MINUS]), 19, 18));
+  }
+
+  // Draw text
   painter->drawText(posLabel.x(), posLabel.y(),
                     Wt::WLength::Auto.toPixels(),
                     Wt::WLength::Auto.toPixels(),
                     Wt::AlignCenter,
                     Wt::WString(_node.name.toStdString()));
-  if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
-    painter->drawImage(posNavIcon, Wt::WPainter::Image(m_icons[utils::MINUS].toStdString(), 19, 18));
-  }
+
   createLink(_node);
 }
 
@@ -122,8 +126,6 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
   if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
       && utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child)) {
 
-    // Draw the edge from parent.
-    // Must to be drawn before the icon for hiding some technical details
     Wt::WPen pen;
     if(child->prop_sev == MonitorBroker::Critical){ //FIXME: child->prop_sev == MonitorBroker::Critical
       pen.setColor(Wt::red);
@@ -136,8 +138,8 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
     }
     painter->setPen(pen);
 
-    Wt::WPointF edgeP1(parent->label_x + 20, parent->label_y + 5);
-    Wt::WPointF edgeP2(child->label_x + 20, child->label_y + 64); // 46 + 18
+    Wt::WPointF edgeP1(parent->label_x, parent->label_y);
+    Wt::WPointF edgeP2(child->label_x, child->label_y); // 46 + 18
     painter->drawLine(edgeP1, edgeP2);
   }
 

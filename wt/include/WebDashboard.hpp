@@ -37,6 +37,7 @@
 #include "WebMap.hpp"
 #include <Wt/WLocalizedStrings>
 #include "DashboardBase.hpp"
+#include "WebTree.hpp"
 
 class WebDashboard : public DashboardBase
 {
@@ -54,14 +55,13 @@ protected:
 
 private:
   Wt::WContainerWidget* m_widget;
-  TreeNodeItemListT* m_tree;
+  WebTree* m_tree;
   WebMap* m_map;
   WebMsgConsole* m_msgConsole;
 
   Wt::WContainerWidget* createMenuBarWidget(void);
-  bool buildNavTreeModel();
-  void updateViews();
-  void updateServicesStatuses();
+  void updateViews(void);
+  void updateServicesStatuses(void);
   void updateParentStatus(const NodeT& _service);
   void updateServiceTree(void);
 };
