@@ -55,7 +55,7 @@ private:
   CoreDataT* m_cdata ;
   GuiTreeItemListT m_items;
 
-   QTreeWidgetItem * createItem(const NodeT & _node);
+  QTreeWidgetItem * createItem(const NodeT & _node);
 };
 
 #endif /* SNAVSVNAVIGATORTREE_H_ */

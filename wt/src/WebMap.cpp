@@ -28,11 +28,15 @@
 #include "MonitorBroker.hpp"
 #include "utilsClient.hpp"
 
+namespace {
+  const double MAP_PADDING = 40;
+}
+
 WebMap::WebMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
     m_cdata(_cdata),
-    scaleX (1),
-    scaleY(1),
+    m_scaleX (1),
+    m_scaleY(1),
     layoutWidth(0),
     layoutHeight(0),
     m_icons(utils::nodeIcons())
@@ -51,18 +55,19 @@ WebMap::~WebMap()
 void WebMap::drawMap(const bool& _init)
 {
   if(_init) {
-    scaleX = layoutWidth/m_cdata->map_width;
-    scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * scaleX;
+    m_scaleX = layoutWidth/m_cdata->map_width;
+    m_scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * m_scaleX;
   }
 
   Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width * scaleX, m_cdata->map_height * scaleY );
+  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX + MAP_PADDING,
+                             m_cdata->map_height * m_scaleY + MAP_PADDING);
 }
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
   painter = new Wt::WPainter(_pdevice);
-  painter->scale(scaleX, scaleY);  //TODO Make it dynamic
+  painter->scale(m_scaleX, m_scaleY);  //TODO Make it dynamic
   painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Draw edges
@@ -142,22 +147,16 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
 
 }
 
-void WebMap::createLink(const NodeT& _service)
+void WebMap::createLink(const NodeT& _node)
 {
-  std::ostringstream tip;
-  //  double x = _service.label_x * scaleX;
-  //  double y = _service.label_y * scaleY;
-  //  double width = 40.0 * scaleX;
-  //  double height = 60.0 * scaleY;
-  //  Wt::WRectArea *area = new Wt::WRectArea(x, y, width, height);
-
-  tip << "Service : " << _service.name.toStdString() << " ";
-  //  //FIXME:    << "\nStatus : " << Ngrt4nConfigParser::statusToString(_service.status_info) << " "
-  //      << "\nDetails : " << _service.msg;
-
-  //  area->setToolTip(tip.str());
-  //  area->setLink("http://ngrt4n.com");
-  //  addArea(area);
+  double x = _node.label_x * m_scaleX;
+  double y = _node.label_y * m_scaleY;
+  double width = 40.0 * m_scaleX;
+  double height = 40.0 * m_scaleY;
+  Wt::WRectArea *area = new Wt::WRectArea(x, y, width, height);
+  area->setToolTip(utils::getNodeToolTip(_node).toStdString());
+  area->setLink("#");
+  addArea(area);
 }
 
 //FIXME: void WebMap::msgPanelSizedChanged(int width)

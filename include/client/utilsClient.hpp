@@ -101,9 +101,7 @@ namespace utils
 
   IconMapT nodeIcons();
 
-
   void alert(const QString & msg);
-  QTreeWidgetItem * createItem(const NodeT & _node);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

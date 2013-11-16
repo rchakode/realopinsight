@@ -37,21 +37,42 @@ WebMsgConsole::WebMsgConsole()
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
   m_model = new Wt::WStandardItemModel(2, 5);
-  m_model->setHeaderData(0, Wt::Horizontal,
-                                std::string("images/built-in/tbv-date.gif"),
-                                Wt::DecorationRole);
-  m_model->setHeaderData(1,Wt::Horizontal,
-                                std::string("images/built-in/tbv-host.gif"),
-                                Wt::DecorationRole);
-  m_model->setHeaderData(2, Wt::Horizontal,
-                                std::string("images/built-in/tbv-service.gif"),
-                                Wt::DecorationRole);
-  m_model->setHeaderData(3, Wt::Horizontal,
-                                std::string("images/built-in/tbv-status.gif"),
-                                Wt::DecorationRole);
-  m_model->setHeaderData(4, Wt::Horizontal,
-                                std::string("images/built-in/tbv-message.gif"),
-                                Wt::DecorationRole);
+  //    m_model->setHeaderData(0, Wt::Horizontal,
+  //                                  std::string("images/built-in/tbv-date.gif"),
+  //                                  Wt::DecorationRole);
+  //    m_model->setHeaderData(1,Wt::Horizontal,
+  //                                  std::string("images/built-in/tbv-host.gif"),
+  //                                  Wt::DecorationRole);
+  //    m_model->setHeaderData(2, Wt::Horizontal,
+  //                                  std::string("images/built-in/tbv-service.gif"),
+  //                                  Wt::DecorationRole);
+  //    m_model->setHeaderData(3, Wt::Horizontal,
+  //                                  std::string("images/built-in/tbv-status.gif"),
+  //                                  Wt::DecorationRole);
+  //    m_model->setHeaderData(4, Wt::Horizontal,
+  //                                  std::string("images/built-in/tbv-message.gif"),
+  //                                  Wt::DecorationRole);
+
+  m_model->setHeaderData(0,
+                         Wt::Horizontal,
+                         QObject::tr("Timestamp").toStdString(),
+                         Wt::DisplayRole);
+  m_model->setHeaderData(1,
+                         Wt::Horizontal,
+                         QObject::tr("Hostname").toStdString(),
+                         Wt::DisplayRole);
+  m_model->setHeaderData(2,
+                         Wt::Horizontal,
+                         QObject::tr("Service").toStdString(),
+                         Wt::DisplayRole);
+  m_model->setHeaderData(3,
+                         Wt::Horizontal,
+                         QObject::tr("Status").toStdString(),
+                         Wt::DisplayRole);
+  m_model->setHeaderData(4,
+                         Wt::Horizontal,
+                         QObject::tr("Details").toAscii(),
+                         Wt::DisplayRole);
 
   SortingProxyModel* sortingProxy = new SortingProxyModel(this);
   sortingProxy->setSourceModel(m_model);

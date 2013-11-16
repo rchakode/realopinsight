@@ -50,8 +50,8 @@ protected:
 
 private:
   CoreDataT* m_cdata;
-  double scaleX;
-  double scaleY;
+  double m_scaleX;
+  double m_scaleY;
   double layoutWidth;
   double layoutHeight;
   Wt::WPainter* painter;

@@ -43,7 +43,7 @@ public:
   void setRenderingModel(Wt::WStandardItem* _item) const {return m_model->appendRow(_item);}
 
   void build(void);
-  void update(void) { setModel(m_model); expandToDepth(2);} //TODO check before
+  void update(void);
   void update(Wt::WStandardItem * _rItem) { setRenderingModel(_rItem); update(); }
 
 private:
@@ -52,6 +52,7 @@ private:
   WebTreeItemsT m_items;
 
   Wt::WStandardItem* createItem(const NodeT& _node);
+  Wt::WStandardItem* findNodeItem(const QString& _nodeId);
 };
 
 #endif /* WEBSERVICETREE_HPP */

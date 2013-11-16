@@ -44,14 +44,14 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
     m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole())
 {
-  Wt::WContainerWidget* leftContainer = new Wt::WContainerWidget();
-  Wt::WContainerWidget* rightContainer = new Wt::WContainerWidget();
+  Wt::WContainerWidget* treeContainer = new Wt::WContainerWidget();
+  Wt::WContainerWidget* mapMsgContainer = new Wt::WContainerWidget();
   Wt::WContainerWidget* mapContainer = new Wt::WContainerWidget();
   Wt::WContainerWidget* msgContainer = new Wt::WContainerWidget();
   Wt::WVBoxLayout* mainLayout = new Wt::WVBoxLayout();
   Wt::WHBoxLayout* centralLayout = new Wt::WHBoxLayout();
-  Wt::WVBoxLayout* leftLayout = new Wt::WVBoxLayout();
-  Wt::WVBoxLayout* rightLayout = new Wt::WVBoxLayout();
+  Wt::WVBoxLayout* treeLayout = new Wt::WVBoxLayout();
+  Wt::WVBoxLayout* rightVLayout = new Wt::WVBoxLayout();
   Wt::WVBoxLayout* mapLayout = new Wt::WVBoxLayout();
   Wt::WVBoxLayout* msgLayout = new Wt::WVBoxLayout();
   Wt::WScrollArea* mapScArea = new Wt::WScrollArea();
@@ -59,51 +59,53 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   Wt::WPanel* mapPanel = new Wt::WPanel();
   Wt::WPanel* msgPanel = new Wt::WPanel();
 
-  m_widget->setStyleClass("container");
-  leftContainer->setStyleClass("container");
-  rightContainer->setStyleClass("container");
-  mapContainer->setStyleClass("container");
-  msgContainer->setStyleClass("container");
+  m_widget->setStyleClass("maincontainer");
+  treeContainer->setStyleClass("panel");
+  mapMsgContainer->setStyleClass("panel");
+  mapContainer->setStyleClass("panel");
+  msgContainer->setStyleClass("panel");
 
   mainLayout->setContentsMargins(0, 0, 0, 0);
   centralLayout->setContentsMargins(0, 0, 0, 0);
-  leftLayout->setContentsMargins(0, 0, 0, 0);
-  rightLayout->setContentsMargins(0, 0, 0, 0);
+  treeLayout->setContentsMargins(0, 0, 0, 0);
+  rightVLayout->setContentsMargins(0, 0, 0, 0);
   mapLayout->setContentsMargins(0, 0, 0, 0);
   msgLayout->setContentsMargins(0, 0, 0, 0);
 
-  centralLayout->setSpacing(1);
-  rightLayout->setSpacing(1);
+  mainLayout->setSpacing(0);
+  centralLayout->setSpacing(0);
+  treeLayout->setSpacing(0);
+  rightVLayout->setSpacing(0);
+  mapLayout->setSpacing(0);
+  msgLayout->setSpacing(0);
 
-  treePanel->setTitle(QObject::tr("Message Console").toStdString());
   treePanel->setCentralWidget(m_tree);
-  leftLayout->addWidget(treePanel);
-  leftContainer->setLayout(leftLayout);
-  leftContainer->setOverflow(Wt::WContainerWidget::OverflowAuto);
-  leftContainer->resize(250, m_widget->height());
+  treeLayout->addWidget(treePanel);
+  treeContainer->setLayout(treeLayout);
+  treePanel->setTitle(QObject::tr("TV Explorer").toStdString());
 
-  mapPanel->setTitle(QObject::tr("TV Explorer").toStdString());
   mapScArea->setWidget(m_map);
   mapLayout->addWidget(mapScArea);
   mapContainer->setLayout(mapLayout);
   mapPanel->setCentralWidget(mapContainer);
+  mapPanel->setTitle(QObject::tr("Service Map").toStdString());
 
-  msgPanel->setTitle(QObject::tr("Message Console").toStdString());
   msgLayout->addWidget(m_msgConsole);
   msgContainer->setLayout(msgLayout);
   msgPanel->setCentralWidget(msgContainer);
+  msgPanel->setTitle(QObject::tr("Message Console").toStdString());
 
   //FIXME: connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
   //connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
 
-  rightContainer->setLayout(rightLayout);
-  rightLayout->addWidget(mapPanel);
-  rightLayout->addWidget(msgPanel);
-  rightLayout->setStretchFactor(mapPanel, 3);
-  rightLayout->setStretchFactor(msgPanel, 2);
+  mapMsgContainer->setLayout(rightVLayout);
+  rightVLayout->addWidget(mapPanel);
+  rightVLayout->addWidget(msgPanel);
+  rightVLayout->setStretchFactor(mapPanel, 3);
+  rightVLayout->setStretchFactor(msgPanel, 2);
 
-  centralLayout->addWidget(leftContainer, 1);
-  centralLayout->addWidget(rightContainer, 3);
+  centralLayout->addWidget(treeContainer, 1);
+  centralLayout->addWidget(mapMsgContainer, 3);
 
   mainLayout->addWidget(createMenuBarWidget(), 0);
   mainLayout->addLayout(centralLayout, 2);
@@ -112,8 +114,8 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   //FIXME: widget alignment
   centralLayout->setResizable(0);
   centralLayout->setResizable(1);
-  rightLayout->setResizable(0);
-  rightLayout->setResizable(1);
+  rightVLayout->setResizable(0);
+  rightVLayout->setResizable(1);
 
   load(_config);
 }
@@ -236,39 +238,39 @@ Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WHBoxLayout* layout(new Wt::WHBoxLayout());
   layout->setSpacing(0);
-  menuBar->setStyleClass("menubar");
+  //  menuBar->setStyleClass("menubar");
   layout->setSpacing(0);
   menuBar->setPadding(0, Wt::All);
   layout->setContentsMargins(0, 0, 0, 0);
 
   Wt::WPushButton *b(new Wt::WPushButton(QObject::tr("Refresh").toStdString()));
   b->setIcon("images/built-in/refresh.png");
-  b->setStyleClass("button");
+  //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Zoom in").toStdString());
-  b->setIcon("images/built-in/zoomin.png");
-  b->setStyleClass("button");
+  // b->setIcon("images/built-in/zoomin.png");
+  //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Zoom out").toStdString());
   b->setIcon("images/built-in/zoomout.png");
-  b->setStyleClass("button");
+  //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Save map").toStdString());
   b->setIcon("images/built-in/disket.png");
-  b->setStyleClass("button");
+  //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Help").toStdString());
   b->setIcon("images/built-in/help.png");
-  b->setStyleClass("button");
+  //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Quit").toStdString());
   b->setIcon("images/built-in/logout.png");
-  b->setStyleClass("button");
+  //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   menuBar->setLayout(layout);

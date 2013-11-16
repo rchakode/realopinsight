@@ -46,28 +46,35 @@ void WebTree::build(void)
 {
   /* Create a item for each individual service */
   for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();
-      node != end; ++node) {
-    m_items.insert(node->id, WebTree::createItem(*node));
+      node != end; ++node)
+  {
+    m_items.insertMulti(node->id, WebTree::createItem(*node));
   }
 
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();
-      node != end; ++node) {
-    m_items.insert(node->id, WebTree::createItem(*node));
+      node != end; ++node)
+  {
+    m_items.insertMulti(node->id, WebTree::createItem(*node));
   }
 
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) {
-    WebTreeItemsT::iterator parent = m_items.find(edge.key());
-    WebTreeItemsT::iterator child = m_items.find(edge.value());
-
-    if (parent != m_items.end() && child != m_items.end()) {
-      parent.value()->appendRow(child.value());
+       edge != end; ++edge)
+  {
+    Wt::WStandardItem* parent = findNodeItem(edge.key());
+    Wt::WStandardItem* child = findNodeItem(edge.value());
+    if (parent && child) {
+      parent->appendRow(child);
     }
   }
 
   update(m_items[utils::ROOT_ID]);
 }
 
+void WebTree::update(void)
+{
+  setModel(m_model);
+  expandToDepth(2); //TODO: check before
+}
 
 Wt::WStandardItem* WebTree::createItem(const NodeT& _node)
 {
@@ -77,3 +84,11 @@ Wt::WStandardItem* WebTree::createItem(const NodeT& _node)
   item->setData(_node.id, Wt::UserRole);
   return item;
 }
+
+Wt::WStandardItem* WebTree::findNodeItem(const QString& _nodeId)
+{
+  WebTreeItemsT::iterator tnode = m_items.find(_nodeId);
+
+  return (tnode != m_items.end())? *tnode : NULL;
+}
+

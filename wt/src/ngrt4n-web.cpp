@@ -1,11 +1,13 @@
 #include "WebUI.hpp"
+#include <Wt/WBootstrapTheme>
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
   WebUI* ui = new WebUI(env, "examples/small_hosting_platform.xml"); //FIXME:set config file
   ui->setTwoPhaseRenderingThreshold(0);
   ui->setTitle(ui->getConfig().toStdString());
-  ui->useStyleSheet(Wt::WApplication::appRoot() + "wt/resources/styles.css");
+ // ui->setTheme(new Wt::WBootstrapTheme());
+  ui->useStyleSheet(Wt::WApplication::appRoot() + "wt/resources/ngrt4n.css");
   ui->render();
   return ui;
 }

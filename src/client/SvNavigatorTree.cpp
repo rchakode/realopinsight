@@ -116,17 +116,19 @@ void SvNavigatorTree::build(void)
 {
   /* Create a item for each individual service */
   for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();
-      node != end; ++node) {
-    m_items.insert(node->id, SvNavigatorTree::createItem(*node));
+      node != end; ++node)
+  {
+    m_items.insertMulti(node->id, SvNavigatorTree::createItem(*node));
   }
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();
-      node != end; ++node) {
-    m_items.insert(node->id, SvNavigatorTree::createItem(*node));
+      node != end; ++node)
+  {
+    m_items.insertMulti(node->id, SvNavigatorTree::createItem(*node));
   }
 
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) {
-
+       edge != end; ++edge)
+  {
     QTreeWidgetItem* parent = findNodeItem(edge.key());
     QTreeWidgetItem* child = findNodeItem(edge.value());
 

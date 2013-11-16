@@ -56,17 +56,6 @@ body, html {
     position: relative;
 }
 
-/* This improves it on iPad and reduces artifacts on Safari.
-.Wt-animated > * {
-    -webkit-transform: translate3d(0,0,0);
-    -webkit-backface-visibility: hidden;
-}
-
-.Wt-animated h3 {
-    -webkit-transform: translate3d(0,0,0);
-}
-*/
-
 /*
  * WCalendar
  */
@@ -1046,17 +1035,17 @@ body.Wt-rtl .Wt-treeview .Wt-noexpand {
 
 .menubar .button {
 	background : #1E5A7A ;
-    background-repeat: no-repeat;*/
-    margin: 0px 0px ;
-    color : #FFFFFF;
-    padding: 0px 0px ;
+  background-repeat: no-repeat;
+  margin: 0px 0px ;
+  color : #FFFFFF;
+  padding: 0px 0px ;
 }
 
 .container {
-    margin: 0px ;
-    padding: 0px ;
-    width: 100% ;
-    height: 100%;
+  margin: 0px ;
+  padding: 0px ;
+  width: 100% ;
+  height: 100%;
 }
 
 .about {
