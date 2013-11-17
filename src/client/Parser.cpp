@@ -229,8 +229,8 @@ void Parser::computeNodeCoordinates(const QString& _plainDot, int wt)
         NodeListT::Iterator node;
         QString nid = splitedLine[1].trimmed();
         if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
-          node->label_x = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
-          node->label_y = wt * m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
+          node->pos_x = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
+          node->pos_y = wt * m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
         m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);

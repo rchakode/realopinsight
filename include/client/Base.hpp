@@ -240,8 +240,8 @@ struct NodeT {
   QString child_nodes;
   CheckT check;
   bool monitored;
-  double label_x;
-  double label_y;
+  double pos_x;
+  double pos_y;
 };
 
 typedef QMap<qint32, qint32> CheckStatusCountT;

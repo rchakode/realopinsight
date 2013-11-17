@@ -267,7 +267,7 @@ void GraphView::drawNode(const NodeT& _node)
   m_mnodes[_node.id].label->setToolTip(msg);
 
   //FIXME: setNodePos(nid, labelOrigin);
-  setNodePos(_node.id, QPointF(_node.label_x, _node.label_y));
+  setNodePos(_node.id, QPointF(_node.pos_x, _node.pos_y));
 }
 
 void GraphView::setNodePos(const QString& _nodeId, const QPointF& _pos)

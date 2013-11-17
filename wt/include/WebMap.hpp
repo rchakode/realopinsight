@@ -52,9 +52,9 @@ private:
   CoreDataT* m_cdata;
   double m_scaleX;
   double m_scaleY;
-  double layoutWidth;
-  double layoutHeight;
-  Wt::WPainter* painter;
+  double m_layoutWidth;
+  double m_layoutHeight;
+  Wt::WPainter* m_painter;
   IconMapT m_icons;
 
   void drawNode(const NodeT& _node);

@@ -249,7 +249,7 @@ Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Zoom in").toStdString());
-  // b->setIcon("images/built-in/zoomin.png");
+   b->setIcon("images/built-in/zoomin.png");
   //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
