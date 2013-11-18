@@ -44,7 +44,7 @@ class WebDashboard : public DashboardBase
 public:
   WebDashboard(const qint32& _userRole, const QString& _config);
   virtual ~WebDashboard();
-  Wt::WContainerWidget* getWidget(void) const {return m_widget;}
+  Wt::WContainerWidget* get(void) const {return m_widget;}
 
 protected:
   virtual void load(const QString& _file);

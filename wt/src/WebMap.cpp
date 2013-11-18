@@ -39,17 +39,21 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_scaleY(1),
     m_layoutWidth(0),
     m_layoutHeight(0),
-    m_icons(utils::nodeIcons())
+    m_icons(utils::nodeIcons()),
+    m_scrollArea(new Wt::WScrollArea())
 {
   setLayoutSizeAware(true);
-  setPreferredMethod(InlineSvgVml); //TODO do that according to the user agent
-  setInline(true);
+  setPreferredMethod(InlineSvgVml); //FIXME: do this according to the user agent
+//  setInline(true);
+  resize(m_cdata->map_width, m_cdata->map_height);
+  m_scrollArea->setWidget(this);
 }
 
 
 WebMap::~WebMap()
 {
   m_icons.clear();
+  delete m_scrollArea;
 }
 
 void WebMap::drawMap(const bool& _init)
@@ -88,6 +92,9 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
       node != end; ++node) {
     drawNode(*node);
   }
+
+  qDebug() << m_cdata->map_height << m_scrollArea->height().toPixels();
+  //m_scrollArea->setHeight(Wt::WLength(10, Wt::WLength::Pixel));
 }
 
 /**

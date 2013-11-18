@@ -29,7 +29,6 @@
 #include <Wt/WText>
 #include <Wt/WLink>
 #include <Wt/WImage>
-#include <Wt/WScrollArea>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -54,7 +53,6 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   Wt::WVBoxLayout* rightVLayout = new Wt::WVBoxLayout();
   Wt::WVBoxLayout* mapLayout = new Wt::WVBoxLayout();
   Wt::WVBoxLayout* msgLayout = new Wt::WVBoxLayout();
-  Wt::WScrollArea* mapScArea = new Wt::WScrollArea();
   Wt::WPanel* treePanel = new Wt::WPanel();
   Wt::WPanel* mapPanel = new Wt::WPanel();
   Wt::WPanel* msgPanel = new Wt::WPanel();
@@ -84,16 +82,15 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   treeContainer->setLayout(treeLayout);
   treePanel->setTitle(QObject::tr("TV Explorer").toStdString());
 
-  mapScArea->setWidget(m_map);
-  mapLayout->addWidget(mapScArea);
+  mapLayout->addWidget(m_map->get());
   mapContainer->setLayout(mapLayout);
   mapPanel->setCentralWidget(mapContainer);
-  mapPanel->setTitle(QObject::tr("Service Map").toStdString());
+ //mapPanel->setTitle(QObject::tr("Service Map").toStdString());
 
   msgLayout->addWidget(m_msgConsole);
   msgContainer->setLayout(msgLayout);
   msgPanel->setCentralWidget(msgContainer);
-  msgPanel->setTitle(QObject::tr("Message Console").toStdString());
+  //msgPanel->setTitle(QObject::tr("Message Console").toStdString());
 
   //FIXME: connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
   //connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
@@ -249,7 +246,7 @@ Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Zoom in").toStdString());
-   b->setIcon("images/built-in/zoomin.png");
+  b->setIcon("images/built-in/zoomin.png");
   //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 

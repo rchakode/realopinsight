@@ -25,13 +25,14 @@
 #ifndef WEBSERVICEMAP_HPP
 #define WEBSERVICEMAP_HPP
 
+#include "Base.hpp"
 #include <Wt/WPaintedWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/WPainter>
 #include <Wt/WObject>
 #include <Wt/WLength>
 #include <Wt/WSignal>
-#include "Base.hpp"
+#include <Wt/WScrollArea>
 
 class WebMap : public Wt::WPaintedWidget
 {
@@ -42,8 +43,11 @@ public:
   virtual ~WebMap();
   void drawMap(const bool& _init);
 
+  Wt::WScrollArea* get(void) const {return m_scrollArea;}
+
 //public slots:
 //  void msgPanelSizedChanged(int width);
+
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
@@ -56,6 +60,7 @@ private:
   double m_layoutHeight;
   Wt::WPainter* m_painter;
   IconMapT m_icons;
+  Wt::WScrollArea* m_scrollArea;
 
   void drawNode(const NodeT& _node);
   void drawEdge(const QString& _parentId, const QString& _childId);
