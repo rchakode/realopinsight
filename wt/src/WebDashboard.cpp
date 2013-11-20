@@ -70,12 +70,12 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   mapLayout->setContentsMargins(0, 0, 0, 0);
   msgLayout->setContentsMargins(0, 0, 0, 0);
 
-  mainLayout->setSpacing(0);
-  centralLayout->setSpacing(0);
-  treeLayout->setSpacing(0);
-  rightVLayout->setSpacing(0);
-  mapLayout->setSpacing(0);
-  msgLayout->setSpacing(0);
+  mainLayout->setSpacing(1);
+  centralLayout->setSpacing(1);
+  treeLayout->setSpacing(1);
+  rightVLayout->setSpacing(1);
+  mapLayout->setSpacing(1);
+  msgLayout->setSpacing(1);
 
   treePanel->setCentralWidget(m_tree);
   treeLayout->addWidget(treePanel);
@@ -92,23 +92,23 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   msgPanel->setCentralWidget(msgContainer);
   //msgPanel->setTitle(QObject::tr("Message Console").toStdString());
 
-  //FIXME: connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
-  //connect(m_msgConsole, SIGNAL(sizeChanged(int, int)), m_map, SLOT(msgPanelSizedChanged(int)));
-
   mapMsgContainer->setLayout(rightVLayout);
   rightVLayout->addWidget(mapPanel);
   rightVLayout->addWidget(msgPanel);
   rightVLayout->setStretchFactor(mapPanel, 3);
   rightVLayout->setStretchFactor(msgPanel, 2);
 
-  centralLayout->addWidget(treeContainer, 1);
-  centralLayout->addWidget(mapMsgContainer, 3);
+  centralLayout->addWidget(treeContainer);
+  centralLayout->addWidget(mapMsgContainer);
 
   mainLayout->addWidget(createMenuBarWidget(), 0);
   mainLayout->addLayout(centralLayout, 2);
   m_widget->setLayout(mainLayout);
 
   //FIXME: widget alignment
+  treeLayout->setResizable(0);
+  centralLayout->setResizable(0);
+  centralLayout->setResizable(1);
   centralLayout->setResizable(0);
   centralLayout->setResizable(1);
   rightVLayout->setResizable(0);
