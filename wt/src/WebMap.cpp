@@ -108,26 +108,23 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 void WebMap::drawNode(const NodeT& _node)
 {
   Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
-  Wt::WPointF posLabel(_node.pos_x, _node.pos_y);
+  Wt::WPointF posLabel(_node.pos_x, _node.pos_y + 9);
   Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15);
 
   // Draw icon
   m_painter->drawImage(posIcon,
                        Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40)
                        );
-
   // Draw anchor icon
   if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
     m_painter->drawImage(posExpIcon, Wt::WPainter::Image(utils::getResourcePath(m_icons[utils::MINUS]), 19, 18));
   }
-
   // Draw text
   m_painter->drawText(posLabel.x(), posLabel.y(),
                       Wt::WLength::Auto.toPixels(),
                       Wt::WLength::Auto.toPixels(),
                       Wt::AlignCenter,
                       Wt::WString(_node.name.toStdString()));
-
   createLink(_node);
 }
 
