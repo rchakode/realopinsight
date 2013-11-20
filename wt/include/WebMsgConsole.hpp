@@ -57,7 +57,7 @@ public:
   Wt::WStandardItemModel* getRenderingModel(void) const {return m_model;}
   void addMsg(const NodeT&  _node);
   void update(const NodeListT& _cnodes);
-  Wt::WStandardItem* createItatusItem(const int& _status);
+  Wt::WStandardItem* createStatusItem(const NodeT& _node);
   Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck);
 
 //signals:

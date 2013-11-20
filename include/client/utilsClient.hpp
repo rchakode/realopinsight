@@ -70,7 +70,7 @@ namespace utils
   inline std::string getResourcePath(const QString& qtPath)
   { return qtPath.mid(1, -1).toStdString(); }
 
-  QString criticityToText(const qint32& _status);
+  QString severity2Str(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);

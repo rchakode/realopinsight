@@ -35,7 +35,7 @@ namespace {
   const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
 }
 
-QString utils::criticityToText(const qint32& _status)
+QString utils::severity2Str(const qint32& _status)
 {
   switch(static_cast<MonitorBroker::SeverityT>(_status))
   {
@@ -372,7 +372,7 @@ QString utils::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            utils::criticityToText(_node.severity),
+                                            utils::severity2Str(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::ALARM_NODE)

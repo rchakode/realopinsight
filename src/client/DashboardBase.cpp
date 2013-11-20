@@ -885,7 +885,7 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            utils::criticityToText(_node.severity),
+                                            utils::severity2Str(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::ALARM_NODE)

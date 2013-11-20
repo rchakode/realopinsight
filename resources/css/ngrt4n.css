@@ -17,5 +17,26 @@ body, html {
 .panel {
   margin: 0px ;
   padding: 0px ;
+  border: none;
+}
+
+.severity-normal {
+  background-color: green; 
+}
+
+.severity-minor {
+  background-color: yellow; 
+}
+
+.severity-major {
+  background-color: orange; 
+}
+
+.severity-critical {
+  background: red; 
+}
+
+.severity-unknown {
+  background-color: gray; 
 }
 

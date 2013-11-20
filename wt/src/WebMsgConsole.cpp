@@ -23,6 +23,7 @@
  */
 
 #include "WebMsgConsole.hpp"
+#include "utilsClient.hpp"
 
 WebMsgConsole::WebMsgConsole()
   : WTableView(0),
@@ -36,50 +37,36 @@ WebMsgConsole::WebMsgConsole()
   setSelectionMode(Wt::SingleSelection);
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
-  m_model = new Wt::WStandardItemModel(2, 5);
-  //    m_model->setHeaderData(0, Wt::Horizontal,
-  //                                  std::string("images/built-in/tbv-date.gif"),
-  //                                  Wt::DecorationRole);
-  //    m_model->setHeaderData(1,Wt::Horizontal,
-  //                                  std::string("images/built-in/tbv-host.gif"),
-  //                                  Wt::DecorationRole);
-  //    m_model->setHeaderData(2, Wt::Horizontal,
-  //                                  std::string("images/built-in/tbv-service.gif"),
-  //                                  Wt::DecorationRole);
-  //    m_model->setHeaderData(3, Wt::Horizontal,
-  //                                  std::string("images/built-in/tbv-status.gif"),
-  //                                  Wt::DecorationRole);
-  //    m_model->setHeaderData(4, Wt::Horizontal,
-  //                                  std::string("images/built-in/tbv-message.gif"),
-  //                                  Wt::DecorationRole);
 
+  m_model = new Wt::WStandardItemModel(2, 5);
   m_model->setHeaderData(0,
                          Wt::Horizontal,
-                         QObject::tr("Timestamp").toStdString(),
+                         QObject::tr("Date & Hour").toStdString(),
                          Wt::DisplayRole);
   m_model->setHeaderData(1,
                          Wt::Horizontal,
-                         QObject::tr("Hostname").toStdString(),
+                         QObject::tr("Severity").toStdString(),
                          Wt::DisplayRole);
   m_model->setHeaderData(2,
                          Wt::Horizontal,
-                         QObject::tr("Service").toStdString(),
+                         QObject::tr("Host").toStdString(),
                          Wt::DisplayRole);
   m_model->setHeaderData(3,
                          Wt::Horizontal,
-                         QObject::tr("Status").toStdString(),
+                         QObject::tr("Service").toStdString(),
                          Wt::DisplayRole);
   m_model->setHeaderData(4,
                          Wt::Horizontal,
-                         QObject::tr("Details").toAscii(),
+                         QObject::tr("Message").toAscii(),
                          Wt::DisplayRole);
 
-  SortingProxyModel* sortingProxy = new SortingProxyModel(this);
-  sortingProxy->setSourceModel(m_model);
-  sortingProxy->setDynamicSortFilter(true);
-  sortingProxy->setFilterRole(Wt::UserRole);
-  setModel(sortingProxy);
-  sortByColumn(3, Wt::DescendingOrder);
+  SortingProxyModel* sproxy = new SortingProxyModel(this);
+  sproxy->setSourceModel(m_model);
+  sproxy->setDynamicSortFilter(true);
+  sproxy->setFilterRole(Wt::UserRole);
+  setModel(sproxy);
+
+  sortByColumn(1, Wt::DescendingOrder);
 }
 
 WebMsgConsole::~WebMsgConsole()
@@ -95,12 +82,13 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
   setColumnWidth(2, 20 * em);
   setColumnWidth(3, 90); /*size of the header image*/
   setColumnWidth(4, width - (65 * em.toPixels() + 90)); /*size of the header image*/
-  //emit sizeChanged(width, height);
 }
 
 void WebMsgConsole::update(const NodeListT& _cnodes)
 {
-  for(NodeListT::ConstIterator node = _cnodes.begin(); node != _cnodes.end(); node++){
+  for(NodeListT::ConstIterator node=_cnodes.begin(), end=_cnodes.end();
+      node != end; ++node)
+  {
     addMsg(*node);
   }
 }
@@ -108,36 +96,38 @@ void WebMsgConsole::update(const NodeListT& _cnodes)
 void WebMsgConsole::addMsg(const NodeT&  _node)
 {
   m_model->setItem(m_rowCount, 0, createDateTimeItem(_node.check.last_state_change));
-  m_model->setItem(m_rowCount, 1, new Wt::WStandardItem(_node.check.host));
-  m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_node.name.toStdString()));
-  m_model->setItem(m_rowCount, 3, createItatusItem(_node.check.status));
-  m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(_node.alarm_msg.toStdString()));
+  m_model->setItem(m_rowCount, 1, createStatusItem(_node));
+  m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_node.check.host));
+  m_model->setItem(m_rowCount, 3, new Wt::WStandardItem(_node.name.toStdString()));
+  m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(_node.actual_msg.toStdString()));
 
   ++m_rowCount;
 }
 
-Wt::WStandardItem* WebMsgConsole::createItatusItem(const int& _status)
+Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
-  std::string icon = "images/built-in/unknown.png";
-  std::string style = "unknown";
   item->setData(std::string("3"), Wt::UserRole);
-  if(_status == MonitorBroker::NagiosOk){
-    icon = "images/built-in/normal.png";
-    style = "normal";
-    item->setData(std::string("0"), Wt::UserRole);
-  } else  if(_status == MonitorBroker::NagiosWarning){
-    icon = "images/built-in/warning.png";
-    style = "warning";
-    item->setData(std::string("1"), Wt::UserRole);
-  }  if(_status == MonitorBroker::NagiosCritical){
-    style = "critical";
-    icon = "images/built-in/critical.png";
-    item->setData(std::string("2"), Wt::UserRole);
+  item->setText(utils::severity2Str(_node.severity).toStdString());
+
+  switch(_node.severity) {
+    case MonitorBroker::Normal:
+      item->setStyleClass("severity-normal");
+      break;
+    case MonitorBroker::Minor:
+      item->setStyleClass("severity-minor");
+      break;
+    case MonitorBroker::Major:
+      item->setStyleClass("severity-major");
+      break;
+    case MonitorBroker::Critical:
+      item->setStyleClass("severity-critical");
+      break;
+    case MonitorBroker::Unknown:
+    default:
+      item->setStyleClass("severity-unknown");
+      break;
   }
-  item->setIcon(icon);
-  //FIXME: item->setText(Ngrt4nConfigParser::statusToString(_status));
-  item->setStyleClass(style);
   return item;
 }
 

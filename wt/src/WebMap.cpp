@@ -29,7 +29,7 @@
 #include "utilsClient.hpp"
 
 namespace {
-  const double MAP_PADDING = 40;
+  const double MAP_PADDING = 15;
 }
 
 WebMap::WebMap(CoreDataT* _cdata)
@@ -46,14 +46,7 @@ WebMap::WebMap(CoreDataT* _cdata)
   setInline(false);
 
   setLayoutSizeAware(true);
-  setJavaScriptMember(WWidget::WT_RESIZE_JS,
-                      "function(self, w, h) {"
-                      """var u = $(self).find('canvas, img');"
-                      """if (w >= 0) "
-                      ""  "u.width(w);"
-                      """if (h >= 0) "
-                      """u.height = h;"
-                      "}");
+  setJavaScriptMember(WWidget::WT_RESIZE_JS, "");
   m_scrollArea->setWidget(this);
 }
 
@@ -72,8 +65,8 @@ void WebMap::drawMap(const bool& _init)
   }
 
   Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX + MAP_PADDING,
-                             m_cdata->map_height * m_scaleY + MAP_PADDING);
+  Wt::WPaintedWidget::resize(m_cdata->map_width + MAP_PADDING,
+                             m_cdata->map_height + MAP_PADDING);
 }
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
@@ -83,8 +76,7 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Draw edges
-  // Must to be drawn before the icon for hiding some technical details
-  for (StringListT::Iterator edge = m_cdata->edges.begin(), end = m_cdata->edges.end();
+  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
        edge != end; ++edge) {
     drawEdge(edge.key(), edge.value());
   }
@@ -108,8 +100,14 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 void WebMap::drawNode(const NodeT& _node)
 {
   Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
-  Wt::WPointF posLabel(_node.pos_x, _node.pos_y + 9);
+  Wt::WPointF posLabel(_node.pos_x, _node.pos_y);
   Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15);
+
+  // Set painting color
+  QColor qcolor = utils::computeColor(_node.severity);
+  Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
+  Wt::WPen pen(wcolor);
+  m_painter->setPen(pen);
 
   // Draw icon
   m_painter->drawImage(posIcon,
@@ -130,30 +128,20 @@ void WebMap::drawNode(const NodeT& _node)
 
 void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
 {
-
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
-
   if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
-      && utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child)) {
-
-    Wt::WPen pen;
-    if(child->prop_sev == MonitorBroker::Critical){ //FIXME: child->prop_sev == MonitorBroker::Critical
-      pen.setColor(Wt::red);
-    } else if(child->prop_sev == MonitorBroker::Major){
-      pen.setColor(Wt::darkYellow);
-    } else if(child->prop_sev == MonitorBroker::Normal){
-      pen.setColor(Wt::darkGreen);
-    } else {
-      pen.setColor(Wt::gray);
-    }
+      && utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child))
+  {
+    QColor qcolor = utils::computeColor(child->prop_sev);
+    Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
+    Wt::WPen pen(wcolor);
     m_painter->setPen(pen);
 
     Wt::WPointF edgeP1(parent->pos_x, parent->pos_y + 24);
     Wt::WPointF edgeP2(child->pos_x, child->pos_y - 24);
     m_painter->drawLine(edgeP1, edgeP2);
   }
-
 }
 
 void WebMap::createLink(const NodeT& _node)

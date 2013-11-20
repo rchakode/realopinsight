@@ -96,7 +96,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 0)->setText(itemText);
   mmodel->item(index, 0)->setData(QDateTime::fromString(itemText), Qt::UserRole);
 
-  mmodel->item(index, 1)->setText(utils::criticityToText(_node.severity));
+  mmodel->item(index, 1)->setText(utils::severity2Str(_node.severity));
   mmodel->item(index, 1)->setData(-1*_node.severity, Qt::UserRole);
   mmodel->item(index, 1)->setBackground(QBrush(utils::computeColor(_node.severity)));
 
@@ -138,7 +138,7 @@ void MsgConsole::clearNormalMsg(void)
   qint32 index = 0;
   qint32 nbRows = mmodel->rowCount();
   while (index < nbRows) {
-    if (mmodel->item(index, 1)->text() == utils::criticityToText(MonitorBroker::Normal)) {
+    if (mmodel->item(index, 1)->text() == utils::severity2Str(MonitorBroker::Normal)) {
       mmodel->removeRow(index);
       --nbRows;
     } else {
