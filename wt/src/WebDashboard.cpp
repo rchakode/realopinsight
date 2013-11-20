@@ -115,6 +115,8 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   rightVLayout->setResizable(1);
 
   load(_config);
+//  mapPanel->resize(m_cdata->map_width,
+//                   m_cdata->map_height);
 }
 
 WebDashboard::~WebDashboard()
@@ -128,8 +130,6 @@ WebDashboard::~WebDashboard()
 
 void WebDashboard::load(const QString& _file)
 {
-
-  qDebug() << _file;
   if (!_file.isEmpty()) {
     m_config = utils::getAbsolutePath(_file);
   }

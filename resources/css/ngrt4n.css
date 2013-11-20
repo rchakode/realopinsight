@@ -1,0 +1,22 @@
+body, html {
+  margin: 0px;
+  margin: 0px;
+  width: 100%; 
+  height: 100%; 
+  font-family: verdana,helvetica,tahoma,sans-serif;
+  font-size: 10pt;
+}
+
+.maincontainer {
+  margin: 0px ;
+  padding: 0px ;
+  width: 100% ;
+  height: 100%;
+}
+
+.panel {
+  margin: 0px ;
+  padding: 0px ;
+  border: solid 1px;
+}
+

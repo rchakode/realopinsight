@@ -42,10 +42,18 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_icons(utils::nodeIcons()),
     m_scrollArea(new Wt::WScrollArea())
 {
-  setLayoutSizeAware(true);
   setPreferredMethod(InlineSvgVml); //FIXME: do this according to the user agent
-//  setInline(true);
-  resize(m_cdata->map_width, m_cdata->map_height);
+  setInline(false);
+
+  setLayoutSizeAware(true);
+  setJavaScriptMember(WWidget::WT_RESIZE_JS,
+                      "function(self, w, h) {"
+                      """var u = $(self).find('canvas, img');"
+                      """if (w >= 0) "
+                      ""  "u.width(w);"
+                      """if (h >= 0) "
+                      """u.height = h;"
+                      "}");
   m_scrollArea->setWidget(this);
 }
 
@@ -92,9 +100,6 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
       node != end; ++node) {
     drawNode(*node);
   }
-
-  qDebug() << m_cdata->map_height << m_scrollArea->height().toPixels();
-  //m_scrollArea->setHeight(Wt::WLength(10, Wt::WLength::Pixel));
 }
 
 /**
@@ -108,8 +113,8 @@ void WebMap::drawNode(const NodeT& _node)
 
   // Draw icon
   m_painter->drawImage(posIcon,
-                     Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40)
-                     );
+                       Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40)
+                       );
 
   // Draw anchor icon
   if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
@@ -118,10 +123,10 @@ void WebMap::drawNode(const NodeT& _node)
 
   // Draw text
   m_painter->drawText(posLabel.x(), posLabel.y(),
-                    Wt::WLength::Auto.toPixels(),
-                    Wt::WLength::Auto.toPixels(),
-                    Wt::AlignCenter,
-                    Wt::WString(_node.name.toStdString()));
+                      Wt::WLength::Auto.toPixels(),
+                      Wt::WLength::Auto.toPixels(),
+                      Wt::AlignCenter,
+                      Wt::WString(_node.name.toStdString()));
 
   createLink(_node);
 }

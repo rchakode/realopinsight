@@ -7,7 +7,7 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
   ui->setTwoPhaseRenderingThreshold(0);
   ui->setTitle(ui->getConfig().toStdString());
   ui->setTheme(new Wt::WBootstrapTheme());
-  ui->useStyleSheet(Wt::WApplication::appRoot() + "wt/resources/ngrt4n.css");
+  ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
   ui->render();
   return ui;
 }
