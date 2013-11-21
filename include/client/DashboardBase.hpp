@@ -98,18 +98,17 @@ protected:
   int m_firstSrcIndex;
 
   virtual void load(const QString& _file) = 0;
-  void computeStatusInfo(NodeListT::iterator& _node, const SourceT& src);
+  void computeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
-  virtual void updateDashboard(const NodeT& _node) = 0;
-  virtual void updateDashboard(NodeListT::iterator& _node);
-  virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip) = 0;
-  virtual void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateDashboard(const NodeT& _node);
+  virtual void updateMap(const NodeT& _node, const QString& _tip) = 0;
   virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
-  virtual void finalizeUpdate(const SourceT& src) = 0;
+  virtual void updateMsgConsole(const NodeT& _node) = 0;
+  virtual void finalizeUpdate(const SourceT& src);
+  virtual void updateChart(void) = 0;
 
 private:
   void updateCNodes(const CheckT & check, const SourceT& src);
-  void computeStatusInfo(NodeT& _node, const SourceT& src);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
   void openRpcSessions(void);

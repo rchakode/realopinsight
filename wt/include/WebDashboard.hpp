@@ -48,10 +48,10 @@ public:
 
 protected:
   virtual void load(const QString& _file);
-  virtual void updateDashboard(const NodeT& _node);
-  virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateMap(const NodeT& _node, const QString& _tip);
   virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  virtual void finalizeUpdate(const SourceT& src);
+  virtual void updateMsgConsole(const NodeT& _node);
+  virtual void updateChart(void);
 
 private:
   Wt::WContainerWidget* m_widget;

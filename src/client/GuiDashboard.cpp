@@ -175,67 +175,31 @@ void GuiDashboard::toggleIncreaseMsgFont(bool _toggled)
   m_msgConsole->useLargeFont(_toggled);
 }
 
-void GuiDashboard::updateMap(const NodeListT::iterator& _node, const QString& _tip)
+void GuiDashboard::updateMap(const NodeT& _node, const QString& _tip)
 {
   m_map->updateNode(_node, _tip);
 }
 
-void GuiDashboard::updateDashboard(NodeListT::iterator& _node)
+void GuiDashboard::updateChart(void)
 {
-  updateDashboard(*_node);
-}
-
-void GuiDashboard::updateDashboard(const NodeT& _node)
-{
-  QString toolTip = utils::getNodeToolTip(_node);
-  updateNavTreeItemStatus(_node, toolTip);
-  m_map->updateNode(_node, toolTip);
-  if (!m_showOnlyTroubles || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal)) {
-    m_msgConsole->updateNodeMsg(_node);
-    if (m_msgConsole->getRowCount() == 1) {
-      m_msgConsole->updateEntriesSize(false);
-    }
-  }
-  emit hasToBeUpdate(_node.parent);
-}
-
-
-void GuiDashboard::finalizeUpdate(const SourceT& src)
-{
-  if (m_cdata->cnodes.isEmpty()) {
-    return;
-  }
-
   Chart *chart = new Chart;
   chart->update(m_cdata->check_status_count, m_cdata->cnodes.size());
   m_map->updateStatsPanel(chart);
   m_chart.reset(chart);
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
-
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
-       end = m_cdata->cnodes.end(); cnode != end; ++cnode)
-  {
-    if (! cnode->monitored &&
-        cnode->child_nodes.toLower()==utils::realCheckId(src.id,
-                                                         QString::fromStdString(cnode->check.id)).toLower())
-    {
-      utils::setCheckOnError(MonitorBroker::Unknown,
-                             tr("Undefined service (%1)").arg(cnode->child_nodes),
-                             cnode->check);
-      computeStatusInfo(cnode, src);
-      m_cdata->check_status_count[cnode->severity]+=1;
-      updateDashboard(cnode);
-    }
-    cnode->monitored = false;
-  }
 }
 
 void GuiDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
 {
-  QTreeWidgetItem* item = m_tree->findNodeItem(_node.id);
-  if (item) {
-    item->setIcon(0, utils::computeCriticityIcon(_node.severity));
-    item->setToolTip(0, _tip);
+  m_tree->updateNodeItem(_node, _tip);
+}
+
+void GuiDashboard::updateMsgConsole(const NodeT& _node)
+{
+  if (!m_showOnlyTroubles
+      || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
+  {
+    m_msgConsole->updateNodeMsg(_node);
   }
 }
 

@@ -41,6 +41,7 @@ public:
   QTreeWidgetItem* addNode(const NodeT &, const bool & = false );
   QTreeWidgetItem* findNodeItem(const QString& _nodeId);
   void removeNodeItem(const QString& _nodeId) {m_items.remove(_nodeId);}
+  void updateNodeItem(const NodeT& _node, const QString& _tip);
 
 signals:
   void treeNodeMoved( QString _nodeId ) ;

@@ -96,7 +96,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   rightVLayout->addWidget(mapPanel);
   rightVLayout->addWidget(msgPanel);
   rightVLayout->setStretchFactor(mapPanel, 3);
-  rightVLayout->setStretchFactor(msgPanel, 2);
+  rightVLayout->setStretchFactor(msgPanel, 1);
 
   centralLayout->addWidget(treeContainer);
   centralLayout->addWidget(mapMsgContainer);
@@ -136,34 +136,30 @@ void WebDashboard::load(const QString& _file)
   parser.process(true);
   parser.computeNodeCoordinates(1);
   m_tree->build();
-  m_map->drawMap(false);
+  m_map->drawMap();
 
   initSettings();
   handleRefresh();
 }
 
-
-void WebDashboard::updateDashboard(const NodeT& _node)
-{
-  qDebug() << _node.name;
-}
-
-void WebDashboard::finalizeUpdate(const SourceT& src)
-{
-  qDebug() << ">>>>>>>>>>>>>>>>>>"<<src.id;
-  m_msgConsole->updateNodeMsg(m_cdata->cnodes);
-}
 void WebDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
 {
-  qDebug() << _node.name << _tip;
+  m_tree->updateNodeItem(_node, _tip);
 }
 
-
-void WebDashboard::updateMap(const NodeListT::iterator& _node, const QString& _tip)
+void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  qDebug() << _node->name << _tip;
+  if (!m_showOnlyTroubles
+      || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
+  {
+    m_msgConsole->updateNodeMsg(_node);
+  }
 }
 
+void WebDashboard::updateChart(void)
+{
+  //FIXME: to be implemented
+}
 
 
 void WebDashboard::handleRefresh(void)
@@ -254,4 +250,9 @@ Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
 
   menuBar->setLayout(layout);
   return menuBar;
+}
+
+void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
+{
+  m_map->updateNode(_node, _tip);
 }

@@ -143,7 +143,6 @@ void SvNavigatorTree::build(void)
 QTreeWidgetItem* SvNavigatorTree::findNodeItem(const QString& _nodeId)
 {
   GuiTreeItemListT::Iterator tnode = m_items.find(_nodeId);
-
   return (tnode != m_items.end())? *tnode : NULL;
 }
 
@@ -154,5 +153,14 @@ QTreeWidgetItem* SvNavigatorTree::createItem(const NodeT& _node)
   item->setText(0, _node.name);
   item->setData(0, QTreeWidgetItem::UserType, _node.id);
   return item;
+}
+
+void SvNavigatorTree::updateNodeItem(const NodeT& _node, const QString& _tip)
+{
+  QTreeWidgetItem* item = findNodeItem(_node.id);
+  if (item) {
+    item->setIcon(0, utils::computeCriticityIcon(_node.severity));
+    item->setToolTip(0, _tip);
+  }
 }
 

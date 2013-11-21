@@ -123,6 +123,8 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   }
   mmodel->item(index, 4)->setText(_node.actual_msg);
   mmodel->item(index, 4)->setData(_node.actual_msg, Qt::UserRole);
+
+  if (getRowCount() == 1) updateEntriesSize(false);
 }
 
 void MsgConsole::clearMsg(const NodeT& _node)

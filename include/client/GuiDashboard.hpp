@@ -85,7 +85,7 @@ public slots:
   void handleSourceBxItemChanged(int index);
   void handleUpdateSourceUrl(void);
   void handleSettingsLoaded(void);
-  void updateDashboard(const NodeT & _node);
+  //  void updateDashboard(const NodeT & _node);
 
 signals:
   void hasToBeUpdate(const QString& nodeid);
@@ -115,10 +115,10 @@ protected:
 
   virtual void load(const QString& _file);
   void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
-  virtual void updateDashboard(NodeListT::iterator& _node);
-  virtual void updateMap(const NodeListT::iterator& _node, const QString& _tip);
+  virtual void updateMap(const NodeT& _node, const QString& _tip);
   virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  virtual void finalizeUpdate(const SourceT& src);
+  virtual void updateMsgConsole(const NodeT& _node);
+  virtual void updateChart(void);
 
 private:
   void addEvents(void);

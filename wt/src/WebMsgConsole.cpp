@@ -111,6 +111,20 @@ void WebMsgConsole::updateNodeMsg(const NodeListT& _cnodes)
   }
 }
 
+void WebMsgConsole::updateNodeMsg(const NodeT& _node)
+{
+  int index = findServiceRow(_node.id.toStdString());
+  if (index < 0) {
+    addMsg(_node);
+  } else {
+    m_model->item(index, 0)->setText(_node.check.last_state_change);
+    setStyleClass(m_model->item(index, 1), _node.severity);
+    m_model->item(index, 2)->setText(_node.check.host);
+    m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
+    m_model->item(index, 4)->setText(_node.actual_msg.toStdString());
+  }
+}
+
 void WebMsgConsole::addMsg(const NodeT&  _node)
 {
   m_model->setItem(m_rowCount, 0, createDateTimeItem(_node.check.last_state_change));

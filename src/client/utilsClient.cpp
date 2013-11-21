@@ -167,26 +167,31 @@ QColor utils::computeColor(const int& _criticity)
 }
 
 
-QIcon utils::computeCriticityIcon(const int& _criticity)
+QIcon utils::computeCriticityIcon(int _severity)
 {
-  QString ipath(":/images/built-in/unknown.png");
-  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
+  return QIcon(":/"+getIconPath(_severity));
+}
+
+QString utils::getIconPath(int _severity)
+{
+  QString ipath("images/built-in/unknown.png");
+  switch (static_cast<MonitorBroker::SeverityT>(_severity)) {
     case MonitorBroker::Normal:
-      ipath = ":/images/built-in/normal.png";
+      ipath = "images/built-in/normal.png";
       break;
     case MonitorBroker::Minor:
-      ipath = ":/images/built-in/minor.png";
+      ipath = "images/built-in/minor.png";
       break;
     case MonitorBroker::Major:
-      ipath = ":/images/built-in/major.png";
+      ipath = "images/built-in/major.png";
       break;
     case MonitorBroker::Critical:
-      ipath = ":/images/built-in/critical.png";
+      ipath = "images/built-in/critical.png";
       break;
     default:
       break;
   }
-  return QIcon(ipath);
+  return ipath;
 }
 
 bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)

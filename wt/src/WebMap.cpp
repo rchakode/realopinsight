@@ -40,7 +40,8 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_layoutWidth(0),
     m_layoutHeight(0),
     m_icons(utils::nodeIcons()),
-    m_scrollArea(new Wt::WScrollArea())
+    m_scrollArea(new Wt::WScrollArea()),
+    m_firstUpdate(true)
 {
   setPreferredMethod(InlineSvgVml); //FIXME: do this according to the user agent
   setInline(false);
@@ -57,17 +58,6 @@ WebMap::~WebMap()
   delete m_scrollArea;
 }
 
-void WebMap::drawMap(const bool& _init)
-{
-  if(_init) {
-    m_scaleX = m_layoutWidth/m_cdata->map_width;
-    m_scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * m_scaleX;
-  }
-
-  Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width + MAP_PADDING,
-                             m_cdata->map_height + MAP_PADDING);
-}
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
@@ -94,9 +84,26 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
   }
 }
 
-/**
- * Draw edge before node to hide some details of drawing
- */
+
+void WebMap::layoutSizeChanged (int width, int height)
+{
+  m_layoutWidth = width;
+  m_layoutHeight = height;
+}
+
+void WebMap::drawMap(void)
+{
+  if(! m_firstUpdate) {
+    m_scaleX = m_layoutWidth/m_cdata->map_width;
+    m_scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * m_scaleX;
+    m_firstUpdate = false;
+  }
+
+  Wt::WPaintedWidget::update(); //this call paintEvent
+  Wt::WPaintedWidget::resize(m_cdata->map_width + MAP_PADDING,
+                             m_cdata->map_height + MAP_PADDING);
+}
+
 void WebMap::drawNode(const NodeT& _node)
 {
   Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
@@ -156,9 +163,20 @@ void WebMap::createLink(const NodeT& _node)
   addArea(area);
 }
 
-//FIXME: void WebMap::msgPanelSizedChanged(int width)
-//void WebMap::msgPanelSizedChanged(int width)
-//{
-//  layoutWidth = width;
-//  drawMap(layoutWidth, layoutHeight, true);
-//}
+void WebMap::updateNode(const NodeT& _node, const QString& _toolTip)
+{
+  QString label = "<span style=\"background: '"%utils::computeColor(_node.severity).name()
+      %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
+  QString r = _toolTip;
+  //FIXME: WebMap::updateNode
+//  GNodeListT::iterator gnodeIt =  m_mnodes.find(_node.id);
+//  if (gnodeIt != m_mnodes.end()) {
+//    gnodeIt->label->setHtml(label);
+//    gnodeIt->icon->setToolTip(_toolTip);
+//    gnodeIt->label->setToolTip(_toolTip);
+//    GEdgeListT::iterator edge = m_medges.find(_node.parent + ":" + _node.id);
+//    if (edge != m_medges.end())
+//      edge->edge->setPen(utils::computeColor(_node.prop_sev));
+//  }
+}
+

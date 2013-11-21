@@ -76,7 +76,8 @@ namespace utils
   MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
   int computePropCriticity(const qint8& _criticity, const qint8& propRule);
   QColor computeColor(const int &_criticity);
-  QIcon computeCriticityIcon(const int &_criticity);
+  QIcon computeCriticityIcon(int _severity);
+  QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(NodeListT& bpnodes,
                 NodeListT& cnodes,

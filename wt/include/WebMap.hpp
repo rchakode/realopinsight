@@ -36,21 +36,19 @@
 
 class WebMap : public Wt::WPaintedWidget
 {
-//  Q_OBJECT
+  //  Q_OBJECT
 
 public:
   WebMap(CoreDataT* _cdata);
   virtual ~WebMap();
-  void drawMap(const bool& _init);
+  void drawMap(void);
 
   Wt::WScrollArea* get(void) const {return m_scrollArea;}
-
-//public slots:
-//  void msgPanelSizedChanged(int width);
-
+  void updateNode(const NodeT& _node, const QString& _toolTip);
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
+  virtual void layoutSizeChanged(int width, int height);
 
 private:
   CoreDataT* m_cdata;
@@ -61,6 +59,7 @@ private:
   Wt::WPainter* m_painter;
   IconMapT m_icons;
   Wt::WScrollArea* m_scrollArea;
+  bool m_firstUpdate;
 
   void drawNode(const NodeT& _node);
   void drawEdge(const QString& _parentId, const QString& _childId);

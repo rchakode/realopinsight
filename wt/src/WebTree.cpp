@@ -66,7 +66,6 @@ void WebTree::build(void)
       parent->appendRow(child);
     }
   }
-
   update(m_items[utils::ROOT_ID]);
 }
 
@@ -88,7 +87,15 @@ Wt::WStandardItem* WebTree::createItem(const NodeT& _node)
 Wt::WStandardItem* WebTree::findNodeItem(const QString& _nodeId)
 {
   WebTreeItemsT::iterator tnode = m_items.find(_nodeId);
-
   return (tnode != m_items.end())? *tnode : NULL;
+}
+
+void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
+{
+  Wt::WStandardItem* item = findNodeItem(_node.id);
+  if (item) {
+    item->setIcon(utils::getIconPath(_node.severity).toStdString());
+    item->setToolTip(_tip.toStdString());
+  }
 }
 

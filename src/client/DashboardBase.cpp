@@ -175,8 +175,8 @@ void DashboardBase::runNagiosUpdate(const SourceT& src)
     cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
     cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
 
-    computeStatusInfo(cnode, src);
-    updateDashboard(cnode);
+    computeStatusInfo(*cnode, src);
+    updateDashboard(*cnode);
     m_cdata->check_status_count[cnode->severity]+=1;
     cnode->monitored = true;
   }
@@ -260,10 +260,13 @@ void DashboardBase::prepareUpdate(const SourceT& src)
   emit updateStatusBar(msg);
 }
 
-
-void DashboardBase::updateDashboard(NodeListT::iterator& _node)
+void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  updateDashboard(*_node);
+  QString toolTip = utils::getNodeToolTip(_node);
+  updateNavTreeItemStatus(_node, toolTip);
+  updateMap(_node, toolTip);
+  updateMsgConsole(_node);
+  emit hasToBeUpdate(_node.parent);
 }
 
 void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
@@ -273,18 +276,12 @@ void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
     if (cnode->child_nodes.toLower()==utils::realCheckId(src.id, QString::fromStdString(check.id)).toLower())
     {
       cnode->check = check;
-      computeStatusInfo(cnode, src);
+      computeStatusInfo(*cnode, src);
       ++(m_cdata->check_status_count[cnode->severity]);
-      updateDashboard(cnode);
+      updateDashboard(*cnode);
       cnode->monitored = true;
     }
   }
-}
-
-
-void DashboardBase::computeStatusInfo(NodeListT::iterator&  _node, const SourceT& src)
-{
-  computeStatusInfo(*_node, src);
 }
 
 void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
@@ -370,19 +367,13 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
       break;
   }
   QString toolTip = getNodeToolTip(*node);
-  updateMap(node, toolTip);
-  updateNavTreeItemStatus(node, toolTip);
-  //qDebug() << node->id << node->name << node->severity;
+  updateMap(*node, toolTip);
+  updateNavTreeItemStatus(*node, toolTip);
   if (node->id != m_root->id) {
     updateBpNode(node->parent);
     // FIXME: emit hasToBeUpdate(node->parent);
     // emit hasToBeUpdate(node->parent);
   }
-}
-
-void DashboardBase::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
-{
-  updateNavTreeItemStatus(*_node, _tip);
 }
 
 void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
@@ -760,8 +751,8 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     if (info.first != src.id) continue;
 
     utils::setCheckOnError(MonitorBroker::Unknown, msg, cnode->check);
-    computeStatusInfo(cnode, src);
-    updateDashboard(cnode);
+    computeStatusInfo(*cnode, src);
+    updateDashboard(*cnode);
     m_cdata->check_status_count[MonitorBroker::Unknown]+=1;
     cnode->monitored = true;
   }
@@ -898,3 +889,27 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
   return toolTip;
 }
 
+
+void DashboardBase::finalizeUpdate(const SourceT& src)
+{
+  if (m_cdata->cnodes.isEmpty()) return;
+
+  updateChart();
+
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
+       end = m_cdata->cnodes.end(); cnode != end; ++cnode)
+  {
+    if (! cnode->monitored &&
+        cnode->child_nodes.toLower()==utils::realCheckId(src.id,
+                                                         QString::fromStdString(cnode->check.id)).toLower())
+    {
+      utils::setCheckOnError(MonitorBroker::Unknown,
+                             tr("Undefined service (%1)").arg(cnode->child_nodes),
+                             cnode->check);
+      computeStatusInfo(*cnode, src);
+      m_cdata->check_status_count[cnode->severity]+=1;
+      updateDashboard(*cnode);
+    }
+    cnode->monitored = false;
+  }
+}
