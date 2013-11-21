@@ -25,6 +25,10 @@
 #include "WebMsgConsole.hpp"
 #include "utilsClient.hpp"
 
+namespace {
+  const qint32 ID_COLUMN = 5;
+}
+
 WebMsgConsole::WebMsgConsole()
   : WTableView(0),
     m_rowCount(0)
@@ -38,7 +42,7 @@ WebMsgConsole::WebMsgConsole()
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
 
-  m_model = new Wt::WStandardItemModel(2, 5);
+  m_model = new Wt::WStandardItemModel(0, ID_COLUMN+1);
   m_model->setHeaderData(0,
                          Wt::Horizontal,
                          QObject::tr("Date & Hour").toStdString(),
@@ -59,7 +63,12 @@ WebMsgConsole::WebMsgConsole()
                          Wt::Horizontal,
                          QObject::tr("Message").toAscii(),
                          Wt::DisplayRole);
+  m_model->setHeaderData(ID_COLUMN,
+                         Wt::Horizontal,
+                         QObject::tr("Service ID").toAscii(),
+                         Wt::UserRole);
 
+  hideColumn(ID_COLUMN);
   SortingProxyModel* sproxy = new SortingProxyModel(this);
   sproxy->setSourceModel(m_model);
   sproxy->setDynamicSortFilter(true);
@@ -84,12 +93,21 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
   setColumnWidth(4, width - (65 * em.toPixels() + 90)); /*size of the header image*/
 }
 
-void WebMsgConsole::update(const NodeListT& _cnodes)
+void WebMsgConsole::updateNodeMsg(const NodeListT& _cnodes)
 {
   for(NodeListT::ConstIterator node=_cnodes.begin(), end=_cnodes.end();
       node != end; ++node)
   {
-    addMsg(*node);
+    int index = findServiceRow(node->id.toStdString());
+    if (index < 0) {
+      addMsg(*node);
+    } else {
+      m_model->item(index, 0)->setText(node->check.last_state_change);
+      setStyleClass(m_model->item(index, 1), node->severity);
+      m_model->item(index, 2)->setText(node->check.host);
+      m_model->item(index, 3)->setText(node->name.toStdString()); //optional
+      m_model->item(index, 4)->setText(node->actual_msg.toStdString());
+    }
   }
 }
 
@@ -100,6 +118,7 @@ void WebMsgConsole::addMsg(const NodeT&  _node)
   m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_node.check.host));
   m_model->setItem(m_rowCount, 3, new Wt::WStandardItem(_node.name.toStdString()));
   m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(_node.actual_msg.toStdString()));
+  m_model->setItem(m_rowCount, 5, new Wt::WStandardItem(_node.id.toStdString()));
 
   ++m_rowCount;
 }
@@ -109,8 +128,34 @@ Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
   Wt::WStandardItem * item = new Wt::WStandardItem();
   item->setData(std::string("3"), Wt::UserRole);
   item->setText(utils::severity2Str(_node.severity).toStdString());
+  setStyleClass(item, _node.severity);
+  return item;
+}
 
-  switch(_node.severity) {
+Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck)
+{
+  Wt::WStandardItem * item = new Wt::WStandardItem();
+  long time = atoi(_lastcheck.c_str());
+  item->setText( ctime(&time) );
+  item->setData(_lastcheck, Wt::UserRole);
+  return item;
+}
+
+int WebMsgConsole::findServiceRow(const std::string& _id)
+{
+  qint32 index = 0;
+  qint32 nbRows = m_model->rowCount();
+  while(index < nbRows &&
+        m_model->item(index, ID_COLUMN) &&
+        m_model->item(index, ID_COLUMN)->text() != _id) { ++index;}
+
+  return (index >= nbRows)? -1 : index;
+}
+
+
+void WebMsgConsole::setStyleClass(Wt::WStandardItem* item, int severity)
+{
+  switch(severity) {
     case MonitorBroker::Normal:
       item->setStyleClass("severity-normal");
       break;
@@ -128,14 +173,4 @@ Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
       item->setStyleClass("severity-unknown");
       break;
   }
-  return item;
-}
-
-Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck)
-{
-  Wt::WStandardItem * item = new Wt::WStandardItem();
-  long time = atoi(_lastcheck.c_str());
-  item->setText( ctime(&time) );
-  item->setData(_lastcheck, Wt::UserRole);
-  return item;
 }

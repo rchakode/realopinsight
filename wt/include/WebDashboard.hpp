@@ -60,8 +60,7 @@ private:
   WebMsgConsole* m_msgConsole;
 
   Wt::WContainerWidget* createMenuBarWidget(void);
-  void updateViews(void);
-  void updateServicesStatuses(void);
+  void handleRefresh(void);
   void updateParentStatus(const NodeT& _service);
   void updateServiceTree(void);
 };

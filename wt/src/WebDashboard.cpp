@@ -85,7 +85,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   mapLayout->addWidget(m_map->get());
   mapContainer->setLayout(mapLayout);
   mapPanel->setCentralWidget(mapContainer);
- //mapPanel->setTitle(QObject::tr("Service Map").toStdString());
+  //mapPanel->setTitle(QObject::tr("Service Map").toStdString());
 
   msgLayout->addWidget(m_msgConsole);
   msgContainer->setLayout(msgLayout);
@@ -115,8 +115,6 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   rightVLayout->setResizable(1);
 
   load(_config);
-//  mapPanel->resize(m_cdata->map_width,
-//                   m_cdata->map_height);
 }
 
 WebDashboard::~WebDashboard()
@@ -139,7 +137,9 @@ void WebDashboard::load(const QString& _file)
   parser.computeNodeCoordinates(1);
   m_tree->build();
   m_map->drawMap(false);
-  updateViews();
+
+  initSettings();
+  handleRefresh();
 }
 
 
@@ -150,7 +150,8 @@ void WebDashboard::updateDashboard(const NodeT& _node)
 
 void WebDashboard::finalizeUpdate(const SourceT& src)
 {
-  qDebug() << src.id;
+  qDebug() << ">>>>>>>>>>>>>>>>>>"<<src.id;
+  m_msgConsole->updateNodeMsg(m_cdata->cnodes);
 }
 void WebDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
 {
@@ -165,32 +166,13 @@ void WebDashboard::updateMap(const NodeListT::iterator& _node, const QString& _t
 
 
 
-void WebDashboard::updateViews(void)
+void WebDashboard::handleRefresh(void)
 {
-  //FIXME: updateViews(void)
-  //  updateServicesStatuses();
-  m_msgConsole->update(m_cdata->cnodes);
-  //  map->update(m_cdata->bpnodes, m_cdata->cnodes, mapWidth, mapHeight);
-  //  navTree->update(navTreeRoot); updateServiceTree();
-}
-
-void WebDashboard::updateServicesStatuses(void)
-{
-  //  //Fixme: loadConfig
-  //  //if (! Ngrt4nConfigParser::loadNagiosCollectedData("examples/status.dat", m_cdata->cnodes) ) return;
-  //  return; //FIXME:
-
-  //  for(NodeListT sIt  = m_cdata->bpnodes.begin(); sIt != m_cdata->bpnodes.end(); ++sIt) {
-  //    sIt->status_info.reset();
-  //  }
-
-  //  for(NodeListT::Iterator sIt  = m_cdata->cnodes.begin(); sIt != m_cdata->cnodes.end(); ++sIt) {
-  //    if(sIt->id != "root") {
-  //      NodeListT pIt = m_cdata->bpnodes.find(sIt->parent);
-  //      pIt->status_info |= sIt->status_info;
-  //      updateParentStatus(*pIt);
-  //    }
-  //  }
+  setEnabled(false);
+  //FIXME: handleUpdateStatusBar(tr("updating..."));
+  runMonitor();
+  //FIXME: handleUpdateStatusBar(tr("update completed"));
+  setEnabled(true);
 }
 
 void WebDashboard::updateParentStatus(const NodeT& _service)
@@ -241,22 +223,22 @@ Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
   layout->setContentsMargins(0, 0, 0, 0);
 
   Wt::WPushButton *b(new Wt::WPushButton(QObject::tr("Refresh").toStdString()));
-  b->setIcon("images/built-in/refresh.png");
+  b->setIcon("images/built-in/menu_refresh.png");
   //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Zoom in").toStdString());
-  b->setIcon("images/built-in/zoomin.png");
+  b->setIcon("images/built-in/menu_zoomin.png");
   //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Zoom out").toStdString());
-  b->setIcon("images/built-in/zoomout.png");
+  b->setIcon("images/built-in/menu_zoomout.png");
   //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 
   b =  new Wt::WPushButton(QObject::tr("Save map").toStdString());
-  b->setIcon("images/built-in/disket.png");
+  b->setIcon("images/built-in/menu_disket.png");
   //  b->setStyleClass("button");
   layout->addWidget(b, 0);
 

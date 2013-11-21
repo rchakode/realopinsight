@@ -34,12 +34,14 @@ const QString MsgConsole::TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
 const QString MsgConsole::TAG_CHECK = "\\{check_name\\}";
 const QString MsgConsole::TAG_THERESHOLD = "\\{threshold\\}";
 const QString MsgConsole::TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
-const qint16 MsgConsole::NUM_COLUMNS = 6;
-const qint32 ID_COLUMN = MsgConsole::NUM_COLUMNS - 1;
+
+namespace {
+  const qint32 ID_COLUMN = 5;
+}
 
 MsgConsole::MsgConsole(QWidget * _parent)
   : QTableView(_parent),
-    mmodel(new QStandardItemModel(0, NUM_COLUMNS, this)),
+    mmodel(new QStandardItemModel(0, ID_COLUMN+1, this)),
     mproxyModel(new MsgConsoleProxyModel)
 {
   mmodel->setHeaderData(0, Qt::Horizontal, QObject::tr("Date & Hour"), Qt::DisplayRole);
@@ -50,7 +52,7 @@ MsgConsole::MsgConsole(QWidget * _parent)
   mproxyModel->setSourceModel(mmodel);
   QTableView::setModel(mproxyModel);
   QTableView::verticalHeader()->hide();
-  QTableView::hideColumn(NUM_COLUMNS - 1);
+  QTableView::hideColumn(ID_COLUMN);
   QTableView::setAlternatingRowColors(true);
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
   QTableView::setSortingEnabled(true);

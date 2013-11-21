@@ -47,7 +47,7 @@ protected:
 
 class WebMsgConsole : public Wt::WTableView
 {
-//  Q_OBJECT
+  //  Q_OBJECT
 
 public:
   WebMsgConsole();
@@ -56,12 +56,12 @@ public:
 
   Wt::WStandardItemModel* getRenderingModel(void) const {return m_model;}
   void addMsg(const NodeT&  _node);
-  void update(const NodeListT& _cnodes);
+  void updateNodeMsg(const NodeListT& _cnodes);
   Wt::WStandardItem* createStatusItem(const NodeT& _node);
   Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck);
 
-//signals:
-//  void sizeChanged(int, int);
+  //signals:
+  //  void sizeChanged(int, int);
 
 protected:
   void layoutSizeChanged (int width, int height);
@@ -69,6 +69,9 @@ protected:
 private:
   Wt::WStandardItemModel* m_model;
   int m_rowCount;
+
+  int findServiceRow(const std::string& _id);
+  void setStyleClass(Wt::WStandardItem* item, int severity);
 };
 
 #endif /* NGRT4NMSGPANEL_HPP_ */
