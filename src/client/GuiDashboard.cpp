@@ -120,11 +120,9 @@ void GuiDashboard::load(const QString& _file)
   parser.process(true);
   parser.computeNodeCoordinates(0);
   m_tree->build();
-  //  m_tree->clear();
-  //  m_tree->addTopLevelItem(m_cdata->tree_items[utils::ROOT_ID]);
-  //FIXME: m_map->load(parser.getDotGraphFile(), m_cdata->bpnodes, m_cdata->cnodes);
   m_map->drawMap();
 
+  //FIXME: not necessary ? m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
   m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
   if (m_root == m_cdata->bpnodes.end()) {
     utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
@@ -388,10 +386,10 @@ void GuiDashboard::addEvents(void)
 {
   connect(m_viewPanel, SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
   connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourceSettingsChanged(QList<qint8>)));
-  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
   connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
   connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
   connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
+  //FIXME:  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
 }

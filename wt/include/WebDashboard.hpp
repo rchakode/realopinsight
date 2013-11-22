@@ -61,8 +61,6 @@ private:
 
   Wt::WContainerWidget* createMenuBarWidget(void);
   void handleRefresh(void);
-  void updateParentStatus(const NodeT& _service);
-  void updateServiceTree(void);
 };
 
 #endif /* WEBDASHBOOARD_HPP */

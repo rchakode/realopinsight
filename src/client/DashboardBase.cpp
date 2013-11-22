@@ -266,7 +266,9 @@ void DashboardBase::updateDashboard(const NodeT& _node)
   updateNavTreeItemStatus(_node, toolTip);
   updateMap(_node, toolTip);
   updateMsgConsole(_node);
-  emit hasToBeUpdate(_node.parent);
+  updateBpNode(_node.parent);
+  // FIXME: emit hasToBeUpdate(_node.parent);
+  // emit hasToBeUpdate(_node.parent);
 }
 
 void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
@@ -353,7 +355,6 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   }
 
   node->severity = criticity.getValue();
-
   switch(node->sev_prule) {
     case PropRules::Increased:
       node->prop_sev = (criticity++).getValue();
@@ -366,14 +367,16 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
       node->prop_sev = node->severity;
       break;
   }
+
   QString toolTip = getNodeToolTip(*node);
   updateMap(*node, toolTip);
   updateNavTreeItemStatus(*node, toolTip);
-  if (node->id != m_root->id) {
+  if (node->id != utils::ROOT_ID) {
     updateBpNode(node->parent);
     // FIXME: emit hasToBeUpdate(node->parent);
     // emit hasToBeUpdate(node->parent);
   }
+
 }
 
 void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
@@ -717,7 +720,7 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
   } else if (src.mon_type == MonitorBroker::Zenoss) {
     apiUrl =  src.zns_handler->getRequestEndpoint();
   }
-  QString errmsg;
+
   switch (_code) {
     case QNetworkReply::RemoteHostClosedError:
       updateDashboardOnError(src, tr("The connection has been closed by the remote host"));

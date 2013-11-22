@@ -163,20 +163,9 @@ void WebMap::createLink(const NodeT& _node)
   addArea(area);
 }
 
-void WebMap::updateNode(const NodeT& _node, const QString& _toolTip)
+void WebMap::updateNode(const NodeT&, const QString&)
 {
-  QString label = "<span style=\"background: '"%utils::computeColor(_node.severity).name()
-      %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
-  QString r = _toolTip;
-  //FIXME: WebMap::updateNode
-//  GNodeListT::iterator gnodeIt =  m_mnodes.find(_node.id);
-//  if (gnodeIt != m_mnodes.end()) {
-//    gnodeIt->label->setHtml(label);
-//    gnodeIt->icon->setToolTip(_toolTip);
-//    gnodeIt->label->setToolTip(_toolTip);
-//    GEdgeListT::iterator edge = m_medges.find(_node.parent + ":" + _node.id);
-//    if (edge != m_medges.end())
-//      edge->edge->setPen(utils::computeColor(_node.prop_sev));
-//  }
+  // Empty function to conform with the polymorphism
+  // With WPaintedWidget, the whole map is updated
 }
 

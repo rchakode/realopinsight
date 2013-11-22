@@ -136,8 +136,8 @@ void WebDashboard::load(const QString& _file)
   parser.process(true);
   parser.computeNodeCoordinates(1);
   m_tree->build();
-  m_map->drawMap();
-
+  //m_map->drawMap();
+  m_msgConsole->updateNodeMsgs(m_cdata->cnodes);
   initSettings();
   handleRefresh();
 }
@@ -167,46 +167,10 @@ void WebDashboard::handleRefresh(void)
   setEnabled(false);
   //FIXME: handleUpdateStatusBar(tr("updating..."));
   runMonitor();
+  m_map->drawMap();
   //FIXME: handleUpdateStatusBar(tr("update completed"));
   setEnabled(true);
 }
-
-void WebDashboard::updateParentStatus(const NodeT& _service)
-{
-  NodeListT::Iterator pIt = m_cdata->bpnodes.find(_service.parent);
-  //pIt->status_info |= _service.status_info;
-  if(pIt->id != "root") updateParentStatus(*pIt);
-}
-
-void WebDashboard::updateServiceTree(void)
-{
-  //  string icon;
-
-  //  for(NodeListT sIt  = m_cdata->bpnodes.begin(); sIt != m_cdata->bpnodes.end(); ++sIt) {
-  //    icon = "icons/built-in/unknown.png";
-  //    if( sIt->status_info[MonitorBroker::NagiosCritical] ){
-  //      icon = "icons/built-in/critical.png";
-  //    } else if(  sIt->status_info[MonitorBroker::NagiosWarning] ){
-  //      icon = "icons/built-in/warning.png";
-  //    } else if(  sIt->status_info[MonitorBroker::NagiosOk]){
-  //      icon = "icons/built-in/normal.png";
-  //    }
-  //    sIt->navt_item->setIcon(icon);
-  //  }
-
-  //  for(NodeListT::Iterator sIt  = m_cdata->cnodes.begin(); sIt != m_cdata->cnodes.end(); ++sIt) {
-  //    icon = "icons/built-in/unknown.png";
-  //    if(  sIt->status_info[MonitorBroker::NagiosCritical] ){
-  //      icon = "icons/built-in/critical.png";
-  //    } else if(  sIt->status_info[MonitorBroker::NagiosWarning] ){
-  //      icon = "icons/built-in/warning.png";
-  //    } else if(  sIt->status_info[MonitorBroker::NagiosOk]){
-  //      icon = "icons/built-in/normal.png";
-  //    }
-  //    sIt->navt_item->setIcon(icon);
-  //  }
-}
-
 
 Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
 {

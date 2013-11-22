@@ -93,7 +93,7 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
   setColumnWidth(4, width - (65 * em.toPixels() + 90)); /*size of the header image*/
 }
 
-void WebMsgConsole::updateNodeMsg(const NodeListT& _cnodes)
+void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
 {
   for(NodeListT::ConstIterator node=_cnodes.begin(), end=_cnodes.end();
       node != end; ++node)
