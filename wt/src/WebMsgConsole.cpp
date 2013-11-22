@@ -103,7 +103,7 @@ void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
       addMsg(*node);
     } else {
       m_model->item(index, 0)->setText(node->check.last_state_change);
-      setStyleClass(m_model->item(index, 1), node->severity);
+      setSeverityItem(m_model->item(index, 1), node->severity);
       m_model->item(index, 2)->setText(node->check.host);
       m_model->item(index, 3)->setText(node->name.toStdString()); //optional
       m_model->item(index, 4)->setText(node->actual_msg.toStdString());
@@ -118,7 +118,7 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
     addMsg(_node);
   } else {
     m_model->item(index, 0)->setText(_node.check.last_state_change);
-    setStyleClass(m_model->item(index, 1), _node.severity);
+    setSeverityItem(m_model->item(index, 1), _node.severity);
     m_model->item(index, 2)->setText(_node.check.host);
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
     m_model->item(index, 4)->setText(_node.actual_msg.toStdString());
@@ -142,7 +142,7 @@ Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
   Wt::WStandardItem * item = new Wt::WStandardItem();
   item->setData(std::string("3"), Wt::UserRole);
   item->setText(utils::severity2Str(_node.severity).toStdString());
-  setStyleClass(item, _node.severity);
+  setSeverityItem(item, _node.severity);
   return item;
 }
 
@@ -167,8 +167,9 @@ int WebMsgConsole::findServiceRow(const std::string& _id)
 }
 
 
-void WebMsgConsole::setStyleClass(Wt::WStandardItem* item, int severity)
+void WebMsgConsole::setSeverityItem(Wt::WStandardItem* item, int severity)
 {
+  item->setText(utils::severity2Str(severity).toStdString());
   switch(severity) {
     case MonitorBroker::Normal:
       item->setStyleClass("severity-normal");

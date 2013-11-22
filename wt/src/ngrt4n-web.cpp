@@ -6,7 +6,8 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
   WebUI* ui = new WebUI(env, "examples/small_hosting_platform.ms.ngrt4n.xml"); //FIXME:set config file
   ui->setTwoPhaseRenderingThreshold(0);
   ui->setTitle(ui->getConfig().toStdString());
-  ui->setTheme(new Wt::WBootstrapTheme());
+  //ui->setTheme(new Wt::WBootstrapTheme());
+  ui->setCssTheme("polished");
   ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
   ui->render();
   return ui;

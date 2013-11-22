@@ -72,7 +72,7 @@ private:
   int m_rowCount;
 
   int findServiceRow(const std::string& _id);
-  void setStyleClass(Wt::WStandardItem* item, int severity);
+  void setSeverityItem(Wt::WStandardItem* item, int severity);
 };
 
 #endif /* NGRT4NMSGPANEL_HPP_ */
