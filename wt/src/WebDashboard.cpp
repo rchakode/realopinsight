@@ -66,8 +66,8 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   treePanel->setStyleClass("panel");
 
   mainLayout->setContentsMargins(0, 9, 0, 0);
-  treeLayout->setContentsMargins(0, 9, 0, 0);
-  mapMsgLayout->setContentsMargins(0, 9, 0, 0);
+  treeLayout->setContentsMargins(0, 0, 0, 0);
+  mapMsgLayout->setContentsMargins(0, 0, 0, 0);
   mapLayout->setContentsMargins(0, 0, 0, 0);
   msgLayout->setContentsMargins(0, 0, 0, 0);
 
