@@ -43,76 +43,68 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
     m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole())
 {
-  Wt::WContainerWidget* treeContainer = new Wt::WContainerWidget();
-  Wt::WContainerWidget* mapMsgContainer = new Wt::WContainerWidget();
-  Wt::WContainerWidget* mapContainer = new Wt::WContainerWidget();
-  Wt::WContainerWidget* msgContainer = new Wt::WContainerWidget();
-  Wt::WVBoxLayout* mainLayout = new Wt::WVBoxLayout();
-  Wt::WHBoxLayout* centralLayout = new Wt::WHBoxLayout();
-  Wt::WVBoxLayout* treeLayout = new Wt::WVBoxLayout();
-  Wt::WVBoxLayout* rightVLayout = new Wt::WVBoxLayout();
-  Wt::WVBoxLayout* mapLayout = new Wt::WVBoxLayout();
-  Wt::WVBoxLayout* msgLayout = new Wt::WVBoxLayout();
+  Wt::WContainerWidget* treeContainer(new Wt::WContainerWidget());
+  Wt::WContainerWidget* mapMsgContainer(new Wt::WContainerWidget());
+  Wt::WContainerWidget* mapContainer(new Wt::WContainerWidget());
+  Wt::WContainerWidget* msgContainer(new Wt::WContainerWidget());
+  Wt::WHBoxLayout* mainLayout(new Wt::WHBoxLayout(m_widget));
+  Wt::WVBoxLayout* treeLayout(new Wt::WVBoxLayout(treeContainer));
+  Wt::WVBoxLayout* mapMsgLayout(new Wt::WVBoxLayout(mapMsgContainer));
+  Wt::WVBoxLayout* mapLayout(new Wt::WVBoxLayout(mapContainer));
+  Wt::WVBoxLayout* msgLayout(new Wt::WVBoxLayout(msgContainer));
   Wt::WPanel* treePanel = new Wt::WPanel();
   Wt::WPanel* mapPanel = new Wt::WPanel();
   Wt::WPanel* msgPanel = new Wt::WPanel();
 
   m_widget->setStyleClass("maincontainer");
-  treeContainer->setStyleClass("panel");
   mapMsgContainer->setStyleClass("panel");
   mapContainer->setStyleClass("panel");
+  mapPanel->setStyleClass("panel");
   msgContainer->setStyleClass("panel");
+  msgPanel->setStyleClass("panel");
+  treeContainer->setStyleClass("panel");
+  treePanel->setStyleClass("panel");
 
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  centralLayout->setContentsMargins(0, 0, 0, 0);
-  treeLayout->setContentsMargins(0, 0, 0, 0);
-  rightVLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setContentsMargins(0, 9, 0, 0);
+  treeLayout->setContentsMargins(0, 9, 0, 0);
+  mapMsgLayout->setContentsMargins(0, 9, 0, 0);
   mapLayout->setContentsMargins(0, 0, 0, 0);
   msgLayout->setContentsMargins(0, 0, 0, 0);
 
-  mainLayout->setSpacing(1);
-  centralLayout->setSpacing(1);
-  treeLayout->setSpacing(1);
-  rightVLayout->setSpacing(1);
-  mapLayout->setSpacing(1);
-  msgLayout->setSpacing(1);
+  mainLayout->setSpacing(2);
+  treeLayout->setSpacing(0);
+  mapMsgLayout->setSpacing(2);
+  mapLayout->setSpacing(0);
+  msgLayout->setSpacing(0);
 
   treePanel->setCentralWidget(m_tree);
   treeLayout->addWidget(treePanel);
-  treeContainer->setLayout(treeLayout);
   treePanel->setTitle(QObject::tr("TV Explorer").toStdString());
 
   mapLayout->addWidget(m_map->get());
-  mapContainer->setLayout(mapLayout);
   mapPanel->setCentralWidget(mapContainer);
   //mapPanel->setTitle(QObject::tr("Service Map").toStdString());
 
   msgLayout->addWidget(m_msgConsole);
-  msgContainer->setLayout(msgLayout);
   msgPanel->setCentralWidget(msgContainer);
   //msgPanel->setTitle(QObject::tr("Message Console").toStdString());
 
-  mapMsgContainer->setLayout(rightVLayout);
-  rightVLayout->addWidget(mapPanel);
-  rightVLayout->addWidget(msgPanel);
-  rightVLayout->setStretchFactor(mapPanel, 3);
-  rightVLayout->setStretchFactor(msgPanel, 1);
+  mapMsgLayout->addWidget(mapPanel);
+  mapMsgLayout->addWidget(msgPanel);
+  //  rightVLayout->setStretchFactor(mapPanel, 3);
+  //  rightVLayout->setStretchFactor(msgPanel, 1);
 
-  centralLayout->addWidget(treeContainer);
-  centralLayout->addWidget(mapMsgContainer);
-
-  mainLayout->addWidget(createMenuBarWidget(), 0);
-  mainLayout->addLayout(centralLayout, 2);
-  m_widget->setLayout(mainLayout);
+  mainLayout->addWidget(treeContainer);
+  mainLayout->addWidget(mapMsgContainer);
 
   //FIXME: widget alignment
   treeLayout->setResizable(0);
-  centralLayout->setResizable(0);
-  centralLayout->setResizable(1);
-  centralLayout->setResizable(0);
-  centralLayout->setResizable(1);
-  rightVLayout->setResizable(0);
-  rightVLayout->setResizable(1);
+  mainLayout->setResizable(0);
+  mainLayout->setResizable(1);
+  mainLayout->setResizable(0);
+  mainLayout->setResizable(1);
+  mapMsgLayout->setResizable(0);
+  mapMsgLayout->setResizable(1);
 
   load(_config);
 }
@@ -139,7 +131,6 @@ void WebDashboard::load(const QString& _file)
   //m_map->drawMap();
   m_msgConsole->updateNodeMsgs(m_cdata->cnodes);
   initSettings();
-  handleRefresh();
 }
 
 void WebDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
@@ -162,61 +153,13 @@ void WebDashboard::updateChart(void)
 }
 
 
-void WebDashboard::handleRefresh(void)
-{
-  setEnabled(false);
-  //FIXME: handleUpdateStatusBar(tr("updating..."));
-  runMonitor();
-  m_map->drawMap();
-  //FIXME: handleUpdateStatusBar(tr("update completed"));
-  setEnabled(true);
-}
-
-Wt::WContainerWidget* WebDashboard::createMenuBarWidget(void)
-{
-  Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
-  Wt::WHBoxLayout* layout(new Wt::WHBoxLayout());
-  layout->setSpacing(0);
-  //  menuBar->setStyleClass("menubar");
-  layout->setSpacing(0);
-  menuBar->setPadding(0, Wt::All);
-  layout->setContentsMargins(0, 0, 0, 0);
-
-  Wt::WPushButton *b(new Wt::WPushButton(QObject::tr("Refresh").toStdString()));
-  b->setIcon("images/built-in/menu_refresh.png");
-  //  b->setStyleClass("button");
-  layout->addWidget(b, 0);
-
-  b =  new Wt::WPushButton(QObject::tr("Zoom in").toStdString());
-  b->setIcon("images/built-in/menu_zoomin.png");
-  //  b->setStyleClass("button");
-  layout->addWidget(b, 0);
-
-  b =  new Wt::WPushButton(QObject::tr("Zoom out").toStdString());
-  b->setIcon("images/built-in/menu_zoomout.png");
-  //  b->setStyleClass("button");
-  layout->addWidget(b, 0);
-
-  b =  new Wt::WPushButton(QObject::tr("Save map").toStdString());
-  b->setIcon("images/built-in/menu_disket.png");
-  //  b->setStyleClass("button");
-  layout->addWidget(b, 0);
-
-  b =  new Wt::WPushButton(QObject::tr("Help").toStdString());
-  b->setIcon("images/built-in/help.png");
-  //  b->setStyleClass("button");
-  layout->addWidget(b, 0);
-
-  b =  new Wt::WPushButton(QObject::tr("Quit").toStdString());
-  b->setIcon("images/built-in/logout.png");
-  //  b->setStyleClass("button");
-  layout->addWidget(b, 0);
-
-  menuBar->setLayout(layout);
-  return menuBar;
-}
 
 void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 {
   m_map->updateNode(_node, _tip);
+}
+
+void WebDashboard::updateMap(void)
+{
+  m_map->drawMap();
 }

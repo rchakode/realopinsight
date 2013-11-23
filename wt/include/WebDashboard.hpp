@@ -45,6 +45,7 @@ public:
   WebDashboard(const qint32& _userRole, const QString& _config);
   virtual ~WebDashboard();
   Wt::WContainerWidget* get(void) const {return m_widget;}
+  void updateMap(void);
 
 protected:
   virtual void load(const QString& _file);
@@ -58,9 +59,6 @@ private:
   WebTree* m_tree;
   WebMap* m_map;
   WebMsgConsole* m_msgConsole;
-
-  Wt::WContainerWidget* createMenuBarWidget(void);
-  void handleRefresh(void);
 };
 
 #endif /* WEBDASHBOOARD_HPP */

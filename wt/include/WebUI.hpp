@@ -39,6 +39,9 @@ public:
 
 private:
   WebDashboard* m_dashboard;
+  Wt::WContainerWidget* createMenuBarWidget(void);
+  Wt::WPushButton* createMenuButton(const std::string& icon,const std::string& text);
+  void handleRefresh(void);
 };
 
 #endif // MAINWEBWINDOW_HPP
