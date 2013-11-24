@@ -224,6 +224,12 @@ void MainWindow::handleRefresh(void)
   setEnabled(true);
 }
 
+void MainWindow::resetTimer(qint32 interval)
+{
+  killTimer(m_dashboard->getTimerId());
+  m_dashboard->setTimerId(startTimer(interval));
+}
+
 void MainWindow::addEvents(void)
 {
   QList<QAction*> actions;

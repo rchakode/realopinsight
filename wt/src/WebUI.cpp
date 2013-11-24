@@ -28,8 +28,10 @@
 
 WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
-    m_dashboard(new WebDashboard(Auth::OpUserRole, config))
+    m_dashboard(new WebDashboard(Auth::OpUserRole, config)),
+    m_mainWidget(new Wt::WContainerWidget())
 {
+  addEvents();
 }
 
 WebUI::~WebUI()
@@ -37,17 +39,22 @@ WebUI::~WebUI()
   delete m_dashboard;
 }
 
+void WebUI::timerEvent(QTimerEvent*)
+{
+  qDebug() << "Updating..............";
+  handleRefresh();
+}
+
 void WebUI::render(void)
 {
-  Wt::WContainerWidget* mainContainer(new Wt::WContainerWidget());
-  mainContainer->setStyleClass("maincontainer");
-  Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(mainContainer));
-  mainContainer->setLayout(mainLayout);
+  m_mainWidget->setStyleClass("maincontainer");
+  Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
+  m_mainWidget->setLayout(mainLayout);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(createMenuBarWidget());
   mainLayout->addWidget(m_dashboard->get());
-  setTitle(QObject::tr("%1 Operations Console - %2").arg(APP_NAME, m_dashboard->getConfig()).toStdString());
-  root()->addWidget(mainContainer);
+  setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getConfig(), APP_NAME).toStdString());
+  root()->addWidget(m_mainWidget);
   handleRefresh();
   refresh();
 }
@@ -82,14 +89,21 @@ Wt::WPushButton* WebUI::createMenuButton(const std::string& icon, const std::str
   return button;
 }
 
-
+void WebUI::resetTimer(qint32 interval)
+{
+  killTimer(m_dashboard->getTimerId());
+  m_dashboard->setTimerId(startTimer(interval));
+}
 
 void WebUI::handleRefresh(void)
 {
-  m_dashboard->setEnabled(false);
-  //FIXME: handleUpdateStatusBar(tr("updating..."));
+  m_mainWidget->disable();
   m_dashboard->runMonitor();
   m_dashboard->updateMap();
-  //FIXME: handleUpdateStatusBar(tr("update completed"));
-  m_dashboard->setEnabled(true);
+  m_mainWidget->enable();
+}
+
+void WebUI::addEvents(void)
+{
+  connect(m_dashboard, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }

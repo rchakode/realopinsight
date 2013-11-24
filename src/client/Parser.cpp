@@ -103,7 +103,6 @@ bool Parser::process(bool console)
         if (console) {
           node.child_nodes = utils::realCheckId(srcid, node.child_nodes);
         }
-        qDebug() << srcid;
         m_cdata->sources.insert(srcid);
       } else {
         m_cdata->sources.insert(srcid);

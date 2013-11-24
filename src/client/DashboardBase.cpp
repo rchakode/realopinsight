@@ -788,13 +788,6 @@ void DashboardBase::initSettings(void)
   emit settingsLoaded();
 }
 
-void DashboardBase::resetInterval()
-{
-  m_interval = 1000 * m_settings->getUpdateInterval();
-  killTimer(m_timer);
-  m_timer = startTimer(m_interval);
-}
-
 bool DashboardBase::allocSourceHandler(SourceT& src)
 {
   bool allocated = false;
@@ -915,4 +908,10 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
     }
     cnode->monitored = false;
   }
+}
+
+void DashboardBase::resetInterval()
+{
+  m_interval = 1000 * m_settings->getUpdateInterval();
+  timerIntervalChanged(m_interval);
 }

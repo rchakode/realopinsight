@@ -29,19 +29,30 @@
 #include <Wt/WApplication>
 #include "WebDashboard.hpp"
 
-class WebUI : public Wt::WApplication
+class WebUI : public QObject, public Wt::WApplication
 {
+  Q_OBJECT
 public:
   WebUI(const Wt::WEnvironment& env, const QString& config);
   virtual ~WebUI();
   void render(void);
   QString getConfig (void) const {return m_dashboard->getConfig();}
+  void enable(void) {m_mainWidget->enable();}
+  void disbale(void) {m_mainWidget->disable();}
+
+public slots:
+  void resetTimer(qint32 interval);
+
+protected:
+  virtual void timerEvent(QTimerEvent*);
 
 private:
   WebDashboard* m_dashboard;
   Wt::WContainerWidget* createMenuBarWidget(void);
   Wt::WPushButton* createMenuButton(const std::string& icon,const std::string& text);
   void handleRefresh(void);
+  Wt::WContainerWidget* m_mainWidget;
+  void addEvents(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

@@ -51,11 +51,7 @@ public:
   virtual ~GuiDashboard();
 
   QWidget* getWidget(void) const {return m_widget;}
-  static StringMapT propRules();
-  static StringMapT calcRules();
-
-  virtual void resizeDashboard(qint32 width, qint32 height);
-
+  void resizeDashboard(qint32 width, qint32 height);
   void showTrayIcon(void) const {m_trayIcon->show();}
   void setTrayIconTooltip(const QString& msg) {m_trayIcon->setToolTip(msg);}
   void scalPaneContentsToViewPort(void) const;
@@ -67,6 +63,8 @@ public:
   void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
   GraphView* getMap(void) const {return m_map;}
   WebKit* getBrowser(void) const {return m_browser;}
+  static StringMapT propRules();
+  static StringMapT calcRules();
 
 public slots:
   void handleShowAbout(void);
@@ -93,6 +91,17 @@ signals:
   void centralTabChanged(int);
 
 protected:
+  void updateTrayInfo(const NodeT& _node);
+  QTabWidget* builtMsgPane(void);
+
+  virtual void load(const QString& _file);
+  void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
+  virtual void updateMap(const NodeT& _node, const QString& _tip);
+  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  virtual void updateMsgConsole(const NodeT& _node);
+  virtual void updateChart(void);
+
+private:
   enum {
     ConsoleTab=0,
     BrowserTab=1
@@ -109,18 +118,6 @@ protected:
   QSystemTrayIcon* m_trayIcon;
   QComboBox* m_bxSourceSelection;
   QTabWidget* m_msgPane;
-
-  void updateTrayInfo(const NodeT& _node);
-  QTabWidget* builtMsgPane(void);
-
-  virtual void load(const QString& _file);
-  void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
-  virtual void updateMap(const NodeT& _node, const QString& _tip);
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
-  virtual void updateMsgConsole(const NodeT& _node);
-  virtual void updateChart(void);
-
-private:
   void addEvents(void);
   QTabWidget* newMsgConsole(void);
   void setBrowserSourceSelectionBx(void);

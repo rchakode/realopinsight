@@ -41,7 +41,7 @@
 class QScriptValueIterator;
 class QSystemTrayIcon;
 
-class DashboardBase : public QWidget
+class DashboardBase : public QObject
 {
   Q_OBJECT
 
@@ -56,6 +56,8 @@ public:
   QString getConfig(void) const {return m_config;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString getSelectedNode(void) const {return m_selectedNode;}
+  void setTimerId(qint32 id) {m_timerId = id;}
+  qint32 getTimerId(void) const {return m_timerId;}
 
 public slots:
   void runMonitor();
@@ -79,6 +81,7 @@ signals:
   void updateStatusBar(const QString& msg);
   void settingsLoaded(void);
   void updateSourceUrl(void);
+  void timerIntervalChanged(qint32 interval);
 
 protected:
   qint64 updateCounter;
@@ -87,7 +90,7 @@ protected:
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;
-  qint32 m_timer;
+  qint32 m_timerId;
   Settings* m_settings;
   Preferences* m_preferences;
   Preferences* m_changePasswdWindow;
@@ -97,6 +100,7 @@ protected:
   NodeListT::Iterator m_root;
   int m_firstSrcIndex;
 
+protected:
   virtual void load(const QString& _file) = 0;
   void computeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
@@ -108,6 +112,7 @@ protected:
   virtual void updateChart(void) = 0;
 
 private:
+  void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);
   QStringList getAuthInfo(const QString& authString);
@@ -115,10 +120,8 @@ private:
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
   void requestZbxZnsData(SourceT& src);
-  void resetInterval(void);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
-
   QString getNodeToolTip(const NodeT& _node);
 };
 

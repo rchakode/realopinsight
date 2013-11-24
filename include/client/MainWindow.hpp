@@ -43,6 +43,7 @@ public slots:
   void handleTabChanged(int index);
   void handleHideChart(void);
   void handleRefresh(void);
+  void resetTimer(qint32 interval);
 
 protected:
   virtual void closeEvent(QCloseEvent*);
