@@ -21,7 +21,7 @@ body, html {
 }
 
 .severity-normal {
-  background-color: green; 
+  background-color: #00FF00; 
 }
 
 .severity-minor {
