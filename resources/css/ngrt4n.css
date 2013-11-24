@@ -6,40 +6,33 @@ body, html {
   font-family: verdana,helvetica,tahoma,sans-serif;
   font-size: 10pt;
 }
-
 .maincontainer {
   margin: 0px;
   padding: 0px;
   width: 100% ;
   height: 100%;
 }
-
 .panel {
   margin: 0px ;
   padding: 0px ;
 /*  border: none;*/
 }
-
 .severity-normal {
   background-color: #00FF00; 
 }
 
 .severity-minor {
-  background-color: yellow; 
+  background-color: #FFFF00;  /*yellow*/
 }
-
 .severity-major {
-  background-color: orange; 
+  background-color: #FFA500; /*orange*/
 }
-
 .severity-critical {
-  background: red; 
+  background: #FF0000;  /*red*/
 }
-
 .severity-unknown {
-  background-color: gray; 
+  background-color: #C0C0C0;  /*gray*/
 }
-
 .button {
  margin: none;
  padding: none;

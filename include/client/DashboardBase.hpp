@@ -58,6 +58,7 @@ public:
   QString getSelectedNode(void) const {return m_selectedNode;}
   void setTimerId(qint32 id) {m_timerId = id;}
   qint32 getTimerId(void) const {return m_timerId;}
+  qint32 getTimerInterval(void) const {return m_interval;}
 
 public slots:
   void runMonitor();
