@@ -98,17 +98,17 @@ Wt::WContainerWidget* WebUI::createPopupMenu(void)
 {
   Wt::WContainerWidget* container(new Wt::WContainerWidget());
   Wt::WPopupMenu* popup(new Wt::WPopupMenu());
+
   Wt::WMenuItem *item = popup->addItem("images/built-in/help.png", QObject::tr("Help").toStdString());
-  popup->addItem(item);
+  item->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php?page=documentation"));
+  item->setLinkTarget(Wt::TargetNewWindow);
 
   popup->addSeparator();
 
   item = popup->addItem("images/built-in/logout.png", QObject::tr("Quit").toStdString());
-  popup->addItem(item);
 
-  Wt::WPushButton *button = new Wt::WPushButton(container);
+  Wt::WPushButton* button = new Wt::WPushButton(container);
   button->setMenu(popup);
-
   return container;
 }
 
