@@ -55,6 +55,9 @@ DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
 DEFINES *= "RELEASE_YEAR='\"2013\"'"
+
+DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
+
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
