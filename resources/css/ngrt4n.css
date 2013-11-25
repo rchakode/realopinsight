@@ -15,7 +15,9 @@ body, html {
 .panel {
   margin: 0px ;
   padding: 0px ;
-/*  border: none;*/
+}
+.panel tree{
+  min-width: 300px ;
 }
 .severity-normal {
   background-color: #00FF00; 

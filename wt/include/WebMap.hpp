@@ -45,6 +45,8 @@ public:
 
   Wt::WScrollArea* get(void) const {return m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
+  void zoomIn(void);
+  void zoomOut(void);
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);

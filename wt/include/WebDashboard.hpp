@@ -46,6 +46,7 @@ public:
   virtual ~WebDashboard();
   Wt::WContainerWidget* get(void) const {return m_widget;}
   void updateMap(void);
+  WebMap* getMap(void) const {return m_map;}
 
 protected:
   virtual void load(const QString& _file);

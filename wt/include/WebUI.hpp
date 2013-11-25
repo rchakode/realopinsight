@@ -26,6 +26,7 @@
 #ifndef MAINWEBWINDOW_HPP
 #define MAINWEBWINDOW_HPP
 
+#include <Wt/WTimer>
 #include <Wt/WApplication>
 #include "WebDashboard.hpp"
 
@@ -39,20 +40,23 @@ public:
   QString getConfig (void) const {return m_dashboard->getConfig();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
-  void initTimer(void) {resetTimer(m_dashboard->getTimerInterval());}
+  void setupTimer(void);
 
 public slots:
   void resetTimer(qint32 interval);
 
-protected:
-  virtual void timerEvent(QTimerEvent*);
-
 private:
+  Wt::WTimer* m_timer;
   WebDashboard* m_dashboard;
   Wt::WContainerWidget* createMenuBarWidget(void);
+  Wt::WContainerWidget* createPopupMenu(void);
+
+  Wt::WContainerWidget* m_mainWidget;
+
   Wt::WPushButton* createMenuButton(const std::string& icon,const std::string& text);
   void handleRefresh(void);
-  Wt::WContainerWidget* m_mainWidget;
+
+
   void addEvents(void);
 };
 

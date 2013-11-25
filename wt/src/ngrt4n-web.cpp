@@ -10,7 +10,6 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
   //ui->setCssTheme("polished");
   ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
   ui->render();
-  ui->initTimer();
   return ui;
 }
 

@@ -79,15 +79,13 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
   treePanel->setCentralWidget(m_tree);
   treeLayout->addWidget(treePanel);
-  treePanel->setTitle(QObject::tr("TV Explorer").toStdString());
+  treePanel->setTitle(QObject::tr("Service Tree").toStdString());
 
   mapLayout->addWidget(m_map->get());
   mapPanel->setCentralWidget(mapContainer);
-  //mapPanel->setTitle(QObject::tr("Service Map").toStdString());
 
   msgLayout->addWidget(m_msgConsole);
   msgPanel->setCentralWidget(msgContainer);
-  //msgPanel->setTitle(QObject::tr("Message Console").toStdString());
 
   mapMsgLayout->addWidget(mapPanel);
   mapMsgLayout->addWidget(msgPanel);

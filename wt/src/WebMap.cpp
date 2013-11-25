@@ -35,7 +35,7 @@ namespace {
 WebMap::WebMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
     m_cdata(_cdata),
-    m_scaleX (1),
+    m_scaleX(1),
     m_scaleY(1),
     m_layoutWidth(0),
     m_layoutHeight(0),
@@ -93,12 +93,11 @@ void WebMap::layoutSizeChanged (int width, int height)
 
 void WebMap::drawMap(void)
 {
-  if(! m_firstUpdate) {
-    m_scaleX = m_layoutWidth/m_cdata->map_width;
-    m_scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * m_scaleX;
-    m_firstUpdate = false;
-  }
-
+//  if(! m_firstUpdate) {
+//    m_scaleX = m_layoutWidth/m_cdata->map_width;
+//    m_scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * m_scaleX;
+//    m_firstUpdate = false;
+//  }
   Wt::WPaintedWidget::update(); //this call paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width + MAP_PADDING,
                              m_cdata->map_height + MAP_PADDING);
@@ -158,7 +157,8 @@ void WebMap::createLink(const NodeT& _node)
   double width = 40.0 * m_scaleX;
   double height = 40.0 * m_scaleY;
   Wt::WRectArea *area = new Wt::WRectArea(x, y, width, height);
-  area->setToolTip(utils::getNodeToolTip(_node).toStdString());
+  //FIXME: for tree and msg console
+  area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toStdString()));
   area->setLink("#");
   addArea(area);
 }
@@ -167,5 +167,19 @@ void WebMap::updateNode(const NodeT&, const QString&)
 {
   // Empty function to conform with the polymorphism
   // With WPaintedWidget, the whole map is updated
+}
+
+void WebMap::zoomIn(void)
+{
+  m_scaleX*=0.9;
+  m_scaleY*=0.9;
+  update();
+}
+
+void WebMap::zoomOut(void)
+{
+  m_scaleX*=1.1;
+  m_scaleY*=1.1;
+  update();
 }
 
