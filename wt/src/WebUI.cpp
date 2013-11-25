@@ -44,12 +44,6 @@ WebUI::~WebUI()
   delete m_mainWidget;
 }
 
-void WebUI::setupTimer(void)
-{
-  m_timer->setInterval(m_dashboard->getTimerInterval());
-  m_timer->timeout().connect(this, &WebUI::handleRefresh);
-  m_timer->start();
-}
 
 void WebUI::render(void)
 {
@@ -63,9 +57,8 @@ void WebUI::render(void)
   root()->addWidget(m_mainWidget);
   handleRefresh();
   refresh();
-  setupTimer();
+  resetTimer();
 }
-
 
 Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 {
@@ -119,8 +112,6 @@ Wt::WContainerWidget* WebUI::createPopupMenu(void)
   return container;
 }
 
-
-
 Wt::WPushButton* WebUI::createMenuButton(const std::string& icon, const std::string& text)
 {
   Wt::WPushButton *button = new Wt::WPushButton();
@@ -130,10 +121,17 @@ Wt::WPushButton* WebUI::createMenuButton(const std::string& icon, const std::str
   return button;
 }
 
+void WebUI::resetTimer(void)
+{
+  m_timer->setInterval(m_dashboard->getTimerInterval());
+  m_timer->timeout().connect(this, &WebUI::handleRefresh);
+  m_timer->start();
+}
+
 void WebUI::resetTimer(qint32 interval)
 {
-  killTimer(m_dashboard->getTimerId());
-  m_dashboard->setTimerId(startTimer(interval));
+  m_timer->stop();
+  m_timer->setInterval(interval);
   m_timer->start();
 }
 

@@ -25,7 +25,7 @@
 #include "core/ns.hpp"
 #include "client/utilsClient.hpp"
 #include "client/Auth.hpp"
-#include "client/SvNavigator.hpp"
+#include "client/MainWindow.hpp"
 #include "client/SvConfigCreator.hpp"
 #include "client/ZbxHelper.hpp"
 #include <sstream>
@@ -108,9 +108,8 @@ int main(int argc, char **argv)
 
     }
     info->finish(0);
-    SvNavigator* console= new SvNavigator(userRole);
-    console->load(file);
-    console->runMonitor();
+    MainWindow* console= new MainWindow(userRole, file);
+    console->render();
   } else if (module == "editor") {
     SvCreator* editor = new SvCreator(userRole);
     editor->load(file);

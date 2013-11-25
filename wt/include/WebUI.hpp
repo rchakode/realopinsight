@@ -40,7 +40,7 @@ public:
   QString getConfig (void) const {return m_dashboard->getConfig();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
-  void setupTimer(void);
+  void resetTimer(void);
 
 public slots:
   void resetTimer(qint32 interval);

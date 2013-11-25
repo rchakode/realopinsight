@@ -765,7 +765,6 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
 void DashboardBase::initSettings(void)
 {
   m_sources.clear();
-
   SourceT src;
   for (auto id=m_cdata->sources.begin(),end = m_cdata->sources.end(); id!=end; ++id)
   {
@@ -777,7 +776,7 @@ void DashboardBase::initSettings(void)
         m_sources.insert(srcinfo.second, src);
       } else {
         src.id = *id;
-        updateDashboardOnError(src, tr("Source not set (%1)").arg(*id));
+        updateDashboardOnError(src, tr("%1 is not set").arg(*id));
       }
     } else {
       utils::alert(tr("Could not handle this source (%1)").arg(*id));

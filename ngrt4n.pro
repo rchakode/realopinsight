@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.4.0
+VERSION_=2.5.0
 VERSION = "-$${VERSION_}"
 config-dist{
 SOURCES	+=
@@ -49,11 +49,11 @@ INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
-DEFINES *= "APPLICATION_NAME='\"RealOpInsight Ultimate\"'"
-DEFINES *= "PACKAGE_NAME='\"\"'"
+DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
+DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "RELEASE_NAME='\"Foederare\"'"
+DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
 DEFINES *= "RELEASE_YEAR='\"2013\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc

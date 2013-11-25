@@ -523,7 +523,7 @@ QString Preferences::getSourceStatesSerialized(void)
 
 void Preferences::initSourceStates(void)
 {
-  initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString() );
+  initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
   updateSourceBtnState();
 }
 
