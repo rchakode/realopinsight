@@ -397,7 +397,7 @@ IconMapT utils::nodeIcons() {
   icons["Firewall"] = ":/images/firewall.png";
   icons["Router"] = ":/images/router.png";
   icons["Network"] = ":/images/network.png";
-  icons["Swicth"] = ":/images/switch.png";
+  icons["Switch"] = ":/images/switch.png";
   icons["Filer"] = ":/images/filer.png";
   icons["Hard disk"] = ":/images/harddisk.png";
   icons["Storage Area"] = ":/images/storage.png";

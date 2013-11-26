@@ -27,6 +27,9 @@
 #include <Wt/WPushButton>
 #include <Wt/WPopupMenu>
 #include <functional>
+#include <Wt/WNavigationBar>
+#include <Wt/WMessageBox>
+#include <Wt/WLineEdit>
 
 WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
@@ -50,10 +53,8 @@ void WebUI::render(void)
   setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getConfig(), APP_NAME).toStdString());
   m_mainWidget->setStyleClass("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
-  m_mainWidget->setLayout(mainLayout);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(createMenuBarWidget());
-  mainLayout->addWidget(m_dashboard->get());
   root()->addWidget(m_mainWidget);
   handleRefresh();
   refresh();
@@ -63,60 +64,90 @@ void WebUI::render(void)
 Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 {
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
-  Wt::WHBoxLayout* layout(new Wt::WHBoxLayout(menuBar));
+  Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
+  navigation->setTitle("(c) RealOpInsight.com", "http://realopinsight.com/");
+  navigation->addStyleClass("panel");
+  navigation->setResponsive(true);
+  Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
+  contentsStack->addStyleClass("maincontainer");
+
+  // Setup a Left-aligned menu.
+  Wt::WMenu *leftMenu = new Wt::WMenu(contentsStack, menuBar);
+  navigation->addMenu(leftMenu);
+
+  leftMenu->addItem("images/built-in/menu_refresh.png",
+                    "Home",
+                    m_dashboard->get(),
+                    Wt::WMenuItem::LazyLoading);
+  navigation->addWidget(createToolBar());
+
+  // Setup a Right-aligned menu.
+  Wt::WMenu* rightMenu = new Wt::WMenu();
+  navigation->addMenu(rightMenu, Wt::AlignRight);
+
+  // Create a popup submenu for the Help menu.
+  Wt::WPopupMenu* popup = new Wt::WPopupMenu();
+  popup->addItem("Documentation")
+      ->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
+  popup->addSeparator();
+  popup->addItem("About");
+
+  Wt::WMenuItem *item = new Wt::WMenuItem("Help");
+  item->setMenu(popup);
+  rightMenu->addItem(item);
+
+  // Add a Search control.
+  Wt::WLineEdit *edit = new Wt::WLineEdit();
+  edit->setEmptyText("Enter a search item");
+  Wt::WText* searchResult = new Wt::WText("Oups, no match !");
+  edit->enterPressed().connect(std::bind([=] () {
+    leftMenu->select(0); // FIXME: is the index of the "Home"
+    searchResult->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
+  }));
+
+  navigation->addSearch(edit, Wt::AlignRight);
+
+  menuBar->addWidget(contentsStack);
+
+  return menuBar;
+}
+
+
+Wt::WContainerWidget* WebUI::createToolBar(void)
+{
+  Wt::WContainerWidget* container(new Wt::WContainerWidget());
+  Wt::WHBoxLayout* layout(new Wt::WHBoxLayout(container));
   Wt::WToolBar* toolBar(new Wt::WToolBar());
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(toolBar, Wt::AlignLeft);
 
   Wt::WPushButton* b(NULL);
-  b = createMenuButton("images/built-in/menu_refresh.png", QObject::tr("Refresh").toStdString());
+  b = createTooBarButton("images/built-in/menu_refresh.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebUI::handleRefresh);
   toolBar->addButton(b);
 
-  b = createMenuButton("images/built-in/menu_zoomin.png", QObject::tr("Zoom in").toStdString());
+  b = createTooBarButton("images/built-in/zoomin.png");
   b->setStyleClass("button");
   b->clicked().connect(m_dashboard->getMap(), &WebMap::zoomIn);
   toolBar->addButton(b);
 
-  b = createMenuButton("images/built-in/menu_zoomout.png",QObject::tr("Zoom out").toStdString());
+  b = createTooBarButton("images/built-in/zoomout.png");
   b->setStyleClass("button");
   b->clicked().connect(m_dashboard->getMap(), &WebMap::zoomOut);
   toolBar->addButton(b);
 
-  b = createMenuButton("images/built-in/menu_disket.png", QObject::tr("Save map").toStdString());
+  b = createTooBarButton("images/built-in/disket.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebUI::handleRefresh);
-  toolBar->addButton(b);
+  toolBar->addButton(createTooBarButton("images/built-in/disket.png"));
 
-  layout->addWidget(createPopupMenu(), 0, Wt::AlignRight);
-  return menuBar;
-}
-
-
-Wt::WContainerWidget* WebUI::createPopupMenu(void)
-{
-  Wt::WContainerWidget* container(new Wt::WContainerWidget());
-  Wt::WPopupMenu* popup(new Wt::WPopupMenu());
-
-  Wt::WMenuItem *item = popup->addItem("images/built-in/help.png", QObject::tr("Help").toStdString());
-  item->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php?page=documentation"));
-  item->setLinkTarget(Wt::TargetNewWindow);
-
-  popup->addSeparator();
-
-  item = popup->addItem("images/built-in/logout.png", QObject::tr("Quit").toStdString());
-
-  Wt::WPushButton* button = new Wt::WPushButton(container);
-  button->setMenu(popup);
   return container;
 }
 
-Wt::WPushButton* WebUI::createMenuButton(const std::string& icon, const std::string& text)
+Wt::WPushButton* WebUI::createTooBarButton(const std::string& icon)
 {
   Wt::WPushButton *button = new Wt::WPushButton();
-  button->setTextFormat(Wt::XHTMLText);
-  button->setText(text);
   button->setIcon(icon);
   return button;
 }

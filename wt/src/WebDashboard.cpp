@@ -56,6 +56,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   Wt::WPanel* mapPanel = new Wt::WPanel();
   Wt::WPanel* msgPanel = new Wt::WPanel();
 
+  m_widget->setPadding(Wt::WLength(0), Wt::All);
   m_widget->setStyleClass("maincontainer");
   mapMsgContainer->setStyleClass("panel");
   mapContainer->setStyleClass("panel");
@@ -65,7 +66,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   treeContainer->setStyleClass("panel");
   treePanel->setStyleClass("panel");
 
-  mainLayout->setContentsMargins(0, 9, 0, 0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   treeLayout->setContentsMargins(0, 0, 0, 0);
   mapMsgLayout->setContentsMargins(0, 0, 0, 0);
   mapLayout->setContentsMargins(0, 0, 0, 0);
@@ -126,7 +127,7 @@ void WebDashboard::load(const QString& _file)
   parser.process(true);
   parser.computeNodeCoordinates(1);
   m_tree->build();
-  //m_map->drawMap();
+  m_map->drawMap();
   m_msgConsole->updateNodeMsgs(m_cdata->cnodes);
   initSettings();
 }

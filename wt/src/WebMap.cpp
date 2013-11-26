@@ -171,15 +171,15 @@ void WebMap::updateNode(const NodeT&, const QString&)
 
 void WebMap::zoomIn(void)
 {
-  m_scaleX*=0.9;
-  m_scaleY*=0.9;
+  m_scaleX*=1.1;
+  m_scaleY*=1.1;
   update();
 }
 
 void WebMap::zoomOut(void)
 {
-  m_scaleX*=1.1;
-  m_scaleY*=1.1;
+  m_scaleX*=0.9;
+  m_scaleY*=0.9;
   update();
 }
 

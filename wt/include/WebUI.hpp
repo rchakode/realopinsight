@@ -49,11 +49,11 @@ private:
   Wt::WTimer* m_timer;
   WebDashboard* m_dashboard;
   Wt::WContainerWidget* createMenuBarWidget(void);
-  Wt::WContainerWidget* createPopupMenu(void);
+  Wt::WContainerWidget* createToolBar(void);
 
   Wt::WContainerWidget* m_mainWidget;
 
-  Wt::WPushButton* createMenuButton(const std::string& icon,const std::string& text);
+  Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
 
 
