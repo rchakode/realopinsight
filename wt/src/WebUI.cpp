@@ -128,20 +128,20 @@ Wt::WContainerWidget* WebUI::createToolBar(void)
   b->clicked().connect(this, &WebUI::handleRefresh);
   toolBar->addButton(b);
 
-  b = createTooBarButton("images/built-in/zoomin.png");
+  b = createTooBarButton("images/built-in/menu_zoomin.png");
   b->setStyleClass("button");
   b->clicked().connect(m_dashboard->getMap(), &WebMap::zoomIn);
   toolBar->addButton(b);
 
-  b = createTooBarButton("images/built-in/zoomout.png");
+  b = createTooBarButton("images/built-in/menu_zoomout.png");
   b->setStyleClass("button");
   b->clicked().connect(m_dashboard->getMap(), &WebMap::zoomOut);
   toolBar->addButton(b);
 
-  b = createTooBarButton("images/built-in/disket.png");
+  b = createTooBarButton("images/built-in/menu_disket.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebUI::handleRefresh);
-  toolBar->addButton(createTooBarButton("images/built-in/disket.png"));
+  toolBar->addButton(createTooBarButton("images/built-in/menu_disket.png"));
 
   return container;
 }
