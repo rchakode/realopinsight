@@ -36,8 +36,6 @@
 
 class WebMap : public Wt::WPaintedWidget
 {
-  //  Q_OBJECT
-
 public:
   WebMap(CoreDataT* _cdata);
   virtual ~WebMap();
@@ -45,8 +43,7 @@ public:
 
   Wt::WScrollArea* get(void) const {return m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
-  void zoomIn(void);
-  void zoomOut(void);
+  void scaleMap(double factor);
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);

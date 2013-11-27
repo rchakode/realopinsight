@@ -34,11 +34,6 @@ const QString GraphView::LABEL_NODE = ":LABEL";
 const QString GraphView::ICON_NODE = ":ICON";
 const QString GraphView::EXPICON_NODE = ":EXPICON";
 
-namespace {
-  const float SCALIN_FACTOR = 1.1;
-  const float SCALOUT_FACTOR = 1/SCALIN_FACTOR;
-}
-
 GraphView::GraphView(CoreDataT* _cdata, QWidget* _parent)
   : QGraphicsView(_parent),
     m_cdata(_cdata),
@@ -127,18 +122,18 @@ void GraphView::mouseMoveEvent(QMouseEvent * event)
 
 void GraphView::zoomIn()
 {
-  QGraphicsView::scale(SCALIN_FACTOR, SCALIN_FACTOR);
+  QGraphicsView::scale(utils::SCALIN_FACTOR, utils::SCALIN_FACTOR);
   if (m_chart) {
     setChartPos();
-    m_chart->scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
+    m_chart->scale(utils::SCALOUT_FACTOR, utils::SCALOUT_FACTOR);
   }
 }
 
 void GraphView::zoomOut()
 {
-  QGraphicsView::scale(SCALOUT_FACTOR, SCALOUT_FACTOR);
+  QGraphicsView::scale(utils::SCALOUT_FACTOR, utils::SCALOUT_FACTOR);
   if (m_chart) {
-    m_chart->scale(SCALIN_FACTOR, SCALIN_FACTOR);
+    m_chart->scale(utils::SCALIN_FACTOR, utils::SCALIN_FACTOR);
     setChartPos();
   }
 }

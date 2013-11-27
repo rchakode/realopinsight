@@ -30,6 +30,7 @@
 #include <Wt/WNavigationBar>
 #include <Wt/WMessageBox>
 #include <Wt/WLineEdit>
+#include <utilsClient.hpp>
 
 WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
@@ -108,8 +109,6 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 
   navigation->addSearch(edit, Wt::AlignRight);
 
-  menuBar->addWidget(contentsStack);
-
   return menuBar;
 }
 
@@ -130,12 +129,12 @@ Wt::WContainerWidget* WebUI::createToolBar(void)
 
   b = createTooBarButton("images/built-in/menu_zoomin.png");
   b->setStyleClass("button");
-  b->clicked().connect(m_dashboard->getMap(), &WebMap::zoomIn);
+  b->clicked().connect(std::bind(&WebMap::scaleMap, m_dashboard->getMap(), utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_zoomout.png");
   b->setStyleClass("button");
-  b->clicked().connect(m_dashboard->getMap(), &WebMap::zoomOut);
+  b->clicked().connect(std::bind(&WebMap::scaleMap, m_dashboard->getMap(), utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_disket.png");

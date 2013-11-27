@@ -96,7 +96,6 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   mainLayout->addWidget(treeContainer);
   mainLayout->addWidget(mapMsgContainer);
 
-  //FIXME: widget alignment
   treeLayout->setResizable(0);
   mainLayout->setResizable(0);
   mainLayout->setResizable(1);

@@ -103,7 +103,6 @@ void WebMap::drawNode(const NodeT& _node)
   Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
   Wt::WPen pen(wcolor);
   m_painter->setPen(pen);
-
   // Draw icon
   m_painter->drawImage(posIcon,Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40));
   // Draw anchor icon
@@ -155,17 +154,10 @@ void WebMap::updateNode(const NodeT&, const QString&)
   // With WPaintedWidget, the whole map is updated
 }
 
-void WebMap::zoomIn(void)
+void WebMap::scaleMap(double factor)
 {
-  m_scaleX*=1.1;
-  m_scaleY*=1.1;
-  update();
+  m_scaleX *= factor;
+  m_scaleY *= factor;
+  Wt::WPaintedWidget::update();
+  Wt::WPaintedWidget::resize(factor * width(), factor * height());
 }
-
-void WebMap::zoomOut(void)
-{
-  m_scaleX*=0.9;
-  m_scaleY*=0.9;
-  update();
-}
-

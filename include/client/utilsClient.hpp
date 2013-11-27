@@ -34,14 +34,14 @@ namespace {
   const QString SRC_BASENAME = "Source";
 }
 
-
-
 namespace utils
 {
   const QString ROOT_ID = "root";
   const QString PLUS = "plus";
   const QString MINUS = "minus";
   const QString DEFAULT_ICON = "Business Process";
+  const double SCALIN_FACTOR = 1.1;
+  const double SCALOUT_FACTOR = 1/SCALIN_FACTOR;
 
   inline void delay(const qint32& d)
   { sleep(d); }
