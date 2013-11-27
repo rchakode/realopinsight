@@ -28,10 +28,6 @@
 #include "MonitorBroker.hpp"
 #include "utilsClient.hpp"
 
-namespace {
-  const double MAP_PADDING = 15;
-}
-
 WebMap::WebMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
     m_cdata(_cdata),
@@ -88,8 +84,7 @@ void WebMap::layoutSizeChanged (int width, int height)
 void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width + MAP_PADDING,
-                             m_cdata->map_height + MAP_PADDING);
+  Wt::WPaintedWidget::resize(m_cdata->map_width, m_cdata->map_height);
 }
 
 void WebMap::drawNode(const NodeT& _node)
