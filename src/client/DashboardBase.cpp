@@ -83,6 +83,21 @@ DashboardBase::~DashboardBase()
   delete m_changePasswdWindow;
 }
 
+void DashboardBase::load(const QString& _file)
+{
+  if (!_file.isEmpty()) {
+    m_config = utils::getAbsolutePath(_file);
+    Parser parser(m_config, m_cdata);
+    parser.process(true);
+    parser.computeNodeCoordinates(1);
+    buildTree();
+    buildMap();
+//    m_msgConsole->updateNodeMsgs(m_cdata->cnodes);
+    initSettings();
+    setRootService();
+  }
+}
+
 void DashboardBase::runMonitor()
 {
   resetStatData();
@@ -263,7 +278,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
   QString toolTip = utils::getNodeToolTip(_node);
-  updateNavTreeItemStatus(_node, toolTip);
+  updateTree(_node, toolTip);
   updateMap(_node, toolTip);
   updateMsgConsole(_node);
   updateBpNode(_node.parent);
@@ -370,7 +385,7 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
 
   QString toolTip = getNodeToolTip(*node);
   updateMap(*node, toolTip);
-  updateNavTreeItemStatus(*node, toolTip);
+  updateTree(*node, toolTip);
   if (node->id != utils::ROOT_ID) {
     updateBpNode(node->parent);
     // FIXME: emit hasToBeUpdate(node->parent);
@@ -499,8 +514,8 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         QString duid = ditem.property("uid").toString();
         QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Component,
                                                             ZnsHelper::ReqPatterns[ZnsHelper::Component]
-                                                            .arg(duid, QString::number(ZnsHelper::Component))
-                                                            .toAscii());
+            .arg(duid, QString::number(ZnsHelper::Component))
+            .toAscii());
         processZnsReply(reply, src);
 
         QString did = utils::realCheckId(src.id, ditem.property("name").toString());
@@ -508,8 +523,8 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         {
           reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
-                                               .arg(duid, QString::number(ZnsHelper::DeviceInfo))
-                                               .toAscii());
+              .arg(duid, QString::number(ZnsHelper::DeviceInfo))
+              .toAscii());
           processZnsReply(reply, src);
         }
       }
@@ -700,8 +715,8 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
 
           QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                               ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                                                              .arg(info.second, QString::number(ZnsHelper::Device))
-                                                              .toAscii());
+              .arg(info.second, QString::number(ZnsHelper::Device))
+              .toAscii());
           processZnsReply(reply, src);
         }
       }
@@ -913,4 +928,13 @@ void DashboardBase::resetInterval()
 {
   m_interval = 1000 * m_settings->getUpdateInterval();
   timerIntervalChanged(m_interval);
+}
+
+void DashboardBase::setRootService(void)
+{
+  m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
+  if (m_root == m_cdata->bpnodes.end()) {
+    utils::alert(tr("The configuration is not valid, there is no root service !"));
+    exit(1);
+  }
 }

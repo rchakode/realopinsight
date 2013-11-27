@@ -176,7 +176,8 @@ void MainWindow::render(void)
 {
   show();
   m_dashboard->scalPaneContentsToViewPort();
-  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, m_dashboard->getConfig()));
+  QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
+                              .arg(m_dashboard->getRootService()->name, APP_NAME));
 }
 
 void MainWindow::handleTabChanged(int _index)

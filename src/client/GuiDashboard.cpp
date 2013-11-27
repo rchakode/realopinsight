@@ -87,9 +87,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
   addEvents();
-  if (! m_config.isEmpty()) {
-    load(m_config);
-  }
+  load(m_config);
 }
 
 GuiDashboard::~GuiDashboard()
@@ -110,25 +108,6 @@ GuiDashboard::~GuiDashboard()
   delete m_msgPane;
 }
 
-void GuiDashboard::load(const QString& _file)
-{
-  if (!_file.isEmpty()) {
-    m_config = utils::getAbsolutePath(_file);
-  }
-
-  Parser parser(m_config, m_cdata);
-  parser.process(true);
-  parser.computeNodeCoordinates(0);
-  m_tree->build();
-  m_map->drawMap();
-
-  //FIXME: not necessary ? m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
-  m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
-  if (m_root == m_cdata->bpnodes.end()) {
-    utils::alert(tr("The configuration seems to be invalid, there is not a root service!"));
-    exit(1);
-  }
-}
 
 void GuiDashboard::handleChangePasswordAction(void)
 {
@@ -173,6 +152,11 @@ void GuiDashboard::toggleIncreaseMsgFont(bool _toggled)
   m_msgConsole->useLargeFont(_toggled);
 }
 
+void GuiDashboard::buildMap(void)
+{
+  m_map->drawMap();
+}
+
 void GuiDashboard::updateMap(const NodeT& _node, const QString& _tip)
 {
   m_map->updateNode(_node, _tip);
@@ -187,7 +171,12 @@ void GuiDashboard::updateChart(void)
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
 }
 
-void GuiDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
+void GuiDashboard::buildTree(void)
+{
+  m_tree->build();
+}
+
+void GuiDashboard::updateTree(const NodeT& _node, const QString& _tip)
 {
   m_tree->updateNodeItem(_node, _tip);
 }
@@ -228,9 +217,8 @@ void GuiDashboard::filterNodeRelatedMsg(void)
   NodeListT::iterator node;
   if (utils::findNode(m_cdata, m_selectedNode, node)) {
     filterNodeRelatedMsg(m_selectedNode);
-    QString title = tr("Messages related to '%2' - %1").arg(APP_NAME, node->name);
     m_filteredMsgConsole->updateEntriesSize(true);
-    m_filteredMsgConsole->setWindowTitle(title);
+    m_filteredMsgConsole->setWindowTitle(tr("Messages related to '%2' - %1").arg(APP_NAME, node->name));
   }
   qint32 rh = qMax(m_filteredMsgConsole->getRowCount() * m_filteredMsgConsole->rowHeight(0) + 50, 100);
   if (m_filteredMsgConsole->height() > rh) {

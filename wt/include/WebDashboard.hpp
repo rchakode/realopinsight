@@ -49,9 +49,10 @@ public:
   WebMap* getMap(void) const {return m_map;}
 
 protected:
-  virtual void load(const QString& _file);
+  virtual void buildMap(void);
   virtual void updateMap(const NodeT& _node, const QString& _tip);
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  virtual void buildTree(void);
+  virtual void updateTree(const NodeT& _node, const QString& _tip);
   virtual void updateMsgConsole(const NodeT& _node);
   virtual void updateChart(void);
 

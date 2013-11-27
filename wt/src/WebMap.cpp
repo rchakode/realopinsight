@@ -62,26 +62,20 @@ WebMap::~WebMap()
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
   m_painter = new Wt::WPainter(_pdevice);
-  m_painter->scale(m_scaleX, m_scaleY);  //TODO Make it dynamic
+  m_painter->scale(m_scaleX, m_scaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Draw edges
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) {
-    drawEdge(edge.key(), edge.value());
-  }
+       edge != end; ++edge) { drawEdge(edge.key(), edge.value()); }
 
   /* Draw node related to business services */
   for(NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
-      node != end; ++node) {
-    drawNode(*node);
-  }
+      node != end; ++node) { drawNode(*node); }
 
   /* Draw node related to alarm services */
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(),end=m_cdata->cnodes.end();
-      node != end; ++node) {
-    drawNode(*node);
-  }
+      node != end; ++node) { drawNode(*node);}
 }
 
 
@@ -93,11 +87,6 @@ void WebMap::layoutSizeChanged (int width, int height)
 
 void WebMap::drawMap(void)
 {
-//  if(! m_firstUpdate) {
-//    m_scaleX = m_layoutWidth/m_cdata->map_width;
-//    m_scaleY = static_cast<double>(YSCAL_FACTOR)/XSCAL_FACTOR * m_scaleX;
-//    m_firstUpdate = false;
-//  }
   Wt::WPaintedWidget::update(); //this call paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width + MAP_PADDING,
                              m_cdata->map_height + MAP_PADDING);
@@ -116,12 +105,10 @@ void WebMap::drawNode(const NodeT& _node)
   m_painter->setPen(pen);
 
   // Draw icon
-  m_painter->drawImage(posIcon,
-                       Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40)
-                       );
+  m_painter->drawImage(posIcon,Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40));
   // Draw anchor icon
   if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
-    m_painter->drawImage(posExpIcon, Wt::WPainter::Image(utils::getResourcePath(m_icons[utils::MINUS]), 19, 18));
+    m_painter->drawImage(posExpIcon,Wt::WPainter::Image(utils::getResourcePath(m_icons[utils::MINUS]),19,18));
   }
   // Draw text
   m_painter->drawText(posLabel.x(), posLabel.y(),
@@ -157,7 +144,6 @@ void WebMap::createLink(const NodeT& _node)
   double width = 40.0 * m_scaleX;
   double height = 40.0 * m_scaleY;
   Wt::WRectArea *area = new Wt::WRectArea(x, y, width, height);
-  //FIXME: for tree and msg console
   area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toStdString()));
   area->setLink("#");
   addArea(area);

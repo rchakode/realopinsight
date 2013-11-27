@@ -116,23 +116,12 @@ WebDashboard::~WebDashboard()
   delete m_widget;
 }
 
-
-void WebDashboard::load(const QString& _file)
+void WebDashboard::buildTree(void)
 {
-  if (!_file.isEmpty()) {
-    m_config = utils::getAbsolutePath(_file);
-  }
-
-  Parser parser(m_config, m_cdata);
-  parser.process(true);
-  parser.computeNodeCoordinates(1);
   m_tree->build();
-  m_map->drawMap();
-  m_msgConsole->updateNodeMsgs(m_cdata->cnodes);
-  initSettings();
 }
 
-void WebDashboard::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
+void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 {
   m_tree->updateNodeItem(_node, _tip);
 }
@@ -151,6 +140,10 @@ void WebDashboard::updateChart(void)
   //FIXME: to be implemented
 }
 
+void WebDashboard::buildMap(void)
+{
+  m_map->drawMap();
+}
 
 
 void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)

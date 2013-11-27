@@ -50,7 +50,8 @@ WebUI::~WebUI()
 
 void WebUI::render(void)
 {
-  setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getConfig(), APP_NAME).toStdString());
+  setTitle(QObject::tr("%1 - %2 Operations Console")
+           .arg(m_dashboard->getRootService()->name, APP_NAME).toStdString());
   m_mainWidget->setStyleClass("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -76,7 +77,7 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   navigation->addMenu(leftMenu);
 
   leftMenu->addItem("images/built-in/menu_refresh.png",
-                    "Home",
+                    m_dashboard->getRootService()->name.toStdString(),
                     m_dashboard->get(),
                     Wt::WMenuItem::LazyLoading);
   navigation->addWidget(createToolBar());

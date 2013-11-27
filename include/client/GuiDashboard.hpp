@@ -91,13 +91,13 @@ signals:
   void centralTabChanged(int);
 
 protected:
-  void updateTrayInfo(const NodeT& _node);
+  virtual void updateTrayInfo(const NodeT& _node);
   QTabWidget* builtMsgPane(void);
-
-  virtual void load(const QString& _file);
   void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
+  virtual void buildMap(void);
   virtual void updateMap(const NodeT& _node, const QString& _tip);
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  virtual void buildTree(void);
+  virtual void updateTree(const NodeT& _node, const QString& _tip);
   virtual void updateMsgConsole(const NodeT& _node);
   virtual void updateChart(void);
 

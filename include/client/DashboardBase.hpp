@@ -59,6 +59,7 @@ public:
   void setTimerId(qint32 id) {m_timerId = id;}
   qint32 getTimerId(void) const {return m_timerId;}
   qint32 getTimerInterval(void) const {return m_interval;}
+  NodeListIteratorT getRootService(void) const {return m_root;}
 
 public slots:
   void runMonitor();
@@ -98,19 +99,22 @@ protected:
   QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
-  NodeListT::Iterator m_root;
+  NodeListIteratorT m_root;
   int m_firstSrcIndex;
 
 protected:
-  virtual void load(const QString& _file) = 0;
+  void load(const QString& _file);
   void computeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   virtual void updateDashboard(const NodeT& _node);
+  virtual void buildMap(void) = 0;
   virtual void updateMap(const NodeT& _node, const QString& _tip) = 0;
-  virtual void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip) = 0;
+  virtual void buildTree(void) = 0;
+  virtual void updateTree(const NodeT& _node, const QString& _tip) = 0;
   virtual void updateMsgConsole(const NodeT& _node) = 0;
   virtual void finalizeUpdate(const SourceT& src);
   virtual void updateChart(void) = 0;
+  void setRootService(void);
 
 private:
   void resetInterval(void);
