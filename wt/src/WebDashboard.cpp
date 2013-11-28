@@ -35,6 +35,7 @@
 #include "WebDashboard.hpp"
 #include "Base.hpp"
 #include "utilsClient.hpp"
+#include "WebChart.hpp"
 
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
@@ -80,6 +81,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
   treePanel->setCentralWidget(m_tree);
   treeLayout->addWidget(treePanel);
+  treeLayout->addWidget(new WebChart());
   treePanel->setTitle(QObject::tr("Service Tree").toStdString());
 
   mapLayout->addWidget(m_map->get());
