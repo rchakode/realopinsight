@@ -44,7 +44,7 @@ public:
   QSize minimumSizeHint() const {return QSize(796, 640);}
   QSize sizeHint() const {return QSize(796, 640);}
 
-public slots:
+public Q_SLOTS:
   void newView(void);
   void newNode(void);
   void insertFromSelected(const NodeT& node);

@@ -225,7 +225,7 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
 
     if (info.first != src.id || ! src.ls_handler->loadHostData(info.second)) continue;
 
-    foreach (const QString& value, hostit.value()) {
+    Q_FOREACH (const QString& value, hostit.value()) {
       QString key;
       if (value != "ping") {
         key = ID_PATTERN.arg(info.second).arg(value);
@@ -272,7 +272,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
       msg = msg.arg(src.id, "undefined source type");
       break;
   }
-  emit updateStatusBar(msg);
+  Q_EMIT updateStatusBar(msg);
 }
 
 void DashboardBase::updateDashboard(const NodeT& _node)
@@ -282,8 +282,8 @@ void DashboardBase::updateDashboard(const NodeT& _node)
   updateMap(_node, toolTip);
   updateMsgConsole(_node);
   updateBpNode(_node.parent);
-  // FIXME: emit hasToBeUpdate(_node.parent);
-  // emit hasToBeUpdate(_node.parent);
+  // FIXME: Q_EMIT hasToBeUpdate(_node.parent);
+  // Q_EMIT hasToBeUpdate(_node.parent);
 }
 
 void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
@@ -358,7 +358,7 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   if (! utils::findNode(m_cdata, _nodeId, node)) return;
 
   QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
-  foreach (const QString& nodeId, nodeIds) {
+  Q_FOREACH (const QString& nodeId, nodeIds) {
     NodeListT::iterator child;
     if (!utils::findNode(m_cdata, nodeId, child)) continue;
     Criticity cst(static_cast<MonitorBroker::SeverityT>(child->prop_sev));
@@ -388,8 +388,8 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   updateTree(*node, toolTip);
   if (node->id != utils::ROOT_ID) {
     updateBpNode(node->parent);
-    // FIXME: emit hasToBeUpdate(node->parent);
-    // emit hasToBeUpdate(node->parent);
+    // FIXME: Q_EMIT hasToBeUpdate(node->parent);
+    // Q_EMIT hasToBeUpdate(node->parent);
   }
 
 }
@@ -689,7 +689,7 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
     case MonitorBroker::Zabbix: {
       if (src.zbx_handler->getIsLogged()) {
         int trid = src.zbx_handler->getTrid();
-        foreach (const QString& hitem, m_cdata->hosts.keys()) {
+        Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
 
           StringPairT info = utils::splitSourceHostInfo(hitem);
 
@@ -707,7 +707,7 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
     case MonitorBroker::Zenoss: {
       if (src.zns_handler->getIsLogged()) {
         src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
-        foreach (const QString& hitem, m_cdata->hosts.keys()) {
+        Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
 
           StringPairT info = utils::splitSourceHostInfo(hitem);
 
@@ -761,7 +761,7 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
 void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (!msg.isEmpty()) {
-    emit updateStatusBar(msg);
+    Q_EMIT updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
   {
@@ -799,7 +799,7 @@ void DashboardBase::initSettings(void)
   }
   resetInterval();
   computeFirstSrcIndex();
-  emit settingsLoaded();
+  Q_EMIT settingsLoaded();
 }
 
 bool DashboardBase::allocSourceHandler(SourceT& src)
@@ -838,7 +838,7 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
 
 void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
 {
-  foreach (const qint8& id, ids) {
+  Q_FOREACH (const qint8& id, ids) {
     SourceT newsrc;
     m_settings->loadSource(id, newsrc);
     SourceListT::Iterator olddata = m_sources.find(id);
@@ -866,7 +866,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     m_sources[id] = newsrc;
     runMonitor(newsrc);
   }
-  emit updateSourceUrl();
+  Q_EMIT updateSourceUrl();
 }
 
 void DashboardBase::computeFirstSrcIndex(void)

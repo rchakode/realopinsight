@@ -230,7 +230,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
     return;
 
   if (node->type == NodeType::SERVICE_NODE && node->child_nodes != "") {
-    foreach(const QString& checkId, node->child_nodes.split(Parser::CHILD_SEP)) {
+    Q_FOREACH(const QString& checkId, node->child_nodes.split(Parser::CHILD_SEP)) {
       deleteNode(checkId);
     }
   }
@@ -492,12 +492,12 @@ void SvCreator::recordData(const QString& _path)
   ofile << "<?xml version=\"1.0\"?>\n"
            "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
   recordNode(ofile,*root);
-  foreach(const NodeT& service, m_cdata->bpnodes) {
+  Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
     if (service.id == utils::ROOT_ID || service.parent.isEmpty())
       continue;
     recordNode(ofile, service);
   }
-  foreach(const NodeT& service, m_cdata->cnodes) {
+  Q_FOREACH(const NodeT& service, m_cdata->cnodes) {
     if (service.parent.isEmpty())
       continue;
     recordNode(ofile, service);

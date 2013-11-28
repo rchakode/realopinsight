@@ -72,10 +72,10 @@ public:
   void setConsoleSize(const QSize& size) {m_consoleSize = size;}
   QSize getConsoleSize(void) const {return m_consoleSize;}
 
-public slots:
+public Q_SLOTS:
   void sortEventConsole(void) {mproxyModel->sort(1);}
 
-signals:
+Q_SIGNALS:
   void acknowledgeChanged(void);
 
 private:

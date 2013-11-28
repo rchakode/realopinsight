@@ -73,7 +73,7 @@ public:
   bool getCancelled(void) const {return m_cancelled;}
 
 
-public slots:
+public Q_SLOTS:
   void handleCancel(void);
   void applySettings(void);
   void addAsSource(void);
@@ -83,7 +83,7 @@ public slots:
   void setAuthChainVisibility(const int& state);
   void handleSourceSelected();
 
-signals:
+Q_SIGNALS:
   void urlChanged(QString);
   void sourcesChanged (QList<qint8>);
 

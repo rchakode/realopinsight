@@ -43,7 +43,7 @@ public:
   void removeNodeItem(const QString& _nodeId) {m_items.remove(_nodeId);}
   void updateNodeItem(const NodeT& _node, const QString& _tip);
 
-signals:
+Q_SIGNALS:
   void treeNodeMoved( QString _nodeId ) ;
 
 protected:

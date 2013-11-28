@@ -61,7 +61,7 @@ public:
   qint32 getTimerInterval(void) const {return m_interval;}
   NodeListIteratorT getRootService(void) const {return m_root;}
 
-public slots:
+public Q_SLOTS:
   void runMonitor();
   void runMonitor(SourceT& src);
   void runNagiosUpdate(int srcId);
@@ -77,7 +77,7 @@ public slots:
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
 
-signals:
+Q_SIGNALS:
   void hasToBeUpdate(QString);
   void sortEventConsole(void);
   void updateStatusBar(const QString& msg);

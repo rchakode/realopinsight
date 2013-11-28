@@ -1,8 +1,9 @@
 QT	+= core gui xml svg webkit network script
+CONFIG += no_keywords
 TEMPLATE = app
 VERSION_=2.5.0
 VERSION = "-$${VERSION_}"
-config-dist{
+config-dist {
 SOURCES	+=
 TARGET = RealOpInsight
 }

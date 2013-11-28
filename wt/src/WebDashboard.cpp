@@ -81,7 +81,12 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
   treePanel->setCentralWidget(m_tree);
   treeLayout->addWidget(treePanel);
-  treeLayout->addWidget(new WebChart());
+  m_cdata->check_status_count[MonitorBroker::Normal] = 10;
+  m_cdata->check_status_count[MonitorBroker::Minor] = 20;
+  m_cdata->check_status_count[MonitorBroker::Major] = 30;
+  m_cdata->check_status_count[MonitorBroker::Critical] = 40;
+  m_cdata->check_status_count[MonitorBroker::Unknown] = 50;
+  treeLayout->addWidget(new WebChart(m_cdata->check_status_count.toStdMap()));
   treePanel->setTitle(QObject::tr("Service Tree").toStdString());
 
   mapLayout->addWidget(m_map->get());

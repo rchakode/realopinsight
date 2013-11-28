@@ -51,14 +51,14 @@ public:
   QGraphicsItem* nodeAtGlobalPos(QPoint pos) { return m_scene->itemAt(mapToScene(mapFromGlobal(pos))); }
   QGraphicsItem* nodeAt(QPoint pos) { return m_scene->itemAt(mapToScene(pos)); }
 
-public slots:
+public Q_SLOTS:
   void capture(void);
   void zoomIn();
   void zoomOut();
   bool hideChart(void);
   void handleScrollBarMoved(void);
 
-signals:
+Q_SIGNALS:
   void mouseIsOverNode(QString);
   void expandNode(QString, bool, qint32);
   void rightClickOnItem(QGraphicsItem *, QPoint pos);

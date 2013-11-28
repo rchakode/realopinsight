@@ -59,9 +59,9 @@ public:
   void setSslConfig(bool verifyPeer);
 
 
-public slots:
+public Q_SLOTS:
   void processError(const QNetworkReply::NetworkError& code) { m_evlHandler->exit(code);}
-signals:
+Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
 private :

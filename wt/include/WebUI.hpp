@@ -42,7 +42,7 @@ public:
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
 
-public slots:
+public Q_SLOTS:
   void resetTimer(qint32 interval);
 
 private:

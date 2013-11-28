@@ -61,7 +61,7 @@ QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & 
   } else {
     request = ReqPatterns[reqId].arg(m_auth);
   }
-  foreach(const QString &param, params) { request = request.arg(param); }
+  Q_FOREACH(const QString &param, params) { request = request.arg(param); }
 
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, request.toAscii());
   reply->setSslConfiguration(*m_sslConfig);

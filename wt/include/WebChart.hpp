@@ -27,14 +27,16 @@
 
 #include <Wt/WStandardItemModel>
 #include <Wt/Chart/WPieChart>
+#include <Wt/WContainerWidget>
 
-class WebChart : public Wt::Chart::WPieChart
+class WebChart : public Wt::WContainerWidget
 {
 public:
-  WebChart();
+  WebChart(std::map<int, int> _sdata);
   virtual ~WebChart();
 
 private:
+  Wt::Chart::WPieChart* m_chart;
   Wt::WStandardItemModel* m_model;
 };
 

@@ -66,7 +66,7 @@ public:
   static StringMapT propRules();
   static StringMapT calcRules();
 
-public slots:
+public Q_SLOTS:
   void handleShowAbout(void);
   void handleShowOnlineResources(void);
   void handleChangeMonitoringSettingsAction(void);
@@ -77,7 +77,7 @@ public slots:
   void centerGraphOnNode(QTreeWidgetItem* _item);
   void filterNodeRelatedMsg(void);
   void filterNodeRelatedMsg(const QString& _nodeId);
-  void handleTabChanged(int index) {emit centralTabChanged(index);}
+  void handleTabChanged(int index) {Q_EMIT centralTabChanged(index);}
   void toggleTroubleView(bool _toggled);
   void toggleIncreaseMsgFont(bool _toggled);
   void handleSourceBxItemChanged(int index);
@@ -85,7 +85,7 @@ public slots:
   void handleSettingsLoaded(void);
   //  void updateDashboard(const NodeT & _node);
 
-signals:
+Q_SIGNALS:
   void hasToBeUpdate(const QString& nodeid);
   void sortEventConsole(void);
   void centralTabChanged(int);

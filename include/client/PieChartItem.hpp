@@ -42,7 +42,7 @@ public:
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 
-public slots:
+public Q_SLOTS:
   void setFillRule(Qt::FillRule rule);
   void setFillGradient(const QColor &color1, const QColor &color2);
 

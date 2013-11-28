@@ -79,14 +79,14 @@ public:
   inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(mitems[CHECK_FIELD]);}
   inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(mitems[CHECK_LIST_FIELD]);}
 
-public slots:
-  inline void handleSaveClick(void) { emit saveClicked(); }
-  void handleCloseClick(void){ emit closeClicked(); }
-  inline void handleReturnPressed(void) { emit returnPressed(); }
+public Q_SLOTS:
+  inline void handleSaveClick(void) { Q_EMIT saveClicked(); }
+  void handleCloseClick(void){ Q_EMIT closeClicked(); }
+  inline void handleReturnPressed(void) { Q_EMIT returnPressed(); }
   void handleNodeTypeChanged(const QString&);
   void handleNodeTypeActivated(const QString& _text);
 
-signals:
+Q_SIGNALS:
   void saveClicked(void);
   void closeClicked(void);
   void returnPressed(void);

@@ -47,7 +47,7 @@ public:
   static const QString AdmUser ;
   static const QString OpUser ;
 
-public slots:
+public Q_SLOTS:
   void cancel(void) ;
   void authentificate(void) ;
 

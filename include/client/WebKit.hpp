@@ -35,7 +35,7 @@ public:
   WebKit(const QString& = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0);
   virtual ~WebKit() ;
 
-public slots:
+public Q_SLOTS:
   void setUrl(const QString& url);
   void handleLoadFinished(bool ok);
   void handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator);

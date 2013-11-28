@@ -36,7 +36,7 @@ public:
   MainWindow(const qint32& _userRole, const QString& _config);
   virtual ~MainWindow();
 
-public slots:
+public Q_SLOTS:
   void handleUpdateStatusBar(const QString& msg);
   void toggleFullScreen(bool _toggled);
   void render(void);

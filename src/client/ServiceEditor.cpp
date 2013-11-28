@@ -245,13 +245,13 @@ void ServiceEditor::loadStatusHandlingFields(void)
   QString defaultRule = CalcRules::label(CalcRules::HighCriticity);
   statusCalcRuleField()->addItem(tr("Calculation rule (Default is %1)").arg(defaultRule), CalcRules::HighCriticity);
 
-  foreach(const QString& rule, crules.keys()) {
+  Q_FOREACH(const QString& rule, crules.keys()) {
     statusCalcRuleField()->addItem(rule, crules.value(rule));
   }
   StringMapT prules = DashboardBase::propRules();
   defaultRule = PropRules::label(PropRules::Unchanged);
   statusPropRuleField()->addItem(tr("Propagation rule (Default is %1)").arg(defaultRule), PropRules::Unchanged);
-  foreach(const QString& rule, prules.keys()) {
+  Q_FOREACH(const QString& rule, prules.keys()) {
     statusPropRuleField()->addItem(rule, prules.value(rule));
   }
   mlayout->addWidget(mitems["priorityLabel"], mlayoutRowIndex, 0);
@@ -278,7 +278,7 @@ void ServiceEditor::loadIconFields()
   IconMapT icons = utils::nodeIcons();
   QString header = "-->Select a icon (Default is " + utils::DEFAULT_ICON + ")";
   iconField()->addItem(header, icons.value(utils::DEFAULT_ICON));
-  foreach(const QString& label, icons.keys()) {
+  Q_FOREACH(const QString& label, icons.keys()) {
     QString path = icons.value(label);
     iconField()->addItem(QIcon(path), label, icons.value(path));
   }
@@ -329,9 +329,9 @@ void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 void ServiceEditor::handleNodeTypeActivated( const QString& _text)
 {
   if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
-    emit nodeTypeActivated( NodeType::ALARM_NODE );
+    Q_EMIT nodeTypeActivated( NodeType::ALARM_NODE );
   } else {
-    emit nodeTypeActivated( NodeType::SERVICE_NODE );
+    Q_EMIT nodeTypeActivated( NodeType::SERVICE_NODE );
   }
 }
 

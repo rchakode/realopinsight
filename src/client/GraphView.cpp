@@ -62,7 +62,7 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
   QGraphicsItem* item = nodeAt(_event->pos());
   if (item) {
     if (_event->button() == Qt::RightButton) {
-      emit rightClickOnItem(item, _event->globalPos());
+      Q_EMIT rightClickOnItem(item, _event->globalPos());
       return;
     }
     QStringList list  = item->data(0).toString().split(":");
@@ -79,7 +79,7 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
           m_mnodes[nodeId].expand = true;
         }
         m_mnodes[nodeId].exp_icon->setPixmap(exp_icon);
-        emit expandNode(nodeId, m_mnodes[nodeId].expand, 1);
+        Q_EMIT expandNode(nodeId, m_mnodes[nodeId].expand, 1);
       }
     }
   }
@@ -301,7 +301,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
       QPixmap expandIcon(m_icons[utils::PLUS], 0, Qt::AutoColor);
       m_mnodes[_nodeId].exp_icon->setPixmap(expandIcon);
     }
-    emit expandNode(_nodeId, _visible, _level + 1);
+    Q_EMIT expandNode(_nodeId, _visible, _level + 1);
   }
 }
 

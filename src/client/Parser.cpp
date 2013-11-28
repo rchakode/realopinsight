@@ -132,7 +132,7 @@ void Parser::updateNodeHierachy(QString& _graphContent)
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
       QStringList ids = node->child_nodes.split(CHILD_SEP);
-      foreach (const QString& nid, ids) {
+      Q_FOREACH(const QString& nid, ids) {
         QString nidTrimmed = nid.trimmed();
         auto childNode = m_cdata->cnodes.find(nidTrimmed);
         if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nidTrimmed, childNode)) {

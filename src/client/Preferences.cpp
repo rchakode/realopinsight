@@ -146,7 +146,7 @@ void Preferences::handleCancel(void)
 {
   switch(m_formType) {
     case ChangeMonitoringSettings:
-      emit sourcesChanged(m_updatedSources);
+      Q_EMIT sourcesChanged(m_updatedSources);
       break;
     case BasicLoginForm:
       break;

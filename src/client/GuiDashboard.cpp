@@ -198,7 +198,7 @@ void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const
   }
   if (!node->child_nodes.isEmpty()) {
     QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
-    foreach (const auto& cid, childNodes) {
+    Q_FOREACH (const auto& cid, childNodes) {
       m_map->setNodeVisible(cid, _nodeId, _expand, _level);
     }
   }
@@ -237,7 +237,7 @@ void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {
       QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
-      foreach (const QString& chkid, childIds) {
+      Q_FOREACH (const QString& chkid, childIds) {
         filterNodeRelatedMsg(chkid);
       }
     }
@@ -364,7 +364,7 @@ void GuiDashboard::setMsgPaneToolBar(const QList<QAction*>& menuAtions)
 {
   QToolBar* tlbar (new QToolBar());
   tlbar->setOrientation(Qt::Vertical);
-  foreach (QAction* action, menuAtions) {
+  Q_FOREACH (QAction* action, menuAtions) {
     tlbar->addAction(action);
   }
   m_msgPane->widget(0)->layout()->addWidget(tlbar);
