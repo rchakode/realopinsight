@@ -35,14 +35,15 @@
 #include "WebDashboard.hpp"
 #include "Base.hpp"
 #include "utilsClient.hpp"
-#include "WebChart.hpp"
+#include <QDebug>
 
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new WebTree(m_cdata)),
     m_map(new WebMap(m_cdata)),
-    m_msgConsole(new WebMsgConsole())
+    m_msgConsole(new WebMsgConsole()),
+    m_chart(new WebChart())
 {
   Wt::WContainerWidget* treeContainer(new Wt::WContainerWidget());
   Wt::WContainerWidget* mapMsgContainer(new Wt::WContainerWidget());
@@ -81,12 +82,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
   treePanel->setCentralWidget(m_tree);
   treeLayout->addWidget(treePanel);
-  m_cdata->check_status_count[MonitorBroker::Normal] = 10;
-  m_cdata->check_status_count[MonitorBroker::Minor] = 20;
-  m_cdata->check_status_count[MonitorBroker::Major] = 30;
-  m_cdata->check_status_count[MonitorBroker::Critical] = 40;
-  m_cdata->check_status_count[MonitorBroker::Unknown] = 50;
-  treeLayout->addWidget(new WebChart(m_cdata->check_status_count.toStdMap()));
+  treeLayout->addWidget(m_chart);
   treePanel->setTitle(QObject::tr("Service Tree").toStdString());
 
   mapLayout->addWidget(m_map->get());
@@ -116,6 +112,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
 WebDashboard::~WebDashboard()
 {
+  delete m_chart;
   delete m_tree;
   delete m_map;
   delete m_msgConsole;
@@ -134,8 +131,8 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (!m_showOnlyTroubles
-      || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
+  if (! m_showOnlyTroubles ||
+      (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -143,7 +140,10 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  //FIXME: to be implemented
+  for(CheckStatusCountT::ConstIterator it = m_cdata->check_status_count.begin(),
+      end = m_cdata->check_status_count.end(); it != end; ++it) {
+    m_chart->setSeverityData(it.key(), it.value());
+  }
 }
 
 void WebDashboard::buildMap(void)

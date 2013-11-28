@@ -25,48 +25,35 @@
 #include "WebChart.hpp"
 #include "utilsClient.hpp"
 #include <Wt/WStandardItem>
+#include <QString>
 #include <QDebug>
+#include <Wt/WPainter>
+#include <Wt/WPen>
 
-WebChart::WebChart(std::map<int, int> _sdata)
+WebChart::WebChart(void)
   : m_chart(new Wt::Chart::WPieChart(this)),
     m_model(new Wt::WStandardItemModel(this))
 {
   m_chart->setModel(m_model);     // Set the model.
-
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
   m_model->setHeaderData(0, Wt::WString("Item"));
   m_model->setHeaderData(1, Wt::WString("Sales"));
   m_model->insertRows(m_model->rowCount(), 5);
-
-  int row = 0;
-  m_model->setData(  row, 0, utils::severity2Str(MonitorBroker::Normal).toStdString());
-  m_model->setData(  row, 1, utils::severity2Str(MonitorBroker::Normal).toStdString(), Wt::ToolTipRole);
-  m_model->setData(  row, 1, _sdata[MonitorBroker::Normal]);
-
-  m_model->setData(++row, 0, utils::severity2Str(MonitorBroker::Minor).toStdString());
-  m_model->setData(  row, 1, _sdata[MonitorBroker::Minor]);
-
-  m_model->setData(++row, 0, utils::severity2Str(MonitorBroker::Major).toStdString());
-  m_model->setData(  row, 1, _sdata[MonitorBroker::Major]);
-
-  m_model->setData(++row, 0, utils::severity2Str(MonitorBroker::Critical).toStdString());
-  m_model->setData(  row, 1, _sdata[MonitorBroker::Critical]);
-
-  m_model->setData(++row, 0, utils::severity2Str(MonitorBroker::Unknown).toStdString());
-  m_model->setData(  row, 1, _sdata[MonitorBroker::Unknown]);
-
+  // Initialize data
+  setSeverityData(MonitorBroker::Normal, 0);
+  setSeverityData(MonitorBroker::Minor, 0);
+  setSeverityData(MonitorBroker::Major, 0);
+  setSeverityData(MonitorBroker::Critical, 0);
+  setSeverityData(MonitorBroker::Unknown, 0);
+  // Draw the chart
   m_chart->setLabelsColumn(0);    // Set the column that holds the labels.
   m_chart->setDataColumn(1);      // Set the column that holds the data.
-
-  // Configure location and type of labels.
-  m_chart->setDisplayLabels(Wt::Chart::TextPercentage);
-  // Enable a 3D and shadow effect.
-  m_chart->setPerspectiveEnabled(true, 0.2);
+  m_chart->setDisplayLabels(Wt::Chart::TextPercentage); // Configure location and type of labels.
+  m_chart->setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   m_chart->setShadowEnabled(true);
-
-  m_chart->resize(250, 250);    // WPaintedWidget must be given an explicit size.
-  m_chart->setMargin(10, Wt::Top | Wt::Bottom); // Add margin vertically.
+  m_chart->resize(200, 250);    // WPaintedWidget must be given an explicit size.
+  //m_chart->setMargin(10, Wt::Top | Wt::Bottom); // Add margin vertically.
   m_chart->setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right); // Center horizontally
 }
 
@@ -76,3 +63,17 @@ WebChart::~WebChart()
   delete m_chart;
 }
 
+Wt::WColor WebChart::colorFromSeverity(const int& _sev)
+{
+  QColor qcolor = utils::computeColor(_sev);
+  return Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
+}
+
+void WebChart::setSeverityData(int _sev, int _count)
+{
+  std::string label = utils::severity2Str(_sev).toStdString();
+  m_model->setData(_sev, 0, label);
+  m_model->setData(_sev, 1, label, Wt::ToolTipRole);
+  m_model->setData(_sev, 1, _count);
+  m_chart->setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
+}

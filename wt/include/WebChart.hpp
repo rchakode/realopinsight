@@ -28,12 +28,16 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/Chart/WPieChart>
 #include <Wt/WContainerWidget>
+#include <Wt/WColor>
+#include <Wt/WPaintDevice>
 
 class WebChart : public Wt::WContainerWidget
 {
 public:
-  WebChart(std::map<int, int> _sdata);
+  WebChart();
   virtual ~WebChart();
+  void setSeverityData(int _sev, int count);
+  static Wt::WColor colorFromSeverity(const int& _sev);
 
 private:
   Wt::Chart::WPieChart* m_chart;

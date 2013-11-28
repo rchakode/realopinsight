@@ -52,7 +52,7 @@ public:
     Minor = 1,
     Major = 2,
     Critical = 3,
-    Unknown = 100
+    Unknown = 4
   };
   enum NagiosStatusT {
     NagiosOk = 0,

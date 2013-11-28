@@ -47,14 +47,11 @@ public:
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
-  virtual void layoutSizeChanged(int width, int height);
 
 private:
   CoreDataT* m_cdata;
   double m_scaleX;
   double m_scaleY;
-  double m_layoutWidth;
-  double m_layoutHeight;
   Wt::WPainter* m_painter;
   IconMapT m_icons;
   Wt::WScrollArea* m_scrollArea;

@@ -115,6 +115,7 @@ void DashboardBase::runMonitor()
     }
   }
   ++updateCounter;
+  updateChart();
 }
 
 void DashboardBase::runMonitor(SourceT& src)
@@ -903,8 +904,6 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
   if (m_cdata->cnodes.isEmpty()) return;
-
-  updateChart();
 
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(),
        end = m_cdata->cnodes.end(); cnode != end; ++cnode)

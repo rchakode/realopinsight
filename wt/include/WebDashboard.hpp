@@ -38,6 +38,7 @@
 #include <Wt/WLocalizedStrings>
 #include "DashboardBase.hpp"
 #include "WebTree.hpp"
+#include "WebChart.hpp"
 
 class WebDashboard : public DashboardBase
 {
@@ -61,6 +62,7 @@ private:
   WebTree* m_tree;
   WebMap* m_map;
   WebMsgConsole* m_msgConsole;
+  WebChart* m_chart;
 };
 
 #endif /* WEBDASHBOOARD_HPP */
