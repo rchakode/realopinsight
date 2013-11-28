@@ -31,10 +31,14 @@
 #include <Wt/WPen>
 
 WebChart::WebChart(void)
-  : m_chart(new Wt::Chart::WPieChart(this)),
-    m_model(new Wt::WStandardItemModel(this))
+  : Wt::Chart::WPieChart(),
+    m_model(new Wt::WStandardItemModel(this)),
+    m_widget(new Wt::WContainerWidget())
 {
-  m_chart->setModel(m_model);     // Set the model.
+  // set the widget
+  setModel(m_model);     // Set the model.
+  m_widget->addWidget(this);
+
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
   m_model->setHeaderData(0, Wt::WString("Item"));
@@ -47,21 +51,29 @@ WebChart::WebChart(void)
   setSeverityData(MonitorBroker::Critical, 0);
   setSeverityData(MonitorBroker::Unknown, 0);
   // Draw the chart
-  m_chart->setLabelsColumn(0);    // Set the column that holds the labels.
-  m_chart->setDataColumn(1);      // Set the column that holds the data.
-  m_chart->setDisplayLabels(Wt::Chart::TextPercentage); // Configure location and type of labels.
-  m_chart->setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
-  m_chart->setShadowEnabled(true);
-  m_chart->resize(200, 250);    // WPaintedWidget must be given an explicit size.
-  //m_chart->setMargin(10, Wt::Top | Wt::Bottom); // Add margin vertically.
-  m_chart->setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right); // Center horizontally
+  setLabelsColumn(0);    // Set the column that holds the labels.
+  setDataColumn(1);      // Set the column that holds the data.
+  setDisplayLabels(Wt::Chart::TextPercentage); // Configure location and type of labels.
+  setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
+  setShadowEnabled(true);
+  resize(200, 250);    // WPaintedWidget must be given an explicit size.
+  //setMargin(10, Wt::Top | Wt::Bottom); // Add margin vertically.
+  setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right); // Center horizontally
 }
 
 WebChart::~WebChart()
 {
   delete m_model;
-  delete m_chart;
+  delete m_widget;
 }
+
+//FIXME: do custom painting to avoid black line, 0%legend
+//void WebChart::paintEvent(Wt::WPaintDevice* _pdevice)
+//{
+//  painter = new Wt::WPainter(_pdevice);
+//  //painter->setPen(Wt::WPen(Wt::WColor(0,0,0,0)));
+//  Wt::Chart::WPieChart::update();
+//}
 
 Wt::WColor WebChart::colorFromSeverity(const int& _sev)
 {
@@ -75,5 +87,5 @@ void WebChart::setSeverityData(int _sev, int _count)
   m_model->setData(_sev, 0, label);
   m_model->setData(_sev, 1, label, Wt::ToolTipRole);
   m_model->setData(_sev, 1, _count);
-  m_chart->setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
+  setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
 }

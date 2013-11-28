@@ -27,21 +27,25 @@
 
 #include <Wt/WStandardItemModel>
 #include <Wt/Chart/WPieChart>
-#include <Wt/WContainerWidget>
 #include <Wt/WColor>
 #include <Wt/WPaintDevice>
+#include <Wt/WContainerWidget>
 
-class WebChart : public Wt::WContainerWidget
+class WebChart : public Wt::Chart::WPieChart
 {
 public:
   WebChart();
   virtual ~WebChart();
   void setSeverityData(int _sev, int count);
+  Wt::WContainerWidget* get(void) const  {return m_widget;}
   static Wt::WColor colorFromSeverity(const int& _sev);
 
+//protected:
+//  void paintEvent(Wt::WPaintDevice* _pdevice);
+
 private:
-  Wt::Chart::WPieChart* m_chart;
   Wt::WStandardItemModel* m_model;
+  Wt::WContainerWidget* m_widget;
 };
 
 #endif // WEBCHART_HPP
