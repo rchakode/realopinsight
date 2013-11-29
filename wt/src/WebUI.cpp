@@ -52,13 +52,14 @@ WebUI::~WebUI()
 void WebUI::render(void)
 {
   setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getRootService()->name, APP_NAME).toStdString());
-  m_mainWidget->setStyleClass("maincontainer");
-  m_mainWidget->setOverflow(Wt::WContainerWidget::OverflowHidden);
+  //m_mainWidget->setStyleClass("maincontainer");
+  // m_mainWidget->setOverflow(Wt::WContainerWidget::OverflowScroll);
+  m_mainWidget->setId("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(createMenuBarWidget());
   root()->addWidget(m_mainWidget);
-  root()->addStyleClass("maincontainer");
+  root()->setId("wrapper");
   handleRefresh();
   refresh();
   resetTimer();
@@ -72,7 +73,7 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   navigation->setResponsive(true);
 
   Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
-  contentsStack->addStyleClass("dashboard");
+  contentsStack->addStyleClass("stackcontentarea");
 
   // Setup a Left-aligned menu.
   Wt::WMenu* leftMenu = new Wt::WMenu(contentsStack);

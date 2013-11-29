@@ -28,6 +28,9 @@
 #include "MonitorBroker.hpp"
 #include "utilsClient.hpp"
 #include "WebChart.hpp"
+#include <Wt/WApplication>
+#include <Wt/WEnvironment>
+#include <Wt/WWidget>
 
 WebMap::WebMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
@@ -38,13 +41,12 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_scrollArea(new Wt::WScrollArea()),
     m_firstUpdate(true)
 {
-  setPreferredMethod(InlineSvgVml); //FIXME: do this according to the user agent
   setInline(false);
-
-  setLayoutSizeAware(true);
-  setJavaScriptMember(WWidget::WT_RESIZE_JS, "");
   m_scrollArea->setWidget(this);
-  m_scrollArea->addStyleClass("panel map");;
+  m_scrollArea->addStyleClass("panel map");
+  setPreferredMethod();
+  setLayoutSizeAware(true);
+  setJavaScriptMember();
 }
 
 
@@ -54,6 +56,32 @@ WebMap::~WebMap()
   delete m_scrollArea;
 }
 
+void WebMap::setPreferredMethod(void)
+{
+  const Wt::WEnvironment& env = wApp->environment();
+  if (env.agentIsGecko() || env.agentIsIE() || env.agentIsSafari()) {
+    WPaintedWidget::setPreferredMethod(HtmlCanvas);
+  } else {
+    WPaintedWidget::setPreferredMethod(InlineSvgVml);
+  }
+}
+
+void WebMap::setJavaScriptMember(void)
+{
+  Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS,"");
+//  Wt::WPaintedWidget::setJavaScriptMember(
+//        WT_RESIZE_JS,
+//        "function(self, w, h) {"
+//        ""  "if (!self.wtWidth || self.wtWidth!=w "
+//        ""      "|| !self.wtHeight || self.wtHeight!=h) {"
+//        ""    "self.wtWidth=w; self.wtHeight=h;"
+//        ""    "self.style.height=h + 'px';"
+//        ""    "$('wrapper').height=$(window).height();"
+//        ""    "$('maincontainer').height=$(window).height();"
+//        ""    "$('stackcontentarea').height=$(window).height();"
+//        ""  "}"
+//        "};");
+}
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
@@ -74,6 +102,13 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
       node != end; ++node) { drawNode(*node);}
 }
 
+
+void WebMap::layoutSizeChanged(int width, int height )
+{
+  qDebug()<<"dsssssssssssssssssssd>>>>>>>>>>>>>>>>>>";
+  qDebug() << width << height;
+}
+
 void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
@@ -87,8 +122,8 @@ void WebMap::drawNode(const NodeT& _node)
   Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15);
 
   // Set painting color
-//  QColor qcolor = utils::computeColor(_node.severity);
-//  Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
+  //  QColor qcolor = utils::computeColor(_node.severity);
+  //  Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
   Wt::WPen pen(WebChart::colorFromSeverity(_node.severity));
   m_painter->setPen(pen);
   // Draw icon

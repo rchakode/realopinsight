@@ -96,9 +96,9 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   msgPanel->setCentralWidget(msgContainer);
 
   mapMsgLayout->addWidget(mapPanel);
-  mapMsgLayout->setStretchFactor(mapPanel, 3);
+  //mapMsgLayout->setStretchFactor(mapPanel, 3);
   mapMsgLayout->addWidget(msgPanel);
-  mapMsgLayout->setStretchFactor(msgPanel, 1);
+  //mapMsgLayout->setStretchFactor(msgPanel, 1);
 
   mainLayout->addWidget(treeContainer);
   mainLayout->addWidget(mapMsgContainer);
@@ -112,6 +112,8 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   mapMsgLayout->setResizable(1);
 
   load(_config);
+
+  m_widget->resize(Wt::WLength(100, Wt::WLength::Percentage), Wt::WLength(100, Wt::WLength::Percentage));
 }
 
 WebDashboard::~WebDashboard()

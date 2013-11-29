@@ -61,11 +61,11 @@ WebMsgConsole::WebMsgConsole()
                          Wt::DisplayRole);
   m_model->setHeaderData(4,
                          Wt::Horizontal,
-                         QObject::tr("Message").toAscii(),
+                         QObject::tr("Message").toStdString(),
                          Wt::DisplayRole);
   m_model->setHeaderData(ID_COLUMN,
                          Wt::Horizontal,
-                         QObject::tr("Service ID").toAscii(),
+                         QObject::tr("Service ID").toStdString(),
                          Wt::UserRole);
 
   hideColumn(ID_COLUMN);
@@ -87,10 +87,10 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
 {
   Wt::WLength em = Wt::WLength(1, Wt::WLength::FontEx);
   setColumnWidth(0, 20 * em);
-  setColumnWidth(1, 20 * em);
+  setColumnWidth(1, 10 * em);
   setColumnWidth(2, 20 * em);
   setColumnWidth(3, 90); /*size of the header image*/
-  setColumnWidth(4, width - (65 * em.toPixels() + 90)); /*size of the header image*/
+  setColumnWidth(4, width - (55 * em.toPixels() + 90)); /*size of the header image*/
 }
 
 void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)

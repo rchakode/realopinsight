@@ -47,6 +47,7 @@ public:
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
+  void layoutSizeChanged(int width, int height );
 
 private:
   CoreDataT* m_cdata;
@@ -60,6 +61,8 @@ private:
   void drawNode(const NodeT& _node);
   void drawEdge(const QString& _parentId, const QString& _childId);
   void createLink(const NodeT& _node);
+  void setPreferredMethod(void);
+  void setJavaScriptMember(void);
 };
 
 #endif /* WEBSERVICEMAP_HPP */
