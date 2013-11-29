@@ -60,7 +60,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   Wt::WPanel* msgPanel(new Wt::WPanel());
 
   m_widget->setPadding(Wt::WLength(0), Wt::All);
-  m_widget->addStyleClass("maincontainer");
+  m_widget->addStyleClass("dashboard");
   mapMsgContainer->addStyleClass("panel");
   mapContainer->addStyleClass("panel");
   mapPanel->addStyleClass("panel");
