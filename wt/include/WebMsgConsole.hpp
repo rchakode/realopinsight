@@ -73,6 +73,7 @@ private:
 
   int findServiceRow(const std::string& _id);
   void setSeverityItem(Wt::WStandardItem* item, int severity);
+  void setModel(void);
 };
 
 #endif /* NGRT4NMSGPANEL_HPP_ */

@@ -47,6 +47,7 @@ WebMap::WebMap(CoreDataT* _cdata)
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
+  m_scrollArea->resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
 }
 
 

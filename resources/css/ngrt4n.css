@@ -3,7 +3,7 @@ body, html {
   
 }
 .Wt-domRoot {
-  position:fixed !important;
+  position: fixed !important;
   display: block;
   left: 0;
   top: 0;
@@ -14,12 +14,11 @@ body, html {
   height: calc(100%);
 }
 #wrapper {
-  position:fixed !important;
+  position: relative !important;
   display: block;
   left: 0;
   top: 0;
   right: 0;
-  bottom: 0;
 }
 
 #maincontainer {
@@ -28,7 +27,6 @@ body, html {
   left: 0;
   top: 0;
   right: 0;
-  bottom: 0; 
   width: 100% !important; 
   height: -moz-calc(100%); 
   height: -webkit-calc(100%);
@@ -41,9 +39,11 @@ body, html {
   display:block;
   left: 0;
   top: 0;
-  right: 0;
-  bottom: 0; 
-  height: 100%; 
+  right: 0; 
+  height: -moz-calc(100% - 40px); 
+  height: -webkit-calc(100% - 40px);
+  height: -o-calc(100% - 40px);
+  height: calc(100% - 40px);
 }
 
 /* navbar is from bootstrap */

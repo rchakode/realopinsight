@@ -67,20 +67,24 @@ WebMsgConsole::WebMsgConsole()
                          Wt::Horizontal,
                          QObject::tr("Service ID").toStdString(),
                          Wt::UserRole);
-
   hideColumn(ID_COLUMN);
-  SortingProxyModel* sproxy = new SortingProxyModel(this);
-  sproxy->setSourceModel(m_model);
-  sproxy->setDynamicSortFilter(true);
-  sproxy->setFilterRole(Wt::UserRole);
-  setModel(sproxy);
 
-  sortByColumn(1, Wt::DescendingOrder);
+  setModel();
+  resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
 }
 
 WebMsgConsole::~WebMsgConsole()
 {
   delete m_model;
+}
+
+void WebMsgConsole::setModel(void)
+{
+  SortingProxyModel* sproxy = new SortingProxyModel(this);
+  sproxy->setSourceModel(m_model);
+  sproxy->setDynamicSortFilter(true);
+  sproxy->setFilterRole(Wt::UserRole);
+  WTableView::setModel(sproxy);
 }
 
 void  WebMsgConsole::layoutSizeChanged(int width, int)
@@ -123,6 +127,7 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
     m_model->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
   }
+  sortByColumn(1, Wt::DescendingOrder);
 }
 
 void WebMsgConsole::addMsg(const NodeT&  _node)
