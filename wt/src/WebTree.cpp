@@ -34,6 +34,7 @@ WebTree::WebTree(CoreDataT* _cdata)
   setSelectionMode(Wt::SingleSelection);
   setSelectable(true);
   setSelectionBehavior(Wt::SelectItems);
+  addStyleClass("panel tree");
 }
 
 WebTree::~WebTree()

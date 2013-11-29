@@ -38,6 +38,7 @@ WebChart::WebChart(void)
   // set the widget
   setModel(m_model);     // Set the model.
   m_widget->addWidget(this);
+  m_widget->addStyleClass("panel chart");
 
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
@@ -53,12 +54,13 @@ WebChart::WebChart(void)
   // Draw the chart
   setLabelsColumn(0);    // Set the column that holds the labels.
   setDataColumn(1);      // Set the column that holds the data.
-  setDisplayLabels(Wt::Chart::TextPercentage); // Configure location and type of labels.
+  setDisplayLabels(Wt::Chart::Inside|Wt::Chart::TextPercentage); // Configure location and type of labels.
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
   resize(200, 250);    // WPaintedWidget must be given an explicit size.
-  //setMargin(10, Wt::Top | Wt::Bottom); // Add margin vertically.
+  setMargin(Wt::WLength::Auto, Wt::Top | Wt::Bottom); // Add margin vertically.
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right); // Center horizontally
+  //addStyleClass("panel chart");
 }
 
 WebChart::~WebChart()

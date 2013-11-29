@@ -45,61 +45,65 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
     m_msgConsole(new WebMsgConsole()),
     m_chart(new WebChart())
 {
+
   Wt::WContainerWidget* treeContainer(new Wt::WContainerWidget(m_widget));
   Wt::WContainerWidget* mapMsgContainer(new Wt::WContainerWidget(m_widget));
   Wt::WContainerWidget* mapContainer(new Wt::WContainerWidget(m_widget));
   Wt::WContainerWidget* msgContainer(new Wt::WContainerWidget(m_widget));
   Wt::WHBoxLayout* mainLayout(new Wt::WHBoxLayout(m_widget));
-  Wt::WVBoxLayout* treeLayout(new Wt::WVBoxLayout(treeContainer));
+  Wt::WVBoxLayout* leftSubMainLayout(new Wt::WVBoxLayout(treeContainer));
+  Wt::WVBoxLayout* rightSubMainLayout(new Wt::WVBoxLayout(msgContainer));
   Wt::WVBoxLayout* mapMsgLayout(new Wt::WVBoxLayout(mapMsgContainer));
   Wt::WVBoxLayout* mapLayout(new Wt::WVBoxLayout(mapContainer));
-  Wt::WVBoxLayout* msgLayout(new Wt::WVBoxLayout(msgContainer));
-  Wt::WPanel* treePanel = new Wt::WPanel(m_widget);
-  Wt::WPanel* mapPanel = new Wt::WPanel(m_widget);
-  Wt::WPanel* msgPanel = new Wt::WPanel(m_widget);
+  Wt::WPanel* treePanel(new Wt::WPanel());
+  Wt::WPanel* mapPanel(new Wt::WPanel());
+  Wt::WPanel* msgPanel(new Wt::WPanel());
 
   m_widget->setPadding(Wt::WLength(0), Wt::All);
-  m_widget->setStyleClass("maincontainer");
-  mapMsgContainer->setStyleClass("panel");
-  mapContainer->setStyleClass("panel");
-  mapPanel->setStyleClass("panel");
-  msgContainer->setStyleClass("panel");
-  msgPanel->setStyleClass("panel");
-  treeContainer->setStyleClass("panel");
-  treePanel->setStyleClass("panel");
+  m_widget->addStyleClass("maincontainer");
+  mapMsgContainer->addStyleClass("panel");
+  mapContainer->addStyleClass("panel");
+  mapPanel->addStyleClass("panel");
+  msgContainer->addStyleClass("panel");
+  msgPanel->addStyleClass("panel");
+  treeContainer->addStyleClass("panel");
+  treePanel->addStyleClass("panel");
 
   mainLayout->setContentsMargins(0, 0, 0, 0);
-  treeLayout->setContentsMargins(0, 0, 0, 0);
+  leftSubMainLayout->setContentsMargins(0, 0, 0, 0);
   mapMsgLayout->setContentsMargins(0, 0, 0, 0);
   mapLayout->setContentsMargins(0, 0, 0, 0);
-  msgLayout->setContentsMargins(0, 0, 0, 0);
+  rightSubMainLayout->setContentsMargins(0, 0, 0, 0);
 
   mainLayout->setSpacing(2);
-  treeLayout->setSpacing(0);
+  leftSubMainLayout->setSpacing(2);
+  rightSubMainLayout->setSpacing(0);
   mapMsgLayout->setSpacing(2);
   mapLayout->setSpacing(0);
-  msgLayout->setSpacing(0);
+
 
   treePanel->setCentralWidget(m_tree);
-  treeLayout->addWidget(treePanel);
-  treeLayout->addWidget(m_chart->get());
+  leftSubMainLayout->addWidget(treePanel);
+  leftSubMainLayout->setStretchFactor(treePanel, 3);
+  leftSubMainLayout->addWidget(m_chart->get());
+  leftSubMainLayout->setStretchFactor(treePanel, 1);
   treePanel->setTitle(QObject::tr("Service Tree").toStdString());
 
   mapLayout->addWidget(m_map->get());
   mapPanel->setCentralWidget(mapContainer);
 
-  msgLayout->addWidget(m_msgConsole);
+  rightSubMainLayout->addWidget(m_msgConsole);
   msgPanel->setCentralWidget(msgContainer);
 
   mapMsgLayout->addWidget(mapPanel);
+  mapMsgLayout->setStretchFactor(mapPanel, 3);
   mapMsgLayout->addWidget(msgPanel);
-  //  rightVLayout->setStretchFactor(mapPanel, 3);
-  //  rightVLayout->setStretchFactor(msgPanel, 1);
+  mapMsgLayout->setStretchFactor(msgPanel, 1);
 
   mainLayout->addWidget(treeContainer);
   mainLayout->addWidget(mapMsgContainer);
 
-  treeLayout->setResizable(0);
+  leftSubMainLayout->setResizable(0);
   mainLayout->setResizable(0);
   mainLayout->setResizable(1);
   mainLayout->setResizable(0);

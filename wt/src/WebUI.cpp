@@ -51,8 +51,7 @@ WebUI::~WebUI()
 
 void WebUI::render(void)
 {
-  setTitle(QObject::tr("%1 - %2 Operations Console")
-           .arg(m_dashboard->getRootService()->name, APP_NAME).toStdString());
+  setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getRootService()->name, APP_NAME).toStdString());
   m_mainWidget->setStyleClass("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -68,15 +67,15 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
   navigation->setTitle("(c) RealOpInsight.com", "http://realopinsight.com/");
-  navigation->addStyleClass("panel");
+  //navigation->addStyleClass("maincontainer");
   navigation->setResponsive(true);
+
   Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
   contentsStack->addStyleClass("maincontainer");
 
   // Setup a Left-aligned menu.
-  Wt::WMenu *leftMenu = new Wt::WMenu(contentsStack, menuBar);
+  Wt::WMenu* leftMenu = new Wt::WMenu(contentsStack);
   navigation->addMenu(leftMenu);
-
   leftMenu->addItem("images/built-in/menu_refresh.png",
                     m_dashboard->getRootService()->name.toStdString(),
                     m_dashboard->get(),
@@ -108,7 +107,6 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   }));
 
   navigation->addSearch(edit, Wt::AlignRight);
-
   return menuBar;
 }
 

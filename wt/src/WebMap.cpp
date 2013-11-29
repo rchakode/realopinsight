@@ -44,6 +44,7 @@ WebMap::WebMap(CoreDataT* _cdata)
   setLayoutSizeAware(true);
   setJavaScriptMember(WWidget::WT_RESIZE_JS, "");
   m_scrollArea->setWidget(this);
+  m_scrollArea->addStyleClass("panel map");;
 }
 
 

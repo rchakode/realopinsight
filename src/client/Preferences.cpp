@@ -292,7 +292,7 @@ void Preferences::changePasswd(void)
 void Preferences::donate(void)
 {
   QDesktopServices appLauncher;
-  appLauncher.openUrl(QUrl("http://realopinsight.com/en/index.php?page=contribute"));
+  appLauncher.openUrl(QUrl("http://realopinsight.com/en/index.php/page/contribute"));
 }
 
 
