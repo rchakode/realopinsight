@@ -60,6 +60,7 @@ public:
   void updateNodeMsg(const NodeT& _node);
   Wt::WStandardItem* createStatusItem(const NodeT& _node);
   Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck);
+  Wt::WStandardItem* createDateTimeItem(time_t _time);
 
   //signals:
   //  void sizeChanged(int, int);

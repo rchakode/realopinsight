@@ -24,6 +24,7 @@
 
 #include "WebMsgConsole.hpp"
 #include "utilsClient.hpp"
+#include <Wt/WDateTime>
 
 namespace {
   const qint32 ID_COLUMN = 5;
@@ -153,9 +154,18 @@ Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
 
 Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck)
 {
+  QString qtimet = QString(_lastcheck.c_str());
+  return createDateTimeItem(QDateTime::fromString(qtimet).toTime_t());
+}
+
+
+Wt::WStandardItem* WebMsgConsole::createDateTimeItem(time_t _time)
+{
   Wt::WStandardItem * item = new Wt::WStandardItem();
-  item->setText(Wt::WString::fromUTF8(_lastcheck));
-  item->setData(_lastcheck, Wt::UserRole);
+  Wt::WDateTime t;
+  t.setTime_t(_time);
+  item->setText(t.toString());
+  item->setData(QString::number(_time).toStdString(), Wt::UserRole);
   return item;
 }
 
