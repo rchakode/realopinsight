@@ -35,6 +35,7 @@ WebTree::WebTree(CoreDataT* _cdata)
   setSelectable(true);
   setSelectionBehavior(Wt::SelectItems);
   addStyleClass("panel tree");
+  resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
 }
 
 WebTree::~WebTree()

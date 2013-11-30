@@ -38,7 +38,7 @@
 #include <Wt/WLocalizedStrings>
 #include "DashboardBase.hpp"
 #include "WebTree.hpp"
-#include "WebChart.hpp"
+#include "WebPieChart.hpp"
 
 class WebDashboard : public DashboardBase
 {
@@ -47,7 +47,7 @@ public:
   virtual ~WebDashboard();
   Wt::WContainerWidget* get(void) const {return m_widget;}
   void updateMap(void);
-  WebMap* getMap(void) const {return m_map;}
+  WebPieMap* getMap(void) const {return m_map;}
 
 protected:
   virtual void buildMap(void);
@@ -60,9 +60,10 @@ protected:
 private:
   Wt::WContainerWidget* m_widget;
   WebTree* m_tree;
-  WebMap* m_map;
+  WebPieMap* m_map;
   WebMsgConsole* m_msgConsole;
-  WebChart* m_chart;
+  WebPieChart* m_chart;
+  void setupUI(void);
 };
 
 #endif /* WEBDASHBOOARD_HPP */

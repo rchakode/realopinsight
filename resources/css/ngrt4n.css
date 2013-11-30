@@ -65,11 +65,11 @@ body, html {
   height: 500px;
 }
 .panel .tree {
-  height: 600px;
+ /* height: 600px;*/
 }
 .panel .chart{
   max-width: 250px;
-  height: 250px;
+/*  height: 250px;*/
 }
 .severity-normal {
   background-color: #00FF00; 

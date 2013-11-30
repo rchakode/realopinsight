@@ -34,11 +34,11 @@
 #include <Wt/WSignal>
 #include <Wt/WScrollArea>
 
-class WebMap : public Wt::WPaintedWidget
+class WebPieMap : public Wt::WPaintedWidget
 {
 public:
-  WebMap(CoreDataT* _cdata);
-  virtual ~WebMap();
+  WebPieMap(CoreDataT* _cdata);
+  virtual ~WebPieMap();
   void drawMap(void);
 
   Wt::WScrollArea* get(void) const {return m_scrollArea;}

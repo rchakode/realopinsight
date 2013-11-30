@@ -95,7 +95,7 @@ int main(int argc, char **argv)
                                         ".",
                                         QObject::tr("Xml files (*.xml);;All files (*)"));
 
-    if (!file.length()) {
+    if (file.isNull() || file.isEmpty()) {
       utils::alert(QObject::tr("No configuration file selected, the program will exit!"));
       exit(1);
     }

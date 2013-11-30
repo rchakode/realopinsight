@@ -77,10 +77,10 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_bxSourceSelection(new QComboBox()),
     m_msgPane(new QTabWidget())
 {
-  m_viewPanel->addTab(m_map, tr("Map")),
-      m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
-  m_viewPanel->addTab(m_browser, tr("Web Browser")),
-      m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
+  m_viewPanel->addTab(m_map, tr("Map"));
+  m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
+  m_viewPanel->addTab(m_browser, tr("Web Browser"));
+  m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
   m_widget->addWidget(m_tree);
   m_widget->addWidget(m_rightSplitter);
   m_rightSplitter->addWidget(m_viewPanel);

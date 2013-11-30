@@ -27,12 +27,12 @@
 #include "WebMap.hpp"
 #include "MonitorBroker.hpp"
 #include "utilsClient.hpp"
-#include "WebChart.hpp"
+#include "WebPieChart.hpp"
 #include <Wt/WApplication>
 #include <Wt/WEnvironment>
 #include <Wt/WWidget>
 
-WebMap::WebMap(CoreDataT* _cdata)
+WebPieMap::WebPieMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
     m_cdata(_cdata),
     m_scaleX(1),
@@ -41,7 +41,7 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_scrollArea(new Wt::WScrollArea()),
     m_firstUpdate(true)
 {
-  setInline(false);
+  setInline(true);
   m_scrollArea->setWidget(this);
   m_scrollArea->addStyleClass("panel map");
   setPreferredMethod();
@@ -50,24 +50,23 @@ WebMap::WebMap(CoreDataT* _cdata)
   m_scrollArea->resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
 }
 
-
-WebMap::~WebMap()
+WebPieMap::~WebPieMap()
 {
   m_icons.clear();
   delete m_scrollArea;
 }
 
-void WebMap::setPreferredMethod(void)
+void WebPieMap::setPreferredMethod(void)
 {
   const Wt::WEnvironment& env = wApp->environment();
   if (env.agentIsGecko() || env.agentIsIE() || env.agentIsSafari()) {
-    WPaintedWidget::setPreferredMethod(HtmlCanvas);
+    WPaintedWidget::setPreferredMethod(InlineSvgVml);
   } else {
     WPaintedWidget::setPreferredMethod(InlineSvgVml);
   }
 }
 
-void WebMap::setJavaScriptMember(void)
+void WebPieMap::setJavaScriptMember(void)
 {
   Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS,"");
 //  Wt::WPaintedWidget::setJavaScriptMember(
@@ -84,7 +83,7 @@ void WebMap::setJavaScriptMember(void)
 //        "};");
 }
 
-void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
+void WebPieMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
   m_painter = new Wt::WPainter(_pdevice);
   m_painter->scale(m_scaleX, m_scaleY);
@@ -104,29 +103,25 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 }
 
 
-void WebMap::layoutSizeChanged(int width, int height )
+void WebPieMap::layoutSizeChanged(int width, int height )
 {
-  qDebug()<<"dsssssssssssssssssssd>>>>>>>>>>>>>>>>>>";
+  qDebug()<<"TODO";
   qDebug() << width << height;
 }
 
-void WebMap::drawMap(void)
+void WebPieMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width, m_cdata->map_height);
 }
 
-void WebMap::drawNode(const NodeT& _node)
+void WebPieMap::drawNode(const NodeT& _node)
 {
   Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
   Wt::WPointF posLabel(_node.pos_x, _node.pos_y);
   Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15);
-
   // Set painting color
-  //  QColor qcolor = utils::computeColor(_node.severity);
-  //  Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
-  Wt::WPen pen(WebChart::colorFromSeverity(_node.severity));
-  m_painter->setPen(pen);
+  m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
   // Draw icon
   m_painter->drawImage(posIcon, Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40));
   // Draw anchor icon
@@ -142,7 +137,7 @@ void WebMap::drawNode(const NodeT& _node)
   createLink(_node);
 }
 
-void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
+void WebPieMap::drawEdge(const QString& _parentId, const QString& _childId)
 {
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
@@ -160,7 +155,7 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
   }
 }
 
-void WebMap::createLink(const NodeT& _node)
+void WebPieMap::createLink(const NodeT& _node)
 {
   double x = _node.pos_x * m_scaleX;
   double y = _node.pos_y * m_scaleY;
@@ -172,13 +167,13 @@ void WebMap::createLink(const NodeT& _node)
   addArea(area);
 }
 
-void WebMap::updateNode(const NodeT&, const QString&)
+void WebPieMap::updateNode(const NodeT&, const QString&)
 {
   // Empty function to conform with the polymorphism
   // With WPaintedWidget, the whole map is updated
 }
 
-void WebMap::scaleMap(double factor)
+void WebPieMap::scaleMap(double factor)
 {
   m_scaleX *= factor;
   m_scaleY *= factor;

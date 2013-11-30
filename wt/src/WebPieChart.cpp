@@ -1,5 +1,5 @@
 /*
- * WebChart.cpp
+ * WebPieChart.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 27-11-2013                                                 #
@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebChart.hpp"
+#include "WebPieChart.hpp"
 #include "utilsClient.hpp"
 #include <Wt/WStandardItem>
 #include <QString>
@@ -30,7 +30,7 @@
 #include <Wt/WPainter>
 #include <Wt/WPen>
 
-WebChart::WebChart(void)
+WebPieChart::WebPieChart(void)
   : Wt::Chart::WPieChart(),
     m_model(new Wt::WStandardItemModel(this)),
     m_widget(new Wt::WContainerWidget())
@@ -60,30 +60,31 @@ WebChart::WebChart(void)
   resize(200, 250);    // WPaintedWidget must be given an explicit size.
   setMargin(Wt::WLength::Auto, Wt::Top | Wt::Bottom); // Add margin vertically.
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right); // Center horizontally
+  resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
   //addStyleClass("panel chart");
 }
 
-WebChart::~WebChart()
+WebPieChart::~WebPieChart()
 {
   delete m_model;
   delete m_widget;
 }
 
 //FIXME: do custom painting to avoid black line, 0%legend
-//void WebChart::paintEvent(Wt::WPaintDevice* _pdevice)
+//void WebPieChart::paintEvent(Wt::WPaintDevice* _pdevice)
 //{
 //  painter = new Wt::WPainter(_pdevice);
 //  //painter->setPen(Wt::WPen(Wt::WColor(0,0,0,0)));
 //  Wt::Chart::WPieChart::update();
 //}
 
-Wt::WColor WebChart::colorFromSeverity(const int& _sev)
+Wt::WColor WebPieChart::colorFromSeverity(const int& _sev)
 {
   QColor qcolor = utils::computeColor(_sev);
   return Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
 }
 
-void WebChart::setSeverityData(int _sev, int _count)
+void WebPieChart::setSeverityData(int _sev, int _count)
 {
   std::string label = utils::severity2Str(_sev).toStdString();
   m_model->setData(_sev, 0, label);

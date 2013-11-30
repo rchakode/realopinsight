@@ -1,5 +1,5 @@
 /*
- * WebChart.hpp
+ * WebPieChart.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 27-11-2013                                                 #
@@ -22,8 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBCHART_HPP
-#define WEBCHART_HPP
+#ifndef WEBPIECHART_HPP
+#define WEBPIECHART_HPP
 
 #include <Wt/WStandardItemModel>
 #include <Wt/Chart/WPieChart>
@@ -31,11 +31,11 @@
 #include <Wt/WPaintDevice>
 #include <Wt/WContainerWidget>
 
-class WebChart : public Wt::Chart::WPieChart
+class WebPieChart : public Wt::Chart::WPieChart
 {
 public:
-  WebChart();
-  virtual ~WebChart();
+  WebPieChart();
+  virtual ~WebPieChart();
   void setSeverityData(int _sev, int count);
   Wt::WContainerWidget* get(void) const  {return m_widget;}
   static Wt::WColor colorFromSeverity(const int& _sev);
@@ -48,4 +48,4 @@ private:
   Wt::WContainerWidget* m_widget;
 };
 
-#endif // WEBCHART_HPP
+#endif // WEBPIECHART_HPP

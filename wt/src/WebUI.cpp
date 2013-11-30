@@ -129,12 +129,12 @@ Wt::WContainerWidget* WebUI::createToolBar(void)
 
   b = createTooBarButton("images/built-in/menu_zoomin.png");
   b->setStyleClass("button");
-  b->clicked().connect(std::bind(&WebMap::scaleMap, m_dashboard->getMap(), utils::SCALIN_FACTOR));
+  b->clicked().connect(std::bind(&WebPieMap::scaleMap, m_dashboard->getMap(), utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_zoomout.png");
   b->setStyleClass("button");
-  b->clicked().connect(std::bind(&WebMap::scaleMap, m_dashboard->getMap(), utils::SCALOUT_FACTOR));
+  b->clicked().connect(std::bind(&WebPieMap::scaleMap, m_dashboard->getMap(), utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_disket.png");
