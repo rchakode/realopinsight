@@ -40,10 +40,10 @@ body, html {
   left: 0;
   top: 0;
   right: 0; 
-  height: -moz-calc(100% - 40px); 
-  height: -webkit-calc(100% - 40px);
-  height: -o-calc(100% - 40px);
-  height: calc(100% - 40px);
+  height: -moz-calc(100% - 50px); 
+  height: -webkit-calc(100% - 50px);
+  height: -o-calc(100% - 50px);
+  height: calc(100% - 50px);
 }
 
 /* navbar is from bootstrap */
@@ -84,7 +84,7 @@ body, html {
   left: 0 !important;
   height: 250px;
 }
-#maincontainer .severity-normal {
+.severity-normal {
   background-color: #00FF00; 
 }
 

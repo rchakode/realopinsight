@@ -112,11 +112,9 @@ void WebDashboard::updateMap(void)
 
 void WebDashboard::setupUI(void)
 {
-  Wt::WContainerWidget* leftSubContainer(new Wt::WContainerWidget(m_widget));
-  Wt::WContainerWidget* rightSubContainer(new Wt::WContainerWidget(m_widget));
   Wt::WHBoxLayout* mainLayout(new Wt::WHBoxLayout(m_widget));
-  Wt::WVBoxLayout* leftSubMainLayout(new Wt::WVBoxLayout(leftSubContainer));
-  Wt::WVBoxLayout* rightSubMainLayout(new Wt::WVBoxLayout(rightSubContainer));
+  Wt::WVBoxLayout* leftSubMainLayout(new Wt::WVBoxLayout());
+  Wt::WVBoxLayout* rightSubMainLayout(new Wt::WVBoxLayout());
 
   m_widget->setId("REALOPINSIGHT_MAIN_DASHBOARD");
 
@@ -136,11 +134,11 @@ void WebDashboard::setupUI(void)
 
   m_tree->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
   m_map->get()->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
-  m_chart->get()->resize(Wt::WLength::Auto, Wt::WLength(400, Wt::WLength::Pixel));
-  m_msgConsole->resize(Wt::WLength::Auto, Wt::WLength(400, Wt::WLength::Pixel));
+  m_chart->get()->resize(Wt::WLength::Auto, Wt::WLength(250, Wt::WLength::Pixel));
+  m_msgConsole->resize(Wt::WLength::Auto, Wt::WLength(250, Wt::WLength::Pixel));
 
-  mainLayout->addWidget(leftSubContainer);
-  mainLayout->addWidget(rightSubContainer);
+  mainLayout->addLayout(leftSubMainLayout);
+  mainLayout->addLayout(rightSubMainLayout);
 
   leftSubMainLayout->setResizable(0);
   mainLayout->setResizable(0);

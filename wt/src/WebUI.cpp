@@ -52,7 +52,6 @@ WebUI::~WebUI()
 void WebUI::render(void)
 {
   setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getRootService()->name, APP_NAME).toStdString());
-  //m_mainWidget->setStyleClass("maincontainer");
   // m_mainWidget->setOverflow(Wt::WContainerWidget::OverflowScroll);
   m_mainWidget->setId("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
