@@ -145,7 +145,7 @@ void WebMsgConsole::addMsg(const NodeT&  _node)
 Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
-  item->setData(std::string("3"), Wt::UserRole);
+  item->setData(QString::number(_node.severity).toStdString(), Wt::UserRole);
   item->setText(utils::severity2Str(_node.severity).toStdString());
   setSeverityItem(item, _node.severity);
   return item;
