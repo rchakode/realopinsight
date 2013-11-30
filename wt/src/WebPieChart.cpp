@@ -24,25 +24,27 @@
 
 #include "WebPieChart.hpp"
 #include "utilsClient.hpp"
+#include "StatsLegend.hpp"
 #include <Wt/WStandardItem>
 #include <QString>
 #include <QDebug>
 #include <Wt/WPainter>
 #include <Wt/WPen>
-#include "StatsLegend.hpp"
+#include <Wt/WScrollArea>
 
 WebPieChart::WebPieChart(void)
   : Wt::Chart::WPieChart(),
     m_model(new Wt::WStandardItemModel(this)),
-    m_widget(new Wt::WContainerWidget())
+    m_scrollArea(new Wt::WScrollArea())
 {
   setModel(m_model);
 
   resize(StatsLegend::CHART_WIDTH, StatsLegend::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
-  setMargin(Wt::WLength::Auto, Wt::Top | Wt::Bottom);
+  setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
-  m_widget->addWidget(this);
+  m_scrollArea->setWidget(this);
+  m_scrollArea->setMargin(0, Wt::Top| Wt::Bottom);
 
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
@@ -66,7 +68,7 @@ WebPieChart::WebPieChart(void)
 WebPieChart::~WebPieChart()
 {
   delete m_model;
-  delete m_widget;
+  delete m_scrollArea;
 }
 
 //FIXME: do custom painting to avoid black line, 0%legend

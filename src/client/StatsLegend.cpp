@@ -30,7 +30,7 @@ const QColor StatsLegend::COLOR_CRITICAL = Qt::red;
 const QColor StatsLegend::COLOR_UNKNOWN = Qt::lightGray;
 const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200);
 const qint32 StatsLegend::CHART_WIDTH=200;
-const qint32 StatsLegend::CHART_HEIGHT=250;
+const qint32 StatsLegend::CHART_HEIGHT=150;
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
   : QWidget(_parent)

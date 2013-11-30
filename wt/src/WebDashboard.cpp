@@ -132,9 +132,10 @@ void WebDashboard::setupUI(void)
   rightSubMainLayout->addWidget(m_map->get());
   rightSubMainLayout->addWidget(m_msgConsole);
 
+  m_widget->resize(Wt::WLength(100, Wt::WLength::Percentage), Wt::WLength(100, Wt::WLength::Percentage));
   m_tree->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
   m_map->get()->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
-  m_chart->get()->resize(Wt::WLength::Auto, Wt::WLength(200, Wt::WLength::Pixel));
+  m_chart->get()->resize(Wt::WLength::Auto, Wt::WLength(StatsLegend::CHART_HEIGHT, Wt::WLength::Pixel));
   m_msgConsole->resize(Wt::WLength::Auto, Wt::WLength(200, Wt::WLength::Pixel));
 
   mainLayout->addLayout(leftSubMainLayout);

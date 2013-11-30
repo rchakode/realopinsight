@@ -37,7 +37,7 @@ public:
   WebPieChart();
   virtual ~WebPieChart();
   void setSeverityData(int _sev, int count);
-  Wt::WContainerWidget* get(void) const  {return m_widget;}
+  Wt::WScrollArea* get(void) const  {return m_scrollArea;}
   static Wt::WColor colorFromSeverity(const int& _sev);
 
 //protected:
@@ -45,7 +45,7 @@ public:
 
 private:
   Wt::WStandardItemModel* m_model;
-  Wt::WContainerWidget* m_widget;
+  Wt::WScrollArea* m_scrollArea;
 };
 
 #endif // WEBPIECHART_HPP
