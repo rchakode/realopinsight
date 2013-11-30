@@ -45,7 +45,6 @@ WebPieMap::WebPieMap(CoreDataT* _cdata)
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
-  m_scrollArea->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
 }
 
 WebPieMap::~WebPieMap()
