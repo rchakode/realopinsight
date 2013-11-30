@@ -34,8 +34,6 @@ WebTree::WebTree(CoreDataT* _cdata)
   setSelectionMode(Wt::SingleSelection);
   setSelectable(true);
   setSelectionBehavior(Wt::SelectItems);
-  addStyleClass("panel tree");
-  resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
 }
 
 WebTree::~WebTree()
@@ -46,7 +44,7 @@ WebTree::~WebTree()
 
 void WebTree::build(void)
 {
-  /* Create a item for each individual service */
+  // Create a item for each individual service
   for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();
       node != end; ++node)
   {

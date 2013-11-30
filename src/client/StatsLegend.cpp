@@ -29,8 +29,8 @@ const QColor StatsLegend::COLOR_MAJOR = QColor("#FF8C00");
 const QColor StatsLegend::COLOR_CRITICAL = Qt::red;
 const QColor StatsLegend::COLOR_UNKNOWN = Qt::lightGray;
 const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200);
-const qint32 StatsLegend::DefaultWidth=250;
-const qint32 StatsLegend::DefaultHeight=300;
+const qint32 StatsLegend::CHART_WIDTH=200;
+const qint32 StatsLegend::CHART_HEIGHT=250;
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
   : QWidget(_parent)
@@ -80,10 +80,10 @@ void StatsLegend::paintEvent(QPaintEvent *)
 
 QSize StatsLegend::minimumSizeHint() const
 {
-  return QSize(DefaultWidth, DefaultHeight);
+  return QSize(CHART_WIDTH, CHART_HEIGHT);
 }
 
 QSize StatsLegend::sizeHint() const
 {
-  return QSize(DefaultWidth, DefaultHeight);
+  return QSize(CHART_WIDTH, CHART_HEIGHT);
 }

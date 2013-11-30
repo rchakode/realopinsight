@@ -47,31 +47,37 @@ body, html {
 }
 
 /* navbar is from bootstrap */
-#maincontainer .navbar { 
+.navbar { 
   margin: 0;
-  pading: 0;
+  padding: 0;
 }
 
-#maincontainer .dashboard {
+#REALOPINSIGHT_MAIN_DASHBOARD {
   margin: 0;
-  pading: 0;
+  padding: 0;
   height: 100%; 
 }
-#maincontainer .panel {
-  margin: 0px;
-  padding: 0px;
+
+#REALOPINSIGHT_MAP_BOARD {
+  margin: 0;
+  padding: 0;
 }
-.panel .map {
-  height: 500px;
+#REALOPINSIGHT_TREE_BOARD {
+  margin: 0;
+  padding: 0;
 }
-.panel .tree {
- /* height: 600px;*/
+#REALOPINSIGHT_MSG_BOARD {
+  margin: 0;
+  padding: 0;
 }
-.panel .chart{
-  max-width: 250px;
-/*  height: 250px;*/
+
+#REALOPINSIGHT_CHART_BOARD{
+  position: absolute;
+  bottom: 0px !important;
+  left: 0 !important;
+  height: 250px;
 }
-.severity-normal {
+#maincontainer .severity-normal {
   background-color: #00FF00; 
 }
 

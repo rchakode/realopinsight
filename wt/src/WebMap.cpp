@@ -41,13 +41,11 @@ WebPieMap::WebPieMap(CoreDataT* _cdata)
     m_scrollArea(new Wt::WScrollArea()),
     m_firstUpdate(true)
 {
-  setInline(true);
   m_scrollArea->setWidget(this);
-  m_scrollArea->addStyleClass("panel map");
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
-  m_scrollArea->resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
+  m_scrollArea->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
 }
 
 WebPieMap::~WebPieMap()
@@ -58,29 +56,25 @@ WebPieMap::~WebPieMap()
 
 void WebPieMap::setPreferredMethod(void)
 {
-  const Wt::WEnvironment& env = wApp->environment();
-  if (env.agentIsGecko() || env.agentIsIE() || env.agentIsSafari()) {
-    WPaintedWidget::setPreferredMethod(InlineSvgVml);
-  } else {
-    WPaintedWidget::setPreferredMethod(InlineSvgVml);
-  }
+  setInline(false);
+  WPaintedWidget::setPreferredMethod(InlineSvgVml);
 }
 
 void WebPieMap::setJavaScriptMember(void)
 {
   Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS,"");
-//  Wt::WPaintedWidget::setJavaScriptMember(
-//        WT_RESIZE_JS,
-//        "function(self, w, h) {"
-//        ""  "if (!self.wtWidth || self.wtWidth!=w "
-//        ""      "|| !self.wtHeight || self.wtHeight!=h) {"
-//        ""    "self.wtWidth=w; self.wtHeight=h;"
-//        ""    "self.style.height=h + 'px';"
-//        ""    "$('wrapper').height=$(window).height();"
-//        ""    "$('maincontainer').height=$(window).height();"
-//        ""    "$('stackcontentarea').height=$(window).height();"
-//        ""  "}"
-//        "};");
+  //  Wt::WPaintedWidget::setJavaScriptMember(
+  //        WT_RESIZE_JS,
+  //        "function(self, w, h) {"
+  //        ""  "if (!self.wtWidth || self.wtWidth!=w "
+  //        ""      "|| !self.wtHeight || self.wtHeight!=h) {"
+  //        ""    "self.wtWidth=w; self.wtHeight=h;"
+  //        ""    "self.style.height=h + 'px';"
+  //        ""    "$('wrapper').height=$(window).height();"
+  //        ""    "$('maincontainer').height=$(window).height();"
+  //        ""    "$('stackcontentarea').height=$(window).height();"
+  //        ""  "}"
+  //        "};");
 }
 
 void WebPieMap::paintEvent(Wt::WPaintDevice* _pdevice)

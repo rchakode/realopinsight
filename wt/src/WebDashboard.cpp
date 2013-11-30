@@ -47,7 +47,15 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 {
   setupUI();
   load(_config);
-  m_widget->resize(Wt::WLength(100, Wt::WLength::Percentage), Wt::WLength(100, Wt::WLength::Percentage));
+//  m_widget->setJavaScriptMember(
+//        "wtResize",
+//        "function(self, width, height) { "
+//        "$('maincontainer').height=height;"
+//        "$('REALOPINSIGHT_TREE_BOARD').height=height*0.50;"
+//        "$('REALOPINSIGHT_MAP_BOARD').height=height*0.50;"
+//        "$('REALOPINSIGHT_CHART_BOARD').height=height*0.50;"
+//        "$('REALOPINSIGHT_MSG_BOARD').height=height*0.50;"
+//        "}");
 }
 
 WebDashboard::~WebDashboard()
@@ -116,16 +124,13 @@ void WebDashboard::setupUI(void)
   Wt::WPanel* treePanel(new Wt::WPanel());
   Wt::WPanel* mapPanel(new Wt::WPanel());
   Wt::WPanel* msgPanel(new Wt::WPanel());
+  Wt::WPanel* chartPanel(new Wt::WPanel());
 
-  m_widget->setPadding(Wt::WLength(0), Wt::All);
-  m_widget->addStyleClass("dashboard");
-  mapMsgContainer->addStyleClass("panel");
-  mapContainer->addStyleClass("panel");
-  mapPanel->addStyleClass("panel");
-  msgContainer->addStyleClass("panel");
-  msgPanel->addStyleClass("panel");
-  treeContainer->addStyleClass("panel");
-  treePanel->addStyleClass("panel");
+  m_widget->setId("REALOPINSIGHT_MAIN_DASHBOARD");
+  treePanel->setId("REALOPINSIGHT_TREE_BOARD");
+  mapPanel->setId("REALOPINSIGHT_MAP_BOARD");
+  msgPanel->setId("REALOPINSIGHT_MSG_BOARD");
+  chartPanel->setId("REALOPINSIGHT_CHART_BOARD");
 
   mainLayout->setContentsMargins(0, 0, 0, 0);
   leftSubMainLayout->setContentsMargins(0, 0, 0, 0);
@@ -141,10 +146,11 @@ void WebDashboard::setupUI(void)
 
   treePanel->setCentralWidget(m_tree);
   leftSubMainLayout->addWidget(treePanel);
-  leftSubMainLayout->setStretchFactor(treePanel, 3);
-  leftSubMainLayout->addWidget(m_chart->get());
-  leftSubMainLayout->setStretchFactor(treePanel, 1);
   treePanel->setTitle(QObject::tr("Service Tree").toStdString());
+
+  chartPanel->setCentralWidget(m_chart->get());
+  leftSubMainLayout->addWidget(chartPanel);
+  chartPanel->setTitle(QObject::tr("Statistics").toStdString());
 
   mapLayout->addWidget(m_map->get());
   mapPanel->setCentralWidget(mapContainer);
@@ -152,11 +158,13 @@ void WebDashboard::setupUI(void)
   rightSubMainLayout->addWidget(m_msgConsole);
   msgPanel->setCentralWidget(msgContainer);
 
-  mapMsgLayout->addWidget(mapPanel);
-  //mapMsgLayout->setStretchFactor(mapPanel, 3);
-  mapMsgLayout->addWidget(msgPanel);
-  //mapMsgLayout->setStretchFactor(msgPanel, 1);
+  chartPanel->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
+  msgPanel->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
+  mapPanel->resize(Wt::WLength::Auto, Wt::WLength::Auto);
+  treePanel->resize(Wt::WLength::Auto, Wt::WLength::Auto);
 
+  mapMsgLayout->addWidget(mapPanel);
+  mapMsgLayout->addWidget(msgPanel);
   mainLayout->addWidget(treeContainer);
   mainLayout->addWidget(mapMsgContainer);
 

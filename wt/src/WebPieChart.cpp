@@ -29,16 +29,20 @@
 #include <QDebug>
 #include <Wt/WPainter>
 #include <Wt/WPen>
+#include "StatsLegend.hpp"
 
 WebPieChart::WebPieChart(void)
   : Wt::Chart::WPieChart(),
     m_model(new Wt::WStandardItemModel(this)),
     m_widget(new Wt::WContainerWidget())
 {
-  // set the widget
-  setModel(m_model);     // Set the model.
+  setModel(m_model);
+
+  resize(StatsLegend::CHART_WIDTH, StatsLegend::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
+  setMargin(Wt::WLength::Auto, Wt::Top | Wt::Bottom);
+  setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
+
   m_widget->addWidget(this);
-  m_widget->addStyleClass("panel chart");
 
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
@@ -57,11 +61,6 @@ WebPieChart::WebPieChart(void)
   setDisplayLabels(Wt::Chart::Inside|Wt::Chart::TextPercentage); // Configure location and type of labels.
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
-  resize(200, 250);    // WPaintedWidget must be given an explicit size.
-  setMargin(Wt::WLength::Auto, Wt::Top | Wt::Bottom); // Add margin vertically.
-  setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right); // Center horizontally
-  resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
-  //addStyleClass("panel chart");
 }
 
 WebPieChart::~WebPieChart()

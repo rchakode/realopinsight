@@ -20,6 +20,7 @@ SOURCES	+= src/client/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
 config-web {
+CONFIG += no_keywords
 HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebMsgConsole.hpp \
     wt/include/WebMap.hpp \
