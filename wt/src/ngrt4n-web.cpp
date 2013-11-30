@@ -7,6 +7,7 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
   ui->setTwoPhaseRenderingThreshold(0);
   ui->setTitle(ui->getConfig().toStdString());
   ui->setTheme(new Wt::WBootstrapTheme());
+  ui->requireJQuery("resources/js/jquery.1.9.0.min.js");
   //ui->setCssTheme("polished");
   ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
   ui->render();

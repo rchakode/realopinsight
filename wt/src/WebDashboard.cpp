@@ -47,15 +47,6 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 {
   setupUI();
   load(_config);
-  //  m_widget->setJavaScriptMember(
-  //        "wtResize",
-  //        "function(self, width, height) { "
-  //        "$('maincontainer').height=height;"
-  //        "$('REALOPINSIGHT_TREE_BOARD').height=height*0.50;"
-  //        "$('REALOPINSIGHT_MAP_BOARD').height=height*0.50;"
-  //        "$('REALOPINSIGHT_CHART_BOARD').height=height*0.50;"
-  //        "$('REALOPINSIGHT_MSG_BOARD').height=height*0.50;"
-  //        "}");
 }
 
 WebDashboard::~WebDashboard()
@@ -116,8 +107,6 @@ void WebDashboard::setupUI(void)
   Wt::WVBoxLayout* leftSubMainLayout(new Wt::WVBoxLayout());
   Wt::WVBoxLayout* rightSubMainLayout(new Wt::WVBoxLayout());
 
-  m_widget->setId("REALOPINSIGHT_MAIN_DASHBOARD");
-
   mainLayout->setContentsMargins(0, 0, 0, 0);
   leftSubMainLayout->setContentsMargins(0, 0, 0, 0);
   rightSubMainLayout->setContentsMargins(0, 0, 0, 0);
@@ -138,6 +127,19 @@ void WebDashboard::setupUI(void)
   m_chart->get()->resize(Wt::WLength::Auto, Wt::WLength(StatsLegend::CHART_HEIGHT, Wt::WLength::Pixel));
   m_msgConsole->resize(Wt::WLength::Auto, Wt::WLength(200, Wt::WLength::Pixel));
 
+  m_widget->setJavaScriptMember(
+        "wtResize",
+        "function(self, width, height) { "
+        " var wh=$(window).height();"
+        " var h6=wh*0.6;"
+        " var h4=wh*0.4;"
+        "$('#maincontainer').height(wh);"
+        "$('#"+wApp->root()->id()+"').height(wh);"
+        "$('#"+m_tree->id()+"').height(h6);"
+        "$('#"+m_map->get()->id()+"').height(h6);"
+        "$('#"+m_chart->get()->id()+"').height(h4);"
+        "$('#"+m_msgConsole->id()+"').height(h4);"
+        "}");
   mainLayout->addLayout(leftSubMainLayout);
   mainLayout->addLayout(rightSubMainLayout);
 
