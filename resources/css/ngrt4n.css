@@ -23,7 +23,7 @@ body, html {
 
 #maincontainer {
   position: relative;
-  display:block;
+  display: block;
   left: 0;
   top: 0;
   right: 0;
@@ -36,7 +36,7 @@ body, html {
 
 #maincontainer .stackcontentarea {
   position: relative;
-  display:block;
+  display: block;
   left: 0;
   top: 0;
   right: 0; 
@@ -53,8 +53,11 @@ body, html {
 }
 
 #REALOPINSIGHT_MAIN_DASHBOARD {
-  margin: 0;
-  padding: 0;
+  position: relative;
+  display: block;
+  left: 0;
+  top: 0;
+  right: 0; 
   height: 100%; 
 }
 
@@ -65,6 +68,10 @@ body, html {
 #REALOPINSIGHT_TREE_BOARD {
   margin: 0;
   padding: 0;
+  height: -moz-calc(100% - 300px); 
+  height: -webkit-calc(100% - 300px);
+  height: -o-calc(100% - 300px);
+  height: calc(100% - 300px);
 }
 #REALOPINSIGHT_MSG_BOARD {
   margin: 0;

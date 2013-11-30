@@ -34,6 +34,7 @@ WebTree::WebTree(CoreDataT* _cdata)
   setSelectionMode(Wt::SingleSelection);
   setSelectable(true);
   setSelectionBehavior(Wt::SelectItems);
+  setColumnWidth(0, 500);
 }
 
 WebTree::~WebTree()
