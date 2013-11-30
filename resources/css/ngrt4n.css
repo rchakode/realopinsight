@@ -1,7 +1,14 @@
 body, html {
   font-size: 10pt;
-  
+  left: 0;
+  top: 0;
+  right: 0;
+  height: -moz-calc(100%); 
+  height: -webkit-calc(100%);
+  height: -o-calc(100%);
+  height: calc(100%);
 }
+/* Wt-domRoot from Wt */
 .Wt-domRoot {
   position: fixed !important;
   display: block;
@@ -13,6 +20,13 @@ body, html {
   height: -o-calc(100%);
   height: calc(100%);
 }
+
+/* navbar is from bootstrap */
+.navbar { 
+  margin: 0;
+  padding: 0;
+}
+
 #wrapper {
   position: relative !important;
   display: block;
@@ -46,11 +60,6 @@ body, html {
   height: calc(100% - 50px);
 }
 
-/* navbar is from bootstrap */
-.navbar { 
-  margin: 0;
-  padding: 0;
-}
 
 #REALOPINSIGHT_MAIN_DASHBOARD {
   position: relative;
