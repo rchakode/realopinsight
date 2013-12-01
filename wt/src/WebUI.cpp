@@ -23,6 +23,7 @@
  */
 
 #include "WebUI.hpp"
+#include "utilsClient.hpp"
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
 #include <Wt/WPopupMenu>
@@ -30,7 +31,7 @@
 #include <Wt/WNavigationBar>
 #include <Wt/WMessageBox>
 #include <Wt/WLineEdit>
-#include <utilsClient.hpp>
+#include <Wt/WImage>
 
 WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
@@ -68,7 +69,10 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 {
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
-  navigation->setTitle("(c) RealOpInsight.com", "http://realopinsight.com/");
+
+  navigation->addWidget(createLogoLink());
+
+//  navigation->setTitle("(c) RealOpInsight.com", "http://realopinsight.com/");
   navigation->setResponsive(true);
 
   Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
@@ -179,4 +183,13 @@ void WebUI::handleRefresh(void)
 void WebUI::addEvents(void)
 {
   connect(m_dashboard, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+}
+
+Wt::WAnchor* WebUI::createLogoLink(void)
+{
+  Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
+                                        new Wt::WImage("images/built-in/logo-mini.png"));
+  anchor->setTarget(Wt::TargetNewWindow);
+  anchor->setMargin(10, Wt::Right);
+  return anchor;
 }

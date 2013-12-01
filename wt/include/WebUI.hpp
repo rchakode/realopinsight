@@ -55,8 +55,7 @@ private:
 
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
-
-
+  Wt::WAnchor* createLogoLink(void);
   void addEvents(void);
 };
 
