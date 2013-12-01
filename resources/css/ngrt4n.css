@@ -1,12 +1,6 @@
 body, html {
   font-size: 10pt;
-  left: 0;
-  top: 0;
-  right: 0;
-  height: -moz-calc(100%); 
-  height: -webkit-calc(100%);
-  height: -o-calc(100%);
-  height: calc(100%);
+  overflow: hidden;
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
@@ -15,70 +9,53 @@ body, html {
   left: 0;
   top: 0;
   right: 0;
-  height: -moz-calc(100%); 
-  height: -webkit-calc(100%);
-  height: -o-calc(100%);
-  height: calc(100%);
 }
-
 /* navbar is from bootstrap */
 .navbar { 
   margin: 0;
   padding: 0;
 }
-
 #wrapper {
-  position: relative !important;
+  position: relative;
   display: block;
   left: 0;
   top: 0;
   right: 0;
 }
-
 #maincontainer {
   position: relative;
   display: block;
   left: 0;
   top: 0;
   right: 0;
-  width: 100% !important; 
-  height: -moz-calc(100%); 
-  height: -webkit-calc(100%);
-  height: -o-calc(100%);
-  height: calc(100%);
 }
 
-#maincontainer .stackcontentarea {
+#stackcontentarea {
   position: relative;
   display: block;
   left: 0;
   top: 0;
   right: 0; 
-  height: -moz-calc(100% - 50px); 
-  height: -webkit-calc(100% - 50px);
-  height: -o-calc(100% - 50px);
-  height: calc(100% - 50px);
 }
-
+.button {
+ margin: none;
+ padding: none;
+}
 .severity-normal {
   background-color: #00FF00; 
 }
 
 .severity-minor {
-  background-color: #FFFF00;  /*yellow*/
+  background-color: #FFFF00;
 }
 .severity-major {
-  background-color: #FFA500; /*orange*/
+  background-color: #FFA500;
 }
 .severity-critical {
-  background: #FF0000;  /*red*/
+  background: #FF0000;
 }
 .severity-unknown {
-  background-color: #C0C0C0;  /*gray*/
-}
-.button {
- margin: none;
- padding: none;
+  background-color: #C0C0C0;
 }
 
 

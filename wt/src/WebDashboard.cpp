@@ -37,6 +37,28 @@
 #include "utilsClient.hpp"
 #include <QDebug>
 
+#define TREE_WIDGET m_tree->id()
+#define MAP_WIDGET m_map->get()->id()
+#define CHART_WIDGET m_chart->get()->id()
+#define MSG_CONSOLE_WIDGET m_msgConsole->id()
+
+#define JS_AUTO_RESIZING_SCRIPT(computeHeight) \
+  computeHeight \
+  "var h6=wh*0.55 - 25;" \
+  "var h4=wh*0.45 - 25;" \
+  "$('#wrapper').height(wh);" \
+  "$('#maincontainer').height(wh);" \
+  "$('#stackcontentarea').height(wh-50);" \
+  "$('#"+TREE_WIDGET+"').height(h6);" \
+  "$('#"+MAP_WIDGET+"').height(h6);" \
+  "$('#"+CHART_WIDGET+"').height(h4);" \
+  "$('#"+MSG_CONSOLE_WIDGET+"').height(h4);"
+
+#define JS_AUTO_RESIZING_FUNCTION \
+  "function(self, width, height) {" \
+  JS_AUTO_RESIZING_SCRIPT("wh=height;") \
+  "}"
+
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
@@ -46,6 +68,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
     m_chart(new WebPieChart())
 {
   setupUI();
+  addJsEventScript();
   load(_config);
 }
 
@@ -120,26 +143,6 @@ void WebDashboard::setupUI(void)
 
   rightSubMainLayout->addWidget(m_map->get());
   rightSubMainLayout->addWidget(m_msgConsole);
-
-  m_widget->resize(Wt::WLength(100, Wt::WLength::Percentage), Wt::WLength(100, Wt::WLength::Percentage));
-  m_tree->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
-  m_map->get()->resize(Wt::WLength::Auto, Wt::WLength(350, Wt::WLength::Pixel));
-  m_chart->get()->resize(Wt::WLength::Auto, Wt::WLength(StatsLegend::CHART_HEIGHT, Wt::WLength::Pixel));
-  m_msgConsole->resize(Wt::WLength::Auto, Wt::WLength(200, Wt::WLength::Pixel));
-
-  m_widget->setJavaScriptMember(
-        "wtResize",
-        "function(self, width, height) { "
-        " var wh=$(window).height();"
-        " var h6=wh*0.6;"
-        " var h4=wh*0.4;"
-        "$('#maincontainer').height(wh);"
-        "$('#"+wApp->root()->id()+"').height(wh);"
-        "$('#"+m_tree->id()+"').height(h6);"
-        "$('#"+m_map->get()->id()+"').height(h6);"
-        "$('#"+m_chart->get()->id()+"').height(h4);"
-        "$('#"+m_msgConsole->id()+"').height(h4);"
-        "}");
   mainLayout->addLayout(leftSubMainLayout);
   mainLayout->addLayout(rightSubMainLayout);
 
@@ -150,4 +153,10 @@ void WebDashboard::setupUI(void)
   mainLayout->setResizable(1);
   rightSubMainLayout->setResizable(0);
   rightSubMainLayout->setResizable(1);
+}
+
+void WebDashboard::addJsEventScript(void)
+{
+  m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
+  m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
 }

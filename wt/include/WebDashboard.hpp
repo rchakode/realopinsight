@@ -64,6 +64,8 @@ private:
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
   void setupUI(void);
+  void addJsEventScript(void);
 };
+
 
 #endif /* WEBDASHBOOARD_HPP */

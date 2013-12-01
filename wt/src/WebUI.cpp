@@ -72,7 +72,8 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   navigation->setResponsive(true);
 
   Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
-  contentsStack->addStyleClass("stackcontentarea");
+  //contentsStack->addStyleClass("stackcontentarea");
+  contentsStack->setId("stackcontentarea");
 
   // Setup a Left-aligned menu.
   Wt::WMenu* leftMenu = new Wt::WMenu(contentsStack);
