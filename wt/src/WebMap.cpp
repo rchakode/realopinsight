@@ -31,6 +31,7 @@
 #include <Wt/WApplication>
 #include <Wt/WEnvironment>
 #include <Wt/WWidget>
+#include <Wt/WScrollBar>
 
 WebPieMap::WebPieMap(CoreDataT* _cdata)
   : WPaintedWidget(0),

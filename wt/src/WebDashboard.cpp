@@ -37,6 +37,7 @@
 #include "utilsClient.hpp"
 #include <QDebug>
 
+#define ROOT_WIDGET_ID wApp->root()->id()
 #define TREE_WIDGET m_tree->id()
 #define MAP_WIDGET m_map->get()->id()
 #define CHART_WIDGET m_chart->get()->id()
@@ -44,11 +45,12 @@
 
 #define JS_AUTO_RESIZING_SCRIPT(computeHeight) \
   computeHeight \
-  "var h6=wh*0.55 - 25;" \
-  "var h4=wh*0.45 - 25;" \
+  "var h6=wh*0.6 - 50;" \
+  "var h4=wh*0.4;" \
   "$('#wrapper').height(wh);" \
   "$('#maincontainer').height(wh);" \
-  "$('#stackcontentarea').height(wh-50);" \
+  "$('#stackcontentarea').height(wh);" \
+  "$('#"+ROOT_WIDGET_ID+"').height(wh);" \
   "$('#"+TREE_WIDGET+"').height(h6);" \
   "$('#"+MAP_WIDGET+"').height(h6);" \
   "$('#"+CHART_WIDGET+"').height(h4);" \
