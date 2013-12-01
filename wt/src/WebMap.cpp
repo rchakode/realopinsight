@@ -32,6 +32,7 @@
 #include <Wt/WEnvironment>
 #include <Wt/WWidget>
 #include <Wt/WScrollBar>
+#include <iostream>
 
 WebPieMap::WebPieMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
@@ -40,12 +41,14 @@ WebPieMap::WebPieMap(CoreDataT* _cdata)
     m_scaleY(1),
     m_icons(utils::nodeIcons()),
     m_scrollArea(new Wt::WScrollArea()),
-    m_firstUpdate(true)
+    m_initialLoading(true),
+    m_containerSizeChanged(this, "containerSizeChanged")
 {
   m_scrollArea->setWidget(this);
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
+  m_containerSizeChanged.connect(this, &WebPieMap::handleScrollAreaSizeChanged);
 }
 
 WebPieMap::~WebPieMap()
@@ -63,18 +66,6 @@ void WebPieMap::setPreferredMethod(void)
 void WebPieMap::setJavaScriptMember(void)
 {
   Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS,"");
-  //  Wt::WPaintedWidget::setJavaScriptMember(
-  //        WT_RESIZE_JS,
-  //        "function(self, w, h) {"
-  //        ""  "if (!self.wtWidth || self.wtWidth!=w "
-  //        ""      "|| !self.wtHeight || self.wtHeight!=h) {"
-  //        ""    "self.wtWidth=w; self.wtHeight=h;"
-  //        ""    "self.style.height=h + 'px';"
-  //        ""    "$('wrapper').height=$(window).height();"
-  //        ""    "$('maincontainer').height=$(window).height();"
-  //        ""    "$('stackcontentarea').height=$(window).height();"
-  //        ""  "}"
-  //        "};");
 }
 
 void WebPieMap::paintEvent(Wt::WPaintDevice* _pdevice)
@@ -173,4 +164,12 @@ void WebPieMap::scaleMap(double factor)
   m_scaleY *= factor;
   Wt::WPaintedWidget::update();
   Wt::WPaintedWidget::resize(factor * width(), factor * height());
+}
+
+void WebPieMap::handleScrollAreaSizeChanged(double w, double h)
+{
+  if (m_initialLoading) {
+    scaleMap(std::min(w/this->width().toPixels(), h/this->height().toPixels()));
+    m_initialLoading = false;
+  }
 }

@@ -37,28 +37,35 @@
 #include "utilsClient.hpp"
 #include <QDebug>
 
-#define ROOT_WIDGET_ID wApp->root()->id()
-#define TREE_WIDGET m_tree->id()
-#define MAP_WIDGET m_map->get()->id()
-#define CHART_WIDGET m_chart->get()->id()
-#define MSG_CONSOLE_WIDGET m_msgConsole->id()
+#define ROOT_DIV wApp->root()->id()
+#define TREEVIEW_DIV m_tree->id()
+#define MAP_DIV m_map->id()
+#define MAP_SCROLL_AREA_DIV m_map->get()->id()
+#define CHART_SCROLL_AREA_DIV m_chart->get()->id()
+#define MSG_CONSOLE_DIV m_msgConsole->id()
+#define MAP_AREA_HEIGHT_RATIO "0.45"
 
 #define JS_AUTO_RESIZING_SCRIPT(computeHeight) \
   computeHeight \
-  "var h6=wh*0.6 - 50;" \
-  "var h4=wh*0.4;" \
+  "var treeHeight=wh*0.6 - 25;" \
+  "var chartAreaHeight=wh - treeHeight - 25;" \
+  "var mapAreaHeight=wh*"+std::string(MAP_AREA_HEIGHT_RATIO)+" - 25;" \
+  "var msgConsoleHeight=wh - mapAreaHeight - 25;" \
   "$('#wrapper').height(wh);" \
   "$('#maincontainer').height(wh);" \
   "$('#stackcontentarea').height(wh);" \
-  "$('#"+ROOT_WIDGET_ID+"').height(wh);" \
-  "$('#"+TREE_WIDGET+"').height(h6);" \
-  "$('#"+MAP_WIDGET+"').height(h6);" \
-  "$('#"+CHART_WIDGET+"').height(h4);" \
-  "$('#"+MSG_CONSOLE_WIDGET+"').height(h4);"
+  "$('#"+ROOT_DIV+"').height(wh);" \
+  "$('#"+TREEVIEW_DIV+"').height(treeHeight);" \
+  "$('#"+MAP_SCROLL_AREA_DIV+"').height(mapAreaHeight);" \
+  "$('#"+CHART_SCROLL_AREA_DIV+"').height(chartAreaHeight);" \
+  "$('#"+MSG_CONSOLE_DIV+"').height(msgConsoleHeight);"
 
 #define JS_AUTO_RESIZING_FUNCTION \
   "function(self, width, height) {" \
   JS_AUTO_RESIZING_SCRIPT("wh=height;") \
+  "var mapHeight = height*0.45 - 25;" \
+  "var mapWidth = $('#"+MAP_SCROLL_AREA_DIV+"').width();" \
+  "Wt.emit("+MAP_DIV+", 'containerSizeChanged', mapWidth, mapHeight);" \
   "}"
 
 WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)

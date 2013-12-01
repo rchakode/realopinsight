@@ -44,6 +44,7 @@ public:
   Wt::WScrollArea* get(void) const {return m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
+  Wt::JSignal<double, double>& containerSizeChanged(void) { return m_containerSizeChanged; }
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
@@ -56,13 +57,15 @@ private:
   Wt::WPainter* m_painter;
   IconMapT m_icons;
   Wt::WScrollArea* m_scrollArea;
-  bool m_firstUpdate;
+  bool m_initialLoading;
+  Wt::JSignal<double, double> m_containerSizeChanged;
 
   void drawNode(const NodeT& _node);
   void drawEdge(const QString& _parentId, const QString& _childId);
   void createLink(const NodeT& _node);
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
+  void handleScrollAreaSizeChanged(double w, double h);
 };
 
 #endif /* WEBSERVICEMAP_HPP */
