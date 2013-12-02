@@ -52,6 +52,7 @@ const QString REL_NAME = RELEASE_NAME;
 const QString REL_YEAR = RELEASE_YEAR;
 const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
 const QString ID_PATTERN("%1/%2");
+const QString CONFIG_DIR("config");
 
 const qint32 MAX_SRCS = 10;
 

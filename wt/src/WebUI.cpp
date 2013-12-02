@@ -35,6 +35,7 @@
 #include <Wt/WFileUpload>
 #include <Wt/WProgressBar>
 #include <Wt/WDialog>
+#include <Wt/WSelectionBox>
 
 WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
@@ -42,7 +43,6 @@ WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
     m_dashboard(new WebDashboard(Auth::OpUserRole, config)), //FIXME: consider user role
     m_mainWidget(new Wt::WContainerWidget())
 {
-  createFileUpdateDialog();
   addEvents();
 }
 
@@ -97,16 +97,12 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   // Create a popup submenu for the Help menu.
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   popup->addItem("Open...")
-      ->triggered().connect(std::bind(&WebUI::openFile,
-                                      this,
-                                      "examples/small_hosting_platform.nag.ngrt4n.xml"));
+      ->triggered().connect(std::bind(&WebUI::selectFileToOpen, this));
   popup->addItem("Import")
-      ->triggered().connect(std::bind(&Wt::WDialog::show,
-                                      m_fileUploadDialog));
+      ->triggered().connect(std::bind(&WebUI::openFileUploadDialog, this));
   popup->addSeparator();
   popup->addItem("Documentation")
-      ->setLink(Wt::WLink(Wt::WLink::Url,
-                          "http://realopinsight.com/en/index.php/page/documentation"));
+      ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
   popup->addItem("About");
   popup->addSeparator();
   popup->addItem("Sign out");
@@ -207,27 +203,57 @@ Wt::WAnchor* WebUI::createLogoLink(void)
 }
 
 
-void WebUI::openFile(const std::string& path)
+void WebUI::selectFileToOpen(void)
 {
-  WebDashboard* dashboard(new WebDashboard(Auth::OpUserRole,// Consider real user role
-                                           QString::fromStdString(path)));
-  m_dashboardMenu->addItem(m_dashboard->getRootService()->name.toStdString(),
-                           dashboard->get(),
-                           Wt::WMenuItem::LazyLoading);
+  m_fileUploadDialog = new Wt::WDialog(QObject::tr("Select a file").toStdString());
+  Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
+
+  container->setMargin(10, Wt::All);
+
+  Wt::WSelectionBox* flist = new Wt::WSelectionBox(container);
+  flist->setMargin(10, Wt::Right);
+
+  // Create a text box to display info
+  Wt::WText* infoBox = new Wt::WText("", container);
+
+  // List the configuration avaialable
+  QDir cdir(CONFIG_DIR);
+  QFileInfoList files = cdir.entryInfoList(QStringList("*.ngrt4n.xml"), QDir::Files);
+  if (! files.empty()) {
+    Q_FOREACH(const QFileInfo& f, files) {
+      flist->addItem(f.fileName().toStdString());
+    }
+    flist->setCurrentIndex(1);
+  } else {
+    infoBox->setText(QObject::tr("No configuration available").toStdString());
+  }
+
+  // Provide a button to close the window
+  Wt::WPushButton* finish(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
+  finish->clicked().connect(std::bind([&]() {
+    m_selectFile = CONFIG_DIR.toStdString() +"/"+ flist->itemText(flist->currentIndex()).toUTF8();
+    finishFileDialog(OPEN);
+    //openFile(flist->itemText(flist->currentIndex()).toUTF8());
+  }));
+
+  m_fileUploadDialog->show();
 }
 
-void WebUI::createFileUpdateDialog(void)
+void WebUI::openFileUploadDialog(void)
 {
   m_fileUploadDialog = new Wt::WDialog(QObject::tr("Import a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
+
+  container->setMargin(10, Wt::All);
+
   m_uploader = new Wt::WFileUpload(container);
-  container->setMargin(15, Wt::All);
-  m_uploader->uploaded().connect(this, &WebUI::finishFileUpload);
+  m_uploader->uploaded().connect(std::bind(&WebUI::finishFileDialog, this, IMPORT));
   m_uploader->setFileTextSize(1024); //max=1MB
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
 
-  Wt::WText* out = new Wt::WText(container);
+  // Create a text zone to display message
+  Wt::WText* infoBox = new Wt::WText(container);
 
   // Provide a button to start uploading.
   Wt::WPushButton* uploadButton = new Wt::WPushButton(QObject::tr("Upload").toStdString(), container);
@@ -237,33 +263,59 @@ void WebUI::createFileUpdateDialog(void)
   }));
 
   // Provide a button to close the upload dialog
-  Wt::WPushButton* close(new Wt::WPushButton(QObject::tr("Close").toStdString(), container));
+  Wt::WPushButton* close(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
   close->clicked().connect(std::bind([=](){
     uploadButton->enable();
     m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
   }));
 
   // React to a succesfull upload.
   m_uploader->uploaded().connect(std::bind([=] () {
-    out->setText(QObject::tr("File upload is finished.").toStdString());
+    infoBox->setText(QObject::tr("File upload is finished.").toStdString());
   }));
 
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
-    out->setText(QObject::tr("File is too large.").toStdString());
+    infoBox->setText(QObject::tr("File is too large.").toStdString());
   }));
+  m_fileUploadDialog->show();
 }
 
-void WebUI::finishFileUpload(void)
+void WebUI::finishFileDialog(int action)
 {
-  if (! m_uploader->empty()) {
-    QDir cdir("config1");
-    if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-      utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
-      //FIXME: display in console
-    }
-    QFile file(QString::fromStdString(m_uploader->spoolFileName()));
-    file.copy(QString("%1/%2").arg(cdir.absolutePath(),
-                                   QString::fromStdString(m_uploader->clientFileName().toUTF8())));
+  switch(action) {
+    case IMPORT:
+      if (! m_uploader->empty()) {
+        QDir cdir(CONFIG_DIR);
+        if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
+          //FIXME: display in console
+          utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
+        }
+        QFile file(QString::fromStdString(m_uploader->spoolFileName()));
+        file.copy(QString("%1/%2").arg(cdir.absolutePath(),
+                                       QString::fromStdString(m_uploader->clientFileName().toUTF8())));
+      }
+      break;
+
+    case OPEN:
+      m_fileUploadDialog->accept();
+      // m_fileUploadDialog->contents()->clear();
+      openFile(m_selectFile);
+      break;
+    default:
+      break;
   }
 }
+
+
+void WebUI::openFile(const std::string& path)
+{
+  std::cout << path;
+  WebDashboard* dashboard(new WebDashboard(m_dashboard->getUserRole(),
+                                           QString::fromStdString(path)));
+  m_dashboardMenu->addItem(m_dashboard->getRootService()->name.toStdString(),
+                           dashboard->get(),
+                           Wt::WMenuItem::LazyLoading);
+}
+

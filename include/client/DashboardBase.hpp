@@ -60,6 +60,7 @@ public:
   qint32 getTimerId(void) const {return m_timerId;}
   qint32 getTimerInterval(void) const {return m_interval;}
   NodeListIteratorT getRootService(void) const {return m_root;}
+  qint32 getUserRole(void) const { return m_userRole;}
 
 public Q_SLOTS:
   void runMonitor();

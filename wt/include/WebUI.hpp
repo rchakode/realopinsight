@@ -46,6 +46,11 @@ public Q_SLOTS:
   void resetTimer(qint32 interval);
 
 private:
+  enum FileDialogAction {
+    OPEN = 1,
+    IMPORT = 0
+  };
+
   Wt::WTimer* m_timer;
   WebDashboard* m_dashboard;
   Wt::WContainerWidget* createMenuBarWidget(void);
@@ -54,13 +59,15 @@ private:
   Wt::WMenu* m_dashboardMenu;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
+  std::string m_selectFile;
 
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);
-  void createFileUpdateDialog(void);
+  void openFileUploadDialog(void);
+  void selectFileToOpen(void);
   void openFile(const std::string& path);
-  void finishFileUpload(void);
+  void finishFileDialog(int action);
   void addEvents(void);
 };
 
