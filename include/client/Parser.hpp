@@ -37,10 +37,11 @@ public:
   virtual ~Parser();
 
   bool process(bool console);
-  void computeNodeCoordinates(int wt);
+  bool computeNodeCoordinates(int wt);
   void computeNodeCoordinates(const QString& dotfile, int wt);
   QString getDotGraphFile(void) const { return m_dotFile; }
   static const QString CHILD_SEP;
+  QString lastError(void) const {return m_lastError;}
 
 private:
   static const QString m_dotHeader;
@@ -48,8 +49,8 @@ private:
   QString m_dotFile;
   QString m_config;
   CoreDataT* m_cdata;
+  QString m_lastError;
 
-  //void buildNodeTree(void);
   void updateNodeHierachy(QString& _graphContent);
   void saveCoordinatesFile(const QString& _content);
 };

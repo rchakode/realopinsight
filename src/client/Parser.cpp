@@ -38,7 +38,7 @@ const QString Parser::m_dotFooter = "}";
 
 Parser::Parser(const QString& _config, CoreDataT* _cdata)
   : m_config(_config),
-    m_cdata(_cdata) {}
+    m_cdata(_cdata){}
 
 Parser::~Parser()
 {
@@ -56,13 +56,16 @@ bool Parser::process(bool console)
 
   QFile file(m_config);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    utils::alert(QObject::tr("Unable to open the file %1").arg(m_config));
+    m_lastError = QObject::tr("Unable to open the file %1").arg(m_config);
+    utils::alert(m_lastError);
     file.close();
     return false;
   }
+
   if (!xmlDoc.setContent(&file)) {
     file.close();
-    utils::alert(QObject::tr("Error while parsing the file %1").arg(m_config));
+    m_lastError = QObject::tr("Error while parsing the file %1").arg(m_config);
+    utils::alert(m_lastError);
     return false;
   }
   file.close(); // The content of the file is already in memory
@@ -118,7 +121,6 @@ bool Parser::process(bool console)
   graphContent = m_dotHeader + graphContent;
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
-
   return true;
 }
 
@@ -151,38 +153,13 @@ void Parser::updateNodeHierachy(QString& _graphContent)
   }
 }
 
-//void Parser::buildNodeTree(void)
-//{
-//  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
-//       node!=end; ++node) { m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node)); }
-
-//  for (NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
-//       node!=end; ++node) {m_cdata->tree_items.insert(node->id, SvNavigatorTree::createTreeItem(*node));}
-
-//  for (NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
-//       node!=end; ++node)
-//  {
-//    if (node->child_nodes.isEmpty()) continue;
-//    auto treeItem = m_cdata->tree_items.find(node->id);
-//    if (treeItem == m_cdata->tree_items.end()) {
-//      utils::alert(QObject::tr("Service not found (%1)").arg(node->name));
-//      continue;
-//    }
-//    QStringList ids = node->child_nodes.split(CHILD_SEP);
-//    foreach (const QString& id, ids) {
-//      auto child = m_cdata->tree_items.find(id);
-//      if (child != m_cdata->tree_items.end())
-//        (*treeItem)->addChild(*child);
-//    }
-//  }
-//}
-
 void Parser::saveCoordinatesFile(const QString& _content)
 {
   m_dotFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(m_dotFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    utils::alert(QObject::tr("Unable into write the file %1").arg(m_dotFile));
+    m_lastError = QObject::tr("Unable into write the file %1").arg(m_dotFile);
+    utils::alert(m_lastError);
     file.close();
     exit(1);
   }
@@ -191,8 +168,9 @@ void Parser::saveCoordinatesFile(const QString& _content)
   file.close();
 }
 
-void Parser::computeNodeCoordinates(int wt)
+bool Parser::computeNodeCoordinates(int wt)
 {
+  bool error = false;
   auto process = std::unique_ptr<QProcess>(new QProcess());
   QString plainDotFile = m_dotFile%".plain";
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
@@ -201,10 +179,13 @@ void Parser::computeNodeCoordinates(int wt)
   if (!exitCode) {
     computeNodeCoordinates(plainDotFile, wt);
   } else {
-    utils::alert(QObject::tr("The graph engine exited with the code %1").arg(exitCode));
-    exit(exitCode);
+    m_lastError = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
+    utils::alert(m_lastError);
+    error = true;
   }
   process.reset(NULL);
+
+  return ! error;
 }
 
 void Parser::computeNodeCoordinates(const QString& _plainDot, int wt)

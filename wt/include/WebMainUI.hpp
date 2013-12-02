@@ -30,12 +30,12 @@
 #include <Wt/WApplication>
 #include "WebDashboard.hpp"
 
-class WebUI : public QObject, public Wt::WApplication
+class WebMainUI : public QObject, public Wt::WApplication
 {
   Q_OBJECT
 public:
-  WebUI(const Wt::WEnvironment& env, const QString& config);
-  virtual ~WebUI();
+  WebMainUI(const Wt::WEnvironment& env, const QString& config);
+  virtual ~WebMainUI();
   void render(void);
   QString getConfig (void) const {return m_dashboard->getConfig();}
   void enable(void) {m_mainWidget->enable();}
@@ -60,6 +60,7 @@ private:
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectFile;
+  Wt::WText* m_infoBox;
 
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);

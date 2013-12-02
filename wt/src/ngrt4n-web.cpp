@@ -1,9 +1,9 @@
-#include "WebUI.hpp"
+#include "WebMainUI.hpp"
 #include <Wt/WBootstrapTheme>
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  WebUI* ui = new WebUI(env, "examples/small_hosting_platform.nag.ngrt4n.xml"); //FIXME:set config file
+  WebMainUI* ui = new WebMainUI(env, "examples/small_hosting_platform.nag.ngrt4n.xml"); //FIXME:set config file
   ui->setTwoPhaseRenderingThreshold(0);
   ui->setTitle(ui->getConfig().toStdString());
   ui->setTheme(new Wt::WBootstrapTheme());

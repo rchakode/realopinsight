@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebUI.hpp"
+#include "WebMainUI.hpp"
 #include "utilsClient.hpp"
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -37,18 +37,20 @@
 #include <Wt/WDialog>
 #include <Wt/WSelectionBox>
 
-WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
+WebMainUI::WebMainUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
     m_timer(new Wt::WTimer(this)),
     m_dashboard(new WebDashboard(Auth::OpUserRole, config)), //FIXME: consider user role
-    m_mainWidget(new Wt::WContainerWidget())
+    m_mainWidget(new Wt::WContainerWidget()),
+    m_infoBox(new Wt::WText("No data available"))
 {
   addEvents();
 }
 
-WebUI::~WebUI()
+WebMainUI::~WebMainUI()
 {
   delete m_timer;
+  delete m_infoBox;
   delete m_fileUploadDialog;
   delete m_dashboardMenu;
   delete m_dashboard;
@@ -56,7 +58,7 @@ WebUI::~WebUI()
 }
 
 
-void WebUI::render(void)
+void WebMainUI::render(void)
 {
   setTitle(QObject::tr("%1 - %2 Operations Console")
            .arg(m_dashboard->getRootService()->name, APP_NAME)
@@ -72,7 +74,7 @@ void WebUI::render(void)
   resetTimer();
 }
 
-Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
+Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
 {
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
@@ -97,9 +99,9 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   // Create a popup submenu for the Help menu.
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   popup->addItem("Open...")
-      ->triggered().connect(std::bind(&WebUI::selectFileToOpen, this));
+      ->triggered().connect(std::bind(&WebMainUI::selectFileToOpen, this));
   popup->addItem("Import")
-      ->triggered().connect(std::bind(&WebUI::openFileUploadDialog, this));
+      ->triggered().connect(std::bind(&WebMainUI::openFileUploadDialog, this));
   popup->addSeparator();
   popup->addItem("Documentation")
       ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
@@ -114,10 +116,9 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
   // Add a Search control.
   Wt::WLineEdit* edit = new Wt::WLineEdit();
   edit->setEmptyText("Enter a search item");
-  Wt::WText* searchResult = new Wt::WText("Oups, no match !");
   edit->enterPressed().connect(std::bind([=] () {
     m_dashboardMenu->select(0); // FIXME: is the index of the "Home"
-    searchResult->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
+    m_infoBox->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
   }));
 
   navigation->addSearch(edit, Wt::AlignRight);
@@ -125,7 +126,7 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 }
 
 
-Wt::WContainerWidget* WebUI::createToolBar(void)
+Wt::WContainerWidget* WebMainUI::createToolBar(void)
 {
   Wt::WContainerWidget* container(new Wt::WContainerWidget());
   Wt::WHBoxLayout* layout(new Wt::WHBoxLayout(container));
@@ -136,7 +137,7 @@ Wt::WContainerWidget* WebUI::createToolBar(void)
   Wt::WPushButton* b(NULL);
   b = createTooBarButton("images/built-in/menu_refresh.png");
   b->setStyleClass("button");
-  b->clicked().connect(this, &WebUI::handleRefresh);
+  b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_zoomin.png");
@@ -151,34 +152,34 @@ Wt::WContainerWidget* WebUI::createToolBar(void)
 
   b = createTooBarButton("images/built-in/menu_disket.png");
   b->setStyleClass("button");
-  b->clicked().connect(this, &WebUI::handleRefresh);
+  b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(createTooBarButton("images/built-in/menu_disket.png"));
 
   return container;
 }
 
-Wt::WPushButton* WebUI::createTooBarButton(const std::string& icon)
+Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 {
   Wt::WPushButton* button = new Wt::WPushButton();
   button->setIcon(icon);
   return button;
 }
 
-void WebUI::resetTimer(void)
+void WebMainUI::resetTimer(void)
 {
   m_timer->setInterval(m_dashboard->getTimerInterval());
-  m_timer->timeout().connect(this, &WebUI::handleRefresh);
+  m_timer->timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer->start();
 }
 
-void WebUI::resetTimer(qint32 interval)
+void WebMainUI::resetTimer(qint32 interval)
 {
   m_timer->stop();
   m_timer->setInterval(interval);
   m_timer->start();
 }
 
-void WebUI::handleRefresh(void)
+void WebMainUI::handleRefresh(void)
 {
   m_timer->stop();
   m_mainWidget->disable();
@@ -188,12 +189,12 @@ void WebUI::handleRefresh(void)
   m_timer->start();
 }
 
-void WebUI::addEvents(void)
+void WebMainUI::addEvents(void)
 {
   connect(m_dashboard, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
-Wt::WAnchor* WebUI::createLogoLink(void)
+Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
                                         new Wt::WImage("images/built-in/logo-mini.png"));
@@ -203,7 +204,7 @@ Wt::WAnchor* WebUI::createLogoLink(void)
 }
 
 
-void WebUI::selectFileToOpen(void)
+void WebMainUI::selectFileToOpen(void)
 {
   m_fileUploadDialog = new Wt::WDialog(QObject::tr("Select a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
@@ -228,18 +229,16 @@ void WebUI::selectFileToOpen(void)
     infoBox->setText(QObject::tr("No configuration available").toStdString());
   }
 
+  flist->activated().connect(std::bind([=]() { m_selectFile = flist->currentText().toUTF8();}));
+
   // Provide a button to close the window
   Wt::WPushButton* finish(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
-  finish->clicked().connect(std::bind([&]() {
-    m_selectFile = CONFIG_DIR.toStdString() +"/"+ flist->itemText(flist->currentIndex()).toUTF8();
-    finishFileDialog(OPEN);
-    //openFile(flist->itemText(flist->currentIndex()).toUTF8());
-  }));
+  finish->clicked().connect(std::bind(&WebMainUI::finishFileDialog, this, OPEN));
 
   m_fileUploadDialog->show();
 }
 
-void WebUI::openFileUploadDialog(void)
+void WebMainUI::openFileUploadDialog(void)
 {
   m_fileUploadDialog = new Wt::WDialog(QObject::tr("Import a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
@@ -247,7 +246,7 @@ void WebUI::openFileUploadDialog(void)
   container->setMargin(10, Wt::All);
 
   m_uploader = new Wt::WFileUpload(container);
-  m_uploader->uploaded().connect(std::bind(&WebUI::finishFileDialog, this, IMPORT));
+  m_uploader->uploaded().connect(std::bind(&WebMainUI::finishFileDialog, this, IMPORT));
   m_uploader->setFileTextSize(1024); //max=1MB
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
@@ -282,7 +281,7 @@ void WebUI::openFileUploadDialog(void)
   m_fileUploadDialog->show();
 }
 
-void WebUI::finishFileDialog(int action)
+void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
     case IMPORT:
@@ -297,10 +296,9 @@ void WebUI::finishFileDialog(int action)
                                        QString::fromStdString(m_uploader->clientFileName().toUTF8())));
       }
       break;
-
     case OPEN:
       m_fileUploadDialog->accept();
-      // m_fileUploadDialog->contents()->clear();
+      m_fileUploadDialog->contents()->clear();
       openFile(m_selectFile);
       break;
     default:
@@ -309,13 +307,17 @@ void WebUI::finishFileDialog(int action)
 }
 
 
-void WebUI::openFile(const std::string& path)
+void WebMainUI::openFile(const std::string& path)
 {
-  std::cout << path;
+  std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
   WebDashboard* dashboard(new WebDashboard(m_dashboard->getUserRole(),
-                                           QString::fromStdString(path)));
-  m_dashboardMenu->addItem(m_dashboard->getRootService()->name.toStdString(),
-                           dashboard->get(),
-                           Wt::WMenuItem::LazyLoading);
+                                           QString::fromStdString(realPath)));
+  if (! dashboard->getErrorState()) {
+    m_dashboardMenu->addItem(dashboard->getRootService()->name.toStdString(),
+                             dashboard->get(),
+                             Wt::WMenuItem::LazyLoading);
+  } else {
+    m_infoBox->setText(m_dashboard->lastError().toStdString()); //FIXME: set it somewhere
+  }
 }
 

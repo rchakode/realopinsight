@@ -25,16 +25,16 @@ HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebMsgConsole.hpp \
     wt/include/WebMap.hpp \
     wt/include/WebTree.hpp \
-    wt/include/WebUI.hpp\
-    wt/include/WebPieChart.hpp
+    wt/include/WebPieChart.hpp \
+    wt/include/WebMainUI.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
     wt/src/ngrt4n-web.cpp \
-    wt/src/WebUI.cpp \
     wt/src/WebMap.cpp \
     wt/src/WebTree.cpp \
-    wt/src/WebPieChart.cpp
+    wt/src/WebPieChart.cpp \
+    wt/src/WebMainUI.cpp
 
 LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lboost_signals
 TARGET = ngrt4n-web

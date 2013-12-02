@@ -72,7 +72,8 @@ DashboardBase::DashboardBase(const qint32& _userRole, const QString& _config)
     m_settings (new Settings()),
     m_preferences (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
     m_changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
-    m_showOnlyTroubles(false)
+    m_showOnlyTroubles(false),
+    m_errorState(false)
 {
 }
 
@@ -85,16 +86,19 @@ DashboardBase::~DashboardBase()
 
 void DashboardBase::load(const QString& _file)
 {
+  m_errorState = false;
   if (!_file.isEmpty()) {
     m_config = utils::getAbsolutePath(_file);
     Parser parser(m_config, m_cdata);
-    parser.process(true);
-    parser.computeNodeCoordinates(1);
-    buildTree();
-    buildMap();
-//    m_msgConsole->updateNodeMsgs(m_cdata->cnodes);
-    initSettings();
-    setRootService();
+    if (parser.process(true) && parser.computeNodeCoordinates(1)) {
+      buildTree();
+      buildMap();
+      initSettings();
+      setRootService();
+    } else {
+      m_errorState = true;
+      m_lastError = parser.getDotGraphFile();
+    }
   }
 }
 

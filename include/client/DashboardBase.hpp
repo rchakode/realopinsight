@@ -61,6 +61,8 @@ public:
   qint32 getTimerInterval(void) const {return m_interval;}
   NodeListIteratorT getRootService(void) const {return m_root;}
   qint32 getUserRole(void) const { return m_userRole;}
+  bool getErrorState() const {return m_errorState;}
+  QString lastError(void) const {return m_lastError;}
 
 public Q_SLOTS:
   void runMonitor();
@@ -102,6 +104,8 @@ protected:
   SourceListT m_sources;
   NodeListIteratorT m_root;
   int m_firstSrcIndex;
+  bool m_errorState;
+  QString m_lastError;
 
 protected:
   void load(const QString& _file);
