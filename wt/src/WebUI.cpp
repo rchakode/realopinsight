@@ -32,19 +32,25 @@
 #include <Wt/WMessageBox>
 #include <Wt/WLineEdit>
 #include <Wt/WImage>
+#include <Wt/WFileUpload>
+#include <Wt/WProgressBar>
+#include <Wt/WDialog>
 
 WebUI::WebUI(const Wt::WEnvironment& env, const QString& config)
   : Wt::WApplication(env),
     m_timer(new Wt::WTimer(this)),
-    m_dashboard(new WebDashboard(Auth::OpUserRole, config)),
+    m_dashboard(new WebDashboard(Auth::OpUserRole, config)), //FIXME: consider user role
     m_mainWidget(new Wt::WContainerWidget())
 {
+  createFileUpdateDialog();
   addEvents();
 }
 
 WebUI::~WebUI()
 {
   delete m_timer;
+  delete m_fileUploadDialog;
+  delete m_dashboardMenu;
   delete m_dashboard;
   delete m_mainWidget;
 }
@@ -52,8 +58,9 @@ WebUI::~WebUI()
 
 void WebUI::render(void)
 {
-  setTitle(QObject::tr("%1 - %2 Operations Console").arg(m_dashboard->getRootService()->name, APP_NAME).toStdString());
-  // m_mainWidget->setOverflow(Wt::WContainerWidget::OverflowScroll);
+  setTitle(QObject::tr("%1 - %2 Operations Console")
+           .arg(m_dashboard->getRootService()->name, APP_NAME)
+           .toStdString());
   m_mainWidget->setId("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -69,23 +76,18 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 {
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
-
+  navigation->setResponsive(true);
   navigation->addWidget(createLogoLink());
 
-//  navigation->setTitle("(c) RealOpInsight.com", "http://realopinsight.com/");
-  navigation->setResponsive(true);
-
   Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
-  //contentsStack->addStyleClass("stackcontentarea");
   contentsStack->setId("stackcontentarea");
 
   // Setup a Left-aligned menu.
-  Wt::WMenu* leftMenu = new Wt::WMenu(contentsStack);
-  navigation->addMenu(leftMenu);
-  leftMenu->addItem("images/built-in/menu_refresh.png",
-                    m_dashboard->getRootService()->name.toStdString(),
-                    m_dashboard->get(),
-                    Wt::WMenuItem::LazyLoading);
+  m_dashboardMenu = new Wt::WMenu(contentsStack);
+  navigation->addMenu(m_dashboardMenu);
+  m_dashboardMenu->addItem(m_dashboard->getRootService()->name.toStdString(),
+                           m_dashboard->get(),
+                           Wt::WMenuItem::LazyLoading);
   navigation->addWidget(createToolBar());
 
   // Setup a Right-aligned menu.
@@ -94,21 +96,31 @@ Wt::WContainerWidget* WebUI::createMenuBarWidget(void)
 
   // Create a popup submenu for the Help menu.
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
-  popup->addItem("Documentation")
-      ->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
+  popup->addItem("Open...")
+      ->triggered().connect(std::bind(&WebUI::openFile,
+                                      this,
+                                      "examples/small_hosting_platform.nag.ngrt4n.xml"));
+  popup->addItem("Import")
+      ->triggered().connect(std::bind(&Wt::WDialog::show,
+                                      m_fileUploadDialog));
   popup->addSeparator();
+  popup->addItem("Documentation")
+      ->setLink(Wt::WLink(Wt::WLink::Url,
+                          "http://realopinsight.com/en/index.php/page/documentation"));
   popup->addItem("About");
+  popup->addSeparator();
+  popup->addItem("Sign out");
 
-  Wt::WMenuItem *item = new Wt::WMenuItem("Help");
+  Wt::WMenuItem* item = new Wt::WMenuItem("Menu");
   item->setMenu(popup);
   rightMenu->addItem(item);
 
   // Add a Search control.
-  Wt::WLineEdit *edit = new Wt::WLineEdit();
+  Wt::WLineEdit* edit = new Wt::WLineEdit();
   edit->setEmptyText("Enter a search item");
   Wt::WText* searchResult = new Wt::WText("Oups, no match !");
   edit->enterPressed().connect(std::bind([=] () {
-    leftMenu->select(0); // FIXME: is the index of the "Home"
+    m_dashboardMenu->select(0); // FIXME: is the index of the "Home"
     searchResult->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
   }));
 
@@ -151,7 +163,7 @@ Wt::WContainerWidget* WebUI::createToolBar(void)
 
 Wt::WPushButton* WebUI::createTooBarButton(const std::string& icon)
 {
-  Wt::WPushButton *button = new Wt::WPushButton();
+  Wt::WPushButton* button = new Wt::WPushButton();
   button->setIcon(icon);
   return button;
 }
@@ -187,9 +199,66 @@ void WebUI::addEvents(void)
 
 Wt::WAnchor* WebUI::createLogoLink(void)
 {
-  Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
                                         new Wt::WImage("images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
   anchor->setMargin(10, Wt::Right);
   return anchor;
+}
+
+
+void WebUI::openFile(const std::string& path)
+{
+  WebDashboard* dashboard(new WebDashboard(Auth::OpUserRole,// Consider real user role
+                                           QString::fromStdString(path)));
+  m_dashboardMenu->addItem(m_dashboard->getRootService()->name.toStdString(),
+                           dashboard->get(),
+                           Wt::WMenuItem::LazyLoading);
+}
+
+void WebUI::createFileUpdateDialog(void)
+{
+  m_fileUploadDialog = new Wt::WDialog(QObject::tr("Import a file").toStdString());
+  Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
+  m_uploader = new Wt::WFileUpload(container);
+  container->setMargin(15, Wt::All);
+  m_uploader->uploaded().connect(this, &WebUI::finishFileUpload);
+  m_uploader->setFileTextSize(1024); //max=1MB
+  m_uploader->setProgressBar(new Wt::WProgressBar());
+  m_uploader->setMargin(10, Wt::Right);
+
+  Wt::WText* out = new Wt::WText(container);
+
+  // Provide a button to start uploading.
+  Wt::WPushButton* uploadButton = new Wt::WPushButton(QObject::tr("Upload").toStdString(), container);
+  uploadButton->clicked().connect(std::bind([=](){
+    m_uploader->upload();
+    uploadButton->disable();
+  }));
+
+  // Provide a button to close the upload dialog
+  Wt::WPushButton* close(new Wt::WPushButton(QObject::tr("Close").toStdString(), container));
+  close->clicked().connect(std::bind([=](){
+    uploadButton->enable();
+    m_fileUploadDialog->accept();
+  }));
+
+  // React to a succesfull upload.
+  m_uploader->uploaded().connect(std::bind([=] () {
+    out->setText(QObject::tr("File upload is finished.").toStdString());
+  }));
+
+  // React to a file upload problem.
+  m_uploader->fileTooLarge().connect(std::bind([=] () {
+    out->setText(QObject::tr("File is too large.").toStdString());
+  }));
+}
+
+void WebUI::finishFileUpload(void)
+{
+  if (m_uploader->empty()) {
+    std::cout <<"epttttttttttttttt>>>>>>>>><\n";
+  }
+  QFile file(QString::fromStdString(m_uploader->spoolFileName()));
+  file.copy(QString("config/%1").arg(QString::fromStdString(m_uploader->clientFileName().toUTF8())));
 }

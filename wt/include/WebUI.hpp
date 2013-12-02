@@ -50,12 +50,17 @@ private:
   WebDashboard* m_dashboard;
   Wt::WContainerWidget* createMenuBarWidget(void);
   Wt::WContainerWidget* createToolBar(void);
-
   Wt::WContainerWidget* m_mainWidget;
+  Wt::WMenu* m_dashboardMenu;
+  Wt::WDialog* m_fileUploadDialog;
+  Wt::WFileUpload* m_uploader;
 
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);
+  void createFileUpdateDialog(void);
+  void openFile(const std::string& path);
+  void finishFileUpload(void);
   void addEvents(void);
 };
 
