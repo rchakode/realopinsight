@@ -61,7 +61,7 @@ WebMainUI::~WebMainUI()
 void WebMainUI::render(void)
 {
   setTitle(QObject::tr("%1 - %2 Operations Console")
-           .arg(m_dashboard->getRootService()->name, APP_NAME)
+           .arg(m_dashboard->rootService()->name, APP_NAME)
            .toStdString());
   m_mainWidget->setId("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
@@ -87,7 +87,7 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
   // Setup a Left-aligned menu.
   m_dashboardMenu = new Wt::WMenu(contentsStack);
   navigation->addMenu(m_dashboardMenu);
-  m_dashboardMenu->addItem(m_dashboard->getRootService()->name.toStdString(),
+  m_dashboardMenu->addItem(m_dashboard->rootService()->name.toStdString(),
                            m_dashboard->get(),
                            Wt::WMenuItem::LazyLoading);
   navigation->addWidget(createToolBar());
@@ -167,7 +167,7 @@ Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 
 void WebMainUI::resetTimer(void)
 {
-  m_timer->setInterval(m_dashboard->getTimerInterval());
+  m_timer->setInterval(m_dashboard->timerInterval());
   m_timer->timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer->start();
 }
@@ -310,10 +310,10 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::openFile(const std::string& path)
 {
   std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
-  WebDashboard* dashboard(new WebDashboard(m_dashboard->getUserRole(),
+  WebDashboard* dashboard(new WebDashboard(m_dashboard->userRole(),
                                            QString::fromStdString(realPath)));
-  if (! dashboard->getErrorState()) {
-    m_dashboardMenu->addItem(dashboard->getRootService()->name.toStdString(),
+  if (! dashboard->errorState()) {
+    m_dashboardMenu->addItem(dashboard->rootService()->name.toStdString(),
                              dashboard->get(),
                              Wt::WMenuItem::LazyLoading);
   } else {

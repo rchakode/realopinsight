@@ -65,7 +65,7 @@ StringMapT DashboardBase::calcRules() {
 }
 
 DashboardBase::DashboardBase(const qint32& _userRole, const QString& _config)
-  : updateCounter(0),
+  : m_updateCounter(0),
     m_cdata (new CoreDataT()),
     m_config(_config),
     m_userRole (_userRole),
@@ -97,7 +97,7 @@ void DashboardBase::load(const QString& _file)
       setRootService();
     } else {
       m_errorState = true;
-      m_lastError = parser.getDotGraphFile();
+      m_lastError = parser.dotFile();
     }
   }
 }
@@ -118,7 +118,7 @@ void DashboardBase::runMonitor()
       utils::alert(tr("The default source is not yet set"));
     }
   }
-  ++updateCounter;
+  ++m_updateCounter;
   updateChart();
 }
 

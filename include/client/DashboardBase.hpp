@@ -52,16 +52,16 @@ public:
   static StringMapT propRules();
   static StringMapT calcRules();
   void initSettings(void);
-  qint64 getUpdateCounter(void) const {return updateCounter;}
-  QString getConfig(void) const {return m_config;}
+  qint64 updateCounter(void) const {return m_updateCounter;}
+  QString config(void) const {return m_config;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
-  QString getSelectedNode(void) const {return m_selectedNode;}
+  QString selectedNode(void) const {return m_selectedNode;}
   void setTimerId(qint32 id) {m_timerId = id;}
-  qint32 getTimerId(void) const {return m_timerId;}
-  qint32 getTimerInterval(void) const {return m_interval;}
-  NodeListIteratorT getRootService(void) const {return m_root;}
-  qint32 getUserRole(void) const { return m_userRole;}
-  bool getErrorState() const {return m_errorState;}
+  qint32 timerId(void) const {return m_timerId;}
+  qint32 timerInterval(void) const {return m_interval;}
+  NodeListIteratorT rootService(void) const {return m_root;}
+  qint32 userRole(void) const { return m_userRole;}
+  bool errorState() const {return m_errorState;}
   QString lastError(void) const {return m_lastError;}
 
 public Q_SLOTS:
@@ -89,7 +89,7 @@ Q_SIGNALS:
   void timerIntervalChanged(qint32 interval);
 
 protected:
-  qint64 updateCounter;
+  qint64 m_updateCounter;
   CoreDataT* m_cdata;
   QString m_config;
   QString m_selectedNode;

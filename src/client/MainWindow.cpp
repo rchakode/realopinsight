@@ -79,7 +79,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 void MainWindow::showEvent(QShowEvent*)
 {
-  if (m_dashboard->getUpdateCounter()==0) {
+  if (m_dashboard->updateCounter()==0) {
     std::unique_ptr<QSplashScreen> info(utils::infoScreen());
     info->showMessage(tr("Please wait for initialization, it may take a while..."),
                       Qt::AlignCenter|Qt::AlignCenter);
@@ -177,7 +177,7 @@ void MainWindow::render(void)
   show();
   m_dashboard->scalPaneContentsToViewPort();
   QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
-                              .arg(m_dashboard->getRootService()->name, APP_NAME));
+                              .arg(m_dashboard->rootService()->name, APP_NAME));
 }
 
 void MainWindow::handleTabChanged(int _index)
@@ -227,7 +227,7 @@ void MainWindow::handleRefresh(void)
 
 void MainWindow::resetTimer(qint32 interval)
 {
-  killTimer(m_dashboard->getTimerId());
+  killTimer(m_dashboard->timerId());
   m_dashboard->setTimerId(startTimer(interval));
 }
 

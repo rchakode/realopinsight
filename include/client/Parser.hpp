@@ -39,7 +39,7 @@ public:
   bool process(bool console);
   bool computeNodeCoordinates(int wt);
   void computeNodeCoordinates(const QString& dotfile, int wt);
-  QString getDotGraphFile(void) const { return m_dotFile; }
+  QString dotFile(void) const { return m_dotFile; }
   static const QString CHILD_SEP;
   QString lastError(void) const {return m_lastError;}
 

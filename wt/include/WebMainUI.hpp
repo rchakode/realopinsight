@@ -37,7 +37,7 @@ public:
   WebMainUI(const Wt::WEnvironment& env, const QString& config);
   virtual ~WebMainUI();
   void render(void);
-  QString getConfig (void) const {return m_dashboard->getConfig();}
+  QString getConfig (void) const {return m_dashboard->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);

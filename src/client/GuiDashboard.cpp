@@ -207,7 +207,7 @@ void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const
 void GuiDashboard::centerGraphOnNode(const QString& _nodeId)
 {
   if (!_nodeId.isEmpty()) DashboardBase::setSelectedNode(_nodeId);
-  m_map->centerOnNode(DashboardBase::getSelectedNode());
+  m_map->centerOnNode(DashboardBase::selectedNode());
 }
 
 void GuiDashboard::filterNodeRelatedMsg(void)
