@@ -256,9 +256,14 @@ void WebUI::createFileUpdateDialog(void)
 
 void WebUI::finishFileUpload(void)
 {
-  if (m_uploader->empty()) {
-    std::cout <<"epttttttttttttttt>>>>>>>>><\n";
+  if (! m_uploader->empty()) {
+    QDir cdir("config1");
+    if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
+      utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
+      //FIXME: display in console
+    }
+    QFile file(QString::fromStdString(m_uploader->spoolFileName()));
+    file.copy(QString("%1/%2").arg(cdir.absolutePath(),
+                                   QString::fromStdString(m_uploader->clientFileName().toUTF8())));
   }
-  QFile file(QString::fromStdString(m_uploader->spoolFileName()));
-  file.copy(QString("config/%1").arg(QString::fromStdString(m_uploader->clientFileName().toUTF8())));
 }
