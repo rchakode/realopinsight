@@ -36,11 +36,12 @@
 #include <Wt/WProgressBar>
 #include <Wt/WDialog>
 #include <Wt/WSelectionBox>
+#include <Wt/WTemplate>
 
-WebMainUI::WebMainUI(const Wt::WEnvironment& env, const QString& config)
+WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
     m_timer(new Wt::WTimer(this)),
-    m_dashboard(new WebDashboard(Auth::OpUserRole, config)), //FIXME: consider user role
+    m_dashboard(new WebDashboard(Auth::OpUserRole, "")), //FIXME: consider user role
     m_mainWidget(new Wt::WContainerWidget()),
     m_infoBox(new Wt::WText("No data available"))
 {
@@ -58,15 +59,14 @@ WebMainUI::~WebMainUI()
 }
 
 
-void WebMainUI::render(void)
+void WebMainUI::showHome(void)
 {
-  setTitle(QObject::tr("%1 - %2 Operations Console")
-           .arg(m_dashboard->rootService()->name, APP_NAME)
-           .toStdString());
+  setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   m_mainWidget->setId("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(createMenuBarWidget());
+  createHomePage();
   root()->addWidget(m_mainWidget);
   root()->setId("wrapper");
   handleRefresh();
@@ -87,9 +87,6 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
   // Setup a Left-aligned menu.
   m_dashboardMenu = new Wt::WMenu(contentsStack);
   navigation->addMenu(m_dashboardMenu);
-  m_dashboardMenu->addItem(m_dashboard->rootService()->name.toStdString(),
-                           m_dashboard->get(),
-                           Wt::WMenuItem::LazyLoading);
   navigation->addWidget(createToolBar());
 
   // Setup a Right-aligned menu.
@@ -181,6 +178,7 @@ void WebMainUI::resetTimer(qint32 interval)
 
 void WebMainUI::handleRefresh(void)
 {
+  //FIXME: do it for every PFS dashboard
   m_timer->stop();
   m_mainWidget->disable();
   m_dashboard->runMonitor();
@@ -224,12 +222,14 @@ void WebMainUI::selectFileToOpen(void)
     Q_FOREACH(const QFileInfo& f, files) {
       flist->addItem(f.fileName().toStdString());
     }
-    flist->setCurrentIndex(1);
   } else {
     infoBox->setText(QObject::tr("No configuration available").toStdString());
   }
 
-  flist->activated().connect(std::bind([=]() { m_selectFile = flist->currentText().toUTF8();}));
+  // Set the selected file dynamically
+  flist->activated().connect(std::bind([=]() {
+    m_selectFile = flist->currentText().toUTF8();
+  }));
 
   // Provide a button to close the window
   Wt::WPushButton* finish(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
@@ -299,7 +299,11 @@ void WebMainUI::finishFileDialog(int action)
     case OPEN:
       m_fileUploadDialog->accept();
       m_fileUploadDialog->contents()->clear();
-      openFile(m_selectFile);
+      if (! m_selectFile.empty()) {
+        openFile(m_selectFile);
+      } else {
+        m_infoBox->setText(QObject::tr("No file selected").toStdString());
+      }
       break;
     default:
       break;
@@ -317,7 +321,13 @@ void WebMainUI::openFile(const std::string& path)
                              dashboard->get(),
                              Wt::WMenuItem::LazyLoading);
   } else {
-    m_infoBox->setText(m_dashboard->lastError().toStdString()); //FIXME: set it somewhere
+    m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
   }
 }
 
+
+void WebMainUI::createHomePage(void)
+{
+  Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
+  m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading);
+}

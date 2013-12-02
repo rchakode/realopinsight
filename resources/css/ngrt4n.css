@@ -58,4 +58,13 @@ body, html {
   background-color: #C0C0C0;
 }
 
+.home-container{
+    float: none;
+    margin: 0 auto;
+    width: 80%;
+}
 
+.thumbnail .caption{
+  padding: 5px 2px; 
+  height: 12em;
+}

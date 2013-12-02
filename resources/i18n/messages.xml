@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<messages>
+  <message id="template.home">
+  <div class="home-container">
+    <div class="row">
+     <!-- Getting Started Pane -->
+      <div class="span7">
+
+        <div class="span7 page-header">
+         <h1><small>Getting Started in 3 Steps</small></h1>
+        </div>
+       <!-- 1st thumnail -->
+        <div class="span2">
+           <div class="thumbnail">
+              <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+              <div class="caption">
+                 <h3 class="label label-default">1. Use the Editor</h3>
+                 <p>Set the business platform you want to monitor.
+                 You can easily defines each service, as well as how the
+                 different services are related among them.</p>
+               </div>
+           </div>
+        </div>
+
+        <!-- 2nd thumnail -->
+        <div class="span2">
+           <div class="thumbnail">
+              <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+              <div class="caption">
+                 <h3 class="label label-info">2. Configuration Manager</h3>
+                 <p>Use it to set how the Operations Console can access to your monitoring
+                 servers in order to retrieve status data.</p>
+               </div>
+           </div>
+        </div>
+
+       <!-- Third thumnail -->
+        <div class="span2">
+           <div class="thumbnail">
+              <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+              <div class="caption">
+                 <h3 class="label label-success">3. Operations Console</h3>
+                 <p>Finaly, load service the description of your platform in order to be
+                 kept informed in real time about the status of your business services.</p>
+               </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- Quick Links Pane -->
+      <div class="span3">
+        <div class="span3 page-header">
+          <h1><small>You're ready</small></h1>
+        </div>
+        <!-- List actions -->
+        <div class="span3 list-group">
+          <a href="#" class="list-group-item active">
+            <h4 class="list-group-item-heading">Load</h4>
+            <p class="list-group-item-text">An existing platform</p>
+          </a>
+          <a href="#" class="list-group-item active">
+            <h4 class="list-group-item-heading">Import</h4>
+            <p class="list-group-item-text">A local platform file description</p>
+          </a>
+        </div>
+      </div>
+    </div>
+    </div> <!-- home-container -->
+  </message>
+</messages>

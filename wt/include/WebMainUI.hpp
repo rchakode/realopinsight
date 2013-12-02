@@ -34,9 +34,9 @@ class WebMainUI : public QObject, public Wt::WApplication
 {
   Q_OBJECT
 public:
-  WebMainUI(const Wt::WEnvironment& env, const QString& config);
+  WebMainUI(const Wt::WEnvironment& env);
   virtual ~WebMainUI();
-  void render(void);
+  void showHome(void);
   QString getConfig (void) const {return m_dashboard->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
@@ -69,6 +69,7 @@ private:
   void selectFileToOpen(void);
   void openFile(const std::string& path);
   void finishFileDialog(int action);
+  void createHomePage(void);
   void addEvents(void);
 };
 

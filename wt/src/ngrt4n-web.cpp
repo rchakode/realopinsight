@@ -3,14 +3,13 @@
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  WebMainUI* ui = new WebMainUI(env, "examples/small_hosting_platform.nag.ngrt4n.xml"); //FIXME:set config file
+  WebMainUI* ui = new WebMainUI(env); //FIXME:set config file
   ui->setTwoPhaseRenderingThreshold(0);
-  ui->setTitle(ui->getConfig().toStdString());
+  ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
+  ui->messageResourceBundle().use(Wt::WApplication::appRoot() + "resources/i18n/messages");
   ui->setTheme(new Wt::WBootstrapTheme());
   ui->requireJQuery("resources/js/jquery-1.10.2.min.js");
-  //ui->setCssTheme("polished");
-  ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
-  ui->render();
+  ui->showHome();
   return ui;
 }
 
