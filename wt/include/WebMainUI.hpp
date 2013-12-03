@@ -74,8 +74,8 @@ private:
   void openFile(const std::string& path);
   void finishFileDialog(int action);
   void createHomePage(void);
-  void addEvents(void);
   void scaleMap(double factor);
+  void addEvents(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

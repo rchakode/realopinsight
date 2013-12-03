@@ -61,10 +61,9 @@ body, html {
 .home-container{
     float: none;
     margin: 0 auto;
-    width: 80%;
+    width: 940px;
 }
 
 .thumbnail .caption{
   padding: 5px 2px; 
-  height: 15em;
 }

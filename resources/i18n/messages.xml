@@ -51,11 +51,11 @@
       <!-- Quick Links Pane -->
       <div class="span3">
         <div class="span3 page-header">
-          <h1><small>You're ready</small></h1>
+          <h1><small>I'm ready</small></h1>
         </div>
         <!-- List actions -->
         <div class="span3 list-group">
-          <a href="/platform-load" class="list-group-item active">
+          <a href="/?_=/platform-load" class="list-group-item active">
             <h4 class="list-group-item-heading">Load</h4>
             <p class="list-group-item-text">An existing platform</p>
           </a>

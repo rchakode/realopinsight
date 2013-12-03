@@ -196,12 +196,6 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
   return anchor;
 }
 
-void WebMainUI::addEvents(void)
-{
-  //FIXME: use right signal
-  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
-}
-
 
 void WebMainUI::selectFileToOpen(void)
 {
@@ -351,4 +345,10 @@ void WebMainUI::handleInternalPath(void)
   } else  {
     //TODO
   }
+}
+
+void WebMainUI::addEvents(void)
+{
+  //FIXME: use right signal
+  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
