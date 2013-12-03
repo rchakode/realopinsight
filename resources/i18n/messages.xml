@@ -14,10 +14,10 @@
            <div class="thumbnail">
               <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <h3 class="label label-default">1. Use the Editor</h3>
-                 <p>Set the business platform you want to monitor.
-                 You can easily defines each service, as well as how the
-                 different services are related among them.</p>
+                 <h3 class="label label-default">1. Set The Target Plaforms</h3>
+                 <p>Run the RealOpInsight Editor to set the platforms you want to monitor.
+                 For each platform, the editor allows you to easily define the related services and
+                 how set they are related among them.</p>
                </div>
            </div>
         </div>
@@ -27,9 +27,10 @@
            <div class="thumbnail">
               <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <h3 class="label label-info">2. Configuration Manager</h3>
-                 <p>Use it to set how the Operations Console can access to your monitoring
-                 servers in order to retrieve status data.</p>
+                 <h3 class="label label-info">2. Monitoring Settings</h3>
+                 <p>From the RealOpInsight Configuration Manager, set when and how the Operations Console
+                 can access to your monitoring servers in order to retrieve status data to kept
+                 your dashboards up-to-date.</p>
                </div>
            </div>
         </div>
@@ -39,9 +40,9 @@
            <div class="thumbnail">
               <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <h3 class="label label-success">3. Operations Console</h3>
-                 <p>Finaly, load service the description of your platform in order to be
-                 kept informed in real time about the status of your business services.</p>
+                 <h3 class="label label-success">3. Operate and Enjoy</h3>
+                 <p>Finaly, load the descriptions of the target platforms within the Operations Console
+                 and assign them to your operators. Then enjoy your productivity !</p>
                </div>
            </div>
         </div>
