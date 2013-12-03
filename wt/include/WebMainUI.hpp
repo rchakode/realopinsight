@@ -37,7 +37,7 @@ public:
   WebMainUI(const Wt::WEnvironment& env);
   virtual ~WebMainUI();
   void showHome(void);
-  QString getConfig (void) const {return m_dashboard->config();}
+  QString getConfig (void) const {return m_currentDashboard->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
@@ -51,8 +51,8 @@ private:
     IMPORT = 0
   };
 
+  qint32 m_userRole;
   Wt::WTimer* m_timer;
-  WebDashboard* m_dashboard;
   Wt::WContainerWidget* createMenuBarWidget(void);
   Wt::WContainerWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
@@ -61,6 +61,8 @@ private:
   Wt::WFileUpload* m_uploader;
   std::string m_selectFile;
   Wt::WText* m_infoBox;
+  WebDashboard* m_currentDashboard;
+  std::map<std::string, WebDashboard*> m_dashboards;
 
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
@@ -71,6 +73,7 @@ private:
   void finishFileDialog(int action);
   void createHomePage(void);
   void addEvents(void);
+  void scaleMap(double factor);
 };
 
 #endif // MAINWEBWINDOW_HPP

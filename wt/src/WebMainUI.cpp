@@ -40,8 +40,8 @@
 
 WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
+    m_userRole(Auth::OpUserRole), //FIXME: consider user role
     m_timer(new Wt::WTimer(this)),
-    m_dashboard(new WebDashboard(Auth::OpUserRole, "")), //FIXME: consider user role
     m_mainWidget(new Wt::WContainerWidget()),
     m_infoBox(new Wt::WText("No data available"))
 {
@@ -54,7 +54,6 @@ WebMainUI::~WebMainUI()
   delete m_infoBox;
   delete m_fileUploadDialog;
   delete m_dashboardMenu;
-  delete m_dashboard;
   delete m_mainWidget;
 }
 
@@ -139,12 +138,12 @@ Wt::WContainerWidget* WebMainUI::createToolBar(void)
 
   b = createTooBarButton("images/built-in/menu_zoomin.png");
   b->setStyleClass("button");
-  b->clicked().connect(std::bind(&WebPieMap::scaleMap, m_dashboard->getMap(), utils::SCALIN_FACTOR));
+  b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_zoomout.png");
   b->setStyleClass("button");
-  b->clicked().connect(std::bind(&WebPieMap::scaleMap, m_dashboard->getMap(), utils::SCALOUT_FACTOR));
+  b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("images/built-in/menu_disket.png");
@@ -164,7 +163,7 @@ Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 
 void WebMainUI::resetTimer(void)
 {
-  m_timer->setInterval(m_dashboard->timerInterval());
+  m_timer->setInterval(m_currentDashboard->timerInterval());
   m_timer->timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer->start();
 }
@@ -178,18 +177,19 @@ void WebMainUI::resetTimer(qint32 interval)
 
 void WebMainUI::handleRefresh(void)
 {
-  //FIXME: do it for every PFS dashboard
   m_timer->stop();
   m_mainWidget->disable();
-  m_dashboard->runMonitor();
-  m_dashboard->updateMap();
+  for(auto&dash: m_dashboards) {
+    dash.second->runMonitor();
+    dash.second->updateMap();
+  }
   m_mainWidget->enable();
   m_timer->start();
 }
 
 void WebMainUI::addEvents(void)
 {
-  connect(m_dashboard, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+  connect(m_currentDashboard, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
@@ -310,16 +310,17 @@ void WebMainUI::finishFileDialog(int action)
   }
 }
 
-
 void WebMainUI::openFile(const std::string& path)
 {
   std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
-  WebDashboard* dashboard(new WebDashboard(m_dashboard->userRole(),
+  WebDashboard* dashboard(new WebDashboard(m_userRole,
                                            QString::fromStdString(realPath)));
   if (! dashboard->errorState()) {
-    m_dashboardMenu->addItem(dashboard->rootService()->name.toStdString(),
+    std::string platform = dashboard->rootService()->name.toStdString();
+    m_dashboardMenu->addItem(platform,
                              dashboard->get(),
                              Wt::WMenuItem::LazyLoading);
+    m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
   } else {
     m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
   }
@@ -331,3 +332,9 @@ void WebMainUI::createHomePage(void)
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading);
 }
+
+void WebMainUI::scaleMap(double factor)
+{
+  m_currentDashboard->getMap()->scaleMap(factor);
+}
+
