@@ -38,7 +38,7 @@ public:
   WebTree(CoreDataT* _cdata);
   virtual ~WebTree();
 
-  Wt::WStandardItemModel* getRenderingModel(void) const {return m_model;}
+  Wt::WStandardItemModel* renderingModel(void) const {return m_model;}
   void setRenderingModel(Wt::WStandardItem* _item) const {return m_model->appendRow(_item);}
   void updateNodeItem(const NodeT& _node, const QString& _tip);
 

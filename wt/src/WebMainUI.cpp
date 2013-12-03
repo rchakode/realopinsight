@@ -335,6 +335,6 @@ void WebMainUI::createHomePage(void)
 
 void WebMainUI::scaleMap(double factor)
 {
-  m_currentDashboard->getMap()->scaleMap(factor);
+  m_currentDashboard->map()->scaleMap(factor);
 }
 

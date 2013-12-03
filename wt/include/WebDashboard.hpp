@@ -47,7 +47,7 @@ public:
   virtual ~WebDashboard();
   Wt::WContainerWidget* get(void) const {return m_widget;}
   void updateMap(void);
-  WebPieMap* getMap(void) const {return m_map;}
+  WebPieMap* map(void) const {return m_map;}
 
 protected:
   virtual void buildMap(void);
