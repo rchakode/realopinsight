@@ -336,8 +336,15 @@ void WebMainUI::openFile(const std::string& path)
       m_currentDashboard = dashboard;
       setInternalPath("/"+platform);
     }));
-    m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
-    handleRefresh();
+  std::pair<DashboardListT::iterator, bool> result;
+    result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
+    if (result.second) {
+      handleRefresh();
+    } else {
+      m_infoBox->setText(QObject::tr("This platform or a platfom "
+                                     "with the same name is already loaded").toStdString());
+      m_infoBox->setHidden(false);
+    }
   } else {
     m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
     m_infoBox->setHidden(false);

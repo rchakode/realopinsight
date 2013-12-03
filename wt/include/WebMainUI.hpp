@@ -64,7 +64,8 @@ private:
   std::string m_selectFile;
   Wt::WText* m_infoBox;
   WebDashboard* m_currentDashboard;
-  std::map<std::string, WebDashboard*> m_dashboards;
+  typedef std::map<std::string, WebDashboard*> DashboardListT;
+  DashboardListT m_dashboards;
 
   void addEvents(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
