@@ -7,7 +7,7 @@
       <div class="span7">
 
         <div class="span7 page-header">
-         <h1><small>Getting Started in 3 Steps</small></h1>
+         <h1><small>Welcome – Getting Started in 3 Easy Steps</small></h1>
         </div>
        <!-- 1st thumnail -->
         <div class="span2">
@@ -61,7 +61,7 @@
           </a>
           <a href="/platform-import-file" class="list-group-item active">
             <h4 class="list-group-item-heading">Import</h4>
-            <p class="list-group-item-text">A local platform description file</p>
+            <p class="list-group-item-text">A platform description</p>
           </a>
         </div>
       </div>
