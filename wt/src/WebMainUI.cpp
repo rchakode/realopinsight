@@ -47,8 +47,10 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
-    m_infoBox(new Wt::WText("No data available"))
+    m_infoBox(new Wt::WText("", m_mainWidget))
 {
+  m_infoBox->addStyleClass("alert alert-warning alert-dismissable");
+  m_infoBox->hide();
   addEvents();
 }
 
@@ -125,6 +127,7 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
   edit->enterPressed().connect(std::bind([=] () {
     m_dashboardMenu->select(0); // FIXME: is the index of the "Home"
     m_infoBox->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
+    m_infoBox->setHidden(false);
   }));
 
   navigation->addSearch(edit, Wt::AlignRight);
@@ -311,6 +314,7 @@ void WebMainUI::finishFileDialog(int action)
         m_selectFile.clear();
       } else {
         m_infoBox->setText(QObject::tr("No file selected").toStdString());
+        m_infoBox->setHidden(false);
       }
       break;
     default:
@@ -336,6 +340,7 @@ void WebMainUI::openFile(const std::string& path)
     handleRefresh();
   } else {
     m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
+    m_infoBox->setHidden(false);
   }
 }
 
@@ -343,7 +348,7 @@ void WebMainUI::openFile(const std::string& path)
 void WebMainUI::createHomePage(void)
 {
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
-
+  tpl->bindWidget("info-box", m_infoBox);
   tpl->bindWidget("andhor-load-file",
                   createAnchorForHomeLink("Open", "An existing platform", LINK_LOAD));
   tpl->bindWidget("andhor-import-file",
@@ -367,7 +372,9 @@ void WebMainUI::handleInternalPath(void)
     openFileUploadDialog();
     setInternalPath("");
   } else  {
-    //TODO
+    m_infoBox->setText(QObject::tr("Sorry, the request resource "
+                                   "is not available or has been removed").toStdString());
+    m_infoBox->setHidden(false);
   }
 }
 
