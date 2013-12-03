@@ -41,6 +41,7 @@ public:
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
+  void handleInternalPath(void);
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);

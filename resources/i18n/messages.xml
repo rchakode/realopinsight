@@ -55,13 +55,13 @@
         </div>
         <!-- List actions -->
         <div class="span3 list-group">
-          <a href="#" class="list-group-item active">
+          <a href="/platform-load" class="list-group-item active">
             <h4 class="list-group-item-heading">Load</h4>
             <p class="list-group-item-text">An existing platform</p>
           </a>
-          <a href="#" class="list-group-item active">
+          <a href="/platform-import-file" class="list-group-item active">
             <h4 class="list-group-item-heading">Import</h4>
-            <p class="list-group-item-text">A local platform file description</p>
+            <p class="list-group-item-text">A local platform description file</p>
           </a>
         </div>
       </div>

@@ -341,3 +341,14 @@ void WebMainUI::scaleMap(double factor)
   m_currentDashboard->map()->scaleMap(factor);
 }
 
+void WebMainUI::handleInternalPath(void)
+{
+  Wt::WApplication *app = Wt::WApplication::instance();
+  if (app->internalPath() == "platform-load") {
+    selectFileToOpen();
+  } else if (app->internalPath() == "platform-import-file") {
+    openFileUploadDialog();
+  } else  {
+    //TODO
+  }
+}

@@ -3,14 +3,15 @@
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  WebMainUI* ui = new WebMainUI(env); //FIXME:set config file
-  ui->setTwoPhaseRenderingThreshold(0);
-  ui->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
-  ui->messageResourceBundle().use(Wt::WApplication::appRoot() + "resources/i18n/messages");
-  ui->setTheme(new Wt::WBootstrapTheme());
-  ui->requireJQuery("resources/js/jquery-1.10.2.min.js");
-  ui->showHome();
-  return ui;
+  WebMainUI* webApp = new WebMainUI(env);
+  webApp->internalPathChanged().connect(webApp, &WebMainUI::handleInternalPath);
+  webApp->setTwoPhaseRenderingThreshold(0);
+  webApp->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
+  webApp->messageResourceBundle().use(Wt::WApplication::appRoot() + "resources/i18n/messages");
+  webApp->setTheme(new Wt::WBootstrapTheme());
+  webApp->requireJQuery("resources/js/jquery-1.10.2.min.js");
+  webApp->showHome();
+  return webApp;
 }
 
 
