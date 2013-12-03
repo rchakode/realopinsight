@@ -41,6 +41,7 @@
 WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
     m_userRole(Auth::OpUserRole), //FIXME: consider user role
+    m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
     m_infoBox(new Wt::WText("No data available"))
@@ -68,7 +69,6 @@ void WebMainUI::showHome(void)
   createHomePage();
   root()->addWidget(m_mainWidget);
   root()->setId("wrapper");
-  handleRefresh();
   refresh();
   resetTimer();
 }
@@ -163,7 +163,7 @@ Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 
 void WebMainUI::resetTimer(void)
 {
-  m_timer->setInterval(m_currentDashboard->timerInterval());
+  m_timer->setInterval(1000*m_settings->updateInterval());
   m_timer->timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer->start();
 }
@@ -187,11 +187,6 @@ void WebMainUI::handleRefresh(void)
   m_timer->start();
 }
 
-void WebMainUI::addEvents(void)
-{
-  connect(m_currentDashboard, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
-}
-
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
@@ -199,6 +194,12 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
   anchor->setTarget(Wt::TargetNewWindow);
   anchor->setMargin(10, Wt::Right);
   return anchor;
+}
+
+void WebMainUI::addEvents(void)
+{
+  //FIXME: use right signal
+  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
 
@@ -319,8 +320,10 @@ void WebMainUI::openFile(const std::string& path)
     std::string platform = dashboard->rootService()->name.toStdString();
     m_dashboardMenu->addItem(platform,
                              dashboard->get(),
-                             Wt::WMenuItem::LazyLoading);
+                             Wt::WMenuItem::LazyLoading)
+        ->triggered().connect(std::bind([=](){m_currentDashboard = dashboard;}));
     m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
+    handleRefresh();
   } else {
     m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
   }

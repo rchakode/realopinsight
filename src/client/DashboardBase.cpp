@@ -929,7 +929,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
 
 void DashboardBase::resetInterval()
 {
-  m_interval = 1000 * m_settings->getUpdateInterval();
+  m_interval = 1000 * m_settings->updateInterval();
   timerIntervalChanged(m_interval);
 }
 

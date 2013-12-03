@@ -79,13 +79,13 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 }
 
 
-qint32 Settings::getUpdateInterval() const
+qint32 Settings::updateInterval() const
 {
   qint32 interval = QSettings::value(UPDATE_INTERVAL_KEY).toInt();
   return (interval > 0)? interval : MonitorBroker::DefaultUpdateInterval;
 }
 
-void Settings::setEntry(const QString& key, const QString& value)
+void Settings::settingEntry(const QString& key, const QString& value)
 {
   QSettings::setValue(key, value);
 }

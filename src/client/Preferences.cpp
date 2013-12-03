@@ -198,7 +198,7 @@ void Preferences::deleteSource(void)
   if (m_selectedSource>=0 && m_selectedSource < MAX_SRCS) {
     m_sourceBtns.at(m_selectedSource)->setEnabled(false);
     m_sourceStates->setBit(m_selectedSource, false);
-    m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    m_settings->settingEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
     m_settings->sync();
     updateFields();
   }
@@ -237,10 +237,10 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.auth = m_serverPassField->text();
   src.use_ls = m_useMklsChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
-  m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
-  m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  m_settings->settingEntry(utils::sourceKey(_idx), utils::source2Str(src));
+  m_settings->settingEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   m_sourceStates->setBit(_idx, true);
-  m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  m_settings->settingEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
 
   if (! m_updatedSources.contains(_idx)) {
@@ -393,7 +393,7 @@ void Preferences::updateFields(void)
     m_monitorTypeField->setCurrentIndex(0);
     m_useMklsChkbx->setCheckState(Qt::Unchecked);
     m_verifySslPeerChkBx->setCheckState(Qt::Unchecked);
-    m_updateIntervalField->setValue(m_settings->getUpdateInterval());
+    m_updateIntervalField->setValue(m_settings->updateInterval());
   }
 }
 
@@ -409,7 +409,7 @@ void Preferences::fillFromSource(int _sidx)
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
   m_useMklsChkbx->setCheckState(static_cast<Qt::CheckState>(src.use_ls));
   m_verifySslPeerChkBx->setCheckState(src.verify_ssl_peer? Qt::Unchecked : Qt::Checked);
-  m_updateIntervalField->setValue(m_settings->getUpdateInterval());
+  m_updateIntervalField->setValue(m_settings->updateInterval());
 
   m_selectedSource = _sidx;
 }
