@@ -38,6 +38,9 @@
 #include <Wt/WSelectionBox>
 #include <Wt/WTemplate>
 
+const std::string LINK_LOAD ="/load-platform";
+const std::string LINK_IMPORT ="/import-platform";
+
 WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
     m_userRole(Auth::OpUserRole), //FIXME: consider user role
@@ -58,6 +61,13 @@ WebMainUI::~WebMainUI()
   delete m_mainWidget;
 }
 
+
+void WebMainUI::addEvents(void)
+{
+  internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
+  //FIXME: use right signal
+  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+}
 
 void WebMainUI::showHome(void)
 {
@@ -94,10 +104,10 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
 
   // Create a popup submenu for the Help menu.
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
-  popup->addItem("Open...")
-      ->triggered().connect(std::bind(&WebMainUI::selectFileToOpen, this));
-  popup->addItem("Import")
-      ->triggered().connect(std::bind(&WebMainUI::openFileUploadDialog, this));
+  Wt::WMenuItem* item = popup->addItem("Open...");
+  item->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+  item = popup->addItem("Import");
+  item->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
   popup->addSeparator();
   popup->addItem("Documentation")
       ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
@@ -105,7 +115,7 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
   popup->addSeparator();
   popup->addItem("Sign out");
 
-  Wt::WMenuItem* item = new Wt::WMenuItem("Menu");
+  item = new Wt::WMenuItem("Menu");
   item->setMenu(popup);
   rightMenu->addItem(item);
 
@@ -131,25 +141,25 @@ Wt::WContainerWidget* WebMainUI::createToolBar(void)
   layout->addWidget(toolBar, Wt::AlignLeft);
 
   Wt::WPushButton* b(NULL);
-  b = createTooBarButton("images/built-in/menu_refresh.png");
+  b = createTooBarButton("/images/built-in/menu_refresh.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(b);
 
-  b = createTooBarButton("images/built-in/menu_zoomin.png");
+  b = createTooBarButton("/images/built-in/menu_zoomin.png");
   b->setStyleClass("button");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
-  b = createTooBarButton("images/built-in/menu_zoomout.png");
+  b = createTooBarButton("/images/built-in/menu_zoomout.png");
   b->setStyleClass("button");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
-  b = createTooBarButton("images/built-in/menu_disket.png");
+  b = createTooBarButton("/images/built-in/menu_disket.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
-  toolBar->addButton(createTooBarButton("images/built-in/menu_disket.png"));
+  toolBar->addButton(createTooBarButton("/images/built-in/menu_disket.png"));
 
   return container;
 }
@@ -190,7 +200,7 @@ void WebMainUI::handleRefresh(void)
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
-                                        new Wt::WImage("images/built-in/logo-mini.png"));
+                                        new Wt::WImage("/images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
   anchor->setMargin(10, Wt::Right);
   return anchor;
@@ -212,6 +222,8 @@ void WebMainUI::selectFileToOpen(void)
 
   // List the configuration avaialable
   QDir cdir(CONFIG_DIR);
+  flist->addItem("");
+  flist->setCurrentIndex(1);
   QFileInfoList files = cdir.entryInfoList(QStringList("*.ngrt4n.xml"), QDir::Files);
   if (! files.empty()) {
     Q_FOREACH(const QFileInfo& f, files) {
@@ -296,6 +308,7 @@ void WebMainUI::finishFileDialog(int action)
       m_fileUploadDialog->contents()->clear();
       if (! m_selectFile.empty()) {
         openFile(m_selectFile);
+        m_selectFile.clear();
       } else {
         m_infoBox->setText(QObject::tr("No file selected").toStdString());
       }
@@ -315,7 +328,10 @@ void WebMainUI::openFile(const std::string& path)
     m_dashboardMenu->addItem(platform,
                              dashboard->get(),
                              Wt::WMenuItem::LazyLoading)
-        ->triggered().connect(std::bind([=](){m_currentDashboard = dashboard;}));
+        ->triggered().connect(std::bind([=](){
+      m_currentDashboard = dashboard;
+      setInternalPath("/"+platform);
+    }));
     m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     handleRefresh();
   } else {
@@ -327,7 +343,13 @@ void WebMainUI::openFile(const std::string& path)
 void WebMainUI::createHomePage(void)
 {
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
-  m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading);
+
+  tpl->bindWidget("andhor-load-file",
+                  createAnchorForHomeLink("Open", "An existing platform", LINK_LOAD));
+  tpl->bindWidget("andhor-import-file",
+                  createAnchorForHomeLink("Import", "A platform description", LINK_IMPORT));
+  m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading)
+      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 }
 
 void WebMainUI::scaleMap(double factor)
@@ -338,17 +360,24 @@ void WebMainUI::scaleMap(double factor)
 void WebMainUI::handleInternalPath(void)
 {
   Wt::WApplication *app = Wt::WApplication::instance();
-  if (app->internalPath() == "platform-load") {
+  if (app->internalPath() == LINK_LOAD) {
     selectFileToOpen();
-  } else if (app->internalPath() == "platform-import-file") {
+    setInternalPath("");
+  } else if (app->internalPath() == LINK_IMPORT) {
     openFileUploadDialog();
+    setInternalPath("");
   } else  {
     //TODO
   }
 }
 
-void WebMainUI::addEvents(void)
+Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
+                                                const std::string& desc,
+                                                const std::string& internalPath)
 {
-  //FIXME: use right signal
-  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+  Wt::WAnchor* anchor(new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath,internalPath),
+                                      "<h4 class='list-group-item-heading'>"+title+"</h4>"
+                                      "<p class='list-group-item-text'>"+desc+"</p>"));
+  anchor->addStyleClass("list-group-item active");
+  return anchor;
 }

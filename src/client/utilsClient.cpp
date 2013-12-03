@@ -174,19 +174,19 @@ QIcon utils::computeCriticityIcon(int _severity)
 
 QString utils::getIconPath(int _severity)
 {
-  QString ipath("images/built-in/unknown.png");
+  QString ipath("/images/built-in/unknown.png");
   switch (static_cast<MonitorBroker::SeverityT>(_severity)) {
     case MonitorBroker::Normal:
-      ipath = "images/built-in/normal.png";
+      ipath = "/images/built-in/normal.png";
       break;
     case MonitorBroker::Minor:
-      ipath = "images/built-in/minor.png";
+      ipath = "/images/built-in/minor.png";
       break;
     case MonitorBroker::Major:
-      ipath = "images/built-in/major.png";
+      ipath = "/images/built-in/major.png";
       break;
     case MonitorBroker::Critical:
-      ipath = "images/built-in/critical.png";
+      ipath = "/images/built-in/critical.png";
       break;
     default:
       break;
@@ -236,7 +236,7 @@ bool utils::findNode(const NodeListT& bpnodes,
 }
 
 QSplashScreen* utils::infoScreen(const QString & msg) {
-  QSplashScreen* screen = new QSplashScreen(QPixmap(":images/built-in/loading-screen.png"));
+  QSplashScreen* screen = new QSplashScreen(QPixmap(":/images/built-in/loading-screen.png"));
   screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
   screen->show();
   return screen;

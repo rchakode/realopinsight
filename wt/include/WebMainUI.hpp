@@ -66,6 +66,7 @@ private:
   WebDashboard* m_currentDashboard;
   std::map<std::string, WebDashboard*> m_dashboards;
 
+  void addEvents(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);
@@ -75,7 +76,9 @@ private:
   void finishFileDialog(int action);
   void createHomePage(void);
   void scaleMap(double factor);
-  void addEvents(void);
+  Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
+                                       const std::string& desc,
+                                       const std::string& internalPath);
 };
 
 #endif // MAINWEBWINDOW_HPP

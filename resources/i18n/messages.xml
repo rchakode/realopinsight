@@ -12,7 +12,7 @@
        <!-- 1st thumnail -->
         <div class="span2">
            <div class="thumbnail">
-              <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
                  <h3 class="label label-default">1. Set The Target Plaforms</h3>
                  <p>Run the RealOpInsight Editor to set the platforms you want to monitor.
@@ -25,7 +25,7 @@
         <!-- 2nd thumnail -->
         <div class="span2">
            <div class="thumbnail">
-              <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
                  <h3 class="label label-info">2. Monitoring Settings</h3>
                  <p>From the RealOpInsight Configuration Manager, set when and how the Operations Console
@@ -38,7 +38,7 @@
        <!-- Third thumnail -->
         <div class="span2">
            <div class="thumbnail">
-              <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
                  <h3 class="label label-success">3. Operate and Enjoy</h3>
                  <p>Finaly, load the descriptions of the target platforms within the Operations Console
@@ -55,14 +55,8 @@
         </div>
         <!-- List actions -->
         <div class="span3 list-group">
-          <a href="/?_=/platform-load" class="list-group-item active">
-            <h4 class="list-group-item-heading">Load</h4>
-            <p class="list-group-item-text">An existing platform</p>
-          </a>
-          <a href="/platform-import-file" class="list-group-item active">
-            <h4 class="list-group-item-heading">Import</h4>
-            <p class="list-group-item-text">A platform description</p>
-          </a>
+        ${andhor-load-file}
+        ${andhor-import-file}
         </div>
       </div>
     </div>

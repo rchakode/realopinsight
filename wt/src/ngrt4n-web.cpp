@@ -4,7 +4,6 @@
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
   WebMainUI* webApp = new WebMainUI(env);
-  webApp->internalPathChanged().connect(webApp, &WebMainUI::handleInternalPath);
   webApp->setTwoPhaseRenderingThreshold(0);
   webApp->useStyleSheet(Wt::WApplication::appRoot() + "resources/css/ngrt4n.css");
   webApp->messageResourceBundle().use(Wt::WApplication::appRoot() + "resources/i18n/messages");

@@ -80,7 +80,7 @@ Wt::WStandardItem* WebTree::createItem(const NodeT& _node)
 {
   Wt::WStandardItem* item = new Wt::WStandardItem();
   item->setText(Wt::WString(_node.name.toStdString()));
-  item->setIcon("images/built-in/unknown.png");
+  item->setIcon("/images/built-in/unknown.png");
   item->setData(_node.id, Wt::UserRole);
   return item;
 }
