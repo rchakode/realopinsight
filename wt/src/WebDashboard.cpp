@@ -83,12 +83,9 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
 WebDashboard::~WebDashboard()
 {
-  // FIXME: raises segfault
-  //  delete m_chart;
-  //  delete m_tree;
-  //  delete m_map;
-  //  delete m_msgConsole;
-  //  delete m_widget;
+  delete m_widget;
+  // m_chart, m_tree, m_map and m_msgConsole are
+  // deleted by thelayout manager
 }
 
 void WebDashboard::buildTree(void)

@@ -54,7 +54,7 @@ WebPieMap::WebPieMap(CoreDataT* _cdata)
 WebPieMap::~WebPieMap()
 {
   m_icons.clear();
-  delete m_scrollArea;
+  // m_scrollArea is deleted by the layout manager
 }
 
 void WebPieMap::setPreferredMethod(void)

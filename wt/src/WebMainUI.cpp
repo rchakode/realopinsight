@@ -325,8 +325,8 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::openFile(const std::string& path)
 {
   std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
-  WebDashboard* dashboard(new WebDashboard(m_userRole,
-                                           QString::fromStdString(realPath)));
+  WebDashboard* dashboard = new WebDashboard(m_userRole,
+                                           QString::fromStdString(realPath));
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;

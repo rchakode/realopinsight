@@ -68,7 +68,7 @@ WebPieChart::WebPieChart(void)
 WebPieChart::~WebPieChart()
 {
   delete m_model;
-  delete m_scrollArea;
+  // m_scrollArea is deleted by the layout manager
 }
 
 //FIXME: do custom painting to avoid black line, 0%legend
