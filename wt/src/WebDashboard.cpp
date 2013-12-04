@@ -83,11 +83,12 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 
 WebDashboard::~WebDashboard()
 {
-  delete m_chart;
-  delete m_tree;
-  delete m_map;
-  delete m_msgConsole;
-  delete m_widget;
+  // FIXME: raises segfault
+  //  delete m_chart;
+  //  delete m_tree;
+  //  delete m_map;
+  //  delete m_msgConsole;
+  //  delete m_widget;
 }
 
 void WebDashboard::buildTree(void)
@@ -111,8 +112,8 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  for(CheckStatusCountT::ConstIterator it = m_cdata->check_status_count.begin(),
-      end = m_cdata->check_status_count.end(); it != end; ++it) {
+  for (CheckStatusCountT::ConstIterator it = m_cdata->check_status_count.begin(),
+       end = m_cdata->check_status_count.end(); it != end; ++it) {
     m_chart->setSeverityData(it.key(), it.value());
   }
 }

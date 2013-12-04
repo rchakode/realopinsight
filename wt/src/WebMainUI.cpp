@@ -329,18 +329,19 @@ void WebMainUI::openFile(const std::string& path)
                                            QString::fromStdString(realPath)));
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
-    m_dashboardMenu->addItem(platform,
-                             dashboard->get(),
-                             Wt::WMenuItem::LazyLoading)
-        ->triggered().connect(std::bind([=](){
-      m_currentDashboard = dashboard;
-      setInternalPath("/"+platform);
-    }));
-  std::pair<DashboardListT::iterator, bool> result;
+    std::pair<DashboardListT::iterator, bool> result;
     result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     if (result.second) {
+      Wt::WMenuItem *item = m_dashboardMenu->addItem(platform,
+                                                     dashboard->get(),
+                                                     Wt::WMenuItem::LazyLoading);
+      item->triggered().connect(std::bind([=](){
+        m_currentDashboard = dashboard;
+        setInternalPath("/"+platform);
+      }));
       handleRefresh();
     } else {
+      delete dashboard;
       m_infoBox->setText(QObject::tr("This platform or a platfom "
                                      "with the same name is already loaded").toStdString());
       m_infoBox->setHidden(false);
