@@ -44,8 +44,7 @@ DbSession::DbSession():
   m_authService->setVerifier(verifier);
   m_authService->setAttemptThrottlingEnabled(true);
   //FIXME: m_authService->setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
-  Wt::Auth::User user("0", *m_users);
-  user.setIdentity();
+  Wt::Auth::User user("1", *m_users);
   std::cout << m_authService->verifyPassword(user, "ngrt4n_adm") <<"VERIFFIIIIIIIIIIIII\n";
 }
 
@@ -75,12 +74,17 @@ void DbSession::setup(void)
 void DbSession::addUser(const std::string& username, const std::string& pass, int role)
 {
   try {
+    Wt::Auth::BCryptHashFunction h(7);
     dbo::Transaction transaction(*m_dbsession);
     User *user = new User();
     user->username = username;
-    user->password = pass;
+    user->password = h.compute(pass, "");
     user->role =  role;
     dbo::ptr<User> userPtr = m_dbsession->add(user);
+
+    AuthInfo* authInfo = new AuthInfo();
+    authInfo->setUser(userPtr);
+    m_dbsession->add(authInfo);
     transaction.commit();
   } catch (...) {
     //FIXME: handle error

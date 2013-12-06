@@ -59,5 +59,4 @@ public:
   }
 };
 
-
 #endif // USER_HPP
