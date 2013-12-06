@@ -26,7 +26,9 @@ HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebMap.hpp \
     wt/include/WebTree.hpp \
     wt/include/WebPieChart.hpp \
-    wt/include/WebMainUI.hpp
+    wt/include/WebMainUI.hpp \
+    wt/dbo/User.hpp \
+    wt/dbo/DbSession.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -34,9 +36,10 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMap.cpp \
     wt/src/WebTree.cpp \
     wt/src/WebPieChart.cpp \
-    wt/src/WebMainUI.cpp
+    wt/src/WebMainUI.cpp \
+    wt/dbo/DbSession.cpp
 
-LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt \
+LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
     -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
     -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 TARGET = ngrt4n-web
@@ -67,10 +70,11 @@ DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
-QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-local-typedefs
+QMAKE_CXXFLAGS += -std=c++0x  -Wno-unused-variable  -Wno-unused-parameter -Werror -Wno-unused-local-typedefs
 INCLUDEPATH = include include/client \
               include/core \
               wt/include \
+              wt/dbo \
               /opt/install/wt-3.3.0/include
 
 HEADERS	+= include/core/ns.hpp \

@@ -29,6 +29,7 @@
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include "WebDashboard.hpp"
+#include "DbSession.hpp"
 
 class WebMainUI : public QObject, public Wt::WApplication
 {
@@ -67,6 +68,7 @@ private:
   WebDashboard* m_currentDashboard;
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
+  DbSession* m_dbSession;
 
   void addEvents(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);

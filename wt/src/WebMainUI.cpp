@@ -47,7 +47,8 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
-    m_infoBox(new Wt::WText("", m_mainWidget))
+    m_infoBox(new Wt::WText("", m_mainWidget)),
+    m_dbSession(new DbSession())
 {
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
@@ -63,6 +64,7 @@ WebMainUI::~WebMainUI()
   delete m_fileUploadDialog;
   delete m_dashboardMenu;
   delete m_mainWidget;
+  delete m_dbSession;
 }
 
 
