@@ -58,12 +58,23 @@ body, html {
   background-color: #C0C0C0;
 }
 
+/* Related to admin home page */
 .home-container{
     float: none;
     margin: 0 auto;
     width: 940px;
 }
-
 .thumbnail .caption{
   padding: 5px 2px; 
+}
+
+/* Related to login form*/
+.login-container {
+ width: 540px;
+ margin: 100px auto;
+ background: -moz-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+ background: -webkit-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+ background: -ms-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+ background: -o-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+ background: -linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
 }

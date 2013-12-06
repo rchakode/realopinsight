@@ -49,112 +49,112 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
 <context>
     <name>DashboardBase</name>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="114"/>
+        <location filename="../src/client/DashboardBase.cpp" line="118"/>
         <source>The default source is not yet set</source>
         <translation type="unfinished">Vous n&apos;avez pas encore configuré la source par défaut</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="144"/>
-        <location filename="../src/client/DashboardBase.cpp" line="208"/>
+        <location filename="../src/client/DashboardBase.cpp" line="148"/>
+        <location filename="../src/client/DashboardBase.cpp" line="212"/>
         <source>Undefined source (%1)</source>
         <translation type="unfinished">Source indéfinie (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="156"/>
+        <location filename="../src/client/DashboardBase.cpp" line="160"/>
         <source>The server serial %1 is not supported</source>
         <translation type="unfinished">Les serveurs de série %1 sont imcompatibles avec cette version</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="241"/>
-        <location filename="../src/client/DashboardBase.cpp" line="916"/>
+        <location filename="../src/client/DashboardBase.cpp" line="245"/>
+        <location filename="../src/client/DashboardBase.cpp" line="920"/>
         <source>Undefined service (%1)</source>
         <translation type="unfinished">Service indéfini (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="475"/>
-        <location filename="../src/client/DashboardBase.cpp" line="574"/>
+        <location filename="../src/client/DashboardBase.cpp" line="479"/>
+        <location filename="../src/client/DashboardBase.cpp" line="578"/>
         <source>Weird response received from the server</source>
         <translation type="unfinished">Réponse bizarre reçu du serveur</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="502"/>
+        <location filename="../src/client/DashboardBase.cpp" line="506"/>
         <source>Authentication failed: %1</source>
         <translation type="unfinished">Echec d&apos;autentification : %1</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="551"/>
+        <location filename="../src/client/DashboardBase.cpp" line="555"/>
         <source>The %1 component is Up</source>
         <translation type="unfinished">Le composant %1 est actif</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="567"/>
+        <location filename="../src/client/DashboardBase.cpp" line="571"/>
         <source>The host &apos;%1&apos; is Up</source>
         <translation type="unfinished">La machine &apos;%1&apos; est accessible</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="570"/>
+        <location filename="../src/client/DashboardBase.cpp" line="574"/>
         <source>The host &apos;%1&apos; is Down</source>
         <translation type="unfinished">La machine &apos;%1&apos; est inaccessible</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="632"/>
+        <location filename="../src/client/DashboardBase.cpp" line="636"/>
         <source>Invalid authentication chain!
 Must follow the pattern login:password</source>
         <translation type="unfinished">Chaine d&apos;authentification invalide!
 Doit être sous la forme utilisateur:mot_de_passe</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="742"/>
+        <location filename="../src/client/DashboardBase.cpp" line="746"/>
         <source>The connection has been closed by the remote host</source>
         <translation type="unfinished">La connexion a été interrompue par la machine distante</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="745"/>
+        <location filename="../src/client/DashboardBase.cpp" line="749"/>
         <source>Host not found</source>
         <translation type="unfinished">Machine inconnue</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="748"/>
+        <location filename="../src/client/DashboardBase.cpp" line="752"/>
         <source>Connection refused</source>
         <translation type="unfinished">Connexion refusée</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="751"/>
+        <location filename="../src/client/DashboardBase.cpp" line="755"/>
         <source>SSL Handshake failed</source>
         <translation type="unfinished">Echec lors de l&apos;échange de certificat SSL </translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="754"/>
+        <location filename="../src/client/DashboardBase.cpp" line="758"/>
         <source>Timeout exceeded</source>
         <translation type="unfinished">Dépassement de délai</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="757"/>
+        <location filename="../src/client/DashboardBase.cpp" line="761"/>
         <source>error %1</source>
         <translation type="unfinished">erreur %1</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="795"/>
+        <location filename="../src/client/DashboardBase.cpp" line="799"/>
         <source>%1 is not set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="798"/>
+        <location filename="../src/client/DashboardBase.cpp" line="802"/>
         <source>Could not handle this source (%1)</source>
         <translation type="unfinished">Oups, cette source n&apos;est pas prise en charge (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="832"/>
+        <location filename="../src/client/DashboardBase.cpp" line="836"/>
         <source>%1: undefined monitor (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="862"/>
+        <location filename="../src/client/DashboardBase.cpp" line="866"/>
         <source>Unknown monitor type (%1)</source>
         <translation type="unfinished">Type de moniteur inconnu (%1)</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="936"/>
+        <location filename="../src/client/DashboardBase.cpp" line="940"/>
         <source>The configuration is not valid, there is no root service !</source>
         <translation type="unfinished"></translation>
     </message>
@@ -400,7 +400,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../src/client/MainWindow.cpp" line="179"/>
         <source>%1 - %2 Operations Console</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 - %2 Console des Opérations</translation>
     </message>
     <message>
         <location filename="../src/client/MainWindow.cpp" line="222"/>
@@ -687,38 +687,38 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
                   &gt;&gt; Pour reporter des bugs, consulter les instructions en ligne : &lt;%7&gt;</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="80"/>
-        <location filename="../include/client/Base.hpp" line="85"/>
+        <location filename="../include/client/Base.hpp" line="81"/>
+        <location filename="../include/client/Base.hpp" line="86"/>
         <source>Unchanged</source>
         <translation>Inchangé</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="81"/>
+        <location filename="../include/client/Base.hpp" line="82"/>
         <source>Decreased</source>
         <translation>Décrémenté</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="82"/>
+        <location filename="../include/client/Base.hpp" line="83"/>
         <source>Increased</source>
         <translation>Incrémenté</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="99"/>
+        <location filename="../include/client/Base.hpp" line="100"/>
         <source>Average</source>
         <translation>Moyenne</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="100"/>
+        <location filename="../include/client/Base.hpp" line="101"/>
         <source>High Severity</source>
         <translation>Sévérité forte</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="111"/>
+        <location filename="../include/client/Base.hpp" line="112"/>
         <source>Native Check</source>
         <translation>Check natif</translation>
     </message>
     <message>
-        <location filename="../include/client/Base.hpp" line="112"/>
+        <location filename="../include/client/Base.hpp" line="113"/>
         <source>Business Process</source>
         <translation>Processus métier</translation>
     </message>
@@ -728,31 +728,31 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     </message>
     <message>
         <location filename="../src/client/MsgConsole.cpp" line="47"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="48"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="49"/>
         <source>Date &amp; Hour</source>
         <translation>Date &amp; Heure</translation>
     </message>
     <message>
         <location filename="../src/client/MsgConsole.cpp" line="48"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="52"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="53"/>
         <source>Severity</source>
         <translation>Sévérité</translation>
     </message>
     <message>
         <location filename="../src/client/MsgConsole.cpp" line="49"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="56"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="57"/>
         <source>Host</source>
         <translation>Hôte</translation>
     </message>
     <message>
         <location filename="../src/client/MsgConsole.cpp" line="50"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="60"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="61"/>
         <source>Service</source>
         <translation>Service</translation>
     </message>
     <message>
         <location filename="../src/client/MsgConsole.cpp" line="51"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="64"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="65"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
@@ -762,12 +762,12 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation>Impossible d&apos;ouvrir le fichier %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Parser.cpp" line="65"/>
+        <location filename="../src/client/Parser.cpp" line="67"/>
         <source>Error while parsing the file %1</source>
         <translation>Erreur lors de l&apos;analyse du fichier %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Parser.cpp" line="204"/>
+        <location filename="../src/client/Parser.cpp" line="182"/>
         <source>The graph engine exited with the code %1</source>
         <translation>Le moteur de graphe a retourné un code d&apos;erreur %1</translation>
     </message>
@@ -780,7 +780,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="obsolete">Service not trouvé  %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Parser.cpp" line="185"/>
+        <location filename="../src/client/Parser.cpp" line="161"/>
         <source>Unable into write the file %1</source>
         <translation>Impossible d&apos;écrire dans le fichier %1</translation>
     </message>
@@ -843,7 +843,7 @@ Autres détails : %9</translation>
         <translation>Echec lors de la connexion à %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../src/client/DashboardBase.cpp" line="261"/>
+        <location filename="../src/client/DashboardBase.cpp" line="265"/>
         <source>updating %1 (%2)...</source>
         <translation>mise à jour %1 (%2)...</translation>
     </message>
@@ -994,19 +994,78 @@ Chargement...</translation>
         <translation>indéfini</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="90"/>
         <source>Service Tree</source>
-        <translation>Arborescence de service</translation>
+        <translation type="obsolete">Arborescence de service</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="68"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="69"/>
         <source>Service ID</source>
         <translation>ID Service </translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUI.cpp" line="54"/>
         <source>%1 - %2 Operations Console</source>
-        <translation>%1 - %2 Console des Opérations</translation>
+        <translation type="obsolete">%1 - %2 Console des Opérations</translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="76"/>
+        <source>%1 Operations Console</source>
+        <translation type="unfinished">Console des operations %1</translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="215"/>
+        <source>Select a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="236"/>
+        <source>No configuration available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="245"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="275"/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="253"/>
+        <source>Import a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="268"/>
+        <source>Upload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="284"/>
+        <source>File upload is finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="289"/>
+        <source>File is too large.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="302"/>
+        <source>Unable to use the configuration directory (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="316"/>
+        <source>No file selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="345"/>
+        <source>This platform or a platfom with the same name is already loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="383"/>
+        <source>Sorry, the request resource is not available or has been removed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1689,14 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <source>Browser requires realm authentication | %1</source>
         <translation type="obsolete">Authentification realm requise | %1</translation>
+    </message>
+</context>
+<context>
+    <name>Wt::WString</name>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="358"/>
+        <source>template.home</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

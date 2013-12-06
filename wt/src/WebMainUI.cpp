@@ -49,6 +49,8 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_mainWidget(new Wt::WContainerWidget()),
     m_infoBox(new Wt::WText("", m_mainWidget))
 {
+  root()->setId("wrapper");
+  m_mainWidget->setId("maincontainer");
   m_infoBox->addStyleClass("alert alert-warning alert-dismissable");
   m_infoBox->hide();
   addEvents();
@@ -71,18 +73,25 @@ void WebMainUI::addEvents(void)
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
-void WebMainUI::showHome(void)
+
+void WebMainUI::showAdminHome(void)
 {
+  root()->addWidget(m_mainWidget);
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
-  m_mainWidget->setId("maincontainer");
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(createMenuBarWidget());
-  createHomePage();
-  root()->addWidget(m_mainWidget);
-  root()->setId("wrapper");
-  refresh();
+  createAdminHome();
   resetTimer();
+}
+
+void WebMainUI::showLoginHome(void)
+{
+  setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
+  root()->addWidget(createLoginHome());
+  root()->doJavaScript("$(document).ready(function(){"
+                       "$('.social-login-box').height( $('.login-box').height() - 160 );"
+                       "});");
 }
 
 Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
@@ -294,31 +303,31 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        QDir cdir(CONFIG_DIR);
-        if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-          //FIXME: display in console
-          utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
-        }
-        QFile file(QString::fromStdString(m_uploader->spoolFileName()));
-        file.copy(QString("%1/%2").arg(cdir.absolutePath(),
-                                       QString::fromStdString(m_uploader->clientFileName().toUTF8())));
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      QDir cdir(CONFIG_DIR);
+      if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
+        //FIXME: display in console
+        utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectFile.empty()) {
-        openFile(m_selectFile);
-        m_selectFile.clear();
-      } else {
-        m_infoBox->setText(QObject::tr("No file selected").toStdString());
-        m_infoBox->setHidden(false);
-      }
-      break;
-    default:
-      break;
+      QFile file(QString::fromStdString(m_uploader->spoolFileName()));
+      file.copy(QString("%1/%2").arg(cdir.absolutePath(),
+                                     QString::fromStdString(m_uploader->clientFileName().toUTF8())));
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectFile.empty()) {
+      openFile(m_selectFile);
+      m_selectFile.clear();
+    } else {
+      m_infoBox->setText(QObject::tr("No file selected").toStdString());
+      m_infoBox->setHidden(false);
+    }
+    break;
+  default:
+    break;
   }
 }
 
@@ -326,7 +335,7 @@ void WebMainUI::openFile(const std::string& path)
 {
   std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
   WebDashboard* dashboard = new WebDashboard(m_userRole,
-                                           QString::fromStdString(realPath));
+                                             QString::fromStdString(realPath));
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
@@ -352,19 +361,6 @@ void WebMainUI::openFile(const std::string& path)
   }
 }
 
-
-void WebMainUI::createHomePage(void)
-{
-  Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
-  tpl->bindWidget("info-box", m_infoBox);
-  tpl->bindWidget("andhor-load-file",
-                  createAnchorForHomeLink("Open", "An existing platform", LINK_LOAD));
-  tpl->bindWidget("andhor-import-file",
-                  createAnchorForHomeLink("Import", "A platform description", LINK_IMPORT));
-  m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading)
-      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
-}
-
 void WebMainUI::scaleMap(double factor)
 {
   m_currentDashboard->map()->scaleMap(factor);
@@ -386,6 +382,31 @@ void WebMainUI::handleInternalPath(void)
   }
 }
 
+void WebMainUI::createAdminHome(void)
+{
+  Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
+  tpl->bindWidget("info-box", m_infoBox);
+  tpl->bindWidget("andhor-load-file",
+                  createAnchorForHomeLink("Open", "An existing platform", LINK_LOAD));
+  tpl->bindWidget("andhor-import-file",
+                  createAnchorForHomeLink("Import", "A platform description", LINK_IMPORT));
+  m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading)
+      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
+}
+
+Wt::WWidget* WebMainUI::createLoginHome(void)
+{
+  Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.login.form"));
+  //  tpl->bindWidget("info-box", m_infoBox);
+  tpl->bindWidget("username-field", new Wt::WLineEdit());
+
+  Wt::WLineEdit* pwdField(new Wt::WLineEdit());
+  pwdField->setEchoMode(Wt::WLineEdit::Password);
+  tpl->bindWidget("password-field", pwdField);
+  tpl->bindWidget("login-button",new Wt::WPushButton(QObject::tr("Login").toStdString()));
+  return tpl;
+}
+
 Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
                                                 const std::string& desc,
                                                 const std::string& internalPath)
@@ -396,3 +417,4 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
   anchor->addStyleClass("list-group-item active");
   return anchor;
 }
+

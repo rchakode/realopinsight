@@ -1,7 +1,7 @@
 QT	+= core gui xml svg webkit network script
 CONFIG += no_keywords
 TEMPLATE = app
-VERSION_=2.5.0
+VERSION_=3.0.0
 VERSION = "-$${VERSION_}"
 config-dist {
 SOURCES	+=
@@ -36,7 +36,9 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebPieChart.cpp \
     wt/src/WebMainUI.cpp
 
-LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lboost_signals
+LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt \
+    -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
+    -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 TARGET = ngrt4n-web
 }
 
@@ -69,7 +71,7 @@ QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-local-typedefs
 INCLUDEPATH = include include/client \
               include/core \
               wt/include \
-              /opt/install/wt-3.3.0/include \
+              /opt/install/wt-3.3.0/include
 
 HEADERS	+= include/core/ns.hpp \
     include/core/MonitorBroker.hpp \

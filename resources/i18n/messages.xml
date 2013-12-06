@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <messages>
-  <message id="template.home">
+<message id="template.home">
   <div class="home-container">
     <div class="row">
      <!-- Getting Started Pane -->
@@ -65,5 +65,28 @@
       </div>
     </div>
     </div> <!-- home-container -->
-  </message>
+</message>
+
+<message id="template.login.form">
+  <div class="login-container">
+   <legend><img src="/images/built-in/logo.png" /></legend>
+    <div class="form-horizontal">
+      <fieldset>
+        <div class="control-group">
+          <label for="${id:first-name}" class="control-label">Username</label>
+          <div class="controls"> ${username-field}</div>
+        </div>
+        <div class="control-group">
+          <label for="${id:password-name}" class="control-label">Password</label>
+          <div class="controls"> ${password-field}</div>
+        </div>
+       </fieldset>
+      <div class="form-actions">
+        <div class="controls">${login-button}</div>
+      </div>
+    </div>
+    RealOpInsight 3.0.0 - Copyright 2010-2013 NGRT4N Project. All rights reserved
+  </div>
+</message>
+
 </messages>
