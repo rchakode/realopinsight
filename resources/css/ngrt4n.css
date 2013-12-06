@@ -70,11 +70,15 @@ body, html {
 
 /* Related to login form*/
 .login-container {
- width: 540px;
+ width: 480px;
  margin: 100px auto;
  background: -moz-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -webkit-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -ms-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -o-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+}
+
+.form-actions {
+ padding: 10px; 
 }
