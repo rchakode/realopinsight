@@ -29,23 +29,23 @@
 
 DbSession::DbSession():
   m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db")),
-  m_dbsession(new dbo::Session()),
   m_basicAuthService(new Wt::Auth::AuthService()),
   m_authService(new Wt::Auth::PasswordService(*m_basicAuthService)),
-  m_users(new UserDatabase(*m_dbsession))
+  m_users(new UserDatabase(*this))
 {
   m_sqlite3Db->setProperty("show-queries", "true");
-  m_dbsession->setConnection(*m_sqlite3Db);
+  setConnection(*m_sqlite3Db);
 
   setup();
 
-  Wt::Auth::PasswordVerifier *verifier = new Wt::Auth::PasswordVerifier();
-  verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));
+
+  Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
+  verifier->addHashFunction(new Wt::Auth::BCryptHashFunction());
   m_authService->setVerifier(verifier);
   m_authService->setAttemptThrottlingEnabled(true);
   //FIXME: m_authService->setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
   Wt::Auth::User user("1", *m_users);
-  std::cout << m_authService->verifyPassword(user, "ngrt4n_adm") <<"VERIFFIIIIIIIIIIIII\n";
+  std::cout << m_authService->verifyPassword(user, "ngrt4n_adm")<<"VERIFFIIIIIIIIIIIII\n";
 }
 
 DbSession::~DbSession()
@@ -54,18 +54,17 @@ DbSession::~DbSession()
   delete m_users;
   delete m_basicAuthService;
   delete m_authService;
-  delete m_dbsession;
 }
 
 void DbSession::setup(void)
 {
-  m_dbsession->mapClass<User>("user");
-  m_dbsession->mapClass<AuthInfo>("auth_info");
-  m_dbsession->mapClass<AuthInfo::AuthIdentityType>("auth_identity");
-  m_dbsession->mapClass<AuthInfo::AuthTokenType>("auth_token");
+  mapClass<User>("user");
+  mapClass<AuthInfo>("auth_info");
+  mapClass<AuthInfo::AuthIdentityType>("auth_identity");
+  mapClass<AuthInfo::AuthTokenType>("auth_token");
 
   try {
-    m_dbsession->createTables();
+    createTables();
   } catch (...) { }
   addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
   addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
@@ -74,19 +73,24 @@ void DbSession::setup(void)
 void DbSession::addUser(const std::string& username, const std::string& pass, int role)
 {
   try {
-    Wt::Auth::BCryptHashFunction h(7);
-    dbo::Transaction transaction(*m_dbsession);
+    dbo::Transaction transaction(*this);
     User *user = new User();
     user->username = username;
-    user->password = h.compute(pass, "");
+    user->password = hashPassword(pass);
     user->role =  role;
-    dbo::ptr<User> userPtr = m_dbsession->add(user);
+    dbo::ptr<User> userPtr = add(user);
 
     AuthInfo* authInfo = new AuthInfo();
     authInfo->setUser(userPtr);
-    m_dbsession->add(authInfo);
+    add(authInfo);
     transaction.commit();
   } catch (...) {
     //FIXME: handle error
   }
+}
+
+std::string DbSession::hashPassword(const std::string& pass)
+{
+  Wt::Auth::BCryptHashFunction h;
+  return h.compute(pass, "salt");
 }

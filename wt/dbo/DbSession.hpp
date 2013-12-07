@@ -39,7 +39,7 @@
 typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
-class DbSession
+class DbSession : public dbo::Session
 {
 public:
   DbSession();
@@ -48,12 +48,12 @@ public:
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
-  dbo::Session* m_dbsession;
   Wt::Auth::AuthService* m_basicAuthService;
   Wt::Auth::PasswordService* m_authService;
   UserDatabase* m_users;
 
   void addUser(const std::string& username, const std::string& pass, int role);
+  std::string hashPassword(const std::string& pass);
 };
 
 #endif // DBSESSION_HPP

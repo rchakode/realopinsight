@@ -91,20 +91,6 @@ void WebMainUI::showAdminHome(void)
 
 void WebMainUI::showLoginHome(void)
 {
-  //  Wt::Auth::AuthWidget *authWidget
-  //      = new Wt::Auth::AuthWidget(Session::auth(), session_.users(),
-  //                                 session_.login());
-
-  //  Wt::Auth::AuthWidget* authWidget = new Wt::Auth::AuthWidget(::auth(), session_.users(),
-  //                                                              session_.login());
-  //  authWidget->model()->addPasswordAuth(&Session::passwordAuth());
-  //  authWidget->model()->addOAuth(Session::oAuth());
-  //  authWidget->setRegistrationEnabled(true);
-
-  //  authWidget->processEnvironment();
-
-  //  root()->addWidget(authWidget);
-
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
   root()->addWidget(createLoginHome());
 }
