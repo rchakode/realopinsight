@@ -75,24 +75,24 @@ Preferences::Preferences(qint32 _userRole, qint32 _formType)
 
   switch (_formType)
   {
-    case Preferences::ChangeMonitoringSettings:
-      organizePrefWindow();
-      break;
+  case Preferences::ChangeMonitoringSettings:
+    organizePrefWindow();
+    break;
 
-    case Preferences::ChangePassword:
-    case Preferences::ForceChangePassword:
-      organizeChangePasswdWindow();
-      break;
+  case Preferences::ChangePassword:
+  case Preferences::ForceChangePassword:
+    organizeChangePasswdWindow();
+    break;
 
-    case Preferences::ShowAbout:
-      organizeAbortWindow();
-      break;
+  case Preferences::ShowAbout:
+    organizeAbortWindow();
+    break;
 
-    case Preferences::BasicLoginForm:
-      loadBasicLoginForm();
-      break;
-    default:
-      break;
+  case Preferences::BasicLoginForm:
+    loadBasicLoginForm();
+    break;
+  default:
+    break;
   }
   addEvents();
 }
@@ -100,36 +100,36 @@ Preferences::Preferences(qint32 _userRole, qint32 _formType)
 Preferences::~Preferences()
 {
   switch(m_formType) {
-    case ChangeMonitoringSettings:
+  case ChangeMonitoringSettings:
 
-      delete m_sourceStates;
-      delete m_monitorTypeField;
-      delete m_monitorUrlField;
-      delete m_updateIntervalField;
-      delete m_brwBtn;
-      delete m_oldPwdField;
-      delete m_pwdField;
-      delete m_rePwdField;
-      delete m_changePwdBtn;
-      delete m_cancelBtn;
-      delete m_applySettingBtn;
-      delete m_addAsSourceBtn;
-      delete m_deleteSourceBtn;
-      delete m_sockAddrField;
-      delete m_sockPortField;
-      delete m_serverPassField;
-      delete m_donateBtn;
-      delete m_showAuthInfoChkbx;
-      delete m_useMklsChkbx;
-      delete m_verifySslPeerChkBx;
-      delete m_mainLayout;
-      break;
-    case BasicLoginForm:
-      delete m_realmLoginField;
-      delete m_realmPasswdField;
-      break;
-    default:
-      break;
+    delete m_sourceStates;
+    delete m_monitorTypeField;
+    delete m_monitorUrlField;
+    delete m_updateIntervalField;
+    delete m_brwBtn;
+    delete m_oldPwdField;
+    delete m_pwdField;
+    delete m_rePwdField;
+    delete m_changePwdBtn;
+    delete m_cancelBtn;
+    delete m_applySettingBtn;
+    delete m_addAsSourceBtn;
+    delete m_deleteSourceBtn;
+    delete m_sockAddrField;
+    delete m_sockPortField;
+    delete m_serverPassField;
+    delete m_donateBtn;
+    delete m_showAuthInfoChkbx;
+    delete m_useMklsChkbx;
+    delete m_verifySslPeerChkBx;
+    delete m_mainLayout;
+    break;
+  case BasicLoginForm:
+    delete m_realmLoginField;
+    delete m_realmPasswdField;
+    break;
+  default:
+    break;
   }
 }
 
@@ -145,13 +145,13 @@ void Preferences::showEvent (QShowEvent *)
 void Preferences::handleCancel(void)
 {
   switch(m_formType) {
-    case ChangeMonitoringSettings:
-      Q_EMIT sourcesChanged(m_updatedSources);
-      break;
-    case BasicLoginForm:
-      break;
-    default:
-      break;
+  case ChangeMonitoringSettings:
+    Q_EMIT sourcesChanged(m_updatedSources);
+    break;
+  case BasicLoginForm:
+    break;
+  default:
+    break;
   }
   m_cancelled = true;
   done(0);
@@ -160,14 +160,14 @@ void Preferences::handleCancel(void)
 void Preferences::applySettings(void)
 {
   switch(m_formType) {
-    case ChangeMonitoringSettings:
-      saveAsSource(m_selectedSource, selectSourceType());
-      break;
-    case BasicLoginForm:
-      done(0);
-      break;
-    default:
-      break;
+  case ChangeMonitoringSettings:
+    saveAsSource(m_selectedSource, selectSourceType());
+    break;
+  case BasicLoginForm:
+    done(0);
+    break;
+  default:
+    break;
   }
 }
 
@@ -198,7 +198,7 @@ void Preferences::deleteSource(void)
   if (m_selectedSource>=0 && m_selectedSource < MAX_SRCS) {
     m_sourceBtns.at(m_selectedSource)->setEnabled(false);
     m_sourceStates->setBit(m_selectedSource, false);
-    m_settings->settingEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
     m_settings->sync();
     updateFields();
   }
@@ -237,11 +237,12 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.auth = m_serverPassField->text();
   src.use_ls = m_useMklsChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
-  m_settings->settingEntry(utils::sourceKey(_idx), utils::source2Str(src));
-  m_settings->settingEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
+  m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   m_sourceStates->setBit(_idx, true);
-  m_settings->settingEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
+  m_settings->emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
   if (! m_updatedSources.contains(_idx)) {
     //FIXME: consider only if source is used in the loaded service view?
@@ -279,7 +280,6 @@ void Preferences::changePasswd(void)
                                APP_NAME,
                                tr("Password updated"),
                                QMessageBox::Ok);
-
       done(0);
     } else {
       utils::alert(tr("Sorry the passwords do not match"));

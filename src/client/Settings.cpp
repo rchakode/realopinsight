@@ -85,7 +85,7 @@ qint32 Settings::updateInterval() const
   return (interval > 0)? interval : MonitorBroker::DefaultUpdateInterval;
 }
 
-void Settings::settingEntry(const QString& key, const QString& value)
+void Settings::setEntry(const QString& key, const QString& value)
 {
   QSettings::setValue(key, value);
 }

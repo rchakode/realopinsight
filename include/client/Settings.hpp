@@ -26,19 +26,22 @@
 #define SETTINGS_HPP
 #include <QString>
 #include <QSettings>
+#include "Base.hpp"
 
 class Settings : public QSettings
 {
+  Q_OBJECT
 public:
   Settings();
+  virtual ~Settings(){}
   void setKeyValue(const QString & _key, const QString & _value);
   qint32 updateInterval() const;
-  void settingEntry(const QString& key, const QString& value);
-  QString settingEntry(const QString& key) const {return QSettings::value(key).toString();}
+  void setEntry(const QString& key, const QString& value);
+  QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
   bool loadSource(const qint32& _idx, SourceT& _src);
   bool loadSource(const QString& _id, SourceT& _src);
   bool setSource(const QString& _info, SourceT& _src);
-
+  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
 
   static const QString UPDATE_INTERVAL_KEY;
   static const QString ADM_UNSERNAME_KEY;
@@ -46,6 +49,9 @@ public:
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
   static const QString SRC_BUCKET_KEY;
+
+Q_SIGNALS:
+  void timerIntervalChanged(qint32);
 
 private:
   QTranslator* translator ;

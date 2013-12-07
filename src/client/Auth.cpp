@@ -78,8 +78,8 @@ void Auth::authentificate(void)
 {
   QString userName = m_loginField->text();
   QString userPasswd = QCryptographicHash::hash(m_passwordField->text().toAscii(), QCryptographicHash::Md5);
-  QString rootPasswd =  settings->settingEntry(Settings::ADM_PASSWD_KEY);
-  QString opPasswd =  settings->settingEntry(Settings::OP_PASSWD_KEY);
+  QString rootPasswd =  settings->setEntry(Settings::ADM_PASSWD_KEY);
+  QString opPasswd =  settings->setEntry(Settings::OP_PASSWD_KEY);
   if(	! rootPasswd.isEmpty()
       && userName == AdmUser
       && userPasswd == rootPasswd ) {
