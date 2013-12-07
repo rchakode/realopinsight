@@ -28,6 +28,7 @@
 
 #include <Wt/WTimer>
 #include <Wt/WApplication>
+#include <Wt/Auth/Login>
 #include "WebDashboard.hpp"
 #include "DbSession.hpp"
 
@@ -44,6 +45,19 @@ public:
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
   void handleInternalPath(void);
+
+  void authEvent() {
+    std::cout <<"ddddddddddddddddddddddddddddddddd\n";
+    if (login->loggedIn()) {
+      std::cout <<"ddddddddddddddddddddddddddddddddd>>>>>>>>>\n";
+      Wt::log("notice") << "User " << login->user().id()
+      << " logged in.";
+     // Wt::Dbo::Transaction t(session_);
+      //dbo::ptr<User> user = m_dbSession->users();
+    } else
+      std::cout <<"ddddddddddddddddddddddddddddddddd<<<\n";
+      Wt::log("notice") << "User logged out.";
+  }
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
@@ -69,6 +83,7 @@ private:
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
   DbSession* m_dbSession;
+  Wt::Auth::Login* login;
 
   void addEvents(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);

@@ -35,9 +35,37 @@
 #include <Wt/Auth/Dbo/AuthInfo>
 #include <Wt/Auth/Dbo/UserDatabase>
 
+namespace Wt {
+  namespace Auth {
+    class Login;
+  }
+}
 
 typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
-typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
+typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> WtDboUserDatabase;
+
+class UserDatabase : public WtDboUserDatabase
+{
+public:
+  UserDatabase(Wt::Dbo::Session &session)
+    : WtDboUserDatabase(session),
+      m_session(session)
+  {
+  }
+
+  virtual Wt::Auth::User registerNew(void)
+  {
+    User *user = new User();
+    m_user = m_session.add(user);
+    m_user.flush();
+    std::cout << "wwwwwwwwwwww>>>>>>>>>>>>>>ID = " <<m_user.id()<<"\n";
+    return Wt::Auth::User("1", *this);
+  }
+
+private:
+  dbo::Session& m_session;
+  mutable dbo::ptr<User> m_user;
+};
 
 class DbSession : public dbo::Session
 {
@@ -46,10 +74,15 @@ public:
   ~DbSession();
   void setup(void);
 
+  Wt::Auth::AuthService* auth() const {return m_basicAuthService;}
+  Wt::Auth::AbstractUserDatabase* users() const {return m_users;}
+  static Wt::Auth::Login login();
+  Wt::Auth::PasswordService* passwordAuth(void) const {return m_passAuthService;}
+
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
   Wt::Auth::AuthService* m_basicAuthService;
-  Wt::Auth::PasswordService* m_authService;
+  Wt::Auth::PasswordService* m_passAuthService;
   UserDatabase* m_users;
 
   void addUser(const std::string& username, const std::string& pass, int role);

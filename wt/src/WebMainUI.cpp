@@ -37,8 +37,9 @@
 #include <Wt/WDialog>
 #include <Wt/WSelectionBox>
 #include <Wt/WTemplate>
-
 #include <Wt/Auth/AuthWidget>
+
+typedef Wt::Auth::AuthWidget AuthWidget;
 
 const std::string LINK_LOAD ="/load-platform";
 const std::string LINK_IMPORT ="/import-platform";
@@ -73,7 +74,6 @@ WebMainUI::~WebMainUI()
 void WebMainUI::addEvents(void)
 {
   internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
-  //FIXME: use right signal
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
@@ -91,8 +91,22 @@ void WebMainUI::showAdminHome(void)
 
 void WebMainUI::showLoginHome(void)
 {
+
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
-  root()->addWidget(createLoginHome());
+  login = new Wt::Auth::Login();
+  AuthWidget* authWidget = new AuthWidget(*m_dbSession->auth(),
+                                          *m_dbSession->users(),
+                                          *login);
+  authWidget->addStyleClass("login-container");
+  authWidget->model()->addPasswordAuth(m_dbSession->passwordAuth());
+  authWidget->setRegistrationEnabled(true);
+  authWidget->processEnvironment();
+
+ // login->changed().connect(this, &WebMainUI::authEvent);
+
+  root()->addWidget(authWidget);
+
+//  root()->addWidget(createLoginHome());
 }
 
 Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
