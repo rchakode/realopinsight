@@ -53,18 +53,28 @@ public:
   {
   }
 
+  void setUser(const User& userData)
+  {
+    m_userData = userData;
+  }
+
   virtual Wt::Auth::User registerNew(void)
   {
-    User *user = new User();
-    m_user = m_session.add(user);
+   // User* user = new User();
+    m_user = m_session.add(&m_userData);
+    AuthInfo* authInfo = new AuthInfo();
+    authInfo->setUser(m_user);
+    m_userAuthInfo = m_session.add(authInfo);
     m_user.flush();
-    std::cout << "wwwwwwwwwwww>>>>>>>>>>>>>>ID = " <<m_user.id()<<"\n";
-    return Wt::Auth::User("1", *this);
+    m_userAuthInfo.flush();
+    return Wt::Auth::User(boost::lexical_cast<std::string>(m_userAuthInfo.id()), *this);
   }
 
 private:
   dbo::Session& m_session;
-  mutable dbo::ptr<User> m_user;
+  dbo::ptr<User> m_user;
+  dbo::ptr<AuthInfo> m_userAuthInfo;
+  User m_userData;
 };
 
 class DbSession : public dbo::Session

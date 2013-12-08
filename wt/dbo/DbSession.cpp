@@ -38,7 +38,6 @@ DbSession::DbSession():
 
   setup();
 
-
   Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
   verifier->addHashFunction(new Wt::Auth::BCryptHashFunction());
   m_passAuthService->setVerifier(verifier);
@@ -76,24 +75,21 @@ void DbSession::setup(void)
   }
   m_users = new UserDatabase(*this);
   addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
-  addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
+  //addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
 }
 
 void DbSession::addUser(const std::string& username, const std::string& pass, int role)
 {
   try {
     dbo::Transaction transaction(*this);
-    Wt::Auth::User user = m_users->registerNew();
-    user.addIdentity("username", username);
-    m_passAuthService->updatePassword(user, pass);
-    //    User *user = new User();
-    //    user->username = username;
-    //    user->password = hashPassword(pass);
-    //    user->role =  role;
-    //    dbo::ptr<User> userPtr = add(user);
-    //    AuthInfo* authInfo = new AuthInfo();
-    //    authInfo->setUser(userPtr);
-    //    add(authInfo);
+    User user;
+    user.username = username;
+    user.password = hashPassword(pass);
+    user.role =  role;
+    m_users->setUser(user);
+    Wt::Auth::User auser = m_users->registerNew();
+    auser.addIdentity(Wt::Auth::Identity::LoginName, username);
+    m_passAuthService->updatePassword(auser, user.password);
     transaction.commit();
   } catch (const std::exception& ex) {
     Wt::log("[realopinsight] error") << ex.what();
