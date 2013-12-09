@@ -46,19 +46,6 @@ public:
   void resetTimer(void);
   void handleInternalPath(void);
 
-  void authEvent() {
-    std::cout <<"ddddddddddddddddddddddddddddddddd\n";
-    if (m_login->loggedIn()) {
-      std::cout <<"ddddddddddddddddddddddddddddddddd>>>>>>>>>\n";
-      Wt::log("notice") << "User " << m_login->user().id()
-      << " logged in.";
-     // Wt::Dbo::Transaction t(session_);
-      //dbo::ptr<User> user = m_dbSession->users();
-    } else
-      std::cout <<"ddddddddddddddddddddddddddddddddd<<<\n";
-      Wt::log("notice") << "User logged out.";
-  }
-
 public Q_SLOTS:
   void resetTimer(qint32 interval);
 
@@ -86,6 +73,7 @@ private:
   Wt::Auth::Login* m_login;
 
   void addEvents(void);
+  void checkAuth(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);

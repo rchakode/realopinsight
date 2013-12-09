@@ -46,14 +46,14 @@ namespace Wt {
 
 class User {
 public:
-  std::string name; /* a copy of auth info's user name */
+  std::string username; /* a copy of auth info's user name */
   int role;
 
   template<class Action>
   void persist(Action& a)
   {
+    dbo::id(a, username, "name");
     dbo::field(a, role, "role");
-    dbo::field(a, name, "name");
   }
 };
 

@@ -35,7 +35,8 @@ namespace {
 }
 
 DbSession::DbSession():
-  m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db"))
+  m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db")),
+  m_dbUsers(new UserDatabase(*this))
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
@@ -66,19 +67,14 @@ void DbSession::setup(void)
   mapClass<AuthInfo::AuthTokenType>("auth_token");
 
   try {
-    std::cout << "cut>>>>>>>>>>>>>>3\n";
     createTables();
-    std::cout << "cut>>>>>>>>>>>>>>3\n";
+    addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
+    addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
     std::cerr << "Created database\n";
   } catch (std::exception& ex) {
     std::cerr << ex.what() << "\n";
     std::cerr << "Using existing database\n";
   }
-  std::cout << "cut>>>>>>>>>>>>>>77\n";
-  m_dbUsers = new UserDatabase(*this);
-
-  addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
-  addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
 }
 
 void DbSession::addUser(const std::string& username, const std::string& pass, int role)
@@ -86,10 +82,12 @@ void DbSession::addUser(const std::string& username, const std::string& pass, in
   dbo::Transaction transaction(*this);
   try {
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
+    dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, username);
-    dbo::ptr<AuthInfo> authInfo = m_dbUsers->find(dbuser);
-    dbo::ptr<User> user = authInfo->user();
-    user.modify()->role = role;
+    User u;
+    u.username = username;
+    u.role = role;
+    info.modify()->setUser(add(&u));
     passAuthService.updatePassword(dbuser, pass);
   } catch (const std::exception& ex) {
     Wt::log("[realopinsight] error") << ex.what();
