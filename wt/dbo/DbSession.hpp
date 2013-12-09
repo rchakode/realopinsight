@@ -42,40 +42,39 @@ namespace Wt {
 }
 
 typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
-typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> WtDboUserDatabase;
+typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
-class UserDatabase : public WtDboUserDatabase
-{
-public:
-  UserDatabase(Wt::Dbo::Session &session)
-    : WtDboUserDatabase(session),
-      m_session(session)
-  {
-  }
+//class UserDatabase : public WtDboUserDatabase
+//{
+//public:
+//  UserDatabase(Wt::Dbo::Session &session)
+//    : WtDboUserDatabase(session),
+//      m_session(session)
+//  {
+//  }
 
-  void setUser(const User& userData)
-  {
-    m_userData = userData;
-  }
+//  void setUser(const User& userData)
+//  {
+//    m_userData = userData;
+//  }
 
-  virtual Wt::Auth::User registerNew(void)
-  {
-   // User* user = new User();
-    m_user = m_session.add(&m_userData);
-    AuthInfo* authInfo = new AuthInfo();
-    authInfo->setUser(m_user);
-    m_userAuthInfo = m_session.add(authInfo);
-    m_user.flush();
-    m_userAuthInfo.flush();
-    return Wt::Auth::User(boost::lexical_cast<std::string>(m_userAuthInfo.id()), *this);
-  }
+//  virtual Wt::Auth::User registerNew(void)
+//  {
+//    m_userPtr = m_session.add(&m_userData);
+//    AuthInfo* authInfo = new AuthInfo();
+//    authInfo->setUser(m_userPtr);
+//    m_userAuthPtr = m_session.add(authInfo);
+//    m_userPtr.flush();
+//    m_userAuthPtr.flush();
+//    return Wt::Auth::User(boost::lexical_cast<std::string>(m_userAuthPtr.id()), *this);
+//  }
 
-private:
-  dbo::Session& m_session;
-  dbo::ptr<User> m_user;
-  dbo::ptr<AuthInfo> m_userAuthInfo;
-  User m_userData;
-};
+//private:
+//  dbo::Session& m_session;
+//  dbo::ptr<User> m_userPtr;
+//  dbo::ptr<AuthInfo> m_userAuthPtr;
+//  User m_userData;
+//};
 
 class DbSession : public dbo::Session
 {
@@ -84,16 +83,13 @@ public:
   ~DbSession();
   void setup(void);
 
-  Wt::Auth::AuthService* auth() const {return m_basicAuthService;}
-  Wt::Auth::AbstractUserDatabase* users() const {return m_users;}
-  static Wt::Auth::Login login();
-  Wt::Auth::PasswordService* passwordAuth(void) const {return m_passAuthService;}
+  Wt::Auth::AbstractUserDatabase* users() const {return m_dbUsers;}
+  static Wt::Auth::AuthService& auth();
+  static Wt::Auth::PasswordService& passwordAuth(void);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
-  Wt::Auth::AuthService* m_basicAuthService;
-  Wt::Auth::PasswordService* m_passAuthService;
-  UserDatabase* m_users;
+  UserDatabase* m_dbUsers;
 
   void addUser(const std::string& username, const std::string& pass, int role);
   std::string hashPassword(const std::string& pass);

@@ -40,9 +40,10 @@
 #include <Wt/Auth/AuthWidget>
 
 typedef Wt::Auth::AuthWidget AuthWidget;
-
-const std::string LINK_LOAD ="/load-platform";
-const std::string LINK_IMPORT ="/import-platform";
+namespace {
+  const std::string LINK_LOAD ="/load-platform";
+  const std::string LINK_IMPORT ="/import-platform";
+}
 
 WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
@@ -62,6 +63,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 
 WebMainUI::~WebMainUI()
 {
+  delete m_login;
   delete m_timer;
   delete m_infoBox;
   delete m_fileUploadDialog;
@@ -91,14 +93,13 @@ void WebMainUI::showAdminHome(void)
 
 void WebMainUI::showLoginHome(void)
 {
-
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
-  login = new Wt::Auth::Login();
-  AuthWidget* authWidget = new AuthWidget(*m_dbSession->auth(),
+  m_login = new Wt::Auth::Login();
+  AuthWidget* authWidget = new AuthWidget( DbSession::auth(),
                                           *m_dbSession->users(),
-                                          *login);
+                                          *m_login);
   authWidget->addStyleClass("login-container");
-  authWidget->model()->addPasswordAuth(m_dbSession->passwordAuth());
+  authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuth());
   authWidget->setRegistrationEnabled(true);
   authWidget->processEnvironment();
 

@@ -26,37 +26,36 @@
 #include <Wt/Auth/PasswordVerifier>
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/Identity>
+#include <Wt/Auth/PasswordStrengthValidator>
 
+
+namespace {
+  Wt::Auth::AuthService basicAuthService;
+  Wt::Auth::PasswordService passAuthService(basicAuthService);
+}
 
 DbSession::DbSession():
-  m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db")),
-  m_basicAuthService(new Wt::Auth::AuthService()),
-  m_passAuthService(new Wt::Auth::PasswordService(*m_basicAuthService))
+  m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db"))
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
 
-  setup();
-
   Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
-  verifier->addHashFunction(new Wt::Auth::BCryptHashFunction());
-  m_passAuthService->setVerifier(verifier);
-  m_passAuthService->setAttemptThrottlingEnabled(true);
-  //FIXME: m_authService->setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
-  //  try {
-  //    Wt::Auth::User user("1", *m_users);
-  //    std::cout << m_authService->verifyPassword(user, "ngrt4n_adm")<<"VERIFFIIIIIIIIIIIII\n";
-  //  } catch (const std::exception& ex) {
-  //    std::cout << ex.what()<< "==>>>>>>>>>>>>>>>>>>>>>>>\n";
-  //  }
+  verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));
+
+  basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
+  basicAuthService.setEmailVerificationEnabled(true);
+  passAuthService.setVerifier(verifier);
+  passAuthService.setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
+  passAuthService.setAttemptThrottlingEnabled(true);
+
+  setup();
 }
 
 DbSession::~DbSession()
 {
   delete m_sqlite3Db;
-  delete m_users;
-  delete m_basicAuthService;
-  delete m_passAuthService;
+  delete m_dbUsers;
 }
 
 void DbSession::setup(void)
@@ -67,37 +66,49 @@ void DbSession::setup(void)
   mapClass<AuthInfo::AuthTokenType>("auth_token");
 
   try {
+    std::cout << "cut>>>>>>>>>>>>>>3\n";
     createTables();
+    std::cout << "cut>>>>>>>>>>>>>>3\n";
     std::cerr << "Created database\n";
   } catch (std::exception& ex) {
     std::cerr << ex.what() << "\n";
     std::cerr << "Using existing database\n";
   }
-  m_users = new UserDatabase(*this);
+  std::cout << "cut>>>>>>>>>>>>>>77\n";
+  m_dbUsers = new UserDatabase(*this);
+
   addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
-  //addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
+  addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
 }
 
 void DbSession::addUser(const std::string& username, const std::string& pass, int role)
 {
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
-    User user;
-    user.username = username;
-    user.password = hashPassword(pass);
-    user.role =  role;
-    m_users->setUser(user);
-    Wt::Auth::User auser = m_users->registerNew();
-    auser.addIdentity(Wt::Auth::Identity::LoginName, username);
-    m_passAuthService->updatePassword(auser, user.password);
-    transaction.commit();
+    Wt::Auth::User dbuser = m_dbUsers->registerNew();
+    dbuser.addIdentity(Wt::Auth::Identity::LoginName, username);
+    dbo::ptr<AuthInfo> authInfo = m_dbUsers->find(dbuser);
+    dbo::ptr<User> user = authInfo->user();
+    user.modify()->role = role;
+    passAuthService.updatePassword(dbuser, pass);
   } catch (const std::exception& ex) {
     Wt::log("[realopinsight] error") << ex.what();
   }
+  transaction.commit();
 }
 
 std::string DbSession::hashPassword(const std::string& pass)
 {
   Wt::Auth::BCryptHashFunction h;
   return h.compute(pass, "salt");
+}
+
+Wt::Auth::AuthService& DbSession::auth()
+{
+  return basicAuthService;
+}
+
+Wt::Auth::PasswordService& DbSession::passwordAuth(void)
+{
+  return passAuthService;
 }

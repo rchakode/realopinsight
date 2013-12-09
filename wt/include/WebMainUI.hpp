@@ -48,9 +48,9 @@ public:
 
   void authEvent() {
     std::cout <<"ddddddddddddddddddddddddddddddddd\n";
-    if (login->loggedIn()) {
+    if (m_login->loggedIn()) {
       std::cout <<"ddddddddddddddddddddddddddddddddd>>>>>>>>>\n";
-      Wt::log("notice") << "User " << login->user().id()
+      Wt::log("notice") << "User " << m_login->user().id()
       << " logged in.";
      // Wt::Dbo::Transaction t(session_);
       //dbo::ptr<User> user = m_dbSession->users();
@@ -83,7 +83,7 @@ private:
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
   DbSession* m_dbSession;
-  Wt::Auth::Login* login;
+  Wt::Auth::Login* m_login;
 
   void addEvents(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
