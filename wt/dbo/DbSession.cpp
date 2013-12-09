@@ -40,16 +40,7 @@ DbSession::DbSession():
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
-
-  Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
-  verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));
-
-  basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
-  basicAuthService.setEmailVerificationEnabled(true);
-  passAuthService.setVerifier(verifier);
-  passAuthService.setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
-  passAuthService.setAttemptThrottlingEnabled(true);
-
+  configureAuth();
   setup();
 }
 
@@ -83,12 +74,12 @@ void DbSession::addUser(const std::string& username, const std::string& pass, in
   try {
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
-    dbuser.addIdentity(Wt::Auth::Identity::LoginName, username);
     User u;
     u.username = username;
     u.role = role;
     info.modify()->setUser(add(&u));
     passAuthService.updatePassword(dbuser, pass);
+    dbuser.addIdentity(Wt::Auth::Identity::LoginName, username);
   } catch (const std::exception& ex) {
     Wt::log("[realopinsight] error") << ex.what();
   }
@@ -109,4 +100,15 @@ Wt::Auth::AuthService& DbSession::auth()
 Wt::Auth::PasswordService& DbSession::passwordAuth(void)
 {
   return passAuthService;
+}
+
+void DbSession::configureAuth(void)
+{
+  basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
+  basicAuthService.setEmailVerificationEnabled(true);
+  Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
+  verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));
+  passAuthService.setVerifier(verifier);
+  passAuthService.setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
+  passAuthService.setAttemptThrottlingEnabled(true);
 }

@@ -44,38 +44,6 @@ namespace Wt {
 typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
-//class UserDatabase : public WtDboUserDatabase
-//{
-//public:
-//  UserDatabase(Wt::Dbo::Session &session)
-//    : WtDboUserDatabase(session),
-//      m_session(session)
-//  {
-//  }
-
-//  void setUser(const User& userData)
-//  {
-//    m_userData = userData;
-//  }
-
-//  virtual Wt::Auth::User registerNew(void)
-//  {
-//    m_userPtr = m_session.add(&m_userData);
-//    AuthInfo* authInfo = new AuthInfo();
-//    authInfo->setUser(m_userPtr);
-//    m_userAuthPtr = m_session.add(authInfo);
-//    m_userPtr.flush();
-//    m_userAuthPtr.flush();
-//    return Wt::Auth::User(boost::lexical_cast<std::string>(m_userAuthPtr.id()), *this);
-//  }
-
-//private:
-//  dbo::Session& m_session;
-//  dbo::ptr<User> m_userPtr;
-//  dbo::ptr<AuthInfo> m_userAuthPtr;
-//  User m_userData;
-//};
-
 class DbSession : public dbo::Session
 {
 public:
@@ -93,6 +61,7 @@ private:
 
   void addUser(const std::string& username, const std::string& pass, int role);
   std::string hashPassword(const std::string& pass);
+  void configureAuth(void);
 };
 
 #endif // DBSESSION_HPP
