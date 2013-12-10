@@ -31,11 +31,11 @@ int main(int argc, char **argv)
       server.stop();
     }
   } catch (Wt::WServer::Exception& e) {
-    std::cerr << e.what() << std::endl;
+    std::cerr << e.what() <"\n";
   } catch (Wt::Dbo::Exception &e) {
-    std::cerr << "Dbo exception: " << e.what() << std::endl;
+    std::cerr << "Dbo exception: " << e.what() <<"\n";
   } catch (std::exception &e) {
-    std::cerr << "exception: " << e.what() << std::endl;
+    std::cerr << "exception: " << e.what() <<"\n";
   }
 
   QApplication* qtApp = new QApplication(argc, argv);
