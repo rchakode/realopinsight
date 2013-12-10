@@ -40,7 +40,7 @@ DbSession::DbSession():
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
-  configureAuth();
+  //configureAuth();
   setup();
 }
 

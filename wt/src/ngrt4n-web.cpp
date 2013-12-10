@@ -1,5 +1,6 @@
 #include "WebMainUI.hpp"
 #include <Wt/WBootstrapTheme>
+#include <Wt/WServer>
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
@@ -16,6 +17,28 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 
 int main(int argc, char **argv)
 {
+
+  try {
+    Wt::WServer server(argv[0]);
+
+    server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
+    server.addEntryPoint(Wt::Application, &createApplication);
+
+    DbSession::configureAuth();
+
+    if (server.start()) {
+      Wt::WServer::waitForShutdown();
+      server.stop();
+    }
+  } catch (Wt::WServer::Exception& e) {
+    std::cerr << e.what() << std::endl;
+  } catch (Wt::Dbo::Exception &e) {
+    std::cerr << "Dbo exception: " << e.what() << std::endl;
+  } catch (std::exception &e) {
+    std::cerr << "exception: " << e.what() << std::endl;
+  }
+
   QApplication* qtApp = new QApplication(argc, argv);
-  return Wt::WRun(argc, argv, &createApplication) | qtApp->exec();
+  //  return Wt::WRun(argc, argv, &createApplication) | qtApp->exec();
+  return qtApp->exec();
 }

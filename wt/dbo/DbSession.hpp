@@ -54,6 +54,7 @@ public:
   Wt::Auth::AbstractUserDatabase* users() const {return m_dbUsers;}
   static Wt::Auth::AuthService& auth();
   static Wt::Auth::PasswordService& passwordAuth(void);
+  static void configureAuth(void);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
@@ -61,7 +62,6 @@ private:
 
   void addUser(const std::string& username, const std::string& pass, int role);
   std::string hashPassword(const std::string& pass);
-  void configureAuth(void);
 };
 
 #endif // DBSESSION_HPP
