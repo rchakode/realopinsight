@@ -38,9 +38,11 @@
 #include <Wt/WSelectionBox>
 #include <Wt/WTemplate>
 #include <Wt/Auth/AuthWidget>
+#include <Wt/Auth/Login>
 
 typedef Wt::Auth::AuthWidget AuthWidget;
 namespace {
+  //  Wt::Auth::Login login; /* slot conflict if decleared in the DbSession class */
   const std::string LINK_LOAD ="/load-platform";
   const std::string LINK_IMPORT ="/import-platform";
   const std::string LINK_LOGIN_PAGE ="/login";
@@ -54,8 +56,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
     m_infoBox(new Wt::WText("", m_mainWidget)),
-    m_dbSession(new DbSession()),
-    m_login(new Wt::Auth::Login())
+    m_dbSession(new DbSession())
 {
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
@@ -66,7 +67,6 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 
 WebMainUI::~WebMainUI()
 {
-  delete m_login;
   delete m_timer;
   delete m_infoBox;
   delete m_fileUploadDialog;
@@ -78,14 +78,33 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  m_login->changed().connect(this, &WebMainUI::checkAuth);
+  login.changed().connect(this, &WebMainUI::handleAuthentification);
   internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
+void WebMainUI::showLoginHome(void)
+{
+  root()->addWidget(createLoginHome());
+}
+
+Wt::WWidget* WebMainUI::createLoginHome(void)
+{
+  setInternalPath(LINK_LOGIN_PAGE);
+  setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
+  AuthWidget* authWidget = new AuthWidget( DbSession::auth(),
+                                           m_dbSession->users(),
+                                           login);
+  authWidget->addStyleClass("login-container");
+  authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuthentificator());
+  authWidget->setRegistrationEnabled(false);
+  authWidget->processEnvironment();
+  return authWidget;
+}
 
 void WebMainUI::showAdminHome(void)
 {
+  checkUserLogin();
   setInternalPath(LINK_ADMIN_HOME);
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
@@ -96,13 +115,10 @@ void WebMainUI::showAdminHome(void)
   root()->addWidget(m_mainWidget);
 }
 
-void WebMainUI::showLoginHome(void)
-{
-  root()->addWidget(createLoginHome());
-}
 
 Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
 {
+  checkUserLogin();
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
   navigation->setResponsive(true);
@@ -131,9 +147,9 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
       ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
   popup->addItem("About");
   popup->addSeparator();
-  popup->addItem("Sign out");
+  popup->addItem("Logout")->triggered().connect(std::bind([=](){ login.logout(); }));
 
-  item = new Wt::WMenuItem("Menu");
+  item = new Wt::WMenuItem(loggedUser());
   item->setMenu(popup);
   rightMenu->addItem(item);
 
@@ -153,6 +169,7 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
 
 Wt::WContainerWidget* WebMainUI::createToolBar(void)
 {
+  checkUserLogin();
   Wt::WContainerWidget* container(new Wt::WContainerWidget());
   Wt::WHBoxLayout* layout(new Wt::WHBoxLayout(container));
   Wt::WToolBar* toolBar(new Wt::WToolBar());
@@ -185,6 +202,7 @@ Wt::WContainerWidget* WebMainUI::createToolBar(void)
 
 Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 {
+  checkUserLogin();
   Wt::WPushButton* button = new Wt::WPushButton();
   button->setIcon(icon);
   return button;
@@ -192,6 +210,7 @@ Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 
 void WebMainUI::resetTimer(void)
 {
+  checkUserLogin();
   m_timer->setInterval(1000*m_settings->updateInterval());
   m_timer->timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer->start();
@@ -199,6 +218,7 @@ void WebMainUI::resetTimer(void)
 
 void WebMainUI::resetTimer(qint32 interval)
 {
+  checkUserLogin();
   m_timer->stop();
   m_timer->setInterval(interval);
   m_timer->start();
@@ -206,6 +226,7 @@ void WebMainUI::resetTimer(qint32 interval)
 
 void WebMainUI::handleRefresh(void)
 {
+  checkUserLogin();
   m_timer->stop();
   m_mainWidget->disable();
   for(auto&dash: m_dashboards) {
@@ -218,6 +239,7 @@ void WebMainUI::handleRefresh(void)
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
+  checkUserLogin();
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
                                         new Wt::WImage("/images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
@@ -228,6 +250,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectFileToOpen(void)
 {
+  checkUserLogin();
   m_fileUploadDialog = new Wt::WDialog(QObject::tr("Select a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
 
@@ -266,6 +289,7 @@ void WebMainUI::selectFileToOpen(void)
 
 void WebMainUI::openFileUploadDialog(void)
 {
+  checkUserLogin();
   m_fileUploadDialog = new Wt::WDialog(QObject::tr("Import a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
 
@@ -309,37 +333,39 @@ void WebMainUI::openFileUploadDialog(void)
 
 void WebMainUI::finishFileDialog(int action)
 {
+  checkUserLogin();
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        QDir cdir(CONFIG_DIR);
-        if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-          //FIXME: display in console
-          utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
-        }
-        QFile file(QString::fromStdString(m_uploader->spoolFileName()));
-        file.copy(QString("%1/%2").arg(cdir.absolutePath(),
-                                       QString::fromStdString(m_uploader->clientFileName().toUTF8())));
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      QDir cdir(CONFIG_DIR);
+      if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
+        //FIXME: display in console
+        utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectFile.empty()) {
-        openFile(m_selectFile);
-        m_selectFile.clear();
-      } else {
-        m_infoBox->setText(QObject::tr("No file selected").toStdString());
-        m_infoBox->setHidden(false);
-      }
-      break;
-    default:
-      break;
+      QFile file(QString::fromStdString(m_uploader->spoolFileName()));
+      file.copy(QString("%1/%2").arg(cdir.absolutePath(),
+                                     QString::fromStdString(m_uploader->clientFileName().toUTF8())));
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectFile.empty()) {
+      openFile(m_selectFile);
+      m_selectFile.clear();
+    } else {
+      m_infoBox->setText(QObject::tr("No file selected").toStdString());
+      m_infoBox->setHidden(false);
+    }
+    break;
+  default:
+    break;
   }
 }
 
 void WebMainUI::openFile(const std::string& path)
 {
+  checkUserLogin();
   std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
   WebDashboard* dashboard = new WebDashboard(m_userRole,
                                              QString::fromStdString(realPath));
@@ -370,11 +396,13 @@ void WebMainUI::openFile(const std::string& path)
 
 void WebMainUI::scaleMap(double factor)
 {
+  checkUserLogin();
   m_currentDashboard->map()->scaleMap(factor);
 }
 
 void WebMainUI::handleInternalPath(void)
 {
+  checkUserLogin();
   std::string path = Wt::WApplication::instance()->internalPath();
   if (path == LINK_LOAD) {
     selectFileToOpen();
@@ -395,6 +423,7 @@ void WebMainUI::handleInternalPath(void)
 
 void WebMainUI::createAdminHome(void)
 {
+  checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   tpl->bindWidget("info-box", m_infoBox);
   tpl->bindWidget("andhor-load-file",
@@ -405,19 +434,6 @@ void WebMainUI::createAdminHome(void)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 }
 
-Wt::WWidget* WebMainUI::createLoginHome(void)
-{
-  setInternalPath(LINK_LOGIN_PAGE);
-  setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
-  AuthWidget* authWidget = new AuthWidget( DbSession::auth(),
-                                           *m_dbSession->users(),
-                                           *m_login);
-  authWidget->addStyleClass("login-container");
-  authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuth());
-  authWidget->setRegistrationEnabled(false);
-  authWidget->processEnvironment();
-  return authWidget;
-}
 
 Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
                                                 const std::string& desc,
@@ -431,14 +447,27 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
 }
 
 
-void WebMainUI::checkAuth(void)
+void WebMainUI::handleAuthentification(void)
 {
   root()->clear();
-  if (m_login->loggedIn()) {
-    Wt::log("notice")<<"User "<<m_login->user().id()<<" logged in.";
+  if (login.loggedIn()) {
+    Wt::log("notice")<<"[realopinsight] "<< loggedUser()<<" logged in.";
     showAdminHome();
   } else {
-    Wt::log("notice") << "Not connected. Redirecting to login page.";
+    Wt::log("notice") << "[realopinsight] "<<"Not connected. Redirecting to login page.";
     showLoginHome();
+  }
+}
+
+std::string WebMainUI::loggedUser(void)
+{
+  return m_dbSession->getUsername(login.user().id());
+}
+
+
+void WebMainUI::checkUserLogin(void)
+{
+  if (! login.loggedIn()) {
+    redirect(LINK_LOGIN_PAGE);
   }
 }

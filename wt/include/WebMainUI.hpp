@@ -70,10 +70,10 @@ private:
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
   DbSession* m_dbSession;
-  Wt::Auth::Login* m_login;
+  Wt::Auth::Login login; /* slot conflict if decleared in the DbSession class */
 
   void addEvents(void);
-  void checkAuth(void);
+  void handleAuthentification(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);
@@ -87,6 +87,8 @@ private:
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
                                        const std::string& internalPath);
+  std::string loggedUser(void);
+  void checkUserLogin(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

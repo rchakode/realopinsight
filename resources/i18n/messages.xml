@@ -49,16 +49,16 @@
       </div>
 
       <!-- Quick Links Pane -->
-      <div class="span3">
-        <div class="span3 page-header">
+      <div class="span2">
+        <div class="span2 page-header">
           <h1><small>I'm ready</small></h1>
         </div>
         <!-- List actions -->
-        <div class="span3">
+        <div class="span2">
            ${info-box}
         </div>
 
-        <div class="span3 list-group">
+        <div class="span2 list-group">
         ${andhor-load-file}
         ${andhor-import-file}
         </div>

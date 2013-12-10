@@ -28,7 +28,6 @@
 #include <Wt/Auth/Identity>
 #include <Wt/Auth/PasswordStrengthValidator>
 
-
 namespace {
   Wt::Auth::AuthService basicAuthService;
   Wt::Auth::PasswordService passAuthService(basicAuthService);
@@ -40,7 +39,6 @@ DbSession::DbSession():
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
-  //configureAuth();
   setup();
 }
 
@@ -61,10 +59,10 @@ void DbSession::setup(void)
     createTables();
     addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
     addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
-    std::cerr << "Created database\n";
+    Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
   } catch (std::exception& ex) {
-    std::cerr << ex.what() << "\n";
-    std::cerr << "Using existing database\n";
+    Wt::log("notice")<<"[realopinsight] "<< "Using existing database";
+    Wt::log("notice")<<"[realopinsight][dbo] "<< ex.what();
   }
 }
 
@@ -97,7 +95,7 @@ Wt::Auth::AuthService& DbSession::auth()
   return basicAuthService;
 }
 
-Wt::Auth::PasswordService& DbSession::passwordAuth(void)
+Wt::Auth::PasswordService& DbSession::passwordAuthentificator(void)
 {
   return passAuthService;
 }
@@ -111,4 +109,14 @@ void DbSession::configureAuth(void)
   passAuthService.setVerifier(verifier);
   passAuthService.setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
   passAuthService.setAttemptThrottlingEnabled(true);
+}
+
+std::string DbSession::getUsername(const std::string& uid)
+{
+
+  dbo::Transaction transaction(*this);
+  dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id="+uid);
+  std::string username = info.modify()->user()->username;
+  transaction.commit();
+  return username;
 }

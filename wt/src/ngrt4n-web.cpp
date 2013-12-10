@@ -17,10 +17,8 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 
 int main(int argc, char **argv)
 {
-
   try {
     Wt::WServer server(argv[0]);
-
     server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
     server.addEntryPoint(Wt::Application, &createApplication);
 
@@ -31,14 +29,12 @@ int main(int argc, char **argv)
       server.stop();
     }
   } catch (Wt::WServer::Exception& e) {
-    std::cerr << e.what() <"\n";
+    Wt::log("error")<<"[realopinsight] "<< e.what();
   } catch (Wt::Dbo::Exception &e) {
-    std::cerr << "Dbo exception: " << e.what() <<"\n";
+    Wt::log("error")<<"[realopinsight][dbo] "<< e.what();
   } catch (std::exception &e) {
-    std::cerr << "exception: " << e.what() <<"\n";
+    Wt::log("error")<<"[realopinsight] "<< e.what();
   }
-
   QApplication* qtApp = new QApplication(argc, argv);
-  //  return Wt::WRun(argc, argv, &createApplication) | qtApp->exec();
   return qtApp->exec();
 }

@@ -51,10 +51,11 @@ public:
   ~DbSession();
   void setup(void);
 
-  Wt::Auth::AbstractUserDatabase* users() const {return m_dbUsers;}
+  Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
   static Wt::Auth::AuthService& auth();
-  static Wt::Auth::PasswordService& passwordAuth(void);
+  static Wt::Auth::PasswordService& passwordAuthentificator(void);
   static void configureAuth(void);
+  std::string getUsername(const std::string& uid);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
