@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <messages>
+  <message id="copyright-info">
+   &nbsp;&copy; 2010 - 2013 NGRT4N Project - Terms &amp; Privacy
+  </message>
+
   <message id="template.home">
   <div class="home-container">
     <div class="row">
@@ -64,6 +68,7 @@
         </div>
       </div>
     </div>
+    ${block:copyright-info}
     </div> <!-- home-container -->
   </message>
 
@@ -95,7 +100,6 @@
               ${user-name}
             </div>
           </div>
-
           ${block:Wt.Auth.field password}
           ${block:Wt.Auth.field remember-me}
         ${</if:passwords>}
@@ -108,15 +112,11 @@
             </div>
           </div>
         ${</if:oauth>}
-
         <div class="form-actions">
-          <p>${login class="btn-primary"}</p>
-          <p>${lost-password class="btn-link"} ${sep}
-          ${register class="btn-link"}</p>
+          <div>${login class="btn-primary"} <span>${lost-password class="btn-link"} ${sep} ${register class="btn-link"}</span></div>
         </div>
       </div>
-      RealOpInsight 3.0.0 - Copyright 2010-2013 NGRT4N Project. All rights reserved
+      ${block:copyright-info}
     </div>
   </message>
-
 </messages>

@@ -39,6 +39,7 @@
 #include <Wt/WTemplate>
 #include <Wt/Auth/AuthWidget>
 #include <Wt/Auth/Login>
+#include <Wt/WHBoxLayout>
 
 typedef Wt::Auth::AuthWidget AuthWidget;
 namespace {
@@ -109,49 +110,54 @@ void WebMainUI::showAdminHome(void)
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setSpacing(0);
+  mainLayout->addWidget(createLogoBar());
   mainLayout->addWidget(createMenuBarWidget());
   createAdminHome();
   resetTimer();
   root()->addWidget(m_mainWidget);
 }
 
+Wt::WWidget* WebMainUI::createLogoBar(void)
+{
+  checkUserLogin();
+  Wt::WNavigationBar* bar(new Wt::WNavigationBar());
+  bar->addWidget(createLogoLink(), Wt::AlignLeft);
 
-Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
+  Wt::WMenu* menu(new Wt::WMenu());
+  bar->addMenu(menu, Wt::AlignRight);
+  menu->addItem("Documentation")
+      ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
+
+
+  Wt::WPopupMenu* popup = new Wt::WPopupMenu();
+  Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(loggedUser().c_str()).toStdString());
+  item->setMenu(popup);
+  menu->addItem(item);
+
+  popup->addItem(QObject::tr("Edit profile").toStdString().c_str())
+      ->triggered().connect(std::bind([=](){ login.logout();}));
+  popup->addItem(QObject::tr("Change password").toStdString().c_str())
+      ->triggered().connect(std::bind([=](){ login.logout();}));
+  popup->addItem("Logout")
+      ->triggered().connect(std::bind([=](){ login.logout();}));
+  return bar;
+}
+
+Wt::WWidget* WebMainUI::createMenuBarWidget(void)
 {
   checkUserLogin();
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
-  Wt::WNavigationBar* navigation = new Wt::WNavigationBar(menuBar);
-  navigation->setResponsive(true);
-  navigation->addWidget(createLogoLink());
+  Wt::WNavigationBar* navBar = new Wt::WNavigationBar(menuBar);
+  navBar->setResponsive(true);
 
   Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
   contentsStack->setId("stackcontentarea");
 
   // Setup a Left-aligned menu.
   m_dashboardMenu = new Wt::WMenu(contentsStack);
-  navigation->addMenu(m_dashboardMenu);
-  navigation->addWidget(createToolBar());
-
-  // Setup a Right-aligned menu.
-  Wt::WMenu* rightMenu = new Wt::WMenu();
-  navigation->addMenu(rightMenu, Wt::AlignRight);
-
-  // Create a popup submenu for the Help menu.
-  Wt::WPopupMenu* popup = new Wt::WPopupMenu();
-  Wt::WMenuItem* item = popup->addItem("Open...");
-  item->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-  item = popup->addItem("Import");
-  item->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
-  popup->addSeparator();
-  popup->addItem("Documentation")
-      ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
-  popup->addItem("About");
-  popup->addSeparator();
-  popup->addItem("Logout")->triggered().connect(std::bind([=](){ login.logout(); }));
-
-  item = new Wt::WMenuItem(loggedUser());
-  item->setMenu(popup);
-  rightMenu->addItem(item);
+  navBar->addMenu(m_dashboardMenu);
+  navBar->addWidget(createToolBar());
 
   // Add a Search control.
   Wt::WLineEdit* edit = new Wt::WLineEdit();
@@ -162,12 +168,12 @@ Wt::WContainerWidget* WebMainUI::createMenuBarWidget(void)
     m_infoBox->setHidden(false);
   }));
 
-  navigation->addSearch(edit, Wt::AlignRight);
+  navBar->addSearch(edit, Wt::AlignRight);
   return menuBar;
 }
 
 
-Wt::WContainerWidget* WebMainUI::createToolBar(void)
+Wt::WWidget* WebMainUI::createToolBar(void)
 {
   checkUserLogin();
   Wt::WContainerWidget* container(new Wt::WContainerWidget());
@@ -427,9 +433,13 @@ void WebMainUI::createAdminHome(void)
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   tpl->bindWidget("info-box", m_infoBox);
   tpl->bindWidget("andhor-load-file",
-                  createAnchorForHomeLink("Open", "An existing platform", LINK_LOAD));
+                  createAnchorForHomeLink(QObject::tr("Open").toStdString(),
+                                          QObject::tr("An existing platform").toStdString(),
+                                          LINK_LOAD));
   tpl->bindWidget("andhor-import-file",
-                  createAnchorForHomeLink("Import", "A platform description", LINK_IMPORT));
+                  createAnchorForHomeLink(QObject::tr("Import").toStdString(),
+                                          QObject::tr("A platform description").toStdString(),
+                                          LINK_IMPORT));
   m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 }

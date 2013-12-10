@@ -1,5 +1,4 @@
 body, html {
-  font-size: 10pt;
   overflow: hidden;
 }
 /* Wt-domRoot from Wt */
@@ -80,5 +79,5 @@ body, html {
 }
 
 .form-actions {
- padding: 10px; 
+ padding: 5px; 
 }

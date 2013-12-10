@@ -58,8 +58,9 @@ private:
   qint32 m_userRole;
   Settings* m_settings;
   Wt::WTimer* m_timer;
-  Wt::WContainerWidget* createMenuBarWidget(void);
-  Wt::WContainerWidget* createToolBar(void);
+  Wt::WWidget* createLogoBar(void);
+  Wt::WWidget* createMenuBarWidget(void);
+  Wt::WWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
   Wt::WMenu* m_dashboardMenu;
   Wt::WDialog* m_fileUploadDialog;
