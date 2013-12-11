@@ -17,6 +17,7 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 
 int main(int argc, char **argv)
 {
+  QApplication* qtApp = new QApplication(argc, argv);
   try {
     Wt::WServer server(argv[0]);
     server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
@@ -35,6 +36,5 @@ int main(int argc, char **argv)
   } catch (std::exception &e) {
     Wt::log("error")<<"[realopinsight] "<< e.what();
   }
-  QApplication* qtApp = new QApplication(argc, argv);
   return qtApp->exec();
 }

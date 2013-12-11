@@ -366,8 +366,10 @@ void WebMainUI::openFile(const std::string& path)
 {
   checkUserLogin();
   std::string realPath = m_confdir+"/"+path;
+  qDebug()<<"ROLE>>>>>>"<< m_userRole;
   WebDashboard* dashboard = new WebDashboard(m_userRole,
                                              QString::fromStdString(realPath));
+  qDebug()<<"ROLE>>>>>>"<< m_userRole;
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
