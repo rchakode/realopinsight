@@ -43,7 +43,6 @@
 
 typedef Wt::Auth::AuthWidget AuthWidget;
 namespace {
-  //  Wt::Auth::Login login; /* slot conflict if decleared in the DbSession class */
   const std::string LINK_LOAD ="/load-platform";
   const std::string LINK_IMPORT ="/import-platform";
   const std::string LINK_LOGIN_PAGE ="/login";
@@ -109,12 +108,9 @@ void WebMainUI::showAdminHome(void)
   checkUserLogin();
   setInternalPath(LINK_ADMIN_HOME);
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
-  Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  mainLayout->setSpacing(0);
-  mainLayout->addWidget(createNavBar());
-  // mainLayout->addWidget(createMenuBarWidget());
-  createAdminHome();
+  m_mainWidget->addWidget(createNavBar());
+  m_dashtabs->addTab(createAdminHome(), "Dashboard", Wt::WTabWidget::LazyLoading)
+      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
   resetTimer();
   root()->addWidget(m_mainWidget);
 }
@@ -122,22 +118,23 @@ void WebMainUI::showAdminHome(void)
 Wt::WWidget* WebMainUI::createNavBar(void)
 {
   checkUserLogin();
-  Wt::WNavigationBar* bar(new Wt::WNavigationBar());
-  bar->addWidget(createLogoLink(), Wt::AlignLeft);
+  Wt::WContainerWidget* container = new Wt::WContainerWidget();
+  Wt::WNavigationBar* navbar(new Wt::WNavigationBar(container));
+  navbar->addWidget(createLogoLink(), Wt::AlignLeft);
 
   // Setup the main menu
-  Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget();
-  contentsStack->setId("stackcontentarea");
-  Wt::WMenu* mainMenu = new Wt::WMenu(contentsStack);
-  bar->addMenu(mainMenu, Wt::AlignLeft);
-  bar->addWidget(createToolBar());
-  mainMenu->addItem("home", m_dashtabs, Wt::WMenuItem::LazyLoading);
-
+  Wt::WStackedWidget* stackedWidgets = new Wt::WStackedWidget(container);
+  stackedWidgets->setId("stackcontentarea");
+  Wt::WMenu* mainMenu (new Wt::WMenu(stackedWidgets));
+  navbar->addMenu(mainMenu, Wt::AlignLeft);
+  navbar->addWidget(createToolBar());
   Wt::WMenu* profileMenu(new Wt::WMenu());
-  bar->addMenu(profileMenu, Wt::AlignRight);
+  navbar->addMenu(profileMenu, Wt::AlignRight);
+
+  mainMenu->addItem("home", m_dashtabs);
+
   profileMenu->addItem("Documentation")
       ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
-
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   item->setMenu(popup);
@@ -149,26 +146,9 @@ Wt::WWidget* WebMainUI::createNavBar(void)
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
   popup->addItem("Logout")
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
-  return bar;
-}
 
-Wt::WWidget* WebMainUI::createMenuBarWidget(void)
-{
-  checkUserLogin();
-  Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
-  Wt::WNavigationBar* navBar = new Wt::WNavigationBar(menuBar);
-  navBar->setResponsive(true);
-  //  // Add a Search control.
-  //  Wt::WLineEdit* edit = new Wt::WLineEdit();
-  //  edit->setEmptyText("Enter a search item");
-  //  edit->enterPressed().connect(std::bind([=] () {
-  //    mainMenu->select(0); // FIXME: is the index of the "Home"
-  //    m_infoBox->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
-  //    m_infoBox->setHidden(false);
-  //  }));
-
-  //  navBar->addSearch(edit, Wt::AlignRight);
-  return menuBar;
+  container->addWidget(stackedWidgets);
+  return container;
 }
 
 
@@ -182,6 +162,20 @@ Wt::WWidget* WebMainUI::createToolBar(void)
   layout->addWidget(toolBar, Wt::AlignLeft);
 
   Wt::WPushButton* b(NULL);
+
+  b = createTooBarButton("/images/built-in/menu_import.png");
+  b->setStyleClass("button");
+  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
+  b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
+  toolBar->addButton(b);
+
+  b = createTooBarButton("/images/built-in/menu_open.png");
+  b->setStyleClass("button");
+  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+  toolBar->addButton(b);
+
+  toolBar->addSeparator();
+
   b = createTooBarButton("/images/built-in/menu_refresh.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
@@ -424,7 +418,7 @@ void WebMainUI::handleInternalPath(void)
   }
 }
 
-void WebMainUI::createAdminHome(void)
+Wt::WWidget* WebMainUI::createAdminHome(void)
 {
   checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
@@ -437,8 +431,7 @@ void WebMainUI::createAdminHome(void)
                   createAnchorForHomeLink(QObject::tr("Import").toStdString(),
                                           QObject::tr("A platform description").toStdString(),
                                           LINK_IMPORT));
-  m_dashtabs->addTab(tpl, "Home", Wt::WTabWidget::LazyLoading)
-      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
+  return tpl;
 }
 
 

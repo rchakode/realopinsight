@@ -60,7 +60,6 @@ private:
   Settings* m_settings;
   Wt::WTimer* m_timer;
   Wt::WWidget* createNavBar(void);
-  Wt::WWidget* createMenuBarWidget(void);
   Wt::WWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
   Wt::WTabWidget* m_dashtabs;
@@ -84,7 +83,7 @@ private:
   void openFile(const std::string& path);
   void finishFileDialog(int action);
   void scaleMap(double factor);
-  void createAdminHome(void);
+  Wt::WWidget* createAdminHome(void);
   Wt::WWidget* createLoginHome(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
