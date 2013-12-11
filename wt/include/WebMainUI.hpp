@@ -31,6 +31,7 @@
 #include <Wt/Auth/Login>
 #include "WebDashboard.hpp"
 #include "DbSession.hpp"
+#include <Wt/WTabWidget>
 
 class WebMainUI : public QObject, public Wt::WApplication
 {
@@ -58,11 +59,11 @@ private:
   qint32 m_userRole;
   Settings* m_settings;
   Wt::WTimer* m_timer;
-  Wt::WWidget* createLogoBar(void);
+  Wt::WWidget* createNavBar(void);
   Wt::WWidget* createMenuBarWidget(void);
   Wt::WWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
-  Wt::WMenu* m_dashboardMenu;
+  Wt::WTabWidget* m_dashtabs;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectFile;

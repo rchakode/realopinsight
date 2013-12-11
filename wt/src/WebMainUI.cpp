@@ -56,6 +56,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
+    m_dashtabs(new Wt::WTabWidget()),
     m_infoBox(new Wt::WText("", m_mainWidget)),
     m_dbSession(new DbSession())
 {
@@ -71,7 +72,7 @@ WebMainUI::~WebMainUI()
   delete m_timer;
   delete m_infoBox;
   delete m_fileUploadDialog;
-  delete m_dashboardMenu;
+  delete m_dashtabs;
   delete m_mainWidget;
   delete m_dbSession;
 }
@@ -111,24 +112,31 @@ void WebMainUI::showAdminHome(void)
   Wt::WVBoxLayout* mainLayout(new Wt::WVBoxLayout(m_mainWidget));
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
-  mainLayout->addWidget(createLogoBar());
+  mainLayout->addWidget(createNavBar());
   mainLayout->addWidget(createMenuBarWidget());
   createAdminHome();
   resetTimer();
   root()->addWidget(m_mainWidget);
 }
 
-Wt::WWidget* WebMainUI::createLogoBar(void)
+Wt::WWidget* WebMainUI::createNavBar(void)
 {
   checkUserLogin();
   Wt::WNavigationBar* bar(new Wt::WNavigationBar());
   bar->addWidget(createLogoLink(), Wt::AlignLeft);
 
   Wt::WMenu* menu(new Wt::WMenu());
+
+  // Setup the main menu
+  Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
+  contentsStack->setId("stackcontentarea");
+  Wt::WMenu* mainMenu = new Wt::WMenu(contentsStack);
+  bar->addMenu(mainMenu, Wt::AlignLeft);
+  bar->addWidget(createToolBar());
+
   bar->addMenu(menu, Wt::AlignRight);
   menu->addItem("Documentation")
       ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
-
 
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
@@ -151,19 +159,15 @@ Wt::WWidget* WebMainUI::createMenuBarWidget(void)
   Wt::WNavigationBar* navBar = new Wt::WNavigationBar(menuBar);
   navBar->setResponsive(true);
 
-  Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
-  contentsStack->setId("stackcontentarea");
 
-  // Setup a Left-aligned menu.
-  m_dashboardMenu = new Wt::WMenu(contentsStack);
-  navBar->addMenu(m_dashboardMenu);
-  navBar->addWidget(createToolBar());
+
+
 
   // Add a Search control.
   Wt::WLineEdit* edit = new Wt::WLineEdit();
   edit->setEmptyText("Enter a search item");
   edit->enterPressed().connect(std::bind([=] () {
-    m_dashboardMenu->select(0); // FIXME: is the index of the "Home"
+    mainMenu->select(0); // FIXME: is the index of the "Home"
     m_infoBox->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
     m_infoBox->setHidden(false);
   }));
@@ -380,13 +384,11 @@ void WebMainUI::openFile(const std::string& path)
     std::pair<DashboardListT::iterator, bool> result;
     result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     if (result.second) {
-      Wt::WMenuItem *item = m_dashboardMenu->addItem(platform,
-                                                     dashboard->get(),
-                                                     Wt::WMenuItem::LazyLoading);
-      item->triggered().connect(std::bind([=](){
-        m_currentDashboard = dashboard;
-        setInternalPath("/"+platform);
-      }));
+      m_dashtabs->addItem(dashboard->get(), platform, Wt::WMenuItem::LazyLoading);
+      //      item->triggered().connect(std::bind([=](){
+      //        m_currentDashboard = dashboard;
+      //        setInternalPath("/"+platform);
+      //      }));
       handleRefresh();
     } else {
       delete dashboard;
@@ -440,8 +442,8 @@ void WebMainUI::createAdminHome(void)
                   createAnchorForHomeLink(QObject::tr("Import").toStdString(),
                                           QObject::tr("A platform description").toStdString(),
                                           LINK_IMPORT));
-  m_dashboardMenu->addItem("Home", tpl, Wt::WMenuItem::LazyLoading)
-      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
+  m_dashtabs->addTab(tpl, "Home" , Wt::WMenuItem::LazyLoading);
+  //FIXME:    ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 }
 
 
