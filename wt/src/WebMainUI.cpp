@@ -57,7 +57,8 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_mainWidget(new Wt::WContainerWidget()),
     m_dashtabs(new Wt::WTabWidget()),
     m_infoBox(new Wt::WText("", m_mainWidget)),
-    m_dbSession(new DbSession())
+    m_dbSession(new DbSession()),
+    m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
@@ -163,19 +164,6 @@ Wt::WWidget* WebMainUI::createToolBar(void)
 
   Wt::WPushButton* b(NULL);
 
-  b = createTooBarButton("/images/built-in/menu_import.png");
-  b->setStyleClass("button");
-  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
-  b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
-  toolBar->addButton(b);
-
-  b = createTooBarButton("/images/built-in/menu_open.png");
-  b->setStyleClass("button");
-  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-  toolBar->addButton(b);
-
-  toolBar->addSeparator();
-
   b = createTooBarButton("/images/built-in/menu_refresh.png");
   b->setStyleClass("button");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
@@ -195,6 +183,18 @@ Wt::WWidget* WebMainUI::createToolBar(void)
   b->setStyleClass("button");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(createTooBarButton("/images/built-in/menu_disket.png"));
+
+  toolBar->addSeparator();
+
+  b = createTooBarButton("/images/built-in/menu_import.png");
+  b->setStyleClass("button");
+  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
+  toolBar->addButton(b);
+
+  b = createTooBarButton("/images/built-in/menu_open.png");
+  b->setStyleClass("button");
+  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+  toolBar->addButton(b);
 
   return container;
 }
@@ -262,7 +262,7 @@ void WebMainUI::selectFileToOpen(void)
   Wt::WText* infoBox = new Wt::WText("", container);
 
   // List the configuration avaialable
-  QDir cdir(CONFIG_DIR);
+  QDir cdir(m_confdir.c_str());
   flist->addItem("");
   flist->setCurrentIndex(1);
   QFileInfoList files = cdir.entryInfoList(QStringList("*.ngrt4n.xml"), QDir::Files);
@@ -336,7 +336,7 @@ void WebMainUI::finishFileDialog(int action)
   switch(action) {
   case IMPORT:
     if (! m_uploader->empty()) {
-      QDir cdir(CONFIG_DIR);
+      QDir cdir(m_confdir.c_str());
       if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
         //FIXME: display in console
         utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
@@ -365,7 +365,7 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::openFile(const std::string& path)
 {
   checkUserLogin();
-  std::string realPath = CONFIG_DIR.toStdString()+"/"+path;
+  std::string realPath = m_confdir+"/"+path;
   WebDashboard* dashboard = new WebDashboard(m_userRole,
                                              QString::fromStdString(realPath));
   if (! dashboard->errorState()) {

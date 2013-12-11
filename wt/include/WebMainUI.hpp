@@ -72,6 +72,7 @@ private:
   DashboardListT m_dashboards;
   DbSession* m_dbSession;
   Wt::Auth::Login m_login; /* slot conflict if decleared in the DbSession class */
+  std::string m_confdir;
 
   void addEvents(void);
   void handleAuthentification(void);
