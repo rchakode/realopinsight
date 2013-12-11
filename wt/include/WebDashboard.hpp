@@ -45,7 +45,7 @@ class WebDashboard : public DashboardBase
 public:
   WebDashboard(const qint32& _userRole, const QString& _config);
   virtual ~WebDashboard();
-  Wt::WContainerWidget* get(void) const {return m_widget;}
+  Wt::WWidget* get(void) const {return m_widget;}
   void updateMap(void);
   WebPieMap* map(void) const {return m_map;}
 

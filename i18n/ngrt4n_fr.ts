@@ -514,7 +514,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="../src/client/Preferences.cpp" line="280"/>
+        <location filename="../src/client/Preferences.cpp" line="281"/>
         <source>Password updated</source>
         <translation>Mot de passe mis à jour</translation>
     </message>
@@ -1007,64 +1007,104 @@ Chargement...</translation>
         <translation type="obsolete">%1 - %2 Console des Opérations</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="76"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="96"/>
+        <source>Authentication - %1 Operations Console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="111"/>
         <source>%1 Operations Console</source>
         <translation type="unfinished">Console des operations %1</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="215"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="142"/>
+        <source>You are %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="146"/>
+        <source>Edit profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="148"/>
+        <source>Change password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="261"/>
         <source>Select a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="236"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="282"/>
         <source>No configuration available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="245"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="275"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="291"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="322"/>
         <source>Finish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="253"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="300"/>
         <source>Import a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="268"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="315"/>
         <source>Upload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="284"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="331"/>
         <source>File upload is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="289"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="336"/>
         <source>File is too large.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="302"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="350"/>
         <source>Unable to use the configuration directory (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="316"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="364"/>
         <source>No file selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="345"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="392"/>
         <source>This platform or a platfom with the same name is already loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="383"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="423"/>
         <source>Sorry, the request resource is not available or has been removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="435"/>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="436"/>
+        <source>An existing platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="439"/>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="440"/>
+        <source>A platform description</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1694,7 +1734,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>Wt::WString</name>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="358"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="432"/>
         <source>template.home</source>
         <translation type="unfinished"></translation>
     </message>

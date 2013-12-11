@@ -113,7 +113,7 @@ void WebMainUI::showAdminHome(void)
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   mainLayout->addWidget(createNavBar());
-  mainLayout->addWidget(createMenuBarWidget());
+  // mainLayout->addWidget(createMenuBarWidget());
   createAdminHome();
   resetTimer();
   root()->addWidget(m_mainWidget);
@@ -125,23 +125,23 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   Wt::WNavigationBar* bar(new Wt::WNavigationBar());
   bar->addWidget(createLogoLink(), Wt::AlignLeft);
 
-  Wt::WMenu* menu(new Wt::WMenu());
-
   // Setup the main menu
-  Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget(menuBar);
+  Wt::WStackedWidget* contentsStack = new Wt::WStackedWidget();
   contentsStack->setId("stackcontentarea");
   Wt::WMenu* mainMenu = new Wt::WMenu(contentsStack);
   bar->addMenu(mainMenu, Wt::AlignLeft);
   bar->addWidget(createToolBar());
+  mainMenu->addItem("home", m_dashtabs, Wt::WMenuItem::LazyLoading);
 
-  bar->addMenu(menu, Wt::AlignRight);
-  menu->addItem("Documentation")
+  Wt::WMenu* profileMenu(new Wt::WMenu());
+  bar->addMenu(profileMenu, Wt::AlignRight);
+  profileMenu->addItem("Documentation")
       ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
 
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   item->setMenu(popup);
-  menu->addItem(item);
+  profileMenu->addItem(item);
 
   popup->addItem(QObject::tr("Edit profile").toStdString().c_str())
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
@@ -158,21 +158,16 @@ Wt::WWidget* WebMainUI::createMenuBarWidget(void)
   Wt::WContainerWidget* menuBar(new Wt::WContainerWidget());
   Wt::WNavigationBar* navBar = new Wt::WNavigationBar(menuBar);
   navBar->setResponsive(true);
+  //  // Add a Search control.
+  //  Wt::WLineEdit* edit = new Wt::WLineEdit();
+  //  edit->setEmptyText("Enter a search item");
+  //  edit->enterPressed().connect(std::bind([=] () {
+  //    mainMenu->select(0); // FIXME: is the index of the "Home"
+  //    m_infoBox->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
+  //    m_infoBox->setHidden(false);
+  //  }));
 
-
-
-
-
-  // Add a Search control.
-  Wt::WLineEdit* edit = new Wt::WLineEdit();
-  edit->setEmptyText("Enter a search item");
-  edit->enterPressed().connect(std::bind([=] () {
-    mainMenu->select(0); // FIXME: is the index of the "Home"
-    m_infoBox->setText(Wt::WString("Nothing found for {1}.").arg(edit->text()));
-    m_infoBox->setHidden(false);
-  }));
-
-  navBar->addSearch(edit, Wt::AlignRight);
+  //  navBar->addSearch(edit, Wt::AlignRight);
   return menuBar;
 }
 
@@ -384,11 +379,11 @@ void WebMainUI::openFile(const std::string& path)
     std::pair<DashboardListT::iterator, bool> result;
     result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     if (result.second) {
-      m_dashtabs->addItem(dashboard->get(), platform, Wt::WMenuItem::LazyLoading);
-      //      item->triggered().connect(std::bind([=](){
-      //        m_currentDashboard = dashboard;
-      //        setInternalPath("/"+platform);
-      //      }));
+      m_dashtabs->addTab(dashboard->get(), platform, Wt::WTabWidget::LazyLoading)
+          ->triggered().connect(std::bind([=](){
+        m_currentDashboard = dashboard;
+        setInternalPath("/"+platform);
+      }));
       handleRefresh();
     } else {
       delete dashboard;
@@ -442,8 +437,8 @@ void WebMainUI::createAdminHome(void)
                   createAnchorForHomeLink(QObject::tr("Import").toStdString(),
                                           QObject::tr("A platform description").toStdString(),
                                           LINK_IMPORT));
-  m_dashtabs->addTab(tpl, "Home" , Wt::WMenuItem::LazyLoading);
-  //FIXME:    ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
+  m_dashtabs->addTab(tpl, "Home", Wt::WTabWidget::LazyLoading)
+      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 }
 
 
