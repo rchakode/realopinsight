@@ -79,7 +79,7 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  login.changed().connect(this, &WebMainUI::handleAuthentification);
+  m_login.changed().connect(this, &WebMainUI::handleAuthentification);
   internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
@@ -95,7 +95,7 @@ Wt::WWidget* WebMainUI::createLoginHome(void)
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
   AuthWidget* authWidget = new AuthWidget( DbSession::auth(),
                                            m_dbSession->users(),
-                                           login);
+                                           m_login);
   authWidget->addStyleClass("login-container");
   authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuthentificator());
   authWidget->setRegistrationEnabled(false);
@@ -131,16 +131,16 @@ Wt::WWidget* WebMainUI::createLogoBar(void)
 
 
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
-  Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(loggedUser().c_str()).toStdString());
+  Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   item->setMenu(popup);
   menu->addItem(item);
 
   popup->addItem(QObject::tr("Edit profile").toStdString().c_str())
-      ->triggered().connect(std::bind([=](){ login.logout();}));
+      ->triggered().connect(std::bind([=](){ m_login.logout();}));
   popup->addItem(QObject::tr("Change password").toStdString().c_str())
-      ->triggered().connect(std::bind([=](){ login.logout();}));
+      ->triggered().connect(std::bind([=](){ m_login.logout();}));
   popup->addItem("Logout")
-      ->triggered().connect(std::bind([=](){ login.logout();}));
+      ->triggered().connect(std::bind([=](){ m_login.logout();}));
   return bar;
 }
 
@@ -460,8 +460,9 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
 void WebMainUI::handleAuthentification(void)
 {
   root()->clear();
-  if (login.loggedIn()) {
-    Wt::log("notice")<<"[realopinsight] "<< loggedUser()<<" logged in.";
+  if (m_login.loggedIn()) {
+    m_dbSession->setLoggedUser(m_login.user().id());
+    Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
     showAdminHome();
   } else {
     Wt::log("notice") << "[realopinsight] "<<"Not connected. Redirecting to login page.";
@@ -469,15 +470,10 @@ void WebMainUI::handleAuthentification(void)
   }
 }
 
-std::string WebMainUI::loggedUser(void)
-{
-  return m_dbSession->getUsername(login.user().id());
-}
-
 
 void WebMainUI::checkUserLogin(void)
 {
-  if (! login.loggedIn()) {
+  if (! m_login.loggedIn()) {
     redirect(LINK_LOGIN_PAGE);
   }
 }

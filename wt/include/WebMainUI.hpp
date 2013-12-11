@@ -71,7 +71,7 @@ private:
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
   DbSession* m_dbSession;
-  Wt::Auth::Login login; /* slot conflict if decleared in the DbSession class */
+  Wt::Auth::Login m_login; /* slot conflict if decleared in the DbSession class */
 
   void addEvents(void);
   void handleAuthentification(void);
@@ -88,7 +88,6 @@ private:
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
                                        const std::string& internalPath);
-  std::string loggedUser(void);
   void checkUserLogin(void);
 };
 

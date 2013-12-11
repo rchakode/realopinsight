@@ -111,12 +111,10 @@ void DbSession::configureAuth(void)
   passAuthService.setAttemptThrottlingEnabled(true);
 }
 
-std::string DbSession::getUsername(const std::string& uid)
+void DbSession::setLoggedUser(const std::string& uid)
 {
-
   dbo::Transaction transaction(*this);
   dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id="+uid);
-  std::string username = info.modify()->user()->username;
+  m_loggedUser = *(info.modify()->user());
   transaction.commit();
-  return username;
 }
