@@ -68,12 +68,16 @@
         </div>
 
         <div class="span2 list-group">
-        ${andhor-load-file}
-        ${andhor-import-file}
+         ${andhor-load-file}
+         ${andhor-import-file}
         </div>
       </div>
-    </div>
-    ${block:copyright-info}
+     </div> <!-- Row --->
+     <div class="row">
+       <div class="footer">
+        Copyright &copy; 2010 - 2013 NGRT4N Project - Terms &amp; Privacy
+       </div>
+     </div>
     </div> <!-- home-container -->
   </message>
 

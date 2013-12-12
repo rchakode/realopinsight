@@ -95,5 +95,10 @@ body, html {
  right: 0;
  padding: 0;
  margin: 0;
- 
+}
+
+.footer {
+ position:fixed;
+ bottom: 0;
+ padding: auto auto;
 }
