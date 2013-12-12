@@ -87,6 +87,7 @@ void WebMainUI::addEvents(void)
 
 void WebMainUI::showLoginHome(void)
 {
+  root()->clear();
   root()->addWidget(createLoginHome());
 }
 
@@ -115,6 +116,7 @@ void WebMainUI::showAdminHome(void)
                      Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
   resetTimer();
+  root()->clear();
   root()->addWidget(m_mainWidget);
 }
 
