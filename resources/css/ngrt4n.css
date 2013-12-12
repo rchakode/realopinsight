@@ -81,3 +81,13 @@ body, html {
 .form-actions {
  padding: 5px; 
 }
+
+.wrapper-container {
+ position: relative;
+ left: 0;
+ top: 0;
+ right: 0;
+ padding: 0;
+ margin: 0;
+ 
+}

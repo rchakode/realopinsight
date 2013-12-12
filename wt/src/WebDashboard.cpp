@@ -76,14 +76,9 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
     m_msgConsole(new WebMsgConsole()),
     m_chart(new WebPieChart())
 {
-  std::cout <<"sssssssssssssssRRsR\n";
   setupUI();
   addJsEventScript();
-
-  std::cout << "sssssssssssssssRRsR" << _config.toStdString() <<"\n";
   load(_config);
-
-  std::cout <<"sssssssssssssssRRsR\n";
 }
 
 WebDashboard::~WebDashboard()

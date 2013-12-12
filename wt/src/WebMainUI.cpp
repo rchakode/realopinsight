@@ -51,7 +51,6 @@ namespace {
 
 WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
-    m_userRole(Auth::OpUserRole), //FIXME: consider user role
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
@@ -62,6 +61,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 {
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
+  m_dashtabs->setStyleClass("wrapper-container");
   m_infoBox->addStyleClass("alert alert-warning alert-dismissable");
   m_infoBox->hide();
   addEvents();
@@ -134,17 +134,21 @@ Wt::WWidget* WebMainUI::createNavBar(void)
 
   mainMenu->addItem("home", m_dashtabs);
 
-  profileMenu->addItem("Documentation")
-      ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   item->setMenu(popup);
   profileMenu->addItem(item);
 
-  popup->addItem(QObject::tr("Edit profile").toStdString().c_str())
+  popup->addItem(QObject::tr("Profile").toStdString().c_str())
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
   popup->addItem(QObject::tr("Change password").toStdString().c_str())
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
+  popup->addSeparator();
+  popup->addItem("Documentation")
+        ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
+  popup->addItem("About")
+        ->triggered().connect(std::bind([=](){}));
+  popup->addSeparator();
   popup->addItem("Logout")
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
 
@@ -334,31 +338,31 @@ void WebMainUI::finishFileDialog(int action)
 {
   checkUserLogin();
   switch(action) {
-  case IMPORT:
-    if (! m_uploader->empty()) {
-      QDir cdir(m_confdir.c_str());
-      if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-        //FIXME: display in console
-        utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
+    case IMPORT:
+      if (! m_uploader->empty()) {
+        QDir cdir(m_confdir.c_str());
+        if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
+          //FIXME: display in console
+          utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
+        }
+        QFile file(QString::fromStdString(m_uploader->spoolFileName()));
+        file.copy(QString("%1/%2").arg(cdir.absolutePath(),
+                                       QString::fromStdString(m_uploader->clientFileName().toUTF8())));
       }
-      QFile file(QString::fromStdString(m_uploader->spoolFileName()));
-      file.copy(QString("%1/%2").arg(cdir.absolutePath(),
-                                     QString::fromStdString(m_uploader->clientFileName().toUTF8())));
-    }
-    break;
-  case OPEN:
-    m_fileUploadDialog->accept();
-    m_fileUploadDialog->contents()->clear();
-    if (! m_selectFile.empty()) {
-      openFile(m_selectFile);
-      m_selectFile.clear();
-    } else {
-      m_infoBox->setText(QObject::tr("No file selected").toStdString());
-      m_infoBox->setHidden(false);
-    }
-    break;
-  default:
-    break;
+      break;
+    case OPEN:
+      m_fileUploadDialog->accept();
+      m_fileUploadDialog->contents()->clear();
+      if (! m_selectFile.empty()) {
+        openFile(m_selectFile);
+        m_selectFile.clear();
+      } else {
+        m_infoBox->setText(QObject::tr("No file selected").toStdString());
+        m_infoBox->setHidden(false);
+      }
+      break;
+    default:
+      break;
   }
 }
 
@@ -366,20 +370,20 @@ void WebMainUI::openFile(const std::string& path)
 {
   checkUserLogin();
   std::string realPath = m_confdir+"/"+path;
-  qDebug()<<"ROLE>>>>>>"<< m_userRole;
-  WebDashboard* dashboard = new WebDashboard(m_userRole,
+  WebDashboard* dashboard = new WebDashboard(m_dbSession->loggedUser().role,
                                              QString::fromStdString(realPath));
-  qDebug()<<"ROLE>>>>>>"<< m_userRole;
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
     result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     if (result.second) {
-      m_dashtabs->addTab(dashboard->get(), platform, Wt::WTabWidget::LazyLoading)
-          ->triggered().connect(std::bind([=](){
+      Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->get(), platform, Wt::WTabWidget::LazyLoading);
+      tab->triggered().connect(std::bind([=](){
         m_currentDashboard = dashboard;
         setInternalPath("/"+platform);
       }));
+      tab->setCloseable(true);
+      m_dashtabs->setCurrentWidget(dashboard->get());
       handleRefresh();
     } else {
       delete dashboard;

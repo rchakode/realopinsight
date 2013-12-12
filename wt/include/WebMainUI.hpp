@@ -56,7 +56,6 @@ private:
     IMPORT = 0
   };
 
-  qint32 m_userRole;
   Settings* m_settings;
   Wt::WTimer* m_timer;
   Wt::WWidget* createNavBar(void);
