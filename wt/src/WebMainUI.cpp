@@ -110,7 +110,9 @@ void WebMainUI::showAdminHome(void)
   setInternalPath(LINK_ADMIN_HOME);
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   m_mainWidget->addWidget(createNavBar());
-  m_dashtabs->addTab(createAdminHome(), "Dashboard", Wt::WTabWidget::LazyLoading)
+  m_dashtabs->addTab(createAdminHome(),
+                     QObject::tr("Home").toStdString(),
+                     Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
   resetTimer();
   root()->addWidget(m_mainWidget);
@@ -128,14 +130,41 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   stackedWidgets->setId("stackcontentarea");
   Wt::WMenu* mainMenu (new Wt::WMenu(stackedWidgets));
   navbar->addMenu(mainMenu, Wt::AlignLeft);
+  mainMenu->addItem(QObject::tr("Dashboard").toStdString(),m_dashtabs);
   navbar->addWidget(createToolBar());
+
   Wt::WMenu* profileMenu(new Wt::WMenu());
   navbar->addMenu(profileMenu, Wt::AlignRight);
 
-  mainMenu->addItem("home", m_dashtabs);
+  Wt::WMenu* mgntMenu(new Wt::WMenu());
+  navbar->addMenu(mgntMenu, Wt::AlignRight);
+
+  Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
+  Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("Management").toStdString());
+  item->setMenu(mgntPopupMenu);
+  mgntMenu->addItem(item);
+
+  // Menus for view management
+  mgntPopupMenu->addSectionHeader("File");
+  mgntPopupMenu->addItem("Import")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
+  mgntPopupMenu->addItem("Open")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+
+  // Menus for view management
+  mgntPopupMenu->addSectionHeader("View");
+  mgntPopupMenu->addItem("Assign/revoke")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+
+  // Menus for user management
+  mgntPopupMenu->addSectionHeader("User");
+  mgntPopupMenu->addItem("Add")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+  mgntPopupMenu->addItem("List")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
 
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
-  Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
+  item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   item->setMenu(popup);
   profileMenu->addItem(item);
 
@@ -145,9 +174,9 @@ Wt::WWidget* WebMainUI::createNavBar(void)
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
   popup->addSeparator();
   popup->addItem("Documentation")
-        ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
+      ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
   popup->addItem("About")
-        ->triggered().connect(std::bind([=](){}));
+      ->triggered().connect(std::bind([=](){}));
   popup->addSeparator();
   popup->addItem("Logout")
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
@@ -183,22 +212,10 @@ Wt::WWidget* WebMainUI::createToolBar(void)
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
-  b = createTooBarButton("/images/built-in/menu_disket.png");
-  b->setStyleClass("button");
-  b->clicked().connect(this, &WebMainUI::handleRefresh);
-  toolBar->addButton(createTooBarButton("/images/built-in/menu_disket.png"));
-
-  toolBar->addSeparator();
-
-  b = createTooBarButton("/images/built-in/menu_import.png");
-  b->setStyleClass("button");
-  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
-  toolBar->addButton(b);
-
-  b = createTooBarButton("/images/built-in/menu_open.png");
-  b->setStyleClass("button");
-  b->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-  toolBar->addButton(b);
+  //  b = createTooBarButton("/images/built-in/menu_disket.png");
+  //  b->setStyleClass("button");
+  //  b->clicked().connect(this, &WebMainUI::handleRefresh);
+  //  toolBar->addButton(createTooBarButton("/images/built-in/menu_disket.png"));
 
   return container;
 }
@@ -400,7 +417,9 @@ void WebMainUI::openFile(const std::string& path)
 void WebMainUI::scaleMap(double factor)
 {
   checkUserLogin();
-  m_currentDashboard->map()->scaleMap(factor);
+  if (m_currentDashboard) {
+    m_currentDashboard->map()->scaleMap(factor);
+  }
 }
 
 void WebMainUI::handleInternalPath(void)

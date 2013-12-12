@@ -90,14 +90,14 @@ void WebPieMap::paintEvent(Wt::WPaintDevice* _pdevice)
 
 void WebPieMap::layoutSizeChanged(int width, int height )
 {
-  qDebug()<<"TODO";
-  qDebug() << width << height;
+  //TODO
 }
 
 void WebPieMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width, m_cdata->map_height);
+  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX,
+                             m_cdata->map_height * m_scaleY);
 }
 
 void WebPieMap::drawNode(const NodeT& _node)
@@ -154,8 +154,7 @@ void WebPieMap::createLink(const NodeT& _node)
 
 void WebPieMap::updateNode(const NodeT&, const QString&)
 {
-  // Empty function to conform with the polymorphism
-  // With WPaintedWidget, the whole map is updated
+  // Empty function just conform with the polymorphism
 }
 
 void WebPieMap::scaleMap(double factor)

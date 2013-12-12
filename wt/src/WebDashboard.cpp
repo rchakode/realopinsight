@@ -84,8 +84,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
 WebDashboard::~WebDashboard()
 {
   delete m_widget;
-  // m_chart, m_tree, m_map and m_msgConsole are
-  // deleted by thelayout manager
+  // Other widget are deleted through the hierarchy
 }
 
 void WebDashboard::buildTree(void)
