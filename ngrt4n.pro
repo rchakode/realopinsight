@@ -21,6 +21,7 @@ TARGET = ngrt4n-editor
 }
 config-web {
 CONFIG += no_keywords
+DEFINES *= REALOPINSIGHT_WEB
 HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebMsgConsole.hpp \
     wt/include/WebMap.hpp \
