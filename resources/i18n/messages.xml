@@ -15,38 +15,43 @@
         </div>
        <!-- 1st thumnail -->
         <div class="span2">
-           <div class="thumbnail">
+           <div class="panel panel-default">
+           <div class="panel-heading">1. Configure your monitoring views</div>
               <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <h3 class="label label-default">1. Set The Target Plaforms</h3>
-                 <p>Run the RealOpInsight Editor to set the platforms you want to monitor.
-                 For each platform, the editor allows you to easily define the related services and
-                 how set they are related among them.</p>
+                 <p>Set the platforms you want to monitor.
+                 The RealOpinsight Editor allows to easily
+                 define the services and how set they are related
+                 among them.
+                 </p>
                </div>
            </div>
         </div>
 
         <!-- 2nd thumnail -->
         <div class="span2">
-           <div class="thumbnail">
+        <div class="panel panel-default">
+        <div class="panel-heading">2. Set your monitoring settings</div>
               <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <h3 class="label label-info">2. Monitoring Settings</h3>
-                 <p>From the RealOpInsight Configuration Manager, set when and how the Operations Console
-                 can access to your monitoring servers in order to retrieve status data to kept
-                 your dashboards up-to-date.</p>
+                 <p>Set when and how status data should be retrieved
+                 from your monitoring servers in order to
+                 keep your monitoring views up-to-date.
+                 </p>
                </div>
            </div>
         </div>
 
        <!-- Third thumnail -->
         <div class="span2">
-           <div class="thumbnail">
+        <div class="panel panel-primary">
+        <div class="panel-heading">3. Assign the views to your operations staff</div>
               <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <h3 class="label label-success">3. Operate and Enjoy</h3>
-                 <p>Finaly, load the descriptions of the target platforms within the Operations Console
-                 and assign them to your operators. Then enjoy your productivity !</p>
+                 <p>Set who can operate your different monitoring views.
+                 Takes the maximum on the productivity of your operators
+                 and enjoy your free time!
+                 </p>
                </div>
            </div>
         </div>
