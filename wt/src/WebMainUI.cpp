@@ -88,7 +88,7 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showLoginHome(void)
 {
   root()->clear();
-  root()->addWidget(createUserForms());
+  root()->addWidget(createUserForms(m_dbSession->getUserList()));
   //root()->addWidget(createLoginHome());
 }
 

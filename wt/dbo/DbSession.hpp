@@ -51,11 +51,14 @@ public:
   static void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(const std::string& uid);
+  UserListT& getUserList(void) {return m_userList;}
+  void updateUserList(void);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
   UserDatabase* m_dbUsers;
   User m_loggedUser;
+  UserListT m_userList;
 
   void addUser(const std::string& username, const std::string& pass, int role);
   std::string hashPassword(const std::string& pass);

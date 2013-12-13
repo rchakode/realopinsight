@@ -22,41 +22,88 @@
 #--------------------------------------------------------------------------#
  */
 
-
 #include "UserForms.hpp"
 #include <Wt/WMenu>
 #include <Wt/WPanel>
+#include <Wt/WComboBox>
+#include <Wt/WStandardItemModel>
+#include <Wt/WStandardItem>
 
-Wt::WContainerWidget* createUserList(void)
+UserFormView::UserFormView()
+{
+  model = new UserFormModel(this);
+
+  setTemplateText(tr("userForm-template"));
+  addFunction("id", &WTemplate::Functions::id);
+
+  setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::FirstNameField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::LastNameField, new Wt::WLineEdit());
+
+  Wt::WStandardItemModel* roleModel =  new Wt::WStandardItemModel(2, 1, this);
+  Wt::WStandardItem* item = new Wt::WStandardItem(User::role2Text(User::OpRole));
+  item->setData(User::OpRole, Wt::UserRole);
+  roleModel->setItem(0, 0, item);
+
+  item = new Wt::WStandardItem(User::role2Text(User::AdmRole));
+  item->setData(User::AdmRole, Wt::UserRole);
+  roleModel->setItem(1, 0, item);
+
+  Wt::WComboBox* roleCbox = new Wt::WComboBox();
+  roleCbox->setModel(roleModel);
+
+  setFormWidget(UserFormModel::RoleField, roleCbox);
+
+
+  // Title & Buttons
+  Wt::WString title = Wt::WString("User information");
+  bindString("title", title);
+
+  Wt::WPushButton *button = new Wt::WPushButton("Save");
+  bindWidget("submit-button", button);
+
+  bindString("submit-info", Wt::WString());
+
+  button->clicked().connect(this, &UserFormView::process);
+
+  updateView(model);
+}
+
+void UserFormView::process()
+{
+  updateModel(model);
+
+  if (model->validate()) {
+    // Do something with the data in the model: show it.
+    bindString("submit-info",
+               Wt::WString::fromUTF8("Saved user data for ")
+               + model->userData(), Wt::PlainText);
+    // Udate the view: Delete any validation message in the view, etc.
+    updateView(model);
+    // Set the focus on the first field in the form.
+    Wt::WLineEdit *viewField =
+        resolve<Wt::WLineEdit*>(UserFormModel::FirstNameField);
+    viewField->setFocus();
+  } else {
+    bindEmpty("submit-info"); // Delete the previous user data.
+    updateView(model);
+  }
+}
+
+
+Wt::WContainerWidget* createUserList(const UserListT& users)
 {
   Wt::WContainerWidget *container = new Wt::WContainerWidget();
 
-//  dbo::Transaction transaction(session);
+  for (auto user: users) {
+    container->addWidget(createUserPanel(user));
+  }
 
-//  typedef dbo::collection< dbo::ptr<User> > Users;
 
-//  Users users = session.find<User>();
-
-//  std::cerr << "We have " << users.size() << " users:" << std::endl;
-
-//  for (Users::const_iterator i = users.begin(); i != users.end(); ++i)
-//    std::cerr << " user " << (*i)->name
-//  << " with karma of " << (*i)->karma << std::endl;
-//  transaction.commit();
-
-  Wt::WPanel *panel = new Wt::WPanel();
-  panel->setTitle("User 1");
-  panel->setCollapsible(true);
-  Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
-         Wt::WAnimation::EaseOut, 100);
-
-  panel->setAnimation(animation);
-  panel->setCentralWidget(new Wt::WText("User details."));
-  container->addWidget(panel);
   return container;
 }
 
-Wt::WContainerWidget* createUserForms(void)
+Wt::WContainerWidget* createUserForms(const UserListT& users)
 {
   Wt::WContainerWidget *container = new Wt::WContainerWidget();
   Wt::WStackedWidget* contents(new Wt::WStackedWidget());
@@ -64,9 +111,30 @@ Wt::WContainerWidget* createUserForms(void)
   Wt::WMenu *menu = new Wt::WMenu(contents, Wt::Vertical, container);
   menu->setStyleClass("nav nav-pills");
   menu->addItem("Add User", new UserFormView());
-  menu->addItem("User List", createUserList());
+  menu->addItem("User List", createUserList(users));
 
   container->addWidget(contents);
 
   return container;
+}
+
+
+Wt::WPanel* createUserPanel(const User& user)
+{
+  Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
+                           Wt::WAnimation::EaseOut, 100);
+  Wt::WPanel *panel = new Wt::WPanel();
+  panel->setTitle(user.username);
+  panel->setCollapsible(true);
+  panel->setAnimation(animation);
+  UserFormView* userForm = new UserFormView();
+  UserFormModel* userModel = new UserFormModel();
+  userModel->setValue(UserFormModel::FirstNameField, user.firstname);
+  userModel->setValue(UserFormModel::LastNameField, user.lastname);
+  userModel->setValue(UserFormModel::RoleField, User::role2Text(user.role));
+  userModel->setValue(UserFormModel::RegistrationDateField, user.registrationDate);
+  userForm->updateView(userModel);
+  panel->setCentralWidget(userForm);
+
+  return panel;
 }

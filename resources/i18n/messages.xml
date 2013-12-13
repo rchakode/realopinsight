@@ -134,7 +134,7 @@
     <div class="form-horizontal">
       <fieldset>
       <div class="control-group">
-            <label for="${id:user-name}" class="control-label">Login</label>
+            <label for="${id:user-name}" class="control-label">Username</label>
          <div class="controls">
               ${last-name} <span class="help-inline">${last-name-info}</span>
           </div>
@@ -154,7 +154,7 @@
       <div class="control-group">
             <label for="${id:role}" class="control-label">Role</label>
          <div class="controls">
-              ${last-name} <span class="help-inline">${last-name-info}</span>
+              ${role} <span class="help-inline">${role-info}</span>
           </div>
       </div>
       </fieldset>

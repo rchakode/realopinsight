@@ -27,6 +27,7 @@
 
 #include <Wt/Dbo/Dbo>
 #include <string>
+#include <list>
 
 namespace dbo = Wt::Dbo;
 
@@ -46,7 +47,19 @@ namespace Wt {
 
 class User {
 public:
-  std::string username; /* a copy of auth info's user name */
+
+  enum RoleT {
+    AdmRole = 100,
+    OpRole = 101
+  };
+
+  static std::string role2Text(int role) {
+    return role == AdmRole? "Administrator" : "Operator";
+  }
+  std::string username;
+  std::string firstname;
+  std::string lastname;
+  std::string registrationDate;
   int role;
 
   template<class Action>
@@ -56,5 +69,7 @@ public:
     dbo::field(a, role, "role");
   }
 };
+
+typedef std::list<User> UserListT;
 
 #endif // USER_HPP

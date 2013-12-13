@@ -25,7 +25,7 @@
 #ifndef USERFORM_HPP
 #define USERFORM_HPP
 
-#include <Wt/WApplication>
+#include "User.hpp"
 #include <Wt/WBoostAny>
 #include <Wt/WDateEdit>
 #include <Wt/WDateValidator>
@@ -43,16 +43,11 @@ class DbSession;
 class UserFormModel : public Wt::WFormModel
 {
 public:
-  // Associate each field with a unique string literal.
-  // With C++11 you can actually put these directly inside the
-  // UserFormModel class like this:
-  //
-  //   static constexpr Field FirstNameField = "first-name";
-
+  static constexpr Wt::WFormModel::Field UsernameField = "user-name";
   static constexpr Wt::WFormModel::Field FirstNameField = "first-name";
   static constexpr Wt::WFormModel::Field LastNameField = "last-name";
   static constexpr Wt::WFormModel::Field RoleField = "role";
-  static constexpr Wt::WFormModel::Field UsernameField = "username";
+  static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
   UserFormModel(Wt::WObject *parent = 0)
     : Wt::WFormModel(parent)
@@ -117,59 +112,15 @@ class UserFormView : public Wt::WTemplateFormView
 {
 public:
   // inline constructor
-  UserFormView() {
-    model = new UserFormModel(this);
-
-    setTemplateText(tr("userForm-template"));
-    addFunction("id", &WTemplate::Functions::id);
-
-    // First Name
-    setFormWidget(UserFormModel::FirstNameField, new Wt::WLineEdit());
-
-    // Last Name
-    setFormWidget(UserFormModel::LastNameField, new Wt::WLineEdit());
-
-
-    // Title & Buttons
-    Wt::WString title = Wt::WString("Create new user");
-    bindString("title", title);
-
-    Wt::WPushButton *button = new Wt::WPushButton("Save");
-    bindWidget("submit-button", button);
-
-    bindString("submit-info", Wt::WString());
-
-    button->clicked().connect(this, &UserFormView::process);
-
-    updateView(model);
-  }
-
+  UserFormView();
 private:
-  void process() {
-    updateModel(model);
-
-    if (model->validate()) {
-      // Do something with the data in the model: show it.
-      bindString("submit-info",
-                 Wt::WString::fromUTF8("Saved user data for ")
-                 + model->userData(), Wt::PlainText);
-      // Udate the view: Delete any validation message in the view, etc.
-      updateView(model);
-      // Set the focus on the first field in the form.
-      Wt::WLineEdit *viewField =
-          resolve<Wt::WLineEdit*>(UserFormModel::FirstNameField);
-      viewField->setFocus();
-    } else {
-      bindEmpty("submit-info"); // Delete the previous user data.
-      updateView(model);
-    }
-  }
-
+  void process();
   UserFormModel *model;
 };
 
 
-Wt::WContainerWidget* createUserForms(void);
-Wt::WContainerWidget* createUserList(void);
+Wt::WContainerWidget* createUserForms(const UserListT& users);
+Wt::WContainerWidget* createUserList(const UserListT& users);
+Wt::WPanel* createUserPanel(const User& user);
 
 #endif // USERFORM_HPP

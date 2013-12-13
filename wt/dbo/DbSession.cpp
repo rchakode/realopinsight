@@ -40,6 +40,7 @@ DbSession::DbSession():
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
   setup();
+  updateUserList();
 }
 
 DbSession::~DbSession()
@@ -57,8 +58,8 @@ void DbSession::setup(void)
 
   try {
     createTables();
-    addUser("ngrt4n_adm", "ngrt4n_adm", Auth::AdmUserRole);
-    addUser("ngrt4n_op", "ngrt4n_op", Auth::OpUserRole);
+    addUser("ngrt4n_adm", "ngrt4n_adm", User::AdmRole);
+    addUser("ngrt4n_op", "ngrt4n_op", User::OpRole);
     Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
   } catch (std::exception& ex) {
     Wt::log("notice")<<"[realopinsight] "<< "Using existing database";
@@ -116,5 +117,17 @@ void DbSession::setLoggedUser(const std::string& uid)
   dbo::Transaction transaction(*this);
   dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id="+uid);
   m_loggedUser = *(info.modify()->user());
+  transaction.commit();
+}
+
+void DbSession::updateUserList(void)
+{
+  m_userList.clear();
+  dbo::Transaction transaction(*this);
+  typedef dbo::collection< dbo::ptr<User> > UserCollectionT;
+  UserCollectionT users = find<User>();
+  for (UserCollectionT::const_iterator it = users.begin(), end = users.end(); it != end; ++it) {
+    m_userList.push_back(*(*it));
+  }
   transaction.commit();
 }
