@@ -26,11 +26,12 @@
 #ifndef MAINWEBWINDOW_HPP
 #define MAINWEBWINDOW_HPP
 
+#include "WebDashboard.hpp"
+#include "DbSession.hpp"
+#include "UserForms.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/Auth/Login>
-#include "WebDashboard.hpp"
-#include "DbSession.hpp"
 #include <Wt/WTabWidget>
 
 class WebMainUI : public QObject, public Wt::WApplication
@@ -72,6 +73,7 @@ private:
   DbSession* m_dbSession;
   Wt::Auth::Login m_login; /* slot conflict if decleared in the DbSession class */
   std::string m_confdir;
+
 
   void addEvents(void);
   void handleAuthentification(void);

@@ -64,7 +64,7 @@ DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
-DEFINES *= "RELEASE_YEAR='\"2013\"'"
+DEFINES *= "RELEASE_YEAR='\"2014\"'"
 
 DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 
@@ -103,7 +103,8 @@ HEADERS	+= include/core/ns.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
-    include/client/DashboardBase.hpp
+    include/client/DashboardBase.hpp \
+    wt/dbo/UserForms.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -130,7 +131,8 @@ SOURCES	+= \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
-    src/client/DashboardBase.cpp
+    src/client/DashboardBase.cpp \
+    wt/dbo/UserForms.cpp
 
 DISTFILES += README \
     INSTALL \

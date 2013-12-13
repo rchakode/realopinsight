@@ -88,7 +88,8 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showLoginHome(void)
 {
   root()->clear();
-  root()->addWidget(createLoginHome());
+  root()->addWidget(createUserForms());
+  //root()->addWidget(createLoginHome());
 }
 
 Wt::WWidget* WebMainUI::createLoginHome(void)

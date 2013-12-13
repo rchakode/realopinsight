@@ -1,8 +1,8 @@
 /*
- * DbSession.hpp
+ * UserForm.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 06-12-2012                                                 #
+# Last Update : 13-12-2013                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,43 +22,51 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef DBSESSION_HPP
-#define DBSESSION_HPP
 
-#include "User.hpp"
-#include "Auth.hpp"
-#include <Wt/Dbo/Dbo>
-#include <Wt/Dbo/backend/Sqlite3>
-#include <Wt/Auth/PasswordService>
-#include <Wt/Auth/User>
-#include <Wt/WGlobal>
-#include <Wt/Auth/Dbo/AuthInfo>
-#include <Wt/Auth/Dbo/UserDatabase>
+#include "UserForms.hpp"
+#include <Wt/WMenu>
+#include <Wt/WPanel>
 
-typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
-typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
-
-class DbSession : public dbo::Session
+Wt::WContainerWidget* createUserList(void)
 {
-public:
-  DbSession();
-  ~DbSession();
-  void setup(void);
+  Wt::WContainerWidget *container = new Wt::WContainerWidget();
 
-  Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
-  static Wt::Auth::AuthService& auth();
-  static Wt::Auth::PasswordService& passwordAuthentificator(void);
-  static void configureAuth(void);
-  const User& loggedUser(void)const {return m_loggedUser;}
-  void setLoggedUser(const std::string& uid);
+//  dbo::Transaction transaction(session);
 
-private:
-  dbo::backend::Sqlite3* m_sqlite3Db;
-  UserDatabase* m_dbUsers;
-  User m_loggedUser;
+//  typedef dbo::collection< dbo::ptr<User> > Users;
 
-  void addUser(const std::string& username, const std::string& pass, int role);
-  std::string hashPassword(const std::string& pass);
-};
+//  Users users = session.find<User>();
 
-#endif // DBSESSION_HPP
+//  std::cerr << "We have " << users.size() << " users:" << std::endl;
+
+//  for (Users::const_iterator i = users.begin(); i != users.end(); ++i)
+//    std::cerr << " user " << (*i)->name
+//  << " with karma of " << (*i)->karma << std::endl;
+//  transaction.commit();
+
+  Wt::WPanel *panel = new Wt::WPanel();
+  panel->setTitle("User 1");
+  panel->setCollapsible(true);
+  Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
+         Wt::WAnimation::EaseOut, 100);
+
+  panel->setAnimation(animation);
+  panel->setCentralWidget(new Wt::WText("User details."));
+  container->addWidget(panel);
+  return container;
+}
+
+Wt::WContainerWidget* createUserForms(void)
+{
+  Wt::WContainerWidget *container = new Wt::WContainerWidget();
+  Wt::WStackedWidget* contents(new Wt::WStackedWidget());
+
+  Wt::WMenu *menu = new Wt::WMenu(contents, Wt::Vertical, container);
+  menu->setStyleClass("nav nav-pills");
+  menu->addItem("Add User", new UserFormView());
+  menu->addItem("User List", createUserList());
+
+  container->addWidget(contents);
+
+  return container;
+}

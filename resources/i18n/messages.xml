@@ -128,4 +128,41 @@
       ${block:copyright-info}
     </div>
   </message>
+
+  <message id="userForm-template">
+    <legend>${title}</legend>
+    <div class="form-horizontal">
+      <fieldset>
+      <div class="control-group">
+            <label for="${id:user-name}" class="control-label">Login</label>
+         <div class="controls">
+              ${last-name} <span class="help-inline">${last-name-info}</span>
+          </div>
+      </div>
+      <div class="control-group">
+      <label for="${id:first-name}" class="control-label">First name</label>
+        <div class="controls">
+          ${first-name} <span class="help-inline">${first-name-info}</span>
+        </div>
+      </div>
+      <div class="control-group">
+          <label for="${id:last-name}" class="control-label">Last name</label>
+          <div class="controls">
+            ${last-name} <span class="help-inline">${last-name-info}</span>
+          </div>
+      </div>
+      <div class="control-group">
+            <label for="${id:role}" class="control-label">Role</label>
+         <div class="controls">
+              ${last-name} <span class="help-inline">${last-name-info}</span>
+          </div>
+      </div>
+      </fieldset>
+      <div class="form-actions">
+        <div class="controls">
+          ${submit-button} <span class="help-inline">${submit-info}</span>
+        </div>
+      </div>
+    </div>
+  </message>
 </messages>
