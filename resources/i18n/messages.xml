@@ -134,34 +134,44 @@
     <div class="form-horizontal">
       <fieldset>
       <div class="control-group">
-            <label for="${id:user-name}" class="control-label">Username</label>
+            <label for="${id:user-name}" class="control-label">Login*</label>
          <div class="controls">
-              ${last-name} <span class="help-inline">${last-name-info}</span>
+              ${user-name} <span class="help-inline">${user-name-info}</span>
           </div>
       </div>
       <div class="control-group">
-      <label for="${id:first-name}" class="control-label">First name</label>
+            <label for="${id:user-name}" class="control-label">Password*</label>
+         <div class="controls">
+              ${password} <span class="help-inline">${password-info}</span>
+          </div>
+      </div>      
+      <div class="control-group">
+      <label for="${id:first-name}" class="control-label">First name*</label>
         <div class="controls">
           ${first-name} <span class="help-inline">${first-name-info}</span>
         </div>
       </div>
       <div class="control-group">
-          <label for="${id:last-name}" class="control-label">Last name</label>
+          <label for="${id:last-name}" class="control-label">Last name*</label>
           <div class="controls">
             ${last-name} <span class="help-inline">${last-name-info}</span>
           </div>
       </div>
       <div class="control-group">
-            <label for="${id:role}" class="control-label">Role</label>
+          <label for="${id:last-name}" class="control-label">Email*</label>
+          <div class="controls">
+            ${email} <span class="help-inline">${email-info}</span>
+          </div>
+      </div>      
+      <div class="control-group">
+            <label for="${id:role}" class="control-label">User level*</label>
          <div class="controls">
               ${role} <span class="help-inline">${role-info}</span>
           </div>
       </div>
       </fieldset>
       <div class="form-actions">
-        <div class="controls">
-          ${submit-button} <span class="help-inline">${submit-info}</span>
-        </div>
+        <div class="controls">${submit-button}</div>
       </div>
     </div>
   </message>

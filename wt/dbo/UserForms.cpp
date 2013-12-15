@@ -23,23 +23,85 @@
  */
 
 #include "UserForms.hpp"
+#include "DbSession.hpp"
 #include <Wt/WMenu>
 #include <Wt/WPanel>
 #include <Wt/WComboBox>
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 
-UserFormView::UserFormView()
+UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
+  : Wt::WFormModel(parent)
 {
-  model = new UserFormModel(this);
+  addField(UsernameField);
+  addField(PasswordField);
+  addField(FirstNameField);
+  addField(LastNameField);
+  addField(EmailField);
+  addField(UserLevelField);
+
+  setValidator(UsernameField, createNameValidator(UsernameField));
+  setValidator(FirstNameField, createNameValidator(FirstNameField));
+  setValidator(FirstNameField, createNameValidator(FirstNameField));
+  setValidator(LastNameField, createNameValidator(LastNameField));
+  setValidator(EmailField, createEmailValidator(EmailField));
+
+  if (user) {
+    setValue(UsernameField, user->username);
+    setValue(FirstNameField, user->firstname);
+    setValue(LastNameField, user->lastname);
+    setValue(EmailField, user->email);
+    setValue(UserLevelField, User::role2Text(user->role));
+    setValue(RegistrationDateField, user->registrationDate);
+  }
+}
+
+UserFormView::UserFormView(const User* user):
+  m_validated(this)
+{
+  m_model = new UserFormModel(user, this);
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
 
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::PasswordField, createPaswordField());
   setFormWidget(UserFormModel::FirstNameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::LastNameField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::EmailField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
 
+  // Title & Buttons
+  Wt::WString title = Wt::WString("User information");
+  bindString("title", title);
+  Wt::WPushButton *button = new Wt::WPushButton("Submit");
+  bindWidget("submit-button", button);
+
+  button->clicked().connect(this, &UserFormView::process);
+
+  updateView(m_model);
+}
+
+void UserFormView::process()
+{
+  updateModel(m_model);
+  bool isvalid = m_model->validate();
+  updateView(m_model);
+  if (isvalid) {
+    User user;
+    user.username = m_model->valueText(UserFormModel::UsernameField).toUTF8();
+    user.firstname = m_model->valueText(UserFormModel::FirstNameField).toUTF8();
+    user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
+    user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
+    user.role = User::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
+    user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
+    std::string password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
+    m_validated.emit(user, password);
+  }
+}
+
+Wt::WComboBox* UserFormView::createUserLevelField(void)
+{
   Wt::WStandardItemModel* roleModel =  new Wt::WStandardItemModel(2, 1, this);
   Wt::WStandardItem* item = new Wt::WStandardItem(User::role2Text(User::OpRole));
   item->setData(User::OpRole, Wt::UserRole);
@@ -51,90 +113,57 @@ UserFormView::UserFormView()
 
   Wt::WComboBox* roleCbox = new Wt::WComboBox();
   roleCbox->setModel(roleModel);
-
-  setFormWidget(UserFormModel::RoleField, roleCbox);
-
-
-  // Title & Buttons
-  Wt::WString title = Wt::WString("User information");
-  bindString("title", title);
-
-  Wt::WPushButton *button = new Wt::WPushButton("Save");
-  bindWidget("submit-button", button);
-
-  bindString("submit-info", Wt::WString());
-
-  button->clicked().connect(this, &UserFormView::process);
-
-  updateView(model);
+  return roleCbox;
 }
 
-void UserFormView::process()
+
+Wt::WLineEdit* UserFormView::createPaswordField(void)
 {
-  updateModel(model);
-
-  if (model->validate()) {
-    // Do something with the data in the model: show it.
-    bindString("submit-info",
-               Wt::WString::fromUTF8("Saved user data for ")
-               + model->userData(), Wt::PlainText);
-    // Udate the view: Delete any validation message in the view, etc.
-    updateView(model);
-    // Set the focus on the first field in the form.
-    Wt::WLineEdit *viewField =
-        resolve<Wt::WLineEdit*>(UserFormModel::FirstNameField);
-    viewField->setFocus();
-  } else {
-    bindEmpty("submit-info"); // Delete the previous user data.
-    updateView(model);
-  }
+  Wt::WLineEdit* field(new Wt::WLineEdit());
+  field->setEchoMode(Wt::WLineEdit::Password);
+  return field;
 }
 
-
-Wt::WContainerWidget* createUserList(const UserListT& users)
+Wt::WContainerWidget* createUserList(DbSession* dbSession)
 {
   Wt::WContainerWidget *container = new Wt::WContainerWidget();
-
-  for (auto user: users) {
-    container->addWidget(createUserPanel(user));
+  dbSession->updateUserList();
+  for (auto user: dbSession->getUserList()) {
+    container->addWidget(createUserPanel(user, dbSession));
   }
-
-
   return container;
 }
 
-Wt::WContainerWidget* createUserForms(const UserListT& users)
+Wt::WContainerWidget* createUserForms(DbSession* dbSession)
 {
-  Wt::WContainerWidget *container = new Wt::WContainerWidget();
+  Wt::WContainerWidget *container(new Wt::WContainerWidget());
   Wt::WStackedWidget* contents(new Wt::WStackedWidget());
-
-  Wt::WMenu *menu = new Wt::WMenu(contents, Wt::Vertical, container);
+  Wt::WMenu *menu(new Wt::WMenu(contents, Wt::Vertical, container));
   menu->setStyleClass("nav nav-pills");
-  menu->addItem("Add User", new UserFormView());
-  menu->addItem("User List", createUserList(users));
+
+  UserFormView* userForm(new UserFormView(NULL));
+  userForm->validated().connect(dbSession, &DbSession::addUser);
+  menu->addItem("Add User", userForm);
+  menu->addItem("User List", createUserList(dbSession));
 
   container->addWidget(contents);
-
   return container;
 }
 
 
-Wt::WPanel* createUserPanel(const User& user)
+Wt::WPanel* createUserPanel(const User& user, DbSession* dbSession)
 {
   Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
                            Wt::WAnimation::EaseOut, 100);
-  Wt::WPanel *panel = new Wt::WPanel();
+
+  UserFormView* userForm(new UserFormView(&user));
+  userForm->validated().connect(dbSession, &DbSession::updateUser);
+  Wt::WPanel *panel(new Wt::WPanel());
+  panel->setAnimation(animation);
+  panel->setCentralWidget(userForm);
   panel->setTitle(user.username);
   panel->setCollapsible(true);
-  panel->setAnimation(animation);
-  UserFormView* userForm = new UserFormView();
-  UserFormModel* userModel = new UserFormModel();
-  userModel->setValue(UserFormModel::FirstNameField, user.firstname);
-  userModel->setValue(UserFormModel::LastNameField, user.lastname);
-  userModel->setValue(UserFormModel::RoleField, User::role2Text(user.role));
-  userModel->setValue(UserFormModel::RegistrationDateField, user.registrationDate);
-  userForm->updateView(userModel);
-  panel->setCentralWidget(userForm);
-
+  panel->setCollapsed(true);
   return panel;
 }
+

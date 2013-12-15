@@ -47,26 +47,33 @@ namespace Wt {
 
 class User {
 public:
-
   enum RoleT {
     AdmRole = 100,
     OpRole = 101
   };
 
-  static std::string role2Text(int role) {
-    return role == AdmRole? "Administrator" : "Operator";
-  }
   std::string username;
   std::string firstname;
   std::string lastname;
-  std::string registrationDate;
+  std::string email;
   int role;
+  std::string registrationDate;
 
   template<class Action>
-  void persist(Action& a)
-  {
+  void persist(Action& a) {
     dbo::id(a, username, "name");
+    dbo::field(a, firstname, "firstname");
+    dbo::field(a, lastname, "lastname");
+    dbo::field(a, email, "email");
     dbo::field(a, role, "role");
+    dbo::field(a, registrationDate, "registrationDate");
+  }
+
+  static std::string role2Text(int role) {
+    return role == AdmRole? "Administrator" : "Operator";
+  }
+  static int role2Int(const std::string& role) {
+    return role =="Administrator" ? AdmRole : OpRole;
   }
 };
 

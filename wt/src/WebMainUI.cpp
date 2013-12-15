@@ -56,7 +56,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_mainWidget(new Wt::WContainerWidget()),
     m_dashtabs(new Wt::WTabWidget()),
     m_infoBox(new Wt::WText("", m_mainWidget)),
-    m_dbSession(new DbSession()),
+    m_dbSession(new DbSession(true)),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
   root()->setId("wrapper");
@@ -88,7 +88,7 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showLoginHome(void)
 {
   root()->clear();
-  root()->addWidget(createUserForms(m_dbSession->getUserList()));
+  root()->addWidget(createUserForms(m_dbSession));
   //root()->addWidget(createLoginHome());
 }
 

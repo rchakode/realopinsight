@@ -41,9 +41,9 @@ typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 class DbSession : public dbo::Session
 {
 public:
-  DbSession();
+  DbSession(bool initializeDb = false);
   ~DbSession();
-  void setup(void);
+  void setup(bool initializeDb);
 
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
   static Wt::Auth::AuthService& auth();
@@ -53,6 +53,8 @@ public:
   void setLoggedUser(const std::string& uid);
   UserListT& getUserList(void) {return m_userList;}
   void updateUserList(void);
+  void addUser(User user, const std::string& password);
+  void updateUser(User user);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
@@ -60,8 +62,8 @@ private:
   User m_loggedUser;
   UserListT m_userList;
 
-  void addUser(const std::string& username, const std::string& pass, int role);
   std::string hashPassword(const std::string& pass);
+  void initDb(void);
 };
 
 #endif // DBSESSION_HPP

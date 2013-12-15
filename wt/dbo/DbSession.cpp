@@ -33,14 +33,13 @@ namespace {
   Wt::Auth::PasswordService passAuthService(basicAuthService);
 }
 
-DbSession::DbSession():
+DbSession::DbSession(bool initializeDb):
   m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db")),
   m_dbUsers(new UserDatabase(*this))
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
-  setup();
-  updateUserList();
+  setup(initializeDb);
 }
 
 DbSession::~DbSession()
@@ -49,46 +48,55 @@ DbSession::~DbSession()
   delete m_dbUsers;
 }
 
-void DbSession::setup(void)
+void DbSession::setup(bool initializeDb)
 {
   mapClass<User>("user");
   mapClass<AuthInfo>("auth_info");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
-
-  try {
-    createTables();
-    addUser("ngrt4n_adm", "ngrt4n_adm", User::AdmRole);
-    addUser("ngrt4n_op", "ngrt4n_op", User::OpRole);
-    Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
-  } catch (std::exception& ex) {
-    Wt::log("notice")<<"[realopinsight] "<< "Using existing database";
-    Wt::log("notice")<<"[realopinsight][dbo] "<< ex.what();
+  if (initializeDb) {
+    initDb();
   }
 }
 
-void DbSession::addUser(const std::string& username, const std::string& pass, int role)
+
+void DbSession::addUser(User user, const std::string& password)
 {
   dbo::Transaction transaction(*this);
   try {
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
-    User u;
-    u.username = username;
-    u.role = role;
-    info.modify()->setUser(add(&u));
-    passAuthService.updatePassword(dbuser, pass);
-    dbuser.addIdentity(Wt::Auth::Identity::LoginName, username);
+    info.modify()->setUser(add(&user));
+    passAuthService.updatePassword(dbuser, password);
+    dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
   } catch (const std::exception& ex) {
-    Wt::log("[realopinsight] error") << ex.what();
+    Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
+  updateUserList();
+}
+
+void DbSession::updateUser(User user)
+{
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<User> info = find<User>().where("name='"+user.username+"'");
+    info.modify()->username = user.username;
+    info.modify()->lastname = user.lastname;
+    info.modify()->firstname = user.firstname;
+    info.modify()->email = user.email;
+    info.modify()->role = user.role;
+  } catch (const std::exception& ex) {
+    Wt::log("error")<<"[realopinsight]" << ex.what();
+  }
+  transaction.commit();
+  updateUserList();
 }
 
 std::string DbSession::hashPassword(const std::string& pass)
 {
   Wt::Auth::BCryptHashFunction h;
-  return h.compute(pass, "salt");
+  return h.compute(pass, "$ngrt4n$salt");
 }
 
 Wt::Auth::AuthService& DbSession::auth()
@@ -130,4 +138,22 @@ void DbSession::updateUserList(void)
     m_userList.push_back(*(*it));
   }
   transaction.commit();
+}
+
+void DbSession::initDb(void)
+{
+  try {
+    createTables();
+    User adm;
+    adm.username = "ngrt4n_adm";
+    adm.firstname = "Default";
+    adm.lastname = "Administrator";
+    adm.role = User::AdmRole;
+    adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
+    addUser(adm, "ngrt4n_adm");
+    Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
+  } catch (std::exception& ex) {
+    Wt::log("error")<<"[realopinsight] "<< "Failed initializing the database";
+    Wt::log("error")<<"[realopinsight][dbo] "<< ex.what();
+  }
 }

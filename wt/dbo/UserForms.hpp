@@ -38,44 +38,22 @@
 #include <Wt/WTemplateFormView>
 #include <Wt/WValidator>
 #include <Wt/WStackedWidget>
+#include <Wt/WRegExpValidator>
+#include <Wt/WSignal>
 
 class DbSession;
 class UserFormModel : public Wt::WFormModel
 {
 public:
   static constexpr Wt::WFormModel::Field UsernameField = "user-name";
+  static constexpr Wt::WFormModel::Field PasswordField = "password";
   static constexpr Wt::WFormModel::Field FirstNameField = "first-name";
   static constexpr Wt::WFormModel::Field LastNameField = "last-name";
-  static constexpr Wt::WFormModel::Field RoleField = "role";
+  static constexpr Wt::WFormModel::Field EmailField = "email";
+  static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
-  UserFormModel(Wt::WObject *parent = 0)
-    : Wt::WFormModel(parent)
-  {
-
-    addField(FirstNameField);
-    addField(LastNameField);
-    addField(RoleField);
-    addField(UsernameField);
-
-    setValidator(FirstNameField, createNameValidator(FirstNameField));
-    setValidator(LastNameField, createNameValidator(LastNameField));
-
-    // Here you could populate the model with initial data using
-    // setValue() for each field.
-
-    setValue(RoleField, std::string());
-  }
-
-  // Get the user data from the model
-  Wt::WString userData() {
-    return
-        Wt::asString(value(FirstNameField)) + " " +
-        Wt::asString(value(LastNameField))
-        + ": role=" + Wt::asString(value(RoleField))
-        + ", username=" + Wt::asString(value(UsernameField))
-        + ".";
-  }
+  UserFormModel(const User* user, Wt::WObject *parent = 0);
 
 private:
   static const int MAX_LENGTH = 25;
@@ -90,20 +68,8 @@ private:
     return v;
   }
 
-
-  Wt::WValidator *createBirthValidator() {
-    Wt::WDateValidator *v = new Wt::WDateValidator();
-    v->setBottom(Wt::WDate(1900, 1, 1));
-    v->setTop(Wt::WDate::currentDate());
-    v->setFormat("dd/MM/yyyy");
-    v->setMandatory(true);
-    return v;
-  }
-
-  Wt::WValidator *createChildrenValidator() {
-    Wt::WIntValidator *v = new Wt::WIntValidator(0, MAX_CHILDREN);
-    v->setMandatory(true);
-    return v;
+  Wt::WValidator *createEmailValidator(const std::string& field) {
+    return new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
   }
 
 };
@@ -111,16 +77,21 @@ private:
 class UserFormView : public Wt::WTemplateFormView
 {
 public:
-  // inline constructor
-  UserFormView();
+  UserFormView(const User* user);
+  Wt::Signal<User, std::string>& validated(void) {return m_validated;}
+
 private:
+  UserFormModel* m_model;
+  Wt::Signal<User, std::string> m_validated;
+
   void process();
-  UserFormModel *model;
+  Wt::WComboBox* createUserLevelField(void);
+  Wt::WLineEdit* createPaswordField(void);
 };
 
 
-Wt::WContainerWidget* createUserForms(const UserListT& users);
-Wt::WContainerWidget* createUserList(const UserListT& users);
-Wt::WPanel* createUserPanel(const User& user);
+Wt::WContainerWidget* createUserForms(DbSession* dbSession);
+Wt::WContainerWidget* createUserList(DbSession* dbSession);
+Wt::WPanel* createUserPanel(const User& user, DbSession* dbSession);
 
 #endif // USERFORM_HPP
