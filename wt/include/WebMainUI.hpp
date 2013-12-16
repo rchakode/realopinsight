@@ -92,6 +92,7 @@ private:
                                        const std::string& desc,
                                        const std::string& internalPath);
   void checkUserLogin(void);
+  void showUserMngtPage(Wt::WStackedWidget* contents, int destination);
 };
 
 #endif // MAINWEBWINDOW_HPP

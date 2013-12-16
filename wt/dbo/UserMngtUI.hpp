@@ -92,14 +92,21 @@ private:
 class UserMngtUI : public Wt::WContainerWidget
 {
 public:
+  enum {
+    AddUser=0,
+    ListUsers=1
+  };
   UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
+  ~UserMngtUI(void);
   void createUserForms(void);
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const User& user);
+  void showDestinationView(int dest);
 private:
   DbSession* m_dbSession;
   UserFormView* m_userForm;
   Wt::WContainerWidget* m_userListContainer;
+  Wt::WMenu* m_menu;
 };
 
 

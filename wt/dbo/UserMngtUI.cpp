@@ -206,6 +206,12 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
   createUserForms();
 }
 
+UserMngtUI::~UserMngtUI(void)
+{
+  delete m_userForm;
+  delete m_userListContainer;
+}
+
 void UserMngtUI::updateUserList(void)
 {
   for (auto user: m_dbSession->getUserList()) {
@@ -216,14 +222,11 @@ void UserMngtUI::updateUserList(void)
 void UserMngtUI::createUserForms(void)
 {
   Wt::WStackedWidget* contents(new Wt::WStackedWidget());
-  Wt::WMenu *menu(new Wt::WMenu(contents, Wt::Vertical, this));
-  menu->setStyleClass("nav nav-pills");
+  m_menu = new Wt::WMenu(contents, Wt::Vertical, this);
+  m_menu->setStyleClass("nav nav-pills");
   m_userForm->validated().connect(m_dbSession, &DbSession::addUser);
-  menu->addItem("Add User", m_userForm)
-      ->triggered().connect(std::bind([=](){
-    //FIXME: m_userForm->clear();
-  }));
-  menu->addItem("User List", m_userListContainer)
+  m_menu->addItem("Add User", m_userForm);
+  m_menu->addItem("User List", m_userListContainer)
       ->triggered().connect(std::bind([=](){
     m_userListContainer->clear();
     updateUserList();
@@ -247,5 +250,19 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   panel->setCollapsible(true);
   panel->setCollapsed(true);
   return panel;
+}
+
+void UserMngtUI::showDestinationView(int dest)
+{
+  switch(dest) {
+    case AddUser:
+      //m_menu->select();
+      break;
+    case ListUsers:
+      //m_menu->setCurrent(1);
+      break;
+    default:
+      break;
+  }
 }
 

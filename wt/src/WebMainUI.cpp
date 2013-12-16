@@ -133,6 +133,7 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   stackedWidgets->setId("stackcontentarea");
   Wt::WMenu* mainMenu (new Wt::WMenu(stackedWidgets));
   navbar->addMenu(mainMenu, Wt::AlignLeft);
+  //FIXME: name tactical overview for operator
   mainMenu->addItem(QObject::tr("Dashboard").toStdString(),m_dashtabs);
   navbar->addWidget(createToolBar());
 
@@ -146,9 +147,9 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("Management").toStdString());
   item->setMenu(mgntPopupMenu);
   mgntMenu->addItem(item);
-//      ->triggered().connect(std::bind([=](){
-//    mgntMenu->select(item);
-//  }));
+  //      ->triggered().connect(std::bind([=](){
+  //    mgntMenu->select(item);
+  //  }));
 
   // Menus for view management
   mgntPopupMenu->addSectionHeader("File");
@@ -167,13 +168,12 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   mgntPopupMenu->addSectionHeader("User");
   mgntPopupMenu->addItem("Add")
       ->triggered().connect(std::bind([=](){
-    stackedWidgets->setCurrentWidget(m_userMgntUI);
+    showUserMngtPage(stackedWidgets, UserMngtUI::AddUser);
   }));
   mgntPopupMenu->addItem("List")
       ->triggered().connect(std::bind([=](){
-    stackedWidgets->setCurrentWidget(m_userMgntUI);
+    showUserMngtPage(stackedWidgets, UserMngtUI::AddUser);
   }));
-
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   item->setMenu(popup);
@@ -504,4 +504,12 @@ void WebMainUI::checkUserLogin(void)
   if (! m_login.loggedIn()) {
     redirect(LINK_LOGIN_PAGE);
   }
+}
+
+
+void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
+{
+  contents->setCurrentWidget(m_userMgntUI);
+  setInternalPath("/users");
+  m_userMgntUI->showDestinationView(destination);
 }
