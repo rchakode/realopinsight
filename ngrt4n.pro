@@ -104,7 +104,7 @@ HEADERS	+= include/core/ns.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
     include/client/DashboardBase.hpp \
-    wt/dbo/UserForms.hpp
+    wt/dbo/UserMngtUI.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -132,7 +132,7 @@ SOURCES	+= \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
     src/client/DashboardBase.cpp \
-    wt/dbo/UserForms.cpp
+    wt/dbo/UserMngtUI.cpp
 
 DISTFILES += README \
     INSTALL \

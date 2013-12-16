@@ -1,5 +1,5 @@
 /*
- * UserForm.cpp
+ * UserMgntUI.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 13-12-2013                                                 #
@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "UserForms.hpp"
+#include "UserMngtUI.hpp"
 #include "DbSession.hpp"
 #include <Wt/WMenu>
 #include <Wt/WPanel>
@@ -148,7 +148,10 @@ void UserMngtUI::createUserForms(void)
   Wt::WMenu *menu(new Wt::WMenu(contents, Wt::Vertical, this));
   menu->setStyleClass("nav nav-pills");
   m_userForm->validated().connect(m_dbSession, &DbSession::addUser);
-  menu->addItem("Add User", m_userForm);
+  menu->addItem("Add User", m_userForm)
+      ->triggered().connect(std::bind([=](){
+    //FIXME: m_userForm->clear();
+  }));
   menu->addItem("User List", m_userListContainer)
       ->triggered().connect(std::bind([=](){
     m_userListContainer->clear();
