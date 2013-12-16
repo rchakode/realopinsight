@@ -131,12 +131,12 @@ UserMngtUI::UserMngtUI(DbSession* dbSession)
     m_userForm(new UserFormView(NULL)),
     m_userListContainer(new Wt::WContainerWidget())
 {
+  m_dbSession->updateUserList();
   createUserForms();
 }
 
 void UserMngtUI::updateUserList(void)
 {
-  m_dbSession->updateUserList();
   for (auto user: m_dbSession->getUserList()) {
     m_userListContainer->addWidget(createUserPanel(user));
   }

@@ -69,10 +69,12 @@ void DbSession::addUser(User user, const std::string& password)
     info.modify()->setUser(add(&user));
     passAuthService.updatePassword(dbuser, password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
+    flush();
   } catch (const std::exception& ex) {
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
+  updateUserList();
 }
 
 void DbSession::updateUser(User user)
@@ -89,6 +91,7 @@ void DbSession::updateUser(User user)
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
+  updateUserList();
 }
 
 std::string DbSession::hashPassword(const std::string& pass)
@@ -133,7 +136,6 @@ void DbSession::updateUserList(void)
   typedef dbo::collection< dbo::ptr<User> > UserCollectionT;
   UserCollectionT users = find<User>();
   for (UserCollectionT::const_iterator it = users.begin(), end = users.end(); it != end; ++it) {
-    std::cout << "current: "<<(*it)->username <<"\n";
     m_userList.push_back(*(*it));
   }
   transaction.commit();
