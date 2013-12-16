@@ -144,7 +144,15 @@
          <div class="controls">
               ${password} <span class="help-inline">${password-info}</span>
           </div>
-      </div>      
+      </div>
+      ${<if:confirm-password>}
+      <div class="control-group">
+            <label for="${id:confirm-password}" class="control-label">Confirm password*</label>
+         <div class="controls">
+              ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
+          </div>
+      </div>
+      ${</if:confirm-password>}
       <div class="control-group">
       <label for="${id:first-name}" class="control-label">First name*</label>
         <div class="controls">
@@ -169,9 +177,17 @@
               ${role} <span class="help-inline">${role-info}</span>
           </div>
       </div>
+      ${<if:registration-date>}
+      <div class="control-group">
+            <label for="${id:registration-date}" class="control-label">Registration*</label>
+         <div class="controls">
+              ${registration-date} <span class="help-inline">${registration-date-info}</span>
+          </div>
+      </div>
+      ${</if:registration-date>}
       </fieldset>
       <div class="form-actions">
-        <div class="controls">${submit-button}</div>
+        <div class="controls">${submit-button} <span>${cancel-button}</span></div>
       </div>
     </div>
   </message>

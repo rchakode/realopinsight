@@ -29,32 +29,82 @@
 #include <Wt/WComboBox>
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
+#include <Wt/Auth/PasswordStrengthValidator>
 
 UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
   : Wt::WFormModel(parent)
 {
   addField(UsernameField);
   addField(PasswordField);
+  addField(PasswordConfimationField);
   addField(FirstNameField);
   addField(LastNameField);
   addField(EmailField);
   addField(UserLevelField);
+  addField(RegistrationDateField);
 
   setValidator(UsernameField, createNameValidator(UsernameField));
   setValidator(FirstNameField, createNameValidator(FirstNameField));
   setValidator(FirstNameField, createNameValidator(FirstNameField));
   setValidator(LastNameField, createNameValidator(LastNameField));
   setValidator(EmailField, createEmailValidator(EmailField));
+  setValidator(UserLevelField, createNameValidator(UserLevelField));
 
   if (user) {
     setValue(UsernameField, user->username);
+    setValue(PasswordField, Wt::WString("passwordissecret"));
     setValue(FirstNameField, user->firstname);
     setValue(LastNameField, user->lastname);
     setValue(EmailField, user->email);
     setValue(UserLevelField, User::role2Text(user->role));
     setValue(RegistrationDateField, user->registrationDate);
+    setVisible(PasswordConfimationField, false);
+    setWritable(false);
+  } else {
+    setVisible(RegistrationDateField, false);
   }
 }
+
+void UserFormModel::setWritable(bool writtable)
+{
+  bool readonly = ! writtable;
+  setReadOnly(UsernameField, readonly);
+  setReadOnly(PasswordField, readonly);
+  setReadOnly(PasswordConfimationField, readonly);
+  setReadOnly(FirstNameField, readonly);
+  setReadOnly(LastNameField, readonly);
+  setReadOnly(EmailField, readonly);
+  setReadOnly(UserLevelField, readonly);
+  setReadOnly(RegistrationDateField, readonly);
+}
+
+Wt::WValidator* UserFormModel::createNameValidator(const std::string& field)
+{
+  Wt::WLengthValidator *v = new Wt::WLengthValidator();
+  v->setMandatory(true);
+  v->setMinimumLength(1);
+  v->setMaximumLength(MAX_LENGTH);
+  return v;
+}
+
+Wt::WValidator* UserFormModel::createPasswordValidator(const std::string& field)
+{
+  Wt::Auth::PasswordStrengthValidator* v = new Wt::Auth::PasswordStrengthValidator();
+  v->setMinimumLength(Wt::Auth::PasswordStrengthValidator::TwoCharClass, 6);
+  v->setMandatory(true);
+  return createNameValidator(field);
+}
+
+Wt::WValidator* UserFormModel::createEmailValidator(const std::string& field)
+{
+  return new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
+}
+
+Wt::WValidator* UserFormModel::createConfirmPasswordValidator(const std::string& field)
+{
+  return createPasswordValidator(field);
+}
+
 
 UserFormView::UserFormView(const User* user):
   m_validated(this)
@@ -66,23 +116,44 @@ UserFormView::UserFormView(const User* user):
 
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
+  setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
   setFormWidget(UserFormModel::FirstNameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::LastNameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::EmailField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
+  setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
 
   // Title & Buttons
   Wt::WString title = Wt::WString("User information");
   bindString("title", title);
-  Wt::WPushButton *button = new Wt::WPushButton("Submit");
-  bindWidget("submit-button", button);
 
-  button->clicked().connect(this, &UserFormView::process);
+  Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
+  bindWidget("submit-button", submitButton);
+  Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
+  bindWidget("cancel-button", cancelButton);
 
+  if (user) {
+    submitButton->setText("Update");
+    cancelButton->setText("Delete");
+    submitButton->clicked().connect(std::bind([=](){
+      m_model->setWritable(true);
+      updateView(m_model);
+      submitButton->clicked().connect(this, &UserFormView::process);
+    }));
+    cancelButton->clicked().connect(std::bind([=](){
+      //TODO
+    }));
+  } else {
+    submitButton->clicked().connect(this, &UserFormView::process);
+    cancelButton->clicked().connect(std::bind([=](){
+      m_model->reset();
+      updateView(m_model);
+    }));
+  }
   updateView(m_model);
 }
 
-void UserFormView::process()
+void UserFormView::process(void)
 {
   updateModel(m_model);
   bool isvalid = m_model->validate();
@@ -125,8 +196,8 @@ Wt::WLineEdit* UserFormView::createPaswordField(void)
 }
 
 
-UserMngtUI::UserMngtUI(DbSession* dbSession)
-  : Wt::WContainerWidget(),
+UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
+  : Wt::WContainerWidget(parent),
     m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL)),
     m_userListContainer(new Wt::WContainerWidget())

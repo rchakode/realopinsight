@@ -28,7 +28,7 @@
 
 #include "WebDashboard.hpp"
 #include "DbSession.hpp"
-#include "UserForms.hpp"
+#include "UserMngtUI.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/Auth/Login>
@@ -73,6 +73,7 @@ private:
   DbSession* m_dbSession;
   Wt::Auth::Login m_login; /* slot conflict if decleared in the DbSession class */
   std::string m_confdir;
+  UserMngtUI* m_userMgntUI;
 
 
   void addEvents(void);

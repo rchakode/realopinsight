@@ -47,6 +47,7 @@ class UserFormModel : public Wt::WFormModel
 public:
   static constexpr Wt::WFormModel::Field UsernameField = "user-name";
   static constexpr Wt::WFormModel::Field PasswordField = "password";
+  static constexpr Wt::WFormModel::Field PasswordConfimationField = "confirm-password";
   static constexpr Wt::WFormModel::Field FirstNameField = "first-name";
   static constexpr Wt::WFormModel::Field LastNameField = "last-name";
   static constexpr Wt::WFormModel::Field EmailField = "email";
@@ -54,29 +55,27 @@ public:
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
   UserFormModel(const User* user, Wt::WObject *parent = 0);
+  void setWritable(bool writtable);
 
 private:
   static const int MAX_LENGTH = 25;
   static const int MAX_CHILDREN = 15;
 
 
-  Wt::WValidator *createNameValidator(const std::string& field) {
-    Wt::WLengthValidator *v = new Wt::WLengthValidator();
-    v->setMandatory(true);
-    v->setMinimumLength(1);
-    v->setMaximumLength(MAX_LENGTH);
-    return v;
-  }
-
-  Wt::WValidator *createEmailValidator(const std::string& field) {
-    return new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
-  }
+  Wt::WValidator* createNameValidator(const std::string& field);
+  Wt::WValidator* createEmailValidator(const std::string& field);
+  Wt::WValidator* createPasswordValidator(const std::string& field);
+  Wt::WValidator* createConfirmPasswordValidator(const std::string& field);
 
 };
 
 class UserFormView : public Wt::WTemplateFormView
 {
 public:
+  enum ActionT {
+    CREATE_USER = 1,
+    UPDATE_USER = 2
+  };
   UserFormView(const User* user);
   Wt::Signal<User, std::string>& validated(void) {return m_validated;}
 
@@ -84,7 +83,7 @@ private:
   UserFormModel* m_model;
   Wt::Signal<User, std::string> m_validated;
 
-  void process();
+  void process(void);
   Wt::WComboBox* createUserLevelField(void);
   Wt::WLineEdit* createPaswordField(void);
 };
@@ -93,7 +92,7 @@ private:
 class UserMngtUI : public Wt::WContainerWidget
 {
 public:
-  UserMngtUI(DbSession* dbSession);
+  UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   void createUserForms(void);
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const User& user);

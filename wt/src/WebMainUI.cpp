@@ -88,8 +88,8 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showLoginHome(void)
 {
   root()->clear();
-  root()->addWidget(new UserMngtUI(m_dbSession));
-  //root()->addWidget(createLoginHome());
+  //root()->addWidget(m_userMgntUI(new UserMngtUI(m_dbSession)));
+  root()->addWidget(createLoginHome());
 }
 
 Wt::WWidget* WebMainUI::createLoginHome(void)
@@ -146,6 +146,9 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("Management").toStdString());
   item->setMenu(mgntPopupMenu);
   mgntMenu->addItem(item);
+//      ->triggered().connect(std::bind([=](){
+//    mgntMenu->select(item);
+//  }));
 
   // Menus for view management
   mgntPopupMenu->addSectionHeader("File");
@@ -160,11 +163,16 @@ Wt::WWidget* WebMainUI::createNavBar(void)
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
 
   // Menus for user management
+  m_userMgntUI = new UserMngtUI(m_dbSession, m_mainWidget);
   mgntPopupMenu->addSectionHeader("User");
   mgntPopupMenu->addItem("Add")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+      ->triggered().connect(std::bind([=](){
+    stackedWidgets->setCurrentWidget(m_userMgntUI);
+  }));
   mgntPopupMenu->addItem("List")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+      ->triggered().connect(std::bind([=](){
+    stackedWidgets->setCurrentWidget(m_userMgntUI);
+  }));
 
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
@@ -184,6 +192,8 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   popup->addItem("Logout")
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
 
+
+  stackedWidgets->addWidget(m_userMgntUI);
   container->addWidget(stackedWidgets);
   return container;
 }
