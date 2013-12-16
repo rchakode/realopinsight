@@ -90,8 +90,18 @@ private:
 };
 
 
-Wt::WContainerWidget* createUserForms(DbSession* dbSession);
-Wt::WContainerWidget* createUserList(DbSession* dbSession);
-Wt::WPanel* createUserPanel(const User& user, DbSession* dbSession);
+class UserMngtUI : public Wt::WContainerWidget
+{
+public:
+  UserMngtUI(DbSession* dbSession);
+  void createUserForms(void);
+  void updateUserList(void);
+  Wt::WPanel* createUserPanel(const User& user);
+private:
+  DbSession* m_dbSession;
+  UserFormView* m_userForm;
+  Wt::WContainerWidget* m_userListContainer;
+};
+
 
 #endif // USERFORM_HPP

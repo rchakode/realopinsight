@@ -124,40 +124,48 @@ Wt::WLineEdit* UserFormView::createPaswordField(void)
   return field;
 }
 
-Wt::WContainerWidget* createUserList(DbSession* dbSession)
+
+UserMngtUI::UserMngtUI(DbSession* dbSession)
+  : Wt::WContainerWidget(),
+    m_dbSession(dbSession),
+    m_userForm(new UserFormView(NULL)),
+    m_userListContainer(new Wt::WContainerWidget())
 {
-  Wt::WContainerWidget *container = new Wt::WContainerWidget();
-  dbSession->updateUserList();
-  for (auto user: dbSession->getUserList()) {
-    container->addWidget(createUserPanel(user, dbSession));
+  createUserForms();
+}
+
+void UserMngtUI::updateUserList(void)
+{
+  m_dbSession->updateUserList();
+  for (auto user: m_dbSession->getUserList()) {
+    m_userListContainer->addWidget(createUserPanel(user));
   }
-  return container;
 }
 
-Wt::WContainerWidget* createUserForms(DbSession* dbSession)
+void UserMngtUI::createUserForms(void)
 {
-  Wt::WContainerWidget *container(new Wt::WContainerWidget());
   Wt::WStackedWidget* contents(new Wt::WStackedWidget());
-  Wt::WMenu *menu(new Wt::WMenu(contents, Wt::Vertical, container));
+  Wt::WMenu *menu(new Wt::WMenu(contents, Wt::Vertical, this));
   menu->setStyleClass("nav nav-pills");
+  m_userForm->validated().connect(m_dbSession, &DbSession::addUser);
+  menu->addItem("Add User", m_userForm);
+  menu->addItem("User List", m_userListContainer)
+      ->triggered().connect(std::bind([=](){
+    m_userListContainer->clear();
+    updateUserList();
+  }));
 
-  UserFormView* userForm(new UserFormView(NULL));
-  userForm->validated().connect(dbSession, &DbSession::addUser);
-  menu->addItem("Add User", userForm);
-  menu->addItem("User List", createUserList(dbSession));
-
-  container->addWidget(contents);
-  return container;
+  this->addWidget(contents);
 }
 
 
-Wt::WPanel* createUserPanel(const User& user, DbSession* dbSession)
+Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 {
   Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
                            Wt::WAnimation::EaseOut, 100);
 
   UserFormView* userForm(new UserFormView(&user));
-  userForm->validated().connect(dbSession, &DbSession::updateUser);
+  userForm->validated().connect(m_dbSession, &DbSession::updateUser);
   Wt::WPanel *panel(new Wt::WPanel());
   panel->setAnimation(animation);
   panel->setCentralWidget(userForm);
