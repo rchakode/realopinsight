@@ -261,9 +261,17 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                            Wt::WAnimation::EaseOut, 100);
 
   UserFormView* userForm(new UserFormView(&user));
+  //userForm->validated().connect(m_dbSession, &DbSession::updateUser);
+  //userForm->deleteTriggered().connect(m_dbSession, &DbSession::deleteUser);
   userForm->validated().connect(m_dbSession, &DbSession::updateUser);
-  //FIXME: show warning message before deleting the user
-  userForm->deleteTriggered().connect(m_dbSession, &DbSession::deleteUser);
+//  userForm->deleteTriggered().connect(std::bind([=](User user, std::string password) {
+//    m_dbSession->updateUser(user);
+//  }, std::placeholders::_1, std::placeholders::_2));
+
+  userForm->deleteTriggered().connect(std::bind([=](std::string username) {
+    m_dbSession->deleteUser(username);
+  }, std::placeholders::_1));
+
   Wt::WPanel *panel(new Wt::WPanel());
   panel->setAnimation(animation);
   panel->setCentralWidget(userForm);
