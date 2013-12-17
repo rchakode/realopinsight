@@ -60,8 +60,9 @@ void DbSession::setup(bool initializeDb)
 }
 
 
-void DbSession::addUser(User user, const std::string& password)
+int DbSession::addUser(User user, const std::string& password)
 {
+  int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
@@ -71,15 +72,19 @@ void DbSession::addUser(User user, const std::string& password)
     passAuthService.updatePassword(dbuser, password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
     flush();
+    retCode = 0;
   } catch (const std::exception& ex) {
+    retCode = 1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
   updateUserList();
+  return retCode;
 }
 
-void DbSession::updateUser(User user)
+int DbSession::updateUser(User user)
 {
+  int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<User> usr = find<User>().where("name='"+user.username+"'");
@@ -89,24 +94,31 @@ void DbSession::updateUser(User user)
     usr.modify()->email = user.email;
     usr.modify()->role = user.role;
     //authinfo->setEmail(user.email); //FIXME: take this into account
+    retCode = 0;
   } catch (const std::exception& ex) {
+    retCode = -1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
   updateUserList();
+  return retCode;
 }
 
-void DbSession::deleteUser(std::string username)
+int DbSession::deleteUser(std::string username)
 {
+  int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<User> usr = find<User>().where("name='"+username+"'");
     usr.remove();
+    retCode = 0;
   } catch (const std::exception& ex) {
+    retCode = 1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
   updateUserList();
+  return retCode;
 }
 
 std::string DbSession::hashPassword(const std::string& pass)

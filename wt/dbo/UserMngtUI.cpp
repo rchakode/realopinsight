@@ -32,6 +32,22 @@
 #include <Wt/Auth/PasswordStrengthValidator>
 #include <Wt/WMessageBox>
 
+ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model,
+                                                   Wt::WFormModel::Field passField)
+  : Wt::WValidator(),
+    m_model(model),
+    m_passwordField(passField)
+{
+
+}
+
+Wt::WValidator::Result ConfirmPasswordValidator::validate (const Wt::WString &input) const
+{
+  return (m_model->valueText(m_passwordField) == input)?
+        Wt::WValidator::Result(Wt::WValidator::Valid):
+        Wt::WValidator::Result(Wt::WValidator::Invalid, "Confirmation don't match");
+}
+
 UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
   : Wt::WFormModel(parent)
 {
@@ -44,12 +60,14 @@ UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
   addField(UserLevelField);
   addField(RegistrationDateField);
 
-  setValidator(UsernameField, createNameValidator(UsernameField));
-  setValidator(FirstNameField, createNameValidator(FirstNameField));
-  setValidator(FirstNameField, createNameValidator(FirstNameField));
-  setValidator(LastNameField, createNameValidator(LastNameField));
-  setValidator(EmailField, createEmailValidator(EmailField));
-  setValidator(UserLevelField, createNameValidator(UserLevelField));
+  setValidator(UsernameField, createNameValidator());
+  setValidator(PasswordField, createPasswordValidator());
+  setValidator(PasswordConfimationField, new ConfirmPasswordValidator(this, PasswordField));
+  setValidator(FirstNameField, createNameValidator());
+  setValidator(FirstNameField, createNameValidator());
+  setValidator(LastNameField, createNameValidator());
+  setValidator(EmailField, createEmailValidator());
+  setValidator(UserLevelField, createNameValidator());
 
   if (user) {
     setValue(UsernameField, user->username);
@@ -70,7 +88,7 @@ void UserFormModel::setWritable(bool writtable)
 {
   bool readonly = ! writtable;
   setReadOnly(UsernameField, true);  // Always read only on update
-  setReadOnly(PasswordField, readonly);
+  setReadOnly(PasswordField, true); // Should be changed differently
   setReadOnly(PasswordConfimationField, readonly);
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
@@ -79,7 +97,7 @@ void UserFormModel::setWritable(bool writtable)
   setReadOnly(RegistrationDateField, readonly);
 }
 
-Wt::WValidator* UserFormModel::createNameValidator(const std::string& field)
+Wt::WValidator* UserFormModel::createNameValidator(void)
 {
   Wt::WLengthValidator *v = new Wt::WLengthValidator();
   v->setMandatory(true);
@@ -88,34 +106,35 @@ Wt::WValidator* UserFormModel::createNameValidator(const std::string& field)
   return v;
 }
 
-Wt::WValidator* UserFormModel::createPasswordValidator(const std::string& field)
+Wt::WValidator* UserFormModel::createPasswordValidator(void)
 {
   Wt::Auth::PasswordStrengthValidator* v = new Wt::Auth::PasswordStrengthValidator();
   v->setMinimumLength(Wt::Auth::PasswordStrengthValidator::TwoCharClass, 6);
   v->setMandatory(true);
-  return createNameValidator(field);
+  return createNameValidator();
 }
 
-Wt::WValidator* UserFormModel::createEmailValidator(const std::string& field)
+Wt::WValidator* UserFormModel::createEmailValidator(void)
 {
   return new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
 }
 
-Wt::WValidator* UserFormModel::createConfirmPasswordValidator(const std::string& field)
+Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
 {
-  return createPasswordValidator(field);
+  return createPasswordValidator();
 }
-
 
 UserFormView::UserFormView(const User* user):
   m_validated(this),
-  m_deleteTriggered(this)
+  m_deleteTriggered(this),
+  m_infoBox(new Wt::WText("test"))
 {
   m_model = new UserFormModel(user, this);
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
 
+  bindWidget("info-box", m_infoBox);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
@@ -168,6 +187,11 @@ UserFormView::UserFormView(const User* user):
     }));
   }
   updateView(m_model);
+}
+
+UserFormView::~UserFormView(void)
+{
+  delete m_infoBox;
 }
 
 void UserFormView::process(void)
@@ -231,6 +255,7 @@ UserMngtUI::~UserMngtUI(void)
 
 void UserMngtUI::updateUserList(void)
 {
+  m_userListContainer->clear();
   for (auto user: m_dbSession->getUserList()) {
     m_userListContainer->addWidget(createUserPanel(user));
   }
@@ -241,12 +266,17 @@ void UserMngtUI::createUserForms(void)
   Wt::WStackedWidget* contents(new Wt::WStackedWidget());
   m_menu = new Wt::WMenu(contents, Wt::Vertical, this);
   m_menu->setStyleClass("nav nav-pills");
-  m_userForm->validated().connect(m_dbSession, &DbSession::addUser);
+  m_userForm->validated().connect(std::bind([=](User user, std::string password) {
+    int ret = m_dbSession->addUser(user, password);
+    m_userForm->showMessage(ret,
+                            "Operation failed. More details in log.",
+                            "User added.");
+  }, std::placeholders::_1, std::placeholders::_2));
+
   Wt::WMenuItem* item = m_menu->addItem("Add User", m_userForm);
   m_menus.insert(std::pair<int, Wt::WMenuItem*>(AddUserAction, item));
   item = m_menu->addItem("User List", m_userListContainer);
   item->triggered().connect(std::bind([=](){
-    m_userListContainer->clear();
     updateUserList();
   }));
   m_menus.insert(std::pair<int, Wt::WMenuItem*>(ListUserAction, item));
@@ -261,15 +291,19 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                            Wt::WAnimation::EaseOut, 100);
 
   UserFormView* userForm(new UserFormView(&user));
-  //userForm->validated().connect(m_dbSession, &DbSession::updateUser);
-  //userForm->deleteTriggered().connect(m_dbSession, &DbSession::deleteUser);
-  userForm->validated().connect(m_dbSession, &DbSession::updateUser);
-//  userForm->deleteTriggered().connect(std::bind([=](User user, std::string password) {
-//    m_dbSession->updateUser(user);
-//  }, std::placeholders::_1, std::placeholders::_2));
+  userForm->validated().connect(std::bind([=](User user, std::string password) {
+    int ret = m_dbSession->updateUser(user);
+    m_userForm->showMessage(ret,
+                            "Update failed. More details in log.",
+                            "Update completed.");
+  }, std::placeholders::_1, std::placeholders::_2));
 
   userForm->deleteTriggered().connect(std::bind([=](std::string username) {
-    m_dbSession->deleteUser(username);
+    int ret = m_dbSession->deleteUser(username);
+    m_userForm->showMessage(ret,
+                            "Deletion failed. More details in log.",
+                            QObject::tr("User %1 deleted").arg(username.c_str()).toStdString());
+    updateUserList();
   }, std::placeholders::_1));
 
   Wt::WPanel *panel(new Wt::WPanel());
@@ -284,16 +318,5 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 void UserMngtUI::showDestinationView(int dest)
 {
   m_menu->select(m_menus[dest]);
-  /*
-  switch(dest) {
-    case AddUser:
-      m_menu->select();
-      break;
-    case ListUsers:
-      //m_menu->setCurrent(1);
-      break;
-    default:
-      break;
-  }*/
 }
 

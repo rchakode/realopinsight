@@ -42,6 +42,22 @@
 #include <Wt/WSignal>
 
 class DbSession;
+class UserFormModel;
+class UserFormView;
+
+class ConfirmPasswordValidator : public Wt::WValidator
+{
+public:
+  ConfirmPasswordValidator(UserFormModel* model, Wt::WFormModel::Field passField);
+
+protected:
+  virtual Wt::WValidator::Result validate(const Wt::WString &input) const;
+
+private:
+  UserFormModel* m_model;
+  Wt::WFormModel::Field m_passwordField;
+};
+
 class UserFormModel : public Wt::WFormModel
 {
 public:
@@ -62,10 +78,10 @@ private:
   static const int MAX_CHILDREN = 15;
 
 
-  Wt::WValidator* createNameValidator(const std::string& field);
-  Wt::WValidator* createEmailValidator(const std::string& field);
-  Wt::WValidator* createPasswordValidator(const std::string& field);
-  Wt::WValidator* createConfirmPasswordValidator(const std::string& field);
+  Wt::WValidator* createNameValidator(void);
+  Wt::WValidator* createEmailValidator(void);
+  Wt::WValidator* createPasswordValidator(void);
+  Wt::WValidator* createConfirmPasswordValidator(void);
 
 };
 
@@ -77,13 +93,33 @@ public:
     UPDATE_USER = 2
   };
   UserFormView(const User* user);
+  ~UserFormView(void);
   Wt::Signal<User, std::string>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
+
+  void showMessage(int opStatus,
+                   const std::string& errorMsg,
+                   const std::string& successMsg)
+  {
+    WTemplate* tpl = NULL;
+    if (! opStatus){
+      tpl = new WTemplate(Wt::WString::tr("error-msg-div-tpl"));
+      tpl->bindString("msg", errorMsg);
+    } else {
+      tpl = new WTemplate(Wt::WString::tr("success-msg-div-tpl"));
+      tpl->bindString("msg", successMsg);
+    }
+    if (tpl) {
+      m_infoBox->setText(tpl->templateText());
+      delete tpl;
+    }
+  }
 
 private:
   UserFormModel* m_model;
   Wt::Signal<User, std::string> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
+  Wt::WText* m_infoBox;
 
   void process(void);
   Wt::WComboBox* createUserLevelField(void);
@@ -104,6 +140,7 @@ public:
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const User& user);
   void showDestinationView(int dest);
+
 private:
   DbSession* m_dbSession;
   UserFormView* m_userForm;
