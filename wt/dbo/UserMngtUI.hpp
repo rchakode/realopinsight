@@ -103,7 +103,7 @@ public:
                    const std::string& successMsg)
   {
     WTemplate* tpl = NULL;
-    if (! opStatus){
+    if (opStatus != 0){
       tpl = new WTemplate(Wt::WString::tr("error-msg-div-tpl"));
       tpl->bindString("msg", errorMsg);
     } else {
@@ -111,7 +111,9 @@ public:
       tpl->bindString("msg", successMsg);
     }
     if (tpl) {
-      m_infoBox->setText(tpl->templateText());
+      std::ostringstream oss;
+      tpl->renderTemplate(oss);
+      m_infoBox->setText(oss.str());
       delete tpl;
     }
   }

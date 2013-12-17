@@ -132,8 +132,8 @@ UserFormView::UserFormView(const User* user):
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
-  m_infoBox = new Wt::WText("test");
- // setFormWidget(UserFormModel::InfoBoxField, static_cast<Wt::WFormWidget*>(m_infoBox));
+  m_infoBox = new Wt::WText();
+  bindWidget("info-box", m_infoBox);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
@@ -180,9 +180,11 @@ UserFormView::UserFormView(const User* user):
   } else {
     submitButton->setStyleClass("btn-success");
     submitButton->clicked().connect(this, &UserFormView::process);
-    cancelButton->clicked().connect(std::bind([=](){
+    cancelButton->clicked().connect(std::bind([=]() {
+      m_infoBox->setText("");
       m_model->reset();
       updateView(m_model);
+      refresh();
     }));
   }
   updateView(m_model);
@@ -285,9 +287,9 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                            Wt::WAnimation::EaseOut, 100);
 
   UserFormView* userForm(new UserFormView(&user));
-  userForm->validated().connect(std::bind([=](User user, std::string password) {
-    int ret = m_dbSession->updateUser(user);
-    m_userForm->showMessage(ret,
+  userForm->validated().connect(std::bind([=](User userToUpdate, std::string password) {
+    int ret = m_dbSession->updateUser(userToUpdate);
+    userForm->showMessage(ret,
                             "Update failed. More details in log.",
                             "Update completed.");
   }, std::placeholders::_1, std::placeholders::_2));

@@ -132,9 +132,7 @@
   <message id="userForm-template">
     <legend>${title}</legend>
     <div class="form-horizontal">
-      ${<if:info-box>}
-        ${info-box}
-      ${</if:info-box>}
+      ${info-box}
       <fieldset>
       <div class="control-group">
             <label for="${id:user-name}" class="control-label">Login*</label>
@@ -196,15 +194,10 @@
   </message>
 
   <message id="error-msg-div-tpl">
-    <div class="alert alert-warning alert-dismissable">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-        &times;
-      </button>
-      ${msg}
-    </div>
+    <div class="alert alert-warning">${msg}</div>
   </message>
 
-  <message id="sucess-msg-div-tpl">
+  <message id="success-msg-div-tpl">
     <div class="alert alert-success">${msg}</div>
   </message>
 </messages>
