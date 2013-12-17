@@ -30,6 +30,7 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 #include <Wt/Auth/PasswordStrengthValidator>
+#include <Wt/WMessageBox>
 
 UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
   : Wt::WFormModel(parent)
@@ -136,15 +137,30 @@ UserFormView::UserFormView(const User* user):
   if (user) {
     submitButton->setText("Update");
     cancelButton->setText("Delete");
+    submitButton->setStyleClass("btn-warning");
+    cancelButton->setStyleClass("btn-danger");
     submitButton->clicked().connect(std::bind([=](){
       m_model->setWritable(true);
       updateView(m_model);
       submitButton->clicked().connect(this, &UserFormView::process);
     }));
+
     cancelButton->clicked().connect(std::bind([=](){
-      m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
+      Wt::WMessageBox *confirmationBox = new Wt::WMessageBox
+          ("Warning !",
+           "<p>Do you really want to delete this user?</p>",
+           Wt::Information, Wt::Yes | Wt::No);
+      confirmationBox->setModal(false);
+      confirmationBox->buttonClicked().connect(std::bind([=] () {
+        if (confirmationBox->buttonResult() == Wt::Yes) {
+          m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
+        }
+        delete confirmationBox;
+      }));
+      confirmationBox->show();
     }));
   } else {
+    submitButton->setStyleClass("btn-success");
     submitButton->clicked().connect(this, &UserFormView::process);
     cancelButton->clicked().connect(std::bind([=](){
       m_model->reset();
@@ -226,12 +242,14 @@ void UserMngtUI::createUserForms(void)
   m_menu = new Wt::WMenu(contents, Wt::Vertical, this);
   m_menu->setStyleClass("nav nav-pills");
   m_userForm->validated().connect(m_dbSession, &DbSession::addUser);
-  m_menu->addItem("Add User", m_userForm);
-  m_menu->addItem("User List", m_userListContainer)
-      ->triggered().connect(std::bind([=](){
+  Wt::WMenuItem* item = m_menu->addItem("Add User", m_userForm);
+  m_menus.insert(std::pair<int, Wt::WMenuItem*>(AddUserAction, item));
+  item = m_menu->addItem("User List", m_userListContainer);
+  item->triggered().connect(std::bind([=](){
     m_userListContainer->clear();
     updateUserList();
   }));
+  m_menus.insert(std::pair<int, Wt::WMenuItem*>(ListUserAction, item));
 
   this->addWidget(contents);
 }
@@ -257,15 +275,17 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 
 void UserMngtUI::showDestinationView(int dest)
 {
+  m_menu->select(m_menus[dest]);
+  /*
   switch(dest) {
     case AddUser:
-      //m_menu->select();
+      m_menu->select();
       break;
     case ListUsers:
       //m_menu->setCurrent(1);
       break;
     default:
       break;
-  }
+  }*/
 }
 

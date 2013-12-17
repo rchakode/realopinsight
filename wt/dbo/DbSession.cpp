@@ -67,7 +67,7 @@ void DbSession::addUser(User user, const std::string& password)
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
     info.modify()->setUser(add(&user));
-    info->setEmail(user.email); //FIXME: take this into account
+    info.modify()->setEmail(user.email); //FIXME: take this into account
     passAuthService.updatePassword(dbuser, password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
     flush();

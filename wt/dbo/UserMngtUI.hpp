@@ -95,8 +95,8 @@ class UserMngtUI : public Wt::WContainerWidget
 {
 public:
   enum {
-    AddUser=0,
-    ListUsers=1
+    AddUserAction=0,
+    ListUserAction=1
   };
   UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   ~UserMngtUI(void);
@@ -109,6 +109,7 @@ private:
   UserFormView* m_userForm;
   Wt::WContainerWidget* m_userListContainer;
   Wt::WMenu* m_menu;
+  std::map<int, Wt::WMenuItem*> m_menus;
 };
 
 

@@ -147,9 +147,6 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("Management").toStdString());
   item->setMenu(mgntPopupMenu);
   mgntMenu->addItem(item);
-  //      ->triggered().connect(std::bind([=](){
-  //    mgntMenu->select(item);
-  //  }));
 
   // Menus for view management
   mgntPopupMenu->addSectionHeader("File");
@@ -168,11 +165,11 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   mgntPopupMenu->addSectionHeader("User");
   mgntPopupMenu->addItem("Add")
       ->triggered().connect(std::bind([=](){
-    showUserMngtPage(stackedWidgets, UserMngtUI::AddUser);
+    showUserMngtPage(stackedWidgets, UserMngtUI::AddUserAction);
   }));
   mgntPopupMenu->addItem("List")
       ->triggered().connect(std::bind([=](){
-    showUserMngtPage(stackedWidgets, UserMngtUI::AddUser);
+    showUserMngtPage(stackedWidgets, UserMngtUI::ListUserAction);
   }));
   Wt::WPopupMenu* popup = new Wt::WPopupMenu();
   item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
@@ -185,7 +182,7 @@ Wt::WWidget* WebMainUI::createNavBar(void)
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
   popup->addSeparator();
   popup->addItem("Documentation")
-      ->setLink(Wt::WLink(Wt::WLink::Url,"http://realopinsight.com/en/index.php/page/documentation"));
+      ->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
   popup->addItem("About")
       ->triggered().connect(std::bind([=](){}));
   popup->addSeparator();
@@ -211,22 +208,22 @@ Wt::WWidget* WebMainUI::createToolBar(void)
   Wt::WPushButton* b(NULL);
 
   b = createTooBarButton("/images/built-in/menu_refresh.png");
-  b->setStyleClass("button");
+  b->setStyleClass("btn-small");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(b);
 
   b = createTooBarButton("/images/built-in/menu_zoomin.png");
-  b->setStyleClass("button");
+  b->setStyleClass("btn-small");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("/images/built-in/menu_zoomout.png");
-  b->setStyleClass("button");
+  b->setStyleClass("btn-small");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
   //  b = createTooBarButton("/images/built-in/menu_disket.png");
-  //  b->setStyleClass("button");
+  //  b->setStyleClass("btn-small");
   //  b->clicked().connect(this, &WebMainUI::handleRefresh);
   //  toolBar->addButton(createTooBarButton("/images/built-in/menu_disket.png"));
 
