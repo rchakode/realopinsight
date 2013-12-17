@@ -126,15 +126,14 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
 
 UserFormView::UserFormView(const User* user):
   m_validated(this),
-  m_deleteTriggered(this),
-  m_infoBox(new Wt::WText("test"))
+  m_deleteTriggered(this)
 {
   m_model = new UserFormModel(user, this);
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
-
-  bindWidget("info-box", m_infoBox);
+  m_infoBox = new Wt::WText("test");
+ // setFormWidget(UserFormModel::InfoBoxField, static_cast<Wt::WFormWidget*>(m_infoBox));
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
@@ -191,7 +190,7 @@ UserFormView::UserFormView(const User* user):
 
 UserFormView::~UserFormView(void)
 {
-  delete m_infoBox;
+  // delete m_infoBox;
 }
 
 void UserFormView::process(void)
@@ -244,25 +243,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
     m_userListContainer(new Wt::WContainerWidget())
 {
   m_dbSession->updateUserList();
-  createUserForms();
-}
 
-UserMngtUI::~UserMngtUI(void)
-{
-  delete m_userForm;
-  delete m_userListContainer;
-}
-
-void UserMngtUI::updateUserList(void)
-{
-  m_userListContainer->clear();
-  for (auto user: m_dbSession->getUserList()) {
-    m_userListContainer->addWidget(createUserPanel(user));
-  }
-}
-
-void UserMngtUI::createUserForms(void)
-{
   Wt::WStackedWidget* contents(new Wt::WStackedWidget());
   m_menu = new Wt::WMenu(contents, Wt::Vertical, this);
   m_menu->setStyleClass("nav nav-pills");
@@ -284,6 +265,19 @@ void UserMngtUI::createUserForms(void)
   this->addWidget(contents);
 }
 
+UserMngtUI::~UserMngtUI(void)
+{
+  delete m_userForm;
+  delete m_userListContainer;
+}
+
+void UserMngtUI::updateUserList(void)
+{
+  m_userListContainer->clear();
+  for (auto user: m_dbSession->getUserList()) {
+    m_userListContainer->addWidget(createUserPanel(user));
+  }
+}
 
 Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 {

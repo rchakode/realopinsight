@@ -61,6 +61,7 @@ private:
 class UserFormModel : public Wt::WFormModel
 {
 public:
+  static constexpr Wt::WFormModel::Field InfoBoxField = "infox-box";
   static constexpr Wt::WFormModel::Field UsernameField = "user-name";
   static constexpr Wt::WFormModel::Field PasswordField = "password";
   static constexpr Wt::WFormModel::Field PasswordConfimationField = "confirm-password";
@@ -136,7 +137,6 @@ public:
   };
   UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   ~UserMngtUI(void);
-  void createUserForms(void);
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const User& user);
   void showDestinationView(int dest);
