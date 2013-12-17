@@ -67,6 +67,7 @@ void DbSession::addUser(User user, const std::string& password)
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
     info.modify()->setUser(add(&user));
+    info->setEmail(user.email); //FIXME: take this into account
     passAuthService.updatePassword(dbuser, password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
     flush();
@@ -81,12 +82,26 @@ void DbSession::updateUser(User user)
 {
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> info = find<User>().where("name='"+user.username+"'");
-    info.modify()->username = user.username;
-    info.modify()->lastname = user.lastname;
-    info.modify()->firstname = user.firstname;
-    info.modify()->email = user.email;
-    info.modify()->role = user.role;
+    dbo::ptr<User> usr = find<User>().where("name='"+user.username+"'");
+    usr.modify()->username = user.username;
+    usr.modify()->lastname = user.lastname;
+    usr.modify()->firstname = user.firstname;
+    usr.modify()->email = user.email;
+    usr.modify()->role = user.role;
+    //authinfo->setEmail(user.email); //FIXME: take this into account
+  } catch (const std::exception& ex) {
+    Wt::log("error")<<"[realopinsight]" << ex.what();
+  }
+  transaction.commit();
+  updateUserList();
+}
+
+void DbSession::deleteUser(std::string username)
+{
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<User> usr = find<User>().where("name='"+username+"'");
+    usr.remove();
   } catch (const std::exception& ex) {
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }

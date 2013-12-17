@@ -55,6 +55,7 @@ public:
   void updateUserList(void);
   void addUser(User user, const std::string& password);
   void updateUser(User user);
+  void deleteUser(std::string username);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;

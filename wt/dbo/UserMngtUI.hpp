@@ -78,10 +78,12 @@ public:
   };
   UserFormView(const User* user);
   Wt::Signal<User, std::string>& validated(void) {return m_validated;}
+  Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
 
 private:
   UserFormModel* m_model;
   Wt::Signal<User, std::string> m_validated;
+  Wt::Signal<std::string> m_deleteTriggered;
 
   void process(void);
   Wt::WComboBox* createUserLevelField(void);

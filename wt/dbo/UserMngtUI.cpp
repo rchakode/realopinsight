@@ -68,7 +68,7 @@ UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
 void UserFormModel::setWritable(bool writtable)
 {
   bool readonly = ! writtable;
-  setReadOnly(UsernameField, readonly);
+  setReadOnly(UsernameField, true);  // Always read only on update
   setReadOnly(PasswordField, readonly);
   setReadOnly(PasswordConfimationField, readonly);
   setReadOnly(FirstNameField, readonly);
@@ -107,7 +107,8 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(const std::string&
 
 
 UserFormView::UserFormView(const User* user):
-  m_validated(this)
+  m_validated(this),
+  m_deleteTriggered(this)
 {
   m_model = new UserFormModel(user, this);
 
@@ -141,7 +142,7 @@ UserFormView::UserFormView(const User* user):
       submitButton->clicked().connect(this, &UserFormView::process);
     }));
     cancelButton->clicked().connect(std::bind([=](){
-      //TODO
+      m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
     }));
   } else {
     submitButton->clicked().connect(this, &UserFormView::process);
@@ -243,6 +244,8 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 
   UserFormView* userForm(new UserFormView(&user));
   userForm->validated().connect(m_dbSession, &DbSession::updateUser);
+  //FIXME: show warning message before deleting the user
+  userForm->deleteTriggered().connect(m_dbSession, &DbSession::deleteUser);
   Wt::WPanel *panel(new Wt::WPanel());
   panel->setAnimation(animation);
   panel->setCentralWidget(userForm);
