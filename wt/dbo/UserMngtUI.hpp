@@ -154,6 +154,7 @@ private:
 
   void addJsEventScript(void);
   Wt::WWidget* createUserList(void);
+  Wt::WWidget* createMainUI(void);
 };
 
 
