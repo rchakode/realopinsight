@@ -1,5 +1,5 @@
 body, html {
-  overflow: scroll;
+  overflow: hidden;
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
