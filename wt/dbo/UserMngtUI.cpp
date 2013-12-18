@@ -283,17 +283,13 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
 
   Wt::WMenuItem* item = m_menu->addItem("Add User", m_userForm);
   m_menus.insert(std::pair<int, Wt::WMenuItem*>(AddUserAction, item));
-  item = m_menu->addItem("User List", m_userListContainer);
+  item = m_menu->addItem("User List", createUserList());
   item->triggered().connect(std::bind([=](){
     updateUserList();
   }));
   m_menus.insert(std::pair<int, Wt::WMenuItem*>(ListUserAction, item));
 
-
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
-  tpl->bindString("title", "User list");
-  tpl->bindWidget("user-list", m_contents);
-  this->setWidget(tpl);
+  this->setWidget(m_contents);
 
   addJsEventScript();
 }
@@ -355,3 +351,10 @@ void UserMngtUI::addJsEventScript(void)
   wApp->root()->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
 }
 
+Wt::WWidget* UserMngtUI::createUserList(void)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
+  tpl->bindString("title", "User list");
+  tpl->bindWidget("user-list", m_userListContainer);
+  return tpl;
+}

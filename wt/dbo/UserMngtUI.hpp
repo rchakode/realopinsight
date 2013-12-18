@@ -153,6 +153,7 @@ private:
   std::map<int, Wt::WMenuItem*> m_menus;
 
   void addJsEventScript(void);
+  Wt::WWidget* createUserList(void);
 };
 
 
