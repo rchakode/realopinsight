@@ -202,10 +202,14 @@
   </message>
 
   <message id="user-list-tpl">
-    <div class="span8">
       <legend>${title}</legend>
       ${user-list}
+  </message>
+  
+  <message id="user-mgnt-tpl">
+    <div class="span8">
+      <div>${menu}</div>
+      <div>${contents}</div>
     </div>
-
   </message>
 </messages>
