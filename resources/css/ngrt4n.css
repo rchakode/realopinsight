@@ -1,5 +1,6 @@
 body, html {
   overflow: hidden;
+  background: #F8F8FF; 
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
@@ -17,7 +18,23 @@ body, html {
 .nav-tabs {
   margin: 0;
   padding: 0;
-  background: #9dc6dd;
+}
+
+.nav-pills {
+  margin: 0;
+  padding: 0;
+}
+
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover {
+  color: #ffffff;
+  background-color: #9dc6dd;
+}
+
+.nav-pills > .active > a,
+.nav-pills > .active > a:hover {
+  color: #ffffff;
+  background-color: #9dc6dd;
 }
 
 .accordion-heading {
@@ -73,9 +90,10 @@ body, html {
 
 /* Related to admin home page */
 .content-container{
-    float: none;
-    margin: 0 auto;
-    width: 940px;
+  position: relative;
+  float: none;
+  margin: 0 auto;
+  width: 940px;
 }
 .thumbnail .caption{
   padding: 5px 2px; 

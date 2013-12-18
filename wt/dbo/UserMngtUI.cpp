@@ -229,12 +229,7 @@ void UserFormView::process(void)
     user.role = User::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
     user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     std::string password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
-    std::cout << "dsds>>>>>>>>>>>>>>>>>>>>>>>5\n";
-    //if (! m_validated) {
-    //m_validated = Wt::Signal<User, std::string>(this);
-    //}
     m_validated.emit(user, password);
-    std::cout << "dsds>>>>>>>>>>>>>>>>>>>>>>>6\n";
   }
 }
 

@@ -60,7 +60,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 {
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
-  m_dashtabs->setStyleClass("wrapper-container");
+  m_dashtabs->addStyleClass("wrapper-container");
   m_infoBox->addStyleClass("alert alert-warning alert-dismissable");
   m_infoBox->hide();
   addEvents();

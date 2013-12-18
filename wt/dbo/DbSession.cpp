@@ -87,13 +87,14 @@ int DbSession::updateUser(User user)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> usr = find<User>().where("name='"+user.username+"'");
-    usr.modify()->username = user.username;
-    usr.modify()->lastname = user.lastname;
-    usr.modify()->firstname = user.firstname;
-    usr.modify()->email = user.email;
-    usr.modify()->role = user.role;
-    //authinfo->setEmail(user.email); //FIXME: take this into account
+    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name='"+user.username+"'");
+    dbo::ptr<User> userPtr = authInfo.modify()->user();
+    userPtr.modify()->username = user.username;
+    userPtr.modify()->lastname = user.lastname;
+    userPtr.modify()->firstname = user.firstname;
+    userPtr.modify()->email = user.email;
+    userPtr.modify()->role = user.role;
+    authInfo.modify()->setEmail(user.email); //FIXME: take this into account
     retCode = 0;
   } catch (const std::exception& ex) {
     retCode = -1;
