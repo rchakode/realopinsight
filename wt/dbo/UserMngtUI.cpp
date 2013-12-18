@@ -289,7 +289,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
   }));
   m_menus.insert(std::pair<int, Wt::WMenuItem*>(ListUserAction, item));
 
-  this->setWidget(m_contents);
+  this->setWidget(createMainUI());
 
   addJsEventScript();
 }
@@ -356,5 +356,13 @@ Wt::WWidget* UserMngtUI::createUserList(void)
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
   tpl->bindString("title", "User list");
   tpl->bindWidget("user-list", m_userListContainer);
+  return tpl;
+}
+
+Wt::WWidget* UserMngtUI::createMainUI(void)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-mgnt-tpl"));
+  tpl->bindWidget("menu", m_menu);
+  tpl->bindWidget("contents", m_contents);
   return tpl;
 }
