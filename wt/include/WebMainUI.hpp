@@ -34,6 +34,7 @@
 #include <Wt/Auth/Login>
 #include <Wt/WTabWidget>
 
+typedef Wt::Auth::AuthWidget AuthWidget;
 class WebMainUI : public QObject, public Wt::WApplication
 {
   Q_OBJECT
@@ -62,6 +63,7 @@ private:
   Wt::WWidget* createNavBar(void);
   Wt::WWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
+  AuthWidget* m_authWidget;
   Wt::WTabWidget* m_dashtabs;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
@@ -87,7 +89,7 @@ private:
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createAdminHome(void);
-  Wt::WWidget* createLoginHome(void);
+  void createLoginWidget(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
                                        const std::string& internalPath);

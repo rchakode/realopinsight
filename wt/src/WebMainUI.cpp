@@ -41,7 +41,6 @@
 #include <Wt/Auth/Login>
 #include <Wt/WHBoxLayout>
 
-typedef Wt::Auth::AuthWidget AuthWidget;
 namespace {
   const std::string LINK_LOAD ="/load-platform";
   const std::string LINK_IMPORT ="/import-platform";
@@ -87,27 +86,30 @@ void WebMainUI::addEvents(void)
 
 void WebMainUI::showLoginHome(void)
 {
-  root()->clear();
-  root()->addWidget(createLoginHome());
+  m_mainWidget->hide();
+  createLoginWidget();
+  root()->addWidget(m_authWidget);
+  m_authWidget->show();
+  refresh();
 }
 
-Wt::WWidget* WebMainUI::createLoginHome(void)
+void WebMainUI::createLoginWidget(void)
 {
   setInternalPath(LINK_LOGIN_PAGE);
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
-  AuthWidget* authWidget = new AuthWidget( DbSession::auth(),
+  m_authWidget = new AuthWidget( DbSession::auth(),
                                            m_dbSession->users(),
                                            m_login);
-  authWidget->addStyleClass("login-container");
-  authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuthentificator());
-  authWidget->setRegistrationEnabled(false);
-  authWidget->processEnvironment();
-  return authWidget;
+  m_authWidget->addStyleClass("login-container");
+  m_authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuthentificator());
+  m_authWidget->setRegistrationEnabled(false);
+  m_authWidget->processEnvironment();
 }
 
 void WebMainUI::showAdminHome(void)
 {
-  root()->clear();
+  m_authWidget->hide();
+  m_mainWidget->show();
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   checkUserLogin();
   setInternalPath(LINK_ADMIN_HOME);
@@ -384,7 +386,7 @@ void WebMainUI::finishFileDialog(int action)
         m_selectFile.clear();
       } else {
         m_infoBox->setText(QObject::tr("No file selected").toStdString());
-        m_infoBox->setHidden(false);
+        m_infoBox->show();
       }
       break;
     default:
@@ -415,11 +417,11 @@ void WebMainUI::openFile(const std::string& path)
       delete dashboard;
       m_infoBox->setText(QObject::tr("This platform or a platfom "
                                      "with the same name is already loaded").toStdString());
-      m_infoBox->setHidden(false);
+      m_infoBox->show();
     }
   } else {
     m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
-    m_infoBox->setHidden(false);
+    m_infoBox->show();
   }
 }
 
@@ -448,7 +450,7 @@ void WebMainUI::handleInternalPath(void)
   } else {
     m_infoBox->setText(QObject::tr("Sorry, the request resource "
                                    "is not available or has been removed").toStdString());
-    m_infoBox->setHidden(false);
+    m_infoBox->show();
   }
 }
 
