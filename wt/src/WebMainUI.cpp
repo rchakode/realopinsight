@@ -72,6 +72,7 @@ WebMainUI::~WebMainUI()
   delete m_infoBox;
   delete m_fileUploadDialog;
   delete m_dashtabs;
+  delete m_authWidget;
   delete m_mainWidget;
   delete m_dbSession;
 }
@@ -113,7 +114,7 @@ void WebMainUI::showAdminHome(void)
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   checkUserLogin();
   setInternalPath(LINK_ADMIN_HOME);
-  m_mainWidget->addWidget(createNavBar());
+  m_mainWidget->addWidget(createMainUI());
   m_dashtabs->addTab(createAdminHome(),
                      QObject::tr("Home").toStdString(),
                      Wt::WTabWidget::LazyLoading)
@@ -122,7 +123,7 @@ void WebMainUI::showAdminHome(void)
   root()->addWidget(m_mainWidget);
 }
 
-Wt::WWidget* WebMainUI::createNavBar(void)
+Wt::WWidget* WebMainUI::createMainUI(void)
 {
   checkUserLogin();
   User loggedUser = m_dbSession->loggedUser();
@@ -222,11 +223,6 @@ Wt::WWidget* WebMainUI::createToolBar(void)
   b->setStyleClass("btn-small");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
-
-  //  b = createTooBarButton("/images/built-in/menu_disket.png");
-  //  b->setStyleClass("btn-small");
-  //  b->clicked().connect(this, &WebMainUI::handleRefresh);
-  //  toolBar->addButton(createTooBarButton("/images/built-in/menu_disket.png"));
 
   return container;
 }

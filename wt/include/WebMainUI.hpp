@@ -60,7 +60,7 @@ private:
 
   Settings* m_settings;
   Wt::WTimer* m_timer;
-  Wt::WWidget* createNavBar(void);
+  Wt::WWidget* createMainUI(void);
   Wt::WWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
   AuthWidget* m_authWidget;
