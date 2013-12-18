@@ -10,7 +10,7 @@ body, html {
   top: 0;
   right: 0;
 }
-/* navbar is from bootstrap */
+/* these classes come from from bootstrap */
 .navbar { 
   margin: 0;
   padding: 0;
@@ -27,13 +27,11 @@ body, html {
 
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover {
-  color: #ffffff;
   background-color: #9dc6dd;
 }
 
 .nav-pills > .active > a,
 .nav-pills > .active > a:hover {
-  color: #ffffff;
   background-color: #9dc6dd;
 }
 
