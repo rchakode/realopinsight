@@ -40,6 +40,7 @@
 #include <Wt/WStackedWidget>
 #include <Wt/WRegExpValidator>
 #include <Wt/WSignal>
+#include <Wt/WScrollArea>
 
 class DbSession;
 class UserFormModel;
@@ -130,7 +131,7 @@ private:
 };
 
 
-class UserMngtUI : public Wt::WContainerWidget
+class UserMngtUI : public Wt::WScrollArea
 {
 public:
   enum {
@@ -147,8 +148,11 @@ private:
   DbSession* m_dbSession;
   UserFormView* m_userForm;
   Wt::WContainerWidget* m_userListContainer;
+  Wt::WStackedWidget* m_contents;
   Wt::WMenu* m_menu;
   std::map<int, Wt::WMenuItem*> m_menus;
+
+  void addJsEventScript(void);
 };
 
 

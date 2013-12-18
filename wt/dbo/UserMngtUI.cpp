@@ -31,6 +31,27 @@
 #include <Wt/WStandardItem>
 #include <Wt/Auth/PasswordStrengthValidator>
 #include <Wt/WMessageBox>
+#include <Wt/WApplication>
+#include <Wt/WTemplate>
+#include <Wt/WString>
+
+#define ROOT_DIV wApp->root()->id()
+#define MAIN_USER_MNGT_DIV this->id()
+
+#define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
+  computeWindowHeight \
+  "$('#wrapper').height(wh);" \
+  "$('#maincontainer').height(wh);" \
+  "$('#stackcontentarea').height(wh);" \
+  "$('#"+ROOT_DIV+"').height(wh);" \
+  "$('#"+MAIN_USER_MNGT_DIV+"').height(wh-40);" \
+  "console.log(wh);" \
+  "$('#user-mgnt-container').height(wh);"
+
+#define JS_AUTO_RESIZING_FUNCTION \
+  "function(self, width, height) {" \
+  JS_AUTO_RESIZING_SCRIPT("wh=height;") \
+  "}"
 
 ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model,
                                                    Wt::WFormModel::Field passField)
@@ -132,7 +153,7 @@ UserFormView::UserFormView(const User* user):
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
-  m_infoBox = new Wt::WText();
+  m_infoBox = new Wt::WText("");
   bindWidget("info-box", m_infoBox);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
@@ -192,7 +213,7 @@ UserFormView::UserFormView(const User* user):
 
 UserFormView::~UserFormView(void)
 {
-  // delete m_infoBox;
+  delete m_infoBox;
 }
 
 void UserFormView::process(void)
@@ -209,7 +230,12 @@ void UserFormView::process(void)
     user.role = User::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
     user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     std::string password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
+    std::cout << "dsds>>>>>>>>>>>>>>>>>>>>>>>5\n";
+    //if (! m_validated) {
+    //m_validated = Wt::Signal<User, std::string>(this);
+    //}
     m_validated.emit(user, password);
+    std::cout << "dsds>>>>>>>>>>>>>>>>>>>>>>>6\n";
   }
 }
 
@@ -239,15 +265,14 @@ Wt::WLineEdit* UserFormView::createPaswordField(void)
 
 
 UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WContainerWidget(parent),
+  : Wt::WScrollArea(parent),
     m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL)),
-    m_userListContainer(new Wt::WContainerWidget())
+    m_userListContainer(new Wt::WContainerWidget()),
+    m_contents(new Wt::WStackedWidget(0)),
+    m_menu(new Wt::WMenu(m_contents, Wt::Vertical, 0))
 {
   m_dbSession->updateUserList();
-
-  Wt::WStackedWidget* contents(new Wt::WStackedWidget());
-  m_menu = new Wt::WMenu(contents, Wt::Vertical, this);
   m_menu->setStyleClass("nav nav-pills");
   m_userForm->validated().connect(std::bind([=](User user, std::string password) {
     int ret = m_dbSession->addUser(user, password);
@@ -264,13 +289,21 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
   }));
   m_menus.insert(std::pair<int, Wt::WMenuItem*>(ListUserAction, item));
 
-  this->addWidget(contents);
+
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
+  tpl->bindString("title", "User list");
+  tpl->bindWidget("user-list", m_contents);
+  this->setWidget(tpl);
+
+  addJsEventScript();
 }
 
 UserMngtUI::~UserMngtUI(void)
 {
   delete m_userForm;
   delete m_userListContainer;
+  delete m_contents;
+  delete m_menu;
 }
 
 void UserMngtUI::updateUserList(void)
@@ -290,8 +323,8 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   userForm->validated().connect(std::bind([=](User userToUpdate, std::string password) {
     int ret = m_dbSession->updateUser(userToUpdate);
     userForm->showMessage(ret,
-                            "Update failed. More details in log.",
-                            "Update completed.");
+                          "Update failed. More details in log.",
+                          "Update completed.");
   }, std::placeholders::_1, std::placeholders::_2));
 
   userForm->deleteTriggered().connect(std::bind([=](std::string username) {
@@ -314,5 +347,11 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 void UserMngtUI::showDestinationView(int dest)
 {
   m_menu->select(m_menus[dest]);
+}
+
+void UserMngtUI::addJsEventScript(void)
+{
+  this->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
+  wApp->root()->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
 }
 

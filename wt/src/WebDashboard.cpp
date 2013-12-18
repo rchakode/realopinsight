@@ -45,8 +45,8 @@
 #define MSG_CONSOLE_DIV m_msgConsole->id()
 #define MAP_AREA_HEIGHT_RATIO "0.45"
 
-#define JS_AUTO_RESIZING_SCRIPT(computeHeight) \
-  computeHeight \
+#define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
+  computeWindowHeight \
   "var treeHeight=wh*0.6 - 25;" \
   "var chartAreaHeight=wh - treeHeight - 25;" \
   "var mapAreaHeight=wh*"+std::string(MAP_AREA_HEIGHT_RATIO)+" - 25;" \

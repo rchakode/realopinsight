@@ -200,4 +200,12 @@
   <message id="success-msg-div-tpl">
     <div class="alert alert-success">${msg}</div>
   </message>
+
+  <message id="user-list-tpl">
+    <div class="span8">
+      <legend>${title}</legend>
+      ${user-list}
+    </div>
+
+  </message>
 </messages>

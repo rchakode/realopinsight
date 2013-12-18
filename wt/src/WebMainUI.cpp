@@ -459,7 +459,7 @@ Wt::WWidget* WebMainUI::createAdminHome(void)
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   tpl->bindWidget("info-box", m_infoBox);
   tpl->bindWidget("andhor-load-file",
-                  createAnchorForHomeLink(QObject::tr("Open").toStdString(),
+                  createAnchorForHomeLink(QObject::tr("Load").toStdString(),
                                           QObject::tr("An existing platform").toStdString(),
                                           LINK_LOAD));
   tpl->bindWidget("andhor-import-file",
