@@ -5,7 +5,7 @@
   </message>
 
   <message id="template.home">
-  <div class="home-container">
+  <div class="content-container">
     <div class="row">
      <!-- Getting Started Pane -->
       <div class="span7">
@@ -78,7 +78,7 @@
         Copyright &copy; 2010 - 2013 NGRT4N Project - Terms &amp; Privacy
        </div>
      </div>
-    </div> <!-- home-container -->
+    </div> <!-- content-container -->
   </message>
 
   <message id="Wt.Auth.field">
@@ -207,7 +207,7 @@
   </message>
   
   <message id="user-mgnt-tpl">
-    <div class="span8">
+    <div class="span8 content-container">
       <div>${menu}</div>
       <div>${contents}</div>
     </div>

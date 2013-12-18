@@ -45,7 +45,6 @@
   "$('#stackcontentarea').height(wh);" \
   "$('#"+ROOT_DIV+"').height(wh);" \
   "$('#"+MAIN_USER_MNGT_DIV+"').height(wh-40);" \
-  "console.log(wh);" \
   "$('#user-mgnt-container').height(wh);"
 
 #define JS_AUTO_RESIZING_FUNCTION \

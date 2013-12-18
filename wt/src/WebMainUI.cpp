@@ -88,7 +88,6 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showLoginHome(void)
 {
   root()->clear();
-  //root()->addWidget(m_userMgntUI(new UserMngtUI(m_dbSession)));
   root()->addWidget(createLoginHome());
 }
 
@@ -108,22 +107,23 @@ Wt::WWidget* WebMainUI::createLoginHome(void)
 
 void WebMainUI::showAdminHome(void)
 {
+  root()->clear();
+  setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   checkUserLogin();
   setInternalPath(LINK_ADMIN_HOME);
-  setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
   m_mainWidget->addWidget(createNavBar());
   m_dashtabs->addTab(createAdminHome(),
                      QObject::tr("Home").toStdString(),
                      Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
   resetTimer();
-  root()->clear();
   root()->addWidget(m_mainWidget);
 }
 
 Wt::WWidget* WebMainUI::createNavBar(void)
 {
   checkUserLogin();
+  User loggedUser = m_dbSession->loggedUser();
   Wt::WContainerWidget* container = new Wt::WContainerWidget();
   Wt::WNavigationBar* navbar(new Wt::WNavigationBar(container));
   navbar->addWidget(createLogoLink(), Wt::AlignLeft);
@@ -133,64 +133,63 @@ Wt::WWidget* WebMainUI::createNavBar(void)
   stackedWidgets->setId("stackcontentarea");
   Wt::WMenu* mainMenu (new Wt::WMenu(stackedWidgets));
   navbar->addMenu(mainMenu, Wt::AlignLeft);
-  //FIXME: name tactical overview for operator
-  mainMenu->addItem(QObject::tr("Dashboard").toStdString(),m_dashtabs);
-  navbar->addWidget(createToolBar());
 
+  Wt::WMenuItem* curItem = NULL;
+  if(loggedUser.role == User::AdmRole) {
+    curItem = mainMenu->addItem(QObject::tr("Home").toStdString(), m_dashtabs);
+    mainMenu->select(curItem);
+    // Menus for administration
+    Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
+    curItem = new Wt::WMenuItem(QObject::tr("Administration").toStdString());
+    curItem->setMenu(mgntPopupMenu);
+    mainMenu->addItem(curItem);
+
+    mgntPopupMenu->addSectionHeader("File");
+    mgntPopupMenu->addItem("Import")
+        ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
+    mgntPopupMenu->addItem("Load")
+        ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+
+    // Menus for view management
+    mgntPopupMenu->addSectionHeader("View");
+    mgntPopupMenu->addItem("Assign/revoke")
+        ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+
+    // Menus for user management
+    m_userMgntUI = new UserMngtUI(m_dbSession);
+    stackedWidgets->addWidget(m_userMgntUI);
+    mgntPopupMenu->addSectionHeader("User");
+    mgntPopupMenu->addItem("Add")
+        ->triggered().connect(std::bind([=](){
+      showUserMngtPage(stackedWidgets, UserMngtUI::AddUserAction);
+    }));
+    mgntPopupMenu->addItem("List")
+        ->triggered().connect(std::bind([=](){
+      showUserMngtPage(stackedWidgets, UserMngtUI::ListUserAction);
+    }));
+  } else {
+    mainMenu->addItem(QObject::tr("Tactical Overview").toStdString(), m_dashtabs);
+  }
+  navbar->addWidget(createToolBar());
   Wt::WMenu* profileMenu(new Wt::WMenu());
   navbar->addMenu(profileMenu, Wt::AlignRight);
+  Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
+  curItem = new Wt::WMenuItem(QObject::tr("You are %1").arg(loggedUser.username.c_str()).toStdString());
+  curItem->setMenu(profilePopupMenu);
+  profileMenu->addItem(curItem);
 
-  Wt::WMenu* mgntMenu(new Wt::WMenu());
-  navbar->addMenu(mgntMenu, Wt::AlignRight);
-
-  Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-  Wt::WMenuItem* item = new Wt::WMenuItem(QObject::tr("Management").toStdString());
-  item->setMenu(mgntPopupMenu);
-  mgntMenu->addItem(item);
-
-  // Menus for view management
-  mgntPopupMenu->addSectionHeader("File");
-  mgntPopupMenu->addItem("Import")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
-  mgntPopupMenu->addItem("Open")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-
-  // Menus for view management
-  mgntPopupMenu->addSectionHeader("View");
-  mgntPopupMenu->addItem("Assign/revoke")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-
-  // Menus for user management
-  m_userMgntUI = new UserMngtUI(m_dbSession, m_mainWidget);
-  mgntPopupMenu->addSectionHeader("User");
-  mgntPopupMenu->addItem("Add")
-      ->triggered().connect(std::bind([=](){
-    showUserMngtPage(stackedWidgets, UserMngtUI::AddUserAction);
-  }));
-  mgntPopupMenu->addItem("List")
-      ->triggered().connect(std::bind([=](){
-    showUserMngtPage(stackedWidgets, UserMngtUI::ListUserAction);
-  }));
-  Wt::WPopupMenu* popup = new Wt::WPopupMenu();
-  item = new Wt::WMenuItem(QObject::tr("You are %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
-  item->setMenu(popup);
-  profileMenu->addItem(item);
-
-  popup->addItem(QObject::tr("Profile").toStdString().c_str())
+  profilePopupMenu->addItem(QObject::tr("Profile").toStdString().c_str())
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
-  popup->addItem(QObject::tr("Change password").toStdString().c_str())
+  profilePopupMenu->addItem(QObject::tr("Change password").toStdString().c_str())
       ->triggered().connect(std::bind([=](){ m_login.logout();}));
-  popup->addSeparator();
-  popup->addItem("Documentation")
+  profilePopupMenu->addSeparator();
+  profilePopupMenu->addItem("Documentation")
       ->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
-  popup->addItem("About")
+  profilePopupMenu->addItem("About")
       ->triggered().connect(std::bind([=](){}));
-  popup->addSeparator();
-  popup->addItem("Logout")
-      ->triggered().connect(std::bind([=](){ m_login.logout();}));
-
-
-  stackedWidgets->addWidget(m_userMgntUI);
+  profilePopupMenu->addSeparator();
+  profilePopupMenu->addItem("Sign out")
+      ->triggered().connect(this, &WebMainUI::logout);
   container->addWidget(stackedWidgets);
   return container;
 }
@@ -484,7 +483,6 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
 
 void WebMainUI::handleAuthentification(void)
 {
-  root()->clear();
   if (m_login.loggedIn()) {
     m_dbSession->setLoggedUser(m_login.user().id());
     Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";

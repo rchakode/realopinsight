@@ -1,5 +1,5 @@
 body, html {
-  overflow: hidden;
+  overflow: scroll;
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
@@ -17,8 +17,16 @@ body, html {
 .nav-tabs {
   margin: 0;
   padding: 0;
+  background: #9dc6dd;
 }
 
+.accordion-heading {
+  background: #9dc6dd; /*for panel */
+}
+
+.accordion-inner {
+  background: #F8F8FF; /*for panel */
+}
 /* Now specific classes */
 #wrapper {
   position: relative;
@@ -64,7 +72,7 @@ body, html {
 }
 
 /* Related to admin home page */
-.home-container{
+.content-container{
     float: none;
     margin: 0 auto;
     width: 940px;
@@ -101,4 +109,27 @@ body, html {
  position:fixed;
  bottom: 0;
  padding: auto auto;
+}
+
+/* Let's get this party started */
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #9dc6dd;/*rgba(255,0,0,0.8); */
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+::-webkit-scrollbar-thumb:window-inactive {
+	background: rgba(255,0,0,0.4); 
 }
