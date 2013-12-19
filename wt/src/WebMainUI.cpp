@@ -99,8 +99,8 @@ void WebMainUI::createLoginWidget(void)
   setInternalPath(LINK_LOGIN_PAGE);
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
   m_authWidget = new AuthWidget( DbSession::auth(),
-                                           m_dbSession->users(),
-                                           m_login);
+                                 m_dbSession->users(),
+                                 m_login);
   m_authWidget->addStyleClass("login-container");
   m_authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuthentificator());
   m_authWidget->setRegistrationEnabled(false);
@@ -116,7 +116,7 @@ void WebMainUI::showAdminHome(void)
   setInternalPath(LINK_ADMIN_HOME);
   m_mainWidget->addWidget(createMainUI());
   m_dashtabs->addTab(createAdminHome(),
-                     QObject::tr("Home").toStdString(),
+                     QObject::tr("Quick Start").toStdString(),
                      Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
   resetTimer();
@@ -181,18 +181,20 @@ Wt::WWidget* WebMainUI::createMainUI(void)
   curItem->setMenu(profilePopupMenu);
   profileMenu->addItem(curItem);
 
-  profilePopupMenu->addItem(QObject::tr("Profile").toStdString().c_str())
-      ->triggered().connect(std::bind([=](){ m_login.logout();}));
+  profilePopupMenu->addItem(QObject::tr("Account").toStdString().c_str())
+      ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
   profilePopupMenu->addItem(QObject::tr("Change password").toStdString().c_str())
-      ->triggered().connect(std::bind([=](){ m_login.logout();}));
+      ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));
   profilePopupMenu->addSeparator();
-  profilePopupMenu->addItem("Documentation")
-      ->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
+  curItem = profilePopupMenu->addItem("Documentation");
+  curItem->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
+  curItem->setLinkTarget(Wt::TargetNewWindow);
+
   profilePopupMenu->addItem("About")
       ->triggered().connect(std::bind([=](){}));
   profilePopupMenu->addSeparator();
   profilePopupMenu->addItem("Sign out")
-      ->triggered().connect(this, &WebMainUI::logout);
+      ->triggered().connect(std::bind([=](){m_login.logout();}));
   container->addWidget(stackedWidgets);
   return container;
 }
@@ -273,7 +275,6 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
   anchor->setMargin(10, Wt::Right);
   return anchor;
 }
-
 
 void WebMainUI::selectFileToOpen(void)
 {
@@ -485,6 +486,8 @@ void WebMainUI::handleAuthentification(void)
     m_dbSession->setLoggedUser(m_login.user().id());
     Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
     showAdminHome();
+    createAccountPanel();
+    createPasswordPanel();
   } else {
     Wt::log("notice") << "[realopinsight] "<<"Not connected. Redirecting to login page.";
     showLoginHome();
@@ -505,4 +508,42 @@ void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
   contents->setCurrentWidget(m_userMgntUI);
   setInternalPath("/users");
   m_userMgntUI->showDestinationView(destination);
+}
+
+void WebMainUI::createAccountPanel(void)
+{
+  bool changedPassword(false);
+  bool enableDelete(false);
+  UserFormView* form = new UserFormView(&(m_dbSession->loggedUser()),
+                                        changedPassword,
+                                        enableDelete);
+  form->closeTriggered().connect(std::bind([=](){m_accountPanel->accept();}));
+  form->validated().connect(std::bind([=](User userToUpdate) {
+    int ret = m_dbSession->updateUser(userToUpdate);
+    form->showMessage(ret,
+                      "Update failed. More details in log.",
+                      "Update completed.");
+  }, std::placeholders::_1));
+
+  m_accountPanel = new Wt::WDialog(QObject::tr("Account information").toStdString());
+  m_accountPanel->contents()->addWidget(form);
+}
+
+void WebMainUI::createPasswordPanel(void)
+{
+  bool changedPassword(true);
+  bool enableDelete(false);
+  UserFormView* form = new UserFormView(&(m_dbSession->loggedUser()),
+                                        changedPassword,
+                                        enableDelete);
+  form->closeTriggered().connect(std::bind([=](){m_changePasswordPanel->accept();}));
+  form->changePasswordTriggered().connect(std::bind([=](const std::string& login, const std::string& pass) {
+    int ret = m_dbSession->updatePassword(login, pass);
+    form->showMessage(ret,
+                      "Change password failed. More details in log.",
+                      "Password changed.");
+  }, std::placeholders::_1, std::placeholders::_2));
+
+  m_changePasswordPanel = new Wt::WDialog(QObject::tr("Change password").toStdString());
+  m_changePasswordPanel->contents()->addWidget(form);
 }

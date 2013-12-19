@@ -105,12 +105,12 @@ int DbSession::updateUser(User user)
   return retCode;
 }
 
-int DbSession::updatePassword(const std::string& username, const std::string& password)
+int DbSession::updatePassword(const std::string& login, const std::string& pass)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name='"+username+"'");
+    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name='"+login+"'");
     dbo::ptr<User> userPtr = authInfo.modify()->user();
     //passAuthService.updatePassword(dbuser, upassword);
     retCode = 0;
@@ -123,12 +123,12 @@ int DbSession::updatePassword(const std::string& username, const std::string& pa
   return retCode;
 }
 
-int DbSession::deleteUser(std::string username)
+int DbSession::deleteUser(std::string login)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> usr = find<User>().where("name='"+username+"'");
+    dbo::ptr<User> usr = find<User>().where("name='"+login+"'");
     usr.remove();
     retCode = 0;
   } catch (const std::exception& ex) {

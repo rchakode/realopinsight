@@ -76,6 +76,8 @@ private:
   Wt::Auth::Login m_login; /* slot conflict if decleared in the DbSession class */
   std::string m_confdir;
   UserMngtUI* m_userMgntUI;
+  Wt::WDialog* m_accountPanel;
+  Wt::WDialog* m_changePasswordPanel;
 
 
   void addEvents(void);
@@ -95,7 +97,8 @@ private:
                                        const std::string& internalPath);
   void checkUserLogin(void);
   void showUserMngtPage(Wt::WStackedWidget* contents, int destination);
-  void logout(void) {m_login.logout();}
+  void createAccountPanel(void);
+  void createPasswordPanel(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

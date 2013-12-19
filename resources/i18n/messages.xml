@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <messages>
   <message id="copyright-info">
-   &nbsp;&copy; 2010 - 2013 NGRT4N Project - Terms &amp; Privacy
+   &nbsp;&copy; 2010 - 2013 NGRT4N Project -
+   <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
   </message>
 
   <message id="template.home">
@@ -75,7 +76,8 @@
      </div> <!-- Row --->
      <div class="row">
        <div class="footer">
-        Copyright &copy; 2010 - 2013 NGRT4N Project - Terms &amp; Privacy
+        Copyright &copy; 2010 - 2013 NGRT4N Project -
+        <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
        </div>
      </div>
     </div> <!-- content-container -->
@@ -130,7 +132,7 @@
   </message>
 
   <message id="userForm-template">
-    <legend>${title}</legend>
+    <!-- <legend>${title}</legend> -->
     <div class="form-horizontal">
       ${info-box}
       <fieldset>
@@ -163,7 +165,7 @@
 
       ${<if:confirm-password>}
       <div class="control-group">
-            <label for="${id:confirm-password}" class="control-label">Confirm password*</label>
+            <label for="${id:confirm-password}" class="control-label">Verify password*</label>
          <div class="controls">
               ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
           </div>

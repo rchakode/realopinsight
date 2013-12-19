@@ -127,16 +127,16 @@ body, html {
  padding: auto auto;
 }
 
-/* Let's get this party started */
+/* For customizing scrollbars */
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
 }
  
 /* Track */
 ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
 }
  
 /* Handle */
@@ -149,3 +149,4 @@ body, html {
 ::-webkit-scrollbar-thumb:window-inactive {
 	background: rgba(255,0,0,0.4); 
 }
+

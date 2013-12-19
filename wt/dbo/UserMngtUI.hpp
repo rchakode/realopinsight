@@ -95,34 +95,16 @@ public:
     CREATE_USER = 1,
     UPDATE_USER = 2
   };
-  UserFormView(const User* user, bool changePassword);
+  UserFormView(const User* user, bool changePassword, bool enableDelete);
   ~UserFormView(void);
   Wt::Signal<User>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
-  Wt::Signal<std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTrigerred;}
-//  void triggerChangePassword(const std::string& username, const std::string& password ) {
-//    m_changePasswordTrigerred.emit(username, password);
-//  }
+  Wt::Signal<std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
+  Wt::Signal<void>& closeTriggered(void) {return m_close;}
 
-  void showMessage(int opStatus,
+  void showMessage(int exitCode,
                    const std::string& errorMsg,
-                   const std::string& successMsg)
-  {
-    WTemplate* tpl = NULL;
-    if (opStatus != 0){
-      tpl = new WTemplate(Wt::WString::tr("error-msg-div-tpl"));
-      tpl->bindString("msg", errorMsg);
-    } else {
-      tpl = new WTemplate(Wt::WString::tr("success-msg-div-tpl"));
-      tpl->bindString("msg", successMsg);
-    }
-    if (tpl) {
-      std::ostringstream oss;
-      tpl->renderTemplate(oss);
-      m_infoBox->setText(oss.str());
-      delete tpl;
-    }
-  }
+                   const std::string& successMsg);
 
 private:
   User m_user;
@@ -130,11 +112,13 @@ private:
   UserFormModel* m_model;
   Wt::Signal<User> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
-  Wt::Signal<std::string, std::string> m_changePasswordTrigerred;
+  Wt::Signal<std::string, std::string> m_changePasswordTriggered;
+  Wt::Signal<void> m_close;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
 
   void process(void);
+  void handleDeleteRequest(void);
   Wt::WComboBox* createUserLevelField(void);
   Wt::WLineEdit* createPaswordField(void);
   void createChangePasswordDialog(void);
