@@ -234,7 +234,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool enableDel
   }
 
   // If user, it's for update. At first time the fields are disable
-  if (user) {
+  if (user && ! changePassword) {
     submitButton->clicked().connect(std::bind([=](){
       m_model->setWritable(true); updateView(m_model);
       submitButton->clicked().connect(this, &UserFormView::process);
