@@ -122,7 +122,7 @@ public:
   }
 
 private:
-  const User* m_user;
+  User m_user;
   bool m_changePassword;
   UserFormModel* m_model;
   Wt::Signal<User> m_validated;
