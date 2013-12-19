@@ -124,12 +124,12 @@ void UserFormModel::setWritable(bool writtable)
   bool readonly = ! writtable;
   setReadOnly(UsernameField, true);  // Always read only on update
   setReadOnly(PasswordField, true); // Should be changed differently
+  setReadOnly(RegistrationDateField, true);
   setReadOnly(PasswordConfimationField, readonly);
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
   setReadOnly(EmailField, readonly);
-  setReadOnly(UserLevelField, readonly);
-  setReadOnly(RegistrationDateField, readonly);
+  setReadOnly(UserLevelField, readonly); //FIXME: shoud depend on the administrator
 }
 
 Wt::WValidator* UserFormModel::createNameValidator(void)
@@ -159,7 +159,7 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
   return createPasswordValidator();
 }
 
-UserFormView::UserFormView(const User* user, bool changePassword, bool enableDelete)
+UserFormView::UserFormView(const User* user, bool changePassword, bool forUserProfile)
   : m_changePassword(changePassword),
     m_validated(this),
     m_deleteTriggered(this),
@@ -214,7 +214,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool enableDel
     } else {
       createChangePasswordDialog();
       submitButton->setText("Update");
-      if (enableDelete) {
+      if (forUserProfile) {
         cancelButton->setText("Delete");
         cancelButton->setStyleClass("btn-danger");
         cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
@@ -337,11 +337,11 @@ Wt::WLineEdit* UserFormView::createPaswordField(void)
 void UserFormView::createChangePasswordDialog(void)
 {
   bool changedPasswd(true);
-  bool enableDelete(false);
+  bool forUserProfile(false);
   m_changePasswordDialog = new Wt::WDialog("Change password");
   UserFormView* changedPasswdForm = new UserFormView(&m_user,
                                                      changedPasswd,
-                                                     enableDelete);
+                                                     forUserProfile);
   m_changePasswordDialog->contents()->addWidget(changedPasswdForm);
   changedPasswdForm->changePasswordTriggered().connect(
         std::bind([=](const std::string& login, const std::string& pass){
@@ -401,13 +401,13 @@ void UserMngtUI::updateUserList(void)
 Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 {
   bool changePassword(false);
-  bool enableDelete(true);
+  bool forUserProfile(true);
   Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
                            Wt::WAnimation::EaseOut, 100);
 
   UserFormView* userForm(new UserFormView(&user,
                                           changePassword,
-                                          enableDelete));
+                                          forUserProfile));
   userForm->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     userForm->showMessage(ret,

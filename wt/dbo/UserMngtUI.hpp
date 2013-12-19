@@ -95,7 +95,7 @@ public:
     CREATE_USER = 1,
     UPDATE_USER = 2
   };
-  UserFormView(const User* user, bool changePassword, bool enableDelete);
+  UserFormView(const User* user, bool changePassword, bool forUserProfile);
   ~UserFormView(void);
   Wt::Signal<User>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
