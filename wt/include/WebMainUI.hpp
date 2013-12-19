@@ -41,7 +41,7 @@ class WebMainUI : public QObject, public Wt::WApplication
 public:
   WebMainUI(const Wt::WEnvironment& env);
   virtual ~WebMainUI();
-  void showAdminHome(void);
+  void showUserHome(void);
   void showLoginHome(void);
   QString getConfig (void) const {return m_currentDashboard->config();}
   void enable(void) {m_mainWidget->enable();}
@@ -90,7 +90,7 @@ private:
   void openFile(const std::string& path);
   void finishFileDialog(int action);
   void scaleMap(double factor);
-  Wt::WWidget* createAdminHome(void);
+  Wt::WWidget* createUserHome(void);
   void createLoginWidget(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,

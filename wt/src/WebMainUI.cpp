@@ -107,7 +107,7 @@ void WebMainUI::createLoginWidget(void)
   m_authWidget->processEnvironment();
 }
 
-void WebMainUI::showAdminHome(void)
+void WebMainUI::showUserHome(void)
 {
   m_authWidget->hide();
   m_mainWidget->show();
@@ -115,7 +115,7 @@ void WebMainUI::showAdminHome(void)
   checkUserLogin();
   setInternalPath(LINK_ADMIN_HOME);
   m_mainWidget->addWidget(createMainUI());
-  m_dashtabs->addTab(createAdminHome(),
+  m_dashtabs->addTab(createUserHome(),
                      QObject::tr("Quick Start").toStdString(),
                      Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
@@ -140,10 +140,10 @@ Wt::WWidget* WebMainUI::createMainUI(void)
   Wt::WMenuItem* curItem = NULL;
   if(loggedUser.role == User::AdmRole) {
     curItem = mainMenu->addItem(QObject::tr("Home").toStdString(), m_dashtabs);
-    mainMenu->select(curItem);
+
     // Menus for administration
     Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-    curItem = new Wt::WMenuItem(QObject::tr("Administration").toStdString());
+    curItem = new Wt::WMenuItem(QObject::tr("Management").toStdString());
     curItem->setMenu(mgntPopupMenu);
     mainMenu->addItem(curItem);
 
@@ -441,7 +441,7 @@ void WebMainUI::handleInternalPath(void)
     openFileUploadDialog();
     setInternalPath("");
   } else if (path == LINK_ADMIN_HOME) {
-    showAdminHome();
+    showUserHome();
   } else if (path == LINK_LOGIN_PAGE) {
     showLoginHome();
   } else {
@@ -451,7 +451,7 @@ void WebMainUI::handleInternalPath(void)
   }
 }
 
-Wt::WWidget* WebMainUI::createAdminHome(void)
+Wt::WWidget* WebMainUI::createUserHome(void)
 {
   checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
@@ -485,7 +485,7 @@ void WebMainUI::handleAuthentification(void)
   if (m_login.loggedIn()) {
     m_dbSession->setLoggedUser(m_login.user().id());
     Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
-    showAdminHome();
+    showUserHome();
     createAccountPanel();
     createPasswordPanel();
   } else {
