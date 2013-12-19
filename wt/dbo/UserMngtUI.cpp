@@ -68,8 +68,12 @@ Wt::WValidator::Result ConfirmPasswordValidator::validate (const Wt::WString &in
         Wt::WValidator::Result(Wt::WValidator::Invalid, "Confirmation don't match");
 }
 
-UserFormModel::UserFormModel(const User* user, bool changePassword, Wt::WObject *parent)
-  : Wt::WFormModel(parent)
+UserFormModel::UserFormModel(const User* user,
+                             bool changePassword,
+                             bool userForm,
+                             Wt::WObject *parent)
+  : Wt::WFormModel(parent),
+    m_userForm(userForm)
 {
   addField(UsernameField);
   addField(PasswordField);
@@ -81,8 +85,7 @@ UserFormModel::UserFormModel(const User* user, bool changePassword, Wt::WObject 
   addField(UserLevelField);
   addField(RegistrationDateField);
 
-  setValidator(UsernameField, createNameValidator());
-  //  setValidator(CurrentPasswordField, createPasswordValidator());
+  setValidator(UsernameField, createNameValidator());;
   setValidator(PasswordField, createPasswordValidator());
   setValidator(PasswordConfimationField, new ConfirmPasswordValidator(this, PasswordField));
   setValidator(FirstNameField, createNameValidator());
@@ -90,6 +93,13 @@ UserFormModel::UserFormModel(const User* user, bool changePassword, Wt::WObject 
   setValidator(LastNameField, createNameValidator());
   setValidator(EmailField, createEmailValidator());
   setValidator(UserLevelField, createNameValidator());
+
+  // These fields shoudl always be read only on update
+  if (user) {
+    setReadOnly(UsernameField, true);
+    setReadOnly(PasswordField, true);
+    setReadOnly(RegistrationDateField, true);
+  }
 
   if (changePassword) {
     setVisible(CurrentPasswordField, true);
@@ -122,14 +132,15 @@ UserFormModel::UserFormModel(const User* user, bool changePassword, Wt::WObject 
 void UserFormModel::setWritable(bool writtable)
 {
   bool readonly = ! writtable;
-  setReadOnly(UsernameField, true);  // Always read only on update
-  setReadOnly(PasswordField, true); // Should be changed differently
-  setReadOnly(RegistrationDateField, true);
   setReadOnly(PasswordConfimationField, readonly);
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
   setReadOnly(EmailField, readonly);
-  setReadOnly(UserLevelField, readonly); //FIXME: shoud depend on the administrator
+  if (readonly) {
+    setReadOnly(UserLevelField, readonly);
+  } else {
+    setReadOnly(UserLevelField, m_userForm);
+  }
 }
 
 Wt::WValidator* UserFormModel::createNameValidator(void)
@@ -159,7 +170,7 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
   return createPasswordValidator();
 }
 
-UserFormView::UserFormView(const User* user, bool changePassword, bool forUserProfile)
+UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
   : m_changePassword(changePassword),
     m_validated(this),
     m_deleteTriggered(this),
@@ -167,7 +178,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool forUserPr
     m_close(this),
     m_infoBox(new Wt::WText(""))
 {
-  m_model = new UserFormModel(user, changePassword, this);
+  m_model = new UserFormModel(user, changePassword, userForm, this);
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
@@ -214,7 +225,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool forUserPr
     } else {
       createChangePasswordDialog();
       submitButton->setText("Update");
-      if (forUserProfile) {
+      if (! userForm) {
         cancelButton->setText("Delete");
         cancelButton->setStyleClass("btn-danger");
         cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
@@ -401,29 +412,29 @@ void UserMngtUI::updateUserList(void)
 Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 {
   bool changePassword(false);
-  bool forUserProfile(true);
+  bool userForm(false);
   Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
                            Wt::WAnimation::EaseOut, 100);
 
-  UserFormView* userForm(new UserFormView(&user,
+  UserFormView* form(new UserFormView(&user,
                                           changePassword,
-                                          forUserProfile));
-  userForm->validated().connect(std::bind([=](User userToUpdate) {
+                                          userForm));
+  form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
-    userForm->showMessage(ret,
+    form->showMessage(ret,
                           "Update failed. More details in log.",
                           "Update completed.");
   }, std::placeholders::_1));
 
-  userForm->changePasswordTriggered().connect(std::bind([=](const std::string& login, const std::string& pass) {
+  form->changePasswordTriggered().connect(std::bind([=](const std::string& login, const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, pass);
-    userForm->showMessage(ret,
+    form->showMessage(ret,
                           "Change password failed. More details in log.",
                           "Password changed.");
   }, std::placeholders::_1, std::placeholders::_2));
 
 
-  userForm->deleteTriggered().connect(std::bind([=](std::string username) {
+  form->deleteTriggered().connect(std::bind([=](std::string username) {
     int ret = m_dbSession->deleteUser(username);
     m_userForm->showMessage(ret,
                             "Deletion failed. More details in log.",
@@ -433,7 +444,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
 
   Wt::WPanel *panel(new Wt::WPanel());
   panel->setAnimation(animation);
-  panel->setCentralWidget(userForm);
+  panel->setCentralWidget(form);
   panel->setTitle(user.username);
   panel->setCollapsible(true);
   panel->setCollapsed(true);

@@ -513,10 +513,10 @@ void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
 void WebMainUI::createAccountPanel(void)
 {
   bool changedPassword(false);
-  bool enableDelete(false);
+  bool userForm(true);
   UserFormView* form = new UserFormView(&(m_dbSession->loggedUser()),
                                         changedPassword,
-                                        enableDelete);
+                                        userForm);
   form->closeTriggered().connect(std::bind([=](){m_accountPanel->accept();}));
   form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
@@ -532,10 +532,10 @@ void WebMainUI::createAccountPanel(void)
 void WebMainUI::createPasswordPanel(void)
 {
   bool changedPassword(true);
-  bool enableDelete(false);
+  bool userForm(true);
   UserFormView* form = new UserFormView(&(m_dbSession->loggedUser()),
                                         changedPassword,
-                                        enableDelete);
+                                        userForm);
   form->closeTriggered().connect(std::bind([=](){m_changePasswordPanel->accept();}));
   form->changePasswordTriggered().connect(std::bind([=](const std::string& login, const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, pass);

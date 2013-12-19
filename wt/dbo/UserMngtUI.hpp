@@ -73,12 +73,16 @@ public:
   static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
-  UserFormModel(const User* user, bool changePassword, Wt::WObject *parent = 0);
+  UserFormModel(const User* user,
+                bool changePassword,
+                bool userForm,
+                Wt::WObject *parent = 0);
   void setWritable(bool writtable);
 
 private:
   static const int MAX_LENGTH = 25;
   static const int MAX_CHILDREN = 15;
+  bool m_userForm;
 
 
   Wt::WValidator* createNameValidator(void);
@@ -95,7 +99,7 @@ public:
     CREATE_USER = 1,
     UPDATE_USER = 2
   };
-  UserFormView(const User* user, bool changePassword, bool forUserProfile);
+  UserFormView(const User* user, bool changePassword, bool userForm);
   ~UserFormView(void);
   Wt::Signal<User>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
