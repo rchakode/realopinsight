@@ -53,6 +53,7 @@ public:
   };
 
   std::string username;
+  std::string password;
   std::string firstname;
   std::string lastname;
   std::string email;

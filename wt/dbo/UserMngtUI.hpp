@@ -97,8 +97,9 @@ public:
   };
   UserFormView(const User* user, bool changePassword);
   ~UserFormView(void);
-  Wt::Signal<User, std::string>& validated(void) {return m_validated;}
+  Wt::Signal<User>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
+  Wt::Signal<std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTrigerred;}
 
   void showMessage(int opStatus,
                    const std::string& errorMsg,
@@ -122,15 +123,18 @@ public:
 
 private:
   const User* m_user;
+  bool m_changePassword;
   UserFormModel* m_model;
-  Wt::Signal<User, std::string> m_validated;
+  Wt::Signal<User> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
+  Wt::Signal<std::string, std::string> m_changePasswordTrigerred;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
 
   void process(void);
   Wt::WComboBox* createUserLevelField(void);
   Wt::WLineEdit* createPaswordField(void);
+  void createChangePasswordDialog(void);
 };
 
 

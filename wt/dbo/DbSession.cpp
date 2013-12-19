@@ -60,7 +60,7 @@ void DbSession::setup(bool initializeDb)
 }
 
 
-int DbSession::addUser(User user, const std::string& password)
+int DbSession::addUser(User user)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
@@ -69,7 +69,7 @@ int DbSession::addUser(User user, const std::string& password)
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
     info.modify()->setUser(add(&user));
     info.modify()->setEmail(user.email); //FIXME: take this into account
-    passAuthService.updatePassword(dbuser, password);
+    passAuthService.updatePassword(dbuser, user.password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
     flush();
     retCode = 0;
@@ -175,11 +175,12 @@ void DbSession::initDb(void)
     createTables();
     User adm;
     adm.username = "ngrt4n_adm";
+    adm.password = "ngrt4n_adm";
     adm.firstname = "Default";
     adm.lastname = "Administrator";
     adm.role = User::AdmRole;
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
-    addUser(adm, "ngrt4n_adm");
+    addUser(adm);
     Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
   } catch (std::exception& ex) {
     Wt::log("error")<<"[realopinsight] "<< "Failed initializing the database";

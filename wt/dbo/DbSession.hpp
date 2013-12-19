@@ -53,7 +53,7 @@ public:
   void setLoggedUser(const std::string& uid);
   UserListT& getUserList(void) {return m_userList;}
   void updateUserList(void);
-  int addUser(User user, const std::string& password);
+  int addUser(User user);
   int updateUser(User user);
   int deleteUser(std::string username);
 
