@@ -68,11 +68,12 @@ Wt::WValidator::Result ConfirmPasswordValidator::validate (const Wt::WString &in
         Wt::WValidator::Result(Wt::WValidator::Invalid, "Confirmation don't match");
 }
 
-UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
+UserFormModel::UserFormModel(const User* user, bool changePassword, Wt::WObject *parent)
   : Wt::WFormModel(parent)
 {
   addField(UsernameField);
   addField(PasswordField);
+  addField(CurrentPasswordField);
   addField(PasswordConfimationField);
   addField(FirstNameField);
   addField(LastNameField);
@@ -81,6 +82,7 @@ UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
   addField(RegistrationDateField);
 
   setValidator(UsernameField, createNameValidator());
+  //  setValidator(CurrentPasswordField, createPasswordValidator());
   setValidator(PasswordField, createPasswordValidator());
   setValidator(PasswordConfimationField, new ConfirmPasswordValidator(this, PasswordField));
   setValidator(FirstNameField, createNameValidator());
@@ -89,18 +91,31 @@ UserFormModel::UserFormModel(const User* user, Wt::WObject *parent)
   setValidator(EmailField, createEmailValidator());
   setValidator(UserLevelField, createNameValidator());
 
-  if (user) {
-    setValue(UsernameField, user->username);
-    setValue(PasswordField, Wt::WString("passwordissecret"));
-    setValue(FirstNameField, user->firstname);
-    setValue(LastNameField, user->lastname);
-    setValue(EmailField, user->email);
-    setValue(UserLevelField, User::role2Text(user->role));
-    setValue(RegistrationDateField, user->registrationDate);
-    setVisible(PasswordConfimationField, false);
-    setWritable(false);
-  } else {
+  if (changePassword) {
+    setVisible(CurrentPasswordField, true);
+    setVisible(PasswordField, true);
+    setVisible(PasswordConfimationField, true);
+    setVisible(UsernameField, false);
+    setVisible(FirstNameField, false);
+    setVisible(LastNameField, false);
+    setVisible(EmailField, false);
+    setVisible(UserLevelField, false);
     setVisible(RegistrationDateField, false);
+  } else {
+    setVisible(CurrentPasswordField, false);
+    if (user) {
+      setValue(UsernameField, user->username);
+      setValue(PasswordField, Wt::WString("passwordissecret"));
+      setValue(FirstNameField, user->firstname);
+      setValue(LastNameField, user->lastname);
+      setValue(EmailField, user->email);
+      setValue(UserLevelField, User::role2Text(user->role));
+      setValue(RegistrationDateField, user->registrationDate);
+      setVisible(PasswordConfimationField, false);
+      setWritable(false);
+    } else {
+      setVisible(RegistrationDateField, false);
+    }
   }
 }
 
@@ -144,17 +159,19 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
   return createPasswordValidator();
 }
 
-UserFormView::UserFormView(const User* user):
-  m_validated(this),
-  m_deleteTriggered(this)
+UserFormView::UserFormView(const User* user, bool changePassword)
+  : m_user(user),
+    m_validated(this),
+    m_deleteTriggered(this)
 {
-  m_model = new UserFormModel(user, this);
+  m_model = new UserFormModel(m_user, changePassword, this);
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
   m_infoBox = new Wt::WText("");
   bindWidget("info-box", m_infoBox);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::CurrentPasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
   setFormWidget(UserFormModel::FirstNameField, new Wt::WLineEdit());
@@ -163,40 +180,43 @@ UserFormView::UserFormView(const User* user):
   setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
   setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
 
-  // Title & Buttons
-  Wt::WString title = Wt::WString("User information");
-  bindString("title", title);
-
+  // Bind buttons
   Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
   bindWidget("submit-button", submitButton);
   Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
   bindWidget("cancel-button", cancelButton);
+  Wt::WString title = Wt::WString("User information");
 
   if (user) {
-    submitButton->setText("Update");
-    cancelButton->setText("Delete");
     submitButton->setStyleClass("btn-warning");
-    cancelButton->setStyleClass("btn-danger");
-    submitButton->clicked().connect(std::bind([=](){
-      m_model->setWritable(true);
-      updateView(m_model);
-      submitButton->clicked().connect(this, &UserFormView::process);
-    }));
-
-    cancelButton->clicked().connect(std::bind([=](){
-      Wt::WMessageBox *confirmationBox = new Wt::WMessageBox
-          ("Warning !",
-           "<p>Do you really want to delete this user?</p>",
-           Wt::Information, Wt::Yes | Wt::No);
-      confirmationBox->setModal(false);
-      confirmationBox->buttonClicked().connect(std::bind([=] () {
-        if (confirmationBox->buttonResult() == Wt::Yes) {
-          m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
-        }
-        delete confirmationBox;
+    if (changePassword) {
+      title = Wt::WString("Set password information");
+      submitButton->setText("Change password");
+      cancelButton->hide();
+    } else {
+      submitButton->setText("Update");
+      cancelButton->setText("Delete");
+      cancelButton->setStyleClass("btn-danger");
+      submitButton->clicked().connect(std::bind([=](){
+        m_model->setWritable(true);
+        updateView(m_model);
+        submitButton->clicked().connect(this, &UserFormView::process);
       }));
-      confirmationBox->show();
-    }));
+      cancelButton->clicked().connect(std::bind([=](){
+        Wt::WMessageBox *confirmationBox = new Wt::WMessageBox
+            ("Warning !",
+             "<p>Do you really want to delete this user?</p>",
+             Wt::Information, Wt::Yes | Wt::No);
+        confirmationBox->setModal(false);
+        confirmationBox->buttonClicked().connect(std::bind([=] () {
+          if (confirmationBox->buttonResult() == Wt::Yes) {
+            m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
+          }
+          delete confirmationBox;
+        }));
+        confirmationBox->show();
+      }));
+    }
   } else {
     submitButton->setStyleClass("btn-success");
     submitButton->clicked().connect(this, &UserFormView::process);
@@ -207,6 +227,7 @@ UserFormView::UserFormView(const User* user):
       refresh();
     }));
   }
+  bindString("title", title);
   updateView(m_model);
 }
 
@@ -217,6 +238,13 @@ UserFormView::~UserFormView(void)
 
 void UserFormView::process(void)
 {
+  if(m_user) {
+    Wt::WDialog *dialog = new Wt::WDialog("Change password");
+    UserFormView* changedPasswdForm = new UserFormView(m_user, true);
+    dialog->contents()->addWidget(changedPasswdForm);
+    dialog->show();
+  }
+
   updateModel(m_model);
   bool isvalid = m_model->validate();
   updateView(m_model);
@@ -261,7 +289,7 @@ Wt::WLineEdit* UserFormView::createPaswordField(void)
 UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WScrollArea(parent),
     m_dbSession(dbSession),
-    m_userForm(new UserFormView(NULL)),
+    m_userForm(new UserFormView(NULL, false)),
     m_userListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
     m_menu(new Wt::WMenu(m_contents, Wt::Vertical, 0))
@@ -309,7 +337,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
                            Wt::WAnimation::EaseOut, 100);
 
-  UserFormView* userForm(new UserFormView(&user));
+  UserFormView* userForm(new UserFormView(&user, false));
   userForm->validated().connect(std::bind([=](User userToUpdate, std::string password) {
     int ret = m_dbSession->updateUser(userToUpdate);
     userForm->showMessage(ret,

@@ -134,18 +134,33 @@
     <div class="form-horizontal">
       ${info-box}
       <fieldset>
+      ${<if:user-name>}
       <div class="control-group">
             <label for="${id:user-name}" class="control-label">Login*</label>
          <div class="controls">
               ${user-name} <span class="help-inline">${user-name-info}</span>
           </div>
       </div>
+      ${</if:user-name>}
+
+      ${<if:current-password>}
       <div class="control-group">
-            <label for="${id:user-name}" class="control-label">Password*</label>
+            <label for="${id:current-password}" class="control-label">Current password*</label>
+         <div class="controls">
+              ${current-password} <span class="help-inline">${current-password-info}</span>
+          </div>
+      </div>
+      ${</if:current-password>}
+
+      ${<if:password>}
+      <div class="control-group">
+            <label for="${id:password}" class="control-label">Password*</label>
          <div class="controls">
               ${password} <span class="help-inline">${password-info}</span>
           </div>
       </div>
+      ${</if:password>}
+
       ${<if:confirm-password>}
       <div class="control-group">
             <label for="${id:confirm-password}" class="control-label">Confirm password*</label>
@@ -154,30 +169,43 @@
           </div>
       </div>
       ${</if:confirm-password>}
+
+      ${<if:first-name>}
       <div class="control-group">
       <label for="${id:first-name}" class="control-label">First name*</label>
         <div class="controls">
           ${first-name} <span class="help-inline">${first-name-info}</span>
         </div>
       </div>
-      <div class="control-group">
+     ${</if:first-name>}
+
+     ${<if:last-name>}
+     <div class="control-group">
           <label for="${id:last-name}" class="control-label">Last name*</label>
           <div class="controls">
             ${last-name} <span class="help-inline">${last-name-info}</span>
           </div>
       </div>
+     ${</if:last-name>}
+
+     ${<if:email>}
       <div class="control-group">
-          <label for="${id:last-name}" class="control-label">Email*</label>
+          <label for="${id:email}" class="control-label">Email*</label>
           <div class="controls">
             ${email} <span class="help-inline">${email-info}</span>
           </div>
-      </div>      
+      </div>
+     ${</if:email>}
+
+     ${<if:role>}
       <div class="control-group">
             <label for="${id:role}" class="control-label">User level*</label>
          <div class="controls">
               ${role} <span class="help-inline">${role-info}</span>
           </div>
       </div>
+     ${</if:role>}
+
       ${<if:registration-date>}
       <div class="control-group">
             <label for="${id:registration-date}" class="control-label">Registration*</label>

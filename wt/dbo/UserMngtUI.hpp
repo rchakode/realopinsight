@@ -64,6 +64,7 @@ class UserFormModel : public Wt::WFormModel
 public:
   static constexpr Wt::WFormModel::Field InfoBoxField = "infox-box";
   static constexpr Wt::WFormModel::Field UsernameField = "user-name";
+  static constexpr Wt::WFormModel::Field CurrentPasswordField = "current-password";
   static constexpr Wt::WFormModel::Field PasswordField = "password";
   static constexpr Wt::WFormModel::Field PasswordConfimationField = "confirm-password";
   static constexpr Wt::WFormModel::Field FirstNameField = "first-name";
@@ -72,7 +73,7 @@ public:
   static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
-  UserFormModel(const User* user, Wt::WObject *parent = 0);
+  UserFormModel(const User* user, bool changePassword, Wt::WObject *parent = 0);
   void setWritable(bool writtable);
 
 private:
@@ -94,7 +95,7 @@ public:
     CREATE_USER = 1,
     UPDATE_USER = 2
   };
-  UserFormView(const User* user);
+  UserFormView(const User* user, bool changePassword);
   ~UserFormView(void);
   Wt::Signal<User, std::string>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
@@ -120,6 +121,7 @@ public:
   }
 
 private:
+  const User* m_user;
   UserFormModel* m_model;
   Wt::Signal<User, std::string> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
