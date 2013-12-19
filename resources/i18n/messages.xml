@@ -154,9 +154,9 @@
 
       ${<if:password>}
       <div class="control-group">
-            <label for="${id:password}" class="control-label">Password*</label>
+            <label for="${id:password}" class="control-label">${password-label}*</label>
          <div class="controls">
-              ${password} <span class="help-inline">${password-info}</span>
+              ${password} <span class="help-inline">${change-password-link}</span><span class="help-inline">${password-info}</span>
           </div>
       </div>
       ${</if:password>}

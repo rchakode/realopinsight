@@ -126,6 +126,7 @@ private:
   Wt::Signal<User, std::string> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
   Wt::WText* m_infoBox;
+  Wt::WDialog *m_changePasswordDialog;
 
   void process(void);
   Wt::WComboBox* createUserLevelField(void);

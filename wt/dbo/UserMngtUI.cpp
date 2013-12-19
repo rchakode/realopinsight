@@ -180,6 +180,28 @@ UserFormView::UserFormView(const User* user, bool changePassword)
   setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
   setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
 
+  if (user) {
+    if (changePassword) {
+      bindString("password-label", "New Password");
+      bindString("change-password-link", "");
+    } else {
+      Wt::WPushButton* changedPwdAnchor = new Wt::WPushButton("change");
+      bindWidget("change-password-link", changedPwdAnchor);
+      //FIXME: avoid memory leak
+      changedPwdAnchor->clicked().connect(std::bind([=](){
+        m_changePasswordDialog = new Wt::WDialog("Change password");
+        UserFormView* changedPasswdForm = new UserFormView(m_user, true);
+        m_changePasswordDialog->contents()->addWidget(changedPasswdForm);
+        m_changePasswordDialog->show();
+      }));
+      bindString("password-label", "Password");
+    }
+  } else {
+    bindString("change-password-link", "");
+    bindString("password-label", "Password");
+
+  }
+
   // Bind buttons
   Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
   bindWidget("submit-button", submitButton);
@@ -188,11 +210,15 @@ UserFormView::UserFormView(const User* user, bool changePassword)
   Wt::WString title = Wt::WString("User information");
 
   if (user) {
-    submitButton->setStyleClass("btn-warning");
+    submitButton->setStyleClass("btn-success");
     if (changePassword) {
       title = Wt::WString("Set password information");
       submitButton->setText("Change password");
-      cancelButton->hide();
+      cancelButton->setText("Cancel");
+      cancelButton->clicked().connect(std::bind([=](){
+        //FIXME: m_changePasswordDialog->accept();
+        m_changePasswordDialog->accept();
+      }));
     } else {
       submitButton->setText("Update");
       cancelButton->setText("Delete");
@@ -238,13 +264,6 @@ UserFormView::~UserFormView(void)
 
 void UserFormView::process(void)
 {
-  if(m_user) {
-    Wt::WDialog *dialog = new Wt::WDialog("Change password");
-    UserFormView* changedPasswdForm = new UserFormView(m_user, true);
-    dialog->contents()->addWidget(changedPasswdForm);
-    dialog->show();
-  }
-
   updateModel(m_model);
   bool isvalid = m_model->validate();
   updateView(m_model);
