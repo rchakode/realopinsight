@@ -160,8 +160,7 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
 }
 
 UserFormView::UserFormView(const User* user, bool changePassword)
-  : m_user(user),
-    m_changePassword(changePassword),
+  : m_changePassword(changePassword),
     m_validated(this),
     m_deleteTriggered(this),
     m_changePasswordTrigerred(this),
@@ -183,13 +182,14 @@ UserFormView::UserFormView(const User* user, bool changePassword)
   setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
 
   if (m_user) {
+    m_user = *user;
     if (m_changePassword) {
       bindString("change-password-link", "");
     } else {
       Wt::WPushButton* changedPwdAnchor = new Wt::WPushButton("change");
       bindWidget("change-password-link", changedPwdAnchor);
       changedPwdAnchor->clicked().connect(std::bind([=, &user](){
-        std::cout << "user "<< user->username << "\n";
+        std::cout << "user "<< m_user.username << "\n";
         m_changePasswordDialog->show();
       }));
     }
@@ -265,19 +265,18 @@ void UserFormView::process(void)
   if (isvalid) {
     if (m_changePassword) {
       m_changePasswordTrigerred.emit(
-            m_user->username,
+            m_user.username,
             m_model->valueText(UserFormModel::PasswordField).toUTF8());
-      std::cout << "change pass<<"<< m_user->username<< " "<<m_model->valueText(UserFormModel::PasswordField).toUTF8()<< "\n";
+      std::cout << "change pass<<"<< m_user.username<< " "<<m_model->valueText(UserFormModel::PasswordField).toUTF8()<< "\n";
     } else {
-      User user;
-      user.username = m_model->valueText(UserFormModel::UsernameField).toUTF8();
-      user.password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
-      user.firstname = m_model->valueText(UserFormModel::FirstNameField).toUTF8();
-      user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
-      user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
-      user.role = User::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
-      user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
-      m_validated.emit(user);
+      m_user.username = m_model->valueText(UserFormModel::UsernameField).toUTF8();
+      m_user.password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
+      m_user.firstname = m_model->valueText(UserFormModel::FirstNameField).toUTF8();
+      m_user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
+      m_user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
+      m_user.role = User::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
+      m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
+      m_validated.emit(m_user);
     }
   }
 }
