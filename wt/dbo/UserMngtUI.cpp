@@ -166,7 +166,7 @@ UserFormView::UserFormView(const User* user, bool changePassword)
     m_changePasswordTrigerred(this),
     m_infoBox(new Wt::WText(""))
 {
-  m_model = new UserFormModel(m_user, changePassword, this);
+  m_model = new UserFormModel(user, changePassword, this);
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
@@ -181,15 +181,14 @@ UserFormView::UserFormView(const User* user, bool changePassword)
   setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
   setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
 
-  if (m_user) {
+  if (user) {
     m_user = *user;
     if (m_changePassword) {
       bindString("change-password-link", "");
     } else {
       Wt::WPushButton* changedPwdAnchor = new Wt::WPushButton("change");
       bindWidget("change-password-link", changedPwdAnchor);
-      changedPwdAnchor->clicked().connect(std::bind([=, &user](){
-        std::cout << "user "<< m_user.username << "\n";
+      changedPwdAnchor->clicked().connect(std::bind([=, &user]() {
         m_changePasswordDialog->show();
       }));
     }
@@ -197,21 +196,23 @@ UserFormView::UserFormView(const User* user, bool changePassword)
     bindString("change-password-link", "");
   }
 
-  // Bind buttons
+  // Bind buttons, but alter later
   Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
   bindWidget("submit-button", submitButton);
   Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
   bindWidget("cancel-button", cancelButton);
   Wt::WString title = Wt::WString("User information");
 
-  if (m_user) {
+  if (user) {
     submitButton->setStyleClass("btn-success");
     if (changePassword) {
       title = Wt::WString("Set password information");
       submitButton->setText("Change password");
+     // submitButton->clicked().connect(this, &UserFormView::triggerChangePassword);
+
       cancelButton->setText("Cancel");
       cancelButton->clicked().connect(std::bind([=](){
-        //FIXME: m_changePasswordDialog->accept();
+        //FIXME: m_changePasswordDialog->accept(); segfault
         m_changePasswordDialog->accept();
       }));
     } else {
@@ -264,10 +265,7 @@ void UserFormView::process(void)
   updateView(m_model);
   if (isvalid) {
     if (m_changePassword) {
-      m_changePasswordTrigerred.emit(
-            m_user.username,
-            m_model->valueText(UserFormModel::PasswordField).toUTF8());
-      std::cout << "change pass<<"<< m_user.username<< " "<<m_model->valueText(UserFormModel::PasswordField).toUTF8()<< "\n";
+      m_changePasswordTrigerred.emit(m_user.username, m_model->valueText(UserFormModel::PasswordField).toUTF8());
     } else {
       m_user.username = m_model->valueText(UserFormModel::UsernameField).toUTF8();
       m_user.password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
@@ -307,7 +305,7 @@ Wt::WLineEdit* UserFormView::createPaswordField(void)
 void UserFormView::createChangePasswordDialog(void)
 {
   m_changePasswordDialog = new Wt::WDialog("Change password");
-  UserFormView* changedPasswdForm = new UserFormView(m_user, true);
+  UserFormView* changedPasswdForm = new UserFormView(&m_user, true);
   m_changePasswordDialog->contents()->addWidget(changedPasswdForm);
 }
 

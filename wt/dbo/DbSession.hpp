@@ -55,6 +55,7 @@ public:
   void updateUserList(void);
   int addUser(User user);
   int updateUser(User user);
+  int updatePassword(const std::string& username, const std::string& password);
   int deleteUser(std::string username);
 
 private:

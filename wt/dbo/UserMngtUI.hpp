@@ -100,6 +100,9 @@ public:
   Wt::Signal<User>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
   Wt::Signal<std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTrigerred;}
+//  void triggerChangePassword(const std::string& username, const std::string& password ) {
+//    m_changePasswordTrigerred.emit(username, password);
+//  }
 
   void showMessage(int opStatus,
                    const std::string& errorMsg,

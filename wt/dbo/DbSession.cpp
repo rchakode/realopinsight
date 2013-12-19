@@ -105,6 +105,24 @@ int DbSession::updateUser(User user)
   return retCode;
 }
 
+int DbSession::updatePassword(const std::string& username, const std::string& password)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name='"+username+"'");
+    dbo::ptr<User> userPtr = authInfo.modify()->user();
+    //passAuthService.updatePassword(dbuser, upassword);
+    retCode = 0;
+  } catch (const std::exception& ex) {
+    retCode = -1;
+    Wt::log("error")<<"[realopinsight]" << ex.what();
+  }
+  transaction.commit();
+  updateUserList();
+  return retCode;
+}
+
 int DbSession::deleteUser(std::string username)
 {
   int retCode = -1;
