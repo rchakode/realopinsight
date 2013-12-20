@@ -1,5 +1,5 @@
 /*
- * Auth.hpp
+ * ParseSVConfig.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -22,41 +22,36 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
+#ifndef SNAVPARSESVCONFIG_H_
+#define SNAVPARSESVCONFIG_H_
+
 #include "Base.hpp"
-#include "Settings.hpp"
 
-class Auth : public QDialog
+
+
+class Parser
 {
-  Q_OBJECT
 public:
-  Auth();
-  virtual ~Auth();
+  Parser(const QString& _config, CoreDataT* _cdata);
+  virtual ~Parser();
 
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
-
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
-
+  bool process(bool console);
+  bool computeNodeCoordinates(int wt);
+  void computeNodeCoordinates(const QString& dotfile, int wt);
+  QString dotFile(void) const { return m_dotFile; }
+  static const QString CHILD_SEP;
+  QString lastError(void) const {return m_lastError;}
 
 private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
+  static const QString m_dotHeader;
+  static const QString m_dotFooter;
+  QString m_dotFile;
+  QString m_config;
+  CoreDataT* m_cdata;
+  QString m_lastError;
 
-  void addEvents(void);
+  void updateNodeHierachy(QString& _graphContent);
+  void saveCoordinatesFile(const QString& _content);
 };
 
-#endif /* SNAVAUTH_HPP_ */
+#endif /* SNAVPARSESVCONFIG_H_ */

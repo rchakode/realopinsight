@@ -1,5 +1,5 @@
 /*
- * Auth.hpp
+ * utilsCore.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -22,41 +22,43 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
-#include "Base.hpp"
-#include "Settings.hpp"
+#include "ns.hpp"
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <exception>
+#include <string>
+#include <iostream>
+#include <unistd.h>
 
-class Auth : public QDialog
+void ngrt4n::initApp()
 {
-  Q_OBJECT
-public:
-  Auth();
-  virtual ~Auth();
+  int ret = mkdir(ngrt4n::APP_HOME.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH ) ;
 
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
-
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
+  if(ret == -1 && errno != EEXIST) {
+      std::cerr << "You need to set the authentication token first !\n" ;
+    }
+}
 
 
-private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
+void ngrt4n::checkUser() {
+  if( getuid() != 0) {
+      std::cerr << "The program must be run as root !\n";
+      exit(1) ;
+    }
+}
 
-  void addEvents(void);
-};
+std::string ngrt4n::trim(const std::string& str, const std::string& enclosingChar)
+{
+  size_t first = str.find_first_not_of(enclosingChar);
 
-#endif /* SNAVAUTH_HPP_ */
+  if (first != std::string::npos) {
+      size_t last = str.find_last_not_of(enclosingChar);
+
+      return str.substr(first, last - first + 1);
+    }
+
+  return "";
+}
+

@@ -1,8 +1,8 @@
 /*
- * Auth.hpp
+ * JsonHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 15-08-2012                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,41 +22,23 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
-#include "Base.hpp"
-#include "Settings.hpp"
+#ifndef JSHELPER_HPP
+#define JSHELPER_HPP
 
-class Auth : public QDialog
+#include <string>
+#include <QString>
+#include <QtScript/QScriptEngine>
+
+class JsonHelper : public QScriptEngine
 {
-  Q_OBJECT
 public:
-  Auth();
-  virtual ~Auth();
-
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
-
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
-
-
-private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
-
-  void addEvents(void);
+  JsonHelper(const std::string& _data = "");
+  JsonHelper(const QString& _data = "");
+  void setData(const std::string& _data);
+  void setData(const QString& _data);
+  QScriptValue getProperty(const std::string& key);
+private :
+  QScriptValue mdata;
 };
 
-#endif /* SNAVAUTH_HPP_ */
+#endif // JSHELPER_HPP

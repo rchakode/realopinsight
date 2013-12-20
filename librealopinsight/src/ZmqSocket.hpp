@@ -1,9 +1,9 @@
 /*
- * Auth.hpp
+ * ZmqSocket.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
-#                                                                          #
+#	                                                                         #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
 #                                                                          #
@@ -22,41 +22,43 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
-#include "Base.hpp"
-#include "Settings.hpp"
+#ifndef ZMQSOCKET_HPP
+#define ZMQSOCKET_HPP
 
-class Auth : public QDialog
+#include <string>
+#include <sstream>
+
+class ZmqSocket
 {
-  Q_OBJECT
 public:
-  Auth();
-  virtual ~Auth();
-
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
-
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
+  ZmqSocket(const int & _type);
+  ZmqSocket(const std::string& uri, const int & _type);
+  ~ZmqSocket();
+  bool init();
+  bool connect();
+  bool connect(const std::string & _uri);
+  bool bind(const std::string & _uri);
+  void disconnecteFromService();
+  void reset();
+  void send(const std::string & _msg);
+  std::string recv() const;
+  void makeHandShake();
+  bool isConnected() const {return m_connected2Server; }
+  void* getSocket() const {return m_socket;}
+  int getServerSerial() const {return m_serverSerial;}
+  std::string getErrorMsg() const {return m_errorMsg;}
+  void setServerUri (const std::string& uri) { m_serverUri = uri; }
 
 
 private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
-
-  void addEvents(void);
+  std::string m_serverUri;
+  std::string m_errorMsg;
+  void *m_socket;
+  void *m_context;
+  int m_type;
+  bool m_connected2Server;
+  int m_serverSerial;
+  int convert2ServerSerial(const std::string &versionStr);
 };
 
-#endif /* SNAVAUTH_HPP_ */
+#endif // ZMQSOCKET_HPP

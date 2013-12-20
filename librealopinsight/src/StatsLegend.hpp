@@ -1,5 +1,5 @@
 /*
- * Auth.hpp
+ * Stats.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -22,41 +22,38 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
+#ifndef SNAVSTATSLEGEND_HPP_
+#define SNAVSTATSLEGEND_HPP_
 #include "Base.hpp"
-#include "Settings.hpp"
 
-class Auth : public QDialog
+class StatsLegend : public QWidget
 {
-  Q_OBJECT
 public:
-  Auth();
-  virtual ~Auth();
+  StatsLegend(const QPoint & _top_corner =  QPoint(0, 0), QWidget * _parent = 0);
 
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
+  QSize minimumSizeHint() const;
+  QSize sizeHint() const;
 
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
+  static const QColor COLOR_NORMAL;
+  static const QColor COLOR_MINOR;
+  static const QColor COLOR_MAJOR;
+  static const QColor COLOR_CRITICAL;
+  static const QColor COLOR_UNKNOWN;
+  static const QColor HIGHLIGHT_COLOR;
+  static const qint32 CHART_WIDTH;
+  static const qint32 CHART_HEIGHT;
+
+protected:
+  void paintEvent(QPaintEvent *event);
 
 
-private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
-
-  void addEvents(void);
+private :
+  QPainterPath normal;
+  QPainterPath minor;
+  QPainterPath major;
+  QPainterPath critical;
+  QPainterPath unknown;
+  QPoint leftTopCorner;
 };
 
-#endif /* SNAVAUTH_HPP_ */
+#endif /* SNAVSTATSLEGEND_HPP_ */

@@ -1,5 +1,5 @@
 /*
- * Auth.hpp
+ * ngrt4n.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -22,41 +22,73 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
-#include "Base.hpp"
-#include "Settings.hpp"
 
-class Auth : public QDialog
-{
-  Q_OBJECT
+#ifndef MONITORBROKER_HPP_
+#define MONITORBROKER_HPP_
+#include<string>
+#include<iostream>
+#include <unordered_map>
+
+struct CheckT{
+  std::string id;
+  std::string host;
+  std::string check_command;
+  std::string last_state_change;
+  std::string alarm_msg;
+  int status;
+};
+typedef std::unordered_map<std::string, CheckT> ChecksT;
+
+class MonitorBroker {
 public:
-  Auth();
-  virtual ~Auth();
-
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
+  enum ApiTypeT {
+    Nagios = 0,
+    Zabbix = 1,
+    Zenoss = 2,
+    Auto=99
+  };
+  enum SeverityT {
+    Normal = 0,
+    Minor = 1,
+    Major = 2,
+    Critical = 3,
+    Unknown = 4
+  };
+  enum NagiosStatusT {
+    NagiosOk = 0,
+    NagiosWarning = 1,
+    NagiosCritical = 2,
+    NagiosUnknown = 3
+  };
+  enum ZabbixSeverityT {
+    ZabbixClear = 0,
+    ZabbixInfo = 1,
+    ZabbixWarn = 2,
+    ZabbixAverage = 3,
+    ZabbixHigh = 4,
+    ZabbixDisaster = 5
+  };
+  enum ZenossSeverityT {
+    ZenossClear = 0,
+    ZenossDebug = 1,
+    ZenossInfo = 2,
+    ZenossWarning = 3,
+    ZenossError = 4,
+    ZenossCritical = 5
   };
 
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
+  static const int DefaultPort;
+  static const int DefaultUpdateInterval;
+  static const int MaxMsg;
 
+  MonitorBroker(const std::string& _sfile);
+  virtual ~MonitorBroker();
+  std::string getInfOfService(const std::string& _sid);
+  static bool loadNagiosCollectedData(const std::string& _sfile, ChecksT& _checks);
 
 private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
-
-  void addEvents(void);
+  int lastUpdate;
+  std::string statusFile;
+  ChecksT services;
 };
-
-#endif /* SNAVAUTH_HPP_ */
+#endif /* MONITORBROKER_HPP_ */

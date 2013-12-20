@@ -28,8 +28,6 @@
 #include "ns.hpp"
 #include "utilsClient.hpp"
 
-const QString Auth::AdmUser = USER_BN%"_adm";
-const QString Auth::OpUser = USER_BN%"_op";
 
 Auth::Auth()
   : QDialog(),

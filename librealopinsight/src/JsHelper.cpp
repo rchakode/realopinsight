@@ -1,8 +1,8 @@
 /*
- * Auth.hpp
+ * JsonHelper.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 15-08-2012                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,41 +22,31 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
-#include <QSettings>
-#include "Base.hpp"
-#include "Settings.hpp"
+#include "JsHelper.hpp"
 
-class Auth : public QDialog
+using namespace std;
+
+JsonHelper::JsonHelper(const string & _data) : QScriptEngine()
 {
-  Q_OBJECT
-public:
-  Auth();
-  virtual ~Auth();
+  setData(_data);
+}
 
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
+JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
+{
+  setData(_data);
+}
 
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
+void JsonHelper::setData(const string& data)
+{
+  mdata = evaluate("(" + QString::fromStdString(data) + ")");
+}
 
+void JsonHelper::setData(const QString& data)
+{
+  mdata = evaluate("("+data+")");
+}
 
-private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
-
-  void addEvents(void);
-};
-
-#endif /* SNAVAUTH_HPP_ */
+QScriptValue JsonHelper::getProperty(const string& key)
+{
+  return mdata.property(QString::fromStdString(key)) ;
+}

@@ -1,8 +1,8 @@
 /*
- * Auth.hpp
+ * Utils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update : 11-08-2012                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,41 +22,40 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVAUTH_HPP_
-#define SNAVAUTH_HPP_
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QGridLayout>
+#ifndef SETTINGS_HPP
+#define SETTINGS_HPP
+#include <QString>
 #include <QSettings>
 #include "Base.hpp"
-#include "Settings.hpp"
 
-class Auth : public QDialog
+class Settings : public QSettings
 {
   Q_OBJECT
 public:
-  Auth();
-  virtual ~Auth();
+  Settings();
+  virtual ~Settings(){}
+  void setKeyValue(const QString & _key, const QString & _value);
+  qint32 updateInterval() const;
+  void setEntry(const QString& key, const QString& value);
+  QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
+  bool loadSource(const qint32& _idx, SourceT& _src);
+  bool loadSource(const QString& _id, SourceT& _src);
+  bool setSource(const QString& _info, SourceT& _src);
+  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
 
-  enum RoleT {
-    AdmUserRole = 100,
-    OpUserRole = 101
-  };
+  static const QString UPDATE_INTERVAL_KEY;
+  static const QString ADM_UNSERNAME_KEY;
+  static const QString OP_UNSERNAME_KEY;
+  static const QString ADM_PASSWD_KEY;
+  static const QString OP_PASSWD_KEY;
+  static const QString SRC_BUCKET_KEY;
 
-public Q_SLOTS:
-  void cancel(void) ;
-  void authentificate(void) ;
-
+Q_SIGNALS:
+  void timerIntervalChanged(qint32);
 
 private:
-  QDialogButtonBox* m_buttonBox;
-  QLineEdit* m_loginField;
-  QLineEdit* m_passwordField;
-  QGridLayout* m_layout;
-  Settings* settings;
-
-  void addEvents(void);
+  QTranslator* translator ;
 };
 
-#endif /* SNAVAUTH_HPP_ */
+
+#endif // SETTINGS_HPP
