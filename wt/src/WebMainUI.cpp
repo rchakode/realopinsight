@@ -573,12 +573,14 @@ void WebMainUI::createPasswordPanel(void)
                                         changedPassword,
                                         userForm);
   form->closeTriggered().connect(std::bind([=](){m_changePasswordPanel->accept();}));
-  form->changePasswordTriggered().connect(std::bind([=](const std::string& login, const std::string& pass) {
-    int ret = m_dbSession->updatePassword(login, pass);
+  form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
+                                                    const std::string& lastpass,
+                                                    const std::string& pass) {
+    int ret = m_dbSession->updatePassword(login, lastpass, pass);
     form->showMessage(ret,
                       "Change password failed. More details in log.",
                       "Password changed.");
-  }, std::placeholders::_1, std::placeholders::_2));
+  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
   m_changePasswordPanel = new Wt::WDialog(QObject::tr("Change password").toStdString());
   m_changePasswordPanel->contents()->addWidget(form);

@@ -103,7 +103,7 @@ public:
   ~UserFormView(void);
   Wt::Signal<User>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
-  Wt::Signal<std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
+  Wt::Signal<std::string, std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
   Wt::Signal<void>& closeTriggered(void) {return m_close;}
 
   void showMessage(int exitCode,
@@ -116,7 +116,7 @@ private:
   UserFormModel* m_model;
   Wt::Signal<User> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
-  Wt::Signal<std::string, std::string> m_changePasswordTriggered;
+  Wt::Signal<std::string, std::string, std::string> m_changePasswordTriggered;
   Wt::Signal<void> m_close;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;

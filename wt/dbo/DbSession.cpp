@@ -105,15 +105,23 @@ int DbSession::updateUser(User user)
   return retCode;
 }
 
-int DbSession::updatePassword(const std::string& login, const std::string& pass)
+int DbSession::updatePassword(const std::string& login,
+                              const std::string& currentPass,
+                              const std::string& newpass)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name='"+login+"'");
-    dbo::ptr<User> userPtr = authInfo.modify()->user();
-    //passAuthService.updatePassword(dbuser, upassword);
-    retCode = 0;
+    Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, login);
+    switch (passAuthService.verifyPassword(dbuser, currentPass)) {
+      case Wt::Auth::PasswordValid:
+        passAuthService.updatePassword(dbuser, newpass);
+        retCode = 0;
+        break;
+      default:
+        retCode = 1;
+        break;
+    }
   } catch (const std::exception& ex) {
     retCode = -1;
     Wt::log("error")<<"[realopinsight]" << ex.what();

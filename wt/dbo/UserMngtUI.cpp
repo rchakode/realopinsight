@@ -291,6 +291,7 @@ void UserFormView::process(void)
   if (isvalid) {
     if (m_changePassword) {
       m_changePasswordTriggered.emit(m_user.username,
+                                     m_model->valueText(UserFormModel::CurrentPasswordField).toUTF8(),
                                      m_model->valueText(UserFormModel::PasswordField).toUTF8());
     } else {
       m_user.username = m_model->valueText(UserFormModel::UsernameField).toUTF8();
@@ -355,10 +356,11 @@ void UserFormView::createChangePasswordDialog(void)
                                                      forUserProfile);
   m_changePasswordDialog->contents()->addWidget(changedPasswdForm);
   changedPasswdForm->changePasswordTriggered().connect(
-        std::bind([=](const std::string& login, const std::string& pass){
-    m_changePasswordTriggered.emit(login, pass);
+        std::bind([=](const std::string& login, const std::string& currentPass,
+                  const std::string& newPass){
+    m_changePasswordTriggered.emit(login, currentPass, newPass);
     m_changePasswordDialog->accept();
-  }, std::placeholders::_1, std::placeholders::_2));
+  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
 }
 
@@ -426,12 +428,14 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                           "Update completed.");
   }, std::placeholders::_1));
 
-  form->changePasswordTriggered().connect(std::bind([=](const std::string& login, const std::string& pass) {
-    int ret = m_dbSession->updatePassword(login, pass);
+  form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
+                                                    const std::string& currentPass,
+                                                    const std::string& newPass) {
+    int ret = m_dbSession->updatePassword(login, currentPass, newPass);
     form->showMessage(ret,
                           "Change password failed. More details in log.",
                           "Password changed.");
-  }, std::placeholders::_1, std::placeholders::_2));
+  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
 
   form->deleteTriggered().connect(std::bind([=](std::string username) {
