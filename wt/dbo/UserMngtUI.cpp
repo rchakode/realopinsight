@@ -373,7 +373,6 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
     m_menu(new Wt::WMenu(m_contents, Wt::Vertical, 0))
 {
   m_menu->setStyleClass("nav nav-pills");
-  m_dbSession->updateUserList();
 
   m_userForm->validated().connect(std::bind([=](User user) {
     int ret = m_dbSession->addUser(user);
@@ -406,7 +405,7 @@ UserMngtUI::~UserMngtUI(void)
 void UserMngtUI::updateUserList(void)
 {
   m_userListContainer->clear();
-  for (auto user: m_dbSession->getUserList()) {
+  for (auto user: m_dbSession->userList()) {
     m_userListContainer->addWidget(createUserPanel(user));
   }
 }

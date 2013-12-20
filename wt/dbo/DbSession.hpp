@@ -25,7 +25,7 @@
 #ifndef DBSESSION_HPP
 #define DBSESSION_HPP
 
-#include "User.hpp"
+#include "DbObjects.hpp"
 #include "Auth.hpp"
 #include <Wt/Dbo/Dbo>
 #include <Wt/Dbo/backend/Sqlite3>
@@ -51,9 +51,12 @@ public:
   static void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(const std::string& uid);
-  UserListT& getUserList(void) {return m_userList;}
   void updateUserList(void);
+  void updateViewList(void);
+  UserListT& userList(void) {return m_userList;}
+  ViewListT& viewList(void) {return m_viewList;}
   int addUser(User user);
+  int addView(View view);
   int updateUser(User user);
   int updatePassword(const std::string& login,
                      const std::string& currentPass,
@@ -66,6 +69,7 @@ private:
   UserDatabase* m_dbUsers;
   User m_loggedUser;
   UserListT m_userList;
+  ViewListT m_viewList;
   std::string m_lastError;
 
   std::string hashPassword(const std::string& pass);

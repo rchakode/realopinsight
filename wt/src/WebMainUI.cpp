@@ -339,30 +339,7 @@ void WebMainUI::selectFileToOpen(void)
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
 
   container->setMargin(10, Wt::All);
-
-  Wt::WSelectionBox* flist = new Wt::WSelectionBox(container);
-  flist->setMargin(10, Wt::Right);
-
-  // Create a text box to display info
-  Wt::WText* infoBox = new Wt::WText("", container);
-
-  // List the configuration avaialable
-  QDir cdir(m_confdir.c_str());
-  flist->addItem("");
-  flist->setCurrentIndex(1);
-  QFileInfoList files = cdir.entryInfoList(QStringList("*.ngrt4n.xml"), QDir::Files);
-  if (! files.empty()) {
-    Q_FOREACH(const QFileInfo& f, files) {
-      flist->addItem(f.fileName().toStdString());
-    }
-  } else {
-    infoBox->setText(QObject::tr("No configuration available").toStdString());
-  }
-
-  // Set the selected file dynamically
-  flist->activated().connect(std::bind([=]() {
-    m_selectFile = flist->currentText().toUTF8();
-  }));
+  container->addWidget(createViewSelector());
 
   // Provide a button to close the window
   Wt::WPushButton* finish(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
@@ -403,11 +380,6 @@ void WebMainUI::openFileUploadDialog(void)
     m_fileUploadDialog->contents()->clear();
   }));
 
-  // React to a succesfull upload.
-  m_uploader->uploaded().connect(std::bind([=] () {
-    infoBox->setText(QObject::tr("File upload is finished.").toStdString());
-  }));
-
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
     infoBox->setText(QObject::tr("File is too large.").toStdString());
@@ -423,12 +395,32 @@ void WebMainUI::finishFileDialog(int action)
       if (! m_uploader->empty()) {
         QDir cdir(m_confdir.c_str());
         if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-          //FIXME: display in console
-          utils::alert(QObject::tr("Unable to use the configuration directory (%1)").arg(cdir.absolutePath()));
+          QString errrMsg = QObject::tr("Unable to use the "
+                                        "configuration directory (%1)").arg(cdir.absolutePath());
+          Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
+          utils::alert(errrMsg);
+        } else {
+          Wt::log("notice")<<"[realopinsight]"<< "Parsing the input file";
+          QString fileName(m_uploader->spoolFileName().c_str());
+          CoreDataT cdata;
+          Parser parser(fileName ,&cdata);
+          if (parser.process(false)) {
+            std::string tmpPath = m_uploader->clientFileName().toUTF8();
+            QString dest = QString("%1/%2").arg(cdir.absolutePath(), tmpPath.c_str());
+            QFile file(fileName);
+            file.copy(dest);
+            file.remove();
+
+            View view;
+            view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
+            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+            view.path = dest.toStdString();
+
+            m_dbSession->addView(view);
+          } else {
+            Wt::log("error")<<"[realopinsight]"<< "Invalid configuration file";
+          }
         }
-        QFile file(QString::fromStdString(m_uploader->spoolFileName()));
-        file.copy(QString("%1/%2").arg(cdir.absolutePath(),
-                                       QString::fromStdString(m_uploader->clientFileName().toUTF8())));
       }
       break;
     case OPEN:
@@ -450,9 +442,8 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::openFile(const std::string& path)
 {
   checkUserLogin();
-  std::string realPath = m_confdir+"/"+path;
   WebDashboard* dashboard = new WebDashboard(m_dbSession->loggedUser().role,
-                                             QString::fromStdString(realPath));
+                                             path.c_str());
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
@@ -607,4 +598,39 @@ void WebMainUI::handleInternalPath(void)
                                    "is not available or has been removed").toStdString());
     m_infoBox->show();
   }
+}
+
+
+Wt::WComboBox* WebMainUI::createViewSelector(void)
+{
+  ViewListT views = m_dbSession->viewList();
+
+  Wt::WComboBox* viewSelector = new Wt::WComboBox();
+  viewSelector->setMargin(10, Wt::Right);
+
+  Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(this);
+  Wt::WStandardItem *item = new Wt::WStandardItem();
+  item->setText("Select the view to load");
+  viewSelectorModel->appendRow(item);
+
+  Q_FOREACH(const View& view, views) {
+    item = new Wt::WStandardItem();
+    item->setText(view.name);
+    item->setData(view.path, Wt::UserRole);
+    viewSelectorModel->appendRow(item);
+  }
+
+  viewSelector->setModel(viewSelectorModel);
+  viewSelector->setCurrentIndex(0);
+
+  // Set selection action
+  viewSelector->activated().connect(std::bind([=]() {
+    int index = viewSelector->currentIndex();
+    Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(viewSelector->model());
+    if (index>0) {
+      m_selectFile = boost::any_cast<std::string>(model->item(index, 0)->data());
+    }
+  }));
+
+  return viewSelector;
 }

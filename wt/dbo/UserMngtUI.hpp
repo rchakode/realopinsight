@@ -25,7 +25,7 @@
 #ifndef USERFORM_HPP
 #define USERFORM_HPP
 
-#include "User.hpp"
+#include "DbObjects.hpp"
 #include <Wt/WBoostAny>
 #include <Wt/WDateEdit>
 #include <Wt/WDateValidator>

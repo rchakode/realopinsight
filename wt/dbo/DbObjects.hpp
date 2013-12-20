@@ -25,25 +25,54 @@
 #ifndef USER_HPP
 #define USER_HPP
 
-#include <Wt/Dbo/Dbo>
 #include <string>
 #include <list>
+#include <Wt/Dbo/Dbo>
+#include <string>
 
 namespace dbo = Wt::Dbo;
 
+class View;
 class User;
+
 namespace Wt {
   namespace Dbo {
+    template<>
+    struct dbo_traits<View> : public dbo_default_traits
+    {
+      typedef std::string IdType;
+      static IdType invalidId() { return std::string(); }
+      static const char* surrogateIdField() { return 0; }
+    };
 
     template<>
     struct dbo_traits<User> : public dbo_default_traits
     {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
-      static const char *surrogateIdField() { return 0; }
+      static const char* surrogateIdField() { return 0; }
     };
   }
 }
+
+class View
+{
+public:
+  std::string name;
+  std::string path;
+  int service_count;
+  dbo::collection< dbo::ptr<User> > users;
+
+  View(){}
+
+  template<class Action>
+  void persist(Action& a) {
+    dbo::id(a, name, "name");
+    dbo::field(a, path, "path");
+    dbo::field(a, service_count, "service_count");
+  }
+};
+
 
 class User {
 public:
@@ -59,6 +88,7 @@ public:
   std::string email;
   int role;
   std::string registrationDate;
+  dbo::collection< dbo::ptr<View> > views;
 
   template<class Action>
   void persist(Action& a) {
@@ -68,6 +98,7 @@ public:
     dbo::field(a, email, "email");
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
+    dbo::hasMany(a, views, dbo::ManyToMany, "user_views");
   }
 
   static std::string role2Text(int role) {
@@ -79,5 +110,6 @@ public:
 };
 
 typedef std::list<User> UserListT;
+typedef std::list<View> ViewListT;
 
 #endif // USER_HPP

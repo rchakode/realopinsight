@@ -107,6 +107,7 @@ private:
   void showUserMngtPage(Wt::WStackedWidget* contents, int destination);
   void createAccountPanel(void);
   void createPasswordPanel(void);
+  Wt::WComboBox* createViewSelector(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

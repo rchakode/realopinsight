@@ -40,6 +40,8 @@ DbSession::DbSession(bool initializeDb):
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
   setup(initializeDb);
+  updateUserList();
+  updateViewList();
 }
 
 DbSession::~DbSession()
@@ -51,6 +53,7 @@ DbSession::~DbSession()
 void DbSession::setup(bool initializeDb)
 {
   mapClass<User>("user");
+  mapClass<View>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
@@ -67,7 +70,7 @@ int DbSession::addUser(User user)
   try {
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
-    info.modify()->setUser(add(&user));
+    info.modify()->setUser(add(const_cast<User*>(&user)));
     info.modify()->setEmail(user.email);
     passAuthService.updatePassword(dbuser, user.password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
@@ -200,6 +203,18 @@ void DbSession::updateUserList(void)
   transaction.commit();
 }
 
+void DbSession::updateViewList(void)
+{
+  m_viewList.clear();
+  dbo::Transaction transaction(*this);
+  typedef dbo::collection< dbo::ptr<View> > ViewCollectionT;
+  ViewCollectionT views = find<View>();
+  for (ViewCollectionT::const_iterator it = views.begin(), end = views.end(); it != end; ++it) {
+    m_viewList.push_back(*(*it));
+  }
+  transaction.commit();
+}
+
 void DbSession::initDb(void)
 {
   try {
@@ -217,4 +232,20 @@ void DbSession::initDb(void)
     Wt::log("error")<<"[realopinsight] "<< "Failed initializing the database";
     Wt::log("error")<<"[realopinsight][dbo] "<< ex.what();
   }
+}
+
+int DbSession::addView(View view)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    std::cout << "here\n";
+    add(&view);
+    retCode = 0;
+  } catch (const std::exception& ex) {
+    m_lastError = "Failed to add the view. More details in log.";
+    Wt::log("error")<<"[realopinsight]" << ex.what();
+  }
+  transaction.commit();
+  return retCode;
 }

@@ -28,7 +28,6 @@ HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebTree.hpp \
     wt/include/WebPieChart.hpp \
     wt/include/WebMainUI.hpp \
-    wt/dbo/User.hpp \
     wt/dbo/DbSession.hpp \
     wt/dbo/UserMngtUI.hpp
 
@@ -91,7 +90,8 @@ HEADERS	+= include/client/Auth.hpp \
     include/client/WebKit.hpp \
     include/client/Settings.hpp \
     include/client/Chart.hpp \
-    include/client/MsgConsole.hpp
+    include/client/MsgConsole.hpp \
+    wt/dbo/DbObjects.hpp
 
 SOURCES	+= src/client/Auth.cpp \
     src/client/GraphView.cpp \
@@ -124,7 +124,7 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-LIBS += -L/tmp/ngrt4n-qt/build-librealopinsight-Desktop-Debug -lrealopinsight \
+LIBS += -L./librealopinsight/release -lrealopinsight \
     -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
     -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
     -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
