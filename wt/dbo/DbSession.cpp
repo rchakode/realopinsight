@@ -247,5 +247,6 @@ int DbSession::addView(View view)
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
+  updateViewList();
   return retCode;
 }
