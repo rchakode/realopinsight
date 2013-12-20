@@ -29,7 +29,8 @@ HEADERS	+= wt/include/WebDashboard.hpp \
     wt/include/WebPieChart.hpp \
     wt/include/WebMainUI.hpp \
     wt/dbo/User.hpp \
-    wt/dbo/DbSession.hpp
+    wt/dbo/DbSession.hpp \
+    wt/dbo/UserMngtUI.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -38,7 +39,8 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebTree.cpp \
     wt/src/WebPieChart.cpp \
     wt/src/WebMainUI.cpp \
-    wt/dbo/DbSession.cpp
+    wt/dbo/DbSession.cpp \
+    wt/dbo/UserMngtUI.cpp
 
 LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
     -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
@@ -103,8 +105,7 @@ HEADERS	+= include/core/ns.hpp \
     include/client/MsgConsole.hpp \
     include/core/ZmqSocket.hpp \
     include/client/LsHelper.hpp \
-    include/client/DashboardBase.hpp \
-    wt/dbo/UserMngtUI.hpp
+    include/client/DashboardBase.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -131,8 +132,7 @@ SOURCES	+= \
     src/client/MsgConsole.cpp \
     src/core/ZmqSocket.cpp \
     src/client/LsHelper.cpp \
-    src/client/DashboardBase.cpp \
-    wt/dbo/UserMngtUI.cpp
+    src/client/DashboardBase.cpp
 
 DISTFILES += README \
     INSTALL \

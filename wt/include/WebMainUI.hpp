@@ -60,9 +60,12 @@ private:
 
   Settings* m_settings;
   Wt::WTimer* m_timer;
-  Wt::WWidget* createMainUI(void);
-  Wt::WWidget* createToolBar(void);
   Wt::WContainerWidget* m_mainWidget;
+  Wt::WStackedWidget* m_contents;
+  Wt::WNavigationBar* m_navbar;
+  Wt::WMenu* m_mgntMenu;
+  Wt::WMenu* m_profileMenu;
+  Wt::WMenuItem* m_mainProfileMenuItem;
   AuthWidget* m_authWidget;
   Wt::WTabWidget* m_dashtabs;
   Wt::WDialog* m_fileUploadDialog;
@@ -81,6 +84,11 @@ private:
 
 
   void addEvents(void);
+  void createMainUI(void);
+  void setupAdminMenus(void);
+  void setupProfileMenus(void);
+  void setupUserMenus(void);
+  Wt::WWidget* createToolBar(void);
   void handleAuthentification(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
@@ -91,7 +99,7 @@ private:
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createUserHome(void);
-  void createLoginWidget(void);
+  void createLoginPage(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
                                        const std::string& internalPath);

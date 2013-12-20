@@ -95,7 +95,7 @@ UserFormModel::UserFormModel(const User* user,
   setValidator(UserLevelField, createNameValidator());
 
   // These fields shoudl always be read only on update
-  if (user) {
+  if (user && ! changePassword) {
     setReadOnly(UsernameField, true);
     setReadOnly(PasswordField, true);
     setReadOnly(RegistrationDateField, true);

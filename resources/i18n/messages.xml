@@ -65,7 +65,7 @@
         </div>
         <!-- List actions -->
         <div class="span2">
-           ${info-box}
+           <span>${info-box}</span>
         </div>
 
         <div class="span2 list-group">

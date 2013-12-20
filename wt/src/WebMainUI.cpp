@@ -53,6 +53,11 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
+    m_contents(NULL),
+    m_navbar(NULL),
+    m_mgntMenu(NULL),
+    m_profileMenu(NULL),
+    m_authWidget(NULL),
     m_dashtabs(new Wt::WTabWidget()),
     m_infoBox(new Wt::WText("", m_mainWidget)),
     m_dbSession(new DbSession(true)),
@@ -63,6 +68,12 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
   m_dashtabs->addStyleClass("wrapper-container");
   m_infoBox->addStyleClass("alert alert-warning alert-dismissable");
   m_infoBox->hide();
+
+
+  createLoginPage();
+  createMainUI();
+  root()->addWidget(m_authWidget);
+  root()->addWidget(m_mainWidget);
   addEvents();
 }
 
@@ -75,6 +86,10 @@ WebMainUI::~WebMainUI()
   delete m_authWidget;
   delete m_mainWidget;
   delete m_dbSession;
+  //FIXME: delete if not null => set them null at startup
+  delete m_navbar;
+  delete m_contents;
+  delete m_mainWidget;
 }
 
 
@@ -88,13 +103,11 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showLoginHome(void)
 {
   m_mainWidget->hide();
-  createLoginWidget();
-  root()->addWidget(m_authWidget);
   m_authWidget->show();
   refresh();
 }
 
-void WebMainUI::createLoginWidget(void)
+void WebMainUI::createLoginPage(void)
 {
   setInternalPath(LINK_LOGIN_PAGE);
   setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
@@ -109,78 +122,102 @@ void WebMainUI::createLoginWidget(void)
 
 void WebMainUI::showUserHome(void)
 {
+  setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
+  setInternalPath(LINK_ADMIN_HOME);
+
+  checkUserLogin();
+
   m_authWidget->hide();
   m_mainWidget->show();
-  setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
-  checkUserLogin();
-  setInternalPath(LINK_ADMIN_HOME);
-  m_mainWidget->addWidget(createMainUI());
+
+  //Clear the tab
+  for(int i = 0, end = m_dashtabs->count(); i < end; ++i) {
+    m_dashtabs->removeTab(m_dashtabs->widget(i));
+  }
+
+  std::string homeTabTitle = m_dbSession->loggedUser().role == User::AdmRole?
+        QObject::tr("Quick Start").toStdString() :
+        QObject::tr("Tactical Overview").toStdString();
+
   m_dashtabs->addTab(createUserHome(),
-                     QObject::tr("Quick Start").toStdString(),
+                     homeTabTitle,
                      Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
+
+  refresh();
+
   resetTimer();
-  root()->addWidget(m_mainWidget);
 }
 
-Wt::WWidget* WebMainUI::createMainUI(void)
+void WebMainUI::createMainUI(void)
 {
-  checkUserLogin();
-  User loggedUser = m_dbSession->loggedUser();
   Wt::WContainerWidget* container = new Wt::WContainerWidget();
-  Wt::WNavigationBar* navbar(new Wt::WNavigationBar(container));
-  navbar->addWidget(createLogoLink(), Wt::AlignLeft);
+  m_navbar = new Wt::WNavigationBar(container);
+  m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
+
+  // Create a container for stacked contents
+  m_contents = new Wt::WStackedWidget(container);
+  m_contents->setId("stackcontentarea");
 
   // Setup the main menu
-  Wt::WStackedWidget* stackedWidgets = new Wt::WStackedWidget(container);
-  stackedWidgets->setId("stackcontentarea");
-  Wt::WMenu* mainMenu (new Wt::WMenu(stackedWidgets));
-  navbar->addMenu(mainMenu, Wt::AlignLeft);
+  Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
+  m_navbar->addMenu(mainMenu, Wt::AlignLeft);
+  mainMenu->addItem(QObject::tr("Home").toStdString(), m_dashtabs);
+  container->addWidget(m_contents);
+
+  setupAdminMenus();
+  setupProfileMenus();
+
+  m_mainWidget->addWidget(container);
+}
+
+
+void WebMainUI::setupAdminMenus(void)
+{
+  Wt::WMenuItem* curItem = NULL;
+  m_mgntMenu = new Wt::WMenu(m_contents);
+  m_navbar->addMenu(m_mgntMenu, Wt::AlignLeft);
+  Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
+  curItem = new Wt::WMenuItem(QObject::tr("Management").toStdString());
+  curItem->setMenu(mgntPopupMenu);
+  m_mgntMenu->addItem(curItem);
+
+  mgntPopupMenu->addSectionHeader("File");
+  mgntPopupMenu->addItem("Import")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
+  mgntPopupMenu->addItem("Load")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+
+  // Menus for view management
+  mgntPopupMenu->addSectionHeader("View");
+  mgntPopupMenu->addItem("Assign/revoke")
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+
+  // Menus for user management
+  m_userMgntUI = new UserMngtUI(m_dbSession);
+  m_contents->addWidget(m_userMgntUI);
+  mgntPopupMenu->addSectionHeader("User");
+  mgntPopupMenu->addItem("Add")
+      ->triggered().connect(std::bind([=](){
+    showUserMngtPage(m_contents, UserMngtUI::AddUserAction);
+  }));
+  mgntPopupMenu->addItem("List")
+      ->triggered().connect(std::bind([=](){
+    showUserMngtPage(m_contents, UserMngtUI::ListUserAction);
+  }));
+
+}
+
+void WebMainUI::setupProfileMenus(void)
+{
+  m_profileMenu = new Wt::WMenu();
+  m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
+  Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
+  m_mainProfileMenuItem = new Wt::WMenuItem("Profile");
+  m_mainProfileMenuItem->setMenu(profilePopupMenu);
+  m_profileMenu->addItem(m_mainProfileMenuItem);
 
   Wt::WMenuItem* curItem = NULL;
-  if(loggedUser.role == User::AdmRole) {
-    curItem = mainMenu->addItem(QObject::tr("Home").toStdString(), m_dashtabs);
-
-    // Menus for administration
-    Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-    curItem = new Wt::WMenuItem(QObject::tr("Management").toStdString());
-    curItem->setMenu(mgntPopupMenu);
-    mainMenu->addItem(curItem);
-
-    mgntPopupMenu->addSectionHeader("File");
-    mgntPopupMenu->addItem("Import")
-        ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
-    mgntPopupMenu->addItem("Load")
-        ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-
-    // Menus for view management
-    mgntPopupMenu->addSectionHeader("View");
-    mgntPopupMenu->addItem("Assign/revoke")
-        ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-
-    // Menus for user management
-    m_userMgntUI = new UserMngtUI(m_dbSession);
-    stackedWidgets->addWidget(m_userMgntUI);
-    mgntPopupMenu->addSectionHeader("User");
-    mgntPopupMenu->addItem("Add")
-        ->triggered().connect(std::bind([=](){
-      showUserMngtPage(stackedWidgets, UserMngtUI::AddUserAction);
-    }));
-    mgntPopupMenu->addItem("List")
-        ->triggered().connect(std::bind([=](){
-      showUserMngtPage(stackedWidgets, UserMngtUI::ListUserAction);
-    }));
-  } else {
-    mainMenu->addItem(QObject::tr("Tactical Overview").toStdString(), m_dashtabs);
-  }
-  navbar->addWidget(createToolBar());
-  Wt::WMenu* profileMenu(new Wt::WMenu());
-  navbar->addMenu(profileMenu, Wt::AlignRight);
-  Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
-  curItem = new Wt::WMenuItem(QObject::tr("You are %1").arg(loggedUser.username.c_str()).toStdString());
-  curItem->setMenu(profilePopupMenu);
-  profileMenu->addItem(curItem);
-
   profilePopupMenu->addItem(QObject::tr("Account").toStdString().c_str())
       ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
   profilePopupMenu->addItem(QObject::tr("Change password").toStdString().c_str())
@@ -194,11 +231,27 @@ Wt::WWidget* WebMainUI::createMainUI(void)
       ->triggered().connect(std::bind([=](){}));
   profilePopupMenu->addSeparator();
   profilePopupMenu->addItem("Sign out")
-      ->triggered().connect(std::bind([=](){m_login.logout();}));
-  container->addWidget(stackedWidgets);
-  return container;
+      ->triggered().connect(std::bind([=]() {
+    m_login.logout();
+  }));
 }
 
+void WebMainUI::setupUserMenus(void)
+{
+  checkUserLogin();
+  User loggedUser = m_dbSession->loggedUser();
+
+  m_mainProfileMenuItem->setText(QObject::tr("You're %1").arg(
+                                   loggedUser.username.c_str()).toStdString());
+  if(loggedUser.role == User::AdmRole) {
+    m_mgntMenu->show();
+  } else {
+    m_mgntMenu->hide();
+  }
+
+  //FIXME: add this after the first view loaded
+  m_navbar->addWidget(createToolBar());
+}
 
 Wt::WWidget* WebMainUI::createToolBar(void)
 {
@@ -430,27 +483,6 @@ void WebMainUI::scaleMap(double factor)
   }
 }
 
-void WebMainUI::handleInternalPath(void)
-{
-  checkUserLogin();
-  std::string path = Wt::WApplication::instance()->internalPath();
-  if (path == LINK_LOAD) {
-    selectFileToOpen();
-    setInternalPath("");
-  } else if (path == LINK_IMPORT) {
-    openFileUploadDialog();
-    setInternalPath("");
-  } else if (path == LINK_ADMIN_HOME) {
-    showUserHome();
-  } else if (path == LINK_LOGIN_PAGE) {
-    showLoginHome();
-  } else {
-    m_infoBox->setText(QObject::tr("Sorry, the request resource "
-                                   "is not available or has been removed").toStdString());
-    m_infoBox->show();
-  }
-}
-
 Wt::WWidget* WebMainUI::createUserHome(void)
 {
   checkUserLogin();
@@ -485,9 +517,10 @@ void WebMainUI::handleAuthentification(void)
   if (m_login.loggedIn()) {
     m_dbSession->setLoggedUser(m_login.user().id());
     Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
-    showUserHome();
     createAccountPanel();
     createPasswordPanel();
+    setupUserMenus();
+    showUserHome();
   } else {
     Wt::log("notice") << "[realopinsight] "<<"Not connected. Redirecting to login page.";
     showLoginHome();
@@ -546,4 +579,27 @@ void WebMainUI::createPasswordPanel(void)
 
   m_changePasswordPanel = new Wt::WDialog(QObject::tr("Change password").toStdString());
   m_changePasswordPanel->contents()->addWidget(form);
+}
+
+
+void WebMainUI::handleInternalPath(void)
+{
+  checkUserLogin();
+  std::string path = Wt::WApplication::instance()->internalPath();
+  if (path == LINK_LOAD) {
+    selectFileToOpen();
+    setInternalPath("");
+  } else if (path == LINK_IMPORT) {
+    openFileUploadDialog();
+    setInternalPath("");
+  } else if (path == LINK_ADMIN_HOME) {
+    showUserHome();
+  } else if (path == LINK_LOGIN_PAGE) {
+    showLoginHome();
+  } else {
+    showLoginHome();
+    m_infoBox->setText(QObject::tr("Sorry, the request resource "
+                                   "is not available or has been removed").toStdString());
+    m_infoBox->show();
+  }
 }
