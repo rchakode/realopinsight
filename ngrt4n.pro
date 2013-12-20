@@ -80,15 +80,10 @@ INCLUDEPATH = include include/client \
               wt/dbo \
               /opt/install/wt-3.3.0/include
 
-HEADERS	+= include/core/ns.hpp \
-    include/core/MonitorBroker.hpp \
-    include/client/Auth.hpp \
-    include/client/Base.hpp \
+HEADERS	+= include/client/Auth.hpp \
     include/client/GraphView.hpp \
-    include/client/Parser.hpp \
     include/client/PieChart.hpp \
     include/client/PieChartItem.hpp \
-    include/client/Preferences.hpp \
     include/client/ServiceEditor.hpp \
     include/client/StatsLegend.hpp \
     include/client/SvConfigCreator.hpp \
@@ -96,22 +91,12 @@ HEADERS	+= include/core/ns.hpp \
     include/client/MainWindow.hpp \
     include/client/SvNavigatorTree.hpp \
     include/client/WebKit.hpp \
-    include/client/ZbxHelper.hpp \
-    include/client/JsHelper.hpp \
-    include/client/ZnsHelper.hpp \
     include/client/Settings.hpp \
-    include/client/utilsClient.hpp \
     include/client/Chart.hpp \
-    include/client/MsgConsole.hpp \
-    include/core/ZmqSocket.hpp \
-    include/client/LsHelper.hpp \
-    include/client/DashboardBase.hpp
+    include/client/MsgConsole.hpp
 
-SOURCES	+= \
-    src/core/MonitorBroker.cpp \
-    src/client/Auth.cpp \
+SOURCES	+= src/client/Auth.cpp \
     src/client/GraphView.cpp \
-    src/client/Parser.cpp \
     src/client/PieChart.cpp \
     src/client/PieChartItem.cpp \
     src/client/Preferences.cpp \
@@ -122,17 +107,8 @@ SOURCES	+= \
     src/client/MainWindow.cpp \
     src/client/SvNavigatorTree.cpp \
     src/client/WebKit.cpp \
-    src/client/ZbxHelper.cpp \
-    src/client/JsHelper.cpp \
-    src/client/ZnsHelper.cpp \
-    src/client/Settings.cpp \
-    src/client/utilsClient.cpp \
-    src/core/utilsCore.cpp \
     src/client/Chart.cpp \
-    src/client/MsgConsole.cpp \
-    src/core/ZmqSocket.cpp \
-    src/client/LsHelper.cpp \
-    src/client/DashboardBase.cpp
+    src/client/MsgConsole.cpp
 
 DISTFILES += README \
     INSTALL \
