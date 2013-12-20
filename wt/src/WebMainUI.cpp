@@ -42,6 +42,7 @@
 #include <Wt/WHBoxLayout>
 
 namespace {
+  const std::string LINK_HOME ="/realopinsight";
   const std::string LINK_LOAD ="/load-platform";
   const std::string LINK_IMPORT ="/import-platform";
   const std::string LINK_LOGIN_PAGE ="/login";
@@ -531,7 +532,7 @@ void WebMainUI::handleAuthentification(void)
 void WebMainUI::checkUserLogin(void)
 {
   if (! m_login.loggedIn()) {
-    redirect(LINK_LOGIN_PAGE);
+    redirect(LINK_HOME);
   }
 }
 
