@@ -7,7 +7,7 @@
 QT       += core gui xml network script
 
 
-TARGET = librealopinsight
+TARGET = realopinsight
 TEMPLATE = lib
 VERSION=1.0.0
 

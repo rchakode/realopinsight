@@ -42,7 +42,7 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/dbo/DbSession.cpp \
     wt/dbo/UserMngtUI.cpp
 
-LIBS += -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
+LIBS += -Lbuild-librealopinsight-Desktop-Debug -lrealopinsight -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
     -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
     -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 TARGET = ngrt4n-web
