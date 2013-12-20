@@ -59,12 +59,14 @@ public:
                      const std::string& currentPass,
                      const std::string& newPass);
   int deleteUser(std::string username);
+  std::string lastError(void) const {return m_lastError;}
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
   UserDatabase* m_dbUsers;
   User m_loggedUser;
   UserListT m_userList;
+  std::string m_lastError;
 
   std::string hashPassword(const std::string& pass);
   void initDb(void);

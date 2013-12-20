@@ -378,7 +378,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
   m_userForm->validated().connect(std::bind([=](User user) {
     int ret = m_dbSession->addUser(user);
     m_userForm->showMessage(ret,
-                            "Operation failed. More details in log.",
+                           m_dbSession->lastError(),
                             "User added.");
   }, std::placeholders::_1));
 
@@ -424,7 +424,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     form->showMessage(ret,
-                          "Update failed. More details in log.",
+                          m_dbSession->lastError(),
                           "Update completed.");
   }, std::placeholders::_1));
 
@@ -433,7 +433,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                                                     const std::string& newPass) {
     int ret = m_dbSession->updatePassword(login, currentPass, newPass);
     form->showMessage(ret,
-                          "Change password failed. More details in log.",
+                          m_dbSession->lastError(),
                           "Password changed.");
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
@@ -441,7 +441,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   form->deleteTriggered().connect(std::bind([=](std::string username) {
     int ret = m_dbSession->deleteUser(username);
     m_userForm->showMessage(ret,
-                            "Deletion failed. More details in log.",
+                            m_dbSession->lastError(),
                             QObject::tr("User %1 deleted").arg(username.c_str()).toStdString());
     updateUserList();
   }, std::placeholders::_1));

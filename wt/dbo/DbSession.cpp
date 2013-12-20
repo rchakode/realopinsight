@@ -68,13 +68,13 @@ int DbSession::addUser(User user)
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
     info.modify()->setUser(add(&user));
-    info.modify()->setEmail(user.email); //FIXME: take this into account
+    info.modify()->setEmail(user.email);
     passAuthService.updatePassword(dbuser, user.password);
     dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
     flush();
     retCode = 0;
   } catch (const std::exception& ex) {
-    retCode = 1;
+    m_lastError = "Failed to add the user. More details in log.";
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
@@ -94,10 +94,10 @@ int DbSession::updateUser(User user)
     userPtr.modify()->firstname = user.firstname;
     userPtr.modify()->email = user.email;
     userPtr.modify()->role = user.role;
-    authInfo.modify()->setEmail(user.email); //FIXME: take this into account
+    authInfo.modify()->setEmail(user.email);
     retCode = 0;
   } catch (const std::exception& ex) {
-    retCode = -1;
+    m_lastError = "Failed to update the user. More details in log.";
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
   transaction.commit();
@@ -118,8 +118,13 @@ int DbSession::updatePassword(const std::string& login,
         passAuthService.updatePassword(dbuser, newpass);
         retCode = 0;
         break;
-      default:
-        retCode = 1;
+      case Wt::Auth::PasswordInvalid:
+        m_lastError = "Your current password doesn't match";
+        break;
+      case Wt::Auth::LoginThrottling:
+        m_lastError = "The account has been blocked. Retry later or contact your administrator";
+        break;
+      default:m_lastError = "Unknown error concerning your current password";
         break;
     }
   } catch (const std::exception& ex) {
