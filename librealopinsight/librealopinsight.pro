@@ -9,6 +9,7 @@ QT       += core gui xml network script
 
 TARGET = librealopinsight
 TEMPLATE = lib
+VERSION=1.0.0
 
 DEFINES += LIBREALOPINSIGHT_LIBRARY
 
