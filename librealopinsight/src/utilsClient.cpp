@@ -25,9 +25,6 @@
 #include "StatsLegend.hpp"
 #include "utilsClient.hpp"
 #include <QFileInfo>
-#include <Wt/WString>
-//FIXME: #include <Wt/WMessageBox>
-//#include <Wt/WMessageBox>
 
 
 namespace {

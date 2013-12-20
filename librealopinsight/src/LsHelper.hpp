@@ -28,7 +28,7 @@
 #include "Base.hpp"
 #include <QTcpSocket>
 
-class LsHelper : public QTcpSocket
+class LIBREALOPINSIGHTSHARED_EXPORT LsHelper : public QTcpSocket
 {
   Q_OBJECT
 public:

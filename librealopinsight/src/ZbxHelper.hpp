@@ -33,7 +33,7 @@ namespace {
   const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
 }
 
-class ZbxHelper : public QNetworkAccessManager {
+class LIBREALOPINSIGHTSHARED_EXPORT ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
 public:
   enum {

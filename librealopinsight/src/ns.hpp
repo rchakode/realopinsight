@@ -28,6 +28,13 @@
 #include<stdlib.h>
 #include <string>
 
+
+#if defined(LIBREALOPINSIGHT_LIBRARY)
+#  define LIBREALOPINSIGHTSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define LIBREALOPINSIGHTSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
 namespace ngrt4n {
   enum {
     AdmUserRole = 100,

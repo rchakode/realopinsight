@@ -25,11 +25,13 @@
 #ifndef JSHELPER_HPP
 #define JSHELPER_HPP
 
+#include "ns.hpp"
+#include <QtCore/QtGlobal>
 #include <string>
 #include <QString>
 #include <QtScript/QScriptEngine>
 
-class JsonHelper : public QScriptEngine
+class LIBREALOPINSIGHTSHARED_EXPORT JsonHelper : public QScriptEngine
 {
 public:
   JsonHelper(const std::string& _data = "");

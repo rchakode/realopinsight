@@ -29,7 +29,7 @@
 
 
 
-class Parser
+class LIBREALOPINSIGHTSHARED_EXPORT Parser
 {
 public:
   Parser(const QString& _config, CoreDataT* _cdata);

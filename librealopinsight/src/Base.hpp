@@ -25,13 +25,15 @@
 #ifndef BASE_HPP
 #define BASE_HPP
 #include "MonitorBroker.hpp"
+#include "ns.hpp"
+#include <QtCore/QtGlobal>
 #include <QtCore>
 #include <QtXml>
 #include <QtGui>
 #include <QSettings>
 #include <memory>
 
-#include <Wt/WStandardItem>
+
 
 #define INIT_TRANSLATION \
   QTranslator translator; \
@@ -54,12 +56,12 @@ const QString ID_PATTERN("%1/%2");
 
 const qint32 MAX_SRCS = 10;
 
-class LsHelper;
-class ZbxHelper;
-class ZnsHelper;
-class ZmqSocket;
+class LIBREALOPINSIGHTSHARED_EXPORT LsHelper;
+class LIBREALOPINSIGHTSHARED_EXPORT ZbxHelper;
+class LIBREALOPINSIGHTSHARED_EXPORT ZnsHelper;
+class LIBREALOPINSIGHTSHARED_EXPORT ZmqSocket;
 
-class PropRules {
+class LIBREALOPINSIGHTSHARED_EXPORT PropRules {
 public:
   enum PropRulesT{
     Unchanged = 0,
@@ -76,9 +78,9 @@ public:
   }
   static QString label(PropRulesT rule) {
     switch(rule) {
-      case Unchanged: return QObject::tr("Unchanged");
-      case Decreased: return QObject::tr("Decreased");
-      case Increased: return QObject::tr("Increased");
+    case Unchanged: return QObject::tr("Unchanged");
+    case Decreased: return QObject::tr("Decreased");
+    case Increased: return QObject::tr("Increased");
     }
 
     return QObject::tr("Unchanged");
@@ -86,7 +88,7 @@ public:
 };
 
 
-class CalcRules {
+class LIBREALOPINSIGHTSHARED_EXPORT CalcRules {
 public:
   enum CalcRulesT{
     HighCriticity = 0,
@@ -99,7 +101,7 @@ public:
     return QObject::tr("High Severity");}
 };
 
-class NodeType {
+class LIBREALOPINSIGHTSHARED_EXPORT NodeType {
 public:
   enum {
     SERVICE_NODE = 0,
@@ -114,7 +116,7 @@ public:
 };
 
 
-class Criticity {
+class LIBREALOPINSIGHTSHARED_EXPORT Criticity {
 public:
   Criticity(MonitorBroker::SeverityT _value): value(_value) {}
   void setValue(MonitorBroker::SeverityT _value) {value = _value;}
@@ -122,32 +124,32 @@ public:
 
   Criticity operator *(Criticity& _criticity) const {
     switch(value) {
-      case MonitorBroker::Critical:
-        return Criticity(value);
-        break;
-      case MonitorBroker::Normal:
+    case MonitorBroker::Critical:
+      return Criticity(value);
+      break;
+    case MonitorBroker::Normal:
+      return _criticity;
+      break;
+    case MonitorBroker::Minor:
+      if(_criticity.value == MonitorBroker::Critical ||
+         _criticity.value == MonitorBroker::Major ||
+         _criticity.value == MonitorBroker::Unknown)
         return _criticity;
-        break;
-      case MonitorBroker::Minor:
-        if(_criticity.value == MonitorBroker::Critical ||
-           _criticity.value == MonitorBroker::Major ||
-           _criticity.value == MonitorBroker::Unknown)
-          return _criticity;
 
-        return Criticity(value);
-        break;
-      case MonitorBroker::Major:
-        if(_criticity.value == MonitorBroker::Critical ||
-           _criticity.value == MonitorBroker::Unknown)
-          return _criticity;
+      return Criticity(value);
+      break;
+    case MonitorBroker::Major:
+      if(_criticity.value == MonitorBroker::Critical ||
+         _criticity.value == MonitorBroker::Unknown)
+        return _criticity;
 
-        return Criticity(value);
-        break;
-      default:
-        // MonitorBroker::CRITICITY_UNKNOWN
-        if(_criticity.value == MonitorBroker::Critical)
-          return _criticity;
-        break;
+      return Criticity(value);
+      break;
+    default:
+      // MonitorBroker::CRITICITY_UNKNOWN
+      if(_criticity.value == MonitorBroker::Critical)
+        return _criticity;
+      break;
     }  //end switch
 
     return Criticity(MonitorBroker::Unknown);
@@ -179,19 +181,19 @@ public:
 
   Criticity operator ++(int) {
     switch(value) {
-      case MonitorBroker::Minor:
-        return Criticity(MonitorBroker::Major);
-        break;
+    case MonitorBroker::Minor:
+      return Criticity(MonitorBroker::Major);
+      break;
 
-      case MonitorBroker::Major:
-        return Criticity(MonitorBroker::Critical);
-        break;
+    case MonitorBroker::Major:
+      return Criticity(MonitorBroker::Critical);
+      break;
 
-      default:
-        //MonitorBroker::CRITICITY_NORMAL:
-        //MonitorBroker::CRITICITY_UNKNOWN:
-        //MonitorBroker::CRITICITY_HIGH:
-        break;
+    default:
+      //MonitorBroker::CRITICITY_NORMAL:
+      //MonitorBroker::CRITICITY_UNKNOWN:
+      //MonitorBroker::CRITICITY_HIGH:
+      break;
     }
 
     return Criticity(value);
@@ -200,19 +202,19 @@ public:
   Criticity operator--(int) {
 
     switch(value) {
-      case MonitorBroker::Critical:
-        return Criticity(MonitorBroker::Major);
-        break;
+    case MonitorBroker::Critical:
+      return Criticity(MonitorBroker::Major);
+      break;
 
-      case MonitorBroker::Major:
-        return Criticity(MonitorBroker::Minor);
-        break;
+    case MonitorBroker::Major:
+      return Criticity(MonitorBroker::Minor);
+      break;
 
-      default:
-        //MonitorBroker::CRITICITY_NORMAL:
-        //MonitorBroker::CRITICITY_MINOR:
-        //MonitorBroker::CRITICITY_UNKNOWN:
-        break;
+    default:
+      //MonitorBroker::CRITICITY_NORMAL:
+      //MonitorBroker::CRITICITY_MINOR:
+      //MonitorBroker::CRITICITY_UNKNOWN:
+      break;
     }
 
     return Criticity(value);
@@ -313,5 +315,4 @@ enum {
 };
 
 
-typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
 #endif /* BASE_HPP */

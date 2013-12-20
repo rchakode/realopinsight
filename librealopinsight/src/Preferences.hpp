@@ -31,7 +31,7 @@
 #include "Base.hpp"
 #include <QSplashScreen>
 
-class ImageButton : public QAbstractButton {
+class LIBREALOPINSIGHTSHARED_EXPORT ImageButton : public QAbstractButton {
   Q_OBJECT
 private:
   QPixmap pixmap;
@@ -47,7 +47,7 @@ protected:
   }
 };
 
-class Preferences : public QDialog
+class LIBREALOPINSIGHTSHARED_EXPORT Preferences : public QDialog
 {
   Q_OBJECT
 

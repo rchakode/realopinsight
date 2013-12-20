@@ -36,7 +36,7 @@
 class QScriptValueIterator;
 class QSystemTrayIcon;
 
-class DashboardBase : public QObject
+class LIBREALOPINSIGHTSHARED_EXPORT DashboardBase : public QObject
 {
   Q_OBJECT
 

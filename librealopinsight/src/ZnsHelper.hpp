@@ -34,7 +34,7 @@ const QString ZNS_API_CONTEXT = "/zport/dmd";
 const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
 }
 
-class ZnsHelper : public QNetworkAccessManager {
+class LIBREALOPINSIGHTSHARED_EXPORT ZnsHelper : public QNetworkAccessManager {
   Q_OBJECT
 
 public:

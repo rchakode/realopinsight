@@ -28,7 +28,7 @@
 #include <QSettings>
 #include "Base.hpp"
 
-class Settings : public QSettings
+class LIBREALOPINSIGHTSHARED_EXPORT Settings : public QSettings
 {
   Q_OBJECT
 public:

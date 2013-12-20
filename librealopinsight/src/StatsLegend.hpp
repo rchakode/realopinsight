@@ -26,7 +26,7 @@
 #define SNAVSTATSLEGEND_HPP_
 #include "Base.hpp"
 
-class StatsLegend : public QWidget
+class LIBREALOPINSIGHTSHARED_EXPORT StatsLegend : public QWidget
 {
 public:
   StatsLegend(const QPoint & _top_corner =  QPoint(0, 0), QWidget * _parent = 0);

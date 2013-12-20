@@ -24,11 +24,12 @@
 
 #ifndef ZMQSOCKET_HPP
 #define ZMQSOCKET_HPP
-
+#include "ns.hpp"
+#include <QtCore/QtGlobal>
 #include <string>
 #include <sstream>
 
-class ZmqSocket
+class LIBREALOPINSIGHTSHARED_EXPORT ZmqSocket
 {
 public:
   ZmqSocket(const int & _type);

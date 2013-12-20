@@ -25,11 +25,14 @@
 
 #ifndef MONITORBROKER_HPP_
 #define MONITORBROKER_HPP_
+
+#include "ns.hpp"
+#include <QtCore/QtGlobal>
 #include<string>
 #include<iostream>
 #include <unordered_map>
 
-struct CheckT{
+struct CheckT {
   std::string id;
   std::string host;
   std::string check_command;
@@ -39,7 +42,7 @@ struct CheckT{
 };
 typedef std::unordered_map<std::string, CheckT> ChecksT;
 
-class MonitorBroker {
+class LIBREALOPINSIGHTSHARED_EXPORT MonitorBroker {
 public:
   enum ApiTypeT {
     Nagios = 0,
