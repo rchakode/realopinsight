@@ -46,7 +46,8 @@ namespace {
   const std::string LINK_LOAD ="/load-platform";
   const std::string LINK_IMPORT ="/import-platform";
   const std::string LINK_LOGIN_PAGE ="/login";
-  const std::string LINK_ADMIN_HOME ="/adm-dashboard";
+  const std::string LINK_ADMIN_HOME ="/adm";
+  const std::string LINK_OP_HOME ="/op";
 }
 
 WebMainUI::WebMainUI(const Wt::WEnvironment& env)
@@ -124,7 +125,6 @@ void WebMainUI::createLoginPage(void)
 void WebMainUI::showUserHome(void)
 {
   setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
-  setInternalPath(LINK_ADMIN_HOME);
 
   checkUserLogin();
 
@@ -246,8 +246,10 @@ void WebMainUI::setupUserMenus(void)
                                    loggedUser.username.c_str()).toStdString());
   if(loggedUser.role == User::AdmRole) {
     m_mgntMenu->show();
+    setInternalPath(LINK_ADMIN_HOME);
   } else {
     m_mgntMenu->hide();
+    setInternalPath(LINK_OP_HOME);
   }
 
   //FIXME: add this after the first view loaded
