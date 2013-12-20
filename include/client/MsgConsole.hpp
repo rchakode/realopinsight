@@ -51,12 +51,6 @@ class MsgConsole : public QTableView  //TODO see style for QtableView
   Q_OBJECT
 
 public:
-  static const QString TAG_HOSTNAME;
-  static const QString TAG_ZABBIX_HOSTNAME;
-  static const QString TAG_ZABBIX_HOSTNAME2;
-  static const QString TAG_CHECK;
-  static const QString TAG_THERESHOLD ;
-  static const QString TAG_PLUGIN_OUTPUT;
   static const qint16 NUM_COLUMNS;
   static const qint16 ROW_MARGIN;
 

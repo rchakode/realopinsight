@@ -38,7 +38,7 @@ class SvCreator: public QMainWindow
   Q_OBJECT
 
 public:
-  SvCreator(const qint32& _userRole = Auth::OpUserRole);
+  SvCreator(const qint32& _userRole = ngrt4n::OpUserRole);
   virtual ~SvCreator();
   void load( const QString&);
   QSize minimumSizeHint() const {return QSize(796, 640);}

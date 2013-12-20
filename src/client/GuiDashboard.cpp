@@ -22,11 +22,11 @@
 #--------------------------------------------------------------------------#
  */
 #include "GuiDashboard.hpp"
-#include "core/MonitorBroker.hpp"
-#include "core/ns.hpp"
-#include "client/utilsClient.hpp"
-#include "client/JsHelper.hpp"
-#include "client/LsHelper.hpp"
+#include "MonitorBroker.hpp"
+#include "ns.hpp"
+#include "utilsClient.hpp"
+#include "JsHelper.hpp"
+#include "LsHelper.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <QSystemTrayIcon>

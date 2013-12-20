@@ -74,7 +74,9 @@ OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
 QMAKE_CXXFLAGS += -std=c++0x  -Wno-unused-variable  -Wno-unused-parameter -Werror -Wno-unused-local-typedefs
-INCLUDEPATH = include include/client \
+INCLUDEPATH = include \
+              librealopinsight/src \
+              include/client \
               include/core \
               wt/include \
               wt/dbo \
@@ -99,9 +101,7 @@ SOURCES	+= src/client/Auth.cpp \
     src/client/GraphView.cpp \
     src/client/PieChart.cpp \
     src/client/PieChartItem.cpp \
-    src/client/Preferences.cpp \
     src/client/ServiceEditor.cpp \
-    src/client/StatsLegend.cpp \
     src/client/SvConfigCreator.cpp \
     src/client/GuiDashboard.cpp \
     src/client/MainWindow.cpp \

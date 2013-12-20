@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "core/ns.hpp"
+#include "ns.hpp"
 #include "SvNavigatorTree.hpp"
 #include <QtGui>
 #include "Parser.hpp"

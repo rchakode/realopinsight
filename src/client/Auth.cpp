@@ -44,7 +44,7 @@ Auth::Auth()
                     line, 0, 2, 1, Qt::AlignLeft);
   line++;
   m_layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight);
-  m_layout->addWidget(m_loginField = new QLineEdit(OpUser), line, 2, Qt::AlignJustify);
+  m_layout->addWidget(m_loginField = new QLineEdit(ngrt4n::OpUser.c_str()), line, 2, Qt::AlignJustify);
   line++;
   m_layout->addWidget(new QLabel(tr("Password")), line, 1, Qt::AlignRight);
   m_layout->addWidget(m_passwordField = new QLineEdit(), line, 2, Qt::AlignJustify);
@@ -79,11 +79,11 @@ void Auth::authentificate(void)
   QString rootPasswd =  settings->setEntry(Settings::ADM_PASSWD_KEY);
   QString opPasswd =  settings->setEntry(Settings::OP_PASSWD_KEY);
   if(	! rootPasswd.isEmpty()
-      && userName == AdmUser
+      && userName == QString::fromStdString(ngrt4n::AdmUser)
       && userPasswd == rootPasswd ) {
     done(AdmUserRole);
   } else if( !opPasswd.isEmpty()
-             && userName == OpUser
+             && userName == QString::fromStdString(ngrt4n::OpUser)
              && userPasswd == opPasswd ) {
     done(OpUserRole);
   } else {

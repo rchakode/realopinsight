@@ -26,7 +26,9 @@
 #define SNAVWEBKIT_H_
 
 #include "Base.hpp"
+#include <QtWebKit>
 
+class QNetworkReply;
 class WebKit : public QWebView
 {
   Q_OBJECT

@@ -23,7 +23,7 @@
  */
 
 
-#include "core/ns.hpp"
+#include "ns.hpp"
 #include "GraphView.hpp"
 #include "StatsLegend.hpp"
 #include "DashboardBase.hpp"
