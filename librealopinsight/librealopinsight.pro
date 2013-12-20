@@ -6,14 +6,12 @@
 
 QT       += core gui xml network script
 
-
 TARGET = realopinsight
 TEMPLATE = lib
+LIBS += -lzmq
 VERSION=1.0.0
 
 DEFINES += LIBREALOPINSIGHT_LIBRARY
-
-
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"

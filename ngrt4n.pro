@@ -41,10 +41,6 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMainUI.cpp \
     wt/dbo/DbSession.cpp \
     wt/dbo/UserMngtUI.cpp
-
-LIBS += -Lbuild-librealopinsight-Desktop-Debug -lrealopinsight -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
-    -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
-    -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 TARGET = ngrt4n-web
 }
 
@@ -128,7 +124,10 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-LIBS += -lzmq
+LIBS += -L/tmp/ngrt4n-qt/build-librealopinsight-Desktop-Debug -lrealopinsight \
+    -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 \
+    -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
+    -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 
 #include(QsLog/QsLog.pri)
 

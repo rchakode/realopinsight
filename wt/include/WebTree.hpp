@@ -48,6 +48,7 @@ public:
   void update(Wt::WStandardItem * _rItem) { setRenderingModel(_rItem); update(); }
 
 private:
+  typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
   Wt::WStandardItemModel* m_model;
   CoreDataT* m_cdata;
   WebTreeItemsT m_items;
