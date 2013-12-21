@@ -55,8 +55,8 @@ public:
   void updateViewList(void);
   UserListT& userList(void) {return m_userList;}
   ViewListT& viewList(void) {return m_viewList;}
-  int addUser(User user);
-  int addView(View view);
+  int addUser(User* user);
+  int addView(View* view);
   int updateUser(User user);
   int updatePassword(const std::string& login,
                      const std::string& currentPass,

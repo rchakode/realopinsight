@@ -375,7 +375,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
   m_menu->setStyleClass("nav nav-pills");
 
   m_userForm->validated().connect(std::bind([=](User user) {
-    int ret = m_dbSession->addUser(user);
+    int ret = m_dbSession->addUser(&user);
     m_userForm->showMessage(ret,
                            m_dbSession->lastError(),
                             "User added.");

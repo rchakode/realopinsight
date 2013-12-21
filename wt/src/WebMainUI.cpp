@@ -415,8 +415,8 @@ void WebMainUI::finishFileDialog(int action)
             view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
-
-            m_dbSession->addView(view);
+            view.users.clear();
+            m_dbSession->addView(&view);
           } else {
             Wt::log("error")<<"[realopinsight]"<< "Invalid configuration file";
           }
