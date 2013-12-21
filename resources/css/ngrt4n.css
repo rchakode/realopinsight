@@ -122,10 +122,16 @@ body, html {
 }
 
 .footer {
- position:fixed;
- bottom: 0;
- padding: auto auto;
+  position: fixed;
+  bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
 }
+
+.info-box {
+  padding: 5;
+}
+
 
 /* For customizing scrollbars */
 ::-webkit-scrollbar {
@@ -150,4 +156,5 @@ body, html {
 ::-webkit-scrollbar-thumb:window-inactive {
 	background: rgba(255,0,0,0.4); 
 }
+
 

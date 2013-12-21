@@ -61,16 +61,12 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_profileMenu(NULL),
     m_authWidget(NULL),
     m_dashtabs(new Wt::WTabWidget()),
-    m_infoBox(new Wt::WText("", m_mainWidget)),
     m_dbSession(new DbSession(true)),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
-  m_infoBox->addStyleClass("alert alert-warning alert-dismissable");
-  m_infoBox->hide();
-
 
   createLoginPage();
   createMainUI();
@@ -82,16 +78,24 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 WebMainUI::~WebMainUI()
 {
   delete m_timer;
-  delete m_infoBox;
+  std::cout << "m_timer deleted\n";
   delete m_fileUploadDialog;
+  std::cout << "m_fileUploadDialog deleted\n";
   delete m_dashtabs;
+  std::cout << "m_dashtabs deleted\n";
   delete m_authWidget;
+  std::cout << "m_authWidget deleted\n";
   delete m_mainWidget;
+  std::cout << "m_mainWidget deleted\n";
   delete m_dbSession;
+  std::cout << "m_dbSession deleted\n";
   //FIXME: delete if not null => set them null at startup
   delete m_navbar;
+  std::cout << "m_navbar deleted\n";
   delete m_contents;
+  std::cout << "m_contents deleted\n";
   delete m_mainWidget;
+  std::cout << "m_mainWidget deleted\n";
 }
 
 
@@ -146,7 +150,7 @@ void WebMainUI::showUserHome(void)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 
   refresh();
-
+  createInfoMsgBox();
   resetTimer();
 }
 
@@ -398,7 +402,7 @@ void WebMainUI::finishFileDialog(int action)
           QString errrMsg = QObject::tr("Unable to use the "
                                         "configuration directory (%1)").arg(cdir.absolutePath());
           Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
-          utils::alert(errrMsg);
+          showMessage(errrMsg.toStdString(), "alert alert-warning");
         } else {
           Wt::log("notice")<<"[realopinsight]"<< " Parsing the input file";
           QString fileName(m_uploader->spoolFileName().c_str());
@@ -429,8 +433,7 @@ void WebMainUI::finishFileDialog(int action)
         openFile(m_selectFile);
         m_selectFile.clear();
       } else {
-        m_infoBox->setText(QObject::tr("No file selected").toStdString());
-        m_infoBox->show();
+        showMessage(QObject::tr("No file selected").toStdString(), "alert alert-warning");
       }
       break;
     default:
@@ -458,13 +461,12 @@ void WebMainUI::openFile(const std::string& path)
       handleRefresh();
     } else {
       delete dashboard;
-      m_infoBox->setText(QObject::tr("This platform or a platfom "
-                                     "with the same name is already loaded").toStdString());
-      m_infoBox->show();
+      showMessage(QObject::tr("This platform or a platfom "
+                              "with the same name is already loaded").toStdString(),
+                  "alert alert-warning");
     }
   } else {
-    m_infoBox->setText(dashboard->lastError().toStdString()); //FIXME: set it somewhere
-    m_infoBox->show();
+    showMessage(dashboard->lastError().toStdString(),"alert alert-warning");
   }
 }
 
@@ -480,7 +482,6 @@ Wt::WWidget* WebMainUI::createUserHome(void)
 {
   checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
-  tpl->bindWidget("info-box", m_infoBox);
   tpl->bindWidget("andhor-load-file",
                   createAnchorForHomeLink(QObject::tr("Load").toStdString(),
                                           QObject::tr("An existing platform").toStdString(),
@@ -510,8 +511,8 @@ void WebMainUI::handleAuthentification(void)
   if (m_login.loggedIn()) {
     m_dbSession->setLoggedUser(m_login.user().id());
     Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
-    createAccountPanel();
-    createPasswordPanel();
+    createAccountPanel(); //FIXME: createAccountPanel() should not be called systematically, or check for deletion
+    createPasswordPanel(); //FIXME: createPasswordPanel() should not be called systematically, or check for deletion
     setupUserMenus();
     showUserHome();
   } else {
@@ -552,6 +553,7 @@ void WebMainUI::createAccountPanel(void)
   }, std::placeholders::_1));
 
   m_accountPanel = new Wt::WDialog(QObject::tr("Account information").toStdString());
+  //FIXME: m_accountPanel->positionAt(m_profileMenu);
   m_accountPanel->contents()->addWidget(form);
 }
 
@@ -593,9 +595,9 @@ void WebMainUI::handleInternalPath(void)
     showLoginHome();
   } else {
     showLoginHome();
-    m_infoBox->setText(QObject::tr("Sorry, the request resource "
-                                   "is not available or has been removed").toStdString());
-    m_infoBox->show();
+    showMessage(QObject::tr("Sorry, the request resource "
+                            "is not available or has been removed").toStdString(),
+                "alert alert-warning");
   }
 }
 
@@ -632,4 +634,28 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   }));
 
   return viewSelector;
+}
+
+void WebMainUI::createInfoMsgBox(void)
+{
+  m_infoMsgBox = new Wt::WDialog(m_mainWidget);
+  m_infoMsgBox->setModal(false);
+  m_infoMsgBox->setTitleBarEnabled(false);
+  m_infoMsgBox->positionAt(m_profileMenu);
+  m_infoMsgBox->setMargin(0, Wt::All);
+  m_infoMsgBox->contents()->setMargin(0, Wt::All);
+  //m_infoMsgDialog->contents()->setStyleClass("info-box");
+}
+
+
+void WebMainUI::showMessage(const std::string& msg, std::string status)
+{
+  m_infoMsgBox->contents()->clear();
+  Wt::WText* textArea = new Wt::WText(msg, m_infoMsgBox->contents());
+  textArea->setStyleClass(status);
+  //textArea->setPadding(10, Wt::All);
+  textArea->clicked().connect(std::bind([=](){
+    m_infoMsgBox->accept();
+  }));
+  m_infoMsgBox->show();
 }

@@ -64,10 +64,6 @@
           <h1><small>I'm ready</small></h1>
         </div>
         <!-- List actions -->
-        <div class="span2">
-           <span>${info-box}</span>
-        </div>
-
         <div class="span2 list-group">
          ${andhor-load-file}
          ${andhor-import-file}

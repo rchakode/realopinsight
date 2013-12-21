@@ -71,7 +71,6 @@ private:
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectFile;
-  Wt::WText* m_infoBox;
   WebDashboard* m_currentDashboard;
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
@@ -81,6 +80,7 @@ private:
   UserMngtUI* m_userMgntUI;
   Wt::WDialog* m_accountPanel;
   Wt::WDialog* m_changePasswordPanel;
+  Wt::WDialog* m_infoMsgBox;
 
 
   void addEvents(void);
@@ -108,6 +108,8 @@ private:
   void createAccountPanel(void);
   void createPasswordPanel(void);
   Wt::WComboBox* createViewSelector(void);
+  void createInfoMsgBox(void);
+  void showMessage(const std::string& msg, std::string status);
 };
 
 #endif // MAINWEBWINDOW_HPP

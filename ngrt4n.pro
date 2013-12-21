@@ -3,22 +3,58 @@ CONFIG += no_keywords
 TEMPLATE = app
 VERSION_=3.0.0
 VERSION = "-$${VERSION_}"
+
 config-dist {
 SOURCES	+=
 TARGET = RealOpInsight
 }
+
 config-manager {
 SOURCES	+= src/client/ngrt4n-manager.cpp
 TARGET = ngrt4n-manager
 }
+
 config-oc {
 SOURCES	+= src/client/ngrt4n-oc.cpp
 TARGET = ngrt4n-oc
 }
+
 config-editor {
 SOURCES	+= src/client/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
+
+config-gui-base {
+HEADERS	+= include/client/Auth.hpp \
+    include/client/GraphView.hpp \
+    include/client/PieChart.hpp \
+    include/client/PieChartItem.hpp \
+    include/client/ServiceEditor.hpp \
+    include/client/StatsLegend.hpp \
+    include/client/SvConfigCreator.hpp \
+    include/client/GuiDashboard.hpp \
+    include/client/MainWindow.hpp \
+    include/client/SvNavigatorTree.hpp \
+    include/client/WebKit.hpp \
+    include/client/Settings.hpp \
+    include/client/Chart.hpp \
+    include/client/MsgConsole.hpp \
+    wt/dbo/DbObjects.hpp
+
+SOURCES	+= src/client/Auth.cpp \
+    src/client/GraphView.cpp \
+    src/client/PieChart.cpp \
+    src/client/PieChartItem.cpp \
+    src/client/ServiceEditor.cpp \
+    src/client/SvConfigCreator.cpp \
+    src/client/GuiDashboard.cpp \
+    src/client/MainWindow.cpp \
+    src/client/SvNavigatorTree.cpp \
+    src/client/WebKit.cpp \
+    src/client/Chart.cpp \
+    src/client/MsgConsole.cpp
+}
+
 config-web {
 CONFIG += no_keywords
 DEFINES *= REALOPINSIGHT_WEB
@@ -50,6 +86,7 @@ MAN.path =$$(INSTALL_PREFIX)/share/man/man1
 TARGET.path=/usr/local/bin
 MAN.path = /usr/share/man/man1
 }
+
 TARGET.files = $${TARGET}
 MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-editor.1.gz
 INSTALLS += TARGET MAN
@@ -76,35 +113,6 @@ INCLUDEPATH = include \
               wt/include \
               wt/dbo \
               /opt/install/wt-3.3.0/include
-
-HEADERS	+= include/client/Auth.hpp \
-    include/client/GraphView.hpp \
-    include/client/PieChart.hpp \
-    include/client/PieChartItem.hpp \
-    include/client/ServiceEditor.hpp \
-    include/client/StatsLegend.hpp \
-    include/client/SvConfigCreator.hpp \
-    include/client/GuiDashboard.hpp \
-    include/client/MainWindow.hpp \
-    include/client/SvNavigatorTree.hpp \
-    include/client/WebKit.hpp \
-    include/client/Settings.hpp \
-    include/client/Chart.hpp \
-    include/client/MsgConsole.hpp \
-    wt/dbo/DbObjects.hpp
-
-SOURCES	+= src/client/Auth.cpp \
-    src/client/GraphView.cpp \
-    src/client/PieChart.cpp \
-    src/client/PieChartItem.cpp \
-    src/client/ServiceEditor.cpp \
-    src/client/SvConfigCreator.cpp \
-    src/client/GuiDashboard.cpp \
-    src/client/MainWindow.cpp \
-    src/client/SvNavigatorTree.cpp \
-    src/client/WebKit.cpp \
-    src/client/Chart.cpp \
-    src/client/MsgConsole.cpp
 
 DISTFILES += README \
     INSTALL \
