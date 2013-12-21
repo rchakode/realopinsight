@@ -55,12 +55,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
-    m_contents(NULL),
-    m_navbar(NULL),
-    m_mgntMenu(NULL),
-    m_profileMenu(NULL),
-    m_authWidget(NULL),
-    m_dashtabs(new Wt::WTabWidget()),
+    m_dashtabs(new Wt::WTabWidget(m_mainWidget)),
     m_dbSession(new DbSession(true)),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
@@ -77,15 +72,19 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 
 WebMainUI::~WebMainUI()
 {
+  // Delete all
+  //  m_contents(NULL),
+  //  m_navbar(NULL),
+  //  m_mgntMenu(NULL),
+  //  m_profileMenu(NULL),
+  //  m_authWidget(NULL),
   delete m_timer;
   std::cout << "m_timer deleted\n";
   delete m_fileUploadDialog;
   std::cout << "m_fileUploadDialog deleted\n";
-  delete m_dashtabs;
+  //delete m_dashtabs;
   std::cout << "m_dashtabs deleted\n";
   delete m_authWidget;
-  std::cout << "m_authWidget deleted\n";
-  delete m_mainWidget;
   std::cout << "m_mainWidget deleted\n";
   delete m_dbSession;
   std::cout << "m_dbSession deleted\n";
@@ -410,7 +409,7 @@ void WebMainUI::finishFileDialog(int action)
           Parser parser(fileName ,&cdata);
           if (parser.process(false)) {
             std::string tmpPath = m_uploader->clientFileName().toUTF8();
-            QString dest = QString("%1/%2").arg(cdir.absolutePath(), tmpPath.c_str());
+            QString dest = QObject::tr("%1/%2").arg(cdir.absolutePath(), tmpPath.c_str());
             QFile file(fileName);
             file.copy(dest);
             file.remove();
@@ -419,7 +418,17 @@ void WebMainUI::finishFileDialog(int action)
             view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
-            m_dbSession->addView(view);
+            if (m_dbSession->addView(view) != 0){
+              showMessage(m_dbSession->lastError(), "alert alert-warning");
+            } else {
+              QString msg = QObject::tr("View added. "
+                                        " Name: %1\n - "
+                                        " Number of services: %2 -"
+                                        " Path: %3").arg(view.name.c_str(),
+                                                        QString::number(view.service_count),
+                                                        view.path.c_str());
+              showMessage(msg.toStdString(), "alert alert-success");
+            }
           } else {
             Wt::log("error")<<"[realopinsight]"<< " Invalid configuration file";
           }
@@ -642,9 +651,6 @@ void WebMainUI::createInfoMsgBox(void)
   m_infoMsgBox->setModal(false);
   m_infoMsgBox->setTitleBarEnabled(false);
   m_infoMsgBox->positionAt(m_profileMenu);
-  m_infoMsgBox->setMargin(0, Wt::All);
-  m_infoMsgBox->contents()->setMargin(0, Wt::All);
-  //m_infoMsgDialog->contents()->setStyleClass("info-box");
 }
 
 
@@ -653,9 +659,9 @@ void WebMainUI::showMessage(const std::string& msg, std::string status)
   m_infoMsgBox->contents()->clear();
   Wt::WText* textArea = new Wt::WText(msg, m_infoMsgBox->contents());
   textArea->setStyleClass(status);
-  //textArea->setPadding(10, Wt::All);
   textArea->clicked().connect(std::bind([=](){
     m_infoMsgBox->accept();
   }));
+  m_infoMsgBox->positionAt(m_profileMenu);
   m_infoMsgBox->show();
 }

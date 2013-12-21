@@ -240,10 +240,18 @@ int DbSession::addView(const View& view)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    View* viewTmpPtr(new View());
-    *viewTmpPtr =  view;
-    add(viewTmpPtr);
-    retCode = 0;
+    rereadAll("view");
+    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(view.name);
+    if (! dboViewPtr.get()) {
+      m_lastError = "Failed: the view already exist.";
+      Wt::log("error")<<" [realopinsight] " << m_lastError;
+      retCode = 1;
+    } else {
+      View* viewTmpPtr(new View());
+      *viewTmpPtr =  view;
+      add(viewTmpPtr);
+      retCode = 0;
+    }
   } catch (const std::exception& ex) {
     m_lastError = "Failed to add the view. More details in log.";
     Wt::log("error")<<" [realopinsight] " << ex.what();
