@@ -63,18 +63,19 @@ void DbSession::setup(bool initializeDb)
 }
 
 
-int DbSession::addUser(User* user)
+int DbSession::addUser(const User& user)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
     Wt::Auth::User dbuser = m_dbUsers->registerNew();
     dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
-    info.modify()->setUser(add(user));
-    info.modify()->setEmail(user->email);
-    passAuthService.updatePassword(dbuser, user->password);
-    dbuser.addIdentity(Wt::Auth::Identity::LoginName, user->username);
-    flush();
+    info.modify()->setEmail(user.email);
+    passAuthService.updatePassword(dbuser, user.password);
+    User* userTmpPtr(new User());
+    *userTmpPtr = user;
+    info.modify()->setUser(add(userTmpPtr));
+    dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
     retCode = 0;
   } catch (const std::exception& ex) {
     m_lastError = "Failed to add the user. More details in log.";
@@ -90,7 +91,7 @@ int DbSession::updateUser(User user)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name='"+user.username+"'");
+    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(user.username);
     dbo::ptr<User> userPtr = authInfo.modify()->user();
     userPtr.modify()->username = user.username;
     userPtr.modify()->lastname = user.lastname;
@@ -144,7 +145,7 @@ int DbSession::deleteUser(std::string login)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> usr = find<User>().where("name='"+login+"'");
+    dbo::ptr<User> usr = find<User>().where("name=?").bind(login);
     usr.remove();
     retCode = 0;
   } catch (const std::exception& ex) {
@@ -186,7 +187,7 @@ void DbSession::configureAuth(void)
 void DbSession::setLoggedUser(const std::string& uid)
 {
   dbo::Transaction transaction(*this);
-  dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id="+uid);
+  dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(uid);
   m_loggedUser = *(info.modify()->user());
   transaction.commit();
 }
@@ -226,7 +227,7 @@ void DbSession::initDb(void)
     adm.lastname = "Administrator";
     adm.role = User::AdmRole;
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
-    addUser(&adm);
+    addUser(adm);
     Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
   } catch (std::exception& ex) {
     Wt::log("error")<<"[realopinsight] "<< "Failed initializing the database";
@@ -234,17 +235,18 @@ void DbSession::initDb(void)
   }
 }
 
-int DbSession::addView(View* view)
+int DbSession::addView(const View& view)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    add(view);
-    flush();
+    View* viewTmpPtr(new View());
+    *viewTmpPtr =  view;
+    add(viewTmpPtr);
     retCode = 0;
   } catch (const std::exception& ex) {
     m_lastError = "Failed to add the view. More details in log.";
-    Wt::log("error")<<"[realopinsight]" << ex.what();
+    Wt::log("error")<<" [realopinsight] " << ex.what();
   }
   transaction.commit();
   updateViewList();

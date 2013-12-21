@@ -63,13 +63,12 @@ public:
   int service_count;
   dbo::collection< dbo::ptr<User> > users;
 
-  View(){}
-
   template<class Action>
   void persist(Action& a) {
     dbo::id(a, name, "name");
     dbo::field(a, path, "path");
     dbo::field(a, service_count, "service_count");
+    dbo::hasMany(a, users, dbo::ManyToMany, "user_view");
   }
 };
 
@@ -98,7 +97,7 @@ public:
     dbo::field(a, email, "email");
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
-    dbo::hasMany(a, views, dbo::ManyToMany, "user_views");
+    dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
   }
 
   static std::string role2Text(int role) {

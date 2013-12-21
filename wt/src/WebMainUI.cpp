@@ -400,7 +400,7 @@ void WebMainUI::finishFileDialog(int action)
           Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
           utils::alert(errrMsg);
         } else {
-          Wt::log("notice")<<"[realopinsight]"<< "Parsing the input file";
+          Wt::log("notice")<<"[realopinsight]"<< " Parsing the input file";
           QString fileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
           Parser parser(fileName ,&cdata);
@@ -415,10 +415,9 @@ void WebMainUI::finishFileDialog(int action)
             view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
-            view.users.clear();
-            m_dbSession->addView(&view);
+            m_dbSession->addView(view);
           } else {
-            Wt::log("error")<<"[realopinsight]"<< "Invalid configuration file";
+            Wt::log("error")<<"[realopinsight]"<< " Invalid configuration file";
           }
         }
       }
