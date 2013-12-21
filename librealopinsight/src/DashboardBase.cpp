@@ -75,6 +75,7 @@ DashboardBase::DashboardBase(const qint32& _userRole, const QString& _config)
     m_showOnlyTroubles(false),
     m_errorState(false)
 {
+  addEvents();
 }
 
 DashboardBase::~DashboardBase()
@@ -90,6 +91,7 @@ void DashboardBase::load(const QString& _file)
   if (!_file.isEmpty()) {
     m_config = utils::getAbsolutePath(_file);
     Parser parser(m_config, m_cdata);
+    connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(errorOccurred(QString)));
     if (parser.process(true) && parser.computeNodeCoordinates(1)) {
       buildTree();
       buildMap();
@@ -115,7 +117,7 @@ void DashboardBase::runMonitor()
     if (src != m_sources.end()) {
       runMonitor(*src);
     } else {
-      utils::alert(tr("The default source is not yet set"));
+      Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
   ++m_updateCounter;
@@ -799,7 +801,7 @@ void DashboardBase::initSettings(void)
         updateDashboardOnError(src, tr("%1 is not set").arg(*id));
       }
     } else {
-      utils::alert(tr("Could not handle this source (%1)").arg(*id));
+      Q_EMIT errorOccurred(tr("Could not handle this source (%1)").arg(*id));
     }
   }
   resetInterval();
@@ -863,7 +865,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
           olddata->zns_handler.reset();
           break;
         default:
-          utils::alert(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
+          Q_EMIT errorOccurred(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
           break;
       }
     }
@@ -937,7 +939,13 @@ void DashboardBase::setRootService(void)
 {
   m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
   if (m_root == m_cdata->bpnodes.end()) {
-    utils::alert(tr("The configuration is not valid, there is no root service !"));
+    Q_EMIT errorOccurred(tr("The configuration is not valid, there is no root service !"));
     exit(1);
   }
+}
+
+
+void DashboardBase::addEvents(void)
+{
+  connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(errorOccurred(QString)));
 }

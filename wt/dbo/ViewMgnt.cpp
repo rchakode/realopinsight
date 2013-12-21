@@ -1,8 +1,8 @@
 /*
- * ParseSVConfig.hpp
+ * ViewMgnt.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update: 22-12-2013                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,40 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVPARSESVCONFIG_H_
-#define SNAVPARSESVCONFIG_H_
+#include "ViewMgnt.hpp"
 
-#include "Base.hpp"
-
-
-
-class LIBREALOPINSIGHTSHARED_EXPORT Parser : public QObject
+ViewMgnt::ViewMgnt()
 {
-  Q_OBJECT
-public:
-  Parser(const QString& _config, CoreDataT* _cdata);
-  virtual ~Parser();
-
-  bool process(bool console);
-  bool computeNodeCoordinates(int wt);
-  void computeNodeCoordinates(const QString& dotfile, int wt);
-  QString dotFile(void) const { return m_dotFile; }
-  static const QString CHILD_SEP;
-  QString lastError(void) const {return m_lastError;}
-
-Q_SIGNALS:
-  void errorOccurred(QString msg);
-
-private:
-  static const QString m_dotHeader;
-  static const QString m_dotFooter;
-  QString m_dotFile;
-  QString m_config;
-  CoreDataT* m_cdata;
-  QString m_lastError;
-
-  void updateNodeHierachy(QString& _graphContent);
-  void saveCoordinatesFile(const QString& _content);
-};
-
-#endif /* SNAVPARSESVCONFIG_H_ */
+}

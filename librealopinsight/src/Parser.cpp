@@ -55,7 +55,7 @@ bool Parser::process(bool console)
   QFile file(m_config);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
     m_lastError = QObject::tr("Unable to open the file %1").arg(m_config);
-    utils::alert(m_lastError);
+    Q_EMIT errorOccurred(m_lastError);
     file.close();
     return false;
   }
@@ -63,7 +63,7 @@ bool Parser::process(bool console)
   if (!xmlDoc.setContent(&file)) {
     file.close();
     m_lastError = QObject::tr("Error while parsing the file %1").arg(m_config);
-    utils::alert(m_lastError);
+    Q_EMIT errorOccurred(m_lastError);
     return false;
   }
   file.close(); // The content of the file is already in memory
@@ -157,7 +157,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
   QFile file(m_dotFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
     m_lastError = QObject::tr("Unable into write the file %1").arg(m_dotFile);
-    utils::alert(m_lastError);
+    Q_EMIT errorOccurred(m_lastError);
     file.close();
     exit(1);
   }
@@ -178,7 +178,7 @@ bool Parser::computeNodeCoordinates(int wt)
     computeNodeCoordinates(plainDotFile, wt);
   } else {
     m_lastError = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
-    utils::alert(m_lastError);
+    Q_EMIT errorOccurred(m_lastError);
     error = true;
   }
   process.reset(NULL);

@@ -1,8 +1,8 @@
 /*
  * DbSession.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 06-12-2012                                                 #
+# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update: 06-12-2013                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -21,6 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
+
 #include "DbSession.hpp"
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/PasswordVerifier>

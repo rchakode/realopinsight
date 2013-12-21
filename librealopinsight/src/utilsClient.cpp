@@ -430,15 +430,6 @@ IconMapT utils::nodeIcons() {
 
 void utils::alert(const QString& msg)
 {
-  qDebug()<< msg <<"\n";
-#ifndef REALOPINSIGHT_WEB
-//  QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
-#else
-//#include <Wt/WMessageBox>
-//  Wt::log("warn")<<Wt::WLogger::timestamp<<Wt::WLogger::sep<<msg.toStdString();
-//  Wt::WMessageBox::show(QObject::tr("%1 - Warning").arg(APP_NAME).toStdString(),
-//                        msg.toStdString(),
-//                        Wt::Ok);
-#endif
+  QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
 }
 

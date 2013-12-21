@@ -282,10 +282,10 @@ void Preferences::changePasswd(void)
                                QMessageBox::Ok);
       done(0);
     } else {
-      utils::alert(tr("Sorry the passwords do not match"));
+      Q_EMIT errorOccurred(tr("Sorry the passwords do not match"));
     }
   } else {
-    utils::alert(tr("Authentication failed"));
+    Q_EMIT errorOccurred(tr("Authentication failed"));
   }
 }
 

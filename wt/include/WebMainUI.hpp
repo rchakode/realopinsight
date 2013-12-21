@@ -51,6 +51,7 @@ public:
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
+  void handleLibError(QString msg) {showMessage(msg.toStdString(), "alert alert-success");}
 
 private:
   enum FileDialogAction {
@@ -81,7 +82,6 @@ private:
   Wt::WDialog* m_accountPanel;
   Wt::WDialog* m_changePasswordPanel;
   Wt::WDialog* m_infoMsgBox;
-
 
   void addEvents(void);
   void createMainUI(void);

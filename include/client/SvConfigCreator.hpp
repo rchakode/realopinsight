@@ -27,6 +27,7 @@
 
 #include "Base.hpp"
 #include "Parser.hpp"
+#include "utilsClient.hpp"
 #include "ServiceEditor.hpp"
 #include "SvNavigatorTree.hpp"
 #include "SvConfigCreator.hpp"
@@ -64,6 +65,9 @@ public Q_SLOTS:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void import(void);
+
+Q_SIGNALS:
+  void handleErrorOccurred(QString msg) {utils::alert(msg);}
 
 protected:
   virtual void contextMenuEvent( QContextMenuEvent *);

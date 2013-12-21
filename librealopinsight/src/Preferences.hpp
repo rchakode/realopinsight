@@ -86,6 +86,7 @@ public Q_SLOTS:
 Q_SIGNALS:
   void urlChanged(QString);
   void sourcesChanged (QList<qint8>);
+  void errorOccurred(QString msg);
 
 protected :
   void showEvent (QShowEvent *);

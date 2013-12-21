@@ -139,3 +139,9 @@ LIBS += -L./librealopinsight/release -lrealopinsight \
 
 #include(QsLog/QsLog.pri)
 
+HEADERS += \
+    wt/dbo/ViewMgnt.hpp
+
+SOURCES += \
+    wt/dbo/ViewMgnt.cpp
+

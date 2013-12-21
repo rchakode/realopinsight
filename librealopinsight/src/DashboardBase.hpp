@@ -74,6 +74,7 @@ public Q_SLOTS:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
+  void handleErrorOccurred(QString msg) {Q_EMIT errorOccurred(msg);}
 
 Q_SIGNALS:
   void hasToBeUpdate(QString);
@@ -82,6 +83,7 @@ Q_SIGNALS:
   void settingsLoaded(void);
   void updateSourceUrl(void);
   void timerIntervalChanged(qint32 interval);
+  void errorOccurred(QString msg);
 
 protected:
   qint64 m_updateCounter;
@@ -128,6 +130,7 @@ private:
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
   QString getNodeToolTip(const NodeT& _node);
+  void addEvents(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

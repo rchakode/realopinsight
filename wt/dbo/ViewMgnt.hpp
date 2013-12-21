@@ -1,8 +1,8 @@
 /*
- * WebDashboard.hpp
+ * ViewMgnt.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 19-09-2013                                                 #
+# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update: 06-12-2013                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,51 +22,14 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBDASHBOOARD_HPP
-#define WEBDASHBOOARD_HPP
 
-#include <Wt/WApplication>
-#include <Wt/WGridLayout>
-#include <Wt/WVBoxLayout>
-#include <Wt/WHBoxLayout>
-#include <Wt/WPushButton>
-#include <Wt/WMenu>
-#include <Wt/WMenuItem>
-#include <Wt/WStackedWidget>
-#include "WebMsgConsole.hpp"
-#include "WebMap.hpp"
-#include <Wt/WLocalizedStrings>
-#include "DashboardBase.hpp"
-#include "WebTree.hpp"
-#include "WebPieChart.hpp"
+#ifndef VIEWMGNT_HPP
+#define VIEWMGNT_HPP
 
-class WebDashboard : public DashboardBase
+class ViewMgnt
 {
 public:
-  WebDashboard(const qint32& _userRole, const QString& _config);
-  virtual ~WebDashboard();
-  Wt::WWidget* get(void) const {return m_widget;}
-  void updateMap(void);
-  WebPieMap* map(void) const {return m_map;}
-
-protected:
-  virtual void buildMap(void);
-  virtual void updateMap(const NodeT& _node, const QString& _tip);
-  virtual void buildTree(void);
-  virtual void updateTree(const NodeT& _node, const QString& _tip);
-  virtual void updateMsgConsole(const NodeT& _node);
-  virtual void updateChart(void);
-
-private:
-  Wt::WContainerWidget* m_widget;
-  WebTree* m_tree;
-  WebPieMap* m_map;
-  WebMsgConsole* m_msgConsole;
-  WebPieChart* m_chart;
-  void setupUI(void);
-  void addJsEventScript(void);
-  void addEvents(void);
+  ViewMgnt();
 };
 
-
-#endif /* WEBDASHBOOARD_HPP */
+#endif // VIEWMGNT_HPP

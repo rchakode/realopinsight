@@ -115,7 +115,7 @@ void WebMainUI::showLoginHome(void)
 void WebMainUI::createLoginPage(void)
 {
   setInternalPath(LINK_LOGIN_PAGE);
-  setTitle(QObject::tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
+  setTitle(tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
   m_authWidget = new AuthWidget( DbSession::auth(),
                                  m_dbSession->users(),
                                  m_login);
@@ -127,7 +127,7 @@ void WebMainUI::createLoginPage(void)
 
 void WebMainUI::showUserHome(void)
 {
-  setTitle(QObject::tr("%1 Operations Console").arg(APP_NAME).toStdString());
+  setTitle(tr("%1 Operations Console").arg(APP_NAME).toStdString());
 
   checkUserLogin();
 
@@ -140,8 +140,8 @@ void WebMainUI::showUserHome(void)
   }
 
   std::string homeTabTitle = m_dbSession->loggedUser().role == User::AdmRole?
-        QObject::tr("Quick Start").toStdString() :
-        QObject::tr("Tactical Overview").toStdString();
+        tr("Quick Start").toStdString() :
+        tr("Tactical Overview").toStdString();
 
   m_dashtabs->addTab(createUserHome(),
                      homeTabTitle,
@@ -166,7 +166,7 @@ void WebMainUI::createMainUI(void)
   // Setup the main menu
   Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
-  mainMenu->addItem(QObject::tr("Home").toStdString(), m_dashtabs);
+  mainMenu->addItem(tr("Home").toStdString(), m_dashtabs);
   container->addWidget(m_contents);
 
   setupAdminMenus();
@@ -182,7 +182,7 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(m_mgntMenu, Wt::AlignLeft);
   Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-  curItem = new Wt::WMenuItem(QObject::tr("Management").toStdString());
+  curItem = new Wt::WMenuItem(tr("Management").toStdString());
   curItem->setMenu(mgntPopupMenu);
   m_mgntMenu->addItem(curItem);
 
@@ -222,9 +222,9 @@ void WebMainUI::setupProfileMenus(void)
   m_profileMenu->addItem(m_mainProfileMenuItem);
 
   Wt::WMenuItem* curItem = NULL;
-  profilePopupMenu->addItem(QObject::tr("Account").toStdString().c_str())
+  profilePopupMenu->addItem(tr("Account").toStdString().c_str())
       ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
-  profilePopupMenu->addItem(QObject::tr("Change password").toStdString().c_str())
+  profilePopupMenu->addItem(tr("Change password").toStdString().c_str())
       ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));
   profilePopupMenu->addSeparator();
   curItem = profilePopupMenu->addItem("Documentation");
@@ -245,7 +245,7 @@ void WebMainUI::setupUserMenus(void)
   checkUserLogin();
   User loggedUser = m_dbSession->loggedUser();
 
-  m_mainProfileMenuItem->setText(QObject::tr("You're %1").arg(
+  m_mainProfileMenuItem->setText(tr("You're %1").arg(
                                    loggedUser.username.c_str()).toStdString());
   if(loggedUser.role == User::AdmRole) {
     m_mgntMenu->show();
@@ -338,14 +338,14 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 void WebMainUI::selectFileToOpen(void)
 {
   checkUserLogin();
-  m_fileUploadDialog = new Wt::WDialog(QObject::tr("Select a file").toStdString());
+  m_fileUploadDialog = new Wt::WDialog(tr("Select a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
 
   container->setMargin(10, Wt::All);
   container->addWidget(createViewSelector());
 
   // Provide a button to close the window
-  Wt::WPushButton* finish(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
+  Wt::WPushButton* finish(new Wt::WPushButton(tr("Finish").toStdString(), container));
   finish->clicked().connect(std::bind(&WebMainUI::finishFileDialog, this, OPEN));
 
   m_fileUploadDialog->show();
@@ -354,7 +354,7 @@ void WebMainUI::selectFileToOpen(void)
 void WebMainUI::openFileUploadDialog(void)
 {
   checkUserLogin();
-  m_fileUploadDialog = new Wt::WDialog(QObject::tr("Import a file").toStdString());
+  m_fileUploadDialog = new Wt::WDialog(tr("Import a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
 
   container->setMargin(10, Wt::All);
@@ -365,18 +365,15 @@ void WebMainUI::openFileUploadDialog(void)
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
 
-  // Create a text zone to display message
-  Wt::WText* infoBox = new Wt::WText(container);
-
   // Provide a button to start uploading.
-  Wt::WPushButton* uploadButton = new Wt::WPushButton(QObject::tr("Upload").toStdString(), container);
+  Wt::WPushButton* uploadButton = new Wt::WPushButton(tr("Upload").toStdString(), container);
   uploadButton->clicked().connect(std::bind([=](){
     m_uploader->upload();
     uploadButton->disable();
   }));
 
   // Provide a button to close the upload dialog
-  Wt::WPushButton* close(new Wt::WPushButton(QObject::tr("Finish").toStdString(), container));
+  Wt::WPushButton* close(new Wt::WPushButton(tr("Close").toStdString(), container));
   close->clicked().connect(std::bind([=](){
     uploadButton->enable();
     m_fileUploadDialog->accept();
@@ -385,7 +382,7 @@ void WebMainUI::openFileUploadDialog(void)
 
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
-    infoBox->setText(QObject::tr("File is too large.").toStdString());
+    showMessage(tr("File is too large.").toStdString(), "alert alert-warning");
   }));
   m_fileUploadDialog->show();
 }
@@ -398,7 +395,7 @@ void WebMainUI::finishFileDialog(int action)
       if (! m_uploader->empty()) {
         QDir cdir(m_confdir.c_str());
         if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-          QString errrMsg = QObject::tr("Unable to use the "
+          QString errrMsg = tr("Unable to use the "
                                         "configuration directory (%1)").arg(cdir.absolutePath());
           Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
           showMessage(errrMsg.toStdString(), "alert alert-warning");
@@ -407,9 +404,10 @@ void WebMainUI::finishFileDialog(int action)
           QString fileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
           Parser parser(fileName ,&cdata);
+          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
           if (parser.process(false)) {
             std::string tmpPath = m_uploader->clientFileName().toUTF8();
-            QString dest = QObject::tr("%1/%2").arg(cdir.absolutePath(), tmpPath.c_str());
+            QString dest = tr("%1/%2").arg(cdir.absolutePath(), tmpPath.c_str());
             QFile file(fileName);
             file.copy(dest);
             file.remove();
@@ -421,16 +419,18 @@ void WebMainUI::finishFileDialog(int action)
             if (m_dbSession->addView(view) != 0){
               showMessage(m_dbSession->lastError(), "alert alert-warning");
             } else {
-              QString msg = QObject::tr("View added. "
+              QString msg = tr("View added. "
                                         " Name: %1\n - "
                                         " Number of services: %2 -"
                                         " Path: %3").arg(view.name.c_str(),
-                                                        QString::number(view.service_count),
-                                                        view.path.c_str());
+                                                         QString::number(view.service_count),
+                                                         view.path.c_str());
               showMessage(msg.toStdString(), "alert alert-success");
             }
           } else {
-            Wt::log("error")<<"[realopinsight]"<< " Invalid configuration file";
+            std::string msg = "Invalid configuration file";
+            Wt::log("warn")<<"[realopinsight] "<< msg;
+            showMessage(msg, "alert alert-warning");
           }
         }
       }
@@ -442,7 +442,7 @@ void WebMainUI::finishFileDialog(int action)
         openFile(m_selectFile);
         m_selectFile.clear();
       } else {
-        showMessage(QObject::tr("No file selected").toStdString(), "alert alert-warning");
+        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
       }
       break;
     default:
@@ -453,8 +453,9 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::openFile(const std::string& path)
 {
   checkUserLogin();
-  WebDashboard* dashboard = new WebDashboard(m_dbSession->loggedUser().role,
-                                             path.c_str());
+  WebDashboard* dashboard = new WebDashboard(m_dbSession->loggedUser().role, path.c_str());
+  connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootService()->name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
@@ -470,7 +471,7 @@ void WebMainUI::openFile(const std::string& path)
       handleRefresh();
     } else {
       delete dashboard;
-      showMessage(QObject::tr("This platform or a platfom "
+      showMessage(tr("This platform or a platfom "
                               "with the same name is already loaded").toStdString(),
                   "alert alert-warning");
     }
@@ -492,12 +493,12 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   tpl->bindWidget("andhor-load-file",
-                  createAnchorForHomeLink(QObject::tr("Load").toStdString(),
-                                          QObject::tr("An existing platform").toStdString(),
+                  createAnchorForHomeLink(tr("Load").toStdString(),
+                                          tr("An existing platform").toStdString(),
                                           LINK_LOAD));
   tpl->bindWidget("andhor-import-file",
-                  createAnchorForHomeLink(QObject::tr("Import").toStdString(),
-                                          QObject::tr("A platform description").toStdString(),
+                  createAnchorForHomeLink(tr("Import").toStdString(),
+                                          tr("A platform description").toStdString(),
                                           LINK_IMPORT));
   return tpl;
 }
@@ -561,7 +562,7 @@ void WebMainUI::createAccountPanel(void)
                       "Update completed.");
   }, std::placeholders::_1));
 
-  m_accountPanel = new Wt::WDialog(QObject::tr("Account information").toStdString());
+  m_accountPanel = new Wt::WDialog(tr("Account information").toStdString());
   //FIXME: m_accountPanel->positionAt(m_profileMenu);
   m_accountPanel->contents()->addWidget(form);
 }
@@ -583,7 +584,7 @@ void WebMainUI::createPasswordPanel(void)
                       "Password changed.");
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-  m_changePasswordPanel = new Wt::WDialog(QObject::tr("Change password").toStdString());
+  m_changePasswordPanel = new Wt::WDialog(tr("Change password").toStdString());
   m_changePasswordPanel->contents()->addWidget(form);
 }
 
@@ -604,7 +605,7 @@ void WebMainUI::handleInternalPath(void)
     showLoginHome();
   } else {
     showLoginHome();
-    showMessage(QObject::tr("Sorry, the request resource "
+    showMessage(tr("Sorry, the request resource "
                             "is not available or has been removed").toStdString(),
                 "alert alert-warning");
   }
@@ -665,3 +666,4 @@ void WebMainUI::showMessage(const std::string& msg, std::string status)
   m_infoMsgBox->positionAt(m_profileMenu);
   m_infoMsgBox->show();
 }
+
