@@ -40,7 +40,6 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
 {
   setStyleClass("Wt-dialog");
   Wt::WContainerWidget* container = contents();
-  //titleBar()->setMargin(30, Wt::Left|Wt::Right);
   container->setMargin(30, Wt::Left|Wt::Right);
   container->setMargin(10, Wt::Bottom);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), container);
@@ -126,9 +125,10 @@ void ViewAssignmentUI::filter(const std::string& username)
       }
     }
   }
-  enableButtonIfApplicable(m_nonAssignedViewModel, m_assignButton);
-  enableButtonIfApplicable(m_assignedViewModel, m_revokeButton);
-  enableButtonIfApplicable(m_nonAssignedViewModel, m_deleteViewButton);
+  if (! m_username.empty()) {
+    enableButtonIfApplicable(m_nonAssignedViewModel, m_assignButton);
+    enableButtonIfApplicable(m_assignedViewModel, m_revokeButton);
+  }
 }
 
 void ViewAssignmentUI::addView(Wt::WStandardItemModel* model, const View& view)
@@ -158,6 +158,7 @@ Wt::WSelectionBox* ViewAssignmentUI::createViewList(Wt::WStandardItemModel* mode
 
 void ViewAssignmentUI::resetModelData(void)
 {
+  m_username.clear();
   m_userListModel->clear();
   m_assignedViewModel->clear();
   m_nonAssignedViewModel->clear();
@@ -166,12 +167,20 @@ void ViewAssignmentUI::resetModelData(void)
   m_userListModel->insertRows(count, 1);
   m_userListModel->setData(count, 0, Wt::WString("Select a user"));
   ++count;
+
   m_dbSession->updateUserList();
   for (const auto& user: m_dbSession->userList()) {
     m_userListModel->insertRows(count, 1);
     m_userListModel->setData(count, 0, user.username);
     ++count;
   }
+
+  for (auto view: m_dbSession->viewList()) {
+    addView(m_nonAssignedViewModel, view);
+  }
+
+  disableButtons();
+  enableButtonIfApplicable(m_nonAssignedViewModel, m_deleteViewButton);
 }
 
 

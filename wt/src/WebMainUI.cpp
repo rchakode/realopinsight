@@ -187,15 +187,14 @@ void WebMainUI::setupAdminMenus(void)
   curItem->setMenu(mgntPopupMenu);
   m_mgntMenu->addItem(curItem);
 
-  mgntPopupMenu->addSectionHeader("File");
+
+  // Menus for view management
+  mgntPopupMenu->addSectionHeader("View");
   mgntPopupMenu->addItem("Import")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
   mgntPopupMenu->addItem("Load")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
-
-  // Menus for view management
-  mgntPopupMenu->addSectionHeader("View");
-  mgntPopupMenu->addItem("Assign/revoke")
+  mgntPopupMenu->addItem("Assign/revoke/delete")
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->show();
   }));

@@ -27,10 +27,10 @@ body, html {
 
 .Wt-dialog .titlebar {
     color: #FFFFFF;
-    background: #9DC6DD;
+    background: #9dc6dd url(title-gradient.png) repeat-x scroll 0 -20px;;
     cursor: move;
     font: bold 12px Verdana;
-    padding: 3px 6px;
+    padding: 2px 3px;
 }
 
 /* these classes come from from bootstrap */

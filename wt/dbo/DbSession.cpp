@@ -248,7 +248,7 @@ int DbSession::addView(const View& view)
   try {
     ViewCollectionT views = find<View>().where("name=?").bind(view.name);
     if (views.size() > 0) {
-      m_lastError = "Failed: the view already exist.";
+      m_lastError = "Failed: a view with the same name already exist.";
       Wt::log("error")<<" [realopinsight] " << m_lastError;
       retCode = 1;
     } else {
