@@ -69,16 +69,23 @@ int DbSession::addUser(const User& user)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    Wt::Auth::User dbuser = m_dbUsers->registerNew();
-    dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
-    info.modify()->setEmail(user.email);
-    passAuthService.updatePassword(dbuser, user.password);
-    User* userTmpPtr(new User());
-    *userTmpPtr = user;
-    info.modify()->setUser(add(userTmpPtr));
-    dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
-    retCode = 0;
-  } catch (const std::exception& ex) {
+    UserCollectionT users = find<User>().where("name=?").bind(user.username);
+    if (users.size() > 0) {
+      m_lastError = "Failed: a user with the same username already exist.";
+      Wt::log("error")<<" [realopinsight] " << m_lastError;
+      retCode = 1;
+    } else {
+      Wt::Auth::User dbuser = m_dbUsers->registerNew();
+      dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
+      info.modify()->setEmail(user.email);
+      passAuthService.updatePassword(dbuser, user.password);
+      User* userTmpPtr(new User());
+      *userTmpPtr = user;
+      info.modify()->setUser(add(userTmpPtr));
+      dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
+      retCode = 0;
+    }
+  } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the user. More details in log.";
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
@@ -101,7 +108,7 @@ int DbSession::updateUser(User user)
     userPtr.modify()->role = user.role;
     authInfo.modify()->setEmail(user.email);
     retCode = 0;
-  } catch (const std::exception& ex) {
+  } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to update the user. More details in log.";
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
@@ -132,7 +139,7 @@ int DbSession::updatePassword(const std::string& login,
       default:m_lastError = "Unknown error concerning your current password";
         break;
     }
-  } catch (const std::exception& ex) {
+  } catch (const dbo::Exception& ex) {
     retCode = -1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
@@ -149,7 +156,7 @@ int DbSession::deleteUser(std::string login)
     dbo::ptr<User> usr = find<User>().where("name=?").bind(login);
     usr.remove();
     retCode = 0;
-  } catch (const std::exception& ex) {
+  } catch (const dbo::Exception& ex) {
     retCode = 1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
@@ -228,7 +235,7 @@ void DbSession::initDb(void)
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     addUser(adm);
     Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
-  } catch (std::exception& ex) {
+  } catch (dbo::Exception& ex) {
     Wt::log("error")<<"[realopinsight] "<< "Failed initializing the database";
     Wt::log("error")<<"[realopinsight][dbo] "<< ex.what();
   }
@@ -239,20 +246,18 @@ int DbSession::addView(const View& view)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    rereadAll("view");
-    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(view.name);
-    //FIXME:
-    //    if (! dboViewPtr) {
-    //      m_lastError = "Failed: the view already exist.";
-    //      Wt::log("error")<<" [realopinsight] " << m_lastError;
-    //      retCode = 1;
-    //    } else {
-    View* viewTmpPtr(new View());
-    *viewTmpPtr =  view;
-    add(viewTmpPtr);
-    retCode = 0;
-    //    }
-  } catch (const std::exception& ex) {
+    ViewCollectionT views = find<View>().where("name=?").bind(view.name);
+    if (views.size() > 0) {
+      m_lastError = "Failed: the view already exist.";
+      Wt::log("error")<<" [realopinsight] " << m_lastError;
+      retCode = 1;
+    } else {
+      View* viewTmpPtr(new View());
+      *viewTmpPtr =  view;
+      add(viewTmpPtr);
+      retCode = 0;
+    }
+  } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the view. More details in log.";
     Wt::log("error")<<" [realopinsight] " << ex.what();
   }
@@ -287,7 +292,7 @@ int DbSession::assignView(const std::string& username, const std::string& viewna
     dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(viewname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
     retCode = 0;
-  } catch (const std::exception& ex) {
+  } catch (const dbo::Exception& ex) {
     Wt::log("error") << "[realopinsight] "<<ex.what();
   }
   transaction.commit();
@@ -304,7 +309,7 @@ int DbSession::revokeView(const std::string& username, const std::string& viewna
     dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(viewname);
     dboUserPtr.modify()->views.erase(dboViewPtr);
     retCode = 0;
-  } catch (const std::exception& ex) {
+  } catch (const dbo::Exception& ex) {
     Wt::log("error") << "[realopinsight] "<<ex.what();
   }
   transaction.commit();

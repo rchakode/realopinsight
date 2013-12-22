@@ -56,7 +56,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_settings (new Settings()),
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
-    m_dashtabs(new Wt::WTabWidget(m_mainWidget)),
+    m_dashtabs(new Wt::WTabWidget()),
     m_dbSession(new DbSession(true)),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
@@ -140,11 +140,6 @@ void WebMainUI::showUserHome(void)
   m_authWidget->hide();
   m_mainWidget->show();
 
-  //Clear the tab
-  for(int i = 0, end = m_dashtabs->count(); i < end; ++i) {
-    m_dashtabs->removeTab(m_dashtabs->widget(i));
-  }
-
   std::string homeTabTitle = m_dbSession->loggedUser().role == User::AdmRole?
         tr("Quick Start").toStdString() :
         tr("Tactical Overview").toStdString();
@@ -160,7 +155,7 @@ void WebMainUI::showUserHome(void)
 }
 
 void WebMainUI::createMainUI(void)
-{
+{;
   Wt::WContainerWidget* container = new Wt::WContainerWidget();
   m_navbar = new Wt::WNavigationBar(container);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
@@ -168,16 +163,13 @@ void WebMainUI::createMainUI(void)
   // Create a container for stacked contents
   m_contents = new Wt::WStackedWidget(container);
   m_contents->setId("stackcontentarea");
-
   // Setup the main menu
   Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
   mainMenu->addItem(tr("Home").toStdString(), m_dashtabs);
   container->addWidget(m_contents);
-
   setupAdminMenus();
   setupProfileMenus();
-
   m_mainWidget->addWidget(container);
 }
 
@@ -244,6 +236,8 @@ void WebMainUI::setupProfileMenus(void)
   profilePopupMenu->addSeparator();
   profilePopupMenu->addItem("Sign out")
       ->triggered().connect(std::bind([=]() {
+    for(int i = 0, end = m_dashtabs->count(); i < end; ++i) {
+      m_dashtabs->removeTab(m_dashtabs->widget(i));}
     m_login.logout();
   }));
 }

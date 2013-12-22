@@ -56,8 +56,11 @@ private:
   Wt::WSelectionBox* createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent);
 
   void resetModelData(void);
+  std::string itemText(Wt::WStandardItemModel* model, int index);
   void assignView(void);
   void revokeView(void);
+  void removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
+  void addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
 };
 
 #endif // VIEWMGNT_HPP

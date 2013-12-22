@@ -37,7 +37,6 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
     m_assignedViewModel(new Wt::WStandardItemModel(this)),
     m_nonAssignedViewModel(new Wt::WStandardItemModel(this))
 {
-
   Wt::WContainerWidget* container = contents();
   container->setMargin(30, Wt::Left|Wt::Right);
   container->setMargin(10, Wt::Bottom);
@@ -158,23 +157,51 @@ void ViewAssignmentUI::resetModelData(void)
 }
 
 
+std::string ViewAssignmentUI::itemText(Wt::WStandardItemModel* model, int index)
+{
+  return model->item(index, 0)->text().toUTF8();
+}
+
 void ViewAssignmentUI::assignView(void)
 {
   //FIXME: segfault on duplication
   for (auto index : m_nonAssignedViewList->selectedIndexes()) {
-    std::string viewName =  m_nonAssignedViewModel->item(index, 0)->text().toUTF8();
-    std::cout << viewName << "\n";
+    std::string viewName = itemText(m_nonAssignedViewModel, index) ;
     m_dbSession->assignView(m_username, viewName);
+    removeViewItemInModel(m_nonAssignedViewModel, viewName);
+    addViewItemInModel(m_assignedViewModel, viewName);
   }
-  resetModelData();
 }
 
 void ViewAssignmentUI::revokeView(void)
 {
-  for (auto index : m_nonAssignedViewList->selectedIndexes()) {
-    std::string viewName =  m_nonAssignedViewModel->item(index, 0)->text().toUTF8();
-    std::cout << viewName << "\n";
+  for (auto index : m_assignedViewList->selectedIndexes()) {
+    std::string viewName = itemText(m_assignedViewModel, index);
     m_dbSession->revokeView(m_username,viewName);
+    removeViewItemInModel(m_assignedViewModel, viewName);
+    addViewItemInModel(m_nonAssignedViewModel, viewName);
   }
-  resetModelData();
+}
+
+void ViewAssignmentUI::removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
+{
+  int index = model->rowCount() - 1;
+  while (index >=0) {
+    if (itemText(model, index) != viewName) {
+      model->removeRow(index);
+      break;
+    }
+    --index;
+  }
+}
+
+void ViewAssignmentUI::addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
+{
+  ViewListT::const_iterator vit;
+  vit = std::find_if(m_dbSession->viewList().begin(),
+                     m_dbSession->viewList().end(),
+                     [=](View v){return v.name == viewName;});
+  if (vit !=m_dbSession->viewList().end()) {
+    addView(model, *vit);
+  }
 }
