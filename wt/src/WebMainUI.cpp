@@ -494,7 +494,7 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
 void WebMainUI::checkUserLogin(void)
 {
   if (! m_authManager->isLogged()) {
-    redirect(LINK_HOME);
+    wApp->redirect(LINK_HOME);
   }
 }
 
