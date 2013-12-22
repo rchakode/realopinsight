@@ -25,6 +25,7 @@
 #include "ViewMgnt.hpp"
 #include "WebMainUI.hpp"
 #include "utilsClient.hpp"
+#include "WebUtils.hpp"
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
 #include <Wt/WPopupMenu>
@@ -57,7 +58,7 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
     m_dashtabs(new Wt::WTabWidget()),
-    m_fileUploadDialog(new Wt::WDialog(tr("Select a file").toStdString())),
+    m_fileUploadDialog(new Wt::WDialog(utils::tr("Select a file"))),
     m_dbSession(new DbSession(true)),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
@@ -144,8 +145,7 @@ void WebMainUI::showUserHome(void)
   m_mainWidget->show();
 
   std::string homeTabTitle = m_dbSession->loggedUser().role == User::AdmRole?
-        tr("Quick Start").toStdString() :
-        tr("Tactical Overview").toStdString();
+        utils::tr("Quick Start"): utils::tr("Tactical Overview");
 
   m_dashtabs->addTab(createUserHome(),
                      homeTabTitle,
@@ -169,7 +169,7 @@ void WebMainUI::createMainUI(void)
   // Setup the main menu
   Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
-  mainMenu->addItem(tr("Home").toStdString(), m_dashtabs);
+  mainMenu->addItem(utils::tr("Home"), m_dashtabs);
   container->addWidget(m_contents);
   setupAdminMenus();
   setupProfileMenus();
@@ -183,7 +183,7 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(m_mgntMenu, Wt::AlignLeft);
   Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-  curItem = new Wt::WMenuItem(tr("Management").toStdString());
+  curItem = new Wt::WMenuItem(utils::tr("Management"));
   curItem->setMenu(mgntPopupMenu);
   m_mgntMenu->addItem(curItem);
 
@@ -224,12 +224,12 @@ void WebMainUI::setupProfileMenus(void)
   m_profileMenu->addItem(m_mainProfileMenuItem);
 
   Wt::WMenuItem* curItem = NULL;
-  profilePopupMenu->addItem(tr("Account").toStdString().c_str())
+  profilePopupMenu->addItem(utils::tr("Account").c_str())
       ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
-  profilePopupMenu->addItem(tr("Change password").toStdString().c_str())
+  profilePopupMenu->addItem(utils::tr("Change password").c_str())
       ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));
   profilePopupMenu->addSeparator();
-  curItem = profilePopupMenu->addItem("Documentation");
+  curItem = profilePopupMenu->addItem(utils::tr("Documentation"));
   curItem->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
   curItem->setLinkTarget(Wt::TargetNewWindow);
 
@@ -249,8 +249,7 @@ void WebMainUI::setupUserMenus(void)
   checkUserLogin();
   User loggedUser = m_dbSession->loggedUser();
 
-  m_mainProfileMenuItem->setText(tr("You're %1").arg(
-                                   loggedUser.username.c_str()).toStdString());
+  m_mainProfileMenuItem->setText(tr("You're %1").arg(loggedUser.username.c_str()).toStdString());
   if(loggedUser.role == User::AdmRole) {
     m_mgntMenu->show();
     setInternalPath(LINK_ADMIN_HOME);
@@ -342,7 +341,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 void WebMainUI::selectFileToOpen(void)
 {
   checkUserLogin();
-  m_fileUploadDialog->setWindowTitle(tr("Select a file").toStdString());
+  m_fileUploadDialog->setWindowTitle(utils::tr("Select a file"));
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
 
@@ -350,7 +349,7 @@ void WebMainUI::selectFileToOpen(void)
   container->addWidget(createViewSelector());
 
   // Provide a button to close the window
-  Wt::WPushButton* finish(new Wt::WPushButton(tr("Finish").toStdString(), container));
+  Wt::WPushButton* finish(new Wt::WPushButton(utils::tr("Finish"), container));
   finish->clicked().connect(std::bind(&WebMainUI::finishFileDialog, this, OPEN));
 
   m_fileUploadDialog->show();
@@ -359,7 +358,7 @@ void WebMainUI::selectFileToOpen(void)
 void WebMainUI::openFileUploadDialog(void)
 {
   checkUserLogin();
-  m_fileUploadDialog->setWindowTitle(tr("Import a file").toStdString());
+  m_fileUploadDialog->setWindowTitle(utils::tr("Import a file"));
   m_fileUploadDialog->setStyleClass("Wt-dialog");
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
@@ -372,14 +371,14 @@ void WebMainUI::openFileUploadDialog(void)
   m_uploader->setMargin(10, Wt::Right);
 
   // Provide a button to start uploading.
-  Wt::WPushButton* uploadButton = new Wt::WPushButton(tr("Upload").toStdString(), container);
+  Wt::WPushButton* uploadButton = new Wt::WPushButton(utils::tr("Upload"), container);
   uploadButton->clicked().connect(std::bind([=](){
     m_uploader->upload();
     uploadButton->disable();
   }));
 
   // Provide a button to close the upload dialog
-  Wt::WPushButton* close(new Wt::WPushButton(tr("Close").toStdString(), container));
+  Wt::WPushButton* close(new Wt::WPushButton(utils::tr("Close"), container));
   close->clicked().connect(std::bind([=](){
     uploadButton->enable();
     m_fileUploadDialog->accept();
@@ -388,7 +387,7 @@ void WebMainUI::openFileUploadDialog(void)
 
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
-    showMessage(tr("File is too large.").toStdString(), "alert alert-warning");
+    showMessage(utils::tr("File is too large."), "alert alert-warning");
   }));
   m_fileUploadDialog->show();
 }
@@ -448,7 +447,7 @@ void WebMainUI::finishFileDialog(int action)
         openFile(m_selectFile);
         m_selectFile.clear();
       } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+        showMessage(utils::tr("No file selected"), "alert alert-warning");
       }
       break;
     default:
@@ -477,9 +476,8 @@ void WebMainUI::openFile(const std::string& path)
       handleRefresh();
     } else {
       delete dashboard;
-      showMessage(tr("This platform or a platfom "
-                     "with the same name is already loaded").toStdString(),
-                  "alert alert-warning");
+      showMessage(utils::tr("This platform or a platfom "
+                            "with the same name is already loaded"),"alert alert-warning");
     }
   } else {
     showMessage(dashboard->lastError().toStdString(),"alert alert-warning");
@@ -499,12 +497,12 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   tpl->bindWidget("andhor-load-file",
-                  createAnchorForHomeLink(tr("Load").toStdString(),
-                                          tr("An existing platform").toStdString(),
+                  createAnchorForHomeLink(utils::tr("Load"),
+                                          utils::tr("An existing platform"),
                                           LINK_LOAD));
   tpl->bindWidget("andhor-import-file",
-                  createAnchorForHomeLink(tr("Import").toStdString(),
-                                          tr("A platform description").toStdString(),
+                  createAnchorForHomeLink(utils::tr("Import"),
+                                          utils::tr("A platform description"),
                                           LINK_IMPORT));
   return tpl;
 }
@@ -568,7 +566,7 @@ void WebMainUI::createAccountPanel(void)
                       "Update completed.");
   }, std::placeholders::_1));
 
-  m_accountPanel = new Wt::WDialog(tr("Account information").toStdString());
+  m_accountPanel = new Wt::WDialog(utils::tr("Account information"));
   m_accountPanel->setStyleClass("Wt-dialog");
   //FIXME: m_accountPanel->positionAt(m_profileMenu);
   m_accountPanel->contents()->addWidget(form);
@@ -591,7 +589,7 @@ void WebMainUI::createPasswordPanel(void)
                       "Password changed.");
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-  m_changePasswordPanel = new Wt::WDialog(tr("Change password").toStdString());
+  m_changePasswordPanel = new Wt::WDialog(utils::tr("Change password"));
   m_changePasswordPanel->setStyleClass("Wt-dialog");
   m_changePasswordPanel->contents()->addWidget(form);
 }
@@ -613,8 +611,8 @@ void WebMainUI::handleInternalPath(void)
     showLoginHome();
   } else {
     showLoginHome();
-    showMessage(tr("Sorry, the request resource "
-                   "is not available or has been removed").toStdString(),
+    showMessage(utils::tr("Sorry, the request resource "
+                          "is not available or has been removed"),
                 "alert alert-warning");
   }
 }

@@ -29,8 +29,11 @@
 
 namespace utils {
   void showMessage(int exitCode,
-                          const std::string& errorMsg,
-                          const std::string& successMsg, Wt::WText* infoBox);
-}
+                   const std::string& errorMsg,
+                   const std::string& successMsg,
+                   Wt::WText* infoBox);
+  std::string tr(const std::string& msg);
+
+} //Namespace
 
 #endif // WEBUTILS_HPP

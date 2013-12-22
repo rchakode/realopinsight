@@ -24,11 +24,12 @@
 
 #include "WebUtils.hpp"
 #include <Wt/WTemplate>
+#include <QObject>
 
 
 void utils::showMessage(int exitCode,
-                               const std::string& errorMsg,
-                               const std::string& successMsg, Wt::WText* infoBox)
+                        const std::string& errorMsg,
+                        const std::string& successMsg, Wt::WText* infoBox)
 {
   Wt::WTemplate* tpl = NULL;
   if (exitCode != 0){
@@ -47,4 +48,9 @@ void utils::showMessage(int exitCode,
   }
 }
 
+
+std::string utils::tr(const std::string& msg)
+{
+  return QObject::tr(msg.c_str()).toStdString();
+}
 
