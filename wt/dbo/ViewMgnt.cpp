@@ -30,13 +30,14 @@
 #include <Wt/WStandardItem>
 
 ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
-  : Wt::WDialog(QObject::tr("View Assignations").toStdString(), parent),
+  : Wt::WDialog(QObject::tr("View Managment").toStdString(), parent),
     m_dbSession(dbSession),
     m_userListModel(new Wt::WStandardItemModel(this)),
     m_assignedViewModel(new Wt::WStandardItemModel(this)),
     m_nonAssignedViewModel(new Wt::WStandardItemModel(this))
 {
   Wt::WContainerWidget* container = contents();
+  titleBar()->setMargin(30, Wt::Left|Wt::Right);
   container->setMargin(30, Wt::Left|Wt::Right);
   container->setMargin(10, Wt::Bottom);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), container);
