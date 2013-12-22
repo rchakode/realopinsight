@@ -47,6 +47,8 @@ private:
   Wt::WStandardItemModel* m_userListModel;
   Wt::WStandardItemModel* m_assignedViewModel;
   Wt::WStandardItemModel* m_nonAssignedViewModel;
+  Wt::WSelectionBox* m_assignedViewList;
+  Wt::WSelectionBox* m_nonAssignedViewList;
   std::string m_username;
 
   void addView(Wt::WStandardItemModel* model, const View& view);
@@ -54,8 +56,8 @@ private:
   Wt::WSelectionBox* createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent);
 
   void resetModelData(void);
-  void assignView(void){ }
-  void revokeView(void){ }
+  void assignView(void);
+  void revokeView(void);
 };
 
 #endif // VIEWMGNT_HPP

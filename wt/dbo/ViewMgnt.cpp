@@ -28,6 +28,7 @@
 #include <QObject>
 #include <Wt/WPushButton>
 #include <Wt/WComboBox>
+#include <Wt/WStandardItem>
 
 ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
   : Wt::WDialog(QObject::tr("View Assignations").toStdString(), parent),
@@ -36,16 +37,24 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
     m_assignedViewModel(new Wt::WStandardItemModel(this)),
     m_nonAssignedViewModel(new Wt::WStandardItemModel(this))
 {
-  contents()->setMargin(30, Wt::Left|Wt::Right);
-  contents()->setMargin(10, Wt::Bottom);
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), contents());
+
+  Wt::WContainerWidget* container = contents();
+  container->setMargin(30, Wt::Left|Wt::Right);
+  container->setMargin(10, Wt::Bottom);
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), container);
   setModelHeaderTitles(m_assignedViewModel);
   setModelHeaderTitles(m_nonAssignedViewModel);
 
-  tpl->bindWidget("assigned-views", createViewList(m_assignedViewModel, contents()));
-  tpl->bindWidget("non-assigned-views", createViewList(m_nonAssignedViewModel, contents()));
+  m_assignedViewList = createViewList(m_assignedViewModel, container);
+  m_nonAssignedViewList = createViewList(m_nonAssignedViewModel, container);
 
-  Wt::WComboBox* userSelector = new Wt::WComboBox(contents());
+  m_assignedViewList->setSelectable(true);
+  m_nonAssignedViewList->setSelectable(true);
+
+  tpl->bindWidget("assigned-views", m_assignedViewList);
+  tpl->bindWidget("non-assigned-views",m_nonAssignedViewList);
+
+  Wt::WComboBox* userSelector = new Wt::WComboBox(container);
   userSelector->setModel(m_userListModel);
   userSelector->setSelectable(true);
   userSelector->changed().connect(std::bind([=](){
@@ -58,15 +67,15 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
   }));
   tpl->bindWidget("user-selector", userSelector);
 
-  Wt::WPushButton* assignButton = new Wt::WPushButton(QObject::tr("Assign >>").toStdString(),contents());
+  Wt::WPushButton* assignButton = new Wt::WPushButton(QObject::tr("<<Assign").toStdString(),container);
   assignButton->setStyleClass("btn-success");
   assignButton->clicked().connect(this, &ViewAssignmentUI::assignView);
 
-  Wt::WPushButton* revokeButton = new Wt::WPushButton(QObject::tr("<<Revoke").toStdString(),contents());
+  Wt::WPushButton* revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(),container);
   revokeButton->setStyleClass("btn-danger");
   revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeView);
 
-  Wt::WPushButton* closeButton = new Wt::WPushButton(QObject::tr("Close").toStdString(),contents());
+  Wt::WPushButton* closeButton = new Wt::WPushButton(QObject::tr("Close").toStdString(),container);
   closeButton->setStyleClass("btn-primary");
   closeButton->clicked().connect(std::bind([=](){
     accept();
@@ -89,16 +98,17 @@ ViewAssignmentUI::~ViewAssignmentUI(void)
 
 void ViewAssignmentUI::filter(const std::string& username)
 {
-  std::cout << username << "\n";
-  m_assignedViewModel->clear();
-  m_nonAssignedViewModel->clear();
-  m_dbSession->updateUserViewList();
-  UserViewListT userViews = m_dbSession->userViewList();
-  for (auto view: m_dbSession->viewList()) {
-    if (userViews.find(username+":"+view.name) != userViews.end()) {
-      addView(m_assignedViewModel, view);
-    } else {
-      addView(m_nonAssignedViewModel, view);
+  if (! username.empty()) {
+    m_assignedViewModel->clear();
+    m_nonAssignedViewModel->clear();
+    //FIXME segfault m_dbSession->updateUserViewList();
+    UserViewListT userViews = m_dbSession->userViewList();
+    for (auto view: m_dbSession->viewList()) {
+      if (userViews.find(username+":"+view.name) != userViews.end()) {
+        addView(m_assignedViewModel, view);
+      } else {
+        addView(m_nonAssignedViewModel, view);
+      }
     }
   }
 }
@@ -121,12 +131,12 @@ void ViewAssignmentUI::setModelHeaderTitles(Wt::WStandardItemModel* model)
 Wt::WSelectionBox* ViewAssignmentUI::createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent)
 {
   Wt::WSelectionBox* list = new Wt::WSelectionBox (parent);
+  list->setSelectionMode(Wt::ExtendedSelection);
   list->setMargin(10, Wt::Top | Wt::Bottom);
   list->setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
   list->setModel(model);
   return list;
 }
-
 
 void ViewAssignmentUI::resetModelData(void)
 {
@@ -139,10 +149,32 @@ void ViewAssignmentUI::resetModelData(void)
   m_userListModel->setData(count, 0, Wt::WString("Select a user"));
   ++count;
   m_dbSession->updateUserList();
-  for (auto user: m_dbSession->userList()) {
+  for (const auto& user: m_dbSession->userList()) {
     m_userListModel->insertRows(count, 1);
     m_userListModel->setData(count, 0, user.username);
-    //m_userListModel->setData(count, 1, user.service_count);
     ++count;
   }
+  filter(m_username);
+}
+
+
+void ViewAssignmentUI::assignView(void)
+{
+  //FIXME: segfault on duplication
+  for (auto index : m_nonAssignedViewList->selectedIndexes()) {
+    std::string viewName =  m_nonAssignedViewModel->item(index, 0)->text().toUTF8();
+    std::cout << viewName << "\n";
+    m_dbSession->assignView(m_username, viewName);
+  }
+  resetModelData();
+}
+
+void ViewAssignmentUI::revokeView(void)
+{
+  for (auto index : m_nonAssignedViewList->selectedIndexes()) {
+    std::string viewName =  m_nonAssignedViewModel->item(index, 0)->text().toUTF8();
+    std::cout << viewName << "\n";
+    m_dbSession->revokeView(m_username,viewName);
+  }
+  resetModelData();
 }

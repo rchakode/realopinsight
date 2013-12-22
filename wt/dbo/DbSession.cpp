@@ -242,16 +242,16 @@ int DbSession::addView(const View& view)
     rereadAll("view");
     dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(view.name);
     //FIXME:
-    if (! dboViewPtr) {
-      m_lastError = "Failed: the view already exist.";
-      Wt::log("error")<<" [realopinsight] " << m_lastError;
-      retCode = 1;
-    } else {
-      View* viewTmpPtr(new View());
-      *viewTmpPtr =  view;
-      add(viewTmpPtr);
-      retCode = 0;
-    }
+    //    if (! dboViewPtr) {
+    //      m_lastError = "Failed: the view already exist.";
+    //      Wt::log("error")<<" [realopinsight] " << m_lastError;
+    //      retCode = 1;
+    //    } else {
+    View* viewTmpPtr(new View());
+    *viewTmpPtr =  view;
+    add(viewTmpPtr);
+    retCode = 0;
+    //    }
   } catch (const std::exception& ex) {
     m_lastError = "Failed to add the view. More details in log.";
     Wt::log("error")<<" [realopinsight] " << ex.what();
@@ -276,3 +276,37 @@ void DbSession::updateUserViewList(void)
   transaction.commit();
 }
 
+
+
+int DbSession::assignView(const std::string& username, const std::string& viewname)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(username);
+    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(viewname);
+    dboUserPtr.modify()->views.insert(dboViewPtr);
+    retCode = 0;
+  } catch (const std::exception& ex) {
+    Wt::log("error") << "[realopinsight] "<<ex.what();
+  }
+  transaction.commit();
+  return retCode;
+}
+
+
+int DbSession::revokeView(const std::string& username, const std::string& viewname)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(username);
+    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(viewname);
+    dboUserPtr.modify()->views.erase(dboViewPtr);
+    retCode = 0;
+  } catch (const std::exception& ex) {
+    Wt::log("error") << "[realopinsight] "<<ex.what();
+  }
+  transaction.commit();
+  return retCode;
+}

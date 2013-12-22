@@ -109,6 +109,7 @@ public:
   }
 };
 
+
 typedef std::set<std::string> UserViewListT;
 typedef std::list<User> UserListT;
 typedef std::list<View> ViewListT;

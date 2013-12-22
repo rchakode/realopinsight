@@ -99,8 +99,6 @@ WebMainUI::~WebMainUI()
   std::cout << "m_navbar deleted\n";
   delete m_contents;
   std::cout << "m_contents deleted\n";
-  delete m_viewAssignmentDialog;
-  std::cout << "m_viewAssignmentDialog deleted\n";
   delete m_mainWidget;
   std::cout << "m_mainWidget deleted\n";
 }

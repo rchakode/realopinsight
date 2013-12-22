@@ -44,7 +44,7 @@ public:
   DbSession(bool initializeDb = false);
   ~DbSession();
   void setup(bool initializeDb);
-
+  std::string lastError(void) const {return m_lastError;}
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
   static Wt::Auth::AuthService& auth();
   static Wt::Auth::PasswordService& passwordAuthentificator(void);
@@ -64,7 +64,8 @@ public:
                      const std::string& currentPass,
                      const std::string& newPass);
   int deleteUser(std::string username);
-  std::string lastError(void) const {return m_lastError;}
+  int assignView(const std::string& username, const std::string& viewname);
+  int revokeView(const std::string& username, const std::string& viewname);
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;
