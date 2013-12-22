@@ -205,8 +205,8 @@ void DbSession::updateUserList(void)
   m_userList.clear();
   dbo::Transaction transaction(*this);
   UserCollectionT users = find<User>();
-  for (UserCollectionT::const_iterator it = users.begin(), end = users.end(); it != end; ++it) {
-    m_userList.push_back(*(*it));
+  for (auto &user : users) {
+    m_userList.push_back(*user);
   }
   transaction.commit();
 }
@@ -216,8 +216,19 @@ void DbSession::updateViewList(void)
   m_viewList.clear();
   dbo::Transaction transaction(*this);
   ViewCollectionT views = find<View>();
-  for (ViewCollectionT::const_iterator it = views.begin(), end = views.end(); it != end; ++it) {
-    m_viewList.push_back(*(*it));
+  for (auto& view :views) {
+    m_viewList.push_back(*view);
+  }
+  transaction.commit();
+}
+
+void DbSession::updateViewList(const std::string& uname)
+{
+  m_viewList.clear();
+  dbo::Transaction transaction(*this);
+  dbo::ptr<User> userDboPtr = find<User>().where("name=?").bind(uname);
+  for (auto& view : userDboPtr.modify()->views) {
+    m_viewList.push_back(*view);
   }
   transaction.commit();
 }
@@ -272,19 +283,8 @@ int DbSession::deleteView(std::string vname)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    //    dbo::ptr<View> viewDboPtr = find<View>().where("name=?").bind(vname);
-    //    if (! viewDboPtr) {
-    //      m_lastError = "No view with this name";
-    //      retCode = 1;
-    //    } else {
-    //      viewDboPtr.modify()->users.clear();
-    //      viewDboPtr.remove();
-    //      retCode = 0;
-    //    }
-    //query<void>("delete from user_view where view_name=?").bind(vname);
     execute("DELETE FROM user_view WHERE view_name=?;").bind(vname);
     execute("DELETE FROM view WHERE name=?;").bind(vname);
-    //sqlCall.run();
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     retCode = 1;
@@ -302,11 +302,9 @@ void DbSession::updateUserViewList(void)
   m_userViewList.clear();
   dbo::Transaction transaction(*this);
   UserCollectionT users = find<User>();
-  for (UserCollectionT::const_iterator user=users.begin(),
-       end=users.end(); user != end; ++user) {
-    for (ViewCollectionT::const_iterator view=(*user)->views.begin(),
-         end=(*user)->views.end(); view != end; ++view) {
-      m_userViewList.insert((*user)->username+":"+(*view)->name);
+  for (auto& user : users) {
+    for (const auto& view: user->views) {
+      m_userViewList.insert(user->username+":"+view->name);
     }
   }
   transaction.commit();
