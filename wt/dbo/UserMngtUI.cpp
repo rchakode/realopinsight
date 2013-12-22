@@ -24,6 +24,7 @@
 
 #include "UserMngtUI.hpp"
 #include "DbSession.hpp"
+#include "WebUtils.hpp"
 #include <Wt/WMenu>
 #include <Wt/WPanel>
 #include <Wt/WComboBox>
@@ -267,20 +268,7 @@ void UserFormView::showMessage(int exitCode,
                                const std::string& errorMsg,
                                const std::string& successMsg)
 {
-  WTemplate* tpl = NULL;
-  if (exitCode != 0){
-    tpl = new WTemplate(Wt::WString::tr("error-msg-div-tpl"));
-    tpl->bindString("msg", errorMsg);
-  } else {
-    tpl = new WTemplate(Wt::WString::tr("success-msg-div-tpl"));
-    tpl->bindString("msg", successMsg);
-  }
-  if (tpl) {
-    std::ostringstream oss;
-    tpl->renderTemplate(oss);
-    m_infoBox->setText(oss.str());
-    delete tpl;
-  }
+  utils::showMessage(exitCode, errorMsg, successMsg, m_infoBox);
 }
 
 void UserFormView::process(void)
@@ -351,6 +339,7 @@ void UserFormView::createChangePasswordDialog(void)
   bool changedPasswd(true);
   bool forUserProfile(false);
   m_changePasswordDialog = new Wt::WDialog("Change password");
+  m_changePasswordDialog->setStyleClass("Wt-dialog");
   UserFormView* changedPasswdForm = new UserFormView(&m_user,
                                                      changedPasswd,
                                                      forUserProfile);
@@ -376,9 +365,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
 
   m_userForm->validated().connect(std::bind([=](User user) {
     int ret = m_dbSession->addUser(user);
-    m_userForm->showMessage(ret,
-                           m_dbSession->lastError(),
-                            "User added.");
+    m_userForm->showMessage(ret, m_dbSession->lastError(), "User added.");
   }, std::placeholders::_1));
 
   Wt::WMenuItem* item = m_menu->addItem("Add User", m_userForm);

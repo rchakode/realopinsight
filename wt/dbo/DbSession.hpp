@@ -51,21 +51,25 @@ public:
   static void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(const std::string& uid);
-  void updateUserList(void);
-  void updateViewList(void);
-  void updateUserViewList(void);
-  UserListT& userList(void) {return m_userList;}
-  ViewListT& viewList(void) {return m_viewList;}
-  UserViewListT& userViewList(void) {return m_userViewList;}
+
   int addUser(const User& user);
-  int addView(const View& view);
   int updateUser(User user);
-  int updatePassword(const std::string& login,
+  int deleteUser(std::string uname);
+  int updatePassword(const std::string& uname,
                      const std::string& currentPass,
                      const std::string& newPass);
-  int deleteUser(std::string username);
-  int assignView(const std::string& username, const std::string& viewname);
-  int revokeView(const std::string& username, const std::string& viewname);
+  void updateUserList(void);
+  UserListT& userList(void) {return m_userList;}
+
+  int addView(const View& view);
+  int deleteView(std::string vname);
+  int assignView(const std::string& uname, const std::string& vname);
+  int revokeView(const std::string& uname, const std::string& vname);
+  void updateViewList(void);
+  ViewListT& viewList(void) {return m_viewList;}
+
+  void updateUserViewList(void);
+  UserViewListT& userViewList(void) {return m_userViewList;}
 
 private:
   dbo::backend::Sqlite3* m_sqlite3Db;

@@ -38,8 +38,7 @@ HEADERS	+= include/client/Auth.hpp \
     include/client/WebKit.hpp \
     include/client/Settings.hpp \
     include/client/Chart.hpp \
-    include/client/MsgConsole.hpp \
-    wt/dbo/DbObjects.hpp
+    include/client/MsgConsole.hpp
 
 SOURCES	+= src/client/Auth.cpp \
     src/client/GraphView.cpp \
@@ -56,16 +55,21 @@ SOURCES	+= src/client/Auth.cpp \
 }
 
 config-web {
+TARGET = ngrt4n-web
 CONFIG += no_keywords
 DEFINES *= REALOPINSIGHT_WEB
-HEADERS	+= wt/include/WebDashboard.hpp \
-    wt/include/WebMsgConsole.hpp \
-    wt/include/WebMap.hpp \
-    wt/include/WebTree.hpp \
-    wt/include/WebPieChart.hpp \
-    wt/include/WebMainUI.hpp \
+
+HEADERS	+= wt/src/WebDashboard.hpp \
+    wt/src/WebMsgConsole.hpp \
+    wt/src/WebMap.hpp \
+    wt/src/WebTree.hpp \
+    wt/src/WebPieChart.hpp \
+    wt/src/WebMainUI.hpp \
     wt/dbo/DbSession.hpp \
-    wt/dbo/UserMngtUI.hpp
+    wt/dbo/UserMngtUI.hpp \
+    wt/dbo/DbObjects.hpp \
+    wt/dbo/ViewMgnt.hpp \
+    wt/src/WebUtils.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -75,8 +79,9 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebPieChart.cpp \
     wt/src/WebMainUI.cpp \
     wt/dbo/DbSession.cpp \
-    wt/dbo/UserMngtUI.cpp
-TARGET = ngrt4n-web
+    wt/dbo/UserMngtUI.cpp\
+    wt/dbo/ViewMgnt.cpp \
+    wt/src/WebUtils.cpp
 }
 
 dflag {
@@ -110,7 +115,7 @@ INCLUDEPATH = include \
               librealopinsight/src \
               include/client \
               include/core \
-              wt/include \
+              wt/src \
               wt/dbo \
               /opt/install/wt-3.3.0/include
 
@@ -137,11 +142,4 @@ LIBS += -L./librealopinsight/release -lrealopinsight \
     -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
     -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 
-#include(QsLog/QsLog.pri)
-
-HEADERS += \
-    wt/dbo/ViewMgnt.hpp
-
-SOURCES += \
-    wt/dbo/ViewMgnt.cpp
 

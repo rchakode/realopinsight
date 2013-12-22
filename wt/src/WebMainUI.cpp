@@ -57,9 +57,12 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
     m_timer(new Wt::WTimer(this)),
     m_mainWidget(new Wt::WContainerWidget()),
     m_dashtabs(new Wt::WTabWidget()),
+    m_fileUploadDialog(new Wt::WDialog(tr("Select a file").toStdString())),
     m_dbSession(new DbSession(true)),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
+  m_fileUploadDialog->setStyleClass("Wt-dialog");
+
   root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
@@ -340,8 +343,9 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 void WebMainUI::selectFileToOpen(void)
 {
   checkUserLogin();
-  m_fileUploadDialog = new Wt::WDialog(tr("Select a file").toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Select a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
+  container->clear();
 
   container->setMargin(10, Wt::All);
   container->addWidget(createViewSelector());
@@ -356,9 +360,10 @@ void WebMainUI::selectFileToOpen(void)
 void WebMainUI::openFileUploadDialog(void)
 {
   checkUserLogin();
-  m_fileUploadDialog = new Wt::WDialog(tr("Import a file").toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Import a file").toStdString());
+  m_fileUploadDialog->setStyleClass("Wt-dialog");
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
-
+  container->clear();
   container->setMargin(10, Wt::All);
 
   m_uploader = new Wt::WFileUpload(container);
@@ -565,6 +570,7 @@ void WebMainUI::createAccountPanel(void)
   }, std::placeholders::_1));
 
   m_accountPanel = new Wt::WDialog(tr("Account information").toStdString());
+  m_accountPanel->setStyleClass("Wt-dialog");
   //FIXME: m_accountPanel->positionAt(m_profileMenu);
   m_accountPanel->contents()->addWidget(form);
 }
@@ -587,6 +593,7 @@ void WebMainUI::createPasswordPanel(void)
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
   m_changePasswordPanel = new Wt::WDialog(tr("Change password").toStdString());
+  m_changePasswordPanel->setStyleClass("Wt-dialog");
   m_changePasswordPanel->contents()->addWidget(form);
 }
 
@@ -651,6 +658,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 void WebMainUI::createInfoMsgBox(void)
 {
   m_infoMsgBox = new Wt::WDialog(m_mainWidget);
+  m_infoMsgBox->setStyleClass("Wt-dialog");
   m_infoMsgBox->setModal(false);
   m_infoMsgBox->setTitleBarEnabled(false);
   m_infoMsgBox->positionAt(m_profileMenu);

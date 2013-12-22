@@ -1,5 +1,5 @@
 /*
- * ViewMgnt.hpp
+ * WebUtils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 06-12-2013                                                 #
@@ -22,53 +22,29 @@
 #--------------------------------------------------------------------------#
  */
 
-
-#ifndef VIEWMGNT_HPP
-#define VIEWMGNT_HPP
-
-#include <Wt/WDialog>
+#include "WebUtils.hpp"
 #include <Wt/WTemplate>
-#include <Wt/WStandardItemModel>
-#include <Wt/WTableView>
-#include <Wt/WPushButton>
-#include <set>
 
-class View;
-class DbSession;
 
-class ViewAssignmentUI : public Wt::WDialog
+void utils::showMessage(int exitCode,
+                               const std::string& errorMsg,
+                               const std::string& successMsg, Wt::WText* infoBox)
 {
-public:
-  ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent=0);
-  virtual ~ViewAssignmentUI(void);
+  Wt::WTemplate* tpl = NULL;
+  if (exitCode != 0){
+    tpl = new Wt::WTemplate(Wt::WString::tr("error-msg-div-tpl"));
+    tpl->bindString("msg", errorMsg);
+  } else {
+    tpl = new Wt::WTemplate(Wt::WString::tr("success-msg-div-tpl"));
+    tpl->bindString("msg", successMsg);
+  }
 
-  void filter(const std::string& username);
+  if (tpl) {
+    std::ostringstream oss;
+    tpl->renderTemplate(oss);
+    infoBox->setText(oss.str());
+    delete tpl;
+  }
+}
 
-private:
-  typedef std::set<std::string> KeyListT;
-  DbSession* m_dbSession;
-  Wt::WStandardItemModel* m_userListModel;
-  Wt::WStandardItemModel* m_assignedViewModel;
-  Wt::WStandardItemModel* m_nonAssignedViewModel;
-  Wt::WSelectionBox* m_assignedViewList;
-  Wt::WSelectionBox* m_nonAssignedViewList;
-  std::string m_username;
-  Wt::WPushButton* m_assignButton;
-  Wt::WPushButton* m_revokeButton;
-  Wt::WPushButton* m_deleteViewButton;
 
-  void addView(Wt::WStandardItemModel* model, const View& view);
-  void setModelHeaderTitles(Wt::WStandardItemModel* model);
-  Wt::WSelectionBox* createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent);
-
-  void resetModelData(void);
-  std::string itemText(Wt::WStandardItemModel* model, int index);
-  void assignView(void);
-  void revokeView(void);
-  void removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
-  void addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
-  void enableButtonIfApplicable(Wt::WStandardItemModel* model, Wt::WPushButton* button);
-  void disableButtons(void);
-};
-
-#endif // VIEWMGNT_HPP

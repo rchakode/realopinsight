@@ -117,14 +117,14 @@ int DbSession::updateUser(User user)
   return retCode;
 }
 
-int DbSession::updatePassword(const std::string& login,
+int DbSession::updatePassword(const std::string& uname,
                               const std::string& currentPass,
                               const std::string& newpass)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, login);
+    Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
     switch (passAuthService.verifyPassword(dbuser, currentPass)) {
       case Wt::Auth::PasswordValid:
         passAuthService.updatePassword(dbuser, newpass);
@@ -148,12 +148,12 @@ int DbSession::updatePassword(const std::string& login,
   return retCode;
 }
 
-int DbSession::deleteUser(std::string login)
+int DbSession::deleteUser(std::string uname)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> usr = find<User>().where("name=?").bind(login);
+    dbo::ptr<User> usr = find<User>().where("name=?").bind(uname);
     usr.remove();
     retCode = 0;
   } catch (const dbo::Exception& ex) {
@@ -266,6 +266,32 @@ int DbSession::addView(const View& view)
   return retCode;
 }
 
+
+int DbSession::deleteView(std::string vname)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<View> viewDboPtr = find<View>().where("name=?").bind(vname);
+    if (! viewDboPtr) {
+      m_lastError = "No view with this name";
+      retCode = 1;
+    } else {
+      viewDboPtr.modify()->users.clear();
+      viewDboPtr.remove();
+      retCode = 0;
+    }
+  } catch (const dbo::Exception& ex) {
+    retCode = 1;
+    m_lastError = ex.what();
+    Wt::log("error")<<"[realopinsight]" << ex.what();
+  }
+  transaction.commit();
+  updateViewList();
+  return retCode;
+}
+
+
 void DbSession::updateUserViewList(void)
 {
   m_userViewList.clear();
@@ -283,13 +309,13 @@ void DbSession::updateUserViewList(void)
 
 
 
-int DbSession::assignView(const std::string& username, const std::string& viewname)
+int DbSession::assignView(const std::string& uname, const std::string& vname)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(username);
-    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(viewname);
+    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(uname);
+    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
     retCode = 0;
   } catch (const dbo::Exception& ex) {
@@ -300,13 +326,13 @@ int DbSession::assignView(const std::string& username, const std::string& viewna
 }
 
 
-int DbSession::revokeView(const std::string& username, const std::string& viewname)
+int DbSession::revokeView(const std::string& uname, const std::string& vname)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(username);
-    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(viewname);
+    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(uname);
+    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.erase(dboViewPtr);
     retCode = 0;
   } catch (const dbo::Exception& ex) {

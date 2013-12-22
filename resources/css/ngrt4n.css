@@ -10,6 +10,29 @@ body, html {
   top: 0;
   right: 0;
 }
+
+.Wt-dialogcover {
+    background: #CCCCCC;
+    background: rgb(204, 204, 204); /* For IE, ... */
+    background: rgba(204, 204, 204, 0.5);
+    height: 100%; width: 100%;
+    top: 0px; left: 0px;
+    position: fixed;
+}
+
+.Wt-dialog {
+  background-color: white;
+  padding: 1px;
+}
+
+.Wt-dialog .titlebar {
+    color: #FFFFFF;
+    background: #9DC6DD;
+    cursor: move;
+    font: bold 12px Verdana;
+    padding: 3px 6px;
+}
+
 /* these classes come from from bootstrap */
 .navbar { 
   margin: 0;
