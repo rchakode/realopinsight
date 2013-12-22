@@ -1,16 +1,20 @@
+#include "AuthManager.hpp"
+#include "DbSession.hpp"
 #include "WebMainUI.hpp"
 #include <Wt/WBootstrapTheme>
 #include <Wt/WServer>
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  WebMainUI* webApp = new WebMainUI(env);
+  Wt::WApplication* webApp = new Wt::WApplication(env);
   webApp->setTwoPhaseRenderingThreshold(0);
   webApp->useStyleSheet("/resources/css/ngrt4n.css");
   webApp->messageResourceBundle().use(webApp->docRoot() + "/resources/i18n/messages");
   webApp->setTheme(new Wt::WBootstrapTheme());
   webApp->requireJQuery("/resources/js/jquery-1.10.2.min.js");
-  webApp->showLoginHome();
+  DbSession* dbSession = new DbSession(true);
+  webApp->root()->setId("wrapper");
+  webApp->root()->addWidget(new AuthManager(dbSession));
   return webApp;
 }
 

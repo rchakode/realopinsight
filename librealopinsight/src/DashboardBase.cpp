@@ -91,7 +91,7 @@ void DashboardBase::load(const QString& _file)
   if (!_file.isEmpty()) {
     m_config = utils::getAbsolutePath(_file);
     Parser parser(m_config, m_cdata);
-    connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(errorOccurred(QString)));
+    connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
     if (parser.process(true) && parser.computeNodeCoordinates(1)) {
       buildTree();
       buildMap();
@@ -947,5 +947,5 @@ void DashboardBase::setRootService(void)
 
 void DashboardBase::addEvents(void)
 {
-  connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(errorOccurred(QString)));
+  connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
 }

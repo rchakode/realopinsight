@@ -35,6 +35,7 @@
 #include <Wt/WApplication>
 #include <Wt/WTemplate>
 #include <Wt/WString>
+#include <QObject>
 
 #define ROOT_DIV wApp->root()->id()
 #define MAIN_USER_MNGT_DIV this->id()

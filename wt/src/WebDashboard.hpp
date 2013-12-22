@@ -25,7 +25,6 @@
 #ifndef WEBDASHBOOARD_HPP
 #define WEBDASHBOOARD_HPP
 
-#include <Wt/WApplication>
 #include <Wt/WGridLayout>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>

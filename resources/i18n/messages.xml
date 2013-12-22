@@ -127,6 +127,12 @@
     </div>
   </message>
 
+  <message id="Wt.Auth.template.logged-in">
+    <div class="row">
+       ${main-ui}
+    </div>
+  </message>
+
   <message id="userForm-template">
     <!-- <legend>${title}</legend> -->
     <div class="form-horizontal">

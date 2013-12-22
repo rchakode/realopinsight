@@ -43,6 +43,7 @@ public:
   virtual ~ViewAssignmentUI(void);
 
   void filter(const std::string& username);
+  void resetModelData(void);
 
 private:
   typedef std::set<std::string> KeyListT;
@@ -63,7 +64,6 @@ private:
   void setModelHeaderTitles(Wt::WStandardItemModel* model);
   Wt::WSelectionBox* createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent);
 
-  void resetModelData(void);
   std::string itemText(Wt::WStandardItemModel* model, int index);
   void assignViews(void);
   void revokeViews(void);

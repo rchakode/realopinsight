@@ -69,7 +69,8 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/dbo/UserMngtUI.hpp \
     wt/dbo/DbObjects.hpp \
     wt/dbo/ViewMgnt.hpp \
-    wt/src/WebUtils.hpp
+    wt/src/WebUtils.hpp \
+    wt/src/AuthManager.hpp
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -81,7 +82,8 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/dbo/DbSession.cpp \
     wt/dbo/UserMngtUI.cpp\
     wt/dbo/ViewMgnt.cpp \
-    wt/src/WebUtils.cpp
+    wt/src/WebUtils.cpp \
+    wt/src/AuthManager.cpp
 }
 
 dflag {

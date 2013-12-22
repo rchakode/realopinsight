@@ -31,17 +31,17 @@
 #include "UserMngtUI.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
-#include <Wt/Auth/Login>
 #include <Wt/WTabWidget>
+#include <Wt/WObject>
 
-typedef Wt::Auth::AuthWidget AuthWidget;
+class AuthManager;
 class ViewAssignmentUI;
 
-class WebMainUI : public QObject, public Wt::WApplication
+class WebMainUI : public QObject, public Wt::WObject
 {
   Q_OBJECT
 public:
-  WebMainUI(const Wt::WEnvironment& env);
+  WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
   void showUserHome(void);
   void showLoginHome(void);
@@ -50,6 +50,7 @@ public:
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
   void handleInternalPath(void);
+  Wt::WContainerWidget* get(void) {return m_mainWidget;}
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
@@ -69,7 +70,6 @@ private:
   Wt::WMenu* m_mgntMenu;
   Wt::WMenu* m_profileMenu;
   Wt::WMenuItem* m_mainProfileMenuItem;
-  AuthWidget* m_authWidget;
   Wt::WTabWidget* m_dashtabs;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
@@ -77,8 +77,8 @@ private:
   WebDashboard* m_currentDashboard;
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
+  AuthManager* m_authManager;
   DbSession* m_dbSession;
-  Wt::Auth::Login m_login; /* slot conflict if decleared in the DbSession class */
   std::string m_confdir;
   UserMngtUI* m_userMgntUI;
   Wt::WDialog* m_accountPanel;
@@ -92,7 +92,6 @@ private:
   void setupProfileMenus(void);
   void setupUserMenus(void);
   Wt::WWidget* createToolBar(void);
-  void handleAuthentification(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
   void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);
@@ -102,7 +101,6 @@ private:
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createUserHome(void);
-  void createLoginPage(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
                                        const std::string& internalPath);
@@ -114,6 +112,8 @@ private:
   void createInfoMsgBox(void);
   void showMessage(const std::string& msg, std::string status);
   void createViewAssignmentDialog(void);
+  void loadUserDashboard(void);
+  void setInternalPath(const std::string& path);
 };
 
 #endif // MAINWEBWINDOW_HPP

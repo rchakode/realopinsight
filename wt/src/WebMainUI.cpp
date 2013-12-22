@@ -21,11 +21,12 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
+#include "AuthManager.hpp"
 #include "ViewMgnt.hpp"
 #include "WebMainUI.hpp"
 #include "utilsClient.hpp"
 #include "WebUtils.hpp"
+#include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
 #include <Wt/WPopupMenu>
@@ -39,8 +40,6 @@
 #include <Wt/WDialog>
 #include <Wt/WSelectionBox>
 #include <Wt/WTemplate>
-#include <Wt/Auth/AuthWidget>
-#include <Wt/Auth/Login>
 #include <Wt/WHBoxLayout>
 
 namespace {
@@ -52,30 +51,27 @@ namespace {
   const std::string LINK_OP_HOME ="/op";
 }
 
-WebMainUI::WebMainUI(const Wt::WEnvironment& env)
-  : Wt::WApplication(env),
-    m_settings (new Settings()),
-    m_timer(new Wt::WTimer(this)),
+WebMainUI::WebMainUI(AuthManager* authManager)
+  : m_settings (new Settings()),
+    m_timer(new Wt::WTimer()),
     m_mainWidget(new Wt::WContainerWidget()),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(new Wt::WDialog(utils::tr("Select a file"))),
-    m_dbSession(new DbSession(true)),
+    m_authManager(authManager),
+    m_dbSession(m_authManager->session()),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
 {
   m_fileUploadDialog->setStyleClass("Wt-dialog");
 
-  root()->setId("wrapper");
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
 
-  createLoginPage();
   createMainUI();
-
   createInfoMsgBox();
   createViewAssignmentDialog();
 
-  root()->addWidget(m_authWidget);
-  root()->addWidget(m_mainWidget);
+  setupUserMenus();
+  showUserHome();
 
   addEvents();
 }
@@ -87,17 +83,12 @@ WebMainUI::~WebMainUI()
   //  m_navbar(NULL),
   //  m_mgntMenu(NULL),
   //  m_profileMenu(NULL),
-  //  m_authWidget(NULL),
   delete m_timer;
   std::cout << "m_timer deleted\n";
   delete m_fileUploadDialog;
   std::cout << "m_fileUploadDialog deleted\n";
   //delete m_dashtabs;
   std::cout << "m_dashtabs deleted\n";
-  delete m_authWidget;
-  std::cout << "m_mainWidget deleted\n";
-  delete m_dbSession;
-  std::cout << "m_dbSession deleted\n";
   //FIXME: delete if not null => set them null at startup
   delete m_navbar;
   std::cout << "m_navbar deleted\n";
@@ -110,39 +101,21 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  m_login.changed().connect(this, &WebMainUI::handleAuthentification);
-  internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
+  wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
 void WebMainUI::showLoginHome(void)
 {
-  m_mainWidget->hide();
-  m_authWidget->show();
-  refresh();
-}
-
-void WebMainUI::createLoginPage(void)
-{
-  setInternalPath(LINK_LOGIN_PAGE);
-  setTitle(tr("Authentication - %1 Operations Console").arg(APP_NAME).toStdString());
-  m_authWidget = new AuthWidget( DbSession::auth(),
-                                 m_dbSession->users(),
-                                 m_login);
-  m_authWidget->addStyleClass("login-container");
-  m_authWidget->model()->addPasswordAuth(&m_dbSession->passwordAuthentificator());
-  m_authWidget->setRegistrationEnabled(false);
-  m_authWidget->processEnvironment();
+  //FIXME: ebMainUI::showLoginHome(void)
+  //  m_mainWidget->hide();
+  //  refresh();
 }
 
 void WebMainUI::showUserHome(void)
 {
-  setTitle(tr("%1 Operations Console").arg(APP_NAME).toStdString());
-
+  wApp->setTitle(tr("%1 Operations Console").arg(APP_NAME).toStdString());
   checkUserLogin();
-
-  m_authWidget->hide();
-  m_mainWidget->show();
 
   std::string homeTabTitle = m_dbSession->loggedUser().role == User::AdmRole?
         utils::tr("Quick Start"): utils::tr("Tactical Overview");
@@ -152,8 +125,9 @@ void WebMainUI::showUserHome(void)
                      Wt::WTabWidget::LazyLoading)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 
-  refresh();
-
+  if (m_dbSession->loggedUser().role == User::OpRole) {
+    loadUserDashboard();
+  }
   resetTimer();
 }
 
@@ -169,7 +143,7 @@ void WebMainUI::createMainUI(void)
   // Setup the main menu
   Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
-  mainMenu->addItem(utils::tr("Home"), m_dashtabs);
+  mainMenu->addItem(utils::tr("Home"), m_dashtabs); //Fixme: use home icon
   container->addWidget(m_contents);
   setupAdminMenus();
   setupProfileMenus();
@@ -196,6 +170,7 @@ void WebMainUI::setupAdminMenus(void)
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
   mgntPopupMenu->addItem("Assign/revoke/delete")
       ->triggered().connect(std::bind([=](){
+    m_viewAssignmentDialog->resetModelData();
     m_viewAssignmentDialog->show();
   }));
 
@@ -237,11 +212,7 @@ void WebMainUI::setupProfileMenus(void)
       ->triggered().connect(std::bind([=](){}));
   profilePopupMenu->addSeparator();
   profilePopupMenu->addItem("Sign out")
-      ->triggered().connect(std::bind([=]() {
-    for(int i = 0, end = m_dashtabs->count(); i < end; ++i) {
-      m_dashtabs->removeTab(m_dashtabs->widget(i));}
-    m_login.logout();
-  }));
+      ->triggered().connect(std::bind([=]() {m_authManager->logout();}));
 }
 
 void WebMainUI::setupUserMenus(void)
@@ -520,25 +491,9 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
 }
 
 
-void WebMainUI::handleAuthentification(void)
-{
-  if (m_login.loggedIn()) {
-    m_dbSession->setLoggedUser(m_login.user().id());
-    Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
-    createAccountPanel(); //FIXME: createAccountPanel() should not be called systematically, or check for deletion
-    createPasswordPanel(); //FIXME: createPasswordPanel() should not be called systematically, or check for deletion
-    setupUserMenus();
-    showUserHome();
-  } else {
-    Wt::log("notice") << "[realopinsight] "<<"Not connected. Redirecting to login page.";
-    showLoginHome();
-  }
-}
-
-
 void WebMainUI::checkUserLogin(void)
 {
-  if (! m_login.loggedIn()) {
+  if (! m_authManager->isLogged()) {
     redirect(LINK_HOME);
   }
 }
@@ -625,7 +580,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   Wt::WComboBox* viewSelector = new Wt::WComboBox();
   viewSelector->setMargin(10, Wt::Right);
 
-  Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(this);
+  Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(m_mainWidget);
   Wt::WStandardItem *item = new Wt::WStandardItem();
   item->setText("Select the view to load");
   viewSelectorModel->appendRow(item);
@@ -677,4 +632,18 @@ void WebMainUI::showMessage(const std::string& msg, std::string status)
 void WebMainUI::createViewAssignmentDialog(void)
 {
   m_viewAssignmentDialog = new ViewAssignmentUI(m_dbSession, m_mainWidget);
+}
+
+void WebMainUI::loadUserDashboard(void)
+{
+  m_dbSession->updateViewList(m_dbSession->loggedUser().username);
+  for (const auto& view: m_dbSession->viewList()) {
+    openFile(view.path);
+  }
+}
+
+
+void WebMainUI::setInternalPath(const std::string& path)
+{
+  wApp->setInternalPath(path);
 }

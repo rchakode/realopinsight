@@ -26,7 +26,6 @@
 #define DBSESSION_HPP
 
 #include "DbObjects.hpp"
-#include "Auth.hpp"
 #include <Wt/Dbo/Dbo>
 #include <Wt/Dbo/backend/Sqlite3>
 #include <Wt/Auth/PasswordService>

@@ -22,6 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
+
+#include <Wt/WApplication>
 #include <fstream>
 #include <iostream>
 #include <Wt/WPanel>
