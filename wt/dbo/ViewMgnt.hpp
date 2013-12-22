@@ -56,6 +56,8 @@ private:
   Wt::WPushButton* m_assignButton;
   Wt::WPushButton* m_revokeButton;
   Wt::WPushButton* m_deleteViewButton;
+  KeyListT m_selectedViews;
+  Wt::WText* m_infoBox;
 
   void addView(Wt::WStandardItemModel* model, const View& view);
   void setModelHeaderTitles(Wt::WStandardItemModel* model);
@@ -63,12 +65,16 @@ private:
 
   void resetModelData(void);
   std::string itemText(Wt::WStandardItemModel* model, int index);
-  void assignView(void);
-  void revokeView(void);
+  void assignViews(void);
+  void revokeViews(void);
+  void deleteViews(void);
   void removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
   void addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
-  void enableButtonIfApplicable(Wt::WStandardItemModel* model, Wt::WPushButton* button);
+  void enableButtonIfApplicable(Wt::WStandardItemModel* model,
+                                Wt::WPushButton* button,
+                                void (ViewAssignmentUI::* targetSlot)(void));
   void disableButtons(void);
+  void setSelectedViews(Wt::WSelectionBox* list, Wt::WStandardItemModel* model);
 };
 
 #endif // VIEWMGNT_HPP

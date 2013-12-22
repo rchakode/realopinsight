@@ -44,8 +44,8 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
   container->setMargin(10, Wt::Bottom);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), container);
 
-  Wt::WText* infoBox = new Wt::WText(container);
-  tpl->bindWidget("info-box", infoBox);
+  m_infoBox = new Wt::WText(container);
+  tpl->bindWidget("info-box", m_infoBox);
 
   setModelHeaderTitles(m_assignedViewModel);
   m_assignedViewList = createViewList(m_assignedViewModel, container);
@@ -72,20 +72,15 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
 
   m_assignButton = new Wt::WPushButton(QObject::tr("<< Assign").toStdString(), container);
   m_assignButton->setStyleClass("btn-success");
-  m_assignButton->clicked().connect(this, &ViewAssignmentUI::assignView);
+  m_assignButton->clicked().connect(this, &ViewAssignmentUI::assignViews);
 
   m_revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(), container);
   m_revokeButton->setStyleClass("btn-warning");
-  m_revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeView);
+  m_revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeViews);
 
   m_deleteViewButton = new Wt::WPushButton(QObject::tr("Delete View").toStdString(), container);
   m_deleteViewButton->setStyleClass("btn-danger");
-  m_deleteViewButton->clicked().connect(std::bind([=]() {
-    disableButtons();
-    int ret = m_dbSession->deleteView(m_username);
-    utils::showMessage(ret, m_dbSession->lastError(), "View deleted", infoBox);
-    filter(m_username);
-  }));
+  m_deleteViewButton->clicked().connect(this, &ViewAssignmentUI::deleteViews);
 
   Wt::WPushButton* closeButton = new Wt::WPushButton(QObject::tr("Close").toStdString(), container);
   closeButton->setStyleClass("btn-primary");
@@ -126,8 +121,12 @@ void ViewAssignmentUI::filter(const std::string& username)
     }
   }
   if (! m_username.empty()) {
-    enableButtonIfApplicable(m_nonAssignedViewModel, m_assignButton);
-    enableButtonIfApplicable(m_assignedViewModel, m_revokeButton);
+    //    enableButtonIfApplicable(m_nonAssignedViewModel,
+    //                             m_assignButton,
+    //                             &ViewAssignmentUI::assignViews);
+    //    enableButtonIfApplicable(m_assignedViewModel,
+    //                             m_revokeButton,
+    //                             &ViewAssignmentUI::revokeViews);
   }
 }
 
@@ -163,12 +162,14 @@ void ViewAssignmentUI::resetModelData(void)
   m_assignedViewModel->clear();
   m_nonAssignedViewModel->clear();
 
+  m_dbSession->updateUserList();
+  m_dbSession->updateViewList();
+
   int count = 0;
   m_userListModel->insertRows(count, 1);
   m_userListModel->setData(count, 0, Wt::WString("Select a user"));
   ++count;
 
-  m_dbSession->updateUserList();
   for (const auto& user: m_dbSession->userList()) {
     m_userListModel->insertRows(count, 1);
     m_userListModel->setData(count, 0, user.username);
@@ -179,8 +180,10 @@ void ViewAssignmentUI::resetModelData(void)
     addView(m_nonAssignedViewModel, view);
   }
 
-  disableButtons();
-  enableButtonIfApplicable(m_nonAssignedViewModel, m_deleteViewButton);
+  //disableButtons();
+  //  enableButtonIfApplicable(m_nonAssignedViewModel,
+  //                           m_deleteViewButton,
+  //                           &ViewAssignmentUI::deleteViews);
 }
 
 
@@ -189,46 +192,64 @@ std::string ViewAssignmentUI::itemText(Wt::WStandardItemModel* model, int index)
   return model->item(index, 0)->text().toUTF8();
 }
 
-void ViewAssignmentUI::assignView(void)
+void ViewAssignmentUI::assignViews(void)
 {
-  disableButtons();
+  //disableButtons();
 
-  KeyListT vnames;
-  for (auto index : m_nonAssignedViewList->selectedIndexes()) {
-    vnames.insert(itemText(m_nonAssignedViewModel, index));
-  }
+  setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
 
-  for (auto name : vnames) {
-    std::cout << name <<"\n";
+  for (auto name : m_selectedViews) {
     m_dbSession->assignView(m_username, name);
   }
+
   filter(m_username); //Enables disable button if needed
 }
 
-void ViewAssignmentUI::revokeView(void)
+void ViewAssignmentUI::revokeViews(void)
 {
-  disableButtons();
-  KeyListT vnames;
-  for (auto index : m_assignedViewList->selectedIndexes()) {
-    std::cout << index <<" >>>index\n";
-    vnames.insert(itemText(m_assignedViewModel, index));
-  }
+  //disableButtons();
 
-  for (auto name : vnames) {
-    std::cout << name <<"\n";
+  setSelectedViews(m_assignedViewList, m_assignedViewModel);
+
+  for (auto name : m_selectedViews) {
     m_dbSession->revokeView(m_username, name);
   }
 
   filter(m_username); //Enables disable button if needed
 }
 
+void ViewAssignmentUI::deleteViews(void)
+{
+  //disableButtons();
+  setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
 
-void ViewAssignmentUI::enableButtonIfApplicable(Wt::WStandardItemModel* model, Wt::WPushButton* button)
+  std::string msg;
+  int summary = 0;
+  for (auto vname : m_selectedViews) {
+    int ret = m_dbSession->deleteView(vname);
+    if (ret != 0) {
+      msg+="- Failed to delete "+vname + " -";
+      Wt::log("warning") <<"[realopinsight] "<< m_dbSession->lastError();
+    } else {
+      msg+="- View deleted "+vname + " -";
+    }
+    summary+=ret;
+  }
+  utils::showMessage(summary, msg, msg, m_infoBox);
+
+  filter(m_username);
+}
+
+
+void ViewAssignmentUI::enableButtonIfApplicable(Wt::WStandardItemModel* model,
+                                                Wt::WPushButton* button,
+                                                void (ViewAssignmentUI::* targetSlot)(void))
 {
   if (model->rowCount() <=0) {
     button->disable();
   } else {
     button->enable();
+    button->clicked().connect(this, targetSlot);
   }
 }
 
@@ -239,6 +260,15 @@ void ViewAssignmentUI::disableButtons(void)
   m_deleteViewButton->disable();
 }
 
+void ViewAssignmentUI::setSelectedViews(Wt::WSelectionBox* list, Wt::WStandardItemModel* model)
+{
+  m_selectedViews.clear();
+  for (auto index : list->selectedIndexes()) {
+    std::cout << itemText(model, index) << "\n";
+    m_selectedViews.insert(itemText(model, index));
+  }
+
+}
 
 void ViewAssignmentUI::removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
 {

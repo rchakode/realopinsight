@@ -272,15 +272,20 @@ int DbSession::deleteView(std::string vname)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<View> viewDboPtr = find<View>().where("name=?").bind(vname);
-    if (! viewDboPtr) {
-      m_lastError = "No view with this name";
-      retCode = 1;
-    } else {
-      viewDboPtr.modify()->users.clear();
-      viewDboPtr.remove();
-      retCode = 0;
-    }
+    //    dbo::ptr<View> viewDboPtr = find<View>().where("name=?").bind(vname);
+    //    if (! viewDboPtr) {
+    //      m_lastError = "No view with this name";
+    //      retCode = 1;
+    //    } else {
+    //      viewDboPtr.modify()->users.clear();
+    //      viewDboPtr.remove();
+    //      retCode = 0;
+    //    }
+    //query<void>("delete from user_view where view_name=?").bind(vname);
+    execute("DELETE FROM user_view WHERE view_name=?;").bind(vname);
+    execute("DELETE FROM view WHERE name=?;").bind(vname);
+    //sqlCall.run();
+    retCode = 0;
   } catch (const dbo::Exception& ex) {
     retCode = 1;
     m_lastError = ex.what();
