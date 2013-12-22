@@ -26,10 +26,36 @@
 #ifndef VIEWMGNT_HPP
 #define VIEWMGNT_HPP
 
-class ViewMgnt
+#include <Wt/WDialog>
+#include <Wt/WTemplate>
+#include <Wt/WStandardItemModel>
+#include <Wt/WTableView>
+
+class View;
+class DbSession;
+
+class ViewAssignmentUI : public Wt::WDialog
 {
 public:
-  ViewMgnt();
+  ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent=0);
+  virtual ~ViewAssignmentUI(void);
+
+  void filter(const std::string& username);
+
+private:
+  DbSession* m_dbSession;
+  Wt::WStandardItemModel* m_userListModel;
+  Wt::WStandardItemModel* m_assignedViewModel;
+  Wt::WStandardItemModel* m_nonAssignedViewModel;
+  std::string m_username;
+
+  void addView(Wt::WStandardItemModel* model, const View& view);
+  void setModelHeaderTitles(Wt::WStandardItemModel* model);
+  Wt::WSelectionBox* createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent);
+
+  void resetModelData(void);
+  void assignView(void){ }
+  void revokeView(void){ }
 };
 
 #endif // VIEWMGNT_HPP

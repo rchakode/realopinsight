@@ -239,4 +239,29 @@
     </div>
   </message>
 
+  <message id="view-assignment-tpl">
+    <div class="row">
+      <div class="span3">${user-selector}</div>
+      <div class="span2">&nbsp;</div>
+      <div class="span3">&nbsp;</div>
+    </div>
+    <div class="row">
+      <div class="span3">
+        ${assigned-views}
+      </div>
+      <div class="span2">
+        <div> ${button-assign}</div>
+        <p>&nbsp;</p>
+        <div>${button-revoke}</div>
+      </div>
+      <div class="span3">
+        ${non-assigned-views}
+      </div>
+    </div>
+    <div class="row">
+      <div class="span3">&nbsp;</div>
+      <div class="span2">${close-button}</div>
+      <div class="span3">&nbsp;</div>
+    </div>
+  </message>
 </messages>

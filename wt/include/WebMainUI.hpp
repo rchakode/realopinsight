@@ -35,6 +35,8 @@
 #include <Wt/WTabWidget>
 
 typedef Wt::Auth::AuthWidget AuthWidget;
+class ViewAssignmentUI;
+
 class WebMainUI : public QObject, public Wt::WApplication
 {
   Q_OBJECT
@@ -82,6 +84,7 @@ private:
   Wt::WDialog* m_accountPanel;
   Wt::WDialog* m_changePasswordPanel;
   Wt::WDialog* m_infoMsgBox;
+  ViewAssignmentUI* m_viewAssignmentDialog;
 
   void addEvents(void);
   void createMainUI(void);
@@ -110,6 +113,7 @@ private:
   Wt::WComboBox* createViewSelector(void);
   void createInfoMsgBox(void);
   void showMessage(const std::string& msg, std::string status);
+  void createViewAssignmentDialog(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

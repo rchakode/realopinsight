@@ -197,7 +197,6 @@ void DbSession::updateUserList(void)
 {
   m_userList.clear();
   dbo::Transaction transaction(*this);
-  typedef dbo::collection< dbo::ptr<User> > UserCollectionT;
   UserCollectionT users = find<User>();
   for (UserCollectionT::const_iterator it = users.begin(), end = users.end(); it != end; ++it) {
     m_userList.push_back(*(*it));
@@ -209,7 +208,6 @@ void DbSession::updateViewList(void)
 {
   m_viewList.clear();
   dbo::Transaction transaction(*this);
-  typedef dbo::collection< dbo::ptr<View> > ViewCollectionT;
   ViewCollectionT views = find<View>();
   for (ViewCollectionT::const_iterator it = views.begin(), end = views.end(); it != end; ++it) {
     m_viewList.push_back(*(*it));
@@ -243,7 +241,8 @@ int DbSession::addView(const View& view)
   try {
     rereadAll("view");
     dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(view.name);
-    if (! dboViewPtr.get()) {
+    //FIXME:
+    if (! dboViewPtr) {
       m_lastError = "Failed: the view already exist.";
       Wt::log("error")<<" [realopinsight] " << m_lastError;
       retCode = 1;
@@ -261,3 +260,19 @@ int DbSession::addView(const View& view)
   updateViewList();
   return retCode;
 }
+
+void DbSession::updateUserViewList(void)
+{
+  m_userViewList.clear();
+  dbo::Transaction transaction(*this);
+  UserCollectionT users = find<User>();
+  for (UserCollectionT::const_iterator user=users.begin(),
+       end=users.end(); user != end; ++user) {
+    for (ViewCollectionT::const_iterator view=(*user)->views.begin(),
+         end=(*user)->views.end(); view != end; ++view) {
+      m_userViewList.insert((*user)->username+":"+(*view)->name);
+    }
+  }
+  transaction.commit();
+}
+

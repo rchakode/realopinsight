@@ -22,6 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "ViewMgnt.hpp"
 #include "WebMainUI.hpp"
 #include "utilsClient.hpp"
 #include <Wt/WToolBar>
@@ -65,8 +66,13 @@ WebMainUI::WebMainUI(const Wt::WEnvironment& env)
 
   createLoginPage();
   createMainUI();
+
+  createInfoMsgBox();
+  createViewAssignmentDialog();
+
   root()->addWidget(m_authWidget);
   root()->addWidget(m_mainWidget);
+
   addEvents();
 }
 
@@ -93,6 +99,8 @@ WebMainUI::~WebMainUI()
   std::cout << "m_navbar deleted\n";
   delete m_contents;
   std::cout << "m_contents deleted\n";
+  delete m_viewAssignmentDialog;
+  std::cout << "m_viewAssignmentDialog deleted\n";
   delete m_mainWidget;
   std::cout << "m_mainWidget deleted\n";
 }
@@ -149,7 +157,7 @@ void WebMainUI::showUserHome(void)
       ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
 
   refresh();
-  createInfoMsgBox();
+
   resetTimer();
 }
 
@@ -195,7 +203,9 @@ void WebMainUI::setupAdminMenus(void)
   // Menus for view management
   mgntPopupMenu->addSectionHeader("View");
   mgntPopupMenu->addItem("Assign/revoke")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+      ->triggered().connect(std::bind([=](){
+    m_viewAssignmentDialog->show();
+  }));
 
   // Menus for user management
   m_userMgntUI = new UserMngtUI(m_dbSession);
@@ -396,7 +406,7 @@ void WebMainUI::finishFileDialog(int action)
         QDir cdir(m_confdir.c_str());
         if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
           QString errrMsg = tr("Unable to use the "
-                                        "configuration directory (%1)").arg(cdir.absolutePath());
+                               "configuration directory (%1)").arg(cdir.absolutePath());
           Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
           showMessage(errrMsg.toStdString(), "alert alert-warning");
         } else {
@@ -420,11 +430,11 @@ void WebMainUI::finishFileDialog(int action)
               showMessage(m_dbSession->lastError(), "alert alert-warning");
             } else {
               QString msg = tr("View added. "
-                                        " Name: %1\n - "
-                                        " Number of services: %2 -"
-                                        " Path: %3").arg(view.name.c_str(),
-                                                         QString::number(view.service_count),
-                                                         view.path.c_str());
+                               " Name: %1\n - "
+                               " Number of services: %2 -"
+                               " Path: %3").arg(view.name.c_str(),
+                                                QString::number(view.service_count),
+                                                view.path.c_str());
               showMessage(msg.toStdString(), "alert alert-success");
             }
           } else {
@@ -472,7 +482,7 @@ void WebMainUI::openFile(const std::string& path)
     } else {
       delete dashboard;
       showMessage(tr("This platform or a platfom "
-                              "with the same name is already loaded").toStdString(),
+                     "with the same name is already loaded").toStdString(),
                   "alert alert-warning");
     }
   } else {
@@ -606,7 +616,7 @@ void WebMainUI::handleInternalPath(void)
   } else {
     showLoginHome();
     showMessage(tr("Sorry, the request resource "
-                            "is not available or has been removed").toStdString(),
+                   "is not available or has been removed").toStdString(),
                 "alert alert-warning");
   }
 }
@@ -667,3 +677,7 @@ void WebMainUI::showMessage(const std::string& msg, std::string status)
   m_infoMsgBox->show();
 }
 
+void WebMainUI::createViewAssignmentDialog(void)
+{
+  m_viewAssignmentDialog = new ViewAssignmentUI(m_dbSession, m_mainWidget);
+}

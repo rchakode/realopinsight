@@ -405,6 +405,7 @@ UserMngtUI::~UserMngtUI(void)
 void UserMngtUI::updateUserList(void)
 {
   m_userListContainer->clear();
+  m_dbSession->updateUserList();
   for (auto user: m_dbSession->userList()) {
     m_userListContainer->addWidget(createUserPanel(user));
   }

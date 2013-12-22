@@ -53,8 +53,10 @@ public:
   void setLoggedUser(const std::string& uid);
   void updateUserList(void);
   void updateViewList(void);
+  void updateUserViewList(void);
   UserListT& userList(void) {return m_userList;}
   ViewListT& viewList(void) {return m_viewList;}
+  UserViewListT& userViewList(void) {return m_userViewList;}
   int addUser(const User& user);
   int addView(const View& view);
   int updateUser(User user);
@@ -70,6 +72,7 @@ private:
   User m_loggedUser;
   UserListT m_userList;
   ViewListT m_viewList;
+  UserViewListT m_userViewList;
   std::string m_lastError;
 
   std::string hashPassword(const std::string& pass);

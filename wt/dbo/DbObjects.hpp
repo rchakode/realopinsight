@@ -29,6 +29,7 @@
 #include <list>
 #include <Wt/Dbo/Dbo>
 #include <string>
+#include <set>
 
 namespace dbo = Wt::Dbo;
 
@@ -108,7 +109,10 @@ public:
   }
 };
 
+typedef std::set<std::string> UserViewListT;
 typedef std::list<User> UserListT;
 typedef std::list<View> ViewListT;
+typedef dbo::collection< dbo::ptr<User> > UserCollectionT;
+typedef dbo::collection< dbo::ptr<View> > ViewCollectionT;
 
 #endif // USER_HPP
