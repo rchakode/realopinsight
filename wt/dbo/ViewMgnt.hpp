@@ -30,6 +30,8 @@
 #include <Wt/WTemplate>
 #include <Wt/WStandardItemModel>
 #include <Wt/WTableView>
+#include <Wt/WPushButton>
+#include <set>
 
 class View;
 class DbSession;
@@ -43,6 +45,7 @@ public:
   void filter(const std::string& username);
 
 private:
+  typedef std::set<std::string> KeyListT;
   DbSession* m_dbSession;
   Wt::WStandardItemModel* m_userListModel;
   Wt::WStandardItemModel* m_assignedViewModel;
@@ -50,6 +53,8 @@ private:
   Wt::WSelectionBox* m_assignedViewList;
   Wt::WSelectionBox* m_nonAssignedViewList;
   std::string m_username;
+  Wt::WPushButton* m_assignButton;
+  Wt::WPushButton* m_revokeButton;
 
   void addView(Wt::WStandardItemModel* model, const View& view);
   void setModelHeaderTitles(Wt::WStandardItemModel* model);

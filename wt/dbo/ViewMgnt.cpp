@@ -26,7 +26,6 @@
 #include "DbSession.hpp"
 #include <Wt/WSelectionBox>
 #include <QObject>
-#include <Wt/WPushButton>
 #include <Wt/WComboBox>
 #include <Wt/WStandardItem>
 
@@ -66,22 +65,22 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
   }));
   tpl->bindWidget("user-selector", userSelector);
 
-  Wt::WPushButton* assignButton = new Wt::WPushButton(QObject::tr("<<Assign").toStdString(),container);
-  assignButton->setStyleClass("btn-success");
-  assignButton->clicked().connect(this, &ViewAssignmentUI::assignView);
+  m_assignButton = new Wt::WPushButton(QObject::tr("<< Assign").toStdString(), container);
+  m_assignButton->setStyleClass("btn-success");
+  m_assignButton->clicked().connect(this, &ViewAssignmentUI::assignView);
 
-  Wt::WPushButton* revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(),container);
-  revokeButton->setStyleClass("btn-danger");
-  revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeView);
+  m_revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(), container);
+  m_revokeButton->setStyleClass("btn-danger");
+  m_revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeView);
 
-  Wt::WPushButton* closeButton = new Wt::WPushButton(QObject::tr("Close").toStdString(),container);
+  Wt::WPushButton* closeButton = new Wt::WPushButton(QObject::tr("Close").toStdString(), container);
   closeButton->setStyleClass("btn-primary");
   closeButton->clicked().connect(std::bind([=](){
     accept();
   }));
 
-  tpl->bindWidget("button-assign", assignButton);
-  tpl->bindWidget("button-revoke", revokeButton);
+  tpl->bindWidget("button-assign", m_assignButton);
+  tpl->bindWidget("button-revoke", m_revokeButton);
   tpl->bindWidget("close-button", closeButton);
 
   resetModelData();
@@ -100,7 +99,7 @@ void ViewAssignmentUI::filter(const std::string& username)
   if (! username.empty()) {
     m_assignedViewModel->clear();
     m_nonAssignedViewModel->clear();
-    //FIXME segfault m_dbSession->updateUserViewList();
+    m_dbSession->updateUserViewList();
     UserViewListT userViews = m_dbSession->userViewList();
     for (auto view: m_dbSession->viewList()) {
       if (userViews.find(username+":"+view.name) != userViews.end()) {
@@ -110,11 +109,23 @@ void ViewAssignmentUI::filter(const std::string& username)
       }
     }
   }
+
+  if (m_nonAssignedViewModel->rowCount() <=0) {
+    m_assignButton->disable();
+  } else {
+    m_assignButton->enable();
+  }
+
+  if (m_assignedViewModel->rowCount() <=0) {
+    m_revokeButton->disable();
+  } else {
+    m_revokeButton->enable();
+  }
 }
 
 void ViewAssignmentUI::addView(Wt::WStandardItemModel* model, const View& view)
 {
-  int count = m_assignedViewModel->rowCount();
+  int count = model->rowCount();
   model->insertRows(count, 1);
   model->setData(count, 0, view.name);
   model->setData(count, 1, view.service_count);
@@ -153,7 +164,6 @@ void ViewAssignmentUI::resetModelData(void)
     m_userListModel->setData(count, 0, user.username);
     ++count;
   }
-  filter(m_username);
 }
 
 
@@ -164,23 +174,38 @@ std::string ViewAssignmentUI::itemText(Wt::WStandardItemModel* model, int index)
 
 void ViewAssignmentUI::assignView(void)
 {
-  //FIXME: segfault on duplication
+  m_assignButton->disable();
+  m_revokeButton->disable();
+
+  KeyListT vnames;
   for (auto index : m_nonAssignedViewList->selectedIndexes()) {
-    std::string viewName = itemText(m_nonAssignedViewModel, index) ;
-    m_dbSession->assignView(m_username, viewName);
-    removeViewItemInModel(m_nonAssignedViewModel, viewName);
-    addViewItemInModel(m_assignedViewModel, viewName);
+    vnames.insert(itemText(m_nonAssignedViewModel, index));
   }
+
+  for (auto name : vnames) {
+    std::cout << name <<"\n";
+    m_dbSession->assignView(m_username, name);
+  }
+  filter(m_username); //Enables disable button if needed
 }
 
 void ViewAssignmentUI::revokeView(void)
 {
+  m_assignButton->disable();
+  m_revokeButton->disable();
+
+  KeyListT vnames;
   for (auto index : m_assignedViewList->selectedIndexes()) {
-    std::string viewName = itemText(m_assignedViewModel, index);
-    m_dbSession->revokeView(m_username,viewName);
-    removeViewItemInModel(m_assignedViewModel, viewName);
-    addViewItemInModel(m_nonAssignedViewModel, viewName);
+    std::cout << index <<" >>>index\n";
+    vnames.insert(itemText(m_assignedViewModel, index));
   }
+
+  for (auto name : vnames) {
+    std::cout << name <<"\n";
+    m_dbSession->revokeView(m_username, name);
+  }
+
+  filter(m_username); //Enables disable button if needed
 }
 
 void ViewAssignmentUI::removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
