@@ -38,7 +38,8 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
     m_assignedViewModel(new Wt::WStandardItemModel(this)),
     m_nonAssignedViewModel(new Wt::WStandardItemModel(this))
 {
-  addStyleClass("Wt-dialog");
+  setStyleClass("ngrt4n-gradient Wt-dialog");
+  titleBar()->setStyleClass("titlebar");
   Wt::WContainerWidget* container = contents();
   container->setMargin(30, Wt::Left|Wt::Right);
   container->setMargin(10, Wt::Bottom);
