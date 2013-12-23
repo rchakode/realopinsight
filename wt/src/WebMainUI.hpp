@@ -32,12 +32,13 @@
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/WTabWidget>
-#include <Wt/WObject>
+#include <Wt/WContainerWidget>
+#include <Wt/WSignal>
 
 class AuthManager;
 class ViewAssignmentUI;
 
-class WebMainUI : public QObject, public Wt::WObject
+class WebMainUI : public QObject, public Wt::WContainerWidget
 {
   Q_OBJECT
 public:
@@ -51,6 +52,8 @@ public:
   void resetTimer(void);
   void handleInternalPath(void);
   Wt::WContainerWidget* get(void) {return m_mainWidget;}
+
+  Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
@@ -85,6 +88,8 @@ private:
   Wt::WDialog* m_changePasswordPanel;
   Wt::WDialog* m_infoMsgBox;
   ViewAssignmentUI* m_viewAssignmentDialog;
+  Wt::WDialog* m_aboutDialog;
+  Wt::Signal<void> m_terminateSession;
 
   void addEvents(void);
   void createMainUI(void);
@@ -112,6 +117,7 @@ private:
   void createInfoMsgBox(void);
   void showMessage(const std::string& msg, std::string status);
   void createViewAssignmentDialog(void);
+  void createAboutDialog(void);
   void loadUserDashboard(void);
   void setInternalPath(const std::string& path);
 };

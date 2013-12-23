@@ -9,6 +9,7 @@ body, html {
   left: 0;
   top: 0;
   right: 0;
+  z-index: -1;
 }
 
 .Wt-dialogcover {
@@ -27,7 +28,7 @@ body, html {
 
 .Wt-dialog .titlebar {
     color: #FFFFFF;
-    background: #9dc6dd url(title-gradient.png) repeat-x scroll 0 -20px;;
+    background: #9dc6dd url(title-gradient.png) repeat-x scroll 0 -20px;
     cursor: move;
     font: bold 12px Verdana;
     padding: 2px 3px;
@@ -120,15 +121,26 @@ body, html {
   padding: 5px 2px; 
 }
 
-/* Related to login form*/
-.login-container {
- width: 480px;
- margin: 100px auto;
+/* Related to form and dialog*/
+.ngrt4n-default {
+ background: #F8F8FF;
+}
+
+.ngrt4n-transparent {
+ background: transparent;
+}
+
+.ngrt4n-gradient {
  background: -moz-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -webkit-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -ms-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -o-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
  background: -linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+}
+
+.login-container {
+ width: 480px;
+ margin: 100px auto;
 }
 
 .form-actions {
@@ -139,7 +151,7 @@ body, html {
  position: relative;
  left: 0;
  top: 0;
- right: 0;
+ right: 2;
  padding: 0;
  margin: 0;
 }
@@ -153,6 +165,14 @@ body, html {
 
 .info-box {
   padding: 5;
+}
+
+.logout-button {
+position: fixed;
+right: 0px;
+top: 0px;
+float: right;
+z-index: 200;
 }
 
 

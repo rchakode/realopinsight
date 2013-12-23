@@ -93,7 +93,7 @@
   </message>
 
   <message id="Wt.Auth.template.login">
-  <div class="login-container">
+  <div class="ngrt4n-gradient login-container">
    <legend><img src="/images/built-in/logo.png" /></legend>
       <p>${tr:Wt.Auth.login-form-info}</p>
 
@@ -129,6 +129,7 @@
 
   <message id="Wt.Auth.template.logged-in">
     <div class="row">
+       <div class="logout-button">${logout-item}</div>
        ${main-ui}
     </div>
   </message>
@@ -272,6 +273,22 @@
       <div class="span3">&nbsp;</div>
       <div class="span2">${close-button}</div>
       <div class="span3">${delete-view-button}</div>
+    </div>
+  </message>
+
+  <message id="about-tpl">
+    <div>
+     <div>
+       <legend>${software}</legend>
+       <p>A BSM dashboard software for complex IT environements.</p>
+       <p>Version ${version} (codename: ${codename})<br />
+         Release ID: ${release-id} <br/>
+         Copyright (c) 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
+         Visit <a href="${package-url}">${package-url}</a> for more information.
+       </p>
+       <p>Report Bugs: ${bug-report-email}</p>
+     </div>
+     <div style="float: right;">${close-button}</div>
     </div>
   </message>
 </messages>

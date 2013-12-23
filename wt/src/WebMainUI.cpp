@@ -52,16 +52,18 @@ namespace {
 }
 
 WebMainUI::WebMainUI(AuthManager* authManager)
-  : m_settings (new Settings()),
+  : Wt::WContainerWidget(),
+    m_settings (new Settings()),
     m_timer(new Wt::WTimer()),
-    m_mainWidget(new Wt::WContainerWidget()),
+    m_mainWidget(new Wt::WContainerWidget(this)),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(new Wt::WDialog(utils::tr("Select a file"))),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_confdir(Wt::WApplication::instance()->docRoot()+"/config")
+    m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
+    m_terminateSession(this)
 {
-  m_fileUploadDialog->setStyleClass("Wt-dialog");
+  m_fileUploadDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
 
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
@@ -69,7 +71,9 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   createMainUI();
   createInfoMsgBox();
   createViewAssignmentDialog();
-
+  createAccountPanel();
+  createPasswordPanel();
+  createAboutDialog();
   setupUserMenus();
   showUserHome();
 
@@ -209,10 +213,7 @@ void WebMainUI::setupProfileMenus(void)
   curItem->setLinkTarget(Wt::TargetNewWindow);
 
   profilePopupMenu->addItem("About")
-      ->triggered().connect(std::bind([=](){}));
-  profilePopupMenu->addSeparator();
-  profilePopupMenu->addItem("Sign out")
-      ->triggered().connect(std::bind([=]() {m_authManager->logout();}));
+      ->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
 }
 
 void WebMainUI::setupUserMenus(void)
@@ -330,7 +331,7 @@ void WebMainUI::openFileUploadDialog(void)
 {
   checkUserLogin();
   m_fileUploadDialog->setWindowTitle(utils::tr("Import a file"));
-  m_fileUploadDialog->setStyleClass("Wt-dialog");
+  m_fileUploadDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
   container->setMargin(10, Wt::All);
@@ -522,7 +523,7 @@ void WebMainUI::createAccountPanel(void)
   }, std::placeholders::_1));
 
   m_accountPanel = new Wt::WDialog(utils::tr("Account information"));
-  m_accountPanel->setStyleClass("Wt-dialog");
+  m_accountPanel->setStyleClass("ngrt4n-gradient Wt-dialog");
   //FIXME: m_accountPanel->positionAt(m_profileMenu);
   m_accountPanel->contents()->addWidget(form);
 }
@@ -545,7 +546,7 @@ void WebMainUI::createPasswordPanel(void)
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
   m_changePasswordPanel = new Wt::WDialog(utils::tr("Change password"));
-  m_changePasswordPanel->setStyleClass("Wt-dialog");
+  m_changePasswordPanel->setStyleClass("ngrt4n-gradient Wt-dialog");
   m_changePasswordPanel->contents()->addWidget(form);
 }
 
@@ -610,7 +611,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 void WebMainUI::createInfoMsgBox(void)
 {
   m_infoMsgBox = new Wt::WDialog(m_mainWidget);
-  m_infoMsgBox->setStyleClass("Wt-dialog");
+  m_infoMsgBox->setStyleClass("ngrt4n-transparent Wt-dialog");
   m_infoMsgBox->setModal(false);
   m_infoMsgBox->setTitleBarEnabled(false);
   m_infoMsgBox->positionAt(m_profileMenu);
@@ -633,6 +634,27 @@ void WebMainUI::createViewAssignmentDialog(void)
 {
   m_viewAssignmentDialog = new ViewAssignmentUI(m_dbSession, m_mainWidget);
 }
+
+void WebMainUI::createAboutDialog(void)
+{
+  m_aboutDialog = new Wt::WDialog(m_mainWidget);
+  m_aboutDialog->setTitleBarEnabled(false);
+  m_aboutDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), m_aboutDialog->contents());
+  tpl->bindString("software", APP_NAME.toStdString());
+  tpl->bindString("version", PKG_VERSION.toStdString());
+  tpl->bindString("codename", REL_NAME.toStdString());
+  tpl->bindString("release-id", REL_INFO.toStdString());
+  tpl->bindString("release-year", REL_YEAR.toStdString());
+  tpl->bindString("package-url", PKG_URL.toStdString());
+  tpl->bindString("bug-report-email", REPORT_BUG.toStdString());
+
+  Wt::WPushButton* closeButton(new Wt::WPushButton(utils::tr("Close")));
+  closeButton->clicked().connect(std::bind([=](){m_aboutDialog->accept();}));
+  tpl->bindWidget("close-button", closeButton);
+}
+
+
 
 void WebMainUI::loadUserDashboard(void)
 {

@@ -6,6 +6,7 @@
 #include <Wt/WContainerWidget>
 
 class DbSession;
+class WebMainUI;
 
 class AuthManager : public Wt::Auth::AuthWidget
 {
@@ -17,10 +18,11 @@ public:
   bool isLogged(void);
 
 protected:
-  virtual void createLoggedInView(void) {}
+  virtual void createLoggedInView(void) { handleAuthentication();}
 
 private:
   DbSession* m_dbSession;
+  WebMainUI* m_mainUI;
 
   void handleAuthentication(void);
 };

@@ -97,8 +97,8 @@ int DbSession::addUser(const User& user)
 int DbSession::updateUser(User user)
 {
   int retCode = -1;
-  dbo::Transaction transaction(*this);
   try {
+    dbo::Transaction transaction(*this);
     dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(user.username);
     dbo::ptr<User> userPtr = authInfo.modify()->user();
     userPtr.modify()->username = user.username;
@@ -108,11 +108,11 @@ int DbSession::updateUser(User user)
     userPtr.modify()->role = user.role;
     authInfo.modify()->setEmail(user.email);
     retCode = 0;
+    transaction.commit();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to update the user. More details in log.";
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
-  transaction.commit();
   updateUserList();
   return retCode;
 }
@@ -122,8 +122,8 @@ int DbSession::updatePassword(const std::string& uname,
                               const std::string& newpass)
 {
   int retCode = -1;
-  dbo::Transaction transaction(*this);
   try {
+    dbo::Transaction transaction(*this);
     Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
     switch (passAuthService.verifyPassword(dbuser, currentPass)) {
       case Wt::Auth::PasswordValid:
@@ -139,11 +139,11 @@ int DbSession::updatePassword(const std::string& uname,
       default:m_lastError = "Unknown error concerning your current password";
         break;
     }
+    transaction.commit();
   } catch (const dbo::Exception& ex) {
     retCode = -1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
-  transaction.commit();
   updateUserList();
   return retCode;
 }
@@ -151,16 +151,16 @@ int DbSession::updatePassword(const std::string& uname,
 int DbSession::deleteUser(std::string uname)
 {
   int retCode = -1;
-  dbo::Transaction transaction(*this);
   try {
+    dbo::Transaction transaction(*this);
     dbo::ptr<User> usr = find<User>().where("name=?").bind(uname);
     usr.remove();
     retCode = 0;
+    transaction.commit();
   } catch (const dbo::Exception& ex) {
     retCode = 1;
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
-  transaction.commit();
   updateUserList();
   return retCode;
 }
@@ -194,43 +194,60 @@ void DbSession::configureAuth(void)
 
 void DbSession::setLoggedUser(const std::string& uid)
 {
-  dbo::Transaction transaction(*this);
-  dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(uid);
-  m_loggedUser = *(info.modify()->user());
-  transaction.commit();
+  try {
+    dbo::Transaction transaction(*this);
+    dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(uid);
+    m_loggedUser = *(info.modify()->user());
+    transaction.commit();
+  } catch (const dbo::Exception& ex) {
+    Wt::log("error") << "[realopinsight] "<<ex.what();
+  }
 }
 
 void DbSession::updateUserList(void)
 {
-  m_userList.clear();
-  dbo::Transaction transaction(*this);
-  UserCollectionT users = find<User>();
-  for (auto &user : users) {
-    m_userList.push_back(*user);
+  try {
+    m_userList.clear();
+    dbo::Transaction transaction(*this);
+    UserCollectionT users = find<User>();
+    for (auto &user : users) {
+      m_userList.push_back(*user);
+    }
+    transaction.commit();
+  } catch (const dbo::Exception& ex) {
+    Wt::log("error") << "[realopinsight] "<<ex.what();
   }
-  transaction.commit();
 }
 
 void DbSession::updateViewList(void)
 {
-  m_viewList.clear();
-  dbo::Transaction transaction(*this);
-  ViewCollectionT views = find<View>();
-  for (auto& view :views) {
-    m_viewList.push_back(*view);
+  try {
+    m_viewList.clear();
+    dbo::Transaction transaction(*this);
+    ViewCollectionT views = find<View>();
+    for (auto& view :views) {
+      m_viewList.push_back(*view);
+    }
+    transaction.commit();
+  } catch (const dbo::Exception& ex) {
+    Wt::log("error") << "[realopinsight] "<<ex.what();
   }
-  transaction.commit();
 }
 
 void DbSession::updateViewList(const std::string& uname)
 {
-  m_viewList.clear();
-  dbo::Transaction transaction(*this);
-  dbo::ptr<User> userDboPtr = find<User>().where("name=?").bind(uname);
-  for (auto& view : userDboPtr.modify()->views) {
-    m_viewList.push_back(*view);
+  try {
+    m_viewList.clear();
+    dbo::Transaction transaction(*this);
+    dbo::ptr<User> userDboPtr = find<User>().where("name=?").bind(uname);
+    for (auto& view : userDboPtr.modify()->views) {
+      m_viewList.push_back(*view);
+    }
+    transaction.commit();
+
+  } catch (const dbo::Exception& ex) {
+    Wt::log("error") << "[realopinsight] "<<ex.what();
   }
-  transaction.commit();
 }
 
 void DbSession::initDb(void)
@@ -281,17 +298,17 @@ int DbSession::addView(const View& view)
 int DbSession::deleteView(std::string vname)
 {
   int retCode = -1;
-  dbo::Transaction transaction(*this);
   try {
+    dbo::Transaction transaction(*this);
     execute("DELETE FROM user_view WHERE view_name=?;").bind(vname);
     execute("DELETE FROM view WHERE name=?;").bind(vname);
     retCode = 0;
+    transaction.commit();
   } catch (const dbo::Exception& ex) {
     retCode = 1;
     m_lastError = ex.what();
     Wt::log("error")<<"[realopinsight]" << ex.what();
   }
-  transaction.commit();
   updateViewList();
   return retCode;
 }
@@ -315,16 +332,16 @@ void DbSession::updateUserViewList(void)
 int DbSession::assignView(const std::string& uname, const std::string& vname)
 {
   int retCode = -1;
-  dbo::Transaction transaction(*this);
   try {
+    dbo::Transaction transaction(*this);
     dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(uname);
     dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
     retCode = 0;
+    transaction.commit();
   } catch (const dbo::Exception& ex) {
     Wt::log("error") << "[realopinsight] "<<ex.what();
   }
-  transaction.commit();
   return retCode;
 }
 
@@ -332,15 +349,15 @@ int DbSession::assignView(const std::string& uname, const std::string& vname)
 int DbSession::revokeView(const std::string& uname, const std::string& vname)
 {
   int retCode = -1;
-  dbo::Transaction transaction(*this);
   try {
+    dbo::Transaction transaction(*this);
     dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(uname);
     dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.erase(dboViewPtr);
     retCode = 0;
+    transaction.commit();
   } catch (const dbo::Exception& ex) {
     Wt::log("error") << "[realopinsight] "<<ex.what();
   }
-  transaction.commit();
   return retCode;
 }
