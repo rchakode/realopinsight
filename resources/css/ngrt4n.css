@@ -4,7 +4,7 @@ body, html {
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
-  position: fixed !important;
+  position: absolute !important;
   display: block;
   left: 0;
   top: 0;
@@ -13,12 +13,12 @@ body, html {
 }
 
 .Wt-dialogcover {
-    background: #CCCCCC;
-    background: rgb(204, 204, 204); /* For IE, ... */
-    background: rgba(204, 204, 204, 0.5);
-    height: 100%; width: 100%;
-    top: 0px; left: 0px;
-    position: fixed;
+  background: #CCCCCC;
+  background: rgb(204, 204, 204); /* For IE, ... */
+  background: rgba(204, 204, 204, 0.5);
+  height: 100%; width: 100%;
+  top: 0px; left: 0px;
+  position: fixed;
 }
 
 .Wt-dialog {
@@ -27,11 +27,11 @@ body, html {
 }
 
 .Wt-dialog .titlebar {
-    color: #FFFFFF;
-    background: #9dc6dd url(title-gradient.png) repeat-x scroll 0 -20px;
-    cursor: move;
-    font: bold 12px Verdana;
-    padding: 2px 3px;
+  color: #FFFFFF;
+  background: #9dc6dd;
+  cursor: move;
+  font: bold 12px Verdana;
+  padding: 2px 3px;
 }
 
 /* these classes come from from bootstrap */
@@ -88,6 +88,7 @@ body, html {
   left: 0;
   top: 0;
   right: 0; 
+  padding: 0 18px;
 }
 .button {
  margin: none;
@@ -128,6 +129,7 @@ body, html {
 
 .ngrt4n-transparent {
  background: transparent;
+ border: none;
 }
 
 .ngrt4n-gradient {
@@ -157,7 +159,7 @@ body, html {
 }
 
 .footer {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   margin-left: auto;
   margin-right: auto;
@@ -168,11 +170,10 @@ body, html {
 }
 
 .logout-button {
-position: fixed;
-right: 0px;
-top: 0px;
-float: right;
-z-index: 200;
+  position: absolute !important;
+  right: 0px;
+  top: 8px;
+  z-index: 200;
 }
 
 

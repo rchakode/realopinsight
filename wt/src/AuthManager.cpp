@@ -9,6 +9,7 @@
 #include <functional>
 #include <Wt/Auth/AuthModel>
 #include <Wt/WPushButton>
+#include <Wt/WImage>
 
 namespace {
   Wt::Auth::Login loginObject;
@@ -34,10 +35,10 @@ void AuthManager::handleAuthentication(void)
     m_mainUI = new WebMainUI(this);
     bindWidget("main-ui", m_mainUI);
 
-    Wt::WPushButton* logoutButton = new Wt::WPushButton(utils::tr("Sign out"), m_mainUI);
-    logoutButton->clicked().connect(this, &AuthManager::logout);
-    bindWidget("logout-item", logoutButton);
-
+    Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
+    image->setToolTip("Sign out");
+    image->clicked().connect(this, &AuthManager::logout);
+    bindWidget("logout-item", image);
 
     Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
   } else {

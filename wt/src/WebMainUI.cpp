@@ -57,14 +57,12 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_timer(new Wt::WTimer()),
     m_mainWidget(new Wt::WContainerWidget(this)),
     m_dashtabs(new Wt::WTabWidget()),
-    m_fileUploadDialog(new Wt::WDialog(utils::tr("Select a file"))),
+    m_fileUploadDialog(createDialog(utils::tr("Select a file"))),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
     m_terminateSession(this)
 {
-  m_fileUploadDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
-
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
 
@@ -522,10 +520,7 @@ void WebMainUI::createAccountPanel(void)
                       "Update completed.");
   }, std::placeholders::_1));
 
-  m_accountPanel = new Wt::WDialog(utils::tr("Account information"));
-  m_accountPanel->setStyleClass("ngrt4n-gradient Wt-dialog");
-  //FIXME: m_accountPanel->positionAt(m_profileMenu);
-  m_accountPanel->contents()->addWidget(form);
+  m_accountPanel = createDialog(utils::tr("Account information"), form);
 }
 
 void WebMainUI::createPasswordPanel(void)
@@ -544,10 +539,7 @@ void WebMainUI::createPasswordPanel(void)
                       "Change password failed. More details in log.",
                       "Password changed.");
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
-  m_changePasswordPanel = new Wt::WDialog(utils::tr("Change password"));
-  m_changePasswordPanel->setStyleClass("ngrt4n-gradient Wt-dialog");
-  m_changePasswordPanel->contents()->addWidget(form);
+  m_changePasswordPanel = createDialog(utils::tr("Change password"), form);
 }
 
 
@@ -668,4 +660,13 @@ void WebMainUI::loadUserDashboard(void)
 void WebMainUI::setInternalPath(const std::string& path)
 {
   wApp->setInternalPath(path);
+}
+
+Wt::WDialog* WebMainUI::createDialog(const std::string& title, Wt::WWidget* content)
+{
+  Wt::WDialog* dialog = new Wt::WDialog(utils::tr("Account information"));
+  dialog->setStyleClass("ngrt4n-gradient Wt-dialog");
+  dialog->titleBar()->setStyleClass("titlebar");
+  if (content != NULL) dialog->contents()->addWidget(content);
+  return dialog;
 }

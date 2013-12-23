@@ -120,6 +120,7 @@ private:
   void createAboutDialog(void);
   void loadUserDashboard(void);
   void setInternalPath(const std::string& path);
+  Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
 };
 
 #endif // MAINWEBWINDOW_HPP

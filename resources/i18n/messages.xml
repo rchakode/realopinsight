@@ -220,7 +220,7 @@
       </div>
       ${</if:registration-date>}
       </fieldset>
-      <div class="form-actions">
+      <div class="form-actions btn-group">
         <div class="controls">${submit-button} <span>${cancel-button}</span></div>
       </div>
     </div>
@@ -284,7 +284,7 @@
        <p>Version ${version} (codename: ${codename})<br />
          Release ID: ${release-id} <br/>
          Copyright (c) 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
-         Visit <a href="${package-url}">${package-url}</a> for more information.
+         Visit <a href="${package-url}" target="_blank">${package-url}</a> for more information.
        </p>
        <p>Report Bugs: ${bug-report-email}</p>
      </div>
