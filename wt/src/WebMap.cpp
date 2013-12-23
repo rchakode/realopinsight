@@ -22,24 +22,30 @@
 #--------------------------------------------------------------------------#
  */
 
-#include <Wt/WPointF>
-#include <Wt/WRectArea>
 #include "WebMap.hpp"
+#include <iostream>
 #include "MonitorBroker.hpp"
 #include "utilsClient.hpp"
 #include "WebPieChart.hpp"
+#include <Wt/WPointF>
+#include <Wt/WRectArea>
 #include <Wt/WApplication>
 #include <Wt/WEnvironment>
 #include <Wt/WWidget>
 #include <Wt/WScrollBar>
-#include <iostream>
+#include <Wt/WSvgImage>
+#include<fstream>
+#include <boost/filesystem/operations.hpp>
 
-WebPieMap::WebPieMap(CoreDataT* _cdata)
+namespace {
+  IconMapT m_icons = utils::nodeIcons();
+}
+
+WebMap::WebMap(CoreDataT* _cdata)
   : WPaintedWidget(0),
     m_cdata(_cdata),
     m_scaleX(1),
     m_scaleY(1),
-    m_icons(utils::nodeIcons()),
     m_scrollArea(new Wt::WScrollArea()),
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged")
@@ -48,27 +54,25 @@ WebPieMap::WebPieMap(CoreDataT* _cdata)
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
-  m_containerSizeChanged.connect(this, &WebPieMap::handleScrollAreaSizeChanged);
+  m_containerSizeChanged.connect(this, &WebMap::handleScrollAreaSizeChanged);
 }
 
-WebPieMap::~WebPieMap()
+WebMap::~WebMap()
 {
-  m_icons.clear();
-  // m_scrollArea is deleted by the layout manager
 }
 
-void WebPieMap::setPreferredMethod(void)
+void WebMap::setPreferredMethod(void)
 {
   setInline(false);
   WPaintedWidget::setPreferredMethod(InlineSvgVml);
 }
 
-void WebPieMap::setJavaScriptMember(void)
+void WebMap::setJavaScriptMember(void)
 {
   Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS,"");
 }
 
-void WebPieMap::paintEvent(Wt::WPaintDevice* _pdevice)
+void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
   m_painter = new Wt::WPainter(_pdevice);
   m_painter->scale(m_scaleX, m_scaleY);
@@ -76,31 +80,60 @@ void WebPieMap::paintEvent(Wt::WPaintDevice* _pdevice)
 
   // Draw edges
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) { drawEdge(edge.key(), edge.value()); }
+       edge != end; ++edge) { drawEdge(edge.key(), edge.value());}
 
-  /* Draw node related to business services */
-  for(NodeListT::ConstIterator node=m_cdata->bpnodes.begin(), end=m_cdata->bpnodes.end();
-      node != end; ++node) { drawNode(*node); }
+  // Draw nodes
+  for(const auto& node : m_cdata->bpnodes) drawNode(node);
+  for(const auto& node : m_cdata->cnodes) drawNode(node);
 
-  /* Draw node related to alarm services */
-  for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(),end=m_cdata->cnodes.end();
-      node != end; ++node) { drawNode(*node);}
+  m_painter->end();
+  delete m_painter;
+}
+
+std::string WebMap::createThumbnail(void)
+{
+  double thumbWidth = 150;
+  double thumbHeight = 120;
+  m_scaleX = thumbWidth/m_cdata->map_width;
+  m_scaleY = std::min(m_cdata->map_width/m_cdata->map_width, m_cdata->map_height/m_cdata->map_width);
+  thumbHeight = m_cdata->map_height * m_scaleY;
+  Wt::WSvgImage thumbnailSvgImg(thumbWidth, thumbHeight);
+
+  m_painter = new Wt::WPainter(&thumbnailSvgImg);
+  m_painter->scale(m_scaleX, m_scaleY);
+  m_painter->setRenderHint(Wt::WPainter::Antialiasing);
+
+  // Draw edges
+  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
+       edge != end; ++edge) { drawEdge(edge.key(), edge.value());}
+
+  // Draw nodes
+  for(const auto& node : m_cdata->bpnodes) drawNode(node);
+  for(const auto& node : m_cdata->cnodes) drawNode(node);
+
+  m_painter->end();
+  std::string path =boost::filesystem::unique_path("/tmp/roi-thumb-%%%%%%.svg").string();
+  std::ofstream output(path);
+  thumbnailSvgImg.write(output);
+  delete m_painter;
+  return path;
 }
 
 
-void WebPieMap::layoutSizeChanged(int width, int height )
+void WebMap::layoutSizeChanged(int width, int height )
 {
   //TODO
 }
 
-void WebPieMap::drawMap(void)
+void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX,
                              m_cdata->map_height * m_scaleY);
+  createThumbnail();
 }
 
-void WebPieMap::drawNode(const NodeT& _node)
+void WebMap::drawNode(const NodeT& _node)
 {
   Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
   Wt::WPointF posLabel(_node.pos_x, _node.pos_y);
@@ -122,7 +155,7 @@ void WebPieMap::drawNode(const NodeT& _node)
   createLink(_node);
 }
 
-void WebPieMap::drawEdge(const QString& _parentId, const QString& _childId)
+void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
 {
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
@@ -140,7 +173,7 @@ void WebPieMap::drawEdge(const QString& _parentId, const QString& _childId)
   }
 }
 
-void WebPieMap::createLink(const NodeT& _node)
+void WebMap::createLink(const NodeT& _node)
 {
   double x = _node.pos_x * m_scaleX;
   double y = _node.pos_y * m_scaleY;
@@ -152,12 +185,12 @@ void WebPieMap::createLink(const NodeT& _node)
   addArea(area);
 }
 
-void WebPieMap::updateNode(const NodeT&, const QString&)
+void WebMap::updateNode(const NodeT&, const QString&)
 {
   // Empty function just conform with the polymorphism
 }
 
-void WebPieMap::scaleMap(double factor)
+void WebMap::scaleMap(double factor)
 {
   m_scaleX *= factor;
   m_scaleY *= factor;
@@ -165,7 +198,7 @@ void WebPieMap::scaleMap(double factor)
   Wt::WPaintedWidget::resize(factor * width(), factor * height());
 }
 
-void WebPieMap::handleScrollAreaSizeChanged(double w, double h)
+void WebMap::handleScrollAreaSizeChanged(double w, double h)
 {
   if (m_initialLoading) {
     scaleMap(std::min(w/this->width().toPixels(), h/this->height().toPixels()));

@@ -25,7 +25,6 @@
 #ifndef WEBSERVICEMAP_HPP
 #define WEBSERVICEMAP_HPP
 
-#include "Base.hpp"
 #include <Wt/WPaintedWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/WPainter>
@@ -34,17 +33,22 @@
 #include <Wt/WSignal>
 #include <Wt/WScrollArea>
 
-class WebPieMap : public Wt::WPaintedWidget
+struct CoreDataT;
+struct NodeT;
+class QString;
+
+class WebMap : public Wt::WPaintedWidget
 {
 public:
-  WebPieMap(CoreDataT* _cdata);
-  virtual ~WebPieMap();
+  WebMap(CoreDataT* _cdata);
+  virtual ~WebMap();
   void drawMap(void);
 
   Wt::WScrollArea* get(void) const {return m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
-  Wt::JSignal<double, double>& containerSizeChanged(void) { return m_containerSizeChanged; }
+  Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
+  std::string createThumbnail(void);
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
@@ -55,7 +59,6 @@ private:
   double m_scaleX;
   double m_scaleY;
   Wt::WPainter* m_painter;
-  IconMapT m_icons;
   Wt::WScrollArea* m_scrollArea;
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;
