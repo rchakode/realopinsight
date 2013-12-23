@@ -45,14 +45,13 @@ public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
   void showUserHome(void);
-  void showLoginHome(void);
   QString getConfig (void) const {return m_currentDashboard->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
   void handleInternalPath(void);
   Wt::WContainerWidget* get(void) {return m_mainWidget;}
-
+  void handleRefresh(void);
   Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
 
 public Q_SLOTS:
@@ -66,7 +65,7 @@ private:
   };
 
   Settings* m_settings;
-  Wt::WTimer* m_timer;
+  Wt::WTimer m_timer;
   Wt::WContainerWidget* m_mainWidget;
   Wt::WStackedWidget* m_contents;
   Wt::WNavigationBar* m_navbar;
@@ -95,21 +94,20 @@ private:
   void createMainUI(void);
   void setupAdminMenus(void);
   void setupProfileMenus(void);
-  void setupUserMenus(void);
+  void setupMenus(void);
   Wt::WWidget* createToolBar(void);
   Wt::WPushButton* createTooBarButton(const std::string& icon);
-  void handleRefresh(void);
   Wt::WAnchor* createLogoLink(void);
   void openFileUploadDialog(void);
   void selectFileToOpen(void);
-  void openFile(const std::string& path);
+  void loadView(const std::string& path, int& tabIndex);
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createUserHome(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
                                        const std::string& desc,
                                        const std::string& internalPath);
-  void checkUserLogin(void);
+  //void checkUserLogin(void);
   void showUserMngtPage(Wt::WStackedWidget* contents, int destination);
   void createAccountPanel(void);
   void createPasswordPanel(void);

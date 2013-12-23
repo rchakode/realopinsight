@@ -19,10 +19,12 @@ public:
 
 protected:
   virtual void createLoggedInView(void) { handleAuthentication();}
+  virtual void create(void);
 
 private:
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
+  bool m_logged;
 
   void handleAuthentication(void);
 };

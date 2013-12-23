@@ -42,19 +42,20 @@
 #include <Wt/WTemplate>
 #include <Wt/WHBoxLayout>
 
+#define CHECK_LOGIN() if (! m_authManager->isLogged()) {wApp->redirect(LINK_HOME); return;}
+
 namespace {
   const std::string LINK_HOME ="/realopinsight";
   const std::string LINK_LOAD ="/load-platform";
   const std::string LINK_IMPORT ="/import-platform";
   const std::string LINK_LOGIN_PAGE ="/login";
-  const std::string LINK_ADMIN_HOME ="/adm";
-  const std::string LINK_OP_HOME ="/op";
+  const std::string LINK_ADMIN_HOME ="/adm-console";
+  const std::string LINK_OP_HOME ="/op-console";
 }
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
     m_settings (new Settings()),
-    m_timer(new Wt::WTimer()),
     m_mainWidget(new Wt::WContainerWidget(this)),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(utils::tr("Select a file"))),
@@ -63,16 +64,13 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
     m_terminateSession(this)
 {
-  m_mainWidget->setId("maincontainer");
-  m_dashtabs->addStyleClass("wrapper-container");
-
   createMainUI();
+  setupMenus();
   createInfoMsgBox();
   createViewAssignmentDialog();
   createAccountPanel();
   createPasswordPanel();
   createAboutDialog();
-  setupUserMenus();
   showUserHome();
 
   addEvents();
@@ -80,24 +78,17 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
 WebMainUI::~WebMainUI()
 {
+  std::cout << "start destructor\n";
   // Delete all
   //  m_contents(NULL),
   //  m_navbar(NULL),
   //  m_mgntMenu(NULL),
   //  m_profileMenu(NULL),
-  delete m_timer;
-  std::cout << "m_timer deleted\n";
   delete m_fileUploadDialog;
-  std::cout << "m_fileUploadDialog deleted\n";
-  //delete m_dashtabs;
-  std::cout << "m_dashtabs deleted\n";
-  //FIXME: delete if not null => set them null at startup
   delete m_navbar;
-  std::cout << "m_navbar deleted\n";
   delete m_contents;
-  std::cout << "m_contents deleted\n";
   delete m_mainWidget;
-  std::cout << "m_mainWidget deleted\n";
+  std::cout << "finish destruction\n";
 }
 
 
@@ -107,25 +98,38 @@ void WebMainUI::addEvents(void)
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
 
-void WebMainUI::showLoginHome(void)
-{
-  //FIXME: ebMainUI::showLoginHome(void)
-  //  m_mainWidget->hide();
-  //  refresh();
-}
-
 void WebMainUI::showUserHome(void)
 {
-  wApp->setTitle(tr("%1 Operations Console").arg(APP_NAME).toStdString());
-  checkUserLogin();
+  CHECK_LOGIN();
 
-  std::string homeTabTitle = m_dbSession->loggedUser().role == User::AdmRole?
-        utils::tr("Quick Start"): utils::tr("Tactical Overview");
+  std::string homeTabTitle = "Home";
+  std::string internalLink = "/";
+  if (m_dbSession->loggedUser().role == User::AdmRole) {
+    homeTabTitle = utils::tr("Quick Start");
+    internalLink = "quick-start";
+  } else {
+    homeTabTitle =  utils::tr("Tactical Overview");
+    internalLink = "tactical-overview";
+  }
+
+  std::string pageTitle = homeTabTitle;
+  pageTitle.append(" - ")
+      .append(m_dbSession->loggedUser().username)
+      .append(" - ")
+      .append(APP_NAME.toStdString())
+      .append(" - ")
+      .append(utils::tr("Operations Console"));
+  wApp->setTitle(pageTitle);
+
+  // Set data for CSS styling
+  m_mainWidget->setId("maincontainer");
+  m_dashtabs->addStyleClass("wrapper-container");
+
 
   m_dashtabs->addTab(createUserHome(),
                      homeTabTitle,
                      Wt::WTabWidget::LazyLoading)
-      ->triggered().connect(std::bind([=](){setInternalPath("/home");}));
+      ->triggered().connect(std::bind([=](){ setInternalPath(internalLink);}));
 
   if (m_dbSession->loggedUser().role == User::OpRole) {
     loadUserDashboard();
@@ -134,22 +138,13 @@ void WebMainUI::showUserHome(void)
 }
 
 void WebMainUI::createMainUI(void)
-{;
-  Wt::WContainerWidget* container = new Wt::WContainerWidget();
-  m_navbar = new Wt::WNavigationBar(container);
+{
+  m_navbar = new Wt::WNavigationBar(m_mainWidget);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
 
   // Create a container for stacked contents
-  m_contents = new Wt::WStackedWidget(container);
+  m_contents = new Wt::WStackedWidget(m_mainWidget);
   m_contents->setId("stackcontentarea");
-  // Setup the main menu
-  Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
-  m_navbar->addMenu(mainMenu, Wt::AlignLeft);
-  mainMenu->addItem(utils::tr("Home"), m_dashtabs); //Fixme: use home icon
-  container->addWidget(m_contents);
-  setupAdminMenus();
-  setupProfileMenus();
-  m_mainWidget->addWidget(container);
 }
 
 
@@ -214,11 +209,19 @@ void WebMainUI::setupProfileMenus(void)
       ->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
 }
 
-void WebMainUI::setupUserMenus(void)
+void WebMainUI::setupMenus(void)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
   User loggedUser = m_dbSession->loggedUser();
 
+  // Setup the main menu
+  Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
+  m_navbar->addMenu(mainMenu, Wt::AlignLeft);
+  mainMenu->addItem(utils::tr("Home"), m_dashtabs); //Fixme: use home icon
+  setupAdminMenus();
+  setupProfileMenus();
+
+  // Setup profile menu
   m_mainProfileMenuItem->setText(tr("You're %1").arg(loggedUser.username.c_str()).toStdString());
   if(loggedUser.role == User::AdmRole) {
     m_mgntMenu->show();
@@ -234,7 +237,6 @@ void WebMainUI::setupUserMenus(void)
 
 Wt::WWidget* WebMainUI::createToolBar(void)
 {
-  checkUserLogin();
   Wt::WContainerWidget* container(new Wt::WContainerWidget());
   Wt::WHBoxLayout* layout(new Wt::WHBoxLayout(container));
   Wt::WToolBar* toolBar(new Wt::WToolBar());
@@ -263,7 +265,6 @@ Wt::WWidget* WebMainUI::createToolBar(void)
 
 Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 {
-  checkUserLogin();
   Wt::WPushButton* button = new Wt::WPushButton();
   button->setIcon(icon);
   return button;
@@ -271,36 +272,35 @@ Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 
 void WebMainUI::resetTimer(void)
 {
-  checkUserLogin();
-  m_timer->setInterval(1000*m_settings->updateInterval());
-  m_timer->timeout().connect(this, &WebMainUI::handleRefresh);
-  m_timer->start();
+  CHECK_LOGIN();
+  m_timer.setInterval(1000*m_settings->updateInterval());
+  m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
+  m_timer.start();
 }
 
 void WebMainUI::resetTimer(qint32 interval)
 {
-  checkUserLogin();
-  m_timer->stop();
-  m_timer->setInterval(interval);
-  m_timer->start();
+  CHECK_LOGIN();
+  m_timer.stop();
+  m_timer.setInterval(interval);
+  m_timer.start();
 }
 
 void WebMainUI::handleRefresh(void)
 {
-  checkUserLogin();
-  m_timer->stop();
+  CHECK_LOGIN();
+  m_timer.stop();
   m_mainWidget->disable();
   for(auto&dash: m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
   }
   m_mainWidget->enable();
-  m_timer->start();
+  m_timer.start();
 }
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
-  checkUserLogin();
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
                                         new Wt::WImage("/images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
@@ -310,7 +310,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectFileToOpen(void)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
   m_fileUploadDialog->setWindowTitle(utils::tr("Select a file"));
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
@@ -327,7 +327,7 @@ void WebMainUI::selectFileToOpen(void)
 
 void WebMainUI::openFileUploadDialog(void)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
   m_fileUploadDialog->setWindowTitle(utils::tr("Import a file"));
   m_fileUploadDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
@@ -364,7 +364,7 @@ void WebMainUI::openFileUploadDialog(void)
 
 void WebMainUI::finishFileDialog(int action)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
   switch(action) {
     case IMPORT:
       if (! m_uploader->empty()) {
@@ -414,7 +414,8 @@ void WebMainUI::finishFileDialog(int action)
       m_fileUploadDialog->accept();
       m_fileUploadDialog->contents()->clear();
       if (! m_selectFile.empty()) {
-        openFile(m_selectFile);
+        int tabIndex;
+        loadView(m_selectFile, tabIndex);
         m_selectFile.clear();
       } else {
         showMessage(utils::tr("No file selected"), "alert alert-warning");
@@ -425,9 +426,12 @@ void WebMainUI::finishFileDialog(int action)
   }
 }
 
-void WebMainUI::openFile(const std::string& path)
+void WebMainUI::loadView(const std::string& path, int& tabIndex)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
+
+  tabIndex = -1;
+
   WebDashboard* dashboard = new WebDashboard(m_dbSession->loggedUser().role, path.c_str());
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
@@ -441,9 +445,9 @@ void WebMainUI::openFile(const std::string& path)
         m_currentDashboard = dashboard;
         setInternalPath("/"+platform);
       }));
+      tabIndex = m_dashtabs->count() - 1;
       tab->setCloseable(true);
-      m_dashtabs->setCurrentWidget(dashboard->get());
-      handleRefresh();
+      m_dashtabs->setTabCloseable(tabIndex, true);
     } else {
       delete dashboard;
       showMessage(utils::tr("This platform or a platfom "
@@ -456,7 +460,7 @@ void WebMainUI::openFile(const std::string& path)
 
 void WebMainUI::scaleMap(double factor)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
   if (m_currentDashboard) {
     m_currentDashboard->map()->scaleMap(factor);
   }
@@ -464,7 +468,6 @@ void WebMainUI::scaleMap(double factor)
 
 Wt::WWidget* WebMainUI::createUserHome(void)
 {
-  checkUserLogin();
   Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
   tpl->bindWidget("andhor-load-file",
                   createAnchorForHomeLink(utils::tr("Load"),
@@ -474,6 +477,10 @@ Wt::WWidget* WebMainUI::createUserHome(void)
                   createAnchorForHomeLink(utils::tr("Import"),
                                           utils::tr("A platform description"),
                                           LINK_IMPORT));
+  tpl->bindString("software", APP_NAME.toStdString());
+  tpl->bindString("version", PKG_VERSION.toStdString());
+  tpl->bindString("codename", REL_NAME.toStdString());
+  tpl->bindString("release-year", REL_YEAR.toStdString());
   return tpl;
 }
 
@@ -490,12 +497,12 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
 }
 
 
-void WebMainUI::checkUserLogin(void)
-{
-  if (! m_authManager->isLogged()) {
-    wApp->redirect(LINK_HOME);
-  }
-}
+//void WebMainUI::checkUserLogin(void)
+//{
+//  if (! m_authManager->isLogged()) {
+//    wApp->redirect(LINK_HOME);
+//  }
+//}
 
 
 void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
@@ -545,7 +552,7 @@ void WebMainUI::createPasswordPanel(void)
 
 void WebMainUI::handleInternalPath(void)
 {
-  checkUserLogin();
+  CHECK_LOGIN();
   std::string path = Wt::WApplication::instance()->internalPath();
   if (path == LINK_LOAD) {
     selectFileToOpen();
@@ -556,12 +563,12 @@ void WebMainUI::handleInternalPath(void)
   } else if (path == LINK_ADMIN_HOME) {
     showUserHome();
   } else if (path == LINK_LOGIN_PAGE) {
-    showLoginHome();
+    wApp->redirect(LINK_LOGIN_PAGE);
   } else {
-    showLoginHome();
     showMessage(utils::tr("Sorry, the request resource "
                           "is not available or has been removed"),
                 "alert alert-warning");
+    //FIXME: url not found wApp->redirect(LINK_LOGIN_PAGE);
   }
 }
 
@@ -652,7 +659,8 @@ void WebMainUI::loadUserDashboard(void)
 {
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   for (const auto& view: m_dbSession->viewList()) {
-    openFile(view.path);
+    int tabIndex;
+    loadView(view.path, tabIndex);
   }
 }
 

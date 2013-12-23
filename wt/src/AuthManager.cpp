@@ -18,7 +18,8 @@ namespace {
 AuthManager::AuthManager(DbSession* dbSession)
   : Wt::Auth::AuthWidget(loginObject),
     m_dbSession(dbSession),
-    m_mainUI(NULL)
+    m_mainUI(NULL),
+    m_logged(false)
 {
   Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(DbSession::auth(), m_dbSession->users());
   authModel->addPasswordAuth(&m_dbSession->passwordAuthentificator());
@@ -30,20 +31,33 @@ AuthManager::AuthManager(DbSession* dbSession)
 void AuthManager::handleAuthentication(void)
 {
   if (loginObject.loggedIn()) {
-    m_dbSession->setLoggedUser(loginObject.user().id());
-    setTemplateText(tr("Wt.Auth.template.logged-in"));
-    m_mainUI = new WebMainUI(this);
-    bindWidget("main-ui", m_mainUI);
+    if (! m_logged) {
+      m_dbSession->setLoggedUser(loginObject.user().id());
+      Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
 
-    Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
-    image->setToolTip("Sign out");
-    image->clicked().connect(this, &AuthManager::logout);
-    bindWidget("logout-item", image);
+      setTemplateText(tr("Wt.Auth.template.logged-in"));
+      m_mainUI = new WebMainUI(this);
+      bindWidget("main-ui", m_mainUI);
 
-    Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
+      Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
+      image->setToolTip("Sign out");
+      image->clicked().connect(this, &AuthManager::logout);
+      bindWidget("logout-item", image);
+
+      m_logged = true;
+      m_mainUI->handleRefresh();
+    }
   } else {
-
+    m_logged = false;
   }
+}
+
+void AuthManager::create(void)
+{
+  Wt::Auth::AuthWidget::create();
+  bindString("software", APP_NAME.toStdString());
+  bindString("version", PKG_VERSION.toStdString());
+  bindString("release-year", REL_YEAR.toStdString());
 }
 
 void AuthManager::logout(void)

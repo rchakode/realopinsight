@@ -1,6 +1,8 @@
 body, html {
   overflow: hidden;
-  background: #F8F8FF; 
+  background: #F8F8FF;
+  margin:0;
+  padding:0;
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
@@ -159,8 +161,9 @@ body, html {
 }
 
 .footer {
-  margin-left: 25%;
-  margin-right: 25%;
+  width: 80%;
+  margin: 0 10%;
+  text-align: center;
 }
 
 .info-box {

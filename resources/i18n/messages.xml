@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <messages>
   <message id="copyright-info">
-   &nbsp;&copy; 2010 - 2013 NGRT4N Project -
-   <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+  <div class="footer">
+    ${software} ${version}. &copy; 2010 - ${release-year} NGRT4N Project <br/>
+    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+  </div>
   </message>
 
   <message id="template.home">
@@ -72,8 +74,9 @@
      </div> <!-- Row --->
      <div class="row">
        <div class="footer">
-        Copyright &copy; 2010 - 2013 NGRT4N Project -
-        <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project
+          <br/>
+          <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
        </div>
      </div>
     </div> <!-- content-container -->
@@ -283,7 +286,7 @@
        <p>A BSM dashboard software for complex IT environements.</p>
        <p>Version ${version} (codename: ${codename})<br />
          Release ID: ${release-id} <br/>
-         Copyright (c) 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
+         Copyright &copy; 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
          Visit <a href="${package-url}" target="_blank">${package-url}</a> for more information.
        </p>
        <p>Report Bugs: ${bug-report-email}</p>
