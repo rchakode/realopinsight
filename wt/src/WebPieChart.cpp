@@ -31,6 +31,47 @@
 #include <Wt/WPainter>
 #include <Wt/WPen>
 #include <Wt/WScrollArea>
+#include <Wt/Chart/WChartPalette>
+
+class WebCharPalette : public Wt::Chart::WChartPalette
+{
+public:
+  WebCharPalette(Wt::WStandardItemModel* model):
+    m_model(model)
+  {
+
+  }
+
+  virtual Wt::WBrush brush (int index) const
+  {
+    return Wt::WBrush(WebPieChart::colorFromSeverity(index));
+  }
+
+  virtual Wt::WPen borderPen (int index) const
+  {
+    return Wt::WPen(Wt::WColor(255, 255, 255, 0));
+  }
+
+  Wt::WPen strokePen (int) const
+  {
+    // Check value first
+    return Wt::WPen(Wt::WColor(255, 255, 255, 0));
+  }
+
+  Wt::WColor fontColor (int index) const
+  {
+    // Check value first
+    return Wt::WColor(255, 255, 255, 0);
+  }
+
+  virtual Wt::WColor color (int index) const
+  {
+    return Wt::WColor(255, 255, 255, 0);
+  }
+
+private:
+  Wt::WStandardItemModel* m_model;
+};
 
 WebPieChart::WebPieChart(void)
   : Wt::Chart::WPieChart(),
@@ -63,21 +104,16 @@ WebPieChart::WebPieChart(void)
   setDisplayLabels(Wt::Chart::Inside|Wt::Chart::TextPercentage); // Configure location and type of labels.
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
+
+  //setPlotAreaPadding(0, Wt::All);
+  setPalette(new WebCharPalette(m_model));
 }
 
 WebPieChart::~WebPieChart()
 {
-  delete m_model;
   // m_scrollArea is deleted by the layout manager
+  delete m_model;
 }
-
-//FIXME: do custom painting to avoid black line, 0%legend
-//void WebPieChart::paintEvent(Wt::WPaintDevice* _pdevice)
-//{
-//  painter = new Wt::WPainter(_pdevice);
-//  //painter->setPen(Wt::WPen(Wt::WColor(0,0,0,0)));
-//  Wt::Chart::WPieChart::update();
-//}
 
 Wt::WColor WebPieChart::colorFromSeverity(const int& _sev)
 {
@@ -91,5 +127,5 @@ void WebPieChart::setSeverityData(int _sev, int _count)
   m_model->setData(_sev, 0, label);
   m_model->setData(_sev, 1, label, Wt::ToolTipRole);
   m_model->setData(_sev, 1, _count);
-  setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
+  //setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
 }

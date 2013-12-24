@@ -31,6 +31,7 @@
 #include <Wt/WPaintDevice>
 #include <Wt/WContainerWidget>
 
+class WebPieChart;
 class WebPieChart : public Wt::Chart::WPieChart
 {
 public:
@@ -39,9 +40,6 @@ public:
   void setSeverityData(int _sev, int count);
   Wt::WScrollArea* get(void) const  {return m_scrollArea;}
   static Wt::WColor colorFromSeverity(const int& _sev);
-
-//protected:
-//  void paintEvent(Wt::WPaintDevice* _pdevice);
 
 private:
   Wt::WStandardItemModel* m_model;
