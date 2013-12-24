@@ -83,13 +83,13 @@
   </message>
 
   <message id="operator-home.tpl">
-  <div class="content-container">
+  <div class="operator-home">
     <div class="row">
      <!-- Getting Started Pane -->
-      <div class="span7">
+      <div class="span10">
 
-        <div class="span7 page-header">
-         <h1><small>Platform Status Overview</small></h1>
+        <div class="span10 page-header">
+         <legend>Overview of service health</legend>
          <div>
            ${contents}
          </div>
@@ -98,6 +98,9 @@
 
       <!-- Quick Links Pane -->
       <div class="span2">
+      <div class="span2 page-header">
+        <legend>Quick info</legend>
+      </div>
         &nbsp; TODO
       </div>
      </div> <!-- Row --->

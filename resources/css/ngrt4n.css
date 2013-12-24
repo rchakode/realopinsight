@@ -113,12 +113,18 @@ body, html {
   background-color: #C0C0C0;
 }
 
-/* Related to admin home page */
+/* Related to user home page */
 .content-container{
   position: relative;
   float: none;
   margin: 0 auto;
   width: 770px;
+}
+.operator-home {
+  position: relative;
+  float: none;
+  margin: 0 15px;
+  width: 100%;
 }
 .thumbnail .caption{
   padding: 5px 2px; 
