@@ -48,7 +48,8 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_scaleY(1),
     m_scrollArea(new Wt::WScrollArea()),
     m_initialLoading(true),
-    m_containerSizeChanged(this, "containerSizeChanged")
+    m_containerSizeChanged(this, "containerSizeChanged"),
+    m_thumbnail("")
 {
   m_scrollArea->setWidget(this);
   setPreferredMethod();
@@ -90,13 +91,13 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
   delete m_painter;
 }
 
-std::string WebMap::createThumbnail(void)
+void WebMap::createThumbnail(void)
 {
-  double thumbWidth = 150;
+  double thumbWidth = 150; //change later
   double thumbHeight = 120;
-  m_scaleX = thumbWidth/m_cdata->map_width;
-  m_scaleY = std::min(m_cdata->map_width/m_cdata->map_width, m_cdata->map_height/m_cdata->map_width);
-  thumbHeight = m_cdata->map_height * m_scaleY;
+  m_scaleY = thumbHeight/m_cdata->map_height;
+  m_scaleX = (double)XSCAL_FACTOR/YSCAL_FACTOR * m_scaleY;
+  thumbWidth = m_scaleX*m_cdata->map_width;
   Wt::WSvgImage thumbnailSvgImg(thumbWidth, thumbHeight);
 
   m_painter = new Wt::WPainter(&thumbnailSvgImg);
@@ -112,11 +113,12 @@ std::string WebMap::createThumbnail(void)
   for(const auto& node : m_cdata->cnodes) drawNode(node);
 
   m_painter->end();
-  std::string path =boost::filesystem::unique_path("/tmp/roi-thumb-%%%%%%.svg").string();
-  std::ofstream output(path);
+  if (m_thumbnail.empty()) {
+    m_thumbnail=boost::filesystem::unique_path(wApp->docRoot().append("/tmp/roi-thumb-%%%%%%.svg")).string();
+  }
+  std::ofstream output(m_thumbnail);
   thumbnailSvgImg.write(output);
   delete m_painter;
-  return path;
 }
 
 

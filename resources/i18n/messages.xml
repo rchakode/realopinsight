@@ -82,6 +82,44 @@
     </div> <!-- content-container -->
   </message>
 
+  <message id="operator-home.tpl">
+  <div class="content-container">
+    <div class="row">
+     <!-- Getting Started Pane -->
+      <div class="span7">
+
+        <div class="span7 page-header">
+         <h1><small>Summary of monitored plaforms</small></h1>
+         <div>
+           ${contents}
+         </div>
+        </div>
+      </div>
+
+      <!-- Quick Links Pane -->
+      <div class="span2">
+        &nbsp; TODO
+      </div>
+     </div> <!-- Row --->
+     <div class="row">
+       <div class="footer">
+          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project
+          <br/>
+          <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+       </div>
+     </div>
+    </div> <!-- content-container -->
+  </message>
+
+  <message id="thumbnail.tpl">
+     <div class="span2">
+       <div class="panel panel-default">
+       <div class="${platorm-status-css-class}">${platform-name}</div>
+        <div class="ngrt4n-thumbnail">${thumb-image}</div>
+       </div>
+    </div>
+  </message>
+
   <message id="Wt.Auth.field">
     <![CDATA[
     ${<if:{1}>}

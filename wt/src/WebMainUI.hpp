@@ -89,6 +89,7 @@ private:
   ViewAssignmentUI* m_viewAssignmentDialog;
   Wt::WDialog* m_aboutDialog;
   Wt::Signal<void> m_terminateSession;
+  Wt::WTemplate* m_userHomeTpl;
 
   void addEvents(void);
   void createMainUI(void);
@@ -100,25 +101,24 @@ private:
   Wt::WAnchor* createLogoLink(void);
   void openFileUploadDialog(void);
   void selectFileToOpen(void);
-  void loadView(const std::string& path, int& tabIndex);
+  void loadUserDashboard(void);
+  void loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex);
+  Wt::WTemplate* createThumbnail(WebDashboard* dashboard, int index);
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createUserHome(void);
-  Wt::WAnchor* createAnchorForHomeLink(const std::string& title,
-                                       const std::string& desc,
-                                       const std::string& internalPath);
-  //void checkUserLogin(void);
+  Wt::WAnchor* createAnchorForHomeLink(const std::string& title,const std::string& desc,const std::string& internalPath);
   void showUserMngtPage(Wt::WStackedWidget* contents, int destination);
   void createAccountPanel(void);
   void createPasswordPanel(void);
+  void createViewAssignmentDialog(void);
+  void createAboutDialog(void);
+  Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);
   void createInfoMsgBox(void);
   void showMessage(const std::string& msg, std::string status);
-  void createViewAssignmentDialog(void);
-  void createAboutDialog(void);
-  void loadUserDashboard(void);
   void setInternalPath(const std::string& path);
-  Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
+  bool createDirectory(std::string path);
 };
 
 #endif // MAINWEBWINDOW_HPP

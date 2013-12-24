@@ -34,6 +34,8 @@ namespace utils {
                    Wt::WText* infoBox);
   std::string tr(const std::string& msg);
 
+  std::string computeSeverityCssClass(int severity);
+
 } //Namespace
 
 #endif // WEBUTILS_HPP

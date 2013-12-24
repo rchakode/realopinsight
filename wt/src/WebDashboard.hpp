@@ -46,7 +46,8 @@ public:
   virtual ~WebDashboard();
   Wt::WWidget* get(void) const {return m_widget;}
   void updateMap(void);
-  WebPieMap* map(void) const {return m_map;}
+  WebMap* map(void) const {return m_map;}
+  Wt::WImage* thumbImage(void);
 
 protected:
   virtual void buildMap(void);
@@ -59,7 +60,7 @@ protected:
 private:
   Wt::WContainerWidget* m_widget;
   WebTree* m_tree;
-  WebPieMap* m_map;
+  WebMap* m_map;
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
   void setupUI(void);

@@ -92,21 +92,21 @@ body, html {
   right: 0; 
   padding: 0 18px;
 }
-.button {
- margin: none;
- padding: none;
-}
+
 .severity-normal {
+  margin: 2px; 
   background-color: #00FF00; 
 }
-
 .severity-minor {
+  margin: 2px; 
   background-color: #FFFF00;
 }
 .severity-major {
+  margin: 2px; 
   background-color: #FFA500;
 }
 .severity-critical {
+  padding: 0 5px; 
   background: #FF0000;
 }
 .severity-unknown {
@@ -126,20 +126,28 @@ body, html {
 
 /* Related to form and dialog*/
 .ngrt4n-default {
- background: #F8F8FF;
+  background: #F8F8FF;
 }
 
 .ngrt4n-transparent {
- background: transparent;
- border: none;
+  background: transparent;
+  border: none;
 }
 
 .ngrt4n-gradient {
- background: -moz-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
- background: -webkit-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
- background: -ms-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
- background: -o-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
- background: -linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+  background: -moz-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
+#9DC6DD);
+  background: -webkit-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
+#9DC6DD);
+  background: -ms-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
+#9DC6DD);
+  background: -o-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
+#9DC6DD);
+  background: -linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+}
+
+.ngrt4n-thumbnail {
+  height: 120px;
 }
 
 .login-container {

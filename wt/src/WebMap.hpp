@@ -48,7 +48,9 @@ public:
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
   Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
-  std::string createThumbnail(void);
+  void createThumbnail(void);
+  std::string thumbnail(void) {return m_thumbnail;}
+
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
@@ -62,6 +64,7 @@ private:
   Wt::WScrollArea* m_scrollArea;
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;
+  std::string m_thumbnail;
 
   void drawNode(const NodeT& _node);
   void drawEdge(const QString& _parentId, const QString& _childId);

@@ -23,6 +23,7 @@
  */
 
 #include "WebUtils.hpp"
+#include "MonitorBroker.hpp"
 #include <Wt/WTemplate>
 #include <QObject>
 
@@ -54,3 +55,26 @@ std::string utils::tr(const std::string& msg)
   return QObject::tr(msg.c_str()).toStdString();
 }
 
+std::string utils::computeSeverityCssClass(int severity)
+{
+  std::string cssClass = "";
+  switch(severity) {
+    case MonitorBroker::Normal:
+      cssClass.append("severity-normal");
+      break;
+    case MonitorBroker::Minor:
+      cssClass.append("severity-minor");
+      break;
+    case MonitorBroker::Major:
+      cssClass.append("severity-major");
+      break;
+    case MonitorBroker::Critical:
+      cssClass.append("severity-critical");
+      break;
+    case MonitorBroker::Unknown:
+    default:
+      cssClass.append("severity-unknown");
+      break;
+  }
+  return cssClass;
+}

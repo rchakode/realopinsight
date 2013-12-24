@@ -21,7 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
+#include "WebUtils.hpp"
 #include "WebMsgConsole.hpp"
 #include "utilsClient.hpp"
 #include <Wt/WDateTime>
@@ -184,23 +184,5 @@ int WebMsgConsole::findServiceRow(const std::string& _id)
 void WebMsgConsole::setSeverityItem(Wt::WStandardItem* item, int severity)
 {
   item->setText(utils::severity2Str(severity).toStdString());
-  switch(severity) {
-    case MonitorBroker::Normal:
-      item->setStyleClass("severity-normal");
-      break;
-    case MonitorBroker::Minor:
-      item->setStyleClass("severity-minor");
-      break;
-    case MonitorBroker::Major:
-      item->setStyleClass("severity-major");
-      break;
-    case MonitorBroker::Critical:
-      item->setStyleClass("severity-critical");
-      break;
-    case MonitorBroker::Unknown:
-    default:
-      item->setStyleClass("severity-unknown");
-      break;
-  }
+  item->setStyleClass(utils::computeSeverityCssClass(severity));
 }
-

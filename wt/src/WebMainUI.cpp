@@ -64,6 +64,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
     m_terminateSession(this)
 {
+  createDirectory(wApp->docRoot().append("/tmp"));
   createMainUI();
   setupMenus();
   createInfoMsgBox();
@@ -106,10 +107,10 @@ void WebMainUI::showUserHome(void)
   std::string internalLink = "/";
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     homeTabTitle = utils::tr("Quick Start");
-    internalLink = "quick-start";
+    internalLink = "/quick-start";
   } else {
     homeTabTitle =  utils::tr("Tactical Overview");
-    internalLink = "tactical-overview";
+    internalLink = "/tactical-overview";
   }
 
   std::string pageTitle = homeTabTitle;
@@ -368,21 +369,15 @@ void WebMainUI::finishFileDialog(int action)
   switch(action) {
     case IMPORT:
       if (! m_uploader->empty()) {
-        QDir cdir(m_confdir.c_str());
-        if (! cdir.exists() && ! cdir.mkdir(cdir.absolutePath())) {
-          QString errrMsg = tr("Unable to use the "
-                               "configuration directory (%1)").arg(cdir.absolutePath());
-          Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
-          showMessage(errrMsg.toStdString(), "alert alert-warning");
-        } else {
+        if (createDirectory(m_confdir)){
           Wt::log("notice")<<"[realopinsight]"<< " Parsing the input file";
           QString fileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
           Parser parser(fileName ,&cdata);
           connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
           if (parser.process(false)) {
-            std::string tmpPath = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(cdir.absolutePath(), tmpPath.c_str());
+            std::string fileBasename = m_uploader->clientFileName().toUTF8();
+            QString dest = tr("%1/%2").arg(m_confdir.c_str(), fileBasename.c_str());
             QFile file(fileName);
             file.copy(dest);
             file.remove();
@@ -415,7 +410,8 @@ void WebMainUI::finishFileDialog(int action)
       m_fileUploadDialog->contents()->clear();
       if (! m_selectFile.empty()) {
         int tabIndex;
-        loadView(m_selectFile, tabIndex);
+        WebDashboard* dashbord;
+        loadView(m_selectFile, dashbord, tabIndex);
         m_selectFile.clear();
       } else {
         showMessage(utils::tr("No file selected"), "alert alert-warning");
@@ -426,13 +422,13 @@ void WebMainUI::finishFileDialog(int action)
   }
 }
 
-void WebMainUI::loadView(const std::string& path, int& tabIndex)
+void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex)
 {
   CHECK_LOGIN();
 
   tabIndex = -1;
 
-  WebDashboard* dashboard = new WebDashboard(m_dbSession->loggedUser().role, path.c_str());
+  dashboard = new WebDashboard(m_dbSession->loggedUser().role, path.c_str());
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
   if (! dashboard->errorState()) {
@@ -441,13 +437,11 @@ void WebMainUI::loadView(const std::string& path, int& tabIndex)
     result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     if (result.second) {
       Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->get(), platform, Wt::WTabWidget::LazyLoading);
-      tab->triggered().connect(std::bind([=](){
+      tab->triggered().connect(std::bind([=]() {
         m_currentDashboard = dashboard;
         setInternalPath("/"+platform);
       }));
       tabIndex = m_dashtabs->count() - 1;
-      tab->setCloseable(true);
-      m_dashtabs->setTabCloseable(tabIndex, true);
     } else {
       delete dashboard;
       showMessage(utils::tr("This platform or a platfom "
@@ -468,20 +462,37 @@ void WebMainUI::scaleMap(double factor)
 
 Wt::WWidget* WebMainUI::createUserHome(void)
 {
-  Wt::WTemplate *tpl = new Wt::WTemplate(Wt::WString::tr("template.home"));
-  tpl->bindWidget("andhor-load-file",
-                  createAnchorForHomeLink(utils::tr("Load"),
-                                          utils::tr("An existing platform"),
-                                          LINK_LOAD));
-  tpl->bindWidget("andhor-import-file",
-                  createAnchorForHomeLink(utils::tr("Import"),
-                                          utils::tr("A platform description"),
-                                          LINK_IMPORT));
-  tpl->bindString("software", APP_NAME.toStdString());
-  tpl->bindString("version", PKG_VERSION.toStdString());
-  tpl->bindString("codename", REL_NAME.toStdString());
-  tpl->bindString("release-year", REL_YEAR.toStdString());
-  return tpl;
+  m_userHomeTpl = new Wt::WTemplate();
+  if (m_dbSession->loggedUser().role == User::AdmRole) {
+    m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
+    m_userHomeTpl->bindWidget("andhor-load-file",
+                              createAnchorForHomeLink(utils::tr("Load"),
+                                                      utils::tr("An existing platform"),
+                                                      LINK_LOAD));
+    m_userHomeTpl->bindWidget("andhor-import-file",
+                              createAnchorForHomeLink(utils::tr("Import"),
+                                                      utils::tr("A platform description"),
+                                                      LINK_IMPORT));
+    m_userHomeTpl->bindString("software", APP_NAME.toStdString());
+    m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
+    m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
+    m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
+  } else {
+    m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
+    m_userHomeTpl->bindWidget("andhor-load-file",
+                              createAnchorForHomeLink(utils::tr("Load"),
+                                                      utils::tr("An existing platform"),
+                                                      LINK_LOAD));
+    m_userHomeTpl->bindWidget("andhor-import-file",
+                              createAnchorForHomeLink(utils::tr("Import"),
+                                                      utils::tr("A platform description"),
+                                                      LINK_IMPORT));
+    m_userHomeTpl->bindString("software", APP_NAME.toStdString());
+    m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
+    m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
+    m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
+  }
+  return m_userHomeTpl;
 }
 
 
@@ -495,14 +506,6 @@ Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
   anchor->addStyleClass("list-group-item active");
   return anchor;
 }
-
-
-//void WebMainUI::checkUserLogin(void)
-//{
-//  if (! m_authManager->isLogged()) {
-//    wApp->redirect(LINK_HOME);
-//  }
-//}
 
 
 void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
@@ -654,16 +657,32 @@ void WebMainUI::createAboutDialog(void)
 }
 
 
-
 void WebMainUI::loadUserDashboard(void)
 {
+  Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
+  Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   for (const auto& view: m_dbSession->viewList()) {
     int tabIndex;
-    loadView(view.path, tabIndex);
+    WebDashboard* dasboard;
+    loadView(view.path, dasboard, tabIndex);
+    layout->addWidget(createThumbnail(dasboard, tab));
   }
+  m_userHomeTpl->bindWidget("contents", thumbs);
 }
 
+
+Wt::WTemplate* WebMainUI::createThumbnail(WebDashboard* dashboard, int index)
+{
+  Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("thumbnail.tpl"));
+  NodeT rootNode = *(dashboard->rootService());
+  tpl->bindString("platorm-status-css-class", utils::computeSeverityCssClass(rootNode.severity));
+  tpl->bindString("platform-name", rootNode.name.toStdString());
+  tpl->bindWidget("thumb-image", dashboard->thumbImage());
+  tpl->setToolTip(utils::severity2Str(rootNode.severity).toStdString());
+  tpl->clicked().connect(std::bind([=](){m_dashtabs->setCurrentIndex(index);}));
+  return tpl;
+}
 
 void WebMainUI::setInternalPath(const std::string& path)
 {
@@ -677,4 +696,19 @@ Wt::WDialog* WebMainUI::createDialog(const std::string& title, Wt::WWidget* cont
   dialog->titleBar()->setStyleClass("titlebar");
   if (content != NULL) dialog->contents()->addWidget(content);
   return dialog;
+}
+
+bool WebMainUI::createDirectory(std::string path)
+{
+  bool ret = false;
+  QDir dir(path.c_str());
+  if (! dir.exists() && ! dir.mkdir(dir.absolutePath())) {
+    return false;
+    QString errrMsg = tr("Unable to create the directory (%1)").arg(dir.absolutePath());
+    Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
+    showMessage(errrMsg.toStdString(), "alert alert-warning");
+  }  else {
+    ret = true;
+  }
+  return ret;
 }

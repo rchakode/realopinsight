@@ -74,7 +74,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new WebTree(m_cdata)),
-    m_map(new WebPieMap(m_cdata)),
+    m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole()),
     m_chart(new WebPieChart())
 {
@@ -167,4 +167,10 @@ void WebDashboard::addJsEventScript(void)
 {
   m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
   m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
+}
+
+Wt::WImage* WebDashboard::thumbImage(void)
+{
+  return new Wt::WImage(m_map->thumbnail(), m_widget);
+
 }
