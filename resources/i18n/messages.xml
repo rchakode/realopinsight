@@ -8,7 +8,7 @@
   </message>
 
   <message id="template.home">
-  <div class="content-container">
+  <div class="ngrt4n-admin-page">
     <div class="row">
      <!-- Getting Started Pane -->
       <div class="span7">
@@ -83,12 +83,12 @@
   </message>
 
   <message id="operator-home.tpl">
-  <div class="operator-home">
+  <div class="ngrt4n-operator-page">
     <div class="row">
      <!-- Getting Started Pane -->
-      <div class="span10">
+      <div class="span9">
 
-        <div class="span10 page-header">
+        <div class="span9 page-header">
          <legend>Overview of service health</legend>
          <div>
            ${contents}
@@ -101,7 +101,7 @@
       <div class="span2 page-header">
         <legend>Quick info</legend>
       </div>
-        &nbsp; TODO
+        TODO
       </div>
      </div> <!-- Row --->
      <div class="row">
@@ -281,7 +281,7 @@
   </message>
   
   <message id="user-mgnt-tpl">
-    <div class="span8 content-container">
+    <div class="span8 ngrt4n-admin-page">
       <div>${menu}</div>
       <div>${contents}</div>
     </div>

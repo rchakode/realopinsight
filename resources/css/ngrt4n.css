@@ -6,7 +6,7 @@ body, html {
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
-  position: absolute !important;
+  position: fixed !important;
   display: block;
   left: 0;
   top: 0;
@@ -89,8 +89,8 @@ body, html {
   display: block;
   left: 0;
   top: 0;
-  right: 0; 
-  padding: 0 18px;
+  right: 0;
+  padding: 0 0 0 20px;
 }
 
 .severity-normal {
@@ -114,17 +114,18 @@ body, html {
 }
 
 /* Related to user home page */
-.content-container{
+.ngrt4n-admin-page{
   position: relative;
   float: none;
   margin: 0 auto;
   width: 770px;
 }
-.operator-home {
+
+.ngrt4n-operator-page{
   position: relative;
   float: none;
-  margin: 0 15px;
-  width: 100%;
+  margin: 0 auto;
+  width: 95%;
 }
 .thumbnail .caption{
   padding: 5px 2px; 
@@ -185,7 +186,7 @@ body, html {
 }
 
 .logout-button {
-  position: absolute !important;
+  position: fixed !important;
   right: 0px;
   top: 8px;
   z-index: 200;
