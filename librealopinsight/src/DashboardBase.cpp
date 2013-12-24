@@ -96,7 +96,6 @@ void DashboardBase::load(const QString& _file)
       buildTree();
       buildMap();
       initSettings();
-      setRootService();
     } else {
       m_errorState = true;
       m_lastError = parser.dotFile();
@@ -934,16 +933,6 @@ void DashboardBase::resetInterval()
   m_interval = 1000 * m_settings->updateInterval();
   timerIntervalChanged(m_interval);
 }
-
-void DashboardBase::setRootService(void)
-{
-  m_root = m_cdata->bpnodes.find(utils::ROOT_ID);
-  if (m_root == m_cdata->bpnodes.end()) {
-    Q_EMIT errorOccurred(tr("The configuration is not valid, there is no root service !"));
-    exit(1);
-  }
-}
-
 
 void DashboardBase::addEvents(void)
 {

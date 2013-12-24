@@ -92,46 +92,6 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
   delete m_painter;
 }
 
-void WebMap::createThumbnail(void)
-{
-  double thumbWidth = 150; //change later
-  double thumbHeight = 120;
-  double factor = (double)XSCAL_FACTOR/YSCAL_FACTOR;
-  double thumbScaleY = thumbHeight/m_cdata->map_height;
-  double thumbScaleX = factor * thumbHeight * thumbScaleY/m_cdata->map_height;
-  thumbWidth = thumbScaleX*m_cdata->map_width;
-
-  Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight);
-
-  m_painter = new Wt::WPainter(&thumbnailImg);
-  m_painter->scale(thumbScaleX, thumbScaleY);
-  m_painter->setRenderHint(Wt::WPainter::Antialiasing);
-
-  // Draw edges
-  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) { drawEdge(edge.key(), edge.value());}
-
-  // Draw nodes
-  for(const auto& node : m_cdata->bpnodes) drawNode(node);
-  for(const auto& node : m_cdata->cnodes) drawNode(node);
-
-  // Draw the platform name in real scale
-  m_painter->scale(1, 1);
-  NodeT rootNode = m_cdata->bpnodes[utils::ROOT_ID];
-  m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(rootNode.severity)));
-  m_painter->drawText(Wt::WRectF(1, thumbHeight/2, thumbWidth, thumbHeight/2 + 20),
-                      Wt::AlignCenter,
-                      Wt::TextSingleLine,
-                      Wt::WString(rootNode.name.toStdString()));
-
-  m_painter->end();
-  if (m_thumbnail.empty()) {
-    m_thumbnail=boost::filesystem::unique_path(wApp->docRoot().append("/tmp/roi-thumb-%%%%%%.svg")).string();
-  }
-  std::ofstream output(m_thumbnail);
-  thumbnailImg.write(output);
-  delete m_painter;
-}
 
 
 void WebMap::layoutSizeChanged(int width, int height )
@@ -147,20 +107,27 @@ void WebMap::drawMap(void)
   createThumbnail();
 }
 
-void WebMap::drawNode(const NodeT& _node)
+
+void WebMap::drawNode(const NodeT& _node, bool drawIcon)
 {
   Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
   Wt::WPointF posLabel(_node.pos_x, _node.pos_y);
   Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15);
-  // Set painting color
+
+  // Set pen, then draw image, nav-icon and text. The order is important !
+
   m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
-  // Draw icon
-  m_painter->drawImage(posIcon, Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
-  // Draw anchor icon
-  if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
+
+  if (drawIcon) {
+    m_painter->drawImage(posIcon, Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
+  } else {
+    //TODO
+  }
+
+  if( _node.type != NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
     m_painter->drawImage(posExpIcon,Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[utils::MINUS]),19,18));
   }
-  // Draw text
+
   m_painter->drawText(posLabel.x(), posLabel.y(),
                       Wt::WLength::Auto.toPixels(),
                       Wt::WLength::Auto.toPixels(),
@@ -218,4 +185,64 @@ void WebMap::handleScrollAreaSizeChanged(double w, double h)
     scaleMap(std::min(w/this->width().toPixels(), h/this->height().toPixels()));
     m_initialLoading = false;
   }
+}
+
+void WebMap::createThumbnail(void)
+{
+  double thumbWidth = 150; //change later
+  double thumbHeight = 120;
+  double factor = (double)XSCAL_FACTOR/YSCAL_FACTOR;
+  double thumbScaleY = thumbHeight/m_cdata->map_height;
+  double thumbScaleX = factor * thumbHeight * thumbScaleY/m_cdata->map_height;
+  thumbWidth = thumbScaleX*m_cdata->map_width + 20;
+
+  Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight);
+
+  m_painter = new Wt::WPainter(&thumbnailImg);
+  m_painter->scale(thumbScaleX, thumbScaleY);
+  m_painter->setRenderHint(Wt::WPainter::Antialiasing);
+
+  // Draw edges
+  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
+       edge != end; ++edge) { drawEdge(edge.key(), edge.value());}
+
+  // Draw nodes
+  bool drawIcon = false;
+  for(const auto& node : m_cdata->bpnodes) drawNode(node, drawIcon);
+  for(const auto& node : m_cdata->cnodes) drawNode(node, drawIcon);
+
+  drawThumbnailBanner(thumbWidth, thumbHeight, thumbScaleX, thumbScaleY);
+
+  m_painter->end();
+
+  // Now save the image
+  if (m_thumbnail.empty()) {
+    m_thumbnail=boost::filesystem::unique_path(wApp->docRoot().append("/tmp/roi-thumb-%%%%%%.svg")).string();
+  }
+  std::ofstream output(m_thumbnail);
+  thumbnailImg.write(output);
+
+  delete m_painter;
+}
+
+
+void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight, double scaleX, double scaleY)
+{
+  Wt::WFont font;
+  std::string text = m_cdata->root->name.toStdString();
+  double fontSize = thumbWidth / (scaleX * text.length());
+  font.setSize(fontSize);
+  double textLength = thumbWidth/scaleX;// fontSize;
+  Wt::WColor brushColor = WebPieChart::colorFromSeverity(m_cdata->root->severity);
+  Wt::WRectF bannerArea(0, thumbHeight/(2 * scaleY) - fontSize/2,
+                        textLength, fontSize);
+  m_painter->setFont(font);
+  m_painter->setPen(Wt::WPen(brushColor));
+  m_painter->setBrush(Wt::WBrush(brushColor));
+  m_painter->drawRect(bannerArea);
+  m_painter->setPen(Wt::WPen(Wt::black));
+  m_painter->drawText(bannerArea,
+                      Wt::AlignCenter|Wt::AlignMiddle,
+                      Wt::TextSingleLine,
+                      text);
 }

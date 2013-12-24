@@ -54,7 +54,7 @@ public:
   void setTimerId(qint32 id) {m_timerId = id;}
   qint32 timerId(void) const {return m_timerId;}
   qint32 timerInterval(void) const {return m_interval;}
-  NodeListIteratorT rootService(void) const {return m_root;}
+  NodeT& rootNode(void) const {return *(m_cdata->root);}
   qint32 userRole(void) const { return m_userRole;}
   bool errorState() const {return m_errorState;}
   QString lastError(void) const {return m_lastError;}
@@ -116,7 +116,6 @@ protected:
   virtual void updateMsgConsole(const NodeT& _node) = 0;
   virtual void finalizeUpdate(const SourceT& src);
   virtual void updateChart(void) = 0;
-  void setRootService(void);
 
 private:
   void resetInterval(void);

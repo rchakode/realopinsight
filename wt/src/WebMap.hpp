@@ -66,12 +66,13 @@ private:
   Wt::JSignal<double, double> m_containerSizeChanged;
   std::string m_thumbnail;
 
-  void drawNode(const NodeT& _node);
+  void drawNode(const NodeT& _node, bool drawIcon = true);
   void drawEdge(const QString& _parentId, const QString& _childId);
   void createLink(const NodeT& _node);
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
   void handleScrollAreaSizeChanged(double w, double h);
+  void drawThumbnailBanner(double thumbWidth, double thumbHeight, double scaleX, double scaleY);
 };
 
 #endif /* WEBSERVICEMAP_HPP */

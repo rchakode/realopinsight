@@ -111,12 +111,9 @@
     </div> <!-- content-container -->
   </message>
 
-  <message id="thumbnail.tpl">
+  <message id="dashboard-thumbnail.tpl">
      <div class="span2">
-       <div class="panel panel-default">
-       <div class="${platorm-status-css-class}">${platform-name}</div>
         <div class="ngrt4n-thumbnail">${thumb-image}</div>
-       </div>
     </div>
   </message>
 

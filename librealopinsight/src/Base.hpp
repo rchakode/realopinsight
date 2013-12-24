@@ -259,6 +259,7 @@ typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
   qint8 monitor;
+  NodeListIteratorT root;
   NodeListT bpnodes;
   NodeListT cnodes;
   CheckStatusCountT check_status_count;

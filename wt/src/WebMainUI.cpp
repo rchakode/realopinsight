@@ -432,7 +432,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
   if (! dashboard->errorState()) {
-    std::string platform = dashboard->rootService()->name.toStdString();
+    std::string platform = dashboard->rootNode().name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
     result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
     if (result.second) {
@@ -676,8 +676,8 @@ void WebMainUI::loadUserDashboard(void)
 
 Wt::WTemplate* WebMainUI::createThumbnail(WebDashboard* dashboard, int index)
 {
-  Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("thumbnail.tpl"));
-  NodeT rootNode = *(dashboard->rootService());
+  Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
+  NodeT& rootNode = dashboard->rootNode();
   tpl->bindString("platorm-status-css-class", utils::computeSeverityCssClass(rootNode.severity));
   tpl->bindString("platform-name", rootNode.name.toStdString());
   tpl->bindWidget("thumb-image", dashboard->thumbImage());
