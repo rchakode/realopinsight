@@ -26,6 +26,7 @@
 #include "MonitorBroker.hpp"
 #include <Wt/WTemplate>
 #include <QObject>
+#include <QString>
 
 
 void utils::showMessage(int exitCode,
@@ -77,4 +78,9 @@ std::string utils::computeSeverityCssClass(int severity)
       break;
   }
   return cssClass;
+}
+
+std::string utils::getPathFromQtResource(const QString& qtPath, const std::string& docRoot)
+{
+  return docRoot+qtPath.mid(1, -1).toStdString();
 }

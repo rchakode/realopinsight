@@ -67,9 +67,6 @@ namespace utils
   inline QString realCheckId(const QString& srcid, const QString& chkid)
   { return QString("%1:%2").arg(srcid, chkid);}
 
-  inline std::string getResourcePath(const QString& qtPath)
-  { return qtPath.mid(1, -1).toStdString(); }
-
   QString severity2Str(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);

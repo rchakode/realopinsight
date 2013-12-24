@@ -27,15 +27,14 @@
 
 #include <Wt/WText>
 
+class QString;
+
 namespace utils {
-  void showMessage(int exitCode,
-                   const std::string& errorMsg,
-                   const std::string& successMsg,
-                   Wt::WText* infoBox);
+  void showMessage(int exitCode, const std::string& errorMsg,
+                   const std::string& successMsg, Wt::WText* infoBox);
   std::string tr(const std::string& msg);
-
   std::string computeSeverityCssClass(int severity);
-
+  std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
 } //Namespace
 
 #endif // WEBUTILS_HPP

@@ -64,7 +64,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
     m_terminateSession(this)
 {
-  createDirectory(wApp->docRoot().append("/tmp"));
+  createDirectory(wApp->docRoot().append("/tmp"), true); //true means clean the directory
   createMainUI();
   setupMenus();
   createInfoMsgBox();
@@ -292,7 +292,7 @@ void WebMainUI::handleRefresh(void)
   CHECK_LOGIN();
   m_timer.stop();
   m_mainWidget->disable();
-  for(auto&dash: m_dashboards) {
+  for(auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
   }
@@ -369,7 +369,7 @@ void WebMainUI::finishFileDialog(int action)
   switch(action) {
     case IMPORT:
       if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir)){
+        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
           Wt::log("notice")<<"[realopinsight]"<< " Parsing the input file";
           QString fileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
@@ -444,6 +444,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
       tabIndex = m_dashtabs->count() - 1;
     } else {
       delete dashboard;
+      dashboard = NULL;
       showMessage(utils::tr("This platform or a platfom "
                             "with the same name is already loaded"),"alert alert-warning");
     }
@@ -666,7 +667,8 @@ void WebMainUI::loadUserDashboard(void)
     int tabIndex;
     WebDashboard* dasboard;
     loadView(view.path, dasboard, tabIndex);
-    layout->addWidget(createThumbnail(dasboard, tab));
+    if (dasboard)
+      layout->addWidget(createThumbnail(dasboard, tabIndex));
   }
   m_userHomeTpl->bindWidget("contents", thumbs);
 }
@@ -698,7 +700,7 @@ Wt::WDialog* WebMainUI::createDialog(const std::string& title, Wt::WWidget* cont
   return dialog;
 }
 
-bool WebMainUI::createDirectory(std::string path)
+bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
 {
   bool ret = false;
   QDir dir(path.c_str());
@@ -709,6 +711,7 @@ bool WebMainUI::createDirectory(std::string path)
     showMessage(errrMsg.toStdString(), "alert alert-warning");
   }  else {
     ret = true;
+    if (cleanContent) dir.remove("*");
   }
   return ret;
 }

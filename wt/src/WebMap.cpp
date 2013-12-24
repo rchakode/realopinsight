@@ -22,6 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "WebUtils.hpp"
 #include "WebMap.hpp"
 #include <iostream>
 #include "MonitorBroker.hpp"
@@ -95,13 +96,15 @@ void WebMap::createThumbnail(void)
 {
   double thumbWidth = 150; //change later
   double thumbHeight = 120;
-  m_scaleY = thumbHeight/m_cdata->map_height;
-  m_scaleX = (double)XSCAL_FACTOR/YSCAL_FACTOR * m_scaleY;
-  thumbWidth = m_scaleX*m_cdata->map_width;
-  Wt::WSvgImage thumbnailSvgImg(thumbWidth, thumbHeight);
+  double factor = (double)XSCAL_FACTOR/YSCAL_FACTOR;
+  double thumbScaleY = thumbHeight/m_cdata->map_height;
+  double thumbScaleX = factor * thumbHeight * thumbScaleY/m_cdata->map_height;
+  thumbWidth = thumbScaleX*m_cdata->map_width;
 
-  m_painter = new Wt::WPainter(&thumbnailSvgImg);
-  m_painter->scale(m_scaleX, m_scaleY);
+  Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight);
+
+  m_painter = new Wt::WPainter(&thumbnailImg);
+  m_painter->scale(thumbScaleX, thumbScaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Draw edges
@@ -112,12 +115,21 @@ void WebMap::createThumbnail(void)
   for(const auto& node : m_cdata->bpnodes) drawNode(node);
   for(const auto& node : m_cdata->cnodes) drawNode(node);
 
+  // Draw the platform name in real scale
+  m_painter->scale(1, 1);
+  NodeT rootNode = m_cdata->bpnodes[utils::ROOT_ID];
+  m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(rootNode.severity)));
+  m_painter->drawText(Wt::WRectF(1, thumbHeight/2, thumbWidth, thumbHeight/2 + 20),
+                      Wt::AlignCenter,
+                      Wt::TextSingleLine,
+                      Wt::WString(rootNode.name.toStdString()));
+
   m_painter->end();
   if (m_thumbnail.empty()) {
     m_thumbnail=boost::filesystem::unique_path(wApp->docRoot().append("/tmp/roi-thumb-%%%%%%.svg")).string();
   }
   std::ofstream output(m_thumbnail);
-  thumbnailSvgImg.write(output);
+  thumbnailImg.write(output);
   delete m_painter;
 }
 
@@ -143,10 +155,10 @@ void WebMap::drawNode(const NodeT& _node)
   // Set painting color
   m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
   // Draw icon
-  m_painter->drawImage(posIcon, Wt::WPainter::Image(utils::getResourcePath(m_icons[_node.icon]),40,40));
+  m_painter->drawImage(posIcon, Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
   // Draw anchor icon
   if( _node.type == NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
-    m_painter->drawImage(posExpIcon,Wt::WPainter::Image(utils::getResourcePath(m_icons[utils::MINUS]),19,18));
+    m_painter->drawImage(posExpIcon,Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[utils::MINUS]),19,18));
   }
   // Draw text
   m_painter->drawText(posLabel.x(), posLabel.y(),

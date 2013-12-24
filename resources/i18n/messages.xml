@@ -89,7 +89,7 @@
       <div class="span7">
 
         <div class="span7 page-header">
-         <h1><small>Summary of monitored plaforms</small></h1>
+         <h1><small>Platform Status Overview</small></h1>
          <div>
            ${contents}
          </div>

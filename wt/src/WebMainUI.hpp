@@ -118,7 +118,7 @@ private:
   void createInfoMsgBox(void);
   void showMessage(const std::string& msg, std::string status);
   void setInternalPath(const std::string& path);
-  bool createDirectory(std::string path);
+  bool createDirectory(const std::string& path, bool cleanContent);
 };
 
 #endif // MAINWEBWINDOW_HPP
