@@ -45,7 +45,8 @@ void AuthManager::handleAuthentication(void)
       bindWidget("logout-item", image);
 
       m_logged = true;
-      m_mainUI->handleRefresh();
+     // sleep(4);
+     //m_mainUI->handleRefresh();
     }
   } else {
     m_logged = false;

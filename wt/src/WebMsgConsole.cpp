@@ -71,7 +71,6 @@ WebMsgConsole::WebMsgConsole()
   hideColumn(ID_COLUMN);
 
   setModel();
-  //resize(Wt::WLength::Auto, Wt::WLength(300, Wt::WLength::Pixel));
 }
 
 WebMsgConsole::~WebMsgConsole()

@@ -45,17 +45,23 @@
 #define MAP_SCROLL_AREA_DIV m_map->get()->id()
 #define CHART_SCROLL_AREA_DIV m_chart->get()->id()
 #define MSG_CONSOLE_DIV m_msgConsole->id()
-#define MAP_AREA_HEIGHT_RATIO "0.45"
+#define MAP_AREA_HEIGHT_RATIO "0.4"
 
+/**
+  This fonction take as parameter the height of the navigation window
+  Important : the size of stacked container corresponds to the size of the windows
+  minus the size of the navbar (40)
+  */
 #define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
   computeWindowHeight \
-  "var treeHeight=wh*0.6 - 25;" \
-  "var chartAreaHeight=wh - treeHeight - 25;" \
-  "var mapAreaHeight=wh*"+std::string(MAP_AREA_HEIGHT_RATIO)+" - 25;" \
-  "var msgConsoleHeight=wh - mapAreaHeight - 25;" \
+  "var contentHeight = wh - 40;" \
+  "$('#stackcontentarea').height(contentHeight);" \
+  "var treeHeight=contentHeight*0.6 - 25;" \
+  "var chartAreaHeight=contentHeight - treeHeight - 25;" \
+  "var mapAreaHeight=contentHeight*"+std::string(MAP_AREA_HEIGHT_RATIO)+" - 25;" \
+  "var msgConsoleHeight=contentHeight - mapAreaHeight - 25;" \
   "$('#wrapper').height(wh);" \
   "$('#maincontainer').height(wh);" \
-  "$('#stackcontentarea').height(wh);" \
   "$('#"+ROOT_DIV+"').height(wh);" \
   "$('#"+TREEVIEW_DIV+"').height(treeHeight);" \
   "$('#"+MAP_SCROLL_AREA_DIV+"').height(mapAreaHeight);" \
@@ -172,6 +178,6 @@ void WebDashboard::addJsEventScript(void)
 
 Wt::WImage* WebDashboard::thumbImage(void)
 {
-  return new Wt::WImage(m_map->thumbnail(), m_widget);
+  return new Wt::WImage(m_map->thumbnailPath(), m_widget);
 
 }

@@ -48,8 +48,9 @@ public:
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
   Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
-  void createThumbnail(void);
-  std::string thumbnail(void) {return m_thumbnail;}
+  Wt::Signal<void>& loaded(void) {return m_loaded;}
+  void updateThumbnail(void);
+  std::string thumbnailPath(void) {return m_thumbnail;}
 
 
 protected:
@@ -64,6 +65,7 @@ private:
   Wt::WScrollArea* m_scrollArea;
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;
+  Wt::Signal<void> m_loaded;
   std::string m_thumbnail;
 
   void drawNode(const NodeT& _node, bool drawIcon = true);
@@ -71,7 +73,7 @@ private:
   void createLink(const NodeT& _node);
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
-  void handleScrollAreaSizeChanged(double w, double h);
+  void handleContainedSizeChanged(double w, double h);
   void drawThumbnailBanner(double thumbWidth, double thumbHeight, double scaleX, double scaleY);
 };
 

@@ -133,9 +133,8 @@ void WebMainUI::showUserHome(void)
       ->triggered().connect(std::bind([=](){ setInternalPath(internalLink);}));
 
   if (m_dbSession->loggedUser().role == User::OpRole) {
-    loadUserDashboard();
+    initOperatorDashboard();
   }
-  resetTimer();
 }
 
 void WebMainUI::createMainUI(void)
@@ -658,17 +657,20 @@ void WebMainUI::createAboutDialog(void)
 }
 
 
-void WebMainUI::loadUserDashboard(void)
+void WebMainUI::initOperatorDashboard(void)
 {
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
+  m_assignedDashboardCount = m_dbSession->viewList().size();
   for (const auto& view: m_dbSession->viewList()) {
     int tabIndex;
-    WebDashboard* dasboard;
-    loadView(view.path, dasboard, tabIndex);
-    if (dasboard)
-      layout->addWidget(createThumbnail(dasboard, tabIndex));
+    WebDashboard* dashboard;
+    loadView(view.path, dashboard, tabIndex);
+    if (dashboard) {
+      layout->addWidget(createThumbnail(dashboard, tabIndex));
+      dashboard->map()->loaded().connect(this, &WebMainUI::startDashbaordUpdate);
+    }
   }
   m_userHomeTpl->bindWidget("contents", thumbs);
 }
@@ -714,4 +716,14 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
     if (cleanContent) dir.remove("*");
   }
   return ret;
+}
+
+
+void WebMainUI::startDashbaordUpdate(void)
+{
+  static int current = 0;
+  if (m_assignedDashboardCount > 0 && ++current == m_assignedDashboardCount) {
+    handleRefresh();
+    resetTimer();
+  }
 }

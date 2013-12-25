@@ -183,7 +183,7 @@ Wt::Auth::PasswordService& DbSession::passwordAuthentificator(void)
 
 void DbSession::configureAuth(void)
 {
-  basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
+  //basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
   basicAuthService.setEmailVerificationEnabled(true);
   Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
   verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));

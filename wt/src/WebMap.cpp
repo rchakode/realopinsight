@@ -50,13 +50,14 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_scrollArea(new Wt::WScrollArea()),
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged"),
+    m_loaded(this),
     m_thumbnail("")
 {
   m_scrollArea->setWidget(this);
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
-  m_containerSizeChanged.connect(this, &WebMap::handleScrollAreaSizeChanged);
+  m_containerSizeChanged.connect(this, &WebMap::handleContainedSizeChanged);
 }
 
 WebMap::~WebMap()
@@ -90,6 +91,10 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 
   m_painter->end();
   delete m_painter;
+
+  if(m_initialLoading) {
+    m_loaded.emit();
+  }
 }
 
 
@@ -104,7 +109,7 @@ void WebMap::drawMap(void)
   Wt::WPaintedWidget::update(); //this call paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX,
                              m_cdata->map_height * m_scaleY);
-  createThumbnail();
+  updateThumbnail();
 }
 
 
@@ -179,7 +184,7 @@ void WebMap::scaleMap(double factor)
   Wt::WPaintedWidget::resize(factor * width(), factor * height());
 }
 
-void WebMap::handleScrollAreaSizeChanged(double w, double h)
+void WebMap::handleContainedSizeChanged(double w, double h)
 {
   if (m_initialLoading) {
     scaleMap(std::min(w/this->width().toPixels(), h/this->height().toPixels()));
@@ -187,7 +192,7 @@ void WebMap::handleScrollAreaSizeChanged(double w, double h)
   }
 }
 
-void WebMap::createThumbnail(void)
+void WebMap::updateThumbnail(void)
 {
   double thumbWidth = 150; //change later
   double thumbHeight = 120;
@@ -225,7 +230,6 @@ void WebMap::createThumbnail(void)
   delete m_painter;
 }
 
-
 void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight, double scaleX, double scaleY)
 {
   Wt::WFont font;
@@ -234,15 +238,11 @@ void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight, double s
   font.setSize(fontSize);
   double textLength = thumbWidth/scaleX;// fontSize;
   Wt::WColor brushColor = WebPieChart::colorFromSeverity(m_cdata->root->severity);
-  Wt::WRectF bannerArea(0, thumbHeight/(2 * scaleY) - fontSize/2,
-                        textLength, fontSize);
+  Wt::WRectF bannerArea(0, thumbHeight/(2 * scaleY)-fontSize/2, textLength, fontSize);
   m_painter->setFont(font);
   m_painter->setPen(Wt::WPen(brushColor));
   m_painter->setBrush(Wt::WBrush(brushColor));
   m_painter->drawRect(bannerArea);
   m_painter->setPen(Wt::WPen(Wt::black));
-  m_painter->drawText(bannerArea,
-                      Wt::AlignCenter|Wt::AlignMiddle,
-                      Wt::TextSingleLine,
-                      text);
+  m_painter->drawText(bannerArea,Wt::AlignCenter|Wt::AlignMiddle,Wt::TextSingleLine,text);
 }

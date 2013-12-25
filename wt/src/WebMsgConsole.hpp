@@ -62,8 +62,6 @@ public:
   Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck);
   Wt::WStandardItem* createDateTimeItem(time_t _time);
 
-  //signals:
-  //  void sizeChanged(int, int);
 
 protected:
   void layoutSizeChanged (int width, int height);

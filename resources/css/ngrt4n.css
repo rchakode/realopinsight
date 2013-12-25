@@ -1,8 +1,7 @@
 body, html {
   overflow: hidden;
   background: #F8F8FF;
-  margin:0;
-  padding:0;
+  margin: 0;
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
@@ -12,6 +11,7 @@ body, html {
   top: 0;
   right: 0;
   z-index: -1;
+  padding-bottom: 50px;
 }
 
 .Wt-dialogcover {
@@ -90,7 +90,7 @@ body, html {
   left: 0;
   top: 0;
   right: 0;
-  padding: 0 0 0 20px;
+  padding: 0 0 5px 20px;
 }
 
 .severity-normal {

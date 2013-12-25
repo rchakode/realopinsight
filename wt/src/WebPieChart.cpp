@@ -105,7 +105,7 @@ WebPieChart::WebPieChart(void)
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
 
-  //setPlotAreaPadding(0, Wt::All);
+  setPlotAreaPadding(0, Wt::All);
   setPalette(new WebCharPalette(m_model));
 }
 

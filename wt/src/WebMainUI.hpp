@@ -90,6 +90,7 @@ private:
   Wt::WDialog* m_aboutDialog;
   Wt::Signal<void> m_terminateSession;
   Wt::WTemplate* m_userHomeTpl;
+  int m_assignedDashboardCount;
 
   void addEvents(void);
   void createMainUI(void);
@@ -101,7 +102,7 @@ private:
   Wt::WAnchor* createLogoLink(void);
   void openFileUploadDialog(void);
   void selectFileToOpen(void);
-  void loadUserDashboard(void);
+  void initOperatorDashboard(void);
   void loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex);
   Wt::WTemplate* createThumbnail(WebDashboard* dashboard, int index);
   void finishFileDialog(int action);
@@ -119,6 +120,7 @@ private:
   void showMessage(const std::string& msg, std::string status);
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);
+  void startDashbaordUpdate(void);
 };
 
 #endif // MAINWEBWINDOW_HPP
