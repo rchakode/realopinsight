@@ -42,7 +42,7 @@ public:
   QSize sizeHint() const {return pixmap.size();}
 protected:
   void paintEvent( QPaintEvent*) {
-    QPainter p( this );
+    QPainter p(this);
     p.drawPixmap(0, 0, pixmap );
   }
 };

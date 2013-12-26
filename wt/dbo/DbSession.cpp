@@ -244,10 +244,10 @@ void DbSession::updateViewList(const std::string& uname)
       m_viewList.push_back(*view);
     }
     transaction.commit();
-
   } catch (const dbo::Exception& ex) {
     Wt::log("error") << "[realopinsight] "<<ex.what();
   }
+
 }
 
 void DbSession::initDb(void)

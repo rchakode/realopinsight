@@ -41,6 +41,7 @@
 #include <Wt/WSelectionBox>
 #include <Wt/WTemplate>
 #include <Wt/WHBoxLayout>
+#include <Wt/WEvent>
 
 #define CHECK_LOGIN() if (! m_authManager->isLogged()) {wApp->redirect(LINK_HOME); return;}
 
@@ -71,9 +72,9 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   createViewAssignmentDialog();
   createAccountPanel();
   createPasswordPanel();
+
   createAboutDialog();
   showUserHome();
-
   addEvents();
 }
 
@@ -95,6 +96,9 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
+  wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){
+    std::cout << "event>>>>>" <<event.key();
+  }, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
@@ -125,8 +129,6 @@ void WebMainUI::showUserHome(void)
   // Set data for CSS styling
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
-
-
   m_dashtabs->addTab(createUserHome(),
                      homeTabTitle,
                      Wt::WTabWidget::LazyLoading)
@@ -661,6 +663,7 @@ void WebMainUI::initOperatorDashboard(void)
 {
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
+
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
   for (const auto& view: m_dbSession->viewList()) {

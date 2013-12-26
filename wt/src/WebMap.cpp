@@ -40,6 +40,7 @@
 
 namespace {
   IconMapT m_icons = utils::nodeIcons();
+  const double THUMB_BANNER_FONT_SIZE = 32;
 }
 
 WebMap::WebMap(CoreDataT* _cdata)
@@ -51,7 +52,8 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged"),
     m_loaded(this),
-    m_thumbnail("")
+    m_thumbnail(""),
+    m_thumbBannerSize(0)
 {
   m_scrollArea->setWidget(this);
   setPreferredMethod();
@@ -77,6 +79,7 @@ void WebMap::setJavaScriptMember(void)
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
+  m_thumbBannerSize = 0;
   m_painter = new Wt::WPainter(_pdevice);
   m_painter->scale(m_scaleX, m_scaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
@@ -115,9 +118,10 @@ void WebMap::drawMap(void)
 
 void WebMap::drawNode(const NodeT& _node, bool drawIcon)
 {
-  Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24);
-  Wt::WPointF posLabel(_node.pos_x, _node.pos_y);
-  Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15);
+  m_painter->save();
+  Wt::WPointF posIcon(_node.pos_x - 20,  _node.pos_y - 24 + m_thumbBannerSize);
+  Wt::WPointF posLabel(_node.pos_x, _node.pos_y + m_thumbBannerSize);
+  Wt::WPointF posExpIcon(_node.pos_x - 10, _node.pos_y + 15 + m_thumbBannerSize);
 
   // Set pen, then draw image, nav-icon and text. The order is important !
 
@@ -139,10 +143,12 @@ void WebMap::drawNode(const NodeT& _node, bool drawIcon)
                       Wt::AlignCenter,
                       Wt::WString(_node.name.toStdString()));
   createLink(_node);
+  m_painter->restore();
 }
 
 void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
 {
+  m_painter->save();
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
   if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
@@ -153,16 +159,17 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
     Wt::WPen pen(wcolor);
     m_painter->setPen(pen);
 
-    Wt::WPointF edgeP1(parent->pos_x, parent->pos_y + 24);
-    Wt::WPointF edgeP2(child->pos_x, child->pos_y - 24);
+    Wt::WPointF edgeP1(parent->pos_x, parent->pos_y + 24 + m_thumbBannerSize);
+    Wt::WPointF edgeP2(child->pos_x, child->pos_y - 24 + m_thumbBannerSize);
     m_painter->drawLine(edgeP1, edgeP2);
   }
+  m_painter->restore();
 }
 
 void WebMap::createLink(const NodeT& _node)
 {
   double x = _node.pos_x * m_scaleX;
-  double y = _node.pos_y * m_scaleY;
+  double y = (_node.pos_y + m_thumbBannerSize) * m_scaleY;
   double width = 40.0 * m_scaleX;
   double height = 40.0 * m_scaleY;
   Wt::WRectArea *area = new Wt::WRectArea(x, y, width, height);
@@ -201,11 +208,15 @@ void WebMap::updateThumbnail(void)
   double thumbScaleX = factor * thumbHeight * thumbScaleY/m_cdata->map_height;
   thumbWidth = thumbScaleX*m_cdata->map_width + 20;
 
-  Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight);
+  m_thumbBannerSize = THUMB_BANNER_FONT_SIZE/thumbScaleY;
+  Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight + m_thumbBannerSize);
 
   m_painter = new Wt::WPainter(&thumbnailImg);
   m_painter->scale(thumbScaleX, thumbScaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
+
+
+  drawThumbnailBanner(thumbWidth, thumbHeight, thumbScaleX, thumbScaleY, m_thumbBannerSize);
 
   // Draw edges
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
@@ -215,8 +226,6 @@ void WebMap::updateThumbnail(void)
   bool drawIcon = false;
   for(const auto& node : m_cdata->bpnodes) drawNode(node, drawIcon);
   for(const auto& node : m_cdata->cnodes) drawNode(node, drawIcon);
-
-  drawThumbnailBanner(thumbWidth, thumbHeight, thumbScaleX, thumbScaleY);
 
   m_painter->end();
 
@@ -230,19 +239,24 @@ void WebMap::updateThumbnail(void)
   delete m_painter;
 }
 
-void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight, double scaleX, double scaleY)
+void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight,
+                                 double scaleX, double scaleY,
+                                 double fontSize)
 {
+  m_painter->save();
   Wt::WFont font;
   std::string text = m_cdata->root->name.toStdString();
-  double fontSize = thumbWidth / (scaleX * text.length());
   font.setSize(fontSize);
   double textLength = thumbWidth/scaleX;// fontSize;
   Wt::WColor brushColor = WebPieChart::colorFromSeverity(m_cdata->root->severity);
-  Wt::WRectF bannerArea(0, thumbHeight/(2 * scaleY)-fontSize/2, textLength, fontSize);
+  Wt::WRectF bannerArea(0, 0/*thumbHeight/(2 * scaleY)-fontSize/2*/, textLength, fontSize);
   m_painter->setFont(font);
   m_painter->setPen(Wt::WPen(brushColor));
   m_painter->setBrush(Wt::WBrush(brushColor));
   m_painter->drawRect(bannerArea);
   m_painter->setPen(Wt::WPen(Wt::black));
-  m_painter->drawText(bannerArea,Wt::AlignCenter|Wt::AlignMiddle,Wt::TextSingleLine,text);
+  m_painter->drawText(bannerArea,Wt::AlignCenter|Wt::AlignMiddle,
+                      Wt::TextSingleLine,
+                      m_cdata->root->name.toStdString());
+  m_painter->restore();
 }

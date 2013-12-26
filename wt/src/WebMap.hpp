@@ -67,6 +67,7 @@ private:
   Wt::JSignal<double, double> m_containerSizeChanged;
   Wt::Signal<void> m_loaded;
   std::string m_thumbnail;
+  double m_thumbBannerSize;
 
   void drawNode(const NodeT& _node, bool drawIcon = true);
   void drawEdge(const QString& _parentId, const QString& _childId);
@@ -74,7 +75,9 @@ private:
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
   void handleContainedSizeChanged(double w, double h);
-  void drawThumbnailBanner(double thumbWidth, double thumbHeight, double scaleX, double scaleY);
+  void drawThumbnailBanner(double thumbWidth, double thumbHeight,
+                             double scaleX, double scaleY,
+                             double fontSize);
 };
 
 #endif /* WEBSERVICEMAP_HPP */
