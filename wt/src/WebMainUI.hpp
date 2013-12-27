@@ -104,7 +104,7 @@ private:
   void selectFileToOpen(void);
   void initOperatorDashboard(void);
   void loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex);
-  Wt::WTemplate* createThumbnail(WebDashboard* dashboard, int index);
+  Wt::WTemplate* thumbnail(WebDashboard* dashboard);
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createUserHome(void);

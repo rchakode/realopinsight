@@ -297,7 +297,6 @@ void WebMainUI::handleRefresh(void)
     dash.second->runMonitor();
     dash.second->updateMap();
   }
-  m_userHomeTpl->resolveWidget("contents")->refresh();
   m_mainWidget->enable();
   m_timer.start();
 }
@@ -444,7 +443,6 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
         setInternalPath("/"+platform);
       }));
       tabIndex = m_dashtabs->count() - 1;
-      m_dashtabs->setCurrentIndex(tabIndex);
     } else {
       delete dashboard;
       dashboard = NULL;
@@ -477,10 +475,6 @@ Wt::WWidget* WebMainUI::createUserHome(void)
                               createAnchorForHomeLink(utils::tr("Import"),
                                                       utils::tr("A platform description"),
                                                       LINK_IMPORT));
-    m_userHomeTpl->bindString("software", APP_NAME.toStdString());
-    m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
-    m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
-    m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
     m_userHomeTpl->bindWidget("andhor-load-file",
@@ -491,11 +485,11 @@ Wt::WWidget* WebMainUI::createUserHome(void)
                               createAnchorForHomeLink(utils::tr("Import"),
                                                       utils::tr("A platform description"),
                                                       LINK_IMPORT));
-    m_userHomeTpl->bindString("software", APP_NAME.toStdString());
-    m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
-    m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
-    m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
   }
+  m_userHomeTpl->bindString("software", APP_NAME.toStdString());
+  m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
+  m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
+  m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
   return m_userHomeTpl;
 }
 
@@ -673,8 +667,9 @@ void WebMainUI::initOperatorDashboard(void)
     WebDashboard* dashboard;
     loadView(view.path, dashboard, tabIndex);
     if (dashboard) {
-      layout->addWidget(createThumbnail(dashboard, tabIndex));
+      layout->addWidget(thumbnail(dashboard));
       dashboard->map()->loaded().connect(this, &WebMainUI::startDashbaordUpdate);
+      m_dashtabs->setCurrentIndex(tabIndex);
     }
   }
   m_userHomeTpl->bindWidget("contents", thumbs);
@@ -682,15 +677,12 @@ void WebMainUI::initOperatorDashboard(void)
 }
 
 
-Wt::WTemplate* WebMainUI::createThumbnail(WebDashboard* dashboard, int index)
+Wt::WTemplate* WebMainUI::thumbnail(WebDashboard* dashboard)
 {
   Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
   NodeT& rootNode = dashboard->rootNode();
-  tpl->bindString("platorm-status-css-class", utils::computeSeverityCssClass(rootNode.severity));
-  tpl->bindString("platform-name", rootNode.name.toStdString());
   tpl->bindWidget("thumb-image", dashboard->thumbnail());
   tpl->setToolTip(utils::severity2Str(rootNode.severity).toStdString());
-  tpl->clicked().connect(std::bind([=](){m_dashtabs->setCurrentIndex(index);}));
   return tpl;
 }
 
