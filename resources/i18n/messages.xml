@@ -149,7 +149,7 @@
             </div>
           </div>
           ${block:Wt.Auth.field password}
-          ${block:Wt.Auth.field remember-me}
+          <!-- ${block:Wt.Auth.field remember-me} -->
         ${</if:passwords>}
 
         ${<if:oauth>}
