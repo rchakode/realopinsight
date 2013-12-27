@@ -1,0 +1,1011 @@
+<?xml version="1.0"?>
+<ServiceView compat="2.0" monitor="99">
+<Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>Complex Random View</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160132472,ngrt4nsrv20130127160149129,ngrt4nsrv20130127160155955,ngrt4nsrv20130227160204733,ngrt4nsrv20130227160206769,ngrt4nsrv20130227160219884,ngrt4nsrv20130227160223371,ngrt4nsrv20130227160226558,ngrt4nsrv20131027161015294,ngrt4nsrv20131027161016688,ngrt4nsrv20131027161018405,ngrt4nsrv20131027161019700,ngrt4nsrv20131027161021022,ngrt4nsrv20131027161022241,ngrt4nsrv20131027161023476,ngrt4nsrv20131027161024788,ngrt4nsrv20131027161027142</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160209248" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 48</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160209369</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160149413" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 14</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160227434" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 87</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160227554</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214356" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 55</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214518</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160147030" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 9</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160147170</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161031446" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 25</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161031578</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160154411" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 20</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160154553</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161024920" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 22</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160228195" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 92</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160228335</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161018405" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 7</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161018536</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160223665" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 75</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160223795</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160156239" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 25</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160156360</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220018" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 66</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220176,ngrt4nsrv20130227160234301</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161018699" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 9</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160209369" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 49</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160209509</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160227554" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 88</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160227709</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160151721" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 17</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160202771" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 33</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160202920</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161027282" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 24</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160226991" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 84</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160227142</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160205044" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 38</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160205187</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161022241" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 16</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161022363</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160227142" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 85</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160227282</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160217166" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 63</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160217325</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160224237" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 79</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160224377</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160204733" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 36</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160204873</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160134688" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 6</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160134851</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160208815" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 45</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160208966</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160149129" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 12</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160149273,ngrt4nsrv20130127160151415</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160223371" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 73</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160223525</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161015594" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 3</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160228335" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 93</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160156360" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 26</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160159403" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 28</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160159535</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160151415" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 15</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160151568</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161031578" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 26</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160206769" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 41</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160206899,ngrt4nsrv20130227160208815</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161022363" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 17</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161022505</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160209509" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 50</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160209642</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220862" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 72</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161018536" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 8</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161018699</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160223795" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 76</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160223957</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160227904" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 90</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160228055</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160147500" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 11</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214799" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 58</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214939</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161019830" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 11</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161019951</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220450" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 69</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220593</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160147170" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 10</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160147500</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160134206" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 3</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160134368</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160154553" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 21</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160154696</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160226697" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 82</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160226838</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161021285" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 15</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160202920" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 34</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160203075</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160134528" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 5</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160134688</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160213952" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 52</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214095</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214518" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 56</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214649</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161016688" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 4</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161016811</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161016811" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 5</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161016950</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160227709" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 89</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160227904</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161015294" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 1</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161015443</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160209107" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 47</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160209248</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161019951" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 12</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161022505" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 18</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160215042" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 60</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160216882</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160234454" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 95</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160234594</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160159535" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 29</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160159659</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160205187" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 39</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160205317</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214939" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 59</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160215042</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160224377" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 80</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160207035" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 43</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160207175</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160223525" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 74</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160223665</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160205317" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 40</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160219884" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 65</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220018</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160234876" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 98</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160235036</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160217325" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 64</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160132472" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 1</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160134037,ngrt4nsrv20130127160147030,ngrt4nsrv20130127160154078</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160226838" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 83</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160226991</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161027142" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 23</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161027282</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160155955" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 23</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160156096,ngrt4nsrv20130127160159253,ngrt4nsrv20130227160213952</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160134851" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 7</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160135001</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160206899" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 42</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160207035</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220176" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 67</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220310</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160208966" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 46</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160209107</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160227282" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 86</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160227434</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160228055" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 91</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160228195</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160204873" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 37</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160205044</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214095" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 53</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214234</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220593" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 70</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220733</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161023476" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 19</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161023608</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161015443" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 2</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161015594</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161021022" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 13</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161021145,ngrt4nsrv20131027161031446</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160151568" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 16</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160151721</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160223957" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 77</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160224087</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160202631" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 32</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160202771</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160209642" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 51</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160234714" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 97</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160234876</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161016950" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 6</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160154171" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 19</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160154411</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161023608" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 20</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160217026" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 62</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160217166</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160234301" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 94</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160234454</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160159659" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 30</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160159779</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220310" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 68</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220450</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160149273" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 13</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160149413</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160203075" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 35</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160135001" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 8</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160234594" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 96</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160234714</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160134037" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 2</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160134206</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160235036" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 99</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214649" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 57</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214799</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161021145" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 14</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161021285</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160216882" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 61</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160217026</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160226558" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 81</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160226697</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160214234" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 54</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160214356</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160224087" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 78</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160224237</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160156096" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 24</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160156239</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160207175" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 44</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130227160220733" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 71</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160220862</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161024788" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 21</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161024920</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160159779" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 31</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130227160202631</SubServices>
+</Service>
+<Service id="ngrt4nsrv20131027161019700" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 10</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20131027161019830</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160154696" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 22</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160159253" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 27</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160159403</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160134368" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 4</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160134528</SubServices>
+</Service>
+<Service id="ngrt4nsrv20130127160154078" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sous service 18</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20130127160154171</SubServices>
+</Service>
+</ServiceView>
