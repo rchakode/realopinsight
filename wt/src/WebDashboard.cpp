@@ -178,5 +178,6 @@ void WebDashboard::addJsEventScript(void)
 
 Wt::WImage* WebDashboard::thumbnail(void)
 {
+  //return new Wt::WImage(m_map->thumbnailPath(), m_widget);
   return m_map->thumbnail();
 }
