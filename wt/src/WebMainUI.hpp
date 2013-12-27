@@ -54,6 +54,8 @@ public:
   void handleRefresh(void);
   Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
   virtual void 	refresh () {handleRefresh();}
+
+
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(msg.toStdString(), "alert alert-success");}
