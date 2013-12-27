@@ -32,6 +32,7 @@ void AuthManager::handleAuthentication(void)
 {
   if (loginObject.loggedIn()) {
     if (! m_logged) {
+      m_logged = true;
       m_dbSession->setLoggedUser(loginObject.user().id());
       Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
 
@@ -43,10 +44,6 @@ void AuthManager::handleAuthentication(void)
       image->setToolTip("Sign out");
       image->clicked().connect(this, &AuthManager::logout);
       bindWidget("logout-item", image);
-
-      m_logged = true;
-     // sleep(4);
-     //m_mainUI->handleRefresh();
     }
   } else {
     m_logged = false;
@@ -59,6 +56,7 @@ void AuthManager::create(void)
   bindString("software", APP_NAME.toStdString());
   bindString("version", PKG_VERSION.toStdString());
   bindString("release-year", REL_YEAR.toStdString());
+  Wt::Auth::AuthWidget::processEnvironment();
 }
 
 void AuthManager::logout(void)

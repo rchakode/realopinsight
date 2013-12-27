@@ -204,6 +204,7 @@ void WebMap::handleContainedSizeChanged(double w, double h)
 
 void WebMap::updateThumbnail(void)
 {
+  static int roundCount = 0;
   double thumbWidth = 150; //change later
   double thumbHeight = 120;
   double factor = (double)XSCAL_FACTOR/YSCAL_FACTOR;
@@ -241,7 +242,7 @@ void WebMap::updateThumbnail(void)
   thumbnailImg.write(output);
   delete m_painter;
 
-  m_thumbnail->setImageLink(Wt::WLink(m_thumbnailPath));
+  m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
 }
 
 void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight,
