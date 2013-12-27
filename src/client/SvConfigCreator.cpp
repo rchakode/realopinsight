@@ -185,7 +185,7 @@ NodeT* SvCreator::createNode(const QString& id,
   node->id = id;
   node->name = label;
   node->parent = parent;
-  node->type = NodeType::SERVICE_NODE;
+  node->type = NodeType::ServiceNode;
   node->severity = MonitorBroker::Unknown;
   node->sev_crule = CalcRules::HighCriticity;
   node->sev_prule = PropRules::Unchanged;
@@ -198,7 +198,7 @@ void SvCreator::insertFromSelected(const NodeT& node)
 {
   NodeListT::iterator pnode = m_cdata->bpnodes.find(m_selectedNode);
   if (pnode == m_cdata->bpnodes.end() ||
-      pnode->type == NodeType::ALARM_NODE) {
+      pnode->type == NodeType::AlarmNode) {
     utils::alert(tr("This action not allowed on the target node"));
     return;
   }
@@ -232,7 +232,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
   if (!utils::findNode(m_cdata, _nodeId, node))
     return;
 
-  if (node->type == NodeType::SERVICE_NODE && node->child_nodes != "") {
+  if (node->type == NodeType::ServiceNode && node->child_nodes != "") {
     Q_FOREACH(const QString& checkId, node->child_nodes.split(Parser::CHILD_SEP)) {
       deleteNode(checkId);
     }
@@ -249,7 +249,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
     if (pNode != m_cdata->bpnodes.end()) {
       pNode->child_nodes.remove(regex);
     }
-    if (node->type == NodeType::ALARM_NODE) {
+    if (node->type == NodeType::AlarmNode) {
       m_cdata->cnodes.remove(_nodeId);
     } else {
       m_cdata->bpnodes.remove(_nodeId);
@@ -405,8 +405,8 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 {
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
-    if (_type == NodeType::SERVICE_NODE) {
-      if (node->type == NodeType::ALARM_NODE) {
+    if (_type == NodeType::ServiceNode) {
+      if (node->type == NodeType::AlarmNode) {
         //TODO: A bug has been reported
         node->child_nodes.clear();
         if (m_editor->updateNode(node)) {
@@ -417,7 +417,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         }
       }
     } else {
-      if (node->type == NodeType::SERVICE_NODE && ! node->child_nodes.isEmpty()) {
+      if (node->type == NodeType::ServiceNode && ! node->child_nodes.isEmpty()) {
         m_editor->typeField()->setCurrentIndex(0);
         utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
       } else {

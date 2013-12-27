@@ -105,15 +105,14 @@ public:
 class LIBREALOPINSIGHTSHARED_EXPORT NodeType {
 public:
   enum {
-    SERVICE_NODE = 0,
-    ALARM_NODE = 1
+    ServiceNode = 0,
+    AlarmNode = 1
   };
   static QString toString(int _type ) {
-    if (_type == ALARM_NODE )
+    if (_type == AlarmNode )
       return QObject::tr("Native Check");
     return QObject::tr("Business Process");
   }
-
 };
 
 
@@ -242,6 +241,7 @@ struct NodeT {
   QString child_nodes;
   CheckT check;
   bool monitored;
+  qint8 visibility;
   double pos_x;
   double pos_y;
 };

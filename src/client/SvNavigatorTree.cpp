@@ -49,7 +49,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event)
   if(tnode && m_cdata) {
     NodeListT::iterator  node = m_cdata->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString());
     if(node != m_cdata->bpnodes.end()) {
-      if(node->type != NodeType::ALARM_NODE) {
+      if(node->type != NodeType::AlarmNode) {
         _event->setDropAction(Qt::MoveAction);
         QTreeWidget::dropEvent(_event);
         Q_EMIT treeNodeMoved(m_selectedNode);
@@ -87,7 +87,7 @@ QTreeWidgetItem* SvNavigatorTree::addNode(const NodeT& _node,
   }
 
   nitem = findNodeItem(_node.id); //FIXME : avoid research
-  if (_node.type != NodeType::ALARM_NODE && ! _node.child_nodes.isEmpty()) {
+  if (_node.type != NodeType::AlarmNode && ! _node.child_nodes.isEmpty()) {
     QStringList cids = _node.child_nodes.split(Parser::CHILD_SEP);
     Q_FOREACH (const QString& cid, cids) {
       GuiTreeItemListT::iterator chkit = m_items.find(cid);

@@ -254,7 +254,7 @@ void GraphView::drawNode(const NodeT& _node)
       m_mnodes[_node.id].exp_icon->setData(0, nodeData),
       m_scene->addItem(m_mnodes[_node.id].exp_icon),
       m_mnodes[_node.id].exp_icon->setZValue(0);
-  if (m_mnodes[_node.id].type == NodeType::ALARM_NODE)
+  if (m_mnodes[_node.id].type == NodeType::AlarmNode)
     m_mnodes[_node.id].exp_icon->setVisible(false);
 
   QString msg =  utils::getNodeToolTip(_node);
@@ -295,7 +295,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
     gnode->expand = _visible;
     gnode->label->setVisible(_visible);
     gnode->icon->setVisible(_visible);
-    if (gnode->type == NodeType::SERVICE_NODE)
+    if (gnode->type == NodeType::ServiceNode)
       gnode->exp_icon->setVisible(_visible);
     if (_visible) {
       QPixmap expandIcon(m_icons[utils::PLUS], 0, Qt::AutoColor);

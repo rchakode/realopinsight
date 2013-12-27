@@ -233,7 +233,7 @@ void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
   NodeListT::iterator node;
   if (utils::findNode(m_cdata, _nodeId, node) &&
       !node->child_nodes.isEmpty()) {
-    if (node->type == NodeType::ALARM_NODE) {
+    if (node->type == NodeType::AlarmNode) {
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {
       QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);

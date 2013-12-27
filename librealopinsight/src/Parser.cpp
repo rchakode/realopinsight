@@ -92,8 +92,8 @@ bool Parser::process(bool console)
     if (node.icon.isEmpty()) {
       node.icon = utils::DEFAULT_ICON;
     }
-    if (node.type == NodeType::ALARM_NODE) {
-
+    if (node.type == NodeType::AlarmNode) {
+      node.visibility = ngrt4n::Visible;
       StringPairT info = utils::splitHostCheckInfo(node.child_nodes);
       m_cdata->hosts[info.first] << info.second;
 
@@ -109,8 +109,8 @@ bool Parser::process(bool console)
         m_cdata->sources.insert(srcid);
       }
       m_cdata->cnodes.insert(node.id, node);
-
-    } else {
+    } else { // means a BP node
+      node.visibility = ngrt4n::Visible | ngrt4n::Expanded;
       m_cdata->bpnodes.insert(node.id, node);
     }
   }

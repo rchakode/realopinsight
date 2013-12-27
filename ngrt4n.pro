@@ -1,3 +1,23 @@
+# ------------------------------------------------------------------------ #
+# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update : 24-12-2013                                                 #
+#                                                                          #
+# This Software is part of NGRT4N Project (http://ngrt4n.com).             #
+#                                                                          #
+# This is a free software: you can redistribute it and/or modify           #
+# it under the terms of the GNU General Public License as published by     #
+# the Free Software Foundation, either version 3 of the License, or        #
+# (at your option) any later version.                                      #
+#                                                                          #
+# The Software is distributed in the hope that it will be useful,          #
+# but WITHOUT ANY WARRANTY; without even the implied warranty or           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+# GNU General Public License for more details.                             #
+#                                                                          #
+# You should have received a copy of the GNU General Public License        #
+# along with the Software.  If not, see <http://www.gnu.org/licenses/>.    #
+#--------------------------------------------------------------------------#
+
 QT	+= core gui xml svg webkit network script
 CONFIG += no_keywords
 TEMPLATE = app

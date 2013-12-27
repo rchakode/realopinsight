@@ -76,7 +76,8 @@ private:
 
   void drawNode(const NodeT& _node, bool drawIcon = true);
   void drawEdge(const QString& _parentId, const QString& _childId);
-  void createLink(const NodeT& _node);
+  void createNodeLink(const NodeT& _node, const Wt::WPointF& pos);
+  void createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos);
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
   void handleContainedSizeChanged(double w, double h);

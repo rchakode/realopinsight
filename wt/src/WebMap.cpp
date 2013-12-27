@@ -41,6 +41,7 @@
 namespace {
   IconMapT m_icons = utils::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
+  typedef Wt::WPainter::Image GImage;
 }
 
 WebMap::WebMap(CoreDataT* _cdata)
@@ -118,34 +119,41 @@ void WebMap::drawMap(void)
   updateThumbnail();
 }
 
-
+/**
+ * @brief WebMap::drawNode
+ * Set node position, set pen, then draw image, nav-icon and text.
+ * The order is important !
+ * @param _node
+ * @param drawIcon
+ */
 void WebMap::drawNode(const NodeT& _node, bool drawIcon)
 {
   m_painter->save();
-  Wt::WPointF posIcon(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
-  Wt::WPointF posLabel(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
-  Wt::WPointF posExpIcon(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
-
-  // Set pen, then draw image, nav-icon and text. The order is important !
+  Wt::WPointF iconPos(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
+  Wt::WPointF labelPos(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
+  Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
 
   m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
 
   if (drawIcon) {
-    m_painter->drawImage(posIcon, Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
+    m_painter->drawImage(iconPos, GImage(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
   } else {
-    //TODO
+    // thumbnail: do nothing
   }
-
-  if( _node.type != NodeType::SERVICE_NODE) { //FIXME:  map_enable_nav_icon
-    m_painter->drawImage(posExpIcon,Wt::WPainter::Image(utils::getPathFromQtResource(m_icons[utils::MINUS]),19,18));
+  if (_node.visibility | ngrt4n::Visible) {
+    if( _node.type == NodeType::ServiceNode) {
+      if (_node.visibility | ngrt4n::Expanded) {
+        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(m_icons[utils::MINUS]),19,18));
+      } else {
+        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(m_icons[utils::PLUS]),19,18));
+      }
+      createExpIconLink(_node, expIconPos);
+    }
+    m_painter->drawText(labelPos.x(), labelPos.y(),
+                        Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+                        Wt::AlignCenter, Wt::WString(_node.name.toStdString()));
+    createNodeLink(_node, iconPos);
   }
-
-  m_painter->drawText(posLabel.x(), posLabel.y(),
-                      Wt::WLength::Auto.toPixels(),
-                      Wt::WLength::Auto.toPixels(),
-                      Wt::AlignCenter,
-                      Wt::WString(_node.name.toStdString()));
-  createLink(_node);
   m_painter->restore();
 }
 
@@ -169,15 +177,25 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
   m_painter->restore();
 }
 
-void WebMap::createLink(const NodeT& _node)
+void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
 {
-  double x = (_node.pos_x + m_translateX) * m_scaleX;
-  double y = (_node.pos_y + m_translateY) * m_scaleY;
-  double width = 40.0 * m_scaleX;
-  double height = 40.0 * m_scaleY;
-  Wt::WRectArea *area = new Wt::WRectArea(x, y, width, height);
-  area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toStdString()));
-  area->setLink("#");
+  Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
+                                          40 * m_scaleX, 40 * m_scaleY);
+  area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toUtf8()));
+  area->clicked().connect(std::bind([=](){
+    qDebug() << "node "<< _node.name << _node.visibility;
+  }));
+  addArea(area);
+}
+
+void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos)
+{
+  Wt::WRectArea* area = new Wt::WRectArea(expIconPos.x() * m_scaleX, expIconPos.y() * m_scaleY,
+                                          20 * m_scaleX, 20 * m_scaleY);
+  area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toUtf8()));
+  area->clicked().connect(std::bind([=](){
+    qDebug() <<"exp icon "<< _node.name << _node.visibility;
+  }));
   addArea(area);
 }
 

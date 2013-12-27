@@ -133,7 +133,7 @@ bool ServiceEditor::updateNode(NodeListT& _node_map, const QString& _node_id)
     node->description = descriptionField()->toPlainText();
     node->alarm_msg  = alarmMsgField()->toPlainText();
     node->notification_msg = notificationMsgField()->toPlainText();
-    if(node->type == NodeType::ALARM_NODE)
+    if(node->type == NodeType::AlarmNode)
       node->child_nodes = checkField()->currentText();
     return true;
   }
@@ -151,7 +151,7 @@ bool ServiceEditor::updateNode(NodeListT::iterator& _node)
   _node->description = descriptionField()->toPlainText();
   _node->alarm_msg  = alarmMsgField()->toPlainText();
   _node->notification_msg = notificationMsgField()->toPlainText();
-  if(_node->type == NodeType::ALARM_NODE)
+  if(_node->type == NodeType::AlarmNode)
     _node->child_nodes = checkField()->currentText();
 
   return true;
@@ -178,7 +178,7 @@ void ServiceEditor::setContent(const NodeT& _node)
   notificationMsgField()->setText(_node.notification_msg);
 
   QString checkId = "";
-  if(_node.type == NodeType::ALARM_NODE) {
+  if(_node.type == NodeType::AlarmNode) {
     QListWidget* checks = checkListField();
     QStringList childNodes = _node.child_nodes.split(Parser::CHILD_SEP);
     QStringList::iterator childNodeIt = childNodes.begin();
@@ -233,8 +233,8 @@ void ServiceEditor::loadDescriptionFields()
 
 void ServiceEditor::loadTypeFields()
 {
-  typeField()->addItem( NodeType::toString(NodeType::SERVICE_NODE) );
-  typeField()->addItem( NodeType::toString(NodeType::ALARM_NODE) );
+  typeField()->addItem( NodeType::toString(NodeType::ServiceNode) );
+  typeField()->addItem( NodeType::toString(NodeType::AlarmNode) );
   mlayout->addWidget(mitems["typeLabel"], mlayoutRowIndex, 0);
   mlayout->addWidget(typeField(),mlayoutRowIndex,1,1,2);
 }
@@ -317,7 +317,7 @@ void ServiceEditor::loadButtonBox(void)
 
 void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 {
-  if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
+  if(_text == NodeType::toString(NodeType::AlarmNode)) {
     setEnableFields(true);
   } else {
     setEnableFields(false);
@@ -328,10 +328,10 @@ void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 
 void ServiceEditor::handleNodeTypeActivated( const QString& _text)
 {
-  if(_text == NodeType::toString(NodeType::ALARM_NODE)) {
-    Q_EMIT nodeTypeActivated( NodeType::ALARM_NODE );
+  if(_text == NodeType::toString(NodeType::AlarmNode)) {
+    Q_EMIT nodeTypeActivated( NodeType::AlarmNode );
   } else {
-    Q_EMIT nodeTypeActivated( NodeType::SERVICE_NODE );
+    Q_EMIT nodeTypeActivated( NodeType::ServiceNode );
   }
 }
 

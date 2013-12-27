@@ -40,6 +40,11 @@ namespace ngrt4n {
     AdmUserRole = 100,
     OpUserRole = 101
   };
+
+  enum VisibilityT {
+    Visible = 0x1,
+    Expanded = 0x2
+  };
   const std::string APP_NAME = "ngrt4n" ;
   const std::string APP_HOME = std::string(getenv("HOME")) + "/." + APP_NAME ;
   const std::string SETTINGS_FILE =  APP_HOME + "/db" ;
