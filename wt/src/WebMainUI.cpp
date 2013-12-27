@@ -673,7 +673,6 @@ void WebMainUI::initOperatorDashboard(void)
     }
   }
   m_userHomeTpl->bindWidget("contents", thumbs);
-  //m_dashtabs->setCurrentIndex(0);
 }
 
 
