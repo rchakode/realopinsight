@@ -225,7 +225,7 @@ void GuiDashboard::filterNodeRelatedMsg(void)
     m_filteredMsgConsole->resize(m_msgConsole->getConsoleSize().width(), rh);
   }
   m_filteredMsgConsole->sortByColumn(1, Qt::AscendingOrder);
-  m_filteredMsgConsole->show();
+  m_filteredMsgConsole->show();;
 }
 
 void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
@@ -379,6 +379,6 @@ void GuiDashboard::addEvents(void)
   connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
-  connect(m_preferences, SIGNAL(errorOccurred(QString), this, SLOT(errorOccurred(QString)));
+  connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
   //FIXME:  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
 }

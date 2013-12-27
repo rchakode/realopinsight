@@ -46,7 +46,7 @@ namespace ngrt4n {
   const std::string AUTH_FILE =  APP_HOME + "/auth" ;
   const std::string salt = "$1$" + APP_NAME + "$";
   const std::string AdmUser = "ngrt4n_adm";
-  const std::string OpUser = "ngrt4n__op";
+  const std::string OpUser = "ngrt4n_op";
 
   const std::string TAG_ZABBIX_HOSTNAME = "\\{HOSTNAME\\}";
   const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";

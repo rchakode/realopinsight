@@ -23,14 +23,13 @@
  */
 
 #include "utilsClient.hpp"
-#include "core/ns.hpp"
+#include "ns.hpp"
 #include "client/Auth.hpp"
 #include "client/SvConfigCreator.hpp"
 #include <sstream>
 #include <getopt.h>
 #include "Base.hpp"
 #include <memory>
-#include "client/utilsClient.hpp"
 
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "Options: \n"

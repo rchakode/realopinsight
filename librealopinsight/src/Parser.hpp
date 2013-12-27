@@ -37,8 +37,6 @@ public:
   virtual ~Parser();
 
   bool process(bool console);
-  bool computeNodeCoordinates(int wt);
-  void computeNodeCoordinates(const QString& dotfile, int wt);
   QString dotFile(void) const { return m_dotFile; }
   static const QString CHILD_SEP;
   QString lastError(void) const {return m_lastError;}
@@ -56,6 +54,8 @@ private:
 
   void updateNodeHierachy(QString& _graphContent);
   void saveCoordinatesFile(const QString& _content);
+  bool computeNodeCoordinates(void);
+  void computeNodeCoordinates(const QString& dotfile);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

@@ -92,7 +92,7 @@ void DashboardBase::load(const QString& _file)
     m_config = utils::getAbsolutePath(_file);
     Parser parser(m_config, m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
-    if (parser.process(true) && parser.computeNodeCoordinates(1)) {
+    if (parser.process(true)) {
       buildTree();
       buildMap();
       initSettings();

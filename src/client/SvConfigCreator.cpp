@@ -31,7 +31,7 @@ namespace {
   const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
   const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
   const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
-  const QString MULTI_SOURCES ="Multiple sources (*.ms.ngrt4n.xml)";
+  const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
 }
 SvCreator::SvCreator(const qint32& _userRole)
   : m_userRole (_userRole),
@@ -124,15 +124,16 @@ void SvCreator::loadFile(const QString& _path)
   } else {
     utils::clear(*m_cdata);
     Parser parser(_path, m_cdata);
-    connect(&parser, SIGNAL(errorOccurred(QString),
-                            this, SLOT(errorOccurred(QString)));
-    if (!parser.process(false)) {
+    connect(&parser, SIGNAL(errorOccurred(QString)),this, SLOT(handleErrorOccurred(QString)));
+    if (! parser.process(false)) {
       utils::alert(tr("Unable to open the file '%1'").arg(_path));
       exit(1);
+    } else {
+      m_tree->build();
+      //m_tree->update();
+      m_activeConfig = utils::getAbsolutePath(_path);
+      setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
     }
-    m_tree->update();
-    m_activeConfig = utils::getAbsolutePath(_path);
-    setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   }
 }
 
@@ -150,7 +151,7 @@ void SvCreator::newView(void)
     utils::clear(*m_cdata);
     m_tree->resetData();
     NodeT* node = createNode(utils::ROOT_ID, tr("New View"), "");
-    m_cdata->bpnodes.insert(node->id, *node);
+    m_cdata->root = m_cdata->bpnodes.insert(node->id, *node);
     m_tree->addNode(*node);
     m_tree->update();
     m_editor->setContent(*node);
@@ -481,37 +482,36 @@ void SvCreator::recordData(const QString& _path)
     statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
     return;
   }
-  NodeListT::const_iterator root = m_cdata->bpnodes.find(utils::ROOT_ID);
-  if (root == m_cdata->bpnodes.end()) {
+  m_cdata->root = m_cdata->bpnodes.find(utils::ROOT_ID);
+  if (m_cdata->root == m_cdata->bpnodes.end()) {
     file.close();
     QString msg =  tr("The hierarchy does not have root");
     utils::alert(msg);
     statusBar()->showMessage(msg);
-    return;
-  }
+  } else {
+    QTextStream ofile(&file);
+    ofile << "<?xml version=\"1.0\"?>\n"
+             "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
+    recordNode(ofile,*m_cdata->root);
+    Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
+      if (service.id == utils::ROOT_ID || service.parent.isEmpty())
+        continue;
+      recordNode(ofile, service);
+    }
+    Q_FOREACH(const NodeT& service, m_cdata->cnodes) {
+      if (service.parent.isEmpty())
+        continue;
+      recordNode(ofile, service);
+    }
+    ofile << "</ServiceView>\n";
+    file.close();
 
-  QTextStream ofile(&file);
-  ofile << "<?xml version=\"1.0\"?>\n"
-           "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
-  recordNode(ofile,*root);
-  Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
-    if (service.id == utils::ROOT_ID || service.parent.isEmpty())
-      continue;
-    recordNode(ofile, service);
+    m_hasLeftUpdates = false;
+    statusBar()->clearMessage();
+    m_activeConfig = utils::getAbsolutePath(_path);
+    statusBar()->showMessage(tr("saved %1").arg(m_activeConfig));
+    setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   }
-  Q_FOREACH(const NodeT& service, m_cdata->cnodes) {
-    if (service.parent.isEmpty())
-      continue;
-    recordNode(ofile, service);
-  }
-  ofile << "</ServiceView>\n";
-  file.close();
-
-  m_hasLeftUpdates = false;
-  statusBar()->clearMessage();
-  m_activeConfig = utils::getAbsolutePath(_path);
-  statusBar()->showMessage(tr("saved %1").arg(m_activeConfig));
-  setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
 }
 
 void SvCreator::recordNode(QTextStream& stream, const NodeT& node)

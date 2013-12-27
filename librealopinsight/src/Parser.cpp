@@ -125,7 +125,8 @@ bool Parser::process(bool console)
   graphContent = m_dotHeader + graphContent;
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
-  return true;
+
+  return computeNodeCoordinates();
 }
 
 void Parser::updateNodeHierachy(QString& _graphContent)
@@ -172,7 +173,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
   file.close();
 }
 
-bool Parser::computeNodeCoordinates(int wt)
+bool Parser::computeNodeCoordinates(void)
 {
   bool error = false;
   auto process = std::unique_ptr<QProcess>(new QProcess());
@@ -181,7 +182,7 @@ bool Parser::computeNodeCoordinates(int wt)
   int exitCode = process->execute("dot", arguments);
   process->waitForFinished(60000);
   if (!exitCode) {
-    computeNodeCoordinates(plainDotFile, wt);
+    computeNodeCoordinates(plainDotFile);
   } else {
     m_lastError = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
     Q_EMIT errorOccurred(m_lastError);
@@ -192,7 +193,7 @@ bool Parser::computeNodeCoordinates(int wt)
   return ! error;
 }
 
-void Parser::computeNodeCoordinates(const QString& _plainDot, int wt)
+void Parser::computeNodeCoordinates(const QString& _plainDot)
 {
   QStringList splitedLine;
   QFile qfile(_plainDot);
@@ -215,7 +216,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot, int wt)
         QString nid = splitedLine[1].trimmed();
         if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
           node->pos_x = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
-          node->pos_y = wt * m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
+          node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
         m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);

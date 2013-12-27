@@ -3,26 +3,7 @@ CONFIG += no_keywords
 TEMPLATE = app
 VERSION_=3.0.0
 VERSION = "-$${VERSION_}"
-
-config-dist {
-SOURCES	+=
-TARGET = RealOpInsight
-}
-
-config-manager {
-SOURCES	+= src/client/ngrt4n-manager.cpp
-TARGET = ngrt4n-manager
-}
-
-config-oc {
-SOURCES	+= src/client/ngrt4n-oc.cpp
-TARGET = ngrt4n-oc
-}
-
-config-editor {
-SOURCES	+= src/client/ngrt4n-editor.cpp
-TARGET = ngrt4n-editor
-}
+LIBS += -lrealopinsight
 
 config-gui-base {
 HEADERS	+= include/client/Auth.hpp \
@@ -54,10 +35,36 @@ SOURCES	+= src/client/Auth.cpp \
     src/client/MsgConsole.cpp
 }
 
+config-dist {
+SOURCES	+=
+TARGET = RealOpInsight
+}
+
+config-manager {
+SOURCES	+= src/client/ngrt4n-manager.cpp
+TARGET = ngrt4n-manager
+}
+
+config-oc {
+CONFIG += config-gui-base
+SOURCES	+= src/client/ngrt4n-oc.cpp
+TARGET = ngrt4n-oc
+}
+
+config-editor {
+CONFIG += config-gui-base
+SOURCES	+= src/client/ngrt4n-editor.cpp
+TARGET = ngrt4n-editor
+}
+
+
 config-web {
 TARGET = bin/ngrt4n-web.bin
-CONFIG += no_keywords
 DEFINES *= REALOPINSIGHT_WEB
+LIBS += -lwt -lwthttp -lwtfcgi -lwtdbo -lwtdbosqlite3 \
+    -lboost_signals -lboost_program_options-mt -lboost_system-mt \
+    -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
+
 
 HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebMsgConsole.hpp \
@@ -139,10 +146,4 @@ DISTFILES += README \
 TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
-
-LIBS += -lrealopinsight \
-    -lwt -lwthttp -lwtfcgi -lwtdbo -lwtdbosqlite3 \
-    -lboost_signals -lboost_program_options-mt -lboost_system-mt \
-    -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
-
 

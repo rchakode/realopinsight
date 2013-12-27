@@ -65,9 +65,7 @@ public Q_SLOTS:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void import(void);
-
-Q_SIGNALS:
-  void handleErrorOccurred(QString msg) {utils::alert(msg);}
+  void handleErrorOccurred(QString msg){utils::alert(msg);}
 
 protected:
   virtual void contextMenuEvent( QContextMenuEvent *);
