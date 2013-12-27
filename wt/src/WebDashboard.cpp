@@ -176,8 +176,8 @@ void WebDashboard::addJsEventScript(void)
   m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
 }
 
-Wt::WImage* WebDashboard::thumbImage(void)
+Wt::WImage* WebDashboard::thumbnail(void)
 {
-  return new Wt::WImage(m_map->thumbnailPath(), m_widget);
-
+  //return new Wt::WImage(m_map->thumbnailPath(), m_widget);
+  return m_map->thumbnail();
 }

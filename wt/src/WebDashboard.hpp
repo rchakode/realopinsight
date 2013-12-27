@@ -47,7 +47,7 @@ public:
   Wt::WWidget* get(void) const {return m_widget;}
   void updateMap(void);
   WebMap* map(void) const {return m_map;}
-  Wt::WImage* thumbImage(void);
+  Wt::WImage* thumbnail(void);
 
 protected:
   virtual void buildMap(void);

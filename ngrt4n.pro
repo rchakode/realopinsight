@@ -55,7 +55,7 @@ SOURCES	+= src/client/Auth.cpp \
 }
 
 config-web {
-TARGET = fcg-bin/ngrt4n-web.bin
+TARGET = bin/ngrt4n-web.bin
 CONFIG += no_keywords
 DEFINES *= REALOPINSIGHT_WEB
 
@@ -140,9 +140,9 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-LIBS += -L./librealopinsight/release -lrealopinsight \
-    -L/opt/install/wt-3.3.0/lib -lwthttp -lwt -lwtdbo -lwtdbosqlite3 -lwtfcgi \
-    -L/opt/install/lib -lboost_signals -lboost_program_options-mt -lboost_system-mt \
+LIBS += -lrealopinsight \
+    -lwt -lwthttp -lwtfcgi -lwtdbo -lwtdbosqlite3 \
+    -lboost_signals -lboost_program_options-mt -lboost_system-mt \
     -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 
 

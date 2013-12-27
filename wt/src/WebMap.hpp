@@ -32,6 +32,7 @@
 #include <Wt/WLength>
 #include <Wt/WSignal>
 #include <Wt/WScrollArea>
+#include <Wt/WImage>
 
 struct CoreDataT;
 struct NodeT;
@@ -50,7 +51,9 @@ public:
   Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
   Wt::Signal<void>& loaded(void) {return m_loaded;}
   void updateThumbnail(void);
-  std::string thumbnailPath(void) {return m_thumbnail;}
+  std::string thumbnailPath(void) {return m_thumbnailPath;}
+  Wt::WImage* thumbnail(void) const {return m_thumbnail;}
+  void emitLoaded(void) const {m_loaded.emit();}
 
 
 protected:
@@ -66,8 +69,10 @@ private:
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;
   Wt::Signal<void> m_loaded;
-  std::string m_thumbnail;
-  double m_thumbBannerSize;
+  std::string m_thumbnailPath;
+  double m_translateX;
+  double m_translateY;
+  Wt::WImage* m_thumbnail;
 
   void drawNode(const NodeT& _node, bool drawIcon = true);
   void drawEdge(const QString& _parentId, const QString& _childId);

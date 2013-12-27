@@ -297,6 +297,7 @@ void WebMainUI::handleRefresh(void)
     dash.second->runMonitor();
     dash.second->updateMap();
   }
+  m_userHomeTpl->resolveWidget("contents")->refresh();
   m_mainWidget->enable();
   m_timer.start();
 }
@@ -443,6 +444,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
         setInternalPath("/"+platform);
       }));
       tabIndex = m_dashtabs->count() - 1;
+      m_dashtabs->setCurrentIndex(tabIndex);
     } else {
       delete dashboard;
       dashboard = NULL;
@@ -676,6 +678,7 @@ void WebMainUI::initOperatorDashboard(void)
     }
   }
   m_userHomeTpl->bindWidget("contents", thumbs);
+  m_dashtabs->setCurrentIndex(0);
 }
 
 
@@ -685,7 +688,7 @@ Wt::WTemplate* WebMainUI::createThumbnail(WebDashboard* dashboard, int index)
   NodeT& rootNode = dashboard->rootNode();
   tpl->bindString("platorm-status-css-class", utils::computeSeverityCssClass(rootNode.severity));
   tpl->bindString("platform-name", rootNode.name.toStdString());
-  tpl->bindWidget("thumb-image", dashboard->thumbImage());
+  tpl->bindWidget("thumb-image", dashboard->thumbnail());
   tpl->setToolTip(utils::severity2Str(rootNode.severity).toStdString());
   tpl->clicked().connect(std::bind([=](){m_dashtabs->setCurrentIndex(index);}));
   return tpl;
