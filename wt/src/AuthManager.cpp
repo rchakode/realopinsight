@@ -11,12 +11,8 @@
 #include <Wt/WPushButton>
 #include <Wt/WImage>
 
-namespace {
-  Wt::Auth::Login loginObject;
-}
-
 AuthManager::AuthManager(DbSession* dbSession)
-  : Wt::Auth::AuthWidget(loginObject),
+  : Wt::Auth::AuthWidget(m_loginObject),
     m_dbSession(dbSession),
     m_mainUI(NULL),
     m_logged(false)
@@ -25,15 +21,15 @@ AuthManager::AuthManager(DbSession* dbSession)
   authModel->addPasswordAuth(&m_dbSession->passwordAuthentificator());
   Wt::Auth::AuthWidget::setModel(authModel);
 
-  loginObject.changed().connect(this, &AuthManager::handleAuthentication);
+  m_loginObject.changed().connect(this, &AuthManager::handleAuthentication);
 }
 
 void AuthManager::handleAuthentication(void)
 {
-  if (loginObject.loggedIn()) {
+  if (m_loginObject.loggedIn()) {
     if (! m_logged) {
       m_logged = true;
-      m_dbSession->setLoggedUser(loginObject.user().id());
+      m_dbSession->setLoggedUser(m_loginObject.user().id());
       Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
 
       setTemplateText(tr("Wt.Auth.template.logged-in"));
@@ -61,13 +57,13 @@ void AuthManager::create(void)
 
 void AuthManager::logout(void)
 {
-  loginObject.logout();
+  m_loginObject.logout();
   create();
 }
 
 
 bool AuthManager::isLogged(void)
 {
-  return loginObject.loggedIn();
+  return m_loginObject.loggedIn();
 }
 

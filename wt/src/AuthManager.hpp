@@ -4,6 +4,7 @@
 
 #include <Wt/Auth/AuthWidget>
 #include <Wt/WContainerWidget>
+#include <Wt/Auth/Login>
 
 class DbSession;
 class WebMainUI;
@@ -22,6 +23,7 @@ protected:
   virtual void create(void);
 
 private:
+  Wt::Auth::Login m_loginObject;
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
   bool m_logged;
