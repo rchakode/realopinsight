@@ -680,9 +680,7 @@ void WebMainUI::initOperatorDashboard(void)
 Wt::WTemplate* WebMainUI::thumbnail(WebDashboard* dashboard)
 {
   Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
-  NodeT& rootNode = dashboard->rootNode();
   tpl->bindWidget("thumb-image", dashboard->thumbnail());
-  tpl->setToolTip(utils::severity2Str(rootNode.severity).toStdString());
   return tpl;
 }
 
