@@ -202,6 +202,7 @@ std::string WebDashboard::statsTooltip(void)
 
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("statistic-tooltip.tpl"));
 
+  tpl->bindString("platform", m_cdata->root->name.toStdString());
   tpl->bindInt("total-count", totalCount);
 
   tpl->bindInt("unknown-ratio", unknownRatio);
