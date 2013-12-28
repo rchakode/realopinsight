@@ -96,9 +96,7 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){
-    std::cout << "event>>>>>" <<event.key();
-  }, std::placeholders::_1));
+  wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
 }
@@ -293,12 +291,15 @@ void WebMainUI::handleRefresh(void)
   CHECK_LOGIN();
   m_timer.stop();
   m_mainWidget->disable();
+
   for(auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
   }
-  m_mainWidget->enable();
+
+  m_timer.setInterval(1000*m_settings->updateInterval());
   m_timer.start();
+  m_mainWidget->enable();
 }
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
@@ -338,7 +339,7 @@ void WebMainUI::openFileUploadDialog(void)
 
   m_uploader = new Wt::WFileUpload(container);
   m_uploader->uploaded().connect(std::bind(&WebMainUI::finishFileDialog, this, IMPORT));
-  m_uploader->setFileTextSize(1024); //max=1MB
+  m_uploader->setFileTextSize(ngrt4n::MAX_FILE_UPLOAD);
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
 
@@ -668,11 +669,10 @@ void WebMainUI::initOperatorDashboard(void)
     loadView(view.path, dashboard, tabIndex);
     if (dashboard) {
       layout->addWidget(thumbnail(dashboard));
-      dashboard->map()->loaded().connect(this, &WebMainUI::startDashbaordUpdate);
-      m_dashtabs->setCurrentIndex(tabIndex);
     }
   }
   m_userHomeTpl->bindWidget("contents", thumbs);
+  startDashbaordUpdate();
 }
 
 
@@ -716,9 +716,7 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
 
 void WebMainUI::startDashbaordUpdate(void)
 {
-  static int current = 0;
-  if (m_assignedDashboardCount > 0 && ++current == m_assignedDashboardCount) {
-    handleRefresh();
-    resetTimer();
-  }
+  m_timer.setInterval(2000);
+  m_timer.start();
+  m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
 }
