@@ -64,6 +64,15 @@ namespace ngrt4n {
   const std::string TAG_THERESHOLD = "\\{threshold\\}";
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
 
+
+  const std::string LINK_HOME ="/realopinsight";
+  const std::string LINK_LOAD ="/load-platform";
+  const std::string LINK_IMPORT ="/import-platform";
+  const std::string LINK_LOGIN ="/login";
+  const std::string LINK_LOGOUT ="/logout";
+  const std::string LINK_ADMIN_HOME ="/adm-console";
+  const std::string LINK_OP_HOME ="/op-console";
+
   void initApp() ;
   void checkUser() ;
   void setPassChain(char* authChain) ;

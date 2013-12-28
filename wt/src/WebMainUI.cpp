@@ -43,16 +43,7 @@
 #include <Wt/WHBoxLayout>
 #include <Wt/WEvent>
 
-#define CHECK_LOGIN() if (! m_authManager->isLogged()) {wApp->redirect(LINK_HOME); return;}
-
-namespace {
-  const std::string LINK_HOME ="/realopinsight";
-  const std::string LINK_LOAD ="/load-platform";
-  const std::string LINK_IMPORT ="/import-platform";
-  const std::string LINK_LOGIN_PAGE ="/login";
-  const std::string LINK_ADMIN_HOME ="/adm-console";
-  const std::string LINK_OP_HOME ="/op-console";
-}
+#define CHECK_LOGIN() if (! m_authManager->isLogged()) {wApp->redirect(ngrt4n::LINK_HOME); return;}
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
@@ -162,9 +153,9 @@ void WebMainUI::setupAdminMenus(void)
   // Menus for view management
   mgntPopupMenu->addSectionHeader("View");
   mgntPopupMenu->addItem("Import")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_IMPORT));
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
   mgntPopupMenu->addItem("Load")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, LINK_LOAD));
+      ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
   mgntPopupMenu->addItem("Assign/revoke/delete")
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->resetModelData();
@@ -467,21 +458,21 @@ Wt::WWidget* WebMainUI::createUserHome(void)
     m_userHomeTpl->bindWidget("andhor-load-file",
                               createAnchorForHomeLink(utils::tr("Load"),
                                                       utils::tr("An existing platform"),
-                                                      LINK_LOAD));
+                                                      ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
                               createAnchorForHomeLink(utils::tr("Import"),
                                                       utils::tr("A platform description"),
-                                                      LINK_IMPORT));
+                                                      ngrt4n::LINK_IMPORT));
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
     m_userHomeTpl->bindWidget("andhor-load-file",
                               createAnchorForHomeLink(utils::tr("Load"),
                                                       utils::tr("An existing platform"),
-                                                      LINK_LOAD));
+                                                      ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
                               createAnchorForHomeLink(utils::tr("Import"),
                                                       utils::tr("A platform description"),
-                                                      LINK_IMPORT));
+                                                      ngrt4n::LINK_IMPORT));
   }
   m_userHomeTpl->bindString("software", APP_NAME.toStdString());
   m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
@@ -550,18 +541,17 @@ void WebMainUI::createPasswordPanel(void)
 
 void WebMainUI::handleInternalPath(void)
 {
-  CHECK_LOGIN();
   std::string path = Wt::WApplication::instance()->internalPath();
-  if (path == LINK_LOAD) {
+  if (path == ngrt4n::LINK_LOAD) {
     selectFileToOpen();
     setInternalPath("");
-  } else if (path == LINK_IMPORT) {
+  } else if (path == ngrt4n::LINK_IMPORT) {
     openFileUploadDialog();
     setInternalPath("");
-  } else if (path == LINK_ADMIN_HOME) {
+  } else if (path == ngrt4n::LINK_ADMIN_HOME) {
     showUserHome();
-  } else if (path == LINK_LOGIN_PAGE) {
-    wApp->redirect(LINK_LOGIN_PAGE);
+  } else if (path == ngrt4n::LINK_LOGIN) {
+    wApp->redirect(ngrt4n::LINK_LOGIN);
   } else {
     showMessage(utils::tr("Sorry, the request resource "
                           "is not available or has been removed"),

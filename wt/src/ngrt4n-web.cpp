@@ -8,7 +8,6 @@
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
   Wt::WApplication* webApp = new Wt::WApplication(env);
-  for (auto c: env.cookies()) std::cout << c.first << " cooooooooooookiiiiii " << c.second <<"\n";
   webApp->setTwoPhaseRenderingThreshold(0);
   webApp->useStyleSheet("/resources/css/ngrt4n.css");
   webApp->messageResourceBundle().use(webApp->docRoot() + "/resources/i18n/messages");

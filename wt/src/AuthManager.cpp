@@ -41,6 +41,7 @@ void AuthManager::handleAuthentication(void)
       image->setToolTip("Sign out");
       image->clicked().connect(this, &AuthManager::logout);
       bindWidget("logout-item", image);
+      //wApp->redirect();
     }
   } else {
     m_logged = false;
@@ -49,6 +50,7 @@ void AuthManager::handleAuthentication(void)
 
 void AuthManager::create(void)
 {
+  wApp->setInternalPath(ngrt4n::LINK_LOGIN);
   Wt::Auth::AuthWidget::create();
   bindString("software", APP_NAME.toStdString());
   bindString("version", PKG_VERSION.toStdString());
@@ -58,6 +60,7 @@ void AuthManager::create(void)
 
 void AuthManager::logout(void)
 {
+  wApp->setInternalPath(ngrt4n::LINK_LOGOUT);
   m_loginObject.logout();
   create();
 }
