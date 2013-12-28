@@ -29,7 +29,6 @@
 
 using namespace std;
 
-const QString Parser::CHILD_SEP = ",";
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
@@ -138,7 +137,7 @@ void Parser::updateNodeHierachy(QString& _graphContent)
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
-      QStringList ids = node->child_nodes.split(CHILD_SEP);
+      QStringList ids = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
       Q_FOREACH(const QString& nid, ids) {
         QString nidTrimmed = nid.trimmed();
         auto childNode = m_cdata->cnodes.find(nidTrimmed);

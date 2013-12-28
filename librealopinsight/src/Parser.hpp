@@ -38,7 +38,6 @@ public:
 
   bool process(bool console);
   QString dotFile(void) const { return m_dotFile; }
-  static const QString CHILD_SEP;
   QString lastError(void) const {return m_lastError;}
 
 Q_SIGNALS:

@@ -363,7 +363,7 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   NodeListT::iterator node;
   if (! utils::findNode(m_cdata, _nodeId, node)) return;
 
-  QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
+  QStringList nodeIds = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
   Q_FOREACH (const QString& nodeId, nodeIds) {
     NodeListT::iterator child;
     if (!utils::findNode(m_cdata, nodeId, child)) continue;

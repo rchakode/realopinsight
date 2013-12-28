@@ -128,21 +128,20 @@ void WebMap::drawMap(void)
  */
 void WebMap::drawNode(const NodeT& _node, bool drawIcon)
 {
-  m_painter->save();
-  Wt::WPointF iconPos(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
-  Wt::WPointF labelPos(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
-  Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
+  if (_node.visibility & ngrt4n::Visible) {
 
-  m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
+    m_painter->save();
 
-  if (drawIcon) {
-    m_painter->drawImage(iconPos, GImage(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
-  } else {
-    // thumbnail: do nothing
-  }
-  if (_node.visibility | ngrt4n::Visible) {
+    Wt::WPointF iconPos(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
+    Wt::WPointF labelPos(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
+    Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
+    m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
+    if (drawIcon) {
+      m_painter->drawImage(iconPos, GImage(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
+    } else { /* thumbnail: do nothing*/ }
+
     if( _node.type == NodeType::ServiceNode) {
-      if (_node.visibility | ngrt4n::Expanded) {
+      if (_node.visibility & ngrt4n::Expanded) {
         m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(m_icons[utils::MINUS]),19,18));
       } else {
         m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(m_icons[utils::PLUS]),19,18));
@@ -153,28 +152,31 @@ void WebMap::drawNode(const NodeT& _node, bool drawIcon)
                         Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
                         Wt::AlignCenter, Wt::WString(_node.name.toStdString()));
     createNodeLink(_node, iconPos);
+
+    m_painter->restore();
   }
-  m_painter->restore();
 }
 
 void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
 {
-  m_painter->save();
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
   if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
       && utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child))
   {
-    QColor qcolor = utils::computeColor(child->prop_sev);
-    Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
-    Wt::WPen pen(wcolor);
-    m_painter->setPen(pen);
+    if (parent->visibility & ngrt4n::Expanded) {
+      m_painter->save();
+      QColor qcolor = utils::computeColor(child->prop_sev);
+      Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
+      Wt::WPen pen(wcolor);
+      m_painter->setPen(pen);
 
-    Wt::WPointF edgeP1(parent->pos_x + m_translateX, parent->pos_y + 24 + m_translateY);
-    Wt::WPointF edgeP2(child->pos_x + m_translateX, child->pos_y - 24 + m_translateY);
-    m_painter->drawLine(edgeP1, edgeP2);
+      Wt::WPointF edgeP1(parent->pos_x + m_translateX, parent->pos_y + 24 + m_translateY);
+      Wt::WPointF edgeP2(child->pos_x + m_translateX, child->pos_y - 24 + m_translateY);
+      m_painter->drawLine(edgeP1, edgeP2);
+      m_painter->restore();
+    }
   }
-  m_painter->restore();
 }
 
 void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
@@ -182,9 +184,9 @@ void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
                                           40 * m_scaleX, 40 * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toUtf8()));
-  area->clicked().connect(std::bind([=](){
-    qDebug() << "node "<< _node.name << _node.visibility;
-  }));
+  //  area->clicked().connect(std::bind([=](){
+  //    qDebug() << "node "<< _node.name << _node.visibility;
+  //  }));
   addArea(area);
 }
 
@@ -193,9 +195,7 @@ void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos
   Wt::WRectArea* area = new Wt::WRectArea(expIconPos.x() * m_scaleX, expIconPos.y() * m_scaleY,
                                           20 * m_scaleX, 20 * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toUtf8()));
-  area->clicked().connect(std::bind([=](){
-    qDebug() <<"exp icon "<< _node.name << _node.visibility;
-  }));
+  area->clicked().connect(std::bind([=]() {expandCollapse(_node.id);}));
   addArea(area);
 }
 
@@ -265,8 +265,7 @@ void WebMap::updateThumbnail(void)
 }
 
 void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight,
-                                 double scaleX, double scaleY,
-                                 double fontSize)
+                                 double scaleX, double scaleY, double fontSize)
 {
   m_painter->save();
   Wt::WFont font;
@@ -284,4 +283,40 @@ void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight,
                       Wt::TextSingleLine,
                       m_cdata->root->name.toStdString());
   m_painter->restore();
+}
+
+
+void WebMap::expandCollapse(const QString& nodeId)
+{
+  NodeListIteratorT node;
+  if (utils::findNode(m_cdata, nodeId, node)) {
+    qint8 childMask = 0x0;
+    if (node->visibility & ngrt4n::Expanded) {
+      childMask = ngrt4n::Hidden;
+      node->visibility &= (ngrt4n::Collapsed | ngrt4n::Visible);
+    } else {
+      childMask = ngrt4n::Visible;
+      node->visibility |= ngrt4n::Expanded;
+    }
+    applyVisibilityToChild(*node, childMask);
+    drawMap();
+  }
+}
+
+
+void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
+{
+  if (node.type != NodeType::AlarmNode && ! node.child_nodes.isEmpty()) {
+    for (const auto & childId: node.child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+      NodeListIteratorT child;
+      if(utils::findNode(m_cdata, childId, child)) {
+        if (node.visibility & ngrt4n::Expanded) {
+          child->visibility |= mask;
+        } else {
+          child->visibility &= mask;
+        }
+        applyVisibilityToChild(*child, mask);
+      }
+    }
+  }
 }

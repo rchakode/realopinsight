@@ -33,6 +33,7 @@
 #include <Wt/WSignal>
 #include <Wt/WScrollArea>
 #include <Wt/WImage>
+#include <QtGlobal>
 
 struct CoreDataT;
 struct NodeT;
@@ -82,8 +83,9 @@ private:
   void setJavaScriptMember(void);
   void handleContainedSizeChanged(double w, double h);
   void drawThumbnailBanner(double thumbWidth, double thumbHeight,
-                             double scaleX, double scaleY,
-                             double fontSize);
+                             double scaleX, double scaleY, double fontSize);
+  void expandCollapse(const QString& nodeId);
+  void applyVisibilityToChild(const NodeT& node, qint8 mask);
 };
 
 #endif /* WEBSERVICEMAP_HPP */
