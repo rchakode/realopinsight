@@ -125,7 +125,7 @@ void WebPieChart::setSeverityData(int _sev, int _count)
 {
   std::string label = utils::severity2Str(_sev).toStdString();
   m_model->setData(_sev, 0, label);
-  m_model->setData(_sev, 1, label, Wt::ToolTipRole);
+ // m_model->setData(_sev, 1, label, Wt::ToolTipRole);
   m_model->setData(_sev, 1, _count);
   //setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
 }

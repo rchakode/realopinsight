@@ -225,10 +225,8 @@ void WebMainUI::setupMenus(void)
   m_mainProfileMenuItem->setText(tr("You're %1").arg(loggedUser.username.c_str()).toStdString());
   if(loggedUser.role == User::AdmRole) {
     m_mgntMenu->show();
-    setInternalPath(LINK_ADMIN_HOME);
   } else {
     m_mgntMenu->hide();
-    setInternalPath(LINK_OP_HOME);
   }
 
   //FIXME: add this after the first view loaded
@@ -274,7 +272,7 @@ void WebMainUI::resetTimer(void)
 {
   CHECK_LOGIN();
   m_timer.setInterval(1000*m_settings->updateInterval());
-  m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
+  //m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer.start();
 }
 
@@ -296,8 +294,6 @@ void WebMainUI::handleRefresh(void)
     dash.second->runMonitor();
     dash.second->updateMap();
   }
-
-  m_timer.setInterval(1000*m_settings->updateInterval());
   m_timer.start();
   m_mainWidget->enable();
 }
@@ -716,7 +712,12 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
 
 void WebMainUI::startDashbaordUpdate(void)
 {
-  m_timer.setInterval(2000);
-  m_timer.start();
-  m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
+  Wt::WTimer* tmpTimer(new Wt::WTimer);
+  tmpTimer->setInterval(2000);
+  tmpTimer->start();
+  tmpTimer->timeout().connect(std::bind([=](){
+    tmpTimer->stop();
+    delete tmpTimer;
+    handleRefresh();
+  }));
 }

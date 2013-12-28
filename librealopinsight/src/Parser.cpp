@@ -76,8 +76,10 @@ bool Parser::process(bool console)
   for (qint32 srv = 0; srv < serviceCount; ++srv) {
     QDomElement service = services.item(srv).toElement();
     node.id = service.attribute("id").trimmed();
+    node.parent = "";
     node.monitored = false;
     node.type = service.attribute("type").toInt();
+    node.severity == MonitorBroker::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
     node.icon = service.firstChildElement("Icon").text().trimmed();
@@ -86,8 +88,7 @@ bool Parser::process(bool console)
     node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-    node.severity = MonitorBroker::NagiosUnknown;
-    node.parent = "";
+
     if (node.icon.isEmpty()) {
       node.icon = utils::DEFAULT_ICON;
     }

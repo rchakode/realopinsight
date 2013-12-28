@@ -66,6 +66,7 @@ private:
   void setupUI(void);
   void addJsEventScript(void);
   void addEvents(void);
+  std::string statsTooltip(void);
 };
 
 

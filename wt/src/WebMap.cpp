@@ -261,7 +261,6 @@ void WebMap::updateThumbnail(void)
   delete m_painter;
 
   m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
-  m_thumbnail->setToolTip(utils::severity2Str(m_cdata->root->severity).toStdString());
 }
 
 void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight,

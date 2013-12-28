@@ -55,6 +55,7 @@ public:
   std::string thumbnailPath(void) {return m_thumbnailPath;}
   Wt::WImage* thumbnail(void) const {return m_thumbnail;}
   void emitLoaded(void) const {m_loaded.emit();}
+  void setThumbnailTooltip(const std::string& tooltip) {m_thumbnail->setToolTip(tooltip);}
 
 
 protected:

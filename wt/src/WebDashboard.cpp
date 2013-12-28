@@ -23,21 +23,22 @@
  */
 
 
-#include <Wt/WApplication>
+#include "WebDashboard.hpp"
+#include "Base.hpp"
+#include "utilsClient.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <fstream>
 #include <iostream>
+#include <QDebug>
+#include <Wt/WApplication>
 #include <Wt/WPanel>
 #include <Wt/WPointF>
 #include <Wt/WText>
 #include <Wt/WLink>
 #include <Wt/WImage>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include "WebDashboard.hpp"
-#include "Base.hpp"
-#include "utilsClient.hpp"
-#include <QDebug>
+#include <Wt/WTemplate>
 
 #define ROOT_DIV wApp->root()->id()
 #define TREEVIEW_DIV m_tree->id()
@@ -120,6 +121,7 @@ void WebDashboard::updateChart(void)
        end = m_cdata->check_status_count.end(); it != end; ++it) {
     m_chart->setSeverityData(it.key(), it.value());
   }
+  m_chart->setToolTip(statsTooltip());
 }
 
 void WebDashboard::buildMap(void)
@@ -137,6 +139,7 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 void WebDashboard::updateMap(void)
 {
   m_map->drawMap();
+  m_map->setThumbnailTooltip(statsTooltip());
 }
 
 void WebDashboard::setupUI(void)
@@ -179,4 +182,45 @@ void WebDashboard::addJsEventScript(void)
 Wt::WImage* WebDashboard::thumbnail(void)
 {
   return m_map->thumbnail();
+}
+
+
+std::string WebDashboard::statsTooltip(void)
+{
+  qint32 totalCount = m_cdata->cnodes.size();
+  qint32 criticalCount = m_cdata->check_status_count[MonitorBroker::Critical];
+  qint32 majorCount = m_cdata->check_status_count[MonitorBroker::Major];
+  qint32 minorCount = m_cdata->check_status_count[MonitorBroker::Minor];
+  qint32 normalCount =  m_cdata->check_status_count[MonitorBroker::Normal];
+  qint32 unknownCount = totalCount - (criticalCount + majorCount + minorCount + normalCount);
+
+  float criticalRatio = (100.0 * criticalCount) / totalCount;
+  float majorRatio = (100.0 * majorCount) / totalCount;
+  float minorRatio = (100.0 * minorCount) / totalCount;
+  float unknownRatio = (100.0 * unknownCount) / totalCount;
+  float normalRatio = (100.0 * normalCount) / totalCount;
+
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("statistic-tooltip.tpl"));
+
+  tpl->bindInt("total-count", totalCount);
+
+  tpl->bindInt("unknown-ratio", unknownRatio);
+  tpl->bindInt("unknown-count", unknownCount);
+
+  tpl->bindInt("critical-ratio", criticalRatio);
+  tpl->bindInt("critical-count", criticalCount);
+
+  tpl->bindInt("major-ratio", majorRatio);
+  tpl->bindInt("major-count", majorCount);
+
+  tpl->bindInt("minor-ratio", minorRatio);
+  tpl->bindInt("minor-count", minorCount);
+
+  tpl->bindInt("normal-ratio", normalRatio);
+  tpl->bindInt("normal-count", normalCount);
+
+  std::ostringstream oss;
+  tpl->renderTemplate(oss);
+  delete tpl;
+  return oss.str();
 }
