@@ -21,6 +21,8 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
+
+#include "WebPreferences.hpp"
 #include "AuthManager.hpp"
 #include "ViewMgnt.hpp"
 #include "WebMainUI.hpp"
@@ -43,16 +45,18 @@
 #include <Wt/WHBoxLayout>
 #include <Wt/WEvent>
 
+
 #define CHECK_LOGIN() if (! m_authManager->isLogged()) {wApp->redirect(ngrt4n::LINK_HOME); return;}
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
-    m_settings (new Settings()),
     m_mainWidget(new Wt::WContainerWidget(this)),
-    m_dashtabs(new Wt::WTabWidget()),
-    m_fileUploadDialog(createDialog(utils::tr("Select a file"))),
+    m_settings (new Settings()),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
+    m_preferenceDialog(new WebPreferences(m_dbSession->loggedUser().role)),
+    m_dashtabs(new Wt::WTabWidget()),
+    m_fileUploadDialog(createDialog(utils::tr("Select a file"))),
     m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
     m_terminateSession(this)
 {
@@ -77,6 +81,7 @@ WebMainUI::~WebMainUI()
   //  m_navbar(NULL),
   //  m_mgntMenu(NULL),
   //  m_profileMenu(NULL),
+  delete m_preferenceDialog;
   delete m_fileUploadDialog;
   delete m_navbar;
   delete m_contents;
@@ -175,6 +180,11 @@ void WebMainUI::setupAdminMenus(void)
     showUserMngtPage(m_contents, UserMngtUI::ListUserAction);
   }));
 
+  mgntPopupMenu->addSectionHeader("Settings");
+  mgntPopupMenu->addItem("Update Settings")
+      ->triggered().connect(std::bind([=](){
+    m_preferenceDialog->show();
+  }));
 }
 
 void WebMainUI::setupProfileMenus(void)

@@ -21,22 +21,27 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-#include "Preferences.hpp"
 #include "WebPreferences.hpp"
+#include <Wt/WTemplate>
+#include <Wt/WContainerWidget>
 
-WebPreferences::WebPreferences(qint32 _userRole)
-  : Preferences(_userRole, Preferences::WebForm)
+WebPreferences::WebPreferences(int _userRole)
+  : Preferences(_userRole, Preferences::WebForm),
+    m_dialog(new Wt::WDialog())
 {
+  Wt::WContainerWidget* container = m_dialog->contents();
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), container);
 }
 
 
-virtual WebPreferences::~WebPreferences()
+WebPreferences::~WebPreferences()
 {
-
+  delete m_dialog;
 }
 
 
 QString WebPreferences::selectSourceType(void)
 {
 
+  return "";
 }

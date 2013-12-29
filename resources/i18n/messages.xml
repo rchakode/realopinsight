@@ -328,40 +328,50 @@
   </message>
 
   <message id="setting-page.tpl">
-    <div class="form-horizontal">
-      <div class="control-group">
-        <span class="controls">${s0}</span>
-        <span class="controls">${s1}</span>
-        <span class="controls">${s2}</span>
-        <span class="controls">${s3}</span>
-        <span class="controls">${s4}</span>
-        <span class="controls">${s5}</span>
-        <span class="controls">${s6}</span>
-        <span class="controls">${s7}</span>
-        <span class="controls">${s8}</span>
-        <span class="controls">${s9}</span>
+    <div class="ngrt4n-admin-page form-horizontal">
+      <div>
+       <div class="row">
+         <span class="span1">${s0}</span>
+         <span class="span1">${s1}</span>
+         <span class="span1">${s2}</span>
+         <span class="span1">${s3}</span>
+         <span class="span1">${s4}</span>
+         <span class="span1">${s5}</span>
+         <span class="span1">${s6}</span>
+         <span class="span1">${s7}</span>
+         <span class="span1">${s8}</span>
+         <span class="span1">${s9}</span>
+       </div>
       </div>
-      <div class="control-group">
-        <label for="${id:{monitor-url}}" class="control-label">Monitor Web URL</label>
-        <span class="controls">${monitor-url}</span>
-        <span class="controls">${monitor-type}</span>
+      <div class="row">
+        <div class="control-group">
+          <label for="${id:{monitor-url}}" class="control-label">Monitor Web URL</label>
+          <span class="controls">${monitor-url}</span>
+          <span class="controls">${monitor-type}</span>
+        </div>
       </div>
-      <div class="control-group">
-        <label for="${id:{auth-string}}" class="control-label">Authentication String</label>
-        <span class="controls">${auth-string}</span>
-        <span class="controls">${show-in-clear}</span>
+      <div class="row">
+        <div class="control-group">
+          <span for="${id:{auth-string}}" class="control-label">Authentication String</span>
+          <span class="controls">${auth-string}</span>
+          <span class="controls">${show-in-clear}</span>
+        </div>
       </div>
-      <div class="control-group">
-        <label for="${id:{update-interval}}" class="control-label">Update Interval</label>
-        <div class="controls">${update-interval}</div>
-        <label class="control-label">seconds</label>
+      <div class="row">
+        <div class="control-group">
+          <span for="${id:{update-interval}}" class="control-label">Update Interval</span>
+          <span class="controls">${update-interval}</span>
+          <span class="control-label">seconds</span>
+        </div>
       </div>
-      <div class="control-group">
-        <label for="${id:{auth-string}}" class="control-label">Livestatus/ngrt4nd Address</label>
-        <span class="controls">${livestatus-server}</span>
-        <label for="${id:{livestatus-port}}" class="control-label">Port</span>
-        <span class="controls">${livestatus-port}</span>
-      </div>
+      <div class="row">
+        <div class="control-group">
+          <span for="${id:{livestatus-server}}" class="control-label">Livestatus/ngrt4nd Address</span>
+          <span class="controls">${livestatus-server}</span>
+          <span for="${id:{livestatus-port}}" class="control-label">Port</span>
+          <span class="controls">${livestatus-port}</span>
+        </div>
+       </div>
 
       <div class="control-group">
         <span class="controls">${close-button}</span>

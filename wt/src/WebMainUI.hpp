@@ -37,6 +37,7 @@
 
 class AuthManager;
 class ViewAssignmentUI;
+class WebPreferences;
 
 class WebMainUI : public QObject, public Wt::WContainerWidget
 {
@@ -66,9 +67,12 @@ private:
     IMPORT = 0
   };
 
-  Settings* m_settings;
-  Wt::WTimer m_timer;
   Wt::WContainerWidget* m_mainWidget;
+  Settings* m_settings;
+  AuthManager* m_authManager;
+  DbSession* m_dbSession;
+  WebPreferences* m_preferenceDialog;
+  Wt::WTimer m_timer;
   Wt::WStackedWidget* m_contents;
   Wt::WNavigationBar* m_navbar;
   Wt::WMenu* m_mgntMenu;
@@ -81,8 +85,6 @@ private:
   WebDashboard* m_currentDashboard;
   typedef std::map<std::string, WebDashboard*> DashboardListT;
   DashboardListT m_dashboards;
-  AuthManager* m_authManager;
-  DbSession* m_dbSession;
   std::string m_confdir;
   UserMngtUI* m_userMgntUI;
   Wt::WDialog* m_accountPanel;

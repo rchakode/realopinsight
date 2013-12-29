@@ -25,17 +25,25 @@
 #ifndef WEBSESSION_HPP
 #define WEBSESSION_HPP
 
-class Preferences;
+#include "Preferences.hpp"
+#include <Wt/WDialog>
+
 class QString;
 
 class WebPreferences : public Preferences
 {
 public:
-  WebPreferences(qint32 _userRole);
+  WebPreferences(int _userRole);
   virtual ~WebPreferences();
+
+  void show(void) {m_dialog->show();}
+  void accept(void) {m_dialog->accept();}
 
 protected :
   virtual QString selectSourceType(void);
+
+private:
+  Wt::WDialog* m_dialog;
 };
 
 #endif // WEBSESSION_HPP
