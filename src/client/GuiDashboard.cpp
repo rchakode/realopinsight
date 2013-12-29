@@ -197,7 +197,7 @@ void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const
     return;
   }
   if (!node->child_nodes.isEmpty()) {
-    QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
+    QStringList  childNodes = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
     Q_FOREACH (const auto& cid, childNodes) {
       m_map->setNodeVisible(cid, _nodeId, _expand, _level);
     }
@@ -236,7 +236,7 @@ void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
     if (node->type == NodeType::AlarmNode) {
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {
-      QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
+      QStringList childIds = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
       Q_FOREACH (const QString& chkid, childIds) {
         filterNodeRelatedMsg(chkid);
       }

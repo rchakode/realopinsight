@@ -79,7 +79,7 @@ bool Parser::process(bool console)
     node.parent = "";
     node.monitored = false;
     node.type = service.attribute("type").toInt();
-    node.severity == MonitorBroker::Unknown;
+    node.severity = MonitorBroker::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
     node.icon = service.firstChildElement("Icon").text().trimmed();

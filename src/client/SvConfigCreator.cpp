@@ -202,7 +202,7 @@ void SvCreator::insertFromSelected(const NodeT& node)
     utils::alert(tr("This action not allowed on the target node"));
     return;
   }
-  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? Parser::CHILD_SEP%node.id : node.id;
+  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? QString::fromStdString(ngrt4n::CHILD_SEP)%node.id : node.id;
   QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
   m_cdata->bpnodes.insert(node.id, node);
   m_tree->setCurrentItem(lastItem);
@@ -232,8 +232,10 @@ void SvCreator::deleteNode(const QString& _nodeId)
   if (!utils::findNode(m_cdata, _nodeId, node))
     return;
 
+  QString sep(ngrt4n::CHILD_SEP.c_str());
+
   if (node->type == NodeType::ServiceNode && node->child_nodes != "") {
-    Q_FOREACH(const QString& checkId, node->child_nodes.split(Parser::CHILD_SEP)) {
+    Q_FOREACH(const QString& checkId, node->child_nodes.split(sep)) {
       deleteNode(checkId);
     }
   }
@@ -241,9 +243,9 @@ void SvCreator::deleteNode(const QString& _nodeId)
   QTreeWidgetItem* item = m_tree->findNodeItem(_nodeId);
   QTreeWidgetItem* pItem = m_tree->findNodeItem(node->parent);
   if (pItem && item) {
-    QRegExp regex("|^" + _nodeId + Parser::CHILD_SEP +
+    QRegExp regex("|^" + _nodeId + sep +
                   "|^" + _nodeId + "$" +
-                  "|" + Parser::CHILD_SEP  + _nodeId);
+                  "|" + sep  + _nodeId);
 
     NodeListT::iterator pNode = m_cdata->bpnodes.find(node->parent);
     if (pNode != m_cdata->bpnodes.end()) {
@@ -371,6 +373,8 @@ void SvCreator::handleSelectedNodeChanged(void)
 
 void SvCreator::handleTreeNodeMoved(QString _node_id)
 {
+  QString sep(ngrt4n::CHILD_SEP.c_str());
+
   QTreeWidgetItem* item =  m_tree->findNodeItem(_node_id);
   if (item) {
 
@@ -380,9 +384,9 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 
       if (nodeIt != m_cdata->bpnodes.end()) {
         /* Remove the node on its old parent's child list*/
-        QRegExp regex ("|^" + _node_id + Parser::CHILD_SEP +
+        QRegExp regex ("|^" + _node_id + sep +
                        "|^" + _node_id + "$" +
-                       "|" + Parser::CHILD_SEP  + _node_id);
+                       "|" + sep + _node_id);
         NodeListT::iterator pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
         if (pNodeIt != m_cdata->bpnodes.end()) {
           pNodeIt->child_nodes.remove(regex);
@@ -392,8 +396,7 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
         nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
         pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
         if (pNodeIt != m_cdata->bpnodes.end()) {
-          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")?
-                Parser::CHILD_SEP + _node_id : _node_id;
+          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")? sep + _node_id : _node_id;
         }
       }
     }

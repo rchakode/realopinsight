@@ -327,6 +327,51 @@
      Normal: ${normal-ratio}% (${normal-count}/${total-count})
   </message>
 
+  <message id="setting-page.tpl">
+    <div class="form-horizontal">
+      <div class="control-group">
+        <span class="controls">${s0}</span>
+        <span class="controls">${s1}</span>
+        <span class="controls">${s2}</span>
+        <span class="controls">${s3}</span>
+        <span class="controls">${s4}</span>
+        <span class="controls">${s5}</span>
+        <span class="controls">${s6}</span>
+        <span class="controls">${s7}</span>
+        <span class="controls">${s8}</span>
+        <span class="controls">${s9}</span>
+      </div>
+      <div class="control-group">
+        <label for="${id:{monitor-url}}" class="control-label">Monitor Web URL</label>
+        <span class="controls">${monitor-url}</span>
+        <span class="controls">${monitor-type}</span>
+      </div>
+      <div class="control-group">
+        <label for="${id:{auth-string}}" class="control-label">Authentication String</label>
+        <span class="controls">${auth-string}</span>
+        <span class="controls">${show-in-clear}</span>
+      </div>
+      <div class="control-group">
+        <label for="${id:{update-interval}}" class="control-label">Update Interval</label>
+        <div class="controls">${update-interval}</div>
+        <label class="control-label">seconds</label>
+      </div>
+      <div class="control-group">
+        <label for="${id:{auth-string}}" class="control-label">Livestatus/ngrt4nd Address</label>
+        <span class="controls">${livestatus-server}</span>
+        <label for="${id:{livestatus-port}}" class="control-label">Port</span>
+        <span class="controls">${livestatus-port}</span>
+      </div>
+
+      <div class="control-group">
+        <span class="controls">${close-button}</span>
+        <span class="controls">${apply-change-button}</span>
+        <span class="controls">${add-as-source-button}</span>
+        <span class="controls">${delete-button}</span>
+      </div>
+    </div>
+  </message>
+
   <message id="about-tpl">
     <div>
      <div>

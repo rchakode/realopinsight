@@ -22,12 +22,11 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "core/ns.hpp"
-#include "client/utilsClient.hpp"
+#include "ns.hpp"
+#include "utilsClient.hpp"
 #include "client/Auth.hpp"
 #include "client/MainWindow.hpp"
 #include "client/SvConfigCreator.hpp"
-#include "client/ZbxHelper.hpp"
 #include <sstream>
 #include <getopt.h>
 #include <QTranslator>

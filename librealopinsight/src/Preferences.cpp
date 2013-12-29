@@ -42,52 +42,26 @@ Preferences::Preferences(qint32 _userRole, qint32 _formType)
     m_formType(_formType),
     m_settings(new Settings()),
     m_sourceStates(new QBitArray(MAX_SRCS)),
-    m_monitorUrlField(new QLineEdit()),
-    m_monitorTypeField(new QComboBox()),
-    m_updateIntervalField(new QSpinBox()),
-    m_brwBtn(new QPushButton(tr("&Browse..."))),
-    m_oldPwdField(new QLineEdit()),
-    m_pwdField(new QLineEdit()),
-    m_rePwdField(new QLineEdit()),
-    m_sockAddrField (new QLineEdit()),
-    m_sockPortField(new QLineEdit()),
-    m_serverPassField(new QLineEdit()),
     m_cancelBtn(new QPushButton(tr("&Close"))),
-    m_applySettingBtn(new QPushButton(tr("&Apply settings"))),
-    m_addAsSourceBtn(new QPushButton(tr("Add a&s Source"))),
-    m_deleteSourceBtn(new QPushButton(tr("&Delete Source"))),
-    m_changePwdBtn(new QPushButton(tr("C&hange password"))),
-    m_donateBtn(new ImageButton(":images/built-in/donate.png")),
-    m_showAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
-    m_useMklsChkbx(new QCheckBox(tr("Use&Livestatus"))),
-    m_verifySslPeerChkBx(new QCheckBox(tr("Don't verify SSL peer (https)"))),
     m_selectedSource(0),
     m_cancelled(false)
 {
-
-  m_oldPwdField->setEchoMode(QLineEdit::Password);
-  m_pwdField->setEchoMode(QLineEdit::Password);
-  m_rePwdField->setEchoMode(QLineEdit::Password);
-  m_serverPassField->setEchoMode(QLineEdit::Password);
-  m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
-
   switch (_formType)
   {
     case Preferences::ChangeMonitoringSettings:
-      organizePrefWindow();
+      createPreferenceWindow();
       break;
-
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
-      organizeChangePasswdWindow();
+      createChangePasswordForm();
       break;
-
     case Preferences::ShowAbout:
       organizeAbortWindow();
       break;
-
     case Preferences::BasicLoginForm:
       loadBasicLoginForm();
+      break;
+    case WebForm:
       break;
     default:
       break;
@@ -99,44 +73,58 @@ Preferences::~Preferences()
 {
   switch(m_formType) {
     case ChangeMonitoringSettings:
-
       delete m_sourceStates;
       delete m_monitorTypeField;
       delete m_monitorUrlField;
       delete m_updateIntervalField;
-      delete m_brwBtn;
-      delete m_oldPwdField;
-      delete m_pwdField;
-      delete m_rePwdField;
-      delete m_changePwdBtn;
-      delete m_cancelBtn;
       delete m_applySettingBtn;
       delete m_addAsSourceBtn;
       delete m_deleteSourceBtn;
       delete m_sockAddrField;
       delete m_sockPortField;
       delete m_serverPassField;
-      delete m_donateBtn;
       delete m_showAuthInfoChkbx;
       delete m_useMklsChkbx;
       delete m_verifySslPeerChkBx;
-      delete m_mainLayout;
+      break;
+    case ChangePassword:
+      delete m_oldPwdField;
+      delete m_pwdField;
+      delete m_rePwdField;
+      delete m_changePwdBtn;
       break;
     case BasicLoginForm:
       delete m_realmLoginField;
       delete m_realmPasswdField;
       break;
+    case ShowAbout:
+      delete m_donateBtn;
+      break;
     default:
       break;
   }
+  delete m_cancelBtn;
+  delete m_mainLayout;
 }
 
 
 void Preferences::showEvent (QShowEvent *)
 {
-  m_oldPwdField->setText("");
-  m_pwdField->setText("");
-  m_rePwdField->setText("");
+  switch(m_formType) {
+    case ChangePassword:
+      m_oldPwdField->setText("");
+      m_pwdField->setText("");
+      m_rePwdField->setText("");
+      break;
+    case ChangeMonitoringSettings:
+      break;
+    case BasicLoginForm:
+      break;
+    case ShowAbout:
+      break;
+    default:
+      break;
+  }
 }
 
 
@@ -340,29 +328,30 @@ QGroupBox* Preferences::createCommonGrp(void)
     connect(btn, SIGNAL(clicked()), this, SLOT(handleSourceSelected()));
     sourceBtnsLyt->addWidget(btn);
   }
+  int line =0;
   QGridLayout* lyt(new QGridLayout());
-  int line;
-  line =0,
-      lyt->addWidget(new QLabel(tr("Sources")), line, 0);
-  lyt->addLayout(sourceBtnsLyt, line, 1, 1, 1, Qt::AlignLeft);
-  ++line,
-      lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
+
+  lyt->addWidget(new QLabel(tr("Sources")), line, 0),
+      lyt->addLayout(sourceBtnsLyt, line, 1, 1, 1, Qt::AlignLeft);
+
+  lyt->addWidget(new QLabel(tr("Monitor Web URL*")), ++line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
       m_monitorTypeField->addItem(tr("Select source type")),
       m_monitorTypeField->addItems(utils::sourceTypes()),
       lyt->addWidget(m_monitorTypeField, line, 2);
-  ++line,
-      lyt->addWidget(m_verifySslPeerChkBx, line, 0, 1, 3, Qt::AlignCenter);
-  ++line,
-      lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
+
+  lyt->addWidget(m_verifySslPeerChkBx, ++line, 0, 1, 3, Qt::AlignCenter);
+
+  lyt->addWidget(new QLabel(tr("Auth String")), ++line, 0),
       lyt->addWidget(m_serverPassField, line, 1),
       lyt->addWidget(m_showAuthInfoChkbx, line, 2);
-  ++line,
-      lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
+
+  lyt->addWidget(new QLabel(tr("Update Interval")), ++line, 0),
       m_updateIntervalField->setMinimum(5),
       m_updateIntervalField->setMaximum(1200),
       lyt->addWidget(m_updateIntervalField, line, 1),
       lyt->addWidget(new QLabel(tr("seconds")), line, 2);
+
   lyt->setColumnStretch(0, 0);
   lyt->setColumnStretch(1, 1);
 
@@ -427,20 +416,31 @@ QGroupBox* Preferences::createUpdateBtnsGrp(void)
 }
 
 
-void Preferences::organizePrefWindow(void)
+void Preferences::createPreferenceWindow(void)
 {
   setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
 
-  qint32 line = -1;
-  ++line,
-      m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
-  ++line,
-      m_mainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
-  ++line,
-      m_mainLayout->addWidget(m_cancelBtn, line, 0, Qt::AlignLeft),
+  m_monitorUrlField = new QLineEdit();
+  m_monitorTypeField = new QComboBox();
+  m_updateIntervalField = new QSpinBox();
+  m_sockAddrField = new QLineEdit();
+  m_sockPortField = new QLineEdit();
+  m_serverPassField = new QLineEdit();
+  m_applySettingBtn = new QPushButton(tr("&Apply settings"));
+  m_addAsSourceBtn = new QPushButton(tr("Add a&s Source"));
+  m_deleteSourceBtn = new QPushButton(tr("&Delete Source"));
+  m_showAuthInfoChkbx = new QCheckBox(tr("&Show in clear"));
+  m_useMklsChkbx = new QCheckBox(tr("Use&Livestatus"));
+  m_verifySslPeerChkBx = new QCheckBox(tr("Don't verify SSL peer (https)"));
+  m_serverPassField->setEchoMode(QLineEdit::Password);
+  m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
+
+  qint32 line = 0;
+  m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
+  m_mainLayout->addWidget(createScktGrp(), ++line, 0, 1, 3);
+  m_mainLayout->addWidget(m_cancelBtn, ++line, 0, Qt::AlignLeft),
       m_mainLayout->addWidget(createUpdateBtnsGrp(), line, 1, 1, 2, Qt::AlignRight);
-  ++line,
-      m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
+  m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), ++line, 0, 1, 3);
 
   m_mainLayout->setColumnStretch(0, 0);
   m_mainLayout->setColumnStretch(1, 6);
@@ -448,11 +448,19 @@ void Preferences::organizePrefWindow(void)
 
   loadProperties();
 
-  disableInputField();
+  disableFieldIfRequired();
 }
 
-void Preferences::organizeChangePasswdWindow(void)
+void Preferences::createChangePasswordForm(void)
 {
+  m_oldPwdField = new QLineEdit();
+  m_pwdField = new QLineEdit();
+  m_rePwdField = new QLineEdit();
+  m_changePwdBtn = new QPushButton(tr("C&hange password"));
+  m_oldPwdField->setEchoMode(QLineEdit::Password);
+  m_pwdField->setEchoMode(QLineEdit::Password);
+  m_rePwdField->setEchoMode(QLineEdit::Password);
+
   setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
 
   int line = -1;
@@ -479,28 +487,24 @@ void Preferences::organizeChangePasswdWindow(void)
 void Preferences::organizeAbortWindow(void)
 {
   setWindowTitle(tr("About %1").arg(APP_NAME));
+  m_donateBtn = new ImageButton(":images/built-in/donate.png");
   QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
                               "\nRelease ID: %4\n"
                               "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
                               "\nVisit %6 for more information\n"
                               "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, REL_NAME, REL_INFO, REL_YEAR, PKG_URL);
-
-  int line = -1;
-
-  ++line,
-      m_mainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
-  ++line,
-      m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft),
-      m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
+  int line = 0;
+  m_mainLayout->addWidget(new QLabel(about), line++, 0, 1, 2);
+  m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft);
+  m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
 }
 
 
-void Preferences::disableInputField(void)
+void Preferences::disableFieldIfRequired(void)
 {
   if(m_userRole == ngrt4n::OpUserRole) {
     m_monitorUrlField->setEnabled(false);
     m_monitorTypeField->setEnabled(false);
-    m_brwBtn->setEnabled(false);
     m_updateIntervalField->setEnabled(false);
     m_applySettingBtn->setEnabled(false);
     m_addAsSourceBtn->setEnabled(false);
@@ -672,11 +676,24 @@ QString Preferences::style()
 
 void Preferences::addEvents(void)
 {
-  connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
-  connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
-  connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
   connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(handleCancel()));
-  connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
-  connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(donate()));
-  connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
+
+  switch(m_formType) {
+    case ChangeMonitoringSettings:
+      connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
+      connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
+      connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
+      connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
+      break;
+    case ChangePassword:
+      connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
+      break;
+    case ShowAbout:
+      connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(donate()));
+      break;
+    case BasicLoginForm:
+      break;
+    default:
+      break;
+  }
 }

@@ -88,7 +88,7 @@ QTreeWidgetItem* SvNavigatorTree::addNode(const NodeT& _node,
 
   nitem = findNodeItem(_node.id); //FIXME : avoid research
   if (_node.type != NodeType::AlarmNode && ! _node.child_nodes.isEmpty()) {
-    QStringList cids = _node.child_nodes.split(Parser::CHILD_SEP);
+    QStringList cids = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
     Q_FOREACH (const QString& cid, cids) {
       GuiTreeItemListT::iterator chkit = m_items.find(cid);
       if(chkit == m_items.end()) {

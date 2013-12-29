@@ -53,12 +53,13 @@ class LIBREALOPINSIGHTSHARED_EXPORT Preferences : public QDialog
 
 public:
   enum FormTypeT {
-    ChangePassword=0,
+    ChangePassword,
     ForceChangePassword,
     ChangeMonitoringSettings,
     ShowHelp,
     ShowAbout,
-    BasicLoginForm
+    BasicLoginForm,
+    WebForm
   };
 
   Preferences(qint32 _userRole, qint32 _formType);
@@ -72,8 +73,16 @@ public:
   void setCancelled(bool cancelled) { m_cancelled = cancelled;}
   bool getCancelled(void) const {return m_cancelled;}
 
+Q_SIGNALS:
+  void urlChanged(QString);
+  void sourcesChanged (QList<qint8>);
+  void errorOccurred(QString msg);
 
-public Q_SLOTS:
+protected :
+  void showEvent (QShowEvent *);
+  virtual QString selectSourceType(void);
+
+protected Q_SLOTS:
   void handleCancel(void);
   void applySettings(void);
   void addAsSource(void);
@@ -83,26 +92,15 @@ public Q_SLOTS:
   void setAuthChainVisibility(const int& state);
   void handleSourceSelected();
 
-Q_SIGNALS:
-  void urlChanged(QString);
-  void sourcesChanged (QList<qint8>);
-  void errorOccurred(QString msg);
-
-protected :
-  void showEvent (QShowEvent *);
-
 private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   int m_formType;
-
   Settings* m_settings;
   QBitArray* m_sourceStates;
-
   QLineEdit* m_monitorUrlField;
   QComboBox* m_monitorTypeField;
   QSpinBox* m_updateIntervalField;
-  QPushButton *m_brwBtn;
   QLineEdit* m_oldPwdField;
   QLineEdit* m_pwdField;
   QLineEdit* m_rePwdField;
@@ -136,14 +134,13 @@ private:
   QString getSourceStatesSerialized(void);
   void initSourceStates();
   void initSourceStates(const QString& str);
-  QString selectSourceType(void);
   int firstSourceSet(void);
   void updateSourceBtnState(void);
   QGroupBox* createUpdateBtnsGrp(void);
-  void organizePrefWindow(void);
-  void organizeChangePasswdWindow(void);
+  void createPreferenceWindow(void);
+  void createChangePasswordForm(void);
   void organizeAbortWindow(void);
-  void disableInputField(void);
+  void disableFieldIfRequired(void);
   void loadBasicLoginForm(void);
 };
 
