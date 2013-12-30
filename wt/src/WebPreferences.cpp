@@ -46,8 +46,14 @@ WebPreferences::WebPreferences(int _userRole)
     Wt::WRadioButton* button;
     tpl->bindWidget(QString("s%1").arg(srcId.c_str()).toStdString(), button = new Wt::WRadioButton(srcId));
     srcBtnGroup->addButton(button, i);
-    m_sourceButtons.insert(srcId, button);
+    m_sourceBtns.push_back(button);
   }
+
+  srcBtnGroup->checkedChanged().connect(std::bind([=](){
+    int selectedIndex = srcBtnGroup->checkedId();
+    std::cout << selectedIndex <<" selected \n" ;
+    fillFromSource(selectedIndex);
+  }));
 
   tpl->bindWidget("monitor-type", m_monitorTypeField = new Wt::WComboBox(container));
   m_monitorTypeField->addItem(utils::tr("Select a monitor type"));
@@ -59,10 +65,11 @@ WebPreferences::WebPreferences(int _userRole)
   tpl->bindWidget("auth-string", m_authStringField = new Wt::WLineEdit(container));
   m_authStringField->setEchoMode(Wt::WLineEdit::Password);
 
-  tpl->bindWidget("livestatus-server", m_livestatusServerField = new Wt::WLineEdit(container));
-  m_livestatusServerField->setEmptyText("server-address:port");
+  tpl->bindWidget("livestatus-server", m_livestatusAddressField = new Wt::WLineEdit(container));
+  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField = new Wt::WCheckBox(utils::tr("Use ngrt4nd"), container));
+  m_livestatusAddressField->setEmptyText("server-address:port");
 
-  tpl->bindWidget("dont-verify-ssl-certificate", m_dontVeriftSslCertificateField = new Wt::WCheckBox(utils::tr("Don't verify SSL certificate"), container));
+  tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField = new Wt::WCheckBox(utils::tr("Don't verify SSL certificate"), container));
   tpl->bindWidget("show-in-clear", m_clearAuthStringField = new Wt::WCheckBox(utils::tr("Show in clear"), container));
   tpl->bindWidget("update-interval", m_updateIntervalField = new Wt::WSpinBox(container));
 
@@ -78,9 +85,9 @@ WebPreferences::WebPreferences(int _userRole)
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
 
   m_cancelBtn->clicked().connect(this, &WebPreferences::handleClose);
-  //m_applyChangeBtn->clicked().connect(this, &WebPreferences::applySettings);
-  //m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
-  //m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
+  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applySettings);
+  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
+  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
 
   m_clearAuthStringField->changed().connect(std::bind([=](){
     if (m_clearAuthStringField->isChecked()) {
@@ -93,6 +100,8 @@ WebPreferences::WebPreferences(int _userRole)
   m_updateIntervalField->setMinimum(5);
   m_updateIntervalField->setMaximum(1200);
   m_updateIntervalField->setValue(Preferences::updateInterval());
+
+  loadProperties();
 }
 
 
@@ -107,3 +116,68 @@ QString WebPreferences::selectSourceType(void)
 
   return "";
 }
+
+void WebPreferences::applySettings(void)
+{
+
+}
+
+void WebPreferences::handleCancel(void)
+{
+
+}
+
+void WebPreferences::addAsSource(void)
+{
+
+}
+
+void WebPreferences::deleteSource(void)
+{
+
+}
+
+
+void WebPreferences::fillFromSource(int _sidx)
+{
+  SourceT src;
+  m_settings->loadSource(_sidx, src);
+  m_monitorUrlField->setText(src.mon_url.toStdString());
+  m_livestatusAddressField->setText(QString("%1:%2").arg(src.ls_addr, src.ls_port).toStdString());
+  m_authStringField->setText(src.auth.toStdString());
+  m_monitorTypeField->setCurrentIndex(src.mon_type+1);
+  m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
+  m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Unchecked : Wt::Checked);
+  m_updateIntervalField->setValue(m_settings->updateInterval());
+
+  m_selectedSource = _sidx;
+}
+
+
+void WebPreferences::updateSourceBtnState(void)
+{
+  int size = m_sourceBtns.size();
+  for (int i=0; i < size; ++i) {
+    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
+  }
+}
+
+
+void WebPreferences::updateFields(void)
+{
+  qDebug() << m_selectedSource <<"selected";
+  m_selectedSource = firstSourceSet();
+  if (m_selectedSource >= 0) {
+    m_sourceBtns.at(m_selectedSource)->setChecked(Wt::Checked);
+  } else {
+    // Set default value
+    m_monitorUrlField->setText("http://localhost/monitor/");
+    m_livestatusAddressField->setText("localhost:1983");
+    m_authStringField->setText("secret");
+    m_monitorTypeField->setCurrentIndex(0);
+    m_useNgrt4ndField->setCheckState(Wt::Unchecked);
+    m_dontVerifyCertificateField->setCheckState(Wt::Unchecked);
+    m_updateIntervalField->setValue(m_settings->updateInterval());
+  }
+}
+

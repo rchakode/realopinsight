@@ -80,13 +80,18 @@ Q_SIGNALS:
 
 protected :
   virtual void showEvent (QShowEvent *);
-  virtual QString selectSourceType(void);
-  virtual void applySettings(void);
+  virtual void fillFromSource(int _sidx);
+  virtual void updateSourceBtnState(void);
+  virtual void loadProperties(void);
+  virtual void updateFields(void);
+  int firstSourceSet(void);
 
 protected Q_SLOTS:
-  void handleCancel(void);
-  void addAsSource(void);
-  void deleteSource(void);
+  virtual QString selectSourceType(void);
+  virtual void applySettings(void);
+  virtual void handleCancel(void);
+  virtual void addAsSource(void);
+  virtual void deleteSource(void);
   void changePasswd(void);
   void donate(void);
   void setAuthChainVisibility(const int& state);
@@ -95,12 +100,13 @@ protected Q_SLOTS:
 
 protected:
   Settings* m_settings;
+  int m_selectedSource;
+  QBitArray* m_sourceStates;
 
 private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   int m_formType;
-  QBitArray* m_sourceStates;
   QLineEdit* m_monitorUrlField;
   QComboBox* m_monitorTypeField;
   QSpinBox* m_updateIntervalField;
@@ -117,11 +123,10 @@ private:
   QPushButton* m_changePwdBtn;
   ImageButton* m_donateBtn;
   QCheckBox* m_showAuthInfoChkbx;
-  QCheckBox* m_useMklsChkbx;
+  QCheckBox* m_useNgrt4ndChkbx;
   QList<qint8> m_updatedSources;
   QCheckBox* m_verifySslPeerChkBx;
   QVector<QRadioButton*> m_sourceBtns;
-  int m_selectedSource;
   bool m_cancelled;
 
   QLineEdit* m_realmLoginField;
@@ -130,15 +135,10 @@ private:
   void addEvents(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
-  void loadProperties(void);
-  void updateFields(void);
-  void fillFromSource(int _sidx);
   void saveAsSource(const qint32& idx, const QString& _stype);
   QString getSourceStatesSerialized(void);
   void initSourceStates();
   void initSourceStates(const QString& str);
-  int firstSourceSet(void);
-  void updateSourceBtnState(void);
   QGroupBox* createUpdateBtnsGrp(void);
   void createPreferenceWindow(void);
   void createChangePasswordForm(void);

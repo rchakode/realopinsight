@@ -359,6 +359,7 @@
       <div class="row">
         <label class="control-label">Livestatus Address&nbsp;</label>
         <span>${livestatus-server}</span>
+        <span>${use-ngrt4nd}</span>
       </div>
       <div class="row">
         <label class="control-label">Authentication String&nbsp;</label>

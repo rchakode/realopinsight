@@ -34,13 +34,13 @@
 
 Preferences::Preferences(qint32 _userRole, qint32 _formType)
   : QDialog(),
+    m_settings(new Settings()),
+    m_selectedSource(0),
+    m_sourceStates(new QBitArray(MAX_SRCS)),
     m_mainLayout(new QGridLayout(this)),
     m_userRole(_userRole),
     m_formType(_formType),
-    m_settings(new Settings()),
-    m_sourceStates(new QBitArray(MAX_SRCS)),
     m_cancelBtn(new QPushButton(tr("&Close"))),
-    m_selectedSource(0),
     m_cancelled(false)
 {
   switch (_formType)
@@ -81,7 +81,7 @@ Preferences::~Preferences()
       delete m_sockPortField;
       delete m_serverPassField;
       delete m_showAuthInfoChkbx;
-      delete m_useMklsChkbx;
+      delete m_useNgrt4ndChkbx;
       delete m_verifySslPeerChkBx;
       break;
     case ChangePassword:
@@ -218,7 +218,7 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
   src.ls_addr = m_sockAddrField->text();
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
-  src.use_ls = m_useMklsChkbx->checkState();
+  src.use_ngrt4nd = m_useNgrt4ndChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
   m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
@@ -297,7 +297,7 @@ QGroupBox* Preferences::createScktGrp(void)
   lyt->addWidget(m_sockAddrField);
   lyt->addWidget(new QLabel(tr("Port")), Qt::AlignRight);
   lyt->addWidget(m_sockPortField);
-  lyt->addWidget(m_useMklsChkbx);
+  lyt->addWidget(m_useNgrt4ndChkbx);
   lyt->setStretch(0, 0);
   lyt->setStretch(1, 1);
   lyt->setStretch(2, 0);
@@ -377,7 +377,7 @@ void Preferences::updateFields(void)
     m_sockPortField->setText("1983");
     m_serverPassField->setText("secret");
     m_monitorTypeField->setCurrentIndex(0);
-    m_useMklsChkbx->setCheckState(Qt::Unchecked);
+    m_useNgrt4ndChkbx->setCheckState(Qt::Unchecked);
     m_verifySslPeerChkBx->setCheckState(Qt::Unchecked);
     m_updateIntervalField->setValue(m_settings->updateInterval());
   }
@@ -393,7 +393,7 @@ void Preferences::fillFromSource(int _sidx)
   m_sockPortField->setText(QString::number(src.ls_port));
   m_serverPassField->setText(src.auth);
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
-  m_useMklsChkbx->setCheckState(static_cast<Qt::CheckState>(src.use_ls));
+  m_useNgrt4ndChkbx->setCheckState(static_cast<Qt::CheckState>(src.use_ngrt4nd));
   m_verifySslPeerChkBx->setCheckState(src.verify_ssl_peer? Qt::Unchecked : Qt::Checked);
   m_updateIntervalField->setValue(m_settings->updateInterval());
 
@@ -427,7 +427,7 @@ void Preferences::createPreferenceWindow(void)
   m_addAsSourceBtn = new QPushButton(tr("Add a&s Source"));
   m_deleteSourceBtn = new QPushButton(tr("&Delete Source"));
   m_showAuthInfoChkbx = new QCheckBox(tr("&Show in clear"));
-  m_useMklsChkbx = new QCheckBox(tr("Use&Livestatus"));
+  m_useNgrt4ndChkbx = new QCheckBox(tr("Use &Ngrt4nd"));
   m_verifySslPeerChkBx = new QCheckBox(tr("Don't verify SSL peer (https)"));
   m_serverPassField->setEchoMode(QLineEdit::Password);
   m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
@@ -510,7 +510,7 @@ void Preferences::disableFieldIfRequired(void)
     m_sockPortField->setEnabled(false);
     m_serverPassField->setEnabled(false);
     m_showAuthInfoChkbx->setEnabled(false);
-    m_useMklsChkbx->setEnabled(false);
+    m_useNgrt4ndChkbx->setEnabled(false);
     m_verifySslPeerChkBx->setEnabled(false);
   }
 }

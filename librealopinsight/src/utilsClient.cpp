@@ -265,7 +265,7 @@ QString utils::source2Str(const SourceT& src)
                  "\"verify_ssl_peer\":\"%8\""
                  "}").arg(src.id,
                           QString::number(src.mon_type),
-                          QString::number(src.use_ls),
+                          QString::number(src.use_ngrt4nd),
                           src.mon_url,
                           src.ls_addr,
                           QString::number(src.ls_port),

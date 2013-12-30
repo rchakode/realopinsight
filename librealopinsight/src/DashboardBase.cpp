@@ -134,7 +134,7 @@ void DashboardBase::runMonitor(SourceT& src)
       break;
     case MonitorBroker::Nagios:
     default:
-      src.use_ls? runLivestatusUpdate(src) : runNagiosUpdate(src);
+      src.use_ngrt4nd? runLivestatusUpdate(src) : runNagiosUpdate(src);
       break;
   }
   finalizeUpdate(src);
@@ -642,7 +642,7 @@ void DashboardBase::openRpcSession(SourceT& src)
   QUrl znsUrlParams;
   switch(src.mon_type) {
     case MonitorBroker::Nagios:
-      if (src.use_ls) {
+      if (src.use_ngrt4nd) {
         if (src.ls_handler->isConnected()) {
           src.ls_handler->disconnectFromService();
         }
@@ -817,7 +817,7 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
 
   switch (src.mon_type) {
     case MonitorBroker::Nagios:
-      if (src.use_ls) {
+      if (src.use_ngrt4nd) {
         src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
       } else {
         QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
@@ -851,7 +851,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     if (olddata != m_sources.end()) {
       switch (olddata->mon_type) {
         case MonitorBroker::Nagios:
-          if (olddata->use_ls) {
+          if (olddata->use_ngrt4nd) {
             olddata->ls_handler.reset();
           } else {
             olddata->d4n_handler.reset();

@@ -289,7 +289,7 @@ struct SourceT {
   QString id;
   qint8 mon_type;
   QString mon_url;
-  qint8 use_ls;
+  qint8 use_ngrt4nd;
   QString ls_addr;
   qint32 ls_port;
   QString auth;

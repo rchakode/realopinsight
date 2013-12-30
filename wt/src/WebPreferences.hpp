@@ -34,7 +34,7 @@
 #include <Wt/WSpinBox>
 #include <Wt/WCheckBox>
 #include <Wt/WObject>
-#include <QMap>
+#include <QVector>
 
 
 class QString;
@@ -50,16 +50,24 @@ public:
 
 protected :
   virtual QString selectSourceType(void);
+  virtual void applySettings(void);
+  virtual void handleCancel(void);
+  virtual void addAsSource(void);
+  virtual void deleteSource(void);
+  virtual void fillFromSource(int _sidx);
+  virtual void updateSourceBtnState(void);
+  virtual void updateFields(void);
 
 private:
   Wt::WDialog* m_dialog;
-  QMap<std::string, Wt::WRadioButton*> m_sourceButtons;
+  QVector<Wt::WRadioButton*> m_sourceBtns;
   Wt::WLineEdit* m_monitorUrlField;
   Wt::WLineEdit* m_authStringField;
-  Wt::WLineEdit* m_livestatusServerField;
+  Wt::WLineEdit* m_livestatusAddressField;
   Wt::WComboBox* m_monitorTypeField;
   Wt::WCheckBox* m_clearAuthStringField;
-  Wt::WCheckBox* m_dontVeriftSslCertificateField;
+  Wt::WCheckBox* m_useNgrt4ndField;
+  Wt::WCheckBox* m_dontVerifyCertificateField;
   Wt::WSpinBox* m_updateIntervalField;
   Wt::WPushButton* m_cancelBtn;
   Wt::WPushButton* m_applyChangeBtn;
