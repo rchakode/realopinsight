@@ -50,7 +50,7 @@ void AuthManager::handleAuthentication(void)
 
 void AuthManager::create(void)
 {
-  wApp->setInternalPath(ngrt4n::LINK_LOGIN);
+  wApp->setInternalPath("");
   Wt::Auth::AuthWidget::create();
   bindString("software", APP_NAME.toStdString());
   bindString("version", PKG_VERSION.toStdString());

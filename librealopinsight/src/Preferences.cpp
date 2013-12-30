@@ -32,12 +32,9 @@
 #include <QIntValidator>
 #include <QRegExpValidator>
 
-
-//FIXME: allocated objects only when required for the different kind of forms
-
 Preferences::Preferences(qint32 _userRole, qint32 _formType)
   : QDialog(),
-    m_mainLayout (new QGridLayout(this)),
+    m_mainLayout(new QGridLayout(this)),
     m_userRole(_userRole),
     m_formType(_formType),
     m_settings(new Settings()),
@@ -336,7 +333,7 @@ QGroupBox* Preferences::createCommonGrp(void)
 
   lyt->addWidget(new QLabel(tr("Monitor Web URL*")), ++line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
-      m_monitorTypeField->addItem(tr("Select source type")),
+      m_monitorTypeField->addItem(tr("Select a monitor type")),
       m_monitorTypeField->addItems(utils::sourceTypes()),
       lyt->addWidget(m_monitorTypeField, line, 2);
 

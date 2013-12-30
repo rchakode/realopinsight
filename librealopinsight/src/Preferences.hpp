@@ -79,24 +79,27 @@ Q_SIGNALS:
   void errorOccurred(QString msg);
 
 protected :
-  void showEvent (QShowEvent *);
+  virtual void showEvent (QShowEvent *);
   virtual QString selectSourceType(void);
+  virtual void applySettings(void);
 
 protected Q_SLOTS:
   void handleCancel(void);
-  void applySettings(void);
   void addAsSource(void);
   void deleteSource(void);
   void changePasswd(void);
   void donate(void);
   void setAuthChainVisibility(const int& state);
   void handleSourceSelected();
+  qint32 updateInterval(void) const {return m_settings->updateInterval();}
+
+protected:
+  Settings* m_settings;
 
 private:
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   int m_formType;
-  Settings* m_settings;
   QBitArray* m_sourceStates;
   QLineEdit* m_monitorUrlField;
   QComboBox* m_monitorTypeField;

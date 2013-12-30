@@ -27,23 +27,44 @@
 
 #include "Preferences.hpp"
 #include <Wt/WDialog>
+#include <Wt/WRadioButton>
+#include <Wt/WLineEdit>
+#include <Wt/WComboBox>
+#include <Wt/WPushButton>
+#include <Wt/WSpinBox>
+#include <Wt/WCheckBox>
+#include <Wt/WObject>
+#include <QMap>
+
 
 class QString;
 
-class WebPreferences : public Preferences
+class WebPreferences : public Preferences, public Wt::WObject
 {
 public:
   WebPreferences(int _userRole);
   virtual ~WebPreferences();
 
   void show(void) {m_dialog->show();}
-  void accept(void) {m_dialog->accept();}
+  void handleClose(void) {m_dialog->accept();}
 
 protected :
   virtual QString selectSourceType(void);
 
 private:
   Wt::WDialog* m_dialog;
+  QMap<std::string, Wt::WRadioButton*> m_sourceButtons;
+  Wt::WLineEdit* m_monitorUrlField;
+  Wt::WLineEdit* m_authStringField;
+  Wt::WLineEdit* m_livestatusServerField;
+  Wt::WComboBox* m_monitorTypeField;
+  Wt::WCheckBox* m_clearAuthStringField;
+  Wt::WCheckBox* m_dontVeriftSslCertificateField;
+  Wt::WSpinBox* m_updateIntervalField;
+  Wt::WPushButton* m_cancelBtn;
+  Wt::WPushButton* m_applyChangeBtn;
+  Wt::WPushButton* m_addAsSourceBtn;
+  Wt::WPushButton* m_deleteSourceBtn;
 };
 
 #endif // WEBSESSION_HPP

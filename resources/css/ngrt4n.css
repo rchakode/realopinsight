@@ -19,13 +19,14 @@ body, html {
   background: rgb(204, 204, 204); /* For IE, ... */
   background: rgba(204, 204, 204, 0.5);
   height: 100%; width: 100%;
-  top: 0px; left: 0px;
+  top: 0px; 
+  left: 0px;
   position: fixed;
 }
 
 .Wt-dialog {
   background-color: white;
-  padding: 1px;
+  padding: 1px 0;
 }
 
 .Wt-dialog .titlebar {
@@ -33,7 +34,7 @@ body, html {
   background: #9dc6dd;
   cursor: move;
   font: bold 12px Verdana;
-  padding: 2px 3px;
+  padding: 1px 3px;
 }
 
 /* these classes come from from bootstrap */
@@ -114,14 +115,14 @@ body, html {
 }
 
 /* Related to user home page */
-.ngrt4n-admin-page{
+.ngrt4n-admin-page {
   position: relative;
   float: none;
   margin: 0 auto;
   width: 770px;
 }
 
-.ngrt4n-operator-page{
+.ngrt4n-operator-page {
   position: relative;
   float: none;
   margin: 0 auto;

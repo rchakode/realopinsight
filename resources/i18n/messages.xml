@@ -328,57 +328,56 @@
   </message>
 
   <message id="setting-page.tpl">
-    <div class="ngrt4n-admin-page form-horizontal">
+    <div class="form-horizontal">
       <div>
        <div class="row">
-         <span class="span1">${s0}</span>
-         <span class="span1">${s1}</span>
-         <span class="span1">${s2}</span>
-         <span class="span1">${s3}</span>
-         <span class="span1">${s4}</span>
-         <span class="span1">${s5}</span>
-         <span class="span1">${s6}</span>
-         <span class="span1">${s7}</span>
-         <span class="span1">${s8}</span>
-         <span class="span1">${s9}</span>
+         <label class="control-label">Sources&nbsp;&nbsp;</label>
+         <!--<div class="btn-group">-->
+           <span>${s0}</span>
+           <span>${s1}</span>
+           <span>${s2}</span>
+           <span>${s3}</span>
+           <span>${s4}</span>
+           <span>${s5}</span>
+           <span>${s6}</span>
+           <span>${s7}</span>
+           <span>${s8}</span>
+           <span>${s9}</span>
+        <!-- </div> -->
        </div>
       </div>
       <div class="row">
-        <div class="control-group">
-          <label for="${id:{monitor-url}}" class="control-label">Monitor Web URL</label>
-          <span class="controls">${monitor-url}</span>
-          <span class="controls">${monitor-type}</span>
-        </div>
+        <label class="control-label">Monitor Type&nbsp;</label>
+        <span>${monitor-type}</span>
       </div>
       <div class="row">
-        <div class="control-group">
-          <span for="${id:{auth-string}}" class="control-label">Authentication String</span>
-          <span class="controls">${auth-string}</span>
-          <span class="controls">${show-in-clear}</span>
-        </div>
+        <label class="control-label">Monitor Web URL&nbsp;</label>
+        <span>${monitor-url}</span>
+        <span>${dont-verify-ssl-certificate}</span>
       </div>
       <div class="row">
-        <div class="control-group">
-          <span for="${id:{update-interval}}" class="control-label">Update Interval</span>
-          <span class="controls">${update-interval}</span>
-          <span class="control-label">seconds</span>
-        </div>
+        <label class="control-label">Livestatus Address&nbsp;</label>
+        <span>${livestatus-server}</span>
       </div>
       <div class="row">
-        <div class="control-group">
-          <span for="${id:{livestatus-server}}" class="control-label">Livestatus/ngrt4nd Address</span>
-          <span class="controls">${livestatus-server}</span>
-          <span for="${id:{livestatus-port}}" class="control-label">Port</span>
-          <span class="controls">${livestatus-port}</span>
-        </div>
-       </div>
+        <label class="control-label">Authentication String&nbsp;</label>
+        <span>${auth-string}</span>
+        <span>${show-in-clear}</span>
+      </div>
+      <div class="row">
+        <label class="control-label">Update Interval&nbsp;</label>
+        <span>${update-interval}</span>
+        <span>&nbsp;seconds</span>
+      </div>
 
-      <div class="control-group">
-        <span class="controls">${close-button}</span>
-        <span class="controls">${apply-change-button}</span>
-        <span class="controls">${add-as-source-button}</span>
-        <span class="controls">${delete-button}</span>
-      </div>
+       <div class="form-actions btn-group">
+         <div class="controls">
+          ${apply-change-button}
+          ${add-as-source-button}
+          ${delete-button}
+          ${close-button}
+       </div>
+     </div>
     </div>
   </message>
 

@@ -466,12 +466,12 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
     m_userHomeTpl->bindWidget("andhor-load-file",
-                              createAnchorForHomeLink(utils::tr("Load"),
-                                                      utils::tr("An existing platform"),
+                              createAnchorForHomeLink(utils::tr("Preview a platform"),
+                                                      utils::tr("Ensure the platform meets your requirements"),
                                                       ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
-                              createAnchorForHomeLink(utils::tr("Import"),
-                                                      utils::tr("A platform description"),
+                              createAnchorForHomeLink(utils::tr("Import a plaform"),
+                                                      utils::tr("From an existing business rules description file"),
                                                       ngrt4n::LINK_IMPORT));
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
@@ -686,7 +686,7 @@ void WebMainUI::setInternalPath(const std::string& path)
 
 Wt::WDialog* WebMainUI::createDialog(const std::string& title, Wt::WWidget* content)
 {
-  Wt::WDialog* dialog = new Wt::WDialog(utils::tr("Account information"));
+  Wt::WDialog* dialog = new Wt::WDialog(title);
   dialog->setStyleClass("ngrt4n-gradient Wt-dialog");
   dialog->titleBar()->setStyleClass("titlebar");
   if (content != NULL) dialog->contents()->addWidget(content);
