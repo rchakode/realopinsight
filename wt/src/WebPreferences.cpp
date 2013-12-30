@@ -27,7 +27,9 @@
 #include "WebPreferences.hpp"
 #include <Wt/WTemplate>
 #include <Wt/WContainerWidget>
+#include <Wt/WButtonGroup>
 #include <QString>
+
 WebPreferences::WebPreferences(int _userRole)
   : Preferences(_userRole, Preferences::WebForm),
     m_dialog(new Wt::WDialog(utils::tr("Preferences - " +APP_NAME.toStdString())))
@@ -38,10 +40,12 @@ WebPreferences::WebPreferences(int _userRole)
   container->setMargin(0, Wt::All);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), container);
 
+  Wt::WButtonGroup* srcBtnGroup = new Wt::WButtonGroup(container);
   for (int i=0; i< 10; ++i) {
     std::string srcId = QString(i+48).toStdString();
     Wt::WRadioButton* button;
     tpl->bindWidget(QString("s%1").arg(srcId.c_str()).toStdString(), button = new Wt::WRadioButton(srcId));
+    srcBtnGroup->addButton(button, i);
     m_sourceButtons.insert(srcId, button);
   }
 

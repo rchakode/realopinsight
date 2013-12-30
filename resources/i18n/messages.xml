@@ -74,6 +74,7 @@
      </div> <!-- Row --->
      <div class="row">
        <div class="footer">
+          <hr />
           ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project
           <br/>
           <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
@@ -107,7 +108,7 @@
      <div class="row">
        <div class="footer">
           ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project
-          <br/>
+          <hr />
           <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
        </div>
      </div>

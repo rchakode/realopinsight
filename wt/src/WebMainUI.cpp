@@ -159,7 +159,7 @@ void WebMainUI::setupAdminMenus(void)
   mgntPopupMenu->addSectionHeader("View");
   mgntPopupMenu->addItem("Import")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
-  mgntPopupMenu->addItem("Load")
+  mgntPopupMenu->addItem("Preview")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
   mgntPopupMenu->addItem("Assign/revoke/delete")
       ->triggered().connect(std::bind([=](){
@@ -467,16 +467,16 @@ Wt::WWidget* WebMainUI::createUserHome(void)
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
     m_userHomeTpl->bindWidget("andhor-load-file",
                               createAnchorForHomeLink(utils::tr("Preview a platform"),
-                                                      utils::tr("Ensure the platform meets your requirements"),
+                                                      utils::tr("To ensure it meets your requirements"),
                                                       ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
-                              createAnchorForHomeLink(utils::tr("Import a plaform"),
-                                                      utils::tr("From an existing business rules description file"),
+                              createAnchorForHomeLink(utils::tr("Import a platform description"),
+                                                      utils::tr("For previewing, assignment and exploitation"),
                                                       ngrt4n::LINK_IMPORT));
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
     m_userHomeTpl->bindWidget("andhor-load-file",
-                              createAnchorForHomeLink(utils::tr("Load"),
+                              createAnchorForHomeLink(utils::tr("Preview"),
                                                       utils::tr("An existing platform"),
                                                       ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
