@@ -40,18 +40,16 @@ WebPreferences::WebPreferences(int _userRole)
   container->setMargin(0, Wt::All);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), container);
 
-  Wt::WButtonGroup* srcBtnGroup = new Wt::WButtonGroup(container);
+  m_srcBtnGroup = new Wt::WButtonGroup(container);
   for (int i=0; i< 10; ++i) {
     std::string srcId = QString(i+48).toStdString();
     Wt::WRadioButton* button;
     tpl->bindWidget(QString("s%1").arg(srcId.c_str()).toStdString(), button = new Wt::WRadioButton(srcId));
-    srcBtnGroup->addButton(button, i);
-    m_sourceBtns.push_back(button);
+    m_srcBtnGroup->addButton(button, i);
   }
 
-  srcBtnGroup->checkedChanged().connect(std::bind([=](){
-    int selectedIndex = srcBtnGroup->checkedId();
-    std::cout << selectedIndex <<" selected \n" ;
+  m_srcBtnGroup->checkedChanged().connect(std::bind([=](){
+    int selectedIndex = m_srcBtnGroup->checkedId();
     fillFromSource(selectedIndex);
   }));
 
@@ -84,10 +82,10 @@ WebPreferences::WebPreferences(int _userRole)
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
 
-  m_cancelBtn->clicked().connect(this, &WebPreferences::handleClose);
-  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applySettings);
+  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
   m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
+  m_cancelBtn->clicked().connect(this, &WebPreferences::handleClose);
 
   m_clearAuthStringField->changed().connect(std::bind([=](){
     if (m_clearAuthStringField->isChecked()) {
@@ -110,22 +108,21 @@ WebPreferences::~WebPreferences()
   delete m_dialog;
 }
 
-
-QString WebPreferences::selectSourceType(void)
-{
-
-  return "";
-}
-
-void WebPreferences::applySettings(void)
-{
-
-}
-
 void WebPreferences::handleCancel(void)
 {
 
 }
+
+void WebPreferences::applyChanges(void)
+{
+  saveAsSource(m_currentSourceIndex, letUserSelectType());
+}
+
+QString WebPreferences::letUserSelectType(void)
+{
+  return "";
+}
+
 
 void WebPreferences::addAsSource(void)
 {
@@ -150,34 +147,53 @@ void WebPreferences::fillFromSource(int _sidx)
   m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Unchecked : Wt::Checked);
   m_updateIntervalField->setValue(m_settings->updateInterval());
 
-  m_selectedSource = _sidx;
+  m_currentSourceIndex = _sidx;
 }
 
 
 void WebPreferences::updateSourceBtnState(void)
 {
-  int size = m_sourceBtns.size();
+  int size = m_srcBtnGroup->count();
   for (int i=0; i < size; ++i) {
-    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
+    m_srcBtnGroup->button(i)->setEnabled(m_sourceStates->at(i));
   }
 }
 
 
 void WebPreferences::updateFields(void)
 {
-  qDebug() << m_selectedSource <<"selected";
-  m_selectedSource = firstSourceSet();
-  if (m_selectedSource >= 0) {
-    m_sourceBtns.at(m_selectedSource)->setChecked(Wt::Checked);
-  } else {
-    // Set default value
-    m_monitorUrlField->setText("http://localhost/monitor/");
-    m_livestatusAddressField->setText("localhost:1983");
-    m_authStringField->setText("secret");
-    m_monitorTypeField->setCurrentIndex(0);
-    m_useNgrt4ndField->setCheckState(Wt::Unchecked);
-    m_dontVerifyCertificateField->setCheckState(Wt::Unchecked);
-    m_updateIntervalField->setValue(m_settings->updateInterval());
+  m_currentSourceIndex = firstSourceSet();
+  if (m_currentSourceIndex >= 0) {
+    m_srcBtnGroup->setCheckedButton(m_srcBtnGroup->button(m_currentSourceIndex));
+    fillFromSource(m_currentSourceIndex);
   }
 }
 
+void WebPreferences::saveAsSource(const qint32& _idx, const QString& _stype)
+{
+  SourceT src;
+  src.id = utils::sourceId(_idx);
+  src.mon_type = utils::convert2ApiType(_stype);
+  src.mon_url = m_monitorUrlField->text().toUTF8().c_str();
+  src.ls_addr = m_livestatusAddressField->text().toUTF8().c_str();
+  src.ls_port = QString(m_livestatusAddressField->text().toUTF8().c_str()).toInt();
+  src.auth = m_authStringField->text().toUTF8().c_str();
+  src.use_ngrt4nd = m_useNgrt4ndField->checkState();
+  src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
+  m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
+  m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
+  m_sourceStates->setBit(_idx, true);
+  m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  m_settings->sync();
+  m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
+
+
+  if (! m_srcBtnGroup->button(_idx)->isEnabled()) {
+    //FIXME: consider only if source is used in the loaded service view?
+    m_srcBtnGroup->button(_idx)->setEnabled(true);
+    m_srcBtnGroup->setSelectedButtonIndex(_idx);
+  }
+
+  m_currentSourceIndex = _idx;
+  updateSourceBtnState();
+}

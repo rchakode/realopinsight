@@ -84,11 +84,14 @@ protected :
   virtual void updateSourceBtnState(void);
   virtual void loadProperties(void);
   virtual void updateFields(void);
-  int firstSourceSet(void);
+  virtual void saveAsSource(const qint32& idx, const QString& _stype);
+  virtual int firstSourceSet(void);
+  virtual void initSourceStates();
+  QString getSourceStatesSerialized(void);
 
 protected Q_SLOTS:
-  virtual QString selectSourceType(void);
-  virtual void applySettings(void);
+  virtual QString letUserSelectType(void);
+  virtual void applyChanges(void);
   virtual void handleCancel(void);
   virtual void addAsSource(void);
   virtual void deleteSource(void);
@@ -100,7 +103,7 @@ protected Q_SLOTS:
 
 protected:
   Settings* m_settings;
-  int m_selectedSource;
+  int m_currentSourceIndex;
   QBitArray* m_sourceStates;
 
 private:
@@ -135,9 +138,6 @@ private:
   void addEvents(void);
   QGroupBox* createScktGrp(void);
   QGroupBox* createCommonGrp(void);
-  void saveAsSource(const qint32& idx, const QString& _stype);
-  QString getSourceStatesSerialized(void);
-  void initSourceStates();
   void initSourceStates(const QString& str);
   QGroupBox* createUpdateBtnsGrp(void);
   void createPreferenceWindow(void);

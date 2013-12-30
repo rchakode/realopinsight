@@ -49,18 +49,18 @@ public:
   void handleClose(void) {m_dialog->accept();}
 
 protected :
-  virtual QString selectSourceType(void);
-  virtual void applySettings(void);
   virtual void handleCancel(void);
+  virtual void applyChanges(void);
+  virtual QString letUserSelectType(void);
   virtual void addAsSource(void);
   virtual void deleteSource(void);
   virtual void fillFromSource(int _sidx);
   virtual void updateSourceBtnState(void);
   virtual void updateFields(void);
+  virtual void saveAsSource(const qint32& _idx, const QString& _stype);
 
 private:
   Wt::WDialog* m_dialog;
-  QVector<Wt::WRadioButton*> m_sourceBtns;
   Wt::WLineEdit* m_monitorUrlField;
   Wt::WLineEdit* m_authStringField;
   Wt::WLineEdit* m_livestatusAddressField;
@@ -73,6 +73,7 @@ private:
   Wt::WPushButton* m_applyChangeBtn;
   Wt::WPushButton* m_addAsSourceBtn;
   Wt::WPushButton* m_deleteSourceBtn;
+  Wt::WButtonGroup* m_srcBtnGroup;
 };
 
 #endif // WEBSESSION_HPP

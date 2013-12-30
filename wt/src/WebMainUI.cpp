@@ -471,7 +471,7 @@ Wt::WWidget* WebMainUI::createUserHome(void)
                                                       ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
                               createAnchorForHomeLink(utils::tr("Import a platform description"),
-                                                      utils::tr("For previewing, assignment and exploitation"),
+                                                      utils::tr("For previewing, assignment and operation"),
                                                       ngrt4n::LINK_IMPORT));
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));

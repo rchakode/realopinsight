@@ -35,7 +35,7 @@
 Preferences::Preferences(qint32 _userRole, qint32 _formType)
   : QDialog(),
     m_settings(new Settings()),
-    m_selectedSource(0),
+    m_currentSourceIndex(0),
     m_sourceStates(new QBitArray(MAX_SRCS)),
     m_mainLayout(new QGridLayout(this)),
     m_userRole(_userRole),
@@ -140,11 +140,11 @@ void Preferences::handleCancel(void)
   done(0);
 }
 
-void Preferences::applySettings(void)
+void Preferences::applyChanges(void)
 {
   switch(m_formType) {
     case ChangeMonitoringSettings:
-      saveAsSource(m_selectedSource, selectSourceType());
+      saveAsSource(m_currentSourceIndex, letUserSelectType());
       break;
     case BasicLoginForm:
       done(0);
@@ -170,7 +170,7 @@ void Preferences::addAsSource(void)
   }
 
   if (bucket >= 0) {
-    QString srcType = selectSourceType();
+    QString srcType = letUserSelectType();
     saveAsSource(bucket, srcType);
   }
 }
@@ -178,9 +178,9 @@ void Preferences::addAsSource(void)
 
 void Preferences::deleteSource(void)
 {
-  if (m_selectedSource>=0 && m_selectedSource < MAX_SRCS) {
-    m_sourceBtns.at(m_selectedSource)->setEnabled(false);
-    m_sourceStates->setBit(m_selectedSource, false);
+  if (m_currentSourceIndex>=0 && m_currentSourceIndex < MAX_SRCS) {
+    m_sourceBtns.at(m_currentSourceIndex)->setEnabled(false);
+    m_sourceStates->setBit(m_currentSourceIndex, false);
     m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
     m_settings->sync();
     updateFields();
@@ -188,7 +188,7 @@ void Preferences::deleteSource(void)
 }
 
 
-QString Preferences::selectSourceType(void)
+QString Preferences::letUserSelectType(void)
 {
   if (m_monitorTypeField->currentIndex() > 0) {
     return m_monitorTypeField->currentText();
@@ -232,9 +232,9 @@ void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
     m_updatedSources.push_back(_idx);
   }
 
-  m_selectedSource = _idx;
+  m_currentSourceIndex = _idx;
   updateSourceBtnState();
-  m_sourceBtns.at(m_selectedSource)->click();
+  m_sourceBtns.at(m_currentSourceIndex)->click();
 }
 
 void Preferences::changePasswd(void)
@@ -367,9 +367,9 @@ void Preferences::loadProperties(void)
 
 void Preferences::updateFields(void)
 {
-  m_selectedSource = firstSourceSet();
-  if (m_selectedSource >= 0) {
-    m_sourceBtns.at(m_selectedSource)->click();
+  m_currentSourceIndex = firstSourceSet();
+  if (m_currentSourceIndex >= 0) {
+    m_sourceBtns.at(m_currentSourceIndex)->click();
   } else {
     // Set default value
     m_monitorUrlField->setText("http://localhost/monitor/");
@@ -397,7 +397,7 @@ void Preferences::fillFromSource(int _sidx)
   m_verifySslPeerChkBx->setCheckState(src.verify_ssl_peer? Qt::Unchecked : Qt::Checked);
   m_updateIntervalField->setValue(m_settings->updateInterval());
 
-  m_selectedSource = _sidx;
+  m_currentSourceIndex = _sidx;
 }
 
 
@@ -677,7 +677,7 @@ void Preferences::addEvents(void)
 
   switch(m_formType) {
     case ChangeMonitoringSettings:
-      connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
+      connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applyChanges()));
       connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
       connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
       connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));

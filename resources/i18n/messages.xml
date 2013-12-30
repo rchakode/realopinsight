@@ -177,7 +177,6 @@
   </message>
 
   <message id="userForm-template">
-    <!-- <legend>${title}</legend> -->
     <div class="form-horizontal">
       ${info-box}
       <fieldset>
@@ -362,7 +361,7 @@
         <span>${use-ngrt4nd}</span>
       </div>
       <div class="row">
-        <label class="control-label">Authentication String&nbsp;</label>
+        <label class="control-label">Auth String&nbsp;</label>
         <span>${auth-string}</span>
         <span>${show-in-clear}</span>
       </div>
