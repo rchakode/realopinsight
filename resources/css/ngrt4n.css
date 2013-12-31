@@ -69,6 +69,10 @@ body, html {
 .accordion-inner {
   background: #F8F8FF; /*for panel */
 }
+.form-actions {
+  text-align: center;
+}
+
 /* Now specific classes */
 #wrapper {
   position: relative;
@@ -158,6 +162,9 @@ body, html {
   height: 120px;
 }
 
+.ngrt4n-dialog {
+  max-width: 640px; 
+}
 .login-container {
  width: 480px;
  margin: 100px auto;

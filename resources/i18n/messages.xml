@@ -18,14 +18,13 @@
         </div>
        <!-- 1st thumnail -->
         <div class="span2">
-           <div class="panel panel-default">
-           <div class="panel-heading">1. Configure your monitoring views</div>
+           <div class="Wt-Dialog titlebar">
+           <div class="panel-heading">1. Configure your business rules</div>
               <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
               <div class="caption">
-                 <p>Set the platforms you want to monitor.
-                 The RealOpinsight Editor allows to easily
-                 define the services and how set they are related
-                 among them.
+                 <p>Describe the platforms you want to monitor. The RealOpinsight Editor
+                 allows you to define the related services as well as the business rules
+                 that bind them in a simple and flexible way.
                  </p>
                </div>
            </div>
@@ -48,8 +47,8 @@
        <!-- Third thumnail -->
         <div class="span2">
         <div class="panel panel-primary">
-        <div class="panel-heading">3. Assign the views to your operations staff</div>
-              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+        <div class="panel-heading">3. Preview and assign to your operators</div>
+              <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
               <div class="caption">
                  <p>Set who can operate your different monitoring views.
                  Takes the maximum on the productivity of your operators,
@@ -261,7 +260,7 @@
       </div>
       ${</if:registration-date>}
       </fieldset>
-      <div class="form-actions btn-group">
+      <div class="row form-actions btn-group">
         <div class="controls">${submit-button} <span>${cancel-button}</span></div>
       </div>
     </div>
@@ -372,12 +371,10 @@
       </div>
 
        <div class="form-actions btn-group">
-         <div class="controls">
           ${apply-change-button}
           ${add-as-source-button}
           ${delete-button}
           ${close-button}
-       </div>
      </div>
     </div>
   </message>
