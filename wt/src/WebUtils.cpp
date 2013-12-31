@@ -27,6 +27,10 @@
 #include <Wt/WTemplate>
 #include <QObject>
 #include <QString>
+#include <Wt/WDialog>
+#include <Wt/WLabel>
+#include <Wt/WLineEdit>
+#include <Wt/WPushButton>
 
 
 void utils::showMessage(int exitCode,
@@ -84,3 +88,42 @@ std::string utils::getPathFromQtResource(const QString& qtPath, const std::strin
 {
   return docRoot+qtPath.mid(1, -1).toStdString();
 }
+
+
+std::string utils::getUserInputDialog(void)
+{
+  Wt::WDialog *dialog = new Wt::WDialog("Go to cell");
+
+  Wt::WLabel *label = new Wt::WLabel("Cell location (A1..Z999)",dialog->contents());
+  Wt::WLineEdit *edit = new Wt::WLineEdit(dialog->contents());
+  label->setBuddy(edit);
+
+  Wt::WPushButton *ok = new Wt::WPushButton("OK", dialog->footer());
+  ok->setDefault(true);
+  ok->disable();
+
+  Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", dialog->footer());
+  dialog->rejectWhenEscapePressed();
+
+  edit->keyWentUp().connect(std::bind([=] () {
+    ok->setDisabled(edit->validate() != Wt::WValidator::Valid);
+  }));
+
+  ok->clicked().connect(std::bind([=] () {
+    if (edit->validate())
+      dialog->accept();
+  }));
+
+  cancel->clicked().connect(dialog, &Wt::WDialog::reject);
+
+  std::string input = "";
+  dialog->finished().connect(std::bind([=,&input] () {
+    if (dialog->result() == Wt::WDialog::Accepted) input = edit->text().toUTF8();
+    delete dialog;
+  }));
+
+  dialog->show();
+
+  return input;
+}
+

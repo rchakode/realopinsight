@@ -35,6 +35,8 @@ namespace utils {
   std::string tr(const std::string& msg);
   std::string computeSeverityCssClass(int severity);
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
+  std::string getUserInputDialog(void);
+
 } //Namespace
 
 #endif // WEBUTILS_HPP

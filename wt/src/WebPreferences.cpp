@@ -83,7 +83,9 @@ WebPreferences::WebPreferences(int _userRole)
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
 
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
-  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
+  //m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
+  m_addAsSourceBtn->clicked().connect(std::bind([=](){
+  }));
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
   m_cancelBtn->clicked().connect(this, &WebPreferences::handleClose);
 
