@@ -1,8 +1,8 @@
 /*
- * WebUtils.cpp
+ * InputDialog.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 06-12-2013                                                 #
+# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update : 31-12-2013                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,20 +22,21 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBUTILS_HPP
-#define WEBUTILS_HPP
+#ifndef INPUTDIALOG_HPP
+#define INPUTDIALOG_HPP
 
-#include <Wt/WText>
+#include <Wt/WDialog>
 
-class QString;
+class InputDialog : public Wt::WDialog
+{
+public:
+  InputDialog();
 
-namespace utils {
-  void showMessage(int exitCode, const std::string& errorMsg,
-                   const std::string& successMsg, Wt::WText* infoBox);
-  std::string tr(const std::string& msg);
-  std::string computeSeverityCssClass(int severity);
-  std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
+  void prompt(void);
+  std::string input(void) const {return m_input;}
 
-} //Namespace
+private:
+  std::string m_input;
+};
 
-#endif // WEBUTILS_HPP
+#endif // INPUTDIALOG_HPP

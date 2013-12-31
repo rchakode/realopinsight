@@ -1,8 +1,8 @@
 /*
- * WebUtils.cpp
+ * InputDialog.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 06-12-2013                                                 #
+# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update : 31-12-2013                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,20 +22,43 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBUTILS_HPP
-#define WEBUTILS_HPP
+#include "InputDialog.hpp"
+#include <Wt/WLabel>
+#include <Wt/WLineEdit>
+#include <Wt/WPushButton>
 
-#include <Wt/WText>
+InputDialog::InputDialog()
+  : Wt::WDialog("Go to cell")
+{
+}
 
-class QString;
 
-namespace utils {
-  void showMessage(int exitCode, const std::string& errorMsg,
-                   const std::string& successMsg, Wt::WText* infoBox);
-  std::string tr(const std::string& msg);
-  std::string computeSeverityCssClass(int severity);
-  std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
+void InputDialog::prompt(void)
+{
+  Wt::WLabel *label = new Wt::WLabel("Cell location (A1..Z999)",contents());
+  Wt::WLineEdit *edit = new Wt::WLineEdit(contents());
+  label->setBuddy(edit);
 
-} //Namespace
+  Wt::WPushButton *ok = new Wt::WPushButton("OK", footer());
+  ok->setDefault(true);
+  ok->disable();
 
-#endif // WEBUTILS_HPP
+  Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", footer());
+  rejectWhenEscapePressed();
+
+  edit->keyWentUp().connect(std::bind([=] () {
+    ok->setDisabled(edit->validate() != Wt::WValidator::Valid);
+  }));
+
+  ok->clicked().connect(std::bind([=] () {
+    if (edit->validate())
+      accept();
+  }));
+
+  cancel->clicked().connect(this, &Wt::WDialog::reject);
+
+  finished().connect(std::bind([=] () {
+    if (result() == Wt::WDialog::Accepted) m_input = edit->text().toUTF8();
+  }));
+  show();
+}

@@ -24,6 +24,7 @@
 
 #include "utilsClient.hpp"
 #include "WebUtils.hpp"
+#include "InputDialog.hpp"
 #include "WebPreferences.hpp"
 #include <Wt/WTemplate>
 #include <Wt/WContainerWidget>
@@ -85,6 +86,9 @@ WebPreferences::WebPreferences(int _userRole)
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
   //m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_addAsSourceBtn->clicked().connect(std::bind([=](){
+    InputDialog* dialog = new InputDialog();
+    dialog->prompt();
+    std::cout << "input="<< dialog->input() << "\n";
   }));
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
   m_cancelBtn->clicked().connect(this, &WebPreferences::handleClose);
