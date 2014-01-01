@@ -9,7 +9,7 @@
 
   <message id="template.home">
   <div class="ngrt4n-admin-page">
-    <div class="row">
+    <div class="row span12">
      <!-- Getting Started Pane -->
       <div class="span7">
 
@@ -18,44 +18,34 @@
         </div>
        <!-- 1st thumnail -->
         <div class="span2">
-           <div class="Wt-Dialog titlebar">
-           <div class="panel-heading">1. Configure your business rules</div>
-              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-              <div class="caption">
-                 <p>Describe the platforms you want to monitor. The RealOpinsight Editor
-                 allows you to define the related services as well as the business rules
-                 that bind them in a simple and flexible way.
-                 </p>
-               </div>
+           <div>
+             <div>1. Describe the platforms you want to monitor</div>
+             <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+             <p>For each platform, the RealOpinsight Editor allows you to easily, and simply, describe
+             the related services as well as the business rules that bind them to each other.
+             </p>
            </div>
         </div>
 
         <!-- 2nd thumnail -->
         <div class="span2">
-        <div class="panel panel-default">
-        <div class="panel-heading">2. Set your monitoring settings</div>
-              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-              <div class="caption">
-                 <p>Set when and how status data should be retrieved
-                 from your monitoring servers in order to
-                 keep your monitoring views up-to-date.
-                 </p>
-               </div>
+           <div>
+             <div>2. Set monitoring settings</div>
+             <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
+             <p>The Configuration Manager enables to easily set when and how status
+             data should be retrieved from your monitoring servers to keep your
+             operators' monitoring views up-to-date.
+             </p>
            </div>
         </div>
 
        <!-- Third thumnail -->
         <div class="span2">
-        <div class="panel panel-primary">
-        <div class="panel-heading">3. Preview and assign to your operators</div>
+           <div>3. Preview and assign to your operators</div>
               <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-              <div class="caption">
-                 <p>Set who can operate your different monitoring views.
-                 Takes the maximum on the productivity of your operators,
-                 save money and enjoy your free time!
-                 </p>
-               </div>
-           </div>
+              <p>Using the management menus, define which of your operators can operate your
+              different monitoring views. Takes the maximum on their productivity, and enjoy !
+               </p>
         </div>
       </div>
 

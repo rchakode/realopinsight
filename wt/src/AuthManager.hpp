@@ -19,8 +19,8 @@ public:
   bool isLogged(void);
 
 protected:
-  virtual void createLoggedInView(void) { handleAuthentication();}
-  virtual void create(void);
+  virtual void createLoggedInView(void);
+  virtual void createLoginView(void);
 
 private:
   Wt::Auth::Login m_loginObject;

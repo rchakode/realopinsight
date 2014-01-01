@@ -150,8 +150,7 @@ INCLUDEPATH = include \
               include/client \
               include/core \
               wt/src \
-              wt/dbo \
-              /opt/install/wt-3.3.0/include
+              wt/dbo
 
 DISTFILES += README \
     INSTALL \

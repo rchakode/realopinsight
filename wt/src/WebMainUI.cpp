@@ -146,11 +146,11 @@ void WebMainUI::createMainUI(void)
 
 void WebMainUI::setupAdminMenus(void)
 {
-  Wt::WMenuItem* curItem = NULL;
+  //Wt::WMenuItem* curItem = NULL;
   m_mgntMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(m_mgntMenu, Wt::AlignLeft);
   Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-  curItem = new Wt::WMenuItem(utils::tr("Management"));
+  Wt::WMenuItem* curItem = new Wt::WMenuItem(utils::tr("Management"));
   curItem->setMenu(mgntPopupMenu);
   m_mgntMenu->addItem(curItem);
 
