@@ -84,7 +84,7 @@ protected :
   virtual void updateSourceBtnState(void);
   virtual void loadProperties(void);
   virtual void updateFields(void);
-  virtual void saveAsSource(const qint32& idx, const QString& _stype);
+  virtual void saveAsSource(const qint32& idx, const QString& type);
   virtual int firstSourceSet(void);
   virtual void initSourceStates();
   QString getSourceStatesSerialized(void);

@@ -171,9 +171,7 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-HEADERS += \
-    wt/src/InputDialog.hpp
+HEADERS +=
 
-SOURCES += \
-    wt/src/InputDialog.cpp
+SOURCES +=
 

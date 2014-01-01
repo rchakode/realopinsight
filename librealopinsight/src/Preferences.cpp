@@ -209,30 +209,30 @@ QString Preferences::letUserSelectType(void)
   return srcType;
 }
 
-void Preferences::saveAsSource(const qint32& _idx, const QString& _stype)
+void Preferences::saveAsSource(const qint32& index, const QString& type)
 {
   SourceT src;
-  src.id = utils::sourceId(_idx);
-  src.mon_type = utils::convert2ApiType(_stype);
+  src.id = utils::sourceId(index);
+  src.mon_type = utils::convert2ApiType(type);
   src.mon_url = m_monitorUrlField->text();
   src.ls_addr = m_sockAddrField->text();
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
   src.use_ngrt4nd = m_useNgrt4ndChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
-  m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
+  m_settings->setEntry(utils::sourceKey(index), utils::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
-  m_sourceStates->setBit(_idx, true);
+  m_sourceStates->setBit(index, true);
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
   m_settings->emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
-  if (! m_updatedSources.contains(_idx)) {
+  if (! m_updatedSources.contains(index)) {
     //FIXME: consider only if source is used in the loaded service view?
-    m_updatedSources.push_back(_idx);
+    m_updatedSources.push_back(index);
   }
 
-  m_currentSourceIndex = _idx;
+  m_currentSourceIndex = index;
   updateSourceBtnState();
   m_sourceBtns.at(m_currentSourceIndex)->click();
 }

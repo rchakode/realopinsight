@@ -24,12 +24,14 @@
 
 #include "utilsClient.hpp"
 #include "WebUtils.hpp"
-#include "InputDialog.hpp"
 #include "WebPreferences.hpp"
+#include <QString>
 #include <Wt/WTemplate>
 #include <Wt/WContainerWidget>
 #include <Wt/WButtonGroup>
-#include <QString>
+#include <Wt/WLabel>
+#include <Wt/WLineEdit>
+#include <Wt/WPushButton>
 
 WebPreferences::WebPreferences(int _userRole)
   : Preferences(_userRole, Preferences::WebForm),
@@ -39,7 +41,10 @@ WebPreferences::WebPreferences(int _userRole)
   m_dialog->titleBar()->setStyleClass("titlebar");
   Wt::WContainerWidget* container = m_dialog->contents();
   container->setMargin(0, Wt::All);
+
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), container);
+
+  tpl->bindWidget("info-box", m_infoBox = new Wt::WText("", container));
 
   m_srcBtnGroup = new Wt::WButtonGroup(container);
   for (int i=0; i< 10; ++i) {
@@ -56,7 +61,13 @@ WebPreferences::WebPreferences(int _userRole)
 
   tpl->bindWidget("monitor-type", m_monitorTypeField = new Wt::WComboBox(container));
   m_monitorTypeField->addItem(utils::tr("Select a monitor type"));
-  for (const auto& srcid: utils::sourceTypes()) m_monitorTypeField->addItem(srcid.toStdString());
+  for (const auto& srcid: utils::sourceTypes())
+    m_monitorTypeField->addItem(srcid.toStdString());
+  m_monitorTypeField->activated().connect(std::bind([=](int index){
+    bool enable = index>0;
+    m_applyChangeBtn->setDisabled(! enable);
+    m_addAsSourceBtn->setDisabled(! enable);
+  }, std::placeholders::_1));
 
   tpl->bindWidget("monitor-url", m_monitorUrlField = new Wt::WLineEdit(container));
   m_monitorUrlField->setEmptyText("http://server-address/monitor");
@@ -77,21 +88,15 @@ WebPreferences::WebPreferences(int _userRole)
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn = new Wt::WPushButton(utils::tr("Add as source"), container));
   tpl->bindWidget("delete-button", m_deleteSourceBtn = new Wt::WPushButton(utils::tr("Delete source"), container));
 
-
   m_cancelBtn->setStyleClass("btn");
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
 
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
-  //m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
-  m_addAsSourceBtn->clicked().connect(std::bind([=](){
-    InputDialog* dialog = new InputDialog();
-    dialog->prompt();
-    std::cout << "input="<< dialog->input() << "\n";
-  }));
+  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-  m_cancelBtn->clicked().connect(this, &WebPreferences::handleClose);
+  m_cancelBtn->clicked().connect(this, &WebPreferences::handleCancel);
 
   m_clearAuthStringField->changed().connect(std::bind([=](){
     if (m_clearAuthStringField->isChecked()) {
@@ -105,6 +110,10 @@ WebPreferences::WebPreferences(int _userRole)
   m_updateIntervalField->setMaximum(1200);
   m_updateIntervalField->setValue(Preferences::updateInterval());
 
+  m_applyChangeBtn->setDisabled(true);
+  m_addAsSourceBtn->setDisabled(true);
+  m_deleteSourceBtn->setDisabled(true);
+
   loadProperties();
 }
 
@@ -114,30 +123,24 @@ WebPreferences::~WebPreferences()
   delete m_dialog;
 }
 
-void WebPreferences::handleCancel(void)
-{
-
-}
-
 void WebPreferences::applyChanges(void)
 {
-  saveAsSource(m_currentSourceIndex, letUserSelectType());
-}
-
-QString WebPreferences::letUserSelectType(void)
-{
-  return "";
-}
-
-
-void WebPreferences::addAsSource(void)
-{
-
+  if ( m_monitorTypeField->currentIndex() <= 0) {
+    utils::showMessage(-1, utils::tr("Bad monitor type"), "", m_infoBox);
+  } else {
+    saveAsSource(m_currentSourceIndex, m_monitorTypeField->currentText().toUTF8().c_str());
+  }
 }
 
 void WebPreferences::deleteSource(void)
 {
-
+  if (m_currentSourceIndex>=0 && m_currentSourceIndex < MAX_SRCS) {
+    m_srcBtnGroup->button(m_currentSourceIndex)->setEnabled(false);
+    m_sourceStates->setBit(m_currentSourceIndex, false);
+    m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    m_settings->sync();
+    updateFields();
+  }
 }
 
 
@@ -152,7 +155,6 @@ void WebPreferences::fillFromSource(int _sidx)
   m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
   m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Unchecked : Wt::Checked);
   m_updateIntervalField->setValue(m_settings->updateInterval());
-
   m_currentSourceIndex = _sidx;
 }
 
@@ -172,34 +174,99 @@ void WebPreferences::updateFields(void)
   if (m_currentSourceIndex >= 0) {
     m_srcBtnGroup->setCheckedButton(m_srcBtnGroup->button(m_currentSourceIndex));
     fillFromSource(m_currentSourceIndex);
+    m_applyChangeBtn->setDisabled(false);
+    m_addAsSourceBtn->setDisabled(false);
+    m_deleteSourceBtn->setDisabled(false);
   }
 }
 
-void WebPreferences::saveAsSource(const qint32& _idx, const QString& _stype)
+void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   SourceT src;
-  src.id = utils::sourceId(_idx);
-  src.mon_type = utils::convert2ApiType(_stype);
+  src.id = utils::sourceId(index);
+  src.mon_type = utils::convert2ApiType(type);
   src.mon_url = m_monitorUrlField->text().toUTF8().c_str();
   src.ls_addr = m_livestatusAddressField->text().toUTF8().c_str();
   src.ls_port = QString(m_livestatusAddressField->text().toUTF8().c_str()).toInt();
   src.auth = m_authStringField->text().toUTF8().c_str();
   src.use_ngrt4nd = m_useNgrt4ndField->checkState();
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
-  m_settings->setEntry(utils::sourceKey(_idx), utils::source2Str(src));
+  m_settings->setEntry(utils::sourceKey(index), utils::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
-  m_sourceStates->setBit(_idx, true);
+  m_sourceStates->setBit(index, true);
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
   m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
 
 
-  if (! m_srcBtnGroup->button(_idx)->isEnabled()) {
+  if (! m_srcBtnGroup->button(index)->isEnabled()) {
     //FIXME: consider only if source is used in the loaded service view?
-    m_srcBtnGroup->button(_idx)->setEnabled(true);
-    m_srcBtnGroup->setSelectedButtonIndex(_idx);
+    m_srcBtnGroup->button(index)->setEnabled(true);
+    m_srcBtnGroup->setSelectedButtonIndex(index);
   }
 
-  m_currentSourceIndex = _idx;
+  m_currentSourceIndex = index;
   updateSourceBtnState();
+}
+
+
+void WebPreferences::promptUser(int inputType)
+{
+
+  Wt::WDialog* inputDialog = new Wt::WDialog();
+  inputDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
+  inputDialog->titleBar()->setStyleClass("titlebar");
+
+  Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
+  std::string dialogTitle;
+  switch (inputType){
+    case SourceTypeInput:
+      dialogTitle = utils::tr("Select source type - ") + APP_NAME.toStdString();
+      for (const auto& src : utils::sourceTypes())
+        inputField->addItem(src.toStdString());
+      break;
+    case SourceIndexInput:
+      dialogTitle = utils::tr("Select the source index - ") + APP_NAME.toStdString();
+      for (const auto& src : utils::sourceIndexes())
+        inputField->addItem(src.toStdString());
+      break;
+    default:
+      break;
+  }
+  inputDialog->setWindowTitle(dialogTitle);
+  Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
+  ok->setDefault(true);
+
+  Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", inputDialog->footer());
+  cancel->clicked().connect(inputDialog, &Wt::WDialog::reject);
+  inputDialog->rejectWhenEscapePressed();
+
+  ok->clicked().connect(std::bind([=] () {
+    if (inputField->validate()) {
+      inputDialog->accept();
+      handleInput(inputField->currentText().toUTF8(), inputType);
+    }
+  }));
+
+  inputDialog->show();
+}
+
+
+void WebPreferences::handleInput(const std::string& input, int inputType)
+{
+  switch(inputType) {
+    case SourceIndexInput:
+      m_currentSourceIndex = input[0]-48;
+      std::cout << "source <<" <<m_currentSourceIndex <<"\n";
+      applyChanges();
+      break;
+    default:
+      //Do nothing
+      break;
+  }
+}
+
+void WebPreferences::addAsSource(void)
+{
+  promptUser(SourceIndexInput);
 }

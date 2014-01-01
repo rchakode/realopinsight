@@ -328,6 +328,7 @@
 
   <message id="setting-page.tpl">
     <div class="form-horizontal">
+    ${info-box}
       <div>
        <div class="row">
          <label class="control-label">Sources&nbsp;&nbsp;</label>

@@ -42,22 +42,25 @@ class QString;
 class WebPreferences : public Preferences, public Wt::WObject
 {
 public:
+  enum InputTypeT {
+    SourceTypeInput=1,
+    SourceIndexInput=2
+  };
+
   WebPreferences(int _userRole);
   virtual ~WebPreferences();
 
   void show(void) {m_dialog->show();}
-  void handleClose(void) {m_dialog->accept();}
 
 protected :
-  virtual void handleCancel(void);
+  void handleCancel(void) {m_dialog->accept();}
   virtual void applyChanges(void);
-  virtual QString letUserSelectType(void);
-  virtual void addAsSource(void);
   virtual void deleteSource(void);
   virtual void fillFromSource(int _sidx);
   virtual void updateSourceBtnState(void);
   virtual void updateFields(void);
-  virtual void saveAsSource(const qint32& _idx, const QString& _stype);
+  virtual void saveAsSource(const qint32& index, const QString& type);
+  virtual void addAsSource(void);
 
 private:
   Wt::WDialog* m_dialog;
@@ -74,6 +77,10 @@ private:
   Wt::WPushButton* m_addAsSourceBtn;
   Wt::WPushButton* m_deleteSourceBtn;
   Wt::WButtonGroup* m_srcBtnGroup;
+  Wt::WText* m_infoBox;
+
+  void promptUser(int inputType);
+  void handleInput(const std::string& input, int inputType);
 };
 
 #endif // WEBSESSION_HPP
