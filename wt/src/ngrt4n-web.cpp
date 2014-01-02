@@ -1,3 +1,4 @@
+#include "WebUtils.hpp"
 #include "AuthManager.hpp"
 #include "DbSession.hpp"
 #include "WebMainUI.hpp"
@@ -5,9 +6,14 @@
 #include <Wt/WServer>
 #include <Wt/WEnvironment>
 
+int argc;
+char** argv;
+QApplication* qtApp;
+
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
   Wt::WApplication* webApp = new Wt::WApplication(env);
+  qtApp = new QApplication(argc, argv);
   webApp->setTwoPhaseRenderingThreshold(0);
   webApp->useStyleSheet("/resources/css/ngrt4n.css");
   webApp->messageResourceBundle().use(webApp->docRoot() + "/resources/i18n/messages");
@@ -16,13 +22,16 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
   DbSession* dbSession = new DbSession(true);
   webApp->root()->setId("wrapper");
   webApp->root()->addWidget(new AuthManager(dbSession));
+
   return webApp;
 }
 
 
-int main(int argc, char **argv)
+int main(int _argc, char **_argv)
 {
-  QApplication* qtApp = new QApplication(argc, argv);
+  argc = _argc;
+  argv = _argv;
+
   try {
     Wt::WServer server(argv[0]);
     server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
@@ -35,11 +44,11 @@ int main(int argc, char **argv)
       server.stop();
     }
   } catch (Wt::WServer::Exception& e) {
-    Wt::log("error")<<"[realopinsight] "<< e.what();
+    LOG("error", e.what());
   } catch (Wt::Dbo::Exception &e) {
-    Wt::log("error")<<"[realopinsight][dbo] "<< e.what();
+    LOG("error", e.what());
   } catch (std::exception &e) {
-    Wt::log("error")<<"[realopinsight] "<< e.what();
+    LOG("error", e.what());
   }
   return qtApp->exec();
 }

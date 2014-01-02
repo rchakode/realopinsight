@@ -30,9 +30,9 @@ void AuthManager::handleAuthentication(void)
   if (m_loginObject.loggedIn()) {
     m_logged = true;
     m_dbSession->setLoggedUser(m_loginObject.user().id());
-    Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
+    LOG("error", m_dbSession->loggedUser().username + " logged in");
   } else {
-    Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged out.";
+    LOG("error", m_dbSession->loggedUser().username + " logged out");
   }
 }
 

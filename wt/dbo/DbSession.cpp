@@ -21,7 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
+#include "WebUtils.hpp"
 #include "DbSession.hpp"
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/PasswordVerifier>
@@ -72,7 +72,7 @@ int DbSession::addUser(const User& user)
     UserCollectionT users = find<User>().where("name=?").bind(user.username);
     if (users.size() > 0) {
       m_lastError = "Failed: a user with the same username already exist.";
-      Wt::log("error")<<" [realopinsight] " << m_lastError;
+      LOG("error", m_lastError);
       retCode = 1;
     } else {
       Wt::Auth::User dbuser = m_dbUsers->registerNew();
@@ -87,7 +87,7 @@ int DbSession::addUser(const User& user)
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the user. More details in log.";
-    Wt::log("error")<<"[realopinsight]" << ex.what();
+    LOG("error", ex.what());
   }
   transaction.commit();
   updateUserList();
@@ -111,7 +111,7 @@ int DbSession::updateUser(User user)
     transaction.commit();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to update the user. More details in log.";
-    Wt::log("error")<<"[realopinsight]" << ex.what();
+    LOG("error", ex.what());
   }
   updateUserList();
   return retCode;
@@ -142,7 +142,7 @@ int DbSession::updatePassword(const std::string& uname,
     transaction.commit();
   } catch (const dbo::Exception& ex) {
     retCode = -1;
-    Wt::log("error")<<"[realopinsight]" << ex.what();
+    LOG("error", ex.what());
   }
   updateUserList();
   return retCode;
@@ -159,7 +159,7 @@ int DbSession::deleteUser(std::string uname)
     transaction.commit();
   } catch (const dbo::Exception& ex) {
     retCode = 1;
-    Wt::log("error")<<"[realopinsight]" << ex.what();
+    LOG("error", ex.what());
   }
   updateUserList();
   return retCode;
@@ -200,7 +200,7 @@ void DbSession::setLoggedUser(const std::string& uid)
     m_loggedUser = *(info.modify()->user());
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    Wt::log("error") << "[realopinsight] "<<ex.what();
+    LOG("error", ex.what());
   }
 }
 
@@ -215,7 +215,7 @@ void DbSession::updateUserList(void)
     }
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    Wt::log("error") << "[realopinsight] "<<ex.what();
+    LOG("error", ex.what());
   }
 }
 
@@ -230,7 +230,7 @@ void DbSession::updateViewList(void)
     }
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    Wt::log("error") << "[realopinsight] "<<ex.what();
+    LOG("error", ex.what());
   }
 }
 
@@ -245,7 +245,7 @@ void DbSession::updateViewList(const std::string& uname)
     }
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    Wt::log("error") << "[realopinsight] "<<ex.what();
+    LOG("error", ex.what());
   }
 
 }
@@ -262,10 +262,10 @@ void DbSession::initDb(void)
     adm.role = User::AdmRole;
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     addUser(adm);
-    Wt::log("notice")<<"[realopinsight][dbo] "<< "Created database";
+    LOG("notice", "Database created");
   } catch (dbo::Exception& ex) {
-    Wt::log("error")<<"[realopinsight] "<< "Failed initializing the database";
-    Wt::log("error")<<"[realopinsight][dbo] "<< ex.what();
+    LOG("error", "Failed initializing the database");
+    LOG("error", ex.what());
   }
 }
 
@@ -277,7 +277,7 @@ int DbSession::addView(const View& view)
     ViewCollectionT views = find<View>().where("name=?").bind(view.name);
     if (views.size() > 0) {
       m_lastError = "Failed: a view with the same name already exist.";
-      Wt::log("error")<<" [realopinsight] " << m_lastError;
+      LOG("error", m_lastError);
       retCode = 1;
     } else {
       View* viewTmpPtr(new View());
@@ -287,7 +287,7 @@ int DbSession::addView(const View& view)
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the view. More details in log.";
-    Wt::log("error")<<" [realopinsight] " << ex.what();
+    LOG("error", ex.what());
   }
   transaction.commit();
   updateViewList();
@@ -307,7 +307,7 @@ int DbSession::deleteView(std::string vname)
   } catch (const dbo::Exception& ex) {
     retCode = 1;
     m_lastError = ex.what();
-    Wt::log("error")<<"[realopinsight]" << ex.what();
+    LOG("error", ex.what());
   }
   updateViewList();
   return retCode;
@@ -340,7 +340,7 @@ int DbSession::assignView(const std::string& uname, const std::string& vname)
     retCode = 0;
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    Wt::log("error") << "[realopinsight] "<<ex.what();
+    LOG("error", ex.what());
   }
   return retCode;
 }
@@ -357,7 +357,7 @@ int DbSession::revokeView(const std::string& uname, const std::string& vname)
     retCode = 0;
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    Wt::log("error") << "[realopinsight] "<<ex.what();
+    LOG("error", ex.what());
   }
   return retCode;
 }

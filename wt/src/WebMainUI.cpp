@@ -146,7 +146,6 @@ void WebMainUI::createMainUI(void)
 
 void WebMainUI::setupAdminMenus(void)
 {
-  //Wt::WMenuItem* curItem = NULL;
   m_mgntMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(m_mgntMenu, Wt::AlignLeft);
   Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
@@ -369,7 +368,7 @@ void WebMainUI::finishFileDialog(int action)
     case IMPORT:
       if (! m_uploader->empty()) {
         if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          Wt::log("notice")<<"[realopinsight]"<< " Parsing the input file";
+          LOG("notice", "Parsing the input file");
           QString fileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
           Parser parser(fileName ,&cdata);
@@ -398,7 +397,7 @@ void WebMainUI::finishFileDialog(int action)
             }
           } else {
             std::string msg = "Invalid configuration file";
-            Wt::log("warn")<<"[realopinsight] "<< msg;
+            LOG("warn", msg);
             showMessage(msg, "alert alert-warning");
           }
         }
@@ -699,9 +698,9 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
   QDir dir(path.c_str());
   if (! dir.exists() && ! dir.mkdir(dir.absolutePath())) {
     return false;
-    QString errrMsg = tr("Unable to create the directory (%1)").arg(dir.absolutePath());
-    Wt::log("error")<<"[realopinsight]"<<errrMsg.toStdString();
-    showMessage(errrMsg.toStdString(), "alert alert-warning");
+    QString errMsg = tr("Unable to create the directory (%1)").arg(dir.absolutePath());
+    LOG("error", errMsg.toStdString());
+    showMessage(errMsg.toStdString(), "alert alert-warning");
   }  else {
     ret = true;
     if (cleanContent) dir.remove("*");

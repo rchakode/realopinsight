@@ -27,8 +27,11 @@
 
 #include <Wt/WText>
 
-class QString;
+#define LOG(level, msg) \
+Wt::log(level)<< Wt::WLogger::timestamp << Wt::WLogger::sep \
+  << "[realopinsight]" << Wt::WLogger::sep << msg;
 
+class QString;
 namespace utils {
   void showMessage(int exitCode, const std::string& errorMsg,
                    const std::string& successMsg, Wt::WText* infoBox);
