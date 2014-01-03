@@ -468,11 +468,11 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
     m_userHomeTpl->bindWidget("andhor-load-file",
-                              createAnchorForHomeLink(tr("Preview a platform").toStdString(),
+                              createAnchorForHomeLink(tr("Preview a view").toStdString(),
                                                       tr("Ensure it meets your requirements").toStdString(),
                                                       ngrt4n::LINK_LOAD));
     m_userHomeTpl->bindWidget("andhor-import-file",
-                              createAnchorForHomeLink(tr("Import a platform").toStdString(),
+                              createAnchorForHomeLink(tr("Upload a view").toStdString(),
                                                       tr("Preview, assign and operate").toStdString(),
                                                       ngrt4n::LINK_IMPORT));
   } else {

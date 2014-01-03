@@ -19,7 +19,7 @@
        <!-- 1st thumnail -->
         <div class="span-one-third">
            <div class="thumbnail">
-             <div class="title">1. Setup the business views for the target platforms</div>
+             <div class="title">Setup the business views for your target platforms</div>
              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
              <p>For each platform, the RealOpinsight Editor allows you to easily, and simply, describe
              the services as well as the business rules that bind them to each other.
@@ -30,7 +30,7 @@
         <!-- 2nd thumnail -->
         <div class="span-one-third">
            <div class="thumbnail">
-             <div class="title">2. Configure the access to your monitoring data</div>
+             <div class="title">Configure the access to your monitoring data</div>
              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
              <p>The setting menu from the management main menu allows you to easily set
              when and how to retrieve status data from your monitoring servers
@@ -42,7 +42,7 @@
        <!-- Third thumnail -->
         <div class="span-one-third">
           <div class="thumbnail">
-            <div class="title">3. Upload, preview and assign views to your staff</div>
+            <div class="title">Upload, preview and assign the views to your staff</div>
               <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
               <p>The management menus also allow to upload, preview and assign views to users.
               Define who can access/operate your different business views.
