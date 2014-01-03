@@ -30,10 +30,11 @@
         <!-- 2nd thumnail -->
         <div class="span-one-third">
            <div class="thumbnail">
-             <div class="title">2. Setup the access to the monitoring data</div>
+             <div class="title">2. Configure the access to your monitoring data</div>
              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-             <p>The setting menu from management menus allow to set when and how to retrieve status
-             data from your monitoring servers to keep operations views up-to-date.
+             <p>The setting menu from the management main menu allows you to easily set
+             when and how to retrieve status data from your monitoring servers
+             to keep your operations views up-to-date.
              </p>
            </div>
         </div>
@@ -41,7 +42,7 @@
        <!-- Third thumnail -->
         <div class="span-one-third">
           <div class="thumbnail">
-            <div class="title">3. Upload, Preview and assign views to your staff</div>
+            <div class="title">3. Upload, preview and assign views to your staff</div>
               <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
               <p>The management menus also allow to upload, preview and assign views to users.
               Define who can access/operate your different business views.
@@ -58,8 +59,8 @@
         </div>
         <!-- List actions -->
         <div class="span2 list-group">
-         ${andhor-load-file}
-         ${andhor-import-file}
+          ${andhor-import-file}
+          ${andhor-load-file}
         </div>
       </div>
      </div> <!-- Row --->
