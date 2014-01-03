@@ -100,7 +100,7 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
 
 ViewAssignmentUI::~ViewAssignmentUI(void)
 {
-  // delete explicitly
+  // deleted implicitly
   //  delete m_userListModel;
   //  delete m_assignedViewModel;
   //  delete m_nonAssignedViewModel;
@@ -120,14 +120,16 @@ void ViewAssignmentUI::filter(const std::string& username)
         addView(m_nonAssignedViewModel, view);
       }
     }
+  } else {
+    resetModelData();
   }
   if (! m_username.empty()) {
-    //    enableButtonIfApplicable(m_nonAssignedViewModel,
-    //                             m_assignButton,
-    //                             &ViewAssignmentUI::assignViews);
-    //    enableButtonIfApplicable(m_assignedViewModel,
-    //                             m_revokeButton,
-    //                             &ViewAssignmentUI::revokeViews);
+    enableButtonIfApplicable(m_nonAssignedViewModel,
+                             m_assignButton,
+                             &ViewAssignmentUI::assignViews);
+    enableButtonIfApplicable(m_assignedViewModel,
+                             m_revokeButton,
+                             &ViewAssignmentUI::revokeViews);
   }
 }
 
@@ -181,10 +183,10 @@ void ViewAssignmentUI::resetModelData(void)
     addView(m_nonAssignedViewModel, view);
   }
 
-  //disableButtons();
-  //  enableButtonIfApplicable(m_nonAssignedViewModel,
-  //                           m_deleteViewButton,
-  //                           &ViewAssignmentUI::deleteViews);
+  disableButtons();
+  enableButtonIfApplicable(m_nonAssignedViewModel,
+                           m_deleteViewButton,
+                           &ViewAssignmentUI::deleteViews);
 }
 
 
@@ -195,7 +197,7 @@ std::string ViewAssignmentUI::itemText(Wt::WStandardItemModel* model, int index)
 
 void ViewAssignmentUI::assignViews(void)
 {
-  //disableButtons();
+  disableButtons();
 
   setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
 
@@ -208,7 +210,7 @@ void ViewAssignmentUI::assignViews(void)
 
 void ViewAssignmentUI::revokeViews(void)
 {
-  //disableButtons();
+  disableButtons();
 
   setSelectedViews(m_assignedViewList, m_assignedViewModel);
 
@@ -221,7 +223,7 @@ void ViewAssignmentUI::revokeViews(void)
 
 void ViewAssignmentUI::deleteViews(void)
 {
-  //disableButtons();
+  disableButtons();
   setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
 
   std::string msg;
@@ -247,18 +249,18 @@ void ViewAssignmentUI::enableButtonIfApplicable(Wt::WStandardItemModel* model,
                                                 void (ViewAssignmentUI::* targetSlot)(void))
 {
   if (model->rowCount() <=0) {
-    button->disable();
+    button->setEnabled(false);
   } else {
-    button->enable();
-    button->clicked().connect(this, targetSlot);
+    button->setEnabled(true);
+    //button->clicked().connect(this, targetSlot);
   }
 }
 
 void ViewAssignmentUI::disableButtons(void)
 {
-  m_assignButton->disable();
-  m_revokeButton->disable();
-  m_deleteViewButton->disable();
+  m_assignButton->setEnabled(false);
+  m_revokeButton->setEnabled(false);
+  m_deleteViewButton->setEnabled(false);
 }
 
 void ViewAssignmentUI::setSelectedViews(Wt::WSelectionBox* list, Wt::WStandardItemModel* model)
