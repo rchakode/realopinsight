@@ -193,6 +193,21 @@ body, html {
   padding: 5;
 }
 
+.span-one-third {
+  width: 31%;
+  margin: 1%;
+}
+
+.thumbnail {
+  font-size: 0.8em;
+}
+.thumbnail .title {
+  font-weight: bold;
+  /*text-transform: capitalize;*/
+  margin-bottom: 5px;
+  border-bottom: 1px solid #d1d1d1;
+}
+
 .logout-button {
   position: fixed !important;
   right: 0px;

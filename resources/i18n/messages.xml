@@ -17,35 +17,37 @@
          <h1><small>Welcome – Getting Started in 3 Easy Steps</small></h1>
         </div>
        <!-- 1st thumnail -->
-        <div class="span2">
-           <div>
-             <div>1. Describe the platforms you want to monitor</div>
+        <div class="span-one-third">
+           <div class="thumbnail">
+             <div class="title">1. Setup the business views for the target platforms</div>
              <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
              <p>For each platform, the RealOpinsight Editor allows you to easily, and simply, describe
-             the related services as well as the business rules that bind them to each other.
+             the services as well as the business rules that bind them to each other.
              </p>
            </div>
         </div>
 
         <!-- 2nd thumnail -->
-        <div class="span2">
-           <div>
-             <div>2. Set monitoring settings</div>
+        <div class="span-one-third">
+           <div class="thumbnail">
+             <div class="title">2. Setup the access to the monitoring data</div>
              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-             <p>The Configuration Manager enables to easily set when and how status
-             data should be retrieved from your monitoring servers to keep your
-             operators' monitoring views up-to-date.
+             <p>The setting menu from management menus allow to set when and how to retrieve status
+             data from your monitoring servers to keep operations views up-to-date.
              </p>
            </div>
         </div>
 
        <!-- Third thumnail -->
-        <div class="span2">
-           <div>3. Preview and assign to your operators</div>
+        <div class="span-one-third">
+          <div class="thumbnail">
+            <div class="title">3. Upload, Preview and assign views to your staff</div>
               <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-              <p>Using the management menus, define which of your operators can operate your
-              different monitoring views. Takes the maximum on their productivity, and enjoy !
-               </p>
+              <p>The management menus also allow to upload, preview and assign views to users.
+              Define who can access/operate your different business views.
+              Take the maximum of the productivity of your operators, and enjoy !
+              </p>
+          </div>
         </div>
       </div>
 
