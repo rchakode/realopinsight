@@ -184,8 +184,9 @@ body, html {
 }
 
 .footer {
-  width: 80%;
-  margin: 0 10%;
+  position: !fixed;
+  width: 65%;
+  margin: 0 18% 0 18%;
   text-align: center;
 }
 
