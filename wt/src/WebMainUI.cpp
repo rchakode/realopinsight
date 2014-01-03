@@ -75,7 +75,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
 WebMainUI::~WebMainUI()
 {
-  std::cout << "start destructor\n";
   // Delete all
   //  m_contents(NULL),
   //  m_navbar(NULL),
@@ -86,7 +85,7 @@ WebMainUI::~WebMainUI()
   delete m_navbar;
   delete m_contents;
   delete m_mainWidget;
-  std::cout << "finish destruction\n";
+  LOG("notice", "End up the application");
 }
 
 
