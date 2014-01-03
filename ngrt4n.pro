@@ -88,6 +88,10 @@ LIBS += -lwt -lwthttp -lwtfcgi -lwtdbo -lwtdbosqlite3 \
     -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
 
 
+INCLUDEPATH += wt/src \
+              wt/dbo \
+              wt/lib/wtwithqt
+
 HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebMsgConsole.hpp \
     wt/src/WebMap.hpp \
@@ -100,7 +104,9 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/dbo/ViewMgnt.hpp \
     wt/src/WebUtils.hpp \
     wt/src/AuthManager.hpp \
-    wt/src/WebPreferences.hpp
+    wt/src/WebPreferences.hpp \
+    wt/lib/wtwithqt/DispatchThread.h \
+    wt/lib/wtwithqt/WQApplication
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -114,7 +120,9 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/dbo/ViewMgnt.cpp \
     wt/src/WebUtils.cpp \
     wt/src/AuthManager.cpp \
-    wt/src/WebPreferences.cpp
+    wt/src/WebPreferences.cpp \
+    wt/lib/wtwithqt/DispatchThread.C \
+    wt/lib/wtwithqt/WQApplication.C
 }
 
 dflag {
@@ -145,12 +153,10 @@ OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
-INCLUDEPATH = include \
+INCLUDEPATH += include \
               librealopinsight/src \
               include/client \
-              include/core \
-              wt/src \
-              wt/dbo
+              include/core
 
 DISTFILES += README \
     INSTALL \

@@ -1,3 +1,5 @@
+
+#include "WQApplication"
 #include "WebUtils.hpp"
 #include "AuthManager.hpp"
 #include "DbSession.hpp"
@@ -6,31 +8,44 @@
 #include <Wt/WServer>
 #include <Wt/WEnvironment>
 
-int argc;
-char** argv;
-QApplication* qtApp;
+
+class WebApp : public Wt::WQApplication
+{
+public:
+  WebApp(const Wt::WEnvironment& env)
+    : WQApplication(env, true) {}
+
+protected:
+  virtual void create()
+  {
+    setTwoPhaseRenderingThreshold(0);
+    useStyleSheet("/resources/css/ngrt4n.css");
+    messageResourceBundle().use(docRoot() + "/resources/i18n/messages");
+    setTheme(new Wt::WBootstrapTheme());
+    requireJQuery("/resources/js/jquery-1.10.2.min.js");
+    m_dbSession = new DbSession(true);
+    root()->setId("wrapper");
+    root()->addWidget(new AuthManager(m_dbSession));
+  }
+
+  virtual void destroy()
+  {
+    delete m_dbSession;
+  }
+
+private:
+  DbSession* m_dbSession;
+};
 
 Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 {
-  Wt::WApplication* webApp = new Wt::WApplication(env);
-  qtApp = new QApplication(argc, argv);
-  webApp->setTwoPhaseRenderingThreshold(0);
-  webApp->useStyleSheet("/resources/css/ngrt4n.css");
-  webApp->messageResourceBundle().use(webApp->docRoot() + "/resources/i18n/messages");
-  webApp->setTheme(new Wt::WBootstrapTheme());
-  webApp->requireJQuery("/resources/js/jquery-1.10.2.min.js");
-  DbSession* dbSession = new DbSession(true);
-  webApp->root()->setId("wrapper");
-  webApp->root()->addWidget(new AuthManager(dbSession));
-
-  return webApp;
+  return new WebApp(env);
 }
 
 
-int main(int _argc, char **_argv)
+int main(int argc, char **argv)
 {
-  argc = _argc;
-  argv = _argv;
+  QApplication* qtApp = new QApplication(argc, argv);
 
   try {
     Wt::WServer server(argv[0]);
