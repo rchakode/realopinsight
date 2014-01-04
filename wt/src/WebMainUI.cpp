@@ -125,7 +125,7 @@ void WebMainUI::showUserHome(void)
   m_dashtabs->addTab(createUserHome(),
                      homeTabTitle,
                      Wt::WTabWidget::LazyLoading)
-      ->triggered().connect(std::bind([=](){ setInternalPath(internalLink);}));
+      ->triggered().connect(std::bind([=](){ /*FIXME: setInternalPath(internalLink)*/;}));
 
   if (m_dbSession->loggedUser().role == User::OpRole) {
     initOperatorDashboard();
@@ -465,6 +465,7 @@ void WebMainUI::scaleMap(double factor)
 Wt::WWidget* WebMainUI::createUserHome(void)
 {
   m_userHomeTpl = new Wt::WTemplate();
+
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
     m_userHomeTpl->bindWidget("andhor-load-file",
@@ -477,19 +478,12 @@ Wt::WWidget* WebMainUI::createUserHome(void)
                                                       ngrt4n::LINK_IMPORT));
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
-    m_userHomeTpl->bindWidget("andhor-load-file",
-                              createAnchorForHomeLink(tr("Preview").toStdString(),
-                                                      tr("An existing platform").toStdString(),
-                                                      ngrt4n::LINK_LOAD));
-    m_userHomeTpl->bindWidget("andhor-import-file",
-                              createAnchorForHomeLink(tr("Import").toStdString(),
-                                                      tr("A platform description").toStdString(),
-                                                      ngrt4n::LINK_IMPORT));
   }
   m_userHomeTpl->bindString("software", APP_NAME.toStdString());
   m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
   m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
   m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
+
   return m_userHomeTpl;
 }
 
