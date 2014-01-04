@@ -659,6 +659,9 @@ void WebMainUI::initOperatorDashboard(void)
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
 
+  Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
+  m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
+
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
   for (const auto& view: m_dbSession->viewList()) {
@@ -666,12 +669,10 @@ void WebMainUI::initOperatorDashboard(void)
     WebDashboard* dashboard;
     loadView(view.path, dashboard, tabIndex);
     if (dashboard) {
+      dashboard->setEventFeedLayout(m_eventFeedLayout);
       layout->addWidget(thumbnail(dashboard));
     }
   }
-
-  Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
-  m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
 
   m_userHomeTpl->bindWidget("contents", thumbs);
   m_userHomeTpl->bindWidget("event-feeds", eventFeeds);
@@ -734,16 +735,5 @@ void WebMainUI::startDashbaordUpdate(void)
 
 void WebMainUI::updateEventFeeds(void)
 {
-  m_eventFeedLayout->addWidget(createEventFeedItem());
-}
-
-Wt::WWidget* WebMainUI::createEventFeedItem(void)
-{
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"), m_mainWidget);
-  tpl->bindString("event-feed-id", "testdsdh");
-  tpl->bindWidget("event-feed-status", new Wt::WImage("/images/business-process.png", m_mainWidget));
-  tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("Event Feed"), "Event Feed", m_mainWidget));
-  tpl->bindString("event-feed-details", "feed event details");
-
-  return tpl;
+  //FIXME: m_eventFeedLayout->addWidget(createEventFeedItem());
 }

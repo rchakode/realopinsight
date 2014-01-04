@@ -127,7 +127,6 @@ private:
   bool createDirectory(const std::string& path, bool cleanContent);
   void startDashbaordUpdate(void);
   void updateEventFeeds(void);
-  Wt::WWidget* createEventFeedItem(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

@@ -51,6 +51,7 @@ public:
   void updateThumbnail(void);
   Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
   Wt::WLabel* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
+  void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
 
 protected:
   virtual void buildMap(void);
@@ -59,6 +60,7 @@ protected:
   virtual void updateTree(const NodeT& _node, const QString& _tip);
   virtual void updateMsgConsole(const NodeT& _node);
   virtual void updateChart(void);
+  virtual void addEventFeedItem(const NodeT& node);
 
 private:
   Wt::WContainerWidget* m_widget;
@@ -67,11 +69,13 @@ private:
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
   Wt::WLabel* m_thumbnailTitleBar;
+  Wt::WVBoxLayout* m_eventFeedLayout;
 
   void setupUI(void);
   void addJsEventScript(void);
   void addEvents(void);
   std::string statsTooltip(void);
+  Wt::WWidget* createEventFeedItem(const NodeT& node);
 };
 
 

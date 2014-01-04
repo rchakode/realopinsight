@@ -228,3 +228,20 @@ std::string WebDashboard::statsTooltip(void)
   delete tpl;
   return oss.str();
 }
+
+void WebDashboard::addEventFeedItem(const NodeT &node)
+{
+  m_eventFeedLayout->addWidget(createEventFeedItem(node));
+}
+
+
+Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"), m_widget);
+  tpl->bindString("event-feed-id", "testdsdh");
+  tpl->bindWidget("event-feed-status", new Wt::WImage("/images/business-process.png", m_widget));
+  tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("Event Feed"), "Event Feed", m_widget));
+  tpl->bindString("event-feed-details", "feed event details");
+
+  return tpl;
+}

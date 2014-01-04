@@ -116,6 +116,7 @@ protected:
   virtual void updateMsgConsole(const NodeT& _node) = 0;
   virtual void finalizeUpdate(const SourceT& src);
   virtual void updateChart(void) = 0;
+  virtual void addEventFeedItem(const NodeT& node) = 0;
 
 private:
   void resetInterval(void);

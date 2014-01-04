@@ -303,6 +303,8 @@ void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
       ++(m_cdata->check_status_count[cnode->severity]);
       updateDashboard(*cnode);
       cnode->monitored = true;
+
+      if (cnode->severity != MonitorBroker::Normal) addEventFeedItem(*cnode);
     }
   }
 }
