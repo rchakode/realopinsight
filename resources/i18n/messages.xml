@@ -85,14 +85,14 @@
   <div class="ngrt4n-operator-page">
     <div class="row">
        <!-- Getting Started Pane -->
-       <div class="span9">
+       <div class="span8">
          <legend>Overview of service health</legend>
          <div>${contents}</div>
        </div>
 
        <div class="span1">&nbsp;</div>
        <!-- Event Feeds Pane -->
-       <div class="span2">
+       <div class="span3">
          <legend>Event Feeds</legend>
          <div>${event-feeds}</div>
        </div>
@@ -111,6 +111,18 @@
      <div class="span2">
         <div>${thumb-titlebar}</div>
         <div class="ngrt4n-thumbnail">${thumb-image}</div>
+    </div>
+  </message>
+
+  <message id="event-feed.tpl">
+    <div id="${event-feed-id}" class="event-feed-item">
+      <div class="status-icon">
+        ${event-feed-status}
+      </div>
+      <div class="info">
+        ${event-feed-title}
+        <p>${event-feed-details}</p>
+      </div>
     </div>
   </message>
 

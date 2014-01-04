@@ -25,6 +25,9 @@
 #ifndef WEBDASHBOOARD_HPP
 #define WEBDASHBOOARD_HPP
 
+#include "DashboardBase.hpp"
+#include "WebTree.hpp"
+#include "WebPieChart.hpp"
 #include <Wt/WGridLayout>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>
@@ -35,9 +38,7 @@
 #include "WebMsgConsole.hpp"
 #include "WebMap.hpp"
 #include <Wt/WLocalizedStrings>
-#include "DashboardBase.hpp"
-#include "WebTree.hpp"
-#include "WebPieChart.hpp"
+#include <Wt/WLabel>
 
 class WebDashboard : public DashboardBase
 {
@@ -49,7 +50,7 @@ public:
   WebMap* map(void) const {return m_map;}
   void updateThumbnail(void);
   Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
-  Wt::WText* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
+  Wt::WLabel* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
 
 protected:
   virtual void buildMap(void);
@@ -65,7 +66,7 @@ private:
   WebMap* m_map;
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
-  Wt::WText* m_thumbnailTitleBar;
+  Wt::WLabel* m_thumbnailTitleBar;
 
   void setupUI(void);
   void addJsEventScript(void);

@@ -95,6 +95,7 @@ private:
   Wt::Signal<void> m_terminateSession;
   Wt::WTemplate* m_userHomeTpl;
   int m_assignedDashboardCount;
+  Wt::WVBoxLayout* m_eventFeedLayout;
 
   void addEvents(void);
   void createMainUI(void);
@@ -125,6 +126,8 @@ private:
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);
   void startDashbaordUpdate(void);
+  void updateEventFeeds(void);
+  Wt::WWidget* createEventFeedItem(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

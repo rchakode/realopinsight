@@ -162,6 +162,22 @@ body, html {
   height: 120px;
 }
 
+.event-feed-item {
+  width: 100%;
+  margin: none;
+}
+
+.event-feed-item .status-icon {
+  width: 40px;
+  float: left;
+  margin: none;
+}
+
+.event-feed-item .info {
+  width: calc(100% - 42px);
+  float: right;
+}
+
 .ngrt4n-dialog {
   max-width: 640px; 
 }

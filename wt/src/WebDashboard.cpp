@@ -88,7 +88,8 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   setupUI();
   addJsEventScript();
   load(_config);
-  m_thumbnailTitleBar = new Wt::WText(rootNode().name.toStdString(), m_widget);
+  m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
+ // Wt::WLabel* label(rootNode().name.toStdString(), m_widget);
 }
 
 WebDashboard::~WebDashboard()

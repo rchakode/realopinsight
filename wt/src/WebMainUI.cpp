@@ -85,7 +85,7 @@ WebMainUI::~WebMainUI()
   delete m_navbar;
   delete m_contents;
   delete m_mainWidget;
-  LOG("notice", "End up the application");
+  LOG("notice", "Session closed");
 }
 
 
@@ -271,7 +271,6 @@ void WebMainUI::resetTimer(void)
 {
   CHECK_LOGIN();
   m_timer.setInterval(1000*m_settings->updateInterval());
-  //m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_timer.start();
 }
 
@@ -294,6 +293,7 @@ void WebMainUI::handleRefresh(void)
     dash.second->updateMap();
     dash.second->updateThumbnail();
   }
+  updateEventFeeds();
   m_timer.start();
   m_mainWidget->enable();
 }
@@ -669,7 +669,13 @@ void WebMainUI::initOperatorDashboard(void)
       layout->addWidget(thumbnail(dashboard));
     }
   }
+
+  Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
+  m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
+
   m_userHomeTpl->bindWidget("contents", thumbs);
+  m_userHomeTpl->bindWidget("event-feeds", eventFeeds);
+
   startDashbaordUpdate();
 }
 
@@ -723,4 +729,21 @@ void WebMainUI::startDashbaordUpdate(void)
     delete tmpTimer;
     handleRefresh();
   }));
+}
+
+
+void WebMainUI::updateEventFeeds(void)
+{
+  m_eventFeedLayout->addWidget(createEventFeedItem());
+}
+
+Wt::WWidget* WebMainUI::createEventFeedItem(void)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"), m_mainWidget);
+  tpl->bindString("event-feed-id", "testdsdh");
+  tpl->bindWidget("event-feed-status", new Wt::WImage("/images/business-process.png", m_mainWidget));
+  tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("Event Feed"), "Event Feed", m_mainWidget));
+  tpl->bindString("event-feed-details", "feed event details");
+
+  return tpl;
 }
