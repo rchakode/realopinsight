@@ -109,6 +109,7 @@
 
   <message id="dashboard-thumbnail.tpl">
      <div class="span2">
+        <div>${thumb-titlebar}</div>
         <div class="ngrt4n-thumbnail">${thumb-image}</div>
     </div>
   </message>

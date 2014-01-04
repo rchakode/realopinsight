@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-
+#include "WebUtils.hpp"
 #include "WebDashboard.hpp"
 #include "Base.hpp"
 #include "utilsClient.hpp"
@@ -88,6 +88,7 @@ WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
   setupUI();
   addJsEventScript();
   load(_config);
+  m_thumbnailTitleBar = new Wt::WText(rootNode().name.toStdString(), m_widget);
 }
 
 WebDashboard::~WebDashboard()
@@ -136,6 +137,12 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
   m_map->updateNode(_node, _tip);
 }
 
+void WebDashboard::updateThumbnail(void)
+{
+  m_thumbnailTitleBar->setStyleClass(utils::computeSeverityCssClass(rootNode().severity));
+}
+
+
 void WebDashboard::updateMap(void)
 {
   m_map->drawMap();
@@ -177,11 +184,6 @@ void WebDashboard::addJsEventScript(void)
 {
   m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
   m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
-}
-
-Wt::WImage* WebDashboard::thumbnail(void)
-{
-  return m_map->thumbnail();
 }
 
 

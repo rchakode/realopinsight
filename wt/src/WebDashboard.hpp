@@ -47,7 +47,9 @@ public:
   Wt::WWidget* get(void) const {return m_widget;}
   void updateMap(void);
   WebMap* map(void) const {return m_map;}
-  Wt::WImage* thumbnail(void);
+  void updateThumbnail(void);
+  Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
+  Wt::WText* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
 
 protected:
   virtual void buildMap(void);
@@ -63,6 +65,8 @@ private:
   WebMap* m_map;
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
+  Wt::WText* m_thumbnailTitleBar;
+
   void setupUI(void);
   void addJsEventScript(void);
   void addEvents(void);

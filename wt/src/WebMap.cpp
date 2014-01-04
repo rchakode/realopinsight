@@ -231,15 +231,12 @@ void WebMap::updateThumbnail(void)
   thumbWidth = thumbScaleX*m_cdata->map_width + 20;
 
   m_translateY = 10;
-  m_translateY = THUMB_BANNER_FONT_SIZE/thumbScaleY;
+  m_translateY = 0;
   Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight + m_translateY);
 
   m_painter = new Wt::WPainter(&thumbnailImg);
   m_painter->scale(thumbScaleX, thumbScaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
-
-
-  drawThumbnailBanner(thumbWidth, thumbHeight, thumbScaleX, thumbScaleY, m_translateY);
 
   // Draw edges
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
@@ -261,27 +258,6 @@ void WebMap::updateThumbnail(void)
   delete m_painter;
 
   m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
-}
-
-void WebMap::drawThumbnailBanner(double thumbWidth, double thumbHeight,
-                                 double scaleX, double scaleY, double fontSize)
-{
-  m_painter->save();
-  Wt::WFont font;
-  std::string text = m_cdata->root->name.toStdString();
-  font.setSize(fontSize);
-  double textLength = thumbWidth/scaleX;// fontSize;
-  Wt::WColor brushColor = WebPieChart::colorFromSeverity(m_cdata->root->severity);
-  Wt::WRectF bannerArea(0, 0, textLength, fontSize);
-  m_painter->setFont(font);
-  m_painter->setPen(Wt::WPen(brushColor));
-  m_painter->setBrush(Wt::WBrush(brushColor));
-  m_painter->drawRect(bannerArea);
-  m_painter->setPen(Wt::WPen(Wt::black));
-  m_painter->drawText(bannerArea,Wt::AlignCenter|Wt::AlignMiddle,
-                      Wt::TextSingleLine,
-                      m_cdata->root->name.toStdString());
-  m_painter->restore();
 }
 
 

@@ -292,6 +292,7 @@ void WebMainUI::handleRefresh(void)
   for(auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
+    dash.second->updateThumbnail();
   }
   m_timer.start();
   m_mainWidget->enable();
@@ -676,6 +677,7 @@ void WebMainUI::initOperatorDashboard(void)
 Wt::WTemplate* WebMainUI::thumbnail(WebDashboard* dashboard)
 {
   Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
+  tpl->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
   tpl->bindWidget("thumb-image", dashboard->thumbnail());
   return tpl;
 }

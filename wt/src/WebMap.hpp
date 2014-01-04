@@ -83,8 +83,6 @@ private:
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
   void handleContainedSizeChanged(double w, double h);
-  void drawThumbnailBanner(double thumbWidth, double thumbHeight,
-                             double scaleX, double scaleY, double fontSize);
   void expandCollapse(const QString& nodeId);
   void applyVisibilityToChild(const NodeT& node, qint8 mask);
 };
