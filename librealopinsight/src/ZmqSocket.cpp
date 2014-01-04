@@ -172,7 +172,7 @@ void ZmqSocket::makeHandShake() {
       socket->reset();
     }
     if (--retriesLeft == 0) {
-      m_errorMsg = "Unable to connect to the service from this address ("+m_serverUri+")";
+      m_errorMsg = "Unable to connect to ngrt4nd service at "+m_serverUri+"";
       std::cerr << m_errorMsg << "\n";
     }
   }

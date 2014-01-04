@@ -39,7 +39,7 @@
 #include <boost/filesystem/operations.hpp>
 
 namespace {
-  IconMapT m_icons = utils::nodeIcons();
+  const IconMapT ICONS = utils::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
 }
@@ -137,14 +137,14 @@ void WebMap::drawNode(const NodeT& _node, bool drawIcon)
     Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
     m_painter->setPen(Wt::WPen(WebPieChart::colorFromSeverity(_node.severity)));
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(utils::getPathFromQtResource(m_icons[_node.icon]),40,40));
+      m_painter->drawImage(iconPos, GImage(utils::getPathFromQtResource(ICONS[_node.icon]),40,40));
     } else { /* thumbnail: do nothing*/ }
 
     if( _node.type == NodeType::ServiceNode) {
       if (_node.visibility & ngrt4n::Expanded) {
-        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(m_icons[utils::MINUS]),19,18));
+        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(ICONS[utils::MINUS]),19,18));
       } else {
-        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(m_icons[utils::PLUS]),19,18));
+        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(ICONS[utils::PLUS]),19,18));
       }
       createExpIconLink(_node, expIconPos);
     }

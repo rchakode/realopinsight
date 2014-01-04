@@ -164,39 +164,41 @@ body, html {
 
 .event-feed-item {
   width: 100%;
-  margin: none;
+  font-size: 0.8em;
 }
 
 .event-feed-item .status-icon {
   width: 40px;
   float: left;
-  margin: none;
+  padding: 2px;
+  margin: auto;
 }
 
 .event-feed-item .info {
-  width: calc(100% - 42px);
+  width: calc(100% - 48px);
   float: right;
+  margin: auto 2px;
 }
 
 .ngrt4n-dialog {
   max-width: 640px; 
 }
 .login-container {
- width: 480px;
- margin: 100px auto;
+  width: 480px;
+  margin: 100px auto;
 }
 
 .form-actions {
- padding: 5px; 
+  padding: 5px; 
 }
 
 .wrapper-container {
- position: relative;
- left: 0;
- top: 0;
- right: 2;
- padding: 0;
- margin: 0;
+  position: relative;
+  left: 0;
+  top: 0;
+  right: 2;
+  padding: 0;
+  margin: 0;
 }
 
 .footer {

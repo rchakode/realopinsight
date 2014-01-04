@@ -288,8 +288,7 @@ void DashboardBase::updateDashboard(const NodeT& _node)
   updateMap(_node, toolTip);
   updateMsgConsole(_node);
   updateBpNode(_node.parent);
-  // FIXME: Q_EMIT hasToBeUpdate(_node.parent);
-  // Q_EMIT hasToBeUpdate(_node.parent);
+  if (_node.severity != MonitorBroker::Normal) addEventFeedItem(_node);
 }
 
 void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
@@ -303,8 +302,6 @@ void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
       ++(m_cdata->check_status_count[cnode->severity]);
       updateDashboard(*cnode);
       cnode->monitored = true;
-
-      if (cnode->severity != MonitorBroker::Normal) addEventFeedItem(*cnode);
     }
   }
 }

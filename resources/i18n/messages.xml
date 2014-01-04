@@ -116,7 +116,7 @@
 
   <message id="event-feed.tpl">
     <div id="${event-feed-id}" class="event-feed-item">
-      <div class="status-icon">
+      <div class="status-icon ${severity-css-class}">
         ${event-feed-status}
       </div>
       <div class="info">

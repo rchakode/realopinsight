@@ -77,19 +77,26 @@
   "Wt.emit("+MAP_DIV+", 'containerSizeChanged', mapWidth, mapHeight);" \
   "}"
 
-WebDashboard::WebDashboard(const qint32& _userRole, const QString& _config)
+namespace {
+  const IconMapT ICONS = utils::nodeIcons();
+}
+
+WebDashboard::WebDashboard(const qint32& _userRole,
+                           const QString& _config,
+                           Wt::WVBoxLayout* eventFeedLayout)
   : DashboardBase(_userRole, _config),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new WebTree(m_cdata)),
     m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole()),
-    m_chart(new WebPieChart())
+    m_chart(new WebPieChart()),
+    m_eventFeedLayout(eventFeedLayout)
 {
   setupUI();
   addJsEventScript();
   load(_config);
   m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
- // Wt::WLabel* label(rootNode().name.toStdString(), m_widget);
+  // Wt::WLabel* label(rootNode().name.toStdString(), m_widget);
 }
 
 WebDashboard::~WebDashboard()
@@ -231,17 +238,21 @@ std::string WebDashboard::statsTooltip(void)
 
 void WebDashboard::addEventFeedItem(const NodeT &node)
 {
-  m_eventFeedLayout->addWidget(createEventFeedItem(node));
+  if (m_eventFeedLayout) m_eventFeedLayout->insertWidget(0, createEventFeedItem(node));
 }
 
 
 Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 {
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"), m_widget);
-  tpl->bindString("event-feed-id", "testdsdh");
-  tpl->bindWidget("event-feed-status", new Wt::WImage("/images/business-process.png", m_widget));
-  tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("Event Feed"), "Event Feed", m_widget));
-  tpl->bindString("event-feed-details", "feed event details");
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
+  tpl->bindString("event-feed-id", node.id.toStdString());
+  tpl->bindString("severity-css-class", utils::severityCssClass(node.severity));
+  tpl->bindWidget("event-feed-status", new Wt::WImage(utils::getPathFromQtResource(ICONS[node.icon])));
+  tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("#"),
+                                                      tr("%1 event on %2")
+                                                      .arg(utils::severityText(node.severity),
+                                                           node.name).toStdString()));
+  tpl->bindString("event-feed-details", node.check.alarm_msg);
 
   return tpl;
 }
