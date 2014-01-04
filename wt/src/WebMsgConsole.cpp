@@ -146,7 +146,7 @@ Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
   item->setData(QString::number(_node.severity).toStdString(), Wt::UserRole);
-  item->setText(utils::severity2Str(_node.severity).toStdString());
+  item->setText(utils::severityText(_node.severity).toStdString());
   setSeverityItem(item, _node.severity);
   return item;
 }
@@ -182,6 +182,6 @@ int WebMsgConsole::findServiceRow(const std::string& _id)
 
 void WebMsgConsole::setSeverityItem(Wt::WStandardItem* item, int severity)
 {
-  item->setText(utils::severity2Str(severity).toStdString());
-  item->setStyleClass(utils::computeSeverityCssClass(severity));
+  item->setText(utils::severityText(severity).toStdString());
+  item->setStyleClass(utils::severityCssClass(severity));
 }

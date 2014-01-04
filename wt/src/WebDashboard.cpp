@@ -140,7 +140,7 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateThumbnail(void)
 {
-  m_thumbnailTitleBar->setStyleClass(utils::computeSeverityCssClass(rootNode().severity));
+  m_thumbnailTitleBar->setStyleClass(utils::severityCssClass(rootNode().severity));
 }
 
 

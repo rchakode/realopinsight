@@ -117,13 +117,13 @@ WebPieChart::~WebPieChart()
 
 Wt::WColor WebPieChart::colorFromSeverity(const int& _sev)
 {
-  QColor qcolor = utils::computeColor(_sev);
+  QColor qcolor = utils::severityColor(_sev);
   return Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
 }
 
 void WebPieChart::setSeverityData(int _sev, int _count)
 {
-  std::string label = utils::severity2Str(_sev).toStdString();
+  std::string label = utils::severityText(_sev).toStdString();
   m_model->setData(_sev, 0, label);
  // m_model->setData(_sev, 1, label, Wt::ToolTipRole);
   m_model->setData(_sev, 1, _count);

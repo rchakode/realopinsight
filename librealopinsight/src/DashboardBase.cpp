@@ -313,7 +313,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
   _node.severity = utils::computeCriticity(src.mon_type, _node.check.status);
-  _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
+  _node.prop_sev = utils::computeSeverity2Propagate(_node.severity, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
   if (_node.check.host == "-") {
@@ -894,7 +894,7 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            utils::severity2Str(_node.severity),
+                                            utils::severityText(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::AlarmNode)

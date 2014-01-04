@@ -56,7 +56,7 @@ std::string utils::tr(const std::string& msg)
   return QObject::tr(msg.c_str()).toStdString();
 }
 
-std::string utils::computeSeverityCssClass(int severity)
+std::string utils::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {

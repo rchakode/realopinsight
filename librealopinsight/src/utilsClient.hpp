@@ -67,13 +67,13 @@ namespace utils
   inline QString realCheckId(const QString& srcid, const QString& chkid)
   { return QString("%1:%2").arg(srcid, chkid);}
 
-  QString severity2Str(const qint32& _status);
+  QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
-  int computePropCriticity(const qint8& _criticity, const qint8& propRule);
-  QColor computeColor(const int &_criticity);
-  QIcon computeCriticityIcon(int _severity);
+  int computeSeverity2Propagate(const qint8& _criticity, const qint8& propRule);
+  QColor severityColor(const int &_criticity);
+  QIcon severityIcon(int _severity);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(NodeListT& bpnodes,

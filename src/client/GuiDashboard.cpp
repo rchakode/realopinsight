@@ -288,7 +288,7 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
-                                                 utils::severity2Str(_node.severity).toUpper());
+                                                 utils::severityText(_node.severity).toUpper());
 
   m_trayIcon->showMessage(title, msg, icon);
   m_trayIcon->setToolTip(title%"\n"%msg);

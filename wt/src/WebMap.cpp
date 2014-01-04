@@ -166,7 +166,7 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
   {
     if (parent->visibility & ngrt4n::Expanded) {
       m_painter->save();
-      QColor qcolor = utils::computeColor(child->prop_sev);
+      QColor qcolor = utils::severityColor(child->prop_sev);
       Wt::WColor wcolor = Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
       Wt::WPen pen(wcolor);
       m_painter->setPen(pen);
