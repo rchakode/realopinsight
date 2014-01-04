@@ -86,13 +86,13 @@
     <div class="row">
        <!-- Getting Started Pane -->
        <div class="ngrt4n-content-pane">
-         <legend>Overview of service health</legend>
+         <h3>Overview of service health</h3>
          <div class="ngrt4n-content">${contents}</div>
        </div>
 
        <!-- Event Feeds Pane -->
        <div class="ngrt4n-side-pane">
-         <legend>Event Feeds</legend>
+         <h3>Event Feeds</h3>
          <div class="ngrt4n-content">${event-feeds}</div>
        </div>
      </div> <!-- Row --->
