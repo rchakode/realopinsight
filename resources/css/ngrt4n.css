@@ -82,11 +82,12 @@ body, html {
   right: 0;
 }
 #maincontainer {
-  position: relative;
+  position: absolute;
   display: block;
   left: 0;
   top: 0;
   right: 0;
+  height: 100%;
 }
 
 #stackcontentarea {
@@ -96,6 +97,7 @@ body, html {
   top: 0;
   right: 0;
   padding: 0 0 5px 20px;
+  height: calc(100% - 40px);
 }
 
 .severity-normal {
@@ -179,6 +181,32 @@ body, html {
   float: right;
   margin: auto 2px;
 }
+
+.ngrt4n-content-pane {
+  position: fixed !important;
+  top: 80px;
+  left: 20px;
+  width: 68%;
+  height: calc(100% - 82px);
+  overflow: hidden;
+}
+
+.ngrt4n-side-pane {
+  position: fixed !important;
+  top: 80px;
+  right: 0;
+  width: 28%;
+  height: calc(100% - 82px);
+  overflow: hidden;
+}
+
+.ngrt4n-content-pane .ngrt4n-content, .ngrt4n-side-pane .ngrt4n-content {
+  position: absolute; 
+  width: calc(100%);
+  height: calc(100% - 50px);
+  overflow: scroll;
+}
+
 
 .ngrt4n-dialog {
   max-width: 640px; 
