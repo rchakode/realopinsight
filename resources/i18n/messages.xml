@@ -276,9 +276,13 @@
   </message>
   
   <message id="user-mgnt-tpl">
-    <div class="span8 ngrt4n-admin-page">
+    <div class="ngrt4n-content-pane">
       <div>${menu}</div>
-      <div>${contents}</div>
+      <div class="ngrt4n-content">${contents}</div>
+    </div>
+    <div class="footer fixed-footer">
+       ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project -
+       <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
     </div>
   </message>
 
