@@ -38,6 +38,7 @@ namespace utils {
   std::string tr(const std::string& msg);
   std::string severityCssClass(int severity);
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
+  Wt::WWidget* footer(void);
 
 } //Namespace
 

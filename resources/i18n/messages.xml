@@ -2,8 +2,7 @@
 <messages>
   <message id="copyright-info">
   <div class="footer">
-    ${software} ${version}. &copy; 2010 - ${release-year} NGRT4N Project <br/>
-    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+    ${footer}
   </div>
   </message>
 
@@ -69,8 +68,7 @@
       </div>
 
        <div class="footer fixed-footer">
-          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project -
-          <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+          ${footer}
        </div>
 
     </div> <!-- content-container -->
@@ -91,8 +89,7 @@
        </div>
 
        <div class="footer fixed-footer">
-          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project -
-          <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+          ${footer}
        </div>
     </div> <!-- content-container -->
   </message>
@@ -281,9 +278,13 @@
       <div class="ngrt4n-content">${contents}</div>
     </div>
     <div class="footer fixed-footer">
-       ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project -
-       <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+       ${footer}
     </div>
+  </message>
+
+  <message id="copyright-footer.tpl">
+    ${software} ${version} (${codename}). &copy; ${release-year} NGRT4N Project -
+    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
   </message>
 
   <message id="view-assignment-tpl">

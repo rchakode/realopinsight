@@ -467,5 +467,6 @@ Wt::WWidget* UserMngtUI::createMainUI(void)
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-mgnt-tpl"));
   tpl->bindWidget("menu", m_menu);
   tpl->bindWidget("contents", m_contents);
+  tpl->bindWidget("footer", utils::footer());
   return tpl;
 }

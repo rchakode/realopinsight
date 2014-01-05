@@ -120,20 +120,7 @@ body, html {
   background-color: #C0C0C0;
 }
 
-/* Related to user home page */
-.ngrt4n-admin-page {
-  position: relative;
-  float: none;
-  margin: 0 auto;
-  width: 770px;
-}
 
-.ngrt4n-operator-page {
-  position: relative;
-  float: none;
-  margin: 0 auto;
-  width: 95%;
-}
 .thumbnail .caption{
   padding: 5px 2px; 
 }
@@ -167,6 +154,7 @@ body, html {
 .event-feed-item {
   width: 100%;
   font-size: 0.8em;
+  background: red;
 }
 
 .event-feed-item .status-icon {
@@ -203,7 +191,7 @@ body, html {
 .ngrt4n-content-pane .ngrt4n-content, .ngrt4n-side-pane .ngrt4n-content {
   position: absolute; 
   width: calc(98%);
-  height: calc(100% - 80px);
+  max-height: calc(100% - 80px);
   overflow: auto;
   background: #FFF;
   border-radius: 5px;
@@ -211,9 +199,6 @@ body, html {
 }
 
 
-.ngrt4n-dialog {
-  max-width: 640px; 
-}
 .login-container {
   width: 480px;
   margin: 100px auto;

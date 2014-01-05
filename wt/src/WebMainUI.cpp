@@ -466,6 +466,8 @@ Wt::WWidget* WebMainUI::createUserHome(void)
 {
   m_userHomeTpl = new Wt::WTemplate();
 
+  m_userHomeTpl->bindWidget("footer", utils::footer());
+
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
     m_userHomeTpl->bindWidget("andhor-load-file",
@@ -479,11 +481,6 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
   }
-  m_userHomeTpl->bindString("software", APP_NAME.toStdString());
-  m_userHomeTpl->bindString("version", PKG_VERSION.toStdString());
-  m_userHomeTpl->bindString("codename", REL_NAME.toStdString());
-  m_userHomeTpl->bindString("release-year", REL_YEAR.toStdString());
-
   return m_userHomeTpl;
 }
 

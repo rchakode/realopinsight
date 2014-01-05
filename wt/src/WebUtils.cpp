@@ -22,6 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "Base.hpp"
 #include "WebUtils.hpp"
 #include "MonitorBroker.hpp"
 #include <Wt/WTemplate>
@@ -85,4 +86,14 @@ std::string utils::getPathFromQtResource(const QString& qtPath, const std::strin
   return docRoot+qtPath.mid(1, -1).toStdString();
 }
 
+
+Wt::WWidget* utils::footer(void)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));
+  tpl->bindString("software", APP_NAME.toStdString());
+  tpl->bindString("version", PKG_VERSION.toStdString());
+  tpl->bindString("codename", REL_NAME.toStdString());
+  tpl->bindString("release-year", REL_YEAR.toStdString());
+  return tpl;
+}
 

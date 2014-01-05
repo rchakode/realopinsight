@@ -41,9 +41,9 @@ void AuthManager::createLoginView(void)
   //wApp->setInternalPath("");
   Wt::Auth::AuthWidget::setTemplateText(Wt::WString::tr("Wt.Auth.template.login"));
   Wt::Auth::AuthWidget::createLoginView();
-  bindString("software", APP_NAME.toStdString());
-  bindString("version", PKG_VERSION.toStdString());
-  bindString("release-year", REL_YEAR.toStdString());
+
+  bindWidget("footer", utils::footer());
+
   Wt::Auth::AuthWidget::processEnvironment();
 }
 
