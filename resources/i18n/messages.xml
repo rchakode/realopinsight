@@ -8,83 +8,77 @@
   </message>
 
   <message id="template.home">
-  <div class="ngrt4n-admin-page">
-    <div class="row span12">
-     <!-- Getting Started Pane -->
-      <div class="span7">
+  <div>
+     <!-- Content Pane -->
+      <div class="ngrt4n-content-pane">
+        <h3>Welcome – Getting Started in 3 Easy Steps</h3>
+        <div class="ngrt4n-content">
+          <!-- 1st thumnail -->
+          <div class="span-one-third">
+             <div class="thumbnail">
+               <div class="title">Setup the business views for your target platforms</div>
+               <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+               <p>For each platform, the RealOpinsight Editor allows you to easily, and simply, describe
+               the related services as well as the business rules that bind them to each other.
+               </p>
+               <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+             </div>
+          </div>
 
-        <div class="span7 page-header">
-         <h1><small>Welcome – Getting Started in 3 Easy Steps</small></h1>
-        </div>
-       <!-- 1st thumnail -->
-        <div class="span-one-third">
-           <div class="thumbnail">
-             <div class="title">Setup the business views for your target platforms</div>
-             <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-             <p>For each platform, the RealOpinsight Editor allows you to easily, and simply, describe
-             the related services as well as the business rules that bind them to each other.
-             </p>
-             <p><a href="http://realopinsight.com/en/index.php/page/documentation"
-             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-           </div>
-        </div>
-
-        <!-- 2nd thumnail -->
-        <div class="span-one-third">
-           <div class="thumbnail">
-             <div class="title">Configure the access to your monitoring data</div>
-             <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-             <p>The setting menu from the management main menu allows you to easily set
-             when and how to retrieve status data from your monitoring servers
-             to keep your operations views up-to-date.
-             </p>
-             <p><a href="http://realopinsight.com/en/index.php/page/documentation"
-             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-           </div>
-        </div>
-
-       <!-- Third thumnail -->
-        <div class="span-one-third">
-          <div class="thumbnail">
-            <div class="title">Upload, preview and assign the views to your staff</div>
-              <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-              <p>The management menus also allow to upload, preview and assign views to users.
-              Define who can access/operate your different business views.
-              Take the maximum of the productivity of your operators, and enjoy !
+          <!-- 2nd thumnail -->
+          <div class="span-one-third">
+            <div class="thumbnail">
+              <div class="title">Configure the access to your monitoring data</div>
+              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
+              <p>The setting menu from the management main menu allows you to easily set
+              when and how to retrieve status data from your monitoring servers
+              to keep your operations views up-to-date.
               </p>
               <p><a href="http://realopinsight.com/en/index.php/page/documentation"
               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+            </div>
+          </div>
+
+          <!-- Third thumnail -->
+          <div class="span-one-third">
+            <div class="thumbnail">
+              <div class="title">Upload, preview and assign the views to your staff</div>
+                <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
+                <p>The management menus also allow to upload, preview and assign views to users.
+                Define who can access/operate your different business views.
+                Take the maximum of the productivity of your operators, and enjoy !
+                </p>
+                <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+                class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Quick Links Pane -->
+      <div class="ngrt4n-side-pane">
+        <h2>I'm ready</h2>
+
+        <div class="ngrt4n-content">
+          <!-- List actions -->
+          <div class="span2 list-group">
+            ${andhor-import-file}
+            ${andhor-load-file}
           </div>
         </div>
       </div>
 
-      <!-- Quick Links Pane -->
-      <div class="span2">
-        <div class="span2 page-header">
-          <h1><small>I'm ready</small></h1>
-        </div>
-        <!-- List actions -->
-        <div class="span2 list-group">
-          ${andhor-import-file}
-          ${andhor-load-file}
-        </div>
-      </div>
-     </div> <!-- Row --->
-     <div class="row">
-       <div class="footer">
-          <hr />
-          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project
-          <br/>
+       <div class="footer fixed-footer">
+          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project -
           <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
        </div>
-     </div>
+
     </div> <!-- content-container -->
   </message>
 
   <message id="operator-home.tpl">
   <div class="ngrt4n-operator-page">
-    <div class="row">
-       <!-- Getting Started Pane -->
+       <!-- Content Pane -->
        <div class="ngrt4n-content-pane">
          <h3>Overview of service health</h3>
          <div class="ngrt4n-content">${contents}</div>
@@ -95,22 +89,17 @@
          <h3>Event Feeds</h3>
          <div class="ngrt4n-content">${event-feeds}</div>
        </div>
-     </div> <!-- Row --->
-     <!--
-     <div class="row">
-       <div class="footer">
-       <hr />
-          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project <br />
+
+       <div class="footer fixed-footer">
+          ${software} ${version} (${codename}). &copy; 2010 - ${release-year} NGRT4N Project -
           <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
        </div>
-     </div>
-     -->
     </div> <!-- content-container -->
   </message>
 
   <message id="dashboard-thumbnail.tpl">
-     <div class="span2">
-        <div>${thumb-titlebar}</div>
+     <div class="span2 thumbnail">
+        <div class="title">${thumb-titlebar}</div>
         <div class="ngrt4n-thumbnail">${thumb-image}</div>
     </div>
   </message>
