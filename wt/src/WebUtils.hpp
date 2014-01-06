@@ -25,6 +25,7 @@
 #ifndef WEBUTILS_HPP
 #define WEBUTILS_HPP
 
+#include "Settings.hpp"
 #include <Wt/WText>
 
 #define LOG(level, msg) \
@@ -38,7 +39,7 @@ namespace utils {
   std::string severityCssClass(int severity);
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
   Wt::WWidget* footer(void);
-  std::string sqliteDbPath(void);
+  std::string sqliteDbPath(const Settings& setting);
 } //Namespace
 
 #endif // WEBUTILS_HPP

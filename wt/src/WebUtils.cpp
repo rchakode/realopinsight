@@ -101,14 +101,7 @@ Wt::WWidget* utils::footer(void)
 
 
 
-std::string utils::sqliteDbPath(void)
+std::string utils::sqliteDbPath(const Settings& settings)
 {
-  std::string path;
-
-  path = QDir::home().path().toStdString();
-  path.push_back(QDir::separator().toAscii());
-  path.append(".realopinsight.db");
-  path = QDir::toNativeSeparators(path.c_str()).toStdString();
-  std::cout << "PATH "<< path << "\n";
-  return path;
+  return QFileInfo(settings.fileName()).dir().path().append(QDir::separator()).append("realopinsight.db").toStdString();
 }
