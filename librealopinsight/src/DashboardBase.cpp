@@ -309,7 +309,7 @@ void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
 void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
-  _node.severity = utils::computeCriticity(src.mon_type, _node.check.status);
+  _node.severity = utils::computeSeverity(src.mon_type, _node.check.status);
   _node.prop_sev = utils::computeSeverity2Propagate(_node.severity, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
@@ -773,7 +773,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     StringPairT info = utils::splitSourceHostInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
 
-    utils::setCheckOnError(MonitorBroker::Unknown, msg, cnode->check);
+    utils::setCheckOnError(-1, msg, cnode->check);
     computeStatusInfo(*cnode, src);
     updateDashboard(*cnode);
     m_cdata->check_status_count[MonitorBroker::Unknown]+=1;

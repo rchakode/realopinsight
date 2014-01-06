@@ -36,6 +36,7 @@ namespace dbo = Wt::Dbo;
 
 class View;
 class User;
+class LoginSession;
 
 namespace Wt {
   namespace Dbo {
@@ -90,6 +91,7 @@ public:
   int role;
   std::string registrationDate;
   dbo::collection< dbo::ptr<View> > views;
+  //dbo::collection< dbo::ptr<LoginSession> > loginSessions;
 
   template<class Action>
   void persist(Action& a) {
@@ -100,6 +102,7 @@ public:
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
     dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
+    //dbo::hasMany(a, loginSessions, dbo::ManyToMany);
   }
 
   static std::string role2Text(int role) {
@@ -117,14 +120,12 @@ public:
   std::string username;
   std::string sessionId;
   Wt::WDateTime loginDate;
-  dbo::collection< dbo::ptr<User> > users;
 
   template<class Action>
   void persist(Action& a) {
     dbo::field(a, username, "username");
     dbo::field(a, sessionId, "session_id");
     dbo::field(a, loginDate, "login_date");
-    dbo::hasMany(a, users, dbo::ManyToMany);
   }
 };
 

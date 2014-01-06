@@ -70,7 +70,7 @@ namespace utils
   QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
-  MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
+  MonitorBroker::SeverityT computeSeverity(const int& _monitor, const int& _statusOrSeverity);
   int computeSeverity2Propagate(const qint8& _criticity, const qint8& propRule);
   QColor severityColor(const int &_criticity);
   QIcon severityIcon(int _severity);

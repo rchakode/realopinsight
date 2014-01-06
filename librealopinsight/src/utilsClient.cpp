@@ -67,7 +67,7 @@ QString utils::getAbsolutePath(const QString& _path)
   return fileInfo.absoluteFilePath();
 }
 
-MonitorBroker::SeverityT utils::computeCriticity(const int& _monitor, const int& _statusOrSeverity)
+MonitorBroker::SeverityT utils::computeSeverity(const int& _monitor, const int& _statusOrSeverity)
 {
   int criticity = MonitorBroker::Unknown;
   if(_monitor == MonitorBroker::Nagios) {
