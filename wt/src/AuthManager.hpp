@@ -25,7 +25,6 @@ protected:
 private:
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
-  bool m_logged;
 
   void handleAuthentication(void);
 };

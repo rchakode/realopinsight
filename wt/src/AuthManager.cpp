@@ -10,12 +10,13 @@
 #include <Wt/Auth/AuthModel>
 #include <Wt/WPushButton>
 #include <Wt/WImage>
+#include <Wt/WApplication>
+#include <Wt/WEnvironment>
 
 AuthManager::AuthManager(DbSession* dbSession)
   : Wt::Auth::AuthWidget(DbSession::loginObject()),
     m_dbSession(dbSession),
-    m_mainUI(NULL),
-    m_logged(false)
+    m_mainUI(NULL)
 {
   Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(DbSession::auth(), m_dbSession->users());
   authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
@@ -28,17 +29,20 @@ AuthManager::AuthManager(DbSession* dbSession)
 void AuthManager::handleAuthentication(void)
 {
   if (DbSession::loginObject().loggedIn()) {
-    m_logged = true;
     m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
-    LOG("error", m_dbSession->loggedUser().username + " logged in.");
+    std::string authCookie = wApp->sessionId();
+    wApp->setCookie(m_dbSession->loggedUser().username, authCookie, 3600, "", "", false);
+    LOG("error", m_dbSession->loggedUser().username + " logged in. Session Id: " + authCookie);
   } else {
+    wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
     LOG("error", m_dbSession->loggedUser().username + " logged out");
   }
 }
 
 void AuthManager::createLoginView(void)
 {
-  //wApp->setInternalPath("");
+  wApp->setInternalPath(ngrt4n::LINK_LOGIN);
+
   Wt::Auth::AuthWidget::setTemplateText(Wt::WString::tr("Wt.Auth.template.login"));
   Wt::Auth::AuthWidget::createLoginView();
 
@@ -49,22 +53,35 @@ void AuthManager::createLoginView(void)
 
 void AuthManager::createLoggedInView(void)
 {
-  m_logged = true;
   m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
-  Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
 
-  setTemplateText(tr("Wt.Auth.template.logged-in"));
-  m_mainUI = new WebMainUI(this);
-  bindWidget("main-ui", m_mainUI);
+  std::string cookie;
+  try {
+    cookie = wApp->environment().getCookie(m_dbSession->loggedUser().username);
+    LOG("notice", "Using cookie "+cookie);
+  } catch (const std::exception& ex) {
+    cookie = "";
+    LOG("notice", "No cookie set");
+  }
 
-  Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
-  image->setToolTip("Sign out");
-  image->clicked().connect(this, &AuthManager::logout);
-  bindWidget("logout-item", image);;
+  //FIXME: need to deal with db
+  if (cookie.empty() || cookie == wApp->sessionId()) {
+    setTemplateText(tr("Wt.Auth.template.logged-in"));
+    m_mainUI = new WebMainUI(this);
+    bindWidget("main-ui", m_mainUI);
+
+    Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
+    image->setToolTip("Sign out");
+    image->clicked().connect(this, &AuthManager::logout);
+    bindWidget("logout-item", image);
+  } else {
+    logout();
+  }
 }
 
 void AuthManager::logout(void)
 {
+  wApp->setInternalPath(ngrt4n::LINK_LOGOUT);
   DbSession::loginObject().logout();
   refresh();
 }

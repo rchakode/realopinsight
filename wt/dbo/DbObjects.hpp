@@ -91,7 +91,7 @@ public:
   int role;
   std::string registrationDate;
   dbo::collection< dbo::ptr<View> > views;
-  //dbo::collection< dbo::ptr<LoginSession> > loginSessions;
+  //dbo::collection< dbo::ptr<LoginSession> > sessions;
 
   template<class Action>
   void persist(Action& a) {
@@ -102,7 +102,7 @@ public:
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
     dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
-    //dbo::hasMany(a, loginSessions, dbo::ManyToMany);
+    //dbo::hasMany(a, sessions, dbo::ManyToMany);
   }
 
   static std::string role2Text(int role) {
@@ -119,13 +119,15 @@ class LoginSession
 public:
   std::string username;
   std::string sessionId;
-  Wt::WDateTime loginDate;
+  Wt::WDateTime firstAccess;
+  Wt::WDateTime lastAccess;
 
   template<class Action>
   void persist(Action& a) {
     dbo::field(a, username, "username");
     dbo::field(a, sessionId, "session_id");
-    dbo::field(a, loginDate, "login_date");
+    dbo::field(a, firstAccess, "first_access");
+    dbo::field(a, lastAccess, "last_access");
   }
 };
 
