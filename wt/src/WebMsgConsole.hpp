@@ -58,9 +58,10 @@ public:
   void addMsg(const NodeT&  _node);
   void updateNodeMsgs(const NodeListT& _cnodes);
   void updateNodeMsg(const NodeT& _node);
-  Wt::WStandardItem* createStatusItem(const NodeT& _node);
-  Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck);
-  Wt::WStandardItem* createDateTimeItem(time_t _time);
+  Wt::WStandardItem* createItem(const Wt::WString& text, int row);
+  Wt::WStandardItem* createSeverityItem(const NodeT& _node);
+  Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck, int row);
+  Wt::WStandardItem* createDateTimeItem(time_t _time, int row);
 
 
 protected:
@@ -71,7 +72,7 @@ private:
   int m_rowCount;
 
   int findServiceRow(const std::string& _id);
-  void setSeverityItem(Wt::WStandardItem* item, int severity);
+  void updateSeverityItem(Wt::WStandardItem* item, int severity);
   void setModel(void);
 };
 

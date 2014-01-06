@@ -37,7 +37,6 @@ WebMsgConsole::WebMsgConsole()
   setSortingEnabled(true);
   setLayoutSizeAware(true);
   setColumnResizeEnabled(true);
-  setAlternatingRowColors(true);
   setSelectable(true);
   setSelectionMode(Wt::SingleSelection);
   setSelectionBehavior(Wt::SelectRows);
@@ -107,7 +106,7 @@ void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
       addMsg(*node);
     } else {
       m_model->item(index, 0)->setText(Wt::WString::fromUTF8(node->check.last_state_change));
-      setSeverityItem(m_model->item(index, 1), node->severity);
+      updateSeverityItem(m_model->item(index, 1), node->severity);
       m_model->item(index, 2)->setText(node->check.host);
       m_model->item(index, 3)->setText(node->name.toStdString()); //optional
       m_model->item(index, 4)->setText(node->actual_msg.toStdString());
@@ -122,7 +121,7 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
     addMsg(_node);
   } else {
     m_model->item(index, 0)->setText(Wt::WString::fromUTF8(_node.check.last_state_change));
-    setSeverityItem(m_model->item(index, 1), _node.severity);
+    updateSeverityItem(m_model->item(index, 1), _node.severity);
     m_model->item(index, 2)->setText(_node.check.host);
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
     m_model->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
@@ -132,39 +131,47 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
 
 void WebMsgConsole::addMsg(const NodeT&  _node)
 {
-  m_model->setItem(m_rowCount, 0, createDateTimeItem(_node.check.last_state_change));
-  m_model->setItem(m_rowCount, 1, createStatusItem(_node));
-  m_model->setItem(m_rowCount, 2, new Wt::WStandardItem(_node.check.host));
-  m_model->setItem(m_rowCount, 3, new Wt::WStandardItem(_node.name.toStdString()));
-  m_model->setItem(m_rowCount, 4, new Wt::WStandardItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString())));
-  m_model->setItem(m_rowCount, 5, new Wt::WStandardItem(_node.id.toStdString()));
+  m_model->setItem(m_rowCount, 0, createDateTimeItem(_node.check.last_state_change, m_rowCount));
+  m_model->setItem(m_rowCount, 1, createSeverityItem(_node));
+  m_model->setItem(m_rowCount, 2, createItem(_node.check.host, m_rowCount));
+  m_model->setItem(m_rowCount, 3, createItem(_node.name.toStdString(), m_rowCount));
+  m_model->setItem(m_rowCount, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), m_rowCount));
+  m_model->setItem(m_rowCount, 5, createItem(_node.id.toStdString(), m_rowCount));
 
   ++m_rowCount;
 }
 
-Wt::WStandardItem* WebMsgConsole::createStatusItem(const NodeT& _node)
+Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
 {
-  Wt::WStandardItem * item = new Wt::WStandardItem();
-  item->setData(QString::number(_node.severity).toStdString(), Wt::UserRole);
-  item->setText(utils::severityText(_node.severity).toStdString());
-  setSeverityItem(item, _node.severity);
+  Wt::WStandardItem* item = new Wt::WStandardItem(text);
+  if (row & 1) item->setStyleClass(utils::severityCssClass(-1));
   return item;
 }
 
-Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck)
+Wt::WStandardItem* WebMsgConsole::createSeverityItem(const NodeT& _node)
+{
+  Wt::WStandardItem* item = new Wt::WStandardItem();
+  item->setData(QString::number(_node.severity).toStdString(), Wt::UserRole);
+  item->setText(utils::severityText(_node.severity).toStdString());
+  updateSeverityItem(item, _node.severity);
+  return item;
+}
+
+Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck, int row)
 {
   QString qtimet = QString(_lastcheck.c_str());
-  return createDateTimeItem(QDateTime::fromString(qtimet).toTime_t());
+  return createDateTimeItem(QDateTime::fromString(qtimet).toTime_t(), row);
 }
 
 
-Wt::WStandardItem* WebMsgConsole::createDateTimeItem(time_t _time)
+Wt::WStandardItem* WebMsgConsole::createDateTimeItem(time_t _time, int row)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
   Wt::WDateTime t;
   t.setTime_t(_time);
   item->setText(t.toString());
   item->setData(QString::number(_time).toStdString(), Wt::UserRole);
+  if (row & 1) item->setStyleClass(utils::severityCssClass(-1));
   return item;
 }
 
@@ -180,7 +187,7 @@ int WebMsgConsole::findServiceRow(const std::string& _id)
 }
 
 
-void WebMsgConsole::setSeverityItem(Wt::WStandardItem* item, int severity)
+void WebMsgConsole::updateSeverityItem(Wt::WStandardItem* item, int severity)
 {
   item->setText(utils::severityText(severity).toStdString());
   item->setStyleClass(utils::severityCssClass(severity));

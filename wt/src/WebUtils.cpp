@@ -74,8 +74,10 @@ std::string utils::severityCssClass(int severity)
       cssClass.append("severity-critical");
       break;
     case MonitorBroker::Unknown:
-    default:
       cssClass.append("severity-unknown");
+      break;
+    default:
+      cssClass.append("default-item-background");
       break;
   }
   return cssClass;

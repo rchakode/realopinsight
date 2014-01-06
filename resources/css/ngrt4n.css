@@ -1,6 +1,6 @@
 body, html {
   overflow: hidden;
-  background: #F8F8FF;
+  background: #f8f8ff;
   margin: 0;
 }
 /* Wt-domRoot from Wt */
@@ -100,6 +100,9 @@ body, html {
   height: calc(100% - 40px);
 }
 
+.default-item-background {
+  background-color: #f8f8ff;  
+}
 .severity-normal {
   margin: 2px; 
   background-color: #00FF00; 
@@ -221,6 +224,7 @@ body, html {
   width: 70%;
   margin: 0 18% 0 18%;
   text-align: center;
+  font-size: 0.8em;
 }
 
 .fixed-footer{

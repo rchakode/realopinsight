@@ -28,8 +28,7 @@
 #include <Wt/WText>
 
 #define LOG(level, msg) \
-Wt::log(level)<< Wt::WLogger::timestamp << Wt::WLogger::sep \
-  << "[realopinsight]" << Wt::WLogger::sep << msg;
+Wt::log(level)<< "[realopinsight]" << Wt::WLogger::sep << msg;
 
 class QString;
 namespace utils {
