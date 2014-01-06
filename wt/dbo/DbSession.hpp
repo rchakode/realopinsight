@@ -41,9 +41,9 @@ typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 class DbSession : public dbo::Session
 {
 public:
-  DbSession(bool initializeDb = false);
+  DbSession(void);
   ~DbSession();
-  void setup(bool initializeDb);
+  void setupDb(void);
   std::string lastError(void) const {return m_lastError;}
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
   static Wt::Auth::AuthService& auth();
@@ -74,6 +74,7 @@ public:
   UserViewListT& userViewList(void) {return m_userViewList;}
 
 private:
+  std::string m_dbPath;
   dbo::backend::Sqlite3* m_sqlite3Db;
   UserDatabase* m_dbUsers;
   User m_loggedUser;

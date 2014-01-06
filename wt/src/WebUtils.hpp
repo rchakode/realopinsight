@@ -38,7 +38,7 @@ namespace utils {
   std::string severityCssClass(int severity);
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
   Wt::WWidget* footer(void);
-
+  std::string sqliteDbPath(void);
 } //Namespace
 
 #endif // WEBUTILS_HPP

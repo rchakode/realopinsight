@@ -23,6 +23,7 @@
  */
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
+#include <QFile>
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/PasswordVerifier>
 #include <Wt/Auth/HashFunction>
@@ -35,13 +36,14 @@ namespace {
   Wt::Auth::Login loginObj;
 }
 
-DbSession::DbSession(bool initializeDb):
-  m_sqlite3Db(new Wt::Dbo::backend::Sqlite3("/tmp/realopinsight.db")),
-  m_dbUsers(new UserDatabase(*this))
+DbSession::DbSession(void)
+  : m_dbPath(utils::sqliteDbPath()),
+    m_sqlite3Db(new Wt::Dbo::backend::Sqlite3(m_dbPath)),
+    m_dbUsers(new UserDatabase(*this))
 {
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
-  setup(initializeDb);
+  setupDb();
   updateUserList();
   updateViewList();
 }
@@ -52,16 +54,15 @@ DbSession::~DbSession()
   delete m_dbUsers;
 }
 
-void DbSession::setup(bool initializeDb)
+void DbSession::setupDb(void)
 {
   mapClass<User>("user");
   mapClass<View>("view");
   mapClass<AuthInfo>("auth_info");
+  mapClass<LoginSession>("login_session");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
-  if (initializeDb) {
-    initDb();
-  }
+  initDb();
 }
 
 
@@ -268,7 +269,7 @@ void DbSession::initDb(void)
     adm.role = User::AdmRole;
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     addUser(adm);
-    LOG("notice", "Database created");
+    LOG("notice", "Database created: "+m_dbPath);
   } catch (dbo::Exception& ex) {
     LOG("error", "Failed initializing the database");
     LOG("error", ex.what());

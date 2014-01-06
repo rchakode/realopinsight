@@ -99,3 +99,16 @@ Wt::WWidget* utils::footer(void)
   return tpl;
 }
 
+
+
+std::string utils::sqliteDbPath(void)
+{
+  std::string path;
+
+  path = QDir::home().path().toStdString();
+  path.push_back(QDir::separator().toAscii());
+  path.append(".realopinsight.db");
+  path = QDir::toNativeSeparators(path.c_str()).toStdString();
+  std::cout << "PATH "<< path << "\n";
+  return path;
+}
