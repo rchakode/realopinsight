@@ -66,12 +66,16 @@ public:
   int deleteView(std::string vname);
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
+
   void updateViewList(void);
   void updateViewList(const std::string& uname);
   ViewListT& viewList(void) {return m_viewList;}
 
   void updateUserViewList(void);
   UserViewListT& userViewList(void) {return m_userViewList;}
+
+  int addSession(const LoginSession& session);
+  int checkUserCookie(const LoginSession& session);
 
 private:
   std::string m_dbPath;

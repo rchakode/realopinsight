@@ -368,3 +368,49 @@ int DbSession::revokeView(const std::string& uname, const std::string& vname)
   }
   return retCode;
 }
+
+
+int DbSession::addSession(const LoginSession& session)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    if (checkUserCookie(session) != LoginSession::ActiveCookie) {
+      LoginSession* sessionPtr(new LoginSession());
+      *sessionPtr = session;
+      add(sessionPtr);
+      retCode = 0;
+    } else {
+      m_lastError = "Already active session";
+      LOG("error", m_lastError);
+      retCode = 1;
+    }
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to add the session. More details in log.";
+    LOG("error", ex.what());
+  }
+  transaction.commit();
+  return retCode;
+}
+
+
+int DbSession::checkUserCookie(const LoginSession& session)
+{
+  int retCode = -1;
+
+  dbo::Transaction transaction(*this);
+  try {
+    LoginSessionCollectionT sessions = find<LoginSession>()
+        .where("username=? AND session_id=? AND status = ?")
+        .bind(session.username)
+        .bind(session.sessionId)
+        .bind(LoginSession::ExpiredCookie);
+    retCode = sessions.size()? LoginSession::ActiveCookie : LoginSession::InvalidSession;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Error checking the session. More details in log.";
+    LOG("error", ex.what());
+  }
+  transaction.commit();
+
+  return retCode;
+}

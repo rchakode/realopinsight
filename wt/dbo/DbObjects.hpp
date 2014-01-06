@@ -91,7 +91,7 @@ public:
   int role;
   std::string registrationDate;
   dbo::collection< dbo::ptr<View> > views;
-  //dbo::collection< dbo::ptr<LoginSession> > sessions;
+  dbo::collection< dbo::ptr<LoginSession> > sessions;
 
   template<class Action>
   void persist(Action& a) {
@@ -102,7 +102,7 @@ public:
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
     dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
-    //dbo::hasMany(a, sessions, dbo::ManyToMany);
+    dbo::hasMany(a, sessions, dbo::ManyToMany);
   }
 
   static std::string role2Text(int role) {
@@ -117,10 +117,17 @@ public:
 class LoginSession
 {
 public:
+  enum {
+    ExpiredCookie = 0,
+    ActiveCookie = 1,
+    InvalidSession = 2
+  };
+
   std::string username;
   std::string sessionId;
   Wt::WDateTime firstAccess;
   Wt::WDateTime lastAccess;
+  int status;
 
   template<class Action>
   void persist(Action& a) {
@@ -128,6 +135,7 @@ public:
     dbo::field(a, sessionId, "session_id");
     dbo::field(a, firstAccess, "first_access");
     dbo::field(a, lastAccess, "last_access");
+    dbo::field(a, status, "status");
   }
 };
 
@@ -135,7 +143,9 @@ public:
 typedef std::set<std::string> UserViewListT;
 typedef std::list<User> UserListT;
 typedef std::list<View> ViewListT;
+typedef std::list<LoginSession> LoginSessionListT;
 typedef dbo::collection< dbo::ptr<User> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<View> > ViewCollectionT;
+typedef dbo::collection< dbo::ptr<LoginSession> > LoginSessionCollectionT;
 
 #endif // USER_HPP

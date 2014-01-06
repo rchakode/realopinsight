@@ -29,10 +29,20 @@ AuthManager::AuthManager(DbSession* dbSession)
 void AuthManager::handleAuthentication(void)
 {
   if (DbSession::loginObject().loggedIn()) {
+
     m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
-    std::string authCookie = wApp->sessionId();
-    wApp->setCookie(m_dbSession->loggedUser().username, authCookie, 3600, "", "", false);
-    LOG("error", m_dbSession->loggedUser().username + " logged in. Session Id: " + authCookie);
+
+    LoginSession sessionInfo;
+    sessionInfo.username = m_dbSession->loggedUser().username;
+    sessionInfo.sessionId = wApp->sessionId();
+    sessionInfo.firstAccess =sessionInfo.lastAccess = Wt::WDateTime::currentDateTime();
+    sessionInfo.status = LoginSession::ActiveCookie;
+
+    //FIXME: add only if there is not an active cookie
+    m_dbSession->addSession(sessionInfo);
+
+    wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
+    LOG("error", m_dbSession->loggedUser().username + " logged in. Session Id: " + sessionInfo.sessionId);
   } else {
     wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
     LOG("error", m_dbSession->loggedUser().username + " logged out");
@@ -55,17 +65,19 @@ void AuthManager::createLoggedInView(void)
 {
   m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
 
-  std::string cookie;
+  LoginSession sessionInfo;
+  sessionInfo.username = m_dbSession->loggedUser().username;
+
   try {
-    cookie = wApp->environment().getCookie(m_dbSession->loggedUser().username);
-    LOG("notice", "Using cookie "+cookie);
+    sessionInfo.sessionId = wApp->environment().getCookie(sessionInfo.username);
+    LOG("notice", "Using cookie "+sessionInfo.sessionId);
   } catch (const std::exception& ex) {
-    cookie = "";
+    sessionInfo.sessionId = "";
     LOG("notice", "No cookie set");
   }
 
-  //FIXME: need to deal with db
-  if (cookie.empty() || cookie == wApp->sessionId()) {
+  if (sessionInfo.sessionId.empty() ||
+      m_dbSession->checkUserCookie(sessionInfo) == LoginSession::ActiveCookie) {
     setTemplateText(tr("Wt.Auth.template.logged-in"));
     m_mainUI = new WebMainUI(this);
     bindWidget("main-ui", m_mainUI);
