@@ -12,7 +12,7 @@
 #include <Wt/WImage>
 
 AuthManager::AuthManager(DbSession* dbSession)
-  : Wt::Auth::AuthWidget(m_loginObject),
+  : Wt::Auth::AuthWidget(DbSession::loginObject()),
     m_dbSession(dbSession),
     m_mainUI(NULL),
     m_logged(false)
@@ -22,14 +22,14 @@ AuthManager::AuthManager(DbSession* dbSession)
   authModel->addPasswordAuth(&m_dbSession->passwordAuthentificator());
   Wt::Auth::AuthWidget::setModel(authModel);
   setRegistrationEnabled(false);
-  m_loginObject.changed().connect(this, &AuthManager::handleAuthentication);
+  DbSession::loginObject().changed().connect(this, &AuthManager::handleAuthentication);
 }
 
 void AuthManager::handleAuthentication(void)
 {
-  if (m_loginObject.loggedIn()) {
+  if (DbSession::loginObject().loggedIn()) {
     m_logged = true;
-    m_dbSession->setLoggedUser(m_loginObject.user().id());
+    m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
     LOG("error", m_dbSession->loggedUser().username + " logged in.");
   } else {
     LOG("error", m_dbSession->loggedUser().username + " logged out");
@@ -50,7 +50,7 @@ void AuthManager::createLoginView(void)
 void AuthManager::createLoggedInView(void)
 {
   m_logged = true;
-  m_dbSession->setLoggedUser(m_loginObject.user().id());
+  m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
   Wt::log("notice")<<"[realopinsight] "<< m_dbSession->loggedUser().username<<" logged in.";
 
   setTemplateText(tr("Wt.Auth.template.logged-in"));
@@ -65,13 +65,13 @@ void AuthManager::createLoggedInView(void)
 
 void AuthManager::logout(void)
 {
-  m_loginObject.logout();
+  DbSession::loginObject().logout();
   refresh();
 }
 
 
 bool AuthManager::isLogged(void)
 {
-  return m_loginObject.loggedIn();
+  return DbSession::loginObject().loggedIn();
 }
 

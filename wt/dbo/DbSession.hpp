@@ -33,6 +33,7 @@
 #include <Wt/WGlobal>
 #include <Wt/Auth/Dbo/AuthInfo>
 #include <Wt/Auth/Dbo/UserDatabase>
+#include <Wt/Auth/Login>
 
 typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
@@ -47,6 +48,7 @@ public:
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
   static Wt::Auth::AuthService& auth();
   static Wt::Auth::PasswordService& passwordAuthentificator(void);
+  static Wt::Auth::Login& loginObject(void);
   static void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(const std::string& uid);

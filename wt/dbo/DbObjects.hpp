@@ -30,6 +30,7 @@
 #include <Wt/Dbo/Dbo>
 #include <string>
 #include <set>
+#include <Wt/WDateTime>
 
 namespace dbo = Wt::Dbo;
 
@@ -106,6 +107,24 @@ public:
   }
   static int role2Int(const std::string& role) {
     return role =="Administrator" ? AdmRole : OpRole;
+  }
+};
+
+
+class LoginSession
+{
+public:
+  std::string username;
+  std::string sessionId;
+  Wt::WDateTime loginDate;
+  dbo::collection< dbo::ptr<User> > users;
+
+  template<class Action>
+  void persist(Action& a) {
+    dbo::field(a, username, "username");
+    dbo::field(a, sessionId, "session_id");
+    dbo::field(a, loginDate, "login_date");
+    dbo::hasMany(a, users, dbo::ManyToMany);
   }
 };
 

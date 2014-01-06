@@ -32,6 +32,7 @@
 namespace {
   Wt::Auth::AuthService basicAuthService;
   Wt::Auth::PasswordService passAuthService(basicAuthService);
+  Wt::Auth::Login loginObj;
 }
 
 DbSession::DbSession(bool initializeDb):
@@ -179,6 +180,11 @@ Wt::Auth::AuthService& DbSession::auth()
 Wt::Auth::PasswordService& DbSession::passwordAuthentificator(void)
 {
   return passAuthService;
+}
+
+Wt::Auth::Login& DbSession::loginObject(void)
+{
+  return loginObj;
 }
 
 void DbSession::configureAuth(void)
