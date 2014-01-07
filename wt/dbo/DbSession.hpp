@@ -48,7 +48,7 @@ public:
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
   static Wt::Auth::AuthService& auth();
   static Wt::Auth::PasswordService& passwordAuthentificator(void);
-  static Wt::Auth::Login& loginObject(void);
+  Wt::Auth::Login& loginObject(void);
   static void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(const std::string& uid);
@@ -86,6 +86,7 @@ private:
   ViewListT m_viewList;
   UserViewListT m_userViewList;
   std::string m_lastError;
+  Wt::Auth::Login loginObj;
 
   std::string hashPassword(const std::string& pass);
   void initDb(void);

@@ -14,7 +14,7 @@
 #include <Wt/WEnvironment>
 
 AuthManager::AuthManager(DbSession* dbSession)
-  : Wt::Auth::AuthWidget(DbSession::loginObject()),
+  : Wt::Auth::AuthWidget(dbSession->loginObject()),
     m_dbSession(dbSession),
     m_mainUI(NULL)
 {
@@ -23,14 +23,19 @@ AuthManager::AuthManager(DbSession* dbSession)
   authModel->addPasswordAuth(&m_dbSession->passwordAuthentificator());
   Wt::Auth::AuthWidget::setModel(authModel);
   setRegistrationEnabled(false);
-  DbSession::loginObject().changed().connect(this, &AuthManager::handleAuthentication);
+  m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
+
+  setInternalBasePath(ngrt4n::LINK_LOGIN);
 }
 
 void AuthManager::handleAuthentication(void)
 {
-  if (DbSession::loginObject().loggedIn()) {
+  if (m_dbSession->loginObject().loggedIn()) {
 
-    m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
+    Wt::WApplication::instance()->changeSessionId();
+    refresh();
+
+    m_dbSession->setLoggedUser(m_dbSession->loginObject().user().id());
 
     LoginSession sessionInfo;
     sessionInfo.username = m_dbSession->loggedUser().username;
@@ -38,7 +43,6 @@ void AuthManager::handleAuthentication(void)
     sessionInfo.firstAccess =sessionInfo.lastAccess = Wt::WDateTime::currentDateTime();
     sessionInfo.status = LoginSession::ActiveCookie;
 
-    //FIXME: add only if there is not an active cookie
     m_dbSession->addSession(sessionInfo);
 
     wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
@@ -52,55 +56,37 @@ void AuthManager::handleAuthentication(void)
 void AuthManager::createLoginView(void)
 {
   wApp->setInternalPath(ngrt4n::LINK_LOGIN);
-
-  Wt::Auth::AuthWidget::setTemplateText(Wt::WString::tr("Wt.Auth.template.login"));
   Wt::Auth::AuthWidget::createLoginView();
-
   bindWidget("footer", utils::footer());
-
-  Wt::Auth::AuthWidget::processEnvironment();
 }
 
 void AuthManager::createLoggedInView(void)
 {
-  m_dbSession->setLoggedUser(DbSession::loginObject().user().id());
+  m_dbSession->setLoggedUser(m_dbSession->loginObject().user().id());
 
   LoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
 
-  try {
-    sessionInfo.sessionId = wApp->environment().getCookie(sessionInfo.username);
-    LOG("notice", "Using cookie "+sessionInfo.sessionId);
-  } catch (const std::exception& ex) {
-    sessionInfo.sessionId = "";
-    LOG("notice", "No cookie set");
-  }
+  setTemplateText(tr("Wt.Auth.template.logged-in"));
+  m_mainUI = new WebMainUI(this);
+  bindWidget("main-ui", m_mainUI);
 
-  if (sessionInfo.sessionId.empty() ||
-      m_dbSession->checkUserCookie(sessionInfo) == LoginSession::ActiveCookie) {
-    setTemplateText(tr("Wt.Auth.template.logged-in"));
-    m_mainUI = new WebMainUI(this);
-    bindWidget("main-ui", m_mainUI);
-
-    Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
-    image->setToolTip("Sign out");
-    image->clicked().connect(this, &AuthManager::logout);
-    bindWidget("logout-item", image);
-  } else {
-    logout();
-  }
+  Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
+  image->setToolTip("Sign out");
+  image->clicked().connect(this, &AuthManager::logout);
+  bindWidget("logout-item", image);
 }
 
 void AuthManager::logout(void)
 {
   wApp->setInternalPath(ngrt4n::LINK_LOGOUT);
-  DbSession::loginObject().logout();
+  m_dbSession->loginObject().logout();
   refresh();
 }
 
 
 bool AuthManager::isLogged(void)
 {
-  return DbSession::loginObject().loggedIn();
+  return m_dbSession->loginObject().loggedIn();
 }
 

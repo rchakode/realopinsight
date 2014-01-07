@@ -33,7 +33,6 @@
 namespace {
   Wt::Auth::AuthService basicAuthService;
   Wt::Auth::PasswordService passAuthService(basicAuthService);
-  Wt::Auth::Login loginObj;
 }
 
 DbSession::DbSession(void)
