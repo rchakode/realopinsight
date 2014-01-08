@@ -173,6 +173,15 @@ body, html {
   margin: auto 2px;
 }
 
+.event-feed-item .event-feed-footer {
+  font-size: 0.8em;
+}
+
+.event-feed-item .event-feed-footer .right {
+  display: block;
+  float: right;
+}
+
 .ngrt4n-content-pane {
   position: fixed !important;
   top: 80px;

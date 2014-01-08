@@ -105,14 +105,16 @@
   </message>
 
   <message id="event-feed.tpl">
-    <div id="${event-feed-id}" class="event-feed-item">
-      <div class="status-icon ${severity-css-class}">
+    <div id="${event-feed-id}" class="event-feed-item  ${severity-css-class}">
+      <div class="status-icon">
         ${event-feed-status}
       </div>
       <div class="info">
         ${event-feed-title}
         <p>${event-feed-details}</p>
       </div>
+      <div class="clearfix"> </div>
+      <div class="event-feed-footer">${platform} <span class="right">${timestamp}</span></div>
     </div>
   </message>
 

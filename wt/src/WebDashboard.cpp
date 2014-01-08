@@ -240,6 +240,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
     EventFeedItemsT::Iterator feed = m_eventFeedItems.find(node.id);
     if (feed != m_eventFeedItems.end()) {
       m_eventFeedLayout->removeWidget(*feed);
+      delete *feed;
       m_eventFeedItems.erase(feed);
     }
     // FIXME: need optimization to avoid removing and readding the same item
@@ -260,9 +261,9 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
   tpl->bindWidget("event-feed-status", new Wt::WImage(utils::getPathFromQtResource(ICONS[node.icon])));
   tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("#"),
                                                       tr("%1 event on %2")
-                                                      .arg(utils::severityText(node.severity),
-                                                           node.name).toStdString()));
+                                                      .arg(utils::severityText(node.severity), node.name).toStdString()));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
-
+  tpl->bindString("platform", rootNode().name.toStdString());
+  tpl->bindString("timestamp", node.check.last_state_change);
   return tpl;
 }
