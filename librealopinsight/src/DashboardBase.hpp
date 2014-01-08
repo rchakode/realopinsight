@@ -62,8 +62,8 @@ public:
 public Q_SLOTS:
   void runMonitor();
   void runMonitor(SourceT& src);
-  void runNagiosUpdate(int srcId);
-  void runNagiosUpdate(const SourceT& src);
+  void runNgrt4ndUpdate(int srcId);
+  void runNgrt4ndUpdate(const SourceT& src);
   void runLivestatusUpdate(int srcId);
   void runLivestatusUpdate(const SourceT& src);
   void resetStatData(void);

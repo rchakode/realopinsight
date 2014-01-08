@@ -32,6 +32,7 @@
 #include <Wt/WLabel>
 #include <Wt/WLineEdit>
 #include <Wt/WPushButton>
+#include <Wt/WIntValidator>
 
 WebPreferences::WebPreferences(int _userRole)
   : Preferences(_userRole, Preferences::WebForm),
@@ -75,9 +76,14 @@ WebPreferences::WebPreferences(int _userRole)
   tpl->bindWidget("auth-string", m_authStringField = new Wt::WLineEdit(container));
   m_authStringField->setEchoMode(Wt::WLineEdit::Password);
 
-  tpl->bindWidget("livestatus-server", m_livestatusAddressField = new Wt::WLineEdit(container));
+  tpl->bindWidget("livestatus-server", m_livestatusHostField = new Wt::WLineEdit(container));
+  tpl->bindWidget("livestatus-port", m_livestatusPortField = new Wt::WLineEdit(container));
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField = new Wt::WCheckBox(utils::tr("Use ngrt4nd"), container));
-  m_livestatusAddressField->setEmptyText("server-address:port");
+
+  m_livestatusHostField->setEmptyText("server-address");
+  m_livestatusPortField->setEmptyText("1983");
+  m_livestatusPortField->setValidator(new Wt::WIntValidator());
+  m_livestatusPortField->setMaxLength(5);
 
   tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField = new Wt::WCheckBox(utils::tr("Don't verify SSL certificate"), container));
   tpl->bindWidget("show-in-clear", m_clearAuthStringField = new Wt::WCheckBox(utils::tr("Show in clear"), container));
@@ -149,7 +155,8 @@ void WebPreferences::fillFromSource(int _sidx)
   SourceT src;
   m_settings->loadSource(_sidx, src);
   m_monitorUrlField->setText(src.mon_url.toStdString());
-  m_livestatusAddressField->setText(QString("%1:%2").arg(src.ls_addr, src.ls_port).toStdString());
+  m_livestatusHostField->setText(src.ls_addr.toStdString());
+  m_livestatusPortField->setText(QString::number(src.ls_port).toStdString());
   m_authStringField->setText(src.auth.toStdString());
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
   m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
@@ -186,8 +193,8 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   src.id = utils::sourceId(index);
   src.mon_type = utils::convert2ApiType(type);
   src.mon_url = m_monitorUrlField->text().toUTF8().c_str();
-  src.ls_addr = m_livestatusAddressField->text().toUTF8().c_str();
-  src.ls_port = QString(m_livestatusAddressField->text().toUTF8().c_str()).toInt();
+  src.ls_addr = m_livestatusHostField->text().toUTF8().c_str();
+  src.ls_port = QString(m_livestatusPortField->text().toUTF8().c_str()).toInt();
   src.auth = m_authStringField->text().toUTF8().c_str();
   src.use_ngrt4nd = m_useNgrt4ndField->checkState();
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);

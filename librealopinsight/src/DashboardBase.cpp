@@ -134,23 +134,23 @@ void DashboardBase::runMonitor(SourceT& src)
       break;
     case MonitorBroker::Nagios:
     default:
-      src.use_ngrt4nd? runLivestatusUpdate(src) : runNagiosUpdate(src);
+      src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
       break;
   }
   finalizeUpdate(src);
 }
 
-void DashboardBase::runNagiosUpdate(int srcId)
+void DashboardBase::runNgrt4ndUpdate(int srcId)
 {
   SourceListT::Iterator src = m_sources.find(srcId);
   if (src != m_sources.end()) {
-    runNagiosUpdate(*src);
+    runNgrt4ndUpdate(*src);
   } else {
     updateDashboardOnError(*src, tr("Undefined source (%1)").arg(utils::sourceId(srcId)));
   }
 }
 
-void DashboardBase::runNagiosUpdate(const SourceT& src)
+void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
   utils::setCheckOnError(MonitorBroker::Unknown, "", invalidCheck);
@@ -816,10 +816,10 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
   switch (src.mon_type) {
     case MonitorBroker::Nagios:
       if (src.use_ngrt4nd) {
-        src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
-      } else {
         QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
         src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+      } else {
+        src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
       }
       allocated = true;
       break;

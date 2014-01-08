@@ -362,8 +362,9 @@
         <span>${dont-verify-ssl-certificate}</span>
       </div>
       <div class="row">
-        <label class="control-label">Livestatus Address&nbsp;</label>
+        <label class="control-label">Livestatus Host&nbsp;</label>
         <span>${livestatus-server}</span>
+        <span>${livestatus-port}</span>
         <span>${use-ngrt4nd}</span>
       </div>
       <div class="row">

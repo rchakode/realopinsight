@@ -66,7 +66,8 @@ private:
   Wt::WDialog* m_dialog;
   Wt::WLineEdit* m_monitorUrlField;
   Wt::WLineEdit* m_authStringField;
-  Wt::WLineEdit* m_livestatusAddressField;
+  Wt::WLineEdit* m_livestatusHostField;
+  Wt::WLineEdit* m_livestatusPortField;
   Wt::WComboBox* m_monitorTypeField;
   Wt::WCheckBox* m_clearAuthStringField;
   Wt::WCheckBox* m_useNgrt4ndField;
