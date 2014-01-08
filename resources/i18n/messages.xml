@@ -141,8 +141,8 @@
               ${user-name}
             </div>
           </div>
+
           ${block:Wt.Auth.field password}
-          <!-- ${block:Wt.Auth.field remember-me} -->
         ${</if:passwords>}
 
         ${<if:oauth>}
@@ -153,8 +153,11 @@
             </div>
           </div>
         ${</if:oauth>}
+
         <div class="form-actions">
-          <div>${login class="btn-primary"} <span>${lost-password class="btn-link"} ${sep} ${register class="btn-link"}</span></div>
+          <span>${login class="btn-primary"}</span>
+          <span>${lost-password class="btn-link"} ${sep}
+          ${register class="btn-link"}</span>
         </div>
       </div>
       ${block:copyright-info}
