@@ -39,6 +39,8 @@
 #include "WebMap.hpp"
 #include <Wt/WLocalizedStrings>
 #include <Wt/WLabel>
+#include <QHash>
+
 
 class WebDashboard : public DashboardBase
 {
@@ -62,9 +64,10 @@ protected:
   virtual void updateTree(const NodeT& _node, const QString& _tip);
   virtual void updateMsgConsole(const NodeT& _node);
   virtual void updateChart(void);
-  virtual void addEventFeedItem(const NodeT& node);
+  virtual void updateEventFeeds(const NodeT& node);
 
 private:
+  typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;
   Wt::WContainerWidget* m_widget;
   WebTree* m_tree;
   WebMap* m_map;
@@ -72,6 +75,7 @@ private:
   WebPieChart* m_chart;
   Wt::WLabel* m_thumbnailTitleBar;
   Wt::WVBoxLayout* m_eventFeedLayout;
+  EventFeedItemsT m_eventFeedItems;
 
   void setupUI(void);
   void addJsEventScript(void);

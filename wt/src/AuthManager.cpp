@@ -25,15 +25,15 @@ AuthManager::AuthManager(DbSession* dbSession)
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
 
-  setInternalBasePath(ngrt4n::LINK_LOGIN);
+ // setInternalBasePath(ngrt4n::LINK_LOGIN);
 }
 
 void AuthManager::handleAuthentication(void)
 {
   if (m_dbSession->loginObject().loggedIn()) {
 
-    Wt::WApplication::instance()->changeSessionId();
-    refresh();
+   // Wt::WApplication::instance()->changeSessionId();
+   // refresh();
 
     m_dbSession->setLoggedUser(m_dbSession->loginObject().user().id());
 

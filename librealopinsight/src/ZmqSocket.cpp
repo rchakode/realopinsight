@@ -56,7 +56,7 @@ ZmqSocket::ZmqSocket(const std::string& uri, const int & _type)
 
 ZmqSocket::~ZmqSocket()
 {
-  disconnecteFromService();
+  disconnectFromService();
 }
 
 bool ZmqSocket::init()
@@ -66,7 +66,7 @@ bool ZmqSocket::init()
   return (m_socket = zmq_socket(m_context, m_type)) != NULL;
 }
 
-void ZmqSocket::disconnecteFromService()
+void ZmqSocket::disconnectFromService()
 {
   zmq_setsockopt(m_socket, ZMQ_LINGER, &ZERO_LINGER, sizeof(ZERO_LINGER));
   zmq_close(m_socket);
@@ -75,7 +75,7 @@ void ZmqSocket::disconnecteFromService()
 
 void ZmqSocket::reset()
 {
-  disconnecteFromService();
+  disconnectFromService();
   connect();
 }
 
@@ -140,13 +140,13 @@ void ZmqSocket::makeHandShake() {
   while (retriesLeft) {
     if(!socket->connect()) break;
     socket->send(msg);
-    time_t curTime = time(NULL); std::string timeStr = std::string(ctime(&curTime));
+
     zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };
     zmq_poll(&items[0], 1, TIMEOUT);
     if (items[0].revents & ZMQ_POLLIN) {
       reply.clear();
       reply = socket->recv();
-      socket->disconnecteFromService();
+      socket->disconnectFromService();
       size_t pos = reply.find(":");
       std::string respType = reply.substr(0, pos);
       if(respType == "ALIVE") {

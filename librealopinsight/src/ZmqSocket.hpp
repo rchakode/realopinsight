@@ -39,7 +39,7 @@ public:
   bool connect();
   bool connect(const std::string & _uri);
   bool bind(const std::string & _uri);
-  void disconnecteFromService();
+  void disconnectFromService();
   void reset();
   void send(const std::string & _msg);
   std::string recv() const;

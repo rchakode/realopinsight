@@ -96,13 +96,11 @@ WebDashboard::WebDashboard(const qint32& _userRole,
   addJsEventScript();
   load(_config);
   m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
-  // Wt::WLabel* label(rootNode().name.toStdString(), m_widget);
 }
 
 WebDashboard::~WebDashboard()
 {
-  delete m_widget;
-  // Other widget are deleted through the hierarchy
+  delete m_widget; // Other widget are deleted through the hierarchy
 }
 
 void WebDashboard::buildTree(void)
@@ -236,9 +234,21 @@ std::string WebDashboard::statsTooltip(void)
   return oss.str();
 }
 
-void WebDashboard::addEventFeedItem(const NodeT &node)
+void WebDashboard::updateEventFeeds(const NodeT &node)
 {
-  if (m_eventFeedLayout) m_eventFeedLayout->insertWidget(0, createEventFeedItem(node));
+  if (m_eventFeedLayout) {
+    EventFeedItemsT::Iterator feed = m_eventFeedItems.find(node.id);
+    if (feed != m_eventFeedItems.end()) {
+      m_eventFeedLayout->removeWidget(*feed);
+      m_eventFeedItems.erase(feed);
+    }
+    // FIXME: need optimization to avoid removing and readding the same item
+    if (node.severity != MonitorBroker::Normal) {
+      Wt::WWidget* widget = createEventFeedItem(node);
+      m_eventFeedLayout->insertWidget(0, widget);
+      m_eventFeedItems.insert(node.id, widget);
+    }
+  }
 }
 
 

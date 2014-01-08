@@ -288,7 +288,7 @@ void DashboardBase::updateDashboard(const NodeT& _node)
   updateMap(_node, toolTip);
   updateMsgConsole(_node);
   updateBpNode(_node.parent);
-  if (_node.severity != MonitorBroker::Normal) addEventFeedItem(_node);
+  updateEventFeeds(_node);
 }
 
 void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
@@ -642,17 +642,16 @@ void DashboardBase::openRpcSession(SourceT& src)
   switch(src.mon_type) {
     case MonitorBroker::Nagios:
       if (src.use_ngrt4nd) {
-        if (src.ls_handler->isConnected()) {
-          src.ls_handler->disconnectFromService();
-        }
-        src.ls_handler->connectToService();
-      } else {
-        if (src.d4n_handler->isConnected()) {
-          src.d4n_handler->disconnecteFromService();
-        }
-        if(src.d4n_handler->connect()) {
+        if (src.d4n_handler->isConnected())
+          src.d4n_handler->disconnectFromService();
+
+        if(src.d4n_handler->connect())
           src.d4n_handler->makeHandShake();
-        }
+      } else {
+        if (src.ls_handler->isConnected())
+          src.ls_handler->disconnectFromService();
+
+        src.ls_handler->connectToService();
       }
       break;
     case MonitorBroker::Zabbix: {
