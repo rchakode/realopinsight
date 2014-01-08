@@ -17,8 +17,10 @@
              <div class="thumbnail">
                <div class="title">Setup the business views for your target platforms</div>
                <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-               <p>For each platform, the RealOpinsight Editor allows you to easily, and simply, describe
-               the related services as well as the business rules that bind them to each other.
+               <p>Using the RealOpinsight Editor, describe and edit the target platform,
+               the related services, as well as the business rules that bind them to each other.
+               The Editor is an effective studio to modelize, in an easy and simply way,
+               any kind of complex platforms you may have.
                </p>
                <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
@@ -30,9 +32,9 @@
             <div class="thumbnail">
               <div class="title">Configure the access to your monitoring data</div>
               <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-              <p>RealOpInsight enables functionality that allows you to easily set
-              when and how to retrieve status data from your monitoring servers
-              to keep your operations views up-to-date.
+              <p>The RealOpInsight setting user interfaces enable you to easily set
+              when and how to retrieve status data from your monitoring servers in order
+              to keep your operations dasboards up-to-date.
               </p>
               <p><a href="http://realopinsight.com/en/index.php/page/documentation"
               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
@@ -44,11 +46,10 @@
             <div class="thumbnail">
               <div class="title">Upload, preview and assign the views to your staff</div>
                 <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-                <p>The views created can be uploaded within the server. Then you can preview and
-                assign then to your operations staff.
-                RealOpInsight provides full control of administration requirements,
-                such as role, access control, authentication and integration to external
-                systems like LDAP.
+                <p>Upload the created views within the RealOpInsight server, then preview and
+                assign then to your operations staff. RealOpInsight provides full control
+                of administration requirements, such as role, access control,
+                authentication and integration to external systems like LDAP.
                 </p>
                 <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
