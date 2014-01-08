@@ -30,7 +30,7 @@
             <div class="thumbnail">
               <div class="title">Configure the access to your monitoring data</div>
               <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-              <p>The setting menu from the management main menu allows you to easily set
+              <p>RealOpInsight enables functionality that allows you to easily set
               when and how to retrieve status data from your monitoring servers
               to keep your operations views up-to-date.
               </p>
@@ -44,9 +44,11 @@
             <div class="thumbnail">
               <div class="title">Upload, preview and assign the views to your staff</div>
                 <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-                <p>The management menus also allow to upload, preview and assign views to users.
-                Define who can access/operate your different business views.
-                Take the maximum of the productivity of your operators, and improve ROI !
+                <p>The views created can be uploaded within the server. Then you can preview and
+                assign then to your operations staff.
+                RealOpInsight provides full control of administration requirements,
+                such as role, access control, authentication and integration to external
+                systems like LDAP.
                 </p>
                 <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
@@ -388,7 +390,7 @@
     <div>
      <div>
        <legend>${software}</legend>
-       <p>A BSM dashboard software for complex IT environements.</p>
+       <p>BSM dashboard software for complex IT environements.</p>
        <p>Version ${version} (codename: ${codename})<br />
          Release ID: ${release-id} <br/>
          Copyright &copy; 2010-${release-year} NGRT4N Project. All rights reserved.<br/>

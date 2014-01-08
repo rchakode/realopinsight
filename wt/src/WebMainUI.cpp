@@ -101,13 +101,13 @@ void WebMainUI::showUserHome(void)
   CHECK_LOGIN();
 
   std::string homeTabTitle = "Home";
-  std::string internalLink = "/";
+  std::string internalPath = "/";
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     homeTabTitle = tr("Quick Start").toStdString();
-    internalLink = "/quick-start";
+    internalPath = "/quick-start";
   } else {
     homeTabTitle =  tr("Tactical Overview").toStdString();
-    internalLink = "/tactical-overview";
+    internalPath = "/tactical-overview";
   }
 
   std::string pageTitle = homeTabTitle;
@@ -117,7 +117,9 @@ void WebMainUI::showUserHome(void)
       .append(APP_NAME.toStdString())
       .append(" - ")
       .append(tr("Operations Console").toStdString());
+
   wApp->setTitle(pageTitle);
+  setInternalPath(internalPath);
 
   // Set data for CSS styling
   m_mainWidget->setId("maincontainer");
@@ -195,7 +197,7 @@ void WebMainUI::setupProfileMenus(void)
   m_profileMenu->addItem(m_mainProfileMenuItem);
 
   Wt::WMenuItem* curItem = NULL;
-  profilePopupMenu->addItem(tr("Account").toStdString())
+  profilePopupMenu->addItem(tr("My Profile").toStdString())
       ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
   profilePopupMenu->addItem(tr("Change password").toStdString())
       ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));

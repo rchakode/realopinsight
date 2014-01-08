@@ -65,7 +65,7 @@ namespace ngrt4n {
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
 
 
-  const std::string LINK_HOME ="/realopinsight";
+  const std::string LINK_HOME ="/home";
   const std::string LINK_LOAD ="/preview-view";
   const std::string LINK_IMPORT ="/upload-view";
   const std::string LINK_LOGIN ="/login";
