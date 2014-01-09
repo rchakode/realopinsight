@@ -159,8 +159,11 @@ Wt::WStandardItem* WebMsgConsole::createSeverityItem(const NodeT& _node)
 
 Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck, int row)
 {
-  QString qtimet = QString(_lastcheck.c_str());
-  return createDateTimeItem(QDateTime::fromString(qtimet).toTime_t(), row);
+  Wt::WStandardItem * item = new Wt::WStandardItem();
+  item->setText(_lastcheck);
+  item->setData(QString::number(QDateTime::fromString(_lastcheck.c_str()).toTime_t()).toStdString(), Wt::UserRole);
+  if (row & 1) item->setStyleClass(utils::severityCssClass(-1));
+  return item;
 }
 
 

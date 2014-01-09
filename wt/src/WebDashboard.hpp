@@ -58,6 +58,7 @@ public:
   void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
 
 protected:
+  virtual void updateDashboard(const NodeT& _node);
   virtual void buildMap(void);
   virtual void updateMap(const NodeT& _node, const QString& _tip);
   virtual void buildTree(void);

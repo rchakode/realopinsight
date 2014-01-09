@@ -40,6 +40,7 @@ namespace utils {
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
   Wt::WWidget* footer(void);
   std::string sqliteDbPath(const Settings& setting);
+  std::string timeTextFromQtTimeText(const std::string& qtimeText);
 } //Namespace
 
 #endif // WEBUTILS_HPP

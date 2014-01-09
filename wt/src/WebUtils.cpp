@@ -26,8 +26,10 @@
 #include "WebUtils.hpp"
 #include "MonitorBroker.hpp"
 #include <Wt/WTemplate>
+#include <Wt/WDateTime>
 #include <QObject>
 #include <QString>
+#include <QDateTime>
 
 
 void utils::showMessage(int exitCode,
@@ -104,4 +106,14 @@ Wt::WWidget* utils::footer(void)
 std::string utils::sqliteDbPath(const Settings& settings)
 {
   return QFileInfo(settings.fileName()).dir().path().append(QDir::separator()).append("realopinsight.db").toStdString();
+}
+
+
+std::string utils::timeTextFromQtTimeText(const std::string& qtimeText)
+{
+  Wt::WDateTime mytime;
+
+  mytime.setTime_t(QDateTime::fromString(QString(qtimeText.c_str())).toTime_t());
+
+  return mytime.toString().toUTF8();
 }

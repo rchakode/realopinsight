@@ -108,6 +108,13 @@ void WebDashboard::buildTree(void)
   m_tree->build();
 }
 
+void WebDashboard::updateDashboard(const NodeT& _node)
+{
+  NodeT& node = const_cast<NodeT&>(_node);
+  node.check.last_state_change = utils::timeTextFromQtTimeText(_node.check.last_state_change);
+  DashboardBase::updateDashboard(node);
+}
+
 void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 {
   m_tree->updateNodeItem(_node, _tip);
