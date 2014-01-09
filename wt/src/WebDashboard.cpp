@@ -108,12 +108,6 @@ void WebDashboard::buildTree(void)
   m_tree->build();
 }
 
-void WebDashboard::updateDashboard(const NodeT& _node)
-{
-  NodeT& node = const_cast<NodeT&>(_node);
-  node.check.last_state_change = utils::timeTextFromQtTimeText(_node.check.last_state_change);
-  DashboardBase::updateDashboard(node);
-}
 
 void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 {
@@ -271,6 +265,6 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
                                                       .arg(utils::severityText(node.severity), node.name).toStdString()));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", rootNode().name.toStdString());
-  tpl->bindString("timestamp", node.check.last_state_change);
+  tpl->bindString("timestamp", Wt::WString(tr("Since ").toStdString()) + utils::wTimeToNow(node.check.last_state_change));
   return tpl;
 }

@@ -41,6 +41,8 @@ namespace utils {
   Wt::WWidget* footer(void);
   std::string sqliteDbPath(const Settings& setting);
   std::string timeTextFromQtTimeText(const std::string& qtimeText);
+  Wt::WString wHumanTimeText(const std::string& mytime_t);
+  Wt::WString wTimeToNow(const std::string& mytime_t);
 } //Namespace
 
 #endif // WEBUTILS_HPP

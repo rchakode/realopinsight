@@ -46,11 +46,11 @@ namespace utils
   inline void delay(const qint32& d)
   { sleep(d); }
 
-  inline std::string getCtime(const QString& dt, const QString& format)
-  { return QDateTime::fromString(dt, format).toString().toStdString(); }
+  inline std::string convertToTimet(const QString& dt, const QString& format)
+  { return QString::number(QDateTime::fromString(dt, format).toTime_t()).toStdString(); }
 
-  inline std::string getCtime(const quint32& tt)
-  { return QDateTime::fromTime_t(tt).toString().toStdString(); }
+  inline std::string humanTimeText(const std::string& mytime_t)
+  { return QDateTime::fromTime_t(QString(mytime_t.c_str()).toUInt()).toString().toStdString(); }
 
   inline QString genNodeId()
   { return "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz"); }

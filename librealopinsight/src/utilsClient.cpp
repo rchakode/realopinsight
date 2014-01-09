@@ -293,7 +293,7 @@ qint32 utils::convert2ApiType(const QString& str)
 void utils::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
 {
   invalidCheck.status = status;
-  invalidCheck.last_state_change = getCtime(0);
+  invalidCheck.last_state_change = humanTimeText("0");
   invalidCheck.host = "-";
   invalidCheck.check_command = "-";
   invalidCheck.alarm_msg = msg.toStdString();

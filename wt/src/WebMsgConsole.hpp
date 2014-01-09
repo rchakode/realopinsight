@@ -61,7 +61,6 @@ public:
   Wt::WStandardItem* createItem(const Wt::WString& text, int row);
   Wt::WStandardItem* createSeverityItem(const NodeT& _node);
   Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck, int row);
-  Wt::WStandardItem* createDateTimeItem(time_t _time, int row);
 
 
 protected:

@@ -291,8 +291,8 @@
   </message>
 
   <message id="copyright-footer.tpl">
-    ${software} ${version} (${codename}). &copy; ${release-year} NGRT4N Project -
-    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+    ${software} ${version} - <a href="#">Support</a> - <a href="#">Documentation</a><br />
+    &copy; ${release-year} NGRT4N Project - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
   </message>
 
   <message id="view-assignment-tpl">

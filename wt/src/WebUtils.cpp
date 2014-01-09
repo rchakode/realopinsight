@@ -96,7 +96,6 @@ Wt::WWidget* utils::footer(void)
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));
   tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
-  tpl->bindString("codename", REL_NAME.toStdString());
   tpl->bindString("release-year", REL_YEAR.toStdString());
   return tpl;
 }
@@ -116,4 +115,20 @@ std::string utils::timeTextFromQtTimeText(const std::string& qtimeText)
   mytime.setTime_t(QDateTime::fromString(QString(qtimeText.c_str())).toTime_t());
 
   return mytime.toString().toUTF8();
+}
+
+
+Wt::WString utils::wHumanTimeText(const std::string& mytime_t)
+{
+  Wt::WDateTime t;
+  t.setTime_t(QString(mytime_t.c_str()).toUInt());
+  return t.toString();
+}
+
+Wt::WString utils::wTimeToNow(const std::string& mytime_t)
+{
+  Wt::WDateTime t;
+  t.setTime_t(QString(mytime_t.c_str()).toUInt());
+
+  return t.timeTo(Wt::WDateTime::currentDateTime());
 }

@@ -192,7 +192,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     qint32 ret = jsHelper.getProperty("return_code").toInt32();
     cnode->check.status = (ret!=0)? MonitorBroker::NagiosUnknown : jsHelper.getProperty("status").toInt32();
     cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-    cnode->check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
+    cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
     cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
     cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
 
@@ -460,13 +460,13 @@ void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
           check.host = targetHost.toStdString();
         }
         if (tid == ZbxHelper::TriggerV18) {
-          check.last_state_change = utils::getCtime(triggerData.property("lastchange").toUInt32());
+          check.last_state_change = triggerData.property("lastchange").toString().toStdString();
         } else {
           QScriptValueIterator item(triggerData.property("items"));
           if (item.hasNext()) {
             item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue itemData = item.value();
-            check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
+            check.last_state_change = itemData.property("lastclock").toString().toStdString();
           }
         }
         QString key = ID_PATTERN.arg(targetHost, triggerName);
@@ -547,7 +547,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
           QString chkid = ID_PATTERN.arg(dname, cname);
           check.id = chkid.toStdString();
           check.host = dname.toStdString();
-          check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
+          check.last_state_change = utils::convertToTimet(device.property("lastChanged").toString(),
                                                     "yyyy/MM/dd hh:mm:ss");
           QString severity =citem.property("severity").toString();
           if (!severity.compare("clear", Qt::CaseInsensitive)) {
@@ -564,7 +564,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         QString dname = devInfo.property("name").toString();
         check.id = check.host = dname.toStdString();
         check.status = devInfo.property("status").toBool();
-        check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
+        check.last_state_change = utils::convertToTimet(devInfo.property("lastChanged").toString(),
                                                   "yyyy/MM/dd hh:mm:ss");
         if (check.status) {
           check.status = MonitorBroker::ZenossClear;

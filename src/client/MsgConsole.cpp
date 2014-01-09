@@ -24,7 +24,6 @@
 
 #include "MsgConsole.hpp"
 #include "StatsLegend.hpp"
-#include <ctime>
 #include "utilsClient.hpp"
 
 const qint16 MsgConsole::ROW_MARGIN = 3;
@@ -90,7 +89,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, ID_COLUMN)->setData(_node.id, Qt::UserRole);
   itemText = QString(check.last_state_change.c_str());
   mmodel->item(index, 0)->setText(itemText);
-  mmodel->item(index, 0)->setData(QDateTime::fromString(itemText), Qt::UserRole);
+  mmodel->item(index, 0)->setData(QDateTime::fromTime_t(itemText.toUInt()), Qt::UserRole);
 
   mmodel->item(index, 1)->setText(utils::severityText(_node.severity));
   mmodel->item(index, 1)->setData(-1*_node.severity, Qt::UserRole);
