@@ -11,13 +11,14 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   glossary
    concepts
    installation
    configuration
    tutorial-nagios
    tutorial-zabbix
    tutorial-zenoss
-   faq
+   faq 
 
 
 Indices and tables

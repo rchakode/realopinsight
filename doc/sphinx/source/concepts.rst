@@ -1,4 +1,6 @@
-
+=================================================================
+What's RealOpInsight: aims, concepts and operation
+=================================================================
 The goal of RealOpinsight is to allow you to focus on business needs,
 instead of wasting time on false alerts. Indeed, monitoring in
 demanding operations environments such as Network Operations Centers
@@ -28,17 +30,12 @@ Features of RealOpInsight
 RealOpinsight allow you to focus on business needs, instead of wasting
 time on false alerts. Its features include, without be limited to:
 
-
-+
-
-
 Business Process Intelligence (BPI)
 ```````````````````````````````````
   Being Business Service/Process Management-centric, RealOpInsight
   allows you to quickly assess how each incident impacts your business,
   providing you with a *real insight* on the healthy of your business
   processes.
-+
 
 
 Effective Operations Management
@@ -46,7 +43,6 @@ Effective Operations Management
   By providing business process-centric dashbaords, you focus on
   business value instead of wasting time on false/irrelevant alerts. You
   can prioritize the *recovery of incidents based on business impact*.
-+
 
 
 Advanced Event Processing
@@ -55,7 +51,6 @@ Advanced Event Processing
   algorithms allowing to *manage incidents in a fine-grained way*
   according to monitoring needs (aggregation, decreasing, increasing,
   etc.).
-+
 
 
 Comprehensive Monitoring
@@ -65,7 +60,6 @@ Comprehensive Monitoring
   space: / 5483 MB (28% inode=67%)", you can have a *more comprehensive
   message *such as "The free space available in the server <hostname/IP>
   root partition is less than 30%".
-+
 
 
 Distributed Monitoring Made Easy
@@ -74,20 +68,16 @@ Distributed Monitoring Made Easy
   systems. This includes (without being limited to): *Nagios, Zabbix,
   Zenoss, Groundwork, Centreon, Icinga, Shinken, and op5*, which can be
   used simultaneously like monitoring backends.
-+
 
 
 System Tray Notifications
 `````````````````````````
   To let you stay aware of any change that could arise when your
   operations window isn't active.
-+
-
 
 Embedded Browser
 ````````````````
   To let you keep track on the default Web UI of your monitoring system.
-+
 
 
 Free, Open Source and Cross-Platform
@@ -96,86 +86,6 @@ Free, Open Source and Cross-Platform
   completely open source and free of charge. Cross-platform, it works on
   *Windows*, *GNU Linux*,and on *Mac OS X*, and is available as source
   tarballs and binary packages.
-
-
-{anchor anchor='main' text='^ Contents'}
-
-
-
-RealOpInsight Terminologies
----------------------------
-
-In the context of RealOpInsight, we use the following terminologies:
-
-
-+ Device: is any physical component composing an IT infrastructure.
-  E.g. servers, routers, switches...
-+ Incident: is any disruption to the normal operation of a device or
-  of a service that the device enables. E.g. failure of a hard-drive, a
-  crash of a process, a network failure.
-+ Monitoring item: is a probe allowing to get the status of a device
-  against a given type of incidents. E.g. a monitoring item can allow to
-  check the availability of the http service on a web server.
-
-    + For Nagios, Shinken, Icinga, Groundwork, op5, Centreon and other
-      Nagios-derived systems, a monitoring item corresponds to a 'check'.
-      E.g. check_mysql allows to monitor the status of MySQL daemon.
-    + For Zabbix this corresponds to a 'trigger'. E.g. the ping trigger
-      allows to monitor the availability of a device.
-    + For Zenoss a monitoring item corresponds to a 'component'. E.g. the
-      httpd component allows to check the status of httpd daemon.
-
-+ Data point: defines the relationship between a monitoring item and a
-  device. In RealOpInsight context, each data point is uniquely
-  characterized with an identifier with the pattern *device_id/probe*:
-
-    + For Nagios, Shinken, Icinga, Groundwork, op5, Centreon and other
-      Nagios-derived systems, a data point is identified with the pattern
-      *host_name/service_description.*
-    + For Zabbix, they're identitied with the pattern *host/trigger_name.*
-    + For Zenoss, they're identified with the pattern
-      *device_name/component_name*.
-
-+ Severity of incident: is the level of impact an incident has on the
-  healthy of a device or of a service enabled by the device. For
-  example:
-
-    + Nagios, Shinken, Icinga, Groundwork, op5, Centreon and other their
-      derived systems defines four levels of severities also known as
-      States: OK, WARNING, CRITICAL and UNKNOWN.
-    + Zabbix defines six levels of severities: NOT CLASSIFIED,
-      INFORMATION, WARNING, AVERAGE, HIGH and DISASTER.
-    + Zenoss also defines six levels severities: CLEAR, DEBUG, INFO,
-      WARNING, ERROR and CRITICAL.
-
-+ Service: in RealOpInsight context we distinguish two kinds of
-  services:
-
-    + IT services also called native checks include all the services
-      directly related to basic IT functionality (e.g. mysqld service).
-    + Business processes services: correspond to high level services not
-      directly related to data points. E.g. a backup service and a hosting
-      service.
-
-+ Monitored platform: represents a set of monitored services. In
-  RealOpInsight context the services are related among them within an
-  hierarchy of services as described in the next section.
-+ Severity propagation rule: describes how the severity of a service
-  is propagated to its parent within an hierarchy.
-+ Severity calculation rule: describes how the severity of a service
-  is calculated according to the severities of its sub services.
-+ Dashboard: is a visualizing interface offering a simple and
-  summarized view on a monitored platform.
-+ Nagios-based system and Nagios-derived system both refer to either:
-  Nagios itself, Shinken, Centreon, Icinga, GroundWork or any other
-  monitoring system that relies on the same concepts than Nagios.
-+ Monitoring source , or simply source , refers to a monitoring server
-  enabling API (native or not) to retrieve data related to probes.
-
-
-{anchor anchor='main' text='^ Contents'}
-
-
 
 RealOpInsight Dashboard Management Concepts
 -------------------------------------------

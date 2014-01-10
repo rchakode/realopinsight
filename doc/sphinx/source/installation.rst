@@ -1,6 +1,7 @@
-
-This document covers the installation of RealOpInsight. For the
-configuration, see `here`_.
+====================================
+Installation
+====================================
+This chapter covers the installation of RealOpInsight.
 
 
 Prerequisites & Dependencies

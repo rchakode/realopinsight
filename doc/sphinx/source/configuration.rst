@@ -1,12 +1,9 @@
-
-This document describes how to configure RealOpInsight. It's
-recommended to read carefully the prerequisites section before moving
+=====================================
+Configuration
+=====================================
+This chapter describes how to configure RealOpInsight. 
+It's recommended to read carefully the prerequisites section before moving
 forward.
-
-
-Contents
---------
-
 
 
 Prerequisites

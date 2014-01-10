@@ -1,10 +1,7 @@
-
-
-Tutorial for Zabbix Users
-=========================
-This tutorial show how to handle a hosting platform with Zabbix and
-RealOpInsight.
-
+==========================================================
+Tutorial: using RealOpInsight with Zabbix
+==========================================================
+This tutorial shows how to use RealOpInsight with Zabbix.
 
 
 Prerequisites

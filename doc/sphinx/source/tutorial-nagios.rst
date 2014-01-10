@@ -1,15 +1,13 @@
+=======================================================
+Tutorial: using RealOpInsight with Nagios
+=======================================================
 
-
-Tutorial for Nagios Users
-=========================
-
-This hands-on introduction shows how RealOpInsight works with Nagios.
-
+This tutorial shows how to use RealOpIinsight with Nagios and its devived systems.
 
 `
 `_Prerequisites
 ---------------
-This tutorial assumes that :
+Here we assumes that:
 
 + You have read and understood the `concepts and the architecture`_ of
   RealOpInsight.
