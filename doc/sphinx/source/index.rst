@@ -12,14 +12,10 @@ Contents:
    :maxdepth: 2
 
    glossary
-   concepts
-   installation
-   configuration
-   tutorial-nagios
-   tutorial-zabbix
-   tutorial-zenoss
-   editor-manual
-   oc-manual
+   overview/overview
+   Administration Guide <adminguide/adminguide>
+   Quick Start Tutorial <gettingtstarted/gettingstarted>
+   User/Operator Guide <userguide/userguide>
    faq 
 
 
