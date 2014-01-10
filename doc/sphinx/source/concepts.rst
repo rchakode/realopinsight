@@ -1,0 +1,379 @@
+
+The goal of RealOpinsight is to allow you to focus on business needs,
+instead of wasting time on false alerts. Indeed, monitoring in
+demanding operations environments such as Network Operations Centers
+(NOC) and large data centers is highly challenging and requires to
+quickly react when incidents arise:
+
+
++ You need to *quickly evaluate the impacts of incidents on business
+  processes* so as to prioritize their recoveries from incidents that
+  have higher impacts.
++ Additionnally, you would need *to report certain incidents to
+  operators able to address them quickly*.
+
+
+Deal with these issues from native tools provided by the monitoring
+systems such as Nagios, Zabbix and Zenoss is not easy. This may be
+especially challenging when the amount of devices monitored increases.
+
+That's where RealOpInsight comes in ! This document covers its
+`features`_, its `concepts`_, and `how it works`_.
+
+
+
+Features of RealOpInsight
+-------------------------
+
+RealOpinsight allow you to focus on business needs, instead of wasting
+time on false alerts. Its features include, without be limited to:
+
+
++
+
+
+Business Process Intelligence (BPI)
+```````````````````````````````````
+  Being Business Service/Process Management-centric, RealOpInsight
+  allows you to quickly assess how each incident impacts your business,
+  providing you with a *real insight* on the healthy of your business
+  processes.
++
+
+
+Effective Operations Management
+```````````````````````````````
+  By providing business process-centric dashbaords, you focus on
+  business value instead of wasting time on false/irrelevant alerts. You
+  can prioritize the *recovery of incidents based on business impact*.
++
+
+
+Advanced Event Processing
+`````````````````````````
+  RealOpInsight brings out powerful event processing rules and
+  algorithms allowing to *manage incidents in a fine-grained way*
+  according to monitoring needs (aggregation, decreasing, increasing,
+  etc.).
++
+
+
+Comprehensive Monitoring
+````````````````````````
+  Messages displayed on operations console can be customized. For
+  example, instead of having a basic message like "DISK CRITICAL - free
+  space: / 5483 MB (28% inode=67%)", you can have a *more comprehensive
+  message *such as "The free space available in the server <hostname/IP>
+  root partition is less than 30%".
++
+
+
+Distributed Monitoring Made Easy
+````````````````````````````````
+  Versatile, RealOpInsight supports different kinds of monitoring
+  systems. This includes (without being limited to): *Nagios, Zabbix,
+  Zenoss, Groundwork, Centreon, Icinga, Shinken, and op5*, which can be
+  used simultaneously like monitoring backends.
++
+
+
+System Tray Notifications
+`````````````````````````
+  To let you stay aware of any change that could arise when your
+  operations window isn't active.
++
+
+
+Embedded Browser
+````````````````
+  To let you keep track on the default Web UI of your monitoring system.
++
+
+
+Free, Open Source and Cross-Platform
+````````````````````````````````````
+  Released under the terms of GPL-v3 License, RealOpInsight is
+  completely open source and free of charge. Cross-platform, it works on
+  *Windows*, *GNU Linux*,and on *Mac OS X*, and is available as source
+  tarballs and binary packages.
+
+
+{anchor anchor='main' text='^ Contents'}
+
+
+
+RealOpInsight Terminologies
+---------------------------
+
+In the context of RealOpInsight, we use the following terminologies:
+
+
++ Device: is any physical component composing an IT infrastructure.
+  E.g. servers, routers, switches...
++ Incident: is any disruption to the normal operation of a device or
+  of a service that the device enables. E.g. failure of a hard-drive, a
+  crash of a process, a network failure.
++ Monitoring item: is a probe allowing to get the status of a device
+  against a given type of incidents. E.g. a monitoring item can allow to
+  check the availability of the http service on a web server.
+
+    + For Nagios, Shinken, Icinga, Groundwork, op5, Centreon and other
+      Nagios-derived systems, a monitoring item corresponds to a 'check'.
+      E.g. check_mysql allows to monitor the status of MySQL daemon.
+    + For Zabbix this corresponds to a 'trigger'. E.g. the ping trigger
+      allows to monitor the availability of a device.
+    + For Zenoss a monitoring item corresponds to a 'component'. E.g. the
+      httpd component allows to check the status of httpd daemon.
+
++ Data point: defines the relationship between a monitoring item and a
+  device. In RealOpInsight context, each data point is uniquely
+  characterized with an identifier with the pattern *device_id/probe*:
+
+    + For Nagios, Shinken, Icinga, Groundwork, op5, Centreon and other
+      Nagios-derived systems, a data point is identified with the pattern
+      *host_name/service_description.*
+    + For Zabbix, they're identitied with the pattern *host/trigger_name.*
+    + For Zenoss, they're identified with the pattern
+      *device_name/component_name*.
+
++ Severity of incident: is the level of impact an incident has on the
+  healthy of a device or of a service enabled by the device. For
+  example:
+
+    + Nagios, Shinken, Icinga, Groundwork, op5, Centreon and other their
+      derived systems defines four levels of severities also known as
+      States: OK, WARNING, CRITICAL and UNKNOWN.
+    + Zabbix defines six levels of severities: NOT CLASSIFIED,
+      INFORMATION, WARNING, AVERAGE, HIGH and DISASTER.
+    + Zenoss also defines six levels severities: CLEAR, DEBUG, INFO,
+      WARNING, ERROR and CRITICAL.
+
++ Service: in RealOpInsight context we distinguish two kinds of
+  services:
+
+    + IT services also called native checks include all the services
+      directly related to basic IT functionality (e.g. mysqld service).
+    + Business processes services: correspond to high level services not
+      directly related to data points. E.g. a backup service and a hosting
+      service.
+
++ Monitored platform: represents a set of monitored services. In
+  RealOpInsight context the services are related among them within an
+  hierarchy of services as described in the next section.
++ Severity propagation rule: describes how the severity of a service
+  is propagated to its parent within an hierarchy.
++ Severity calculation rule: describes how the severity of a service
+  is calculated according to the severities of its sub services.
++ Dashboard: is a visualizing interface offering a simple and
+  summarized view on a monitored platform.
++ Nagios-based system and Nagios-derived system both refer to either:
+  Nagios itself, Shinken, Centreon, Icinga, GroundWork or any other
+  monitoring system that relies on the same concepts than Nagios.
++ Monitoring source , or simply source , refers to a monitoring server
+  enabling API (native or not) to retrieve data related to probes.
+
+
+{anchor anchor='main' text='^ Contents'}
+
+
+
+RealOpInsight Dashboard Management Concepts
+-------------------------------------------
+
+This section introduces:
+
+
++ `The organisation of a monitoring hierarchy`_
++ `How the serverity of incidents are managed`_
++ `How alarm messages are handled`_
+
+
+
+Dashboard as a Hierarchy of Services
+------------------------------------
+The hierarchy of a monitored platform is comprised of two kinds of
+services :
+
++ IT Services: related to monitoring probes (data point in
+  RealOpInsight terminology), those services sit at the bottom of the
+  hierarchy. Their statuses are updated periodically through status data
+  retrieved from the monitoring servers.
+
+
++ Business Services a.k.a Business Processes define high level
+  services providing value-added to end-users or to applications (e.g.
+  operating systems, network devices, applications, database systems,
+  storage areas/devices, web engines, a hosting service, a downloading
+  service, and so forth).
+
+
+As you can see from the figure, a business service node can have one
+or more sub-services that can be IT services or other business
+services. However, an IT service could has sub-services, and
+additionally, it should be related to an actual probe within the
+underlying monitoring sources. This is a requirement to ensure the
+consistency and the coherency of the service hierarchy.
+
+
+
+{anchor anchor='main' text='^ Contents'}
+
+
+
+Severity Model and Incident Management
+--------------------------------------
+
+To deal with the various models of severity used by the different
+underlying monitoring systems, RealOpInsight relies on a unified
+severity model. This model comprised of five levels of impacts
+(NORMAL, MINOR, MAJOR, CRITICAL, UNKNOWN) is described in the
+following table.
+Severity Nagios State Zabbix Severity Zenoss Severity NORMAL OK CLEAR
+CLEAR MINOR -
+INFORMATION, WARNING
+DEBUG MAJOR WARNING AVERAGE WARNING CRITICAL CRITICAL HIGH, DISASTER
+ERROR, CRITICAL UNKNOWN UNKNOWN NOT CLASSIFIED -
+When an incident enters to the RealOpInsight Engine its severity is
+processed and propagated through the service view according to
+customized severity calculcation and propagation rules:
+
+
++ *A severity calculation rule* allows to determine the status of a
+  service *by aggregating the statuses* of its sub-services. Aggregation
+  rules currently include high-severity and average severities.
++ *A severity propagation rule* allows to determine how the status of
+  a service will be propagated to its parent service. A severity can be
+  decreased, increased or leave unchanged.
+
+
+For more explanation let's take an example: assuming you have a
+storage service that relies on two mirrored disks. If one of disks
+fails, the storage service will still operate -- even if in a degraded
+mode. In such a case, we would not want to report the status of the
+storage area as critical. Instead, since it continue to operate but in
+degraded mode, we would want to set its status to major.
+
+RealOpInsight combines five sorts of rules which permit various kinds
+of advanced incident management.
+Rule Type Description HIGH SEVERITY Calculation rule The severity of
+the related service is determined by the severity of its sub service
+having the highest severity AVERAGE SEVERITY Calculation rule The
+severity of the related service is determined by aggregating the
+severities of its sub services DECREASE Propagation rule The severity
+of the related service is decreased before being propagated to its
+parent service INCREASE Propagation rule The severity of the related
+service is increased before being propagated to its parent service
+UNCHANGED Propagation rule The severity of the related service is
+propagated as is to its parent service
+{anchor anchor='main' text='^ Contents'}
+
+
+
+Custom Alarm Messages
+---------------------
+Message customization is one of the key features of RealOpInsight. To
+better understand how that works we'll proceed by examples.
+
+
+Examples
+~~~~~~~~
+
+Assume that for monitoring the root partition of a database server, we
+have the following definition in our Nagios configuration :
+
+::
+
+    {literal}
+    define service{
+       use                  local-service 
+       host_name            mysql-server
+       service_description  Root Partition
+       check_command	check_local_disk!30%!10%!/
+    }{/literal}
+
+If the free space on that partition becomes less than 30% (warning
+threshold) of the total disk space:
+
++ Nagios shall report an alert indicating something like " *DISK
+  WARNING - free space: / 58483 MB (28% inode=67%)*".
++ Instead of this basis message, RealOpInsight allows you to have a
+  more human-comprehensible message such as " *The free space in the
+  root partition of the machine mysql-server is less than 30%*".In the
+  RealOpInsight Editor, you just need to set a message in the form of "
+  *The free space in the root partition of the machine
+  {literal}{hostname}{/literal} is less than
+  {literal}{threshold}{/literal}*". Here *{literal}{hostname}{/literal}*
+  and *{literal}{threshold}{/literal}* are tags that are automaticaly
+  replaced at runtime with contextual information.
+
+
+
+Contextualization Tags
+~~~~~~~~~~~~~~~~~~~~~~
+There is the list of supported tags (the curly braces are required) :
+
++ {literal}{hostname}{/literal}: shall be replaced with the hostname
+  of the machine to which the incident is related.
++ {literal}{threshold}{/literal}: shall be replaced with the threshold
+  defined in the check command. Currently this tag is only supported for
+  Nagios.
++ {literal}{plugin_output}{/literal}: shall be replaced with the
+  native message returned by the command (e.g. *PING ok - Packet loss =
+  0%, RTA = 0.80 ms*)
++ {literal}{check_name}{/literal}: shall be replaced with the name of
+  the check component. E.g. *check_local_disk.*
+
+{anchor anchor='main' text='^ Content'}
+
+
+How Does RealOpInsight Work?
+----------------------------
+
+RealOpInsight relies on three basic concepts:
+
+
++ a native `WYSIWYG editor`_ to ease the edition of service views;
++ a `Configuration Manager`_ to set the parameters to access the
+  underlying monitoring servers,;
++ a `Operations Console`_ to operate the service views on operations
+  environments.
+
+
+To make its integration easy, and especially in distributed monitoring
+environments, the OPerations Console has been built upon a loosely-
+coupled architecture where all the information related to IT services
+are retrieved from the underlying monitoring sources only through RPC
+APIs. As result, it's able to handle many (up to ten) distributed
+homogeneous/heterogeneous sources simultaneously, and in a powerful
+way.
+
+Here are how the Operations Console retrieves data from the underlying
+monitoring systems:
+
+
++ For Zabbix and Zenoss, it relies on their native RPC APIs : JSON-RPC
+  for Zabbix and JSON API for Zenoss.
++ To retrieve data from Nagios, Shinken, Icinga, Groundwork, op5,
+  Centreon and other Nagios-derived systems that do not enable native
+  APIs, RealOpInsight relies either on `specific daemon`_ (ngrt4nd)
+  enabled on the monitoring server, or on Livestatus (MK Livestatus or
+  Shinken Livestatus).
+
+
+
+Note that the support of multisource data retrieving is available only
+since the version 2.4 of the software. Details concerning the
+integration are described in the `Configuration Guide`_.
+
+
+
+
+
+
+
+
+Related Links : `Download`_ | `Installing and Configuring
+RealOpInsight`_ | `Installing the Daemon for Nagios`_
+
+{anchor anchor='main' text='^ Contents'}
+
