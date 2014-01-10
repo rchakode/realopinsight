@@ -1,6 +1,6 @@
-=================================================================
-What's RealOpInsight: aims, concepts and operation
-=================================================================
+#################################################################
+What's RealOpInsight: aim, concepts and operation
+#################################################################
 The goal of RealOpinsight is to allow you to focus on business needs,
 instead of wasting time on false alerts. Indeed, monitoring in
 demanding operations environments such as Network Operations Centers
@@ -23,84 +23,68 @@ That's where RealOpInsight comes in ! This document covers its
 `features`_, its `concepts`_, and `how it works`_.
 
 
-
-Features of RealOpInsight
--------------------------
+Features
+******************************************
 
 RealOpinsight allow you to focus on business needs, instead of wasting
 time on false alerts. Its features include, without be limited to:
 
-Business Process Intelligence (BPI)
-```````````````````````````````````
+Business Process Intelligence (BPI
   Being Business Service/Process Management-centric, RealOpInsight
   allows you to quickly assess how each incident impacts your business,
   providing you with a *real insight* on the healthy of your business
   processes.
 
-
 Effective Operations Management
-```````````````````````````````
   By providing business process-centric dashbaords, you focus on
   business value instead of wasting time on false/irrelevant alerts. You
   can prioritize the *recovery of incidents based on business impact*.
 
-
 Advanced Event Processing
-`````````````````````````
   RealOpInsight brings out powerful event processing rules and
   algorithms allowing to *manage incidents in a fine-grained way*
   according to monitoring needs (aggregation, decreasing, increasing,
   etc.).
 
-
 Comprehensive Monitoring
-````````````````````````
   Messages displayed on operations console can be customized. For
   example, instead of having a basic message like "DISK CRITICAL - free
   space: / 5483 MB (28% inode=67%)", you can have a *more comprehensive
-  message *such as "The free space available in the server <hostname/IP>
+  message* such as "The free space available in the server <hostname/IP>
   root partition is less than 30%".
 
-
 Distributed Monitoring Made Easy
-````````````````````````````````
   Versatile, RealOpInsight supports different kinds of monitoring
   systems. This includes (without being limited to): *Nagios, Zabbix,
   Zenoss, Groundwork, Centreon, Icinga, Shinken, and op5*, which can be
   used simultaneously like monitoring backends.
 
-
 System Tray Notifications
-`````````````````````````
   To let you stay aware of any change that could arise when your
   operations window isn't active.
 
 Embedded Browser
-````````````````
   To let you keep track on the default Web UI of your monitoring system.
 
-
 Free, Open Source and Cross-Platform
-````````````````````````````````````
   Released under the terms of GPL-v3 License, RealOpInsight is
   completely open source and free of charge. Cross-platform, it works on
   *Windows*, *GNU Linux*,and on *Mac OS X*, and is available as source
   tarballs and binary packages.
 
-RealOpInsight Dashboard Management Concepts
--------------------------------------------
+Dashboard Management
+******************************************
 
-This section introduces:
+In this section:
 
-
-+ `The organisation of a monitoring hierarchy`_
-+ `How the serverity of incidents are managed`_
-+ `How alarm messages are handled`_
-
++ `Dashboard as a Hierarchy of Services`_
++ `Severity Model and Incident Management`_
++ `Custom Alarm Messages`_
 
 
 Dashboard as a Hierarchy of Services
-------------------------------------
+===============================================
+
 The hierarchy of a monitored platform is comprised of two kinds of
 services :
 
@@ -125,13 +109,8 @@ underlying monitoring sources. This is a requirement to ensure the
 consistency and the coherency of the service hierarchy.
 
 
-
-{anchor anchor='main' text='^ Contents'}
-
-
-
 Severity Model and Incident Management
---------------------------------------
+===================================================
 
 To deal with the various models of severity used by the different
 underlying monitoring systems, RealOpInsight relies on a unified
@@ -175,31 +154,29 @@ parent service INCREASE Propagation rule The severity of the related
 service is increased before being propagated to its parent service
 UNCHANGED Propagation rule The severity of the related service is
 propagated as is to its parent service
-{anchor anchor='main' text='^ Contents'}
-
 
 
 Custom Alarm Messages
----------------------
+===================================================
 Message customization is one of the key features of RealOpInsight. To
 better understand how that works we'll proceed by examples.
 
 
 Examples
-~~~~~~~~
-
+-------------------------------
+  
 Assume that for monitoring the root partition of a database server, we
 have the following definition in our Nagios configuration :
 
 ::
 
-    {literal}
+    
     define service{
        use                  local-service 
        host_name            mysql-server
        service_description  Root Partition
        check_command	check_local_disk!30%!10%!/
-    }{/literal}
+    }
 
 If the free space on that partition becomes less than 30% (warning
 threshold) of the total disk space:
@@ -211,33 +188,30 @@ threshold) of the total disk space:
   root partition of the machine mysql-server is less than 30%*".In the
   RealOpInsight Editor, you just need to set a message in the form of "
   *The free space in the root partition of the machine
-  {literal}{hostname}{/literal} is less than
-  {literal}{threshold}{/literal}*". Here *{literal}{hostname}{/literal}*
-  and *{literal}{threshold}{/literal}* are tags that are automaticaly
+  {hostname} is less than
+  {threshold}*". Here *{hostname}*
+  and *{threshold}* are tags that are automaticaly
   replaced at runtime with contextual information.
 
-
-
 Contextualization Tags
-~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
+
 There is the list of supported tags (the curly braces are required) :
 
-+ {literal}{hostname}{/literal}: shall be replaced with the hostname
++ {hostname}: shall be replaced with the hostname
   of the machine to which the incident is related.
-+ {literal}{threshold}{/literal}: shall be replaced with the threshold
++ {threshold}: shall be replaced with the threshold
   defined in the check command. Currently this tag is only supported for
   Nagios.
-+ {literal}{plugin_output}{/literal}: shall be replaced with the
++ {plugin_output}: shall be replaced with the
   native message returned by the command (e.g. *PING ok - Packet loss =
   0%, RTA = 0.80 ms*)
-+ {literal}{check_name}{/literal}: shall be replaced with the name of
++ {check_name}: shall be replaced with the name of
   the check component. E.g. *check_local_disk.*
-
-{anchor anchor='main' text='^ Content'}
 
 
 How Does RealOpInsight Work?
-----------------------------
+****************************************************
 
 RealOpInsight relies on three basic concepts:
 
@@ -273,17 +247,14 @@ monitoring systems:
 
 Note that the support of multisource data retrieving is available only
 since the version 2.4 of the software. Details concerning the
-integration are described in the `Configuration Guide`_.
+integration are described in the :doc:`Configuration Guide <configuration>`.
 
 
 
+Next Steps
+---------------- 
 
-
-
-
-
-Related Links : `Download`_ | `Installing and Configuring
-RealOpInsight`_ | `Installing the Daemon for Nagios`_
-
-{anchor anchor='main' text='^ Contents'}
+  + `Download`_ 
+  + `Installing`_
+  + `Configuration`_
 

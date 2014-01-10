@@ -18,6 +18,8 @@ Contents:
    tutorial-nagios
    tutorial-zabbix
    tutorial-zenoss
+   editor-manual
+   oc-manual
    faq 
 
 
