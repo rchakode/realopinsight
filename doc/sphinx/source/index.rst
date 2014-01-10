@@ -14,6 +14,10 @@ Contents:
    concepts
    installation
    configuration
+   tutorial-nagios
+   tutorial-zabbix
+   tutorial-zenoss
+   faq
 
 
 Indices and tables
