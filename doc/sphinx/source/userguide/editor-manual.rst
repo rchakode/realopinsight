@@ -5,23 +5,18 @@ RealOpInsight Editor User's Manual
 .. contents::
 
 Overview and prerequisites
-----------------------
+----------------------------
 
-The goal of Editor is to ease the description and the edition of 
-service views by enabling to:
+The goal of Editor is to ease the creation and the edition of description of 
+business service view. It provides a friendly user interface comprising a tree 
+view component to ease the edition and the manipulation of service views. 
+For that, it enables functionaly such as drag-and-drop to reoganize the hierarchy 
+on-the-fly, context menus to add, delete, copy/paste, and many relevant features.
 
-+ *Manage the hierarchy in a flexible way*: it provides a friendly
-  user interface comprising a tree view component to ease the edition
-  and the manipulation of service views (drag-and-drop to reoganize the
-  hierarchy on-the-fly, context menus to add, delete, copy/paste, and
-  other relevant features to ease the edition of services).
-+ *Edit the services easily*: the `User Interface`_ enables to edit
-  the properties of services in a simple way.
+Here, we assume that:
 
-In the rest of this guide, we assume that:
-
-+ You have read and understood the `RealOpInsight Concepts`_, and
-  especially the section related to `message contextualization`_.
++ You have read and understood the :doc:`basic concepts of RealOpInsight <../overview/concepts>`, and
+  especially the section related to *message contextualization*.
 + Your RealOpInsight installation is ready to use.
 
 Run the Editor
@@ -33,7 +28,7 @@ on Windows, there is also a quick access from Start Menu.
 The Command Line Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The CLI command is named *`ngrt4n-editor`_. *As shown below, its usage
+The CLI command is named *ngrt4n-editor*. As shown below, its usage
 is quite simple.
 
 ::
@@ -60,14 +55,13 @@ Overview of the user interface
 -------------------------------
 The user interface shown on the Figure below consists of:
 
-+ *Menus*: Accessible from the `menu bar`_ or the toolbar, they enable
-  to access the Editor's features (Open an exiting file, Save changes, 
-  Import a Nagios Status File, etc.)
-+ *Explorer Pane*: Represents the hierarchy in a tree view that eases
-  the manipulation (select service for modification, add/delete service,
-  reorganization of the tree). See `here`_ for more details.
-+ *Edition Pane*: Consists of a form allowing to set or update the
-  `properties`_ of services.
++ *Menus*: Accessible from the menu bar or the toolbar, they enable to access 
+  the Editor's features (Open an exiting file, Save changes, Import a Nagios 
+  Status File, etc.)
++ *Explorer Pane*, at the left of the user interface, represents the hierarchy 
+  in a tree view that eases the manipulation (select service for modification, 
+  add/delete service, reorganization of the tree, etc. 
++ *Edition Pane*: Consists of a form allowing to set or edit the service properties.
 
 
 Add and edit services
@@ -89,8 +83,8 @@ Zabbix-based), you need to save the configuration in a suitable
 format. By default the format is Nagios-compatible, it can be changed
 through the file selection window (File -> Save As).
 
-Description of fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Understand service properties
+-------------------------------
 Every service in a hierarchy has the following properties:
 
 + *Name*: Serves as a label for the service.
@@ -109,7 +103,7 @@ Every service in a hierarchy has the following properties:
   an incident arises (when the state changes from NORMAL to another
   state).
 
-    + The message can include `contextualization tags`_.
+    + The message can include :doc:`contextualization tags <../overview/concepts>`.
     + The default value is the raw output returned by the monitoring
       plugin (same as  *{plugin_output}*).
 
@@ -118,7 +112,7 @@ Every service in a hierarchy has the following properties:
   service is recovered (when the status changes to another state to
   NORMAL.
 
-    + The message can include one or more `contextualization tags`_.
+    + The message can include one or more :doc:`contextualization tags <../overview/concepts>`.
     + The default value is the raw output returned by the monitoring
       plugin (same as  *{plugin_output}*).
 

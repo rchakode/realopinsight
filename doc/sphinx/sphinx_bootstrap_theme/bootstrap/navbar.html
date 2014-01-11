@@ -9,7 +9,7 @@
         </button>
         <a class="navbar-brand" href="{{ pathto(master_doc) }}">
           {%- block sidebarlogo %}
-            {%- if logo %}<img src="{{ pathto('_static/' + logo, 1) }}" height="35">{%- endif %}
+            {%- if logo %}<img src="{{ pathto('_static/' + logo, 1) }}">{%- endif %}
           {%- endblock %}
         </a>
         <span class="navbar-text navbar-version pull-left"><b>{{ version|e }}</b></span>
