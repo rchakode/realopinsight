@@ -36,11 +36,21 @@ underlying monitoring systems, RealOpInsight relies on a unified
 severity model. This model comprised of five levels of impacts
 (NORMAL, MINOR, MAJOR, CRITICAL, UNKNOWN) is described in the
 following table.
-Severity Nagios State Zabbix Severity Zenoss Severity NORMAL OK CLEAR
-CLEAR MINOR -
-INFORMATION, WARNING
-DEBUG MAJOR WARNING AVERAGE WARNING CRITICAL CRITICAL HIGH, DISASTER
-ERROR, CRITICAL UNKNOWN UNKNOWN NOT CLASSIFIED -
+
++------------+----------------+----------------------+-----------------+
+| Severity   | Nagios State   | Zabbix Severity      | Zenoss Severity |
++============+================+======================+=================+
+| NORMAL     | OK             | CLEAR                | CLEAR           |
++------------+----------------+----------------------+-----------------+
+| MINOR      | -              | INFORMATION, WARNING | DEBUG           |
++------------+----------------+----------------------+---------------- +
+| MAJOR      | WARNING        | AVERAGE              | WARNING         |
++------------+----------------+----------------------+-----------------+
+| CRITICAL   | CRITICAL       | HIGH, DISASTER       | ERROR, CRITICAL |
++------------+----------------+----------------------+-----------------+
+| UNKNOWN    | UNKNOWN        | NOT CLASSIFIED       | -               |
++------------+----------------+----------------------+-----------------+
+
 When an incident enters to the RealOpInsight Engine its severity is
 processed and propagated through the service view according to
 customized severity calculcation and propagation rules:
@@ -59,21 +69,33 @@ storage service that relies on two mirrored disks. If one of disks
 fails, the storage service will still operate -- even if in a degraded
 mode. In such a case, we would not want to report the status of the
 storage area as critical. Instead, since it continue to operate but in
-degraded mode, we would want to set its status to major.
++degraded mode, we would want to set its status to major.
 
 RealOpInsight combines five sorts of rules which permit various kinds
 of advanced incident management.
-Rule Type Description HIGH SEVERITY Calculation rule The severity of
-the related service is determined by the severity of its sub service
-having the highest severity AVERAGE SEVERITY Calculation rule The
-severity of the related service is determined by aggregating the
-severities of its sub services DECREASE Propagation rule The severity
-of the related service is decreased before being propagated to its
-parent service INCREASE Propagation rule The severity of the related
-service is increased before being propagated to its parent service
-UNCHANGED Propagation rule The severity of the related service is
-propagated as is to its parent service
 
++------------------+------------------+------------------------------------------+
+| Rule             | Type             | Description                              |
++==================+==================+==========================================+
+| HIGH SEVERITY    | Calculation rule | The severity of the related service is   |
+|                  |                  | determined by the severity of its sub    |
+|                  |                  | service having the highest severity      |
++------------------+------------------+------------------------------------------+
+| AVERAGE SEVERITY | Calculation rule | The severity of the related service is   |
+|                  |                  | determined by aggregating the severities | 
+|                  |                  | of its sub services                      |
++------------------+------------------+------------------------------------------+
+| DECREASE         | Propagation rule | The severity of the related service is   |
+|                  |                  | decreased before being propagated to     |
+|                  |                  | its parent service                       |
++------------------+------------------+------------------------------------------+
+| INCREASE         | Propagation rule | The severity of the related service is   | 
+|                  |                  | increased before being propagated to its |
+|                  |                  | parent service                           |
++------------------+------------------+------------------------------------------+
+| UNCHANGED        | Propagation rule | The severity of the related service is   |
+|                  |                  | propagated as is to its parent service   |
++------------------+------------------+------------------------------------------+
 
 Advanced Message Management
 ===================================================
@@ -164,10 +186,4 @@ monitoring systems:
   The support of multisource data retrieving is available only
   since the version 2.4 of the software. Details concerning the
   integration are described in the :doc:`Configuration Guide <configuration>`.
-
-
-**Next Steps**
-
-  + :doc:`../adminguide/installation`
-  + :doc:`../adminguide/configuration`
 

@@ -106,11 +106,6 @@ following components:nts:
 
 + And the Ping status of the Zenoss server.
 
-
 If some of them are not set to the Zenoss server you can assign them
 to see the effect in the Operations Console.
 
-Next Steps
-------------------------------------------------------
-   * More about the Operations Console's Features.
-   * Create your own configurations

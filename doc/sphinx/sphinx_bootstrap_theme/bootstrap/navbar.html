@@ -9,9 +9,8 @@
         </button>
         <a class="navbar-brand" href="{{ pathto(master_doc) }}">
           {%- block sidebarlogo %}
-            {%- if logo %}<img src="_static/{{ logo }}">{%- endif %}
+            {%- if logo %}<img src="{{ pathto('_static/' + logo, 1) }}" height="35">{%- endif %}
           {%- endblock %}
-          {% if theme_navbar_title -%}{{ theme_navbar_title|e }}{%- else -%}{{ project|e }}{%- endif -%}
         </a>
         <span class="navbar-text navbar-version pull-left"><b>{{ version|e }}</b></span>
       </div>

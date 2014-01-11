@@ -106,11 +106,14 @@
     {%- block sidebar1 %}{{ bsidebar() }}{% endblock %}
     <div class="{{ bs_span_prefix }}{{ bs_content_width }}">
       {% block body %}{% endblock %}
+      {{ relbar() }}
     </div>
     {% block sidebar2 %} {# possible location for sidebar #} {% endblock %}
   </div>
 </div>
+
 {%- endblock %}
+
 
 {%- block footer %}
 <footer class="footer">

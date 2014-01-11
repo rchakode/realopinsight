@@ -62,7 +62,3 @@ to use as possible:
   events, severity, hostname, service, and message). Just click on the
   header of the associated column.
 
-
-Now you have understood how RealOpInsight works, `create your own
-configuration`_ and enjoy!!!
-
