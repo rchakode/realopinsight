@@ -70,7 +70,7 @@ Launch the Operations Console
 
 ::
 
-    {literal}$ ngrt4n-manager -d $EXAMPLE_DIR/small_hosting_platform.zns.ngrt4n.xml{/literal}
+    $ ngrt4n-manager -d $EXAMPLE_DIR/small_hosting_platform.zns.ngrt4n.xml
 
 
 * On Windows systems:

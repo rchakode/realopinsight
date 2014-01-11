@@ -145,7 +145,7 @@ about sources management:
 + To associate a data point to a given source, you need to prefix the
   data point with the source identifier as follow:
   *SourceIndex:device/probe* (note the colon *':' *separator) *.* For
-  example, {literal}'Source0:mysql-server01/Root Partition'{/literal}
+  example, 'Source0:mysql-server01/Root Partition'
   indicates the probe allowing to monitor the root partition on the
   server named mysql-server from the Nagios server refered with Source0.
 + It's not required to set all the sources, but if a source is not

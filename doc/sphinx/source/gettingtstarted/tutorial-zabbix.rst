@@ -23,7 +23,7 @@ The tutorial is based on the example files provided with
 RealOpInsight. Available in the folder *examples, *the following file:
 
 
-+ *{literal}small_hosting_platform.zbx.ngrt4n.xml *{/literal}**: This
++ *small_hosting_platform.zbx.ngrt4n.xml ***: This
   file contains the configuration describing of our dashboard. This
   dashboard relies on some triggers from the default Zabbix server's
   monitoring configuration.
@@ -75,7 +75,7 @@ Launch the Operations Console
 
 ::
 
-    {literal}$ ngrt4n-manager -d $SRCDIR/example/small_hosting_platform.zbx.ngrt4n.xml{/literal}
+    $ ngrt4n-manager -d $SRCDIR/example/small_hosting_platform.zbx.ngrt4n.xml
 
 
 * On Windows systems:

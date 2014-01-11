@@ -23,9 +23,9 @@ Launch the Operations Console
 
 ::
 
-    {literal}$ ngrt4n-manager -d <file>{/literal}
+    $ ngrt4n-manager -d <file>
     or
-    {literal}$ ngrt4n-oc <file>{/literal}
+    $ ngrt4n-oc <file>
 
 
 * On Windows systems:

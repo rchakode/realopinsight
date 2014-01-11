@@ -26,7 +26,7 @@ tree, this example illustrates the monitoring of a web hosting
 platform through a RealOpInsight-based dashboard..
 We need the following files from this folder :
 
-+ *{literal}small_hosting_platform.nag.ngrt4n.xml *{/literal}** : The
++ *small_hosting_platform.nag.ngrt4n.xml *** : The
   NGRT4N configuration file describing the monitored platform along with
   its business processes.
 + *status.dat* : The Nagios status file providing the related
@@ -71,7 +71,7 @@ Now start the daemon.
 
 ::
 
-    {literal}$ ngrt4nd -D -c SRCDIR/examples/status.dat{/literal}
+    $ ngrt4nd -D -c SRCDIR/examples/status.dat
 
 
 This will start the daemon in foreground mode while loading the status
@@ -113,7 +113,7 @@ Launch the Operations Console
 
 ::
 
-    {literal}$ ngrt4n-manager -d $SRCDIR/example/small_hosting_platform.nag.ngrt4n.xml{/literal}
+    $ ngrt4n-manager -d $SRCDIR/example/small_hosting_platform.nag.ngrt4n.xml
 
 
 * On Windows systems:

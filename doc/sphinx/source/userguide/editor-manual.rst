@@ -13,9 +13,6 @@ Here we assume that:
   especially the section related to `message contextualization`_.
 + Your RealOpInsight installation is ready to use.
 
-{anchor anchor='main' text='^ Contents'}
-
-
 Overview of the Editor
 ----------------------
 
@@ -30,11 +27,6 @@ enabling to:
   other relevant features to ease the edition of services).
 + *Edit the services easily*: the `User Interface`_ enables to edit
   the properties of services in a simple way.
-
-
-
-{anchor anchor='main' text='^ Contents'}
-
 
 Run the Editor
 --------------
@@ -69,9 +61,6 @@ From Start Menu :
 
     Start -> NGRT4N Monitoring Suite -> RealOpInsight Editor
 
-{anchor anchor='main' text='^ Contents'}
-
-
 User Interface
 --------------
 The user interface shown on the Figure below consists of:
@@ -102,9 +91,6 @@ enable functionalities such as :
 + Open an exiting file: File -> Open
 + Save changes: File -> Save, File -> Save As
 + Import a Nagios Status File: File -> Import
-
-{anchor anchor='main' text='^ Contents'}
-
 
 Edition
 -------
@@ -152,7 +138,7 @@ Every service in a hierarchy has the following properties:
 
     + The message can include `contextualization tags`_.
     + The default value is the raw output returned by the monitoring
-      plugin (same as {literal} *{plugin_output}*{/literal}).
+      plugin (same as  *{plugin_output}*).
 
 + *Notification Message*: Optional and specific to native checks, this
   holds the custom message to show on Operations Console when the
@@ -161,7 +147,7 @@ Every service in a hierarchy has the following properties:
 
     + The message can include one or more `contextualization tags`_.
     + The default value is the raw output returned by the monitoring
-      plugin (same as {literal} *{plugin_output}*{/literal}).
+      plugin (same as  *{plugin_output}*).
 
 + *Data Point*: Sets the probe associated to an IT service node. It's
   defined in form of device/probe:
@@ -172,8 +158,8 @@ Every service in a hierarchy has the following properties:
       identifies the check allowing to monitor the load of Nagios server.
     + For Zabbix, the pattern is *host_name/trigger_name.* host_name and
       trigger_name as well as the relationship between them should be valid
-      entries in Zabbix. For example, {literal}'Zabbix server/Lack of free
-      swap space on{HOST.NAME}'{/literal} identifies the trigger allowing to
+      entries in Zabbix. For example, 'Zabbix server/Lack of free
+      swap space on{HOST.NAME}' identifies the trigger allowing to
       monitor the swap space on Zabbix server.
     + For Zenoss data points are identified through the following the
       pattern *device_name/component_name* according to the description of
@@ -181,5 +167,3 @@ Every service in a hierarchy has the following properties:
       identifies the component responsible for monitoring the Apache server
       process (httpd) on Zenoss Server.
 
-
-{anchor anchor='main' text='^ Contents'}
