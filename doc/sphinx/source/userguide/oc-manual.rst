@@ -1,11 +1,8 @@
-
-
 RealOpInsight Operations Console User's Manual
 ==============================================
 
 This manual presents the user interface as well as the features of
 RealOpInsight Operations Console.
-
 
 
 Prerequisites
@@ -16,7 +13,7 @@ Ensure that your environment is configured properly as described
 If not, refer to the corresponding `manual`_.
 
 
-Launch the Operations Console
+Run the Operations Console
 -----------------------------
 
 * On GNU/Linux and OS X Systems:
@@ -39,22 +36,18 @@ After `login`_, you shall be invited to select a configuration file
 through a file selection window.
 
 
-User Interface
---------------
+Overview of the user interface
+------------------------------
 The user interface shown on the Figure below consists in four main
-parts :
+parts:
 
 + Menus: accessible via the menu bar or the tools bar.
 + Tree Explorer: gives the preview of the dashboard hierarchy.
 + Map: gives a representation of the dashboard hierarchy.
 + Message Console: shows message about the status of monitored checks.
 
-
-
-
 The Operations Console has been designed so as to be friendly and easy
 to use as possible:
-
 
 + The map can be zoomed in/out using either menus or more simply
   through the mouse wheel.

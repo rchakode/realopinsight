@@ -1,12 +1,6 @@
 Dashboard Management Principles
 *************************************************
-
-In this section:
-
-+ `Dashboard as a Hierarchy of Services`_
-+ `Severity Model and Incident Management`_
-+ `Custom Alarm Messages`_
-
+.. contents::
 
 Dashboard as a Hierarchy of Services
 ===============================================
@@ -25,7 +19,6 @@ services :
   operating systems, network devices, applications, database systems,
   storage areas/devices, web engines, a hosting service, a downloading
   service, and so forth).
-
 
 As you can see from the figure, a business service node can have one
 or more sub-services that can be IT services or other business
@@ -82,21 +75,20 @@ UNCHANGED Propagation rule The severity of the related service is
 propagated as is to its parent service
 
 
-Custom Alarm Messages
+Advanced Message Management
 ===================================================
 Message customization is one of the key features of RealOpInsight. To
 better understand how that works we'll proceed by examples.
 
 
 Examples
--------------------------------
+--------------------------------------------------
   
 Assume that for monitoring the root partition of a database server, we
 have the following definition in our Nagios configuration :
 
 ::
 
-    
     define service{
        use                  local-service 
        host_name            mysql-server
@@ -119,8 +111,9 @@ threshold) of the total disk space:
   and *{threshold}* are tags that are automaticaly
   replaced at runtime with contextual information.
 
+
 Contextualization Tags
-------------------------------------------
+--------------------------------------------------
 
 There is the list of supported tags (the curly braces are required) :
 
@@ -136,7 +129,7 @@ There is the list of supported tags (the curly braces are required) :
   the check component. E.g. *check_local_disk.*
 
 
-How RealOpInsight Works?
+How RealOpInsight Works
 ****************************************************
 
 RealOpInsight provides :
@@ -148,18 +141,15 @@ RealOpInsight provides :
 + A :doc:`Operations Console <../userguide/oc-manual>` to operate the service views on operations
   environments.
 
-
 To make its integration easy, and especially in distributed monitoring
-environments, the OPerations Console has been built upon a loosely-
-coupled architecture where all the information related to IT services
-are retrieved from the underlying monitoring sources only through RPC
-APIs. As result, it's able to handle many (up to ten) distributed
-homogeneous/heterogeneous sources simultaneously, and in a powerful
-way.
+environments, RealOpInsight has been built upon a loosely-coupled architecture 
+where all the information related to IT services are retrieved from the 
+underlying monitoring sources only through RPC APIs. 
+As result, it cano handle many distributed homogeneous/heterogeneous 
+sources simultaneously, and in a powerful way.
 
 Here are how the Operations Console retrieves data from the underlying
 monitoring systems:
-
 
 + For Zabbix and Zenoss, it relies on their native RPC APIs : JSON-RPC
   for Zabbix and JSON API for Zenoss.
@@ -169,16 +159,14 @@ monitoring systems:
   enabled on the monitoring server, or on Livestatus (MK Livestatus or
   Shinken Livestatus).
 
+.. note::
+
+  The support of multisource data retrieving is available only
+  since the version 2.4 of the software. Details concerning the
+  integration are described in the :doc:`Configuration Guide <configuration>`.
 
 
-Note that the support of multisource data retrieving is available only
-since the version 2.4 of the software. Details concerning the
-integration are described in the :doc:`Configuration Guide <configuration>`.
-
-
-
-Next Steps
----------------- 
+**Next Steps**
 
   + :doc:`../adminguide/installation`
   + :doc:`../adminguide/configuration`

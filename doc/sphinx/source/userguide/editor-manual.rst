@@ -1,24 +1,14 @@
 
-
 RealOpInsight Editor User's Manual
 ==================================
 
+.. contents::
 
-
-Prerequisites
--------------
-Here we assume that:
-
-+ You have read and understood the `RealOpInsight Concepts`_, and
-  especially the section related to `message contextualization`_.
-+ Your RealOpInsight installation is ready to use.
-
-Overview of the Editor
+Overview and prerequisites
 ----------------------
 
-The goal of Editor is to ease the definition of service views by
-enabling to:
-
+The goal of Editor is to ease the description and the edition of 
+service views by enabling to:
 
 + *Manage the hierarchy in a flexible way*: it provides a friendly
   user interface comprising a tree view component to ease the edition
@@ -27,6 +17,12 @@ enabling to:
   other relevant features to ease the edition of services).
 + *Edit the services easily*: the `User Interface`_ enables to edit
   the properties of services in a simple way.
+
+In the rest of this guide, we assume that:
+
++ You have read and understood the `RealOpInsight Concepts`_, and
+  especially the section related to `message contextualization`_.
++ Your RealOpInsight installation is ready to use.
 
 Run the Editor
 --------------
@@ -51,7 +47,6 @@ configuration will be initialized.
 
 Type *ngrt4n-editor -h* to learn more options.
 
-
 Graphical Interface (Windows only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -61,12 +56,13 @@ From Start Menu :
 
     Start -> NGRT4N Monitoring Suite -> RealOpInsight Editor
 
-User Interface
---------------
+Overview of the user interface
+-------------------------------
 The user interface shown on the Figure below consists of:
 
 + *Menus*: Accessible from the `menu bar`_ or the toolbar, they enable
-  to access the Editor's features.
+  to access the Editor's features (Open an exiting file, Save changes, 
+  Import a Nagios Status File, etc.)
 + *Explorer Pane*: Represents the hierarchy in a tree view that eases
   the manipulation (select service for modification, add/delete service,
   reorganization of the tree). See `here`_ for more details.
@@ -74,26 +70,8 @@ The user interface shown on the Figure below consists of:
   `properties`_ of services.
 
 
-
-
-
-
-
-
-
-
-
-Menus
------
-Accessible from the menu bar with shortcuts on the toolbar, they
-enable functionalities such as :
-
-+ Open an exiting file: File -> Open
-+ Save changes: File -> Save, File -> Save As
-+ Import a Nagios Status File: File -> Import
-
-Edition
--------
+Add and edit services
+-------------------------------
 The edition mainly relies on the Explorer Pane that significantly
 eases the manipulation of the hierarchy. Among its different
 functionalities, you can note that :
@@ -106,18 +84,13 @@ functionalities, you can note that :
   automatically filled into the Edition Pane from which they can be
   modified.
 
-
 Important Note: According to your monitoring system (Nagios-based or
 Zabbix-based), you need to save the configuration in a suitable
 format. By default the format is Nagios-compatible, it can be changed
 through the file selection window (File -> Save As).
 
-
-
-
-
-Properties of Services
-----------------------
+Description of fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Every service in a hierarchy has the following properties:
 
 + *Name*: Serves as a label for the service.

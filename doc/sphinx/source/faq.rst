@@ -2,6 +2,7 @@
 Frequently Asked Questions
 ==============================
 
+.. contents::
 
 What does RealOpInsight mean?
 -----------------------------
@@ -20,17 +21,8 @@ Zabbix. The aim being to provide those proven tools with advanced and
 powerful dashboard management capabilities.
 
 
-NGRT4N or RealOpInsight, what differences?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Originally, NGRT4N was designed for Nagios. Then has been extended to
-support other technologies. In this process, its name was changed from
-NGRT4N to RealOpInsight.
-
-
-Do I need a separate installation of RealOpInsight for the different
-kinds of monitoring servers?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Do I need a separate installation of RealOpInsight for the different kinds of monitoring systems?
+--------------------------------------------------------------------------------------------------
 
 No, independently to the monitoring system you're using, Nagios,
 Zabbix, Zenoss, Icinga, Centreon or whatever, only one installation is
@@ -95,7 +87,7 @@ and restart xinetd. This configuration should look as follows:
     {/literal}
 
 
-Basically, this states that the service shall listen on the port 6557
+Basically, this means that the service shall listen on the port 6557
 and shall forward requests to the UNIX socket located in
 /var/lib/nagios/live (server_args), which is assumed to be the path of
 the native socket managed by the Livestatus NEB. For more details, see
@@ -120,7 +112,7 @@ specific.cfg), and restart Shinken.
     } {/literal}
 
 
-In short, this states that the service shall listen on any network
+In short, this means that the service shall listen on any network
 interfaces (host *) on port the 50000 on the Shinken server. For more
 details, see the `official documentation of Shinken`_.
 
