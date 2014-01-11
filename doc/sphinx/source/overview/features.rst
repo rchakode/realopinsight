@@ -1,7 +1,6 @@
 Features of RealOpInsight
 =================================================
-RealOpinsight allow you to focus on business needs, instead of wasting
-time on false alerts. Its features include, without be limited to:
+The features of RealOpinsight include, without be limited to:
 
 Business Process Intelligence (BPI
   Being Business Service/Process Management-centric, RealOpInsight

@@ -1,30 +1,5 @@
-#################################################################
-What's RealOpInsight: basic concepts and operation
-#################################################################
-
-The goal of RealOpinsight is to allow you to focus on business needs,
-instead of wasting time on false alerts. Indeed, monitoring in
-demanding operations environments such as Network Operations Centers
-(NOC) and large data centers is highly challenging and requires to
-quickly react when incidents arise:
-
-+ You need to *quickly evaluate the impacts of incidents on business
-  processes* so as to prioritize their recoveries from incidents that
-  have higher impacts.
-+ Additionnally, you would need *to report certain incidents to
-  operators able to address them quickly*.
-
-
-Deal with these issues from native tools provided by the monitoring
-systems such as Nagios, Zabbix and Zenoss is not easy. This may be
-especially challenging when the amount of devices monitored increases.
-
-That's where RealOpInsight comes in ! This chapter presents its
-basic concepts and how it works.
-
-
-Dashboard Management
-******************************************
+Dashboard Management Principles
+*************************************************
 
 In this section:
 
@@ -161,16 +136,16 @@ There is the list of supported tags (the curly braces are required) :
   the check component. E.g. *check_local_disk.*
 
 
-How Does RealOpInsight Work?
+How RealOpInsight Works?
 ****************************************************
 
-RealOpInsight relies on three basic concepts:
+RealOpInsight provides :
 
-
-+ a native `WYSIWYG editor`_ to ease the edition of service views;
-+ a `Configuration Manager`_ to set the parameters to access the
-  underlying monitoring servers,;
-+ a `Operations Console`_ to operate the service views on operations
++ A native :doc:`WYSIWYG editor <../userguide/editor-manual>`, which is a real studio to create 
+  and edit the description of service views in a easy way.
++ A :doc:`Configuration Manager <../adminguide/configuration>` to set the parameters to access the
+  underlying monitoring servers.
++ A :doc:`Operations Console <../userguide/oc-manual>` to operate the service views on operations
   environments.
 
 
@@ -205,7 +180,6 @@ integration are described in the :doc:`Configuration Guide <configuration>`.
 Next Steps
 ---------------- 
 
-  + `Download`_ 
-  + `Installing`_
-  + `Configuration`_
+  + :doc:`../adminguide/installation`
+  + :doc:`../adminguide/configuration`
 

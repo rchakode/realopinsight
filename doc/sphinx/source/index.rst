@@ -13,8 +13,8 @@ Contents:
 
    glossary
    overview/overview
-   Administration Guide <adminguide/adminguide>
-   Quick Start Tutorial <gettingtstarted/gettingstarted>
+   Getting Started <adminguide/adminguide>
+   Quickstart Tutorials <gettingtstarted/gettingstarted>
    User/Operator Guide <userguide/userguide>
    faq 
 

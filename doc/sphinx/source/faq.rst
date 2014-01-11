@@ -1,7 +1,6 @@
-
-
+==============================
 Frequently Asked Questions
-==========================
+==============================
 
 
 What does RealOpInsight mean?
