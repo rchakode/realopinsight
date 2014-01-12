@@ -6,27 +6,34 @@ Dashboard as a Hierarchy of Services
 ===============================================
 
 The hierarchy of a monitored platform is comprised of two kinds of
-services :
+services decribed here after:
 
-+ IT Services: related to monitoring probes (data point in
-  RealOpInsight terminology), those services sit at the bottom of the
+IT Services  
+  Related to monitoring probes (data point in RealOpInsight terminology), 
+  those services sit at the bottom of the
   hierarchy. Their statuses are updated periodically through status data
   retrieved from the monitoring servers.
 
-
-+ Business Services a.k.a Business Processes define high level
+Business Services
+  Also called *Business Processes*, they correspond to high level
   services providing value-added to end-users or to applications (e.g.
   operating systems, network devices, applications, database systems,
   storage areas/devices, web engines, a hosting service, a downloading
   service, and so forth).
 
-As you can see from the figure, a business service node can have one
-or more sub-services that can be IT services or other business
-services. However, an IT service could has sub-services, and
-additionally, it should be related to an actual probe within the
-underlying monitoring sources. This is a requirement to ensure the
-consistency and the coherency of the service hierarchy.
+.. note::
 
+  As illustrated on the figure below, a business service node can have one
+  or more sub-services that can be IT services or other business
+  services. However, an IT service could has sub-services, and
+  additionally, it should be related to an actual probe within the
+  underlying monitoring sources. This is a requirement to ensure the
+  consistency and the coherency of the service hierarchy.
+
+.. figure:: ../images/hierarchical-business-services.png
+  :align: center
+   
+  Illustration of hierarchical business service dashboard
 
 Severity Model and Incident Management
 ===================================================
@@ -160,15 +167,15 @@ RealOpInsight provides :
   and edit the description of service views in a easy way.
 + A :doc:`Configuration Manager <../adminguide/configuration>` to set the parameters to access the
   underlying monitoring servers.
-+ A :doc:`Operations Console <../userguide/oc-manual>` to operate the service views on operations
-  environments.
++ A :doc:`Operations Console <../userguide/oc-manual>` to operate the service 
+  views on operations environments.
 
 To make its integration easy, and especially in distributed monitoring
-environments, RealOpInsight has been built upon a loosely-coupled architecture 
-where all the information related to IT services are retrieved from the 
-underlying monitoring sources only through RPC APIs. 
-As result, it cano handle many distributed homogeneous/heterogeneous 
-sources simultaneously, and in a powerful way.
+environments, the :ref:`fig-architecture` is a loosely-coupled architecture, 
+where every status data are retrieved from the underlying monitoring servers 
+only through RPC APIs. This results to a scalable and powerful architecture 
+able to handle a large number [#f1]_  of distributed homogeneous/heterogeneous monitoring 
+sources simultaneously.
 
 Here are how the Operations Console retrieves data from the underlying
 monitoring systems:
@@ -177,13 +184,22 @@ monitoring systems:
   for Zabbix and JSON API for Zenoss.
 + To retrieve data from Nagios, Shinken, Icinga, Groundwork, op5,
   Centreon and other Nagios-derived systems that do not enable native
-  APIs, RealOpInsight relies either on `specific daemon`_ (ngrt4nd)
-  enabled on the monitoring server, or on Livestatus (MK Livestatus or
-  Shinken Livestatus).
+  APIs, RealOpInsight relies either on Livestatus or on 
+  :doc:`ngrt4nd <../adminguide/installing-ngrt4nd>`, a specific daemon 
+  enabled on the monitoring server.
 
-.. note::
+.. _fig-architecture:
 
-  The support of multisource data retrieving is available only
-  since the version 2.4 of the software. Details concerning the
-  integration are described in the :doc:`Configuration Guide <configuration>`.
+.. figure:: ../images/realopinsight-architecture.png
+  :align: center
+  
+  Architecture of RealOpInsight
+ 
+  This architecture shows how it interact with the different kinds 
+  of monitoring systems.
+
+
+.. [#f1]
+  The support of multisource data retrieving has been introduced in the version 2.4 of RealOpInsight. 
+  Details concerning the integration are described in the :doc:`configuration guide <../adminguide/configuration>`.
 

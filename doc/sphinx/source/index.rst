@@ -12,10 +12,10 @@ Contents:
    :maxdepth: 2
 
    glossary
-   overview/overview
-   Getting Started <adminguide/adminguide>
-   Quickstart Tutorials <gettingtstarted/gettingstarted>
-   User/Operator Guide <userguide/userguide>
+   overview/index
+   Getting Started <adminguide/index>
+   Quickstart Tutorials <gettingtstarted/index>
+   User/Operator Guide <userguide/index>
    faq 
 
 
