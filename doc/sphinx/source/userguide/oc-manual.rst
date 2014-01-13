@@ -8,9 +8,9 @@ RealOpInsight Operations Console.
 Prerequisites
 -------------
 
-Ensure that your environment is configured properly as described
-`here`_. Additionally, you would have edited a service view ready use.
-If not, refer to the corresponding `manual`_.
+Ensure that your environment is configured properly. 
+Additionally, you would have edited a service view ready use.
+If not, read the :doc:`corresponding manual <../userguide/editor-manual>`.
 
 
 Run the Operations Console
@@ -32,14 +32,13 @@ Run the Operations Console
     Start->NGRT4N Monitoring Suite -> RealOpInsight Operations Console
 
 
-After `login`_, you shall be invited to select a configuration file
+Sign in, then you shall be invited to select a configuration file
 through a file selection window.
 
 
 Overview of the user interface
 ------------------------------
-The user interface shown on the Figure below consists in four main
-parts:
+The user interface shown below consists in four main parts:
 
 + Menus: accessible via the menu bar or the tools bar.
 + Tree Explorer: gives the preview of the dashboard hierarchy.
@@ -56,9 +55,13 @@ to use as possible:
   hoving). The context menu gives access to various functionalities
   allowing for example to filter the messages related to a given
   service. Furthermore, the tooltip enabled on each service provides
-  detailed information concerning the `properties`_ of the service
-  (name, status, propagation rule, etc).
+  detailed information concerning its different properties (name, status, 
+  propagation rule, etc).
 + The message console can be sorted according to every column (date of
   events, severity, hostname, service, and message). Just click on the
   header of the associated column.
 
+.. figure:: ../images/realopinsight-operations-console.png
+  :align: center
+
+  Overview of the RealOpInsight Operations Console user interface

@@ -63,6 +63,10 @@ The user interface shown on the Figure below consists of:
   add/delete service, reorganization of the tree, etc. 
 + *Edition Pane*: Consists of a form allowing to set or edit the service properties.
 
+.. figure:: ../images/realopinsight-editor.png
+  :align: center
+
+  Overview of the RealOpInsight Editor user interface
 
 Add and edit services
 -------------------------------
