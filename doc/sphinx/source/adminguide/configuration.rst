@@ -81,36 +81,38 @@ As described in the following table, some of configuration parameters
 may be required, optional, or not applicable(NA) at all according to
 the underlying monitoring system.
 
-+-----------------+------------------+----------------------
-| Parameter       | Nagios/derived   | Zabbix/Zenoss             | Description                         |
-| Monitor Web URL | Optional         | Required                  | Sets the URL to the default web     |
-|                 |                  |                           | interface of the monitoring server  |
-|                                                                | E.g1. http://nagios-server/nagios/  |
-                                                                 | E.g2: http://zabbix-server/zabbix/  |
-+                  +                   +                            +
-Auth String       - Required with ngrt4nd
-
-- NA with Livestatus
-
-Required
-
-Sets the token for authenticating against the remote API endpoint:
-
-* With Zabbix and Zenoss, this should be set with a couple
-*login:password* (note the colon *':'* ) representing a valid user
-account. Prior to Zabbix 2.0, this user MUST belong to the group *API
-Access*;
-
-* With ngrt4nd this corresponds to the `authentication token`_.
-Server Address Required NA
-Sets the IP address or the hostname of the monitoring server (e.g.
-nagios-server.lan, shinken-server.example.com, 192.168.1.168)
-Port Required NA
-Sets the port on which ngrt4nd or the Livestatus API is listening on
-on the monitoring server (e.g. 1983 for ngrt4nd)
-Update Interval Required Required Set the interval after which the
-Operations Console will be refreshed with new status information
-retrieved from the monitoring servers
++-----------------+-----------------+----------------------
+| Parameter       | Nagios/derived  | Zabbix/Zenoss | Description                            |
+| Monitor Web URL | Optional        | Required      | Sets the URL to the default web        |
+|                 |                 |               | interface of the monitoring server     |
+|                                                   | E.g1. http://nagios-server/nagios/     |
+                                                    | E.g2: http://zabbix-server/zabbix/     |
+-----------------------------------------------------------------------------------------------
+Auth String       | - Required with | Required      | Sets the token for authenticating 
+                      ngrt4nd                       | against the remote API endpoint: 
+                    - NA with Livestatus              - With Zabbix and Zenoss, this should     
+                                                        be set with a couple *login:password*      
+                                                        (note the colon *':'* ) representing a    
+                                                        valid user account. Prior to Zabbix 2.0, 
+                                                        this user MUST belong to the group *API
+                                                        Access*;
+                                                        - With ngrt4nd this corresponds to the 
+                                                        `authentication token`_
+-----------------------------------------------------------------------------------------------
+Server Address   | Required | NA                     | Sets the IP address or the hostname 
+                                                       of the monitoring server.
+                                                         e.g. server.example.com
+-----------------------------------------------------------------------------------------------                                                             
+Port             | Required | NA                      | Sets the port on which ngrt4nd or 
+                                                        the Livestatus API is listening on
+                                                        on the monitoring server.
+                                                        Eg. 1983 for ngrt4nd
+-----------------------------------------------------------------------------------------------
+Update Interval  | Required | Required                     | Set the interval after which the 
+                                                             Operations Console will be refreshed 
+                                                             with new status information retrieved 
+                                                             from the monitoring servers
+-----------------------------------------------------------------------------------------------
 
 
 Basic Configuration for Single Monitoring Source
