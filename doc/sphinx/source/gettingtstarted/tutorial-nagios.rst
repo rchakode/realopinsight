@@ -5,15 +5,16 @@ Tutorial: using RealOpInsight with Nagios
 This tutorial shows how to use RealOpIinsight with Nagios and its devived systems.
 
 `
-`_Prerequisites
+Prerequisites
 ---------------
+
 Here we assumes that:
 
-+ You have read and understood the `concepts and the architecture`_ of
-  RealOpInsight.
-+ The `Daemon Service for Nagios`_ and RealOpInsight are installed and
-  ready to use. To simplify the tutorial, all these components can be
-  installed on the same machine.
++ You have read and understood the basic concepts of RealOpInsight. 
+  If not, read the corresponding guide.
++ :doc:`ngrt4nd <../adminguide/installing-ngrt4nd>` and RealOpInsight 
+  are installed and ready to use. To simplify the tutorial, all these 
+  components can be installed on the same machine.
 
 
 
@@ -80,7 +81,7 @@ foreground mode is useful for viewing debugging messages in case of
 errors.
 
 Now you have the daemon started and listening on the port 1983
-(`default port`_).
+(default port).
 
 
 Configure your RealOpInsight Environment
@@ -102,8 +103,8 @@ Launch a terminal and start the RealOpInsight configuration wizard.
     Start->NGRT4N Monitoring Suite->RealOpInsight Operations Console
 
 
-Then follow the steps described `here`_ to configure your environment
-properly.
+Then follow the steps described in the configuration guide to set up your 
+environment properly.
 
 
 Launch the Operations Console
@@ -125,10 +126,10 @@ Launch the Operations Console
 
 You will be invited to select a configuration file. Browse through the
 file selection window that will appear to pick the suitable
-configuration file in *C:\Program Files\NGRT4N/examples *(default
+configuration file in *C:\Program Files\NGRT4N/examples* (default
 installation directory).
 
-After `login`_, the interface will be loaded. See `here`_ to learn
+After signing in, the interface will be loaded. See `here`_ to learn
 about the Operations Console's Features. See the `FAQ`_ for the
 default user credentails.
 
