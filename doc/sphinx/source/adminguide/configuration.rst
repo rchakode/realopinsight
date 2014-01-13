@@ -80,14 +80,15 @@ Description of Configuration Parameters
 As described in the following table, some of configuration parameters
 may be required, optional, or not applicable(NA) at all according to
 the underlying monitoring system.
-Parameter Nagios/derived Zabbix/Zenoss Description Monitor Web URL
-Optional Required
 
-Sets the URL to the default web interface of the monitoring server
-(E.g. http://nagios-server/nagios/, http://zabbix-server/zabbix/, http
-://zenoss-server:8080/)
-Auth String
-- Required with ngrt4nd
++-----------------+------------------+----------------------
+| Parameter       | Nagios/derived   | Zabbix/Zenoss             | Description                         |
+| Monitor Web URL | Optional         | Required                  | Sets the URL to the default web     |
+|                 |                  |                           | interface of the monitoring server  |
+|                                                                | E.g1. http://nagios-server/nagios/  |
+                                                                 | E.g2: http://zabbix-server/zabbix/  |
++                  +                   +                            +
+Auth String       - Required with ngrt4nd
 
 - NA with Livestatus
 
