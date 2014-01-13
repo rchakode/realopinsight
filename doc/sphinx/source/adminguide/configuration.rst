@@ -34,8 +34,10 @@ from a former version. This is important to note. Since you don't need
 to care about multi-source handling when your monitoring view rely on
 only a single monitoring source.
 
-Important: If you're using a version earlier than the version 2.4.0,
-we recommand to follow this `configuration guide`_.
+.. warning::
+
+  Important: If you're using a version earlier than the version 2.4.0,
+  we recommand to follow the `former configuration guide`_.
 
 To upgrade to the version 2.4.0, you need to reset your configuration
 settings. Otherwise, the Operations Console would be able to connect
@@ -179,3 +181,4 @@ Let's see how to set the sources. Here are basic steps:
 .. [#shinkenls] http://www.shinken-monitoring.org/wiki/livestatus_shinken
 .. _JSON-RPC: https://www.zabbix.com/wiki/doc/api
 .. _JSON API: http://community.zenoss.org/community/documentation/official_documentation/api
+.. _former configuration guide: http://realopinsight.com/en/index.php?page=configuring-realopinsight-operations-console_v23
