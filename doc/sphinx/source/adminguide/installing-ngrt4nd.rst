@@ -1,11 +1,11 @@
 ======================
-Installion of ngrt4nd
+Installation of ngrt4nd
 ======================
 Ngrt4nd is a daemon that offers the service of retrieving status data 
-from a Nagios installation. It relies on the Nagios's status.dat file, 
-thus due the disc I/O that involves it's less performant and scalable 
-than using Livestatus. It's mainly designed for testing purpose or to 
-quickly have a overview on how RealOpInsight works. 
+from a Nagios installation. It relies on the Nagios's status.dat file. And
+thus, due the disc I/O that this approach involves, it's not performant and is less scalable 
+than using Livestatus. Hence its use is mainly appropriate for testing purpose, notably to 
+quickly have an overview on how RealOpInsight works. 
 
 This document assumes you have read and understood the :doc:`basic concepts of 
 RealOpInsight <../overview/concepts>`.
