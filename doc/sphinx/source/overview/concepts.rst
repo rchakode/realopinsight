@@ -1,4 +1,4 @@
-Dashboard Management Principles
+Dashboard Management
 *************************************************
 .. contents::
 
@@ -158,7 +158,7 @@ There is the list of supported tags (the curly braces are required) :
   the check component. E.g. *check_local_disk.*
 
 
-How RealOpInsight Works
+RealOpInsight Architecture and Operation
 ****************************************************
 
 RealOpInsight provides :

@@ -9,19 +9,19 @@ forward.
 Prerequisites
 -------------
 
-As introduced in the `Concepts Guide`_, RealOpInsight uses different
-approaches to retrieve data from the underlying monitoring servers
-(a.k.a monitoring sources):
+As introduced in the :doc:`concepts guide <../overview/concepts>`, 
+RealOpInsight uses different approaches to retrieve data from the 
+underlying monitoring servers, also called monitoring sources:
 
 
-+ For Zabbix and Zenoss, it relies on their native RPC APIs: `JSON-
-  RPC`_ for Zabbix and `JSON API`_ for Zenoss.
++ For Zabbix and Zenoss, it relies on their native RPC APIs: `JSON-RPC`_ 
+  for Zabbix and `JSON API`_ for Zenoss.
 + To retrieve data from Nagios, Shinken, Icinga, Groundwork, op5,
   Centreon and other Nagios-derived systems that do not enable native
-  APIs, it relies either on a `specific daemon`_ (ngrt4nd) on the
-  monitoring server, or on Livestatus (MKLivestatus or Shinken
-  Livestatus). The Livestatus APIs must be enabled over the network. See
-  `here`_ or `here`_, respectively, to learn how to do that.
+  APIs, it relies either on :doc:`ngrt4nd <../adminguide/installing-ngrt4nd>`, 
+  on MKLivestatus [#mkls]_ or on Shinken Livestatus [#shinkenls]_. 
+  The Livestatus APIs must be enabled over the network. You can see the 
+  :doc:`FAQ <faq>` to learn how to do that.
 
 
 Since the version 2.4.0, RealOpInsight can handle monitoring views
@@ -175,8 +175,7 @@ Let's see how to set the sources. Here are basic steps:
    *Close* to quit the configuration window. You can now use the sources.
 
 
-
-
-Related Links : `Tutorial for Nagios`_ | `Tutorial for Zabbix`_ |
-`Tutorial for Zenoss`_
-
+.. [#mkls] http://mathias-kettner.de/checkmk_livestatus.html
+.. [#shinkenls] http://www.shinken-monitoring.org/wiki/livestatus_shinken
+.. _JSON-RPC: https://www.zabbix.com/wiki/doc/api
+.. _JSON API: http://community.zenoss.org/community/documentation/official_documentation/api
