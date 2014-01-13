@@ -64,4 +64,4 @@ to use as possible:
 .. figure:: ../images/realopinsight-operations-console.png
   :align: center
 
-  Overview of the RealOpInsight Operations Console user interface
+  Overview of RealOpInsight Operations Console's user interface

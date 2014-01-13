@@ -66,7 +66,7 @@ The user interface shown on the Figure below consists of:
 .. figure:: ../images/realopinsight-editor.png
   :align: center
 
-  Overview of the RealOpInsight Editor user interface
+  Overview of RealOpInsight Editor's user interface
 
 Add and edit services
 -------------------------------
