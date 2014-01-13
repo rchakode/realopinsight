@@ -1,0 +1,20 @@
+{# Import the theme's layout. #}
+{% extends "!layout.html" %}
+
+{# Add some extra stuff before and use existing with 'super()' call. #}
+{% block extrahead %}
+    <link rel="stylesheet" href="{{ pathto('_static/ngrt4n.css', 1) }}" type="text/css" />
+  {{ super() }}
+{% endblock %}
+
+{% block footer %}
+  <footer class="footer">
+    <div class="container">
+      <p>
+      &copy; 2010-2013 <a href="http://realopinsight.com">NGRT4N Project</a>. All Rights Reserved. 
+<br/>Read the <a href="http://realopinsight.com/en/index.php/page/legal">Legal Notice</a>. 
+Please <a href="mailto:contact [at] ngrt4n [dot] com">contact us</a> if you have any comment.
+      </p>
+    </div>
+  </footer>
+{% endblock %}

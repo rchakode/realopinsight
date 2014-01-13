@@ -14,7 +14,7 @@ This tutorial assumes that :
 + Your Zenoss installation is running.
 
 
-Use Case
+Use case
 --------
 
 The tutorial is based on the example file

@@ -18,7 +18,7 @@ Here we assumes that:
 
 
 
-Use Case
+Use case
 --------
 
 The tutorial is based on the example files provided with
@@ -129,10 +129,10 @@ file selection window that will appear to pick the suitable
 configuration file in *C:\Program Files\NGRT4N/examples* (default
 installation directory).
 
-After signing in, the interface will be loaded. See `here`_ to learn
-about the Operations Console's Features. See the `FAQ`_ for the
+After signing in, the interface will be loaded. See :doc:`here <../userguide/oc-manual>` 
+to learn more about the Operations Console's Features. See the :doc:`FAQ <../faq>` for the
 default user credentails.
 
-That's all for this tutorial. Now `create your own configurations`_
-and enjoy monitoring with RealOpInsight!!!
+That's all for this tutorial. Now create your own environment and enjoy 
+monitoring with RealOpInsight!!!
 

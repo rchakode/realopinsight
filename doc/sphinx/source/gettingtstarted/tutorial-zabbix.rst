@@ -8,20 +8,20 @@ Prerequisites
 -------------
 This tutorial assumes that :
 
-+ You read and understood the `concepts and the architecture`_ of
-  RealOpInsight.
++ You read and understood the :doc:`basic concepts of 
+  RealOpInsight <../overview/concepts>`.
 + RealOpInsight is installed and ready to use.
-+ Your Zabbix Server as well as its `JSON-RPC API`_ service are
++ Your Zabbix Server as well as its JSON-RPC API service are
   running.
 
 
 
-Use Case
+Use case
 --------
 
 The tutorial is based on the example files provided with
-RealOpInsight. Available in the folder *examples, *the following file:
-
+RealOpInsight. Available in the folder *examples,* the following 
+file:
 
 + *small_hosting_platform.zbx.ngrt4n.xml ***: This
   file contains the configuration describing of our dashboard. This
@@ -64,7 +64,7 @@ Launch a terminal and start the RealOpInsight configuration wizard.
     Start->NGRT4N Monitoring Suite->RealOpInsight Operations Console
 
 
-Then follow the steps described `here`_ to configure your environment
+Then follow the steps described in the configuration manual to set up your environment
 properly.
 
 
@@ -90,16 +90,17 @@ file selection window that will appear to pick a suitable
 configuration file in *C:\Program Files\NGRT4N/examples* (default
 installation directory).
 
-After `login`_, the interface will be loaded. See `here`_ to learn
-about the Operations Console's Features. See the `FAQ`_ for the
-default user credentails.
+After signing in, the interface will be loaded. See :doc:`here 
+<../userguide/oc-manual>` to learn about the Operations Console's 
+Features. See the :doc:`FAQ <../faq>` for the default user credentails.
 
 Note: The configuration file is based on Zabbix 2.0.x. Therefore, if
 you're using a former version, it's possible some services appear as
 unknown. This is due to the fact the names of default triggers vary
 from a version to another. You can edit the configuration file through
-the `Editor Utility`_ to suit your Zabbix configuration.
+the :doc:`RealOpInsight's Editor <../userguide/editor-manual>` to suit 
+your Zabbix configuration.
 
-That's all for this tutorial. Now `create your own configurations`_
-and enjoy monitoring with RealOpInsight!!!
+That's all for this tutorial. Now create your own environment and 
+enjoy monitoring with RealOpInsight!!!
 

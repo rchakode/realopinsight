@@ -27,8 +27,8 @@ Do I need a separate installation of RealOpInsight for the different kinds of mo
 No, independently to the monitoring system you're using, Nagios,
 Zabbix, Zenoss, Icinga, Centreon or whatever, only one installation is
 necessary. The target monitoring system is detected automatically from
-the format of the configuration file that you do set `when editing
-this configuration file`_.
+the format of the configuration file that you do set when editing
+describing the platform to monitor with RealOpInsight.
 
 
 What are the default user credentials?
@@ -91,7 +91,7 @@ Basically, this means that the service shall listen on the port 6557
 and shall forward requests to the UNIX socket located in
 /var/lib/nagios/live (server_args), which is assumed to be the path of
 the native socket managed by the Livestatus NEB. For more details, see
-the `official documentation of MKLivestatus`_.
+the official documentation of MKLivestatus.
 
 
 How to enable Shinken Livestatus API over a TCP socket?
@@ -113,6 +113,6 @@ specific.cfg), and restart Shinken.
 
 
 In short, this means that the service shall listen on any network
-interfaces (host *) on port the 50000 on the Shinken server. For more
-details, see the `official documentation of Shinken`_.
+interfaces (host \*) on port the 50000 on the Shinken server. For more
+details, see the official documentation of Shinken Livestatus.
 
