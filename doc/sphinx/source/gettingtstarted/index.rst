@@ -1,5 +1,5 @@
 #########################################
-Quick Start Tutorial
+Quickstart Tutorials
 #########################################
 
 .. toctree::

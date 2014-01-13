@@ -27,7 +27,7 @@ tree, this example illustrates the monitoring of a web hosting
 platform through a RealOpInsight-based dashboard..
 We need the following files from this folder :
 
-+ *small_hosting_platform.nag.ngrt4n.xml *** : The
++ *small_hosting_platform.nag.ngrt4n.xml*: The
   NGRT4N configuration file describing the monitored platform along with
   its business processes.
 + *status.dat* : The Nagios status file providing the related
