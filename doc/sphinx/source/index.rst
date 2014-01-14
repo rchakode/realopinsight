@@ -14,7 +14,7 @@ Contents:
    glossary
    overview/index
    Getting Started <adminguide/index>
-   Quickstart Tutorials <gettingtstarted/index>
+   QuickStart Tutorials <tutorials/index>
    User/Operator Guide <userguide/index>
    faq 
 
