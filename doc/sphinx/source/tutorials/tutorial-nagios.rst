@@ -4,7 +4,6 @@ Tutorial: using RealOpInsight with Nagios
 
 This tutorial shows how to use RealOpIinsight with Nagios and its devived systems.
 
-`
 Prerequisites
 ---------------
 
