@@ -1,5 +1,5 @@
 =========================================================
-Tutorial: using RealOpInsight with Zenoss
+Tutorial: Using RealOpInsight with Zenoss
 =========================================================
 
 This chapter describes how to use RealOpInsight with Zenoss.
@@ -17,8 +17,8 @@ This tutorial assumes that :
 Use case
 --------
 
-The tutorial is based on the example file
-*small_hosting_platform.zns.ngrt4n.xml* provided with RealOpInsight. This file is located in the directory:
+The tutorial is based on the example file *small_hosting_platform.zns.ngrt4n.xml* 
+provided with RealOpInsight. This file is located in the directory:
 
 
 + *SRC_DIR/examples* from source tree;
@@ -27,8 +27,7 @@ The tutorial is based on the example file
 + *C:\\Program Files\\NGRT4N\\examples* (by default) in Windows systems.
 
 
-In the rest of the tutorial, we'll refer to this folder as
-EXAMPLE_DIR.
+In the rest of the tutorial, we'll refer to this folder as *EXAMPLE_DIR*.
 
 
 Check your Zenoss Installation
@@ -37,7 +36,6 @@ You need to ensure that:
 
 + The version of your Zenoss Server is greater than 3.2.
 + The Zenoss is running.
-
 
 
 Configure your RealOpInsight Environment

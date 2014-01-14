@@ -1,5 +1,5 @@
 ==========================================================
-Tutorial: using RealOpInsight with Zabbix
+Tutorial: Using RealOpInsight with Zabbix
 ==========================================================
 This tutorial shows how to use RealOpInsight with Zabbix.
 

@@ -1,3 +1,5 @@
+.. _basic-concepts:
+
 Dashboard Management
 *************************************************
 
