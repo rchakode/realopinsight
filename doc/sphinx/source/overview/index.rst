@@ -23,10 +23,10 @@ systems such as Nagios, Zabbix and Zenoss is not easy. This may be
 especially challenging when the amount of devices monitored increases.
 
 That's where RealOpInsight comes in, providing a integrated and flexible 
-business intelligence toolkit, that, based on a :doc:`hierarchical 
-service dependency tree model <concepts>`, gives you an accurate insight 
+business intelligence toolkit, that, based on a hierarchical  service 
+dependency tree model <concepts>, gives you an accurate insight 
 on the healthy of your business processes. This chapter introduces its 
-features, its basic concepts and how it works.
+features, its basic concepts and how it works:
 
 
 .. toctree::
