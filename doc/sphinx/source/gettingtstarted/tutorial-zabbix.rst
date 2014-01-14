@@ -20,11 +20,10 @@ Use case
 --------
 
 The tutorial is based on the example files provided with
-RealOpInsight. Available in the folder *examples,* the following 
-file:
+RealOpInsight, and notably:
 
-+ *small_hosting_platform.zbx.ngrt4n.xml ***: This
-  file contains the configuration describing of our dashboard. This
++ The file *examples/small_hosting_platform.zbx.ngrt4n.xml* containing
+  the configuration describing of our dashboard. This
   dashboard relies on some triggers from the default Zabbix server's
   monitoring configuration.
 
