@@ -11,9 +11,9 @@ quickly react when incidents arise:
 + You need to *quickly evaluate the impacts of incidents on your business
   processes*, so as to prioritize their recovery from incidents that
   have higher impacts.
-+ Additionnally, you would need *to report certain incidents to
-  operators able to address them quickly*.
-+ More generally, RealOpInsight helps you answering questions like: 
++ You should be able *to report certain incidents to operators able to 
+  address them quickly*.
++ More generally, you need to quickly answering questions like: 
   what is the current status of my applications/end-user services? which 
   applications/end-user services are affected by a given incident? 
   which services depend on a given hardware device? etc.
