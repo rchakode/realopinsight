@@ -23,7 +23,7 @@ The tutorial is based on the example files provided with
 RealOpInsight, and notably:
 
 + The file *examples/small_hosting_platform.zbx.ngrt4n.xml* containing
-  the configuration describing of our dashboard. This
+  the configuration describing a dashboard. This
   dashboard relies on some triggers from the default Zabbix server's
   monitoring configuration.
 
