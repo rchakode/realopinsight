@@ -170,7 +170,7 @@ RealOpInsight provides :
   and edit the description of service views in a easy way.
 + A :doc:`Configuration Manager <../adminguide/configuration>` to set the parameters to access the
   underlying monitoring servers.
-+ A :doc:`Operations Console <../userguide/oc-manual>` to operate the service 
++ An :doc:`Operations Console <../userguide/oc-manual>` to operate the service 
   views on operations environments.
 
 To make its integration easy, and especially in distributed monitoring
