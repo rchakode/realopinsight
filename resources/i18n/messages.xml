@@ -202,7 +202,7 @@
       <div class="control-group">
             <label for="${id:password}" class="control-label">Password*</label>
          <div class="controls">
-              ${password} <span class="help-inline">${change-password-link}</span><span class="help-inline">${password-info}</span>
+              ${password}<span class="help-inline">${password-info}</span>
           </div>
       </div>
       ${</if:password>}
@@ -262,7 +262,9 @@
       ${</if:registration-date>}
       </fieldset>
       <div class="row form-actions btn-group">
-        <div class="controls">${submit-button} <span>${cancel-button}</span></div>
+        ${submit-button}
+        ${change-password-link}
+        ${cancel-button}
       </div>
     </div>
   </message>

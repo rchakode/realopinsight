@@ -117,13 +117,15 @@ UserFormModel::UserFormModel(const User* user,
     setVisible(CurrentPasswordField, false);
     if (user) {
       setValue(UsernameField, user->username);
-      setValue(PasswordField, Wt::WString("passwordissecret"));
       setValue(FirstNameField, user->firstname);
       setValue(LastNameField, user->lastname);
       setValue(EmailField, user->email);
       setValue(UserLevelField, User::role2Text(user->role));
       setValue(RegistrationDateField, user->registrationDate);
+
+      setVisible(PasswordField, false);
       setVisible(PasswordConfimationField, false);
+
       setWritable(false);
     } else {
       setVisible(RegistrationDateField, false);
@@ -200,9 +202,10 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
     if (m_changePassword) {
       bindString("change-password-link", "");
     } else {
-      Wt::WPushButton* changedPwdAnchor = new Wt::WPushButton("change");
-      bindWidget("change-password-link", changedPwdAnchor);
-      changedPwdAnchor->clicked().connect(std::bind([=, &user]() {
+      Wt::WPushButton* changedPwdButton = new Wt::WPushButton("Change password");
+      changedPwdButton->setStyleClass("btn btn-warning");
+      bindWidget("change-password-link", changedPwdButton);
+      changedPwdButton->clicked().connect(std::bind([=, &user]() {
         m_changePasswordDialog->show();
       }));
     }
