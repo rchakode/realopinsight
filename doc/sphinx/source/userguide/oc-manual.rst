@@ -1,3 +1,5 @@
+.. _oc-manual:
+
 RealOpInsight Operations Console User's Manual
 ==============================================
 

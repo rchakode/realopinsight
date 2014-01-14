@@ -1,3 +1,4 @@
+.. _editor-manual:
 
 RealOpInsight Editor User's Manual
 ==================================

@@ -1,6 +1,7 @@
-======================
+.. _install-ngrt4nd
+
 Installation of ngrt4nd
-======================
+========================
 Ngrt4nd is a daemon that offers the service of retrieving status data 
 from a Nagios installation. It relies on the Nagios's status.dat file. And
 thus, due the disc I/O that this approach involves, it's not performant and is less scalable 

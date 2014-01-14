@@ -147,6 +147,8 @@ threshold) of the total disk space:
 Contextualization Tags
 --------------------------------------------------
 
+.. _contextualization:
+
 There is the list of supported tags (the curly braces are required) :
 
 + {hostname}: shall be replaced with the hostname
@@ -166,12 +168,12 @@ RealOpInsight Architecture and Operation
 
 RealOpInsight provides :
 
-+ A native :doc:`WYSIWYG editor <../userguide/editor-manual>`, which is a real studio to create 
-  and edit the description of service views in a easy way.
-+ A :doc:`Configuration Manager <../adminguide/configuration>` to set the parameters to access the
-  underlying monitoring servers.
-+ An :doc:`Operations Console <../userguide/oc-manual>` to operate the service 
-  views on operations environments.
++ A native :ref:`WYSIWYG editor <editor-manual>`, which is a studio 
+  to create  and edit the description of service views in a easy way.
++ A :ref:`Configuration Manager <config-guide>` to set the parameters to 
+  access the underlying monitoring servers.
++ An :ref:`Operations Console <oc-manual>` to operate the service views 
+  from an operations environment.
 
 To make its integration easy, and especially in distributed monitoring
 environments, the :ref:`fig-architecture` is a loosely-coupled architecture, 

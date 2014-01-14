@@ -34,7 +34,7 @@ In the rest of the tutorial, we'll refer to the source directory with
 the variable *SRCDIR*.
 
 
-Set up the Daemon Service For Nagios
+Set up ngrt4nd
 ------------------------------------
 
 Log on the machine where you installed the daemon service and launch a
@@ -126,8 +126,8 @@ file selection window that will appear to pick the suitable
 configuration file in *C:\\Program Files\\NGRT4N\\examples* (default
 installation directory).
 
-After signing in, the interface will be loaded. See :doc:`here <../userguide/oc-manual>` 
-to learn more about the Operations Console's Features. See the :doc:`FAQ <../faq>` for the
+After signing in, the interface will be loaded. See :ref:`here <oc-manual>` 
+to learn more about the Operations Console's Features. See the :ref:`FAQ <faq>` for the
 default user credentails.
 
 That's all for this tutorial. Now create your own environment and enjoy 
