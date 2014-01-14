@@ -21,16 +21,14 @@ Here we assumes that:
 Use case
 --------
 
-The tutorial is based on the example files provided with
-RealOpInsight. Available in the *examples* directory from the source
-tree, this example illustrates the monitoring of a web hosting
-platform through a RealOpInsight-based dashboard..
-We need the following files from this folder :
+The tutorial is based on the example files provided with RealOpInsight. 
+The example illustrates the monitoring of a web hosting platform using RealOpInsight. 
+We'll need the following files from the source directory:
 
-+ *small_hosting_platform.nag.ngrt4n.xml*: The
++ *examples/small_hosting_platform.nag.ngrt4n.xml*: The
   NGRT4N configuration file describing the monitored platform along with
   its business processes.
-+ *status.dat* : The Nagios status file providing the related
++ *status.dat*: The Nagios status file providing the related
   monitoring data.
 
 In the rest of the tutorial, we'll refer to the source directory with
