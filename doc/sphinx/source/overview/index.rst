@@ -2,7 +2,7 @@
 Overview of RealOpInsight
 #########################################
 
-Basically,the goal of RealOpinsight is to allow you to focus on business needs,
+Basically, the goal of RealOpinsight is to allow you to focus on business needs,
 instead of wasting time on false alerts. Indeed, monitoring in
 demanding operations environments such as Network Operations Centers
 (NOC) and large data centers is highly challenging and requires to
