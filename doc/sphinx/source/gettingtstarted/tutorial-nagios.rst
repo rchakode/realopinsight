@@ -126,7 +126,7 @@ Launch the Operations Console
 
 You will be invited to select a configuration file. Browse through the
 file selection window that will appear to pick the suitable
-configuration file in *C:\Program Files\NGRT4N/examples* (default
+configuration file in *C:\\Program Files\\NGRT4N\\examples* (default
 installation directory).
 
 After signing in, the interface will be loaded. See :doc:`here <../userguide/oc-manual>` 
