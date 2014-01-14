@@ -1,9 +1,9 @@
 Dashboard Management
 *************************************************
 
-This chapter introduces how RealOpInsight manages services and the
-dependency tree, alarm messages, as well as how it integrates with 
-the underlying monitoring systems.
+Here, we introduce how RealOpInsight manages services and the
+dependency tree, alarm messages, as well as how it integrates 
+with the underlying monitoring systems.
 
 Dashboard as a Hierarchy of Services
 ===============================================
