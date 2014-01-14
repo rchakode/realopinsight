@@ -24,7 +24,7 @@ The tutorial is based on the example file
 + *SRC_DIR/examples* from source tree;
 + */usr/share/doc/packages/realopinsight/examples* if you installed
   the software from a Linux binary package
-+ *C:\Program Files\NGRT4N\examples* (by default) in Windows systems.
++ *C:\\Program Files\\NGRT4N\\examples* (by default) in Windows systems.
 
 
 In the rest of the tutorial, we'll refer to this folder as
