@@ -261,7 +261,7 @@
       </div>
       ${</if:registration-date>}
       </fieldset>
-      <div class="row form-actions btn-group">
+      <div class="form-actions btn-group">
         ${submit-button}
         ${change-password-link}
         ${cancel-button}
