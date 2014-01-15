@@ -78,6 +78,7 @@ WebPreferences::WebPreferences(int _userRole)
 
   tpl->bindWidget("livestatus-server", m_livestatusHostField = new Wt::WLineEdit(container));
   tpl->bindWidget("livestatus-port", m_livestatusPortField = new Wt::WLineEdit(container));
+  m_livestatusPortField->setWidth(50);
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField = new Wt::WCheckBox(utils::tr("Use ngrt4nd"), container));
 
   m_livestatusHostField->setEmptyText("server-address");

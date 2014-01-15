@@ -518,10 +518,9 @@ void WebMainUI::createAccountPanel(void)
     int ret = m_dbSession->updateUser(userToUpdate);
     form->showMessage(ret,
                       "Update failed. More details in log.",
-                      "Update completed.");
-  }, std::placeholders::_1));
+                      "Update completed.");}, std::placeholders::_1));
 
-  m_accountPanel = createDialog(tr("Account information").toStdString(), form);
+  m_accountPanel = createDialog(tr("Manage user account").toStdString(), form);
 }
 
 void WebMainUI::createPasswordPanel(void)

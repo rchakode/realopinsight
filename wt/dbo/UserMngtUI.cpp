@@ -185,8 +185,8 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
   m_model = new UserFormModel(user, changePassword, userForm, this);
 
   setTemplateText(tr("userForm-template"));
-  addFunction("id", &WTemplate::Functions::id);
   bindWidget("info-box", m_infoBox);
+  addFunction("id", &WTemplate::Functions::id);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::CurrentPasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
@@ -202,24 +202,27 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
     if (m_changePassword) {
       bindString("change-password-link", "");
     } else {
-      Wt::WPushButton* changedPwdButton = new Wt::WPushButton("Change password");
-      changedPwdButton->setStyleClass("btn btn-warning");
-      bindWidget("change-password-link", changedPwdButton);
-      changedPwdButton->clicked().connect(std::bind([=, &user]() {
-        m_changePasswordDialog->show();
-      }));
+      if (! userForm) {
+        Wt::WPushButton* changedPwdButton = new Wt::WPushButton("Change password");
+        changedPwdButton->setStyleClass("btn btn-warning");
+        bindEmpty("title");
+        bindWidget("change-password-link", changedPwdButton);
+        changedPwdButton->clicked().connect(std::bind([=, &user]() { m_changePasswordDialog->show();}));
+      } else {
+        bindEmpty("change-password-link");
+      }
     }
   } else {
-    bindString("change-password-link", "");
+    bindEmpty("change-password-link");
   }
 
   // Bind buttons, but alter later
   Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
-  bindWidget("submit-button", submitButton);
   Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
+  bindWidget("submit-button", submitButton);
   bindWidget("cancel-button", cancelButton);
-  Wt::WString title = Wt::WString("User information");
 
+  Wt::WString title = Wt::WString("User information");
   if (user) {
     submitButton->setStyleClass("btn-success");
     if (changePassword) {
@@ -410,13 +413,13 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                            Wt::WAnimation::EaseOut, 100);
 
   UserFormView* form(new UserFormView(&user,
-                                          changePassword,
-                                          userForm));
+                                      changePassword,
+                                      userForm));
   form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     form->showMessage(ret,
-                          m_dbSession->lastError(),
-                          "Update completed.");
+                      m_dbSession->lastError(),
+                      "Update completed.");
   }, std::placeholders::_1));
 
   form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
@@ -424,8 +427,8 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                                                     const std::string& newPass) {
     int ret = m_dbSession->updatePassword(login, currentPass, newPass);
     form->showMessage(ret,
-                          m_dbSession->lastError(),
-                          "Password changed.");
+                      m_dbSession->lastError(),
+                      "Password changed.");
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
 

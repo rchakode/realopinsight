@@ -180,8 +180,9 @@
     <div class="form-horizontal">
       ${info-box}
       <fieldset>
+      <legend>User information</legend>
       ${<if:user-name>}
-      <div class="control-group">
+      <div class="row">
             <label for="${id:user-name}" class="control-label">Login*</label>
          <div class="controls">
               ${user-name} <span class="help-inline">${user-name-info}</span>
@@ -190,7 +191,7 @@
       ${</if:user-name>}
 
       ${<if:current-password>}
-      <div class="control-group">
+      <div class="row">
             <label for="${id:current-password}" class="control-label">Current password*</label>
          <div class="controls">
               ${current-password} <span class="help-inline">${current-password-info}</span>
@@ -199,7 +200,7 @@
       ${</if:current-password>}
 
       ${<if:password>}
-      <div class="control-group">
+      <div class="row">
             <label for="${id:password}" class="control-label">Password*</label>
          <div class="controls">
               ${password}<span class="help-inline">${password-info}</span>
@@ -208,7 +209,7 @@
       ${</if:password>}
 
       ${<if:confirm-password>}
-      <div class="control-group">
+      <div class="row">
             <label for="${id:confirm-password}" class="control-label">Verify password*</label>
          <div class="controls">
               ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
@@ -217,7 +218,7 @@
       ${</if:confirm-password>}
 
       ${<if:first-name>}
-      <div class="control-group">
+      <div class="row">
       <label for="${id:first-name}" class="control-label">First name*</label>
         <div class="controls">
           ${first-name} <span class="help-inline">${first-name-info}</span>
@@ -226,7 +227,7 @@
      ${</if:first-name>}
 
      ${<if:last-name>}
-     <div class="control-group">
+     <div class="row">
           <label for="${id:last-name}" class="control-label">Last name*</label>
           <div class="controls">
             ${last-name} <span class="help-inline">${last-name-info}</span>
@@ -235,7 +236,7 @@
      ${</if:last-name>}
 
      ${<if:email>}
-      <div class="control-group">
+      <div class="row">
           <label for="${id:email}" class="control-label">Email*</label>
           <div class="controls">
             ${email} <span class="help-inline">${email-info}</span>
@@ -244,7 +245,7 @@
      ${</if:email>}
 
      ${<if:role>}
-      <div class="control-group">
+      <div class="row">
             <label for="${id:role}" class="control-label">User level*</label>
          <div class="controls">
               ${role} <span class="help-inline">${role-info}</span>
@@ -253,7 +254,7 @@
      ${</if:role>}
 
       ${<if:registration-date>}
-      <div class="control-group">
+      <div class="row">
             <label for="${id:registration-date}" class="control-label">Registration*</label>
          <div class="controls">
               ${registration-date} <span class="help-inline">${registration-date-info}</span>
