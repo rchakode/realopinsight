@@ -265,6 +265,6 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
                                                       .arg(utils::severityText(node.severity), node.name).toStdString()));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", rootNode().name.toStdString());
-  tpl->bindString("timestamp", Wt::WString(tr("Since ").toStdString()) + utils::wTimeToNow(node.check.last_state_change));
+  tpl->bindString("timestamp", utils::wTimeToNow(node.check.last_state_change));
   return tpl;
 }

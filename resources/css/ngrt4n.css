@@ -104,23 +104,20 @@ body, html {
   background-color: #f8f8ff;  
 }
 .severity-normal {
-  margin: 2px; 
-  background-color: #00FF00; 
+  background-color: #00ff00; 
 }
 .severity-minor {
-  margin: 2px; 
-  background-color: #FFFF00;
+  background-color: #ffff00;
 }
-.severity-major {
-  margin: 2px; 
+.severity-major { 
   background-color: #FFA500;
 }
 .severity-critical {
   padding: 0 5px; 
-  background: #FF0000;
+  background: #ff0000;
 }
 .severity-unknown {
-  background-color: #C0C0C0;
+  background-color: #c0c0c0;
 }
 
 
@@ -157,7 +154,6 @@ body, html {
 .event-feed-item {
   width: 100%;
   font-size: 0.8em;
-  background: red;
 }
 
 .event-feed-item .status-icon {

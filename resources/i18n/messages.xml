@@ -113,7 +113,7 @@
         ${event-feed-title}
         <p>${event-feed-details}</p>
       </div>
-      <div class="clearfix"> </div>
+      <div class="clearfix"></div>
       <div class="event-feed-footer">${platform} <span class="right">${timestamp}</span></div>
     </div>
   </message>
@@ -295,7 +295,8 @@
 
   <message id="copyright-footer.tpl">
     ${software} ${version} - <a href="#">Support</a> - <a href="#">Documentation</a><br />
-    Copyright &copy; 2010-${release-year} NGRT4N Project - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+    Copyright &copy; 2010-${release-year} NGRT4N Project -
+    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
   </message>
 
   <message id="view-assignment-tpl">
