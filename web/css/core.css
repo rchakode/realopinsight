@@ -1,3 +1,50 @@
+/* ---------- FONT ---------- */
+@font-face {
+  font-family: ProximaNova;
+  src:url('/en/uploads/fonts/ProximaNova-Reg-webfont.eot');
+  src:url('/en/uploads/fonts/ProximaNova-Reg-webfont.eot?#iefix') format('embedded-opentype'),
+    url('/en/uploads/fonts/ProximaNova-Reg-webfont.woff') format('woff'),
+    url('/en/uploads/fonts/ProximaNova-Reg-webfont.ttf') format('truetype'),
+    url('/en/uploads/fonts/ProximaNova-Reg-webfont.svg') format('svg');
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: ProximaNovaLight;
+  src:url('/en/uploads/fonts/ProximaNova-Light-webfont.eot');
+  src:url('/en/uploads/fonts/ProximaNova-Light-webfont.eot?#iefix') format('embedded-opentype'),
+    url('/en/uploads/fonts/ProximaNova-Light-webfont.woff') format('woff'),
+    url('/en/uploads/fonts/ProximaNova-Light-webfont.ttf') format('truetype'),
+    url('/en/uploads/fonts/ProximaNova-Light-webfont.svg') format('svg');
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: ProximaNovaBold;
+  src:url('/en/uploads/fonts/ProximaNova-Sbold-webfont.eot');
+  src:url('/en/uploads/fonts/ProximaNova-Sbold-webfont.eot?#iefix') format('embedded-opentype'),
+    url('/en/uploads/fonts/ProximaNova-Sbold-webfont.woff') format('woff'),
+    url('/en/uploads/fonts/ProximaNova-Sbold-webfont.ttf') format('truetype'),
+    url('/en/uploads/fonts/ProximaNova-Sbold-webfont.svg') format('svg');
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: ProximaNovaItalic;
+  src:url('/en/uploads/fonts/ProximaNova-RegIt-webfont.eot');
+  src:url('/en/uploads/fonts/ProximaNova-RegIt-webfont.eot?#iefix') format('embedded-opentype'),
+    url('/en/uploads/fonts/ProximaNova-RegIt-webfont.woff') format('woff'),
+    url('/en/uploads/fonts/ProximaNova-RegIt-webfont.ttf') format('truetype'),
+    url('/en/uploads/fonts/ProximaNova-RegIt-webfont.svg') format('svg');
+  font-weight: normal;
+  font-style: normal
+}
+
+
+
 /* Main content div */
 div#main {
     font-size: 1.2em;
@@ -9,23 +56,23 @@ div#main h2 {
 	padding-top: 1em;
 	padding-bottom: 1px;
 	margin: 0.75em 0 0.5em 0;
-        font: 16px 'ApexSansBook', Helvetica, Arial, sans-serif; 	
+  font: 16px 'ProximaNova', Helvetica, Arial, sans-serif; 	
 	text-align: left;
-        text-transform: uppercase;
+  text-transform: uppercase;
 	border-bottom: 1px solid #899092;
-        width: 80%;
+  width: 80%;
 }
 div#main h3 {
 	color: #294B5F;
 	margin: 1em 0 0.25em 0;
-        font:14px/50px 'ApexSansBook', Helvetica, Arial, sans-serif; 
+        font:14px/50px 'ProximaNova', Helvetica, Arial, sans-serif; 
 	font-size: 1.25em;
 	line-height: 1.25em;
 }
 div#main h4 {
 	color: #294B5F;
 	margin:  0.75em 0 0.25em 0;
-        font:14px/50px 'ApexSansBook', Helvetica, Arial, sans-serif; 
+        font:14px/50px 'ProximaNova', Helvetica, Arial, sans-serif; 
 	font-size: 1.1em;
 	line-height: 1.2em;
         font-weight: bold;
@@ -33,7 +80,7 @@ div#main h4 {
 
 div#main h5 {
 	color: #294B5F;
-        font:12px/50px 'ApexSansBook', Helvetica, Arial, sans-serif; 
+        font:12px/50px 'ProximaNova', Helvetica, Arial, sans-serif; 
 	font-size: 1.1em;
 	line-height: 1.3em;
 	margin: 0 0 0.25em 0;
@@ -236,7 +283,7 @@ mark, rp, rt, ruby, summary, time {display:inline}
 /* Global properties */
 
 body {
-  font-family: "ApexSansBook", "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Arial, 
+  font-family: "ProximaNova", "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Arial, 
 sans-serif;
   color: #000; 
   line-height: 1.4em;
@@ -252,7 +299,7 @@ sans-serif;
 h1 { 
   float: left;
   padding: 23px 0 0 30px;
-  font-family: 'ApexSansBook', Helvetica, Arial, sans-serif; 
+  font-family: 'ProximaNova', Helvetica, Arial, sans-serif; 
 }
 
 #top_nav {
@@ -302,7 +349,7 @@ h1 {
 }
 
 .text {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.2em;
   color: #fff;
   padding: 43px 0 0 45px;
@@ -376,7 +423,7 @@ h1 {
 #gallery {
   position: relative;
   height: 413px;
-  width: 530px;
+  width: 500px;
   float: right;
   padding-right: 30px;
 }
@@ -609,30 +656,6 @@ img {vertical-align:top}
 embed {vertical-align:top}
 * {border:none}
 
-
-/* ---------- FONT ---------- */
-
-@font-face {
-  font-family: 'ApexSansBook';
-  src:url('/en/uploads/fonts/ApexSans-Book.eot');
-  src:url('/en/uploads/fonts/ApexSans-Book.eot?#iefix') format('embedded-opentype'),
-      url('/en/uploads/fonts/ApexSans-Book.woff') format('woff'),
-      url('/en/uploads/fonts/ApexSans-Book.ttf') format('truetype'),
-      url('/en/uploads/fonts/ApexSans-Book.svg#ApexSansBook') format('svg');
-  font-weight:normal;
-  font-style:normal;
-}
-@font-face {
-  font-family:'ApexSansMedium';
-  src:url('/en/uploads/fonts/ApexSans-Medium.eot');
-  src:url('/en/uploads/fonts/ApexSans-Medium.eot?#iefix') format('embedded-opentype'),
-      url('/en/uploads/fonts/ApexSans-Medium.woff') format('woff'),
-      url('/en/uploads/fonts/ApexSans-Medium.ttf') format('truetype'),
-      url('/en/uploads/fonts/ApexSans-Medium.svg#ApexSansBook') format('svg');
-  font-weight:normal;
-  font-style:normal;
-}
-
 /* ---------- DEFINITION ---------- */
 div#lefthome {
   float: left;
@@ -646,7 +669,7 @@ div#righthome {
 } 
 
 div#righthome p.hightlight{
-  font:12px 'ApexSansBook', Helvetica, Arial, sans-serif;
+  font:12px 'ProximaNova', Helvetica, Arial, sans-serif;
   font-weight: bold;
 } 
 .slide-show {
@@ -658,7 +681,7 @@ div#righthome p.hightlight{
    -webkit-border-radius:15px;
    width: 100%;
    padding: 15px;
-   font:14px 'ApexSansBook', Helvetica, Arial, sans-serif;
+   font:14px 'ProximaNova', Helvetica, Arial, sans-serif;
    z-index:0;
    background-color:  #F8F8FF;
 }

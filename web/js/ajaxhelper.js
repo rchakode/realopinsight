@@ -28,14 +28,14 @@ $(document).ready(function() {
 });
 
 $.xmlrpc({
-  url: 'http://blog.realopinsight.com/nucleus/xmlrpc/server.php',
+  url: 'http://labs.realopinsight.com/nucleus/xmlrpc/server.php',
   methodName: 'mt.getRecentPostTitles',
   params: ['1','ajax', 'A2Z3E4R5T6Y7U8I9O0P', 2],
   success: function(response, status, jqXHR) {
     var content = "";
     var count = response.length;
     for (i=0; i<count; i++) {
-      content += '<li><a href="http://blog.realopinsight.com/index.php?itemid='
+      content += '<li><a href="http://labs.realopinsight.com/index.php?itemid='
                               +response[i].postid+'" target="_blank">'+response[i].title+'</a></li>';
     }
     $("#blogupdates").html(content);
