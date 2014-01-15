@@ -171,6 +171,11 @@ void GuiDashboard::updateChart(void)
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
 }
 
+void GuiDashboard::updateEventFeeds(const NodeT& node)
+{
+  //TODO
+}
+
 void GuiDashboard::buildTree(void)
 {
   m_tree->build();

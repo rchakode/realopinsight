@@ -100,6 +100,7 @@ protected:
   virtual void updateTree(const NodeT& _node, const QString& _tip);
   virtual void updateMsgConsole(const NodeT& _node);
   virtual void updateChart(void);
+  virtual void updateEventFeeds(const NodeT& node);
 
 private:
   enum {
