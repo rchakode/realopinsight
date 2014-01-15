@@ -113,7 +113,6 @@ body, html {
   background-color: #FFA500;
 }
 .severity-critical {
-  padding: 0 5px; 
   background: #ff0000;
 }
 .severity-unknown {
