@@ -632,17 +632,20 @@ void WebMainUI::createAboutDialog(void)
   m_aboutDialog = new Wt::WDialog(m_mainWidget);
   m_aboutDialog->setTitleBarEnabled(false);
   m_aboutDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
+
+  Wt::WPushButton* closeButton(new Wt::WPushButton(tr("Close").toStdString()));
+  closeButton->clicked().connect(std::bind([=](){m_aboutDialog->accept();}));
+
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), m_aboutDialog->contents());
+
   tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
+  tpl->bindString("corelib-version", utils::libVersion().toStdString());
   tpl->bindString("codename", REL_NAME.toStdString());
   tpl->bindString("release-id", REL_INFO.toStdString());
   tpl->bindString("release-year", REL_YEAR.toStdString());
   tpl->bindString("package-url", PKG_URL.toStdString());
   tpl->bindString("bug-report-email", REPORT_BUG.toStdString());
-
-  Wt::WPushButton* closeButton(new Wt::WPushButton(tr("Close").toStdString()));
-  closeButton->clicked().connect(std::bind([=](){m_aboutDialog->accept();}));
   tpl->bindWidget("close-button", closeButton);
 }
 

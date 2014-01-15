@@ -10,7 +10,7 @@
   <div>
      <!-- Content Pane -->
       <div class="ngrt4n-content-pane">
-        <h3>Welcome – Getting Started in 3 Easy Steps</h3>
+        <h3>Welcome – Getting Started in 3 Easy Steps !</h3>
         <div class="ngrt4n-content">
           <!-- 1st thumnail -->
           <div class="span-one-third">
@@ -294,7 +294,7 @@
 
   <message id="copyright-footer.tpl">
     ${software} ${version} - <a href="#">Support</a> - <a href="#">Documentation</a><br />
-    &copy; 2010-${release-year} NGRT4N Project - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
+    Copyright &copy; 2010-${release-year} NGRT4N Project - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Privacy</a>
   </message>
 
   <message id="view-assignment-tpl">
@@ -395,14 +395,20 @@
   <message id="about-tpl">
     <div>
      <div>
-       <legend>${software}</legend>
-       <p>BSM dashboard software for complex IT environements.</p>
-       <p>Version ${version} (codename: ${codename})<br />
-         Release ID: ${release-id} <br/>
-         Copyright &copy; 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
-         Visit <a href="${package-url}" target="_blank">${package-url}</a> for more information.
+       <legend>${software} ${version}</legend>
+       <p class="pull-left">
+         <img src="/images/built-in/logo.png" />
        </p>
-       <p>Report Bugs: ${bug-report-email}</p>
+       <p class="pull-right">
+          Codename: ${codename}<br />
+          Core Library: ${corelib-version}<br />
+          Release ID: ${release-id}
+       </p>
+       <div class="clearfix"></div>
+       <p>
+          Copyright &copy; 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
+          Read the <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
+       </p>
      </div>
      <div style="float: right;">${close-button}</div>
     </div>

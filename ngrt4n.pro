@@ -21,11 +21,12 @@
 QT	+= core gui xml svg webkit network script
 CONFIG += no_keywords
 TEMPLATE = app
-VERSION_=2.5.0
-VERSION = "-$${VERSION_}"
+BASE_VERSION=2.5.0
+VERSION = "-$${BASE_VERSION}"
 LIBS += -lrealopinsight
 
 config-gui-base {
+PACKAGE_VERSION = "$${BASE_VERSION}-SE"
 HEADERS	+= include/client/Auth.hpp \
     include/client/GraphView.hpp \
     include/client/PieChart.hpp \
@@ -79,6 +80,7 @@ TARGET = ngrt4n-editor
 
 
 config-web {
+PACKAGE_VERSION = "$${BASE_VERSION}-UE"
 TARGET = bin/ngrt4n-web.bin
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
@@ -141,7 +143,7 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
-DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
+DEFINES *= "PACKAGE_VERSION='\"$${PACKAGE_VERSION}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
 DEFINES *= "RELEASE_YEAR='\"2014\"'"
