@@ -21,7 +21,7 @@
 QT	+= core gui xml svg webkit network script
 CONFIG += no_keywords
 TEMPLATE = app
-VERSION_=3.0.0
+VERSION_=2.5.0
 VERSION = "-$${VERSION_}"
 LIBS += -lrealopinsight
 

@@ -67,6 +67,9 @@ namespace utils
   inline QString realCheckId(const QString& srcid, const QString& chkid)
   { return QString("%1:%2").arg(srcid, chkid);}
 
+  inline QString libVersion(void)
+  { return PKG_VERSION; }
+
   QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
