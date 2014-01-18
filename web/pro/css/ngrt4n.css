@@ -1,3 +1,7 @@
+body {
+  /* background-color: #f1f1f1;*/
+}
+
 .jumbotron h1,
 .jumbotron .h1 {
   line-height: 1;
@@ -18,8 +22,8 @@
 
 @media screen and (min-width: 768px) {
   .jumbotron {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 0em;
+    padding-bottom: 0em;
     background-color: transparent;
   }
   .container .jumbotron {
@@ -32,7 +36,25 @@
   }
 }
 
-
-.splash .bg-white {
-  background-color: #FFF;
+.splash {
+  padding-top:2em;
+  padding-bottom: 1em;
 }
+
+.page-header {
+  background-color: #f1f1f1;
+  margin: 0;
+  padding-top: 3em;
+  padding-bottom: 1em;
+}
+
+.splash .thumbnail  {
+  text-align: left;
+  min-height: 17em;
+}
+
+.option-quicklinks .thumbnail {
+  border: none;
+}
+
+
