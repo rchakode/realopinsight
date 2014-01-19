@@ -75,11 +75,12 @@ body {
 
 .carousel-caption h1 {
   font-size: 56px;
+  color: #f57a00;
 }
 
 .carousel-caption p {
   font-size: 1.5em;
-  color: gray ;
+  color: #000 ;
 }
 
 .carousel-inner img {
@@ -91,5 +92,5 @@ body {
   background-color: #f1f1f1;
 }
 .carousel-indicators .active {
-  background-color: orange;
+  background-color: #f57a00;
 }
