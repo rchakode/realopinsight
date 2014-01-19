@@ -42,7 +42,6 @@ body {
 }
 
 .page-header {
-  background-color: #f1f1f1;
   margin: 0;
   padding-top: 3em;
   padding-bottom: 1em;
@@ -74,8 +73,23 @@ body {
   text-align: left;
 }
 
+.carousel-caption h1 {
+  font-size: 56px;
+}
+
+.carousel-caption p {
+  font-size: 1.5em;
+  color: gray ;
+}
 
 .carousel-inner img {
   position: relative;
   float: right;
+}
+
+.carousel-indicators li {
+  background-color: #f1f1f1;
+}
+.carousel-indicators .active {
+  background-color: orange;
 }
