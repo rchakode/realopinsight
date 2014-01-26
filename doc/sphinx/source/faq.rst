@@ -34,8 +34,6 @@ describing the platform to monitor with RealOpInsight.
 
 What are the default user credentials?
 --------------------------------------
-{adsense ad_client="ca-pub-8497973273552052" ad_width="300"
-ad_height="250" ad_slot="3707764170"}
 Here is the list of the default user profiles:
 Operator User (Limited Privileges)
 
