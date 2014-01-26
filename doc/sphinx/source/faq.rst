@@ -66,7 +66,6 @@ and restart xinetd. This configuration should look as follows:
 
 ::
 
-    {literal}
     service livestatus
     {
     	type = UNLISTED
@@ -83,7 +82,6 @@ and restart xinetd. This configuration should look as follows:
     	server_args = /var/lib/nagios/rw/live
     	disable = no
     }
-    {/literal}
 
 
 Basically, this means that the service shall listen on the port 6557
@@ -101,14 +99,13 @@ specific.cfg), and restart Shinken.
 
 ::
 
-    {literal}
     define module {
       module_name Livestatus 
       module_type livestatus
       host *
       port 50000
       socket /usr/local/shinken/var/rw/live
-    } {/literal}
+    }
 
 
 In short, this means that the service shall listen on any network
