@@ -103,7 +103,7 @@ void WebMainUI::showUserHome(void)
   std::string homeTabTitle = "Home";
   std::string internalPath = "/";
   if (m_dbSession->loggedUser().role == User::AdmRole) {
-    homeTabTitle = tr("Quick Start").toStdString();
+    homeTabTitle = tr("Administration").toStdString();
     internalPath = "/quick-start";
   } else {
     homeTabTitle =  tr("Tactical Overview").toStdString();
@@ -147,21 +147,16 @@ void WebMainUI::createMainUI(void)
 
 void WebMainUI::setupAdminMenus(void)
 {
-  m_mgntMenu = new Wt::WMenu(m_contents);
-  m_navbar->addMenu(m_mgntMenu, Wt::AlignLeft);
-  Wt::WPopupMenu* mgntPopupMenu = new Wt::WPopupMenu();
-  Wt::WMenuItem* curItem = new Wt::WMenuItem(tr("Management").toStdString());
-  curItem->setMenu(mgntPopupMenu);
-  m_mgntMenu->addItem(curItem);
-
+  Wt::WStackedWidget* mgntContents = new Wt::WStackedWidget(m_mainWidget);
+  m_mgntTopMenu = new Wt::WMenu(mgntContents, m_mainWidget);
 
   // Menus for view management
-  mgntPopupMenu->addSectionHeader("View");
-  mgntPopupMenu->addItem("Import")
+  m_mgntTopMenu->addSectionHeader("View");
+  m_mgntTopMenu->addItem("Import")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
-  mgntPopupMenu->addItem("Preview")
+  m_mgntTopMenu->addItem("Preview")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-  mgntPopupMenu->addItem("Assign/revoke/delete")
+  m_mgntTopMenu->addItem("Assign/revoke/delete")
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->resetModelData();
     m_viewAssignmentDialog->show();
@@ -170,18 +165,18 @@ void WebMainUI::setupAdminMenus(void)
   // Menus for user management
   m_userMgntUI = new UserMngtUI(m_dbSession);
   m_contents->addWidget(m_userMgntUI);
-  mgntPopupMenu->addSectionHeader("User");
-  mgntPopupMenu->addItem("Add")
+  m_mgntTopMenu->addSectionHeader("User");
+  m_mgntTopMenu->addItem("Add")
       ->triggered().connect(std::bind([=](){
     showUserMngtPage(m_contents, UserMngtUI::AddUserAction);
   }));
-  mgntPopupMenu->addItem("List")
+  m_mgntTopMenu->addItem("List")
       ->triggered().connect(std::bind([=](){
     showUserMngtPage(m_contents, UserMngtUI::ListUserAction);
   }));
 
-  mgntPopupMenu->addSectionHeader("Settings");
-  mgntPopupMenu->addItem("Update Settings")
+  m_mgntTopMenu->addSectionHeader("Settings");
+  m_mgntTopMenu->addItem("Update Settings")
       ->triggered().connect(std::bind([=](){
     m_preferenceDialog->show();
   }));
@@ -216,7 +211,7 @@ void WebMainUI::setupMenus(void)
   User loggedUser = m_dbSession->loggedUser();
 
   // Setup the main menu
-  Wt::WMenu* mainMenu (new Wt::WMenu(m_contents));
+  Wt::WMenu* mainMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
   mainMenu->addItem(tr("Home").toStdString(), m_dashtabs); //Fixme: use home icon
   setupAdminMenus();
@@ -224,11 +219,6 @@ void WebMainUI::setupMenus(void)
 
   // Setup profile menu
   m_mainProfileMenuItem->setText(tr("You're %1").arg(loggedUser.username.c_str()).toStdString());
-  if(loggedUser.role == User::AdmRole) {
-    m_mgntMenu->show();
-  } else {
-    m_mgntMenu->hide();
-  }
 
   //FIXME: add this after the first view loaded
   m_navbar->addWidget(createToolBar());
@@ -467,37 +457,15 @@ void WebMainUI::scaleMap(double factor)
 Wt::WWidget* WebMainUI::createUserHome(void)
 {
   m_userHomeTpl = new Wt::WTemplate();
-
   m_userHomeTpl->bindWidget("footer", utils::footer());
-
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
-    m_userHomeTpl->bindWidget("andhor-load-file",
-                              createAnchorForHomeLink(tr("Preview a view").toStdString(),
-                                                      tr("Ensure it meets your requirements").toStdString(),
-                                                      ngrt4n::LINK_LOAD));
-    m_userHomeTpl->bindWidget("andhor-import-file",
-                              createAnchorForHomeLink(tr("Upload a view").toStdString(),
-                                                      tr("Preview, assign and operate").toStdString(),
-                                                      ngrt4n::LINK_IMPORT));
+    m_userHomeTpl->bindWidget("menu", m_mgntTopMenu);
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
   }
   return m_userHomeTpl;
 }
-
-
-Wt::WAnchor* WebMainUI::createAnchorForHomeLink(const std::string& title,
-                                                const std::string& desc,
-                                                const std::string& internalPath)
-{
-  Wt::WAnchor* anchor(new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath,internalPath),
-                                      "<h4 class='list-group-item-heading'>"+title+"</h4>"
-                                      "<p class='list-group-item-text'>"+desc+"</p>"));
-  anchor->addStyleClass("list-group-item active");
-  return anchor;
-}
-
 
 void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
 {

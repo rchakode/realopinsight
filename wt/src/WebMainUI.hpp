@@ -75,7 +75,7 @@ private:
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_contents;
   Wt::WNavigationBar* m_navbar;
-  Wt::WMenu* m_mgntMenu;
+  Wt::WMenu* m_mgntTopMenu;
   Wt::WMenu* m_profileMenu;
   Wt::WMenuItem* m_mainProfileMenuItem;
   Wt::WTabWidget* m_dashtabs;

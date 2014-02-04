@@ -10,25 +10,56 @@
   <div>
      <!-- Content Pane -->
       <div class="ngrt4n-content-pane">
-        <h3>Welcome – Getting Started in 3 Easy Steps !</h3>
+        {$contents}
+      </div>
+      <!-- Quick Links Pane -->
+      <div class="ngrt4n-side-pane">
+        <h3>Actions</h3>
         <div class="ngrt4n-content">
-          <!-- 1st thumnail -->
-          <div class="span-one-third">
-             <div class="thumbnail">
-               <div class="title">Setup the business views for your target platforms</div>
-               <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-               <p>Using the RealOpinsight Editor, describe and edit the target platform,
-               the related services, as well as the business rules that bind them to each other.
-               The Editor is an effective studio to modelize, in an easy and simply way,
-               any kind of complex platforms you may have.
-               </p>
-               <p><a href="http://realopinsight.com/en/index.php/page/documentation"
-               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-             </div>
+          <!-- List actions -->
+          <div class="span2 list-group">
+            <!--
+            ${andhor-import-file}
+            ${andhor-load-file}
+            -->
+            ${menu}
           </div>
+        </div>
+      </div>
 
-          <!-- 2nd thumnail -->
-          <div class="span-one-third">
+      <div class="footer fixed-footer">
+        ${footer}
+      </div>
+
+    </div> <!-- content-container -->
+  </message>
+
+
+  <message id="getting-started.tpl">
+  <div>
+    <h3>Welcome – Getting Started in 3 Steps !</h3>
+    <div class="ngrt4n-content">
+
+    <!-- 1st thumnail -->
+    <div class="span-one-third">
+         <div class="thumbnail">
+            <div class="title">
+              Setup the business views for your target platforms
+            </div>
+            <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+            <p>Using the RealOpinsight Editor, describe and edit the target platform,
+            the related services, as well as the business rules that bind them to each other.
+            The Editor is an effective studio to modelize, in an easy and simply way,
+            any kind of complex platforms you may have.
+            </p>
+            <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+            class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
+            </p>
+         </div>
+    </div>
+
+    <!-- 2nd thumnail -->
+    <div class="span-one-third">
             <div class="thumbnail">
               <div class="title">Configure the access to your monitoring data</div>
               <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
@@ -39,43 +70,28 @@
               <p><a href="http://realopinsight.com/en/index.php/page/documentation"
               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
             </div>
-          </div>
+    </div>
 
-          <!-- Third thumnail -->
-          <div class="span-one-third">
-            <div class="thumbnail">
-              <div class="title">Upload, preview and assign the views to your staff</div>
-                <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-                <p>Upload the created views within the RealOpInsight server, then preview and
+
+    <!-- Third thumnail -->
+    <div class="span-one-third">
+        <div class="thumbnail">
+           <div class="title">Upload, preview and assign the views to your staff
+           </div>
+           <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
+           <p>Upload the created views within the RealOpInsight server, then preview and
                 assign then to your operations staff. RealOpInsight provides full control
                 of administration requirements, such as role, access control,
                 authentication and integration to external systems like LDAP.
                 </p>
-                <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+           <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-            </div>
-          </div>
         </div>
-      </div>
-      <!-- Quick Links Pane -->
-      <div class="ngrt4n-side-pane">
-        <h2>I'm ready</h2>
+    </div>
+  </div>
+  </div>
+ </message>
 
-        <div class="ngrt4n-content">
-          <!-- List actions -->
-          <div class="span2 list-group">
-            ${andhor-import-file}
-            ${andhor-load-file}
-          </div>
-        </div>
-      </div>
-
-       <div class="footer fixed-footer">
-          ${footer}
-       </div>
-
-    </div> <!-- content-container -->
-  </message>
 
   <message id="operator-home.tpl">
   <div class="ngrt4n-operator-page">
@@ -292,6 +308,17 @@
        ${footer}
     </div>
   </message>
+
+  <message id="mgnt-home.tpl">
+    <div class="ngrt4n-content-pane">
+      <div class="pull-left">${menu}</div>
+      <div class="ngrt4n-content pull-right">${contents}</div>
+    </div>
+    <div class="footer fixed-footer clearfix">
+       ${footer}
+    </div>
+  </message>
+
 
   <message id="copyright-footer.tpl">
     ${software} ${version} - <a href="#">Support</a> - <a href="#">Documentation</a><br />
