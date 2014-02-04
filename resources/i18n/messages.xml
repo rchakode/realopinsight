@@ -10,7 +10,7 @@
   <div>
      <!-- Content Pane -->
       <div class="ngrt4n-content-pane">
-        {$contents}
+        ${contents}
       </div>
       <!-- Quick Links Pane -->
       <div class="ngrt4n-side-pane">

@@ -141,6 +141,9 @@ public:
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const User& user);
   void showDestinationView(int dest);
+  UserFormView* userForm() {return m_userForm;}
+  Wt::WContainerWidget* userListContainer(void) {return m_userListContainer;}
+  Wt::WWidget* createUserList(void);
 
 private:
   DbSession* m_dbSession;
@@ -151,7 +154,6 @@ private:
   std::map<int, Wt::WMenuItem*> m_menus;
 
   void addJsEventScript(void);
-  Wt::WWidget* createUserList(void);
   Wt::WWidget* createMainUI(void);
 };
 

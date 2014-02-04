@@ -74,6 +74,7 @@ private:
   WebPreferences* m_preferenceDialog;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_contents;
+  Wt::WStackedWidget* m_mgntContents;
   Wt::WNavigationBar* m_navbar;
   Wt::WMenu* m_mgntTopMenu;
   Wt::WMenu* m_profileMenu;
@@ -114,7 +115,6 @@ private:
   void scaleMap(double factor);
   Wt::WWidget* createUserHome(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,const std::string& desc,const std::string& internalPath);
-  void showUserMngtPage(Wt::WStackedWidget* contents, int destination);
   void createAccountPanel(void);
   void createPasswordPanel(void);
   void createViewAssignmentDialog(void);

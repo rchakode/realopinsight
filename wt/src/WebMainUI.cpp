@@ -147,8 +147,10 @@ void WebMainUI::createMainUI(void)
 
 void WebMainUI::setupAdminMenus(void)
 {
-  Wt::WStackedWidget* mgntContents = new Wt::WStackedWidget(m_mainWidget);
-  m_mgntTopMenu = new Wt::WMenu(mgntContents, m_mainWidget);
+  m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
+  m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
+
+  m_mgntTopMenu->addItem("Home", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
 
   // Menus for view management
   m_mgntTopMenu->addSectionHeader("View");
@@ -164,16 +166,10 @@ void WebMainUI::setupAdminMenus(void)
 
   // Menus for user management
   m_userMgntUI = new UserMngtUI(m_dbSession);
-  m_contents->addWidget(m_userMgntUI);
+  //m_contents->addWidget(m_userMgntUI);
   m_mgntTopMenu->addSectionHeader("User");
-  m_mgntTopMenu->addItem("Add")
-      ->triggered().connect(std::bind([=](){
-    showUserMngtPage(m_contents, UserMngtUI::AddUserAction);
-  }));
-  m_mgntTopMenu->addItem("List")
-      ->triggered().connect(std::bind([=](){
-    showUserMngtPage(m_contents, UserMngtUI::ListUserAction);
-  }));
+  m_mgntTopMenu->addItem("Add", m_userMgntUI);
+  m_mgntTopMenu->addItem("List", m_userMgntUI);
 
   m_mgntTopMenu->addSectionHeader("Settings");
   m_mgntTopMenu->addItem("Update Settings")
@@ -460,6 +456,7 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   m_userHomeTpl->bindWidget("footer", utils::footer());
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
+    m_userHomeTpl->bindWidget("contents", m_mgntContents);
     m_userHomeTpl->bindWidget("menu", m_mgntTopMenu);
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
@@ -467,12 +464,6 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   return m_userHomeTpl;
 }
 
-void WebMainUI::showUserMngtPage(Wt::WStackedWidget* contents, int destination)
-{
-  contents->setCurrentWidget(m_userMgntUI);
-  setInternalPath("/users");
-  m_userMgntUI->showDestinationView(destination);
-}
 
 void WebMainUI::createAccountPanel(void)
 {
