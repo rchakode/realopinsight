@@ -6,22 +6,21 @@
   </div>
   </message>
 
-  <message id="template.home">
+  <message id="admin-home.tpl">
   <div>
      <!-- Content Pane -->
       <div class="ngrt4n-content-pane">
-        ${contents}
+        <h3>${title}</h3>
+         <div class="ngrt4n-content">
+           ${contents}
+         </div>
       </div>
       <!-- Quick Links Pane -->
       <div class="ngrt4n-side-pane">
-        <h3>Actions</h3>
+        <h3>Adminitration</h3>
         <div class="ngrt4n-content">
           <!-- List actions -->
           <div class="span2 list-group">
-            <!--
-            ${andhor-import-file}
-            ${andhor-load-file}
-            -->
             ${menu}
           </div>
         </div>
@@ -36,10 +35,6 @@
 
 
   <message id="getting-started.tpl">
-  <div>
-    <h3>Welcome – Getting Started in 3 Steps !</h3>
-    <div class="ngrt4n-content">
-
     <!-- 1st thumnail -->
     <div class="span-one-third">
          <div class="thumbnail">
@@ -74,9 +69,10 @@
 
 
     <!-- Third thumnail -->
-    <div class="span-one-third">
+     <div class="span-one-third">
         <div class="thumbnail">
-           <div class="title">Upload, preview and assign the views to your staff
+           <div class="title">
+             Upload, preview and assign the views to your staff
            </div>
            <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
            <p>Upload the created views within the RealOpInsight server, then preview and
@@ -87,9 +83,7 @@
            <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
         </div>
-    </div>
-  </div>
-  </div>
+     </div>
  </message>
 
 
@@ -295,18 +289,7 @@
   </message>
 
   <message id="user-list-tpl">
-      <legend>${title}</legend>
-      ${user-list}
-  </message>
-  
-  <message id="user-mgnt-tpl">
-    <div class="ngrt4n-content-pane">
-      <div>${menu}</div>
-      <div class="ngrt4n-content">${contents}</div>
-    </div>
-    <div class="footer fixed-footer">
-       ${footer}
-    </div>
+     ${user-list}
   </message>
 
   <message id="mgnt-home.tpl">
@@ -321,9 +304,10 @@
 
 
   <message id="copyright-footer.tpl">
-    ${software} ${version} - <a href="#">Support</a> - <a href="#">Documentation</a><br />
-    Copyright &copy; 2010-${release-year} NGRT4N Project -
-    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
+    ${software} ${version}
+    - Copyright &copy; 2010-${release-year} NGRT4N Project
+    - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
+    - <a href="#">Support</a> - <a href="#">Documentation</a>
   </message>
 
   <message id="view-assignment-tpl">

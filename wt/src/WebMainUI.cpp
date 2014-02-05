@@ -150,7 +150,11 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
   m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
 
-  m_mgntTopMenu->addItem("Home", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
+  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Getting Started",
+                                               new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
+  item->triggered().connect(std::bind([=](){
+    m_adminPanelTitle->setText("Getting started in 3 steps !");
+  }));
 
   // Menus for view management
   m_mgntTopMenu->addSectionHeader("View");
@@ -166,10 +170,20 @@ void WebMainUI::setupAdminMenus(void)
 
   // Menus for user management
   m_userMgntUI = new UserMngtUI(m_dbSession);
-  //m_contents->addWidget(m_userMgntUI);
+
   m_mgntTopMenu->addSectionHeader("User");
-  m_mgntTopMenu->addItem("Add", m_userMgntUI);
-  m_mgntTopMenu->addItem("List", m_userMgntUI);
+
+  item = m_mgntTopMenu->addItem("Add", m_userMgntUI->userForm());
+  item->triggered().connect(std::bind([=](){
+    m_adminPanelTitle->setText("Creat new user");
+  }));
+
+
+  item = m_mgntTopMenu->addItem("List", m_userMgntUI->userListWidget());
+  item->triggered().connect(std::bind([=](){
+    m_userMgntUI->updateUserList();
+    m_adminPanelTitle->setText("User Management");
+  }));
 
   m_mgntTopMenu->addSectionHeader("Settings");
   m_mgntTopMenu->addItem("Update Settings")
@@ -455,7 +469,8 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   m_userHomeTpl = new Wt::WTemplate();
   m_userHomeTpl->bindWidget("footer", utils::footer());
   if (m_dbSession->loggedUser().role == User::AdmRole) {
-    m_userHomeTpl->setTemplateText(Wt::WString::tr("template.home"));
+    m_userHomeTpl->setTemplateText(Wt::WString::tr("admin-home.tpl"));
+    m_userHomeTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText("Getting started in 3 steps !"));
     m_userHomeTpl->bindWidget("contents", m_mgntContents);
     m_userHomeTpl->bindWidget("menu", m_mgntTopMenu);
   } else {

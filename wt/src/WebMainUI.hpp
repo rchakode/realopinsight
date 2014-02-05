@@ -97,6 +97,7 @@ private:
   Wt::WTemplate* m_userHomeTpl;
   int m_assignedDashboardCount;
   Wt::WVBoxLayout* m_eventFeedLayout;
+  Wt::WText* m_adminPanelTitle;
 
   void addEvents(void);
   void createMainUI(void);

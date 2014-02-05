@@ -37,22 +37,6 @@
 #include <Wt/WString>
 #include <QObject>
 
-#define ROOT_DIV wApp->root()->id()
-#define MAIN_USER_MNGT_DIV this->id()
-
-#define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
-  computeWindowHeight \
-  "$('#wrapper').height(wh);" \
-  "$('#maincontainer').height(wh);" \
-  "$('#stackcontentarea').height(wh);" \
-  "$('#"+ROOT_DIV+"').height(wh);" \
-  "$('#"+MAIN_USER_MNGT_DIV+"').height(wh-40);" \
-  "$('#user-mgnt-container').height(wh);"
-
-#define JS_AUTO_RESIZING_FUNCTION \
-  "function(self, width, height) {" \
-  JS_AUTO_RESIZING_SCRIPT("wh=height;") \
-  "}"
 
 ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model,
                                                    Wt::WFormModel::Field passField)
@@ -360,9 +344,8 @@ void UserFormView::createChangePasswordDialog(void)
   changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
 }
 
-UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WScrollArea(parent),
-    m_dbSession(dbSession),
+UserMngtUI::UserMngtUI(DbSession* dbSession)
+  : m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL, false, false)),
     m_userListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
@@ -375,17 +358,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent)
     m_userForm->showMessage(ret, m_dbSession->lastError(), "User added.");
   }, std::placeholders::_1));
 
-  Wt::WMenuItem* item = m_menu->addItem("Add User", m_userForm);
-  m_menus.insert(std::pair<int, Wt::WMenuItem*>(AddUserAction, item));
-  item = m_menu->addItem("User List", createUserList());
-  item->triggered().connect(std::bind([=](){
-    updateUserList();
-  }));
-  m_menus.insert(std::pair<int, Wt::WMenuItem*>(ListUserAction, item));
-
-  this->setWidget(createMainUI());
-
-  addJsEventScript();
+  createUserList();
 }
 
 UserMngtUI::~UserMngtUI(void)
@@ -454,25 +427,11 @@ void UserMngtUI::showDestinationView(int dest)
   m_menu->select(m_menus[dest]);
 }
 
-void UserMngtUI::addJsEventScript(void)
-{
-  this->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
-  wApp->root()->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
-}
 
-Wt::WWidget* UserMngtUI::createUserList(void)
+void UserMngtUI::createUserList(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
   tpl->bindString("title", "User list");
   tpl->bindWidget("user-list", m_userListContainer);
-  return tpl;
-}
-
-Wt::WWidget* UserMngtUI::createMainUI(void)
-{
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-mgnt-tpl"));
-  tpl->bindWidget("menu", m_menu);
-  tpl->bindWidget("contents", m_contents);
-  tpl->bindWidget("footer", utils::footer());
-  return tpl;
+  m_userListWidget = tpl;
 }

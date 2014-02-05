@@ -136,14 +136,15 @@ public:
     AddUserAction=0,
     ListUserAction=1
   };
-  UserMngtUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
+  UserMngtUI(DbSession* dbSession);
   ~UserMngtUI(void);
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const User& user);
   void showDestinationView(int dest);
   UserFormView* userForm() {return m_userForm;}
   Wt::WContainerWidget* userListContainer(void) {return m_userListContainer;}
-  Wt::WWidget* createUserList(void);
+  void createUserList(void);
+  Wt::WWidget* userListWidget(void) {return m_userListWidget;}
 
 private:
   DbSession* m_dbSession;
@@ -152,9 +153,7 @@ private:
   Wt::WStackedWidget* m_contents;
   Wt::WMenu* m_menu;
   std::map<int, Wt::WMenuItem*> m_menus;
-
-  void addJsEventScript(void);
-  Wt::WWidget* createMainUI(void);
+  Wt::WWidget* m_userListWidget;
 };
 
 
