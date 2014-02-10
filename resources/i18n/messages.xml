@@ -56,7 +56,7 @@
     <!-- 2nd thumnail -->
     <div class="span-one-third">
             <div class="thumbnail">
-              <div class="title">Configure the access to your monitoring data</div>
+              <div class="title">Enable the acess to your monitoring data</div>
               <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
               <p>The RealOpInsight setting user interfaces enable you to easily set
               when and how to retrieve status data from your monitoring servers in order
@@ -72,13 +72,13 @@
      <div class="span-one-third">
         <div class="thumbnail">
            <div class="title">
-             Upload, preview and assign the views to your staff
+             Test and assign the views to your staff
            </div>
            <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-           <p>Upload the created views within the RealOpInsight server, then preview and
-                assign then to your operations staff. RealOpInsight provides full control
-                of administration requirements, such as role, access control,
-                authentication and integration to external systems like LDAP.
+           <p>Once created, upload the views within the RealOpInsight server. Afterwards, you 
+           can preview and assign them to your operations staff. 
+           RealOpInsight provides full control of administration requirements, such as, authentication, 
+           user roles, and access control.
                 </p>
            <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
