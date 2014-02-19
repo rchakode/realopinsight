@@ -252,8 +252,17 @@ body, html {
 }
 
 .span-one-third {
+  position: relative;
   width: 31%;
   margin: 1%;
+}
+
+.center {
+  width: 25%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .thumbnail {

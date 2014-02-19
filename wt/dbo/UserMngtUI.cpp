@@ -208,7 +208,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
 
   Wt::WString title = Wt::WString("User information");
   if (user) {
-    submitButton->setStyleClass("btn-success");
+    submitButton->setStyleClass("btn btn-success");
     if (changePassword) {
       title = Wt::WString("Set password information");
       submitButton->setText("Change password");
@@ -219,7 +219,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
       submitButton->setText("Update");
       if (! userForm) {
         cancelButton->setText("Delete");
-        cancelButton->setStyleClass("btn-danger");
+        cancelButton->setStyleClass("btn btn-danger");
         cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
       } else {
         cancelButton->setText("Fermer");
@@ -227,7 +227,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
       }
     }
   } else {
-    submitButton->setStyleClass("btn-success");
+    submitButton->setStyleClass("btn btn-success");
     cancelButton->clicked().connect(std::bind([=]() {
       m_infoBox->setText("");
       m_model->reset();

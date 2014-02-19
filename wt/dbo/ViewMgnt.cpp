@@ -72,26 +72,19 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
   tpl->bindWidget("user-selector", userSelector);
 
   m_assignButton = new Wt::WPushButton(QObject::tr("<< Assign").toStdString(), container);
-  m_assignButton->setStyleClass("btn-success");
+  m_assignButton->setStyleClass("btn btn-success");
   m_assignButton->clicked().connect(this, &ViewAssignmentUI::assignViews);
 
   m_revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(), container);
-  m_revokeButton->setStyleClass("btn-warning");
+  m_revokeButton->setStyleClass("btn btn-warning");
   m_revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeViews);
 
   m_deleteViewButton = new Wt::WPushButton(QObject::tr("Delete View").toStdString(), container);
-  m_deleteViewButton->setStyleClass("btn-danger");
+  m_deleteViewButton->setStyleClass("btn btn-danger");
   m_deleteViewButton->clicked().connect(this, &ViewAssignmentUI::deleteViews);
-
-  Wt::WPushButton* closeButton = new Wt::WPushButton(QObject::tr("Close").toStdString(), container);
-  closeButton->setStyleClass("btn-primary");
-  closeButton->clicked().connect(std::bind([=](){
-    accept();
-  }));
 
   tpl->bindWidget("button-assign", m_assignButton);
   tpl->bindWidget("button-revoke", m_revokeButton);
-  tpl->bindWidget("close-button", closeButton);
   tpl->bindWidget("delete-view-button", m_deleteViewButton);
 
 

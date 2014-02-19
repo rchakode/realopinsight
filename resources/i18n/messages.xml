@@ -40,7 +40,7 @@
     <div class="span-one-third">
          <div class="thumbnail">
             <div class="title">
-              Setup the business views for your target platforms
+              Describe your target platforms
             </div>
             <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
             <p>Using the RealOpinsight Editor, describe and edit the target platform,
@@ -57,7 +57,7 @@
     <!-- 2nd thumnail -->
     <div class="span-one-third">
             <div class="thumbnail">
-              <div class="title">Enable the acess to your monitoring data</div>
+              <div class="title">Enable the acess to monitoring data</div>
               <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
               <p>The RealOpInsight setting user interfaces enable you to easily set
               when and how to retrieve status data from your monitoring servers in order
@@ -73,7 +73,7 @@
      <div class="span-one-third">
         <div class="thumbnail">
            <div class="title">
-             Test and assign the views to your staff
+             Preview and assign
            </div>
            <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
            <p>Once created, upload the views within the RealOpInsight server. Afterwards, you 
@@ -317,27 +317,18 @@
       <div>${info-box}</div>
     </div>
     <div class="row">
-      <div class="span3">${user-selector}</div>
-      <div class="span2">&nbsp;</div>
-      <div class="span3">&nbsp;</div>
+      <div class="span-one-third">${user-selector}</div>
+      <div class="span-one-third">&nbsp;</div>
+      <div class="span-one-third">&nbsp;</div>
     </div>
     <div class="row">
-      <div class="span3">
-        ${assigned-views}
+      <div class="span-one-third">${assigned-views}</div>
+      <div class="span-one-third">
+        <div class="center">${button-assign}</div>
+        <div class="center">${button-revoke}</div>
+        <div class="center">${delete-view-button}</div>
       </div>
-      <div class="span2">
-        <div> ${button-assign}</div>
-        <p>&nbsp;</p>
-        <div>${button-revoke}</div>
-      </div>
-      <div class="span3">
-        ${non-assigned-views}
-      </div>
-    </div>
-    <div class="row">
-      <div class="span3">&nbsp;</div>
-      <div class="span2">${close-button}</div>
-      <div class="span3">${delete-view-button}</div>
+      <div class="span-one-third">${non-assigned-views}</div>
     </div>
   </message>
 
@@ -401,7 +392,6 @@
           ${apply-change-button}
           ${add-as-source-button}
           ${delete-button}
-          ${close-button}
      </div>
     </div>
   </message>

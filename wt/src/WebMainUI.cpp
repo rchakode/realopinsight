@@ -62,13 +62,14 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 {
   createDirectory(wApp->docRoot().append("/tmp"), true); //true means clean the directory
   createMainUI();
-  setupMenus();
   createInfoMsgBox();
   createViewAssignmentDialog();
   createAccountPanel();
   createPasswordPanel();
-
   createAboutDialog();
+
+  setupMenus();
+
   showUserHome();
   addEvents();
 }
@@ -150,7 +151,7 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
   m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
 
-  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Getting Started",
+  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Start",
                                                new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
   item->triggered().connect(std::bind([=](){
     m_adminPanelTitle->setText("Getting started in 3 steps !");
@@ -162,10 +163,9 @@ void WebMainUI::setupAdminMenus(void)
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
   m_mgntTopMenu->addItem("Preview")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-  m_mgntTopMenu->addItem("Assign/revoke/delete")
+  m_mgntTopMenu->addItem("Manage", m_viewAssignmentDialog->contents())
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->resetModelData();
-    m_viewAssignmentDialog->show();
   }));
 
   // Menus for user management
@@ -186,10 +186,7 @@ void WebMainUI::setupAdminMenus(void)
   }));
 
   m_mgntTopMenu->addSectionHeader("Settings");
-  m_mgntTopMenu->addItem("Update Settings")
-      ->triggered().connect(std::bind([=](){
-    m_preferenceDialog->show();
-  }));
+  m_mgntTopMenu->addItem("Configure", m_preferenceDialog->getWidget());
 }
 
 void WebMainUI::setupProfileMenus(void)
@@ -232,6 +229,7 @@ void WebMainUI::setupMenus(void)
 
   //FIXME: add this after the first view loaded
   m_navbar->addWidget(createToolBar());
+  m_infoMsgBox->positionAt(m_profileMenu);
 }
 
 Wt::WWidget* WebMainUI::createToolBar(void)
@@ -245,17 +243,17 @@ Wt::WWidget* WebMainUI::createToolBar(void)
   Wt::WPushButton* b(NULL);
 
   b = createTooBarButton("/images/built-in/menu_refresh.png");
-  b->setStyleClass("btn-small");
+  b->setStyleClass("btn btn-small");
   b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(b);
 
   b = createTooBarButton("/images/built-in/menu_zoomin.png");
-  b->setStyleClass("btn-small");
+  b->setStyleClass("btn btn-small");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
   b = createTooBarButton("/images/built-in/menu_zoomout.png");
-  b->setStyleClass("btn-small");
+  b->setStyleClass("btn btn-small");
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
@@ -579,7 +577,6 @@ void WebMainUI::createInfoMsgBox(void)
   m_infoMsgBox->setStyleClass("ngrt4n-transparent Wt-dialog");
   m_infoMsgBox->setModal(false);
   m_infoMsgBox->setTitleBarEnabled(false);
-  m_infoMsgBox->positionAt(m_profileMenu);
 }
 
 

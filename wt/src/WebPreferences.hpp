@@ -49,8 +49,8 @@ public:
 
   WebPreferences(int _userRole);
   virtual ~WebPreferences();
-
   void show(void) {m_dialog->show();}
+  Wt::WWidget* getWidget(void) {return m_dialog->contents();}
 
 protected :
   void handleCancel(void) {m_dialog->accept();}
@@ -73,7 +73,6 @@ private:
   Wt::WCheckBox* m_useNgrt4ndField;
   Wt::WCheckBox* m_dontVerifyCertificateField;
   Wt::WSpinBox* m_updateIntervalField;
-  Wt::WPushButton* m_cancelBtn;
   Wt::WPushButton* m_applyChangeBtn;
   Wt::WPushButton* m_addAsSourceBtn;
   Wt::WPushButton* m_deleteSourceBtn;

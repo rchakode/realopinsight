@@ -90,12 +90,10 @@ WebPreferences::WebPreferences(int _userRole)
   tpl->bindWidget("show-in-clear", m_clearAuthStringField = new Wt::WCheckBox(utils::tr("Show in clear"), container));
   tpl->bindWidget("update-interval", m_updateIntervalField = new Wt::WSpinBox(container));
 
-  tpl->bindWidget("close-button", m_cancelBtn = new Wt::WPushButton(utils::tr("Close"), container));
   tpl->bindWidget("apply-change-button", m_applyChangeBtn = new Wt::WPushButton(utils::tr("Apply changes"), container));
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn = new Wt::WPushButton(utils::tr("Add as source"), container));
   tpl->bindWidget("delete-button", m_deleteSourceBtn = new Wt::WPushButton(utils::tr("Delete source"), container));
 
-  m_cancelBtn->setStyleClass("btn");
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
@@ -103,7 +101,6 @@ WebPreferences::WebPreferences(int _userRole)
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
   m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-  m_cancelBtn->clicked().connect(this, &WebPreferences::handleCancel);
 
   m_clearAuthStringField->changed().connect(std::bind([=](){
     if (m_clearAuthStringField->isChecked()) {
