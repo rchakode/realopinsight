@@ -8,22 +8,23 @@
 
   <message id="admin-home.tpl">
   <div>
-     <!-- Content Pane -->
-      <div class="ngrt4n-content-pane">
-        <h3>${title}</h3>
-         <div class="ngrt4n-content">
-           ${contents}
-         </div>
-      </div>
-      <!-- Quick Links Pane -->
-      <div class="ngrt4n-side-pane">
-        <h3>Adminitration</h3>
+      <!-- Menu pane -->
+      <div class="ngrt4n-side-pane ngrt4n-admin-menu-left">
+        <h3>&nbsp;</h3>
         <div class="ngrt4n-content">
           <!-- List actions -->
           <div class="span2 list-group">
             ${menu}
           </div>
         </div>
+      </div>
+
+     <!-- Content Pane -->
+      <div class="ngrt4n-content-pane ngrt4n-admin-content-right">
+        <h3>${title}</h3>
+         <div class="ngrt4n-content">
+           ${contents}
+         </div>
       </div>
 
       <div class="footer fixed-footer">

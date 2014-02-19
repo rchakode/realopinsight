@@ -195,14 +195,25 @@ body, html {
   overflow: hidden;
 }
 
-.ngrt4n-content-pane .ngrt4n-content, .ngrt4n-side-pane .ngrt4n-content {
+
+.ngrt4n-admin-content-right {
+  left: 25%; 
+}
+
+.ngrt4n-admin-menu-left {
+  left: 20px;
+  width: 20%;
+}
+
+.ngrt4n-content-pane .ngrt4n-content, 
+.ngrt4n-side-pane .ngrt4n-content {
   position: absolute; 
   width: calc(98%);
   max-height: calc(100% - 80px);
-  overflow: auto;
   background: #FFF;
   border-radius: 5px;
   box-shadow: 1px -1px 1px 1px #f1f1f1;
+  overflow: auto;
 }
 
 
