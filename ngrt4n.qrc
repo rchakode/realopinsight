@@ -65,8 +65,5 @@
         <file>images/built-in/menu_disket.png</file>
         <file>images/built-in/menu_import.png</file>
         <file>images/built-in/menu_open.png</file>
-        <file>images/built-in/menu_refresh.png</file>
-        <file>images/built-in/menu_zoomin.png</file>
-        <file>images/built-in/menu_zoomout.png</file>
     </qresource>
 </RCC>

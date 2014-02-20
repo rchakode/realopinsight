@@ -107,7 +107,7 @@ void WebMainUI::showUserHome(void)
     homeTabTitle = tr("Administration").toStdString();
     internalPath = "/quick-start";
   } else {
-    homeTabTitle =  tr("Tactical Overview").toStdString();
+    homeTabTitle =  tr("Operations Console").toStdString();
     internalPath = "/tactical-overview";
   }
 
@@ -115,9 +115,7 @@ void WebMainUI::showUserHome(void)
   pageTitle.append(" - ")
       .append(m_dbSession->loggedUser().username)
       .append(" - ")
-      .append(APP_NAME.toStdString())
-      .append(" - ")
-      .append(tr("Operations Console").toStdString());
+      .append(APP_NAME.toStdString());
 
   wApp->setTitle(pageTitle);
   setInternalPath(internalPath);
@@ -161,8 +159,10 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntTopMenu->addSectionHeader("View");
   m_mgntTopMenu->addItem("Import")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
+
   m_mgntTopMenu->addItem("Preview")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
+
   m_mgntTopMenu->addItem("Manage", m_viewAssignmentDialog->contents())
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->resetModelData();
@@ -220,7 +220,9 @@ void WebMainUI::setupMenus(void)
   // Setup the main menu
   Wt::WMenu* mainMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
-  mainMenu->addItem(tr("Home").toStdString(), m_dashtabs); //Fixme: use home icon
+  Wt::WMenuItem* item = mainMenu->addItem("", m_dashtabs); //Fixme: use home icon
+  item->setStyleClass("fa fa-home");
+
   setupAdminMenus();
   setupProfileMenus();
 
@@ -242,18 +244,21 @@ Wt::WWidget* WebMainUI::createToolBar(void)
 
   Wt::WPushButton* b(NULL);
 
-  b = createTooBarButton("/images/built-in/menu_refresh.png");
-  b->setStyleClass("btn btn-small");
+  b = createTooBarButton("");
+  b->setStyleClass("fa fa-refresh");
+  b->setToolTip(utils::tr("Refresh console"));
   b->clicked().connect(this, &WebMainUI::handleRefresh);
   toolBar->addButton(b);
 
-  b = createTooBarButton("/images/built-in/menu_zoomin.png");
-  b->setStyleClass("btn btn-small");
+  b = createTooBarButton("");
+  b->setStyleClass("fa fa-plus");
+  b->setToolTip(utils::tr("Zoom in"));
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   toolBar->addButton(b);
 
-  b = createTooBarButton("/images/built-in/menu_zoomout.png");
-  b->setStyleClass("btn btn-small");
+  b = createTooBarButton("");
+  b->setStyleClass("fa fa-minus");
+  b->setToolTip(utils::tr("Zoom out"));
   b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   toolBar->addButton(b);
 
@@ -263,7 +268,7 @@ Wt::WWidget* WebMainUI::createToolBar(void)
 Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
 {
   Wt::WPushButton* button = new Wt::WPushButton();
-  button->setIcon(icon);
+  //button->setIcon(icon);
   return button;
 }
 

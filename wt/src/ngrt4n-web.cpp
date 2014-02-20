@@ -20,6 +20,7 @@ protected:
   {
     setTwoPhaseRenderingThreshold(0);
     useStyleSheet("/resources/css/ngrt4n.css");
+    useStyleSheet("/resources/css/font-awesome.min.css");
     messageResourceBundle().use(docRoot() + "/resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
     requireJQuery("/resources/js/jquery-1.10.2.min.js");
