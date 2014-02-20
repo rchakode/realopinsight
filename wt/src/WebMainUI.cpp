@@ -149,7 +149,7 @@ void WebMainUI::setupAdminMenus(void)
     m_adminPanelTitle->setText("Getting started in 3 steps !");
   }));
 
-  // Menus for view management
+  // view menus
   m_mgntTopMenu->addSectionHeader("Views");
   m_mgntTopMenu->addItem("Import")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
@@ -163,15 +163,13 @@ void WebMainUI::setupAdminMenus(void)
     m_adminPanelTitle->setText("Manage Views");
   }));
 
-  // Menus for user management
+  // User menus
   m_userMgntUI = new UserMngtUI(m_dbSession);
-
   m_mgntTopMenu->addSectionHeader("Users");
   item = m_mgntTopMenu->addItem("Add user", m_userMgntUI->userForm());
   item->triggered().connect(std::bind([=](){
     m_adminPanelTitle->setText("Create new user");
   }));
-
 
   item = m_mgntTopMenu->addItem("Manage", m_userMgntUI->userListWidget());
   item->triggered().connect(std::bind([=](){
@@ -179,19 +177,27 @@ void WebMainUI::setupAdminMenus(void)
     m_adminPanelTitle->setText("Manage Users");
   }));
 
+  // setting menus
   m_mgntTopMenu->addSectionHeader("Settings");
   m_mgntTopMenu->addItem("Update", m_preferenceDialog->getWidget());
 }
 
 void WebMainUI::setupProfileMenus(void)
 {
-  User loggedUser = m_dbSession->loggedUser();
 
   m_profileMenu = new Wt::WMenu();
   m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
-  Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
+
+  Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+  notificationIcon->bindString("notification-count", "2");
+  m_navbar->addWidget(notificationIcon, Wt::AlignRight);
+
   m_mainProfileMenuItem = new Wt::WMenuItem("Profile");
-  m_mainProfileMenuItem->setText(tr("You're %1").arg(loggedUser.username.c_str()).toStdString());
+  m_mainProfileMenuItem->setText(tr("You're %1")
+                                 .arg(m_dbSession->loggedUser().username.c_str())
+                                 .toStdString());
+
+  Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
   m_mainProfileMenuItem->setMenu(profilePopupMenu);
   m_profileMenu->addItem(m_mainProfileMenuItem);
 

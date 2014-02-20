@@ -399,7 +399,6 @@
   </message>
 
   <message id="about-tpl">
-    <div>
      <div>
        <legend>${software} ${version}</legend>
        <p class="pull-left">
@@ -415,8 +414,13 @@
           Copyright &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved.<br/>
           <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
        </p>
+       <div style="float: right;">${close-button}</div>
      </div>
-     <div style="float: right;">${close-button}</div>
-    </div>
+  </message>
+  <message id="notification.block.tpl">
+     <div id="notification-ontainer">
+        <i class="icon-warning-sign"></i>
+        <div class="notification-bubble">${notification-count}</div>
+     </div>
   </message>
 </messages>
