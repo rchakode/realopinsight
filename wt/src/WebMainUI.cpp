@@ -467,7 +467,7 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   m_userHomeTpl->bindWidget("footer", utils::footer());
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("admin-home.tpl"));
-    m_userHomeTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText("Getting started in 3 steps !"));
+    m_userHomeTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText("Getting Started in 3 Steps !"));
     m_userHomeTpl->bindWidget("contents", m_mgntContents);
     m_userHomeTpl->bindWidget("menu", m_mgntTopMenu);
   } else {
