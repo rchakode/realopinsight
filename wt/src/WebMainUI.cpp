@@ -221,7 +221,7 @@ void WebMainUI::setupMenus(void)
   Wt::WMenu* mainMenu = new Wt::WMenu(m_contents);
   m_navbar->addMenu(mainMenu, Wt::AlignLeft);
   Wt::WMenuItem* item = mainMenu->addItem("", m_dashtabs); //Fixme: use home icon
-  item->setStyleClass("fa fa-home");
+  item->setStyleClass("fa fa-home fa-lg");
 
   setupAdminMenus();
   setupProfileMenus();
@@ -230,39 +230,33 @@ void WebMainUI::setupMenus(void)
   m_mainProfileMenuItem->setText(tr("You're %1").arg(loggedUser.username.c_str()).toStdString());
 
   //FIXME: add this after the first view loaded
-  m_navbar->addWidget(createToolBar());
+
+  Wt::WText* text = createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
+  text->clicked().connect(this, &WebMainUI::handleRefresh);
+  m_navbar->addWidget(text);
+
+  text = createFontAwesomeTextButton("icon-zoom-in", "Zoom the console map in");
+  text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
+  m_navbar->addWidget(text);
+
+  text = createFontAwesomeTextButton("icon-zoom-out", "Zoom the console map out");
+  text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
+  m_navbar->addWidget(text);
+
+  //m_navbar->addWidget(createToolBar());
   m_infoMsgBox->positionAt(m_profileMenu);
 }
 
-Wt::WWidget* WebMainUI::createToolBar(void)
+Wt::WText* WebMainUI::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
 {
-  Wt::WContainerWidget* container(new Wt::WContainerWidget());
-  Wt::WHBoxLayout* layout(new Wt::WHBoxLayout(container));
-  Wt::WToolBar* toolBar(new Wt::WToolBar());
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->addWidget(toolBar, Wt::AlignLeft);
-
-  Wt::WPushButton* b(NULL);
-
-  b = createTooBarButton("");
-  b->setStyleClass("fa fa-refresh");
-  b->setToolTip(utils::tr("Refresh console"));
-  b->clicked().connect(this, &WebMainUI::handleRefresh);
-  toolBar->addButton(b);
-
-  b = createTooBarButton("");
-  b->setStyleClass("fa fa-plus");
-  b->setToolTip(utils::tr("Zoom in"));
-  b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
-  toolBar->addButton(b);
-
-  b = createTooBarButton("");
-  b->setStyleClass("fa fa-minus");
-  b->setToolTip(utils::tr("Zoom out"));
-  b->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
-  toolBar->addButton(b);
-
-  return container;
+  Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
+                                              " <i class=\"%1\"></i>"
+                                              "</span>")
+                                  .arg(iconClasses.c_str()).toStdString(),
+                                  Wt::XHTMLText,
+                                  m_mainWidget);
+  link->setToolTip(tip);
+  return link;
 }
 
 Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
@@ -370,61 +364,61 @@ void WebMainUI::finishFileDialog(int action)
 {
   CHECK_LOGIN();
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("notice", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+        LOG("notice", "Parsing the input file");
+        QString tmpFileName(m_uploader->spoolFileName().c_str());
+        CoreDataT cdata;
 
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+        Parser parser(tmpFileName ,&cdata);
+        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid configuration file").toStdString();
-            LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+        if (! parser.process(false)) {
+          std::string msg = tr("Invalid configuration file").toStdString();
+          LOG("warn", msg);
+          showMessage(msg, "alert alert-warning");
+        } else {
+
+          std::string filename = m_uploader->clientFileName().toUTF8();
+          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+          QFile file(tmpFileName);
+          file.copy(dest);
+          file.remove();
+
+          View view;
+          view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
+          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+          view.path = dest.toStdString();
+          if (m_dbSession->addView(view) != 0){
+            showMessage(m_dbSession->lastError(), "alert alert-warning");
           } else {
-
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            View view;
-            view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Number of services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
-            }
+            QString msg = tr("View added. "
+                             " Name: %1\n - "
+                             " Number of services: %2 -"
+                             " Path: %3").arg(view.name.c_str(),
+                                              QString::number(view.service_count),
+                                              view.path.c_str());
+            showMessage(msg.toStdString(), "alert alert-success");
           }
         }
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectFile.empty()) {
-        int tabIndex;
-        WebDashboard* dashbord;
-        loadView(m_selectFile, dashbord, tabIndex);
-        m_selectFile.clear();
-      } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-      }
-      break;
-    default:
-      break;
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectFile.empty()) {
+      int tabIndex;
+      WebDashboard* dashbord;
+      loadView(m_selectFile, dashbord, tabIndex);
+      m_selectFile.clear();
+    } else {
+      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+    }
+    break;
+  default:
+    break;
   }
 }
 
