@@ -92,7 +92,7 @@
   <div class="ngrt4n-operator-page">
        <!-- Content Pane -->
        <div class="ngrt4n-content-pane">
-         <h3>Overview of service health</h3>
+         <h3>Service Health</h3>
          <div class="ngrt4n-content">${contents}</div>
        </div>
 
@@ -304,7 +304,7 @@
 
   <message id="copyright-footer.tpl">
     ${software} ${version}
-    - Copyright &copy; 2010-${release-year} NGRT4N Project
+    - Copyright &copy; 2010-${release-year} RealOpInsight Labs
     - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
     - <a href="#">Support</a> - <a href="#">Documentation</a>
   </message>
@@ -348,7 +348,7 @@
     <div class="form-horizontal">
     ${info-box}
       <div>
-       <div class="row">
+       <div class="control-group">
          <label class="control-label">Sources&nbsp;&nbsp;</label>
          <!--<div class="btn-group">-->
            <span>${s0}</span>
@@ -364,36 +364,36 @@
         <!-- </div> -->
        </div>
       </div>
-      <div class="row">
+      <div class="control-group">
         <label class="control-label">Monitor Type&nbsp;</label>
         <span>${monitor-type}</span>
       </div>
-      <div class="row">
+      <div class="control-group">
         <label class="control-label">Monitor Web URL&nbsp;</label>
         <span>${monitor-url}</span>
         <span>${dont-verify-ssl-certificate}</span>
       </div>
-      <div class="row">
+      <div class="control-group">
         <label class="control-label">Livestatus Host&nbsp;</label>
         <span>${livestatus-server}</span>
         <span>${livestatus-port}</span>
         <span>${use-ngrt4nd}</span>
       </div>
-      <div class="row">
+      <div class="control-group">
         <label class="control-label">Auth String&nbsp;</label>
         <span>${auth-string}</span>
         <span>${show-in-clear}</span>
       </div>
-      <div class="row">
+      <div class="control-group">
         <label class="control-label">Update Interval&nbsp;</label>
         <span>${update-interval}</span>
         <span>&nbsp;seconds</span>
       </div>
 
-       <div class="form-actions btn-group">
-          ${apply-change-button}
-          ${add-as-source-button}
-          ${delete-button}
+       <div class="form-actions">
+          <span>${apply-change-button}</span>
+          <span>${add-as-source-button}</span>
+          <span>${delete-button}</span>
      </div>
     </div>
   </message>
@@ -411,9 +411,9 @@
           Release ID: ${release-id}
        </p>
        <div class="clearfix"></div>
-       <p>
-          Copyright &copy; 2010-${release-year} NGRT4N Project. All rights reserved.<br/>
-          Read the <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
+       <p class="text-center">
+          Copyright &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved.<br/>
+          <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
        </p>
      </div>
      <div style="float: right;">${close-button}</div>

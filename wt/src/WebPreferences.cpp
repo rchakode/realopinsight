@@ -38,7 +38,7 @@ WebPreferences::WebPreferences(int _userRole)
   : Preferences(_userRole, Preferences::WebForm),
     m_dialog(new Wt::WDialog(utils::tr("Preferences - " +APP_NAME.toStdString())))
 {
-  m_dialog->setStyleClass("ngrt4n-gradient Wt-dialog");
+  m_dialog->setStyleClass("Wt-dialog");
   m_dialog->titleBar()->setStyleClass("titlebar");
   Wt::WContainerWidget* container = m_dialog->contents();
   container->setMargin(0, Wt::All);
@@ -219,7 +219,7 @@ void WebPreferences::promptUser(int inputType)
 {
 
   Wt::WDialog* inputDialog = new Wt::WDialog();
-  inputDialog->setStyleClass("ngrt4n-gradient Wt-dialog");
+  inputDialog->setStyleClass("Wt-dialog");
   inputDialog->titleBar()->setStyleClass("titlebar");
 
   Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
