@@ -259,7 +259,7 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
   tpl->bindString("event-feed-id", node.id.toStdString());
   tpl->bindString("severity-css-class", utils::severityCssClass(node.severity));
-  tpl->bindWidget("event-feed-status", new Wt::WImage(utils::getPathFromQtResource(ICONS[node.icon])));
+  tpl->bindString("event-feed-icon", utils::getPathFromQtResource(ICONS[node.icon]));
   tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("#"),
                                                       tr("%1 event on %2")
                                                       .arg(utils::severityText(node.severity), node.name).toStdString()));

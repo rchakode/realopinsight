@@ -116,17 +116,17 @@
   </message>
 
   <message id="event-feed.tpl">
-    <div id="${event-feed-id}" class="event-feed-item  ${severity-css-class}">
-      <div class="status-icon">
-        ${event-feed-status}
+    <div class="media">
+      <a class="pull-left" href="#">
+        <img class="media-object" src="${event-feed-icon}" alt="..." />
+      </a>
+      <div class="media-body">
+        <h4 class="media-heading">${event-feed-title}</h4>
+        ${event-feed-details}
+        <div class="clearfix ${severity-css-class}">${platform} <span class="pull-right">${timestamp}</span></div>
       </div>
-      <div class="info">
-        ${event-feed-title}
-        <p>${event-feed-details}</p>
-      </div>
-      <div class="clearfix"></div>
-      <div class="event-feed-footer">${platform} <span class="right">${timestamp}</span></div>
     </div>
+
   </message>
 
   <message id="Wt.Auth.field">
@@ -418,9 +418,12 @@
      </div>
   </message>
   <message id="notification.block.tpl">
-     <div id="notification-ontainer">
-        <i class="icon-warning-sign"></i>
-        <div class="notification-bubble">${notification-count}</div>
+     <div id="notification-container">
+        <span class="badge severity-unknown">${unknown-count}</span>
+        <span class="badge severity-critical">${critical-count}</span>
+        <span class="badge severity-major">${major-count}</span>
+        <span class="badge severity-minor">${minor-count}</span>
+        <span class="badge severity-normal">${normal-count}</span>
      </div>
   </message>
 </messages>

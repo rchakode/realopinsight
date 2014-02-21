@@ -150,31 +150,8 @@ body, html {
   height: 120px;
 }
 
-.event-feed-item {
-  width: 100%;
+.media {
   font-size: 0.8em;
-}
-
-.event-feed-item .status-icon {
-  width: 40px;
-  float: left;
-  padding: 2px;
-  margin: auto;
-}
-
-.event-feed-item .info {
-  width: calc(100% - 48px);
-  float: right;
-  margin: auto 2px;
-}
-
-.event-feed-item .event-feed-footer {
-  font-size: 0.8em;
-}
-
-.event-feed-item .event-feed-footer .right {
-  display: block;
-  float: right;
 }
 
 .ngrt4n-content-pane {
@@ -308,27 +285,14 @@ body, html {
 }
 
 
-#notification-ontainer {
-    position: relative;     /* This is crucial for the absolutely positioned element */
-    width: 16;
-    height: 16px;
-    top: 10px;
+#notification-container {
+  margin-top: 10px;
 }
-.notification-bubble {
-    position: absolute;    /* This breaks the div from the normal HTML document. */
-    top: -6px;
-    right: -6px;
-    padding: 1px 2px 1px 2px;
-    background-color: red; /* you could use a background image if you'd like as well */
-    color: white;
-    font-weight: bold;
-    font-size: 0.55em;
 
-    /* The following is CSS3, but isn't crucial for this technique to work. */
-    /* Keep in mind that if a browser doesn't support CSS3, it's fine! They just won't have rounded 
-borders and won't have a box shadow effect. */
-    /* You can always use a background image to produce the same effect if you want to, and you can 
-use both together so browsers without CSS3 still have the rounded/shadow look. */
-    border-radius:30px;
-    box-shadow:1px 1px 1px gray;
+#notification-container span{
+  color: #000000;
+}
+
+#notification-container .badge{
+  box-shadow:1px 1px 1px gray;
 }
