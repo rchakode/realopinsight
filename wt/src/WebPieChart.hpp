@@ -30,8 +30,8 @@
 #include <Wt/WColor>
 #include <Wt/WPaintDevice>
 #include <Wt/WContainerWidget>
+#include <Wt/WText>
 
-class WebPieChart;
 class WebPieChart : public Wt::Chart::WPieChart
 {
 public:
@@ -44,6 +44,7 @@ public:
 private:
   Wt::WStandardItemModel* m_model;
   Wt::WScrollArea* m_scrollArea;
+  std::map<int, Wt::WText*> m_badges;
 };
 
 #endif // WEBPIECHART_HPP

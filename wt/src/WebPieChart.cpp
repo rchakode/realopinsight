@@ -32,6 +32,7 @@
 #include <Wt/WPen>
 #include <Wt/WScrollArea>
 #include <Wt/Chart/WChartPalette>
+#include <Wt/WTemplate>
 
 class WebCharPalette : public Wt::Chart::WChartPalette
 {
@@ -84,7 +85,15 @@ WebPieChart::WebPieChart(void)
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
-  m_scrollArea->setWidget(this);
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
+  tpl->bindWidget("unknown-count", m_badges[MonitorBroker::Unknown] = new Wt::WText());
+  tpl->bindWidget("critical-count", m_badges[MonitorBroker::Critical] = new Wt::WText());
+  tpl->bindWidget("major-count", m_badges[MonitorBroker::Major] = new Wt::WText());
+  tpl->bindWidget("minor-count", m_badges[MonitorBroker::Minor] = new Wt::WText());
+  tpl->bindWidget("normal-count", m_badges[MonitorBroker::Normal] = new Wt::WText());
+  tpl->bindWidget("chart", this);
+
+  m_scrollArea->setWidget(tpl);
   m_scrollArea->setMargin(0, Wt::Top| Wt::Bottom);
 
   // Configure the header.
@@ -111,7 +120,6 @@ WebPieChart::WebPieChart(void)
 
 WebPieChart::~WebPieChart()
 {
-  // m_scrollArea is deleted by the layout manager
   delete m_model;
 }
 
@@ -125,7 +133,6 @@ void WebPieChart::setSeverityData(int _sev, int _count)
 {
   std::string label = utils::severityText(_sev).toStdString();
   m_model->setData(_sev, 0, label);
- // m_model->setData(_sev, 1, label, Wt::ToolTipRole);
   m_model->setData(_sev, 1, _count);
-  //setBrush(_sev, Wt::WBrush(colorFromSeverity(_sev)));
+  m_badges[_sev]->setText(QString::number(_count).toStdString());
 }

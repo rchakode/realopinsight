@@ -344,6 +344,17 @@
      Normal: ${normal-ratio}% (${normal-count}/${total-count})
   </message>
 
+  <message id="chart.tpl">
+  <div>
+    <span class="badge severity-unknown">${unknown-count}</span>
+    <span class="badge severity-critical">${critical-count}</span>
+    <span class="badge severity-major">${major-count}</span>
+    <span class="badge severity-minor">${minor-count}</span>
+    <span class="badge severity-normal">${normal-count}</span>
+  </div>
+  <div>${chart}</div>
+  </message>
+
   <message id="setting-page.tpl">
     <div class="form-horizontal">
     ${info-box}
@@ -419,12 +430,8 @@
   </message>
   <message id="notification.block.tpl">
      <div id="notification-container">
-        <span><i class="fa fa-flag" id="notification-flag"></i><sup><span class="badge severity-critical">${problem-count}</span></sup></span>
-        <span class="badge severity-unknown">${unknown-count}</span>
-        <span class="badge severity-critical">${critical-count}</span>
-        <span class="badge severity-major">${major-count}</span>
-        <span class="badge severity-minor">${minor-count}</span>
-        <span class="badge severity-normal">${normal-count}</span>
+     <i class="fa fa-flag" id="notification-flag"></i>
+     <sup><span class="badge severity-critical">${problem-count}</span></sup>
      </div>
   </message>
 </messages>

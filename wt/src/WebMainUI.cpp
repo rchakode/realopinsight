@@ -189,11 +189,6 @@ void WebMainUI::setupProfileMenus(void)
   m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
 
   Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
-  notificationIcon->bindString("unknown-count", "2");
-  notificationIcon->bindString("critical-count", "2");
-  notificationIcon->bindString("major-count", "2");
-  notificationIcon->bindString("minor-count", "2");
-  notificationIcon->bindString("normal-count", "2");
   notificationIcon->bindString("problem-count", "2");
 
   m_navbar->addWidget(notificationIcon, Wt::AlignRight);
@@ -225,7 +220,9 @@ void WebMainUI::setupMenus(void)
 {
   CHECK_LOGIN();
 
-  setupAdminMenus();
+  if (m_dbSession->loggedUser().role == User::AdmRole) {
+    setupAdminMenus();
+  }
   setupProfileMenus();
 
   //FIXME: add this after the first view loaded
