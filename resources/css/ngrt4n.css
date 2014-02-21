@@ -220,8 +220,7 @@ body, html {
 }
 
 .fixed-footer{
-  position: absolute;
-  bottom: 0;
+  position: relative;
 }
 
 .info-box {

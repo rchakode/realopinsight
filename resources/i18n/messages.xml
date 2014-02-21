@@ -27,7 +27,7 @@
          </div>
       </div>
 
-      <div class="footer fixed-footer">
+      <div class="footer">
         ${footer}
       </div>
 
@@ -92,19 +92,25 @@
   <div class="ngrt4n-operator-page">
        <!-- Content Pane -->
        <div class="ngrt4n-content-pane">
-         <h3>Service Health</h3>
-         <div class="ngrt4n-content">${contents}</div>
+
+         <div class="ngrt4n-content">
+           <h3>Service Health</h3>
+           ${contents}
+         </div>
        </div>
 
        <!-- Event Feeds Pane -->
        <div class="ngrt4n-side-pane">
-         <h3>Event Feeds</h3>
-         <div class="ngrt4n-content">${event-feeds}</div>
+         <div class="ngrt4n-content">
+           <h3>Event Feeds</h3>
+           ${event-feeds}
+         </div>
        </div>
-
-       <div class="footer fixed-footer">
+<!--
+       <div class="footer">
           ${footer}
        </div>
+-->
     </div> <!-- content-container -->
   </message>
 
