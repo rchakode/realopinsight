@@ -159,7 +159,7 @@ body, html {
   top: 80px;
   left: 20px;
   width: 68%;
-  height: calc(100% - 82px);
+  height: calc(100%);
   overflow: hidden;
 }
 
@@ -168,7 +168,7 @@ body, html {
   top: 80px;
   right: 0;
   width: 29%;
-  height: calc(100% - 82px);
+  height: calc(100%);
   overflow: hidden;
 }
 
