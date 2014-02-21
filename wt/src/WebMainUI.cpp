@@ -127,8 +127,8 @@ void WebMainUI::showUserHome(void)
 
 void WebMainUI::createMainUI(void)
 {
-  // navbar
   m_navbar = new Wt::WNavigationBar(m_mainWidget);
+  m_navbar->setResponsive(true);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
 
   // Create a container for stacked contents

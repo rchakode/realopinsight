@@ -220,7 +220,7 @@ body, html {
 }
 
 .fixed-footer{
-  position: fixed !important;
+  position: absolute;
   bottom: 0;
 }
 

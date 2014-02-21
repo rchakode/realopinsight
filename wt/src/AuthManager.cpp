@@ -24,8 +24,6 @@ AuthManager::AuthManager(DbSession* dbSession)
   Wt::Auth::AuthWidget::setModel(authModel);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
-
- // setInternalBasePath(ngrt4n::LINK_LOGIN);
 }
 
 void AuthManager::handleAuthentication(void)
@@ -55,7 +53,6 @@ void AuthManager::handleAuthentication(void)
 
 void AuthManager::createLoginView(void)
 {
-  wApp->setInternalPath(ngrt4n::LINK_LOGIN);
   Wt::Auth::AuthWidget::createLoginView();
   bindWidget("footer", utils::footer());
 }
