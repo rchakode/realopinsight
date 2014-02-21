@@ -419,7 +419,7 @@
   </message>
   <message id="notification.block.tpl">
      <div id="notification-container">
-        <span><i class="fa fa-flag"></i><sup><span class="badge severity-critical">${business-problem-count}</span></sup></span>
+        <span><i class="fa fa-flag" id="notification-flag"></i><sup><span class="badge severity-critical">${problem-count}</span></sup></span>
         <span class="badge severity-unknown">${unknown-count}</span>
         <span class="badge severity-critical">${critical-count}</span>
         <span class="badge severity-major">${major-count}</span>

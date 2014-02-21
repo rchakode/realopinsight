@@ -194,6 +194,8 @@ void WebMainUI::setupProfileMenus(void)
   notificationIcon->bindString("major-count", "2");
   notificationIcon->bindString("minor-count", "2");
   notificationIcon->bindString("normal-count", "2");
+  notificationIcon->bindString("problem-count", "2");
+
   m_navbar->addWidget(notificationIcon, Wt::AlignRight);
 
   m_mainProfileMenuItem = new Wt::WMenuItem("Profile");

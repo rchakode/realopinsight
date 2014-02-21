@@ -293,6 +293,12 @@ body, html {
   color: #000000;
 }
 
-#notification-container .badge{
+#notification-container .badge {
   box-shadow:1px 1px 1px gray;
+}
+
+#notification-flag {
+  color: #c0c0c0;
+  text-shadow: 1px 1px 1px #ccc;
+  font-size: 1.5em;
 }

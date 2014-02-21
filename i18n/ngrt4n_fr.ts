@@ -934,6 +934,11 @@ Chargement...</translation>
         <source>Delete View</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="246"/>
+        <source>&lt;span class=&quot;btn&quot;&gt; &lt;i class=&quot;%1&quot;&gt;&lt;/i&gt;&lt;/span&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ServiceEditor</name>
@@ -1578,105 +1583,105 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <name>WebMainUI</name>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="59"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="320"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="306"/>
         <source>Select a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="107"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="106"/>
         <source>Administration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="110"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="108"/>
         <source>Operations Console</source>
         <translation type="unfinished">Console des opérations</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="202"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="209"/>
         <source>My Profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="204"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="521"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="211"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="506"/>
         <source>Change password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="207"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="214"/>
         <source>Documentation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="230"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="200"/>
         <source>You&apos;re %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="328"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="314"/>
         <source>Finish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="337"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="323"/>
         <source>Import a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="350"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="336"/>
         <source>Upload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="357"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="613"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="343"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="598"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="366"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="352"/>
         <source>File is too large.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="386"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="372"/>
         <source>Invalid configuration file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="392"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="378"/>
         <source>%1/%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="404"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="390"/>
         <source>View added.  Name: %1
  -  Number of services: %2 - Path: %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="425"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="411"/>
         <source>No file selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="456"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="441"/>
         <source>This platform or a platfom with the same name is already loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="502"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="487"/>
         <source>Manage user account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="539"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="524"/>
         <source>Sorry, the request resource is not available or has been removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="685"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="670"/>
         <source>Unable to create the directory (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1704,27 +1709,32 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="153"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="147"/>
         <source>getting-started.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="477"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="191"/>
+        <source>notification.block.tpl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="462"/>
         <source>admin-home.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="482"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="467"/>
         <source>operator-home.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="616"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="601"/>
         <source>about-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="659"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="644"/>
         <source>dashboard-thumbnail.tpl</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1754,21 +1764,6 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <source>Unknown</source>
         <translation type="obsolete">Indéfini</translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="251"/>
-        <source>Refresh console</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="257"/>
-        <source>Zoom in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="263"/>
-        <source>Zoom out</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="39"/>
