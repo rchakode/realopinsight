@@ -180,6 +180,9 @@ body, html {
   overflow: auto;
 }
 
+.info-box {
+  z-index: 100; 
+}
 
 .login-container {
   width: 480px;

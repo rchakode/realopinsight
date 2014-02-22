@@ -19,7 +19,7 @@
     </div>
    <!-- Content Pane -->
     <div class="ngrt4n-content-pane ngrt4n-admin-content-right">
-    <div>${info-box}</div>
+    <div class="info-box">${info-box}</div>
       <h3>${title}</h3>
        <div class="ngrt4n-content">
            ${contents}
@@ -82,6 +82,7 @@
 
  <message id="operator-home.tpl">
     <!-- Content Pane -->
+    <div class="info-box">${info-box}</div>
     <div class="ngrt4n-content-pane">
        <div class="ngrt4n-content">
          <legend>Service Health</legend>
