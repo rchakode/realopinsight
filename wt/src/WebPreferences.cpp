@@ -226,12 +226,12 @@ void WebPreferences::promptUser(int inputType)
   std::string dialogTitle;
   switch (inputType){
     case SourceTypeInput:
-      dialogTitle = utils::tr("Select source type - ") + APP_NAME.toStdString();
+      dialogTitle = QObject::tr("Select source type").toStdString();
       for (const auto& src : utils::sourceTypes())
         inputField->addItem(src.toStdString());
       break;
     case SourceIndexInput:
-      dialogTitle = utils::tr("Select the source index - ") + APP_NAME.toStdString();
+      dialogTitle = QObject::tr("Select the source index").toStdString();
       for (const auto& src : utils::sourceIndexes())
         inputField->addItem(src.toStdString());
       break;

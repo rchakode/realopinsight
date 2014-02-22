@@ -62,7 +62,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 {
   createDirectory(wApp->docRoot().append("/tmp"), true); //true means clean the directory
   createMainUI();
-  createInfoMsgBox();
   createViewAssignmentDialog();
   createAccountPanel();
   createPasswordPanel();
@@ -143,20 +142,18 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
   m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
 
-  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Start",
-                                               new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
+  // Start menu
+  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Start", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
   item->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Getting started in 3 steps !");
+    m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
   }));
 
   // view menus
   m_mgntTopMenu->addSectionHeader("Views");
   m_mgntTopMenu->addItem("Import")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
-
   m_mgntTopMenu->addItem("Preview")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-
   m_mgntTopMenu->addItem("Manage", m_viewAssignmentDialog->contents())
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->resetModelData();
@@ -179,12 +176,14 @@ void WebMainUI::setupAdminMenus(void)
 
   // setting menus
   m_mgntTopMenu->addSectionHeader("Settings");
-  m_mgntTopMenu->addItem("Update", m_preferenceDialog->getWidget());
+  item = m_mgntTopMenu->addItem("Set or update", m_preferenceDialog->getWidget());
+  item->triggered().connect(std::bind([=](){
+    m_adminPanelTitle->setText("Update Settings");
+  }));
 }
 
 void WebMainUI::setupProfileMenus(void)
 {
-
   m_profileMenu = new Wt::WMenu();
   m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
 
@@ -203,7 +202,7 @@ void WebMainUI::setupProfileMenus(void)
   m_profileMenu->addItem(m_mainProfileMenuItem);
 
   Wt::WMenuItem* curItem = NULL;
-  profilePopupMenu->addItem(tr("My Profile").toStdString())
+  profilePopupMenu->addItem(tr("My Account").toStdString())
       ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
   profilePopupMenu->addItem(tr("Change password").toStdString())
       ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));
@@ -211,7 +210,6 @@ void WebMainUI::setupProfileMenus(void)
   curItem = profilePopupMenu->addItem(tr("Documentation").toStdString());
   curItem->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
   curItem->setLinkTarget(Wt::TargetNewWindow);
-
   profilePopupMenu->addItem("About")
       ->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
 }
@@ -237,7 +235,6 @@ void WebMainUI::setupMenus(void)
   text = createFontAwesomeTextButton("icon-zoom-out", "Zoom the console map out");
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   m_navbar->addWidget(text);
-  m_infoMsgBox->positionAt(m_profileMenu);
 }
 
 Wt::WText* WebMainUI::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
@@ -319,7 +316,7 @@ void WebMainUI::selectFileToOpen(void)
 void WebMainUI::openFileUploadDialog(void)
 {
   CHECK_LOGIN();
-  m_fileUploadDialog->setWindowTitle(tr("Import a file").toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Import a description file").toStdString());
   m_fileUploadDialog->setStyleClass("Wt-dialog");
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
@@ -455,16 +452,21 @@ void WebMainUI::scaleMap(double factor)
 
 Wt::WWidget* WebMainUI::createUserHome(void)
 {
+  m_infoBox = new Wt::WText(m_mainWidget);
+  m_infoBox->hide();
+  m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
+
   m_userHomeTpl = new Wt::WTemplate();
-  m_userHomeTpl->bindWidget("footer", utils::footer());
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("admin-home.tpl"));
-    m_userHomeTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText("Getting Started in 3 Steps !"));
+    m_userHomeTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText(m_mainWidget));
     m_userHomeTpl->bindWidget("contents", m_mgntContents);
     m_userHomeTpl->bindWidget("menu", m_mgntTopMenu);
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
   }
+
+  m_userHomeTpl->bindWidget("info-box", m_infoBox);
   return m_userHomeTpl;
 }
 
@@ -537,7 +539,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 
   Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(m_mainWidget);
   Wt::WStandardItem *item = new Wt::WStandardItem();
-  item->setText("Select the view to load");
+  item->setText("Select a description file");
   viewSelectorModel->appendRow(item);
 
   Q_FOREACH(const View& view, views) {
@@ -562,25 +564,12 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   return viewSelector;
 }
 
-void WebMainUI::createInfoMsgBox(void)
-{
-  m_infoMsgBox = new Wt::WDialog(m_mainWidget);
-  m_infoMsgBox->setStyleClass("ngrt4n-transparent Wt-dialog");
-  m_infoMsgBox->setModal(false);
-  m_infoMsgBox->setTitleBarEnabled(false);
-}
-
 
 void WebMainUI::showMessage(const std::string& msg, std::string status)
 {
-  m_infoMsgBox->contents()->clear();
-  Wt::WText* textArea = new Wt::WText(msg, m_infoMsgBox->contents());
-  textArea->setStyleClass(status);
-  textArea->clicked().connect(std::bind([=](){
-    m_infoMsgBox->accept();
-  }));
-  m_infoMsgBox->positionAt(m_profileMenu);
-  m_infoMsgBox->show();
+  m_infoBox->setText(msg);
+  m_infoBox->setStyleClass(status);
+  m_infoBox->show();
 }
 
 void WebMainUI::createViewAssignmentDialog(void)

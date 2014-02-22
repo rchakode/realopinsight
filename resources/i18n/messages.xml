@@ -1,346 +1,325 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <messages>
-  <message id="copyright-info">
-  <div class="footer">
+<message id="copyright-info">
+<div class="footer">
     ${footer}
-  </div>
-  </message>
+</div>
+</message>
 
-  <message id="admin-home.tpl">
-  <div>
-      <!-- Menu pane -->
-      <div class="ngrt4n-side-pane ngrt4n-admin-menu-left">
-        <h3>&nbsp;</h3>
-        <div class="ngrt4n-content">
-          <!-- List actions -->
-          <div class="span2 list-group">
+<message id="admin-home.tpl">
+    <!-- Menu pane -->
+    <div class="ngrt4n-side-pane ngrt4n-admin-menu-left">
+      <h3>&nbsp;</h3>
+      <div class="ngrt4n-content">
+        <!-- List actions -->
+        <div class="span2 list-group">
             ${menu}
-          </div>
         </div>
       </div>
-
-     <!-- Content Pane -->
-      <div class="ngrt4n-content-pane ngrt4n-admin-content-right">
-        <h3>${title}</h3>
-         <div class="ngrt4n-content">
+    </div>
+   <!-- Content Pane -->
+    <div class="ngrt4n-content-pane ngrt4n-admin-content-right">
+    <div>${info-box}</div>
+      <h3>${title}</h3>
+       <div class="ngrt4n-content">
            ${contents}
-         </div>
-      </div>
-
-      <div class="footer">
-        ${footer}
-      </div>
-
-    </div> <!-- content-container -->
-  </message>
+       </div>
+    </div>
+</message>
 
 
-  <message id="getting-started.tpl">
-    <!-- 1st thumnail -->
-    <div class="span-one-third">
-         <div class="thumbnail">
-            <div class="title">
+<message id="getting-started.tpl">
+  <!-- 1st thumnail -->
+  <div class="span-one-third">
+       <div class="thumbnail">
+          <div class="title">
               Describe your target platforms
-            </div>
-            <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-            <p>Using the RealOpinsight Editor, describe and edit the target platform,
+          </div>
+          <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+          <p>Using the RealOpinsight Editor, describe and edit the target platform,
             the related services, as well as the business rules that bind them to each other.
             The Editor is an effective studio to modelize, in an easy and simply way,
             any kind of complex platforms you may have.
-            </p>
-            <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+          </p>
+          <p><a href="http://realopinsight.com/en/index.php/page/documentation"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
-            </p>
-         </div>
-    </div>
+          </p>
+       </div>
+  </div>
 
-    <!-- 2nd thumnail -->
-    <div class="span-one-third">
-            <div class="thumbnail">
-              <div class="title">Enable the acess to monitoring data</div>
-              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-              <p>The RealOpInsight setting user interfaces enable you to easily set
+  <!-- 2nd thumnail -->
+  <div class="span-one-third">
+          <div class="thumbnail">
+            <div class="title">Enable the acess to monitoring data</div>
+            <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
+            <p>The RealOpInsight setting user interfaces enable you to easily set
               when and how to retrieve status data from your monitoring servers in order
               to keep your operations dasboards up-to-date.
-              </p>
-              <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+            </p>
+            <p><a href="http://realopinsight.com/en/index.php/page/documentation"
               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-            </div>
-    </div>
+          </div>
+  </div>
 
 
-    <!-- Third thumnail -->
-     <div class="span-one-third">
-        <div class="thumbnail">
-           <div class="title">
+  <!-- Third thumnail -->
+   <div class="span-one-third">
+      <div class="thumbnail">
+         <div class="title">
              Preview and assign
-           </div>
-           <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-           <p>Once created, upload the views within the RealOpInsight server. Afterwards, you 
+         </div>
+         <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
+         <p>Once created, upload the views within the RealOpInsight server. Afterwards, you
            can preview and assign them to your operations staff. 
            RealOpInsight provides full control of administration requirements, such as, authentication, 
            user roles, and access control.
-                </p>
-           <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+              </p>
+         <p><a href="http://realopinsight.com/en/index.php/page/documentation"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-        </div>
-     </div>
+      </div>
+   </div>
  </message>
 
-
-  <message id="operator-home.tpl">
-  <div class="ngrt4n-operator-page">
-       <!-- Content Pane -->
-       <div class="ngrt4n-content-pane">
-
-         <div class="ngrt4n-content">
-           <h3>Service Health</h3>
+ <message id="operator-home.tpl">
+    <!-- Content Pane -->
+    <div class="ngrt4n-content-pane">
+       <div class="ngrt4n-content">
+         <legend>Service Health</legend>
            ${contents}
-         </div>
        </div>
-
-       <!-- Event Feeds Pane -->
-       <div class="ngrt4n-side-pane">
-         <div class="ngrt4n-content">
-           <h3>Event Feeds</h3>
+     </div>
+     <!-- Event Feeds Pane -->
+     <div class="ngrt4n-side-pane">
+       <div class="ngrt4n-content">
+         <legend>Event Feeds</legend>
            ${event-feeds}
-         </div>
        </div>
-<!--
-       <div class="footer">
-          ${footer}
-       </div>
--->
-    </div> <!-- content-container -->
-  </message>
+     </div>
+</message>
 
-  <message id="dashboard-thumbnail.tpl">
-     <div class="span2 thumbnail">
-        <div class="title">${thumb-titlebar}</div>
-        <div class="ngrt4n-thumbnail">${thumb-image}</div>
-    </div>
-  </message>
+<message id="dashboard-thumbnail.tpl">
+   <div class="span2 thumbnail">
+      <div class="title">${thumb-titlebar}</div>
+      <div class="ngrt4n-thumbnail">${thumb-image}</div>
+  </div>
+</message>
 
-  <message id="event-feed.tpl">
-    <div class="media">
-      <a class="pull-left" href="#">
-        <img class="media-object" src="${event-feed-icon}" alt="..." />
-      </a>
-      <div class="media-body">
-        <h4 class="media-heading">${event-feed-title}</h4>
+<message id="event-feed.tpl">
+  <div class="media">
+    <a class="pull-left" href="#">
+      <img class="media-object" src="${event-feed-icon}" alt="..." />
+    </a>
+    <div class="media-body">
+      <h4 class="media-heading">${event-feed-title}</h4>
         ${event-feed-details}
-        <div class="clearfix ${severity-css-class}">${platform} <span class="pull-right">${timestamp}</span></div>
-      </div>
+      <div class="clearfix ${severity-css-class}">${platform} <span class="pull-right">${timestamp}</span></div>
     </div>
+  </div>
 
-  </message>
+</message>
 
-  <message id="Wt.Auth.field">
-    <![CDATA[
+<message id="Wt.Auth.field">
+  <![CDATA[
     ${<if:{1}>}
-    <div class="control-group">
-      <label for="${id:{1}}" class="control-label">
+  <div class="control-group">
+    <label for="${id:{1}}" class="control-label">
         ${tr:Wt.Auth.{1}}
-      </label>
-      <div class="controls">${{1}}</div>
-    </div>
+    </label>
+    <div class="controls">${{1}}</div>
+  </div>
     ${</if:{1}>}
     ]]>
-  </message>
+</message>
 
-  <message id="Wt.Auth.template.login">
-  <div class="ngrt4n-gradient login-container">
-   <legend><img src="/images/built-in/logo.png" /></legend>
-      <p>${tr:Wt.Auth.login-form-info}</p>
+<message id="Wt.Auth.template.login">
+<div class="ngrt4n-gradient login-container">
+ <legend><img src="/images/built-in/logo.png" /></legend>
+    <p>${tr:Wt.Auth.login-form-info}</p>
 
-      <div class="form-horizontal">
+    <div class="form-horizontal">
         ${<if:passwords>}
-          <div class="control-group">
-            <label for="${id:user-name}" class="control-label">
+        <div class="control-group">
+          <label for="${id:user-name}" class="control-label">
               ${user-name-label}
-            </label>
-            <div class="controls">
+          </label>
+          <div class="controls">
               ${user-name}
-            </div>
           </div>
+        </div>
 
           ${block:Wt.Auth.field password}
         ${</if:passwords>}
 
         ${<if:oauth>}
-          <div class="control-group">
-            <div class="controls">
-              <p>Or login using:</p>
+        <div class="control-group">
+          <div class="controls">
+            <p>Or login using:</p>
               ${icons}
-            </div>
           </div>
+        </div>
         ${</if:oauth>}
 
-        <div class="form-actions">
-          <span>${login class="btn-primary"}</span>
-          <span>${lost-password class="btn-link"} ${sep}
+      <div class="form-actions">
+        <span>${login class="btn-primary"}</span>
+        <span>${lost-password class="btn-link"} ${sep}
           ${register class="btn-link"}</span>
-        </div>
       </div>
+    </div>
       ${block:copyright-info}
-    </div>
-  </message>
+  </div>
+</message>
 
-  <message id="Wt.Auth.template.logged-in">
-    <div class="row">
-       <div class="logout-button">${logout-item}</div>
-       ${main-ui}
-    </div>
-  </message>
+<message id="Wt.Auth.template.logged-in">
+  <div class="logout-button">${logout-item}</div>
+    ${main-ui}
+</message>
 
-  <message id="userForm-template">
-    <div class="form-horizontal">
+<message id="userForm-template">
+  <div class="form-horizontal">
       ${info-box}
-      <legend>User information</legend>
+    <legend>User information</legend>
       ${<if:user-name>}
-      <div class="control-group">
-          <label for="${id:user-name}" class="control-label">Login*</label>
-          <div class="controls">
+    <div class="control-group">
+        <label for="${id:user-name}" class="control-label">Login*</label>
+        <div class="controls">
             ${user-name} <span class="help-inline">${user-name-info}</span>
-         </div>
-      </div>
+       </div>
+    </div>
       ${</if:user-name>}
 
       ${<if:current-password>}
-      <div class="control-group">
-          <label for="${id:current-password}" class="control-label">Current password*</label>
-          <div class="controls">
+    <div class="control-group">
+        <label for="${id:current-password}" class="control-label">Current password*</label>
+        <div class="controls">
            ${current-password} <span class="help-inline">${current-password-info}</span>
-          </div>
-      </div>
+        </div>
+    </div>
       ${</if:current-password>}
 
       ${<if:password>}
-      <div class="control-group">
-            <label for="${id:password}" class="control-label">Password*</label>
-            <div class="controls">
+    <div class="control-group">
+          <label for="${id:password}" class="control-label">Password*</label>
+          <div class="controls">
               ${password}<span class="help-inline">${password-info}</span>
-            </div>
-      </div>
+          </div>
+    </div>
       ${</if:password>}
 
       ${<if:confirm-password>}
-      <div class="control-group">
-            <label for="${id:confirm-password}" class="control-label">Verify password*</label>
-            <div class="controls">
+    <div class="control-group">
+          <label for="${id:confirm-password}" class="control-label">Verify password*</label>
+          <div class="controls">
               ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
-            </div>
-      </div>
+          </div>
+    </div>
       ${</if:confirm-password>}
 
       ${<if:first-name>}
-      <div class="control-group">
-          <label for="${id:first-name}" class="control-label">First name*</label>
-          <div class="controls">
+    <div class="control-group">
+        <label for="${id:first-name}" class="control-label">First name*</label>
+        <div class="controls">
             ${first-name} <span class="help-inline">${first-name-info}</span>
-           </div>
-      </div>
+         </div>
+    </div>
      ${</if:first-name>}
 
      ${<if:last-name>}
-     <div class="control-group">
-          <label for="${id:last-name}" class="control-label">Last name*</label>
-          <div class="controls">
+   <div class="control-group">
+        <label for="${id:last-name}" class="control-label">Last name*</label>
+        <div class="controls">
             ${last-name} <span class="help-inline">${last-name-info}</span>
-          </div>
-      </div>
+        </div>
+    </div>
      ${</if:last-name>}
 
      ${<if:email>}
-      <div class="control-group">
-          <label for="${id:email}" class="control-label">Email*</label>
-          <div class="controls">
+    <div class="control-group">
+        <label for="${id:email}" class="control-label">Email*</label>
+        <div class="controls">
             ${email} <span class="help-inline">${email-info}</span>
-          </div>
         </div>
+      </div>
      ${</if:email>}
 
      ${<if:role>}
-      <div class="control-group">
-            <label for="${id:role}" class="control-label">User level*</label>
-            <div class="controls">
+    <div class="control-group">
+          <label for="${id:role}" class="control-label">User level*</label>
+          <div class="controls">
               ${role} <span class="help-inline">${role-info}</span>
-            </div>
-      </div>
+          </div>
+    </div>
      ${</if:role>}
 
       ${<if:registration-date>}
-      <div class="control-group">
-            <label for="${id:registration-date}" class="control-label">Registration*</label>
-            <div class="controls">
+    <div class="control-group">
+          <label for="${id:registration-date}" class="control-label">Registration*</label>
+          <div class="controls">
               ${registration-date} <span class="help-inline">${registration-date-info}</span>
-             </div>
-      </div>
+           </div>
+    </div>
       ${</if:registration-date>}
-      <div class="form-actions">
-          <span>${submit-button}</span>
-          <span>${change-password-link}</span>
-          <span>${cancel-button}</span>
-      </div>
+    <div class="form-actions">
+        <span>${submit-button}</span>
+        <span>${change-password-link}</span>
+        <span>${cancel-button}</span>
     </div>
-  </message>
+  </div>
+</message>
 
-  <message id="error-msg-div-tpl">
-    <div class="alert alert-warning">${msg}</div>
-  </message>
+<message id="error-msg-div-tpl">
+  <div class="alert alert-warning">${msg}</div>
+</message>
 
-  <message id="success-msg-div-tpl">
-    <div class="alert alert-success">${msg}</div>
-  </message>
+<message id="success-msg-div-tpl">
+  <div class="alert alert-success">${msg}</div>
+</message>
 
-  <message id="user-list-tpl">
+<message id="user-list-tpl">
      ${user-list}
-  </message>
+</message>
 
-  <message id="mgnt-home.tpl">
-    <div class="ngrt4n-content-pane">
-      <div class="pull-left">${menu}</div>
-      <div class="ngrt4n-content pull-right">${contents}</div>
-    </div>
-    <div class="footer fixed-footer clearfix">
+<message id="mgnt-home.tpl">
+  <div class="ngrt4n-content-pane">
+    <div class="pull-left">${menu}</div>
+    <div class="ngrt4n-content pull-right">${contents}</div>
+  </div>
+  <div class="footer fixed-footer clearfix">
        ${footer}
-    </div>
-  </message>
+  </div>
+</message>
 
 
-  <message id="copyright-footer.tpl">
-    ${software} ${version}
-    - Copyright &copy; 2010-${release-year} RealOpInsight Labs
-    - <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
+<message id="copyright-footer.tpl">
+    ${software} ${version} - Copyright &copy; 2010-${release-year} RealOpInsight Labs <br />
+    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
     - <a href="#">Support</a> - <a href="#">Documentation</a>
-  </message>
+</message>
 
-  <message id="view-assignment-tpl">
-    <br />
-    <div class="row">
-      <div>${info-box}</div>
+<message id="view-assignment-tpl">
+  <div class="row">
+      ${info-box}
+  </div>
+  <div class="row">
+    <div class="span-one-third">
+      <div class="center">${user-selector}</div>
     </div>
-    <div class="row">
-      <div class="span-one-third">
-        <div class="center">${user-selector}</div>
-      </div>
-      <div class="span-one-third">&nbsp;</div>
-      <div class="span-one-third">&nbsp;</div>
+    <div class="span-one-third">&nbsp;</div>
+    <div class="span-one-third">&nbsp;</div>
+  </div>
+  <div class="row">
+    <div class="span-one-third">
+      <div class="center">${assigned-views}</div>
     </div>
-    <div class="row">
-      <div class="span-one-third">
-        <div class="center">${assigned-views}</div>
-      </div>
-      <div class="span-one-third">
-        <div class="center">${button-assign}</div>
-        <div class="center">${button-revoke}</div>
-        <div class="center">${delete-view-button}</div>
-      </div>
-      <div class="span-one-third">${non-assigned-views}</div>
+    <div class="span-one-third">
+      <div class="center">${button-assign}</div>
+      <div class="center">${button-revoke}</div>
+      <div class="center">${delete-view-button}</div>
     </div>
-  </message>
+    <div class="span-one-third">${non-assigned-views}</div>
+  </div>
+</message>
 
-  <message id="statistic-tooltip.tpl">
+<message id="statistic-tooltip.tpl">
      ${platform}
      -----------
      Unknown: ${unknown-ratio}% (${unknown-count}/${total-count})
@@ -348,96 +327,92 @@
      Major: ${major-ratio}% (${major-count}/${total-count})
      Minor: ${minor-ratio}% (${minor-count}/${total-count})
      Normal: ${normal-ratio}% (${normal-count}/${total-count})
-  </message>
+</message>
 
-  <message id="chart.tpl">
-  <div>
-    <span class="badge severity-unknown">${unknown-count}</span>
-    <span class="badge severity-critical">${critical-count}</span>
-    <span class="badge severity-major">${major-count}</span>
-    <span class="badge severity-minor">${minor-count}</span>
-    <span class="badge severity-normal">${normal-count}</span>
-  </div>
-  <div>${chart}</div>
-  </message>
+<message id="chart.tpl">
+<div>
+  <span class="badge severity-unknown">${unknown-count}</span>
+  <span class="badge severity-critical">${critical-count}</span>
+  <span class="badge severity-major">${major-count}</span>
+  <span class="badge severity-minor">${minor-count}</span>
+  <span class="badge severity-normal">${normal-count}</span>
+</div>
+<div>${chart}</div>
+</message>
 
-  <message id="setting-page.tpl">
-    <div class="form-horizontal">
+<message id="setting-page.tpl">
+  <div class="form-horizontal">
     ${info-box}
-      <div>
-       <div class="control-group">
-         <label class="control-label">Sources&nbsp;&nbsp;</label>
-         <!--<div class="btn-group">-->
-           <span>${s0}</span>
-           <span>${s1}</span>
-           <span>${s2}</span>
-           <span>${s3}</span>
-           <span>${s4}</span>
-           <span>${s5}</span>
-           <span>${s6}</span>
-           <span>${s7}</span>
-           <span>${s8}</span>
-           <span>${s9}</span>
-        <!-- </div> -->
-       </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Monitor Type&nbsp;</label>
-        <span>${monitor-type}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Monitor Web URL&nbsp;</label>
-        <span>${monitor-url}</span>
-        <span>${dont-verify-ssl-certificate}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Livestatus Host&nbsp;</label>
-        <span>${livestatus-server}</span>
-        <span>${livestatus-port}</span>
-        <span>${use-ngrt4nd}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Auth String&nbsp;</label>
-        <span>${auth-string}</span>
-        <span>${show-in-clear}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Update Interval&nbsp;</label>
-        <span>${update-interval}</span>
-        <span>&nbsp;seconds</span>
-      </div>
-
-       <div class="form-actions">
-          <span>${apply-change-button}</span>
-          <span>${add-as-source-button}</span>
-          <span>${delete-button}</span>
+     <div class="control-group">
+       <label class="control-label">Sources&nbsp;&nbsp;</label>
+       <!--<div class="btn-group">-->
+         <span>${s0}</span>
+         <span>${s1}</span>
+         <span>${s2}</span>
+         <span>${s3}</span>
+         <span>${s4}</span>
+         <span>${s5}</span>
+         <span>${s6}</span>
+         <span>${s7}</span>
+         <span>${s8}</span>
+         <span>${s9}</span>
+      <!-- </div> -->
      </div>
+    <div class="control-group">
+      <label class="control-label">Monitor Type&nbsp;</label>
+      <span>${monitor-type}</span>
     </div>
-  </message>
+    <div class="control-group">
+      <label class="control-label">Monitor Web URL&nbsp;</label>
+      <span>${monitor-url}</span>
+      <span>${dont-verify-ssl-certificate}</span>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Livestatus Host&nbsp;</label>
+      <span>${livestatus-server}</span>
+      <span>${livestatus-port}</span>
+      <span>${use-ngrt4nd}</span>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Auth String&nbsp;</label>
+      <span>${auth-string}</span>
+      <span>${show-in-clear}</span>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Update Interval&nbsp;</label>
+      <span>${update-interval}</span>
+      <span>&nbsp;seconds</span>
+    </div>
 
-  <message id="about-tpl">
-     <div>
-       <legend>${software} ${version}</legend>
-       <p class="pull-left">
-         <img src="/images/built-in/logo.png" />
-       </p>
-       <p class="pull-right">
+     <div class="form-actions">
+        <span>${apply-change-button}</span>
+        <span>${add-as-source-button}</span>
+        <span>${delete-button}</span>
+   </div>
+ </div>
+</message>
+
+<message id="about-tpl">
+   <legend>${software} ${version}</legend>
+   <p class="pull-left">
+      <img src="/images/built-in/logo.png" />
+    </p>
+    <p class="pull-right">
           Codename: ${codename}<br />
           Core Library: ${corelib-version}<br />
           Release ID: ${release-id}
-       </p>
-       <div class="clearfix"></div>
-       <p class="text-center">
+    </p>
+    <div class="clearfix"></div>
+    <p class="text-center">
           Copyright &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved.<br/>
-          <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
-       </p>
-       <div style="float: right;">${close-button}</div>
-     </div>
-  </message>
-  <message id="notification.block.tpl">
-     <div id="notification-container">
-     <i class="fa fa-flag" id="notification-flag"></i>
-     <sup><span class="badge severity-critical">${problem-count}</span></sup>
-     </div>
-  </message>
+        <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
+    </p>
+    <div style="float: right;">${close-button}</div>
+</message>
+<message id="notification.block.tpl">
+   <div id="notification-container">
+   <i class="fa fa-flag" id="notification-flag"></i>
+   <sup><span class="badge severity-critical">${problem-count}</span></sup>
+   </div>
+</message>
 </messages>

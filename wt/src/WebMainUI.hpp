@@ -90,7 +90,6 @@ private:
   UserMngtUI* m_userMgntUI;
   Wt::WDialog* m_accountPanel;
   Wt::WDialog* m_changePasswordPanel;
-  Wt::WDialog* m_infoMsgBox;
   ViewAssignmentUI* m_viewAssignmentDialog;
   Wt::WDialog* m_aboutDialog;
   Wt::Signal<void> m_terminateSession;
@@ -98,6 +97,7 @@ private:
   int m_assignedDashboardCount;
   Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WText* m_adminPanelTitle;
+  Wt::WText* m_infoBox;
 
   void addEvents(void);
   void createMainUI(void);
@@ -122,7 +122,6 @@ private:
   void createAboutDialog(void);
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);
-  void createInfoMsgBox(void);
   void showMessage(const std::string& msg, std::string status);
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);

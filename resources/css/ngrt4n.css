@@ -1,7 +1,12 @@
 body, html {
-  overflow: hidden;
-  background: #f8f8ff;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.42857143;
+  color: #222222;
+  background-color: #f8f8ff;
+  background-color: #ffffff;
   margin: 0;
+  overflow: hidden;
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
@@ -14,15 +19,6 @@ body, html {
   padding-bottom: 50px;
 }
 
-.Wt-dialogcover {
-  background: #CCCCCC;
-  background: rgb(204, 204, 204); /* For IE, ... */
-  background: rgba(204, 204, 204, 0.5);
-  height: 100%; width: 100%;
-  top: 0px; 
-  left: 0px;
-  position: fixed;
-}
 
 .Wt-dialog {
   background-color: white;
@@ -75,14 +71,14 @@ body, html {
 
 /* Now specific classes */
 #wrapper {
-  position: relative;
+  position: absolute;
   display: block;
   left: 0;
   top: 0;
   right: 0;
 }
 #maincontainer {
-  position: absolute;
+  position: relative;
   display: block;
   left: 0;
   top: 0;
@@ -96,7 +92,6 @@ body, html {
   left: 0;
   top: 0;
   right: 0;
-  padding: 0 0 5px 20px;
   height: calc(100% - 40px);
 }
 
@@ -155,41 +150,33 @@ body, html {
 }
 
 .ngrt4n-content-pane {
-  position: fixed !important;
-  top: 80px;
-  left: 20px;
+  position: absolute;
   width: 68%;
-  height: calc(100%);
   overflow: hidden;
 }
 
 .ngrt4n-side-pane {
-  position: fixed !important;
-  top: 80px;
+  position: absolute;
   right: 0;
-  width: 29%;
-  height: calc(100%);
+  width: 28%;
   overflow: hidden;
 }
 
-
 .ngrt4n-admin-content-right {
+  position: absolute;
   left: 25%; 
 }
 
 .ngrt4n-admin-menu-left {
-  left: 20px;
-  width: 20%;
+  position: absolute;
+  width: 25%;
 }
 
 .ngrt4n-content-pane .ngrt4n-content, 
 .ngrt4n-side-pane .ngrt4n-content {
-  position: absolute; 
-  width: calc(98%);
-  max-height: calc(100% - 80px);
-  background: #FFF;
+  width: 98%;
+  background: #ffffff;
   border-radius: 5px;
-  box-shadow: 1px -1px 1px 1px #f1f1f1;
   overflow: auto;
 }
 
@@ -213,8 +200,8 @@ body, html {
 }
 
 .footer {
-  width: 70%;
-  margin: 0 18% 0 18%;
+  width: 90%;
+  margin: 0 5% 0 5%;
   text-align: center;
   font-size: 0.8em;
 }

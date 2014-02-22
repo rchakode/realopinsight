@@ -76,7 +76,6 @@ void AuthManager::createLoggedInView(void)
 
 void AuthManager::logout(void)
 {
-  wApp->setInternalPath(ngrt4n::LINK_LOGOUT);
   m_dbSession->loginObject().logout();
   refresh();
 }
