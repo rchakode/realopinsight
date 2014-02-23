@@ -10,13 +10,39 @@ body, html {
 }
 /* Wt-domRoot from Wt */
 .Wt-domRoot {
-  position: fixed !important;
-  display: block;
+  position: absolute;
   left: 0;
   top: 0;
   right: 0;
   z-index: -1;
-  padding-bottom: 50px;
+  height: 100%;
+}
+
+/* Now specific classes */
+#wrapper {
+  position: absolute;
+  display: block;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 100%;
+}
+#maincontainer {
+  position: relative;
+  display: block;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 100%;
+}
+
+#stackcontentarea {
+  position: relative;
+  display: block;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 100%;
 }
 
 
@@ -68,33 +94,6 @@ body, html {
 .form-actions {
   text-align: center;
 }
-
-/* Now specific classes */
-#wrapper {
-  position: absolute;
-  display: block;
-  left: 0;
-  top: 0;
-  right: 0;
-}
-#maincontainer {
-  position: relative;
-  display: block;
-  left: 0;
-  top: 0;
-  right: 0;
-  height: 100%;
-}
-
-#stackcontentarea {
-  position: relative;
-  display: block;
-  left: 0;
-  top: 0;
-  right: 0;
-  height: calc(100% - 40px);
-}
-
 .default-item-background {
   background-color: #f8f8ff;  
 }
@@ -113,7 +112,6 @@ body, html {
 .severity-unknown {
   background-color: #c0c0c0;
 }
-
 
 .thumbnail .caption{
   padding: 5px 2px; 
@@ -149,17 +147,28 @@ body, html {
   font-size: 0.8em;
 }
 
-.ngrt4n-content-pane {
+#ngrt4n-content-pane {
   position: absolute;
   width: 68%;
-  overflow: hidden;
+  overflow: auto;
+  margin-left: 5px;
 }
 
-.ngrt4n-side-pane {
+#ngrt4n-side-pane {
   position: absolute;
   right: 0;
   width: 28%;
-  overflow: hidden;
+  overflow: auto;
+  margin-left: 5px;
+}
+
+#ngrt4n-content-pane .ngrt4n-content, 
+#ngrt4n-side-pane .ngrt4n-content {
+  width: 98%;
+  height:100%;
+  background: #ffffff;
+  border-radius: 5px;
+  overflow: auto;
 }
 
 .ngrt4n-admin-content-right {
@@ -169,15 +178,8 @@ body, html {
 
 .ngrt4n-admin-menu-left {
   position: absolute;
+  left: 0; 
   width: 25%;
-}
-
-.ngrt4n-content-pane .ngrt4n-content, 
-.ngrt4n-side-pane .ngrt4n-content {
-  width: 98%;
-  background: #ffffff;
-  border-radius: 5px;
-  overflow: auto;
 }
 
 .info-box {
@@ -242,7 +244,7 @@ body, html {
 }
 
 .logout-button {
-  position: fixed !important;
+  position: absolute;
   right: 0px;
   top: 8px;
   z-index: 200;
@@ -274,15 +276,20 @@ body, html {
 }
 
 
-#notification-container {
+.notification-container {
   margin-top: 10px;
 }
 
-#notification-container span{
+.notification-container span,
+.chart .badge {
   color: #000000;
 }
 
-#notification-container .badge {
+.chart legend {
+ margin-left: 5px; 
+}
+
+.notification-container .badge {
   box-shadow:1px 1px 1px gray;
 }
 
@@ -290,4 +297,8 @@ body, html {
   color: #c0c0c0;
   text-shadow: 1px 1px 1px #ccc;
   font-size: 1.5em;
+}
+
+legend {
+ border: none; 
 }

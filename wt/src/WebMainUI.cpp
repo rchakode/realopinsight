@@ -45,8 +45,11 @@
 #include <Wt/WHBoxLayout>
 #include <Wt/WEvent>
 
-
-#define CHECK_LOGIN() if (! m_authManager->isLogged()) {wApp->redirect(ngrt4n::LINK_HOME); return;}
+#define RESIZE_PANES \
+  "var top = $(\"#ngrt4n-content-pane\").offset().top;" \
+  "var windowHeight = $(window).height();" \
+  "$(\"#ngrt4n-content-pane\").height(windowHeight - top);" \
+  "$(\"#ngrt4n-side-pane\").height(windowHeight - top);"
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
@@ -71,6 +74,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
   showUserHome();
   addEvents();
+  doJavaScript(RESIZE_PANES);
 }
 
 WebMainUI::~WebMainUI()
@@ -98,8 +102,6 @@ void WebMainUI::addEvents(void)
 
 void WebMainUI::showUserHome(void)
 {
-  CHECK_LOGIN();
-
   std::string homeTabTitle = "Home";
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     homeTabTitle = tr("Administration").toStdString();
@@ -143,7 +145,7 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
 
   // Start menu
-  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Start", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
+  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Home", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
   item->triggered().connect(std::bind([=](){
     m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
   }));
@@ -187,10 +189,11 @@ void WebMainUI::setupProfileMenus(void)
   m_profileMenu = new Wt::WMenu();
   m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
 
-  Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
-  notificationIcon->bindString("problem-count", "2");
-
-  m_navbar->addWidget(notificationIcon, Wt::AlignRight);
+  if (m_dbSession->loggedUser().role == User::OpRole) {
+    Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+    notificationIcon->bindString("problem-count", "1");
+    m_navbar->addWidget(notificationIcon, Wt::AlignRight);
+  }
 
   m_mainProfileMenuItem = new Wt::WMenuItem("Profile");
   m_mainProfileMenuItem->setText(tr("You're %1")
@@ -207,8 +210,8 @@ void WebMainUI::setupProfileMenus(void)
   profilePopupMenu->addItem(tr("Change password").toStdString())
       ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));
   profilePopupMenu->addSeparator();
-  curItem = profilePopupMenu->addItem(tr("Documentation").toStdString());
-  curItem->setLink(Wt::WLink(Wt::WLink::Url, "http://realopinsight.com/en/index.php/page/documentation"));
+  curItem = profilePopupMenu->addItem(tr("Help").toStdString());
+  curItem->setLink(Wt::WLink(Wt::WLink::Url, GET_HELP_URL));
   curItem->setLinkTarget(Wt::TargetNewWindow);
   profilePopupMenu->addItem("About")
       ->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
@@ -216,7 +219,6 @@ void WebMainUI::setupProfileMenus(void)
 
 void WebMainUI::setupMenus(void)
 {
-  CHECK_LOGIN();
 
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     setupAdminMenus();
@@ -224,48 +226,33 @@ void WebMainUI::setupMenus(void)
   setupProfileMenus();
 
   //FIXME: add this after the first view loaded
-  Wt::WText* text = createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
+  Wt::WText* text = utils::createFontAwesomeTextButton("fa fa-refresh",
+                                                       "Refresh the console map",
+                                                       m_mainWidget);
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar->addWidget(text);
 
-  text = createFontAwesomeTextButton("icon-zoom-in", "Zoom the console map in");
+  text = utils::createFontAwesomeTextButton("icon-zoom-in",
+                                            "Zoom the console map in",
+                                            m_mainWidget);
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   m_navbar->addWidget(text);
 
-  text = createFontAwesomeTextButton("icon-zoom-out", "Zoom the console map out");
+  text = utils::createFontAwesomeTextButton("icon-zoom-out",
+                                            "Zoom the console map out",
+                                            m_mainWidget);
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
   m_navbar->addWidget(text);
 }
 
-Wt::WText* WebMainUI::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
-{
-  Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
-                                              " <i class=\"%1\"></i>"
-                                              "</span>")
-                                  .arg(iconClasses.c_str()).toStdString(),
-                                  Wt::XHTMLText,
-                                  m_mainWidget);
-  link->setToolTip(tip);
-  return link;
-}
-
-Wt::WPushButton* WebMainUI::createTooBarButton(const std::string& icon)
-{
-  Wt::WPushButton* button = new Wt::WPushButton();
-  //button->setIcon(icon);
-  return button;
-}
-
 void WebMainUI::resetTimer(void)
 {
-  CHECK_LOGIN();
   m_timer.setInterval(1000*m_settings->updateInterval());
   m_timer.start();
 }
 
 void WebMainUI::resetTimer(qint32 interval)
 {
-  CHECK_LOGIN();
   m_timer.stop();
   m_timer.setInterval(interval);
   m_timer.start();
@@ -273,7 +260,6 @@ void WebMainUI::resetTimer(qint32 interval)
 
 void WebMainUI::handleRefresh(void)
 {
-  CHECK_LOGIN();
   m_timer.stop();
   m_mainWidget->disable();
 
@@ -298,7 +284,6 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectFileToOpen(void)
 {
-  CHECK_LOGIN();
   m_fileUploadDialog->setWindowTitle(tr("Select a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
@@ -315,7 +300,6 @@ void WebMainUI::selectFileToOpen(void)
 
 void WebMainUI::openFileUploadDialog(void)
 {
-  CHECK_LOGIN();
   m_fileUploadDialog->setWindowTitle(tr("Import a description file").toStdString());
   m_fileUploadDialog->setStyleClass("Wt-dialog");
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
@@ -352,7 +336,6 @@ void WebMainUI::openFileUploadDialog(void)
 
 void WebMainUI::finishFileDialog(int action)
 {
-  CHECK_LOGIN();
   switch(action) {
     case IMPORT:
       if (! m_uploader->empty()) {
@@ -414,7 +397,6 @@ void WebMainUI::finishFileDialog(int action)
 
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex)
 {
-  CHECK_LOGIN();
 
   tabIndex = -1;
 
@@ -444,7 +426,6 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
 
 void WebMainUI::scaleMap(double factor)
 {
-  CHECK_LOGIN();
   if (m_currentDashboard) {
     m_currentDashboard->map()->scaleMap(factor);
   }
@@ -605,6 +586,7 @@ void WebMainUI::initOperatorDashboard(void)
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
 
+
   Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
   m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
 
@@ -621,9 +603,9 @@ void WebMainUI::initOperatorDashboard(void)
   }
 
   m_userHomeTpl->bindWidget("contents", thumbs);
-  m_userHomeTpl->bindWidget("event-feeds", eventFeeds);
-
   startDashbaordUpdate();
+  m_userHomeTpl->bindWidget("event-feeds", eventFeeds);
+  //m_userHomeTpl->bindString("event-feeds", "<i class=\"fa fa-refresh fa-spin\"></i>");
 }
 
 

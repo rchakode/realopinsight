@@ -43,6 +43,9 @@ namespace utils {
   std::string timeTextFromQtTimeText(const std::string& qtimeText);
   Wt::WString wHumanTimeText(const std::string& mytime_t);
   Wt::WString wTimeToNow(const std::string& mytime_t);
+  Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses,
+                                         const std::string& tip,
+                                         Wt::WContainerWidget* parent);
 } //Namespace
 
 #endif // WEBUTILS_HPP

@@ -132,3 +132,18 @@ Wt::WString utils::wTimeToNow(const std::string& mytime_t)
 
   return t.timeTo(Wt::WDateTime::currentDateTime());
 }
+
+
+Wt::WText* utils::createFontAwesomeTextButton(const std::string& iconClasses,
+                                              const std::string& tip,
+                                              Wt::WContainerWidget* parent)
+{
+  Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
+                                              " <i class=\"%1\"></i>"
+                                              "</span>")
+                                  .arg(iconClasses.c_str()).toStdString(),
+                                  Wt::XHTMLText,
+                                  parent);
+  link->setToolTip(tip);
+  return link;
+}

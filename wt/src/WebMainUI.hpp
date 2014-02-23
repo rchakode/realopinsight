@@ -104,8 +104,6 @@ private:
   void setupAdminMenus(void);
   void setupProfileMenus(void);
   void setupMenus(void);
-  Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses, const std::string& ti);
-  Wt::WPushButton* createTooBarButton(const std::string& icon);
   Wt::WAnchor* createLogoLink(void);
   void openFileUploadDialog(void);
   void selectFileToOpen(void);

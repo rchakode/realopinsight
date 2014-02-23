@@ -8,7 +8,7 @@
 
 <message id="admin-home.tpl">
     <!-- Menu pane -->
-    <div class="ngrt4n-side-pane ngrt4n-admin-menu-left">
+    <div id="ngrt4n-side-pane" class="ngrt4n-admin-menu-left">
       <h3>&nbsp;</h3>
       <div class="ngrt4n-content">
         <!-- List actions -->
@@ -18,7 +18,7 @@
       </div>
     </div>
    <!-- Content Pane -->
-    <div class="ngrt4n-content-pane ngrt4n-admin-content-right">
+    <div id="ngrt4n-content-pane" class="ngrt4n-admin-content-right">
     <div class="info-box">${info-box}</div>
       <h3>${title}</h3>
        <div class="ngrt4n-content">
@@ -41,7 +41,7 @@
             The Editor is an effective studio to modelize, in an easy and simply way,
             any kind of complex platforms you may have.
           </p>
-          <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+          <p><a href="http://realopinsight.com/library/getting-started"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
           </p>
        </div>
@@ -56,7 +56,7 @@
               when and how to retrieve status data from your monitoring servers in order
               to keep your operations dasboards up-to-date.
             </p>
-            <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+            <p><a href="http://realopinsight.com/library/getting-started"
               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
           </div>
   </div>
@@ -74,7 +74,7 @@
            RealOpInsight provides full control of administration requirements, such as, authentication, 
            user roles, and access control.
               </p>
-         <p><a href="http://realopinsight.com/en/index.php/page/documentation"
+         <p><a href="http://realopinsight.com/library/getting-started"
                 class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
       </div>
    </div>
@@ -83,19 +83,19 @@
  <message id="operator-home.tpl">
     <!-- Content Pane -->
     <div class="info-box">${info-box}</div>
-    <div class="ngrt4n-content-pane">
+    <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-         <legend>Service Health</legend>
+         <legend>Application/Service Health</legend>
            ${contents}
        </div>
-     </div>
-     <!-- Event Feeds Pane -->
-     <div class="ngrt4n-side-pane">
-       <div class="ngrt4n-content">
-         <legend>Event Feeds</legend>
-           ${event-feeds}
-       </div>
-     </div>
+    </div>
+    <!-- Event Feeds Pane -->
+    <div id="ngrt4n-side-pane">
+    <div class="ngrt4n-content">
+    <legend>Event Feeds</legend>
+     ${event-feeds}
+    </div>
+    </div>
 </message>
 
 <message id="dashboard-thumbnail.tpl">
@@ -113,7 +113,8 @@
     <div class="media-body">
       <h4 class="media-heading">${event-feed-title}</h4>
         ${event-feed-details}
-      <div class="clearfix ${severity-css-class}">${platform} <span class="pull-right">${timestamp}</span></div>
+      <div class="clearfix ${severity-css-class}">${platform}
+      <span class="pull-right">${timestamp}</span></div>
     </div>
   </div>
 
@@ -292,8 +293,8 @@
 
 <message id="copyright-footer.tpl">
     ${software} ${version} - Copyright &copy; 2010-${release-year} RealOpInsight Labs <br />
-    <a href="http://realopinsight.com/en/index.php?page=legal" target="_blank">Terms &amp; Conditions</a>
-    - <a href="#">Support</a> - <a href="#">Documentation</a>
+    <a href="http://realopinsight.com/library/getting-started" target="_blank">Terms &amp; Conditions</a>
+    - <a href="#">Support</a> - <a href="#">Help</a>
 </message>
 
 <message id="view-assignment-tpl">
@@ -331,14 +332,16 @@
 </message>
 
 <message id="chart.tpl">
-<div>
+<div class="chart">
+ <legend>
   <span class="badge severity-unknown">${unknown-count}</span>
   <span class="badge severity-critical">${critical-count}</span>
   <span class="badge severity-major">${major-count}</span>
   <span class="badge severity-minor">${minor-count}</span>
   <span class="badge severity-normal">${normal-count}</span>
+ </legend>
+  ${chart}
 </div>
-<div>${chart}</div>
 </message>
 
 <message id="setting-page.tpl">
@@ -411,7 +414,7 @@
     <div style="float: right;">${close-button}</div>
 </message>
 <message id="notification.block.tpl">
-   <div id="notification-container">
+   <div class="notification-container">
    <i class="fa fa-flag" id="notification-flag"></i>
    <sup><span class="badge severity-critical">${problem-count}</span></sup>
    </div>
