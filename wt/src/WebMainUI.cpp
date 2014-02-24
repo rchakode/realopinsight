@@ -69,9 +69,9 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   createAccountPanel();
   createPasswordPanel();
   createAboutDialog();
-
+  
   setupMenus();
-
+  
   showUserHome();
   addEvents();
   doJavaScript(RESIZE_PANES);
@@ -108,19 +108,19 @@ void WebMainUI::showUserHome(void)
   } else {
     homeTabTitle =  tr("Operations Console").toStdString();
   }
-
+  
   std::string pageTitle = homeTabTitle;
   pageTitle.append(" - ")
       .append(m_dbSession->loggedUser().username)
       .append(" - ")
       .append(APP_NAME.toStdString());
   wApp->setTitle(pageTitle);
-
+  
   // data for CSS styling
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
   m_dashtabs->addTab(createUserHome(), homeTabTitle, Wt::WTabWidget::LazyLoading);
-
+  
   if (m_dbSession->loggedUser().role == User::OpRole) {
     initOperatorDashboard();
   }
@@ -131,7 +131,7 @@ void WebMainUI::createMainUI(void)
   m_navbar = new Wt::WNavigationBar(m_mainWidget);
   m_navbar->setResponsive(true);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
-
+  
   // Create a container for stacked contents
   m_contents = new Wt::WStackedWidget(m_mainWidget);
   m_contents->setId("stackcontentarea");
@@ -143,39 +143,41 @@ void WebMainUI::setupManagementMenus(void)
 {
   m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
   m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
-
-  // Start menu
-  Wt::WMenuItem* item = m_mgntTopMenu->addItem("Home", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
-  item->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
-  }));
-
-  // view menus
-  m_mgntTopMenu->addSectionHeader("Views");
-  m_mgntTopMenu->addItem("Import")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
-  m_mgntTopMenu->addItem("Preview")
-      ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-  m_mgntTopMenu->addItem("Manage Views", m_viewAssignmentDialog->contents())
-      ->triggered().connect(std::bind([=](){
-    m_viewAssignmentDialog->resetModelData();
-    m_adminPanelTitle->setText("Manage Views");
-  }));
-
-  // User menus
-  m_userMgntUI = new UserMngtUI(m_dbSession);
-  m_mgntTopMenu->addSectionHeader("Users");
-  item = m_mgntTopMenu->addItem("Add user", m_userMgntUI->userForm());
-  item->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Create new user");
-  }));
-
-  item = m_mgntTopMenu->addItem("Manage Users", m_userMgntUI->userListWidget());
-  item->triggered().connect(std::bind([=](){
-    m_userMgntUI->updateUserList();
-    m_adminPanelTitle->setText("Manage Users");
-  }));
-
+  
+  if (m_dbSession->loggedUser().role == User::AdmRole) {
+    // Start menu
+    Wt::WMenuItem* item = m_mgntTopMenu->addItem("Home", new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
+    item->triggered().connect(std::bind([=](){
+      m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
+    }));
+    
+    // view menus
+    m_mgntTopMenu->addSectionHeader("Views");
+    m_mgntTopMenu->addItem("Import")
+        ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
+    m_mgntTopMenu->addItem("Preview")
+        ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
+    m_mgntTopMenu->addItem("Manage Views", m_viewAssignmentDialog->contents())
+        ->triggered().connect(std::bind([=](){
+      m_viewAssignmentDialog->resetModelData();
+      m_adminPanelTitle->setText("Manage Views");
+    }));
+    
+    // User menus
+    m_userMgntUI = new UserMngtUI(m_dbSession);
+    m_mgntTopMenu->addSectionHeader("Users");
+    item = m_mgntTopMenu->addItem("Add user", m_userMgntUI->userForm());
+    item->triggered().connect(std::bind([=](){
+      m_adminPanelTitle->setText("Create new user");
+    }));
+    
+    item = m_mgntTopMenu->addItem("Manage Users", m_userMgntUI->userListWidget());
+    item->triggered().connect(std::bind([=](){
+      m_userMgntUI->updateUserList();
+      m_adminPanelTitle->setText("Manage Users");
+    }));
+  }
+  
   // setting menus
   m_mgntTopMenu->addSectionHeader("Account & Settings");
   item = m_mgntTopMenu->addItem("Monitoring Settings", m_preferenceDialog->getWidget());
@@ -198,22 +200,22 @@ void WebMainUI::setupProfileMenus(void)
 {
   m_profileMenu = new Wt::WMenu();
   m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
-
+  
   if (m_dbSession->loggedUser().role == User::OpRole) {
     Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
     notificationIcon->bindString("problem-count", "1");
     m_navbar->addWidget(notificationIcon, Wt::AlignRight);
   }
-
+  
   m_mainProfileMenuItem = new Wt::WMenuItem("Profile");
   m_mainProfileMenuItem->setText(tr("Signed in as %1")
                                  .arg(m_dbSession->loggedUser().username.c_str())
                                  .toStdString());
-
+  
   Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
   m_mainProfileMenuItem->setMenu(profilePopupMenu);
   m_profileMenu->addItem(m_mainProfileMenuItem);
-
+  
   Wt::WMenuItem* curItem = NULL;
   curItem = profilePopupMenu->addItem(tr("Help").toStdString());
   curItem->setLink(Wt::WLink(Wt::WLink::Url, GET_HELP_URL));
@@ -224,25 +226,22 @@ void WebMainUI::setupProfileMenus(void)
 
 void WebMainUI::setupMenus(void)
 {
-
-  if (m_dbSession->loggedUser().role == User::AdmRole) {
-    setupManagementMenus();
-  }
+  setupManagementMenus();
   setupProfileMenus();
-
+  
   //FIXME: add this after the first view loaded
   Wt::WText* text = utils::createFontAwesomeTextButton("fa fa-refresh",
                                                        "Refresh the console map",
                                                        m_mainWidget);
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar->addWidget(text);
-
+  
   text = utils::createFontAwesomeTextButton("icon-zoom-in",
                                             "Zoom the console map in",
                                             m_mainWidget);
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
   m_navbar->addWidget(text);
-
+  
   text = utils::createFontAwesomeTextButton("icon-zoom-out",
                                             "Zoom the console map out",
                                             m_mainWidget);
@@ -267,7 +266,7 @@ void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
   m_mainWidget->disable();
-
+  
   for(auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
@@ -292,14 +291,14 @@ void WebMainUI::selectFileToOpen(void)
   m_fileUploadDialog->setWindowTitle(tr("Select a file").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
-
+  
   container->setMargin(10, Wt::All);
   container->addWidget(createViewSelector());
-
+  
   // Provide a button to close the window
   Wt::WPushButton* finish(new Wt::WPushButton(tr("Finish").toStdString(), container));
   finish->clicked().connect(std::bind(&WebMainUI::finishFileDialog, this, OPEN));
-
+  
   m_fileUploadDialog->show();
 }
 
@@ -310,20 +309,20 @@ void WebMainUI::openFileUploadDialog(void)
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
   container->setMargin(10, Wt::All);
-
+  
   m_uploader = new Wt::WFileUpload(container);
   m_uploader->uploaded().connect(std::bind(&WebMainUI::finishFileDialog, this, IMPORT));
   m_uploader->setFileTextSize(ngrt4n::MAX_FILE_UPLOAD);
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
-
+  
   // Provide a button to start uploading.
   Wt::WPushButton* uploadButton = new Wt::WPushButton(tr("Upload").toStdString(), container);
   uploadButton->clicked().connect(std::bind([=](){
     m_uploader->upload();
     uploadButton->disable();
   }));
-
+  
   // Provide a button to close the upload dialog
   Wt::WPushButton* close(new Wt::WPushButton(tr("Close").toStdString(), container));
   close->clicked().connect(std::bind([=](){
@@ -331,7 +330,7 @@ void WebMainUI::openFileUploadDialog(void)
     m_fileUploadDialog->accept();
     m_fileUploadDialog->contents()->clear();
   }));
-
+  
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
     showMessage(tr("File is too large.").toStdString(), "alert alert-warning");
@@ -342,72 +341,72 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("notice", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
-
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
-
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid configuration file").toStdString();
-            LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+        LOG("notice", "Parsing the input file");
+        QString tmpFileName(m_uploader->spoolFileName().c_str());
+        CoreDataT cdata;
+        
+        Parser parser(tmpFileName ,&cdata);
+        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+        
+        if (! parser.process(false)) {
+          std::string msg = tr("Invalid configuration file").toStdString();
+          LOG("warn", msg);
+          showMessage(msg, "alert alert-warning");
+        } else {
+          
+          std::string filename = m_uploader->clientFileName().toUTF8();
+          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+          QFile file(tmpFileName);
+          file.copy(dest);
+          file.remove();
+          
+          View view;
+          view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
+          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+          view.path = dest.toStdString();
+          if (m_dbSession->addView(view) != 0){
+            showMessage(m_dbSession->lastError(), "alert alert-warning");
           } else {
-
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            View view;
-            view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Number of services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
-            }
+            QString msg = tr("View added. "
+                             " Name: %1\n - "
+                             " Number of services: %2 -"
+                             " Path: %3").arg(view.name.c_str(),
+                                              QString::number(view.service_count),
+                                              view.path.c_str());
+            showMessage(msg.toStdString(), "alert alert-success");
           }
         }
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectFile.empty()) {
-        int tabIndex;
-        WebDashboard* dashbord;
-        loadView(m_selectFile, dashbord, tabIndex);
-        m_selectFile.clear();
-      } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-      }
-      break;
-    default:
-      break;
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectFile.empty()) {
+      int tabIndex;
+      WebDashboard* dashbord;
+      loadView(m_selectFile, dashbord, tabIndex);
+      m_selectFile.clear();
+    } else {
+      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+    }
+    break;
+  default:
+    break;
   }
 }
 
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex)
 {
-
+  
   tabIndex = -1;
-
+  
   dashboard = new WebDashboard(m_dbSession->loggedUser().role, path.c_str());
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
-
+  
   if (! dashboard->errorState()) {
     std::string platform = dashboard->rootNode().name.toStdString();
     std::pair<DashboardListT::iterator, bool> result;
@@ -441,7 +440,7 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   m_infoBox = new Wt::WText(m_mainWidget);
   m_infoBox->hide();
   m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
-
+  
   m_userHomeTpl = new Wt::WTemplate();
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("admin-home.tpl"));
@@ -451,7 +450,7 @@ Wt::WWidget* WebMainUI::createUserHome(void)
   } else {
     m_userHomeTpl->setTemplateText(Wt::WString::tr("operator-home.tpl"));
   }
-
+  
   m_userHomeTpl->bindWidget("info-box", m_infoBox);
   return m_userHomeTpl;
 }
@@ -470,7 +469,7 @@ void WebMainUI::createAccountPanel(void)
     form->showMessage(ret,
                       "Update failed. More details in log.",
                       "Update completed.");}, std::placeholders::_1));
-
+  
   m_accountPanel = createDialog(tr("Manage user account").toStdString(), form);
 }
 
@@ -519,25 +518,25 @@ void WebMainUI::handleInternalPath(void)
 Wt::WComboBox* WebMainUI::createViewSelector(void)
 {
   ViewListT views = m_dbSession->viewList();
-
+  
   Wt::WComboBox* viewSelector = new Wt::WComboBox();
   viewSelector->setMargin(10, Wt::Right);
-
+  
   Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(m_mainWidget);
   Wt::WStandardItem *item = new Wt::WStandardItem();
   item->setText("Select a description file");
   viewSelectorModel->appendRow(item);
-
+  
   Q_FOREACH(const View& view, views) {
     item = new Wt::WStandardItem();
     item->setText(view.name);
     item->setData(view.path, Wt::UserRole);
     viewSelectorModel->appendRow(item);
   }
-
+  
   viewSelector->setModel(viewSelectorModel);
   viewSelector->setCurrentIndex(0);
-
+  
   // Set selection action
   viewSelector->activated().connect(std::bind([=]() {
     int index = viewSelector->currentIndex();
@@ -546,7 +545,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
       m_selectFile = boost::any_cast<std::string>(model->item(index, 0)->data());
     }
   }));
-
+  
   return viewSelector;
 }
 
@@ -568,12 +567,12 @@ void WebMainUI::createAboutDialog(void)
   m_aboutDialog = new Wt::WDialog(m_mainWidget);
   m_aboutDialog->setTitleBarEnabled(false);
   m_aboutDialog->setStyleClass("Wt-dialog");
-
+  
   Wt::WPushButton* closeButton(new Wt::WPushButton(tr("Close").toStdString()));
   closeButton->clicked().connect(std::bind([=](){m_aboutDialog->accept();}));
-
+  
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), m_aboutDialog->contents());
-
+  
   tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
   tpl->bindString("corelib-version", utils::libVersion().toStdString());
@@ -590,11 +589,11 @@ void WebMainUI::initOperatorDashboard(void)
 {
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
-
-
+  
+  
   Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
   m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
-
+  
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
   for (const auto& view: m_dbSession->viewList()) {
@@ -606,7 +605,7 @@ void WebMainUI::initOperatorDashboard(void)
       layout->addWidget(thumbnail(dashboard));
     }
   }
-
+  
   m_userHomeTpl->bindWidget("contents", thumbs);
   startDashbaordUpdate();
   m_userHomeTpl->bindWidget("event-feeds", eventFeeds);
