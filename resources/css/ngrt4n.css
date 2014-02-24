@@ -3,8 +3,8 @@ body, html {
   font-size: 15px;
   line-height: 1.42857143;
   color: #222222;
-  background-color: #f8f8ff;
   background-color: #ffffff;
+  background-color: #f8f8ff;
   margin: 0;
   overflow: hidden;
 }
@@ -148,15 +148,14 @@ body, html {
 }
 
 #ngrt4n-content-pane {
-  position: absolute;
-  width: 68%;
+  float: left;
+  width: 70%;
   overflow: auto;
   margin-left: 5px;
 }
 
 #ngrt4n-side-pane {
-  position: absolute;
-  right: 0;
+  float: right;
   width: 28%;
   overflow: auto;
   margin-left: 5px;
@@ -165,21 +164,21 @@ body, html {
 #ngrt4n-content-pane .ngrt4n-content, 
 #ngrt4n-side-pane .ngrt4n-content {
   width: 98%;
-  height:100%;
-  background: #ffffff;
+  height: 100%;
   border-radius: 5px;
   overflow: auto;
+  background-color: #ffffff;
 }
 
-.ngrt4n-admin-content-right {
-  position: absolute;
-  left: 25%; 
+.admin-page #ngrt4n-content-pane {
+  float: right;
+  overflow: hidden;
+  background-color: #ffffff;
 }
 
-.ngrt4n-admin-menu-left {
-  position: absolute;
-  left: 0; 
-  width: 25%;
+.admin-page #ngrt4n-side-pane {
+  float: left;
+  overflow: hidden;
 }
 
 .info-box {

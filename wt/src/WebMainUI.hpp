@@ -93,11 +93,11 @@ private:
   ViewAssignmentUI* m_viewAssignmentDialog;
   Wt::WDialog* m_aboutDialog;
   Wt::Signal<void> m_terminateSession;
-  Wt::WTemplate* m_userHomeTpl;
   int m_assignedDashboardCount;
   Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WText* m_adminPanelTitle;
   Wt::WText* m_infoBox;
+  bool m_showSettingTab;
 
   void addEvents(void);
   void createMainUI(void);
@@ -112,7 +112,7 @@ private:
   Wt::WTemplate* thumbnail(WebDashboard* dashboard);
   void finishFileDialog(int action);
   void scaleMap(double factor);
-  Wt::WWidget* createUserHome(void);
+  Wt::WWidget* createSettingPage(void);
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,const std::string& desc,const std::string& internalPath);
   void createAccountPanel(void);
   void createPasswordPanel(void);

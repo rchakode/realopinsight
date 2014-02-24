@@ -7,8 +7,9 @@
 </message>
 
 <message id="admin-home.tpl">
+  <div class="admin-page">
     <!-- Menu pane -->
-    <div id="ngrt4n-side-pane" class="ngrt4n-admin-menu-left">
+    <div id="ngrt4n-side-pane">
       <h3>&nbsp;</h3>
       <div class="ngrt4n-content">
         <!-- List actions -->
@@ -18,13 +19,14 @@
       </div>
     </div>
    <!-- Content Pane -->
-    <div id="ngrt4n-content-pane" class="ngrt4n-admin-content-right">
+    <div id="ngrt4n-content-pane">
     <div class="info-box">${info-box}</div>
       <h3>${title}</h3>
        <div class="ngrt4n-content">
            ${contents}
        </div>
     </div>
+  </div>
 </message>
 
 
@@ -85,7 +87,7 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-         <legend>Business Service Health</legend>
+         <legend>Application/Service Health</legend>
            ${contents}
        </div>
     </div>
