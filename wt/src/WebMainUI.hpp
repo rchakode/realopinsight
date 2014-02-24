@@ -101,7 +101,7 @@ private:
 
   void addEvents(void);
   void createMainUI(void);
-  void setupAdminMenus(void);
+  void setupManagementMenus(void);
   void setupProfileMenus(void);
   void setupMenus(void);
   Wt::WAnchor* createLogoLink(void);

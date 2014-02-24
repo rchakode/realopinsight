@@ -139,7 +139,7 @@ void WebMainUI::createMainUI(void)
 }
 
 
-void WebMainUI::setupAdminMenus(void)
+void WebMainUI::setupManagementMenus(void)
 {
   m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
   m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
@@ -226,7 +226,7 @@ void WebMainUI::setupMenus(void)
 {
 
   if (m_dbSession->loggedUser().role == User::AdmRole) {
-    setupAdminMenus();
+    setupManagementMenus();
   }
   setupProfileMenus();
 
