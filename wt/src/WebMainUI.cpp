@@ -178,9 +178,19 @@ void WebMainUI::setupAdminMenus(void)
 
   // setting menus
   m_mgntTopMenu->addSectionHeader("Settings");
-  item = m_mgntTopMenu->addItem("Set or update", m_preferenceDialog->getWidget());
+  item = m_mgntTopMenu->addItem("Monitoring Settings", m_preferenceDialog->getWidget());
   item->triggered().connect(std::bind([=](){
     m_adminPanelTitle->setText("Update Settings");
+  }));
+  
+  item = m_mgntTopMenu->addItem("My account", m_accountPanel->contents());
+  item->triggered().connect(std::bind([=](){
+    m_adminPanelTitle->setText("My Accounts");
+  }));
+  
+  item = m_mgntTopMenu->addItem("Change password", m_changePasswordPanel->contents());
+  item->triggered().connect(std::bind([=](){
+    m_adminPanelTitle->setText("Change password");
   }));
 }
 
