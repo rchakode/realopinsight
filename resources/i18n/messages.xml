@@ -179,7 +179,6 @@
 <message id="userForm-template">
   <div class="form-horizontal">
       ${info-box}
-    <legend>User information</legend>
       ${<if:user-name>}
     <div class="control-group">
         <label for="${id:user-name}" class="control-label">Login*</label>

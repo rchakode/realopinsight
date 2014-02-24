@@ -104,7 +104,7 @@ void WebMainUI::showUserHome(void)
 {
   std::string homeTabTitle = "Home";
   if (m_dbSession->loggedUser().role == User::AdmRole) {
-    homeTabTitle = tr("Administration").toStdString();
+    homeTabTitle = tr("Settings").toStdString();
   } else {
     homeTabTitle =  tr("Operations Console").toStdString();
   }
@@ -156,7 +156,7 @@ void WebMainUI::setupAdminMenus(void)
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
   m_mgntTopMenu->addItem("Preview")
       ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-  m_mgntTopMenu->addItem("Manage", m_viewAssignmentDialog->contents())
+  m_mgntTopMenu->addItem("Manage Views", m_viewAssignmentDialog->contents())
       ->triggered().connect(std::bind([=](){
     m_viewAssignmentDialog->resetModelData();
     m_adminPanelTitle->setText("Manage Views");
@@ -170,7 +170,7 @@ void WebMainUI::setupAdminMenus(void)
     m_adminPanelTitle->setText("Create new user");
   }));
 
-  item = m_mgntTopMenu->addItem("Manage", m_userMgntUI->userListWidget());
+  item = m_mgntTopMenu->addItem("Manage Users", m_userMgntUI->userListWidget());
   item->triggered().connect(std::bind([=](){
     m_userMgntUI->updateUserList();
     m_adminPanelTitle->setText("Manage Users");
@@ -180,15 +180,15 @@ void WebMainUI::setupAdminMenus(void)
   m_mgntTopMenu->addSectionHeader("Settings");
   item = m_mgntTopMenu->addItem("Monitoring Settings", m_preferenceDialog->getWidget());
   item->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Update Settings");
+    m_adminPanelTitle->setText("Update Monitoring Settings");
   }));
   
-  item = m_mgntTopMenu->addItem("My account", m_accountPanel->contents());
+  item = m_mgntTopMenu->addItem("My Account", m_accountPanel->contents());
   item->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("My Accounts");
+    m_adminPanelTitle->setText("My Account");
   }));
   
-  item = m_mgntTopMenu->addItem("Change password", m_changePasswordPanel->contents());
+  item = m_mgntTopMenu->addItem("Change Password", m_changePasswordPanel->contents());
   item->triggered().connect(std::bind([=](){
     m_adminPanelTitle->setText("Change password");
   }));
@@ -206,7 +206,7 @@ void WebMainUI::setupProfileMenus(void)
   }
 
   m_mainProfileMenuItem = new Wt::WMenuItem("Profile");
-  m_mainProfileMenuItem->setText(tr("You're %1")
+  m_mainProfileMenuItem->setText(tr("Signed in as %1")
                                  .arg(m_dbSession->loggedUser().username.c_str())
                                  .toStdString());
 
@@ -215,11 +215,6 @@ void WebMainUI::setupProfileMenus(void)
   m_profileMenu->addItem(m_mainProfileMenuItem);
 
   Wt::WMenuItem* curItem = NULL;
-  profilePopupMenu->addItem(tr("My Account").toStdString())
-      ->triggered().connect(std::bind([=](){m_accountPanel->show();}));
-  profilePopupMenu->addItem(tr("Change password").toStdString())
-      ->triggered().connect(std::bind([=](){m_changePasswordPanel->show();}));
-  profilePopupMenu->addSeparator();
   curItem = profilePopupMenu->addItem(tr("Help").toStdString());
   curItem->setLink(Wt::WLink(Wt::WLink::Url, GET_HELP_URL));
   curItem->setLinkTarget(Wt::TargetNewWindow);
