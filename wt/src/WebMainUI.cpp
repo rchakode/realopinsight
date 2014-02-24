@@ -104,7 +104,7 @@ void WebMainUI::showUserHome(void)
 {
   std::string homeTabTitle = "Home";
   if (m_dbSession->loggedUser().role == User::AdmRole) {
-    homeTabTitle = tr("Settings").toStdString();
+    homeTabTitle = tr("Account & Settings").toStdString();
   } else {
     homeTabTitle =  tr("Operations Console").toStdString();
   }
@@ -177,7 +177,7 @@ void WebMainUI::setupManagementMenus(void)
   }));
 
   // setting menus
-  m_mgntTopMenu->addSectionHeader("Settings");
+  m_mgntTopMenu->addSectionHeader("Account & Settings");
   item = m_mgntTopMenu->addItem("Monitoring Settings", m_preferenceDialog->getWidget());
   item->triggered().connect(std::bind([=](){
     m_adminPanelTitle->setText("Update Monitoring Settings");
