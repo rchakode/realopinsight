@@ -31,23 +31,8 @@
 #include "Base.hpp"
 #include <QSplashScreen>
 
-class LIBREALOPINSIGHTSHARED_EXPORT ImageButton : public QAbstractButton {
-  Q_OBJECT
-private:
-  QPixmap pixmap;
-public:
-  ImageButton(const QString& ipath) {this->pixmap = QPixmap(ipath); update();}
-  ~ImageButton(){}
-  void setPixmap(const QPixmap& pm ) {pixmap = pm; update(); }
-  QSize sizeHint() const {return pixmap.size();}
-protected:
-  void paintEvent( QPaintEvent*) {
-    QPainter p(this);
-    p.drawPixmap(0, 0, pixmap );
-  }
-};
 
-class LIBREALOPINSIGHTSHARED_EXPORT Preferences : public QDialog
+class LIBREALOPINSIGHTSHARED_EXPORT Preferences
 {
   Q_OBJECT
 
@@ -64,14 +49,8 @@ public:
 
   Preferences(qint32 _userRole, qint32 _formType);
   virtual ~Preferences();
-  static QString style();
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
-  void clearUpdatedSources(void) { m_updatedSources.clear(); }
-  QString getRealmLogin(void) const {return m_realmLoginField->text();}
-  QString getRealmPasswd(void) const {return m_realmPasswdField->text();}
-  void setCancelled(bool cancelled) { m_cancelled = cancelled;}
-  bool getCancelled(void) const {return m_cancelled;}
 
 Q_SIGNALS:
   void urlChanged(QString);
@@ -79,26 +58,20 @@ Q_SIGNALS:
   void errorOccurred(QString msg);
 
 protected :
-  virtual void showEvent (QShowEvent *);
-  virtual void fillFromSource(int _sidx);
-  virtual void updateSourceBtnState(void);
+  virtual void fillFromSource(int _sidx) = 0;
+  virtual void updateSourceBtnState(void) = 0;
   virtual void loadProperties(void);
   virtual void updateFields(void);
-  virtual void saveAsSource(const qint32& idx, const QString& type);
+  virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
   virtual int firstSourceSet(void);
   virtual void initSourceStates();
   QString getSourceStatesSerialized(void);
 
 protected Q_SLOTS:
-  virtual QString letUserSelectType(void);
-  virtual void applyChanges(void);
-  virtual void handleCancel(void);
-  virtual void addAsSource(void);
-  virtual void deleteSource(void);
-  void changePasswd(void);
-  void donate(void);
-  void setAuthChainVisibility(const int& state);
-  void handleSourceSelected();
+  virtual void applyChanges(void) = 0;
+  virtual void handleCancel(void) = 0;
+  virtual void addAsSource(void) = 0;
+  virtual void deleteSource(void) = 0;
   qint32 updateInterval(void) const {return m_settings->updateInterval();}
 
 protected:
@@ -106,45 +79,7 @@ protected:
   int m_currentSourceIndex;
   QBitArray* m_sourceStates;
 
-private:
-  QGridLayout* m_mainLayout;
-  qint32 m_userRole;
-  int m_formType;
-  QLineEdit* m_monitorUrlField;
-  QComboBox* m_monitorTypeField;
-  QSpinBox* m_updateIntervalField;
-  QLineEdit* m_oldPwdField;
-  QLineEdit* m_pwdField;
-  QLineEdit* m_rePwdField;
-  QLineEdit* m_sockAddrField;
-  QLineEdit* m_sockPortField;
-  QLineEdit* m_serverPassField;
-  QPushButton* m_cancelBtn;
-  QPushButton* m_applySettingBtn;
-  QPushButton* m_addAsSourceBtn;
-  QPushButton* m_deleteSourceBtn;
-  QPushButton* m_changePwdBtn;
-  ImageButton* m_donateBtn;
-  QCheckBox* m_showAuthInfoChkbx;
-  QCheckBox* m_useNgrt4ndChkbx;
-  QList<qint8> m_updatedSources;
-  QCheckBox* m_verifySslPeerChkBx;
-  QVector<QRadioButton*> m_sourceBtns;
-  bool m_cancelled;
-
-  QLineEdit* m_realmLoginField;
-  QLineEdit* m_realmPasswdField;
-
-  void addEvents(void);
-  QGroupBox* createScktGrp(void);
-  QGroupBox* createCommonGrp(void);
   void initSourceStates(const QString& str);
-  QGroupBox* createUpdateBtnsGrp(void);
-  void createPreferenceWindow(void);
-  void createChangePasswordForm(void);
-  void organizeAbortWindow(void);
-  void disableFieldIfRequired(void);
-  void loadBasicLoginForm(void);
 };
 
 

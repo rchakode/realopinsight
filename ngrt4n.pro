@@ -179,7 +179,9 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
 
-HEADERS +=
+HEADERS += \
+    client/src/GuiPreferences.hpp
 
-SOURCES +=
+SOURCES += \
+    client/src/GuiPreferences.cpp
 

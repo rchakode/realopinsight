@@ -53,14 +53,14 @@ public:
   Wt::WWidget* getWidget(void) {return m_dialog->contents();}
 
 protected :
-  void handleCancel(void) {m_dialog->accept();}
   virtual void applyChanges(void);
-  virtual void deleteSource(void);
+  void handleCancel(void) {m_dialog->accept();}
   virtual void fillFromSource(int _sidx);
   virtual void updateSourceBtnState(void);
   virtual void updateFields(void);
   virtual void saveAsSource(const qint32& index, const QString& type);
   virtual void addAsSource(void);
+  virtual void deleteSource(void);
 
 private:
   Wt::WDialog* m_dialog;
