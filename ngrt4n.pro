@@ -27,33 +27,33 @@ LIBS += -lrealopinsight
 
 config-gui-base {
 PACKAGE_VERSION = "$${BASE_VERSION}-SE"
-HEADERS	+= include/client/Auth.hpp \
-    include/client/GraphView.hpp \
-    include/client/PieChart.hpp \
-    include/client/PieChartItem.hpp \
-    include/client/ServiceEditor.hpp \
-    include/client/StatsLegend.hpp \
-    include/client/SvConfigCreator.hpp \
-    include/client/GuiDashboard.hpp \
-    include/client/MainWindow.hpp \
-    include/client/SvNavigatorTree.hpp \
-    include/client/WebKit.hpp \
-    include/client/Settings.hpp \
-    include/client/Chart.hpp \
-    include/client/MsgConsole.hpp
+HEADERS	+= client/src/Auth.hpp \
+    client/src/GraphView.hpp \
+    client/src/PieChart.hpp \
+    client/src/PieChartItem.hpp \
+    client/src/ServiceEditor.hpp \
+    client/src/StatsLegend.hpp \
+    client/src/SvConfigCreator.hpp \
+    client/src/GuiDashboard.hpp \
+    client/src/MainWindow.hpp \
+    client/src/SvNavigatorTree.hpp \
+    client/src/WebKit.hpp \
+    client/src/Settings.hpp \
+    client/src/Chart.hpp \
+    client/src/MsgConsole.hpp
 
-SOURCES	+= src/client/Auth.cpp \
-    src/client/GraphView.cpp \
-    src/client/PieChart.cpp \
-    src/client/PieChartItem.cpp \
-    src/client/ServiceEditor.cpp \
-    src/client/SvConfigCreator.cpp \
-    src/client/GuiDashboard.cpp \
-    src/client/MainWindow.cpp \
-    src/client/SvNavigatorTree.cpp \
-    src/client/WebKit.cpp \
-    src/client/Chart.cpp \
-    src/client/MsgConsole.cpp
+SOURCES	+= client/src/Auth.cpp \
+    client/src/GraphView.cpp \
+    client/src/PieChart.cpp \
+    client/src/PieChartItem.cpp \
+    client/src/ServiceEditor.cpp \
+    client/src/SvConfigCreator.cpp \
+    client/src/GuiDashboard.cpp \
+    client/src/MainWindow.cpp \
+    client/src/SvNavigatorTree.cpp \
+    client/src/WebKit.cpp \
+    client/src/Chart.cpp \
+    client/src/MsgConsole.cpp
 }
 
 config-dist {
@@ -62,19 +62,19 @@ TARGET = RealOpInsight
 }
 
 config-manager {
-SOURCES	+= src/client/ngrt4n-manager.cpp
+SOURCES	+= client/src/ngrt4n-manager.cpp
 TARGET = ngrt4n-manager
 }
 
 config-oc {
 CONFIG += config-gui-base
-SOURCES	+= src/client/ngrt4n-oc.cpp
+SOURCES	+= client/src/ngrt4n-oc.cpp
 TARGET = ngrt4n-oc
 }
 
 config-editor {
 CONFIG += config-gui-base
-SOURCES	+= src/client/ngrt4n-editor.cpp
+SOURCES	+= client/src/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
 
@@ -171,7 +171,7 @@ DISTFILES += README \
     images/*.png \
     images/built-in/*.png \
     examples/{*.ngrt4n.xml,*.dat} \
-    src/client/ngrt4n-*.cpp \
+    client/src/ngrt4n-*.cpp \
     doc/man/*.gz \
     i18n/ngrt4n_*.qm
 
