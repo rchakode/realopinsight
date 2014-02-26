@@ -22,11 +22,11 @@ protected:
 };
 
 
-class GuiPreferences : public Preferences, public QDialog
+class GuiPreferences : public Preferences
 {
   Q_OBJECT
 public:
-  explicit GuiPreferences(qint32 _userRole, qint32 _formType, QWidget *parent = 0);
+  explicit GuiPreferences(qint32 _userRole, qint32 _formType);
   ~GuiPreferences();
   void clearUpdatedSources(void) { m_updatedSources.clear(); }
   QString getRealmLogin(void) const {return m_realmLoginField->text();}
@@ -34,10 +34,9 @@ public:
   void setCancelled(bool cancelled) { m_cancelled = cancelled;}
   bool getCancelled(void) const {return m_cancelled;}
   static QString style();
+  void show(void);
 
 protected :
-  virtual void showEvent (QShowEvent *);
-  virtual void updateSourceBtnState(void);
   virtual void applyChanges(void);
   virtual void handleCancel(void);
   virtual void fillFromSource(int _sidx);
@@ -51,8 +50,10 @@ protected Q_SLOTS:
   void setAuthChainVisibility(const int& state);
   void handleDonate(void);
   void changePasswd(void);
+  void handleSourceSelected();
 
 private:
+  QDialog* m_dialog;
   QGridLayout* m_mainLayout;
   qint32 m_userRole;
   int m_formType;
@@ -77,7 +78,6 @@ private:
   QCheckBox* m_verifySslPeerChkBx;
   QVector<QRadioButton*> m_sourceBtns;
   bool m_cancelled;
-
   QLineEdit* m_realmLoginField;
   QLineEdit* m_realmPasswdField;
 
@@ -90,7 +90,6 @@ private:
   void organizeAbortWindow(void);
   void disableFieldIfRequired(void);
   void loadBasicLoginForm(void);
-  void handleSourceSelected();
   QString letUserSelectType(void);
 };
 

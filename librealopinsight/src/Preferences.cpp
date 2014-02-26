@@ -32,7 +32,7 @@
 #include <QIntValidator>
 #include <QRegExpValidator>
 
-Preferences::Preferences(qint32 _userRole, qint32 _formType)
+Preferences::Preferences(void)
   : m_settings(new Settings()),
     m_currentSourceIndex(0),
     m_sourceStates(new QBitArray(MAX_SRCS))

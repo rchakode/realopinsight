@@ -32,7 +32,7 @@
 #include <QSplashScreen>
 
 
-class LIBREALOPINSIGHTSHARED_EXPORT Preferences
+class LIBREALOPINSIGHTSHARED_EXPORT Preferences: public QObject
 {
   Q_OBJECT
 
@@ -47,7 +47,7 @@ public:
     WebForm
   };
 
-  Preferences(qint32 _userRole, qint32 _formType);
+  Preferences(void);
   virtual ~Preferences();
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }

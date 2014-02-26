@@ -1,10 +1,11 @@
 
 #include "GuiPreferences.hpp"
+#include "utilsClient.hpp"
 
-GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType,QWidget *parent)
-  : Preferences(_userRole, _formType),
-    QDialog(parent),
-    m_mainLayout(new QGridLayout(this)),
+GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType)
+  : Preferences(),
+    m_dialog(new QDialog()),
+    m_mainLayout(new QGridLayout(m_dialog)),
     m_userRole(_userRole),
     m_formType(_formType),
     m_cancelBtn(new QPushButton(tr("&Close"))),
@@ -12,23 +13,23 @@ GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType,QWidget *paren
 {
   switch (_formType)
   {
-    case Preferences::ChangeMonitoringSettings:
-      createPreferenceWindow();
-      break;
-    case Preferences::ChangePassword:
-    case Preferences::ForceChangePassword:
-      createChangePasswordForm();
-      break;
-    case Preferences::ShowAbout:
-      organizeAbortWindow();
-      break;
-    case Preferences::BasicLoginForm:
-      loadBasicLoginForm();
-      break;
-    case WebForm:
-      break;
-    default:
-      break;
+  case Preferences::ChangeMonitoringSettings:
+    createPreferenceWindow();
+    break;
+  case Preferences::ChangePassword:
+  case Preferences::ForceChangePassword:
+    createChangePasswordForm();
+    break;
+  case Preferences::ShowAbout:
+    organizeAbortWindow();
+    break;
+  case Preferences::BasicLoginForm:
+    loadBasicLoginForm();
+    break;
+  case WebForm:
+    break;
+  default:
+    break;
   }
   addEvents();
 }
@@ -37,60 +38,62 @@ GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType,QWidget *paren
 GuiPreferences::~GuiPreferences()
 {
   switch(m_formType) {
-    case ChangeMonitoringSettings:
-      delete m_sourceStates;
-      delete m_monitorTypeField;
-      delete m_monitorUrlField;
-      delete m_updateIntervalField;
-      delete m_applySettingBtn;
-      delete m_addAsSourceBtn;
-      delete m_deleteSourceBtn;
-      delete m_sockAddrField;
-      delete m_sockPortField;
-      delete m_serverPassField;
-      delete m_showAuthInfoChkbx;
-      delete m_useNgrt4ndChkbx;
-      delete m_verifySslPeerChkBx;
-      break;
-    case ChangePassword:
-      delete m_oldPwdField;
-      delete m_pwdField;
-      delete m_rePwdField;
-      delete m_changePwdBtn;
-      break;
-    case BasicLoginForm:
-      delete m_realmLoginField;
-      delete m_realmPasswdField;
-      break;
-    case ShowAbout:
-      delete m_donateBtn;
-      break;
-    default:
-      break;
+  case ChangeMonitoringSettings:
+    delete m_sourceStates;
+    delete m_monitorTypeField;
+    delete m_monitorUrlField;
+    delete m_updateIntervalField;
+    delete m_applySettingBtn;
+    delete m_addAsSourceBtn;
+    delete m_deleteSourceBtn;
+    delete m_sockAddrField;
+    delete m_sockPortField;
+    delete m_serverPassField;
+    delete m_showAuthInfoChkbx;
+    delete m_useNgrt4ndChkbx;
+    delete m_verifySslPeerChkBx;
+    break;
+  case ChangePassword:
+    delete m_oldPwdField;
+    delete m_pwdField;
+    delete m_rePwdField;
+    delete m_changePwdBtn;
+    break;
+  case BasicLoginForm:
+    delete m_realmLoginField;
+    delete m_realmPasswdField;
+    break;
+  case ShowAbout:
+    delete m_donateBtn;
+    break;
+  default:
+    break;
   }
   delete m_cancelBtn;
   delete m_mainLayout;
+  delete m_dialog;
 }
 
 
 
-void GuiPreferences::showEvent (QShowEvent *)
+void GuiPreferences::show(void)
 {
   switch(m_formType) {
-    case ChangePassword:
-      m_oldPwdField->setText("");
-      m_pwdField->setText("");
-      m_rePwdField->setText("");
-      break;
-    case ChangeMonitoringSettings:
-      break;
-    case BasicLoginForm:
-      break;
-    case ShowAbout:
-      break;
-    default:
-      break;
+  case ChangePassword:
+    m_oldPwdField->setText("");
+    m_pwdField->setText("");
+    m_rePwdField->setText("");
+    break;
+  case ChangeMonitoringSettings:
+    break;
+  case BasicLoginForm:
+    break;
+  case ShowAbout:
+    break;
+  default:
+    break;
   }
+  m_dialog->show();
 }
 
 
@@ -101,7 +104,7 @@ QString GuiPreferences::letUserSelectType(void)
   }
 
   bool ok = false;
-  QString srcType = QInputDialog::getItem(this,
+  QString srcType = QInputDialog::getItem(m_dialog,
                                           tr("Select the source type | %1").arg(APP_NAME),
                                           tr("Please select the source type (Remote API)"),
                                           utils::sourceTypes(),
@@ -130,21 +133,21 @@ void GuiPreferences::updateSourceBtnState(void)
 void GuiPreferences::handleCancel(void)
 {
   switch(m_formType) {
-    case ChangeMonitoringSettings:
-      Q_EMIT sourcesChanged(m_updatedSources);
-      break;
-    case BasicLoginForm:
-      break;
-    default:
-      break;
+  case ChangeMonitoringSettings:
+    Q_EMIT sourcesChanged(m_updatedSources);
+    break;
+  case BasicLoginForm:
+    break;
+  default:
+    break;
   }
   m_cancelled = true;
-  done(0);
+  m_dialog->done(0);
 }
 
 void GuiPreferences::createPreferenceWindow(void)
 {
-  setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
+  m_dialog->setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
 
   m_monitorUrlField = new QLineEdit();
   m_monitorTypeField = new QComboBox();
@@ -187,7 +190,7 @@ void GuiPreferences::createChangePasswordForm(void)
   m_pwdField->setEchoMode(QLineEdit::Password);
   m_rePwdField->setEchoMode(QLineEdit::Password);
 
-  setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
+  m_dialog->setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
 
   int line = -1;
 
@@ -212,7 +215,7 @@ void GuiPreferences::createChangePasswordForm(void)
 
 void GuiPreferences::organizeAbortWindow(void)
 {
-  setWindowTitle(tr("About %1").arg(APP_NAME));
+  m_dialog->setWindowTitle(tr("About %1").arg(APP_NAME));
   m_donateBtn = new ImageButton(":images/built-in/donate.png");
   QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
                               "\nRelease ID: %4\n"
@@ -329,7 +332,7 @@ QString GuiPreferences::style()
 
 void GuiPreferences::loadBasicLoginForm(void)
 {
-  setWindowTitle(tr("Browser requires realm authentication | %1").arg(APP_NAME));
+  m_dialog->setWindowTitle(tr("Browser requires realm authentication | %1").arg(APP_NAME));
   int line;
   line = 0,
       m_mainLayout->addWidget(new QLabel(tr("Login")), line, 0),
@@ -414,11 +417,11 @@ void GuiPreferences::changePasswd(void)
   if (userPasswd == passwd) {
     if(newPasswd == renewPasswd) {
       m_settings->setKeyValue(key, newPasswd);
-      QMessageBox::information(this,
+      QMessageBox::information(m_dialog,
                                APP_NAME,
                                tr("Password updated"),
                                QMessageBox::Ok);
-      done(0);
+      m_dialog->done(0);
     } else {
       Q_EMIT errorOccurred(tr("Sorry the passwords do not match"));
     }
@@ -566,14 +569,14 @@ QGroupBox* GuiPreferences::createCommonGrp(void)
 void GuiPreferences::applyChanges(void)
 {
   switch(m_formType) {
-    case ChangeMonitoringSettings:
-      saveAsSource(m_currentSourceIndex, letUserSelectType());
-      break;
-    case BasicLoginForm:
-      done(0);
-      break;
-    default:
-      break;
+  case ChangeMonitoringSettings:
+    saveAsSource(m_currentSourceIndex, letUserSelectType());
+    break;
+  case BasicLoginForm:
+    m_dialog->done(0);
+    break;
+  default:
+    break;
   }
 }
 
@@ -582,7 +585,7 @@ void GuiPreferences::addAsSource(void)
 {
   int bucket = -1;
   bool ok = false;
-  QString srcId = QInputDialog::getItem(this,
+  QString srcId = QInputDialog::getItem(m_dialog,
                                         tr("Select source index | %1").arg(APP_NAME),
                                         tr("Please select the index of the source"),
                                         utils::sourceIndexes(),
@@ -617,21 +620,21 @@ void GuiPreferences::addEvents(void)
   connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(handleCancel()));
 
   switch(m_formType) {
-    case ChangeMonitoringSettings:
-      connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applyChanges()));
-      connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
-      connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
-      connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
-      break;
-    case ChangePassword:
-      connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
-      break;
-    case ShowAbout:
-      connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(handleDonate()));
-      break;
-    case BasicLoginForm:
-      break;
-    default:
-      break;
+  case ChangeMonitoringSettings:
+    QObject::connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applyChanges()));
+    connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
+    connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
+    connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
+    break;
+  case ChangePassword:
+    connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
+    break;
+  case ShowAbout:
+    connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(handleDonate()));
+    break;
+  case BasicLoginForm:
+    break;
+  default:
+    break;
   }
 }

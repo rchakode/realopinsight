@@ -41,7 +41,7 @@ class LIBREALOPINSIGHTSHARED_EXPORT DashboardBase : public QObject
   Q_OBJECT
 
 public:
-  DashboardBase(const qint32& _userRole, const QString& _config);
+  DashboardBase(Preferences* preferences, const QString& _config);
   virtual ~DashboardBase();
 
   static StringMapT propRules();
@@ -94,8 +94,6 @@ protected:
   qint32 m_interval;
   qint32 m_timerId;
   Settings* m_settings;
-  Preferences* m_preferences;
-  Preferences* m_changePasswdWindow;
   QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
@@ -119,6 +117,8 @@ protected:
   virtual void updateEventFeeds(const NodeT& node) = 0;
 
 private:
+  Preferences* m_preferences;
+
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);
@@ -130,7 +130,6 @@ private:
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
   QString getNodeToolTip(const NodeT& _node);
-  void addEvents(void);
 };
 
 #endif /* SVNAVIGATOR_HPP */

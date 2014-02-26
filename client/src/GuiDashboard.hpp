@@ -33,7 +33,7 @@
 #include "MsgConsole.hpp"
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
-#include "Preferences.hpp"
+#include "GuiPreferences.hpp"
 #include "ZmqSocket.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
@@ -107,6 +107,8 @@ private:
     ConsoleTab=0,
     BrowserTab=1
   };
+  GuiPreferences* m_preferences;
+  GuiPreferences* m_changePasswdWindow;
   std::shared_ptr<Chart> m_chart;
   MsgConsole* m_filteredMsgConsole;
   QSplitter* m_widget;
@@ -119,6 +121,7 @@ private:
   QSystemTrayIcon* m_trayIcon;
   QComboBox* m_bxSourceSelection;
   QTabWidget* m_msgPane;
+
   void addEvents(void);
   QTabWidget* newMsgConsole(void);
   void setBrowserSourceSelectionBx(void);

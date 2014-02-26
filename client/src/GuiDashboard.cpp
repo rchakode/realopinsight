@@ -64,6 +64,8 @@ StringMapT GuiDashboard::calcRules() {
 
 GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_userRole, _config),
+    m_preferences (new GuiPreferences(_userRole, Preferences::ChangeMonitoringSettings)),
+    m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
     m_chart (std::make_shared<Chart>()),
     m_filteredMsgConsole (NULL),
     m_widget (new QSplitter()),
@@ -320,17 +322,17 @@ void GuiDashboard::handleSettingsLoaded(void)
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-        case MonitorBroker::Nagios:
-          it->icon = ":images/nagios-logo-n.png";
-          break;
-        case MonitorBroker::Zabbix:
-          it->icon = ":images/zabbix-logo-z.png";
-          break;
-        case MonitorBroker::Zenoss:
-          it->icon = ":images/zenoss-logo-o.png";
-          break;
-        default:
-          break;
+      case MonitorBroker::Nagios:
+        it->icon = ":images/nagios-logo-n.png";
+        break;
+      case MonitorBroker::Zabbix:
+        it->icon = ":images/zabbix-logo-z.png";
+        break;
+      case MonitorBroker::Zenoss:
+        it->icon = ":images/zenoss-logo-o.png";
+        break;
+      default:
+        break;
       }
       m_bxSourceSelection->addItem(QIcon(it->icon), it->id, QVariant(it->id));
     }
