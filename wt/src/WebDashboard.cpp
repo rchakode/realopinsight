@@ -81,10 +81,9 @@ namespace {
   const IconMapT ICONS = utils::nodeIcons();
 }
 
-WebDashboard::WebDashboard(const qint32& _userRole,
-                           const QString& _config,
+WebDashboard::WebDashboard(const QString& _config,
                            Wt::WVBoxLayout* eventFeedLayout)
-  : DashboardBase(_userRole, _config),
+  : DashboardBase(_config),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new WebTree(m_cdata)),
     m_map(new WebMap(m_cdata)),
@@ -94,7 +93,6 @@ WebDashboard::WebDashboard(const qint32& _userRole,
 {
   setupUI();
   addJsEventScript();
-  load(_config);
   m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
 }
 

@@ -63,8 +63,7 @@ StringMapT GuiDashboard::calcRules() {
 }
 
 GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
-  : DashboardBase(_userRole, _config),
-    m_preferences (new GuiPreferences(_userRole, Preferences::ChangeMonitoringSettings)),
+  : DashboardBase(_config),
     m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
     m_chart (std::make_shared<Chart>()),
     m_filteredMsgConsole (NULL),
@@ -89,7 +88,6 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
   addEvents();
-  load(m_config);
 }
 
 GuiDashboard::~GuiDashboard()
@@ -104,7 +102,6 @@ GuiDashboard::~GuiDashboard()
   delete m_viewPanel;
   delete m_rightSplitter;
   delete m_widget;
-  delete m_preferences;
   delete m_changePasswdWindow;
   delete m_trayIcon;
   delete m_msgPane;
@@ -116,12 +113,6 @@ void GuiDashboard::handleChangePasswordAction(void)
   m_changePasswdWindow->exec();
 }
 
-void GuiDashboard::handleChangeMonitoringSettingsAction(void)
-{
-  m_preferences->clearUpdatedSources();
-  m_preferences->exec();
-}
-
 void GuiDashboard::handleShowOnlineResources(void)
 {
   QDesktopServices appLauncher;
@@ -130,7 +121,7 @@ void GuiDashboard::handleShowOnlineResources(void)
 
 void GuiDashboard::handleShowAbout(void)
 {
-  Preferences about(m_userRole, Preferences::ShowAbout);
+  GuiPreferences about(m_userRole, Preferences::ShowAbout);
   about.exec();
 }
 
@@ -380,12 +371,10 @@ void GuiDashboard::setMsgPaneToolBar(const QList<QAction*>& menuAtions)
 void GuiDashboard::addEvents(void)
 {
   connect(m_viewPanel, SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
-  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourceSettingsChanged(QList<qint8>)));
   connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString&, const bool &, const qint32 &)));
   connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
   connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
-  connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
   //FIXME:  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
 }

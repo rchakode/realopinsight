@@ -69,7 +69,6 @@ public:
 public Q_SLOTS:
   void handleShowAbout(void);
   void handleShowOnlineResources(void);
-  void handleChangeMonitoringSettingsAction(void);
   void handleChangePasswordAction(void);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
   void centerGraphOnNode(void) { centerGraphOnNode(m_selectedNode); }
@@ -107,7 +106,7 @@ private:
     ConsoleTab=0,
     BrowserTab=1
   };
-  GuiPreferences* m_preferences;
+
   GuiPreferences* m_changePasswdWindow;
   std::shared_ptr<Chart> m_chart;
   MsgConsole* m_filteredMsgConsole;

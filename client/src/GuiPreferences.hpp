@@ -35,6 +35,7 @@ public:
   bool getCancelled(void) const {return m_cancelled;}
   static QString style();
   void show(void);
+  int exec(void) {return m_dialog->exec();}
 
 protected :
   virtual void applyChanges(void);

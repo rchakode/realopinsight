@@ -46,7 +46,7 @@ int main(int argc, char **argv)
   INIT_TRANSLATION;
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
-  app->setStyleSheet(Preferences::style());
+  app->setStyleSheet(GuiPreferences::style());
   QString cmdName = basename(argv[0]);
   QString versionMsg = utils::getWelcomeMsg(QObject::tr("Operations Console"));
   bool runConfig = false;
@@ -76,10 +76,10 @@ int main(int argc, char **argv)
   if ( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
 
   if (runConfig) {
-    Preferences* update_settings = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
-    Preferences* change_passwd = new Preferences(userRole, Preferences::ChangePassword);
-    update_settings->exec();
-    change_passwd->exec();
+    GuiPreferences* preferenceWindow = new GuiPreferences(userRole, Preferences::ChangeMonitoringSettings);
+    GuiPreferences* changePasswdWindow = new GuiPreferences(userRole, Preferences::ChangePassword);
+    preferenceWindow->exec();
+    changePasswdWindow->exec();
     exit(0);
   }
   QSplashScreen* info = utils::infoScreen(versionMsg);

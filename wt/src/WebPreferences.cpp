@@ -35,7 +35,7 @@
 #include <Wt/WIntValidator>
 
 WebPreferences::WebPreferences(int _userRole)
-  : Preferences(_userRole, Preferences::WebForm),
+  : Preferences(),
     m_dialog(new Wt::WDialog(utils::tr("Preferences - " +APP_NAME.toStdString())))
 {
   m_dialog->setStyleClass("Wt-dialog");

@@ -25,6 +25,7 @@
 
 #include "WebKit.hpp"
 #include "Preferences.hpp"
+#include "GuiDashboard.hpp"
 #include <QAuthenticator>
 
 WebKit::WebKit(const QString& _url, QWidget* _parent)
@@ -54,7 +55,7 @@ void WebKit::handleLoadFinished(bool ok)
 
 void WebKit::handleAuthenticationRequired(QNetworkReply*, QAuthenticator* authenticator)
 {
-  std::unique_ptr<Preferences> form(new Preferences(ngrt4n::OpUserRole, Preferences::BasicLoginForm));
+  std::unique_ptr<GuiPreferences> form(new GuiPreferences(ngrt4n::OpUserRole, Preferences::BasicLoginForm));
   form->exec();
   if (! form->getCancelled()) {
     authenticator->setUser(form->getRealmLogin());

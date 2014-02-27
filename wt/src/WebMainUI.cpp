@@ -427,7 +427,8 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
   
   tabIndex = -1;
   
-  dashboard = new WebDashboard(m_dbSession->loggedUser().role, path.c_str());
+  dashboard = new WebDashboard(path.c_str());
+  dashboard->initialize(m_preferenceDialog);
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
   
   if (! dashboard->errorState()) {

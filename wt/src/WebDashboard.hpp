@@ -45,8 +45,7 @@
 class WebDashboard : public DashboardBase
 {
 public:
-  WebDashboard(const qint32& _userRole,
-               const QString& _config,
+  WebDashboard(const QString& _config,
                Wt::WVBoxLayout* eventFeedLayout=NULL);
   virtual ~WebDashboard();
   Wt::WWidget* get(void) const {return m_widget;}

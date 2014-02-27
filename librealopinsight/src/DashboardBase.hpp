@@ -41,12 +41,12 @@ class LIBREALOPINSIGHTSHARED_EXPORT DashboardBase : public QObject
   Q_OBJECT
 
 public:
-  DashboardBase(Preferences* preferences, const QString& _config);
+  DashboardBase(const QString& _config);
   virtual ~DashboardBase();
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void initSettings(void);
+  void initSettings(Preferences* preferencePtr);
   qint64 updateCounter(void) const {return m_updateCounter;}
   QString config(void) const {return m_config;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
@@ -55,7 +55,6 @@ public:
   qint32 timerId(void) const {return m_timerId;}
   qint32 timerInterval(void) const {return m_interval;}
   NodeT& rootNode(void) const {return *(m_cdata->root);}
-  qint32 userRole(void) const { return m_userRole;}
   bool errorState() const {return m_errorState;}
   QString lastError(void) const {return m_lastError;}
 
@@ -75,6 +74,7 @@ public Q_SLOTS:
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {Q_EMIT errorOccurred(msg);}
+  void initialize(Preferences* preferencePtr);
 
 Q_SIGNALS:
   void hasToBeUpdate(QString);
@@ -86,9 +86,9 @@ Q_SIGNALS:
   void errorOccurred(QString msg);
 
 protected:
-  qint64 m_updateCounter;
-  CoreDataT* m_cdata;
   QString m_config;
+  CoreDataT* m_cdata;
+  qint64 m_updateCounter;
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;
@@ -103,7 +103,6 @@ protected:
   QString m_lastError;
 
 protected:
-  void load(const QString& _file);
   void computeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   virtual void updateDashboard(const NodeT& _node);
@@ -117,8 +116,6 @@ protected:
   virtual void updateEventFeeds(const NodeT& node) = 0;
 
 private:
-  Preferences* m_preferences;
-
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);

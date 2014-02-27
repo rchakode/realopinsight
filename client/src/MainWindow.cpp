@@ -29,6 +29,7 @@
 MainWindow::MainWindow(const qint32& _userRole,
                        const QString& _config)
   : QMainWindow(0),
+    m_preferences (new GuiPreferences(_userRole, Preferences::ChangeMonitoringSettings)),
     m_dashboard(new GuiDashboard(_userRole, _config)),
     m_contextMenu(new QMenu(this))
 {
@@ -37,12 +38,15 @@ MainWindow::MainWindow(const qint32& _userRole,
   setCentralWidget(m_dashboard->getWidget());
   handleTabChanged(0);
   addEvents();
+
+  m_dashboard->initialize(m_preferences);
 }
 
 
 MainWindow::~MainWindow()
 {
   unloadMenus();
+  delete m_preferences;
   delete m_dashboard;
   delete m_contextMenu;
 }
@@ -84,7 +88,7 @@ void MainWindow::showEvent(QShowEvent*)
     info->showMessage(tr("Please wait for initialization, it may take a while..."),
                       Qt::AlignCenter|Qt::AlignCenter);
 
-    m_dashboard->initSettings();
+    m_dashboard->initSettings(m_preferences);
     handleRefresh();
 
     info->finish(0);
@@ -231,6 +235,14 @@ void MainWindow::resetTimer(qint32 interval)
   m_dashboard->setTimerId(startTimer(interval));
 }
 
+
+void MainWindow::handleChangeMonitoringSettingsAction(void)
+{
+  m_preferences->clearUpdatedSources();
+  m_preferences->exec();
+}
+
+
 void MainWindow::addEvents(void)
 {
   QList<QAction*> actions;
@@ -238,6 +250,8 @@ void MainWindow::addEvents(void)
   actions.push_back(m_subMenus["IncreaseMsgFont"]);
   m_dashboard->setMsgPaneToolBar(actions);
 
+  connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
+  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourceSettingsChanged(QList<qint8>)));
   connect(m_dashboard, SIGNAL(hasToBeUpdate(QString)), m_dashboard, SLOT(updateBpNode(QString)));
   connect(m_subMenus["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
   connect(m_subMenus["Capture"], SIGNAL(triggered(bool)), m_dashboard->getMap(), SLOT(capture()));
@@ -246,7 +260,7 @@ void MainWindow::addEvents(void)
   connect(m_subMenus["HideChart"], SIGNAL(triggered(bool)), this, SLOT(handleHideChart()));
   connect(m_subMenus["Refresh"], SIGNAL(triggered(bool)), this, SLOT(handleRefresh()));
   connect(m_subMenus["ChangePassword"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleChangePasswordAction(void)));
-  connect(m_subMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleChangeMonitoringSettingsAction(void)));
+  connect(m_subMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
   connect(m_subMenus["ShowAbout"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleShowAbout()));
   connect(m_subMenus["ShowOnlineResources"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleShowOnlineResources()));
   connect(m_subMenus["BrowserBack"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(back()));

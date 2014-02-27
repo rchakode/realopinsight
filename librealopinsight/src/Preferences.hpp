@@ -61,7 +61,7 @@ protected :
   virtual void fillFromSource(int _sidx) = 0;
   virtual void updateSourceBtnState(void) = 0;
   virtual void loadProperties(void);
-  virtual void updateFields(void);
+  virtual void updateFields(void) = 0;
   virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
   virtual int firstSourceSet(void);
   virtual void initSourceStates();

@@ -26,6 +26,7 @@
 #include "SvConfigCreator.hpp"
 #include "GraphView.hpp"
 #include "utilsClient.hpp"
+#include "GuiDashboard.hpp"
 
 namespace {
   const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
@@ -443,7 +444,7 @@ void SvCreator::handleShowOnlineResources(void)
 
 void SvCreator::handleShowAbout(void)
 {
-  Preferences about(m_userRole, Preferences::ShowAbout);
+  GuiPreferences about(m_userRole, Preferences::ShowAbout);
   about.exec();
 }
 

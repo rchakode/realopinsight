@@ -27,6 +27,7 @@
 
 #include "Base.hpp"
 #include "GuiDashboard.hpp"
+#include "utilsClient.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +45,8 @@ public Q_SLOTS:
   void handleHideChart(void);
   void handleRefresh(void);
   void resetTimer(qint32 interval);
+  void handleErrorOccurred(QString msg) {utils::alert(msg);}
+  void handleChangeMonitoringSettingsAction(void);
 
 protected:
   virtual void closeEvent(QCloseEvent*);
@@ -52,6 +55,7 @@ protected:
   virtual void showEvent(QShowEvent*);
 
 private:
+  GuiPreferences* m_preferences;
   GuiDashboard* m_dashboard;
   QMenu* m_contextMenu;
   MenuListT m_menus;
