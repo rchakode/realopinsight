@@ -24,7 +24,6 @@
 
 #include "WebPieChart.hpp"
 #include "utilsClient.hpp"
-#include "StatsLegend.hpp"
 #include <Wt/WStandardItem>
 #include <QString>
 #include <QDebug>
@@ -33,6 +32,7 @@
 #include <Wt/WScrollArea>
 #include <Wt/Chart/WChartPalette>
 #include <Wt/WTemplate>
+#include "WebUtils.hpp"
 
 class WebCharPalette : public Wt::Chart::WChartPalette
 {
@@ -45,7 +45,7 @@ public:
 
   virtual Wt::WBrush brush (int index) const
   {
-    return Wt::WBrush(WebPieChart::colorFromSeverity(index));
+    return Wt::WBrush(utils::severityWColor(index));
   }
 
   virtual Wt::WPen borderPen (int index) const
@@ -81,7 +81,7 @@ WebPieChart::WebPieChart(void)
 {
   setModel(m_model);
 
-  resize(StatsLegend::CHART_WIDTH, StatsLegend::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
+  resize(utils::CHART_WIDTH, utils::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
@@ -123,11 +123,6 @@ WebPieChart::~WebPieChart()
   delete m_model;
 }
 
-Wt::WColor WebPieChart::colorFromSeverity(const int& _sev)
-{
-  QColor qcolor = utils::severityColor(_sev);
-  return Wt::WColor(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
-}
 
 void WebPieChart::setSeverityData(int _sev, int _count)
 {

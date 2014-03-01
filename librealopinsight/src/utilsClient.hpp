@@ -27,7 +27,6 @@
 
 #include "Base.hpp"
 #include <QString>
-#include <QIcon>
 #include <unistd.h>
 
 namespace {
@@ -42,6 +41,8 @@ namespace utils
   const QString DEFAULT_ICON = "Business Process";
   const double SCALIN_FACTOR = 1.1;
   const double SCALOUT_FACTOR = 1/SCALIN_FACTOR;
+  const qint32 CHART_WIDTH=200;
+  const qint32 CHART_HEIGHT=150;
 
   inline void delay(const qint32& d)
   { sleep(d); }
@@ -75,8 +76,6 @@ namespace utils
   QString getAbsolutePath(const QString& _path);
   MonitorBroker::SeverityT computeSeverity(const int& _monitor, const int& _statusOrSeverity);
   int computeSeverity2Propagate(const qint8& _criticity, const qint8& propRule);
-  QColor severityColor(const int &_criticity);
-  QIcon severityIcon(int _severity);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(NodeListT& bpnodes,
@@ -87,7 +86,6 @@ namespace utils
                 const NodeListT& cnodes,
                 const QString& nodeId,
                 NodeListT::const_iterator& node);
-  QSplashScreen* infoScreen(const QString & msg="");
   QString getWelcomeMsg(const QString& utility);
   QString source2Str(const SourceT& src);
   qint32 convert2ApiType(const QString& str);
@@ -99,10 +97,7 @@ namespace utils
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
   QString getNodeToolTip(const NodeT& _node);
-
   IconMapT nodeIcons();
-
-  void alert(const QString & msg);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

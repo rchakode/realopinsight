@@ -22,8 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
-
 #include "PieChart.hpp"
+#include "GuiUtils.hpp"
 
 PieChart::PieChart(const QRectF& _bounding_rect, QWidget * _parent)
   : QWidget( _parent ), boundingRect( _bounding_rect ),
@@ -57,31 +57,31 @@ void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _coun
       new PieChartItem(boundingRect,
                        0,
                        3.6 * critical_ratio,
-                       StatsLegend::COLOR_CRITICAL,
+                       utils::COLOR_CRITICAL,
                        this);
   slices[MonitorBroker::Major] =
       new PieChartItem(boundingRect,
                        3.6 * critical_ratio,
                        3.6 * major_ratio,
-                       StatsLegend::COLOR_MAJOR,
+                       utils::COLOR_MAJOR,
                        this);
   slices[MonitorBroker::Minor] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio),
                        3.6 * minor_ratio,
-                       StatsLegend::COLOR_MINOR,
+                       utils::COLOR_MINOR,
                        this);
   slices[MonitorBroker::Unknown] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio),
                        3.6 * unknown_ratio,
-                       StatsLegend::COLOR_UNKNOWN,
+                       utils::COLOR_UNKNOWN,
                        this);
   slices[MonitorBroker::Normal] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio + unknown_ratio),
                        3.6 * ok_ratio,
-                       StatsLegend::COLOR_NORMAL,
+                       utils::COLOR_NORMAL,
                        this);
   toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
       "/"%QString::number(_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"

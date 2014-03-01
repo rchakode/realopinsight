@@ -3,28 +3,31 @@
 
 #include <QDialog>
 #include "Preferences.hpp"
+#include <QAbstractButton>
+#include<QtGui>
 
 
-class LIBREALOPINSIGHTSHARED_EXPORT ImageButton : public QAbstractButton {
-  Q_OBJECT
-private:
-  QPixmap pixmap;
+class ImageButton : public QAbstractButton {
 public:
-  ImageButton(const QString& ipath) {this->pixmap = QPixmap(ipath); update();}
+  ImageButton(const QString& ipath) {
+    this->pixmap = QPixmap(ipath);
+    update();
+  }
   ~ImageButton(){}
   void setPixmap(const QPixmap& pm ) {pixmap = pm; update(); }
   QSize sizeHint() const {return pixmap.size();}
 protected:
-  void paintEvent( QPaintEvent*) {
+  void paintEvent(QPaintEvent*) {
     QPainter p(this);
     p.drawPixmap(0, 0, pixmap );
   }
+private:
+  QPixmap pixmap;
 };
 
 
 class GuiPreferences : public Preferences
 {
-  Q_OBJECT
 public:
   explicit GuiPreferences(qint32 _userRole, qint32 _formType);
   ~GuiPreferences();

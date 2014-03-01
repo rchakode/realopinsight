@@ -29,6 +29,8 @@
 #include "DashboardBase.hpp"
 #include "utilsClient.hpp"
 
+typedef QList<QListWidgetItem*> CheckItemList;
+
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),

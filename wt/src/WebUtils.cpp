@@ -30,6 +30,7 @@
 #include <QObject>
 #include <QString>
 #include <QDateTime>
+#include <Wt/WColor>
 
 
 void utils::showMessage(int exitCode,
@@ -63,24 +64,24 @@ std::string utils::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-    case MonitorBroker::Normal:
-      cssClass.append("severity-normal");
-      break;
-    case MonitorBroker::Minor:
-      cssClass.append("severity-minor");
-      break;
-    case MonitorBroker::Major:
-      cssClass.append("severity-major");
-      break;
-    case MonitorBroker::Critical:
-      cssClass.append("severity-critical");
-      break;
-    case MonitorBroker::Unknown:
-      cssClass.append("severity-unknown");
-      break;
-    default:
-      cssClass.append("default-item-background");
-      break;
+  case MonitorBroker::Normal:
+    cssClass.append("severity-normal");
+    break;
+  case MonitorBroker::Minor:
+    cssClass.append("severity-minor");
+    break;
+  case MonitorBroker::Major:
+    cssClass.append("severity-major");
+    break;
+  case MonitorBroker::Critical:
+    cssClass.append("severity-critical");
+    break;
+  case MonitorBroker::Unknown:
+    cssClass.append("severity-unknown");
+    break;
+  default:
+    cssClass.append("default-item-background");
+    break;
   }
   return cssClass;
 }
@@ -146,4 +147,29 @@ Wt::WText* utils::createFontAwesomeTextButton(const std::string& iconClasses,
                                   parent);
   link->setToolTip(tip);
   return link;
+}
+
+
+Wt::WColor utils::severityWColor(const int& _criticity)
+{
+  Wt::WColor color;
+  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
+  case MonitorBroker::Normal:
+    color = Wt::WColor("#00ff00");
+    break;
+  case MonitorBroker::Minor:
+    color = Wt::WColor("#ffff00");
+    break;
+  case MonitorBroker::Major:
+    color = Wt::WColor("#ffa500");
+    break;
+  case MonitorBroker::Critical:
+    color = Wt::WColor("#ff0000");
+    break;
+  case MonitorBroker::Unknown:
+  default:
+    color = Wt::WColor(" #c0c0c0");
+    break;
+  }
+  return color;
 }

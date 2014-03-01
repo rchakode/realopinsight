@@ -25,6 +25,7 @@
 #ifndef MSGCONSOLE_HPP
 #define MSGCONSOLE_HPP
 #include "Base.hpp"
+#include <QtGui>
 
 class MsgConsoleProxyModel: public QSortFilterProxyModel
 {

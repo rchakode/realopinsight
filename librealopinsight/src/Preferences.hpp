@@ -29,7 +29,6 @@
 #include "ns.hpp"
 #include "Settings.hpp"
 #include "Base.hpp"
-#include <QSplashScreen>
 
 
 class LIBREALOPINSIGHTSHARED_EXPORT Preferences: public QObject

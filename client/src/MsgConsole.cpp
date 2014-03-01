@@ -25,6 +25,7 @@
 #include "MsgConsole.hpp"
 #include "StatsLegend.hpp"
 #include "utilsClient.hpp"
+#include "GuiUtils.hpp"
 
 const qint16 MsgConsole::ROW_MARGIN = 3;
 
@@ -93,7 +94,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
 
   mmodel->item(index, 1)->setText(utils::severityText(_node.severity));
   mmodel->item(index, 1)->setData(-1*_node.severity, Qt::UserRole);
-  mmodel->item(index, 1)->setBackground(QBrush(utils::severityColor(_node.severity)));
+  mmodel->item(index, 1)->setBackground(QBrush(utils::severityQColor(_node.severity)));
 
   itemText = QString(check.host.c_str());
   mmodel->item(index, 2)->setText(itemText);
@@ -108,10 +109,10 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
     mmodel->item(index, 3)->setBackground(Qt::transparent);
     mmodel->item(index, 4)->setBackground(Qt::transparent);
   } else {
-    mmodel->item(index, 0)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-    mmodel->item(index, 2)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-    mmodel->item(index, 3)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
-    mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
+    mmodel->item(index, 0)->setBackground(utils::HIGHLIGHT_COLOR);
+    mmodel->item(index, 2)->setBackground(utils::HIGHLIGHT_COLOR);
+    mmodel->item(index, 3)->setBackground(utils::HIGHLIGHT_COLOR);
+    mmodel->item(index, 4)->setBackground(utils::HIGHLIGHT_COLOR);
 
   }
   mmodel->item(index, 4)->setText(_node.actual_msg);

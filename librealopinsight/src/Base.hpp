@@ -29,7 +29,6 @@
 #include <QtCore/QtGlobal>
 #include <QtCore>
 #include <QtXml>
-#include <QtGui>
 #include <QSettings>
 #include <memory>
 
@@ -254,7 +253,6 @@ typedef QHash<QString, CheckT> CheckListT;
 typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;
 typedef QHash<QString, QStringList> HostListT;
-typedef QHash<QString, QTreeWidgetItem*> GuiTreeItemListT;
 typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
@@ -269,20 +267,6 @@ struct CoreDataT {
   double map_height;
   double map_width;
 };
-
-struct GNodeT {
-  QGraphicsTextItem* label;
-  QGraphicsPixmapItem* icon;
-  QGraphicsPixmapItem* exp_icon;
-  qint32 type;
-  bool expand;
-};
-typedef QHash<QString, GNodeT> GNodeListT;
-
-struct GEdgeT {
-  QGraphicsPathItem* edge;
-};
-typedef QHash<QString, GEdgeT> GEdgeListT;
 
 
 struct SourceT {
@@ -304,9 +288,6 @@ struct SourceT {
 typedef QHash<int, SourceT> SourceListT;
 
 typedef QMap<QString, QString> IconMapT;
-typedef QList<QListWidgetItem*> CheckItemList;
-typedef QMap<QString, QMenu*> MenuListT;
-typedef QMap<QString, QAction*> SubMenuListT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 typedef QPair<QString, QString> StringPairT;

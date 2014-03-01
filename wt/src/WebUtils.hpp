@@ -46,6 +46,7 @@ namespace utils {
   Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses,
                                          const std::string& tip,
                                          Wt::WContainerWidget* parent);
+  Wt::WColor severityWColor(const int& _criticity);
 } //Namespace
 
 #endif // WEBUTILS_HPP

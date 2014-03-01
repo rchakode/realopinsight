@@ -26,6 +26,7 @@
 #define SNAVSVNAVIGATORTREE_H_
 
 #include "Base.hpp"
+#include "GuiUtils.hpp"
 
 class SvNavigatorTree : public QTreeWidget
 {

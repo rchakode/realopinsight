@@ -1,4 +1,5 @@
 
+#include <QCoreApplication>
 #include "WQApplication"
 #include "WebUtils.hpp"
 #include "AuthManager.hpp"
@@ -7,6 +8,7 @@
 #include <Wt/WBootstrapTheme>
 #include <Wt/WServer>
 #include <Wt/WEnvironment>
+
 
 
 class WebApp : public Wt::WQApplication
@@ -46,7 +48,7 @@ Wt::WApplication* createApplication(const Wt::WEnvironment& env)
 
 int main(int argc, char **argv)
 {
-  QApplication* qtApp = new QApplication(argc, argv);
+  QCoreApplication* qtApp = new QCoreApplication(argc, argv);
 
   try {
     Wt::WServer server(argv[0]);
@@ -59,10 +61,6 @@ int main(int argc, char **argv)
       Wt::WServer::waitForShutdown();
       server.stop();
     }
-  } catch (Wt::WServer::Exception& e) {
-    LOG("error", e.what());
-  } catch (Wt::Dbo::Exception &e) {
-    LOG("error", e.what());
   } catch (std::exception &e) {
     LOG("error", e.what());
   }

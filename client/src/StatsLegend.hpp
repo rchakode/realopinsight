@@ -25,8 +25,9 @@
 #ifndef SNAVSTATSLEGEND_HPP_
 #define SNAVSTATSLEGEND_HPP_
 #include "Base.hpp"
+#include <QtGui>
 
-class LIBREALOPINSIGHTSHARED_EXPORT StatsLegend : public QWidget
+class StatsLegend : public QWidget
 {
 public:
   StatsLegend(const QPoint & _top_corner =  QPoint(0, 0), QWidget * _parent = 0);
@@ -34,18 +35,8 @@ public:
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 
-  static const QColor COLOR_NORMAL;
-  static const QColor COLOR_MINOR;
-  static const QColor COLOR_MAJOR;
-  static const QColor COLOR_CRITICAL;
-  static const QColor COLOR_UNKNOWN;
-  static const QColor HIGHLIGHT_COLOR;
-  static const qint32 CHART_WIDTH;
-  static const qint32 CHART_HEIGHT;
-
 protected:
   void paintEvent(QPaintEvent *event);
-
 
 private :
   QPainterPath normal;

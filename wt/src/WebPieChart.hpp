@@ -39,7 +39,6 @@ public:
   virtual ~WebPieChart();
   void setSeverityData(int _sev, int count);
   Wt::WScrollArea* get(void) const  {return m_scrollArea;}
-  static Wt::WColor colorFromSeverity(const int& _sev);
 
 private:
   Wt::WStandardItemModel* m_model;

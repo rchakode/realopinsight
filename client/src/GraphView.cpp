@@ -311,7 +311,7 @@ void GraphView::drawEdge(const QString& _headNodeId, const QString& _tailNodeId)
   QString eid =  QString("%1:%2").arg(_headNodeId, _tailNodeId);
   QPainterPath path;
   setEdgePath(_headNodeId, _tailNodeId, path);
-  QPen pen(StatsLegend::COLOR_UNKNOWN);
+  QPen pen(utils::COLOR_UNKNOWN);
   m_medges[eid].edge = new QGraphicsPathItem(path),
       m_medges[eid].edge->setPen(pen),
       m_scene->addItem(m_medges[eid].edge),
@@ -339,7 +339,7 @@ void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _too
 
 void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
 {
-  QString label = "<span style=\"background: '"%utils::severityColor(_node.severity).name()
+  QString label = "<span style=\"background: '"%utils::severityQColor(_node.severity).name()
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
   GNodeListT::iterator gnodeIt =  m_mnodes.find(_node.id);
   if (gnodeIt != m_mnodes.end()) {
@@ -348,7 +348,7 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
     gnodeIt->label->setToolTip(_toolTip);
     GEdgeListT::iterator edge = m_medges.find(_node.parent + ":" + _node.id);
     if (edge != m_medges.end())
-      edge->edge->setPen(utils::severityColor(_node.prop_sev));
+      edge->edge->setPen(utils::severityQColor(_node.prop_sev));
   }
 }
 

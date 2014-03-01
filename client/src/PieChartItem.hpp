@@ -26,6 +26,7 @@
 #define PieChartItem_HPP_
 
 #include "Base.hpp"
+#include <QtGui>
 
 
 class PieChartItem : public QWidget

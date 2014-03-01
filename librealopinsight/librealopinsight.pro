@@ -18,7 +18,7 @@
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.    #
 #--------------------------------------------------------------------------#
 
-QT       += core gui xml network script
+QT       += core xml network script
 
 TARGET = realopinsight
 TEMPLATE = lib
@@ -42,7 +42,6 @@ SOURCES += \
     src/MonitorBroker.cpp \
     src/Parser.cpp \
     src/Preferences.cpp \
-    src/StatsLegend.cpp \
     src/ZbxHelper.cpp \
     src/JsHelper.cpp \
     src/ZnsHelper.cpp \

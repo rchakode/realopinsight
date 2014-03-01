@@ -27,7 +27,9 @@
 #include "Preferences.hpp"
 #include "ns.hpp"
 #include "utilsClient.hpp"
-
+#include "GuiUtils.hpp"
+#include <QLabel>
+#include <QPushButton>
 
 Auth::Auth()
   : QDialog(),

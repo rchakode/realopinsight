@@ -29,6 +29,7 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "Settings.hpp"
+#include <QtGui>
 
 
 const qint32 MAX_NODE_NAME = 255;

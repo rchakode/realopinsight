@@ -22,7 +22,6 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "StatsLegend.hpp"
 #include "utilsClient.hpp"
 #include <QFileInfo>
 
@@ -140,35 +139,6 @@ int utils::computeSeverity2Propagate(const qint8& _critValue, const qint8& propR
   return propCriticity;
 }
 
-
-QColor utils::severityColor(const int& _criticity)
-{
-  QColor color(StatsLegend::COLOR_UNKNOWN);
-  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
-    case MonitorBroker::Normal:
-      color = StatsLegend::COLOR_NORMAL;
-      break;
-    case MonitorBroker::Minor:
-      color = StatsLegend::COLOR_MINOR;
-      break;
-    case MonitorBroker::Major:
-      color = StatsLegend::COLOR_MAJOR;
-      break;
-    case MonitorBroker::Critical:
-      color = StatsLegend::COLOR_CRITICAL;
-      break;
-    default:
-      break;
-  }
-  return color;
-}
-
-
-QIcon utils::severityIcon(int _severity)
-{
-  return QIcon(":/"+getIconPath(_severity));
-}
-
 QString utils::getIconPath(int _severity)
 {
   QString ipath("/images/built-in/unknown.png");
@@ -230,13 +200,6 @@ bool utils::findNode(const NodeListT& bpnodes,
     }
   }
   return found;
-}
-
-QSplashScreen* utils::infoScreen(const QString & msg) {
-  QSplashScreen* screen = new QSplashScreen(QPixmap(":/images/built-in/loading-screen.png"));
-  screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
-  screen->show();
-  return screen;
 }
 
 QString utils::getWelcomeMsg(const QString& utility)
@@ -425,11 +388,5 @@ IconMapT utils::nodeIcons() {
   icons["Hierarchy"] = ":/images/hierarchy.png";
   icons[MINUS] = ":/images/minus.png";
   return icons;
-}
-
-
-void utils::alert(const QString& msg)
-{
-  QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
 }
 

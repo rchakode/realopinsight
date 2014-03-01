@@ -23,16 +23,9 @@
  */
 
 #include "StatsLegend.hpp"
+#include "GuiUtils.hpp"
+#include "utilsClient.hpp"
 #include <QColor>
-
-const QColor StatsLegend::COLOR_NORMAL =  Qt::green;
-const QColor StatsLegend::COLOR_MINOR = Qt::yellow;
-const QColor StatsLegend::COLOR_MAJOR = QColor("#FF8C00");
-const QColor StatsLegend::COLOR_CRITICAL = Qt::red;
-const QColor StatsLegend::COLOR_UNKNOWN = Qt::lightGray;
-const QColor StatsLegend::HIGHLIGHT_COLOR = QColor(255, 255, 200);
-const qint32 StatsLegend::CHART_WIDTH=200;
-const qint32 StatsLegend::CHART_HEIGHT=150;
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)
   : QWidget(_parent)
@@ -64,28 +57,28 @@ void StatsLegend::paintEvent(QPaintEvent *)
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 
-  painter.setBrush(COLOR_NORMAL);
+  painter.setBrush(utils::COLOR_NORMAL);
   painter.drawPath(normal);
 
-  painter.setBrush(COLOR_MINOR);
+  painter.setBrush(utils::COLOR_MINOR);
   painter.drawPath(minor);
 
-  painter.setBrush(COLOR_MAJOR);
+  painter.setBrush(utils::COLOR_MAJOR);
   painter.drawPath(major);
 
-  painter.setBrush(COLOR_CRITICAL);
+  painter.setBrush(utils::COLOR_CRITICAL);
   painter.drawPath(critical);
 
-  painter.setBrush(COLOR_UNKNOWN);
+  painter.setBrush(utils::COLOR_UNKNOWN);
   painter.drawPath(unknown);
 }
 
 QSize StatsLegend::minimumSizeHint() const
 {
-  return QSize(CHART_WIDTH, CHART_HEIGHT);
+  return QSize(utils::CHART_WIDTH, utils::CHART_HEIGHT);
 }
 
 QSize StatsLegend::sizeHint() const
 {
-  return QSize(CHART_WIDTH, CHART_HEIGHT);
+  return QSize(utils::CHART_WIDTH, utils::CHART_HEIGHT);
 }

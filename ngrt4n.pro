@@ -18,7 +18,7 @@
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.    #
 #--------------------------------------------------------------------------#
 
-QT	+= core gui xml svg webkit network script
+QT	+= core xml network script
 CONFIG += no_keywords
 TEMPLATE = app
 BASE_VERSION=2.4.2
@@ -26,8 +26,10 @@ VERSION = "-$${BASE_VERSION}"
 LIBS += -lrealopinsight
 
 config-gui-base {
+QT += svg gui webkit
 PACKAGE_VERSION = "$${BASE_VERSION}-SE"
 HEADERS	+= client/src/Auth.hpp \
+    client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
     client/src/PieChart.hpp \
     client/src/PieChartItem.hpp \
@@ -40,9 +42,13 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/WebKit.hpp \
     client/src/Settings.hpp \
     client/src/Chart.hpp \
-    client/src/MsgConsole.hpp
+    client/src/MsgConsole.hpp \
+    client/src/GuiPreferences.hpp \
+    client/src/GuiUtils.hpp
 
 SOURCES	+= client/src/Auth.cpp \
+    client/src/GuiUtils.cpp \
+    client/src/StatsLegend.cpp \
     client/src/GraphView.cpp \
     client/src/PieChart.cpp \
     client/src/PieChartItem.cpp \
@@ -53,6 +59,7 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/SvNavigatorTree.cpp \
     client/src/WebKit.cpp \
     client/src/Chart.cpp \
+    client/src/GuiPreferences.cpp \
     client/src/MsgConsole.cpp
 }
 
@@ -81,18 +88,18 @@ TARGET = ngrt4n-editor
 
 config-web {
 PACKAGE_VERSION = "$${BASE_VERSION}-UE"
-TARGET = bin/ngrt4n-web.bin
+TARGET = bin/ngrt4n-web.fcgi
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
-LIBS += -lwt -lwthttp -lwtdbo -lwtdbosqlite3 \
-    -lboost_signals -lboost_program_options-mt -lboost_system-mt \
-    -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt -lboost_filesystem-mt -lboost_date_time-mt
-
+LIBS += -lwt -lwtfcgi -lwtdbo -lwtdbosqlite3 \
+        -lboost_signals -lboost_program_options-mt -lboost_system-mt \
+        -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt \
+        -lboost_filesystem-mt -lboost_date_time-mt
 
 INCLUDEPATH += wt/src \
-              wt/dbo \
-              wt/lib/wtwithqt
+               wt/dbo \
+               wt/lib/wtwithqt
 
 HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebMsgConsole.hpp \
@@ -178,10 +185,4 @@ DISTFILES += README \
 TRANSLATIONS += i18n/ngrt4n_fr.ts
 
 CODECFORSRC = UTF-8
-
-HEADERS += \
-    client/src/GuiPreferences.hpp
-
-SOURCES += \
-    client/src/GuiPreferences.cpp
 
