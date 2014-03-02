@@ -86,7 +86,7 @@ private:
   ViewListT m_viewList;
   UserViewListT m_userViewList;
   std::string m_lastError;
-  Wt::Auth::Login loginObj;
+  Wt::Auth::Login m_loginObj;
 
   std::string hashPassword(const std::string& pass);
   void initDb(void);

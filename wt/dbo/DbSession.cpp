@@ -184,7 +184,7 @@ Wt::Auth::PasswordService& DbSession::passwordAuthentificator(void)
 
 Wt::Auth::Login& DbSession::loginObject(void)
 {
-  return loginObj;
+  return m_loginObj;
 }
 
 void DbSession::configureAuth(void)
