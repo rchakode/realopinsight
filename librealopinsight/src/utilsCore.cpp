@@ -32,16 +32,6 @@
 #include <iostream>
 #include <unistd.h>
 
-void ngrt4n::initApp()
-{
-  int ret = mkdir(ngrt4n::APP_HOME.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH ) ;
-
-  if(ret == -1 && errno != EEXIST) {
-      std::cerr << "You need to set the authentication token first !\n" ;
-    }
-}
-
-
 void ngrt4n::checkUser() {
   if( getuid() != 0) {
       std::cerr << "The program must be run as root !\n";

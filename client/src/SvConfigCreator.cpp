@@ -187,7 +187,7 @@ NodeT* SvCreator::createNode(const QString& id,
   node->name = label;
   node->parent = parent;
   node->type = NodeType::ServiceNode;
-  node->severity = MonitorBroker::Unknown;
+  node->severity = utils::Unknown;
   node->sev_crule = CalcRules::HighCriticity;
   node->sev_prule = PropRules::Unchanged;
   node->icon = utils::DEFAULT_ICON;
@@ -319,16 +319,16 @@ void SvCreator::saveAs(void)
   } else {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
-      m_cdata->monitor = MonitorBroker::Zabbix;
+      m_cdata->monitor = utils::Zabbix;
       if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
     } else if (filter == ZNS_SOURCE) {
-      m_cdata->monitor = MonitorBroker::Zenoss;
+      m_cdata->monitor = utils::Zenoss;
       if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else if (filter == NAG_SOURCE){
-      m_cdata->monitor = MonitorBroker::Nagios;
+      m_cdata->monitor = utils::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     } else {
-      m_cdata->monitor = MonitorBroker::Auto;
+      m_cdata->monitor = utils::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
     recordData(path);

@@ -162,7 +162,7 @@ DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
-QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
+QMAKE_CXXFLAGS += -pg -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
 INCLUDEPATH += include \
               librealopinsight/src \
               include/client \

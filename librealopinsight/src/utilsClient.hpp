@@ -35,6 +35,10 @@ namespace {
 
 namespace utils
 {
+  const int DefaultPort = 1983;
+  const int DefaultUpdateInterval = 300;
+  const int MaxMsg = 512;
+
   const QString ROOT_ID = "root";
   const QString PLUS = "plus";
   const QString MINUS = "minus";
@@ -74,7 +78,7 @@ namespace utils
   QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
-  MonitorBroker::SeverityT computeSeverity(const int& _monitor, const int& _statusOrSeverity);
+  utils::SeverityT computeSeverity(const int& _monitor, const int& _statusOrSeverity);
   int computeSeverity2Propagate(const qint8& _criticity, const qint8& propRule);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);

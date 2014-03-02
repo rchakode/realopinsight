@@ -99,7 +99,7 @@ void DashboardBase::initialize(Preferences* preferencePtr)
 void DashboardBase::runMonitor()
 {
   resetStatData();
-  if (m_cdata->monitor == MonitorBroker::Auto) {
+  if (m_cdata->monitor == utils::Auto) {
     for (SourceListT::Iterator src=m_sources.begin(), end=m_sources.end(); src!=end; ++src)
     {
       runMonitor(*src);
@@ -121,11 +121,11 @@ void DashboardBase::runMonitor(SourceT& src)
   prepareUpdate(src);
   openRpcSession(src);
   switch(src.mon_type) {
-    case MonitorBroker::Zenoss:
-    case MonitorBroker::Zabbix:
+    case utils::Zenoss:
+    case utils::Zabbix:
       requestZbxZnsData(src);
       break;
-    case MonitorBroker::Nagios:
+    case utils::Nagios:
     default:
       src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
       break;
@@ -146,7 +146,7 @@ void DashboardBase::runNgrt4ndUpdate(int srcId)
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
-  utils::setCheckOnError(MonitorBroker::Unknown, "", invalidCheck);
+  utils::setCheckOnError(utils::Unknown, "", invalidCheck);
 
   /* Check if the handler is connected */
   if (src.d4n_handler->isConnected()) {
@@ -166,7 +166,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
-      cnode->severity = MonitorBroker::Unknown;
+      cnode->severity = utils::Unknown;
       m_cdata->check_status_count[cnode->severity]+=1;
       continue;
     }
@@ -183,7 +183,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
     // Treat data
     qint32 ret = jsHelper.getProperty("return_code").toInt32();
-    cnode->check.status = (ret!=0)? MonitorBroker::NagiosUnknown : jsHelper.getProperty("status").toInt32();
+    cnode->check.status = (ret!=0)? utils::NagiosUnknown : jsHelper.getProperty("status").toInt32();
     cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
     cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
     cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
@@ -215,7 +215,7 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
   }
 
   CheckT invalidCheck;
-  utils::setCheckOnError(MonitorBroker::Unknown, "", invalidCheck);
+  utils::setCheckOnError(utils::Unknown, "", invalidCheck);
 
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
@@ -246,11 +246,11 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
 
 void DashboardBase::resetStatData(void)
 {
-  m_cdata->check_status_count[MonitorBroker::Normal] = 0;
-  m_cdata->check_status_count[MonitorBroker::Minor] = 0;
-  m_cdata->check_status_count[MonitorBroker::Major] = 0;
-  m_cdata->check_status_count[MonitorBroker::Critical] = 0;
-  m_cdata->check_status_count[MonitorBroker::Unknown] = 0;
+  m_cdata->check_status_count[utils::Normal] = 0;
+  m_cdata->check_status_count[utils::Minor] = 0;
+  m_cdata->check_status_count[utils::Major] = 0;
+  m_cdata->check_status_count[utils::Critical] = 0;
+  m_cdata->check_status_count[utils::Unknown] = 0;
 }
 
 
@@ -258,13 +258,13 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-    case MonitorBroker::Nagios:
+    case utils::Nagios:
       msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
       break;
-    case MonitorBroker::Zabbix:
+    case utils::Zabbix:
       msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
       break;
-    case MonitorBroker::Zenoss:
+    case utils::Zenoss:
       msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
       break;
     default:
@@ -310,7 +310,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     return;
   }
 
-  if (m_cdata->monitor == MonitorBroker::Zabbix)
+  if (m_cdata->monitor == utils::Zabbix)
   {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
@@ -318,7 +318,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
   }
 
-  if (_node.severity == MonitorBroker::Normal)
+  if (_node.severity == utils::Normal)
   {
     if (_node.notification_msg.isEmpty()) {
       return ;
@@ -337,12 +337,12 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     regexp.setPattern(ngrt4n::TAG_CHECK.c_str());
     _node.actual_msg.replace(regexp, info[1]);
   }
-  if (m_cdata->monitor == MonitorBroker::Nagios) {
+  if (m_cdata->monitor == utils::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
       regexp.setPattern(ngrt4n::TAG_THERESHOLD.c_str());
       _node.actual_msg.replace(regexp, info[1]);
-      if (_node.severity == MonitorBroker::Major)
+      if (_node.severity == utils::Major)
         _node.actual_msg.replace(regexp, info[2]);
     }
   }
@@ -350,7 +350,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 
 void DashboardBase::updateBpNode(const QString& _nodeId)
 {
-  Criticity criticity(MonitorBroker::Normal);
+  Criticity criticity(utils::Normal);
 
   NodeListT::iterator node;
   if (! utils::findNode(m_cdata, _nodeId, node)) return;
@@ -359,7 +359,7 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   Q_FOREACH (const QString& nodeId, nodeIds) {
     NodeListT::iterator child;
     if (!utils::findNode(m_cdata, nodeId, child)) continue;
-    Criticity cst(static_cast<MonitorBroker::SeverityT>(child->prop_sev));
+    Criticity cst(static_cast<utils::SeverityT>(child->prop_sev));
     if (node->sev_crule == CalcRules::WeightedCriticity) {
       criticity = criticity / cst;
     } else {
@@ -437,7 +437,7 @@ void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
         CheckT check;
         check.check_command = triggerName.toStdString();
         check.status = triggerData.property("value").toInt32();
-        if (check.status == MonitorBroker::ZabbixClear) {
+        if (check.status == utils::ZabbixClear) {
           check.alarm_msg = "OK ("+triggerName.toStdString()+")";
         } else {
           check.alarm_msg = triggerData.property("error").toString().toStdString();
@@ -544,7 +544,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
                                                           "yyyy/MM/dd hh:mm:ss");
           QString severity =citem.property("severity").toString();
           if (!severity.compare("clear", Qt::CaseInsensitive)) {
-            check.status = MonitorBroker::ZenossClear;
+            check.status = utils::ZenossClear;
             check.alarm_msg = tr("The %1 component is Up").arg(cname).toStdString();
           } else {
             check.status = citem.property("failSeverity").toInt32();
@@ -560,10 +560,10 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         check.last_state_change = utils::convertToTimet(devInfo.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
         if (check.status) {
-          check.status = MonitorBroker::ZenossClear;
+          check.status = utils::ZenossClear;
           check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
         } else {
-          check.status = MonitorBroker::ZenossCritical;
+          check.status = utils::ZenossCritical;
           check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
         }
         updateCNodes(check, src);
@@ -608,10 +608,10 @@ void DashboardBase::openRpcSession(int srcId)
   SourceListT::Iterator src = m_sources.find(srcId);
   if (src != m_sources.end()) {
     switch (src->mon_type) {
-      case MonitorBroker::Zabbix:
+      case utils::Zabbix:
         src->zbx_handler->setIsLogged(false);
         break;
-      case MonitorBroker::Zenoss:
+      case utils::Zenoss:
         src->zns_handler->setIsLogged(false);
         break;
       default:
@@ -625,7 +625,7 @@ void DashboardBase::openRpcSession(int srcId)
 void DashboardBase::openRpcSession(SourceT& src)
 {
   QStringList authParams = getAuthInfo(src.auth);
-  if (authParams.size() != 2 && src.mon_type != MonitorBroker::Nagios) {
+  if (authParams.size() != 2 && src.mon_type != utils::Nagios) {
     updateDashboardOnError(src, tr("Invalid authentication chain!\n"
                                    "Must follow the pattern login:password"));
     return;
@@ -633,7 +633,7 @@ void DashboardBase::openRpcSession(SourceT& src)
 
   QUrl znsUrlParams;
   switch(src.mon_type) {
-    case MonitorBroker::Nagios:
+    case utils::Nagios:
       if (src.use_ngrt4nd) {
         if (src.d4n_handler->isConnected())
           src.d4n_handler->disconnectFromService();
@@ -647,7 +647,7 @@ void DashboardBase::openRpcSession(SourceT& src)
         src.ls_handler->connectToService();
       }
       break;
-    case MonitorBroker::Zabbix: {
+    case utils::Zabbix: {
       src.zbx_handler->setBaseUrl(src.mon_url);
       authParams.push_back(QString::number(ZbxHelper::Login));
       src.zbx_handler->setSslConfig(src.verify_ssl_peer);
@@ -663,7 +663,7 @@ void DashboardBase::openRpcSession(SourceT& src)
       }
       break;
     }
-    case MonitorBroker::Zenoss: {
+    case utils::Zenoss: {
       src.zns_handler->setBaseUrl(src.mon_url);
       znsUrlParams.addQueryItem("__ac_name", authParams[0]);
       znsUrlParams.addQueryItem("__ac_password", authParams[1]);
@@ -683,7 +683,7 @@ void DashboardBase::openRpcSession(SourceT& src)
 void DashboardBase::requestZbxZnsData(SourceT& src)
 {
   switch(src.mon_type) {
-    case MonitorBroker::Zabbix: {
+    case utils::Zabbix: {
       if (src.zbx_handler->getIsLogged()) {
         int trid = src.zbx_handler->getTrid();
         Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
@@ -701,7 +701,7 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
       }
       break;
     }
-    case MonitorBroker::Zenoss: {
+    case utils::Zenoss: {
       if (src.zns_handler->getIsLogged()) {
         src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
         Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
@@ -727,9 +727,9 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
 void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const SourceT& src)
 {
   QString apiUrl = "";
-  if (src.mon_type == MonitorBroker::Zabbix) {
+  if (src.mon_type == utils::Zabbix) {
     apiUrl = src.zbx_handler->getApiEndpoint();
-  } else if (src.mon_type == MonitorBroker::Zenoss) {
+  } else if (src.mon_type == utils::Zenoss) {
     apiUrl =  src.zns_handler->getRequestEndpoint();
   }
 
@@ -768,7 +768,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     utils::setCheckOnError(-1, msg, cnode->check);
     computeStatusInfo(*cnode, src);
     updateDashboard(*cnode);
-    m_cdata->check_status_count[MonitorBroker::Unknown]+=1;
+    m_cdata->check_status_count[utils::Unknown]+=1;
     cnode->monitored = true;
   }
 }
@@ -802,12 +802,12 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 bool DashboardBase::allocSourceHandler(SourceT& src)
 {
   bool allocated = false;
-  if (src.mon_type == MonitorBroker::Auto) {
+  if (src.mon_type == utils::Auto) {
     src.mon_type = m_cdata->monitor;
   }
 
   switch (src.mon_type) {
-    case MonitorBroker::Nagios:
+    case utils::Nagios:
       if (src.use_ngrt4nd) {
         QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
         src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
@@ -816,11 +816,11 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
       }
       allocated = true;
       break;
-    case MonitorBroker::Zabbix:
+    case utils::Zabbix:
       src.zbx_handler = std::make_shared<ZbxHelper>();
       allocated = true;
       break;
-    case MonitorBroker::Zenoss:
+    case utils::Zenoss:
       src.zns_handler = std::make_shared<ZnsHelper>();
       allocated = true;
       break;
@@ -841,17 +841,17 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     SourceListT::Iterator olddata = m_sources.find(id);
     if (olddata != m_sources.end()) {
       switch (olddata->mon_type) {
-        case MonitorBroker::Nagios:
+        case utils::Nagios:
           if (olddata->use_ngrt4nd) {
             olddata->ls_handler.reset();
           } else {
             olddata->d4n_handler.reset();
           }
           break;
-        case MonitorBroker::Zabbix:
+        case utils::Zabbix:
           olddata->zbx_handler.reset();
           break;
-        case MonitorBroker::Zenoss:
+        case utils::Zenoss:
           olddata->zns_handler.reset();
           break;
         default:
@@ -908,7 +908,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
         cnode->child_nodes.toLower()==utils::realCheckId(src.id,
                                                          QString::fromStdString(cnode->check.id)).toLower())
     {
-      utils::setCheckOnError(MonitorBroker::Unknown,
+      utils::setCheckOnError(utils::Unknown,
                              tr("Undefined service (%1)").arg(cnode->child_nodes),
                              cnode->check);
       computeStatusInfo(*cnode, src);

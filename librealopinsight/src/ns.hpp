@@ -47,10 +47,7 @@ namespace ngrt4n {
     Expanded = 0x2,
     Collapsed = 0xFC
   };
-  const std::string APP_NAME = "ngrt4n" ;
-  const std::string APP_HOME = std::string(getenv("HOME")) + "/." + APP_NAME ;
-  const std::string SETTINGS_FILE =  APP_HOME + "/db" ;
-  const std::string AUTH_FILE =  APP_HOME + "/auth" ;
+  const std::string APP_NAME = "ngrt4n";
   const std::string salt = "$1$" + APP_NAME + "$";
   const std::string AdmUser = "ngrt4n_adm";
   const std::string OpUser = "ngrt4n_op";
@@ -73,7 +70,6 @@ namespace ngrt4n {
   const std::string LINK_ADMIN_HOME ="/adm-console";
   const std::string LINK_OP_HOME ="/op-console";
 
-  void initApp() ;
   void checkUser() ;
   void setPassChain(char* authChain) ;
   std::string getPassChain() ;

@@ -86,11 +86,11 @@ WebPieChart::WebPieChart(void)
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
-  tpl->bindWidget("unknown-count", m_badges[MonitorBroker::Unknown] = new Wt::WText());
-  tpl->bindWidget("critical-count", m_badges[MonitorBroker::Critical] = new Wt::WText());
-  tpl->bindWidget("major-count", m_badges[MonitorBroker::Major] = new Wt::WText());
-  tpl->bindWidget("minor-count", m_badges[MonitorBroker::Minor] = new Wt::WText());
-  tpl->bindWidget("normal-count", m_badges[MonitorBroker::Normal] = new Wt::WText());
+  tpl->bindWidget("unknown-count", m_badges[utils::Unknown] = new Wt::WText());
+  tpl->bindWidget("critical-count", m_badges[utils::Critical] = new Wt::WText());
+  tpl->bindWidget("major-count", m_badges[utils::Major] = new Wt::WText());
+  tpl->bindWidget("minor-count", m_badges[utils::Minor] = new Wt::WText());
+  tpl->bindWidget("normal-count", m_badges[utils::Normal] = new Wt::WText());
   tpl->bindWidget("chart", this);
 
   m_scrollArea->setWidget(tpl);
@@ -102,11 +102,11 @@ WebPieChart::WebPieChart(void)
   m_model->setHeaderData(1, Wt::WString("Sales"));
   m_model->insertRows(m_model->rowCount(), 5);
   // Initialize data
-  setSeverityData(MonitorBroker::Normal, 0);
-  setSeverityData(MonitorBroker::Minor, 0);
-  setSeverityData(MonitorBroker::Major, 0);
-  setSeverityData(MonitorBroker::Critical, 0);
-  setSeverityData(MonitorBroker::Unknown, 0);
+  setSeverityData(utils::Normal, 0);
+  setSeverityData(utils::Minor, 0);
+  setSeverityData(utils::Major, 0);
+  setSeverityData(utils::Critical, 0);
+  setSeverityData(utils::Unknown, 0);
   // Draw the chart
   setLabelsColumn(0);    // Set the column that holds the labels.
   setDataColumn(1);      // Set the column that holds the data.

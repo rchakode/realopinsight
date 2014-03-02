@@ -182,7 +182,7 @@ void GuiDashboard::updateTree(const NodeT& _node, const QString& _tip)
 void GuiDashboard::updateMsgConsole(const NodeT& _node)
 {
   if (!m_showOnlyTroubles
-      || (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
+      || (m_showOnlyTroubles && _node.severity != utils::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -275,14 +275,14 @@ void GuiDashboard::scalPaneContentsToViewPort(void) const
 void GuiDashboard::updateTrayInfo(const NodeT& _node)
 {
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-  if (_node.severity == MonitorBroker::Critical ||
-      _node.severity == MonitorBroker::Unknown) {
+  if (_node.severity == utils::Critical ||
+      _node.severity == utils::Unknown) {
     icon = QSystemTrayIcon::Critical;
-  } else if (_node.severity == MonitorBroker::Minor ||
-             _node.severity == MonitorBroker::Major) {
+  } else if (_node.severity == utils::Minor ||
+             _node.severity == utils::Major) {
     icon = QSystemTrayIcon::Warning;
   }
-  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[MonitorBroker::Normal];
+  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[utils::Normal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
@@ -313,13 +313,13 @@ void GuiDashboard::handleSettingsLoaded(void)
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-      case MonitorBroker::Nagios:
+      case utils::Nagios:
         it->icon = ":images/nagios-logo-n.png";
         break;
-      case MonitorBroker::Zabbix:
+      case utils::Zabbix:
         it->icon = ":images/zabbix-logo-z.png";
         break;
-      case MonitorBroker::Zenoss:
+      case utils::Zenoss:
         it->icon = ":images/zenoss-logo-o.png";
         break;
       default:

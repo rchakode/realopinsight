@@ -49,7 +49,7 @@ Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" 
   QString opPasswd = QSettings::value(Settings::OP_PASSWD_KEY).toString();
 
   if (updateInterval.isEmpty()) {
-    QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(MonitorBroker::DefaultUpdateInterval));
+    QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(utils::DefaultUpdateInterval));
   }
   if (admUser.isEmpty()) {
     QSettings::setValue(Settings::ADM_UNSERNAME_KEY, ngrt4n::AdmUser.c_str());
@@ -81,7 +81,7 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 qint32 Settings::updateInterval() const
 {
   qint32 interval = QSettings::value(UPDATE_INTERVAL_KEY).toInt();
-  return (interval > 0)? interval : MonitorBroker::DefaultUpdateInterval;
+  return (interval > 0)? interval : utils::DefaultUpdateInterval;
 }
 
 void Settings::setEntry(const QString& key, const QString& value)

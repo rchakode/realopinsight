@@ -41,10 +41,10 @@ PieChart::~PieChart()
 
 void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _count, QString& toolTip)
 {
-  qint32 critical_count = _check_status_count[MonitorBroker::Critical];
-  qint32 major_count = _check_status_count[MonitorBroker::Major];
-  qint32 minor_count = _check_status_count[MonitorBroker::Minor];
-  qint32 ok_count =  _check_status_count[MonitorBroker::Normal];
+  qint32 critical_count = _check_status_count[utils::Critical];
+  qint32 major_count = _check_status_count[utils::Major];
+  qint32 minor_count = _check_status_count[utils::Minor];
+  qint32 ok_count =  _check_status_count[utils::Normal];
   qint32 unknown_count = _count - (critical_count + major_count + minor_count + ok_count);
 
   float critical_ratio= (100.0 * critical_count)/_count;
@@ -53,31 +53,31 @@ void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _coun
   float unknown_ratio = (100.0 * unknown_count) / _count;
   float ok_ratio = (100.0 * ok_count)/_count;
 
-  slices[MonitorBroker::Critical] =
+  slices[utils::Critical] =
       new PieChartItem(boundingRect,
                        0,
                        3.6 * critical_ratio,
                        utils::COLOR_CRITICAL,
                        this);
-  slices[MonitorBroker::Major] =
+  slices[utils::Major] =
       new PieChartItem(boundingRect,
                        3.6 * critical_ratio,
                        3.6 * major_ratio,
                        utils::COLOR_MAJOR,
                        this);
-  slices[MonitorBroker::Minor] =
+  slices[utils::Minor] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio),
                        3.6 * minor_ratio,
                        utils::COLOR_MINOR,
                        this);
-  slices[MonitorBroker::Unknown] =
+  slices[utils::Unknown] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio),
                        3.6 * unknown_ratio,
                        utils::COLOR_UNKNOWN,
                        this);
-  slices[MonitorBroker::Normal] =
+  slices[utils::Normal] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio + unknown_ratio),
                        3.6 * ok_ratio,

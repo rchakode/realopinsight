@@ -103,7 +103,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 3)->setText(_node.name);
   mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
 
-  if(_node.severity == MonitorBroker::Normal) {
+  if(_node.severity == utils::Normal) {
     mmodel->item(index, 0)->setBackground(Qt::transparent);
     mmodel->item(index, 2)->setBackground(Qt::transparent);
     mmodel->item(index, 3)->setBackground(Qt::transparent);
@@ -136,7 +136,7 @@ void MsgConsole::clearNormalMsg(void)
   qint32 index = 0;
   qint32 nbRows = mmodel->rowCount();
   while (index < nbRows) {
-    if (mmodel->item(index, 1)->text() == utils::severityText(MonitorBroker::Normal)) {
+    if (mmodel->item(index, 1)->text() == utils::severityText(utils::Normal)) {
       mmodel->removeRow(index);
       --nbRows;
     } else {

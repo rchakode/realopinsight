@@ -117,41 +117,41 @@ public:
 
 class LIBREALOPINSIGHTSHARED_EXPORT Criticity {
 public:
-  Criticity(MonitorBroker::SeverityT _value): value(_value) {}
-  void setValue(MonitorBroker::SeverityT _value) {value = _value;}
-  MonitorBroker::SeverityT getValue() const {return value;}
+  Criticity(utils::SeverityT _value): value(_value) {}
+  void setValue(utils::SeverityT _value) {value = _value;}
+  utils::SeverityT getValue() const {return value;}
 
   Criticity operator *(Criticity& _criticity) const {
     switch(value) {
-    case MonitorBroker::Critical:
+    case utils::Critical:
       return Criticity(value);
       break;
-    case MonitorBroker::Normal:
+    case utils::Normal:
       return _criticity;
       break;
-    case MonitorBroker::Minor:
-      if(_criticity.value == MonitorBroker::Critical ||
-         _criticity.value == MonitorBroker::Major ||
-         _criticity.value == MonitorBroker::Unknown)
+    case utils::Minor:
+      if(_criticity.value == utils::Critical ||
+         _criticity.value == utils::Major ||
+         _criticity.value == utils::Unknown)
         return _criticity;
 
       return Criticity(value);
       break;
-    case MonitorBroker::Major:
-      if(_criticity.value == MonitorBroker::Critical ||
-         _criticity.value == MonitorBroker::Unknown)
+    case utils::Major:
+      if(_criticity.value == utils::Critical ||
+         _criticity.value == utils::Unknown)
         return _criticity;
 
       return Criticity(value);
       break;
     default:
       // MonitorBroker::CRITICITY_UNKNOWN
-      if(_criticity.value == MonitorBroker::Critical)
+      if(_criticity.value == utils::Critical)
         return _criticity;
       break;
     }  //end switch
 
-    return Criticity(MonitorBroker::Unknown);
+    return Criticity(utils::Unknown);
   }
 
 
@@ -159,33 +159,33 @@ public:
     if(value == st.value)
       return st;
 
-    if(value == MonitorBroker::Critical ||
-       st.value == MonitorBroker::Critical)
-      return Criticity(MonitorBroker::Critical);
+    if(value == utils::Critical ||
+       st.value == utils::Critical)
+      return Criticity(utils::Critical);
 
-    if(value == MonitorBroker::Unknown ||
-       st.value == MonitorBroker::Unknown)
-      return Criticity(MonitorBroker::Unknown);
+    if(value == utils::Unknown ||
+       st.value == utils::Unknown)
+      return Criticity(utils::Unknown);
 
-    if(value == MonitorBroker::Major ||
-       st.value == MonitorBroker::Major)
-      return Criticity(MonitorBroker::Major);
+    if(value == utils::Major ||
+       st.value == utils::Major)
+      return Criticity(utils::Major);
 
-    if(value == MonitorBroker::Minor ||
-       st.value == MonitorBroker::Minor)
-      return Criticity(MonitorBroker::Minor);
+    if(value == utils::Minor ||
+       st.value == utils::Minor)
+      return Criticity(utils::Minor);
 
-    return Criticity(MonitorBroker::Normal);
+    return Criticity(utils::Normal);
   }
 
   Criticity operator ++(int) {
     switch(value) {
-    case MonitorBroker::Minor:
-      return Criticity(MonitorBroker::Major);
+    case utils::Minor:
+      return Criticity(utils::Major);
       break;
 
-    case MonitorBroker::Major:
-      return Criticity(MonitorBroker::Critical);
+    case utils::Major:
+      return Criticity(utils::Critical);
       break;
 
     default:
@@ -201,12 +201,12 @@ public:
   Criticity operator--(int) {
 
     switch(value) {
-    case MonitorBroker::Critical:
-      return Criticity(MonitorBroker::Major);
+    case utils::Critical:
+      return Criticity(utils::Major);
       break;
 
-    case MonitorBroker::Major:
-      return Criticity(MonitorBroker::Minor);
+    case utils::Major:
+      return Criticity(utils::Minor);
       break;
 
     default:
@@ -220,7 +220,7 @@ public:
   }
 
 private:
-  MonitorBroker::SeverityT value;
+  utils::SeverityT value;
 };
 
 struct NodeT {

@@ -64,19 +64,19 @@ std::string utils::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-  case MonitorBroker::Normal:
+  case utils::Normal:
     cssClass.append("severity-normal");
     break;
-  case MonitorBroker::Minor:
+  case utils::Minor:
     cssClass.append("severity-minor");
     break;
-  case MonitorBroker::Major:
+  case utils::Major:
     cssClass.append("severity-major");
     break;
-  case MonitorBroker::Critical:
+  case utils::Critical:
     cssClass.append("severity-critical");
     break;
-  case MonitorBroker::Unknown:
+  case utils::Unknown:
     cssClass.append("severity-unknown");
     break;
   default:
@@ -153,20 +153,20 @@ Wt::WText* utils::createFontAwesomeTextButton(const std::string& iconClasses,
 Wt::WColor utils::severityWColor(const int& _criticity)
 {
   Wt::WColor color;
-  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
-  case MonitorBroker::Normal:
+  switch (static_cast<utils::SeverityT>(_criticity)) {
+  case utils::Normal:
     color = Wt::WColor("#00ff00");
     break;
-  case MonitorBroker::Minor:
+  case utils::Minor:
     color = Wt::WColor("#ffff00");
     break;
-  case MonitorBroker::Major:
+  case utils::Major:
     color = Wt::WColor("#ffa500");
     break;
-  case MonitorBroker::Critical:
+  case utils::Critical:
     color = Wt::WColor("#ff0000");
     break;
-  case MonitorBroker::Unknown:
+  case utils::Unknown:
   default:
     color = Wt::WColor(" #c0c0c0");
     break;

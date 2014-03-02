@@ -12,17 +12,17 @@ QSplashScreen* utils::infoScreen(const QString & msg) {
 QColor utils::severityQColor(const int& _criticity)
 {
   QColor color(utils::COLOR_UNKNOWN);
-  switch (static_cast<MonitorBroker::SeverityT>(_criticity)) {
-    case MonitorBroker::Normal:
+  switch (static_cast<utils::SeverityT>(_criticity)) {
+    case utils::Normal:
       color = utils::COLOR_NORMAL;
       break;
-    case MonitorBroker::Minor:
+    case utils::Minor:
       color = utils::COLOR_MINOR;
       break;
-    case MonitorBroker::Major:
+    case utils::Major:
       color = utils::COLOR_MAJOR;
       break;
-    case MonitorBroker::Critical:
+    case utils::Critical:
       color = utils::COLOR_CRITICAL;
       break;
     default:

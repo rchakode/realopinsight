@@ -115,7 +115,7 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
   if (! m_showOnlyTroubles ||
-      (m_showOnlyTroubles && _node.severity != MonitorBroker::Normal))
+      (m_showOnlyTroubles && _node.severity != utils::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -195,10 +195,10 @@ void WebDashboard::addJsEventScript(void)
 std::string WebDashboard::statsTooltip(void)
 {
   qint32 totalCount = m_cdata->cnodes.size();
-  qint32 criticalCount = m_cdata->check_status_count[MonitorBroker::Critical];
-  qint32 majorCount = m_cdata->check_status_count[MonitorBroker::Major];
-  qint32 minorCount = m_cdata->check_status_count[MonitorBroker::Minor];
-  qint32 normalCount =  m_cdata->check_status_count[MonitorBroker::Normal];
+  qint32 criticalCount = m_cdata->check_status_count[utils::Critical];
+  qint32 majorCount = m_cdata->check_status_count[utils::Major];
+  qint32 minorCount = m_cdata->check_status_count[utils::Minor];
+  qint32 normalCount =  m_cdata->check_status_count[utils::Normal];
   qint32 unknownCount = totalCount - (criticalCount + majorCount + minorCount + normalCount);
 
   float criticalRatio = (100.0 * criticalCount) / totalCount;
@@ -243,7 +243,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
       m_eventFeedItems.erase(feed);
     }
     // FIXME: need optimization to avoid removing and readding the same item
-    if (node.severity != MonitorBroker::Normal) {
+    if (node.severity != utils::Normal) {
       Wt::WWidget* widget = createEventFeedItem(node);
       m_eventFeedLayout->insertWidget(0, widget);
       m_eventFeedItems.insert(node.id, widget);

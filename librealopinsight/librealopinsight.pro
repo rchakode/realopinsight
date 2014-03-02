@@ -39,7 +39,6 @@ DEFINES *= "BUG_REPORT_EMAIL='\"bugs@ngrt4n.com\"'"
 QMAKE_CXXFLAGS += -std=c++0x
 
 SOURCES += \
-    src/MonitorBroker.cpp \
     src/Parser.cpp \
     src/Preferences.cpp \
     src/ZbxHelper.cpp \

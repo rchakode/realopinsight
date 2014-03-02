@@ -5,43 +5,43 @@
 <context>
     <name>Auth</name>
     <message>
-        <location filename="../client/src/Auth.cpp" line="36"/>
+        <location filename="../client/src/Auth.cpp" line="38"/>
         <source>%1 - Login</source>
         <translation>%1 - Authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="43"/>
+        <location filename="../client/src/Auth.cpp" line="45"/>
         <source>Version %1 (%2)</source>
         <translation>Version %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="46"/>
+        <location filename="../client/src/Auth.cpp" line="48"/>
         <source>Login</source>
         <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="49"/>
+        <location filename="../client/src/Auth.cpp" line="51"/>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="54"/>
+        <location filename="../client/src/Auth.cpp" line="56"/>
         <source>Sign in</source>
         <translation>Connexion</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="55"/>
+        <location filename="../client/src/Auth.cpp" line="57"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="56"/>
+        <location filename="../client/src/Auth.cpp" line="58"/>
         <source>
 Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation>Copyright (c) 2010-%1 Projet NGRT4N. Tous droits réservés.</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="90"/>
+        <location filename="../client/src/Auth.cpp" line="92"/>
         <source>Authentication failed: wrong username or password</source>
         <translation>Echec d&apos;autentification: nom d&apos;utilisateur ou mot de passe incorrect</translation>
     </message>
@@ -832,35 +832,36 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="obsolete">Processus métier</translation>
     </message>
     <message>
+        <location filename="../client/src/GuiUtils.cpp" line="36"/>
         <source>%1 - Warning</source>
-        <translation type="obsolete">%1 - Attention</translation>
+        <translation type="unfinished">%1 - Attention</translation>
     </message>
     <message>
-        <location filename="../client/src/MsgConsole.cpp" line="40"/>
+        <location filename="../client/src/MsgConsole.cpp" line="41"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="48"/>
         <source>Date &amp; Hour</source>
         <translation>Date &amp; Heure</translation>
     </message>
     <message>
-        <location filename="../client/src/MsgConsole.cpp" line="41"/>
+        <location filename="../client/src/MsgConsole.cpp" line="42"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="52"/>
         <source>Severity</source>
         <translation>Sévérité</translation>
     </message>
     <message>
-        <location filename="../client/src/MsgConsole.cpp" line="42"/>
+        <location filename="../client/src/MsgConsole.cpp" line="43"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="56"/>
         <source>Host</source>
         <translation>Hôte</translation>
     </message>
     <message>
-        <location filename="../client/src/MsgConsole.cpp" line="43"/>
+        <location filename="../client/src/MsgConsole.cpp" line="44"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="60"/>
         <source>Service</source>
         <translation>Service</translation>
     </message>
     <message>
-        <location filename="../client/src/MsgConsole.cpp" line="44"/>
+        <location filename="../client/src/MsgConsole.cpp" line="45"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="64"/>
         <source>Message</source>
         <translation>Message</translation>
@@ -1062,24 +1063,29 @@ Chargement...</translation>
         <translation>Indéfini : </translation>
     </message>
     <message>
+        <location filename="../client/src/StatsLegend.cpp" line="41"/>
         <source>normal</source>
-        <translation type="obsolete">normal</translation>
+        <translation type="unfinished">normal</translation>
     </message>
     <message>
+        <location filename="../client/src/StatsLegend.cpp" line="43"/>
         <source>minor</source>
-        <translation type="obsolete">mineur</translation>
+        <translation type="unfinished">mineur</translation>
     </message>
     <message>
+        <location filename="../client/src/StatsLegend.cpp" line="45"/>
         <source>major</source>
-        <translation type="obsolete">majeur</translation>
+        <translation type="unfinished">majeur</translation>
     </message>
     <message>
+        <location filename="../client/src/StatsLegend.cpp" line="47"/>
         <source>critical</source>
-        <translation type="obsolete">critique</translation>
+        <translation type="unfinished">critique</translation>
     </message>
     <message>
+        <location filename="../client/src/StatsLegend.cpp" line="49"/>
         <source>unknown</source>
-        <translation type="obsolete">indéfini</translation>
+        <translation type="unfinished">indéfini</translation>
     </message>
     <message>
         <source>Service Tree</source>
@@ -1124,7 +1130,7 @@ Chargement...</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="141"/>
+        <location filename="../wt/src/WebUtils.cpp" line="142"/>
         <source>&lt;span class=&quot;btn&quot;&gt; &lt;i class=&quot;%1&quot;&gt;&lt;/i&gt;&lt;/span&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1147,59 +1153,59 @@ Chargement...</translation>
 <context>
     <name>ServiceEditor</name>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="39"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="41"/>
         <source>Name</source>
         <translation>Etiquette</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="42"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="44"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="45"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="47"/>
         <source>Icon</source>
         <translation>Icône</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="48"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="50"/>
         <source>Severity Handling Rules</source>
         <translation>Traitement de sévérité</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="52"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="54"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="55"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="57"/>
         <source>Alarm Message</source>
         <translation>Message d&apos;alarme</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="58"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="60"/>
         <source>Notification Message</source>
         <translation>Message de notification</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="61"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="63"/>
         <source>Data Point</source>
         <translation>Source de données</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="246"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="248"/>
         <source>Calculation rule (Default is %1)</source>
         <oldsource>Calculation rule (Default is</oldsource>
         <translation>Règle de calcul (valeur par défaut %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="253"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="255"/>
         <source>Propagation rule (Default is %1)</source>
         <oldsource>Propagation rule (Default is</oldsource>
         <translation>Règle de propagation (valeur par défaut %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="300"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="302"/>
         <source>This depends on your monitoring configuration:
  * For Nagios this follows the patterns &apos;host_name/service_name&apos; or just &apos;host_name&apos;
     E.g. mysql-server.example.com/Current Load, mysql-server.example.com
@@ -1955,17 +1961,17 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="41"/>
+        <location filename="../wt/src/WebUtils.cpp" line="42"/>
         <source>error-msg-div-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="44"/>
+        <location filename="../wt/src/WebUtils.cpp" line="45"/>
         <source>success-msg-div-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="96"/>
+        <location filename="../wt/src/WebUtils.cpp" line="97"/>
         <source>copyright-footer.tpl</source>
         <translation type="unfinished"></translation>
     </message>

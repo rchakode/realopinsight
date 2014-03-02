@@ -42,8 +42,7 @@ struct CheckT {
 };
 typedef std::unordered_map<std::string, CheckT> ChecksT;
 
-class LIBREALOPINSIGHTSHARED_EXPORT MonitorBroker {
-public:
+namespace utils {
   enum ApiTypeT {
     Nagios = 0,
     Zabbix = 1,
@@ -79,19 +78,5 @@ public:
     ZenossError = 4,
     ZenossCritical = 5
   };
-
-  static const int DefaultPort;
-  static const int DefaultUpdateInterval;
-  static const int MaxMsg;
-
-  MonitorBroker(const std::string& _sfile);
-  virtual ~MonitorBroker();
-  std::string getInfOfService(const std::string& _sid);
-  static bool loadNagiosCollectedData(const std::string& _sfile, ChecksT& _checks);
-
-private:
-  int lastUpdate;
-  std::string statusFile;
-  ChecksT services;
-};
-#endif /* MONITORBROKER_HPP_ */
+}
+#endif /* utills namespace */
