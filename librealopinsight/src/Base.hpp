@@ -24,8 +24,7 @@
 
 #ifndef BASE_HPP
 #define BASE_HPP
-#include "MonitorBroker.hpp"
-#include "ns.hpp"
+#include "global.hpp"
 #include <QtCore/QtGlobal>
 #include <QtCore>
 #include <QtXml>
@@ -117,41 +116,41 @@ public:
 
 class LIBREALOPINSIGHTSHARED_EXPORT Criticity {
 public:
-  Criticity(utils::SeverityT _value): value(_value) {}
-  void setValue(utils::SeverityT _value) {value = _value;}
-  utils::SeverityT getValue() const {return value;}
+  Criticity(ngrt4n::SeverityT _value): value(_value) {}
+  void setValue(ngrt4n::SeverityT _value) {value = _value;}
+  ngrt4n::SeverityT getValue() const {return value;}
 
   Criticity operator *(Criticity& _criticity) const {
     switch(value) {
-    case utils::Critical:
+    case ngrt4n::Critical:
       return Criticity(value);
       break;
-    case utils::Normal:
+    case ngrt4n::Normal:
       return _criticity;
       break;
-    case utils::Minor:
-      if(_criticity.value == utils::Critical ||
-         _criticity.value == utils::Major ||
-         _criticity.value == utils::Unknown)
+    case ngrt4n::Minor:
+      if(_criticity.value == ngrt4n::Critical ||
+         _criticity.value == ngrt4n::Major ||
+         _criticity.value == ngrt4n::Unknown)
         return _criticity;
 
       return Criticity(value);
       break;
-    case utils::Major:
-      if(_criticity.value == utils::Critical ||
-         _criticity.value == utils::Unknown)
+    case ngrt4n::Major:
+      if(_criticity.value == ngrt4n::Critical ||
+         _criticity.value == ngrt4n::Unknown)
         return _criticity;
 
       return Criticity(value);
       break;
     default:
       // MonitorBroker::CRITICITY_UNKNOWN
-      if(_criticity.value == utils::Critical)
+      if(_criticity.value == ngrt4n::Critical)
         return _criticity;
       break;
     }  //end switch
 
-    return Criticity(utils::Unknown);
+    return Criticity(ngrt4n::Unknown);
   }
 
 
@@ -159,33 +158,33 @@ public:
     if(value == st.value)
       return st;
 
-    if(value == utils::Critical ||
-       st.value == utils::Critical)
-      return Criticity(utils::Critical);
+    if(value == ngrt4n::Critical ||
+       st.value == ngrt4n::Critical)
+      return Criticity(ngrt4n::Critical);
 
-    if(value == utils::Unknown ||
-       st.value == utils::Unknown)
-      return Criticity(utils::Unknown);
+    if(value == ngrt4n::Unknown ||
+       st.value == ngrt4n::Unknown)
+      return Criticity(ngrt4n::Unknown);
 
-    if(value == utils::Major ||
-       st.value == utils::Major)
-      return Criticity(utils::Major);
+    if(value == ngrt4n::Major ||
+       st.value == ngrt4n::Major)
+      return Criticity(ngrt4n::Major);
 
-    if(value == utils::Minor ||
-       st.value == utils::Minor)
-      return Criticity(utils::Minor);
+    if(value == ngrt4n::Minor ||
+       st.value == ngrt4n::Minor)
+      return Criticity(ngrt4n::Minor);
 
-    return Criticity(utils::Normal);
+    return Criticity(ngrt4n::Normal);
   }
 
   Criticity operator ++(int) {
     switch(value) {
-    case utils::Minor:
-      return Criticity(utils::Major);
+    case ngrt4n::Minor:
+      return Criticity(ngrt4n::Major);
       break;
 
-    case utils::Major:
-      return Criticity(utils::Critical);
+    case ngrt4n::Major:
+      return Criticity(ngrt4n::Critical);
       break;
 
     default:
@@ -201,12 +200,12 @@ public:
   Criticity operator--(int) {
 
     switch(value) {
-    case utils::Critical:
-      return Criticity(utils::Major);
+    case ngrt4n::Critical:
+      return Criticity(ngrt4n::Major);
       break;
 
-    case utils::Major:
-      return Criticity(utils::Minor);
+    case ngrt4n::Major:
+      return Criticity(ngrt4n::Minor);
       break;
 
     default:
@@ -220,7 +219,7 @@ public:
   }
 
 private:
-  utils::SeverityT value;
+  ngrt4n::SeverityT value;
 };
 
 struct NodeT {

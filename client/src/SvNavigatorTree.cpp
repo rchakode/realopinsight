@@ -54,7 +54,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event)
         QTreeWidget::dropEvent(_event);
         Q_EMIT treeNodeMoved(m_selectedNode);
       } else {
-        utils::alert(tr("Dropping is not allowed on the target node"));
+        ngrt4n::alert(tr("Dropping is not allowed on the target node"));
       }
     }
   }
@@ -106,8 +106,8 @@ QTreeWidgetItem* SvNavigatorTree::addNode(const NodeT& _node,
 void SvNavigatorTree::update(void)
 {
   QTreeWidget::clear();
-  QTreeWidget::addTopLevelItem(m_items[utils::ROOT_ID]);
-  QTreeWidget::setCurrentItem(m_items[utils::ROOT_ID]);
+  QTreeWidget::addTopLevelItem(m_items[ngrt4n::ROOT_ID]);
+  QTreeWidget::setCurrentItem(m_items[ngrt4n::ROOT_ID]);
   QTreeWidget::expandAll();
 }
 
@@ -137,7 +137,7 @@ void SvNavigatorTree::build(void)
     }
   }
   clear();
-  addTopLevelItem(m_items[utils::ROOT_ID]);
+  addTopLevelItem(m_items[ngrt4n::ROOT_ID]);
 }
 
 QTreeWidgetItem* SvNavigatorTree::findNodeItem(const QString& _nodeId)
@@ -159,7 +159,7 @@ void SvNavigatorTree::updateNodeItem(const NodeT& _node, const QString& _tip)
 {
   QTreeWidgetItem* item = findNodeItem(_node.id);
   if (item) {
-    item->setIcon(0, utils::severityIcon(_node.severity));
+    item->setIcon(0, ngrt4n::severityIcon(_node.severity));
     item->setToolTip(0, _tip);
   }
 }

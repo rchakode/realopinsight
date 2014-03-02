@@ -105,7 +105,7 @@ void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
     if (index < 0) {
       addMsg(*node);
     } else {
-      m_model->item(index, 0)->setText(utils::humanTimeText(node->check.last_state_change));
+      m_model->item(index, 0)->setText(ngrt4n::humanTimeText(node->check.last_state_change));
       updateSeverityItem(m_model->item(index, 1), node->severity);
       m_model->item(index, 2)->setText(node->check.host);
       m_model->item(index, 3)->setText(node->name.toStdString()); //optional
@@ -120,7 +120,7 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
   if (index < 0) {
     addMsg(_node);
   } else {
-    m_model->item(index, 0)->setText(utils::humanTimeText(_node.check.last_state_change));
+    m_model->item(index, 0)->setText(ngrt4n::humanTimeText(_node.check.last_state_change));
     updateSeverityItem(m_model->item(index, 1), _node.severity);
     m_model->item(index, 2)->setText(_node.check.host);
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
@@ -144,7 +144,7 @@ void WebMsgConsole::addMsg(const NodeT&  _node)
 Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
 {
   Wt::WStandardItem* item = new Wt::WStandardItem(text);
-  if (row & 1) item->setStyleClass(utils::severityCssClass(-1));
+  if (row & 1) item->setStyleClass(ngrt4n::severityCssClass(-1));
   return item;
 }
 
@@ -152,7 +152,7 @@ Wt::WStandardItem* WebMsgConsole::createSeverityItem(const NodeT& _node)
 {
   Wt::WStandardItem* item = new Wt::WStandardItem();
   item->setData(QString::number(_node.severity).toStdString(), Wt::UserRole);
-  item->setText(utils::severityText(_node.severity).toStdString());
+  item->setText(ngrt4n::severityText(_node.severity).toStdString());
   updateSeverityItem(item, _node.severity);
   return item;
 }
@@ -160,9 +160,9 @@ Wt::WStandardItem* WebMsgConsole::createSeverityItem(const NodeT& _node)
 Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck, int row)
 {
   Wt::WStandardItem * item = new Wt::WStandardItem();
-  item->setText(utils::wHumanTimeText(_lastcheck));
+  item->setText(ngrt4n::wHumanTimeText(_lastcheck));
   item->setData(_lastcheck, Wt::UserRole);
-  if (row & 1) item->setStyleClass(utils::severityCssClass(-1));
+  if (row & 1) item->setStyleClass(ngrt4n::severityCssClass(-1));
   return item;
 }
 
@@ -181,6 +181,6 @@ int WebMsgConsole::findServiceRow(const std::string& _id)
 
 void WebMsgConsole::updateSeverityItem(Wt::WStandardItem* item, int severity)
 {
-  item->setText(utils::severityText(severity).toStdString());
-  item->setStyleClass(utils::severityCssClass(severity));
+  item->setText(ngrt4n::severityText(severity).toStdString());
+  item->setStyleClass(ngrt4n::severityCssClass(severity));
 }

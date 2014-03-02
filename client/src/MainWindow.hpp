@@ -45,7 +45,7 @@ public Q_SLOTS:
   void handleHideChart(void);
   void handleRefresh(void);
   void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {utils::alert(msg);}
+  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
   void handleChangeMonitoringSettingsAction(void);
 
 protected:

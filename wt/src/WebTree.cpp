@@ -67,7 +67,7 @@ void WebTree::build(void)
       parent->appendRow(child);
     }
   }
-  update(m_items[utils::ROOT_ID]);
+  update(m_items[ngrt4n::ROOT_ID]);
 }
 
 void WebTree::update(void)
@@ -95,7 +95,7 @@ void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
 {
   Wt::WStandardItem* item = findNodeItem(_node.id);
   if (item) {
-    item->setIcon(utils::getIconPath(_node.severity).toStdString());
+    item->setIcon(ngrt4n::getIconPath(_node.severity).toStdString());
     item->setToolTip(Wt::WString::fromUTF8(_tip.toStdString()));
   }
 }

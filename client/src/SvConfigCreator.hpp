@@ -65,7 +65,7 @@ public Q_SLOTS:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void import(void);
-  void handleErrorOccurred(QString msg){utils::alert(msg);}
+  void handleErrorOccurred(QString msg){ngrt4n::alert(msg);}
 
 protected:
   virtual void contextMenuEvent( QContextMenuEvent *);

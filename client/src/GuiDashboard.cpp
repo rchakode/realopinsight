@@ -182,7 +182,7 @@ void GuiDashboard::updateTree(const NodeT& _node, const QString& _tip)
 void GuiDashboard::updateMsgConsole(const NodeT& _node)
 {
   if (!m_showOnlyTroubles
-      || (m_showOnlyTroubles && _node.severity != utils::Normal))
+      || (m_showOnlyTroubles && _node.severity != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -213,7 +213,7 @@ void GuiDashboard::filterNodeRelatedMsg(void)
   if (m_filteredMsgConsole) delete m_filteredMsgConsole;
   m_filteredMsgConsole = new MsgConsole();
   NodeListT::iterator node;
-  if (utils::findNode(m_cdata, m_selectedNode, node)) {
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
     filterNodeRelatedMsg(m_selectedNode);
     m_filteredMsgConsole->updateEntriesSize(true);
     m_filteredMsgConsole->setWindowTitle(tr("Messages related to '%2' - %1").arg(APP_NAME, node->name));
@@ -229,7 +229,7 @@ void GuiDashboard::filterNodeRelatedMsg(void)
 void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (utils::findNode(m_cdata, _nodeId, node) &&
+  if (ngrt4n::findNode(m_cdata, _nodeId, node) &&
       !node->child_nodes.isEmpty()) {
     if (node->type == NodeType::AlarmNode) {
       m_filteredMsgConsole->updateNodeMsg(node);
@@ -275,18 +275,18 @@ void GuiDashboard::scalPaneContentsToViewPort(void) const
 void GuiDashboard::updateTrayInfo(const NodeT& _node)
 {
   QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-  if (_node.severity == utils::Critical ||
-      _node.severity == utils::Unknown) {
+  if (_node.severity == ngrt4n::Critical ||
+      _node.severity == ngrt4n::Unknown) {
     icon = QSystemTrayIcon::Critical;
-  } else if (_node.severity == utils::Minor ||
-             _node.severity == utils::Major) {
+  } else if (_node.severity == ngrt4n::Minor ||
+             _node.severity == ngrt4n::Major) {
     icon = QSystemTrayIcon::Warning;
   }
-  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[utils::Normal];
+  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[ngrt4n::Normal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
-                                                 utils::severityText(_node.severity).toUpper());
+                                                 ngrt4n::severityText(_node.severity).toUpper());
 
   m_trayIcon->showMessage(title, msg, icon);
   m_trayIcon->setToolTip(title%"\n"%msg);
@@ -313,13 +313,13 @@ void GuiDashboard::handleSettingsLoaded(void)
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-      case utils::Nagios:
+      case ngrt4n::Nagios:
         it->icon = ":images/nagios-logo-n.png";
         break;
-      case utils::Zabbix:
+      case ngrt4n::Zabbix:
         it->icon = ":images/zabbix-logo-z.png";
         break;
-      case utils::Zenoss:
+      case ngrt4n::Zenoss:
         it->icon = ":images/zenoss-logo-o.png";
         break;
       default:

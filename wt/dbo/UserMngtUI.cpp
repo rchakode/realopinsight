@@ -259,7 +259,7 @@ void UserFormView::showMessage(int exitCode,
                                const std::string& errorMsg,
                                const std::string& successMsg)
 {
-  utils::showMessage(exitCode, errorMsg, successMsg, m_infoBox);
+  ngrt4n::showMessage(exitCode, errorMsg, successMsg, m_infoBox);
 }
 
 void UserFormView::process(void)

@@ -25,7 +25,6 @@
 #include "WebUtils.hpp"
 #include "WebMap.hpp"
 #include <iostream>
-#include "MonitorBroker.hpp"
 #include "utilsClient.hpp"
 #include "WebPieChart.hpp"
 #include <Wt/WPointF>
@@ -39,7 +38,7 @@
 #include <boost/filesystem/operations.hpp>
 
 namespace {
-  const IconMapT ICONS = utils::nodeIcons();
+  const IconMapT ICONS = ngrt4n::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
 }
@@ -135,16 +134,16 @@ void WebMap::drawNode(const NodeT& _node, bool drawIcon)
     Wt::WPointF iconPos(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
     Wt::WPointF labelPos(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
     Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
-    m_painter->setPen(Wt::WPen(utils::severityWColor(_node.severity)));
+    m_painter->setPen(Wt::WPen(ngrt4n::severityWColor(_node.severity)));
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(utils::getPathFromQtResource(ICONS[_node.icon]),40,40));
+      m_painter->drawImage(iconPos, GImage(ngrt4n::getPathFromQtResource(ICONS[_node.icon]),40,40));
     } else { /* thumbnail: do nothing*/ }
 
     if( _node.type == NodeType::ServiceNode) {
       if (_node.visibility & ngrt4n::Expanded) {
-        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(ICONS[utils::MINUS]),19,18));
+        m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::MINUS]),19,18));
       } else {
-        m_painter->drawImage(expIconPos,GImage(utils::getPathFromQtResource(ICONS[utils::PLUS]),19,18));
+        m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::PLUS]),19,18));
       }
       createExpIconLink(_node, expIconPos);
     }
@@ -161,12 +160,12 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
 {
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
-  if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
-      && utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child))
+  if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
+      && ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child))
   {
     if (parent->visibility & ngrt4n::Expanded) {
       m_painter->save();
-      Wt::WPen pen(utils::severityWColor(child->prop_sev));
+      Wt::WPen pen(ngrt4n::severityWColor(child->prop_sev));
       m_painter->setPen(pen);
 
       Wt::WPointF edgeP1(parent->pos_x + m_translateX, parent->pos_y + 24 + m_translateY);
@@ -181,7 +180,7 @@ void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
 {
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
                                           40 * m_scaleX, 40 * m_scaleY);
-  area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toUtf8()));
+  area->setToolTip(Wt::WString::fromUTF8(ngrt4n::getNodeToolTip(_node).toUtf8()));
   //  area->clicked().connect(std::bind([=](){
   //    qDebug() << "node "<< _node.name << _node.visibility;
   //  }));
@@ -192,7 +191,7 @@ void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos
 {
   Wt::WRectArea* area = new Wt::WRectArea(expIconPos.x() * m_scaleX, expIconPos.y() * m_scaleY,
                                           20 * m_scaleX, 20 * m_scaleY);
-  area->setToolTip(Wt::WString::fromUTF8(utils::getNodeToolTip(_node).toUtf8()));
+  area->setToolTip(Wt::WString::fromUTF8(ngrt4n::getNodeToolTip(_node).toUtf8()));
   area->clicked().connect(std::bind([=]() {expandCollapse(_node.id);}));
   addArea(area);
 }
@@ -262,7 +261,7 @@ void WebMap::updateThumbnail(void)
 void WebMap::expandCollapse(const QString& nodeId)
 {
   NodeListIteratorT node;
-  if (utils::findNode(m_cdata, nodeId, node)) {
+  if (ngrt4n::findNode(m_cdata, nodeId, node)) {
     qint8 childMask = 0x0;
     if (node->visibility & ngrt4n::Expanded) {
       childMask = ngrt4n::Hidden;
@@ -282,7 +281,7 @@ void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
   if (node.type != NodeType::AlarmNode && ! node.child_nodes.isEmpty()) {
     for (const auto & childId: node.child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
       NodeListIteratorT child;
-      if(utils::findNode(m_cdata, childId, child)) {
+      if(ngrt4n::findNode(m_cdata, childId, child)) {
         if (node.visibility & ngrt4n::Expanded) {
           child->visibility |= mask;
         } else {

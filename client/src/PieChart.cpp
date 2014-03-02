@@ -41,10 +41,10 @@ PieChart::~PieChart()
 
 void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _count, QString& toolTip)
 {
-  qint32 critical_count = _check_status_count[utils::Critical];
-  qint32 major_count = _check_status_count[utils::Major];
-  qint32 minor_count = _check_status_count[utils::Minor];
-  qint32 ok_count =  _check_status_count[utils::Normal];
+  qint32 critical_count = _check_status_count[ngrt4n::Critical];
+  qint32 major_count = _check_status_count[ngrt4n::Major];
+  qint32 minor_count = _check_status_count[ngrt4n::Minor];
+  qint32 ok_count =  _check_status_count[ngrt4n::Normal];
   qint32 unknown_count = _count - (critical_count + major_count + minor_count + ok_count);
 
   float critical_ratio= (100.0 * critical_count)/_count;
@@ -53,35 +53,35 @@ void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _coun
   float unknown_ratio = (100.0 * unknown_count) / _count;
   float ok_ratio = (100.0 * ok_count)/_count;
 
-  slices[utils::Critical] =
+  slices[ngrt4n::Critical] =
       new PieChartItem(boundingRect,
                        0,
                        3.6 * critical_ratio,
-                       utils::COLOR_CRITICAL,
+                       ngrt4n::COLOR_CRITICAL,
                        this);
-  slices[utils::Major] =
+  slices[ngrt4n::Major] =
       new PieChartItem(boundingRect,
                        3.6 * critical_ratio,
                        3.6 * major_ratio,
-                       utils::COLOR_MAJOR,
+                       ngrt4n::COLOR_MAJOR,
                        this);
-  slices[utils::Minor] =
+  slices[ngrt4n::Minor] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio),
                        3.6 * minor_ratio,
-                       utils::COLOR_MINOR,
+                       ngrt4n::COLOR_MINOR,
                        this);
-  slices[utils::Unknown] =
+  slices[ngrt4n::Unknown] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio),
                        3.6 * unknown_ratio,
-                       utils::COLOR_UNKNOWN,
+                       ngrt4n::COLOR_UNKNOWN,
                        this);
-  slices[utils::Normal] =
+  slices[ngrt4n::Normal] =
       new PieChartItem(boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio + unknown_ratio),
                        3.6 * ok_ratio,
-                       utils::COLOR_NORMAL,
+                       ngrt4n::COLOR_NORMAL,
                        this);
   toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
       "/"%QString::number(_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"

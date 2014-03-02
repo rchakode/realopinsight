@@ -45,7 +45,7 @@ public:
 
   virtual Wt::WBrush brush (int index) const
   {
-    return Wt::WBrush(utils::severityWColor(index));
+    return Wt::WBrush(ngrt4n::severityWColor(index));
   }
 
   virtual Wt::WPen borderPen (int index) const
@@ -81,16 +81,16 @@ WebPieChart::WebPieChart(void)
 {
   setModel(m_model);
 
-  resize(utils::CHART_WIDTH, utils::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
+  resize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
-  tpl->bindWidget("unknown-count", m_badges[utils::Unknown] = new Wt::WText());
-  tpl->bindWidget("critical-count", m_badges[utils::Critical] = new Wt::WText());
-  tpl->bindWidget("major-count", m_badges[utils::Major] = new Wt::WText());
-  tpl->bindWidget("minor-count", m_badges[utils::Minor] = new Wt::WText());
-  tpl->bindWidget("normal-count", m_badges[utils::Normal] = new Wt::WText());
+  tpl->bindWidget("unknown-count", m_badges[ngrt4n::Unknown] = new Wt::WText());
+  tpl->bindWidget("critical-count", m_badges[ngrt4n::Critical] = new Wt::WText());
+  tpl->bindWidget("major-count", m_badges[ngrt4n::Major] = new Wt::WText());
+  tpl->bindWidget("minor-count", m_badges[ngrt4n::Minor] = new Wt::WText());
+  tpl->bindWidget("normal-count", m_badges[ngrt4n::Normal] = new Wt::WText());
   tpl->bindWidget("chart", this);
 
   m_scrollArea->setWidget(tpl);
@@ -102,11 +102,11 @@ WebPieChart::WebPieChart(void)
   m_model->setHeaderData(1, Wt::WString("Sales"));
   m_model->insertRows(m_model->rowCount(), 5);
   // Initialize data
-  setSeverityData(utils::Normal, 0);
-  setSeverityData(utils::Minor, 0);
-  setSeverityData(utils::Major, 0);
-  setSeverityData(utils::Critical, 0);
-  setSeverityData(utils::Unknown, 0);
+  setSeverityData(ngrt4n::Normal, 0);
+  setSeverityData(ngrt4n::Minor, 0);
+  setSeverityData(ngrt4n::Major, 0);
+  setSeverityData(ngrt4n::Critical, 0);
+  setSeverityData(ngrt4n::Unknown, 0);
   // Draw the chart
   setLabelsColumn(0);    // Set the column that holds the labels.
   setDataColumn(1);      // Set the column that holds the data.
@@ -126,7 +126,7 @@ WebPieChart::~WebPieChart()
 
 void WebPieChart::setSeverityData(int _sev, int _count)
 {
-  std::string label = utils::severityText(_sev).toStdString();
+  std::string label = ngrt4n::severityText(_sev).toStdString();
   m_model->setData(_sev, 0, label);
   m_model->setData(_sev, 1, _count);
   m_badges[_sev]->setText(QString::number(_count).toStdString());

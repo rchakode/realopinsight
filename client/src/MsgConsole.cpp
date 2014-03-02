@@ -92,9 +92,9 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 0)->setText(itemText);
   mmodel->item(index, 0)->setData(QDateTime::fromTime_t(itemText.toUInt()), Qt::UserRole);
 
-  mmodel->item(index, 1)->setText(utils::severityText(_node.severity));
+  mmodel->item(index, 1)->setText(ngrt4n::severityText(_node.severity));
   mmodel->item(index, 1)->setData(-1*_node.severity, Qt::UserRole);
-  mmodel->item(index, 1)->setBackground(QBrush(utils::severityQColor(_node.severity)));
+  mmodel->item(index, 1)->setBackground(QBrush(ngrt4n::severityQColor(_node.severity)));
 
   itemText = QString(check.host.c_str());
   mmodel->item(index, 2)->setText(itemText);
@@ -103,16 +103,16 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 3)->setText(_node.name);
   mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
 
-  if(_node.severity == utils::Normal) {
+  if(_node.severity == ngrt4n::Normal) {
     mmodel->item(index, 0)->setBackground(Qt::transparent);
     mmodel->item(index, 2)->setBackground(Qt::transparent);
     mmodel->item(index, 3)->setBackground(Qt::transparent);
     mmodel->item(index, 4)->setBackground(Qt::transparent);
   } else {
-    mmodel->item(index, 0)->setBackground(utils::HIGHLIGHT_COLOR);
-    mmodel->item(index, 2)->setBackground(utils::HIGHLIGHT_COLOR);
-    mmodel->item(index, 3)->setBackground(utils::HIGHLIGHT_COLOR);
-    mmodel->item(index, 4)->setBackground(utils::HIGHLIGHT_COLOR);
+    mmodel->item(index, 0)->setBackground(ngrt4n::HIGHLIGHT_COLOR);
+    mmodel->item(index, 2)->setBackground(ngrt4n::HIGHLIGHT_COLOR);
+    mmodel->item(index, 3)->setBackground(ngrt4n::HIGHLIGHT_COLOR);
+    mmodel->item(index, 4)->setBackground(ngrt4n::HIGHLIGHT_COLOR);
 
   }
   mmodel->item(index, 4)->setText(_node.actual_msg);
@@ -136,7 +136,7 @@ void MsgConsole::clearNormalMsg(void)
   qint32 index = 0;
   qint32 nbRows = mmodel->rowCount();
   while (index < nbRows) {
-    if (mmodel->item(index, 1)->text() == utils::severityText(utils::Normal)) {
+    if (mmodel->item(index, 1)->text() == ngrt4n::severityText(ngrt4n::Normal)) {
       mmodel->removeRow(index);
       --nbRows;
     } else {

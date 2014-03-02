@@ -24,7 +24,7 @@
 
 #ifndef ZMQSOCKET_HPP
 #define ZMQSOCKET_HPP
-#include "ns.hpp"
+#include "global.hpp"
 #include <QtCore/QtGlobal>
 #include <string>
 #include <sstream>

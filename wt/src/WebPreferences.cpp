@@ -36,7 +36,7 @@
 
 WebPreferences::WebPreferences(int _userRole)
   : Preferences(),
-    m_dialog(new Wt::WDialog(utils::tr("Preferences - " +APP_NAME.toStdString())))
+    m_dialog(new Wt::WDialog(ngrt4n::tr("Preferences - " +APP_NAME.toStdString())))
 {
   m_dialog->setStyleClass("Wt-dialog");
   m_dialog->titleBar()->setStyleClass("titlebar");
@@ -61,8 +61,8 @@ WebPreferences::WebPreferences(int _userRole)
   }));
 
   tpl->bindWidget("monitor-type", m_monitorTypeField = new Wt::WComboBox(container));
-  m_monitorTypeField->addItem(utils::tr("Select a monitor type"));
-  for (const auto& srcid: utils::sourceTypes())
+  m_monitorTypeField->addItem(ngrt4n::tr("Select a monitor type"));
+  for (const auto& srcid: ngrt4n::sourceTypes())
     m_monitorTypeField->addItem(srcid.toStdString());
   m_monitorTypeField->activated().connect(std::bind([=](int index){
     bool enable = index>0;
@@ -79,20 +79,20 @@ WebPreferences::WebPreferences(int _userRole)
   tpl->bindWidget("livestatus-server", m_livestatusHostField = new Wt::WLineEdit(container));
   tpl->bindWidget("livestatus-port", m_livestatusPortField = new Wt::WLineEdit(container));
   m_livestatusPortField->setWidth(50);
-  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField = new Wt::WCheckBox(utils::tr("Use ngrt4nd"), container));
+  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField = new Wt::WCheckBox(ngrt4n::tr("Use ngrt4nd"), container));
 
   m_livestatusHostField->setEmptyText("server-address");
   m_livestatusPortField->setEmptyText("1983");
   m_livestatusPortField->setValidator(new Wt::WIntValidator());
   m_livestatusPortField->setMaxLength(5);
 
-  tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField = new Wt::WCheckBox(utils::tr("Don't verify SSL certificate"), container));
-  tpl->bindWidget("show-in-clear", m_clearAuthStringField = new Wt::WCheckBox(utils::tr("Show in clear"), container));
+  tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField = new Wt::WCheckBox(ngrt4n::tr("Don't verify SSL certificate"), container));
+  tpl->bindWidget("show-in-clear", m_clearAuthStringField = new Wt::WCheckBox(ngrt4n::tr("Show in clear"), container));
   tpl->bindWidget("update-interval", m_updateIntervalField = new Wt::WSpinBox(container));
 
-  tpl->bindWidget("apply-change-button", m_applyChangeBtn = new Wt::WPushButton(utils::tr("Apply changes"), container));
-  tpl->bindWidget("add-as-source-button", m_addAsSourceBtn = new Wt::WPushButton(utils::tr("Add as source"), container));
-  tpl->bindWidget("delete-button", m_deleteSourceBtn = new Wt::WPushButton(utils::tr("Delete source"), container));
+  tpl->bindWidget("apply-change-button", m_applyChangeBtn = new Wt::WPushButton(ngrt4n::tr("Apply changes"), container));
+  tpl->bindWidget("add-as-source-button", m_addAsSourceBtn = new Wt::WPushButton(ngrt4n::tr("Add as source"), container));
+  tpl->bindWidget("delete-button", m_deleteSourceBtn = new Wt::WPushButton(ngrt4n::tr("Delete source"), container));
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
@@ -130,7 +130,7 @@ WebPreferences::~WebPreferences()
 void WebPreferences::applyChanges(void)
 {
   if ( m_monitorTypeField->currentIndex() <= 0) {
-    utils::showMessage(-1, utils::tr("Bad monitor type"), "", m_infoBox);
+    ngrt4n::showMessage(-1, ngrt4n::tr("Bad monitor type"), "", m_infoBox);
   } else {
     saveAsSource(m_currentSourceIndex, m_monitorTypeField->currentText().toUTF8().c_str());
   }
@@ -188,15 +188,15 @@ void WebPreferences::updateFields(void)
 void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   SourceT src;
-  src.id = utils::sourceId(index);
-  src.mon_type = utils::convert2ApiType(type);
+  src.id = ngrt4n::sourceId(index);
+  src.mon_type = ngrt4n::convert2ApiType(type);
   src.mon_url = m_monitorUrlField->text().toUTF8().c_str();
   src.ls_addr = m_livestatusHostField->text().toUTF8().c_str();
   src.ls_port = QString(m_livestatusPortField->text().toUTF8().c_str()).toInt();
   src.auth = m_authStringField->text().toUTF8().c_str();
   src.use_ngrt4nd = m_useNgrt4ndField->checkState();
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
-  m_settings->setEntry(utils::sourceKey(index), utils::source2Str(src));
+  m_settings->setEntry(ngrt4n::sourceKey(index), ngrt4n::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
   m_sourceStates->setBit(index, true);
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
@@ -227,12 +227,12 @@ void WebPreferences::promptUser(int inputType)
   switch (inputType){
     case SourceTypeInput:
       dialogTitle = QObject::tr("Select source type").toStdString();
-      for (const auto& src : utils::sourceTypes())
+      for (const auto& src : ngrt4n::sourceTypes())
         inputField->addItem(src.toStdString());
       break;
     case SourceIndexInput:
       dialogTitle = QObject::tr("Select the source index").toStdString();
-      for (const auto& src : utils::sourceIndexes())
+      for (const auto& src : ngrt4n::sourceIndexes())
         inputField->addItem(src.toStdString());
       break;
     default:

@@ -2,28 +2,28 @@
 #include "utilsClient.hpp"
 #include "StatsLegend.hpp"
 
-QSplashScreen* utils::infoScreen(const QString & msg) {
+QSplashScreen* ngrt4n::infoScreen(const QString & msg) {
   QSplashScreen* screen = new QSplashScreen(QPixmap(":/images/built-in/loading-screen.png"));
   screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
   screen->show();
   return screen;
 }
 
-QColor utils::severityQColor(const int& _criticity)
+QColor ngrt4n::severityQColor(const int& _criticity)
 {
-  QColor color(utils::COLOR_UNKNOWN);
-  switch (static_cast<utils::SeverityT>(_criticity)) {
-    case utils::Normal:
-      color = utils::COLOR_NORMAL;
+  QColor color(ngrt4n::COLOR_UNKNOWN);
+  switch (static_cast<ngrt4n::SeverityT>(_criticity)) {
+    case ngrt4n::Normal:
+      color = ngrt4n::COLOR_NORMAL;
       break;
-    case utils::Minor:
-      color = utils::COLOR_MINOR;
+    case ngrt4n::Minor:
+      color = ngrt4n::COLOR_MINOR;
       break;
-    case utils::Major:
-      color = utils::COLOR_MAJOR;
+    case ngrt4n::Major:
+      color = ngrt4n::COLOR_MAJOR;
       break;
-    case utils::Critical:
-      color = utils::COLOR_CRITICAL;
+    case ngrt4n::Critical:
+      color = ngrt4n::COLOR_CRITICAL;
       break;
     default:
       break;
@@ -31,12 +31,12 @@ QColor utils::severityQColor(const int& _criticity)
   return color;
 }
 
-void utils::alert(const QString& msg)
+void ngrt4n::alert(const QString& msg)
 {
   QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);
 }
 
-QIcon utils::severityIcon(int _severity)
+QIcon ngrt4n::severityIcon(int _severity)
 {
-  return QIcon(":/"+utils::getIconPath(_severity));
+  return QIcon(":/"+ngrt4n::getIconPath(_severity));
 }

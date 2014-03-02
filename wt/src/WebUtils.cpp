@@ -24,7 +24,6 @@
 
 #include "Base.hpp"
 #include "WebUtils.hpp"
-#include "MonitorBroker.hpp"
 #include <Wt/WTemplate>
 #include <Wt/WDateTime>
 #include <QObject>
@@ -33,7 +32,7 @@
 #include <Wt/WColor>
 
 
-void utils::showMessage(int exitCode,
+void ngrt4n::showMessage(int exitCode,
                         const std::string& errorMsg,
                         const std::string& successMsg, Wt::WText* infoBox)
 {
@@ -55,28 +54,28 @@ void utils::showMessage(int exitCode,
 }
 
 
-std::string utils::tr(const std::string& msg)
+std::string ngrt4n::tr(const std::string& msg)
 {
   return QObject::tr(msg.c_str()).toStdString();
 }
 
-std::string utils::severityCssClass(int severity)
+std::string ngrt4n::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-  case utils::Normal:
+  case ngrt4n::Normal:
     cssClass.append("severity-normal");
     break;
-  case utils::Minor:
+  case ngrt4n::Minor:
     cssClass.append("severity-minor");
     break;
-  case utils::Major:
+  case ngrt4n::Major:
     cssClass.append("severity-major");
     break;
-  case utils::Critical:
+  case ngrt4n::Critical:
     cssClass.append("severity-critical");
     break;
-  case utils::Unknown:
+  case ngrt4n::Unknown:
     cssClass.append("severity-unknown");
     break;
   default:
@@ -86,13 +85,13 @@ std::string utils::severityCssClass(int severity)
   return cssClass;
 }
 
-std::string utils::getPathFromQtResource(const QString& qtPath, const std::string& docRoot)
+std::string ngrt4n::getPathFromQtResource(const QString& qtPath, const std::string& docRoot)
 {
   return docRoot+qtPath.mid(1, -1).toStdString();
 }
 
 
-Wt::WWidget* utils::footer(void)
+Wt::WWidget* ngrt4n::footer(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));
   tpl->bindString("software", APP_NAME.toStdString());
@@ -103,13 +102,13 @@ Wt::WWidget* utils::footer(void)
 
 
 
-std::string utils::sqliteDbPath(const Settings& settings)
+std::string ngrt4n::sqliteDbPath(void)
 {
-  return QFileInfo(settings.fileName()).dir().path().append(QDir::separator()).append("realopinsight.db").toStdString();
+  return "/var/lib/realopinsight/run/realopinsight.db";
 }
 
 
-std::string utils::timeTextFromQtTimeText(const std::string& qtimeText)
+std::string ngrt4n::timeTextFromQtTimeText(const std::string& qtimeText)
 {
   Wt::WDateTime mytime;
 
@@ -119,14 +118,14 @@ std::string utils::timeTextFromQtTimeText(const std::string& qtimeText)
 }
 
 
-Wt::WString utils::wHumanTimeText(const std::string& mytime_t)
+Wt::WString ngrt4n::wHumanTimeText(const std::string& mytime_t)
 {
   Wt::WDateTime t;
   t.setTime_t(QString(mytime_t.c_str()).toUInt());
   return t.toString();
 }
 
-Wt::WString utils::wTimeToNow(const std::string& mytime_t)
+Wt::WString ngrt4n::wTimeToNow(const std::string& mytime_t)
 {
   Wt::WDateTime t;
   t.setTime_t(QString(mytime_t.c_str()).toUInt());
@@ -135,7 +134,7 @@ Wt::WString utils::wTimeToNow(const std::string& mytime_t)
 }
 
 
-Wt::WText* utils::createFontAwesomeTextButton(const std::string& iconClasses,
+Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses,
                                               const std::string& tip,
                                               Wt::WContainerWidget* parent)
 {
@@ -150,23 +149,23 @@ Wt::WText* utils::createFontAwesomeTextButton(const std::string& iconClasses,
 }
 
 
-Wt::WColor utils::severityWColor(const int& _criticity)
+Wt::WColor ngrt4n::severityWColor(const int& _criticity)
 {
   Wt::WColor color;
-  switch (static_cast<utils::SeverityT>(_criticity)) {
-  case utils::Normal:
+  switch (static_cast<ngrt4n::SeverityT>(_criticity)) {
+  case ngrt4n::Normal:
     color = Wt::WColor("#00ff00");
     break;
-  case utils::Minor:
+  case ngrt4n::Minor:
     color = Wt::WColor("#ffff00");
     break;
-  case utils::Major:
+  case ngrt4n::Major:
     color = Wt::WColor("#ffa500");
     break;
-  case utils::Critical:
+  case ngrt4n::Critical:
     color = Wt::WColor("#ff0000");
     break;
-  case utils::Unknown:
+  case ngrt4n::Unknown:
   default:
     color = Wt::WColor(" #c0c0c0");
     break;

@@ -32,14 +32,14 @@
 Wt::log(level)<< "[realopinsight]" << Wt::WLogger::sep << msg;
 
 class QString;
-namespace utils {
+namespace ngrt4n {
   void showMessage(int exitCode, const std::string& errorMsg,
                    const std::string& successMsg, Wt::WText* infoBox);
   std::string tr(const std::string& msg);
   std::string severityCssClass(int severity);
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
   Wt::WWidget* footer(void);
-  std::string sqliteDbPath(const Settings& setting);
+  std::string sqliteDbPath(void);
   std::string timeTextFromQtTimeText(const std::string& qtimeText);
   Wt::WString wHumanTimeText(const std::string& mytime_t);
   Wt::WString wTimeToNow(const std::string& mytime_t);

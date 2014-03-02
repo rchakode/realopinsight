@@ -123,16 +123,16 @@ void SvCreator::loadFile(const QString& _path)
   if (_path == NULL) {
     newView();
   } else {
-    utils::clear(*m_cdata);
+    ngrt4n::clear(*m_cdata);
     Parser parser(_path, m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)),this, SLOT(handleErrorOccurred(QString)));
     if (! parser.process(false)) {
-      utils::alert(tr("Unable to open the file '%1'").arg(_path));
+      ngrt4n::alert(tr("Unable to open the file '%1'").arg(_path));
       exit(1);
     } else {
       m_tree->build();
       //m_tree->update();
-      m_activeConfig = utils::getAbsolutePath(_path);
+      m_activeConfig = ngrt4n::getAbsolutePath(_path);
       setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
     }
   }
@@ -149,9 +149,9 @@ void SvCreator::import() {
 void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
-    utils::clear(*m_cdata);
+    ngrt4n::clear(*m_cdata);
     m_tree->resetData();
-    NodeT* node = createNode(utils::ROOT_ID, tr("New View"), "");
+    NodeT* node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
     m_cdata->root = m_cdata->bpnodes.insert(node->id, *node);
     m_tree->addNode(*node);
     m_tree->update();
@@ -167,7 +167,7 @@ void SvCreator::newView(void)
 void SvCreator::newNode(void)
 {
   static int count = 1;
-  NodeT* node = createNode(utils::genNodeId(),
+  NodeT* node = createNode(ngrt4n::genNodeId(),
                            tr("sub service %1").arg(QString::number(count)),
                            m_selectedNode);
   insertFromSelected(*node);
@@ -180,17 +180,17 @@ NodeT* SvCreator::createNode(const QString& id,
 {
   NodeT* node = new NodeT;
   if (!node) {
-    utils::alert(tr("Out of memory. the application will exit"));
+    ngrt4n::alert(tr("Out of memory. the application will exit"));
     exit(1);
   }
   node->id = id;
   node->name = label;
   node->parent = parent;
   node->type = NodeType::ServiceNode;
-  node->severity = utils::Unknown;
+  node->severity = ngrt4n::Unknown;
   node->sev_crule = CalcRules::HighCriticity;
   node->sev_prule = PropRules::Unchanged;
-  node->icon = utils::DEFAULT_ICON;
+  node->icon = ngrt4n::DEFAULT_ICON;
   node->child_nodes = QString();
   return node;
 }
@@ -200,7 +200,7 @@ void SvCreator::insertFromSelected(const NodeT& node)
   NodeListT::iterator pnode = m_cdata->bpnodes.find(m_selectedNode);
   if (pnode == m_cdata->bpnodes.end() ||
       pnode->type == NodeType::AlarmNode) {
-    utils::alert(tr("This action not allowed on the target node"));
+    ngrt4n::alert(tr("This action not allowed on the target node"));
     return;
   }
   pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? QString::fromStdString(ngrt4n::CHILD_SEP)%node.id : node.id;
@@ -230,7 +230,7 @@ void SvCreator::deleteNode(void)
 void SvCreator::deleteNode(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (!utils::findNode(m_cdata, _nodeId, node))
+  if (!ngrt4n::findNode(m_cdata, _nodeId, node))
     return;
 
   QString sep(ngrt4n::CHILD_SEP.c_str());
@@ -268,7 +268,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
 void SvCreator::copySelected(void)
 {
   NodeListIteratorT node;
-  if (utils::findNode(m_cdata, m_selectedNode, node)) {
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
     if (!m_clipboardData) m_clipboardData = new NodeT;
     *m_clipboardData =*node;
     m_clipboardData->name+=" (Copy)";
@@ -279,11 +279,11 @@ void SvCreator::copySelected(void)
 void SvCreator::pasteFromSelected(void)
 {
   if (m_clipboardData) {
-    m_clipboardData->id = utils::genNodeId();
+    m_clipboardData->id = ngrt4n::genNodeId();
     m_clipboardData->parent = m_selectedNode;
     insertFromSelected(*m_clipboardData);
   } else {
-    utils::alert(tr("There is no data in the clipboard!"));
+    ngrt4n::alert(tr("There is no data in the clipboard!"));
   }
 }
 
@@ -314,21 +314,21 @@ void SvCreator::saveAs(void)
 
   if (path.isNull()) {
     QString msg = tr("The path is not valid!");
-    utils::alert(msg);
+    ngrt4n::alert(msg);
     statusBar()->showMessage(msg);
   } else {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
-      m_cdata->monitor = utils::Zabbix;
+      m_cdata->monitor = ngrt4n::Zabbix;
       if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
     } else if (filter == ZNS_SOURCE) {
-      m_cdata->monitor = utils::Zenoss;
+      m_cdata->monitor = ngrt4n::Zenoss;
       if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else if (filter == NAG_SOURCE){
-      m_cdata->monitor = utils::Nagios;
+      m_cdata->monitor = ngrt4n::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     } else {
-      m_cdata->monitor = utils::Auto;
+      m_cdata->monitor = ngrt4n::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
     recordData(path);
@@ -423,7 +423,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
     } else {
       if (node->type == NodeType::ServiceNode && ! node->child_nodes.isEmpty()) {
         m_editor->typeField()->setCurrentIndex(0);
-        utils::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
+        ngrt4n::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
       } else {
         if (m_editor->updateNode(node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
@@ -451,7 +451,7 @@ void SvCreator::handleShowAbout(void)
 void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
-  if (utils::findNode(m_cdata, m_selectedNode, node)) {
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
     if (m_editor->updateNode(node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
@@ -460,7 +460,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
     }
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-  if (utils::findNode(m_cdata, m_selectedNode, node)) m_editor->setContent(node);
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) m_editor->setContent(node);
 }
 
 
@@ -486,11 +486,11 @@ void SvCreator::recordData(const QString& _path)
     statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
     return;
   }
-  m_cdata->root = m_cdata->bpnodes.find(utils::ROOT_ID);
+  m_cdata->root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
   if (m_cdata->root == m_cdata->bpnodes.end()) {
     file.close();
     QString msg =  tr("The hierarchy does not have root");
-    utils::alert(msg);
+    ngrt4n::alert(msg);
     statusBar()->showMessage(msg);
   } else {
     QTextStream ofile(&file);
@@ -498,7 +498,7 @@ void SvCreator::recordData(const QString& _path)
              "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
     recordNode(ofile,*m_cdata->root);
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
-      if (service.id == utils::ROOT_ID || service.parent.isEmpty())
+      if (service.id == ngrt4n::ROOT_ID || service.parent.isEmpty())
         continue;
       recordNode(ofile, service);
     }
@@ -512,7 +512,7 @@ void SvCreator::recordData(const QString& _path)
 
     m_hasLeftUpdates = false;
     statusBar()->clearMessage();
-    m_activeConfig = utils::getAbsolutePath(_path);
+    m_activeConfig = ngrt4n::getAbsolutePath(_path);
     statusBar()->showMessage(tr("saved %1").arg(m_activeConfig));
     setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   }

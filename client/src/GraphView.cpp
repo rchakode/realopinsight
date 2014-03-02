@@ -39,7 +39,7 @@ GraphView::GraphView(CoreDataT* _cdata, QWidget* _parent)
     m_cdata(_cdata),
     m_scene(new QGraphicsScene()),
     m_chart(NULL),
-    m_icons(utils::nodeIcons()),
+    m_icons(ngrt4n::nodeIcons()),
     m_mapScalFactor(1),
     m_chartScalFactor(1),
     m_isAjustedChartSize(false),
@@ -72,10 +72,10 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
       if (sfx == EXPICON_NODE) {
         QPixmap exp_icon;
         if (m_mnodes[nodeId].expand) {
-          exp_icon.load(m_icons[utils::MINUS], 0, Qt::AutoColor);
+          exp_icon.load(m_icons[ngrt4n::MINUS], 0, Qt::AutoColor);
           m_mnodes[nodeId].expand = false;
         } else {
-          exp_icon.load(m_icons[utils::PLUS], 0, Qt::AutoColor);
+          exp_icon.load(m_icons[ngrt4n::PLUS], 0, Qt::AutoColor);
           m_mnodes[nodeId].expand = true;
         }
         m_mnodes[nodeId].exp_icon->setPixmap(exp_icon);
@@ -122,18 +122,18 @@ void GraphView::mouseMoveEvent(QMouseEvent * event)
 
 void GraphView::zoomIn()
 {
-  QGraphicsView::scale(utils::SCALIN_FACTOR, utils::SCALIN_FACTOR);
+  QGraphicsView::scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
   if (m_chart) {
     setChartPos();
-    m_chart->scale(utils::SCALOUT_FACTOR, utils::SCALOUT_FACTOR);
+    m_chart->scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
   }
 }
 
 void GraphView::zoomOut()
 {
-  QGraphicsView::scale(utils::SCALOUT_FACTOR, utils::SCALOUT_FACTOR);
+  QGraphicsView::scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
   if (m_chart) {
-    m_chart->scale(utils::SCALIN_FACTOR, utils::SCALIN_FACTOR);
+    m_chart->scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
     setChartPos();
   }
 }
@@ -234,7 +234,7 @@ void GraphView::drawNode(const NodeT& _node)
 {
   QPixmap icon, expIcon;
   icon.load(m_icons[_node.icon], 0, Qt::AutoColor);
-  expIcon.load(m_icons[utils::PLUS], 0, Qt::AutoColor);
+  expIcon.load(m_icons[ngrt4n::PLUS], 0, Qt::AutoColor);
   //FIXME: take care with background color
   QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;"%_node.name%"&nbsp;</span>";
   QString nodeData = _node.id%LABEL_NODE;
@@ -257,7 +257,7 @@ void GraphView::drawNode(const NodeT& _node)
   if (m_mnodes[_node.id].type == NodeType::AlarmNode)
     m_mnodes[_node.id].exp_icon->setVisible(false);
 
-  QString msg =  utils::getNodeToolTip(_node);
+  QString msg =  ngrt4n::getNodeToolTip(_node);
   m_mnodes[_node.id].icon->setToolTip(msg);
   m_mnodes[_node.id].label->setToolTip(msg);
 
@@ -298,7 +298,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
     if (gnode->type == NodeType::ServiceNode)
       gnode->exp_icon->setVisible(_visible);
     if (_visible) {
-      QPixmap expandIcon(m_icons[utils::PLUS], 0, Qt::AutoColor);
+      QPixmap expandIcon(m_icons[ngrt4n::PLUS], 0, Qt::AutoColor);
       m_mnodes[_nodeId].exp_icon->setPixmap(expandIcon);
     }
     Q_EMIT expandNode(_nodeId, _visible, _level + 1);
@@ -311,7 +311,7 @@ void GraphView::drawEdge(const QString& _headNodeId, const QString& _tailNodeId)
   QString eid =  QString("%1:%2").arg(_headNodeId, _tailNodeId);
   QPainterPath path;
   setEdgePath(_headNodeId, _tailNodeId, path);
-  QPen pen(utils::COLOR_UNKNOWN);
+  QPen pen(ngrt4n::COLOR_UNKNOWN);
   m_medges[eid].edge = new QGraphicsPathItem(path),
       m_medges[eid].edge->setPen(pen),
       m_scene->addItem(m_medges[eid].edge),
@@ -339,7 +339,7 @@ void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _too
 
 void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
 {
-  QString label = "<span style=\"background: '"%utils::severityQColor(_node.severity).name()
+  QString label = "<span style=\"background: '"%ngrt4n::severityQColor(_node.severity).name()
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
   GNodeListT::iterator gnodeIt =  m_mnodes.find(_node.id);
   if (gnodeIt != m_mnodes.end()) {
@@ -348,7 +348,7 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
     gnodeIt->label->setToolTip(_toolTip);
     GEdgeListT::iterator edge = m_medges.find(_node.parent + ":" + _node.id);
     if (edge != m_medges.end())
-      edge->edge->setPen(utils::severityQColor(_node.prop_sev));
+      edge->edge->setPen(ngrt4n::severityQColor(_node.prop_sev));
   }
 }
 

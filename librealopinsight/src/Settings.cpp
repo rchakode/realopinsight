@@ -26,8 +26,7 @@
 #include "Base.hpp"
 #include "Settings.hpp"
 #include "Preferences.hpp"
-#include "MonitorBroker.hpp"
-#include "ns.hpp"
+#include "global.hpp"
 #include "utilsClient.hpp"
 #include "JsHelper.hpp"
 #include <QtScript/QScriptEngine>
@@ -49,7 +48,7 @@ Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" 
   QString opPasswd = QSettings::value(Settings::OP_PASSWD_KEY).toString();
 
   if (updateInterval.isEmpty()) {
-    QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(utils::DefaultUpdateInterval));
+    QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(ngrt4n::DefaultUpdateInterval));
   }
   if (admUser.isEmpty()) {
     QSettings::setValue(Settings::ADM_UNSERNAME_KEY, ngrt4n::AdmUser.c_str());
@@ -81,7 +80,7 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 qint32 Settings::updateInterval() const
 {
   qint32 interval = QSettings::value(UPDATE_INTERVAL_KEY).toInt();
-  return (interval > 0)? interval : utils::DefaultUpdateInterval;
+  return (interval > 0)? interval : ngrt4n::DefaultUpdateInterval;
 }
 
 void Settings::setEntry(const QString& key, const QString& value)
@@ -91,12 +90,12 @@ void Settings::setEntry(const QString& key, const QString& value)
 
 bool Settings::loadSource(const qint32& _idx, SourceT& _src)
 {
-  return setSource(QSettings::value(utils::sourceKey(_idx)).toString(), _src);
+  return setSource(QSettings::value(ngrt4n::sourceKey(_idx)).toString(), _src);
 }
 
 bool Settings::loadSource(const QString& _id, SourceT& _src)
 {
-  return setSource(QSettings::value(utils::sourceKey(_id)).toString(), _src);
+  return setSource(QSettings::value(ngrt4n::sourceKey(_id)).toString(), _src);
 }
 
 

@@ -46,13 +46,11 @@ SOURCES += \
     src/ZnsHelper.cpp \
     src/Settings.cpp \
     src/utilsClient.cpp \
-    src/utilsCore.cpp \
     src/ZmqSocket.cpp \
     src/LsHelper.cpp \
     src/DashboardBase.cpp
 
-HEADERS += src/ns.hpp \
-    src/MonitorBroker.hpp \
+HEADERS += \
     src/Base.hpp \
     src/Parser.hpp \
     src/Preferences.hpp \
@@ -66,7 +64,8 @@ HEADERS += src/ns.hpp \
     src/ZmqSocket.hpp \
     src/LsHelper.hpp \
     src/DashboardBase.hpp \
-    librealopinsight_global.h
+    librealopinsight_global.h \
+    src/global.hpp
 
 unix:!symbian {
     maemo5 {

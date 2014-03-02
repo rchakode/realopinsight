@@ -89,7 +89,7 @@ void Auth::authentificate(void)
              && userPasswd == opPasswd ) {
     done(OpUserRole);
   } else {
-    utils::alert(tr("Authentication failed: wrong username or password"));
+    ngrt4n::alert(tr("Authentication failed: wrong username or password"));
   }
 }
 

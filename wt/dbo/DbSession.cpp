@@ -36,7 +36,7 @@ namespace {
 }
 
 DbSession::DbSession(void)
-  : m_dbPath(utils::sqliteDbPath(Settings())),
+  : m_dbPath(ngrt4n::sqliteDbPath()),
     m_sqlite3Db(new Wt::Dbo::backend::Sqlite3(m_dbPath)),
     m_dbUsers(new UserDatabase(*this))
 {

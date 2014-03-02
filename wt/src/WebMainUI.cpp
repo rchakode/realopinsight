@@ -253,22 +253,22 @@ void WebMainUI::setupMenus(void)
   setupProfileMenus();
   
   //FIXME: add this after the first view loaded
-  Wt::WText* text = utils::createFontAwesomeTextButton("fa fa-refresh",
+  Wt::WText* text = ngrt4n::createFontAwesomeTextButton("fa fa-refresh",
                                                        "Refresh the console map",
                                                        m_mainWidget);
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar->addWidget(text);
   
-  text = utils::createFontAwesomeTextButton("icon-zoom-in",
+  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-in",
                                             "Zoom the console map in",
                                             m_mainWidget);
-  text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALIN_FACTOR));
+  text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
   m_navbar->addWidget(text);
   
-  text = utils::createFontAwesomeTextButton("icon-zoom-out",
+  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-out",
                                             "Zoom the console map out",
                                             m_mainWidget);
-  text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, utils::SCALOUT_FACTOR));
+  text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
   m_navbar->addWidget(text);
 }
 
@@ -387,7 +387,7 @@ void WebMainUI::finishFileDialog(int action)
             file.remove();
 
             View view;
-            view.name = cdata.bpnodes[utils::ROOT_ID].name.toStdString();
+            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
             if (m_dbSession->addView(view) != 0){
@@ -593,7 +593,7 @@ void WebMainUI::createAboutDialog(void)
   
   tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
-  tpl->bindString("corelib-version", utils::libVersion().toStdString());
+  tpl->bindString("corelib-version", ngrt4n::libVersion().toStdString());
   tpl->bindString("codename", REL_NAME.toStdString());
   tpl->bindString("release-id", REL_INFO.toStdString());
   tpl->bindString("release-year", REL_YEAR.toStdString());

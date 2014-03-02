@@ -18,7 +18,7 @@ typedef QHash<QString, QTreeWidgetItem*> GuiTreeItemListT;
 typedef QMap<QString, QMenu*> MenuListT;
 typedef QMap<QString, QAction*> SubMenuListT;
 
-namespace utils {
+namespace ngrt4n {
   const QColor COLOR_NORMAL =  Qt::green;
   const QColor COLOR_MINOR = Qt::yellow;
   const QColor COLOR_MAJOR = QColor("#FF8C00");

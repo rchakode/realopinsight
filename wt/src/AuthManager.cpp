@@ -54,7 +54,7 @@ void AuthManager::handleAuthentication(void)
 void AuthManager::createLoginView(void)
 {
   Wt::Auth::AuthWidget::createLoginView();
-  bindWidget("footer", utils::footer());
+  bindWidget("footer", ngrt4n::footer());
 }
 
 void AuthManager::createLoggedInView(void)

@@ -25,7 +25,7 @@
 #ifndef JSHELPER_HPP
 #define JSHELPER_HPP
 
-#include "ns.hpp"
+#include "global.hpp"
 #include <QtCore/QtGlobal>
 #include <string>
 #include <QString>

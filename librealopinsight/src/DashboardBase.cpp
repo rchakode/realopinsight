@@ -24,8 +24,7 @@
 
 
 #include "DashboardBase.hpp"
-#include "MonitorBroker.hpp"
-#include "ns.hpp"
+#include "global.hpp"
 #include "utilsClient.hpp"
 #include "JsHelper.hpp"
 #include "LsHelper.hpp"
@@ -65,7 +64,7 @@ StringMapT DashboardBase::calcRules() {
 }
 
 DashboardBase::DashboardBase(const QString& _config)
-  : m_config(utils::getAbsolutePath(_config)),
+  : m_config(ngrt4n::getAbsolutePath(_config)),
     m_cdata (new CoreDataT()),
     m_updateCounter(0),
     m_settings (new Settings()),
@@ -99,7 +98,7 @@ void DashboardBase::initialize(Preferences* preferencePtr)
 void DashboardBase::runMonitor()
 {
   resetStatData();
-  if (m_cdata->monitor == utils::Auto) {
+  if (m_cdata->monitor == ngrt4n::Auto) {
     for (SourceListT::Iterator src=m_sources.begin(), end=m_sources.end(); src!=end; ++src)
     {
       runMonitor(*src);
@@ -121,11 +120,11 @@ void DashboardBase::runMonitor(SourceT& src)
   prepareUpdate(src);
   openRpcSession(src);
   switch(src.mon_type) {
-    case utils::Zenoss:
-    case utils::Zabbix:
+    case ngrt4n::Zenoss:
+    case ngrt4n::Zabbix:
       requestZbxZnsData(src);
       break;
-    case utils::Nagios:
+    case ngrt4n::Nagios:
     default:
       src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
       break;
@@ -139,14 +138,14 @@ void DashboardBase::runNgrt4ndUpdate(int srcId)
   if (src != m_sources.end()) {
     runNgrt4ndUpdate(*src);
   } else {
-    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(utils::sourceId(srcId)));
+    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(ngrt4n::sourceId(srcId)));
   }
 }
 
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
-  utils::setCheckOnError(utils::Unknown, "", invalidCheck);
+  ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
 
   /* Check if the handler is connected */
   if (src.d4n_handler->isConnected()) {
@@ -166,12 +165,12 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
        end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
-      cnode->severity = utils::Unknown;
+      cnode->severity = ngrt4n::Unknown;
       m_cdata->check_status_count[cnode->severity]+=1;
       continue;
     }
 
-    QPair<QString, QString> info = utils::splitSourceHostInfo(cnode->child_nodes);
+    QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
     if (info.first != src.id) {
       continue;
     }
@@ -183,7 +182,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
     // Treat data
     qint32 ret = jsHelper.getProperty("return_code").toInt32();
-    cnode->check.status = (ret!=0)? utils::NagiosUnknown : jsHelper.getProperty("status").toInt32();
+    cnode->check.status = (ret!=0)? ngrt4n::NagiosUnknown : jsHelper.getProperty("status").toInt32();
     cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
     cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
     cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
@@ -203,7 +202,7 @@ void DashboardBase::runLivestatusUpdate(int srcId)
   if (src != m_sources.end()) {
     runLivestatusUpdate(*src);
   } else {
-    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(utils::sourceId(srcId)));
+    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(ngrt4n::sourceId(srcId)));
   }
 }
 
@@ -215,12 +214,12 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
   }
 
   CheckT invalidCheck;
-  utils::setCheckOnError(utils::Unknown, "", invalidCheck);
+  ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
 
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
-    QPair<QString, QString> info = utils::splitSourceHostInfo(hostit.key());
+    QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(hostit.key());
 
     if (info.first != src.id || ! src.ls_handler->loadHostData(info.second)) continue;
 
@@ -246,11 +245,11 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
 
 void DashboardBase::resetStatData(void)
 {
-  m_cdata->check_status_count[utils::Normal] = 0;
-  m_cdata->check_status_count[utils::Minor] = 0;
-  m_cdata->check_status_count[utils::Major] = 0;
-  m_cdata->check_status_count[utils::Critical] = 0;
-  m_cdata->check_status_count[utils::Unknown] = 0;
+  m_cdata->check_status_count[ngrt4n::Normal] = 0;
+  m_cdata->check_status_count[ngrt4n::Minor] = 0;
+  m_cdata->check_status_count[ngrt4n::Major] = 0;
+  m_cdata->check_status_count[ngrt4n::Critical] = 0;
+  m_cdata->check_status_count[ngrt4n::Unknown] = 0;
 }
 
 
@@ -258,13 +257,13 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-    case utils::Nagios:
+    case ngrt4n::Nagios:
       msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
       break;
-    case utils::Zabbix:
+    case ngrt4n::Zabbix:
       msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
       break;
-    case utils::Zenoss:
+    case ngrt4n::Zenoss:
       msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
       break;
     default:
@@ -276,7 +275,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  QString toolTip = utils::getNodeToolTip(_node);
+  QString toolTip = ngrt4n::getNodeToolTip(_node);
   updateTree(_node, toolTip);
   updateMap(_node, toolTip);
   updateMsgConsole(_node);
@@ -288,7 +287,7 @@ void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
 {
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(); cnode!=m_cdata->cnodes.end(); ++cnode)
   {
-    if (cnode->child_nodes.toLower()==utils::realCheckId(src.id, QString::fromStdString(check.id)).toLower())
+    if (cnode->child_nodes.toLower()==ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower())
     {
       cnode->check = check;
       computeStatusInfo(*cnode, src);
@@ -302,15 +301,15 @@ void DashboardBase::updateCNodes(const CheckT& check, const SourceT& src)
 void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
-  _node.severity = utils::computeSeverity(src.mon_type, _node.check.status);
-  _node.prop_sev = utils::computeSeverity2Propagate(_node.severity, _node.sev_prule);
+  _node.severity = ngrt4n::computeSeverity(src.mon_type, _node.check.status);
+  _node.prop_sev = ngrt4n::computeSeverity2Propagate(_node.severity, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
   if (_node.check.host == "-") {
     return;
   }
 
-  if (m_cdata->monitor == utils::Zabbix)
+  if (m_cdata->monitor == ngrt4n::Zabbix)
   {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
@@ -318,7 +317,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
   }
 
-  if (_node.severity == utils::Normal)
+  if (_node.severity == ngrt4n::Normal)
   {
     if (_node.notification_msg.isEmpty()) {
       return ;
@@ -337,12 +336,12 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     regexp.setPattern(ngrt4n::TAG_CHECK.c_str());
     _node.actual_msg.replace(regexp, info[1]);
   }
-  if (m_cdata->monitor == utils::Nagios) {
+  if (m_cdata->monitor == ngrt4n::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
       regexp.setPattern(ngrt4n::TAG_THERESHOLD.c_str());
       _node.actual_msg.replace(regexp, info[1]);
-      if (_node.severity == utils::Major)
+      if (_node.severity == ngrt4n::Major)
         _node.actual_msg.replace(regexp, info[2]);
     }
   }
@@ -350,16 +349,16 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 
 void DashboardBase::updateBpNode(const QString& _nodeId)
 {
-  Criticity criticity(utils::Normal);
+  Criticity criticity(ngrt4n::Normal);
 
   NodeListT::iterator node;
-  if (! utils::findNode(m_cdata, _nodeId, node)) return;
+  if (! ngrt4n::findNode(m_cdata, _nodeId, node)) return;
 
   QStringList nodeIds = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
   Q_FOREACH (const QString& nodeId, nodeIds) {
     NodeListT::iterator child;
-    if (!utils::findNode(m_cdata, nodeId, child)) continue;
-    Criticity cst(static_cast<utils::SeverityT>(child->prop_sev));
+    if (!ngrt4n::findNode(m_cdata, nodeId, child)) continue;
+    Criticity cst(static_cast<ngrt4n::SeverityT>(child->prop_sev));
     if (node->sev_crule == CalcRules::WeightedCriticity) {
       criticity = criticity / cst;
     } else {
@@ -384,7 +383,7 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   updateMap(*node, toolTip);
   updateTree(*node, toolTip);
-  if (node->id != utils::ROOT_ID) {
+  if (node->id != ngrt4n::ROOT_ID) {
     updateBpNode(node->parent);
     // FIXME: Q_EMIT hasToBeUpdate(node->parent);
     // Q_EMIT hasToBeUpdate(node->parent);
@@ -437,7 +436,7 @@ void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
         CheckT check;
         check.check_command = triggerName.toStdString();
         check.status = triggerData.property("value").toInt32();
-        if (check.status == utils::ZabbixClear) {
+        if (check.status == ngrt4n::ZabbixClear) {
           check.alarm_msg = "OK ("+triggerName.toStdString()+")";
         } else {
           check.alarm_msg = triggerData.property("error").toString().toStdString();
@@ -516,7 +515,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
             .toAscii());
         processZnsReply(reply, src);
 
-        QString did = utils::realCheckId(src.id, ditem.property("name").toString());
+        QString did = ngrt4n::realCheckId(src.id, ditem.property("name").toString());
         if (m_cdata->hosts[did].contains("ping", Qt::CaseInsensitive))
         {
           reply = src.zns_handler->postRequest(ZnsHelper::Device,
@@ -540,11 +539,11 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
           QString chkid = ID_PATTERN.arg(dname, cname);
           check.id = chkid.toStdString();
           check.host = dname.toStdString();
-          check.last_state_change = utils::convertToTimet(device.property("lastChanged").toString(),
+          check.last_state_change = ngrt4n::convertToTimet(device.property("lastChanged").toString(),
                                                           "yyyy/MM/dd hh:mm:ss");
           QString severity =citem.property("severity").toString();
           if (!severity.compare("clear", Qt::CaseInsensitive)) {
-            check.status = utils::ZenossClear;
+            check.status = ngrt4n::ZenossClear;
             check.alarm_msg = tr("The %1 component is Up").arg(cname).toStdString();
           } else {
             check.status = citem.property("failSeverity").toInt32();
@@ -557,13 +556,13 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         QString dname = devInfo.property("name").toString();
         check.id = check.host = dname.toStdString();
         check.status = devInfo.property("status").toBool();
-        check.last_state_change = utils::convertToTimet(devInfo.property("lastChanged").toString(),
+        check.last_state_change = ngrt4n::convertToTimet(devInfo.property("lastChanged").toString(),
                                                         "yyyy/MM/dd hh:mm:ss");
         if (check.status) {
-          check.status = utils::ZenossClear;
+          check.status = ngrt4n::ZenossClear;
           check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
         } else {
-          check.status = utils::ZenossCritical;
+          check.status = ngrt4n::ZenossCritical;
           check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
         }
         updateCNodes(check, src);
@@ -608,10 +607,10 @@ void DashboardBase::openRpcSession(int srcId)
   SourceListT::Iterator src = m_sources.find(srcId);
   if (src != m_sources.end()) {
     switch (src->mon_type) {
-      case utils::Zabbix:
+      case ngrt4n::Zabbix:
         src->zbx_handler->setIsLogged(false);
         break;
-      case utils::Zenoss:
+      case ngrt4n::Zenoss:
         src->zns_handler->setIsLogged(false);
         break;
       default:
@@ -625,7 +624,7 @@ void DashboardBase::openRpcSession(int srcId)
 void DashboardBase::openRpcSession(SourceT& src)
 {
   QStringList authParams = getAuthInfo(src.auth);
-  if (authParams.size() != 2 && src.mon_type != utils::Nagios) {
+  if (authParams.size() != 2 && src.mon_type != ngrt4n::Nagios) {
     updateDashboardOnError(src, tr("Invalid authentication chain!\n"
                                    "Must follow the pattern login:password"));
     return;
@@ -633,7 +632,7 @@ void DashboardBase::openRpcSession(SourceT& src)
 
   QUrl znsUrlParams;
   switch(src.mon_type) {
-    case utils::Nagios:
+    case ngrt4n::Nagios:
       if (src.use_ngrt4nd) {
         if (src.d4n_handler->isConnected())
           src.d4n_handler->disconnectFromService();
@@ -647,7 +646,7 @@ void DashboardBase::openRpcSession(SourceT& src)
         src.ls_handler->connectToService();
       }
       break;
-    case utils::Zabbix: {
+    case ngrt4n::Zabbix: {
       src.zbx_handler->setBaseUrl(src.mon_url);
       authParams.push_back(QString::number(ZbxHelper::Login));
       src.zbx_handler->setSslConfig(src.verify_ssl_peer);
@@ -663,7 +662,7 @@ void DashboardBase::openRpcSession(SourceT& src)
       }
       break;
     }
-    case utils::Zenoss: {
+    case ngrt4n::Zenoss: {
       src.zns_handler->setBaseUrl(src.mon_url);
       znsUrlParams.addQueryItem("__ac_name", authParams[0]);
       znsUrlParams.addQueryItem("__ac_password", authParams[1]);
@@ -683,12 +682,12 @@ void DashboardBase::openRpcSession(SourceT& src)
 void DashboardBase::requestZbxZnsData(SourceT& src)
 {
   switch(src.mon_type) {
-    case utils::Zabbix: {
+    case ngrt4n::Zabbix: {
       if (src.zbx_handler->getIsLogged()) {
         int trid = src.zbx_handler->getTrid();
         Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
 
-          StringPairT info = utils::splitSourceHostInfo(hitem);
+          StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
 
           if (info.first != src.id) continue;
 
@@ -701,12 +700,12 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
       }
       break;
     }
-    case utils::Zenoss: {
+    case ngrt4n::Zenoss: {
       if (src.zns_handler->getIsLogged()) {
         src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
         Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
 
-          StringPairT info = utils::splitSourceHostInfo(hitem);
+          StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
 
           if (info.first != src.id) continue;
 
@@ -727,9 +726,9 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
 void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const SourceT& src)
 {
   QString apiUrl = "";
-  if (src.mon_type == utils::Zabbix) {
+  if (src.mon_type == ngrt4n::Zabbix) {
     apiUrl = src.zbx_handler->getApiEndpoint();
-  } else if (src.mon_type == utils::Zenoss) {
+  } else if (src.mon_type == ngrt4n::Zenoss) {
     apiUrl =  src.zns_handler->getRequestEndpoint();
   }
 
@@ -762,13 +761,13 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode)
   {
-    StringPairT info = utils::splitSourceHostInfo(cnode->child_nodes);
+    StringPairT info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
 
-    utils::setCheckOnError(-1, msg, cnode->check);
+    ngrt4n::setCheckOnError(-1, msg, cnode->check);
     computeStatusInfo(*cnode, src);
     updateDashboard(*cnode);
-    m_cdata->check_status_count[utils::Unknown]+=1;
+    m_cdata->check_status_count[ngrt4n::Unknown]+=1;
     cnode->monitored = true;
   }
 }
@@ -780,7 +779,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
   SourceT src;
   for (auto id=m_cdata->sources.begin(),end = m_cdata->sources.end(); id!=end; ++id)
   {
-    QPair<bool, int> srcinfo = utils::checkSourceId(*id);
+    QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (preferencePtr->isSetSource(srcinfo.second) &&
           m_settings->loadSource(*id, src) &&
@@ -802,12 +801,12 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 bool DashboardBase::allocSourceHandler(SourceT& src)
 {
   bool allocated = false;
-  if (src.mon_type == utils::Auto) {
+  if (src.mon_type == ngrt4n::Auto) {
     src.mon_type = m_cdata->monitor;
   }
 
   switch (src.mon_type) {
-    case utils::Nagios:
+    case ngrt4n::Nagios:
       if (src.use_ngrt4nd) {
         QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
         src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
@@ -816,11 +815,11 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
       }
       allocated = true;
       break;
-    case utils::Zabbix:
+    case ngrt4n::Zabbix:
       src.zbx_handler = std::make_shared<ZbxHelper>();
       allocated = true;
       break;
-    case utils::Zenoss:
+    case ngrt4n::Zenoss:
       src.zns_handler = std::make_shared<ZnsHelper>();
       allocated = true;
       break;
@@ -841,17 +840,17 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     SourceListT::Iterator olddata = m_sources.find(id);
     if (olddata != m_sources.end()) {
       switch (olddata->mon_type) {
-        case utils::Nagios:
+        case ngrt4n::Nagios:
           if (olddata->use_ngrt4nd) {
             olddata->ls_handler.reset();
           } else {
             olddata->d4n_handler.reset();
           }
           break;
-        case utils::Zabbix:
+        case ngrt4n::Zabbix:
           olddata->zbx_handler.reset();
           break;
-        case utils::Zenoss:
+        case ngrt4n::Zenoss:
           olddata->zns_handler.reset();
           break;
         default:
@@ -883,7 +882,7 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            utils::severityText(_node.severity),
+                                            ngrt4n::severityText(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::AlarmNode)
@@ -905,10 +904,10 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
        end = m_cdata->cnodes.end(); cnode != end; ++cnode)
   {
     if (! cnode->monitored &&
-        cnode->child_nodes.toLower()==utils::realCheckId(src.id,
+        cnode->child_nodes.toLower()==ngrt4n::realCheckId(src.id,
                                                          QString::fromStdString(cnode->check.id)).toLower())
     {
-      utils::setCheckOnError(utils::Unknown,
+      ngrt4n::setCheckOnError(ngrt4n::Unknown,
                              tr("Undefined service (%1)").arg(cnode->child_nodes),
                              cnode->check);
       computeStatusInfo(*cnode, src);

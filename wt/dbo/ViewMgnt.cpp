@@ -231,7 +231,7 @@ void ViewAssignmentUI::deleteViews(void)
     }
     summary+=ret;
   }
-  utils::showMessage(summary, msg, msg, m_infoBox);
+  ngrt4n::showMessage(summary, msg, msg, m_infoBox);
 
   filter(m_username);
 }

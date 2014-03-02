@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "ns.hpp"
+#include "global.hpp"
 #include "Parser.hpp"
 #include "utilsClient.hpp"
 #include <QObject>
@@ -79,7 +79,7 @@ bool Parser::process(bool console)
     node.parent = "";
     node.monitored = false;
     node.type = service.attribute("type").toInt();
-    node.severity = utils::Unknown;
+    node.severity = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
     node.icon = service.firstChildElement("Icon").text().trimmed();
@@ -90,19 +90,19 @@ bool Parser::process(bool console)
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
 
     if (node.icon.isEmpty()) {
-      node.icon = utils::DEFAULT_ICON;
+      node.icon = ngrt4n::DEFAULT_ICON;
     }
     if (node.type == NodeType::AlarmNode) {
       node.visibility = ngrt4n::Visible;
-      StringPairT info = utils::splitHostCheckInfo(node.child_nodes);
+      StringPairT info = ngrt4n::splitHostCheckInfo(node.child_nodes);
       m_cdata->hosts[info.first] << info.second;
 
-      QString srcid = utils::getSourceIdFromStr(info.first);
+      QString srcid = ngrt4n::getSourceIdFromStr(info.first);
 
       if (srcid.isEmpty()) {
-        QString srcid = utils::sourceId(0);
+        QString srcid = ngrt4n::sourceId(0);
         if (console) {
-          node.child_nodes = utils::realCheckId(srcid, node.child_nodes);
+          node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
         }
         m_cdata->sources.insert(srcid);
       } else {
@@ -115,7 +115,7 @@ bool Parser::process(bool console)
     }
   }
 
-  m_cdata->root = m_cdata->bpnodes.find(utils::ROOT_ID);
+  m_cdata->root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
   if (m_cdata->root == m_cdata->bpnodes.end()) {
     Q_EMIT errorOccurred(tr("The configuration is not valid, there is no root service !"));
     return false;
@@ -142,7 +142,7 @@ void Parser::updateNodeHierachy(QString& _graphContent)
       Q_FOREACH(const QString& nid, ids) {
         QString nidTrimmed = nid.trimmed();
         auto childNode = m_cdata->cnodes.find(nidTrimmed);
-        if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nidTrimmed, childNode)) {
+        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nidTrimmed, childNode)) {
           childNode->parent = node->id;
           _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
         }
@@ -214,7 +214,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
       if (splitedLine[0] == "node") {
         NodeListT::Iterator node;
         QString nid = splitedLine[1].trimmed();
-        if (utils::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
+        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
           node->pos_x = splitedLine[2].trimmed().toFloat() * XSCAL_FACTOR;
           node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }

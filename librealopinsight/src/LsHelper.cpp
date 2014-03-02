@@ -103,7 +103,7 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
       chkid = fields[0].toLower();
       check.id = check.host = fields[0].toStdString();
       check.status = fields[1].toInt();
-      check.last_state_change = utils::humanTimeText(fields[2].toStdString());
+      check.last_state_change = ngrt4n::humanTimeText(fields[2].toStdString());
       check.check_command = fields[3].toStdString();
       check.alarm_msg = fields[4].toStdString();
     } else if (reqType == Service) {
@@ -114,7 +114,7 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
       check.host = hostname.toStdString();
       check.id = chkid.toStdString();
       check.status = fields[2].toInt();
-      check.last_state_change = utils::humanTimeText(fields[3].toStdString());
+      check.last_state_change = ngrt4n::humanTimeText(fields[3].toStdString());
       check.check_command = fields[4].toStdString();
       check.alarm_msg = fields[5].toStdString();
     } else {

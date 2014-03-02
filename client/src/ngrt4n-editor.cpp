@@ -47,7 +47,7 @@ int main(int argc, char **argv)
   app->setStyleSheet(Preferences::style());
 
   QString cmdName= basename(argv[0]);
-  QString versionMsg = utils::getWelcomeMsg(QObject::tr("Editor"));
+  QString versionMsg = ngrt4n::getWelcomeMsg(QObject::tr("Editor"));
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
   if ((opt = getopt(argc, argv, "hv")) != -1) {

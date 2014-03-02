@@ -57,28 +57,28 @@ void StatsLegend::paintEvent(QPaintEvent *)
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 
-  painter.setBrush(utils::COLOR_NORMAL);
+  painter.setBrush(ngrt4n::COLOR_NORMAL);
   painter.drawPath(normal);
 
-  painter.setBrush(utils::COLOR_MINOR);
+  painter.setBrush(ngrt4n::COLOR_MINOR);
   painter.drawPath(minor);
 
-  painter.setBrush(utils::COLOR_MAJOR);
+  painter.setBrush(ngrt4n::COLOR_MAJOR);
   painter.drawPath(major);
 
-  painter.setBrush(utils::COLOR_CRITICAL);
+  painter.setBrush(ngrt4n::COLOR_CRITICAL);
   painter.drawPath(critical);
 
-  painter.setBrush(utils::COLOR_UNKNOWN);
+  painter.setBrush(ngrt4n::COLOR_UNKNOWN);
   painter.drawPath(unknown);
 }
 
 QSize StatsLegend::minimumSizeHint() const
 {
-  return QSize(utils::CHART_WIDTH, utils::CHART_HEIGHT);
+  return QSize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);
 }
 
 QSize StatsLegend::sizeHint() const
 {
-  return QSize(utils::CHART_WIDTH, utils::CHART_HEIGHT);
+  return QSize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);
 }

@@ -54,7 +54,7 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(Preferences::style());
   QString cmdName = basename(argv[0]);
-  QString versionMsg = utils::getWelcomeMsg("");
+  QString versionMsg = ngrt4n::getWelcomeMsg("");
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;
@@ -89,19 +89,19 @@ int main(int argc, char **argv)
   int userRole = authentication.exec();
   if (userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
   if (module == "dashboard") {
-    QSplashScreen* info = utils::infoScreen(versionMsg);
-    utils::delay(1);
+    QSplashScreen* info = ngrt4n::infoScreen(versionMsg);
+    ngrt4n::delay(1);
     if (file == "") {
       info->clearMessage();
       info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
-      utils::delay(1); info->finish(0);
+      ngrt4n::delay(1); info->finish(0);
       file = QFileDialog::getOpenFileName(0,
                                           QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
                                           ".",
                                           QObject::tr("Xml files (*.xml);;All files (*)"));
 
       if (!file.length()){
-        utils::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
+        ngrt4n::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
         exit (1);
       }
 

@@ -84,7 +84,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 void MainWindow::showEvent(QShowEvent*)
 {
   if (m_dashboard->updateCounter()==0) {
-    std::unique_ptr<QSplashScreen> info(utils::infoScreen());
+    std::unique_ptr<QSplashScreen> info(ngrt4n::infoScreen());
     info->showMessage(tr("Please wait for initialization, it may take a while..."),
                       Qt::AlignCenter|Qt::AlignCenter);
 

@@ -107,7 +107,7 @@ QString GuiPreferences::letUserSelectType(void)
   QString srcType = QInputDialog::getItem(m_dialog,
                                           tr("Select the source type | %1").arg(APP_NAME),
                                           tr("Please select the source type (Remote API)"),
-                                          utils::sourceTypes(),
+                                          ngrt4n::sourceTypes(),
                                           0,
                                           false,
                                           &ok);
@@ -470,15 +470,15 @@ QGroupBox* GuiPreferences::createUpdateBtnsGrp(void)
 void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   SourceT src;
-  src.id = utils::sourceId(index);
-  src.mon_type = utils::convert2ApiType(type);
+  src.id = ngrt4n::sourceId(index);
+  src.mon_type = ngrt4n::convert2ApiType(type);
   src.mon_url = m_monitorUrlField->text();
   src.ls_addr = m_sockAddrField->text();
   src.ls_port = m_sockPortField->text().toInt();
   src.auth = m_serverPassField->text();
   src.use_ngrt4nd = m_useNgrt4ndChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
-  m_settings->setEntry(utils::sourceKey(index), utils::source2Str(src));
+  m_settings->setEntry(ngrt4n::sourceKey(index), ngrt4n::source2Str(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   m_sourceStates->setBit(index, true);
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
@@ -541,7 +541,7 @@ QGroupBox* GuiPreferences::createCommonGrp(void)
   lyt->addWidget(new QLabel(tr("Monitor Web URL*")), ++line, 0),
       lyt->addWidget(m_monitorUrlField, line, 1),
       m_monitorTypeField->addItem(tr("Select a monitor type")),
-      m_monitorTypeField->addItems(utils::sourceTypes()),
+      m_monitorTypeField->addItems(ngrt4n::sourceTypes()),
       lyt->addWidget(m_monitorTypeField, line, 2);
 
   lyt->addWidget(m_verifySslPeerChkBx, ++line, 0, 1, 3, Qt::AlignCenter);
@@ -588,7 +588,7 @@ void GuiPreferences::addAsSource(void)
   QString srcId = QInputDialog::getItem(m_dialog,
                                         tr("Select source index | %1").arg(APP_NAME),
                                         tr("Please select the index of the source"),
-                                        utils::sourceIndexes(),
+                                        ngrt4n::sourceIndexes(),
                                         0,
                                         false,
                                         &ok);

@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(GuiPreferences::style());
   QString cmdName = basename(argv[0]);
-  QString versionMsg = utils::getWelcomeMsg(QObject::tr("Operations Console"));
+  QString versionMsg = ngrt4n::getWelcomeMsg(QObject::tr("Operations Console"));
   bool runConfig = false;
   int opt;
   if ((opt = getopt(argc, argv, "chv")) != -1) {
@@ -82,21 +82,21 @@ int main(int argc, char **argv)
     changePasswdWindow->exec();
     exit(0);
   }
-  QSplashScreen* info = utils::infoScreen(versionMsg);
-  utils::delay(2);
+  QSplashScreen* info = ngrt4n::infoScreen(versionMsg);
+  ngrt4n::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
   if (file.isEmpty()) {
     info->clearMessage();
     info->showMessage(QObject::tr("You need to select a configuration file!"),
                       Qt::AlignCenter|Qt::AlignCenter);
-    utils::delay(1); info->finish(0);
+    ngrt4n::delay(1); info->finish(0);
     file = QFileDialog::getOpenFileName(0,
                                         QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
                                         ".",
                                         QObject::tr("Xml files (*.xml);;All files (*)"));
 
     if (file.isNull() || file.isEmpty()) {
-      utils::alert(QObject::tr("No configuration file selected, the program will exit!"));
+      ngrt4n::alert(QObject::tr("No configuration file selected, the program will exit!"));
       exit(1);
     }
   }

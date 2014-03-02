@@ -104,7 +104,7 @@ ServiceEditor::~ServiceEditor()
 void ServiceEditor::loadStatusFile(const QString& path)
 {
   ChecksT checks;
-  utils::loadNagiosCollectedData(path.toStdString(), checks);
+  ngrt4n::loadNagiosCollectedData(path.toStdString(), checks);
   setCheckListField( checks );
 }
 
@@ -277,9 +277,9 @@ void ServiceEditor::loadNotificationMsgFields()
 
 void ServiceEditor::loadIconFields()
 {
-  IconMapT icons = utils::nodeIcons();
-  QString header = "-->Select a icon (Default is " + utils::DEFAULT_ICON + ")";
-  iconField()->addItem(header, icons.value(utils::DEFAULT_ICON));
+  IconMapT icons = ngrt4n::nodeIcons();
+  QString header = "-->Select a icon (Default is " + ngrt4n::DEFAULT_ICON + ")";
+  iconField()->addItem(header, icons.value(ngrt4n::DEFAULT_ICON));
   Q_FOREACH(const QString& label, icons.keys()) {
     QString path = icons.value(label);
     iconField()->addItem(QIcon(path), label, icons.value(path));

@@ -66,8 +66,9 @@ int main(int argc, char **argv)
   RealOpInsightQApp* qtApp = new RealOpInsightQApp(argc, argv);
 
   try {
-    Wt::WServer server(argv[0]);
-    server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
+    std::string configurationFile = "/var/lib/realopinsight/etc/wt_config.xml";
+    Wt::WServer server(argv[0], configurationFile);
+    server.setServerConfiguration(argc, argv, configurationFile);
     server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication);
 
     DbSession::configureAuth();

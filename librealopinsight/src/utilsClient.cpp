@@ -31,145 +31,145 @@ namespace {
   const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
 }
 
-QString utils::severityText(const qint32& _status)
+QString ngrt4n::severityText(const qint32& _status)
 {
-  switch(static_cast<utils::SeverityT>(_status))
+  switch(static_cast<ngrt4n::SeverityT>(_status))
   {
-    case utils::Normal:
-      return QObject::tr("Normal");
-      break;
-    case utils::Minor:
-      return  QObject::tr("Minor");
-      break;
-    case utils::Major:
-      return  QObject::tr("Major");
-      break;
-    case utils::Critical:
-      return  QObject::tr("Critical");
-      break;
-    default:
-      break;
+  case ngrt4n::Normal:
+    return QObject::tr("Normal");
+    break;
+  case ngrt4n::Minor:
+    return  QObject::tr("Minor");
+    break;
+  case ngrt4n::Major:
+    return  QObject::tr("Major");
+    break;
+  case ngrt4n::Critical:
+    return  QObject::tr("Critical");
+    break;
+  default:
+    break;
   }
   return QObject::tr("Unknown");
 }
 
-void utils::clear(CoreDataT& _cdata)
+void ngrt4n::clear(CoreDataT& _cdata)
 {
   _cdata.cnodes.clear();
   _cdata.bpnodes.clear();
   _cdata.edges.clear();
 }
 
-QString utils::getAbsolutePath(const QString& _path)
+QString ngrt4n::getAbsolutePath(const QString& _path)
 {
   QFileInfo fileInfo(_path);
   return fileInfo.absoluteFilePath();
 }
 
-utils::SeverityT utils::computeSeverity(const int& _monitor, const int& _statusOrSeverity)
+ngrt4n::SeverityT ngrt4n::computeSeverity(const int& _monitor, const int& _statusOrSeverity)
 {
-  int criticity = utils::Unknown;
-  if(_monitor == utils::Nagios) {
+  int criticity = ngrt4n::Unknown;
+  if(_monitor == ngrt4n::Nagios) {
     switch(_statusOrSeverity) {
-      case utils::NagiosOk:
-        criticity = utils::Normal;
-        break;
-      case utils::NagiosWarning:
-        criticity = utils::Major;
-        break;
-      case utils::NagiosCritical:
-        criticity = utils::Critical;
-        break;
-      default:
-        break;
-    }
-  } else if (_monitor == utils::Zabbix) {
-    switch(_statusOrSeverity) {
-      case utils::ZabbixClear:
-        criticity = utils::Normal;
-        break;
-      case utils::ZabbixInfo:
-      case utils::ZabbixWarn:
-        criticity = utils::Minor;
-        break;
-      case utils::ZabbixAverage:
-        criticity = utils::Major;
-        break;
-      case utils::ZabbixHigh:
-      case utils::ZabbixDisaster:
-        criticity = utils::Critical;
-        break;
-      default:
-        break;
-    }
-  } else if (_monitor == utils::Zenoss){
-    switch(_statusOrSeverity) {
-      case utils::ZenossClear:
-        criticity = utils::Normal;
-        break;
-      case utils::ZenossDebug:
-        criticity = utils::Minor;
-        break;
-      case utils::ZenossWarning:
-        criticity = utils::Major;
-        break;
-      case utils::ZenossError:
-      case utils::ZenossCritical:
-        criticity = utils::Critical;
-        break;
-      default:
-        break;
-    }
-  }
-  return static_cast<utils::SeverityT>(criticity);
-}
-
-int utils::computeSeverity2Propagate(const qint8& _critValue, const qint8& propRule)
-{
-  utils::SeverityT propCriticity = static_cast<utils::SeverityT>(_critValue);
-  Criticity criticity(static_cast<utils::SeverityT>(_critValue));
-  switch(propRule) {
-    case PropRules::Increased: propCriticity = (criticity++).getValue();
+    case ngrt4n::NagiosOk:
+      criticity = ngrt4n::Normal;
       break;
-    case PropRules::Decreased: propCriticity = (criticity--).getValue();
+    case ngrt4n::NagiosWarning:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::NagiosCritical:
+      criticity = ngrt4n::Critical;
       break;
     default:
       break;
+    }
+  } else if (_monitor == ngrt4n::Zabbix) {
+    switch(_statusOrSeverity) {
+    case ngrt4n::ZabbixClear:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::ZabbixInfo:
+    case ngrt4n::ZabbixWarn:
+      criticity = ngrt4n::Minor;
+      break;
+    case ngrt4n::ZabbixAverage:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::ZabbixHigh:
+    case ngrt4n::ZabbixDisaster:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
+    }
+  } else if (_monitor == ngrt4n::Zenoss){
+    switch(_statusOrSeverity) {
+    case ngrt4n::ZenossClear:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::ZenossDebug:
+      criticity = ngrt4n::Minor;
+      break;
+    case ngrt4n::ZenossWarning:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::ZenossError:
+    case ngrt4n::ZenossCritical:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
+    }
+  }
+  return static_cast<ngrt4n::SeverityT>(criticity);
+}
+
+int ngrt4n::computeSeverity2Propagate(const qint8& _critValue, const qint8& propRule)
+{
+  ngrt4n::SeverityT propCriticity = static_cast<ngrt4n::SeverityT>(_critValue);
+  Criticity criticity(static_cast<ngrt4n::SeverityT>(_critValue));
+  switch(propRule) {
+  case PropRules::Increased: propCriticity = (criticity++).getValue();
+    break;
+  case PropRules::Decreased: propCriticity = (criticity--).getValue();
+    break;
+  default:
+    break;
   }
   return propCriticity;
 }
 
-QString utils::getIconPath(int _severity)
+QString ngrt4n::getIconPath(int _severity)
 {
   QString ipath("/images/built-in/unknown.png");
-  switch (static_cast<utils::SeverityT>(_severity)) {
-    case utils::Normal:
-      ipath = "/images/built-in/normal.png";
-      break;
-    case utils::Minor:
-      ipath = "/images/built-in/minor.png";
-      break;
-    case utils::Major:
-      ipath = "/images/built-in/major.png";
-      break;
-    case utils::Critical:
-      ipath = "/images/built-in/critical.png";
-      break;
-    default:
-      break;
+  switch (static_cast<ngrt4n::SeverityT>(_severity)) {
+  case ngrt4n::Normal:
+    ipath = "/images/built-in/normal.png";
+    break;
+  case ngrt4n::Minor:
+    ipath = "/images/built-in/minor.png";
+    break;
+  case ngrt4n::Major:
+    ipath = "/images/built-in/major.png";
+    break;
+  case ngrt4n::Critical:
+    ipath = "/images/built-in/critical.png";
+    break;
+  default:
+    break;
   }
   return ipath;
 }
 
-bool utils::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)
+bool ngrt4n::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)
 {
   return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
 }
 
-bool utils::findNode(NodeListT& bpnodes,
-                     NodeListT& cnodes,
-                     const QString& nodeId,
-                     NodeListT::iterator& node)
+bool ngrt4n::findNode(NodeListT& bpnodes,
+                      NodeListT& cnodes,
+                      const QString& nodeId,
+                      NodeListT::iterator& node)
 {
   bool found = false;
   node = bpnodes.find(nodeId);
@@ -184,10 +184,10 @@ bool utils::findNode(NodeListT& bpnodes,
   return found;
 }
 
-bool utils::findNode(const NodeListT& bpnodes,
-                     const NodeListT& cnodes,
-                     const QString& nodeId,
-                     NodeListT::const_iterator& node)
+bool ngrt4n::findNode(const NodeListT& bpnodes,
+                      const NodeListT& cnodes,
+                      const QString& nodeId,
+                      NodeListT::const_iterator& node)
 {
   bool found = false;
   node = bpnodes.find(nodeId);
@@ -202,7 +202,7 @@ bool utils::findNode(const NodeListT& bpnodes,
   return found;
 }
 
-QString utils::getWelcomeMsg(const QString& utility)
+QString ngrt4n::getWelcomeMsg(const QString& utility)
 {
   return QObject::tr("       > %1 %2 %3 (codename: %4)"
                      "\n        >> Realease ID: %5"
@@ -216,7 +216,7 @@ QString utils::getWelcomeMsg(const QString& utility)
                                                                                    PKG_URL);
 }
 
-QString utils::source2Str(const SourceT& src)
+QString ngrt4n::source2Str(const SourceT& src)
 {
   return QString("{\"sid\":\"%1\","
                  "\"mon_type\":\"%2\","
@@ -236,24 +236,24 @@ QString utils::source2Str(const SourceT& src)
                           QString::number(src.verify_ssl_peer));
 }
 
-qint32 utils::convert2ApiType(const QString& str)
+qint32 ngrt4n::convert2ApiType(const QString& str)
 {
   QStringList types = sourceTypes();
   int type;
-  if (str == types[utils::Nagios])
-    type = utils::Nagios;
-  else if (str == types[utils::Zabbix])
-    type = utils::Zabbix;
-  else if (str == types[utils::Zenoss])
-    type = utils::Zenoss;
+  if (str == types[ngrt4n::Nagios])
+    type = ngrt4n::Nagios;
+  else if (str == types[ngrt4n::Zabbix])
+    type = ngrt4n::Zabbix;
+  else if (str == types[ngrt4n::Zenoss])
+    type = ngrt4n::Zenoss;
   else
-    type = utils::Auto;
+    type = ngrt4n::Auto;
 
   return type;
 }
 
 
-void utils::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
+void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
 {
   invalidCheck.status = status;
   invalidCheck.last_state_change = humanTimeText("0");
@@ -262,14 +262,14 @@ void utils::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck
   invalidCheck.alarm_msg = msg.toStdString();
 }
 
-QStringList utils::sourceTypes(void)
+QStringList ngrt4n::sourceTypes(void)
 {
   return QStringList() << "Nagios-like"
                        << "Zabbix"
                        << "Zenoss";
 }
 
-QStringList utils::sourceIndexes(void)
+QStringList ngrt4n::sourceIndexes(void)
 {
   return QStringList() << "0"
                        << "1"
@@ -285,7 +285,7 @@ QStringList utils::sourceIndexes(void)
 
 
 /* return <[sourcei:]hostaddr, checkid> */
-StringPairT utils::splitHostCheckInfo(const QString& info)
+StringPairT ngrt4n::splitHostCheckInfo(const QString& info)
 {
   int pos = info.indexOf("/");
   QString second = ((pos == -1)? "ping" : info.mid(pos+1));
@@ -295,7 +295,7 @@ StringPairT utils::splitHostCheckInfo(const QString& info)
 
 
 /* return <source, hostaddr> */
-StringPairT utils::splitSourceHostInfo(const QString& info)
+StringPairT ngrt4n::splitSourceHostInfo(const QString& info)
 {
   int pos = info.indexOf(":");
   QString first;
@@ -308,7 +308,7 @@ StringPairT utils::splitSourceHostInfo(const QString& info)
 }
 
 
-QString utils::getSourceIdFromStr(const QString& str)
+QString ngrt4n::getSourceIdFromStr(const QString& str)
 {
   QString srcid = "";
   int pos = str.indexOf(":");
@@ -318,7 +318,7 @@ QString utils::getSourceIdFromStr(const QString& str)
   return srcid;
 }
 
-QPair<bool, int> utils::checkSourceId(const QString &id)
+QPair<bool, int> ngrt4n::checkSourceId(const QString &id)
 {
   int index = -1;
   bool valid = false;
@@ -333,11 +333,11 @@ QPair<bool, int> utils::checkSourceId(const QString &id)
 }
 
 
-QString utils::getNodeToolTip(const NodeT& _node)
+QString ngrt4n::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            utils::severityText(_node.severity),
+                                            ngrt4n::severityText(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::AlarmNode) {
@@ -349,7 +349,7 @@ QString utils::getNodeToolTip(const NodeT& _node)
   return toolTip;
 }
 
-IconMapT utils::nodeIcons() {
+IconMapT ngrt4n::nodeIcons() {
   IconMapT icons;
   icons[DEFAULT_ICON]= ":/images/business-process.png";
   icons["Other Check"] = ":/images/check.png";

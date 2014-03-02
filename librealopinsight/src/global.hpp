@@ -1,36 +1,39 @@
 /*
- * ngrt4n.cpp
+ * ns.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
 #                                                                          #
-# This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
-# by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
+# This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
-# RealOpInsight is free software: you can redistribute it and/or modify    #
+# NGRT4N is free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
 # (at your option) any later version.                                      #
 #                                                                          #
-# The Software is distributed in the hope that it will be useful,          #
+# NGRT4N is distributed in the hope that it will be useful,                #
 # but WITHOUT ANY WARRANTY; without even the implied warranty of           #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
 # GNU General Public License for more details.                             #
 #                                                                          #
 # You should have received a copy of the GNU General Public License        #
-# along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
+# along with NGRT4N.  If not, see <http://www.gnu.org/licenses/>.          #
 #--------------------------------------------------------------------------#
  */
 
 
-#ifndef MONITORBROKER_HPP_
-#define MONITORBROKER_HPP_
+#ifndef NS_HPP_
+#define NS_HPP_
 
-#include "ns.hpp"
-#include <QtCore/QtGlobal>
-#include<string>
-#include<iostream>
+#include<stdlib.h>
+#include <string>
 #include <unordered_map>
+
+#if defined(LIBREALOPINSIGHT_LIBRARY)
+#  define LIBREALOPINSIGHTSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define LIBREALOPINSIGHTSHARED_EXPORT Q_DECL_IMPORT
+#endif
 
 struct CheckT {
   std::string id;
@@ -42,7 +45,7 @@ struct CheckT {
 };
 typedef std::unordered_map<std::string, CheckT> ChecksT;
 
-namespace utils {
+namespace ngrt4n {
   enum ApiTypeT {
     Nagios = 0,
     Zabbix = 1,
@@ -78,5 +81,35 @@ namespace utils {
     ZenossError = 4,
     ZenossCritical = 5
   };
+
+  enum {
+    AdmUserRole = 100,
+    OpUserRole = 101
+  };
+
+  enum VisibilityT {
+    Hidden = 0x0,
+    Visible = 0x1,
+    Expanded = 0x2,
+    Collapsed = 0xFC
+  };
+  const std::string AdmUser = "ngrt4n_adm";
+  const std::string OpUser = "ngrt4n_op";
+  const int MAX_FILE_UPLOAD = 2048; // 2MB
+  const std::string CHILD_SEP = ",";
+  const std::string TAG_ZABBIX_HOSTNAME = "\\{HOSTNAME\\}";
+  const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
+  const std::string TAG_HOSTNAME = "\\{hostname\\}";
+  const std::string TAG_CHECK = "\\{check_name\\}";
+  const std::string TAG_THERESHOLD = "\\{threshold\\}";
+  const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
+  const std::string LINK_HOME ="/home";
+  const std::string LINK_LOAD ="/preview-view";
+  const std::string LINK_IMPORT ="/upload-view";
+  const std::string LINK_LOGIN ="/login";
+  const std::string LINK_LOGOUT ="/logout";
+  const std::string LINK_ADMIN_HOME ="/adm-console";
+  const std::string LINK_OP_HOME ="/op-console";
 }
-#endif /* utills namespace */
+
+#endif /* NS_HPP_ */

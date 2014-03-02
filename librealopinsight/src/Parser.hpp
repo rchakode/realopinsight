@@ -28,7 +28,6 @@
 #include "Base.hpp"
 
 
-
 class LIBREALOPINSIGHTSHARED_EXPORT Parser : public QObject
 {
   Q_OBJECT

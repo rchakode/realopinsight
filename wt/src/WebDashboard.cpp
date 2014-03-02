@@ -78,7 +78,7 @@
   "}"
 
 namespace {
-  const IconMapT ICONS = utils::nodeIcons();
+  const IconMapT ICONS = ngrt4n::nodeIcons();
 }
 
 WebDashboard::WebDashboard(const QString& _config,
@@ -115,7 +115,7 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
   if (! m_showOnlyTroubles ||
-      (m_showOnlyTroubles && _node.severity != utils::Normal))
+      (m_showOnlyTroubles && _node.severity != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -144,7 +144,7 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateThumbnail(void)
 {
-  m_thumbnailTitleBar->setStyleClass(utils::severityCssClass(rootNode().severity));
+  m_thumbnailTitleBar->setStyleClass(ngrt4n::severityCssClass(rootNode().severity));
 }
 
 
@@ -195,10 +195,10 @@ void WebDashboard::addJsEventScript(void)
 std::string WebDashboard::statsTooltip(void)
 {
   qint32 totalCount = m_cdata->cnodes.size();
-  qint32 criticalCount = m_cdata->check_status_count[utils::Critical];
-  qint32 majorCount = m_cdata->check_status_count[utils::Major];
-  qint32 minorCount = m_cdata->check_status_count[utils::Minor];
-  qint32 normalCount =  m_cdata->check_status_count[utils::Normal];
+  qint32 criticalCount = m_cdata->check_status_count[ngrt4n::Critical];
+  qint32 majorCount = m_cdata->check_status_count[ngrt4n::Major];
+  qint32 minorCount = m_cdata->check_status_count[ngrt4n::Minor];
+  qint32 normalCount =  m_cdata->check_status_count[ngrt4n::Normal];
   qint32 unknownCount = totalCount - (criticalCount + majorCount + minorCount + normalCount);
 
   float criticalRatio = (100.0 * criticalCount) / totalCount;
@@ -243,7 +243,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
       m_eventFeedItems.erase(feed);
     }
     // FIXME: need optimization to avoid removing and readding the same item
-    if (node.severity != utils::Normal) {
+    if (node.severity != ngrt4n::Normal) {
       Wt::WWidget* widget = createEventFeedItem(node);
       m_eventFeedLayout->insertWidget(0, widget);
       m_eventFeedItems.insert(node.id, widget);
@@ -256,13 +256,13 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
   tpl->bindString("event-feed-id", node.id.toStdString());
-  tpl->bindString("severity-css-class", utils::severityCssClass(node.severity));
-  tpl->bindString("event-feed-icon", utils::getPathFromQtResource(ICONS[node.icon]));
+  tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.severity));
+  tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
   tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("#"),
                                                       tr("%1 event on %2")
-                                                      .arg(utils::severityText(node.severity), node.name).toStdString()));
+                                                      .arg(ngrt4n::severityText(node.severity), node.name).toStdString()));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", rootNode().name.toStdString());
-  tpl->bindString("timestamp", utils::wTimeToNow(node.check.last_state_change));
+  tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
   return tpl;
 }
