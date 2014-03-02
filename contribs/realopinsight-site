@@ -1,0 +1,10 @@
+<IfModule mod_fastcgi.c>
+  <VirtualHost *:80>
+    DocumentRoot /var/www/roi
+    ServerName roi-server
+
+    # Autres directives ici
+    # Alias /roi /var/www/roi
+  </VirtualHost>
+    FastCgiConfig -idle-timeout 100 -maxClassProcesses 1 -initial-env WT_APP_ROOT=/var/www/roi
+</IfModule>
