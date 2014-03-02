@@ -60,7 +60,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_preferenceDialog(new WebPreferences(m_dbSession->loggedUser().role)),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select a file").toStdString())),
-    m_confdir(Wt::WApplication::instance()->docRoot()+"/config"),
+    m_confdir("/var/lib/realopinsight/config"),
     m_terminateSession(this),
     m_showSettingTab(true)
 {

@@ -104,7 +104,7 @@ Wt::WWidget* ngrt4n::footer(void)
 
 std::string ngrt4n::sqliteDbPath(void)
 {
-  return "/var/lib/realopinsight/run/realopinsight.db";
+  return "/var/lib/realopinsight/config/realopinsight.db";
 }
 
 

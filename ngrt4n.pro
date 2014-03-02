@@ -88,7 +88,7 @@ TARGET = ngrt4n-editor
 
 config-web {
 PACKAGE_VERSION = "$${BASE_VERSION}-UE"
-TARGET = bin/ngrt4n-web.fcgi
+TARGET = ngrt4n-web.fcgi
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
