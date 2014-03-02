@@ -40,20 +40,35 @@ private:
   DbSession* m_dbSession;
 };
 
-Wt::WApplication* createApplication(const Wt::WEnvironment& env)
+Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
 {
   return new WebApp(env);
 }
 
+class RealOpInsightQApp : public QCoreApplication
+{
+public:
+  RealOpInsightQApp(int& argc, char ** argv) : QCoreApplication(argc, argv) { }
+  virtual ~RealOpInsightQApp() { }
+
+  virtual bool notify(QObject * receiver, QEvent * event) {
+    try {
+      return QCoreApplication::notify(receiver, event);
+    } catch(std::exception& ex) {
+      LOG("fatal", ex.what());
+    }
+    return false;
+  }
+};
 
 int main(int argc, char **argv)
 {
-  QCoreApplication* qtApp = new QCoreApplication(argc, argv);
+  RealOpInsightQApp* qtApp = new RealOpInsightQApp(argc, argv);
 
   try {
     Wt::WServer server(argv[0]);
     server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-    server.addEntryPoint(Wt::Application, &createApplication);
+    server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication);
 
     DbSession::configureAuth();
 
