@@ -161,10 +161,10 @@ void WebMainUI::setupManagementMenus(void)
         ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
     m_mgntTopMenu->addItem("Preview")
         ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-    m_mgntTopMenu->addItem("Manage Views", m_viewAssignmentDialog->contents())
+    m_mgntTopMenu->addItem("Manage views and assignments", m_viewAssignmentDialog->contents())
         ->triggered().connect(std::bind([=](){
       m_viewAssignmentDialog->resetModelData();
-      m_adminPanelTitle->setText("Manage Views");
+      m_adminPanelTitle->setText("Manage views and assignments");
     }));
     
     // User menus
@@ -175,7 +175,7 @@ void WebMainUI::setupManagementMenus(void)
       m_adminPanelTitle->setText("Create new user");
     }));
     
-    menuItem = m_mgntTopMenu->addItem("Manage Users", m_userMgntUI->userListWidget());
+    menuItem = m_mgntTopMenu->addItem("View all users", m_userMgntUI->userListWidget());
     menuItem->triggered().connect(std::bind([=](){
       m_userMgntUI->updateUserList();
       m_adminPanelTitle->setText("Manage Users");
