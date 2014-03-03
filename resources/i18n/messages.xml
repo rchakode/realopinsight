@@ -15,6 +15,61 @@
         <!-- List actions -->
         <div class="span2 list-group">
             ${menu}
+			
+			<div class="accordion" id="menu-accordion">
+			  <div class="accordion-group">
+ 			   <div class="accordion-heading">
+ 			     <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu-accordion" href="#viewMenuBlock">
+  			      View Management
+   			     </a>
+   			 </div>
+   			 <div id="viewMenuBlock" class="accordion-body collapse in">
+   			   <div class="accordion-inner">
+   			     <ul class="nav">
+                    <li><a href="#"><i class="fa fa-upload"></i> Import</a></li>
+                    <li><a href="#"><i class="fa fa-icon-folder-open"></i> Preview</a></li>
+                    <li><a href="#"><i class="fa fa-icon-folder-open"></i> View all views and assignments</a></li>
+   			     </ul>
+   			   </div>
+   			 </div>
+  			</div>
+			
+ 			 <div class="accordion-group">
+  			  <div class="accordion-heading">
+   			      <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu-accordion" href="#userMenuBlock">
+    			    <i class="fa fa-users"></i> User Management
+    			  </a>
+    			</div>
+   			 <div id="userMenuBlock" class="accordion-body collapse in">
+  			    <div class="accordion-inner">
+    			  <ul class="nav">
+                    <li><a href="#"><i class="fa fa-plus"></i> New user</a></li>
+                    <li><a href="#"><i class="fa-list"></i> View all users</a></li>
+   			     </ul>
+    			</div>
+   			  </div>
+ 			 </div>
+
+			  <div class="accordion-group">
+ 			   <div class="accordion-heading">
+ 			     <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu-accordion" href="#viewMenuBlock">
+  			      <i class="fa fa-cogs fa-fw"></i> Account &amp; Settings
+   			     </a>
+   			 </div>
+   			 <div id="viewMenuBlock" class="accordion-body collapse in">
+   			   <div class="accordion-inner">
+   			     <ul class="nav">
+                    <li><a href="#"><i class="fa fa-cog"></i> Monitoring Settings</a></li>
+                    <li><a href="#"><i class="fa fa-plus"></i> My Account</a></li>
+                    <li><a href="#"><i class="fa fa-key fa-fw"></i> Change Password</a></li>
+   			     </ul>
+   			   </div>
+   			 </div>
+  			</div>
+			
+			</div>
+
+			
         </div>
       </div>
     </div>

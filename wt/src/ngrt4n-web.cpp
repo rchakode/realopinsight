@@ -26,6 +26,7 @@ protected:
     messageResourceBundle().use("resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
     requireJQuery("/resources/js/jquery-1.10.2.min.js");
+    requireJQuery("/resources/js/bootstrap.min.js");
     m_dbSession = new DbSession();
     root()->setId("wrapper");
     root()->addWidget(new AuthManager(m_dbSession));
