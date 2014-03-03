@@ -1130,7 +1130,7 @@ Chargement...</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="142"/>
+        <location filename="../wt/src/WebUtils.cpp" line="141"/>
         <source>&lt;span class=&quot;btn&quot;&gt; &lt;i class=&quot;%1&quot;&gt;&lt;/i&gt;&lt;/span&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1961,17 +1961,17 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="42"/>
+        <location filename="../wt/src/WebUtils.cpp" line="41"/>
         <source>error-msg-div-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="45"/>
+        <location filename="../wt/src/WebUtils.cpp" line="44"/>
         <source>success-msg-div-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="97"/>
+        <location filename="../wt/src/WebUtils.cpp" line="96"/>
         <source>copyright-footer.tpl</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1982,11 +1982,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     </message>
 </context>
 <context>
-    <name>utils</name>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Indéfini</translation>
-    </message>
+    <name>ngrt4n</name>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="39"/>
         <source>Preferences - </source>
@@ -2031,6 +2027,13 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <location filename="../wt/src/WebPreferences.cpp" line="133"/>
         <source>Bad monitor type</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>utils</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="obsolete">Indéfini</translation>
     </message>
 </context>
 </TS>

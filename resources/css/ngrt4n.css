@@ -172,7 +172,7 @@ body, html {
 
 .admin-page #ngrt4n-content-pane {
   float: right;
-  overflow: hidden;
+  overflow: visible;
   background-color: #ffffff;
 }
 
