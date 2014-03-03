@@ -434,25 +434,25 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     settingPageTpl->bindWidget("menu-preview", link);
 
     m_mgntContents->addWidget(m_viewAssignmentDialog->contents());
-    link = new Wt::WAnchor("#", "All views and assignments", m_mainWidget);
+    link = new Wt::WAnchor("#", "All Views and Assignments", m_mainWidget);
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_viewAssignmentDialog->contents());
       m_viewAssignmentDialog->resetModelData();
-      m_adminPanelTitle->setText("All views and assignments");
+      m_adminPanelTitle->setText("All Views and Assignments");
     }));
     settingPageTpl->bindWidget("menu-all-views", link);
 
     // User menus
     m_userMgntUI = new UserMngtUI(m_dbSession);
     m_mgntContents->addWidget(m_userMgntUI->userForm());
-    link = new Wt::WAnchor("#", "New user", m_mainWidget);
+    link = new Wt::WAnchor("#", "New User", m_mainWidget);
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
-      m_adminPanelTitle->setText("Create new user");
+      m_adminPanelTitle->setText("Create New User");
     }));
     settingPageTpl->bindWidget("menu-new-user", link);
 
-    link = new Wt::WAnchor("#", "View all users", m_mainWidget);
+    link = new Wt::WAnchor("#", "View All Users", m_mainWidget);
     m_mgntContents->addWidget(m_userMgntUI->userListWidget());
     link->clicked().connect(std::bind([=]() {
       m_mgntContents->setCurrentWidget(m_userMgntUI->userListWidget());
