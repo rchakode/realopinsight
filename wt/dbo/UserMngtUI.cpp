@@ -204,7 +204,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
   Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
   Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
   bindWidget("submit-button", submitButton);
-  bindWidget("cancel-button", cancelButton);
+  bindEmpty("cancel-button");
 
   Wt::WString title = Wt::WString("User information");
   if (user) {

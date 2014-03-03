@@ -181,6 +181,10 @@ body, html {
   overflow: hidden;
 }
 
+.admin-page #ngrt4n-side-pane li {
+  white-space: nowrap;
+}
+
 .info-box {
   z-index: 100; 
 }

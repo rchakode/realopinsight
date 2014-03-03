@@ -44,10 +44,10 @@ void AuthManager::handleAuthentication(void)
     m_dbSession->addSession(sessionInfo);
 
     wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
-    LOG("error", m_dbSession->loggedUser().username + " logged in. Session Id: " + sessionInfo.sessionId);
+    LOG("notice", m_dbSession->loggedUser().username + " logged in. Session Id: " + sessionInfo.sessionId);
   } else {
     wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
-    LOG("error", m_dbSession->loggedUser().username + " logged out");
+    LOG("notice", m_dbSession->loggedUser().username + " logged out");
   }
 }
 

@@ -10,24 +10,19 @@
   <div class="admin-page">
     <!-- Menu pane -->
     <div id="ngrt4n-side-pane">
-      <h3>&nbsp;</h3>
+      <legend>${menu-get-started}</legend>
       <div class="ngrt4n-content">
-        <!-- List actions -->
-        <div class="span2 list-group">
-            ${menu}
-            <div class="accordion" id="menu-accordion">
-              <div class="accordion-group">
+            <div class="accordion">
+            <div class="accordion-group">
             <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu-accordion" href="#viewMenuBlock">
-              View Management
-              </a>
+              <i class="fa fa-dashboard"></i> View Management
             </div>
             <div id="viewMenuBlock" class="accordion-body collapse in">
               <div class="accordion-inner">
               <ul class="nav">
-            <li><a href="#"><i class="fa fa-upload"></i> Import</a></li>
-            <li><a href="#"><i class="fa fa-eye"></i> Preview</a></li>
-            <li><a href="#"><i class="fa fa-icon-folder-open"></i> View all views and assignments</a></li>
+               <li><i class="fa fa-upload pull-left"></i> ${menu-import}</li>
+               <li><i class="fa fa-eye pull-left"></i> ${menu-preview}</li>
+               <li><i class="icon-fixed-width icon-pencil pull-left"></i> ${menu-all-views}</li>
               </ul>
               </div>
             </div>
@@ -35,15 +30,13 @@
 
             <div class="accordion-group">
               <div class="accordion-heading">
-               <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu-accordion" href="#userMenuBlock">
                 <i class="fa fa-users"></i> User Management
-              </a>
               </div>
             <div id="userMenuBlock" class="accordion-body collapse in">
                 <div class="accordion-inner">
               <ul class="nav">
-            <li><a href="#"><i class="fa fa-plus"></i> New user</a></li>
-            <li><a href="#"><i class="fa-list"></i> View all users</a></li>
+               <li><i class="fa fa-plus pull-left"></i> ${menu-new-user}</li>
+               <li><a href="#"><i class="fa fa-list pull-left"></i> ${menu-all-users}</a></li>
               </ul>
               </div>
              </div>
@@ -51,24 +44,20 @@
 
             <div class="accordion-group">
               <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu-accordion" href="#viewMenuBlock">
-              <i class="fa fa-cogs fa-fw"></i> Account &amp; Settings
-              </a>
-            </div>
+                 <i class="fa fa-cogs fa-fw pull-left"></i> Account &amp; Settings
+              </div>
             <div id="viewMenuBlock" class="accordion-body collapse in">
               <div class="accordion-inner">
-              <ul class="nav">
-            <li><a href="#"><i class="fa fa-cog"></i> Monitoring Settings</a></li>
-            <li><a href="#"><i class="fa fa-plus"></i> My Account</a></li>
-            <li><a href="#"><i class="fa fa-key fa-fw"></i> Change Password</a></li>
+               <ul class="nav">
+                <li><i class="fa fa-cog pull-left"></i> ${menu-monitoring-setting}</li>
+                <li><i class="fa fa-plus pull-left"></i> ${menu-my-account}</li>
+                <li><a href="#"><i class="fa fa-key fa-fw pull-left"></i> ${menu-change-password}</a></li>
               </ul>
               </div>
             </div>
             </div>
-
-            </div>
-
         </div>
+
       </div>
     </div>
    <!-- Content Pane -->

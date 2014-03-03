@@ -141,65 +141,6 @@ void WebMainUI::createMainUI(void)
 }
 
 
-void WebMainUI::setupManagementMenus(void)
-{
-  m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
-  m_mgntTopMenu = new Wt::WMenu(m_mgntContents, m_mainWidget);
-  
-  Wt::WMenuItem* menuItem = NULL;
-  if (m_dbSession->loggedUser().role == User::AdmRole) {
-    // Start menu
-    menuItem = m_mgntTopMenu->addItem("Get Started",
-                                      new Wt::WTemplate(Wt::WString::tr("getting-started.tpl")));
-    menuItem->triggered().connect(std::bind([=](){
-      m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
-    }));
-    
-    // view menus
-    m_mgntTopMenu->addSectionHeader("Views");
-    m_mgntTopMenu->addItem("Import")
-        ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_IMPORT));
-    m_mgntTopMenu->addItem("Preview")
-        ->setLink(Wt::WLink(Wt::WLink::InternalPath, ngrt4n::LINK_LOAD));
-    m_mgntTopMenu->addItem("Manage views and assignments", m_viewAssignmentDialog->contents())
-        ->triggered().connect(std::bind([=](){
-      m_viewAssignmentDialog->resetModelData();
-      m_adminPanelTitle->setText("Manage views and assignments");
-    }));
-    
-    // User menus
-    m_userMgntUI = new UserMngtUI(m_dbSession);
-    m_mgntTopMenu->addSectionHeader("Users");
-    menuItem = m_mgntTopMenu->addItem("Add user", m_userMgntUI->userForm());
-    menuItem->triggered().connect(std::bind([=](){
-      m_adminPanelTitle->setText("Create new user");
-    }));
-    
-    menuItem = m_mgntTopMenu->addItem("View all users", m_userMgntUI->userListWidget());
-    menuItem->triggered().connect(std::bind([=](){
-      m_userMgntUI->updateUserList();
-      m_adminPanelTitle->setText("Manage Users");
-    }));
-  }
-  
-  // setting menus
-  m_mgntTopMenu->addSectionHeader("Account & Settings");
-  menuItem = m_mgntTopMenu->addItem("Monitoring Settings", m_preferenceDialog->getWidget());
-  menuItem->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Update Monitoring Settings");
-  }));
-  
-  menuItem = m_mgntTopMenu->addItem("My Account", m_accountPanel->contents());
-  menuItem->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("My Account");
-  }));
-  
-  menuItem = m_mgntTopMenu->addItem("Change Password", m_changePasswordPanel->contents());
-  menuItem->triggered().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Change password");
-  }));
-}
-
 void WebMainUI::setupProfileMenus(void)
 {
   m_profileMenu = new Wt::WMenu();
@@ -249,25 +190,24 @@ void WebMainUI::setupProfileMenus(void)
 
 void WebMainUI::setupMenus(void)
 {
-  setupManagementMenus();
   setupProfileMenus();
   
   //FIXME: add this after the first view loaded
   Wt::WText* text = ngrt4n::createFontAwesomeTextButton("fa fa-refresh",
-                                                       "Refresh the console map",
-                                                       m_mainWidget);
+                                                        "Refresh the console map",
+                                                        m_mainWidget);
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar->addWidget(text);
   
   text = ngrt4n::createFontAwesomeTextButton("icon-zoom-in",
-                                            "Zoom the console map in",
-                                            m_mainWidget);
+                                             "Zoom the console map in",
+                                             m_mainWidget);
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
   m_navbar->addWidget(text);
   
   text = ngrt4n::createFontAwesomeTextButton("icon-zoom-out",
-                                            "Zoom the console map out",
-                                            m_mainWidget);
+                                             "Zoom the console map out",
+                                             m_mainWidget);
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
   m_navbar->addWidget(text);
 }
@@ -465,11 +405,88 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_infoBox->hide();
   m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
 
+  m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
+
   Wt::WTemplate* settingPageTpl = new Wt::WTemplate(Wt::WString::tr("admin-home.tpl"));
   settingPageTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText(m_mainWidget));
   settingPageTpl->bindWidget("contents", m_mgntContents);
-  settingPageTpl->bindWidget("menu", m_mgntTopMenu);
   settingPageTpl->bindWidget("info-box", m_infoBox);
+
+  Wt::WAnchor* link = NULL;
+  if (m_dbSession->loggedUser().role == User::AdmRole) {
+    // Start menu
+    link = new Wt::WAnchor("#", "Administration Home", m_mainWidget);
+    Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
+    m_mgntContents->addWidget(getStartPage);
+    link->clicked().connect(std::bind([=](){
+      m_mgntContents->setCurrentWidget(getStartPage);
+      m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
+    }));
+    settingPageTpl->bindWidget("menu-get-started", link);
+
+    // view menus
+    link = new Wt::WAnchor("#", "Import", m_mainWidget);
+    link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
+    settingPageTpl->bindWidget("menu-import", link);
+
+    link = new Wt::WAnchor("#", "Preview", m_mainWidget);
+    link->clicked().connect(this, &WebMainUI::selectFileToOpen);
+    settingPageTpl->bindWidget("menu-preview", link);
+
+    m_mgntContents->addWidget(m_viewAssignmentDialog->contents());
+    link = new Wt::WAnchor("#", "All views and assignments", m_mainWidget);
+    link->clicked().connect(std::bind([=](){
+      m_mgntContents->setCurrentWidget(m_viewAssignmentDialog->contents());
+      m_viewAssignmentDialog->resetModelData();
+      m_adminPanelTitle->setText("All views and assignments");
+    }));
+    settingPageTpl->bindWidget("menu-all-views", link);
+
+    // User menus
+    m_userMgntUI = new UserMngtUI(m_dbSession);
+    m_mgntContents->addWidget(m_userMgntUI->userForm());
+    link = new Wt::WAnchor("#", "New user", m_mainWidget);
+    link->clicked().connect(std::bind([=](){
+      m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
+      m_adminPanelTitle->setText("Create new user");
+    }));
+    settingPageTpl->bindWidget("menu-new-user", link);
+
+    link = new Wt::WAnchor("#", "View all users", m_mainWidget);
+    m_mgntContents->addWidget(m_userMgntUI->userListWidget());
+    link->clicked().connect(std::bind([=]() {
+      m_mgntContents->setCurrentWidget(m_userMgntUI->userListWidget());
+      m_userMgntUI->updateUserList();
+      m_adminPanelTitle->setText("Manage Users");
+    }));
+    settingPageTpl->bindWidget("menu-all-users", link);
+  }
+
+  // setting menus
+  m_mgntContents->addWidget(m_preferenceDialog->getWidget());
+  link = new Wt::WAnchor("#", "Monitoring Settings", m_mainWidget);
+  link->clicked().connect(std::bind([=](){
+    m_mgntContents->setCurrentWidget(m_preferenceDialog->getWidget());
+    m_adminPanelTitle->setText("Update Monitoring Settings");
+  }));
+  settingPageTpl->bindWidget("menu-monitoring-setting", link);
+
+  m_mgntContents->addWidget(m_accountPanel->contents());
+  link = new Wt::WAnchor("#", "My Account", m_mainWidget);
+  link->clicked().connect(std::bind([=](){
+    m_mgntContents->setCurrentWidget(m_accountPanel->contents());
+    m_adminPanelTitle->setText("My Account");
+  }));
+  settingPageTpl->bindWidget("menu-my-account", link);
+
+  m_mgntContents->addWidget(m_changePasswordPanel->contents());
+  link = new Wt::WAnchor("#", "Change Password", m_mainWidget);
+  link->clicked().connect(std::bind([=](){
+    m_mgntContents->setCurrentWidget(m_changePasswordPanel->contents());
+    m_adminPanelTitle->setText("Change password");
+  }));
+  settingPageTpl->bindWidget("menu-change-password", link);
+
   return settingPageTpl;
 }
 

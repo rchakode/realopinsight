@@ -76,7 +76,6 @@ private:
   Wt::WStackedWidget* m_contents;
   Wt::WStackedWidget* m_mgntContents;
   Wt::WNavigationBar* m_navbar;
-  Wt::WMenu* m_mgntTopMenu;
   Wt::WMenu* m_profileMenu;
   Wt::WMenuItem* m_mainProfileMenuItem;
   Wt::WTabWidget* m_dashtabs;
@@ -101,7 +100,6 @@ private:
 
   void addEvents(void);
   void createMainUI(void);
-  void setupManagementMenus(void);
   void setupProfileMenus(void);
   void setupMenus(void);
   Wt::WAnchor* createLogoLink(void);
