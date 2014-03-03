@@ -438,7 +438,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_viewAssignmentDialog->contents());
       m_viewAssignmentDialog->resetModelData();
-      m_adminPanelTitle->setText("All Views and Assignments");
+      m_adminPanelTitle->setText("Manage Views and Assignments");
     }));
     settingPageTpl->bindWidget("menu-all-views", link);
 
