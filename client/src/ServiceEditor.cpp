@@ -104,7 +104,7 @@ ServiceEditor::~ServiceEditor()
 void ServiceEditor::loadStatusFile(const QString& path)
 {
   ChecksT checks;
-  ngrt4n::loadNagiosCollectedData(path.toStdString(), checks);
+  //FIXME: ngrt4n::loadNagiosCollectedData(path.toStdString(), checks);
   setCheckListField( checks );
 }
 

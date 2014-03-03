@@ -22,8 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 #include "GuiDashboard.hpp"
-#include "MonitorBroker.hpp"
-#include "ns.hpp"
+#include "global.hpp"
 #include "utilsClient.hpp"
 #include "JsHelper.hpp"
 #include "LsHelper.hpp"

@@ -25,7 +25,6 @@
 
 #include "Auth.hpp"
 #include "Preferences.hpp"
-#include "ns.hpp"
 #include "utilsClient.hpp"
 #include "GuiUtils.hpp"
 #include <QLabel>

@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "ns.hpp"
+#include "global.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Parser.hpp"
 #include "utilsClient.hpp"
