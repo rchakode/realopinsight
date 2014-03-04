@@ -163,13 +163,11 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
     m_validated(this),
     m_deleteTriggered(this),
     m_changePasswordTriggered(this),
-    m_close(this),
     m_infoBox(new Wt::WText(""))
 {
   m_model = new UserFormModel(user, changePassword, userForm, this);
 
   setTemplateText(tr("userForm-template"));
-  bindWidget("info-box", m_infoBox);
   addFunction("id", &WTemplate::Functions::id);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::CurrentPasswordField, createPaswordField());
@@ -204,7 +202,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
   Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
   Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
   bindWidget("submit-button", submitButton);
-  bindEmpty("cancel-button");
+  bindWidget("cancel-button", cancelButton);
 
   Wt::WString title = Wt::WString("User information");
   if (user) {
@@ -212,7 +210,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
     if (changePassword) {
       title = Wt::WString("Set password information");
       submitButton->setText("Change password");
-      cancelButton->setText("Fermer");
+      cancelButton->setText("Close");
       cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
     } else {
       createChangePasswordDialog();
@@ -222,15 +220,14 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
         cancelButton->setStyleClass("btn btn-danger");
         cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
       } else {
-        cancelButton->setText("Fermer");
+        cancelButton->setText("Close");
         cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
+        cancelButton->hide();
       }
     }
   } else {
     submitButton->setStyleClass("btn btn-success");
     cancelButton->clicked().connect(std::bind([=]() {
-      m_infoBox->setText("");
-      m_infoBox->hide();
       m_model->reset();
       updateView(m_model);
     }));
@@ -252,15 +249,14 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
 
 UserFormView::~UserFormView(void)
 {
-  delete m_infoBox;
 }
 
-void UserFormView::showMessage(int exitCode,
-                               const std::string& errorMsg,
-                               const std::string& successMsg)
+void UserFormView::reset(void)
 {
-  ngrt4n::showMessage(exitCode, errorMsg, successMsg, m_infoBox);
+  m_model->reset();
+  updateView(m_model);
 }
+
 
 void UserFormView::process(void)
 {
@@ -349,18 +345,10 @@ UserMngtUI::UserMngtUI(DbSession* dbSession)
     m_userForm(new UserFormView(NULL, false, false)),
     m_userListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
-    m_menu(new Wt::WMenu(m_contents, Wt::Vertical, 0)),
-    m_userAdded(this)
+    m_updateCompleted(this)
 {
-  m_menu->setStyleClass("nav nav-pills");
-
   m_userForm->validated().connect(std::bind([=](User user) {
-    int retCode = m_dbSession->addUser(user);
-    m_userForm->showMessage(retCode, m_dbSession->lastError(), "User added.");
-    m_userAdded.emit(retCode);
-    m_userForm->reset();
-  }, std::placeholders::_1));
-
+    m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
   createUserList();
 }
 
@@ -369,7 +357,6 @@ UserMngtUI::~UserMngtUI(void)
   delete m_userForm;
   delete m_userListContainer;
   delete m_contents;
-  delete m_menu;
 }
 
 void UserMngtUI::updateUserList(void)
@@ -393,26 +380,18 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
                                       userForm));
   form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
-    form->showMessage(ret,
-                      m_dbSession->lastError(),
-                      "Update completed.");
+    m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
   }, std::placeholders::_1));
 
   form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
                                                     const std::string& currentPass,
                                                     const std::string& newPass) {
-    int ret = m_dbSession->updatePassword(login, currentPass, newPass);
-    form->showMessage(ret,
-                      m_dbSession->lastError(),
-                      "Password changed.");
+    m_updateCompleted.emit(m_dbSession->updatePassword(login, currentPass, newPass));
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
 
   form->deleteTriggered().connect(std::bind([=](std::string username) {
-    int ret = m_dbSession->deleteUser(username);
-    m_userForm->showMessage(ret,
-                            m_dbSession->lastError(),
-                            QObject::tr("User %1 deleted").arg(username.c_str()).toStdString());
+    m_updateCompleted.emit(m_dbSession->deleteUser(username));
     updateUserList();
   }, std::placeholders::_1));
 
@@ -423,11 +402,6 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   panel->setCollapsible(true);
   panel->setCollapsed(true);
   return panel;
-}
-
-void UserMngtUI::showDestinationView(int dest)
-{
-  m_menu->select(m_menus[dest]);
 }
 
 

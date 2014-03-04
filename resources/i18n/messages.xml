@@ -15,11 +15,11 @@
        </div>
       <div class="ngrt4n-content">
             <div class="accordion">
-            <div class="accordion-group">
+            <div class="accordion-group" id="viewMenuBlock">
             <div class="accordion-heading">
               <i class="fa fa-dashboard"></i> View Management
             </div>
-            <div id="viewMenuBlock" class="accordion-body collapse in">
+            <div class="accordion-body collapse in">
               <div class="accordion-inner">
               <ul class="nav">
                <li><i class="fa fa-upload pull-left"></i> ${menu-import}</li>
@@ -30,11 +30,11 @@
             </div>
             </div>
 
-            <div class="accordion-group">
+            <div class="accordion-group" id="userMenuBlock">
               <div class="accordion-heading">
                 <i class="fa fa-users"></i> User Management
               </div>
-            <div id="userMenuBlock" class="accordion-body collapse in">
+            <div class="accordion-body collapse in">
                 <div class="accordion-inner">
               <ul class="nav">
                <li><i class="fa fa-plus pull-left"></i> ${menu-new-user}</li>
@@ -44,11 +44,11 @@
              </div>
             </div>
 
-            <div class="accordion-group">
+            <div class="accordion-group" id="viewMenuBlock">
               <div class="accordion-heading">
                  <i class="fa fa-cogs fa-fw pull-left"></i> Account &amp; Settings
               </div>
-            <div id="viewMenuBlock" class="accordion-body collapse in">
+            <div class="accordion-body collapse in">
               <div class="accordion-inner">
                <ul class="nav">
                 <li><i class="fa fa-cog pull-left"></i> ${menu-monitoring-setting}</li>
@@ -224,7 +224,6 @@
 
 <message id="userForm-template">
   <div class="form-horizontal">
-      ${info-box}
       ${<if:user-name>}
     <div class="control-group">
         <label for="${id:user-name}" class="control-label">Login*</label>

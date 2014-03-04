@@ -47,7 +47,7 @@
 
 #define RESIZE_PANES \
   "var top = $(\"#ngrt4n-content-pane\").offset().top;" \
-  "var windowHeight = $(window).height();" \
+  "var windowHeight = $(window).height() - 40;" \
   "$(\"#ngrt4n-content-pane\").height(windowHeight - top);" \
   "$(\"#ngrt4n-side-pane\").height(windowHeight - top);"
 
@@ -304,61 +304,61 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-  case IMPORT:
-    if (! m_uploader->empty()) {
-      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-        LOG("notice", "Parsing the input file");
-        QString tmpFileName(m_uploader->spoolFileName().c_str());
-        CoreDataT cdata;
+    case IMPORT:
+      if (! m_uploader->empty()) {
+        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+          LOG("notice", "Parsing the input file");
+          QString tmpFileName(m_uploader->spoolFileName().c_str());
+          CoreDataT cdata;
 
-        Parser parser(tmpFileName ,&cdata);
-        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+          Parser parser(tmpFileName ,&cdata);
+          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-        if (! parser.process(false)) {
-          std::string msg = tr("Invalid description file").toStdString();
-          LOG("warn", msg);
-          showMessage(msg, "alert alert-warning");
-        } else {
-
-          std::string filename = m_uploader->clientFileName().toUTF8();
-          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-          QFile file(tmpFileName);
-          file.copy(dest);
-          file.remove();
-
-          View view;
-          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-          view.path = dest.toStdString();
-          if (m_dbSession->addView(view) != 0){
-            showMessage(m_dbSession->lastError(), "alert alert-warning");
+          if (! parser.process(false)) {
+            std::string msg = tr("Invalid description file").toStdString();
+            LOG("warn", msg);
+            showMessage(msg, "alert alert-warning");
           } else {
-            QString msg = tr("View added. "
-                             " Name: %1\n - "
-                             " Number of services: %2 -"
-                             " Path: %3").arg(view.name.c_str(),
-                                              QString::number(view.service_count),
-                                              view.path.c_str());
-            showMessage(msg.toStdString(), "alert alert-success");
+
+            std::string filename = m_uploader->clientFileName().toUTF8();
+            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+            QFile file(tmpFileName);
+            file.copy(dest);
+            file.remove();
+
+            View view;
+            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+            view.path = dest.toStdString();
+            if (m_dbSession->addView(view) != 0){
+              showMessage(m_dbSession->lastError(), "alert alert-warning");
+            } else {
+              QString msg = tr("View added. "
+                               " Name: %1\n - "
+                               " Number of services: %2 -"
+                               " Path: %3").arg(view.name.c_str(),
+                                                QString::number(view.service_count),
+                                                view.path.c_str());
+              showMessage(msg.toStdString(), "alert alert-success");
+            }
           }
         }
       }
-    }
-    break;
-  case OPEN:
-    m_fileUploadDialog->accept();
-    m_fileUploadDialog->contents()->clear();
-    if (! m_selectFile.empty()) {
-      int tabIndex;
-      WebDashboard* dashbord;
-      loadView(m_selectFile, dashbord, tabIndex);
-      m_selectFile.clear();
-    } else {
-      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-    }
-    break;
-  default:
-    break;
+      break;
+    case OPEN:
+      m_fileUploadDialog->accept();
+      m_fileUploadDialog->contents()->clear();
+      if (! m_selectFile.empty()) {
+        int tabIndex;
+        WebDashboard* dashbord;
+        loadView(m_selectFile, dashbord, tabIndex);
+        m_selectFile.clear();
+      } else {
+        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+      }
+      break;
+    default:
+      break;
   }
 }
 
@@ -444,6 +444,14 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
     // User menus
     m_userMgntUI = new UserMngtUI(m_dbSession);
+    m_userMgntUI->updateCompleted().connect(std::bind([=](int retCode) {
+      if (retCode != 0) {
+        showMessage(m_dbSession->lastError(), "alert alert-warning");
+      } else {
+        showMessage("Successul updated", "alert alert-success");
+        m_userMgntUI->resetUserForm();
+      }
+    }, std::placeholders::_1));
     m_mgntContents->addWidget(m_userMgntUI->userForm());
     link = new Wt::WAnchor("#", "New User", m_mainWidget);
     link->clicked().connect(std::bind([=](){
@@ -461,6 +469,15 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_adminPanelTitle->setText("Manage Users");
     }));
     settingPageTpl->bindWidget("menu-all-users", link);
+  } else {
+    settingPageTpl->bindEmpty("menu-get-started");
+    settingPageTpl->bindEmpty("menu-import");
+    settingPageTpl->bindEmpty("menu-preview");
+    settingPageTpl->bindEmpty("menu-all-views");
+    settingPageTpl->bindEmpty("menu-new-user");
+    settingPageTpl->bindEmpty("menu-all-users");
+    wApp->doJavaScript("$('#userMenuBlock').hide();");
+    wApp->doJavaScript("$('#viewMenuBlock').hide();");
   }
 
   // setting menus
@@ -505,9 +522,11 @@ void WebMainUI::createAccountPanel(void)
   form->closeTriggered().connect(std::bind([=](){m_accountPanel->accept();}));
   form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
-    form->showMessage(ret,
-                      "Update failed. See in log for more details.",
-                      "Update completed.");}, std::placeholders::_1));
+    if (ret != 0) {
+      showMessage("Update failed, see details in log.", "alert alert-warning");
+    } else {
+      showMessage("Update completed.", "alert alert-success");
+    }}, std::placeholders::_1));
   
   m_accountPanel = createDialog(tr("Manage user account").toStdString(), form);
 }
@@ -524,9 +543,11 @@ void WebMainUI::createPasswordPanel(void)
                                                     const std::string& lastpass,
                                                     const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
-    form->showMessage(ret,
-                      "Change password failed. More details in log.",
-                      "Password changed.");
+    if (ret != 0) {
+      showMessage("Change password failed, see details in log.", "alert alert-warning");
+    } else {
+      showMessage("Successul password updated.", "alert alert-success");
+    }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   m_changePasswordPanel = createDialog(tr("Change password").toStdString(), form);
 }
@@ -549,7 +570,6 @@ void WebMainUI::handleInternalPath(void)
     showMessage(tr("Sorry, the request resource "
                    "is not available or has been removed").toStdString(),
                 "alert alert-warning");
-    //FIXME: url not found wApp->redirect(LINK_LOGIN_PAGE);
   }
 }
 

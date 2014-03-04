@@ -30,27 +30,25 @@
 #include <QString>
 #include <QDateTime>
 #include <Wt/WColor>
+#include <memory>
 
 
 void ngrt4n::showMessage(int exitCode,
-                        const std::string& errorMsg,
-                        const std::string& successMsg, Wt::WText* infoBox)
+                         const std::string& errorMsg,
+                         const std::string& successMsg, Wt::WText* infoBox)
 {
-  Wt::WTemplate* tpl = NULL;
+  std::unique_ptr<Wt::WTemplate> tpl;
   if (exitCode != 0){
-    tpl = new Wt::WTemplate(Wt::WString::tr("error-msg-div-tpl"));
+    tpl.reset(new Wt::WTemplate(Wt::WString::tr("error-msg-div-tpl")));
     tpl->bindString("msg", errorMsg);
   } else {
-    tpl = new Wt::WTemplate(Wt::WString::tr("success-msg-div-tpl"));
+    tpl.reset(new Wt::WTemplate(Wt::WString::tr("success-msg-div-tpl")));
     tpl->bindString("msg", successMsg);
   }
 
-  if (tpl) {
-    std::ostringstream oss;
-    tpl->renderTemplate(oss);
-    infoBox->setText(oss.str());
-    delete tpl;
-  }
+  std::ostringstream oss;
+  tpl->renderTemplate(oss);
+  infoBox->setText(oss.str());
 }
 
 
@@ -63,24 +61,24 @@ std::string ngrt4n::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-  case ngrt4n::Normal:
-    cssClass.append("severity-normal");
-    break;
-  case ngrt4n::Minor:
-    cssClass.append("severity-minor");
-    break;
-  case ngrt4n::Major:
-    cssClass.append("severity-major");
-    break;
-  case ngrt4n::Critical:
-    cssClass.append("severity-critical");
-    break;
-  case ngrt4n::Unknown:
-    cssClass.append("severity-unknown");
-    break;
-  default:
-    cssClass.append("default-item-background");
-    break;
+    case ngrt4n::Normal:
+      cssClass.append("severity-normal");
+      break;
+    case ngrt4n::Minor:
+      cssClass.append("severity-minor");
+      break;
+    case ngrt4n::Major:
+      cssClass.append("severity-major");
+      break;
+    case ngrt4n::Critical:
+      cssClass.append("severity-critical");
+      break;
+    case ngrt4n::Unknown:
+      cssClass.append("severity-unknown");
+      break;
+    default:
+      cssClass.append("default-item-background");
+      break;
   }
   return cssClass;
 }
@@ -135,8 +133,8 @@ Wt::WString ngrt4n::wTimeToNow(const std::string& mytime_t)
 
 
 Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses,
-                                              const std::string& tip,
-                                              Wt::WContainerWidget* parent)
+                                               const std::string& tip,
+                                               Wt::WContainerWidget* parent)
 {
   Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
                                               " <i class=\"%1\"></i>"
@@ -153,22 +151,22 @@ Wt::WColor ngrt4n::severityWColor(const int& _criticity)
 {
   Wt::WColor color;
   switch (static_cast<ngrt4n::SeverityT>(_criticity)) {
-  case ngrt4n::Normal:
-    color = Wt::WColor("#00ff00");
-    break;
-  case ngrt4n::Minor:
-    color = Wt::WColor("#ffff00");
-    break;
-  case ngrt4n::Major:
-    color = Wt::WColor("#ffa500");
-    break;
-  case ngrt4n::Critical:
-    color = Wt::WColor("#ff0000");
-    break;
-  case ngrt4n::Unknown:
-  default:
-    color = Wt::WColor(" #c0c0c0");
-    break;
+    case ngrt4n::Normal:
+      color = Wt::WColor("#00ff00");
+      break;
+    case ngrt4n::Minor:
+      color = Wt::WColor("#ffff00");
+      break;
+    case ngrt4n::Major:
+      color = Wt::WColor("#ffa500");
+      break;
+    case ngrt4n::Critical:
+      color = Wt::WColor("#ff0000");
+      break;
+    case ngrt4n::Unknown:
+    default:
+      color = Wt::WColor(" #c0c0c0");
+      break;
   }
   return color;
 }

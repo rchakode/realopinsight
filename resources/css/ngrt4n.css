@@ -52,7 +52,7 @@ body, html {
 }
 
 .Wt-dialog .titlebar {
-  color: #FFFFFF;
+  color: #ffffff;
   background: #9dc6dd;
   cursor: move;
   font: bold 12px Verdana;
@@ -89,7 +89,7 @@ body, html {
 }
 
 .accordion-inner {
-  background: #F8F8FF; /*for panel */
+  background: #f8f8ff; /*for panel */
 }
 .form-actions {
   text-align: center;
@@ -104,7 +104,7 @@ body, html {
   background-color: #ffff00;
 }
 .severity-major { 
-  background-color: #FFA500;
+  background-color: #ffa500;
 }
 .severity-critical {
   background: #ff0000;
@@ -179,6 +179,10 @@ body, html {
 .admin-page #ngrt4n-side-pane {
   float: left;
   overflow: hidden;
+}
+
+.admin-page #ngrt4n-side-pane .ngrt4n-content {
+  background-color: #f8f8ff;
 }
 
 .admin-page #ngrt4n-side-pane li {
