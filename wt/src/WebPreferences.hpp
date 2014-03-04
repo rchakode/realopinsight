@@ -51,6 +51,7 @@ public:
   virtual ~WebPreferences();
   void show(void) {m_dialog->show();}
   Wt::WWidget* getWidget(void) {return m_dialog->contents();}
+  void setEnabledInputs(bool enable);
 
 protected :
   virtual void applyChanges(void);

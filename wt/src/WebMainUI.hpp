@@ -71,7 +71,7 @@ private:
   Settings* m_settings;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
-  WebPreferences* m_preferenceDialog;
+  WebPreferences* m_preferenceForm;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_contents;
   Wt::WStackedWidget* m_mgntContents;

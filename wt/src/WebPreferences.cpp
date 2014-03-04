@@ -225,18 +225,18 @@ void WebPreferences::promptUser(int inputType)
   Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
   std::string dialogTitle;
   switch (inputType){
-    case SourceTypeInput:
-      dialogTitle = QObject::tr("Select source type").toStdString();
-      for (const auto& src : ngrt4n::sourceTypes())
-        inputField->addItem(src.toStdString());
-      break;
-    case SourceIndexInput:
-      dialogTitle = QObject::tr("Select the source index").toStdString();
-      for (const auto& src : ngrt4n::sourceIndexes())
-        inputField->addItem(src.toStdString());
-      break;
-    default:
-      break;
+  case SourceTypeInput:
+    dialogTitle = QObject::tr("Select source type").toStdString();
+    for (const auto& src : ngrt4n::sourceTypes())
+      inputField->addItem(src.toStdString());
+    break;
+  case SourceIndexInput:
+    dialogTitle = QObject::tr("Select the source index").toStdString();
+    for (const auto& src : ngrt4n::sourceIndexes())
+      inputField->addItem(src.toStdString());
+    break;
+  default:
+    break;
   }
   inputDialog->setWindowTitle(dialogTitle);
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
@@ -260,18 +260,34 @@ void WebPreferences::promptUser(int inputType)
 void WebPreferences::handleInput(const std::string& input, int inputType)
 {
   switch(inputType) {
-    case SourceIndexInput:
-      m_currentSourceIndex = input[0]-48;
-      std::cout << "source <<" <<m_currentSourceIndex <<"\n";
-      applyChanges();
-      break;
-    default:
-      //Do nothing
-      break;
+  case SourceIndexInput:
+    m_currentSourceIndex = input[0]-48;
+    std::cout << "source <<" <<m_currentSourceIndex <<"\n";
+    applyChanges();
+    break;
+  default:
+    //Do nothing
+    break;
   }
 }
 
 void WebPreferences::addAsSource(void)
 {
   promptUser(SourceIndexInput);
+}
+
+void WebPreferences::setEnabledInputs(bool enable)
+{
+ m_monitorUrlField->setEnabled(enable);
+ m_authStringField->setEnabled(enable);
+ m_livestatusHostField->setEnabled(enable);
+ m_livestatusPortField->setEnabled(enable);
+ m_monitorTypeField->setEnabled(enable);
+ m_clearAuthStringField->setEnabled(enable);
+ m_useNgrt4ndField->setEnabled(enable);
+ m_dontVerifyCertificateField->setEnabled(enable);
+ m_updateIntervalField->setEnabled(enable);
+ m_applyChangeBtn->setEnabled(enable);
+ m_addAsSourceBtn->setEnabled(enable);
+ m_deleteSourceBtn->setEnabled(enable);
 }

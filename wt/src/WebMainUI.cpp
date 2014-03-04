@@ -57,7 +57,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_settings (new Settings()),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_preferenceDialog(new WebPreferences(m_dbSession->loggedUser().role)),
+    m_preferenceForm(new WebPreferences(m_dbSession->loggedUser().role)),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select a file").toStdString())),
     m_confdir("/var/lib/realopinsight/config"),
@@ -85,7 +85,7 @@ WebMainUI::~WebMainUI()
   //  m_navbar(NULL),
   //  m_mgntMenu(NULL),
   //  m_profileMenu(NULL),
-  delete m_preferenceDialog;
+  delete m_preferenceForm;
   delete m_fileUploadDialog;
   delete m_navbar;
   delete m_contents;
@@ -304,61 +304,61 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("notice", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+        LOG("notice", "Parsing the input file");
+        QString tmpFileName(m_uploader->spoolFileName().c_str());
+        CoreDataT cdata;
 
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+        Parser parser(tmpFileName ,&cdata);
+        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid configuration file").toStdString();
-            LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+        if (! parser.process(false)) {
+          std::string msg = tr("Invalid configuration file").toStdString();
+          LOG("warn", msg);
+          showMessage(msg, "alert alert-warning");
+        } else {
+
+          std::string filename = m_uploader->clientFileName().toUTF8();
+          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+          QFile file(tmpFileName);
+          file.copy(dest);
+          file.remove();
+
+          View view;
+          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+          view.path = dest.toStdString();
+          if (m_dbSession->addView(view) != 0){
+            showMessage(m_dbSession->lastError(), "alert alert-warning");
           } else {
-
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            View view;
-            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Number of services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
-            }
+            QString msg = tr("View added. "
+                             " Name: %1\n - "
+                             " Number of services: %2 -"
+                             " Path: %3").arg(view.name.c_str(),
+                                              QString::number(view.service_count),
+                                              view.path.c_str());
+            showMessage(msg.toStdString(), "alert alert-success");
           }
         }
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectFile.empty()) {
-        int tabIndex;
-        WebDashboard* dashbord;
-        loadView(m_selectFile, dashbord, tabIndex);
-        m_selectFile.clear();
-      } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-      }
-      break;
-    default:
-      break;
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectFile.empty()) {
+      int tabIndex;
+      WebDashboard* dashbord;
+      loadView(m_selectFile, dashbord, tabIndex);
+      m_selectFile.clear();
+    } else {
+      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+    }
+    break;
+  default:
+    break;
   }
 }
 
@@ -368,7 +368,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int&
   tabIndex = -1;
   
   dashboard = new WebDashboard(path.c_str());
-  dashboard->initialize(m_preferenceDialog);
+  dashboard->initialize(m_preferenceForm);
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
   
   if (! dashboard->errorState()) {
@@ -463,11 +463,14 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   }
 
   // setting menus
-  m_mgntContents->addWidget(m_preferenceDialog->getWidget());
+  m_mgntContents->addWidget(m_preferenceForm->getWidget());
   link = new Wt::WAnchor("#", "Monitoring Settings", m_mainWidget);
   link->clicked().connect(std::bind([=](){
-    m_mgntContents->setCurrentWidget(m_preferenceDialog->getWidget());
-    m_adminPanelTitle->setText("Update Monitoring Settings");
+    m_adminPanelTitle->setText("Monitoring Settings");
+    if (m_dbSession->loggedUser().role == User::OpRole) {
+      m_preferenceForm->setEnabledInputs(false);
+    }
+    m_mgntContents->setCurrentWidget(m_preferenceForm->getWidget());
   }));
   settingPageTpl->bindWidget("menu-monitoring-setting", link);
 
