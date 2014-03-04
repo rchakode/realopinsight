@@ -315,7 +315,7 @@ void WebMainUI::finishFileDialog(int action)
         connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
         if (! parser.process(false)) {
-          std::string msg = tr("Invalid configuration file").toStdString();
+          std::string msg = tr("Invalid description file").toStdString();
           LOG("warn", msg);
           showMessage(msg, "alert alert-warning");
         } else {
@@ -447,6 +447,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     m_mgntContents->addWidget(m_userMgntUI->userForm());
     link = new Wt::WAnchor("#", "New User", m_mainWidget);
     link->clicked().connect(std::bind([=](){
+      m_userMgntUI->userForm()->reset();
       m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
       m_adminPanelTitle->setText("Create New User");
     }));
@@ -505,7 +506,7 @@ void WebMainUI::createAccountPanel(void)
   form->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     form->showMessage(ret,
-                      "Update failed. More details in log.",
+                      "Update failed. See in log for more details.",
                       "Update completed.");}, std::placeholders::_1));
   
   m_accountPanel = createDialog(tr("Manage user account").toStdString(), form);

@@ -230,9 +230,9 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
     submitButton->setStyleClass("btn btn-success");
     cancelButton->clicked().connect(std::bind([=]() {
       m_infoBox->setText("");
+      m_infoBox->hide();
       m_model->reset();
       updateView(m_model);
-      refresh();
     }));
   }
 
@@ -349,13 +349,16 @@ UserMngtUI::UserMngtUI(DbSession* dbSession)
     m_userForm(new UserFormView(NULL, false, false)),
     m_userListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
-    m_menu(new Wt::WMenu(m_contents, Wt::Vertical, 0))
+    m_menu(new Wt::WMenu(m_contents, Wt::Vertical, 0)),
+    m_userAdded(this)
 {
   m_menu->setStyleClass("nav nav-pills");
 
   m_userForm->validated().connect(std::bind([=](User user) {
-    int ret = m_dbSession->addUser(user);
-    m_userForm->showMessage(ret, m_dbSession->lastError(), "User added.");
+    int retCode = m_dbSession->addUser(user);
+    m_userForm->showMessage(retCode, m_dbSession->lastError(), "User added.");
+    m_userAdded.emit(retCode);
+    m_userForm->reset();
   }, std::placeholders::_1));
 
   createUserList();

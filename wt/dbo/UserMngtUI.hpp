@@ -105,10 +105,13 @@ public:
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
   Wt::Signal<std::string, std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
   Wt::Signal<void>& closeTriggered(void) {return m_close;}
-
-  void showMessage(int exitCode,
-                   const std::string& errorMsg,
-                   const std::string& successMsg);
+  void showMessage(int exitCode, const std::string& errorMsg, const std::string& successMsg);
+  void reset(void)
+  {
+    m_model->reset();
+    updateView(m_model);
+    refresh();
+  }
 
 private:
   User m_user;
@@ -145,6 +148,7 @@ public:
   Wt::WContainerWidget* userListContainer(void) {return m_userListContainer;}
   void createUserList(void);
   Wt::WWidget* userListWidget(void) {return m_userListWidget;}
+  Wt::Signal<int>& userAdded(void) {return m_userAdded;}
 
 private:
   DbSession* m_dbSession;
@@ -154,6 +158,7 @@ private:
   Wt::WMenu* m_menu;
   std::map<int, Wt::WMenuItem*> m_menus;
   Wt::WWidget* m_userListWidget;
+  Wt::Signal<int> m_userAdded;
 };
 
 
