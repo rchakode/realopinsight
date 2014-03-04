@@ -415,7 +415,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   Wt::WAnchor* link = NULL;
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     // Start menu
-    link = new Wt::WAnchor("#", "Administration Home", m_mainWidget);
+    link = new Wt::WAnchor("#", "Welcome", m_mainWidget);
     Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
     m_mgntContents->addWidget(getStartPage);
     link->clicked().connect(std::bind([=](){
