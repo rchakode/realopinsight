@@ -162,7 +162,7 @@ void WebPreferences::applyChanges(void)
 void WebPreferences::deleteSource(void)
 {
   if (m_currentSourceIndex>=0 && m_currentSourceIndex < MAX_SRCS) {
-    m_sourceBox->button(m_currentSourceIndex)->setEnabled(false);
+    m_sourceBoxModel->removeRow(m_currentSourceIndex);
     m_sourceStates->setBit(m_currentSourceIndex, false);
     m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
     m_settings->sync();
@@ -189,10 +189,10 @@ void WebPreferences::fillFromSource(int _sidx)
 
 void WebPreferences::updateSourceBtnState(void)
 {
-  int size = m_sourceBox->count();
-  for (int i=0; i < size; ++i) {
-    m_sourceBox->button(i)->setEnabled(m_sourceStates->at(i));
-  }
+//FIXME:  int size = m_sourceBox->count();
+//  for (int i=0; i < size; ++i) {
+//    m_sourceBox->button(i)->setEnabled(m_sourceStates->at(i));
+//  }
 }
 
 
@@ -200,7 +200,7 @@ void WebPreferences::updateFields(void)
 {
   m_currentSourceIndex = firstSourceSet();
   if (m_currentSourceIndex >= 0) {
-    m_sourceBox->setCheckedButton(m_sourceBox->button(m_currentSourceIndex));
+    m_sourceBox->setCurrentIndex(m_currentSourceIndex);
     fillFromSource(m_currentSourceIndex);
     m_applyChangeBtn->setDisabled(false);
     m_addAsSourceBtn->setDisabled(false);
@@ -227,11 +227,11 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
 
 
-  if (! m_sourceBox->button(index)->isEnabled()) {
-    //FIXME: consider only if source is used in the loaded service view?
-    m_sourceBox->button(index)->setEnabled(true);
-    m_sourceBox->setSelectedButtonIndex(index);
-  }
+//FIXME:  if (! m_sourceBox->button(index)->isEnabled()) {
+//    //FIXME: consider only if source is used in the loaded service view?
+//    m_sourceBox->button(index)->setEnabled(true);
+//    m_sourceBox->setSelectedButtonIndex(index);
+//  }
 
   m_currentSourceIndex = index;
   updateSourceBtnState();
