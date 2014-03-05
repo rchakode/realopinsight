@@ -470,14 +470,14 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     }));
     settingPageTpl->bindWidget("menu-all-users", link);
   } else {
+    wApp->doJavaScript("$('#userMenuBlock').hide();"
+                       "$('#viewMenuBlock').hide();");
     settingPageTpl->bindEmpty("menu-get-started");
     settingPageTpl->bindEmpty("menu-import");
     settingPageTpl->bindEmpty("menu-preview");
     settingPageTpl->bindEmpty("menu-all-views");
     settingPageTpl->bindEmpty("menu-new-user");
     settingPageTpl->bindEmpty("menu-all-users");
-    wApp->doJavaScript("$('#userMenuBlock').hide();");
-    wApp->doJavaScript("$('#viewMenuBlock').hide();");
   }
 
   // setting menus
