@@ -64,6 +64,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_terminateSession(this),
     m_showSettingTab(true)
 {
+  m_preferenceForm->setEnabledInputs(false);
   createDirectory(wApp->docRoot().append("/tmp"), true); //true means clean the directory
   createMainUI();
   createViewAssignmentDialog();
@@ -469,6 +470,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_adminPanelTitle->setText("Manage Users");
     }));
     settingPageTpl->bindWidget("menu-all-users", link);
+    m_preferenceForm->setEnabledInputs(true);
   } else {
     wApp->doJavaScript("$('#userMenuBlock').hide();"
                        "$('#viewMenuBlock').hide();");
@@ -485,9 +487,6 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   link = new Wt::WAnchor("#", "Monitoring Settings", m_mainWidget);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
-    if (m_dbSession->loggedUser().role == User::OpRole) {
-      m_preferenceForm->setEnabledInputs(false);
-    }
     m_mgntContents->setCurrentWidget(m_preferenceForm->getWidget());
   }));
   settingPageTpl->bindWidget("menu-monitoring-setting", link);

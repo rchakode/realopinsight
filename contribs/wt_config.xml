@@ -227,6 +227,10 @@
 	   the built-in httpd).
          -->
 	<log-file></log-file>
+	
+	
+	<!-- Set Log level -->
+        <log-config>* -notice -info -debug</log-config>
 
 	<!-- Log response times
 
