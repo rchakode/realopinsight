@@ -34,8 +34,8 @@
 #include <Wt/WSpinBox>
 #include <Wt/WCheckBox>
 #include <Wt/WObject>
-#include <QVector>
-
+#include <Wt/WStringListModel>
+#include <memory>
 
 class QString;
 
@@ -47,7 +47,7 @@ public:
     SourceIndexInput=2
   };
 
-  WebPreferences(int _userRole);
+  WebPreferences(void);
   virtual ~WebPreferences();
   void show(void) {m_dialog->show();}
   Wt::WWidget* getWidget(void) {return m_dialog->contents();}
@@ -64,21 +64,22 @@ protected :
   virtual void deleteSource(void);
 
 private:
-  Wt::WDialog* m_dialog;
-  Wt::WLineEdit* m_monitorUrlField;
-  Wt::WLineEdit* m_authStringField;
-  Wt::WLineEdit* m_livestatusHostField;
-  Wt::WLineEdit* m_livestatusPortField;
-  Wt::WComboBox* m_monitorTypeField;
-  Wt::WCheckBox* m_clearAuthStringField;
-  Wt::WCheckBox* m_useNgrt4ndField;
-  Wt::WCheckBox* m_dontVerifyCertificateField;
-  Wt::WSpinBox* m_updateIntervalField;
-  Wt::WPushButton* m_applyChangeBtn;
-  Wt::WPushButton* m_addAsSourceBtn;
-  Wt::WPushButton* m_deleteSourceBtn;
-  Wt::WButtonGroup* m_srcBtnGroup;
-  Wt::WText* m_infoBox;
+  std::shared_ptr<Wt::WDialog> m_dialog;
+  std::shared_ptr<Wt::WText> m_infoBox;
+  std::shared_ptr<Wt::WComboBox> m_sourceBox;
+  std::shared_ptr<Wt::WStringListModel> m_sourceBoxModel;
+  std::shared_ptr<Wt::WLineEdit> m_monitorUrlField;
+  std::shared_ptr<Wt::WLineEdit> m_authStringField;
+  std::shared_ptr<Wt::WLineEdit> m_livestatusHostField;
+  std::shared_ptr<Wt::WLineEdit> m_livestatusPortField;
+  std::shared_ptr<Wt::WComboBox> m_monitorTypeField;
+  std::shared_ptr<Wt::WCheckBox> m_clearAuthStringField;
+  std::shared_ptr<Wt::WCheckBox> m_useNgrt4ndField;
+  std::shared_ptr<Wt::WCheckBox> m_dontVerifyCertificateField;
+  std::shared_ptr<Wt::WSpinBox> m_updateIntervalField;
+  std::shared_ptr<Wt::WPushButton> m_applyChangeBtn;
+  std::shared_ptr<Wt::WPushButton> m_addAsSourceBtn;
+  std::shared_ptr<Wt::WPushButton> m_deleteSourceBtn;
 
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);

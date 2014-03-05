@@ -268,7 +268,7 @@ void DbSession::initDb(void)
     adm.role = User::AdmRole;
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     addUser(adm);
-    LOG("notice", "Database created: "+m_dbPath);
+    LOG("info", "Database created: "+m_dbPath);
   } catch (dbo::Exception& ex) {
     LOG("error", "Failed initializing the database");
     LOG("error", ex.what());

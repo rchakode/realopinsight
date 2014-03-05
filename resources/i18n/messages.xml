@@ -393,18 +393,7 @@
     ${info-box}
      <div class="control-group">
        <label class="control-label">Sources&nbsp;&nbsp;</label>
-       <!--<div class="btn-group">-->
-         <span>${s0}</span>
-         <span>${s1}</span>
-         <span>${s2}</span>
-         <span>${s3}</span>
-         <span>${s4}</span>
-         <span>${s5}</span>
-         <span>${s6}</span>
-         <span>${s7}</span>
-         <span>${s8}</span>
-         <span>${s9}</span>
-      <!-- </div> -->
+       <span>${source-box}</span>
      </div>
     <div class="control-group">
       <label class="control-label">Monitor Type&nbsp;</label>

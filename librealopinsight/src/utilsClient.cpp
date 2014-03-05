@@ -216,7 +216,7 @@ QString ngrt4n::getWelcomeMsg(const QString& utility)
                                                                                    PKG_URL);
 }
 
-QString ngrt4n::source2Str(const SourceT& src)
+QString ngrt4n::sourceData2Json(const SourceT& src)
 {
   return QString("{\"sid\":\"%1\","
                  "\"mon_type\":\"%2\","

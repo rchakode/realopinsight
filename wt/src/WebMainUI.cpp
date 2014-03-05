@@ -57,7 +57,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_settings (new Settings()),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_preferenceForm(new WebPreferences(m_dbSession->loggedUser().role)),
+    m_preferenceForm(new WebPreferences()),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select a file").toStdString())),
     m_confdir("/var/lib/realopinsight/config"),
@@ -91,7 +91,7 @@ WebMainUI::~WebMainUI()
   delete m_navbar;
   delete m_contents;
   delete m_mainWidget;
-  LOG("notice", "Session closed");
+  LOG("info", "Session closed");
 }
 
 
@@ -308,7 +308,7 @@ void WebMainUI::finishFileDialog(int action)
     case IMPORT:
       if (! m_uploader->empty()) {
         if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("notice", "Parsing the input file");
+          LOG("info", "Parsing the input file");
           QString tmpFileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
 

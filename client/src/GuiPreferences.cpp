@@ -478,7 +478,7 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   src.auth = m_serverPassField->text();
   src.use_ngrt4nd = m_useNgrt4ndChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
-  m_settings->setEntry(ngrt4n::sourceKey(index), ngrt4n::source2Str(src));
+  m_settings->setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   m_sourceStates->setBit(index, true);
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());

@@ -91,7 +91,7 @@ namespace ngrt4n
                 const QString& nodeId,
                 NodeListT::const_iterator& node);
   QString getWelcomeMsg(const QString& utility);
-  QString source2Str(const SourceT& src);
+  QString sourceData2Json(const SourceT& src);
   qint32 convert2ApiType(const QString& str);
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
   QStringList sourceTypes(void);
