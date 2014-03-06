@@ -191,12 +191,15 @@ void WebPreferences::fillFromSource(int _sidx)
 void WebPreferences::updateSourceBtnState(void)
 {
   //FIXME: ensure the model is clear or remove duplication
+  Wt::WStringListModel* tmpModel = new Wt::WStringListModel(m_dialog->contents());
   for (int index=0; index< MAX_SRCS; ++index) {
     if (isSetSource(index)) {
-      m_sourceBoxModel->addString(ngrt4n::sourceId(index).toStdString());
-      m_sourceBoxModel->setData(0, 0, index, Wt::UserRole);
+      tmpModel->addString(ngrt4n::sourceId(index).toStdString());
+      tmpModel->setData(index, 0, index, Wt::UserRole);
     }
   }
+  m_sourceBox->setModel(tmpModel);
+  m_sourceBoxModel.reset(tmpModel);
 }
 
 
