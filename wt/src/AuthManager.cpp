@@ -29,10 +29,6 @@ AuthManager::AuthManager(DbSession* dbSession)
 void AuthManager::handleAuthentication(void)
 {
   if (m_dbSession->loginObject().loggedIn()) {
-
-   // Wt::WApplication::instance()->changeSessionId();
-   // refresh();
-
     m_dbSession->setLoggedUser(m_dbSession->loginObject().user().id());
 
     LoginSession sessionInfo;
