@@ -55,9 +55,10 @@ WebPreferences::WebPreferences(void)
   m_sourceBox->setModel(m_sourceBoxModel.get());
   tpl->bindWidget("source-box", m_sourceBox.get());
 
-  m_sourceBox->changed().connect(std::bind([=](){
-    //    FIXME: int selectedIndex = m_sourceBox->checkedId();
-    //    fillFromSource(selectedIndex);
+  m_sourceBox->changed().connect(std::bind([=]() {
+    Wt::WAbstractItemModel* itemModel = static_cast<Wt::WAbstractItemModel*>(m_sourceBoxModel.get());
+    int selectedIndex = boost::any_cast<int>(itemModel->data(m_sourceBox->currentIndex(), 0, Wt::UserRole));
+    fillFromSource(selectedIndex);
   }));
 
   m_monitorTypeField = std::make_shared<Wt::WComboBox>(mainContainer);
@@ -228,14 +229,7 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
   m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
-
-
-  //FIXME:  if (! m_sourceBox->button(index)->isEnabled()) {
-  //    //FIXME: consider only if source is used in the loaded service view?
-  //    m_sourceBox->button(index)->setEnabled(true);
-  //    m_sourceBox->setSelectedButtonIndex(index);
-  //  }
-
+  //FIXME: m_sourceBox->setCurrentIndex(index);
   m_currentSourceIndex = index;
   updateSourceBtnState();
 }
