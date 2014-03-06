@@ -47,6 +47,7 @@ public:
   };
 
   Preferences(void);
+  Preferences(const QString& settingFile);
   virtual ~Preferences();
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }

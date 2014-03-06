@@ -73,7 +73,7 @@ private:
   std::shared_ptr<Wt::WLineEdit> m_livestatusHostField;
   std::shared_ptr<Wt::WLineEdit> m_livestatusPortField;
   std::shared_ptr<Wt::WComboBox> m_monitorTypeField;
-  std::shared_ptr<Wt::WCheckBox> m_clearAuthStringField;
+  std::shared_ptr<Wt::WCheckBox> m_showAuthStringField;
   std::shared_ptr<Wt::WCheckBox> m_useNgrt4ndField;
   std::shared_ptr<Wt::WCheckBox> m_dontVerifyCertificateField;
   std::shared_ptr<Wt::WSpinBox> m_updateIntervalField;

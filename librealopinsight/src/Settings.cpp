@@ -40,6 +40,18 @@ const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
 
 Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
+  init();
+}
+
+
+Settings::Settings(const QString& path): QSettings(path, QSettings::NativeFormat)
+{
+  init();
+}
+
+
+void Settings::init(void)
+{
   Q_INIT_RESOURCE(ngrt4n);
   QString updateInterval = QSettings::value(Settings::UPDATE_INTERVAL_KEY).toString();
   QString admUser = QSettings::value(Settings::ADM_UNSERNAME_KEY).toString();

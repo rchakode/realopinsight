@@ -35,7 +35,7 @@
 #include <Wt/WIntValidator>
 
 WebPreferences::WebPreferences(void)
-  : Preferences()
+  : Preferences("/var/lib/realopinsight/config/realopinsight.conf")
 
 {
   m_dialog = std::make_shared<Wt::WDialog>(ngrt4n::tr("Preferences - " +APP_NAME.toStdString()));
@@ -74,49 +74,50 @@ WebPreferences::WebPreferences(void)
 
   m_monitorUrlField = std::make_shared<Wt::WLineEdit>(mainContainer);
   tpl->bindWidget("monitor-url", m_monitorUrlField.get());
-  m_monitorUrlField->setEmptyText("http://server-address/monitor");
+  m_monitorUrlField->setEmptyText("e.g. http://server.example.com/monitor");
 
   m_authStringField = std::make_shared<Wt::WLineEdit>(mainContainer);
   tpl->bindWidget("auth-string", m_authStringField.get());
   m_authStringField->setEchoMode(Wt::WLineEdit::Password);
 
+  m_showAuthStringField = std::make_shared<Wt::WCheckBox>(QObject::tr("Show in clear").toStdString(), mainContainer);
+  tpl->bindWidget("show-in-clear", m_showAuthStringField.get());
+
+  m_showAuthStringField->changed().connect(std::bind([=](){
+    if (m_showAuthStringField->isChecked()) {
+      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
+    } else {
+      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
+    }
+  }));
+
   m_livestatusHostField = std::make_shared<Wt::WLineEdit>(mainContainer);
+  m_livestatusHostField->setEmptyText("hostname/IP");
   tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
 
   m_livestatusPortField = std::make_shared<Wt::WLineEdit>(mainContainer);
-  tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
   m_livestatusPortField->setWidth(50);
-
-  m_useNgrt4ndField = std::make_shared<Wt::WCheckBox>(QObject::tr("Use ngrt4nd").toStdString(),
-                                                      mainContainer);
-  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
-
-  m_livestatusHostField->setEmptyText("server-address");
-  m_livestatusPortField->setEmptyText("1983");
+  m_livestatusPortField->setEmptyText("port");
   m_livestatusPortField->setValidator(new Wt::WIntValidator());
   m_livestatusPortField->setMaxLength(5);
+  tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
 
-  m_dontVerifyCertificateField = std::make_shared<Wt::WCheckBox>(QObject::tr("Don't verify SSL certificate").toStdString(),
-                                                                 mainContainer);
+  m_useNgrt4ndField = std::make_shared<Wt::WCheckBox>(QObject::tr("Use ngrt4nd").toStdString(), mainContainer);
+  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
+
+  m_dontVerifyCertificateField = std::make_shared<Wt::WCheckBox>(QObject::tr("Don't verify SSL certificate").toStdString(),mainContainer);
   tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField.get());
-
-  m_clearAuthStringField = std::make_shared<Wt::WCheckBox>(QObject::tr("Show in clear").toStdString(),
-                                                           mainContainer);
-  tpl->bindWidget("show-in-clear", m_clearAuthStringField.get());
 
   m_updateIntervalField = std::make_shared<Wt::WSpinBox>(mainContainer);
   tpl->bindWidget("update-interval", m_updateIntervalField.get());
 
-  m_applyChangeBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Apply changes").toStdString(),
-                                                       mainContainer);
+  m_applyChangeBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Apply changes").toStdString(), mainContainer);
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
 
-  m_addAsSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Add as source").toStdString(),
-                                                       mainContainer);
+  m_addAsSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Add as source").toStdString(), mainContainer);
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
 
-  m_deleteSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Delete source").toStdString(),
-                                                        mainContainer);
+  m_deleteSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Delete source").toStdString(), mainContainer);
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
@@ -126,14 +127,6 @@ WebPreferences::WebPreferences(void)
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
   m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-
-  m_clearAuthStringField->changed().connect(std::bind([=](){
-    if (m_clearAuthStringField->isChecked()) {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
-    } else {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
-    }
-  }));
 
   m_updateIntervalField->setMinimum(5);
   m_updateIntervalField->setMaximum(1200);
@@ -191,15 +184,12 @@ void WebPreferences::fillFromSource(int _sidx)
 void WebPreferences::updateSourceBtnState(void)
 {
   //FIXME: ensure the model is clear or remove duplication
-  Wt::WStringListModel* tmpModel = new Wt::WStringListModel(m_dialog->contents());
   for (int index=0; index< MAX_SRCS; ++index) {
     if (isSetSource(index)) {
-      tmpModel->addString(ngrt4n::sourceId(index).toStdString());
-      tmpModel->setData(index, 0, index, Wt::UserRole);
+      m_sourceBoxModel->addString(ngrt4n::sourceId(index).toStdString());
+      m_sourceBoxModel->setData(index, 0, index, Wt::UserRole);
     }
   }
-  m_sourceBox->setModel(tmpModel);
-  m_sourceBoxModel.reset(tmpModel);
 }
 
 
@@ -306,7 +296,7 @@ void WebPreferences::setEnabledInputs(bool enable)
   m_livestatusHostField->setEnabled(enable);
   m_livestatusPortField->setEnabled(enable);
   m_monitorTypeField->setEnabled(enable);
-  m_clearAuthStringField->setEnabled(enable);
+  m_showAuthStringField->setEnabled(enable);
   m_useNgrt4ndField->setEnabled(enable);
   m_dontVerifyCertificateField->setEnabled(enable);
   m_updateIntervalField->setEnabled(enable);

@@ -405,7 +405,7 @@
       <span>${dont-verify-ssl-certificate}</span>
     </div>
     <div class="control-group">
-      <label class="control-label">Livestatus Host&nbsp;</label>
+      <label class="control-label">Livestatus Socket&nbsp;</label>
       <span>${livestatus-server}</span>
       <span>${livestatus-port}</span>
       <span>${use-ngrt4nd}</span>

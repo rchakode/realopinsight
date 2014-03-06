@@ -33,6 +33,8 @@ class LIBREALOPINSIGHTSHARED_EXPORT Settings : public QSettings
   Q_OBJECT
 public:
   Settings();
+  Settings(const QString& path);
+  void init(void);
   virtual ~Settings(){}
   void setKeyValue(const QString & _key, const QString & _value);
   qint32 updateInterval() const;

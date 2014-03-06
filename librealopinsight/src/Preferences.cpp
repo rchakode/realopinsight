@@ -38,6 +38,13 @@ Preferences::Preferences(void)
 {
 }
 
+Preferences::Preferences(const QString& settingFile)
+  : m_settings(new Settings(settingFile)),
+    m_currentSourceIndex(0),
+    m_sourceStates(new QBitArray(MAX_SRCS))
+{
+}
+
 Preferences::~Preferences()
 {
 }
