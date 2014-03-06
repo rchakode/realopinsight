@@ -51,19 +51,13 @@ WebPreferences::WebPreferences(void)
   tpl->bindWidget("info-box", m_infoBox.get());
 
   m_sourceBox = std::make_shared<Wt::WComboBox>(mainContainer);
-  m_sourceBoxModel = std::make_shared<Wt::WStringListModel>(m_sourceBox);
-  for (int index=0; index< MAX_SRCS; ++index) {
-    if (isSetSource(index)) {
-      m_sourceBoxModel->addString(ngrt4n::sourceId(index).toStdString());
-      m_sourceBoxModel->setData(0, 0, index, Wt::UserRole);
-    }
-  }
+  m_sourceBoxModel = std::make_shared<Wt::WStringListModel>(m_sourceBox.get());
   m_sourceBox->setModel(m_sourceBoxModel.get());
   tpl->bindWidget("source-box", m_sourceBox.get());
 
   m_sourceBox->changed().connect(std::bind([=](){
-//    FIXME: int selectedIndex = m_sourceBox->checkedId();
-//    fillFromSource(selectedIndex);
+    //    FIXME: int selectedIndex = m_sourceBox->checkedId();
+    //    fillFromSource(selectedIndex);
   }));
 
   m_monitorTypeField = std::make_shared<Wt::WComboBox>(mainContainer);
@@ -92,7 +86,8 @@ WebPreferences::WebPreferences(void)
   tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
   m_livestatusPortField->setWidth(50);
 
-  m_useNgrt4ndField = std::make_shared<Wt::WLineEdit>(QObject::tr("Use ngrt4nd"), mainContainer);
+  m_useNgrt4ndField = std::make_shared<Wt::WCheckBox>(QObject::tr("Use ngrt4nd").toStdString(),
+                                                      mainContainer);
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
 
   m_livestatusHostField->setEmptyText("server-address");
@@ -100,22 +95,27 @@ WebPreferences::WebPreferences(void)
   m_livestatusPortField->setValidator(new Wt::WIntValidator());
   m_livestatusPortField->setMaxLength(5);
 
-  m_dontVerifyCertificateField = std::make_shared<Wt::WCheckBox>(QObject::tr("Don't verify SSL certificate"), mainContainer);
+  m_dontVerifyCertificateField = std::make_shared<Wt::WCheckBox>(QObject::tr("Don't verify SSL certificate").toStdString(),
+                                                                 mainContainer);
   tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField.get());
 
-  m_clearAuthStringField = std::make_shared<Wt::WCheckBox>(QObject::tr("Show in clear"), mainContainer);
+  m_clearAuthStringField = std::make_shared<Wt::WCheckBox>(QObject::tr("Show in clear").toStdString(),
+                                                           mainContainer);
   tpl->bindWidget("show-in-clear", m_clearAuthStringField.get());
 
   m_updateIntervalField = std::make_shared<Wt::WSpinBox>(mainContainer);
   tpl->bindWidget("update-interval", m_updateIntervalField.get());
 
-  m_applyChangeBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Apply changes"), mainContainer);
+  m_applyChangeBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Apply changes").toStdString(),
+                                                       mainContainer);
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
 
-  m_addAsSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Add as source"), mainContainer);
+  m_addAsSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Add as source").toStdString(),
+                                                       mainContainer);
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
 
-  m_deleteSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Delete source"), mainContainer);
+  m_deleteSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Delete source").toStdString(),
+                                                        mainContainer);
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
@@ -189,10 +189,13 @@ void WebPreferences::fillFromSource(int _sidx)
 
 void WebPreferences::updateSourceBtnState(void)
 {
-//FIXME:  int size = m_sourceBox->count();
-//  for (int i=0; i < size; ++i) {
-//    m_sourceBox->button(i)->setEnabled(m_sourceStates->at(i));
-//  }
+  //FIXME: ensure the model is clear or remove duplication
+  for (int index=0; index< MAX_SRCS; ++index) {
+    if (isSetSource(index)) {
+      m_sourceBoxModel->addString(ngrt4n::sourceId(index).toStdString());
+      m_sourceBoxModel->setData(0, 0, index, Wt::UserRole);
+    }
+  }
 }
 
 
@@ -227,11 +230,11 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
 
 
-//FIXME:  if (! m_sourceBox->button(index)->isEnabled()) {
-//    //FIXME: consider only if source is used in the loaded service view?
-//    m_sourceBox->button(index)->setEnabled(true);
-//    m_sourceBox->setSelectedButtonIndex(index);
-//  }
+  //FIXME:  if (! m_sourceBox->button(index)->isEnabled()) {
+  //    //FIXME: consider only if source is used in the loaded service view?
+  //    m_sourceBox->button(index)->setEnabled(true);
+  //    m_sourceBox->setSelectedButtonIndex(index);
+  //  }
 
   m_currentSourceIndex = index;
   updateSourceBtnState();
@@ -248,18 +251,18 @@ void WebPreferences::promptUser(int inputType)
   Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
   std::string dialogTitle;
   switch (inputType){
-    case SourceTypeInput:
-      dialogTitle = QObject::tr("Select source type").toStdString();
-      for (const auto& src : ngrt4n::sourceTypes())
-        inputField->addItem(src.toStdString());
-      break;
-    case SourceIndexInput:
-      dialogTitle = QObject::tr("Select the source index").toStdString();
-      for (const auto& src : ngrt4n::sourceIndexes())
-        inputField->addItem(src.toStdString());
-      break;
-    default:
-      break;
+  case SourceTypeInput:
+    dialogTitle = QObject::tr("Select source type").toStdString();
+    for (const auto& src : ngrt4n::sourceTypes())
+      inputField->addItem(src.toStdString());
+    break;
+  case SourceIndexInput:
+    dialogTitle = QObject::tr("Select the source index").toStdString();
+    for (const auto& src : ngrt4n::sourceIndexes())
+      inputField->addItem(src.toStdString());
+    break;
+  default:
+    break;
   }
   inputDialog->setWindowTitle(dialogTitle);
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
@@ -283,14 +286,14 @@ void WebPreferences::promptUser(int inputType)
 void WebPreferences::handleInput(const std::string& input, int inputType)
 {
   switch(inputType) {
-    case SourceIndexInput:
-      m_currentSourceIndex = input[0]-48;
-      std::cout << "source <<" <<m_currentSourceIndex <<"\n";
-      applyChanges();
-      break;
-    default:
-      //Do nothing
-      break;
+  case SourceIndexInput:
+    m_currentSourceIndex = input[0]-48;
+    std::cout << "source <<" <<m_currentSourceIndex <<"\n";
+    applyChanges();
+    break;
+  default:
+    //Do nothing
+    break;
   }
 }
 
