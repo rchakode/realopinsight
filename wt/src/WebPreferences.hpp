@@ -35,6 +35,7 @@
 #include <Wt/WCheckBox>
 #include <Wt/WObject>
 #include <Wt/WStringListModel>
+#include <Wt/WLengthValidator>
 #include <memory>
 
 class QString;
@@ -83,6 +84,8 @@ private:
 
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);
+  Wt::WIntValidator* createPortValidator(void);
+  Wt::WLengthValidator* createTextValidator(void);
 };
 
 #endif // WEBSESSION_HPP

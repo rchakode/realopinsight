@@ -73,8 +73,9 @@ WebPreferences::WebPreferences(void)
   }, std::placeholders::_1));
 
   m_monitorUrlField = std::make_shared<Wt::WLineEdit>(mainContainer);
-  tpl->bindWidget("monitor-url", m_monitorUrlField.get());
+  m_monitorUrlField->setValidator(createTextValidator());
   m_monitorUrlField->setEmptyText("e.g. http://server.example.com/monitor");
+  tpl->bindWidget("monitor-url", m_monitorUrlField.get());
 
   m_authStringField = std::make_shared<Wt::WLineEdit>(mainContainer);
   tpl->bindWidget("auth-string", m_authStringField.get());
@@ -93,12 +94,13 @@ WebPreferences::WebPreferences(void)
 
   m_livestatusHostField = std::make_shared<Wt::WLineEdit>(mainContainer);
   m_livestatusHostField->setEmptyText("hostname/IP");
+  m_livestatusHostField->setValidator(createTextValidator());
   tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
 
   m_livestatusPortField = std::make_shared<Wt::WLineEdit>(mainContainer);
   m_livestatusPortField->setWidth(50);
+  m_livestatusPortField->setValidator(createPortValidator());
   m_livestatusPortField->setEmptyText("port");
-  m_livestatusPortField->setValidator(new Wt::WIntValidator());
   m_livestatusPortField->setMaxLength(5);
   tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
 
@@ -238,18 +240,18 @@ void WebPreferences::promptUser(int inputType)
   Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
   std::string dialogTitle;
   switch (inputType){
-  case SourceTypeInput:
-    dialogTitle = QObject::tr("Select source type").toStdString();
-    for (const auto& src : ngrt4n::sourceTypes())
-      inputField->addItem(src.toStdString());
-    break;
-  case SourceIndexInput:
-    dialogTitle = QObject::tr("Select the source index").toStdString();
-    for (const auto& src : ngrt4n::sourceIndexes())
-      inputField->addItem(src.toStdString());
-    break;
-  default:
-    break;
+    case SourceTypeInput:
+      dialogTitle = QObject::tr("Select source type").toStdString();
+      for (const auto& src : ngrt4n::sourceTypes())
+        inputField->addItem(src.toStdString());
+      break;
+    case SourceIndexInput:
+      dialogTitle = QObject::tr("Select the source index").toStdString();
+      for (const auto& src : ngrt4n::sourceIndexes())
+        inputField->addItem(src.toStdString());
+      break;
+    default:
+      break;
   }
   inputDialog->setWindowTitle(dialogTitle);
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
@@ -273,14 +275,14 @@ void WebPreferences::promptUser(int inputType)
 void WebPreferences::handleInput(const std::string& input, int inputType)
 {
   switch(inputType) {
-  case SourceIndexInput:
-    m_currentSourceIndex = input[0]-48;
-    std::cout << "source <<" <<m_currentSourceIndex <<"\n";
-    applyChanges();
-    break;
-  default:
-    //Do nothing
-    break;
+    case SourceIndexInput:
+      m_currentSourceIndex = input[0]-48;
+      std::cout << "source <<" <<m_currentSourceIndex <<"\n";
+      applyChanges();
+      break;
+    default:
+      //Do nothing
+      break;
   }
 }
 
@@ -303,4 +305,20 @@ void WebPreferences::setEnabledInputs(bool enable)
   m_applyChangeBtn->setEnabled(enable);
   m_addAsSourceBtn->setEnabled(enable);
   m_deleteSourceBtn->setEnabled(enable);
+}
+
+
+Wt::WIntValidator* WebPreferences::createPortValidator(void)
+{
+  Wt::WIntValidator* validator = new Wt::WIntValidator();
+  validator->setRange(1, 65535);
+  return validator;
+}
+
+
+Wt::WLengthValidator* WebPreferences::createTextValidator(void)
+{
+  Wt::WLengthValidator* validator = new Wt::WLengthValidator();
+  validator->setMaximumLength(1);
+  return validator;
 }

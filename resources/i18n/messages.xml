@@ -392,7 +392,7 @@
   <div class="form-horizontal">
     ${info-box}
      <div class="control-group">
-       <label class="control-label">Sources&nbsp;&nbsp;</label>
+       <label class="control-label">Source&nbsp;</label>
        <span>${source-box}</span>
      </div>
     <div class="control-group">
