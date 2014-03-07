@@ -53,6 +53,7 @@ public:
   void show(void) {m_dialog->show();}
   Wt::WWidget* getWidget(void) {return m_dialog->contents();}
   void setEnabledInputs(bool enable);
+  Wt::Signal<std::string>& errorOccurred() {return m_errorOccurred;}
 
 protected :
   virtual void applyChanges(void);
@@ -66,7 +67,6 @@ protected :
 
 private:
   std::shared_ptr<Wt::WDialog> m_dialog;
-  std::shared_ptr<Wt::WText> m_infoBox;
   std::shared_ptr<Wt::WComboBox> m_sourceBox;
   std::shared_ptr<Wt::WStringListModel> m_sourceBoxModel;
   std::shared_ptr<Wt::WLineEdit> m_monitorUrlField;
@@ -81,12 +81,14 @@ private:
   std::shared_ptr<Wt::WPushButton> m_applyChangeBtn;
   std::shared_ptr<Wt::WPushButton> m_addAsSourceBtn;
   std::shared_ptr<Wt::WPushButton> m_deleteSourceBtn;
+  Wt::Signal<std::string> m_errorOccurred;
 
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);
   Wt::WIntValidator* createPortValidator(void);
   Wt::WLengthValidator* createTextValidator(void);
-  int getSourceGlobalIndex(Wt::WStringListModel* model, int sourceBoxIndex);
+  int getSourceGlobalIndex(int sourceBoxIndex);
+  int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);
 };
 

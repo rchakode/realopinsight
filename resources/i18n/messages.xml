@@ -390,42 +390,51 @@
 
 <message id="setting-page.tpl">
   <div class="form-horizontal">
-    ${info-box}
+    <fieldset>
+     <h6>Generic Settings</h6>
      <div class="control-group">
        <label class="control-label">Source&nbsp;</label>
        <span>${source-box}</span>
+       <span>Monitor Type&nbsp;</span>
+       <span>${monitor-type}</span>
      </div>
-    <div class="control-group">
-      <label class="control-label">Monitor Type&nbsp;</label>
-      <span>${monitor-type}</span>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Monitor Web URL&nbsp;</label>
+
+     <div class="control-group">
+      <label class="control-label">Update Interval&nbsp;</label>
+      <span>${update-interval}</span>
+      <span>&nbsp;seconds</span>
+     </div>
+    </fieldset>
+
+    <fieldset>
+     <h6>Monitor Web Access</h6>
+     <div class="control-group">
+      <label class="control-label">URL&nbsp;</label>
       <span>${monitor-url}</span>
       <span>${dont-verify-ssl-certificate}</span>
-    </div>
+     </div>
+    </fieldset>
+    <fieldset>
+    <h6>Livestatus Socket</h6>
     <div class="control-group">
-      <label class="control-label">Livestatus Socket&nbsp;</label>
+      <label class="control-label">Host&nbsp;</label>
       <span>${livestatus-server}</span>
+      <span>Port</span>
       <span>${livestatus-port}</span>
       <span>${use-ngrt4nd}</span>
     </div>
+    </fieldset>
     <div class="control-group">
       <label class="control-label">Auth String&nbsp;</label>
       <span>${auth-string}</span>
       <span>${show-in-clear}</span>
     </div>
-    <div class="control-group">
-      <label class="control-label">Update Interval&nbsp;</label>
-      <span>${update-interval}</span>
-      <span>&nbsp;seconds</span>
-    </div>
 
-     <div class="form-actions">
-        <span>${apply-change-button}</span>
-        <span>${add-as-source-button}</span>
-        <span>${delete-button}</span>
-   </div>
+    <div class="form-actions">
+      <span>${apply-change-button}</span>
+      <span>${add-as-source-button}</span>
+      <span>${delete-button}</span>
+    </div>
  </div>
 </message>
 

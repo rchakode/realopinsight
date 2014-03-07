@@ -65,6 +65,8 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_showSettingTab(true)
 {
   m_preferenceForm->setEnabledInputs(false);
+  m_preferenceForm->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this,
+                                                      std::placeholders::_1, "alert alert-warning"));
   createDirectory(wApp->docRoot().append("/tmp"), true); //true means clean the directory
   createMainUI();
   createViewAssignmentDialog();

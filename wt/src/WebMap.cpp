@@ -181,9 +181,6 @@ void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
                                           40 * m_scaleX, 40 * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(ngrt4n::getNodeToolTip(_node).toUtf8()));
-  //  area->clicked().connect(std::bind([=](){
-  //    qDebug() << "node "<< _node.name << _node.visibility;
-  //  }));
   addArea(area);
 }
 

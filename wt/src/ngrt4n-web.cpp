@@ -23,7 +23,7 @@ protected:
     setTwoPhaseRenderingThreshold(0);
     useStyleSheet("/resources/css/ngrt4n.css");
     useStyleSheet("/resources/css/font-awesome.min.css");
-    messageResourceBundle().use("resources/i18n/messages");
+    messageResourceBundle().use(docRoot()+"/resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
     requireJQuery("/resources/js/jquery-1.10.2.min.js");
     m_dbSession = new DbSession();
@@ -66,9 +66,9 @@ int main(int argc, char **argv)
   RealOpInsightQApp* qtApp = new RealOpInsightQApp(argc, argv);
 
   try {
-    std::string configurationFile = "/var/lib/realopinsight/config/wt_config.xml";
+    std::string configurationFile = "/opt/install/etc/wt_config.xml";
     Wt::WServer server(argv[0], configurationFile);
-    server.setServerConfiguration(argc, argv, configurationFile);
+    server.setServerConfiguration(argc, argv);
     server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication);
 
     DbSession::configureAuth();

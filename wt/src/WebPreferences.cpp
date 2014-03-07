@@ -34,8 +34,16 @@
 #include <Wt/WPushButton>
 #include <Wt/WIntValidator>
 
+
+#define VALIDATE_FIELDS()   if (m_monitorTypeField->validate() != Wt::WValidator::Valid \
+  || m_livestatusPortField->validate() != Wt::WValidator::Valid \
+  || m_monitorTypeField->currentIndex() <= 0) { \
+  m_errorOccurred.emit(QObject::tr("Please verify the monitor type and fix field(s) in red").toStdString());\
+  return; \
+  }
 WebPreferences::WebPreferences(void)
-  : Preferences("/var/lib/realopinsight/config/realopinsight.conf")
+  : Preferences("/var/lib/realopinsight/config/realopinsight.conf"),
+    m_errorOccurred(this)
 
 {
   m_dialog = std::make_shared<Wt::WDialog>(ngrt4n::tr("Preferences - " +APP_NAME.toStdString()));
@@ -47,28 +55,21 @@ WebPreferences::WebPreferences(void)
 
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), mainContainer);
 
-  m_infoBox = std::make_shared<Wt::WText>("", mainContainer);
-  tpl->bindWidget("info-box", m_infoBox.get());
-
   m_sourceBox = std::make_shared<Wt::WComboBox>(mainContainer);
   m_sourceBoxModel = std::make_shared<Wt::WStringListModel>(m_sourceBox.get());
   m_sourceBox->setModel(m_sourceBoxModel.get());
   tpl->bindWidget("source-box", m_sourceBox.get());
 
   m_sourceBox->changed().connect(std::bind([=]() {
-    fillFromSource(getSourceGlobalIndex(m_sourceBoxModel.get(), m_sourceBox->currentIndex());
+    fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
   }));
 
   m_monitorTypeField = std::make_shared<Wt::WComboBox>(mainContainer);
   tpl->bindWidget("monitor-type", m_monitorTypeField.get());
   m_monitorTypeField->addItem(ngrt4n::tr("Select a monitor type"));
-  for (const auto& srcid: ngrt4n::sourceTypes())
+  for (const auto& srcid: ngrt4n::sourceTypes()) {
     m_monitorTypeField->addItem(srcid.toStdString());
-  m_monitorTypeField->activated().connect(std::bind([=](int index){
-    bool enable = index>0;
-    m_applyChangeBtn->setDisabled(! enable);
-    m_addAsSourceBtn->setDisabled(! enable);
-  }, std::placeholders::_1));
+  }
 
   m_monitorUrlField = std::make_shared<Wt::WLineEdit>(mainContainer);
   m_monitorUrlField->setValidator(createTextValidator());
@@ -146,11 +147,17 @@ WebPreferences::~WebPreferences()
 
 void WebPreferences::applyChanges(void)
 {
+  VALIDATE_FIELDS();
+
   if ( m_monitorTypeField->currentIndex() <= 0) {
-    ngrt4n::showMessage(-1, ngrt4n::tr("Bad monitor type"), "", m_infoBox.get());
-  } else {
-    saveAsSource(m_currentSourceIndex, m_monitorTypeField->currentText().toUTF8().c_str());
+    m_errorOccurred.emit(QObject::tr("Bad monitor type").toStdString());
+    return;
   }
+  if (m_currentSourceIndex < 0) {
+    m_errorOccurred.emit(QObject::tr("Bad index for source (%1)").arg(m_currentSourceIndex).toStdString());
+    return;
+  }
+  saveAsSource(m_currentSourceIndex, m_monitorTypeField->currentText().toUTF8().c_str());
 }
 
 void WebPreferences::deleteSource(void)
@@ -175,7 +182,7 @@ void WebPreferences::fillFromSource(int _sidx)
   m_authStringField->setText(src.auth.toStdString());
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
   m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
-  m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Unchecked : Wt::Checked);
+  m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
   m_updateIntervalField->setValue(m_settings->updateInterval());
   m_currentSourceIndex = _sidx;
 }
@@ -187,9 +194,10 @@ void WebPreferences::updateAllSourceWidgetStates(void)
   for (int index=0; index< MAX_SRCS; ++index) {
     if (isSetSource(index)) {
       m_sourceBoxModel->addString(ngrt4n::sourceId(index).toStdString());
-      m_sourceBoxModel->setData(index, 0, index, Wt::UserRole);
+      m_sourceBoxModel->setData(m_sourceBoxModel->rowCount() - 1, 0, index, Wt::UserRole);
     }
   }
+  m_sourceBoxModel->sort(0);
 }
 
 
@@ -222,9 +230,8 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
   m_settings->sync();
   m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
-  //FIXME: m_sourceBox->setCurrentIndex(index);
   addToSourceBox(index);
-  m_currentSourceIndex = index;
+  m_sourceBox->setCurrentIndex(findSourceIndexInBox(index));
 }
 
 
@@ -275,7 +282,6 @@ void WebPreferences::handleInput(const std::string& input, int inputType)
   switch(inputType) {
   case SourceIndexInput:
     m_currentSourceIndex = input[0]-48;
-    std::cout << "source <<" <<m_currentSourceIndex <<"\n";
     applyChanges();
     break;
   default:
@@ -286,6 +292,7 @@ void WebPreferences::handleInput(const std::string& input, int inputType)
 
 void WebPreferences::addAsSource(void)
 {
+  VALIDATE_FIELDS();
   promptUser(SourceIndexInput);
 }
 
@@ -317,28 +324,29 @@ Wt::WIntValidator* WebPreferences::createPortValidator(void)
 Wt::WLengthValidator* WebPreferences::createTextValidator(void)
 {
   Wt::WLengthValidator* validator = new Wt::WLengthValidator();
-  validator->setMaximumLength(1);
+  validator->setMinimumLength(1);
   return validator;
 }
 
-int WebPreferences::getSourceGlobalIndex(Wt::WStringListModel* model, int sourceBoxIndex)
+int WebPreferences::getSourceGlobalIndex(int sourceBoxIndex)
 {
-  return boost::any_cast<int>(static_cast<Wt::WAbstractItemModel*>(model.get())->data(sourceBoxIndex, 0, Wt::UserRole));
+  return boost::any_cast<int>(static_cast<Wt::WAbstractItemModel*>(m_sourceBoxModel.get())->data(sourceBoxIndex, 0, Wt::UserRole));
+}
+
+
+int WebPreferences::findSourceIndexInBox(int sourceGlobalIndex)
+{
+  int index = m_sourceBoxModel->rowCount() - 1;
+  while (index >= 0 && (getSourceGlobalIndex(index) != sourceGlobalIndex)) --index;
+  return index;
 }
 
 void WebPreferences::addToSourceBox(int sourceGlobalIndex)
 {
-  int index = -1;
-  for (int i: m_sourceBoxModel->rowCount()) {
-    if (getSourceGlobalIndex(m_sourceBoxModel, i) == sourceGlobalIndex) {
-      index = i;
-      break;
-    }
-  }
-  if (index == -1) {
-
-  } else {
-
+  int index = findSourceIndexInBox(sourceGlobalIndex);
+  if (index < 0) {
+    m_sourceBoxModel->addString(ngrt4n::sourceId(sourceGlobalIndex).toStdString());
+    m_sourceBoxModel->setData(m_sourceBoxModel->rowCount() - 1, 0, sourceGlobalIndex, Wt::UserRole);
   }
   m_sourceBoxModel->sort(0);
 }

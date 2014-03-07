@@ -92,7 +92,7 @@ TARGET = realopinsight.fcgi
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
-LIBS += -lwt -lwtfcgi -lwtdbo -lwtdbosqlite3 \
+LIBS += -lwt -lwthttp -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options-mt -lboost_system-mt \
         -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt \
         -lboost_filesystem-mt -lboost_date_time-mt
