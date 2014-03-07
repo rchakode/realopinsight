@@ -120,7 +120,7 @@ QString GuiPreferences::letUserSelectType(void)
 
 
 
-void GuiPreferences::updateSourceBtnState(void)
+void GuiPreferences::updateAllSourceWidgetStates(void)
 {
   int size = m_sourceBtns.size();
   for (int i=0; i < size; ++i) {
@@ -491,7 +491,7 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   }
 
   m_currentSourceIndex = index;
-  updateSourceBtnState();
+  updateAllSourceWidgetStates();
   m_sourceBtns.at(m_currentSourceIndex)->click();
 }
 

@@ -44,7 +44,7 @@ protected :
   virtual void applyChanges(void);
   virtual void handleCancel(void);
   virtual void fillFromSource(int _sidx);
-  virtual void updateSourceBtnState(void);
+  virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
   virtual void saveAsSource(const qint32& index, const QString& type);
   virtual void addAsSource(void);

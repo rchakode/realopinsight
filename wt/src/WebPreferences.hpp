@@ -58,7 +58,7 @@ protected :
   virtual void applyChanges(void);
   void handleCancel(void) {m_dialog->accept();}
   virtual void fillFromSource(int _sidx);
-  virtual void updateSourceBtnState(void);
+  virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
   virtual void saveAsSource(const qint32& index, const QString& type);
   virtual void addAsSource(void);
@@ -86,6 +86,8 @@ private:
   void handleInput(const std::string& input, int inputType);
   Wt::WIntValidator* createPortValidator(void);
   Wt::WLengthValidator* createTextValidator(void);
+  int getSourceGlobalIndex(Wt::WStringListModel* model, int sourceBoxIndex);
+  void addToSourceBox(int sourceGlobalIndex);
 };
 
 #endif // WEBSESSION_HPP

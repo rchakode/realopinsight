@@ -56,9 +56,7 @@ WebPreferences::WebPreferences(void)
   tpl->bindWidget("source-box", m_sourceBox.get());
 
   m_sourceBox->changed().connect(std::bind([=]() {
-    Wt::WAbstractItemModel* itemModel = static_cast<Wt::WAbstractItemModel*>(m_sourceBoxModel.get());
-    int selectedIndex = boost::any_cast<int>(itemModel->data(m_sourceBox->currentIndex(), 0, Wt::UserRole));
-    fillFromSource(selectedIndex);
+    fillFromSource(getSourceGlobalIndex(m_sourceBoxModel.get(), m_sourceBox->currentIndex());
   }));
 
   m_monitorTypeField = std::make_shared<Wt::WComboBox>(mainContainer);
@@ -183,7 +181,7 @@ void WebPreferences::fillFromSource(int _sidx)
 }
 
 
-void WebPreferences::updateSourceBtnState(void)
+void WebPreferences::updateAllSourceWidgetStates(void)
 {
   //FIXME: ensure the model is clear or remove duplication
   for (int index=0; index< MAX_SRCS; ++index) {
@@ -225,8 +223,8 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   m_settings->sync();
   m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
   //FIXME: m_sourceBox->setCurrentIndex(index);
+  addToSourceBox(index);
   m_currentSourceIndex = index;
-  updateSourceBtnState();
 }
 
 
@@ -240,18 +238,18 @@ void WebPreferences::promptUser(int inputType)
   Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
   std::string dialogTitle;
   switch (inputType){
-    case SourceTypeInput:
-      dialogTitle = QObject::tr("Select source type").toStdString();
-      for (const auto& src : ngrt4n::sourceTypes())
-        inputField->addItem(src.toStdString());
-      break;
-    case SourceIndexInput:
-      dialogTitle = QObject::tr("Select the source index").toStdString();
-      for (const auto& src : ngrt4n::sourceIndexes())
-        inputField->addItem(src.toStdString());
-      break;
-    default:
-      break;
+  case SourceTypeInput:
+    dialogTitle = QObject::tr("Select source type").toStdString();
+    for (const auto& src : ngrt4n::sourceTypes())
+      inputField->addItem(src.toStdString());
+    break;
+  case SourceIndexInput:
+    dialogTitle = QObject::tr("Select the source index").toStdString();
+    for (const auto& src : ngrt4n::sourceIndexes())
+      inputField->addItem(src.toStdString());
+    break;
+  default:
+    break;
   }
   inputDialog->setWindowTitle(dialogTitle);
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
@@ -275,14 +273,14 @@ void WebPreferences::promptUser(int inputType)
 void WebPreferences::handleInput(const std::string& input, int inputType)
 {
   switch(inputType) {
-    case SourceIndexInput:
-      m_currentSourceIndex = input[0]-48;
-      std::cout << "source <<" <<m_currentSourceIndex <<"\n";
-      applyChanges();
-      break;
-    default:
-      //Do nothing
-      break;
+  case SourceIndexInput:
+    m_currentSourceIndex = input[0]-48;
+    std::cout << "source <<" <<m_currentSourceIndex <<"\n";
+    applyChanges();
+    break;
+  default:
+    //Do nothing
+    break;
   }
 }
 
@@ -321,4 +319,26 @@ Wt::WLengthValidator* WebPreferences::createTextValidator(void)
   Wt::WLengthValidator* validator = new Wt::WLengthValidator();
   validator->setMaximumLength(1);
   return validator;
+}
+
+int WebPreferences::getSourceGlobalIndex(Wt::WStringListModel* model, int sourceBoxIndex)
+{
+  return boost::any_cast<int>(static_cast<Wt::WAbstractItemModel*>(model.get())->data(sourceBoxIndex, 0, Wt::UserRole));
+}
+
+void WebPreferences::addToSourceBox(int sourceGlobalIndex)
+{
+  int index = -1;
+  for (int i: m_sourceBoxModel->rowCount()) {
+    if (getSourceGlobalIndex(m_sourceBoxModel, i) == sourceGlobalIndex) {
+      index = i;
+      break;
+    }
+  }
+  if (index == -1) {
+
+  } else {
+
+  }
+  m_sourceBoxModel->sort(0);
 }

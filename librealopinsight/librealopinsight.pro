@@ -22,6 +22,7 @@ QT       += core xml network script
 
 TARGET = realopinsight
 TEMPLATE = lib
+CONFIG+= staticlib
 LIBS += -lzmq
 VERSION=1.0.0
 

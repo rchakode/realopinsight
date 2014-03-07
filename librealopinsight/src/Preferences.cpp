@@ -67,7 +67,7 @@ QString Preferences::getSourceStatesSerialized(void)
 void Preferences::initSourceStates(void)
 {
   initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
-  updateSourceBtnState();
+  updateAllSourceWidgetStates();
 }
 
 void Preferences::initSourceStates(const QString& str)
