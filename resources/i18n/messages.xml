@@ -458,7 +458,7 @@
 <message id="notification.block.tpl">
    <div class="notification-container">
    <i class="fa fa-bell" id="notification-flag"></i>
-   <sup><span class="badge severity-critical">${problem-count}</span></sup>
+   <sup>${problem-count}</sup>
    </div>
 </message>
 </messages>

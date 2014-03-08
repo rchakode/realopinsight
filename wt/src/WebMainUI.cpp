@@ -240,15 +240,19 @@ void WebMainUI::handleRefresh(void)
   m_mainWidget->disable();
   
   int problemCount = 0;
+  int highestSeverity = ngrt4n::Normal;
   for(auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
-    if (dash.second->rootNode().severity != ngrt4n::Normal) {
+    int platformSeverity = dash.second->rootNode().severity;
+    if (platformSeverity != ngrt4n::Normal) {
       ++problemCount;
+      if (platformSeverity > highestSeverity) highestSeverity = platformSeverity;
     }
   }
   m_notificationBox->setText(QString::number(problemCount).toStdString());
+  m_notificationBox->setStyleClass("badge " + ngrt4n::severityCssClass(highestSeverity));
   updateEventFeeds();
   m_timer.start();
   m_mainWidget->enable();
