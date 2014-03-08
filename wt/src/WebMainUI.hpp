@@ -74,7 +74,7 @@ private:
   Wt::WText* m_notificationBox;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
-  WebPreferences* m_preferenceForm;
+  WebPreferences* m_preferences;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_contents;
   Wt::WStackedWidget* m_mgntContents;
@@ -86,7 +86,7 @@ private:
   DashboardListT m_dashboards;
   std::string m_confdir;
   UserMngtUI* m_userMgntUI;
-  Wt::WDialog* m_accountPanel;
+  UserFormView* m_userAccountForm;
   Wt::WDialog* m_changePasswordPanel;
   ViewAssignmentUI* m_viewAssignmentDialog;
   Wt::WDialog* m_aboutDialog;

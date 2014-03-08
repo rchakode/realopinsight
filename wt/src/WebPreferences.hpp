@@ -40,7 +40,7 @@
 
 class QString;
 
-class WebPreferences : public Preferences, public Wt::WObject
+class WebPreferences : public Preferences, public Wt::WContainerWidget
 {
 public:
   enum InputTypeT {
@@ -50,14 +50,12 @@ public:
 
   WebPreferences(void);
   virtual ~WebPreferences();
-  void show(void) {m_dialog->show();}
-  Wt::WWidget* getWidget(void) {return m_dialog->contents();}
   void setEnabledInputs(bool enable);
   Wt::Signal<std::string>& errorOccurred() {return m_errorOccurred;}
 
 protected :
   virtual void applyChanges(void);
-  void handleCancel(void) {m_dialog->accept();}
+  void handleCancel(void) {return;}
   virtual void fillFromSource(int _sidx);
   virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
@@ -66,7 +64,6 @@ protected :
   virtual void deleteSource(void);
 
 private:
-  std::shared_ptr<Wt::WDialog> m_dialog;
   std::shared_ptr<Wt::WComboBox> m_sourceBox;
   std::shared_ptr<Wt::WStringListModel> m_sourceBoxModel;
   std::shared_ptr<Wt::WLineEdit> m_monitorUrlField;

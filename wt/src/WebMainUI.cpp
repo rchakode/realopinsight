@@ -57,7 +57,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_settings (new Settings()),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_preferenceForm(new WebPreferences()),
+    m_preferences(new WebPreferences()),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_confdir("/var/lib/realopinsight/config"),
@@ -65,8 +65,8 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_currentDashboard(NULL),
     m_terminateSession(this)
 {
-  m_preferenceForm->setEnabledInputs(false);
-  m_preferenceForm->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this,
+  m_preferences->setEnabledInputs(false);
+  m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this,
                                                       std::placeholders::_1, "alert alert-warning"));
   // create directory for view thumbnails and misc runtime data
   // true means clean the directory
@@ -91,7 +91,7 @@ WebMainUI::~WebMainUI()
   //  m_navbar(NULL),
   //  m_mgntMenu(NULL),
   //  m_profileMenu(NULL),
-  delete m_preferenceForm;
+  delete m_preferences;
   delete m_fileUploadDialog;
   delete m_navbar;
   delete m_contents;
@@ -179,7 +179,7 @@ void WebMainUI::setupProfileMenus(void)
           wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
         }
       } else {
-        if (m_dashtabs->count()>1) {
+        if (m_dashtabs->count() > 1) {
           m_dashtabs->setTabHidden(0, true);
           m_dashtabs->setCurrentIndex(1);
           curItem->setText(tr("Show Account & Settings").toStdString());
@@ -241,19 +241,21 @@ void WebMainUI::handleRefresh(void)
   
   int problemCount = 0;
   int highestSeverity = ngrt4n::Normal;
-  for(auto& dash : m_dashboards) {
+  for (auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
     int platformSeverity = dash.second->rootNode().severity;
     if (platformSeverity != ngrt4n::Normal) {
       ++problemCount;
-      if (platformSeverity > highestSeverity) highestSeverity = platformSeverity;
+      highestSeverity = std::max(highestSeverity, platformSeverity);
     }
   }
   m_notificationBox->setText(QString::number(problemCount).toStdString());
   m_notificationBox->setStyleClass("badge " + ngrt4n::severityCssClass(highestSeverity));
+
   updateEventFeeds();
+
   m_timer.start();
   m_mainWidget->enable();
 }
@@ -382,11 +384,10 @@ void WebMainUI::finishFileDialog(int action)
 
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex)
 {
-  
   tabIndex = -1;
   
-  dashboard = new WebDashboard(path.c_str());
-  dashboard->initialize(m_preferenceForm);
+  dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
+  dashboard->initialize(m_preferences);
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
   
   if (! dashboard->errorState()) {
@@ -487,7 +488,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_adminPanelTitle->setText("Manage Users");
     }));
     settingPageTpl->bindWidget("menu-all-users", link);
-    m_preferenceForm->setEnabledInputs(true);
+    m_preferences->setEnabledInputs(true);
   } else {
     wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
     settingPageTpl->bindEmpty("menu-get-started");
@@ -499,18 +500,18 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   }
 
   // setting menus
-  m_mgntContents->addWidget(m_preferenceForm->getWidget());
+  m_mgntContents->addWidget(m_preferences);
   link = new Wt::WAnchor("#", "Monitoring Settings", m_mainWidget);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
-    m_mgntContents->setCurrentWidget(m_preferenceForm->getWidget());
+    m_mgntContents->setCurrentWidget(m_preferences);
   }));
   settingPageTpl->bindWidget("menu-monitoring-setting", link);
 
-  m_mgntContents->addWidget(m_accountPanel->contents());
+  m_mgntContents->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", "My Account", m_mainWidget);
   link->clicked().connect(std::bind([=](){
-    m_mgntContents->setCurrentWidget(m_accountPanel->contents());
+    m_mgntContents->setCurrentWidget(m_userAccountForm);
     m_adminPanelTitle->setText("My Account");
   }));
   settingPageTpl->bindWidget("menu-my-account", link);
@@ -530,20 +531,15 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 void WebMainUI::createAccountPanel(void)
 {
   bool changedPassword(false);
-  bool userForm(true);
-  UserFormView* form = new UserFormView(&(m_dbSession->loggedUser()),
-                                        changedPassword,
-                                        userForm);
-  form->closeTriggered().connect(std::bind([=](){m_accountPanel->accept();}));
-  form->validated().connect(std::bind([=](User userToUpdate) {
+  bool isUserForm(true);
+  m_userAccountForm = new UserFormView(&(m_dbSession->loggedUser()), changedPassword, isUserForm);
+  m_userAccountForm->validated().connect(std::bind([=](User userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage("Update failed, see details in log.", "alert alert-warning");
     } else {
       showMessage("Update completed.", "alert alert-success");
     }}, std::placeholders::_1));
-  
-  m_accountPanel = createDialog(tr("Manage user account").toStdString(), form);
 }
 
 void WebMainUI::createPasswordPanel(void)
@@ -681,11 +677,9 @@ void WebMainUI::initOperatorDashboard(void)
     WebDashboard* dashboard;
     loadView(view.path, dashboard, tabIndex);
     if (dashboard) {
-      dashboard->setEventFeedLayout(m_eventFeedLayout);
       layout->addWidget(thumbnail(dashboard));
     }
   }
-
   startDashbaordUpdate();
 }
 

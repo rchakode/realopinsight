@@ -250,6 +250,8 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
       m_eventFeedLayout->insertWidget(0, widget);
       m_eventFeedItems.insert(node.id, widget);
     }
+  } else {
+    LOG ("warn", "Null event feeds container");
   }
 }
 

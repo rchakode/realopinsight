@@ -46,16 +46,11 @@ WebPreferences::WebPreferences(void)
     m_errorOccurred(this)
 
 {
-  m_dialog = std::make_shared<Wt::WDialog>(ngrt4n::tr("Preferences - " +APP_NAME.toStdString()));
-  m_dialog->setStyleClass("Wt-dialog");
-  m_dialog->titleBar()->setStyleClass("titlebar");
+  this->setMargin(0, Wt::All);
 
-  Wt::WContainerWidget* mainContainer = m_dialog->contents();
-  mainContainer->setMargin(0, Wt::All);
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), this);
 
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), mainContainer);
-
-  m_sourceBox = std::make_shared<Wt::WComboBox>(mainContainer);
+  m_sourceBox = std::make_shared<Wt::WComboBox>(this);
   m_sourceBoxModel = std::make_shared<Wt::WStringListModel>(m_sourceBox.get());
   m_sourceBox->setModel(m_sourceBoxModel.get());
 
@@ -64,7 +59,7 @@ WebPreferences::WebPreferences(void)
   }));
   tpl->bindWidget("source-box", m_sourceBox.get());
 
-  m_monitorTypeField = std::make_shared<Wt::WComboBox>(mainContainer);
+  m_monitorTypeField = std::make_shared<Wt::WComboBox>(this);
   m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
   for (const auto& srcid: ngrt4n::sourceTypes()) {
     m_monitorTypeField->addItem(srcid.toStdString());
@@ -81,16 +76,16 @@ WebPreferences::WebPreferences(void)
   }));
   tpl->bindWidget("monitor-type", m_monitorTypeField.get());
 
-  m_monitorUrlField = std::make_shared<Wt::WLineEdit>(mainContainer);
+  m_monitorUrlField = std::make_shared<Wt::WLineEdit>(this);
   m_monitorUrlField->setValidator(createTextValidator());
   m_monitorUrlField->setEmptyText("e.g. http://server.example.com/monitor");
   tpl->bindWidget("monitor-url", m_monitorUrlField.get());
 
-  m_authStringField = std::make_shared<Wt::WLineEdit>(mainContainer);
+  m_authStringField = std::make_shared<Wt::WLineEdit>(this);
   tpl->bindWidget("auth-string", m_authStringField.get());
   m_authStringField->setEchoMode(Wt::WLineEdit::Password);
 
-  m_showAuthStringField = std::make_shared<Wt::WCheckBox>(QObject::tr("Show in clear").toStdString(), mainContainer);
+  m_showAuthStringField = std::make_shared<Wt::WCheckBox>(QObject::tr("Show in clear").toStdString(), this);
   tpl->bindWidget("show-in-clear", m_showAuthStringField.get());
 
   m_showAuthStringField->changed().connect(std::bind([=](){
@@ -101,34 +96,34 @@ WebPreferences::WebPreferences(void)
     }
   }));
 
-  m_livestatusHostField = std::make_shared<Wt::WLineEdit>(mainContainer);
+  m_livestatusHostField = std::make_shared<Wt::WLineEdit>(this);
   m_livestatusHostField->setEmptyText("hostname/IP");
   m_livestatusHostField->setValidator(createTextValidator());
   tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
 
-  m_livestatusPortField = std::make_shared<Wt::WLineEdit>(mainContainer);
+  m_livestatusPortField = std::make_shared<Wt::WLineEdit>(this);
   m_livestatusPortField->setWidth(50);
   m_livestatusPortField->setValidator(createPortValidator());
   m_livestatusPortField->setEmptyText("port");
   m_livestatusPortField->setMaxLength(5);
   tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
 
-  m_useNgrt4ndField = std::make_shared<Wt::WCheckBox>(QObject::tr("Use ngrt4nd").toStdString(), mainContainer);
+  m_useNgrt4ndField = std::make_shared<Wt::WCheckBox>(QObject::tr("Use ngrt4nd").toStdString(), this);
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
 
-  m_dontVerifyCertificateField = std::make_shared<Wt::WCheckBox>(QObject::tr("Don't verify SSL certificate").toStdString(),mainContainer);
+  m_dontVerifyCertificateField = std::make_shared<Wt::WCheckBox>(QObject::tr("Don't verify SSL certificate").toStdString(),this);
   tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField.get());
 
-  m_updateIntervalField = std::make_shared<Wt::WSpinBox>(mainContainer);
+  m_updateIntervalField = std::make_shared<Wt::WSpinBox>(this);
   tpl->bindWidget("update-interval", m_updateIntervalField.get());
 
-  m_applyChangeBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Apply changes").toStdString(), mainContainer);
+  m_applyChangeBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Apply changes").toStdString(), this);
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
 
-  m_addAsSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Add as source").toStdString(), mainContainer);
+  m_addAsSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Add as source").toStdString(), this);
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
 
-  m_deleteSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Delete source").toStdString(), mainContainer);
+  m_deleteSourceBtn = std::make_shared<Wt::WPushButton>(QObject::tr("Delete source").toStdString(), this);
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
 
   m_applyChangeBtn->setStyleClass("btn btn-success");

@@ -120,14 +120,14 @@ void DashboardBase::runMonitor(SourceT& src)
   prepareUpdate(src);
   openRpcSession(src);
   switch(src.mon_type) {
-    case ngrt4n::Zenoss:
-    case ngrt4n::Zabbix:
-      requestZbxZnsData(src);
-      break;
-    case ngrt4n::Nagios:
-    default:
-      src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
-      break;
+  case ngrt4n::Zenoss:
+  case ngrt4n::Zabbix:
+    requestZbxZnsData(src);
+    break;
+  case ngrt4n::Nagios:
+  default:
+    src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
+    break;
   }
   finalizeUpdate(src);
 }
@@ -257,18 +257,18 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-    case ngrt4n::Nagios:
-      msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
-      break;
-    case ngrt4n::Zabbix:
-      msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
-      break;
-    case ngrt4n::Zenoss:
-      msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
-      break;
-    default:
-      msg = msg.arg(src.id, "undefined source type");
-      break;
+  case ngrt4n::Nagios:
+    msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
+    break;
+  case ngrt4n::Zabbix:
+    msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
+    break;
+  case ngrt4n::Zenoss:
+    msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
+    break;
+  default:
+    msg = msg.arg(src.id, "undefined source type");
+    break;
   }
   Q_EMIT updateStatusBar(msg);
 }
@@ -368,16 +368,16 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
 
   node->severity = criticity.getValue();
   switch(node->sev_prule) {
-    case PropRules::Increased:
-      node->prop_sev = (criticity++).getValue();
-      break;
-    case PropRules::Decreased:
-      node->prop_sev = (criticity--).getValue();
-      break;
-    case PropRules::Unchanged:
-    default:
-      node->prop_sev = node->severity;
-      break;
+  case PropRules::Increased:
+    node->prop_sev = (criticity++).getValue();
+    break;
+  case PropRules::Decreased:
+    node->prop_sev = (criticity--).getValue();
+    break;
+  case PropRules::Unchanged:
+  default:
+    node->prop_sev = node->severity;
+    break;
   }
 
   QString toolTip = getNodeToolTip(*node);
@@ -409,68 +409,68 @@ void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
   }
   qint32 tid = jsHelper.getProperty("id").toInt32();
   switch(tid) {
-    case ZbxHelper::Login: {
-      QString auth = jsHelper.getProperty("result").toString();
-      if (!auth.isEmpty()) {
-        src.zbx_handler->setAuth(auth);
-        src.zbx_handler->setIsLogged(true);
+  case ZbxHelper::Login: {
+    QString auth = jsHelper.getProperty("result").toString();
+    if (!auth.isEmpty()) {
+      src.zbx_handler->setAuth(auth);
+      src.zbx_handler->setIsLogged(true);
+    }
+    break;
+  }
+  case ZbxHelper::ApiVersion: {
+    src.zbx_handler->setTrid(jsHelper.getProperty("result").toString());
+    break;
+  }
+  case ZbxHelper::Trigger:
+  case ZbxHelper::TriggerV18: {
+
+    QScriptValueIterator trigger(jsHelper.getProperty("result"));
+    while (trigger.hasNext()) {
+
+      trigger.next();
+      if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+
+      QScriptValue triggerData = trigger.value();
+      QString triggerName = triggerData.property("description").toString();
+
+      CheckT check;
+      check.check_command = triggerName.toStdString();
+      check.status = triggerData.property("value").toInt32();
+      if (check.status == ngrt4n::ZabbixClear) {
+        check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+      } else {
+        check.alarm_msg = triggerData.property("error").toString().toStdString();
+        check.status = triggerData.property("priority").toInteger();
       }
-      break;
-    }
-    case ZbxHelper::ApiVersion: {
-      src.zbx_handler->setTrid(jsHelper.getProperty("result").toString());
-      break;
-    }
-    case ZbxHelper::Trigger:
-    case ZbxHelper::TriggerV18: {
-
-      QScriptValueIterator trigger(jsHelper.getProperty("result"));
-      while (trigger.hasNext()) {
-
-        trigger.next();
-        if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
-
-        QScriptValue triggerData = trigger.value();
-        QString triggerName = triggerData.property("description").toString();
-
-        CheckT check;
-        check.check_command = triggerName.toStdString();
-        check.status = triggerData.property("value").toInt32();
-        if (check.status == ngrt4n::ZabbixClear) {
-          check.alarm_msg = "OK ("+triggerName.toStdString()+")";
-        } else {
-          check.alarm_msg = triggerData.property("error").toString().toStdString();
-          check.status = triggerData.property("priority").toInteger();
-        }
-        QString targetHost = "";
-        QScriptValueIterator host(triggerData.property("hosts"));
-        if (host.hasNext())
-        {
-          host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
-          QScriptValue hostData = host.value();
-          targetHost = hostData.property("host").toString();
-          check.host = targetHost.toStdString();
-        }
-        if (tid == ZbxHelper::TriggerV18) {
-          check.last_state_change = triggerData.property("lastchange").toString().toStdString();
-        } else {
-          QScriptValueIterator item(triggerData.property("items"));
-          if (item.hasNext()) {
-            item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
-            QScriptValue itemData = item.value();
-            check.last_state_change = itemData.property("lastclock").toString().toStdString();
-          }
-        }
-        QString key = ID_PATTERN.arg(targetHost, triggerName);
-        check.id = key.toStdString();
-        updateCNodes(check, src);
+      QString targetHost = "";
+      QScriptValueIterator host(triggerData.property("hosts"));
+      if (host.hasNext())
+      {
+        host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+        QScriptValue hostData = host.value();
+        targetHost = hostData.property("host").toString();
+        check.host = targetHost.toStdString();
       }
-      break;
+      if (tid == ZbxHelper::TriggerV18) {
+        check.last_state_change = triggerData.property("lastchange").toString().toStdString();
+      } else {
+        QScriptValueIterator item(triggerData.property("items"));
+        if (item.hasNext()) {
+          item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+          QScriptValue itemData = item.value();
+          check.last_state_change = itemData.property("lastclock").toString().toStdString();
+        }
+      }
+      QString key = ID_PATTERN.arg(targetHost, triggerName);
+      check.id = key.toStdString();
+      updateCNodes(check, src);
     }
-    default :
-      updateDashboardOnError(src, tr("Weird response received from the server"));
-      qDebug() << data;
-      break;
+    break;
+  }
+  default :
+    updateDashboardOnError(src, tr("Weird response received from the server"));
+    qDebug() << data;
+    break;
   }
 }
 
@@ -511,8 +511,8 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         QString duid = ditem.property("uid").toString();
         QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Component,
                                                             ZnsHelper::ReqPatterns[ZnsHelper::Component]
-            .arg(duid, QString::number(ZnsHelper::Component))
-            .toAscii());
+                               .arg(duid, QString::number(ZnsHelper::Component))
+                               .toAscii());
         processZnsReply(reply, src);
 
         QString did = ngrt4n::realCheckId(src.id, ditem.property("name").toString());
@@ -520,8 +520,8 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         {
           reply = src.zns_handler->postRequest(ZnsHelper::Device,
                                                ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
-              .arg(duid, QString::number(ZnsHelper::DeviceInfo))
-              .toAscii());
+                  .arg(duid, QString::number(ZnsHelper::DeviceInfo))
+                  .toAscii());
           processZnsReply(reply, src);
         }
       }
@@ -540,7 +540,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
           check.id = chkid.toStdString();
           check.host = dname.toStdString();
           check.last_state_change = ngrt4n::convertToTimet(device.property("lastChanged").toString(),
-                                                          "yyyy/MM/dd hh:mm:ss");
+                                                           "yyyy/MM/dd hh:mm:ss");
           QString severity =citem.property("severity").toString();
           if (!severity.compare("clear", Qt::CaseInsensitive)) {
             check.status = ngrt4n::ZenossClear;
@@ -557,7 +557,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         check.id = check.host = dname.toStdString();
         check.status = devInfo.property("status").toBool();
         check.last_state_change = ngrt4n::convertToTimet(devInfo.property("lastChanged").toString(),
-                                                        "yyyy/MM/dd hh:mm:ss");
+                                                         "yyyy/MM/dd hh:mm:ss");
         if (check.status) {
           check.status = ngrt4n::ZenossClear;
           check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
@@ -607,14 +607,14 @@ void DashboardBase::openRpcSession(int srcId)
   SourceListT::Iterator src = m_sources.find(srcId);
   if (src != m_sources.end()) {
     switch (src->mon_type) {
-      case ngrt4n::Zabbix:
-        src->zbx_handler->setIsLogged(false);
-        break;
-      case ngrt4n::Zenoss:
-        src->zns_handler->setIsLogged(false);
-        break;
-      default:
-        break;
+    case ngrt4n::Zabbix:
+      src->zbx_handler->setIsLogged(false);
+      break;
+    case ngrt4n::Zenoss:
+      src->zns_handler->setIsLogged(false);
+      break;
+    default:
+      break;
     }
   }
   openRpcSession(*src);
@@ -632,49 +632,49 @@ void DashboardBase::openRpcSession(SourceT& src)
 
   QUrl znsUrlParams;
   switch(src.mon_type) {
-    case ngrt4n::Nagios:
-      if (src.use_ngrt4nd) {
-        if (src.d4n_handler->isConnected())
-          src.d4n_handler->disconnectFromService();
+  case ngrt4n::Nagios:
+    if (src.use_ngrt4nd) {
+      if (src.d4n_handler->isConnected())
+        src.d4n_handler->disconnectFromService();
 
-        if(src.d4n_handler->connect())
-          src.d4n_handler->makeHandShake();
-      } else {
-        if (src.ls_handler->isConnected())
-          src.ls_handler->disconnectFromService();
+      if(src.d4n_handler->connect())
+        src.d4n_handler->makeHandShake();
+    } else {
+      if (src.ls_handler->isConnected())
+        src.ls_handler->disconnectFromService();
 
-        src.ls_handler->connectToService();
-      }
-      break;
-    case ngrt4n::Zabbix: {
-      src.zbx_handler->setBaseUrl(src.mon_url);
-      authParams.push_back(QString::number(ZbxHelper::Login));
+      src.ls_handler->connectToService();
+    }
+    break;
+  case ngrt4n::Zabbix: {
+    src.zbx_handler->setBaseUrl(src.mon_url);
+    authParams.push_back(QString::number(ZbxHelper::Login));
+    src.zbx_handler->setSslConfig(src.verify_ssl_peer);
+    QNetworkReply* reply = src.zbx_handler->postRequest(ZbxHelper::Login, authParams);
+    processZbxReply(reply, src);
+    if (src.zbx_handler->getIsLogged()) {
+      // The get API version
+      QStringList params;
+      params.push_back(QString::number(ZbxHelper::ApiVersion));
       src.zbx_handler->setSslConfig(src.verify_ssl_peer);
-      QNetworkReply* reply = src.zbx_handler->postRequest(ZbxHelper::Login, authParams);
+      reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
       processZbxReply(reply, src);
-      if (src.zbx_handler->getIsLogged()) {
-        // The get API version
-        QStringList params;
-        params.push_back(QString::number(ZbxHelper::ApiVersion));
-        src.zbx_handler->setSslConfig(src.verify_ssl_peer);
-        reply = src.zbx_handler->postRequest(ZbxHelper::ApiVersion, params);
-        processZbxReply(reply, src);
-      }
-      break;
     }
-    case ngrt4n::Zenoss: {
-      src.zns_handler->setBaseUrl(src.mon_url);
-      znsUrlParams.addQueryItem("__ac_name", authParams[0]);
-      znsUrlParams.addQueryItem("__ac_password", authParams[1]);
-      znsUrlParams.addQueryItem("submitted", "true");
-      znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
-      src.zns_handler->setSslConfig(src.verify_ssl_peer);
-      QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
-      processZnsReply(reply, src);
-    }
-      break;
-    default:
-      break;
+    break;
+  }
+  case ngrt4n::Zenoss: {
+    src.zns_handler->setBaseUrl(src.mon_url);
+    znsUrlParams.addQueryItem("__ac_name", authParams[0]);
+    znsUrlParams.addQueryItem("__ac_password", authParams[1]);
+    znsUrlParams.addQueryItem("submitted", "true");
+    znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
+    src.zns_handler->setSslConfig(src.verify_ssl_peer);
+    QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
+    processZnsReply(reply, src);
+  }
+    break;
+  default:
+    break;
   }
 }
 
@@ -682,44 +682,44 @@ void DashboardBase::openRpcSession(SourceT& src)
 void DashboardBase::requestZbxZnsData(SourceT& src)
 {
   switch(src.mon_type) {
-    case ngrt4n::Zabbix: {
-      if (src.zbx_handler->getIsLogged()) {
-        int trid = src.zbx_handler->getTrid();
-        Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+  case ngrt4n::Zabbix: {
+    if (src.zbx_handler->getIsLogged()) {
+      int trid = src.zbx_handler->getTrid();
+      Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
 
-          StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
+        StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
 
-          if (info.first != src.id) continue;
+        if (info.first != src.id) continue;
 
-          QStringList params;
-          params.push_back(info.second);
-          params.push_back(QString::number(trid));
-          QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
-          processZbxReply(reply, src);
-        }
+        QStringList params;
+        params.push_back(info.second);
+        params.push_back(QString::number(trid));
+        QNetworkReply* reply = src.zbx_handler->postRequest(trid, params);
+        processZbxReply(reply, src);
       }
-      break;
     }
-    case ngrt4n::Zenoss: {
-      if (src.zns_handler->getIsLogged()) {
-        src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
-        Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+    break;
+  }
+  case ngrt4n::Zenoss: {
+    if (src.zns_handler->getIsLogged()) {
+      src.zns_handler->setRouterEndpoint(ZnsHelper::Device);
+      Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
 
-          StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
+        StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
 
-          if (info.first != src.id) continue;
+        if (info.first != src.id) continue;
 
-          QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
-                                                              ZnsHelper::ReqPatterns[ZnsHelper::Device]
-              .arg(info.second, QString::number(ZnsHelper::Device))
-              .toAscii());
-          processZnsReply(reply, src);
-        }
+        QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
+                                                            ZnsHelper::ReqPatterns[ZnsHelper::Device]
+                               .arg(info.second, QString::number(ZnsHelper::Device))
+                               .toAscii());
+        processZnsReply(reply, src);
       }
-      break;
     }
-    default:
-      break;
+    break;
+  }
+  default:
+    break;
   }
 }
 
@@ -733,23 +733,23 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
   }
 
   switch (_code) {
-    case QNetworkReply::RemoteHostClosedError:
-      updateDashboardOnError(src, tr("The connection has been closed by the remote host"));
-      break;
-    case QNetworkReply::HostNotFoundError:
-      updateDashboardOnError(src, tr("Host not found"));
-      break;
-    case QNetworkReply::ConnectionRefusedError:
-      updateDashboardOnError(src, tr("Connection refused"));
-      break;
-    case QNetworkReply::SslHandshakeFailedError:
-      updateDashboardOnError(src, tr("SSL Handshake failed"));
-      break;
-    case QNetworkReply::TimeoutError:
-      updateDashboardOnError(src, tr("Timeout exceeded"));
-      break;
-    default:
-      updateDashboardOnError(src, SERVICE_OFFLINE_MSG.arg(apiUrl, tr("error %1").arg(_code)));
+  case QNetworkReply::RemoteHostClosedError:
+    updateDashboardOnError(src, tr("The connection has been closed by the remote host"));
+    break;
+  case QNetworkReply::HostNotFoundError:
+    updateDashboardOnError(src, tr("Host not found"));
+    break;
+  case QNetworkReply::ConnectionRefusedError:
+    updateDashboardOnError(src, tr("Connection refused"));
+    break;
+  case QNetworkReply::SslHandshakeFailedError:
+    updateDashboardOnError(src, tr("SSL Handshake failed"));
+    break;
+  case QNetworkReply::TimeoutError:
+    updateDashboardOnError(src, tr("Timeout exceeded"));
+    break;
+  default:
+    updateDashboardOnError(src, SERVICE_OFFLINE_MSG.arg(apiUrl, tr("error %1").arg(_code)));
   }
 }
 
@@ -767,7 +767,8 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
     computeStatusInfo(*cnode, src);
     updateDashboard(*cnode);
-    m_cdata->check_status_count[ngrt4n::Unknown]+=1;
+    ++(m_cdata->check_status_count[ngrt4n::Unknown]);
+    updateEventFeeds(*cnode);
     cnode->monitored = true;
   }
 }
@@ -777,14 +778,17 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 {
   m_sources.clear();
   SourceT src;
-  for (auto id=m_cdata->sources.begin(),end = m_cdata->sources.end(); id!=end; ++id)
+  for (auto id=m_cdata->sources.begin(), end = m_cdata->sources.end(); id != end; ++id)
   {
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
-      if (preferencePtr->isSetSource(srcinfo.second) &&
-          m_settings->loadSource(*id, src) &&
-          allocSourceHandler(src)) {
-        m_sources.insert(srcinfo.second, src);
+      if (preferencePtr->isSetSource(srcinfo.second)) {
+        if (m_settings->loadSource(*id, src) && allocSourceHandler(src)) {
+          m_sources.insert(srcinfo.second, src);
+        } else {
+          src.id = *id;
+          updateDashboardOnError(src, tr("Cannot set handler for %1").arg(*id));
+        }
       } else {
         src.id = *id;
         updateDashboardOnError(src, tr("%1 is not set").arg(*id));
@@ -806,27 +810,27 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
   }
 
   switch (src.mon_type) {
-    case ngrt4n::Nagios:
-      if (src.use_ngrt4nd) {
-        QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
-        src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
-      } else {
-        src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
-      }
-      allocated = true;
-      break;
-    case ngrt4n::Zabbix:
-      src.zbx_handler = std::make_shared<ZbxHelper>();
-      allocated = true;
-      break;
-    case ngrt4n::Zenoss:
-      src.zns_handler = std::make_shared<ZnsHelper>();
-      allocated = true;
-      break;
-    default:
-      updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
-      allocated = false;
-      break;
+  case ngrt4n::Nagios:
+    if (src.use_ngrt4nd) {
+      QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
+      src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+    } else {
+      src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
+    }
+    allocated = true;
+    break;
+  case ngrt4n::Zabbix:
+    src.zbx_handler = std::make_shared<ZbxHelper>();
+    allocated = true;
+    break;
+  case ngrt4n::Zenoss:
+    src.zns_handler = std::make_shared<ZnsHelper>();
+    allocated = true;
+    break;
+  default:
+    updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
+    allocated = false;
+    break;
   }
 
   return allocated;
@@ -840,22 +844,22 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     SourceListT::Iterator olddata = m_sources.find(id);
     if (olddata != m_sources.end()) {
       switch (olddata->mon_type) {
-        case ngrt4n::Nagios:
-          if (olddata->use_ngrt4nd) {
-            olddata->ls_handler.reset();
-          } else {
-            olddata->d4n_handler.reset();
-          }
-          break;
-        case ngrt4n::Zabbix:
-          olddata->zbx_handler.reset();
-          break;
-        case ngrt4n::Zenoss:
-          olddata->zns_handler.reset();
-          break;
-        default:
-          Q_EMIT errorOccurred(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
-          break;
+      case ngrt4n::Nagios:
+        if (olddata->use_ngrt4nd) {
+          olddata->ls_handler.reset();
+        } else {
+          olddata->d4n_handler.reset();
+        }
+        break;
+      case ngrt4n::Zabbix:
+        olddata->zbx_handler.reset();
+        break;
+      case ngrt4n::Zenoss:
+        olddata->zns_handler.reset();
+        break;
+      default:
+        Q_EMIT errorOccurred(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
+        break;
       }
     }
     allocSourceHandler(newsrc);
@@ -905,11 +909,11 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
   {
     if (! cnode->monitored &&
         cnode->child_nodes.toLower()==ngrt4n::realCheckId(src.id,
-                                                         QString::fromStdString(cnode->check.id)).toLower())
+                                                          QString::fromStdString(cnode->check.id)).toLower())
     {
       ngrt4n::setCheckOnError(ngrt4n::Unknown,
-                             tr("Undefined service (%1)").arg(cnode->child_nodes),
-                             cnode->check);
+                              tr("Undefined service (%1)").arg(cnode->child_nodes),
+                              cnode->check);
       computeStatusInfo(*cnode, src);
       m_cdata->check_status_count[cnode->severity]+=1;
       updateDashboard(*cnode);
