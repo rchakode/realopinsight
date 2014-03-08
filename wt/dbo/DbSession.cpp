@@ -261,8 +261,8 @@ void DbSession::initDb(void)
   try {
     createTables();
     User adm;
-    adm.username = "ngrt4n_adm";
-    adm.password = "ngrt4n_adm";
+    adm.username = "admin";
+    adm.password = "realopinsight";
     adm.firstname = "Default";
     adm.lastname = "Administrator";
     adm.role = User::AdmRole;

@@ -83,20 +83,18 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
   m_translateX = 0;
   m_translateY = 0;
-  m_painter = new Wt::WPainter(_pdevice);
+  m_painter.reset(new Wt::WPainter(_pdevice));
   m_painter->scale(m_scaleX, m_scaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Draw edges
-  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) { drawEdge(edge.key(), edge.value());}
+  for (auto edge=std::begin(m_cdata->edges); edge != std::end(m_cdata->edges); ++edge) { drawEdge(edge.key(), edge.value());}
 
   // Draw nodes
   for(const auto& node : m_cdata->bpnodes) drawNode(node);
   for(const auto& node : m_cdata->cnodes) drawNode(node);
 
   m_painter->end();
-  delete m_painter;
 
   if(m_initialLoading) {
     m_loaded.emit();
@@ -228,7 +226,7 @@ void WebMap::updateThumbnail(void)
   m_translateY = 0;
   Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight + m_translateY);
 
-  m_painter = new Wt::WPainter(&thumbnailImg);
+  m_painter.reset(new Wt::WPainter(&thumbnailImg));
   m_painter->scale(thumbScaleX, thumbScaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
@@ -245,11 +243,10 @@ void WebMap::updateThumbnail(void)
 
   // Now save the image
   if (m_thumbnailPath.empty()) {
-    m_thumbnailPath=boost::filesystem::unique_path(wApp->docRoot().append("/tmp/roi-thumb-%%%%%%.svg")).string();
+    m_thumbnailPath=boost::filesystem::unique_path("/run/thumb-%%%%%%.svg").string();
   }
-  std::ofstream output(m_thumbnailPath);
+  std::ofstream output(wApp->docRoot().append(m_thumbnailPath));
   thumbnailImg.write(output);
-  delete m_painter;
 
   m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
 }

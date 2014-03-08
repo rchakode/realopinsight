@@ -85,7 +85,6 @@ SOURCES	+= client/src/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
 
-
 config-web {
 PACKAGE_VERSION = "$${BASE_VERSION}-UE"
 TARGET = realopinsight.fcgi

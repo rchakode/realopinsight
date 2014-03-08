@@ -59,23 +59,26 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_dbSession(m_authManager->session()),
     m_preferenceForm(new WebPreferences()),
     m_dashtabs(new Wt::WTabWidget()),
-    m_fileUploadDialog(createDialog(tr("Select a file").toStdString())),
+    m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_confdir("/var/lib/realopinsight/config"),
-    m_terminateSession(this),
-    m_showSettingTab(true)
+    m_showSettingTab(true),
+    m_currentDashboard(NULL),
+    m_terminateSession(this)
 {
   m_preferenceForm->setEnabledInputs(false);
   m_preferenceForm->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this,
                                                       std::placeholders::_1, "alert alert-warning"));
-  createDirectory(wApp->docRoot().append("/tmp"), true); //true means clean the directory
+  // create directory for view thumbnails and misc runtime data
+  // true means clean the directory
+  createDirectory(wApp->docRoot().append("/run"), true);
+
+  // Now start creating the view
   createMainUI();
   createViewAssignmentDialog();
   createAccountPanel();
   createPasswordPanel();
   createAboutDialog();
-  
   setupMenus();
-  
   showUserHome();
   addEvents();
   doJavaScript(RESIZE_PANES);
@@ -93,7 +96,7 @@ WebMainUI::~WebMainUI()
   delete m_navbar;
   delete m_contents;
   delete m_mainWidget;
-  LOG("info", "Session closed");
+  LOG("debug", "Session closed");
 }
 
 
@@ -126,8 +129,9 @@ void WebMainUI::showUserHome(void)
   m_dashtabs->addTab(createSettingPage(), tr("Account & Settings").toStdString());
   
   if (m_dbSession->loggedUser().role == User::OpRole) {
-    m_dashtabs->setTabHidden(0, true);
     initOperatorDashboard();
+    m_dashtabs->setTabHidden(0, true);
+    m_dashtabs->setCurrentIndex(1);
   }
 }
 
@@ -146,42 +150,44 @@ void WebMainUI::createMainUI(void)
 
 void WebMainUI::setupProfileMenus(void)
 {
-  m_profileMenu = new Wt::WMenu();
-  m_navbar->addMenu(m_profileMenu, Wt::AlignRight);
+  Wt::WMenu* profileMenu = new Wt::WMenu();
+  m_navbar->addMenu(profileMenu, Wt::AlignRight);
   
   if (m_dbSession->loggedUser().role == User::OpRole) {
     Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
-    notificationIcon->bindString("problem-count", "1");
+    m_notificationBox = new Wt::WText("0");
+    notificationIcon->bindWidget("problem-count", m_notificationBox);
     m_navbar->addWidget(notificationIcon, Wt::AlignRight);
   }
   
-  m_mainProfileMenuItem = new Wt::WMenuItem("Profile");
-  m_mainProfileMenuItem->setText(tr("Signed in as %1")
-                                 .arg(m_dbSession->loggedUser().username.c_str())
-                                 .toStdString());
-  
+  Wt::WMenuItem* profileMenuItem = new Wt::WMenuItem(tr("Signed in as %1")
+                                                     .arg(m_dbSession->loggedUser().username.c_str())
+                                                     .toStdString());
   Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
-  m_mainProfileMenuItem->setMenu(profilePopupMenu);
-  m_profileMenu->addItem(m_mainProfileMenuItem);
+  profileMenuItem->setMenu(profilePopupMenu);
+  profileMenu->addItem(profileMenuItem);
   
   Wt::WMenuItem* curItem = NULL;
-  curItem = profilePopupMenu->addItem(tr("Show Account & Settings").toStdString());
-  curItem->triggered().connect(std::bind([=]() {
-    if (m_showSettingTab) {
-      if (m_dashtabs->count() > 1) {
-        m_dashtabs->setTabHidden(0, false);
-        m_dashtabs->setCurrentIndex(0);
-        curItem->setText(tr("Hide Account & Settings").toStdString());
+  if (m_dbSession->loggedUser().role == User::OpRole) {
+    curItem = profilePopupMenu->addItem(tr("Show Account & Settings").toStdString());
+    curItem->triggered().connect(std::bind([=]() {
+      if (m_showSettingTab) {
+        if (m_dashtabs->count() > 1) {
+          m_dashtabs->setTabHidden(0, false);
+          m_dashtabs->setCurrentIndex(0);
+          curItem->setText(tr("Hide Account & Settings").toStdString());
+          wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
+        }
+      } else {
+        if (m_dashtabs->count()>1) {
+          m_dashtabs->setTabHidden(0, true);
+          m_dashtabs->setCurrentIndex(1);
+          curItem->setText(tr("Show Account & Settings").toStdString());
+        }
       }
-    } else {
-      if (m_dashtabs->count()>1) {
-        m_dashtabs->setTabHidden(0, true);
-        m_dashtabs->setCurrentIndex(1);
-        curItem->setText(tr("Show Account & Settings").toStdString());
-      }
-    }
-    m_showSettingTab = ! m_showSettingTab;
-  }));
+      m_showSettingTab = ! m_showSettingTab;
+    }));
+  }
 
   curItem = profilePopupMenu->addItem(tr("Help").toStdString());
   curItem->setLink(Wt::WLink(Wt::WLink::Url, GET_HELP_URL));
@@ -233,11 +239,16 @@ void WebMainUI::handleRefresh(void)
   m_timer.stop();
   m_mainWidget->disable();
   
+  int problemCount = 0;
   for(auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
+    if (dash.second->rootNode().severity != ngrt4n::Normal) {
+      ++problemCount;
+    }
   }
+  m_notificationBox->setText(QString::number(problemCount).toStdString());
   updateEventFeeds();
   m_timer.start();
   m_mainWidget->enable();
@@ -254,7 +265,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectFileToOpen(void)
 {
-  m_fileUploadDialog->setWindowTitle(tr("Select a file").toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Select a file | %1").arg(APP_NAME).toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
   
@@ -262,7 +273,7 @@ void WebMainUI::selectFileToOpen(void)
   container->addWidget(createViewSelector());
   
   // Provide a button to close the window
-  Wt::WPushButton* finish(new Wt::WPushButton(tr("Finish").toStdString(), container));
+  Wt::WPushButton* finish(new Wt::WPushButton(tr("Preview").toStdString(), container));
   finish->clicked().connect(std::bind(&WebMainUI::finishFileDialog, this, OPEN));
   
   m_fileUploadDialog->show();
@@ -307,61 +318,61 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("info", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+        LOG("debug", "Parsing the input file");
+        QString tmpFileName(m_uploader->spoolFileName().c_str());
+        CoreDataT cdata;
 
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+        Parser parser(tmpFileName ,&cdata);
+        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid description file").toStdString();
-            LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+        if (! parser.process(false)) {
+          std::string msg = tr("Invalid description file").toStdString();
+          LOG("warn", msg);
+          showMessage(msg, "alert alert-warning");
+        } else {
+
+          std::string filename = m_uploader->clientFileName().toUTF8();
+          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+          QFile file(tmpFileName);
+          file.copy(dest);
+          file.remove();
+
+          View view;
+          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+          view.path = dest.toStdString();
+          if (m_dbSession->addView(view) != 0){
+            showMessage(m_dbSession->lastError(), "alert alert-warning");
           } else {
-
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            View view;
-            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Number of services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
-            }
+            QString msg = tr("View added. "
+                             " Name: %1\n - "
+                             " Number of services: %2 -"
+                             " Path: %3").arg(view.name.c_str(),
+                                              QString::number(view.service_count),
+                                              view.path.c_str());
+            showMessage(msg.toStdString(), "alert alert-success");
           }
         }
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectFile.empty()) {
-        int tabIndex;
-        WebDashboard* dashbord;
-        loadView(m_selectFile, dashbord, tabIndex);
-        m_selectFile.clear();
-      } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-      }
-      break;
-    default:
-      break;
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectedFile.empty()) {
+      int tabIndex;
+      WebDashboard* dashbord;
+      loadView(m_selectedFile, dashbord, tabIndex);
+      m_selectedFile.clear();
+    } else {
+      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+    }
+    break;
+  default:
+    break;
   }
 }
 
@@ -464,7 +475,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     }));
     settingPageTpl->bindWidget("menu-new-user", link);
 
-    link = new Wt::WAnchor("#", "View All Users", m_mainWidget);
+    link = new Wt::WAnchor("#", "All Users", m_mainWidget);
     m_mgntContents->addWidget(m_userMgntUI->userListWidget());
     link->clicked().connect(std::bind([=]() {
       m_mgntContents->setCurrentWidget(m_userMgntUI->userListWidget());
@@ -474,8 +485,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     settingPageTpl->bindWidget("menu-all-users", link);
     m_preferenceForm->setEnabledInputs(true);
   } else {
-    wApp->doJavaScript("$('#userMenuBlock').hide();"
-                       "$('#viewMenuBlock').hide();");
+    wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
     settingPageTpl->bindEmpty("menu-get-started");
     settingPageTpl->bindEmpty("menu-import");
     settingPageTpl->bindEmpty("menu-preview");
@@ -584,7 +594,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   
   Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(m_mainWidget);
   Wt::WStandardItem *item = new Wt::WStandardItem();
-  item->setText("Select a description file");
+  item->setText("-- Select a description file --");
   viewSelectorModel->appendRow(item);
   
   Q_FOREACH(const View& view, views) {
@@ -602,7 +612,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
     int index = viewSelector->currentIndex();
     Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(viewSelector->model());
     if (index>0) {
-      m_selectFile = boost::any_cast<std::string>(model->item(index, 0)->data());
+      m_selectedFile = boost::any_cast<std::string>(model->item(index, 0)->data());
     }
   }));
   

@@ -66,7 +66,7 @@ private:
   CoreDataT* m_cdata;
   double m_scaleX;
   double m_scaleY;
-  Wt::WPainter* m_painter;
+  std::shared_ptr<Wt::WPainter> m_painter;
   Wt::WScrollArea* m_scrollArea;
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;

@@ -47,7 +47,7 @@ ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model,
 
 }
 
-Wt::WValidator::Result ConfirmPasswordValidator::validate (const Wt::WString &input) const
+Wt::WValidator::Result ConfirmPasswordValidator::validate(const Wt::WString &input) const
 {
   return (m_model->valueText(m_passwordField) == input)?
         Wt::WValidator::Result(Wt::WValidator::Valid):
@@ -133,11 +133,12 @@ void UserFormModel::setWritable(bool writtable)
 
 Wt::WValidator* UserFormModel::createNameValidator(void)
 {
-  Wt::WLengthValidator *v = new Wt::WLengthValidator();
-  v->setMandatory(true);
-  v->setMinimumLength(1);
-  v->setMaximumLength(MAX_LENGTH);
-  return v;
+  Wt::WLengthValidator* validator = new Wt::WLengthValidator();
+  validator->setInvalidBlankText("Required field");
+  validator->setMandatory(true);
+  validator->setMinimumLength(1);
+  validator->setMaximumLength(MAX_LENGTH);
+  return validator;
 }
 
 Wt::WValidator* UserFormModel::createPasswordValidator(void)
@@ -145,12 +146,16 @@ Wt::WValidator* UserFormModel::createPasswordValidator(void)
   Wt::Auth::PasswordStrengthValidator* v = new Wt::Auth::PasswordStrengthValidator();
   v->setMinimumLength(Wt::Auth::PasswordStrengthValidator::TwoCharClass, 6);
   v->setMandatory(true);
-  return createNameValidator();
+  return v;
 }
 
 Wt::WValidator* UserFormModel::createEmailValidator(void)
 {
-  return new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
+  Wt::WRegExpValidator* validator = new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
+  validator->setInvalidBlankText("Required field");
+  validator->setInvalidBlankText("Invalid email");
+  validator->setMandatory(true);
+  return validator;
 }
 
 Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)

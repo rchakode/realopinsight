@@ -66,9 +66,12 @@ private:
     OPEN = 1,
     IMPORT = 0
   };
+  typedef std::map<std::string, WebDashboard*> DashboardListT;
 
   Wt::WContainerWidget* m_mainWidget;
   Settings* m_settings;
+  Wt::WText* m_infoBox;
+  Wt::WText* m_notificationBox;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   WebPreferences* m_preferenceForm;
@@ -76,14 +79,10 @@ private:
   Wt::WStackedWidget* m_contents;
   Wt::WStackedWidget* m_mgntContents;
   Wt::WNavigationBar* m_navbar;
-  Wt::WMenu* m_profileMenu;
-  Wt::WMenuItem* m_mainProfileMenuItem;
   Wt::WTabWidget* m_dashtabs;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
-  std::string m_selectFile;
-  WebDashboard* m_currentDashboard;
-  typedef std::map<std::string, WebDashboard*> DashboardListT;
+  std::string m_selectedFile;
   DashboardListT m_dashboards;
   std::string m_confdir;
   UserMngtUI* m_userMgntUI;
@@ -91,12 +90,14 @@ private:
   Wt::WDialog* m_changePasswordPanel;
   ViewAssignmentUI* m_viewAssignmentDialog;
   Wt::WDialog* m_aboutDialog;
-  Wt::Signal<void> m_terminateSession;
   int m_assignedDashboardCount;
   Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WText* m_adminPanelTitle;
-  Wt::WText* m_infoBox;
   bool m_showSettingTab;
+  WebDashboard* m_currentDashboard;
+
+  /** Signals */
+  Wt::Signal<void> m_terminateSession;
 
   void addEvents(void);
   void createMainUI(void);

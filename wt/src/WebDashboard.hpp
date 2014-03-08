@@ -45,8 +45,7 @@
 class WebDashboard : public DashboardBase
 {
 public:
-  WebDashboard(const QString& _config,
-               Wt::WVBoxLayout* eventFeedLayout=NULL);
+  WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout=NULL);
   virtual ~WebDashboard();
   Wt::WWidget* get(void) const {return m_widget;}
   void updateMap(void);
@@ -55,6 +54,7 @@ public:
   Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
   Wt::WLabel* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
   void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
+  virtual void initialize(Preferences* preferencePtr);
 
 protected:
   virtual void buildMap(void);

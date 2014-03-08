@@ -30,7 +30,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <fstream>
-#include <iostream>
 #include <QDebug>
 #include <Wt/WApplication>
 #include <Wt/WPanel>
@@ -81,9 +80,8 @@ namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
 }
 
-WebDashboard::WebDashboard(const QString& _config,
-                           Wt::WVBoxLayout* eventFeedLayout)
-  : DashboardBase(_config),
+WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
+  : DashboardBase(descriptionFile),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new WebTree(m_cdata)),
     m_map(new WebMap(m_cdata)),
@@ -93,12 +91,17 @@ WebDashboard::WebDashboard(const QString& _config,
 {
   setupUI();
   addJsEventScript();
-  m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
 }
 
 WebDashboard::~WebDashboard()
 {
   delete m_widget; // Other widget are deleted through the hierarchy
+}
+
+void WebDashboard::initialize(Preferences* preferencePtr)
+{
+  DashboardBase::initialize(preferencePtr);
+  m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
 }
 
 void WebDashboard::buildTree(void)
@@ -123,8 +126,7 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  for (CheckStatusCountT::ConstIterator it = m_cdata->check_status_count.begin(),
-       end = m_cdata->check_status_count.end(); it != end; ++it) {
+  for (auto it = std::begin(m_cdata->check_status_count); it != std::end(m_cdata->check_status_count); ++it) {
     m_chart->setSeverityData(it.key(), it.value());
   }
   m_chart->setToolTip(statsTooltip());

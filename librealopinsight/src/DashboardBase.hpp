@@ -41,14 +41,14 @@ class LIBREALOPINSIGHTSHARED_EXPORT DashboardBase : public QObject
   Q_OBJECT
 
 public:
-  DashboardBase(const QString& _config);
+  DashboardBase(const QString& descriptionFile);
   virtual ~DashboardBase();
 
   static StringMapT propRules();
   static StringMapT calcRules();
   void initSettings(Preferences* preferencePtr);
   qint64 updateCounter(void) const {return m_updateCounter;}
-  QString config(void) const {return m_config;}
+  QString config(void) const {return m_descriptionFile;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString selectedNode(void) const {return m_selectedNode;}
   void setTimerId(qint32 id) {m_timerId = id;}
@@ -74,7 +74,7 @@ public Q_SLOTS:
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {Q_EMIT errorOccurred(msg);}
-  void initialize(Preferences* preferencePtr);
+  virtual void initialize(Preferences* preferencePtr);
 
 Q_SIGNALS:
   void hasToBeUpdate(QString);
@@ -86,7 +86,7 @@ Q_SIGNALS:
   void errorOccurred(QString msg);
 
 protected:
-  QString m_config;
+  QString m_descriptionFile;
   CoreDataT* m_cdata;
   qint64 m_updateCounter;
   QString m_selectedNode;

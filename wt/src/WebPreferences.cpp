@@ -58,18 +58,28 @@ WebPreferences::WebPreferences(void)
   m_sourceBox = std::make_shared<Wt::WComboBox>(mainContainer);
   m_sourceBoxModel = std::make_shared<Wt::WStringListModel>(m_sourceBox.get());
   m_sourceBox->setModel(m_sourceBoxModel.get());
-  tpl->bindWidget("source-box", m_sourceBox.get());
 
   m_sourceBox->changed().connect(std::bind([=]() {
     fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
   }));
+  tpl->bindWidget("source-box", m_sourceBox.get());
 
   m_monitorTypeField = std::make_shared<Wt::WComboBox>(mainContainer);
-  tpl->bindWidget("monitor-type", m_monitorTypeField.get());
-  m_monitorTypeField->addItem(ngrt4n::tr("Select a monitor type"));
+  m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
   for (const auto& srcid: ngrt4n::sourceTypes()) {
     m_monitorTypeField->addItem(srcid.toStdString());
   }
+
+  m_monitorTypeField->changed().connect(std::bind([=]() {
+    if (m_sourceBox->currentIndex() != 1) {
+      m_livestatusHostField->setEnabled(false);
+      m_livestatusPortField->setEnabled(false);
+    } else {
+      m_livestatusHostField->setEnabled(true);
+      m_livestatusPortField->setEnabled(true);
+    }
+  }));
+  tpl->bindWidget("monitor-type", m_monitorTypeField.get());
 
   m_monitorUrlField = std::make_shared<Wt::WLineEdit>(mainContainer);
   m_monitorUrlField->setValidator(createTextValidator());

@@ -163,7 +163,7 @@ void ViewAssignmentUI::resetModelData(void)
 
   int count = 0;
   m_userListModel->insertRows(count, 1);
-  m_userListModel->setData(count, 0, Wt::WString("Select a user"));
+  m_userListModel->setData(count, 0, Wt::WString("-- Select user --"));
   ++count;
 
   for (const auto& user: m_dbSession->userList()) {

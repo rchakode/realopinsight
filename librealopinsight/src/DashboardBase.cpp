@@ -63,8 +63,8 @@ StringMapT DashboardBase::calcRules() {
   return map;
 }
 
-DashboardBase::DashboardBase(const QString& _config)
-  : m_config(ngrt4n::getAbsolutePath(_config)),
+DashboardBase::DashboardBase(const QString& descriptionFile)
+  : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
     m_cdata (new CoreDataT()),
     m_updateCounter(0),
     m_settings (new Settings()),
@@ -81,8 +81,8 @@ DashboardBase::~DashboardBase()
 void DashboardBase::initialize(Preferences* preferencePtr)
 {
   m_errorState = false;
-  if (! m_config.isEmpty()) {
-    Parser parser(m_config, m_cdata);
+  if (! m_descriptionFile.isEmpty()) {
+    Parser parser(m_descriptionFile, m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
     if (parser.process(true)) {
       buildTree();
@@ -99,7 +99,7 @@ void DashboardBase::runMonitor()
 {
   resetStatData();
   if (m_cdata->monitor == ngrt4n::Auto) {
-    for (SourceListT::Iterator src=m_sources.begin(), end=m_sources.end(); src!=end; ++src)
+    for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src)
     {
       runMonitor(*src);
     }
