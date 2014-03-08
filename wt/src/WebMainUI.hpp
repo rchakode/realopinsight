@@ -66,7 +66,8 @@ private:
     OPEN = 1,
     IMPORT = 0
   };
-  typedef std::map<std::string, WebDashboard*> DashboardListT;
+  typedef std::map<QString, WebDashboard*> DashboardListT;
+  typedef std::map<QString, Wt::WMenuItem*> DashboardTabIndexesT;
 
   Wt::WContainerWidget* m_mainWidget;
   Settings* m_settings;
@@ -95,6 +96,7 @@ private:
   Wt::WText* m_adminPanelTitle;
   bool m_showSettingTab;
   WebDashboard* m_currentDashboard;
+  DashboardTabIndexesT m_dashTabIndexes;
 
   /** Signals */
   Wt::Signal<void> m_terminateSession;
@@ -107,7 +109,7 @@ private:
   void openFileUploadDialog(void);
   void selectFileToOpen(void);
   void initOperatorDashboard(void);
-  void loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex);
+  void loadView(const std::string& path, WebDashboard*& dashboard);
   Wt::WTemplate* thumbnail(WebDashboard* dashboard);
   void finishFileDialog(int action);
   void scaleMap(double factor);

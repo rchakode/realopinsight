@@ -250,6 +250,7 @@ void WebMainUI::handleRefresh(void)
       ++problemCount;
       highestSeverity = std::max(highestSeverity, platformSeverity);
     }
+    m_dashTabIndexes[dash.second->rootNode().name]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
   }
   m_notificationBox->setText(QString::number(problemCount).toStdString());
   m_notificationBox->setStyleClass("badge " + ngrt4n::severityCssClass(highestSeverity));
@@ -369,9 +370,8 @@ void WebMainUI::finishFileDialog(int action)
     m_fileUploadDialog->accept();
     m_fileUploadDialog->contents()->clear();
     if (! m_selectedFile.empty()) {
-      int tabIndex;
       WebDashboard* dashbord;
-      loadView(m_selectedFile, dashbord, tabIndex);
+      loadView(m_selectedFile, dashbord);
       m_selectedFile.clear();
     } else {
       showMessage(tr("No file selected").toStdString(), "alert alert-warning");
@@ -382,24 +382,22 @@ void WebMainUI::finishFileDialog(int action)
   }
 }
 
-void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard, int& tabIndex)
+void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
 {
-  tabIndex = -1;
-  
   dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
   dashboard->initialize(m_preferences);
   connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
   
   if (! dashboard->errorState()) {
-    std::string platform = dashboard->rootNode().name.toStdString();
+    QString platformName = dashboard->rootNode().name;
     std::pair<DashboardListT::iterator, bool> result;
-    result = m_dashboards.insert(std::pair<std::string, WebDashboard*>(platform, dashboard));
+    result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
     if (result.second) {
-      Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->get(), platform, Wt::WTabWidget::LazyLoading);
+      Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->get(), platformName.toStdString());
       tab->triggered().connect(std::bind([=]() {
         m_currentDashboard = dashboard;
       }));
-      tabIndex = m_dashtabs->count() - 1;
+      m_dashTabIndexes.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
     } else {
       delete dashboard;
       dashboard = NULL;
@@ -673,9 +671,8 @@ void WebMainUI::initOperatorDashboard(void)
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
   for (const auto& view: m_dbSession->viewList()) {
-    int tabIndex;
     WebDashboard* dashboard;
-    loadView(view.path, dashboard, tabIndex);
+    loadView(view.path, dashboard);
     if (dashboard) {
       layout->addWidget(thumbnail(dashboard));
     }
