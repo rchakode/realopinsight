@@ -251,7 +251,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
       m_eventFeedItems.insert(node.id, widget);
     }
   } else {
-    LOG ("warn", "Null event feeds container");
+    LOG ("warn", "Invalid null event feeds container");
   }
 }
 
