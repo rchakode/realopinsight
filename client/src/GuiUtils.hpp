@@ -29,6 +29,7 @@ namespace ngrt4n {
   QColor severityQColor(const int& _criticity);
   void alert(const QString & msg);
   QIcon severityIcon(int _severity);
+  QString getWelcomeMsg(const QString& utility);
 }
 
 #endif // GUIUTILS_HPP

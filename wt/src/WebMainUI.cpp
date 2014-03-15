@@ -272,7 +272,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectFileToOpen(void)
 {
-  m_fileUploadDialog->setWindowTitle(tr("Select a file | %1").arg(APP_NAME).toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Select the platform to preview").toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
   
@@ -317,7 +317,7 @@ void WebMainUI::openFileUploadDialog(void)
   
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
-    showMessage(tr("File is too large.").toStdString(), "alert alert-warning");
+    showMessage(tr("File too large.").toStdString(), "alert alert-warning");
   }));
   m_fileUploadDialog->show();
 }
@@ -451,11 +451,11 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     settingPageTpl->bindWidget("menu-preview", link);
 
     m_mgntContents->addWidget(m_viewAssignmentDialog->contents());
-    link = new Wt::WAnchor("#", "All Views and Assignments", m_mainWidget);
+    link = new Wt::WAnchor("#", "All Views and Access Permissions", m_mainWidget);
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_viewAssignmentDialog->contents());
       m_viewAssignmentDialog->resetModelData();
-      m_adminPanelTitle->setText("Manage Views and Assignments");
+      m_adminPanelTitle->setText("Manage Views and Access Permissions");
     }));
     settingPageTpl->bindWidget("menu-all-views", link);
 

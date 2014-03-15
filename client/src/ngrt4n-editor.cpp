@@ -23,13 +23,13 @@
  */
 
 #include "utilsClient.hpp"
-#include "ns.hpp"
-#include "client/Auth.hpp"
-#include "client/SvConfigCreator.hpp"
-#include <sstream>
-#include <getopt.h>
+#include "global.hpp"
+#include "Auth.hpp"
 #include "Base.hpp"
-#include <memory>
+#include "SvConfigCreator.hpp"
+#include "GuiPreferences.hpp"
+#include <iostream>
+#include <getopt.h>
 
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "Options: \n"
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   INIT_TRANSLATION;
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
-  app->setStyleSheet(Preferences::style());
+  app->setStyleSheet(GuiPreferences::style());
 
   QString cmdName= basename(argv[0]);
   QString versionMsg = ngrt4n::getWelcomeMsg(QObject::tr("Editor"));

@@ -5,43 +5,43 @@
 <context>
     <name>Auth</name>
     <message>
-        <location filename="../client/src/Auth.cpp" line="38"/>
+        <location filename="../client/src/Auth.cpp" line="37"/>
         <source>%1 - Login</source>
         <translation>%1 - Authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="45"/>
+        <location filename="../client/src/Auth.cpp" line="44"/>
         <source>Version %1 (%2)</source>
         <translation>Version %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="48"/>
+        <location filename="../client/src/Auth.cpp" line="47"/>
         <source>Login</source>
         <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="51"/>
+        <location filename="../client/src/Auth.cpp" line="50"/>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="56"/>
+        <location filename="../client/src/Auth.cpp" line="55"/>
         <source>Sign in</source>
         <translation>Connexion</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="57"/>
+        <location filename="../client/src/Auth.cpp" line="56"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="58"/>
+        <location filename="../client/src/Auth.cpp" line="57"/>
         <source>
 Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
         <translation>Copyright (c) 2010-%1 Projet NGRT4N. Tous droits réservés.</translation>
     </message>
     <message>
-        <location filename="../client/src/Auth.cpp" line="92"/>
+        <location filename="../client/src/Auth.cpp" line="91"/>
         <source>Authentication failed: wrong username or password</source>
         <translation>Echec d&apos;autentification: nom d&apos;utilisateur ou mot de passe incorrect</translation>
     </message>
@@ -49,7 +49,7 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
 <context>
     <name>AuthManager</name>
     <message>
-        <location filename="../wt/src/AuthManager.cpp" line="67"/>
+        <location filename="../wt/src/AuthManager.cpp" line="63"/>
         <source>Wt.Auth.template.logged-in</source>
         <translation type="unfinished"></translation>
     </message>
@@ -152,39 +152,39 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>GuiDashboard</name>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="81"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="80"/>
         <source>Map</source>
         <translation type="unfinished">Cartographie</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="83"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="82"/>
         <source>Web Browser</source>
         <translation type="unfinished">Navigateur Web</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="219"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="218"/>
         <source>Messages related to &apos;%2&apos; - %1</source>
         <translation type="unfinished">Messages relatifs au service &apos;%2&apos; - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="287"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="286"/>
         <source> - %1 Problem%2
  - Level of Impact: %3</source>
         <translation type="unfinished"> - %1 incident%2
  - Niveau d&apos;impact : %3</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="288"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="287"/>
         <source>s</source>
         <translation type="unfinished">s</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="303"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="302"/>
         <source>Message Console</source>
         <translation type="unfinished">Console des messages</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="357"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="356"/>
         <source>Web Browser (%1)</source>
         <translation type="unfinished">Navigateur Web (%1)</translation>
     </message>
@@ -837,6 +837,14 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="unfinished">%1 - Attention</translation>
     </message>
     <message>
+        <location filename="../client/src/GuiUtils.cpp" line="46"/>
+        <source>       &gt; %1 %2 %3 (codename: %4)
+        &gt;&gt; Realease ID: %5
+        &gt;&gt; Copyright (C) 2010 - %6 RealOpInsight Labs. All rights reserved
+        &gt;&gt; For bug reporting instructions, see: &lt;%7&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../client/src/MsgConsole.cpp" line="41"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="48"/>
         <source>Date &amp; Hour</source>
@@ -913,7 +921,7 @@ Visiter notre site web %6 pour plus d&apos;informations
 Reporter des bugs : bugs@ngrt4n.com</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="42"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="41"/>
         <source>Service: %1
 Description: %2
 Severity: %3
@@ -926,7 +934,7 @@ Séverité : %3
    Règle de propagation : %5</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="43"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="42"/>
         <source>
 Target Host: %6
 Data Point: %7
@@ -939,7 +947,7 @@ Sortie du plugin : %8
 Autres détails : %9</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="44"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="43"/>
         <source>Failed to connect to %1 (%2)</source>
         <translation>Echec lors de la connexion à %1 (%2)</translation>
     </message>
@@ -968,19 +976,19 @@ Autres détails : %9</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="96"/>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="90"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="91"/>
         <source>You need to select a configuration file!</source>
         <translation>Vous devez sélectionner un fichier de configuration!</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="99"/>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="94"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="95"/>
         <source>%1 | Select a configuration file</source>
         <translation>%1 | Sélectionner un fichier de configuration</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="101"/>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="96"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="97"/>
         <source>Xml files (*.xml);;All files (*)</source>
         <translation>Fichiers Xml (*.xml);;Tous les fichiers (*)</translation>
     </message>
@@ -990,7 +998,7 @@ Autres détails : %9</translation>
         <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="51"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="52"/>
         <source>Operations Console</source>
         <translation>Console des opérations</translation>
     </message>
@@ -1003,7 +1011,7 @@ Loading...</source>
 Chargement...</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="99"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="100"/>
         <source>No configuration file selected, the program will exit!</source>
         <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
     </message>
@@ -1105,11 +1113,6 @@ Chargement...</translation>
         <translation type="obsolete">Console des operations %1</translation>
     </message>
     <message>
-        <location filename="../wt/dbo/UserMngtUI.cpp" line="412"/>
-        <source>User %1 deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="35"/>
         <source>View Managment</source>
         <translation type="unfinished"></translation>
@@ -1130,22 +1133,67 @@ Chargement...</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="141"/>
+        <location filename="../wt/src/WebUtils.cpp" line="139"/>
         <source>&lt;span class=&quot;btn&quot;&gt; &lt;i class=&quot;%1&quot;&gt;&lt;/i&gt;&lt;/span&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/AuthManager.cpp" line="72"/>
+        <location filename="../wt/src/AuthManager.cpp" line="68"/>
         <source>Sign out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="229"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="41"/>
+        <source>Please verify the monitor type and fix field(s) in red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="88"/>
+        <source>Show in clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="111"/>
+        <source>Use ngrt4nd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="114"/>
+        <source>Don&apos;t verify SSL certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="120"/>
+        <source>Apply changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="123"/>
+        <source>Add as source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="126"/>
+        <source>Delete source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="158"/>
+        <source>Bad monitor type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="162"/>
+        <source>Bad index for source (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebPreferences.cpp" line="254"/>
         <source>Select source type</source>
         <translation type="unfinished">Sélectionner le type de source</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="234"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="259"/>
         <source>Select the source index</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1764,7 +1812,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>UserFormView</name>
     <message>
-        <location filename="../wt/dbo/UserMngtUI.cpp" line="171"/>
+        <location filename="../wt/dbo/UserMngtUI.cpp" line="175"/>
         <source>userForm-template</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1772,7 +1820,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>WebDashboard</name>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="262"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="266"/>
         <source>%1 event on %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1792,113 +1840,112 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>WebMainUI</name>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="62"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="314"/>
-        <source>Select a file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="110"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="619"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="116"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="669"/>
         <source>Operations Console</source>
         <translation type="unfinished">Console des opérations</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="510"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="339"/>
+        <source>Invalid description file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="561"/>
         <source>Change password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="322"/>
-        <source>Finish</source>
+        <location filename="../wt/src/WebMainUI.cpp" line="62"/>
+        <source>Select file to preview | %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="108"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="123"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="114"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="129"/>
         <source>Account &amp; Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="215"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="163"/>
         <source>Signed in as %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="224"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="236"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="172"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="185"/>
         <source>Show Account &amp; Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="230"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="178"/>
         <source>Hide Account &amp; Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="242"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="192"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="330"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="275"/>
+        <source>Select the platform to preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="283"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="291"/>
         <source>Import a description file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="343"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="304"/>
         <source>Upload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="350"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="589"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="311"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="639"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="359"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="320"/>
         <source>File is too large.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="378"/>
-        <source>Invalid configuration file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="384"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="345"/>
         <source>%1/%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="396"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="357"/>
         <source>View added.  Name: %1
  -  Number of services: %2 - Path: %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="417"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="377"/>
         <source>No file selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="447"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="404"/>
         <source>This platform or a platfom with the same name is already loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="491"/>
-        <source>Manage user account</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="528"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="579"/>
         <source>Sorry, the request resource is not available or has been removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="665"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="712"/>
         <source>Unable to create the directory (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1906,7 +1953,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>Wt::WString</name>
     <message>
-        <location filename="../wt/dbo/UserMngtUI.cpp" line="433"/>
+        <location filename="../wt/dbo/UserMngtUI.cpp" line="415"/>
         <source>user-list-tpl</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1916,62 +1963,62 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="210"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="212"/>
         <source>statistic-tooltip.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="257"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="261"/>
         <source>event-feed.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="153"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="436"/>
         <source>getting-started.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="209"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="157"/>
         <source>notification.block.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="468"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="427"/>
         <source>admin-home.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="615"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="665"/>
         <source>operator-home.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="592"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="642"/>
         <source>about-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="639"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="686"/>
         <source>dashboard-thumbnail.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="46"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="51"/>
         <source>setting-page.tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="41"/>
+        <location filename="../wt/src/WebUtils.cpp" line="42"/>
         <source>error-msg-div-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="44"/>
+        <location filename="../wt/src/WebUtils.cpp" line="45"/>
         <source>success-msg-div-tpl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="96"/>
+        <location filename="../wt/src/WebUtils.cpp" line="94"/>
         <source>copyright-footer.tpl</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1984,48 +2031,8 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
 <context>
     <name>ngrt4n</name>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="39"/>
-        <source>Preferences - </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="64"/>
-        <source>Select a monitor type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="82"/>
-        <source>Use ngrt4nd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="89"/>
-        <source>Don&apos;t verify SSL certificate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="90"/>
-        <source>Show in clear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="93"/>
-        <source>Apply changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="94"/>
-        <source>Add as source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="95"/>
-        <source>Delete source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="133"/>
-        <source>Bad monitor type</source>
+        <location filename="../wt/src/WebPreferences.cpp" line="63"/>
+        <source>-- Select a type --</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

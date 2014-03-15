@@ -262,7 +262,7 @@ void DbSession::initDb(void)
     createTables();
     User adm;
     adm.username = "admin";
-    adm.password = "realopinsight";
+    adm.password = "password";
     adm.firstname = "Default";
     adm.lastname = "Administrator";
     adm.role = User::AdmRole;
