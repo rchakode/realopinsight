@@ -660,7 +660,7 @@ void WebMainUI::initOperatorDashboard(void)
   
   
   Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
-  m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
+  m_eventFeedLayout.reset(new Wt::WVBoxLayout(eventFeeds));
   
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);

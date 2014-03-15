@@ -92,10 +92,10 @@ private:
   ViewAssignmentUI* m_viewAssignmentDialog;
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;
-  Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WText* m_adminPanelTitle;
   bool m_showSettingTab;
   WebDashboard* m_currentDashboard;
+  std::shared_ptr <Wt::WVBoxLayout> m_eventFeedLayout;
   DashboardTabIndexesT m_dashTabIndexes;
 
   /** Signals */

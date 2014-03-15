@@ -45,7 +45,7 @@
 class WebDashboard : public DashboardBase
 {
 public:
-  WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout=NULL);
+  WebDashboard(const QString& descriptionFile, std::shared_ptr<Wt::WVBoxLayout> eventFeedLayout=NULL);
   virtual ~WebDashboard();
   Wt::WWidget* get(void) const {return m_widget;}
   void updateMap(void);
@@ -53,7 +53,7 @@ public:
   void updateThumbnail(void);
   Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
   Wt::WLabel* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
-  void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
+  void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout.reset(layout);}
   virtual void initialize(Preferences* preferencePtr);
 
 protected:
@@ -73,7 +73,7 @@ private:
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
   Wt::WLabel* m_thumbnailTitleBar;
-  Wt::WVBoxLayout* m_eventFeedLayout;
+  std::shared_ptr<Wt::WVBoxLayout> m_eventFeedLayout;
   EventFeedItemsT m_eventFeedItems;
 
   void setupUI(void);
