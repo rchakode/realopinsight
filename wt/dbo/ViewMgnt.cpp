@@ -31,34 +31,29 @@
 #include <Wt/WStandardItem>
 #include <Wt/WText>
 
-ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
-  : Wt::WDialog(QObject::tr("View Managment").toStdString(), parent),
+ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WContainerWidget* parent)
+  : Wt::WContainerWidget(parent),
     m_dbSession(dbSession),
     m_userListModel(new Wt::WStandardItemModel(this)),
     m_assignedViewModel(new Wt::WStandardItemModel(this)),
-    m_nonAssignedViewModel(new Wt::WStandardItemModel(this))
+    m_nonAssignedViewModel(new Wt::WStandardItemModel(this)),
+    m_updateCompleted(this)
 {
-  setStyleClass("Wt-dialog");
-  titleBar()->setStyleClass("titlebar");
-  Wt::WContainerWidget* container = contents();
-  container->setMargin(30, Wt::Left|Wt::Right);
-  container->setMargin(10, Wt::Bottom);
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), container);
-
-  m_infoBox = new Wt::WText(container);
-  tpl->bindWidget("info-box", m_infoBox);
+  this->setMargin(30, Wt::Left|Wt::Right);
+  this->setMargin(10, Wt::Bottom);
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("view-assignment-tpl"), this);
 
   setModelHeaderTitles(m_assignedViewModel);
-  m_assignedViewList = createViewList(m_assignedViewModel, container);
+  m_assignedViewList = createViewList(m_assignedViewModel, this);
   m_assignedViewList->setSelectable(true);
   tpl->bindWidget("assigned-views", m_assignedViewList);
 
   setModelHeaderTitles(m_nonAssignedViewModel);
-  m_nonAssignedViewList = createViewList(m_nonAssignedViewModel, container);
+  m_nonAssignedViewList = createViewList(m_nonAssignedViewModel, this);
   m_nonAssignedViewList->setSelectable(true);
   tpl->bindWidget("non-assigned-views",m_nonAssignedViewList);
 
-  Wt::WComboBox* userSelector = new Wt::WComboBox(container);
+  Wt::WComboBox* userSelector = new Wt::WComboBox(this);
   userSelector->setModel(m_userListModel);
   userSelector->setSelectable(true);
   userSelector->changed().connect(std::bind([=](){
@@ -71,15 +66,15 @@ ViewAssignmentUI::ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent)
   }));
   tpl->bindWidget("user-selector", userSelector);
 
-  m_assignButton = new Wt::WPushButton(QObject::tr("<< Assign").toStdString(), container);
+  m_assignButton = new Wt::WPushButton(QObject::tr("<< Assign").toStdString(), this);
   m_assignButton->setStyleClass("btn btn-success");
   m_assignButton->clicked().connect(this, &ViewAssignmentUI::assignViews);
 
-  m_revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(), container);
+  m_revokeButton = new Wt::WPushButton(QObject::tr("Revoke>>").toStdString(), this);
   m_revokeButton->setStyleClass("btn btn-warning");
   m_revokeButton->clicked().connect(this, &ViewAssignmentUI::revokeViews);
 
-  m_deleteViewButton = new Wt::WPushButton(QObject::tr("Delete View").toStdString(), container);
+  m_deleteViewButton = new Wt::WPushButton(QObject::tr("Delete View").toStdString(), this);
   m_deleteViewButton->setStyleClass("btn btn-danger");
   m_deleteViewButton->clicked().connect(this, &ViewAssignmentUI::deleteViews);
 
@@ -220,7 +215,7 @@ void ViewAssignmentUI::deleteViews(void)
   setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
 
   std::string msg;
-  int summary = 0;
+  int finalReturnCode = 0;
   for (auto vname : m_selectedViews) {
     int ret = m_dbSession->deleteView(vname);
     if (ret != 0) {
@@ -229,9 +224,9 @@ void ViewAssignmentUI::deleteViews(void)
     } else {
       msg+="- View deleted "+vname + " -";
     }
-    summary+=ret;
+    finalReturnCode+=ret;
   }
-  ngrt4n::showMessage(summary, msg, msg, m_infoBox);
+  m_updateCompleted.emit(finalReturnCode, msg);
 
   filter(m_username);
 }

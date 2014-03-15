@@ -89,7 +89,7 @@ private:
   UserMngtUI* m_userMgntUI;
   UserFormView* m_userAccountForm;
   Wt::WDialog* m_changePasswordPanel;
-  ViewAssignmentUI* m_viewAssignmentDialog;
+  ViewAssignmentUI* m_viewAccessPermissionForm;
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;
   Wt::WText* m_adminPanelTitle;

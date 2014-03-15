@@ -343,9 +343,6 @@
 
 <message id="view-assignment-tpl">
   <div class="row">
-      ${info-box}
-  </div>
-  <div class="row">
     <div class="span-one-third">
       <div class="center">${user-selector}</div>
     </div>

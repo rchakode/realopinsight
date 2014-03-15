@@ -450,11 +450,11 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     link->clicked().connect(this, &WebMainUI::selectFileToOpen);
     settingPageTpl->bindWidget("menu-preview", link);
 
-    m_mgntContents->addWidget(m_viewAssignmentDialog->contents());
+    m_mgntContents->addWidget(m_viewAccessPermissionForm);
     link = new Wt::WAnchor("#", "All Views and Access Permissions", m_mainWidget);
     link->clicked().connect(std::bind([=](){
-      m_mgntContents->setCurrentWidget(m_viewAssignmentDialog->contents());
-      m_viewAssignmentDialog->resetModelData();
+      m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
+      m_viewAccessPermissionForm->resetModelData();
       m_adminPanelTitle->setText("Manage Views and Access Permissions");
     }));
     settingPageTpl->bindWidget("menu-all-views", link);
@@ -627,7 +627,14 @@ void WebMainUI::showMessage(const std::string& msg, std::string status)
 
 void WebMainUI::createViewAssignmentDialog(void)
 {
-  m_viewAssignmentDialog = new ViewAssignmentUI(m_dbSession, m_mainWidget);
+  m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession, m_mainWidget);
+  m_viewAccessPermissionForm->updateCompleted().connect(std::bind([=](int retCode, std::string msg) {
+    if (retCode != 0) {
+      showMessage(msg, "alert alert-success");
+    } else {
+      showMessage(msg, "alert alert-warning");
+    }
+  }, std::placeholders::_1, std::placeholders::_2));
 }
 
 void WebMainUI::createAboutDialog(void)

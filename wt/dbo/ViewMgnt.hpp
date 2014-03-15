@@ -31,19 +31,21 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/WTableView>
 #include <Wt/WPushButton>
+#include <Wt/WContainerWidget>
 #include <set>
 
 class View;
 class DbSession;
 
-class ViewAssignmentUI : public Wt::WDialog
+class ViewAssignmentUI: public Wt::WContainerWidget
 {
 public:
-  ViewAssignmentUI(DbSession* dbSession, Wt::WObject* parent=0);
+  ViewAssignmentUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   virtual ~ViewAssignmentUI(void);
 
   void filter(const std::string& username);
   void resetModelData(void);
+  Wt::Signal<int, std::string>& updateCompleted(void) {return m_updateCompleted;}
 
 private:
   typedef std::set<std::string> KeyListT;
@@ -58,7 +60,7 @@ private:
   Wt::WPushButton* m_revokeButton;
   Wt::WPushButton* m_deleteViewButton;
   KeyListT m_selectedViews;
-  Wt::WText* m_infoBox;
+  Wt::Signal<int, std::string> m_updateCompleted;
 
   void addView(Wt::WStandardItemModel* model, const View& view);
   void setModelHeaderTitles(Wt::WStandardItemModel* model);
