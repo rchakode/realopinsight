@@ -243,7 +243,7 @@ void WebMap::updateThumbnail(void)
 
   // Now save the image
   if (m_thumbnailPath.empty()) {
-    m_thumbnailPath=boost::filesystem::unique_path("/run/thumb-%%%%%%.svg").string();
+    m_thumbnailPath=boost::filesystem::unique_path("/tmp/thumb-%%%%%%.svg").string();
   }
   std::ofstream output(wApp->docRoot().append(m_thumbnailPath));
   thumbnailImg.write(output);
