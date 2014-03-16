@@ -793,7 +793,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
         updateDashboardOnError(src, tr("%1 is not set").arg(*id));
       }
     } else {
-      Q_EMIT errorOccurred(tr("Could not handle this source (%1)").arg(*id));
+      Q_EMIT errorOccurred(tr("Cannot handle source (%1)").arg(*id));
     }
   }
   resetInterval();

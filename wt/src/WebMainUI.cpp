@@ -385,9 +385,7 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
 {
   dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
-  dashboard->initialize(m_preferences);
-  connect(dashboard, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
-  
+  dashboard->initialize(m_preferences);  
   if (! dashboard->errorState()) {
     QString platformName = dashboard->rootNode().name;
     std::pair<DashboardListT::iterator, bool> result;
