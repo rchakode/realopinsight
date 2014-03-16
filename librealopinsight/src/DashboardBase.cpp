@@ -90,7 +90,6 @@ void DashboardBase::initialize(Preferences* preferencePtr)
       initSettings(preferencePtr);
     } else {
       m_errorState = true;
-      m_lastError = parser.dotFile();
     }
   }
 }

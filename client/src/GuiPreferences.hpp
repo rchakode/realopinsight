@@ -28,6 +28,8 @@ private:
 
 class GuiPreferences : public Preferences
 {
+  Q_OBJECT
+
 public:
   explicit GuiPreferences(qint32 _userRole, qint32 _formType);
   ~GuiPreferences();
@@ -54,7 +56,7 @@ protected Q_SLOTS:
   void setAuthChainVisibility(const int& state);
   void handleDonate(void);
   void changePasswd(void);
-  void handleSourceSelected();
+  void handleSourceSelected(void);
 
 private:
   QDialog* m_dialog;

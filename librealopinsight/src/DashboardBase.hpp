@@ -73,7 +73,7 @@ public Q_SLOTS:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
-  void handleErrorOccurred(QString msg) {Q_EMIT errorOccurred(msg);}
+  void handleErrorOccurred(QString msg) {m_lastError  = msg;}
   virtual void initialize(Preferences* preferencePtr);
 
 Q_SIGNALS:

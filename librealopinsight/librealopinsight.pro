@@ -34,7 +34,7 @@ DEFINES *= "PACKAGE_VERSION='\"$${VERSION}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
 DEFINES *= "RELEASE_YEAR='\"2014\"'"
-DEFINES *= "BUG_REPORT_EMAIL='\"bugs@ngrt4n.com\"'"
+DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 
 QMAKE_CXXFLAGS += -std=c++0x
 

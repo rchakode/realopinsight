@@ -29,7 +29,7 @@
 MainWindow::MainWindow(const qint32& _userRole,
                        const QString& _config)
   : QMainWindow(0),
-    m_preferences (new GuiPreferences(_userRole, Preferences::ChangeMonitoringSettings)),
+    m_preferences(new GuiPreferences(_userRole, Preferences::ChangeMonitoringSettings)),
     m_dashboard(new GuiDashboard(_userRole, _config)),
     m_contextMenu(new QMenu(this))
 {
@@ -38,7 +38,6 @@ MainWindow::MainWindow(const qint32& _userRole,
   setCentralWidget(m_dashboard->getWidget());
   handleTabChanged(0);
   addEvents();
-
   m_dashboard->initialize(m_preferences);
 }
 
@@ -179,9 +178,14 @@ void MainWindow::toggleFullScreen(bool _toggled)
 void MainWindow::render(void)
 {
   show();
-  m_dashboard->scalPaneContentsToViewPort();
-  QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
-                              .arg(m_dashboard->rootNode().name, APP_NAME));
+  m_dashboard->initialize(m_preferences);
+  if (! m_dashboard->errorState()) {
+    m_dashboard->scalPaneContentsToViewPort();
+    QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
+                                .arg(m_dashboard->rootNode().name, APP_NAME));
+  } else {
+    ngrt4n::alert(m_dashboard->lastError());
+  }
 }
 
 void MainWindow::handleTabChanged(int _index)
@@ -251,7 +255,7 @@ void MainWindow::addEvents(void)
   m_dashboard->setMsgPaneToolBar(actions);
 
   connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
-  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), this, SLOT(handleSourceSettingsChanged(QList<qint8>)));
+  connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), m_dashboard, SLOT(handleSourceSettingsChanged(QList<qint8>)));
   connect(m_dashboard, SIGNAL(hasToBeUpdate(QString)), m_dashboard, SLOT(updateBpNode(QString)));
   connect(m_subMenus["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
   connect(m_subMenus["Capture"], SIGNAL(triggered(bool)), m_dashboard->getMap(), SLOT(capture()));
