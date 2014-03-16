@@ -213,20 +213,28 @@ void ViewAssignmentUI::deleteViews(void)
 {
   disableButtons();
   setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
-
-  std::string msg;
+  std::string outputMsg;
   int finalReturnCode = 0;
-  for (auto vname : m_selectedViews) {
-    int ret = m_dbSession->deleteView(vname);
-    if (ret != 0) {
-      msg+="- Failed to delete "+vname + " -";
-      Wt::log("warning") <<"[realopinsight] "<< m_dbSession->lastError();
-    } else {
-      msg+="- View deleted "+vname + " -";
+  for (const auto& vname : m_selectedViews) {
+    View curView;
+    if (m_dbSession->findView(vname, curView)) {
+      if (m_dbSession->deleteView(vname) != 0) {
+        outputMsg.append("- Failed to delete view: "+vname + " -");
+        Wt::log("warning") <<"[realopinsight] "<< m_dbSession->lastError();
+        finalReturnCode = -1;
+      } else {
+        if (! QFile(curView.path.c_str()).remove()) {
+          finalReturnCode = -1;
+          Wt::log("info") <<"[realopinsight] Failed to removed file: "<< curView.path;
+        } else {
+          Wt::log("info") <<"[realopinsight] View removed: "<< vname;
+        }
+      }
     }
-    finalReturnCode+=ret;
   }
-  m_updateCompleted.emit(finalReturnCode, msg);
+  if (finalReturnCode != 0) {
+    m_updateCompleted.emit(finalReturnCode, outputMsg);
+  }
 
   filter(m_username);
 }

@@ -95,7 +95,7 @@ namespace ngrt4n {
   };
   const std::string AdmUser = "ngrt4n_adm";
   const std::string OpUser = "ngrt4n_op";
-  const int MAX_FILE_UPLOAD = 10 * 1024 * 1024; // 10MB
+  const int MAX_FILE_UPLOAD = 2048; // 2MB
   const std::string CHILD_SEP = ",";
   const std::string TAG_ZABBIX_HOSTNAME = "\\{HOSTNAME\\}";
   const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";

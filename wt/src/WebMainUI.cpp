@@ -356,7 +356,7 @@ void WebMainUI::finishFileDialog(int action)
           } else {
             QString msg = tr("View added. "
                              " Name: %1\n - "
-                             " Number of services: %2 -"
+                             " Services: %2 -"
                              " Path: %3").arg(view.name.c_str(),
                                               QString::number(view.service_count),
                                               view.path.c_str());
@@ -630,9 +630,9 @@ void WebMainUI::createViewAssignmentDialog(void)
   m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession, m_mainWidget);
   m_viewAccessPermissionForm->updateCompleted().connect(std::bind([=](int retCode, std::string msg) {
     if (retCode != 0) {
-      showMessage(msg, "alert alert-success");
-    } else {
       showMessage(msg, "alert alert-warning");
+    } else {
+      showMessage(msg, "alert alert-success");
     }
   }, std::placeholders::_1, std::placeholders::_2));
 }

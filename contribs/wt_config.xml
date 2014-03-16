@@ -204,7 +204,7 @@
                The default value is 128K, which is more than enough for
                any interactive Wt event.
 	      -->
-	    <max-memory-request-size>128</max-memory-request-size>
+	    <max-memory-request-size>1024</max-memory-request-size>
 	</connector-isapi>
 
         <!-- Javascript debug options
@@ -246,7 +246,7 @@
            Maximum size of an incoming POST request. This value must be
            increased when the user is allowed to upload files.
          -->
-	<max-request-size>128</max-request-size>
+	<max-request-size>1024</max-request-size>
 
 	<!-- Session id length (number of characters) -->
 	<session-id-length>16</session-id-length>

@@ -253,7 +253,19 @@ void DbSession::updateViewList(const std::string& uname)
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
+}
 
+bool DbSession::findView(const std::string& vname, View& view)
+{
+  ViewListT::const_iterator it = std::find_if(m_viewList.begin(),
+                                              m_viewList.end(),
+                                              [&vname](View v){return v.name == vname;});
+  bool found = false;
+  if (it != m_viewList.end()) {
+    found = true;
+    view = *it;
+  }
+  return found;
 }
 
 void DbSession::initDb(void)

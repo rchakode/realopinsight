@@ -70,6 +70,7 @@ public:
   void updateViewList(void);
   void updateViewList(const std::string& uname);
   ViewListT& viewList(void) {return m_viewList;}
+  bool findView(const std::string& vname, View& view);
 
   void updateUserViewList(void);
   UserViewListT& userViewList(void) {return m_userViewList;}
