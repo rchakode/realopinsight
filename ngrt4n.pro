@@ -98,7 +98,7 @@ LIBS += -lwt -lwthttp -lwtdbo -lwtdbosqlite3 \
 
 INCLUDEPATH += wt/src \
                wt/dbo \
-               wt/lib/wtwithqt
+               wt/extlibs/wtwithqt
 
 HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebMsgConsole.hpp \
@@ -113,8 +113,8 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebUtils.hpp \
     wt/src/AuthManager.hpp \
     wt/src/WebPreferences.hpp \
-    wt/lib/wtwithqt/DispatchThread.h \
-    wt/lib/wtwithqt/WQApplication
+    wt/extlibs/wtwithqt/DispatchThread.h \
+    wt/extlibs/wtwithqt/WQApplication
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -129,8 +129,8 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebUtils.cpp \
     wt/src/AuthManager.cpp \
     wt/src/WebPreferences.cpp \
-    wt/lib/wtwithqt/DispatchThread.C \
-    wt/lib/wtwithqt/WQApplication.C
+    wt/extlibs/wtwithqt/DispatchThread.C \
+    wt/extlibs/wtwithqt/WQApplication.C
 }
 
 dflag {
