@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Raphaël tutorial - Getting Started - Example 1</title>    
+    <script type="text/javascript" src="js/raphael-min.js"></script>    
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>    
+  </head>
+  <body>
+  
+	<!-- the html element where to put the paper -->
+	<div id="paper1"></div>
+	
+	<!-- a script that create's a paper and a rectangle -->
+	<script type="text/javascript">
+	var paper = Raphael("paper1", 500,500);
+	var rect1 = paper.rect(20,30,100,12).attr({fill: "orange"});
+	var ellipse1 = paper.ellipse(120,130,40,30).attr({fill: "red"});
+	var circle1 = paper.circle(160,50,40).attr({fill: "yellow"});
+	var path1 = paper.path("m10,10l30,40l150,80z").
+		attr({fill: "green", "stroke-width": 2});
+	
+	var set1 = paper.set();
+	set1.push(rect1, ellipse1, circle1);
+	set1.attr({"stroke": "purple", "stroke-width": 3, "stroke-dasharray": "."});
+	</script>
+	
+  </body>
+</html>
