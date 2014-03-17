@@ -63,7 +63,7 @@ public:
 
 int main(int argc, char **argv)
 {
-  RealOpInsightQApp* qtApp = new RealOpInsightQApp(argc, argv);
+  RealOpInsightQApp qtApp (argc, argv);
 
   try {
     std::string configurationFile = "/opt/install/etc/wt_config.xml";
@@ -80,5 +80,5 @@ int main(int argc, char **argv)
   } catch (std::exception &e) {
     LOG("error", e.what());
   }
-  return qtApp->exec();
+  return qtApp.exec();
 }
