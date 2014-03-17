@@ -64,20 +64,20 @@ protected :
   virtual void deleteSource(void);
 
 private:
-  std::shared_ptr<Wt::WComboBox> m_sourceBox;
-  std::shared_ptr<Wt::WStringListModel> m_sourceBoxModel;
-  std::shared_ptr<Wt::WLineEdit> m_monitorUrlField;
-  std::shared_ptr<Wt::WLineEdit> m_authStringField;
-  std::shared_ptr<Wt::WLineEdit> m_livestatusHostField;
-  std::shared_ptr<Wt::WLineEdit> m_livestatusPortField;
-  std::shared_ptr<Wt::WComboBox> m_monitorTypeField;
-  std::shared_ptr<Wt::WCheckBox> m_showAuthStringField;
-  std::shared_ptr<Wt::WCheckBox> m_useNgrt4ndField;
-  std::shared_ptr<Wt::WCheckBox> m_dontVerifyCertificateField;
-  std::shared_ptr<Wt::WSpinBox> m_updateIntervalField;
-  std::shared_ptr<Wt::WPushButton> m_applyChangeBtn;
-  std::shared_ptr<Wt::WPushButton> m_addAsSourceBtn;
-  std::shared_ptr<Wt::WPushButton> m_deleteSourceBtn;
+  std::unique_ptr<Wt::WComboBox> m_sourceBox;
+  std::unique_ptr<Wt::WStringListModel> m_sourceBoxModel;
+  std::unique_ptr<Wt::WLineEdit> m_monitorUrlField;
+  std::unique_ptr<Wt::WLineEdit> m_authStringField;
+  std::unique_ptr<Wt::WLineEdit> m_livestatusHostField;
+  std::unique_ptr<Wt::WLineEdit> m_livestatusPortField;
+  std::unique_ptr<Wt::WComboBox> m_monitorTypeField;
+  std::unique_ptr<Wt::WCheckBox> m_showAuthStringField;
+  std::unique_ptr<Wt::WCheckBox> m_useNgrt4ndField;
+  std::unique_ptr<Wt::WCheckBox> m_dontVerifyCertificateField;
+  std::unique_ptr<Wt::WSpinBox> m_updateIntervalField;
+  std::unique_ptr<Wt::WPushButton> m_applyChangeBtn;
+  std::unique_ptr<Wt::WPushButton> m_addAsSourceBtn;
+  std::unique_ptr<Wt::WPushButton> m_deleteSourceBtn;
   Wt::Signal<std::string> m_errorOccurred;
 
   void promptUser(int inputType);
