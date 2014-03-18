@@ -9,7 +9,7 @@
   <body>
   
 	<!-- the html element where to put the paper -->
-	<div id="HostList"></div>
+	<div id="HostLoad"></div>
 	
 	<!-- a script that create's a paper and a rectangle -->
 	<script type="text/javascript">
@@ -28,16 +28,29 @@
              {
                if ($(this).find('boolean').text() == 1) 
                {
+                 var paper = Raphael(10, 50, 500, 500);
+                 var CORE_UNIT = 10;
+                 var ITEM_MARGIN = 2;
+                 var curTop = 0;
+                 var curLeft = 0;
                  $( $.parseXML( $(this).find('string').text() ) ).find('HOST').each(   
                  function()
                  {
-                   console.log($(this).find('ID').text());
+                   var nbCpu = $(this).find('MAX_CPU').text() / 100;
+                   var nbRow = Math.ceil(nbCpu / 4);
+                   for (var item=0; item< nbCpu; ++item) {
+                     var coreSideWidth = CORE_UNIT + ITEM_MARGIN;
+                     paper.rect(curLeft + 1, curTop + 1, coreSideWidth, coreSideWidth);
+                     curLeft += coreSideWidth + ITEM_MARGIN;
+                   }
+                   //curTop += itemHeight;
+ /*                console.log($(this).find('ID').text());
                    console.log($(this).find('NAME').text());
                    console.log($(this).find('RUNNING_VMS').text());
                    console.log($(this).find('MAX_MEM').text());
-                   console.log($(this).find('MAX_CPU').text());
                    console.log($(this).find('FREE_MEM').text());
                    console.log($(this).find('FREE_CPU').text());
+*/                   
                  });     
               }               
            }
