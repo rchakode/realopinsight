@@ -1,29 +1,178 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Raphaël tutorial - Getting Started - Example 1</title>    
-    <script type="text/javascript" src="js/raphael-min.js"></script>    
-    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>    
+  <title>ONE Insight - Host Usage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <script type="text/javascript" src="js/raphael-min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="css/bootswatch.min.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="../bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
   </head>
   <body>
-  
-	<!-- the html element where to put the paper -->
-	<div id="paper1"></div>
-	
-	<!-- a script that create's a paper and a rectangle -->
-	<script type="text/javascript">
-	var paper = Raphael("paper1", 500,500);
-	var rect1 = paper.rect(20,30,100,12).attr({fill: "orange"});
-	var ellipse1 = paper.ellipse(120,130,40,30).attr({fill: "red"});
-	var circle1 = paper.circle(160,50,40).attr({fill: "yellow"});
-	var path1 = paper.path("m10,10l30,40l150,80z").
-		attr({fill: "green", "stroke-width": 2});
-	
-	var set1 = paper.set();
-	set1.push(rect1, ellipse1, circle1);
-	set1.attr({"stroke": "purple", "stroke-width": 3, "stroke-dasharray": "."});
-	</script>
-	
+    <script src="../assets/js/bsa.js"></script>
+
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../" class="navbar-brand">RealOpInsight-one</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Nodes <span class="caret"></span></a>
+              <ul class="dropdown-menu" aria-labelledby="themes">
+                <li><a tabindex="-1" href="../default/">Default</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+          <li><a href="help.html">Help</a></li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+
+        <!-- the html element where to put the paper -->
+        <div id="HostLoad"></div>
+
+        <!-- a script that create's a paper and a rectangle -->
+        <script type="text/javascript">
+        $(document).ready(
+        function()
+        {
+      $.ajax(
+      {
+         type: "GET",
+         url: "onehost.xml",
+         dataType: "xml",
+         success: function(xml)
+         {
+             $(xml).find('methodResponse').find('data').each(
+             function()
+             {
+               if ($(this).find('boolean').text() == 1)
+               {
+                 var DRAWING_AREA = new Object();
+                     DRAWING_AREA.width = 800,
+                     DRAWING_AREA.height = '100%';
+
+                 var BASE_SHAPE_INFO = new Object();
+                     BASE_SHAPE_INFO.unit = 10,
+                     BASE_SHAPE_INFO.margin = 2;
+                     BASE_SHAPE_INFO.node_margin = 4;
+
+                 var curPos = new Object();
+                     curPos.x = BASE_SHAPE_INFO.node_margin,
+                     curPos.y = BASE_SHAPE_INFO.node_margin;
+
+                 var paper = Raphael("HostLoad", DRAWING_AREA.width, '100%');
+
+                 $( $.parseXML( $(this).find('string').text() ) ).find('HOST').each(
+                 function()
+                 {
+                   var nbCpu = $(this).find('MAX_CPU').text() / 100;
+                   var nbRow = 1;
+                   var nbCol = 1;
+
+                   switch(nbCpu) {
+                   case 1:
+                     nbRow = 1;
+                   break;
+                   case 2:
+                   case 4:
+                     nbRow = 2;
+                   break;
+                   case 6:
+                   case 12:
+                     nbRow = 6;
+                   case 8:
+                   case 16:
+                     nbRow = 4;
+                   break;
+                   default:
+                     if (nbCpu % 4 == 0)
+                       nbRow = 4;
+                     else if (nbCpu % 6 == 0)
+                       nbRow = 6;
+                     else if (nbCpu % 8 == 0)
+                       nbRow = 8;
+                     else
+                       nbRow = Math.ceil(nbCpu);
+                   break;
+                   }
+
+                   nbCol = Math.ceil(nbCpu / nbRow);
+
+                   var curNodeShape = new Object();
+                       curNodeShape.width  = nbCol * BASE_SHAPE_INFO.unit + (nbCol - 1) * BASE_SHAPE_INFO.margin;
+                       curNodeShape.height = nbRow * BASE_SHAPE_INFO.unit + (nbRow - 1) * BASE_SHAPE_INFO.margin;
+
+                   if (curPos.x + curNodeShape.width > DRAWING_AREA.width) {
+                     curPos.y += curNodeShape.height + BASE_SHAPE_INFO.node_margin;
+                     curPos.x = BASE_SHAPE_INFO.node_margin;
+                   }
+
+                   for (var index=0; index< nbCpu; ++index) {
+                     var curShape = paper.rect(curPos.x + Math.floor(index / nbRow) * (BASE_SHAPE_INFO.unit + BASE_SHAPE_INFO.margin),
+                                               curPos.y + (index % nbRow) * (BASE_SHAPE_INFO.unit + BASE_SHAPE_INFO.margin),
+                                               BASE_SHAPE_INFO.unit,
+                                               BASE_SHAPE_INFO.unit)
+                                          //.attr({fill: '#00ff00', 'stroke-width': 0});
+                                          .attr({fill: '#10A2EB', 'stroke-width': 0});
+                   }
+                   curPos.x += curNodeShape.width + BASE_SHAPE_INFO.node_margin;
+                 });
+              }
+           }
+         );
+        }
+      });
+    }
+   );
+</script>
+
+
+
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            
+            <ul class="list-unstyled">
+              <li class="pull-right"><a href="#top">Back to top</a></li>
+              <li><a href="http://news.bootswatch.com" onclick="pageTracker._link(this.href); return 
+false;">Blog</a></li>
+              <li><a href="https://twitter.com/thomashpark">Twitter</a></li>
+              <li><a href="https://github.com/thomaspark/bootswatch/">GitHub</a></li>
+              <li><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=F22JEM3Q78JC2">Donate</a></li>
+            </ul>
+            <p>Made by <a href="http://realopinsight.com">Rodrigue Chakode</a>. Contact him at <a 
+href="mailto:chakode@realopinsight.com">rodrigue.chakode@realopinsight.com</a>.</p>
+            <p>Code licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 
+License v2.0</a>.</p>
+          </div>
+        </div>
+        
+      </footer>
+    
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootswatch.js"></script>
   </body>
 </html>
