@@ -661,11 +661,11 @@ void WebMainUI::createAboutDialog(void)
 void WebMainUI::initOperatorDashboard(void)
 {
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
-  Wt::WHBoxLayout* layout = new  Wt::WHBoxLayout(thumbs);
+  Wt::WGridLayout* thumbLayout = new Wt::WGridLayout(thumbs);
   
   
   Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
-  m_eventFeedLayout.reset(new Wt::WVBoxLayout(eventFeeds));
+  m_eventFeedLayout = std::make_shared<Wt::WVBoxLayout>(eventFeeds);
   
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
@@ -675,11 +675,13 @@ void WebMainUI::initOperatorDashboard(void)
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
+  int thumbIndex = 0;
   for (const auto& view: m_dbSession->viewList()) {
     WebDashboard* dashboard;
     loadView(view.path, dashboard);
     if (dashboard) {
-      layout->addWidget(thumbnail(dashboard));
+      thumbLayout->addWidget(thumbnail(dashboard), thumbIndex / 4, thumbIndex % 4);
+      ++thumbIndex;
     }
   }
   startDashbaordUpdate();
