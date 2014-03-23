@@ -24,33 +24,26 @@
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
 #include <QFile>
-#include <Wt/Auth/AuthService>
-#include <Wt/Auth/PasswordVerifier>
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/Identity>
 #include <Wt/Auth/PasswordStrengthValidator>
 
-namespace {
-  Wt::Auth::AuthService basicAuthService;
-  Wt::Auth::PasswordService passAuthService(basicAuthService);
-}
-
 DbSession::DbSession(void)
-  : m_dbPath(ngrt4n::sqliteDbPath()),
-    m_sqlite3Db(new Wt::Dbo::backend::Sqlite3(m_dbPath)),
-    m_dbUsers(new UserDatabase(*this))
+  : m_dbPath(ngrt4n::sqliteDbPath())
 {
+  m_dbUsers.reset(new UserDatabase(*this));
+  m_passAuthService.reset(new Wt::Auth::PasswordService(m_basicAuthService));
+  m_sqlite3Db.reset(new Wt::Dbo::backend::Sqlite3(m_dbPath));
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
   setupDb();
   updateUserList();
   updateViewList();
+  configureAuth();
 }
 
 DbSession::~DbSession()
 {
-  delete m_sqlite3Db;
-  delete m_dbUsers;
 }
 
 void DbSession::setupDb(void)
@@ -79,7 +72,7 @@ int DbSession::addUser(const User& user)
       Wt::Auth::User dbuser = m_dbUsers->registerNew();
       dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
       info.modify()->setEmail(user.email);
-      passAuthService.updatePassword(dbuser, user.password);
+      m_passAuthService->updatePassword(dbuser, user.password);
       User* userTmpPtr(new User());
       *userTmpPtr = user;
       info.modify()->setUser(add(userTmpPtr));
@@ -126,9 +119,9 @@ int DbSession::updatePassword(const std::string& uname,
   try {
     dbo::Transaction transaction(*this);
     Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
-    switch (passAuthService.verifyPassword(dbuser, currentPass)) {
+    switch (m_passAuthService->verifyPassword(dbuser, currentPass)) {
       case Wt::Auth::PasswordValid:
-        passAuthService.updatePassword(dbuser, newpass);
+        m_passAuthService->updatePassword(dbuser, newpass);
         retCode = 0;
         break;
       case Wt::Auth::PasswordInvalid:
@@ -174,12 +167,12 @@ std::string DbSession::hashPassword(const std::string& pass)
 
 Wt::Auth::AuthService& DbSession::auth()
 {
-  return basicAuthService;
+  return m_basicAuthService;
 }
 
-Wt::Auth::PasswordService& DbSession::passwordAuthentificator(void)
+Wt::Auth::PasswordService* DbSession::passwordAuthentificator(void)
 {
-  return passAuthService;
+  return m_passAuthService.get();
 }
 
 Wt::Auth::Login& DbSession::loginObject(void)
@@ -189,13 +182,13 @@ Wt::Auth::Login& DbSession::loginObject(void)
 
 void DbSession::configureAuth(void)
 {
-  basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
-  basicAuthService.setEmailVerificationEnabled(true);
+  m_basicAuthService.setAuthTokensEnabled(true, "realopinsightcookie");
+  m_basicAuthService.setEmailVerificationEnabled(true);
   Wt::Auth::PasswordVerifier* verifier = new Wt::Auth::PasswordVerifier();
   verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));
-  passAuthService.setVerifier(verifier);
-  passAuthService.setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
-  passAuthService.setAttemptThrottlingEnabled(true);
+  m_passAuthService->setVerifier(verifier);
+  m_passAuthService->setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
+  m_passAuthService->setAttemptThrottlingEnabled(true);
 }
 
 void DbSession::setLoggedUser(const std::string& uid)

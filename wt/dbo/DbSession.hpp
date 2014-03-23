@@ -26,6 +26,8 @@
 #define DBSESSION_HPP
 
 #include "DbObjects.hpp"
+#include <Wt/Auth/AuthService>
+#include <Wt/Auth/PasswordVerifier>
 #include <Wt/Dbo/Dbo>
 #include <Wt/Dbo/backend/Sqlite3>
 #include <Wt/Auth/PasswordService>
@@ -46,10 +48,10 @@ public:
   void setupDb(void);
   std::string lastError(void) const {return m_lastError;}
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
-  static Wt::Auth::AuthService& auth();
-  static Wt::Auth::PasswordService& passwordAuthentificator(void);
+  Wt::Auth::AuthService& auth();
+  Wt::Auth::PasswordService* passwordAuthentificator(void);
   Wt::Auth::Login& loginObject(void);
-  static void configureAuth(void);
+  void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(const std::string& uid);
 
@@ -80,14 +82,16 @@ public:
 
 private:
   std::string m_dbPath;
-  dbo::backend::Sqlite3* m_sqlite3Db;
-  UserDatabase* m_dbUsers;
+  std::unique_ptr<dbo::backend::Sqlite3> m_sqlite3Db;
+  std::unique_ptr<UserDatabase> m_dbUsers;
   User m_loggedUser;
   UserListT m_userList;
   ViewListT m_viewList;
   UserViewListT m_userViewList;
   std::string m_lastError;
   Wt::Auth::Login m_loginObj;
+  Wt::Auth::AuthService m_basicAuthService;
+  std::unique_ptr<Wt::Auth::PasswordService> m_passAuthService;
 
   std::string hashPassword(const std::string& pass);
   void initDb(void);

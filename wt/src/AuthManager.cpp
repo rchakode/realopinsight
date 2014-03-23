@@ -42,9 +42,9 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_dbSession(dbSession),
     m_mainUI(NULL)
 {
-  Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(DbSession::auth(), m_dbSession->users());
+  Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
   authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
-  authModel->addPasswordAuth(&m_dbSession->passwordAuthentificator());
+  authModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
   Wt::Auth::AuthWidget::setModel(authModel);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);

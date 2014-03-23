@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     server.setServerConfiguration(argc, argv);
     server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication);
 
-    DbSession::configureAuth();
+    //DbSession::configureAuth();
 
     if (server.start()) {
       Wt::WServer::waitForShutdown();
