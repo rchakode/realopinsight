@@ -80,7 +80,7 @@ namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
 }
 
-WebDashboard::WebDashboard(const QString& descriptionFile, std::shared_ptr<Wt::WVBoxLayout> eventFeedLayout)
+WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
   : DashboardBase(descriptionFile),
     m_widget(new Wt::WContainerWidget()),
     m_tree(new WebTree(m_cdata)),

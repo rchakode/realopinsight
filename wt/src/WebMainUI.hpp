@@ -95,7 +95,7 @@ private:
   Wt::WText* m_adminPanelTitle;
   bool m_showSettingTab;
   WebDashboard* m_currentDashboard;
-  std::shared_ptr <Wt::WVBoxLayout> m_eventFeedLayout;
+  Wt::WVBoxLayout* m_eventFeedLayout;
   DashboardTabIndexesT m_dashTabIndexes;
 
   /** Signals */
@@ -110,7 +110,7 @@ private:
   void selectFileToOpen(void);
   void initOperatorDashboard(void);
   void loadView(const std::string& path, WebDashboard*& dashboard);
-  Wt::WTemplate* thumbnail(WebDashboard* dashboard);
+  Wt::WTemplate* getDashboardThumbnail(WebDashboard* dashboard);
   void finishFileDialog(int action);
   void scaleMap(double factor);
   Wt::WWidget* createSettingPage(void);

@@ -419,7 +419,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
     std::pair<DashboardListT::iterator, bool> result;
     result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
     if (result.second) {
-      Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->get(), platformName.toStdString());
+      Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->getWidget(), platformName.toStdString());
       tab->triggered().connect(std::bind([=]() {
         m_currentDashboard = dashboard;
       }));
@@ -689,7 +689,7 @@ void WebMainUI::initOperatorDashboard(void)
   
   
   Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
-  m_eventFeedLayout = std::make_shared<Wt::WVBoxLayout>(eventFeeds);
+  m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
   
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
@@ -704,7 +704,9 @@ void WebMainUI::initOperatorDashboard(void)
     WebDashboard* dashboard;
     loadView(view.path, dashboard);
     if (dashboard) {
-      thumbLayout->addWidget(thumbnail(dashboard), thumbIndex / 4, thumbIndex % 4);
+      Wt::WTemplate* thumb = getDashboardThumbnail(dashboard);
+      thumb->clicked().connect(std::bind([=](){m_dashtabs->setCurrentWidget(dashboard->getWidget());}));
+      thumbLayout->addWidget(thumb, thumbIndex / 4, thumbIndex % 4);
       ++thumbIndex;
     }
   }
@@ -712,7 +714,7 @@ void WebMainUI::initOperatorDashboard(void)
 }
 
 
-Wt::WTemplate* WebMainUI::thumbnail(WebDashboard* dashboard)
+Wt::WTemplate* WebMainUI::getDashboardThumbnail(WebDashboard* dashboard)
 {
   Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
   tpl->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
