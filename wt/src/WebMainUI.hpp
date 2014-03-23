@@ -72,7 +72,7 @@ private:
   Wt::WContainerWidget* m_mainWidget;
   Settings* m_settings;
   Wt::WText* m_infoBox;
-  Wt::WText* m_notificationBox;
+  std::map<int, Wt::WText*> m_notificationBoxes;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   WebPreferences* m_preferences;
@@ -88,7 +88,7 @@ private:
   std::string m_confdir;
   UserMngtUI* m_userMgntUI;
   UserFormView* m_userAccountForm;
-  Wt::WDialog* m_changePasswordPanel;
+  UserFormView* m_changePasswordPanel;
   ViewAssignmentUI* m_viewAccessPermissionForm;
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;

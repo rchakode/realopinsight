@@ -455,7 +455,10 @@
 <message id="notification.block.tpl">
    <div class="notification-container">
    <i class="fa fa-bell" id="notification-flag"></i>
-   <sup>${problem-count}</sup>
+   <sup>${minor-count}</sup>
+   <sup>${major-count}</sup>
+   <sup>${critical-count}</sup>
+   <sup>${unknown-count}</sup>
    </div>
 </message>
 </messages>

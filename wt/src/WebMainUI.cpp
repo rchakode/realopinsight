@@ -67,7 +67,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 {
   m_preferences->setEnabledInputs(false);
   m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this,
-                                                      std::placeholders::_1, "alert alert-warning"));
+                                                   std::placeholders::_1, "alert alert-warning"));
   // create directory for view thumbnails and misc runtime data
   // true means clean the directory
   createDirectory(wApp->docRoot().append("/run"), true);
@@ -153,15 +153,34 @@ void WebMainUI::setupProfileMenus(void)
   m_navbar->addMenu(profileMenu, Wt::AlignRight);
   
   if (m_dbSession->loggedUser().role == User::OpRole) {
-    Wt::WTemplate* notificationIcon = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
-    m_notificationBox = new Wt::WText("0");
-    notificationIcon->bindWidget("problem-count", m_notificationBox);
-    m_navbar->addWidget(notificationIcon, Wt::AlignRight);
+
+    Wt::WTemplate* notificationBlock = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+
+    m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
+    m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
+    m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
+    notificationBlock->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
+
+    m_notificationBoxes[ngrt4n::Major] = new Wt::WText("0");
+    m_notificationBoxes[ngrt4n::Major]->setStyleClass("badge severity-major");
+    m_notificationBoxes[ngrt4n::Major]->setHidden(true);
+    notificationBlock->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
+
+    m_notificationBoxes[ngrt4n::Critical] = new Wt::WText("0");
+    m_notificationBoxes[ngrt4n::Critical]->setStyleClass("badge severity-critical");
+    m_notificationBoxes[ngrt4n::Critical]->setHidden(true);
+    notificationBlock->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
+
+    m_notificationBoxes[ngrt4n::Unknown] = new Wt::WText("0");
+    m_notificationBoxes[ngrt4n::Unknown]->setStyleClass("badge severity-unknown");
+    m_notificationBoxes[ngrt4n::Unknown]->setHidden(true);
+    notificationBlock->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
+
+    m_navbar->addWidget(notificationBlock, Wt::AlignRight);
   }
   
-  Wt::WMenuItem* profileMenuItem = new Wt::WMenuItem(tr("Signed in as %1")
-                                                     .arg(m_dbSession->loggedUser().username.c_str())
-                                                     .toStdString());
+  Wt::WMenuItem* profileMenuItem
+      = new Wt::WMenuItem(tr("Signed in as %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
   profileMenuItem->setMenu(profilePopupMenu);
   profileMenu->addItem(profileMenuItem);
@@ -238,21 +257,31 @@ void WebMainUI::handleRefresh(void)
   m_timer.stop();
   m_mainWidget->disable();
   
-  int problemCount = 0;
-  int highestSeverity = ngrt4n::Normal;
+  std::map<int, int> problemTypeCount;
+  problemTypeCount[ngrt4n::Minor] = 0;
+  problemTypeCount[ngrt4n::Major] = 0;
+  problemTypeCount[ngrt4n::Critical] = 0;
+  problemTypeCount[ngrt4n::Unknown] = 0;
+
   for (auto& dash : m_dashboards) {
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
     int platformSeverity = dash.second->rootNode().severity;
     if (platformSeverity != ngrt4n::Normal) {
-      ++problemCount;
-      highestSeverity = std::max(highestSeverity, platformSeverity);
+      ++problemTypeCount[platformSeverity];
     }
     m_dashTabIndexes[dash.second->rootNode().name]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
   }
-  m_notificationBox->setText(QString::number(problemCount).toStdString());
-  m_notificationBox->setStyleClass("badge " + ngrt4n::severityCssClass(highestSeverity));
+
+  for(auto ptype: problemTypeCount) {
+    m_notificationBoxes[ptype.first]->setText(QString::number(ptype.second).toStdString());
+    if (ptype.second > 0) {
+      m_notificationBoxes[ptype.first]->setHidden(false);
+    } else {
+      m_notificationBoxes[ptype.first]->setHidden(true);
+    }
+  }
 
   updateEventFeeds();
 
@@ -324,67 +353,67 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-  case IMPORT:
-    if (! m_uploader->empty()) {
-      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-        LOG("debug", "Parsing the input file");
-        QString tmpFileName(m_uploader->spoolFileName().c_str());
-        CoreDataT cdata;
+    case IMPORT:
+      if (! m_uploader->empty()) {
+        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+          LOG("debug", "Parsing the input file");
+          QString tmpFileName(m_uploader->spoolFileName().c_str());
+          CoreDataT cdata;
 
-        Parser parser(tmpFileName ,&cdata);
-        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+          Parser parser(tmpFileName ,&cdata);
+          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-        if (! parser.process(false)) {
-          std::string msg = tr("Invalid description file").toStdString();
-          LOG("warn", msg);
-          showMessage(msg, "alert alert-warning");
-        } else {
-
-          std::string filename = m_uploader->clientFileName().toUTF8();
-          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-          QFile file(tmpFileName);
-          file.copy(dest);
-          file.remove();
-
-          View view;
-          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-          view.path = dest.toStdString();
-          if (m_dbSession->addView(view) != 0){
-            showMessage(m_dbSession->lastError(), "alert alert-warning");
+          if (! parser.process(false)) {
+            std::string msg = tr("Invalid description file").toStdString();
+            LOG("warn", msg);
+            showMessage(msg, "alert alert-warning");
           } else {
-            QString msg = tr("View added. "
-                             " Name: %1\n - "
-                             " Services: %2 -"
-                             " Path: %3").arg(view.name.c_str(),
-                                              QString::number(view.service_count),
-                                              view.path.c_str());
-            showMessage(msg.toStdString(), "alert alert-success");
+
+            std::string filename = m_uploader->clientFileName().toUTF8();
+            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+            QFile file(tmpFileName);
+            file.copy(dest);
+            file.remove();
+
+            View view;
+            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+            view.path = dest.toStdString();
+            if (m_dbSession->addView(view) != 0){
+              showMessage(m_dbSession->lastError(), "alert alert-warning");
+            } else {
+              QString msg = tr("View added. "
+                               " Name: %1\n - "
+                               " Services: %2 -"
+                               " Path: %3").arg(view.name.c_str(),
+                                                QString::number(view.service_count),
+                                                view.path.c_str());
+              showMessage(msg.toStdString(), "alert alert-success");
+            }
           }
         }
       }
-    }
-    break;
-  case OPEN:
-    m_fileUploadDialog->accept();
-    m_fileUploadDialog->contents()->clear();
-    if (! m_selectedFile.empty()) {
-      WebDashboard* dashbord;
-      loadView(m_selectedFile, dashbord);
-      m_selectedFile.clear();
-    } else {
-      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-    }
-    break;
-  default:
-    break;
+      break;
+    case OPEN:
+      m_fileUploadDialog->accept();
+      m_fileUploadDialog->contents()->clear();
+      if (! m_selectedFile.empty()) {
+        WebDashboard* dashbord;
+        loadView(m_selectedFile, dashbord);
+        m_selectedFile.clear();
+      } else {
+        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+      }
+      break;
+    default:
+      break;
   }
 }
 
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
 {
   dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
-  dashboard->initialize(m_preferences);  
+  dashboard->initialize(m_preferences);
   if (! dashboard->errorState()) {
     QString platformName = dashboard->rootNode().name;
     std::pair<DashboardListT::iterator, bool> result;
@@ -520,10 +549,10 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   }));
   settingPageTpl->bindWidget("menu-my-account", link);
 
-  m_mgntContents->addWidget(m_changePasswordPanel->contents());
+  m_mgntContents->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password", m_mainWidget);
   link->clicked().connect(std::bind([=](){
-    m_mgntContents->setCurrentWidget(m_changePasswordPanel->contents());
+    m_mgntContents->setCurrentWidget(m_changePasswordPanel);
     m_adminPanelTitle->setText("Change password");
   }));
   settingPageTpl->bindWidget("menu-change-password", link);
@@ -550,13 +579,13 @@ void WebMainUI::createPasswordPanel(void)
 {
   bool changedPassword(true);
   bool userForm(true);
-  UserFormView* form = new UserFormView(&(m_dbSession->loggedUser()),
-                                        changedPassword,
-                                        userForm);
-  form->closeTriggered().connect(std::bind([=](){m_changePasswordPanel->accept();}));
-  form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
-                                                    const std::string& lastpass,
-                                                    const std::string& pass) {
+  m_changePasswordPanel = new UserFormView(&(m_dbSession->loggedUser()),
+                                           changedPassword,
+                                           userForm);
+  //m_changePasswordPanel->closeTriggered().connect(std::bind([=](){m_changePasswordPanel->accept();}));
+  m_changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
+                                                                     const std::string& lastpass,
+                                                                     const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
     if (ret != 0) {
       showMessage("Change password failed, see details in log.", "alert alert-warning");
@@ -564,7 +593,6 @@ void WebMainUI::createPasswordPanel(void)
       showMessage("Successul password updated.", "alert alert-success");
     }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-  m_changePasswordPanel = createDialog(tr("Change password").toStdString(), form);
 }
 
 
