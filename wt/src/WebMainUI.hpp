@@ -117,7 +117,6 @@ private:
   Wt::WAnchor* createAnchorForHomeLink(const std::string& title,const std::string& desc,const std::string& internalPath);
   void createAccountPanel(void);
   void createPasswordPanel(void);
-  void createViewAssignmentDialog(void);
   void createAboutDialog(void);
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);

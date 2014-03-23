@@ -74,7 +74,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
   // Now start creating the view
   createMainUI();
-  createViewAssignmentDialog();
   createAccountPanel();
   createPasswordPanel();
   createAboutDialog();
@@ -448,6 +447,15 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     link->clicked().connect(this, &WebMainUI::selectFileToOpen);
     settingPageTpl->bindWidget("menu-preview", link);
 
+    // Create view management form
+    m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession, m_mainWidget);
+    m_viewAccessPermissionForm->updateCompleted().connect(std::bind([=](int retCode, std::string msg) {
+      if (retCode != 0) {
+        showMessage(msg, "alert alert-warning");
+      } else {
+        showMessage(msg, "alert alert-success");
+      }
+    }, std::placeholders::_1, std::placeholders::_2));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
     link = new Wt::WAnchor("#", "All Views and Access Permissions", m_mainWidget);
     link->clicked().connect(std::bind([=](){
@@ -621,18 +629,6 @@ void WebMainUI::showMessage(const std::string& msg, std::string status)
   m_infoBox->setText(msg);
   m_infoBox->setStyleClass(status);
   m_infoBox->show();
-}
-
-void WebMainUI::createViewAssignmentDialog(void)
-{
-  m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession, m_mainWidget);
-  m_viewAccessPermissionForm->updateCompleted().connect(std::bind([=](int retCode, std::string msg) {
-    if (retCode != 0) {
-      showMessage(msg, "alert alert-warning");
-    } else {
-      showMessage(msg, "alert alert-success");
-    }
-  }, std::placeholders::_1, std::placeholders::_2));
 }
 
 void WebMainUI::createAboutDialog(void)
