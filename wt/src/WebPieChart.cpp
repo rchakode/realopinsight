@@ -1,8 +1,8 @@
 /*
  * WebPieChart.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 27-11-2013                                                 #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update: 23-03-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -21,7 +21,6 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
 #include "WebPieChart.hpp"
 #include "utilsClient.hpp"
 #include <Wt/WStandardItem>

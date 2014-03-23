@@ -1,6 +1,7 @@
+# librealopinsight.pro                                                     #
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-12-2013                                                 #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 23-03-2014                                                 #
 #                                                                          #
 # This Software is part of NGRT4N Project (http://ngrt4n.com).             #
 #                                                                          #

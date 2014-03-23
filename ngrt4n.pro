@@ -1,6 +1,7 @@
+# ngrt4n.pro
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2013 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-12-2013                                                 #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 24-12-2014                                                 #
 #                                                                          #
 # This Software is part of NGRT4N Project (http://ngrt4n.com).             #
 #                                                                          #
@@ -8,7 +9,7 @@
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
 # (at your option) any later version.                                      #
-#        s                                                                  #
+#                                                                          #
 # The Software is distributed in the hope that it will be useful,          #
 # but WITHOUT ANY WARRANTY; without even the implied warranty or           #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
