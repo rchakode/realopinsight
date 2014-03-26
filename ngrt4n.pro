@@ -29,9 +29,16 @@ CONFIG += no_keywords
 TEMPLATE = app
 BASE_VERSION=2.4.2
 VERSION = "-$${BASE_VERSION}"
-LIBS += -lrealopinsight
 
-config-gui-base {
+win32 {
+LIBS += -L$$PWD/../qt-build/debug/ -lrealopinsight1
+}
+unix {
+LIBS += -lrealopinsight
+}
+
+
+gui-base {
 QT += svg gui webkit
 PACKAGE_VERSION = "$${BASE_VERSION}-SE"
 HEADERS	+= client/src/Auth.hpp \
@@ -69,29 +76,29 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/MsgConsole.cpp
 }
 
-config-dist {
+dist {
 SOURCES	+=
 TARGET = RealOpInsight
 }
 
-config-manager {
+manager {
 SOURCES	+= client/src/ngrt4n-manager.cpp
 TARGET = ngrt4n-manager
 }
 
-config-oc {
-CONFIG += config-gui-base
+oc {
+CONFIG += gui-base
 SOURCES	+= client/src/ngrt4n-oc.cpp
 TARGET = ngrt4n-oc
 }
 
-config-editor {
-CONFIG += config-gui-base
+editor {
+CONFIG += gui-base
 SOURCES	+= client/src/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
 
-config-web {
+web {
 PACKAGE_VERSION = "$${BASE_VERSION}-UE"
 TARGET = realopinsight.fcgi
 DEFINES *= REALOPINSIGHT_WEB
@@ -167,7 +174,7 @@ DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
-QMAKE_CXXFLAGS += -pg -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
+QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
 INCLUDEPATH += include \
               librealopinsight/src \
               include/client \

@@ -30,8 +30,8 @@ TEMPLATE = lib
 VERSION=1.0.0
 
 win32 {
-INCLUDEPATH += c:\ZeroMQ\include
-LIBS += -Lc:\ZeroMQ\lib -llibzmq
+INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
+LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
 }
 unix {
 LIBS += -lzmq
