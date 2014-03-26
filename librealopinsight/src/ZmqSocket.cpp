@@ -34,7 +34,7 @@
 #endif
 #if ZMQ_VERSION_MAJOR == 2
 #   define ZMQ_POLL_MSEC    1000
-#elif ZMQ_VERSION_MAJOR == 3
+#else
 #   define ZMQ_POLL_MSEC    1
 #endif
 const int ZERO_LINGER = 0;
@@ -106,7 +106,7 @@ void ZmqSocket::send(const std::string & _msg) {
   memcpy (zmq_msg_data (&msg), _msg.c_str(), _msg.size());
   zmq_send(m_socket, &msg, 0);
   zmq_msg_close(&msg);
-#elif ZMQ_VERSION_MAJOR == 3
+#else
   sent = zmq_send(m_socket, _msg.c_str(), _msg.size(), 0);
 #endif
   if(sent <= 0) { /* TODO: deal with error */}

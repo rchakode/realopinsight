@@ -64,6 +64,7 @@ public:
 int main(int argc, char **argv)
 {
   RealOpInsightQApp qtApp (argc, argv);
+  Q_INIT_RESOURCE(ngrt4n);
 
   try {
     std::string configurationFile = "/opt/install/etc/wt_config.xml";

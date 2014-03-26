@@ -29,6 +29,9 @@
 #include "DashboardBase.hpp"
 #include "utilsClient.hpp"
 #include <memory>
+#include <QGraphicsProxyWidget>
+#include <QScrollBar>
+#include <QFileDialog>
 
 const QString GraphView::LABEL_NODE = ":LABEL";
 const QString GraphView::ICON_NODE = ":ICON";
@@ -88,7 +91,7 @@ void GraphView::mouseReleaseEvent(QMouseEvent * _event)
 void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
 {
   QPointF pos = mapToScene(QPoint(_event->pos()));
-  QGraphicsItem* item = m_scene->itemAt(pos);
+  QGraphicsItem* item = m_scene->itemAt(pos, QTransform());
   if (item) {
     centerOn(pos);
     setChartPos();
@@ -125,7 +128,7 @@ void GraphView::zoomIn()
   QGraphicsView::scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
   if (m_chart) {
     setChartPos();
-    m_chart->scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
+    //FIXME: m_chart->scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
   }
 }
 
@@ -133,7 +136,7 @@ void GraphView::zoomOut()
 {
   QGraphicsView::scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
   if (m_chart) {
-    m_chart->scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
+    //FIXME: m_chart->scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
     setChartPos();
   }
 }
@@ -175,8 +178,8 @@ void GraphView::ajustStatsPanelSize(void)
     QSizeF statPanelSize = m_chart->size();
     m_chartScalFactor = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
     if (m_chartScalFactor < 1) {
-      if (m_mapScalFactor < 1) 	m_chart->scale(1/m_mapScalFactor, 1/m_mapScalFactor);
-      m_chart->scale(m_chartScalFactor, m_chartScalFactor);
+      //FIXME: if (m_mapScalFactor < 1) 	m_chart->scale(1/m_mapScalFactor, 1/m_mapScalFactor);
+      //FIXME: m_chart->scale(m_chartScalFactor, m_chartScalFactor);
     }
     m_isAjustedChartSize = true;
     setChartPos();
@@ -360,7 +363,7 @@ void GraphView::scaleToFitViewPort(void)
   m_mapScalFactor = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
   if (m_mapScalFactor < 1.0) {
     if (m_chart)
-      m_chart->scale(1 / m_mapScalFactor, 1 / m_mapScalFactor);
+      //FIXME: m_chart->scale(1 / m_mapScalFactor, 1 / m_mapScalFactor);
     scale(m_mapScalFactor, m_mapScalFactor);
   } else {
     m_mapScalFactor = 1;

@@ -24,6 +24,7 @@
 #include "GuiUtils.hpp"
 #include "utilsClient.hpp"
 #include "StatsLegend.hpp"
+#include <QMessageBox>
 
 QSplashScreen* ngrt4n::infoScreen(const QString & msg) {
   QSplashScreen* screen = new QSplashScreen(QPixmap(":/images/built-in/loading-screen.png"));
@@ -76,4 +77,12 @@ QString ngrt4n::getWelcomeMsg(const QString& utility)
                                                                                    REL_INFO,
                                                                                    REL_YEAR,
                                                                                    PKG_URL);
+}
+
+
+QString ngrt4n::basename(const char* path)
+{
+  char* name = strrchr(path, '/');
+  name = name ? name + 1 : const_cast<char*>(path);
+  return QString(name);
 }

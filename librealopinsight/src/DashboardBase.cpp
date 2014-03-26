@@ -34,9 +34,15 @@
 #include <sstream>
 #include <QStatusBar>
 #include <QObject>
+#include <QNetworkCookie>
 #include <zmq.h>
 #include <iostream>
 #include <algorithm>
+
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#   include <QUrlQuery>
+#endif
 
 
 namespace {
@@ -509,18 +515,16 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
         QScriptValue ditem = devices.value();
         QString duid = ditem.property("uid").toString();
         QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Component,
-                                                            ZnsHelper::ReqPatterns[ZnsHelper::Component]
-                               .arg(duid, QString::number(ZnsHelper::Component))
-                               .toAscii());
+                                                            ngrt4n::toByteArray(
+                                                              ZnsHelper::ReqPatterns[ZnsHelper::Component].arg(duid, QString::number(ZnsHelper::Component))
+                                                            ));
         processZnsReply(reply, src);
 
         QString did = ngrt4n::realCheckId(src.id, ditem.property("name").toString());
         if (m_cdata->hosts[did].contains("ping", Qt::CaseInsensitive))
         {
           reply = src.zns_handler->postRequest(ZnsHelper::Device,
-                                               ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo]
-                  .arg(duid, QString::number(ZnsHelper::DeviceInfo))
-                  .toAscii());
+                                               ngrt4n::toByteArray(ZnsHelper::ReqPatterns[ZnsHelper::DeviceInfo].arg(duid, QString::number(ZnsHelper::DeviceInfo))));
           processZnsReply(reply, src);
         }
       }
@@ -629,7 +633,6 @@ void DashboardBase::openRpcSession(SourceT& src)
     return;
   }
 
-  QUrl znsUrlParams;
   switch(src.mon_type) {
   case ngrt4n::Nagios:
     if (src.use_ngrt4nd) {
@@ -663,12 +666,21 @@ void DashboardBase::openRpcSession(SourceT& src)
   }
   case ngrt4n::Zenoss: {
     src.zns_handler->setBaseUrl(src.mon_url);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    QUrl znsUrlParams;
+#else
+    QUrlQuery znsUrlParams;
+#endif
     znsUrlParams.addQueryItem("__ac_name", authParams[0]);
     znsUrlParams.addQueryItem("__ac_password", authParams[1]);
     znsUrlParams.addQueryItem("submitted", "true");
     znsUrlParams.addQueryItem("came_from", src.zns_handler->getApiContextEndpoint());
     src.zns_handler->setSslConfig(src.verify_ssl_peer);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
     QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
+#else
+    QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Login, znsUrlParams.query(QUrl::FullyEncoded).toUtf8());
+#endif
     processZnsReply(reply, src);
   }
     break;
@@ -709,9 +721,7 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
         if (info.first != src.id) continue;
 
         QNetworkReply* reply = src.zns_handler->postRequest(ZnsHelper::Device,
-                                                            ZnsHelper::ReqPatterns[ZnsHelper::Device]
-                               .arg(info.second, QString::number(ZnsHelper::Device))
-                               .toAscii());
+                                                            ngrt4n::toByteArray(ZnsHelper::ReqPatterns[ZnsHelper::Device].arg(info.second, QString::number(ZnsHelper::Device))));
         processZnsReply(reply, src);
       }
     }

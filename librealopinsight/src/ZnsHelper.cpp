@@ -23,6 +23,7 @@
  */
 
 #include "ZnsHelper.hpp"
+#include "utilsClient.hpp"
 #include <QtScript/QScriptEngine>
 #include <QDebug>
 #include <QMessageBox>
@@ -60,7 +61,7 @@ void ZnsHelper::setBaseUrl(const QString& url)
 
 QNetworkReply* ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
 {
-  m_reqHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
+  m_reqHandler->setRawHeader("Content-Type", ngrt4n::toByteArray(ContentTypes[reqType]));
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, data);
   reply->setSslConfiguration(*m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));

@@ -430,12 +430,11 @@ void GuiPreferences::changePasswd(void)
                                    QString::fromStdString(ngrt4n::AdmUser)).toString();
   } else {
     key = Settings::OP_PASSWD_KEY;
-    userPasswd = m_settings->value(key,
-                                   QString::fromStdString(ngrt4n::OpUser)).toString();
+    userPasswd = m_settings->value(key, QString::fromStdString(ngrt4n::OpUser)).toString();
   }
-  passwd = QCryptographicHash::hash(m_oldPwdField->text().toAscii(), QCryptographicHash::Md5);
-  newPasswd = QCryptographicHash::hash(m_pwdField->text().toAscii(), QCryptographicHash::Md5);
-  renewPasswd = QCryptographicHash::hash(m_rePwdField->text().toAscii(), QCryptographicHash::Md5);
+  passwd = QCryptographicHash::hash(ngrt4n::toByteArray(m_oldPwdField->text()), QCryptographicHash::Md5);
+  newPasswd = QCryptographicHash::hash(ngrt4n::toByteArray(m_pwdField->text()), QCryptographicHash::Md5);
+  renewPasswd = QCryptographicHash::hash(ngrt4n::toByteArray(m_rePwdField->text()), QCryptographicHash::Md5);
 
   if (userPasswd == passwd) {
     if(newPasswd == renewPasswd) {

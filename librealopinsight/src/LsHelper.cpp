@@ -74,7 +74,7 @@ bool LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
     connectToService();
   }
   if (!isConnected() ||
-      (nb = QAbstractSocket::write(mrequestMap[reqType].arg(host).toAscii())) <= 0 ||
+      (nb = QAbstractSocket::write(ngrt4n::toByteArray(mrequestMap[reqType].arg(host)))) <= 0 ||
       !QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
     handleNetworkFailure();
     return false;

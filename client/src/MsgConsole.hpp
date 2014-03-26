@@ -25,7 +25,12 @@
 #ifndef MSGCONSOLE_HPP
 #define MSGCONSOLE_HPP
 #include "Base.hpp"
-#include <QtGui>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#   include <QtWebKitWidgets>
+#else
+#   include <QtGui>
+#endif
 
 class MsgConsoleProxyModel: public QSortFilterProxyModel
 {

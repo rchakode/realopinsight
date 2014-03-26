@@ -32,7 +32,6 @@
 #include <sstream>
 #include <QStatusBar>
 #include <QObject>
-#include <zmq.h>
 #include <iostream>
 #include <algorithm>
 

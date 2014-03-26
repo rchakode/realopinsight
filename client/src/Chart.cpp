@@ -30,9 +30,10 @@ const qint32 Chart::DefaultHeight=175;
 
 Chart::Chart()
   : QWidget(),
-    pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
+    m_pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
 {
-  resize(pieChart->size());
+  m_scale = 1; //FIXME: test me  m_scale = 1
+  resize(m_pieChart->size());
   QPalette pal;
   pal.setColor(backgroundRole(), Qt::transparent);
   setPalette(pal);
@@ -40,7 +41,7 @@ Chart::Chart()
 
 Chart::~Chart()
 {
-  delete pieChart;
+  delete m_pieChart;
 }
 
 QSize Chart::minimumSizeHint() const
@@ -56,6 +57,6 @@ QSize Chart::sizeHint() const
 void Chart::update(const CheckStatusCountT& _stCount, qint32 _count)
 {
   QString toolTip;
-  pieChart->update(_stCount, _count, toolTip);
+  m_pieChart->update(_stCount, _count, toolTip);
   setToolTip(toolTip);
 }

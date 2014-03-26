@@ -41,12 +41,13 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
+  Q_INIT_RESOURCE(ngrt4n);
   INIT_TRANSLATION;
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(GuiPreferences::style());
 
-  QString cmdName= basename(argv[0]);
+  QString cmdName= ngrt4n::basename(argv[0]);
   QString versionMsg = ngrt4n::getWelcomeMsg(QObject::tr("Editor"));
   QString file = (argc >= 2)? argv[1] : "";
   int opt;

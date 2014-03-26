@@ -28,6 +28,7 @@
 #include "Base.hpp"
 #include "Chart.hpp"
 #include "SvNavigatorTree.hpp"
+#include <QGraphicsView>
 
 class GraphView : public QGraphicsView
 {
@@ -48,8 +49,8 @@ public:
   void setChartPos(void);
   void updateStatsPanel(Chart * _stats_panel);
   void centerOnNode(const QString& id);
-  QGraphicsItem* nodeAtGlobalPos(QPoint pos) { return m_scene->itemAt(mapToScene(mapFromGlobal(pos))); }
-  QGraphicsItem* nodeAt(QPoint pos) { return m_scene->itemAt(mapToScene(pos)); }
+  QGraphicsItem* nodeAtGlobalPos(QPoint pos) { return m_scene->itemAt(mapToScene(mapFromGlobal(pos)), QTransform()); }
+  QGraphicsItem* nodeAt(QPoint pos) { return m_scene->itemAt(mapToScene(pos), QTransform()); }
 
 public Q_SLOTS:
   void capture(void);

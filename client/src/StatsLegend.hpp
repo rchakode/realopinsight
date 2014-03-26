@@ -26,6 +26,7 @@
 #define SNAVSTATSLEGEND_HPP_
 #include "Base.hpp"
 #include <QtGui>
+#include <QWidget>
 
 class StatsLegend : public QWidget
 {

@@ -20,6 +20,11 @@
 #--------------------------------------------------------------------------#
 
 QT	+= core xml network script
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+  QT += widgets webkitwidgets
+}
+
 CONFIG += no_keywords
 TEMPLATE = app
 BASE_VERSION=2.4.2

@@ -23,6 +23,7 @@
  */
 
 #include "ZbxHelper.hpp"
+#include "utilsClient.hpp"
 #include <QtScript/QScriptEngine>
 #include <QDebug>
 #include <QMessageBox>
@@ -63,7 +64,7 @@ QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & 
   }
   Q_FOREACH(const QString &param, params) { request = request.arg(param); }
 
-  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, request.toAscii());
+  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   reply->setSslConfiguration(*m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));

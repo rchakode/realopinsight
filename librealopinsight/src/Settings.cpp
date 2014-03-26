@@ -52,7 +52,6 @@ Settings::Settings(const QString& path): QSettings(path, QSettings::NativeFormat
 
 void Settings::init(void)
 {
-  Q_INIT_RESOURCE(ngrt4n);
   QString updateInterval = QSettings::value(Settings::UPDATE_INTERVAL_KEY).toString();
   QString admUser = QSettings::value(Settings::ADM_UNSERNAME_KEY).toString();
   QString admPasswd = QSettings::value(Settings::ADM_PASSWD_KEY).toString();

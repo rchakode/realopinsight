@@ -27,6 +27,7 @@
 
 #include "Base.hpp"
 #include <QtGui>
+#include <QWidget>
 
 
 class PieChartItem : public QWidget

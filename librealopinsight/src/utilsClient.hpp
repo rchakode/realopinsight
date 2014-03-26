@@ -101,6 +101,7 @@ namespace ngrt4n
   QPair<bool, int> checkSourceId(const QString& id);
   QString getNodeToolTip(const NodeT& _node);
   IconMapT nodeIcons();
+  inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

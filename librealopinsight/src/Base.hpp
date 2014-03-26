@@ -37,7 +37,7 @@
   QTranslator translator; \
   translator.load(QString(":i18n/ngrt4n_%1").arg(QLocale::system().name())); \
   app->installTranslator(&translator); \
-  QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
 
 const QString PROJECT = "NGRT4N";

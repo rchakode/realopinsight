@@ -21,10 +21,21 @@
 
 QT       += core xml network script
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets
+}
+
 TARGET = realopinsight
 TEMPLATE = lib
-LIBS += -lzmq
 VERSION=1.0.0
+
+win32 {
+INCLUDEPATH += c:\ZeroMQ\include
+LIBS += -Lc:\ZeroMQ\lib -llibzmq
+}
+unix {
+LIBS += -lzmq
+}
 
 DEFINES += LIBREALOPINSIGHT_LIBRARY
 DEFINES *= QT_USE_QSTRINGBUILDER
@@ -55,25 +66,13 @@ HEADERS += \
     src/Base.hpp \
     src/Parser.hpp \
     src/Preferences.hpp \
-    src/StatsLegend.hpp \
     src/ZbxHelper.hpp \
     src/JsHelper.hpp \
     src/ZnsHelper.hpp \
     src/Settings.hpp \
     src/utilsClient.hpp \
-    src/Chart.hpp \
     src/ZmqSocket.hpp \
     src/LsHelper.hpp \
     src/DashboardBase.hpp \
     librealopinsight_global.h \
     src/global.hpp
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
-

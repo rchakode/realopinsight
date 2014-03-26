@@ -41,8 +41,21 @@ public:
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 
+protected:
+  void paintEvent(QPaintEvent * event)
+  {
+    QPainter p;
+    p.scale(m_scale, m_scale);
+    QWidget::paintEvent(event);
+  }
+  void wheelEvent(QWheelEvent * event)
+  {
+    m_scale+=(event->delta()/120); //FIXME: use the scaling factors
+  }
+
 private:
-  PieChart * pieChart ;
+  PieChart* m_pieChart;
+  double m_scale;
 };
 
 #endif /* SNAVSTATS_HPP_ */

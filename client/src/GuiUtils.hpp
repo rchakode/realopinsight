@@ -25,6 +25,9 @@
 #ifndef GUIUTILS_HPP
 #define GUIUTILS_HPP
 #include <QtGui>
+#include <QGraphicsTextItem>
+#include <QTreeWidgetItem>
+#include <QSplashScreen>
 
 struct GNodeT {
   QGraphicsTextItem* label;
@@ -54,6 +57,7 @@ namespace ngrt4n {
   void alert(const QString & msg);
   QIcon severityIcon(int _severity);
   QString getWelcomeMsg(const QString& utility);
+  QString basename(const char* path);
 }
 
 #endif // GUIUTILS_HPP

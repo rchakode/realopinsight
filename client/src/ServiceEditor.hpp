@@ -29,7 +29,12 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "Settings.hpp"
-#include <QtGui>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#   include <QtWidgets>
+#else
+#   include <QtGui>
+#endif
 
 
 const qint32 MAX_NODE_NAME = 255;
