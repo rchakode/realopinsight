@@ -24,7 +24,7 @@
 
 #include "StatsLegend.hpp"
 #include "GuiUtils.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <QColor>
 
 StatsLegend::StatsLegend(const QPoint & _left_top_corner, QWidget * _parent)

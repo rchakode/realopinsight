@@ -22,11 +22,13 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "ns.hpp"
-#include "utilsClient.hpp"
-#include "client/Auth.hpp"
-#include "client/MainWindow.hpp"
-#include "client/SvConfigCreator.hpp"
+#include "global.hpp"
+#include "utilsCore.hpp"
+#include "client/src/Auth.hpp"
+#include "client/src/MainWindow.hpp"
+#include "client/src/SvConfigCreator.hpp"
+#include "client/src/GuiPreferences.hpp"
+#include <iostream>
 #include <sstream>
 #include <getopt.h>
 #include <QTranslator>
@@ -39,9 +41,9 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "	-e [view_config]\n"
     "	   Run the VE utility and load the file view_config if specified\n"
     "	-d view_config\n"
-    "	   Run the OC utility and load the file view_config\n"
+    "	   Run the Operations Console and load the file view_config\n"
     "	-v\n"
-    "	  Print the version and license information.\n"
+    "	  Print version and license information.\n"
     "	-h \n"
     "	   Print this help.\n";
 
@@ -53,7 +55,7 @@ int main(int argc, char **argv)
   INIT_TRANSLATION;
   app->setWindowIcon(QIcon(":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME.toUpper());
-  app->setStyleSheet(Preferences::style());
+  app->setStyleSheet(GuiPreferences::style());
   QString cmdName = ngrt4n::basename(argv[0]);
   QString versionMsg = ngrt4n::getWelcomeMsg("");
   QString module = "config";
@@ -114,7 +116,7 @@ int main(int argc, char **argv)
     SvCreator* editor = new SvCreator(userRole);
     editor->load(file);
   } else if (module == "config") {
-    Preferences* monPref = new Preferences(userRole, Preferences::ChangeMonitoringSettings);
+    GuiPreferences* monPref = new GuiPreferences(userRole, Preferences::ChangeMonitoringSettings);
     monPref->exec();
     exit(0);
   }

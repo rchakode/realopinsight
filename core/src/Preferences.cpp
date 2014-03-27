@@ -1,8 +1,8 @@
 /*
-# MainWindow.hpp
+ * Preferences.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Last Update : 23-03-2014                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,48 +22,73 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
 
+#include "Preferences.hpp"
 #include "Base.hpp"
-#include "GuiDashboard.hpp"
 #include "utilsCore.hpp"
+#include "JsHelper.hpp"
+#include <sstream>
+#include <QIntValidator>
+#include <QRegExpValidator>
 
-class MainWindow : public QMainWindow
+Preferences::Preferences(void)
+  : m_settings(new Settings()),
+    m_currentSourceIndex(0),
+    m_sourceStates(new QBitArray(MAX_SRCS))
 {
-  Q_OBJECT
+}
 
-public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+Preferences::Preferences(const QString& settingFile)
+  : m_settings(new Settings(settingFile)),
+    m_currentSourceIndex(0),
+    m_sourceStates(new QBitArray(MAX_SRCS))
+{
+}
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
+Preferences::~Preferences()
+{
+}
 
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
 
-private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
-};
+void Preferences::loadProperties(void)
+{
+  initSourceStates();
+  updateFields();
+}
 
-#endif /* MAINWINDOW_HPP*/
+
+QString Preferences::getSourceStatesSerialized(void)
+{
+  QString str = "";
+  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";
+  return str;
+}
+
+void Preferences::initSourceStates(void)
+{
+  initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
+  updateAllSourceWidgetStates();
+}
+
+void Preferences::initSourceStates(const QString& str)
+{
+  if (str.isEmpty()) {
+    for (int i=0; i < MAX_SRCS; ++i) {
+      m_sourceStates->setBit(i, false);
+    }
+  } else {
+    for (int i=0; i < MAX_SRCS; ++i) {
+      m_sourceStates->setBit(i, str.at(i).digitValue());
+    }
+  }
+}
+
+
+
+int Preferences::firstSourceSet()
+{
+  int idx = 0;
+  while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
+
+  return ((idx < MAX_SRCS)? idx : -1);
+}

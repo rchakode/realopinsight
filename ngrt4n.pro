@@ -30,13 +30,79 @@ TEMPLATE = app
 BASE_VERSION=2.4.2
 VERSION = "-$${BASE_VERSION}"
 
+
 win32 {
-LIBS += -L$$PWD/../qt-build/debug/ -lrealopinsight1
+INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
+LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
 }
 unix {
-LIBS += -lrealopinsight
+LIBS += -lzmq
 }
 
+INCLUDEPATH += core/src/
+RESOURCES += ngrt4n.qrc
+DEFINES *= QT_USE_QSTRINGBUILDER
+DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
+DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
+DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
+DEFINES *= "PACKAGE_VERSION='\"$${PACKAGE_VERSION}\"'"
+DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
+DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
+DEFINES *= "RELEASE_YEAR='\"2014\"'"
+DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
+DEFINES *= "GET_HELP_URL='\"http://realopinsight.com/library/getting-started\"'"
+
+DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
+
+OBJECTS_DIR = build/obj
+MOC_DIR = build/moc
+RCC_DIR = build/rcc
+QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
+
+DISTFILES += README \
+    INSTALL \
+    COPYING \
+    NEWS \
+    ChangeLog \
+    AUTHORS \
+    install-sh \
+    images/*.png \
+    images/built-in/*.png \
+    examples/{*.ngrt4n.xml,*.dat} \
+    client/src/ngrt4n-*.cpp \
+    doc/man/*.gz \
+    i18n/ngrt4n_*.qm
+
+TRANSLATIONS += i18n/ngrt4n_fr.ts
+
+CODECFORSRC = UTF-8
+
+HEADERS += \
+    core/src/Base.hpp \
+    core/src/Parser.hpp \
+    core/src/Preferences.hpp \
+    core/src/ZbxHelper.hpp \
+    core/src/JsHelper.hpp \
+    core/src/ZnsHelper.hpp \
+    core/src/Settings.hpp \
+    core/src/ZmqSocket.hpp \
+    core/src/LsHelper.hpp \
+    core/src/DashboardBase.hpp \
+    core/src/global.hpp \
+    core/src/utilsCore.hpp
+
+
+SOURCES += \
+    core/src/Parser.cpp \
+    core/src/Preferences.cpp \
+    core/src/ZbxHelper.cpp \
+    core/src/JsHelper.cpp \
+    core/src/ZnsHelper.cpp \
+    core/src/Settings.cpp \
+    core/src/ZmqSocket.cpp \
+    core/src/LsHelper.cpp \
+    core/src/DashboardBase.cpp \
+    core/src/utilsCore.cpp
 
 gui-base {
 QT += svg gui webkit
@@ -53,7 +119,6 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/MainWindow.hpp \
     client/src/SvNavigatorTree.hpp \
     client/src/WebKit.hpp \
-    client/src/Settings.hpp \
     client/src/Chart.hpp \
     client/src/MsgConsole.hpp \
     client/src/GuiPreferences.hpp \
@@ -87,13 +152,11 @@ TARGET = ngrt4n-manager
 }
 
 oc {
-CONFIG += gui-base
 SOURCES	+= client/src/ngrt4n-oc.cpp
 TARGET = ngrt4n-oc
 }
 
 editor {
-CONFIG += gui-base
 SOURCES	+= client/src/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
@@ -157,44 +220,5 @@ MAN.path = /usr/share/man/man1
 TARGET.files = $${TARGET}
 MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-editor.1.gz
 INSTALLS += TARGET MAN
-RESOURCES += ngrt4n.qrc
-DEFINES *= QT_USE_QSTRINGBUILDER
-DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
-DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
-DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
-DEFINES *= "PACKAGE_VERSION='\"$${PACKAGE_VERSION}\"'"
-DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
-DEFINES *= "RELEASE_YEAR='\"2014\"'"
-DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
-DEFINES *= "GET_HELP_URL='\"http://realopinsight.com/library/getting-started\"'"
 
-DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
-
-OBJECTS_DIR = build/obj
-MOC_DIR = build/moc
-RCC_DIR = build/rcc
-QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
-INCLUDEPATH += include \
-              librealopinsight/src \
-              include/client \
-              include/core
-
-DISTFILES += README \
-    INSTALL \
-    COPYING \
-    NEWS \
-    ChangeLog \
-    AUTHORS \
-    install-sh \
-    images/*.png \
-    images/built-in/*.png \
-    examples/{*.ngrt4n.xml,*.dat} \
-    client/src/ngrt4n-*.cpp \
-    doc/man/*.gz \
-    i18n/ngrt4n_*.qm
-
-TRANSLATIONS += i18n/ngrt4n_fr.ts
-
-CODECFORSRC = UTF-8
 

@@ -23,7 +23,7 @@
  */
 
 #include "GuiPreferences.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 
 GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType)
   : Preferences(),

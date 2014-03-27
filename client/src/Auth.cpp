@@ -25,7 +25,7 @@
 
 #include "Auth.hpp"
 #include "Preferences.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "GuiUtils.hpp"
 #include <QLabel>
 #include <QPushButton>

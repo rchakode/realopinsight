@@ -1,8 +1,8 @@
 /*
-# MainWindow.hpp
+ * JsonHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Last Update: 24-03-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,48 +22,25 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef JSHELPER_HPP
+#define JSHELPER_HPP
 
-#include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
+#include "global.hpp"
+#include <QtCore/QtGlobal>
+#include <string>
+#include <QString>
+#include <QtScript/QScriptEngine>
 
-class MainWindow : public QMainWindow
+class JsonHelper : public QScriptEngine
 {
-  Q_OBJECT
-
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
-
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
-
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
-
-private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+  JsonHelper(const std::string& _data = "");
+  JsonHelper(const QString& _data = "");
+  void setData(const std::string& _data);
+  void setData(const QString& _data);
+  QScriptValue getProperty(const std::string& key);
+private :
+  QScriptValue mdata;
 };
 
-#endif /* MAINWINDOW_HPP*/
+#endif // JSHELPER_HPP

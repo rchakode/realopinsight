@@ -27,7 +27,7 @@
 #include "GraphView.hpp"
 #include "StatsLegend.hpp"
 #include "DashboardBase.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <memory>
 #include <QGraphicsProxyWidget>
 #include <QScrollBar>

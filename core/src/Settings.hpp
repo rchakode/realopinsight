@@ -1,8 +1,8 @@
 /*
-# MainWindow.hpp
+ * Utils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Last Update : 23-03-2014                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,48 +22,42 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
-
+#ifndef SETTINGS_HPP
+#define SETTINGS_HPP
+#include <QString>
+#include <QSettings>
 #include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
 
-class MainWindow : public QMainWindow
+class Settings : public QSettings
 {
   Q_OBJECT
-
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+  Settings();
+  Settings(const QString& path);
+  void init(void);
+  virtual ~Settings(){}
+  void setKeyValue(const QString & _key, const QString & _value);
+  qint32 updateInterval() const;
+  void setEntry(const QString& key, const QString& value);
+  QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
+  bool loadSource(const qint32& _idx, SourceT& _src);
+  bool loadSource(const QString& _id, SourceT& _src);
+  bool setSource(const QString& _info, SourceT& _src);
+  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
+  static const QString UPDATE_INTERVAL_KEY;
+  static const QString ADM_UNSERNAME_KEY;
+  static const QString OP_UNSERNAME_KEY;
+  static const QString ADM_PASSWD_KEY;
+  static const QString OP_PASSWD_KEY;
+  static const QString SRC_BUCKET_KEY;
 
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
+Q_SIGNALS:
+  void timerIntervalChanged(qint32);
 
 private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+  QTranslator* translator ;
 };
 
-#endif /* MAINWINDOW_HPP*/
+
+#endif // SETTINGS_HPP

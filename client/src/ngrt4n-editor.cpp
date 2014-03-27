@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "global.hpp"
 #include "Auth.hpp"
 #include "Base.hpp"
@@ -34,7 +34,7 @@
 QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "Options: \n"
     "	-v\n"
-    "	  Print the version and license information.\n"
+    "	  Print version and license information.\n"
     "	-h \n"
     "	   Print this help.\n";
 

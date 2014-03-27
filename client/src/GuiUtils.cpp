@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 #include "GuiUtils.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "StatsLegend.hpp"
 #include <QMessageBox>
 

@@ -24,7 +24,7 @@
 
 #include "MsgConsole.hpp"
 #include "StatsLegend.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "GuiUtils.hpp"
 
 const qint16 MsgConsole::ROW_MARGIN = 3;

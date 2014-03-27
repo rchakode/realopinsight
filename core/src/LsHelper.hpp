@@ -1,5 +1,5 @@
 /*
-# MainWindow.hpp
+ * LsHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 23-03-2014                                                  #
@@ -22,48 +22,44 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef MKLSHELPER_HPP
+#define MKLSHELPER_HPP
 
 #include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
+#include <QTcpSocket>
 
-class MainWindow : public QMainWindow
+class LsHelper : public QTcpSocket
 {
   Q_OBJECT
-
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+  enum ReqTypeT{
+    Host = 0,
+    Service = 1
+  };
+  LsHelper(const QString& host, const int& port);
+  ~LsHelper();
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
-
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
+  bool connectToService(void);
+  void disconnectFromService(void);
+  bool requestData(const QString& host, const ReqTypeT& reqType);
+  bool recvData(const ReqTypeT& reqType);
+  bool loadHostData(const QString& host);
+  bool findCheck(const QString& id, CheckListCstIterT& check);
+  void clearData(void) {m_ldchecks.clear();}
+  void setHost(const QString& host) {m_host = host;}
+  void setPort(const int& port) {m_port = port;}
+  bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
 
 private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+  const static int DefaultTimeout = 50000; /* 5 seconds */
+  QString m_host;
+  qint32 m_port;
+  RequestListT mrequestMap;
+  CheckListT m_ldchecks;
+  QString m_errorMsg;
+  void setRequestPatterns();
+  void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}
+  void handleNetworkFailure(QAbstractSocket::SocketError error);
 };
 
-#endif /* MAINWINDOW_HPP*/
+#endif // MKLSHELPER_HPP

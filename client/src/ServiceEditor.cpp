@@ -27,7 +27,7 @@
 #include "Preferences.hpp"
 #include "GraphView.hpp"
 #include "DashboardBase.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 
 typedef QList<QListWidgetItem*> CheckItemList;
 

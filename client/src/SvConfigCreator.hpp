@@ -27,7 +27,7 @@
 
 #include "Base.hpp"
 #include "Parser.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "ServiceEditor.hpp"
 #include "SvNavigatorTree.hpp"
 #include "SvConfigCreator.hpp"

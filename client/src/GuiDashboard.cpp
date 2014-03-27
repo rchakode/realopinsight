@@ -23,7 +23,7 @@
  */
 #include "GuiDashboard.hpp"
 #include "global.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "JsHelper.hpp"
 #include "LsHelper.hpp"
 #include <QScriptValueIterator>

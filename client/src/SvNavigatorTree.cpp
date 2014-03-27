@@ -25,7 +25,7 @@
 #include "global.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Parser.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <QtGui>
 
 SvNavigatorTree::SvNavigatorTree(CoreDataT* _cdata, const bool& _enableDrag, QWidget* _parent)

@@ -25,7 +25,7 @@
 
 #include "SvConfigCreator.hpp"
 #include "GraphView.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "GuiDashboard.hpp"
 
 namespace {

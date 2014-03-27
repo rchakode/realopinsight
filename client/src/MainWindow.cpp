@@ -23,7 +23,7 @@
  */
 
 #include "MainWindow.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 
 
 MainWindow::MainWindow(const qint32& _userRole,

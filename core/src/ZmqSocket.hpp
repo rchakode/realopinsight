@@ -1,9 +1,9 @@
 /*
-# MainWindow.hpp
+ * ZmqSocket.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
-#                                                                          #
+# Last Update : 23-03-2014                                                 #
+#	                                                                         #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
 #                                                                          #
@@ -22,48 +22,44 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef ZMQSOCKET_HPP
+#define ZMQSOCKET_HPP
+#include "global.hpp"
+#include <QtCore/QtGlobal>
+#include <string>
+#include <sstream>
 
-#include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
-
-class MainWindow : public QMainWindow
+class ZmqSocket
 {
-  Q_OBJECT
-
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+  ZmqSocket(const int & _type);
+  ZmqSocket(const std::string& uri, const int & _type);
+  ~ZmqSocket();
+  bool init();
+  bool connect();
+  bool connect(const std::string & _uri);
+  bool bind(const std::string & _uri);
+  void disconnectFromService();
+  void reset();
+  void send(const std::string & _msg);
+  std::string recv() const;
+  void makeHandShake();
+  bool isConnected() const {return m_connected2Server; }
+  void* getSocket() const {return m_socket;}
+  int getServerSerial() const {return m_serverSerial;}
+  std::string getErrorMsg() const {return m_errorMsg;}
+  void setServerUri (const std::string& uri) { m_serverUri = uri; }
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
-
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
 
 private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+  std::string m_serverUri;
+  std::string m_errorMsg;
+  void *m_socket;
+  void *m_context;
+  int m_type;
+  bool m_connected2Server;
+  int m_serverSerial;
+  int convert2ServerSerial(const std::string &versionStr);
 };
 
-#endif /* MAINWINDOW_HPP*/
+#endif // ZMQSOCKET_HPP

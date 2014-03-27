@@ -26,7 +26,7 @@
 #include "Auth.hpp"
 #include "MainWindow.hpp"
 #include "SvConfigCreator.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <sstream>
 #include <getopt.h>
 #include <QObject>
@@ -37,7 +37,7 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
     "	-c\n"
     "	   Launch the configuration utility\n"
     "	-v\n"
-    "	  Print the version and license information.\n"
+    "	  Print version and license information.\n"
     "	-h \n"
     "	   Print this help.\n";
 

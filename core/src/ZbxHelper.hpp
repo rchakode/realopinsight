@@ -1,8 +1,8 @@
 /*
-# MainWindow.hpp
+ * ZABBIXHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Last Update : 23-03-2014                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,48 +22,57 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
-
+#ifndef ZABBIXHELPER_HPP_
+#define ZABBIXHELPER_HPP_
 #include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
+#include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QNetworkAccessManager>
 
-class MainWindow : public QMainWindow
-{
+
+namespace {
+  const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+}
+
+class ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
+public:
+  enum {
+    Login=1,
+    ApiVersion=2,
+    Trigger=3,
+    TriggerV18=4
+  };
+  static const RequestListT ReqPatterns;
 
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+  ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
+  virtual ~ZbxHelper();
+  QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
+  void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
+  QString getApiEndpoint(void) const {return m_apiUri;}
+  void setTrid(const QString& apiv);
+  int getTrid(void) const {return m_trid;}
+  void setIsLogged(bool state) {m_isLogged = state;}
+  bool getIsLogged(void) const {return m_isLogged;}
+  void setAuth(const QString& auth) {m_auth = auth;}
+  QString getAuth(void) const {return m_auth;}
+  void setSslConfig(bool verifyPeer);
+
 
 public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
+  void processError(const QNetworkReply::NetworkError& code) { m_evlHandler->exit(code);}
+Q_SIGNALS:
+  void propagateError(QNetworkReply::NetworkError);
 
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
-
-private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+private :
+  QString m_apiUri;
+  QNetworkRequest* m_reqHandler;
+  int m_trid;
+  static RequestListT requestsPatterns();
+  QEventLoop* m_evlHandler;
+  bool m_isLogged;
+  QString m_auth;
+  QSslConfiguration* m_sslConfig;
 };
 
-#endif /* MAINWINDOW_HPP*/
+#endif /* ZABBIXHELPER_HPP_ */

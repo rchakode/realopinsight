@@ -1,5 +1,5 @@
 /*
-# MainWindow.hpp
+ * JsonHelper.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 23-03-2014                                                  #
@@ -22,48 +22,31 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#include "JsHelper.hpp"
 
-#include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
+using namespace std;
 
-class MainWindow : public QMainWindow
+JsonHelper::JsonHelper(const string & _data) : QScriptEngine()
 {
-  Q_OBJECT
+  setData(_data);
+}
 
-public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
+{
+  setData(_data);
+}
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
+void JsonHelper::setData(const string& data)
+{
+  mdata = evaluate("(" + QString::fromStdString(data) + ")");
+}
 
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
+void JsonHelper::setData(const QString& data)
+{
+  mdata = evaluate("("+data+")");
+}
 
-private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
-};
-
-#endif /* MAINWINDOW_HPP*/
+QScriptValue JsonHelper::getProperty(const string& key)
+{
+  return mdata.property(QString::fromStdString(key)) ;
+}

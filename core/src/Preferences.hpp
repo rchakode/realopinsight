@@ -1,5 +1,5 @@
 /*
-# MainWindow.hpp
+ * Preferences.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 23-03-2014                                                  #
@@ -22,48 +22,65 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
 
+#ifndef SNAVPREFERENCES_HPP_
+#define SNAVPREFERENCES_HPP_
+
+#include "global.hpp"
+#include "Settings.hpp"
 #include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
 
-class MainWindow : public QMainWindow
+
+class Preferences: public QObject
 {
   Q_OBJECT
 
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+  enum FormTypeT {
+    ChangePassword,
+    ForceChangePassword,
+    ChangeMonitoringSettings,
+    ShowHelp,
+    ShowAbout,
+    BasicLoginForm,
+    WebForm
+  };
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
+  Preferences(void);
+  Preferences(const QString& settingFile);
+  virtual ~Preferences();
+  QBitArray* getSourceStates() const { return m_sourceStates; }
+  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
+
+Q_SIGNALS:
+  void urlChanged(QString);
+  void sourcesChanged (QList<qint8>);
+  void errorOccurred(QString msg);
+
+protected :
+  virtual void fillFromSource(int _sidx) = 0;
+  virtual void updateAllSourceWidgetStates(void) = 0;
+  virtual void loadProperties(void);
+  virtual void updateFields(void) = 0;
+  virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
+  virtual int firstSourceSet(void);
+  virtual void initSourceStates();
+  QString getSourceStatesSerialized(void);
+
+protected Q_SLOTS:
+  virtual void applyChanges(void) = 0;
+  virtual void handleCancel(void) = 0;
+  virtual void addAsSource(void) = 0;
+  virtual void deleteSource(void) = 0;
+  qint32 updateInterval(void) const {return m_settings->updateInterval();}
 
 protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
+  Settings* m_settings;
+  int m_currentSourceIndex;
+  QBitArray* m_sourceStates;
 
-private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+  void initSourceStates(const QString& str);
 };
 
-#endif /* MAINWINDOW_HPP*/
+
+#endif /* SNAVPREFERENCES_HPP_ */

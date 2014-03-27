@@ -1,8 +1,8 @@
 /*
-# MainWindow.hpp
+ * ParseSVConfig.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Last Update: 23-05-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,48 +22,38 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef SNAVPARSESVCONFIG_H_
+#define SNAVPARSESVCONFIG_H_
 
 #include "Base.hpp"
-#include "GuiDashboard.hpp"
-#include "utilsCore.hpp"
 
-class MainWindow : public QMainWindow
+
+class Parser : public QObject
 {
   Q_OBJECT
-
 public:
-  MainWindow(const qint32& _userRole, const QString& _config);
-  virtual ~MainWindow();
+  Parser(const QString& _config, CoreDataT* _cdata);
+  virtual ~Parser();
 
-public Q_SLOTS:
-  void handleUpdateStatusBar(const QString& msg);
-  void toggleFullScreen(bool _toggled);
-  void render(void);
-  void handleTabChanged(int index);
-  void handleHideChart(void);
-  void handleRefresh(void);
-  void resetTimer(qint32 interval);
-  void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
-  void handleChangeMonitoringSettingsAction(void);
+  bool process(bool console);
+  QString dotFile(void) const { return m_dotFile; }
+  QString lastError(void) const {return m_lastError;}
 
-protected:
-  virtual void closeEvent(QCloseEvent*);
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual void timerEvent(QTimerEvent*);
-  virtual void showEvent(QShowEvent*);
+Q_SIGNALS:
+  void errorOccurred(QString msg);
 
 private:
-  GuiPreferences* m_preferences;
-  GuiDashboard* m_dashboard;
-  QMenu* m_contextMenu;
-  MenuListT m_menus;
-  SubMenuListT m_subMenus;
-  SubMenuListT m_contextMenuList;
-  void loadMenus(void);
-  void unloadMenus(void);
-  void addEvents(void);
+  static const QString m_dotHeader;
+  static const QString m_dotFooter;
+  QString m_dotFile;
+  QString m_config;
+  CoreDataT* m_cdata;
+  QString m_lastError;
+
+  void updateNodeHierachy(QString& _graphContent);
+  void saveCoordinatesFile(const QString& _content);
+  bool computeNodeCoordinates(void);
+  void computeNodeCoordinates(const QString& dotfile);
 };
 
-#endif /* MAINWINDOW_HPP*/
+#endif /* SNAVPARSESVCONFIG_H_ */
