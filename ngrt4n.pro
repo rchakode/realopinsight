@@ -1,9 +1,10 @@
 # ngrt4n.pro
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 24-12-2014                                                 #
+# Last Update : 24-03-2014                                                 #
 #                                                                          #
-# This Software is part of NGRT4N Project (http://ngrt4n.com).             #
+# This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
+# by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
 #                                                                          #
 # This is a free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
