@@ -66,6 +66,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_chart (std::make_shared<Chart>()),
     m_filteredMsgConsole (NULL),
     m_widget (new QSplitter()),
+    m_leftSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
     m_browser (new WebKit()),
@@ -80,8 +81,14 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
   m_viewPanel->addTab(m_browser, tr("Web Browser"));
   m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
-  m_widget->addWidget(m_tree);
+
+  m_widget->addWidget(m_leftSplitter);
   m_widget->addWidget(m_rightSplitter);
+
+  m_leftSplitter->addWidget(m_tree);
+  m_leftSplitter->addWidget(m_chart.get());
+  m_leftSplitter->setOrientation(Qt::Vertical);
+
   m_rightSplitter->addWidget(m_viewPanel);
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
@@ -157,7 +164,6 @@ void GuiDashboard::updateChart(void)
 {
   Chart *chart = new Chart;
   chart->update(m_cdata->check_status_count, m_cdata->cnodes.size());
-  m_map->updateStatsPanel(chart);
   m_chart.reset(chart);
   m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
 }
@@ -227,8 +233,8 @@ void GuiDashboard::filterNodeRelatedMsg(void)
 void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (ngrt4n::findNode(m_cdata, _nodeId, node) &&
-      !node->child_nodes.isEmpty()) {
+  if (ngrt4n::findNode(m_cdata, _nodeId, node)
+      && ! node->child_nodes.isEmpty()) {
     if (node->type == NodeType::AlarmNode) {
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {
@@ -248,19 +254,21 @@ void GuiDashboard::centerGraphOnNode(QTreeWidgetItem * _item)
 void GuiDashboard::resizeDashboard(qint32 width, qint32 height)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
-  QSize mcSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));;
+  QSize mapRectSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));;
 
   QList<qint32> framesSize;
   framesSize.push_back(width * 0.20);
-  framesSize.push_back(mcSize.width());
+  framesSize.push_back(mapRectSize.width());
   m_widget->setSizes(framesSize);
 
   framesSize[0] = (height * GRAPH_HEIGHT_RATE);
-  framesSize[1] = (mcSize.height());
+  framesSize[1] = (mapRectSize.height());
+
+  m_leftSplitter->setSizes(framesSize);
   m_rightSplitter->setSizes(framesSize);
 
   m_widget->resize(width, height * 0.85);
-  m_msgConsole->setConsoleSize(mcSize);
+  m_msgConsole->setConsoleSize(mapRectSize);
 }
 
 
@@ -364,6 +372,14 @@ void GuiDashboard::setMsgPaneToolBar(const QList<QAction*>& menuAtions)
     tlbar->addAction(action);
   }
   m_msgPane->widget(0)->layout()->addWidget(tlbar);
+}
+
+
+bool GuiDashboard::hideChart(void)
+{
+  bool visible = m_chart->isVisible();
+  m_chart->setVisible(! visible);
+  return visible;
 }
 
 void GuiDashboard::addEvents(void)

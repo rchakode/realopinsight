@@ -41,11 +41,9 @@ GraphView::GraphView(CoreDataT* _cdata, QWidget* _parent)
   : QGraphicsView(_parent),
     m_cdata(_cdata),
     m_scene(new QGraphicsScene()),
-    m_chart(NULL),
     m_icons(ngrt4n::nodeIcons()),
     m_mapScalFactor(1),
     m_chartScalFactor(1),
-    m_isAjustedChartSize(false),
     m_trackingOn(false)
 {
   setScene(m_scene);
@@ -94,7 +92,6 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent * _event)
   QGraphicsItem* item = m_scene->itemAt(pos, QTransform());
   if (item) {
     centerOn(pos);
-    setChartPos();
   }
 }
 
@@ -102,7 +99,6 @@ void GraphView::scrollBy(int dx, int dy)
 {
   horizontalScrollBar()->setValue(horizontalScrollBar()->value() + dx);
   verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
-  setChartPos();
 }
 
 
@@ -126,85 +122,19 @@ void GraphView::mouseMoveEvent(QMouseEvent * event)
 void GraphView::zoomIn()
 {
   QGraphicsView::scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
-  if (m_chart) {
-    setChartPos();
-    //FIXME: m_chart->scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
-  }
 }
 
 void GraphView::zoomOut()
 {
   QGraphicsView::scale(ngrt4n::SCALOUT_FACTOR, ngrt4n::SCALOUT_FACTOR);
-  if (m_chart) {
-    //FIXME: m_chart->scale(ngrt4n::SCALIN_FACTOR, ngrt4n::SCALIN_FACTOR);
-    setChartPos();
-  }
-}
-
-void GraphView::updateStatsPanel(Chart * _statsPanel)
-{
-  bool visible = true;
-  if (m_chart) {
-    visible = m_chart->isVisible();
-    m_chart->setWidget(_statsPanel);
-    m_chart->setVisible(visible);
-  } else {
-    m_chart = m_scene->addWidget(_statsPanel);
-    m_chartArea = new QGraphicsRectItem();
-    m_chartArea->setBrush(Qt::transparent);
-    m_chartArea->setPen(QColor(Qt::transparent));
-    m_scene->addItem(m_chartArea);
-  }
-
-  if (m_chart) { //Mandatory
-    setChartPos();
-    if (!m_isAjustedChartSize) ajustStatsPanelSize();
-  }
 }
 
 void GraphView::centerOnNode(const QString& id)
 {
   if (!id.isEmpty()) {
     centerOn(m_mnodes[id].label);
-    setChartPos();
   }
 }
-
-
-void GraphView::ajustStatsPanelSize(void)
-{
-  if (m_chart) {
-    QSizeF viewSize = size();
-    QSizeF statPanelSize = m_chart->size();
-    m_chartScalFactor = qMin(viewSize.width()/statPanelSize.width(), viewSize.height()/statPanelSize.height())/4;
-    if (m_chartScalFactor < 1) {
-      //FIXME: if (m_mapScalFactor < 1) 	m_chart->scale(1/m_mapScalFactor, 1/m_mapScalFactor);
-      //FIXME: m_chart->scale(m_chartScalFactor, m_chartScalFactor);
-    }
-    m_isAjustedChartSize = true;
-    setChartPos();
-  }
-}
-
-void GraphView::setChartPos(void)
-{
-  if (m_chart) {
-    qreal xp = size().width() - m_chart->size().width() *  m_chartScalFactor - 2;
-    QPointF pos = mapToScene(QPoint(xp, 0));
-    m_chart->setPos(pos);
-    Chart* widget = dynamic_cast<Chart*>(m_chart->widget());
-    m_chartArea->setRect(widget->x(), widget->y(), Chart::DefaultWidth, Chart::DefaultHeight);
-  }
-}
-
-
-bool GraphView::hideChart(void)
-{
-  bool visible = m_chart->isVisible();
-  m_chart->setVisible(! visible);
-  return visible;
-}
-
 
 void GraphView::drawMap(void)
 {
@@ -362,8 +292,6 @@ void GraphView::scaleToFitViewPort(void)
   QSizeF sceneSize = m_scene->itemsBoundingRect().size();
   m_mapScalFactor = qMin(viewSize.width()/sceneSize.width(), viewSize.height()/sceneSize.height()) ;
   if (m_mapScalFactor < 1.0) {
-    if (m_chart)
-      //FIXME: m_chart->scale(1 / m_mapScalFactor, 1 / m_mapScalFactor);
     scale(m_mapScalFactor, m_mapScalFactor);
   } else {
     m_mapScalFactor = 1;
@@ -387,12 +315,6 @@ void GraphView::capture(void)
   render(&painter);
   painter.end();
   pixmap.save(fileName);
-}
-
-
-void GraphView::handleScrollBarMoved(void)
-{
-  setChartPos();
 }
 
 void GraphView::addEvents(void)

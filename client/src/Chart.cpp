@@ -32,7 +32,6 @@ Chart::Chart()
   : QWidget(),
     m_pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
 {
-  m_scale = 1; //FIXME: test me  m_scale = 1
   resize(m_pieChart->size());
   QPalette pal;
   pal.setColor(backgroundRole(), Qt::transparent);

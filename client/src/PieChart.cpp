@@ -26,17 +26,17 @@
 #include "GuiUtils.hpp"
 
 PieChart::PieChart(const QRectF& _bounding_rect, QWidget * _parent)
-  : QWidget( _parent ), boundingRect( _bounding_rect ),
-    legend(new StatsLegend(QPoint(_bounding_rect.width() + 25, 10), this))
+  : QWidget( _parent ), m_boundingRect( _bounding_rect ),
+    m_legend(new StatsLegend(QPoint(_bounding_rect.width() + 25, 10), this))
 {
-  resize(legend->size().width() + 10,  boundingRect.topLeft().y() + boundingRect.height());
+  resize(m_legend->size().width() + 10,  m_boundingRect.topLeft().y() + m_boundingRect.height());
   setStyleSheet("background:transparent");
 }
 
 PieChart::~PieChart()
 {
-  delete legend;
-  slices.clear();
+  delete m_legend;
+  m_slices.clear();
 }
 
 void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _count, QString& toolTip)
@@ -53,32 +53,32 @@ void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _coun
   float unknown_ratio = (100.0 * unknown_count) / _count;
   float ok_ratio = (100.0 * ok_count)/_count;
 
-  slices[ngrt4n::Critical] =
-      new PieChartItem(boundingRect,
+  m_slices[ngrt4n::Critical] =
+      new PieChartItem(m_boundingRect,
                        0,
                        3.6 * critical_ratio,
                        ngrt4n::COLOR_CRITICAL,
                        this);
-  slices[ngrt4n::Major] =
-      new PieChartItem(boundingRect,
+  m_slices[ngrt4n::Major] =
+      new PieChartItem(m_boundingRect,
                        3.6 * critical_ratio,
                        3.6 * major_ratio,
                        ngrt4n::COLOR_MAJOR,
                        this);
-  slices[ngrt4n::Minor] =
-      new PieChartItem(boundingRect,
+  m_slices[ngrt4n::Minor] =
+      new PieChartItem(m_boundingRect,
                        3.6 * (critical_ratio + major_ratio),
                        3.6 * minor_ratio,
                        ngrt4n::COLOR_MINOR,
                        this);
-  slices[ngrt4n::Unknown] =
-      new PieChartItem(boundingRect,
+  m_slices[ngrt4n::Unknown] =
+      new PieChartItem(m_boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio),
                        3.6 * unknown_ratio,
                        ngrt4n::COLOR_UNKNOWN,
                        this);
-  slices[ngrt4n::Normal] =
-      new PieChartItem(boundingRect,
+  m_slices[ngrt4n::Normal] =
+      new PieChartItem(m_boundingRect,
                        3.6 * (critical_ratio + major_ratio + minor_ratio + unknown_ratio),
                        3.6 * ok_ratio,
                        ngrt4n::COLOR_NORMAL,

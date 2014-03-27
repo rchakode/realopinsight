@@ -59,7 +59,7 @@ public:
   QGraphicsItem* getMapNodeAt(const QPoint& pos) const {return m_map->nodeAtGlobalPos(pos);}
   QComboBox* getSourceSelectionBox(void) const {return m_bxSourceSelection;}
   MsgConsole* getFilteredMsgConsole(void) const {return m_filteredMsgConsole;}
-  bool hideChart(void) {return m_map->hideChart();}
+  bool hideChart(void);
   void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
   GraphView* getMap(void) const {return m_map;}
   WebKit* getBrowser(void) const {return m_browser;}
@@ -85,7 +85,6 @@ public Q_SLOTS:
   //  void updateDashboard(const NodeT & _node);
 
 Q_SIGNALS:
-  void hasToBeUpdate(const QString& nodeid);
   void sortEventConsole(void);
   void centralTabChanged(int);
 
@@ -111,6 +110,7 @@ private:
   std::shared_ptr<Chart> m_chart;
   MsgConsole* m_filteredMsgConsole;
   QSplitter* m_widget;
+  QSplitter* m_leftSplitter;
   QSplitter* m_rightSplitter;
   QTabWidget* m_viewPanel;
   WebKit* m_browser;

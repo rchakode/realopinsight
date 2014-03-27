@@ -46,8 +46,6 @@ public:
   void updateNode(const NodeListT::iterator& _nodeIt, const QString& _toolTip);
   void updateNode(const NodeT& _nodeIt, const QString& _toolTip);
   void scaleToFitViewPort(void);
-  void setChartPos(void);
-  void updateStatsPanel(Chart * _stats_panel);
   void centerOnNode(const QString& id);
   QGraphicsItem* nodeAtGlobalPos(QPoint pos) { return m_scene->itemAt(mapToScene(mapFromGlobal(pos)), QTransform()); }
   QGraphicsItem* nodeAt(QPoint pos) { return m_scene->itemAt(mapToScene(pos), QTransform()); }
@@ -56,8 +54,6 @@ public Q_SLOTS:
   void capture(void);
   void zoomIn();
   void zoomOut();
-  bool hideChart(void);
-  void handleScrollBarMoved(void);
 
 Q_SIGNALS:
   void mouseIsOverNode(QString);
@@ -68,8 +64,6 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *);
   virtual void mouseDoubleClickEvent(QMouseEvent *);
   virtual void wheelEvent(QWheelEvent * _event) { (_event->delta() > 0)? zoomIn() : zoomOut();}
-  virtual void resizeEvent(QResizeEvent *) { setChartPos(); }
-  virtual void showEvent(QShowEvent *) { setChartPos(); }
   virtual void scrollBy(int dx, int dy);
   virtual void mouseMoveEvent(QMouseEvent * event);
 
@@ -80,15 +74,12 @@ private:
 
   CoreDataT* m_cdata;
   QGraphicsScene* m_scene;
-  QGraphicsProxyWidget* m_chart;
-  QGraphicsRectItem* m_chartArea;
   QString m_mcoordFile;
   GNodeListT m_mnodes;
   GEdgeListT m_medges;
   IconMapT m_icons;
   qreal m_mapScalFactor;
   qreal m_chartScalFactor;
-  bool m_isAjustedChartSize;
   QPoint m_lastTrackingPos;
   bool m_trackingOn;
 
@@ -96,7 +87,6 @@ private:
   void setNodePos(const QString& _nodeId, const QPointF& _pos);
   void drawEdge(const QString& _headNodeId, const QString& _tailNodeId);
   void setEdgePath(const QString& _parentVertex, const QString& _childVertex, QPainterPath& path);
-  void ajustStatsPanelSize(void);
   void addEvents(void);
 };
 
