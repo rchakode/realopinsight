@@ -80,7 +80,7 @@ QString ngrt4n::getWelcomeMsg(const QString& utility)
 }
 
 
-QString ngrt4n::basename(const char* path)
+QString ngrt4n::basename(char* path)
 {
   char* name = strrchr(path, '/');
   name = name ? name + 1 : const_cast<char*>(path);
