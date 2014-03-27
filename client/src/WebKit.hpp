@@ -26,7 +26,7 @@
 #define SNAVWEBKIT_H_
 
 #include "Base.hpp"
-#include <QtWebKit>
+#include <QtWebKit/QtWebKit>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QtWebKitWidgets>
