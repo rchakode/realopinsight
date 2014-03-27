@@ -24,6 +24,7 @@
 
 #include "GuiPreferences.hpp"
 #include "utilsCore.hpp"
+#include "GuiUtils.hpp"
 
 GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType)
   : Preferences(),
@@ -590,15 +591,19 @@ QGroupBox* GuiPreferences::createCommonGrp(void)
 
 void GuiPreferences::applyChanges(void)
 {
-  switch(m_formType) {
-  case ChangeMonitoringSettings:
-    saveAsSource(m_currentSourceIndex, letUserSelectType());
-    break;
-  case BasicLoginForm:
-    m_dialog->done(0);
-    break;
-  default:
-    break;
+  if (m_currentSourceIndex > 0) {
+    switch(m_formType) {
+    case ChangeMonitoringSettings:
+      saveAsSource(m_currentSourceIndex, letUserSelectType());
+      break;
+    case BasicLoginForm:
+      m_dialog->done(0);
+      break;
+    default:
+      break;
+    }
+  } else {
+    ngrt4n::alert("Not source selected");
   }
 }
 
