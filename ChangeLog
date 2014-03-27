@@ -1,6 +1,19 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.0b1 (Eliana, b1)
+  * Huge refactoring and code simplification
+  * Livestatus is now the default mode selected for retrieving monitoring data
+    when setting Nagios-based sources. The use of ngrt4nd needs to be explicitly
+    enabled
+  * Fixed ticket #25 enabling the ability to cancel the basic authentication for
+    Nagios
+  * Fixed close action on preference window (ticket #24)
+
+2.4.0 (Federator) - 08/09/2013
+  * Fixed ticket #22 : Operations Console doesn't update the status of triggers with Zabbix API v1.4 (Zabbix 2.0.x, x<5)
+  * Fixed close action on the preference window (ticket #24)
+
 2.4.0 (Federator) - 08/09/2013
   * Fixed compilation issue on OS X related to basename and QString (ticket #20)
   * Fixed install script for OS X (ticket #21): removed the use of lscpu
