@@ -57,7 +57,7 @@ int main(int argc, char **argv)
   app->setApplicationName(APP_NAME.toUpper());
   app->setStyleSheet(GuiPreferences::style());
   QString cmdName = ngrt4n::basename(argv[0]);
-  QString versionMsg = ngrt4n::getWelcomeMsg("");
+  QString versionMsg = ngrt4n::getWelcomeMsg("Workstation");
   QString module = "config";
   QString file = (argc >= 2)? argv[1] : "";
   int opt;

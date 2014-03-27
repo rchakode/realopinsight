@@ -28,8 +28,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-BASE_VERSION=2.4.2
-VERSION = "-$${BASE_VERSION}"
+REALOPINSIGHT_VERSION=3.0.0b1
+VERSION = "-$${REALOPINSIGHT_VERSION}"
 
 
 win32 {
@@ -40,18 +40,6 @@ unix {
 LIBS += -lzmq
 }
 
-INCLUDEPATH += core/src/
-RESOURCES += ngrt4n.qrc
-DEFINES *= QT_USE_QSTRINGBUILDER
-DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
-DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
-DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
-DEFINES *= "PACKAGE_VERSION='\"$${PACKAGE_VERSION}\"'"
-DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "RELEASE_NAME='\"Everywhere\"'"
-DEFINES *= "RELEASE_YEAR='\"2014\"'"
-DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
-DEFINES *= "GET_HELP_URL='\"http://realopinsight.com/library/getting-started\"'"
 
 DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 
@@ -107,7 +95,7 @@ SOURCES += \
 
 gui-base {
 QT += svg gui webkit
-PACKAGE_VERSION = "$${BASE_VERSION}-SE"
+DEFINES *= "PACKAGE_NAME='\"Workstation\"'"
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
@@ -163,7 +151,7 @@ TARGET = ngrt4n-editor
 }
 
 web {
-PACKAGE_VERSION = "$${BASE_VERSION}-UE"
+DEFINES *= "PACKAGE_NAME='\"Ultimate Edition\"'"
 TARGET = realopinsight.fcgi
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
@@ -223,3 +211,14 @@ MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-ed
 INSTALLS += TARGET MAN
 
 
+INCLUDEPATH += core/src/
+RESOURCES += ngrt4n.qrc
+DEFINES *= QT_USE_QSTRINGBUILDER
+DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
+DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
+DEFINES *= "PACKAGE_VERSION='\"$${REALOPINSIGHT_VERSION}\"'"
+DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
+DEFINES *= "RELEASE_NAME='\"Eliana\"'"
+DEFINES *= "RELEASE_YEAR='\"2014\"'"
+DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
+DEFINES *= "GET_HELP_URL='\"http://realopinsight.com/library/getting-started\"'"

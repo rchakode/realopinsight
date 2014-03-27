@@ -54,7 +54,7 @@ Auth::Auth()
   m_layout->addWidget(m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
   m_buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Sign in"));
   m_buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
-  line++; QString copying = tr("\nCopyright (c) 2010-%1 NGRT4N Project. All rights reserved.").arg(REL_YEAR);
+  line++; QString copying = tr("\nCopyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.").arg(REL_YEAR);
   m_layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft);
   addEvents();
 }
