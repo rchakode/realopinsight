@@ -585,7 +585,7 @@ QGroupBox* GuiPreferences::createCommonGrp(void)
 
 void GuiPreferences::applyChanges(void)
 {
-  if (m_currentSourceIndex > 0) {
+  if (m_currentSourceIndex >= 0) {
     switch(m_formType) {
     case ChangeMonitoringSettings:
       saveAsSource(m_currentSourceIndex, letUserSelectType());
@@ -597,7 +597,7 @@ void GuiPreferences::applyChanges(void)
       break;
     }
   } else {
-    ngrt4n::alert("Not source selected");
+    ngrt4n::alert("No source selected");
   }
 }
 
