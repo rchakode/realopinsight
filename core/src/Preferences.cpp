@@ -84,7 +84,6 @@ void Preferences::initSourceStates(const QString& str)
 }
 
 
-
 int Preferences::firstSourceSet()
 {
   int idx = 0;

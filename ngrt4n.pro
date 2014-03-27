@@ -49,16 +49,16 @@ RCC_DIR = build/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
 
 DISTFILES += README \
+    client/src/*pp \
+    install-sh \
     INSTALL \
     COPYING \
     NEWS \
     ChangeLog \
     AUTHORS \
-    install-sh \
     images/*.png \
     images/built-in/*.png \
     examples/{*.ngrt4n.xml,*.dat} \
-    client/src/ngrt4n-*.cpp \
     doc/man/*.gz \
     i18n/ngrt4n_*.qm
 

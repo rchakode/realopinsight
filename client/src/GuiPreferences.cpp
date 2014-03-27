@@ -354,18 +354,16 @@ void GuiPreferences::loadBasicLoginForm(void)
 {
     m_dialog->setWindowTitle(tr("Browser requires realm authentication | %1").arg(APP_NAME));
     int line;
-    line = 0,
-            m_mainLayout->addWidget(new QLabel(tr("Login")), line, 0),
+    line = 0;
+    m_mainLayout->addWidget(new QLabel(tr("Login")), line, 0),
             m_realmLoginField = new QLineEdit(),
             m_mainLayout->addWidget(m_realmLoginField, line, 1);
-    ++line,
-            m_mainLayout->addWidget(new QLabel(tr("Password")), line, 0),
+    m_mainLayout->addWidget(new QLabel(tr("Password")), ++line, 0),
             m_realmPasswdField = new QLineEdit(),
             m_realmPasswdField->setEchoMode(QLineEdit::Password),
             m_mainLayout->addWidget(m_realmPasswdField, line, 1);
-    ++line,
-            m_applySettingBtn->setText(tr("Submit")),
-            m_mainLayout->addWidget(m_applySettingBtn, line, 0, Qt::AlignRight),
+    m_applySettingBtn->setText(tr("Submit")),
+            m_mainLayout->addWidget(m_applySettingBtn, ++line, 0, Qt::AlignRight),
             m_mainLayout->addWidget(m_cancelBtn, line, 1, Qt::AlignRight);
 }
 
@@ -645,8 +643,8 @@ void GuiPreferences::addEvents(void)
     switch(m_formType) {
     case ChangeMonitoringSettings:
         QObject::connect(m_applySettingBtn, SIGNAL(clicked()),  this, SLOT(applyChanges()));
-        connect(m_addAsSourceBtn, SIGNAL(clicked()),  this, SLOT(addAsSource()));
-        connect(m_deleteSourceBtn, SIGNAL(clicked()),  this, SLOT(deleteSource()));
+        connect(m_addAsSourceBtn, SIGNAL(clicked()), this, SLOT(addAsSource()));
+        connect(m_deleteSourceBtn, SIGNAL(clicked()), this, SLOT(deleteSource()));
         connect(m_showAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
         break;
     case ChangePassword:
