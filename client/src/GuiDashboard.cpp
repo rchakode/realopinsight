@@ -64,9 +64,8 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_config),
     m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
     m_chart (std::make_shared<Chart>()),
-    m_filteredMsgConsole (NULL),
     m_widget (new QSplitter()),
-    m_leftSplitter (new QSplitter()),
+    m_lelfSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
     m_browser (new WebKit()),
@@ -82,12 +81,12 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_viewPanel->addTab(m_browser, tr("Web Browser"));
   m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
 
-  m_widget->addWidget(m_leftSplitter);
+  m_widget->addWidget(m_lelfSplitter);
   m_widget->addWidget(m_rightSplitter);
 
-  m_leftSplitter->addWidget(m_tree);
-  m_leftSplitter->addWidget(m_chart.get());
-  m_leftSplitter->setOrientation(Qt::Vertical);
+  m_lelfSplitter->addWidget(m_chart.get());
+  m_lelfSplitter->addWidget(m_tree);
+  m_lelfSplitter->setOrientation(Qt::Vertical);
 
   m_rightSplitter->addWidget(m_viewPanel);
   m_rightSplitter->addWidget(builtMsgPane());
@@ -97,14 +96,13 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
 
 GuiDashboard::~GuiDashboard()
 {
-  if (m_filteredMsgConsole) delete m_filteredMsgConsole;
   delete m_msgConsole;
-  m_chart.reset();
   delete m_tree;
   delete m_browser;
   delete m_map;
   delete m_cdata;
   delete m_viewPanel;
+  delete m_lelfSplitter;
   delete m_rightSplitter;
   delete m_widget;
   delete m_changePasswdWindow;
@@ -214,20 +212,18 @@ void GuiDashboard::centerGraphOnNode(const QString& _nodeId)
 
 void GuiDashboard::filterNodeRelatedMsg(void)
 {
-  if (m_filteredMsgConsole) delete m_filteredMsgConsole;
-  m_filteredMsgConsole = new MsgConsole();
+  m_filteredMsgConsole.reset(new MsgConsole());
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
     filterNodeRelatedMsg(m_selectedNode);
-    m_filteredMsgConsole->updateEntriesSize(true);
+    QSize size(750, 400);
+    m_filteredMsgConsole->resize(size.width(), size.height());
+    m_filteredMsgConsole->setConsoleSize(size);
+    m_filteredMsgConsole->updateEntriesSize(false);
+    m_filteredMsgConsole->sortByColumn(1, Qt::AscendingOrder);
     m_filteredMsgConsole->setWindowTitle(tr("Messages related to '%2' - %1").arg(APP_NAME, node->name));
   }
-  qint32 rh = qMax(m_filteredMsgConsole->getRowCount() * m_filteredMsgConsole->rowHeight(0) + 50, 100);
-  if (m_filteredMsgConsole->height() > rh) {
-    m_filteredMsgConsole->resize(m_msgConsole->getConsoleSize().width(), rh);
-  }
-  m_filteredMsgConsole->sortByColumn(1, Qt::AscendingOrder);
-  m_filteredMsgConsole->show();;
+  m_filteredMsgConsole->show();
 }
 
 void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
@@ -254,21 +250,21 @@ void GuiDashboard::centerGraphOnNode(QTreeWidgetItem * _item)
 void GuiDashboard::resizeDashboard(qint32 width, qint32 height)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
-  QSize mapRectSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));;
+  QSize msgConsoleSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));;
 
   QList<qint32> framesSize;
   framesSize.push_back(width * 0.20);
-  framesSize.push_back(mapRectSize.width());
+  framesSize.push_back(msgConsoleSize.width());
   m_widget->setSizes(framesSize);
 
   framesSize[0] = (height * GRAPH_HEIGHT_RATE);
-  framesSize[1] = (mapRectSize.height());
+  framesSize[1] = (msgConsoleSize.height());
 
-  m_leftSplitter->setSizes(framesSize);
+  m_lelfSplitter->setSizes(framesSize);
   m_rightSplitter->setSizes(framesSize);
 
   m_widget->resize(width, height * 0.85);
-  m_msgConsole->setConsoleSize(mapRectSize);
+  m_msgConsole->setConsoleSize(msgConsoleSize);
 }
 
 
@@ -390,5 +386,4 @@ void GuiDashboard::addEvents(void)
   connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
-  //FIXME:  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
 }

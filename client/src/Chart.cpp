@@ -33,9 +33,6 @@ Chart::Chart()
     m_pieChart(new PieChart(QRectF(2, 2, 125, 125), this))
 {
   resize(m_pieChart->size());
-  QPalette pal;
-  pal.setColor(backgroundRole(), Qt::transparent);
-  setPalette(pal);
 }
 
 Chart::~Chart()

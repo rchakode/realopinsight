@@ -58,7 +58,7 @@ public:
   QList<QTreeWidgetItem*> getTreeSelectedItem() const {return m_tree->selectedItems();}
   QGraphicsItem* getMapNodeAt(const QPoint& pos) const {return m_map->nodeAtGlobalPos(pos);}
   QComboBox* getSourceSelectionBox(void) const {return m_bxSourceSelection;}
-  MsgConsole* getFilteredMsgConsole(void) const {return m_filteredMsgConsole;}
+  MsgConsole* getFilteredMsgConsole(void) const {return m_filteredMsgConsole.get();}
   bool hideChart(void);
   void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
   GraphView* getMap(void) const {return m_map;}
@@ -108,9 +108,9 @@ private:
 
   GuiPreferences* m_changePasswdWindow;
   std::shared_ptr<Chart> m_chart;
-  MsgConsole* m_filteredMsgConsole;
+  std::unique_ptr<MsgConsole> m_filteredMsgConsole;
   QSplitter* m_widget;
-  QSplitter* m_leftSplitter;
+  QSplitter* m_lelfSplitter;
   QSplitter* m_rightSplitter;
   QTabWidget* m_viewPanel;
   WebKit* m_browser;

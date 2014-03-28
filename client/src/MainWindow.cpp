@@ -52,8 +52,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-  MsgConsole* mconsole = m_dashboard->getFilteredMsgConsole();
-  if (mconsole) mconsole->close();
   QMainWindow::closeEvent(event);
 }
 

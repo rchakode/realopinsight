@@ -319,6 +319,4 @@ void GraphView::capture(void)
 
 void GraphView::addEvents(void)
 {
-  connect(horizontalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(handleScrollBarMoved()));
-  connect(verticalScrollBar(), SIGNAL(valueChanged (int)), this, SLOT(handleScrollBarMoved()));
 }
