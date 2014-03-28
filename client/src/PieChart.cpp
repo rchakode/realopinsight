@@ -41,7 +41,6 @@ PieChart::~PieChart()
 
 void PieChart::paintEvent(QPaintEvent*)
 {
-  qDebug()<<"dsqdsddsddsds" << m_boundingRect;
   qint32 critical_count = m_statsData[ngrt4n::Critical];
   qint32 major_count = m_statsData[ngrt4n::Major];
   qint32 minor_count = m_statsData[ngrt4n::Minor];
