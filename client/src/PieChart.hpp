@@ -25,7 +25,6 @@
 #ifndef PieChart_HPP_
 #define PieChart_HPP_
 
-#include "PieChartItem.hpp"
 #include "StatsLegend.hpp"
 #include "GuiUtils.hpp"
 
@@ -44,7 +43,6 @@ protected:
 
 private:
   QRectF m_boundingRect;
-  QMap<qint32, PieChartItem*> m_slices;
   StatsLegend* m_legend;
   CheckStatusCountT m_statsData;
   qint32 m_nbStatsEntries;

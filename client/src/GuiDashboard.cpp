@@ -64,7 +64,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_config),
     m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
     m_widget (new QSplitter()),
-    m_chart(new PieChart(QRectF(2, 2, 250, 250), m_widget)),
+    m_chart(new PieChart(QRectF(2, 2, 150, 150), m_widget)),
     m_lelfSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),

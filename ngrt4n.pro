@@ -100,7 +100,6 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
     client/src/PieChart.hpp \
-    client/src/PieChartItem.hpp \
     client/src/ServiceEditor.hpp \
     client/src/StatsLegend.hpp \
     client/src/SvConfigCreator.hpp \
@@ -117,7 +116,6 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/StatsLegend.cpp \
     client/src/GraphView.cpp \
     client/src/PieChart.cpp \
-    client/src/PieChartItem.cpp \
     client/src/ServiceEditor.cpp \
     client/src/SvConfigCreator.cpp \
     client/src/GuiDashboard.cpp \
