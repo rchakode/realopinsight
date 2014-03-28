@@ -35,22 +35,11 @@ public:
   virtual ~PieChart();
   QRectF getBoundingRect() {return m_boundingRect ; }
   void update(const CheckStatusCountT & _check_status_count, qint32 _count, QString& toolTip) ;
-  void setScaleFactors(double sx, double sy) {m_scaleX = sx; m_scaleY = sy;}
-
-  void paintEvent(QPaintEvent* event)
-  {
-    QPainter p(this);
-    p.scale(m_scaleX, m_scaleY);
-    qDebug() << m_scaleX << m_scaleY <<"\n";
-    //QWidget::paintEvent(event);
-  }
 
 private:
   QRectF m_boundingRect ;
   QMap<qint32, PieChartItem*> m_slices ;
   StatsLegend* m_legend ;
-  double m_scaleX;
-  double m_scaleY;
 };
 
 #endif /* PieChart_HPP_ */
