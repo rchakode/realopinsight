@@ -63,8 +63,8 @@ StringMapT GuiDashboard::calcRules() {
 GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_config),
     m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
-    m_chart (std::make_shared<Chart>()),
     m_widget (new QSplitter()),
+    m_chart(new PieChart(QRectF(2, 2, 250, 250), m_widget)),
     m_lelfSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
@@ -84,8 +84,8 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_widget->addWidget(m_lelfSplitter);
   m_widget->addWidget(m_rightSplitter);
 
-  m_lelfSplitter->addWidget(m_chart.get());
   m_lelfSplitter->addWidget(m_tree);
+  m_lelfSplitter->addWidget(m_chart.get());
   m_lelfSplitter->setOrientation(Qt::Vertical);
 
   m_rightSplitter->addWidget(m_viewPanel);
@@ -160,10 +160,9 @@ void GuiDashboard::updateMap(const NodeT& _node, const QString& _tip)
 
 void GuiDashboard::updateChart(void)
 {
-  Chart *chart = new Chart;
-  chart->update(m_cdata->check_status_count, m_cdata->cnodes.size());
-  m_chart.reset(chart);
-  m_msgConsole->sortByColumn(1, Qt::AscendingOrder);
+  m_chart->setStatsData(m_cdata->check_status_count);
+  m_chart->setNbStatEntries(m_cdata->cnodes.size());
+  m_chart->repaint();
 }
 
 void GuiDashboard::updateEventFeeds(const NodeT& node)

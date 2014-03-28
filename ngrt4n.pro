@@ -108,7 +108,6 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/MainWindow.hpp \
     client/src/SvNavigatorTree.hpp \
     client/src/WebKit.hpp \
-    client/src/Chart.hpp \
     client/src/MsgConsole.hpp \
     client/src/GuiPreferences.hpp \
     client/src/GuiUtils.hpp
@@ -125,7 +124,6 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/MainWindow.cpp \
     client/src/SvNavigatorTree.cpp \
     client/src/WebKit.cpp \
-    client/src/Chart.cpp \
     client/src/GuiPreferences.cpp \
     client/src/MsgConsole.cpp
 }

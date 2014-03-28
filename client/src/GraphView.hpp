@@ -26,7 +26,7 @@
 #define GRAPHVIEW_HPP
 
 #include "Base.hpp"
-#include "Chart.hpp"
+#include "PieChart.hpp"
 #include "SvNavigatorTree.hpp"
 #include <QGraphicsView>
 

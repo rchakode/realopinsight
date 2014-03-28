@@ -25,12 +25,12 @@
 #include "PieChart.hpp"
 #include "GuiUtils.hpp"
 
-PieChart::PieChart(const QRectF& _bounding_rect, QWidget * _parent)
-  : QWidget( _parent ), m_boundingRect( _bounding_rect ),
-    m_legend(new StatsLegend(QPoint(_bounding_rect.width() + 25, 10), this))
+PieChart::PieChart(const QRectF& chartArea, QWidget * _parent)
+  : QWidget( _parent ), m_boundingRect(chartArea),
+    m_legend(new StatsLegend(QPoint(chartArea.width() + 25, 10), this))
 {
   resize(m_legend->size().width() + 10,  m_boundingRect.topLeft().y() + m_boundingRect.height());
-  setStyleSheet("background:transparent");
+  setStyleSheet("background:#ffffff;");
 }
 
 PieChart::~PieChart()
@@ -39,19 +39,20 @@ PieChart::~PieChart()
   m_slices.clear();
 }
 
-void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _count, QString& toolTip)
+void PieChart::paintEvent(QPaintEvent*)
 {
-  qint32 critical_count = _check_status_count[ngrt4n::Critical];
-  qint32 major_count = _check_status_count[ngrt4n::Major];
-  qint32 minor_count = _check_status_count[ngrt4n::Minor];
-  qint32 ok_count =  _check_status_count[ngrt4n::Normal];
-  qint32 unknown_count = _count - (critical_count + major_count + minor_count + ok_count);
+  qDebug()<<"dsqdsddsddsds" << m_boundingRect;
+  qint32 critical_count = m_statsData[ngrt4n::Critical];
+  qint32 major_count = m_statsData[ngrt4n::Major];
+  qint32 minor_count = m_statsData[ngrt4n::Minor];
+  qint32 ok_count =  m_statsData[ngrt4n::Normal];
+  qint32 unknown_count = m_nbStatsEntries - (critical_count + major_count + minor_count + ok_count);
 
-  float critical_ratio= (100.0 * critical_count)/_count;
-  float major_ratio = (100.0 * major_count)/_count;
-  float minor_ratio = (100.0 * minor_count)/_count;
-  float unknown_ratio = (100.0 * unknown_count) / _count;
-  float ok_ratio = (100.0 * ok_count)/_count;
+  float critical_ratio= (100.0 * critical_count)/m_nbStatsEntries;
+  float major_ratio = (100.0 * major_count)/m_nbStatsEntries;
+  float minor_ratio = (100.0 * minor_count)/m_nbStatsEntries;
+  float unknown_ratio = (100.0 * unknown_count)/m_nbStatsEntries;
+  float ok_ratio = (100.0 * ok_count)/m_nbStatsEntries;
 
   m_slices[ngrt4n::Critical] =
       new PieChartItem(m_boundingRect,
@@ -83,14 +84,15 @@ void PieChart::update(const CheckStatusCountT& _check_status_count, qint32 _coun
                        3.6 * ok_ratio,
                        ngrt4n::COLOR_NORMAL,
                        this);
-  toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
-      "/"%QString::number(_count)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
+  QString toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
+      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
       %"\n"%QObject::tr("Minor: ")%QString::number(minor_count)%
-      "/"%QString::number(_count)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"
+      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"
       %"\n"%QObject::tr("Major: ")%QString::number(major_count)%
-      "/"%QString::number(_count)%" ("%QString::number(major_ratio, 'f', 0)%"%)"
+      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(major_ratio, 'f', 0)%"%)"
       %"\n"%QObject::tr("Critical: ")%QString::number(critical_count)%"/"
-      %QString::number(_count)%" ("%QString::number(critical_ratio, 'f', 0) %"%)"
+      %QString::number(m_nbStatsEntries)%" ("%QString::number(critical_ratio, 'f', 0) %"%)"
       %"\n"%QObject::tr("Unknown: ")%QString::number(unknown_count)%
-      "/"%QString::number(_count)%" ("%QString::number(unknown_ratio, 'f', 0)%"%)";
+      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(unknown_ratio, 'f', 0)%"%)";
+  setToolTip(toolTip);
 }

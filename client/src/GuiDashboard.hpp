@@ -27,7 +27,7 @@
 
 #include <QString>
 #include "Base.hpp"
-#include "Chart.hpp"
+#include "PieChart.hpp"
 #include "Parser.hpp"
 #include "WebKit.hpp"
 #include "MsgConsole.hpp"
@@ -107,9 +107,9 @@ private:
   };
 
   GuiPreferences* m_changePasswdWindow;
-  std::shared_ptr<Chart> m_chart;
   std::unique_ptr<MsgConsole> m_filteredMsgConsole;
   QSplitter* m_widget;
+  std::unique_ptr<PieChart> m_chart;
   QSplitter* m_lelfSplitter;
   QSplitter* m_rightSplitter;
   QTabWidget* m_viewPanel;
