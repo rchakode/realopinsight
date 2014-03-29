@@ -25,7 +25,7 @@
 #include "WebUtils.hpp"
 #include "WebMap.hpp"
 #include <iostream>
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "WebPieChart.hpp"
 #include <Wt/WPointF>
 #include <Wt/WRectArea>

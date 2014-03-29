@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 #include "WebPieChart.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <Wt/WStandardItem>
 #include <QString>
 #include <QDebug>

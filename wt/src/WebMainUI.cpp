@@ -26,7 +26,7 @@
 #include "AuthManager.hpp"
 #include "WebMainUI.hpp"
 #include "ViewMgnt.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>

@@ -24,7 +24,7 @@
 
 #include "WebUtils.hpp"
 #include "WebMsgConsole.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <Wt/WDateTime>
 
 namespace {

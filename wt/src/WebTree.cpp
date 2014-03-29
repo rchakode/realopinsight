@@ -23,7 +23,7 @@
  */
 
 #include "WebTree.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 
 WebTree::WebTree(CoreDataT* _cdata)
   : Wt::WTreeView(0),

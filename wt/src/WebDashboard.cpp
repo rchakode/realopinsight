@@ -25,7 +25,7 @@
 #include "WebUtils.hpp"
 #include "WebDashboard.hpp"
 #include "Base.hpp"
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>

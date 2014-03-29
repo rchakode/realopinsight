@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "utilsClient.hpp"
+#include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "WebPreferences.hpp"
 #include <QString>
