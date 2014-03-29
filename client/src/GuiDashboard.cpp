@@ -64,7 +64,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_config),
     m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
     m_widget (new QSplitter()),
-    m_chart(new PieChart(QRectF(2, 2, 150, 150), m_widget)),
+    m_chart(new PieChart(QRectF(2, 2, 200, 200), m_widget.get())),
     m_lelfSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
@@ -76,19 +76,19 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_bxSourceSelection(new QComboBox()),
     m_msgPane(new QTabWidget())
 {
-  m_viewPanel->addTab(m_map, tr("Map"));
+  m_viewPanel->addTab(m_map.get(), tr("Map"));
   m_viewPanel->setTabIcon(ConsoleTab, QIcon(":images/hierarchy.png"));
-  m_viewPanel->addTab(m_browser, tr("Web Browser"));
+  m_viewPanel->addTab(m_browser.get(), tr("Web Browser"));
   m_viewPanel->setTabIcon(BrowserTab, QIcon(":images/web.png"));
 
-  m_widget->addWidget(m_lelfSplitter);
-  m_widget->addWidget(m_rightSplitter);
+  m_widget->addWidget(m_lelfSplitter.get());
+  m_widget->addWidget(m_rightSplitter.get());
 
-  m_lelfSplitter->addWidget(m_tree);
+  m_lelfSplitter->addWidget(m_tree.get());
   m_lelfSplitter->addWidget(m_chart.get());
   m_lelfSplitter->setOrientation(Qt::Vertical);
 
-  m_rightSplitter->addWidget(m_viewPanel);
+  m_rightSplitter->addWidget(m_viewPanel.get());
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
   addEvents();
@@ -96,18 +96,6 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
 
 GuiDashboard::~GuiDashboard()
 {
-  delete m_msgConsole;
-  delete m_tree;
-  delete m_browser;
-  delete m_map;
-  delete m_cdata;
-  delete m_viewPanel;
-  delete m_lelfSplitter;
-  delete m_rightSplitter;
-  delete m_widget;
-  delete m_changePasswdWindow;
-  delete m_trayIcon;
-  delete m_msgPane;
 }
 
 
@@ -297,12 +285,12 @@ QTabWidget* GuiDashboard::builtMsgPane(void)
 {
   QHBoxLayout* lyt(new QHBoxLayout());
   QGroupBox* wdgsGrp(new QGroupBox());
-  lyt->addWidget(m_msgConsole, Qt::AlignLeft);
+  lyt->addWidget(m_msgConsole.get(), Qt::AlignLeft);
   lyt->setMargin(0);
   lyt->setContentsMargins(QMargins(0, 0, 0, 0));
   wdgsGrp->setLayout(lyt);
   m_msgPane->addTab(wdgsGrp, tr("Message Console"));
-  return m_msgPane;
+  return m_msgPane.get();
 }
 
 void GuiDashboard::handleSettingsLoaded(void)
@@ -379,10 +367,10 @@ bool GuiDashboard::hideChart(void)
 
 void GuiDashboard::addEvents(void)
 {
-  connect(m_viewPanel, SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
-  connect(m_map, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString&, const bool &, const qint32 &)));
-  connect(m_tree, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
-  connect(m_bxSourceSelection, SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
+  connect(m_viewPanel.get(), SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
+  connect(m_map.get(), SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString&, const bool &, const qint32 &)));
+  connect(m_tree.get(), SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
+  connect(m_bxSourceSelection.get(), SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
 }
