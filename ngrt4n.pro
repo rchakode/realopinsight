@@ -49,11 +49,10 @@ RCC_DIR = build/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
 
 DISTFILES += README \
-    client/src/*pp \
     install-sh \
     INSTALL \
-    COPYING \
-    NEWS \
+    client/src/ngrt4n-*.cpp \
+    LICENSE \
     ChangeLog \
     AUTHORS \
     images/*.png \
@@ -101,7 +100,6 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/GraphView.hpp \
     client/src/PieChart.hpp \
     client/src/ServiceEditor.hpp \
-    client/src/StatsLegend.hpp \
     client/src/SvConfigCreator.hpp \
     client/src/GuiDashboard.hpp \
     client/src/MainWindow.hpp \

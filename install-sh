@@ -41,7 +41,7 @@ usage(){
 
 prompt_copyright(){ 
 echo
-echo "Thanks for choosing NGRT4N Monitoring Suite."
+echo "Thanks for choosing RealOpInsight Workstation."
 echo
 echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
 echo
@@ -95,30 +95,25 @@ checking_uipreq(){
 }
 
 install_default(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-manager ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=manager ${dflag}
   make -Bj${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_editor(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-editor ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=editor ${dflag}
   make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_oc(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-oc ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=oc ${dflag}
   make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
-remove_old(){
- echo "Removing deprecated files => ${NGRT4N_CMD:=`which ngrt4n 2>/dev/null`}"
- [ -e ${NGRT4N_CMD} ] && rm -rf ${NGRT4N_CMD}
- rm -rf ${INSTALL_PREFIX}/bin/ngrt4n
-}
 install_ui() {
-  echo "==>Installing RealOpInsight..."  
+  echo "==>Installing RealOpInsight Workstation..."  
   checking_uipreq
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
   echo -n "DEGUG : Current component => Manager..."
@@ -132,7 +127,6 @@ install_ui() {
   echo -n "DEGUG : Current component => Operator Console..."
   install_oc
   echo done
-  remove_old
   echo "==>Installation completed"
 }
 
@@ -164,7 +158,7 @@ export NCPU
 
 prompt_copyright
 
-echo "DEBUG: Init setup with $NCPU CPU..."
+echo "DEBUG: Initializing setup with $NCPU CPU..."
 
 if [ -z ${install_prefix} ] ; then
   export INSTALL_PREFIX=/usr/local
