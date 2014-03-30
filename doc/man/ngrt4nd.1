@@ -1,0 +1,43 @@
+.TH ngrt4nd 1  "Last Update: October 03, 2012" "Version: 1.1.0" "ADMIN COMMANDS"
+.SH NAME
+ngrt4nd \- The utility to manage the daemon module of NGRT4N.
+.SH SYNOPSIS
+.B ngrt4nd
+[OPTIONS]
+.SH DESCRIPTION
+This program allows to manage the daemon module of NGRT4N. 
+.PP
+It sits on the same server than Nagios.
+.SH OPTIONS
+.TP
+\-h
+Print a brief help.
+.TP
+\-c </path/to/status.dat>
+Set an alternative location for the Nagios status file. By default, the program looks at /usr/local/var/nagios/status.dat. 
+.TP
+\-D
+Run ngrt4nd in the foreground. This option is useful for debuging, since error and debug messages are printed to the terminal.
+.TP
+\-P 
+Set the authentication token.
+.TP
+\-T
+Print the authentication token.
+.TP
+\-p <port>
+Set the listening port. Default is 1983.
+.SH EXAMPLES
+.TP
+$ ngrt4nd -p 2345
+.SH EXIT STATUS
+ngrt4nd returns a zero exit status on success. Non zero is returned in case of failure.
+.SH AUTHOR
+This page has been written by Rodrigue Chakode <rodrigue.chakode@ngrt4n.com>
+.SH COPYRIGHT
+Copyright (c) 2010-2012 by NGRT4N Project. All rights reserved.
+.PP
+Visit http://ngrt4n.com for more information.
+.SH SEE ALSO
+.BR ngrt4n(1)
+
