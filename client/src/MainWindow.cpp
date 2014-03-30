@@ -90,12 +90,8 @@ void MainWindow::showEvent(QShowEvent*)
     info->finish(0);
     m_dashboard->showTrayIcon();
     m_dashboard->setTrayIconTooltip(APP_NAME);
-
-    QSize screenSize = qApp->desktop()->screen(0)->size();
-    qint32 width = screenSize.width();
-    qint32 height = screenSize.height();
-    QMainWindow::resize(width, height);
-    m_dashboard->resizeDashboard(width, height);
+    QMainWindow::resize(1024, 768);
+    m_dashboard->resizeDashboard(size().width(), size().height());
   }
 }
 

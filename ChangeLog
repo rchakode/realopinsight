@@ -12,6 +12,7 @@ RealOpInsight ChangeLog
   * Fixed close action on preference window (ticket #24)
   * Moved piechart from the map to lelf side
   * Improved charting rendering: cleanup and new algorithm
+  * Change default operations console size to 1024 x 768
 
 2.4.0 (Federator) - 08/09/2013
   * Fixed ticket #22 : Operations Console doesn't update the status of triggers with Zabbix API v1.4 (Zabbix 2.0.x, x<5)
