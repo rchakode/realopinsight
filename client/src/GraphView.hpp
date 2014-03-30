@@ -69,8 +69,8 @@ protected:
 
 private:
   static const QString LABEL_NODE;
-  static const QString  ICON_NODE;
-  static const QString  EXPICON_NODE;
+  static const QString ICON_NODE;
+  static const QString EXPICON_NODE;
 
   CoreDataT* m_cdata;
   QGraphicsScene* m_scene;

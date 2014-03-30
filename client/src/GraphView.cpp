@@ -235,6 +235,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
       m_mnodes[_nodeId].exp_icon->setPixmap(expandIcon);
     }
     Q_EMIT expandNode(_nodeId, _visible, _level + 1);
+    repaint();
   }
 }
 

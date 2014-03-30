@@ -41,6 +41,8 @@ namespace {
   const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
   const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
+  const qint32 CHART_WIDTH = 200;
+  const qint32 CHART_HEIGHT = 200;
 }
 
 StringMapT GuiDashboard::propRules() {
@@ -64,7 +66,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   : DashboardBase(_config),
     m_changePasswdWindow (new GuiPreferences(_userRole, Preferences::ChangePassword)),
     m_widget (new QSplitter()),
-    m_chart(new PieChart(QRectF(2, 2, 200, 200), m_widget.get())),
+    m_chart(new PieChart(QRectF(2, 2, CHART_WIDTH, CHART_HEIGHT), m_widget.get())),
     m_lelfSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
@@ -237,18 +239,26 @@ void GuiDashboard::centerGraphOnNode(QTreeWidgetItem * _item)
 void GuiDashboard::resizeDashboard(qint32 width, qint32 height)
 {
   const qreal GRAPH_HEIGHT_RATE = 0.50;
-  QSize msgConsoleSize = QSize(width * 0.80, height * (1.0 - GRAPH_HEIGHT_RATE));;
+  const qreal LEFT_FRAME_HEIGHT_RATE = 0.30;
+  const qreal RIGHT_FRAME_HEIGHT_RATE = (1 - LEFT_FRAME_HEIGHT_RATE);
+  QSize msgConsoleSize = QSize(width * RIGHT_FRAME_HEIGHT_RATE,
+                               height * (1.0 - GRAPH_HEIGHT_RATE));;
 
-  QList<qint32> framesSize;
-  framesSize.push_back(width * 0.20);
-  framesSize.push_back(msgConsoleSize.width());
-  m_widget->setSizes(framesSize);
+  QList<qint32> horizontalFramesSize;
+  QList<qint32> leftFramesSize;
+  QList<qint32> rightFramesSize;
 
-  framesSize[0] = (height * GRAPH_HEIGHT_RATE);
-  framesSize[1] = (msgConsoleSize.height());
+  horizontalFramesSize.push_back(width * LEFT_FRAME_HEIGHT_RATE);
+  horizontalFramesSize.push_back(msgConsoleSize.width());
+  m_widget->setSizes(horizontalFramesSize);
 
-  m_lelfSplitter->setSizes(framesSize);
-  m_rightSplitter->setSizes(framesSize);
+  leftFramesSize.push_back(width - m_chart->size().height());
+  leftFramesSize.push_back( m_chart->size().height());
+  m_lelfSplitter->setSizes(leftFramesSize);
+
+  rightFramesSize.push_back(height * GRAPH_HEIGHT_RATE);
+  rightFramesSize.push_back(msgConsoleSize.height());
+  m_rightSplitter->setSizes(rightFramesSize);
 
   m_widget->resize(width, height * 0.85);
   m_msgConsole->setConsoleSize(msgConsoleSize);
