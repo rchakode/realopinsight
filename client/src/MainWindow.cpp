@@ -86,7 +86,6 @@ void MainWindow::showEvent(QShowEvent*)
                       Qt::AlignCenter|Qt::AlignCenter);
 
     m_dashboard->initSettings(m_preferences);
-    handleRefresh();
 
     info->finish(0);
     m_dashboard->showTrayIcon();
@@ -181,6 +180,7 @@ void MainWindow::render(void)
     m_dashboard->scalPaneContentsToViewPort();
     QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
                                 .arg(m_dashboard->rootNode().name, APP_NAME));
+    handleRefresh();
   } else {
     ngrt4n::alert(m_dashboard->lastError());
   }
