@@ -35,9 +35,9 @@
 #include <QStatusBar>
 #include <QObject>
 #include <QNetworkCookie>
-#include <zmq.h>
 #include <iostream>
 #include <algorithm>
+#include <zmq.h>
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -77,6 +77,7 @@ DashboardBase::DashboardBase(const QString& descriptionFile)
     m_showOnlyTroubles(false),
     m_errorState(false)
 {
+  resetStatData();
 }
 
 DashboardBase::~DashboardBase()
@@ -117,7 +118,6 @@ void DashboardBase::runMonitor()
     }
   }
   ++m_updateCounter;
-  updateChart();
 }
 
 void DashboardBase::runMonitor(SourceT& src)
@@ -134,6 +134,7 @@ void DashboardBase::runMonitor(SourceT& src)
     src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
     break;
   }
+  updateChart();
   finalizeUpdate(src);
 }
 
@@ -254,7 +255,7 @@ void DashboardBase::resetStatData(void)
   m_cdata->check_status_count[ngrt4n::Minor] = 0;
   m_cdata->check_status_count[ngrt4n::Major] = 0;
   m_cdata->check_status_count[ngrt4n::Critical] = 0;
-  m_cdata->check_status_count[ngrt4n::Unknown] = 0;
+  m_cdata->check_status_count[ngrt4n::Unknown] = m_cdata->cnodes.size();
 }
 
 
@@ -283,6 +284,7 @@ void DashboardBase::updateDashboard(const NodeT& _node)
   QString toolTip = ngrt4n::getNodeToolTip(_node);
   updateTree(_node, toolTip);
   updateMap(_node, toolTip);
+  updateChart();
   updateMsgConsole(_node);
   updateBpNode(_node.parent);
   updateEventFeeds(_node);
@@ -775,10 +777,9 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
 
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
     computeStatusInfo(*cnode, src);
-    updateDashboard(*cnode);
-    ++(m_cdata->check_status_count[ngrt4n::Unknown]);
-    updateEventFeeds(*cnode);
+    ++(m_cdata->check_status_count[ngrt4n::Unknown]);  //FIXME: reset stat data
     cnode->monitored = true;
+    updateDashboard(*cnode);
   }
 }
 
@@ -847,35 +848,39 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
 
 void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
 {
-  Q_FOREACH (const qint8& id, ids) {
-    SourceT newsrc;
-    m_settings->loadSource(id, newsrc);
-    SourceListT::Iterator olddata = m_sources.find(id);
-    if (olddata != m_sources.end()) {
-      switch (olddata->mon_type) {
-      case ngrt4n::Nagios:
-        if (olddata->use_ngrt4nd) {
-          olddata->ls_handler.reset();
-        } else {
-          olddata->d4n_handler.reset();
+  if (ids.size() > 0)
+  {
+    Q_FOREACH (const qint8& id, ids) {
+      SourceT newsrc;
+      m_settings->loadSource(id, newsrc);
+      SourceListT::Iterator olddata = m_sources.find(id);
+      if (olddata != m_sources.end()) {
+        switch (olddata->mon_type) {
+        case ngrt4n::Nagios:
+          if (olddata->use_ngrt4nd) {
+            olddata->ls_handler.reset();
+          } else {
+            olddata->d4n_handler.reset();
+          }
+          break;
+        case ngrt4n::Zabbix:
+          olddata->zbx_handler.reset();
+          break;
+        case ngrt4n::Zenoss:
+          olddata->zns_handler.reset();
+          break;
+        default:
+          Q_EMIT errorOccurred(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
+          break;
         }
-        break;
-      case ngrt4n::Zabbix:
-        olddata->zbx_handler.reset();
-        break;
-      case ngrt4n::Zenoss:
-        olddata->zns_handler.reset();
-        break;
-      default:
-        Q_EMIT errorOccurred(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
-        break;
       }
+      allocSourceHandler(newsrc);
+      m_sources[id] = newsrc;
+      //      runMonitor(newsrc);
     }
-    allocSourceHandler(newsrc);
-    m_sources[id] = newsrc;
-    runMonitor(newsrc);
+    runMonitor();
+    Q_EMIT updateSourceUrl();
   }
-  Q_EMIT updateSourceUrl();
 }
 
 void DashboardBase::computeFirstSrcIndex(void)

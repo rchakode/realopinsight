@@ -163,6 +163,7 @@ void GuiDashboard::updateEventFeeds(const NodeT& node)
 void GuiDashboard::buildTree(void)
 {
   m_tree->build();
+  m_tree->expandAll();
 }
 
 void GuiDashboard::updateTree(const NodeT& _node, const QString& _tip)

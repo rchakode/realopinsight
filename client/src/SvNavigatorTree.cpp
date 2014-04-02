@@ -38,11 +38,6 @@ SvNavigatorTree::SvNavigatorTree(CoreDataT* _cdata, const bool& _enableDrag, QWi
   setDragEnabled(_enableDrag);
 }
 
-void SvNavigatorTree::showEvent(QShowEvent*)
-{
-  expandAll();
-}
-
 void SvNavigatorTree::dropEvent(QDropEvent * _event)
 {
   QTreeWidgetItem* tnode = itemAt(_event->pos());

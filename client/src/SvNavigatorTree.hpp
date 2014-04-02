@@ -35,7 +35,7 @@ class SvNavigatorTree : public QTreeWidget
 public:
   SvNavigatorTree(CoreDataT* _cdata, const bool& _enableDrag=false, QWidget* = 0 );
 
-  void update(void) ;
+  void update(void);
 
   void resetData(void) {m_items.clear();}
   void build(void);
@@ -45,16 +45,15 @@ public:
   void updateNodeItem(const NodeT& _node, const QString& _tip);
 
 Q_SIGNALS:
-  void treeNodeMoved( QString _nodeId ) ;
+  void treeNodeMoved( QString _nodeId );
 
 protected:
-  void showEvent(QShowEvent *) ;
-  void dropEvent(QDropEvent *) ;
-  void startDrag(Qt::DropActions)  ;
+  void dropEvent(QDropEvent *);
+  void startDrag(Qt::DropActions) ;
 
 private:
-  QString m_selectedNode ;
-  CoreDataT* m_cdata ;
+  QString m_selectedNode;
+  CoreDataT* m_cdata;
   GuiTreeItemListT m_items;
 
   QTreeWidgetItem * createItem(const NodeT & _node);

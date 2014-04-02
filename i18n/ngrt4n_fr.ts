@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="fr_FR">
 <context>
     <name>Auth</name>
     <message>
@@ -51,7 +50,7 @@ Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
     <message>
         <location filename="../wt/src/AuthManager.cpp" line="63"/>
         <source>Wt.Auth.template.logged-in</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -154,39 +153,39 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="80"/>
         <source>Map</source>
-        <translation type="unfinished">Cartographie</translation>
+        <translation>Cartographie</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="82"/>
         <source>Web Browser</source>
-        <translation type="unfinished">Navigateur Web</translation>
+        <translation>Navigateur Web</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="218"/>
         <source>Messages related to &apos;%2&apos; - %1</source>
-        <translation type="unfinished">Messages relatifs au service &apos;%2&apos; - %1</translation>
+        <translation>Messages relatifs au service &apos;%2&apos; - %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="286"/>
         <source> - %1 Problem%2
  - Level of Impact: %3</source>
-        <translation type="unfinished"> - %1 incident%2
+        <translation> - %1 incident%2
  - Niveau d&apos;impact : %3</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="287"/>
         <source>s</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="302"/>
         <source>Message Console</source>
-        <translation type="unfinished">Console des messages</translation>
+        <translation>Console des messages</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="356"/>
         <source>Web Browser (%1)</source>
-        <translation type="unfinished">Navigateur Web (%1)</translation>
+        <translation>Navigateur Web (%1)</translation>
     </message>
 </context>
 <context>
@@ -194,187 +193,187 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="11"/>
         <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Fermer</translation>
+        <translation>&amp;Fermer</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="108"/>
         <source>Select the source type | %1</source>
-        <translation type="unfinished">Sélectionner le type de source | %1</translation>
+        <translation>Sélectionner le type de source | %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="109"/>
         <source>Please select the source type (Remote API)</source>
-        <translation type="unfinished">Sélectionner le type de source (API distante)</translation>
+        <translation>Veuillez sélectionner le type de source (API distante)</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="150"/>
         <source>Monitoring Settings | %1</source>
-        <translation type="unfinished">Paramètres de la console | %1</translation>
+        <translation>Paramètres de la console | %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="158"/>
         <source>&amp;Apply settings</source>
-        <translation type="unfinished">&amp;Appliquer les changements</translation>
+        <translation>&amp;Appliquer les changements</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="159"/>
         <source>Add a&amp;s Source</source>
-        <translation type="unfinished">Sauver comme &amp;source</translation>
+        <translation>Ajouter comme nouvelle &amp;source</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="160"/>
         <source>&amp;Delete Source</source>
-        <translation type="unfinished">Sup&amp;primer</translation>
+        <translation>Sup&amp;primer</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="161"/>
         <source>&amp;Show in clear</source>
-        <translation type="unfinished">Afficher en &amp;clair</translation>
+        <translation>Afficher en &amp;clair</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="162"/>
         <source>Use &amp;Ngrt4nd</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser &amp;ngrt4nd</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="163"/>
         <source>Don&apos;t verify SSL peer (https)</source>
-        <translation type="unfinished">Ne pas vérifier le pair SSL</translation>
+        <translation>Ne pas vérifier le pair SSL</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="172"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
-        <translation type="unfinished">(*) Réquis pour Zabbix et Zenoss.</translation>
+        <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="188"/>
         <source>C&amp;hange password</source>
-        <translation type="unfinished">C&amp;hanger mot de passe</translation>
+        <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="193"/>
         <source>Change Password | %1</source>
-        <translation type="unfinished">Changer mot de passe | %1</translation>
+        <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="198"/>
         <source>Current Password</source>
-        <translation type="unfinished">Mot de passe actuel</translation>
+        <translation>Mot de passe actuel</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="201"/>
         <source>New password</source>
-        <translation type="unfinished">Nouveau mot de passe</translation>
+        <translation>Nouveau mot de passe</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="204"/>
         <source>Retype new password</source>
-        <translation type="unfinished">Confirmation</translation>
+        <translation>Confirmation</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="218"/>
         <source>About %1</source>
-        <translation type="unfinished">A propos de %1</translation>
+        <translation>A propos de %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="335"/>
         <source>Browser requires realm authentication | %1</source>
-        <translation type="unfinished">Authentification realm requise | %1</translation>
+        <translation>La page demandée requiert une authentification | %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="338"/>
         <source>Login</source>
-        <translation type="unfinished">Nom d&apos;utilisateur</translation>
+        <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="342"/>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="347"/>
         <source>Submit</source>
-        <translation type="unfinished">Soumettre</translation>
+        <translation>Soumettre</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="422"/>
         <source>Password updated</source>
-        <translation type="unfinished">Mot de passe mis à jour</translation>
+        <translation>Mot de passe mis à jour</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="426"/>
         <source>Sorry the passwords do not match</source>
-        <translation type="unfinished">Désolé, les deux mots de passe ne correspondent pas</translation>
+        <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="429"/>
         <source>Authentication failed</source>
-        <translation type="unfinished">Echec d&apos;authentification</translation>
+        <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="459"/>
         <source>Update Actions</source>
-        <translation type="unfinished">Actions</translation>
+        <translation>Actions</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="501"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
-        <translation type="unfinished">Point d&apos;accès à Livestatus ou à ngrt4nd</translation>
+        <translation>Point d&apos;accès à Livestatus ou à ngrt4nd</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="503"/>
         <source>Server Address</source>
-        <translation type="unfinished">Adresse du serveur</translation>
+        <translation>Adresse du serveur</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="505"/>
         <source>Port</source>
-        <translation type="unfinished">Port</translation>
+        <translation>Port</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="538"/>
         <source>Sources</source>
-        <translation type="unfinished">Sources</translation>
+        <translation>Sources</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="541"/>
         <source>Monitor Web URL*</source>
-        <translation type="unfinished">Adresse web du moniteur*</translation>
+        <translation>Adresse web du moniteur*</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="543"/>
         <source>Select a monitor type</source>
-        <translation type="unfinished"></translation>
+        <translation>Selectionner le type de moniteur</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="549"/>
         <source>Auth String</source>
-        <translation type="unfinished">Chaine d&apos;authentification</translation>
+        <translation>Chaine d&apos;authentification</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="553"/>
         <source>Update Interval</source>
-        <translation type="unfinished">Intervalle de mise à jour</translation>
+        <translation>Intervalle de mise à jour</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="557"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="562"/>
         <source>Common Settings</source>
-        <translation type="unfinished">Paramètres généraux</translation>
+        <translation>Paramètres généraux</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="589"/>
         <source>Select source index | %1</source>
-        <translation type="unfinished">Sélectionner l&apos;index de la source | %1</translation>
+        <translation>Sélectionner l&apos;index de la source | %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="590"/>
         <source>Please select the index of the source</source>
-        <translation type="unfinished">Sélectionner l&apos;index de la source</translation>
+        <translation>Veuillez sélectionner l&apos;index de la source</translation>
     </message>
 </context>
 <context>
@@ -425,147 +424,147 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="36"/>
         <source>%1 Operations Console</source>
-        <translation type="unfinished">Console des operations %1</translation>
+        <translation>Console des operations %1</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="88"/>
         <source>Please wait for initialization, it may take a while...</source>
-        <translation type="unfinished">Veuillez attendre la fin de l&apos;initialisation, cela peut prendre quelques secondes...</translation>
+        <translation>Veuillez attendre la fin de l&apos;initialisation, cela peut prendre quelques secondes...</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="109"/>
         <source>&amp;File</source>
-        <translation type="unfinished">&amp;Fichier</translation>
+        <translation>&amp;Fichier</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="110"/>
         <source>&amp;Refresh Screen</source>
-        <translation type="unfinished">&amp;Actualiser la console</translation>
+        <translation>&amp;Actualiser la console</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="111"/>
         <source>&amp;Save Map as Image</source>
-        <translation type="unfinished">Enregi&amp;strer la cartographie sous forme d&apos;image</translation>
+        <translation>Enregi&amp;strer la cartographie sous forme d&apos;image</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="113"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Quitter</translation>
+        <translation>&amp;Quitter</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="117"/>
         <source>&amp;Console</source>
-        <translation type="unfinished">&amp;Console</translation>
+        <translation>&amp;Console</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="118"/>
         <source>Map Zoom &amp;In</source>
-        <translation type="unfinished">Zoom &amp;avant sur la cartographie</translation>
+        <translation>Zoom &amp;avant sur la cartographie</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="119"/>
         <source>Map Zoom &amp;Out</source>
-        <translation type="unfinished">Zoom a&amp;rrière sur la cartographie</translation>
+        <translation>Zoom a&amp;rrière sur la cartographie</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="120"/>
         <source>Hide &amp;Chart</source>
-        <translation type="unfinished">Masquer/afficher la &amp;charte</translation>
+        <translation>Masquer/afficher la &amp;charte</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="124"/>
         <source>&amp;Full Screen</source>
-        <translation type="unfinished">Pl&amp;ein écran</translation>
+        <translation>Pl&amp;ein écran</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="127"/>
         <source>&amp;Show only trouble messages</source>
-        <translation type="unfinished">N&apos;afficher que des &amp;incidents</translation>
+        <translation>N&apos;afficher que des &amp;incidents</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="129"/>
         <source>&amp;Increase message &amp;font</source>
-        <translation type="unfinished">Activer/désactiver &amp;grande police</translation>
+        <translation>Activer/désactiver &amp;grande police</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="131"/>
         <source>&amp;Preferences</source>
-        <translation type="unfinished">&amp;Préférences</translation>
+        <translation>&amp;Préférences</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="132"/>
         <source>Change &amp;Password</source>
-        <translation type="unfinished">Changer de mot de &amp;passe</translation>
+        <translation>Changer de mot de &amp;passe</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="133"/>
         <source>&amp;Monitoring Settings</source>
-        <translation type="unfinished">Para&amp;mètres de la console</translation>
+        <translation>Para&amp;mètres de la console</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="135"/>
         <source>&amp;Browser</source>
-        <translation type="unfinished">&amp;Navigateur</translation>
+        <translation>&amp;Navigateur</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="136"/>
         <source>Bac&amp;k</source>
-        <translation type="unfinished">&amp;Précédent</translation>
+        <translation>&amp;Précédent</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="137"/>
         <source>For&amp;ward</source>
-        <translation type="unfinished">&amp;Suivant</translation>
+        <translation>&amp;Suivant</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="138"/>
         <source>Sto&amp;p</source>
-        <translation type="unfinished">&amp;Arrêter</translation>
+        <translation>&amp;Arrêter</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="139"/>
         <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Aide</translation>
+        <translation>&amp;Aide</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="140"/>
         <source>Online &amp;Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aide en ligne</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="142"/>
         <source>&amp;About %1</source>
-        <translation type="unfinished">&amp;A propos de %1</translation>
+        <translation>&amp;A propos de %1</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="144"/>
         <source>&amp;Filter related messages</source>
-        <translation type="unfinished">&amp;Filtrer les messages associés</translation>
+        <translation>&amp;Filtrer les messages associés</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="145"/>
         <source>Center Graph &amp;On</source>
-        <translation type="unfinished">&amp;Centrer la carte sur le noeud</translation>
+        <translation>&amp;Centrer la carte sur le noeud</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="146"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="183"/>
         <source>%1 - %2 Operations Console</source>
-        <translation type="unfinished">%1 - %2 Console des Opérations</translation>
+        <translation>%1 - %2 Console des Opérations</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="226"/>
         <source>updating...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="228"/>
         <source>update completed</source>
-        <translation type="unfinished">mise à jour terminée</translation>
+        <translation>mise à jour terminée</translation>
     </message>
 </context>
 <context>
@@ -834,7 +833,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../client/src/GuiUtils.cpp" line="36"/>
         <source>%1 - Warning</source>
-        <translation type="unfinished">%1 - Attention</translation>
+        <translation>%1 - Attention</translation>
     </message>
     <message>
         <location filename="../client/src/GuiUtils.cpp" line="46"/>
@@ -842,7 +841,10 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         &gt;&gt; Realease ID: %5
         &gt;&gt; Copyright (C) 2010 - %6 RealOpInsight Labs. All rights reserved
         &gt;&gt; For bug reporting instructions, see: &lt;%7&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>       &gt; %1 %2 %3 (nom de code: %4)
+        &gt;&gt; Realease ID: %5
+        &gt;&gt; Copyright (C) 2010 - %6 RealOpInsight Labs. Tous droits reservés
+        &gt;&gt; Pour reporter les bugs, voir: &lt;%7&gt;</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="41"/>
@@ -910,7 +912,7 @@ Visit %6 for more information
 
 Report Bugs: bugs@ngrt4n.com
 </source>
-        <translation type="unfinished">
+        <translation>
 %1 %2 (nom de code : %3)
 
 Numéro de série : %4
@@ -1073,27 +1075,27 @@ Chargement...</translation>
     <message>
         <location filename="../client/src/StatsLegend.cpp" line="41"/>
         <source>normal</source>
-        <translation type="unfinished">normal</translation>
+        <translation>normal</translation>
     </message>
     <message>
         <location filename="../client/src/StatsLegend.cpp" line="43"/>
         <source>minor</source>
-        <translation type="unfinished">mineur</translation>
+        <translation>mineur</translation>
     </message>
     <message>
         <location filename="../client/src/StatsLegend.cpp" line="45"/>
         <source>major</source>
-        <translation type="unfinished">majeur</translation>
+        <translation>majeur</translation>
     </message>
     <message>
         <location filename="../client/src/StatsLegend.cpp" line="47"/>
         <source>critical</source>
-        <translation type="unfinished">critique</translation>
+        <translation>critique</translation>
     </message>
     <message>
         <location filename="../client/src/StatsLegend.cpp" line="49"/>
         <source>unknown</source>
-        <translation type="unfinished">indéfini</translation>
+        <translation>indéfini</translation>
     </message>
     <message>
         <source>Service Tree</source>
@@ -1115,87 +1117,88 @@ Chargement...</translation>
     <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="35"/>
         <source>View Managment</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestion des vues</translation>
     </message>
     <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="74"/>
         <source>&lt;&lt; Assign</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt; Assigner</translation>
     </message>
     <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="78"/>
         <source>Revoke&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Désassigner&gt;&gt;</translation>
     </message>
     <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="82"/>
         <source>Delete View</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer vue</translation>
     </message>
     <message>
         <location filename="../wt/src/WebUtils.cpp" line="139"/>
         <source>&lt;span class=&quot;btn&quot;&gt; &lt;i class=&quot;%1&quot;&gt;&lt;/i&gt;&lt;/span&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/AuthManager.cpp" line="68"/>
         <source>Sign out</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnexion</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="41"/>
         <source>Please verify the monitor type and fix field(s) in red</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez vérifier le type de moniteur et toutes les informations marquées en rouge</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="88"/>
         <source>Show in clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher en clair</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="111"/>
         <source>Use ngrt4nd</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser ngrt4nd</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="114"/>
         <source>Don&apos;t verify SSL certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne vérifier pas le certificat SSL</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="120"/>
         <source>Apply changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="123"/>
         <source>Add as source</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter comme nouvelle source</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="126"/>
         <source>Delete source</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer source</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="158"/>
         <source>Bad monitor type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type de moniteur invalide</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="162"/>
         <source>Bad index for source (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;index de la source est incorrect (%1)</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="254"/>
         <source>Select source type</source>
-        <translation type="unfinished">Sélectionner le type de source</translation>
+        <translatorcomment>Veuillez sélectionner le type de source</translatorcomment>
+        <translation>Sélectionner le type de source</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="259"/>
         <source>Select the source index</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez sélectionner l&apos;index de la source</translation>
     </message>
 </context>
 <context>
@@ -1814,7 +1817,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../wt/dbo/UserMngtUI.cpp" line="175"/>
         <source>userForm-template</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1822,7 +1825,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../wt/src/WebDashboard.cpp" line="266"/>
         <source>%1 event on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 évènement(s) sur %2</translation>
     </message>
 </context>
 <context>
@@ -1843,111 +1846,112 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
         <location filename="../wt/src/WebMainUI.cpp" line="116"/>
         <location filename="../wt/src/WebMainUI.cpp" line="669"/>
         <source>Operations Console</source>
-        <translation type="unfinished">Console des opérations</translation>
+        <translation>Console des opérations</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="339"/>
         <source>Invalid description file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de description invalide</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="561"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>Changer de mot de passe</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="62"/>
         <source>Select file to preview | %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner la fichier à prévisualiser | %1</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="114"/>
         <location filename="../wt/src/WebMainUI.cpp" line="129"/>
         <source>Account &amp; Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Compte et paramètres</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="163"/>
         <source>Signed in as %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Connecté en tant que %1</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="172"/>
         <location filename="../wt/src/WebMainUI.cpp" line="185"/>
         <source>Show Account &amp; Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Affichier les paramètres</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="178"/>
         <source>Hide Account &amp; Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Masquer les paramètres</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="192"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="275"/>
         <source>Select the platform to preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner la plateforme à prévisualiser</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="283"/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Prévisualiser</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="291"/>
         <source>Import a description file</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer un fichier de description</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="304"/>
         <source>Upload</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="311"/>
         <location filename="../wt/src/WebMainUI.cpp" line="639"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="320"/>
         <source>File is too large.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier trop volumineux.</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="345"/>
         <source>%1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="357"/>
         <source>View added.  Name: %1
  -  Number of services: %2 - Path: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Vue ajoutée.  Nom: %1
+ -  Nombre de services: %2 - Chemin: %3</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="377"/>
         <source>No file selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun fichier sélectionné</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="404"/>
         <source>This platform or a platfom with the same name is already loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette  plateforme ou une plateforme du même nom existe déjà</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="579"/>
         <source>Sorry, the request resource is not available or has been removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Désolé, la resource demandé n&apos;est plus disponible</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="712"/>
         <source>Unable to create the directory (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de créer le repertoire (%1)</translation>
     </message>
 </context>
 <context>
@@ -1955,77 +1959,77 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../wt/dbo/UserMngtUI.cpp" line="415"/>
         <source>user-list-tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="46"/>
         <source>view-assignment-tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebDashboard.cpp" line="212"/>
         <source>statistic-tooltip.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebDashboard.cpp" line="261"/>
         <source>event-feed.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="436"/>
         <source>getting-started.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="157"/>
         <source>notification.block.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="427"/>
         <source>admin-home.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="665"/>
         <source>operator-home.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="642"/>
         <source>about-tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="686"/>
         <source>dashboard-thumbnail.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="51"/>
         <source>setting-page.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebUtils.cpp" line="42"/>
         <source>error-msg-div-tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebUtils.cpp" line="45"/>
         <source>success-msg-div-tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebUtils.cpp" line="94"/>
         <source>copyright-footer.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebPieChart.cpp" line="88"/>
         <source>chart.tpl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2033,7 +2037,7 @@ Doit être sous la forme utilisateur:mot_de_passe</translation>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="63"/>
         <source>-- Select a type --</source>
-        <translation type="unfinished"></translation>
+        <translation>-- Sélectionner un type --</translation>
     </message>
 </context>
 <context>
