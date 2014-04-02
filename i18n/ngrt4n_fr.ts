@@ -37,7 +37,7 @@
         <location filename="../client/src/Auth.cpp" line="57"/>
         <source>
 Copyright (c) 2010-%1 NGRT4N Project. All rights reserved.</source>
-        <translation>Copyright (c) 2010-%1 Projet NGRT4N. Tous droits réservés.</translation>
+        <translation type="unfinished">Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
     <message>
         <location filename="../client/src/Auth.cpp" line="91"/>
