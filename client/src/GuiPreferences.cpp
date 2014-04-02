@@ -241,7 +241,7 @@ void GuiPreferences::organizeAbortWindow(void)
                                 "\nRelease ID: %4\n"
                                 "\nCopyright (c) 2010-%5 RealOpInsight Labs. All rights reserved"
                                 "\nVisit %6 for more information\n"
-                                "\nReport Bugs: %7%\n").arg(PKG_NAME, PKG_VERSION, REL_NAME, REL_INFO, REL_YEAR, PKG_URL, REPORT_BUG);
+                                "\nReport Bugs: %7\n").arg(PKG_NAME, PKG_VERSION, REL_NAME, REL_INFO, REL_YEAR, PKG_URL, REPORT_BUG);
     int line = 0;
     m_mainLayout->addWidget(new QLabel(about), line++, 0, 1, 2);
     m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft);
