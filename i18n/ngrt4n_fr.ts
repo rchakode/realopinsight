@@ -214,7 +214,7 @@
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="422"/>
         <source>Password updated</source>
-        <translation>Mot de passe mis à jour</translation>
+        <translation>Mot de passe mis Ã  jour</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="426"/>
@@ -234,7 +234,7 @@
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="501"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
-        <translation>Point d&apos;accès à Livestatus ou à ngrt4nd</translation>
+        <translation>Point d&apos;accès Ã  Livestatus ou Ã  ngrt4nd</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="503"/>
@@ -269,7 +269,7 @@
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="553"/>
         <source>Update Interval</source>
-        <translation>Intervalle de mise à jour</translation>
+        <translation>Intervalle de mise Ã  jour</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="557"/>
@@ -395,7 +395,7 @@
     <message>
         <location filename="../client/src/MainWindow.cpp" line="138"/>
         <source>Sto&amp;p</source>
-        <translation>&amp;Arrêter</translation>
+        <translation>&amp;ArrÃªter</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="139"/>
@@ -440,7 +440,7 @@
     <message>
         <location filename="../client/src/MainWindow.cpp" line="228"/>
         <source>update completed</source>
-        <translation>mise à jour terminée</translation>
+        <translation>mise Ã  jour terminée</translation>
     </message>
 </context>
 <context>
@@ -483,7 +483,7 @@
         <location filename="../client/src/MsgConsole.cpp" line="43"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="56"/>
         <source>Host</source>
-        <translation>Hôte</translation>
+        <translation>HÃ´te</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="44"/>
@@ -548,7 +548,7 @@ Autres détails : %9</translation>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="43"/>
         <source>Failed to connect to %1 (%2)</source>
-        <translation>Echec lors de la connexion à %1 (%2)</translation>
+        <translation>Echec lors de la connexion Ã  %1 (%2)</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-editor.cpp" line="50"/>
@@ -745,7 +745,7 @@ Autres détails : %9</translation>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="47"/>
         <source>Icon</source>
-        <translation>Icône</translation>
+        <translation>IcÃ´ne</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="50"/>
@@ -775,13 +775,13 @@ Autres détails : %9</translation>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="248"/>
         <source>Calculation rule (Default is %1)</source>
-        <oldsource>Calculation rule (Default is</oldsource>
+        <oldsource>Calculation rule (Default is)</oldsource>
         <translation>Règle de calcul (valeur par défaut %1)</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="255"/>
         <source>Propagation rule (Default is %1)</source>
-        <oldsource>Propagation rule (Default is</oldsource>
+        <oldsource>Propagation rule (Default is)</oldsource>
         <translation>Règle de propagation (valeur par défaut %1)</translation>
     </message>
     <message>
@@ -919,14 +919,14 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="345"/>
         <source>Save change? - %1</source>
-        <translation>Enregistrer les mises à jour ? - %1</translation>
+        <translation>Enregistrer les mises Ã  jour ? - %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="346"/>
         <source>The document has changed.
 Do you want to save the changes?</source>
         <translation>Le document n&apos;a été modifiée.
-Voulez-vous enregistrer les mises à jour?</translation>
+Voulez-vous enregistrer les mises Ã  jour?</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="420"/>
@@ -1088,7 +1088,7 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="62"/>
         <source>Select file to preview | %1</source>
-        <translation>Sélectionner la fichier à prévisualiser | %1</translation>
+        <translation>Sélectionner la fichier Ã  prévisualiser | %1</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="114"/>
@@ -1120,7 +1120,7 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="275"/>
         <source>Select the platform to preview</source>
-        <translation>Sélectionner la plateforme à prévisualiser</translation>
+        <translation>Sélectionner la plateforme Ã  prévisualiser</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="283"/>
@@ -1168,7 +1168,7 @@ Voulez-vous enregistrer les mises à jour?</translation>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="404"/>
         <source>This platform or a platfom with the same name is already loaded</source>
-        <translation>Cette  plateforme ou une plateforme du même nom existe déjà</translation>
+        <translation>Cette  plateforme ou une plateforme du mÃªme nom existe déjÃ </translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="579"/>
