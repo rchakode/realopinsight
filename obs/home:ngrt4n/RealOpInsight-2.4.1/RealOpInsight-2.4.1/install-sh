@@ -1,0 +1,202 @@
+# ------------------------------------------------------------------------ #
+# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update : 24-05-2012                                                 #
+#                                                                          #
+# This Software is part of NGRT4N Project (http://ngrt4n.com).             #
+#     									   #
+# This is a free software: you can redistribute it and/or modify           #
+# it under the terms of the GNU General Public License as published by     #
+# the Free Software Foundation, either version 3 of the License, or        #
+# (at your option) any later version.                                      #
+#			                                                   #
+# The Software is distributed in the hope that it will be useful,          #
+# but WITHOUT ANY WARRANTY; without even the implied warranty or           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
+# GNU General Public License for more details.                             #
+#                                                                          #
+# You should have received a copy of the GNU General Public License	   #
+# along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
+#--------------------------------------------------------------------------#
+
+set -e
+shopt -s extglob
+
+APP="ngrt4n"
+APP_PREFIX="/usr/local"
+VERSION_BKR="1.0"
+
+# Print help
+#
+usage(){
+  echo
+  echo "Usage: `basename $0` [OPTION]"
+  echo "OPTIONS"
+  echo "	-d <install_dir>"
+  echo "	  Sets the installation directory,  default is /usr/local."
+  echo "	-n <ncpu>"
+  echo "	  Sets the number of cpu to use for the compilation"
+  echo "	-h"
+  echo "	  Shows this help"
+}
+
+prompt_copyright(){ 
+echo
+echo "Thanks for choosing NGRT4N Monitoring Suite."
+echo
+echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
+echo
+echo "Type 'y' to accept this license offer."
+echo "Type 'n' to decline this license offer."
+echo "Type 'r' to view this license offer."
+echo
+while true; do
+read -p "Do you accept the terms of the License ? y/N/r " rep
+  case $rep in
+	r) more COPYING ; echo ;;
+	y) break ;;
+	*) exit 0 ;; 
+  esac
+done
+}
+install_daemon(){
+  
+  echo "==>Installing the Daemon Service for Nagios..."  
+  echo -n "DEGUG : Checking prerequises..." 
+  ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
+  echo done
+  
+  echo -n "DEGUG : Compiling..."
+  make -Bj${NCPU} 1>>install.log
+  echo done
+  
+  echo -n "DEGUG : Installation..."
+  make install 1>>install.log
+  cd ..
+  echo "done" 
+  echo "==>Installation completed"
+}
+
+checking_uipreq(){
+  echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
+  [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
+  echo "done"
+ 
+  echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "
+  [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
+  echo "done"
+ 
+  echo -n "DEGUG : Checking C++ compiler => ${CXX:=`which g++`}... "
+  [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
+  echo "done"
+ 
+  echo -n "DEGUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
+  echo "done"
+}
+
+install_default(){
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-manager ${dflag}
+  make -Bj${NCPU} 1>>install.log
+  make install 1>>install.log
+}
+
+install_editor(){
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-editor ${dflag}
+  make -j${NCPU} 1>>install.log
+  make install 1>>install.log
+}
+
+install_oc(){
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-oc ${dflag}
+  make -j${NCPU} 1>>install.log
+  make install 1>>install.log
+}
+
+remove_old(){
+ echo "Removing deprecated files => ${NGRT4N_CMD:=`which ngrt4n 2>/dev/null`}"
+ [ -e ${NGRT4N_CMD} ] && rm -rf ${NGRT4N_CMD}
+ rm -rf ${INSTALL_PREFIX}/bin/ngrt4n
+}
+install_ui() {
+  echo "==>Installing RealOpInsight..."  
+  checking_uipreq
+  echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
+  echo -n "DEGUG : Current component => Manager..."
+  install_default
+  echo done
+  
+  echo -n "DEGUG : Current component => Editor..."
+  install_editor
+  echo done
+  
+  echo -n "DEGUG : Current component => Operator Console..."
+  install_oc
+  echo done
+  remove_old
+  echo "==>Installation completed"
+}
+
+NCPU=1
+mflag=
+dflag=
+while getopts m:d:n:h name ; do
+  case $name in
+    d) dflag=1
+       install_prefix="$OPTARG"
+    ;;
+    n) NCPU=$OPTARG
+    ;;
+    h) usage;
+       exit 0
+    ;;
+    ?) usage
+     exit 1
+    ;;
+  esac
+done
+
+if [[ ! $NCPU == +([1-9]) ]]; then
+    echo "The option -n requires a number between 1 and 9"
+    exit 1
+fi
+
+export NCPU
+
+prompt_copyright
+
+echo "DEBUG: Init setup with $NCPU CPU..."
+
+if [ -z ${install_prefix} ] ; then
+  export INSTALL_PREFIX=/usr/local
+else
+  case ${install_prefix} in
+  /*) export INSTALL_PREFIX=${install_prefix}
+      export dflag="CONFIG+=dflag"
+     ;;
+  *) echo "This is not an absolute path : ${install_prefix}"
+     exit 2 ;;
+ esac
+fi
+
+if [ `id -u` -ne 0 ]; then
+  echo "DEBUG: You're performing a user mode installation"
+  echo "WARNING: You must have read/write permissions on the target directory ($INSTALL_PREFIX)"
+fi 
+
+if [ -e src/server/ngrt4nd.cpp ]; then
+  module=daemon;
+else
+  module=ui
+fi
+ 
+case ${module} in
+  daemon|ui) install_${module}
+    ;;
+  all) install_daemon 
+    install_ui
+   ;;     
+  *)echo "Unknown module : ${module}" ; 
+     exit 2;;
+esac 
+
+exit 0

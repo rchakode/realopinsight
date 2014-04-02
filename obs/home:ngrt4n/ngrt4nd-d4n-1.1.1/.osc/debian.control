@@ -1,0 +1,15 @@
+Source: ngrt4n-d4n
+Section: admin
+Priority: extra
+Maintainer: Rodrigue Chakode <bugs@ngrt4n.com>
+Build-Depends: debhelper (>= 4.0.0), g++, libzmq-dev
+Standards-Version: 3.9.3
+Homepage: http://ngrt4n.com
+#Vcs-Git: git://git.debian.org/collab-maint/ngrt4n.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/ngrt4n.git;a=summary
+
+Package: ngrt4n-d4n
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: This package provides ngrt4nd; the service allowing to RealOpInsight to 
+  retrieve status data from Nagios-based monitoring systems.

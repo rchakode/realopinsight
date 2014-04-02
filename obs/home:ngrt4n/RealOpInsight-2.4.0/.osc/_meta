@@ -1,0 +1,11 @@
+<package name="RealOpInsight-2.4.0" project="home:ngrt4n">
+  <title>RealOpInsight-2.4.0</title>
+  <description>Packages for the version 2.4.0.</description>
+  <build>
+    <enable repository="Fedora_19"/>
+    <enable repository="CentOS_CentOS-6"/>
+    <enable repository="xUbuntu_13.04"/>
+    <enable repository="Debian_7.0"/>
+  </build>
+</package>
+

@@ -1,0 +1,9 @@
+<directory name="RealOpInsight-2.4.0" rev="49" srcmd5="bd3b002bc756e15cbad89872ef75ee57" vrev="47">
+  <entry md5="3ccf564f6efc5260ac003f1e73f555c9" mtime="1378572007" name="RealOpInsight-2.4.0.tar.gz" size="872428" />
+  <entry md5="7a253c937b3768baea4fa2ba67e80302" mtime="1376693181" name="debian.changelog" size="158" />
+  <entry md5="c30f7472766d25af1dc80b3ffc9a58c7" mtime="1376692611" name="debian.compat" size="2" />
+  <entry md5="c9cc0d80b49a4d870bbfeec3a4ec5be7" mtime="1376692625" name="debian.control" size="677" />
+  <entry md5="6b978b083db7b7a6e76bdc26cb5bc07d" mtime="1376693321" name="debian.rules" size="1109" />
+  <entry md5="8f46e4ded6ee4fd4224cbbb58df09e9e" mtime="1378508848" name="realopinsight.dsc" size="506" />
+  <entry md5="aee41f782e2c95ce8b7645222a579a4f" mtime="1378504676" name="realopinsight.spec" size="3400" />
+</directory>

@@ -1,0 +1,12 @@
+<package name="RealOpInsight-2.3.0" project="home:ngrt4n">
+  <title>RealOpInsight-2.3.0</title>
+  <description>Package for RealOpInsight 2.3.0 (Briator)</description>
+  <build>
+    <disable repository="xUbuntu_13.04"/>
+    <disable repository="xUbuntu_12.10"/>
+    <disable repository="CentOS_CentOS-6"/>
+    <disable repository="Debian_6.0"/>
+    <disable repository="Debian_7.0"/>
+  </build>
+</package>
+
