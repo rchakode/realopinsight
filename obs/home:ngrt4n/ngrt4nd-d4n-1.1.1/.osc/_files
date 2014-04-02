@@ -1,9 +1,0 @@
-<directory name="ngrt4nd-d4n-1.1.1" rev="22" srcmd5="813903e4d038aef26d201538908e0513" vrev="22">
-  <entry md5="99016e6111e71bd4d149f6684f1c081f" mtime="1376854596" name="debian.changelog" size="155" />
-  <entry md5="c30f7472766d25af1dc80b3ffc9a58c7" mtime="1376854731" name="debian.compat" size="2" />
-  <entry md5="500947c05daa0f7ea857cceb6a36341d" mtime="1376854605" name="debian.control" size="561" />
-  <entry md5="ed7ce6a3bc1e466e1ca9a79e0017cb64" mtime="1376854620" name="debian.rules" size="1089" />
-  <entry md5="3c2b571702ffd2ac601498e75c1e572a" mtime="1378572258" name="ngrt4n-d4n-1.1.1.tar.gz" size="114552" />
-  <entry md5="cf8ef049b78a646413af6a33c4b81a18" mtime="1376854713" name="ngrt4n-d4n.dsc" size="441" />
-  <entry md5="6c577346afbb300f4aeb8004cc5af726" mtime="1376858498" name="ngrt4n-d4n.spec" size="2755" />
-</directory>

@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 02-12-2012                                                 #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update : 02-04-2014                                                 #
 #                                                                          #
-# This Software is part of NGRT4N Project (http://ngrt4n.com).             #
+# This Software is part of RealOpInsight (http://realopinsight.com).       #
 #                                                                          #
 # This is a free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
@@ -21,7 +21,7 @@
 %define binprefix     ngrt4n
     
 Name:           RealOpInsight
-Summary:    	Dashboard Software for Nagios, Zabbix, Zenoss, Icinga, Shinken, Centreon, etc
+Summary:    	Business service management software for open source monitoring
 Version:        X.Y.Z
 Release:        build<CI_CNT>.<B_CNT>
 Group:          System/Monitoring
@@ -30,6 +30,9 @@ URL:            http://ReolOpInsight.com
 Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %_tmppath/%name-%version-build
 
+
+BuildRequires:  gcc-c++  
+
 %if 0%{?centos_version}
 BuildRequires:  libzmq3
 %else
@@ -37,31 +40,27 @@ BuildRequires:  zeromq-devel
 %endif
 
 %if 0%{?suse_version} >= 1140
-BuildRequires:  gcc-c++ libqt4-devel >= 4.6.3 libQtWebKit4 libQtWebKit-devel
+BuildRequires:  libqt4 >= 4.6.3 libqt4-devel libQtWebKit4 libQtWebKit-devel
 %endif
 
 %if 0%{?fedora}
-BuildRequires:  gcc-c++ qt >= 4.6.3 qt4-devel qt-webkit-devel
+BuildRequires:  libgcc glibc gcc-c++ libstdc++ qt >= 4.6.3 qt4-devel
+BuildRequires:  qtwebkit qtwebkit qt-webkit-devel
 %endif
 
-%if 0%{?centos_version}
-BuildRequires:  gcc-c++ qt-devel qtwebkit
-%endif
 
-%if 0%{?suse_version} >= 1140
+BuildRequires: graphviz
 Requires:  graphviz
-%endif
-%if 0%{?fedora}
-Requires: graphviz qt >= 4.6.3 qtwebkit glibc libgcc >= 4.3 libstdc++
-%endif
 
 %description
-RealOpInsight (http://RealOpInsight.com/) is an advanced dashboard management
-engine for common open source monitoring systems including Nagios, Zabbix, Icinga,
-GroundWork, Centreon, Shinken® and op5 Monitor.
+RealOpinsight provides visualization systems that enables IT operations 
+staff to deal with monitoring with focus on business values. Not a monitor, 
+it provides specialized capabilities for monitoring the real healthy 
+of business services and cloud applications.
 
-The Solution brings Novel Concepts along with a Powerful Technology that allow
-operators to be effective in challenging operating environments such as
+RealOpInsight works on top of existing monitoring systems, including, 
+Nagios, Zabbix, Zenoss, Icinga, op5, Centreon, Shinken, GroundWork, 
+and more. 
 
 %prep
 %setup -q
@@ -70,7 +69,7 @@ operators to be effective in challenging operating environments such as
 #TODO
 
 %install
-./install-sh -d %{buildroot}%{_prefix}
+bash ./install-sh.obs -d %{buildroot}%{_prefix}
 
 %clean
 make clean
@@ -90,7 +89,7 @@ rm -rf %{buildroot}
 %doc %{_prefix}/share/man/man1/%{binprefix}-manager.1.gz
 %doc %{_prefix}/share/man/man1/%{binprefix}-oc.1.gz
 %doc %{_prefix}/share/man/man1/%{binprefix}-editor.1.gz
-%doc README COPYING ChangeLog
+%doc README LICENSE ChangeLog
 %doc examples
 
 %changelog

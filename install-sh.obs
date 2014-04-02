@@ -78,7 +78,11 @@ install_daemon(){
 
 checking_uipreq(){
   echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
-  [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
+  if [ -z $QMAKE ] ; then
+    echo "DEBUG : qmake not found, trying to find qmake-qt4."
+    echo -n "DEGUG : Checking qmake-qt4 => ${QMAKE:=`which qmake-qt4`}... "
+    [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
+  fi
   echo "done"
  
   echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "

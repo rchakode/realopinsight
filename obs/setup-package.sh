@@ -1,6 +1,7 @@
 #!/bin/bash
 # This script
 
+set +x
 
 VERSION=$1
 DEFAULT_VERSION=X.Y.Z
