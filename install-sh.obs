@@ -1,24 +1,25 @@
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 02-12-2012                                                 #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 23-03-2014                                                 #
 #                                                                          #
 # This Software is part of NGRT4N Project (http://ngrt4n.com).             #
-#                                                                          #
+#     									   #
 # This is a free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
 # (at your option) any later version.                                      #
-#	                                                                         #
+#			                                                   #
 # The Software is distributed in the hope that it will be useful,          #
 # but WITHOUT ANY WARRANTY; without even the implied warranty or           #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
 # GNU General Public License for more details.                             #
 #                                                                          #
-# You should have received a copy of the GNU General Public License        #
+# You should have received a copy of the GNU General Public License	   #
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
 #--------------------------------------------------------------------------#
 
 set -e
+shopt -s extglob
 
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
@@ -30,19 +31,17 @@ usage(){
   echo
   echo "Usage: `basename $0` [OPTION]"
   echo "OPTIONS"
-#  echo "	-m <daemon|ui|all>"
-#  echo "	  daemon : Installs the daemon module."
-#  echo "	  ui : Installs the RealOpInsight."
-#  echo "	  all : Installs all the modules."
   echo "	-d <install_dir>"
   echo "	  Sets the installation directory,  default is /usr/local."
+  echo "	-n <ncpu>"
+  echo "	  Sets the number of cpu to use for the compilation"
   echo "	-h"
   echo "	  Shows this help"
 }
 
 prompt_copyright(){ 
 echo
-echo "Thanks for choosing NGRT4N Monitoring Suite."
+echo "Thanks for choosing RealOpInsight Workstation."
 echo
 echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
 echo
@@ -60,17 +59,14 @@ read -p "Do you accept the terms of the License ? y/N/r " rep
 done
 }
 install_daemon(){
-#  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;} END{print ncpu}')
   
   echo "==>Installing the Daemon Service for Nagios..."  
   echo -n "DEGUG : Checking prerequises..." 
-#  tar zxf dm-${VERSION_BKR}.tar.gz && cd dm-${VERSION_BKR}
   ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
   echo done
   
   echo -n "DEGUG : Compiling..."
-#  make -Bj${ncpu} 1>>install.log
-  make -B 1>>install.log
+  make -Bj${NCPU} 1>>install.log
   echo done
   
   echo -n "DEGUG : Installation..."
@@ -82,11 +78,7 @@ install_daemon(){
 
 checking_uipreq(){
   echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
-  if [ -z $QMAKE ] ; then
-    echo "DEBUG : qmake not found, trying to find qmake-qt4."
-    echo -n "DEGUG : Checking qmake-qt4 => ${QMAKE:=`which qmake-qt4`}... "
-    [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
-  fi
+  [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
   echo "done"
  
   echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "
@@ -97,46 +89,35 @@ checking_uipreq(){
   [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
   echo "done"
  
-#  echo -n "DEGUG : Checking Graphviz => ${DOT:=`which dot`}... "
-#  [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
-#  echo "done"
+  echo -n "DEGUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
+  echo "done"
 }
 
-install_manager(){
-#  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-manager ${dflag}
-#  make -Bj${ncpu} 1>>install.log
-  make -B 1>>install.log
+install_default(){
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=manager ${dflag}
+  make -Bj${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_editor(){
-#  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-editor ${dflag}
-#  make -j${ncpu} 1>>install.log
-  make -B 1>>install.log
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=editor ${dflag}
+  make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_oc(){
-#  ncpu=$(lscpu -p | awk 'BEGIN{ncpu=0}{if ($1>=0 && $1<=9) ncpu++;}END{print ncpu}')
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-oc ${dflag}
-#  make -j${ncpu} 1>>install.log
-  make -B 1>>install.log
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=oc ${dflag}
+  make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
-remove_old(){
- echo "Removing depreeated files => ${NGRT4N_CMD:=`which ngrt4n 2>/dev/null`}"
- [ -e ${NGRT4N_CMD} ] && rm -rf ${NGRT4N_CMD}
- rm -rf ${INSTALL_PREFIX}/bin/ngrt4n
-}
 install_ui() {
-  echo "==>Installing RealOpInsight..."  
+  echo "==>Installing RealOpInsight Workstation..."  
   checking_uipreq
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
   echo -n "DEGUG : Current component => Manager..."
-  install_manager
+  install_default
   echo done
   
   echo -n "DEGUG : Current component => Editor..."
@@ -146,35 +127,54 @@ install_ui() {
   echo -n "DEGUG : Current component => Operator Console..."
   install_oc
   echo done
-#  remove_old
   echo "==>Installation completed"
 }
 
+NCPU=1
 mflag=
 dflag=
-while getopts m:d:h name ; do
+while getopts m:d:n:h name ; do
   case $name in
-#    m) mflag=1
-#       module="$OPTARG" ;;
     d) dflag=1
-       install_prefix="$OPTARG";;
-    h) usage 
-       exit 0;;       
+       install_prefix="$OPTARG"
+    ;;
+    n) NCPU=$OPTARG
+    ;;
+    h) usage;
+       exit 0
+    ;;
     ?) usage
-     exit 1;;
+     exit 1
+    ;;
   esac
 done
 
-#[ `id -u` -ne 0 ] && echo "ERROR : the installation requires root privileges" && exit 1 
+if [[ ! $NCPU == +([1-9]) ]]; then
+    echo "The option -n requires a number between 1 and 9"
+    exit 1
+fi
 
-#prompt_copyright
+export NCPU
+
+
+echo "DEBUG: Initializing setup with $NCPU CPU..."
 
 if [ -z ${install_prefix} ] ; then
   export INSTALL_PREFIX=/usr/local
 else
- export INSTALL_PREFIX=${install_prefix}
- export dflag="CONFIG+=dflag"
+  case ${install_prefix} in
+  /*) export INSTALL_PREFIX=${install_prefix}
+      export dflag="CONFIG+=dflag"
+     ;;
+  *) echo "This is not an absolute path : ${install_prefix}"
+     exit 2 ;;
+ esac
 fi
+
+if [ `id -u` -ne 0 ]; then
+  echo "DEBUG: You're performing a user mode installation"
+  echo "WARNING: You must have read/write permissions on the target directory ($INSTALL_PREFIX)"
+fi 
 
 if [ -e src/server/ngrt4nd.cpp ]; then
   module=daemon;
