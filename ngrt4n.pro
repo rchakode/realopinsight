@@ -50,6 +50,7 @@ QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter
 
 DISTFILES += README \
     install-sh \
+    install-sh.obs \
     INSTALL \
     client/src/ngrt4n-*.cpp \
     LICENSE \
