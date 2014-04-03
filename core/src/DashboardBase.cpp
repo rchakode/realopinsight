@@ -539,8 +539,8 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
           QScriptValue citem = components.value();
           QString cname = citem.property("name").toString();
           QScriptValue device = citem.property("device");
-          QString duid = device.property("uid").toString();
-          QString dname = ZnsHelper::getDeviceName(duid);
+          //QString duid = device.property("uid").toString();
+          QString dname = device.property("name").toString();//ZnsHelper::getDeviceName(duid);
           QString chkid = ID_PATTERN.arg(dname, cname);
           check.id = chkid.toStdString();
           check.host = dname.toStdString();
