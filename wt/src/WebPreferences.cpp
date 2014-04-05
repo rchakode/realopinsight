@@ -42,7 +42,7 @@
   return; \
   }
 WebPreferences::WebPreferences(void)
-  : Preferences("/var/lib/realopinsight/config/realopinsight.conf"),
+  : Preferences("/opt/realopinsight/etc/realopinsight.conf"),
     m_errorOccurred(this)
 
 {

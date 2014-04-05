@@ -69,6 +69,8 @@ private:
   typedef std::map<QString, WebDashboard*> DashboardListT;
   typedef std::map<QString, Wt::WMenuItem*> DashboardTabIndexesT;
 
+  std::string m_rootDir;
+  std::string m_confdir;
   Wt::WContainerWidget* m_mainWidget;
   Settings* m_settings;
   Wt::WText* m_infoBox;
@@ -85,7 +87,6 @@ private:
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
   DashboardListT m_dashboards;
-  std::string m_confdir;
   UserMngtUI* m_userMgntUI;
   UserFormView* m_userAccountForm;
   UserFormView* m_changePasswordPanel;
