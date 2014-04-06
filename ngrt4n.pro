@@ -40,12 +40,11 @@ unix {
 LIBS += -lzmq
 }
 
-
 DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 
-OBJECTS_DIR = build/obj
-MOC_DIR = build/moc
-RCC_DIR = build/rcc
+OBJECTS_DIR = generated/obj
+MOC_DIR = generated/moc
+RCC_DIR = generated/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
 
 DISTFILES += README \
@@ -145,13 +144,12 @@ SOURCES	+= client/src/ngrt4n-editor.cpp
 TARGET = ngrt4n-editor
 }
 
-web {
+web-base {
 DEFINES *= "PACKAGE_NAME='\"Ultimate Edition\"'"
-TARGET = realopinsight.fcgi
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
-LIBS += -lwt -lwthttp -lwtdbo -lwtdbosqlite3 \
+LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
         -lboost_thread -lboost_regex -lboost_signals \
         -lboost_filesystem -lboost_date_time
@@ -191,6 +189,17 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebPreferences.cpp \
     wt/extlibs/wtwithqt/DispatchThread.C \
     wt/extlibs/wtwithqt/WQApplication.C
+}
+
+
+webd {
+  TARGET = realopinsightd
+  LIBS += -lwthttp
+}
+
+web-fcgi {
+  TARGET = realopinsight.fcgi
+  LIBS += -lwtfcgi
 }
 
 dflag {
