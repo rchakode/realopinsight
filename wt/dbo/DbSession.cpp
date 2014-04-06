@@ -175,7 +175,7 @@ Wt::Auth::AuthService& DbSession::auth()
 
 Wt::Auth::PasswordService* DbSession::passwordAuthentificator(void)
 {
-  return m_passAuthService.get();
+  return m_passAuthService;
 }
 
 Wt::Auth::Login& DbSession::loginObject(void)
