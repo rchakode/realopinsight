@@ -36,10 +36,13 @@ DbSession::DbSession(void)
   m_sqlite3Db = new Wt::Dbo::backend::Sqlite3(m_dbPath);
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
+
+  // do this before anything
+  configureAuth();
+
   setupDb();
   updateUserList();
   updateViewList();
-  configureAuth();
 }
 
 DbSession::~DbSession()
