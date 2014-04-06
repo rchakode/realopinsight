@@ -152,9 +152,9 @@ DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
 LIBS += -lwt -lwthttp -lwtdbo -lwtdbosqlite3 \
-        -lboost_signals -lboost_program_options-mt -lboost_system-mt \
-        -lboost_thread-mt -lboost_regex-mt -lboost_signals-mt \
-        -lboost_filesystem-mt -lboost_date_time-mt
+        -lboost_signals -lboost_program_options -lboost_system \
+        -lboost_thread -lboost_regex -lboost_signals \
+        -lboost_filesystem -lboost_date_time
 
 INCLUDEPATH += wt/src \
                wt/dbo \
