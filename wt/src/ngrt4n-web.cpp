@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   Q_INIT_RESOURCE(ngrt4n);
 
   try {
-    std::string configurationFile = "/opt/install/etc/wt_config.xml";
+    std::string configurationFile = "/opt/realopinsight/etc/wt_config.xml";
     Wt::WServer server(argv[0], configurationFile);
     server.setServerConfiguration(argc, argv);
     server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication);
