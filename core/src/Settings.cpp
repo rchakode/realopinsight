@@ -1,5 +1,5 @@
 /*
- * Base.cpp
+ * Settings.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 23-03-2014                                                  #
