@@ -30,8 +30,30 @@
 #include <QString>
 #include <QDateTime>
 #include <Wt/WColor>
+#include <Wt/WApplication>
 #include <memory>
 
+
+
+Logger::Logger(const std::string& path)
+{
+  addField("datetime", false);
+  addField("session", false);
+  addField("type", false);
+  addField("message", true);
+  setFile(path);
+}
+void Logger::log(const std::string& level, const std::string& msg)
+{
+  Wt::WLogEntry logEntry = Wt::WLogger::entry(level);
+  logEntry << Wt::WLogger::timestamp << Wt::WLogger::sep
+        << '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
+        << '[' << level << ']' << Wt::WLogger::sep
+        << msg;
+}
+
+
+Logger logger("/opt/realopinsight/log/realopinsight.log");
 
 void ngrt4n::showMessage(int exitCode,
                          const std::string& errorMsg,
@@ -169,4 +191,9 @@ Wt::WColor ngrt4n::severityWColor(const int& _criticity)
       break;
   }
   return color;
+}
+
+void ngrt4n::log(const std::string& level, const std::string& msg)
+{
+  logger.log(level, msg);
 }

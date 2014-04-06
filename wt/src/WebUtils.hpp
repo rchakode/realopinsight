@@ -27,9 +27,16 @@
 
 #include "Settings.hpp"
 #include <Wt/WText>
+#include <Wt/WLogger>
 
-#define LOG(level, msg) \
-Wt::log(level)<< "[realopinsight]" << Wt::WLogger::sep << msg;
+
+class Logger : public Wt::WLogger {
+public:
+  Logger(const std::string& path);
+  void log(const std::string& level, const std::string& msg);
+};
+
+#define LOG(level, msg) ngrt4n::log(level, msg)
 
 class QString;
 namespace ngrt4n {
@@ -47,6 +54,8 @@ namespace ngrt4n {
                                          const std::string& tip,
                                          Wt::WContainerWidget* parent);
   Wt::WColor severityWColor(const int& _criticity);
+
+  void log(const std::string& level, const std::string& msg);
 } //Namespace
 
 #endif // WEBUTILS_HPP

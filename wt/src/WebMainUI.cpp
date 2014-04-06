@@ -483,7 +483,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       }
     }, std::placeholders::_1, std::placeholders::_2));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
-    link = new Wt::WAnchor("#", "All Views and Access Permissions", m_mainWidget);
+    link = new Wt::WAnchor("#", "All Views and Access Control", m_mainWidget);
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
       m_viewAccessPermissionForm->resetModelData();
