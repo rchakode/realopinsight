@@ -1,20 +1,21 @@
 # ------------------------------------------------------------------------ #
+# File: install-sh                                                         #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 23-03-2014                                                 #
+# Last Update : 06-04-2014                                                 #
 #                                                                          #
-# This Software is part of NGRT4N Project (http://ngrt4n.com).             #
-#     									   #
+# This Software is part of RealOpInsight (http://realopinsight.com)        #
+#     									                                   #
 # This is a free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
 # (at your option) any later version.                                      #
-#			                                                   #
+#                                                                          #
 # The Software is distributed in the hope that it will be useful,          #
 # but WITHOUT ANY WARRANTY; without even the implied warranty or           #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
 # GNU General Public License for more details.                             #
 #                                                                          #
-# You should have received a copy of the GNU General Public License	   #
+# You should have received a copy of the GNU General Public License        #
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
 #--------------------------------------------------------------------------#
 
@@ -76,7 +77,7 @@ install_daemon(){
   echo "==>Installation completed"
 }
 
-checking_uipreq(){
+check_prerequisites(){
   echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
   [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
   echo "done"
@@ -112,9 +113,9 @@ install_oc(){
   make install 1>>install.log
 }
 
-install_ui() {
+install_workstation() {
   echo "==>Installing RealOpInsight Workstation..."  
-  checking_uipreq
+  check_prerequisites
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
   echo -n "DEGUG : Current component => Manager..."
   install_default
@@ -130,9 +131,39 @@ install_ui() {
   echo "==>Installation completed"
 }
 
+install_webd() {
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
+  make -j${NCPU} 1>>install.log
+  make install 1>>install.log
+}
+
+install_fcgi() {
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
+  make -j${NCPU} 1>>install.log
+  make install 1>>install.log
+}
+
+install_ultimate() {
+  echo "==>Installing RealOpInsight Ultimate..."  
+  
+  check_prerequisites
+  
+  echo -n "DEGUG : Current component Standalone Server..."
+  install_webd
+  echo done
+  
+  echo -n "DEGUG : Current component => FastCGI Server..."
+  install_fcgi
+  echo done
+  
+  echo "==>Installation completed"
+}
+
+
 NCPU=1
 mflag=
 dflag=
+MODULE=
 while getopts m:d:n:h name ; do
   case $name in
     d) dflag=1
@@ -140,6 +171,8 @@ while getopts m:d:n:h name ; do
     ;;
     n) NCPU=$OPTARG
     ;;
+    m) MODULE=$OPTARG
+    ;;	
     h) usage;
        exit 0
     ;;
@@ -168,7 +201,8 @@ else
       export dflag="CONFIG+=dflag"
      ;;
   *) echo "This is not an absolute path : ${install_prefix}"
-     exit 2 ;;
+     exit 2 
+	 ;;
  esac
 fi
 
@@ -177,19 +211,23 @@ if [ `id -u` -ne 0 ]; then
   echo "WARNING: You must have read/write permissions on the target directory ($INSTALL_PREFIX)"
 fi 
 
-if [ -e src/server/ngrt4nd.cpp ]; then
-  module=daemon;
-else
-  module=ui
+if [ -z "$MODULE" ]; then
+  if [ -e src/server/ngrt4nd.cpp ]; then
+    MODULE=daemon;
+  else
+    MODULE=workstation
+  fi
 fi
  
-case ${module} in
-  daemon|ui) install_${module}
+case ${MODULE} in
+  daemon|workstation|ultimate) install_${MODULE}
     ;;
   all) install_daemon 
-    install_ui
-   ;;     
-  *)echo "Unknown module : ${module}" ; 
+       install_workstation
+       install_ultimate
+   ;;  
+     
+  *)echo "Unknown module : ${MODULE}" ; 
      exit 2;;
 esac 
 
