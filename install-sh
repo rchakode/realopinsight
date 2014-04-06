@@ -163,6 +163,7 @@ install_ultimate() {
   install -d ${INSTALL_PREFIX}/run
   install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
   cp -r resources ${INSTALL_PREFIX}/
+  cp -r images ${INSTALL_PREFIX}/
   cp -r i18n ${INSTALL_PREFIX}/
   echo done
   
