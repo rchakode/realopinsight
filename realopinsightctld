@@ -19,6 +19,8 @@
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
 #--------------------------------------------------------------------------#
 
+#!/bin/bash 
+
 REALOPINSIGHT_ROOT=/opt/realopinsight
  
 ${REALOPINSIGHT_ROOT}/realopinsightd --docroot ${REALOPINSIGHT_ROOT} \
