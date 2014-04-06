@@ -156,6 +156,12 @@ install_ultimate() {
   echo -n "DEGUG : Copy files..."
   install -m 755 realopinsightd  ${INSTALL_PREFIX}/
   install -m 755 realopinsight.fcgi ${INSTALL_PREFIX}/
+  install -m 755 realopinsightctld  ${INSTALL_PREFIX}/
+  install -d ${INSTALL_PREFIX}/etc
+  install -d ${INSTALL_PREFIX}/data
+  install -d ${INSTALL_PREFIX}/log
+  install -d ${INSTALL_PREFIX}/run
+  install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
   cp -r resources ${INSTALL_PREFIX}/
   cp -r i18n ${INSTALL_PREFIX}/
   echo done

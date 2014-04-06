@@ -127,7 +127,7 @@
 
                Path used by Wt to do session management.
 	      -->
-	    <run-directory>/var/lib/realopinsight/run</run-directory>
+	    <run-directory>/opt/realopinsight/run</run-directory>
 
 	    <!-- Number of threads per process
 
