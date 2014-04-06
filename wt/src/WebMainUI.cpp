@@ -53,6 +53,8 @@
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
+    m_rootDir("/opt/realopinsight"),
+    m_confdir(m_rootDir.append("/data")),
     m_mainWidget(new Wt::WContainerWidget(this)),
     m_settings (new Settings()),
     m_authManager(authManager),
@@ -60,8 +62,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_preferences(new WebPreferences()),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
-    m_rootDir("/opt/realopinsight"),
-    m_confdir(m_rootDir.append("/data")),
     m_showSettingTab(true),
     m_currentDashboard(NULL),
     m_terminateSession(this)
