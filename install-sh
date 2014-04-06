@@ -20,7 +20,6 @@
 #--------------------------------------------------------------------------#
 
 set -e
-shopt -s extglob
 
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
@@ -134,13 +133,11 @@ install_workstation() {
 install_webd() {
   ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
-  make install 1>>install.log
 }
 
 install_fcgi() {
   ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
   make -j${NCPU} 1>>install.log
-  make install 1>>install.log
 }
 
 install_ultimate() {
@@ -148,12 +145,19 @@ install_ultimate() {
   
   check_prerequisites
   
-  echo -n "DEGUG : Current component Standalone Server..."
+  echo -n "DEGUG : Building Standalone Server..."
   install_webd
   echo done
   
-  echo -n "DEGUG : Current component => FastCGI Server..."
+  echo -n "DEGUG : Building FastCGI Server..."
   install_fcgi
+  echo done
+  
+  echo -n "DEGUG : Copy files..."
+  install -m 755 realopinsightd  ${INSTALL_PREFIX}/
+  install -m 755 realopinsight.fcgi ${INSTALL_PREFIX}/
+  cp -r resources ${INSTALL_PREFIX}/
+  cp -r i18n ${INSTALL_PREFIX}/
   echo done
   
   echo "==>Installation completed"
@@ -182,8 +186,8 @@ while getopts m:d:n:h name ; do
   esac
 done
 
-if [[ ! $NCPU == +([1-9]) ]]; then
-    echo "The option -n requires a number between 1 and 9"
+if ! echo $NCPU | egrep -q '^[0-9]+$'; then
+    echo "The option -n requires a number"
     exit 1
 fi
 
