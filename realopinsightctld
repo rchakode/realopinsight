@@ -20,6 +20,6 @@
 #--------------------------------------------------------------------------#
 
 REALOPINSIGHT_ROOT=/opt/realopinsight
-
+ 
 ${REALOPINSIGHT_ROOT}/realopinsightd --docroot ${REALOPINSIGHT_ROOT} \
                  --http-address 0.0.0.0 --http-port 1990 --deploy-path /realopinsight
