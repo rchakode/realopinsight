@@ -60,7 +60,8 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_preferences(new WebPreferences()),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
-    m_confdir("/var/lib/realopinsight/config"),
+    m_rootDir("/opt/realopinsight"),
+    m_confdir(m_rootDir.append("/data")),
     m_showSettingTab(true),
     m_currentDashboard(NULL),
     m_terminateSession(this)
@@ -70,7 +71,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
                                                    std::placeholders::_1, "alert alert-warning"));
   // create directory for view thumbnails and misc runtime data
   // true means clean the directory
-  createDirectory(wApp->docRoot().append("/run"), true);
+  createDirectory(m_rootDir.append("/run"), true);
 
   // Now start creating the view
   createMainUI();
