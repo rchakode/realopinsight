@@ -160,7 +160,7 @@ install_ultimate() {
   install -d ${INSTALL_PREFIX}/etc
   install -d ${INSTALL_PREFIX}/data
   install -d ${INSTALL_PREFIX}/log
-  install -d ${INSTALL_PREFIX}/run
+  install -d ${INSTALL_PREFIX}/run   # directory for session info and thumbnails
   install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
   cp -r resources ${INSTALL_PREFIX}/
   cp -r images ${INSTALL_PREFIX}/

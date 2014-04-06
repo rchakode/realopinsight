@@ -67,11 +67,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_terminateSession(this)
 {
   m_preferences->setEnabledInputs(false);
-  m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this,
-                                                   std::placeholders::_1, "alert alert-warning"));
-  // create directory for view thumbnails and misc runtime data
-  // true means clean the directory
-  createDirectory(m_rootDir.append("/run"), true);
 
   // Now start creating the view
   createMainUI();
@@ -102,6 +97,7 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
+  m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this, std::placeholders::_1, "alert alert-warning"));
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));

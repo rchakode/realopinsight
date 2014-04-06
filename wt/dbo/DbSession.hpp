@@ -82,8 +82,8 @@ public:
 
 private:
   std::string m_dbPath;
-  std::unique_ptr<dbo::backend::Sqlite3> m_sqlite3Db;
-  std::unique_ptr<UserDatabase> m_dbUsers;
+  dbo::backend::Sqlite3* m_sqlite3Db;
+  UserDatabase* m_dbUsers;
   User m_loggedUser;
   UserListT m_userList;
   ViewListT m_viewList;
@@ -91,7 +91,7 @@ private:
   std::string m_lastError;
   Wt::Auth::Login m_loginObj;
   Wt::Auth::AuthService m_basicAuthService;
-  std::unique_ptr<Wt::Auth::PasswordService> m_passAuthService;
+  Wt::Auth::PasswordService* m_passAuthService;
 
   std::string hashPassword(const std::string& pass);
   void initDb(void);

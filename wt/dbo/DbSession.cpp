@@ -31,9 +31,9 @@
 DbSession::DbSession(void)
   : m_dbPath(ngrt4n::sqliteDbPath())
 {
-  m_dbUsers.reset(new UserDatabase(*this));
-  m_passAuthService.reset(new Wt::Auth::PasswordService(m_basicAuthService));
-  m_sqlite3Db.reset(new Wt::Dbo::backend::Sqlite3(m_dbPath));
+  m_dbUsers = new UserDatabase(*this);
+  m_passAuthService = new Wt::Auth::PasswordService(m_basicAuthService);
+  m_sqlite3Db = new Wt::Dbo::backend::Sqlite3(m_dbPath);
   m_sqlite3Db->setProperty("show-queries", "true");
   setConnection(*m_sqlite3Db);
   setupDb();
@@ -44,6 +44,9 @@ DbSession::DbSession(void)
 
 DbSession::~DbSession()
 {
+  delete m_dbUsers;
+  delete m_sqlite3Db;
+  delete m_passAuthService;
 }
 
 void DbSession::setupDb(void)
