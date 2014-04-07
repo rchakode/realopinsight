@@ -273,8 +273,8 @@ QString GuiPreferences::style()
 {
     QString styleSheet =
             "QMenuBar, QMenu {"
-            " background: #2d2d2d; "
-            " color : white; "
+            " background: #9dc6dd; "
+            " color : #423F3F; "
             "}"
             "QMenuBar {"
             " font-weight : bold;"
