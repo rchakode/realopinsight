@@ -7,21 +7,21 @@ DefaultDirName={pf}\RealOpInsight Workstation
 DefaultGroupName=RealOpInsight Workstation
 LicenseFile=COPYING                                  
 OutputDir=output                  
-OutputBaseFilename=realopinsight-workstation-{#Version}-wininst
+OutputBaseFilename=RealOpInsight-Workstation-{#Version}-wininst
 WizardSmallImageFile=icon.bmp
 WizardSmallImageBackColor=$ffba64
 WizardImageFile=realopinsight.bmp          
 WizardImageStretch = false       
 WizardImageBackColor=$FFFFFF
                                                    
-                                                                    
+                                                                     
 [Files]
 Source: "C:\Dev\qt-build\release\ngrt4n-manager.exe" ; DestDir: "{app}"      
 Source: "C:\Dev\qt-build\release\ngrt4n-oc.exe" ; DestDir: "{app}"  
 Source: "C:\Dev\qt-build\release\ngrt4n-editor.exe" ; DestDir: "{app}"
 Source: "deps\*.dll" ; DestDir: "{app}"          
 Source: "C:\Program Files (x86)\Graphviz2.36\bin\*" ; DestDir: "{app}"    
-                            
+                             
 Source: "C:\Qt-5.2\5.2.1\mingw48_32\bin\Qt5Core.dll" ; DestDir: "{app}"
 Source: "C:\Qt-5.2\5.2.1\mingw48_32\bin\Qt5Gui.dll" ; DestDir: "{app}"
 Source: "C:\Qt-5.2\5.2.1\mingw48_32\bin\Qt5Network.dll" ; DestDir: "{app}"
