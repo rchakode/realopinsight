@@ -147,11 +147,13 @@ install_ultimate() {
   
   # check credential requirements
   if [ -z "$REALOPINSIGHT_USER" ]; then
-    echo "REALOPINSIGHT_USER not set"
+    echo "ERROR : REALOPINSIGHT_USER not set"
+	exit 1
   fi
   
   if [ -z "$REALOPINSIGHT_GROUP" ]; then
-    echo "REALOPINSIGHT_GROUP not set"
+    echo "ERROR : REALOPINSIGHT_GROUP not set"
+	exit 1
   fi  
   
   # checking dependencies
