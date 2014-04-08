@@ -118,15 +118,15 @@ install_workstation() {
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
   echo -n "DEGUG : Current component => Manager..."
   install_default
-  echo done
+  echo "done"
   
   echo -n "DEGUG : Current component => Editor..."
   install_editor
-  echo done
+  echo "done"
   
   echo -n "DEGUG : Current component => Operator Console..."
   install_oc
-  echo done
+  echo "done"
   echo "==>Installation completed"
 }
 
@@ -165,7 +165,7 @@ install_ultimate() {
   
   echo -n "DEGUG : Building FastCGI Server..."
   install_fcgi
-  echo done
+  echo "done"
   
   echo -n "DEGUG : Copy files..."
   
@@ -187,11 +187,11 @@ install_ultimate() {
   
   echo -n "Settings files permissions"
   chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
-  echo done
+  echo "done"
   
   echo -n "Configuring Apache..."
   a2enconf realopinsight-ultimate
-  echo done
+  echo "done"
   
   echo "==>Installation completed"
 }
