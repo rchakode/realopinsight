@@ -168,6 +168,7 @@ install_ultimate() {
   echo done
   
   echo -n "DEGUG : Copy files..."
+  
   install -m 755 realopinsightd  ${REALOPINSIGHT_ROOT}/
   install -m 755 realopinsight.fcgi ${REALOPINSIGHT_ROOT}/
   install -m 755 realopinsightctld  ${REALOPINSIGHT_ROOT}/
@@ -176,11 +177,20 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_ROOT}/log
   install -d ${REALOPINSIGHT_ROOT}/run   # directory for session info and thumbnails
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_ROOT}/etc/
+  install -m 600 contribs/realopinsight-ultimate.conf /etc/apache2/conf-available/
+
   cp -r resources ${REALOPINSIGHT_ROOT}/
   cp -r images ${REALOPINSIGHT_ROOT}/
   cp -r i18n ${REALOPINSIGHT_ROOT}/
   
-  chown $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
+  echo done
+  
+  echo -n "Settings files permissions"
+  chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
+  echo done
+  
+  echo -n "Configuring Apache..."
+  a2enconf realopinsight-ultimate
   echo done
   
   echo "==>Installation completed"
