@@ -143,6 +143,18 @@ install_fcgi() {
 install_ultimate() {
   echo "==>Installing RealOpInsight Ultimate..."  
   
+  export REALOPINSIGHT_ROOT=${INSTALL_PREFIX}/realopinsight
+  
+  # check credential requirements
+  if [ -z "$REALOPINSIGHT_USER" ]; then
+    echo "REALOPINSIGHT_USER not set"
+  fi
+  
+  if [ -z "$REALOPINSIGHT_GROUP" ]; then
+    echo "REALOPINSIGHT_GROUP not set"
+  fi  
+  
+  # checking dependencies
   check_prerequisites
   
   echo -n "DEGUG : Building Standalone Server..."
@@ -154,17 +166,19 @@ install_ultimate() {
   echo done
   
   echo -n "DEGUG : Copy files..."
-  install -m 755 realopinsightd  ${INSTALL_PREFIX}/
-  install -m 755 realopinsight.fcgi ${INSTALL_PREFIX}/
-  install -m 755 realopinsightctld  ${INSTALL_PREFIX}/
-  install -d ${INSTALL_PREFIX}/etc
-  install -d ${INSTALL_PREFIX}/data
-  install -d ${INSTALL_PREFIX}/log
-  install -d ${INSTALL_PREFIX}/run   # directory for session info and thumbnails
-  install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
-  cp -r resources ${INSTALL_PREFIX}/
-  cp -r images ${INSTALL_PREFIX}/
-  cp -r i18n ${INSTALL_PREFIX}/
+  install -m 755 realopinsightd  ${REALOPINSIGHT_ROOT}/
+  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_ROOT}/
+  install -m 755 realopinsightctld  ${REALOPINSIGHT_ROOT}/
+  install -d ${REALOPINSIGHT_ROOT}/etc
+  install -d ${REALOPINSIGHT_ROOT}/data
+  install -d ${REALOPINSIGHT_ROOT}/log
+  install -d ${REALOPINSIGHT_ROOT}/run   # directory for session info and thumbnails
+  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_ROOT}/etc/
+  cp -r resources ${REALOPINSIGHT_ROOT}/
+  cp -r images ${REALOPINSIGHT_ROOT}/
+  cp -r i18n ${REALOPINSIGHT_ROOT}/
+  
+  chown $REALOPINSIGHT_USER:REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
   echo done
   
   echo "==>Installation completed"
