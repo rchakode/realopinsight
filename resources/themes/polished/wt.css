@@ -123,6 +123,7 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
     cursor: pointer; cursor: hand;
     font: bold 20px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
     vertical-align: middle;
+    display: block;
 }
 
 .Wt-cal caption select {
@@ -181,10 +182,27 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
 }
 
 /*
+ * WDateEdit
+ */
+.Wt-dateedit {
+    background-image: url('../../calendar_edit.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+    padding-right: 40px;
+}
+
+/*
  * WDatePicker
  */
 .Wt-datepicker {
     background-color: white;
+}
+
+/*
+ * Wt-dateedit
+ */
+.Wt-dateedit::-ms-clear {
+    display:none
 }
 
 /*
@@ -223,7 +241,16 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
     padding: 4px 6px;
 }
 
-.Wt-dialog .titlebar h3 {
+.Wt-dialog .footer {
+    text-align: right;
+}
+
+.Wt-dialog .footer button {
+    padding: 1px 4px 1px;
+    margin: 2px;
+}
+
+.Wt-dialog .titlebar h4 {
     margin: 0px 2px;
     font-size: 110%;
 }
@@ -231,9 +258,20 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
 /*
  * WMessageBox
  */
-.Wt-msgbox-buttons button {
-    padding: 1px 4px 1px;
-    margin: 2px;
+.Wt-dialog .Wt-msgbox-icon {
+    display: block;
+    float: left;
+    margin: 0px 15px -15px;
+    width: 25px;
+    height: 35px;
+}
+
+.Wt-dialog .Wt-msgbox-body {
+    padding: 10px;
+}
+
+.Wt-dialog .Wt-msgbox-text {
+    overflow: auto;
 }
 
 /*
@@ -286,6 +324,7 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
 }
 
 .Wt-panel .body {
+    clear: left;
     padding: 4px 6px;
 }
 
@@ -410,12 +449,12 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
  * WPushButton
  */
 .Wt-btn:hover {
-    border-color:#99CCFF #6699EE #6699EE #77AAFF;
+    border-color:#9CF #69E #69E #7AF;
 }
 
 .Wt-btn {
     background: transparent url(gradient.png) repeat-x scroll 0 0;
-    border: 1px outset #CCCCCC;
+    border: 1px outset #CCC;
     cursor: pointer; cursor: hand;
     font-size: small;
     margin: 0px 2px;
@@ -423,8 +462,21 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
     text-decoration: none;
 }
 
+.Wt-btn img {
+    vertical-align: middle;
+}
+
+.Wt-btn.with-label img {
+    padding-right: 10px;
+}
+
 .Wt-btn:active {
-    border: 1px inset #CCCCCC;
+    border: 1px inset #CCC;
+}
+
+.Wt-btn-default {
+    font-weight: bold;
+    border: 1px outset #37E;
 }
 
 /*
@@ -603,6 +655,10 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
     background-image: url('../default/spin-buttons-dn.png');
 }
 
+.Wt-spinbox::-ms-clear {
+    display: none
+}
+
 /*
  * WTabWidget
  */
@@ -681,7 +737,7 @@ body.Wt-rtl .Wt-tabs li {
  */
 .Wt-tooltip {
     position: absolute;
-    max-width: 1000px;
+    max-width: 700px;
     background-color: #ffffcc;
     border: 1px solid black;
     padding: 1px 2px;
@@ -706,6 +762,11 @@ body.Wt-rtl .Wt-tabs li {
     list-style: none;
 }
 
+body.Wt-rtl .Wt-tree ul {
+    padding-right: 20px;
+    padding-left: 0px;
+}
+
 /* nodes */
 
 .Wt-tree div.Wt-root {
@@ -716,11 +777,19 @@ body.Wt-rtl .Wt-tabs li {
     padding-left: 0px;
 }
 
+body.Wt-rtl .Wt-tree ul.Wt-root {
+    padding-right: 0px;
+}
+
 .Wt-tree .Wt-ctrl {
     float: left;
     display: block;
     width: 19px;
     height: 18px;
+}
+
+body.Wt-rtl .Wt-tree .Wt-ctrl {
+    float: right;
 }
 
 .Wt-treetable {
@@ -740,8 +809,24 @@ body.Wt-rtl .Wt-tabs li {
     padding: 3px 0px 3px 3px;
 }
 
+.Wt-sbspacer {
+    float: right;
+    width: 16px;
+    height: 1px;
+    border: 0px;
+    display: none;
+}
+
+body.Wt-rtl .Wt-sbspacer {
+    float: left;
+}
+
 .Wt-tree .cols-row {
     float: right;
+}
+
+body.Wt-rtl .Wt-tree .cols-row {
+    float: left;
 }
 
 /* selection */
@@ -785,6 +870,11 @@ body.Wt-rtl .Wt-itemview .Wt-tv-rh {
     width: 0px;
     margin-left: 4px;
     cursor: default;
+}
+
+body.Wt-rtl .Wt-itemview .Wt-tv-no-rh {
+    margin-left: 0px;
+    margin-right: 4px;
 }
 
 /* sort handles */
@@ -931,14 +1021,12 @@ body.Wt-rtl .Wt-tableview .Wt-tv-br {
     border-left: 1px solid #dcdfe8;
 }
 
-/* borders */
 body.Wt-ltr .Wt-tableview .Wt-tv-contents .Wt-tv-c,
 body.Wt-ltr .Wt-tableview .Wt-plaintable tbody .Wt-tv-c {
     border-right: 0px;
     margin-right: 1px;
 }
 
-/* borders */
 body.Wt-rtl .Wt-tableview .Wt-tv-contents .Wt-tv-c,
 body.Wt-rtl .Wt-tableview .Wt-plaintable tbody .Wt-tv-c {
     border-left: 0px;
@@ -956,8 +1044,17 @@ body.Wt-rtl .Wt-tableview .Wt-plaintable tbody .Wt-tv-c {
     list-style: none;
 }
 
+body.Wt-rtl .Wt-treeview ul {
+    padding-left: 0px;
+    padding-right: 20px;
+}
+
 .Wt-treeview ul.Wt-tv-root {
     padding-left: 0px;
+}
+
+body.Wt-rtl .Wt-treeview ul.Wt-tv-root {
+    padding-right: 0px;
 }
 
 .Wt-treeview .Wt-tv-row {
@@ -979,10 +1076,6 @@ body.Wt-rtl .Wt-treeview .Wt-tv-row {
 
 body.Wt-rtl .Wt-treeview .Wt-tv-row .Wt-tv-c {
     float: right;
-}
-
-.Wt-treeview .Wt-tv-c {
-    /* padding: 0px 3px; */
 }
 
 .Wt-treeview img.icon, .Wt-treeview input.icon {
@@ -1030,20 +1123,28 @@ body.Wt-rtl .Wt-treeview .Wt-header .Wt-tv-c {
     float: left;
 }
 
+body.Wt-rtl .Wt-treeview .Wt-ctrl {
+    float: right;
+}
+
 .Wt-treeview .Wt-ctrl.expand {
-    background: url(nav-plus.png) no-repeat 0 center;
+    background-image: url(nav-plus.png);
+    background-repeat: no-repeat;
+    background-position: 0 center;
 }
 
 body.Wt-rtl .Wt-treeview .Wt-ctrl.expand {
-    background: url(nav-plus-rtl.png) no-repeat 0 center;
+    background-image: url(nav-plus-rtl.png);
 }
 
 .Wt-treeview .Wt-ctrl.collapse {
-    background: url(nav-minus.png) no-repeat 0 center;
+    background-image: url(nav-minus.png);
+    background-repeat: no-repeat;
+    background-position: 0 center;
 }
 
 body.Wt-rtl .Wt-treeview .Wt-ctrl.collapse {
-    background: url(nav-minus-rtl.png) no-repeat 0 center;
+    background-image: url(nav-minus-rtl.png);
 }
 
 /* borders */
@@ -1070,8 +1171,8 @@ body.Wt-rtl .Wt-treeview li .Wt-tv-row .Wt-tv-c {
  */
 .Wt-pagingbar {
     text-align: center;
-    height: 25px;
-    line-height: 25px;
+    height: 35px;
+    line-height: 35px;
 }
 
 .Wt-pagingbar span {

@@ -180,7 +180,7 @@ install_ultimate() {
   cp -r images ${REALOPINSIGHT_ROOT}/
   cp -r i18n ${REALOPINSIGHT_ROOT}/
   
-  chown $REALOPINSIGHT_USER:REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
+  chown $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
   echo done
   
   echo "==>Installation completed"
