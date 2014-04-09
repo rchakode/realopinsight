@@ -143,10 +143,6 @@ body, html {
   height: 120px;
 }
 
-.media {
-  font-size: 0.8em;
-}
-
 #ngrt4n-content-pane {
   float: left;
   width: 70%;
@@ -240,9 +236,6 @@ body, html {
   margin-bottom: 5px;
 }
 
-.thumbnail {
-  font-size: 0.8em;
-}
 .thumbnail .title {
   font-weight: bold;
   /*text-transform: capitalize;*/
