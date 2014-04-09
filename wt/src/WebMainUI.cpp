@@ -217,7 +217,7 @@ void WebMainUI::setupMenus(void)
   setupProfileMenus();
   
   //FIXME: add this after the first view loaded
-  Wt::WText* text = ngrt4n::createFontAwesomeTextButton("fa fa-refresh","Refresh the console map");
+  Wt::WText* text = ngrt4n::createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar->addWidget(text);
   

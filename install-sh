@@ -190,7 +190,7 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_CONFIG}/run   # directory for session info and thumbnails
    
   echo "DEBUG : copy web files..."
-  install -m 600 contribs/apache-htaccess ${REALOPINSIGHT_WWW}/.htaccess
+  install contribs/index.html ${REALOPINSIGHT_WWW}/
   cp -r resources ${REALOPINSIGHT_WWW}/
   cp -r images ${REALOPINSIGHT_WWW}/
   cp -r i18n ${REALOPINSIGHT_WWW}/
