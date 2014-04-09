@@ -34,7 +34,7 @@ DbSession::DbSession(void)
   m_dbUsers = new UserDatabase(*this);
   m_passAuthService = new Wt::Auth::PasswordService(m_basicAuthService);
   m_sqlite3Db = new Wt::Dbo::backend::Sqlite3(m_dbPath);
-  m_sqlite3Db->setProperty("show-queries", "true");
+  m_sqlite3Db->setProperty("show-queries", "false");
   setConnection(*m_sqlite3Db);
 
   // do this before anything

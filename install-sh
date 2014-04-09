@@ -149,11 +149,11 @@ install_ultimate() {
   fi
   
   if [ -z "$REALOPINSIGHT_WWW_ROOT" ]; then
-    echo "REALOPINSIGHT_WWW_ROOT not set, using /var/www"
+    echo "DEBUG : REALOPINSIGHT_WWW_ROOT not set, using /var/www"
 	export REALOPINSIGHT_WWW_ROOT=/var/www
   fi  
  
-  export REALOPINSIGHT_ROOT=/opt/realopinsight
+  export REALOPINSIGHT_CONFIG=/opt/realopinsight
   export REALOPINSIGHT_WWW=${REALOPINSIGHT_WWW_ROOT}/realopinsight
   
   # check credential requirements
@@ -182,27 +182,28 @@ install_ultimate() {
 
   echo "DEBUG : creating directories..."
   install -d ${REALOPINSIGHT_WWW}
-  install -d ${REALOPINSIGHT_ROOT}
-  install -d ${REALOPINSIGHT_ROOT}/etc
-  install -d ${REALOPINSIGHT_ROOT}/data
-  install -d ${REALOPINSIGHT_ROOT}/log
-  install -d ${REALOPINSIGHT_ROOT}/run   # directory for session info and thumbnails
+  install -d ${REALOPINSIGHT_CONFIG}
+  install -d ${REALOPINSIGHT_CONFIG}/etc
+  install -d ${REALOPINSIGHT_CONFIG}/data
+  install -d ${REALOPINSIGHT_CONFIG}/log
+  install -d ${REALOPINSIGHT_CONFIG}/run   # directory for session info and thumbnails
    
   echo "DEBUG : copy web files..."
   install -m 600 contribs/apache-htaccess ${REALOPINSIGHT_WWW}/.htaccess
   cp -r resources ${REALOPINSIGHT_WWW}/
   cp -r images ${REALOPINSIGHT_WWW}/
   cp -r i18n ${REALOPINSIGHT_WWW}/
+  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
+  install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
   
   echo "DEBUG : copy configuration files..."
-  install -m 755 realopinsightd  ${REALOPINSIGHT_ROOT}/
-  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_ROOT}/
-  install -m 755 realopinsightctld  ${REALOPINSIGHT_ROOT}/
-  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_ROOT}/etc/
+  install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
+  install -m 755 realopinsightctld  ${REALOPINSIGHT_CONFIG}/
+  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
   install -m 600 contribs/apache-realopinsight-ultimate.conf /etc/apache2/conf-available/realopinsight-ultimate.conf
   
   echo "DEBUG : Settings files permissions..."
-  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_ROOT}/
+  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
   echo "Configuring Apache..."
