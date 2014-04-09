@@ -208,8 +208,7 @@ install_ultimate() {
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
   echo "Configuring Apache..."
-  sed --in-place s/REALOPINSIGHT_WWW_ROOT/$REALOPINSIGHT_WWW/ ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
-  sed --in-place 's!REALOPINSIGHT_WWW_ROOT!'"$REALOPINSIGHT_WWW"'!' ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
+  sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
   a2enconf realopinsight-ultimate
   
   echo "==>Installation completed"
