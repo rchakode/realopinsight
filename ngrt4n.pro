@@ -126,7 +126,7 @@ SOURCES	+= client/src/Auth.cpp \
 
 dist {
 SOURCES	+=
-TARGET = RealOpInsight
+TARGET = RealOpInsight-Workstation
 }
 
 manager {
