@@ -81,7 +81,7 @@
           <div class="title">
               Describe your target platforms
           </div>
-          <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+          <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
           <p>Using the RealOpinsight Editor, describe and edit the target platform,
             the related services, as well as the business rules that bind them to each other.
             The Editor is an effective studio to modelize, in an easy and simply way,
@@ -97,7 +97,7 @@
   <div class="span-one-third">
           <div class="thumbnail">
             <div class="title">Enable the acess to monitoring data</div>
-            <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
+            <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
             <p>The RealOpInsight setting user interfaces enable you to easily set
               when and how to retrieve status data from your monitoring servers in order
               to keep your operations dasboards up-to-date.
@@ -114,7 +114,7 @@
          <div class="title">
              Preview and assign
          </div>
-         <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
+         <img src="images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
          <p>Once created, upload the views within the RealOpInsight server. Afterwards, you
            can preview and assign them to your operations staff. 
            RealOpInsight provides full control of administration requirements, such as, authentication, 
@@ -181,7 +181,7 @@
 
 <message id="Wt.Auth.template.login">
 <div class="ngrt4n-gradient login-container">
- <legend><img src="/images/built-in/logo.png" /></legend>
+ <legend><img src="images/built-in/logo.png" /></legend>
     <p>${tr:Wt.Auth.login-form-info}</p>
 
     <div class="form-horizontal">
@@ -438,7 +438,7 @@
 <message id="about-tpl">
    <legend>${software} ${version}</legend>
    <p class="pull-left">
-      <img src="/images/built-in/logo.png" />
+      <img src="images/built-in/logo.png" />
     </p>
     <p class="pull-right">
           Codename: ${codename}<br />

@@ -21,11 +21,11 @@ protected:
   virtual void create()
   {
     setTwoPhaseRenderingThreshold(0);
-    useStyleSheet("/resources/css/ngrt4n.css");
-    useStyleSheet("/resources/css/font-awesome.min.css");
-    messageResourceBundle().use(docRoot()+"/resources/i18n/messages");
+    useStyleSheet("resources/css/ngrt4n.css");
+    useStyleSheet("resources/css/font-awesome.min.css");
+    messageResourceBundle().use("resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
-    requireJQuery("/resources/js/jquery-1.10.2.min.js");
+    requireJQuery("resources/js/jquery-1.10.2.min.js");
     m_dbSession = new DbSession();
     root()->setId("wrapper");
     root()->addWidget(new AuthManager(m_dbSession));

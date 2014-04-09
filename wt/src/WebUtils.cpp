@@ -107,7 +107,7 @@ std::string ngrt4n::severityCssClass(int severity)
 
 std::string ngrt4n::getPathFromQtResource(const QString& qtPath, const std::string& docRoot)
 {
-  return docRoot+qtPath.mid(1, -1).toStdString();
+  return docRoot+qtPath.mid(2, -1).toStdString();
 }
 
 
