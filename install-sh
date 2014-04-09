@@ -203,6 +203,7 @@ install_ultimate() {
   
   echo "DEBUG : Settings files permissions..."
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_ROOT}/
+  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
   echo "Configuring Apache..."
   a2enconf realopinsight-ultimate
