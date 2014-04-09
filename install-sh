@@ -141,18 +141,29 @@ install_fcgi() {
 }
 
 install_ultimate() {
-  echo "==>Installing RealOpInsight Ultimate..."  
+  echo "==>Installing RealOpInsight Ultimate..."
+
+  if [ `id -u` -ne 0 ]; then 
+    echo "ERROR : root privileges are required"
+    exit 1	
+  fi
   
-  export REALOPINSIGHT_ROOT=${INSTALL_PREFIX}/realopinsight
+  if [ -z "$REALOPINSIGHT_WWW_ROOT" ]; then
+    echo "REALOPINSIGHT_WWW_ROOT not set, using /var/www"
+	export REALOPINSIGHT_WWW_ROOT=/var/www
+  fi  
+ 
+  export REALOPINSIGHT_ROOT=/opt/realopinsight
+  export REALOPINSIGHT_WWW=${REALOPINSIGHT_WWW_ROOT}/realopinsight
   
   # check credential requirements
-  if [ -z "$REALOPINSIGHT_USER" ]; then
-    echo "ERROR : REALOPINSIGHT_USER not set"
+  if [ -z "$REALOPINSIGHT_WWW_USER" ]; then
+    echo "ERROR : REALOPINSIGHT_WWW_USER not set"
 	exit 1
   fi
   
-  if [ -z "$REALOPINSIGHT_GROUP" ]; then
-    echo "ERROR : REALOPINSIGHT_GROUP not set"
+  if [ -z "$REALOPINSIGHT_WWW_GROUP" ]; then
+    echo "ERROR : REALOPINSIGHT_WWW_GROUP not set"
 	exit 1
   fi  
   
@@ -168,34 +179,36 @@ install_ultimate() {
   echo "done"
   
   echo -n "DEGUG : Copy files..."
-  
-  install -m 755 realopinsightd  ${REALOPINSIGHT_ROOT}/
-  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_ROOT}/
-  install -m 755 realopinsightctld  ${REALOPINSIGHT_ROOT}/
+
+  echo "DEBUG : creating directories..."
+  install -d ${REALOPINSIGHT_WWW}
+  install -d ${REALOPINSIGHT_ROOT}
   install -d ${REALOPINSIGHT_ROOT}/etc
   install -d ${REALOPINSIGHT_ROOT}/data
   install -d ${REALOPINSIGHT_ROOT}/log
   install -d ${REALOPINSIGHT_ROOT}/run   # directory for session info and thumbnails
+   
+  echo "DEBUG : copy web files..."
+  install -m 600 contribs/apache-htaccess ${REALOPINSIGHT_WWW}/.htaccess
+  cp -r resources ${REALOPINSIGHT_WWW}/
+  cp -r images ${REALOPINSIGHT_WWW}/
+  cp -r i18n ${REALOPINSIGHT_WWW}/
+  
+  echo "DEBUG : copy configuration files..."
+  install -m 755 realopinsightd  ${REALOPINSIGHT_ROOT}/
+  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_ROOT}/
+  install -m 755 realopinsightctld  ${REALOPINSIGHT_ROOT}/
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_ROOT}/etc/
-  install -m 600 contribs/realopinsight-ultimate.conf /etc/apache2/conf-available/
-
-  cp -r resources ${REALOPINSIGHT_ROOT}/
-  cp -r images ${REALOPINSIGHT_ROOT}/
-  cp -r i18n ${REALOPINSIGHT_ROOT}/
+  install -m 600 contribs/apache-realopinsight-ultimate.conf /etc/apache2/conf-available/realopinsight-ultimate.conf
   
-  echo done
+  echo "DEBUG : Settings files permissions..."
+  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_ROOT}/
   
-  echo -n "Settings files permissions"
-  chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_ROOT}/
-  echo "done"
-  
-  echo -n "Configuring Apache..."
+  echo "Configuring Apache..."
   a2enconf realopinsight-ultimate
-  echo "done"
   
   echo "==>Installation completed"
 }
-
 
 NCPU=1
 mflag=
