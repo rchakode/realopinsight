@@ -46,7 +46,7 @@ public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
   void showUserHome(void);
-  QString getConfig (void) const {return m_currentDashboard->config();}
+  QString getConfig (void) const {return m_currentDashboardPtr->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void resetTimer(void);
@@ -95,7 +95,7 @@ private:
   int m_assignedDashboardCount;
   Wt::WText* m_adminPanelTitle;
   bool m_showSettingTab;
-  WebDashboard* m_currentDashboard;
+  WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
   DashboardTabIndexesT m_dashTabIndexes;
 

@@ -63,7 +63,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
-    m_currentDashboard(NULL),
+    m_currentDashboardPtr(NULL),
     m_terminateSession(this)
 {
   m_preferences->setEnabledInputs(false);
@@ -283,7 +283,7 @@ void WebMainUI::handleRefresh(void)
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
-                                        new Wt::WImage("/images/built-in/logo-mini.png"));
+                                        new Wt::WImage("images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
   anchor->setMargin(10, Wt::Right);
   return anchor;
@@ -344,92 +344,96 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("debug", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+        LOG("debug", "Parsing the input file");
+        QString tmpFileName(m_uploader->spoolFileName().c_str());
+        CoreDataT cdata;
 
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+        Parser parser(tmpFileName ,&cdata);
+        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid description file").toStdString();
-            LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+        if (! parser.process(false)) {
+          std::string msg = tr("Invalid description file").toStdString();
+          LOG("warn", msg);
+          showMessage(msg, "alert alert-warning");
+        } else {
+
+          std::string filename = m_uploader->clientFileName().toUTF8();
+          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+          QFile file(tmpFileName);
+          file.copy(dest);
+          file.remove();
+
+          View view;
+          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+          view.path = dest.toStdString();
+          if (m_dbSession->addView(view) != 0){
+            showMessage(m_dbSession->lastError(), "alert alert-warning");
           } else {
-
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            View view;
-            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
-            }
+            QString msg = tr("View added. "
+                             " Name: %1\n - "
+                             " Services: %2 -"
+                             " Path: %3").arg(view.name.c_str(),
+                                              QString::number(view.service_count),
+                                              view.path.c_str());
+            showMessage(msg.toStdString(), "alert alert-success");
           }
         }
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectedFile.empty()) {
-        WebDashboard* dashbord;
-        loadView(m_selectedFile, dashbord);
-        m_selectedFile.clear();
-      } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-      }
-      break;
-    default:
-      break;
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectedFile.empty()) {
+      WebDashboard* dashbord;
+      loadView(m_selectedFile, dashbord);
+      m_selectedFile.clear();
+    } else {
+      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+    }
+    break;
+  default:
+    break;
   }
 }
 
-void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
+void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget)
 {
-  dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
-  dashboard->initialize(m_preferences);
-  if (! dashboard->errorState()) {
-    QString platformName = dashboard->rootNode().name;
-    std::pair<DashboardListT::iterator, bool> result;
-    result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
-    if (result.second) {
-      Wt::WMenuItem* tab = m_dashtabs->addTab(dashboard->getWidget(), platformName.toStdString());
-      tab->triggered().connect(std::bind([=]() {
-        m_currentDashboard = dashboard;
-      }));
-      m_dashTabIndexes.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
+  dashboardWidget = new WebDashboard(path.c_str(), m_eventFeedLayout);
+  if (dashboardWidget) {
+    dashboardWidget->initialize(m_preferences);
+    if (! dashboardWidget->errorState()) {
+      QString platformName = dashboardWidget->rootNode().name;
+      std::pair<DashboardListT::iterator, bool> result;
+      result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboardWidget));
+      if (result.second) {
+        Wt::WMenuItem* tab = m_dashtabs->addTab(dashboardWidget->getWidget(), platformName.toStdString());
+        tab->triggered().connect(std::bind([=]() {
+          m_currentDashboardPtr = dashboardWidget;
+        }));
+        m_dashTabIndexes.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
+      } else {
+        delete dashboardWidget;
+        dashboardWidget = NULL;
+        showMessage(tr("This platform or a platfom "
+                       "with the same name is already loaded").toStdString(),"alert alert-warning");
+      }
     } else {
-      delete dashboard;
-      dashboard = NULL;
-      showMessage(tr("This platform or a platfom "
-                     "with the same name is already loaded").toStdString(),"alert alert-warning");
+      showMessage(dashboardWidget->lastError().toStdString(),"alert alert-warning");
     }
   } else {
-    showMessage(dashboard->lastError().toStdString(),"alert alert-warning");
+    showMessage("Dashboard allocator returned return null","alert alert-warning");
   }
 }
 
 void WebMainUI::scaleMap(double factor)
 {
-  if (m_currentDashboard) {
-    m_currentDashboard->map()->scaleMap(factor);
+  if (m_currentDashboardPtr) {
+    m_currentDashboardPtr->map()->scaleMap(factor);
   }
 }
 

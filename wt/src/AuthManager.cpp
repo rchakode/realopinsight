@@ -88,7 +88,7 @@ void AuthManager::createLoggedInView(void)
   m_mainUI = new WebMainUI(this);
   bindWidget("main-ui", m_mainUI);
 
-  Wt::WImage* image = new Wt::WImage(Wt::WLink("/images/built-in/logout.png"), m_mainUI);
+  Wt::WImage* image = new Wt::WImage(Wt::WLink("images/built-in/logout.png"), m_mainUI);
   image->setToolTip(QObject::tr("Sign out").toStdString());
   image->clicked().connect(this, &AuthManager::logout);
   bindWidget("logout-item", image);
