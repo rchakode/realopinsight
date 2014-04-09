@@ -182,12 +182,13 @@ install_ultimate() {
   echo -n "DEGUG : Copy files..."
 
   echo "DEBUG : creating directories..."
-  install -d ${REALOPINSIGHT_WWW}
   install -d ${REALOPINSIGHT_CONFIG}
   install -d ${REALOPINSIGHT_CONFIG}/etc
   install -d ${REALOPINSIGHT_CONFIG}/data
   install -d ${REALOPINSIGHT_CONFIG}/log
   install -d ${REALOPINSIGHT_CONFIG}/run   # directory for session info and thumbnails
+  install -d ${REALOPINSIGHT_WWW}
+  install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
    
   echo "DEBUG : copy web files..."
   install contribs/index.html ${REALOPINSIGHT_WWW}/
@@ -202,6 +203,7 @@ install_ultimate() {
   install -m 755 realopinsightctld  ${REALOPINSIGHT_CONFIG}/
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
   install -m 600 contribs/apache-realopinsight-ultimate.conf ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
+  install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
   
   echo "DEBUG : Settings files permissions..."
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
