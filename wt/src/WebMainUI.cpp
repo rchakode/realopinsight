@@ -217,21 +217,15 @@ void WebMainUI::setupMenus(void)
   setupProfileMenus();
   
   //FIXME: add this after the first view loaded
-  Wt::WText* text = ngrt4n::createFontAwesomeTextButton("fa fa-refresh",
-                                                        "Refresh the console map",
-                                                        m_mainWidget);
+  Wt::WText* text = ngrt4n::createFontAwesomeTextButton("fa fa-refresh","Refresh the console map");
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar->addWidget(text);
   
-  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-in",
-                                             "Zoom the console map in",
-                                             m_mainWidget);
+  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-in", "Zoom the console map in");
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
   m_navbar->addWidget(text);
   
-  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-out",
-                                             "Zoom the console map out",
-                                             m_mainWidget);
+  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-out","Zoom the console map out");
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
   m_navbar->addWidget(text);
 }
@@ -441,7 +435,7 @@ void WebMainUI::scaleMap(double factor)
 
 Wt::WWidget* WebMainUI::createSettingPage(void)
 {
-  m_infoBox = new Wt::WText(m_mainWidget);
+  m_infoBox = new Wt::WText();
   m_infoBox->hide();
   m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
 
@@ -474,7 +468,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     settingPageTpl->bindWidget("menu-preview", link);
 
     // Create view management form
-    m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession, m_mainWidget);
+    m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession);
     m_viewAccessPermissionForm->updateCompleted().connect(std::bind([=](int retCode, std::string msg) {
       if (retCode != 0) {
         showMessage(msg, "alert alert-warning");
@@ -483,7 +477,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       }
     }, std::placeholders::_1, std::placeholders::_2));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
-    link = new Wt::WAnchor("#", "All Views and Access Control", m_mainWidget);
+    link = new Wt::WAnchor("#", "All Views and Access Control");
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
       m_viewAccessPermissionForm->resetModelData();
@@ -502,7 +496,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       }
     }, std::placeholders::_1));
     m_mgntContents->addWidget(m_userMgntUI->userForm());
-    link = new Wt::WAnchor("#", "New User", m_mainWidget);
+    link = new Wt::WAnchor("#", "New User");
     link->clicked().connect(std::bind([=](){
       m_userMgntUI->userForm()->reset();
       m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
@@ -510,7 +504,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     }));
     settingPageTpl->bindWidget("menu-new-user", link);
 
-    link = new Wt::WAnchor("#", "All Users", m_mainWidget);
+    link = new Wt::WAnchor("#", "All Users");
     m_mgntContents->addWidget(m_userMgntUI->userListWidget());
     link->clicked().connect(std::bind([=]() {
       m_mgntContents->setCurrentWidget(m_userMgntUI->userListWidget());
@@ -531,7 +525,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // setting menus
   m_mgntContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", "Monitoring Settings", m_mainWidget);
+  link = new Wt::WAnchor("#", "Monitoring Settings");
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
     m_mgntContents->setCurrentWidget(m_preferences);
@@ -539,7 +533,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   settingPageTpl->bindWidget("menu-monitoring-setting", link);
 
   m_mgntContents->addWidget(m_userAccountForm);
-  link = new Wt::WAnchor("#", "My Account", m_mainWidget);
+  link = new Wt::WAnchor("#", "My Account");
   link->clicked().connect(std::bind([=](){
     m_mgntContents->setCurrentWidget(m_userAccountForm);
     m_adminPanelTitle->setText("My Account");
@@ -547,7 +541,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   settingPageTpl->bindWidget("menu-my-account", link);
 
   m_mgntContents->addWidget(m_changePasswordPanel);
-  link = new Wt::WAnchor("#", "Change Password", m_mainWidget);
+  link = new Wt::WAnchor("#", "Change Password");
   link->clicked().connect(std::bind([=](){
     m_mgntContents->setCurrentWidget(m_changePasswordPanel);
     m_adminPanelTitle->setText("Change password");

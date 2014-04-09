@@ -51,8 +51,7 @@ namespace ngrt4n {
   Wt::WString wHumanTimeText(const std::string& mytime_t);
   Wt::WString wTimeToNow(const std::string& mytime_t);
   Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses,
-                                         const std::string& tip,
-                                         Wt::WContainerWidget* parent);
+                                         const std::string& tip);
   Wt::WColor severityWColor(const int& _criticity);
 
   void log(const std::string& level, const std::string& msg);
