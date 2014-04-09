@@ -155,6 +155,7 @@ install_ultimate() {
  
   export REALOPINSIGHT_CONFIG=/opt/realopinsight
   export REALOPINSIGHT_WWW=${REALOPINSIGHT_WWW_ROOT}/realopinsight
+  export APACHE_ROOT=/etc/apache2
   
   # check credential requirements
   if [ -z "$REALOPINSIGHT_WWW_USER" ]; then
@@ -200,13 +201,15 @@ install_ultimate() {
   install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
   install -m 755 realopinsightctld  ${REALOPINSIGHT_CONFIG}/
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
-  install -m 600 contribs/apache-realopinsight-ultimate.conf /etc/apache2/conf-available/realopinsight-ultimate.conf
+  install -m 600 contribs/apache-realopinsight-ultimate.conf ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
   
   echo "DEBUG : Settings files permissions..."
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
   echo "Configuring Apache..."
+  sed --in-place s/REALOPINSIGHT_WWW_ROOT/$REALOPINSIGHT_WWW/ ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
+  sed --in-place 's!REALOPINSIGHT_WWW_ROOT!'"$REALOPINSIGHT_WWW"'!' ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
   a2enconf realopinsight-ultimate
   
   echo "==>Installation completed"
