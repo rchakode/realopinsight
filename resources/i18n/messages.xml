@@ -78,17 +78,14 @@
   <!-- 1st thumnail -->
   <div class="span-one-third">
        <div class="thumbnail">
-          <div class="title">
-              Describe your target platforms
-          </div>
+          <div class="title">Describe</div>
           <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-          <p>Using the RealOpinsight Editor, describe and edit the target platform,
-            the related services, as well as the business rules that bind them to each other.
-            The Editor is an effective studio to modelize, in an easy and simply way,
-            any kind of complex platforms you may have.
+          <p>Define the description files that govern your business platforms.
+          A description file defines a business platform as a set of services along
+          with business rules that bind them to each other. The RealOpInsight Editor
+          will assist you to deal with this in an easy and simple wa
           </p>
-          <p><a href="http://realopinsight.com/library/getting-started"
-            class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
+          <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
           </p>
        </div>
   </div>
@@ -96,14 +93,12 @@
   <!-- 2nd thumnail -->
   <div class="span-one-third">
           <div class="thumbnail">
-            <div class="title">Enable the acess to monitoring data</div>
+            <div class="title">Upload and Assign</div>
             <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-            <p>The RealOpInsight setting user interfaces enable you to easily set
-              when and how to retrieve status data from your monitoring servers in order
-              to keep your operations dasboards up-to-date.
+            <p>Once created, upload the description files into the RealOpInsight Datastore.
+            Then check preview them to ensure they suit your monitoring needs.
             </p>
-            <p><a href="http://realopinsight.com/library/getting-started"
-              class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+            <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
           </div>
   </div>
 
@@ -111,17 +106,13 @@
   <!-- Third thumnail -->
    <div class="span-one-third">
       <div class="thumbnail">
-         <div class="title">
-             Preview and assign
-         </div>
+         <div class="title">Operate</div>
          <img src="images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-         <p>Once created, upload the views within the RealOpInsight server. Afterwards, you
-           can preview and assign them to your operations staff. 
-           RealOpInsight provides full control of administration requirements, such as, authentication, 
-           user roles, and access control.
-              </p>
-         <p><a href="http://realopinsight.com/library/getting-started"
-                class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+         <p>Enable the access to your monitoring data by setting when and how RealOpInsight
+         should retrieve status data from your monitoring servers in order to keep your
+         operations dasboards up-to-date. Then assign the uploaded views to your operations staff.
+         </p>
+         <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
       </div>
    </div>
  </message>
