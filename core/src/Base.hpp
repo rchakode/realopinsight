@@ -47,7 +47,6 @@ const QString APP_NAME = QObject::tr("%1 Workstation").arg(APPLICATION_NAME);
 
 const QString COMPANY = "RealOpInsight Labs";
 const QString USER_BN = "ngrt4n";
-const QString PKG_NAME = PACKAGE_NAME;
 const QString PKG_VERSION = PACKAGE_VERSION;
 const QString PKG_URL = PACKAGE_URL;
 const QString REL_NAME = RELEASE_NAME;
