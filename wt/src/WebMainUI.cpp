@@ -136,6 +136,7 @@ void WebMainUI::createMainUI(void)
   m_navbar = new Wt::WNavigationBar(m_mainWidget);
   m_navbar->setResponsive(true);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
+  m_navbar->addWidget(new Wt::Wtemplare(Wt::WString::tr("beta-message")));
   
   // Create a container for stacked contents
   m_contents = new Wt::WStackedWidget(m_mainWidget);

@@ -6,6 +6,9 @@
 </div>
 </message>
 
+<message id="beta-message">
+  <span><sup>Beta</sup></span>
+</message>
 <message id="admin-home.tpl">
   <div class="admin-page">
     <!-- Menu pane -->
