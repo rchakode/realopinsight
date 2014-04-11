@@ -145,7 +145,7 @@ TARGET = ngrt4n-editor
 }
 
 web-base {
-DEFINES *= "PACKAGE_NAME='\"Ultimate"'"
+DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
