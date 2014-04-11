@@ -94,7 +94,6 @@ SOURCES += \
 
 gui-base {
 QT += svg gui webkit
-DEFINES *= "PACKAGE_NAME='\"Workstation\"'"
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
@@ -145,7 +144,6 @@ TARGET = ngrt4n-editor
 }
 
 web-base {
-DEFINES *= "PACKAGE_NAME='\"Ultimate\"'"
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 

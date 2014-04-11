@@ -39,11 +39,14 @@
   app->installTranslator(&translator); \
   QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
+#ifdef REALOPINSIGHT_WEB
+const QString APP_NAME = QObject::tr("%1 Ultimate").arg(APPLICATION_NAME);
+#else
+const QString APP_NAME = QObject::tr("%1 Workstation").arg(APPLICATION_NAME);
+#endif
 
-const QString PROJECT = "NGRT4N";
+const QString COMPANY = "RealOpInsight Labs";
 const QString USER_BN = "ngrt4n";
-const QString PJT_NAME = PROJECT;
-const QString APP_NAME = APPLICATION_NAME;
 const QString PKG_NAME = PACKAGE_NAME;
 const QString PKG_VERSION = PACKAGE_VERSION;
 const QString PKG_URL = PACKAGE_URL;

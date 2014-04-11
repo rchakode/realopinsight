@@ -38,7 +38,7 @@ const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
 
-Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
+Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
   init();
 }
