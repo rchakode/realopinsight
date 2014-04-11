@@ -330,9 +330,9 @@
 
 
 <message id="copyright-footer.tpl">
-    ${software} ${version} - Copyright &copy; 2010-${release-year} RealOpInsight Labs <br />
-    <a href="http://realopinsight.com/about/license-and-copyright" target="_blank">Terms &amp; Conditions</a>
-    - <a href="http://support.realopinsight.com/">Support</a> - <a href="http://docs.realopinsight.com/">Help</a>
+    ${software} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
+    <br />Version ${version} - <a href="http://docs.realopinsight.com/">Help</a>
+    <a href="${package-url}" target="_blank">Terms &amp; Conditions</a>
 </message>
 
 <message id="view-assignment-tpl">
@@ -436,7 +436,7 @@
     </p>
     <p class="pull-right">
           Codename: ${codename}<br />
-          Core Library: ${corelib-version}<br />
+          Core Version: ${corelib-version}<br />
           Release ID: ${release-id}
     </p>
     <div class="clearfix"></div>

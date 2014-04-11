@@ -114,8 +114,9 @@ std::string ngrt4n::getPathFromQtResource(const QString& qtPath, const std::stri
 Wt::WWidget* ngrt4n::footer(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));
-  tpl->bindString("software", APP_NAME.toStdString());
+  tpl->bindString("software", APP_NAME.append(" ").append(PKG_NAME).toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
+  tpl->bindString("package-url", PKG_URL.toStdString());
   tpl->bindString("release-year", REL_YEAR.toStdString());
   return tpl;
 }
