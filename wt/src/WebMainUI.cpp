@@ -474,7 +474,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     // Create view management form
     m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession);
     m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
-        m_dashtabs->removeTab(m_dashTabIndexes[viewName]);
+        m_dashtabs->removeTab(m_dashTabIndexes[viewName.c_str()]);
     }, std::placeholders::_1));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
     link = new Wt::WAnchor("#", "All Views and Access Control");
@@ -661,7 +661,7 @@ void WebMainUI::createAboutDialog(void)
   
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), m_aboutDialog->contents());
   
-  tpl->bindString("software", QObject::tr("%1 %2").arg(APP_NAME, PKG_NAME).toStdString());
+  tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
   tpl->bindString("corelib-version", ngrt4n::libVersion().toStdString());
   tpl->bindString("codename", REL_NAME.toStdString());
