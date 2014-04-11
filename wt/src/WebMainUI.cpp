@@ -136,7 +136,7 @@ void WebMainUI::createMainUI(void)
   m_navbar = new Wt::WNavigationBar(m_mainWidget);
   m_navbar->setResponsive(true);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
-  m_navbar->addWidget(new Wt::Wtemplare(Wt::WString::tr("beta-message")));
+  m_navbar->addWidget(new Wt::WTemplate(Wt::WString::tr("beta-message")));
   
   // Create a container for stacked contents
   m_contents = new Wt::WStackedWidget(m_mainWidget);
@@ -286,7 +286,6 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
                                         new Wt::WImage("images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
-  anchor->setMargin(10, Wt::Right);
   return anchor;
 }
 

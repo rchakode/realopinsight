@@ -7,7 +7,7 @@
 </message>
 
 <message id="beta-message">
-  <span><sup>Beta</sup></span>
+  <span><sup class="severity-major">Beta</sup>&nbsp;</span>
 </message>
 <message id="admin-home.tpl">
   <div class="admin-page">
@@ -331,8 +331,8 @@
 
 <message id="copyright-footer.tpl">
     ${software} ${version} - Copyright &copy; 2010-${release-year} RealOpInsight Labs <br />
-    <a href="http://realopinsight.com/library/getting-started" target="_blank">Terms &amp; Conditions</a>
-    - <a href="#">Support</a> - <a href="#">Help</a>
+    <a href="http://realopinsight.com/about/license-and-copyright" target="_blank">Terms &amp; Conditions</a>
+    - <a href="http://support.realopinsight.com/">Support</a> - <a href="http://docs.realopinsight.com/">Help</a>
 </message>
 
 <message id="view-assignment-tpl">

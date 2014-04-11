@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     std::string configurationFile = "/opt/realopinsight/etc/wt_config.xml";
     Wt::WServer server(argv[0], configurationFile);
     server.setServerConfiguration(argc, argv);
-    server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication);
+    server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication, "", "favicon.ico");
 
     //DbSession::configureAuth();
 
