@@ -45,7 +45,7 @@ public:
 
   void filter(const std::string& username);
   void resetModelData(void);
-  Wt::Signal<int, std::string>& updateCompleted(void) {return m_updateCompleted;}
+  Wt::Signal<std::string>& viewDeleted(void) {return m_viewDeleted;}
 
 private:
   typedef std::set<std::string> KeyListT;
@@ -60,7 +60,7 @@ private:
   Wt::WPushButton* m_revokeButton;
   Wt::WPushButton* m_deleteViewButton;
   KeyListT m_selectedViews;
-  Wt::Signal<int, std::string> m_updateCompleted;
+  Wt::Signal<std::string> m_viewDeleted;
 
   void addView(Wt::WStandardItemModel* model, const View& view);
   void setModelHeaderTitles(Wt::WStandardItemModel* model);

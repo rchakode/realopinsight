@@ -473,13 +473,9 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
     // Create view management form
     m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession);
-    m_viewAccessPermissionForm->updateCompleted().connect(std::bind([=](int retCode, std::string msg) {
-      if (retCode != 0) {
-        showMessage(msg, "alert alert-warning");
-      } else {
-        showMessage(msg, "alert alert-success");
-      }
-    }, std::placeholders::_1, std::placeholders::_2));
+    m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
+        m_dashtabs->removeTab(m_dashTabIndexes[viewName]);
+    }, std::placeholders::_1));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
     link = new Wt::WAnchor("#", "All Views and Access Control");
     link->clicked().connect(std::bind([=](){
