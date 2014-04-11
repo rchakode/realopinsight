@@ -47,23 +47,23 @@ void PieChart::paintEvent(QPaintEvent*)
   qint32 ok_count =  m_statsData[ngrt4n::Normal];
   qint32 unknown_count = m_nbStatsEntries - (critical_count + major_count + minor_count + ok_count);
 
-  int critical_ratio= 16 * (100.0 * critical_count)/m_nbStatsEntries;
-  int major_ratio = 16 * (100.0 * major_count)/m_nbStatsEntries;
-  int minor_ratio = 16 * (100.0 * minor_count)/m_nbStatsEntries;
-  int unknown_ratio = 16 * (100.0 * unknown_count)/m_nbStatsEntries;
-  int ok_ratio = 16 * (100.0 * ok_count)/m_nbStatsEntries;
+  int critical_ratio= (100.0 * critical_count)/m_nbStatsEntries;
+  int major_ratio = (100.0 * major_count)/m_nbStatsEntries;
+  int minor_ratio = (100.0 * minor_count)/m_nbStatsEntries;
+  int unknown_ratio = (100.0 * unknown_count)/m_nbStatsEntries;
+  int ok_ratio = (100.0 * ok_count)/m_nbStatsEntries;
 
   painter.setPen(Qt::transparent);
   painter.setBrush(ngrt4n::COLOR_CRITICAL);
-  painter.drawPie(m_boundingRect, 0, 3.6 * critical_ratio);
+  painter.drawPie(m_boundingRect, 0, 16 * 3.6 * critical_ratio);
   painter.setBrush(ngrt4n::COLOR_MAJOR);
-  painter.drawPie(m_boundingRect, 3.6 * critical_ratio, 3.6 * major_ratio);
+  painter.drawPie(m_boundingRect, 3.6 * critical_ratio, 16 * 3.6 * major_ratio);
   painter.setBrush(ngrt4n::COLOR_MINOR);
-  painter.drawPie(m_boundingRect, 3.6 * (critical_ratio + major_ratio), 3.6 * minor_ratio);
+  painter.drawPie(m_boundingRect, 3.6 * (critical_ratio + major_ratio), 16 * 3.6 * minor_ratio);
   painter.setBrush(ngrt4n::COLOR_UNKNOWN);
-  painter.drawPie(m_boundingRect, 3.6 * (critical_ratio + major_ratio + minor_ratio), 3.6 * unknown_ratio);
+  painter.drawPie(m_boundingRect, 3.6 * (critical_ratio + major_ratio + minor_ratio), 16 * 3.6 * unknown_ratio);
   painter.setBrush(ngrt4n::COLOR_NORMAL);
-  painter.drawPie(m_boundingRect, 3.6 * (critical_ratio + major_ratio + minor_ratio + unknown_ratio), 3.6 * ok_ratio);
+  painter.drawPie(m_boundingRect, 3.6 * (critical_ratio + major_ratio + minor_ratio + unknown_ratio), 16 * 3.6 * ok_ratio);
 
   QString toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
       "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
