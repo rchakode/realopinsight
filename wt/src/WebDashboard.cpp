@@ -117,8 +117,8 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (! m_showOnlyTroubles ||
-      (m_showOnlyTroubles && _node.severity != ngrt4n::Normal))
+  if (! DashboardBase::showOnlyTroubles() ||
+      (DashboardBase::showOnlyTroubles() && _node.severity != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
