@@ -84,9 +84,8 @@
           <div class="title">Describe</div>
           <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
           <p>Define the description files that govern your business platforms.
-          A description file defines a business platform as a set of services along
-          with business rules that bind them to each other. The RealOpInsight Editor
-          will assist you to deal with this in an easy and simple wa
+          The RealOpInsight Editor will assist you to deal with this in an
+          easy and simple way
           </p>
           <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
           </p>
@@ -111,9 +110,9 @@
       <div class="thumbnail">
          <div class="title">Operate</div>
          <img src="images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-         <p>Enable the access to your monitoring data by setting when and how RealOpInsight
-         should retrieve status data from your monitoring servers in order to keep your
-         operations dasboards up-to-date. Then assign the uploaded views to your operations staff.
+         <p>Enable the access to your monitoring data by setting when and how
+         the RealOpInsight engine can connect to your monitoring servers to retrieve status data.
+         And finally, assign the views to your operations staff to let them operate.
          </p>
          <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
       </div>
@@ -331,8 +330,9 @@
 
 <message id="copyright-footer.tpl">
     ${software} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
-    <br />Version ${version} - <a href="http://docs.realopinsight.com/">Help</a>
-    <a href="${package-url}" target="_blank">Terms &amp; Conditions</a>
+    <br />Version ${version}
+    - <a href="http://docs.realopinsight.com/">Help</a>
+    - <a href="${package-url}" target="_blank">Terms &amp; Conditions</a>
 </message>
 
 <message id="view-assignment-tpl">
