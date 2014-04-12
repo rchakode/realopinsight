@@ -64,6 +64,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
     m_currentDashboardPtr(NULL),
+    m_eventFeedLayout(NULL),
     m_terminateSession(this)
 {
   m_preferences->setEnabledInputs(false);
@@ -263,7 +264,7 @@ void WebMainUI::handleRefresh(void)
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
     }
-    m_dashTabIndexes[dash.second->rootNode().name]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
+    m_dashTabWidgets[dash.second->rootNode().name]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
   }
 
   for(auto ptype: problemTypeCount) {
@@ -344,60 +345,59 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-  case IMPORT:
-    if (! m_uploader->empty()) {
-      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-        LOG("debug", "Parsing the input file");
-        QString tmpFileName(m_uploader->spoolFileName().c_str());
-        CoreDataT cdata;
+    case IMPORT:
+      if (! m_uploader->empty()) {
+        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+          LOG("debug", "Parsing the input file");
+          QString tmpFileName(m_uploader->spoolFileName().c_str());
+          CoreDataT cdata;
 
-        Parser parser(tmpFileName ,&cdata);
-        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+          Parser parser(tmpFileName ,&cdata);
+          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-        if (! parser.process(false)) {
-          std::string msg = tr("Invalid description file").toStdString();
-          LOG("warn", msg);
-          showMessage(msg, "alert alert-warning");
-        } else {
-
-          std::string filename = m_uploader->clientFileName().toUTF8();
-          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-          QFile file(tmpFileName);
-          file.copy(dest);
-          file.remove();
-
-          View view;
-          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-          view.path = dest.toStdString();
-          if (m_dbSession->addView(view) != 0){
-            showMessage(m_dbSession->lastError(), "alert alert-warning");
+          if (! parser.process(false)) {
+            std::string msg = tr("Invalid description file").toStdString();
+            LOG("warn", msg);
+            showMessage(msg, "alert alert-warning");
           } else {
-            QString msg = tr("View added. "
-                             " Name: %1\n - "
-                             " Services: %2 -"
-                             " Path: %3").arg(view.name.c_str(),
-                                              QString::number(view.service_count),
-                                              view.path.c_str());
-            showMessage(msg.toStdString(), "alert alert-success");
+            std::string filename = m_uploader->clientFileName().toUTF8();
+            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+            QFile file(tmpFileName);
+            file.copy(dest);
+            file.remove();
+
+            View view;
+            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+            view.path = dest.toStdString();
+            if (m_dbSession->addView(view) != 0){
+              showMessage(m_dbSession->lastError(), "alert alert-warning");
+            } else {
+              QString msg = tr("View added. "
+                               " Name: %1\n - "
+                               " Services: %2 -"
+                               " Path: %3").arg(view.name.c_str(),
+                                                QString::number(view.service_count),
+                                                view.path.c_str());
+              showMessage(msg.toStdString(), "alert alert-success");
+            }
           }
         }
       }
-    }
-    break;
-  case OPEN:
-    m_fileUploadDialog->accept();
-    m_fileUploadDialog->contents()->clear();
-    if (! m_selectedFile.empty()) {
-      WebDashboard* dashbord;
-      loadView(m_selectedFile, dashbord);
-      m_selectedFile.clear();
-    } else {
-      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-    }
-    break;
-  default:
-    break;
+      break;
+    case OPEN:
+      m_fileUploadDialog->accept();
+      m_fileUploadDialog->contents()->clear();
+      if (! m_selectedFile.empty()) {
+        WebDashboard* dashbord;
+        loadView(m_selectedFile, dashbord);
+        m_selectedFile.clear();
+      } else {
+        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+      }
+      break;
+    default:
+      break;
   }
 }
 
@@ -415,12 +415,12 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
         tab->triggered().connect(std::bind([=]() {
           m_currentDashboardPtr = dashboardWidget;
         }));
-        m_dashTabIndexes.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
+        m_dashTabWidgets.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
       } else {
         delete dashboardWidget;
         dashboardWidget = NULL;
-        showMessage(tr("This platform or a platfom "
-                       "with the same name is already loaded").toStdString(),"alert alert-warning");
+        showMessage(tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString(),
+                    "alert alert-warning");
       }
     } else {
       showMessage(dashboardWidget->lastError().toStdString(),"alert alert-warning");
@@ -474,7 +474,12 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     // Create view management form
     m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession);
     m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
-        m_dashtabs->removeTab(m_dashTabIndexes[viewName.c_str()]);
+      DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
+      if (tabItem != m_dashTabWidgets.end()) {
+        m_dashtabs->removeTab(tabItem->second);
+        delete tabItem->second;
+        m_dashTabWidgets.erase(tabItem->first);
+      }
     }, std::placeholders::_1));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
     link = new Wt::WAnchor("#", "All Views and Access Control");
@@ -645,6 +650,12 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 
 void WebMainUI::showMessage(const std::string& msg, std::string status)
 {
+  std::string logLevel = "info";
+  if (status != "alert alert-success") {
+    logLevel = "error";
+  }
+  LOG(logLevel, msg);
+
   m_infoBox->setText(msg);
   m_infoBox->setStyleClass(status);
   m_infoBox->show();

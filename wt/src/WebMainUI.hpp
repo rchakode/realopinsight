@@ -67,7 +67,7 @@ private:
     IMPORT = 0
   };
   typedef std::map<QString, WebDashboard*> DashboardListT;
-  typedef std::map<QString, Wt::WMenuItem*> DashboardTabIndexesT;
+  typedef std::map<QString, Wt::WMenuItem*> DashTabWidgetsT;
 
   std::string m_rootDir;
   std::string m_confdir;
@@ -97,7 +97,7 @@ private:
   bool m_showSettingTab;
   WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
-  DashboardTabIndexesT m_dashTabIndexes;
+  DashTabWidgetsT m_dashTabWidgets;
 
   /** Signals */
   Wt::Signal<void> m_terminateSession;

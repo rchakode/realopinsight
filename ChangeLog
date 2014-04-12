@@ -1,6 +1,9 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.0b2
+  * Fixed chart tooltip, ratios were multiplied by 16
+
 3.0.0b1 (Eliana, b1)
   * Lot of refactoring and code simplification
   * Port to Qt 5.x
