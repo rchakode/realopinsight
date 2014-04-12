@@ -75,6 +75,12 @@ public Q_SLOTS:
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastError  = msg;}
   virtual void initialize(Preferences* preferencePtr);
+  CoreDataT* cdata(void) {return m_cdata;}
+  qint32 userRole(void) const {return m_userRole;}
+  bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
+  void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
+  SourceListT sources(void) {return m_sources;}
+  int firstSrcIndex(void) {return m_firstSrcIndex;}
 
 Q_SIGNALS:
   void hasToBeUpdate(QString);
@@ -86,6 +92,19 @@ Q_SIGNALS:
   void errorOccurred(QString msg);
 
 protected:
+  void computeStatusInfo(NodeT& _node, const SourceT& src);
+  int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
+  virtual void updateDashboard(const NodeT& _node);
+  virtual void buildMap(void) = 0;
+  virtual void updateMap(const NodeT& _node, const QString& _tip) = 0;
+  virtual void buildTree(void) = 0;
+  virtual void updateTree(const NodeT& _node, const QString& _tip) = 0;
+  virtual void updateMsgConsole(const NodeT& _node) = 0;
+  virtual void finalizeUpdate(const SourceT& src);
+  virtual void updateChart(void) = 0;
+  virtual void updateEventFeeds(const NodeT& node) = 0;
+
+private:
   QString m_descriptionFile;
   CoreDataT* m_cdata;
   qint64 m_updateCounter;
@@ -102,20 +121,6 @@ protected:
   bool m_errorState;
   QString m_lastError;
 
-protected:
-  void computeStatusInfo(NodeT& _node, const SourceT& src);
-  int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
-  virtual void updateDashboard(const NodeT& _node);
-  virtual void buildMap(void) = 0;
-  virtual void updateMap(const NodeT& _node, const QString& _tip) = 0;
-  virtual void buildTree(void) = 0;
-  virtual void updateTree(const NodeT& _node, const QString& _tip) = 0;
-  virtual void updateMsgConsole(const NodeT& _node) = 0;
-  virtual void finalizeUpdate(const SourceT& src);
-  virtual void updateChart(void) = 0;
-  virtual void updateEventFeeds(const NodeT& node) = 0;
-
-private:
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);

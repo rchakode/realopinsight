@@ -83,8 +83,8 @@ namespace {
 WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
   : DashboardBase(descriptionFile),
     m_widget(new Wt::WContainerWidget()),
-    m_tree(new WebTree(m_cdata)),
-    m_map(new WebMap(m_cdata)),
+    m_tree(new WebTree(DashboardBase::cdata())),
+    m_map(new WebMap(DashboardBase::cdata())),
     m_msgConsole(new WebMsgConsole()),
     m_chart(new WebPieChart()),
     m_eventFeedLayout(eventFeedLayout)
@@ -126,7 +126,7 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  for (auto it = std::begin(m_cdata->check_status_count); it != std::end(m_cdata->check_status_count); ++it) {
+  for (auto it = std::begin(DashboardBase::cdata()->check_status_count); it != std::end(DashboardBase::cdata()->check_status_count); ++it) {
     m_chart->setSeverityData(it.key(), it.value());
   }
   m_chart->setToolTip(statsTooltip());
@@ -196,11 +196,11 @@ void WebDashboard::addJsEventScript(void)
 
 std::string WebDashboard::statsTooltip(void)
 {
-  qint32 totalCount = m_cdata->cnodes.size();
-  qint32 criticalCount = m_cdata->check_status_count[ngrt4n::Critical];
-  qint32 majorCount = m_cdata->check_status_count[ngrt4n::Major];
-  qint32 minorCount = m_cdata->check_status_count[ngrt4n::Minor];
-  qint32 normalCount =  m_cdata->check_status_count[ngrt4n::Normal];
+  qint32 totalCount = DashboardBase::cdata()->cnodes.size();
+  qint32 criticalCount = DashboardBase::cdata()->check_status_count[ngrt4n::Critical];
+  qint32 majorCount = DashboardBase::cdata()->check_status_count[ngrt4n::Major];
+  qint32 minorCount = DashboardBase::cdata()->check_status_count[ngrt4n::Minor];
+  qint32 normalCount =  DashboardBase::cdata()->check_status_count[ngrt4n::Normal];
   qint32 unknownCount = totalCount - (criticalCount + majorCount + minorCount + normalCount);
 
   float criticalRatio = (100.0 * criticalCount) / totalCount;
@@ -211,7 +211,7 @@ std::string WebDashboard::statsTooltip(void)
 
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("statistic-tooltip.tpl"));
 
-  tpl->bindString("platform", m_cdata->root->name.toStdString());
+  tpl->bindString("platform", DashboardBase::rootNode().name.toStdString());
   tpl->bindInt("total-count", totalCount);
 
   tpl->bindInt("unknown-ratio", unknownRatio);

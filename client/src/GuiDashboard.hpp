@@ -71,7 +71,7 @@ public Q_SLOTS:
   void handleShowOnlineResources(void);
   void handleChangePasswordAction(void);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
-  void centerGraphOnNode(void) { centerGraphOnNode(m_selectedNode); }
+  void centerGraphOnNode(void) { centerGraphOnNode(DashboardBase::selectedNode()); }
   void centerGraphOnNode(const QString& _nodeId);
   void centerGraphOnNode(QTreeWidgetItem* _item);
   void filterNodeRelatedMsg(void);
@@ -82,7 +82,6 @@ public Q_SLOTS:
   void handleSourceBxItemChanged(int index);
   void handleUpdateSourceUrl(void);
   void handleSettingsLoaded(void);
-  //  void updateDashboard(const NodeT & _node);
 
 Q_SIGNALS:
   void sortEventConsole(void);
