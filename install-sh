@@ -171,11 +171,14 @@ install_ultimate() {
   # checking dependencies
   check_prerequisites
   
-  echo -n "DEGUG : Building Standalone Server..."
+  echo "Generating locale file"
+  lrelease ngrt4n.pro
+  
+  echo -n "DEGUG : Building the Standalone Server..."
   install_webd
   echo done
   
-  echo -n "DEGUG : Building FastCGI Server..."
+  echo -n "DEGUG : Building the FastCGI Module..."
   install_fcgi
   echo "done"
   
@@ -212,6 +215,9 @@ install_ultimate() {
   echo "Configuring Apache..."
   sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
   a2enconf realopinsight-ultimate
+  
+  echo "Reloading Apache"
+  service apache2 reload
   
   echo "==>Installation completed"
 }
