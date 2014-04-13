@@ -54,7 +54,7 @@ public:
   void setTimerId(qint32 id) {m_timerId = id;}
   qint32 timerId(void) const {return m_timerId;}
   qint32 timerInterval(void) const {return m_interval;}
-  NodeT& rootNode(void) const {return *(m_cdata->root);}
+  NodeT rootNode(void);
   bool errorState() const {return m_errorState;}
   QString lastError(void) const {return m_lastError;}
 

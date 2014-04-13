@@ -114,7 +114,8 @@ void SvCreator::open(void)
                                                                                                ZNS_SOURCE,
                                                                                                MULTI_SOURCES)
                                       );
-  if (!path.isNull() && !path.isEmpty()) loadFile(path);
+  if (!path.isNull() && !path.isEmpty())
+    loadFile(path);
 }
 
 
@@ -131,7 +132,6 @@ void SvCreator::loadFile(const QString& _path)
       exit(1);
     } else {
       m_tree->build();
-      //m_tree->update();
       m_activeConfig = ngrt4n::getAbsolutePath(_path);
       setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
     }
@@ -152,7 +152,7 @@ void SvCreator::newView(void)
     ngrt4n::clear(*m_cdata);
     m_tree->resetData();
     NodeT* node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
-    m_cdata->root = m_cdata->bpnodes.insert(node->id, *node);
+    m_root = m_cdata->bpnodes.insert(node->id, *node);
     m_tree->addNode(*node);
     m_tree->update();
     m_editor->setContent(*node);
@@ -219,11 +219,11 @@ void SvCreator::deleteNode(void)
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec())
   {
-    case QMessageBox::Yes:
-      deleteNode(m_selectedNode);
-      break;
-    default:
-      break;
+  case QMessageBox::Yes:
+    deleteNode(m_selectedNode);
+    break;
+  default:
+    break;
   }
 }
 
@@ -346,16 +346,16 @@ int SvCreator::treatCloseAction(const bool& _close)
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
       mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
       switch (mbox.exec()) {
-        case QMessageBox::Yes:
-          save();
-          break;
-        case QMessageBox::Cancel:
-          enforceClose = false;
-          ret = 1;
-          break;
-        case QMessageBox::Discard:
-        default:
-          break;
+      case QMessageBox::Yes:
+        save();
+        break;
+      case QMessageBox::Cancel:
+        enforceClose = false;
+        ret = 1;
+        break;
+      case QMessageBox::Discard:
+      default:
+        break;
       }
     }
     if (enforceClose) qApp->quit();
@@ -486,8 +486,8 @@ void SvCreator::recordData(const QString& _path)
     statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
     return;
   }
-  m_cdata->root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-  if (m_cdata->root == m_cdata->bpnodes.end()) {
+  m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+  if (m_root == m_cdata->bpnodes.end()) {
     file.close();
     QString msg =  tr("The hierarchy does not have root");
     ngrt4n::alert(msg);
@@ -496,7 +496,7 @@ void SvCreator::recordData(const QString& _path)
     QTextStream ofile(&file);
     ofile << "<?xml version=\"1.0\"?>\n"
              "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
-    recordNode(ofile,*m_cdata->root);
+    recordNode(ofile,*m_root);
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
       if (service.id == ngrt4n::ROOT_ID || service.parent.isEmpty())
         continue;

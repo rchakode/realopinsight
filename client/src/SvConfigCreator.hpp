@@ -87,6 +87,7 @@ private:
   QToolBar* m_toolBar;
   QMenu* m_nodeContextMenu;
   NodeT* m_clipboardData;
+  NodeListIteratorT m_root;
 
   void loadFile(const QString &);
   void recordData(const QString &);

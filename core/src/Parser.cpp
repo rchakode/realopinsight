@@ -115,12 +115,6 @@ bool Parser::process(bool console)
     }
   }
 
-  m_cdata->root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-  if (m_cdata->root == m_cdata->bpnodes.end()) {
-    Q_EMIT errorOccurred(tr("The configuration is not valid, there is no root service !"));
-    return false;
-  }
-
   updateNodeHierachy(graphContent);
   graphContent = m_dotHeader + graphContent;
   graphContent += m_dotFooter;
