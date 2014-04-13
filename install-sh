@@ -171,18 +171,19 @@ install_ultimate() {
   # checking dependencies
   check_prerequisites
   
-  echo "Generating locale file"
+  echo "Patching the project file for REALOPINSIGHT_WWW..."
+  sed --in-place 's!/var/www/realopinsight!'"${REALOPINSIGHT_WWW}"'!' ngrt4n.pro
+  
+  echo "DEBUG : Generating locale file"
   lrelease ngrt4n.pro
   
-  echo -n "DEGUG : Building the Standalone Server..."
+  echo "DEGUG : Building the Standalone Server..."
   install_webd
-  echo done
   
-  echo -n "DEGUG : Building the FastCGI Module..."
+  echo "DEGUG : Building the FastCGI Module..."
   install_fcgi
-  echo "done"
   
-  echo -n "DEGUG : Copy files..."
+  echo "DEGUG : Copy files..."
 
   echo "DEBUG : creating directories..."
   install -d ${REALOPINSIGHT_CONFIG}
@@ -191,6 +192,7 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_CONFIG}/log
   install -d ${REALOPINSIGHT_CONFIG}/run   # directory for session info and thumbnails
   install -d ${REALOPINSIGHT_WWW}
+  install -d ${REALOPINSIGHT_WWW}/run      # directory for thumbnails
   install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
    
   echo "DEBUG : copy web files..."

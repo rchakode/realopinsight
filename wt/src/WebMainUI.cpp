@@ -402,6 +402,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
     if (dashboardWidget->lastErrorState()) {
       showMessage(dashboardWidget->lastErrorMsg().toStdString(), "alert alert-warning");
       delete dashboardWidget;
+      dashboardWidget = NULL;
     } else {
       QString platformName = dashboardWidget->rootNode().name;
       std::pair<DashboardListT::iterator, bool> result;
@@ -414,6 +415,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
         showMessage(tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString(),
                     "alert alert-warning");
         delete dashboardWidget;
+        dashboardWidget = NULL;
       }
     }
   } catch (const std::bad_alloc& ex) {
