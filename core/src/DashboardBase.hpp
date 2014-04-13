@@ -55,8 +55,8 @@ public:
   qint32 timerId(void) const {return m_timerId;}
   qint32 timerInterval(void) const {return m_interval;}
   NodeT rootNode(void);
-  bool errorState() const {return m_errorState;}
-  QString lastError(void) const {return m_lastError;}
+  bool lastErrorState() const {return m_lastErrorState;}
+  QString lastErrorMsg(void) const {return m_lastErrorMsg;}
 
 public Q_SLOTS:
   void runMonitor();
@@ -73,7 +73,7 @@ public Q_SLOTS:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
-  void handleErrorOccurred(QString msg) {m_lastError  = msg;}
+  void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
   virtual void initialize(Preferences* preferencePtr);
   CoreDataT* cdata(void) {return m_cdata;}
   qint32 userRole(void) const {return m_userRole;}
@@ -118,8 +118,8 @@ private:
   SourceListT m_sources;
   NodeListIteratorT m_root;
   int m_firstSrcIndex;
-  bool m_errorState;
-  QString m_lastError;
+  bool m_lastErrorState;
+  QString m_lastErrorMsg;
 
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);

@@ -101,7 +101,12 @@ WebDashboard::~WebDashboard()
 void WebDashboard::initialize(Preferences* preferencePtr)
 {
   DashboardBase::initialize(preferencePtr);
-  m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
+  if (! DashboardBase::lastErrorState()) {
+    m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
+  } else {
+    LOG("error", DashboardBase::lastErrorMsg());
+    Q_EMIT errorOccurred(DashboardBase::lastErrorMsg());
+  }
 }
 
 void WebDashboard::buildTree(void)
@@ -117,8 +122,8 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (! DashboardBase::showOnlyTroubles() ||
-      (DashboardBase::showOnlyTroubles() && _node.severity != ngrt4n::Normal))
+  if (! DashboardBase::showOnlyTroubles()
+      || (DashboardBase::showOnlyTroubles() && _node.severity != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }

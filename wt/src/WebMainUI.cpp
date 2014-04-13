@@ -399,7 +399,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
   try {
     dashboardWidget = new WebDashboard(path.c_str(), m_eventFeedLayout);
     dashboardWidget->initialize(m_preferences);
-    if (! dashboardWidget->errorState()) {
+    if (! dashboardWidget->lastErrorState()) {
       QString platformName = dashboardWidget->rootNode().name;
       std::pair<DashboardListT::iterator, bool> result;
       result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboardWidget));
@@ -416,7 +416,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
                     "alert alert-warning");
       }
     } else {
-      showMessage(dashboardWidget->lastError().toStdString(),"alert alert-warning");
+      showMessage(dashboardWidget->lastErrorMsg().toStdString(),"alert alert-warning");
     }
   } catch (const std::bad_alloc& ex) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();

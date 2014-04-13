@@ -38,6 +38,7 @@
 #include <iostream>
 #include <algorithm>
 #include <zmq.h>
+#include <cassert>
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -75,7 +76,7 @@ DashboardBase::DashboardBase(const QString& descriptionFile)
     m_updateCounter(0),
     m_settings (new Settings()),
     m_showOnlyTroubles(false),
-    m_errorState(false)
+    m_lastErrorState(false)
 {
   resetStatData();
 }
@@ -87,7 +88,7 @@ DashboardBase::~DashboardBase()
 
 void DashboardBase::initialize(Preferences* preferencePtr)
 {
-  m_errorState = false;
+  m_lastErrorState = false;
   if (! m_descriptionFile.isEmpty()) {
     Parser parser(m_descriptionFile, m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
@@ -96,7 +97,8 @@ void DashboardBase::initialize(Preferences* preferencePtr)
       buildMap();
       initSettings(preferencePtr);
     } else {
-      m_errorState = true;
+      m_lastErrorState = true;
+      m_lastErrorMsg = parser.lastErrorMsg();
     }
   }
 }
@@ -947,10 +949,7 @@ void DashboardBase::resetInterval()
 NodeT DashboardBase::rootNode(void)
 {
   NodeListT::iterator root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-  if (root == m_cdata->bpnodes.end()) {
-    qDebug() << "No root service";
-    qFatal("The configuration is not valid, there is no root service !");
-  }
+  assert(root != m_cdata->bpnodes.end());
   return *root;
 }
 
