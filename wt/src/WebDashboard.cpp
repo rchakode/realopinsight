@@ -104,7 +104,7 @@ void WebDashboard::initialize(Preferences* preferencePtr)
   if (! DashboardBase::lastErrorState()) {
     m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
   } else {
-    LOG("error", DashboardBase::lastErrorMsg());
+    LOG("error", DashboardBase::lastErrorMsg().toStdString());
     Q_EMIT errorOccurred(DashboardBase::lastErrorMsg());
   }
 }
