@@ -949,7 +949,7 @@ NodeT DashboardBase::rootNode(void)
   NodeListT::iterator root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
   if (root == m_cdata->bpnodes.end()) {
     qDebug() << "No root service";
-    qFatal(QObject::tr("The configuration is not valid, there is no root service !").toStdString().c_str());
+    qFatal("The configuration is not valid, there is no root service !");
   }
   return *root;
 }

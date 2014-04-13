@@ -80,7 +80,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     doJavaScript(RESIZE_PANES);
   } catch (const std::bad_alloc& ) {
     m_mainWidget->clear();
-    m_mainWidget->addWidget(new Wt::WText("Error: no sufficient memory, please upgrade your system first");
+    m_mainWidget->addWidget(new Wt::WText("Error: no sufficient memory, please upgrade your system first"));
   }
 }
 
