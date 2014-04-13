@@ -124,7 +124,7 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-         <legend>Application/Service Health</legend>
+         <legend>Service Health Overview</legend>
            ${contents}
        </div>
     </div>
@@ -138,7 +138,7 @@
 </message>
 
 <message id="dashboard-thumbnail.tpl">
-   <div class="span2 thumbnail">
+   <div>
       <div class="title">${thumb-titlebar}</div>
       <div class="ngrt4n-thumbnail">${thumb-image}</div>
   </div>
