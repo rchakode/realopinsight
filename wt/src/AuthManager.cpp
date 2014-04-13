@@ -85,12 +85,8 @@ void AuthManager::createLoggedInView(void)
   sessionInfo.username = m_dbSession->loggedUser().username;
 
   setTemplateText(tr("Wt.Auth.template.logged-in"));
-  try {
-    m_mainUI = new WebMainUI(this);
-    bindWidget("main-ui", m_mainUI);
-  } catch (const std::bad_alloc& ) {
-    m_mainUI->addWidget(new Wt::WText("Error: no sufficient memory, please consider to upgrade your system"));
-  }
+  m_mainUI = new WebMainUI(this);
+  bindWidget("main-ui", m_mainUI);
 
   Wt::WImage* image = new Wt::WImage(Wt::WLink("images/built-in/logout.png"), m_mainUI);
   image->setToolTip(QObject::tr("Sign out").toStdString());

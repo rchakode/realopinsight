@@ -195,15 +195,15 @@ install_ultimate() {
    
   echo "DEBUG : copy web files..."
   install contribs/index.html ${REALOPINSIGHT_WWW}/
-  cp -r resources ${REALOPINSIGHT_WWW}/
+  cp -r resources ${REALOPINSIGHT_WWW}/ 
   cp -r images ${REALOPINSIGHT_WWW}/
   cp -r i18n ${REALOPINSIGHT_WWW}/
   install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
   install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
   
-  echo "DEBUG : copy configuration files..."
+  echo "DEBUG : copy configuration files..." 
   install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
-  install -m 755 realopinsightctld  ${REALOPINSIGHT_CONFIG}/
+  install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
   install -m 600 contribs/apache-realopinsight-ultimate.conf ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
