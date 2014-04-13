@@ -68,8 +68,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_terminateSession(this)
 {
   m_preferences->setEnabledInputs(false);
-  //try {
-  // Now start creating the view
   createMainUI();
   createAccountPanel();
   createPasswordPanel();
@@ -78,19 +76,10 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   showUserHome();
   addEvents();
   doJavaScript(RESIZE_PANES);
- // } catch (const std::bad_alloc& ) {
- //   m_mainWidget->clear();
- //   m_mainWidget->addWidget(new Wt::WText("Error: no sufficient memory, please consider to upgrade your system"));
- // }
 }
 
 WebMainUI::~WebMainUI()
 {
-  // Delete all
-  //  m_contents(NULL),
-  //  m_navbar(NULL),
-  //  m_mgntMenu(NULL),
-  //  m_profileMenu(NULL),
   delete m_preferences;
   delete m_fileUploadDialog;
   delete m_navbar;

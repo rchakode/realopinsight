@@ -89,7 +89,7 @@ void AuthManager::createLoggedInView(void)
     m_mainUI = new WebMainUI(this);
     bindWidget("main-ui", m_mainUI);
   } catch (const std::bad_alloc& ) {
-    m_mainUI = new Wt::WText("Error: no sufficient memory, please consider to upgrade your system");
+    bindWidget("main-ui", new Wt::WText("Error: no sufficient memory, please consider to upgrade your system !"));
   }
 
   Wt::WImage* image = new Wt::WImage(Wt::WLink("images/built-in/logout.png"), m_mainUI);
