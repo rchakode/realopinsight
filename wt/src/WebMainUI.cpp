@@ -68,16 +68,20 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_terminateSession(this)
 {
   m_preferences->setEnabledInputs(false);
-
-  // Now start creating the view
-  createMainUI();
-  createAccountPanel();
-  createPasswordPanel();
-  createAboutDialog();
-  setupMenus();
-  showUserHome();
-  addEvents();
-  doJavaScript(RESIZE_PANES);
+  try {
+    // Now start creating the view
+    createMainUI();
+    createAccountPanel();
+    createPasswordPanel();
+    createAboutDialog();
+    setupMenus();
+    showUserHome();
+    addEvents();
+    doJavaScript(RESIZE_PANES);
+  } catch (const std::bad_alloc& ) {
+    m_mainWidget->clear();
+    m_mainWidget->addWidget(new Wt::WText("Error: no sufficient memory, please upgrade your system first");
+  }
 }
 
 WebMainUI::~WebMainUI()
@@ -345,59 +349,59 @@ void WebMainUI::openFileUploadDialog(void)
 void WebMainUI::finishFileDialog(int action)
 {
   switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("debug", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
+  case IMPORT:
+    if (! m_uploader->empty()) {
+      if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+        LOG("debug", "Parsing the input file");
+        QString tmpFileName(m_uploader->spoolFileName().c_str());
+        CoreDataT cdata;
 
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+        Parser parser(tmpFileName ,&cdata);
+        connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid description file").toStdString();
-            LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+        if (! parser.process(false)) {
+          std::string msg = tr("Invalid description file").toStdString();
+          LOG("warn", msg);
+          showMessage(msg, "alert alert-warning");
+        } else {
+          std::string filename = m_uploader->clientFileName().toUTF8();
+          QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+          QFile file(tmpFileName);
+          file.copy(dest);
+          file.remove();
+
+          View view;
+          view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+          view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+          view.path = dest.toStdString();
+          if (m_dbSession->addView(view) != 0){
+            showMessage(m_dbSession->lastError(), "alert alert-warning");
           } else {
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            View view;
-            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
-            }
+            QString msg = tr("View added. "
+                             " Name: %1\n - "
+                             " Services: %2 -"
+                             " Path: %3").arg(view.name.c_str(),
+                                              QString::number(view.service_count),
+                                              view.path.c_str());
+            showMessage(msg.toStdString(), "alert alert-success");
           }
         }
       }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectedFile.empty()) {
-        WebDashboard* dashbord;
-        loadView(m_selectedFile, dashbord);
-        m_selectedFile.clear();
-      } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
-      }
-      break;
-    default:
-      break;
+    }
+    break;
+  case OPEN:
+    m_fileUploadDialog->accept();
+    m_fileUploadDialog->contents()->clear();
+    if (! m_selectedFile.empty()) {
+      WebDashboard* dashbord;
+      loadView(m_selectedFile, dashbord);
+      m_selectedFile.clear();
+    } else {
+      showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+    }
+    break;
+  default:
+    break;
   }
 }
 

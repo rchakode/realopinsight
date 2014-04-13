@@ -80,6 +80,7 @@ int main(int argc, char **argv)
     }
   } catch (std::exception &e) {
     LOG("error", e.what());
+    exit(1);
   }
   return qtApp.exec();
 }
