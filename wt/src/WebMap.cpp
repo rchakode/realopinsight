@@ -246,7 +246,7 @@ void WebMap::updateThumbnail(void)
   if (m_thumbnailPath.empty()) {
     m_thumbnailPath=boost::filesystem::unique_path("/run/thumb-%%%%%%.svg").string();
   }
-  std::ofstream output(WWW_ROOT.append("/").append(m_thumbnailPath));
+  std::ofstream output(WWW_ROOT + "/" + m_thumbnailPath);
   thumbnailImg.write(output);
 
   m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
