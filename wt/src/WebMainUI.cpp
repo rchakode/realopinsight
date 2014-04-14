@@ -249,7 +249,9 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Critical] = 0;
   problemTypeCount[ngrt4n::Unknown] = 0;
 
+
   for (auto& dash : m_dashboards) {
+    dash.second->initSettings(m_preferences);
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
@@ -397,7 +399,12 @@ void WebMainUI::finishFileDialog(int action)
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget)
 {
   try {
+    dashboardWidget = NULL;
     dashboardWidget = new WebDashboard(path.c_str(), m_eventFeedLayout);
+    if (! dashboardWidget) {
+      showMessage("Cannot allocate the dashboard widget", "alert alert-warning");
+      return ;
+    }
     dashboardWidget->initialize(m_preferences);
     if (dashboardWidget->lastErrorState()) {
       showMessage(dashboardWidget->lastErrorMsg().toStdString(), "alert alert-warning");

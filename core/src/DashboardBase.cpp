@@ -95,7 +95,6 @@ void DashboardBase::initialize(Preferences* preferencePtr)
     if (parser.process(true)) {
       buildTree();
       buildMap();
-      initSettings(preferencePtr);
     } else {
       m_lastErrorState = true;
       m_lastErrorMsg = parser.lastErrorMsg();
