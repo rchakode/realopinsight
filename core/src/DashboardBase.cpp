@@ -74,7 +74,6 @@ DashboardBase::DashboardBase(const QString& descriptionFile)
   : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
     m_cdata (new CoreDataT()),
     m_updateCounter(0),
-    m_settings (new Settings()),
     m_showOnlyTroubles(false),
     m_lastErrorState(false)
 {
@@ -88,6 +87,7 @@ DashboardBase::~DashboardBase()
 
 void DashboardBase::initialize(Preferences* preferencePtr)
 {
+  m_preferences = preferencePtr;
   m_lastErrorState = false;
   if (! m_descriptionFile.isEmpty()) {
     Parser parser(m_descriptionFile, m_cdata);
@@ -95,6 +95,7 @@ void DashboardBase::initialize(Preferences* preferencePtr)
     if (parser.process(true)) {
       buildTree();
       buildMap();
+      initSettings(m_preferences);
     } else {
       m_lastErrorState = true;
       m_lastErrorMsg = parser.lastErrorMsg();
@@ -796,7 +797,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (preferencePtr->isSetSource(srcinfo.second)) {
-        if (m_settings->loadSource(*id, src) && allocSourceHandler(src)) {
+        if (preferencePtr->loadSource(*id, src) && allocSourceHandler(src)) {
           m_sources.insert(srcinfo.second, src);
         } else {
           src.id = *id;
@@ -855,7 +856,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
   {
     Q_FOREACH (const qint8& id, ids) {
       SourceT newsrc;
-      m_settings->loadSource(id, newsrc);
+      m_preferences->loadSource(id, newsrc);
       SourceListT::Iterator olddata = m_sources.find(id);
       if (olddata != m_sources.end()) {
         switch (olddata->mon_type) {
@@ -941,7 +942,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
 
 void DashboardBase::resetInterval()
 {
-  m_interval = 1000 * m_settings->updateInterval();
+  m_interval = 1000 * m_preferences->updateInterval();
   timerIntervalChanged(m_interval);
 }
 

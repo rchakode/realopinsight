@@ -63,7 +63,6 @@ GuiPreferences::~GuiPreferences()
 {
   switch(m_formType) {
     case ChangeMonitoringSettings:
-      delete m_sourceStates;
       delete m_monitorTypeField;
       delete m_monitorUrlField;
       delete m_updateIntervalField;
@@ -148,7 +147,7 @@ void GuiPreferences::updateAllSourceWidgetStates(void)
 {
   int size = m_sourceBtns.size();
   for (int i=0; i < size; ++i) {
-    m_sourceBtns.at(i)->setEnabled(m_sourceStates->at(i));
+    m_sourceBtns.at(i)->setEnabled(getSourceState(i));
   }
 }
 
@@ -397,7 +396,7 @@ void GuiPreferences::updateFields(void)
     m_monitorTypeField->setCurrentIndex(0);
     m_useNgrt4ndChkbx->setCheckState(Qt::Unchecked);
     m_verifySslPeerChkBx->setCheckState(Qt::Unchecked);
-    m_updateIntervalField->setValue(m_settings->updateInterval());
+    m_updateIntervalField->setValue(updateInterval());
   }
 }
 
@@ -422,11 +421,10 @@ void GuiPreferences::changePasswd(void)
 
   if (m_userRole == ngrt4n::AdmUserRole) {
     key = Settings::ADM_PASSWD_KEY;
-    userPasswd = m_settings->value(key,
-                                   QString::fromStdString(ngrt4n::AdmUser)).toString();
+    userPasswd = value(key, QString::fromStdString(ngrt4n::AdmUser));
   } else {
     key = Settings::OP_PASSWD_KEY;
-    userPasswd = m_settings->value(key, QString::fromStdString(ngrt4n::OpUser)).toString();
+    userPasswd = value(key, QString::fromStdString(ngrt4n::OpUser));
   }
   passwd = QCryptographicHash::hash(ngrt4n::toByteArray(m_oldPwdField->text()), QCryptographicHash::Md5);
   newPasswd = QCryptographicHash::hash(ngrt4n::toByteArray(m_pwdField->text()), QCryptographicHash::Md5);
@@ -434,7 +432,7 @@ void GuiPreferences::changePasswd(void)
 
   if (userPasswd == passwd) {
     if(newPasswd == renewPasswd) {
-      m_settings->setKeyValue(key, newPasswd);
+      setKeyValue(key, newPasswd);
       QMessageBox::information(m_dialog,
                                APP_NAME,
                                tr("Password updated"),
@@ -458,7 +456,7 @@ void GuiPreferences::handleDonate(void)
 void GuiPreferences::fillFromSource(int _sidx)
 {
   SourceT src;
-  m_settings->loadSource(_sidx, src);
+  loadSource(_sidx, src);
   m_monitorUrlField->setText(src.mon_url);
   m_sockAddrField->setText(src.ls_addr);
   m_sockPortField->setText(QString::number(src.ls_port));
@@ -466,7 +464,7 @@ void GuiPreferences::fillFromSource(int _sidx)
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
   m_useNgrt4ndChkbx->setCheckState(static_cast<Qt::CheckState>(src.use_ngrt4nd));
   m_verifySslPeerChkBx->setCheckState(src.verify_ssl_peer? Qt::Unchecked : Qt::Checked);
-  m_updateIntervalField->setValue(m_settings->updateInterval());
+  m_updateIntervalField->setValue(updateInterval());
 
   setCurrentSourceIndex(_sidx);
 }
@@ -496,12 +494,12 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   src.auth = m_serverPassField->text();
   src.use_ngrt4nd = m_useNgrt4ndChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
-  m_settings->setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
-  m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
-  m_sourceStates->setBit(index, true);
-  m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
-  m_settings->sync();
-  m_settings->emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
+  setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
+  setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  setSourceState(index, true);
+  setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  sync();
+  emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
   if (! m_updatedSources.contains(index)) {
     //FIXME: consider only if source is used in the loaded service view?
@@ -631,9 +629,9 @@ void GuiPreferences::deleteSource(void)
   int curIndex = currentSourceIndex();
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBtns.at(curIndex)->setEnabled(false);
-    m_sourceStates->setBit(curIndex, false);
-    m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
-    m_settings->sync();
+    setSourceState(curIndex, false);
+    setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    sync();
     updateFields();
   }
 }

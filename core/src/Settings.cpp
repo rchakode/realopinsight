@@ -101,11 +101,18 @@ void Settings::setEntry(const QString& key, const QString& value)
 
 bool Settings::loadSource(qint32 _idx, SourceT& _src)
 {
+  qDebug() << _idx
+           << ngrt4n::sourceKey(_idx)
+           << QSettings::value(ngrt4n::sourceKey(_idx)).toString()
+           << fileName();
   return setSource(QSettings::value(ngrt4n::sourceKey(_idx)).toString(), _src);
 }
 
 bool Settings::loadSource(const QString& _id, SourceT& _src)
 {
+  qDebug() << _id << ngrt4n::sourceKey(_id)
+           << QSettings::value(ngrt4n::sourceKey(_id)).toString()
+              << fileName();
   return setSource(QSettings::value(ngrt4n::sourceKey(_id)).toString(), _src);
 }
 

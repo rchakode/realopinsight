@@ -31,6 +31,12 @@
 #include <QIntValidator>
 #include <QRegExpValidator>
 
+Preferences::Preferences(const QString& settingFile)
+  : m_settings(new Settings(settingFile)),
+    m_currentSourceIndex(0),
+    m_sourceStates(new QBitArray(MAX_SRCS))
+{
+}
 Preferences::Preferences(void)
   : m_settings(new Settings()),
     m_currentSourceIndex(0),
@@ -38,15 +44,10 @@ Preferences::Preferences(void)
 {
 }
 
-Preferences::Preferences(const QString& settingFile)
-  : m_settings(new Settings(settingFile)),
-    m_currentSourceIndex(0),
-    m_sourceStates(new QBitArray(MAX_SRCS))
-{
-}
 
 Preferences::~Preferences()
 {
+  delete m_sourceStates;
 }
 
 
@@ -78,7 +79,7 @@ void Preferences::initSourceStates(const QString& str)
     }
   } else {
     for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, str.at(i).digitValue());
+      m_sourceStates->setBit(i, str.at(i) == '1');
     }
   }
 }

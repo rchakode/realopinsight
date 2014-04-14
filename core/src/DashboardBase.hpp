@@ -112,7 +112,6 @@ private:
   qint32 m_userRole;
   qint32 m_interval;
   qint32 m_timerId;
-  Settings* m_settings;
   QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
@@ -120,6 +119,7 @@ private:
   int m_firstSrcIndex;
   bool m_lastErrorState;
   QString m_lastErrorMsg;
+  Preferences* m_preferences;
 
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);

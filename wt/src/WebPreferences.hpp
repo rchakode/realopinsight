@@ -50,7 +50,7 @@ public:
 
   WebPreferences(void);
   virtual ~WebPreferences();
-  void setEnabledInputs(bool enable);
+  virtual void setEnabledInputs(bool enable);
   Wt::Signal<std::string>& errorOccurred() {return m_errorOccurred;}
 
 protected :

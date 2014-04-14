@@ -46,8 +46,8 @@ public:
     WebForm
   };
 
-  Preferences(void);
   Preferences(const QString& settingFile);
+  Preferences(void);
   virtual ~Preferences();
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
@@ -57,6 +57,11 @@ Q_SIGNALS:
   void urlChanged(QString);
   void sourcesChanged (QList<qint8>);
   void errorOccurred(QString msg);
+
+public Q_SLOTS:
+  qint32 updateInterval(void) const {return m_settings->updateInterval();}
+  bool loadSource(qint32 _id, SourceT& _src) {return m_settings->loadSource(_id, _src);}
+  bool loadSource(const QString& _id, SourceT& _src) {return m_settings->loadSource(_id, _src);}
 
 protected :
   virtual void fillFromSource(int _sidx) = 0;
@@ -72,14 +77,15 @@ protected :
   void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
   void sync(void) {m_settings->sync();}
   void setEntry(const QString& key, const QString& value) {m_settings->setEntry(key, value);}
-  bool loadSource(qint32 _id, SourceT& _src) {return m_settings->loadSource(_id, _src);}
+  QString value(const QString& key, const QString& defaultValue) {return m_settings->value(key, defaultValue).toString(); }
+  void setKeyValue(const QString & _key, const QString & _value) {m_settings->setKeyValue(_key, _value);}
+  bool getSourceState(int index) {return m_sourceStates->at(index);}
 
 protected Q_SLOTS:
   virtual void applyChanges(void) = 0;
   virtual void handleCancel(void) = 0;
   virtual void addAsSource(void) = 0;
   virtual void deleteSource(void) = 0;
-  qint32 updateInterval(void) const {return m_settings->updateInterval();}
   void emitTimerIntervalChanged(qint32 _interval) {m_settings->emitTimerIntervalChanged(_interval);}
 
 private:
