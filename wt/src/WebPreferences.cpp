@@ -158,20 +158,21 @@ void WebPreferences::applyChanges(void)
     m_errorOccurred.emit(QObject::tr("Bad monitor type").toStdString());
     return;
   }
-  if (m_currentSourceIndex < 0) {
-    m_errorOccurred.emit(QObject::tr("Bad index for source (%1)").arg(m_currentSourceIndex).toStdString());
+  if (currentSourceIndex() < 0) {
+    m_errorOccurred.emit(QObject::tr("Bad index for source (%1)").arg(currentSourceIndex()).toStdString());
     return;
   }
-  saveAsSource(m_currentSourceIndex, m_monitorTypeField->currentText().toUTF8().c_str());
+  saveAsSource(currentSourceIndex(), m_monitorTypeField->currentText().toUTF8().c_str());
 }
 
 void WebPreferences::deleteSource(void)
 {
-  if (m_currentSourceIndex>=0 && m_currentSourceIndex < MAX_SRCS) {
-    m_sourceBoxModel->removeRow(m_currentSourceIndex);
-    m_sourceStates->setBit(m_currentSourceIndex, false);
-    m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
-    m_settings->sync();
+  int curIndex = currentSourceIndex();
+  if (curIndex >= 0 && curIndex < MAX_SRCS) {
+    m_sourceBoxModel->removeRow(currentSourceIndex());
+    setSourceState(currentSourceIndex(), false);
+    setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    sync();
     updateFields();
   }
 }
@@ -180,7 +181,7 @@ void WebPreferences::deleteSource(void)
 void WebPreferences::fillFromSource(int _sidx)
 {
   SourceT src;
-  m_settings->loadSource(_sidx, src);
+  loadSource(_sidx, src);
   m_monitorUrlField->setText(src.mon_url.toStdString());
   m_livestatusHostField->setText(src.ls_addr.toStdString());
   m_livestatusPortField->setText(QString::number(src.ls_port).toStdString());
@@ -188,8 +189,8 @@ void WebPreferences::fillFromSource(int _sidx)
   m_monitorTypeField->setCurrentIndex(src.mon_type+1);
   m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
   m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
-  m_updateIntervalField->setValue(m_settings->updateInterval());
-  m_currentSourceIndex = _sidx;
+  m_updateIntervalField->setValue(updateInterval());
+  setCurrentSourceIndex(_sidx);
 }
 
 
@@ -208,10 +209,11 @@ void WebPreferences::updateAllSourceWidgetStates(void)
 
 void WebPreferences::updateFields(void)
 {
-  m_currentSourceIndex = firstSourceSet();
-  if (m_currentSourceIndex >= 0) {
-    m_sourceBox->setCurrentIndex(m_currentSourceIndex);
-    fillFromSource(m_currentSourceIndex);
+  setCurrentSourceIndex(firstSourceSet());
+  int curIndex = currentSourceIndex();
+  if (curIndex >= 0) {
+    m_sourceBox->setCurrentIndex(curIndex);
+    fillFromSource(curIndex);
     m_applyChangeBtn->setDisabled(false);
     m_addAsSourceBtn->setDisabled(false);
     m_deleteSourceBtn->setDisabled(false);
@@ -229,12 +231,12 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   src.auth = m_authStringField->text().toUTF8().c_str();
   src.use_ngrt4nd = m_useNgrt4ndField->checkState();
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
-  m_settings->setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
-  m_settings->setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
-  m_sourceStates->setBit(index, true);
-  m_settings->setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
-  m_settings->sync();
-  m_settings->emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
+  setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
+  setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
+  setSourceState(index, true);
+  setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  sync();
+  emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
   addToSourceBox(index);
   m_sourceBox->setCurrentIndex(findSourceIndexInBox(index));
 }
@@ -286,7 +288,7 @@ void WebPreferences::handleInput(const std::string& input, int inputType)
 {
   switch(inputType) {
   case SourceIndexInput:
-    m_currentSourceIndex = input[0]-48;
+    setCurrentSourceIndex(input[0]-48);
     applyChanges();
     break;
   default:

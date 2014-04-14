@@ -51,6 +51,7 @@ public:
   virtual ~Preferences();
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
+  void setSourceState(int index, int value) {m_sourceStates->setBit(index, value);}
 
 Q_SIGNALS:
   void urlChanged(QString);
@@ -65,7 +66,13 @@ protected :
   virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
   virtual int firstSourceSet(void);
   virtual void initSourceStates();
+  void initSourceStates(const QString& str);
   QString getSourceStatesSerialized(void);
+  int currentSourceIndex(void) const {return m_currentSourceIndex;}
+  void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
+  void sync(void) {m_settings->sync();}
+  void setEntry(const QString& key, const QString& value) {m_settings->setEntry(key, value);}
+  bool loadSource(qint32 _id, SourceT& _src) {return m_settings->loadSource(_id, _src);}
 
 protected Q_SLOTS:
   virtual void applyChanges(void) = 0;
@@ -73,13 +80,13 @@ protected Q_SLOTS:
   virtual void addAsSource(void) = 0;
   virtual void deleteSource(void) = 0;
   qint32 updateInterval(void) const {return m_settings->updateInterval();}
+  void emitTimerIntervalChanged(qint32 _interval) {m_settings->emitTimerIntervalChanged(_interval);}
 
-protected:
+private:
   Settings* m_settings;
   int m_currentSourceIndex;
   QBitArray* m_sourceStates;
 
-  void initSourceStates(const QString& str);
 };
 
 

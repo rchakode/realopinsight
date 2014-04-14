@@ -99,7 +99,7 @@ void Settings::setEntry(const QString& key, const QString& value)
   QSettings::setValue(key, value);
 }
 
-bool Settings::loadSource(const qint32& _idx, SourceT& _src)
+bool Settings::loadSource(qint32 _idx, SourceT& _src)
 {
   return setSource(QSettings::value(ngrt4n::sourceKey(_idx)).toString(), _src);
 }

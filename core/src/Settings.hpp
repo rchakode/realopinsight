@@ -40,7 +40,7 @@ public:
   qint32 updateInterval() const;
   void setEntry(const QString& key, const QString& value);
   QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
-  bool loadSource(const qint32& _idx, SourceT& _src);
+  bool loadSource(qint32 _idx, SourceT& _src);
   bool loadSource(const QString& _id, SourceT& _src);
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
