@@ -105,7 +105,7 @@ install_wt()
 				  apache2 libapache2-mod-fastcgi \
 				  > /dev/null
 				  
-  echo "DEBUG : Download wt..."
+  echo "DEBUG : Downloading wt..."
   wget http://prdownloads.sourceforge.net/witty/wt-${WT_VERSION}.tar.gz
   
   echo "DEBUG : Untar archive and move to build dir..."
@@ -122,6 +122,9 @@ install_wt()
   
   echo "DEBUG : Installing..."
   make install
+  
+  echo "DEBUG : Updating ld..."
+  ldconfig 
   
   echo "DEBUG : Move to base directory"
   cd ${BASE_BUILD_DIR}   
@@ -244,7 +247,7 @@ install_ultimate() {
   # check dependencies
   check_prerequisites
     
-  echo "Patching the project file for REALOPINSIGHT_WWW..."
+  echo "DEBUG : Patching the project file for REALOPINSIGHT_WWW..."
   sed --in-place 's!/var/www/realopinsight!'"${REALOPINSIGHT_WWW}"'!' ngrt4n.pro
   
   echo "DEBUG : Generating locale file"
@@ -287,12 +290,12 @@ install_ultimate() {
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
-  echo "Configuring Apache..."
+  echo "DEBUG : Configuring Apache..."
   sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
   a2enmod fastcgi
   a2enconf realopinsight-ultimate
   
-  echo "Reloading Apache"
+  echo "DEBUG : Reloading Apache"
   service apache2 reload
   
   echo "==>Installation completed"
