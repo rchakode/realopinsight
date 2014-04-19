@@ -24,10 +24,14 @@ set -e
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
 VERSION_BKR="1.0"
+WT_VERSION=3.3.2
+WT_SRC_DIR=wt/extlibs
+BASE_BUILD_DIR=`pwd`
 
 # Print help
 #
-usage(){
+usage()
+{
   echo
   echo "Usage: `basename $0` [OPTION]"
   echo "OPTIONS"
@@ -39,27 +43,85 @@ usage(){
   echo "	  Shows this help"
 }
 
-prompt_copyright(){ 
-echo
-echo "Thanks for choosing RealOpInsight Workstation."
-echo
-echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
-echo
-echo "Type 'y' to accept this license offer."
-echo "Type 'n' to decline this license offer."
-echo "Type 'r' to view this license offer."
-echo
-while true; do
-read -p "Do you accept the terms of the License ? y/N/r " rep
-  case $rep in
-	r) more COPYING ; echo ;;
-	y) break ;;
-	*) exit 0 ;; 
-  esac
-done
+prompt_copyright()
+{ 
+  echo
+  echo "Thanks for choosing RealOpInsight Workstation."
+  echo
+  echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
+  echo
+  echo "Type 'y' to accept this license offer."
+  echo "Type 'n' to decline this license offer."
+  echo "Type 'r' to view this license offer."
+  echo
+  while true; do
+    read -p "Do you accept the terms of the License ? y/N/r " rep
+    case $rep in
+	  r) more COPYING ; echo ;;
+	  y) break ;;
+	  *) exit 0 ;; 
+    esac
+  done
 }
-install_daemon(){
+
+install_wt()
+{
+  if [ ! -e /etc/lsb-release ]; then
+    echo "ERROR: Distribution not supported"
+	exit 1
+  fi
   
+  . /etc/lsb_release
+  
+  echo "DEBUG : Distribution $DISTRIB_ID"
+  
+  echo "DEBUG : Installing Wt dependencies..."
+  apt-get install -y g++ \
+                  make \
+                  cmake  \
+				  graphviz \
+				  libzmq1 libzmq-dev \
+				  libqt4-dev libqt4-webkit \
+                  libsqlite-dev \
+				  libssl-dev \
+				  libgraphicsmagick++1-dev \
+				  libpango1.0-dev \
+				  libboost-program-options1.54 \
+				  libboost-system1.54 \
+				  libboost-thread1.54 \
+				  libboost-regex1.54 \
+				  libboost-signals1.54  \
+				  libboost-filesystem1.54 \
+				  libboost-date-time1.54 \
+				  libboost-program-options1.54-dev \
+				  libboost-system1.54-dev \
+				  libboost-thread1.54-dev \
+                  libboost-regex1.54-dev \
+				  libboost-signals1.54-dev \
+				  libboost-filesystem1.54-dev \
+				  libboost-date-time1.54-dev \
+				  libboost-random1.54-dev \
+				  apache2 libapache2-mod-fastcgi
+				  
+  echo "DEBUG : Generating sources and dependencies..."
+  tar zxf ${WT_SRC_DIR}/wt-${WT_VERSION}.tar.gz && cd wt-${WT_VERSION}
+  mkdir build && cd build
+  cmake ..  -DWEBUSER=${REALOPINSIGHT_WWW_USER} \
+            -DWEBGROUP=REALOPINSIGHT_WWW_GROUP \
+            -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick
+			
+  echo "DEBUG : Building..."
+  make
+  
+  echo "DEBUG : Installing..."
+  make install
+  
+  echo "DEBUG : Move to base directory"
+  cd ${BASE_BUILD_DIR}   
+}
+
+install_daemon()
+{  
   echo "==>Installing the Daemon Service for Nagios..."  
   echo -n "DEGUG : Checking prerequises..." 
   ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
@@ -76,7 +138,8 @@ install_daemon(){
   echo "==>Installation completed"
 }
 
-check_prerequisites(){
+check_prerequisites()
+{
   echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
   [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
   echo "done"
@@ -168,9 +231,12 @@ install_ultimate() {
 	exit 1
   fi  
   
-  # checking dependencies
+  # check dependencies
   check_prerequisites
-  
+
+  echo "DEBUG : Installing Wt..."
+  install_wt
+    
   echo "Patching the project file for REALOPINSIGHT_WWW..."
   sed --in-place 's!/var/www/realopinsight!'"${REALOPINSIGHT_WWW}"'!' ngrt4n.pro
   
@@ -216,6 +282,7 @@ install_ultimate() {
   
   echo "Configuring Apache..."
   sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${APACHE_ROOT}/conf-available/realopinsight-ultimate.conf
+  a2enmod fastcgi
   a2enconf realopinsight-ultimate
   
   echo "Reloading Apache"
