@@ -95,7 +95,7 @@
   <!-- 2nd thumnail -->
   <div class="span-one-third">
           <div class="thumbnail">
-            <div class="title">Upload and Assign</div>
+            <div class="title">Assign</div>
             <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
             <p>Once created, upload the description files into the RealOpInsight Datastore.
             Then check preview them to ensure they suit your monitoring needs.
