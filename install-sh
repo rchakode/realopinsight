@@ -71,7 +71,7 @@ install_wt()
 	exit 1
   fi
   
-  . /etc/lsb_release
+  . /etc/lsb-release
   
   echo "DEBUG : Distribution $DISTRIB_ID"
   
@@ -101,17 +101,24 @@ install_wt()
 				  libboost-filesystem1.54-dev \
 				  libboost-date-time1.54-dev \
 				  libboost-random1.54-dev \
-				  apache2 libapache2-mod-fastcgi
+				  libfcgi libfcgi-dev \
+				  apache2 libapache2-mod-fastcgi \
+				  > /dev/null
 				  
-  echo "DEBUG : Generating sources and dependencies..."
+  echo "DEBUG : Download wt..."
+  wget http://prdownloads.sourceforge.net/witty/wt-${WT_VERSION}.tar.gz
+  
+  echo "DEBUG : Untar archive and move to build dir..."
   tar zxf ${WT_SRC_DIR}/wt-${WT_VERSION}.tar.gz && cd wt-${WT_VERSION}
   mkdir build && cd build
+  
+  echo "DEBUG : Run cmake"
   cmake ..  -DWEBUSER=${REALOPINSIGHT_WWW_USER} \
             -DWEBGROUP=REALOPINSIGHT_WWW_GROUP \
             -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick
 			
   echo "DEBUG : Building..."
-  make
+  make > /dev/null
   
   echo "DEBUG : Installing..."
   make install
@@ -123,15 +130,15 @@ install_wt()
 install_daemon()
 {  
   echo "==>Installing the Daemon Service for Nagios..."  
-  echo -n "DEGUG : Checking prerequises..." 
+  echo -n "DEBUG : Checking prerequises..." 
   ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
   echo done
   
-  echo -n "DEGUG : Compiling..."
+  echo -n "DEBUG : Compiling..."
   make -Bj${NCPU} 1>>install.log
   echo done
   
-  echo -n "DEGUG : Installation..."
+  echo -n "DEBUG : Installation..."
   make install 1>>install.log
   cd ..
   echo "done" 
@@ -140,19 +147,19 @@ install_daemon()
 
 check_prerequisites()
 {
-  echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
+  echo -n "DEBUG : Checking qmake => ${QMAKE:=`which qmake`}... "
   [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "
+  echo -n "DEBUG : Checking make => ${MAKE:=`which make`}... "
   [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking C++ compiler => ${CXX:=`which g++`}... "
+  echo -n "DEBUG : Checking C++ compiler => ${CXX:=`which g++`}... "
   [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  echo -n "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
   [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
   echo "done"
 }
@@ -179,15 +186,15 @@ install_workstation() {
   echo "==>Installing RealOpInsight Workstation..."  
   check_prerequisites
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
-  echo -n "DEGUG : Current component => Manager..."
+  echo -n "DEBUG : Current component => Manager..."
   install_default
   echo "done"
   
-  echo -n "DEGUG : Current component => Editor..."
+  echo -n "DEBUG : Current component => Editor..."
   install_editor
   echo "done"
   
-  echo -n "DEGUG : Current component => Operator Console..."
+  echo -n "DEBUG : Current component => Operator Console..."
   install_oc
   echo "done"
   echo "==>Installation completed"
@@ -231,11 +238,11 @@ install_ultimate() {
 	exit 1
   fi  
   
+  #echo "DEBUG : Installing Wt and other dependencies..."
+  #install_wt
+  
   # check dependencies
   check_prerequisites
-
-  echo "DEBUG : Installing Wt..."
-  install_wt
     
   echo "Patching the project file for REALOPINSIGHT_WWW..."
   sed --in-place 's!/var/www/realopinsight!'"${REALOPINSIGHT_WWW}"'!' ngrt4n.pro
@@ -243,13 +250,13 @@ install_ultimate() {
   echo "DEBUG : Generating locale file"
   lrelease ngrt4n.pro
   
-  echo "DEGUG : Building the Standalone Server..."
+  echo "DEBUG : Building the Standalone Server..."
   install_webd
   
-  echo "DEGUG : Building the FastCGI Module..."
+  echo "DEBUG : Building the FastCGI Module..."
   install_fcgi
   
-  echo "DEGUG : Copy files..."
+  echo "DEBUG : Copy files..."
 
   echo "DEBUG : creating directories..."
   install -d ${REALOPINSIGHT_CONFIG}
