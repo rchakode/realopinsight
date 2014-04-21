@@ -66,7 +66,7 @@ WebPreferences::WebPreferences(void)
   }
 
   m_monitorTypeField->changed().connect(std::bind([=]() {
-    if (m_sourceBox->currentIndex() != 1) {
+    if (m_monitorTypeField->currentIndex() != 1) {
       m_livestatusHostField->setEnabled(false);
       m_livestatusPortField->setEnabled(false);
     } else {
