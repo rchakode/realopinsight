@@ -404,8 +404,15 @@
       <span>${monitor-url}</span>
       <span>${dont-verify-ssl-certificate}</span>
      </div>
+
+     <div class="control-group">
+      <label class="control-label">Auth String&nbsp;</label>
+      <span>${auth-string}</span>
+      <span>${show-in-clear}</span>
+     </div>
     </fieldset>
-    <fieldset>
+
+    <fieldset id="livetstatus-section">
     <h6>Livestatus Socket</h6>
     <div class="control-group">
       <label class="control-label">Host&nbsp;</label>
@@ -415,11 +422,6 @@
       <span>${use-ngrt4nd}</span>
     </div>
     </fieldset>
-    <div class="control-group">
-      <label class="control-label">Auth String&nbsp;</label>
-      <span>${auth-string}</span>
-      <span>${show-in-clear}</span>
-    </div>
 
     <div class="form-actions">
       <span>${apply-change-button}</span>
