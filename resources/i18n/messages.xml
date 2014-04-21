@@ -432,19 +432,19 @@
 </message>
 
 <message id="about-tpl">
-   <legend>${software} ${version}</legend>
+   <legend>${software}</legend>
    <p class="pull-left">
       <img src="images/built-in/logo.png" />
     </p>
     <p class="pull-right">
-          Codename: ${codename}<br />
           Core Version: ${corelib-version}<br />
-          Release ID: ${release-id}
+          Codename: ${codename}<br />
+          Release ID: ${release-id} <br />
+          Bug report: <a href="mailto:${bug-report-email}">${bug-report-email}</a>
     </p>
     <div class="clearfix"></div>
     <p class="text-center">
-          Copyright &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved.<br/>
-        <a href="${package-url}" target="_blank">User Terms and Conditions</a>.
+      Copyright &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved
     </p>
     <div style="float: right;">${close-button}</div>
 </message>
