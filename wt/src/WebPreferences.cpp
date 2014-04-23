@@ -33,6 +33,7 @@
 #include <Wt/WLineEdit>
 #include <Wt/WPushButton>
 #include <Wt/WIntValidator>
+#include <Wt/WApplication>
 
 
 #define VALIDATE_FIELDS()   if (m_monitorTypeField->validate() != Wt::WValidator::Valid \
@@ -66,24 +67,23 @@ WebPreferences::WebPreferences(void)
   }
 
   m_monitorTypeField->changed().connect(std::bind([=]() {
-    if (m_sourceBox->currentIndex() != 1) {
-      m_livestatusHostField->setEnabled(false);
-      m_livestatusPortField->setEnabled(false);
+    if (m_monitorTypeField->currentIndex() != 1) {
+      wApp->doJavaScript("$('#livetstatus-section').hide();");
     } else {
-      m_livestatusHostField->setEnabled(true);
-      m_livestatusPortField->setEnabled(true);
+      wApp->doJavaScript("$('#livetstatus-section').show();");
     }
   }));
   tpl->bindWidget("monitor-type", m_monitorTypeField.get());
 
   m_monitorUrlField.reset(new Wt::WLineEdit(this));
   m_monitorUrlField->setValidator(createTextValidator());
-  m_monitorUrlField->setEmptyText("e.g. http://server.example.com/monitor");
+  m_monitorUrlField->setEmptyText("Set the url to the monitor web interface");
   tpl->bindWidget("monitor-url", m_monitorUrlField.get());
 
   m_authStringField.reset(new Wt::WLineEdit(this));
   tpl->bindWidget("auth-string", m_authStringField.get());
   m_authStringField->setEchoMode(Wt::WLineEdit::Password);
+  m_authStringField->setEmptyText("Set the authentication string");
 
   m_showAuthStringField.reset(new Wt::WCheckBox(QObject::tr("Show in clear").toStdString(), this));
   tpl->bindWidget("show-in-clear", m_showAuthStringField.get());

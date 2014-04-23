@@ -683,7 +683,6 @@ void WebMainUI::createAboutDialog(void)
   tpl->bindString("codename", REL_NAME.toStdString());
   tpl->bindString("release-id", REL_INFO.toStdString());
   tpl->bindString("release-year", REL_YEAR.toStdString());
-  tpl->bindString("package-url", PKG_URL.toStdString());
   tpl->bindString("bug-report-email", REPORT_BUG.toStdString());
   tpl->bindWidget("close-button", closeButton);
 }
