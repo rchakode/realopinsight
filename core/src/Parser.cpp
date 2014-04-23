@@ -120,7 +120,10 @@ bool Parser::process(bool console)
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
 
-  return computeNodeCoordinates();
+  if (console)
+    return computeNodeCoordinates();
+  else
+    return true;
 }
 
 void Parser::updateNodeHierachy(QString& _graphContent)
