@@ -27,8 +27,6 @@
 #include "utilsCore.hpp"
 #include <QObject>
 
-using namespace std;
-
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
