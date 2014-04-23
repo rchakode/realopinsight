@@ -123,7 +123,7 @@ void ServiceEditor::setEnableFields(const bool& _enable)
   mitems[NOTIFICATION_MSG_FIELD]->setEnabled(_enable);
 }
 
-bool ServiceEditor::updateNode(NodeListT& _node_map, const QString& _node_id)
+bool ServiceEditor::updateNodeContent(NodeListT& _node_map, const QString& _node_id)
 {
   NodeListT::iterator node = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
   if( node != _node_map.end()) {
@@ -143,32 +143,30 @@ bool ServiceEditor::updateNode(NodeListT& _node_map, const QString& _node_id)
 }
 
 
-bool ServiceEditor::updateNode(NodeListT::iterator& _node)
+bool ServiceEditor::updateNodeContent(NodeListT::iterator& node)
 {
-  _node->name = nameField()->text();
-  _node->type = typeField()->currentIndex();
-  _node->sev_crule = statusCalcRuleField()->currentIndex();
-  _node->sev_prule = statusPropRuleField()->currentIndex();
-  _node->icon = iconField()->currentText();
-  _node->description = descriptionField()->toPlainText();
-  _node->alarm_msg  = alarmMsgField()->toPlainText();
-  _node->notification_msg = notificationMsgField()->toPlainText();
-  if(_node->type == NodeType::AlarmNode)
-    _node->child_nodes = checkField()->currentText();
+  node->name             = nameField()->text();
+  node->type             = typeField()->currentIndex();
+  node->sev_crule        = statusCalcRuleField()->currentIndex();
+  node->sev_prule        = statusPropRuleField()->currentIndex();
+  node->icon             = iconField()->currentText();
+  node->description      = descriptionField()->toPlainText();
+  node->alarm_msg        = alarmMsgField()->toPlainText();
+  node->notification_msg = notificationMsgField()->toPlainText();
+  if(node->type == NodeType::AlarmNode) node->child_nodes = checkField()->currentText();
 
   return true;
 }
 
-void ServiceEditor::setContent(const NodeListT& _node_map, const QString& _nodeId)
+void ServiceEditor::fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId)
 {
-  NodeListT::const_iterator node = _node_map.find(_nodeId);
-  if( node != _node_map.end())
-    setContent(node);
+  NodeListT::const_iterator node = nodes.find(nodeId);
+  if( node != nodes.end()) fillFormWithNodeContent(node);
 }
 
 
 
-void ServiceEditor::setContent(const NodeT& _node)
+void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);

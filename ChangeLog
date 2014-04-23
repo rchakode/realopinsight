@@ -3,6 +3,7 @@ RealOpInsight ChangeLog
 ###############################
 3.0.0b2
   * Fixed chart tooltip, ratios were multiplied by 16
+  * Fixed Editor file open when the name of the root service is altered
 
 3.0.0b1 (Eliana, b1)
   * Lot of refactoring and code simplification

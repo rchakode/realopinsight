@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ServiceView compat="2.0" monitor="2">
 <Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Hosting Platform [ZENOSS]</Name>
+ <Name>Customer C [ZENOSS]</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -120,13 +120,21 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S154643802,S154659138,S073824371</SubServices>
 </Service>
-<Service id="S232705693" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Availability</Name>
- <Icon>Other Check</Icon>
- <Description>Host availability</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
+<Service id="S232532458" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>xend</Name>
+ <Icon>Process</Icon>
+ <Description>Xen daemon</Description>
+ <AlarmMsg>The process xend is down</AlarmMsg>
+ <NotificationMsg>The process xend is now up</NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S232842975" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>nfsd</Name>
+ <Icon>Process</Icon>
+ <Description>NFS server daemon</Description>
+ <AlarmMsg>The NFS daemon is down</AlarmMsg>
+ <NotificationMsg>The NFS daemon is now up</NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
 </Service>
 <Service id="S181629167" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Load</Name>
@@ -135,6 +143,70 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S003842685" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>ssh</Name>
+ <Icon>Process</Icon>
+ <Description>Connection to SSH server at xen02</Description>
+ <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+ <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S232612395" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Availability</Name>
+ <Icon>Other Check</Icon>
+ <Description>Host availability</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost</SubServices>
+</Service>
+<Service id="S073824371" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>mysql</Name>
+ <Icon>Database Engine</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost/mysqld</SubServices>
+</Service>
+<Service id="S232525850" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>libvirtd</Name>
+ <Icon>Process</Icon>
+ <Description>libvirt daemon</Description>
+ <AlarmMsg>The process libvirtd is down</AlarmMsg>
+ <NotificationMsg>The process libvirtd is running</NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S020232626" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Disk Space</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S181611135" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Memory Usage</Name>
+ <Icon>Other Check</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S233042914" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>NFS Badcalls</Name>
+ <Icon>Logfile</Icon>
+ <Description>Number of NFS badcalls on 30 mins</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
+<Service id="S232705693" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Availability</Name>
+ <Icon>Other Check</Icon>
+ <Description>Host availability</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost</SubServices>
 </Service>
 <Service id="S003820357" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>ssh</Name>
@@ -150,14 +222,6 @@
  <Description>libvirt daemon</Description>
  <AlarmMsg>The process libvirtd is down</AlarmMsg>
  <NotificationMsg>The process libvirtd is running</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S181611135" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Memory Usage</Name>
- <Icon>Other Check</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
  <SubServices>localhost/ssh</SubServices>
 </Service>
 <Service id="S003857309" type="1" statusCalcRule="0" statusPropRule="0">
@@ -224,6 +288,14 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>localhost/mysqld</SubServices>
 </Service>
+<Service id="S181349742" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Swap Usage</Name>
+ <Icon>Other Check</Icon>
+ <Description>Check swap usage</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost/ssh</SubServices>
+</Service>
 <Service id="S230727734" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
  <Icon>Hard disk</Icon>
@@ -256,6 +328,14 @@
  <NotificationMsg>The OpenNebula daemon is now up</NotificationMsg>
  <SubServices>localhost/ssh</SubServices>
 </Service>
+<Service id="S181551014" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Avalability</Name>
+ <Icon>Other Check</Icon>
+ <Description>Host availability</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>localhost</SubServices>
+</Service>
 <Service id="S003801812" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>ssh</Name>
  <Icon>Process</Icon>
@@ -264,7 +344,7 @@
  <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
  <SubServices>localhost/ssh</SubServices>
 </Service>
-<Service id="S232540042" type="1" statusCalcRule="0" statusPropRule="0">
+<Service id="S181448973" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
  <Icon>Other Check</Icon>
  <Description>Host availability</Description>
@@ -272,13 +352,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>localhost</SubServices>
 </Service>
-<Service id="S181349742" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Swap Usage</Name>
+<Service id="S232540042" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Availability</Name>
  <Icon>Other Check</Icon>
- <Description>Check swap usage</Description>
+ <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>localhost</SubServices>
 </Service>
 <Service id="S230632845" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
@@ -296,62 +376,6 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>localhost/ssh</SubServices>
 </Service>
-<Service id="S181551014" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Avalability</Name>
- <Icon>Other Check</Icon>
- <Description>Host availability</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
-</Service>
-<Service id="S181448973" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Availability</Name>
- <Icon>Other Check</Icon>
- <Description>Host availability</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
-</Service>
-<Service id="S232532458" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>xend</Name>
- <Icon>Process</Icon>
- <Description>Xen daemon</Description>
- <AlarmMsg>The process xend is down</AlarmMsg>
- <NotificationMsg>The process xend is now up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S232842975" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>nfsd</Name>
- <Icon>Process</Icon>
- <Description>NFS server daemon</Description>
- <AlarmMsg>The NFS daemon is down</AlarmMsg>
- <NotificationMsg>The NFS daemon is now up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S003842685" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>ssh</Name>
- <Icon>Process</Icon>
- <Description>Connection to SSH server at xen02</Description>
- <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
- <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S232612395" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Availability</Name>
- <Icon>Other Check</Icon>
- <Description>Host availability</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
-</Service>
-<Service id="S073824371" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>mysql</Name>
- <Icon>Database Engine</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost/mysqld</SubServices>
-</Service>
 <Service id="S005813829" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Firewall</Name>
  <Icon>Firewall</Icon>
@@ -364,30 +388,6 @@
  <Name>Load</Name>
  <Icon>Other Check</Icon>
  <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S232525850" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>libvirtd</Name>
- <Icon>Process</Icon>
- <Description>libvirt daemon</Description>
- <AlarmMsg>The process libvirtd is down</AlarmMsg>
- <NotificationMsg>The process libvirtd is running</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S020232626" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Disk Space</Name>
- <Icon>Business Process</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S233042914" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>NFS Badcalls</Name>
- <Icon>Logfile</Icon>
- <Description>Number of NFS badcalls on 30 mins</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>localhost/ssh</SubServices>
