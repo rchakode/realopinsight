@@ -119,7 +119,7 @@ bool Parser::process(bool console)
   saveCoordinatesFile(graphContent);
 
   if (console)
-    return computeNodeCoordinates();
+    return parseDotResult();
   else
     return true;
 }
@@ -169,7 +169,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
   file.close();
 }
 
-bool Parser::computeNodeCoordinates(void)
+bool Parser::parseDotResult(void)
 {
   bool error = false;
   auto process = std::unique_ptr<QProcess>(new QProcess());
@@ -178,7 +178,7 @@ bool Parser::computeNodeCoordinates(void)
   int exitCode = process->execute("dot", arguments);
   process->waitForFinished(60000);
   if (!exitCode) {
-    computeNodeCoordinates(plainDotFile);
+    parseDotResult(plainDotFile);
   } else {
     m_lastErrorMsg = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
     Q_EMIT errorOccurred(m_lastErrorMsg);
@@ -189,7 +189,7 @@ bool Parser::computeNodeCoordinates(void)
   return ! error;
 }
 
-void Parser::computeNodeCoordinates(const QString& _plainDot)
+void Parser::parseDotResult(const QString& _plainDot)
 {
   QStringList splitedLine;
   QFile qfile(_plainDot);
@@ -215,7 +215,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
           node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
-        //FIXME: why multi insertion there? m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
+        // multiInsert since a node can have several childs
         m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
       } else if (splitedLine[0] == "stop") {
         break;

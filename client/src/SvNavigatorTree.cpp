@@ -109,27 +109,32 @@ void SvNavigatorTree::update(void)
 
 void SvNavigatorTree::build(void)
 {
-  /* Create a item for each individual service */
+  // Create a tree item for each bpnode
   for(NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),
       end = m_cdata->bpnodes.end();
       node != end; ++node) {
-    // Why multiple insertions there? m_items.insertMulti(node->id, SvNavigatorTree::createItem(*node));
     m_items.insertMulti(node->id, SvNavigatorTree::createItem(*node));
   }
+
+  // Create a tree item for each bpnode
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(),
       end=m_cdata->cnodes.end();
       node != end; ++node) {
     m_items.insertMulti(node->id, SvNavigatorTree::createItem(*node));
   }
 
-  for (StringListT::Iterator edge=m_cdata->edges.begin(),
-       end=m_cdata->edges.end();
-       edge != end; ++edge) {
-    QTreeWidgetItem* parent = findNodeItem(edge.key());
-    QTreeWidgetItem* child = findNodeItem(edge.value());
-
-    if (parent && child) {
-      parent->addChild(child);
+  for(NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),
+      end = m_cdata->bpnodes.end();
+      node != end; ++node) {
+    QTreeWidgetItem* parent = findNodeItem(node->id);
+    if (parent) {
+      QStringList childs = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
+      Q_FOREACH(const QString& id, childs) {
+        QTreeWidgetItem* child = findNodeItem(id);
+        if (child) {
+          parent->addChild(child);
+        }
+      }
     }
   }
   clear();

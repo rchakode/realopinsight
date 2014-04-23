@@ -49,11 +49,12 @@ private:
   QString m_config;
   CoreDataT* m_cdata;
   QString m_lastErrorMsg;
+  bool m_console;
 
   void updateNodeHierachy(QString& _graphContent);
   void saveCoordinatesFile(const QString& _content);
-  bool computeNodeCoordinates(void);
-  void computeNodeCoordinates(const QString& dotfile);
+  bool parseDotResult(void);
+  void parseDotResult(const QString& dotfile);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */
