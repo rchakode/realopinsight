@@ -127,9 +127,10 @@ bool Parser::process(bool console)
 void Parser::updateNodeHierachy(QString& _graphContent)
 {
   _graphContent = "\n";
-  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin();
-       node != m_cdata->bpnodes.end(); ++node)
-  {
+  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),
+       end = m_cdata->bpnodes.end();
+       node != end; ++node) {
+
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
@@ -145,9 +146,9 @@ void Parser::updateNodeHierachy(QString& _graphContent)
     }
   }
 
-  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
-       node != end; ++node)
-  {
+  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(),
+       end = m_cdata->cnodes.end();
+       node != end; ++node) {
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
   }
@@ -214,6 +215,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
           node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
+        //FIXME: why multi insertion there? m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
         m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
       } else if (splitedLine[0] == "stop") {
         break;
