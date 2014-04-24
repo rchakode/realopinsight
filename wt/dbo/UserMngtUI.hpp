@@ -73,17 +73,14 @@ public:
   static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
-  UserFormModel(const User* user,
-                bool changePassword,
-                bool userForm,
-                Wt::WObject *parent = 0);
+  UserFormModel(const User* user, bool changePassword, bool userForm, Wt::WObject *parent = 0);
   void setWritable(bool writtable);
+  void setData(const User& user);
 
 private:
   static const int MAX_LENGTH = 25;
   static const int MAX_CHILDREN = 15;
   bool m_userForm;
-
 
   Wt::WValidator* createNameValidator(void);
   Wt::WValidator* createEmailValidator(void);
@@ -106,17 +103,22 @@ public:
   Wt::Signal<std::string, std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
   Wt::Signal<void>& closeTriggered(void) {return m_close;}
   void reset(void);
+  void setWritable(bool writtable);
+
+  void resetValidationState(bool writtable);
 
 private:
   User m_user;
   bool m_changePassword;
   UserFormModel* m_model;
+  Wt::WText* m_infoBox;
+  Wt::WDialog *m_changePasswordDialog;
+
   Wt::Signal<User> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
   Wt::Signal<std::string, std::string, std::string> m_changePasswordTriggered;
   Wt::Signal<void> m_close;
-  Wt::WText* m_infoBox;
-  Wt::WDialog *m_changePasswordDialog;
+
 
   void process(void);
   void handleDeleteRequest(void);

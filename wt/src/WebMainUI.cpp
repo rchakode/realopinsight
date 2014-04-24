@@ -545,6 +545,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_mgntContents->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", "My Account");
   link->clicked().connect(std::bind([=](){
+    m_userAccountForm->resetValidationState(false);
     m_mgntContents->setCurrentWidget(m_userAccountForm);
     m_adminPanelTitle->setText("My Account");
   }));
@@ -554,6 +555,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   link = new Wt::WAnchor("#", "Change Password");
   link->clicked().connect(std::bind([=](){
     m_mgntContents->setCurrentWidget(m_changePasswordPanel);
+    m_changePasswordPanel->reset();
     m_adminPanelTitle->setText("Change password");
   }));
   settingPageTpl->bindWidget("menu-change-password", link);

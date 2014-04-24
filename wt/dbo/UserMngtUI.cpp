@@ -54,10 +54,7 @@ Wt::WValidator::Result ConfirmPasswordValidator::validate(const Wt::WString &inp
         Wt::WValidator::Result(Wt::WValidator::Invalid, "Confirmation don't match");
 }
 
-UserFormModel::UserFormModel(const User* user,
-                             bool changePassword,
-                             bool userForm,
-                             Wt::WObject *parent)
+UserFormModel::UserFormModel(const User* user, bool changePassword, bool userForm, Wt::WObject *parent)
   : Wt::WFormModel(parent),
     m_userForm(userForm)
 {
@@ -100,16 +97,9 @@ UserFormModel::UserFormModel(const User* user,
   } else {
     setVisible(CurrentPasswordField, false);
     if (user) {
-      setValue(UsernameField, user->username);
-      setValue(FirstNameField, user->firstname);
-      setValue(LastNameField, user->lastname);
-      setValue(EmailField, user->email);
-      setValue(UserLevelField, User::role2Text(user->role));
-      setValue(RegistrationDateField, user->registrationDate);
-
+      setData(*user);
       setVisible(PasswordField, false);
       setVisible(PasswordConfimationField, false);
-
       setWritable(false);
     } else {
       setVisible(RegistrationDateField, false);
@@ -129,6 +119,16 @@ void UserFormModel::setWritable(bool writtable)
   } else {
     setReadOnly(UserLevelField, m_userForm);
   }
+}
+
+void UserFormModel::setData(const User& user)
+{
+  setValue(UsernameField, user.username);
+  setValue(FirstNameField, user.firstname);
+  setValue(LastNameField, user.lastname);
+  setValue(EmailField, user.email);
+  setValue(UserLevelField, User::role2Text(user.role));
+  setValue(RegistrationDateField, user.registrationDate);
 }
 
 Wt::WValidator* UserFormModel::createNameValidator(void)
@@ -165,10 +165,10 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
 
 UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
   : m_changePassword(changePassword),
+    m_infoBox(new Wt::WText("")),
     m_validated(this),
     m_deleteTriggered(this),
-    m_changePasswordTriggered(this),
-    m_infoBox(new Wt::WText(""))
+    m_changePasswordTriggered(this)
 {
   m_model = new UserFormModel(user, changePassword, userForm, this);
 
@@ -241,7 +241,7 @@ UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
   // If user, it's for update. At first time the fields are disable
   if (user && ! changePassword) {
     submitButton->clicked().connect(std::bind([=](){
-      m_model->setWritable(true); updateView(m_model);
+      setWritable(true);
       submitButton->clicked().connect(this, &UserFormView::process);
     }));
   } else {
@@ -262,6 +262,18 @@ void UserFormView::reset(void)
   updateView(m_model);
 }
 
+void UserFormView::setWritable(bool writtable)
+{
+  m_model->setWritable(writtable);
+  updateView(m_model);
+}
+
+void UserFormView::resetValidationState(bool writtable)
+{
+  m_model->reset();
+  m_model->setData(m_user);
+  setWritable(writtable);
+}
 
 void UserFormView::process(void)
 {
