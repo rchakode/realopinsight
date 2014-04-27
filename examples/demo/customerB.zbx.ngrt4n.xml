@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ServiceView compat="2.0" monitor="1">
 <Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Customer B [ZABBIX]</Name>
+ <Name>Customer B [Zabbix Source]</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
