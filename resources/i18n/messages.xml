@@ -124,14 +124,14 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-         <legend>Service Health Overview</legend>
+         <legend>Business Service Health Summary</legend>
            ${contents}
        </div>
     </div>
     <!-- Event Feeds Pane -->
     <div id="ngrt4n-side-pane">
     <div class="ngrt4n-content">
-    <legend>Event Feeds</legend>
+    <legend>Open Event Feeds</legend>
      ${event-feeds}
     </div>
     </div>
