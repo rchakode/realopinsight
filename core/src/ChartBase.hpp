@@ -1,8 +1,8 @@
 /*
- * WebPieChart.hpp
+ * ChartBase.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 23-03-2014                                                 #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 27-04-2014                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,29 +22,27 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBPIECHART_HPP
-#define WEBPIECHART_HPP
 
-#include <Wt/WStandardItemModel>
-#include <Wt/Chart/WPieChart>
-#include <Wt/WColor>
-#include <Wt/WPaintDevice>
-#include <Wt/WContainerWidget>
-#include <Wt/WText>
-#include "ChartBase.hpp"
+#ifndef CHARTBASE_HPP
+#define CHARTBASE_HPP
 
-class WebPieChart : public Wt::Chart::WPieChart, public ChartBase
+#include "Base.hpp"
+#include <QMap>
+
+class ChartBase
 {
 public:
-  WebPieChart();
-  virtual ~WebPieChart();
-  Wt::WScrollArea* get(void) const  {return m_scrollArea;}
-  void repaint();
+  ChartBase();
+  void setStatsData(const CheckStatusCountT& statsData) {m_statsData = statsData;}
+  void setNbStatEntries(qint32 count) {m_nbStatsEntries = count;}
+  void updateSeverityInfo(void);
+  QString buildTooltipText(void);
 
-private:
-  Wt::WStandardItemModel* m_model;
-  Wt::WScrollArea* m_scrollArea;
-  std::map<int, Wt::WText*> m_legendBadges;
+protected:
+  CheckStatusCountT m_statsData;
+  qint32 m_nbStatsEntries;
+  QMap<int, int> m_severityCount;
+  QMap<int, float> m_severityRatio;
 };
 
-#endif // WEBPIECHART_HPP
+#endif // CHARTBASE_HPP

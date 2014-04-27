@@ -85,11 +85,11 @@ WebPieChart::WebPieChart(void)
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
-  tpl->bindWidget("unknown-count", m_badges[ngrt4n::Unknown] = new Wt::WText());
-  tpl->bindWidget("critical-count", m_badges[ngrt4n::Critical] = new Wt::WText());
-  tpl->bindWidget("major-count", m_badges[ngrt4n::Major] = new Wt::WText());
-  tpl->bindWidget("minor-count", m_badges[ngrt4n::Minor] = new Wt::WText());
-  tpl->bindWidget("normal-count", m_badges[ngrt4n::Normal] = new Wt::WText());
+  tpl->bindWidget("unknown-count", m_legendBadges[ngrt4n::Unknown] = new Wt::WText());
+  tpl->bindWidget("critical-count", m_legendBadges[ngrt4n::Critical] = new Wt::WText());
+  tpl->bindWidget("major-count", m_legendBadges[ngrt4n::Major] = new Wt::WText());
+  tpl->bindWidget("minor-count", m_legendBadges[ngrt4n::Minor] = new Wt::WText());
+  tpl->bindWidget("normal-count", m_legendBadges[ngrt4n::Normal] = new Wt::WText());
   tpl->bindWidget("chart", this);
 
   m_scrollArea->setWidget(tpl);
@@ -100,12 +100,7 @@ WebPieChart::WebPieChart(void)
   m_model->setHeaderData(0, Wt::WString("Item"));
   m_model->setHeaderData(1, Wt::WString("Sales"));
   m_model->insertRows(m_model->rowCount(), 5);
-  // Initialize data
-  setSeverityData(ngrt4n::Normal, 0);
-  setSeverityData(ngrt4n::Minor, 0);
-  setSeverityData(ngrt4n::Major, 0);
-  setSeverityData(ngrt4n::Critical, 0);
-  setSeverityData(ngrt4n::Unknown, 0);
+
   // Draw the chart
   setLabelsColumn(0);    // Set the column that holds the labels.
   setDataColumn(1);      // Set the column that holds the data.
@@ -123,10 +118,15 @@ WebPieChart::~WebPieChart()
 }
 
 
-void WebPieChart::setSeverityData(int _sev, int _count)
+void WebPieChart::repaint()
 {
-  std::string label = ngrt4n::severityText(_sev).toStdString();
-  m_model->setData(_sev, 0, label);
-  m_model->setData(_sev, 1, _count);
-  m_badges[_sev]->setText(QString::number(_count).toStdString());
+  updateSeverityInfo();
+
+  for(auto it = std::begin(m_severityCount); it != std::end(m_severityCount); ++it) {
+    m_model->setData(it.key(), 0, ngrt4n::severityText(it.key()).toStdString());
+    m_model->setData(it.key(), 1, it.value());
+    m_legendBadges[it.key()]->setText(QString::number(it.value()).toStdString());
+  }
+
+  setToolTip(ChartBase::buildTooltipText().toStdString());
 }

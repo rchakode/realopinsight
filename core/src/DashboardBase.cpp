@@ -283,9 +283,9 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  QString toolTip = ngrt4n::getNodeToolTip(_node);
-  updateTree(_node, toolTip);
-  updateMap(_node, toolTip);
+  QString nodeToolTip = ngrt4n::getNodeToolTip(_node);
+  updateTree(_node, nodeToolTip);
+  updateMap(_node, nodeToolTip);
   updateChart();
   updateMsgConsole(_node);
   updateBpNode(_node.parent);

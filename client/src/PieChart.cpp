@@ -41,23 +41,14 @@ PieChart::~PieChart()
 void PieChart::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  qint32 critical_count = m_statsData[ngrt4n::Critical];
-  qint32 major_count = m_statsData[ngrt4n::Major];
-  qint32 minor_count = m_statsData[ngrt4n::Minor];
-  qint32 ok_count =  m_statsData[ngrt4n::Normal];
-  qint32 unknown_count = m_nbStatsEntries - (critical_count + major_count + minor_count + ok_count);
 
-  int unknown_ratio = qRound((100.0 * unknown_count)/m_nbStatsEntries);
-  int critical_ratio = qRound((100.0 * critical_count)/m_nbStatsEntries);
-  int major_ratio  = qRound((100.0 * major_count)/m_nbStatsEntries);
-  int minor_ratio  = qRound((100.0 * minor_count)/m_nbStatsEntries);
-  int ok_ratio = qRound((100.0 * ok_count)/m_nbStatsEntries);
+  updateSeverityInfo();
 
-  int unknown_angle = 16 * unknown_ratio;
-  int critical_angle= 16 * critical_ratio;
-  int major_angle = 16 * major_ratio;
-  int minor_angle = 16 * minor_ratio;
-  int ok_angle = 16 * ok_ratio;
+  int unknown_angle = 16 * m_severityRatio[ngrt4n::Unknown];
+  int critical_angle= 16 * m_severityRatio[ngrt4n::Critical];
+  int major_angle = 16 * m_severityRatio[ngrt4n::Major];
+  int minor_angle = 16 * m_severityRatio[ngrt4n::Minor];
+  int ok_angle = 16 * m_severityRatio[ngrt4n::Normal];
 
   painter.setPen(Qt::transparent);
   painter.setBrush(ngrt4n::COLOR_CRITICAL);
@@ -71,15 +62,5 @@ void PieChart::paintEvent(QPaintEvent*)
   painter.setBrush(ngrt4n::COLOR_NORMAL);
   painter.drawPie(m_boundingRect, 3.6 * (critical_angle + major_angle + minor_angle + unknown_angle), 3.6 * ok_angle);
 
-  QString toolTip = QObject::tr("Normal: ")%QString::number(ok_count)%
-      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(ok_ratio, 'f', 0)%"%)"
-      %"\n"%QObject::tr("Minor: ")%QString::number(minor_count)%
-      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(minor_ratio, 'f', 0)%"%)"
-      %"\n"%QObject::tr("Major: ")%QString::number(major_count)%
-      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(major_ratio, 'f', 0)%"%)"
-      %"\n"%QObject::tr("Critical: ")%QString::number(critical_count)%"/"
-      %QString::number(m_nbStatsEntries)%" ("%QString::number(critical_ratio, 'f', 0) %"%)"
-      %"\n"%QObject::tr("Unknown: ")%QString::number(unknown_count)%
-      "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(unknown_ratio, 'f', 0)%"%)";
-  setToolTip(toolTip);
+  setToolTip(ChartBase::buildTooltipText());
 }

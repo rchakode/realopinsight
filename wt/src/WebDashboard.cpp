@@ -83,8 +83,8 @@ namespace {
 WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
   : DashboardBase(descriptionFile),
     m_widget(new Wt::WContainerWidget()),
-    m_tree(new WebTree(DashboardBase::cdata())),
-    m_map(new WebMap(DashboardBase::cdata())),
+    m_tree(new WebTree(m_cdata)),
+    m_map(new WebMap(m_cdata)),
     m_msgConsole(new WebMsgConsole()),
     m_chart(new WebPieChart()),
     m_eventFeedLayout(eventFeedLayout)
@@ -104,8 +104,8 @@ void WebDashboard::initialize(Preferences* preferencePtr)
   if (! DashboardBase::lastErrorState()) {
     m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
   } else {
-    LOG("error", DashboardBase::lastErrorMsg().toStdString());
-    Q_EMIT errorOccurred(DashboardBase::lastErrorMsg());
+    LOG("error", m_lastErrorMsg.toStdString());
+    Q_EMIT errorOccurred(m_lastErrorMsg);
   }
 }
 
@@ -122,8 +122,8 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (! DashboardBase::showOnlyTroubles()
-      || (DashboardBase::showOnlyTroubles() && _node.severity != ngrt4n::Normal))
+  if (! m_showOnlyTroubles
+      || (m_showOnlyTroubles && _node.severity != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -131,10 +131,9 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  for (auto it = std::begin(DashboardBase::cdata()->check_status_count); it != std::end(DashboardBase::cdata()->check_status_count); ++it) {
-    m_chart->setSeverityData(it.key(), it.value());
-  }
-  m_chart->setToolTip(statsTooltip());
+  m_chart->setStatsData(m_cdata->check_status_count);
+  m_chart->setNbStatEntries(m_cdata->cnodes.size());
+  m_chart->repaint();
 }
 
 void WebDashboard::buildMap(void)
@@ -152,13 +151,13 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 void WebDashboard::updateThumbnail(void)
 {
   m_thumbnailTitleBar->setStyleClass(ngrt4n::severityCssClass(rootNode().severity));
+  m_map->thumbnail()->setToolTip(m_chart->buildTooltipText().toStdString());
 }
 
 
 void WebDashboard::updateMap(void)
 {
   m_map->drawMap();
-  m_map->setThumbnailTooltip(statsTooltip());
 }
 
 void WebDashboard::setupUI(void)
@@ -196,48 +195,6 @@ void WebDashboard::addJsEventScript(void)
 {
   m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
   m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
-}
-
-
-std::string WebDashboard::statsTooltip(void)
-{
-  qint32 totalCount = DashboardBase::cdata()->cnodes.size();
-  qint32 criticalCount = DashboardBase::cdata()->check_status_count[ngrt4n::Critical];
-  qint32 majorCount = DashboardBase::cdata()->check_status_count[ngrt4n::Major];
-  qint32 minorCount = DashboardBase::cdata()->check_status_count[ngrt4n::Minor];
-  qint32 normalCount =  DashboardBase::cdata()->check_status_count[ngrt4n::Normal];
-  qint32 unknownCount = totalCount - (criticalCount + majorCount + minorCount + normalCount);
-
-  float criticalRatio = (100.0 * criticalCount) / totalCount;
-  float majorRatio = (100.0 * majorCount) / totalCount;
-  float minorRatio = (100.0 * minorCount) / totalCount;
-  float unknownRatio = (100.0 * unknownCount) / totalCount;
-  float normalRatio = (100.0 * normalCount) / totalCount;
-
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("statistic-tooltip.tpl"));
-
-  tpl->bindString("platform", DashboardBase::rootNode().name.toStdString());
-  tpl->bindInt("total-count", totalCount);
-
-  tpl->bindInt("unknown-ratio", unknownRatio);
-  tpl->bindInt("unknown-count", unknownCount);
-
-  tpl->bindInt("critical-ratio", criticalRatio);
-  tpl->bindInt("critical-count", criticalCount);
-
-  tpl->bindInt("major-ratio", majorRatio);
-  tpl->bindInt("major-count", majorCount);
-
-  tpl->bindInt("minor-ratio", minorRatio);
-  tpl->bindInt("minor-count", minorCount);
-
-  tpl->bindInt("normal-ratio", normalRatio);
-  tpl->bindInt("normal-count", normalCount);
-
-  std::ostringstream oss;
-  tpl->renderTemplate(oss);
-  delete tpl;
-  return oss.str();
 }
 
 void WebDashboard::updateEventFeeds(const NodeT &node)

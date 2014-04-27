@@ -356,16 +356,6 @@
   </div>
 </message>
 
-<message id="statistic-tooltip.tpl">
-     ${platform}
-     -----------
-     Unknown: ${unknown-ratio}% (${unknown-count}/${total-count})
-     Critical: ${critical-ratio}% (${critical-count}/${total-count})
-     Major: ${major-ratio}% (${major-count}/${total-count})
-     Minor: ${minor-ratio}% (${minor-count}/${total-count})
-     Normal: ${normal-ratio}% (${normal-count}/${total-count})
-</message>
-
 <message id="chart.tpl">
 <div class="chart">
  <legend>

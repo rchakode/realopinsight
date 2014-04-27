@@ -77,7 +77,8 @@ HEADERS += \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
     core/src/global.hpp \
-    core/src/utilsCore.hpp
+    core/src/utilsCore.hpp \
+    core/src/ChartBase.hpp
 
 
 SOURCES += \
@@ -90,7 +91,8 @@ SOURCES += \
     core/src/ZmqSocket.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
-    core/src/utilsCore.cpp
+    core/src/utilsCore.cpp \
+    core/src/ChartBase.cpp
 
 gui-base {
 QT += svg gui webkit
