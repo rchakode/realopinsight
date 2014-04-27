@@ -458,25 +458,33 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   Wt::WAnchor* link = NULL;
   if (m_dbSession->loggedUser().role == User::AdmRole) {
     // Start menu
-    link = new Wt::WAnchor("#", "Welcome", m_mainWidget);
+    std::string menuText = QObject::tr("Welcome").toStdString();
+    std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
+    link = new Wt::WAnchor("#", menuText, m_mainWidget);
     Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
     m_mgntContents->addWidget(getStartPage);
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(getStartPage);
-      m_adminPanelTitle->setText("Getting Started in 3 Simple Steps !");
+      m_adminPanelTitle->setText(contentTitle);
     }));
     settingPageTpl->bindWidget("menu-get-started", link);
 
-    // view menus
-    link = new Wt::WAnchor("#", "Import", m_mainWidget);
+    // menu view
+    menuText = QObject::tr("Import").toStdString();
+    link = new Wt::WAnchor("#", menuText, m_mainWidget);
     link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
     settingPageTpl->bindWidget("menu-import", link);
 
-    link = new Wt::WAnchor("#", "Preview", m_mainWidget);
+    // menu preview
+
+    menuText = QObject::tr("Preview").toStdString();
+    link = new Wt::WAnchor("#", menuText, m_mainWidget);
     link->clicked().connect(this, &WebMainUI::selectFileToOpen);
     settingPageTpl->bindWidget("menu-preview", link);
 
     // Create view management form
+    menuText = QObject::tr("All Views and Access Control").toStdString();
+    contentTitle = QObject::tr("All Views and Access Control").toStdString();
     m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession);
     m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
       DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
@@ -487,11 +495,11 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       }
     }, std::placeholders::_1));
     m_mgntContents->addWidget(m_viewAccessPermissionForm);
-    link = new Wt::WAnchor("#", "All Views and Access Control");
+    link = new Wt::WAnchor("#", menuText);
     link->clicked().connect(std::bind([=](){
       m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
       m_viewAccessPermissionForm->resetModelData();
-      m_adminPanelTitle->setText("Manage Views and Access Permissions");
+      m_adminPanelTitle->setText(contentTitle);
     }));
     settingPageTpl->bindWidget("menu-all-views", link);
 
