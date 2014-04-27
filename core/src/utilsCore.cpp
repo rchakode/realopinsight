@@ -206,7 +206,7 @@ QString ngrt4n::sourceData2Json(const SourceT& src)
 {
   return QString("{\"sid\":\"%1\","
                  "\"mon_type\":\"%2\","
-                 "\"use_ls\":\"%3\","
+                 "\"use_ngrt4nd\":\"%3\","
                  "\"mon_url\":\"%4\","
                  "\"ls_addr\":\"%5\","
                  "\"ls_port\":\"%6\","

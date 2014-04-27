@@ -98,14 +98,12 @@ bool Parser::process(bool console)
       QString srcid = ngrt4n::getSourceIdFromStr(info.first);
 
       if (srcid.isEmpty()) {
-        QString srcid = ngrt4n::sourceId(0);
+        srcid = ngrt4n::sourceId(0);
         if (console) {
           node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
         }
-        m_cdata->sources.insert(srcid);
-      } else {
-        m_cdata->sources.insert(srcid);
       }
+      m_cdata->sources.insert(srcid);
       m_cdata->cnodes.insert(node.id, node);
     } else { // means a BP node
       node.visibility = ngrt4n::Visible | ngrt4n::Expanded;

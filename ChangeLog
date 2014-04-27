@@ -4,6 +4,7 @@ RealOpInsight ChangeLog
 3.0.0b2
   * Fixed chart tooltip, ratios were multiplied by 16
   * Fixed Editor file open when the name of the root service is altered
+  * Change the name of the field use_ls in setting file to use_ngrt4nd
 
 3.0.0b1 (Eliana, b1)
   * Lot of refactoring and code simplification

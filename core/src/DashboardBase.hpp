@@ -104,7 +104,7 @@ protected:
   virtual void updateChart(void) = 0;
   virtual void updateEventFeeds(const NodeT& node) = 0;
 
-private:
+protected:
   QString m_descriptionFile;
   CoreDataT* m_cdata;
   qint64 m_updateCounter;
@@ -121,6 +121,7 @@ private:
   QString m_lastErrorMsg;
   Preferences* m_preferences;
 
+protected:
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);

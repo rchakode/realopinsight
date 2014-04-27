@@ -71,11 +71,11 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
     m_browser (new WebKit()),
-    m_map (new GraphView(DashboardBase::cdata())),
-    m_tree (new SvNavigatorTree(DashboardBase::cdata())),
+    m_map (new GraphView(m_cdata)),
+    m_tree (new SvNavigatorTree(m_cdata)),
     m_msgConsole(new MsgConsole()),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
-    m_bxSourceSelection(new QComboBox()),
+    m_sourceSelectionBox(new QComboBox()),
     m_msgPane(new QTabWidget())
 {
   m_viewPanel->addTab(m_map.get(), tr("Map"));
@@ -114,7 +114,7 @@ void GuiDashboard::handleShowOnlineResources(void)
 
 void GuiDashboard::handleShowAbout(void)
 {
-  GuiPreferences about(DashboardBase::userRole(), Preferences::ShowAbout);
+  GuiPreferences about(m_userRole, Preferences::ShowAbout);
   about.exec();
 }
 
@@ -126,7 +126,7 @@ void GuiDashboard::toggleTroubleView(bool _toggled)
   if (DashboardBase::showOnlyTroubles()) {
     m_msgConsole->clearNormalMsg();
   } else {
-    for (auto it = DashboardBase::cdata()->cnodes.begin(), end = DashboardBase::cdata()->cnodes.end();
+    for (auto it = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
          it != end; ++it) m_msgConsole->updateNodeMsg(it);
     m_msgConsole->sortByColumn(1);
   }
@@ -150,8 +150,8 @@ void GuiDashboard::updateMap(const NodeT& _node, const QString& _tip)
 
 void GuiDashboard::updateChart(void)
 {
-  m_chart->setStatsData(DashboardBase::cdata()->check_status_count);
-  m_chart->setNbStatEntries(DashboardBase::cdata()->cnodes.size());
+  m_chart->setStatsData(m_cdata->check_status_count);
+  m_chart->setNbStatEntries(m_cdata->cnodes.size());
   m_chart->repaint();
 }
 
@@ -182,8 +182,8 @@ void GuiDashboard::updateMsgConsole(const NodeT& _node)
 
 void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
 {
-  auto node = DashboardBase::cdata()->bpnodes.find(_nodeId);
-  if (node == DashboardBase::cdata()->bpnodes.end()) {
+  auto node = m_cdata->bpnodes.find(_nodeId);
+  if (node == m_cdata->bpnodes.end()) {
     return;
   }
   if (!node->child_nodes.isEmpty()) {
@@ -196,16 +196,16 @@ void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const
 
 void GuiDashboard::centerGraphOnNode(const QString& _nodeId)
 {
-  if (!_nodeId.isEmpty()) DashboardBase::setSelectedNode(_nodeId);
-  m_map->centerOnNode(DashboardBase::selectedNode());
+  if (!_nodeId.isEmpty()) m_selectedNode = _nodeId;
+  m_map->centerOnNode(m_selectedNode);
 }
 
 void GuiDashboard::filterNodeRelatedMsg(void)
 {
   m_filteredMsgConsole.reset(new MsgConsole());
   NodeListT::iterator node;
-  if (ngrt4n::findNode(DashboardBase::cdata(), DashboardBase::selectedNode(), node)) {
-    filterNodeRelatedMsg(DashboardBase::selectedNode());
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
+    filterNodeRelatedMsg(m_selectedNode);
     QSize size(750, 400);
     m_filteredMsgConsole->resize(size.width(), size.height());
     m_filteredMsgConsole->setConsoleSize(size);
@@ -219,7 +219,7 @@ void GuiDashboard::filterNodeRelatedMsg(void)
 void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (ngrt4n::findNode(DashboardBase::cdata(), _nodeId, node)
+  if (ngrt4n::findNode(m_cdata, _nodeId, node)
       && ! node->child_nodes.isEmpty()) {
     if (node->type == NodeType::AlarmNode) {
       m_filteredMsgConsole->updateNodeMsg(node);
@@ -282,7 +282,7 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
              _node.severity == ngrt4n::Major) {
     icon = QSystemTrayIcon::Warning;
   }
-  qint32 pbCount = DashboardBase::cdata()->cnodes.size() - DashboardBase::cdata()->check_status_count[ngrt4n::Normal];
+  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[ngrt4n::Normal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
@@ -306,26 +306,27 @@ QTabWidget* GuiDashboard::builtMsgPane(void)
 
 void GuiDashboard::handleSettingsLoaded(void)
 {
-  m_bxSourceSelection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  for (SourceListT::iterator it=DashboardBase::sources().begin(),
-       end = DashboardBase::sources().end(); it != end; ++it)
+  m_sourceSelectionBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  for (SourceListT::iterator it=m_sources.begin(),
+       end = m_sources.end(); it != end; ++it)
   {
-    if (DashboardBase::cdata()->sources.contains(it->id))
+    if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-      case ngrt4n::Nagios:
-        it->icon = ":images/nagios-logo-n.png";
-        break;
-      case ngrt4n::Zabbix:
-        it->icon = ":images/zabbix-logo-z.png";
-        break;
-      case ngrt4n::Zenoss:
-        it->icon = ":images/zenoss-logo-o.png";
-        break;
-      default:
-        break;
+        case ngrt4n::Nagios:
+          it->icon = ":images/nagios-logo-n.png";
+          break;
+        case ngrt4n::Zabbix:
+          it->icon = ":images/zabbix-logo-z.png";
+          break;
+        case ngrt4n::Zenoss:
+          it->icon = ":images/zenoss-logo-o.png";
+          break;
+        default:
+          it->icon = "";
+          break;
       }
-      m_bxSourceSelection->addItem(QIcon(it->icon), it->id, QVariant(it->id));
+      m_sourceSelectionBox->addItem(QIcon(it->icon), it->id, QVariant(it->id));
     }
   }
   handleUpdateSourceUrl();
@@ -334,18 +335,18 @@ void GuiDashboard::handleSettingsLoaded(void)
 
 void GuiDashboard::handleSourceBxItemChanged(int index)
 {
-  int idx = extractSourceIndex(m_bxSourceSelection->itemData(index).toString());
-  SourceListT::Iterator src = DashboardBase::sources().find(idx);
-  if (src != DashboardBase::sources().end()) {
+  int idx = extractSourceIndex(m_sourceSelectionBox->itemData(index).toString());
+  SourceListT::Iterator src = m_sources.find(idx);
+  if (src != m_sources.end()) {
     changeBrowserUrl(src->id, src->mon_url, src->icon);
   }
 }
 
 void GuiDashboard::handleUpdateSourceUrl(void)
 {
-  if (DashboardBase::firstSrcIndex() >=0 ) {
-    SourceListT::Iterator first = DashboardBase::sources().find(DashboardBase::firstSrcIndex());
-    if (first != DashboardBase::sources().end()) {
+  if (m_firstSrcIndex >=0 ) {
+    SourceListT::Iterator first = m_sources.find(m_firstSrcIndex);
+    if (first != m_sources.end()) {
       changeBrowserUrl(first->id, first->mon_url, first->icon);
     }
   }
@@ -381,7 +382,7 @@ void GuiDashboard::addEvents(void)
   connect(m_viewPanel.get(), SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
   connect(m_map.get(), SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString&, const bool &, const qint32 &)));
   connect(m_tree.get(), SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
-  connect(m_bxSourceSelection.get(), SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
+  connect(m_sourceSelectionBox.get(), SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
 }
