@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<ServiceView compat="2.0" monitor="2">
+<ServiceView compat="2.0" monitor="1">
 <Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Customer C [ZENOSS]</Name>
+ <Name>Hosting Platform</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -126,7 +126,7 @@
  <Description>Xen daemon</Description>
  <AlarmMsg>The process xend is down</AlarmMsg>
  <NotificationMsg>The process xend is now up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232842975" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>nfsd</Name>
@@ -134,15 +134,7 @@
  <Description>NFS server daemon</Description>
  <AlarmMsg>The NFS daemon is down</AlarmMsg>
  <NotificationMsg>The NFS daemon is now up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
-</Service>
-<Service id="S181629167" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Load</Name>
- <Icon>Other Check</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S003842685" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>ssh</Name>
@@ -150,7 +142,15 @@
  <Description>Connection to SSH server at xen02</Description>
  <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
  <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+</Service>
+<Service id="S181629167" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Load</Name>
+ <Icon>Other Check</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232612395" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
@@ -158,15 +158,15 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S073824371" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>mysql</Name>
+ <Name>sqlserver</Name>
  <Icon>Database Engine</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/mysqld</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232525850" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>libvirtd</Name>
@@ -174,7 +174,7 @@
  <Description>libvirt daemon</Description>
  <AlarmMsg>The process libvirtd is down</AlarmMsg>
  <NotificationMsg>The process libvirtd is running</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S020232626" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Disk Space</Name>
@@ -182,7 +182,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S181611135" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Memory Usage</Name>
@@ -190,7 +190,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S233042914" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>NFS Badcalls</Name>
@@ -198,7 +198,7 @@
  <Description>Number of NFS badcalls on 30 mins</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232705693" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
@@ -206,7 +206,7 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S003820357" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>ssh</Name>
@@ -214,7 +214,7 @@
  <Description></Description>
  <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
  <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232512298" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>libvirtd</Name>
@@ -222,7 +222,7 @@
  <Description>libvirt daemon</Description>
  <AlarmMsg>The process libvirtd is down</AlarmMsg>
  <NotificationMsg>The process libvirtd is running</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S003857309" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>ssh</Name>
@@ -230,7 +230,7 @@
  <Description></Description>
  <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
  <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232605330" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>xend</Name>
@@ -238,7 +238,7 @@
  <Description>Xen daemon</Description>
  <AlarmMsg>The process xend is down</AlarmMsg>
  <NotificationMsg>The process xend is now up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S205551217" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Backbone Router</Name>
@@ -246,7 +246,7 @@
  <Description>Backend switch. Cisco Nexus 1000V</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S230718077" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
@@ -254,7 +254,7 @@
  <Description>The NFS mountpoint serving as cloud repository</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232601251" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
@@ -262,7 +262,7 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S230723319" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
@@ -270,15 +270,23 @@
  <Description>The NFS mountpoint serving as cloud repository</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S153210146" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>www</Name>
  <Icon>Other Check</Icon>
  <Description>check apache response time</Description>
- <AlarmMsg>The http service does not response on server {hostname}</AlarmMsg>
+ <AlarmMsg>The response time of the web server {hostname} is more than {threshold}</AlarmMsg>
+ <NotificationMsg>The response time of the web server is normal</NotificationMsg>
+ <SubServices>Zabbix server/Zabbix http poller processes more than 75% busy</SubServices>
+</Service>
+<Service id="S181349742" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Swap Usage</Name>
+ <Icon>Other Check</Icon>
+ <Description>Check swap usage</Description>
+ <AlarmMsg>The free swap space</AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/http</SubServices>
+ <SubServices>Zabbix server/Lack of free swap space on {HOST.NAME}</SubServices>
 </Service>
 <Service id="S073757810" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>mysql</Name>
@@ -286,15 +294,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/mysqld</SubServices>
-</Service>
-<Service id="S181349742" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Swap Usage</Name>
- <Icon>Other Check</Icon>
- <Description>Check swap usage</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix http poller processes more than 75% busy</SubServices>
 </Service>
 <Service id="S230727734" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
@@ -302,15 +302,15 @@
  <Description>The NFS mountpoint serving as cloud repository</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S154659138" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>www</Name>
  <Icon>Other Check</Icon>
  <Description>Microsoft IIS server</Description>
- <AlarmMsg>The https service does not response on server {hostname}</AlarmMsg>
+ <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/https</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S233025410" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>SAN Device</Name>
@@ -318,7 +318,7 @@
  <Description>The virtual infrastructure root file system containing virtual machine images and data shared among VMs</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>FreeBSD_4.2.i386/Lack of available memory on server {HOSTNAME}</SubServices>
 </Service>
 <Service id="S232630635" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>oned</Name>
@@ -326,7 +326,7 @@
  <Description>OpenNebula daemon process</Description>
  <AlarmMsg>The OpenNebula daemon is down</AlarmMsg>
  <NotificationMsg>The OpenNebula daemon is now up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S181551014" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Avalability</Name>
@@ -334,15 +334,7 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
-</Service>
-<Service id="S003801812" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>ssh</Name>
- <Icon>Process</Icon>
- <Description></Description>
- <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
- <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S181448973" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
@@ -350,7 +342,15 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+</Service>
+<Service id="S003801812" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>ssh</Name>
+ <Icon>Process</Icon>
+ <Description></Description>
+ <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+ <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232540042" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
@@ -358,7 +358,7 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S230632845" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
@@ -366,7 +366,7 @@
  <Description>The NFS mountpoint serving as cloud repository</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S232616083" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
@@ -374,7 +374,7 @@
  <Description>Host availability</Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S005813829" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Firewall</Name>
@@ -382,7 +382,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
 <Service id="S181426068" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Load</Name>
@@ -390,6 +390,6 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>localhost/ssh</SubServices>
+ <SubServices>Zabbix server/Processor load is too high on {HOST.NAME}</SubServices>
 </Service>
 </ServiceView>

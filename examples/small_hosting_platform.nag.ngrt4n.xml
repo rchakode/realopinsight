@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ServiceView compat="2.0" monitor="0">
 <Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Customer A [Nagios]</Name>
+ <Name>Hosting Platform</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
