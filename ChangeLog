@@ -2,9 +2,11 @@
 RealOpInsight ChangeLog
 ###############################
 3.0.0b2
-  * Fixed chart tooltip, ratios were multiplied by 16
+  * Fixed chart tooltip, severity ratios were not well built
   * Fixed Editor file open when the name of the root service is altered
   * Change the name of the field use_ls in setting file to use_ngrt4nd
+  * Fixed time display in the message console, now print human-readable
+    date instead of time_t
 
 3.0.0b1 (Eliana, b1)
   * Lot of refactoring and code simplification
@@ -24,7 +26,8 @@ RealOpInsight ChangeLog
   * Restyling the menu bar
 
 2.4.0 (Federator) - 08/09/2013
-  * Fixed ticket #22 : Operations Console doesn't update the status of triggers with Zabbix API v1.4 (Zabbix 2.0.x, x<5)
+  * Fixed ticket #22 : Operations Console doesn't update the status of triggers
+    with Zabbix API v1.4 (Zabbix 2.0.x, x<5)
   * Fixed close action on the preference window (ticket #24)
 
 2.4.0 (Federator) - 08/09/2013
@@ -37,7 +40,8 @@ RealOpInsight ChangeLog
 2.4.0beta2 (Federator,b2) - 16/08/2013
   * Fixed ticket #16: adding support for realm authentication within the browser
   * Fixed ticket #17: file path missing in the title bar of the console
-  * Fixed ticket #18: Added the possibility to select the source to load within the browser
+  * Fixed ticket #18: Added the possibility to select the source to load within
+    the browser
   * Added logo and misc icons for Nagios, Zenoss, Zenoss, and hierarchy
 
 2.4.0beta1 (Federator,b1) - 08/08/2013
