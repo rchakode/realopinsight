@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ServiceView compat="2.0" monitor="2">
 <Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Customer C [Zenoss Source]</Name>
+ <Name>Customer C [Zenoss]</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
