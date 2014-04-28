@@ -28,7 +28,6 @@ ChartBase::ChartBase()
 {
 }
 
-
 void ChartBase::updateSeverityInfo(void)
 {
   m_severityCount[ngrt4n::Critical] = m_statsData[ngrt4n::Critical];
@@ -46,13 +45,11 @@ void ChartBase::updateSeverityInfo(void)
   m_severityRatio[ngrt4n::Major] = qRound((100.0 * m_severityCount[ngrt4n::Major])/m_nbStatsEntries);
   m_severityRatio[ngrt4n::Minor] = qRound((100.0 * m_severityCount[ngrt4n::Minor])/m_nbStatsEntries);
   m_severityRatio[ngrt4n::Normal] = qRound((100.0 * m_severityCount[ngrt4n::Normal])/m_nbStatsEntries);
-
 }
 
 
 QString ChartBase::buildTooltipText(void)
 {
-
   return QObject::tr("Normal: ")%QString::number(m_severityCount[ngrt4n::Normal])%
       "/"%QString::number(m_nbStatsEntries)%" ("%QString::number(m_severityRatio[ngrt4n::Normal], 'f', 0)%"%)"
       %"\n"%QObject::tr("Minor: ")%QString::number(m_severityCount[ngrt4n::Minor])%

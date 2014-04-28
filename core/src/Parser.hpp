@@ -34,7 +34,6 @@ class Parser : public QObject
 public:
   Parser(const QString& _config, CoreDataT* _cdata);
   virtual ~Parser();
-
   bool process(bool console);
   QString dotFile(void) const { return m_dotFile; }
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}

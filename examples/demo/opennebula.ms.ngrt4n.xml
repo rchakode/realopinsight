@@ -8,30 +8,6 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S044105216,S231920128,S232250597,S220857086</SubServices>
 </Service>
-<Service id="S231920128" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Storage</Name>
- <Icon>Server</Icon>
- <Description>Storage service</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S232842975,S233042914,S020232626</SubServices>
-</Service>
-<Service id="S232038066" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>kvm02</Name>
- <Icon>Hypervisor</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S232525850,S232616083,S230632845,S003801812</SubServices>
-</Service>
-<Service id="S044105216" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>Network</Name>
- <Icon>Network</Icon>
- <Description>Network devices</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S205551217,S005813829</SubServices>
-</Service>
 <Service id="ngrt4nsrv20145227235234663" type="0" statusCalcRule="1" statusPropRule="0">
  <Name>Services</Name>
  <Icon>Business Process</Icon>
@@ -40,24 +16,8 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S044014198,ngrt4nsrv20144827234851316</SubServices>
 </Service>
-<Service id="S231948216" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>xen01</Name>
- <Icon>Hypervisor</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S232532458,S232540042,S230727734,S003857309</SubServices>
-</Service>
-<Service id="ngrt4nsrv20144927234931020" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>OCA</Name>
- <Icon>Business Process</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>www.ngrt4n.com/HTTP</SubServices>
-</Service>
-<Service id="S220857086" type="0" statusCalcRule="1" statusPropRule="0">
- <Name>Managed Hosts</Name>
+<Service id="S220857086" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>compute nodes</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -72,6 +32,14 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S232512298,S232612395,S230718077,S003820357</SubServices>
 </Service>
+<Service id="S231920128" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>storage</Name>
+ <Icon>Server</Icon>
+ <Description>Storage service</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>S232842975,S233042914,S020232626</SubServices>
+</Service>
 <Service id="ngrt4nsrv20144827234851316" type="0" statusCalcRule="1" statusPropRule="0">
  <Name>API</Name>
  <Icon>Business Process</Icon>
@@ -80,13 +48,21 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>ngrt4nsrv20144927234903674,ngrt4nsrv20144927234919012,ngrt4nsrv20144927234931020</SubServices>
 </Service>
-<Service id="ngrt4nsrv20144927234903674" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>XMLRPC</Name>
- <Icon>Business Process</Icon>
+<Service id="S232250597" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>cloud controler</Name>
+ <Icon>Server</Icon>
+ <Description>OpenNebula Frontend server</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>S232630635,S232705693,ngrt4nsrv20145227235234663</SubServices>
+</Service>
+<Service id="S232038066" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>kvm02</Name>
+ <Icon>Hypervisor</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>www.ngrt4n.com/HTTP</SubServices>
+ <SubServices>S232525850,S232616083,S230632845,S003801812</SubServices>
 </Service>
 <Service id="S232019113" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>xen02</Name>
@@ -96,21 +72,45 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S232601251,S232605330,S230723319,S003842685</SubServices>
 </Service>
-<Service id="S232250597" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>OpenNebula Server</Name>
- <Icon>Server</Icon>
- <Description>OpenNebula Frontend server</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S232630635,S232705693,ngrt4nsrv20145227235234663</SubServices>
-</Service>
-<Service id="ngrt4nsrv20144927234919012" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Amazon EC2</Name>
- <Icon>Business Process</Icon>
+<Service id="S231948216" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>xen01</Name>
+ <Icon>Hypervisor</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>www.ngrt4n.com/HTTP</SubServices>
+ <SubServices>S232532458,S232540042,S230727734,S003857309</SubServices>
+</Service>
+<Service id="S044105216" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>network</Name>
+ <Icon>Network</Icon>
+ <Description>Network devices</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>S205551217,S005813829</SubServices>
+</Service>
+<Service id="S232605330" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>xend</Name>
+ <Icon>Process</Icon>
+ <Description>Xen daemon</Description>
+ <AlarmMsg>The process xend is down</AlarmMsg>
+ <NotificationMsg>The process xend is now up</NotificationMsg>
+ <SubServices>xen02/xend alive</SubServices>
+</Service>
+<Service id="S232601251" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Host Ping Response Time</Name>
+ <Icon>Other Check</Icon>
+ <Description>Host availability</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>xen02/PING</SubServices>
+</Service>
+<Service id="S003820357" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>sshd</Name>
+ <Icon>Process</Icon>
+ <Description></Description>
+ <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+ <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+ <SubServices>kvm01/SSH</SubServices>
 </Service>
 <Service id="S044014198" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Sunstone</Name>
@@ -120,13 +120,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>www.itsoftbyrc.com/HTTP</SubServices>
 </Service>
-<Service id="S205551217" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Router</Name>
- <Icon>Switch</Icon>
- <Description>Backend switch. Cisco Nexus 1000V</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>linksys-srw224p</SubServices>
+<Service id="S003857309" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>sshd</Name>
+ <Icon>Process</Icon>
+ <Description></Description>
+ <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+ <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+ <SubServices>xen01/SSH</SubServices>
 </Service>
 <Service id="S230718077" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
@@ -136,6 +136,14 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>kvm01/Mountpoint /srv/cloud</SubServices>
 </Service>
+<Service id="S205551217" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Router</Name>
+ <Icon>Switch</Icon>
+ <Description>Backend switch. Cisco Nexus 1000V</Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>linksys-srw224p</SubServices>
+</Service>
 <Service id="S232630635" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>oned</Name>
  <Icon>Process</Icon>
@@ -144,6 +152,14 @@
  <NotificationMsg>The OpenNebula daemon is now up</NotificationMsg>
  <SubServices>nebula-front/oned alive</SubServices>
 </Service>
+<Service id="ngrt4nsrv20144927234931020" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>OCA</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>www.ngrt4n.com/HTTP</SubServices>
+</Service>
 <Service id="S230723319" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
  <Icon>Hard disk</Icon>
@@ -151,14 +167,6 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>xen02/Mountpoint /srv/cloud</SubServices>
-</Service>
-<Service id="S003801812" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sshd</Name>
- <Icon>Process</Icon>
- <Description></Description>
- <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
- <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>kvm02/SSH</SubServices>
 </Service>
 <Service id="S232540042" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Host Ping Response Time</Name>
@@ -184,6 +192,14 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>kvm02/PING</SubServices>
 </Service>
+<Service id="S003801812" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>sshd</Name>
+ <Icon>Process</Icon>
+ <Description></Description>
+ <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+ <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+ <SubServices>kvm02/SSH</SubServices>
+</Service>
 <Service id="S232532458" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>xend</Name>
  <Icon>Process</Icon>
@@ -200,14 +216,6 @@
  <NotificationMsg>The NFS daemon is now up</NotificationMsg>
  <SubServices>nebula-front/nfsd alive</SubServices>
 </Service>
-<Service id="S003842685" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sshd</Name>
- <Icon>Process</Icon>
- <Description>Connection to SSH server at xen02</Description>
- <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
- <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>xen02/SSH</SubServices>
-</Service>
 <Service id="S230632845" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>/srv/cloud</Name>
  <Icon>Hard disk</Icon>
@@ -215,6 +223,14 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>kvm02/Mountpoint /srv/cloud</SubServices>
+</Service>
+<Service id="ngrt4nsrv20144927234903674" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>XMLRPC</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>www.ngrt4n.com/HTTP</SubServices>
 </Service>
 <Service id="S232612395" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Host Ping Response Time</Name>
@@ -248,6 +264,14 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>songish</SubServices>
 </Service>
+<Service id="ngrt4nsrv20144927234919012" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>Amazon EC2</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>www.ngrt4n.com/HTTP</SubServices>
+</Service>
 <Service id="S233042914" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>NFS Badcalls</Name>
  <Icon>Logfile</Icon>
@@ -255,6 +279,14 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>nebula-front/NFS badcalls</SubServices>
+</Service>
+<Service id="S003842685" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>sshd</Name>
+ <Icon>Process</Icon>
+ <Description>Connection to SSH server at xen02</Description>
+ <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
+ <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
+ <SubServices>xen02/SSH</SubServices>
 </Service>
 <Service id="S232705693" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Host Ping Response Time</Name>
@@ -264,14 +296,6 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>nebula-front/PING</SubServices>
 </Service>
-<Service id="S003820357" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sshd</Name>
- <Icon>Process</Icon>
- <Description></Description>
- <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
- <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>kvm01/SSH</SubServices>
-</Service>
 <Service id="S232512298" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>libvirtd</Name>
  <Icon>Process</Icon>
@@ -279,29 +303,5 @@
  <AlarmMsg>The process libvirtd is down</AlarmMsg>
  <NotificationMsg>The process libvirtd is running</NotificationMsg>
  <SubServices>kvm01/libvirtd alive</SubServices>
-</Service>
-<Service id="S003857309" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sshd</Name>
- <Icon>Process</Icon>
- <Description></Description>
- <AlarmMsg>The ssh server on the host {hostname} seems to be down</AlarmMsg>
- <NotificationMsg>The ssh server on the host {hostname} is up</NotificationMsg>
- <SubServices>xen01/SSH</SubServices>
-</Service>
-<Service id="S232605330" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>xend</Name>
- <Icon>Process</Icon>
- <Description>Xen daemon</Description>
- <AlarmMsg>The process xend is down</AlarmMsg>
- <NotificationMsg>The process xend is now up</NotificationMsg>
- <SubServices>xen02/xend alive</SubServices>
-</Service>
-<Service id="S232601251" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Host Ping Response Time</Name>
- <Icon>Other Check</Icon>
- <Description>Host availability</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>xen02/PING</SubServices>
 </Service>
 </ServiceView>
