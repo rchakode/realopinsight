@@ -87,9 +87,12 @@ int main(int argc, char **argv)
       Wt::WServer::waitForShutdown();
       server.stop();
     }
-  } catch (std::exception &e) {
-    std::cerr << QObject::tr("[FATAL] %1").arg(e.what()).toStdString();
-    exit(1);
+  } catch (dbo::Exception& ex){
+    std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
+    wApp->changeSessionId();
+  } catch (std::exception &ex) {
+    std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
+    wApp->changeSessionId();
   }
   return qtApp.exec();
 }
