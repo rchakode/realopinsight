@@ -16,16 +16,8 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S232525850,S232616083,S230632845,S003801812</SubServices>
 </Service>
-<Service id="S153201106" type="0" statusCalcRule="0" statusPropRule="1">
- <Name>OS</Name>
- <Icon>Business Process</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S181349742,S181426068,S181448973</SubServices>
-</Service>
 <Service id="S154643802" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>OS</Name>
+ <Name>web server</Name>
  <Icon>Windows OS</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -72,14 +64,6 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>S232601251,S232605330,S230723319,S003842685</SubServices>
 </Service>
-<Service id="S153132715" type="0" statusCalcRule="2" statusPropRule="1">
- <Name>ngrt4n.com</Name>
- <Icon>Business Process</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>S153201106,S153210146,S073757810</SubServices>
-</Service>
 <Service id="S231853830" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>Virtual Infrastructure</Name>
  <Icon>Cloud</Icon>
@@ -97,12 +81,12 @@
  <SubServices>S232532458,S232540042,S230727734,S003857309</SubServices>
 </Service>
 <Service id="S154545828" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>itsoftbyrc.com</Name>
+ <Name>Web controler</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>S154643802,S154659138,S073824371</SubServices>
+ <SubServices>S154659138,S073824371</SubServices>
 </Service>
 <Service id="S232250597" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>nebula-server</Name>
@@ -118,7 +102,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>S153132715,S154545828</SubServices>
+ <SubServices>S154545828,S154643802</SubServices>
 </Service>
 <Service id="S230727734" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Network Bandwidth</Name>
@@ -176,14 +160,6 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>Source2:Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
-<Service id="S153210146" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>www</Name>
- <Icon>Other Check</Icon>
- <Description>check apache response time</Description>
- <AlarmMsg>The response time of the web server {hostname} is more than {threshold}</AlarmMsg>
- <NotificationMsg>The response time of the web server is normal</NotificationMsg>
- <SubServices>Source1:www.ngrt4n.com/HTTP</SubServices>
-</Service>
 <Service id="S154659138" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>www</Name>
  <Icon>Other Check</Icon>
@@ -224,14 +200,6 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>Source2:Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
 </Service>
-<Service id="S073757810" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>mysql</Name>
- <Icon>Database Engine</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>Source1:www.ngrt4n.com/Mysql</SubServices>
-</Service>
 <Service id="S232540042" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Availability</Name>
  <Icon>Other Check</Icon>
@@ -239,22 +207,6 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>Source3:localhost</SubServices>
-</Service>
-<Service id="S181448973" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Availability</Name>
- <Icon>Other Check</Icon>
- <Description>Host availability</Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>Source1:www.ngrt4n.com/PING</SubServices>
-</Service>
-<Service id="S181426068" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Load</Name>
- <Icon>Other Check</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>Source1:vsphere01/Current Load</SubServices>
 </Service>
 <Service id="S181629167" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>Load</Name>
@@ -335,14 +287,6 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>Source2:Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
-</Service>
-<Service id="S181349742" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>Swap Usage</Name>
- <Icon>Other Check</Icon>
- <Description>Check swap usage</Description>
- <AlarmMsg>The free swap space</AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>Source1:www.ngrt4n.com/Swap Usage</SubServices>
 </Service>
 <Service id="S003820357" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>ssh</Name>
