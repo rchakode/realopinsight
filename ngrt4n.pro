@@ -193,6 +193,7 @@ SOURCES	+= wt/src/WebDashboard.cpp \
 
 
 webd {
+DEFINES *= REALOPINSIGHT_WEB_STANDALONE
   TARGET = realopinsightd
   LIBS += -lwthttp
 }
@@ -226,4 +227,4 @@ DEFINES *= "RELEASE_NAME='\"Eliana\"'"
 DEFINES *= "RELEASE_YEAR='\"2014\"'"
 DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
-DEFINES *= "REALOPINSIGHT_WWW='\"/var/www/realopinsight\"'"
+DEFINES *= "REALOPINSIGHT_WWW_ROOT='\"REALOPINSIGHT_WWW_ROOT_VALUE\"'"

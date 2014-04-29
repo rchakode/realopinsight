@@ -41,7 +41,7 @@ namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
-  const std::string WWW_ROOT = REALOPINSIGHT_WWW;
+  const std::string WWW_ROOT = REALOPINSIGHT_WWW_ROOT;
 }
 
 WebMap::WebMap(CoreDataT* _cdata)

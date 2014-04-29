@@ -148,6 +148,11 @@ void WebMainUI::setupProfileMenus(void)
 
     Wt::WTemplate* notificationBlock = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
+    m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
+    m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
+    m_notificationBoxes[ngrt4n::Normal]->setHidden(true);
+    notificationBlock->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
+
     m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
     m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
@@ -244,10 +249,11 @@ void WebMainUI::handleRefresh(void)
   m_mainWidget->disable();
   
   std::map<int, int> problemTypeCount;
-  problemTypeCount[ngrt4n::Minor] = 0;
-  problemTypeCount[ngrt4n::Major] = 0;
+  problemTypeCount[ngrt4n::Normal]   = 0;
+  problemTypeCount[ngrt4n::Minor]    = 0;
+  problemTypeCount[ngrt4n::Major]    = 0;
   problemTypeCount[ngrt4n::Critical] = 0;
-  problemTypeCount[ngrt4n::Unknown] = 0;
+  problemTypeCount[ngrt4n::Unknown]  = 0;
 
 
   for (auto& dash : m_dashboards) {
@@ -255,7 +261,7 @@ void WebMainUI::handleRefresh(void)
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
-    int platformSeverity = dash.second->rootNode().severity;
+    int platformSeverity = qMin(dash.second->rootNode().severity, (int)ngrt4n::Unknown);
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
     }
