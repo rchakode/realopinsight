@@ -204,13 +204,7 @@ install_workstation() {
 }
 
 install_webd() {
-  if [ -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
-    BUILD_MODE=release
-  else
-    BUILD_MODE=debug
-  fi
-  echo "[DEBUG] Build mode: ${BUILD_MODE}"
-  ${QMAKE} -config ${BUILD_MODE} ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
+  ${QMAKE} -config debug ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
@@ -258,16 +252,24 @@ install_ultimate() {
   
   echo "DEBUG : Generating locale file"
   lrelease ngrt4n.pro
-  
-  echo "DEBUG : Building the Standalone Server..."
-  install_webd
-  
-  echo "DEBUG : Building the FastCGI Module..."
-  install_fcgi
-  
-  echo "DEBUG : Copy files..."
+ 
+  if [ -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
+    echo "DEBUG : Building the Standalone Server for debug..."
+    install_webd
+    install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
+    install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
+  else
+    echo "DEBUG : Building the FastCGI Module..."
+    install_fcgi
+  fi
 
-  echo "DEBUG : creating directories..."
+  echo "DEBUG : Installing setting files..."
+
+  if [ -d ${APACHE_ROOT}/conf-available ]; then
+    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf-available
+  else
+    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
+  fi
   install -d ${REALOPINSIGHT_CONFIG}
   install -d ${REALOPINSIGHT_CONFIG}/etc
   install -d ${REALOPINSIGHT_CONFIG}/data
@@ -276,37 +278,25 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_WWW}
   install -d ${REALOPINSIGHT_WWW}/run      # directory for thumbnails
   install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
-   
-  echo "DEBUG : copy web files..."
   install contribs/index.html ${REALOPINSIGHT_WWW}/
-  cp -r resources ${REALOPINSIGHT_WWW}/ 
-  cp -r images ${REALOPINSIGHT_WWW}/
-  cp -r i18n ${REALOPINSIGHT_WWW}/
   install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
   install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
   
-  echo "DEBUG : copy configuration files..." 
-  if [ -d ${APACHE_ROOT}/conf-available ]; then
-    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf-available
-  else
-    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
-  fi
-  install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
-  install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
   install -m 600 contribs/apache-realopinsight-ultimate.conf ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
+  cp -r resources ${REALOPINSIGHT_WWW}/ 
+  cp -r images ${REALOPINSIGHT_WWW}/
+  cp -r i18n ${REALOPINSIGHT_WWW}/
   
-  echo "DEBUG : Settings files permissions..."
+  echo "DEBUG : Settings permissions and ..."
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
-  echo "DEBUG : Configuring Apache..."
+  echo "DEBUG : Settings Apache"
   sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
   a2enmod fastcgi || true
   a2enconf realopinsight-ultimate || true 
-  
-  echo "DEBUG : Reloading Apache"
   service apache2 reload
   
   echo "==>Installation completed"
