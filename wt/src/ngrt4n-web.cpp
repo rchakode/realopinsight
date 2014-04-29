@@ -11,6 +11,7 @@
 
 
 
+
 class WebApp : public Wt::WQApplication
 {
 public:
@@ -20,12 +21,20 @@ public:
 protected:
   virtual void create()
   {
+#ifdef REALOPINSIGHT_WEB_STANDALONE
+    m_dirroot = "/";
+    m_docroot = docRoot() +  m_dirroot;
+#else
+    m_dirroot = "";
+    m_docroot = "";
+#endif
+
     setTwoPhaseRenderingThreshold(0);
-    useStyleSheet("resources/css/ngrt4n.css");
-    useStyleSheet("resources/css/font-awesome.min.css");
-    messageResourceBundle().use("resources/i18n/messages");
+    useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
+    useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
+    messageResourceBundle().use(m_docroot+"resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
-    requireJQuery("resources/js/jquery-1.10.2.min.js");
+    requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
     m_dbSession = new DbSession();
     root()->setId("wrapper");
     root()->addWidget(new AuthManager(m_dbSession));
@@ -38,6 +47,8 @@ protected:
 
 private:
   DbSession* m_dbSession;
+  std::string m_dirroot;
+  std::string m_docroot;
 };
 
 Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
@@ -72,14 +83,12 @@ int main(int argc, char **argv)
     server.setServerConfiguration(argc, argv);
     server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication, "", "favicon.ico");
 
-    //DbSession::configureAuth();
-
     if (server.start()) {
       Wt::WServer::waitForShutdown();
       server.stop();
     }
   } catch (std::exception &e) {
-    LOG("error", e.what());
+    std::cerr << QObject::tr("[FATAL] %1").arg(e.what()).toStdString();
     exit(1);
   }
   return qtApp.exec();
