@@ -253,13 +253,13 @@ install_ultimate() {
   echo "DEBUG : Generating locale file"
   lrelease ngrt4n.pro
  
-  if [ -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
-    echo "DEBUG : Building the Standalone Server for debug..."
+  if [ ! -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
+    echo "DEBUG : Building RealOpInsight Standalone..."
     install_webd
     install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
     install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
   else
-    echo "DEBUG : Building the FastCGI Module..."
+    echo "DEBUG : Building RealOpInsight for FastCGI..."
     install_fcgi
   fi
 
