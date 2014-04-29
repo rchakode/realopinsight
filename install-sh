@@ -209,7 +209,7 @@ install_webd() {
   else
     BUILD_MODE=debug
   fi
-  echo "Build mode: ${BUILD_MODE}"
+  echo "[DEBUG] Build mode: ${BUILD_MODE}"
   ${QMAKE} -config ${BUILD_MODE} ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }

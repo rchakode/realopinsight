@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR">
+<TS version="2.0" language="fr_FR">
 <context>
     <name>Auth</name>
     <message>
@@ -34,6 +34,12 @@
         <translation>Annuler</translation>
     </message>
     <message>
+        <location filename="../client/src/Auth.cpp" line="57"/>
+        <source>
+Copyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../client/src/Auth.cpp" line="91"/>
         <source>Authentication failed: wrong username or password</source>
         <translation>Echec d&apos;autentification: nom d&apos;utilisateur ou mot de passe incorrect</translation>
@@ -42,24 +48,133 @@
 <context>
     <name>AuthManager</name>
     <message>
-        <location filename="../wt/src/AuthManager.cpp" line="63"/>
+        <location filename="../wt/src/AuthManager.cpp" line="87"/>
         <source>Wt.Auth.template.logged-in</source>
         <translation></translation>
     </message>
 </context>
 <context>
     <name>DashboardBase</name>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="119"/>
+        <source>The default source is not yet set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="149"/>
+        <location filename="../core/src/DashboardBase.cpp" line="213"/>
+        <source>Undefined source (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="161"/>
+        <source>The server serial %1 is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="246"/>
+        <location filename="../core/src/DashboardBase.cpp" line="933"/>
+        <source>Undefined service (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="479"/>
+        <location filename="../core/src/DashboardBase.cpp" line="579"/>
+        <source>Weird response received from the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="506"/>
+        <source>Authentication failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="556"/>
+        <source>The %1 component is Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="572"/>
+        <source>The host &apos;%1&apos; is Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="575"/>
+        <source>The host &apos;%1&apos; is Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="637"/>
+        <source>Invalid authentication chain!
+Must follow the pattern login:password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="752"/>
+        <source>The connection has been closed by the remote host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="755"/>
+        <source>Host not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="758"/>
+        <source>Connection refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="761"/>
+        <source>SSL Handshake failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="764"/>
+        <source>Timeout exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="767"/>
+        <source>error %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="804"/>
+        <source>Cannot set handler for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="808"/>
+        <source>%1 is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="811"/>
+        <source>Cannot handle source (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="845"/>
+        <source>%1: undefined monitor (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="877"/>
+        <source>Unknown monitor type (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GraphView</name>
     <message>
-        <location filename="../client/src/GraphView.cpp" line="376"/>
+        <location filename="../client/src/GraphView.cpp" line="308"/>
         <source>Select the image destination - %1</source>
         <oldsource>Select the image destination - </oldsource>
         <translation>Sélectionnez le fichier de destination - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GraphView.cpp" line="378"/>
+        <location filename="../client/src/GraphView.cpp" line="310"/>
         <source>PNG files (*.png);; All files (*)</source>
         <translation>Fichier PNG (*.png);; Tous les fichiers (*)</translation>
     </message>
@@ -67,39 +182,39 @@
 <context>
     <name>GuiDashboard</name>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="80"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="81"/>
         <source>Map</source>
         <translation>Cartographie</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="82"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="83"/>
         <source>Web Browser</source>
         <translation>Navigateur Web</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="218"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="214"/>
         <source>Messages related to &apos;%2&apos; - %1</source>
         <translation>Messages relatifs au service &apos;%2&apos; - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="286"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="287"/>
         <source> - %1 Problem%2
  - Level of Impact: %3</source>
         <translation> - %1 incident%2
  - Niveau d&apos;impact : %3</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="287"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="288"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="302"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="303"/>
         <source>Message Console</source>
         <translation>Console des messages</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="356"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="358"/>
         <source>Web Browser (%1)</source>
         <translation>Navigateur Web (%1)</translation>
     </message>
@@ -107,193 +222,218 @@
 <context>
     <name>GuiPreferences</name>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="11"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="35"/>
         <source>&amp;Close</source>
         <translation>&amp;Fermer</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="108"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="131"/>
         <source>Select the source type | %1</source>
         <translation>Sélectionner le type de source | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="109"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="132"/>
         <source>Please select the source type (Remote API)</source>
         <translation>Veuillez sélectionner le type de source (API distante)</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="150"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="173"/>
         <source>Monitoring Settings | %1</source>
         <translation>Paramètres de la console | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="158"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="181"/>
         <source>&amp;Apply settings</source>
         <translation>&amp;Appliquer les changements</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="159"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="182"/>
         <source>Add a&amp;s Source</source>
         <translation>Ajouter comme nouvelle &amp;source</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="160"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="183"/>
         <source>&amp;Delete Source</source>
         <translation>Sup&amp;primer</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="161"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="184"/>
         <source>&amp;Show in clear</source>
         <translation>Afficher en &amp;clair</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="162"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="185"/>
         <source>Use &amp;Ngrt4nd</source>
         <translation>Utiliser &amp;ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="163"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="186"/>
         <source>Don&apos;t verify SSL peer (https)</source>
         <translation>Ne pas vérifier le pair SSL</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="172"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="195"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
         <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="188"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="211"/>
         <source>C&amp;hange password</source>
         <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="193"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="216"/>
         <source>Change Password | %1</source>
         <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="198"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="219"/>
         <source>Current Password</source>
         <translation>Mot de passe actuel</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="201"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="221"/>
         <source>New password</source>
         <translation>Nouveau mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="204"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="223"/>
         <source>Retype new password</source>
         <translation>Confirmation</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="218"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="236"/>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="335"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="354"/>
         <source>Browser requires realm authentication | %1</source>
         <translation>La page demandée requiert une authentification | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="338"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="357"/>
         <source>Login</source>
         <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="342"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="360"/>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="347"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="364"/>
         <source>Submit</source>
         <translation>Soumettre</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="422"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="438"/>
         <source>Password updated</source>
         <translation>Mot de passe mis Ã  jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="426"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="442"/>
         <source>Sorry the passwords do not match</source>
         <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="429"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="445"/>
         <source>Authentication failed</source>
         <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="459"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="475"/>
         <source>Update Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="501"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="517"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
         <translation>Point d&apos;accès Ã  Livestatus ou Ã  ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="503"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="519"/>
         <source>Server Address</source>
         <translation>Adresse du serveur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="505"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="521"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="538"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="554"/>
         <source>Sources</source>
         <translation>Sources</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="541"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="557"/>
         <source>Monitor Web URL*</source>
         <translation>Adresse web du moniteur*</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="543"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="559"/>
         <source>Select a monitor type</source>
         <translation>Selectionner le type de moniteur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="549"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="565"/>
         <source>Auth String</source>
         <translation>Chaine d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="553"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="569"/>
         <source>Update Interval</source>
         <translation>Intervalle de mise Ã  jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="557"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="573"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="562"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="578"/>
         <source>Common Settings</source>
         <translation>Paramètres généraux</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="589"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="610"/>
         <source>Select source index | %1</source>
         <translation>Sélectionner l&apos;index de la source | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="590"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="611"/>
         <source>Please select the index of the source</source>
         <translation>Veuillez sélectionner l&apos;index de la source</translation>
     </message>
 </context>
 <context>
     <name>LsHelper</name>
+    <message>
+        <location filename="../core/src/LsHelper.cpp" line="121"/>
+        <source>Bad request type: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/LsHelper.cpp" line="158"/>
+        <source>Connection closed by the remote host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/LsHelper.cpp" line="161"/>
+        <source>Host not found (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/LsHelper.cpp" line="164"/>
+        <source>Connection refused. Make sure that Livestatus API is listening on tcp://%1:%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/LsHelper.cpp" line="168"/>
+        <source>The following error occurred (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
@@ -303,161 +443,155 @@
         <translation>Console des operations %1</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="88"/>
+        <location filename="../client/src/MainWindow.cpp" line="85"/>
         <source>Please wait for initialization, it may take a while...</source>
         <translation>Veuillez attendre la fin de l&apos;initialisation, cela peut prendre quelques secondes...</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="109"/>
+        <location filename="../client/src/MainWindow.cpp" line="101"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="110"/>
+        <location filename="../client/src/MainWindow.cpp" line="102"/>
         <source>&amp;Refresh Screen</source>
         <translation>&amp;Actualiser la console</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="111"/>
+        <location filename="../client/src/MainWindow.cpp" line="103"/>
         <source>&amp;Save Map as Image</source>
         <translation>Enregi&amp;strer la cartographie sous forme d&apos;image</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="113"/>
+        <location filename="../client/src/MainWindow.cpp" line="105"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="117"/>
+        <location filename="../client/src/MainWindow.cpp" line="109"/>
         <source>&amp;Console</source>
         <translation>&amp;Console</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="118"/>
+        <location filename="../client/src/MainWindow.cpp" line="110"/>
         <source>Map Zoom &amp;In</source>
         <translation>Zoom &amp;avant sur la cartographie</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="119"/>
+        <location filename="../client/src/MainWindow.cpp" line="111"/>
         <source>Map Zoom &amp;Out</source>
         <translation>Zoom a&amp;rrière sur la cartographie</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="120"/>
+        <location filename="../client/src/MainWindow.cpp" line="112"/>
         <source>Hide &amp;Chart</source>
         <translation>Masquer/afficher la &amp;charte</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="124"/>
+        <location filename="../client/src/MainWindow.cpp" line="116"/>
         <source>&amp;Full Screen</source>
         <translation>Pl&amp;ein écran</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="127"/>
+        <location filename="../client/src/MainWindow.cpp" line="119"/>
         <source>&amp;Show only trouble messages</source>
         <translation>N&apos;afficher que des &amp;incidents</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="129"/>
+        <location filename="../client/src/MainWindow.cpp" line="121"/>
         <source>&amp;Increase message &amp;font</source>
         <translation>Activer/désactiver &amp;grande police</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="131"/>
+        <location filename="../client/src/MainWindow.cpp" line="123"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Préférences</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="132"/>
+        <location filename="../client/src/MainWindow.cpp" line="124"/>
         <source>Change &amp;Password</source>
         <translation>Changer de mot de &amp;passe</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="133"/>
+        <location filename="../client/src/MainWindow.cpp" line="125"/>
         <source>&amp;Monitoring Settings</source>
         <translation>Para&amp;mètres de la console</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="135"/>
+        <location filename="../client/src/MainWindow.cpp" line="127"/>
         <source>&amp;Browser</source>
         <translation>&amp;Navigateur</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="136"/>
+        <location filename="../client/src/MainWindow.cpp" line="128"/>
         <source>Bac&amp;k</source>
         <translation>&amp;Précédent</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="137"/>
+        <location filename="../client/src/MainWindow.cpp" line="129"/>
         <source>For&amp;ward</source>
         <translation>&amp;Suivant</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="138"/>
+        <location filename="../client/src/MainWindow.cpp" line="130"/>
         <source>Sto&amp;p</source>
         <translation>&amp;ArrÃªter</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="139"/>
+        <location filename="../client/src/MainWindow.cpp" line="131"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="140"/>
+        <location filename="../client/src/MainWindow.cpp" line="132"/>
         <source>Online &amp;Resources</source>
         <translation>&amp;Aide en ligne</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="142"/>
+        <location filename="../client/src/MainWindow.cpp" line="134"/>
         <source>&amp;About %1</source>
         <translation>&amp;A propos de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="144"/>
+        <location filename="../client/src/MainWindow.cpp" line="136"/>
         <source>&amp;Filter related messages</source>
         <translation>&amp;Filtrer les messages associés</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="145"/>
+        <location filename="../client/src/MainWindow.cpp" line="137"/>
         <source>Center Graph &amp;On</source>
         <translation>&amp;Centrer la carte sur le noeud</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="146"/>
+        <location filename="../client/src/MainWindow.cpp" line="138"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="183"/>
+        <location filename="../client/src/MainWindow.cpp" line="177"/>
         <source>%1 - %2 Operations Console</source>
         <translation>%1 - %2 Console des Opérations</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="226"/>
+        <location filename="../client/src/MainWindow.cpp" line="224"/>
         <source>updating...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="228"/>
+        <location filename="../client/src/MainWindow.cpp" line="226"/>
         <source>update completed</source>
         <translation>mise Ã  jour terminée</translation>
     </message>
 </context>
 <context>
-    <name>PieChart</name>
-</context>
-<context>
-    <name>Preferences</name>
-</context>
-<context>
     <name>QObject</name>
     <message>
-        <location filename="../client/src/GuiUtils.cpp" line="36"/>
+        <location filename="../client/src/GuiUtils.cpp" line="60"/>
         <source>%1 - Warning</source>
         <translation>%1 - Attention</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiUtils.cpp" line="46"/>
+        <location filename="../client/src/GuiUtils.cpp" line="70"/>
         <source>       &gt; %1 %2 %3 (codename: %4)
         &gt;&gt; Realease ID: %5
         &gt;&gt; Copyright (C) 2010 - %6 RealOpInsight Labs. All rights reserved
@@ -469,36 +603,35 @@
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="41"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="48"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="49"/>
         <source>Date &amp; Hour</source>
         <translation>Date &amp; Heure</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="42"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="52"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="53"/>
         <source>Severity</source>
         <translation>Sévérité</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="43"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="56"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="57"/>
         <source>Host</source>
         <translation>HÃ´te</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="44"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="60"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="61"/>
         <source>Service</source>
         <translation>Service</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="45"/>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="64"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="65"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="220"/>
         <source>
 %1 %2 (codename: %3)
 
@@ -509,7 +642,7 @@ Visit %6 for more information
 
 Report Bugs: bugs@ngrt4n.com
 </source>
-        <translation>
+        <translation type="obsolete">
 %1 %2 (nom de code : %3)
 
 Numéro de série : %4
@@ -520,7 +653,9 @@ Visiter notre site web %6 pour plus d&apos;informations
 Reporter des bugs : bugs@ngrt4n.com</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="41"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="40"/>
+        <location filename="../core/src/DashboardBase.cpp" line="50"/>
+        <location filename="../core/src/utilsCore.cpp" line="30"/>
         <source>Service: %1
 Description: %2
 Severity: %3
@@ -533,7 +668,9 @@ Séverité : %3
    Règle de propagation : %5</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="42"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="41"/>
+        <location filename="../core/src/DashboardBase.cpp" line="51"/>
+        <location filename="../core/src/utilsCore.cpp" line="31"/>
         <source>
 Target Host: %6
 Data Point: %7
@@ -546,70 +683,71 @@ Sortie du plugin : %8
 Autres détails : %9</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="43"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="42"/>
+        <location filename="../core/src/DashboardBase.cpp" line="52"/>
         <source>Failed to connect to %1 (%2)</source>
         <translation>Echec lors de la connexion Ã  %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-editor.cpp" line="50"/>
+        <location filename="../client/src/ngrt4n-editor.cpp" line="51"/>
         <source>Editor</source>
         <translation>Editeur</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-manager.cpp" line="96"/>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="91"/>
+        <location filename="../client/src/ngrt4n-manager.cpp" line="99"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="92"/>
         <source>You need to select a configuration file!</source>
         <translation>Vous devez sélectionner un fichier de configuration!</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-manager.cpp" line="99"/>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="95"/>
+        <location filename="../client/src/ngrt4n-manager.cpp" line="102"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="96"/>
         <source>%1 | Select a configuration file</source>
         <translation>%1 | Sélectionner un fichier de configuration</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-manager.cpp" line="101"/>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="97"/>
+        <location filename="../client/src/ngrt4n-manager.cpp" line="104"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="98"/>
         <source>Xml files (*.xml);;All files (*)</source>
         <translation>Fichiers Xml (*.xml);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-manager.cpp" line="104"/>
+        <location filename="../client/src/ngrt4n-manager.cpp" line="107"/>
         <source>No configuration file has been selected and the program will exit!</source>
         <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="52"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="53"/>
         <source>Operations Console</source>
         <translation>Console des opérations</translation>
     </message>
     <message>
-        <location filename="../client/src/ngrt4n-oc.cpp" line="100"/>
+        <location filename="../client/src/ngrt4n-oc.cpp" line="101"/>
         <source>No configuration file selected, the program will exit!</source>
         <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
     </message>
     <message>
-        <location filename="../client/src/PieChart.cpp" line="86"/>
+        <location filename="../core/src/ChartBase.cpp" line="53"/>
         <source>Normal: </source>
         <translation>Normal :</translation>
     </message>
     <message>
-        <location filename="../client/src/PieChart.cpp" line="88"/>
+        <location filename="../core/src/ChartBase.cpp" line="55"/>
         <source>Minor: </source>
         <translation>Mineur : </translation>
     </message>
     <message>
-        <location filename="../client/src/PieChart.cpp" line="90"/>
+        <location filename="../core/src/ChartBase.cpp" line="57"/>
         <source>Major: </source>
         <translation>Majeur : </translation>
     </message>
     <message>
-        <location filename="../client/src/PieChart.cpp" line="92"/>
+        <location filename="../core/src/ChartBase.cpp" line="59"/>
         <source>Critical: </source>
         <translation>Critique : </translation>
     </message>
     <message>
-        <location filename="../client/src/PieChart.cpp" line="94"/>
+        <location filename="../core/src/ChartBase.cpp" line="61"/>
         <source>Unknown: </source>
         <translation>Indéfini : </translation>
     </message>
@@ -639,42 +777,41 @@ Autres détails : %9</translation>
         <translation>indéfini</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMsgConsole.cpp" line="68"/>
+        <location filename="../wt/src/WebMsgConsole.cpp" line="69"/>
         <source>Service ID</source>
         <translation>ID Service </translation>
     </message>
     <message>
-        <location filename="../wt/dbo/ViewMgnt.cpp" line="35"/>
         <source>View Managment</source>
-        <translation>Gestion des vues</translation>
+        <translation type="obsolete">Gestion des vues</translation>
     </message>
     <message>
-        <location filename="../wt/dbo/ViewMgnt.cpp" line="74"/>
+        <location filename="../wt/dbo/ViewMgnt.cpp" line="69"/>
         <source>&lt;&lt; Assign</source>
         <translation>&lt;&lt; Assigner</translation>
     </message>
     <message>
-        <location filename="../wt/dbo/ViewMgnt.cpp" line="78"/>
+        <location filename="../wt/dbo/ViewMgnt.cpp" line="73"/>
         <source>Revoke&gt;&gt;</source>
         <translation>Désassigner&gt;&gt;</translation>
     </message>
     <message>
-        <location filename="../wt/dbo/ViewMgnt.cpp" line="82"/>
+        <location filename="../wt/dbo/ViewMgnt.cpp" line="77"/>
         <source>Delete View</source>
         <translation>Supprimer vue</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="139"/>
+        <location filename="../wt/src/WebUtils.cpp" line="161"/>
         <source>&lt;span class=&quot;btn&quot;&gt; &lt;i class=&quot;%1&quot;&gt;&lt;/i&gt;&lt;/span&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/AuthManager.cpp" line="68"/>
+        <location filename="../wt/src/AuthManager.cpp" line="96"/>
         <source>Sign out</source>
         <translation>Déconnexion</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="41"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="42"/>
         <source>Please verify the monitor type and fix field(s) in red</source>
         <translation>Veuillez vérifier le type de moniteur et toutes les informations marquées en rouge</translation>
     </message>
@@ -719,15 +856,158 @@ Autres détails : %9</translation>
         <translation>L&apos;index de la source est incorrect (%1)</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="254"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="256"/>
         <source>Select source type</source>
         <translatorcomment>Veuillez sélectionner le type de source</translatorcomment>
         <translation>Sélectionner le type de source</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="259"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="261"/>
         <source>Select the source index</source>
         <translation>Veuillez sélectionner l&apos;index de la source</translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiPreferences.cpp" line="238"/>
+        <source>
+Version: %2 (codename: %3)
+
+Edition: %1
+
+Release ID: %4
+
+Copyright (c) 2010-%5 RealOpInsight Labs. All rights reserved
+Visit %6 for more information
+
+Report Bugs: %7
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="43"/>
+        <source>%1 Ultimate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="45"/>
+        <source>%1 Workstation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="82"/>
+        <location filename="../core/src/Base.hpp" line="87"/>
+        <source>Unchanged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="83"/>
+        <source>Decreased</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="84"/>
+        <source>Increased</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="101"/>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="102"/>
+        <source>High Severity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="113"/>
+        <source>Native Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="114"/>
+        <source>Business Process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/DashboardBase.cpp" line="266"/>
+        <source>updating %1 (%2)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Parser.cpp" line="54"/>
+        <source>Unable to open the file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Parser.cpp" line="62"/>
+        <source>Error while parsing the file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Parser.cpp" line="160"/>
+        <source>Unable into write the file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/Parser.cpp" line="181"/>
+        <source>The graph engine exited with the code %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/utilsCore.cpp" line="39"/>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/utilsCore.cpp" line="42"/>
+        <source>Minor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/utilsCore.cpp" line="45"/>
+        <source>Major</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/utilsCore.cpp" line="48"/>
+        <source>Critical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../core/src/utilsCore.cpp" line="53"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="467"/>
+        <source>Welcome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="468"/>
+        <source>Getting Started in 3 Simple Steps !</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="479"/>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="486"/>
+        <source>Preview</source>
+        <translation type="unfinished">Prévisualiser</translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="492"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="493"/>
+        <source>All Views and Access Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/ngrt4n-web.cpp" line="91"/>
+        <source>[FATAL] %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -773,19 +1053,33 @@ Autres détails : %9</translation>
         <translation>Source de données</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="248"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="246"/>
         <source>Calculation rule (Default is %1)</source>
         <oldsource>Calculation rule (Default is)</oldsource>
         <translation>Règle de calcul (valeur par défaut %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="255"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="253"/>
         <source>Propagation rule (Default is %1)</source>
         <oldsource>Propagation rule (Default is)</oldsource>
         <translation>Règle de propagation (valeur par défaut %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="302"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="300"/>
+        <source>This depends on your monitoring configuration:
+ * For Nagios this follows the patterns &apos;host_name/service_name&apos;
+    E.g. mysql-server.example.com/Current Load.
+    From RealOpInsght 3.0 and higher, both the host part and the service are required.
+ * For Zabbix it follows the pattern &apos;host_name/trigger_name&apos;
+    E.g. Zabbix server/Zabbix http poller processes more than 75% busy
+    From RealOpInsght 3.0 and higher, both the host part and the service are required.
+ * For Zenoss it follows the patterns &apos;device_name/component_name&apos;
+    E.g. localhost/httpd, localhost
+    From RealOpInsght 3.0 and higher, both the host part and the service are required.
+See the online documentation for further details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>This depends on your monitoring configuration:
  * For Nagios this follows the patterns &apos;host_name/service_name&apos; or just &apos;host_name&apos;
     E.g. mysql-server.example.com/Current Load, mysql-server.example.com
@@ -806,7 +1100,7 @@ See the online documentation for further details.</source>
     E.g. localhost/httpd, localhost
     NOTE: When only device_name is set, the data point is associated to ping status.
 See the online documentation for further details.</oldsource>
-        <translation>Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
+        <translation type="obsolete">Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
  * Pour Nagios et les systèmes similaires comme Shinken; c&apos;est de la forme &apos;host_name/service_name&apos; or juste &apos;host_name&apos;
     Ex. mysql-server.example.com/Current Load, mysql-server.example.com
     Si seulement la partie host_name est définie la source de données sera assignée au ping.
@@ -819,9 +1113,6 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
     </message>
 </context>
 <context>
-    <name>StatsLegend</name>
-</context>
-<context>
     <name>SvCreator</name>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="56"/>
@@ -830,8 +1121,8 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="100"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="136"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="517"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="138"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="520"/>
         <source>%1 Editor - %2</source>
         <translation> Editeur %1 - %2</translation>
     </message>
@@ -851,33 +1142,32 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
         <translation>%1;;%2;;%3;;%4;;Fichiers Xml (*.xml);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="130"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="486"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="489"/>
         <source>Unable to open the file &apos;%1&apos;</source>
         <translation>Impossible d&apos;ouvrir le fichier &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="143"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="145"/>
         <source>Select the Status File %</source>
         <translation>Sélectionner un fichier de status Nagios %</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="145"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="147"/>
         <source>Data files (*.dat);;All files (*)</source>
         <translation>Fichiers de données (*.dat);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="154"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="156"/>
         <source>New View</source>
         <translation>Nouvelle vue de service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="162"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="164"/>
         <source>%1 Editor - unsaved document*</source>
         <translation>Editeur %1 - document non enregistré*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="171"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="172"/>
         <source>sub service %1</source>
         <translation>sous service %1</translation>
     </message>
@@ -929,106 +1219,103 @@ Do you want to save the changes?</source>
 Voulez-vous enregistrer les mises Ã  jour?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="420"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="432"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="459"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="475"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="423"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="435"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="462"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="478"/>
         <source>%1 Editor - %2*</source>
         <translation>Editeur %1 - %2*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="426"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="429"/>
         <source>This action is not permitted for a service having sub service(s)!!!</source>
         <translation>Cette action n&apos;est pas autorisée sur un service ayant des sous-services!!!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="482"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="485"/>
         <source>saving %1</source>
         <translation>enregistrement de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="492"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="495"/>
         <source>The hierarchy does not have root</source>
         <translation>La hiérarchie n&apos;a pas de racine</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="516"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="519"/>
         <source>saved %1</source>
         <translation>sauvé %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="547"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="550"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="550"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="553"/>
         <source>&amp;Open</source>
         <translation>&amp;Ouvrir</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="552"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="555"/>
         <source>&amp;Save</source>
         <translation>&amp;Enregistrer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="554"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="557"/>
         <source>Save &amp;As...</source>
         <translation>Enregistrer &amp;sous...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="557"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="560"/>
         <source>&amp;Import Status File</source>
         <translation>&amp;Importer un fichier de status Nagios</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="559"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="562"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="561"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="564"/>
         <source>&amp;Edition</source>
         <translation>&amp;Edition</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="562"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="565"/>
         <source>&amp;Add sub service</source>
         <translation>&amp;Ajouter sous service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="565"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="568"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="568"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="571"/>
         <source>&amp;Paste</source>
         <translation>Co&amp;ller</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="571"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="574"/>
         <source>&amp;Delete</source>
         <translation>&amp;Supprimer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="574"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="577"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="575"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="578"/>
         <source>Online &amp;Resources</source>
         <translation>&amp;Ressources en ligne</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="578"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="581"/>
         <source>&amp;About %1</source>
         <translation>&amp;A propos de %1</translation>
     </message>
-</context>
-<context>
-    <name>SvNavigator</name>
 </context>
 <context>
     <name>SvNavigatorTree</name>
@@ -1038,7 +1325,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation>Explorateur d&apos;arborescence</translation>
     </message>
     <message>
-        <location filename="../client/src/SvNavigatorTree.cpp" line="57"/>
+        <location filename="../client/src/SvNavigatorTree.cpp" line="52"/>
         <source>Dropping is not allowed on the target node</source>
         <translation>Impossible de déposer : ce type de noeud ne peut pas avoir de sous services</translation>
     </message>
@@ -1054,7 +1341,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
 <context>
     <name>WebDashboard</name>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="266"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="226"/>
         <source>%1 event on %2</source>
         <translation>%1 évènement(s) sur %2</translation>
     </message>
@@ -1070,113 +1357,130 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
 <context>
     <name>WebMainUI</name>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="116"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="669"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="106"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="720"/>
         <source>Operations Console</source>
         <translation>Console des opérations</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="339"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="343"/>
+        <source>File too large.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="362"/>
         <source>Invalid description file</source>
         <translation>Fichier de description invalide</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="561"/>
         <source>Change password</source>
-        <translation>Changer de mot de passe</translation>
+        <translation type="obsolete">Changer de mot de passe</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="62"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="64"/>
         <source>Select file to preview | %1</source>
         <translation>Sélectionner la fichier Ã  prévisualiser | %1</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="114"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="129"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="104"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="119"/>
         <source>Account &amp; Settings</source>
         <translation>Compte et paramètres</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="163"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="180"/>
         <source>Signed in as %1</source>
         <translation>Connecté en tant que %1</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="172"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="185"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="187"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="200"/>
         <source>Show Account &amp; Settings</source>
         <translation>Affichier les paramètres</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="178"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="193"/>
         <source>Hide Account &amp; Settings</source>
         <translation>Masquer les paramètres</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="192"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="207"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="275"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="298"/>
         <source>Select the platform to preview</source>
         <translation>Sélectionner la plateforme Ã  prévisualiser</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="283"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="306"/>
         <source>Preview</source>
         <translation>Prévisualiser</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="291"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="314"/>
         <source>Import a description file</source>
         <translation>Importer un fichier de description</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="304"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="327"/>
         <source>Upload</source>
         <translation>Importer</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="311"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="639"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="334"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="691"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="320"/>
-        <source>File is too large.</source>
-        <translation>Fichier trop volumineux.</translation>
+        <location filename="../wt/src/WebMainUI.cpp" line="379"/>
+        <source>View added.  Name: %1
+ -  Services: %2 - Path: %3</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="345"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="430"/>
+        <source>A platfom with the same name is already loaded (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="437"/>
+        <source>Dashboard initialization failed with bad_alloc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File is too large.</source>
+        <translation type="obsolete">Fichier trop volumineux.</translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="367"/>
         <source>%1/%2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="357"/>
         <source>View added.  Name: %1
  -  Number of services: %2 - Path: %3</source>
-        <translation>Vue ajoutée.  Nom: %1
+        <translation type="obsolete">Vue ajoutée.  Nom: %1
  -  Nombre de services: %2 - Chemin: %3</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="377"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="399"/>
         <source>No file selected</source>
         <translation>Aucun fichier sélectionné</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="404"/>
         <source>This platform or a platfom with the same name is already loaded</source>
-        <translation>Cette  plateforme ou une plateforme du mÃªme nom existe déjÃ </translation>
+        <translation type="obsolete">Cette  plateforme ou une plateforme du mÃªme nom existe déjÃ </translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="579"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="630"/>
         <source>Sorry, the request resource is not available or has been removed</source>
         <translation>Désolé, la resource demandé n&apos;est plus disponible</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="712"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="767"/>
         <source>Unable to create the directory (%1)</source>
         <translation>Impossible de créer le repertoire (%1)</translation>
     </message>
@@ -1184,77 +1488,77 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
 <context>
     <name>Wt::WString</name>
     <message>
-        <location filename="../wt/dbo/UserMngtUI.cpp" line="415"/>
+        <location filename="../wt/dbo/UserMngtUI.cpp" line="427"/>
         <source>user-list-tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/dbo/ViewMgnt.cpp" line="46"/>
+        <location filename="../wt/dbo/ViewMgnt.cpp" line="44"/>
         <source>view-assignment-tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="212"/>
-        <source>statistic-tooltip.tpl</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="261"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="221"/>
         <source>event-feed.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="436"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="470"/>
         <source>getting-started.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="157"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="149"/>
         <source>notification.block.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="427"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="133"/>
+        <source>beta-message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="459"/>
         <source>admin-home.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="665"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="716"/>
         <source>operator-home.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="642"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="694"/>
         <source>about-tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="686"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="741"/>
         <source>dashboard-thumbnail.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="51"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="52"/>
         <source>setting-page.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="42"/>
+        <location filename="../wt/src/WebUtils.cpp" line="64"/>
         <source>error-msg-div-tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="45"/>
+        <location filename="../wt/src/WebUtils.cpp" line="67"/>
         <source>success-msg-div-tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebUtils.cpp" line="94"/>
+        <location filename="../wt/src/WebUtils.cpp" line="116"/>
         <source>copyright-footer.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebPieChart.cpp" line="88"/>
+        <location filename="../wt/src/WebPieChart.cpp" line="87"/>
         <source>chart.tpl</source>
         <translation></translation>
     </message>
@@ -1262,12 +1566,9 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
 <context>
     <name>ngrt4n</name>
     <message>
-        <location filename="../wt/src/WebPreferences.cpp" line="63"/>
+        <location filename="../wt/src/WebPreferences.cpp" line="64"/>
         <source>-- Select a type --</source>
         <translation>-- Sélectionner un type --</translation>
     </message>
-</context>
-<context>
-    <name>utils</name>
 </context>
 </TS>

@@ -21,12 +21,12 @@ public:
 protected:
   virtual void create()
   {
-#ifdef REALOPINSIGHT_WEB_STANDALONE
-    m_dirroot = "/";
-    m_docroot = docRoot() +  m_dirroot;
-#else
+#ifdef REALOPINSIGHT_WEB_FASTCGI
     m_dirroot = "";
     m_docroot = "";
+#else
+    m_dirroot = "/";
+    m_docroot = docRoot() +  m_dirroot;
 #endif
 
     setTwoPhaseRenderingThreshold(0);

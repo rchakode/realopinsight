@@ -193,12 +193,12 @@ SOURCES	+= wt/src/WebDashboard.cpp \
 
 
 webd {
-DEFINES *= REALOPINSIGHT_WEB_STANDALONE
   TARGET = realopinsightd
   LIBS += -lwthttp
 }
 
 web-fcgi {
+  DEFINES *= REALOPINSIGHT_WEB_FASTCGI
   TARGET = realopinsight.fcgi
   LIBS += -lwtfcgi
 }
