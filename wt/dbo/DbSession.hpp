@@ -51,9 +51,10 @@ public:
   Wt::Auth::AuthService& auth();
   Wt::Auth::PasswordService* passwordAuthentificator(void);
   Wt::Auth::Login& loginObject(void);
+  bool isLogged(void) {return loginObject().loggedIn();}
   void configureAuth(void);
   const User& loggedUser(void)const {return m_loggedUser;}
-  void setLoggedUser(const std::string& uid);
+  void setLoggedUser(void);
 
   int addUser(const User& user);
   int updateUser(User user);

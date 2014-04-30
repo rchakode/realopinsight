@@ -89,10 +89,10 @@ int main(int argc, char **argv)
     }
   } catch (dbo::Exception& ex){
     std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
-    wApp->changeSessionId();
+    exit(1);
   } catch (std::exception &ex) {
     std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
-    wApp->changeSessionId();
+    exit(1);
   }
   return qtApp.exec();
 }

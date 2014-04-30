@@ -183,6 +183,7 @@ Wt::Auth::PasswordService* DbSession::passwordAuthentificator(void)
 
 Wt::Auth::Login& DbSession::loginObject(void)
 {
+  rereadAll();
   return m_loginObj;
 }
 
@@ -197,11 +198,12 @@ void DbSession::configureAuth(void)
   m_passAuthService->setAttemptThrottlingEnabled(true);
 }
 
-void DbSession::setLoggedUser(const std::string& uid)
+void DbSession::setLoggedUser(void)
 {
   try {
+    std::string dbUserId = loginObject().user().id();
     dbo::Transaction transaction(*this);
-    dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(uid);
+    dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(dbUserId);
     m_loggedUser = *(info.modify()->user());
     transaction.commit();
   } catch (const dbo::Exception& ex) {

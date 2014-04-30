@@ -52,9 +52,8 @@ AuthManager::AuthManager(DbSession* dbSession)
 
 void AuthManager::handleAuthentication(void)
 {
-  if (m_dbSession->loginObject().loggedIn()) {
-    m_dbSession->setLoggedUser(m_dbSession->loginObject().user().id());
-
+  if (m_dbSession->isLogged()) {
+    m_dbSession->setLoggedUser();
     LoginSession sessionInfo;
     sessionInfo.username = m_dbSession->loggedUser().username;
     sessionInfo.sessionId = wApp->sessionId();
@@ -79,7 +78,7 @@ void AuthManager::createLoginView(void)
 
 void AuthManager::createLoggedInView(void)
 {
-  m_dbSession->setLoggedUser(m_dbSession->loginObject().user().id());
+  m_dbSession->setLoggedUser();
 
   LoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;

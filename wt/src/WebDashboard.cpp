@@ -224,7 +224,7 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
   tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
   tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("#"),
                                                       tr("%1 event on %2")
-                                                      .arg(ngrt4n::severityText(node.severity), node.name).toStdString()));
+                                                      .arg(ngrt4n::severityText(node.severity), node.child_nodes).toStdString()));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", rootNode().name.toStdString());
   tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
