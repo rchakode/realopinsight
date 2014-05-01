@@ -9,7 +9,7 @@
  <SubServices>ngrt4nsrv20130127160155955,ngrt4nsrv20130227160204733,ngrt4nsrv20130227160223371,ngrt4nsrv20130227160226558,ngrt4nsrv20131027161016688,ngrt4nsrv20131027161019700,ngrt4nsrv20144803144834428,ngrt4nsrv20144803144846415,ngrt4nsrv20145603145648535,ngrt4nsrv20145703145717099,ngrt4nsrv20145703145725891</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160214649" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 57</Name>
+ <Name>item 57</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -17,7 +17,7 @@
  <SubServices>ngrt4nsrv20130227160214799</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160223957" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 77</Name>
+ <Name>item 77</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -33,7 +33,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135426077" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 131</Name>
+ <Name>item 131</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -57,7 +57,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145725891" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 74</Name>
+ <Name>item 74</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -65,7 +65,7 @@
  <SubServices>ngrt4nsrv20145703145726034</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135403748" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 108</Name>
+ <Name>item 108</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -73,7 +73,7 @@
  <SubServices>ngrt4nsrv20145415135403877</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160159253" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 27</Name>
+ <Name>item 27</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -81,7 +81,7 @@
  <SubServices>ngrt4nsrv20130127160159403</SubServices>
 </Service>
 <Service id="ngrt4nsrv20131027161019951" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 12</Name>
+ <Name>item 12</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -89,7 +89,7 @@
  <SubServices>ngrt4nsrv20140011170032021,ngrt4nsrv20140511170522854</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160156096" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 24</Name>
+ <Name>item 24</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -97,7 +97,7 @@
  <SubServices>ngrt4nsrv20130127160156239</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135403877" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 109</Name>
+ <Name>item 109</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -105,7 +105,7 @@
  <SubServices>ngrt4nsrv20140311170303582,ngrt4nsrv20140311170306367</SubServices>
 </Service>
 <Service id="ngrt4nsrv20131027161019700" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 10</Name>
+ <Name>item 10</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -113,7 +113,7 @@
  <SubServices>ngrt4nsrv20131027161019830</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160223371" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 73</Name>
+ <Name>item 73</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -121,7 +121,7 @@
  <SubServices>ngrt4nsrv20130227160223525,ngrt4nsrv20144215134249820,ngrt4nsrv20144215134251091</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145717099" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 57</Name>
+ <Name>item 57</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -129,7 +129,7 @@
  <SubServices>ngrt4nsrv20145703145717254,ngrt4nsrv20145515135551338,ngrt4nsrv20145515135552975</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160202771" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 33</Name>
+ <Name>item 33</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -137,7 +137,7 @@
  <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135547035" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 140</Name>
+ <Name>item 140</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -145,7 +145,7 @@
  <SubServices>ngrt4nsrv20145515135547165</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135603064" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 159</Name>
+ <Name>item 159</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -161,7 +161,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144846415" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 12</Name>
+ <Name>item 12</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -169,7 +169,7 @@
  <SubServices>ngrt4nsrv20144803144846565</SubServices>
 </Service>
 <Service id="ngrt4nsrv20131027161019830" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 11</Name>
+ <Name>item 11</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -185,7 +185,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135605007" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 162</Name>
+ <Name>item 162</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -193,7 +193,7 @@
  <SubServices>ngrt4nsrv20145615135605146</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145717562" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 60</Name>
+ <Name>item 60</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -201,7 +201,7 @@
  <SubServices>ngrt4nsrv20145703145717716</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135547165" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 141</Name>
+ <Name>item 141</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -217,7 +217,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145726034" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 75</Name>
+ <Name>item 75</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -241,7 +241,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135551338" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 143</Name>
+ <Name>item 143</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -249,7 +249,7 @@
  <SubServices>ngrt4nsrv20145515135551478</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134245218" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 42</Name>
+ <Name>item 42</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -265,7 +265,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135416867" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 121</Name>
+ <Name>item 121</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -273,7 +273,7 @@
  <SubServices>ngrt4nsrv20145415135417026</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135542998" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 133</Name>
+ <Name>item 133</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -289,7 +289,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135410756" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 112</Name>
+ <Name>item 112</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -305,7 +305,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160214799" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 58</Name>
+ <Name>item 58</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -313,7 +313,7 @@
  <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135402080" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 104</Name>
+ <Name>item 104</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -321,7 +321,7 @@
  <SubServices>ngrt4nsrv20145415135402222</SubServices>
 </Service>
 <Service id="ngrt4nsrv20131027161016688" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 4</Name>
+ <Name>item 4</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -329,7 +329,7 @@
  <SubServices>ngrt4nsrv20131027161016811</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135605146" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 163</Name>
+ <Name>item 163</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -337,7 +337,7 @@
  <SubServices>ngrt4nsrv20145615135605294</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160224237" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 79</Name>
+ <Name>item 79</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -345,7 +345,7 @@
  <SubServices>ngrt4nsrv20130227160224377</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160226558" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 81</Name>
+ <Name>item 81</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -369,7 +369,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144834428" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 1</Name>
+ <Name>item 1</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -377,7 +377,7 @@
  <SubServices>ngrt4nsrv20144803144836519</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145726177" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 76</Name>
+ <Name>item 76</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -385,7 +385,7 @@
  <SubServices>ngrt4nsrv20145703145726331</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160204733" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 36</Name>
+ <Name>item 36</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -393,7 +393,7 @@
  <SubServices>ngrt4nsrv20130227160204873,ngrt4nsrv20144215134243579</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135551478" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 144</Name>
+ <Name>item 144</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -401,7 +401,7 @@
  <SubServices>ngrt4nsrv20145515135551636</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164158829" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 78</Name>
+ <Name>item 78</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -409,7 +409,7 @@
  <SubServices>ngrt4nsrv20144116164158961</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134245109" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 41</Name>
+ <Name>item 41</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -417,7 +417,7 @@
  <SubServices>ngrt4nsrv20144215134245218</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144846565" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 13</Name>
+ <Name>item 13</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -433,7 +433,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160155955" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 23</Name>
+ <Name>item 23</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -441,7 +441,7 @@
  <SubServices>ngrt4nsrv20130127160156096,ngrt4nsrv20130127160159253,ngrt4nsrv20130227160213952,ngrt4nsrv20145415135426077</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160214095" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 53</Name>
+ <Name>item 53</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -457,7 +457,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160224377" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 80</Name>
+ <Name>item 80</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -465,7 +465,7 @@
  <SubServices>ngrt4nsrv20140011170048967,ngrt4nsrv20140611170608178</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134233359" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 30</Name>
+ <Name>item 30</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -481,7 +481,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135543145" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 134</Name>
+ <Name>item 134</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -497,7 +497,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160226697" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 82</Name>
+ <Name>item 82</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -505,7 +505,7 @@
  <SubServices>ngrt4nsrv20130227160226838,ngrt4nsrv20145415135414624</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134233230" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 29</Name>
+ <Name>item 29</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -513,7 +513,7 @@
  <SubServices>ngrt4nsrv20144215134233359</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160204873" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 37</Name>
+ <Name>item 37</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -521,7 +521,7 @@
  <SubServices>ngrt4nsrv20130227160205044,ngrt4nsrv20144215134245109</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164158961" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 79</Name>
+ <Name>item 79</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -553,7 +553,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135605294" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 164</Name>
+ <Name>item 164</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -561,7 +561,7 @@
  <SubServices>ngrt4nsrv20140111170127121,ngrt4nsrv20140711170744797</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135659307" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 181</Name>
+ <Name>item 181</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -577,7 +577,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135417026" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 122</Name>
+ <Name>item 122</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -601,7 +601,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144836519" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 2</Name>
+ <Name>item 2</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -625,7 +625,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135414922" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 119</Name>
+ <Name>item 119</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -633,7 +633,7 @@
  <SubServices>ngrt4nsrv20140211170256198,ngrt4nsrv20140211170259941</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164159109" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 80</Name>
+ <Name>item 80</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -641,7 +641,7 @@
  <SubServices>ngrt4nsrv20144116164159279</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160156239" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 25</Name>
+ <Name>item 25</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -649,7 +649,7 @@
  <SubServices>ngrt4nsrv20130127160156360</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160159779" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 31</Name>
+ <Name>item 31</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -657,23 +657,23 @@
  <SubServices>ngrt4nsrv20130227160202631</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160227434" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 87</Name>
+ <Name>item 87</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>ngrt4nsrv20140211170232857,ngrt4nsrv20140211170239033</SubServices>
 </Service>
-<Service id="ngrt4nsrv20130127160156360" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 26</Name>
+<Service id="ngrt4nsrv20130127160156360" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>item 26</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164156079" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 73</Name>
+ <Name>item 73</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -697,7 +697,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135603201" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 160</Name>
+ <Name>item 160</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -705,7 +705,7 @@
  <SubServices>ngrt4nsrv20145615135603340</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134236542" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 34</Name>
+ <Name>item 34</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -721,7 +721,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160213952" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 52</Name>
+ <Name>item 52</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -729,7 +729,7 @@
  <SubServices>ngrt4nsrv20130227160214095,ngrt4nsrv20145515135544990</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135426227" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 132</Name>
+ <Name>item 132</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -745,7 +745,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20131027161016811" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 5</Name>
+ <Name>item 5</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -753,7 +753,7 @@
  <SubServices>ngrt4nsrv20131027161016950</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160159659" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 30</Name>
+ <Name>item 30</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -761,7 +761,7 @@
  <SubServices>ngrt4nsrv20130127160159779</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160159403" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 28</Name>
+ <Name>item 28</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -777,7 +777,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134236423" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 33</Name>
+ <Name>item 33</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -785,7 +785,7 @@
  <SubServices>ngrt4nsrv20144215134236542</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130127160159535" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 29</Name>
+ <Name>item 29</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -793,7 +793,7 @@
  <SubServices>ngrt4nsrv20130127160159659</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160223525" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 74</Name>
+ <Name>item 74</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -801,7 +801,7 @@
  <SubServices>ngrt4nsrv20130227160223665</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145603145648704" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 2</Name>
+ <Name>item 2</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -809,7 +809,7 @@
  <SubServices>ngrt4nsrv20145603145648859,ngrt4nsrv20144215134234713</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164156423" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 75</Name>
+ <Name>item 75</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -817,7 +817,7 @@
  <SubServices>ngrt4nsrv20144116164156561</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135544990" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 137</Name>
+ <Name>item 137</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -825,7 +825,7 @@
  <SubServices>ngrt4nsrv20145515135545139</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135603340" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 161</Name>
+ <Name>item 161</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -849,7 +849,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145717716" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 61</Name>
+ <Name>item 61</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -857,7 +857,7 @@
  <SubServices>ngrt4nsrv20145703145717870,ngrt4nsrv20145615135605007</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135402222" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 105</Name>
+ <Name>item 105</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -865,7 +865,7 @@
  <SubServices>ngrt4nsrv20145415135402369</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145717254" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 58</Name>
+ <Name>item 58</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -881,7 +881,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20131027161016950" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 6</Name>
+ <Name>item 6</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -896,13 +896,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>xen01/PING</SubServices>
 </Service>
-<Service id="ngrt4nsrv20144215134234830" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 32</Name>
+<Service id="ngrt4nsrv20144215134234830" type="1" statusCalcRule="0" statusPropRule="0">
+ <Name>item 32</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20140411170404617" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>xen01/PING (Copy)</Name>
@@ -913,7 +913,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135416552" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 120</Name>
+ <Name>item 120</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -921,7 +921,7 @@
  <SubServices>ngrt4nsrv20145415135416867</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160205044" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 38</Name>
+ <Name>item 38</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -929,7 +929,7 @@
  <SubServices>ngrt4nsrv20130227160205187</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160214356" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 55</Name>
+ <Name>item 55</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -937,7 +937,7 @@
  <SubServices>ngrt4nsrv20130227160214518</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160223665" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 75</Name>
+ <Name>item 75</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -945,7 +945,7 @@
  <SubServices>ngrt4nsrv20130227160223795</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164156561" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 76</Name>
+ <Name>item 76</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -953,7 +953,7 @@
  <SubServices>ngrt4nsrv20144116164156704</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134234713" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 31</Name>
+ <Name>item 31</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -961,7 +961,7 @@
  <SubServices>ngrt4nsrv20144215134234830</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160223795" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 76</Name>
+ <Name>item 76</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -969,7 +969,7 @@
  <SubServices>ngrt4nsrv20130227160223957</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135545139" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 138</Name>
+ <Name>item 138</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -977,7 +977,7 @@
  <SubServices>ngrt4nsrv20145515135545290</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160214234" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 54</Name>
+ <Name>item 54</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -993,7 +993,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144836680" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 3</Name>
+ <Name>item 3</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1001,7 +1001,7 @@
  <SubServices>ngrt4nsrv20144803144836834</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135412640" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 115</Name>
+ <Name>item 115</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1017,7 +1017,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135402369" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 106</Name>
+ <Name>item 106</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1025,7 +1025,7 @@
  <SubServices>ngrt4nsrv20140211170206414,ngrt4nsrv20140211170249134</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160226838" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 83</Name>
+ <Name>item 83</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1033,7 +1033,7 @@
  <SubServices>ngrt4nsrv20130227160226991</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135547331" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 142</Name>
+ <Name>item 142</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1041,7 +1041,7 @@
  <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135552975" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 146</Name>
+ <Name>item 146</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1049,7 +1049,7 @@
  <SubServices>ngrt4nsrv20145515135553104</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135553104" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 147</Name>
+ <Name>item 147</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1057,7 +1057,7 @@
  <SubServices>ngrt4nsrv20140111170139025,ngrt4nsrv20140811170809653</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145603145648859" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 3</Name>
+ <Name>item 3</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1065,7 +1065,7 @@
  <SubServices>ngrt4nsrv20145603145649011,ngrt4nsrv20144215134236423</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160205187" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 39</Name>
+ <Name>item 39</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1081,7 +1081,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135412778" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 116</Name>
+ <Name>item 116</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1097,7 +1097,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164159279" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 81</Name>
+ <Name>item 81</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1105,7 +1105,7 @@
  <SubServices>ngrt4nsrv20140011170016322,ngrt4nsrv20140411170420874</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145726331" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 77</Name>
+ <Name>item 77</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1113,7 +1113,7 @@
  <SubServices>ngrt4nsrv20145703145726483,ngrt4nsrv20140411170424878</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135403599" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 107</Name>
+ <Name>item 107</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1129,7 +1129,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135417543" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 123</Name>
+ <Name>item 123</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1137,7 +1137,7 @@
  <SubServices>ngrt4nsrv20140211170215677,ngrt4nsrv20140211170246542</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135658859" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 179</Name>
+ <Name>item 179</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1145,7 +1145,7 @@
  <SubServices>ngrt4nsrv20145615135659138,ngrt4nsrv20144116164156079</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135551636" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 145</Name>
+ <Name>item 145</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1161,7 +1161,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134243579" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 39</Name>
+ <Name>item 39</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1185,7 +1185,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144846727" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 14</Name>
+ <Name>item 14</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1193,7 +1193,7 @@
  <SubServices>ngrt4nsrv20144803144846880</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145717870" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 62</Name>
+ <Name>item 62</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1201,7 +1201,7 @@
  <SubServices>ngrt4nsrv20145703145718032</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134241728" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 38</Name>
+ <Name>item 38</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1225,7 +1225,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135543305" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 135</Name>
+ <Name>item 135</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1233,7 +1233,7 @@
  <SubServices>ngrt4nsrv20145515135543462</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135405087" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 111</Name>
+ <Name>item 111</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1241,7 +1241,7 @@
  <SubServices>ngrt4nsrv20140311170312602,ngrt4nsrv20140311170316674</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135633759" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 171</Name>
+ <Name>item 171</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1249,7 +1249,7 @@
  <SubServices>ngrt4nsrv20145615135634047</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134241609" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 37</Name>
+ <Name>item 37</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1273,7 +1273,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134239631" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 36</Name>
+ <Name>item 36</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1281,7 +1281,7 @@
  <SubServices>ngrt4nsrv20141611171619593,ngrt4nsrv20141611171620933</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135545290" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 139</Name>
+ <Name>item 139</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1321,7 +1321,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134251091" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 45</Name>
+ <Name>item 45</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1329,7 +1329,7 @@
  <SubServices>ngrt4nsrv20144215134251210</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134239513" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 35</Name>
+ <Name>item 35</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1337,7 +1337,7 @@
  <SubServices>ngrt4nsrv20144215134239631</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160224087" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 78</Name>
+ <Name>item 78</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1353,7 +1353,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145603145649011" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 4</Name>
+ <Name>item 4</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1361,7 +1361,7 @@
  <SubServices>ngrt4nsrv20145603145649155</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160226991" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 84</Name>
+ <Name>item 84</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1369,7 +1369,7 @@
  <SubServices>ngrt4nsrv20130227160227142,ngrt4nsrv20145415135412640,ngrt4nsrv20145415135416552,ngrt4nsrv20145615135633759</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135659138" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 180</Name>
+ <Name>item 180</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1401,7 +1401,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135414624" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 117</Name>
+ <Name>item 117</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1433,7 +1433,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144846880" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 15</Name>
+ <Name>item 15</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1441,7 +1441,7 @@
  <SubServices>ngrt4nsrv20144803144847013</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145718032" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 63</Name>
+ <Name>item 63</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1449,7 +1449,7 @@
  <SubServices>ngrt4nsrv20145703145718173</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134249938" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 44</Name>
+ <Name>item 44</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1457,7 +1457,7 @@
  <SubServices>ngrt4nsrv20140011170057321,ngrt4nsrv20140611170652605</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145603145649155" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 5</Name>
+ <Name>item 5</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1465,7 +1465,7 @@
  <SubServices>ngrt4nsrv20141511171510856,ngrt4nsrv20141511171512781</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144847013" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 16</Name>
+ <Name>item 16</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1473,7 +1473,7 @@
  <SubServices>ngrt4nsrv20140111170151107,ngrt4nsrv20140811170823395</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164156704" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 77</Name>
+ <Name>item 77</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1481,7 +1481,7 @@
  <SubServices>ngrt4nsrv20140011170022719,ngrt4nsrv20140411170459350</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160205317" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 40</Name>
+ <Name>item 40</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1497,7 +1497,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145717407" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 59</Name>
+ <Name>item 59</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1505,7 +1505,7 @@
  <SubServices>ngrt4nsrv20145703145717562,ngrt4nsrv20145615135603064</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135543462" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 136</Name>
+ <Name>item 136</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1521,7 +1521,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160227142" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 85</Name>
+ <Name>item 85</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1529,7 +1529,7 @@
  <SubServices>ngrt4nsrv20130227160227282</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134243706" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 40</Name>
+ <Name>item 40</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1545,7 +1545,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145615135634047" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 172</Name>
+ <Name>item 172</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1561,7 +1561,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134233091" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 28</Name>
+ <Name>item 28</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1569,7 +1569,7 @@
  <SubServices>ngrt4nsrv20144215134233230,ngrt4nsrv20144215134239513</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144116164156250" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 74</Name>
+ <Name>item 74</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1577,7 +1577,7 @@
  <SubServices>ngrt4nsrv20144116164156423</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145703145718173" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 64</Name>
+ <Name>item 64</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1585,7 +1585,7 @@
  <SubServices>ngrt4nsrv20140111170135212,ngrt4nsrv20140711170756588</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145603145648535" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 1</Name>
+ <Name>item 1</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1593,7 +1593,7 @@
  <SubServices>ngrt4nsrv20145603145648704,ngrt4nsrv20144215134233091,ngrt4nsrv20144215134241609</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134249820" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 43</Name>
+ <Name>item 43</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1601,7 +1601,7 @@
  <SubServices>ngrt4nsrv20144215134249938</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135404958" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 110</Name>
+ <Name>item 110</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1625,7 +1625,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135414773" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 118</Name>
+ <Name>item 118</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1641,7 +1641,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144215134251210" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 46</Name>
+ <Name>item 46</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1657,7 +1657,7 @@
  <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144836834" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 4</Name>
+ <Name>item 4</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1665,7 +1665,7 @@
  <SubServices>ngrt4nsrv20140311170323916,ngrt4nsrv20140311170328607</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160202631" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 32</Name>
+ <Name>item 32</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1673,7 +1673,7 @@
  <SubServices>ngrt4nsrv20130227160202771</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160214518" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 56</Name>
+ <Name>item 56</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
@@ -1681,7 +1681,7 @@
  <SubServices>ngrt4nsrv20130227160214649</SubServices>
 </Service>
 <Service id="ngrt4nsrv20130227160227282" type="0" statusCalcRule="0" statusPropRule="0">
- <Name>sous service 86</Name>
+ <Name>item 86</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
