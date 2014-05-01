@@ -124,7 +124,7 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-         <legend>Business Service Health Summary</legend>
+         <legend>Summary of Business Service Healthy</legend>
            ${contents}
        </div>
     </div>
