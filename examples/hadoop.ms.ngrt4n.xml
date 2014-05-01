@@ -128,13 +128,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>ngrt4nsrv20145703145717254,ngrt4nsrv20145515135551338,ngrt4nsrv20145515135552975</SubServices>
 </Service>
-<Service id="ngrt4nsrv20130227160202771" type="0" statusCalcRule="0" statusPropRule="0">
+<Service id="ngrt4nsrv20130227160202771" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 33</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135547035" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 140</Name>
@@ -153,12 +153,12 @@
  <SubServices>ngrt4nsrv20145615135603201</SubServices>
 </Service>
 <Service id="ngrt4nsrv20140411170459350" type="1" statusCalcRule="0" statusPropRule="0">
- <Name>xen01/PING (Copy) (Copy)</Name>
+ <Name>xen01/PING</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen01/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20144803144846415" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 12</Name>
@@ -304,13 +304,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>xen01/PING</SubServices>
 </Service>
-<Service id="ngrt4nsrv20130227160214799" type="0" statusCalcRule="0" statusPropRule="0">
+<Service id="ngrt4nsrv20130227160214799" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 58</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145415135402080" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 104</Name>
@@ -1032,13 +1032,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>ngrt4nsrv20130227160226991</SubServices>
 </Service>
-<Service id="ngrt4nsrv20145515135547331" type="0" statusCalcRule="0" statusPropRule="0">
+<Service id="ngrt4nsrv20145515135547331" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 142</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145515135552975" type="0" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 146</Name>
@@ -1280,13 +1280,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>ngrt4nsrv20141611171619593,ngrt4nsrv20141611171620933</SubServices>
 </Service>
-<Service id="ngrt4nsrv20145515135545290" type="0" statusCalcRule="0" statusPropRule="0">
+<Service id="ngrt4nsrv20145515135545290" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 139</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20140011170048967" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>xen01/PING (Copy)</Name>
@@ -1504,13 +1504,13 @@
  <NotificationMsg></NotificationMsg>
  <SubServices>ngrt4nsrv20145703145717562,ngrt4nsrv20145615135603064</SubServices>
 </Service>
-<Service id="ngrt4nsrv20145515135543462" type="0" statusCalcRule="0" statusPropRule="0">
+<Service id="ngrt4nsrv20145515135543462" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>sous service 136</Name>
  <Icon>Business Process</Icon>
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices></SubServices>
+ <SubServices>xen02/PING</SubServices>
 </Service>
 <Service id="ngrt4nsrv20140311170316674" type="1" statusCalcRule="0" statusPropRule="0">
  <Name>xen01/PING (Copy)</Name>

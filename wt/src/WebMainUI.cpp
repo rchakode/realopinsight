@@ -95,6 +95,7 @@ void WebMainUI::addEvents(void)
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+  m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
 }
 
 void WebMainUI::showUserHome(void)
@@ -230,7 +231,7 @@ void WebMainUI::setupMenus(void)
   m_navbar->addWidget(text);
 }
 
-void WebMainUI::resetTimer(void)
+void WebMainUI::startTimer(void)
 {
   m_timer.setInterval(1000*m_settings->updateInterval());
   m_timer.start();
@@ -280,8 +281,7 @@ void WebMainUI::handleRefresh(void)
     }
     updateEventFeeds();
   } // notification section
-
-  m_timer.start();
+  startTimer();
   m_mainWidget->enable();
 }
 
@@ -732,7 +732,11 @@ void WebMainUI::initOperatorDashboard(void)
       ++thumbIndex;
     }
   }
-  startDashbaordUpdate();
+  if (thumbIndex > 0) {
+    startDashbaordUpdate();
+  } else {
+    thumbLayout->addWidget(new Wt::WText(tr("No view to display").toStdString()), 0, 0);
+  }
 }
 
 

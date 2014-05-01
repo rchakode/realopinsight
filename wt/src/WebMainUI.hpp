@@ -49,7 +49,7 @@ public:
   QString getConfig (void) const {return m_currentDashboardPtr->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
-  void resetTimer(void);
+  void startTimer(void);
   void handleInternalPath(void);
   Wt::WContainerWidget* get(void) {return m_mainWidget;}
   void handleRefresh(void);
