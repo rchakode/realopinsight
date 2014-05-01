@@ -86,7 +86,7 @@ bool Parser::process(bool console)
     node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-
+    node.check.status = -1;
     if (node.icon.isEmpty()) {
       node.icon = ngrt4n::DEFAULT_ICON;
     }

@@ -138,7 +138,6 @@ void WebDashboard::updateChart(void)
 
 void WebDashboard::buildMap(void)
 {
-  //FIXME:  m_map->drawMap(); avoid do this twice at statup
   m_map->drawMap();
 }
 

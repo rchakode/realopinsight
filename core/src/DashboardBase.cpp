@@ -170,7 +170,9 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
   /* Now start doing the job */
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
-       end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
+       end=m_cdata->cnodes.end();
+       cnode!=end;
+       ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
       cnode->severity = ngrt4n::Unknown;
