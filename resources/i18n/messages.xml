@@ -147,7 +147,7 @@
 <message id="event-feed.tpl">
   <div class="media">
     <a class="pull-left" href="#">
-      <img class="media-object" src="${event-feed-icon}" alt="..." />
+      <img class="media-object" src="${event-feed-icon}" />
     </a>
     <div class="media-body">
       <h4 class="media-heading">${event-feed-title}</h4>

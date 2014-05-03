@@ -90,6 +90,7 @@ Q_SIGNALS:
   void updateSourceUrl(void);
   void timerIntervalChanged(qint32 interval);
   void errorOccurred(QString msg);
+  void dashboardLinkSelected(void);
 
 protected:
   void computeStatusInfo(NodeT& _node, const SourceT& src);

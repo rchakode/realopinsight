@@ -31,7 +31,6 @@ TEMPLATE = app
 REALOPINSIGHT_VERSION=3.0.0b2
 VERSION = "-$${REALOPINSIGHT_VERSION}"
 
-
 win32 {
 INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
 LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
@@ -218,6 +217,8 @@ INSTALLS += TARGET MAN
 
 INCLUDEPATH += core/src/
 RESOURCES += ngrt4n.qrc
+
+DEFINES *= "BUILD_DATE=\"`date '+%s'`\""
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"

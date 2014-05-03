@@ -60,6 +60,7 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(msg.toStdString(), "alert alert-success");}
+  void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
 
 private:
   enum FileDialogAction {

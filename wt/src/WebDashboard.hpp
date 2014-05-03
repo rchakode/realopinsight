@@ -44,6 +44,8 @@
 
 class WebDashboard : public DashboardBase
 {
+  Q_OBJECT
+
 public:
   WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout=NULL);
   virtual ~WebDashboard();
@@ -56,6 +58,7 @@ public:
   void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
   virtual void initialize(Preferences* preferencePtr);
 
+
 protected:
   virtual void buildMap(void);
   virtual void updateMap(const NodeT& _node, const QString& _tip);
@@ -64,6 +67,9 @@ protected:
   virtual void updateMsgConsole(const NodeT& _node);
   virtual void updateChart(void);
   virtual void updateEventFeeds(const NodeT& node);
+
+Q_SIGNALS:
+  void dashboardSelected(Wt::WWidget* widget);
 
 private:
   typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;

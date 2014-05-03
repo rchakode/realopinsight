@@ -27,6 +27,8 @@
 #include <QString>
 #include <QSettings>
 #include "Base.hpp"
+#include <ctime>
+
 
 class Settings : public QSettings
 {

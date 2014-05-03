@@ -218,12 +218,14 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
 Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
-  tpl->bindString("event-feed-id", node.id.toStdString());
+
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(ngrt4n::severityText(node.severity),
+                                                                                 node.child_nodes).toStdString());
+  anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(m_widget);}));
+
+  tpl->bindWidget("event-feed-title", anchor);
   tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.severity));
   tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
-  tpl->bindWidget("event-feed-title", new Wt::WAnchor(Wt::WLink("#"),
-                                                      tr("%1 event on %2")
-                                                      .arg(ngrt4n::severityText(node.severity), node.child_nodes).toStdString()));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", rootNode().name.toStdString());
   tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
