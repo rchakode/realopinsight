@@ -37,7 +37,8 @@
         <location filename="../client/src/Auth.cpp" line="57"/>
         <source>
 Copyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translation>
     </message>
     <message>
         <location filename="../client/src/Auth.cpp" line="91"/>
@@ -48,7 +49,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.</source>
 <context>
     <name>AuthManager</name>
     <message>
-        <location filename="../wt/src/AuthManager.cpp" line="87"/>
+        <location filename="../wt/src/AuthManager.cpp" line="86"/>
         <source>Wt.Auth.template.logged-in</source>
         <translation></translation>
     </message>
@@ -58,111 +59,112 @@ Copyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.</source>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="119"/>
         <source>The default source is not yet set</source>
-        <translation type="unfinished"></translation>
+        <translation>La source par défaut n&apos;est encore pas configuré</translation>
     </message>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="149"/>
-        <location filename="../core/src/DashboardBase.cpp" line="213"/>
+        <location filename="../core/src/DashboardBase.cpp" line="215"/>
         <source>Undefined source (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Source non configurée (%1)</translation>
     </message>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="161"/>
         <source>The server serial %1 is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>La série %1de ngrt4nd n&apos;est plus supporté </translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="246"/>
-        <location filename="../core/src/DashboardBase.cpp" line="933"/>
+        <location filename="../core/src/DashboardBase.cpp" line="248"/>
+        <location filename="../core/src/DashboardBase.cpp" line="935"/>
         <source>Undefined service (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Service non défini (%1)</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="479"/>
-        <location filename="../core/src/DashboardBase.cpp" line="579"/>
+        <location filename="../core/src/DashboardBase.cpp" line="481"/>
+        <location filename="../core/src/DashboardBase.cpp" line="581"/>
         <source>Weird response received from the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Réponse inattendue reçue du serveur</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="506"/>
+        <location filename="../core/src/DashboardBase.cpp" line="508"/>
         <source>Authentication failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec d&apos;authentification: %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="556"/>
+        <location filename="../core/src/DashboardBase.cpp" line="558"/>
         <source>The %1 component is Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun problème détecté sur le composant: %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="572"/>
+        <location filename="../core/src/DashboardBase.cpp" line="574"/>
         <source>The host &apos;%1&apos; is Up</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;hote %1 est actif</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="575"/>
+        <location filename="../core/src/DashboardBase.cpp" line="577"/>
         <source>The host &apos;%1&apos; is Down</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;hôte %1 semble hors ligne</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="637"/>
+        <location filename="../core/src/DashboardBase.cpp" line="639"/>
         <source>Invalid authentication chain!
 Must follow the pattern login:password</source>
-        <translation type="unfinished"></translation>
+        <translation>Chaine d&apos;autentification invalide. 
+la valeur doit être sur la forme login:mot_de_passe</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="752"/>
+        <location filename="../core/src/DashboardBase.cpp" line="754"/>
         <source>The connection has been closed by the remote host</source>
-        <translation type="unfinished"></translation>
+        <translation>La connexion a été fermée de manière inattendue</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="755"/>
+        <location filename="../core/src/DashboardBase.cpp" line="757"/>
         <source>Host not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Hôte non trouvé</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="758"/>
+        <location filename="../core/src/DashboardBase.cpp" line="760"/>
         <source>Connection refused</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion refusée</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="761"/>
+        <location filename="../core/src/DashboardBase.cpp" line="763"/>
         <source>SSL Handshake failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors du handshake SSL</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="764"/>
+        <location filename="../core/src/DashboardBase.cpp" line="766"/>
         <source>Timeout exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout expiré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="767"/>
+        <location filename="../core/src/DashboardBase.cpp" line="769"/>
         <source>error %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="804"/>
+        <location filename="../core/src/DashboardBase.cpp" line="806"/>
         <source>Cannot set handler for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors de l&apos;initialisation du hanldler de %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="808"/>
+        <location filename="../core/src/DashboardBase.cpp" line="810"/>
         <source>%1 is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 n&apos;est pas configuré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="811"/>
+        <location filename="../core/src/DashboardBase.cpp" line="813"/>
         <source>Cannot handle source (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors de l&apos;initialisation du hanldler de %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="845"/>
+        <location filename="../core/src/DashboardBase.cpp" line="847"/>
         <source>%1: undefined monitor (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 : moniteur supporté (%2)</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="877"/>
+        <location filename="../core/src/DashboardBase.cpp" line="879"/>
         <source>Unknown monitor type (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Type de moniteur indéfini (%1)</translation>
     </message>
 </context>
 <context>
@@ -412,27 +414,27 @@ Must follow the pattern login:password</source>
     <message>
         <location filename="../core/src/LsHelper.cpp" line="121"/>
         <source>Bad request type: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Le type de la requête est inconnu: %1</translation>
     </message>
     <message>
         <location filename="../core/src/LsHelper.cpp" line="158"/>
         <source>Connection closed by the remote host</source>
-        <translation type="unfinished"></translation>
+        <translation>Connection fermée par l&apos;hôte distant</translation>
     </message>
     <message>
         <location filename="../core/src/LsHelper.cpp" line="161"/>
         <source>Host not found (%1).</source>
-        <translation type="unfinished"></translation>
+        <translation>Hôte non trouvé (%1).</translation>
     </message>
     <message>
         <location filename="../core/src/LsHelper.cpp" line="164"/>
         <source>Connection refused. Make sure that Livestatus API is listening on tcp://%1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion refusée. Assurez-vous que le service Livestatus écoute bien sur l&apos;adresse tcp://%1:%2  </translation>
     </message>
     <message>
         <location filename="../core/src/LsHelper.cpp" line="168"/>
         <source>The following error occurred (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;appel a retourné l&apos;erreur suivante (%1)</translation>
     </message>
 </context>
 <context>
@@ -806,7 +808,7 @@ Autres détails : %9</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/AuthManager.cpp" line="96"/>
+        <location filename="../wt/src/AuthManager.cpp" line="104"/>
         <source>Sign out</source>
         <translation>Déconnexion</translation>
     </message>
@@ -880,134 +882,145 @@ Visit %6 for more information
 
 Report Bugs: %7
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Version: %2 (nom de code: %3)
+
+Edition: %1
+
+Release ID: %4
+
+Copyright (c) 2010-%5 RealOpInsight Labs. Tous droits réservés
+Visitez %6 pour plus d&apos;information
+
+Reporter des bugs: %7</translation>
     </message>
     <message>
-        <location filename="../core/src/Base.hpp" line="43"/>
+        <location filename="../core/src/Base.hpp" line="42"/>
         <source>%1 Ultimate</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Ultimate</translation>
     </message>
     <message>
-        <location filename="../core/src/Base.hpp" line="45"/>
+        <location filename="../core/src/Base.hpp" line="44"/>
         <source>%1 Workstation</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Workstation</translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="80"/>
+        <location filename="../core/src/Base.hpp" line="85"/>
+        <source>Unchanged</source>
+        <translation>Inchangé</translation>
+    </message>
+    <message>
+        <location filename="../core/src/Base.hpp" line="81"/>
+        <source>Decreased</source>
+        <translation>Décrémenté</translation>
     </message>
     <message>
         <location filename="../core/src/Base.hpp" line="82"/>
-        <location filename="../core/src/Base.hpp" line="87"/>
-        <source>Unchanged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../core/src/Base.hpp" line="83"/>
-        <source>Decreased</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../core/src/Base.hpp" line="84"/>
         <source>Increased</source>
-        <translation type="unfinished"></translation>
+        <translation>Incrémenté</translation>
     </message>
     <message>
-        <location filename="../core/src/Base.hpp" line="101"/>
+        <location filename="../core/src/Base.hpp" line="99"/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Moyenne</translation>
     </message>
     <message>
-        <location filename="../core/src/Base.hpp" line="102"/>
+        <location filename="../core/src/Base.hpp" line="100"/>
         <source>High Severity</source>
-        <translation type="unfinished"></translation>
+        <translation>Sévérité haute</translation>
     </message>
     <message>
-        <location filename="../core/src/Base.hpp" line="113"/>
+        <location filename="../core/src/Base.hpp" line="111"/>
         <source>Native Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Sonde native</translation>
     </message>
     <message>
-        <location filename="../core/src/Base.hpp" line="114"/>
+        <location filename="../core/src/Base.hpp" line="112"/>
         <source>Business Process</source>
-        <translation type="unfinished"></translation>
+        <translation>Service métier</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="266"/>
+        <location filename="../core/src/DashboardBase.cpp" line="268"/>
         <source>updating %1 (%2)...</source>
-        <translation type="unfinished"></translation>
+        <translation>mise à jour %1 (%2)...</translation>
     </message>
     <message>
         <location filename="../core/src/Parser.cpp" line="54"/>
         <source>Unable to open the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier %1</translation>
     </message>
     <message>
         <location filename="../core/src/Parser.cpp" line="62"/>
         <source>Error while parsing the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur : le fichier est corrompu ou contient des données syntaxiquement incorrectes (%1)</translation>
     </message>
     <message>
         <location filename="../core/src/Parser.cpp" line="160"/>
         <source>Unable into write the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;écrire dans le fichier %1</translation>
     </message>
     <message>
         <location filename="../core/src/Parser.cpp" line="181"/>
         <source>The graph engine exited with the code %1</source>
-        <translation type="unfinished"></translation>
+        <translation>l&apos;appel au moteur de graphe s&apos;est anormalement terminé %1</translation>
     </message>
     <message>
         <location filename="../core/src/utilsCore.cpp" line="39"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <location filename="../core/src/utilsCore.cpp" line="42"/>
         <source>Minor</source>
-        <translation type="unfinished"></translation>
+        <translation>Mineur</translation>
     </message>
     <message>
         <location filename="../core/src/utilsCore.cpp" line="45"/>
         <source>Major</source>
-        <translation type="unfinished"></translation>
+        <translation>Majeur</translation>
     </message>
     <message>
         <location filename="../core/src/utilsCore.cpp" line="48"/>
         <source>Critical</source>
-        <translation type="unfinished"></translation>
+        <translation>Critique</translation>
     </message>
     <message>
         <location filename="../core/src/utilsCore.cpp" line="53"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Indéfini</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="467"/>
         <source>Welcome</source>
-        <translation type="unfinished"></translation>
+        <translation>Bienvenue</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="468"/>
         <source>Getting Started in 3 Simple Steps !</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer en 3 trois étapes simples !</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="479"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="486"/>
         <source>Preview</source>
-        <translation type="unfinished">Prévisualiser</translation>
+        <translation>Prévisualiser</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="492"/>
         <location filename="../wt/src/WebMainUI.cpp" line="493"/>
         <source>All Views and Access Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Gérer les vues et contrôles d&apos;accès</translation>
     </message>
     <message>
         <location filename="../wt/src/ngrt4n-web.cpp" line="91"/>
+        <location filename="../wt/src/ngrt4n-web.cpp" line="94"/>
         <source>[FATAL] %1</source>
-        <translation type="unfinished"></translation>
+        <translation>[FATALE] %1</translation>
     </message>
 </context>
 <context>
@@ -1077,7 +1090,16 @@ Report Bugs: %7
     E.g. localhost/httpd, localhost
     From RealOpInsght 3.0 and higher, both the host part and the service are required.
 See the online documentation for further details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
+ * Pour Nagios et les systèmes similaires comme Shinken; c&apos;est de la forme &apos;host_name/service_name&apos; or juste &apos;host_name&apos;
+    Ex. mysql-server.example.com/Current Load, mysql-server.example.com
+    Si seulement la partie host_name est définie la source de données sera assignée au ping.
+ * Pour Zabbix, c&apos;est de la forme &apos;host_name/trigger_name&apos;
+    Ex. Zabbix server/Zabbix http poller processes more than 75% busy
+ * Pour Zenoss c&apos;est de la forme &apos;device_name/component_name&apos; ou juste &apos;device_name&apos;
+    E.g. localhost/httpd, localhost
+    Si seulement la partie host_name est définie la source de données sera assignée au ping.
+Voir la documentatuon en ligne pour plus de détails.</translation>
     </message>
     <message>
         <source>This depends on your monitoring configuration:
@@ -1341,7 +1363,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
 <context>
     <name>WebDashboard</name>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="226"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="222"/>
         <source>%1 event on %2</source>
         <translation>%1 évènement(s) sur %2</translation>
     </message>
@@ -1357,7 +1379,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
 <context>
     <name>WebMainUI</name>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="106"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="107"/>
         <location filename="../wt/src/WebMainUI.cpp" line="720"/>
         <source>Operations Console</source>
         <translation>Console des opérations</translation>
@@ -1365,7 +1387,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="343"/>
         <source>File too large.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier très volumineux.</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="362"/>
@@ -1382,29 +1404,29 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation>Sélectionner la fichier Ã  prévisualiser | %1</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="104"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="119"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="105"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="120"/>
         <source>Account &amp; Settings</source>
         <translation>Compte et paramètres</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="180"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="181"/>
         <source>Signed in as %1</source>
         <translation>Connecté en tant que %1</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="187"/>
-        <location filename="../wt/src/WebMainUI.cpp" line="200"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="188"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="201"/>
         <source>Show Account &amp; Settings</source>
         <translation>Affichier les paramètres</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="193"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="194"/>
         <source>Hide Account &amp; Settings</source>
         <translation>Masquer les paramètres</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="207"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="208"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
@@ -1438,17 +1460,18 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <location filename="../wt/src/WebMainUI.cpp" line="379"/>
         <source>View added.  Name: %1
  -  Services: %2 - Path: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Vue ajoutée.  Nom: %1
+ -  Nombre de services: %2 - Chemin: %3</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="430"/>
         <source>A platfom with the same name is already loaded (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>La plateforme (%1) ou une plateforme du même nom existe déjà </translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="437"/>
         <source>Dashboard initialization failed with bad_alloc</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre système semble manquer de mémoire</translation>
     </message>
     <message>
         <source>File is too large.</source>
@@ -1480,7 +1503,12 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation>Désolé, la resource demandé n&apos;est plus disponible</translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="767"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="739"/>
+        <source>No view to display</source>
+        <translation>Aucune vue à afficher</translation>
+    </message>
+    <message>
+        <location filename="../wt/src/WebMainUI.cpp" line="772"/>
         <source>Unable to create the directory (%1)</source>
         <translation>Impossible de créer le repertoire (%1)</translation>
     </message>
@@ -1498,7 +1526,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebDashboard.cpp" line="221"/>
+        <location filename="../wt/src/WebDashboard.cpp" line="220"/>
         <source>event-feed.tpl</source>
         <translation></translation>
     </message>
@@ -1508,14 +1536,14 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="149"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="150"/>
         <source>notification.block.tpl</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="133"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="134"/>
         <source>beta-message</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="459"/>
@@ -1533,7 +1561,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../wt/src/WebMainUI.cpp" line="741"/>
+        <location filename="../wt/src/WebMainUI.cpp" line="746"/>
         <source>dashboard-thumbnail.tpl</source>
         <translation></translation>
     </message>
