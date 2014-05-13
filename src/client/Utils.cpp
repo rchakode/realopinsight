@@ -1,8 +1,8 @@
 /*
- * WebKit.hpp
+ * Utils.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update : 11-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,21 +21,50 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVWEBKIT_H_
-#define SNAVWEBKIT_H_
+#include <QFileInfo>
+#include "Utils.hpp"
 
-#include "Base.hpp"
-
-class WebKit : public QWebView
+QString Utils::statusToString(const qint32 & _status)
 {
-	Q_OBJECT
+    switch(_status)
+    {
+    case MonitorBroker::OK:
+        return "Normal";
+        break;
 
-public:
-    WebKit( const QString & = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0 );
-	virtual ~WebKit() ;
+    case MonitorBroker::WARNING:
+        return  "Warning";
+        break;
 
-public slots:
-	void setUrl( QString );
-};
+    case MonitorBroker::CRITICAL:
+        return  "Critical";
+        break;
 
-#endif /* SNAVWEBKIT_H_ */
+    default:
+        return "Unknown";
+        break;
+    }
+
+    return "Unknown";
+}
+
+void Utils::clear(Struct& data) {
+    data.cnodes.clear();
+    data.nodes.clear();
+    data.tree_items.clear();
+}
+
+void Utils::alert(const QString  & msg) {
+    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
+}
+
+QString Utils::getAbsolutePath(const QString & _path) {
+    QFileInfo fileInfo(_path);
+    return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
+}
+
+void Utils::delay(const qint32 & d) {
+    sleep(d);
+}
+
+

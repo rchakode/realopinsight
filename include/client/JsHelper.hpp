@@ -1,8 +1,8 @@
 /*
- * WebKit.hpp
+ * JsonHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 15-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,21 +21,21 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVWEBKIT_H_
-#define SNAVWEBKIT_H_
+#ifndef JSHELPER_HPP
+#define JSHELPER_HPP
 
-#include "Base.hpp"
+#include <string>
+#include <QString>
+#include <QtScript/QScriptEngine>
 
-class WebKit : public QWebView
+class JsonHelper : public QScriptEngine
 {
-	Q_OBJECT
-
 public:
-    WebKit( const QString & = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0 );
-	virtual ~WebKit() ;
-
-public slots:
-	void setUrl( QString );
+    JsonHelper(const std::string & jsonStr = "");
+    void setData(const std::string& jsonStr);
+    QScriptValue getProperty(const std::string& key);
+private :
+    QScriptValue data;
 };
 
-#endif /* SNAVWEBKIT_H_ */
+#endif // JSHELPER_HPP

@@ -32,71 +32,71 @@
 #include "Preferences.hpp"
 
 
-
 class SvCreator: public QMainWindow
 {
 	Q_OBJECT
 
 public:
 	SvCreator(const qint32 & _user_role = Auth::OP_USER_ROLE);
-	virtual ~SvCreator( );
+    virtual ~SvCreator();
 
-	void load( const QString& );
-	QSize minimumSizeHint() const { 	return QSize(796, 640) ; }
-	QSize sizeHint() const { return QSize(796, 640) ; }
-
+    void load( const QString&);
+    QSize minimumSizeHint() const { return QSize(796, 640); }
+    QSize sizeHint() const { return QSize(796, 640); }
+    static const QString NagiosCompatibleFormat;
+    static const QString ZabbixCompatibleFormat;
 
 public slots:
 	void newBusinessView(void);
 	void newNode(void);
 	void deleteNode(void);
-	void deleteNode(const QString & );
+    void deleteNode(const QString &);
 	void open(void);
 	void save(void);
 	void saveAs(void);
-	int close( const bool & = true );
+    int close( const bool & = true);
 	void fillEditorFromService( QTreeWidgetItem*);
-	void handleReturnPressed(void) ;
-	void handleSelectedNodeChanged( void ) ;
-	void handleTreeNodeMoved(QString) ;
-	void handleNodeTypeActivated(qint32) ;
-	void handleShowOnlineResources(void) ;
-	void handleShowAbout(void) ;
+    void handleReturnPressed(void);
+    void handleSelectedNodeChanged( void);
+    void handleTreeNodeMoved(QString);
+    void handleNodeTypeActivated(qint32);
+    void handleShowOnlineResources(void);
+    void handleShowAbout(void);
 	void import(void);
 
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * );
-	void closeEvent( QCloseEvent * ) ;
+    void contextMenuEvent( QContextMenuEvent *);
+    void closeEvent( QCloseEvent *);
 
 
 private:
 
-qint32 userRole ;
-qint32 hasToBeSaved ;
-QString openedFile ;
-QString selectedNode ;
+qint32 userRole;
+qint32 hasToBeSaved;
+QString openedFile;
+QString selectedNode;
 
-//QString statusFile ;
-QString selectedNodeId ;
+//QString statusFile;
+QString selectedNodeId;
 
-Settings* settings ;
-Struct* snavStruct ;
-QSplitter* mainSplitter ;
-MenuListT menuList ;
-SubMenuListT subMenuList ;
+Settings* settings;
+Struct* coreData;
+QSplitter* mainSplitter;
+MenuListT menuList;
+SubMenuListT subMenuList;
 
 SvNavigatorTree* navigationTree;
 ServiceEditor* editor;
-QMenuBar* menuBar ;
-QToolBar* toolBar ;
-QMenu* nodeContextMenu ;
+QMenuBar* menuBar;
+QToolBar* toolBar;
+QMenu* nodeContextMenu;
 
-void loadFile(const QString & );
-void saveInFile(const QString & ) ;
-bool updateServiceNode(NodeListT & , const QString & ) ;
-void loadMenu(void) ;
-void unloadMenu(void) ;
+void loadFile(const QString &);
+void saveInFile(const QString &);
+bool updateServiceNode(NodeListT & , const QString &);
+void loadMenu(void);
+void unloadMenu(void);
 void addEvents(void);
 void resize(void);
 

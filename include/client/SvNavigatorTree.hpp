@@ -38,7 +38,7 @@ public:
 	void update(Struct * & _snav_struct) ;
 
 	static const QString rootID ;
-	Struct* ptr2MainStruct ;
+    Struct* ptr2Data ;
 
 signals:
 	void treeNodeMoved( QString _node_id ) ;

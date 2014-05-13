@@ -21,52 +21,48 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVMSGPANEL_HPP_
-#define SNAVMSGPANEL_HPP_
+#ifndef SNAVMSGPANEL_HPP
+#define SNAVMSGPANEL_HPP
 #include "Base.hpp"
 
 
 
 class MsgPanel : public QTableWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-
-	MsgPanel(QWidget * parent = 0 );
+    MsgPanel(QWidget * parent = 0 );
     virtual ~MsgPanel() {}
 
-	static const qint16 msgPanelColumnCount;
-	void addMsg(const NodeListT::iterator &);
-	void resizeFields( const QSize & ,  const bool & = false );
+    static const qint16 msgPanelColumnCount;
+    void addMsg(const NodeListT::iterator &);
+    void resizeFields( const QSize & ,  const bool & = false );
 
-	//EVENT CONSOLE META-MESSAGES
-	static const QString HOSTNAME_META_MSG_PATERN ;
-	static const QString SERVICE_META_MSG_PATERN ;
-	static const QString THERESHOLD_META_MSG_PATERN  ;
-	static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
+    static const QString HOSTNAME_META_MSG_PATERN ;
+    static const QString SERVICE_META_MSG_PATERN ;
+    static const QString THERESHOLD_META_MSG_PATERN  ;
+    static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
 
 public slots:
-	void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
-	void sortEventConsole(void) {sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;}
+    void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
+    void sortEventConsole(void) {sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;}
 
 signals:
-	void acknowledgeChanged(void) ;
+    void acknowledgeChanged(void) ;
 
 protected :
-void showEvent ( QShowEvent * ) ;
+    void showEvent ( QShowEvent * ) ;
 
 private:
+    QPoint charSize;
+    QSize windowSize ;
 
-QPoint charSize;
-QSize windowSize ;
-
-static const QStringList msgPanelHeaderLabels;
-
-inline QCheckBox* msgItem(const qint32 & _row, const qint32 & _column) 	{
-	return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
-}
+    static const QStringList msgPanelHeaderLabels;
+    inline QCheckBox* msgItem(const qint32 & _row, const qint32 & _column) 	{
+        return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
+    }
 
 };
 
-#endif /* SNAVMSGPANEL_HPP_ */
+#endif /* SNAVMSGPANEL_HPP */

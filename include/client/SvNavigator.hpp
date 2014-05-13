@@ -21,8 +21,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAV_H_
-#define SNAV_H_
+#ifndef SVNAVIGATOR_HPP
+#define SVNAVIGATOR_HPP
 
 #include "Base.hpp"
 #include "Stats.hpp"
@@ -32,94 +32,111 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include "zmq.hpp"
-
-using namespace std;
-
+#include "core/ZmqHelper.hpp"
+#include "ZbxHelper.hpp"
+#include <QScriptValueIterator>
 
 class SvNavigator : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	SvNavigator( const qint32 & _user_role = Auth::OP_USER_ROLE, const QString & = "", QWidget* = 0);
-	virtual ~SvNavigator();
+    SvNavigator(const qint32 & _userRole = Auth::OP_USER_ROLE,
+                const QString & _config = "",
+                QWidget* = 0);
+    virtual ~SvNavigator();
+    void load(const QString & _file = "");
 
-	void load( void );
-	void resize(void);
-	void startMonitor();
+    void resize(void);
 
-	static ComboBoxItemsT propRules();
-	static ComboBoxItemsT calcRules() ;
+    static ComboBoxItemsT propRules();
+    static ComboBoxItemsT calcRules();
+
+    static QString getNodeToolTip(const NodeT & _node);
 
 public slots:
-	int monitor(void) ;
-	void updateNodeStatus( QString ) ;
-	void expandNode( const QString &, const bool &, const qint32 &) ;
-	void centerGraphOnNode( const QString & _node_id = "") ;
-	void filterNodeRelatedMsg(void) ;
-	void filterNodeRelatedMsg( const QString & ) ;
-	void acknowledge(void) ;
-	void tabChanged( int ) ;
-	void hideChart(void) ;
-	void centerGraphOnNode( QTreeWidgetItem * ) ;
-	void handleChangePasswordAction(void) ;
-	void handleChangeMonitoringSettingsAction(void) ;
-	void handleShowOnlineResources(void) ;
-	void handleShowAbout(void) ;
-
+    void startMonitor();
+    int runNagiosMonitor(void);
+    void resetStatData(void);
+    void updateNodeStatus(QString);
+    void expandNode(const QString &, const bool &, const qint32 &);
+    void centerGraphOnNode(const QString & _node_id = "");
+    void filterNodeRelatedMsg(void);
+    void filterNodeRelatedMsg(const QString &);
+    void acknowledge(void);
+    void tabChanged(int);
+    void hideChart(void);
+    void centerGraphOnNode(QTreeWidgetItem *);
+    void handleChangePasswordAction(void);
+    void handleChangeMonitoringSettingsAction(void);
+    void handleShowOnlineResources(void);
+    void handleShowAbout(void);
+    void processZabbixReply(QNetworkReply* reply);
+    void processZabbixError(QNetworkReply::NetworkError code);
 
 signals:
-	void hasToBeUpdate( QString ) ;
-	void sortEventConsole(void) ;
+    void hasToBeUpdate(QString);
+    void sortEventConsole(void);
 
-
-protected :
-	void closeEvent(QCloseEvent * ) ;
-	void contextMenuEvent(QContextMenuEvent * ) ;
-	void timerEvent(QTimerEvent *) ;
+protected:
+    void closeEvent(QCloseEvent *);
+    void contextMenuEvent(QContextMenuEvent *);
+    void timerEvent(QTimerEvent *);
 
 
 private:
+    Struct* coreData;
+    QString configFile;
+    QString openedFile;
+    QString monitorBaseUrl;
+    QString selectedNodeId;
+    QString statsPanelTooltip;
+    qint32 userRole;
+    qint32 updateInterval;
+    qint32 timerId;
+    Settings* settings;
+    Stats* statsPanel;
+    MsgPanel* filteredMsgPanel;
+    QSplitter* mainSplitter;
+    QSplitter* rightSplitter;
+    QTabWidget * topRightPanel;
+    QTabWidget* bottomRightPanel;
+    WebKit* browser;
+    GraphView* graphView;
+    SvNavigatorTree* navigationTree;
+    Preferences* monPrefWindow;
+    Preferences* changePasswdWindow;
+    MsgPanel* msgPanel;
+    QMenu* nodeContextMenu;
+    QSize msgPanelSize;
+    MenuListT menuList;
+    SubMenuListT subMenuList;
+    SubMenuListT contextMenuList;
+    QString serverAddr;
+    QString serverPort;
+    std::string serverUrl;
+    std::string serverAuthChain;
+    zmq::socket_t* comChannel;
+    ZbxHelper* zxHelper;
+    QString zxAuthToken;
+    qint32 hLeft;
+    qint32 iter;
+    bool success;
 
-QString configFile ;
-QString openedFile ;
-QString webUIUrl ;
-QString selectedNodeId ;
-QString statsPanelTooltip ;
-qint32 userRole ;
-qint32 updateInterval ;
-qint32 timerId ;
-Settings* settings ;
-Struct* snavStruct ;
-Stats* statsPanel ;
-MsgPanel* filteredMsgPanel ;
-QSplitter* mainSplitter ;
-QSplitter* rightSplitter ;
-QTabWidget * topRightPanel ;
-QTabWidget* bottomRightPanel ;
-WebKit* webBrowser ;
-GraphView* graphView ;
-SvNavigatorTree* navigationTree ;
-Preferences* monPrefWindow ;
-Preferences* changePasswdWindow ;
-MsgPanel* msgPanel ;
-QMenu* nodeContextMenu;
-QSize msgPanelSize ;
-MenuListT menuList;
-SubMenuListT subMenuList;
-SubMenuListT contextMenuList;
-string serverUrl ;
-string serverAuthChain ;
-zmq::socket_t* comChannel ;
 
-void updateNavTreeItemStatus(const NodeListT::iterator &, const QString & );
-QString getNodeToolTip(const NodeT & _node) ;
-void updateAlarmMsg(NodeListT::iterator &);
-void loadMenus(void);
-void unloadMenus(void);
-void addEvents(void);
-
+    void addEvents(void);
+    void loadMenus(void);
+    void unloadMenus(void);
+    void updateMonitoringSettings();
+    void updateNavTreeItemStatus(const NodeListT::iterator &, const QString &);
+    void updateAlarmMsg(NodeListT::iterator &);
+    void updateNode(NodeListT::iterator & _node) ;
+    void updateStats();
+    void openZabbixSession(void);
+    void closeZabbixSession(void);
+    void retrieveZabbixTriggers(const QString & host);
+    void updateStatusBar(const QString & msg);
+    void requestZabbixChecks(void);
 };
 
-#endif /* SNAV_H_ */
+#endif /* SVNAVIGATOR_HPP */

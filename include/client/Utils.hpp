@@ -1,8 +1,8 @@
 /*
- * WebKit.hpp
+ * Utils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update : 11-08-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -21,21 +21,23 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVWEBKIT_H_
-#define SNAVWEBKIT_H_
+#ifndef UTILS_HPP
+#define UTILS_HPP
 
 #include "Base.hpp"
+#include "QString"
 
-class WebKit : public QWebView
-{
-	Q_OBJECT
+namespace Utils {
+QString
+statusToString(const qint32 & _status);
+void
+clear(Struct& data);
+void
+alert(const QString  & msg);
+QString
+getAbsolutePath(const QString & _path);
+void
+delay(const qint32 & d) ;
+}
 
-public:
-    WebKit( const QString & = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0 );
-	virtual ~WebKit() ;
-
-public slots:
-	void setUrl( QString );
-};
-
-#endif /* SNAVWEBKIT_H_ */
+#endif // UTILS_HPP

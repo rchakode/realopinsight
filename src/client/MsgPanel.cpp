@@ -24,6 +24,7 @@
 #include "MsgPanel.hpp"
 #include "StatsLegend.hpp"
 #include <ctime>
+#include "Utils.hpp"
 
 const qint16 MsgPanel::msgPanelColumnCount = 7;
 
@@ -33,122 +34,113 @@ const QString MsgPanel::SERVICE_META_MSG_PATERN = "\\{check_name\\}" ;
 const QString MsgPanel::THERESHOLD_META_MSG_PATERN = "\\{threshold\\}" ;
 const QString MsgPanel::PLUGIN_OUTPUT_META_MSG_PATERN = "\\{plugin_output\\}" ;
 
-const QStringList MsgPanel::msgPanelHeaderLabels =
-		QStringList() <<"Date & Hour"
-		<<"Status"
-		<<"Host"
-		<<"Service"
-		<<"Message"
-		;
+const QStringList MsgPanel::msgPanelHeaderLabels = QStringList() <<"Date & Hour"<<"Status"<<"Host"<<"Service"<<"Message";
 
 MsgPanel::MsgPanel(QWidget * _parent)
-: QTableWidget( 0, msgPanelColumnCount, _parent ),
-  charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0), QFontMetrics(QFont()).height()))
-  {
-	verticalHeader()->hide() ;
-	hideColumn(msgPanelColumnCount - 2) ;
-	hideColumn(msgPanelColumnCount - 1) ;
-	setHorizontalHeaderLabels(msgPanelHeaderLabels);
-	setAlternatingRowColors( true ) ;
-	setSelectionBehavior(QAbstractItemView::SelectRows);
+    : QTableWidget( 0, msgPanelColumnCount, _parent ),
+      charSize(QPoint(QFontMetrics(QFont()).charWidth("c", 0),
+                      QFontMetrics(QFont()).height()))
+{
+    verticalHeader()->hide() ;
+    hideColumn(msgPanelColumnCount - 2) ;
+    hideColumn(msgPanelColumnCount - 1) ;
+    setHorizontalHeaderLabels(msgPanelHeaderLabels);
+    setAlternatingRowColors( true ) ;
+    setSelectionBehavior(QAbstractItemView::SelectRows);
 
-	connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
-  }
+    connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
+}
 
 
 void MsgPanel::showEvent ( QShowEvent * )
 {
-	sortItems(msgPanelColumnCount - 1);
+    sortItems(msgPanelColumnCount - 1);
 }
 
-void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
+void MsgPanel::addMsg(const NodeListT::iterator & _node)
 {
-	const qint32 id_column = msgPanelColumnCount - 2 ;
-	const qint32 date_column = msgPanelColumnCount - 1 ;
+    const qint32 idColumn = msgPanelColumnCount - 2 ;
+    const qint32 dateColumn = msgPanelColumnCount - 1 ;
 
-	time_t i_time ;
-	qint32 i, row_count ;
-    QString line[msgPanelColumnCount], s_time ;
 
-    i_time = atol(_node_it->check.last_state_change.c_str()) ;
-    s_time = ctime(&i_time) ;
-	line[0] = s_time.replace("\n", "") ;
-	line[1] = Utils::statusToString(_node_it->status) ;
-	line[2] = QString(_node_it->check.host.c_str()) ;
-	line[3] = " " + _node_it->name ;
+    time_t time = atol(_node->check.last_state_change.c_str()) ;
+    QString time_ = ctime(&time) ;
+    QString line[msgPanelColumnCount] ;
+    line[0] = time_.remove("\n");
+    line[1] = Utils::statusToString(_node->status) ;
+    line[2] = QString(_node->check.host.c_str()) ;
+    line[3] = " " + _node->name ;
 
-	if( _node_it->status == MonitorBroker::OK ) {
-		line[4] = ( _node_it->notification_msg.trimmed().length() != 0) ? _node_it->notification_msg : QString(_node_it->check.alarm_msg.c_str()) ;
+    if( _node->status == MonitorBroker::OK ) {
+        line[4] = ( _node->notification_msg.trimmed().length() != 0) ? _node->notification_msg : QString(_node->check.alarm_msg.c_str()) ;
     } else {
-		line[4] = ( _node_it->alarm_msg.trimmed().length() != 0 )? _node_it->alarm_msg :  QString(_node_it->check.alarm_msg.c_str()) ;
-	}
+        line[4] = ( _node->alarm_msg.trimmed().length() != 0 && _node->status != MonitorBroker::UNKNOWN)? _node->alarm_msg :  QString(_node->check.alarm_msg.c_str()) ;
+    }
 
-	line[id_column] = _node_it->id ;
-	line[date_column] = "";
+    line[idColumn] = _node->id ;
+    line[dateColumn] = "";
 
-	i = 0 ;
-	row_count = rowCount();
-    setSortingEnabled( false ) ;
-	while( i < row_count ) {
-		if ( item(i, id_column)->text() != _node_it->id ) {
-			i ++ ;
-			continue ;
-		}
-		removeRow(i) ;
-		row_count -- ;
-	}
+    qint32 i = 0 ;
+    qint32 nbRows = this->rowCount();
+    //    setSortingEnabled(false) ;
+    while(i < nbRows ) {
+        if(item(i, idColumn)->text() != _node->id) {
+            i++ ;
+            continue ;
+        }
+        removeRow(i) ;
+        nbRows-- ;
+    }
 
-	insertRow( 0 ) ;
-	setRowCount( row_count + 1) ;
-	setRowHeight(0, charSize.y() + 3) ;
+    insertRow( 0 ) ;
+    setRowCount( nbRows + 1) ;
+    setRowHeight(0, charSize.y() + 3) ;
 
-	//TODO deal with data for sorting
-	QTableWidgetItem* items[msgPanelColumnCount] ;
-	for(i = 0; i < msgPanelColumnCount ; i ++) {
-		setCellWidget(0, i, new QLabel( "" ) ) ;
-		items[i] = new QTableWidgetItem(line[i]) ;
-		items[i]->setData(Qt::UserRole, line[i]) ;
-		setItem(0, i, items[i]) ;
-		if( _node_it->status != MonitorBroker::OK ) {
-			item(0, i)->setBackground(StatsLegend::HIGHLIGHT_COLOR) ;
-		}
-	}
+    //TODO deal with data for sorting
+    QTableWidgetItem* items[msgPanelColumnCount] ;
+    for(i = 0; i < msgPanelColumnCount ; i ++) {
+        setCellWidget(0, i, new QLabel( "" ) ) ;
+        items[i] = new QTableWidgetItem(line[i]) ;
+        items[i]->setData(Qt::UserRole, line[i]) ;
+        setItem(0, i, items[i]) ;
+        if( _node->status != MonitorBroker::OK ) {
+            item(0, i)->setBackground(StatsLegend::HIGHLIGHT_COLOR) ;
+        }
+    }
 
-	switch(_node_it->status) {
-	case MonitorBroker::OK:
-		item(0, 1)->setBackground(QBrush(StatsLegend::OK_COLOR)) ;
-		break;
+    switch(_node->status) {
+    case MonitorBroker::OK:
+        item(0, 1)->setBackground(QBrush(StatsLegend::OK_COLOR)) ;
+        break;
 
-	case MonitorBroker::WARNING:
-		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::WARNING)) ;
-		item(0, 1)->setBackground(QBrush(StatsLegend::WARNING_COLOR)) ;
-		break;
+    case MonitorBroker::WARNING:
+        item(0, dateColumn)->setText(QString::number(-1 * MonitorBroker::WARNING)) ;
+        item(0, 1)->setBackground(QBrush(StatsLegend::WARNING_COLOR)) ;
+        break;
 
-	case MonitorBroker::CRITICAL:
-		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::CRITICAL)) ;
-		item(0, 1)->setBackground(QBrush(StatsLegend::CRITICAL_COLOR)) ;
-		break;
+    case MonitorBroker::CRITICAL:
+        item(0, dateColumn)->setText(QString::number(-1 * MonitorBroker::CRITICAL)) ;
+        item(0, 1)->setBackground(QBrush(StatsLegend::CRITICAL_COLOR)) ;
+        break;
 
-	case MonitorBroker::UNKNOWN:
-		item(0, date_column)->setText(QString::number(-1 * MonitorBroker::UNKNOWN)) ;
-		item(0, 1)->setBackground(QBrush(StatsLegend::UNKNOWN_COLOR)) ;
-		break;
+    case MonitorBroker::UNKNOWN:
+        item(0, dateColumn)->setText(QString::number(-1 * MonitorBroker::UNKNOWN)) ;
+        item(0, 1)->setBackground(QBrush(StatsLegend::UNKNOWN_COLOR)) ;
+        break;
 
-	default:
-		break;
-	}
-	sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
+    default:
+        break;
+    }
+    //	sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;
 }
 
 void MsgPanel::resizeFields( const QSize & _window_size, const bool & _resize_window )
 {
-	qint32 msg_width ;
+    resizeColumnsToContents() ;
 
-	resizeColumnsToContents() ;
-
-	if( rowCount() ) {
-		msg_width = (_window_size.width() - cellWidget(0, 4)->pos().x() ) ;
-		setColumnWidth(4, msg_width ) ;
-	}
-	if ( _resize_window ) window()->resize( _window_size ) ;
+    if( rowCount() ) {
+        qint32  msgWidth = (_window_size.width() - cellWidget(0, 4)->pos().x() ) ;
+        setColumnWidth(4, msgWidth ) ;
+    }
+    if ( _resize_window ) window()->resize( _window_size ) ;
 }
