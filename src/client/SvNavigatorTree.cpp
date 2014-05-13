@@ -59,7 +59,7 @@ void SvNavigatorTree::dropEvent(QDropEvent * _event )
 				emit treeNodeMoved(selectedNode) ;
 			}
 			else {
-				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
+                QMessageBox::warning(this, "Warning! | " +appName.toUpper(),
 						"Dropping not allowed on the target node", QMessageBox::Ok) ;
 			}
 		}

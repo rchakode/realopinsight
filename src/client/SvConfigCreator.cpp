@@ -85,7 +85,7 @@ void SvCreator::unloadMenu(void)
 
 void SvCreator::load(const QString& _filename)
 {
-	setWindowTitle(openedFile + " - " + QString(ngrt4n::APP_NAME.c_str())
+    setWindowTitle(openedFile + " - " + appName.toUpper()
 			+ " | Monitoring View Configuration Editor") ;
 	loadMenu();
 	addEvents() ;
@@ -97,7 +97,7 @@ void SvCreator::load(const QString& _filename)
 void SvCreator::open(void)
 {
 	QString path = QFileDialog::getOpenFileName(this,
-			"Select view configuration file - " + QString(ngrt4n::APP_NAME.c_str()),
+            appName.toUpper() + " :: Select a configuration file | ",
 			".",
 			"Xml files (*.xml);;All files (*)");
 
@@ -120,7 +120,7 @@ void SvCreator::loadFile(const QString& _filename)
 
 void SvCreator::import(){
 	QString path = QFileDialog::getOpenFileName(this,
-			"Select the Status File - " + QString(ngrt4n::APP_NAME.c_str()),
+            "Select the Status File - " + appName.toUpper(),
 			".",
 			"Data files (*.dat);;All files (*)");
 	if(path.length()) editor->loadStatusFile(path) ;
@@ -161,7 +161,7 @@ void SvCreator::newNode(void)
 	if(p_node_it == snavStruct->node_list.end() || p_node_it->type == NodeType::ALARM_NODE ) {
 
 		QMessageBox::warning(this, "Warning! | "
-				+ QString(ngrt4n::APP_NAME.c_str()),
+                + appName.toUpper(),
 				"Action not allowed on the target node",
 				QMessageBox::Ok) ;
 		return ;
@@ -189,7 +189,7 @@ void SvCreator::deleteNode(void)
 	QMessageBox msg_box ;
 
 	msg_box.setText("Would you really want to delete the service and (possibly) its sub services?");
-	msg_box.setWindowTitle("Delete service ? - " + QString(ngrt4n::APP_NAME.c_str()));
+    msg_box.setWindowTitle("Delete service ? - " + appName.toUpper());
 
 	msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
 
@@ -266,11 +266,11 @@ void SvCreator::saveAs(void)
 {
 	QString config_file;
 	config_file = QFileDialog::getSaveFileName(this,
-			"Select view configuration destination path - " + QString(ngrt4n::APP_NAME.c_str()),
+            "Select view configuration destination path - " + appName.toUpper(),
 			".",
 			"Xml files (*.xml)");
 	saveInFile(config_file);
-	setWindowTitle(openedFile + " - " + QString(ngrt4n::APP_NAME.c_str()) + " | Monitoring View Builder") ;
+    setWindowTitle(openedFile + " - " + appName.toUpper() + " | Monitoring View Builder") ;
 }
 
 int SvCreator::close( const bool & _close_windows )
@@ -280,7 +280,7 @@ int SvCreator::close( const bool & _close_windows )
 	}
 
 	QMessageBox mbox;
-	mbox.setWindowTitle("Save change? - " + QString(ngrt4n::APP_NAME.c_str()));
+    mbox.setWindowTitle("Save change? - " + appName.toUpper());
 	mbox.setText("The document has been modified.\n "
 			"Do you want to save your changes?");
 
@@ -382,7 +382,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 		}
 		else {
 			if ( node_it->type == NodeType::SERVICE_NODE && ! node_it->child_nodes.isEmpty() ) {
-				QMessageBox::warning(this, "Warning! | " + QString(ngrt4n::APP_NAME.c_str()),
+                QMessageBox::warning(this, "Warning! | " + appName.toUpper(),
 						"This action required that the service has no sub service", QMessageBox::Ok) ;
 				editor->typeField()->setCurrentIndex( 0 ) ;
 			}
@@ -508,7 +508,7 @@ void SvCreator::loadMenu(void)
 	menuList["MENU2"] = menuBar->addMenu(tr("&Help")),
 			subMenuList["ShowOnlineResources"] = menuList["MENU2"]->addAction("Online &Resources"),
 			menuList["MENU2"]->addSeparator(),
-			subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + QString(ngrt4n::APP_NAME.c_str()).toUpper());
+            subMenuList["ShowAbout"] = menuList["MENU2"]->addAction("&About " + appName.toUpper());
 
 	subMenuList["NewFile"]->setShortcut(QKeySequence::New) ;
 	subMenuList["Open"]->setShortcut(QKeySequence::Open) ;

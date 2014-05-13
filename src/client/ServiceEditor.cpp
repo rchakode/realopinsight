@@ -108,7 +108,7 @@ ServiceEditor::~ServiceEditor()
 void ServiceEditor::loadStatusFile(const QString & path)
 {
 	MonitorBroker::NagiosChecksT checks ;
-	MonitorBroker::loadNagiosCollectedData(path.toStdString(), checks);
+    MonitorBroker::loadNagiosCollectedData(path.toStdString(), checks);
 	setCheckListField( checks );
 }
 

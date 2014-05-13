@@ -36,31 +36,43 @@
 
 using namespace std;
 
-int numWorkers = 1 ;
-
-string statusFile = "/usr/local/nagios/var/status.dat" ;
-string authChain = "" ;
 string packageName = PACKAGE_NAME ;
+string packageVersion = PACKAGE_VERSION ;
+string packageUrl = PACKAGE_URL ;
+string statusFile = "/usr/local/nagios/var/status.dat" ;
+string progName = "";
+string authChain= "" ;
 
-ostringstream help(""
-		"SYNOPSIS\n"
-		"	" + packageName +" [OPTIONS]\n"
-		"\n"
-		"OPTIONS\n"
-		"	-c FILE\n"
-		"	 Specify the path of the status file. Default is " + statusFile + ".\n"
-		"	-D\n"
-		"	 Run ngrt4nd in foreground mode. \n"
-		"	-p\n"
-		"	 Set the port of listening. Default is 1983.\n"
-		"	-P\n"
-		"	 Change the authentication token.\n"
-		"	-T\n"
-		"	 Print the authentication token.\n"
-		"	-v\n"
-		"	 Print the version and license information.\n"
-		"	-h\n"
-		"	 Print this help.\n") ;
+string help() {
+	ostringstream msg("SYNOPSIS\n"
+			"	" + progName +" [OPTIONS]\n"
+			"\n"
+			"OPTIONS\n"
+			"	-c FILE\n"
+			"	 Specify the path of the Nagios status file. Default is " + statusFile + ".\n"
+			"	-D\n"
+			"	 Run the program in foreground mode. \n"
+			"	-p\n"
+			"	 Set the listening port. Default is 1983.\n"
+			"	-P\n"
+			"	 Change the authentication token.\n"
+			"	-T\n"
+			"	 Print the authentication token.\n"
+			"	-v\n"
+			"	 Print the version and copyright information.\n"
+			"	-h\n"
+			"	 Print this help.\n") ;
+
+	return msg.str();
+}
+
+string version(){
+	ostringstream versionMsg(progName + " (" + packageName + "), Version " + packageVersion +  ".\n"
+	      + "Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>.\n"
+	      + "All rights reserved. Visit "+ packageUrl + " for more information.");
+
+return versionMsg.str();
+}
 
 void ngrt4n::setPassChain(char* authChain) {
 
@@ -68,7 +80,7 @@ void ngrt4n::setPassChain(char* authChain) {
 
 	ofpass.open( ngrt4n::AUTH_FILE.c_str() );
 	if( ! ofpass.good()) {
-		cerr << "Unable to set the password :  perhaps the application's settings file is not well configured." << endl;
+		cerr << "Unable to set the authentication token." << endl;
 		exit(1) ;
 	}
 
@@ -83,7 +95,7 @@ string ngrt4n::getPassChain() {
 
 	pfile.open ( ngrt4n::AUTH_FILE.c_str() );
 	if( ! pfile.good()) {
-		cerr << "Unable to get application's settings" << endl;
+		cerr << "Unable to load the application's settings" << endl;
 		exit(1) ;
 	}
 
@@ -94,40 +106,27 @@ string ngrt4n::getPassChain() {
 
 int main(int argc, char ** argv)
 {
-	ostringstream versionMsg;
-	versionMsg<< "NGRT4N Broker - " << PACKAGE_NAME <<" "<<PACKAGE_VERSION<< "."<< endl
-			<<"This program is part of the NGRT4N Software." << endl
-			<<"Copyright (c) 2010-2012 NGRT4N Project <contact@ngrt4n.com>" << "." << endl
-			<<"Visit "<<PACKAGE_URL<<" for further details."<< endl ;
+	progName = basename(argv[0]);
 
 	bool foreground = false;
-	static const char *shotOpt="DTPhvc:p:n:" ;
+	static const char *shotOpt="DTPhvc:p:" ;
 	int port = MonitorBroker::DEFAULT_PORT ;
 	char opt ;
 	while ((opt = getopt(argc, argv, shotOpt)) != -1) {
 		switch (opt)
 		{
-		case 'D':		// daemon mode
+		case 'D':
 			foreground = true ;
 			break;
 
-		case 'c':		// alternative location of status.dat
+		case 'c':
 			statusFile = optarg ;
 			break;
 
-		case 'p': {	// alternative location of status.dat
+		case 'p': {
 			port = atoi(optarg) ;
 			if(port <= 0 ) {
-				cerr << "ERROR : Bad port number." << endl ;
-				exit(1) ;
-			}
-			break;
-		}
-
-		case 'n': {	// alternative location of status.dat
-			numWorkers = atoi(optarg) ;
-			if(numWorkers <= 0 ) {
-				cerr << "ERROR : Bad number of instances." << endl ;
+				cerr << "ERROR: Bad port number." << endl ;
 				exit(1) ;
 			}
 			break;
@@ -137,7 +136,7 @@ int main(int argc, char ** argv)
 			ngrt4n::checkUser() ;
 			ngrt4n::initApp() ;
 
-			char* pass = getpass("Type the passphrase:");
+			char* pass = getpass("Type a passphrase:");
 			ngrt4n::setPassChain(pass) ;
 			cout << ngrt4n::getPassChain() << endl ;
 
@@ -152,18 +151,17 @@ int main(int argc, char ** argv)
 		}
 
 		case 'v': {
-			cout << versionMsg.str() ;
+			cout << version() << endl ;
 			exit(0) ;
 		}
 
-		case 'h': {		// alternative location of status.dat
-			cout << help.str() << endl ;
+		case 'h': {
+			cout << help() << endl ;
 			exit(0) ;
 		}
 		default: {
-			cerr << "Unknow option : " << opt << endl;
-			cout << help.str() << endl ;
-			exit(0) ;
+			cout << help() << endl ;
+			exit(1) ;
 		}
 		}
 	}
@@ -175,7 +173,7 @@ int main(int argc, char ** argv)
 	if( ! foreground ) {
 		pid_t pid = fork();
 		if(pid <= -1) {
-			cerr << "Can not fork process" << endl;
+			cerr << "Failure while starting the program in daemon mode" << endl;
 			exit(1);
 		}
 		else if(pid > 0) {
@@ -187,14 +185,15 @@ int main(int argc, char ** argv)
 	ostringstream tcpAddr;
 	tcpAddr << "tcp://*:" << port ;
 
-	cout << versionMsg.str() ;
-	cout << "Starting the program ..." << endl ;
+	cout << "Starting "<< version() << endl << endl ;
 	cout << "Listening address => " << tcpAddr.str() << endl ;
 	cout << "Nagios status file => " << statusFile << endl ;
 
 	zmq::context_t ctx(1);
 	zmq::socket_t comChannel(ctx, ZMQ_REP);
 	comChannel.bind(tcpAddr.str().c_str());
+        
+	cout << "Service started." << endl ;
 
 	MonitorBroker* monitor = new MonitorBroker( statusFile ) ;
 	while (true) {
@@ -211,7 +210,7 @@ int main(int argc, char ** argv)
 		char* _sid = strtok(NULL, ":") ;
 		string sid = (_sid == NULL) ? "" : _sid ;
 
-		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentification" ;
+		string result = (pass == authChain )? monitor->getInfOfService(sid) : "-2#Wrong authentication" ;
 		msize = result.size() ;
 		zmq::message_t reply( MonitorBroker::MAX_MSG) ;
 		memset(reply.data(), 0, MonitorBroker::MAX_MSG) ;

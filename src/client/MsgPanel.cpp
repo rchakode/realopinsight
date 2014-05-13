@@ -23,6 +23,7 @@
 
 #include "MsgPanel.hpp"
 #include "StatsLegend.hpp"
+#include <ctime>
 
 const qint16 MsgPanel::msgPanelColumnCount = 7;
 
@@ -67,10 +68,10 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	time_t i_time ;
 	qint32 i, row_count ;
-	QString line[ msgPanelColumnCount ], s_time ;
+    QString line[msgPanelColumnCount], s_time ;
 
-	setSortingEnabled( false ) ;
-	i_time = atol(_node_it->check.last_state_change.c_str()) ; s_time = ctime(&i_time) ;
+    i_time = atol(_node_it->check.last_state_change.c_str()) ;
+    s_time = ctime(&i_time) ;
 	line[0] = s_time.replace("\n", "") ;
 	line[1] = Utils::statusToString(_node_it->status) ;
 	line[2] = QString(_node_it->check.host.c_str()) ;
@@ -78,8 +79,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	if( _node_it->status == MonitorBroker::OK ) {
 		line[4] = ( _node_it->notification_msg.trimmed().length() != 0) ? _node_it->notification_msg : QString(_node_it->check.alarm_msg.c_str()) ;
-	}
-	else {
+    } else {
 		line[4] = ( _node_it->alarm_msg.trimmed().length() != 0 )? _node_it->alarm_msg :  QString(_node_it->check.alarm_msg.c_str()) ;
 	}
 
@@ -88,6 +88,7 @@ void MsgPanel::addMsg(const NodeListT::iterator & _node_it)
 
 	i = 0 ;
 	row_count = rowCount();
+    setSortingEnabled( false ) ;
 	while( i < row_count ) {
 		if ( item(i, id_column)->text() != _node_it->id ) {
 			i ++ ;

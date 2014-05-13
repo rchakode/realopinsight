@@ -28,6 +28,7 @@
 #include "core/ns.hpp"
 #include "Auth.hpp"
 #include "Base.hpp"
+#include<QSplashScreen>
 
 
 class Preferences : public QDialog
@@ -37,8 +38,9 @@ class Preferences : public QDialog
 public:
 	Preferences(const qint32 & _user_role = Auth::OP_USER_ROLE, const qint32 & _action = Preferences::ChangePassword);
 	virtual ~Preferences();
-
 	static QString style() ;
+    static QSplashScreen* infoScreen(const QString & msg="");
+
 	static const qint32 ChangePassword ;
 	static const qint32 ForceChangePassword ;
 	static const  qint32 ChangeMonitoringSettings ;

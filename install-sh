@@ -22,7 +22,7 @@ set -e
 
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
-VERSION_BKR="1.0-beta1"
+VERSION_BKR="1.0"
 
 # Print help
 #
@@ -42,7 +42,7 @@ usage(){
 
 prompt_copyright(){ 
 echo
-echo "Welcome to NGRT4N Software Suite."
+echo "Thanks for choosing NGRT4N Monitoring Suite."
 echo
 echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
 echo
@@ -92,7 +92,7 @@ checking_uipreq(){
   [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking Graphviz's dot utility => ${DOT:=`which dot`}... "
+  echo -n "DEGUG : Checking Graphviz => ${DOT:=`which dot`}... "
   [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
   echo "done"
 }

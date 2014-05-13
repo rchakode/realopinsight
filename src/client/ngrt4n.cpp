@@ -2,7 +2,7 @@
  * ngrt4n.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -26,15 +26,10 @@
 #include "client/SvNavigator.hpp"
 #include "client/SvConfigCreator.hpp"
 #include <sstream>
+#include <getopt.h>
 
-
-const string appName = APPLICATION_NAME ;
-const string releaseYear = RELEASE_YEAR;
-const string packageName = PACKAGE_NAME ;
-const string packageVersion = PACKAGE_VERSION;
-const string packageUrl = PACKAGE_URL;
-
-QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
+QString cmdName = "" ;
+QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
 		"Options: \n"
 		"	-c\n"
 		"	   Launch the configuration utility\n"
@@ -48,27 +43,23 @@ QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_con
 		"	   Print this help.\n" ;
 
 
-ostringstream versionMsg(appName + " UI " + packageVersion + ".\n"
-		+"This program is part of the NGRT4N Software.\n"
-		+"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
-		+"Visit "+ packageUrl + " for further information.") ;
+ostringstream versionMsg(appName.toStdString() + " "+packageName.toStdString()+", Version " + packageVersion.toStdString() + ".\n\n"
+		+"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
+		+"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
 
 int main(int argc, char **argv)
 {
 	QApplication* app = new QApplication(argc, argv) ;
-	QIcon app_icon (":images/built-in/icon.png") ;
-	app->setWindowIcon( app_icon ) ;
-	app->setApplicationName(  QString(appName.c_str()) ) ;
+	app->setWindowIcon(QIcon(":images/built-in/icon.png")) ;
+	app->setApplicationName(appName.toUpper() ) ;
 	app->setStyleSheet(Preferences::style());
-
+	cmdName=argv[0];
 	if(argc > 3) {
 		qDebug() << usage ;
 		exit (1) ;
 	}
 
-	ngrt4n::initApp() ;
-
-	QString module = "dashboard" ;
+	QString module = "config" ;
 	QString file = argv[1] ;
 	int opt ;
 
@@ -104,20 +95,33 @@ int main(int argc, char **argv)
 			break ;
 		}
 	}
-	cout << "Launching..." << endl << versionMsg.str() << endl;
-	Auth authentification;
-	int userRole = authentification.exec() ;
+	cout <<"Launching "<<versionMsg.str()<<endl;
+	Auth authentication;
+	int userRole = authentication.exec() ;
 	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
 	if(module == "dashboard") {
+		QSplashScreen* info = Preferences::infoScreen("Welcome to NGRT4N Operations Concole..."+QString::fromStdString(versionMsg.str()));
+		sleep(1);
 		if(file == "") {
-			qDebug() << "invalid file !" ;
-			QMessageBox::warning(0,
-					"Error | " + QString(packageName.c_str()),
-					" :: You need to specify a configuration file !!",
-					QMessageBox::Ok);
-			exit (1) ;
+			info->clearMessage();
+			info->showMessage("You need to select a configuration file!", Qt::AlignCenter|Qt::AlignCenter);
+			sleep(1); info->finish(0);
+			file = QFileDialog::getOpenFileName(0,
+					appName.toUpper() + " :: Select a configuration file",
+					".",
+					"Xml files (*.xml);;All files (*)");
+
+			if(! file.length()){
+				QMessageBox::critical(0,
+						appName.toUpper() + " :: Info",
+						"No configuration file has been selected and the program will exit.",
+						QMessageBox::Ok);
+				exit (1) ;
+			}
+
 		}
+		info->finish(0);
 		SvNavigator *monitor= new SvNavigator(userRole, file) ; monitor->startMonitor() ;
 	} else if(module == "editor") {
 		SvCreator* svc = new SvCreator(userRole) ;

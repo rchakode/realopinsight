@@ -26,6 +26,7 @@
 #include "Preferences.hpp"
 #include "Auth.hpp"
 #include <sstream>
+#include "Base.hpp"
 
 const qint32 Preferences::ChangePassword = 0 ;
 const qint32 Preferences::ForceChangePassword = 1 ;
@@ -81,7 +82,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 				layout->addWidget(new QLabel("Port"), line, 2, Qt::AlignRight),
 				layout->addWidget(serverPortField, line, 3) ;
 		line += 1,
-				layout->addWidget(new QLabel("Server Passphrase"), line, 0),
+				layout->addWidget(new QLabel("Passphrase"), line, 0),
 				layout->addWidget(serverPassField, line, 1, 1, 4) ;
 		line += 1,
 				layout->addWidget(cancelButton, line, 1, 1, 2, Qt::AlignRight),
@@ -100,8 +101,7 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 			serverPortField->setEnabled(false) ;
 			serverPassField->setEnabled(false) ;
 		}
-		setWindowTitle("Preferences - Monitoring Settings | " + QString(ngrt4n::APP_NAME.c_str())) ;
-
+		setWindowTitle("Monitoring Settings | " + appName.toUpper()) ;
 		break;
 
 	case Preferences::ChangePassword:
@@ -124,21 +124,21 @@ Preferences::Preferences(const qint32 & _user_role, const qint32 & _action)
 
 		if(_action == Preferences::ForceChangePassword) cancelButton->setEnabled(false) ;
 
-		setWindowTitle("Preferences - Change User Password | " + QString(ngrt4n::APP_NAME.c_str())) ;
+		setWindowTitle("Change Password | " + appName.toUpper()) ;
 		break;
 
-	case Preferences::ShowAbout: {
+	case Preferences::ShowAbout:
 		ostringstream about ;
-		about << QString::fromStdString(PACKAGE_NAME).toUpper().toStdString() << " UI Module, version " << PACKAGE_VERSION << endl ;
-		about << "Copyright (c) 2010-"<< RELEASE_YEAR << " NGRT4N Project <contact@ngrt4n.com>." << endl;
-		about << "Visit "<< PACKAGE_URL << " for further information." << endl;
-		about << "\n Report Bugs : bugs@ngrt4n.com" << endl;
+		about << appName.toUpper().toStdString()<<" "<<packageName.toStdString()<<", Version "<< packageVersion.toStdString();
+		about << "\n\nCopyright (c) 2010-"<<releaseYear.toStdString()<<" NGRT4N Project <contact@ngrt4n.com>.";
+		about << "\nAll rights reserved. Visit "<<packageUrl.toStdString()<<" for more information.";
+		about << "\n\nReport Bugs : bugs@ngrt4n.com"<<endl;
 		line += 1 ,
 				layout->addWidget(new QLabel(QString(about.str().c_str())), line, 0) ;
 		line += 1,
 				layout->addWidget(cancelButton, line, 0) ;
+		setWindowTitle("About " + appName.toUpper()) ;
 		break ;
-	}
 	}
 
 	setContent() ;
@@ -212,7 +212,7 @@ void Preferences::changePasswd(void)
 		{
 			settings->setKeyValue( key, new_passwd ) ;
 			QMessageBox::information(this,
-					QString(ngrt4n::APP_NAME.c_str()).toUpper(),
+					appName.toUpper().toUpper(),
 					"Password updated",
 					QMessageBox::Ok) ;
 
@@ -221,14 +221,14 @@ void Preferences::changePasswd(void)
 		else
 		{
 			QMessageBox::warning(this,
-					QString(ngrt4n::APP_NAME.c_str()),
+					appName.toUpper(),
 					"Sorry, passwords do not match",
 					QMessageBox::Ok) ;
 		}
 	}
 	else
 	{
-		QMessageBox::warning(this, QString(ngrt4n::APP_NAME.c_str()), "Authentification failed", QMessageBox::Ok) ;
+		QMessageBox::warning(this, appName.toUpper(), "Authentication failed", QMessageBox::Ok) ;
 	}
 }
 
@@ -257,6 +257,13 @@ void Preferences::addEvents(void)
 	connect(applySettingButton, SIGNAL(clicked()),  this, SLOT(applySettings()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(changePasswdButton, SIGNAL(clicked()),  this, SLOT(changePasswd()));
+}
+
+QSplashScreen* Preferences::infoScreen(const QString & msg) {
+	QSplashScreen* screen = new QSplashScreen(QPixmap(":images/built-in/loading-screen.png"));
+	screen->showMessage(msg, Qt::AlignJustify|Qt::AlignCenter);
+	screen->show();
+	return  screen ;
 }
 
 QString Preferences::style() {
@@ -323,14 +330,15 @@ QString Preferences::style() {
 			"	padding: 1px;"
 			"	border-radius: 3px;"
 			"	opacity: 500;"
+			"	color : #000000;"
 			"}"
 			"QDialog {"
 			"	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,"
-            "		stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
-            "		stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
+			"		stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
+			"		stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
 			"}"
 			"QGraphicsView{"
 			"	background:#f1f1f1;"
 			"}";
-return styleSheet ;
+	return styleSheet ;
 }

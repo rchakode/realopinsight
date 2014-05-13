@@ -25,15 +25,11 @@
 #include "client/Auth.hpp"
 #include "client/SvConfigCreator.hpp"
 #include <sstream>
+#include <getopt.h>
+#include "Base.hpp"
 
-
-const string appName = APPLICATION_NAME ;
-const string releaseYear = RELEASE_YEAR;
-const string packageName = PACKAGE_NAME ;
-const string packageVersion = PACKAGE_VERSION;
-const string packageUrl = PACKAGE_URL;
-
-QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_config]\n"
+QString cmdName = "" ;
+QString  usage = "usage: " + cmdName + " [OPTION] [view_config]\n"
 		"Options: \n"
 		"	-v\n"
 		"	  Print the version and license information.\n"
@@ -41,24 +37,22 @@ QString  usage = "usage: " + QString(packageName.c_str()) + " [OPTION] [view_con
 		"	   Print this help.\n" ;
 
 
-ostringstream versionMsg(appName + " Editor, version " + packageVersion + ".\n"
-		+"This program is part of the NGRT4N Software.\n"
-		+"Copyright (c) 2010-" + releaseYear + " NGRT4N Project <contact@ngrt4n.com>." + "\n"
-		+"Visit "+ packageUrl + " for further information.") ;
+ostringstream versionMsg(appName.toStdString()+"Editor, Version "+packageVersion.toStdString()+".\n\n"
+		+"Copyright (c) 2010-"+releaseYear.toStdString()+" NGRT4N Project <contact@ngrt4n.com>.\n"
+		+"All rights reserved. Visit "+packageUrl.toStdString()+" for more information.");
 
 int main(int argc, char **argv)
 {
 	QApplication* app = new QApplication(argc, argv) ;
-	QIcon app_icon (":images/built-in/icon.png") ;
-	app->setWindowIcon( app_icon ) ;
-	app->setApplicationName(  QString(appName.c_str()) ) ;
+	app->setWindowIcon(QIcon(":images/built-in/icon.png")) ;
+	app->setApplicationName(appName) ;
 	app->setStyleSheet(Preferences::style());
-
+	cmdName=argv[0];
 	if(argc > 3) {
 		qDebug() << usage ;
 		exit (1) ;
 	}
-	ngrt4n::initApp() ;
+
 	QString file = argv[1] ;
 	int opt ;
 
@@ -81,9 +75,9 @@ int main(int argc, char **argv)
 			break ;
 		}
 	}
-	cout << "Launching..." << endl << versionMsg.str() << endl;
-	Auth authentification;
-	int userRole = authentification.exec() ;
+	cout <<"Launching "<<versionMsg.str()<<endl;
+	Auth authentication;
+	int userRole = authentication.exec() ;
 	if( userRole != Auth::ADM_USER_ROLE && userRole != Auth::OP_USER_ROLE ) exit( 1 ) ;
 
 	SvCreator* svc = new SvCreator(userRole) ;

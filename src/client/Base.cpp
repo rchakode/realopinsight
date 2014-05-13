@@ -2,7 +2,7 @@
  * Base.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -34,7 +34,7 @@ void Struct::clear(void)
 	node_list.clear() ;
 }
 
-Settings::Settings(): QSettings(QString(ngrt4n::SETTINGS_FILE.c_str()), QSettings::NativeFormat )
+Settings::Settings(): QSettings(appName.toLower(), packageName.toLower().replace(" ", "-"))
 {
 	Q_INIT_RESOURCE(ngrt4n);
 

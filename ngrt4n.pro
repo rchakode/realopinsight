@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit
 TEMPLATE = app
-VERSION = 2.0-beta1
+VERSION = 2.0
 LIBS += -lzmq
 FORMS	  +=
 config-default{
@@ -26,7 +26,7 @@ MAN.files = doc/man/ngrt4n.1.gz
 INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc
 DEFINES += "APPLICATION_NAME='\"NGRT4N\"'"
-DEFINES += "PACKAGE_NAME='\"ngrt4n\"'"
+DEFINES += "PACKAGE_NAME='\"UI Module\"'"
 DEFINES += "PACKAGE_VERSION='\"$$VERSION\"'"
 DEFINES += "PACKAGE_URL='\"http://ngrt4n.com\"'"
 DEFINES += "RELEASE_YEAR='\"2012\"'"
@@ -83,4 +83,4 @@ DISTFILES += README \
 			 src/client/ngrt4n-editor.cpp \
 			 src/server/ngrt4nd.cpp \
 			 doc/man/*.gz \
-			 dm-1.0-beta1.tar.gz
+			 dm-1.0.tar.gz
