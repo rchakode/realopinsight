@@ -1,10 +1,10 @@
 Format: 1.0 
-Source: realopinsight-X.Y.Z.tar.gz
+Source: realopinsight-workstation-X.Y.Z.tar.gz
 Binary: realopinsight
 Architecture: any
 Version: X.Y.Z
-Maintainer: Rodrigue Chakode <bugs@ngrt4n.com>
-Homepage: http://ngrt4n.com
+Maintainer: Rodrigue Chakode <bugs@realopinsight.com>
+Homepage: http://realopinsight.com
 Standards-Version: 3.9.3
 Build-Depends: debhelper (>= 4.1.16), libqt4-dev (>= 4.6.3), libqtwebkit-dev, g++ (>= 4.6.3), libzmq-dev
 Package-List: 

@@ -1,27 +1,27 @@
-# ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 02-04-2014                                                 #
-#                                                                          #
-# This Software is part of RealOpInsight (http://realopinsight.com).       #
-#                                                                          #
-# This is a free software: you can redistribute it and/or modify           #
-# it under the terms of the GNU General Public License as published by     #
-# the Free Software Foundation, either version 3 of the License, or        #
-# (at your option) any later version.                                      #
-#	                                                                   #
-# The Software is distributed in the hope that it will be useful,          #
-# but WITHOUT ANY WARRANTY; without even the implied warranty or           #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
-# GNU General Public License for more details.                             #
-#                                                                          #
-# You should have received a copy of the GNU General Public License        #
-# along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
-#--------------------------------------------------------------------------#
+# ------------------------------------------------------------------------------- #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)           #
+# Last Update : 02-04-2014                                                        #
+#                                                                                 #
+# This Software is part of RealOpInsight (http://realopinsight.com).              #
+#                                                                                 #
+# This is a free software: you can redistribute it and/or modify                  #
+# it under the terms of the GNU General Public License as published by            #
+# the Free Software Foundation, either version 3 of the License, or               #
+# (at your option) any later version.                                             #
+#	                                                                          #
+# The Software is distributed in the hope that it will be useful,                 #
+# but WITHOUT ANY WARRANTY; without even the implied warranty or                  #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	                  #
+# GNU General Public License for more details.                                    #
+#                                                                                 #
+# You should have received a copy of the GNU General Public License               #
+# along with the Software.  If not, see <http://www.gnu.org/licenses/>.	          #
+#---------------------------------------------------------------------------------#
     
-%define binprefix     ngrt4n
+%define binprefix     realopinsight
     
-Name:           RealOpInsight
-Summary:    	Business service management software for open source monitoring
+Name:           realopinsight-workstation
+Summary:    	Workstation Edition of RealOpInsight Software
 Version:        X.Y.Z
 Release:        build<CI_CNT>.<B_CNT>
 Group:          System/Monitoring
@@ -53,14 +53,16 @@ BuildRequires: graphviz
 Requires:  graphviz
 
 %description
-RealOpinsight provides visualization systems that enables IT operations 
-staff to deal with monitoring with focus on business values. Not a monitor, 
-it provides specialized capabilities for monitoring the real healthy 
-of business services and cloud applications.
+RealOpinsight is an open source business service monitoring 
+dashboard software that enables IT operations staff to deal 
+with monitoring with focus on business. Not a monitor, 
+RealOpInsight provides specialized capabilities for 
+monitoring the real healthy of business services and cloud 
+applications. 
 
-RealOpInsight works on top of existing monitoring systems, including, 
-Nagios, Zabbix, Zenoss, Icinga, op5, Centreon, Shinken, GroundWork, 
-and more. 
+It supports Nagios, Zabbix, Zenoss, Icinga, op5, Centreon, 
+Shinken, GroundWork, and many other common monitoring 
+systems. 
 
 %prep
 %setup -q
@@ -93,5 +95,5 @@ rm -rf %{buildroot}
 %doc examples
 
 %changelog
-* Tue Nov 27 2012 bugs@ngrt4n.com
+* Tue May 13 2014 bugs@realopinsight.com
 - See the web site (http://RealOpInsight.com) to learn what changed in the different versions of the software
