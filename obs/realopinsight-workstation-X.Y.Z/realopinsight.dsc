@@ -6,7 +6,7 @@ Version: X.Y.Z
 Maintainer: Rodrigue Chakode <bugs@realopinsight.com>
 Homepage: http://realopinsight.com
 Standards-Version: 3.9.3
-Build-Depends: debhelper (>= 4.1.16), libqt4-dev (>= 4.6.3), libqtwebkit-dev, g++ (>= 4.6.3), libzmq-dev
+Build-Depends: debhelper(>= 4.1.16),libqt4-dev(>= 4.6.3),libqtwebkit-dev,g++(>= 4.6.3),libzmq-dev, graphviz
 Package-List: 
  realopinsight deb admin extra
 Files:     

@@ -2,7 +2,7 @@ Source: realopinsight
 Section: admin
 Priority: extra
 Maintainer: Rodrigue Chakode <bugs@realopinsight.com>
-Build-Depends: debhelper (>= 4.0.0), libqt4-dev (>= 4.6.3), libqtwebkit-dev, g++ (>= 4.6.3)
+Build-Depends: debhelper(>= 4.0.0),libqt4-dev (>= 4.6.3),libqtwebkit-dev,g++ (>= 4.6.3),graphviz
 Standards-Version: 3.9.3
 Homepage: http://realopinsight.com
 #Vcs-Git: git://git.debian.org/collab-maint/realopinsight.git

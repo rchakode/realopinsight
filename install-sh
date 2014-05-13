@@ -335,17 +335,11 @@ prompt_copyright
 
 echo "DEBUG: Initializing setup with $NCPU CPU..."
 
-if [ -z ${install_prefix} ] ; then
+if [ -z "${install_prefix}" ] ; then
   export INSTALL_PREFIX=/usr/local
 else
-  case ${install_prefix} in
-  /*) export INSTALL_PREFIX=${install_prefix}
-      export dflag="CONFIG+=dflag"
-     ;;
-  *) echo "This is not an absolute path : ${install_prefix}"
-     exit 2 
-	 ;;
- esac
+  export INSTALL_PREFIX=${install_prefix}
+  export dflag="CONFIG+=dflag"
 fi
 
 if [ `id -u` -ne 0 ]; then
