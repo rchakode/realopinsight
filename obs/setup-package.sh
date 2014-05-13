@@ -7,8 +7,8 @@ VERSION=$1
 DEFAULT_VERSION=X.Y.Z
 OBS_PROJECT="home:ngrt4n"
 OBS_PROJECT_DIR=/opt/dev/ngrt4n-qt/obs/$OBS_PROJECT
-PACKAGE_NAME=RealOpInsight-$VERSION
-DEFAULT_PACKAGE=RealOpInsight-$DEFAULT_VERSION
+PACKAGE_NAME=realopinsight-workstation-$VERSION
+DEFAULT_PACKAGE=realopinsight-workstation-$DEFAULT_VERSION
 DOWNLOAD_URL="file:///opt/dev/ngrt4n-qt/$PACKAGE_NAME.tar.gz"
 WORKING_DIR=/tmp/$PACKAGE_NAME
 

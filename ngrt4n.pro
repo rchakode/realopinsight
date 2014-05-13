@@ -131,17 +131,17 @@ TARGET = realopinsight-workstation
 
 manager {
 SOURCES	+= client/src/ngrt4n-manager.cpp
-TARGET = ngrt4n-manager
+TARGET = realopinsight-manager
 }
 
 oc {
 SOURCES	+= client/src/ngrt4n-oc.cpp
-TARGET = ngrt4n-oc
+TARGET = realopinsight-oc
 }
 
 editor {
 SOURCES	+= client/src/ngrt4n-editor.cpp
-TARGET = ngrt4n-editor
+TARGET = realopinsight-editor
 }
 
 web-base {
@@ -211,7 +211,7 @@ MAN.path = /usr/share/man/man1
 }
 
 TARGET.files = $${TARGET}
-MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-editor.1.gz
+MAN.files = doc/man/realopinsight-manager.1.gz doc/man/realopinsight-oc.1.gz doc/man/realopinsight-editor.1.gz
 INSTALLS += TARGET MAN
 
 
