@@ -9,7 +9,7 @@ export DH_VERBOSE=1
 export app_name=realopinsight
 export install_root=debian/${app_name}
 export prefix_dir=${install_root}/usr
-export bin_prefix=ngrt4n
+export bin_prefix=realopinsight
 
 build: build-stamp
 
