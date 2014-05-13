@@ -671,12 +671,15 @@ void SvNavigator::retrieveZabbixTriggers(const QString & host)
 
 void SvNavigator::processZabbixReply(QNetworkReply* reply)
 {
-    if (reply->error() != QNetworkReply::NoError)
+    if (reply->error() != QNetworkReply::NoError) {
+        //reply->deleteLater();
         return;
+    }
+
     string data = static_cast<QString>(reply->readAll()).toStdString();
     JsonHelper jsHelper(data);
-
     qint32 dataId = jsHelper.getProperty("id").toInt32();
+
     switch(dataId) {
     case ZbxHelper::LOGIN :
         zxAuthToken = jsHelper.getProperty("result").toString();
@@ -687,9 +690,12 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
     case ZbxHelper::TRIGGER: {
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
+
             trigger.next();
-            if (trigger.flags()&QScriptValue::SkipInEnumeration)
+            if (trigger.flags()&QScriptValue::SkipInEnumeration) {
                 continue;
+            }
+
             QScriptValue triggerData = trigger.value();
             MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
@@ -697,6 +703,9 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
             check.status = triggerData.property("value").toInt32();
             if(check.status != MonitorBroker::OK) {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
+                int sev = triggerData.property("priority").toInteger();
+                Status st(static_cast<MonitorBroker::StatusT>(check.status), static_cast<MonitorBroker::SeverityT>(sev));
+                check.status = st.getValue();
             } else {
                 check.alarm_msg = triggerName.toStdString(); //TODO
             }
@@ -738,6 +747,7 @@ void SvNavigator::processZabbixReply(QNetworkReply* reply)
         exit(1);
         break;
     }
+    //reply->deleteLater();
 }
 
 void SvNavigator::requestZabbixChecks(void) {

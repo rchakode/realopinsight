@@ -57,6 +57,7 @@ void ZbxHelper::get(const qint32 & reqId, const QStringList & params) {
     }
     QNetworkReply* reply = this->post(*requestHandler, request.toAscii());
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+    //reply->deleteLater();
 }
 
 void ZbxHelper::processError(QNetworkReply::NetworkError code) {

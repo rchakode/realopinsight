@@ -316,7 +316,7 @@ void GraphView::drawNode(const NodeT & _node )
     icon.load(iconMap[_node.icon], 0, Qt::AutoColor);  // TODO
     exp_icon.load(iconMap[PLUS], 0, Qt::AutoColor);
 
-    QString label = "<span style=\"background: 'lightgray'\">&nbsp;" + _node.name + "&nbsp;</span>";
+    QString label = "<span style=\"background: '#F8F8FF'\">&nbsp;" + _node.name + "&nbsp;</span>";
 
     gnodesList[_node.id].label = new QGraphicsTextItem(),
             gnodesList[_node.id].label->setHtml(label),

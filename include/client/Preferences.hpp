@@ -76,12 +76,13 @@ public slots:
     void applySettings(void);
     void changePasswd(void);
     void donate(void);
+    void setAuthChainVisibility(const int & state);
 
 signals:
-    void urlChanged( QString );
+    void urlChanged(QString);
 
 protected :
-    void showEvent (QShowEvent * );
+    void showEvent (QShowEvent *);
 
 private:
     qint32 userRole;
@@ -104,6 +105,7 @@ private:
     QPushButton* applySettingButton;
     QPushButton* changePasswdButton;
     ImageButton* donateButton;
+    QCheckBox* showAuthChain;
     QGridLayout* layout;
 
     void setContent(void);
