@@ -1,7 +1,10 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
-3.0.0b2
+3.0.0
+  * Changed command line names: ngrt4n-oc -> realopinsight-oc, 
+    ngrt4n-manager -> realopinsight-manager, ngrt4n-editor -> 
+    realopinsight-editor
   * Fixed chart tooltip, severity ratios were not well built
   * Fixed Editor file open when the name of the root service is altered
   * Change the name of the field use_ls in setting file to use_ngrt4nd
