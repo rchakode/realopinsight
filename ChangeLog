@@ -1,6 +1,9 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.1
+  * Fixed importation of Nagios status file in the editor
+
 3.0.0
   * Changed command line names: ngrt4n-oc -> realopinsight-oc, 
     ngrt4n-manager -> realopinsight-manager, ngrt4n-editor -> 
