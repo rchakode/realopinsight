@@ -101,32 +101,25 @@ ServiceEditor::~ServiceEditor()
 
 }
 
-void ServiceEditor::loadStatusFile(const QString& path)
-{
-  ChecksT checks;
-  //FIXME: ngrt4n::loadNagiosCollectedData(path.toStdString(), checks);
-  setCheckListField( checks );
-}
-
-void ServiceEditor::setCheckListField(const ChecksT& _nagios_checks)
+void ServiceEditor::loadChecks(const ChecksT& checks)
 {
   checkField()->clear();
-  for(ChecksT::const_iterator it=_nagios_checks.begin(), end=_nagios_checks.end();
+  for(ChecksT::const_iterator it=checks.begin(), end=checks.end();
       it!=end; ++it) { checkField()->addItem(QString::fromStdString(it->second.id)); }
 }
 
-void ServiceEditor::setEnableFields(const bool& _enable)
+void ServiceEditor::setEnableFields(const bool& enable)
 {
-  mitems[CHECK_FIELD]->setEnabled(_enable);
-  mitems[CHECK_LIST_FIELD]->setEnabled(_enable);
-  mitems[ALARM_MSG_FIELD]->setEnabled(_enable);
-  mitems[NOTIFICATION_MSG_FIELD]->setEnabled(_enable);
+  mitems[CHECK_FIELD]->setEnabled(enable);
+  mitems[CHECK_LIST_FIELD]->setEnabled(enable);
+  mitems[ALARM_MSG_FIELD]->setEnabled(enable);
+  mitems[NOTIFICATION_MSG_FIELD]->setEnabled(enable);
 }
 
-bool ServiceEditor::updateNodeContent(NodeListT& _node_map, const QString& _node_id)
+bool ServiceEditor::updateNodeContent(NodeListT& _nodes, const QString& _nodeId)
 {
-  NodeListT::iterator node = static_cast<const NodeListT::iterator>(_node_map.find(_node_id));
-  if( node != _node_map.end()) {
+  NodeListT::iterator node = static_cast<const NodeListT::iterator>(_nodes.find(_nodeId));
+  if( node != _nodes.end()) {
     node->name = nameField()->text();
     node->type = typeField()->currentIndex();
     node->sev_crule = statusCalcRuleField()->currentIndex();
@@ -143,17 +136,17 @@ bool ServiceEditor::updateNodeContent(NodeListT& _node_map, const QString& _node
 }
 
 
-bool ServiceEditor::updateNodeContent(NodeListT::iterator& node)
+bool ServiceEditor::updateNodeContent(NodeListT::iterator& _node)
 {
-  node->name             = nameField()->text();
-  node->type             = typeField()->currentIndex();
-  node->sev_crule        = statusCalcRuleField()->currentIndex();
-  node->sev_prule        = statusPropRuleField()->currentIndex();
-  node->icon             = iconField()->currentText();
-  node->description      = descriptionField()->toPlainText();
-  node->alarm_msg        = alarmMsgField()->toPlainText();
-  node->notification_msg = notificationMsgField()->toPlainText();
-  if(node->type == NodeType::AlarmNode) node->child_nodes = checkField()->currentText();
+  _node->name             = nameField()->text();
+  _node->type             = typeField()->currentIndex();
+  _node->sev_crule        = statusCalcRuleField()->currentIndex();
+  _node->sev_prule        = statusPropRuleField()->currentIndex();
+  _node->icon             = iconField()->currentText();
+  _node->description      = descriptionField()->toPlainText();
+  _node->alarm_msg        = alarmMsgField()->toPlainText();
+  _node->notification_msg = notificationMsgField()->toPlainText();
+  if(_node->type == NodeType::AlarmNode) _node->child_nodes = checkField()->currentText();
 
   return true;
 }

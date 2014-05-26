@@ -27,6 +27,7 @@
 #include "GraphView.hpp"
 #include "utilsCore.hpp"
 #include "GuiDashboard.hpp"
+#include <fstream>
 
 namespace {
 const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
@@ -34,6 +35,7 @@ const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
 const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
 const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
 }
+
 SvCreator::SvCreator(const qint32& _userRole)
   : m_userRole (_userRole),
     m_hasLeftUpdates (false),
@@ -140,12 +142,25 @@ void SvCreator::loadFile(const QString& _path)
   }
 }
 
-void SvCreator::import() {
+void SvCreator::importStatusFile(void)
+{
   QString path = QFileDialog::getOpenFileName(this,
-                                              tr("Select the Status File %").arg(APP_NAME),
+                                              tr("Select a status file | %1").arg(APP_NAME),
                                               ".",
                                               tr("Data files (*.dat);;All files (*)"));
-  if (!path.isNull() && !path.isEmpty()) m_editor->loadStatusFile(path);
+  if (! path.isNull() && !path.isEmpty()) {
+    ChecksT checks;
+    if (parseStatusFile(path, checks)) {
+      m_editor->loadChecks(checks);
+    } else {
+      ngrt4n::alert("Error while parsing the file");
+    }
+  }
+}
+
+void SvCreator::importZabbixTriggers(void)
+{
+  //TODO
 }
 
 void SvCreator::newView(void)
@@ -557,7 +572,8 @@ void SvCreator::loadMenu(void)
   m_subMenus["SaveAs"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
       m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
   m_menus["FILE"]->addSeparator(),
-      m_subMenus["Import"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import.png"), tr("&Import Status File"));
+      m_subMenus["ImportStatusFile"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("&Import Status File")),
+      m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("&Import Zabbix Triggers"));
   m_menus["FILE"]->addSeparator(),
       m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
       m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
@@ -581,9 +597,57 @@ void SvCreator::loadMenu(void)
       m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
   m_toolBar->addAction(m_subMenus["Save"]);
   m_toolBar->addAction(m_subMenus["Open"]);
-  m_toolBar->addAction(m_subMenus["Import"]);
+  m_toolBar->addAction(m_subMenus["ImportStatusFile"]);
+  m_toolBar->addAction(m_subMenus["ImportZabbixTriggers"]);
   setMenuBar(m_menuBar);
   addToolBar(m_toolBar);
+}
+
+bool SvCreator::parseStatusFile(const QString& path, ChecksT& _checks)
+{
+  std::ifstream fileStream;
+  fileStream.open(path.toStdString(), std::ios_base::in);
+  if (! fileStream.good() ) {
+    qDebug() << tr("ERROR: Unable to open the file %1").arg(path);
+    return false;
+  }
+
+  std::string line;
+  while (getline(fileStream, line), ! fileStream.eof()) {
+
+    if(line.find("#") != std::string::npos ) continue;
+
+    if( line.find("hoststatus") == std::string::npos
+        && line.find("servicestatus") == std::string::npos )
+      continue;
+
+    CheckT check;
+    check.status = -1;
+    while (getline(fileStream, line), ! fileStream.eof()) {
+      size_t pos;
+      if (pos = line.find("}"), pos != std::string::npos ) break;
+      if (pos = line.find("="), pos == std::string::npos) continue;
+      QString param = QString(line.substr(0, pos).c_str()).trimmed();
+      std::string value = QString(line.substr(pos+1, std::string::npos).c_str()).trimmed().toStdString();
+      if (param == "host_name") {
+        check.host = check.id = QString(line.substr(pos+1).c_str()).trimmed().toStdString();
+      } else if(param == "service_description") {
+        check.id += "/" + value;
+      } else if(param == "check_command") {
+        check.check_command = value;
+      } else if(param == "current_state") {
+        check.status = atoi(value.c_str());
+      } else if(param == "last_state_change") {
+        check.last_state_change = value;
+      } else if(param == "plugin_output") {
+        check.alarm_msg = value;
+      }
+    }
+    _checks[check.id] = check;
+  }
+  fileStream.close();
+
+  return true;
 }
 
 void SvCreator::addEvents(void)
@@ -596,7 +660,8 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
   connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
   connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
-  connect(m_subMenus["Import"],SIGNAL(triggered(bool)),this,SLOT(import()));
+  connect(m_subMenus["ImportStatusFile"],SIGNAL(triggered(bool)),this,SLOT(importStatusFile()));
+  connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
   connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
   connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));

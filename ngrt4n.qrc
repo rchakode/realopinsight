@@ -7,7 +7,6 @@
         <file>images/built-in/zoomin.png</file>
         <file>images/built-in/refresh.png</file>
         <file>images/built-in/folder.png</file>
-        <file>images/built-in/import.png</file>
         <file>images/built-in/normal.png</file>
         <file>images/built-in/major.png</file>
         <file>images/built-in/minor.png</file>
@@ -65,5 +64,7 @@
         <file>images/built-in/menu_disket.png</file>
         <file>images/built-in/menu_import.png</file>
         <file>images/built-in/menu_open.png</file>
+        <file>images/built-in/import-nagios.png</file>
+        <file>images/built-in/import-zabbix.png</file>
     </qresource>
 </RCC>
