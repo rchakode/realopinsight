@@ -24,6 +24,8 @@
 
 #include "ZbxHelper.hpp"
 #include "utilsCore.hpp"
+#include "JsHelper.hpp"
+#include <QtScript/QScriptValueIterator>
 #include <QtScript/QScriptEngine>
 #include <QDebug>
 #include <QMessageBox>
@@ -125,4 +127,112 @@ void ZbxHelper::setTrid(const QString& apiv)
   } else {
     m_trid = Trigger;
   }
+}
+
+
+int ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
+{
+  reply->deleteLater();
+  QNetworkReply::NetworkError errcode = reply->error();
+  if (errcode != QNetworkReply::NoError) {
+    m_lastError = reply->errorString();
+    qDebug() << m_lastError;
+    //FIXME: processRpcError(errcode, src);
+    return -1;
+  }
+
+  QString data = reply->readAll();
+  JsonHelper jsHelper(data);
+  QString errmsg = jsHelper.getProperty("error").property("data").toString();
+  if (errmsg.isEmpty()) errmsg = jsHelper.getProperty("error").property("message").toString();
+  if (! errmsg.isEmpty()) {
+    m_lastError = errmsg;
+    qDebug() << m_lastError;
+    //FIXME: updateDashboardOnError(src, errmsg);
+    return -1;
+  }
+
+  qint32 tid = jsHelper.getProperty("id").toInt32();
+  switch(tid) {
+  case ZbxHelper::Login: {
+    QString auth = jsHelper.getProperty("result").toString();
+    if (!auth.isEmpty()) {
+      m_auth = auth;
+      m_isLogged = true;
+    }
+    break;
+  }
+  case ZbxHelper::ApiVersion: {
+    setTrid(jsHelper.getProperty("result").toString());
+    break;
+  }
+  case ZbxHelper::Trigger:
+  case ZbxHelper::TriggerV18: {
+
+    QScriptValueIterator trigger(jsHelper.getProperty("result"));
+    while (trigger.hasNext()) {
+
+      trigger.next();
+      if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+
+      QScriptValue triggerData = trigger.value();
+      QString triggerName = triggerData.property("description").toString();
+
+      CheckT check;
+      check.check_command = triggerName.toStdString();
+      check.status = triggerData.property("value").toInt32();
+      if (check.status == ngrt4n::ZabbixClear) {
+        check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+      } else {
+        check.alarm_msg = triggerData.property("error").toString().toStdString();
+        check.status = triggerData.property("priority").toInteger();
+      }
+      QString targetHost = "";
+      QScriptValueIterator host(triggerData.property("hosts"));
+      if (host.hasNext())
+      {
+        host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+        QScriptValue hostData = host.value();
+        targetHost = hostData.property("host").toString();
+        check.host = targetHost.toStdString();
+      }
+      if (tid == ZbxHelper::TriggerV18) {
+        check.last_state_change = triggerData.property("lastchange").toString().toStdString();
+      } else {
+        QScriptValueIterator item(triggerData.property("items"));
+        if (item.hasNext()) {
+          item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+          QScriptValue itemData = item.value();
+          check.last_state_change = itemData.property("lastclock").toString().toStdString();
+        }
+      }
+      QString key = ID_PATTERN.arg(targetHost, triggerName);
+      check.id = key.toStdString();
+      checks.insert(std::pair<std::string, CheckT>(check.id, check));
+    }
+    break;
+  }
+  default:
+    m_lastError = tr("Weird response received from the server");
+    qDebug() << m_lastError << "\n" << data;
+    return -1;
+    break;
+  }
+
+  return 0;
+}
+
+
+int ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks)
+{
+  setBaseUrl(srcInfo.mon_url);
+  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
+  params.push_back(QString::number(Login));
+  setSslConfig(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = postRequest(Login, params);
+  if (processReply(response, checks) !=0) {
+    return -1;
+  }
+
+  return 0;
 }

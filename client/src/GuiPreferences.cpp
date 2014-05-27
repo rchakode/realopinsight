@@ -50,7 +50,7 @@ GuiPreferences::GuiPreferences(qint32 _userRole, qint32 _formType)
     case Preferences::BasicLoginForm:
       loadBasicLoginForm();
       break;
-    case WebForm:
+    case NoForm:
       break;
     default:
       break;

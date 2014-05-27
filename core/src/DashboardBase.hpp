@@ -70,7 +70,7 @@ public Q_SLOTS:
   void updateBpNode(const QString& _node);
   void processZbxReply(QNetworkReply* reply, SourceT& src);
   void processZnsReply(QNetworkReply* reply, SourceT& src);
-  void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
+  void processRpcError(const QString& msg, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
@@ -126,7 +126,6 @@ protected:
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);
-  QStringList getAuthInfo(const QString& authString);
   void openRpcSessions(void);
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);

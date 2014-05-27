@@ -50,6 +50,10 @@ Settings::Settings(const QString& path): QSettings(path, QSettings::NativeFormat
 }
 
 
+Settings::~Settings(void)
+{
+}
+
 void Settings::init(void)
 {
   QString updateInterval = QSettings::value(Settings::UPDATE_INTERVAL_KEY).toString();
@@ -75,9 +79,6 @@ void Settings::init(void)
     QString passwd = QCryptographicHash::hash(ngrt4n::OpUser.c_str(), QCryptographicHash::Md5) ;
     QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
   }
-  translator = new QTranslator();
-  translator->load("ngrt4n_la");
-  qApp->installTranslator(translator);
   sync();
 }
 

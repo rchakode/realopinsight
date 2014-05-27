@@ -27,6 +27,7 @@
 #include "GraphView.hpp"
 #include "utilsCore.hpp"
 #include "GuiDashboard.hpp"
+#include "Auth.hpp"
 #include <fstream>
 
 namespace {
@@ -160,7 +161,32 @@ void SvCreator::importStatusFile(void)
 
 void SvCreator::importZabbixTriggers(void)
 {
-  //TODO
+  GuiPreferences preferences(Auth::OpUserRole, Preferences::NoForm);
+  preferences.initSourceStatesFromData();
+  SourceT srcInfo;
+  QStringList sourceList;
+  for (int i = 0; i< MAX_SRCS; ++i) {
+    if (preferences.loadSource(i, srcInfo)) {
+      if (srcInfo.mon_type == ngrt4n::Zabbix) {
+        sourceList.push_back(srcInfo.id);
+      }
+    }
+  }
+
+  bool ok = false;
+  QString srcId = QInputDialog::getItem(this,
+                                        tr("Select source | %1").arg(APP_NAME),
+                                        tr("Please select a source"),
+                                        sourceList,
+                                        0,
+                                        false,
+                                        &ok);
+  if (ok && ! srcId.isEmpty()) {
+    ChecksT checks;
+    ZbxHelper handler;
+    handler.loadChecks(srcInfo, checks);
+    //TODO
+  }
 }
 
 void SvCreator::newView(void)

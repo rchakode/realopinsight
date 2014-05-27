@@ -30,7 +30,7 @@
 
 
 namespace {
-  const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
 }
 
 class ZbxHelper : public QNetworkAccessManager {
@@ -48,6 +48,8 @@ public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
   QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
+  int loadChecks(const SourceT& srcInfo, ChecksT& checks);
+  int processReply(QNetworkReply* reply, ChecksT& checks);
   void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
   QString getApiEndpoint(void) const {return m_apiUri;}
   void setTrid(const QString& apiv);
@@ -73,6 +75,7 @@ private :
   bool m_isLogged;
   QString m_auth;
   QSslConfiguration* m_sslConfig;
+  QString m_lastError;
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

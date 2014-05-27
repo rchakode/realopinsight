@@ -406,7 +406,7 @@ void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
   _reply->deleteLater();
   QNetworkReply::NetworkError errcode = _reply->error();
   if (errcode != QNetworkReply::NoError) {
-    processRpcError(errcode, src);
+    processRpcError(_reply->errorString(), src);
     return;
   }
   QString data = _reply->readAll();
@@ -489,7 +489,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
   _reply->deleteLater();
 
   if (_reply->error() != QNetworkReply::NoError) {
-    processRpcError(_reply->error(), src);
+    processRpcError(_reply->errorString(), src);
     return;
   }
 
@@ -588,20 +588,9 @@ QStringList DashboardBase::getAuthInfo(int srcId)
 {
   SourceListT::Iterator source = m_sources.find(srcId);
   if (source != m_sources.end()) {
-    return getAuthInfo(source->auth);
+    return ngrt4n::getAuthInfo(source->auth);
   }
   return QStringList();
-}
-
-QStringList DashboardBase::getAuthInfo(const QString& authString)
-{
-  QStringList authInfo;
-  int pos = authString.indexOf(":");
-  if (pos != -1) {
-    authInfo.push_back(authString.left(pos));
-    authInfo.push_back(authString.mid(pos+1, -1));
-  }
-  return authInfo;
 }
 
 
@@ -634,7 +623,7 @@ void DashboardBase::openRpcSession(int srcId)
 
 void DashboardBase::openRpcSession(SourceT& src)
 {
-  QStringList authParams = getAuthInfo(src.auth);
+  QStringList authParams = ngrt4n::getAuthInfo(src.auth);
   if (authParams.size() != 2 && src.mon_type != ngrt4n::Nagios) {
     updateDashboardOnError(src, tr("Invalid authentication chain!\n"
                                    "Must follow the pattern login:password"));
@@ -740,7 +729,7 @@ void DashboardBase::requestZbxZnsData(SourceT& src)
   }
 }
 
-void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const SourceT& src)
+void DashboardBase::processRpcError(const QString& msg, const SourceT& src)
 {
   QString apiUrl = "";
   if (src.mon_type == ngrt4n::Zabbix) {
@@ -748,26 +737,7 @@ void DashboardBase::processRpcError(QNetworkReply::NetworkError _code, const Sou
   } else if (src.mon_type == ngrt4n::Zenoss) {
     apiUrl =  src.zns_handler->getRequestEndpoint();
   }
-
-  switch (_code) {
-  case QNetworkReply::RemoteHostClosedError:
-    updateDashboardOnError(src, tr("The connection has been closed by the remote host"));
-    break;
-  case QNetworkReply::HostNotFoundError:
-    updateDashboardOnError(src, tr("Host not found"));
-    break;
-  case QNetworkReply::ConnectionRefusedError:
-    updateDashboardOnError(src, tr("Connection refused"));
-    break;
-  case QNetworkReply::SslHandshakeFailedError:
-    updateDashboardOnError(src, tr("SSL Handshake failed"));
-    break;
-  case QNetworkReply::TimeoutError:
-    updateDashboardOnError(src, tr("Timeout exceeded"));
-    break;
-  default:
-    updateDashboardOnError(src, SERVICE_OFFLINE_MSG.arg(apiUrl, tr("error %1").arg(_code)));
-  }
+  updateDashboardOnError(src, msg);
 }
 
 

@@ -36,8 +36,9 @@ class Settings : public QSettings
 public:
   Settings();
   Settings(const QString& path);
+  virtual ~Settings(void);
+
   void init(void);
-  virtual ~Settings(){}
   void setKeyValue(const QString & _key, const QString & _value);
   qint32 updateInterval() const;
   void setEntry(const QString& key, const QString& value);
@@ -56,9 +57,6 @@ public:
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);
-
-private:
-  QTranslator* translator ;
 };
 
 

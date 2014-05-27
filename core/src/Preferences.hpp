@@ -43,7 +43,7 @@ public:
     ShowHelp,
     ShowAbout,
     BasicLoginForm,
-    WebForm
+    NoForm
   };
 
   Preferences(const QString& settingFile);
@@ -52,6 +52,7 @@ public:
   QBitArray* getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
   void setSourceState(int index, int value) {m_sourceStates->setBit(index, value);}
+  virtual void initSourceStatesFromData();
 
 Q_SIGNALS:
   void urlChanged(QString);
@@ -70,8 +71,7 @@ protected :
   virtual void updateFields(void) = 0;
   virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
   virtual int firstSourceSet(void);
-  virtual void initSourceStates();
-  void initSourceStates(const QString& str);
+  void setSourceStatesFromData(const QString& str);
   QString getSourceStatesSerialized(void);
   int currentSourceIndex(void) const {return m_currentSourceIndex;}
   void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
@@ -88,7 +88,7 @@ protected Q_SLOTS:
   virtual void deleteSource(void) = 0;
   void emitTimerIntervalChanged(qint32 _interval) {m_settings->emitTimerIntervalChanged(_interval);}
 
-private:
+protected:
   Settings* m_settings;
   int m_currentSourceIndex;
   QBitArray* m_sourceStates;
