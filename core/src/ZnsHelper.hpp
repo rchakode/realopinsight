@@ -79,7 +79,7 @@ private :
   QNetworkRequest* m_reqHandler;
   QEventLoop* m_evlHandler;
   bool m_isLogged;
-  QSslConfiguration* m_sslConfig;
+  QSslConfiguration m_sslConfig;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

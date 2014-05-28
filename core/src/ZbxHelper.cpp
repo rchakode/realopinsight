@@ -41,8 +41,7 @@ ZbxHelper::ZbxHelper(const QString & baseUrl)
     m_reqHandler(new QNetworkRequest()),
     m_trid(-1),
     m_evlHandler(new QEventLoop(this)),
-    m_isLogged(false),
-    m_sslConfig(new QSslConfiguration())
+    m_isLogged(false)
 {
   m_reqHandler->setRawHeader("Content-Type", "application/json");
   m_reqHandler->setUrl(QUrl(m_apiUri));
@@ -53,7 +52,6 @@ ZbxHelper::~ZbxHelper()
 {
   delete m_reqHandler;
   delete m_evlHandler;
-  delete m_sslConfig;
 }
 
 QNetworkReply*
@@ -67,7 +65,7 @@ ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
   }
   Q_FOREACH(const QString &param, params) { request = request.arg(param); }
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
-  reply->setSslConfiguration(*m_sslConfig);
+  reply->setSslConfiguration(m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
   m_evlHandler->exec();
@@ -115,9 +113,9 @@ void
 ZbxHelper::setSslConfig(bool verifyPeer)
 {
   if (verifyPeer) {
-    m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);
+    m_sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
   } else {
-    m_sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
+    m_sslConfig.setPeerVerifyMode(QSslSocket::QueryPeer);
   }
 }
 

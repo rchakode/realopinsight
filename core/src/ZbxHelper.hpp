@@ -100,7 +100,7 @@ private :
   QEventLoop* m_evlHandler;
   bool m_isLogged;
   QString m_auth;
-  QSslConfiguration* m_sslConfig;
+  QSslConfiguration m_sslConfig;
   QString m_lastError;
   JsonHelper m_replyJsonData;
 };
