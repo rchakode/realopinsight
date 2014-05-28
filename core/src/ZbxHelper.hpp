@@ -48,7 +48,7 @@ public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
   QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
-  int loadChecks(const SourceT& srcInfo, ChecksT& checks);
+  int loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
   int processReply(QNetworkReply* reply, ChecksT& checks);
   void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
   QString getApiEndpoint(void) const {return m_apiUri;}
@@ -59,6 +59,7 @@ public:
   void setAuth(const QString& auth) {m_auth = auth;}
   QString getAuth(void) const {return m_auth;}
   void setSslConfig(bool verifyPeer);
+  QString lastError(void) {return m_lastError;}
 
 
 public Q_SLOTS:

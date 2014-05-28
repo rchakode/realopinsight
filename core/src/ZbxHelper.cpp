@@ -65,7 +65,6 @@ QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & 
     request = ReqPatterns[reqId].arg(m_auth);
   }
   Q_FOREACH(const QString &param, params) { request = request.arg(param); }
-
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   reply->setSslConfiguration(*m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
@@ -132,26 +131,27 @@ void ZbxHelper::setTrid(const QString& apiv)
 
 int ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
 {
+  // necessary to properly free resource after processing
   reply->deleteLater();
-  QNetworkReply::NetworkError errcode = reply->error();
-  if (errcode != QNetworkReply::NoError) {
-    m_lastError = reply->errorString();
-    qDebug() << m_lastError;
-    //FIXME: processRpcError(errcode, src);
+
+  // Check for error in network communication
+  if (reply->error() != QNetworkReply::NoError) {
+    m_lastError = tr("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
     return -1;
   }
 
+  // Check for error in RPC result
   QString data = reply->readAll();
   JsonHelper jsHelper(data);
   QString errmsg = jsHelper.getProperty("error").property("data").toString();
   if (errmsg.isEmpty()) errmsg = jsHelper.getProperty("error").property("message").toString();
   if (! errmsg.isEmpty()) {
     m_lastError = errmsg;
-    qDebug() << m_lastError;
-    //FIXME: updateDashboardOnError(src, errmsg);
     return -1;
   }
 
+  // treat successful result
+  int returnValue = 0;
   qint32 tid = jsHelper.getProperty("id").toInt32();
   switch(tid) {
   case ZbxHelper::Login: {
@@ -168,7 +168,6 @@ int ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
   }
   case ZbxHelper::Trigger:
   case ZbxHelper::TriggerV18: {
-
     QScriptValueIterator trigger(jsHelper.getProperty("result"));
     while (trigger.hasNext()) {
 
@@ -214,23 +213,60 @@ int ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
   }
   default:
     m_lastError = tr("Weird response received from the server");
-    qDebug() << m_lastError << "\n" << data;
-    return -1;
+    returnValue = -1;
     break;
   }
 
-  return 0;
+  return returnValue;
 }
 
 
-int ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks)
+int ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
 {
+  checks.clear();
   setBaseUrl(srcInfo.mon_url);
-  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
-  params.push_back(QString::number(Login));
+
+  QStringList params;
+  QNetworkReply* response = NULL;
+  // Try to log in if not yet the case
+  if (! m_isLogged) {
+    params = ngrt4n::getAuthInfo(srcInfo.auth);
+    if (params.size() != 2) {
+      m_lastError = tr("Bad auth string, should be in the form of login:password");
+      return -1;
+    }
+    params.push_back(QString::number(Login));
+    setSslConfig(srcInfo.verify_ssl_peer);
+    response = postRequest(Login, params);
+    if (! response
+        || processReply(response, checks) !=0) {
+      return -1;
+    }
+  }
+
+  // Return if login failed
+  if (! m_isLogged) {
+    return -1;
+  }
+
+  // Get the API version
+  params.clear();
+  params.push_back(QString::number(ZbxHelper::ApiVersion));
   setSslConfig(srcInfo.verify_ssl_peer);
-  QNetworkReply* response = postRequest(Login, params);
-  if (processReply(response, checks) !=0) {
+  response = postRequest(ZbxHelper::ApiVersion, params);
+  if (! response
+      || processReply(response, checks) !=0) {
+    return -1;
+  }
+
+  // Finally retriev triggers related to the given host
+  // FIXME: if host empty get triggers from all hosts
+  params.clear();
+  params.push_back(host);
+  params.push_back(QString::number(m_trid));
+  response = postRequest(m_trid, params);
+  if (! response
+      || processReply(response, checks) !=0) {
     return -1;
   }
 

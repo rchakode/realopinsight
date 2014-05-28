@@ -164,11 +164,13 @@ void SvCreator::importZabbixTriggers(void)
   GuiPreferences preferences(Auth::OpUserRole, Preferences::NoForm);
   preferences.initSourceStatesFromData();
   SourceT srcInfo;
-  QStringList sourceList;
+  QStringList zbxSourceIds;
+  QMap<QString, SourceT> zbxSourceInfos;
   for (int i = 0; i< MAX_SRCS; ++i) {
     if (preferences.loadSource(i, srcInfo)) {
       if (srcInfo.mon_type == ngrt4n::Zabbix) {
-        sourceList.push_back(srcInfo.id);
+        zbxSourceIds.push_back(srcInfo.id);
+        zbxSourceInfos.insert(srcInfo.id, srcInfo);
       }
     }
   }
@@ -177,15 +179,32 @@ void SvCreator::importZabbixTriggers(void)
   QString srcId = QInputDialog::getItem(this,
                                         tr("Select source | %1").arg(APP_NAME),
                                         tr("Please select a source"),
-                                        sourceList,
+                                        zbxSourceIds,
                                         0,
                                         false,
                                         &ok);
   if (ok && ! srcId.isEmpty()) {
+
+
+
+    srcInfo = zbxSourceInfos[srcId];
+    statusBar()->showMessage(tr("Loading triggers from host %1...").arg(srcInfo.mon_url));
+
     ChecksT checks;
     ZbxHelper handler;
-    handler.loadChecks(srcInfo, checks);
-    //TODO
+    QString host = QInputDialog::getText(this,
+                                         tr("Use host filter? | %1").arg(APP_NAME),
+                                         tr("Set host for filter"),
+                                         QLineEdit::Normal);
+    qDebug() << host;
+    if (handler.loadChecks(srcInfo, host, checks)) {
+      statusBar()->showMessage(handler.lastError());
+      statusBar()->setStyleSheet("background: red;");
+    } else {
+      m_editor->loadChecks(checks);
+      statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
+      statusBar()->setStyleSheet("background: transparent;");
+    }
   }
 }
 
@@ -629,7 +648,7 @@ void SvCreator::loadMenu(void)
   addToolBar(m_toolBar);
 }
 
-bool SvCreator::parseStatusFile(const QString& path, ChecksT& _checks)
+bool SvCreator::parseStatusFile(const QString& path, ChecksT& checks)
 {
   std::ifstream fileStream;
   fileStream.open(path.toStdString(), std::ios_base::in);
@@ -669,7 +688,7 @@ bool SvCreator::parseStatusFile(const QString& path, ChecksT& _checks)
         check.alarm_msg = value;
       }
     }
-    _checks[check.id] = check;
+    checks[check.id] = check;
   }
   fileStream.close();
 
