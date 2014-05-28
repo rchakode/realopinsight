@@ -52,8 +52,6 @@ public:
   postRequest(const qint32& reqId, const QStringList& params);
   void
   setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
-  QString
-  getApiEndpoint(void) const {return m_apiUri;}
   void
   setTrid(const QString& apiv);
   int
@@ -66,11 +64,12 @@ public:
   setAuth(const QString& auth) {m_auth = auth;}
   QString
   getAuth(void) const {return m_auth;}
-  void
-  setSslConfig(bool verifyPeer);
   QString
   lastError(void) const {return m_lastError;}
-
+  QString
+  getApiEndpoint(void) const {return m_apiUri;}
+  void
+  setSslConfig(bool verifyPeer);
   int
   parseReply(QNetworkReply* reply);
   bool
@@ -82,9 +81,9 @@ public:
   int
   processApiVersionReply(QNetworkReply* reply);
   int
-  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
-  int
   processTriggerReply(QNetworkReply* reply, ChecksT& checks);
+  int
+  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
 
 
 public Q_SLOTS:

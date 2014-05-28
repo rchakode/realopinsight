@@ -504,7 +504,7 @@ void DashboardBase::processZnsReply(QNetworkReply* _reply, SourceT& src)
     qint32 tid = jsonHelper.getProperty("tid").toInt32();
     QScriptValue result = jsonHelper.getProperty("result");
     bool reqSucceed = result.property("success").toBool();
-    if (!reqSucceed) {
+    if (! reqSucceed) {
       updateDashboardOnError(src, tr("Authentication failed: %1").arg(result.property("msg").toString()));
       return;
     }

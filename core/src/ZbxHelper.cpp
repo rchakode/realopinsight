@@ -163,6 +163,67 @@ ZbxHelper::checkRPCResultStatus(void)
 }
 
 int
+ZbxHelper::openSession(const SourceT& srcInfo)
+{
+  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
+  if (params.size() != 2) {
+    m_lastError = tr("Bad auth string, should be in the form of login:password");
+    return -1;
+  }
+  params.push_back(QString::number(Login));
+  setSslConfig(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = postRequest(Login, params);
+  if (! response
+      || processLoginReply(response) !=0) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int
+ZbxHelper::processLoginReply(QNetworkReply* reply)
+{
+  if (parseReply(reply) != 0){
+    return -1;
+  }
+
+  int returnValue = -1;
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  QString result = m_replyJsonData.getProperty("result").toString();
+  if (tid == ZbxHelper::Login
+      && ! result.isEmpty()) {
+    m_auth = result;
+    m_isLogged = true;
+    returnValue = 0;
+  } else {
+    m_lastError = tr("Login failed");
+  }
+
+  return returnValue;
+}
+
+
+int
+ZbxHelper::processApiVersionReply(QNetworkReply* reply)
+{
+  if (parseReply(reply) != 0){
+    return -1;
+  }
+
+  int returnValue = -1;
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  if (tid == ZbxHelper::ApiVersion) {
+    setTrid(m_replyJsonData.getProperty("result").toString());
+    returnValue = 0;
+  } else {
+    m_lastError = tr("the transaction does not correspond to getApiVersion");
+  }
+
+  return returnValue;
+}
+
+int
 ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 {
   if (parseReply(reply) != 0){
@@ -226,67 +287,6 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 }
 
 int
-ZbxHelper::openSession(const SourceT& srcInfo)
-{
-  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
-  if (params.size() != 2) {
-    m_lastError = tr("Bad auth string, should be in the form of login:password");
-    return -1;
-  }
-  params.push_back(QString::number(Login));
-  setSslConfig(srcInfo.verify_ssl_peer);
-  QNetworkReply* response = postRequest(Login, params);
-  if (! response
-      || processLoginReply(response) !=0) {
-    return -1;
-  }
-
-  return 0;
-}
-
-int
-ZbxHelper::processLoginReply(QNetworkReply* reply)
-{
-  if (parseReply(reply) != 0){
-    return -1;
-  }
-
-  int returnValue = -1;
-  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  QString result = m_replyJsonData.getProperty("result").toString();
-  if (tid == ZbxHelper::Login
-      && ! result.isEmpty()) {
-    m_auth = result;
-    m_isLogged = true;
-    returnValue = 0;
-  } else {
-    m_lastError = tr("Login failed");
-  }
-
-  return returnValue;
-}
-
-
-int
-ZbxHelper::processApiVersionReply(QNetworkReply* reply)
-{
-  if (parseReply(reply) != 0){
-    return -1;
-  }
-
-  int returnValue = -1;
-  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  if (tid == ZbxHelper::ApiVersion) {
-    setTrid(m_replyJsonData.getProperty("result").toString());
-    returnValue = 0;
-  } else {
-    m_lastError = tr("the transaction does not correspond to getApiVersion");
-  }
-
-  return returnValue;
-}
-
-int
 ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
 {
   setBaseUrl(srcInfo.mon_url);
@@ -303,8 +303,9 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
 
   QStringList params;
   QNetworkReply* response = NULL;
-  // Get the API version
   params.clear();
+
+  // Get the API version
   params.push_back(QString::number(ZbxHelper::ApiVersion));
   setSslConfig(srcInfo.verify_ssl_peer);
   response = postRequest(ZbxHelper::ApiVersion, params);
@@ -327,3 +328,4 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
 
   return 0;
 }
+
