@@ -121,14 +121,14 @@ bool LsHelper::recvData(const ReqTypeT& reqType)
       QAbstractSocket::setErrorString(tr("Bad request type: %1").arg(reqType));
       return false;
     }
-    m_ldchecks.insert(chkid, check);
+    m_checks.insert(chkid, check);
   }
   return true;
 }
 
-bool LsHelper::loadHostData(const QString& host)
+bool LsHelper::fecthHostChecks(const QString& host)
 {
-  m_ldchecks.clear();
+  m_checks.clear();
   bool succeed;
   succeed = connectToService() &&
       requestData(host, Host) &&
@@ -144,8 +144,8 @@ bool LsHelper::loadHostData(const QString& host)
 
 bool LsHelper::findCheck(const QString& id, CheckListCstIterT& check)
 {
-  check = m_ldchecks.find(id.toLower());
-  if (check != m_ldchecks.end()) {
+  check = m_checks.find(id.toLower());
+  if (check != m_checks.end()) {
     return true;
   }
   return false;

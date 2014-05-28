@@ -56,7 +56,8 @@ ZbxHelper::~ZbxHelper()
   delete m_sslConfig;
 }
 
-QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
+QNetworkReply*
+ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
 {
   QString request;
   if (reqId == Login) {
@@ -73,7 +74,8 @@ QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & 
   return reply;
 }
 
-RequestListT ZbxHelper::requestsPatterns()
+RequestListT
+ZbxHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[Login] = "{\"jsonrpc\": \"2.0\", \
@@ -109,7 +111,8 @@ RequestListT ZbxHelper::requestsPatterns()
   return patterns;
 }
 
-void ZbxHelper::setSslConfig(bool verifyPeer)
+void
+ZbxHelper::setSslConfig(bool verifyPeer)
 {
   if (verifyPeer) {
     m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);
@@ -118,7 +121,8 @@ void ZbxHelper::setSslConfig(bool verifyPeer)
   }
 }
 
-void ZbxHelper::setTrid(const QString& apiv)
+void
+ZbxHelper::setTrid(const QString& apiv)
 {
   qint32 vnum = apiv.mid(0, 3).remove(".").toInt();
   if (vnum < 14) {
@@ -129,7 +133,8 @@ void ZbxHelper::setTrid(const QString& apiv)
 }
 
 
-int ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
+int
+ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
 {
   // necessary to properly free resource after processing
   reply->deleteLater();
@@ -221,7 +226,8 @@ int ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
 }
 
 
-int ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+int
+ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
 {
   checks.clear();
   setBaseUrl(srcInfo.mon_url);

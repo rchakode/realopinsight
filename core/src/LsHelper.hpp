@@ -43,9 +43,9 @@ public:
   void disconnectFromService(void);
   bool requestData(const QString& host, const ReqTypeT& reqType);
   bool recvData(const ReqTypeT& reqType);
-  bool loadHostData(const QString& host);
+  bool fecthHostChecks(const QString& host);
   bool findCheck(const QString& id, CheckListCstIterT& check);
-  void clearData(void) {m_ldchecks.clear();}
+  void clearData(void) {m_checks.clear();}
   void setHost(const QString& host) {m_host = host;}
   void setPort(const int& port) {m_port = port;}
   bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
@@ -55,7 +55,7 @@ private:
   QString m_host;
   qint32 m_port;
   RequestListT mrequestMap;
-  CheckListT m_ldchecks;
+  CheckListT m_checks;
   QString m_errorMsg;
   void setRequestPatterns();
   void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}

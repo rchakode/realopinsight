@@ -152,7 +152,7 @@ void SvCreator::importStatusFile(void)
   if (! path.isNull() && !path.isEmpty()) {
     ChecksT checks;
     if (parseStatusFile(path, checks)) {
-      m_editor->loadChecks(checks);
+      m_editor->loadChecks(checks, "Source0");
     } else {
       ngrt4n::alert("Error while parsing the file");
     }
@@ -196,12 +196,11 @@ void SvCreator::importZabbixTriggers(void)
                                          tr("Use host filter? | %1").arg(APP_NAME),
                                          tr("Set host for filter"),
                                          QLineEdit::Normal);
-    qDebug() << host;
     if (handler.loadChecks(srcInfo, host, checks)) {
       statusBar()->showMessage(handler.lastError());
       statusBar()->setStyleSheet("background: red;");
     } else {
-      m_editor->loadChecks(checks);
+      m_editor->loadChecks(checks, srcId);
       statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
       statusBar()->setStyleSheet("background: transparent;");
     }

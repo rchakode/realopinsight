@@ -231,7 +231,7 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
     hostit.next();
     QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(hostit.key());
 
-    if (info.first != src.id || ! src.ls_handler->loadHostData(info.second)) continue;
+    if (info.first != src.id || ! src.ls_handler->fecthHostChecks(info.second)) continue;
 
     Q_FOREACH (const QString& value, hostit.value()) {
       QString key;

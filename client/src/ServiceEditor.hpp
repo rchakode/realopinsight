@@ -68,7 +68,7 @@ public:
   void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
   bool updateNodeContent(NodeListT& _nodes, const QString& _nodeId);
   bool updateNodeContent(NodeListT::iterator& _node);
-  void loadChecks(const ChecksT& checks);
+  void loadChecks(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
   void setLowLevelAlarmComponentEnabled(bool enable){ mitems[CHECK_LIST_FIELD]->setEnabled(enable); }
 
