@@ -34,7 +34,6 @@
 class JsonHelper : public QScriptEngine
 {
 public:
-  JsonHelper(const std::string& _data = "");
   JsonHelper(const QString& _data = "");
   void setData(const std::string& _data);
   void setData(const QString& _data);

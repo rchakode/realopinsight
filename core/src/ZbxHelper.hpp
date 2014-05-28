@@ -25,6 +25,7 @@
 #ifndef ZABBIXHELPER_HPP_
 #define ZABBIXHELPER_HPP_
 #include "Base.hpp"
+#include "JsHelper.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
@@ -49,10 +50,6 @@ public:
   virtual ~ZbxHelper();
   QNetworkReply*
   postRequest(const qint32& reqId, const QStringList& params);
-  int
-  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
-  int
-  processReply(QNetworkReply* reply, ChecksT& checks);
   void
   setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
   QString
@@ -72,7 +69,22 @@ public:
   void
   setSslConfig(bool verifyPeer);
   QString
-  lastError(void) {return m_lastError;}
+  lastError(void) const {return m_lastError;}
+
+  int
+  parseReply(QNetworkReply* reply);
+  bool
+  checkRPCResultStatus(void);
+  int
+  openSession(const SourceT& srcInfo);
+  int
+  processLoginReply(QNetworkReply* reply);
+  int
+  processApiVersionReply(QNetworkReply* reply);
+  int
+  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
+  int
+  processTriggerReply(QNetworkReply* reply, ChecksT& checks);
 
 
 public Q_SLOTS:
@@ -90,6 +102,7 @@ private :
   QString m_auth;
   QSslConfiguration* m_sslConfig;
   QString m_lastError;
+  JsonHelper m_replyJsonData;
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

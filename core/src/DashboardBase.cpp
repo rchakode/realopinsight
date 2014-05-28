@@ -188,7 +188,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     // Retrieve data
     QString msg = src.auth%":"%info.second;
     src.d4n_handler->send(msg.toStdString());
-    JsonHelper jsHelper(src.d4n_handler->recv());
+    JsonHelper jsHelper(src.d4n_handler->recv().c_str());
 
     // Treat data
     qint32 ret = jsHelper.getProperty("return_code").toInt32();
@@ -879,8 +879,7 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
                                             ngrt4n::severityText(_node.severity),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
-  if (_node.type == NodeType::AlarmNode)
-  {
+  if (_node.type == NodeType::AlarmNode) {
     toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
                                               _node.child_nodes,
                                               QString::fromStdString(_node.check.alarm_msg),

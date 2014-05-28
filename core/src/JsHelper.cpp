@@ -24,19 +24,12 @@
 
 #include "JsHelper.hpp"
 
-using namespace std;
-
-JsonHelper::JsonHelper(const string & _data) : QScriptEngine()
-{
-  setData(_data);
-}
-
 JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
 {
   setData(_data);
 }
 
-void JsonHelper::setData(const string& data)
+void JsonHelper::setData(const std::string& data)
 {
   mdata = evaluate("(" + QString::fromStdString(data) + ")");
 }
@@ -46,7 +39,7 @@ void JsonHelper::setData(const QString& data)
   mdata = evaluate("("+data+")");
 }
 
-QScriptValue JsonHelper::getProperty(const string& key)
+QScriptValue JsonHelper::getProperty(const std::string& key)
 {
   return mdata.property(QString::fromStdString(key)) ;
 }

@@ -132,94 +132,137 @@ ZbxHelper::setTrid(const QString& apiv)
   }
 }
 
-
 int
-ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
+ZbxHelper::parseReply(QNetworkReply* reply)
 {
-  // necessary to properly free resource after processing
   reply->deleteLater();
 
-  // Check for error in network communication
+  // check for error in network communication
   if (reply->error() != QNetworkReply::NoError) {
     m_lastError = tr("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
     return -1;
   }
 
-  // Check for error in RPC result
+  // now read data
   QString data = reply->readAll();
-  JsonHelper jsHelper(data);
-  QString errmsg = jsHelper.getProperty("error").property("data").toString();
-  if (errmsg.isEmpty()) errmsg = jsHelper.getProperty("error").property("message").toString();
+  m_replyJsonData.setData(data);
+
+  return 0;
+}
+
+bool
+ZbxHelper::checkRPCResultStatus(void)
+{
+  QString errmsg = m_replyJsonData.getProperty("error").property("data").toString();
+  if (errmsg.isEmpty()) {
+    errmsg = m_replyJsonData.getProperty("error").property("message").toString();
+  }
   if (! errmsg.isEmpty()) {
     m_lastError = errmsg;
+    return false;
+  }
+  return true;
+}
+
+int
+ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
+{
+  if (parseReply(reply) != 0){
     return -1;
   }
 
-  // treat successful result
-  int returnValue = 0;
-  qint32 tid = jsHelper.getProperty("id").toInt32();
-  switch(tid) {
-  case ZbxHelper::Login: {
-    QString auth = jsHelper.getProperty("result").toString();
-    if (!auth.isEmpty()) {
-      m_auth = auth;
-      m_isLogged = true;
-    }
-    break;
+  if (! checkRPCResultStatus()) {
+    return -1;
   }
-  case ZbxHelper::ApiVersion: {
-    setTrid(jsHelper.getProperty("result").toString());
-    break;
-  }
-  case ZbxHelper::Trigger:
-  case ZbxHelper::TriggerV18: {
-    QScriptValueIterator trigger(jsHelper.getProperty("result"));
-    while (trigger.hasNext()) {
 
-      trigger.next();
-      if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
-
-      QScriptValue triggerData = trigger.value();
-      QString triggerName = triggerData.property("description").toString();
-
-      CheckT check;
-      check.check_command = triggerName.toStdString();
-      check.status = triggerData.property("value").toInt32();
-      if (check.status == ngrt4n::ZabbixClear) {
-        check.alarm_msg = "OK ("+triggerName.toStdString()+")";
-      } else {
-        check.alarm_msg = triggerData.property("error").toString().toStdString();
-        check.status = triggerData.property("priority").toInteger();
-      }
-      QString targetHost = "";
-      QScriptValueIterator host(triggerData.property("hosts"));
-      if (host.hasNext())
-      {
-        host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
-        QScriptValue hostData = host.value();
-        targetHost = hostData.property("host").toString();
-        check.host = targetHost.toStdString();
-      }
-      if (tid == ZbxHelper::TriggerV18) {
-        check.last_state_change = triggerData.property("lastchange").toString().toStdString();
-      } else {
-        QScriptValueIterator item(triggerData.property("items"));
-        if (item.hasNext()) {
-          item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
-          QScriptValue itemData = item.value();
-          check.last_state_change = itemData.property("lastclock").toString().toStdString();
-        }
-      }
-      QString key = ID_PATTERN.arg(targetHost, triggerName);
-      check.id = key.toStdString();
-      checks.insert(std::pair<std::string, CheckT>(check.id, check));
-    }
-    break;
-  }
-  default:
+  // check weird reponset
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  if (tid != ZbxHelper::Trigger && ZbxHelper::TriggerV18) {
     m_lastError = tr("Weird response received from the server");
-    returnValue = -1;
-    break;
+    return -1;
+  }
+
+  // now treat successful result
+  QScriptValueIterator trigger(m_replyJsonData.getProperty("result"));
+  while (trigger.hasNext()) {
+
+    trigger.next();
+    if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+
+    QScriptValue triggerData = trigger.value();
+    QString triggerName = triggerData.property("description").toString();
+
+    CheckT check;
+    check.check_command = triggerName.toStdString();
+    check.status = triggerData.property("value").toInt32();
+    if (check.status == ngrt4n::ZabbixClear) {
+      check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+    } else {
+      check.alarm_msg = triggerData.property("error").toString().toStdString();
+      check.status = triggerData.property("priority").toInteger();
+    }
+    QString targetHost = "";
+    QScriptValueIterator host(triggerData.property("hosts"));
+    if (host.hasNext())
+    {
+      host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+      QScriptValue hostData = host.value();
+      targetHost = hostData.property("host").toString();
+      check.host = targetHost.toStdString();
+    }
+    if (tid == ZbxHelper::TriggerV18) {
+      check.last_state_change = triggerData.property("lastchange").toString().toStdString();
+    } else {
+      QScriptValueIterator item(triggerData.property("items"));
+      if (item.hasNext()) {
+        item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+        QScriptValue itemData = item.value();
+        check.last_state_change = itemData.property("lastclock").toString().toStdString();
+      }
+    }
+    QString key = ID_PATTERN.arg(targetHost, triggerName);
+    check.id = key.toStdString();
+    checks.insert(std::pair<std::string, CheckT>(check.id, check));
+  }
+  return 0;
+}
+
+int
+ZbxHelper::openSession(const SourceT& srcInfo)
+{
+  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
+  if (params.size() != 2) {
+    m_lastError = tr("Bad auth string, should be in the form of login:password");
+    return -1;
+  }
+  params.push_back(QString::number(Login));
+  setSslConfig(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = postRequest(Login, params);
+  if (! response
+      || processLoginReply(response) !=0) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int
+ZbxHelper::processLoginReply(QNetworkReply* reply)
+{
+  if (parseReply(reply) != 0){
+    return -1;
+  }
+
+  int returnValue = -1;
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  QString result = m_replyJsonData.getProperty("result").toString();
+  if (tid == ZbxHelper::Login
+      && ! result.isEmpty()) {
+    m_auth = result;
+    m_isLogged = true;
+    returnValue = 0;
+  } else {
+    m_lastError = tr("Login failed");
   }
 
   return returnValue;
@@ -227,52 +270,60 @@ ZbxHelper::processReply(QNetworkReply* reply, ChecksT& checks)
 
 
 int
-ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+ZbxHelper::processApiVersionReply(QNetworkReply* reply)
 {
-  checks.clear();
-  setBaseUrl(srcInfo.mon_url);
-
-  QStringList params;
-  QNetworkReply* response = NULL;
-  // Try to log in if not yet the case
-  if (! m_isLogged) {
-    params = ngrt4n::getAuthInfo(srcInfo.auth);
-    if (params.size() != 2) {
-      m_lastError = tr("Bad auth string, should be in the form of login:password");
-      return -1;
-    }
-    params.push_back(QString::number(Login));
-    setSslConfig(srcInfo.verify_ssl_peer);
-    response = postRequest(Login, params);
-    if (! response
-        || processReply(response, checks) !=0) {
-      return -1;
-    }
+  if (parseReply(reply) != 0){
+    return -1;
   }
 
-  // Return if login failed
+  int returnValue = -1;
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  if (tid == ZbxHelper::ApiVersion) {
+    setTrid(m_replyJsonData.getProperty("result").toString());
+    returnValue = 0;
+  } else {
+    m_lastError = tr("the transaction does not correspond to getApiVersion");
+  }
+
+  return returnValue;
+}
+
+int
+ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+{
+  setBaseUrl(srcInfo.mon_url);
+
+  // Log in if not yet the case
+  if (! m_isLogged
+      && openSession(srcInfo) != 0) {
+    return -1;
+  }
+
   if (! m_isLogged) {
     return -1;
   }
 
+  QStringList params;
+  QNetworkReply* response = NULL;
   // Get the API version
   params.clear();
   params.push_back(QString::number(ZbxHelper::ApiVersion));
   setSslConfig(srcInfo.verify_ssl_peer);
   response = postRequest(ZbxHelper::ApiVersion, params);
   if (! response
-      || processReply(response, checks) !=0) {
+      || processApiVersionReply(response) !=0) {
     return -1;
   }
 
   // Finally retriev triggers related to the given host
   // FIXME: if host empty get triggers from all hosts
+  checks.clear();
   params.clear();
   params.push_back(host);
   params.push_back(QString::number(m_trid));
   response = postRequest(m_trid, params);
   if (! response
-      || processReply(response, checks) !=0) {
+      || processTriggerReply(response, checks) !=0) {
     return -1;
   }
 
