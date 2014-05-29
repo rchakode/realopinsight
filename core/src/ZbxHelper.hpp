@@ -79,7 +79,9 @@ public:
   int
   processLoginReply(QNetworkReply* reply);
   int
-  processApiVersionReply(QNetworkReply* reply);
+  fecthApiVersion(const SourceT& srcInfo);
+  int
+  processGetApiVersionReply(QNetworkReply* reply);
   int
   processTriggerReply(QNetworkReply* reply, ChecksT& checks);
   int

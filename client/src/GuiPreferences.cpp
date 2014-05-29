@@ -450,7 +450,7 @@ void GuiPreferences::changePasswd(void)
 void GuiPreferences::handleDonate(void)
 {
   QDesktopServices appLauncher;
-  appLauncher.openUrl(QUrl("http://realopinsight.com/en/index.php/page/contribute"));
+  appLauncher.openUrl(QUrl("http://realopinsight.com/"));
 }
 
 void GuiPreferences::fillFromSource(int _sidx)

@@ -47,6 +47,7 @@ namespace ngrt4n {
     Auto=99
   };
   enum SeverityT {
+    Unset = -1,
     Normal = 0,
     Minor = 1,
     Major = 2,

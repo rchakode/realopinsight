@@ -204,9 +204,22 @@ ZbxHelper::processLoginReply(QNetworkReply* reply)
   return returnValue;
 }
 
+int
+ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
+{
+  QStringList params;
+  params.push_back(QString::number(ZbxHelper::ApiVersion));
+  setSslConfig(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = postRequest(ZbxHelper::ApiVersion, params);
+  if (! response || processGetApiVersionReply(response) !=0) {
+    return -1;
+  }
+
+  return 0;
+}
 
 int
-ZbxHelper::processApiVersionReply(QNetworkReply* reply)
+ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
 {
   if (parseReply(reply) != 0){
     return -1;
@@ -293,8 +306,7 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   setBaseUrl(srcInfo.mon_url);
 
   // Log in if not yet the case
-  if (! m_isLogged
-      && openSession(srcInfo) != 0) {
+  if (! m_isLogged && openSession(srcInfo) != 0) {
     return -1;
   }
 
@@ -307,10 +319,7 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   params.clear();
 
   // Get the API version
-  params.push_back(QString::number(ZbxHelper::ApiVersion));
-  setSslConfig(srcInfo.verify_ssl_peer);
-  response = postRequest(ZbxHelper::ApiVersion, params);
-  if (! response || processApiVersionReply(response) !=0) {
+  if (fecthApiVersion(srcInfo) != 0) {
     return -1;
   }
 
@@ -318,7 +327,7 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   // FIXME: if host empty get triggers from all hosts
   checks.clear();
   params.clear();
-  QString hostFilter = host.isEmpty() ? "" : "\"host\":[\"%2\"]";
+  QString hostFilter = host.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(host);
   params.push_back(hostFilter);
   params.push_back(QString::number(m_trid));
   response = postRequest(m_trid, params);

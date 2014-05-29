@@ -68,9 +68,6 @@ public Q_SLOTS:
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
   void updateBpNode(const QString& _node);
-  void processZbxReply(QNetworkReply* reply, SourceT& src);
-  void processZnsReply(QNetworkReply* reply, SourceT& src);
-  void processRpcError(const QString& msg, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
@@ -124,12 +121,12 @@ protected:
 
 protected:
   void resetInterval(void);
-  void updateCNodes(const CheckT & check, const SourceT& src);
+  void updateCNodesWithCheck(const CheckT & check, const SourceT& src);
+  void updateCNodesWithChecks(const ChecksT& checks, const SourceT& src);
   QStringList getAuthInfo(int srcId);
   void openRpcSessions(void);
   void openRpcSession(int srcId);
   void openRpcSession(SourceT& src);
-  void requestZbxZnsData(SourceT& src);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
   QString getNodeToolTip(const NodeT& _node);
