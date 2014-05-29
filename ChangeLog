@@ -3,6 +3,8 @@ RealOpInsight ChangeLog
 ###############################
 3.0.1
   * Fixed importation of Nagios status file in the editor
+  * Added ability to import Zabbix triggers and Zenoss components
+    from the editor
 
 3.0.0
   * Changed command line names: ngrt4n-oc -> realopinsight-oc, 

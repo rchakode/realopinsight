@@ -107,7 +107,8 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/WebKit.hpp \
     client/src/MsgConsole.hpp \
     client/src/GuiPreferences.hpp \
-    client/src/GuiUtils.hpp
+    client/src/GuiUtils.hpp \
+    client/src/GuiDialogForms.hpp
 
 SOURCES	+= client/src/Auth.cpp \
     client/src/GuiUtils.cpp \
@@ -121,7 +122,8 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/SvNavigatorTree.cpp \
     client/src/WebKit.cpp \
     client/src/GuiPreferences.cpp \
-    client/src/MsgConsole.cpp
+    client/src/MsgConsole.cpp \
+    client/src/GuiDialogForms.cpp
 }
 
 dist {

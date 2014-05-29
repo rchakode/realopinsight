@@ -102,7 +102,7 @@ private:
   void addEvents(void);
   void resize(void);
   NodeT* createNode(const QString& id, const QString& label, const QString& parent);
-  bool parseStatusFile(const QString& _path, ChecksT& _checks);
+  int parseStatusFile(const QString& _path, ChecksT& _checks);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

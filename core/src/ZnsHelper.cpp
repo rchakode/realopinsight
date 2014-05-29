@@ -356,8 +356,7 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   setBaseUrl(srcInfo.mon_url);
 
   // Log in if not yet the case
-  if (! m_isLogged
-      && openSession(srcInfo) != 0) {
+  if (! m_isLogged && openSession(srcInfo) != 0) {
     return -1;
   }
 
@@ -373,8 +372,7 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   // FIXME: if host empty get triggers from all hosts
   response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg(host, QString::number(Device))));
 
-  if (! response
-      || processComponentReply(response, checks) !=0) {
+  if (! response || processDeviceReply(response, checks) !=0) {
     return -1;
   }
 

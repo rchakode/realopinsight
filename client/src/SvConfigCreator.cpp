@@ -28,6 +28,7 @@
 #include "utilsCore.hpp"
 #include "GuiDashboard.hpp"
 #include "Auth.hpp"
+#include "GuiDialogForms.hpp"
 #include <fstream>
 
 namespace {
@@ -115,8 +116,7 @@ void SvCreator::open(void)
                                       tr("%1;;%2;;%3;;%4;;Xml files(*.xml);;All files(*)").arg(NAG_SOURCE,
                                                                                                ZBX_SOURCE,
                                                                                                ZNS_SOURCE,
-                                                                                               MULTI_SOURCES)
-                                      );
+                                                                                               MULTI_SOURCES));
   if (! path.isNull() && ! path.isEmpty())
     loadFile(path);
 }
@@ -143,22 +143,6 @@ void SvCreator::loadFile(const QString& _path)
   }
 }
 
-void SvCreator::importNagiosChecks(void)
-{
-  QString path = QFileDialog::getOpenFileName(this,
-                                              tr("Select a status file | %1").arg(APP_NAME),
-                                              ".",
-                                              tr("Data files (*.dat);;All files (*)"));
-  if (! path.isNull() && !path.isEmpty()) {
-    ChecksT checks;
-    if (parseStatusFile(path, checks)) {
-      m_editor->loadChecks(checks, "Source0");
-    } else {
-      ngrt4n::alert("Error while parsing the file");
-    }
-  }
-}
-
 void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 {
   GuiPreferences preferences(Auth::OpUserRole, Preferences::NoForm);
@@ -176,6 +160,71 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 }
 
 
+
+
+void SvCreator::importNagiosChecks(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString path = importationSettingForm.selectedStatusFile();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    if (! path.isNull() && !path.isEmpty()) {
+      statusBar()->showMessage(tr("Loading checks from %1:%2...").arg(srcId, path));
+      ChecksT checks;
+      int retcode = parseStatusFile(path, checks);
+      treatCheckLoadResults(retcode, srcInfo.id, checks, tr("Error while parsing the file"));
+    } else {
+      statusBar()->showMessage(tr("No file selected"));
+    }
+  }
+  //  QString path = QFileDialog::getOpenFileName(this,
+  //                                              tr("Select a status file | %1").arg(APP_NAME),
+  //                                              ".",
+  //                                              tr("Data files (*.dat);;All files (*)"));
+}
+
+void SvCreator::importZabbixTriggers(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString host = importationSettingForm.selectedHost();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    statusBar()->showMessage(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
+
+    ChecksT checks;
+    ZbxHelper handler;
+    int retcode = handler.loadChecks(srcInfo, host, checks);
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+  }
+}
+
+void SvCreator::importZenossComponents(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zenoss, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString host = importationSettingForm.selectedHost();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    statusBar()->showMessage(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
+
+    ChecksT checks;
+    ZnsHelper handler;
+    int retcode = handler.loadChecks(srcInfo, host, checks);
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+  }
+}
+
 void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const ChecksT& checks, const QString& msg)
 {
   if (retCode != 0) {
@@ -187,62 +236,6 @@ void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const C
     statusBar()->setStyleSheet("background: transparent;");
   }
 }
-
-void SvCreator::importZabbixTriggers(void)
-{
-  QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
-  bool ok = false;
-  QString srcId = QInputDialog::getItem(this,
-                                        tr("Select source | %1").arg(APP_NAME),
-                                        tr("Please select a source"),
-                                        sourceInfos.keys(),
-                                        0,
-                                        false,
-                                        &ok);
-  if (ok && ! srcId.isEmpty()) {
-    SourceT srcInfo = sourceInfos[srcId];
-    statusBar()->showMessage(tr("Loading triggers from host %1...").arg(srcInfo.mon_url));
-
-    ChecksT checks;
-    ZbxHelper handler;
-    QString host = QInputDialog::getText(this,
-                                         tr("Use host filter? | %1").arg(APP_NAME),
-                                         tr("Set host for filter"),
-                                         QLineEdit::Normal);
-    int retcode = handler.loadChecks(srcInfo, host, checks);
-    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
-  }
-}
-
-void SvCreator::importZenossComponents(void)
-{
-  QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zenoss, sourceInfos);
-  bool ok = false;
-  QString srcId = QInputDialog::getItem(this,
-                                        tr("Select source | %1").arg(APP_NAME),
-                                        tr("Please select a source"),
-                                        sourceInfos.keys(),
-                                        0,
-                                        false,
-                                        &ok);
-  if (ok && ! srcId.isEmpty()) {
-    SourceT srcInfo = sourceInfos[srcId];
-    statusBar()->showMessage(tr("Loading triggers from host %1...").arg(srcInfo.mon_url));
-
-    ChecksT checks;
-    ZnsHelper handler;
-    QString host = QInputDialog::getText(this,
-                                         tr("Use host filter? | %1").arg(APP_NAME),
-                                         tr("Set host for filter"),
-                                         QLineEdit::Normal);
-    int retcode = handler.loadChecks(srcInfo, host, checks);
-    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
-  }
-}
-
-
 
 void SvCreator::newView(void)
 {
@@ -686,13 +679,13 @@ void SvCreator::loadMenu(void)
   addToolBar(m_toolBar);
 }
 
-bool SvCreator::parseStatusFile(const QString& path, ChecksT& checks)
+int SvCreator::parseStatusFile(const QString& path, ChecksT& checks)
 {
   std::ifstream fileStream;
   fileStream.open(path.toStdString(), std::ios_base::in);
   if (! fileStream.good() ) {
     qDebug() << tr("ERROR: Unable to open the file %1").arg(path);
-    return false;
+    return -1;
   }
 
   std::string line;
@@ -730,7 +723,7 @@ bool SvCreator::parseStatusFile(const QString& path, ChecksT& checks)
   }
   fileStream.close();
 
-  return true;
+  return 0;
 }
 
 void SvCreator::addEvents(void)

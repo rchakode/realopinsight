@@ -105,7 +105,7 @@ void ServiceEditor::loadChecks(const ChecksT& checks, const QString& srcId)
 {
   checkField()->clear();
   for(ChecksT::const_iterator it=checks.begin(), end=checks.end(); it!=end; ++it) {
-    checkField()->addItem(QString("%1/%2").arg(srcId, (it->second).id.c_str()));
+    checkField()->addItem(QString("%1:%2").arg(srcId, (it->second).id.c_str()));
   }
 }
 
