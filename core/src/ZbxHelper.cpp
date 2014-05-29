@@ -63,7 +63,9 @@ ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
   } else {
     request = ReqPatterns[reqId].arg(m_auth);
   }
-  Q_FOREACH(const QString &param, params) { request = request.arg(param); }
+  Q_FOREACH(const QString &param, params) {
+    request = request.arg(param);
+  }
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   reply->setSslConfiguration(m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
@@ -90,7 +92,7 @@ ZbxHelper::requestsPatterns()
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
-      \"filter\": { \"host\":[\"%2\"]}, \
+      \"filter\": {%2}, \
       \"selectHosts\": [\"host\"], \
       \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
@@ -100,7 +102,7 @@ ZbxHelper::requestsPatterns()
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
-      \"filter\": { \"host\":[\"%2\"]}, \
+      \"filter\": {%2}, \
       \"select_hosts\": [\"host\"], \
       \"output\":  \"extend\", \
       \"limit\": -1}, \
@@ -173,8 +175,7 @@ ZbxHelper::openSession(const SourceT& srcInfo)
   params.push_back(QString::number(Login));
   setSslConfig(srcInfo.verify_ssl_peer);
   QNetworkReply* response = postRequest(Login, params);
-  if (! response
-      || processLoginReply(response) !=0) {
+  if (! response || processLoginReply(response) !=0) {
     return -1;
   }
 
@@ -309,8 +310,7 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   params.push_back(QString::number(ZbxHelper::ApiVersion));
   setSslConfig(srcInfo.verify_ssl_peer);
   response = postRequest(ZbxHelper::ApiVersion, params);
-  if (! response
-      || processApiVersionReply(response) !=0) {
+  if (! response || processApiVersionReply(response) !=0) {
     return -1;
   }
 
@@ -318,14 +318,13 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   // FIXME: if host empty get triggers from all hosts
   checks.clear();
   params.clear();
-  params.push_back(host);
+  QString hostFilter = host.isEmpty() ? "" : "\"host\":[\"%2\"]";
+  params.push_back(hostFilter);
   params.push_back(QString::number(m_trid));
   response = postRequest(m_trid, params);
-  if (! response
-      || processTriggerReply(response, checks) !=0) {
+  if (! response || processTriggerReply(response, checks) !=0) {
     return -1;
   }
-
   return 0;
 }
 

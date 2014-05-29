@@ -107,6 +107,10 @@ void ServiceEditor::loadChecks(const ChecksT& checks, const QString& srcId)
   for(ChecksT::const_iterator it=checks.begin(), end=checks.end(); it!=end; ++it) {
     checkField()->addItem(QString("%1:%2").arg(srcId, (it->second).id.c_str()));
   }
+  if (checkField()->count()>0) {
+    checkField()->model()->sort(0);
+    checkField()->setCurrentIndex(0);
+  }
 }
 
 void ServiceEditor::setEnableFields(const bool& enable)

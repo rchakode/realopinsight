@@ -12,11 +12,10 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
     m_hostFilter(NULL),
     m_statusFileArea(NULL)
 {
-  // build widgets
+  // build generic widgets
   m_sourceSelectionBox = new QComboBox(this);
   m_sourceSelectionBox->addItems(sourceList);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel, Qt::Horizontal, this);
-  QPushButton* fileBrowser = new QPushButton(tr("browse..."), this);
 
   // build form
   QGridLayout* layout = new QGridLayout(this);
@@ -27,18 +26,19 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
     m_hostFilter = new QLineEdit(this);
     layout->addWidget(m_hostFilter, 1, 1);
   } else {
+    QPushButton* fileBrowser = new QPushButton(tr("browse..."), this);
     m_statusFileArea = new QLineEdit(this);
     m_statusFileArea->setReadOnly(true);
     layout->addWidget(new QLabel(tr("Status file"), this), 1, 0);
     layout->addWidget(m_statusFileArea, 1, 1);
     layout->addWidget(fileBrowser, 1, 2);
+    connect(fileBrowser, SIGNAL(clicked()), this, SLOT(handleSelectStatusFile()));
   }
   layout->addWidget(buttons, 2, 1);
 
   //events
   connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
-  connect(fileBrowser, SIGNAL(clicked()), this, SLOT(handleSelectStatusFile()));
 }
 
 CheckImportationSettingsForm::~CheckImportationSettingsForm()

@@ -62,12 +62,12 @@ void ZnsHelper::setBaseUrl(const QString& url)
 QNetworkReply* ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
 {
   m_reqHandler->setRawHeader("Content-Type", ngrt4n::toByteArray(ContentTypes[reqType]));
-  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, data);
-  reply->setSslConfiguration(m_sslConfig);
-  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
-  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+  QNetworkReply* response = QNetworkAccessManager::post(*m_reqHandler, data);
+  response->setSslConfiguration(m_sslConfig);
+  connect(response, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+  connect(response, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
   m_evlHandler->exec();
-  return reply;
+  return response;
 }
 
 void ZnsHelper::setRouterEndpoint(const int& reqType) {
@@ -191,8 +191,7 @@ ZnsHelper::openSession(const SourceT& srcInfo)
   response = postRequest(ZnsHelper::Login, params.query(QUrl::FullyEncoded).toUtf8());
 #endif
 
-  if (! response
-      || processLoginReply(response) != 0) {
+  if (! response || processLoginReply(response) != 0) {
     return -1;
   }
 
@@ -218,7 +217,6 @@ ZnsHelper::processLoginReply(QNetworkReply* reply)
       returnValue = 0;
     }
   }
-
   return returnValue;
 }
 
@@ -243,7 +241,7 @@ ZnsHelper::processComponentReply(QNetworkReply* reply, ChecksT& checks)
 
   // now treat successful result
   CheckT check;
-  QScriptValueIterator components(m_replyJsonData.getProperty("data"));
+  QScriptValueIterator components(m_replyJsonData.getProperty("result").property("data"));
   while (components.hasNext()) {
     components.next(); if (components.flags()&QScriptValue::SkipInEnumeration) continue;
     QScriptValue citem = components.value();
@@ -370,6 +368,7 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
 
   // Finally retriev triggers related to the given host
   // FIXME: if host empty get triggers from all hosts
+  setRouterEndpoint(Device);
   response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg(host, QString::number(Device))));
 
   if (! response || processDeviceReply(response, checks) !=0) {
