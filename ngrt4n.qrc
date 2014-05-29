@@ -66,5 +66,6 @@
         <file>images/built-in/menu_open.png</file>
         <file>images/built-in/import-nagios.png</file>
         <file>images/built-in/import-zabbix.png</file>
+        <file>images/built-in/import-zenoss.png</file>
     </qresource>
 </RCC>

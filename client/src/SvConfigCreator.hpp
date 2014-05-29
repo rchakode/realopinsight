@@ -64,8 +64,11 @@ public Q_SLOTS:
   void handleNodeTypeActivated(qint32);
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
-  void importStatusFile(void);
+  void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
+  void treatCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
+  void importNagiosChecks(void);
   void importZabbixTriggers(void);
+  void importZenossComponents(void);
   void handleErrorOccurred(QString msg){ngrt4n::alert(msg);}
 
 protected:

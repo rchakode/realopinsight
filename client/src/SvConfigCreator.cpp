@@ -143,7 +143,7 @@ void SvCreator::loadFile(const QString& _path)
   }
 }
 
-void SvCreator::importStatusFile(void)
+void SvCreator::importNagiosChecks(void)
 {
   QString path = QFileDialog::getOpenFileName(this,
                                               tr("Select a status file | %1").arg(APP_NAME),
@@ -159,35 +159,49 @@ void SvCreator::importStatusFile(void)
   }
 }
 
-void SvCreator::importZabbixTriggers(void)
+void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 {
   GuiPreferences preferences(Auth::OpUserRole, Preferences::NoForm);
   preferences.initSourceStatesFromData();
   SourceT srcInfo;
-  QStringList zbxSourceIds;
-  QMap<QString, SourceT> zbxSourceInfos;
+  QStringList sourceList;
   for (int i = 0; i< MAX_SRCS; ++i) {
     if (preferences.loadSource(i, srcInfo)) {
-      if (srcInfo.mon_type == ngrt4n::Zabbix) {
-        zbxSourceIds.push_back(srcInfo.id);
-        zbxSourceInfos.insert(srcInfo.id, srcInfo);
+      if (srcInfo.mon_type == type) {
+        sourceList.push_back(srcInfo.id);
+        sourceInfos.insert(srcInfo.id, srcInfo);
       }
     }
   }
+}
 
+
+void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const ChecksT& checks, const QString& msg)
+{
+  if (retCode != 0) {
+    statusBar()->showMessage(msg);
+    statusBar()->setStyleSheet("background: red;");
+  } else {
+    m_editor->loadChecks(checks, srcId);
+    statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
+    statusBar()->setStyleSheet("background: transparent;");
+  }
+}
+
+void SvCreator::importZabbixTriggers(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
   bool ok = false;
   QString srcId = QInputDialog::getItem(this,
                                         tr("Select source | %1").arg(APP_NAME),
                                         tr("Please select a source"),
-                                        zbxSourceIds,
+                                        sourceInfos.keys(),
                                         0,
                                         false,
                                         &ok);
   if (ok && ! srcId.isEmpty()) {
-
-
-
-    srcInfo = zbxSourceInfos[srcId];
+    SourceT srcInfo = sourceInfos[srcId];
     statusBar()->showMessage(tr("Loading triggers from host %1...").arg(srcInfo.mon_url));
 
     ChecksT checks;
@@ -196,16 +210,39 @@ void SvCreator::importZabbixTriggers(void)
                                          tr("Use host filter? | %1").arg(APP_NAME),
                                          tr("Set host for filter"),
                                          QLineEdit::Normal);
-    if (handler.loadChecks(srcInfo, host, checks)) {
-      statusBar()->showMessage(handler.lastError());
-      statusBar()->setStyleSheet("background: red;");
-    } else {
-      m_editor->loadChecks(checks, srcId);
-      statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
-      statusBar()->setStyleSheet("background: transparent;");
-    }
+    int retcode = handler.loadChecks(srcInfo, host, checks);
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }
+
+void SvCreator::importZenossComponents(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zenoss, sourceInfos);
+  bool ok = false;
+  QString srcId = QInputDialog::getItem(this,
+                                        tr("Select source | %1").arg(APP_NAME),
+                                        tr("Please select a source"),
+                                        sourceInfos.keys(),
+                                        0,
+                                        false,
+                                        &ok);
+  if (ok && ! srcId.isEmpty()) {
+    SourceT srcInfo = sourceInfos[srcId];
+    statusBar()->showMessage(tr("Loading triggers from host %1...").arg(srcInfo.mon_url));
+
+    ChecksT checks;
+    ZnsHelper handler;
+    QString host = QInputDialog::getText(this,
+                                         tr("Use host filter? | %1").arg(APP_NAME),
+                                         tr("Set host for filter"),
+                                         QLineEdit::Normal);
+    int retcode = handler.loadChecks(srcInfo, host, checks);
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+  }
+}
+
+
 
 void SvCreator::newView(void)
 {
@@ -616,8 +653,9 @@ void SvCreator::loadMenu(void)
   m_subMenus["SaveAs"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
       m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
   m_menus["FILE"]->addSeparator(),
-      m_subMenus["ImportStatusFile"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("&Import Status File")),
-      m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("&Import Zabbix Triggers"));
+      m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("&Import Nagios Checks")),
+      m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("&Import Zabbix Triggers")),
+      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("&Import Zenoss Components"));
   m_menus["FILE"]->addSeparator(),
       m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
       m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
@@ -641,8 +679,9 @@ void SvCreator::loadMenu(void)
       m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
   m_toolBar->addAction(m_subMenus["Save"]);
   m_toolBar->addAction(m_subMenus["Open"]);
-  m_toolBar->addAction(m_subMenus["ImportStatusFile"]);
+  m_toolBar->addAction(m_subMenus["ImportNagiosChecks"]);
   m_toolBar->addAction(m_subMenus["ImportZabbixTriggers"]);
+  m_toolBar->addAction(m_subMenus["ImportZenossComponents"]);
   setMenuBar(m_menuBar);
   addToolBar(m_toolBar);
 }
@@ -704,8 +743,9 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
   connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
   connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
-  connect(m_subMenus["ImportStatusFile"],SIGNAL(triggered(bool)),this,SLOT(importStatusFile()));
+  connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
+  connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
   connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
   connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
