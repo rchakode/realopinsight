@@ -24,7 +24,7 @@
 
 #include "ZbxHelper.hpp"
 #include "utilsCore.hpp"
-#include "JsHelper.hpp"
+#include "JsonHelper.hpp"
 #include <QtScript/QScriptValueIterator>
 #include <QtScript/QScriptEngine>
 #include <QDebug>

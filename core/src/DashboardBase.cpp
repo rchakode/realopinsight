@@ -26,7 +26,7 @@
 #include "DashboardBase.hpp"
 #include "global.hpp"
 #include "utilsCore.hpp"
-#include "JsHelper.hpp"
+#include "JsonHelper.hpp"
 #include "LsHelper.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>

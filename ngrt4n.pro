@@ -69,7 +69,6 @@ HEADERS += \
     core/src/Parser.hpp \
     core/src/Preferences.hpp \
     core/src/ZbxHelper.hpp \
-    core/src/JsHelper.hpp \
     core/src/ZnsHelper.hpp \
     core/src/Settings.hpp \
     core/src/ZmqSocket.hpp \
@@ -77,21 +76,22 @@ HEADERS += \
     core/src/DashboardBase.hpp \
     core/src/global.hpp \
     core/src/utilsCore.hpp \
-    core/src/ChartBase.hpp
+    core/src/ChartBase.hpp \
+    core/src/JsonHelper.hpp
 
 
 SOURCES += \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
-    core/src/JsHelper.cpp \
     core/src/ZnsHelper.cpp \
     core/src/Settings.cpp \
     core/src/ZmqSocket.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
     core/src/utilsCore.cpp \
-    core/src/ChartBase.cpp
+    core/src/ChartBase.cpp \
+    core/src/JsonHelper.cpp
 
 gui-base {
 QT += svg gui webkit

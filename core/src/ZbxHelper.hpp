@@ -25,7 +25,7 @@
 #ifndef ZABBIXHELPER_HPP_
 #define ZABBIXHELPER_HPP_
 #include "Base.hpp"
-#include "JsHelper.hpp"
+#include "JsonHelper.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 

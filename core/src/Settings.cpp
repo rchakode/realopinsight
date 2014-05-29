@@ -28,7 +28,7 @@
 #include "Preferences.hpp"
 #include "global.hpp"
 #include "utilsCore.hpp"
-#include "JsHelper.hpp"
+#include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
 
 const QString Settings::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";

@@ -26,7 +26,6 @@
 #include "Preferences.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
-#include "JsHelper.hpp"
 #include <sstream>
 #include <QIntValidator>
 #include <QRegExpValidator>

@@ -26,7 +26,7 @@
 #ifndef ZENOSSHELPER_HPP_
 #define ZENOSSHELPER_HPP_
 #include "Base.hpp"
-#include "JsHelper.hpp"
+#include "JsonHelper.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
