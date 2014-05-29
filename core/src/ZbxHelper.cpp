@@ -288,13 +288,13 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
     } else {
       QScriptValueIterator item(triggerData.property("items"));
       if (item.hasNext()) {
-        item.next(); if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+        item.next();
+        if (item.flags()&QScriptValue::SkipInEnumeration) continue;
         QScriptValue itemData = item.value();
         check.last_state_change = itemData.property("lastclock").toString().toStdString();
       }
     }
-    QString key = ID_PATTERN.arg(targetHost, triggerName);
-    check.id = key.toStdString();
+    check.id = ID_PATTERN.arg(targetHost, triggerName).toStdString();
     checks.insert(std::pair<std::string, CheckT>(check.id, check));
   }
   return 0;

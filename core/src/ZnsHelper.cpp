@@ -252,8 +252,8 @@ ZnsHelper::processComponentReply(QNetworkReply* reply, ChecksT& checks)
       QString duid = device.property("uid").toString();
       ZnsHelper::getDeviceName(duid);
     }
-    QString chkid = ID_PATTERN.arg(dname, cname);
-    check.id = chkid.toStdString();
+
+    check.id = ID_PATTERN.arg(dname, cname).toStdString();
     check.host = dname.toStdString();
     check.last_state_change = ngrt4n::convertToTimet(device.property("lastChanged").toString(),
                                                      "yyyy/MM/dd hh:mm:ss");
@@ -293,7 +293,9 @@ ZnsHelper::processDeviceInfoReply(QNetworkReply* reply, ChecksT& checks)
   CheckT check;
   QScriptValue devInfo(m_replyJsonData.getProperty("result").property("data"));
   QString dname = devInfo.property("name").toString();
-  check.id = check.host = dname.toStdString();
+  check.host = dname.toStdString();
+  check.id = check.host;
+  //FIXME: check.id = ID_PATTERN.arg(check.host.c_str(), "ping").toStdString();
   check.status = devInfo.property("status").toBool();
   check.last_state_change = ngrt4n::convertToTimet(devInfo.property("lastChanged").toString(),
                                                    "yyyy/MM/dd hh:mm:ss");
