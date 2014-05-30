@@ -171,7 +171,6 @@ void MainWindow::toggleFullScreen(bool _toggled)
 void MainWindow::render(void)
 {
   show();
-  m_dashboard->initialize(m_preferences);
   if (! m_dashboard->lastErrorState()) {
     m_dashboard->scalPaneContentsToViewPort();
     QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
@@ -185,37 +184,37 @@ void MainWindow::render(void)
 void MainWindow::handleTabChanged(int _index)
 {
   switch(_index) {
-    case 0:
-      m_subMenus["Refresh"]->setEnabled(true);
-      m_subMenus["Capture"]->setEnabled(true);
-      m_subMenus["ZoomIn"]->setEnabled(true);
-      m_subMenus["ZoomOut"]->setEnabled(true);
-      m_menus["BROWSER"]->setEnabled(false);
-      m_subMenus["BrowserBack"]->setEnabled(false);
-      m_subMenus["BrowserForward"]->setEnabled(false);
-      m_subMenus["BrowserStop"]->setEnabled(false);
-      m_subMenus["SourceSelectionBx"]->setEnabled(false);
-      break;
-    case 1:
-      m_menus["BROWSER"]->setEnabled(true);
-      m_subMenus["BrowserBack"]->setEnabled(true);
-      m_subMenus["BrowserForward"]->setEnabled(true);
-      m_subMenus["BrowserStop"]->setEnabled(true);
-      m_subMenus["SourceSelectionBx"]->setEnabled(true);
-      m_subMenus["Refresh"]->setEnabled(false);
-      m_subMenus["Capture"]->setEnabled(false);
-      m_subMenus["ZoomIn"]->setEnabled(false);
-      m_subMenus["ZoomOut"]->setEnabled(false);
-      break;
-    default:
-      break;
+  case 0:
+    m_subMenus["Refresh"]->setEnabled(true);
+    m_subMenus["Capture"]->setEnabled(true);
+    m_subMenus["ZoomIn"]->setEnabled(true);
+    m_subMenus["ZoomOut"]->setEnabled(true);
+    m_menus["BROWSER"]->setEnabled(false);
+    m_subMenus["BrowserBack"]->setEnabled(false);
+    m_subMenus["BrowserForward"]->setEnabled(false);
+    m_subMenus["BrowserStop"]->setEnabled(false);
+    m_subMenus["SourceSelectionBx"]->setEnabled(false);
+    break;
+  case 1:
+    m_menus["BROWSER"]->setEnabled(true);
+    m_subMenus["BrowserBack"]->setEnabled(true);
+    m_subMenus["BrowserForward"]->setEnabled(true);
+    m_subMenus["BrowserStop"]->setEnabled(true);
+    m_subMenus["SourceSelectionBx"]->setEnabled(true);
+    m_subMenus["Refresh"]->setEnabled(false);
+    m_subMenus["Capture"]->setEnabled(false);
+    m_subMenus["ZoomIn"]->setEnabled(false);
+    m_subMenus["ZoomOut"]->setEnabled(false);
+    break;
+  default:
+    break;
   }
 }
 
 void MainWindow::handleHideChart(void)
 {
   m_dashboard->hideChart()? m_subMenus["HideChart"]->setIcon(QIcon(":images/check.png")):
-                            m_subMenus["HideChart"]->setIcon(QIcon(""));
+    m_subMenus["HideChart"]->setIcon(QIcon(""));
 }
 
 void MainWindow::handleRefresh(void)

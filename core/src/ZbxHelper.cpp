@@ -167,6 +167,7 @@ ZbxHelper::checkRPCResultStatus(void)
 int
 ZbxHelper::openSession(const SourceT& srcInfo)
 {
+  setBaseUrl(srcInfo.mon_url);
   QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
   if (params.size() != 2) {
     m_lastError = tr("Bad auth string, should be in the form of login:password");

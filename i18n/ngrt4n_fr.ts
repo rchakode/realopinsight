@@ -619,7 +619,7 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
         <location filename="../client/src/MsgConsole.cpp" line="43"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="57"/>
         <source>Host</source>
-        <translation>HÃ´te</translation>
+        <translation>Serveur/périphérique</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="44"/>
@@ -1013,7 +1013,7 @@ Reporter des bugs: %7</translation>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="47"/>
         <source>Icon</source>
-        <translation>IcÃ´ne</translation>
+        <translation>Image</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="50"/>

@@ -165,6 +165,7 @@ ZnsHelper::checkRPCResultStatus(void)
 int
 ZnsHelper::openSession(const SourceT& srcInfo)
 {
+  setBaseUrl(srcInfo.mon_url);
   QStringList authInfo = ngrt4n::getAuthInfo(srcInfo.auth);
   if (authInfo.size() != 2) {
     m_lastError = tr("Bad auth string, should be in the form of login:password");

@@ -5,9 +5,9 @@ RealOpInsight ChangeLog
   * Fixed importation of Nagios status file in the editor
   * Added ability to import Zabbix triggers and Zenoss components
     from the editor
-  * Fixed problem in mono-source handling when the source type set
-    in the description file was overriden by the source type
-  * Simplified monitoring data retrieving with Zabbix and Zenoss
+  * Fixed problem in mono-source handling when the description
+    file-defined source type was overriden by the setting source type
+  * Simplified monitoring-data retrieving with Zabbix and Zenoss
 
 3.0.0
   * Changed command line names: ngrt4n-oc -> realopinsight-oc, 

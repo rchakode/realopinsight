@@ -120,7 +120,7 @@ void GuiPreferences::show(void)
 }
 
 
-QString GuiPreferences::letUserSelectType(void)
+QString GuiPreferences::selectSourceType(void)
 {
   if (m_monitorTypeField->currentIndex() > 0) {
     return m_monitorTypeField->currentText();
@@ -588,7 +588,7 @@ void GuiPreferences::applyChanges(void)
   if (curIndex >= 0) {
     switch(m_formType) {
       case ChangeMonitoringSettings:
-        saveAsSource(curIndex, letUserSelectType());
+        saveAsSource(curIndex, selectSourceType());
         break;
       case BasicLoginForm:
         m_dialog->done(0);
@@ -618,7 +618,7 @@ void GuiPreferences::addAsSource(void)
   }
 
   if (bucket >= 0) {
-    QString srcType = letUserSelectType();
+    QString srcType = selectSourceType();
     saveAsSource(bucket, srcType);
   }
 }
