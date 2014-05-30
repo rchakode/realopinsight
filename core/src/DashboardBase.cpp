@@ -107,8 +107,7 @@ void DashboardBase::runMonitor()
 {
   resetStatData();
   if (m_cdata->monitor == ngrt4n::Auto) {
-    for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src)
-    {
+    for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src) {
       runMonitor(*src);
     }
   } else {
@@ -135,7 +134,7 @@ void DashboardBase::runMonitor(SourceT& src)
       if (src.zns_handler->loadChecks(src, info.second, checks) == 0) {
         updateCNodesWithChecks(checks, src);
       } else {
-        updateDashboardOnError(src, src.zbx_handler->lastError());
+        updateDashboardOnError(src, src.zns_handler->lastError());
       }
     }
     break;
@@ -293,10 +292,8 @@ void DashboardBase::prepareUpdate(const SourceT& src)
     msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
     break;
   case ngrt4n::Zabbix:
-    msg = msg.arg(src.id, src.zbx_handler->getApiEndpoint());
-    break;
   case ngrt4n::Zenoss:
-    msg = msg.arg(src.id, src.zns_handler->getApiBaseEndpoint());
+    msg = msg.arg(src.id, src.mon_url);
     break;
   default:
     msg = msg.arg(src.id, "undefined source type");
@@ -488,10 +485,10 @@ void DashboardBase::openRpcSession(SourceT& src)
     }
     break;
   case ngrt4n::Zabbix:
-    //src.zbx_handler->openSession(src);
+    src.zbx_handler->openSession(src);
     break;
   case ngrt4n::Zenoss:
-    //src.zbx_handler->openSession(src);
+    src.zns_handler->openSession(src);
     break;
   default:
     break;
@@ -548,7 +545,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 bool DashboardBase::allocSourceHandler(SourceT& src)
 {
   bool allocated = false;
-  if (src.mon_type == ngrt4n::Auto) {
+  if (m_cdata->monitor != ngrt4n::Auto) {
     src.mon_type = m_cdata->monitor;
   }
 
@@ -609,7 +606,6 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
       }
       allocSourceHandler(newsrc);
       m_sources[id] = newsrc;
-      //      runMonitor(newsrc);
     }
     runMonitor();
     Q_EMIT updateSourceUrl();

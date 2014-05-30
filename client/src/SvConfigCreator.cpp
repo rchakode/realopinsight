@@ -201,7 +201,10 @@ void SvCreator::importZabbixTriggers(void)
 
     ChecksT checks;
     ZbxHelper handler;
-    int retcode = handler.loadChecks(srcInfo, host, checks);
+    int retcode = handler.openSession(srcInfo);
+    if (retcode == 0) {
+      retcode = handler.loadChecks(srcInfo, host, checks);
+    }
     treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }
@@ -220,7 +223,10 @@ void SvCreator::importZenossComponents(void)
 
     ChecksT checks;
     ZnsHelper handler;
-    int retcode = handler.loadChecks(srcInfo, host, checks);
+    int retcode = handler.openSession(srcInfo);
+    if (retcode == 0) {
+      retcode = handler.loadChecks(srcInfo, host, checks);
+    }
     treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }

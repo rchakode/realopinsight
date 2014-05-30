@@ -179,6 +179,11 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     return -1;
   }
 
+  // Get the API version
+  if (fecthApiVersion(srcInfo) != 0) {
+    return -1;
+  }
+
   return 0;
 }
 
@@ -303,25 +308,15 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 int
 ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
 {
-  setBaseUrl(srcInfo.mon_url);
-
-  // Log in if not yet the case
-  if (! m_isLogged && openSession(srcInfo) != 0) {
-    return -1;
-  }
 
   if (! m_isLogged) {
     return -1;
   }
 
+  setBaseUrl(srcInfo.mon_url);
+
   QStringList params;
   QNetworkReply* response = NULL;
-  params.clear();
-
-  // Get the API version
-  if (fecthApiVersion(srcInfo) != 0) {
-    return -1;
-  }
 
   // Finally retriev triggers related to the given host
   // FIXME: if host empty get triggers from all hosts
