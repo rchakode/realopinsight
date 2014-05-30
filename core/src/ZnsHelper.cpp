@@ -139,7 +139,7 @@ ZnsHelper::parseReply(QNetworkReply* reply)
 
   // check for error in network communication
   if (reply->error() != QNetworkReply::NoError) {
-    m_lastError = tr("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
+    m_lastError = QString("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
     return -1;
   }
 

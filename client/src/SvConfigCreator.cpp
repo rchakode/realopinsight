@@ -200,7 +200,7 @@ void SvCreator::importZabbixTriggers(void)
     statusBar()->showMessage(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
 
     ChecksT checks;
-    ZbxHelper handler;
+    ZbxHelper handler(srcInfo.mon_url);
     int retcode = handler.openSession(srcInfo);
     if (retcode == 0) {
       retcode = handler.loadChecks(srcInfo, host, checks);
@@ -222,7 +222,7 @@ void SvCreator::importZenossComponents(void)
     statusBar()->showMessage(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
 
     ChecksT checks;
-    ZnsHelper handler;
+    ZnsHelper handler(srcInfo.mon_url);
     int retcode = handler.openSession(srcInfo);
     if (retcode == 0) {
       retcode = handler.loadChecks(srcInfo, host, checks);

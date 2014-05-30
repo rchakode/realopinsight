@@ -634,27 +634,6 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
         <translation>Message</translation>
     </message>
     <message>
-        <source>
-%1 %2 (codename: %3)
-
-Release ID: %4
-
-Copyright (c) 2010-%5 NGRT4N Project. All rights reserved
-Visit %6 for more information
-
-Report Bugs: bugs@ngrt4n.com
-</source>
-        <translation type="obsolete">
-%1 %2 (nom de code : %3)
-
-Numéro de série : %4
-
-Copyright (c) 2010-%5 Projet NGRT4N. Tous droits réservés
-Visiter notre site web %6 pour plus d&apos;informations
-
-Reporter des bugs : bugs@ngrt4n.com</translation>
-    </message>
-    <message>
         <location filename="../client/src/GuiDashboard.cpp" line="40"/>
         <location filename="../core/src/DashboardBase.cpp" line="50"/>
         <location filename="../core/src/utilsCore.cpp" line="30"/>
@@ -782,10 +761,6 @@ Autres détails : %9</translation>
         <location filename="../wt/src/WebMsgConsole.cpp" line="69"/>
         <source>Service ID</source>
         <translation>ID Service </translation>
-    </message>
-    <message>
-        <source>View Managment</source>
-        <translation type="obsolete">Gestion des vues</translation>
     </message>
     <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="69"/>
@@ -1101,38 +1076,6 @@ See the online documentation for further details.</source>
     Si seulement la partie host_name est définie la source de données sera assignée au ping.
 Voir la documentatuon en ligne pour plus de détails.</translation>
     </message>
-    <message>
-        <source>This depends on your monitoring configuration:
- * For Nagios this follows the patterns &apos;host_name/service_name&apos; or just &apos;host_name&apos;
-    E.g. mysql-server.example.com/Current Load, mysql-server.example.com
-    When only host_name is set, the data point is associated to ping status.
- * For Zabbix it follows the pattern &apos;host_name/trigger_name&apos;
-    E.g. Zabbix server/Zabbix http poller processes more than 75% busy
- * For Zenoss it follows the patterns &apos;device_name/component_name&apos; or just &apos;device_name&apos;
-    E.g. localhost/httpd, localhost
-    When only device_name is set, the data point is associated to ping status.
-See the online documentation for further details.</source>
-        <oldsource>This depends on your monitoring configuration:
- * For Nagios this follows the patterns &apos;host_name/service_name&apos; or just &apos;host_name&apos;
-    E.g. mysql-server.example.com/Current Load, mysql-server.example.com
-    When only host_name is set, the data point is associated to ping status.
- * For Zabbix it follows the pattern &apos;host_name/trigger_name&apos;
-    E.g. Zabbix server/Zabbix http poller processes more than 75% busy
- * For Zenoss it follows the patterns &apos;device_name/component_name&apos; or just &apos;device_name&apos;
-    E.g. localhost/httpd, localhost
-    NOTE: When only device_name is set, the data point is associated to ping status.
-See the online documentation for further details.</oldsource>
-        <translation type="obsolete">Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
- * Pour Nagios et les systèmes similaires comme Shinken; c&apos;est de la forme &apos;host_name/service_name&apos; or juste &apos;host_name&apos;
-    Ex. mysql-server.example.com/Current Load, mysql-server.example.com
-    Si seulement la partie host_name est définie la source de données sera assignée au ping.
- * Pour Zabbix, c&apos;est de la forme &apos;host_name/trigger_name&apos;
-    Ex. Zabbix server/Zabbix http poller processes more than 75% busy
- * Pour Zenoss c&apos;est de la forme &apos;device_name/component_name&apos; ou juste &apos;device_name&apos;
-    E.g. localhost/httpd, localhost
-    Si seulement la partie host_name est définie la source de données sera assignée au ping.
-Voir la documentatuon en ligne pour plus de détails.</translation>
-    </message>
 </context>
 <context>
     <name>SvCreator</name>
@@ -1395,10 +1338,6 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation>Fichier de description invalide</translation>
     </message>
     <message>
-        <source>Change password</source>
-        <translation type="obsolete">Changer de mot de passe</translation>
-    </message>
-    <message>
         <location filename="../wt/src/WebMainUI.cpp" line="64"/>
         <source>Select file to preview | %1</source>
         <translation>Sélectionner la fichier Ã  prévisualiser | %1</translation>
@@ -1474,28 +1413,14 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation>Votre système semble manquer de mémoire</translation>
     </message>
     <message>
-        <source>File is too large.</source>
-        <translation type="obsolete">Fichier trop volumineux.</translation>
-    </message>
-    <message>
         <location filename="../wt/src/WebMainUI.cpp" line="367"/>
         <source>%1/%2</source>
         <translation></translation>
     </message>
     <message>
-        <source>View added.  Name: %1
- -  Number of services: %2 - Path: %3</source>
-        <translation type="obsolete">Vue ajoutée.  Nom: %1
- -  Nombre de services: %2 - Chemin: %3</translation>
-    </message>
-    <message>
         <location filename="../wt/src/WebMainUI.cpp" line="399"/>
         <source>No file selected</source>
         <translation>Aucun fichier sélectionné</translation>
-    </message>
-    <message>
-        <source>This platform or a platfom with the same name is already loaded</source>
-        <translation type="obsolete">Cette  plateforme ou une plateforme du mÃªme nom existe déjÃ </translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="630"/>
