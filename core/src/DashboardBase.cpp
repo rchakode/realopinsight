@@ -560,11 +560,11 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
     allocated = true;
     break;
   case ngrt4n::Zabbix:
-    src.zbx_handler = std::make_shared<ZbxHelper>();
+    src.zbx_handler = std::make_shared<ZbxHelper>(src.mon_url);
     allocated = true;
     break;
   case ngrt4n::Zenoss:
-    src.zns_handler = std::make_shared<ZnsHelper>();
+    src.zns_handler = std::make_shared<ZnsHelper>(src.mon_url);
     allocated = true;
     break;
   default:

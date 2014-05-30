@@ -308,12 +308,9 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 int
 ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
 {
-
   if (! m_isLogged) {
     return -1;
   }
-
-  setBaseUrl(srcInfo.mon_url);
 
   QStringList params;
   QNetworkReply* response = NULL;
