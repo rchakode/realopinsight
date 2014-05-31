@@ -10,6 +10,7 @@ RealOpInsight ChangeLog
   * Simplified monitoring-data retrieving with Zabbix and Zenoss
   * Now disables the workstation operations console when updating
     the console after preferences changed
+  * Added french translation for new string added by changes
 
 3.0.0
   * Changed command line names: ngrt4n-oc -> realopinsight-oc, 
