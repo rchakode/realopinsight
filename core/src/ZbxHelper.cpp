@@ -237,7 +237,7 @@ ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
     setTrid(m_replyJsonData.getProperty("result").toString());
     returnValue = 0;
   } else {
-    m_lastError = tr("the transaction does not correspond to getApiVersion");
+    m_lastError = tr("the transaction id does not correspond to getApiVersion");
   }
 
   return returnValue;

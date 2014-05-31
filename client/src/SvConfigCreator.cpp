@@ -652,9 +652,9 @@ void SvCreator::loadMenu(void)
   m_subMenus["SaveAs"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
       m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
   m_menus["FILE"]->addSeparator(),
-      m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("&Import Nagios Checks")),
-      m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("&Import Zabbix Triggers")),
-      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("&Import Zenoss Components"));
+      m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
+      m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
+      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
   m_menus["FILE"]->addSeparator(),
       m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
       m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
