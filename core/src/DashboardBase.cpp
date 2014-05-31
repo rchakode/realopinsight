@@ -105,6 +105,7 @@ void DashboardBase::initialize(Preferences* preferencePtr)
 
 void DashboardBase::runMonitor()
 {
+  Q_EMIT updateInprogress();
   resetStatData();
   if (m_cdata->monitor == ngrt4n::Auto) {
     for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src) {
@@ -119,6 +120,7 @@ void DashboardBase::runMonitor()
     }
   }
   ++m_updateCounter;
+  Q_EMIT updateFinished();
 }
 
 void DashboardBase::runMonitor(SourceT& src)
@@ -583,29 +585,15 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
     Q_FOREACH (const qint8& id, ids) {
       SourceT newsrc;
       m_preferences->loadSource(id, newsrc);
-      SourceListT::Iterator olddata = m_sources.find(id);
-      if (olddata != m_sources.end()) {
-        switch (olddata->mon_type) {
-        case ngrt4n::Nagios:
-          if (olddata->use_ngrt4nd) {
-            olddata->ls_handler.reset();
-          } else {
-            olddata->d4n_handler.reset();
-          }
-          break;
-        case ngrt4n::Zabbix:
-          olddata->zbx_handler.reset();
-          break;
-        case ngrt4n::Zenoss:
-          olddata->zns_handler.reset();
-          break;
-        default:
-          Q_EMIT errorOccurred(tr("Unknown monitor type (%1)").arg(olddata->mon_type));
-          break;
+      if (allocSourceHandler(newsrc)) {
+        SourceListT::Iterator olddata = m_sources.find(id);
+        if (olddata != m_sources.end()) {
+          m_sources.erase(olddata);
         }
+        m_sources.insert(id, newsrc);
+      } else {
+        Q_EMIT errorOccurred(tr("Can't allocate handler for source %1").arg(id));
       }
-      allocSourceHandler(newsrc);
-      m_sources[id] = newsrc;
     }
     runMonitor();
     Q_EMIT updateSourceUrl();

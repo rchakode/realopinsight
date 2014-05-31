@@ -8,6 +8,8 @@ RealOpInsight ChangeLog
   * Fixed problem in mono-source handling when the description
     file-defined source type was overriden by the setting source type
   * Simplified monitoring-data retrieving with Zabbix and Zenoss
+  * Now disables the workstation operations console when updating
+    the console after preferences changed
 
 3.0.0
   * Changed command line names: ngrt4n-oc -> realopinsight-oc, 

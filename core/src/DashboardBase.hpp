@@ -88,6 +88,8 @@ Q_SIGNALS:
   void timerIntervalChanged(qint32 interval);
   void errorOccurred(QString msg);
   void dashboardLinkSelected(void);
+  void updateInprogress(void);
+  void updateFinished(void);
 
 protected:
   void computeStatusInfo(NodeT& _node, const SourceT& src);

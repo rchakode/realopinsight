@@ -219,11 +219,9 @@ void MainWindow::handleHideChart(void)
 
 void MainWindow::handleRefresh(void)
 {
-  setEnabled(false);
   handleUpdateStatusBar(tr("updating..."));
   m_dashboard->runMonitor();
   handleUpdateStatusBar(tr("update completed"));
-  setEnabled(true);
 }
 
 void MainWindow::resetTimer(qint32 interval)
@@ -270,4 +268,7 @@ void MainWindow::addEvents(void)
   connect(m_contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), m_dashboard, SLOT(centerGraphOnNode()));
   connect(m_dashboard, SIGNAL(centralTabChanged(int)), this, SLOT(handleTabChanged(int)));
   connect(m_dashboard, SIGNAL(updateStatusBar(const QString&)), this, SLOT(handleUpdateStatusBar(const QString&)));
+  connect(m_dashboard, SIGNAL(updateInprogress()), this, SLOT(handleUpdateIntprogress()));
+  connect(m_dashboard, SIGNAL(updateFinished()), this, SLOT(handleUpdateFinished()));
+
 }

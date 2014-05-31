@@ -47,6 +47,8 @@ public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleErrorOccurred(QString msg) {ngrt4n::alert(msg);}
   void handleChangeMonitoringSettingsAction(void);
+  void handleUpdateIntprogress(void) {setEnabled(false);}
+  void handleUpdateFinished(void) {setEnabled(true);}
 
 protected:
   virtual void closeEvent(QCloseEvent*);

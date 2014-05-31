@@ -105,6 +105,7 @@ int main(int argc, char **argv)
   info->finish(0);
   MainWindow *console= new MainWindow(userRole, file);
   console->render();
-
-  return app->exec();
+  int ret = app->exec();
+  QWebSettings::clearMemoryCaches();
+  return ret;
 }
