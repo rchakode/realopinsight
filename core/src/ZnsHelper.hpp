@@ -29,6 +29,7 @@
 #include "JsonHelper.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QSslConfiguration>
 
 namespace {
 const QString ZNS_API_CONTEXT = "/zport/dmd";

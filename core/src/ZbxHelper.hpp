@@ -28,6 +28,7 @@
 #include "JsonHelper.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QSslConfiguration>
 
 
 namespace {
