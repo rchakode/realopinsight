@@ -12,6 +12,7 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
     m_hostFilter(NULL),
     m_statusFileArea(NULL)
 {
+  setWindowTitle(tr("Import data | %1").arg(APP_NAME));
   // build generic widgets
   m_sourceSelectionBox = new QComboBox(this);
   m_sourceSelectionBox->addItems(sourceList);
