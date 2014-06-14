@@ -181,10 +181,6 @@ void SvCreator::importNagiosChecks(void)
       statusBar()->showMessage(tr("No file selected"));
     }
   }
-  //  QString path = QFileDialog::getOpenFileName(this,
-  //                                              tr("Select a status file | %1").arg(APP_NAME),
-  //                                              ".",
-  //                                              tr("Data files (*.dat);;All files (*)"));
 }
 
 void SvCreator::importZabbixTriggers(void)
