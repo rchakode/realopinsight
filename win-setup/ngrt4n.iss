@@ -1,4 +1,4 @@
-#define Version "3.0.0"
+#define Version "3.0.1"
 #define Application "RealOpInsight Workstation" 
 [Setup] 
 AppName={#Application}
