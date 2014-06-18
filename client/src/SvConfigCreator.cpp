@@ -36,6 +36,7 @@ const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
 const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
 const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
 const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
+const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
 }
 
 SvCreator::SvCreator(const qint32& _userRole)
@@ -294,7 +295,7 @@ void SvCreator::insertFromSelected(const NodeT& node)
     ngrt4n::alert(tr("This action not allowed on the target node"));
     return;
   }
-  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? QString::fromStdString(ngrt4n::CHILD_SEP)%node.id : node.id;
+  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? CHILD_SEPERATOR % node.id : node.id;
   QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
   m_cdata->bpnodes.insert(node.id, node);
   m_tree->setCurrentItem(lastItem);
@@ -324,10 +325,8 @@ void SvCreator::deleteNode(const QString& _nodeId)
   if (!ngrt4n::findNode(m_cdata, _nodeId, node))
     return;
 
-  QString sep(ngrt4n::CHILD_SEP.c_str());
-
   if (node->type == NodeType::ServiceNode && node->child_nodes != "") {
-    Q_FOREACH(const QString& checkId, node->child_nodes.split(sep)) {
+    Q_FOREACH(const QString& checkId, node->child_nodes.split(CHILD_SEPERATOR)) {
       deleteNode(checkId);
     }
   }
@@ -335,9 +334,9 @@ void SvCreator::deleteNode(const QString& _nodeId)
   QTreeWidgetItem* item = m_tree->findNodeItem(_nodeId);
   QTreeWidgetItem* pItem = m_tree->findNodeItem(node->parent);
   if (pItem && item) {
-    QRegExp regex("|^" + _nodeId + sep +
+    QRegExp regex("|^" + _nodeId + CHILD_SEPERATOR +
                   "|^" + _nodeId + "$" +
-                  "|" + sep  + _nodeId);
+                  "|" + CHILD_SEPERATOR  + _nodeId);
 
     NodeListT::iterator pNode = m_cdata->bpnodes.find(node->parent);
     if (pNode != m_cdata->bpnodes.end()) {
@@ -468,8 +467,6 @@ void SvCreator::handleSelectedNodeChanged(void)
 
 void SvCreator::handleTreeNodeMoved(QString _node_id)
 {
-  QString sep(ngrt4n::CHILD_SEP.c_str());
-
   QTreeWidgetItem* item =  m_tree->findNodeItem(_node_id);
   if (item) {
 
@@ -479,9 +476,9 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
 
       if (nodeIt != m_cdata->bpnodes.end()) {
         /* Remove the node on its old parent's child list*/
-        QRegExp regex ("|^" + _node_id + sep +
+        QRegExp regex ("|^" + _node_id + CHILD_SEPERATOR +
                        "|^" + _node_id + "$" +
-                       "|" + sep + _node_id);
+                       "|" + CHILD_SEPERATOR + _node_id);
         NodeListT::iterator pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
         if (pNodeIt != m_cdata->bpnodes.end()) {
           pNodeIt->child_nodes.remove(regex);
@@ -491,7 +488,7 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
         nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
         pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
         if (pNodeIt != m_cdata->bpnodes.end()) {
-          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")? sep + _node_id : _node_id;
+          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")? CHILD_SEPERATOR + _node_id : _node_id;
         }
       }
     }
@@ -547,7 +544,10 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
     if (m_editor->updateNodeContent(node)) {
-      m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
+      QTreeWidgetItem* selectedNodeItem = m_tree->findNodeItem(m_selectedNode);
+      if (selectedNodeItem) {
+        selectedNodeItem->setText(0, node->name);
+      }
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");
       setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
