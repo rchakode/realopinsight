@@ -42,6 +42,7 @@ const QString Preferences::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Preferences::SERVER_ADDR_KEY = "/Monitor/serverAddr";
 const QString Preferences::SERVER_PORT_KEY = "/Monitor/serverPort";
 const QString Preferences::USE_MKLS_KEY = "/Monitor/UseMkLs";
+const QString Preferences::DONT_VERIFY_SSL_PEER_KEY = "/Monitor/VerifySslPeer";
 const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser";
 const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
@@ -52,6 +53,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
   : QDialog(),
     muserRole(_userRole),
     msettings(new Settings()),
+    mmainLayout (new QGridLayout(this)),
     monitorUrlField(new QLineEdit()),
     mupdateIntervalField(new QSpinBox()),
     mbrwBtn(new QPushButton(tr("&Browse..."))),
@@ -67,7 +69,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
     mdonateBtn(new ImageButton(":images/built-in/donate.png")),
     mshowAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
     museMklsChkbx(new QCheckBox(tr("Use &Livestatus"))),
-    mmainLayout (new QGridLayout(this))
+    mverifyPeerChkBx(new QCheckBox(tr("Don't verify SSL peer")))
 {
   qint32 line = -1;
   moldPwdField->setEchoMode(QLineEdit::Password);
@@ -76,7 +78,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
   mserverPassField->setEchoMode(QLineEdit::Password);
   msockPortField->setValidator(new QIntValidator(1, 65535, msockPortField));
   switch (_action)
-    {
+  {
     case Preferences::ChangeMonitoringSettings:
       setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
       line++,
@@ -92,16 +94,16 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
       mmainLayout->setColumnStretch(1, 6);
       mmainLayout->setColumnStretch(2, 0);
       if(_userRole == Auth::OpUserRole) {
-          monitorUrlField->setEnabled(false);
-          mbrwBtn->setEnabled(false);
-          mupdateIntervalField->setEnabled(false);
-          mapplySettingBtn->setEnabled(false);
-          msockAddrField->setEnabled(false);
-          msockPortField->setEnabled(false);
-          mserverPassField->setEnabled(false);
-          mshowAuthInfoChkbx->setEnabled(false);
-          museMklsChkbx->setEnabled(false);
-        }
+        monitorUrlField->setEnabled(false);
+        mbrwBtn->setEnabled(false);
+        mupdateIntervalField->setEnabled(false);
+        mapplySettingBtn->setEnabled(false);
+        msockAddrField->setEnabled(false);
+        msockPortField->setEnabled(false);
+        mserverPassField->setEnabled(false);
+        mshowAuthInfoChkbx->setEnabled(false);
+        museMklsChkbx->setEnabled(false);
+      }
       break;
     case Preferences::ChangePassword:
     case Preferences::ForceChangePassword:
@@ -120,8 +122,8 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
           mmainLayout->addWidget(mchangePwdBtn, line, 2);
 
       if(_action == Preferences::ForceChangePassword) {
-          mcancelBtn->setEnabled(false);
-        }
+        mcancelBtn->setEnabled(false);
+      }
       break;
     case Preferences::ShowAbout:
       setWindowTitle(tr("About %1").arg(APP_NAME));
@@ -137,7 +139,7 @@ Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
           mmainLayout->addWidget(mdonateBtn, line, 0, 1, 1, Qt::AlignLeft),
           mmainLayout->addWidget(mcancelBtn, line, 1, 1, 1, Qt::AlignRight);
       break;
-    }
+  }
   setContent();
   addEvents();
 }
@@ -157,6 +159,7 @@ Preferences::~Preferences()
   delete mdonateBtn;
   delete mshowAuthInfoChkbx;
   delete museMklsChkbx;
+  delete mverifyPeerChkBx;
   delete mmainLayout;
 }
 
@@ -177,8 +180,10 @@ void Preferences::applySettings(void)
   if(msockPortField->text().toInt() <= 0) msockPortField->setText(QString::number(MonitorBroker::DefaultPort));
   msettings->setValue(SERVER_PORT_KEY, msockPortField->text());
   msettings->setValue(SERVER_PASS_KEY, mserverPassField->text());
-  museMkls = static_cast<Qt::CheckState>(museMklsChkbx->checkState());
-  msettings->setValue(USE_MKLS_KEY, museMkls);
+  museMkls = static_cast<Qt::CheckState>(museMklsChkbx->checkState()),
+      msettings->setValue(USE_MKLS_KEY, museMkls);
+  mverifyPeer = static_cast<Qt::CheckState>(mverifyPeerChkBx->checkState()),
+      msettings->setValue(DONT_VERIFY_SSL_PEER_KEY, mverifyPeer);
   msettings->sync();
   close();
   emit urlChanged(homeUrl);
@@ -194,31 +199,31 @@ void Preferences::changePasswd(void)
   QString key;
 
   if (muserRole == Auth::AdmUserRole) {
-      key = ADM_PASSWD_KEY;
-      userPasswd = msettings->value(key).toString();
-    } else {
-      key = OP_PASSWD_KEY;
-      userPasswd = msettings->value(key).toString();
-    }
+    key = ADM_PASSWD_KEY;
+    userPasswd = msettings->value(key).toString();
+  } else {
+    key = OP_PASSWD_KEY;
+    userPasswd = msettings->value(key).toString();
+  }
   passwd = QCryptographicHash::hash(moldPwdField->text().toAscii(), QCryptographicHash::Md5);
   newPasswd = QCryptographicHash::hash(mpwdField->text().toAscii(), QCryptographicHash::Md5);
   renewPasswd = QCryptographicHash::hash(mrePwdField->text().toAscii(), QCryptographicHash::Md5);
 
   if(userPasswd == passwd) {
-      if(newPasswd == renewPasswd) {
-          msettings->setKeyValue(key, newPasswd);
-          QMessageBox::information(this,
-                                   APP_NAME,
-                                   tr("Password updated"),
-                                   QMessageBox::Ok);
+    if(newPasswd == renewPasswd) {
+      msettings->setKeyValue(key, newPasswd);
+      QMessageBox::information(this,
+                               APP_NAME,
+                               tr("Password updated"),
+                               QMessageBox::Ok);
 
-          done(0);
-        } else {
-          utils::alert(tr("Sorry the passwords do not match"));
-        }
+      done(0);
     } else {
-      utils::alert(tr("Authentication failed"));
+      utils::alert(tr("Sorry the passwords do not match"));
     }
+  } else {
+    utils::alert(tr("Authentication failed"));
+  }
 }
 
 void Preferences::donate(void)
@@ -230,10 +235,10 @@ void Preferences::donate(void)
 
 void Preferences::setAuthChainVisibility(const int & state) {
   if(state == Qt::Checked) {
-      mserverPassField->setEchoMode(QLineEdit::Normal);
-    } else {
-      mserverPassField->setEchoMode(QLineEdit::Password);
-    }
+    mserverPassField->setEchoMode(QLineEdit::Normal);
+  } else {
+    mserverPassField->setEchoMode(QLineEdit::Password);
+  }
 }
 
 QGroupBox* Preferences::createScktGrp(void)
@@ -264,7 +269,8 @@ QGroupBox* Preferences::createCommonGrp(void)
   int line;
   line = 0,
       lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
-      lyt->addWidget(monitorUrlField, line, 1, 1, 2);
+      lyt->addWidget(monitorUrlField, line, 1);
+  lyt->addWidget(mverifyPeerChkBx, line, 2);
   line++,
       lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
       lyt->addWidget(mserverPassField, line, 1),
@@ -290,8 +296,10 @@ void Preferences::setContent(void)
   msockAddrField->setText(msettings->value(SERVER_ADDR_KEY).toString());
   msockPortField->setText(msettings->value(SERVER_PORT_KEY).toString());
   mserverPassField->setText(msettings->value(SERVER_PASS_KEY).toString());
-  museMkls = static_cast<Qt::CheckState>(msettings->value(USE_MKLS_KEY).toInt());
-  museMklsChkbx->setCheckState(museMkls);
+  museMkls = static_cast<Qt::CheckState>(msettings->value(USE_MKLS_KEY).toInt()),
+      museMklsChkbx->setCheckState(museMkls);
+  mverifyPeer = static_cast<Qt::CheckState>(msettings->value(DONT_VERIFY_SSL_PEER_KEY).toInt()),
+      mverifyPeerChkBx->setCheckState(mverifyPeer);
 }
 
 QString Preferences::style() {

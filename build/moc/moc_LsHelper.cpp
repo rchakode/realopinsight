@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'LsHelper.hpp'
 **
-** Created: Wed May 15 21:08:20 2013
+** Created: Wed Jun 19 20:59:05 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!

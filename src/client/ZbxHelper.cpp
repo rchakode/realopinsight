@@ -30,22 +30,26 @@ ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
     apiUri(baseUrl%ZBX_API_CONTEXT),
     mrequestHandler(new QNetworkRequest()),
-    mtrid(Trigger)
+    mtrid(Trigger),
+    sslConf(new QSslConfiguration)
 {
   mrequestHandler->setRawHeader("Content-Type", "application/json");
   mrequestHandler->setUrl(QUrl(apiUri));
   setRequestsPatterns();
+
 }
 
 ZbxHelper::~ZbxHelper()
 {
   delete mrequestHandler;
+  delete sslConf;
 }
 
 void ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
   QString request = mrequestsPatterns[reqId];
   foreach(const QString &param, params) {request = request.arg(param);}
   QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, request.toAscii());
+  reply->setSslConfiguration(*sslConf);
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
@@ -85,4 +89,14 @@ void ZbxHelper::setRequestsPatterns()
       \"params\": {\"sessionid\": \"%1\"}, \
       \"auth\": \"%1\", \
       \"id\": %9}";
+}
+
+
+void ZbxHelper::setSslConf(bool verifyPeer)
+{
+  if (verifyPeer) {
+    sslConf->setPeerVerifyMode(QSslSocket::VerifyPeer);
+  } else {
+    sslConf->setPeerVerifyMode(QSslSocket::QueryPeer);
+  }
 }

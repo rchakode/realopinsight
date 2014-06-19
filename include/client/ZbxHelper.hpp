@@ -51,6 +51,7 @@ public:
   inline QString getApiUri(void) const {return apiUri;}
   inline void updateTrid(const QString& apiv) {mtrid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
   inline int getTrid(void) const {return mtrid;}
+  void setSslConf(bool verifyPeer);
 
 public slots:
   inline void processError(const QNetworkReply::NetworkError& code) {if(code <200 && code >=599) emit propagateError(code);}
@@ -63,6 +64,7 @@ private :
   QNetworkRequest* mrequestHandler;
   RequestListT mrequestsPatterns;
   int mtrid;
+  QSslConfiguration* sslConf;
   void setRequestsPatterns();
 };
 

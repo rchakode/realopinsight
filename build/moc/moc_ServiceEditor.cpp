@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ServiceEditor.hpp'
 **
-** Created: Wed May 15 21:08:07 2013
+** Created: Wed Jun 19 20:58:50 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!

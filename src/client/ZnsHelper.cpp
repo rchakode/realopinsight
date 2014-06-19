@@ -35,7 +35,8 @@ const RequestListT ZnsHelper::Routers = ZnsHelper::getRouters();
 ZnsHelper::ZnsHelper(const QString& baseUrl)
   : QNetworkAccessManager(),
     mapiBaseUrl(baseUrl),
-    mrequestHandler(new QNetworkRequest())
+    mrequestHandler(new QNetworkRequest()),
+    sslConf(new QSslConfiguration)
 {
   mrequestHandler->setUrl(QUrl(mapiBaseUrl+ZNS_API_CONTEXT));
 }
@@ -43,6 +44,7 @@ ZnsHelper::ZnsHelper(const QString& baseUrl)
 ZnsHelper::~ZnsHelper()
 {
   delete mrequestHandler;
+  delete sslConf;
 }
 
 void ZnsHelper::setBaseUrl(const QString& url)
@@ -55,6 +57,7 @@ void ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
 {
   mrequestHandler->setRawHeader("Content-Type", ContentTypes[reqType].toAscii());
   QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, data);
+  reply->setSslConfiguration(*sslConf);
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
@@ -109,5 +112,14 @@ RequestListT ZnsHelper::getRouters()
   list[Component] = "device_router";
   list[Device] = "device_router";
   return list;
+}
+
+void ZnsHelper::setSslConf(bool verifyPeer)
+{
+  if (verifyPeer) {
+    sslConf->setPeerVerifyMode(QSslSocket::VerifyPeer);
+  } else {
+    sslConf->setPeerVerifyMode(QSslSocket::QueryPeer);
+  }
 }
 
