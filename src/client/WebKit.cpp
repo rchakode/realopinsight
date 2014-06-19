@@ -30,7 +30,7 @@ WebKit::WebKit(const QString& url, QWidget* _parent)
   settings()->setAttribute(QWebSettings::PluginsEnabled, true);
   settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
   settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-  load(QUrl(url));
+  load(QUrl(url)); //FIXME: check error when loading an url
 }
 
 WebKit::~WebKit() {}

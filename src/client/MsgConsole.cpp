@@ -79,7 +79,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   qint32 nbRows = mmodel->rowCount();
   while(index < nbRows &&
         mmodel->item(index, ID_COLUMN) &&
-         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) { index++;}
+        mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) { index++;}
   if(index >= nbRows) {
       index = 0;
       mmodel->insertRow(index);
@@ -109,22 +109,18 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
 
   if(_node.severity == MonitorBroker::Normal) {
-      itemText = (_node.notification_msg.trimmed().length() != 0)?
-            _node.notification_msg:QString(_node.check.alarm_msg.c_str());
       mmodel->item(index, 0)->setBackground(Qt::transparent);
       mmodel->item(index, 2)->setBackground(Qt::transparent);
       mmodel->item(index, 3)->setBackground(Qt::transparent);
       mmodel->item(index, 4)->setBackground(Qt::transparent);
     } else {
-      itemText = (_node.alarm_msg.trimmed().length() &&
-                  _node.severity != MonitorBroker::Unknown)?
-            _node.alarm_msg: QString(_node.check.alarm_msg.c_str());
       mmodel->item(index, 0)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
       mmodel->item(index, 2)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
       mmodel->item(index, 3)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
       mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
 
     }
+  itemText =QString(_node.check.alarm_msg.c_str());
   mmodel->item(index, 4)->setText(itemText);
   mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
 }

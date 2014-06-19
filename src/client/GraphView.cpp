@@ -217,7 +217,7 @@ bool GraphView::load(const QString& _dotFile,
       exit(exitCode);
     }
 
-  dotParser.reset(nullptr);
+  dotParser.reset(NULL);
   return false;
 }
 

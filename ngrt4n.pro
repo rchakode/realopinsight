@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.2.0beta1
+VERSION_=2.2.0
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
@@ -21,11 +21,12 @@ TARGET = ngrt4n-editor
 }
 dflag{
 TARGET.path=$$(INSTALL_PREFIX)/bin
+MAN.path =$$(INSTALL_PREFIX)/share/man/man1
 }else{
 TARGET.path=/usr/local/bin
+MAN.path = /usr/share/man/man1
 }
 TARGET.files = $${TARGET}
-MAN.path = /usr/share/man/man1
 MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-editor.1.gz
 INSTALLS += TARGET MAN
 RESOURCES += ngrt4n.qrc

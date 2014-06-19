@@ -23,7 +23,6 @@
 #include "StatsLegend.hpp"
 #include "utilsClient.hpp"
 #include <QFileInfo>
-#include <unistd.h>
 
 QString utils::criticityToText(const qint32& _status)
 {

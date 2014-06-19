@@ -1,10 +1,8 @@
-This file shows how to install RealOpInsight and the Daemon Service for Nagios
-
-First, note that this software is released under the terms the GPL License (version 3). 
+RealOpInsight and the related software are released under the terms of GPLv3 License.
 Prior to the installation, you may need to read the license offer. See the COPYING file. 
  
 
-INSTALL REALOPINSIGHT
+INSTALLING REALOPINSIGHT
 -------------
 * This component needs to be installed on the workstations where users operate
 
@@ -20,7 +18,7 @@ INSTALL REALOPINSIGHT
   $ sudo ./install-sh
   
 
-INSTALL THE DAEMON SERVICE FOR NAGIOS
+INSTALLING THE DAEMON SERVICE FOR NAGIOS (ngrt4nd)
 ---------------
 * This component needs to be installed on the Nagios server.
 
