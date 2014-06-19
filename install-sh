@@ -24,10 +24,14 @@ set -e
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
 VERSION_BKR="1.0"
+WT_VERSION=3.3.2
+WT_SRC_DIR=wt/extlibs
+BASE_BUILD_DIR=`pwd`
 
 # Print help
 #
-usage(){
+usage()
+{
   echo
   echo "Usage: `basename $0` [OPTION]"
   echo "OPTIONS"
@@ -39,57 +43,126 @@ usage(){
   echo "	  Shows this help"
 }
 
-prompt_copyright(){ 
-echo
-echo "Thanks for choosing RealOpInsight Workstation."
-echo
-echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
-echo
-echo "Type 'y' to accept this license offer."
-echo "Type 'n' to decline this license offer."
-echo "Type 'r' to view this license offer."
-echo
-while true; do
-read -p "Do you accept the terms of the License ? y/N/r " rep
-  case $rep in
-	r) more COPYING ; echo ;;
-	y) break ;;
-	*) exit 0 ;; 
-  esac
-done
+prompt_copyright()
+{ 
+  echo
+  echo "Thanks for choosing RealOpInsight Workstation."
+  echo
+  echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
+  echo
+  echo "Type 'y' to accept this license offer."
+  echo "Type 'n' to decline this license offer."
+  echo "Type 'r' to view this license offer."
+  echo
+  while true; do
+    read -p "Do you accept the terms of the License ? y/N/r " rep
+    case $rep in
+	  r) more COPYING ; echo ;;
+	  y) break ;;
+	  *) exit 0 ;; 
+    esac
+  done
 }
-install_daemon(){
+
+install_wt()
+{
+  if [ ! -e /etc/lsb-release ]; then
+    echo "ERROR: Distribution not supported"
+	exit 1
+  fi
   
+  . /etc/lsb-release
+  
+  echo "DEBUG : Distribution $DISTRIB_ID"
+  
+  echo "DEBUG : Installing Wt dependencies..."
+  apt-get install -y g++ \
+                  make \
+                  cmake  \
+                  graphviz \
+                  libzmq1 libzmq-dev \
+                  libqt4-dev libqt4-webkit \
+                  libsqlite-dev \
+                  libssl-dev \
+                  libgraphicsmagick++1-dev \
+                  libpango1.0-dev \
+                  libboost-program-options1.54 \
+                  libboost-system1.54 \
+                  libboost-thread1.54 \
+                  libboost-regex1.54 \
+                  libboost-signals1.54  \
+                  libboost-filesystem1.54 \
+                  libboost-date-time1.54 \
+                  libboost-program-options1.54-dev \
+                  libboost-system1.54-dev \
+                  libboost-thread1.54-dev \
+                  libboost-regex1.54-dev \
+                  libboost-signals1.54-dev \
+                  libboost-filesystem1.54-dev \
+                  libboost-date-time1.54-dev \
+                  libboost-random1.54-dev \
+                  libfcgi libfcgi-dev \
+                  apache2 libapache2-mod-fastcgi \
+                  > /dev/null
+				  
+  echo "DEBUG : Downloading wt..."
+  wget http://prdownloads.sourceforge.net/witty/wt-${WT_VERSION}.tar.gz
+  
+  echo "DEBUG : Untar archive and move to build dir..."
+  tar zxf ${WT_SRC_DIR}/wt-${WT_VERSION}.tar.gz && cd wt-${WT_VERSION}
+  mkdir build && cd build
+  
+  echo "DEBUG : Run cmake"
+  cmake ..  -DWEBUSER=${REALOPINSIGHT_WWW_USER} \
+            -DWEBGROUP=REALOPINSIGHT_WWW_GROUP \
+            -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick
+			
+  echo "DEBUG : Building..."
+  make > /dev/null
+  
+  echo "DEBUG : Installing..."
+  make install
+  
+  echo "DEBUG : Updating ld..."
+  ldconfig 
+  
+  echo "DEBUG : Move to base directory"
+  cd ${BASE_BUILD_DIR}   
+}
+
+install_daemon()
+{  
   echo "==>Installing the Daemon Service for Nagios..."  
-  echo -n "DEGUG : Checking prerequises..." 
+  echo -n "DEBUG : Checking prerequises..." 
   ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
   echo done
   
-  echo -n "DEGUG : Compiling..."
+  echo -n "DEBUG : Compiling..."
   make -Bj${NCPU} 1>>install.log
   echo done
   
-  echo -n "DEGUG : Installation..."
+  echo -n "DEBUG : Installation..."
   make install 1>>install.log
   cd ..
   echo "done" 
   echo "==>Installation completed"
 }
 
-check_prerequisites(){
-  echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
+check_prerequisites()
+{
+  echo -n "DEBUG : Checking qmake => ${QMAKE:=`which qmake`}... "
   [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking make => ${MAKE:=`which make`}... "
+  echo -n "DEBUG : Checking make => ${MAKE:=`which make`}... "
   [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking C++ compiler => ${CXX:=`which g++`}... "
+  echo -n "DEBUG : Checking C++ compiler => ${CXX:=`which g++`}... "
   [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
   echo "done"
  
-  echo -n "DEGUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  echo -n "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
   [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
   echo "done"
 }
@@ -116,22 +189,22 @@ install_workstation() {
   echo "==>Installing RealOpInsight Workstation..."  
   check_prerequisites
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
-  echo -n "DEGUG : Current component => Manager..."
+  echo -n "DEBUG : Current component => Manager..."
   install_default
-  echo done
+  echo "done"
   
-  echo -n "DEGUG : Current component => Editor..."
+  echo -n "DEBUG : Current component => Editor..."
   install_editor
-  echo done
+  echo "done"
   
-  echo -n "DEGUG : Current component => Operator Console..."
+  echo -n "DEBUG : Current component => Operator Console..."
   install_oc
-  echo done
+  echo "done"
   echo "==>Installation completed"
 }
 
 install_webd() {
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
+  ${QMAKE} -config debug ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
@@ -141,35 +214,93 @@ install_fcgi() {
 }
 
 install_ultimate() {
-  echo "==>Installing RealOpInsight Ultimate..."  
+  echo "==>Installing RealOpInsight Ultimate..."
+
+  if [ `id -u` -ne 0 ]; then 
+    echo "ERROR : root privileges are required"
+    exit 1	
+  fi
   
+  if [ -z "$REALOPINSIGHT_WWW_ROOT" ]; then
+    echo "DEBUG : REALOPINSIGHT_WWW_ROOT not set, using /var/www"
+	export REALOPINSIGHT_WWW_ROOT=/var/www
+  fi  
+ 
+  export REALOPINSIGHT_CONFIG=/opt/realopinsight
+  export REALOPINSIGHT_WWW=${REALOPINSIGHT_WWW_ROOT}/realopinsight
+  export APACHE_ROOT=/etc/apache2
+  
+  # check credential requirements
+  if [ -z "$REALOPINSIGHT_WWW_USER" ]; then
+    echo "ERROR : REALOPINSIGHT_WWW_USER not set"
+	exit 1
+  fi
+  
+  if [ -z "$REALOPINSIGHT_WWW_GROUP" ]; then
+    echo "ERROR : REALOPINSIGHT_WWW_GROUP not set"
+	exit 1
+  fi  
+  
+  #echo "DEBUG : Installing Wt and other dependencies..."
+  #install_wt
+  
+  # check dependencies
   check_prerequisites
+    
+  echo "DEBUG : Patching the project file for REALOPINSIGHT_WWW_ROOT_VALUE..."
+  sed --in-place 's!REALOPINSIGHT_WWW_ROOT_VALUE!'"${REALOPINSIGHT_WWW}"'!' ngrt4n.pro
   
-  echo -n "DEGUG : Building Standalone Server..."
-  install_webd
-  echo done
+  echo "DEBUG : Generating locale file"
+  lrelease ngrt4n.pro
+ 
+  if [ ! -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
+    echo "DEBUG : Building RealOpInsight Standalone..."
+    install_webd
+    install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
+    install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
+  else
+    echo "DEBUG : Building RealOpInsight for FastCGI..."
+    install_fcgi
+  fi
+
+  echo "DEBUG : Installing setting files..."
+
+  if [ -d ${APACHE_ROOT}/conf-available ]; then
+    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf-available
+  else
+    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
+  fi
+  install -d ${REALOPINSIGHT_CONFIG}
+  install -d ${REALOPINSIGHT_CONFIG}/etc
+  install -d ${REALOPINSIGHT_CONFIG}/data
+  install -d ${REALOPINSIGHT_CONFIG}/log
+  install -d ${REALOPINSIGHT_CONFIG}/run   # directory for session info and thumbnails
+  install -d ${REALOPINSIGHT_WWW}
+  install -d ${REALOPINSIGHT_WWW}/run      # directory for thumbnails
+  install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
+  install contribs/index.html ${REALOPINSIGHT_WWW}/
+  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
+  install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
   
-  echo -n "DEGUG : Building FastCGI Server..."
-  install_fcgi
-  echo done
+  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
+  install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
+  install -m 600 contribs/apache-realopinsight-ultimate.conf ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
+  cp -r resources ${REALOPINSIGHT_WWW}/ 
+  cp -r images ${REALOPINSIGHT_WWW}/
+  cp -r i18n ${REALOPINSIGHT_WWW}/
   
-  echo -n "DEGUG : Copy files..."
-  install -m 755 realopinsightd  ${INSTALL_PREFIX}/
-  install -m 755 realopinsight.fcgi ${INSTALL_PREFIX}/
-  install -m 755 realopinsightctld  ${INSTALL_PREFIX}/
-  install -d ${INSTALL_PREFIX}/etc
-  install -d ${INSTALL_PREFIX}/data
-  install -d ${INSTALL_PREFIX}/log
-  install -d ${INSTALL_PREFIX}/run   # directory for session info and thumbnails
-  install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
-  cp -r resources ${INSTALL_PREFIX}/
-  cp -r images ${INSTALL_PREFIX}/
-  cp -r i18n ${INSTALL_PREFIX}/
-  echo done
+  echo "DEBUG : Settings permissions and ..."
+  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
+  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
+  
+  echo "DEBUG : Settings Apache"
+  sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
+  a2enmod fastcgi || true
+  a2enconf realopinsight-ultimate || true 
+  service apache2 reload
   
   echo "==>Installation completed"
 }
-
 
 NCPU=1
 mflag=
@@ -204,17 +335,11 @@ prompt_copyright
 
 echo "DEBUG: Initializing setup with $NCPU CPU..."
 
-if [ -z ${install_prefix} ] ; then
+if [ -z "${install_prefix}" ] ; then
   export INSTALL_PREFIX=/usr/local
 else
-  case ${install_prefix} in
-  /*) export INSTALL_PREFIX=${install_prefix}
-      export dflag="CONFIG+=dflag"
-     ;;
-  *) echo "This is not an absolute path : ${install_prefix}"
-     exit 2 
-	 ;;
- esac
+  export INSTALL_PREFIX=${install_prefix}
+  export dflag="CONFIG+=dflag"
 fi
 
 if [ `id -u` -ne 0 ]; then

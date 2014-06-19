@@ -1,8 +1,8 @@
 /*
- * Preferences.cpp
+ * ChartBase.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 23-03-2014                                                 #
+# Last Update : 27-04-2014                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,73 +22,26 @@
 #--------------------------------------------------------------------------#
  */
 
+#ifndef CHARTBASE_HPP
+#define CHARTBASE_HPP
 
-#include "Preferences.hpp"
 #include "Base.hpp"
-#include "utilsCore.hpp"
-#include "JsHelper.hpp"
-#include <sstream>
-#include <QIntValidator>
-#include <QRegExpValidator>
+#include <QMap>
 
-Preferences::Preferences(const QString& settingFile)
-  : m_settings(new Settings(settingFile)),
-    m_currentSourceIndex(0),
-    m_sourceStates(new QBitArray(MAX_SRCS))
+class ChartBase
 {
-}
-Preferences::Preferences(void)
-  : m_settings(new Settings()),
-    m_currentSourceIndex(0),
-    m_sourceStates(new QBitArray(MAX_SRCS))
-{
-}
+public:
+  ChartBase();
+  void setStatsData(const CheckStatusCountT& statsData) {m_statsData = statsData;}
+  void setNbStatEntries(qint32 count) {m_nbStatsEntries = count;}
+  void updateSeverityInfo(void);
+  QString buildTooltipText(void);
 
+protected:
+  CheckStatusCountT m_statsData;
+  qint32 m_nbStatsEntries;
+  QMap<int, int> m_severityCount;
+  QMap<int, float> m_severityRatio;
+};
 
-Preferences::~Preferences()
-{
-  delete m_sourceStates;
-}
-
-
-void Preferences::loadProperties(void)
-{
-  initSourceStates();
-  updateFields();
-}
-
-
-QString Preferences::getSourceStatesSerialized(void)
-{
-  QString str = "";
-  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";
-  return str;
-}
-
-void Preferences::initSourceStates(void)
-{
-  initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
-  updateAllSourceWidgetStates();
-}
-
-void Preferences::initSourceStates(const QString& str)
-{
-  if (str.isEmpty()) {
-    for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, false);
-    }
-  } else {
-    for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, str.at(i) == '1');
-    }
-  }
-}
-
-
-int Preferences::firstSourceSet()
-{
-  int idx = 0;
-  while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
-
-  return ((idx < MAX_SRCS)? idx : -1);
-}
+#endif // CHARTBASE_HPP

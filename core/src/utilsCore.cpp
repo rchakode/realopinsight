@@ -141,19 +141,19 @@ int ngrt4n::computeSeverity2Propagate(const qint8& _critValue, const qint8& prop
 
 QString ngrt4n::getIconPath(int _severity)
 {
-  QString ipath("/images/built-in/unknown.png");
+  QString ipath("images/built-in/unknown.png");
   switch (static_cast<ngrt4n::SeverityT>(_severity)) {
   case ngrt4n::Normal:
-    ipath = "/images/built-in/normal.png";
+    ipath = "images/built-in/normal.png";
     break;
   case ngrt4n::Minor:
-    ipath = "/images/built-in/minor.png";
+    ipath = "images/built-in/minor.png";
     break;
   case ngrt4n::Major:
-    ipath = "/images/built-in/major.png";
+    ipath = "images/built-in/major.png";
     break;
   case ngrt4n::Critical:
-    ipath = "/images/built-in/critical.png";
+    ipath = "images/built-in/critical.png";
     break;
   default:
     break;
@@ -206,7 +206,7 @@ QString ngrt4n::sourceData2Json(const SourceT& src)
 {
   return QString("{\"sid\":\"%1\","
                  "\"mon_type\":\"%2\","
-                 "\"use_ls\":\"%3\","
+                 "\"use_ngrt4nd\":\"%3\","
                  "\"mon_url\":\"%4\","
                  "\"ls_addr\":\"%5\","
                  "\"ls_port\":\"%6\","

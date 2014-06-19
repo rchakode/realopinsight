@@ -27,6 +27,7 @@
 
 #include "Base.hpp"
 #include "GuiUtils.hpp"
+#include "utilsCore.hpp"
 
 class SvNavigatorTree : public QTreeWidget
 {
@@ -39,6 +40,7 @@ public:
 
   void resetData(void) {m_items.clear();}
   void build(void);
+  QTreeWidgetItem* rootItem(void) {return m_items[ngrt4n::ROOT_ID];}
   QTreeWidgetItem* addNode(const NodeT &, const bool & = false );
   QTreeWidgetItem* findNodeItem(const QString& _nodeId);
   void removeNodeItem(const QString& _nodeId) {m_items.remove(_nodeId);}
@@ -55,7 +57,6 @@ private:
   QString m_selectedNode;
   CoreDataT* m_cdata;
   GuiTreeItemListT m_items;
-
   QTreeWidgetItem * createItem(const NodeT & _node);
 };
 

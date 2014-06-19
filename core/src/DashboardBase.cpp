@@ -38,6 +38,7 @@
 #include <iostream>
 #include <algorithm>
 #include <zmq.h>
+#include <cassert>
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -73,9 +74,8 @@ DashboardBase::DashboardBase(const QString& descriptionFile)
   : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
     m_cdata (new CoreDataT()),
     m_updateCounter(0),
-    m_settings (new Settings()),
     m_showOnlyTroubles(false),
-    m_errorState(false)
+    m_lastErrorState(false)
 {
   resetStatData();
 }
@@ -87,16 +87,18 @@ DashboardBase::~DashboardBase()
 
 void DashboardBase::initialize(Preferences* preferencePtr)
 {
-  m_errorState = false;
+  m_preferences = preferencePtr;
+  m_lastErrorState = false;
   if (! m_descriptionFile.isEmpty()) {
     Parser parser(m_descriptionFile, m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
     if (parser.process(true)) {
       buildTree();
       buildMap();
-      initSettings(preferencePtr);
+      initSettings(m_preferences);
     } else {
-      m_errorState = true;
+      m_lastErrorState = true;
+      m_lastErrorMsg = parser.lastErrorMsg();
     }
   }
 }
@@ -168,7 +170,9 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
   /* Now start doing the job */
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
-       end=m_cdata->cnodes.end(); cnode!=end; ++cnode)
+       end=m_cdata->cnodes.end();
+       cnode!=end;
+       ++cnode)
   {
     if (cnode->child_nodes.isEmpty()) {
       cnode->severity = ngrt4n::Unknown;
@@ -281,9 +285,9 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  QString toolTip = ngrt4n::getNodeToolTip(_node);
-  updateTree(_node, toolTip);
-  updateMap(_node, toolTip);
+  QString nodeToolTip = ngrt4n::getNodeToolTip(_node);
+  updateTree(_node, nodeToolTip);
+  updateMap(_node, nodeToolTip);
   updateChart();
   updateMsgConsole(_node);
   updateBpNode(_node.parent);
@@ -390,12 +394,11 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   QString toolTip = getNodeToolTip(*node);
   updateMap(*node, toolTip);
   updateTree(*node, toolTip);
-  if (node->id != ngrt4n::ROOT_ID) {
+  if (node->id != ngrt4n::ROOT_ID && ! node->parent.isEmpty()) {
     updateBpNode(node->parent);
     // FIXME: Q_EMIT hasToBeUpdate(node->parent);
     // Q_EMIT hasToBeUpdate(node->parent);
   }
-
 }
 
 void DashboardBase::processZbxReply(QNetworkReply* _reply, SourceT& src)
@@ -796,7 +799,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (preferencePtr->isSetSource(srcinfo.second)) {
-        if (m_settings->loadSource(*id, src) && allocSourceHandler(src)) {
+        if (preferencePtr->loadSource(*id, src) && allocSourceHandler(src)) {
           m_sources.insert(srcinfo.second, src);
         } else {
           src.id = *id;
@@ -855,7 +858,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
   {
     Q_FOREACH (const qint8& id, ids) {
       SourceT newsrc;
-      m_settings->loadSource(id, newsrc);
+      m_preferences->loadSource(id, newsrc);
       SourceListT::Iterator olddata = m_sources.find(id);
       if (olddata != m_sources.end()) {
         switch (olddata->mon_type) {
@@ -941,6 +944,14 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
 
 void DashboardBase::resetInterval()
 {
-  m_interval = 1000 * m_settings->updateInterval();
+  m_interval = 1000 * m_preferences->updateInterval();
   timerIntervalChanged(m_interval);
 }
+
+NodeT DashboardBase::rootNode(void)
+{
+  NodeListT::iterator root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+  assert(root != m_cdata->bpnodes.end());
+  return *root;
+}
+

@@ -34,10 +34,9 @@ class Parser : public QObject
 public:
   Parser(const QString& _config, CoreDataT* _cdata);
   virtual ~Parser();
-
   bool process(bool console);
   QString dotFile(void) const { return m_dotFile; }
-  QString lastError(void) const {return m_lastError;}
+  QString lastErrorMsg(void) const {return m_lastErrorMsg;}
 
 Q_SIGNALS:
   void errorOccurred(QString msg);
@@ -48,12 +47,13 @@ private:
   QString m_dotFile;
   QString m_config;
   CoreDataT* m_cdata;
-  QString m_lastError;
+  QString m_lastErrorMsg;
+  bool m_console;
 
   void updateNodeHierachy(QString& _graphContent);
   void saveCoordinatesFile(const QString& _content);
-  bool computeNodeCoordinates(void);
-  void computeNodeCoordinates(const QString& dotfile);
+  bool parseDotResult(void);
+  void parseDotResult(const QString& dotfile);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

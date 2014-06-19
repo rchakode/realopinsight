@@ -38,7 +38,7 @@ const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
 
-Settings::Settings(): QSettings(PROJECT.toLower(), APP_NAME.toLower().replace(" ", "-"))
+Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
   init();
 }
@@ -99,7 +99,7 @@ void Settings::setEntry(const QString& key, const QString& value)
   QSettings::setValue(key, value);
 }
 
-bool Settings::loadSource(const qint32& _idx, SourceT& _src)
+bool Settings::loadSource(qint32 _idx, SourceT& _src)
 {
   return setSource(QSettings::value(ngrt4n::sourceKey(_idx)).toString(), _src);
 }
@@ -121,7 +121,7 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
   _src.mon_type = jsHelper.getProperty("mon_type").toInt32();
   _src.mon_url = jsHelper.getProperty("mon_url").toString();
   _src.auth = jsHelper.getProperty("auth").toString();
-  _src.use_ngrt4nd = jsHelper.getProperty("use_ls").toInt32();
+  _src.use_ngrt4nd = jsHelper.getProperty("use_ngrt4nd").toInt32();
   _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
   _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
   _src.verify_ssl_peer = jsHelper.getProperty("verify_ssl_peer").toInt32();

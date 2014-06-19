@@ -75,7 +75,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_tree (new SvNavigatorTree(m_cdata)),
     m_msgConsole(new MsgConsole()),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
-    m_bxSourceSelection(new QComboBox()),
+    m_sourceSelectionBox(new QComboBox()),
     m_msgPane(new QTabWidget())
 {
   m_viewPanel->addTab(m_map.get(), tr("Map"));
@@ -122,8 +122,8 @@ void GuiDashboard::handleShowAbout(void)
 void GuiDashboard::toggleTroubleView(bool _toggled)
 {
   m_msgConsole->setEnabled(false);
-  m_showOnlyTroubles = _toggled;
-  if (m_showOnlyTroubles) {
+  DashboardBase::setShowOnlyTroubles(_toggled);
+  if (DashboardBase::showOnlyTroubles()) {
     m_msgConsole->clearNormalMsg();
   } else {
     for (auto it = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
@@ -173,8 +173,8 @@ void GuiDashboard::updateTree(const NodeT& _node, const QString& _tip)
 
 void GuiDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (!m_showOnlyTroubles
-      || (m_showOnlyTroubles && _node.severity != ngrt4n::Normal))
+  if (! DashboardBase::showOnlyTroubles()
+      || (DashboardBase::showOnlyTroubles() && _node.severity != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -196,8 +196,8 @@ void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const
 
 void GuiDashboard::centerGraphOnNode(const QString& _nodeId)
 {
-  if (!_nodeId.isEmpty()) DashboardBase::setSelectedNode(_nodeId);
-  m_map->centerOnNode(DashboardBase::selectedNode());
+  if (!_nodeId.isEmpty()) m_selectedNode = _nodeId;
+  m_map->centerOnNode(m_selectedNode);
 }
 
 void GuiDashboard::filterNodeRelatedMsg(void)
@@ -306,26 +306,27 @@ QTabWidget* GuiDashboard::builtMsgPane(void)
 
 void GuiDashboard::handleSettingsLoaded(void)
 {
-  m_bxSourceSelection->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  m_sourceSelectionBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   for (SourceListT::iterator it=m_sources.begin(),
        end = m_sources.end(); it != end; ++it)
   {
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-      case ngrt4n::Nagios:
-        it->icon = ":images/nagios-logo-n.png";
-        break;
-      case ngrt4n::Zabbix:
-        it->icon = ":images/zabbix-logo-z.png";
-        break;
-      case ngrt4n::Zenoss:
-        it->icon = ":images/zenoss-logo-o.png";
-        break;
-      default:
-        break;
+        case ngrt4n::Nagios:
+          it->icon = ":images/nagios-logo-n.png";
+          break;
+        case ngrt4n::Zabbix:
+          it->icon = ":images/zabbix-logo-z.png";
+          break;
+        case ngrt4n::Zenoss:
+          it->icon = ":images/zenoss-logo-o.png";
+          break;
+        default:
+          it->icon = "";
+          break;
       }
-      m_bxSourceSelection->addItem(QIcon(it->icon), it->id, QVariant(it->id));
+      m_sourceSelectionBox->addItem(QIcon(it->icon), it->id, QVariant(it->id));
     }
   }
   handleUpdateSourceUrl();
@@ -334,7 +335,7 @@ void GuiDashboard::handleSettingsLoaded(void)
 
 void GuiDashboard::handleSourceBxItemChanged(int index)
 {
-  int idx = extractSourceIndex(m_bxSourceSelection->itemData(index).toString());
+  int idx = extractSourceIndex(m_sourceSelectionBox->itemData(index).toString());
   SourceListT::Iterator src = m_sources.find(idx);
   if (src != m_sources.end()) {
     changeBrowserUrl(src->id, src->mon_url, src->icon);
@@ -381,7 +382,7 @@ void GuiDashboard::addEvents(void)
   connect(m_viewPanel.get(), SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
   connect(m_map.get(), SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString&, const bool &, const qint32 &)));
   connect(m_tree.get(), SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
-  connect(m_bxSourceSelection.get(), SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
+  connect(m_sourceSelectionBox.get(), SIGNAL(activated(int)), this, SLOT(handleSourceBxItemChanged(int)));
   connect(this, SIGNAL(settingsLoaded(void)), this, SLOT(handleSettingsLoaded(void)));
   connect(this, SIGNAL(updateSourceUrl(void)), this, SLOT(handleUpdateSourceUrl(void)));
 }

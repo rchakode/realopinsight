@@ -172,13 +172,13 @@ void MainWindow::render(void)
 {
   show();
   m_dashboard->initialize(m_preferences);
-  if (! m_dashboard->errorState()) {
+  if (! m_dashboard->lastErrorState()) {
     m_dashboard->scalPaneContentsToViewPort();
     QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
                                 .arg(m_dashboard->rootNode().name, APP_NAME));
     handleRefresh();
   } else {
-    ngrt4n::alert(m_dashboard->lastError());
+    ngrt4n::alert(m_dashboard->lastErrorMsg());
   }
 }
 

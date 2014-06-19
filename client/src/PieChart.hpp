@@ -27,16 +27,14 @@
 
 #include "StatsLegend.hpp"
 #include "GuiUtils.hpp"
+#include "ChartBase.hpp"
 
-class PieChart : public  QWidget
+class PieChart : public QWidget, public ChartBase
 {
 public:
   PieChart(const QRectF &  = QRectF(50, 50, 150, 100), QWidget* = 0 );
   virtual ~PieChart();
   QRectF getBoundingRect() {return m_boundingRect ; }
-  void update(const CheckStatusCountT & m_statsData, qint32 _count, QString& toolTip);
-  void setStatsData(const CheckStatusCountT& statsData) {m_statsData = statsData;}
-  void setNbStatEntries(qint32 count) {m_nbStatsEntries = count;}
 
 protected:
   virtual void paintEvent(QPaintEvent*);
@@ -44,8 +42,6 @@ protected:
 private:
   QRectF m_boundingRect;
   StatsLegend* m_legend;
-  CheckStatusCountT m_statsData;
-  qint32 m_nbStatsEntries;
 };
 
 #endif /* PieChart_HPP_ */

@@ -63,11 +63,11 @@ public:
   virtual ~ServiceEditor();
 
   void layoutEditorComponents(void);
-  void setContent(const NodeListT& nodes, const QString& _nid);
-  void setContent(const NodeT& _node);
-  void setContent(NodeListT::const_iterator _nit) {setContent(*_nit);}
-  bool updateNode(NodeListT&, const QString&);
-  bool updateNode(NodeListT::iterator& _node_it);
+  void fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId);
+  void fillFormWithNodeContent(const NodeT& node);
+  void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
+  bool updateNodeContent(NodeListT&, const QString&);
+  bool updateNodeContent(NodeListT::iterator& _node_it);
   void setCheckListField(const ChecksT&);
   void setEnableFields(const bool&);
   void loadStatusFile(const QString&);

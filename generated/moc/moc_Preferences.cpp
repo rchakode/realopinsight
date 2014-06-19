@@ -22,7 +22,7 @@ static const uint qt_meta_data_Preferences[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       8,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -35,11 +35,14 @@ static const uint qt_meta_data_Preferences[] = {
       66,   62,   12,   12, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      89,   12,   12,   12, 0x09,
-     104,   12,   12,   12, 0x09,
-     119,   12,   12,   12, 0x09,
-     133,   12,   12,   12, 0x09,
-     155,   12,  148,   12, 0x09,
+      96,   12,   89,   12, 0x0a,
+     127,  118,  113,   12, 0x0a,
+     155,  118,  113,   12, 0x0a,
+     184,   12,   12,   12, 0x09,
+     199,   12,   12,   12, 0x09,
+     214,   12,   12,   12, 0x09,
+     228,   12,   12,   12, 0x09,
+     253,  243,   12,   12, 0x09,
 
        0        // eod
 };
@@ -47,9 +50,13 @@ static const uint qt_meta_data_Preferences[] = {
 static const char qt_meta_stringdata_Preferences[] = {
     "Preferences\0\0urlChanged(QString)\0"
     "sourcesChanged(QList<qint8>)\0msg\0"
-    "errorOccurred(QString)\0applyChanges()\0"
-    "handleCancel()\0addAsSource()\0"
-    "deleteSource()\0qint32\0updateInterval()\0"
+    "errorOccurred(QString)\0qint32\0"
+    "updateInterval()\0bool\0_id,_src\0"
+    "loadSource(qint32,SourceT&)\0"
+    "loadSource(QString,SourceT&)\0"
+    "applyChanges()\0handleCancel()\0"
+    "addAsSource()\0deleteSource()\0_interval\0"
+    "emitTimerIntervalChanged(qint32)\0"
 };
 
 void Preferences::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -61,12 +68,17 @@ void Preferences::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 0: _t->urlChanged((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 1: _t->sourcesChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
         case 2: _t->errorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 3: _t->applyChanges(); break;
-        case 4: _t->handleCancel(); break;
-        case 5: _t->addAsSource(); break;
-        case 6: _t->deleteSource(); break;
-        case 7: { qint32 _r = _t->updateInterval();
+        case 3: { qint32 _r = _t->updateInterval();
             if (_a[0]) *reinterpret_cast< qint32*>(_a[0]) = _r; }  break;
+        case 4: { bool _r = _t->loadSource((*reinterpret_cast< qint32(*)>(_a[1])),(*reinterpret_cast< SourceT(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 5: { bool _r = _t->loadSource((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< SourceT(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 6: _t->applyChanges(); break;
+        case 7: _t->handleCancel(); break;
+        case 8: _t->addAsSource(); break;
+        case 9: _t->deleteSource(); break;
+        case 10: _t->emitTimerIntervalChanged((*reinterpret_cast< qint32(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -104,9 +116,9 @@ int Preferences::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 11;
     }
     return _id;
 }

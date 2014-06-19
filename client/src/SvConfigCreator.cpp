@@ -29,10 +29,10 @@
 #include "GuiDashboard.hpp"
 
 namespace {
-  const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
-  const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
-  const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
-  const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
+const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
+const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
+const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
+const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
 }
 SvCreator::SvCreator(const qint32& _userRole)
   : m_userRole (_userRole),
@@ -114,7 +114,8 @@ void SvCreator::open(void)
                                                                                                ZNS_SOURCE,
                                                                                                MULTI_SOURCES)
                                       );
-  if (!path.isNull() && !path.isEmpty()) loadFile(path);
+  if (! path.isNull() && ! path.isEmpty())
+    loadFile(path);
 }
 
 
@@ -125,13 +126,14 @@ void SvCreator::loadFile(const QString& _path)
   } else {
     ngrt4n::clear(*m_cdata);
     Parser parser(_path, m_cdata);
-    connect(&parser, SIGNAL(errorOccurred(QString)),this, SLOT(handleErrorOccurred(QString)));
     if (! parser.process(false)) {
-      ngrt4n::alert(tr("Unable to open the file '%1'").arg(_path));
+      ngrt4n::alert(parser.lastErrorMsg());
       exit(1);
     } else {
+      m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+      m_editor->fillFormWithNodeContent(*m_root);
       m_tree->build();
-      //m_tree->update();
+      fillEditorFromService(m_tree->rootItem());
       m_activeConfig = ngrt4n::getAbsolutePath(_path);
       setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
     }
@@ -152,10 +154,10 @@ void SvCreator::newView(void)
     ngrt4n::clear(*m_cdata);
     m_tree->resetData();
     NodeT* node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
-    m_cdata->root = m_cdata->bpnodes.insert(node->id, *node);
+    m_root = m_cdata->bpnodes.insert(node->id, *node);
     m_tree->addNode(*node);
     m_tree->update();
-    m_editor->setContent(*node);
+    m_editor->fillFormWithNodeContent(*node);
     m_selectedNode = node->id;
     m_hasLeftUpdates = true;
     m_activeConfig.clear();
@@ -167,9 +169,7 @@ void SvCreator::newView(void)
 void SvCreator::newNode(void)
 {
   static int count = 1;
-  NodeT* node = createNode(ngrt4n::genNodeId(),
-                           tr("sub service %1").arg(QString::number(count)),
-                           m_selectedNode);
+  NodeT* node = createNode(ngrt4n::genNodeId(), tr("sub service %1").arg(QString::number(count)), m_selectedNode);
   insertFromSelected(*node);
   ++count;
 }
@@ -219,11 +219,11 @@ void SvCreator::deleteNode(void)
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec())
   {
-    case QMessageBox::Yes:
-      deleteNode(m_selectedNode);
-      break;
-    default:
-      break;
+  case QMessageBox::Yes:
+    deleteNode(m_selectedNode);
+    break;
+  default:
+    break;
   }
 }
 
@@ -290,7 +290,7 @@ void SvCreator::pasteFromSelected(void)
 
 void SvCreator::save(void)
 {
-  if (!m_selectedNode.isEmpty()) {
+  if (! m_selectedNode.isEmpty()) {
     fillEditorFromService(m_tree->findNodeItem(m_selectedNode));
   }
   if (m_activeConfig.isEmpty()) {
@@ -346,16 +346,16 @@ int SvCreator::treatCloseAction(const bool& _close)
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
       mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
       switch (mbox.exec()) {
-        case QMessageBox::Yes:
-          save();
-          break;
-        case QMessageBox::Cancel:
-          enforceClose = false;
-          ret = 1;
-          break;
-        case QMessageBox::Discard:
-        default:
-          break;
+      case QMessageBox::Yes:
+        save();
+        break;
+      case QMessageBox::Cancel:
+        enforceClose = false;
+        ret = 1;
+        break;
+      case QMessageBox::Discard:
+      default:
+        break;
       }
     }
     if (enforceClose) qApp->quit();
@@ -367,8 +367,11 @@ int SvCreator::treatCloseAction(const bool& _close)
 void SvCreator::handleSelectedNodeChanged(void)
 {
   QList<QTreeWidgetItem*> items = m_tree->selectedItems();
-  if (items.length())
+  if (items.length()) {
     fillEditorFromService(*(items.begin()));
+  } else {
+    fillEditorFromService(m_tree->rootItem());
+  }
 }
 
 
@@ -413,7 +416,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
       if (node->type == NodeType::AlarmNode) {
         //TODO: A bug has been reported
         node->child_nodes.clear();
-        if (m_editor->updateNode(node)) {
+        if (m_editor->updateNodeContent(node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
@@ -425,7 +428,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         m_editor->typeField()->setCurrentIndex(0);
         ngrt4n::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
       } else {
-        if (m_editor->updateNode(node)) {
+        if (m_editor->updateNodeContent(node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
@@ -452,7 +455,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
-    if (m_editor->updateNode(node)) {
+    if (m_editor->updateNodeContent(node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");
@@ -460,7 +463,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
     }
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) m_editor->setContent(node);
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) m_editor->fillFormWithNodeContent(node);
 }
 
 
@@ -468,7 +471,7 @@ void SvCreator::handleReturnPressed(void)
 {
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
-    if (m_editor->updateNode(node)) {
+    if (m_editor->updateNodeContent(node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");
@@ -486,8 +489,8 @@ void SvCreator::recordData(const QString& _path)
     statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
     return;
   }
-  m_cdata->root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-  if (m_cdata->root == m_cdata->bpnodes.end()) {
+  m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+  if (m_root == m_cdata->bpnodes.end()) {
     file.close();
     QString msg =  tr("The hierarchy does not have root");
     ngrt4n::alert(msg);
@@ -496,7 +499,7 @@ void SvCreator::recordData(const QString& _path)
     QTextStream ofile(&file);
     ofile << "<?xml version=\"1.0\"?>\n"
              "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
-    recordNode(ofile,*m_cdata->root);
+    recordNode(ofile,*m_root);
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
       if (service.id == ngrt4n::ROOT_ID || service.parent.isEmpty())
         continue;

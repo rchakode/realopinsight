@@ -28,9 +28,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_VERSION=3.0.0b1
+REALOPINSIGHT_VERSION=3.0.0
 VERSION = "-$${REALOPINSIGHT_VERSION}"
-
 
 win32 {
 INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
@@ -77,7 +76,8 @@ HEADERS += \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
     core/src/global.hpp \
-    core/src/utilsCore.hpp
+    core/src/utilsCore.hpp \
+    core/src/ChartBase.hpp
 
 
 SOURCES += \
@@ -90,11 +90,11 @@ SOURCES += \
     core/src/ZmqSocket.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
-    core/src/utilsCore.cpp
+    core/src/utilsCore.cpp \
+    core/src/ChartBase.cpp
 
 gui-base {
 QT += svg gui webkit
-DEFINES *= "PACKAGE_NAME='\"Workstation\"'"
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
@@ -126,26 +126,25 @@ SOURCES	+= client/src/Auth.cpp \
 
 dist {
 SOURCES	+=
-TARGET = RealOpInsight-Workstation
+TARGET = realopinsight-workstation
 }
 
 manager {
 SOURCES	+= client/src/ngrt4n-manager.cpp
-TARGET = ngrt4n-manager
+TARGET = realopinsight-manager
 }
 
 oc {
 SOURCES	+= client/src/ngrt4n-oc.cpp
-TARGET = ngrt4n-oc
+TARGET = realopinsight-oc
 }
 
 editor {
 SOURCES	+= client/src/ngrt4n-editor.cpp
-TARGET = ngrt4n-editor
+TARGET = realopinsight-editor
 }
 
 web-base {
-DEFINES *= "PACKAGE_NAME='\"Ultimate Edition\"'"
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
@@ -198,6 +197,7 @@ webd {
 }
 
 web-fcgi {
+  DEFINES *= REALOPINSIGHT_WEB_FASTCGI
   TARGET = realopinsight.fcgi
   LIBS += -lwtfcgi
 }
@@ -211,12 +211,14 @@ MAN.path = /usr/share/man/man1
 }
 
 TARGET.files = $${TARGET}
-MAN.files = doc/man/ngrt4n-manager.1.gz doc/man/ngrt4n-oc.1.gz doc/man/ngrt4n-editor.1.gz
+MAN.files = doc/man/realopinsight-manager.1.gz doc/man/realopinsight-oc.1.gz doc/man/realopinsight-editor.1.gz
 INSTALLS += TARGET MAN
 
 
 INCLUDEPATH += core/src/
 RESOURCES += ngrt4n.qrc
+
+DEFINES *= "BUILD_DATE=\"`date '+%s'`\""
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
@@ -225,4 +227,5 @@ DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "RELEASE_NAME='\"Eliana\"'"
 DEFINES *= "RELEASE_YEAR='\"2014\"'"
 DEFINES *= "BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
-DEFINES *= "GET_HELP_URL='\"http://realopinsight.com/library/getting-started\"'"
+DEFINES *= "GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
+DEFINES *= "REALOPINSIGHT_WWW_ROOT='\"REALOPINSIGHT_WWW_ROOT_VALUE\"'"

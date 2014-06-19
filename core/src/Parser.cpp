@@ -27,8 +27,6 @@
 #include "utilsCore.hpp"
 #include <QObject>
 
-using namespace std;
-
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
@@ -53,16 +51,16 @@ bool Parser::process(bool console)
 
   QFile file(m_config);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    m_lastError = QObject::tr("Unable to open the file %1").arg(m_config);
-    Q_EMIT errorOccurred(m_lastError);
+    m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_config);
+    Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
     return false;
   }
 
   if (!xmlDoc.setContent(&file)) {
     file.close();
-    m_lastError = QObject::tr("Error while parsing the file %1").arg(m_config);
-    Q_EMIT errorOccurred(m_lastError);
+    m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_config);
+    Q_EMIT errorOccurred(m_lastErrorMsg);
     return false;
   }
   file.close(); // The content of the file is already in memory
@@ -88,7 +86,7 @@ bool Parser::process(bool console)
     node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-
+    node.check.status = -1;
     if (node.icon.isEmpty()) {
       node.icon = ngrt4n::DEFAULT_ICON;
     }
@@ -100,14 +98,12 @@ bool Parser::process(bool console)
       QString srcid = ngrt4n::getSourceIdFromStr(info.first);
 
       if (srcid.isEmpty()) {
-        QString srcid = ngrt4n::sourceId(0);
+        srcid = ngrt4n::sourceId(0);
         if (console) {
           node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
         }
-        m_cdata->sources.insert(srcid);
-      } else {
-        m_cdata->sources.insert(srcid);
       }
+      m_cdata->sources.insert(srcid);
       m_cdata->cnodes.insert(node.id, node);
     } else { // means a BP node
       node.visibility = ngrt4n::Visible | ngrt4n::Expanded;
@@ -115,26 +111,24 @@ bool Parser::process(bool console)
     }
   }
 
-  m_cdata->root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-  if (m_cdata->root == m_cdata->bpnodes.end()) {
-    Q_EMIT errorOccurred(tr("The configuration is not valid, there is no root service !"));
-    return false;
-  }
-
   updateNodeHierachy(graphContent);
   graphContent = m_dotHeader + graphContent;
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
 
-  return computeNodeCoordinates();
+  if (console)
+    return parseDotResult();
+  else
+    return true;
 }
 
 void Parser::updateNodeHierachy(QString& _graphContent)
 {
   _graphContent = "\n";
-  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin();
-       node != m_cdata->bpnodes.end(); ++node)
-  {
+  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),
+       end = m_cdata->bpnodes.end();
+       node != end; ++node) {
+
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
@@ -150,9 +144,9 @@ void Parser::updateNodeHierachy(QString& _graphContent)
     }
   }
 
-  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
-       node != end; ++node)
-  {
+  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(),
+       end = m_cdata->cnodes.end();
+       node != end; ++node) {
     QString nname = node->name;
     _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
   }
@@ -163,8 +157,8 @@ void Parser::saveCoordinatesFile(const QString& _content)
   m_dotFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(m_dotFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    m_lastError = QObject::tr("Unable into write the file %1").arg(m_dotFile);
-    Q_EMIT errorOccurred(m_lastError);
+    m_lastErrorMsg = QObject::tr("Unable into write the file %1").arg(m_dotFile);
+    Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
     exit(1);
   }
@@ -173,7 +167,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
   file.close();
 }
 
-bool Parser::computeNodeCoordinates(void)
+bool Parser::parseDotResult(void)
 {
   bool error = false;
   auto process = std::unique_ptr<QProcess>(new QProcess());
@@ -182,10 +176,10 @@ bool Parser::computeNodeCoordinates(void)
   int exitCode = process->execute("dot", arguments);
   process->waitForFinished(60000);
   if (!exitCode) {
-    computeNodeCoordinates(plainDotFile);
+    parseDotResult(plainDotFile);
   } else {
-    m_lastError = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
-    Q_EMIT errorOccurred(m_lastError);
+    m_lastErrorMsg = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
+    Q_EMIT errorOccurred(m_lastErrorMsg);
     error = true;
   }
   process.reset(NULL);
@@ -193,7 +187,7 @@ bool Parser::computeNodeCoordinates(void)
   return ! error;
 }
 
-void Parser::computeNodeCoordinates(const QString& _plainDot)
+void Parser::parseDotResult(const QString& _plainDot)
 {
   QStringList splitedLine;
   QFile qfile(_plainDot);
@@ -219,6 +213,7 @@ void Parser::computeNodeCoordinates(const QString& _plainDot)
           node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toFloat() * YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
+        // multiInsert since a node can have several childs
         m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
       } else if (splitedLine[0] == "stop") {
         break;

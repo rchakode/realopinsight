@@ -54,9 +54,9 @@ public:
   void setTimerId(qint32 id) {m_timerId = id;}
   qint32 timerId(void) const {return m_timerId;}
   qint32 timerInterval(void) const {return m_interval;}
-  NodeT& rootNode(void) const {return *(m_cdata->root);}
-  bool errorState() const {return m_errorState;}
-  QString lastError(void) const {return m_lastError;}
+  NodeT rootNode(void);
+  bool lastErrorState() const {return m_lastErrorState;}
+  QString lastErrorMsg(void) const {return m_lastErrorMsg;}
 
 public Q_SLOTS:
   void runMonitor();
@@ -73,8 +73,14 @@ public Q_SLOTS:
   void processRpcError(QNetworkReply::NetworkError code, const SourceT& src);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
-  void handleErrorOccurred(QString msg) {m_lastError  = msg;}
+  void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
   virtual void initialize(Preferences* preferencePtr);
+  CoreDataT* cdata(void) {return m_cdata;}
+  qint32 userRole(void) const {return m_userRole;}
+  bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
+  void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
+  SourceListT sources(void) {return m_sources;}
+  int firstSrcIndex(void) {return m_firstSrcIndex;}
 
 Q_SIGNALS:
   void hasToBeUpdate(QString);
@@ -84,23 +90,7 @@ Q_SIGNALS:
   void updateSourceUrl(void);
   void timerIntervalChanged(qint32 interval);
   void errorOccurred(QString msg);
-
-protected:
-  QString m_descriptionFile;
-  CoreDataT* m_cdata;
-  qint64 m_updateCounter;
-  QString m_selectedNode;
-  qint32 m_userRole;
-  qint32 m_interval;
-  qint32 m_timerId;
-  Settings* m_settings;
-  QSize m_msgConsoleSize;
-  bool m_showOnlyTroubles;
-  SourceListT m_sources;
-  NodeListIteratorT m_root;
-  int m_firstSrcIndex;
-  bool m_errorState;
-  QString m_lastError;
+  void dashboardLinkSelected(void);
 
 protected:
   void computeStatusInfo(NodeT& _node, const SourceT& src);
@@ -115,7 +105,24 @@ protected:
   virtual void updateChart(void) = 0;
   virtual void updateEventFeeds(const NodeT& node) = 0;
 
-private:
+protected:
+  QString m_descriptionFile;
+  CoreDataT* m_cdata;
+  qint64 m_updateCounter;
+  QString m_selectedNode;
+  qint32 m_userRole;
+  qint32 m_interval;
+  qint32 m_timerId;
+  QSize m_msgConsoleSize;
+  bool m_showOnlyTroubles;
+  SourceListT m_sources;
+  NodeListIteratorT m_root;
+  int m_firstSrcIndex;
+  bool m_lastErrorState;
+  QString m_lastErrorMsg;
+  Preferences* m_preferences;
+
+protected:
   void resetInterval(void);
   void updateCNodes(const CheckT & check, const SourceT& src);
   QStringList getAuthInfo(int srcId);

@@ -57,7 +57,7 @@ public:
   void scalPaneContentsToViewPort(void) const;
   QList<QTreeWidgetItem*> getTreeSelectedItem() const {return m_tree->selectedItems();}
   QGraphicsItem* getMapNodeAt(const QPoint& pos) const {return m_map->nodeAtGlobalPos(pos);}
-  QComboBox* getSourceSelectionBox(void) const {return m_bxSourceSelection.get();}
+  QComboBox* getSourceSelectionBox(void) const {return m_sourceSelectionBox.get();}
   MsgConsole* getFilteredMsgConsole(void) const {return m_filteredMsgConsole.get();}
   bool hideChart(void);
   void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
@@ -82,7 +82,6 @@ public Q_SLOTS:
   void handleSourceBxItemChanged(int index);
   void handleUpdateSourceUrl(void);
   void handleSettingsLoaded(void);
-  //  void updateDashboard(const NodeT & _node);
 
 Q_SIGNALS:
   void sortEventConsole(void);
@@ -118,7 +117,7 @@ private:
   std::unique_ptr<SvNavigatorTree> m_tree;
   std::unique_ptr<MsgConsole> m_msgConsole;
   std::unique_ptr<QSystemTrayIcon> m_trayIcon;
-  std::unique_ptr<QComboBox> m_bxSourceSelection;
+  std::unique_ptr<QComboBox> m_sourceSelectionBox;
   std::unique_ptr<QTabWidget> m_msgPane;
 
   void addEvents(void);
