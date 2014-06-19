@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.3.0beta1
+VERSION_=2.3.0
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
@@ -36,7 +36,7 @@ DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "RELEASE_NAME='\"Briator, b1\"'"
+DEFINES *= "RELEASE_NAME='\"Briator\"'"
 DEFINES *= "RELEASE_YEAR='\"2013\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
