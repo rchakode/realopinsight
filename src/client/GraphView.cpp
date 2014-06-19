@@ -64,6 +64,13 @@ IconMapT GraphView::nodeIcons() {
   icons["Database Server"] = ":/images/db-server.png";
   icons["Process"] = ":/images/process.png";
   icons["Logfile"] = ":/images/log.png";
+  icons["Network Bandwith"] = ":/images/network-usage.png";
+  icons["CPU"] = ":/images/cpu.png";
+  icons["CPU Load"] = ":/images/performance-level.png";
+  icons["Memory"] = ":/images/memory.png";
+  icons["Memory Usage"] = ":/images/memory-usage.png";
+  icons["Resource Utilization"] = ":/images/resource-usage.png";
+  icons["Performance"] = ":/images/performance.png";
   return icons;
 }
 
@@ -199,7 +206,7 @@ bool GraphView::hideChart(void)
 }
 
 
-bool GraphView::load(const QString& _dotFile,
+void GraphView::load(const QString& _dotFile,
                      const NodeListT& _bpnodes,
                      const NodeListT& _cnodes)
 {
@@ -213,12 +220,10 @@ bool GraphView::load(const QString& _dotFile,
       mscene->setSceneRect(mscene->itemsBoundingRect());
     } else {
       utils::alert(tr("The graph engine exited with the code %1").arg(exitCode));
-      qDebug() << tr("The graph engine exited with the code %1").arg(exitCode);
       exit(exitCode);
     }
 
   dotParser.reset(NULL);
-  return false;
 }
 
 void GraphView::drawMap(const NodeListT& _bpnodes, const NodeListT& _cnodes)
@@ -389,7 +394,7 @@ void GraphView::capture(void)
   QPixmap pixmap(size());
   QPainter painter(&pixmap);
   QString fileName= QFileDialog::getSaveFileName(this,
-                                                 tr("Select the image destination - ") + APP_NAME,
+                                                 tr("Select the image destination - %1").arg(APP_NAME),
                                                  ".",
                                                  tr("PNG files (*.png);; All files (*)"));
   QFileInfo fileInfo(fileName);

@@ -27,6 +27,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 const int MonitorBroker::DefaultPort = 1983 ;
 const int MonitorBroker::DefaultUpdateInterval = 300 ;
@@ -45,9 +46,7 @@ string MonitorBroker::getInfOfService(const string & _sid)
       loadNagiosCollectedData(statusFile, services) ;
       lastUpdate = curTime ;
     }
-
   ChecksT::iterator it = services.find(_sid) ;
-
   if (it == services.end() ) {
       return "{\"return_code\":\"-1\",\"message\":\"ERROR: Unknow service '" + _sid + "'\"}" ;
     }
@@ -111,8 +110,8 @@ bool MonitorBroker::loadNagiosCollectedData(const string & _sfile, ChecksT & _ch
               info.alarm_msg = value;
             }
         }
+     //std::transform(info.id.begin(), info.id.end(), info.id.begin(), ::tolower);
       _checks[info.id] = info;
-
     }
   stFileStream.close() ;
 

@@ -49,7 +49,7 @@ public:
   void postRequest(const qint32& reqId, const QStringList& params);
   void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; mrequestHandler->setUrl(QUrl(apiUri));}
   inline QString getApiUri(void) const {return apiUri;}
-  inline void updateTrid(const QString& apiv) {mtrid = (apiv.startsWith("1.3"))? TriggerV18 : Trigger;}
+  inline void updateTrid(const QString& apiv) {mtrid = (apiv.startsWith("1"))? TriggerV18 : Trigger;}
   inline int getTrid(void) const {return mtrid;}
 
 public slots:

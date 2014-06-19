@@ -54,8 +54,6 @@ MsgConsole::MsgConsole(QWidget * _parent)
   QTableView::setSelectionBehavior(QAbstractItemView::SelectRows);
   QTableView::setSortingEnabled(true);
   QTableView::setEditTriggers(QAbstractItemView::NoEditTriggers);
-  QPoint emFontSize(QPoint(QFontMetrics(QFont()).charWidth("m", 0), QFontMetrics(QFont()).height()));
-  mrHeight = emFontSize.y() + ROW_MARGIN;
   connect(horizontalHeader(),SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
 }
 
@@ -85,7 +83,6 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
       index = 0;
       mmodel->insertRow(index);
       mmodel->setRowCount(nbRows + 1);
-      QTableView::setRowHeight(index, mrHeight);
       mmodel->setItem(index, 0, new QStandardItem(itemText));
       mmodel->setItem(index, 1, new QStandardItem(itemText));
       mmodel->setItem(index, 2, new QStandardItem(itemText));
@@ -121,21 +118,43 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
       mmodel->item(index, 4)->setBackground(StatsLegend::HIGHLIGHT_COLOR);
 
     }
-  itemText =QString(_node.check.alarm_msg.c_str());
-  mmodel->item(index, 4)->setText(itemText);
-  mmodel->item(index, 4)->setData(itemText, Qt::UserRole);
+  mmodel->item(index, 4)->setText(_node.actual_msg);
+  mmodel->item(index, 4)->setData(_node.actual_msg, Qt::UserRole);
 }
 
-void MsgConsole::updateColumnWidths(const QSize& _windowSize, const bool& _resizeWindow)
+void MsgConsole::clearMsg(const NodeT& _node)
+{
+  qint32 index = 0;
+  qint32 nbRows = mmodel->rowCount();
+  while (index < nbRows &&
+         mmodel->item(index, ID_COLUMN)->data(Qt::UserRole) != _node.id) index++;
+  if (index < nbRows)
+    mmodel->removeRow(index);
+}
+
+void MsgConsole::clearNormalMsg(void)
+{
+  qint32 index = 0;
+  qint32 nbRows = mmodel->rowCount();
+  while (index < nbRows) {
+      if (mmodel->item(index, 1)->text() == utils::criticityToText(MonitorBroker::Normal)) {
+          mmodel->removeRow(index);
+          nbRows--;
+        } else {
+          index++;
+        }
+    }
+}
+
+void MsgConsole::updateEntriesSize(const QSize& _windowSize, const bool& _resizeWindow)
 {
   if (_resizeWindow) window()->resize(_windowSize);
   QTableView::resizeColumnsToContents();
+  QTableView::resizeRowsToContents();
   if(mmodel->rowCount()) {
-      qint32 msgWidth = QTableView::width() - (QTableView::columnWidth(0)
-                                               +QTableView::columnWidth(1)
-                                               +QTableView::columnWidth(2)
-                                               +QTableView::columnWidth(3));
-      QTableView::setColumnWidth(4, msgWidth);
+      QTableView::setColumnWidth(4, QTableView::width() - (QTableView::columnWidth(0)
+                                                           +QTableView::columnWidth(1)
+                                                           +QTableView::columnWidth(2)
+                                                           +QTableView::columnWidth(3)));
     }
-
 }

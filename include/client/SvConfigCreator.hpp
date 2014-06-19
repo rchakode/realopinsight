@@ -48,8 +48,11 @@ public:
   QSize sizeHint() const {return QSize(796, 640);}
 
 public slots:
-  void newBusinessView(void);
+  void newView(void);
   void newNode(void);
+  void insertFromSelected(const NodeT& node);
+  void copySelected(void);
+  void pasteFromSelected(void);
   void deleteNode(void);
   void deleteNode(const QString &);
   void open(void);
@@ -78,12 +81,13 @@ private:
   CoreDataT* mcoreData;
   QSplitter* mainSplitter;
   MenuListT mmenuList;
-  SubMenuListT msubMenuList;
+  SubMenuListT msubMenus;
   SvNavigatorTree* mtree;
   ServiceEditor* meditor;
   QMenuBar* mmenuBar;
   QToolBar* mtoolBar;
   QMenu* mnodeContextMenu;
+  NodeT* mclipboardData;
 
   void loadFile(const QString &);
   void recordData(const QString &);
@@ -93,6 +97,7 @@ private:
   void unloadMenu(void);
   void addEvents(void);
   void resize(void);
+  NodeT* createNode(const QString& id, const QString& label, const QString& parent);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

@@ -30,13 +30,16 @@
 #include <unistd.h>
 
 namespace utils {
-  inline void delay(const qint32& d){ sleep(d);}
-  inline std::string getCtime(const QString& dt, const QString& format){
-    return QDateTime::fromString(dt, format).toString().toStdString();}
-  inline std::string getCtime(const quint32& tt){
-    return QDateTime::fromTime_t(tt).toString().toStdString();}
-  inline void alert(const QString & msg) {
-    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);}
+  inline void delay(const qint32& d)
+  { sleep(d); }
+  inline std::string getCtime(const QString& dt, const QString& format)
+  { return QDateTime::fromString(dt, format).toString().toStdString(); }
+  inline std::string getCtime(const quint32& tt)
+  { return QDateTime::fromTime_t(tt).toString().toStdString(); }
+  inline void alert(const QString & msg)
+  { QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes); }
+  inline QString genNodeId()
+  { return "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz"); }
   QString criticityToText(const qint32& _status);
   void clear(CoreDataT& data);
   QString getAbsolutePath(const QString& _path);
@@ -53,6 +56,8 @@ namespace utils {
                 const NodeListT& cnodes,
                 const QString& nodeId,
                 NodeListT::const_iterator& node);
+  QSplashScreen* infoScreen(const QString & msg="");
+  QString getWelcomeMsg(const QString& utility);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

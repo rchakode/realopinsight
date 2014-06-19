@@ -33,7 +33,7 @@
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include "Socket.hpp"
+#include "ZmqSocket.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
 
@@ -50,7 +50,7 @@ public:
               QWidget* = 0);
   virtual ~SvNavigator();
   void load(const QString& _file = "");
-  void resize(void);
+  void resizeDashboard(void);
   static StringMapT propRules();
   static StringMapT calcRules();
   static QString getNodeToolTip(const NodeT& _node);
@@ -58,6 +58,7 @@ public:
 public slots:
   void startMonitor();
   int runNagiosMonitor(void);
+  int runLsMonitor(void);
   void prepareDashboardUpdate(void);
   void updateBpNode(const QString& _node);
   void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
@@ -72,6 +73,9 @@ public slots:
   void handleChangeMonitoringSettingsAction(void);
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
+  void toggleFullScreen(bool _toggled);
+  void toggleTroubleView(bool _toggled);
+  void toggleIncreaseMsgFont(bool _toggled);
   void processZbxReply(QNetworkReply* reply);
   void processZnsReply(QNetworkReply* reply);
   void processRpcError(QNetworkReply::NetworkError code);
@@ -102,11 +106,10 @@ private:
   QSplitter* mmainSplitter;
   QSplitter* mrightSplitter;
   QTabWidget* mviewPanel;
-  QTabWidget* mmsgConsolePanel;
   WebKit* mbrowser;
   GraphView* mmap;
   SvNavigatorTree* mtree;
-  Preferences* mprefWindow;
+  Preferences* mpreferences;
   Preferences* mchangePasswdWindow;
   MsgConsole* mmsgConsole;
   QMenu* mnodeContextMenu;
@@ -124,8 +127,9 @@ private:
   bool mupdateSucceed;
   ZnsHelper* mznsHelper;
   bool misLogged;
-  QString mlastError;
+  QString mlastErrorMsg;
   QSystemTrayIcon* mtrayIcon;
+  bool mshowOnlyTroubles;
 
   void addEvents(void);
   void loadMenus(void);
@@ -137,15 +141,16 @@ private:
   void computeStatusInfo(NodeT& _node);
   void updateDashboard(NodeListT::iterator& _node);
   void updateDashboard(const NodeT & _node);
-  void updateCNodes(const MonitorBroker::CheckT & check);
+  void updateCNodes(const CheckT & check);
   void finalizeDashboardUpdate(const bool& enable=true);
   void updateStatusBar(const QString& msg);
   QStringList getAuthInfo(void);
   void openRpcSession(void);
   void closeRpcSession(void);
   void postRpcDataRequest(void);
-  void updateDashboardOnUnknown(const QString& msg);
+  void updateDashboardOnUnknown();
   void updateTrayInfo(const NodeT& _node);
+  QTabWidget* createMsgConsole();
 };
 
 #endif /* SVNAVIGATOR_HPP */

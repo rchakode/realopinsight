@@ -30,6 +30,25 @@
 #include <QtWebKit>
 #include <QSettings>
 
+/* TODO: Logging
+#define LOGFILE QDir::tempPath()%"/realopinsight.log"
+#define SETUP_LOGGING() {\
+  QsLogging::Logger& logger = QsLogging::Logger::instance(); \
+  logger.setLoggingLevel(QsLogging::TraceLevel); \
+  const QString sLogPath = LOGFILE; \
+  QsLogging::DestinationPtr fileDestination(QsLogging::DestinationFactory::MakeFileDestination(sLogPath)); \
+  QsLogging::DestinationPtr debugDestination(QsLogging::DestinationFactory::MakeDebugOutputDestination()); \
+  logger.addDestination(debugDestination.get()); \
+  logger.addDestination(fileDestination.get()); \
+  }
+  */
+
+#define INIT_TRANSLATION \
+  QTranslator translator; \
+  translator.load(QString(":i18n/ngrt4n_%1").arg(QLocale::system().name())); \
+  app->installTranslator(&translator); \
+  QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+
 const QString PROJECT = "NGRT4N";
 const QString USER_BN = BUILTIN_USER_PREFIX;
 const QString PJT_NAME = PROJECT;
@@ -37,17 +56,10 @@ const QString APP_NAME = APPLICATION_NAME;
 const QString PKG_NAME = PACKAGE_NAME;
 const QString PKG_VERSION = PACKAGE_VERSION;
 const QString PKG_URL = PACKAGE_URL;
-const QString REL_INFO = RELEASE_INFO;
 const QString REL_NAME = RELEASE_NAME;
-
-const QString APP_INFO = QObject::tr("                  > %1 %6 %2 (codename: %3)"
-                                     "\n                  >> Realease ID: %4"
-                                     "\n                  >> Copyright (C) 2010 NGRT4N Project. All rights reserved"
-                                     "\n                  >> For bug reporting instructions, see: <%5>").arg(APP_NAME,
-                                                                                                             PKG_VERSION,
-                                                                                                             REL_NAME,
-                                                                                                             REL_INFO,
-                                                                                                             PKG_URL);
+const QString REL_YEAR = RELEASE_YEAR;
+const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
+const QString ID_PATTERN("%1/%2");
 typedef QMap<QString, QString> IconMapT;
 typedef QList<QListWidgetItem*> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
@@ -231,6 +243,7 @@ typedef struct _NodeT {
   QString parent;
   QString alarm_msg;
   QString notification_msg;
+  QString actual_msg;
   qint32 severity;
   qint32 prop_sev;
   QString child_nodes;
@@ -238,11 +251,14 @@ typedef struct _NodeT {
   bool monitored;
 } NodeT;
 
-typedef QHash<QString, NodeT> NodeListT;
 typedef QMap<qint32, qint32> CheckStatusCountT;
-typedef QHash<QString, MonitorBroker::CheckT> CheckListT;
-typedef QHash<QString, QStringList> HostListT;
+typedef QHash<QString, NodeT> NodeListT;
 typedef NodeListT::Iterator NodeListIteratorT;
+typedef MonitorBroker::CheckT CheckT;
+typedef QHash<QString, CheckT> CheckListT;
+typedef CheckListT::Iterator CheckListIterT;
+typedef CheckListT::ConstIterator CheckListCstIterT;
+typedef QHash<QString, QStringList> HostListT;
 
 typedef struct _CoreDataT {
   qint8 monitor;

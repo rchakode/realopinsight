@@ -42,11 +42,12 @@ QString  usage = "usage: %1 [OPTION] [view_config]\n"
 int main(int argc, char **argv)
 {
   QApplication* app = new QApplication(argc, argv);
+  INIT_TRANSLATION;
   app->setWindowIcon(QIcon (":images/built-in/icon.png"));
   app->setApplicationName(APP_NAME);
   app->setStyleSheet(Preferences::style());
   QString cmdName = basename(argv[0]);
-  QString versionMsg = APP_INFO.arg(QObject::tr("Operations Console"));
+  QString versionMsg = utils::getWelcomeMsg(QObject::tr("Operations Console"));
   bool runConfig = false;
   int opt;
   if ((opt = getopt(argc, argv, "chv")) != -1) {
@@ -68,8 +69,7 @@ int main(int argc, char **argv)
           break;
         }
     }
-  std::clog<<versionMsg.toStdString()
-     <<"\nLoading...\n";
+  std::clog<<versionMsg.toStdString()<<"\n";
   Auth authentication;
   int userRole = authentication.exec();
   if ( userRole != Auth::AdmUserRole && userRole != Auth::OpUserRole) exit(1);
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
       change_passwd->exec();
       exit(0);
     }
-  QSplashScreen* info = Preferences::infoScreen(QString(QObject::tr("%1\n\nLoading...")).arg(versionMsg));
+  QSplashScreen* info = utils::infoScreen(versionMsg);
   utils::delay(2);
   QString file = (argc >= 2)? argv[1] : "";
   if (file.isEmpty()) {

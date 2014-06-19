@@ -1,34 +1,98 @@
-<ServiceView compat="2.0" monitor="1">
-	<Service id="root" type="0" statusCalcRule="0" statusPropRule="-1">
-		<Name>New Business view</Name>
-		<Icon>Business Process</Icon>
-		<Description></Description>
-		<AlarmMsg></AlarmMsg>
-		<NotificationMsg></NotificationMsg>
-		<SubServices>ngrt4nsrv20133807233819703,ngrt4nsrv20133807233824117,ngrt4nsrv20133807233826137</SubServices>
-	</Service>
-	<Service id="ngrt4nsrv20133807233824117" type="1" statusCalcRule="-1" statusPropRule="-1">
-		<Name>sub service 2</Name>
-		<Icon>Business Process</Icon>
-		<Description></Description>
-		<AlarmMsg></AlarmMsg>
-		<NotificationMsg></NotificationMsg>
-		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
-	</Service>
-	<Service id="ngrt4nsrv20133807233819703" type="1" statusCalcRule="-1" statusPropRule="-1">
-		<Name>sub service 1</Name>
-		<Icon>Business Process</Icon>
-		<Description></Description>
-		<AlarmMsg></AlarmMsg>
-		<NotificationMsg></NotificationMsg>
-		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
-	</Service>
-	<Service id="ngrt4nsrv20133807233826137" type="1" statusCalcRule="-1" statusPropRule="-1">
-		<Name>sub service 3</Name>
-		<Icon>Business Process</Icon>
-		<Description></Description>
-		<AlarmMsg></AlarmMsg>
-		<NotificationMsg></NotificationMsg>
-		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
-	</Service>
+<ServiceView compat="2.0" monitor="0">
+<Service id="root" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>New View 1</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20134623164641452</SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164647240" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164641452" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20134623164642620,ngrt4nsrv20134623164644835,ngrt4nsrv20134623164645740</SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164642620" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 2</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20134623164646794,ngrt4nsrv20134623164647922,ngrt4nsrv20134623164649470</SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164645151" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164649470" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164644835" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20134623164645151</SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164646167" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164646794" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20134623164647240,ngrt4nsrv20134623164650941</SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164650941" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164645740" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>ngrt4nsrv20134623164646167</SubServices>
+</Service>
+<Service id="ngrt4nsrv20134623164647922" type="0" statusCalcRule="0" statusPropRule="0">
+ <Name>sub service 1 (Copy)</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices></SubServices>
+</Service>
 </ServiceView>

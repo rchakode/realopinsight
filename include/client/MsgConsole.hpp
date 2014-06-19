@@ -52,7 +52,7 @@ class MsgConsole : public QTableView  //TODO see style for QtableView
 public:
   static const QString TAG_HOSTNAME;
   static const QString TAG_ZABBIX_HOSTNAME;
-    static const QString TAG_ZABBIX_HOSTNAME2;
+  static const QString TAG_ZABBIX_HOSTNAME2;
   static const QString TAG_CHECK;
   static const QString TAG_THERESHOLD ;
   static const QString TAG_PLUGIN_OUTPUT;
@@ -63,14 +63,17 @@ public:
   virtual ~MsgConsole();
   void updateNodeMsg(const NodeListT::iterator &);
   void updateNodeMsg(const NodeT &);
-  void updateColumnWidths( const QSize& ,  const bool& = false );
-//  inline QPoint getEmFontSize() const { return memFontSize; }
-  inline qint32 getRowCount() const { return model()->rowCount();}
-  inline qint32 getRowHeight() const {return mrHeight;}
+  void updateEntriesSize( const QSize& ,  const bool& = false );
+  void clearMsg(const NodeT &);
+  void clearNormalMsg(void);
+  inline qint32 getRowCount() const
+  {return model()->rowCount();}
 
 public slots:
-  inline void acknowledgeMsg(void) { emit acknowledgeChanged(); }
-  inline void sortEventConsole(void) { mproxyModel->sort(1); }
+  inline void acknowledgeMsg(void)
+  {emit acknowledgeChanged();}
+  inline void sortEventConsole(void)
+  {mproxyModel->sort(1);}
 
 signals:
   void acknowledgeChanged(void);
@@ -78,8 +81,6 @@ signals:
 private:
   QStandardItemModel* mmodel;
   MsgConsoleProxyModel* mproxyModel;
-  QPoint memFontSize;
-  qint32 mrHeight;
 };
 
 #endif /* MSGCONSOLE_HPP */

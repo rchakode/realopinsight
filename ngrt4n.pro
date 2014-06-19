@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.2.1
+VERSION_=2.3.0beta1
 VERSION = "-$${VERSION_}"
 LIBS += -lzmq
 config-dist{
@@ -36,8 +36,8 @@ DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "RELEASE_INFO='\"221/032013\"'"
-DEFINES *= "RELEASE_NAME='\"Lucia, p1\"'"
+DEFINES *= "RELEASE_NAME='\"Briator, b1\"'"
+DEFINES *= "RELEASE_YEAR='\"2013\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
@@ -60,12 +60,13 @@ HEADERS	+= include/core/ns.hpp \
     include/client/WebKit.hpp \
     include/client/ZbxHelper.hpp \
     include/client/JsHelper.hpp \
-    include/core/Socket.hpp \
     include/client/ZnsHelper.hpp \
     include/client/Settings.hpp \
     include/client/utilsClient.hpp \
     include/client/Chart.hpp \
-    include/client/MsgConsole.hpp
+    include/client/MsgConsole.hpp \
+    include/core/ZmqSocket.hpp \
+    include/client/LsHelper.hpp
 
 SOURCES	+= \
     src/core/MonitorBroker.cpp \
@@ -83,16 +84,14 @@ SOURCES	+= \
     src/client/WebKit.cpp \
     src/client/ZbxHelper.cpp \
     src/client/JsHelper.cpp \
-    src/core/Socket.cpp \
     src/client/ZnsHelper.cpp \
     src/client/Settings.cpp \
     src/client/utilsClient.cpp \
     src/core/utilsCore.cpp \
     src/client/Chart.cpp \
-    src/client/MsgConsole.cpp
-
-
-TRANSLATIONS += ngrt4n_en.ts
+    src/client/MsgConsole.cpp \
+    src/core/ZmqSocket.cpp \
+    src/client/LsHelper.cpp
 
 DISTFILES += README \
     INSTALL \
@@ -105,6 +104,11 @@ DISTFILES += README \
     images/built-in/*.png \
     examples/{*.ngrt4n.xml,*.dat} \
     src/client/ngrt4n-*.cpp \
-    doc/man/*.gz
+    doc/man/*.gz \
+    i18n/ngrt4n_*.qm
 
-OTHER_FILES += ngrt4n_la.ts
+TRANSLATIONS += i18n/ngrt4n_fr.ts
+
+CODECFORSRC = UTF-8
+
+#include(QsLog/QsLog.pri)

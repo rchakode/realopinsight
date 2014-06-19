@@ -29,21 +29,21 @@ QString utils::criticityToText(const qint32& _status)
   switch(static_cast<MonitorBroker::SeverityT>(_status))
     {
     case MonitorBroker::Normal:
-      return "Normal";
+      return QObject::tr("Normal");
       break;
     case MonitorBroker::Minor:
-      return  "Minor";
+      return  QObject::tr("Minor");
       break;
     case MonitorBroker::Major:
-      return  "Major";
+      return  QObject::tr("Major");
       break;
     case MonitorBroker::Critical:
-      return  "Critical";
+      return  QObject::tr("Critical");
       break;
     default:
       break;
     }
-  return "Unknown";
+  return QObject::tr("Unknown");
 }
 
 void utils::clear(CoreDataT& data)
@@ -219,3 +219,23 @@ bool utils::findNode(const NodeListT& bpnodes,
   return found;
 }
 
+QSplashScreen* utils::infoScreen(const QString & msg) {
+  QSplashScreen* screen = new QSplashScreen(QPixmap(":images/built-in/loading-screen.png"));
+  screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
+  screen->show();
+  return screen;
+}
+
+QString utils::getWelcomeMsg(const QString& utility)
+{
+  return QObject::tr("                  > %1 %2 %3 (codename: %4)"
+                     "\n                  >> Realease ID: %5"
+                     "\n                  >> Copyright (C) 2010 - %6 NGRT4N Project. All rights reserved"
+                     "\n                  >> For bug reporting instructions, see: <%7>").arg(APP_NAME,
+                                                                                             utility,
+                                                                                             PKG_VERSION,
+                                                                                             REL_NAME,
+                                                                                             REL_INFO,
+                                                                                             REL_YEAR,
+                                                                                             PKG_URL);
+}

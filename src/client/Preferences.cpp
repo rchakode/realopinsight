@@ -1,7 +1,7 @@
 /*
  * Preferences.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Copyright (c) 2010 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)        #
 # Last Update : 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
@@ -29,6 +29,8 @@
 #include "Base.hpp"
 #include "utilsClient.hpp"
 #include <QWebView>
+#include <QIntValidator>
+#include <QRegExpValidator>
 
 const qint32 Preferences::ChangePassword = 0;
 const qint32 Preferences::ForceChangePassword = 1;
@@ -39,193 +41,172 @@ const QString Preferences::URL_KEY = "/Monitor/nagiosHome";
 const QString Preferences::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Preferences::SERVER_ADDR_KEY = "/Monitor/serverAddr";
 const QString Preferences::SERVER_PORT_KEY = "/Monitor/serverPort";
+const QString Preferences::USE_MKLS_KEY = "/Monitor/UseMkLs";
 const QString Preferences::ADM_UNSERNAME_KEY = "/Auth/admUser";
 const QString Preferences::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Preferences::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Preferences::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Preferences::SERVER_PASS_KEY = "/Auth/ServerAuthChain";
 
-
-const QString AboutPattern = QObject::tr("\n%1 %2 (codename: %3)\n \
-                                         \nRelease ID: %4\n \
-                                         \nCopyright (c) 2010 NGRT4N Project. All rights reserved \
-                                         \nVisit %5 for more information\n \
-                                         \nReport Bugs: bugs@ngrt4n.com\n");
-
-
-                                         Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
-                                         : QDialog(),
-                                         userRole(_userRole),
-                                         settings(new Settings()),
-                                         monitorHomeField(new QLineEdit()),
-                                         updateIntervalField(new QSpinBox()),
-                                         bBrowse(new QPushButton(tr("&Browse..."))),
-                                         oldPasswdField(new QLineEdit()),
-                                         passwdField(new QLineEdit()),
-                                         rePasswdField(new QLineEdit()),
-                                         serverAddrField (new QLineEdit()),
-                                         serverPortField(new QLineEdit()),
-                                         serverPassField(new QLineEdit()),
-                                         cancelButton(new QPushButton(tr("&Close"))),
-                                         applySettingButton(new QPushButton("&Apply settings")),
-                                         changePasswdButton(new QPushButton("C&hange password")),
-                                         donateButton(new ImageButton(":images/built-in/donate.png")),
-                                         showAuthChain(new QCheckBox(tr("&Show in clear"))),
-                                         layout(new QGridLayout(this))
+Preferences::Preferences(const qint32 & _userRole, const qint32 & _action)
+  : QDialog(),
+    muserRole(_userRole),
+    msettings(new Settings()),
+    monitorUrlField(new QLineEdit()),
+    mupdateIntervalField(new QSpinBox()),
+    mbrwBtn(new QPushButton(tr("&Browse..."))),
+    moldPwdField(new QLineEdit()),
+    mpwdField(new QLineEdit()),
+    mrePwdField(new QLineEdit()),
+    msockAddrField (new QLineEdit()),
+    msockPortField(new QLineEdit()),
+    mserverPassField(new QLineEdit()),
+    mcancelBtn(new QPushButton(tr("&Close"))),
+    mapplySettingBtn(new QPushButton(tr("&Apply settings"))),
+    mchangePwdBtn(new QPushButton(tr("C&hange password"))),
+    mdonateBtn(new ImageButton(":images/built-in/donate.png")),
+    mshowAuthInfoChkbx(new QCheckBox(tr("&Show in clear"))),
+    museMklsChkbx(new QCheckBox(tr("Use &Livestatus"))),
+    mmainLayout (new QGridLayout(this))
 {
-                                         qint32 line = -1;
-    oldPasswdField->setEchoMode(QLineEdit::Password);
-passwdField->setEchoMode(QLineEdit::Password);
-rePasswdField->setEchoMode(QLineEdit::Password);
-serverPassField->setEchoMode(QLineEdit::Password);
+  qint32 line = -1;
+  moldPwdField->setEchoMode(QLineEdit::Password);
+  mpwdField->setEchoMode(QLineEdit::Password);
+  mrePwdField->setEchoMode(QLineEdit::Password);
+  mserverPassField->setEchoMode(QLineEdit::Password);
+  msockPortField->setValidator(new QIntValidator(1, 65535, msockPortField));
+  switch (_action)
+    {
+    case Preferences::ChangeMonitoringSettings:
+      setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
+      line++,
+          mmainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
+      line++,
+          mmainLayout->addWidget(createScktGrp(), line, 0, 1, 3);
+      line++,
+          mmainLayout->addWidget(mcancelBtn, line, 1, Qt::AlignRight),
+          mmainLayout->addWidget(mapplySettingBtn, line, 2);
+      line++,
+          mmainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), line, 0, 1, 3);
+      mmainLayout->setColumnStretch(0, 0);
+      mmainLayout->setColumnStretch(1, 6);
+      mmainLayout->setColumnStretch(2, 0);
+      if(_userRole == Auth::OpUserRole) {
+          monitorUrlField->setEnabled(false);
+          mbrwBtn->setEnabled(false);
+          mupdateIntervalField->setEnabled(false);
+          mapplySettingBtn->setEnabled(false);
+          msockAddrField->setEnabled(false);
+          msockPortField->setEnabled(false);
+          mserverPassField->setEnabled(false);
+          mshowAuthInfoChkbx->setEnabled(false);
+          museMklsChkbx->setEnabled(false);
+        }
+      break;
+    case Preferences::ChangePassword:
+    case Preferences::ForceChangePassword:
+      setWindowTitle(tr("Change Password | %1").arg(APP_NAME));
+      line++,
+          mmainLayout->addWidget(new QLabel(tr("Current Password")), line, 0),
+          mmainLayout->addWidget(moldPwdField, line, 1, 1, 2);
+      line++,
+          mmainLayout->addWidget(new QLabel(tr("New password")), line, 0),
+          mmainLayout->addWidget(mpwdField, line, 1, 1, 2);
+      line++,
+          mmainLayout->addWidget(new QLabel(tr("Retype new password")), line, 0),
+          mmainLayout->addWidget(mrePwdField, line, 1, 1, 2);
+      line++,
+          mmainLayout->addWidget(mcancelBtn, line, 1),
+          mmainLayout->addWidget(mchangePwdBtn, line, 2);
 
-switch (_action)
-{
-  case Preferences::ChangeMonitoringSettings:
-    setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
-    line++,
-        layout->addWidget(new QLabel(tr("Web Interface*")), line, 0),
-        layout->addWidget(monitorHomeField, line, 1, 1, 4);
-    line++,
-        layout->addWidget(new QLabel(tr("Server Address**")), line, 0),
-        layout->addWidget(serverAddrField, line, 1),
-        layout->addWidget(new QLabel(tr("Port")), line, 2, Qt::AlignRight),
-        layout->addWidget(serverPortField, line, 3);
-    line++,
-        layout->addWidget(new QLabel(tr("Auth chain")), line, 0),
-        layout->addWidget(serverPassField, line, 1, 1, 4);
-    line++,
-        layout->addWidget(new QLabel(tr("")), line, 0),
-        layout->addWidget(showAuthChain, line, 1, 1, 4);
-    line++,
-        layout->addWidget(new QLabel(tr("Update Interval")), line, 0),
-        layout->addWidget(updateIntervalField, line, 1, 1, 2),
-        layout->addWidget(new QLabel("seconds"), line, 3);
-    line++,
-        layout->addWidget(cancelButton, line, 1, 1, 2, Qt::AlignRight),
-        layout->addWidget(applySettingButton, line, 3, 1, 2);
-    line++,
-        layout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss. (**) Required for Nagios.")), line, 0, 1, 5);
-    layout->setColumnStretch(0, 0);
-    layout->setColumnStretch(1, 6);
-    layout->setColumnStretch(2, 0);
-    layout->setColumnStretch(3, 1);
-    if(_userRole == Auth::OpUserRole) {
-        monitorHomeField->setEnabled(false);
-        bBrowse->setEnabled(false);
-        updateIntervalField->setEnabled(false);
-        applySettingButton->setEnabled(false);
-        serverAddrField->setEnabled(false);
-        serverPortField->setEnabled(false);
-        serverPassField->setEnabled(false);
-        showAuthChain->setEnabled(false);
-      }
-    break;
+      if(_action == Preferences::ForceChangePassword) {
+          mcancelBtn->setEnabled(false);
+        }
+      break;
+    case Preferences::ShowAbout:
+      setWindowTitle(tr("About %1").arg(APP_NAME));
+      QString about = QObject::tr("\n%1 %2 (codename: %3)\n"
+                                  "\nRelease ID: %4\n"
+                                  "\nCopyright (c) 2010-%5 NGRT4N Project. All rights reserved"
+                                  "\nVisit %6 for more information\n"
+                                  "\nReport Bugs: bugs@ngrt4n.com\n").arg(APP_NAME, PKG_VERSION, RELEASE_NAME, REL_INFO, REL_YEAR, PKG_URL);
 
-  case Preferences::ChangePassword:
-  case Preferences::ForceChangePassword:
-    setWindowTitle(tr("Change Password| %1").arg(APP_NAME));
-    line++,
-        layout->addWidget(new QLabel(tr("Current Password")), line, 0),
-        layout->addWidget(oldPasswdField, line, 1, 1, 2);
-    line++,
-        layout->addWidget(new QLabel(tr("New password")), line, 0),
-        layout->addWidget(passwdField, line, 1, 1, 2);
-    line++,
-        layout->addWidget(new QLabel(tr("Retype new password")), line, 0),
-        layout->addWidget(rePasswdField, line, 1, 1, 2);
-    line++,
-        layout->addWidget(cancelButton, line, 1),
-        layout->addWidget(changePasswdButton, line, 2);
-
-    if(_action == Preferences::ForceChangePassword) {
-        cancelButton->setEnabled(false);
-      }
-    break;
-
-  case Preferences::ShowAbout:
-    setWindowTitle(tr("About %1").arg(APP_NAME));
-    QString about = AboutPattern.arg(APP_NAME)
-        .arg(PKG_VERSION)
-        .arg(RELEASE_NAME)
-        .arg(REL_INFO)
-        .arg(PKG_URL);
-
-    line++,
-        layout->addWidget(new QLabel(about), line, 0, 1, 2);
-    line++,
-        layout->addWidget(donateButton, line, 0, 1, 1, Qt::AlignLeft),
-        layout->addWidget(cancelButton, line, 1, 1, 1, Qt::AlignRight);
-    break;
-}
-
-setContent();
-addEvents();
+      line++,
+          mmainLayout->addWidget(new QLabel(about), line, 0, 1, 2);
+      line++,
+          mmainLayout->addWidget(mdonateBtn, line, 0, 1, 1, Qt::AlignLeft),
+          mmainLayout->addWidget(mcancelBtn, line, 1, 1, 1, Qt::AlignRight);
+      break;
+    }
+  setContent();
+  addEvents();
 }
 
 Preferences::~Preferences()
 {
-  delete updateIntervalField;
-  delete oldPasswdField;
-  delete passwdField;
-  delete rePasswdField;
-  delete changePasswdButton;
-  delete cancelButton;
-  delete applySettingButton;
-  delete serverAddrField;
-  delete serverPortField;
-  delete serverPassField;
-  delete donateButton;
-  delete showAuthChain;
-  delete layout;
+  delete mupdateIntervalField;
+  delete moldPwdField;
+  delete mpwdField;
+  delete mrePwdField;
+  delete mchangePwdBtn;
+  delete mcancelBtn;
+  delete mapplySettingBtn;
+  delete msockAddrField;
+  delete msockPortField;
+  delete mserverPassField;
+  delete mdonateBtn;
+  delete mshowAuthInfoChkbx;
+  delete museMklsChkbx;
+  delete mmainLayout;
 }
 
 
 void Preferences::showEvent (QShowEvent *)
 {
-  oldPasswdField->setText("");
-  passwdField->setText("");
-  rePasswdField->setText("");
+  moldPwdField->setText("");
+  mpwdField->setText("");
+  mrePwdField->setText("");
 }
 
 void Preferences::applySettings(void)
 {
-  QString nagios_home;
-
-  nagios_home = monitorHomeField->text();
-
-  settings->setValue(URL_KEY, nagios_home);
-  settings->setValue(UPDATE_INTERVAL_KEY, updateIntervalField->text());
-  settings->setValue(SERVER_ADDR_KEY, serverAddrField->text());
-  if(serverPortField->text().toInt() <= 0) serverPortField->setText(QString::number(MonitorBroker::DefaultPort));
-  settings->setValue(SERVER_PORT_KEY, serverPortField->text());
-  settings->setValue(SERVER_PASS_KEY, serverPassField->text());
-  settings->sync();
-
+  QString homeUrl = monitorUrlField->text();
+  msettings->setValue(URL_KEY, homeUrl);
+  msettings->setValue(UPDATE_INTERVAL_KEY, mupdateIntervalField->text());
+  msettings->setValue(SERVER_ADDR_KEY, msockAddrField->text());
+  if(msockPortField->text().toInt() <= 0) msockPortField->setText(QString::number(MonitorBroker::DefaultPort));
+  msettings->setValue(SERVER_PORT_KEY, msockPortField->text());
+  msettings->setValue(SERVER_PASS_KEY, mserverPassField->text());
+  museMkls = static_cast<Qt::CheckState>(museMklsChkbx->checkState());
+  msettings->setValue(USE_MKLS_KEY, museMkls);
+  msettings->sync();
   close();
-
-  emit urlChanged(nagios_home);
+  emit urlChanged(homeUrl);
 }
 
 
 void Preferences::changePasswd(void)
 {
-  QString userPasswd, passwd, newPasswd, renewPasswd, key;
+  QString userPasswd;
+  QString passwd;
+  QString newPasswd;
+  QString renewPasswd;
+  QString key;
 
-  if (userRole == Auth::AdmUserRole) {
+  if (muserRole == Auth::AdmUserRole) {
       key = ADM_PASSWD_KEY;
-      userPasswd = settings->value(key).toString();
+      userPasswd = msettings->value(key).toString();
     } else {
       key = OP_PASSWD_KEY;
-      userPasswd = settings->value(key).toString();
+      userPasswd = msettings->value(key).toString();
     }
-  passwd = QCryptographicHash::hash(oldPasswdField->text().toAscii(), QCryptographicHash::Md5);
-  newPasswd = QCryptographicHash::hash(passwdField->text().toAscii(), QCryptographicHash::Md5);
-  renewPasswd = QCryptographicHash::hash(rePasswdField->text().toAscii(), QCryptographicHash::Md5);
+  passwd = QCryptographicHash::hash(moldPwdField->text().toAscii(), QCryptographicHash::Md5);
+  newPasswd = QCryptographicHash::hash(mpwdField->text().toAscii(), QCryptographicHash::Md5);
+  renewPasswd = QCryptographicHash::hash(mrePwdField->text().toAscii(), QCryptographicHash::Md5);
 
   if(userPasswd == passwd) {
       if(newPasswd == renewPasswd) {
-          settings->setKeyValue(key, newPasswd);
+          msettings->setKeyValue(key, newPasswd);
           QMessageBox::information(this,
                                    APP_NAME,
                                    tr("Password updated"),
@@ -249,37 +230,68 @@ void Preferences::donate(void)
 
 void Preferences::setAuthChainVisibility(const int & state) {
   if(state == Qt::Checked) {
-      serverPassField->setEchoMode(QLineEdit::Normal);
+      mserverPassField->setEchoMode(QLineEdit::Normal);
     } else {
-      serverPassField->setEchoMode(QLineEdit::Password);
+      mserverPassField->setEchoMode(QLineEdit::Password);
     }
+}
+
+QGroupBox* Preferences::createScktGrp(void)
+{
+  QGroupBox* bx(new QGroupBox(tr("Livestatus/ngrt4nd Endpoint")));
+  QHBoxLayout* lyt(new QHBoxLayout());
+  lyt->addWidget(new QLabel(tr("Server Address")));
+  lyt->addWidget(msockAddrField);
+  lyt->addWidget(new QLabel(tr("Port")), Qt::AlignRight);
+  lyt->addWidget(msockPortField);
+  lyt->addWidget(museMklsChkbx);
+  lyt->setStretch(0, 0);
+  lyt->setStretch(1, 1);
+  lyt->setStretch(2, 0);
+  lyt->setStretch(3, 0);
+  lyt->setStretch(4, 0);
+  bx->setFlat(false);
+  lyt->setMargin(0);
+  bx->setLayout(lyt);
+  bx->setAlignment(Qt::AlignLeft);
+  return bx;
+}
+
+QGroupBox* Preferences::createCommonGrp(void)
+{
+  QGroupBox* bx(new QGroupBox(tr("Common Settings")));
+  QGridLayout* lyt(new QGridLayout());
+  int line;
+  line = 0,
+      lyt->addWidget(new QLabel(tr("Monitor Web URL*")), line, 0),
+      lyt->addWidget(monitorUrlField, line, 1, 1, 2);
+  line++,
+      lyt->addWidget(new QLabel(tr("Auth String")), line, 0),
+      lyt->addWidget(mserverPassField, line, 1),
+      lyt->addWidget(mshowAuthInfoChkbx, line, 2);
+  line++,
+      lyt->addWidget(new QLabel(tr("Update Interval")), line, 0),
+      lyt->addWidget(mupdateIntervalField, line, 1),
+      lyt->addWidget(new QLabel(tr("seconds")), line, 2);
+  lyt->setColumnStretch(0, 0);
+  lyt->setColumnStretch(1, 1);
+  bx->setFlat(false);
+  bx->setLayout(lyt);
+  bx->setAlignment(Qt::AlignLeft);
+  return bx;
 }
 
 void Preferences::setContent(void)
 {
-  updateIntervalField->setMinimum(5);
-  updateIntervalField->setMaximum(600);
-  updateInterval = settings->value(UPDATE_INTERVAL_KEY).toInt();
-  updateIntervalField->setValue(updateInterval);
-
-  monitorUrl = settings->value(URL_KEY).toString();
-  monitorHomeField->setText(monitorUrl);
-
-  serverAddr = settings->value(SERVER_ADDR_KEY).toString();
-  serverAddrField->setText(serverAddr);
-
-  serverPort = settings->value(SERVER_PORT_KEY).toString();
-  serverPortField->setText(serverPort);
-
-  serverPass = settings->value(SERVER_PASS_KEY).toString();
-  serverPassField->setText(serverPass);
-}
-
-QSplashScreen* Preferences::infoScreen(const QString & msg) {
-  QSplashScreen* screen = new QSplashScreen(QPixmap(":images/built-in/loading-screen.png"));
-  screen->showMessage(msg, Qt::AlignJustify|Qt::AlignVCenter);
-  screen->show();
-  return  screen;
+  mupdateIntervalField->setMinimum(5);
+  mupdateIntervalField->setMaximum(600);
+  mupdateIntervalField->setValue(msettings->value(UPDATE_INTERVAL_KEY).toInt());
+  monitorUrlField->setText(msettings->value(URL_KEY).toString());
+  msockAddrField->setText(msettings->value(SERVER_ADDR_KEY).toString());
+  msockPortField->setText(msettings->value(SERVER_PORT_KEY).toString());
+  mserverPassField->setText(msettings->value(SERVER_PASS_KEY).toString());
+  museMkls = static_cast<Qt::CheckState>(msettings->value(USE_MKLS_KEY).toInt());
+  museMklsChkbx->setCheckState(museMkls);
 }
 
 QString Preferences::style() {
@@ -364,9 +376,9 @@ QString Preferences::style() {
 
 void Preferences::addEvents(void)
 {
-  connect(applySettingButton, SIGNAL(clicked()),  this, SLOT(applySettings()));
-  connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-  connect(changePasswdButton, SIGNAL(clicked()),  this, SLOT(changePasswd()));
-  connect(donateButton, SIGNAL(clicked()),  this, SLOT(donate()));
-  connect(showAuthChain, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
+  connect(mapplySettingBtn, SIGNAL(clicked()),  this, SLOT(applySettings()));
+  connect(mcancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(mchangePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
+  connect(mdonateBtn, SIGNAL(clicked()),  this, SLOT(donate()));
+  connect(mshowAuthInfoChkbx, SIGNAL(stateChanged(int)), this, SLOT(setAuthChainVisibility(int)));
 }
