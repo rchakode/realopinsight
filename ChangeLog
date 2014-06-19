@@ -1,6 +1,13 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+2.4.0 (Federator)
+  * Fixed compilation issue on OS X related to basename and QString (ticket #20)
+  * Fixed install script for OS X (ticket #21): removed the use of lscpu
+    and added option to set the number of CPU
+  * Improved install script enabling user mode installation
+  * comes with ngrt4n-d4n that brings support for ZeroMQ 3.x
+
 2.4.0beta1 (Federator,b2)
   * Fixed ticket #16: adding support for realm authentication within the browser
   * Fixed ticket #17: file path missing in the title bar of the console
@@ -24,7 +31,7 @@ RealOpInsight ChangeLog
 2.3.0 (Briator)
   * Minor changes from the beta version.
   * Binaries are available for Fedora 17 and 18, openSUSE 12.1, 12.2 and 12.3.
-  From this version, we don't longer provide binaries for Fedora 16
+    From this version, we don't longer provide binaries for Fedora 16
 
 2.3.0beta1 (Briator, b1)
 --------------

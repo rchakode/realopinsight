@@ -59,7 +59,7 @@ void utils::clear(CoreDataT& data)
 QString utils::getAbsolutePath(const QString& _path)
 {
   QFileInfo fileInfo(_path);
-  return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
+  return fileInfo.absoluteFilePath();
 }
 
 MonitorBroker::SeverityT utils::computeCriticity(const int& _monitor, const int& _statusOrSeverity)

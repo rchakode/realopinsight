@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.4.0b2
+VERSION_=2.4.0
 VERSION = "-$${VERSION_}"
 config-dist{
 SOURCES	+=
@@ -40,7 +40,7 @@ DEFINES *= "RELEASE_YEAR='\"2013\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-local-typedefs
 INCLUDEPATH = include include/client include/core
 HEADERS	+= include/core/ns.hpp \
     include/core/MonitorBroker.hpp \

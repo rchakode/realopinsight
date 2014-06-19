@@ -61,28 +61,28 @@ int main(int argc, char **argv)
   int opt;
   if ((opt = getopt(argc, argv, "chvd:e:")) != -1) {
     switch (opt) {
-    case 'c':
-      module = "config";
-      break;
-    case 'd':
-      module = "dashboard";
-      file = optarg;
-      break;
-    case 'e':
-      module = "editor";
-      file = optarg;
-      break;
-    case 'v':
-      cout << versionMsg.toStdString()<<endl;
-      exit(0);
-    case 'h': {
-      cout << usage.arg(cmdName).toStdString();
-      exit(0);
-    }
-    default:
-      cout << usage.arg(cmdName).toStdString();
-      exit(1);
-      break;
+      case 'c':
+        module = "config";
+        break;
+      case 'd':
+        module = "dashboard";
+        file = optarg;
+        break;
+      case 'e':
+        module = "editor";
+        file = optarg;
+        break;
+      case 'v':
+        std::cout << versionMsg.toStdString()<<"\n";
+        exit(0);
+      case 'h': {
+        std::cout << usage.arg(cmdName).toStdString();
+        exit(0);
+      }
+      default:
+        std::cout << usage.arg(cmdName).toStdString();
+        exit(1);
+        break;
     }
   }
   std::clog << versionMsg.toStdString()<<"\n";

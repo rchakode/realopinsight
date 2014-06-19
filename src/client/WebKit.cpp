@@ -25,6 +25,7 @@
 
 #include "WebKit.hpp"
 #include "Preferences.hpp"
+#include <QAuthenticator>
 
 WebKit::WebKit(const QString& _url, QWidget* _parent)
   :QWebView(_parent),

@@ -104,7 +104,7 @@ void ZmqSocket::send(const std::string & _msg) {
   zmq_msg_t msg;
   sent = zmq_msg_init_size (&msg, _msg.size());
   memcpy (zmq_msg_data (&msg), _msg.c_str(), _msg.size());
-  zmq_send(msocket, &msg, 0);
+  zmq_send(m_socket, &msg, 0);
   zmq_msg_close(&msg);
 #elif ZMQ_VERSION_MAJOR == 3
   sent = zmq_send(m_socket, _msg.c_str(), _msg.size(), 0);
@@ -118,7 +118,7 @@ std::string ZmqSocket::recv() const{
 #if ZMQ_VERSION_MAJOR == 2
   ret = zmq_msg_init(&msg);
   if (ret != 0) return "";
-  ret = zmq_recv(msocket, &msg, 0);
+  ret = zmq_recv(m_socket, &msg, 0);
   if (ret == 0) ret = zmq_msg_size(&msg);
 #elif ZMQ_VERSION_MAJOR == 3
   ret = zmq_msg_init_size(&msg, MAX_MSG_SIZE);
