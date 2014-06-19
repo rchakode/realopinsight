@@ -33,4 +33,4 @@ INSTALLING THE DAEMON SERVICE FOR NAGIOS (ngrt4nd)
   $ sudo ./install-sh
 
 
-After the installation, check the online documentation for further processing (http://ngrt4n.com or http://RealOpInsight.com).
+After the installation, check the online documentation for further processing (http://docs.realopinsight.com).

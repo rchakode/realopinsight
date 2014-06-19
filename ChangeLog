@@ -1,6 +1,27 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.0b1 (Eliana, b1)
+  * Lot of refactoring and code simplification
+  * Port to Qt 5.x
+  * Livestatus is now the default mode selected for retrieving monitoring data
+    when setting Nagios-based sources. The use of ngrt4nd needs to be explicitly
+    enabled
+  * Fixed ticket #25 enabling the ability to cancel the basic authentication for
+    Nagios
+  * Fixed close action on preference window (ticket #24)
+  * Moved piechart from the map to lelf side
+  * Improved charting rendering: cleanup and new algorithm
+  * Changed default operations console size to 1024 x 768
+  * Fixed ticket #27 when events are not well propagated
+  * IMPORTANT implicit check name for ping is not longer supported, the user
+    is now required to set that. E.g. mysql-server/ping
+  * Restyling the menu bar
+
+2.4.0 (Federator) - 08/09/2013
+  * Fixed ticket #22 : Operations Console doesn't update the status of triggers with Zabbix API v1.4 (Zabbix 2.0.x, x<5)
+  * Fixed close action on the preference window (ticket #24)
+
 2.4.0 (Federator) - 08/09/2013
   * Fixed compilation issue on OS X related to basename and QString (ticket #20)
   * Fixed install script for OS X (ticket #21): removed the use of lscpu

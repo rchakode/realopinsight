@@ -1,25 +1,25 @@
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# File: install-sh                                                         #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 06-04-2014                                                 #
 #                                                                          #
-# This Software is part of NGRT4N Project (http://ngrt4n.com).             #
-#     									   #
+# This Software is part of RealOpInsight (http://realopinsight.com)        #
+#                                                                          #
 # This is a free software: you can redistribute it and/or modify           #
 # it under the terms of the GNU General Public License as published by     #
 # the Free Software Foundation, either version 3 of the License, or        #
 # (at your option) any later version.                                      #
-#			                                                   #
+#                                                                          #
 # The Software is distributed in the hope that it will be useful,          #
 # but WITHOUT ANY WARRANTY; without even the implied warranty or           #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	           #
 # GNU General Public License for more details.                             #
 #                                                                          #
-# You should have received a copy of the GNU General Public License	   #
+# You should have received a copy of the GNU General Public License        #
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
 #--------------------------------------------------------------------------#
 
 set -e
-shopt -s extglob
 
 APP="ngrt4n"
 APP_PREFIX="/usr/local"
@@ -41,7 +41,7 @@ usage(){
 
 prompt_copyright(){ 
 echo
-echo "Thanks for choosing NGRT4N Monitoring Suite."
+echo "Thanks for choosing RealOpInsight Workstation."
 echo
 echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
 echo
@@ -76,7 +76,7 @@ install_daemon(){
   echo "==>Installation completed"
 }
 
-checking_uipreq(){
+check_prerequisites(){
   echo -n "DEGUG : Checking qmake => ${QMAKE:=`which qmake`}... "
   [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
   echo "done"
@@ -95,31 +95,26 @@ checking_uipreq(){
 }
 
 install_default(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-manager ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=manager ${dflag}
   make -Bj${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_editor(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-editor ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=editor ${dflag}
   make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_oc(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=config-oc ${dflag}
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=oc ${dflag}
   make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
-remove_old(){
- echo "Removing deprecated files => ${NGRT4N_CMD:=`which ngrt4n 2>/dev/null`}"
- [ -e ${NGRT4N_CMD} ] && rm -rf ${NGRT4N_CMD}
- rm -rf ${INSTALL_PREFIX}/bin/ngrt4n
-}
-install_ui() {
-  echo "==>Installing RealOpInsight..."  
-  checking_uipreq
+install_workstation() {
+  echo "==>Installing RealOpInsight Workstation..."  
+  check_prerequisites
   echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
   echo -n "DEGUG : Current component => Manager..."
   install_default
@@ -132,13 +127,54 @@ install_ui() {
   echo -n "DEGUG : Current component => Operator Console..."
   install_oc
   echo done
-  remove_old
   echo "==>Installation completed"
 }
+
+install_webd() {
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
+  make -j${NCPU} 1>>install.log
+}
+
+install_fcgi() {
+  ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
+  make -j${NCPU} 1>>install.log
+}
+
+install_ultimate() {
+  echo "==>Installing RealOpInsight Ultimate..."  
+  
+  check_prerequisites
+  
+  echo -n "DEGUG : Building Standalone Server..."
+  install_webd
+  echo done
+  
+  echo -n "DEGUG : Building FastCGI Server..."
+  install_fcgi
+  echo done
+  
+  echo -n "DEGUG : Copy files..."
+  install -m 755 realopinsightd  ${INSTALL_PREFIX}/
+  install -m 755 realopinsight.fcgi ${INSTALL_PREFIX}/
+  install -m 755 realopinsightctld  ${INSTALL_PREFIX}/
+  install -d ${INSTALL_PREFIX}/etc
+  install -d ${INSTALL_PREFIX}/data
+  install -d ${INSTALL_PREFIX}/log
+  install -d ${INSTALL_PREFIX}/run   # directory for session info and thumbnails
+  install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
+  cp -r resources ${INSTALL_PREFIX}/
+  cp -r images ${INSTALL_PREFIX}/
+  cp -r i18n ${INSTALL_PREFIX}/
+  echo done
+  
+  echo "==>Installation completed"
+}
+
 
 NCPU=1
 mflag=
 dflag=
+MODULE=
 while getopts m:d:n:h name ; do
   case $name in
     d) dflag=1
@@ -146,6 +182,8 @@ while getopts m:d:n:h name ; do
     ;;
     n) NCPU=$OPTARG
     ;;
+    m) MODULE=$OPTARG
+    ;;	
     h) usage;
        exit 0
     ;;
@@ -155,8 +193,8 @@ while getopts m:d:n:h name ; do
   esac
 done
 
-if [[ ! $NCPU == +([1-9]) ]]; then
-    echo "The option -n requires a number between 1 and 9"
+if ! echo $NCPU | egrep -q '^[0-9]+$'; then
+    echo "The option -n requires a number"
     exit 1
 fi
 
@@ -164,7 +202,7 @@ export NCPU
 
 prompt_copyright
 
-echo "DEBUG: Init setup with $NCPU CPU..."
+echo "DEBUG: Initializing setup with $NCPU CPU..."
 
 if [ -z ${install_prefix} ] ; then
   export INSTALL_PREFIX=/usr/local
@@ -174,7 +212,8 @@ else
       export dflag="CONFIG+=dflag"
      ;;
   *) echo "This is not an absolute path : ${install_prefix}"
-     exit 2 ;;
+     exit 2 
+	 ;;
  esac
 fi
 
@@ -183,19 +222,23 @@ if [ `id -u` -ne 0 ]; then
   echo "WARNING: You must have read/write permissions on the target directory ($INSTALL_PREFIX)"
 fi 
 
-if [ -e src/server/ngrt4nd.cpp ]; then
-  module=daemon;
-else
-  module=ui
+if [ -z "$MODULE" ]; then
+  if [ -e src/server/ngrt4nd.cpp ]; then
+    MODULE=daemon;
+  else
+    MODULE=workstation
+  fi
 fi
  
-case ${module} in
-  daemon|ui) install_${module}
+case ${MODULE} in
+  daemon|workstation|ultimate) install_${MODULE}
     ;;
   all) install_daemon 
-    install_ui
-   ;;     
-  *)echo "Unknown module : ${module}" ; 
+       install_workstation
+       install_ultimate
+   ;;  
+     
+  *)echo "Unknown module : ${MODULE}" ; 
      exit 2;;
 esac 
 
