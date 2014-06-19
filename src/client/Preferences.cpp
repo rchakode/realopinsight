@@ -152,6 +152,7 @@ void Preferences::handleCancel(void)
       done(1);
       break;
     default:
+      done(0);
       break;
   }
 }

@@ -1,6 +1,6 @@
 QT	+= core gui xml svg webkit network script
 TEMPLATE = app
-VERSION_=2.4.0
+VERSION_=2.4.1
 VERSION = "-$${VERSION_}"
 config-dist{
 SOURCES	+=
@@ -35,7 +35,7 @@ DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "PACKAGE_NAME='\"\"'"
 DEFINES *= "PACKAGE_VERSION='\"$${VERSION_}\"'"
 DEFINES *= "PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "RELEASE_NAME='\"Foederare\"'"
+DEFINES *= "RELEASE_NAME='\"Foederare, p1\"'"
 DEFINES *= "RELEASE_YEAR='\"2013\"'"
 OBJECTS_DIR = build/obj
 MOC_DIR = build/moc
