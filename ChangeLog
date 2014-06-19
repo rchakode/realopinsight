@@ -2,7 +2,26 @@
 NGRT4N/RealOpInsight ChangeLog
 ###############################
 
-2.1.0 - Stable
+2.2.0 (beta)
+--------------
+  * Added support for Zenoss. Has been tested with Zenoss 4.x but would work
+    with Zenoss 3.x
+  * New criticity model introducing a fine-grained manageability of incidents
+    (UNKNOWN, CRITICAL, MAJOR, MINOR, NORMAL)
+  * Added System Tray Icon for notification the main window is inactive
+  * Support some Zabbix's meta tag (e.g. {HOST.NAME}) in alarm messages
+  * Brings new and optimized data structures and algorithms for better
+    performances and a reduced memory footprint
+  * Added buttons for back, forward and stop actions through the embedded browser
+  * Added support for zeromq 3.x (ticket #3)
+  * Added man pages for the commands ngrt4n-manager, ngrt4n-oc and ngrt4n-editor
+  * Added contextual help for editor fields
+  * Fixed compilation problems on c++11 (tickets #4 and #5)
+  * Fixed bug #6 when the Operations Console crashes when the colon is ommited
+    on the authchain for Zabbix
+  * Changed tooltip font
+
+2.1.0
 --------------
   * Added option for hiding/showing the auth chain
   * Fixed bug #1: The severities of Zabbix triggers are now supported.

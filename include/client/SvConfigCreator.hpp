@@ -34,72 +34,65 @@
 
 class SvCreator: public QMainWindow
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	SvCreator(const qint32 & _user_role = Auth::OP_USER_ROLE);
-    virtual ~SvCreator();
+  static const QString NagiosCompatibleFormat;
+  static const QString ZabbixCompatibleFormat;
+  static const QString ZenossCompatibleFormat;
 
-    void load( const QString&);
-    QSize minimumSizeHint() const { return QSize(796, 640); }
-    QSize sizeHint() const { return QSize(796, 640); }
-    static const QString NagiosCompatibleFormat;
-    static const QString ZabbixCompatibleFormat;
+  SvCreator(const qint32& _userRole = Auth::OpUserRole);
+  virtual ~SvCreator();
+  void load( const QString&);
+  QSize minimumSizeHint() const {return QSize(796, 640);}
+  QSize sizeHint() const {return QSize(796, 640);}
 
 public slots:
-	void newBusinessView(void);
-	void newNode(void);
-	void deleteNode(void);
-    void deleteNode(const QString &);
-	void open(void);
-	void save(void);
-	void saveAs(void);
-    int close( const bool & = true);
-	void fillEditorFromService( QTreeWidgetItem*);
-    void handleReturnPressed(void);
-    void handleSelectedNodeChanged( void);
-    void handleTreeNodeMoved(QString);
-    void handleNodeTypeActivated(qint32);
-    void handleShowOnlineResources(void);
-    void handleShowAbout(void);
-	void import(void);
-
+  void newBusinessView(void);
+  void newNode(void);
+  void deleteNode(void);
+  void deleteNode(const QString &);
+  void open(void);
+  void save(void);
+  void saveAs(void);
+  int treatCloseAction(const bool& = true);
+  void fillEditorFromService( QTreeWidgetItem*);
+  void handleReturnPressed(void);
+  void handleSelectedNodeChanged( void);
+  void handleTreeNodeMoved(QString);
+  void handleNodeTypeActivated(qint32);
+  void handleShowOnlineResources(void);
+  void handleShowAbout(void);
+  void import(void);
 
 protected:
-    void contextMenuEvent( QContextMenuEvent *);
-    void closeEvent( QCloseEvent *);
-
+  void contextMenuEvent( QContextMenuEvent *);
+  void closeEvent( QCloseEvent *);
 
 private:
+  qint32 muserRole;
+  bool mhasLeftUpdates;
+  QString mactiveFile;
+  QString mselectedNode;
+  Settings* msettings;
+  CoreDataT* mcoreData;
+  QSplitter* mainSplitter;
+  MenuListT mmenuList;
+  SubMenuListT msubMenuList;
+  SvNavigatorTree* mtree;
+  ServiceEditor* meditor;
+  QMenuBar* mmenuBar;
+  QToolBar* mtoolBar;
+  QMenu* mnodeContextMenu;
 
-qint32 userRole;
-qint32 hasToBeSaved;
-QString openedFile;
-QString selectedNode;
-
-//QString statusFile;
-QString selectedNodeId;
-
-Settings* settings;
-Struct* coreData;
-QSplitter* mainSplitter;
-MenuListT menuList;
-SubMenuListT subMenuList;
-
-SvNavigatorTree* navigationTree;
-ServiceEditor* editor;
-QMenuBar* menuBar;
-QToolBar* toolBar;
-QMenu* nodeContextMenu;
-
-void loadFile(const QString &);
-void saveInFile(const QString &);
-bool updateServiceNode(NodeListT & , const QString &);
-void loadMenu(void);
-void unloadMenu(void);
-void addEvents(void);
-void resize(void);
-
+  void loadFile(const QString &);
+  void recordData(const QString &);
+  void recordNode(QTextStream& stream, const NodeT & node);
+  bool updateServiceNode(NodeListT& , const QString &);
+  void loadMenu(void);
+  void unloadMenu(void);
+  void addEvents(void);
+  void resize(void);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

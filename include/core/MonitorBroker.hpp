@@ -27,57 +27,64 @@
 #include<iostream>
 #include <unordered_map>
 
-using namespace std ;
-
 class MonitorBroker {
 public:
-    enum StatusT {
-	  OK = 0,
-	  WARNING = 1,
-	  CRITICAL = 2,
-	  UNKNOWN = 3,
-	  UNSET_STATUS = 4
-    };
+  enum MonirorTypeT {
+    Nagios = 0,
+    Zabbix = 1,
+    Zenoss = 2
+  };
+  enum SeverityT {
+    Normal = 0,
+    Minor = 1,
+    Major = 2,
+    Critical = 3,
+    Unknown = 100
+  };
+  enum NagiosStatusT {
+    NagiosOk = 0,
+    NagiosWarning = 1,
+    NagiosCritical = 2,
+    NagiosUnknown = 3
+  };
+  enum ZabbixSeverityT {
+    ZabbixClear = 0,
+    ZabbixInfo = 1,
+    ZabbixWarn = 2,
+    ZabbixAverage = 3,
+    ZabbixHigh = 4,
+    ZabbixDisaster = 5
+  };
+  enum ZenossSeverityT {
+    ZenossClear = 0,
+    ZenossDebug = 1,
+    ZenossInfo = 2,
+    ZenossWarning = 3,
+    ZenossError = 4,
+    ZenossCritical = 5
+  };
+  struct CheckT{
+    std::string id;
+    std::string host;
+    std::string check_command;
+    std::string last_state_change;
+    std::string alarm_msg;
+    int status;
+  };
+  typedef std::unordered_map<std::string, CheckT> ChecksT;
 
-    enum SeverityT {
-      UNSET = 0,
-      INFO = 1,
-      WARN = 2,
-      AVERAGE = 3,
-      HIGH = 4,
-      DISASTER = 5
-    };
+  static const int DefaultPort;
+  static const int DefaultUpdateInterval;
+  static const int MaxMsg;
 
-    enum MonirorTypeT {
-      NAGIOS = 0,
-      ZABBIX = 1
-    } ;
-
-    typedef struct _CheckT{
-		string id;
-		string host ;
-		string check_command ;
-		string last_state_change ;
-		string alarm_msg ;
-		int status ;
-    }CheckT;
-    typedef CheckT NagiosCheckT;
-	typedef unordered_map<string, NagiosCheckT> NagiosChecksT ;
-
-	MonitorBroker(const string & _sfile);
-	virtual ~MonitorBroker();
-
-	string getInfOfService(const string & _sid) ;
-	static bool loadNagiosCollectedData(const string & _sfile, NagiosChecksT & _checks) ;
-
-	static const int DEFAULT_PORT ;
-	static const int DEFAULT_UPDATE_INTERVAL ;
-	static const int MAX_MSG ;
+  MonitorBroker(const std::string& _sfile);
+  virtual ~MonitorBroker();
+  std::string getInfOfService(const std::string& _sid);
+  static bool loadNagiosCollectedData(const std::string& _sfile, ChecksT& _checks);
 
 private:
-	int lastUpdate ;
-	string statusFile ;
-	NagiosChecksT services ;
+  int lastUpdate;
+  std::string statusFile;
+  ChecksT services;
 };
-
 #endif /* MONITORBROKER_HPP_ */

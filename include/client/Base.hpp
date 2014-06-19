@@ -2,7 +2,7 @@
  * Base.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update : 24-05-2012                                                 #
+# Last Update: 24-05-2012                                                 #
 #                                                                          #
 # This file is part of NGRT4N (http://ngrt4n.com).                         #
 #                                                                          #
@@ -23,256 +23,253 @@
 
 #ifndef BASE_HPP
 #define BASE_HPP
+#include "core/MonitorBroker.hpp"
 #include <QtCore>
 #include <QtXml>
 #include <QtGui>
 #include <QtWebKit>
 #include <QSettings>
-#include <bitset>
-#include "core/MonitorBroker.hpp"
-#include <QTranslator>
 
 const QString PROJECT = "NGRT4N";
-const QString USER_BASE_NAME = BUILTIN_USER_PREFIX;
-const QString projectName = PROJECT;
-const QString appName = APPLICATION_NAME;
-const QString packageName = PACKAGE_NAME;
-const QString packageVersion = PACKAGE_VERSION;
-const QString packageUrl = PACKAGE_URL;
-const QString releaseYear = RELEASE_YEAR;
-const QString releaseName = RELEASE_NAME;
+const QString USER_BN = BUILTIN_USER_PREFIX;
+const QString PJT_NAME = PROJECT;
+const QString APP_NAME = APPLICATION_NAME;
+const QString PKG_NAME = PACKAGE_NAME;
+const QString PKG_VERSION = PACKAGE_VERSION;
+const QString PKG_URL = PACKAGE_URL;
+const QString REL_INFO = RELEASE_INFO;
+const QString REL_NAME = RELEASE_NAME;
 
+const QString APP_INFO = QObject::tr("                  > %1 %6 %2 (codename: %3)"
+                                     "\n                  >> Realease ID: %4"
+                                     "\n                  >> Copyright (C) 2010 NGRT4N Project. All rights reserved"
+                                     "\n                  >> For bug reporting instructions, see: <%5>").arg(APP_NAME,
+                                                                                                             PKG_VERSION,
+                                                                                                             REL_NAME,
+                                                                                                             REL_INFO,
+                                                                                                             PKG_URL);
 typedef QMap<QString, QString> IconMapT;
-typedef QList<QListWidgetItem  *> CheckItemList;
+typedef QList<QListWidgetItem*> CheckItemList;
 typedef QHash<QString, QTreeWidgetItem*> TreeNodeItemListT;
-typedef bitset<4> StatusInfoT;
 
-class StatusPropRules {
-public :
-    enum StatusPropRulesT{
-        Unchanged = 0,
-        Decreased = 1,
-        Increased = 2
-    };
+class PropRules {
+public:
+  enum PropRulesT{
+    Unchanged = 0,
+    Decreased = 1,
+    Increased = 2
+  };
 
-    static QString toString(StatusPropRulesT rule) {
-        return QString::number(rule);
-    }
+  static QString toString(PropRulesT rule) {
+    return QString::number(rule);
+  }
 
-    static QString label(qint32 rule) {
-        return label(static_cast<StatusPropRulesT>(rule));
-    }
-    static QString label(StatusPropRulesT rule) {
-        switch(rule) {
-        case Unchanged: return "Unchanged";
-        case Decreased: return "Decreased";
-        case Increased: return "Increased";
-        }
+  static QString label(qint32 rule) {
+    return label(static_cast<PropRulesT>(rule));
+  }
+  static QString label(PropRulesT rule) {
+    switch(rule) {
+      case Unchanged: return QObject::tr("Unchanged");
+      case Decreased: return QObject::tr("Decreased");
+      case Increased: return QObject::tr("Increased");
+      }
 
-        return "Unchanged";
-    }
+    return QObject::tr("Unchanged");
+  }
 };
 
 
-class StatusCalcRules {
-public :
-    enum StatusCalcRulesT{
-        HighCriticity = 0,
-        WeightedCriticity = 1
-    };
-
-    static QString toString(StatusCalcRulesT rule) {
-        return QString::number(rule);
-    }
-
-    static QString label(qint32 rule) {
-        return label(static_cast<StatusCalcRulesT>(rule));
-    }
-
-    static QString label(StatusCalcRulesT rule) {
-
-        if (rule == WeightedCriticity) return "Weighted Criticity";
-
-        return "High Criticity";
-    }
+class CalcRules {
+public:
+  enum CalcRulesT{
+    HighCriticity = 0,
+    WeightedCriticity = 1
+  };
+  static QString toString(CalcRulesT rule) { return QString::number(rule);}
+  static QString label(qint32 rule) { return label(static_cast<CalcRulesT>(rule));}
+  static QString label(CalcRulesT rule) {
+    if (rule == WeightedCriticity) return QObject::tr("Average");
+    return QObject::tr("High Severity");}
 };
-
 
 class NodeType {
-public :
-    enum {
-        SERVICE_NODE = 0,
-        ALARM_NODE = 1
-    };
-    static QString toString(int _type ) {
+public:
+  enum {
+    SERVICE_NODE = 0,
+    ALARM_NODE = 1
+  };
+  static QString toString(int _type ) {
 
-        if (_type == ALARM_NODE ) return "Native Check";
+    if (_type == ALARM_NODE )
+      return QObject::tr("Native Check");
 
-        return  "Business Process";
-    }
+    return QObject::tr("Business Process");
+  }
 
 };
 
 
-class Status{
+class Criticity {
 
 public:
+  Criticity(MonitorBroker::SeverityT _value=MonitorBroker::Normal): value(_value) {}
+  void setValue(MonitorBroker::SeverityT _value) {value = _value;}
+  MonitorBroker::SeverityT getValue() const {return value;}
 
-    Status(MonitorBroker::StatusT _value=MonitorBroker::OK): value(_value) {}
+  Criticity operator *(Criticity& _criticity) const {
+    switch(value) {
+      case MonitorBroker::Critical:
+        return Criticity(value);
+        break;
+      case MonitorBroker::Normal:
+        return _criticity;
+        break;
+      case MonitorBroker::Minor:
+        if(_criticity.value == MonitorBroker::Critical ||
+           _criticity.value == MonitorBroker::Major ||
+           _criticity.value == MonitorBroker::Unknown)
+          return _criticity;
 
-    Status(MonitorBroker::StatusT _status,
-           MonitorBroker::SeverityT _severity): value(_status) {
-        applySeverity(_severity);
-    }
-    MonitorBroker::StatusT getValue() const{return value;}
+        return Criticity(value);
+        break;
+      case MonitorBroker::Major:
+        if(_criticity.value == MonitorBroker::Critical ||
+           _criticity.value == MonitorBroker::Unknown)
+          return _criticity;
 
-    Status operator *(Status& st) const {
-        switch(value) {
-        case MonitorBroker::CRITICAL :
-            return Status(MonitorBroker::CRITICAL);
-        case MonitorBroker::OK :
-            return st;
-        case MonitorBroker::WARNING:
-            if(st.value == MonitorBroker::CRITICAL
-                    || st.value == MonitorBroker::UNKNOWN) {
-                return st;
-            }
-            return Status(MonitorBroker::WARNING);
-        default : //UNKNOWN
-            if(st.value == MonitorBroker::CRITICAL) {
-                return st;
-            }
-            return Status(MonitorBroker::UNKNOWN);
-        }
-    }
+        return Criticity(value);
+        break;
+      default:
+        // MonitorBroker::CRITICITY_UNKNOWN
+        if(_criticity.value == MonitorBroker::Critical)
+          return _criticity;
+        break;
+      }  //end switch
 
-    Status operator /(Status& st) const {
-        if((value == MonitorBroker::CRITICAL) || (st.value == MonitorBroker::CRITICAL))
-            return Status(MonitorBroker::CRITICAL);
-        if((value == MonitorBroker::UNKNOWN) || (st.value == MonitorBroker::UNKNOWN))
-            return Status(MonitorBroker::UNKNOWN);
-        if(value == st.value) return  st;
-
-        return Status(MonitorBroker::WARNING);
-    }
-
-    Status operator ++(int) {
-        switch(value) {
-        case MonitorBroker::WARNING:
-            return Status(MonitorBroker::CRITICAL);
-
-        case MonitorBroker::UNKNOWN :
-            return Status(MonitorBroker::WARNING);
-
-        default : break;
-        }
-
-        return Status(value);
-    }
-
-    Status operator --(int) {
-
-        switch(value) {
-        case MonitorBroker::CRITICAL:
-            return Status(MonitorBroker::WARNING);
-
-        default : break;
-        }
-        return Status(value);
-    }
+    return Criticity(MonitorBroker::Unknown);
+  }
 
 
-    void applySeverity(MonitorBroker::SeverityT & severity) {
+  Criticity operator / (Criticity& st) const {
+    if(value == st.value)
+      return  st;
 
-        if(value == MonitorBroker::OK) {
-            return ;
-        }
+    if(value == MonitorBroker::Critical ||
+       st.value == MonitorBroker::Critical)
+      return Criticity(MonitorBroker::Critical);
 
-        switch(severity) {
-        case MonitorBroker::UNSET:
-        case MonitorBroker::INFO:
-            value =  MonitorBroker::OK;
-            break;
+    if(value == MonitorBroker::Unknown ||
+       st.value == MonitorBroker::Unknown)
+      return Criticity(MonitorBroker::Unknown);
 
-        case MonitorBroker::WARN:
-            value = MonitorBroker::WARNING;
-            break;
+    if(value == MonitorBroker::Major ||
+       st.value == MonitorBroker::Major)
+      return Criticity(MonitorBroker::Major);
 
-        case MonitorBroker::AVERAGE:
-        case MonitorBroker::HIGH:
-        case MonitorBroker::DISASTER:
-            value = MonitorBroker::CRITICAL;
-            break;
+    if(value == MonitorBroker::Minor ||
+       st.value == MonitorBroker::Minor)
+      return Criticity(MonitorBroker::Minor);
 
-        default: break;
-        }
-    }
+    return Criticity(MonitorBroker::Normal);
+  }
+
+  Criticity operator ++(int) {
+    switch(value) {
+      case MonitorBroker::Minor:
+        return Criticity(MonitorBroker::Major);
+        break;
+
+      case MonitorBroker::Major:
+        return Criticity(MonitorBroker::Critical);
+        break;
+
+      default:
+        //MonitorBroker::CRITICITY_NORMAL:
+        //MonitorBroker::CRITICITY_UNKNOWN:
+        //MonitorBroker::CRITICITY_HIGH:
+        break;
+      }
+
+    return Criticity(value);
+  }
+
+  Criticity operator --(int) {
+
+    switch(value) {
+      case MonitorBroker::Critical:
+        return Criticity(MonitorBroker::Major);
+        break;
+
+      case MonitorBroker::Major:
+        return Criticity(MonitorBroker::Minor);
+        break;
+
+      default:
+        //MonitorBroker::CRITICITY_NORMAL:
+        //MonitorBroker::CRITICITY_MINOR:
+        //MonitorBroker::CRITICITY_UNKNOWN:
+        break;
+      }
+
+    return Criticity(value);
+  }
+
 private:
 
-    MonitorBroker::StatusT value;
+  MonitorBroker::SeverityT value;
 };
 
 
 typedef struct _NodeT {
-    QString id;
-    QString name;
-    qint32 type;
-    qint32 status_crule;
-    qint32 status_prule;
-    QString icon;
-    QString description;
-    QString parent;
-    QString propagation_rule;
-    QString alarm_msg;
-    QString notification_msg;
-    qint32 status;
-    qint32 prop_status;
-    QString child_nodes;
-    MonitorBroker::NagiosCheckT check;
+  QString id;
+  QString name;
+  qint32 type;
+  qint32 sev_crule;
+  qint32 sev_prule;
+  QString icon;
+  QString description;
+  QString parent;
+  QString alarm_msg;
+  QString notification_msg;
+  qint32 severity;
+  qint32 prop_sev;
+  QString child_nodes;
+  MonitorBroker::CheckT check;
+  bool monitored;
 } NodeT;
 
 typedef QHash<QString, NodeT> NodeListT;
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, MonitorBroker::CheckT> CheckListT;
+typedef QHash<QString, QStringList> HostListT;
+typedef NodeListT::Iterator NodeListIteratorT;
+
+typedef struct _CoreDataT {
+  qint8 monitor;
+  NodeListT bpnodes;
+  NodeListT cnodes;
+  CheckStatusCountT check_status_count;
+  HostListT hosts;
+  TreeNodeItemListT tree_items;
+}CoreDataT;
 
 typedef struct _GNode {
-    QGraphicsTextItem* label;
-    QGraphicsPixmapItem* icon;
-    QGraphicsPixmapItem* exp_icon;
-    qint32 type;
-    bool expand;
+  QGraphicsTextItem* label;
+  QGraphicsPixmapItem* icon;
+  QGraphicsPixmapItem* exp_icon;
+  qint32 type;
+  bool expand;
 }GNodeT;
 
 typedef struct _GEdge {
-    QGraphicsPathItem* edge;
+  QGraphicsPathItem* edge;
 }GEdgeT;
 
-typedef QHash<QString,GNodeT> GNodeListT;
-typedef QHash<QString,GEdgeT> GEdgeListT;
-typedef QHash<QString,QStringList> HostListT;
-typedef QMap<QString,QMenu*> MenuListT;
-typedef QMap<QString,QAction*> SubMenuListT;
-typedef QMap<QString,QString> ComboBoxItemsT;
-
-
-struct Struct {
-    qint8 monitor;
-    NodeListT nodes;
-    NodeListT cnodes;
-    CheckListT checks_;
-    CheckStatusCountT check_status_count;
-    HostListT hosts;
-    TreeNodeItemListT tree_items;
-};
-
-class Settings : public QSettings
-{
-public:
-    Settings();
-    void setKeyValue(const QString & _key, const QString & _value);
-
-private:
-    QTranslator* translator ;
-};
+typedef QHash<QString, GNodeT> GNodeListT;
+typedef QHash<QString, GEdgeT> GEdgeListT;
+typedef QMap<QString, QMenu*> MenuListT;
+typedef QMap<QString, QAction*> SubMenuListT;
+typedef QMap<QString, QString> StringMapT;
+typedef QMap<qint32, QString> RequestListT;
 
 #endif /* BASE_HPP */

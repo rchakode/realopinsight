@@ -29,32 +29,34 @@
 
 class PieChartItem : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	PieChartItem(const QRectF & _bounding_rect = QRectF(10.0, 10.0, 100.0, 80.0),
-			const qreal & _start_angle = 0, const qreal & _proportion = 0,
-			const QColor & _color = Qt::green, QWidget * _parent = 0);
+  PieChartItem(const QRectF & _bounding_rect = QRectF(10.0, 10.0, 100.0, 80.0),
+               const qreal & _start_angle = 0,
+               const qreal & _proportion = 0,
+               const QColor & _color = Qt::green,
+               QWidget * _parent = 0);
 
-	QSize minimumSizeHint() const;
-	QSize sizeHint() const;
+  QSize minimumSizeHint() const;
+  QSize sizeHint() const;
 
 public slots:
-void setFillRule(Qt::FillRule rule);
-void setFillGradient(const QColor &color1, const QColor &color2);
+  void setFillRule(Qt::FillRule rule);
+  void setFillGradient(const QColor &color1, const QColor &color2);
 
 protected:
-void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event);
 
 private:
-QPainterPath path;
-QRectF pieChartBoundingRect ;
-qreal startAngle ;
-qreal proportion ;
-QColor fillColor1;
-QColor fillColor2;
+  QPainterPath path;
+  QRectF pieChartBoundingRect ;
+  qreal startAngle ;
+  qreal proportion ;
+  QColor fillColor1;
+  QColor fillColor2;
 
-void setPath(void) ;
+  void setPath(void) ;
 
 };
 

@@ -23,38 +23,43 @@
 
 #ifndef ZABBIXHELPER_HPP_
 #define ZABBIXHELPER_HPP_
+#include "Base.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
+
+
+const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+
 class ZbxHelper : public QNetworkAccessManager {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    enum {
-        LOGIN=1,
-        TRIGGER=2,
-        LOGOUT=3
-    };
+  enum {
+    Login=1,
+    Trigger=2,
+    Logout=3
+  };
 
 public:
-    ZbxHelper(const QString & baseUrl="http://localhost/zabbix");
-    virtual ~ZbxHelper();
-    void setBaseUrl(const QString & url) ;
-    QString getApiUri(void) const ;
+  ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
+  virtual ~ZbxHelper();
+  void postRequest(const qint32& reqId, const QStringList& params);
+  void setBaseUrl(const QString& url) {apiUri = url%ZBX_API_CONTEXT; mrequestHandler->setUrl(QUrl(apiUri));}
+  inline QString getApiUri(void) const {return apiUri;}
 
 public slots:
-    void get(const qint32 & reqId, const QStringList & params) ;
-    void processError(QNetworkReply::NetworkError code) ;
+  inline void processError(const QNetworkReply::NetworkError& code) {if(code <200 && code >=599) emit propagateError(code);}
 
 signals:
-    void propagateError(QNetworkReply::NetworkError);
+  void propagateError(QNetworkReply::NetworkError);
 
 private :
-    typedef QMap<qint32, QString> RequestListT;
-    QString apiUri ;
-    QNetworkRequest* requestHandler;
-    RequestListT requestsPatterns ;
-    void setRequestsPatterns();
+  QString apiUri;
+  QNetworkRequest* mrequestHandler;
+  RequestListT mrequestsPatterns;
+
+  void setRequestsPatterns();
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

@@ -30,18 +30,15 @@
 class PieChart : public  QWidget
 {
 public:
-
-	PieChart(const QRectF &  = QRectF(50, 50, 150, 100), QWidget* = 0 );
-	virtual ~PieChart();
-
-	QRectF getBoundingRect() {return boundingRect ; }
-	QString update(const CheckStatusCountT & _check_status_count, const qint32 _check_count) ;
+  PieChart(const QRectF &  = QRectF(50, 50, 150, 100), QWidget* = 0 );
+  virtual ~PieChart();
+  QRectF getBoundingRect() {return boundingRect ; }
+  QString update(const CheckStatusCountT & _check_status_count, const qint32 _count) ;
 
 private:
-	QRectF boundingRect ;
-	QMap<qint32, PieChartItem*> slices ;
-
-	StatsLegend* legend ;
+  QRectF boundingRect ;
+  QMap<qint32, PieChartItem*> slices ;
+  StatsLegend* legend ;
 };
 
 #endif /* PieChart_HPP_ */

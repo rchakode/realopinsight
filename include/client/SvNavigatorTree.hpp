@@ -26,31 +26,29 @@
 
 #include "Base.hpp"
 
-
-
 class SvNavigatorTree : public QTreeWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	SvNavigatorTree(const bool & =false, QWidget* = 0 );
-    static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
-	void update(Struct * & _snav_struct) ;
+  static const QString RootId ;
 
-	static const QString rootID ;
-    Struct* ptr2Data ;
+  SvNavigatorTree(const bool & =false, QWidget* = 0 );
+  static void addNode( TreeNodeItemListT & , const NodeT &, const bool & = false );
+  void update(CoreDataT * & _coreData) ;
+  static QTreeWidgetItem * createTreeItem(const NodeT & _node);
 
 signals:
-	void treeNodeMoved( QString _node_id ) ;
+  void treeNodeMoved( QString _nodeId ) ;
 
 protected:
-	void showEvent(QShowEvent *) ;
-	void dropEvent(QDropEvent *) ;
-	void startDrag(Qt::DropActions)  ;
+  void showEvent(QShowEvent *) ;
+  void dropEvent(QDropEvent *) ;
+  void startDrag(Qt::DropActions)  ;
 
 private:
-	QString selectedNode ;
-
+  QString mactiveNode ;
+  CoreDataT* mcoreData ;
 };
 
 #endif /* SNAVSVNAVIGATORTREE_H_ */

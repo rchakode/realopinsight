@@ -28,29 +28,31 @@
 class StatsLegend : public QWidget
 {
 public:
-	StatsLegend(const QPoint & _top_corner =  QPoint(0, 0), QWidget * _parent = 0);
+  StatsLegend(const QPoint & _top_corner =  QPoint(0, 0), QWidget * _parent = 0);
 
-	QSize minimumSizeHint() const;
-	QSize sizeHint() const;
+  QSize minimumSizeHint() const;
+  QSize sizeHint() const;
 
-	static const QColor OK_COLOR ;
-	static const QColor WARNING_COLOR ;
-	static const QColor CRITICAL_COLOR ;
-	static const QColor UNKNOWN_COLOR ;
-	static const QColor HIGHLIGHT_COLOR ;
-	static const qint32 DefaultWidth ;
-	static const qint32 DefaultHeight ;
+  static const QColor COLOR_NORMAL;
+  static const QColor COLOR_MINOR;
+  static const QColor COLOR_MAJOR;
+  static const QColor COLOR_CRITICAL;
+  static const QColor COLOR_UNKNOWN;
+  static const QColor HIGHLIGHT_COLOR;
+  static const qint32 DefaultWidth;
+  static const qint32 DefaultHeight;
 
 protected:
-void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event);
 
 
 private :
-	QPainterPath normal ;
-	QPainterPath warning ;
-	QPainterPath critical ;
-	QPainterPath unknown ;
-	QPoint leftTopCorner ;
+  QPainterPath normal;
+  QPainterPath minor;
+  QPainterPath major;
+  QPainterPath critical;
+  QPainterPath unknown;
+  QPoint leftTopCorner;
 };
 
 #endif /* SNAVSTATSLEGEND_HPP_ */

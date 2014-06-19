@@ -21,23 +21,37 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef UTILS_CLIENT_HPP
+#define UTILS_CLIENT_HPP
 
 #include "Base.hpp"
-#include "QString"
+#include <QString>
+#include <QIcon>
 
-namespace Utils {
-QString
-statusToString(const qint32 & _status);
-void
-clear(Struct& data);
-void
-alert(const QString  & msg);
-QString
-getAbsolutePath(const QString & _path);
-void
-delay(const qint32 & d) ;
-}
+namespace utils {
+  inline void delay(const qint32& d){ sleep(d);}
+  inline std::string getCtime(const QString& dt, const QString& format){
+    return QDateTime::fromString(dt, format).toString().toStdString();}
+  inline std::string getCtime(const quint32& tt){
+    return QDateTime::fromTime_t(tt).toString().toStdString();}
+  inline void alert(const QString & msg) {
+    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(APP_NAME), msg, QMessageBox::Yes);}
+  QString criticityToText(const qint32& _status);
+  void clear(CoreDataT& data);
+  QString getAbsolutePath(const QString& _path);
+  MonitorBroker::SeverityT computeCriticity(const int& _monitor, const int& _statusOrSeverity);
+  int computePropCriticity(const qint8& _criticity, const qint8& propRule);
+  QColor computeColor(const int &_criticity);
+  QIcon computeCriticityIcon(const int &_criticity);
+  bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
+  bool findNode(NodeListT& bpnodes,
+                NodeListT& cnodes,
+                const QString& nodeId,
+                NodeListT::iterator& node);
+  bool findNode(const NodeListT& bpnodes,
+                const NodeListT& cnodes,
+                const QString& nodeId,
+                NodeListT::const_iterator& node);
+} //NAMESPACE
 
-#endif // UTILS_HPP
+#endif // UTILS_CLIENT_HPP

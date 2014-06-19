@@ -25,75 +25,73 @@
 #include "Auth.hpp"
 #include "Preferences.hpp"
 #include "ns.hpp"
-#include "Utils.hpp"
+#include "utilsClient.hpp"
 
-const QString Auth::ADM_USER_NAME = USER_BASE_NAME%"_adm" ;
-const QString Auth::OP_USER_NAME = USER_BASE_NAME%"_op" ;
-const qint32 Auth::ADM_USER_ROLE = 100 ;
-const qint32 Auth::OP_USER_ROLE = 101 ;
+const QString Auth::AdmUser = USER_BN%"_adm";
+const QString Auth::OpUser = USER_BN%"_op";
 
 Auth::Auth()
-: QDialog(),
-  settings (new Settings())
+  : QDialog(),
+    settings (new Settings())
 {
-    setWindowTitle(tr("%1 - Login").arg(appName));
-	layout = new QGridLayout(this);
-	qint32 line = 0 ;
-    QPixmap logo(":images/built-in/logo.png") ;
-    QLabel* llogo =  new QLabel(); llogo->setPixmap(logo) ;
-	layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft) ;
-	line++ ;
-    layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(packageVersion).arg(releaseName)), line, 0, 2, 1, Qt::AlignLeft) ;
-	line++;
-    layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight) ;
-	layout->addWidget(login = new QLineEdit(OP_USER_NAME), line, 2, Qt::AlignJustify);
-	line++;
-    layout->addWidget(new QLabel(tr("Password")), line, 1, Qt::AlignRight) ;
-	layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignJustify);
-	password->setEchoMode(QLineEdit::Password);
-	line++;
-	layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
-    line++; QString copying = QString("\nCopyright (c) 2010-"+releaseYear +" by NGRT4N Project. All rights reserved.");
-	layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft) ;
-	addEvents();
+  setWindowTitle(tr("%1 - Login").arg(APP_NAME));
+  layout = new QGridLayout(this);
+  qint32 line = 0;
+  QPixmap logo(":images/built-in/logo.png");
+  QLabel* llogo =  new QLabel(); llogo->setPixmap(logo);
+  layout->addWidget(llogo, line, 0, 1, 3, Qt::AlignLeft);
+  line++;
+  layout->addWidget(new QLabel(tr("Version %1 (%2)").arg(PKG_VERSION).arg(RELEASE_NAME)), line, 0, 2, 1, Qt::AlignLeft);
+  line++;
+  layout->addWidget(new QLabel(tr("Login")), line, 1, Qt::AlignRight);
+  layout->addWidget(login = new QLineEdit(OpUser), line, 2, Qt::AlignJustify);
+  line++;
+  layout->addWidget(new QLabel(tr("Password")), line, 1, Qt::AlignRight);
+  layout->addWidget(password = new QLineEdit(), line, 2, Qt::AlignJustify);
+  password->setEchoMode(QLineEdit::Password);
+  line++;
+  layout->addWidget(buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel|QDialogButtonBox::Ok), line, 1, 1, 3, Qt::AlignRight);
+  line++; QString copying = QString("\nCopyright (c) 2010 NGRT4N Project. All rights reserved.");
+  layout->addWidget(new QLabel(copying), line, 0, 1, 3, Qt::AlignLeft);
+  addEvents();
 }
 
 Auth::~Auth()
 {
-	delete login ;
-	delete password ;
-	delete layout ;
+  delete login;
+  delete password;
+  delete layout;
 }
 
 
 void Auth::cancel(void)
 {
-	exit( 1 );
+  exit(1);
 }
 
 
 void Auth::authentificate(void)
 {
-	QString userName = login->text() ;
-	QString userPasswd = QCryptographicHash::hash(password->text().toAscii(), QCryptographicHash::Md5) ;
-	QString rootPasswd =  settings->value(Preferences::ADM_PASSWD_KEY).toString() ;
-	QString opPasswd =  settings->value(Preferences::OP_PASSWD_KEY).toString() ;
-    if(	! rootPasswd.isEmpty()
-            && userName == ADM_USER_NAME
-			&& userPasswd == rootPasswd ) {
-        done(ADM_USER_ROLE);
+  QString userName = login->text();
+  QString userPasswd = QCryptographicHash::hash(password->text().toAscii(), QCryptographicHash::Md5);
+  QString rootPasswd =  settings->value(Preferences::ADM_PASSWD_KEY).toString();
+  QString opPasswd =  settings->value(Preferences::OP_PASSWD_KEY).toString();
+  if(	! rootPasswd.isEmpty()
+        && userName == AdmUser
+        && userPasswd == rootPasswd ) {
+      done(AdmUserRole);
     } else if( !opPasswd.isEmpty()
-			&& userName == OP_USER_NAME
-			&& userPasswd == opPasswd ) {
-		done(OP_USER_ROLE);
-	} else {
-        Utils::alert(tr("Authentication failed: wrong username or password"));
-	}
+               && userName == OpUser
+               && userPasswd == opPasswd ) {
+      done(OpUserRole);
+    } else {
+      utils::alert(tr("Authentication failed: wrong username or password"));
+    }
 }
 
 
 void Auth::addEvents(void)
 {
-	connect(buttonBox, SIGNAL(rejected()), this, SLOT(cancel()));
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(authentificate()));
+  connect(buttonBox, SIGNAL(rejected()), this, SLOT(cancel()));
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(authentificate()));
 }

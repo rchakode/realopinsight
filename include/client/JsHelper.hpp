@@ -31,11 +31,11 @@
 class JsonHelper : public QScriptEngine
 {
 public:
-    JsonHelper(const std::string & jsonStr = "");
-    void setData(const std::string& jsonStr);
-    QScriptValue getProperty(const std::string& key);
+  JsonHelper(const std::string & jsonStr = "");
+  void setData(const std::string& jsonStr);
+  QScriptValue getProperty(const std::string& key);
 private :
-    QScriptValue data;
+  QScriptValue data;
 };
 
 #endif // JSHELPER_HPP

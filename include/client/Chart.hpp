@@ -1,5 +1,5 @@
 /*
- * MsgPanel.hpp
+ * Stats.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 24-05-2012                                                 #
@@ -21,48 +21,27 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SNAVMSGPANEL_HPP
-#define SNAVMSGPANEL_HPP
-#include "Base.hpp"
+
+#ifndef SNAVSTATS_HPP_
+#define SNAVSTATS_HPP_
+
+#include "PieChart.hpp"
 
 
-
-class MsgPanel : public QTableWidget
+class Chart : public QWidget
 {
-    Q_OBJECT
-
 public:
-    MsgPanel(QWidget * parent = 0 );
-    virtual ~MsgPanel() {}
+  static const qint32 DefaultWidth ;
+  static const qint32 DefaultHeight ;
 
-    static const qint16 msgPanelColumnCount;
-    void addMsg(const NodeListT::iterator &);
-    void resizeFields( const QSize & ,  const bool & = false );
-
-    static const QString HOSTNAME_META_MSG_PATERN ;
-    static const QString SERVICE_META_MSG_PATERN ;
-    static const QString THERESHOLD_META_MSG_PATERN  ;
-    static const QString PLUGIN_OUTPUT_META_MSG_PATERN ;
-
-public slots:
-    void acknowledgeMsg(void) { emit acknowledgeChanged() ;}
-    void sortEventConsole(void) {sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder) ;}
-
-signals:
-    void acknowledgeChanged(void) ;
-
-protected :
-    void showEvent ( QShowEvent * ) ;
+  Chart();
+  virtual ~Chart();
+  QString update(const CheckStatusCountT & _check_status_count, const qint32 & check_count) ;
+  QSize minimumSizeHint() const;
+  QSize sizeHint() const;
 
 private:
-    QPoint charSize;
-    QSize windowSize ;
-
-    static const QStringList msgPanelHeaderLabels;
-    inline QCheckBox* msgItem(const qint32 & _row, const qint32 & _column) 	{
-        return dynamic_cast<QCheckBox*>(cellWidget( _row, _column ) ) ;
-    }
-
+  PieChart * pieChart ;
 };
 
-#endif /* SNAVMSGPANEL_HPP */
+#endif /* SNAVSTATS_HPP_ */

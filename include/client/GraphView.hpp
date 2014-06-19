@@ -25,84 +25,87 @@
 #define GRAPHVIEW_HPP
 
 #include "Base.hpp"
-#include "Stats.hpp"
+#include "Chart.hpp"
 #include "SvNavigatorTree.hpp"
 
 class GraphView : public QGraphicsView
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    GraphView(QWidget* = 0 ) ;
-    virtual ~GraphView() ;
+  static IconMapT nodeIcons();
+  static const QString PLUS;
+  static const QString MINUS;
+  static const QString DEFAULT_ICON;
 
-    bool load( const QString&, const NodeListT& ) ;
-    void updateNode(const NodeListT::iterator &, const QString & _tool_tip) ;
-    void updateNodeColor(const NodeListT::iterator & ) ;
-    void setNodeVisible( const QString &, const QString &, const bool &, const qint32 &) ;
-    void scaleToFitViewPort(void) ;
-    void updateStatsPanel(Stats * _stats_panel) ;
-    void setStatsPanelPos(void) ;
+  GraphView(QWidget* = 0);
+  virtual ~GraphView();
 
-    inline void centerOnNode( const QString & id) { if (! id.isEmpty() ) centerOn( gnodesList[id].label ) ; }
-    inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){return graphScene->itemAt(mapToScene(mapFromGlobal(pos))); }
-    inline QGraphicsItem* nodeAt(QPoint pos){return graphScene->itemAt(mapToScene(pos));}
+  bool load(const QString& _dotFile,
+            const NodeListT& _bpnodes,
+            const NodeListT& _cnodes);
+  void setNodeVisible(const QString& _nodeId,
+                      const QString& _parent,
+                      const bool& _visible,
+                      const qint32& _level);
+  void updateNode(const NodeListT::iterator& _nodeIt, const QString& _toolTip);
+  void updateNode(const NodeT& _nodeIt, const QString& _toolTip);
+  void scaleToFitViewPort(void);
+  void setStatsPanelPos(void);
+  void updateStatsPanel(Chart * _stats_panel);
 
-    static IconMapT nodeIcons();
-    static const QString PLUS ;
-    static const QString MINUS ;
-    static const QString DEFAULT_ICON ;
+  inline void centerOnNode(const QString& id){
+    if (!id.isEmpty())centerOn(mgnodes[id].label);}
+  inline QGraphicsItem* nodeAtGlobalPos(QPoint pos){
+    return mscene->itemAt(mapToScene(mapFromGlobal(pos)));}
+  inline QGraphicsItem* nodeAt(QPoint pos){
+    return mscene->itemAt(mapToScene(pos));}
 
 public slots:
-    void capture(void) ;
-    void zoomIn();
-    void zoomOut();
-    bool hideChart(void) ;
+  void capture(void);
+  void zoomIn();
+  void zoomOut();
+  bool hideChart(void);
 
 signals:
-    void mouseIsOverNode( QString ) ;
-    void expandNode( QString, bool, qint32 ) ;
-    void rightClickOnItem( QGraphicsItem *, QPoint pos ) ;
-
+  void mouseIsOverNode(QString);
+  void expandNode(QString, bool, qint32);
+  void rightClickOnItem(QGraphicsItem *, QPoint pos);
 
 protected:
-    void mouseReleaseEvent( QMouseEvent * ) ;
-    void mouseDoubleClickEvent( QMouseEvent * ) ;
-    void wheelEvent( QWheelEvent * ) ;
-    void resizeEvent ( QResizeEvent * ) ;
-    void showEvent(QShowEvent * ) ;
-    void scrollContentsBy ( int dx, int dy ) ;
-
+  void mouseReleaseEvent(QMouseEvent *);
+  void mouseDoubleClickEvent(QMouseEvent *);
+  void wheelEvent(QWheelEvent * _event) { (_event->delta() > 0)? zoomIn() : zoomOut();}
+  void resizeEvent(QResizeEvent *) {setStatsPanelPos();}
+  void showEvent(QShowEvent *) {setStatsPanelPos();}
+  void scrollContentsBy(int dx, int dy) {QGraphicsView::scrollContentsBy (dx, dy);
+                                           setStatsPanelPos();}
 
 private:
-    QGraphicsScene* graphScene ;
-    QGraphicsProxyWidget* statsPanelItem ;
-    QGraphicsRectItem* statsArea ;
-    QPoint statsPanelPos ;
+  static const qreal XSCAL_FACTOR;
+  static const qreal YSCAL_FACTOR;
+  static const QString LABEL_NODE;
+  static const QString  ICON_NODE;
+  static const QString  EXPICON_NODE;
 
-    QString svgGraphFile ;
-    QString coodinatesGraphFile ;
+  QGraphicsScene* mscene;
+  QGraphicsProxyWidget* mchart;
+  QGraphicsRectItem* mchartArea;
+  QPoint mchartPos;
+  QString msvgGphFile;
+  QString mgphCoordFile;
+  GNodeListT mgnodes;
+  GEdgeListT medges;
+  IconMapT micons;
+  qreal mviewScalFactor;
+  qreal mchartScalFactor;
+  bool misAjustedChartSize;
 
-    GNodeListT gnodesList ;
-    GEdgeListT edgesList ;
-
-    IconMapT iconMap ;
-
-    static const qreal XScalingRatio ;
-    static const qreal YScalingRatio ;
-    qreal portViewScalingRatio ;
-    qreal statsPanelScaleRatio ;
-    bool isAjustedStatsPanelSize ;
-
-    void drawGraph(const NodeListT &) ;
-    void drawNode(const NodeT & ) ;
-    void setEdgePath(const QString &, const QString &, QPainterPath & ) ;
-    void setNodePos(const QString & , const QPointF & ) ;
-    void ajustStatsPanelSize(void) ;
-
-    static const QString NODE_LABEL_ID_SFX ;
-    static const QString  NODE_ICON_ID_SFX ;
-    static const QString  NODE_EXP_ICON_ID_SFX ;
+  void setEdgePath(const QString& _parentVertex, const QString& _childVertex, QPainterPath& path);
+  void drawMap(const NodeListT &_bpnodes, const NodeListT& _cnodes);
+  void drawNode(const NodeT&);
+  void setNodePos(const QString& , const QPointF&);
+  void ajustStatsPanelSize(void);
 };
 
 #endif /* GRAPHVIEW_HPP */

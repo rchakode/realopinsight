@@ -25,783 +25,964 @@
 #include "SvNavigator.hpp"
 #include "core/MonitorBroker.hpp"
 #include "core/ns.hpp"
-#include "Utils.hpp"
+#include "utilsClient.hpp"
 #include "client/JsHelper.hpp"
+#include <QScriptValueIterator>
+#include <QSystemTrayIcon>
 #include <sstream>
 #include <QStatusBar>
 #include <QObject>
+#include <zmq.h>
+#include <iostream>
+#include <locale>
+#include <memory>
 
-
-const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nStatus: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
-const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nCheck/Trigger ID: %7\nCheck Output: %8\nMore info: %9"));
-const QString SERVICE_OFFLINE_MSG(QObject::tr("ERROR: Failed to connect to %1"));
+const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
+const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1"));
 const QString DEFAULT_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 const QString ID_PATTERN("%1/%2");
+const string UNKNOWN_UPDATE_TIME = utils::getCtime(0);
 
-ComboBoxItemsT SvNavigator::propRules() {
-    ComboBoxItemsT map;
-    map.insert(StatusPropRules::label(StatusPropRules::Unchanged),StatusPropRules::toString(StatusPropRules::Unchanged));
-    map.insert(StatusPropRules::label(StatusPropRules::Decreased),StatusPropRules::toString(StatusPropRules::Decreased));
-    map.insert(StatusPropRules::label(StatusPropRules::Increased),StatusPropRules::toString(StatusPropRules::Increased));
-    return map;
+StringMapT SvNavigator::propRules() {
+  StringMapT map;
+  map.insert(PropRules::label(PropRules::Unchanged),
+             PropRules::toString(PropRules::Unchanged));
+  map.insert(PropRules::label(PropRules::Decreased),
+             PropRules::toString(PropRules::Decreased));
+  map.insert(PropRules::label(PropRules::Increased),
+             PropRules::toString(PropRules::Increased));
+  return map;
 }
 
-ComboBoxItemsT SvNavigator::calcRules() {
-    ComboBoxItemsT map;
-    map.insert(StatusCalcRules::label(StatusCalcRules::HighCriticity),StatusCalcRules::toString(StatusCalcRules::HighCriticity));
-    map.insert(StatusCalcRules::label(StatusCalcRules::WeightedCriticity),StatusCalcRules::toString(StatusCalcRules::WeightedCriticity));
-    return map;
+StringMapT SvNavigator::calcRules() {
+  StringMapT map;
+  map.insert(CalcRules::label(CalcRules::HighCriticity),
+             CalcRules::toString(CalcRules::HighCriticity));
+  map.insert(CalcRules::label(CalcRules::WeightedCriticity),
+             CalcRules::toString(CalcRules::WeightedCriticity));
+  return map;
 }
 
-SvNavigator::SvNavigator(const qint32 & _userRole,
-                         const QString & _config,
+SvNavigator::SvNavigator(const qint32& _userRole,
+                         const QString& _config,
                          QWidget* parent)
-    : QMainWindow(parent),
-      coreData (new Struct()),
-      configFile(_config),
-      userRole (_userRole),
-      settings (new Settings()),
-      statsPanel (new Stats()),
-      filteredMsgPanel (NULL),
-      mainSplitter (new QSplitter(this)),
-      rightSplitter (new QSplitter()),
-      topRightPanel (new QTabWidget()),
-      bottomRightPanel (new QTabWidget()),
-      browser (new WebKit()),
-      graphView (new GraphView()),
-      navigationTree (new SvNavigatorTree()),
-      monPrefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
-      changePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
-      msgPanel(new MsgPanel()),
-      nodeContextMenu (new QMenu()),
-      zxHelper(new ZbxHelper()),
-      zxAuthToken(""),
-      hLeft(0)
+  : QMainWindow(parent),
+    mcoreData (new CoreDataT()),
+    mconfigFile(_config),
+    muserRole (_userRole),
+    msettings (new Settings()),
+    mchart (new Chart()),
+    mfilteredMsgConsole (NULL),
+    mmainSplitter (new QSplitter(this)),
+    mrightSplitter (new QSplitter()),
+    mviewPanel (new QTabWidget()),
+    mmsgConsolePanel (new QTabWidget()),
+    mbrowser (new WebKit()),
+    mmap (new GraphView(this)),
+    mtree (new SvNavigatorTree()),
+    mprefWindow (new Preferences(_userRole, Preferences::ChangeMonitoringSettings)),
+    mchangePasswdWindow (new Preferences(_userRole, Preferences::ChangePassword)),
+    mmsgConsole(new MsgConsole(this)),
+    mnodeContextMenu (new QMenu()),
+    mzbxHelper(new ZbxHelper()),
+    mzbxAuthToken(""),
+    mhostLeft(0),
+    mznsHelper(new ZnsHelper()),
+    misLogged(false),
+    mlastError(""),
+    mtrayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png")))
 {
-    setWindowTitle(tr("%1 Operations Console").arg(appName));
-    loadMenus();
-    topRightPanel->addTab(graphView, tr("Dashboard"));
-    topRightPanel->addTab(browser, tr("Native Web UI"));
-    bottomRightPanel->addTab(msgPanel, tr("Event Console"));
-    mainSplitter->addWidget(navigationTree);
-    mainSplitter->addWidget(rightSplitter);
-    rightSplitter->addWidget(topRightPanel);
-    rightSplitter->addWidget(bottomRightPanel);
-    rightSplitter->setOrientation(Qt::Vertical);
-    setCentralWidget(mainSplitter);
-    updateMonitoringSettings();
-    addEvents();
+  setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
+  loadMenus();
+  mviewPanel->addTab(mmap, tr("Dashboard"));
+  mviewPanel->addTab(mbrowser, tr("Native Web UI"));
+  mmsgConsolePanel->addTab(mmsgConsole, tr("Event Console"));
+  mmainSplitter->addWidget(mtree);
+  mmainSplitter->addWidget(mrightSplitter);
+  mrightSplitter->addWidget(mviewPanel);
+  mrightSplitter->addWidget(mmsgConsolePanel);
+  mrightSplitter->setOrientation(Qt::Vertical);
+  setCentralWidget(mmainSplitter);
+  updateMonitoringSettings();
+  tabChanged(0);
+  addEvents();
 }
 
 SvNavigator::~SvNavigator()
 {
-    delete msgPanel;
-    delete statsPanel;
-    delete navigationTree;
-    delete browser;
-    delete graphView;
-    delete coreData;
-    delete topRightPanel;
-    delete bottomRightPanel;
-    delete rightSplitter;
-    delete mainSplitter;
-    delete monPrefWindow;
-    delete changePasswdWindow;
-    delete zxHelper;
-    if(filteredMsgPanel) delete filteredMsgPanel;
-    unloadMenus();
+  if (mfilteredMsgConsole) delete mfilteredMsgConsole;
+  delete mmsgConsole;
+  delete mchart;
+  delete mtree;
+  delete mbrowser;
+  delete mmap;
+  delete mcoreData;
+  delete mviewPanel;
+  delete mmsgConsolePanel;
+  delete mrightSplitter;
+  delete mmainSplitter;
+  delete mprefWindow;
+  delete mchangePasswdWindow;
+  delete mzbxHelper;
+  delete mznsHelper;
+  delete mtrayIcon;
+  unloadMenus();
+}
+
+void SvNavigator::loadMenus(void)
+{
+  QMenuBar* menuBar = new QMenuBar();
+  mmenus["FILE"] = menuBar->addMenu("&File"),
+      msubMenus["Refresh"] = mmenus["FILE"]->addAction(QIcon(":images/built-in/refresh.png"),tr("&Refresh Screen")),
+      msubMenus["Capture"] = mmenus["FILE"]->addAction( QIcon(":images/built-in/camera.png"),tr("&Save Map as Image")),
+      mmenus["FILE"]->addSeparator(),
+      msubMenus["Quit"] = mmenus["FILE"]->addAction(tr("&Quit"));
+  mmenus["MAP"] = menuBar->addMenu("&Map"),
+      msubMenus["ZoomIn"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomin.png"),tr("Zoom &In")),
+      msubMenus["ZoomOut"] = mmenus["MAP"]->addAction(QIcon(":images/built-in/zoomout.png"),tr("Zoom &Out")),
+      msubMenus["HideChart"] = mmenus["MAP"]->addAction(tr("Hide &Chart"));
+  mmenus["PREFERENCES"] = menuBar->addMenu("&Preferences"),
+      msubMenus["ChangePassword"] = mmenus["PREFERENCES"]->addAction(tr("Change &Password")),
+      msubMenus["ChangeMonitoringSettings"] = mmenus["PREFERENCES"]->addAction(tr("&Monitoring Settings"));
+  mmenus["BROWSER"] = menuBar->addMenu("&Browser"),
+      msubMenus["BrowserBack"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-back.png"),tr("Bac&k")),
+      msubMenus["BrowserForward"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-forward.png"),tr("For&ward"));
+  msubMenus["BrowserStop"] = mmenus["BROWSER"]->addAction(QIcon(":images/built-in/browser-stop.png"),tr("Sto&p"));
+  mmenus["HELP"] = menuBar->addMenu("&Help"),
+      msubMenus["ShowOnlineResources"] = mmenus["HELP"]->addAction(tr("Online &Resources")),
+      mmenus["HELP"]->addSeparator(),
+      msubMenus["ShowAbout"] = mmenus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
+  msubMenus["Capture"]->setShortcut(QKeySequence::Save);
+  msubMenus["Refresh"]->setShortcut(QKeySequence::Refresh);
+  msubMenus["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
+  msubMenus["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
+  msubMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
+  msubMenus["Quit"]->setShortcut(QKeySequence::Quit);
+
+  mcontextMenuList["FilterNodeRelatedMessages"] = mnodeContextMenu->addAction(tr("&Filter related messages"));
+  mcontextMenuList["CenterOnNode"] = mnodeContextMenu->addAction(tr("Center Graph &On"));
+  mcontextMenuList["Cancel"] = mnodeContextMenu->addAction(tr("&Cancel"));
+
+  QToolBar* toolBar = addToolBar(APP_NAME);
+  toolBar->setIconSize(QSize(16,16));
+  toolBar->addAction(msubMenus["Refresh"]);
+  toolBar->addAction(msubMenus["ZoomIn"]);
+  toolBar->addAction(msubMenus["ZoomOut"]);
+  toolBar->addAction(msubMenus["Capture"]);
+  toolBar->addAction(msubMenus["BrowserBack"]);
+  toolBar->addAction(msubMenus["BrowserForward"]);
+  toolBar->addAction(msubMenus["BrowserStop"]);
+  setMenuBar(menuBar);
 }
 
 void SvNavigator::closeEvent(QCloseEvent * event)
 {
-    if(filteredMsgPanel)
-        filteredMsgPanel->close();
-    QMainWindow::closeEvent(event);
+  if (mfilteredMsgConsole) mfilteredMsgConsole->close();
+  QMainWindow::closeEvent(event);
 }
-
 
 void SvNavigator::contextMenuEvent(QContextMenuEvent * event)
 {
-    QPoint pos = event->globalPos();
-    QList<QTreeWidgetItem*> treeNodes = navigationTree->selectedItems();
-    QGraphicsItem* graphNode = graphView->nodeAtGlobalPos(pos);
-
-    if (treeNodes.length() || graphNode) {
-        if(graphNode) {
-            QString itemId = graphNode->data(0).toString();
-            selectedNodeId =  itemId.left(itemId.indexOf(":"));
+  QPoint pos = event->globalPos();
+  QList<QTreeWidgetItem*> treeNodes = mtree->selectedItems();
+  QGraphicsItem* graphNode = mmap->nodeAtGlobalPos(pos);
+  if (treeNodes.length() || graphNode) {
+      if (graphNode) {
+          QString itemId = graphNode->data(0).toString();
+          mselectedNode =  itemId.left(itemId.indexOf(":"));
         }  else {
-            selectedNodeId = treeNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
+          mselectedNode = treeNodes[0]->data(0, QTreeWidgetItem::UserType).toString();
         }
-
-        nodeContextMenu->exec(pos);
+      mnodeContextMenu->exec(pos);
     }
 }
 
 void SvNavigator::startMonitor()
 {
-    updateStatusBar(tr("Connecting to the server..."));
-    success = true ;
-    setEnabled(false);
-    switch(coreData->monitor){
-    case MonitorBroker::ZABBIX:
-        zxAuthToken.isEmpty()? openZabbixSession() : requestZabbixChecks();
-        break;
-    case MonitorBroker::NAGIOS:
-    default :
-        runNagiosMonitor();
-        break;
+  prepareDashboardUpdate();
+  switch(mcoreData->monitor) {
+    case MonitorBroker::Zenoss:
+    case MonitorBroker::Zabbix:
+      !misLogged ? openRpcSession(): postRpcDataRequest();
+      break;
+    case MonitorBroker::Nagios:
+    default:
+      runNagiosMonitor();
+      break;
     }
-    setEnabled(true);
-    updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
-    updateInterval = 1000 * ((updateInterval > 0)? updateInterval : MonitorBroker::DEFAULT_UPDATE_INTERVAL);
-    timerId = startTimer(updateInterval);
 }
 
 void SvNavigator::timerEvent(QTimerEvent *)
 {
-    startMonitor();
+  startMonitor();
 }
 
-void SvNavigator::load(const QString & _file)
+void  SvNavigator::updateStatusBar(const QString& msg)
 {
-    if( ! _file.isEmpty()) {
-        configFile = Utils::getAbsolutePath(_file);
-    }
-    openedFile = configFile;
-    Parser parser;
-    parser.parseSvConfig(configFile, *coreData);
-    navigationTree->clear();
-    navigationTree->addTopLevelItem(coreData->tree_items[SvNavigatorTree::rootID]);
-    graphView->load(parser.getDotGraphFile(), coreData->nodes);
-    browser->setUrl(monitorBaseUrl);
-    resize();
-    show();
-    graphView->scaleToFitViewPort();
-    setWindowTitle(tr("%1 Operations Console - %2").arg(appName).arg(configFile));
+  statusBar()->showMessage(msg);
+}
+
+void SvNavigator::load(const QString& _file)
+{
+  if (!_file.isEmpty())
+    mconfigFile = utils::getAbsolutePath(_file);
+  mactiveFile = mconfigFile;
+  QMainWindow::setWindowTitle(tr("%1 Operations Console - %2").arg(APP_NAME, mconfigFile));
+  Parser parser;
+  parser.parseSvConfig(mconfigFile, *mcoreData);
+  mtree->clear();
+  mtree->addTopLevelItem(mcoreData->tree_items[SvNavigatorTree::RootId]);
+  mmap->load(parser.getDotGraphFile(), mcoreData->bpnodes, mcoreData->cnodes);
+  mbrowser->setUrl(mmonitorBaseUrl);
+  this->resize();
+  QMainWindow::show();
+  mmap->scaleToFitViewPort();
+  mtrayIcon->show();
+  mtrayIcon->setToolTip(APP_NAME);
 }
 
 void SvNavigator::unloadMenus(void)
 {
-    subMenuList.clear();
-    menuList.clear();
-    delete nodeContextMenu;
+  msubMenus.clear();
+  mmenus.clear();
+  delete mnodeContextMenu;
 }
 
 void SvNavigator::handleChangePasswordAction(void)
 {
-    changePasswdWindow->exec();
+  mchangePasswdWindow->exec();
 }
 
 void SvNavigator::handleChangeMonitoringSettingsAction(void)
 {
-    monPrefWindow->exec();
-    updateMonitoringSettings();
-    killTimer(timerId);
-    timerId = startTimer(updateInterval);
-    zxAuthToken.clear();
-    startMonitor();
+  mprefWindow->exec();
+  updateMonitoringSettings();
+  killTimer(mtimer);
+  mtimer = startTimer(mupdateInterval);
+  misLogged = false;
+  startMonitor();
 }
 
 void SvNavigator::handleShowOnlineResources(void)
 {
-    QDesktopServices appLauncher;
-    appLauncher.openUrl(QUrl("http://RealOpInsight.com/"));
+  QDesktopServices appLauncher;
+  appLauncher.openUrl(QUrl("http://RealOpInsight.com/"));
 }
 
 void SvNavigator::handleShowAbout(void)
 {
-    Preferences about(userRole, Preferences::ShowAbout);
-    about.exec();
+  Preferences about(muserRole, Preferences::ShowAbout);
+  about.exec();
 }
 
 int SvNavigator::runNagiosMonitor(void)
 {
-    zmq::context_t comContext(1);
-    string srvVer;
-    comChannel = ZmqHelper::initCliChannel(comContext, serverUrl, srvVer);
-    if(!comChannel) {
-        QString msg = SERVICE_OFFLINE_MSG.arg(QString::fromStdString(serverUrl));
-        Utils::alert(msg);
-        updateStatusBar(msg);
-        success = false ;
+  auto socket = std::unique_ptr<Socket>(new Socket(mserverUrl.toStdString(), ZMQ_REQ));
+  if(socket->connect())
+    socket->makeHandShake();
+  if (socket->isConnected2Server()) {
+      if (socket->getServerSerial() < 110) {
+          utils::alert(tr("The server %1 is not supported").arg(socket->getServerSerial()));
+          mupdateSucceed = false;
+        }
+      updateStatusBar(tr("Updating..."));
     } else {
-        if(atoi(QString::fromStdString(srvVer).remove(".").toAscii()) < 110) {
-            Utils::alert(tr("ERROR: The server %1 is not supported").arg(QString::fromStdString(srvVer)));
-            success = false;
-        }
-        updateStatusBar(tr("Updating..."));
+      mupdateSucceed = false;
+      QString msg = SERVICE_OFFLINE_MSG.arg(mserverUrl);
+      utils::alert(msg);
+      updateStatusBar(msg);
     }
-    resetStatData();
-    msgPanel->setSortingEnabled(false);
 
-    foreach(const QString & checkId, coreData->cnodes.keys()) {
-
-        NodeListT::iterator node = coreData->nodes.find(checkId); //TODO
-        if(node == coreData->nodes.end()) {
-            continue;
+  for (auto& cnode : mcoreData->cnodes) {
+      if (cnode.child_nodes == "") {
+          cnode.severity = MonitorBroker::Unknown;
+          mcoreData->check_status_count[cnode.severity]++;
+          continue;
         }
 
-        if(node->child_nodes == "") {
-            node->status = MonitorBroker::UNKNOWN;
-            coreData->check_status_count[node->status]++;
-            continue;
-        }
-
-        QStringList childNodes = node->child_nodes.split(Parser::CHILD_NODES_SEP);
-        foreach(const QString & nodeId, childNodes) {
-            string msg = serverAuthChain+":"+nodeId.toStdString(); //TODO à mettre au propre avec la nouvelle organization => cnodes
-            if(success) {
-                ZmqHelper::sendFromSocket(*comChannel, msg);
-                msg = ZmqHelper::recvFromSocket(*comChannel);
+      QStringList checks = cnode.child_nodes.split(Parser::CHILD_SEP);
+      for(auto cid : checks) {
+          QString msg = mserverAuthChain%":"%cid;
+          if (mupdateSucceed) {
+              socket->send(msg.toStdString());
+              msg = QString::fromStdString(socket->recv());
             } else {
-                msg = DEFAULT_ERROR_MSG.arg(QString::fromStdString(serverUrl)).toStdString();
+              msg = DEFAULT_ERROR_MSG.arg(mserverUrl);
             }
-            JsonHelper jsHelper(msg);
-            if(jsHelper.getProperty("return_code").toInt32() == 0 && comChannel) {
-                node->check.status = jsHelper.getProperty("status").toInt32();
-                node->check.host = jsHelper.getProperty("host").toString().toStdString();
-                node->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
-                node->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-                node->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+          JsonHelper jsHelper(msg.toStdString());
+          if (jsHelper.getProperty("return_code").toInt32() == 0
+              && socket->isConnected2Server())
+            {
+              cnode.check.status = jsHelper.getProperty("status").toInt32();
+              cnode.check.host = jsHelper.getProperty("host").toString().toStdString();
+              cnode.check.last_state_change = utils::getCtime(jsHelper.getProperty("lastchange").toUInt32());
+              cnode.check.check_command = jsHelper.getProperty("command").toString().toStdString();
+              cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             } else {
-                node->check.status = MonitorBroker::UNKNOWN;
-                node->check.host = "Unknown";
-                node->check.last_state_change = "0";
-                node->check.check_command = "Unknown" ;
-                node->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+              cnode.check.status = MonitorBroker::NagiosUnknown;
+              cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
+              cnode.check.host = "-";
+              cnode.check.check_command = "-";
+              cnode.check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
             }
-            coreData->check_status_count[node->check.status]++;
-            updateNode(node);
+          cnode.monitored = true;
+          computeStatusInfo(cnode);
+          updateDashboard(cnode);
+          mcoreData->check_status_count[cnode.severity]++;
         }
     }
-    updateStats();
-    ZmqHelper::endCliChannel(comChannel);
-    return 0;
+  socket.reset(nullptr);
+  finalizeDashboardUpdate();
+  return 0;
 }
 
-void SvNavigator::resetStatData(void)
+void SvNavigator::prepareDashboardUpdate(void)
 {
-    coreData->check_status_count[MonitorBroker::OK] = 0;
-    coreData->check_status_count[MonitorBroker::WARNING] = 0;
-    coreData->check_status_count[MonitorBroker::CRITICAL] = 0;
-    coreData->check_status_count[MonitorBroker::UNKNOWN] = 0;
-    hLeft = coreData->hosts.size();
-    iter = 0;
+  QMainWindow::setEnabled(false);
+  mcoreData->check_status_count[MonitorBroker::Normal] = 0;
+  mcoreData->check_status_count[MonitorBroker::Minor] = 0;
+  mcoreData->check_status_count[MonitorBroker::Major] = 0;
+  mcoreData->check_status_count[MonitorBroker::Critical] = 0;
+  mcoreData->check_status_count[MonitorBroker::Unknown] = 0;
+  mhostLeft = mcoreData->hosts.size();
+  mupdateSucceed = true;
+  QString msg = QObject::tr("Connecting to %1...");
+  switch(mcoreData->monitor) {
+    case MonitorBroker::Nagios:
+      msg = msg.arg(mserverUrl);
+      break;
+    case MonitorBroker::Zabbix:
+      msg = msg.arg(mzbxHelper->getApiUri());
+      break;
+    case MonitorBroker::Zenoss:
+      msg = msg.arg(mznsHelper->getApiBaseUrl()); //FIXME: msg.arg(mznsHelper->getApiContextUrl()) crashes
+      break;
+    default:
+      break;
+    }
+  updateStatusBar(msg);
 }
 
-
-QString SvNavigator::getNodeToolTip(const NodeT & _node)
+QString SvNavigator::getNodeToolTip(const NodeT& _node)
 {
-    QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name)
-            .arg(const_cast<QString&>(_node.description).replace("\n", " "))
-            .arg(Utils::statusToString(_node.status))
-            .arg(StatusCalcRules::label(_node.status_crule))
-            .arg(StatusPropRules::label(_node.status_prule));
-    if (_node.type == NodeType::ALARM_NODE) {
-        QString msg = "";
-        if(_node.status == MonitorBroker::OK) {
-            msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
+  QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
+                                            const_cast<QString&>(_node.description).replace("\n", " "),
+                                            utils::criticityToText(_node.severity),
+                                            CalcRules::label(_node.sev_crule),
+                                            PropRules::label(_node.sev_prule));
+
+  if (_node.type == NodeType::ALARM_NODE) {
+      QString msg = "";
+      if (_node.severity == MonitorBroker::Normal) {
+          msg = const_cast<QString&>(_node.notification_msg).replace("\n", " ");
         } else {
-            msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
+          msg = QString::fromStdString(_node.check.alarm_msg).replace("\n", " ");
         }
-        toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "))
-                .arg(_node.child_nodes)
-                .arg(QString::fromStdString(_node.check.alarm_msg).replace("\n", " "))
-                .arg(msg);
+      toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
+                                                _node.child_nodes,
+                                                QString::fromStdString(_node.check.alarm_msg).replace("\n", " "),
+                                                msg);
     }
-
-    return toolTip;
+  return toolTip;
 }
 
-void SvNavigator::updateNode(NodeListT::iterator & _node) {
-    QString toolTip;
-    _node->status = _node->prop_status = _node->check.status;
-    updateAlarmMsg(_node);
-    toolTip = getNodeToolTip(*_node);
-    updateNavTreeItemStatus(_node, toolTip);
-    graphView->updateNode(_node, toolTip);
-    msgPanel->addMsg(_node);
-    emit hasToBeUpdate(_node->parent);
-}
-
-void SvNavigator::updateStats() {
-
-    qint64 nbChecks = coreData->cnodes.size();
-    if(nbChecks == 0) return;
-    Stats *stats = new Stats;
-    QString info = stats->update(coreData->check_status_count, nbChecks);
-    stats->setToolTip(info);
-    graphView->updateStatsPanel(stats);
-    if(statsPanel) delete statsPanel;
-    statsPanel = stats;
-    msgPanel->sortItems(MsgPanel::msgPanelColumnCount - 1, Qt::DescendingOrder);
-    msgPanel->resizeFields(msgPanelSize);
-    if(success) updateStatusBar("Update completed");
-}
-
-void SvNavigator::updateAlarmMsg(NodeListT::iterator &  _node)
+void SvNavigator::updateDashboard(NodeListT::iterator& _node)
 {
-    QRegExp regexp;
-    QStringList splited_check_id;
-    QStringList splited_check_command;
-    QString  msg;
-    qint32 len;
+  updateDashboard(*_node);
+}
 
-    splited_check_id = QString(_node->check.id.c_str()).split("/");
-    len =  splited_check_id.length();
+void SvNavigator::updateDashboard(const NodeT& _node)
+{
+  QString toolTip = getNodeToolTip(_node);
+  updateNavTreeItemStatus(_node, toolTip);
+  mmap->updateNode(_node, toolTip);
+  mmsgConsole->updateNodeMsg(_node);
+  emit hasToBeUpdate(_node.parent);
+}
 
-    if(_node->status == MonitorBroker::OK) {
-        msg = _node->notification_msg;
-    } else {
-        msg = _node->alarm_msg;
-    }
+void SvNavigator::updateCNodes(const MonitorBroker::CheckT& check) {
 
-    if(len) {
-        regexp.setPattern(MsgPanel::HOSTNAME_META_MSG_PATERN);
-        msg.replace(regexp, splited_check_id[0]);
-
-        if(len == 2) {
-            regexp.setPattern(MsgPanel::SERVICE_META_MSG_PATERN);
-            msg.replace(regexp, splited_check_id[1]);
+  for (auto& cnode : mcoreData->cnodes) {
+      if (cnode.child_nodes.toStdString() == check.id) {
+          cnode.check = check;
+          computeStatusInfo(cnode);
+          mcoreData->check_status_count[cnode.severity]++;
+          updateDashboard(cnode);
+          cnode.monitored = true;
         }
-    }
-
-    splited_check_command = QString(_node->check.check_command.c_str()).split("!");
-    if(splited_check_command.length() >= 3) {
-        regexp.setPattern(MsgPanel::THERESHOLD_META_MSG_PATERN);
-        msg.replace(regexp, splited_check_command[1]);
-
-        if(_node->status == MonitorBroker::WARNING) {
-            msg.replace(regexp, splited_check_command[2]);
-        }
-
-    }
-
-    if(_node->status == MonitorBroker::OK) {
-        _node->notification_msg = msg;
-    } else {
-        _node->alarm_msg = msg;
     }
 }
 
-void SvNavigator::updateNodeStatus(QString _node_id)
+void SvNavigator::finalizeDashboardUpdate(const bool& enable)
 {
-    qint32 normal_count = 0;
-    qint32 warning_count = 0;
-    qint32 unknown_count = 0;
-    qint32 critical_count = 0;
+  if (!mcoreData->cnodes.isEmpty()) {
+      Chart *chart = new Chart;
+      QString chartdDetails = chart->update(mcoreData->check_status_count, mcoreData->cnodes.size());
+      mmap->updateStatsPanel(chart);
+      if (mchart) delete mchart; mchart = chart; mchart->setToolTip(chartdDetails);
+      mmsgConsole->sortByColumn(1, Qt::AscendingOrder);
+      mmsgConsole->updateColumnWidths(mmsgConsoleSize);
+      mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt();
+      mupdateInterval = 1000*((mupdateInterval > 0)? mupdateInterval:MonitorBroker::DefaultUpdateInterval);
+      mtimer = startTimer(mupdateInterval);
+      if (mupdateSucceed) updateStatusBar(tr("Update completed"));
+      for (auto& cnode : mcoreData->cnodes) {
+          if (!cnode.monitored) {
+              cnode.check.status = MonitorBroker::Unknown;
+              cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
+              cnode.check.host = "-";
+              cnode.check.alarm_msg = tr("Unknown service %1").arg(cnode.child_nodes).toStdString();
+              computeStatusInfo(cnode);
+              mcoreData->check_status_count[cnode.severity]++;
+              updateDashboard(cnode);
+              cnode.monitored = true;
+            }
+          cnode.monitored = false;
+        }
+    }
+  if (!mcoreData->bpnodes.isEmpty())
+    updateTrayInfo(mcoreData->bpnodes[SvNavigatorTree::RootId]); //FIXME: avoid searching at each update
+  QMainWindow::setEnabled(enable);
+}
 
-    NodeListT::iterator node = coreData->nodes.find(_node_id);
-    if (node == coreData->nodes.end()) return;
+void SvNavigator::computeStatusInfo(NodeListT::iterator&  _node)
+{
+  computeStatusInfo(*_node);
+}
 
-    Status status;
-    QStringList node_ids = node->child_nodes.split(Parser::CHILD_NODES_SEP);
-    for(QStringList::const_iterator it = node_ids.begin(); it != node_ids.end(); it++) {
+void SvNavigator::computeStatusInfo(NodeT& _node)
+{
+  _node.severity = utils::computeCriticity(mcoreData->monitor, _node.check.status);
+  _node.prop_sev = utils::computePropCriticity(_node.severity, _node.sev_prule);
+  QString statusText = (_node.severity == MonitorBroker::Normal)? _node.notification_msg : _node.alarm_msg;
+  QRegExp regexp(MsgConsole::TAG_HOSTNAME);
+  statusText.replace(regexp, _node.check.host.c_str());
 
-        NodeListT::iterator child = coreData->nodes.find(*it);
-        if (child == coreData->nodes.end()) continue;
+  auto info = QString(_node.check.id.c_str()).split("/");
+  if (info.length() > 1) {
+      regexp.setPattern(MsgConsole::TAG_CHECK);
+      statusText.replace(regexp, info[1]);
+    }
+  if (mcoreData->monitor == MonitorBroker::Nagios) { // FIXME: Threshold tag don't work for other monitors
+      info = QString(_node.check.check_command.c_str()).split("!");
+      if (info.length() >= 3) {
+          regexp.setPattern(MsgConsole::TAG_THERESHOLD);
+          statusText.replace(regexp, info[1]);
+          if (_node.severity == MonitorBroker::Major)
+            statusText.replace(regexp, info[2]);
+        }
+    }
+  if (mcoreData->monitor == MonitorBroker::Zabbix) {
+      regexp.setPattern(MsgConsole::TAG_HOSTNAME_ZABBIX);
+      statusText.replace(regexp, _node.check.host.c_str());
+      _node.check.alarm_msg = QString(_node.check.alarm_msg.c_str()).replace(regexp, _node.check.host.c_str()).toStdString();
+    }
+  if (_node.severity == MonitorBroker::Normal) {
+      _node.notification_msg = statusText;
+    } else {
+      _node.alarm_msg = statusText;
+    }
+}
 
-        Status cst(static_cast<MonitorBroker::StatusT>(child->prop_status));
+void SvNavigator::updateBpNode(const QString& _nodeId)
+{
+  NodeListT::iterator node;
+  if (!utils::findNode(mcoreData, _nodeId, node)) return;
 
-        if(node->status_crule == StatusCalcRules::WeightedCriticity) {
-            status = status / cst;
+  QStringList nodeIds = node->child_nodes.split(Parser::CHILD_SEP);
+  Criticity criticity;
+  for (auto nodeId : nodeIds) {
+      NodeListT::iterator child;
+      if (!utils::findNode(mcoreData, nodeId, child)) continue;
+      Criticity cst(static_cast<MonitorBroker::SeverityT>(child->prop_sev));
+      if (node->sev_crule == CalcRules::WeightedCriticity) {
+          criticity = criticity / cst;
         } else {
-            status = status *  cst;
-        }
-
-        switch(child->status) {
-
-        case MonitorBroker::CRITICAL:
-            critical_count ++;
-            break;
-
-        case MonitorBroker::WARNING:
-            warning_count ++;
-            break;
-
-        case MonitorBroker::UNKNOWN:
-            unknown_count ++;
-            break;
-
-        case MonitorBroker::OK:
-            normal_count ++;
-            break;
-
-        default:
-            break;
+          criticity = criticity * cst;
         }
     }
-
-    node->status = status.getValue();
-
-    switch(node->status_prule) {
-    case StatusPropRules::Increased: node->prop_status = (status++).getValue();
-        break;
-    case StatusPropRules::Decreased: node->prop_status = (status--).getValue();
-        break;
-    default: node->prop_status = node->status;
-        break;
-
+  node->severity = criticity.getValue();
+  switch(node->sev_prule) {
+    case PropRules::Increased: node->prop_sev = (criticity++).getValue();
+      break;
+    case PropRules::Decreased: node->prop_sev = (criticity--).getValue();
+      break;
+    default: node->prop_sev = node->severity;
+      break;
     }
-    QString toolTip = getNodeToolTip(*node);
-    graphView->updateNode(node, toolTip);
-    updateNavTreeItemStatus(node, toolTip);
+  QString toolTip = getNodeToolTip(*node);
+  mmap->updateNode(node, toolTip);
+  updateNavTreeItemStatus(node, toolTip);
+  if (node->id != SvNavigatorTree::RootId)
     emit hasToBeUpdate(node->parent);
 }
 
-
-void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator & _node, const QString & _tip)
+void SvNavigator::updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip)
 {
-    QIcon icon;
-    switch(_node->status) {
-    case MonitorBroker::OK:
-        icon.addFile(":/images/normal.png");
-        break;
+  updateNavTreeItemStatus(*_node, _tip);
+}
 
-    case MonitorBroker::WARNING:
-        icon.addFile(":/images/warning.png");
-        break;
-
-    case MonitorBroker::CRITICAL:
-        icon.addFile(":/images/critical.png");
-        break;
-
-    default:
-        icon.addFile(":/images/unknown.png");
-        break;
-    }
-
-    TreeNodeItemListT::iterator tnode_it = coreData->tree_items.find(_node->id);
-    if(tnode_it != coreData->tree_items.end()) {
-        (*tnode_it)->setIcon(0, icon);
-        (*tnode_it)->setToolTip(0, _tip);
+void SvNavigator::updateNavTreeItemStatus(const NodeT& _node, const QString& _tip)
+{
+  auto tnode_it = mcoreData->tree_items.find(_node.id);
+  if (tnode_it != mcoreData->tree_items.end()) {
+      (*tnode_it)->setIcon(0, utils::computeCriticityIcon(_node.severity));
+      (*tnode_it)->setToolTip(0, _tip);
     }
 }
 
-void SvNavigator::updateMonitoringSettings(){
-    monitorBaseUrl = settings->value(Preferences::URL_KEY).toString();
-    serverAuthChain = settings->value(Preferences::SERVER_PASS_KEY).toString().toStdString();
-    serverAddr = settings->value(Preferences::SERVER_ADDR_KEY).toString();
-    serverPort = settings->value(Preferences::SERVER_PORT_KEY).toString();
-    serverUrl = QString("tcp://%1:%2").arg(serverAddr).arg(serverPort).toStdString();
-    updateInterval = settings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
-    if (updateInterval <= 0) updateInterval = MonitorBroker::DEFAULT_UPDATE_INTERVAL * 1000;
+void SvNavigator::updateMonitoringSettings() {
+  mmonitorBaseUrl = msettings->value(Preferences::URL_KEY).toString();
+  mserverAuthChain = msettings->value(Preferences::SERVER_PASS_KEY).toString();
+  mserverAddr = msettings->value(Preferences::SERVER_ADDR_KEY).toString();
+  mserverPort = msettings->value(Preferences::SERVER_PORT_KEY).toString();
+  mserverUrl = QString("tcp://%1:%2").arg(mserverAddr, mserverPort);
+  mupdateInterval = msettings->value(Preferences::UPDATE_INTERVAL_KEY).toInt() * 1000;
+  if (mupdateInterval <= 0) mupdateInterval = MonitorBroker::DefaultUpdateInterval * 1000;
 }
 
-void SvNavigator::expandNode(const QString & _node_id, const bool & _expand, const qint32 & _level)
+void SvNavigator::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
 {
-    QStringList::iterator uds_it;
-    NodeT& node = coreData->nodes[_node_id];
-
-    if(node.type == NodeType::SERVICE_NODE && node.child_nodes != "") {
-        QStringList  childNodes = node.child_nodes.split(Parser::CHILD_NODES_SEP);
-        for (uds_it = childNodes.begin(); uds_it != childNodes.end(); uds_it++) {
-            graphView->setNodeVisible(*uds_it, _node_id, _expand, _level);
+  auto node = mcoreData->bpnodes.find(_nodeId);
+  if (node == mcoreData->bpnodes.end()) return;
+  if (node->child_nodes != "") {
+      QStringList  childNodes = node->child_nodes.split(Parser::CHILD_SEP);
+      for (auto cid : childNodes) {
+          mmap->setNodeVisible(cid, _nodeId, _expand, _level);
         }
     }
 }
 
-void SvNavigator::centerGraphOnNode(const QString & _node_id)
+void SvNavigator::centerGraphOnNode(const QString& _nodeId)
 {
-    if(_node_id != "") selectedNodeId =  _node_id;
-    graphView->centerOnNode(selectedNodeId);
+  if (_nodeId != "") mselectedNode =  _nodeId;
+  mmap->centerOnNode(mselectedNode);
 }
 
 void SvNavigator::filterNodeRelatedMsg(void)
 {
-    if(filteredMsgPanel) delete filteredMsgPanel;
-    filteredMsgPanel = new MsgPanel();
-    NodeListT::iterator node = coreData->nodes.find(selectedNodeId);
-
-    if(node != coreData->nodes.end()) {
-        filterNodeRelatedMsg(selectedNodeId);
-        QString title = tr("Messages related to '%2' - %1")
-                .arg(appName)
-                .arg(coreData->nodes[selectedNodeId].name);
-        filteredMsgPanel->resizeFields(msgPanelSize, true);
-        filteredMsgPanel->setWindowTitle(title);
+  if (mfilteredMsgConsole) delete mfilteredMsgConsole;
+  mfilteredMsgConsole = new MsgConsole();
+  NodeListT::iterator node;
+  if (utils::findNode(mcoreData, mselectedNode, node)) {
+      filterNodeRelatedMsg(mselectedNode);
+      QString title = tr("Messages related to '%2' - %1").arg(APP_NAME, node->name);
+      mfilteredMsgConsole->updateColumnWidths(mmsgConsoleSize, true);
+      mfilteredMsgConsole->setWindowTitle(title);
     }
-    filteredMsgPanel->show();
+  qint32 rh = qMax(mfilteredMsgConsole->getRowCount() * mfilteredMsgConsole->getRowHeight() + 50, 100);
+  if (mfilteredMsgConsole->height() > rh) mfilteredMsgConsole->resize(mmsgConsoleSize.width(), rh);
+  mfilteredMsgConsole->show();
 }
 
-void SvNavigator::filterNodeRelatedMsg(const QString & _nodeId)
+void SvNavigator::filterNodeRelatedMsg(const QString& _nodeId)
 {
-    NodeListT::iterator nodeIt = coreData->nodes.find(_nodeId);
-
-    if(nodeIt == coreData->nodes.end() || nodeIt->child_nodes == "") {
-        return;
-    }
-
-    if (nodeIt->type == NodeType::ALARM_NODE) {
-        filteredMsgPanel->addMsg(nodeIt);
-    } else {
-        QStringList childIds = nodeIt->child_nodes.split(Parser::CHILD_NODES_SEP);
-        foreach(QString checkId, childIds) {
-            filterNodeRelatedMsg(checkId);
+  NodeListT::iterator node;
+  if (utils::findNode(mcoreData, _nodeId, node) &&
+      node->child_nodes != "") {
+      if (node->type == NodeType::ALARM_NODE) {
+          mfilteredMsgConsole->updateNodeMsg(node);
+        } else {
+          QStringList childIds = node->child_nodes.split(Parser::CHILD_SEP);
+          for (auto chkid : childIds) {
+              filterNodeRelatedMsg(chkid);
+            }
         }
     }
 }
 
-
 void SvNavigator::acknowledge(void)
 {
-    //TODO
+  //TODO: To be implemented
 }
 
-void SvNavigator::tabChanged(int _tab_index)
+void SvNavigator::tabChanged(int _index)
 {
-    if (_tab_index != 0) {
-        subMenuList["ZoomIn"]->setEnabled(false);
-        subMenuList["ZoomOut"]->setEnabled(false);
-        return;
-    }
+  switch(_index) {
+    case 0:
+      msubMenus["Refresh"]->setVisible(true);
+      msubMenus["Capture"]->setVisible(true);
+      msubMenus["ZoomIn"]->setVisible(true);
+      msubMenus["ZoomOut"]->setVisible(true);
+      mmenus["BROWSER"]->setEnabled(false);
+      msubMenus["BrowserBack"]->setVisible(false);
+      msubMenus["BrowserForward"]->setVisible(false);
+      msubMenus["BrowserStop"]->setVisible(false);
+      break;
+    case 1:
+      mmenus["BROWSER"]->setEnabled(true);
+      msubMenus["BrowserBack"]->setVisible(true);
+      msubMenus["BrowserForward"]->setVisible(true);
+      msubMenus["BrowserStop"]->setVisible(true);
+      msubMenus["Refresh"]->setVisible(false);
+      msubMenus["Capture"]->setVisible(false);
+      msubMenus["ZoomIn"]->setVisible(false);
+      msubMenus["ZoomOut"]->setVisible(false);
+      break;
+    default:
+      break;
 
-    subMenuList["ZoomIn"]->setEnabled(true);
-    subMenuList["ZoomOut"]->setEnabled(true);
+    }
 }
 
 void SvNavigator::hideChart(void)
 {
-    if (graphView->hideChart()) {
-        subMenuList["HideChart"]->setIcon(QIcon(":images/check.png"));
-        return;
+  if (mmap->hideChart()) {
+      msubMenus["HideChart"]->setIcon(QIcon(":images/check.png"));
+      return;
     }
-    subMenuList["HideChart"]->setIcon(QIcon(""));
+  msubMenus["HideChart"]->setIcon(QIcon(""));
 }
 
 void SvNavigator::centerGraphOnNode(QTreeWidgetItem * _item)
 {
-    centerGraphOnNode(_item->data(0, QTreeWidgetItem::UserType).toString());
+  centerGraphOnNode(_item->data(0, QTreeWidgetItem::UserType).toString());
 }
 
 void SvNavigator::resize(void)
 {
-    const qreal GRAPH_HEIGHT_RATE = 0.50;
-    QSize screenSize = qApp->desktop()->screen(0)->size();
-    msgPanelSize = QSize(screenSize.width() * 0.80, screenSize.height() * (1.0 - GRAPH_HEIGHT_RATE));
+  const qreal GRAPH_HEIGHT_RATE = 0.50;
+  QSize screenSize = qApp->desktop()->screen(0)->size();
+  mmsgConsoleSize = QSize(screenSize.width() * 0.80, screenSize.height() * (1.0 - GRAPH_HEIGHT_RATE));
 
-    QList<qint32> framesSize;
-    framesSize.push_back(screenSize.width() * 0.20);
-    framesSize.push_back(msgPanelSize.width());
-    mainSplitter->setSizes(framesSize);
+  QList<qint32> framesSize;
+  framesSize.push_back(screenSize.width() * 0.20);
+  framesSize.push_back(mmsgConsoleSize.width());
+  mmainSplitter->setSizes(framesSize);
 
-    framesSize[0] = (screenSize.height() * GRAPH_HEIGHT_RATE);
-    framesSize[1] = (msgPanelSize.height());
-    rightSplitter->setSizes(framesSize);
+  framesSize[0] = (screenSize.height() * GRAPH_HEIGHT_RATE);
+  framesSize[1] = (mmsgConsoleSize.height());
+  mrightSplitter->setSizes(framesSize);
 
-    mainSplitter->resize(screenSize.width(), screenSize.height() * 0.85);
-    QMainWindow::resize(screenSize.width(),  screenSize.height());
+  mmainSplitter->resize(screenSize.width(), screenSize.height() * 0.85);
+  QMainWindow::resize(screenSize.width(),  screenSize.height());
 }
 
-
-void SvNavigator::loadMenus(void)
+void SvNavigator::closeRpcSession(void)
 {
-    QIcon refreshIcon(":images/built-in/refresh.png");
-    QIcon cameraIcon(":images/built-in/camera.png");
-    QIcon zoominIcon(":images/built-in/zoomin.png");
-    QIcon zoomoutIcon(":images/built-in/zoomout.png");
-
-    QMenuBar* menuBar = new QMenuBar();
-    menuList["MENU1"] = menuBar->addMenu("&File"),
-            subMenuList["Refresh"] = menuList["MENU1"]->addAction(refreshIcon, tr("&Refresh Screen")),
-            subMenuList["Capture"] = menuList["MENU1"]->addAction(cameraIcon, tr("&Save Map as Image")),
-            menuList["MENU1"]->addSeparator(),
-            subMenuList["Quit"] = menuList["MENU1"]->addAction(tr("&Quit"));
-
-    menuList["MENU2"] = menuBar->addMenu("&Map"),
-            subMenuList["ZoomIn"] = menuList["MENU2"]->addAction(zoominIcon, tr("Zoom &In")),
-            subMenuList["ZoomOut"] = menuList["MENU2"]->addAction(zoomoutIcon, tr("Zoom &Out")),
-            subMenuList["HideChart"] = menuList["MENU2"]->addAction(tr("Hide &Chart"));
-
-    menuList["MENU3"] = menuBar->addMenu("&Preferences"),
-            subMenuList["ChangePassword"] = menuList["MENU3"]->addAction(tr("Change &Password")),
-            subMenuList["ChangeMonitoringSettings"] = menuList["MENU3"]->addAction(tr("&Monitoring Settings"));
-
-    menuList["MENU4"] = menuBar->addMenu("&Help"),
-            subMenuList["ShowOnlineResources"] = menuList["MENU4"]->addAction(tr("Online &Resources")),
-            menuList["MENU4"]->addSeparator(),
-            subMenuList["ShowAbout"] = menuList["MENU4"]->addAction(tr("&About %1").arg(appName));
-
-    subMenuList["Capture"]->setShortcut(QKeySequence::Save);
-    subMenuList["Refresh"]->setShortcut(QKeySequence::Refresh);
-    subMenuList["ZoomIn"]->setShortcut(QKeySequence::ZoomIn);
-    subMenuList["ZoomOut"]->setShortcut(QKeySequence::ZoomOut);
-    subMenuList["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-    subMenuList["Quit"]->setShortcut(QKeySequence::Quit);
-
-    contextMenuList["FilterNodeRelatedMessages"] = nodeContextMenu->addAction(tr("&Filter related messages"));
-    contextMenuList["CenterOnNode"] = nodeContextMenu->addAction(tr("Center Graph &On"));
-    contextMenuList["Cancel"] = nodeContextMenu->addAction(tr("&Cancel"));
-
-    QToolBar* toolBar = addToolBar(QString(ngrt4n::APP_NAME.c_str()));
-    toolBar->addAction(subMenuList["Refresh"]);
-    toolBar->addAction(subMenuList["ZoomIn"]);
-    toolBar->addAction(subMenuList["ZoomOut"]);
-    toolBar->addAction(subMenuList["Capture"]);
-    toolBar->setIconSize(QSize(16,16));
-    setMenuBar(menuBar);
+  QStringList params;
+  params.push_back(mzbxAuthToken);
+  params.push_back(QString::number(ZbxHelper::Logout));
+  mzbxHelper->postRequest(ZbxHelper::Logout, params);
 }
 
-
-void SvNavigator::openZabbixSession(void)
+void SvNavigator::processZbxReply(QNetworkReply* _reply)
 {
-    zxHelper->setBaseUrl(monitorBaseUrl);
-    QStringList params = QString::fromStdString(serverAuthChain).split(":");
-    params.push_back(QString::number(ZbxHelper::LOGIN));
-    zxHelper->get(ZbxHelper::LOGIN, params);
-}
-
-void SvNavigator::closeZabbixSession(void)
-{
-    QStringList params;
-    params.push_back(zxAuthToken);
-    params.push_back(QString::number(ZbxHelper::LOGOUT));
-    zxHelper->get(ZbxHelper::LOGOUT, params);
-}
-
-void SvNavigator::retrieveZabbixTriggers(const QString & host)
-{
-    QStringList params;
-    params.push_back(zxAuthToken);
-    params.push_back(host);
-    params.push_back(QString::number(ZbxHelper::TRIGGER));
-    zxHelper->get(ZbxHelper::TRIGGER, params);
-}
-
-void SvNavigator::processZabbixReply(QNetworkReply* reply)
-{
-    if (reply->error() != QNetworkReply::NoError) {
-        //reply->deleteLater();
-        return;
+  _reply->deleteLater();
+  if (_reply->error() != QNetworkReply::NoError) {
+      updateDashboardOnUnknown(_reply->errorString());
+      return;
     }
-
-    string data = static_cast<QString>(reply->readAll()).toStdString();
-    JsonHelper jsHelper(data);
-    qint32 dataId = jsHelper.getProperty("id").toInt32();
-
-    switch(dataId) {
-    case ZbxHelper::LOGIN :
-        zxAuthToken = jsHelper.getProperty("result").toString();
-        resetStatData();
-        requestZabbixChecks();
+  QString data = _reply->readAll();
+  JsonHelper jsHelper(data.toStdString());
+  qint32 tid = jsHelper.getProperty("id").toInt32();
+  switch(tid) {
+    case ZbxHelper::Login : {
+        mzbxAuthToken = jsHelper.getProperty("result").toString();
+        if(mzbxAuthToken.isEmpty()) {
+            QString errMsg = jsHelper.getProperty("error").property("data").toString();
+            if (errMsg.isEmpty()) errMsg = jsHelper.getProperty("error").property("message").toString();
+            QString msg = tr("Authentication failed: %1").arg(errMsg);
+            updateDashboardOnUnknown(msg);
+          } else {
+            misLogged = true;
+            postRpcDataRequest();
+          }
         break;
-
-    case ZbxHelper::TRIGGER: {
+      }
+    case ZbxHelper::Trigger: {
+        MonitorBroker::CheckT check;
         QScriptValueIterator trigger(jsHelper.getProperty("result"));
         while (trigger.hasNext()) {
-
             trigger.next();
-            if (trigger.flags()&QScriptValue::SkipInEnumeration) {
-                continue;
-            }
-
+            if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
             QScriptValue triggerData = trigger.value();
-            MonitorBroker::CheckT check;
             QString triggerName = triggerData.property("description").toString();
             check.check_command = triggerName.toStdString();
             check.status = triggerData.property("value").toInt32();
-            if(check.status != MonitorBroker::OK) {
+            if (check.status == MonitorBroker::ZabbixClear) {
+                check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+              } else {
                 check.alarm_msg = triggerData.property("error").toString().toStdString();
-                int sev = triggerData.property("priority").toInteger();
-                Status st(static_cast<MonitorBroker::StatusT>(check.status), static_cast<MonitorBroker::SeverityT>(sev));
-                check.status = st.getValue();
-            } else {
-                check.alarm_msg = triggerName.toStdString(); //TODO
-            }
+                check.status = triggerData.property("priority").toInteger();
+              }
             QString targetHost = "";
             QScriptValueIterator host(triggerData.property("hosts"));
-            if(host.hasNext()) {
+            if (host.hasNext()) {
                 host.next();
                 QScriptValue hostData = host.value();
                 targetHost = hostData.property("host").toString();
                 check.host = targetHost.toStdString();
-            }
+              }
             QScriptValueIterator item(triggerData.property("items"));
-            if(item.hasNext()) {
+            if (item.hasNext()) {
                 item.next();
                 QScriptValue itemData = item.value();
-                check.last_state_change = itemData.property("lastclock").toString().toStdString();
-            }
-            QString key = ID_PATTERN.arg(targetHost).arg(triggerName);
+                check.last_state_change = utils::getCtime(itemData.property("lastclock").toUInt32());
+              }
+            QString key = ID_PATTERN.arg(targetHost, triggerName);
             check.id = key.toStdString();
-            coreData->checks_[key] = check;
-        }
-        if(hLeft--, hLeft == 0){
-            foreach(const QString & c, coreData->cnodes.keys()) {
-                NodeListT::iterator node = coreData->nodes.find(c);
-                if(node == coreData->nodes.end()) continue;
-                CheckListT::Iterator check = coreData->checks_.find(node->child_nodes);
-                if(check == coreData->checks_.end()) continue;
-                node->check = *check;
-                updateNode(node);
-                coreData->check_status_count[check->status]++;
-            }
-            success = true;
-            updateStats();
-        }
+            updateCNodes(check);
+          }
+        if (--mhostLeft == 0) {
+            mupdateSucceed = true;
+            finalizeDashboardUpdate();
+          }
         break;
-    }
+      }
     default :
-        Utils::alert(tr("ERROR: Weird response received from the server"));
-        exit(1);
-        break;
-    }
-    //reply->deleteLater();
-}
-
-void SvNavigator::requestZabbixChecks(void) {
-    updateStatusBar(tr("Updating..."));
-    foreach(const QString & host, coreData->hosts.keys()) {
-        retrieveZabbixTriggers(host);
+      QString msg = tr("Weird response received from the server");
+      utils::alert(msg);
+      updateDashboardOnUnknown(msg);
+      break;
     }
 }
 
-
-void SvNavigator::processZabbixError(QNetworkReply::NetworkError code){
-
-    QString msg = SERVICE_OFFLINE_MSG.arg(zxHelper->getApiUri()%tr(" (error code %1)").arg(code));
-    Utils::alert(msg);
-    updateStatusBar(msg);
-    foreach(const QString & c, coreData->cnodes.keys()) {
-        NodeListT::iterator node = coreData->nodes.find(c);
-        if(node == coreData->nodes.end()) continue;
-        node->check.status = MonitorBroker::UNKNOWN;
-        node->check.host = "Unknown";
-        node->check.last_state_change = "0";
-        node->check.check_command = "Unknown" ;
-        node->check.alarm_msg = msg.toStdString();
-        updateNode(node);
-        coreData->check_status_count[MonitorBroker::UNKNOWN]++;
+void SvNavigator::processZnsReply(QNetworkReply* _reply)
+{
+  _reply->deleteLater();
+  if (_reply->error() != QNetworkReply::NoError) {
+      updateDashboardOnUnknown(_reply->errorString());
+      return;
     }
-    success = false ;
-    updateStats();
+  QVariant cookiesContainer = _reply->header(QNetworkRequest::SetCookieHeader);
+  QList<QNetworkCookie> cookies = qvariant_cast<QList<QNetworkCookie> >(cookiesContainer);
+  QString data = _reply->readAll();
+  if (data.endsWith("submitted=true")) {
+      misLogged = true;
+      postRpcDataRequest();
+      mznsHelper->cookieJar()->setCookiesFromUrl(cookies, mznsHelper->getApiBaseUrl());
+    } else {
+      JsonHelper jsonHelper(data.toStdString());
+      qint32 tid = jsonHelper.getProperty("tid").toInt32();
+      QScriptValue result = jsonHelper.getProperty("result");
+      bool successMsg = result.property("success").toBool();
+      if (!successMsg) {
+          QString msg = tr("Authentication failed: %1").arg(result.property("msg").toString());
+          updateDashboardOnUnknown(msg);
+          return;
+        }
+      if (tid == ZnsHelper::Device) {
+          QScriptValueIterator devices(result.property("devices"));
+          while(devices.hasNext()) {
+              devices.next();
+              if (devices.flags()&QScriptValue::SkipInEnumeration) continue;
+
+              QScriptValue ditem = devices.value();
+              QString duid = ditem.property("uid").toString();
+              mznsHelper->postRequest(ZnsHelper::Component,
+                                      ZnsHelper::ReQPatterns[ZnsHelper::Component]
+                                      .arg(duid, QString::number(ZnsHelper::Component))
+                                      .toAscii());
+
+              QString dname = ditem.property("name").toString();
+              if (mcoreData->hosts[dname].contains("ping", Qt::CaseInsensitive)) {
+                  mznsHelper->postRequest(ZnsHelper::Device,
+                                          ZnsHelper::ReQPatterns[ZnsHelper::DeviceInfo]
+                                          .arg(duid, QString::number(ZnsHelper::DeviceInfo))
+                                          .toAscii());
+                }
+            }
+        } else if (tid == ZnsHelper::Component) {
+          MonitorBroker::CheckT check;
+          QScriptValueIterator components(result.property("data"));
+          while (components.hasNext()) {
+              components.next();
+              if (components.flags()&QScriptValue::SkipInEnumeration) continue;
+              QScriptValue citem = components.value();
+              QString cname = citem.property("name").toString();
+              QScriptValue device = citem.property("device");
+              QString duid = device.property("uid").toString();
+              QString chkid = ID_PATTERN.arg(ZnsHelper::getDeviceName(duid), cname);
+              check.id = chkid.toStdString();
+              check.host = device.property("name").toString().toStdString();
+              check.last_state_change = utils::getCtime(device.property("lastChanged").toString(),
+                                                        "yyyy/MM/dd hh:mm:ss");
+              QString severity =citem.property("severity").toString();
+              if (!severity.compare("clear", Qt::CaseInsensitive)) {
+                  check.status = MonitorBroker::ZenossClear;
+                  check.alarm_msg = tr("The %1 component  is Up").arg(cname).toStdString();
+                } else {
+                  check.status = citem.property("failSeverity").toInt32();
+                  check.alarm_msg = citem.property("status").toString().toStdString();
+                }
+              updateCNodes(check);
+            }
+          if (--mhostLeft== 0) {
+              mupdateSucceed = true;
+              finalizeDashboardUpdate();
+            }
+        } else if (tid == ZnsHelper::DeviceInfo) {
+          MonitorBroker::CheckT check;
+          QScriptValue devInfo(result.property("data"));
+          QString dname = devInfo.property("name").toString();
+          check.id = check.host = dname.toStdString();
+          check.status = devInfo.property("status").toBool();
+          check.last_state_change = utils::getCtime(devInfo.property("lastChanged").toString(),
+                                                    "yyyy/MM/dd hh:mm:ss");
+          if (check.status) {
+              check.status = MonitorBroker::ZenossClear;
+              check.alarm_msg = tr("The host '%1' is Up").arg(dname).toStdString();
+            } else {
+              check.status = MonitorBroker::ZenossCritical;
+              check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
+            }
+          updateCNodes(check);
+        } else {
+          QString msg = tr("Weird response received from the server");
+          utils::alert(msg);
+          updateDashboardOnUnknown(msg);
+        }
+    }
 }
 
-void  SvNavigator::updateStatusBar(const QString & msg) {
-    statusBar()->showMessage(msg);
+QStringList SvNavigator::getAuthInfo(void)
+{
+  QStringList authInfo = QStringList();
+  int pos = mserverAuthChain.indexOf(":");
+  if (pos != -1) {
+      authInfo.push_back(mserverAuthChain.left(pos));
+      authInfo.push_back(mserverAuthChain.mid(pos+1, -1));
+    }
+  return authInfo;
+}
+
+void SvNavigator::openRpcSession(void)
+{
+  updateDashboardOnUnknown("");
+  QStringList authParams = getAuthInfo();
+  if (authParams.size() == 2) {
+      QUrl znsUrlParams;
+      switch(mcoreData->monitor) {
+        case MonitorBroker::Zabbix:
+          mzbxHelper->setBaseUrl(mmonitorBaseUrl);
+          authParams.push_back(QString::number(ZbxHelper::Login));
+          mzbxHelper->postRequest(ZbxHelper::Login, authParams);
+          break;
+        case MonitorBroker::Zenoss:
+          mznsHelper->setBaseUrl(mmonitorBaseUrl);
+          znsUrlParams.addQueryItem("__ac_name", authParams[0]);
+          znsUrlParams.addQueryItem("__ac_password", authParams[1]);
+          znsUrlParams.addQueryItem("submitted", "true");
+          znsUrlParams.addQueryItem("came_from", mznsHelper->getApiContextUrl());
+          mznsHelper->postRequest(ZnsHelper::Login, znsUrlParams.encodedQuery());
+          break;
+        default:
+          break;
+        }
+    } else {
+      updateDashboardOnUnknown(tr("Invalid authentication chain!\n"
+                                  "Must be in the form login:password"));
+    }
+}
+
+void SvNavigator::postRpcDataRequest(void) {
+  updateStatusBar(tr("Updating..."));
+  switch(mcoreData->monitor) {
+    case MonitorBroker::Zabbix:
+      for (auto host : mcoreData->hosts.keys()) {
+          QStringList params;
+          params.push_back(mzbxAuthToken);
+          params.push_back(host);
+          params.push_back(QString::number(ZbxHelper::Trigger));
+          mzbxHelper->postRequest(ZbxHelper::Trigger, params);
+        }
+      break;
+    case MonitorBroker::Zenoss:
+      mznsHelper->setRouter(ZnsHelper::Device);
+      for (auto host : mcoreData->hosts.keys()) {
+          mznsHelper->postRequest(ZnsHelper::Device,
+                                  ZnsHelper::ReQPatterns[ZnsHelper::Device]
+                                  .arg(host, QString::number(ZnsHelper::Device))
+                                  .toAscii());
+        }
+      break;
+    default:
+      break;
+    }
+}
+
+void SvNavigator::processRpcError(QNetworkReply::NetworkError _code)
+{
+  QString apiUrl = "";
+  if (mcoreData->monitor == MonitorBroker::Zabbix) {
+      apiUrl = mzbxHelper->getApiUri();
+    } else if (mcoreData->monitor == MonitorBroker::Zenoss) {
+      apiUrl =  mznsHelper->getRequestUrl();
+    }
+  updateDashboardOnUnknown(SERVICE_OFFLINE_MSG.arg(apiUrl%tr(" (error code %1)"), _code));
+}
+
+void SvNavigator::updateDashboardOnUnknown(const QString& msg)
+{
+  mupdateSucceed = false;
+  bool enable = false;
+  if (!msg.isEmpty()) {
+      enable = true;
+      utils::alert(msg);
+      updateStatusBar(msg);
+      mlastError = msg;
+    }
+  for (auto& cnode : mcoreData->cnodes) {
+      cnode.monitored = true;
+      cnode.check.status = MonitorBroker::Unknown;
+      cnode.check.last_state_change = UNKNOWN_UPDATE_TIME;
+      cnode.check.host = "-";
+      cnode.check.check_command = "-";
+      cnode.check.alarm_msg = mlastError.toStdString();
+      computeStatusInfo(cnode);
+      updateDashboard(cnode);
+    }
+  mcoreData->check_status_count[MonitorBroker::Unknown] = mcoreData->cnodes.size();
+  finalizeDashboardUpdate(enable);
+}
+
+void SvNavigator::updateTrayInfo(const NodeT& _node)
+{
+  //FIXME: update once;
+  QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
+  if (_node.severity == MonitorBroker::Critical ||
+      _node.severity == MonitorBroker::Unknown) {
+      icon = QSystemTrayIcon::Critical;
+    } else if (_node.severity == MonitorBroker::Minor ||
+               _node.severity == MonitorBroker::Major) {
+      icon = QSystemTrayIcon::Warning;
+    }
+  qint32 pbCount = mcoreData->cnodes.size() - mcoreData->check_status_count[MonitorBroker::Normal];
+  QString title = APP_NAME%" - "%_node.name;
+  QString msg = tr(" - %1 Problem%2\n"
+                   " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
+                                                 utils::criticityToText(_node.severity).toUpper());
+
+  mtrayIcon->showMessage(title, msg, icon);
+  mtrayIcon->setToolTip(title%"\n"%msg);
 }
 
 void SvNavigator::addEvents(void)
 {
-    connect(this, SIGNAL(sortEventConsole()), msgPanel, SLOT(sortEventConsole()));
-    connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateNodeStatus(QString)));
-    connect(subMenuList["Capture"], SIGNAL(triggered(bool)), graphView, SLOT(capture()));
-    connect(subMenuList["ZoomIn"], SIGNAL(triggered(bool)), graphView, SLOT(zoomIn()));
-    connect(subMenuList["ZoomOut"], SIGNAL(triggered(bool)), graphView, SLOT(zoomOut()));
-    connect(subMenuList["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
-    connect(subMenuList["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
-    connect(subMenuList["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
-    connect(subMenuList["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
-    connect(subMenuList["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
-    connect(subMenuList["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources()));
-    connect(subMenuList["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
-    connect(contextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
-    connect(contextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
-    connect(monPrefWindow, SIGNAL(urlChanged(QString)), browser, SLOT(setUrl(QString)));
-    connect(topRightPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
-    connect(graphView, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
-    connect(navigationTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
-    connect(zxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZabbixReply(QNetworkReply*)));
-    connect(zxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processZabbixError(QNetworkReply::NetworkError)));
+  connect(this, SIGNAL(hasToBeUpdate(QString)), this, SLOT(updateBpNode(QString)));
+  connect(msubMenus["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+  connect(msubMenus["Capture"], SIGNAL(triggered(bool)), mmap, SLOT(capture()));
+  connect(msubMenus["ZoomIn"], SIGNAL(triggered(bool)), mmap, SLOT(zoomIn()));
+  connect(msubMenus["ZoomOut"], SIGNAL(triggered(bool)), mmap, SLOT(zoomOut()));
+  connect(msubMenus["HideChart"], SIGNAL(triggered(bool)), this, SLOT(hideChart()));
+  connect(msubMenus["Refresh"], SIGNAL(triggered(bool)), this, SLOT(startMonitor()));
+  connect(msubMenus["ChangePassword"], SIGNAL(triggered(bool)), this, SLOT(handleChangePasswordAction(void)));
+  connect(msubMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
+  connect(msubMenus["ShowAbout"], SIGNAL(triggered(bool)), this, SLOT(handleShowAbout()));
+  connect(msubMenus["ShowOnlineResources"], SIGNAL(triggered(bool)), this, SLOT(handleShowOnlineResources()));
+  connect(msubMenus["BrowserBack"], SIGNAL(triggered(bool)), mbrowser, SLOT(back()));
+  connect(msubMenus["BrowserForward"], SIGNAL(triggered(bool)), mbrowser, SLOT(forward()));
+  connect(msubMenus["BrowserStop"], SIGNAL(triggered(bool)), mbrowser, SLOT(stop()));
+  connect(mcontextMenuList["FilterNodeRelatedMessages"], SIGNAL(triggered(bool)), this, SLOT(filterNodeRelatedMsg()));
+  connect(mcontextMenuList["CenterOnNode"], SIGNAL(triggered(bool)), this, SLOT(centerGraphOnNode()));
+  connect(mprefWindow, SIGNAL(urlChanged(QString)), mbrowser, SLOT(setUrl(QString)));
+  connect(mviewPanel, SIGNAL(currentChanged (int)), this, SLOT(tabChanged(int)));
+  connect(mmap, SIGNAL(expandNode(QString, bool, qint32)), this, SLOT(expandNode(const QString &, const bool &, const qint32 &)));
+  connect(mtree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(centerGraphOnNode(QTreeWidgetItem *)));
+  connect(mzbxHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZbxReply(QNetworkReply*)));
+  connect(mzbxHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processRpcError(QNetworkReply::NetworkError)));
+  connect(mznsHelper, SIGNAL(finished(QNetworkReply*)), this, SLOT(processZnsReply(QNetworkReply*)));
+  connect(mznsHelper, SIGNAL(propagateError(QNetworkReply::NetworkError)), this, SLOT(processRpcError(QNetworkReply::NetworkError)));
 }

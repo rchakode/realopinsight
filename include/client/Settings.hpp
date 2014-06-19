@@ -1,5 +1,5 @@
 /*
- * Utils.cpp
+ * Utils.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 11-08-2012                                                 #
@@ -21,50 +21,20 @@
 #--------------------------------------------------------------------------#
  */
 
-#include <QFileInfo>
-#include "Utils.hpp"
+#ifndef SETTINGS_HPP
+#define SETTINGS_HPP
+#include <QString>
+#include <QSettings>
 
-QString Utils::statusToString(const qint32 & _status)
+class Settings : public QSettings
 {
-    switch(_status)
-    {
-    case MonitorBroker::OK:
-        return "Normal";
-        break;
+public:
+  Settings();
+  void setKeyValue(const QString & _key, const QString & _value);
 
-    case MonitorBroker::WARNING:
-        return  "Warning";
-        break;
-
-    case MonitorBroker::CRITICAL:
-        return  "Critical";
-        break;
-
-    default:
-        return "Unknown";
-        break;
-    }
-
-    return "Unknown";
-}
-
-void Utils::clear(Struct& data) {
-    data.cnodes.clear();
-    data.nodes.clear();
-    data.tree_items.clear();
-}
-
-void Utils::alert(const QString  & msg) {
-    QMessageBox::warning(0, QObject::tr("%1 - Warning").arg(appName), msg, QMessageBox::Yes);
-}
-
-QString Utils::getAbsolutePath(const QString & _path) {
-    QFileInfo fileInfo(_path);
-    return fileInfo.absolutePath()%"/"%basename(_path.toAscii());
-}
-
-void Utils::delay(const qint32 & d) {
-    sleep(d);
-}
+private:
+  QTranslator* translator ;
+};
 
 
+#endif // SETTINGS_HPP

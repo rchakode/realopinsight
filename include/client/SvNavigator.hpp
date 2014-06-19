@@ -24,119 +24,128 @@
 #ifndef SVNAVIGATOR_HPP
 #define SVNAVIGATOR_HPP
 
+#include <QString>
 #include "Base.hpp"
-#include "Stats.hpp"
+#include "Chart.hpp"
 #include "Parser.hpp"
 #include "WebKit.hpp"
-#include "MsgPanel.hpp"
+#include "MsgConsole.hpp"
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Preferences.hpp"
-#include "core/ZmqHelper.hpp"
+#include "Socket.hpp"
 #include "ZbxHelper.hpp"
-#include <QScriptValueIterator>
+#include "ZnsHelper.hpp"
+
+class QScriptValueIterator;
+class QSystemTrayIcon;
 
 class SvNavigator : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    SvNavigator(const qint32 & _userRole = Auth::OP_USER_ROLE,
-                const QString & _config = "",
-                QWidget* = 0);
-    virtual ~SvNavigator();
-    void load(const QString & _file = "");
-
-    void resize(void);
-
-    static ComboBoxItemsT propRules();
-    static ComboBoxItemsT calcRules();
-
-    static QString getNodeToolTip(const NodeT & _node);
+  SvNavigator(const qint32& _userRole = Auth::OpUserRole,
+              const QString& _config = "",
+              QWidget* = 0);
+  virtual ~SvNavigator();
+  void load(const QString& _file = "");
+  void resize(void);
+  static StringMapT propRules();
+  static StringMapT calcRules();
+  static QString getNodeToolTip(const NodeT& _node);
 
 public slots:
-    void startMonitor();
-    int runNagiosMonitor(void);
-    void resetStatData(void);
-    void updateNodeStatus(QString);
-    void expandNode(const QString &, const bool &, const qint32 &);
-    void centerGraphOnNode(const QString & _node_id = "");
-    void filterNodeRelatedMsg(void);
-    void filterNodeRelatedMsg(const QString &);
-    void acknowledge(void);
-    void tabChanged(int);
-    void hideChart(void);
-    void centerGraphOnNode(QTreeWidgetItem *);
-    void handleChangePasswordAction(void);
-    void handleChangeMonitoringSettingsAction(void);
-    void handleShowOnlineResources(void);
-    void handleShowAbout(void);
-    void processZabbixReply(QNetworkReply* reply);
-    void processZabbixError(QNetworkReply::NetworkError code);
+  void startMonitor();
+  int runNagiosMonitor(void);
+  void prepareDashboardUpdate(void);
+  void updateBpNode(const QString& _node);
+  void expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level);
+  void centerGraphOnNode(const QString& _nodeId = "");
+  void filterNodeRelatedMsg(void);
+  void filterNodeRelatedMsg(const QString &);
+  void acknowledge(void);
+  void tabChanged(int);
+  void hideChart(void);
+  void centerGraphOnNode(QTreeWidgetItem *);
+  void handleChangePasswordAction(void);
+  void handleChangeMonitoringSettingsAction(void);
+  void handleShowOnlineResources(void);
+  void handleShowAbout(void);
+  void processZbxReply(QNetworkReply* reply);
+  void processZnsReply(QNetworkReply* reply);
+  void processRpcError(QNetworkReply::NetworkError code);
 
 signals:
-    void hasToBeUpdate(QString);
-    void sortEventConsole(void);
+  void hasToBeUpdate(QString);
+  void sortEventConsole(void);
 
 protected:
-    void closeEvent(QCloseEvent *);
-    void contextMenuEvent(QContextMenuEvent *);
-    void timerEvent(QTimerEvent *);
+  void closeEvent(QCloseEvent *);
+  void contextMenuEvent(QContextMenuEvent *);
+  void timerEvent(QTimerEvent *);
 
 
 private:
-    Struct* coreData;
-    QString configFile;
-    QString openedFile;
-    QString monitorBaseUrl;
-    QString selectedNodeId;
-    QString statsPanelTooltip;
-    qint32 userRole;
-    qint32 updateInterval;
-    qint32 timerId;
-    Settings* settings;
-    Stats* statsPanel;
-    MsgPanel* filteredMsgPanel;
-    QSplitter* mainSplitter;
-    QSplitter* rightSplitter;
-    QTabWidget * topRightPanel;
-    QTabWidget* bottomRightPanel;
-    WebKit* browser;
-    GraphView* graphView;
-    SvNavigatorTree* navigationTree;
-    Preferences* monPrefWindow;
-    Preferences* changePasswdWindow;
-    MsgPanel* msgPanel;
-    QMenu* nodeContextMenu;
-    QSize msgPanelSize;
-    MenuListT menuList;
-    SubMenuListT subMenuList;
-    SubMenuListT contextMenuList;
-    QString serverAddr;
-    QString serverPort;
-    std::string serverUrl;
-    std::string serverAuthChain;
-    zmq::socket_t* comChannel;
-    ZbxHelper* zxHelper;
-    QString zxAuthToken;
-    qint32 hLeft;
-    qint32 iter;
-    bool success;
+  CoreDataT* mcoreData;
+  QString mconfigFile;
+  QString mactiveFile;
+  QString mmonitorBaseUrl;
+  QString mselectedNode;
+  QString mstatsInfo;
+  qint32 muserRole;
+  qint32 mupdateInterval;
+  qint32 mtimer;
+  Settings* msettings;
+  Chart* mchart;
+  MsgConsole* mfilteredMsgConsole;
+  QSplitter* mmainSplitter;
+  QSplitter* mrightSplitter;
+  QTabWidget* mviewPanel;
+  QTabWidget* mmsgConsolePanel;
+  WebKit* mbrowser;
+  GraphView* mmap;
+  SvNavigatorTree* mtree;
+  Preferences* mprefWindow;
+  Preferences* mchangePasswdWindow;
+  MsgConsole* mmsgConsole;
+  QMenu* mnodeContextMenu;
+  QSize mmsgConsoleSize;
+  MenuListT mmenus;
+  SubMenuListT msubMenus;
+  SubMenuListT mcontextMenuList;
+  QString mserverAddr;
+  QString mserverPort;
+  QString mserverUrl;
+  QString mserverAuthChain;
+  ZbxHelper* mzbxHelper;
+  QString mzbxAuthToken;
+  qint32 mhostLeft;
+  bool mupdateSucceed;
+  ZnsHelper* mznsHelper;
+  bool misLogged;
+  QString mlastError;
+  QSystemTrayIcon* mtrayIcon;
 
-
-    void addEvents(void);
-    void loadMenus(void);
-    void unloadMenus(void);
-    void updateMonitoringSettings();
-    void updateNavTreeItemStatus(const NodeListT::iterator &, const QString &);
-    void updateAlarmMsg(NodeListT::iterator &);
-    void updateNode(NodeListT::iterator & _node) ;
-    void updateStats();
-    void openZabbixSession(void);
-    void closeZabbixSession(void);
-    void retrieveZabbixTriggers(const QString & host);
-    void updateStatusBar(const QString & msg);
-    void requestZabbixChecks(void);
+  void addEvents(void);
+  void loadMenus(void);
+  void unloadMenus(void);
+  void updateMonitoringSettings();
+  void updateNavTreeItemStatus(const NodeListT::iterator& _node, const QString& _tip);
+  void updateNavTreeItemStatus(const NodeT& _node, const QString& _tip);
+  void computeStatusInfo(NodeListT::iterator& _node);
+  void computeStatusInfo(NodeT& _node);
+  void updateDashboard(NodeListT::iterator& _node);
+  void updateDashboard(const NodeT & _node);
+  void updateCNodes(const MonitorBroker::CheckT & check);
+  void finalizeDashboardUpdate(const bool& enable=true);
+  void updateStatusBar(const QString& msg);
+  QStringList getAuthInfo(void);
+  void openRpcSession(void);
+  void closeRpcSession(void);
+  void postRpcDataRequest(void);
+  void updateDashboardOnUnknown(const QString& msg);
+  void updateTrayInfo(const NodeT& _node);
 };
 
 #endif /* SVNAVIGATOR_HPP */

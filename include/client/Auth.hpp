@@ -29,34 +29,38 @@
 #include <QGridLayout>
 #include <QSettings>
 #include "Base.hpp"
+#include "Settings.hpp"
 
 class Auth : public QDialog
 {
 
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	Auth();
-	virtual ~Auth();
+  Auth();
+  virtual ~Auth();
 
-	static const QString ADM_USER_NAME ;
-	static const QString OP_USER_NAME ;
-	static const qint32 ADM_USER_ROLE ;
-	static const qint32 OP_USER_ROLE ;
+  enum RoleT {
+    AdmUserRole = 100,
+    OpUserRole = 101
+  };
+
+  static const QString AdmUser ;
+  static const QString OpUser ;
 
 public slots:
-void cancel(void) ;
-void authentificate(void) ;
+  void cancel(void) ;
+  void authentificate(void) ;
 
 
 private:
-	QDialogButtonBox* buttonBox;
-	QLineEdit* login;
-	QLineEdit* password;
-	QGridLayout* layout;
-	Settings* settings;
+  QDialogButtonBox* buttonBox;
+  QLineEdit* login;
+  QLineEdit* password;
+  QGridLayout* layout;
+  Settings* settings;
 
-	void addEvents(void);
+  void addEvents(void);
 
 };
 

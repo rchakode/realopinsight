@@ -26,66 +26,46 @@
 #include <QDebug>
 #include <QMessageBox>
 
-const QString apiContext = "/api_jsonrpc.php";
-
 ZbxHelper::ZbxHelper(const QString & baseUrl)
-    : QNetworkAccessManager(),
-      apiUri(baseUrl + apiContext),
-      requestHandler(new QNetworkRequest()) {
-    requestHandler->setRawHeader("Content-Type", "application/json");
-    requestHandler->setUrl(QUrl(apiUri));
-    setRequestsPatterns();
+  : QNetworkAccessManager(),
+    apiUri(baseUrl%ZBX_API_CONTEXT),
+    mrequestHandler(new QNetworkRequest()) {
+  mrequestHandler->setRawHeader("Content-Type", "application/json");
+  mrequestHandler->setUrl(QUrl(apiUri));
+  setRequestsPatterns();
 }
 
 ZbxHelper::~ZbxHelper() {
-    delete requestHandler;
+  delete mrequestHandler;
 }
 
-void ZbxHelper::setBaseUrl(const QString & url) {
-    apiUri = url + apiContext ;
-    requestHandler->setUrl(QUrl(apiUri));
+void ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params) {
+  QString request = mrequestsPatterns[reqId];
+  foreach(const QString &param, params) {request = request.arg(param);}
+  QNetworkReply* reply = QNetworkAccessManager::post(*mrequestHandler, request.toAscii());
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 }
 
-QString ZbxHelper::getApiUri(void) const {
-    return apiUri ;
-}
-
-void ZbxHelper::get(const qint32 & reqId, const QStringList & params) {
-    QString request = requestsPatterns[reqId];
-    foreach(const QString &param, params) {
-        request = request.arg(param) ;
-    }
-    QNetworkReply* reply = this->post(*requestHandler, request.toAscii());
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
-    //reply->deleteLater();
-}
-
-void ZbxHelper::processError(QNetworkReply::NetworkError code) {
-    emit propagateError(code);
-}
-
-void ZbxHelper::setRequestsPatterns(){
-
-    requestsPatterns[LOGIN] = "{\"jsonrpc\": \"2.0\", \
-            \"auth\": null, \
-            \"method\": \"user.login\", \
-            \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-            \"id\": %9}" ;
-
-    requestsPatterns[TRIGGER] = "{\"jsonrpc\": \"2.0\", \
-            \"auth\": \"%1\", \
-            \"method\": \"trigger.get\", \
-            \"params\": { \
-            \"filter\": { \"host\":[\"%2\"]}, \
-            \"selectHosts\": [\"host\"], \
-            \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-            \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-            \"limit\": -1}, \
-            \"id\": %9}";
-
-    requestsPatterns[LOGOUT] = "{\"jsonrpc\": \"2.0\", \
-            \"method\": \"user.logout\", \
-            \"params\": {\"sessionid\": \"%1\"}, \
-            \"auth\": \"%1\", \
-            \"id\": %9}";
+void ZbxHelper::setRequestsPatterns()
+{
+  mrequestsPatterns[Login] = "{\"jsonrpc\": \"2.0\", \
+      \"auth\": null, \
+      \"method\": \"user.login\", \
+      \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
+      \"id\": %9}";
+  mrequestsPatterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
+      \"auth\": \"%1\", \
+      \"method\": \"trigger.get\", \
+      \"params\": { \
+      \"filter\": { \"host\":[\"%2\"]}, \
+      \"selectHosts\": [\"host\"], \
+      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+      \"limit\": -1}, \
+      \"id\": %9}";
+  mrequestsPatterns[Logout] = "{\"jsonrpc\": \"2.0\", \
+      \"method\": \"user.logout\", \
+      \"params\": {\"sessionid\": \"%1\"}, \
+      \"auth\": \"%1\", \
+      \"id\": %9}";
 }
