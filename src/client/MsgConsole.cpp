@@ -28,7 +28,8 @@
 
 const qint16 MsgConsole::ROW_MARGIN = 3;
 const QString MsgConsole::TAG_HOSTNAME = "\\{hostname\\}";
-const QString MsgConsole::TAG_HOSTNAME_ZABBIX = "\\{HOST.NAME\\}";
+const QString MsgConsole::TAG_ZABBIX_HOSTNAME = "\\{HOSTNAME\\}";
+const QString MsgConsole::TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
 const QString MsgConsole::TAG_CHECK = "\\{check_name\\}";
 const QString MsgConsole::TAG_THERESHOLD = "\\{threshold\\}";
 const QString MsgConsole::TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";

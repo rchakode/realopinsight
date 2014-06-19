@@ -1,6 +1,11 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+2.2.1
+-------------
+  * Added support for Zabbix 1.8.x. Fixed ticket #11
+  * Minor upates on metadata handling
+
 2.2.0
 --------------
   * Fixed compilation problems on nullptr. See Ticket #8

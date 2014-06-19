@@ -1,0 +1,34 @@
+<ServiceView compat="2.0" monitor="1">
+	<Service id="root" type="0" statusCalcRule="0" statusPropRule="-1">
+		<Name>New Business view</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>ngrt4nsrv20133807233819703,ngrt4nsrv20133807233824117,ngrt4nsrv20133807233826137</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20133807233824117" type="1" statusCalcRule="-1" statusPropRule="-1">
+		<Name>sub service 2</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20133807233819703" type="1" statusCalcRule="-1" statusPropRule="-1">
+		<Name>sub service 1</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+	</Service>
+	<Service id="ngrt4nsrv20133807233826137" type="1" statusCalcRule="-1" statusPropRule="-1">
+		<Name>sub service 3</Name>
+		<Icon>Business Process</Icon>
+		<Description></Description>
+		<AlarmMsg></AlarmMsg>
+		<NotificationMsg></NotificationMsg>
+		<SubServices>Zabbix server/Zabbix agent on {HOST.NAME} is unreachable for 5 minutes</SubServices>
+	</Service>
+</ServiceView>
