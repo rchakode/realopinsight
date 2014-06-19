@@ -22,7 +22,7 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -39,6 +39,8 @@ static const uint qt_meta_data_MainWindow[] = {
      159,  150,   11,   11, 0x0a,
      178,   12,   11,   11, 0x0a,
      207,   11,   11,   11, 0x0a,
+     246,   11,   11,   11, 0x0a,
+     272,   11,   11,   11, 0x0a,
 
        0        // eod
 };
@@ -51,6 +53,8 @@ static const char qt_meta_stringdata_MainWindow[] = {
     "interval\0resetTimer(qint32)\0"
     "handleErrorOccurred(QString)\0"
     "handleChangeMonitoringSettingsAction()\0"
+    "handleUpdateIntprogress()\0"
+    "handleUpdateFinished()\0"
 };
 
 void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -68,6 +72,8 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 6: _t->resetTimer((*reinterpret_cast< qint32(*)>(_a[1]))); break;
         case 7: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 8: _t->handleChangeMonitoringSettingsAction(); break;
+        case 9: _t->handleUpdateIntprogress(); break;
+        case 10: _t->handleUpdateFinished(); break;
         default: ;
         }
     }
@@ -105,9 +111,9 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 11;
     }
     return _id;
 }

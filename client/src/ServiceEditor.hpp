@@ -64,14 +64,13 @@ public:
 
   void layoutEditorComponents(void);
   void fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId);
-  void fillFormWithNodeContent(const NodeT& node);
+  void fillFormWithNodeContent(const NodeT& _node);
   void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
-  bool updateNodeContent(NodeListT&, const QString&);
-  bool updateNodeContent(NodeListT::iterator& _node_it);
-  void setCheckListField(const ChecksT&);
-  void setEnableFields(const bool&);
-  void loadStatusFile(const QString&);
-  void setLowLevelAlarmComponentEnabled(bool enable){mitems[CHECK_LIST_FIELD]->setEnabled(enable);}
+  bool updateNodeContent(NodeListT& _nodes, const QString& _nodeId);
+  bool updateNodeContent(NodeListT::iterator& _node);
+  void loadChecks(const ChecksT& checks, const QString& srcId);
+  void setEnableFields(const bool& enable);
+  void setLowLevelAlarmComponentEnabled(bool enable){ mitems[CHECK_LIST_FIELD]->setEnabled(enable); }
 
   inline WidgetMapT* itemList(void) {return& mitems;}
   inline QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(mitems[NAME_FIELD]);}

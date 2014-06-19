@@ -28,7 +28,7 @@
 #include "Preferences.hpp"
 #include "global.hpp"
 #include "utilsCore.hpp"
-#include "JsHelper.hpp"
+#include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
 
 const QString Settings::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
@@ -49,6 +49,10 @@ Settings::Settings(const QString& path): QSettings(path, QSettings::NativeFormat
   init();
 }
 
+
+Settings::~Settings(void)
+{
+}
 
 void Settings::init(void)
 {
@@ -75,9 +79,6 @@ void Settings::init(void)
     QString passwd = QCryptographicHash::hash(ngrt4n::OpUser.c_str(), QCryptographicHash::Md5) ;
     QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
   }
-  translator = new QTranslator();
-  translator->load("ngrt4n_la");
-  qApp->installTranslator(translator);
   sync();
 }
 

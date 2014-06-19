@@ -26,7 +26,6 @@
 #include "Preferences.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
-#include "JsHelper.hpp"
 #include <sstream>
 #include <QIntValidator>
 #include <QRegExpValidator>
@@ -53,7 +52,8 @@ Preferences::~Preferences()
 
 void Preferences::loadProperties(void)
 {
-  initSourceStates();
+  setSourceStatesFromData(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
+  updateAllSourceWidgetStates();
   updateFields();
 }
 
@@ -65,13 +65,12 @@ QString Preferences::getSourceStatesSerialized(void)
   return str;
 }
 
-void Preferences::initSourceStates(void)
+void Preferences::initSourceStatesFromData(void)
 {
-  initSourceStates(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
-  updateAllSourceWidgetStates();
+  setSourceStatesFromData(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
 }
 
-void Preferences::initSourceStates(const QString& str)
+void Preferences::setSourceStatesFromData(const QString& str)
 {
   if (str.isEmpty()) {
     for (int i=0; i < MAX_SRCS; ++i) {

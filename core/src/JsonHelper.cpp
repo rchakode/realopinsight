@@ -1,5 +1,5 @@
 /*
- * LsHelper.hpp
+ * JsonHelper.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 23-03-2014                                                  #
@@ -22,44 +22,24 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MKLSHELPER_HPP
-#define MKLSHELPER_HPP
+#include "JsonHelper.hpp"
 
-#include "Base.hpp"
-#include <QTcpSocket>
-
-class LsHelper : public QTcpSocket
+JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
 {
-  Q_OBJECT
-public:
-  enum ReqTypeT{
-    Host = 0,
-    Service = 1
-  };
-  LsHelper(const QString& host, const int& port);
-  ~LsHelper();
+  setData(_data);
+}
 
-  bool connectToService(void);
-  void disconnectFromService(void);
-  bool requestData(const QString& host, const ReqTypeT& reqType);
-  bool recvData(const ReqTypeT& reqType);
-  bool fecthHostChecks(const QString& host);
-  bool findCheck(const QString& id, CheckListCstIterT& check);
-  void clearData(void) {m_checks.clear();}
-  void setHost(const QString& host) {m_host = host;}
-  void setPort(const int& port) {m_port = port;}
-  bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
+void JsonHelper::setData(const std::string& data)
+{
+  mdata = evaluate("(" + QString::fromStdString(data) + ")");
+}
 
-private:
-  const static int DefaultTimeout = 50000; /* 5 seconds */
-  QString m_host;
-  qint32 m_port;
-  RequestListT mrequestMap;
-  CheckListT m_checks;
-  QString m_errorMsg;
-  void setRequestPatterns();
-  void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}
-  void handleNetworkFailure(QAbstractSocket::SocketError error);
-};
+void JsonHelper::setData(const QString& data)
+{
+  mdata = evaluate("("+data+")");
+}
 
-#endif // MKLSHELPER_HPP
+QScriptValue JsonHelper::getProperty(const std::string& key)
+{
+  return mdata.property(QString::fromStdString(key)) ;
+}

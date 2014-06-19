@@ -102,6 +102,7 @@ namespace ngrt4n
   QString getNodeToolTip(const NodeT& _node);
   IconMapT nodeIcons();
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
+  QStringList getAuthInfo(const QString& authString);
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

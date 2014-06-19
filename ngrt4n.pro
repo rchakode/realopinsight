@@ -28,7 +28,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_VERSION=3.0.0
+REALOPINSIGHT_VERSION=3.0.1
 VERSION = "-$${REALOPINSIGHT_VERSION}"
 
 win32 {
@@ -69,7 +69,6 @@ HEADERS += \
     core/src/Parser.hpp \
     core/src/Preferences.hpp \
     core/src/ZbxHelper.hpp \
-    core/src/JsHelper.hpp \
     core/src/ZnsHelper.hpp \
     core/src/Settings.hpp \
     core/src/ZmqSocket.hpp \
@@ -77,21 +76,22 @@ HEADERS += \
     core/src/DashboardBase.hpp \
     core/src/global.hpp \
     core/src/utilsCore.hpp \
-    core/src/ChartBase.hpp
+    core/src/ChartBase.hpp \
+    core/src/JsonHelper.hpp
 
 
 SOURCES += \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
-    core/src/JsHelper.cpp \
     core/src/ZnsHelper.cpp \
     core/src/Settings.cpp \
     core/src/ZmqSocket.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
     core/src/utilsCore.cpp \
-    core/src/ChartBase.cpp
+    core/src/ChartBase.cpp \
+    core/src/JsonHelper.cpp
 
 gui-base {
 QT += svg gui webkit
@@ -107,7 +107,8 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/WebKit.hpp \
     client/src/MsgConsole.hpp \
     client/src/GuiPreferences.hpp \
-    client/src/GuiUtils.hpp
+    client/src/GuiUtils.hpp \
+    client/src/GuiDialogForms.hpp
 
 SOURCES	+= client/src/Auth.cpp \
     client/src/GuiUtils.cpp \
@@ -121,7 +122,8 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/SvNavigatorTree.cpp \
     client/src/WebKit.cpp \
     client/src/GuiPreferences.cpp \
-    client/src/MsgConsole.cpp
+    client/src/MsgConsole.cpp \
+    client/src/GuiDialogForms.cpp
 }
 
 dist {
@@ -218,7 +220,7 @@ INSTALLS += TARGET MAN
 INCLUDEPATH += core/src/
 RESOURCES += ngrt4n.qrc
 
-DEFINES *= "BUILD_DATE=\"`date '+%s'`\""
+DEFINES *= "BUILD_DATE=\"1400095511\""
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "APPLICATION_NAME='\"RealOpInsight\"'"

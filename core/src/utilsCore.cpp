@@ -376,3 +376,14 @@ IconMapT ngrt4n::nodeIcons() {
   return icons;
 }
 
+
+QStringList ngrt4n::getAuthInfo(const QString& authString)
+{
+  QStringList authInfo = QStringList();
+  int pos = authString.indexOf(":");
+  if (pos != -1) {
+    authInfo.push_back(authString.left(pos));
+    authInfo.push_back(authString.mid(pos+1, -1));
+  }
+  return authInfo;
+}

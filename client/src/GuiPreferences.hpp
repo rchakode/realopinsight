@@ -125,7 +125,7 @@ private:
   void organizeAbortWindow(void);
   void disableFieldIfRequired(void);
   void loadBasicLoginForm(void);
-  QString letUserSelectType(void);
+  QString selectSourceType(void);
 };
 
 #endif // GUIPREFERENCES_HPP

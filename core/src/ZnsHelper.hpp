@@ -26,8 +26,10 @@
 #ifndef ZENOSSHELPER_HPP_
 #define ZENOSSHELPER_HPP_
 #include "Base.hpp"
+#include "JsonHelper.hpp"
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QSslConfiguration>
 
 namespace {
 const QString ZNS_API_CONTEXT = "/zport/dmd";
@@ -51,21 +53,54 @@ public:
   ZnsHelper(const QString & baseUrl="http://localhost:8080");
   virtual ~ZnsHelper();
 
-  static RequestListT contentTypes();
-  static RequestListT requestsPatterns();
-  static RequestListT routers();
-  void setBaseUrl(const QString & url);
-  QNetworkReply* postRequest(const qint32 & reqId,  const QByteArray & data);
-  void setRouterEndpoint(const int & reqType);
-  QString getRequestEndpoint(void) const {return m_reqHandler->url().toString();}
-  void setRequestEndpoint(const QString & url) {m_reqHandler->setUrl(QUrl(url));}
-  void setRequestEndpoint(const QUrl & url) {m_reqHandler->setUrl(url);}
-  QString getApiContextEndpoint(void) const {return m_apiBaseUrl+ZNS_API_CONTEXT;}
-  QString getApiBaseEndpoint(void) const {return m_apiBaseUrl;}
-  static QString getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
-  void setIsLogged(bool state) {m_isLogged = state;}
-  bool getIsLogged(void) const {return m_isLogged;}
-  void setSslConfig(bool verifyPeer);
+  static RequestListT
+  contentTypes();
+  static RequestListT
+  requestsPatterns();
+  static RequestListT
+  routers();
+  void
+  setBaseUrl(const QString & url);
+  QNetworkReply*
+  postRequest(const qint32 & reqId,  const QByteArray & data);
+  void
+  setRouterEndpoint(const int & reqType);
+  QString
+  getRequestEndpoint(void) const {return m_reqHandler->url().toString();}
+  void
+  setRequestEndpoint(const QString & url) {m_reqHandler->setUrl(QUrl(url));}
+  void
+  setRequestEndpoint(const QUrl & url) {m_reqHandler->setUrl(url);}
+  QString
+  getApiContextEndpoint(void) const {return m_apiBaseUrl+ZNS_API_CONTEXT;}
+  QString
+  getApiBaseEndpoint(void) const {return m_apiBaseUrl;}
+  static QString
+  getDeviceName(const QString& uid) {return uid.mid(uid.lastIndexOf("/")+1, -1);}
+  void
+  setIsLogged(bool state) {m_isLogged = state;}
+  QString
+  lastError(void) const {return m_lastError;}
+  bool
+  getIsLogged(void) const {return m_isLogged;}
+  void
+  setSslConfig(bool verifyPeer);
+  int
+  parseReply(QNetworkReply* reply);
+  bool
+  checkRPCResultStatus(void);
+  int
+  openSession(const SourceT& srcInfo);
+  int
+  processLoginReply(QNetworkReply* reply);
+  int
+  processDeviceReply(QNetworkReply* reply, ChecksT& checks);
+  int
+  processDeviceInfoReply(QNetworkReply* reply, ChecksT& checks);
+  int
+  processComponentReply(QNetworkReply* reply, ChecksT& checks);
+  int
+  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
 
 
 public Q_SLOTS:
@@ -79,7 +114,10 @@ private :
   QNetworkRequest* m_reqHandler;
   QEventLoop* m_evlHandler;
   bool m_isLogged;
-  QSslConfiguration* m_sslConfig;
+  QSslConfiguration m_sslConfig;
+  QString m_lastError;
+  QString m_replyData;
+  JsonHelper m_replyJsonData;
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

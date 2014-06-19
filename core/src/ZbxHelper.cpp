@@ -24,6 +24,8 @@
 
 #include "ZbxHelper.hpp"
 #include "utilsCore.hpp"
+#include "JsonHelper.hpp"
+#include <QtScript/QScriptValueIterator>
 #include <QtScript/QScriptEngine>
 #include <QDebug>
 #include <QMessageBox>
@@ -39,8 +41,7 @@ ZbxHelper::ZbxHelper(const QString & baseUrl)
     m_reqHandler(new QNetworkRequest()),
     m_trid(-1),
     m_evlHandler(new QEventLoop(this)),
-    m_isLogged(false),
-    m_sslConfig(new QSslConfiguration())
+    m_isLogged(false)
 {
   m_reqHandler->setRawHeader("Content-Type", "application/json");
   m_reqHandler->setUrl(QUrl(m_apiUri));
@@ -51,10 +52,10 @@ ZbxHelper::~ZbxHelper()
 {
   delete m_reqHandler;
   delete m_evlHandler;
-  delete m_sslConfig;
 }
 
-QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
+QNetworkReply*
+ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
 {
   QString request;
   if (reqId == Login) {
@@ -62,17 +63,19 @@ QNetworkReply* ZbxHelper::postRequest(const qint32 & reqId, const QStringList & 
   } else {
     request = ReqPatterns[reqId].arg(m_auth);
   }
-  Q_FOREACH(const QString &param, params) { request = request.arg(param); }
-
+  Q_FOREACH(const QString &param, params) {
+    request = request.arg(param);
+  }
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
-  reply->setSslConfiguration(*m_sslConfig);
+  reply->setSslConfiguration(m_sslConfig);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
   m_evlHandler->exec();
   return reply;
 }
 
-RequestListT ZbxHelper::requestsPatterns()
+RequestListT
+ZbxHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[Login] = "{\"jsonrpc\": \"2.0\", \
@@ -89,7 +92,7 @@ RequestListT ZbxHelper::requestsPatterns()
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
-      \"filter\": { \"host\":[\"%2\"]}, \
+      \"filter\": {%2}, \
       \"selectHosts\": [\"host\"], \
       \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
@@ -99,7 +102,7 @@ RequestListT ZbxHelper::requestsPatterns()
       \"auth\": \"%1\", \
       \"method\": \"trigger.get\", \
       \"params\": { \
-      \"filter\": { \"host\":[\"%2\"]}, \
+      \"filter\": {%2}, \
       \"select_hosts\": [\"host\"], \
       \"output\":  \"extend\", \
       \"limit\": -1}, \
@@ -108,16 +111,18 @@ RequestListT ZbxHelper::requestsPatterns()
   return patterns;
 }
 
-void ZbxHelper::setSslConfig(bool verifyPeer)
+void
+ZbxHelper::setSslConfig(bool verifyPeer)
 {
   if (verifyPeer) {
-    m_sslConfig->setPeerVerifyMode(QSslSocket::VerifyPeer);
+    m_sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
   } else {
-    m_sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
+    m_sslConfig.setPeerVerifyMode(QSslSocket::QueryPeer);
   }
 }
 
-void ZbxHelper::setTrid(const QString& apiv)
+void
+ZbxHelper::setTrid(const QString& apiv)
 {
   qint32 vnum = apiv.mid(0, 3).remove(".").toInt();
   if (vnum < 14) {
@@ -126,3 +131,202 @@ void ZbxHelper::setTrid(const QString& apiv)
     m_trid = Trigger;
   }
 }
+
+int
+ZbxHelper::parseReply(QNetworkReply* reply)
+{
+  reply->deleteLater();
+
+  // check for error in network communication
+  if (reply->error() != QNetworkReply::NoError) {
+    m_lastError = tr("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
+    return -1;
+  }
+
+  // now read data
+  QString data = reply->readAll();
+  m_replyJsonData.setData(data);
+
+  return 0;
+}
+
+bool
+ZbxHelper::checkRPCResultStatus(void)
+{
+  QString errmsg = m_replyJsonData.getProperty("error").property("data").toString();
+  if (errmsg.isEmpty()) {
+    errmsg = m_replyJsonData.getProperty("error").property("message").toString();
+  }
+  if (! errmsg.isEmpty()) {
+    m_lastError = errmsg;
+    return false;
+  }
+  return true;
+}
+
+int
+ZbxHelper::openSession(const SourceT& srcInfo)
+{
+  setBaseUrl(srcInfo.mon_url);
+  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
+  if (params.size() != 2) {
+    m_lastError = tr("Bad auth string, should be in the form of login:password");
+    return -1;
+  }
+  params.push_back(QString::number(Login));
+  setSslConfig(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = postRequest(Login, params);
+  if (! response || processLoginReply(response) !=0) {
+    return -1;
+  }
+
+  // Get the API version
+  if (fecthApiVersion(srcInfo) != 0) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int
+ZbxHelper::processLoginReply(QNetworkReply* reply)
+{
+  if (parseReply(reply) != 0){
+    return -1;
+  }
+
+  int returnValue = -1;
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  QString result = m_replyJsonData.getProperty("result").toString();
+  if (tid == ZbxHelper::Login
+      && ! result.isEmpty()) {
+    m_auth = result;
+    m_isLogged = true;
+    returnValue = 0;
+  } else {
+    m_lastError = tr("Login failed");
+  }
+
+  return returnValue;
+}
+
+int
+ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
+{
+  QStringList params;
+  params.push_back(QString::number(ZbxHelper::ApiVersion));
+  setSslConfig(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = postRequest(ZbxHelper::ApiVersion, params);
+  if (! response || processGetApiVersionReply(response) !=0) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int
+ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
+{
+  if (parseReply(reply) != 0){
+    return -1;
+  }
+
+  int returnValue = -1;
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  if (tid == ZbxHelper::ApiVersion) {
+    setTrid(m_replyJsonData.getProperty("result").toString());
+    returnValue = 0;
+  } else {
+    m_lastError = tr("the transaction id does not correspond to getApiVersion");
+  }
+
+  return returnValue;
+}
+
+int
+ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
+{
+  if (parseReply(reply) != 0){
+    return -1;
+  }
+
+  if (! checkRPCResultStatus()) {
+    return -1;
+  }
+
+  // check weird reponset
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  if (tid != ZbxHelper::Trigger && ZbxHelper::TriggerV18) {
+    m_lastError = tr("Weird response received from the server");
+    return -1;
+  }
+
+  // now treat successful result
+  QScriptValueIterator trigger(m_replyJsonData.getProperty("result"));
+  while (trigger.hasNext()) {
+
+    trigger.next();
+    if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+
+    QScriptValue triggerData = trigger.value();
+    QString triggerName = triggerData.property("description").toString();
+
+    CheckT check;
+    check.check_command = triggerName.toStdString();
+    check.status = triggerData.property("value").toInt32();
+    if (check.status == ngrt4n::ZabbixClear) {
+      check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+    } else {
+      check.alarm_msg = triggerData.property("error").toString().toStdString();
+      check.status = triggerData.property("priority").toInteger();
+    }
+    QString targetHost = "";
+    QScriptValueIterator host(triggerData.property("hosts"));
+    if (host.hasNext())
+    {
+      host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
+      QScriptValue hostData = host.value();
+      targetHost = hostData.property("host").toString();
+      check.host = targetHost.toStdString();
+    }
+    if (tid == ZbxHelper::TriggerV18) {
+      check.last_state_change = triggerData.property("lastchange").toString().toStdString();
+    } else {
+      QScriptValueIterator item(triggerData.property("items"));
+      if (item.hasNext()) {
+        item.next();
+        if (item.flags()&QScriptValue::SkipInEnumeration) continue;
+        QScriptValue itemData = item.value();
+        check.last_state_change = itemData.property("lastclock").toString().toStdString();
+      }
+    }
+    check.id = ID_PATTERN.arg(targetHost, triggerName).toStdString();
+    checks.insert(std::pair<std::string, CheckT>(check.id, check));
+  }
+  return 0;
+}
+
+int
+ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+{
+  if (! m_isLogged) {
+    return -1;
+  }
+
+  QStringList params;
+  QNetworkReply* response = NULL;
+
+  // Finally retriev triggers related to the given host
+  // FIXME: if host empty get triggers from all hosts
+  checks.clear();
+  params.clear();
+  QString hostFilter = host.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(host);
+  params.push_back(hostFilter);
+  params.push_back(QString::number(m_trid));
+  response = postRequest(m_trid, params);
+  if (! response || processTriggerReply(response, checks) !=0) {
+    return -1;
+  }
+  return 0;
+}
+

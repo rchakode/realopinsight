@@ -55,6 +55,39 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     </message>
 </context>
 <context>
+    <name>CheckImportationSettingsForm</name>
+    <message>
+        <location filename="../client/src/GuiDialogForms.cpp" line="22"/>
+        <source>Select source*</source>
+        <translation>Sélectionner une source</translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiDialogForms.cpp" line="25"/>
+        <source>Host filter (optional)</source>
+        <translation>Filtre par nom (optionnel)</translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiDialogForms.cpp" line="29"/>
+        <source>browse...</source>
+        <translation>Parcourir...</translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiDialogForms.cpp" line="32"/>
+        <source>Status file</source>
+        <translation>Fichier status</translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiDialogForms.cpp" line="51"/>
+        <source>Select a status file | %1</source>
+        <translation>Sélectionner un fichier status | %1</translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiDialogForms.cpp" line="53"/>
+        <source>Data files (*.dat);;All files (*)</source>
+        <translation>Fichiers status (*.dat);;Tous les fichiers (*)</translation>
+    </message>
+</context>
+<context>
     <name>DashboardBase</name>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="119"/>
@@ -62,109 +95,101 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
         <translation>La source par défaut n&apos;est encore pas configuré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="149"/>
-        <location filename="../core/src/DashboardBase.cpp" line="215"/>
+        <location filename="../core/src/DashboardBase.cpp" line="172"/>
+        <location filename="../core/src/DashboardBase.cpp" line="238"/>
         <source>Undefined source (%1)</source>
         <translation>Source non configurée (%1)</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="161"/>
+        <location filename="../core/src/DashboardBase.cpp" line="184"/>
         <source>The server serial %1 is not supported</source>
         <translation>La série %1de ngrt4nd n&apos;est plus supporté </translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="248"/>
-        <location filename="../core/src/DashboardBase.cpp" line="935"/>
+        <location filename="../core/src/DashboardBase.cpp" line="271"/>
+        <location filename="../core/src/DashboardBase.cpp" line="638"/>
         <source>Undefined service (%1)</source>
         <translation>Service non défini (%1)</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="481"/>
-        <location filename="../core/src/DashboardBase.cpp" line="581"/>
+        <location filename="../core/src/DashboardBase.cpp" line="595"/>
+        <source>Can&apos;t allocate handler for source %1</source>
+        <translation>Ne peut allouer le handler pour la source %1</translation>
+    </message>
+    <message>
         <source>Weird response received from the server</source>
-        <translation>Réponse inattendue reçue du serveur</translation>
+        <translation type="obsolete">Réponse inattendue reçue du serveur</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="508"/>
         <source>Authentication failed: %1</source>
-        <translation>Echec d&apos;authentification: %1</translation>
+        <translation type="obsolete">Echec d&apos;authentification: %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="558"/>
         <source>The %1 component is Up</source>
-        <translation>Aucun problème détecté sur le composant: %1</translation>
+        <translation type="obsolete">Aucun problème détecté sur le composant: %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="574"/>
         <source>The host &apos;%1&apos; is Up</source>
-        <translation>L&apos;hote %1 est actif</translation>
+        <translation type="obsolete">L&apos;hote %1 est actif</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="577"/>
         <source>The host &apos;%1&apos; is Down</source>
-        <translation>L&apos;hôte %1 semble hors ligne</translation>
+        <translation type="obsolete">L&apos;hôte %1 semble hors ligne</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="639"/>
+        <location filename="../core/src/DashboardBase.cpp" line="469"/>
         <source>Invalid authentication chain!
 Must follow the pattern login:password</source>
         <translation>Chaine d&apos;autentification invalide. 
 la valeur doit être sur la forme login:mot_de_passe</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="754"/>
         <source>The connection has been closed by the remote host</source>
-        <translation>La connexion a été fermée de manière inattendue</translation>
+        <translation type="obsolete">La connexion a été fermée de manière inattendue</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="757"/>
         <source>Host not found</source>
-        <translation>Hôte non trouvé</translation>
+        <translation type="obsolete">Hôte non trouvé</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="760"/>
         <source>Connection refused</source>
-        <translation>Connexion refusée</translation>
+        <translation type="obsolete">Connexion refusée</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="763"/>
         <source>SSL Handshake failed</source>
-        <translation>Echec lors du handshake SSL</translation>
+        <translation type="obsolete">Echec lors du handshake SSL</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="766"/>
         <source>Timeout exceeded</source>
-        <translation>Timeout expiré</translation>
+        <translation type="obsolete">Timeout expiré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="769"/>
         <source>error %1</source>
-        <translation>Erreur %1</translation>
+        <translation type="obsolete">Erreur %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="806"/>
+        <location filename="../core/src/DashboardBase.cpp" line="532"/>
         <source>Cannot set handler for %1</source>
         <translation>Echec lors de l&apos;initialisation du hanldler de %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="810"/>
+        <location filename="../core/src/DashboardBase.cpp" line="536"/>
         <source>%1 is not set</source>
         <translation>%1 n&apos;est pas configuré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="813"/>
+        <location filename="../core/src/DashboardBase.cpp" line="539"/>
         <source>Cannot handle source (%1)</source>
         <translation>Echec lors de l&apos;initialisation du hanldler de %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="847"/>
+        <location filename="../core/src/DashboardBase.cpp" line="573"/>
         <source>%1: undefined monitor (%2)</source>
         <translation>%1 : moniteur supporté (%2)</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="879"/>
         <source>Unknown monitor type (%1)</source>
-        <translation>Type de moniteur indéfini (%1)</translation>
+        <translation type="obsolete">Type de moniteur indéfini (%1)</translation>
     </message>
 </context>
 <context>
@@ -184,39 +209,39 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
 <context>
     <name>GuiDashboard</name>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="81"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="80"/>
         <source>Map</source>
         <translation>Cartographie</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="83"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="82"/>
         <source>Web Browser</source>
         <translation>Navigateur Web</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="214"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="213"/>
         <source>Messages related to &apos;%2&apos; - %1</source>
         <translation>Messages relatifs au service &apos;%2&apos; - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="287"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="286"/>
         <source> - %1 Problem%2
  - Level of Impact: %3</source>
         <translation> - %1 incident%2
  - Niveau d&apos;impact : %3</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="288"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="287"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="303"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="302"/>
         <source>Message Console</source>
         <translation>Console des messages</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="358"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="357"/>
         <source>Web Browser (%1)</source>
         <translation>Navigateur Web (%1)</translation>
     </message>
@@ -239,172 +264,172 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
         <translation>Veuillez sélectionner le type de source (API distante)</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="173"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="167"/>
         <source>Monitoring Settings | %1</source>
         <translation>Paramètres de la console | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="181"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="175"/>
         <source>&amp;Apply settings</source>
         <translation>&amp;Appliquer les changements</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="182"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="176"/>
         <source>Add a&amp;s Source</source>
         <translation>Ajouter comme nouvelle &amp;source</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="183"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="177"/>
         <source>&amp;Delete Source</source>
         <translation>Sup&amp;primer</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="184"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="178"/>
         <source>&amp;Show in clear</source>
         <translation>Afficher en &amp;clair</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="185"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="179"/>
         <source>Use &amp;Ngrt4nd</source>
         <translation>Utiliser &amp;ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="186"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="180"/>
         <source>Don&apos;t verify SSL peer (https)</source>
         <translation>Ne pas vérifier le pair SSL</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="195"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="189"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
         <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="211"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="205"/>
         <source>C&amp;hange password</source>
         <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="216"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="210"/>
         <source>Change Password | %1</source>
         <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="219"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="213"/>
         <source>Current Password</source>
         <translation>Mot de passe actuel</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="221"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="215"/>
         <source>New password</source>
         <translation>Nouveau mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="223"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="217"/>
         <source>Retype new password</source>
         <translation>Confirmation</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="236"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="230"/>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="354"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="348"/>
         <source>Browser requires realm authentication | %1</source>
         <translation>La page demandée requiert une authentification | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="357"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="351"/>
         <source>Login</source>
         <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="360"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="354"/>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="364"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="358"/>
         <source>Submit</source>
         <translation>Soumettre</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="438"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="432"/>
         <source>Password updated</source>
         <translation>Mot de passe mis Ã  jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="442"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="436"/>
         <source>Sorry the passwords do not match</source>
         <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="445"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="439"/>
         <source>Authentication failed</source>
         <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="475"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="469"/>
         <source>Update Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="517"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="511"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
         <translation>Point d&apos;accès Ã  Livestatus ou Ã  ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="519"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="513"/>
         <source>Server Address</source>
         <translation>Adresse du serveur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="521"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="515"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="554"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="548"/>
         <source>Sources</source>
         <translation>Sources</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="557"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="551"/>
         <source>Monitor Web URL*</source>
         <translation>Adresse web du moniteur*</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="559"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="553"/>
         <source>Select a monitor type</source>
         <translation>Selectionner le type de moniteur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="565"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="559"/>
         <source>Auth String</source>
         <translation>Chaine d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="569"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="563"/>
         <source>Update Interval</source>
         <translation>Intervalle de mise Ã  jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="573"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="567"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="578"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="572"/>
         <source>Common Settings</source>
         <translation>Paramètres généraux</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="610"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="604"/>
         <source>Select source index | %1</source>
         <translation>Sélectionner l&apos;index de la source | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="611"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="605"/>
         <source>Please select the index of the source</source>
         <translation>Veuillez sélectionner l&apos;index de la source</translation>
     </message>
@@ -570,17 +595,17 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="177"/>
+        <location filename="../client/src/MainWindow.cpp" line="176"/>
         <source>%1 - %2 Operations Console</source>
         <translation>%1 - %2 Console des Opérations</translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="224"/>
+        <location filename="../client/src/MainWindow.cpp" line="222"/>
         <source>updating...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../client/src/MainWindow.cpp" line="226"/>
+        <location filename="../client/src/MainWindow.cpp" line="224"/>
         <source>update completed</source>
         <translation>mise Ã  jour terminée</translation>
     </message>
@@ -619,7 +644,7 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
         <location filename="../client/src/MsgConsole.cpp" line="43"/>
         <location filename="../wt/src/WebMsgConsole.cpp" line="57"/>
         <source>Host</source>
-        <translation>HÃ´te</translation>
+        <translation>Serveur/périphérique</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="44"/>
@@ -634,28 +659,7 @@ la valeur doit être sur la forme login:mot_de_passe</translation>
         <translation>Message</translation>
     </message>
     <message>
-        <source>
-%1 %2 (codename: %3)
-
-Release ID: %4
-
-Copyright (c) 2010-%5 NGRT4N Project. All rights reserved
-Visit %6 for more information
-
-Report Bugs: bugs@ngrt4n.com
-</source>
-        <translation type="obsolete">
-%1 %2 (nom de code : %3)
-
-Numéro de série : %4
-
-Copyright (c) 2010-%5 Projet NGRT4N. Tous droits réservés
-Visiter notre site web %6 pour plus d&apos;informations
-
-Reporter des bugs : bugs@ngrt4n.com</translation>
-    </message>
-    <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="40"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="39"/>
         <location filename="../core/src/DashboardBase.cpp" line="50"/>
         <location filename="../core/src/utilsCore.cpp" line="30"/>
         <source>Service: %1
@@ -670,7 +674,7 @@ Séverité : %3
    Règle de propagation : %5</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="41"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="40"/>
         <location filename="../core/src/DashboardBase.cpp" line="51"/>
         <location filename="../core/src/utilsCore.cpp" line="31"/>
         <source>
@@ -685,7 +689,7 @@ Sortie du plugin : %8
 Autres détails : %9</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="42"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="41"/>
         <location filename="../core/src/DashboardBase.cpp" line="52"/>
         <source>Failed to connect to %1 (%2)</source>
         <translation>Echec lors de la connexion Ã  %1 (%2)</translation>
@@ -784,10 +788,6 @@ Autres détails : %9</translation>
         <translation>ID Service </translation>
     </message>
     <message>
-        <source>View Managment</source>
-        <translation type="obsolete">Gestion des vues</translation>
-    </message>
-    <message>
         <location filename="../wt/dbo/ViewMgnt.cpp" line="69"/>
         <source>&lt;&lt; Assign</source>
         <translation>&lt;&lt; Assigner</translation>
@@ -869,7 +869,7 @@ Autres détails : %9</translation>
         <translation>Veuillez sélectionner l&apos;index de la source</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="238"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="232"/>
         <source>
 Version: %2 (codename: %3)
 
@@ -941,7 +941,7 @@ Reporter des bugs: %7</translation>
         <translation>Service métier</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="268"/>
+        <location filename="../core/src/DashboardBase.cpp" line="291"/>
         <source>updating %1 (%2)...</source>
         <translation>mise à jour %1 (%2)...</translation>
     </message>
@@ -1038,7 +1038,7 @@ Reporter des bugs: %7</translation>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="47"/>
         <source>Icon</source>
-        <translation>IcÃ´ne</translation>
+        <translation>Image</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="50"/>
@@ -1066,19 +1066,19 @@ Reporter des bugs: %7</translation>
         <translation>Source de données</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="246"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="244"/>
         <source>Calculation rule (Default is %1)</source>
         <oldsource>Calculation rule (Default is)</oldsource>
         <translation>Règle de calcul (valeur par défaut %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="253"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="251"/>
         <source>Propagation rule (Default is %1)</source>
         <oldsource>Propagation rule (Default is)</oldsource>
         <translation>Règle de propagation (valeur par défaut %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="300"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="298"/>
         <source>This depends on your monitoring configuration:
  * For Nagios this follows the patterns &apos;host_name/service_name&apos;
     E.g. mysql-server.example.com/Current Load.
@@ -1101,240 +1101,263 @@ See the online documentation for further details.</source>
     Si seulement la partie host_name est définie la source de données sera assignée au ping.
 Voir la documentatuon en ligne pour plus de détails.</translation>
     </message>
-    <message>
-        <source>This depends on your monitoring configuration:
- * For Nagios this follows the patterns &apos;host_name/service_name&apos; or just &apos;host_name&apos;
-    E.g. mysql-server.example.com/Current Load, mysql-server.example.com
-    When only host_name is set, the data point is associated to ping status.
- * For Zabbix it follows the pattern &apos;host_name/trigger_name&apos;
-    E.g. Zabbix server/Zabbix http poller processes more than 75% busy
- * For Zenoss it follows the patterns &apos;device_name/component_name&apos; or just &apos;device_name&apos;
-    E.g. localhost/httpd, localhost
-    When only device_name is set, the data point is associated to ping status.
-See the online documentation for further details.</source>
-        <oldsource>This depends on your monitoring configuration:
- * For Nagios this follows the patterns &apos;host_name/service_name&apos; or just &apos;host_name&apos;
-    E.g. mysql-server.example.com/Current Load, mysql-server.example.com
-    When only host_name is set, the data point is associated to ping status.
- * For Zabbix it follows the pattern &apos;host_name/trigger_name&apos;
-    E.g. Zabbix server/Zabbix http poller processes more than 75% busy
- * For Zenoss it follows the patterns &apos;device_name/component_name&apos; or just &apos;device_name&apos;
-    E.g. localhost/httpd, localhost
-    NOTE: When only device_name is set, the data point is associated to ping status.
-See the online documentation for further details.</oldsource>
-        <translation type="obsolete">Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
- * Pour Nagios et les systèmes similaires comme Shinken; c&apos;est de la forme &apos;host_name/service_name&apos; or juste &apos;host_name&apos;
-    Ex. mysql-server.example.com/Current Load, mysql-server.example.com
-    Si seulement la partie host_name est définie la source de données sera assignée au ping.
- * Pour Zabbix, c&apos;est de la forme &apos;host_name/trigger_name&apos;
-    Ex. Zabbix server/Zabbix http poller processes more than 75% busy
- * Pour Zenoss c&apos;est de la forme &apos;device_name/component_name&apos; ou juste &apos;device_name&apos;
-    E.g. localhost/httpd, localhost
-    Si seulement la partie host_name est définie la source de données sera assignée au ping.
-Voir la documentatuon en ligne pour plus de détails.</translation>
-    </message>
 </context>
 <context>
     <name>SvCreator</name>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="56"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="60"/>
         <source>Open or edit a file via the File menu</source>
         <translation>Créer un fichier ou ouvrir un fichier existant via le menu Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="100"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="138"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="520"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="104"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="141"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="615"/>
         <source>%1 Editor - %2</source>
         <translation> Editeur %1 - %2</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="101"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="105"/>
         <source>Loaded.</source>
         <translation>Chargement terminé.</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="110"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="114"/>
         <source>%1 | Select target file</source>
         <translation>%1 | Sélectionner le fichier cible</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="112"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="116"/>
         <source>%1;;%2;;%3;;%4;;Xml files(*.xml);;All files(*)</source>
         <translation>%1;;%2;;%3;;%4;;Fichiers Xml (*.xml);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="489"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="176"/>
+        <source>Loading checks from %1:%2...</source>
+        <translation>Chargement des données de sondes à partir de %1:%2...</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="179"/>
+        <source>Error while parsing the file</source>
+        <translation>Erreur lors du traitement du fichier</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="181"/>
+        <source>No file selected</source>
+        <translation>Aucun fichier sélectionné</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="200"/>
+        <source>Loading triggers from %1:%2...</source>
+        <translation>Chargement des données de déclencheurs à partir de %1:%2...</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="222"/>
+        <source>Loading components from %1:%2...</source>
+        <translation>Chargements des données de composants à partir de %1:%2... </translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="241"/>
+        <source>%1 triggers imported</source>
+        <translation>%1 déclencheurs importés</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="584"/>
         <source>Unable to open the file &apos;%1&apos;</source>
         <translation>Impossible d&apos;ouvrir le fichier &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="145"/>
         <source>Select the Status File %</source>
-        <translation>Sélectionner un fichier de status Nagios %</translation>
+        <translation type="obsolete">Sélectionner un fichier de status Nagios %</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="147"/>
         <source>Data files (*.dat);;All files (*)</source>
-        <translation>Fichiers de données (*.dat);;Tous les fichiers (*)</translation>
+        <translation type="obsolete">Fichiers de données (*.dat);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="156"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="251"/>
         <source>New View</source>
         <translation>Nouvelle vue de service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="164"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="259"/>
         <source>%1 Editor - unsaved document*</source>
         <translation>Editeur %1 - document non enregistré*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="172"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="267"/>
         <source>sub service %1</source>
         <translation>sous service %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="183"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="278"/>
         <source>Out of memory. the application will exit</source>
         <translation>Mémoire indisponible, l&apos;application va se terminer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="203"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="298"/>
         <source>This action not allowed on the target node</source>
         <translation>Cette action n&apos;est pas autorisée sur le noeud cible</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="217"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="312"/>
         <source>Do you really want to delete the service and its sub services?</source>
         <translation>Voulez-vous vraiment suppimer le service?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="218"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="313"/>
         <source>Deleting service - %1 Editor</source>
         <translation>Suppression de service  - Editeur %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="286"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="381"/>
         <source>There is no data in the clipboard!</source>
         <translation>Il n&apos;y a pas de données dans le presse papier!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="307"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="402"/>
         <source>Select the destination file | %1</source>
         <translation>Sélectionner le fichier de destination | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="316"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="411"/>
         <source>The path is not valid!</source>
         <translation>Chemin invalide!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="345"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="440"/>
         <source>Save change? - %1</source>
         <translation>Enregistrer les mises Ã  jour ? - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="346"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="441"/>
         <source>The document has changed.
 Do you want to save the changes?</source>
         <translation>Le document n&apos;a été modifiée.
 Voulez-vous enregistrer les mises Ã  jour?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="423"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="435"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="462"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="478"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="518"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="530"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="557"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="573"/>
         <source>%1 Editor - %2*</source>
         <translation>Editeur %1 - %2*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="429"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="524"/>
         <source>This action is not permitted for a service having sub service(s)!!!</source>
         <translation>Cette action n&apos;est pas autorisée sur un service ayant des sous-services!!!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="485"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="580"/>
         <source>saving %1</source>
         <translation>enregistrement de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="495"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="590"/>
         <source>The hierarchy does not have root</source>
         <translation>La hiérarchie n&apos;a pas de racine</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="519"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="614"/>
         <source>saved %1</source>
         <translation>sauvé %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="550"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="645"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="553"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="648"/>
         <source>&amp;Open</source>
         <translation>&amp;Ouvrir</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="555"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="650"/>
         <source>&amp;Save</source>
         <translation>&amp;Enregistrer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="557"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="652"/>
         <source>Save &amp;As...</source>
         <translation>Enregistrer &amp;sous...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="560"/>
-        <source>&amp;Import Status File</source>
-        <translation>&amp;Importer un fichier de status Nagios</translation>
+        <location filename="../client/src/SvConfigCreator.cpp" line="655"/>
+        <source>Import Na&amp;gios Checks</source>
+        <translation>Importer des sondes Na&amp;gios</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="562"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="656"/>
+        <source>Import Za&amp;bbix Triggers</source>
+        <translation>Importer des déclencheurs Za&amp;bbix</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="657"/>
+        <source>&amp;Import Z&amp;enoss Components</source>
+        <translation>Importer des composants Z&amp;enoss</translation>
+    </message>
+    <message>
+        <source>&amp;Import Nagios Checks</source>
+        <translation type="obsolete">&amp;Importer des sondes Nagios s</translation>
+    </message>
+    <message>
+        <source>&amp;Import Zabbix Triggers</source>
+        <translation type="obsolete">&amp;</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="693"/>
+        <source>ERROR: Unable to open the file %1</source>
+        <translation>ERREUR: Ne peut ouvrir le fichier %1</translation>
+    </message>
+    <message>
+        <source>&amp;Import Status File</source>
+        <translation type="obsolete">&amp;Importer un fichier de status Nagios</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="659"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="564"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="661"/>
         <source>&amp;Edition</source>
         <translation>&amp;Edition</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="565"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="662"/>
         <source>&amp;Add sub service</source>
         <translation>&amp;Ajouter sous service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="568"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="665"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="571"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="668"/>
         <source>&amp;Paste</source>
         <translation>Co&amp;ller</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="574"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="671"/>
         <source>&amp;Delete</source>
         <translation>&amp;Supprimer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="577"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="674"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="578"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="675"/>
         <source>Online &amp;Resources</source>
         <translation>&amp;Ressources en ligne</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="581"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="678"/>
         <source>&amp;About %1</source>
         <translation>&amp;A propos de %1</translation>
     </message>
@@ -1393,10 +1416,6 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <location filename="../wt/src/WebMainUI.cpp" line="362"/>
         <source>Invalid description file</source>
         <translation>Fichier de description invalide</translation>
-    </message>
-    <message>
-        <source>Change password</source>
-        <translation type="obsolete">Changer de mot de passe</translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="64"/>
@@ -1474,28 +1493,14 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <translation>Votre système semble manquer de mémoire</translation>
     </message>
     <message>
-        <source>File is too large.</source>
-        <translation type="obsolete">Fichier trop volumineux.</translation>
-    </message>
-    <message>
         <location filename="../wt/src/WebMainUI.cpp" line="367"/>
         <source>%1/%2</source>
         <translation></translation>
     </message>
     <message>
-        <source>View added.  Name: %1
- -  Number of services: %2 - Path: %3</source>
-        <translation type="obsolete">Vue ajoutée.  Nom: %1
- -  Nombre de services: %2 - Chemin: %3</translation>
-    </message>
-    <message>
         <location filename="../wt/src/WebMainUI.cpp" line="399"/>
         <source>No file selected</source>
         <translation>Aucun fichier sélectionné</translation>
-    </message>
-    <message>
-        <source>This platform or a platfom with the same name is already loaded</source>
-        <translation type="obsolete">Cette  plateforme ou une plateforme du mÃªme nom existe déjÃ </translation>
     </message>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="630"/>
@@ -1589,6 +1594,77 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <location filename="../wt/src/WebPieChart.cpp" line="87"/>
         <source>chart.tpl</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ZbxHelper</name>
+    <message>
+        <location filename="../core/src/ZbxHelper.cpp" line="142"/>
+        <source>%1 (%2)</source>
+        <translation>%1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZbxHelper.cpp" line="173"/>
+        <source>Bad auth string, should be in the form of login:password</source>
+        <translation>Le format de la chaine d&apos;autentification est incorrect. Doit être sur la forme login:mot_de_passe</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZbxHelper.cpp" line="207"/>
+        <source>Login failed</source>
+        <translation>Echec d&apos;autentification</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZbxHelper.cpp" line="240"/>
+        <source>the transaction id does not correspond to getApiVersion</source>
+        <translation>Le numéro de transaction ne semble pas correspondre pas à celle de la méthode getApiVersion</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZbxHelper.cpp" line="260"/>
+        <source>Weird response received from the server</source>
+        <translation>Réponse inattendue reçue du serveur</translation>
+    </message>
+</context>
+<context>
+    <name>ZnsHelper</name>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="159"/>
+        <source>Authentication failed: %1</source>
+        <translation>Echec d&apos;authentification: %1</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="171"/>
+        <source>Bad auth string, should be in the form of login:password</source>
+        <translation>Le format de la chaine d&apos;autentification est incorrect. Doit être sur la forme login:mot_de_passe</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="239"/>
+        <source>Weird transaction type set for component info (%1)</source>
+        <translation>Le type de transaction ne semble pas correspondre à la méthode getComposant (%1)</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="264"/>
+        <source>The %1 component is Up</source>
+        <translation>Aucun problème détecté sur le composant: %1</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="289"/>
+        <source>Weird transaction type set for device info (%1)</source>
+        <translation>Numéro de transaction incorrect pour getDeviceInfo (%1)</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="305"/>
+        <source>The host &apos;%1&apos; is Up</source>
+        <translation>L&apos;hote %1 est actif</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="308"/>
+        <source>The host &apos;%1&apos; is Down</source>
+        <translation>Le serveur ou le périphérique réseau %1 semble hors ligne</translation>
+    </message>
+    <message>
+        <location filename="../core/src/ZnsHelper.cpp" line="331"/>
+        <source>Weird transaction type set for device (%1)</source>
+        <translation>Type de transaction incorrect pour getDevice (%1)</translation>
     </message>
 </context>
 <context>
