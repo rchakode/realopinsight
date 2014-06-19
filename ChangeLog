@@ -1,0 +1,140 @@
+###############################
+RealOpInsight ChangeLog
+###############################
+2.4.0beta1 (Federator,b2)
+  * Fixed ticket #16: adding support for realm authentication within the browser
+  * Fixed ticket #17: file path missing in the title bar of the console
+  * Fixed ticket #18: Added the possibility to select the source to load within the browser
+  * Added logo and misc icons for Nagios, Zenoss, Zenoss, and hierarchy
+
+2.4.0beta1 (Federator,b1)
+  * Improved support for overriding SSL peer verification
+  * Added support for multisources management, up to 10 sources supported
+  * Lot of refactoring, imporving loading and updating
+  * Added splash screen when loading configuration
+  * Added support for dragging and scrolling from the map
+  * Added workaround for ticket #13 adding option to override host verification
+  * Fixed ticket #14 related to chart panel repositionning
+  * Password manager is not longer execute through the configuration wizard
+
+2.3.1 (Briator, p1)
+  * Added support for overriding SSL peer verification
+  * Private release no sufficiently tested for production
+
+2.3.0 (Briator)
+  * Minor changes from the beta version.
+  * Binaries are available for Fedora 17 and 18, openSUSE 12.1, 12.2 and 12.3.
+  From this version, we don't longer provide binaries for Fedora 16
+
+2.3.0beta1 (Briator, b1)
+--------------
+  * Added support for MK Livestatus remote socket
+  * Added new menus for handling full screen, filtering trouble messages, and
+    for changing font size from the operations console
+  * Added support for copy/paste as well as more menu shortcuts within the editor
+  * Added new icons
+  * Added french translation
+  * added validator for the Port field
+  * Make the IDs of data points case insensitive
+  * Minor bug fixes
+  
+2.2.1 (Lucia, p1)
+-------------
+  * Added support for Zabbix 1.8.x. Fixed ticket #11
+  * Minor upates on metadata handling
+
+2.2.0 (Lucia)
+--------------
+  * Fixed compilation problems on nullptr. See Ticket #8
+  * Fixed metadata handling. See ticket #9
+
+2.2.0beta1(Lucia, b1)
+--------------
+  * Added support for Zenoss. Has been tested with Zenoss 4.x but would work
+    with Zenoss 3.x
+  * Update severity model introducing a fine-grained manageability of incidents
+    (UNKNOWN, CRITICAL, MAJOR, MINOR, NORMAL)
+  * Added System Tray Icon for notification the main window is inactive
+  * Support some Zabbix's meta tag (e.g. {HOST.NAME}) in alarm messages
+  * Brings new and optimized data structures and algorithms for better
+    performances and a reduced memory footprint
+  * Added buttons for back, forward and stop actions through the embedded browser
+  * Added support for zeromq 3.x (ticket #3)
+  * Added man pages for the commands ngrt4n-manager, ngrt4n-oc and ngrt4n-editor
+  * Added contextual help for editor fields
+  * Fixed compilation problems on c++11 (tickets #4 and #5)
+  * Fixed bug #6 when the Operations Console crashes when the colon is ommited
+    on the authchain for Zabbix
+  * Changed tooltip font
+
+2.1.0 (M-Sylvie)
+--------------
+  * Added option for hiding/showing the auth chain
+  * Fixed bug #1: The severities of Zabbix triggers are now supported.
+  * Updated the preferences window for easing the setting of monitoring settings
+
+2.1.0beta1
+--------------
+  * Added support for Zabbix: Requires Zabbix >= 1.7. 
+    Known Issues: the severities of triggers are not yet taken into account. 
+    All problems are simply reported. This will be fixed before the stable 
+    release (ticket #1). 
+
+  * Released the UI Module and the Daemon Module as seperate packages. 
+    The UI Module became 'RealOpInsight' while the Daemon Module, specific 
+    to Nagios, is now called 'Daemon Service for Nagios'.
+
+  * VERY IMPORTANT: To support both Zabbix and Nagios without additional 
+    configuration constraints for the administrators, the format of configuration 
+    files has been modified to detect automatically the target monitoring system 
+    at the loading time. Nevertheless, for backward compatibility, the former 
+    format is still supported and detected as compatible with Nagios. 
+    It's recommended to upgrade the format of your former configuration files: just 
+    open the each file from the Editor and resave it (File -> Save).
+
+  * Changed of the format of message exchanges between the Daemon 
+    Service for Nagios and the Operations Consoles for better 
+    performance and better performance and more flexibility. It's 
+    required to upgrade the Daemon Service towards the version 1.1.0.
+
+  * Bug fix: Added more robustness in the communications to prevent situations 
+    of infinite waiting when the Daemon Service for Nagios does not respond.
+
+  * Bug fix: minor changes on the management of update interval.
+
+  * Bug fix: fixed the problem when the native check field appears empty when there 
+    is no Nagios status file loaded.
+
+  * Deprecated command: 'ngrt4n', now use 'ngrt4n-manager' instead.
+
+  * The Windows Installer has been tested on Windows 7 and Windows 8. 
+    Please remove any older version of NGRT4N before installing RealOpInsight.
+
+2.0 - Stable
+-------------
+  * Minor bug fixes
+
+2.0-beta1
+-------------
+ENHANCEMENTS
+ * Enabled a distributed architecture based on a messaging system
+   - Added a daemon module between Nagios and the UI Modules
+   - Changed authentication mechanism
+   - Removed requirements on X Forwarding
+   - Removed requirements for specific user and group
+ * Provided the editor utility and the operator console utility as separated programs  
+   - Kept backward compatibility support from the ngrt4n utility 
+   - Added a menu for importing the Nagios status.dat from the editor
+ * Added custom event propagation rules
+ * Optimized code and algorithms
+ * Improved user interfaces
+ * Refined chart
+
+1.0.1 (NGRT4N)
+-------------
+ * Improved algorithms
+ * Add GPL License
+
+1.0  (NGRT4N)
+-------------
+ * First release
