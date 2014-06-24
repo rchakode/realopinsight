@@ -2,8 +2,8 @@ RealOpInsight and the related software are released under the terms of GPLv3 Lic
 Prior to the installation, you may need to read the license offer. See the COPYING file. 
  
 
-INSTALLING REALOPINSIGHT
--------------
+INSTALLATION
+------------
 * This component needs to be installed on the workstations where users operate
 
 * Dependencies
@@ -16,21 +16,3 @@ INSTALLING REALOPINSIGHT
   $ tar zxf RealOpInsightX.Y.Y.tar.gz  # X.Y.Z refers to the version
   $ cd RealOpInsight-X.Y.Z
   $ sudo ./install-sh
-  
-
-INSTALLING THE DAEMON SERVICE FOR NAGIOS (ngrt4nd)
----------------
-* This component needs to be installed on the Nagios server.
-
-* Dependencies
- - gcc-c++ >= 4.6.3
- - make
- - libzmq (librairies and development files)
-
-* Installation
-  $ tar zxf ngrt4n-d4n-X.Y.Y.tar.gz  # X.Y.Z refers to the version
-  $ cd ngrt4n-d4n-X.Y.Z
-  $ sudo ./install-sh
-
-
-After the installation, check the online documentation for further processing (http://docs.realopinsight.com).
