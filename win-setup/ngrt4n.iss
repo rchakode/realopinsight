@@ -1,4 +1,4 @@
-#define Version "3.0.1"
+#define Version "3.0.2"
 #define Application "RealOpInsight Workstation" 
 [Setup] 
 AppName={#Application}
@@ -41,7 +41,9 @@ Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\Qt5Sensors.dll" ; DestDir: "{app}"
 Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\Qt5OpenGL.dll" ; DestDir: "{app}"
 Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\Qt5PrintSupport.dll" ; DestDir: "{app}"
 Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\Qt5MultimediaWidgets.dll" ; DestDir: "{app}"
-Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\Qt5Svg.dll" ; DestDir: "{app}"  
+Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\Qt5Svg.dll" ; DestDir: "{app}"                 
+Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\plugins\platforms\qwindows.dll" ; DestDir: "{app}\platforms"  
+
 Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\libgcc_s_dw2-1.dll" ; DestDir: "{app}" 
 Source: "C:\ZeroMQ-2.2.0\bin\libzmq-v100-mt.dll" ; DestDir: "{app}"   
 Source: "C:\ZeroMQ-2.2.0\bin\msvcp100.dll" ; DestDir: "{app}"
