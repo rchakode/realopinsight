@@ -1,6 +1,11 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.2
+  * Fixed editor crash on native check service deletion (ticket #27)
+  * Fixed missing librairies in Windows binaries causing fail on
+    Windows plugin loading (ticket #28)
+
 3.0.1
   * Fixed importation of Nagios status file in the editor
   * Added ability to import Zabbix triggers and Zenoss components
