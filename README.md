@@ -4,15 +4,15 @@ Prior to the installation, you may need to read the license offer.
 
 INSTALLATION
 =
-* This component needs to be installed on the user workstation.
+This component needs to be installed on the user workstation.
 
-* Dependencies
-===
+Dependencies
+==
 
- - gcc-c++ >= 4.6.3
- - Qt >= 4.6.3 (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript)
- - libzmq (librairies and development files)
- - graphviz
+- gcc-c++ >= 4.6.3
+- Qt >= 4.6.3 (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript)
+- libzmq (librairies and development files)
+- graphviz
  
 Installation
 ==
