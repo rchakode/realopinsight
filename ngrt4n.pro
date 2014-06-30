@@ -95,7 +95,7 @@ SOURCES += \
 
 gui-base {
 QT += svg gui webkit
-PACKAGE_VERSION=3.0.2
+PACKAGE_VERSION=3.0.3
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
