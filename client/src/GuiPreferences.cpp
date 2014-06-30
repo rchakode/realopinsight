@@ -229,12 +229,20 @@ void GuiPreferences::organizeAbortWindow(void)
 {
   m_dialog->setWindowTitle(tr("About %1").arg(APP_NAME));
   m_donateBtn = new ImageButton(":images/built-in/donate.png");
-  QString about = QObject::tr("\nVersion: %2 (codename: %3)\n"
-                              "\nEdition: %1\n"
-                              "\nRelease ID: %4\n"
-                              "\nCopyright (c) 2010-%5 RealOpInsight Labs. All rights reserved"
-                              "\nVisit %6 for more information\n"
-                              "\nReport Bugs: %7\n").arg(PKG_VERSION, REL_NAME, REL_INFO, REL_YEAR, PKG_URL, REPORT_BUG);
+  QString about = QObject::tr("\n%1"
+                              "\nVersion: %2 (%3)"
+                              "\nCore version: %4"
+                              "\nRelease ID: %5"
+                              "\nCopyright (c) 2010-%6 RealOpInsight Labs. All rights reserved"
+                              "\nVisit %7 for more information"
+                              "\nReport Bugs: %8\n").arg(APP_NAME,
+                                                         PKG_VERSION,
+                                                         REL_NAME,
+                                                         CORE_VERSION,
+                                                         REL_INFO,
+                                                         REL_YEAR,
+                                                         PKG_URL,
+                                                         REPORT_BUG);
   int line = 0;
   m_mainLayout->addWidget(new QLabel(about), line++, 0, 1, 2);
   m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft);
