@@ -39,18 +39,19 @@
   QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
 #ifdef REALOPINSIGHT_WEB
-const QString APP_NAME = QObject::tr("%1 Ultimate").arg(APPLICATION_NAME);
+const QString APP_NAME = QObject::tr("%1 Ultimate").arg(REALOPINSIGHT_APPLICATION_NAME);
 #else
-const QString APP_NAME = QObject::tr("%1 Workstation").arg(APPLICATION_NAME);
+const QString APP_NAME = QObject::tr("%1 Workstation").arg(REALOPINSIGHT_APPLICATION_NAME);
 #endif
 const QString COMPANY = "RealOpInsight Labs";
 const QString USER_BN = "ngrt4n";
-const QString PKG_VERSION = PACKAGE_VERSION;
-const QString PKG_URL = PACKAGE_URL;
-const QString REL_NAME = RELEASE_NAME;
-const QString REL_YEAR = RELEASE_YEAR;
-const QString REPORT_BUG = BUG_REPORT_EMAIL;
-const long long BUILD_TIME = BUILD_DATE;
+const QString CORE_VERSION = REALOPINSIGHT_CORE_VERSION;
+const QString PKG_VERSION = REALOPINSIGHT_PACKAGE_VERSION;
+const QString PKG_URL = REALOPINSIGHT_PACKAGE_URL;
+const QString REL_NAME = REALOPINSIGHT_RELEASE_NAME;
+const QString REL_YEAR = REALOPINSIGHT_RELEASE_YEAR;
+const QString REPORT_BUG = REALOPINSIGHT_BUG_REPORT_EMAIL;
+const long long BUILD_TIME = REALOPINSIGHT_BUILD_DATE;
 const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
 const QString ID_PATTERN("%1/%2");
 const qint32 MAX_SRCS = 10;
