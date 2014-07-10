@@ -241,11 +241,6 @@ void DashboardBase::runLivestatusUpdate(int srcId)
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {
-  if (!src.ls_handler->isConnected()) {
-    updateDashboardOnError(src, src.ls_handler->errorString());
-    return;
-  }
-
   CheckT invalidCheck;
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
 
@@ -254,23 +249,13 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
     hostit.next();
     QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(hostit.key());
 
-    if (info.first != src.id || ! src.ls_handler->fecthHostChecks(info.second)) continue;
+    if (info.first != src.id) continue;
 
-    Q_FOREACH (const QString& value, hostit.value()) {
-      QString key;
-      if (value != "ping") {
-        key = ID_PATTERN.arg(info.second).arg(value);
-      } else {
-        key = info.second;
-      }
-      CheckListCstIterT chkit;
-      if (src.ls_handler->findCheck(key, chkit)) {
-        updateCNodesWithCheck(*chkit, src);
-      } else {
-        invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
-        invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
-        updateCNodesWithCheck(invalidCheck, src);
-      }
+    ChecksT checks;
+    if (src.ls_handler->loadChecks(info.second, checks) == 0) {
+      updateCNodesWithChecks(checks, src);
+    } else {
+      updateDashboardOnError(src, src.ls_handler->lastError());
     }
   }
 }
@@ -482,7 +467,6 @@ void DashboardBase::openRpcSession(SourceT& src)
     } else {
       if (src.ls_handler->isConnected())
         src.ls_handler->disconnectFromService();
-
       src.ls_handler->connectToService();
     }
     break;

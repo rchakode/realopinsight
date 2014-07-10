@@ -39,27 +39,24 @@ public:
   LsHelper(const QString& host, const int& port);
   ~LsHelper();
 
-  bool connectToService(void);
+  int connectToService(void);
   void disconnectFromService(void);
-  bool requestData(const QString& host, const ReqTypeT& reqType);
-  bool recvData(const ReqTypeT& reqType);
-  bool fecthHostChecks(const QString& host);
-  bool findCheck(const QString& id, CheckListCstIterT& check);
-  void clearData(void) {m_checks.clear();}
+  int requestData(const QString& host, const ReqTypeT& reqType);
+  int recvData(const ReqTypeT& reqType, ChecksT& checks);
+  int loadChecks(const QString& host, ChecksT& checks);
   void setHost(const QString& host) {m_host = host;}
   void setPort(const int& port) {m_port = port;}
   bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
+  QString lastError(void) const {return m_lastError;}
 
 private:
   const static int DefaultTimeout = 50000; /* 5 seconds */
   QString m_host;
   qint32 m_port;
   RequestListT mrequestMap;
-  CheckListT m_checks;
-  QString m_errorMsg;
+  QString m_lastError;
   void setRequestPatterns();
-  void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}
-  void handleNetworkFailure(QAbstractSocket::SocketError error);
+  void handleNetworkFailure() {m_lastError = tr("Error when connecting to tcp://%1:%2 (%3)").arg(QAbstractSocket::errorString());}
 };
 
 #endif // MKLSHELPER_HPP
