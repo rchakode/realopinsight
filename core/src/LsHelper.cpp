@@ -50,15 +50,15 @@ void LsHelper::setRequestPatterns()
       "Filter: host_name = %1\n\n";
 }
 
-bool LsHelper::connectToService()
+int LsHelper::connectToService()
 {
   disconnectFromHost();
   QAbstractSocket::connectToHost(m_host, m_port, QAbstractSocket::ReadWrite);
   if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
     handleNetworkFailure();
-    return false;
+    return -1;
   }
-  return true;
+  return 0;
 }
 
 
@@ -67,106 +67,100 @@ void LsHelper::disconnectFromService()
   QAbstractSocket::disconnectFromHost();
 }
 
-bool LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
+int LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
 {
-  qint32 nb;
-  if (!isConnected()) {
-    connectToService();
-  }
-  if (!isConnected() ||
-      (nb = QAbstractSocket::write(ngrt4n::toByteArray(mrequestMap[reqType].arg(host)))) <= 0 ||
-      !QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
+  qint32 byteExchanged;
+  if (! isConnected() && ! connectToService())
+    return -1;
+
+  if (! isConnected())
+    return -1;
+
+  byteExchanged = QAbstractSocket::write(ngrt4n::toByteArray(mrequestMap[reqType].arg(host)));
+  if (byteExchanged <= 0 || ! QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
     handleNetworkFailure();
-    return false;
+    return -1;
   }
-  return true;
+
+  return 0;
 }
 
-bool LsHelper::recvData(const ReqTypeT& reqType)
+int LsHelper::recvData(const ReqTypeT& reqType, ChecksT& checks)
 {
   if (!QAbstractSocket::waitForReadyRead(DefaultTimeout)) {
     handleNetworkFailure();
-    return false;
+    return -1;
   }
   QString chkid = "";
   CheckT check;
   QString entry;
   QTextStream buffer(this);
+
   while (!((entry = buffer.readLine()).isNull())) {
+
     if (entry.isEmpty()) continue;
+
     QStringList fields = entry.split(";");
-    chkid.clear();
-    if (reqType == Host) {
-      if (fields.size() != 5) {
-        return false;
-      }
+
+    switch(reqType) {
+    case Host:
+
+      if (fields.size() != 5)
+        continue;
+
       chkid = fields[0].toLower();
       check.id = check.host = fields[0].toStdString();
       check.status = fields[1].toInt();
       check.last_state_change = ngrt4n::humanTimeText(fields[2].toStdString());
       check.check_command = fields[3].toStdString();
       check.alarm_msg = fields[4].toStdString();
-    } else if (reqType == Service) {
+      break;
+
+    case Service:
+
       if (fields.size() != 6)
-        return false;
-      QString hostname = fields[0];
-      chkid = ID_PATTERN.arg(hostname, fields[1]).toLower();
-      check.host = hostname.toStdString();
+        continue;
+
+      // fields[0] => hostname
+      chkid = ID_PATTERN.arg(fields[0], fields[1]).toLower();
+      check.host = fields[0].toStdString();
       check.id = chkid.toStdString();
       check.status = fields[2].toInt();
       check.last_state_change = ngrt4n::humanTimeText(fields[3].toStdString());
       check.check_command = fields[4].toStdString();
       check.alarm_msg = fields[5].toStdString();
-    } else {
-      QAbstractSocket::setErrorString(tr("Bad request type: %1").arg(reqType));
-      return false;
+      break;
+
+    default:
+      m_lastError = tr("Bad request type: %1").arg(reqType);
+      continue;
+      break;
     }
-    m_checks.insert(chkid, check);
+
+    checks.insert(std::pair<std::string, CheckT>(chkid.toStdString(), check));
   }
-  return true;
+  return 0;
 }
 
-bool LsHelper::fecthHostChecks(const QString& host)
+
+int LsHelper::loadChecks(const QString& host, ChecksT& checks)
 {
-  m_checks.clear();
-  bool succeed;
-  succeed = connectToService() &&
-      requestData(host, Host) &&
-      recvData(Host);
+  checks.clear();
+  if (connectToService() != 0)
+    return -1;
+
+  if (! isConnected()) {
+    return -1;
+  }
+
+  if (requestData(host, Host) != 0)
+    return -1;
+
+  if (recvData(Host, checks) != 0)
+    return -1;
+
   disconnectFromService();
 
-  succeed = succeed && connectToService() &&
-      requestData(host, Service)&&
-      recvData(Service);
-  disconnectFromService();
-  return true;
-}
-
-bool LsHelper::findCheck(const QString& id, CheckListCstIterT& check)
-{
-  check = m_checks.find(id.toLower());
-  if (check != m_checks.end()) {
-    return true;
-  }
-  return false;
-}
-
-void LsHelper::handleNetworkFailure(QAbstractSocket::SocketError error)
-{
-  switch (error) {
-  case QAbstractSocket::RemoteHostClosedError:
-    QAbstractSocket::setErrorString(tr("Connection closed by the remote host"));
-    break;
-  case QAbstractSocket::HostNotFoundError:
-    QAbstractSocket::setErrorString(tr("Host not found (%1).").arg(m_host));
-    break;
-  case QAbstractSocket::ConnectionRefusedError:
-    QAbstractSocket::setErrorString(tr("Connection refused. "
-                                       "Make sure that Livestatus API is listening on tcp://%1:%2").arg(m_host).arg(m_port));
-    break;
-  default:
-    QAbstractSocket::setErrorString(tr("The following error occurred (%1)")
-                                    .arg(QAbstractSocket::errorString()));
-  }
+  return 0;
 }
 
