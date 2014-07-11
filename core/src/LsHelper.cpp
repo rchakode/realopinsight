@@ -42,10 +42,10 @@ LsHelper::~LsHelper()
 
 void LsHelper::setRequestPatterns()
 {
-  mrequestMap[Host] = "GET hosts\n"
+  m_requestMap[Host] = "GET hosts\n"
       "Columns: name state last_state_change check_command plugin_output\n"
       "Filter: name = %1\n\n";
-  mrequestMap[Service] = "GET services\n"
+  m_requestMap[Service] = "GET services\n"
       "Columns: host_name service_description state last_state_change check_command plugin_output\n"
       "Filter: host_name = %1\n\n";
 }
@@ -76,7 +76,7 @@ int LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
   if (! isConnected())
     return -1;
 
-  byteExchanged = QAbstractSocket::write(ngrt4n::toByteArray(mrequestMap[reqType].arg(host)));
+  byteExchanged = QAbstractSocket::write(ngrt4n::toByteArray(m_requestMap[reqType].arg(host)));
   if (byteExchanged <= 0 || ! QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
     handleNetworkFailure();
     return -1;

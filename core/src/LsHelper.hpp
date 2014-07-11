@@ -53,7 +53,7 @@ private:
   const static int DefaultTimeout = 50000; /* 5 seconds */
   QString m_host;
   qint32 m_port;
-  RequestListT mrequestMap;
+  RequestListT m_requestMap;
   QString m_lastError;
   void setRequestPatterns();
   void handleNetworkFailure() {m_lastError = tr("Error when connecting to tcp://%1:%2 (%3)").arg(QAbstractSocket::errorString());}
