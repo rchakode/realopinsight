@@ -74,39 +74,22 @@ int LsHelper::loadChecks(const QString& host, ChecksT& checks)
   checks.clear();
 
   // get host data
-  if (m_socketHandler.makeRequest(prepareRequestData(host, LsHelper::Host)) != 0) {
-    m_lastError = m_socketHandler.lastError();
+  if (makeRequest(prepareRequestData(host, LsHelper::Host), checks) != 0) {
+    return -1;
   }
-  parseResult(m_socketHandler.lastResult(), checks);
 
   // get service data
-  if (m_socketHandler.makeRequest(prepareRequestData(host, LsHelper::Service)) != 0) {
-    m_lastError = m_socketHandler.lastError();
-  }
-  parseResult(m_socketHandler.lastResult(), checks);
-  return 0;
+  return makeRequest(prepareRequestData(host, LsHelper::Service), checks);
 }
 
-int LsHelper::makeRpcCall(const QString& host, ReqTypeT requestType)
+
+int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
 {
-  QByteArray data = prepareRequestData(host, requestType);
-
-  WSADATA WSAData;
-  SOCKET sock;
-  SOCKADDR_IN sin;
-  char buffer[1024*1024];
-  WSAStartup(MAKEWORD(2,0), &WSAData);
-  /* Tout est configuré pour se connecter sur IRC, haarlem, Undernet. */
-  sock = socket(AF_INET, SOCK_STREAM, 0);
-  sin.sin_addr.s_addr = inet_addr(m_host.toStdString().c_str());
-  sin.sin_family = AF_INET;
-  sin.sin_port = htons(m_port);
-  connect(sock, (SOCKADDR *)&sin, sizeof(sin));
-
-  send(sock, data, data.size(), 0);
-  recv(sock, buffer, sizeof(buffer), 0);
-  closesocket(sock);
-  WSACleanup();
+  if (m_socketHandler.makeRequest(data) != 0) {
+    m_lastError = m_socketHandler.lastError();
+    return -1;
+  }
+  parseResult(m_socketHandler.lastResult(), checks);
   return 0;
 }
 

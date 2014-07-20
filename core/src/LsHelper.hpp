@@ -39,7 +39,7 @@ public:
   LsHelper(const QString& host, const int& port);
   ~LsHelper();
 
-  int makeRpcCall(const QString& host, ReqTypeT requestType);
+  int makeRequest(const QByteArray& data, ChecksT& checks);
   int loadChecks(const QString& host, ChecksT& checks);
   QString lastError(void) const {return m_lastError;}
   int setupSocket(void);

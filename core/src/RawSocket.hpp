@@ -36,7 +36,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h> /* close */
+#include <unistd.h>
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 #define closesocket(s) close(s)
@@ -47,10 +47,11 @@ typedef struct in_addr IN_ADDR;
 
 #endif
 
-const size_t BUFFER_SIZE = 1024 * 1024; // 1 Mo
 #include <QString>
 #include <QObject>
 
+
+const size_t BUFFER_SIZE = 1024 * 1024; // 1 Mo
 
 class RawSocket
 {

@@ -99,15 +99,24 @@ QString RawSocket::lastResult(void)
 
 void RawSocket::buildErrorString(void)
 {
-  switch (errno) {
+  int errorCode = -1;
+#ifdef WIN32
+  errorCode = WSAGetLastError();
+#else
+  errorCode = errno;
+#endif
+
+  switch (errorCode) {
+  case WSAEHOSTDOWN:
   case EHOSTUNREACH:
-    m_lastError = QObject::tr("Host unreachable %1").arg(m_host);
+    m_lastError = QObject::tr("Host down or unreachable %1").arg(m_host);
     break;
+  case WSAETIMEDOUT:
   case ETIMEDOUT:
-    m_lastError = QObject::tr("Connection timeout %1").arg(m_host);
+    m_lastError = QObject::tr("Connection failed due to timeout %1").arg(m_host);
     break;
   default:
-    m_lastError = QObject::tr("socket error %1").arg(errno);
+    m_lastError = QObject::tr("Socket operation failed with error %1").arg(errno);
     break;
   }
 }

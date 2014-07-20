@@ -230,8 +230,10 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
     if (info.first == src.id) {
       ChecksT checks;
       if (src.ls_handler->loadChecks(info.second, checks) == 0) {
+        std::cout << "success";
         updateCNodesWithChecks(checks, src);
       } else {
+        std::cout << "failed";
         updateDashboardOnError(src, src.ls_handler->lastError());
         break;
       }
