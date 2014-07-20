@@ -36,7 +36,7 @@ public:
     Service = 1
   };
 
-  LsHelper(const QString& host, const int& port);
+  LsHelper(const QString& host, int port);
   ~LsHelper();
 
   int makeRequest(const QByteArray& data, ChecksT& checks);

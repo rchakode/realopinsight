@@ -67,5 +67,6 @@
         <file>images/built-in/import-nagios.png</file>
         <file>images/built-in/import-zabbix.png</file>
         <file>images/built-in/import-zenoss.png</file>
+        <file>images/built-in/import-livestatus.png</file>
     </qresource>
 </RCC>

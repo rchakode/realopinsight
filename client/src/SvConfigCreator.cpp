@@ -23,13 +23,14 @@
  */
 
 
+#include <fstream>
 #include "SvConfigCreator.hpp"
 #include "GraphView.hpp"
 #include "utilsCore.hpp"
 #include "GuiDashboard.hpp"
 #include "Auth.hpp"
 #include "GuiDialogForms.hpp"
-#include <fstream>
+#include "LsHelper.hpp"
 
 namespace {
   const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
@@ -160,9 +161,6 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
   }
 }
 
-
-
-
 void SvCreator::importNagiosChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
@@ -173,7 +171,7 @@ void SvCreator::importNagiosChecks(void)
     QString path = importationSettingForm.selectedStatusFile();
     SourceT srcInfo = sourceInfos[srcId];
 
-    if (! path.isNull() && !path.isEmpty()) {
+    if (! path.isNull() && ! path.isEmpty()) {
       statusBar()->showMessage(tr("Loading checks from %1:%2...").arg(srcId, path));
       ChecksT checks;
       int retcode = parseStatusFile(path, checks);
@@ -183,6 +181,30 @@ void SvCreator::importNagiosChecks(void)
     }
   }
 }
+
+void SvCreator::importLivestatusChecks(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString host = importationSettingForm.selectedHost();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    statusBar()->showMessage(tr("Loading checks from Livestatus at %1:%2:%3...")
+                             .arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)));
+
+    ChecksT checks;
+    LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
+    int retcode = handler.setupSocket();
+    if (retcode == 0) {
+      retcode = handler.loadChecks(host, checks);
+    }
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+  }
+}
+
 
 void SvCreator::importZabbixTriggers(void)
 {
@@ -652,6 +674,7 @@ void SvCreator::loadMenu(void)
       m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
   m_menus["FILE"]->addSeparator(),
       m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
+      m_subMenus["ImportLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
       m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
       m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
   m_menus["FILE"]->addSeparator(),
@@ -678,6 +701,7 @@ void SvCreator::loadMenu(void)
   m_toolBar->addAction(m_subMenus["Save"]);
   m_toolBar->addAction(m_subMenus["Open"]);
   m_toolBar->addAction(m_subMenus["ImportNagiosChecks"]);
+  m_toolBar->addAction(m_subMenus["ImportLivestatusChecks"]);
   m_toolBar->addAction(m_subMenus["ImportZabbixTriggers"]);
   m_toolBar->addAction(m_subMenus["ImportZenossComponents"]);
   setMenuBar(m_menuBar);
@@ -742,6 +766,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
   connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
   connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
+  connect(m_subMenus["ImportLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importLivestatusChecks()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));

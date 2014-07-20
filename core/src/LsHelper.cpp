@@ -29,7 +29,7 @@
 #include "utilsCore.hpp"
 #include "RawSocket.hpp"
 
-LsHelper::LsHelper(const QString& host, const int& port)
+LsHelper::LsHelper(const QString& host, int port)
   : m_socketHandler(new RawSocket(host, port))
 {
 }
