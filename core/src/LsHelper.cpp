@@ -30,19 +30,19 @@
 #include "RawSocket.hpp"
 
 LsHelper::LsHelper(const QString& host, const int& port)
-  : m_host(host),
-    m_port(port)
+  : m_socketHandler(new RawSocket(host, port))
 {
 }
 
 LsHelper::~LsHelper()
 {
+  delete m_socketHandler;
 }
 
 int LsHelper::setupSocket(void)
 {
-  if (m_socketHandler.setupSocket(m_host, m_port)) {
-    m_lastError = m_socketHandler.lastError();
+  if (m_socketHandler->setupSocket()) {
+    m_lastError = m_socketHandler->lastError();
     return -1;
   }
   return 0;
@@ -85,11 +85,11 @@ int LsHelper::loadChecks(const QString& host, ChecksT& checks)
 
 int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
 {
-  if (m_socketHandler.makeRequest(data) != 0) {
-    m_lastError = m_socketHandler.lastError();
+  if (m_socketHandler->makeRequest(data) != 0) {
+    m_lastError = m_socketHandler->lastError();
     return -1;
   }
-  parseResult(m_socketHandler.lastResult(), checks);
+  parseResult(m_socketHandler->lastResult(), checks);
   return 0;
 }
 

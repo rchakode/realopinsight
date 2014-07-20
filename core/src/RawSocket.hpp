@@ -56,9 +56,9 @@ const size_t BUFFER_SIZE = 1024 * 1024; // 1 Mo
 class RawSocket
 {
 public:
-  RawSocket();
+  RawSocket(const QString& host, int port);
   ~RawSocket();
-  int setupSocket(const QString& host, int port);
+  int setupSocket();
   void cleanUp(void);
   int makeRequest(const QByteArray& data);
   QString lastResult(void);

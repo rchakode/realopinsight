@@ -26,11 +26,10 @@
 #include "RawSocket.hpp"
 #include <cerrno>
 #include <QDebug>
-#include <iostream>
 
-RawSocket::RawSocket():
-  m_host(""),
-  m_port(6557)
+RawSocket::RawSocket(const QString& host, int port)
+  : m_host(host),
+    m_port(port)
 {
 }
 
@@ -40,11 +39,8 @@ RawSocket::~RawSocket()
 }
 
 
-int RawSocket::setupSocket(const QString& host, int port)
+int RawSocket::setupSocket(void)
 {
-  m_host = host;
-  m_port = port;
-
 #ifdef WIN32
   WSADATA wsa;
   int err = WSAStartup(MAKEWORD(2, 2), &wsa);

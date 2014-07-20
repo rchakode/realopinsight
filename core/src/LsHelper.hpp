@@ -48,12 +48,9 @@ public:
   static QByteArray prepareRequestData(const QString& host, ReqTypeT requestType);
 
 private:
-  const static int DefaultTimeout = 600000; /* 60 seconds */
-  QString m_host;
-  qint32 m_port;
   QString m_lastError;
   QEventLoop* m_evloop;
-  RawSocket m_socketHandler;
+  RawSocket* m_socketHandler;
 };
 
 #endif // MKLSHELPER_HPP
