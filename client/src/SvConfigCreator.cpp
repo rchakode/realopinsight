@@ -32,12 +32,12 @@
 #include <fstream>
 
 namespace {
-const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
-const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
-const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
-const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
-const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
-}
+  const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
+  const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
+  const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
+  const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
+  const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
+  }
 
 SvCreator::SvCreator(const qint32& _userRole)
   : m_userRole (_userRole),
@@ -261,7 +261,9 @@ void SvCreator::newView(void)
 void SvCreator::newNode(void)
 {
   static int count = 1;
-  NodeT* node = createNode(ngrt4n::genNodeId(), tr("sub service %1").arg(QString::number(count)), m_selectedNode);
+  NodeT* node = createNode(ngrt4n::genNodeId(),
+                           tr("sub service %1").arg(QString::number(count)),
+                           m_selectedNode);
   insertFromSelected(*node);
   ++count;
 }
@@ -271,7 +273,7 @@ NodeT* SvCreator::createNode(const QString& id,
                              const QString& parent)
 {
   NodeT* node = new NodeT;
-  if (!node) {
+  if (! node) {
     ngrt4n::alert(tr("Out of memory. the application will exit"));
     exit(1);
   }
@@ -309,8 +311,7 @@ void SvCreator::deleteNode(void)
   msgBox.setText(tr("Do you really want to delete the service and its sub services?"));
   msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(APP_NAME));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
-  switch (msgBox.exec())
-  {
+  switch (msgBox.exec()) {
   case QMessageBox::Yes:
     deleteNode(m_selectedNode);
     break;
@@ -322,10 +323,11 @@ void SvCreator::deleteNode(void)
 void SvCreator::deleteNode(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (!ngrt4n::findNode(m_cdata, _nodeId, node))
+  if (! ngrt4n::findNode(m_cdata, _nodeId, node))
     return;
 
-  if (node->type == NodeType::ServiceNode && node->child_nodes != "") {
+  if (node->type == NodeType::ServiceNode
+      && ! node->child_nodes.isEmpty()) {
     Q_FOREACH(const QString& checkId, node->child_nodes.split(CHILD_SEPERATOR)) {
       deleteNode(checkId);
     }
@@ -359,7 +361,8 @@ void SvCreator::copySelected(void)
 {
   NodeListIteratorT node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
-    if (!m_clipboardData) m_clipboardData = new NodeT;
+    if (! m_clipboardData)
+      m_clipboardData = new NodeT;
     *m_clipboardData =*node;
     m_clipboardData->name+=" (Copy)";
     m_clipboardData->child_nodes.clear();
@@ -448,7 +451,8 @@ int SvCreator::treatCloseAction(const bool& _close)
         break;
       }
     }
-    if (enforceClose) qApp->quit();
+    if (enforceClose)
+      qApp->quit();
   }
   return ret;
 }
@@ -468,7 +472,7 @@ void SvCreator::handleSelectedNodeChanged(void)
 void SvCreator::handleTreeNodeMoved(QString _node_id)
 {
   QTreeWidgetItem* item =  m_tree->findNodeItem(_node_id);
-  if (item) {
+  if (item != NULL) {
 
     QTreeWidgetItem* tnodeP = item->parent();
     if (tnodeP) {
@@ -502,7 +506,6 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
   if (node != m_cdata->bpnodes.end()) {
     if (_type == NodeType::ServiceNode) {
       if (node->type == NodeType::AlarmNode) {
-        //TODO: A bug has been reported
         node->child_nodes.clear();
         if (m_editor->updateNodeContent(node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
@@ -514,7 +517,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
     } else {
       if (node->type == NodeType::ServiceNode && ! node->child_nodes.isEmpty()) {
         m_editor->typeField()->setCurrentIndex(0);
-        ngrt4n::alert(tr("This action is not permitted for a service having sub service(s)!!!"));
+        ngrt4n::alert(tr("Failed ! This action is not permitted for a leave service."));
       } else {
         if (m_editor->updateNodeContent(node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
