@@ -32,14 +32,16 @@ REALOPINSIGHT_CORE_VERSION=3.0.2
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
+DEFINES *= WIN32
+DEFINES *= WIN32_LEAN_AND_MEAN
 INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
-LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
+LIBS += -lws2_32 -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
 }
 unix {
 LIBS += -lzmq
 }
 
-DEFINES *=BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
+DEFINES *= BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
@@ -77,7 +79,8 @@ HEADERS += \
     core/src/global.hpp \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
-    core/src/JsonHelper.hpp
+    core/src/JsonHelper.hpp \
+    core/src/RawSocket.hpp
 
 
 SOURCES += \
@@ -91,7 +94,8 @@ SOURCES += \
     core/src/DashboardBase.cpp \
     core/src/utilsCore.cpp \
     core/src/ChartBase.cpp \
-    core/src/JsonHelper.cpp
+    core/src/JsonHelper.cpp \
+    core/src/RawSocket.cpp
 
 gui-base {
 QT += svg gui webkit

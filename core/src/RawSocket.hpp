@@ -1,8 +1,8 @@
 /*
- * LsHelper.hpp
+ * RawSocket.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Creation : 20-07-2014                                                    #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,38 +22,55 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef MKLSHELPER_HPP
-#define MKLSHELPER_HPP
 
-#include "Base.hpp"
-#include "RawSocket.hpp"
+#ifndef RAWSOCKET_HPP
+#define RAWSOCKET_HPP
 
-class LsHelper
+#ifdef WIN32
+
+#include <winsock2.h>
+
+#else
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h> /* close */
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket(s) close(s)
+typedef int SOCKET;
+typedef struct sockaddr_in SOCKADDR_IN;
+typedef struct sockaddr SOCKADDR;
+typedef struct in_addr IN_ADDR;
+
+#endif
+
+const size_t BUFFER_SIZE = 1024 * 1024; // 1 Mo
+#include <QString>
+#include <QObject>
+
+
+class RawSocket
 {
 public:
-  enum ReqTypeT{
-    Host = 0,
-    Service = 1
-  };
-
-  LsHelper(const QString& host, const int& port);
-  ~LsHelper();
-
-  int makeRpcCall(const QString& host, ReqTypeT requestType);
-  int loadChecks(const QString& host, ChecksT& checks);
+  RawSocket();
+  ~RawSocket();
+  int setupSocket(const QString& host, int port);
+  void cleanUp(void);
+  int makeRequest(const QByteArray& data);
+  QString lastResult(void);
   QString lastError(void) const {return m_lastError;}
-  int setupSocket(void);
-
-  void parseResult(const QString& result, ChecksT& checks);
-  static QByteArray prepareRequestData(const QString& host, ReqTypeT requestType);
 
 private:
-  const static int DefaultTimeout = 600000; /* 60 seconds */
-  QString m_host;
-  qint32 m_port;
   QString m_lastError;
-  QEventLoop* m_evloop;
-  RawSocket m_socketHandler;
+  char m_lastResult[BUFFER_SIZE];
+  QString m_host;
+  int m_port;
+  SOCKADDR_IN m_sockAddr;
+
+  void buildErrorString(void);
 };
 
-#endif // MKLSHELPER_HPP
+#endif // RAWSOCKET_HPP

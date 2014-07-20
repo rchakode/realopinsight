@@ -27,87 +27,104 @@
 #include <QDir>
 #include <iostream>
 #include "utilsCore.hpp"
+#include "RawSocket.hpp"
 
 LsHelper::LsHelper(const QString& host, const int& port)
-  : m_host(host), m_port(port)
+  : m_host(host),
+    m_port(port)
 {
-  setSocketOption(QAbstractSocket::KeepAliveOption, 1);
-  setRequestPatterns();
 }
 
 LsHelper::~LsHelper()
 {
-  QAbstractSocket::disconnect();
 }
 
-void LsHelper::setRequestPatterns()
+int LsHelper::setupSocket(void)
 {
-  m_requestMap[Host] = "GET hosts\n"
-      "Columns: name state last_state_change check_command plugin_output\n"
-      "Filter: name = %1\n\n";
-  m_requestMap[Service] = "GET services\n"
-      "Columns: host_name service_description state last_state_change check_command plugin_output\n"
-      "Filter: host_name = %1\n\n";
-}
-
-int LsHelper::connectToService()
-{
-  disconnectFromHost();
-  QAbstractSocket::connectToHost(m_host, m_port, QAbstractSocket::ReadWrite);
-  if (!QAbstractSocket::waitForConnected(DefaultTimeout)) {
-    handleNetworkFailure();
+  if (m_socketHandler.setupSocket(m_host, m_port)) {
+    m_lastError = m_socketHandler.lastError();
     return -1;
   }
   return 0;
 }
 
-
-void LsHelper::disconnectFromService()
+QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestType)
 {
-  QAbstractSocket::disconnectFromHost();
-}
-
-int LsHelper::requestData(const QString& host, const ReqTypeT& reqType)
-{
-  qint32 byteExchanged;
-  if (! isConnected() && ! connectToService())
-    return -1;
-
-  if (! isConnected())
-    return -1;
-
-  byteExchanged = QAbstractSocket::write(ngrt4n::toByteArray(m_requestMap[reqType].arg(host)));
-  if (byteExchanged <= 0 || ! QAbstractSocket::waitForBytesWritten(DefaultTimeout)) {
-    handleNetworkFailure();
-    return -1;
+  QString data = "";
+  switch(requestType) {
+  case LsHelper::Host:
+    data = "GET hosts\n"
+        "Columns: name state last_state_change check_command plugin_output\n"
+        "Filter: name = %1\n\n";
+    break;
+  case LsHelper::Service:
+    data = "GET services\n"
+        "Columns: host_name service_description state last_state_change check_command plugin_output\n"
+        "Filter: host_name = %1\n\n";
+    break;
+  default:
+    break;
   }
 
+  return ngrt4n::toByteArray(data.arg(host));
+}
+
+int LsHelper::loadChecks(const QString& host, ChecksT& checks)
+{
+  checks.clear();
+
+  // get host data
+  if (m_socketHandler.makeRequest(prepareRequestData(host, LsHelper::Host)) != 0) {
+    m_lastError = m_socketHandler.lastError();
+  }
+  parseResult(m_socketHandler.lastResult(), checks);
+
+  // get service data
+  if (m_socketHandler.makeRequest(prepareRequestData(host, LsHelper::Service)) != 0) {
+    m_lastError = m_socketHandler.lastError();
+  }
+  parseResult(m_socketHandler.lastResult(), checks);
   return 0;
 }
 
-int LsHelper::recvData(const ReqTypeT& reqType, ChecksT& checks)
+int LsHelper::makeRpcCall(const QString& host, ReqTypeT requestType)
 {
-  if (!QAbstractSocket::waitForReadyRead(DefaultTimeout)) {
-    handleNetworkFailure();
-    return -1;
-  }
+  QByteArray data = prepareRequestData(host, requestType);
+
+  WSADATA WSAData;
+  SOCKET sock;
+  SOCKADDR_IN sin;
+  char buffer[1024*1024];
+  WSAStartup(MAKEWORD(2,0), &WSAData);
+  /* Tout est configuré pour se connecter sur IRC, haarlem, Undernet. */
+  sock = socket(AF_INET, SOCK_STREAM, 0);
+  sin.sin_addr.s_addr = inet_addr(m_host.toStdString().c_str());
+  sin.sin_family = AF_INET;
+  sin.sin_port = htons(m_port);
+  connect(sock, (SOCKADDR *)&sin, sizeof(sin));
+
+  send(sock, data, data.size(), 0);
+  recv(sock, buffer, sizeof(buffer), 0);
+  closesocket(sock);
+  WSACleanup();
+  return 0;
+}
+
+
+void LsHelper::parseResult(const QString& result, ChecksT& checks)
+{
   QString chkid = "";
   CheckT check;
   QString entry;
-  QTextStream buffer(this);
 
-  while (!((entry = buffer.readLine()).isNull())) {
+  QTextStream stream(result.toLatin1(), QIODevice::ReadOnly);
 
+  while (!((entry = stream.readLine()).isNull())) {
     if (entry.isEmpty()) continue;
-
     QStringList fields = entry.split(";");
 
-    switch(reqType) {
-    case Host:
-
-      if (fields.size() != 5)
-        continue;
-
+    switch( fields.size() ) {
+    case 5: // host response
       chkid = fields[0].toLower();
       check.id = check.host = fields[0].toStdString();
       check.status = fields[1].toInt();
@@ -116,13 +133,8 @@ int LsHelper::recvData(const ReqTypeT& reqType, ChecksT& checks)
       check.alarm_msg = fields[4].toStdString();
       break;
 
-    case Service:
-
-      if (fields.size() != 6)
-        continue;
-
-      // fields[0] => hostname
-      chkid = ID_PATTERN.arg(fields[0], fields[1]).toLower();
+    case 6: // service response
+      chkid = ID_PATTERN.arg(fields[0], fields[1]).toLower(); // fields[0] => hostname
       check.host = fields[0].toStdString();
       check.id = chkid.toStdString();
       check.status = fields[2].toInt();
@@ -132,35 +144,9 @@ int LsHelper::recvData(const ReqTypeT& reqType, ChecksT& checks)
       break;
 
     default:
-      m_lastError = tr("Bad request type: %1").arg(reqType);
       continue;
       break;
     }
-
     checks.insert(std::pair<std::string, CheckT>(chkid.toStdString(), check));
   }
-  return 0;
 }
-
-
-int LsHelper::loadChecks(const QString& host, ChecksT& checks)
-{
-  checks.clear();
-  if (connectToService() != 0)
-    return -1;
-
-  if (! isConnected()) {
-    return -1;
-  }
-
-  if (requestData(host, Host) != 0)
-    return -1;
-
-  if (recvData(Host, checks) != 0)
-    return -1;
-
-  disconnectFromService();
-
-  return 0;
-}
-
