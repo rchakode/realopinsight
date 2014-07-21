@@ -1,6 +1,12 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.3
+  * Added the ability to import Livestatus-based data within
+    the editor (fixed ticket #31).
+  * Rewrite in Livestatus handler introducing simplification in code
+    as well as significant performance improvements
+
 3.0.2
   * Fixed editor crash on native check service deletion (ticket #27)
   * Fixed missing librairies in Windows binaries causing fail on
