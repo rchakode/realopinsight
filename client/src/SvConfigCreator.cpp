@@ -192,7 +192,7 @@ void SvCreator::importLivestatusChecks(void)
     QString host = importationSettingForm.selectedHost();
     SourceT srcInfo = sourceInfos[srcId];
 
-    statusBar()->showMessage(tr("Loading checks from Livestatus at %1:%2:%3...")
+    statusBar()->showMessage(tr("Loading checks from %1:%2:%3...")
                              .arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)));
 
     ChecksT checks;

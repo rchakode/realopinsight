@@ -54,19 +54,31 @@ QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestTyp
   switch(requestType) {
   case LsHelper::Host:
     data = "GET hosts\n"
-        "Columns: name state last_state_change check_command plugin_output\n"
-        "Filter: name = %1\n\n";
+        "Columns: name state last_state_change check_command plugin_output\n";
     break;
   case LsHelper::Service:
     data = "GET services\n"
-        "Columns: host_name service_description state last_state_change check_command plugin_output\n"
-        "Filter: host_name = %1\n\n";
+        "Columns: host_name service_description state last_state_change check_command plugin_output\n";
     break;
   default:
     break;
   }
 
-  return ngrt4n::toByteArray(data.arg(host));
+  if (! host.isEmpty()) {
+    QString filterPattern;
+    switch(requestType) {
+    case LsHelper::Host:
+      filterPattern = "Filter: name = %1\n";
+      break;
+    case LsHelper::Service:
+      filterPattern = "Filter: host_name = %1\n";
+      break;
+    default:
+      break;
+    }
+    data.append(filterPattern.arg(host));
+  }
+  return ngrt4n::toByteArray(data.append("\n"));
 }
 
 int LsHelper::loadChecks(const QString& host, ChecksT& checks)

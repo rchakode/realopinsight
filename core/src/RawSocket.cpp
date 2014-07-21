@@ -78,8 +78,8 @@ int RawSocket::makeRequest(const QByteArray& data)
     return -1;
   }
 
-  if (! recv(sock, m_lastResult, BUFFER_SIZE -1, 0) <= 0) {
-    m_lastError = QObject::tr("Empty result");
+  if (recv(sock, m_lastResult, BUFFER_SIZE -1, 0) < 0) {
+    m_lastError = QObject::tr("Failed receiving data");
     return -1;
   }
 
@@ -100,19 +100,36 @@ void RawSocket::buildErrorString(void)
   errorCode = WSAGetLastError();
 #else
   errorCode = errno;
+#define WSAEHOSTDOWN EHOSTUNREACH
+#define WSAETIMEDOUT ETIMEDOUT
+#define WSAEADDRNOTAVAIL EADDRNOTAVAIL
+#define WSAENETDOWN ENETDOWN
+#define WSAECONNRESET ECONNRESET
+#define WSAECONNREFUSED ECONNREFUSED
 #endif
 
   switch (errorCode) {
   case WSAEHOSTDOWN:
-  case EHOSTUNREACH:
     m_lastError = QObject::tr("Host down or unreachable %1").arg(m_host);
     break;
   case WSAETIMEDOUT:
-  case ETIMEDOUT:
-    m_lastError = QObject::tr("Connection failed due to timeout %1").arg(m_host);
+    m_lastError = QObject::tr("Connection failed due to timeout %1:%2").arg(m_host, QString::number(m_port));
+    break;
+  case WSAEADDRNOTAVAIL:
+  case EADDRNOTAVAIL:
+    m_lastError = QObject::tr("Cannot assign requested address %1:%2").arg(m_host, QString::number(m_port));
+    break;
+  case WSAENETDOWN:
+    m_lastError = QObject::tr("Network is down");
+    break;
+  case WSAECONNRESET:
+    m_lastError = QObject::tr("Connection reset by peer");
+    break;
+  case WSAECONNREFUSED:
+    m_lastError = QObject::tr("Connection refused");
     break;
   default:
-    m_lastError = QObject::tr("Socket operation failed with error %1").arg(errno);
+    m_lastError = QObject::tr("Socket operation failed with error %1").arg(errorCode);
     break;
   }
 }
