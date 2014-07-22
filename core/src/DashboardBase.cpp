@@ -171,7 +171,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
   // Check if the handler is connected
   if (! src.d4n_handler->isReady()) {
-    updateDashboardOnError(src, QString::fromStdString(src.d4n_handler->lastError()));
+    updateDashboardOnError(src, src.d4n_handler->lastError());
     return;
   }
 

@@ -116,7 +116,6 @@ void RawSocket::buildErrorString(void)
     m_lastError = QObject::tr("Connection failed due to timeout %1:%2").arg(m_host, QString::number(m_port));
     break;
   case WSAEADDRNOTAVAIL:
-  case EADDRNOTAVAIL:
     m_lastError = QObject::tr("Cannot assign requested address %1:%2").arg(m_host, QString::number(m_port));
     break;
   case WSAENETDOWN:

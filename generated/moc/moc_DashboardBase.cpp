@@ -22,7 +22,7 @@ static const uint qt_meta_data_DashboardBase[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      29,   14, // methods
+      27,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -44,23 +44,21 @@ static const uint qt_meta_data_DashboardBase[] = {
  // slots: signature, parameters, type, tag, flags
      242,   14,   14,   14, 0x0a,
      259,  255,   14,   14, 0x0a,
-     286,  280,   14,   14, 0x0a,
-     308,  255,   14,   14, 0x0a,
-     334,  280,   14,   14, 0x0a,
-     359,  255,   14,   14, 0x0a,
-     388,   14,   14,   14, 0x0a,
-     404,  255,   14,   14, 0x0a,
-     433,  427,   14,   14, 0x0a,
-     460,  255,  455,   14, 0x0a,
-     493,  489,   14,   14, 0x0a,
-     535,   57,   14,   14, 0x0a,
-     578,  564,   14,   14, 0x0a,
-     614,   14,  603,   14, 0x0a,
-     629,   14,  622,   14, 0x0a,
-     640,   14,  455,   14, 0x0a,
-     665,  659,   14,   14, 0x0a,
-     703,   14,  691,   14, 0x0a,
-     717,   14,  713,   14, 0x0a,
+     280,  255,   14,   14, 0x0a,
+     306,  255,   14,   14, 0x0a,
+     335,   14,   14,   14, 0x0a,
+     351,  255,   14,   14, 0x0a,
+     380,  374,   14,   14, 0x0a,
+     407,  255,  402,   14, 0x0a,
+     440,  436,   14,   14, 0x0a,
+     482,   57,   14,   14, 0x0a,
+     525,  511,   14,   14, 0x0a,
+     561,   14,  550,   14, 0x0a,
+     576,   14,  569,   14, 0x0a,
+     587,   14,  402,   14, 0x0a,
+     612,  606,   14,   14, 0x0a,
+     650,   14,  638,   14, 0x0a,
+     664,   14,  660,   14, 0x0a,
 
        0        // eod
 };
@@ -73,9 +71,7 @@ static const char qt_meta_stringdata_DashboardBase[] = {
     "errorOccurred(QString)\0dashboardLinkSelected()\0"
     "updateInprogress()\0updateFinished()\0"
     "runMonitor()\0src\0runMonitor(SourceT&)\0"
-    "srcId\0runNgrt4ndUpdate(int)\0"
     "runNgrt4ndUpdate(SourceT)\0"
-    "runLivestatusUpdate(int)\0"
     "runLivestatusUpdate(SourceT)\0"
     "resetStatData()\0prepareUpdate(SourceT)\0"
     "_node\0updateBpNode(QString)\0bool\0"
@@ -106,28 +102,26 @@ void DashboardBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 9: _t->updateFinished(); break;
         case 10: _t->runMonitor(); break;
         case 11: _t->runMonitor((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
-        case 12: _t->runNgrt4ndUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 13: _t->runNgrt4ndUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 14: _t->runLivestatusUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 15: _t->runLivestatusUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 16: _t->resetStatData(); break;
-        case 17: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 18: _t->updateBpNode((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 19: { bool _r = _t->allocSourceHandler((*reinterpret_cast< SourceT(*)>(_a[1])));
+        case 12: _t->runNgrt4ndUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 13: _t->runLivestatusUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 14: _t->resetStatData(); break;
+        case 15: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 16: _t->updateBpNode((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 17: { bool _r = _t->allocSourceHandler((*reinterpret_cast< SourceT(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
-        case 20: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
-        case 21: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 22: _t->initialize((*reinterpret_cast< Preferences*(*)>(_a[1]))); break;
-        case 23: { CoreDataT* _r = _t->cdata();
+        case 18: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
+        case 19: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 20: _t->initialize((*reinterpret_cast< Preferences*(*)>(_a[1]))); break;
+        case 21: { CoreDataT* _r = _t->cdata();
             if (_a[0]) *reinterpret_cast< CoreDataT**>(_a[0]) = _r; }  break;
-        case 24: { qint32 _r = _t->userRole();
+        case 22: { qint32 _r = _t->userRole();
             if (_a[0]) *reinterpret_cast< qint32*>(_a[0]) = _r; }  break;
-        case 25: { bool _r = _t->showOnlyTroubles();
+        case 23: { bool _r = _t->showOnlyTroubles();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
-        case 26: _t->setShowOnlyTroubles((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 27: { SourceListT _r = _t->sources();
+        case 24: _t->setShowOnlyTroubles((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 25: { SourceListT _r = _t->sources();
             if (_a[0]) *reinterpret_cast< SourceListT*>(_a[0]) = _r; }  break;
-        case 28: { int _r = _t->firstSrcIndex();
+        case 26: { int _r = _t->firstSrcIndex();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         default: ;
         }
@@ -166,9 +160,9 @@ int DashboardBase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 29)
+        if (_id < 27)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 29;
+        _id -= 27;
     }
     return _id;
 }

@@ -28,6 +28,7 @@
 #include <QtCore/QtGlobal>
 #include <string>
 #include <sstream>
+#include <QString>
 
 class ZmqSocket
 {
@@ -45,13 +46,13 @@ public:
   bool isReady() const {return m_connected2Server; }
   void* getSocket() const {return m_socket;}
   int getServerSerial() const {return m_serverSerial;}
-  std::string lastError() const {return m_lastError;}
+  QString lastError() const {return m_lastError;}
   void setServerUri (const std::string& uri) { m_serverUri = uri; }
 
 
 private:
   std::string m_serverUri;
-  std::string m_lastError;
+  QString m_lastError;
   void *m_socket;
   void *m_context;
   int m_type;

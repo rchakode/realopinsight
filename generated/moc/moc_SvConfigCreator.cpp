@@ -22,7 +22,7 @@ static const uint qt_meta_data_SvCreator[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      25,   14, // methods
+      26,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -54,7 +54,8 @@ static const uint qt_meta_data_SvCreator[] = {
      533,   10,   10,   10, 0x0a,
      554,   10,   10,   10, 0x0a,
      577,   10,   10,   10, 0x0a,
-     606,  602,   10,   10, 0x0a,
+     602,   10,   10,   10, 0x0a,
+     631,  627,   10,   10, 0x0a,
 
        0        // eod
 };
@@ -76,7 +77,8 @@ static const char qt_meta_stringdata_SvCreator[] = {
     "retCode,srcId,checks,msg\0"
     "treatCheckLoadResults(int,QString,ChecksT,QString)\0"
     "importNagiosChecks()\0importZabbixTriggers()\0"
-    "importZenossComponents()\0msg\0"
+    "importZenossComponents()\0"
+    "importLivestatusChecks()\0msg\0"
     "handleErrorOccurred(QString)\0"
 };
 
@@ -112,7 +114,8 @@ void SvCreator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 21: _t->importNagiosChecks(); break;
         case 22: _t->importZabbixTriggers(); break;
         case 23: _t->importZenossComponents(); break;
-        case 24: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 24: _t->importLivestatusChecks(); break;
+        case 25: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -150,9 +153,9 @@ int SvCreator::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 25)
+        if (_id < 26)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 25;
+        _id -= 26;
     }
     return _id;
 }

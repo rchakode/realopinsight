@@ -28,6 +28,8 @@
 #include <iostream>
 #include <memory>
 #include <ctime>
+#include <QObject>
+#include <QDebug>
 
 #ifndef ZMQ_DONTWAIT
 #   define ZMQ_DONTWAIT     ZMQ_NOBLOCK
@@ -156,22 +158,21 @@ void ZmqSocket::makeHandShake() {
         } else {
           m_serverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
         }
-        m_lastError = "Connection etablished; server serial: " + m_serverSerial;
+        m_lastError = QObject::tr("Connection etablished; server serial: %1").arg(QString::number(m_serverSerial));
         return;
       } else {
-        //FIXME: sometimes this could be due to authentication failed
-        m_lastError = "Weird response from the server ("+reply+")";
-        std::cerr << m_lastError << "\n";
+        m_lastError = QObject::tr("Weird response from the server (%1)").arg(reply.c_str());
+        qDebug() << m_lastError;
         break;
       }
     } else {
-      m_lastError = "No response from server, retrying...";
-      std::cerr << m_lastError << "\n";
+      m_lastError = QObject::tr("No response from server, retrying...");
+      qDebug() << m_lastError;
       socket.reset();
     }
     if (--retriesLeft == 0) {
-      m_lastError = "Unable to connect to ngrt4nd at "+m_serverUri+"";
-      std::cerr << m_lastError << "\n";
+      m_lastError = QObject::tr("Unable to connect to ngrt4nd at %1").arg(m_serverUri.c_str());
+      qDebug() << m_lastError;
     }
   }
 }
