@@ -206,7 +206,7 @@ void WebMainUI::setupProfileMenus(void)
   }
 
   curItem = profilePopupMenu->addItem(tr("Help").toStdString());
-  curItem->setLink(Wt::WLink(Wt::WLink::Url, GET_HELP_URL));
+  curItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
   curItem->setLinkTarget(Wt::TargetNewWindow);
 
   profilePopupMenu->addItem("About")
