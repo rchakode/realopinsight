@@ -243,6 +243,13 @@ body, html {
   border-bottom: 1px solid #d1d1d1;
 }
 
+#update-banner {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  z-index: 200;
+}
+
 .logout-button {
   position: absolute;
   right: 0px;

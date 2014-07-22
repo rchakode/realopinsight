@@ -211,7 +211,8 @@
 </message>
 
 <message id="Wt.Auth.template.logged-in">
-  <div class="logout-button">${logout-item}</div>
+  <div id="update-banner">${update-banner}</div>
+  <div class="logout-button ">${logout-item}</div>
     ${main-ui}
 </message>
 

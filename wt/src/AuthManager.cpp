@@ -85,16 +85,18 @@ void AuthManager::createLoggedInView(void)
 
   setTemplateText(tr("Wt.Auth.template.logged-in"));
   try {
+    m_mainUI = new WebMainUI(this);
+    bindWidget("main-ui", m_mainUI);
+
     long diffTimeSinceBuilt = time(NULL) - BUILD_TIME;
     if (diffTimeSinceBuilt > 31556926) {
-      bindWidget("main-ui", new Wt::WText("This copy of the software is expired."
-                                          " Please go to"
-                                          " <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
-                                          " to get a new copy.",
-                                          Wt::XHTMLText));
+      bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">This copy of the software is too old."
+                                                " Please go to"
+                                                " <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
+                                                " to get a new copy.</div>",
+                                                Wt::XHTMLText));
     } else {
-      m_mainUI = new WebMainUI(this);
-      bindWidget("main-ui", m_mainUI);
+      bindEmpty("update-banner");
     }
   } catch (const std::bad_alloc& ) {
     bindWidget("main-ui", new Wt::WText("Error: no sufficient memory, please consider to upgrade your system !"));
