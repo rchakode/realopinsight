@@ -1,5 +1,12 @@
-RealOpInsight Workstation is released under the terms of GPLv3 License. See the LICENSE file.
-Prior to the installation, you may need to read the license offer.  
+RealOpInsight is an open source business service monitoring dashboard
+toolkit that enables IT operations staff to deal with monitoring with
+focus on business. It supports Nagios, Zenoss, Zabbix, Shinken, Centreon,
+Naemon, Icinga, op5, and more.
+
+
+RealOpInsight Workstation is released under the terms of GPLv3 License.
+See the LICENSE file.Prior to the installation, you may need to read
+the license offer.
  
 
 INSTALLATION
