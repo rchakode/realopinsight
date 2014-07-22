@@ -164,7 +164,7 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 void SvCreator::importNagiosChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(ngrt4n::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -185,7 +185,7 @@ void SvCreator::importNagiosChecks(void)
 void SvCreator::importLivestatusChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(ngrt4n::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
