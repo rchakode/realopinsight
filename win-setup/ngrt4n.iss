@@ -1,7 +1,7 @@
 #define Version "3.0.2"
 #define Application "RealOpInsight Workstation" 
 [Setup] 
-AppName={#Application}
+AppName={#Application}     
 AppVersion={#Version}
 DefaultDirName={pf}\RealOpInsight Workstation
 DefaultGroupName=RealOpInsight Workstation

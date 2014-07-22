@@ -40,11 +40,13 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
   //events
   connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+
+  // Disable OK button if no source
+  if (sourceList.isEmpty()) {
+    buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
+  }
 }
 
-CheckImportationSettingsForm::~CheckImportationSettingsForm()
-{
-}
 
 void CheckImportationSettingsForm::handleSelectStatusFile(void)
 {

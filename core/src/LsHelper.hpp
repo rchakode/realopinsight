@@ -26,40 +26,31 @@
 #define MKLSHELPER_HPP
 
 #include "Base.hpp"
-#include <QTcpSocket>
+#include "RawSocket.hpp"
 
-class LsHelper : public QTcpSocket
+class LsHelper
 {
-  Q_OBJECT
 public:
   enum ReqTypeT{
     Host = 0,
     Service = 1
   };
-  LsHelper(const QString& host, const int& port);
+
+  LsHelper(const QString& host, int port);
   ~LsHelper();
 
-  bool connectToService(void);
-  void disconnectFromService(void);
-  bool requestData(const QString& host, const ReqTypeT& reqType);
-  bool recvData(const ReqTypeT& reqType);
-  bool fecthHostChecks(const QString& host);
-  bool findCheck(const QString& id, CheckListCstIterT& check);
-  void clearData(void) {m_checks.clear();}
-  void setHost(const QString& host) {m_host = host;}
-  void setPort(const int& port) {m_port = port;}
-  bool isConnected() const {return state() == QAbstractSocket::ConnectedState;}
+  int makeRequest(const QByteArray& data, ChecksT& checks);
+  int loadChecks(const QString& host, ChecksT& checks);
+  QString lastError(void) const {return m_lastError;}
+  int setupSocket(void);
+
+  void parseResult(const QString& result, ChecksT& checks);
+  static QByteArray prepareRequestData(const QString& host, ReqTypeT requestType);
 
 private:
-  const static int DefaultTimeout = 50000; /* 5 seconds */
-  QString m_host;
-  qint32 m_port;
-  RequestListT mrequestMap;
-  CheckListT m_checks;
-  QString m_errorMsg;
-  void setRequestPatterns();
-  void handleNetworkFailure() {handleNetworkFailure(QAbstractSocket::error());}
-  void handleNetworkFailure(QAbstractSocket::SocketError error);
+  QString m_lastError;
+  QEventLoop* m_evloop;
+  RawSocket* m_socketHandler;
 };
 
 #endif // MKLSHELPER_HPP

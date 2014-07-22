@@ -73,7 +73,7 @@ namespace ngrt4n
   { return QString("%1:%2").arg(srcid, chkid);}
 
   inline QString libVersion(void)
-  { return CORE_VERSION; }
+  { return PKG_VERSION; }
 
   QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);

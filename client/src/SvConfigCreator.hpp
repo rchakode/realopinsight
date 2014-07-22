@@ -69,6 +69,7 @@ public Q_SLOTS:
   void importNagiosChecks(void);
   void importZabbixTriggers(void);
   void importZenossComponents(void);
+  void importLivestatusChecks(void);
   void handleErrorOccurred(QString msg){ngrt4n::alert(msg);}
 
 protected:

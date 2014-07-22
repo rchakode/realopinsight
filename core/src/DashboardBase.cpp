@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <zmq.h>
 #include <cassert>
+#include "ZmqLivestatusHelper.hpp"
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -47,11 +48,11 @@
 
 
 namespace {
-const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
-const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
-const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
-const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-}
+  const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
+  const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
+  const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
+  const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
+  } //namespace
 
 StringMapT DashboardBase::propRules() {
   StringMapT map;
@@ -163,114 +164,78 @@ void DashboardBase::runMonitor(SourceT& src)
   finalizeUpdate(src);
 }
 
-void DashboardBase::runNgrt4ndUpdate(int srcId)
-{
-  SourceListT::Iterator src = m_sources.find(srcId);
-  if (src != m_sources.end()) {
-    runNgrt4ndUpdate(*src);
-  } else {
-    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(ngrt4n::sourceId(srcId)));
-  }
-}
-
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
 
-  /* Check if the handler is connected */
-  if (src.d4n_handler->isConnected()) {
-    if (src.d4n_handler->getServerSerial() < 110) {
-      QString errmsg = tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial());
-      updateDashboardOnError(src, errmsg);
-      return;
-    }
-  } else {
-    QString errmsg(src.d4n_handler->getErrorMsg().c_str());
+  // Check if the handler is connected
+  if (! src.d4n_handler->isReady()) {
+    updateDashboardOnError(src, src.d4n_handler->lastError());
+    return;
+  }
+
+  if (src.d4n_handler->getServerSerial() < 110) {
+    QString errmsg = tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial());
     updateDashboardOnError(src, errmsg);
     return;
   }
 
-  /* Now start doing the job */
-  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(),
-       end=m_cdata->cnodes.end();
-       cnode!=end;
-       ++cnode)
-  {
+  // Now start doing the job
+  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode!=end; ++cnode) {
     if (cnode->child_nodes.isEmpty()) {
       cnode->severity = ngrt4n::Unknown;
       m_cdata->check_status_count[cnode->severity]+=1;
-      continue;
+    } else {
+      QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
+      if (info.first == src.id) {
+        // Retrieve data
+        QString requestData = QString("%1:%2").arg(src.auth, info.second);
+        src.d4n_handler->send(requestData.toStdString());
+        JsonHelper jsHelper(src.d4n_handler->recv().c_str());
+
+        // Treat data
+        qint32 ret = jsHelper.getProperty("return_code").toInt32();
+        cnode->check.status = (ret!=0)? ngrt4n::NagiosUnknown : jsHelper.getProperty("status").toInt32();
+        cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
+        cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
+        cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
+        cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
+
+        computeStatusInfo(*cnode, src);
+        updateDashboard(*cnode);
+        m_cdata->check_status_count[cnode->severity]+=1;
+        cnode->monitored = true;
+      }
     }
-
-    QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
-    if (info.first != src.id) {
-      continue;
-    }
-
-    // Retrieve data
-    QString msg = src.auth%":"%info.second;
-    src.d4n_handler->send(msg.toStdString());
-    JsonHelper jsHelper(src.d4n_handler->recv().c_str());
-
-    // Treat data
-    qint32 ret = jsHelper.getProperty("return_code").toInt32();
-    cnode->check.status = (ret!=0)? ngrt4n::NagiosUnknown : jsHelper.getProperty("status").toInt32();
-    cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-    cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
-    cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-    cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
-
-    computeStatusInfo(*cnode, src);
-    updateDashboard(*cnode);
-    m_cdata->check_status_count[cnode->severity]+=1;
-    cnode->monitored = true;
   }
 }
 
-
-void DashboardBase::runLivestatusUpdate(int srcId)
-{
-  SourceListT::Iterator src = m_sources.find(srcId);
-  if (src != m_sources.end()) {
-    runLivestatusUpdate(*src);
-  } else {
-    updateDashboardOnError(*src, tr("Undefined source (%1)").arg(ngrt4n::sourceId(srcId)));
-  }
-}
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {
-  if (!src.ls_handler->isConnected()) {
-    updateDashboardOnError(src, src.ls_handler->errorString());
+  if (src.ls_handler->setupSocket() != 0) {
+    updateDashboardOnError(src, src.ls_handler->lastError());
     return;
   }
 
   CheckT invalidCheck;
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
-
+  int iter=1;
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
+
   while (hostit.hasNext()) {
     hostit.next();
     QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(hostit.key());
-
-    if (info.first != src.id || ! src.ls_handler->fecthHostChecks(info.second)) continue;
-
-    Q_FOREACH (const QString& value, hostit.value()) {
-      QString key;
-      if (value != "ping") {
-        key = ID_PATTERN.arg(info.second).arg(value);
+    if (info.first == src.id) {
+      ChecksT checks;
+      if (src.ls_handler->loadChecks(info.second, checks) == 0) {
+        updateCNodesWithChecks(checks, src);
       } else {
-        key = info.second;
+        updateDashboardOnError(src, src.ls_handler->lastError());
+        break;
       }
-      CheckListCstIterT chkit;
-      if (src.ls_handler->findCheck(key, chkit)) {
-        updateCNodesWithCheck(*chkit, src);
-      } else {
-        invalidCheck.id = key.toStdString(); //FIXME: invalidCheck.id = key.toStdString();
-        invalidCheck.alarm_msg = tr("Undefined service (%1)").arg(key).toStdString();
-        updateCNodesWithCheck(invalidCheck, src);
-      }
+      iter++;
     }
   }
 }
@@ -466,24 +431,17 @@ void DashboardBase::openRpcSession(SourceT& src)
 {
   QStringList authParams = ngrt4n::getAuthInfo(src.auth);
   if (authParams.size() != 2 && src.mon_type != ngrt4n::Nagios) {
-    updateDashboardOnError(src, tr("Invalid authentication chain!\n"
-                                   "Must follow the pattern login:password"));
+    updateDashboardOnError(src, tr("Invalid authentication chain. Must be login:password"));
     return;
   }
 
   switch(src.mon_type) {
   case ngrt4n::Nagios:
     if (src.use_ngrt4nd) {
-      if (src.d4n_handler->isConnected())
-        src.d4n_handler->disconnectFromService();
-
-      if(src.d4n_handler->connect())
-        src.d4n_handler->makeHandShake();
+      src.d4n_handler->setupSocket();
+      src.d4n_handler->makeHandShake();
     } else {
-      if (src.ls_handler->isConnected())
-        src.ls_handler->disconnectFromService();
-
-      src.ls_handler->connectToService();
+      //src.ls_handler->setupSocket();
     }
     break;
   case ngrt4n::Zabbix:

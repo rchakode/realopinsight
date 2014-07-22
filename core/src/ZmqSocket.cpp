@@ -28,6 +28,8 @@
 #include <iostream>
 #include <memory>
 #include <ctime>
+#include <QObject>
+#include <QDebug>
 
 #ifndef ZMQ_DONTWAIT
 #   define ZMQ_DONTWAIT     ZMQ_NOBLOCK
@@ -56,17 +58,23 @@ ZmqSocket::ZmqSocket(const std::string& uri, const int & _type)
 
 ZmqSocket::~ZmqSocket()
 {
-  disconnectFromService();
+  releaseSocket();
 }
 
-bool ZmqSocket::init()
+int ZmqSocket::init()
 {
   m_context = zmq_init(1);
-  if (!m_context) return false;
-  return (m_socket = zmq_socket(m_context, m_type)) != NULL;
+  if (! m_context)
+    return -1;
+
+  m_socket = zmq_socket(m_context, m_type);
+  if (! m_socket)
+    return -1;
+
+  return 0;
 }
 
-void ZmqSocket::disconnectFromService()
+void ZmqSocket::releaseSocket()
 {
   zmq_setsockopt(m_socket, ZMQ_LINGER, &ZERO_LINGER, sizeof(ZERO_LINGER));
   zmq_close(m_socket);
@@ -75,41 +83,33 @@ void ZmqSocket::disconnectFromService()
 
 void ZmqSocket::reset()
 {
-  disconnectFromService();
-  connect();
+  releaseSocket();
+  setupSocket();
 }
 
-bool ZmqSocket::connect()
+int ZmqSocket::setupSocket()
 {
-  if (!init()) return false;
-  return zmq_connect(m_socket, m_serverUri.c_str()) == 0;
+  if (init() != 0)
+    return -1;
+
+  if (zmq_connect(m_socket, m_serverUri.c_str()) != 0)
+    return -1;
+
+  return 0;
 }
 
-bool ZmqSocket::connect(const std::string & _uri)
-{
-  m_serverUri = _uri;
-  return connect();
-}
-
-bool ZmqSocket::bind(const std::string & _uri)
-{
-  m_serverUri = _uri;
-  if (!init()) return false;
-  return zmq_bind(m_socket, m_serverUri.c_str()) == 0;
-}
-
-void ZmqSocket::send(const std::string & _msg) {
+void ZmqSocket::send(const std::string & data) {
   int sent = -1;
 #if ZMQ_VERSION_MAJOR == 2
   zmq_msg_t msg;
-  sent = zmq_msg_init_size (&msg, _msg.size());
-  memcpy (zmq_msg_data (&msg), _msg.c_str(), _msg.size());
+  sent = zmq_msg_init_size (&msg, data.size());
+  memcpy(zmq_msg_data (&msg), data.c_str(), data.size());
   zmq_send(m_socket, &msg, 0);
   zmq_msg_close(&msg);
 #else
-  sent = zmq_send(m_socket, _msg.c_str(), _msg.size(), 0);
+  sent = zmq_send(m_socket, data.c_str(), data.size(), 0);
 #endif
-  if(sent <= 0) { /* TODO: deal with error */}
+  if (sent <= 0) { /* TODO: deal with error */}
 }
 
 std::string ZmqSocket::recv() const{
@@ -133,47 +133,46 @@ std::string ZmqSocket::recv() const{
 void ZmqSocket::makeHandShake() {
   int retriesLeft = NUM_RETRIES;
   std::string reply("");
-  auto socket = std::unique_ptr<ZmqSocket>(new ZmqSocket(m_serverUri, ZMQ_REQ));
+  ZmqSocket socket(m_serverUri, ZMQ_REQ);
   std::string msg("PING");
   m_connected2Server = false;
 
   while (retriesLeft) {
-    if(!socket->connect()) break;
-    socket->send(msg);
 
-    zmq_pollitem_t items[] = { {socket->getSocket(), 0, ZMQ_POLLIN, 0 } };
+    if (socket.setupSocket() != 0) break;
+
+    socket.send(msg);
+
+    zmq_pollitem_t items[] = { {socket.getSocket(), 0, ZMQ_POLLIN, 0} };
     zmq_poll(&items[0], 1, TIMEOUT);
     if (items[0].revents & ZMQ_POLLIN) {
       reply.clear();
-      reply = socket->recv();
-      socket->disconnectFromService();
+      reply = socket.recv();
+      socket.releaseSocket();
       size_t pos = reply.find(":");
       std::string respType = reply.substr(0, pos);
-      if(respType == "ALIVE") {
+      if (respType == "ALIVE") {
         m_connected2Server = true;
-        if(pos == std::string::npos){
+        if (pos == std::string::npos){
           m_serverSerial = 100;
         } else {
           m_serverSerial = convert2ServerSerial(reply.substr(pos+1, std::string::npos));
         }
-        std::ostringstream oss;
-        oss << "Connection etablished; server serial: " << m_serverSerial;
-        m_errorMsg = oss.str();
+        m_lastError = QObject::tr("Connection etablished; server serial: %1").arg(QString::number(m_serverSerial));
         return;
       } else {
-        //FIXME: sometimes this could be due to authentication failed
-        m_errorMsg = "Weird response from the server ("+reply+")";
-        std::cerr << m_errorMsg << "\n";
+        m_lastError = QObject::tr("Weird response from the server (%1)").arg(reply.c_str());
+        qDebug() << m_lastError;
         break;
       }
     } else {
-      m_errorMsg = "No response from server, retrying...";
-      std::cerr << m_errorMsg << "\n";
-      socket->reset();
+      m_lastError = QObject::tr("No response from server, retrying...");
+      qDebug() << m_lastError;
+      socket.reset();
     }
     if (--retriesLeft == 0) {
-      m_errorMsg = "Unable to connect to ngrt4nd service at "+m_serverUri+"";
-      std::cerr << m_errorMsg << "\n";
+      m_lastError = QObject::tr("Unable to connect to ngrt4nd at %1").arg(m_serverUri.c_str());
+      qDebug() << m_lastError;
     }
   }
 }
@@ -190,3 +189,4 @@ int ZmqSocket::convert2ServerSerial(const std::string & versionStr){
   }
   return atoi(str.c_str());
 }
+

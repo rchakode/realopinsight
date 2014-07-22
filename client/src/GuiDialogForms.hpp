@@ -12,7 +12,6 @@ class CheckImportationSettingsForm: public QDialog
   Q_OBJECT
 public:
   CheckImportationSettingsForm(const QList<QString>& sourceList, bool statusFile);
-  virtual ~CheckImportationSettingsForm();
 
   QString selectedSource(void) const {return m_sourceSelectionBox->currentText();}
   QString selectedHost(void) const {return m_hostFilter->text();}

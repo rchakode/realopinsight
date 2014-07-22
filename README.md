@@ -22,5 +22,3 @@ Installation
   $ cd RealOpInsight-X.Y.Z
   $ sudo ./install-sh
 ```
-
-After the installation, check the online documentation for further processing (http://docs.realopinsight.com).
