@@ -26,6 +26,7 @@
 #include "WebMainUI.hpp"
 #include "DbSession.hpp"
 #include "AuthManager.hpp"
+#include "LdapAuthModel.hpp"
 #include <Wt/Auth/Login>
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/AbstractUserDatabase>
@@ -42,7 +43,8 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_dbSession(dbSession),
     m_mainUI(NULL)
 {
-  Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
+  //Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
+  LdapAuthModel* authModel = new LdapAuthModel(m_dbSession->auth(), m_dbSession->users());
   authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
   authModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
   Wt::Auth::AuthWidget::setModel(authModel);
@@ -61,12 +63,14 @@ void AuthManager::handleAuthentication(void)
     sessionInfo.status = LoginSession::ActiveCookie;
 
     m_dbSession->addSession(sessionInfo);
-
     wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
-    LOG("info", m_dbSession->loggedUser().username + " logged in. Session Id: " + sessionInfo.sessionId);
+
+    QString logMsg = QObject::tr("%1 logged in. Session Id: %2")
+        .arg(m_dbSession->loggedUser().username.c_str(), sessionInfo.sessionId.c_str());
+    LOG("info",logMsg.toStdString());
   } else {
     wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
-    LOG("info", m_dbSession->loggedUser().username + " logged out");
+    LOG("info", QObject::tr("%1 logged out").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   }
 }
 

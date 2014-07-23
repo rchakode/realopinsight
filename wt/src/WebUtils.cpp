@@ -155,8 +155,7 @@ Wt::WString ngrt4n::wTimeToNow(const std::string& mytime_t)
 }
 
 
-Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses,
-                                               const std::string& tip)
+Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
 {
   Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
                                               " <i class=\"%1\"></i>"

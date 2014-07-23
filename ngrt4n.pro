@@ -152,14 +152,15 @@ TARGET = realopinsight-editor
 }
 
 web-base {
-PACKAGE_VERSION=beta3.c$${REALOPINSIGHT_CORE_VERSION}
+PACKAGE_VERSION=2014b3.c$${REALOPINSIGHT_CORE_VERSION}
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
         -lboost_thread -lboost_regex -lboost_signals \
-        -lboost_filesystem -lboost_date_time
+        -lboost_filesystem -lboost_date_time \
+        -lldap
 
 INCLUDEPATH += wt/src \
                wt/dbo \
@@ -179,7 +180,9 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/AuthManager.hpp \
     wt/src/WebPreferences.hpp \
     wt/extlibs/wtwithqt/DispatchThread.h \
-    wt/extlibs/wtwithqt/WQApplication
+    wt/extlibs/wtwithqt/WQApplication \
+    wt/src/LdapAuthModel.hpp
+
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
@@ -195,7 +198,8 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/AuthManager.cpp \
     wt/src/WebPreferences.cpp \
     wt/extlibs/wtwithqt/DispatchThread.C \
-    wt/extlibs/wtwithqt/WQApplication.C
+    wt/extlibs/wtwithqt/WQApplication.C \
+    wt/src/LdapAuthModel.cpp
 }
 
 
