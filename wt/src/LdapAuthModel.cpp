@@ -11,39 +11,42 @@ LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
 {
 }
 
-void LdapAuthModel::reset()
-{
-  Wt::Auth::AuthModel::reset();
-}
-bool LdapAuthModel::isVisible(Wt::WFormModel::Field field) const
-{
-  return Wt::Auth::AuthModel::isVisible(field);
-}
+//void LdapAuthModel::reset()
+//{
+//  Wt::Auth::AuthModel::reset();
+//}
+//bool LdapAuthModel::isVisible(Wt::WFormModel::Field field) const
+//{
+//  return Wt::Auth::AuthModel::isVisible(field);
+//}
 
-bool LdapAuthModel::validateField(Wt::WFormModel::Field field)
-{
-  return Wt::Auth::AuthModel::validateField(field);
-}
+//bool LdapAuthModel::validateField(Wt::WFormModel::Field field)
+//{
+//  return Wt::Auth::AuthModel::validateField(field);
+//}
 
 bool LdapAuthModel::validate()
 {
   // Implement validation
-  // Wt::Auth::AuthModel::validate();
+  return Wt::Auth::AuthModel::validate();
   return true;
 }
 
-void LdapAuthModel::configureThrottling(Wt::WInteractWidget* button)
-{
-  Wt::Auth::AuthModel::configureThrottling(button);
-}
+//void LdapAuthModel::configureThrottling(Wt::WInteractWidget* button)
+//{
+//  Wt::Auth::AuthModel::configureThrottling(button);
+//}
 
-void LdapAuthModel::updateThrottling(Wt::WInteractWidget* button)
-{
-  Wt::Auth::AuthModel::updateThrottling(button);
-}
+//void LdapAuthModel::updateThrottling(Wt::WInteractWidget* button)
+//{
+//  Wt::Auth::AuthModel::updateThrottling(button);
+//}
 
 bool LdapAuthModel::login(Wt::Auth::Login& login)
 {
+  if (! valid())
+    return false;
+
   std::string username = valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8();
   std::string password = valueText(Wt::Auth::AuthModel::PasswordField).toUTF8();
 
@@ -84,7 +87,7 @@ Wt::Auth::User LdapAuthModel::processAuthToken()
 
 bool LdapAuthModel::ldapLogin(const std::string& serverUri, const std::string& username, const std::string& password)
 {
-  QString bindDn = QString("cn=%1,ou=People,dc=nafiux,dc=com").arg(username.c_str());
+  QString bindDn = QString("cn=%1,ou=People,dc=realopinsight,dc=com").arg(username.c_str());
   bool resultStatus = false;
 
   // Intialize a connection handler

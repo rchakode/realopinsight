@@ -10,12 +10,12 @@ class LdapAuthModel : public Wt::Auth::AuthModel
 {
 public:
   LdapAuthModel(const Wt::Auth::AuthService& baseAuth, Wt::Auth::AbstractUserDatabase& users, Wt::WObject* parent=0);
-  virtual void reset();
-  virtual bool isVisible(Wt::WFormModel::Field field) const;
-  virtual bool validateField(Wt::WFormModel::Field field);
+  //  virtual void reset();
+  //  virtual bool isVisible(Wt::WFormModel::Field field) const;
+  //  virtual bool validateField(Wt::WFormModel::Field field);
   virtual bool validate();
-  virtual void configureThrottling(Wt::WInteractWidget* button);
-  virtual void updateThrottling(Wt::WInteractWidget* button);
+  //  virtual void configureThrottling(Wt::WInteractWidget* button);
+  //  virtual void updateThrottling(Wt::WInteractWidget* button);
   virtual bool login(Wt::Auth::Login& login);
   virtual void logout(Wt::Auth::Login& login);
   virtual Wt::Auth::EmailTokenResult processEmailToken(const std::string& token);
