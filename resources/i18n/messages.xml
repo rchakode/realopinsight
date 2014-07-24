@@ -377,7 +377,7 @@
      <div class="control-group">
        <label class="control-label">Source&nbsp;</label>
        <span>${source-box}</span>
-       <span>Monitor Type&nbsp;</span>
+       <span>Type&nbsp;</span>
        <span>${monitor-type}</span>
      </div>
 
@@ -398,7 +398,7 @@
 
      <div class="control-group">
       <label class="control-label">Auth String&nbsp;</label>
-      <span>${auth-string}</span>
+      <span>${monitor-auth-string}</span>
       <span>${show-in-clear}</span>
      </div>
     </fieldset>
@@ -412,6 +412,24 @@
       <span>${livestatus-port}</span>
       <span>${use-ngrt4nd}</span>
     </div>
+    </fieldset>  <!-- id="livetstatus-section" -->
+
+    <fieldset id="auth-section">
+    <h6>Authentication</h6>
+    <div class="control-group">
+      <label class="control-label">&nbsp;</label>
+      <span>${authentication-mode}</span>
+    </div>
+    <div id="ldap-auth-setting-section">
+      <div class="control-group">
+        <label class="control-label">LDAP Server URI&nbsp;</label>
+        <span>${ldap-server-uri}</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">LDAP DN Format&nbsp;</label>
+        <span>${ldap-dn-format}</span>
+      </div>
+    </div> <!-- id="ldap-auth-setting-section" -->
     </fieldset>
 
     <div class="form-actions">

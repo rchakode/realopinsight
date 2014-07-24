@@ -37,6 +37,9 @@ const QString Settings::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
+const QString Settings::AUTHENTICATION_MODE_KEY = "/Auth/mode";
+const QString Settings::AUTHENTICATION_LDAP_SERVER_URI = "/Auth/LDAP/SERVER_URI";
+const QString Settings::AUTHENTICATION_LDAP_DN_FORMAT = "/Auth/LDAP/DN_FORMAT";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {

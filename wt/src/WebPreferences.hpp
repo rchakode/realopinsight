@@ -48,10 +48,16 @@ public:
     SourceIndexInput=2
   };
 
+  enum AuthenticationModeT {
+    BuiltIn = 0,
+    LDAP = 1
+  };
+
   WebPreferences(void);
   virtual ~WebPreferences();
   virtual void setEnabledInputs(bool enable);
-  Wt::Signal<std::string>& errorOccurred() {return m_errorOccurred;}
+  Wt::Signal<std::string>& errorOccurred() { return m_errorOccurred; }
+  void hideUnrequiredFields(void);
 
 protected :
   virtual void applyChanges(void);
@@ -78,6 +84,10 @@ private:
   std::unique_ptr<Wt::WPushButton> m_applyChangeBtn;
   std::unique_ptr<Wt::WPushButton> m_addAsSourceBtn;
   std::unique_ptr<Wt::WPushButton> m_deleteSourceBtn;
+
+  std::unique_ptr<Wt::WComboBox> m_authenticationMode;
+  std::unique_ptr<Wt::WLineEdit> m_ldapServerUri;
+  std::unique_ptr<Wt::WLineEdit> m_ldapDNFormat;
   Wt::Signal<std::string> m_errorOccurred;
 
   void promptUser(int inputType);
@@ -87,6 +97,7 @@ private:
   int getSourceGlobalIndex(int sourceBoxIndex);
   int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);
+  void bindFormWidget(void);
 };
 
 #endif // WEBSESSION_HPP

@@ -49,8 +49,6 @@ WebPreferences::WebPreferences(void)
 {
   this->setMargin(0, Wt::All);
 
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), this);
-
   m_sourceBox.reset(new Wt::WComboBox(this));
   m_sourceBoxModel.reset(new Wt::WStringListModel(m_sourceBox.get()));
   m_sourceBox->setModel(m_sourceBoxModel.get());
@@ -58,7 +56,6 @@ WebPreferences::WebPreferences(void)
   m_sourceBox->changed().connect(std::bind([=]() {
     fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
   }));
-  tpl->bindWidget("source-box", m_sourceBox.get());
 
   m_monitorTypeField.reset(new Wt::WComboBox(this));
   m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
@@ -73,20 +70,16 @@ WebPreferences::WebPreferences(void)
       wApp->doJavaScript("$('#livetstatus-section').show();");
     }
   }));
-  tpl->bindWidget("monitor-type", m_monitorTypeField.get());
 
   m_monitorUrlField.reset(new Wt::WLineEdit(this));
   m_monitorUrlField->setValidator(createTextValidator());
   m_monitorUrlField->setEmptyText("Set the url to the monitor web interface");
-  tpl->bindWidget("monitor-url", m_monitorUrlField.get());
 
   m_authStringField.reset(new Wt::WLineEdit(this));
-  tpl->bindWidget("auth-string", m_authStringField.get());
   m_authStringField->setEchoMode(Wt::WLineEdit::Password);
   m_authStringField->setEmptyText("Set the authentication string");
 
   m_showAuthStringField.reset(new Wt::WCheckBox(QObject::tr("Show in clear").toStdString(), this));
-  tpl->bindWidget("show-in-clear", m_showAuthStringField.get());
 
   m_showAuthStringField->changed().connect(std::bind([=](){
     if (m_showAuthStringField->isChecked()) {
@@ -96,35 +89,49 @@ WebPreferences::WebPreferences(void)
     }
   }));
 
+  // set livestatus server
   m_livestatusHostField.reset(new Wt::WLineEdit(this));
   m_livestatusHostField->setEmptyText("hostname/IP");
   m_livestatusHostField->setValidator(createTextValidator());
-  tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
 
+  // set livestatus port field
   m_livestatusPortField.reset(new Wt::WLineEdit(this));
   m_livestatusPortField->setWidth(50);
   m_livestatusPortField->setValidator(createPortValidator());
   m_livestatusPortField->setEmptyText("port");
   m_livestatusPortField->setMaxLength(5);
-  tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
 
+  // other fields
   m_useNgrt4ndField.reset(new Wt::WCheckBox(QObject::tr("Use ngrt4nd").toStdString(), this));
-  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
-
   m_dontVerifyCertificateField.reset(new Wt::WCheckBox(QObject::tr("Don't verify SSL certificate").toStdString(),this));
-  tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField.get());
-
   m_updateIntervalField.reset(new Wt::WSpinBox(this));
-  tpl->bindWidget("update-interval", m_updateIntervalField.get());
-
   m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
-  tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
-
   m_addAsSourceBtn.reset(new Wt::WPushButton(QObject::tr("Add as source").toStdString(), this));
-  tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
-
   m_deleteSourceBtn.reset(new Wt::WPushButton(QObject::tr("Delete source").toStdString(), this));
-  tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
+
+
+  // Authentication mode
+  m_authenticationMode.reset(new Wt::WComboBox(this));
+  m_authenticationMode->addItem(ngrt4n::tr("Built-in"));
+  m_authenticationMode->addItem(ngrt4n::tr("LDAP"));
+  m_authenticationMode->changed().connect(std::bind([=]() {
+    switch (m_authenticationMode->currentIndex()) {
+      case LDAP:
+        wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
+        break;
+      case BuiltIn: // BUILT-IN
+      default:
+        wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
+        break;
+    }
+  }));
+
+  // LDAP settings
+  m_ldapServerUri.reset(new Wt::WLineEdit(this));
+  m_ldapServerUri->setEmptyText("ldap://localhost:389");
+  m_ldapDNFormat.reset(new Wt::WLineEdit(this));
+  m_ldapDNFormat->setEmptyText("cn={USERNAME},ou=people,dc=realopinsight,dc=com");
+
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
@@ -142,6 +149,7 @@ WebPreferences::WebPreferences(void)
   m_addAsSourceBtn->setDisabled(true);
   m_deleteSourceBtn->setDisabled(true);
 
+  bindFormWidget();
   loadProperties();
 }
 
@@ -252,18 +260,18 @@ void WebPreferences::promptUser(int inputType)
   Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
   std::string dialogTitle;
   switch (inputType){
-  case SourceTypeInput:
-    dialogTitle = QObject::tr("Select source type").toStdString();
-    for (const auto& src : ngrt4n::sourceTypes())
-      inputField->addItem(src.toStdString());
-    break;
-  case SourceIndexInput:
-    dialogTitle = QObject::tr("Select the source index").toStdString();
-    for (const auto& src : ngrt4n::sourceIndexes())
-      inputField->addItem(src.toStdString());
-    break;
-  default:
-    break;
+    case SourceTypeInput:
+      dialogTitle = QObject::tr("Select source type").toStdString();
+      for (const auto& src : ngrt4n::sourceTypes())
+        inputField->addItem(src.toStdString());
+      break;
+    case SourceIndexInput:
+      dialogTitle = QObject::tr("Select the source index").toStdString();
+      for (const auto& src : ngrt4n::sourceIndexes())
+        inputField->addItem(src.toStdString());
+      break;
+    default:
+      break;
   }
   inputDialog->setWindowTitle(dialogTitle);
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
@@ -287,13 +295,13 @@ void WebPreferences::promptUser(int inputType)
 void WebPreferences::handleInput(const std::string& input, int inputType)
 {
   switch(inputType) {
-  case SourceIndexInput:
-    setCurrentSourceIndex(input[0]-48);
-    applyChanges();
-    break;
-  default:
-    //Do nothing
-    break;
+    case SourceIndexInput:
+      setCurrentSourceIndex(input[0]-48);
+      applyChanges();
+      break;
+    default:
+      //Do nothing
+      break;
   }
 }
 
@@ -356,4 +364,40 @@ void WebPreferences::addToSourceBox(int sourceGlobalIndex)
     m_sourceBoxModel->setData(m_sourceBoxModel->rowCount() - 1, 0, sourceGlobalIndex, Wt::UserRole);
   }
   m_sourceBoxModel->sort(0);
+}
+
+
+void WebPreferences::bindFormWidget(void)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), this);
+  tpl->bindWidget("show-in-clear", m_showAuthStringField.get());
+  tpl->bindWidget("monitor-auth-string", m_authStringField.get());
+  tpl->bindWidget("monitor-url", m_monitorUrlField.get());
+  tpl->bindWidget("monitor-type", m_monitorTypeField.get());
+  tpl->bindWidget("source-box", m_sourceBox.get());
+  tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField.get());
+  tpl->bindWidget("update-interval", m_updateIntervalField.get());
+  tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
+  tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
+  tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
+  tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
+  tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
+  tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
+  tpl->bindWidget("authentication-mode", m_authenticationMode.get());
+  tpl->bindWidget("ldap-server-uri", m_ldapServerUri.get());
+  tpl->bindWidget("ldap-dn-format", m_ldapDNFormat.get());
+}
+
+
+void WebPreferences::hideUnrequiredFields(void)
+{
+  switch (m_settings->keyValue(Settings::AUTHENTICATION_MODE_KEY).toInt()) {
+    case LDAP:
+      wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
+      break;
+    case BuiltIn:
+    default:
+      wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
+      break;
+  }
 }

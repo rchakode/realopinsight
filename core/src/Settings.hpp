@@ -40,6 +40,7 @@ public:
 
   void init(void);
   void setKeyValue(const QString & _key, const QString & _value);
+  QString keyValue(const QString & _key) {return QSettings::value(_key).toString();}
   qint32 updateInterval() const;
   void setEntry(const QString& key, const QString& value);
   QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
@@ -54,6 +55,9 @@ public:
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
   static const QString SRC_BUCKET_KEY;
+  static const QString AUTHENTICATION_MODE_KEY;
+  static const QString AUTHENTICATION_LDAP_SERVER_URI;
+  static const QString AUTHENTICATION_LDAP_DN_FORMAT;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

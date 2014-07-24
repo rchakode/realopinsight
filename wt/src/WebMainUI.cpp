@@ -553,6 +553,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
     m_mgntContents->setCurrentWidget(m_preferences);
+    m_preferences->hideUnrequiredFields();
   }));
   settingPageTpl->bindWidget("menu-monitoring-setting", link);
 
