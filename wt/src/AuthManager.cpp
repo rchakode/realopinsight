@@ -41,7 +41,8 @@
 AuthManager::AuthManager(DbSession* dbSession)
   : Wt::Auth::AuthWidget(dbSession->loginObject()),
     m_dbSession(dbSession),
-    m_mainUI(NULL)
+    m_mainUI(NULL),
+    m_preferences(new WebPreferences())
 {
   //Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
   LdapAuthModel* authModel = new LdapAuthModel(m_dbSession->auth(), m_dbSession->users());
@@ -50,6 +51,11 @@ AuthManager::AuthManager(DbSession* dbSession)
   Wt::Auth::AuthWidget::setModel(authModel);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
+}
+
+AuthManager::~AuthManager(void)
+{
+  delete m_preferences;
 }
 
 void AuthManager::handleAuthentication(void)

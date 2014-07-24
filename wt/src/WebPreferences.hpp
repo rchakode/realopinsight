@@ -84,7 +84,6 @@ private:
   std::unique_ptr<Wt::WPushButton> m_applyChangeBtn;
   std::unique_ptr<Wt::WPushButton> m_addAsSourceBtn;
   std::unique_ptr<Wt::WPushButton> m_deleteSourceBtn;
-
   std::unique_ptr<Wt::WComboBox> m_authenticationMode;
   std::unique_ptr<Wt::WLineEdit> m_ldapServerUri;
   std::unique_ptr<Wt::WLineEdit> m_ldapDNFormat;

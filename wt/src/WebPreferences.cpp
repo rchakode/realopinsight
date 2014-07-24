@@ -179,7 +179,7 @@ void WebPreferences::deleteSource(void)
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBoxModel->removeRow(currentSourceIndex());
     setSourceState(currentSourceIndex(), false);
-    setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
     sync();
     updateFields();
   }
@@ -190,6 +190,7 @@ void WebPreferences::fillFromSource(int _sidx)
 {
   SourceT src;
   loadSource(_sidx, src);
+
   m_monitorUrlField->setText(src.mon_url.toStdString());
   m_livestatusHostField->setText(src.ls_addr.toStdString());
   m_livestatusPortField->setText(QString::number(src.ls_port).toStdString());
@@ -198,6 +199,16 @@ void WebPreferences::fillFromSource(int _sidx)
   m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
   m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
   m_updateIntervalField->setValue(updateInterval());
+
+  int authMode = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
+  if (authMode < 0 || authMode >= m_authenticationMode->count()) authMode = BuiltIn; // normalize to avoid crash
+
+  m_authenticationMode->setCurrentIndex(authMode);
+  m_ldapServerUri->setText(m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString());
+  m_ldapDNFormat->setText(m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT).toStdString());
+
+
+  // this triggers a signal
   setCurrentSourceIndex(_sidx);
 }
 
@@ -230,6 +241,13 @@ void WebPreferences::updateFields(void)
 
 void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
+  // global settings
+  setEntry(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
+  setEntry(Settings::AUTH_MODE_KEY, QString::number(m_authenticationMode->currentIndex()));
+  setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUri->text().toUTF8().c_str());
+  setEntry(Settings::AUTH_LDAP_DN_FORMAT, m_ldapDNFormat->text().toUTF8().c_str());
+
+  // source-specific settings
   SourceT src;
   src.id = ngrt4n::sourceId(index);
   src.mon_type = ngrt4n::convert2ApiType(type);
@@ -240,10 +258,13 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   src.use_ngrt4nd = m_useNgrt4ndField->checkState();
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
   setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
-  setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
   setSourceState(index, true);
-  setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
+
+  // sync to commit changes
   sync();
+
+  // emit signal a finilize
   emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
   addToSourceBox(index);
   m_sourceBox->setCurrentIndex(findSourceIndexInBox(index));
@@ -391,7 +412,7 @@ void WebPreferences::bindFormWidget(void)
 
 void WebPreferences::hideUnrequiredFields(void)
 {
-  switch (m_settings->keyValue(Settings::AUTHENTICATION_MODE_KEY).toInt()) {
+  switch (m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt()) {
     case LDAP:
       wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
       break;

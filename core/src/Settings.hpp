@@ -49,15 +49,15 @@ public:
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
 
-  static const QString UPDATE_INTERVAL_KEY;
-  static const QString ADM_UNSERNAME_KEY;
-  static const QString OP_UNSERNAME_KEY;
-  static const QString ADM_PASSWD_KEY;
-  static const QString OP_PASSWD_KEY;
-  static const QString SRC_BUCKET_KEY;
-  static const QString AUTHENTICATION_MODE_KEY;
-  static const QString AUTHENTICATION_LDAP_SERVER_URI;
-  static const QString AUTHENTICATION_LDAP_DN_FORMAT;
+  static const QString GLOBAL_SRC_BUCKET_KEY;
+  static const QString GLOBAL_UPDATE_INTERVAL_KEY;
+  static const QString AUTH_ADM_UNSERNAME_KEY;
+  static const QString AUTH_OP_UNSERNAME_KEY;
+  static const QString AUTH_ADM_PASSWD_KEY;
+  static const QString AUTH_OP_PASSWD_KEY;
+  static const QString AUTH_MODE_KEY;
+  static const QString AUTH_LDAP_SERVER_URI;
+  static const QString AUTH_LDAP_DN_FORMAT;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

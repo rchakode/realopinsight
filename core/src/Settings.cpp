@@ -31,15 +31,15 @@
 #include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
 
-const QString Settings::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
-const QString Settings::ADM_UNSERNAME_KEY = "/Auth/admUser";
-const QString Settings::OP_UNSERNAME_KEY = "/Auth/opUsername";
-const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
-const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
-const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
-const QString Settings::AUTHENTICATION_MODE_KEY = "/Auth/mode";
-const QString Settings::AUTHENTICATION_LDAP_SERVER_URI = "/Auth/LDAP/SERVER_URI";
-const QString Settings::AUTHENTICATION_LDAP_DN_FORMAT = "/Auth/LDAP/DN_FORMAT";
+const QString Settings::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
+const QString Settings::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
+const QString Settings::AUTH_ADM_UNSERNAME_KEY = "/Auth/admUser";
+const QString Settings::AUTH_OP_UNSERNAME_KEY = "/Auth/opUsername";
+const QString Settings::AUTH_ADM_PASSWD_KEY = "/Auth/admPasswd";
+const QString Settings::AUTH_OP_PASSWD_KEY = "/Auth/opPasswd";
+const QString Settings::AUTH_MODE_KEY = "/Auth/authMode";
+const QString Settings::AUTH_LDAP_SERVER_URI = "/Auth/ldapServerUri";
+const QString Settings::AUTH_LDAP_DN_FORMAT = "/Auth/ldapDnFormat";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
@@ -59,28 +59,28 @@ Settings::~Settings(void)
 
 void Settings::init(void)
 {
-  QString updateInterval = QSettings::value(Settings::UPDATE_INTERVAL_KEY).toString();
-  QString admUser = QSettings::value(Settings::ADM_UNSERNAME_KEY).toString();
-  QString admPasswd = QSettings::value(Settings::ADM_PASSWD_KEY).toString();
-  QString opUser = QSettings::value(Settings::OP_UNSERNAME_KEY).toString();
-  QString opPasswd = QSettings::value(Settings::OP_PASSWD_KEY).toString();
+  QString updateInterval = QSettings::value(Settings::GLOBAL_UPDATE_INTERVAL_KEY).toString();
+  QString admUser = QSettings::value(Settings::AUTH_ADM_UNSERNAME_KEY).toString();
+  QString admPasswd = QSettings::value(Settings::AUTH_ADM_PASSWD_KEY).toString();
+  QString opUser = QSettings::value(Settings::AUTH_OP_UNSERNAME_KEY).toString();
+  QString opPasswd = QSettings::value(Settings::AUTH_OP_PASSWD_KEY).toString();
 
   if (updateInterval.isEmpty()) {
-    QSettings::setValue(Settings::UPDATE_INTERVAL_KEY, QString::number(ngrt4n::DefaultUpdateInterval));
+    QSettings::setValue(Settings::GLOBAL_UPDATE_INTERVAL_KEY, QString::number(ngrt4n::DefaultUpdateInterval));
   }
   if (admUser.isEmpty()) {
-    QSettings::setValue(Settings::ADM_UNSERNAME_KEY, ngrt4n::AdmUser.c_str());
+    QSettings::setValue(Settings::AUTH_ADM_UNSERNAME_KEY, ngrt4n::AdmUser.c_str());
   }
   if (admPasswd.isEmpty()) {
     QString passwd = QCryptographicHash::hash(ngrt4n::AdmUser.c_str(), QCryptographicHash::Md5) ;
-    QSettings::setValue(Settings::ADM_PASSWD_KEY, passwd);
+    QSettings::setValue(Settings::AUTH_ADM_PASSWD_KEY, passwd);
   }
   if (opUser.isEmpty()) {
-    QSettings::setValue(Settings::OP_UNSERNAME_KEY, ngrt4n::OpUser.c_str());
+    QSettings::setValue(Settings::AUTH_OP_UNSERNAME_KEY, ngrt4n::OpUser.c_str());
   }
   if (opPasswd.isEmpty()) {
     QString passwd = QCryptographicHash::hash(ngrt4n::OpUser.c_str(), QCryptographicHash::Md5) ;
-    QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
+    QSettings::setValue(Settings::AUTH_OP_PASSWD_KEY, passwd);
   }
   sync();
 }
@@ -94,7 +94,7 @@ void Settings::setKeyValue(const QString & _key, const QString & _value)
 
 qint32 Settings::updateInterval() const
 {
-  qint32 interval = QSettings::value(UPDATE_INTERVAL_KEY).toInt();
+  qint32 interval = QSettings::value(GLOBAL_UPDATE_INTERVAL_KEY).toInt();
   return (interval > 0)? interval : ngrt4n::DefaultUpdateInterval;
 }
 

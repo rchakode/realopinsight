@@ -422,10 +422,10 @@ void GuiPreferences::changePasswd(void)
   QString key;
 
   if (m_userRole == ngrt4n::AdmUserRole) {
-    key = Settings::ADM_PASSWD_KEY;
+    key = Settings::AUTH_ADM_PASSWD_KEY;
     userPasswd = value(key, QString::fromStdString(ngrt4n::AdmUser));
   } else {
-    key = Settings::OP_PASSWD_KEY;
+    key = Settings::AUTH_OP_PASSWD_KEY;
     userPasswd = value(key, QString::fromStdString(ngrt4n::OpUser));
   }
   passwd = QCryptographicHash::hash(ngrt4n::toByteArray(m_oldPwdField->text()), QCryptographicHash::Md5);
@@ -497,9 +497,9 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   src.use_ngrt4nd = m_useNgrt4ndChkbx->checkState();
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
   setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
-  setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  setEntry(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
   setSourceState(index, true);
-  setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+  setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
   sync();
   emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
@@ -632,7 +632,7 @@ void GuiPreferences::deleteSource(void)
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBtns.at(curIndex)->setEnabled(false);
     setSourceState(curIndex, false);
-    setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+    setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
     sync();
     updateFields();
   }

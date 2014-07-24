@@ -29,6 +29,7 @@
 #include <Wt/Auth/AuthWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/Auth/Login>
+#include "WebPreferences.hpp"
 
 class DbSession;
 class WebMainUI;
@@ -37,10 +38,11 @@ class AuthManager : public Wt::Auth::AuthWidget
 {
 public:
   AuthManager(DbSession* dbSession);
-  virtual ~AuthManager(void){}
+  virtual ~AuthManager(void);
   DbSession* session(void) {return m_dbSession;}
   void logout(void);
   bool isLogged(void);
+  WebPreferences* preferences(void) {return m_preferences;}
 
 protected:
   virtual void createLoggedInView(void);
@@ -49,6 +51,7 @@ protected:
 private:
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
+  WebPreferences* m_preferences;
 
   void handleAuthentication(void);
 };

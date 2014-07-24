@@ -59,7 +59,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_settings (new Settings()),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_preferences(new WebPreferences()),
+    m_preferences(authManager->preferences()),
     m_dashtabs(new Wt::WTabWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
@@ -80,7 +80,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
 WebMainUI::~WebMainUI()
 {
-  delete m_preferences;
   delete m_fileUploadDialog;
   delete m_navbar;
   delete m_contents;

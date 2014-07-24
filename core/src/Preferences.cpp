@@ -52,7 +52,7 @@ Preferences::~Preferences()
 
 void Preferences::loadProperties(void)
 {
-  setSourceStatesFromData(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
+  setSourceStatesFromData(m_settings->value(Settings::GLOBAL_SRC_BUCKET_KEY).toString());
   updateAllSourceWidgetStates();
   updateFields();
 }
@@ -67,7 +67,7 @@ QString Preferences::getSourceStatesSerialized(void)
 
 void Preferences::initSourceStatesFromData(void)
 {
-  setSourceStatesFromData(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
+  setSourceStatesFromData(m_settings->value(Settings::GLOBAL_SRC_BUCKET_KEY).toString());
 }
 
 void Preferences::setSourceStatesFromData(const QString& str)
