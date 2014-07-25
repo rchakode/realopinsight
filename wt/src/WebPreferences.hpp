@@ -40,6 +40,7 @@
 
 class QString;
 
+
 class WebPreferences : public Preferences, public Wt::WContainerWidget
 {
 public:
@@ -95,8 +96,6 @@ private:
 
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);
-  Wt::WIntValidator* createPortValidator(void);
-  Wt::WLengthValidator* createTextValidator(void);
   int getSourceGlobalIndex(int sourceBoxIndex);
   int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);

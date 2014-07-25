@@ -16,7 +16,7 @@ public:
                 Wt::WObject* parent=0);
   //  virtual void reset();
   //  virtual bool isVisible(Wt::WFormModel::Field field) const;
-  //  virtual bool validateField(Wt::WFormModel::Field field);
+  virtual bool validateField(Wt::WFormModel::Field field);
   virtual bool validate();
   //  virtual void configureThrottling(Wt::WInteractWidget* button);
   //  virtual void updateThrottling(Wt::WInteractWidget* button);

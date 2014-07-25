@@ -47,9 +47,9 @@ void Logger::log(const std::string& level, const std::string& msg)
 {
   Wt::WLogEntry logEntry = Wt::WLogger::entry(level);
   logEntry << Wt::WLogger::timestamp << Wt::WLogger::sep
-        << '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
-        << '[' << level << ']' << Wt::WLogger::sep
-        << msg;
+           << '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
+           << '[' << level << ']' << Wt::WLogger::sep
+           << msg;
 }
 
 
@@ -194,4 +194,33 @@ Wt::WColor ngrt4n::severityWColor(const int& _criticity)
 void ngrt4n::log(const std::string& level, const std::string& msg)
 {
   logger.log(level, msg);
+}
+
+
+bool ngrt4n::isValidUri(const QString& addr, const QString& schemePrefix, bool nopath)
+{
+  QUrl qurl(addr);
+  QString scheme = qurl.scheme();
+  QString secureSchemePrefix = schemePrefix+"s";
+  if ( ! addr.isEmpty()
+       && ! scheme.isEmpty()
+       && qurl.isValid()
+       && qurl.path().isEmpty() == nopath
+       && (scheme == schemePrefix || scheme == secureSchemePrefix) )
+    return true;
+
+  return false;
+}
+
+bool ngrt4n::isValidHostAddr(const QString& addr)
+{
+  QUrl qurl(addr);
+  if ( ! addr.isEmpty()
+       && qurl.scheme().isEmpty()
+       && ! qurl.host().isEmpty()
+       && qurl.port(-1) == -1
+       && qurl.path().isEmpty() )
+    return true;
+
+  return false;
 }

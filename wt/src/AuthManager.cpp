@@ -48,7 +48,7 @@ AuthManager::AuthManager(DbSession* dbSession)
   LdapAuthModel* authModel = new LdapAuthModel(m_preferences, m_dbSession->auth(), m_dbSession->users());
   authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
   authModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
-  Wt::Auth::AuthWidget::setModel(authModel);
+  setModel(authModel);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
 }

@@ -53,6 +53,8 @@ namespace ngrt4n {
   Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip);
   Wt::WColor severityWColor(const int& _criticity);
   void log(const std::string& level, const std::string& msg);
+  bool isValidUri(const QString& addr, const QString& schemePrefix, bool nopath);
+  bool isValidHostAddr(const QString& addr);
 } //Namespace
 
 #endif // WEBUTILS_HPP

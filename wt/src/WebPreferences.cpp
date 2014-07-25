@@ -25,6 +25,7 @@
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "WebPreferences.hpp"
+#include "Validators.hpp"
 #include <ldap.h>
 #include <QString>
 #include <Wt/WTemplate>
@@ -36,6 +37,9 @@
 #include <Wt/WIntValidator>
 #include <Wt/WApplication>
 
+
+
+const QString DnFormatValidator::DN_FORMAT_USERNAME = "{USERNAME}";
 
 #define VALIDATE_FIELDS()   if (m_monitorTypeField->validate() != Wt::WValidator::Valid \
   || m_livestatusPortField->validate() != Wt::WValidator::Valid \
@@ -73,7 +77,7 @@ WebPreferences::WebPreferences(void)
   }));
 
   m_monitorUrlField.reset(new Wt::WLineEdit(this));
-  m_monitorUrlField->setValidator(createTextValidator());
+  m_monitorUrlField->setValidator(new UriValidator("http", false));
   m_monitorUrlField->setEmptyText("Set the url to the monitor web interface");
 
   m_authStringField.reset(new Wt::WLineEdit(this));
@@ -93,12 +97,12 @@ WebPreferences::WebPreferences(void)
   // set livestatus server
   m_livestatusHostField.reset(new Wt::WLineEdit(this));
   m_livestatusHostField->setEmptyText("hostname/IP");
-  m_livestatusHostField->setValidator(createTextValidator());
+  m_livestatusHostField->setValidator(new HostValidator());
 
   // set livestatus port field
   m_livestatusPortField.reset(new Wt::WLineEdit(this));
   m_livestatusPortField->setWidth(50);
-  m_livestatusPortField->setValidator(createPortValidator());
+  m_livestatusPortField->setValidator(new PortValidator());
   m_livestatusPortField->setEmptyText("port");
   m_livestatusPortField->setMaxLength(5);
 
@@ -130,8 +134,10 @@ WebPreferences::WebPreferences(void)
   // LDAP settings
   m_ldapServerUri.reset(new Wt::WLineEdit(this));
   m_ldapServerUri->setEmptyText("ldap://localhost:389");
+  m_ldapServerUri->setValidator(new UriValidator("ldap", true));
   m_ldapDNFormat.reset(new Wt::WLineEdit(this));
-  m_ldapDNFormat->setEmptyText("cn={USERNAME},ou=people,dc=realopinsight,dc=com");
+  m_ldapDNFormat->setEmptyText(QString("cn=%1,ou=people,dc=realopinsight,dc=com")
+                               .arg(DnFormatValidator::DN_FORMAT_USERNAME).toStdString());
 
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
@@ -205,7 +211,7 @@ void WebPreferences::fillFromSource(int _sidx)
   m_authenticationMode->setCurrentIndex(getAuthenticationMode());
   m_ldapServerUri->setText(m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString());
   m_ldapDNFormat->setText(m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT).toStdString());
-
+  m_ldapDNFormat->setValidator(new DnFormatValidator());
 
   // this triggers a signal
   setCurrentSourceIndex(_sidx);
@@ -347,21 +353,6 @@ void WebPreferences::setEnabledInputs(bool enable)
   m_deleteSourceBtn->setEnabled(enable);
 }
 
-
-Wt::WIntValidator* WebPreferences::createPortValidator(void)
-{
-  Wt::WIntValidator* validator = new Wt::WIntValidator();
-  validator->setRange(1, 65535);
-  return validator;
-}
-
-
-Wt::WLengthValidator* WebPreferences::createTextValidator(void)
-{
-  Wt::WLengthValidator* validator = new Wt::WLengthValidator();
-  validator->setMinimumLength(1);
-  return validator;
-}
 
 int WebPreferences::getSourceGlobalIndex(int sourceBoxIndex)
 {

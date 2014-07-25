@@ -1,5 +1,7 @@
 #include "LdapAuthModel.hpp"
 #include "UserMngtUI.hpp"
+#include "WebUtils.hpp"
+#include "Validators.hpp"
 #include <ldap.h>
 #include <QObject>
 #include <QDebug>
@@ -22,16 +24,19 @@ LdapAuthModel::LdapAuthModel(WebPreferences* preferences,
 //  return Wt::Auth::AuthModel::isVisible(field);
 //}
 
-//bool LdapAuthModel::validateField(Wt::WFormModel::Field field)
-//{
-//  return Wt::Auth::AuthModel::validateField(field);
-//}
+bool LdapAuthModel::validateField(Wt::WFormModel::Field field)
+{
+  //return true;
+  return Wt::Auth::AuthModel::validateField(field);
+}
 
 bool LdapAuthModel::validate()
 {
-  // Implement validation
-  //return Wt::Auth::AuthModel::validate();
-  return true;
+//  if (validateField(Wt::Auth::FormBaseModel::LoginNameField)
+//      && validateField(Wt::Auth::AuthModel::PasswordField))
+    return true;
+
+  return false;
 }
 
 //void LdapAuthModel::configureThrottling(Wt::WInteractWidget* button)
@@ -46,8 +51,10 @@ bool LdapAuthModel::validate()
 
 bool LdapAuthModel::login(Wt::Auth::Login& login)
 {
-  //if (! valid())
-  //  return false;
+  if (! validate()) {
+    qDebug() << "Validation failed";
+    return false;
+  }
 
   std::string username = valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8();
   std::string password = valueText(Wt::Auth::AuthModel::PasswordField).toUTF8();
@@ -62,7 +69,8 @@ bool LdapAuthModel::login(Wt::Auth::Login& login)
   if (ldapLogin(username, password)) {
     Wt::Auth::User user;
     login.login(user);
-    qDebug() << "Authentication successful";
+    std::cout << std::boolalpha<< user.isValid()<<"\n";
+    qDebug() << m_lastError;
     return true;
   }
 
@@ -89,14 +97,20 @@ Wt::Auth::User LdapAuthModel::processAuthToken()
 
 bool LdapAuthModel::ldapLogin(const std::string& username, const std::string& password)
 {
-  QString bindDn = m_preferences->getLdapDnFormat().replace("{USERNAME}", username.c_str(), Qt::CaseInsensitive);
-  bool resultStatus = false;
-
+  QString bindDn = m_preferences->getLdapDnFormat().replace(DnFormatValidator::DN_FORMAT_USERNAME,
+                                                            username.c_str(),
+                                                            Qt::CaseInsensitive);
   // Intialize a connection handler
+  QString serverUri = m_preferences->getLdapServerUri();
+  if (! ngrt4n::isValidUri(serverUri, "ldap", true)) {
+    m_lastError = QObject::tr("Invalid LDAP address: %1").arg(serverUri);
+    return false;
+  }
+
   LDAP* ldapHandler;
-  if (ldap_initialize(&ldapHandler, m_preferences->getLdapServerUri().toAscii())) {
-    m_lastError = QObject::tr("failed initializing annuary handler");
-    return resultStatus;
+  if (ldap_initialize(&ldapHandler, serverUri.toAscii())) {
+    m_lastError = QObject::tr("Failed initializing annuary handler");
+    return false;
   }
 
   // Set protocol
@@ -109,14 +123,17 @@ bool LdapAuthModel::ldapLogin(const std::string& username, const std::string& pa
   cred.bv_len = password.length();
 
   // User authentication (bind)
+  bool resultStatus = false;
   int rc = ldap_sasl_bind_s(ldapHandler, bindDn.toAscii().data(), LDAP_SASL_SIMPLE, &cred, NULL,NULL,NULL);
   if (rc == LDAP_SUCCESS) {
     resultStatus = true;
+    m_lastError = QObject::tr("Authentication successful");
   } else {
-    m_lastError = QString("Authentication failed: %1").arg(ldap_err2string(rc));
+    m_lastError = QObject::tr("Authentication failed: %1").arg(ldap_err2string(rc));
   }
 
-  // Free ldap handler
+  // Free the LDAP handler
   ldap_unbind_ext(ldapHandler, NULL, NULL);
+
   return resultStatus;
 }
