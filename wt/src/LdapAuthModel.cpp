@@ -4,10 +4,12 @@
 #include <QObject>
 #include <QDebug>
 
-LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
+LdapAuthModel::LdapAuthModel(WebPreferences* preferences,
+                             const Wt::Auth::AuthService& baseAuth,
                              Wt::Auth::AbstractUserDatabase& users,
                              Wt::WObject* parent)
-  : Wt::Auth::AuthModel(baseAuth, users, parent)
+  : Wt::Auth::AuthModel(baseAuth, users, parent),
+    m_preferences(preferences)
 {
 }
 
@@ -28,7 +30,7 @@ LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
 bool LdapAuthModel::validate()
 {
   // Implement validation
-  return Wt::Auth::AuthModel::validate();
+  //return Wt::Auth::AuthModel::validate();
   return true;
 }
 
@@ -44,8 +46,8 @@ bool LdapAuthModel::validate()
 
 bool LdapAuthModel::login(Wt::Auth::Login& login)
 {
-  if (! valid())
-    return false;
+  //if (! valid())
+  //  return false;
 
   std::string username = valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8();
   std::string password = valueText(Wt::Auth::AuthModel::PasswordField).toUTF8();
@@ -55,9 +57,9 @@ bool LdapAuthModel::login(Wt::Auth::Login& login)
     return Wt::Auth::AuthModel::login(login);
   }
 
-  qDebug() << "Login through LDAP";
+  qDebug() << "Login through LDAP"<< m_preferences->getLdapServerUri() ;
 
-  if (ldapLogin("ldap://localhost:389", username, password)) {
+  if (ldapLogin(username, password)) {
     Wt::Auth::User user;
     login.login(user);
     qDebug() << "Authentication successful";
@@ -85,20 +87,20 @@ Wt::Auth::User LdapAuthModel::processAuthToken()
 }
 
 
-bool LdapAuthModel::ldapLogin(const std::string& serverUri, const std::string& username, const std::string& password)
+bool LdapAuthModel::ldapLogin(const std::string& username, const std::string& password)
 {
-  QString bindDn = QString("cn=%1,ou=People,dc=realopinsight,dc=com").arg(username.c_str());
+  QString bindDn = m_preferences->getLdapDnFormat().replace("{USERNAME}", username.c_str(), Qt::CaseInsensitive);
   bool resultStatus = false;
 
   // Intialize a connection handler
   LDAP* ldapHandler;
-  if (ldap_initialize(&ldapHandler, serverUri.c_str())) {
+  if (ldap_initialize(&ldapHandler, m_preferences->getLdapServerUri().toAscii())) {
     m_lastError = QObject::tr("failed initializing annuary handler");
     return resultStatus;
   }
 
   // Set protocol
-  int version = LDAP_VERSION3;
+  int version = m_preferences->getLdapVersion();
   ldap_set_option(ldapHandler, LDAP_OPT_PROTOCOL_VERSION, &version);
 
   // Prepare credentials

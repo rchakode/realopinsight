@@ -1,6 +1,7 @@
 #ifndef LDAPAUTHMODEL_HPP
 #define LDAPAUTHMODEL_HPP
 
+#include "WebPreferences.hpp"
 #include <Wt/Auth/AuthModel>
 #include <Wt/Auth/Login>
 #include <QString>
@@ -9,7 +10,10 @@
 class LdapAuthModel : public Wt::Auth::AuthModel
 {
 public:
-  LdapAuthModel(const Wt::Auth::AuthService& baseAuth, Wt::Auth::AbstractUserDatabase& users, Wt::WObject* parent=0);
+  LdapAuthModel(WebPreferences* preferences,
+                const Wt::Auth::AuthService& baseAuth,
+                Wt::Auth::AbstractUserDatabase& users,
+                Wt::WObject* parent=0);
   //  virtual void reset();
   //  virtual bool isVisible(Wt::WFormModel::Field field) const;
   //  virtual bool validateField(Wt::WFormModel::Field field);
@@ -23,7 +27,8 @@ public:
 
 private:
   QString m_lastError;
-  bool ldapLogin(const std::string& serverUri, const std::string& username, const std::string& password);
+  WebPreferences* m_preferences;
+  bool ldapLogin(const std::string& username, const std::string& password);
 };
 
 #endif // LDAPAUTHMODEL_HPP

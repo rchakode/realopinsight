@@ -25,6 +25,7 @@
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "WebPreferences.hpp"
+#include <ldap.h>
 #include <QString>
 #include <Wt/WTemplate>
 #include <Wt/WContainerWidget>
@@ -200,10 +201,8 @@ void WebPreferences::fillFromSource(int _sidx)
   m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
   m_updateIntervalField->setValue(updateInterval());
 
-  int authMode = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
-  if (authMode < 0 || authMode >= m_authenticationMode->count()) authMode = BuiltIn; // normalize to avoid crash
 
-  m_authenticationMode->setCurrentIndex(authMode);
+  m_authenticationMode->setCurrentIndex(getAuthenticationMode());
   m_ldapServerUri->setText(m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString());
   m_ldapDNFormat->setText(m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT).toStdString());
 
@@ -387,7 +386,6 @@ void WebPreferences::addToSourceBox(int sourceGlobalIndex)
   m_sourceBoxModel->sort(0);
 }
 
-
 void WebPreferences::bindFormWidget(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), this);
@@ -409,7 +407,6 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("ldap-dn-format", m_ldapDNFormat.get());
 }
 
-
 void WebPreferences::hideUnrequiredFields(void)
 {
   switch (m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt()) {
@@ -421,4 +418,32 @@ void WebPreferences::hideUnrequiredFields(void)
       wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
       break;
   }
+}
+
+QString WebPreferences::getLdapServerUri(void) const
+{
+  return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI);
+}
+
+QString WebPreferences::getLdapDnFormat(void) const
+{
+  return m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT);
+}
+
+int WebPreferences::getLdapVersion(void) const
+{
+  int val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toInt();
+  if (val != LDAP_VERSION2)
+    return LDAP_VERSION3;
+
+  return val;
+}
+
+int WebPreferences::getAuthenticationMode(void) const
+{
+  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
+  if (val != LDAP)
+    return BuiltIn;
+
+  return val;
 }

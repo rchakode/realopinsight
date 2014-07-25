@@ -58,6 +58,10 @@ public:
   virtual void setEnabledInputs(bool enable);
   Wt::Signal<std::string>& errorOccurred() { return m_errorOccurred; }
   void hideUnrequiredFields(void);
+  QString getLdapServerUri(void) const;
+  QString getLdapDnFormat(void) const;
+  int getLdapVersion(void) const;
+  int getAuthenticationMode(void) const;
 
 protected :
   virtual void applyChanges(void);

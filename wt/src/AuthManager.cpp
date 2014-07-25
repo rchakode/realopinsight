@@ -45,7 +45,7 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_preferences(new WebPreferences())
 {
   //Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
-  LdapAuthModel* authModel = new LdapAuthModel(m_dbSession->auth(), m_dbSession->users());
+  LdapAuthModel* authModel = new LdapAuthModel(m_preferences, m_dbSession->auth(), m_dbSession->users());
   authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
   authModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
   Wt::Auth::AuthWidget::setModel(authModel);
