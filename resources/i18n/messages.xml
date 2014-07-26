@@ -426,8 +426,12 @@
         <span>${ldap-server-uri}</span>
       </div>
       <div class="control-group">
-        <label class="control-label">DN Format&nbsp;</label>
+        <label class="control-label">DN Search Format&nbsp;</label>
         <span>${ldap-dn-format}</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">User Search Base&nbsp;</label>
+        <span>${ldap-user-search-base}</span>
       </div>
     </div> <!-- id="ldap-auth-setting-section" -->
     </fieldset>

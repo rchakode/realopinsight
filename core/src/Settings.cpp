@@ -41,6 +41,7 @@ const QString Settings::AUTH_MODE_KEY = "/Auth/authMode";
 const QString Settings::AUTH_LDAP_SERVER_URI = "/Auth/ldapServerUri";
 const QString Settings::AUTH_LDAP_VERSION = "/Auth/ldapVersion";
 const QString Settings::AUTH_LDAP_DN_FORMAT = "/Auth/ldapDnFormat";
+const QString Settings::DN_FORMAT_USERNAME = "{USERNAME}";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {

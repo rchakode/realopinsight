@@ -1,8 +1,32 @@
+/*
+# LdapAuthModel.cpp
+# ------------------------------------------------------------------------ #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update: 25-07-2014                                                  #
+#                                                                          #
+# This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
+# by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
+#                                                                          #
+# RealOpInsight is free software: you can redistribute it and/or modify    #
+# it under the terms of the GNU General Public License as published by     #
+# the Free Software Foundation, either version 3 of the License, or        #
+# (at your option) any later version.                                      #
+#                                                                          #
+# The Software is distributed in the hope that it will be useful,          #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+# GNU General Public License for more details.                             #
+#                                                                          #
+# You should have received a copy of the GNU General Public License        #
+# along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
+#--------------------------------------------------------------------------#
+ */
+
 #include "LdapAuthModel.hpp"
 #include "UserMngtUI.hpp"
 #include "WebUtils.hpp"
 #include "Validators.hpp"
-#include <ldap.h>
+#include "LdapHelper.hpp"
 #include <QObject>
 #include <QDebug>
 
@@ -30,14 +54,14 @@ bool LdapAuthModel::validateField(Wt::WFormModel::Field field)
   return Wt::Auth::AuthModel::validateField(field);
 }
 
-bool LdapAuthModel::validate()
-{
-//  if (validateField(Wt::Auth::FormBaseModel::LoginNameField)
-//      && validateField(Wt::Auth::AuthModel::PasswordField))
-    return true;
+//bool LdapAuthModel::validate()
+//{
+//  //  if (validateField(Wt::Auth::FormBaseModel::LoginNameField)
+//  //      && validateField(Wt::Auth::AuthModel::PasswordField))
+//  return true;
 
-  return false;
-}
+//  return false;
+//}
 
 //void LdapAuthModel::configureThrottling(Wt::WInteractWidget* button)
 //{
@@ -64,18 +88,24 @@ bool LdapAuthModel::login(Wt::Auth::Login& login)
     return Wt::Auth::AuthModel::login(login);
   }
 
-  qDebug() << "Login through LDAP"<< m_preferences->getLdapServerUri() ;
+  LdapHelper ldapHelper(m_preferences->getLdapServerUri(), m_preferences->getLdapDnFormat(), m_preferences->getLdapVersion());
 
-  if (ldapLogin(username, password)) {
-    Wt::Auth::User user;
-    login.login(user);
-    std::cout << std::boolalpha<< user.isValid()<<"\n";
-    qDebug() << m_lastError;
-    return true;
+  qDebug() << "Login through LDAP"<< m_preferences->getLdapServerUri();
+  LdapUsersT ldapUsers;
+  if (ldapHelper.listUsers("ou=people,dc=realopinsight,dc=com", "Robert Smith", "rJsmitH", ldapUsers) == 0) {
+    qDebug() << "list users succeed: "<< ldapUsers.size();
+  } else {
+    qDebug() << "list users succeed: "<< ldapHelper.lastError();
   }
 
+  if (! ldapHelper.loginWithUsername(username, password))
+    return false;
+
+  Wt::Auth::User user;
+  login.login(user);
+  std::cout << std::boolalpha<< user.isValid()<<"\n";
   qDebug() << m_lastError;
-  return false;
+  return true;
 }
 
 void LdapAuthModel::logout(Wt::Auth::Login& login)
@@ -92,48 +122,4 @@ Wt::Auth::EmailTokenResult LdapAuthModel::processEmailToken(const std::string& t
 Wt::Auth::User LdapAuthModel::processAuthToken()
 {
   return Wt::Auth::AuthModel::processAuthToken();
-}
-
-
-bool LdapAuthModel::ldapLogin(const std::string& username, const std::string& password)
-{
-  QString bindDn = m_preferences->getLdapDnFormat().replace(DnFormatValidator::DN_FORMAT_USERNAME,
-                                                            username.c_str(),
-                                                            Qt::CaseInsensitive);
-  // Intialize a connection handler
-  QString serverUri = m_preferences->getLdapServerUri();
-  if (! ngrt4n::isValidUri(serverUri, "ldap", true)) {
-    m_lastError = QObject::tr("Invalid LDAP address: %1").arg(serverUri);
-    return false;
-  }
-
-  LDAP* ldapHandler;
-  if (ldap_initialize(&ldapHandler, serverUri.toAscii())) {
-    m_lastError = QObject::tr("Failed initializing annuary handler");
-    return false;
-  }
-
-  // Set protocol
-  int version = m_preferences->getLdapVersion();
-  ldap_set_option(ldapHandler, LDAP_OPT_PROTOCOL_VERSION, &version);
-
-  // Prepare credentials
-  struct berval cred;
-  cred.bv_val = const_cast<char*>(password.c_str());
-  cred.bv_len = password.length();
-
-  // User authentication (bind)
-  bool resultStatus = false;
-  int rc = ldap_sasl_bind_s(ldapHandler, bindDn.toAscii().data(), LDAP_SASL_SIMPLE, &cred, NULL,NULL,NULL);
-  if (rc == LDAP_SUCCESS) {
-    resultStatus = true;
-    m_lastError = QObject::tr("Authentication successful");
-  } else {
-    m_lastError = QObject::tr("Authentication failed: %1").arg(ldap_err2string(rc));
-  }
-
-  // Free the LDAP handler
-  ldap_unbind_ext(ldapHandler, NULL, NULL);
-
-  return resultStatus;
 }

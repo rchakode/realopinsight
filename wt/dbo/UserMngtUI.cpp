@@ -54,7 +54,7 @@ Wt::WValidator::Result ConfirmPasswordValidator::validate(const Wt::WString &inp
         Wt::WValidator::Result(Wt::WValidator::Invalid, "Confirmation don't match");
 }
 
-UserFormModel::UserFormModel(const User* user, bool changePassword, bool userForm, Wt::WObject *parent)
+UserFormModel::UserFormModel(const RoiDboUser* user, bool changePassword, bool userForm, Wt::WObject *parent)
   : Wt::WFormModel(parent),
     m_userForm(userForm)
 {
@@ -121,13 +121,13 @@ void UserFormModel::setWritable(bool writtable)
   }
 }
 
-void UserFormModel::setData(const User& user)
+void UserFormModel::setData(const RoiDboUser& user)
 {
   setValue(UsernameField, user.username);
   setValue(FirstNameField, user.firstname);
   setValue(LastNameField, user.lastname);
   setValue(EmailField, user.email);
-  setValue(UserLevelField, User::role2Text(user.role));
+  setValue(UserLevelField, RoiDboUser::role2Text(user.role));
   setValue(RegistrationDateField, user.registrationDate);
 }
 
@@ -163,7 +163,7 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
   return createPasswordValidator();
 }
 
-UserFormView::UserFormView(const User* user, bool changePassword, bool userForm)
+UserFormView::UserFormView(const RoiDboUser* user, bool changePassword, bool userForm)
   : m_changePassword(changePassword),
     m_infoBox(new Wt::WText("")),
     m_validated(this),
@@ -291,7 +291,7 @@ void UserFormView::process(void)
       m_user.firstname = m_model->valueText(UserFormModel::FirstNameField).toUTF8();
       m_user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
       m_user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
-      m_user.role = User::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
+      m_user.role = RoiDboUser::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
       m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
       m_validated.emit(m_user);
     }
@@ -318,12 +318,12 @@ void UserFormView::handleDeleteRequest(void)
 Wt::WComboBox* UserFormView::createUserLevelField(void)
 {
   Wt::WStandardItemModel* roleModel =  new Wt::WStandardItemModel(2, 1, this);
-  Wt::WStandardItem* item = new Wt::WStandardItem(User::role2Text(User::OpRole));
-  item->setData(User::OpRole, Wt::UserRole);
+  Wt::WStandardItem* item = new Wt::WStandardItem(RoiDboUser::role2Text(RoiDboUser::OpRole));
+  item->setData(RoiDboUser::OpRole, Wt::UserRole);
   roleModel->setItem(0, 0, item);
 
-  item = new Wt::WStandardItem(User::role2Text(User::AdmRole));
-  item->setData(User::AdmRole, Wt::UserRole);
+  item = new Wt::WStandardItem(RoiDboUser::role2Text(RoiDboUser::AdmRole));
+  item->setData(RoiDboUser::AdmRole, Wt::UserRole);
   roleModel->setItem(1, 0, item);
 
   Wt::WComboBox* roleCbox = new Wt::WComboBox();
@@ -364,7 +364,7 @@ UserMngtUI::UserMngtUI(DbSession* dbSession)
     m_contents(new Wt::WStackedWidget(0)),
     m_updateCompleted(this)
 {
-  m_userForm->validated().connect(std::bind([=](User user) {
+  m_userForm->validated().connect(std::bind([=](RoiDboUser user) {
     m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
   createUserList();
 }
@@ -385,7 +385,7 @@ void UserMngtUI::updateUserList(void)
   }
 }
 
-Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
+Wt::WPanel* UserMngtUI::createUserPanel(const RoiDboUser& user)
 {
   bool changePassword(false);
   bool userForm(false);
@@ -395,7 +395,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const User& user)
   UserFormView* form(new UserFormView(&user,
                                       changePassword,
                                       userForm));
-  form->validated().connect(std::bind([=](User userToUpdate) {
+  form->validated().connect(std::bind([=](RoiDboUser userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
   }, std::placeholders::_1));

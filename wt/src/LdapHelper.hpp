@@ -1,5 +1,5 @@
 /*
-# LdapAuthModel.hpp
+# LdapHelper.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 25-07-2014                                                  #
@@ -22,36 +22,46 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef LDAPAUTHMODEL_HPP
-#define LDAPAUTHMODEL_HPP
-
-#include "WebPreferences.hpp"
-#include <Wt/Auth/AuthModel>
-#include <Wt/Auth/Login>
+#ifndef LDAPHELPER_HPP
+#define LDAPHELPER_HPP
 #include <QString>
-#include <string>
+#include <QVector>
+#include <ldap.h>
 
-class LdapAuthModel : public Wt::Auth::AuthModel
+
+struct LdapUserT
 {
-public:
-  LdapAuthModel(WebPreferences* preferences,
-                const Wt::Auth::AuthService& baseAuth,
-                Wt::Auth::AbstractUserDatabase& users,
-                Wt::WObject* parent=0);
-  //  virtual void reset();
-  //  virtual bool isVisible(Wt::WFormModel::Field field) const;
-  virtual bool validateField(Wt::WFormModel::Field field);
-  //virtual bool validate();
-  //  virtual void configureThrottling(Wt::WInteractWidget* button);
-  //  virtual void updateThrottling(Wt::WInteractWidget* button);
-  virtual bool login(Wt::Auth::Login& login);
-  virtual void logout(Wt::Auth::Login& login);
-  virtual Wt::Auth::EmailTokenResult processEmailToken(const std::string& token);
-  virtual Wt::Auth::User processAuthToken();
-
-private:
-  QString m_lastError;
-  WebPreferences* m_preferences;
+  std::string username;
+  std::string password;
+  std::string firstname;
+  std::string lastname;
+  std::string email;
 };
 
-#endif // LDAPAUTHMODEL_HPP
+typedef QVector<LdapUserT> LdapUsersT;
+
+class LdapHelper
+{
+public:
+  LdapHelper(const QString& serverUriconst, const QString& baseDnSearchFormat, int version=LDAP_VERSION3);
+  virtual ~LdapHelper();
+  bool loginWithUsername(const std::string& username, const std::string& password);
+  bool loginWithDistinguishName(const std::string& dn, const std::string& password);
+  int listUsers(const std::string& baseDn,
+                const std::string& bindUsername,
+                const std::string& bindPassword,
+                LdapUsersT& users);
+  QString lastError(void) const {return m_lastError;}
+
+private:
+  LDAP* m_handler;
+  QString m_lastError;
+  QString m_serverUri;
+  QString m_baseDnSearchFormat;
+  int m_version;
+
+  int setupHandler(void);
+  void cleanupHandler(void);
+};
+
+#endif // LDAPHELPER_HPP

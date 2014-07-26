@@ -100,7 +100,7 @@ void ViewAssignmentUI::filter(const std::string& username)
     m_assignedViewModel->clear();
     m_nonAssignedViewModel->clear();
     m_dbSession->updateUserViewList();
-    UserViewListT userViews = m_dbSession->userViewList();
+    RoiUserViewsT userViews = m_dbSession->userViewList();
     for (auto view: m_dbSession->viewList()) {
       if (userViews.find(username+":"+view.name) != userViews.end()) {
         addView(m_assignedViewModel, view);
@@ -121,7 +121,7 @@ void ViewAssignmentUI::filter(const std::string& username)
   }
 }
 
-void ViewAssignmentUI::addView(Wt::WStandardItemModel* model, const View& view)
+void ViewAssignmentUI::addView(Wt::WStandardItemModel* model, const RoiDboView& view)
 {
   int count = model->rowCount();
   model->insertRows(count, 1);
@@ -215,7 +215,7 @@ void ViewAssignmentUI::deleteViews(void)
   setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
   std::string outputMsg;
   for (const auto& vname : m_selectedViews) {
-    View curView;
+    RoiDboView curView;
     if (m_dbSession->findView(vname, curView)) {
       if (m_dbSession->deleteView(vname) != 0) {
         outputMsg.append("- Failed to delete view: "+vname + " -");
@@ -277,10 +277,10 @@ void ViewAssignmentUI::removeViewItemInModel(Wt::WStandardItemModel* model, cons
 
 void ViewAssignmentUI::addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
 {
-  ViewListT::const_iterator vit;
+  RoiDboViewsT::const_iterator vit;
   vit = std::find_if(m_dbSession->viewList().begin(),
                      m_dbSession->viewList().end(),
-                     [=](View v){return v.name == viewName;});
+                     [=](RoiDboView v){return v.name == viewName;});
   if (vit !=m_dbSession->viewList().end()) {
     addView(model, *vit);
   }

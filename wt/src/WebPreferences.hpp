@@ -92,6 +92,7 @@ private:
   std::unique_ptr<Wt::WComboBox> m_authenticationMode;
   std::unique_ptr<Wt::WLineEdit> m_ldapServerUri;
   std::unique_ptr<Wt::WLineEdit> m_ldapDNFormat;
+  std::unique_ptr<Wt::WLineEdit> m_ldapUserSearchBase;
   Wt::Signal<std::string> m_errorOccurred;
 
   void promptUser(int inputType);

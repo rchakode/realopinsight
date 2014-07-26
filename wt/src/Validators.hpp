@@ -59,7 +59,6 @@ public:
 class DnFormatValidator: public Wt::WValidator
 {
 public:
-  static const QString DN_FORMAT_USERNAME;
 
   DnFormatValidator(Wt::WObject* parent = 0)
     : Wt::WValidator(parent)
@@ -69,13 +68,11 @@ public:
   virtual Wt::WValidator::Result validate(const Wt::WString& input) const
   {
     QString dnformat = QString::fromStdString(input.toUTF8());
-    if (dnformat.count(DN_FORMAT_USERNAME, Qt::CaseInsensitive))
+    if (dnformat.count(Settings::DN_FORMAT_USERNAME, Qt::CaseInsensitive))
       return Wt::WValidator::Result(Wt::WValidator::Valid);
 
     return Wt::WValidator::Result(Wt::WValidator::Invalid, QObject::tr("Invalid DN format: %1").arg(dnformat).toStdString());
   }
 };
-
-//const QString DnFormatValidator::DN_FORMAT_USERNAME = "{USERNAME}";
 
 #endif // VALIDATOR_HPP

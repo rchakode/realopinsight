@@ -59,6 +59,7 @@ public:
   static const QString AUTH_LDAP_SERVER_URI;
   static const QString AUTH_LDAP_VERSION;
   static const QString AUTH_LDAP_DN_FORMAT;
+  static const QString DN_FORMAT_USERNAME;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

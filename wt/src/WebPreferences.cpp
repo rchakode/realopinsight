@@ -39,8 +39,6 @@
 
 
 
-const QString DnFormatValidator::DN_FORMAT_USERNAME = "{USERNAME}";
-
 #define VALIDATE_FIELDS()   if (m_monitorTypeField->validate() != Wt::WValidator::Valid \
   || m_livestatusPortField->validate() != Wt::WValidator::Valid \
   || m_monitorTypeField->currentIndex() <= 0) { \
@@ -135,11 +133,15 @@ WebPreferences::WebPreferences(void)
   m_ldapServerUri.reset(new Wt::WLineEdit(this));
   m_ldapServerUri->setEmptyText("ldap://localhost:389");
   m_ldapServerUri->setValidator(new UriValidator("ldap", true));
+
   m_ldapDNFormat.reset(new Wt::WLineEdit(this));
-  m_ldapDNFormat->setEmptyText(QString("cn=%1,ou=people,dc=realopinsight,dc=com")
-                               .arg(DnFormatValidator::DN_FORMAT_USERNAME).toStdString());
+  m_ldapDNFormat->setEmptyText(QString("cn=%1,ou=devops,dc=realopinsight,dc=com").arg(Settings::DN_FORMAT_USERNAME).toStdString());
+
+  m_ldapUserSearchBase.reset(new Wt::WLineEdit(this));
+  m_ldapUserSearchBase->setEmptyText(QString("ou=devops,dc=realopinsight,dc=com").toStdString());
 
 
+  // buttons
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
@@ -396,6 +398,7 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("authentication-mode", m_authenticationMode.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUri.get());
   tpl->bindWidget("ldap-dn-format", m_ldapDNFormat.get());
+  tpl->bindWidget("ldap-user-search-base", m_ldapUserSearchBase.get());
 }
 
 void WebPreferences::hideUnrequiredFields(void)

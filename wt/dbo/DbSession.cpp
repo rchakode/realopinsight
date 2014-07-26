@@ -54,22 +54,22 @@ DbSession::~DbSession()
 
 void DbSession::setupDb(void)
 {
-  mapClass<User>("user");
-  mapClass<View>("view");
+  mapClass<RoiDboUser>("user");
+  mapClass<RoiDboView>("view");
   mapClass<AuthInfo>("auth_info");
-  mapClass<LoginSession>("login_session");
+  mapClass<RoiDboLoginSession>("login_session");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
   initDb();
 }
 
 
-int DbSession::addUser(const User& user)
+int DbSession::addUser(const RoiDboUser& user)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    UserCollectionT users = find<User>().where("name=?").bind(user.username);
+    UserCollectionT users = find<RoiDboUser>().where("name=?").bind(user.username);
     if (users.size() > 0) {
       m_lastError = "Failed: a user with the same username already exist.";
       LOG("error", m_lastError);
@@ -79,7 +79,7 @@ int DbSession::addUser(const User& user)
       dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
       info.modify()->setEmail(user.email);
       m_passAuthService->updatePassword(dbuser, user.password);
-      User* userTmpPtr(new User());
+      RoiDboUser* userTmpPtr(new RoiDboUser());
       *userTmpPtr = user;
       info.modify()->setUser(add(userTmpPtr));
       dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
@@ -94,13 +94,13 @@ int DbSession::addUser(const User& user)
   return retCode;
 }
 
-int DbSession::updateUser(User user)
+int DbSession::updateUser(RoiDboUser user)
 {
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
     dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(user.username);
-    dbo::ptr<User> userPtr = authInfo.modify()->user();
+    dbo::ptr<RoiDboUser> userPtr = authInfo.modify()->user();
     userPtr.modify()->username = user.username;
     userPtr.modify()->lastname = user.lastname;
     userPtr.modify()->firstname = user.firstname;
@@ -153,7 +153,7 @@ int DbSession::deleteUser(std::string uname)
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
-    dbo::ptr<User> usr = find<User>().where("name=?").bind(uname);
+    dbo::ptr<RoiDboUser> usr = find<RoiDboUser>().where("name=?").bind(uname);
     usr.remove();
     retCode = 0;
     transaction.commit();
@@ -216,7 +216,7 @@ void DbSession::updateUserList(void)
   try {
     m_userList.clear();
     dbo::Transaction transaction(*this);
-    UserCollectionT users = find<User>();
+    UserCollectionT users = find<RoiDboUser>();
     for (auto &user : users) {
       m_userList.push_back(*user);
     }
@@ -231,7 +231,7 @@ void DbSession::updateViewList(void)
   try {
     m_viewList.clear();
     dbo::Transaction transaction(*this);
-    ViewCollectionT views = find<View>();
+    ViewCollectionT views = find<RoiDboView>();
     for (auto& view :views) {
       m_viewList.push_back(*view);
     }
@@ -246,7 +246,7 @@ void DbSession::updateViewList(const std::string& uname)
   try {
     m_viewList.clear();
     dbo::Transaction transaction(*this);
-    dbo::ptr<User> userDboPtr = find<User>().where("name=?").bind(uname);
+    dbo::ptr<RoiDboUser> userDboPtr = find<RoiDboUser>().where("name=?").bind(uname);
     for (auto& view : userDboPtr.modify()->views) {
       m_viewList.push_back(*view);
     }
@@ -256,11 +256,11 @@ void DbSession::updateViewList(const std::string& uname)
   }
 }
 
-bool DbSession::findView(const std::string& vname, View& view)
+bool DbSession::findView(const std::string& vname, RoiDboView& view)
 {
-  ViewListT::const_iterator it = std::find_if(m_viewList.begin(),
+  RoiDboViewsT::const_iterator it = std::find_if(m_viewList.begin(),
                                               m_viewList.end(),
-                                              [&vname](View v){return v.name == vname;});
+                                              [&vname](RoiDboView v){return v.name == vname;});
   bool found = false;
   if (it != m_viewList.end()) {
     found = true;
@@ -273,12 +273,12 @@ void DbSession::initDb(void)
 {
   try {
     createTables();
-    User adm;
+    RoiDboUser adm;
     adm.username = "admin";
     adm.password = "password";
     adm.firstname = "Default";
     adm.lastname = "Administrator";
-    adm.role = User::AdmRole;
+    adm.role = RoiDboUser::AdmRole;
     adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
     addUser(adm);
     LOG("info", "Database created: "+m_dbPath);
@@ -288,18 +288,18 @@ void DbSession::initDb(void)
   }
 }
 
-int DbSession::addView(const View& view)
+int DbSession::addView(const RoiDboView& view)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    ViewCollectionT views = find<View>().where("name=?").bind(view.name);
+    ViewCollectionT views = find<RoiDboView>().where("name=?").bind(view.name);
     if (views.size() > 0) {
       m_lastError = "Failed: a view with the same name already exist.";
       LOG("error", m_lastError);
       retCode = 1;
     } else {
-      View* viewTmpPtr(new View());
+      RoiDboView* viewTmpPtr(new RoiDboView());
       *viewTmpPtr =  view;
       add(viewTmpPtr);
       retCode = 0;
@@ -337,7 +337,7 @@ void DbSession::updateUserViewList(void)
 {
   m_userViewList.clear();
   dbo::Transaction transaction(*this);
-  UserCollectionT users = find<User>();
+  UserCollectionT users = find<RoiDboUser>();
   for (auto& user : users) {
     for (const auto& view: user->views) {
       m_userViewList.insert(user->username+":"+view->name);
@@ -353,8 +353,8 @@ int DbSession::assignView(const std::string& uname, const std::string& vname)
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
-    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(uname);
-    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(vname);
+    dbo::ptr<RoiDboUser> dboUserPtr = find<RoiDboUser>().where("name=?").bind(uname);
+    dbo::ptr<RoiDboView> dboViewPtr = find<RoiDboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
     retCode = 0;
     transaction.commit();
@@ -370,8 +370,8 @@ int DbSession::revokeView(const std::string& uname, const std::string& vname)
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
-    dbo::ptr<User> dboUserPtr = find<User>().where("name=?").bind(uname);
-    dbo::ptr<View> dboViewPtr = find<View>().where("name=?").bind(vname);
+    dbo::ptr<RoiDboUser> dboUserPtr = find<RoiDboUser>().where("name=?").bind(uname);
+    dbo::ptr<RoiDboView> dboViewPtr = find<RoiDboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.erase(dboViewPtr);
     retCode = 0;
     transaction.commit();
@@ -382,13 +382,13 @@ int DbSession::revokeView(const std::string& uname, const std::string& vname)
 }
 
 
-int DbSession::addSession(const LoginSession& session)
+int DbSession::addSession(const RoiDboLoginSession& session)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    if (checkUserCookie(session) != LoginSession::ActiveCookie) {
-      LoginSession* sessionPtr(new LoginSession());
+    if (checkUserCookie(session) != RoiDboLoginSession::ActiveCookie) {
+      RoiDboLoginSession* sessionPtr(new RoiDboLoginSession());
       *sessionPtr = session;
       add(sessionPtr);
       retCode = 0;
@@ -406,18 +406,18 @@ int DbSession::addSession(const LoginSession& session)
 }
 
 
-int DbSession::checkUserCookie(const LoginSession& session)
+int DbSession::checkUserCookie(const RoiDboLoginSession& session)
 {
   int retCode = -1;
 
   dbo::Transaction transaction(*this);
   try {
-    LoginSessionCollectionT sessions = find<LoginSession>()
+    LoginSessionCollectionT sessions = find<RoiDboLoginSession>()
         .where("username=? AND session_id=? AND status = ?")
         .bind(session.username)
         .bind(session.sessionId)
-        .bind(LoginSession::ExpiredCookie);
-    retCode = sessions.size()? LoginSession::ActiveCookie : LoginSession::InvalidSession;
+        .bind(RoiDboLoginSession::ExpiredCookie);
+    retCode = sessions.size()? RoiDboLoginSession::ActiveCookie : RoiDboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
     LOG("error", ex.what());
