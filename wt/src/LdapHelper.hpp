@@ -24,6 +24,7 @@
 
 #ifndef LDAPHELPER_HPP
 #define LDAPHELPER_HPP
+#include "Base.hpp"
 #include <QString>
 #include <QVector>
 #include <ldap.h>
@@ -62,6 +63,9 @@ private:
 
   int setupHandler(void);
   void cleanupHandler(void);
+  std::string getObjectDistingisghName(LDAPMessage* objectData);
+  void parseObjectAttr(LDAPMessage* objectData, StringMapT& attrs);
+  void fillUserInfo(const StringMapT& attrs, LdapUserT& userInfo);
 };
 
 #endif // LDAPHELPER_HPP

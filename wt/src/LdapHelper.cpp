@@ -108,7 +108,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
 
 
 int LdapHelper::listUsers(const std::string& baseDn,
-                          const std::string& bindUsername,
+                          const std::string& bindUserDn,
                           const std::string& bindPassword,
                           LdapUsersT& users)
 {
@@ -122,7 +122,7 @@ int LdapHelper::listUsers(const std::string& baseDn,
   struct timeval timeout;
   timeout.tv_sec = REQUEST_TIMEOUT;
 
-  if (! loginWithUsername(bindUsername, bindPassword)) {
+  if (! loginWithDistinguishName(bindUserDn, bindPassword)) {
     return -1;
   }
 
@@ -143,26 +143,60 @@ int LdapHelper::listUsers(const std::string& baseDn,
     return -1;
   }
 
-
   // parse result
   for (LDAPMessage* currentEntry = ldap_first_entry(m_handler, searchResult);
        currentEntry != NULL;
        currentEntry = ldap_next_entry(m_handler, currentEntry)) {
 
-    char* property;
-    if ((property = ldap_get_dn(m_handler, currentEntry)) != NULL) {
-      printf( "dn: %s\n", property );
-      ldap_memfree(property);
-    }
+    LdapUserT user;
+    StringMapT userAttrs;
+    user.username = getObjectDistingisghName(currentEntry);
+    parseObjectAttr(currentEntry, userAttrs);
+    fillUserInfo(userAttrs, user);
 
-    if ((property = ldap_get_dn(m_handler, currentEntry)) != NULL) {
-      printf( "userpassword: %s\n", property);
-      ldap_memfree(property);
-    }
+    users.push_back(user);
   }
 
   if (searchResult)
     ldap_msgfree(searchResult);
 
   return 0;
+}
+
+
+std::string LdapHelper::getObjectDistingisghName(LDAPMessage* objectData)
+{
+  char* buffer;
+  std::string result = "";
+  if ((buffer = ldap_get_dn(m_handler, objectData)) != NULL) {
+    result = std::string(buffer);
+    ldap_memfree(buffer);
+  }
+  return result;
+}
+
+void LdapHelper::parseObjectAttr(LDAPMessage* objectData, StringMapT& attrs)
+{
+  attrs.clear();
+  BerElement* ber;
+  struct berval** values;
+  for (char* curAttr = ldap_first_attribute(m_handler, objectData, &ber);
+       curAttr != NULL; curAttr = ldap_next_attribute(m_handler, objectData, ber) ) {
+    if ((values = ldap_get_values_len(m_handler, objectData, curAttr)) != NULL ) {
+      for (int attrIndex = 0; values[attrIndex] != NULL; attrIndex++ ) {
+        attrs.insertMulti(curAttr, values[attrIndex]->bv_val);
+      }
+      ldap_value_free_len(values);
+    }
+    ldap_memfree(curAttr);
+  }
+}
+
+
+void LdapHelper::fillUserInfo(const StringMapT& attrs, LdapUserT& userInfo)
+{
+  userInfo.password = attrs["userPassword"].toStdString();
+  userInfo.lastname = attrs["cn"].toStdString();
+  userInfo.firstname = attrs["sn"].toStdString();
+  userInfo.email = attrs["email"].toStdString();
 }

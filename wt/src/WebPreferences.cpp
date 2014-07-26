@@ -107,13 +107,14 @@ WebPreferences::WebPreferences(void)
   // other fields
   m_useNgrt4ndField.reset(new Wt::WCheckBox(QObject::tr("Use ngrt4nd").toStdString(), this));
   m_dontVerifyCertificateField.reset(new Wt::WCheckBox(QObject::tr("Don't verify SSL certificate").toStdString(),this));
+
+  // update interval field
   m_updateIntervalField.reset(new Wt::WSpinBox(this));
-  m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
-  m_addAsSourceBtn.reset(new Wt::WPushButton(QObject::tr("Add as source").toStdString(), this));
-  m_deleteSourceBtn.reset(new Wt::WPushButton(QObject::tr("Delete source").toStdString(), this));
+  m_updateIntervalField->setMinimum(5);
+  m_updateIntervalField->setMaximum(1200);
+  m_updateIntervalField->setValue(Preferences::updateInterval());
 
-
-  // Authentication mode
+  // Authentication settings
   m_authenticationMode.reset(new Wt::WComboBox(this));
   m_authenticationMode->addItem(ngrt4n::tr("Built-in"));
   m_authenticationMode->addItem(ngrt4n::tr("LDAP"));
@@ -129,30 +130,40 @@ WebPreferences::WebPreferences(void)
     }
   }));
 
-  // LDAP settings
+  // LDAP fields
   m_ldapServerUri.reset(new Wt::WLineEdit(this));
   m_ldapServerUri->setEmptyText("ldap://localhost:389");
   m_ldapServerUri->setValidator(new UriValidator("ldap", true));
 
-  m_ldapDNFormat.reset(new Wt::WLineEdit(this));
-  m_ldapDNFormat->setEmptyText(QString("cn=%1,ou=devops,dc=realopinsight,dc=com").arg(Settings::DN_FORMAT_USERNAME).toStdString());
+  m_ldapBindUserDn.reset(new Wt::WLineEdit(this));
+  m_ldapBindUserDn->setEmptyText("cn=Manager,ou=devops,dc=realopinsight,dc=com");
 
-  m_ldapUserSearchBase.reset(new Wt::WLineEdit(this));
-  m_ldapUserSearchBase->setEmptyText(QString("ou=devops,dc=realopinsight,dc=com").toStdString());
+  m_ldapBindUserPassword.reset(new Wt::WLineEdit(this));
+  m_ldapBindUserPassword->setEchoMode(Wt::WLineEdit::Password);
+  m_ldapBindUserPassword->setText("mysecretpassword");
+
+  m_ldapDNFormat.reset(new Wt::WLineEdit(this));
+  m_ldapDNFormat->setEmptyText(QString("cn=%1,dc=realopinsight,dc=com").arg(Settings::DN_FORMAT_USERNAME).toStdString());
+
+  m_ldapSearchBase.reset(new Wt::WLineEdit(this));
+  m_ldapSearchBase->setEmptyText("ou=devops,dc=realopinsight,dc=com");
 
 
   // buttons
+  m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
+  m_addAsSourceBtn.reset(new Wt::WPushButton(QObject::tr("Add as source").toStdString(), this));
+  m_deleteSourceBtn.reset(new Wt::WPushButton(QObject::tr("Delete source").toStdString(), this));
+  m_importLdapAccountBtn.reset(new Wt::WPushButton(QObject::tr("Import Accounts").toStdString(), this));
+
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
+  m_importLdapAccountBtn->setStyleClass("btn btn-info");
 
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
   m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-
-  m_updateIntervalField->setMinimum(5);
-  m_updateIntervalField->setMaximum(1200);
-  m_updateIntervalField->setValue(Preferences::updateInterval());
+  //m_importLdapAccountBtn->clicked().connect(this, &WebPreferences::importLdapAccounts);
 
   m_applyChangeBtn->setDisabled(true);
   m_addAsSourceBtn->setDisabled(true);
@@ -209,11 +220,7 @@ void WebPreferences::fillFromSource(int _sidx)
   m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
   m_updateIntervalField->setValue(updateInterval());
 
-
-  m_authenticationMode->setCurrentIndex(getAuthenticationMode());
-  m_ldapServerUri->setText(m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString());
-  m_ldapDNFormat->setText(m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT).toStdString());
-  m_ldapDNFormat->setValidator(new DnFormatValidator());
+  loadAuthSettings();
 
   // this triggers a signal
   setCurrentSourceIndex(_sidx);
@@ -250,9 +257,7 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   // global settings
   setEntry(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
-  setEntry(Settings::AUTH_MODE_KEY, QString::number(m_authenticationMode->currentIndex()));
-  setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUri->text().toUTF8().c_str());
-  setEntry(Settings::AUTH_LDAP_DN_FORMAT, m_ldapDNFormat->text().toUTF8().c_str());
+  saveAuthSettings();
 
   // source-specific settings
   SourceT src;
@@ -392,13 +397,18 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
   tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
+
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
+  tpl->bindWidget("import-ldap-accounts-button", m_importLdapAccountBtn.get());
+
   tpl->bindWidget("authentication-mode", m_authenticationMode.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUri.get());
+  tpl->bindWidget("ldap-bind-user-dn", m_ldapBindUserDn.get());
+  tpl->bindWidget("ldap-bind-user-password", m_ldapBindUserPassword.get());
   tpl->bindWidget("ldap-dn-format", m_ldapDNFormat.get());
-  tpl->bindWidget("ldap-user-search-base", m_ldapUserSearchBase.get());
+  tpl->bindWidget("ldap-user-search-base", m_ldapSearchBase.get());
 }
 
 void WebPreferences::hideUnrequiredFields(void)
@@ -414,22 +424,12 @@ void WebPreferences::hideUnrequiredFields(void)
   }
 }
 
-QString WebPreferences::getLdapServerUri(void) const
-{
-  return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI);
-}
-
-QString WebPreferences::getLdapDnFormat(void) const
-{
-  return m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT);
-}
 
 int WebPreferences::getLdapVersion(void) const
 {
   int val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toInt();
   if (val != LDAP_VERSION2)
     return LDAP_VERSION3;
-
   return val;
 }
 
@@ -440,4 +440,26 @@ int WebPreferences::getAuthenticationMode(void) const
     return BuiltIn;
 
   return val;
+}
+
+
+void WebPreferences::saveAuthSettings(void)
+{
+  setEntry(Settings::AUTH_MODE_KEY, QString::number(m_authenticationMode->currentIndex()));
+  setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUri->text().toUTF8().c_str());
+  setEntry(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBase->text().toUTF8().c_str());
+  setEntry(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDn->text().toUTF8().c_str());
+  setEntry(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPassword->text().toUTF8().c_str());
+  setEntry(Settings::AUTH_LDAP_DN_FORMAT, m_ldapDNFormat->text().toUTF8().c_str());
+}
+
+void WebPreferences::loadAuthSettings(void)
+{
+  m_authenticationMode->setCurrentIndex(getAuthenticationMode());
+  m_ldapServerUri->setText(m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString());
+  m_ldapSearchBase->setText(m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE).toStdString());
+  m_ldapBindUserDn->setText(m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString());
+  m_ldapBindUserPassword->setText(m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD).toStdString());
+  m_ldapDNFormat->setText(m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT).toStdString());
+  m_ldapDNFormat->setValidator(new DnFormatValidator());
 }

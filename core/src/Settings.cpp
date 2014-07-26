@@ -39,8 +39,11 @@ const QString Settings::AUTH_ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Settings::AUTH_OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Settings::AUTH_MODE_KEY = "/Auth/authMode";
 const QString Settings::AUTH_LDAP_SERVER_URI = "/Auth/ldapServerUri";
+const QString Settings::AUTH_LDAP_BIND_USER_DN = "/Auth/ldapBindUserDn";
+const QString Settings::AUTH_LDAP_BIND_USER_PASSWORD = "/Auth/ldapBindUserPassword";
+const QString Settings::AUTH_LDAP_SEARCH_BASE = "/Auth/ldapSearchBase";
 const QString Settings::AUTH_LDAP_VERSION = "/Auth/ldapVersion";
-const QString Settings::AUTH_LDAP_DN_FORMAT = "/Auth/ldapDnFormat";
+const QString Settings::AUTH_LDAP_DN_FORMAT = "/Auth/ldapUserDnFormat";
 const QString Settings::DN_FORMAT_USERNAME = "{USERNAME}";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))

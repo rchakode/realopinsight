@@ -57,6 +57,9 @@ public:
   static const QString AUTH_OP_PASSWD_KEY;
   static const QString AUTH_MODE_KEY;
   static const QString AUTH_LDAP_SERVER_URI;
+  static const QString AUTH_LDAP_BIND_USER_DN;
+  static const QString AUTH_LDAP_BIND_USER_PASSWORD;
+  static const QString AUTH_LDAP_SEARCH_BASE;
   static const QString AUTH_LDAP_VERSION;
   static const QString AUTH_LDAP_DN_FORMAT;
   static const QString DN_FORMAT_USERNAME;

@@ -59,12 +59,15 @@ public:
   virtual void setEnabledInputs(bool enable);
   Wt::Signal<std::string>& errorOccurred() { return m_errorOccurred; }
   void hideUnrequiredFields(void);
-  QString getLdapServerUri(void) const;
-  QString getLdapDnFormat(void) const;
+  QString getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI);}
+  QString getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN);}
+  QString getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE);}
+  QString getLdapBindUserPassword(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD);}
+  QString getLdapDnFormat(void) const{ return m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT);}
   int getLdapVersion(void) const;
   int getAuthenticationMode(void) const;
 
-protected :
+protected:
   virtual void applyChanges(void);
   void handleCancel(void) {return;}
   virtual void fillFromSource(int _sidx);
@@ -75,6 +78,9 @@ protected :
   virtual void deleteSource(void);
 
 private:
+  Wt::Signal<std::string> m_errorOccurred;
+
+  // monitoring settings properties
   std::unique_ptr<Wt::WComboBox> m_sourceBox;
   std::unique_ptr<Wt::WStringListModel> m_sourceBoxModel;
   std::unique_ptr<Wt::WLineEdit> m_monitorUrlField;
@@ -89,11 +95,15 @@ private:
   std::unique_ptr<Wt::WPushButton> m_applyChangeBtn;
   std::unique_ptr<Wt::WPushButton> m_addAsSourceBtn;
   std::unique_ptr<Wt::WPushButton> m_deleteSourceBtn;
+
+  // auth settings properties
   std::unique_ptr<Wt::WComboBox> m_authenticationMode;
   std::unique_ptr<Wt::WLineEdit> m_ldapServerUri;
+  std::unique_ptr<Wt::WLineEdit> m_ldapBindUserDn;
+  std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPassword;
   std::unique_ptr<Wt::WLineEdit> m_ldapDNFormat;
-  std::unique_ptr<Wt::WLineEdit> m_ldapUserSearchBase;
-  Wt::Signal<std::string> m_errorOccurred;
+  std::unique_ptr<Wt::WLineEdit> m_ldapSearchBase;
+  std::unique_ptr<Wt::WPushButton> m_importLdapAccountBtn;
 
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);
@@ -101,6 +111,8 @@ private:
   int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);
   void bindFormWidget(void);
+  void saveAuthSettings(void);
+  void loadAuthSettings(void);
 };
 
 #endif // WEBSESSION_HPP

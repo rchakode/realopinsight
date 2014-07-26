@@ -370,40 +370,41 @@
 </div>
 </message>
 
-<message id="setting-page.tpl">
-  <div class="form-horizontal">
-    <fieldset>
-     <h6>Generic Settings</h6>
-     <div class="control-group">
-       <label class="control-label">Source&nbsp;</label>
-       <span>${source-box}</span>
-       <span>Type&nbsp;</span>
-       <span>${monitor-type}</span>
-     </div>
+<message id="setting-page.tpl">c
+<div class="form-horizontal">
+  <!-- monitoring-settings-section -->
+  <div id="monitoring-settings-section">
+     <fieldset>
+       <h6>Generic Settings</h6>
+       <div class="control-group">
+         <label class="control-label">Source&nbsp;</label>
+         <span>${source-box}</span>
+         <span>Type&nbsp;</span>
+         <span>${monitor-type}</span>
+       </div>
+       <div class="control-group">
+        <label class="control-label">Update Interval&nbsp;</label>
+        <span>${update-interval}</span>
+        <span>&nbsp;seconds</span>
+       </div>
+     </fieldset>
 
-     <div class="control-group">
-      <label class="control-label">Update Interval&nbsp;</label>
-      <span>${update-interval}</span>
-      <span>&nbsp;seconds</span>
-     </div>
-    </fieldset>
+     <fieldset>
+       <h6>Monitor Web Access</h6>
+       <div class="control-group">
+         <label class="control-label">URL&nbsp;</label>
+         <span>${monitor-url}</span>
+         <span>${dont-verify-ssl-certificate}</span>
+       </div>
 
-    <fieldset>
-     <h6>Monitor Web Access</h6>
-     <div class="control-group">
-      <label class="control-label">URL&nbsp;</label>
-      <span>${monitor-url}</span>
-      <span>${dont-verify-ssl-certificate}</span>
-     </div>
+       <div class="control-group">
+         <label class="control-label">Auth String&nbsp;</label>
+         <span>${monitor-auth-string}</span>
+         <span>${show-in-clear}</span>
+       </div>
+     </fieldset>
 
-     <div class="control-group">
-      <label class="control-label">Auth String&nbsp;</label>
-      <span>${monitor-auth-string}</span>
-      <span>${show-in-clear}</span>
-     </div>
-    </fieldset>
-
-    <fieldset id="livetstatus-section">
+      <fieldset id="livetstatus-section">
     <h6>Livestatus Socket</h6>
     <div class="control-group">
       <label class="control-label">Host&nbsp;</label>
@@ -414,7 +415,16 @@
     </div>
     </fieldset>  <!-- id="livetstatus-section" -->
 
-    <fieldset id="auth-section">
+       <div class="form-actions">
+      <span>${apply-change-button}</span>
+      <span>${add-as-source-button}</span>
+      <span>${delete-button}</span>
+    </div>
+  </div>  <!-- id="monitoring-settings-section" -->
+
+  <!-- Auth section -->
+    <div id="auth-section">
+    <fieldset>
     <h6>Authentication</h6>
     <div class="control-group">
       <label class="control-label">&nbsp;</label>
@@ -426,7 +436,15 @@
         <span>${ldap-server-uri}</span>
       </div>
       <div class="control-group">
-        <label class="control-label">DN Search Format&nbsp;</label>
+        <label class="control-label">Bind User DN&nbsp;</label>
+        <span>${ldap-bind-user-dn}</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Bind User Password&nbsp;</label>
+        <span>${ldap-bind-user-password}</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">User DN Search&nbsp;</label>
         <span>${ldap-dn-format}</span>
       </div>
       <div class="control-group">
@@ -437,11 +455,11 @@
     </fieldset>
 
     <div class="form-actions">
-      <span>${apply-change-button}</span>
-      <span>${add-as-source-button}</span>
-      <span>${delete-button}</span>
+      <span>${import-ldap-accounts-button}</span>
     </div>
- </div>
+  </div> <!-- id="auth-section" -->
+
+</div> <!-- class="form-hoizontal" -->
 </message>
 
 <message id="about-tpl">

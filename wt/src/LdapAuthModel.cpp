@@ -39,52 +39,21 @@ LdapAuthModel::LdapAuthModel(WebPreferences* preferences,
 {
 }
 
-//void LdapAuthModel::reset()
-//{
-//  Wt::Auth::AuthModel::reset();
-//}
-//bool LdapAuthModel::isVisible(Wt::WFormModel::Field field) const
-//{
-//  return Wt::Auth::AuthModel::isVisible(field);
-//}
 
-bool LdapAuthModel::validateField(Wt::WFormModel::Field field)
+bool LdapAuthModel::validate()
 {
-  //return true;
-  return Wt::Auth::AuthModel::validateField(field);
+  if (valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8() != "admin")
+    return true;
+
+  return Wt::Auth::AuthModel::validate();
 }
-
-//bool LdapAuthModel::validate()
-//{
-//  //  if (validateField(Wt::Auth::FormBaseModel::LoginNameField)
-//  //      && validateField(Wt::Auth::AuthModel::PasswordField))
-//  return true;
-
-//  return false;
-//}
-
-//void LdapAuthModel::configureThrottling(Wt::WInteractWidget* button)
-//{
-//  Wt::Auth::AuthModel::configureThrottling(button);
-//}
-
-//void LdapAuthModel::updateThrottling(Wt::WInteractWidget* button)
-//{
-//  Wt::Auth::AuthModel::updateThrottling(button);
-//}
 
 bool LdapAuthModel::login(Wt::Auth::Login& login)
 {
-  if (! validate()) {
-    qDebug() << "Validation failed";
-    return false;
-  }
-
   std::string username = valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8();
   std::string password = valueText(Wt::Auth::AuthModel::PasswordField).toUTF8();
 
   if (username == "admin") {
-    qDebug() << "Login through built-in database";
     return Wt::Auth::AuthModel::login(login);
   }
 
@@ -92,7 +61,10 @@ bool LdapAuthModel::login(Wt::Auth::Login& login)
 
   qDebug() << "Login through LDAP"<< m_preferences->getLdapServerUri();
   LdapUsersT ldapUsers;
-  if (ldapHelper.listUsers("ou=people,dc=realopinsight,dc=com", "Robert Smith", "rJsmitH", ldapUsers) == 0) {
+  if (ldapHelper.listUsers( m_preferences->getLdapSearchBase().toStdString(),
+                           m_preferences->getLdapBindUserDn().toStdString(),
+                           m_preferences->getLdapBindUserPassword().toStdString(),
+                           ldapUsers) == 0) {
     qDebug() << "list users succeed: "<< ldapUsers.size();
   } else {
     qDebug() << "list users succeed: "<< ldapHelper.lastError();
