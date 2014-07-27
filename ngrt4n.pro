@@ -82,7 +82,6 @@ HEADERS += \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp
 
-
 SOURCES += \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
@@ -173,9 +172,7 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebPieChart.hpp \
     wt/src/WebMainUI.hpp \
     wt/dbo/DbSession.hpp \
-    wt/dbo/UserMngtUI.hpp \
     wt/dbo/DbObjects.hpp \
-    wt/dbo/ViewMgnt.hpp \
     wt/src/WebUtils.hpp \
     wt/src/AuthManager.hpp \
     wt/src/WebPreferences.hpp \
@@ -183,7 +180,10 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/extlibs/wtwithqt/WQApplication \
     wt/src/LdapAuthModel.hpp \
     wt/src/Validators.hpp \
-    wt/src/LdapHelper.hpp
+    wt/src/LdapHelper.hpp\
+    wt/dbo/ViewAclManagement.hpp \
+    wt/dbo/UserManagement.hpp
+
 
 
 SOURCES	+= wt/src/WebDashboard.cpp \
@@ -194,15 +194,15 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebPieChart.cpp \
     wt/src/WebMainUI.cpp \
     wt/dbo/DbSession.cpp \
-    wt/dbo/UserMngtUI.cpp\
-    wt/dbo/ViewMgnt.cpp \
     wt/src/WebUtils.cpp \
     wt/src/AuthManager.cpp \
     wt/src/WebPreferences.cpp \
     wt/extlibs/wtwithqt/DispatchThread.C \
     wt/extlibs/wtwithqt/WQApplication.C \
     wt/src/LdapAuthModel.cpp \
-    wt/src/LdapHelper.cpp
+    wt/src/LdapHelper.cpp \
+    wt/dbo/UserManagement.cpp \
+    wt/dbo/ViewAclManagement.cpp
 }
 
 

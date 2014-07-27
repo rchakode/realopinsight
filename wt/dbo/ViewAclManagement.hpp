@@ -37,11 +37,11 @@
 class RoiDboView;
 class DbSession;
 
-class ViewAssignmentUI: public Wt::WContainerWidget
+class ViewAclManagement: public Wt::WContainerWidget
 {
 public:
-  ViewAssignmentUI(DbSession* dbSession, Wt::WContainerWidget* parent=0);
-  virtual ~ViewAssignmentUI(void);
+  ViewAclManagement(DbSession* dbSession, Wt::WContainerWidget* parent=0);
+  virtual ~ViewAclManagement(void);
 
   void filter(const std::string& username);
   void resetModelData(void);
@@ -74,7 +74,7 @@ private:
   void addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName);
   void enableButtonIfApplicable(Wt::WStandardItemModel* model,
                                 Wt::WPushButton* button,
-                                void (ViewAssignmentUI::* targetSlot)(void));
+                                void (ViewAclManagement::* targetSlot)(void));
   void disableButtons(void);
   void setSelectedViews(Wt::WSelectionBox* list, Wt::WStandardItemModel* model);
 };

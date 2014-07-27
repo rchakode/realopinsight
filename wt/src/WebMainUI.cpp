@@ -25,7 +25,7 @@
 #include "WebPreferences.hpp"
 #include "AuthManager.hpp"
 #include "WebMainUI.hpp"
-#include "ViewMgnt.hpp"
+#include "ViewAclManagement.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include <Wt/WApplication>
@@ -491,7 +491,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     // Create view management form
     menuText = QObject::tr("All Views and Access Control").toStdString();
     contentTitle = QObject::tr("All Views and Access Control").toStdString();
-    m_viewAccessPermissionForm = new ViewAssignmentUI(m_dbSession);
+    m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
     m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
       DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
       if (tabItem != m_dashTabWidgets.end()) {
@@ -510,7 +510,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     settingPageTpl->bindWidget("menu-all-views", link);
 
     // User menus
-    m_userMgntUI = new UserMngtUI(m_dbSession);
+    m_userMgntUI = new UserList(m_dbSession);
     m_userMgntUI->updateCompleted().connect(std::bind([=](int retCode) {
       if (retCode != 0) {
         showMessage(m_dbSession->lastError(), "alert alert-warning");

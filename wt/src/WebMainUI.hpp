@@ -28,7 +28,7 @@
 
 #include "WebDashboard.hpp"
 #include "DbSession.hpp"
-#include "UserMngtUI.hpp"
+#include "UserManagement.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/WTabWidget>
@@ -36,7 +36,7 @@
 #include <Wt/WSignal>
 
 class AuthManager;
-class ViewAssignmentUI;
+class ViewAclManagement;
 class WebPreferences;
 
 class WebMainUI : public QObject, public Wt::WContainerWidget
@@ -88,10 +88,10 @@ private:
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
   DashboardListT m_dashboards;
-  UserMngtUI* m_userMgntUI;
+  UserList* m_userMgntUI;
   UserFormView* m_userAccountForm;
   UserFormView* m_changePasswordPanel;
-  ViewAssignmentUI* m_viewAccessPermissionForm;
+  ViewAclManagement* m_viewAccessPermissionForm;
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;
   Wt::WText* m_adminPanelTitle;

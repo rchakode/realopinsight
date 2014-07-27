@@ -23,7 +23,7 @@
  */
 
 #include "LdapAuthModel.hpp"
-#include "UserMngtUI.hpp"
+#include "UserManagement.hpp"
 #include "WebUtils.hpp"
 #include "Validators.hpp"
 #include "LdapHelper.hpp"

@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "UserMngtUI.hpp"
+#include "UserManagement.hpp"
 #include "DbSession.hpp"
 #include "WebUtils.hpp"
 #include <Wt/WMenu>
@@ -357,7 +357,7 @@ void UserFormView::createChangePasswordDialog(void)
   changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
 }
 
-UserMngtUI::UserMngtUI(DbSession* dbSession)
+UserList::UserList(DbSession* dbSession)
   : m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL, false, false)),
     m_userListContainer(new Wt::WContainerWidget()),
@@ -369,14 +369,14 @@ UserMngtUI::UserMngtUI(DbSession* dbSession)
   createUserList();
 }
 
-UserMngtUI::~UserMngtUI(void)
+UserList::~UserList(void)
 {
   delete m_userForm;
   delete m_userListContainer;
   delete m_contents;
 }
 
-void UserMngtUI::updateUserList(void)
+void UserList::updateUserList(void)
 {
   m_userListContainer->clear();
   m_dbSession->updateUserList();
@@ -385,7 +385,7 @@ void UserMngtUI::updateUserList(void)
   }
 }
 
-Wt::WPanel* UserMngtUI::createUserPanel(const RoiDboUser& user)
+Wt::WPanel* UserList::createUserPanel(const RoiDboUser& user)
 {
   bool changePassword(false);
   bool userForm(false);
@@ -422,7 +422,7 @@ Wt::WPanel* UserMngtUI::createUserPanel(const RoiDboUser& user)
 }
 
 
-void UserMngtUI::createUserList(void)
+void UserList::createUserList(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
   tpl->bindString("title", "User list");

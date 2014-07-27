@@ -128,15 +128,15 @@ private:
 };
 
 
-class UserMngtUI : public Wt::WScrollArea
+class UserList : public Wt::WScrollArea
 {
 public:
   enum {
     AddUserAction=0,
     ListUserAction=1
   };
-  UserMngtUI(DbSession* dbSession);
-  ~UserMngtUI(void);
+  UserList(DbSession* dbSession);
+  ~UserList(void);
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const RoiDboUser& user);
   UserFormView* userForm() {return m_userForm;}
