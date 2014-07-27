@@ -59,6 +59,8 @@ public:
   virtual void setEnabledInputs(bool enable);
   Wt::Signal<std::string>& errorOccurred() { return m_errorOccurred; }
   void hideUnrequiredFields(void);
+  void showAuthSettings(void);
+  void showMonitoringSettings(void);
   QString getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI);}
   QString getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN);}
   QString getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE);}
@@ -70,7 +72,7 @@ public:
 protected:
   virtual void applyChanges(void);
   void handleCancel(void) {return;}
-  virtual void fillFromSource(int _sidx);
+  virtual void fillFromSource(int _index);
   virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
   virtual void saveAsSource(const qint32& index, const QString& type);
@@ -103,7 +105,7 @@ private:
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPassword;
   std::unique_ptr<Wt::WLineEdit> m_ldapDNFormat;
   std::unique_ptr<Wt::WLineEdit> m_ldapSearchBase;
-  std::unique_ptr<Wt::WPushButton> m_importLdapAccountBtn;
+  std::unique_ptr<Wt::WPushButton> m_saveAuthSettingsBtn;
 
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);

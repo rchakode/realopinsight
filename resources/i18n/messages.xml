@@ -54,7 +54,8 @@
             <div class="accordion-body collapse in">
               <div class="accordion-inner">
                <ul class="nav">
-                <li><i class="fa fa-cog pull-left"></i> ${menu-monitoring-setting}</li>
+                <li><i class="fa fa-cog pull-left"></i> ${menu-monitoring-settings}</li>
+                <li><i class="fa fa-cog pull-left"></i> ${menu-auth-settings}</li>
                 <li><i class="fa fa-plus pull-left"></i> ${menu-my-account}</li>
                 <li><a href="#"><i class="fa fa-key fa-fw pull-left"></i> ${menu-change-password}</a></li>
               </ul>
@@ -370,12 +371,12 @@
 </div>
 </message>
 
-<message id="setting-page.tpl">c
+<message id="setting-page.tpl">
 <div class="form-horizontal">
   <!-- monitoring-settings-section -->
   <div id="monitoring-settings-section">
      <fieldset>
-       <h6>Generic Settings</h6>
+       <h6>General Settings</h6>
        <div class="control-group">
          <label class="control-label">Source&nbsp;</label>
          <span>${source-box}</span>
@@ -425,9 +426,8 @@
   <!-- Auth section -->
     <div id="auth-section">
     <fieldset>
-    <h6>Authentication</h6>
     <div class="control-group">
-      <label class="control-label">&nbsp;</label>
+      <label class="control-label">Authentication Mode&nbsp;</label>
       <span>${authentication-mode}</span>
     </div>
     <div id="ldap-auth-setting-section">

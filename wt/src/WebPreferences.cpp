@@ -153,17 +153,17 @@ WebPreferences::WebPreferences(void)
   m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
   m_addAsSourceBtn.reset(new Wt::WPushButton(QObject::tr("Add as source").toStdString(), this));
   m_deleteSourceBtn.reset(new Wt::WPushButton(QObject::tr("Delete source").toStdString(), this));
-  m_importLdapAccountBtn.reset(new Wt::WPushButton(QObject::tr("Import Accounts").toStdString(), this));
+  m_saveAuthSettingsBtn.reset(new Wt::WPushButton(QObject::tr("Save").toStdString(), this));
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
-  m_importLdapAccountBtn->setStyleClass("btn btn-info");
+  m_saveAuthSettingsBtn->setStyleClass("btn btn-info");
 
   m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
   m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-  //m_importLdapAccountBtn->clicked().connect(this, &WebPreferences::importLdapAccounts);
+  m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
 
   m_applyChangeBtn->setDisabled(true);
   m_addAsSourceBtn->setDisabled(true);
@@ -206,24 +206,25 @@ void WebPreferences::deleteSource(void)
 }
 
 
-void WebPreferences::fillFromSource(int _sidx)
+void WebPreferences::fillFromSource(int _index)
 {
-  SourceT src;
-  loadSource(_sidx, src);
+  if (_index >= 0 && _index < MAX_SRCS) {
+    SourceT src;
+    loadSource(_index, src);
 
-  m_monitorUrlField->setText(src.mon_url.toStdString());
-  m_livestatusHostField->setText(src.ls_addr.toStdString());
-  m_livestatusPortField->setText(QString::number(src.ls_port).toStdString());
-  m_authStringField->setText(src.auth.toStdString());
-  m_monitorTypeField->setCurrentIndex(src.mon_type+1);
-  m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
-  m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
-  m_updateIntervalField->setValue(updateInterval());
+    m_sourceBox->setValueText(ngrt4n::sourceId(_index).toStdString());
+    m_monitorUrlField->setText(src.mon_url.toStdString());
+    m_livestatusHostField->setText(src.ls_addr.toStdString());
+    m_livestatusPortField->setText(QString::number(src.ls_port).toStdString());
+    m_authStringField->setText(src.auth.toStdString());
+    m_monitorTypeField->setCurrentIndex(src.mon_type+1);
+    m_useNgrt4ndField->setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
+    m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
+    m_updateIntervalField->setValue(updateInterval());
 
-  loadAuthSettings();
-
-  // this triggers a signal
-  setCurrentSourceIndex(_sidx);
+    // this triggers a signal
+    setCurrentSourceIndex(_index);
+  }
 }
 
 
@@ -257,7 +258,6 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   // global settings
   setEntry(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
-  saveAuthSettings();
 
   // source-specific settings
   SourceT src;
@@ -273,7 +273,7 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   setSourceState(index, true);
   setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
 
-  // sync to commit changes
+  // save changes
   sync();
 
   // emit signal a finilize
@@ -401,7 +401,7 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
-  tpl->bindWidget("import-ldap-accounts-button", m_importLdapAccountBtn.get());
+  tpl->bindWidget("import-ldap-accounts-button", m_saveAuthSettingsBtn.get());
 
   tpl->bindWidget("authentication-mode", m_authenticationMode.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUri.get());
@@ -411,8 +411,13 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("ldap-user-search-base", m_ldapSearchBase.get());
 }
 
-void WebPreferences::hideUnrequiredFields(void)
+
+void WebPreferences::showAuthSettings(void)
 {
+  loadAuthSettings();
+
+  wApp->doJavaScript("$('#monitoring-settings-section').hide();");
+  wApp->doJavaScript("$('#auth-section').show();");
   switch (m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt()) {
     case LDAP:
       wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
@@ -422,6 +427,13 @@ void WebPreferences::hideUnrequiredFields(void)
       wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
       break;
   }
+}
+
+void WebPreferences::showMonitoringSettings(void)
+{
+  fillFromSource(firstSourceSet());
+  wApp->doJavaScript("$('#auth-section').hide();");
+  wApp->doJavaScript("$('#monitoring-settings-section').show();");
 }
 
 

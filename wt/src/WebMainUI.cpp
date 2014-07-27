@@ -547,16 +547,27 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     settingPageTpl->bindEmpty("menu-all-users");
   }
 
-  // setting menus
+  // monitoring settings menu
   m_mgntContents->addWidget(m_preferences);
   link = new Wt::WAnchor("#", "Monitoring Settings");
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
     m_mgntContents->setCurrentWidget(m_preferences);
-    m_preferences->hideUnrequiredFields();
+    m_preferences->showMonitoringSettings();
   }));
-  settingPageTpl->bindWidget("menu-monitoring-setting", link);
+  settingPageTpl->bindWidget("menu-monitoring-settings", link);
 
+  // auth settings menu
+  m_mgntContents->addWidget(m_preferences);
+  link = new Wt::WAnchor("#", "Authentication Settings");
+  link->clicked().connect(std::bind([=](){
+    m_adminPanelTitle->setText("Authentication Settings");
+    m_mgntContents->setCurrentWidget(m_preferences);
+    m_preferences->showAuthSettings();
+  }));
+  settingPageTpl->bindWidget("menu-auth-settings", link);
+
+  // my account menu
   m_mgntContents->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", "My Account");
   link->clicked().connect(std::bind([=](){
@@ -566,6 +577,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   }));
   settingPageTpl->bindWidget("menu-my-account", link);
 
+  // change password settings
   m_mgntContents->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password");
   link->clicked().connect(std::bind([=](){
