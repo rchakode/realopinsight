@@ -65,7 +65,7 @@ public Q_SLOTS:
   bool loadSource(const QString& _id, SourceT& _src) {return m_settings->loadSource(_id, _src);}
 
 protected :
-  virtual void fillFromSource(int _sidx) = 0;
+  virtual void fillFromSource(int _index) = 0;
   virtual void updateAllSourceWidgetStates(void) = 0;
   virtual void loadProperties(void);
   virtual void updateFields(void) = 0;
