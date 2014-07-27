@@ -559,7 +559,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // auth settings menu
   m_mgntContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", "Authentication Settings");
+  link = new Wt::WAnchor("#", "Auth Settings");
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Authentication Settings");
     m_mgntContents->setCurrentWidget(m_preferences);
