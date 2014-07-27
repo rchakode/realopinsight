@@ -160,7 +160,7 @@ int LdapHelper::listUsers(const std::string& baseDn,
   if (searchResult)
     ldap_msgfree(searchResult);
 
-  return 0;
+  return users.size();
 }
 
 

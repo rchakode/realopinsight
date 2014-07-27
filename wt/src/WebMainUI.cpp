@@ -462,89 +462,110 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   settingPageTpl->bindWidget("info-box", m_infoBox);
 
   Wt::WAnchor* link = NULL;
-  if (m_dbSession->loggedUser().role == RoiDboUser::AdmRole) {
-    // Start menu
-    std::string menuText = QObject::tr("Welcome").toStdString();
-    std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
-    link = new Wt::WAnchor("#", menuText, m_mainWidget);
-    Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
-    m_mgntContents->addWidget(getStartPage);
-    link->clicked().connect(std::bind([=](){
-      m_mgntContents->setCurrentWidget(getStartPage);
-      m_adminPanelTitle->setText(contentTitle);
-    }));
-    settingPageTpl->bindWidget("menu-get-started", link);
+  switch (m_dbSession->loggedUser().role) {
+    case RoiDboUser::AdmRole: {
+      m_preferences->setEnabledInputs(true);
+      // Start menu
+      std::string menuText = QObject::tr("Welcome").toStdString();
+      std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
+      link = new Wt::WAnchor("#", menuText, m_mainWidget);
+      Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
+      m_mgntContents->addWidget(getStartPage);
+      link->clicked().connect(std::bind([=](){
+        m_mgntContents->setCurrentWidget(getStartPage);
+        m_adminPanelTitle->setText(contentTitle);
+      }));
+      settingPageTpl->bindWidget("menu-get-started", link);
 
-    // menu view
-    menuText = QObject::tr("Import").toStdString();
-    link = new Wt::WAnchor("#", menuText, m_mainWidget);
-    link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
-    settingPageTpl->bindWidget("menu-import", link);
+      // menu view
+      menuText = QObject::tr("Import").toStdString();
+      link = new Wt::WAnchor("#", menuText, m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
+      settingPageTpl->bindWidget("menu-import", link);
 
-    // menu preview
+      // menu preview
 
-    menuText = QObject::tr("Preview").toStdString();
-    link = new Wt::WAnchor("#", menuText, m_mainWidget);
-    link->clicked().connect(this, &WebMainUI::selectFileToOpen);
-    settingPageTpl->bindWidget("menu-preview", link);
+      menuText = QObject::tr("Preview").toStdString();
+      link = new Wt::WAnchor("#", menuText, m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::selectFileToOpen);
+      settingPageTpl->bindWidget("menu-preview", link);
 
-    // Create view management form
-    menuText = QObject::tr("All Views and Access Control").toStdString();
-    contentTitle = QObject::tr("All Views and Access Control").toStdString();
-    m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
-    m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
-      DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
-      if (tabItem != m_dashTabWidgets.end()) {
-        m_dashtabs->removeTab(tabItem->second);
-        delete tabItem->second;
-        m_dashTabWidgets.erase(tabItem->first);
-      }
-    }, std::placeholders::_1));
-    m_mgntContents->addWidget(m_viewAccessPermissionForm);
-    link = new Wt::WAnchor("#", menuText);
-    link->clicked().connect(std::bind([=](){
-      m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
-      m_viewAccessPermissionForm->resetModelData();
-      m_adminPanelTitle->setText(contentTitle);
-    }));
-    settingPageTpl->bindWidget("menu-all-views", link);
+      // Create view management form
+      menuText = QObject::tr("All Views and Access Control").toStdString();
+      contentTitle = QObject::tr("All Views and Access Control").toStdString();
+      m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
+      m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
+        DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
+        if (tabItem != m_dashTabWidgets.end()) {
+          m_dashtabs->removeTab(tabItem->second);
+          delete tabItem->second;
+          m_dashTabWidgets.erase(tabItem->first);
+        }
+      }, std::placeholders::_1));
+      m_mgntContents->addWidget(m_viewAccessPermissionForm);
+      link = new Wt::WAnchor("#", menuText);
+      link->clicked().connect(std::bind([=](){
+        m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
+        m_viewAccessPermissionForm->resetModelData();
+        m_adminPanelTitle->setText(contentTitle);
+      }));
+      settingPageTpl->bindWidget("menu-all-views", link);
 
-    // User menus
-    m_userMgntUI = new UserList(m_dbSession);
-    m_userMgntUI->updateCompleted().connect(std::bind([=](int retCode) {
-      if (retCode != 0) {
-        showMessage(m_dbSession->lastError(), "alert alert-warning");
-      } else {
-        showMessage("Successul updated", "alert alert-success");
-        m_userMgntUI->resetUserForm();
-      }
-    }, std::placeholders::_1));
-    m_mgntContents->addWidget(m_userMgntUI->userForm());
-    link = new Wt::WAnchor("#", "New User");
-    link->clicked().connect(std::bind([=](){
-      m_userMgntUI->userForm()->reset();
-      m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
-      m_adminPanelTitle->setText("Create New User");
-    }));
-    settingPageTpl->bindWidget("menu-new-user", link);
+      // User menus
+      m_userMgntUI = new UserList(m_dbSession);
+      m_userMgntUI->updateCompleted().connect(std::bind([=](int retCode) {
+        if (retCode != 0) {
+          showMessage(m_dbSession->lastError(), "alert alert-warning");
+        } else {
+          showMessage("Successul updated", "alert alert-success");
+          m_userMgntUI->resetUserForm();
+        }
+      }, std::placeholders::_1));
+      m_mgntContents->addWidget(m_userMgntUI->userForm());
+      link = new Wt::WAnchor("#", "New User");
+      link->clicked().connect(std::bind([=](){
+        m_userMgntUI->userForm()->reset();
+        m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
+        m_adminPanelTitle->setText("Create New User");
+      }));
+      settingPageTpl->bindWidget("menu-new-user", link);
 
-    link = new Wt::WAnchor("#", "All Users");
-    m_mgntContents->addWidget(m_userMgntUI->userListWidget());
-    link->clicked().connect(std::bind([=]() {
-      m_mgntContents->setCurrentWidget(m_userMgntUI->userListWidget());
-      m_userMgntUI->updateUserList();
-      m_adminPanelTitle->setText("Manage Users");
-    }));
-    settingPageTpl->bindWidget("menu-all-users", link);
-    m_preferences->setEnabledInputs(true);
-  } else {
-    wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
-    settingPageTpl->bindEmpty("menu-get-started");
-    settingPageTpl->bindEmpty("menu-import");
-    settingPageTpl->bindEmpty("menu-preview");
-    settingPageTpl->bindEmpty("menu-all-views");
-    settingPageTpl->bindEmpty("menu-new-user");
-    settingPageTpl->bindEmpty("menu-all-users");
+      // built-in menu
+      link = new Wt::WAnchor("#", "Buil-in Users");
+      Wt::WWidget* widget = m_userMgntUI->builtinUserListWidget();
+      m_mgntContents->addWidget(widget);
+      link->clicked().connect(std::bind([=]() {
+        m_mgntContents->setCurrentWidget(widget);
+        m_userMgntUI->updateUserList();
+        m_adminPanelTitle->setText("Manage Users");
+      }));
+      settingPageTpl->bindWidget("menu-builin-users", link);
+
+      // ldap user menu
+      link = new Wt::WAnchor("#", "LDAP Users");
+      widget = m_userMgntUI->ldapUserListWidget();
+      m_mgntContents->addWidget(widget);
+      link->clicked().connect(std::bind([=]() {
+        m_mgntContents->setCurrentWidget(widget);
+        m_userMgntUI->updateUserList();
+        m_adminPanelTitle->setText("Manage LDAP Users");
+      }));
+      settingPageTpl->bindWidget("menu-ldap-users", link);
+    }
+      break;
+    case RoiDboUser::OpRole: {
+      wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
+      settingPageTpl->bindEmpty("menu-get-started");
+      settingPageTpl->bindEmpty("menu-import");
+      settingPageTpl->bindEmpty("menu-preview");
+      settingPageTpl->bindEmpty("menu-all-views");
+      settingPageTpl->bindEmpty("menu-new-user");
+      settingPageTpl->bindEmpty("menu-all-users");
+    }
+      break;
+
+    default:
+      break;
   }
 
   // monitoring settings menu

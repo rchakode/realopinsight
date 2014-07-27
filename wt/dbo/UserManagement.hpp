@@ -41,10 +41,18 @@
 #include <Wt/WRegExpValidator>
 #include <Wt/WSignal>
 #include <Wt/WScrollArea>
+#include <Wt/WAbstractTableModel>
+#include <Wt/WTableView>
+#include "LdapHelper.hpp"
 
 class DbSession;
 class UserFormModel;
 class UserFormView;
+class ConfirmPasswordValidator;
+class UserFormModel;
+class UserFormView;
+class UserList;
+class ScrollableUserTableodel;
 
 class ConfirmPasswordValidator : public Wt::WValidator
 {
@@ -140,20 +148,40 @@ public:
   void updateUserList(void);
   Wt::WPanel* createUserPanel(const RoiDboUser& user);
   UserFormView* userForm() {return m_userForm;}
-  Wt::WContainerWidget* userListContainer(void) {return m_userListContainer;}
+  Wt::WContainerWidget* userListContainer(void) {return m_builtinUserListContainer;}
   void createUserList(void);
-  Wt::WWidget* userListWidget(void) {return m_userListWidget;}
+  Wt::WWidget* builtinUserListWidget(void) {return m_builtinUserListWidget;}
+  Wt::WWidget* ldapUserListWidget(void) {return m_ldapUserTable;}
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}
   void resetUserForm(void) {m_userForm->reset();}
 
 private:
   DbSession* m_dbSession;
   UserFormView* m_userForm;
-  Wt::WContainerWidget* m_userListContainer;
+  Wt::WContainerWidget* m_builtinUserListContainer;
   Wt::WStackedWidget* m_contents;
-  Wt::WWidget* m_userListWidget;
+  Wt::WWidget* m_builtinUserListWidget;
   Wt::Signal<int> m_updateCompleted;
+
+  ScrollableUserTableodel* m_ldapUserTableModel;
+  Wt::WTableView* m_ldapUserTable;
 };
 
+class ScrollableUserTableodel : public Wt::WAbstractTableModel
+{
+public:
+  ScrollableUserTableodel(int rows, int columns, Wt::WObject *parent = 0);
+  virtual int rowCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
+  virtual int columnCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
+  virtual boost::any data(const Wt::WModelIndex& index, int role = Wt::DisplayRole) const;
+  virtual boost::any headerData(int section,
+        Wt::Orientation orientation = Wt::Horizontal,
+        int role = Wt::DisplayRole) const;
+
+private:
+  int m_rows;
+  int m_columns;
+  LdapUsersT m_users;
+};
 
 #endif // USERFORM_HPP

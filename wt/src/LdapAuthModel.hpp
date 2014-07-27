@@ -35,8 +35,7 @@
 class LdapAuthModel : public Wt::Auth::AuthModel
 {
 public:
-  LdapAuthModel(WebPreferences* preferences,
-                const Wt::Auth::AuthService& baseAuth,
+  LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
                 Wt::Auth::AbstractUserDatabase& users,
                 Wt::WObject* parent=0);
   virtual bool validate();
@@ -47,7 +46,6 @@ public:
 
 private:
   QString m_lastError;
-  WebPreferences* m_preferences;
 
 };
 

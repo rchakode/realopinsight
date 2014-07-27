@@ -25,6 +25,7 @@
 #include "UserManagement.hpp"
 #include "DbSession.hpp"
 #include "WebUtils.hpp"
+#include "WebPreferences.hpp"
 #include <Wt/WMenu>
 #include <Wt/WPanel>
 #include <Wt/WComboBox>
@@ -360,28 +361,37 @@ void UserFormView::createChangePasswordDialog(void)
 UserList::UserList(DbSession* dbSession)
   : m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL, false, false)),
-    m_userListContainer(new Wt::WContainerWidget()),
+    m_builtinUserListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
-    m_updateCompleted(this)
+    m_updateCompleted(this),
+    m_ldapUserTableModel(NULL),
+    m_ldapUserTable(NULL)
 {
   m_userForm->validated().connect(std::bind([=](RoiDboUser user) {
     m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
   createUserList();
+
+  WebPreferences appPreference;
+  if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
+    m_ldapUserTable = new Wt::WTableView(m_contents);
+    m_ldapUserTableModel = new ScrollableUserTableodel(1, 6, m_ldapUserTable);
+    m_ldapUserTable->setModel(m_ldapUserTableModel);
+  }
 }
 
 UserList::~UserList(void)
 {
   delete m_userForm;
-  delete m_userListContainer;
+  delete m_builtinUserListContainer;
   delete m_contents;
 }
 
 void UserList::updateUserList(void)
 {
-  m_userListContainer->clear();
+  m_builtinUserListContainer->clear();
   m_dbSession->updateUserList();
   for (auto user: m_dbSession->userList()) {
-    m_userListContainer->addWidget(createUserPanel(user));
+    m_builtinUserListContainer->addWidget(createUserPanel(user));
   }
 }
 
@@ -426,6 +436,76 @@ void UserList::createUserList(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
   tpl->bindString("title", "User list");
-  tpl->bindWidget("user-list", m_userListContainer);
-  m_userListWidget = tpl;
+  tpl->bindWidget("user-list", m_builtinUserListContainer);
+  m_builtinUserListWidget = tpl;
+}
+
+
+
+ScrollableUserTableodel::ScrollableUserTableodel(int rows, int columns, Wt::WObject *parent)
+  : Wt::WAbstractTableModel(parent),
+    m_rows(rows),
+    m_columns(columns)
+{
+  WebPreferences* appPreferences = new WebPreferences();
+  LdapHelper ldapHelper(appPreferences->getLdapServerUri(),
+                        appPreferences->getLdapSearchBase());
+
+  if (ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
+                           appPreferences->getLdapBindUserDn().toStdString(),
+                           appPreferences->getLdapBindUserPassword().toStdString(),
+                           m_users) > 0) {
+    m_rows = m_users.size();
+  } else {
+    qDebug()<< ldapHelper.lastError();
+  }
+}
+
+int ScrollableUserTableodel::rowCount(const Wt::WModelIndex& parent) const
+{
+  if (!parent.isValid())
+    return m_rows;
+  return 0;
+}
+
+int ScrollableUserTableodel::columnCount(const Wt::WModelIndex& parent) const
+{
+  if (! parent.isValid())
+    return m_columns;
+
+  return 0;
+}
+
+boost::any ScrollableUserTableodel::data(const Wt::WModelIndex& index, int role) const
+{
+  switch (role) {
+    case Wt::DisplayRole:
+      if (index.column() == 0)
+        return Wt::WString("Row {1}").arg(index.row());
+      else
+        return Wt::WString("Item row {1}, col {2}")
+            .arg(index.row()).arg(index.column());
+      break;
+    default:
+      return boost::any();
+      break;
+  }
+}
+
+boost::any ScrollableUserTableodel::headerData(int section,
+                                               Wt::Orientation orientation,
+                                               int role) const
+{
+  if (orientation == Wt::Horizontal) {
+    switch (role) {
+      case Wt::DisplayRole:
+        return Wt::WString("Column {1}").arg(section);
+        break;
+      default:
+        return boost::any();
+        break;
+    }
+  }
+
+  return boost::any();
 }

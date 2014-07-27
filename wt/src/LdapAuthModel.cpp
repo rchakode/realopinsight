@@ -30,12 +30,10 @@
 #include <QObject>
 #include <QDebug>
 
-LdapAuthModel::LdapAuthModel(WebPreferences* preferences,
-                             const Wt::Auth::AuthService& baseAuth,
+LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
                              Wt::Auth::AbstractUserDatabase& users,
                              Wt::WObject* parent)
-  : Wt::Auth::AuthModel(baseAuth, users, parent),
-    m_preferences(preferences)
+  : Wt::Auth::AuthModel(baseAuth, users, parent)
 {
 }
 
@@ -57,13 +55,14 @@ bool LdapAuthModel::login(Wt::Auth::Login& login)
     return Wt::Auth::AuthModel::login(login);
   }
 
-  LdapHelper ldapHelper(m_preferences->getLdapServerUri(), m_preferences->getLdapDnFormat(), m_preferences->getLdapVersion());
+  WebPreferences preferences;
+  LdapHelper ldapHelper(preferences.getLdapServerUri(), preferences.getLdapDnFormat(), preferences.getLdapVersion());
 
-  qDebug() << "Login through LDAP"<< m_preferences->getLdapServerUri();
+  qDebug() << "Login through LDAP"<< preferences.getLdapServerUri();
   LdapUsersT ldapUsers;
-  if (ldapHelper.listUsers( m_preferences->getLdapSearchBase().toStdString(),
-                           m_preferences->getLdapBindUserDn().toStdString(),
-                           m_preferences->getLdapBindUserPassword().toStdString(),
+  if (ldapHelper.listUsers( preferences.getLdapSearchBase().toStdString(),
+                           preferences.getLdapBindUserDn().toStdString(),
+                           preferences.getLdapBindUserPassword().toStdString(),
                            ldapUsers) == 0) {
     qDebug() << "list users succeed: "<< ldapUsers.size();
   } else {

@@ -88,7 +88,7 @@ ViewAclManagement::ViewAclManagement(DbSession* dbSession, Wt::WContainerWidget*
 
 ViewAclManagement::~ViewAclManagement(void)
 {
-  // deleted implicitly
+  //  deleted implicitly
   //  delete m_userListModel;
   //  delete m_assignedViewModel;
   //  delete m_nonAssignedViewModel;

@@ -38,7 +38,6 @@ class AuthManager : public Wt::Auth::AuthWidget
 {
 public:
   AuthManager(DbSession* dbSession);
-  virtual ~AuthManager(void);
   DbSession* session(void) {return m_dbSession;}
   void logout(void);
   bool isLogged(void);

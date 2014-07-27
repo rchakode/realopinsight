@@ -41,7 +41,8 @@
                 <div class="accordion-inner">
               <ul class="nav">
                <li><i class="fa fa-plus pull-left"></i> ${menu-new-user}</li>
-               <li><a href="#"><i class="fa fa-list pull-left"></i> ${menu-all-users}</a></li>
+               <li><a href="#"><i class="fa fa-list pull-left"></i> ${menu-builin-users}</a></li>
+               <li><a href="#"><i class="fa fa-list pull-left"></i> ${menu-ldap-users}</a></li>
               </ul>
               </div>
              </div>
@@ -444,7 +445,7 @@
         <span>${ldap-bind-user-password}</span>
       </div>
       <div class="control-group">
-        <label class="control-label">User DN Search&nbsp;</label>
+        <label class="control-label">User DN Search Format&nbsp;</label>
         <span>${ldap-dn-format}</span>
       </div>
       <div class="control-group">
