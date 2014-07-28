@@ -398,7 +398,6 @@
          <span>${monitor-url}</span>
          <span>${dont-verify-ssl-certificate}</span>
        </div>
-
        <div class="control-group">
          <label class="control-label">Auth String&nbsp;</label>
          <span>${monitor-auth-string}</span>
@@ -406,60 +405,57 @@
        </div>
      </fieldset>
 
-      <fieldset id="livetstatus-section">
-    <h6>Livestatus Socket</h6>
-    <div class="control-group">
-      <label class="control-label">Host&nbsp;</label>
-      <span>${livestatus-server}</span>
-      <span>Port</span>
-      <span>${livestatus-port}</span>
-      <span>${use-ngrt4nd}</span>
-    </div>
+    <fieldset id="livetstatus-section">
+      <h6>Livestatus Socket</h6>
+      <div class="control-group">
+        <label class="control-label">Host&nbsp;</label>
+        <span>${livestatus-server}</span>
+        <span>Port</span>
+        <span>${livestatus-port}</span>
+        <span>${use-ngrt4nd}</span>
+      </div>
     </fieldset>  <!-- id="livetstatus-section" -->
-
-       <div class="form-actions">
-      <span>${apply-change-button}</span>
-      <span>${add-as-source-button}</span>
-      <span>${delete-button}</span>
-    </div>
   </div>  <!-- id="monitoring-settings-section" -->
 
   <!-- Auth section -->
     <div id="auth-section">
-    <fieldset>
-    <div class="control-group">
-      <label class="control-label">Authentication Mode&nbsp;</label>
-      <span>${authentication-mode}</span>
-    </div>
-    <div id="ldap-auth-setting-section">
-      <div class="control-group">
-        <label class="control-label">Server URI&nbsp;</label>
-        <span>${ldap-server-uri}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Bind User DN&nbsp;</label>
-        <span>${ldap-bind-user-dn}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Bind User Password&nbsp;</label>
-        <span>${ldap-bind-user-password}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">User DN Search Format&nbsp;</label>
-        <span>${ldap-dn-format}</span>
-      </div>
-      <div class="control-group">
-        <label class="control-label">User Search Base&nbsp;</label>
-        <span>${ldap-user-search-base}</span>
-      </div>
-    </div> <!-- id="ldap-auth-setting-section" -->
-    </fieldset>
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label">Authentication Mode&nbsp;</label>
+          <span>${authentication-mode}</span>
+        </div>
+      </fieldset>
+      <fieldset id="ldap-auth-setting-section">
+        <div class="control-group">
+          <label class="control-label">Server URI&nbsp;</label>
+          <span>${ldap-server-uri}</span>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Bind User DN&nbsp;</label>
+          <span>${ldap-bind-user-dn}</span>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Bind User Password&nbsp;</label>
+          <span>${ldap-bind-user-password}</span>
+        </div>
+        <div class="control-group">
+          <label class="control-label">User Search Base&nbsp;</label>
+          <span>${ldap-user-search-base}</span>
+        </div>
+        <div class="control-group">
+          <label class="control-label">User DN Search Format&nbsp;</label>
+          <span>${ldap-dn-format}</span>
+        </div>
+      </fieldset> <!-- id="ldap-auth-setting-section" -->
+    </div> <!-- id="auth-section" -->
 
+    <!-- form buttons -->
     <div class="form-actions">
-      <span>${import-ldap-accounts-button}</span>
+      <span id="save-auth-setting-button">${save-auth-settings-button}</span>
+      <span id="apply-source-settings-button">${apply-change-button}</span>
+      <span id="add-as-source-settings-button">${add-as-source-button}</span>
+      <span id="delete-source-settings-button">${delete-button}</span>
     </div>
-  </div> <!-- id="auth-section" -->
-
 </div> <!-- class="form-hoizontal" -->
 </message>
 

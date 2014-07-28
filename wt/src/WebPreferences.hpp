@@ -99,12 +99,12 @@ private:
   std::unique_ptr<Wt::WPushButton> m_deleteSourceBtn;
 
   // auth settings properties
-  std::unique_ptr<Wt::WComboBox> m_authenticationMode;
-  std::unique_ptr<Wt::WLineEdit> m_ldapServerUri;
-  std::unique_ptr<Wt::WLineEdit> m_ldapBindUserDn;
-  std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPassword;
-  std::unique_ptr<Wt::WLineEdit> m_ldapDNFormat;
-  std::unique_ptr<Wt::WLineEdit> m_ldapSearchBase;
+  std::unique_ptr<Wt::WComboBox> m_authenticationModeField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapServerUriField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapBindUserDnField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPasswordField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapDNFormatField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapSearchBaseField;
   std::unique_ptr<Wt::WPushButton> m_saveAuthSettingsBtn;
 
   void promptUser(int inputType);
@@ -115,6 +115,10 @@ private:
   void bindFormWidget(void);
   void saveAuthSettings(void);
   void loadAuthSettings(void);
+  void showMonitoringSettingsWidgets(bool display);
+  void showAuthSettingsWidgets(bool display);
+  bool validateMonitoringSettingsFields(void);
+  bool validateAuthSettingsFields(void);
 };
 
 #endif // WEBSESSION_HPP
