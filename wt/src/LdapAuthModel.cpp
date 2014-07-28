@@ -59,7 +59,7 @@ bool LdapAuthModel::login(Wt::Auth::Login& login)
   LdapHelper ldapHelper(preferences.getLdapServerUri(), preferences.getLdapDnFormat(), preferences.getLdapVersion());
 
   qDebug() << "Login through LDAP"<< preferences.getLdapServerUri();
-  LdapUsersT ldapUsers;
+  UserInfoListT ldapUsers;
   if (ldapHelper.listUsers( preferences.getLdapSearchBase().toStdString(),
                            preferences.getLdapBindUserDn().toStdString(),
                            preferences.getLdapBindUserPassword().toStdString(),

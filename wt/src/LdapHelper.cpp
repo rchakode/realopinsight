@@ -110,7 +110,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
 int LdapHelper::listUsers(const std::string& baseDn,
                           const std::string& bindUserDn,
                           const std::string& bindPassword,
-                          LdapUsersT& users)
+                          UserInfoListT& users)
 {
   if (! m_handler) {
     m_lastError = QObject::tr("Unitialized handler");
@@ -148,13 +148,13 @@ int LdapHelper::listUsers(const std::string& baseDn,
        currentEntry != NULL;
        currentEntry = ldap_next_entry(m_handler, currentEntry)) {
 
-    LdapUserT user;
+    UserInfoT userInfo;
     StringMapT userAttrs;
-    user.username = getObjectDistingisghName(currentEntry);
+    userInfo.dn = getObjectDistingisghName(currentEntry);
     parseObjectAttr(currentEntry, userAttrs);
-    fillUserInfo(userAttrs, user);
+    fillUserInfo(userAttrs, userInfo);
 
-    users.push_back(user);
+    users.push_back(userInfo);
   }
 
   if (searchResult)
@@ -193,10 +193,11 @@ void LdapHelper::parseObjectAttr(LDAPMessage* objectData, StringMapT& attrs)
 }
 
 
-void LdapHelper::fillUserInfo(const StringMapT& attrs, LdapUserT& userInfo)
+void LdapHelper::fillUserInfo(const StringMapT& attrs, UserInfoT& userInfo)
 {
-  userInfo.password = attrs["userPassword"].toStdString();
-  userInfo.lastname = attrs["cn"].toStdString();
-  userInfo.firstname = attrs["sn"].toStdString();
+  userInfo.cn = attrs["cn"].toStdString();
+  userInfo.sn = attrs["sn"].toStdString();
+  userInfo.uid = attrs["uid"].toStdString();
   userInfo.email = attrs["email"].toStdString();
+  userInfo.password = attrs["userPassword"].toStdString();
 }

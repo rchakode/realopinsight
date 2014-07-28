@@ -179,9 +179,13 @@ public:
         int role = Wt::DisplayRole) const;
 
 private:
+  QString m_lastError;
   int m_rows;
   int m_columns;
-  LdapUsersT m_users;
+  UserInfoListT m_users;
+
+
+  int listLdapUser(void);
 };
 
 #endif // USERFORM_HPP

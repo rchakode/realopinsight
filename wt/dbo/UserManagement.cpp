@@ -374,7 +374,7 @@ UserList::UserList(DbSession* dbSession)
   WebPreferences appPreference;
   if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
     m_ldapUserTable = new Wt::WTableView(m_contents);
-    m_ldapUserTableModel = new ScrollableUserTableodel(1, 6, m_ldapUserTable);
+    m_ldapUserTableModel = new ScrollableUserTableodel(0, 4, m_ldapUserTable);
     m_ldapUserTable->setModel(m_ldapUserTableModel);
   }
 }
@@ -447,17 +447,11 @@ ScrollableUserTableodel::ScrollableUserTableodel(int rows, int columns, Wt::WObj
     m_rows(rows),
     m_columns(columns)
 {
-  WebPreferences* appPreferences = new WebPreferences();
-  LdapHelper ldapHelper(appPreferences->getLdapServerUri(),
-                        appPreferences->getLdapSearchBase());
-
-  if (ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
-                           appPreferences->getLdapBindUserDn().toStdString(),
-                           appPreferences->getLdapBindUserPassword().toStdString(),
-                           m_users) > 0) {
+  if (listLdapUser() > 0) {
     m_rows = m_users.size();
   } else {
-    qDebug()<< ldapHelper.lastError();
+    qDebug() << m_lastError;
+    m_rows = m_users.size();
   }
 }
 
@@ -480,11 +474,24 @@ boost::any ScrollableUserTableodel::data(const Wt::WModelIndex& index, int role)
 {
   switch (role) {
     case Wt::DisplayRole:
-      if (index.column() == 0)
-        return Wt::WString("Row {1}").arg(index.row());
-      else
-        return Wt::WString("Item row {1}, col {2}")
-            .arg(index.row()).arg(index.column());
+      switch (index.column()) {
+        case 0:
+          qDebug() << index.row();
+          return m_users[index.row()].ldapDn;
+          break;
+        case 1:
+          return m_users[index.row()].ldapCn;
+          break;
+        case 2:
+          return m_users[index.row()].email;
+          break;
+        case 3:
+          return Wt::WString("*");
+          break;
+        default:
+          return boost::any();
+          break;
+      }
       break;
     default:
       return boost::any();
@@ -499,7 +506,23 @@ boost::any ScrollableUserTableodel::headerData(int section,
   if (orientation == Wt::Horizontal) {
     switch (role) {
       case Wt::DisplayRole:
-        return Wt::WString("Column {1}").arg(section);
+        switch (section) {
+          case 0:
+            return Wt::WString("DN");
+            break;
+          case 1:
+            return Wt::WString("CN");
+            break;
+          case 2:
+            return Wt::WString("Email");
+            break;
+          case 3:
+            return Wt::WString("Import");
+            break;
+          default:
+            return boost::any();
+            break;
+        }
         break;
       default:
         return boost::any();
@@ -508,4 +531,20 @@ boost::any ScrollableUserTableodel::headerData(int section,
   }
 
   return boost::any();
+}
+
+
+
+int ScrollableUserTableodel::listLdapUser(void)
+{
+  WebPreferences* appPreferences = new WebPreferences();
+  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());
+  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
+                                   appPreferences->getLdapBindUserDn().toStdString(),
+                                   appPreferences->getLdapBindUserPassword().toStdString(),
+                                   m_users);
+  if (count < 0)
+    m_lastError = ldapHelper.lastError();
+
+  return count;
 }

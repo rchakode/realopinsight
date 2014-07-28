@@ -30,16 +30,18 @@
 #include <ldap.h>
 
 
-struct LdapUserT
+struct UserInfoT
 {
-  std::string username;
+  std::string dn;
+  std::string sn;
+  std::string cn;
+  std::string uid;
   std::string password;
-  std::string firstname;
-  std::string lastname;
+  std::string username;
   std::string email;
 };
 
-typedef QVector<LdapUserT> LdapUsersT;
+typedef QVector<UserInfoT> UserInfoListT;
 
 class LdapHelper
 {
@@ -51,7 +53,7 @@ public:
   int listUsers(const std::string& baseDn,
                 const std::string& bindUsername,
                 const std::string& bindPassword,
-                LdapUsersT& users);
+                UserInfoListT& users);
   QString lastError(void) const {return m_lastError;}
 
 private:
@@ -65,7 +67,7 @@ private:
   void cleanupHandler(void);
   std::string getObjectDistingisghName(LDAPMessage* objectData);
   void parseObjectAttr(LDAPMessage* objectData, StringMapT& attrs);
-  void fillUserInfo(const StringMapT& attrs, LdapUserT& userInfo);
+  void fillUserInfo(const StringMapT& attrs, UserInfoT& userInfo);
 };
 
 #endif // LDAPHELPER_HPP
