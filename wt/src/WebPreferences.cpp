@@ -143,6 +143,7 @@ WebPreferences::WebPreferences(void)
   m_ldapBindUserPassword->setText("mysecretpassword");
 
   m_ldapDNFormat.reset(new Wt::WLineEdit(this));
+  m_ldapDNFormat->setValidator(new DnFormatValidator());
   m_ldapDNFormat->setEmptyText(QString("cn=%1,dc=realopinsight,dc=com").arg(Settings::DN_FORMAT_USERNAME).toStdString());
 
   m_ldapSearchBase.reset(new Wt::WLineEdit(this));
@@ -473,5 +474,4 @@ void WebPreferences::loadAuthSettings(void)
   m_ldapBindUserDn->setText(m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString());
   m_ldapBindUserPassword->setText(m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD).toStdString());
   m_ldapDNFormat->setText(m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT).toStdString());
-  m_ldapDNFormat->setValidator(new DnFormatValidator());
 }
