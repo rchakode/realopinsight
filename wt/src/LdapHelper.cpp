@@ -98,7 +98,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
     resultStatus = true;
     m_lastError = QObject::tr("Authentication successful");
   } else {
-    m_lastError = QObject::tr("Authentication failed: %1").arg(ldap_err2string(rc));
+    m_lastError = QObject::tr("LDAP: %1").arg(ldap_err2string(rc));
   }
 
   return resultStatus;
@@ -113,7 +113,7 @@ int LdapHelper::listUsers(const std::string& baseDn,
                           UserInfoListT& users)
 {
   if (! m_handler) {
-    m_lastError = QObject::tr("Unitialized handler");
+    m_lastError = QObject::tr("LDAP: Unitialized handler");
     return -1;
   }
 
@@ -139,7 +139,7 @@ int LdapHelper::listUsers(const std::string& baseDn,
                               0,
                               &searchResult);
   if (ret != LDAP_SUCCESS) {
-    m_lastError = QObject::tr("ldap_search_ext_s failed: %1").arg(ldap_err2string(ret));
+    m_lastError = QObject::tr("LDAP: Search failed: %1").arg(ldap_err2string(ret));
     return -1;
   }
 

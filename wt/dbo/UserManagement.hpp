@@ -145,8 +145,6 @@ public:
   UserList(DbSession* dbSession);
   ~UserList(void);
 
-  Wt::Signal<std::string>& errorOccured(void) {return m_errorOccured;}
-
   void updateDbUsers(void);
   Wt::WPanel* createUserPanel(const RoiDboUser& user);
   UserFormView* userForm() {return m_userForm;}
@@ -157,11 +155,9 @@ public:
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}
   void resetUserForm(void) {m_userForm->reset();}
   int updateLdapUsers(void);
+  std::string lastError(void) const {return m_lastError.toStdString();}
 
 private:
-  /** Signals */
-  Wt::Signal<std::string> m_errorOccured;
-
   /** Private member **/
   QString m_lastError;
   DbSession* m_dbSession;
@@ -173,24 +169,24 @@ private:
 
   ScrollableUserTableModel* m_ldapUserTableModel;
   Wt::WTableView* m_ldapUserTable;
-  UserInfoListT m_ldapUsers;
 };
 
 class ScrollableUserTableModel : public Wt::WAbstractTableModel
 {
 public:
-  ScrollableUserTableModel(const UserInfoListT& users, int columns, Wt::WObject *parent = 0);
+  ScrollableUserTableModel(Wt::WObject *parent = 0);
   virtual int rowCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
   virtual int columnCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
   virtual boost::any data(const Wt::WModelIndex& index, int role = Wt::DisplayRole) const;
-  virtual boost::any headerData(int section,
-        Wt::Orientation orientation = Wt::Horizontal,
-        int role = Wt::DisplayRole) const;
+  virtual boost::any headerData(int section, Wt::Orientation orientation = Wt::Horizontal,int role = Wt::DisplayRole) const;
+  int updateLdapUsers(void);
+  QString lastError(void) const {return m_lastError;}
 
 private:
-  const UserInfoListT& m_users;
+  UserInfoListT m_users;
   int m_rows;
   int m_columns;
+  QString m_lastError;
 };
 
 #endif // USERFORM_HPP

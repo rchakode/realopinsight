@@ -523,10 +523,6 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
         }
       }, std::placeholders::_1));
 
-      m_userList->errorOccured().connect(std::bind([=](std::string errorMsg) {
-        showMessage(errorMsg, "alert alert-warning");
-      }, std::placeholders::_1));
-
       link = new Wt::WAnchor("#", "New User");
       settingPageTpl->bindWidget("menu-new-user", link);
       link->clicked().connect(std::bind([=](){
@@ -553,7 +549,9 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_mgntContentWidgets->addWidget(widget);
       link->clicked().connect(std::bind([=]() {
         m_mgntContentWidgets->setCurrentWidget(widget);
-        m_userList->updateDbUsers();
+        if (m_userList->updateLdapUsers() <= 0) {
+          showMessage(m_userList->lastError(), "alert alert-warning");
+        }
         m_adminPanelTitle->setText("Manage LDAP Users");
       }));
     }

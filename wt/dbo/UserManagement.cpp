@@ -359,8 +359,7 @@ void UserFormView::createChangePasswordDialog(void)
 }
 
 UserList::UserList(DbSession* dbSession)
-  : m_errorOccured(this),
-    m_dbSession(dbSession),
+  : m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL, false, false)),
     m_builtinUserListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
@@ -375,13 +374,7 @@ UserList::UserList(DbSession* dbSession)
   WebPreferences appPreference;
   if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
     m_ldapUserTable = new Wt::WTableView();
-
-    if (updateLdapUsers() < 0) {
-      //FIXME: do this elsewhere
-      m_errorOccured.emit(m_lastError.toStdString());
-    }
-
-    m_ldapUserTableModel = new ScrollableUserTableModel(m_ldapUsers, 4, m_ldapUserTable);
+    m_ldapUserTableModel = new ScrollableUserTableModel(m_ldapUserTable);
     m_ldapUserTable->setModel(m_ldapUserTableModel);
   }
 }
@@ -395,6 +388,14 @@ UserList::~UserList(void)
 
 }
 
+
+int UserList::updateLdapUsers(void)
+{
+  int ret = m_ldapUserTableModel->updateLdapUsers();
+  m_lastError = m_ldapUserTableModel->lastError();
+  return ret;
+}
+
 void UserList::updateDbUsers(void)
 {
   m_builtinUserListContainer->clear();
@@ -404,21 +405,6 @@ void UserList::updateDbUsers(void)
   }
 }
 
-
-int UserList::updateLdapUsers(void)
-{
-  m_ldapUsers.clear();
-  WebPreferences* appPreferences = new WebPreferences();
-  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());
-  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
-                                   appPreferences->getLdapBindUserDn().toStdString(),
-                                   appPreferences->getLdapBindUserPassword().toStdString(),
-                                   m_ldapUsers);
-  if (count < 0)
-    m_lastError = ldapHelper.lastError();
-
-  return count;
-}
 
 Wt::WPanel* UserList::createUserPanel(const RoiDboUser& user)
 {
@@ -467,12 +453,12 @@ void UserList::createUserList(void)
 
 
 
-ScrollableUserTableModel::ScrollableUserTableModel(const UserInfoListT& users, int columns, Wt::WObject *parent)
+ScrollableUserTableModel::ScrollableUserTableModel(Wt::WObject *parent)
   : Wt::WAbstractTableModel(parent),
-    m_users(users),
-    m_rows(users.size()),
-    m_columns(columns)
+    m_rows(0),
+    m_columns(4)
 {
+  updateLdapUsers();
 }
 
 int ScrollableUserTableModel::rowCount(const Wt::WModelIndex& parent) const
@@ -519,9 +505,7 @@ boost::any ScrollableUserTableModel::data(const Wt::WModelIndex& index, int role
   }
 }
 
-boost::any ScrollableUserTableModel::headerData(int section,
-                                                Wt::Orientation orientation,
-                                                int role) const
+boost::any ScrollableUserTableModel::headerData(int section, Wt::Orientation orientation,int role) const
 {
   if (orientation == Wt::Horizontal) {
     switch (role) {
@@ -537,7 +521,7 @@ boost::any ScrollableUserTableModel::headerData(int section,
             return Wt::WString("Email");
             break;
           case 3:
-            return Wt::WString("Import");
+            return Wt::WString("Enable");
             break;
           default:
             return boost::any();
@@ -553,3 +537,22 @@ boost::any ScrollableUserTableModel::headerData(int section,
   return boost::any();
 }
 
+
+int ScrollableUserTableModel::updateLdapUsers(void)
+{
+  m_users.clear();
+  WebPreferences* appPreferences = new WebPreferences();
+  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());
+  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
+                                   appPreferences->getLdapBindUserDn().toStdString(),
+                                   appPreferences->getLdapBindUserPassword().toStdString(),
+                                   m_users);
+  if (count <= 0) {
+    m_rows = 0;
+    m_lastError = ldapHelper.lastError();
+  } else {
+    m_rows = count;
+  }
+
+  return count;
+}
