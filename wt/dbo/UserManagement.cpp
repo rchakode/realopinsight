@@ -359,7 +359,8 @@ void UserFormView::createChangePasswordDialog(void)
 }
 
 UserList::UserList(DbSession* dbSession)
-  : m_dbSession(dbSession),
+  : m_errorOccured(this),
+    m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL, false, false)),
     m_builtinUserListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
@@ -373,8 +374,14 @@ UserList::UserList(DbSession* dbSession)
 
   WebPreferences appPreference;
   if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
-    m_ldapUserTable = new Wt::WTableView(m_contents);
-    m_ldapUserTableModel = new ScrollableUserTableModel(0, 4, m_ldapUserTable);
+    m_ldapUserTable = new Wt::WTableView();
+
+    if (updateLdapUsers() < 0) {
+      //FIXME: do this elsewhere
+      m_errorOccured.emit(m_lastError.toStdString());
+    }
+
+    m_ldapUserTableModel = new ScrollableUserTableModel(m_ldapUsers, 4, m_ldapUserTable);
     m_ldapUserTable->setModel(m_ldapUserTableModel);
   }
 }
@@ -383,16 +390,34 @@ UserList::~UserList(void)
 {
   delete m_userForm;
   delete m_builtinUserListContainer;
+  delete m_ldapUserTable;
   delete m_contents;
+
 }
 
-void UserList::updateUserList(void)
+void UserList::updateDbUsers(void)
 {
   m_builtinUserListContainer->clear();
   m_dbSession->updateUserList();
   for (auto user: m_dbSession->userList()) {
     m_builtinUserListContainer->addWidget(createUserPanel(user));
   }
+}
+
+
+int UserList::updateLdapUsers(void)
+{
+  m_ldapUsers.clear();
+  WebPreferences* appPreferences = new WebPreferences();
+  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());
+  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
+                                   appPreferences->getLdapBindUserDn().toStdString(),
+                                   appPreferences->getLdapBindUserPassword().toStdString(),
+                                   m_ldapUsers);
+  if (count < 0)
+    m_lastError = ldapHelper.lastError();
+
+  return count;
 }
 
 Wt::WPanel* UserList::createUserPanel(const RoiDboUser& user)
@@ -419,7 +444,7 @@ Wt::WPanel* UserList::createUserPanel(const RoiDboUser& user)
 
   form->deleteTriggered().connect(std::bind([=](std::string username) {
     m_updateCompleted.emit(m_dbSession->deleteUser(username));
-    updateUserList();
+    updateDbUsers();
   }, std::placeholders::_1));
 
   Wt::WPanel *panel(new Wt::WPanel());
@@ -442,17 +467,12 @@ void UserList::createUserList(void)
 
 
 
-ScrollableUserTableModel::ScrollableUserTableModel(int rows, int columns, Wt::WObject *parent)
+ScrollableUserTableModel::ScrollableUserTableModel(const UserInfoListT& users, int columns, Wt::WObject *parent)
   : Wt::WAbstractTableModel(parent),
-    m_rows(rows),
+    m_users(users),
+    m_rows(users.size()),
     m_columns(columns)
 {
-  if (listLdapUser() > 0) {
-    m_rows = m_users.size();
-  } else {
-    qDebug() << m_lastError;
-    m_rows = m_users.size();
-  }
 }
 
 int ScrollableUserTableModel::rowCount(const Wt::WModelIndex& parent) const
@@ -500,8 +520,8 @@ boost::any ScrollableUserTableModel::data(const Wt::WModelIndex& index, int role
 }
 
 boost::any ScrollableUserTableModel::headerData(int section,
-                                               Wt::Orientation orientation,
-                                               int role) const
+                                                Wt::Orientation orientation,
+                                                int role) const
 {
   if (orientation == Wt::Horizontal) {
     switch (role) {
@@ -533,18 +553,3 @@ boost::any ScrollableUserTableModel::headerData(int section,
   return boost::any();
 }
 
-
-
-int ScrollableUserTableModel::listLdapUser(void)
-{
-  WebPreferences* appPreferences = new WebPreferences();
-  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());
-  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
-                                   appPreferences->getLdapBindUserDn().toStdString(),
-                                   appPreferences->getLdapBindUserPassword().toStdString(),
-                                   m_users);
-  if (count < 0)
-    m_lastError = ldapHelper.lastError();
-
-  return count;
-}

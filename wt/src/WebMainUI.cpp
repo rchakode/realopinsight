@@ -53,6 +53,7 @@
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
+    m_terminateSession(this),
     m_rootDir("/opt/realopinsight"),
     m_confdir(m_rootDir.append("/data")),
     m_mainWidget(new Wt::WContainerWidget(this)),
@@ -64,8 +65,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
     m_currentDashboardPtr(NULL),
-    m_eventFeedLayout(NULL),
-    m_terminateSession(this)
+    m_eventFeedLayout(NULL)
 {
   m_preferences->setEnabledInputs(false);
   createMainUI();
@@ -454,11 +454,11 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_infoBox->hide();
   m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
 
-  m_mgntContents = new Wt::WStackedWidget(m_mainWidget);
+  m_mgntContentWidgets = new Wt::WStackedWidget(m_mainWidget);
 
   Wt::WTemplate* settingPageTpl = new Wt::WTemplate(Wt::WString::tr("admin-home.tpl"));
   settingPageTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText(m_mainWidget));
-  settingPageTpl->bindWidget("contents", m_mgntContents);
+  settingPageTpl->bindWidget("contents", m_mgntContentWidgets);
   settingPageTpl->bindWidget("info-box", m_infoBox);
 
   Wt::WAnchor* link = NULL;
@@ -470,9 +470,9 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
-      m_mgntContents->addWidget(getStartPage);
+      m_mgntContentWidgets->addWidget(getStartPage);
       link->clicked().connect(std::bind([=](){
-        m_mgntContents->setCurrentWidget(getStartPage);
+        m_mgntContentWidgets->setCurrentWidget(getStartPage);
         m_adminPanelTitle->setText(contentTitle);
       }));
       settingPageTpl->bindWidget("menu-get-started", link);
@@ -502,55 +502,60 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
           m_dashTabWidgets.erase(tabItem->first);
         }
       }, std::placeholders::_1));
-      m_mgntContents->addWidget(m_viewAccessPermissionForm);
+      m_mgntContentWidgets->addWidget(m_viewAccessPermissionForm);
       link = new Wt::WAnchor("#", menuText);
       link->clicked().connect(std::bind([=](){
-        m_mgntContents->setCurrentWidget(m_viewAccessPermissionForm);
+        m_mgntContentWidgets->setCurrentWidget(m_viewAccessPermissionForm);
         m_viewAccessPermissionForm->resetModelData();
         m_adminPanelTitle->setText(contentTitle);
       }));
       settingPageTpl->bindWidget("menu-all-views", link);
 
       // User menus
-      m_userMgntUI = new UserList(m_dbSession);
-      m_userMgntUI->updateCompleted().connect(std::bind([=](int retCode) {
+      m_userList = new UserList(m_dbSession);
+      m_mgntContentWidgets->addWidget(m_userList->userForm());
+      m_userList->updateCompleted().connect(std::bind([=](int retCode) {
         if (retCode != 0) {
           showMessage(m_dbSession->lastError(), "alert alert-warning");
         } else {
           showMessage("Successul updated", "alert alert-success");
-          m_userMgntUI->resetUserForm();
+          m_userList->resetUserForm();
         }
       }, std::placeholders::_1));
-      m_mgntContents->addWidget(m_userMgntUI->userForm());
+
+      m_userList->errorOccured().connect(std::bind([=](std::string errorMsg) {
+        showMessage(errorMsg, "alert alert-warning");
+      }, std::placeholders::_1));
+
       link = new Wt::WAnchor("#", "New User");
+      settingPageTpl->bindWidget("menu-new-user", link);
       link->clicked().connect(std::bind([=](){
-        m_userMgntUI->userForm()->reset();
-        m_mgntContents->setCurrentWidget(m_userMgntUI->userForm());
+        m_userList->userForm()->reset();
+        m_mgntContentWidgets->setCurrentWidget(m_userList->userForm());
         m_adminPanelTitle->setText("Create New User");
       }));
-      settingPageTpl->bindWidget("menu-new-user", link);
 
       // built-in menu
       link = new Wt::WAnchor("#", "Buil-in Users");
-      Wt::WWidget* widget = m_userMgntUI->builtinUserListWidget();
-      m_mgntContents->addWidget(widget);
+      settingPageTpl->bindWidget("menu-builin-users", link);
+      Wt::WWidget* widget = m_userList->dbUserListWidget();
+      m_mgntContentWidgets->addWidget(widget);
       link->clicked().connect(std::bind([=]() {
-        m_mgntContents->setCurrentWidget(widget);
-        m_userMgntUI->updateUserList();
+        m_mgntContentWidgets->setCurrentWidget(widget);
+        m_userList->updateDbUsers();
         m_adminPanelTitle->setText("Manage Users");
       }));
-      settingPageTpl->bindWidget("menu-builin-users", link);
 
       // ldap user menu
       link = new Wt::WAnchor("#", "LDAP Users");
-      widget = m_userMgntUI->ldapUserListWidget();
-      m_mgntContents->addWidget(widget);
+      settingPageTpl->bindWidget("menu-ldap-users", link);
+      widget = m_userList->ldapUserListWidget();
+      m_mgntContentWidgets->addWidget(widget);
       link->clicked().connect(std::bind([=]() {
-        m_mgntContents->setCurrentWidget(widget);
-        m_userMgntUI->updateUserList();
+        m_mgntContentWidgets->setCurrentWidget(widget);
+        m_userList->updateDbUsers();
         m_adminPanelTitle->setText("Manage LDAP Users");
       }));
-      settingPageTpl->bindWidget("menu-ldap-users", link);
     }
       break;
     case RoiDboUser::OpRole: {
@@ -563,50 +568,49 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       settingPageTpl->bindEmpty("menu-all-users");
     }
       break;
-
     default:
       break;
   }
 
   // monitoring settings menu
-  m_mgntContents->addWidget(m_preferences);
+  m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", "Monitoring Settings");
+  settingPageTpl->bindWidget("menu-monitoring-settings", link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
-    m_mgntContents->setCurrentWidget(m_preferences);
+    m_mgntContentWidgets->setCurrentWidget(m_preferences);
     m_preferences->showMonitoringSettings();
   }));
-  settingPageTpl->bindWidget("menu-monitoring-settings", link);
 
   // auth settings menu
-  m_mgntContents->addWidget(m_preferences);
+  m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", "Auth Settings");
+  settingPageTpl->bindWidget("menu-auth-settings", link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Authentication Settings");
-    m_mgntContents->setCurrentWidget(m_preferences);
+    m_mgntContentWidgets->setCurrentWidget(m_preferences);
     m_preferences->showAuthSettings();
   }));
-  settingPageTpl->bindWidget("menu-auth-settings", link);
 
   // my account menu
-  m_mgntContents->addWidget(m_userAccountForm);
+  m_mgntContentWidgets->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", "My Account");
+  settingPageTpl->bindWidget("menu-my-account", link);
   link->clicked().connect(std::bind([=](){
     m_userAccountForm->resetValidationState(false);
-    m_mgntContents->setCurrentWidget(m_userAccountForm);
+    m_mgntContentWidgets->setCurrentWidget(m_userAccountForm);
     m_adminPanelTitle->setText("My Account");
   }));
-  settingPageTpl->bindWidget("menu-my-account", link);
 
   // change password settings
-  m_mgntContents->addWidget(m_changePasswordPanel);
+  m_mgntContentWidgets->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password");
+  settingPageTpl->bindWidget("menu-change-password", link);
   link->clicked().connect(std::bind([=](){
-    m_mgntContents->setCurrentWidget(m_changePasswordPanel);
+    m_mgntContentWidgets->setCurrentWidget(m_changePasswordPanel);
     m_changePasswordPanel->reset();
     m_adminPanelTitle->setText("Change password");
   }));
-  settingPageTpl->bindWidget("menu-change-password", link);
 
   return settingPageTpl;
 }

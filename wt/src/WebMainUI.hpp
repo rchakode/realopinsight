@@ -64,12 +64,16 @@ public Q_SLOTS:
 
 private:
   enum FileDialogAction {
-    OPEN = 1,
-    IMPORT = 0
+    IMPORT = 0,
+    OPEN = 1
   };
   typedef std::map<QString, WebDashboard*> DashboardListT;
   typedef std::map<QString, Wt::WMenuItem*> DashTabWidgetsT;
 
+  /** Signals */
+  Wt::Signal<void> m_terminateSession;
+
+  /** Private members **/
   std::string m_rootDir;
   std::string m_confdir;
   Wt::WContainerWidget* m_mainWidget;
@@ -81,14 +85,14 @@ private:
   WebPreferences* m_preferences;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_contents;
-  Wt::WStackedWidget* m_mgntContents;
+  Wt::WStackedWidget* m_mgntContentWidgets;
   Wt::WNavigationBar* m_navbar;
   Wt::WTabWidget* m_dashtabs;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
   DashboardListT m_dashboards;
-  UserList* m_userMgntUI;
+  UserList* m_userList;
   UserFormView* m_userAccountForm;
   UserFormView* m_changePasswordPanel;
   ViewAclManagement* m_viewAccessPermissionForm;
@@ -99,9 +103,6 @@ private:
   WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
   DashTabWidgetsT m_dashTabWidgets;
-
-  /** Signals */
-  Wt::Signal<void> m_terminateSession;
 
   void addEvents(void);
   void createMainUI(void);

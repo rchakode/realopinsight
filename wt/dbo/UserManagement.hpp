@@ -112,7 +112,6 @@ public:
   Wt::Signal<void>& closeTriggered(void) {return m_close;}
   void reset(void);
   void setWritable(bool writtable);
-
   void resetValidationState(bool writtable);
 
 private:
@@ -145,17 +144,26 @@ public:
   };
   UserList(DbSession* dbSession);
   ~UserList(void);
-  void updateUserList(void);
+
+  Wt::Signal<std::string>& errorOccured(void) {return m_errorOccured;}
+
+  void updateDbUsers(void);
   Wt::WPanel* createUserPanel(const RoiDboUser& user);
   UserFormView* userForm() {return m_userForm;}
   Wt::WContainerWidget* userListContainer(void) {return m_builtinUserListContainer;}
   void createUserList(void);
-  Wt::WWidget* builtinUserListWidget(void) {return m_builtinUserListWidget;}
+  Wt::WWidget* dbUserListWidget(void) {return m_builtinUserListWidget;}
   Wt::WWidget* ldapUserListWidget(void) {return m_ldapUserTable;}
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}
   void resetUserForm(void) {m_userForm->reset();}
+  int updateLdapUsers(void);
 
 private:
+  /** Signals */
+  Wt::Signal<std::string> m_errorOccured;
+
+  /** Private member **/
+  QString m_lastError;
   DbSession* m_dbSession;
   UserFormView* m_userForm;
   Wt::WContainerWidget* m_builtinUserListContainer;
@@ -165,12 +173,13 @@ private:
 
   ScrollableUserTableModel* m_ldapUserTableModel;
   Wt::WTableView* m_ldapUserTable;
+  UserInfoListT m_ldapUsers;
 };
 
 class ScrollableUserTableModel : public Wt::WAbstractTableModel
 {
 public:
-  ScrollableUserTableModel(int rows, int columns, Wt::WObject *parent = 0);
+  ScrollableUserTableModel(const UserInfoListT& users, int columns, Wt::WObject *parent = 0);
   virtual int rowCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
   virtual int columnCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
   virtual boost::any data(const Wt::WModelIndex& index, int role = Wt::DisplayRole) const;
@@ -179,13 +188,9 @@ public:
         int role = Wt::DisplayRole) const;
 
 private:
-  QString m_lastError;
+  const UserInfoListT& m_users;
   int m_rows;
   int m_columns;
-  UserInfoListT m_users;
-
-
-  int listLdapUser(void);
 };
 
 #endif // USERFORM_HPP
