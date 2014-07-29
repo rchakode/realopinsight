@@ -92,7 +92,7 @@ void Settings::init(void)
 
 void Settings::setKeyValue(const QString & _key, const QString & _value)
 {
-  setValue(_key, _value) ;
+  setValue(_key, _value.trimmed()) ;
   sync() ;
 }
 
