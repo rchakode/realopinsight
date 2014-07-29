@@ -42,6 +42,21 @@ class WebPreferences;
 class WebMainUI : public QObject, public Wt::WContainerWidget
 {
   Q_OBJECT
+
+  enum MenuEntriesT {
+    MenuWelcome,
+    MenuImport,
+    MenuPreview,
+    MenuViewAndAcl,
+    MenuNewUser,
+    MenuBuiltInUsers,
+    MenuLdapUsers,
+    MenuMonitoringSettings,
+    MenuAuthSettings,
+    MenuMyAccount,
+    MenuChangePassword
+  };
+
 public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
@@ -50,7 +65,6 @@ public:
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void startTimer(void);
-  void handleInternalPath(void);
   Wt::WContainerWidget* get(void) {return m_mainWidget;}
   void handleRefresh(void);
   Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
@@ -74,6 +88,7 @@ private:
   Wt::Signal<void> m_terminateSession;
 
   /** Private members **/
+  QMap<int,Wt::WAnchor*> m_menuLinks;
   std::string m_rootDir;
   std::string m_confdir;
   Wt::WContainerWidget* m_mainWidget;
@@ -128,6 +143,14 @@ private:
   bool createDirectory(const std::string& path, bool cleanContent);
   void startDashbaordUpdate(void);
   void updateEventFeeds(void);
+
+
+  void handleInternalPath(void);
+  void handleAuthSystemChanged(int authSystem);
+  void handleLdapUsersMenu(void);
+  void handleBuiltInUsersMenu(void);
+  void handleNewUserMenu(void);
+  void handleViewAclMenu(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

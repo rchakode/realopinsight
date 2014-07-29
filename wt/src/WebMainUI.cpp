@@ -92,6 +92,7 @@ WebMainUI::~WebMainUI()
 void WebMainUI::addEvents(void)
 {
   m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this, std::placeholders::_1, "alert alert-warning"));
+  m_preferences->authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
@@ -469,19 +470,21 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       std::string menuText = QObject::tr("Welcome").toStdString();
       std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
+      settingPageTpl->bindWidget("menu-get-started", link);
       Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
       m_mgntContentWidgets->addWidget(getStartPage);
       link->clicked().connect(std::bind([=](){
         m_mgntContentWidgets->setCurrentWidget(getStartPage);
         m_adminPanelTitle->setText(contentTitle);
       }));
-      settingPageTpl->bindWidget("menu-get-started", link);
+      m_menuLinks.insert(MenuWelcome, link);
 
       // menu view
       menuText = QObject::tr("Import").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
       settingPageTpl->bindWidget("menu-import", link);
+      m_menuLinks.insert(MenuImport, link);
 
       // menu preview
 
@@ -489,10 +492,10 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       link->clicked().connect(this, &WebMainUI::selectFileToOpen);
       settingPageTpl->bindWidget("menu-preview", link);
+      m_menuLinks.insert(MenuPreview, link);
 
       // Create view management form
-      menuText = QObject::tr("All Views and Access Control").toStdString();
-      contentTitle = QObject::tr("All Views and Access Control").toStdString();
+      menuText = QObject::tr("Views and Access Control").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
       m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
         DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
@@ -503,13 +506,13 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
         }
       }, std::placeholders::_1));
       m_mgntContentWidgets->addWidget(m_viewAccessPermissionForm);
+
+
+      // link views and acl
       link = new Wt::WAnchor("#", menuText);
-      link->clicked().connect(std::bind([=](){
-        m_mgntContentWidgets->setCurrentWidget(m_viewAccessPermissionForm);
-        m_viewAccessPermissionForm->resetModelData();
-        m_adminPanelTitle->setText(contentTitle);
-      }));
+      link->clicked().connect(this, &WebMainUI::handleViewAclMenu);
       settingPageTpl->bindWidget("menu-all-views", link);
+      m_menuLinks.insert(MenuViewAndAcl, link);
 
       // User menus
       m_userList = new UserList(m_dbSession);
@@ -523,37 +526,27 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
         }
       }, std::placeholders::_1));
 
+      // link new user
       link = new Wt::WAnchor("#", "New User");
+      link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
       settingPageTpl->bindWidget("menu-new-user", link);
-      link->clicked().connect(std::bind([=](){
-        m_userList->userForm()->reset();
-        m_mgntContentWidgets->setCurrentWidget(m_userList->userForm());
-        m_adminPanelTitle->setText("Create New User");
-      }));
+      m_menuLinks.insert(MenuNewUser, link);
 
       // built-in menu
+      m_mgntContentWidgets->addWidget(m_userList->dbUserListWidget());
       link = new Wt::WAnchor("#", "Buil-in Users");
+      link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
       settingPageTpl->bindWidget("menu-builin-users", link);
-      Wt::WWidget* widget = m_userList->dbUserListWidget();
-      m_mgntContentWidgets->addWidget(widget);
-      link->clicked().connect(std::bind([=]() {
-        m_mgntContentWidgets->setCurrentWidget(widget);
-        m_userList->updateDbUsers();
-        m_adminPanelTitle->setText("Manage Users");
-      }));
+      m_menuLinks.insert(MenuBuiltInUsers, link);
+
 
       // ldap user menu
+      m_mgntContentWidgets->addWidget(m_userList->ldapUserListWidget());
       link = new Wt::WAnchor("#", "LDAP Users");
+      link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
       settingPageTpl->bindWidget("menu-ldap-users", link);
-      widget = m_userList->ldapUserListWidget();
-      m_mgntContentWidgets->addWidget(widget);
-      link->clicked().connect(std::bind([=]() {
-        m_mgntContentWidgets->setCurrentWidget(widget);
-        if (m_userList->updateLdapUsers() <= 0) {
-          showMessage(m_userList->lastError(), "alert alert-warning");
-        }
-        m_adminPanelTitle->setText("Manage LDAP Users");
-      }));
+      m_menuLinks.insert(MenuLdapUsers, link);
+
     }
       break;
     case RoiDboUser::OpRole: {
@@ -574,6 +567,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", "Monitoring Settings");
   settingPageTpl->bindWidget("menu-monitoring-settings", link);
+  m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Monitoring Settings");
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
@@ -584,6 +578,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", "Auth Settings");
   settingPageTpl->bindWidget("menu-auth-settings", link);
+  m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText("Authentication Settings");
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
@@ -594,6 +589,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_mgntContentWidgets->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", "My Account");
   settingPageTpl->bindWidget("menu-my-account", link);
+  m_menuLinks.insert(MenuMyAccount, link);
   link->clicked().connect(std::bind([=](){
     m_userAccountForm->resetValidationState(false);
     m_mgntContentWidgets->setCurrentWidget(m_userAccountForm);
@@ -604,6 +600,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   m_mgntContentWidgets->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password");
   settingPageTpl->bindWidget("menu-change-password", link);
+  m_menuLinks.insert(MenuChangePassword, link);
   link->clicked().connect(std::bind([=](){
     m_mgntContentWidgets->setCurrentWidget(m_changePasswordPanel);
     m_changePasswordPanel->reset();
@@ -648,26 +645,6 @@ void WebMainUI::createPasswordPanel(void)
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
-
-void WebMainUI::handleInternalPath(void)
-{
-  std::string path = Wt::WApplication::instance()->internalPath();
-  if (path == ngrt4n::LINK_LOAD) {
-    selectFileToOpen();
-    setInternalPath("");
-  } else if (path == ngrt4n::LINK_IMPORT) {
-    openFileUploadDialog();
-    setInternalPath("");
-  } else if (path == ngrt4n::LINK_ADMIN_HOME) {
-    showUserHome();
-  } else if (path == ngrt4n::LINK_LOGIN) {
-    wApp->redirect(ngrt4n::LINK_LOGIN);
-  } else {
-    showMessage(tr("Sorry, the request resource "
-                   "is not available or has been removed").toStdString(),
-                "alert alert-warning");
-  }
-}
 
 
 Wt::WComboBox* WebMainUI::createViewSelector(void)
@@ -832,4 +809,72 @@ void WebMainUI::startDashbaordUpdate(void)
 void WebMainUI::updateEventFeeds(void)
 {
   //FIXME: m_eventFeedLayout->addWidget(createEventFeedItem());
+}
+
+
+void WebMainUI::handleInternalPath(void)
+{
+  std::string path = Wt::WApplication::instance()->internalPath();
+  if (path == ngrt4n::LINK_LOAD) {
+    selectFileToOpen();
+    setInternalPath("");
+  } else if (path == ngrt4n::LINK_IMPORT) {
+    openFileUploadDialog();
+    setInternalPath("");
+  } else if (path == ngrt4n::LINK_ADMIN_HOME) {
+    showUserHome();
+  } else if (path == ngrt4n::LINK_LOGIN) {
+    wApp->redirect(ngrt4n::LINK_LOGIN);
+  } else {
+    showMessage(tr("Sorry, the request resource "
+                   "is not available or has been removed").toStdString(),
+                "alert alert-warning");
+  }
+}
+
+
+void WebMainUI::handleAuthSystemChanged(int authSystem)
+{
+  switch (authSystem) {
+    case WebPreferences::LDAP:
+      m_menuLinks[MenuLdapUsers]->setDisabled(false);
+      wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', false);");
+      break;
+    default:
+      wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', true);");
+      break;
+  }
+}
+
+void WebMainUI::handleLdapUsersMenu(void)
+{
+  m_mgntContentWidgets->setCurrentWidget(m_userList->ldapUserListWidget());
+  if (m_userList->updateLdapUsers() <= 0) {
+    showMessage(m_userList->lastError(), "alert alert-warning");
+  }
+  m_adminPanelTitle->setText(QObject::tr("Manage LDAP Users").toStdString());
+}
+
+
+void WebMainUI::handleBuiltInUsersMenu(void)
+{
+  m_mgntContentWidgets->setCurrentWidget(m_userList->dbUserListWidget());
+  m_userList->updateDbUsers();
+  m_adminPanelTitle->setText(QObject::tr("Manage Users").toStdString());
+}
+
+
+void WebMainUI::handleNewUserMenu(void)
+{
+  m_userList->userForm()->reset();
+  m_mgntContentWidgets->setCurrentWidget(m_userList->userForm());
+  m_adminPanelTitle->setText(QObject::tr("Create New User").toStdString());
+}
+
+
+void  WebMainUI::handleViewAclMenu(void)
+{
+  m_mgntContentWidgets->setCurrentWidget(m_viewAccessPermissionForm);
+  m_viewAccessPermissionForm->resetModelData();
+  m_adminPanelTitle->setText(QObject::tr("Manage Views and Access Control").toStdString());
 }

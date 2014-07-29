@@ -47,8 +47,8 @@
   }
 WebPreferences::WebPreferences(void)
   : Preferences("/opt/realopinsight/etc/realopinsight.conf"),
-    m_errorOccurred(this)
-
+    m_errorOccurred(this),
+    m_authSystemChanged(this)
 {
   this->setMargin(0, Wt::All);
 
@@ -460,6 +460,7 @@ void WebPreferences::saveAuthSettings(void)
     setEntry(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField->text().toUTF8().c_str());
     setEntry(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField->text().toUTF8().c_str());
     setEntry(Settings::AUTH_LDAP_DN_FORMAT, m_ldapDNFormatField->text().toUTF8().c_str());
+    m_authSystemChanged.emit(getAuthenticationMode());
   }
 }
 

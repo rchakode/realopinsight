@@ -39,6 +39,9 @@
 #include <QObject>
 
 
+namespace {
+  const int MAX_USER_TABLE_COLUMN = 4;
+}
 ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model,
                                                    Wt::WFormModel::Field passField)
   : Wt::WValidator(),
@@ -371,12 +374,21 @@ UserList::UserList(DbSession* dbSession)
     m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
   createUserList();
 
-  WebPreferences appPreference;
-  if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
-    m_ldapUserTable = new Wt::WTableView();
-    m_ldapUserTableModel = new ScrollableUserTableModel(m_ldapUserTable);
-    m_ldapUserTable->setModel(m_ldapUserTableModel);
-  }
+  //  WebPreferences appPreference;
+  //  if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
+  m_ldapUserTable = new Wt::WTableView();
+  m_ldapUserTableModel = new ScrollableUserTableModel(m_ldapUserTable);
+  m_ldapUserTable->setModel(m_ldapUserTableModel);
+
+  m_ldapUserTable->setColumnResizeEnabled(false);
+  m_ldapUserTable->setColumnAlignment(0, Wt::AlignCenter);
+  m_ldapUserTable->setHeaderAlignment(0, Wt::AlignCenter);
+  m_ldapUserTable->setAlternatingRowColors(true);
+  m_ldapUserTable->setRowHeight(28);
+  m_ldapUserTable->setHeaderHeight(28);
+  m_ldapUserTable->setSelectionMode(Wt::SingleSelection);
+  m_ldapUserTable->setEditTriggers(Wt::WAbstractItemView::NoEditTrigger);
+  //  }
 }
 
 UserList::~UserList(void)
@@ -385,7 +397,6 @@ UserList::~UserList(void)
   delete m_builtinUserListContainer;
   delete m_ldapUserTable;
   delete m_contents;
-
 }
 
 
@@ -456,15 +467,16 @@ void UserList::createUserList(void)
 ScrollableUserTableModel::ScrollableUserTableModel(Wt::WObject *parent)
   : Wt::WAbstractTableModel(parent),
     m_rows(0),
-    m_columns(4)
+    m_columns(MAX_USER_TABLE_COLUMN)
 {
   updateLdapUsers();
 }
 
 int ScrollableUserTableModel::rowCount(const Wt::WModelIndex& parent) const
 {
-  if (!parent.isValid())
+  if (! parent.isValid())
     return m_rows;
+
   return 0;
 }
 
@@ -481,18 +493,28 @@ boost::any ScrollableUserTableModel::data(const Wt::WModelIndex& index, int role
   switch (role) {
     case Wt::DisplayRole:
       switch (index.column()) {
-        case 0:
-          qDebug() << index.row();
+        case MAX_USER_TABLE_COLUMN-4:
           return m_users[index.row()].dn;
           break;
-        case 1:
+        case MAX_USER_TABLE_COLUMN-3:
           return m_users[index.row()].cn;
           break;
-        case 2:
+        case MAX_USER_TABLE_COLUMN-2:
           return m_users[index.row()].email;
           break;
-        case 3:
+        case MAX_USER_TABLE_COLUMN-1:
           return Wt::WString("*");
+          break;
+        default:
+          return boost::any();
+          break;
+      }
+      break;
+
+    case Wt::DecorationRole:
+      switch (index.column()) {
+        case MAX_USER_TABLE_COLUMN-1:
+          return std::string("icons/git-blob.png");
           break;
         default:
           return boost::any();
@@ -511,16 +533,16 @@ boost::any ScrollableUserTableModel::headerData(int section, Wt::Orientation ori
     switch (role) {
       case Wt::DisplayRole:
         switch (section) {
-          case 0:
+          case MAX_USER_TABLE_COLUMN-4:
             return Wt::WString("DN");
             break;
-          case 1:
+          case MAX_USER_TABLE_COLUMN-3:
             return Wt::WString("CN");
             break;
-          case 2:
+          case MAX_USER_TABLE_COLUMN-2:
             return Wt::WString("Email");
             break;
-          case 3:
+          case MAX_USER_TABLE_COLUMN-1:
             return Wt::WString("Enable");
             break;
           default:

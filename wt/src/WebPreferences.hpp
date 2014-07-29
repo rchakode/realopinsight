@@ -56,8 +56,11 @@ public:
 
   WebPreferences(void);
   virtual ~WebPreferences();
-  virtual void setEnabledInputs(bool enable);
+
   Wt::Signal<std::string>& errorOccurred() { return m_errorOccurred; }
+  Wt::Signal<int>& authSystemChanged() { return m_authSystemChanged; }
+
+  virtual void setEnabledInputs(bool enable);
   void hideUnrequiredFields(void);
   void showAuthSettings(void);
   void showMonitoringSettings(void);
@@ -81,6 +84,7 @@ protected:
 
 private:
   Wt::Signal<std::string> m_errorOccurred;
+  Wt::Signal<int> m_authSystemChanged;
 
   // monitoring settings properties
   std::unique_ptr<Wt::WComboBox> m_sourceBox;
