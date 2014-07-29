@@ -374,7 +374,7 @@ UserList::UserList(DbSession* dbSession)
   WebPreferences appPreference;
   if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
     m_ldapUserTable = new Wt::WTableView(m_contents);
-    m_ldapUserTableModel = new ScrollableUserTableodel(0, 4, m_ldapUserTable);
+    m_ldapUserTableModel = new ScrollableUserTableModel(0, 4, m_ldapUserTable);
     m_ldapUserTable->setModel(m_ldapUserTableModel);
   }
 }
@@ -442,7 +442,7 @@ void UserList::createUserList(void)
 
 
 
-ScrollableUserTableodel::ScrollableUserTableodel(int rows, int columns, Wt::WObject *parent)
+ScrollableUserTableModel::ScrollableUserTableModel(int rows, int columns, Wt::WObject *parent)
   : Wt::WAbstractTableModel(parent),
     m_rows(rows),
     m_columns(columns)
@@ -455,14 +455,14 @@ ScrollableUserTableodel::ScrollableUserTableodel(int rows, int columns, Wt::WObj
   }
 }
 
-int ScrollableUserTableodel::rowCount(const Wt::WModelIndex& parent) const
+int ScrollableUserTableModel::rowCount(const Wt::WModelIndex& parent) const
 {
   if (!parent.isValid())
     return m_rows;
   return 0;
 }
 
-int ScrollableUserTableodel::columnCount(const Wt::WModelIndex& parent) const
+int ScrollableUserTableModel::columnCount(const Wt::WModelIndex& parent) const
 {
   if (! parent.isValid())
     return m_columns;
@@ -470,17 +470,17 @@ int ScrollableUserTableodel::columnCount(const Wt::WModelIndex& parent) const
   return 0;
 }
 
-boost::any ScrollableUserTableodel::data(const Wt::WModelIndex& index, int role) const
+boost::any ScrollableUserTableModel::data(const Wt::WModelIndex& index, int role) const
 {
   switch (role) {
     case Wt::DisplayRole:
       switch (index.column()) {
         case 0:
           qDebug() << index.row();
-          return m_users[index.row()].ldapDn;
+          return m_users[index.row()].dn;
           break;
         case 1:
-          return m_users[index.row()].ldapCn;
+          return m_users[index.row()].cn;
           break;
         case 2:
           return m_users[index.row()].email;
@@ -499,7 +499,7 @@ boost::any ScrollableUserTableodel::data(const Wt::WModelIndex& index, int role)
   }
 }
 
-boost::any ScrollableUserTableodel::headerData(int section,
+boost::any ScrollableUserTableModel::headerData(int section,
                                                Wt::Orientation orientation,
                                                int role) const
 {
@@ -535,7 +535,7 @@ boost::any ScrollableUserTableodel::headerData(int section,
 
 
 
-int ScrollableUserTableodel::listLdapUser(void)
+int ScrollableUserTableModel::listLdapUser(void)
 {
   WebPreferences* appPreferences = new WebPreferences();
   LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());

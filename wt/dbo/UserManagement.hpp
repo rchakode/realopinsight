@@ -52,7 +52,7 @@ class ConfirmPasswordValidator;
 class UserFormModel;
 class UserFormView;
 class UserList;
-class ScrollableUserTableodel;
+class ScrollableUserTableModel;
 
 class ConfirmPasswordValidator : public Wt::WValidator
 {
@@ -163,14 +163,14 @@ private:
   Wt::WWidget* m_builtinUserListWidget;
   Wt::Signal<int> m_updateCompleted;
 
-  ScrollableUserTableodel* m_ldapUserTableModel;
+  ScrollableUserTableModel* m_ldapUserTableModel;
   Wt::WTableView* m_ldapUserTable;
 };
 
-class ScrollableUserTableodel : public Wt::WAbstractTableModel
+class ScrollableUserTableModel : public Wt::WAbstractTableModel
 {
 public:
-  ScrollableUserTableodel(int rows, int columns, Wt::WObject *parent = 0);
+  ScrollableUserTableModel(int rows, int columns, Wt::WObject *parent = 0);
   virtual int rowCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
   virtual int columnCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
   virtual boost::any data(const Wt::WModelIndex& index, int role = Wt::DisplayRole) const;
