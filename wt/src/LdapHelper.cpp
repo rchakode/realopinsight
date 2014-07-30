@@ -154,7 +154,7 @@ int LdapHelper::listUsers(const std::string& baseDn,
     parseObjectAttr(currentEntry, userAttrs);
     fillUserInfo(userAttrs, userInfo);
 
-    users.push_back(userInfo);
+    users.insert(userInfo.dn, userInfo);
   }
 
   if (searchResult)

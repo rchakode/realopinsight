@@ -163,6 +163,21 @@ int DbSession::deleteUser(std::string uname)
   return retCode;
 }
 
+
+bool DbSession::findUser(const std::string& username, DbUserT& user)
+{
+  DbUsersT::const_iterator it = std::find_if(m_userList.cbegin(),
+                                             m_userList.cend(),
+                                             [&username](const DbUserT& u){return u.username == username;});
+  bool found = false;
+  if (it != m_userList.end()) {
+    found = true;
+    user = *it;
+  }
+  return found;
+}
+
+
 std::string DbSession::hashPassword(const std::string& pass)
 {
   Wt::Auth::BCryptHashFunction h;
@@ -256,9 +271,9 @@ void DbSession::updateViewList(const std::string& uname)
 
 bool DbSession::findView(const std::string& vname, DbViewT& view)
 {
-  DbViewsT::const_iterator it = std::find_if(m_viewList.begin(),
-                                              m_viewList.end(),
-                                              [&vname](DbViewT v){return v.name == vname;});
+  DbViewsT::const_iterator it = std::find_if(m_viewList.cbegin(),
+                                             m_viewList.cend(),
+                                             [&vname](const DbViewT& v){return v.name == vname;});
   bool found = false;
   if (it != m_viewList.end()) {
     found = true;

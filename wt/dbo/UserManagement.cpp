@@ -430,10 +430,10 @@ Wt::WPanel* DbUserManager::createUserPanel(const DbUserT& user)
  * @brief LdapUserTable::LdapUserTable
  * @param parent
  */
-LdapUserManager::LdapUserManager(Wt::WContainerWidget* parent)
+LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
     m_model(new Wt::WStandardItemModel(0, 5, this)),
-    m_rows(0)
+    m_dbSession(dbSession)
 {
   setSortingEnabled(true);
   setLayoutSizeAware(true);
@@ -448,6 +448,7 @@ LdapUserManager::LdapUserManager(Wt::WContainerWidget* parent)
   m_model->setHeaderData(2, Wt::Horizontal, Q_TR("SN"), Wt::DisplayRole);
   m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Email"), Wt::DisplayRole);
   m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Enable Auth"), Wt::DisplayRole);
+  m_model->itemChanged().connect(this, &LdapUserManager::handleImportatonAction);
   setModel(m_model);
 }
 
@@ -455,7 +456,7 @@ LdapUserManager::LdapUserManager(Wt::WContainerWidget* parent)
  * @brief LdapUserTable::updateLdapUsers
  * @return
  */
-int LdapUserManager::updateUsers(void)
+int LdapUserManager::updateUserList(void)
 {
   m_users.clear();
   WebPreferences* appPreferences = new WebPreferences();
@@ -468,8 +469,10 @@ int LdapUserManager::updateUsers(void)
     m_lastError = ldapHelper.lastError();
   } else {
     m_model->clear();
-    for (int i = 0; i < count; ++i) {
-      addUserRow(m_users[i]);
+    for (const auto& ldapUserInfo : m_users) {
+      DbUserT dbUserInfo;
+      bool imported = m_dbSession->findUser(ldapUserInfo.dn, dbUserInfo);
+      addUserRow(ldapUserInfo, imported);
     }
   }
 
@@ -477,27 +480,60 @@ int LdapUserManager::updateUsers(void)
 }
 
 
-void LdapUserManager::addUserRow(const UserInfoT& userInfo)
+void LdapUserManager::addUserRow(const UserInfoT& userInfo, bool imported)
 {
-  m_model->setItem(m_rows, 0, createEntryItem(userInfo.dn, userInfo.dn));
-  m_model->setItem(m_rows, 1, createEntryItem(userInfo.cn, userInfo.dn));
-  m_model->setItem(m_rows, 2, createEntryItem(userInfo.sn, userInfo.dn));
-  m_model->setItem(m_rows, 3, createEntryItem(userInfo.email, userInfo.dn));
-  m_model->setItem(m_rows, 4, createImportationItem("", userInfo.dn));
-  ++m_rows;
+  int row = m_model->rowCount();
+  m_model->setItem(row, 0, createEntryItem(userInfo.dn, userInfo.dn));
+  m_model->setItem(row, 1, createEntryItem(userInfo.cn, userInfo.dn));
+  m_model->setItem(row, 2, createEntryItem(userInfo.sn, userInfo.dn));
+  m_model->setItem(row, 3, createEntryItem(userInfo.email, userInfo.dn));
+  m_model->setItem(row, 4, createImportationItem(userInfo.dn, imported));
 }
 
-Wt::WStandardItem* LdapUserManager::createEntryItem(const Wt::WString& text, const Wt::WString& data)
+Wt::WStandardItem* LdapUserManager::createEntryItem(const std::string& text, const std::string& data)
 {
   Wt::WStandardItem* item = new Wt::WStandardItem(text);
   item->setData(data, Wt::UserRole);
   return item;
 }
 
-Wt::WStandardItem* LdapUserManager::createImportationItem(const Wt::WString& text, const Wt::WString& data)
+Wt::WStandardItem* LdapUserManager::createImportationItem(const std::string& data, bool alreadyImported)
 {
-  Wt::WStandardItem* item = createEntryItem(text, data);
+  Wt::WStandardItem* item = createEntryItem("", data);
   item->setCheckable(true);
-
+  item->setChecked(alreadyImported);
   return item;
+}
+
+
+void LdapUserManager::handleImportatonAction(Wt::WStandardItem* item)
+{
+  if (item->isCheckable()) {
+    std::string ldapDn = getItemData(item);
+    if (item->checkState() == Wt::Checked) { // enable LDAP authentication
+      DbUserT dbUser;
+      UserInfoListT::ConstIterator userInfo =  m_users.find(ldapDn);
+      dbUser.username = userInfo->dn;
+      dbUser.password = ngrt4n::md5Hash(userInfo->dn); //FIXME: md5
+      dbUser.email = userInfo->email;
+      dbUser.firstname = userInfo->sn;
+      dbUser.lastname = userInfo->cn;
+      m_dbSession->addUser(dbUser);
+    } else { // disable LDAP authentication
+      m_dbSession->deleteUser(ldapDn);
+    }
+  }
+}
+
+
+std::string LdapUserManager::getItemData(Wt::WStandardItem* item)
+{
+  std::string data;
+  try {
+    data = boost::any_cast<std::string>(item->data(Wt::UserRole));
+  } catch(...) {
+    data = "";
+  }
+
+  return data;
 }

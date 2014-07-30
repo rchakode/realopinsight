@@ -224,3 +224,8 @@ bool ngrt4n::isValidHostAddr(const QString& addr)
 
   return false;
 }
+
+std::string ngrt4n::md5Hash(const std::string& input)
+{
+  return std::string(QCryptographicHash::hash(input.c_str(), QCryptographicHash::Md5).data());
+}

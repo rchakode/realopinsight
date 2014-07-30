@@ -41,7 +41,7 @@ struct UserInfoT
   std::string email;
 };
 
-typedef QVector<UserInfoT> UserInfoListT;
+typedef QMap<std::string, UserInfoT> UserInfoListT;
 
 class LdapHelper
 {

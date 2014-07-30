@@ -527,23 +527,23 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       }, std::placeholders::_1));
 
       // link new user
-      link = new Wt::WAnchor("#", "New User");
+      link = new Wt::WAnchor("#", Q_TR("New User"));
       link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
       settingPageTpl->bindWidget("menu-new-user", link);
       m_menuLinks.insert(MenuNewUser, link);
 
       // built-in menu
       m_mgntContentWidgets->addWidget(m_dbUserManager->dbUserListWidget());
-      link = new Wt::WAnchor("#", "Buil-in Users");
+      link = new Wt::WAnchor("#", Q_TR("Buil-in Users"));
       link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
       settingPageTpl->bindWidget("menu-builin-users", link);
       m_menuLinks.insert(MenuBuiltInUsers, link);
 
 
       // ldap user menu
-      m_ldapUserManager = new LdapUserManager();
+      m_ldapUserManager = new LdapUserManager(m_dbSession);
       m_mgntContentWidgets->addWidget(m_ldapUserManager);
-      link = new Wt::WAnchor("#", "LDAP Users");
+      link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
       link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
       settingPageTpl->bindWidget("menu-ldap-users", link);
       m_menuLinks.insert(MenuLdapUsers, link);
@@ -566,35 +566,35 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // monitoring settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", "Monitoring Settings");
+  link = new Wt::WAnchor("#", Q_TR("Monitoring Settings"));
   settingPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Monitoring Settings");
+    m_adminPanelTitle->setText(Q_TR("Monitoring Settings"));
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
     m_preferences->showMonitoringSettings();
   }));
 
   // auth settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", "Auth Settings");
+  link = new Wt::WAnchor("#", Q_TR("Auth Settings"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText("Authentication Settings");
+    m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
     m_preferences->showAuthSettings();
   }));
 
   // my account menu
   m_mgntContentWidgets->addWidget(m_userAccountForm);
-  link = new Wt::WAnchor("#", "My Account");
+  link = new Wt::WAnchor("#", Q_TR("My Account"));
   settingPageTpl->bindWidget("menu-my-account", link);
   m_menuLinks.insert(MenuMyAccount, link);
   link->clicked().connect(std::bind([=](){
     m_userAccountForm->resetValidationState(false);
     m_mgntContentWidgets->setCurrentWidget(m_userAccountForm);
-    m_adminPanelTitle->setText("My Account");
+    m_adminPanelTitle->setText(Q_TR("My Account"));
   }));
 
   // change password settings
@@ -620,9 +620,9 @@ void WebMainUI::createAccountPanel(void)
   m_userAccountForm->validated().connect(std::bind([=](DbUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
-      showMessage("Update failed, see details in log.", "alert alert-warning");
+      showMessage(Q_TR("Update failed, see details in log."), "alert alert-warning");
     } else {
-      showMessage("Update completed.", "alert alert-success");
+      showMessage(Q_TR("Update completed."), "alert alert-success");
     }}, std::placeholders::_1));
 }
 
@@ -639,9 +639,9 @@ void WebMainUI::createPasswordPanel(void)
                                                                      const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
     if (ret != 0) {
-      showMessage("Change password failed, see details in log.", "alert alert-warning");
+      showMessage(Q_TR("Change password failed, see details in log."), "alert alert-warning");
     } else {
-      showMessage("Successul password updated.", "alert alert-success");
+      showMessage(Q_TR("Successul password updated."), "alert alert-success");
     }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
@@ -657,7 +657,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   
   Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(m_mainWidget);
   Wt::WStandardItem *item = new Wt::WStandardItem();
-  item->setText("-- Select a description file --");
+  item->setText(Q_TR("-- Select a description file --"));
   viewSelectorModel->appendRow(item);
   
   Q_FOREACH(const DbViewT& view, views) {
@@ -731,7 +731,7 @@ void WebMainUI::initOperatorDashboard(void)
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
   m_operatorHomeTpl->bindWidget("contents", thumbs);
   m_operatorHomeTpl->bindWidget("event-feeds", eventFeeds);
-  m_dashtabs->addTab(m_operatorHomeTpl, tr("Operations Console").toStdString());
+  m_dashtabs->addTab(m_operatorHomeTpl, Q_TR("Operations Console"));
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
@@ -827,9 +827,7 @@ void WebMainUI::handleInternalPath(void)
   } else if (path == ngrt4n::LINK_LOGIN) {
     wApp->redirect(ngrt4n::LINK_LOGIN);
   } else {
-    showMessage(tr("Sorry, the request resource "
-                   "is not available or has been removed").toStdString(),
-                "alert alert-warning");
+    showMessage(Q_TR("Sorry, the request resource is not available or has been removed"),"alert alert-warning");
   }
 }
 
@@ -850,10 +848,10 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 void WebMainUI::handleLdapUsersMenu(void)
 {
   m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
-  if (m_ldapUserManager->updateUsers() <= 0) {
+  if (m_ldapUserManager->updateUserList() <= 0) {
     showMessage(m_ldapUserManager->lastError(), "alert alert-warning");
   }
-  m_adminPanelTitle->setText(QObject::tr("Manage LDAP Users").toStdString());
+  m_adminPanelTitle->setText(Q_TR("Manage LDAP Users"));
 }
 
 
@@ -861,7 +859,7 @@ void WebMainUI::handleBuiltInUsersMenu(void)
 {
   m_mgntContentWidgets->setCurrentWidget(m_dbUserManager->dbUserListWidget());
   m_dbUserManager->updateDbUsers();
-  m_adminPanelTitle->setText(QObject::tr("Manage Users").toStdString());
+  m_adminPanelTitle->setText(Q_TR("Manage Users"));
 }
 
 
@@ -869,7 +867,7 @@ void WebMainUI::handleNewUserMenu(void)
 {
   m_dbUserManager->userForm()->reset();
   m_mgntContentWidgets->setCurrentWidget(m_dbUserManager->userForm());
-  m_adminPanelTitle->setText(QObject::tr("Create New User").toStdString());
+  m_adminPanelTitle->setText(Q_TR("Create New User"));
 }
 
 
@@ -877,5 +875,5 @@ void  WebMainUI::handleViewAclMenu(void)
 {
   m_mgntContentWidgets->setCurrentWidget(m_viewAccessPermissionForm);
   m_viewAccessPermissionForm->resetModelData();
-  m_adminPanelTitle->setText(QObject::tr("Manage Views and Access Control").toStdString());
+  m_adminPanelTitle->setText(Q_TR("Manage Views and Access Control"));
 }

@@ -176,18 +176,21 @@ private:
 class LdapUserManager : public Wt::WTableView
 {
 public:
-  LdapUserManager(Wt::WContainerWidget* parent = 0);
-  int updateUsers(void);
+  LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
+  int updateUserList(void);
   std::string lastError(void) const {return m_lastError.toStdString();}
 
 private:
   Wt::WStandardItemModel* m_model;
+  DbSession* m_dbSession;
   UserInfoListT m_users;
-  int m_rows;
   QString m_lastError;
-  void addUserRow(const UserInfoT& userInfo);
-  Wt::WStandardItem* createEntryItem(const Wt::WString& text, const Wt::WString& data);
-  Wt::WStandardItem* createImportationItem(const Wt::WString& text, const Wt::WString& data);
+  void addUserRow(const UserInfoT& userInfo, bool imported);
+  Wt::WStandardItem* createEntryItem(const std::string& text, const std::string& data);
+  Wt::WStandardItem* createImportationItem(const std::string& data, bool alreadyImported);
+  void handleImportatonAction(Wt::WStandardItem* item);
+
+  std::string getItemData(Wt::WStandardItem* item);
 };
 
 #endif // USERFORM_HPP

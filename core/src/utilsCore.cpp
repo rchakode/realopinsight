@@ -35,20 +35,20 @@ QString ngrt4n::severityText(const qint32& _status)
 {
   switch(static_cast<ngrt4n::SeverityT>(_status))
   {
-  case ngrt4n::Normal:
-    return QObject::tr("Normal");
-    break;
-  case ngrt4n::Minor:
-    return  QObject::tr("Minor");
-    break;
-  case ngrt4n::Major:
-    return  QObject::tr("Major");
-    break;
-  case ngrt4n::Critical:
-    return  QObject::tr("Critical");
-    break;
-  default:
-    break;
+    case ngrt4n::Normal:
+      return QObject::tr("Normal");
+      break;
+    case ngrt4n::Minor:
+      return  QObject::tr("Minor");
+      break;
+    case ngrt4n::Major:
+      return  QObject::tr("Major");
+      break;
+    case ngrt4n::Critical:
+      return  QObject::tr("Critical");
+      break;
+    default:
+      break;
   }
   return QObject::tr("Unknown");
 }
@@ -71,54 +71,54 @@ ngrt4n::SeverityT ngrt4n::computeSeverity(const int& _monitor, const int& _statu
   int criticity = ngrt4n::Unknown;
   if(_monitor == ngrt4n::Nagios) {
     switch(_statusOrSeverity) {
-    case ngrt4n::NagiosOk:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::NagiosWarning:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::NagiosCritical:
-      criticity = ngrt4n::Critical;
-      break;
-    default:
-      break;
+      case ngrt4n::NagiosOk:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::NagiosWarning:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::NagiosCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        break;
     }
   } else if (_monitor == ngrt4n::Zabbix) {
     switch(_statusOrSeverity) {
-    case ngrt4n::ZabbixClear:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::ZabbixInfo:
-    case ngrt4n::ZabbixWarn:
-      criticity = ngrt4n::Minor;
-      break;
-    case ngrt4n::ZabbixAverage:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::ZabbixHigh:
-    case ngrt4n::ZabbixDisaster:
-      criticity = ngrt4n::Critical;
-      break;
-    default:
-      break;
+      case ngrt4n::ZabbixClear:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::ZabbixInfo:
+      case ngrt4n::ZabbixWarn:
+        criticity = ngrt4n::Minor;
+        break;
+      case ngrt4n::ZabbixAverage:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::ZabbixHigh:
+      case ngrt4n::ZabbixDisaster:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        break;
     }
   } else if (_monitor == ngrt4n::Zenoss){
     switch(_statusOrSeverity) {
-    case ngrt4n::ZenossClear:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::ZenossDebug:
-      criticity = ngrt4n::Minor;
-      break;
-    case ngrt4n::ZenossWarning:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::ZenossError:
-    case ngrt4n::ZenossCritical:
-      criticity = ngrt4n::Critical;
-      break;
-    default:
-      break;
+      case ngrt4n::ZenossClear:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::ZenossDebug:
+        criticity = ngrt4n::Minor;
+        break;
+      case ngrt4n::ZenossWarning:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::ZenossError:
+      case ngrt4n::ZenossCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        break;
     }
   }
   return static_cast<ngrt4n::SeverityT>(criticity);
@@ -129,12 +129,12 @@ int ngrt4n::computeSeverity2Propagate(const qint8& _critValue, const qint8& prop
   ngrt4n::SeverityT propCriticity = static_cast<ngrt4n::SeverityT>(_critValue);
   Criticity criticity(static_cast<ngrt4n::SeverityT>(_critValue));
   switch(propRule) {
-  case PropRules::Increased: propCriticity = (criticity++).getValue();
-    break;
-  case PropRules::Decreased: propCriticity = (criticity--).getValue();
-    break;
-  default:
-    break;
+    case PropRules::Increased: propCriticity = (criticity++).getValue();
+      break;
+    case PropRules::Decreased: propCriticity = (criticity--).getValue();
+      break;
+    default:
+      break;
   }
   return propCriticity;
 }
@@ -143,20 +143,20 @@ QString ngrt4n::getIconPath(int _severity)
 {
   QString ipath("images/built-in/unknown.png");
   switch (static_cast<ngrt4n::SeverityT>(_severity)) {
-  case ngrt4n::Normal:
-    ipath = "images/built-in/normal.png";
-    break;
-  case ngrt4n::Minor:
-    ipath = "images/built-in/minor.png";
-    break;
-  case ngrt4n::Major:
-    ipath = "images/built-in/major.png";
-    break;
-  case ngrt4n::Critical:
-    ipath = "images/built-in/critical.png";
-    break;
-  default:
-    break;
+    case ngrt4n::Normal:
+      ipath = "images/built-in/normal.png";
+      break;
+    case ngrt4n::Minor:
+      ipath = "images/built-in/minor.png";
+      break;
+    case ngrt4n::Major:
+      ipath = "images/built-in/major.png";
+      break;
+    case ngrt4n::Critical:
+      ipath = "images/built-in/critical.png";
+      break;
+    default:
+      break;
   }
   return ipath;
 }
