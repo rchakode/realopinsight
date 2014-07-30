@@ -52,7 +52,7 @@ class ConfirmPasswordValidator;
 class UserFormModel;
 class UserFormView;
 class UserList;
-class ScrollableUserTableModel;
+class LdapUsers;
 
 class ConfirmPasswordValidator : public Wt::WValidator
 {
@@ -148,9 +148,9 @@ public:
   void updateDbUsers(void);
   Wt::WPanel* createUserPanel(const RoiDboUser& user);
   UserFormView* userForm() {return m_userForm;}
-  Wt::WContainerWidget* userListContainer(void) {return m_builtinUserListContainer;}
+  Wt::WContainerWidget* userListContainer(void) {return m_containerDbUserUi;}
   void createUserList(void);
-  Wt::WWidget* dbUserListWidget(void) {return m_builtinUserListWidget;}
+  Wt::WWidget* dbUserListWidget(void) {return m_templateDbUsersUi;}
   Wt::WWidget* ldapUserListWidget(void) {return m_ldapUserTable;}
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}
   void resetUserForm(void) {m_userForm->reset();}
@@ -162,27 +162,24 @@ private:
   QString m_lastError;
   DbSession* m_dbSession;
   UserFormView* m_userForm;
-  Wt::WContainerWidget* m_builtinUserListContainer;
+  Wt::WContainerWidget* m_containerDbUserUi;
   Wt::WStackedWidget* m_contents;
-  Wt::WWidget* m_builtinUserListWidget;
+  Wt::WWidget* m_templateDbUsersUi;
   Wt::Signal<int> m_updateCompleted;
 
-  ScrollableUserTableModel* m_ldapUserTableModel;
+  LdapUsers* m_ldapUserTableModel;
   Wt::WTableView* m_ldapUserTable;
 };
 
-class ScrollableUserTableModel : public Wt::WAbstractTableModel
+class LdapUsers : public Wt::WTableView
 {
 public:
-  ScrollableUserTableModel(Wt::WObject *parent = 0);
-  virtual int rowCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
-  virtual int columnCount(const Wt::WModelIndex& parent = Wt::WModelIndex()) const;
-  virtual boost::any data(const Wt::WModelIndex& index, int role = Wt::DisplayRole) const;
-  virtual boost::any headerData(int section, Wt::Orientation orientation = Wt::Horizontal,int role = Wt::DisplayRole) const;
+  LdapUsers(Wt::WObject *parent = 0);
   int updateLdapUsers(void);
   QString lastError(void) const {return m_lastError;}
 
 private:
+  Wt::WAbstractTableModel m_model;
   UserInfoListT m_users;
   int m_rows;
   int m_columns;
