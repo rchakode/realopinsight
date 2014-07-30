@@ -47,8 +47,6 @@ protected:
 
 class WebMsgConsole : public Wt::WTableView
 {
-  //  Q_OBJECT
-
 public:
   WebMsgConsole();
   virtual
