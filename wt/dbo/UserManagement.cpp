@@ -40,9 +40,6 @@
 #include <Wt/WImage>
 
 
-namespace {
-  const int MAX_USER_TABLE_COLUMN = 4;
-}
 ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model,
                                                    Wt::WFormModel::Field passField)
   : Wt::WValidator(),
@@ -56,7 +53,7 @@ Wt::WValidator::Result ConfirmPasswordValidator::validate(const Wt::WString &inp
 {
   return (m_model->valueText(m_passwordField) == input)?
         Wt::WValidator::Result(Wt::WValidator::Valid):
-        Wt::WValidator::Result(Wt::WValidator::Invalid, "Confirmation don't match");
+        Wt::WValidator::Result(Wt::WValidator::Invalid, Q_TR("Confirmation don't match"));
 }
 
 UserFormModel::UserFormModel(const RoiDboUser* user, bool changePassword, bool userForm, Wt::WObject *parent)
@@ -139,7 +136,7 @@ void UserFormModel::setData(const RoiDboUser& user)
 Wt::WValidator* UserFormModel::createNameValidator(void)
 {
   Wt::WLengthValidator* validator = new Wt::WLengthValidator();
-  validator->setInvalidBlankText("Required field");
+  validator->setInvalidBlankText(Q_TR("Required field"));
   validator->setMandatory(true);
   validator->setMinimumLength(1);
   validator->setMaximumLength(MAX_LENGTH);
@@ -157,8 +154,8 @@ Wt::WValidator* UserFormModel::createPasswordValidator(void)
 Wt::WValidator* UserFormModel::createEmailValidator(void)
 {
   Wt::WRegExpValidator* validator = new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
-  validator->setInvalidBlankText("Required field");
-  validator->setInvalidBlankText("Invalid email");
+  validator->setInvalidBlankText(Q_TR("Required field"));
+  validator->setInvalidBlankText(Q_TR("Invalid email"));
   validator->setMandatory(true);
   return validator;
 }
@@ -195,7 +192,7 @@ UserFormView::UserFormView(const RoiDboUser* user, bool changePassword, bool use
       bindString("change-password-link", "");
     } else {
       if (! userForm) {
-        Wt::WPushButton* changedPwdButton = new Wt::WPushButton("Change password");
+        Wt::WPushButton* changedPwdButton = new Wt::WPushButton(Q_TR("Change password"));
         changedPwdButton->setStyleClass("btn btn-warning");
         bindEmpty("title");
         bindWidget("change-password-link", changedPwdButton);
@@ -209,28 +206,28 @@ UserFormView::UserFormView(const RoiDboUser* user, bool changePassword, bool use
   }
 
   // Bind buttons, but alter later
-  Wt::WPushButton* submitButton = new Wt::WPushButton("Submit");
-  Wt::WPushButton* cancelButton = new Wt::WPushButton("Clear");
+  Wt::WPushButton* submitButton = new Wt::WPushButton( Q_TR("Submit") );
+  Wt::WPushButton* cancelButton = new Wt::WPushButton( Q_TR("Clear") );
   bindWidget("submit-button", submitButton);
   bindWidget("cancel-button", cancelButton);
 
-  Wt::WString title = Wt::WString("User information");
+  Wt::WString title = Wt::WString( Q_TR("User information") );
   if (user) {
     submitButton->setStyleClass("btn btn-success");
     if (changePassword) {
-      title = Wt::WString("Set password information");
-      submitButton->setText("Change password");
-      cancelButton->setText("Close");
+      title = Wt::WString( Q_TR("Set password information") );
+      submitButton->setText( Q_TR("Change password") );
+      cancelButton->setText( Q_TR("Close") );
       cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
     } else {
       createChangePasswordDialog();
-      submitButton->setText("Update");
+      submitButton->setText( Q_TR("Update") );
       if (! userForm) {
-        cancelButton->setText("Delete");
+        cancelButton->setText( Q_TR("Delete") );
         cancelButton->setStyleClass("btn btn-danger");
         cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
       } else {
-        cancelButton->setText("Close");
+        cancelButton->setText( Q_TR("Close") );
         cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
         cancelButton->hide();
       }
@@ -347,7 +344,7 @@ void UserFormView::createChangePasswordDialog(void)
 {
   bool changedPasswd(true);
   bool forUserProfile(false);
-  m_changePasswordDialog = new Wt::WDialog("Change password");
+  m_changePasswordDialog = new Wt::WDialog( Q_TR("Change password") );
   m_changePasswordDialog->setStyleClass("Wt-dialog");
   UserFormView* changedPasswdForm = new UserFormView(&m_user,
                                                      changedPasswd,
@@ -362,52 +359,37 @@ void UserFormView::createChangePasswordDialog(void)
   changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
 }
 
-UserList::UserList(DbSession* dbSession)
-  : m_dbSession(dbSession),
+DbUserManager::DbUserManager(DbSession* dbSession)
+  : m_updateCompleted(this),
+    m_dbSession(dbSession),
     m_userForm(new UserFormView(NULL, false, false)),
-    m_containerDbUserUi(new Wt::WContainerWidget()),
+    m_usersListContainer(new Wt::WContainerWidget()),
     m_contents(new Wt::WStackedWidget(0)),
-    m_updateCompleted(this),
-    m_ldapUserTableModel(NULL),
-    m_ldapUserTable(NULL)
+    m_dbUserListWidget(new Wt::WTemplate(Wt::WString::tr("user-list-tpl")))
 {
-  m_userForm->validated().connect(std::bind([=](RoiDboUser user) {
-    m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
-  createUserList();
-
-  //  WebPreferences appPreference;
-  //  if (appPreference.getAuthenticationMode() == WebPreferences::LDAP) {
-  m_ldapUserTable = new Wt::WTableView();
-  //  }
+  m_dbUserListWidget->bindString("title", Q_TR("User list"));
+  m_dbUserListWidget->bindWidget("user-list", m_usersListContainer);
+  m_userForm->validated().connect(std::bind([=](RoiDboUser user) { m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
 }
 
-UserList::~UserList(void)
+DbUserManager::~DbUserManager(void)
 {
   delete m_userForm;
-  delete m_containerDbUserUi;
-  delete m_ldapUserTable;
-  delete m_contents;
+  delete m_usersListContainer;
 }
 
 
-int UserList::updateLdapUsers(void)
+void DbUserManager::updateDbUsers(void)
 {
-  int ret = m_ldapUserTableModel->updateLdapUsers();
-  m_lastError = m_ldapUserTableModel->lastError();
-  return ret;
-}
-
-void UserList::updateDbUsers(void)
-{
-  m_containerDbUserUi->clear();
+  m_usersListContainer->clear();
   m_dbSession->updateUserList();
   for (auto user: m_dbSession->userList()) {
-    m_containerDbUserUi->addWidget(createUserPanel(user));
+    m_usersListContainer->addWidget(createUserPanel(user));
   }
 }
 
 
-Wt::WPanel* UserList::createUserPanel(const RoiDboUser& user)
+Wt::WPanel* DbUserManager::createUserPanel(const RoiDboUser& user)
 {
   bool changePassword(false);
   bool userForm(false);
@@ -444,34 +426,36 @@ Wt::WPanel* UserList::createUserPanel(const RoiDboUser& user)
 }
 
 
-void UserList::createUserList(void)
+/**
+ * @brief LdapUserTable::LdapUserTable
+ * @param parent
+ */
+LdapUserManager::LdapUserManager(Wt::WContainerWidget* parent)
+  : Wt::WTableView(parent),
+    m_model(new Wt::WStandardItemModel(0, 5, this)),
+    m_rows(0)
 {
-  m_templateDbUsersUi = new Wt::WTemplate(Wt::WString::tr("user-list-tpl"));
-  m_templateDbUsersUi->bindString("title", "User list");
-  m_templateDbUsersUi->bindWidget("user-list", m_containerDbUserUi);
-}
-
-
-
-LdapUsers::LdapUsers(Wt::WObject *parent)
-  : Wt::WAbstractTableModel(parent),
-    m_model(new Wt::WAbstractTableModel(this)),
-    m_rows(0),
-    m_columns(MAX_USER_TABLE_COLUMN)
-{
-  setColumnResizeEnabled(false);
-  setColumnAlignment(0, Wt::AlignCenter);
-  setHeaderAlignment(0, Wt::AlignCenter);
-  setAlternatingRowColors(true);
-  setRowHeight(28);
-  setHeaderHeight(28);
+  setSortingEnabled(true);
+  setLayoutSizeAware(true);
+  setColumnResizeEnabled(true);
+  setSelectable(true);
   setSelectionMode(Wt::SingleSelection);
-  setEditTriggers(Wt::WAbstractItemView::NoEditTrigger);
+  setSelectionBehavior(Wt::SelectRows);
+  setHeaderHeight(26);
 
-  updateLdapUsers();
+  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("DN"), Wt::DisplayRole);
+  m_model->setHeaderData(1, Wt::Horizontal, Q_TR("CN"), Wt::DisplayRole);
+  m_model->setHeaderData(2, Wt::Horizontal, Q_TR("SN"), Wt::DisplayRole);
+  m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Email"), Wt::DisplayRole);
+  m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Enable Auth"), Wt::DisplayRole);
+  setModel(m_model);
 }
 
-int LdapUsers::updateLdapUsers(void)
+/**
+ * @brief LdapUserTable::updateLdapUsers
+ * @return
+ */
+int LdapUserManager::updateUsers(void)
 {
   m_users.clear();
   WebPreferences* appPreferences = new WebPreferences();
@@ -481,11 +465,39 @@ int LdapUsers::updateLdapUsers(void)
                                    appPreferences->getLdapBindUserPassword().toStdString(),
                                    m_users);
   if (count <= 0) {
-    m_rows = 0;
     m_lastError = ldapHelper.lastError();
   } else {
-    m_rows = count;
+    m_model->clear();
+    for (int i = 0; i < count; ++i) {
+      addUserRow(m_users[i]);
+    }
   }
 
   return count;
+}
+
+
+void LdapUserManager::addUserRow(const UserInfoT& userInfo)
+{
+  m_model->setItem(m_rows, 0, createEntryItem(userInfo.dn, userInfo.dn));
+  m_model->setItem(m_rows, 1, createEntryItem(userInfo.cn, userInfo.dn));
+  m_model->setItem(m_rows, 2, createEntryItem(userInfo.sn, userInfo.dn));
+  m_model->setItem(m_rows, 3, createEntryItem(userInfo.email, userInfo.dn));
+  m_model->setItem(m_rows, 4, createImportationItem("", userInfo.dn));
+  ++m_rows;
+}
+
+Wt::WStandardItem* LdapUserManager::createEntryItem(const Wt::WString& text, const Wt::WString& data)
+{
+  Wt::WStandardItem* item = new Wt::WStandardItem(text);
+  item->setData(data, Wt::UserRole);
+  return item;
+}
+
+Wt::WStandardItem* LdapUserManager::createImportationItem(const Wt::WString& text, const Wt::WString& data)
+{
+  Wt::WStandardItem* item = createEntryItem(text, data);
+  item->setCheckable(true);
+
+  return item;
 }

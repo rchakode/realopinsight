@@ -515,14 +515,14 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_menuLinks.insert(MenuViewAndAcl, link);
 
       // User menus
-      m_userList = new UserList(m_dbSession);
-      m_mgntContentWidgets->addWidget(m_userList->userForm());
-      m_userList->updateCompleted().connect(std::bind([=](int retCode) {
+      m_dbUserManager = new DbUserManager(m_dbSession);
+      m_mgntContentWidgets->addWidget(m_dbUserManager->userForm());
+      m_dbUserManager->updateCompleted().connect(std::bind([=](int retCode) {
         if (retCode != 0) {
           showMessage(m_dbSession->lastError(), "alert alert-warning");
         } else {
           showMessage("Successul updated", "alert alert-success");
-          m_userList->resetUserForm();
+          m_dbUserManager->resetUserForm();
         }
       }, std::placeholders::_1));
 
@@ -533,7 +533,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_menuLinks.insert(MenuNewUser, link);
 
       // built-in menu
-      m_mgntContentWidgets->addWidget(m_userList->dbUserListWidget());
+      m_mgntContentWidgets->addWidget(m_dbUserManager->dbUserListWidget());
       link = new Wt::WAnchor("#", "Buil-in Users");
       link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
       settingPageTpl->bindWidget("menu-builin-users", link);
@@ -541,7 +541,8 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
 
       // ldap user menu
-      m_mgntContentWidgets->addWidget(m_userList->ldapUserListWidget());
+      m_ldapUserManager = new LdapUserManager();
+      m_mgntContentWidgets->addWidget(m_ldapUserManager);
       link = new Wt::WAnchor("#", "LDAP Users");
       link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
       settingPageTpl->bindWidget("menu-ldap-users", link);
@@ -848,9 +849,9 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 
 void WebMainUI::handleLdapUsersMenu(void)
 {
-  m_mgntContentWidgets->setCurrentWidget(m_userList->ldapUserListWidget());
-  if (m_userList->updateLdapUsers() <= 0) {
-    showMessage(m_userList->lastError(), "alert alert-warning");
+  m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
+  if (m_ldapUserManager->updateUsers() <= 0) {
+    showMessage(m_ldapUserManager->lastError(), "alert alert-warning");
   }
   m_adminPanelTitle->setText(QObject::tr("Manage LDAP Users").toStdString());
 }
@@ -858,16 +859,16 @@ void WebMainUI::handleLdapUsersMenu(void)
 
 void WebMainUI::handleBuiltInUsersMenu(void)
 {
-  m_mgntContentWidgets->setCurrentWidget(m_userList->dbUserListWidget());
-  m_userList->updateDbUsers();
+  m_mgntContentWidgets->setCurrentWidget(m_dbUserManager->dbUserListWidget());
+  m_dbUserManager->updateDbUsers();
   m_adminPanelTitle->setText(QObject::tr("Manage Users").toStdString());
 }
 
 
 void WebMainUI::handleNewUserMenu(void)
 {
-  m_userList->userForm()->reset();
-  m_mgntContentWidgets->setCurrentWidget(m_userList->userForm());
+  m_dbUserManager->userForm()->reset();
+  m_mgntContentWidgets->setCurrentWidget(m_dbUserManager->userForm());
   m_adminPanelTitle->setText(QObject::tr("Create New User").toStdString());
 }
 

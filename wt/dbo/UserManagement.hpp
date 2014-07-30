@@ -41,7 +41,7 @@
 #include <Wt/WRegExpValidator>
 #include <Wt/WSignal>
 #include <Wt/WScrollArea>
-#include <Wt/WAbstractTableModel>
+#include <Wt/WStandardItemModel>
 #include <Wt/WTableView>
 #include "LdapHelper.hpp"
 
@@ -51,8 +51,9 @@ class UserFormView;
 class ConfirmPasswordValidator;
 class UserFormModel;
 class UserFormView;
-class UserList;
-class LdapUsers;
+class DbUserManager;
+class DbUserTable;
+class LdapUserManager;
 
 class ConfirmPasswordValidator : public Wt::WValidator
 {
@@ -135,55 +136,58 @@ private:
 };
 
 
-class UserList : public Wt::WScrollArea
+class DbUserManager : public Wt::WScrollArea
 {
 public:
   enum {
     AddUserAction=0,
     ListUserAction=1
   };
-  UserList(DbSession* dbSession);
-  ~UserList(void);
+  DbUserManager(DbSession* dbSession);
+  ~DbUserManager(void);
 
   void updateDbUsers(void);
+  Wt::WWidget* dbUserListWidget(void) {return m_dbUserListWidget;}
   Wt::WPanel* createUserPanel(const RoiDboUser& user);
   UserFormView* userForm() {return m_userForm;}
-  Wt::WContainerWidget* userListContainer(void) {return m_containerDbUserUi;}
-  void createUserList(void);
-  Wt::WWidget* dbUserListWidget(void) {return m_templateDbUsersUi;}
-  Wt::WWidget* ldapUserListWidget(void) {return m_ldapUserTable;}
+  Wt::WContainerWidget* userListContainer(void) {return m_usersListContainer;}
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}
   void resetUserForm(void) {m_userForm->reset();}
-  int updateLdapUsers(void);
   std::string lastError(void) const {return m_lastError.toStdString();}
 
 private:
+  /** signals **/
+  Wt::Signal<int> m_updateCompleted;
+
   /** Private member **/
   QString m_lastError;
   DbSession* m_dbSession;
   UserFormView* m_userForm;
-  Wt::WContainerWidget* m_containerDbUserUi;
+  Wt::WContainerWidget* m_usersListContainer;
   Wt::WStackedWidget* m_contents;
-  Wt::WWidget* m_templateDbUsersUi;
-  Wt::Signal<int> m_updateCompleted;
-
-  LdapUsers* m_ldapUserTableModel;
-  Wt::WTableView* m_ldapUserTable;
+  Wt::WTemplate* m_dbUserListWidget;
 };
 
-class LdapUsers : public Wt::WTableView
+
+
+/**
+ * @brief The LdapUserTable class
+ */
+class LdapUserManager : public Wt::WTableView
 {
 public:
-  LdapUsers(Wt::WObject *parent = 0);
-  int updateLdapUsers(void);
-  QString lastError(void) const {return m_lastError;}
+  LdapUserManager(Wt::WContainerWidget* parent = 0);
+  int updateUsers(void);
+  std::string lastError(void) const {return m_lastError.toStdString();}
 
 private:
-  Wt::WAbstractTableModel m_model;
+  Wt::WStandardItemModel* m_model;
   UserInfoListT m_users;
   int m_rows;
-  int m_columns;
   QString m_lastError;
+  void addUserRow(const UserInfoT& userInfo);
+  Wt::WStandardItem* createEntryItem(const Wt::WString& text, const Wt::WString& data);
+  Wt::WStandardItem* createImportationItem(const Wt::WString& text, const Wt::WString& data);
 };
 
 #endif // USERFORM_HPP

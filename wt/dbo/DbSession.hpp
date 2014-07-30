@@ -59,9 +59,7 @@ public:
   int addUser(const RoiDboUser& user);
   int updateUser(RoiDboUser user);
   int deleteUser(std::string uname);
-  int updatePassword(const std::string& uname,
-                     const std::string& currentPass,
-                     const std::string& newPass);
+  int updatePassword(const std::string& uname, const std::string& currentPass,const std::string& newPass);
   void updateUserList(void);
   RoiDboUsersT& userList(void) {return m_userList;}
 

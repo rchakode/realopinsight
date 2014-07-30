@@ -107,7 +107,8 @@ private:
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
   DashboardListT m_dashboards;
-  UserList* m_userList;
+  DbUserManager* m_dbUserManager;
+  LdapUserManager* m_ldapUserManager;
   UserFormView* m_userAccountForm;
   UserFormView* m_changePasswordPanel;
   ViewAclManagement* m_viewAccessPermissionForm;

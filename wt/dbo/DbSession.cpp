@@ -117,9 +117,7 @@ int DbSession::updateUser(RoiDboUser user)
   return retCode;
 }
 
-int DbSession::updatePassword(const std::string& uname,
-                              const std::string& currentPass,
-                              const std::string& newpass)
+int DbSession::updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newpass)
 {
   int retCode = -1;
   try {
