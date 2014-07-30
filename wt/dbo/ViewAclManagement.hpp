@@ -34,7 +34,7 @@
 #include <Wt/WContainerWidget>
 #include <set>
 
-class RoiDboView;
+class DbViewT;
 class DbSession;
 
 class ViewAclManagement: public Wt::WContainerWidget
@@ -62,7 +62,7 @@ private:
   KeyListT m_selectedViews;
   Wt::Signal<std::string> m_viewDeleted;
 
-  void addView(Wt::WStandardItemModel* model, const RoiDboView& view);
+  void addView(Wt::WStandardItemModel* model, const DbViewT& view);
   void setModelHeaderTitles(Wt::WStandardItemModel* model);
   Wt::WSelectionBox* createViewList(Wt::WStandardItemModel* model, Wt::WContainerWidget* parent);
 

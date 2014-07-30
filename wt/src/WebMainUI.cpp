@@ -102,7 +102,7 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showUserHome(void)
 {
   std::string homeTabTitle = "Home";
-  if (m_dbSession->loggedUser().role == RoiDboUser::AdmRole) {
+  if (m_dbSession->loggedUser().role == DbUserT::AdmRole) {
     homeTabTitle = tr("Account & Settings").toStdString();
   } else {
     homeTabTitle =  tr("Operations Console").toStdString();
@@ -120,7 +120,7 @@ void WebMainUI::showUserHome(void)
   m_dashtabs->addStyleClass("wrapper-container");
   m_dashtabs->addTab(createSettingPage(), tr("Account & Settings").toStdString());
   
-  if (m_dbSession->loggedUser().role == RoiDboUser::OpRole) {
+  if (m_dbSession->loggedUser().role == DbUserT::OpRole) {
     initOperatorDashboard();
     m_dashtabs->setTabHidden(0, true);
     m_dashtabs->setCurrentIndex(1);
@@ -146,7 +146,7 @@ void WebMainUI::setupProfileMenus(void)
   Wt::WMenu* profileMenu = new Wt::WMenu();
   m_navbar->addMenu(profileMenu, Wt::AlignRight);
   
-  if (m_dbSession->loggedUser().role == RoiDboUser::OpRole) {
+  if (m_dbSession->loggedUser().role == DbUserT::OpRole) {
 
     Wt::WTemplate* notificationBlock = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
@@ -185,7 +185,7 @@ void WebMainUI::setupProfileMenus(void)
   profileMenu->addItem(profileMenuItem);
   
   Wt::WMenuItem* curItem = NULL;
-  if (m_dbSession->loggedUser().role == RoiDboUser::OpRole) {
+  if (m_dbSession->loggedUser().role == DbUserT::OpRole) {
     curItem = profilePopupMenu->addItem(tr("Show Account & Settings").toStdString());
     curItem->triggered().connect(std::bind([=]() {
       if (m_showSettingTab) {
@@ -271,7 +271,7 @@ void WebMainUI::handleRefresh(void)
   }
 
   // Set notification only for operator console
-  if (m_dbSession->loggedUser().role == RoiDboUser::OpRole) {
+  if (m_dbSession->loggedUser().role == DbUserT::OpRole) {
     for(auto ptype: problemTypeCount) {
       m_notificationBoxes[ptype.first]->setText(QString::number(ptype.second).toStdString());
       if (ptype.second > 0) {
@@ -370,7 +370,7 @@ void WebMainUI::finishFileDialog(int action)
             file.copy(dest);
             file.remove();
 
-            RoiDboView view;
+            DbViewT view;
             view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
@@ -464,7 +464,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
-    case RoiDboUser::AdmRole: {
+    case DbUserT::AdmRole: {
       m_preferences->setEnabledInputs(true);
       // Start menu
       std::string menuText = QObject::tr("Welcome").toStdString();
@@ -550,7 +550,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
     }
       break;
-    case RoiDboUser::OpRole: {
+    case DbUserT::OpRole: {
       wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
       settingPageTpl->bindEmpty("menu-get-started");
       settingPageTpl->bindEmpty("menu-import");
@@ -617,7 +617,7 @@ void WebMainUI::createAccountPanel(void)
   bool changedPassword(false);
   bool isUserForm(true);
   m_userAccountForm = new UserFormView(&(m_dbSession->loggedUser()), changedPassword, isUserForm);
-  m_userAccountForm->validated().connect(std::bind([=](RoiDboUser userToUpdate) {
+  m_userAccountForm->validated().connect(std::bind([=](DbUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage("Update failed, see details in log.", "alert alert-warning");
@@ -650,7 +650,7 @@ void WebMainUI::createPasswordPanel(void)
 
 Wt::WComboBox* WebMainUI::createViewSelector(void)
 {
-  RoiDboViewsT views = m_dbSession->viewList();
+  DbViewsT views = m_dbSession->viewList();
   
   Wt::WComboBox* viewSelector = new Wt::WComboBox();
   viewSelector->setMargin(10, Wt::Right);
@@ -660,7 +660,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   item->setText("-- Select a description file --");
   viewSelectorModel->appendRow(item);
   
-  Q_FOREACH(const RoiDboView& view, views) {
+  Q_FOREACH(const DbViewT& view, views) {
     item = new Wt::WStandardItem();
     item->setText(view.name);
     item->setData(view.path, Wt::UserRole);

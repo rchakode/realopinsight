@@ -56,7 +56,7 @@ Wt::WValidator::Result ConfirmPasswordValidator::validate(const Wt::WString &inp
         Wt::WValidator::Result(Wt::WValidator::Invalid, Q_TR("Confirmation don't match"));
 }
 
-UserFormModel::UserFormModel(const RoiDboUser* user, bool changePassword, bool userForm, Wt::WObject *parent)
+UserFormModel::UserFormModel(const DbUserT* user, bool changePassword, bool userForm, Wt::WObject *parent)
   : Wt::WFormModel(parent),
     m_userForm(userForm)
 {
@@ -123,13 +123,13 @@ void UserFormModel::setWritable(bool writtable)
   }
 }
 
-void UserFormModel::setData(const RoiDboUser& user)
+void UserFormModel::setData(const DbUserT& user)
 {
   setValue(UsernameField, user.username);
   setValue(FirstNameField, user.firstname);
   setValue(LastNameField, user.lastname);
   setValue(EmailField, user.email);
-  setValue(UserLevelField, RoiDboUser::role2Text(user.role));
+  setValue(UserLevelField, DbUserT::role2Text(user.role));
   setValue(RegistrationDateField, user.registrationDate);
 }
 
@@ -165,7 +165,7 @@ Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
   return createPasswordValidator();
 }
 
-UserFormView::UserFormView(const RoiDboUser* user, bool changePassword, bool userForm)
+UserFormView::UserFormView(const DbUserT* user, bool changePassword, bool userForm)
   : m_changePassword(changePassword),
     m_infoBox(new Wt::WText("")),
     m_validated(this),
@@ -293,7 +293,7 @@ void UserFormView::process(void)
       m_user.firstname = m_model->valueText(UserFormModel::FirstNameField).toUTF8();
       m_user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
       m_user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
-      m_user.role = RoiDboUser::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
+      m_user.role = DbUserT::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
       m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
       m_validated.emit(m_user);
     }
@@ -320,12 +320,12 @@ void UserFormView::handleDeleteRequest(void)
 Wt::WComboBox* UserFormView::createUserLevelField(void)
 {
   Wt::WStandardItemModel* roleModel =  new Wt::WStandardItemModel(2, 1, this);
-  Wt::WStandardItem* item = new Wt::WStandardItem(RoiDboUser::role2Text(RoiDboUser::OpRole));
-  item->setData(RoiDboUser::OpRole, Wt::UserRole);
+  Wt::WStandardItem* item = new Wt::WStandardItem(DbUserT::role2Text(DbUserT::OpRole));
+  item->setData(DbUserT::OpRole, Wt::UserRole);
   roleModel->setItem(0, 0, item);
 
-  item = new Wt::WStandardItem(RoiDboUser::role2Text(RoiDboUser::AdmRole));
-  item->setData(RoiDboUser::AdmRole, Wt::UserRole);
+  item = new Wt::WStandardItem(DbUserT::role2Text(DbUserT::AdmRole));
+  item->setData(DbUserT::AdmRole, Wt::UserRole);
   roleModel->setItem(1, 0, item);
 
   Wt::WComboBox* roleCbox = new Wt::WComboBox();
@@ -369,7 +369,7 @@ DbUserManager::DbUserManager(DbSession* dbSession)
 {
   m_dbUserListWidget->bindString("title", Q_TR("User list"));
   m_dbUserListWidget->bindWidget("user-list", m_usersListContainer);
-  m_userForm->validated().connect(std::bind([=](RoiDboUser user) { m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
+  m_userForm->validated().connect(std::bind([=](DbUserT user) { m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
 }
 
 DbUserManager::~DbUserManager(void)
@@ -389,7 +389,7 @@ void DbUserManager::updateDbUsers(void)
 }
 
 
-Wt::WPanel* DbUserManager::createUserPanel(const RoiDboUser& user)
+Wt::WPanel* DbUserManager::createUserPanel(const DbUserT& user)
 {
   bool changePassword(false);
   bool userForm(false);
@@ -399,7 +399,7 @@ Wt::WPanel* DbUserManager::createUserPanel(const RoiDboUser& user)
   UserFormView* form(new UserFormView(&user,
                                       changePassword,
                                       userForm));
-  form->validated().connect(std::bind([=](RoiDboUser userToUpdate) {
+  form->validated().connect(std::bind([=](DbUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
   }, std::placeholders::_1));

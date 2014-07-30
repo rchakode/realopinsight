@@ -34,14 +34,14 @@
 
 namespace dbo = Wt::Dbo;
 
-class RoiDboView;
-class RoiDboUser;
-class RoiDboLoginSession;
+class DbViewT;
+class DbUserT;
+class DbLoginSession;
 
 namespace Wt {
   namespace Dbo {
     template<>
-    struct dbo_traits<RoiDboView> : public dbo_default_traits
+    struct dbo_traits<DbViewT> : public dbo_default_traits
     {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
@@ -49,7 +49,7 @@ namespace Wt {
     };
 
     template<>
-    struct dbo_traits<RoiDboUser> : public dbo_default_traits
+    struct dbo_traits<DbUserT> : public dbo_default_traits
     {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
@@ -58,13 +58,13 @@ namespace Wt {
   }
 }
 
-class RoiDboView
+class DbViewT
 {
 public:
   std::string name;
   std::string path;
   int service_count;
-  dbo::collection< dbo::ptr<RoiDboUser> > users;
+  dbo::collection< dbo::ptr<DbUserT> > users;
 
   template<class Action>
   void persist(Action& a) {
@@ -76,7 +76,7 @@ public:
 };
 
 
-class RoiDboUser {
+class DbUserT {
 public:
   enum RoleT {
     AdmRole = 100,
@@ -91,8 +91,8 @@ public:
   int role;
   std::string registrationDate;
   //int authSystem; // e.g. LDAP or BuiltIn
-  dbo::collection< dbo::ptr<RoiDboView> > views;
-  dbo::collection< dbo::ptr<RoiDboLoginSession> > sessions;
+  dbo::collection< dbo::ptr<DbViewT> > views;
+  dbo::collection< dbo::ptr<DbLoginSession> > sessions;
 
   template<class Action>
   void persist(Action& a) {
@@ -116,7 +116,7 @@ public:
 };
 
 
-class RoiDboLoginSession
+class DbLoginSession
 {
 public:
   enum {
@@ -142,12 +142,12 @@ public:
 };
 
 
-typedef std::set<std::string> RoiUserViewsT;
-typedef std::list<RoiDboUser> RoiDboUsersT;
-typedef std::list<RoiDboView> RoiDboViewsT;
-typedef std::list<RoiDboLoginSession> LoginSessionListT;
-typedef dbo::collection< dbo::ptr<RoiDboUser> > UserCollectionT;
-typedef dbo::collection< dbo::ptr<RoiDboView> > ViewCollectionT;
-typedef dbo::collection< dbo::ptr<RoiDboLoginSession> > LoginSessionCollectionT;
+typedef std::set<std::string> UserViewsT;
+typedef std::list<DbUserT> DbUsersT;
+typedef std::list<DbViewT> DbViewsT;
+typedef std::list<DbLoginSession> LoginSessionListT;
+typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
+typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
+typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;
 
 #endif // USER_HPP

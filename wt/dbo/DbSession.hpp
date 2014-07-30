@@ -37,7 +37,7 @@
 #include <Wt/Auth/Dbo/UserDatabase>
 #include <Wt/Auth/Login>
 
-typedef Wt::Auth::Dbo::AuthInfo<RoiDboUser> AuthInfo;
+typedef Wt::Auth::Dbo::AuthInfo<DbUserT> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
 class DbSession : public dbo::Session
@@ -53,40 +53,40 @@ public:
   Wt::Auth::Login& loginObject(void);
   bool isLogged(void) {return loginObject().loggedIn();}
   void configureAuth(void);
-  const RoiDboUser& loggedUser(void)const {return m_loggedUser;}
+  const DbUserT& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(void);
 
-  int addUser(const RoiDboUser& user);
-  int updateUser(RoiDboUser user);
+  int addUser(const DbUserT& user);
+  int updateUser(DbUserT user);
   int deleteUser(std::string uname);
   int updatePassword(const std::string& uname, const std::string& currentPass,const std::string& newPass);
   void updateUserList(void);
-  RoiDboUsersT& userList(void) {return m_userList;}
+  DbUsersT& userList(void) {return m_userList;}
 
-  int addView(const RoiDboView& view);
+  int addView(const DbViewT& view);
   int deleteView(std::string vname);
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);
-  RoiDboViewsT& viewList(void) {return m_viewList;}
-  bool findView(const std::string& vname, RoiDboView& view);
+  DbViewsT& viewList(void) {return m_viewList;}
+  bool findView(const std::string& vname, DbViewT& view);
 
   void updateUserViewList(void);
-  RoiUserViewsT& userViewList(void) {return m_userViewList;}
+  UserViewsT& userViewList(void) {return m_userViewList;}
 
-  int addSession(const RoiDboLoginSession& session);
-  int checkUserCookie(const RoiDboLoginSession& session);
+  int addSession(const DbLoginSession& session);
+  int checkUserCookie(const DbLoginSession& session);
 
 private:
   std::string m_dbPath;
   dbo::backend::Sqlite3* m_sqlite3Db;
   UserDatabase* m_dbUsers;
-  RoiDboUser m_loggedUser;
-  RoiDboUsersT m_userList;
-  RoiDboViewsT m_viewList;
-  RoiUserViewsT m_userViewList;
+  DbUserT m_loggedUser;
+  DbUsersT m_userList;
+  DbViewsT m_viewList;
+  UserViewsT m_userViewList;
   std::string m_lastError;
   Wt::Auth::Login m_loginObj;
   Wt::Auth::AuthService m_basicAuthService;

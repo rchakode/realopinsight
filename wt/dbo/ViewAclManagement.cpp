@@ -100,7 +100,7 @@ void ViewAclManagement::filter(const std::string& username)
     m_assignedViewModel->clear();
     m_nonAssignedViewModel->clear();
     m_dbSession->updateUserViewList();
-    RoiUserViewsT userViews = m_dbSession->userViewList();
+    UserViewsT userViews = m_dbSession->userViewList();
     for (auto view: m_dbSession->viewList()) {
       if (userViews.find(username+":"+view.name) != userViews.end()) {
         addView(m_assignedViewModel, view);
@@ -121,7 +121,7 @@ void ViewAclManagement::filter(const std::string& username)
   }
 }
 
-void ViewAclManagement::addView(Wt::WStandardItemModel* model, const RoiDboView& view)
+void ViewAclManagement::addView(Wt::WStandardItemModel* model, const DbViewT& view)
 {
   int count = model->rowCount();
   model->insertRows(count, 1);
@@ -215,7 +215,7 @@ void ViewAclManagement::deleteViews(void)
   setSelectedViews(m_nonAssignedViewList, m_nonAssignedViewModel);
   std::string outputMsg;
   for (const auto& vname : m_selectedViews) {
-    RoiDboView curView;
+    DbViewT curView;
     if (m_dbSession->findView(vname, curView)) {
       if (m_dbSession->deleteView(vname) != 0) {
         outputMsg.append("- Failed to delete view: "+vname + " -");
@@ -277,10 +277,10 @@ void ViewAclManagement::removeViewItemInModel(Wt::WStandardItemModel* model, con
 
 void ViewAclManagement::addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
 {
-  RoiDboViewsT::const_iterator vit;
+  DbViewsT::const_iterator vit;
   vit = std::find_if(m_dbSession->viewList().begin(),
                      m_dbSession->viewList().end(),
-                     [=](RoiDboView v){return v.name == viewName;});
+                     [=](DbViewT v){return v.name == viewName;});
   if (vit !=m_dbSession->viewList().end()) {
     addView(model, *vit);
   }
