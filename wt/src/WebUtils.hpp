@@ -30,6 +30,9 @@
 #include <Wt/WLogger>
 
 
+#define Q_TR(s) QObject::tr(s).toStdString()
+
+
 class Logger : public Wt::WLogger {
 public:
   Logger(const std::string& path);
