@@ -158,7 +158,7 @@ private:
   void handleBuiltInUsersMenu(void);
   void handleNewUserMenu(void);
   void handleViewAclMenu(void);
-  void handleUserEnableStatusChanged(int status, std::string userId);
+  void handleUserEnableStatusChanged(int status, std::string data);
 };
 
 #endif // MAINWEBWINDOW_HPP

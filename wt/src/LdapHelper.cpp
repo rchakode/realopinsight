@@ -33,10 +33,9 @@ namespace {
 }
 
 
-LdapHelper::LdapHelper(const QString& serverUriconst, const QString& baseDnSearchFormat, int version)
+LdapHelper::LdapHelper(const std::string& serverUri, int version)
   : m_handler(NULL),
-    m_serverUri(serverUriconst),
-    m_baseDnSearchFormat(baseDnSearchFormat),
+    m_serverUri(serverUri),
     m_version(version)
 {
   setupHandler();
@@ -49,7 +48,7 @@ LdapHelper::~LdapHelper()
 
 int LdapHelper::setupHandler(void)
 {
-  if (ldap_initialize(& m_handler, m_serverUri.toAscii()) != 0) {
+  if (ldap_initialize(& m_handler, m_serverUri.c_str()) != 0) {
     m_lastError = QObject::tr("Failed initializing annuary handler");
     return -1;
   }
@@ -62,19 +61,12 @@ void LdapHelper::cleanupHandler(void)
     ldap_unbind_ext(m_handler, NULL, NULL);
 }
 
-bool LdapHelper::loginWithUsername(const std::string& username, const std::string& password)
-{
-  QString dn  = m_baseDnSearchFormat.replace(Settings::DN_FORMAT_USERNAME,
-                                             username.c_str(),
-                                             Qt::CaseInsensitive);
-  return loginWithDistinguishName(dn.toStdString(), password);
-}
 
 bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::string& password)
 {
   // Intialize a connection handler
-  if (! ngrt4n::isValidUri(m_serverUri, "ldap", true)) {
-    m_lastError = QObject::tr("Invalid LDAP address: %1").arg(m_serverUri);
+  if (! ngrt4n::isValidUri(m_serverUri.c_str(), "ldap", true)) {
+    m_lastError = QObject::tr("Invalid LDAP address: %1").arg(m_serverUri.c_str());
     return false;
   }
 
@@ -107,30 +99,30 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
 
 
 
-int LdapHelper::listUsers(const std::string& baseDn,
-                          const std::string& bindUserDn,
-                          const std::string& bindPassword,
-                          UserInfoListT& users)
+int LdapHelper::listUsers(const std::string& searchBase,
+                          const std::string& bindUser,
+                          const std::string& bindPass,
+                          const std::string& filter,
+                          LdapUserMapT& userMap)
 {
   if (! m_handler) {
     m_lastError = QObject::tr("LDAP: Unitialized handler");
     return -1;
   }
 
-  char filter[] = "(objectClass=person)";
   LDAPMessage* searchResult;
   struct timeval timeout;
   timeout.tv_sec = REQUEST_TIMEOUT;
 
-  if (! loginWithDistinguishName(bindUserDn, bindPassword)) {
+  if (! loginWithDistinguishName(bindUser, bindPass)) {
     return -1;
   }
 
   // make request
   int ret = ldap_search_ext_s(m_handler,
-                              baseDn.c_str(),
+                              searchBase.c_str(),
                               LDAP_SCOPE_SUBTREE,
-                              filter,
+                              filter.c_str(),
                               NULL,
                               0,
                               NULL,
@@ -147,20 +139,15 @@ int LdapHelper::listUsers(const std::string& baseDn,
   for (LDAPMessage* currentEntry = ldap_first_entry(m_handler, searchResult);
        currentEntry != NULL;
        currentEntry = ldap_next_entry(m_handler, currentEntry)) {
-
-    UserInfoT userInfo;
-    StringMapT userAttrs;
-    userInfo.dn = getObjectDistingisghName(currentEntry);
-    parseObjectAttr(currentEntry, userAttrs);
-    fillUserInfo(userAttrs, userInfo);
-
-    users.insert(userInfo.dn, userInfo);
+    std::string dn = getObjectDistingisghName(currentEntry);
+    userMap[dn].insert("dn", dn);
+    parseObjectAttr(currentEntry, userMap[dn]);
   }
 
   if (searchResult)
     ldap_msgfree(searchResult);
 
-  return users.size();
+  return userMap.size();
 }
 
 
@@ -175,16 +162,15 @@ std::string LdapHelper::getObjectDistingisghName(LDAPMessage* objectData)
   return result;
 }
 
-void LdapHelper::parseObjectAttr(LDAPMessage* objectData, StringMapT& attrs)
+void LdapHelper::parseObjectAttr(LDAPMessage* objectData, LdapUserAttrsT& userInfo)
 {
-  attrs.clear();
   BerElement* ber;
   struct berval** values;
   for (char* curAttr = ldap_first_attribute(m_handler, objectData, &ber);
        curAttr != NULL; curAttr = ldap_next_attribute(m_handler, objectData, ber) ) {
     if ((values = ldap_get_values_len(m_handler, objectData, curAttr)) != NULL ) {
       for (int attrIndex = 0; values[attrIndex] != NULL; attrIndex++ ) {
-        attrs.insertMulti(curAttr, values[attrIndex]->bv_val);
+        userInfo.insertMulti(QString(curAttr).toLower().toStdString(), values[attrIndex]->bv_val);
       }
       ldap_value_free_len(values);
     }
@@ -192,12 +178,3 @@ void LdapHelper::parseObjectAttr(LDAPMessage* objectData, StringMapT& attrs)
   }
 }
 
-
-void LdapHelper::fillUserInfo(const StringMapT& attrs, UserInfoT& userInfo)
-{
-  userInfo.cn = attrs["cn"].toStdString();
-  userInfo.sn = attrs["sn"].toStdString();
-  userInfo.uid = attrs["uid"].toStdString();
-  userInfo.email = attrs["email"].toStdString();
-  userInfo.password = attrs["userPassword"].toStdString();
-}

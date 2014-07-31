@@ -38,15 +38,10 @@ public:
   LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
                 Wt::Auth::AbstractUserDatabase& users,
                 Wt::WObject* parent=0);
-  virtual bool validate();
   virtual bool login(Wt::Auth::Login& login);
-  virtual void logout(Wt::Auth::Login& login);
-  virtual Wt::Auth::EmailTokenResult processEmailToken(const std::string& token);
-  virtual Wt::Auth::User processAuthToken();
 
 private:
   QString m_lastError;
-
 };
 
 #endif // LDAPAUTHMODEL_HPP

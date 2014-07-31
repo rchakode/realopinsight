@@ -61,7 +61,7 @@ public:
   static const QString AUTH_LDAP_BIND_USER_PASSWORD;
   static const QString AUTH_LDAP_SEARCH_BASE;
   static const QString AUTH_LDAP_VERSION;
-  static const QString AUTH_LDAP_DN_FORMAT;
+  static const QString AUTH_LDAP_ID_FIELD;
   static const QString DN_FORMAT_USERNAME;
 
 Q_SIGNALS:

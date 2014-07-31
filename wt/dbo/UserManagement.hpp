@@ -178,9 +178,8 @@ class LdapUserManager : public Wt::WTableView
 public:
   enum EnableOperationT {
     EnableAuthSuccess,
-    EnableAuthError,
     DisableAuthSuccess,
-    DisableAuthError
+    GenericError
   };
 
   LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
@@ -194,16 +193,18 @@ private:
   Wt::Signal<int, std::string> m_userEnableStatusChanged;
 
   /** other members **/
+  QString m_lastError;
   Wt::WStandardItemModel* m_model;
   DbSession* m_dbSession;
-  UserInfoListT m_users;
-  QString m_lastError;
-  void addUserRow(const UserInfoT& userInfo, bool imported);
+  LdapUserMapT m_users;
+  std::string m_ldapUidField;
+
+  void addUserRow(const LdapUserAttrsT& userInfo, bool imported);
   Wt::WStandardItem* createEntryItem(const std::string& text, const std::string& data);
   Wt::WStandardItem* createImportationItem(const std::string& data, bool alreadyImported);
   void handleImportationAction(Wt::WStandardItem* item);
-
   std::string getItemData(Wt::WStandardItem* item);
+  int insertIntoDatabase(const LdapUserAttrsT& userInfo);
 };
 
 #endif // USERFORM_HPP

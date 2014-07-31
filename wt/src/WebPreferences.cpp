@@ -142,9 +142,8 @@ WebPreferences::WebPreferences(void)
   m_ldapBindUserPasswordField->setEchoMode(Wt::WLineEdit::Password);
   m_ldapBindUserPasswordField->setText("mysecretpassword");
 
-  m_ldapDNFormatField.reset(new Wt::WLineEdit(this));
-  m_ldapDNFormatField->setValidator(new DnFormatValidator());
-  m_ldapDNFormatField->setEmptyText(QString("cn=%1,dc=example,dc=com").arg(Settings::DN_FORMAT_USERNAME).toStdString());
+  m_ldapIdField.reset(new Wt::WLineEdit(this));
+  m_ldapIdField->setEmptyText(QString("uid").arg(Settings::DN_FORMAT_USERNAME).toStdString());
 
   m_ldapSearchBaseField.reset(new Wt::WLineEdit(this));
   m_ldapSearchBaseField->setEmptyText("ou=devops,dc=example,dc=com");
@@ -202,10 +201,18 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("ldap-server-uri", m_ldapServerUriField.get());
   tpl->bindWidget("ldap-bind-user-dn", m_ldapBindUserDnField.get());
   tpl->bindWidget("ldap-bind-user-password", m_ldapBindUserPasswordField.get());
-  tpl->bindWidget("ldap-dn-format", m_ldapDNFormatField.get());
+  tpl->bindWidget("ldap-uid-attribute", m_ldapIdField.get());
   tpl->bindWidget("ldap-user-search-base", m_ldapSearchBaseField.get());
 }
 
+std::string WebPreferences::getLdapIdField(void) const
+{
+  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
+  if (val.isEmpty())
+    return "uid";
+
+  return val.toStdString();
+}
 int WebPreferences::getLdapVersion(void) const
 {
   int val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toInt();
@@ -455,11 +462,13 @@ void WebPreferences::saveAuthSettings(void)
   // validate fields
   if (validateAuthSettingsFields()) {
     setEntry(Settings::AUTH_MODE_KEY, QString::number(m_authenticationModeField->currentIndex()));
-    setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUriField->text().toUTF8().c_str());
-    setEntry(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField->text().toUTF8().c_str());
-    setEntry(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField->text().toUTF8().c_str());
-    setEntry(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField->text().toUTF8().c_str());
-    setEntry(Settings::AUTH_LDAP_DN_FORMAT, m_ldapDNFormatField->text().toUTF8().c_str());
+    if (getAuthenticationMode() == LDAP) {
+      setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUriField->text().toUTF8().c_str());
+      setEntry(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField->text().toUTF8().c_str());
+      setEntry(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField->text().toUTF8().c_str());
+      setEntry(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField->text().toUTF8().c_str());
+      setEntry(Settings::AUTH_LDAP_ID_FIELD, m_ldapIdField->text().toUTF8().c_str());
+    }
     m_authSystemChanged.emit(getAuthenticationMode());
   }
 }
@@ -467,11 +476,11 @@ void WebPreferences::saveAuthSettings(void)
 void WebPreferences::loadAuthSettings(void)
 {
   m_authenticationModeField->setCurrentIndex(getAuthenticationMode());
-  m_ldapServerUriField->setText(getLdapServerUri().toStdString());
-  m_ldapSearchBaseField->setText(getLdapSearchBase().toStdString());
-  m_ldapBindUserDnField->setText(getLdapBindUserDn().toStdString());
-  m_ldapBindUserPasswordField->setText(getLdapBindUserPassword().toStdString());
-  m_ldapDNFormatField->setText(getLdapDnFormat().toStdString());
+  m_ldapServerUriField->setText(getLdapServerUri());
+  m_ldapSearchBaseField->setText(getLdapSearchBase());
+  m_ldapBindUserDnField->setText(getLdapBindUserDn());
+  m_ldapBindUserPasswordField->setText(getLdapBindUserPassword());
+  m_ldapIdField->setText(getLdapIdField());
 }
 
 void WebPreferences::showMonitoringSettingsWidgets(bool display)
@@ -514,12 +523,15 @@ bool WebPreferences::validateMonitoringSettingsFields(void)
 
 bool WebPreferences::validateAuthSettingsFields(void)
 {
+  if (m_authenticationModeField->currentIndex() == BuiltIn)
+    return true;
+
   if (m_authenticationModeField->validate() == Wt::WValidator::Valid
       && m_ldapServerUriField->validate() == Wt::WValidator::Valid
       && m_ldapSearchBaseField->validate() == Wt::WValidator::Valid
       && m_ldapBindUserDnField->validate() == Wt::WValidator::Valid
       && m_ldapBindUserPasswordField->validate() == Wt::WValidator::Valid
-      && m_ldapDNFormatField->validate() == Wt::WValidator::Valid)
+      && m_ldapIdField->validate() == Wt::WValidator::Valid)
     return true;
 
   m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());

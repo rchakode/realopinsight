@@ -56,23 +56,5 @@ public:
   }
 };
 
-class DnFormatValidator: public Wt::WValidator
-{
-public:
-
-  DnFormatValidator(Wt::WObject* parent = 0)
-    : Wt::WValidator(parent)
-  {
-  }
-
-  virtual Wt::WValidator::Result validate(const Wt::WString& input) const
-  {
-    QString dnformat = QString::fromStdString(input.toUTF8());
-    if (dnformat.count(Settings::DN_FORMAT_USERNAME, Qt::CaseInsensitive))
-      return Wt::WValidator::Result(Wt::WValidator::Valid);
-
-    return Wt::WValidator::Result(Wt::WValidator::Invalid, QObject::tr("Invalid DN format: %1").arg(dnformat).toStdString());
-  }
-};
 
 #endif // VALIDATOR_HPP

@@ -445,8 +445,8 @@ LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* par
   setHeaderHeight(26);
 
   m_model->setHeaderData(0, Wt::Horizontal, Q_TR("DN"), Wt::DisplayRole);
-  m_model->setHeaderData(1, Wt::Horizontal, Q_TR("CN"), Wt::DisplayRole);
-  m_model->setHeaderData(2, Wt::Horizontal, Q_TR("SN"), Wt::DisplayRole);
+  m_model->setHeaderData(1, Wt::Horizontal, Q_TR("Full Name"), Wt::DisplayRole);
+  m_model->setHeaderData(2, Wt::Horizontal, Q_TR("UID"), Wt::DisplayRole);
   m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Email"), Wt::DisplayRole);
   m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Enable Auth"), Wt::DisplayRole);
   m_model->itemChanged().connect(this, &LdapUserManager::handleImportationAction);
@@ -460,20 +460,24 @@ LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* par
 int LdapUserManager::updateUserList(void)
 {
   m_users.clear();
+  std::string filter = "(objectClass=person)";
   WebPreferences* appPreferences = new WebPreferences();
-  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapSearchBase());
-  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase().toStdString(),
-                                   appPreferences->getLdapBindUserDn().toStdString(),
-                                   appPreferences->getLdapBindUserPassword().toStdString(),
+  m_ldapUidField = appPreferences->getLdapIdField();
+  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapVersion());
+
+  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase(),
+                                   appPreferences->getLdapBindUserDn(),
+                                   appPreferences->getLdapBindUserPassword(),
+                                   filter,
                                    m_users);
   if (count <= 0) {
     m_lastError = ldapHelper.lastError();
   } else {
     m_model->clear();
-    for (const auto& ldapUserInfo : m_users) {
+    for (const auto& userInfo : m_users) {
       DbUserT dbUserInfo;
-      bool imported = m_dbSession->findUser(ldapUserInfo.dn, dbUserInfo);
-      addUserRow(ldapUserInfo, imported);
+      bool imported = m_dbSession->findUser(userInfo[m_ldapUidField], dbUserInfo);
+      addUserRow(userInfo, imported);
     }
   }
 
@@ -481,14 +485,15 @@ int LdapUserManager::updateUserList(void)
 }
 
 
-void LdapUserManager::addUserRow(const UserInfoT& userInfo, bool imported)
+void LdapUserManager::addUserRow(const LdapUserAttrsT& userInfo, bool imported)
 {
   int row = m_model->rowCount();
-  m_model->setItem(row, 0, createEntryItem(userInfo.dn, userInfo.dn));
-  m_model->setItem(row, 1, createEntryItem(userInfo.cn, userInfo.dn));
-  m_model->setItem(row, 2, createEntryItem(userInfo.sn, userInfo.dn));
-  m_model->setItem(row, 3, createEntryItem(userInfo.email, userInfo.dn));
-  m_model->setItem(row, 4, createImportationItem(userInfo.dn, imported));
+  std::string dn = userInfo["dn"];
+  m_model->setItem(row, 0, createEntryItem(dn, dn));
+  m_model->setItem(row, 1, createEntryItem(userInfo["cn"], dn));
+  m_model->setItem(row, 2, createEntryItem(userInfo[m_ldapUidField], dn));
+  m_model->setItem(row, 3, createEntryItem(userInfo["mail"], dn));
+  m_model->setItem(row, 4, createImportationItem(dn, imported));
 }
 
 Wt::WStandardItem* LdapUserManager::createEntryItem(const std::string& text, const std::string& data)
@@ -511,25 +516,23 @@ void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
 {
   if (item->isCheckable()) {
     std::string ldapDn = getItemData(item);
-    if (item->checkState() == Wt::Checked) { // enable LDAP authentication
-      DbUserT dbUser;
-      UserInfoListT::ConstIterator userInfo =  m_users.find(ldapDn);
-      dbUser.username = userInfo->dn;
-      dbUser.password = ngrt4n::md5Hash(userInfo->dn); //FIXME: md5
-      dbUser.email = userInfo->email;
-      dbUser.firstname = userInfo->cn;
-      dbUser.lastname = userInfo->sn;
-      if (m_dbSession->addUser(dbUser) == 0) {
-        m_userEnableStatusChanged.emit(EnableAuthSuccess, ldapDn);
-      } else {
-        m_userEnableStatusChanged.emit(EnableAuthError, ldapDn);
+    LdapUserMapT::ConstIterator userInfo =  m_users.find(ldapDn);
+    if (userInfo != m_users.end()) {
+      std::string username = (*userInfo)[m_ldapUidField];
+      if (item->checkState() == Wt::Checked) { // enable LDAP authentication
+        if (insertIntoDatabase(*userInfo) != 0) {
+          updateUserList();
+        }
+      } else { // disable LDAP authentication
+        if (m_dbSession->deleteUser(username) == 0) {
+          m_userEnableStatusChanged.emit(DisableAuthSuccess, username);
+        } else {
+          m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
+        }
       }
-    } else { // disable LDAP authentication
-      if (m_dbSession->deleteUser(ldapDn) == 0) {
-        m_userEnableStatusChanged.emit(DisableAuthSuccess, ldapDn);
-      } else {
-        m_userEnableStatusChanged.emit(DisableAuthError, ldapDn);
-      }
+    } else {
+      m_userEnableStatusChanged.emit(GenericError,
+                                     Q_TR("User DN not found in the directory: ")+ldapDn);
     }
   }
 }
@@ -545,4 +548,28 @@ std::string LdapUserManager::getItemData(Wt::WStandardItem* item)
   }
 
   return data;
+}
+
+
+int LdapUserManager::insertIntoDatabase(const LdapUserAttrsT& userInfo)
+{
+  int retCode = -1;
+  DbUserT dbUser;
+  dbUser.username = userInfo[m_ldapUidField];
+  if (! dbUser.username.empty()) {
+    dbUser.password = userInfo["userpassword"];
+    dbUser.email = userInfo["mail"];
+    dbUser.firstname = userInfo["gn"];
+    dbUser.lastname = userInfo["sn"];
+    if (m_dbSession->addUser(dbUser) == 0) {
+      m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
+      retCode = 0;
+    } else {
+      m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
+    }
+  } else {
+    m_userEnableStatusChanged.emit(GenericError, Q_TR("The ID attribute is empty: ")+m_ldapUidField);
+  }
+
+  return retCode;
 }

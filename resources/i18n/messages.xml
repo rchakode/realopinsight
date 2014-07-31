@@ -443,8 +443,8 @@
           <span>${ldap-user-search-base}</span>
         </div>
         <div class="control-group">
-          <label class="control-label">User DN Search Format&nbsp;</label>
-          <span>${ldap-dn-format}</span>
+          <label class="control-label">User ID Attribute&nbsp;</label>
+          <span>${ldap-uid-attribute}</span>
         </div>
       </fieldset> <!-- id="ldap-auth-setting-section" -->
     </div> <!-- id="auth-section" -->

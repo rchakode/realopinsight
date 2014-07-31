@@ -35,62 +35,49 @@ LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
                              Wt::WObject* parent)
   : Wt::Auth::AuthModel(baseAuth, users, parent)
 {
+
 }
 
-
-bool LdapAuthModel::validate()
-{
-  if (valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8() != "admin")
-    return true;
-
-  return Wt::Auth::AuthModel::validate();
-}
 
 bool LdapAuthModel::login(Wt::Auth::Login& login)
 {
-  std::string username = valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8();
-  std::string password = valueText(Wt::Auth::AuthModel::PasswordField).toUTF8();
+  WebPreferences preferences;
+
+  if (preferences.getAuthenticationMode()== WebPreferences::BuiltIn)
+    return Wt::Auth::AuthModel::login(login);
+
+  // Otherwise deal with LDAP authentication
+  std::string ldapServerUri = preferences.getLdapServerUri();
+  std::string ldapIdField = preferences.getLdapIdField();
+  int ldapVersion = preferences.getLdapVersion();
+  std::string ldapSearchBase = preferences.getLdapSearchBase();
+  std::string ldapBindUserDn =preferences.getLdapBindUserDn();
+  std::string ldapBindPassword =  preferences.getLdapBindUserPassword();
+
+  QString username = QString::fromStdString(valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8());
+  QString password = QString::fromStdString(valueText(Wt::Auth::AuthModel::PasswordField).toUTF8());
 
   if (username == "admin") {
     return Wt::Auth::AuthModel::login(login);
   }
 
-  WebPreferences preferences;
-  LdapHelper ldapHelper(preferences.getLdapServerUri(), preferences.getLdapDnFormat(), preferences.getLdapVersion());
-
-  qDebug() << "Login through LDAP"<< preferences.getLdapServerUri();
-  UserInfoListT ldapUsers;
-  if (ldapHelper.listUsers( preferences.getLdapSearchBase().toStdString(),
-                           preferences.getLdapBindUserDn().toStdString(),
-                           preferences.getLdapBindUserPassword().toStdString(),
-                           ldapUsers) == 0) {
-    qDebug() << "list users succeed: "<< ldapUsers.size();
+  LdapHelper ldapHelper(ldapServerUri, ldapVersion);
+  QString ldapFilter = QString("(&(%1=%2)(userPassword=%3))").arg(ldapIdField.c_str(),
+                                                                  username,
+                                                                  password);
+  LdapUserMapT ldapUsers;
+  int result = ldapHelper.listUsers(ldapSearchBase,
+                                    ldapBindUserDn,
+                                    ldapBindPassword,
+                                    ldapFilter.toStdString().c_str(),
+                                    ldapUsers);
+  if (result != 1) {
+    LOG("error", Q_TR("LDAP authentication failed: ")+username.toStdString());
   } else {
-    qDebug() << "list users succeed: "<< ldapHelper.lastError();
+    LOG("info", Q_TR("LDAP authentication succeeded: ")+username.toStdString());
+    if (valid())
+      return Wt::Auth::AuthModel::login(login);
   }
-
-  if (! ldapHelper.loginWithUsername(username, password))
-    return false;
-
-  Wt::Auth::User user;
-  login.login(user);
-  std::cout << std::boolalpha<< user.isValid()<<"\n";
-  qDebug() << m_lastError;
-  return true;
+  return false;
 }
 
-void LdapAuthModel::logout(Wt::Auth::Login& login)
-{
-  login.logout();
-  //This also removes the remember-me cookie for the user.
-}
-
-Wt::Auth::EmailTokenResult LdapAuthModel::processEmailToken(const std::string& token)
-{
-  return Wt::Auth::AuthModel::processEmailToken(token);
-}
-
-Wt::Auth::User LdapAuthModel::processAuthToken()
-{
-  return Wt::Auth::AuthModel::processAuthToken();
-}

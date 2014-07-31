@@ -64,11 +64,11 @@ public:
   void hideUnrequiredFields(void);
   void showAuthSettings(void);
   void showMonitoringSettings(void);
-  QString getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI);}
-  QString getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN);}
-  QString getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE);}
-  QString getLdapBindUserPassword(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD);}
-  QString getLdapDnFormat(void) const{ return m_settings->keyValue(Settings::AUTH_LDAP_DN_FORMAT);}
+  std::string getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString();}
+  std::string getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString();}
+  std::string getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE).toStdString();}
+  std::string getLdapBindUserPassword(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD).toStdString();}
+  std::string getLdapIdField(void) const;
   int getLdapVersion(void) const;
   int getAuthenticationMode(void) const;
 
@@ -107,7 +107,7 @@ private:
   std::unique_ptr<Wt::WLineEdit> m_ldapServerUriField;
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserDnField;
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPasswordField;
-  std::unique_ptr<Wt::WLineEdit> m_ldapDNFormatField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapIdField;
   std::unique_ptr<Wt::WLineEdit> m_ldapSearchBaseField;
   std::unique_ptr<Wt::WPushButton> m_saveAuthSettingsBtn;
 

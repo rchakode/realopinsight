@@ -186,6 +186,7 @@ void WebMainUI::setupProfileMenus(void)
   
   Wt::WMenuItem* curItem = NULL;
   if (m_dbSession->loggedUser().role == DbUserT::OpRole) {
+
     curItem = profilePopupMenu->addItem(tr("Show Account & Settings").toStdString());
     curItem->triggered().connect(std::bind([=]() {
       if (m_showSettingTab) {
@@ -193,7 +194,8 @@ void WebMainUI::setupProfileMenus(void)
           m_dashtabs->setTabHidden(0, false);
           m_dashtabs->setCurrentIndex(0);
           curItem->setText(tr("Hide Account & Settings").toStdString());
-          wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
+          wApp->doJavaScript("$('#userMenuBlock').hide(); "
+                             "$('#viewMenuBlock').hide();");
         }
       } else {
         if (m_dashtabs->count() > 1) {
@@ -204,14 +206,14 @@ void WebMainUI::setupProfileMenus(void)
       }
       m_showSettingTab = ! m_showSettingTab;
     }));
+
   }
 
   curItem = profilePopupMenu->addItem(tr("Help").toStdString());
   curItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
   curItem->setLinkTarget(Wt::TargetNewWindow);
 
-  profilePopupMenu->addItem("About")
-      ->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
+  profilePopupMenu->addItem("About")->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
 }
 
 void WebMainUI::setupMenus(void)
@@ -894,20 +896,17 @@ void  WebMainUI::handleViewAclMenu(void)
 }
 
 
-void WebMainUI::handleUserEnableStatusChanged(int status, std::string userId)
+void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 {
   switch (status) {
     case LdapUserManager::EnableAuthSuccess:
-      showMessage(Q_TR("LDAP authentication enabled for user ") + userId, OperationSuccess);
-      break;
-    case LdapUserManager::EnableAuthError:
-      showMessage(Q_TR("Failed to enable authentication for user ") + userId, OperationError);
+      showMessage(Q_TR("LDAP authentication enabled for user ") + data, OperationSuccess);
       break;
     case LdapUserManager::DisableAuthSuccess:
-      showMessage(Q_TR("LDAP authentication disabled for user ") + userId, OperationSuccess);
+      showMessage(Q_TR("LDAP authentication disabled for user ") + data, OperationSuccess);
       break;
-    case LdapUserManager::DisableAuthError:
-      showMessage(Q_TR("Failed to disable authentication for user ") + userId, OperationError);
+    case LdapUserManager::GenericError:
+      showMessage(data, OperationError);
       break;
     default:
       break;
