@@ -561,6 +561,7 @@ int LdapUserManager::insertIntoDatabase(const LdapUserAttrsT& userInfo)
     dbUser.email = userInfo["mail"];
     dbUser.firstname = userInfo["gn"];
     dbUser.lastname = userInfo["sn"];
+    dbUser.role = DbUserT::OpRole;
     if (m_dbSession->addUser(dbUser) == 0) {
       m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
       retCode = 0;
