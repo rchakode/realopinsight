@@ -176,11 +176,24 @@ private:
 class LdapUserManager : public Wt::WTableView
 {
 public:
+  enum EnableOperationT {
+    EnableAuthSuccess,
+    EnableAuthError,
+    DisableAuthSuccess,
+    DisableAuthError
+  };
+
   LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
   int updateUserList(void);
   std::string lastError(void) const {return m_lastError.toStdString();}
 
+  Wt::Signal<int, std::string>& userEnableStatusChanged(void) {return m_userEnableStatusChanged;}
+
 private:
+  /** Signals **/
+  Wt::Signal<int, std::string> m_userEnableStatusChanged;
+
+  /** other members **/
   Wt::WStandardItemModel* m_model;
   DbSession* m_dbSession;
   UserInfoListT m_users;
@@ -188,7 +201,7 @@ private:
   void addUserRow(const UserInfoT& userInfo, bool imported);
   Wt::WStandardItem* createEntryItem(const std::string& text, const std::string& data);
   Wt::WStandardItem* createImportationItem(const std::string& data, bool alreadyImported);
-  void handleImportatonAction(Wt::WStandardItem* item);
+  void handleImportationAction(Wt::WStandardItem* item);
 
   std::string getItemData(Wt::WStandardItem* item);
 };

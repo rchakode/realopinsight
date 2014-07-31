@@ -432,6 +432,7 @@ Wt::WPanel* DbUserManager::createUserPanel(const DbUserT& user)
  */
 LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
+    m_userEnableStatusChanged(this),
     m_model(new Wt::WStandardItemModel(0, 5, this)),
     m_dbSession(dbSession)
 {
@@ -448,7 +449,7 @@ LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* par
   m_model->setHeaderData(2, Wt::Horizontal, Q_TR("SN"), Wt::DisplayRole);
   m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Email"), Wt::DisplayRole);
   m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Enable Auth"), Wt::DisplayRole);
-  m_model->itemChanged().connect(this, &LdapUserManager::handleImportatonAction);
+  m_model->itemChanged().connect(this, &LdapUserManager::handleImportationAction);
   setModel(m_model);
 }
 
@@ -506,7 +507,7 @@ Wt::WStandardItem* LdapUserManager::createImportationItem(const std::string& dat
 }
 
 
-void LdapUserManager::handleImportatonAction(Wt::WStandardItem* item)
+void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
 {
   if (item->isCheckable()) {
     std::string ldapDn = getItemData(item);
@@ -516,11 +517,19 @@ void LdapUserManager::handleImportatonAction(Wt::WStandardItem* item)
       dbUser.username = userInfo->dn;
       dbUser.password = ngrt4n::md5Hash(userInfo->dn); //FIXME: md5
       dbUser.email = userInfo->email;
-      dbUser.firstname = userInfo->sn;
-      dbUser.lastname = userInfo->cn;
-      m_dbSession->addUser(dbUser);
+      dbUser.firstname = userInfo->cn;
+      dbUser.lastname = userInfo->sn;
+      if (m_dbSession->addUser(dbUser) == 0) {
+        m_userEnableStatusChanged.emit(EnableAuthSuccess, ldapDn);
+      } else {
+        m_userEnableStatusChanged.emit(EnableAuthError, ldapDn);
+      }
     } else { // disable LDAP authentication
-      m_dbSession->deleteUser(ldapDn);
+      if (m_dbSession->deleteUser(ldapDn) == 0) {
+        m_userEnableStatusChanged.emit(DisableAuthSuccess, ldapDn);
+      } else {
+        m_userEnableStatusChanged.emit(DisableAuthError, ldapDn);
+      }
     }
   }
 }

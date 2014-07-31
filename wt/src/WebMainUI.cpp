@@ -91,7 +91,7 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this, std::placeholders::_1, "alert alert-warning"));
+  m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this, std::placeholders::_1, OperationError));
   m_preferences->authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
@@ -341,7 +341,7 @@ void WebMainUI::openFileUploadDialog(void)
   
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
-    showMessage(tr("File too large.").toStdString(), "alert alert-warning");
+    showMessage(tr("File too large.").toStdString(), OperationError);
   }));
   m_fileUploadDialog->show();
 }
@@ -362,7 +362,7 @@ void WebMainUI::finishFileDialog(int action)
           if (! parser.process(false)) {
             std::string msg = tr("Invalid description file").toStdString();
             LOG("warn", msg);
-            showMessage(msg, "alert alert-warning");
+            showMessage(msg, OperationError);
           } else {
             std::string filename = m_uploader->clientFileName().toUTF8();
             QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
@@ -375,7 +375,7 @@ void WebMainUI::finishFileDialog(int action)
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
             if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), "alert alert-warning");
+              showMessage(m_dbSession->lastError(), OperationError);
             } else {
               QString msg = tr("View added. "
                                " Name: %1\n - "
@@ -383,7 +383,7 @@ void WebMainUI::finishFileDialog(int action)
                                " Path: %3").arg(view.name.c_str(),
                                                 QString::number(view.service_count),
                                                 view.path.c_str());
-              showMessage(msg.toStdString(), "alert alert-success");
+              showMessage(msg.toStdString(), OperationSuccess);
             }
           }
         }
@@ -397,7 +397,7 @@ void WebMainUI::finishFileDialog(int action)
         loadView(m_selectedFile, dashbord);
         m_selectedFile.clear();
       } else {
-        showMessage(tr("No file selected").toStdString(), "alert alert-warning");
+        showMessage(tr("No file selected").toStdString(), OperationError);
       }
       break;
     default:
@@ -411,12 +411,12 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
     dashboardWidget = NULL;
     dashboardWidget = new WebDashboard(path.c_str(), m_eventFeedLayout);
     if (! dashboardWidget) {
-      showMessage("Cannot allocate the dashboard widget", "alert alert-warning");
+      showMessage("Cannot allocate the dashboard widget", OperationError);
       return ;
     }
     dashboardWidget->initialize(m_preferences);
     if (dashboardWidget->lastErrorState()) {
-      showMessage(dashboardWidget->lastErrorMsg().toStdString(), "alert alert-warning");
+      showMessage(dashboardWidget->lastErrorMsg().toStdString(), OperationError);
       delete dashboardWidget;
       dashboardWidget = NULL;
     } else {
@@ -429,7 +429,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
         m_dashTabWidgets.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
       } else {
         showMessage(tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString(),
-                    "alert alert-warning");
+                    OperationError);
         delete dashboardWidget;
         dashboardWidget = NULL;
       }
@@ -438,7 +438,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     LOG("error", errorMsg);
     delete dashboardWidget;
-    showMessage(errorMsg, "alert alert-error");
+    showMessage(errorMsg, OperationError);
   }
 }
 
@@ -519,9 +519,9 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_mgntContentWidgets->addWidget(m_dbUserManager->userForm());
       m_dbUserManager->updateCompleted().connect(std::bind([=](int retCode) {
         if (retCode != 0) {
-          showMessage(m_dbSession->lastError(), "alert alert-warning");
+          showMessage(m_dbSession->lastError(), OperationError);
         } else {
-          showMessage("Successul updated", "alert alert-success");
+          showMessage("Successul updated", OperationSuccess);
           m_dbUserManager->resetUserForm();
         }
       }, std::placeholders::_1));
@@ -545,6 +545,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_mgntContentWidgets->addWidget(m_ldapUserManager);
       link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
       link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
+      m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
       settingPageTpl->bindWidget("menu-ldap-users", link);
       m_menuLinks.insert(MenuLdapUsers, link);
 
@@ -620,9 +621,9 @@ void WebMainUI::createAccountPanel(void)
   m_userAccountForm->validated().connect(std::bind([=](DbUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
-      showMessage(Q_TR("Update failed, see details in log."), "alert alert-warning");
+      showMessage(Q_TR("Update failed, see details in log."), OperationError);
     } else {
-      showMessage(Q_TR("Update completed."), "alert alert-success");
+      showMessage(Q_TR("Update completed."), OperationSuccess);
     }}, std::placeholders::_1));
 }
 
@@ -639,9 +640,9 @@ void WebMainUI::createPasswordPanel(void)
                                                                      const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
     if (ret != 0) {
-      showMessage(Q_TR("Change password failed, see details in log."), "alert alert-warning");
+      showMessage(Q_TR("Change password failed, see details in log."), OperationError);
     } else {
-      showMessage(Q_TR("Successul password updated."), "alert alert-success");
+      showMessage(Q_TR("Successul password updated."), OperationSuccess);
     }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
@@ -683,16 +684,30 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 }
 
 
-void WebMainUI::showMessage(const std::string& msg, std::string status)
+void WebMainUI::showMessage(const std::string& msg, int status)
+{
+  switch (status) {
+    case OperationSuccess:
+      showMessageClass(msg, "alert alert-success");
+      break;
+    case OperationError:
+      showMessageClass(msg, "alert alert-warning");
+      break;
+    default:
+      break;
+  }
+}
+
+void WebMainUI::showMessageClass(const std::string& msg, std::string statusCssClass)
 {
   std::string logLevel = "info";
-  if (status != "alert alert-success") {
+  if (statusCssClass != "alert alert-success") {
     logLevel = "error";
   }
   LOG(logLevel, msg);
 
   m_infoBox->setText(msg);
-  m_infoBox->setStyleClass(status);
+  m_infoBox->setStyleClass(statusCssClass);
   m_infoBox->show();
 }
 
@@ -785,7 +800,7 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
     return false;
     QString errMsg = tr("Unable to create the directory (%1)").arg(dir.absolutePath());
     LOG("error", errMsg.toStdString());
-    showMessage(errMsg.toStdString(), "alert alert-warning");
+    showMessage(errMsg.toStdString(), OperationError);
   }  else {
     ret = true;
     if (cleanContent) dir.remove("*");
@@ -827,7 +842,7 @@ void WebMainUI::handleInternalPath(void)
   } else if (path == ngrt4n::LINK_LOGIN) {
     wApp->redirect(ngrt4n::LINK_LOGIN);
   } else {
-    showMessage(Q_TR("Sorry, the request resource is not available or has been removed"),"alert alert-warning");
+    showMessage(Q_TR("Sorry, the request resource is not available or has been removed"),OperationError);
   }
 }
 
@@ -849,7 +864,7 @@ void WebMainUI::handleLdapUsersMenu(void)
 {
   m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
   if (m_ldapUserManager->updateUserList() <= 0) {
-    showMessage(m_ldapUserManager->lastError(), "alert alert-warning");
+    showMessage(m_ldapUserManager->lastError(), OperationError);
   }
   m_adminPanelTitle->setText(Q_TR("Manage LDAP Users"));
 }
@@ -876,4 +891,25 @@ void  WebMainUI::handleViewAclMenu(void)
   m_mgntContentWidgets->setCurrentWidget(m_viewAccessPermissionForm);
   m_viewAccessPermissionForm->resetModelData();
   m_adminPanelTitle->setText(Q_TR("Manage Views and Access Control"));
+}
+
+
+void WebMainUI::handleUserEnableStatusChanged(int status, std::string userId)
+{
+  switch (status) {
+    case LdapUserManager::EnableAuthSuccess:
+      showMessage(Q_TR("LDAP authentication enabled for user ") + userId, OperationSuccess);
+      break;
+    case LdapUserManager::EnableAuthError:
+      showMessage(Q_TR("Failed to enable authentication for user ") + userId, OperationError);
+      break;
+    case LdapUserManager::DisableAuthSuccess:
+      showMessage(Q_TR("LDAP authentication disabled for user ") + userId, OperationSuccess);
+      break;
+    case LdapUserManager::DisableAuthError:
+      showMessage(Q_TR("Failed to disable authentication for user ") + userId, OperationError);
+      break;
+    default:
+      break;
+  }
 }

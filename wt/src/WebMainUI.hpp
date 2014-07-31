@@ -57,6 +57,11 @@ class WebMainUI : public QObject, public Wt::WContainerWidget
     MenuChangePassword
   };
 
+  enum OperationStatusT {
+    OperationSuccess,
+    OperationError
+  };
+
 public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
@@ -73,7 +78,7 @@ public:
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
-  void handleLibError(QString msg) {showMessage(msg.toStdString(), "alert alert-success");}
+  void handleLibError(QString msg) {showMessage(msg.toStdString(), OperationSuccess);}
   void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
 
 private:
@@ -139,7 +144,8 @@ private:
   void createAboutDialog(void);
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);
-  void showMessage(const std::string& msg, std::string status);
+  void showMessage(const std::string& msg, int status);
+  void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);
   void startDashbaordUpdate(void);
@@ -152,6 +158,7 @@ private:
   void handleBuiltInUsersMenu(void);
   void handleNewUserMenu(void);
   void handleViewAclMenu(void);
+  void handleUserEnableStatusChanged(int status, std::string userId);
 };
 
 #endif // MAINWEBWINDOW_HPP
