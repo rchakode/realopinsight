@@ -857,6 +857,7 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
       wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', false);");
       break;
     default:
+      m_dbSession->deleteAuthSystemUsers(WebPreferences::LDAP);
       wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', true);");
       break;
   }

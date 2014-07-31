@@ -90,7 +90,7 @@ public:
   std::string email;
   int role;
   std::string registrationDate;
-  //int authSystem; // e.g. LDAP or BuiltIn
+  int authsystem; // e.g. LDAP or BuiltIn
   dbo::collection< dbo::ptr<DbViewT> > views;
   dbo::collection< dbo::ptr<DbLoginSession> > sessions;
 
@@ -102,7 +102,7 @@ public:
     dbo::field(a, email, "email");
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
-    //dbo::id(a, authSystem, "authSystem");
+    dbo::field(a, authsystem, "authsystem");
     dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
     dbo::hasMany(a, sessions, dbo::ManyToMany);
   }
@@ -111,7 +111,7 @@ public:
     return role == AdmRole? "Administrator" : "Operator";
   }
   static int role2Int(const std::string& role) {
-    return role =="Administrator" ? AdmRole : OpRole;
+    return role == "Administrator" ? AdmRole : OpRole;
   }
 };
 

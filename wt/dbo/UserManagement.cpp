@@ -174,6 +174,10 @@ UserFormView::UserFormView(const DbUserT* user, bool changePassword, bool userFo
 {
   m_model = new UserFormModel(user, changePassword, userForm, this);
 
+  Wt::WPushButton* changedPwdButton = NULL;
+  Wt::WPushButton* submitButton = NULL;
+  Wt::WPushButton* cancelButton = NULL;
+
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
   setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
@@ -192,7 +196,7 @@ UserFormView::UserFormView(const DbUserT* user, bool changePassword, bool userFo
       bindString("change-password-link", "");
     } else {
       if (! userForm) {
-        Wt::WPushButton* changedPwdButton = new Wt::WPushButton(Q_TR("Change password"));
+        changedPwdButton = new Wt::WPushButton(Q_TR("Change password"));
         changedPwdButton->setStyleClass("btn btn-warning");
         bindEmpty("title");
         bindWidget("change-password-link", changedPwdButton);
@@ -206,8 +210,8 @@ UserFormView::UserFormView(const DbUserT* user, bool changePassword, bool userFo
   }
 
   // Bind buttons, but alter later
-  Wt::WPushButton* submitButton = new Wt::WPushButton( Q_TR("Submit") );
-  Wt::WPushButton* cancelButton = new Wt::WPushButton( Q_TR("Clear") );
+  submitButton = new Wt::WPushButton( Q_TR("Submit") );
+  cancelButton = new Wt::WPushButton( Q_TR("Clear") );
   bindWidget("submit-button", submitButton);
   bindWidget("cancel-button", cancelButton);
 
@@ -248,6 +252,12 @@ UserFormView::UserFormView(const DbUserT* user, bool changePassword, bool userFo
     }));
   } else {
     submitButton->clicked().connect(this, &UserFormView::process);
+  }
+
+  if (user && user->authsystem == WebPreferences::LDAP) {
+    if (submitButton) submitButton->setDisabled(true);
+    if (cancelButton) cancelButton->setDisabled(true);
+    if (changedPwdButton) changedPwdButton->setDisabled(true);
   }
 
   bindString("title", title);
@@ -556,20 +566,24 @@ int LdapUserManager::insertIntoDatabase(const LdapUserAttrsT& userInfo)
   int retCode = -1;
   DbUserT dbUser;
   dbUser.username = userInfo[m_ldapUidField];
-  if (! dbUser.username.empty()) {
-    dbUser.password = userInfo["userpassword"];
-    dbUser.email = userInfo["mail"];
-    dbUser.firstname = userInfo["gn"];
-    dbUser.lastname = userInfo["sn"];
-    dbUser.role = DbUserT::OpRole;
-    if (m_dbSession->addUser(dbUser) == 0) {
-      m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
-      retCode = 0;
-    } else {
-      m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
-    }
-  } else {
+
+  if (dbUser.username.empty()) {
     m_userEnableStatusChanged.emit(GenericError, Q_TR("The ID attribute is empty: ")+m_ldapUidField);
+    return retCode;
+  }
+
+  dbUser.password = userInfo["userpassword"];
+  dbUser.email = userInfo["mail"];
+  dbUser.firstname = userInfo["gn"];
+  dbUser.lastname = userInfo["sn"];
+  dbUser.role = DbUserT::OpRole;
+  dbUser.authsystem = WebPreferences::LDAP;
+
+  if (m_dbSession->addUser(dbUser) == 0) {
+    m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
+    retCode = 0;
+  } else {
+    m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
   }
 
   return retCode;

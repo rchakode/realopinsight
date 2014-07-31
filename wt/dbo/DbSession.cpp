@@ -164,6 +164,24 @@ int DbSession::deleteUser(std::string uname)
 }
 
 
+int DbSession::deleteAuthSystemUsers(int authSystem)
+{
+  int retCode = -1;
+  try {
+    dbo::Transaction transaction(*this);
+    dbo::ptr<DbUserT> usr = find<DbUserT>().where("authsystem=?").bind(authSystem);
+    usr.remove();
+    retCode = 0;
+    transaction.commit();
+  } catch (const dbo::Exception& ex) {
+    retCode = 1;
+    LOG("error", ex.what());
+  }
+  updateUserList();
+  return retCode;
+}
+
+
 bool DbSession::findUser(const std::string& username, DbUserT& user)
 {
   DbUsersT::const_iterator it = std::find_if(m_userList.cbegin(),

@@ -59,6 +59,7 @@ public:
   int addUser(const DbUserT& user);
   int updateUser(DbUserT user);
   int deleteUser(std::string uname);
+  int deleteAuthSystemUsers(int authSystem);
   bool findUser(const std::string& username, DbUserT& user);
   int updatePassword(const std::string& uname, const std::string& currentPass,const std::string& newPass);
   void updateUserList(void);
