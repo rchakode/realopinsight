@@ -195,7 +195,9 @@ void WebMainUI::setupProfileMenus(void)
           m_dashtabs->setCurrentIndex(0);
           curItem->setText(tr("Hide Account & Settings").toStdString());
           wApp->doJavaScript("$('#userMenuBlock').hide(); "
-                             "$('#viewMenuBlock').hide();");
+                             "$('#viewMenuBlock').hide();"
+                             "$('#menu-auth-settings').hide();");
+          m_preferences->showAuthSettingsWidgets(false);
         }
       } else {
         if (m_dashtabs->count() > 1) {

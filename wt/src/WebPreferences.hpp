@@ -64,6 +64,8 @@ public:
   void hideUnrequiredFields(void);
   void showAuthSettings(void);
   void showMonitoringSettings(void);
+  void showMonitoringSettingsWidgets(bool display);
+  void showAuthSettingsWidgets(bool display);
   std::string getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString();}
   std::string getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString();}
   std::string getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE).toStdString();}
@@ -119,8 +121,6 @@ private:
   void bindFormWidget(void);
   void saveAuthSettings(void);
   void loadAuthSettings(void);
-  void showMonitoringSettingsWidgets(bool display);
-  void showAuthSettingsWidgets(bool display);
   bool validateMonitoringSettingsFields(void);
   bool validateAuthSettingsFields(void);
 };
