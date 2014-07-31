@@ -143,7 +143,7 @@ WebPreferences::WebPreferences(void)
   m_ldapBindUserPasswordField->setText("mysecretpassword");
 
   m_ldapIdField.reset(new Wt::WLineEdit(this));
-  m_ldapIdField->setEmptyText(QString("uid").arg(Settings::DN_FORMAT_USERNAME).toStdString());
+  m_ldapIdField->setEmptyText("uid");
 
   m_ldapSearchBaseField.reset(new Wt::WLineEdit(this));
   m_ldapSearchBaseField->setEmptyText("ou=devops,dc=example,dc=com");
