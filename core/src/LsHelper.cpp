@@ -123,7 +123,7 @@ void LsHelper::parseResult(const QString& result, ChecksT& checks)
       chkid = fields[0].toLower();
       check.id = check.host = fields[0].toStdString();
       check.status = fields[1].toInt();
-      check.last_state_change = ngrt4n::humanTimeText(fields[2].toStdString());
+      check.last_state_change = fields[2].toStdString();
       check.check_command = fields[3].toStdString();
       check.alarm_msg = fields[4].toStdString();
       break;
@@ -133,7 +133,7 @@ void LsHelper::parseResult(const QString& result, ChecksT& checks)
       check.host = fields[0].toStdString();
       check.id = chkid.toStdString();
       check.status = fields[2].toInt();
-      check.last_state_change = ngrt4n::humanTimeText(fields[3].toStdString());
+      check.last_state_change = fields[3].toStdString();
       check.check_command = fields[4].toStdString();
       check.alarm_msg = fields[5].toStdString();
       break;
