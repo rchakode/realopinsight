@@ -139,6 +139,7 @@ void LsHelper::parseResult(const QString& result, ChecksT& checks)
       break;
 
     default:
+        qDebug()<< "unexpected entry: "<< entry;
       continue;
       break;
     }
