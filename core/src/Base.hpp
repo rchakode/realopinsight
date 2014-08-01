@@ -178,44 +178,34 @@ public:
     return Criticity(ngrt4n::Normal);
   }
 
-  Criticity operator ++(int) {
+  Criticity operator ++() {
     switch(value) {
     case ngrt4n::Minor:
       return Criticity(ngrt4n::Major);
       break;
-
     case ngrt4n::Major:
       return Criticity(ngrt4n::Critical);
       break;
-
     default:
-      //MonitorBroker::CRITICITY_NORMAL:
-      //MonitorBroker::CRITICITY_UNKNOWN:
-      //MonitorBroker::CRITICITY_HIGH:
+      //leave unchanged
       break;
     }
-
     return Criticity(value);
   }
 
-  Criticity operator--(int) {
+  Criticity operator--() {
 
     switch(value) {
     case ngrt4n::Critical:
       return Criticity(ngrt4n::Major);
       break;
-
     case ngrt4n::Major:
       return Criticity(ngrt4n::Minor);
       break;
-
     default:
-      //MonitorBroker::CRITICITY_NORMAL:
-      //MonitorBroker::CRITICITY_MINOR:
-      //MonitorBroker::CRITICITY_UNKNOWN:
+      //leave unchanged
       break;
     }
-
     return Criticity(value);
   }
 
@@ -237,12 +227,18 @@ struct NodeT {
   QString actual_msg;
   qint32 severity;
   qint32 prop_sev;
+  int weight;
   QString child_nodes;
   CheckT check;
   bool monitored;
   qint8 visibility;
   double pos_x;
   double pos_y;
+  NodeT():
+    sev_crule(PropRules::Unchanged),
+    sev_prule(CalcRules::HighCriticity),
+    severity(ngrt4n::Unknown),
+    weight(1){}
 };
 
 typedef QMap<qint32, qint32> CheckStatusCountT;
