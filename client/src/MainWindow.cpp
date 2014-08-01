@@ -39,6 +39,7 @@ MainWindow::MainWindow(const qint32& _userRole,
   handleTabChanged(0);
   addEvents();
   m_dashboard->initialize(m_preferences);
+  resetTimer(m_preferences->updateInterval());
 }
 
 
@@ -227,7 +228,7 @@ void MainWindow::handleRefresh(void)
 void MainWindow::resetTimer(qint32 interval)
 {
   killTimer(m_dashboard->timerId());
-  m_dashboard->setTimerId(startTimer(interval));
+  m_dashboard->setTimerId( startTimer(1000 * interval) );
 }
 
 
@@ -270,5 +271,4 @@ void MainWindow::addEvents(void)
   connect(m_dashboard, SIGNAL(updateStatusBar(const QString&)), this, SLOT(handleUpdateStatusBar(const QString&)));
   connect(m_dashboard, SIGNAL(updateInprogress()), this, SLOT(handleUpdateIntprogress()));
   connect(m_dashboard, SIGNAL(updateFinished()), this, SLOT(handleUpdateFinished()));
-
 }
