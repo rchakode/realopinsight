@@ -129,12 +129,12 @@ int ngrt4n::computeSeverity2Propagate(const qint8& _critValue, const qint8& prop
   ngrt4n::SeverityT propCriticity = static_cast<ngrt4n::SeverityT>(_critValue);
   Criticity criticity(static_cast<ngrt4n::SeverityT>(_critValue));
   switch(propRule) {
-    case PropRules::Increased: propCriticity = (criticity++).getValue();
-      break;
-    case PropRules::Decreased: propCriticity = (criticity--).getValue();
-      break;
-    default:
-      break;
+  case PropRules::Increased: propCriticity = (++criticity).getValue();
+    break;
+  case PropRules::Decreased: propCriticity = (--criticity).getValue();
+    break;
+  default:
+    break;
   }
   return propCriticity;
 }

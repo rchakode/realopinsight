@@ -371,10 +371,10 @@ void DashboardBase::updateBpNode(const QString& _nodeId)
   node->severity = criticity.getValue();
   switch(node->sev_prule) {
   case PropRules::Increased:
-    node->prop_sev = (criticity++).getValue();
+    node->prop_sev = (++criticity).getValue();
     break;
   case PropRules::Decreased:
-    node->prop_sev = (criticity--).getValue();
+    node->prop_sev = (--criticity).getValue();
     break;
   case PropRules::Unchanged:
   default:
