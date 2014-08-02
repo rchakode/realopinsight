@@ -4,8 +4,12 @@ RealOpInsight ChangeLog
 3.0.3
   * Added the ability to import Livestatus-based data within
     the editor (fixed ticket #31).
-  * Rewrite in Livestatus handler introducing simplification in code
+  * Rewrite in the livestatus backend introducing code simplification
     as well as significant performance improvements
+  * Fixed date display with livestatus backend (see ticket #35)
+  * Fixed dashboard refreshing in RealOpInsight Workstation (see ticket #35)
+  * Introduce graph-based algorithms to improved the mecanism to compute
+    severities. Brings fix for ticket #36.
 
 3.0.2
   * Fixed editor crash on native check service deletion (ticket #27)
