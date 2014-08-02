@@ -61,7 +61,8 @@ Source: "..\i18n\ngrt4n_*.qm" ; DestDir: "{app}\i18n"
 Name: "{group}\{#Application} Configuration Manager"; Filename: "{app}\realopinsight-manager.exe"; IconFilename: "{app}\icons\icon.ico";
 Name: "{group}\{#Application} Operations Console"; Filename: "{app}\realopinsight-oc.exe"; IconFilename: "{app}\icons\icon.ico";
 Name: "{group}\{#Application} Editor"; Filename: "{app}\realopinsight-editor.exe"; IconFilename: "{app}\icons\icon.ico";
-Name: "{group}\Uninstall RealOpInsight"; Filename: "{uninstallexe}"
+Name: "{group}\Uninstall RealOpInsight"; Filename: "{uninstallexe}"  
+Name: "{commondesktop}\{#Application} Coonfiguration Manager"; Filename: "{app}\realopinsight-manager.exe"; IconFilename: "{app}\icons\icon.ico";
 Name: "{commondesktop}\{#Application} Operations Console"; Filename: "{app}\realopinsight-oc.exe"; IconFilename: "{app}\icons\icon.ico";
 Name: "{commondesktop}\{#Application} Editor"; Filename: "{app}\realopinsight-editor.exe"; IconFilename: "{app}\icons\icon.ico";
         

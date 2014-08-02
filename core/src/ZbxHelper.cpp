@@ -67,7 +67,7 @@ ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
     request = request.arg(param);
   }
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
-  reply->setSslConfiguration(m_sslConfig);
+  setSslReplyErrorHandlingOptions(reply);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
   m_evlHandler->exec();
@@ -112,12 +112,12 @@ ZbxHelper::requestsPatterns()
 }
 
 void
-ZbxHelper::setSslConfig(bool verifyPeer)
+ZbxHelper::setSslPeerVerification(bool verifyPeer)
 {
   if (verifyPeer) {
     m_sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
   } else {
-    m_sslConfig.setPeerVerifyMode(QSslSocket::QueryPeer);
+    m_sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
   }
 }
 
@@ -174,16 +174,16 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     return -1;
   }
   params.push_back(QString::number(Login));
-  setSslConfig(srcInfo.verify_ssl_peer);
+  qDebug()<<"session <<"<<srcInfo.verify_ssl_peer<<(srcInfo.verify_ssl_peer != 0);
+  setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
   QNetworkReply* response = postRequest(Login, params);
-  if (! response || processLoginReply(response) !=0) {
+
+  if (! response || processLoginReply(response) !=0)
     return -1;
-  }
 
   // Get the API version
-  if (fecthApiVersion(srcInfo) != 0) {
+  if (fecthApiVersion(srcInfo) != 0)
     return -1;
-  }
 
   return 0;
 }
@@ -215,7 +215,7 @@ ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
 {
   QStringList params;
   params.push_back(QString::number(ZbxHelper::ApiVersion));
-  setSslConfig(srcInfo.verify_ssl_peer);
+  setSslPeerVerification(srcInfo.verify_ssl_peer);
   QNetworkReply* response = postRequest(ZbxHelper::ApiVersion, params);
   if (! response || processGetApiVersionReply(response) !=0) {
     return -1;
@@ -309,9 +309,11 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 int
 ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
 {
-  if (! m_isLogged) {
+  if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
-  }
+
+  if (! m_isLogged)
+    return -1;
 
   QStringList params;
   QNetworkReply* response = NULL;
@@ -330,3 +332,10 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   return 0;
 }
 
+void
+ZbxHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
+{
+  reply->setSslConfiguration(m_sslConfig);
+  if (m_sslConfig.peerVerifyMode() == QSslSocket::VerifyNone)
+    reply->ignoreSslErrors();
+}

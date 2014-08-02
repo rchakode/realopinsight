@@ -32,9 +32,9 @@
 #include <QtNetwork/QSslConfiguration>
 
 namespace {
-const QString ZNS_API_CONTEXT = "/zport/dmd";
-const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
-}
+  const QString ZNS_API_CONTEXT = "/zport/dmd";
+  const QString ZNS_LOGIN_API_CONTEXT = "/zport/acl_users/cookieAuthHelper/login";
+  }
 
 class ZnsHelper : public QNetworkAccessManager {
   Q_OBJECT
@@ -84,7 +84,7 @@ public:
   bool
   getIsLogged(void) const {return m_isLogged;}
   void
-  setSslConfig(bool verifyPeer);
+  setSslPeerVerification(bool verifyPeer);
   int
   parseReply(QNetworkReply* reply);
   bool
@@ -118,6 +118,9 @@ private :
   QString m_lastError;
   QString m_replyData;
   JsonHelper m_replyJsonData;
+
+  void
+  setSslReplyErrorHandlingOptions(QNetworkReply* reply);
 };
 
 #endif /* ZENOSSHELPER_HPP_ */

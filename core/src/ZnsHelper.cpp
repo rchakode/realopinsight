@@ -62,12 +62,12 @@ void ZnsHelper::setBaseUrl(const QString& url)
 QNetworkReply* ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
 {
   m_reqHandler->setRawHeader("Content-Type", ngrt4n::toByteArray(ContentTypes[reqType]));
-  QNetworkReply* response = QNetworkAccessManager::post(*m_reqHandler, data);
-  response->setSslConfiguration(m_sslConfig);
-  connect(response, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
-  connect(response, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, data);
+  setSslReplyErrorHandlingOptions(reply);
+  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
   m_evlHandler->exec();
-  return response;
+  return reply;
 }
 
 void ZnsHelper::setRouterEndpoint(const int& reqType) {
@@ -123,7 +123,7 @@ RequestListT ZnsHelper::routers()
   return list;
 }
 
-void ZnsHelper::setSslConfig(bool verifyPeer)
+void ZnsHelper::setSslPeerVerification(bool verifyPeer)
 {
   if (verifyPeer) {
     m_sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
@@ -184,7 +184,7 @@ ZnsHelper::openSession(const SourceT& srcInfo)
   params.addQueryItem("__ac_password", authInfo[1]);
   params.addQueryItem("submitted", "true");
   params.addQueryItem("came_from", getApiContextEndpoint());
-  setSslConfig(srcInfo.verify_ssl_peer);
+  setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
   QNetworkReply* response = NULL;
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
   response = postRequest(ZnsHelper::Login, params.encodedQuery());
@@ -357,14 +357,12 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   setBaseUrl(srcInfo.mon_url);
 
   // Log in if not yet the case
-  if (! m_isLogged && openSession(srcInfo) != 0) {
+  if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
-  }
 
   // check if login succeeded
-  if (! m_isLogged) {
+  if (! m_isLogged)
     return -1;
-  }
 
   checks.clear();
   QNetworkReply* response = NULL;
@@ -377,8 +375,14 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   if (! response || processDeviceReply(response, checks) !=0) {
     return -1;
   }
-
   return 0;
 }
 
+void
+ZnsHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
+{
+  reply->setSslConfiguration(m_sslConfig);
+  if (m_sslConfig.peerVerifyMode() == QSslSocket::VerifyNone)
+    reply->ignoreSslErrors();
+}
 
