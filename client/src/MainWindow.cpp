@@ -248,7 +248,6 @@ void MainWindow::addEvents(void)
 
   connect(m_preferences, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
   connect(m_preferences, SIGNAL(sourcesChanged(QList<qint8>)), m_dashboard, SLOT(handleSourceSettingsChanged(QList<qint8>)));
-  connect(m_dashboard, SIGNAL(hasToBeUpdate(QString)), m_dashboard, SLOT(updateBpNode(QString)));
   connect(m_subMenus["Quit"], SIGNAL(triggered(bool)), qApp, SLOT(quit()));
   connect(m_subMenus["Capture"], SIGNAL(triggered(bool)), m_dashboard->getMap(), SLOT(capture()));
   connect(m_subMenus["ZoomIn"], SIGNAL(triggered(bool)), m_dashboard->getMap(), SLOT(zoomIn()));

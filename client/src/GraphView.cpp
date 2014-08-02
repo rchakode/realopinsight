@@ -273,7 +273,7 @@ void GraphView::updateNode(const NodeListT::iterator& _node, const QString& _too
 
 void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
 {
-  QString label = "<span style=\"background: '"%ngrt4n::severityQColor(_node.severity).name()
+  QString label = "<span style=\"background: '"%ngrt4n::severityQColor(_node.sev).name()
       %"'\">&nbsp;" %_node.name%"&nbsp;</span>";
   GNodeListT::iterator gnodeIt =  m_mnodes.find(_node.id);
   if (gnodeIt != m_mnodes.end()) {
@@ -282,7 +282,7 @@ void GraphView::updateNode(const NodeT& _node, const QString& _toolTip)
     gnodeIt->label->setToolTip(_toolTip);
     GEdgeListT::iterator edge = m_medges.find(_node.parent + ":" + _node.id);
     if (edge != m_medges.end())
-      edge->edge->setPen(ngrt4n::severityQColor(_node.prop_sev));
+      edge->edge->setPen(ngrt4n::severityQColor(_node.sev_prop));
   }
 }
 
