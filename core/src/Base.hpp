@@ -115,98 +115,98 @@ public:
 };
 
 
-class Criticity {
+class SeverityHelper {
 public:
-  Criticity(ngrt4n::SeverityT _value): value(_value) {}
+  SeverityHelper(ngrt4n::SeverityT _value): value(_value) {}
   void setValue(ngrt4n::SeverityT _value) {value = _value;}
   ngrt4n::SeverityT getValue() const {return value;}
 
-  Criticity operator *(Criticity& _criticity) const {
+  SeverityHelper operator *(SeverityHelper& sh) const {
     switch(value) {
     case ngrt4n::Critical:
-      return Criticity(value);
+      return SeverityHelper(value);
       break;
     case ngrt4n::Normal:
-      return _criticity;
+      return sh;
       break;
     case ngrt4n::Minor:
-      if(_criticity.value == ngrt4n::Critical ||
-         _criticity.value == ngrt4n::Major ||
-         _criticity.value == ngrt4n::Unknown)
-        return _criticity;
+      if(sh.value == ngrt4n::Critical ||
+         sh.value == ngrt4n::Major ||
+         sh.value == ngrt4n::Unknown)
+        return sh;
 
-      return Criticity(value);
+      return SeverityHelper(value);
       break;
     case ngrt4n::Major:
-      if(_criticity.value == ngrt4n::Critical ||
-         _criticity.value == ngrt4n::Unknown)
-        return _criticity;
+      if(sh.value == ngrt4n::Critical ||
+         sh.value == ngrt4n::Unknown)
+        return sh;
 
-      return Criticity(value);
+      return SeverityHelper(value);
       break;
     default:
       // MonitorBroker::CRITICITY_UNKNOWN
-      if(_criticity.value == ngrt4n::Critical)
-        return _criticity;
+      if(sh.value == ngrt4n::Critical)
+        return sh;
       break;
     }  //end switch
 
-    return Criticity(ngrt4n::Unknown);
+    return SeverityHelper(ngrt4n::Unknown);
   }
 
 
-  Criticity operator / (Criticity& st) const {
+  SeverityHelper operator / (SeverityHelper& st) const {
     if(value == st.value)
       return st;
 
     if(value == ngrt4n::Critical ||
        st.value == ngrt4n::Critical)
-      return Criticity(ngrt4n::Critical);
+      return SeverityHelper(ngrt4n::Critical);
 
     if(value == ngrt4n::Unknown ||
        st.value == ngrt4n::Unknown)
-      return Criticity(ngrt4n::Unknown);
+      return SeverityHelper(ngrt4n::Unknown);
 
     if(value == ngrt4n::Major ||
        st.value == ngrt4n::Major)
-      return Criticity(ngrt4n::Major);
+      return SeverityHelper(ngrt4n::Major);
 
     if(value == ngrt4n::Minor ||
        st.value == ngrt4n::Minor)
-      return Criticity(ngrt4n::Minor);
+      return SeverityHelper(ngrt4n::Minor);
 
-    return Criticity(ngrt4n::Normal);
+    return SeverityHelper(ngrt4n::Normal);
   }
 
-  Criticity operator ++() {
+  SeverityHelper operator ++() {
     switch(value) {
     case ngrt4n::Minor:
-      return Criticity(ngrt4n::Major);
+      return SeverityHelper(ngrt4n::Major);
       break;
     case ngrt4n::Major:
-      return Criticity(ngrt4n::Critical);
+      return SeverityHelper(ngrt4n::Critical);
       break;
     default:
       //leave unchanged
       break;
     }
-    return Criticity(value);
+    return SeverityHelper(value);
   }
 
-  Criticity operator--() {
+  SeverityHelper operator--() {
 
     switch(value) {
     case ngrt4n::Critical:
-      return Criticity(ngrt4n::Major);
+      return SeverityHelper(ngrt4n::Major);
       break;
     case ngrt4n::Major:
-      return Criticity(ngrt4n::Minor);
+      return SeverityHelper(ngrt4n::Minor);
       break;
     default:
       //leave unchanged
       break;
     }
-    return Criticity(value);
+    return SeverityHelper(value);
   }
 
 private:
@@ -225,8 +225,8 @@ struct NodeT {
   QString alarm_msg;
   QString notification_msg;
   QString actual_msg;
-  qint32 severity;
-  qint32 prop_sev;
+  qint32 sev;
+  qint32 sev_prop;
   int weight;
   QString child_nodes;
   CheckT check;
@@ -237,8 +237,17 @@ struct NodeT {
   NodeT():
     sev_crule(PropRules::Unchanged),
     sev_prule(CalcRules::HighCriticity),
-    severity(ngrt4n::Unknown),
+    sev(ngrt4n::Unknown),
     weight(1){}
+};
+
+struct SeverityWeightInfoT {
+  int sev;
+  int weight;
+  SeverityWeightInfoT() : sev(ngrt4n::Unknown), weight(1){}
+  friend bool operator < (const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2) {
+    return s1.sev < s2.sev;
+  }
 };
 
 typedef QMap<qint32, qint32> CheckStatusCountT;

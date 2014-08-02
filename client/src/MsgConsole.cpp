@@ -92,9 +92,9 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 0)->setText(QDateTime::fromTime_t(itemText.toUInt()).toString());
   mmodel->item(index, 0)->setData(itemText, Qt::UserRole);
 
-  mmodel->item(index, 1)->setText(ngrt4n::severityText(_node.severity));
-  mmodel->item(index, 1)->setData(-1*_node.severity, Qt::UserRole);
-  mmodel->item(index, 1)->setBackground(QBrush(ngrt4n::severityQColor(_node.severity)));
+  mmodel->item(index, 1)->setText(ngrt4n::severityText(_node.sev));
+  mmodel->item(index, 1)->setData(-1*_node.sev, Qt::UserRole);
+  mmodel->item(index, 1)->setBackground(QBrush(ngrt4n::severityQColor(_node.sev)));
 
   itemText = QString(check.host.c_str());
   mmodel->item(index, 2)->setText(itemText);
@@ -103,7 +103,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 3)->setText(_node.name);
   mmodel->item(index, 3)->setData(_node.name, Qt::UserRole);
 
-  if(_node.severity == ngrt4n::Normal) {
+  if(_node.sev == ngrt4n::Normal) {
     mmodel->item(index, 0)->setBackground(Qt::transparent);
     mmodel->item(index, 2)->setBackground(Qt::transparent);
     mmodel->item(index, 3)->setBackground(Qt::transparent);

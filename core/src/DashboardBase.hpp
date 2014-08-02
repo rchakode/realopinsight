@@ -65,7 +65,7 @@ public Q_SLOTS:
   void runLivestatusUpdate(const SourceT& src);
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
-  void updateBpNode(const QString& _node);
+  SeverityWeightInfoT updateNodeStates(const QString& _node);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
@@ -78,7 +78,6 @@ public Q_SLOTS:
   int firstSrcIndex(void) {return m_firstSrcIndex;}
 
 Q_SIGNALS:
-  void hasToBeUpdate(QString);
   void sortEventConsole(void);
   void updateStatusBar(const QString& msg);
   void settingsLoaded(void);
@@ -113,7 +112,6 @@ protected:
   QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;
-  NodeListIteratorT m_root;
   int m_firstSrcIndex;
   bool m_lastErrorState;
   QString m_lastErrorMsg;

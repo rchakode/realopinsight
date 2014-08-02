@@ -120,6 +120,7 @@ void DashboardBase::runMonitor()
       Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
+  updateNodeStates(rootNode().id);
   ++m_updateCounter;
   Q_EMIT updateFinished();
 }
@@ -184,8 +185,8 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
   // Now start doing the job
   for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode!=end; ++cnode) {
     if (cnode->child_nodes.isEmpty()) {
-      cnode->severity = ngrt4n::Unknown;
-      m_cdata->check_status_count[cnode->severity]+=1;
+      cnode->sev = ngrt4n::Unknown;
+      m_cdata->check_status_count[cnode->sev]+=1;
     } else {
       QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
       if (info.first == src.id) {
@@ -204,7 +205,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
         computeStatusInfo(*cnode, src);
         updateDashboard(*cnode);
-        m_cdata->check_status_count[cnode->severity]+=1;
+        m_cdata->check_status_count[cnode->sev]+=1;
         cnode->monitored = true;
       }
     }
@@ -276,7 +277,6 @@ void DashboardBase::updateDashboard(const NodeT& _node)
   updateMap(_node, nodeToolTip);
   updateChart();
   updateMsgConsole(_node);
-  updateBpNode(_node.parent);
   updateEventFeeds(_node);
 }
 
@@ -286,7 +286,7 @@ void DashboardBase::updateCNodesWithCheck(const CheckT& check, const SourceT& sr
     if (cnode->child_nodes.toLower() == ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower()) {
       cnode->check = check;
       computeStatusInfo(*cnode, src);
-      ++(m_cdata->check_status_count[cnode->severity]);
+      ++(m_cdata->check_status_count[cnode->sev]);
       updateDashboard(*cnode);
       cnode->monitored = true;
     }
@@ -303,23 +303,22 @@ void DashboardBase::updateCNodesWithChecks(const ChecksT& checks, const SourceT&
 void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
-  _node.severity = ngrt4n::computeSeverity(src.mon_type, _node.check.status);
-  _node.prop_sev = ngrt4n::computeSeverity2Propagate(_node.severity, _node.sev_prule);
+  _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
+  _node.sev_prop = ngrt4n::severityFromPropRule(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
   if (_node.check.host == "-") {
     return;
   }
 
-  if (m_cdata->monitor == ngrt4n::Zabbix)
-  {
+  if (m_cdata->monitor == ngrt4n::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME2.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
   }
 
-  if (_node.severity == ngrt4n::Normal)
+  if (_node.sev == ngrt4n::Normal)
   {
     if (_node.notification_msg.isEmpty()) {
       return ;
@@ -343,51 +342,51 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     if (info.length() >= 3) {
       regexp.setPattern(ngrt4n::TAG_THERESHOLD.c_str());
       _node.actual_msg.replace(regexp, info[1]);
-      if (_node.severity == ngrt4n::Major)
+      if (_node.sev == ngrt4n::Major)
         _node.actual_msg.replace(regexp, info[2]);
     }
   }
 }
 
-void DashboardBase::updateBpNode(const QString& _nodeId)
+SeverityWeightInfoT DashboardBase::updateNodeStates(const QString& _nodeId)
 {
-  Criticity criticity(ngrt4n::Normal);
+  SeverityWeightInfoT result;
 
   NodeListT::iterator node;
-  if (! ngrt4n::findNode(m_cdata, _nodeId, node)) return;
-
-  QStringList nodeIds = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-  Q_FOREACH (const QString& nodeId, nodeIds) {
-    NodeListT::iterator child;
-    if (!ngrt4n::findNode(m_cdata, nodeId, child)) continue;
-    Criticity cst(static_cast<ngrt4n::SeverityT>(child->prop_sev));
-    if (node->sev_crule == CalcRules::WeightedCriticity) {
-      criticity = criticity / cst;
-    } else {
-      criticity = criticity * cst;
-    }
+  if (! ngrt4n::findNode(m_cdata, _nodeId, node)) {
+    result.weight = 0;
+    return result;
   }
 
-  node->severity = criticity.getValue();
-  switch(node->sev_prule) {
-  case PropRules::Increased:
-    node->prop_sev = (++criticity).getValue();
-    break;
-  case PropRules::Decreased:
-    node->prop_sev = (--criticity).getValue();
-    break;
-  case PropRules::Unchanged:
-  default:
-    node->prop_sev = node->severity;
-    break;
+  if (node->child_nodes.isEmpty()) {
+    result.sev = ngrt4n::Unknown;
+    result.weight = node->weight;
+    return result;
   }
+
+  if (node->type == NodeType::AlarmNode) {
+    result.sev = node->sev_prop;
+    result.weight = node->weight;
+    return result;
+  }
+
+  QVector<SeverityWeightInfoT> childSeverityInfos;
+  Q_FOREACH (const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+    result = updateNodeStates(childId);
+    if (result.weight > 0)
+      childSeverityInfos.push_back( result );
+  }
+
+  result = ngrt4n::severityFromCalcRule(childSeverityInfos, node->sev_crule);
+  node->sev = result.sev;
+  node->sev_prop = ngrt4n::severityFromPropRule(node->sev, node->sev_prule);
+  result.sev = node->sev_prop;
 
   QString toolTip = getNodeToolTip(*node);
   updateMap(*node, toolTip);
   updateTree(*node, toolTip);
-  if (node->id != ngrt4n::ROOT_ID && ! node->parent.isEmpty()) {
-    updateBpNode(node->parent);
-  }
+
+  return result;
 }
 
 QStringList DashboardBase::getAuthInfo(int srcId)
@@ -462,7 +461,6 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     Q_EMIT updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode) {
-
     StringPairT info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
 
@@ -575,7 +573,7 @@ QString DashboardBase::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            ngrt4n::severityText(_node.severity),
+                                            ngrt4n::severityText(_node.sev),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::AlarmNode) {
@@ -595,7 +593,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
     if (! cnode->monitored && cnode->child_nodes.startsWith(prefix, Qt::CaseInsensitive)) {
       ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode->child_nodes), cnode->check);
       computeStatusInfo(*cnode, src);
-      m_cdata->check_status_count[cnode->severity]+=1;
+      m_cdata->check_status_count[cnode->sev]+=1;
       updateDashboard(*cnode);
     }
     cnode->monitored = false;

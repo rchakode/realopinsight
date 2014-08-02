@@ -29,7 +29,7 @@
 namespace {
   const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
   const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
-}
+  }
 
 QString ngrt4n::severityText(const qint32& _status)
 {
@@ -66,7 +66,7 @@ QString ngrt4n::getAbsolutePath(const QString& _path)
   return fileInfo.absoluteFilePath();
 }
 
-ngrt4n::SeverityT ngrt4n::computeSeverity(const int& _monitor, const int& _statusOrSeverity)
+ngrt4n::SeverityT ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity)
 {
   int criticity = ngrt4n::Unknown;
   if(_monitor == ngrt4n::Nagios) {
@@ -124,20 +124,68 @@ ngrt4n::SeverityT ngrt4n::computeSeverity(const int& _monitor, const int& _statu
   return static_cast<ngrt4n::SeverityT>(criticity);
 }
 
-int ngrt4n::computeSeverity2Propagate(const qint8& _critValue, const qint8& propRule)
+int ngrt4n::severityFromPropRule(const qint8& _critValue, const qint8& prule)
 {
-  ngrt4n::SeverityT propCriticity = static_cast<ngrt4n::SeverityT>(_critValue);
-  Criticity criticity(static_cast<ngrt4n::SeverityT>(_critValue));
-  switch(propRule) {
-  case PropRules::Increased: propCriticity = (++criticity).getValue();
+  ngrt4n::SeverityT result = static_cast<ngrt4n::SeverityT>(_critValue);
+  SeverityHelper sh(static_cast<ngrt4n::SeverityT>(_critValue));
+  switch(prule) {
+  case PropRules::Increased:
+    result = (++sh).getValue();
     break;
-  case PropRules::Decreased: propCriticity = (--criticity).getValue();
+  case PropRules::Decreased:
+    result = (--sh).getValue();
     break;
   default:
     break;
   }
-  return propCriticity;
+  return result;
 }
+
+SeverityWeightInfoT ngrt4n::severityFromCalcRule(QVector<SeverityWeightInfoT>& data, int crule)
+{
+  SeverityWeightInfoT result;
+
+  int len = data.size();
+  if (len >= 1) {
+    qSort(data.begin(), data.end());
+    switch (crule) {
+    case CalcRules::WeightedCriticity:
+      result = ngrt4n::meanSeverities(data[0], data[len - 1]);
+      break;
+    case CalcRules::HighCriticity:
+    default:
+      result = data[len-1];
+      break;
+    }
+  }
+  return result;
+}
+
+SeverityWeightInfoT ngrt4n::meanSeverities(const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2)
+{
+  SeverityWeightInfoT result;
+  result.weight = (s1.weight + s2.weight) / 2;
+
+  if (s1.sev == s2.sev) {
+    result.sev = s1.sev;
+    return result;
+  }
+
+  if (s1.sev == ngrt4n::Unset || s1.sev == ngrt4n::Unset) {
+    result.sev = ngrt4n::Unset;
+    return result;
+  }
+
+  if (s1.sev == ngrt4n::Unknown || s1.sev == ngrt4n::Unknown) {
+    result.sev = ngrt4n::Unknown;
+    return result;
+  }
+
+  result.sev = (s1.sev + s2.sev) / 2;
+
+  return result;
+}
+
 
 QString ngrt4n::getIconPath(int _severity)
 {
@@ -201,6 +249,17 @@ bool ngrt4n::findNode(const NodeListT& bpnodes,
   }
   return found;
 }
+
+bool ngrt4n::findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node)
+{
+  bool found = false;
+  node = nodes.find(nodeId);
+  if(node != nodes.end()) {
+    found = true;
+  }
+  return found;
+}
+
 
 QString ngrt4n::sourceData2Json(const SourceT& src)
 {
@@ -323,7 +382,7 @@ QString ngrt4n::getNodeToolTip(const NodeT& _node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
                                             const_cast<QString&>(_node.description).replace("\n", " "),
-                                            ngrt4n::severityText(_node.severity),
+                                            ngrt4n::severityText(_node.sev),
                                             CalcRules::label(_node.sev_crule),
                                             PropRules::label(_node.sev_prule));
   if (_node.type == NodeType::AlarmNode) {

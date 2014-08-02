@@ -303,7 +303,7 @@ NodeT* SvCreator::createNode(const QString& id,
   node->name = label;
   node->parent = parent;
   node->type = NodeType::ServiceNode;
-  node->severity = ngrt4n::Unknown;
+  node->sev = ngrt4n::Unknown;
   node->sev_crule = CalcRules::HighCriticity;
   node->sev_prule = PropRules::Unchanged;
   node->icon = ngrt4n::DEFAULT_ICON;

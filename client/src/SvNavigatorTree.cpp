@@ -160,7 +160,7 @@ void SvNavigatorTree::updateNodeItem(const NodeT& _node, const QString& _tip)
 {
   QTreeWidgetItem* item = findNodeItem(_node.id);
   if (item) {
-    item->setIcon(0, ngrt4n::severityIcon(_node.severity));
+    item->setIcon(0, ngrt4n::severityIcon(_node.sev));
     item->setToolTip(0, _tip);
   }
 }

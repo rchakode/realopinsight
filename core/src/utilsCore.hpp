@@ -78,18 +78,15 @@ namespace ngrt4n
   QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
-  ngrt4n::SeverityT computeSeverity(const int& _monitor, const int& _statusOrSeverity);
-  int computeSeverity2Propagate(const qint8& _criticity, const qint8& propRule);
+  ngrt4n::SeverityT severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity);
+  int severityFromPropRule(const qint8& _criticity, const qint8& prule);
+  SeverityWeightInfoT severityFromCalcRule(QVector<SeverityWeightInfoT>& data, int crule);
+  SeverityWeightInfoT meanSeverities(const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
-  bool findNode(NodeListT& bpnodes,
-                NodeListT& cnodes,
-                const QString& nodeId,
-                NodeListT::iterator& node);
-  bool findNode(const NodeListT& bpnodes,
-                const NodeListT& cnodes,
-                const QString& nodeId,
-                NodeListT::const_iterator& node);
+  bool findNode(NodeListT& bpnodes, NodeListT& cnodes,const QString& nodeId, NodeListT::iterator& node);
+  bool findNode(const NodeListT& bpnodes, const NodeListT& cnodes, const QString& nodeId, NodeListT::const_iterator& node);
+  bool findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node);
   QString sourceData2Json(const SourceT& src);
   qint32 convert2ApiType(const QString& str);
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
