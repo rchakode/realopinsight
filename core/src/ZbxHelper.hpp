@@ -70,7 +70,7 @@ public:
   QString
   getApiEndpoint(void) const {return m_apiUri;}
   void
-  setSslConfig(bool verifyPeer);
+  setSslPeerVerification(bool verifyPeer);
   int
   parseReply(QNetworkReply* reply);
   bool
@@ -91,6 +91,7 @@ public:
 
 public Q_SLOTS:
   void processError(const QNetworkReply::NetworkError& code) { m_evlHandler->exit(code);}
+
 Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
@@ -105,6 +106,9 @@ private :
   QSslConfiguration m_sslConfig;
   QString m_lastError;
   JsonHelper m_replyJsonData;
+
+  void
+  setSslReplyErrorHandlingOptions(QNetworkReply* reply);
 };
 
 #endif /* ZABBIXHELPER_HPP_ */
