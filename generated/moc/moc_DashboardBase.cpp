@@ -22,59 +22,59 @@ static const uint qt_meta_data_DashboardBase[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      27,   14, // methods
+      26,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-      10,       // signalCount
+       9,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
       15,   14,   14,   14, 0x05,
-      38,   14,   14,   14, 0x05,
-      61,   57,   14,   14, 0x05,
-      86,   14,   14,   14, 0x05,
-     103,   14,   14,   14, 0x05,
-     130,  121,   14,   14, 0x05,
-     159,   57,   14,   14, 0x05,
-     182,   14,   14,   14, 0x05,
-     206,   14,   14,   14, 0x05,
-     225,   14,   14,   14, 0x05,
+      38,   34,   14,   14, 0x05,
+      63,   14,   14,   14, 0x05,
+      80,   14,   14,   14, 0x05,
+     107,   98,   14,   14, 0x05,
+     136,   34,   14,   14, 0x05,
+     159,   14,   14,   14, 0x05,
+     183,   14,   14,   14, 0x05,
+     202,   14,   14,   14, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     242,   14,   14,   14, 0x0a,
-     259,  255,   14,   14, 0x0a,
-     280,  255,   14,   14, 0x0a,
-     306,  255,   14,   14, 0x0a,
-     335,   14,   14,   14, 0x0a,
-     351,  255,   14,   14, 0x0a,
-     380,  374,   14,   14, 0x0a,
-     407,  255,  402,   14, 0x0a,
-     440,  436,   14,   14, 0x0a,
-     482,   57,   14,   14, 0x0a,
-     525,  511,   14,   14, 0x0a,
-     561,   14,  550,   14, 0x0a,
-     576,   14,  569,   14, 0x0a,
-     587,   14,  402,   14, 0x0a,
-     612,  606,   14,   14, 0x0a,
-     650,   14,  638,   14, 0x0a,
-     664,   14,  660,   14, 0x0a,
+     219,   14,   14,   14, 0x0a,
+     236,  232,   14,   14, 0x0a,
+     257,  232,   14,   14, 0x0a,
+     283,  232,   14,   14, 0x0a,
+     312,   14,   14,   14, 0x0a,
+     328,  232,   14,   14, 0x0a,
+     377,  371,  351,   14, 0x0a,
+     408,  232,  403,   14, 0x0a,
+     441,  437,   14,   14, 0x0a,
+     483,   34,   14,   14, 0x0a,
+     526,  512,   14,   14, 0x0a,
+     562,   14,  551,   14, 0x0a,
+     577,   14,  570,   14, 0x0a,
+     588,   14,  403,   14, 0x0a,
+     613,  607,   14,   14, 0x0a,
+     651,   14,  639,   14, 0x0a,
+     665,   14,  661,   14, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_DashboardBase[] = {
-    "DashboardBase\0\0hasToBeUpdate(QString)\0"
-    "sortEventConsole()\0msg\0updateStatusBar(QString)\0"
-    "settingsLoaded()\0updateSourceUrl()\0"
-    "interval\0timerIntervalChanged(qint32)\0"
+    "DashboardBase\0\0sortEventConsole()\0msg\0"
+    "updateStatusBar(QString)\0settingsLoaded()\0"
+    "updateSourceUrl()\0interval\0"
+    "timerIntervalChanged(qint32)\0"
     "errorOccurred(QString)\0dashboardLinkSelected()\0"
     "updateInprogress()\0updateFinished()\0"
     "runMonitor()\0src\0runMonitor(SourceT&)\0"
     "runNgrt4ndUpdate(SourceT)\0"
     "runLivestatusUpdate(SourceT)\0"
     "resetStatData()\0prepareUpdate(SourceT)\0"
-    "_node\0updateBpNode(QString)\0bool\0"
+    "SeverityWeightInfoT\0_node\0"
+    "updateNodeStates(QString)\0bool\0"
     "allocSourceHandler(SourceT&)\0ids\0"
     "handleSourceSettingsChanged(QList<qint8>)\0"
     "handleErrorOccurred(QString)\0preferencePtr\0"
@@ -90,38 +90,38 @@ void DashboardBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         Q_ASSERT(staticMetaObject.cast(_o));
         DashboardBase *_t = static_cast<DashboardBase *>(_o);
         switch (_id) {
-        case 0: _t->hasToBeUpdate((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 1: _t->sortEventConsole(); break;
-        case 2: _t->updateStatusBar((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 3: _t->settingsLoaded(); break;
-        case 4: _t->updateSourceUrl(); break;
-        case 5: _t->timerIntervalChanged((*reinterpret_cast< qint32(*)>(_a[1]))); break;
-        case 6: _t->errorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 7: _t->dashboardLinkSelected(); break;
-        case 8: _t->updateInprogress(); break;
-        case 9: _t->updateFinished(); break;
-        case 10: _t->runMonitor(); break;
-        case 11: _t->runMonitor((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
-        case 12: _t->runNgrt4ndUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 13: _t->runLivestatusUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 14: _t->resetStatData(); break;
-        case 15: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 16: _t->updateBpNode((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 17: { bool _r = _t->allocSourceHandler((*reinterpret_cast< SourceT(*)>(_a[1])));
+        case 0: _t->sortEventConsole(); break;
+        case 1: _t->updateStatusBar((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 2: _t->settingsLoaded(); break;
+        case 3: _t->updateSourceUrl(); break;
+        case 4: _t->timerIntervalChanged((*reinterpret_cast< qint32(*)>(_a[1]))); break;
+        case 5: _t->errorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 6: _t->dashboardLinkSelected(); break;
+        case 7: _t->updateInprogress(); break;
+        case 8: _t->updateFinished(); break;
+        case 9: _t->runMonitor(); break;
+        case 10: _t->runMonitor((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
+        case 11: _t->runNgrt4ndUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 12: _t->runLivestatusUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 13: _t->resetStatData(); break;
+        case 14: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 15: { SeverityWeightInfoT _r = _t->updateNodeStates((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< SeverityWeightInfoT*>(_a[0]) = _r; }  break;
+        case 16: { bool _r = _t->allocSourceHandler((*reinterpret_cast< SourceT(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
-        case 18: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
-        case 19: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 20: _t->initialize((*reinterpret_cast< Preferences*(*)>(_a[1]))); break;
-        case 21: { CoreDataT* _r = _t->cdata();
+        case 17: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
+        case 18: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 19: _t->initialize((*reinterpret_cast< Preferences*(*)>(_a[1]))); break;
+        case 20: { CoreDataT* _r = _t->cdata();
             if (_a[0]) *reinterpret_cast< CoreDataT**>(_a[0]) = _r; }  break;
-        case 22: { qint32 _r = _t->userRole();
+        case 21: { qint32 _r = _t->userRole();
             if (_a[0]) *reinterpret_cast< qint32*>(_a[0]) = _r; }  break;
-        case 23: { bool _r = _t->showOnlyTroubles();
+        case 22: { bool _r = _t->showOnlyTroubles();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
-        case 24: _t->setShowOnlyTroubles((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 25: { SourceListT _r = _t->sources();
+        case 23: _t->setShowOnlyTroubles((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 24: { SourceListT _r = _t->sources();
             if (_a[0]) *reinterpret_cast< SourceListT*>(_a[0]) = _r; }  break;
-        case 26: { int _r = _t->firstSrcIndex();
+        case 25: { int _r = _t->firstSrcIndex();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         default: ;
         }
@@ -160,74 +160,67 @@ int DashboardBase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 27)
+        if (_id < 26)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 27;
+        _id -= 26;
     }
     return _id;
 }
 
 // SIGNAL 0
-void DashboardBase::hasToBeUpdate(QString _t1)
+void DashboardBase::sortEventConsole()
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 
 // SIGNAL 1
-void DashboardBase::sortEventConsole()
-{
-    QMetaObject::activate(this, &staticMetaObject, 1, 0);
-}
-
-// SIGNAL 2
 void DashboardBase::updateStatusBar(const QString & _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void DashboardBase::settingsLoaded()
+{
+    QMetaObject::activate(this, &staticMetaObject, 2, 0);
 }
 
 // SIGNAL 3
-void DashboardBase::settingsLoaded()
+void DashboardBase::updateSourceUrl()
 {
     QMetaObject::activate(this, &staticMetaObject, 3, 0);
 }
 
 // SIGNAL 4
-void DashboardBase::updateSourceUrl()
+void DashboardBase::timerIntervalChanged(qint32 _t1)
 {
-    QMetaObject::activate(this, &staticMetaObject, 4, 0);
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 
 // SIGNAL 5
-void DashboardBase::timerIntervalChanged(qint32 _t1)
+void DashboardBase::errorOccurred(QString _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 5, _a);
 }
 
 // SIGNAL 6
-void DashboardBase::errorOccurred(QString _t1)
+void DashboardBase::dashboardLinkSelected()
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 6, _a);
+    QMetaObject::activate(this, &staticMetaObject, 6, 0);
 }
 
 // SIGNAL 7
-void DashboardBase::dashboardLinkSelected()
+void DashboardBase::updateInprogress()
 {
     QMetaObject::activate(this, &staticMetaObject, 7, 0);
 }
 
 // SIGNAL 8
-void DashboardBase::updateInprogress()
-{
-    QMetaObject::activate(this, &staticMetaObject, 8, 0);
-}
-
-// SIGNAL 9
 void DashboardBase::updateFinished()
 {
-    QMetaObject::activate(this, &staticMetaObject, 9, 0);
+    QMetaObject::activate(this, &staticMetaObject, 8, 0);
 }
 QT_END_MOC_NAMESPACE
