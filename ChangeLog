@@ -2,14 +2,17 @@
 RealOpInsight ChangeLog
 ###############################
 3.0.3
-  * Added the ability to import Livestatus-based data within
-    the editor (fixed ticket #31).
-  * Rewrite in the livestatus backend introducing code simplification
-    as well as significant performance improvements
-  * Fixed date display with livestatus backend (see ticket #35)
-  * Fixed dashboard refreshing in RealOpInsight Workstation (see ticket #35)
-  * Introduce graph-based algorithms to improved the mecanism to compute
-    severities. Brings fix for ticket #36.
+  * Fixed ticket #31 adding the ability from the editor to import data
+    points from network-based Livestatus endpoints. This feature
+    complements the existing capabilities to import data points
+    from Zabbix, Zenoss and from Nagios status file.
+  * Rewrite in the Livestatus backend using native socket for
+    simplification and performance improvements.
+  * Fixed ticket #35 related to date display with livestatus backend.
+  * Fixed ticket #35 related to dashboard refreshing in RealOpInsight Workstation.
+  * Fixed ticket #36 related to the computation of average severity.
+    Graph-based traversal algorithms were introduced to improve the
+    performance as well as the accuracy of severities computation.
 
 3.0.2
   * Fixed editor crash on native check service deletion (ticket #27)
