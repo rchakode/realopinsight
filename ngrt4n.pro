@@ -48,7 +48,7 @@ MOC_DIR = generated/moc
 RCC_DIR = generated/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
 
-DISTFILES += README \
+DISTFILES += README.md \
     install-sh \
     install-sh.obs \
     INSTALL \
