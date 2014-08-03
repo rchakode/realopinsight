@@ -1,6 +1,6 @@
-#define Version "3.0.2"
+#define Version "3.0.3"
 #define Application "RealOpInsight Workstation" 
-[Setup] 
+[Setup]          
 AppName={#Application}     
 AppVersion={#Version}
 DefaultDirName={pf}\RealOpInsight Workstation
@@ -65,7 +65,7 @@ Name: "{group}\Uninstall RealOpInsight"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#Application} Coonfiguration Manager"; Filename: "{app}\realopinsight-manager.exe"; IconFilename: "{app}\icons\icon.ico";
 Name: "{commondesktop}\{#Application} Operations Console"; Filename: "{app}\realopinsight-oc.exe"; IconFilename: "{app}\icons\icon.ico";
 Name: "{commondesktop}\{#Application} Editor"; Filename: "{app}\realopinsight-editor.exe"; IconFilename: "{app}\icons\icon.ico";
-        
+       
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
     
