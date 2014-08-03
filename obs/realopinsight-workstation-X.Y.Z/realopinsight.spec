@@ -91,7 +91,7 @@ rm -rf %{buildroot}
 %doc %{_prefix}/share/man/man1/%{binprefix}-manager.1.gz
 %doc %{_prefix}/share/man/man1/%{binprefix}-oc.1.gz
 %doc %{_prefix}/share/man/man1/%{binprefix}-editor.1.gz
-%doc README LICENSE ChangeLog
+%doc README.md LICENSE ChangeLog
 %doc examples
 
 %changelog
