@@ -39,7 +39,6 @@
 #include <algorithm>
 #include <zmq.h>
 #include <cassert>
-#include "ZmqLivestatusHelper.hpp"
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
