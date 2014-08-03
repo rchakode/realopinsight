@@ -28,7 +28,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	./install-sh -d ${prefix_dir}
+	./install-sh.obs -d ${prefix_dir}
 	
 
 # Build architecture-independent files here.
