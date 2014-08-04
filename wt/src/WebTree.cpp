@@ -95,7 +95,7 @@ void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
 {
   Wt::WStandardItem* item = findNodeItem(_node.id);
   if (item) {
-    item->setIcon(ngrt4n::getIconPath(_node.severity).toStdString());
+    item->setIcon(ngrt4n::getIconPath(_node.sev).toStdString());
     item->setToolTip(Wt::WString::fromUTF8(_tip.toStdString()));
   }
 }

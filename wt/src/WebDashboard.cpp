@@ -123,7 +123,7 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
   if (! m_showOnlyTroubles
-      || (m_showOnlyTroubles && _node.severity != ngrt4n::Normal))
+      || (m_showOnlyTroubles && _node.sev != ngrt4n::Normal))
   {
     m_msgConsole->updateNodeMsg(_node);
   }
@@ -149,7 +149,7 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateThumbnail(void)
 {
-  m_thumbnailTitleBar->setStyleClass(ngrt4n::severityCssClass(rootNode().severity));
+  m_thumbnailTitleBar->setStyleClass(ngrt4n::severityCssClass(rootNode().sev));
   m_map->thumbnail()->setToolTip(m_chart->buildTooltipText().toStdString());
 }
 
@@ -206,7 +206,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
       m_eventFeedItems.erase(feed);
     }
     // FIXME: need optimization to avoid removing and readding the same item
-    if (node.severity != ngrt4n::Normal) {
+    if (node.sev != ngrt4n::Normal) {
       Wt::WWidget* widget = createEventFeedItem(node);
       m_eventFeedLayout->insertWidget(0, widget);
       m_eventFeedItems.insert(node.id, widget);
@@ -219,12 +219,12 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
 
-  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(ngrt4n::severityText(node.severity),
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(ngrt4n::severityText(node.sev),
                                                                                  node.child_nodes).toStdString());
   anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(m_widget);}));
 
   tpl->bindWidget("event-feed-title", anchor);
-  tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.severity));
+  tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
   tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", rootNode().name.toStdString());

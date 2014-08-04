@@ -89,7 +89,7 @@ void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
       addMsg(*node);
     } else {
       m_model->item(index, 0)->setText(ngrt4n::humanTimeText(node->check.last_state_change));
-      updateSeverityItem(m_model->item(index, 1), node->severity);
+      updateSeverityItem(m_model->item(index, 1), node->sev);
       m_model->item(index, 2)->setText(node->check.host);
       m_model->item(index, 3)->setText(node->name.toStdString()); //optional
       m_model->item(index, 4)->setText(node->actual_msg.toStdString());
@@ -104,7 +104,7 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
     addMsg(_node);
   } else {
     m_model->item(index, 0)->setText(ngrt4n::humanTimeText(_node.check.last_state_change));
-    updateSeverityItem(m_model->item(index, 1), _node.severity);
+    updateSeverityItem(m_model->item(index, 1), _node.sev);
     m_model->item(index, 2)->setText(_node.check.host);
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
     m_model->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
@@ -134,9 +134,9 @@ Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
 Wt::WStandardItem* WebMsgConsole::createSeverityItem(const NodeT& _node)
 {
   Wt::WStandardItem* item = new Wt::WStandardItem();
-  item->setData(QString::number(_node.severity).toStdString(), Wt::UserRole);
-  item->setText(ngrt4n::severityText(_node.severity).toStdString());
-  updateSeverityItem(item, _node.severity);
+  item->setData(QString::number(_node.sev).toStdString(), Wt::UserRole);
+  item->setText(ngrt4n::severityText(_node.sev).toStdString());
+  updateSeverityItem(item, _node.sev);
   return item;
 }
 

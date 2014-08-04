@@ -26,7 +26,7 @@
 #include "WebMainUI.hpp"
 #include "DbSession.hpp"
 #include "AuthManager.hpp"
-#include "LdapAuthModel.hpp"
+#include "AuthModelProxy.hpp"
 #include <Wt/Auth/Login>
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/AbstractUserDatabase>
@@ -44,7 +44,7 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_mainUI(NULL)
 {
   //Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
-  LdapAuthModel* authModel = new LdapAuthModel(m_dbSession->auth(), m_dbSession->users());
+  AuthModelProxy* authModel = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
   authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
   authModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
   setModel(authModel);

@@ -133,7 +133,7 @@ void WebMap::drawNode(const NodeT& _node, bool drawIcon)
     Wt::WPointF iconPos(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
     Wt::WPointF labelPos(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
     Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
-    m_painter->setPen(Wt::WPen(ngrt4n::severityWColor(_node.severity)));
+    m_painter->setPen(Wt::WPen(ngrt4n::severityWColor(_node.sev)));
     if (drawIcon) {
       m_painter->drawImage(iconPos, GImage(ngrt4n::getPathFromQtResource(ICONS[_node.icon]),40,40));
     } else { /* thumbnail: do nothing*/ }
@@ -164,7 +164,7 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
   {
     if (parent->visibility & ngrt4n::Expanded) {
       m_painter->save();
-      Wt::WPen pen(ngrt4n::severityWColor(child->prop_sev));
+      Wt::WPen pen(ngrt4n::severityWColor(child->sev_prop));
       m_painter->setPen(pen);
 
       Wt::WPointF edgeP1(parent->pos_x + m_translateX, parent->pos_y + 24 + m_translateY);

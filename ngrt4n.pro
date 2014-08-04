@@ -178,11 +178,11 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/WebPreferences.hpp \
     wt/extlibs/wtwithqt/DispatchThread.h \
     wt/extlibs/wtwithqt/WQApplication \
-    wt/src/LdapAuthModel.hpp \
     wt/src/Validators.hpp \
     wt/src/LdapHelper.hpp\
     wt/dbo/ViewAclManagement.hpp \
-    wt/dbo/UserManagement.hpp
+    wt/dbo/UserManagement.hpp \
+    wt/src/AuthModelProxy.hpp
 
 
 
@@ -199,10 +199,10 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebPreferences.cpp \
     wt/extlibs/wtwithqt/DispatchThread.C \
     wt/extlibs/wtwithqt/WQApplication.C \
-    wt/src/LdapAuthModel.cpp \
     wt/src/LdapHelper.cpp \
     wt/dbo/UserManagement.cpp \
-    wt/dbo/ViewAclManagement.cpp
+    wt/dbo/ViewAclManagement.cpp \
+    wt/src/AuthModelProxy.cpp
 }
 
 

@@ -267,7 +267,7 @@ void WebMainUI::handleRefresh(void)
     dash.second->runMonitor();
     dash.second->updateMap();
     dash.second->updateThumbnail();
-    int platformSeverity = qMin(dash.second->rootNode().severity, (int)ngrt4n::Unknown);
+    int platformSeverity = qMin(dash.second->rootNode().sev, (int)ngrt4n::Unknown);
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
     }
