@@ -51,8 +51,10 @@ private:
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
   WebPreferences* m_preferences;
+  Wt::WText* m_infoBox;
 
   void handleAuthentication(void);
+  void handleLoginFailed(std::string data);
 };
 
 #endif // AUTHWIDGET_HPP

@@ -36,11 +36,17 @@ class AuthModelProxy : public Wt::Auth::AuthModel
 {
 public:
   AuthModelProxy(const Wt::Auth::AuthService& baseAuth,
-                Wt::Auth::AbstractUserDatabase& users,
-                Wt::WObject* parent=0);
+                 Wt::Auth::AbstractUserDatabase& users,
+                 Wt::WObject* parent=0);
   virtual bool login(Wt::Auth::Login& login);
 
+  Wt::Signal<std::string>& loginFailed(void) {return m_loginFailed;}
+
 private:
+  /** Signals **/
+  Wt::Signal<std::string> m_loginFailed;
+
+  /** Private member **/
   QString m_lastError;
 };
 

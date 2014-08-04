@@ -865,11 +865,15 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 
 void WebMainUI::handleLdapUsersMenu(void)
 {
-  m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
-  if (m_ldapUserManager->updateUserList() <= 0) {
-    showMessage(m_ldapUserManager->lastError(), OperationError);
+  if (m_preferences->getAuthenticationMode() != WebPreferences::LDAP) {
+    showMessage(Q_TR("Action not permitted. LDAP authentication is disabled"), OperationError);
+  } else {
+    m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
+    if (m_ldapUserManager->updateUserList() <= 0) {
+      showMessage(m_ldapUserManager->lastError(), OperationError);
+    }
+    m_adminPanelTitle->setText(Q_TR("Manage LDAP Users"));
   }
-  m_adminPanelTitle->setText(Q_TR("Manage LDAP Users"));
 }
 
 

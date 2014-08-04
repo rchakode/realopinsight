@@ -44,10 +44,12 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_mainUI(NULL)
 {
   //Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
-  AuthModelProxy* authModel = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
-  authModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
-  authModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
-  setModel(authModel);
+  AuthModelProxy* authModelProxy = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
+  authModelProxy->loginFailed().connect(this, &AuthManager::handleLoginFailed);
+
+  authModelProxy->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
+  authModelProxy->addPasswordAuth(m_dbSession->passwordAuthentificator());
+  setModel(authModelProxy);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
 }
@@ -78,6 +80,7 @@ void AuthManager::createLoginView(void)
 {
   Wt::Auth::AuthWidget::createLoginView();
   bindWidget("footer", ngrt4n::footer());
+  bindWidget("info-box", m_infoBox = new Wt::WText());
 }
 
 void AuthManager::createLoggedInView(void)
@@ -124,3 +127,8 @@ bool AuthManager::isLogged(void)
   return m_dbSession->loginObject().loggedIn();
 }
 
+
+void AuthManager::handleLoginFailed(std::string data)
+{
+  m_infoBox->setText(data);
+}

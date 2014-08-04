@@ -175,6 +175,7 @@
 </message>
 
 <message id="Wt.Auth.template.login">
+<div class="info-box">${info-box}</div>
 <div class="ngrt4n-gradient login-container">
  <legend><img src="images/built-in/logo.png" /></legend>
     <p>${tr:Wt.Auth.login-form-info}</p>
