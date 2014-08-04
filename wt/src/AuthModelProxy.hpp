@@ -32,10 +32,10 @@
 #include <string>
 
 
-class LdapAuthModel : public Wt::Auth::AuthModel
+class AuthModelProxy : public Wt::Auth::AuthModel
 {
 public:
-  LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
+  AuthModelProxy(const Wt::Auth::AuthService& baseAuth,
                 Wt::Auth::AbstractUserDatabase& users,
                 Wt::WObject* parent=0);
   virtual bool login(Wt::Auth::Login& login);

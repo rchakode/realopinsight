@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "LdapAuthModel.hpp"
+#include "AuthModelProxy.hpp"
 #include "UserManagement.hpp"
 #include "WebUtils.hpp"
 #include "Validators.hpp"
@@ -30,7 +30,7 @@
 #include <QObject>
 #include <QDebug>
 
-LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
+AuthModelProxy::AuthModelProxy(const Wt::Auth::AuthService& baseAuth,
                              Wt::Auth::AbstractUserDatabase& users,
                              Wt::WObject* parent)
   : Wt::Auth::AuthModel(baseAuth, users, parent)
@@ -39,7 +39,7 @@ LdapAuthModel::LdapAuthModel(const Wt::Auth::AuthService& baseAuth,
 }
 
 
-bool LdapAuthModel::login(Wt::Auth::Login& login)
+bool AuthModelProxy::login(Wt::Auth::Login& login)
 {
   WebPreferences preferences;
 
