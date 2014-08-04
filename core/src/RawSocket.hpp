@@ -61,12 +61,12 @@ public:
   int setupSocket();
   void cleanUp(void);
   int makeRequest(const QByteArray& data);
-  QString lastResult(void);
+  QString& lastResult(void) {return m_lastResult;}
   QString lastError(void) const {return m_lastError;}
 
 private:
   QString m_lastError;
-  char m_lastResult[BUFFER_SIZE];
+  QString m_lastResult;
   QString m_host;
   int m_port;
   SOCKADDR_IN m_sockAddr;

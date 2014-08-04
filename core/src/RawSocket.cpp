@@ -78,7 +78,13 @@ int RawSocket::makeRequest(const QByteArray& data)
     return -1;
   }
 
-  if (recv(sock, m_lastResult, BUFFER_SIZE -1, 0) < 0) {
+  char buffer[BUFFER_SIZE];
+  int count = 0;
+  m_lastResult.clear();
+  while ((count = recv(sock, buffer, BUFFER_SIZE -1, 0)) > 0)
+    m_lastResult.append(buffer);
+
+  if (count< 0) {
     m_lastError = QObject::tr("Failed receiving data");
     return -1;
   }
@@ -86,12 +92,6 @@ int RawSocket::makeRequest(const QByteArray& data)
   closesocket(sock);
   return 0;
 }
-
-QString RawSocket::lastResult(void)
-{
-  return QString(m_lastResult);
-}
-
 
 void RawSocket::buildErrorString(void)
 {
