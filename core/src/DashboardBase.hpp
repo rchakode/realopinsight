@@ -104,11 +104,11 @@ protected:
 protected:
   QString m_descriptionFile;
   CoreDataT* m_cdata;
+  qint32 m_timerId;
   qint64 m_updateCounter;
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;
-  qint32 m_timerId;
   QSize m_msgConsoleSize;
   bool m_showOnlyTroubles;
   SourceListT m_sources;

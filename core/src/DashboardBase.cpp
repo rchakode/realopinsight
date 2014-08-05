@@ -73,6 +73,7 @@ StringMapT DashboardBase::calcRules() {
 DashboardBase::DashboardBase(const QString& descriptionFile)
   : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
     m_cdata (new CoreDataT()),
+    m_timerId(-1),
     m_updateCounter(0),
     m_showOnlyTroubles(false),
     m_lastErrorState(false)
