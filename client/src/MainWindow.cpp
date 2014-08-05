@@ -227,7 +227,8 @@ void MainWindow::handleRefresh(void)
 
 void MainWindow::resetTimer(qint32 interval)
 {
-  killTimer(m_dashboard->timerId());
+  if (m_dashboard->timerId() < 0)
+    killTimer(m_dashboard->timerId());
   m_dashboard->setTimerId( startTimer(1000 * interval) );
 }
 
