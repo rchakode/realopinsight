@@ -453,14 +453,30 @@ LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* par
   setSelectionMode(Wt::SingleSelection);
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
+  setAlternatingRowColors(true);
 
-  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("DN"), Wt::DisplayRole);
-  m_model->setHeaderData(1, Wt::Horizontal, Q_TR("Full Name"), Wt::DisplayRole);
-  m_model->setHeaderData(2, Wt::Horizontal, Q_TR("UID"), Wt::DisplayRole);
-  m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Email"), Wt::DisplayRole);
-  m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Enable Auth"), Wt::DisplayRole);
-  m_model->itemChanged().connect(this, &LdapUserManager::handleImportationAction);
+  setModelHeader();
   setModel(m_model);
+}
+
+/**
+ * @brief Add signa/slot event handling
+ */
+void LdapUserManager::addEvent()
+{
+  m_model->itemChanged().connect(this, &LdapUserManager::handleImportationAction);
+}
+
+/**
+ * @brief Set the table view header
+ */
+void LdapUserManager::setModelHeader(void)
+{
+  m_model->setHeaderData(0, Q_TR("DN"));
+  m_model->setHeaderData(1, Q_TR("Full Name"));
+  m_model->setHeaderData(2, Q_TR("UID"));
+  m_model->setHeaderData(3, Q_TR("Email"));
+  m_model->setHeaderData(4, Q_TR("Enable Auth"));
 }
 
 /**
@@ -469,6 +485,7 @@ LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* par
  */
 int LdapUserManager::updateUserList(void)
 {
+  setDisabled(true);
   m_users.clear();
   std::string filter = "(objectClass=person)";
   WebPreferences* appPreferences = new WebPreferences();
@@ -480,17 +497,18 @@ int LdapUserManager::updateUserList(void)
                                    appPreferences->getLdapBindUserPassword(),
                                    filter,
                                    m_users);
+  m_model->clear();
   if (count <= 0) {
     m_lastError = ldapHelper.lastError();
   } else {
-    m_model->clear();
     for (const auto& userInfo : m_users) {
       DbUserT dbUserInfo;
       bool imported = m_dbSession->findUser(userInfo[m_ldapUidField], dbUserInfo);
       addUserRow(userInfo, imported);
     }
+    setModelHeader();
   }
-
+  setDisabled(false);
   return count;
 }
 

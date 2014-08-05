@@ -199,6 +199,8 @@ private:
   LdapUserMapT m_users;
   std::string m_ldapUidField;
 
+  void addEvent(void);
+  void setModelHeader(void);
   void addUserRow(const LdapUserAttrsT& userInfo, bool imported);
   Wt::WStandardItem* createEntryItem(const std::string& text, const std::string& data);
   Wt::WStandardItem* createImportationItem(const std::string& data, bool alreadyImported);
