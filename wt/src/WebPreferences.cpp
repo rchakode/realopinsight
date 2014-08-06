@@ -136,8 +136,8 @@ WebPreferences::WebPreferences(void)
   m_ldapServerUriField->setEmptyText("ldap://localhost:389");
 
   m_ldapVersionField.reset(new Wt::WComboBox(this));
-  m_ldapVersionField->addItem("3");
-  m_ldapVersionField->addItem("2");
+  m_ldapVersionField->addItem("LDAPv3");
+  m_ldapVersionField->addItem("LDAPv2");
 
   m_ldapSslUseCustomSettingsField.reset(new Wt::WCheckBox(QObject::tr("Use custom SSL certificate").toStdString(), this));
   m_ldapSslCertFileField.reset(new Wt::WLineEdit(this));
