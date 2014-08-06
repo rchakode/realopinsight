@@ -33,12 +33,18 @@ namespace {
 }
 
 
-LdapHelper::LdapHelper(const std::string& serverUri, int version)
+LdapHelper::LdapHelper(const std::string& serverUri,
+                       int version,
+                       bool sslUseMyCert,
+                       const std::string& sslCertFile,
+                       const std::string& sslCaFile)
   : m_handler(NULL),
     m_serverUri(serverUri),
-    m_version(version)
+    m_version(version),
+    m_sslUseMyCert(sslUseMyCert),
+    m_sslCertFile(sslCertFile),
+    m_sslCaFile(sslCaFile)
 {
-  setSslSettings();
   setupHandler();
 }
 
@@ -49,6 +55,7 @@ LdapHelper::~LdapHelper()
 
 int LdapHelper::setupHandler(void)
 {
+  setSslSettings();
   if (ldap_initialize(& m_handler, m_serverUri.c_str()) != 0) {
     m_lastError = QObject::tr("Failed initializing annuary handler");
     return -1;
@@ -62,16 +69,22 @@ void LdapHelper::cleanupHandler(void)
     ldap_unbind_ext(m_handler, NULL, NULL);
 }
 
+void LdapHelper::reset(void)
+{
+  cleanupHandler();
+  setupHandler();
+}
 
 void LdapHelper::setSslSettings(void)
 {
   if ( ldap_is_ldaps_url(m_serverUri.c_str()) ) {
     int sslRequireCert = LDAP_OPT_X_TLS_DEMAND;
-    char sslCaFile[] = "/opt/SSLCA/demoCA/cacert.pem";
-    char sslCertFile[] = "/etc/ssl/certs/ldap.cert";
-    ldap_set_option (NULL, LDAP_OPT_X_TLS_CACERTFILE, sslCaFile);
-    ldap_set_option (NULL, LDAP_OPT_X_TLS_CERTFILE, sslCertFile);
     ldap_set_option (NULL, LDAP_OPT_X_TLS_REQUIRE_CERT, &sslRequireCert);
+
+    if (m_sslUseMyCert) {
+      ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, m_sslCaFile.c_str());
+      ldap_set_option(NULL, LDAP_OPT_X_TLS_CERTFILE, m_sslCertFile.c_str());
+    }
   }
 }
 
@@ -100,7 +113,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
   bool resultStatus = false;
   int rc = ldap_sasl_bind_s(m_handler, dn.c_str(), LDAP_SASL_SIMPLE, &cred, NULL,NULL,NULL);
   if (rc != LDAP_SUCCESS) {
-    m_lastError = QString(ldap_err2string(rc));
+    m_lastError = QString("LDAP: %1").arg(ldap_err2string(rc));
   } else {
     resultStatus = true;
     m_lastError = QObject::tr("Authentication successful");

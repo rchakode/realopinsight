@@ -37,8 +37,13 @@ typedef QMap<std::string, LdapUserAttrsT> LdapUserMapT;
 class LdapHelper
 {
 public:
-  LdapHelper(const std::string& serverUriconst, int version=LDAP_VERSION3);
+  LdapHelper(const std::string& serverUri,
+             int version = LDAP_VERSION3,
+             bool sslUseMyCert = true,
+             const std::string& sslCertFile = "",
+             const std::string& sslCaFile = "");
   virtual ~LdapHelper();
+  void reset(void);
   bool loginWithDistinguishName(const std::string& dn, const std::string& password);
   int listUsers(const std::string& searchBase,
                 const std::string& bindUser,
@@ -52,6 +57,10 @@ private:
   QString m_lastError;
   std::string m_serverUri;
   int m_version;
+  bool m_sslUseMyCert;
+  std::string m_sslCertFile;
+  std::string m_sslCaFile;
+
 
   int setupHandler(void);
   void cleanupHandler(void);

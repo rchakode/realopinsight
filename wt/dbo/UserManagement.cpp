@@ -491,15 +491,19 @@ void LdapUserManager::setModelHeader(void)
 int LdapUserManager::updateUserList(void)
 {
   setDisabled(true);
-  m_users.clear();
-  std::string filter = "(objectClass=person)";
-  WebPreferences* appPreferences = new WebPreferences();
-  m_ldapUidField = appPreferences->getLdapIdField();
-  LdapHelper ldapHelper(appPreferences->getLdapServerUri(), appPreferences->getLdapVersion());
+  WebPreferences preferences;
+  m_ldapUidField = preferences.getLdapIdField();
+  LdapHelper ldapHelper(preferences.getLdapServerUri(),
+                        preferences.getLdapVersion(),
+                        preferences.getLdapSslUseMyCert(),
+                        preferences.getLdapSslCertFile(),
+                        preferences.getLdapSslCaFile());
 
-  int count = ldapHelper.listUsers(appPreferences->getLdapSearchBase(),
-                                   appPreferences->getLdapBindUserDn(),
-                                   appPreferences->getLdapBindUserPassword(),
+  std::string filter = "(objectClass=person)";
+  m_users.clear();
+  int count = ldapHelper.listUsers(preferences.getLdapSearchBase(),
+                                   preferences.getLdapBindUserDn(),
+                                   preferences.getLdapBindUserPassword(),
                                    filter,
                                    m_users);
   m_model->clear();

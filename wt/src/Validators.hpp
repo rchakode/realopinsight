@@ -56,5 +56,21 @@ public:
   }
 };
 
+class FileExistValidator: public Wt::WValidator
+{
+public:
+  FileExistValidator(Wt::WObject* parent = 0)
+    : Wt::WValidator(parent)
+  {
+  }
+
+  virtual Wt::WValidator::Result validate(const Wt::WString& input) const
+  {
+    QFile file(input.toUTF8().c_str());
+    if (file.exists())
+      return Wt::WValidator::Result(Wt::WValidator::Valid);
+    return Wt::WValidator::Result(Wt::WValidator::Invalid, QObject::tr("File not found").toStdString());
+  }
+};
 
 #endif // VALIDATOR_HPP

@@ -73,7 +73,9 @@ public:
   std::string getLdapIdField(void) const;
   int getLdapVersion(void) const;
   int getAuthenticationMode(void) const;
-
+  bool getLdapSslUseMyCert(void) const;
+  std::string getLdapSslCertFile(void) const;
+  std::string getLdapSslCaFile(void) const;
   static std::string authTypeString(int authSystem);
 
 protected:
@@ -109,15 +111,15 @@ private:
   // auth settings properties
   std::unique_ptr<Wt::WComboBox> m_authenticationModeField;
   std::unique_ptr<Wt::WLineEdit> m_ldapServerUriField;
-  std::unique_ptr<Wt::WCheckBox> m_ldapSslUseCustomSettingsField;
   std::unique_ptr<Wt::WComboBox> m_ldapVersionField;
-  std::unique_ptr<Wt::WLineEdit> m_ldapSslCertFileField;
-  std::unique_ptr<Wt::WLineEdit> m_ldapSslCaFileField;
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserDnField;
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPasswordField;
   std::unique_ptr<Wt::WLineEdit> m_ldapIdField;
   std::unique_ptr<Wt::WLineEdit> m_ldapSearchBaseField;
   std::unique_ptr<Wt::WPushButton> m_saveAuthSettingsBtn;
+  std::unique_ptr<Wt::WCheckBox> m_ldapSslUseCertField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapSslCertFileField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapSslCaFileField;
 
 
   void addEvent(void);
@@ -131,6 +133,7 @@ private:
   void loadAuthSettings(void);
   bool validateMonitoringSettingsFields(void);
   bool validateAuthSettingsFields(void);
+  void showLdapSslSettings(bool display);
 };
 
 #endif // WEBSESSION_HPP

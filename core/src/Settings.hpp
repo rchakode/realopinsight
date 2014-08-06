@@ -62,7 +62,9 @@ public:
   static const QString AUTH_LDAP_SEARCH_BASE;
   static const QString AUTH_LDAP_VERSION;
   static const QString AUTH_LDAP_ID_FIELD;
-  static const QString DN_FORMAT_USERNAME;
+  static const QString AUTH_LDAP_SSL_USE_CERT;
+  static const QString AUTH_LDAP_SSL_CERT_FILE;
+  static const QString AUTH_LDAP_SSL_CA_FILE;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

@@ -38,13 +38,11 @@
 #include <Wt/WApplication>
 
 
+namespace {
+  const std::string LDAP_VERSION2_TEXT = "LDAPv2";
+  const std::string LDAP_VERSION3_TEXT = "LDAPv3";
+}
 
-#define VALIDATE_FIELDS()   if (m_monitorTypeField->validate() != Wt::WValidator::Valid \
-  || m_livestatusPortField->validate() != Wt::WValidator::Valid \
-  || m_monitorTypeField->currentIndex() <= 0) { \
-  m_errorOccurred.emit(QObject::tr("Please verify the monitor type and fix field(s) in red").toStdString());\
-  return; \
-  }
 WebPreferences::WebPreferences(void)
   : Preferences("/opt/realopinsight/etc/realopinsight.conf"),
     m_errorOccurred(this),
@@ -65,7 +63,7 @@ WebPreferences::WebPreferences(void)
   }
 
   m_monitorUrlField.reset(new Wt::WLineEdit(this));
-  m_monitorUrlField->setValidator(new UriValidator("http", false));
+  m_monitorUrlField->setValidator(new UriValidator("http", false, this));
   m_monitorUrlField->setEmptyText("Set the url to the monitor web interface");
 
   m_authStringField.reset(new Wt::WLineEdit(this));
@@ -77,12 +75,12 @@ WebPreferences::WebPreferences(void)
   // set livestatus server
   m_livestatusHostField.reset(new Wt::WLineEdit(this));
   m_livestatusHostField->setEmptyText("hostname/IP");
-  m_livestatusHostField->setValidator(new HostValidator());
+  m_livestatusHostField->setValidator(new HostValidator(this));
 
   // set livestatus port field
   m_livestatusPortField.reset(new Wt::WLineEdit(this));
   m_livestatusPortField->setWidth(50);
-  m_livestatusPortField->setValidator(new PortValidator());
+  m_livestatusPortField->setValidator(new PortValidator(this));
   m_livestatusPortField->setEmptyText("port");
   m_livestatusPortField->setMaxLength(5);
 
@@ -103,16 +101,19 @@ WebPreferences::WebPreferences(void)
 
   // LDAP fields
   m_ldapServerUriField.reset(new Wt::WLineEdit(this));
-  m_ldapServerUriField->setValidator(new UriValidator("ldap", true));
+  m_ldapServerUriField->setValidator(new UriValidator("ldap", true, this));
   m_ldapServerUriField->setEmptyText("ldap://localhost:389");
 
   m_ldapVersionField.reset(new Wt::WComboBox(this));
-  m_ldapVersionField->addItem("LDAPv3");
-  m_ldapVersionField->addItem("LDAPv2");
+  m_ldapVersionField->addItem(LDAP_VERSION3_TEXT);
+  m_ldapVersionField->addItem(LDAP_VERSION2_TEXT);
 
-  m_ldapSslUseCustomSettingsField.reset(new Wt::WCheckBox(QObject::tr("Use custom SSL certificate").toStdString(), this));
+  m_ldapSslUseCertField.reset(new Wt::WCheckBox(QObject::tr("Use custom SSL certificate").toStdString(), this));
   m_ldapSslCertFileField.reset(new Wt::WLineEdit(this));
+  m_ldapSslCertFileField->setValidator(new FileExistValidator(this));
+
   m_ldapSslCaFileField.reset(new Wt::WLineEdit(this));
+  m_ldapSslCaFileField->setValidator(new FileExistValidator(this));
 
   m_ldapBindUserDnField.reset(new Wt::WLineEdit(this));
   m_ldapBindUserDnField->setEmptyText("cn=Manager,ou=devops,dc=example,dc=com");
@@ -149,42 +150,6 @@ WebPreferences::WebPreferences(void)
   loadProperties();
 }
 
-void WebPreferences::addEvent(void)
-{
-  m_sourceBox->changed().connect(std::bind([=]() {
-    fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
-  }));
-  m_monitorTypeField->changed().connect(std::bind([=]() {
-    if (m_monitorTypeField->currentIndex() != 1) {
-      wApp->doJavaScript("$('#livetstatus-section').hide();");
-    } else {
-      wApp->doJavaScript("$('#livetstatus-section').show();");
-    }
-  }));
-  m_showAuthStringField->changed().connect(std::bind([=](){
-    if (m_showAuthStringField->isChecked()) {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
-    } else {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
-    }
-  }));
-  m_authenticationModeField->changed().connect(std::bind([=]() {
-    switch (m_authenticationModeField->currentIndex()) {
-      case LDAP:
-        wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
-        break;
-      case BuiltIn: // BUILT-IN
-      default:
-        wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
-        break;
-    }
-  }));
-  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
-  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
-  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-  m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
-}
-
 
 WebPreferences::~WebPreferences()
 {
@@ -212,7 +177,7 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("authentication-mode", m_authenticationModeField.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUriField.get());
   tpl->bindWidget("ldap-version", m_ldapVersionField.get());
-  tpl->bindWidget("ldap-ssl-use-custom-settings", m_ldapSslUseCustomSettingsField.get());
+  tpl->bindWidget("ldap-ssl-use-custom-settings", m_ldapSslUseCertField.get());
   tpl->bindWidget("ldap-ssl-cert-file", m_ldapSslCertFileField.get());
   tpl->bindWidget("ldap-ssl-ca-file", m_ldapSslCaFileField.get());
   tpl->bindWidget("ldap-bind-user-dn", m_ldapBindUserDnField.get());
@@ -229,12 +194,14 @@ std::string WebPreferences::getLdapIdField(void) const
 
   return val.toStdString();
 }
+
 int WebPreferences::getLdapVersion(void) const
 {
-  int val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toInt();
-  if (val != LDAP_VERSION2)
-    return LDAP_VERSION3;
-  return val;
+  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
+  if (val != LDAP_VERSION3_TEXT)
+    return LDAP_VERSION2;
+
+  return LDAP_VERSION3;
 }
 
 int WebPreferences::getAuthenticationMode(void) const
@@ -245,6 +212,21 @@ int WebPreferences::getAuthenticationMode(void) const
   return val;
 }
 
+
+bool WebPreferences::getLdapSslUseMyCert(void) const
+{
+  return m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;
+}
+
+std::string WebPreferences::getLdapSslCertFile(void) const
+{
+  return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CERT_FILE).toStdString();
+}
+
+std::string WebPreferences::getLdapSslCaFile(void) const
+{
+  return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CA_FILE).toStdString();
+}
 
 std::string WebPreferences::authTypeString(int authSystem)
 {
@@ -488,10 +470,18 @@ void WebPreferences::saveAuthSettings(void)
     setEntry(Settings::AUTH_MODE_KEY, QString::number(m_authenticationModeField->currentIndex()));
     if (getAuthenticationMode() == LDAP) {
       setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUriField->text().toUTF8().c_str());
+      setEntry(Settings::AUTH_LDAP_VERSION, m_ldapVersionField->currentText().toUTF8().c_str());
       setEntry(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField->text().toUTF8().c_str());
       setEntry(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField->text().toUTF8().c_str());
       setEntry(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField->text().toUTF8().c_str());
       setEntry(Settings::AUTH_LDAP_ID_FIELD, m_ldapIdField->text().toUTF8().c_str());
+
+      int useCert = m_ldapSslUseCertField->checkState();
+      setEntry(Settings::AUTH_LDAP_SSL_USE_CERT, QString::number(useCert));
+      if (useCert == Wt::Checked) {
+        setEntry(Settings::AUTH_LDAP_SSL_CERT_FILE, m_ldapSslCertFileField->text().toUTF8().c_str());
+        setEntry(Settings::AUTH_LDAP_SSL_CA_FILE, m_ldapSslCaFileField->text().toUTF8().c_str());
+      }
     }
     m_authSystemChanged.emit(getAuthenticationMode());
   }
@@ -501,10 +491,18 @@ void WebPreferences::loadAuthSettings(void)
 {
   m_authenticationModeField->setCurrentIndex(getAuthenticationMode());
   m_ldapServerUriField->setText(getLdapServerUri());
+  m_ldapVersionField->setValueText(m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString());
   m_ldapSearchBaseField->setText(getLdapSearchBase());
   m_ldapBindUserDnField->setText(getLdapBindUserDn());
   m_ldapBindUserPasswordField->setText(getLdapBindUserPassword());
   m_ldapIdField->setText(getLdapIdField());
+
+  // optional settings related if secure LDAP
+  Wt::CheckState useMySslCert = static_cast<Wt::CheckState>(m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt());
+  m_ldapSslUseCertField->setCheckState(useMySslCert);
+  m_ldapSslCertFileField->setText(getLdapSslCertFile());
+  m_ldapSslCaFileField->setText(getLdapSslCaFile());
+  showLdapSslSettings(useMySslCert == Wt::Checked);
 }
 
 void WebPreferences::showMonitoringSettingsWidgets(bool display)
@@ -533,6 +531,13 @@ void WebPreferences::showAuthSettingsWidgets(bool display)
   }
 }
 
+void WebPreferences::showLdapSslSettings(bool display)
+{
+  std::string v = display ? "true" : "false";
+  wApp->doJavaScript(Wt::WString("$('#ldap-custom-ssl-settings').toggle({1});").arg(v).toUTF8());
+}
+
+
 bool WebPreferences::validateMonitoringSettingsFields(void)
 {
   if (m_monitorTypeField->validate() == Wt::WValidator::Valid
@@ -560,4 +565,53 @@ bool WebPreferences::validateAuthSettingsFields(void)
 
   m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
   return false;
+}
+
+
+void WebPreferences::addEvent(void)
+{
+  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
+  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
+  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
+  m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
+
+  m_sourceBox->changed().connect(std::bind([=]() {
+    fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
+  }));
+
+  m_monitorTypeField->changed().connect(std::bind([=]() {
+    if (m_monitorTypeField->currentIndex() != 1) {
+      wApp->doJavaScript("$('#livetstatus-section').hide();");
+    } else {
+      wApp->doJavaScript("$('#livetstatus-section').show();");
+    }
+  }));
+
+  m_showAuthStringField->changed().connect(std::bind([=](){
+    if (m_showAuthStringField->isChecked()) {
+      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
+    } else {
+      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
+    }
+  }));
+
+  m_authenticationModeField->changed().connect(std::bind([=]() {
+    switch (m_authenticationModeField->currentIndex()) {
+      case LDAP:
+        wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
+        break;
+      case BuiltIn: // BUILT-IN
+      default:
+        wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
+        break;
+    }
+  }));
+
+  m_ldapSslUseCertField->changed().connect(std::bind([=](){
+    if (m_ldapSslUseCertField->checkState() == Wt::Checked) {
+      wApp->doJavaScript("$('#ldap-custom-ssl-settings').show();");
+    } else {
+      wApp->doJavaScript("$('#ldap-custom-ssl-settings').hide();");
+    }
+  }));
 }
