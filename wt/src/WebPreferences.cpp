@@ -56,23 +56,13 @@ WebPreferences::WebPreferences(void)
   m_sourceBoxModel.reset(new Wt::WStringListModel(m_sourceBox.get()));
   m_sourceBox->setModel(m_sourceBoxModel.get());
 
-  m_sourceBox->changed().connect(std::bind([=]() {
-    fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
-  }));
+
 
   m_monitorTypeField.reset(new Wt::WComboBox(this));
   m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
   for (const auto& srcid: ngrt4n::sourceTypes()) {
     m_monitorTypeField->addItem(srcid.toStdString());
   }
-
-  m_monitorTypeField->changed().connect(std::bind([=]() {
-    if (m_monitorTypeField->currentIndex() != 1) {
-      wApp->doJavaScript("$('#livetstatus-section').hide();");
-    } else {
-      wApp->doJavaScript("$('#livetstatus-section').show();");
-    }
-  }));
 
   m_monitorUrlField.reset(new Wt::WLineEdit(this));
   m_monitorUrlField->setValidator(new UriValidator("http", false));
@@ -83,14 +73,6 @@ WebPreferences::WebPreferences(void)
   m_authStringField->setEmptyText("Set the authentication string");
 
   m_showAuthStringField.reset(new Wt::WCheckBox(QObject::tr("Show in clear").toStdString(), this));
-
-  m_showAuthStringField->changed().connect(std::bind([=](){
-    if (m_showAuthStringField->isChecked()) {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
-    } else {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
-    }
-  }));
 
   // set livestatus server
   m_livestatusHostField.reset(new Wt::WLineEdit(this));
@@ -118,17 +100,6 @@ WebPreferences::WebPreferences(void)
   m_authenticationModeField.reset(new Wt::WComboBox(this));
   m_authenticationModeField->addItem(Q_TR("Built-in"));
   m_authenticationModeField->addItem(Q_TR("LDAP"));
-  m_authenticationModeField->changed().connect(std::bind([=]() {
-    switch (m_authenticationModeField->currentIndex()) {
-      case LDAP:
-        wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
-        break;
-      case BuiltIn: // BUILT-IN
-      default:
-        wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
-        break;
-    }
-  }));
 
   // LDAP fields
   m_ldapServerUriField.reset(new Wt::WLineEdit(this));
@@ -169,17 +140,49 @@ WebPreferences::WebPreferences(void)
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
   m_saveAuthSettingsBtn->setStyleClass("btn btn-info");
 
-  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
-  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
-  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-  m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
-
   m_applyChangeBtn->setDisabled(true);
   m_addAsSourceBtn->setDisabled(true);
   m_deleteSourceBtn->setDisabled(true);
 
+  addEvent();
   bindFormWidget();
   loadProperties();
+}
+
+void WebPreferences::addEvent(void)
+{
+  m_sourceBox->changed().connect(std::bind([=]() {
+    fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
+  }));
+  m_monitorTypeField->changed().connect(std::bind([=]() {
+    if (m_monitorTypeField->currentIndex() != 1) {
+      wApp->doJavaScript("$('#livetstatus-section').hide();");
+    } else {
+      wApp->doJavaScript("$('#livetstatus-section').show();");
+    }
+  }));
+  m_showAuthStringField->changed().connect(std::bind([=](){
+    if (m_showAuthStringField->isChecked()) {
+      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
+    } else {
+      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
+    }
+  }));
+  m_authenticationModeField->changed().connect(std::bind([=]() {
+    switch (m_authenticationModeField->currentIndex()) {
+      case LDAP:
+        wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
+        break;
+      case BuiltIn: // BUILT-IN
+      default:
+        wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
+        break;
+    }
+  }));
+  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
+  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
+  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
+  m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
 }
 
 

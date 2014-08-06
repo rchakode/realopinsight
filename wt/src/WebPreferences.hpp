@@ -119,6 +119,8 @@ private:
   std::unique_ptr<Wt::WLineEdit> m_ldapSearchBaseField;
   std::unique_ptr<Wt::WPushButton> m_saveAuthSettingsBtn;
 
+
+  void addEvent(void);
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);
   int getSourceGlobalIndex(int sourceBoxIndex);
