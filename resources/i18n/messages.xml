@@ -7,7 +7,7 @@
 </message>
 
 <message id="beta-message">
-  <span><sup class="severity-major">Beta</sup> </span>
+  <span><sup class="severity-major">Beta</sup>&nbsp;</span>
 </message>
 <message id="admin-home.tpl">
   <div class="admin-page">
@@ -50,7 +50,7 @@
 
             <div class="accordion-group" id="viewMenuBlock">
               <div class="accordion-heading">
-                 <i class="fa fa-cogs fa-fw pull-left"></i> Account & Settings
+                 <i class="fa fa-cogs fa-fw pull-left"></i> Account &amp; Settings
               </div>
             <div class="accordion-body collapse in">
               <div class="accordion-inner">
@@ -333,10 +333,10 @@
 
 
 <message id="copyright-footer.tpl">
-    ${software} - Copyright © 2010-${release-year} RealOpInsight Labs
+    ${software} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
     <br />Version ${version}
     - <a href="http://docs.realopinsight.com/">Help</a>
-    - <a href="${package-url}" target="_blank">Terms & Conditions</a>
+    - <a href="${package-url}" target="_blank">Terms &amp; Conditions</a>
 </message>
 
 <message id="view-assignment-tpl">
@@ -344,8 +344,8 @@
     <div class="span-one-third">
       <div class="center">${user-selector}</div>
     </div>
-    <div class="span-one-third"> </div>
-    <div class="span-one-third"> </div>
+    <div class="span-one-third">&nbsp;</div>
+    <div class="span-one-third">&nbsp;</div>
   </div>
   <div class="row">
     <div class="span-one-third">
@@ -380,27 +380,27 @@
      <fieldset>
        <h6>General Settings</h6>
        <div class="control-group">
-         <label class="control-label">Source </label>
+         <label class="control-label">Source&nbsp;</label>
          <span>${source-box}</span>
-         <span>Type </span>
+         <span>Type&nbsp;</span>
          <span>${monitor-type}</span>
        </div>
        <div class="control-group">
-        <label class="control-label">Update Interval </label>
+        <label class="control-label">Update Interval&nbsp;</label>
         <span>${update-interval}</span>
-        <span> seconds</span>
+        <span>&nbsp;seconds</span>
        </div>
      </fieldset>
 
      <fieldset>
        <h6>Monitor Web Access</h6>
        <div class="control-group">
-         <label class="control-label">URL </label>
+         <label class="control-label">URL&nbsp;</label>
          <span>${monitor-url}</span>
          <span>${dont-verify-ssl-certificate}</span>
        </div>
        <div class="control-group">
-         <label class="control-label">Auth String </label>
+         <label class="control-label">Auth String&nbsp;</label>
          <span>${monitor-auth-string}</span>
          <span>${show-in-clear}</span>
        </div>
@@ -409,7 +409,7 @@
     <fieldset id="livetstatus-section">
       <h6>Livestatus Socket</h6>
       <div class="control-group">
-        <label class="control-label">Host </label>
+        <label class="control-label">Host&nbsp;</label>
         <span>${livestatus-server}</span>
         <span>Port</span>
         <span>${livestatus-port}</span>
@@ -422,42 +422,46 @@
     <div id="auth-section">
       <fieldset>
         <div class="control-group">
-          <label class="control-label">Authentication Mode </label>
+          <label class="control-label">Authentication Mode&nbsp;</label>
           <span>${authentication-mode}</span>
         </div>
       </fieldset>
       <fieldset id="ldap-auth-setting-section">
         <div class="control-group">
-          <label class="control-label">Server URI </label>
+          <label class="control-label">Server URI&nbsp;</label>
           <span>${ldap-server-uri}</span>
           <span>${ldap-version}</span>
-          <span>${ldap-use-private-cert-settings}</span>
         </div>
-        <!-- private certificate settings -->
-        <div id="ldap-private-cert-settings">
-           <div  class="control-group">
-             <label class="control-label">Certificate File</label>
-             <span>${ldap-private-cert-file}</span>
-           </div> 
-           <div  class="control-group">
-             <label class="control-label">CA File</label>
-             <span>${ldap-private-cert-cafile}</span>
-           </div>            
-        </div> <!-- id="ldap-private-cert-info" -->
         <div class="control-group">
-          <label class="control-label">Bind User DN </label>
+          <label class="control-label">&nbsp;</label>
+          <span>${ldap-ssl-use-custom-settings}</span>
+        </div>
+        <!-- custom ssl settings -->
+        <div id="ldap-custom-ssl-settings">
+           <div class="control-group">
+             <label class="control-label">Certificate File&nbsp;</label>
+             <span>${ldap-ssl-cert-file}</span>
+           </div>
+           <div  class="control-group">
+             <label class="control-label">CA File&nbsp;</label>
+             <span>${ldap-ssl-ca-file}</span>
+           </div>
+        </div> <!-- id="ldap-custom-ssl-settings" -->
+
+        <div class="control-group">
+          <label class="control-label">Bind User DN&nbsp;</label>
           <span>${ldap-bind-user-dn}</span>
         </div>
         <div class="control-group">
-          <label class="control-label">Bind User Password </label>
+          <label class="control-label">Bind User Password&nbsp;</label>
           <span>${ldap-bind-user-password}</span>
         </div>
         <div class="control-group">
-          <label class="control-label">User Search Base </label>
+          <label class="control-label">User Search Base&nbsp;</label>
           <span>${ldap-user-search-base}</span>
         </div>
         <div class="control-group">
-          <label class="control-label">User ID Attribute </label>
+          <label class="control-label">User ID Attribute&nbsp;</label>
           <span>${ldap-uid-attribute}</span>
         </div>
       </fieldset> <!-- id="ldap-auth-setting-section" -->
@@ -486,7 +490,7 @@
     </p>
     <div class="clearfix"></div>
     <p class="text-center">
-      Copyright © 2010-${release-year} RealOpInsight Labs. All rights reserved
+      Copyright &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved
     </p>
     <div style="float: right;">${close-button}</div>
 </message>

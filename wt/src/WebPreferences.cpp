@@ -116,8 +116,8 @@ WebPreferences::WebPreferences(void)
 
   // Authentication settings
   m_authenticationModeField.reset(new Wt::WComboBox(this));
-  m_authenticationModeField->addItem(ngrt4n::tr("Built-in"));
-  m_authenticationModeField->addItem(ngrt4n::tr("LDAP"));
+  m_authenticationModeField->addItem(Q_TR("Built-in"));
+  m_authenticationModeField->addItem(Q_TR("LDAP"));
   m_authenticationModeField->changed().connect(std::bind([=]() {
     switch (m_authenticationModeField->currentIndex()) {
       case LDAP:
@@ -135,8 +135,17 @@ WebPreferences::WebPreferences(void)
   m_ldapServerUriField->setValidator(new UriValidator("ldap", true));
   m_ldapServerUriField->setEmptyText("ldap://localhost:389");
 
+  m_ldapVersionField.reset(new Wt::WComboBox(this));
+  m_ldapVersionField->addItem("3");
+  m_ldapVersionField->addItem("2");
+
+  m_ldapSslUseCustomSettingsField.reset(new Wt::WCheckBox(QObject::tr("Use custom SSL certificate").toStdString(), this));
+  m_ldapSslCertFileField.reset(new Wt::WLineEdit(this));
+  m_ldapSslCaFileField.reset(new Wt::WLineEdit(this));
+
   m_ldapBindUserDnField.reset(new Wt::WLineEdit(this));
   m_ldapBindUserDnField->setEmptyText("cn=Manager,ou=devops,dc=example,dc=com");
+
 
   m_ldapBindUserPasswordField.reset(new Wt::WLineEdit(this));
   m_ldapBindUserPasswordField->setEchoMode(Wt::WLineEdit::Password);
@@ -199,6 +208,10 @@ void WebPreferences::bindFormWidget(void)
 
   tpl->bindWidget("authentication-mode", m_authenticationModeField.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUriField.get());
+  tpl->bindWidget("ldap-version", m_ldapVersionField.get());
+  tpl->bindWidget("ldap-ssl-use-custom-settings", m_ldapSslUseCustomSettingsField.get());
+  tpl->bindWidget("ldap-ssl-cert-file", m_ldapSslCertFileField.get());
+  tpl->bindWidget("ldap-ssl-ca-file", m_ldapSslCaFileField.get());
   tpl->bindWidget("ldap-bind-user-dn", m_ldapBindUserDnField.get());
   tpl->bindWidget("ldap-bind-user-password", m_ldapBindUserPasswordField.get());
   tpl->bindWidget("ldap-uid-attribute", m_ldapIdField.get());

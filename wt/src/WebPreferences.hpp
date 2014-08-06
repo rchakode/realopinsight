@@ -109,6 +109,10 @@ private:
   // auth settings properties
   std::unique_ptr<Wt::WComboBox> m_authenticationModeField;
   std::unique_ptr<Wt::WLineEdit> m_ldapServerUriField;
+  std::unique_ptr<Wt::WCheckBox> m_ldapSslUseCustomSettingsField;
+  std::unique_ptr<Wt::WComboBox> m_ldapVersionField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapSslCertFileField;
+  std::unique_ptr<Wt::WLineEdit> m_ldapSslCaFileField;
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserDnField;
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPasswordField;
   std::unique_ptr<Wt::WLineEdit> m_ldapIdField;
