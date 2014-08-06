@@ -538,7 +538,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
       // built-in menu
       m_mgntContentWidgets->addWidget(m_dbUserManager->dbUserListWidget());
-      link = new Wt::WAnchor("#", Q_TR("Buil-in Users"));
+      link = new Wt::WAnchor("#", Q_TR("All Users"));
       link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
       settingPageTpl->bindWidget("menu-builin-users", link);
       m_menuLinks.insert(MenuBuiltInUsers, link);
