@@ -230,6 +230,14 @@ int WebPreferences::getAuthenticationMode(void) const
 }
 
 
+std::string WebPreferences::authTypeString(int authSystem)
+{
+  if (authSystem == LDAP)
+    return "LDAP";
+
+  return "BuiltIn";
+}
+
 void WebPreferences::applyChanges(void)
 {
   if (validateMonitoringSettingsFields()) {

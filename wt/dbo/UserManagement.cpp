@@ -394,7 +394,7 @@ void DbUserManager::updateDbUsers(void)
   m_usersListContainer->clear();
   m_dbSession->updateUserList();
   for (auto user: m_dbSession->userList()) {
-    m_usersListContainer->addWidget(createUserPanel(user));
+    m_usersListContainer->addWidget( createUserPanel(user) );
   }
 }
 
@@ -406,32 +406,36 @@ Wt::WPanel* DbUserManager::createUserPanel(const DbUserT& user)
   Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
                            Wt::WAnimation::EaseOut, 100);
 
-  UserFormView* form(new UserFormView(&user,
-                                      changePassword,
-                                      userForm));
+  UserFormView* form(new UserFormView(&user,  changePassword, userForm));
+
+  // connect signal for add user
   form->validated().connect(std::bind([=](DbUserT userToUpdate) {
-    int ret = m_dbSession->updateUser(userToUpdate);
+    m_dbSession->updateUser(userToUpdate);
     m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
   }, std::placeholders::_1));
 
+  // connect signal for change password
   form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
                                                     const std::string& currentPass,
                                                     const std::string& newPass) {
     m_updateCompleted.emit(m_dbSession->updatePassword(login, currentPass, newPass));
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-
+  // connect signal for delete user
   form->deleteTriggered().connect(std::bind([=](std::string username) {
     m_updateCompleted.emit(m_dbSession->deleteUser(username));
     updateDbUsers();
   }, std::placeholders::_1));
 
   Wt::WPanel *panel(new Wt::WPanel());
+  panel->setTitle(Wt::WString("{1} ({2})")
+                  .arg(user.username)
+                  .arg(WebPreferences::authTypeString(user.authsystem)));
   panel->setAnimation(animation);
   panel->setCentralWidget(form);
-  panel->setTitle(user.username);
   panel->setCollapsible(true);
   panel->setCollapsed(true);
+
   return panel;
 }
 
@@ -457,6 +461,7 @@ LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* par
 
   setModelHeader();
   setModel(m_model);
+  addEvent();
 }
 
 /**

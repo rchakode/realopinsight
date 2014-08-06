@@ -74,6 +74,8 @@ public:
   int getLdapVersion(void) const;
   int getAuthenticationMode(void) const;
 
+  static std::string authTypeString(int authSystem);
+
 protected:
   virtual void applyChanges(void);
   void handleCancel(void) {return;}
