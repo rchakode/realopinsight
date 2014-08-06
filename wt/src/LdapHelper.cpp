@@ -38,6 +38,7 @@ LdapHelper::LdapHelper(const std::string& serverUri, int version)
     m_serverUri(serverUri),
     m_version(version)
 {
+  setSslSettings();
   setupHandler();
 }
 
@@ -62,11 +63,23 @@ void LdapHelper::cleanupHandler(void)
 }
 
 
+void LdapHelper::setSslSettings(void)
+{
+  if ( ldap_is_ldaps_url(m_serverUri.c_str()) ) {
+    int sslRequireCert = LDAP_OPT_X_TLS_DEMAND;
+    char sslCaFile[] = "/opt/SSLCA/demoCA/cacert.pem";
+    char sslCertFile[] = "/etc/ssl/certs/ldap.cert";
+    ldap_set_option (NULL, LDAP_OPT_X_TLS_CACERTFILE, sslCaFile);
+    ldap_set_option (NULL, LDAP_OPT_X_TLS_CERTFILE, sslCertFile);
+    ldap_set_option (NULL, LDAP_OPT_X_TLS_REQUIRE_CERT, &sslRequireCert);
+  }
+}
+
 bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::string& password)
 {
   // Intialize a connection handler
-  if (! ngrt4n::isValidUri(m_serverUri.c_str(), "ldap", true)) {
-    m_lastError = QObject::tr("Invalid LDAP address: %1").arg(m_serverUri.c_str());
+  if (! ldap_is_ldap_url(m_serverUri.c_str()) ) {
+    m_lastError = QObject::tr("Invalid LDAP URL: %1").arg(m_serverUri.c_str());
     return false;
   }
 
@@ -75,7 +88,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
     return false;
   }
 
-  // Set protocol
+  // Set LDAP protocol version
   ldap_set_option(m_handler, LDAP_OPT_PROTOCOL_VERSION, &m_version);
 
   // Prepare credentials
@@ -86,11 +99,11 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
   // User authentication (bind)
   bool resultStatus = false;
   int rc = ldap_sasl_bind_s(m_handler, dn.c_str(), LDAP_SASL_SIMPLE, &cred, NULL,NULL,NULL);
-  if (rc == LDAP_SUCCESS) {
+  if (rc != LDAP_SUCCESS) {
+    m_lastError = QString(ldap_err2string(rc));
+  } else {
     resultStatus = true;
     m_lastError = QObject::tr("Authentication successful");
-  } else {
-    m_lastError = QObject::tr("LDAP: %1").arg(ldap_err2string(rc));
   }
 
   return resultStatus;

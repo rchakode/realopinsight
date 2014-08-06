@@ -235,7 +235,7 @@ std::string WebPreferences::authTypeString(int authSystem)
   if (authSystem == LDAP)
     return "LDAP";
 
-  return "BuiltIn";
+  return "Built-in";
 }
 
 void WebPreferences::applyChanges(void)
