@@ -131,4 +131,5 @@ bool AuthManager::isLogged(void)
 void AuthManager::handleLoginFailed(std::string data)
 {
   m_infoBox->setText(data);
+  m_infoBox->setStyleClass("alert alert-danger");
 }
