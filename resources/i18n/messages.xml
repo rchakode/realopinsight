@@ -336,7 +336,7 @@
     ${software} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
     <br />Version ${version}
     - <a href="http://docs.realopinsight.com/">Help</a>
-    - <a href="${package-url}" target="_blank">Terms &amp; Conditions</a>
+    - <a href="http://legal.realopinsight.com/" target="_blank">Terms &amp; Conditions</a>
 </message>
 
 <message id="view-assignment-tpl">
@@ -494,48 +494,11 @@
  <div>
    <h3>Copyrights</h3>
    <p>
-   Copyrights © 2010-2014, Rodrigue Chakode.<br/>
-   Copyrights © 2014, RealOpInsight Labs.<br/>
-   All rights reserved.
+   Copyrights &copy; 2010-2014, Rodrigue Chakode.<br/>
+   Copyrights &copy; 2014, RealOpInsight Labs. <br />
+   All rights reserved. <a href="http://legal.realopinsight.com/">Terms of Use</a>
    </p>
-   <h3>Terms of Use</h3>
-   <p>
-   <strong>Permitted use.</strong> Permission to use this software, its name and logo,<br/>
-   is hereby granted freely for academic and non-commercial use.
-   </p>
-
-   <p>
-   <strong>Restricted use.</strong> Permission to copy, modify and redistribute <br/>
-   the software requires prior express authorization of RealOpInsight Labs. <br />
-   Please contact us if you want any question or details concerning <br/>
-   your use: <a href="mailto:contact@realopinsight.com">contact@realopinsight.com</a>.
-   </p>
-   <p>
-   <h3>Guarantee and Liability</h3>
-   THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR <br/>
-   DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS <br/>
-   SOFTWARE INCLUDING ALL IMPLIED WARRANTIES <br/>
-   OF MERCHANTABILITY AND FITNESS. IN NO EVENT <br/>
-   SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, <br/>
-   DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES <br/>
-   OR ANY DAMAGES WHATSOEVER RESULTING FROM <br/>
-   LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION <br/>
-   OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, <br/>
-   ARISING OUT OF OR IN CONNECTION WITH THE USE OR<br/>
-   PERFORMANCE OF THIS SOFTWARE.
-   </p>
-   <p>
-   <h3>Trademarks</h3>
-   RealOpInsight, RealOpInsight Workstation, RealOpInsight Ultimate,<br/>
-   RealOpInsight Labs and their respective logos, are trademarks<br/>
-   owned by Rodrigue Chakode and granted for exploitation<br/>
-   purposes to RealOpInsight Labs.<br/>
-   Others trademarks are properties of their respective authors.
-   </p>
-   <p>
-   You MUST use them in compliance with law.
-   </p>
- </div>
+</div>
  <div style="float: right;">${close-button}</div>
 </message>
 <message id="notification.block.tpl">
