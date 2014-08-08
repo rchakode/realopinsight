@@ -57,7 +57,7 @@ prompt_copyright()
   while true; do
     read -p "Do you accept the terms of the License ? y/N/r " rep
     case $rep in
-	  r) more COPYING ; echo ;;
+	  r) more LICENSE ; echo ;;
 	  y) break ;;
 	  *) exit 0 ;; 
     esac
