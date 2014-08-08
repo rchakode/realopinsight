@@ -68,6 +68,9 @@ echo -n "DEBUG : Shutting down Apache..."
 /etc/init.d/apache2 stop
 check_exit_code
 
+echo -n "DEBUG : Installing sqlite3 CLI..."
+apt-get install -y sqlite3
+check_exit_code
 
 echo -n "DEBUG : Updating database..."
 su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem int not null default 0;" \
