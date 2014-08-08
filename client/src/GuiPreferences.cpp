@@ -346,6 +346,7 @@ QString GuiPreferences::style()
       "QGraphicsView {"
       " background: #F8F8FF;"
       "}"
+      "QLineEdit { border: none }"
       ;
   return styleSheet;
 }

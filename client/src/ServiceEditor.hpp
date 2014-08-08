@@ -46,8 +46,9 @@ const QString ICON_FIELD = "icon";
 const QString DESCRIPTION_FIELD = "description";
 const QString ALARM_MSG_FIELD = "alarmMsg";
 const QString NOTIFICATION_MSG_FIELD = "notificationMsg";
-const QString CHECK_LIST_FIELD = "ChecksField";
 const QString CHECK_FIELD = "CheckField";
+const QString CHECK_FILTER_FIELD = "Search...";
+const QString CHECK_HOST_GROUP_FIELD = "Select Host Group";
 const QString HIGH_CRITICITY_CALC_RULE_FIELD = "Higher Severity";
 const QString WEIGHTED_CALC_RULE_FIELD = "Equal-weighted Severity";
 
@@ -70,7 +71,6 @@ public:
   bool updateNodeContent(NodeListT::iterator& _node);
   void loadChecks(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
-  void setLowLevelAlarmComponentEnabled(bool enable){ mitems[CHECK_LIST_FIELD]->setEnabled(enable); }
 
   inline WidgetMapT* itemList(void) {return& mitems;}
   inline QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(mitems[NAME_FIELD]);}
@@ -81,18 +81,18 @@ public:
   inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(mitems[DESCRIPTION_FIELD]);}
   inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(mitems[ALARM_MSG_FIELD]);}
   inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(mitems[NOTIFICATION_MSG_FIELD]);}
-  inline QComboBox* checkField(void){return dynamic_cast<QComboBox*>(mitems[CHECK_FIELD]);}
-  inline QListWidget* checkListField(void){return dynamic_cast<QListWidget*>(mitems[CHECK_LIST_FIELD]);}
+  inline QListWidget* checkField(void){return dynamic_cast<QListWidget*>(mitems[CHECK_FIELD]);}
 
 public Q_SLOTS:
   inline void handleSaveClick(void) { Q_EMIT saveClicked(); }
   void handleCloseClick(void){ Q_EMIT closeClicked(); }
   inline void handleReturnPressed(void) { Q_EMIT returnPressed(); }
   void handleNodeTypeChanged(const QString&);
-  void handleNodeTypeActivated(const QString& _text);
+  void handleNodeTypeActivated(const QString& text);
+  void handleCheckFilter(const QString& text);
 
-Q_SIGNALS:
-  void saveClicked(void);
+  Q_SIGNALS:
+    void saveClicked(void);
   void closeClicked(void);
   void returnPressed(void);
   void nodeTypeActivated(qint32);
@@ -105,6 +105,11 @@ private:
   WidgetMapT mitems;
   QGridLayout* mlayout;
   QDialogButtonBox* buttonBox;
+  QStringList m_dataPoints;
+  QLineEdit* m_checkSearchFilterField;
+  QComboBox* m_hostGroupFilterBox;
+  QGroupBox* m_checkFieldsGroup;
+
 
   void addEvent(void);
   void loadLabelFields(void);
@@ -116,6 +121,7 @@ private:
   void loadIconFields(void);
   void loadCheckField(void);
   void loadButtonBox(void);
+  QLabel* createCheckFieldHelpIcon(void);
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */

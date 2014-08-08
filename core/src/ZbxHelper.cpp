@@ -93,6 +93,7 @@ ZbxHelper::requestsPatterns()
       \"method\": \"trigger.get\", \
       \"params\": { \
       \"filter\": {%2}, \
+      \"selectGroups\": [\"name\"], \
       \"selectHosts\": [\"host\"], \
       \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
@@ -145,6 +146,7 @@ ZbxHelper::parseReply(QNetworkReply* reply)
 
   // now read data
   QString data = reply->readAll();
+  qDebug()<< data;
   m_replyJsonData.setData(data);
 
   return 0;
