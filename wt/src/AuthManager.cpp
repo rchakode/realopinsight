@@ -43,7 +43,6 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_dbSession(dbSession),
     m_mainUI(NULL)
 {
-  //Wt::Auth::AuthModel* authModel = new Wt::Auth::AuthModel(m_dbSession->auth(), m_dbSession->users());
   AuthModelProxy* authModelProxy = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
   authModelProxy->loginFailed().connect(this, &AuthManager::handleLoginFailed);
 
@@ -133,3 +132,4 @@ void AuthManager::handleLoginFailed(std::string data)
   m_infoBox->setText(data);
   m_infoBox->setStyleClass("alert alert-danger");
 }
+

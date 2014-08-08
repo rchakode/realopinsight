@@ -36,6 +36,7 @@ class WebMainUI;
 
 class AuthManager : public Wt::Auth::AuthWidget
 {
+
 public:
   AuthManager(DbSession* dbSession);
   DbSession* session(void) {return m_dbSession;}

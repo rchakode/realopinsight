@@ -107,6 +107,7 @@ WebPreferences::WebPreferences(void)
   m_ldapVersionField.reset(new Wt::WComboBox(this));
   m_ldapVersionField->addItem(LDAP_VERSION3_TEXT);
   m_ldapVersionField->addItem(LDAP_VERSION2_TEXT);
+  m_ldapVersionField->setCurrentIndex(0);
 
   m_ldapSslUseCertField.reset(new Wt::WCheckBox(QObject::tr("Use custom SSL certificate").toStdString(), this));
   m_ldapSslCertFileField.reset(new Wt::WLineEdit(this));

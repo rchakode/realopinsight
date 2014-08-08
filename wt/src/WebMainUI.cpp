@@ -215,7 +215,7 @@ void WebMainUI::setupProfileMenus(void)
   curItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
   curItem->setLinkTarget(Wt::TargetNewWindow);
 
-  profilePopupMenu->addItem("About")->triggered().connect(std::bind([=](){m_aboutDialog->show();}));
+  profilePopupMenu->addItem("About")->triggered().connect(m_aboutDialog, &Wt::WDialog::show);
 }
 
 void WebMainUI::setupMenus(void)
@@ -720,10 +720,9 @@ void WebMainUI::createAboutDialog(void)
   m_aboutDialog->setStyleClass("Wt-dialog");
   
   Wt::WPushButton* closeButton(new Wt::WPushButton(tr("Close").toStdString()));
-  closeButton->clicked().connect(std::bind([=](){m_aboutDialog->accept();}));
-  
+  closeButton->clicked().connect(m_aboutDialog, &Wt::WDialog::accept);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), m_aboutDialog->contents());
-  
+
   tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
   tpl->bindString("corelib-version", ngrt4n::libVersion().toStdString());
