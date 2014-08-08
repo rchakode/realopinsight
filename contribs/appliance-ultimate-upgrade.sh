@@ -19,11 +19,11 @@
 #--------------------------------------------------------------------------#
 
 
-REALOPINSIGHT_WWW_USER=www-data 
-REALOPINSIGHT_WWW_GROUP=www-data
+export REALOPINSIGHT_WWW_USER=www-data 
+export REALOPINSIGHT_WWW_GROUP=www-data
 
-TARGET_VERSION=2014b3
-PATCH_TARBALL=patch_${TARGET_VERSION}.tar.gz
+export TARGET_VERSION=2014b3
+export PATCH_TARBALL=patch_${TARGET_VERSION}.tar.gz
 
 
 prompt_copyright()
