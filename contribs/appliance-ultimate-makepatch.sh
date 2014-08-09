@@ -1,6 +1,6 @@
 #!/bin/bash
 # ------------------------------------------------------------------------ #
-# File: install-sh                                                         #
+# File: appliance-ultimate-makepatch.sh                                    #
 # Copyright (c) 2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
 # Creation : 08-08-2014                                                    #
 #                                                                          #
@@ -17,6 +17,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           #
 #                                                                          #
 #--------------------------------------------------------------------------#
+
+set -u 
 
 TARGET_VERSION=2014b3
 PATCH_TARBALL=patch_${TARGET_VERSION}_x64_86.tar.gz

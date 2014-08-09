@@ -1,6 +1,6 @@
 #!/bin/bash
 # ------------------------------------------------------------------------ #
-# File: install-sh                                                         #
+# File: appliance-ultimate-apply-patch.sh                                  #
 # Copyright (c) 2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
 # Creation : 08-08-2014                                                    #
 #                                                                          #
@@ -18,13 +18,39 @@
 #                                                                          #
 #--------------------------------------------------------------------------#
 
-
-export REALOPINSIGHT_WWW_USER=www-data 
-export REALOPINSIGHT_WWW_GROUP=www-data
+set -u
 
 export TARGET_VERSION=2014b3
+export REALOPINSIGHT_APP_DIR=/opt/realopinsight
+export REALOPINSIGHT_WWW_DIR=/var/www/realopinsight
+export REALOPINSIGHT_WWW_USER=www-data 
+export REALOPINSIGHT_WWW_GROUP=www-data
 export PATCH_TARBALL=patch_${TARGET_VERSION}.tar.gz
+export BACKUP_FILE=backup_`date +%Y-%M-%d_%H:%M:%S`.tar.gz
 
+make_backup()
+{
+  echo -n "DEBUG : Backup current installation to ${BACKUP_FILE}..."
+  tar --same-owner -zcf ${BACKUP_FILE} ${REALOPINSIGHT_WWW_DIR} ${REALOPINSIGHT_APP_DIR}
+  if [ $? -eq 0 ]; then
+    echo done
+  else  
+    echo failed
+	exit 1
+  fi
+}
+
+make_restore()
+{
+  echo -n "DEBUG : Restoring system from ${BACKUP_FILE} ..."
+  tar --same-owner -zxf ${BACKUP_FILE} -C /
+  if [ $? -eq 0 ]; then
+    echo done
+  else  
+    echo failed
+	exit 1
+  fi
+}
 
 prompt_copyright()
 { 
@@ -55,12 +81,15 @@ check_exit_code()
     echo "done"
   else
     echo "failed"
+	make_restore
     exit 1
   fi
 }
 
-
 prompt_copyright
+
+# Make backup
+make_backup
 
 echo "DEBUG : Upgrading RealOpInsight Ultimate to version ${TARGET_VERSION}..."
 
@@ -79,12 +108,12 @@ su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem i
 check_exit_code
 
 echo -n "DEBUG : Upplying update from ${PATCH_TARBALL}..."
-tar --same-owner zxf ${PATCH_TARBALL}
+tar --same-owner -zxf ${PATCH_TARBALL} -C /
 
 echo -n "DEBUG : Restarting Apache..."
 /etc/init.d/apache2 start
 check_exit_code
 
-echo "DEBUG: Upgrade completed."
+echo "DEBUG: Upgrade completed. Backup file: ${BACKUP_FILE}"
 
 
