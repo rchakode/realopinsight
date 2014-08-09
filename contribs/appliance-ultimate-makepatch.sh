@@ -18,11 +18,17 @@
 #                                                                          #
 #--------------------------------------------------------------------------#
 
-export TARGET_VERSION=2014b3
-export PATCH_TARBALL=patch_${TARGET_VERSION}.tar.gz
-export REALOPINSIGHT_PREFIX=/opt
-export REALOPINSIGHT_WWW=/var/www
-export REALOPINSIGHT_WWW_USER=www-data 
-export REALOPINSIGHT_WWW_GROUP=www-data
+TARGET_VERSION=2014b3
+PATCH_TARBALL=patch_${TARGET_VERSION}_x64_86.tar.gz
+REALOPINSIGHT_PREFIX=/opt
+REALOPINSIGHT_WWW=/var/www
+REALOPINSIGHT_WWW_USER=www-data 
+REALOPINSIGHT_WWW_GROUP=www-data
+RELEASE_TARBALL_BASENAME=realopinsight-ultimate-patch-${TARGET_VERSION}_x64_86
 
-tar --same-owner -zcf ${PATCH_TARBALL} ${REALOPINSIGHT_WWW}/realopinsight
+mkdir ${RELEASE_TARBALL_BASENAME}
+tar --same-owner zcf ${RELEASE_TARBALL_BASENAME}/${PATCH_TARBALL} ${REALOPINSIGHT_WWW}/realopinsight
+cp contribs/appliance-ultimate-upgrade.sh ${RELEASE_TARBALL_BASENAME}
+cp contribs/README_APPLIANCE ${RELEASE_TARBALL_BASENAME}
+
+tar zcf ${RELEASE_TARBALL_BASENAME}.tar.gz ${RELEASE_TARBALL_BASENAME}
