@@ -21,11 +21,11 @@
 set -u
 
 export REAlOPINSIGHT_TARGET_VERSION=2014b3
+export REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}_x64_86.tar.gz
 export REALOPINSIGHT_APP_DIR=/opt/realopinsight
 export REALOPINSIGHT_WWW_DIR=/var/www/realopinsight
 export REALOPINSIGHT_WWW_USER=www-data 
 export REALOPINSIGHT_WWW_GROUP=www-data
-export REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}.tar.gz
 export REAlOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
 
 make_backup()
@@ -104,11 +104,13 @@ check_exit_code
 echo -n "DEBUG : Updating database..."
 su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem int not null default 0;" \
                 | sqlite3 /opt/realopinsight/data/realopinsight.db'
-
+				
 check_exit_code
 
 echo -n "DEBUG : Upplying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
 tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
+check_exit_code
+
 
 echo -n "DEBUG : Restarting Apache..."
 /etc/init.d/apache2 start
