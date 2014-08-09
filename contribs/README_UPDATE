@@ -7,7 +7,7 @@ See the terms of use: http://legal.realopinsight.com/
 INSTALLING THE PATCH
 =====================
 To install the patch, execute the following command and follow 
-the installation process. Messages will guide you throughout 
+the installation process. Messages will guide you throughout the
 process. 
 
 sudo ./appliance-ultimate-apply-patch.sh 
