@@ -29,7 +29,7 @@ REALOPINSIGHT_WWW_GROUP=www-data
 RELEASE_TARBALL_BASENAME=realopinsight-ultimate-patch-${TARGET_VERSION}_x64_86
 
 mkdir ${RELEASE_TARBALL_BASENAME}
-tar --same-owner zcf ${RELEASE_TARBALL_BASENAME}/${PATCH_TARBALL} ${REALOPINSIGHT_WWW}/realopinsight
+tar --same-owner -zcf ${RELEASE_TARBALL_BASENAME}/${PATCH_TARBALL} ${REALOPINSIGHT_WWW}/realopinsight
 cp contribs/appliance-ultimate-apply-patch.sh ${RELEASE_TARBALL_BASENAME}
 cp contribs/README_APPLIANCE ${RELEASE_TARBALL_BASENAME}
 

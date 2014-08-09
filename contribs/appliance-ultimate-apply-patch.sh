@@ -20,18 +20,18 @@
 
 set -u
 
-export TARGET_VERSION=2014b3
+export REAlOPINSIGHT_TARGET_VERSION=2014b3
 export REALOPINSIGHT_APP_DIR=/opt/realopinsight
 export REALOPINSIGHT_WWW_DIR=/var/www/realopinsight
 export REALOPINSIGHT_WWW_USER=www-data 
 export REALOPINSIGHT_WWW_GROUP=www-data
-export PATCH_TARBALL=patch_${TARGET_VERSION}.tar.gz
-export BACKUP_FILE=backup_`date +%Y-%M-%d_%H:%M:%S`.tar.gz
+export REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}.tar.gz
+export REAlOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
 
 make_backup()
 {
-  echo -n "DEBUG : Backup current installation to ${BACKUP_FILE}..."
-  tar --same-owner -zcf ${BACKUP_FILE} ${REALOPINSIGHT_WWW_DIR} ${REALOPINSIGHT_APP_DIR}
+  echo -n "DEBUG : Backup current installation to ${REAlOPINSIGHT_BACKUP_FILE}..."
+  tar --same-owner -zcf ${REAlOPINSIGHT_BACKUP_FILE} ${REALOPINSIGHT_WWW_DIR} ${REALOPINSIGHT_APP_DIR}
   if [ $? -eq 0 ]; then
     echo done
   else  
@@ -42,8 +42,8 @@ make_backup()
 
 make_restore()
 {
-  echo -n "DEBUG : Restoring system from ${BACKUP_FILE} ..."
-  tar --same-owner -zxf ${BACKUP_FILE} -C /
+  echo -n "DEBUG : Restoring system from ${REAlOPINSIGHT_BACKUP_FILE} ..."
+  tar --same-owner -zxf ${REAlOPINSIGHT_BACKUP_FILE} -C /
   if [ $? -eq 0 ]; then
     echo done
   else  
@@ -91,7 +91,7 @@ prompt_copyright
 # Make backup
 make_backup
 
-echo "DEBUG : Upgrading RealOpInsight Ultimate to version ${TARGET_VERSION}..."
+echo "DEBUG : Upgrading RealOpInsight Ultimate to version ${REAlOPINSIGHT_TARGET_VERSION}..."
 
 echo -n "DEBUG : Shutting down Apache..."
 /etc/init.d/apache2 stop
@@ -107,13 +107,13 @@ su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem i
 
 check_exit_code
 
-echo -n "DEBUG : Upplying update from ${PATCH_TARBALL}..."
-tar --same-owner -zxf ${PATCH_TARBALL} -C /
+echo -n "DEBUG : Upplying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
+tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
 
 echo -n "DEBUG : Restarting Apache..."
 /etc/init.d/apache2 start
 check_exit_code
 
-echo "DEBUG: Upgrade completed. Backup file: ${BACKUP_FILE}"
+echo "DEBUG: Upgrade completed. Backup file: ${REAlOPINSIGHT_BACKUP_FILE}"
 
 
