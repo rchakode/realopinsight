@@ -1,0 +1,13 @@
+RealOpInsight Ultimate Update Patch
+===================================
+
+Copyright (c) 2014 RealOpInsight Labs. All right reserved.
+See the terms of use: http://legal.realopinsight.com/
+
+INSTALLING THE PATCH
+=====================
+To install the patch, execute the following command and follow 
+the installation process. Messages will guide you throughout 
+process. 
+
+sudo ./appliance-ultimate-apply-patch.sh 
