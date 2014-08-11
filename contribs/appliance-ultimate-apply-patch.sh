@@ -107,7 +107,7 @@ su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem i
 				
 check_exit_code
 
-echo -n "DEBUG : Upplying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
+echo -n "DEBUG : Applying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
 tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
 check_exit_code
 
