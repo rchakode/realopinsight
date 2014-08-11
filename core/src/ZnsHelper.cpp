@@ -88,30 +88,32 @@ RequestListT ZnsHelper::contentTypes()
 RequestListT ZnsHelper::requestsPatterns()
 {
   RequestListT list;
-  list[Device] = "{\"action\": \"DeviceRouter\", \
-      \"method\": \"getDevices\", \
-      \"data\": [{\
-      \"uid\": \"/zport/dmd/Devices\", \
-      \"sort\": \"name\", \
-      \"params\": {\"name\": \"%1\"},  \
-      \"keys\":[\"name\",\"uid\"] }], \
-      \"type\": \"rpc\", \
-      \"tid\": %2}";
-  list[Component] = "{\"action\": \"DeviceRouter\", \
-      \"method\": \"getComponents\", \
-      \"data\": [{\
-      \"uid\": \"%1\", \
-      \"limit\": 1000, \
-      \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\"]}], \
-      \"type\": \"rpc\", \
-      \"tid\": %2}";
-  list[DeviceInfo] = "{\"action\": \"DeviceRouter\", \
-      \"method\": \"getInfo\", \
-      \"data\": [{\
-      \"uid\": \"%1\", \
-      \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\"] }], \
-      \"type\": \"rpc\", \
-      \"tid\": %2}";
+  list[Device] = "{\"action\": \"DeviceRouter\", "
+      " \"method\": \"getDevices\", "
+      " \"data\": [{ "
+      " \"uid\": \"/zport/dmd/Devices\", "
+      " \"sort\": \"name\", "
+      " \"params\": {\"name\": \"%1\"}, "
+      " \"keys\":[\"name\",\"uid\",\"groups\"] "
+      "}], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
+  list[Component] = "{\"action\": \"DeviceRouter\", "
+      " \"method\": \"getComponents\", "
+      " \"data\": [{ "
+      " \"uid\": \"%1\", "
+      " \"limit\": 1000, "
+      " \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\",\"groups\"]"
+      " }], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
+  list[DeviceInfo] = "{\"action\": \"DeviceRouter\", "
+      " \"method\": \"getInfo\", "
+      " \"data\": [{ "
+      " \"uid\": \"%1\", "
+      " \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\",\"groups\"] }], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
   return list;
 }
 
