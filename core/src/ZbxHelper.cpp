@@ -146,7 +146,6 @@ ZbxHelper::parseReply(QNetworkReply* reply)
 
   // now read data
   QString data = reply->readAll();
-  qDebug()<< data;
   m_replyJsonData.setData(data);
 
   return 0;
@@ -176,7 +175,6 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     return -1;
   }
   params.push_back(QString::number(Login));
-  qDebug()<<"session <<"<<srcInfo.verify_ssl_peer<<(srcInfo.verify_ssl_peer != 0);
   setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
   QNetworkReply* response = postRequest(Login, params);
 
@@ -282,15 +280,26 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
       check.alarm_msg = triggerData.property("error").toString().toStdString();
       check.status = triggerData.property("priority").toInteger();
     }
-    QString targetHost = "";
-    QScriptValueIterator host(triggerData.property("hosts"));
-    if (host.hasNext())
-    {
-      host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
-      QScriptValue hostData = host.value();
-      targetHost = hostData.property("host").toString();
-      check.host = targetHost.toStdString();
+
+    // parse host info
+    QString hostAddress = "";
+    QScriptValueIterator iterHosts(triggerData.property("hosts"));
+    if (iterHosts.hasNext()) {
+      iterHosts.next(); if (iterHosts.flags() & QScriptValue::SkipInEnumeration) continue;
+      QScriptValue hostData = iterHosts.value();
+      hostAddress = hostData.property("host").toString();
+      check.host = hostAddress.toStdString();
     }
+
+    // parse group info
+    QScriptValueIterator iterGroups(triggerData.property("hosts"));
+    while (iterGroups.hasNext()) {
+      iterGroups.next(); if (iterGroups.flags() & QScriptValue::SkipInEnumeration) continue;
+      QScriptValue groupData = iterGroups.value();
+      std::string groupName = groupData.property("name").toString().toStdString();
+      check.host_groups = check.host_groups.empty()? groupName : ","+groupName;
+    }
+
     if (tid == ZbxHelper::TriggerV18) {
       check.last_state_change = triggerData.property("lastchange").toString().toStdString();
     } else {
@@ -302,7 +311,7 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
         check.last_state_change = itemData.property("lastclock").toString().toStdString();
       }
     }
-    check.id = ID_PATTERN.arg(targetHost, triggerName).toStdString();
+    check.id = ID_PATTERN.arg(hostAddress, triggerName).toStdString();
     checks.insert(std::pair<std::string, CheckT>(check.id, check));
   }
   return 0;

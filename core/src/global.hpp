@@ -35,6 +35,7 @@ struct CheckT {
   std::string check_command;
   std::string last_state_change;
   std::string alarm_msg;
+  std::string host_groups;
   int status;
 };
 typedef std::unordered_map<std::string, CheckT> ChecksT;

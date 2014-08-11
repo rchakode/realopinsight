@@ -44,7 +44,7 @@ public:
   QString lastError(void) const {return m_lastError;}
   int setupSocket(void);
 
-  void parseResult(const QString& result, ChecksT& checks);
+  void parseResult(ChecksT& checks);
   static QByteArray prepareRequestData(const QString& host, ReqTypeT requestType);
 
 private:
