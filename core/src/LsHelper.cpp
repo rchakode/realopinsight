@@ -142,6 +142,7 @@ void LsHelper::parseResult(ChecksT& checks)
       continue;
       break;
     }
+
     checks.insert(std::pair<std::string, CheckT>(check.id, check));
   }
 }

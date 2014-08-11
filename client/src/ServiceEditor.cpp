@@ -229,9 +229,14 @@ void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
     if (childNodeIt != childNodes.end()) {
       checkId = (*childNodeIt).trimmed();
     }
-    childNodes.clear();
   }
   QList<QListWidgetItem*> matchs = checkField()->findItems(checkId, Qt::MatchExactly);
+  if (matchs.isEmpty()) {
+    m_dataPoints.append(checkId);
+    checkField()->addItem(checkId);
+    matchs = checkField()->findItems(checkId, Qt::MatchExactly);
+  }
+
   if (! matchs.isEmpty())
     checkField()->setCurrentItem(matchs.at(0));
 }
@@ -322,8 +327,8 @@ void ServiceEditor::loadCheckField(void)
   labelLayout->addWidget(createCheckFieldHelpIcon());
 
   QGridLayout* fieldsLayout = new QGridLayout();
-  fieldsLayout->addWidget(m_checkSearchFilterField, 0, 0, 1, 1);
-  fieldsLayout->addWidget(m_hostGroupFilterBox, 0, 1, 1, 1);
+  fieldsLayout->addWidget(m_hostGroupFilterBox, 0, 0, 1, 1);
+  fieldsLayout->addWidget(m_checkSearchFilterField, 0, 1, 1, 1);
   fieldsLayout->addWidget(checkField(), 1, 0, 1, 2, 0);
 
   m_checkFieldsGroup->setLayout(fieldsLayout);
