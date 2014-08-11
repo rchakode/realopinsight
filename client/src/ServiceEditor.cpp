@@ -222,23 +222,21 @@ void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
   alarmMsgField()->setText(_node.alarm_msg);
   notificationMsgField()->setText(_node.notification_msg);
 
-  QString checkId = "";
   if (_node.type == NodeType::AlarmNode) {
     QStringList childNodes = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
     QStringList::iterator childNodeIt = childNodes.begin();
     if (childNodeIt != childNodes.end()) {
-      checkId = (*childNodeIt).trimmed();
+      QString checkId = (*childNodeIt).trimmed();
+      QList<QListWidgetItem*> matchs = checkField()->findItems(checkId, Qt::MatchExactly);
+      if (matchs.isEmpty()) {
+        m_dataPoints.append(checkId);
+        checkField()->addItem(checkId);
+        matchs = checkField()->findItems(checkId, Qt::MatchExactly);
+      }
+      if (! matchs.isEmpty())
+        checkField()->setCurrentItem(matchs.at(0));
     }
   }
-  QList<QListWidgetItem*> matchs = checkField()->findItems(checkId, Qt::MatchExactly);
-  if (matchs.isEmpty()) {
-    m_dataPoints.append(checkId);
-    checkField()->addItem(checkId);
-    matchs = checkField()->findItems(checkId, Qt::MatchExactly);
-  }
-
-  if (! matchs.isEmpty())
-    checkField()->setCurrentItem(matchs.at(0));
 }
 
 void ServiceEditor::loadLabelFields()
