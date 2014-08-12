@@ -93,6 +93,7 @@ ZbxHelper::requestsPatterns()
       \"method\": \"trigger.get\", \
       \"params\": { \
       \"filter\": {%2}, \
+      \"selectGroups\": [\"name\"], \
       \"selectHosts\": [\"host\"], \
       \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
       \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
@@ -174,7 +175,6 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     return -1;
   }
   params.push_back(QString::number(Login));
-  qDebug()<<"session <<"<<srcInfo.verify_ssl_peer<<(srcInfo.verify_ssl_peer != 0);
   setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
   QNetworkReply* response = postRequest(Login, params);
 
@@ -272,6 +272,8 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
     QString triggerName = triggerData.property("description").toString();
 
     CheckT check;
+    check.host = parseHost(triggerData.property("hosts"));
+    check.host_groups = parseHostGroups(triggerData.property("groups"));
     check.check_command = triggerName.toStdString();
     check.status = triggerData.property("value").toInt32();
     if (check.status == ngrt4n::ZabbixClear) {
@@ -280,15 +282,7 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
       check.alarm_msg = triggerData.property("error").toString().toStdString();
       check.status = triggerData.property("priority").toInteger();
     }
-    QString targetHost = "";
-    QScriptValueIterator host(triggerData.property("hosts"));
-    if (host.hasNext())
-    {
-      host.next(); if (host.flags()&QScriptValue::SkipInEnumeration) continue;
-      QScriptValue hostData = host.value();
-      targetHost = hostData.property("host").toString();
-      check.host = targetHost.toStdString();
-    }
+
     if (tid == ZbxHelper::TriggerV18) {
       check.last_state_change = triggerData.property("lastchange").toString().toStdString();
     } else {
@@ -300,7 +294,7 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
         check.last_state_change = itemData.property("lastclock").toString().toStdString();
       }
     }
-    check.id = ID_PATTERN.arg(targetHost, triggerName).toStdString();
+    check.id = ID_PATTERN.arg(check.host.c_str(), triggerName).toStdString();
     checks.insert(std::pair<std::string, CheckT>(check.id, check));
   }
   return 0;
@@ -316,19 +310,15 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
     return -1;
 
   QStringList params;
-  QNetworkReply* response = NULL;
-
-  // Finally retriev triggers related to the given host
-  // FIXME: if host empty get triggers from all hosts
   checks.clear();
-  params.clear();
   QString hostFilter = host.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(host);
   params.push_back(hostFilter);
   params.push_back(QString::number(m_trid));
-  response = postRequest(m_trid, params);
+  QNetworkReply* response = postRequest(m_trid, params);
   if (! response || processTriggerReply(response, checks) !=0) {
     return -1;
   }
+
   return 0;
 }
 
@@ -338,4 +328,40 @@ ZbxHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
   reply->setSslConfiguration(m_sslConfig);
   if (m_sslConfig.peerVerifyMode() == QSslSocket::VerifyNone)
     reply->ignoreSslErrors();
+}
+
+
+std::string
+ZbxHelper::parseHostGroups(const QScriptValue& json)
+{
+  std::string result("");
+  QScriptValueIterator iterGroups(json);
+  while (iterGroups.hasNext()) {
+    iterGroups.next();
+    if (iterGroups.flags() & QScriptValue::SkipInEnumeration)
+      continue;
+    QScriptValue groupData = iterGroups.value();
+    std::string groupName = groupData.property("name").toString().toStdString();
+    result = result.empty()? groupName : "," + groupName;
+  }
+
+  return result;
+}
+
+
+std::string
+ZbxHelper::parseHost(const QScriptValue& json)
+{
+  std::string result("");
+  QScriptValueIterator iterHosts(json);
+  while (iterHosts.hasNext()) {
+    iterHosts.next();
+    if (iterHosts.flags() & QScriptValue::SkipInEnumeration)
+      continue;
+    QScriptValue hostData = iterHosts.value();
+    result = hostData.property("host").toString().toStdString();
+    break;
+  }
+
+  return result;
 }
