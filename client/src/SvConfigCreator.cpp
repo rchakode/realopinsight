@@ -253,7 +253,7 @@ void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const C
     statusBar()->showMessage(msg);
     statusBar()->setStyleSheet("background: red;");
   } else {
-    m_editor->loadChecks(checks, srcId);
+    m_editor->updateDataPoints(checks, srcId);
     statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
     statusBar()->setStyleSheet("background: transparent;");
   }

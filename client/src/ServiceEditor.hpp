@@ -69,19 +69,19 @@ public:
   void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
   bool updateNodeContent(NodeListT& _nodes, const QString& _nodeId);
   bool updateNodeContent(NodeListT::iterator& _node);
-  void loadChecks(const ChecksT& checks, const QString& srcId);
+  void updateDataPoints(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
 
-  inline WidgetMapT* itemList(void) {return& mitems;}
-  inline QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(mitems[NAME_FIELD]);}
-  inline QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(mitems[TYPE_FIELD]);}
-  inline QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(mitems[STATUS_CALC_RULE_FIELD]);}
-  inline QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(mitems[STATUS_PROP_RULE_FIELD]);}
-  inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(mitems[ICON_FIELD]);}
-  inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(mitems[DESCRIPTION_FIELD]);}
-  inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(mitems[ALARM_MSG_FIELD]);}
-  inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(mitems[NOTIFICATION_MSG_FIELD]);}
-  inline QListWidget* checkField(void){return dynamic_cast<QListWidget*>(mitems[CHECK_FIELD]);}
+  inline WidgetMapT* itemList(void) {return& m_fieldWidgets;}
+  inline QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[NAME_FIELD]);}
+  inline QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[TYPE_FIELD]);}
+  inline QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_CALC_RULE_FIELD]);}
+  inline QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_PROP_RULE_FIELD]);}
+  inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[ICON_FIELD]);}
+  inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(m_fieldWidgets[DESCRIPTION_FIELD]);}
+  inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[ALARM_MSG_FIELD]);}
+  inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[NOTIFICATION_MSG_FIELD]);}
+  inline QListWidget* checkField(void){return dynamic_cast<QListWidget*>(m_fieldWidgets[CHECK_FIELD]);}
 
 public Q_SLOTS:
   inline void handleSaveClick(void) { Q_EMIT saveClicked(); }
@@ -89,39 +89,44 @@ public Q_SLOTS:
   inline void handleReturnPressed(void) { Q_EMIT returnPressed(); }
   void handleNodeTypeChanged(const QString&);
   void handleNodeTypeActivated(const QString& text);
-  void handleCheckFilter(const QString& text);
+  void handleDataPointFilter(const QString& text);
+  void handleDataPointSearch(void) { handleDataPointFilter(m_dataPointSearchField->text()); }
+  void handleAddDataPointEntry(void) { addAndSelectDataPointEntry(m_dataPointSearchField->text());}
 
-  Q_SIGNALS:
-    void saveClicked(void);
+Q_SIGNALS:
+  void saveClicked(void);
   void closeClicked(void);
   void returnPressed(void);
   void nodeTypeActivated(qint32);
 
+
 private:
-  Settings* msettings;
-  qint32 editorLayoutRowCount;
-  qint32 mlayoutColumnCount;
-  qint16 mlayoutRowIndex;
-  WidgetMapT mitems;
-  QGridLayout* mlayout;
-  QDialogButtonBox* buttonBox;
+  qint32 m_rows;
+  qint16 m_currentRow;
+  WidgetMapT m_fieldWidgets;
+  QGridLayout* m_mainLayout;
+  QDialogButtonBox* m_actionButtonBox;
   QStringList m_dataPoints;
-  QLineEdit* m_checkSearchFilterField;
+  QLineEdit* m_dataPointSearchField;
   QComboBox* m_hostGroupFilterBox;
   QGroupBox* m_checkFieldsGroup;
-
+  QStackedWidget* m_dataPointActionButtons;
+  QPushButton* m_searchDataPointButton;
+  QPushButton* m_addDataPointButton;
 
   void addEvent(void);
-  void loadLabelFields(void);
-  void loadDescriptionFields(void);
-  void loadTypeFields(void);
-  void loadStatusHandlingFields(void);
-  void loadAlarmMsgFields(void);
-  void loadNotificationMsgFields(void);
-  void loadIconFields(void);
-  void loadCheckField(void);
-  void loadButtonBox(void);
+  void layoutLabelFields(void);
+  void layoutDescriptionFields(void);
+  void layoutTypeFields(void);
+  void layoutStatusHandlingFields(void);
+  void layoutAlarmMsgFields(void);
+  void layoutNotificationMsgFields(void);
+  void layoutIconFields(void);
+  void layoutCheckField(void);
+  void layoutButtonBox(void);
   QLabel* createCheckFieldHelpIcon(void);
+  void setCheckFieldsStyle(void);
+  void addAndSelectDataPointEntry(const QString& text);
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */
