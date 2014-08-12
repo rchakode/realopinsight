@@ -272,6 +272,8 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
     QString triggerName = triggerData.property("description").toString();
 
     CheckT check;
+    check.host = parseHost(triggerData.property("hosts"));
+    check.host_groups = parseHostGroups(triggerData.property("groups"));
     check.check_command = triggerName.toStdString();
     check.status = triggerData.property("value").toInt32();
     if (check.status == ngrt4n::ZabbixClear) {
@@ -279,25 +281,6 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
     } else {
       check.alarm_msg = triggerData.property("error").toString().toStdString();
       check.status = triggerData.property("priority").toInteger();
-    }
-
-    // parse host info
-    QString hostAddress = "";
-    QScriptValueIterator iterHosts(triggerData.property("hosts"));
-    if (iterHosts.hasNext()) {
-      iterHosts.next(); if (iterHosts.flags() & QScriptValue::SkipInEnumeration) continue;
-      QScriptValue hostData = iterHosts.value();
-      hostAddress = hostData.property("host").toString();
-      check.host = hostAddress.toStdString();
-    }
-
-    // parse group info
-    QScriptValueIterator iterGroups(triggerData.property("hosts"));
-    while (iterGroups.hasNext()) {
-      iterGroups.next(); if (iterGroups.flags() & QScriptValue::SkipInEnumeration) continue;
-      QScriptValue groupData = iterGroups.value();
-      std::string groupName = groupData.property("name").toString().toStdString();
-      check.host_groups = check.host_groups.empty()? groupName : ","+groupName;
     }
 
     if (tid == ZbxHelper::TriggerV18) {
@@ -311,7 +294,7 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
         check.last_state_change = itemData.property("lastclock").toString().toStdString();
       }
     }
-    check.id = ID_PATTERN.arg(hostAddress, triggerName).toStdString();
+    check.id = ID_PATTERN.arg(check.host.c_str(), triggerName).toStdString();
     checks.insert(std::pair<std::string, CheckT>(check.id, check));
   }
   return 0;
@@ -327,19 +310,15 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
     return -1;
 
   QStringList params;
-  QNetworkReply* response = NULL;
-
-  // Finally retriev triggers related to the given host
-  // FIXME: if host empty get triggers from all hosts
   checks.clear();
-  params.clear();
   QString hostFilter = host.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(host);
   params.push_back(hostFilter);
   params.push_back(QString::number(m_trid));
-  response = postRequest(m_trid, params);
+  QNetworkReply* response = postRequest(m_trid, params);
   if (! response || processTriggerReply(response, checks) !=0) {
     return -1;
   }
+
   return 0;
 }
 
@@ -349,4 +328,40 @@ ZbxHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
   reply->setSslConfiguration(m_sslConfig);
   if (m_sslConfig.peerVerifyMode() == QSslSocket::VerifyNone)
     reply->ignoreSslErrors();
+}
+
+
+std::string
+ZbxHelper::parseHostGroups(const QScriptValue& json)
+{
+  std::string result("");
+  QScriptValueIterator iterGroups(json);
+  while (iterGroups.hasNext()) {
+    iterGroups.next();
+    if (iterGroups.flags() & QScriptValue::SkipInEnumeration)
+      continue;
+    QScriptValue groupData = iterGroups.value();
+    std::string groupName = groupData.property("name").toString().toStdString();
+    result = result.empty()? groupName : "," + groupName;
+  }
+
+  return result;
+}
+
+
+std::string
+ZbxHelper::parseHost(const QScriptValue& json)
+{
+  std::string result("");
+  QScriptValueIterator iterHosts(json);
+  while (iterHosts.hasNext()) {
+    iterHosts.next();
+    if (iterHosts.flags() & QScriptValue::SkipInEnumeration)
+      continue;
+    QScriptValue hostData = iterHosts.value();
+    result = hostData.property("host").toString().toStdString();
+    break;
+  }
+
+  return result;
 }

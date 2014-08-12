@@ -68,7 +68,7 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
   m_checkFieldsGroup = new QGroupBox(this);
 
   m_dataPointSearchField = new QLineEdit(this);
-  m_dataPointSearchField->setPlaceholderText(tr("Search..."));
+  m_dataPointSearchField->setPlaceholderText(tr("Set or search data point..."));
   m_hostGroupFilterBox = new QComboBox(this);
   m_hostGroupFilterBox->addItem(tr("Select host group"));
 

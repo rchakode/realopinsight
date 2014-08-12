@@ -107,8 +107,9 @@ private :
   QString m_lastError;
   JsonHelper m_replyJsonData;
 
-  void
-  setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  std::string parseHostGroups(const QScriptValue& json);
+  std::string parseHost(const QScriptValue& json);
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

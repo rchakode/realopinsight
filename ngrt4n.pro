@@ -99,7 +99,7 @@ SOURCES += \
 
 gui-base {
 QT += svg gui webkit
-PACKAGE_VERSION=3.0.3
+PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
