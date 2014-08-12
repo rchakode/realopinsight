@@ -71,21 +71,21 @@ public:
   void updateDataPoints(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
 
-  inline WidgetMapT* itemList(void) {return& m_fieldWidgets;}
-  inline QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[NAME_FIELD]);}
-  inline QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[TYPE_FIELD]);}
-  inline QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_CALC_RULE_FIELD]);}
-  inline QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_PROP_RULE_FIELD]);}
-  inline QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[ICON_FIELD]);}
-  inline QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(m_fieldWidgets[DESCRIPTION_FIELD]);}
-  inline QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[ALARM_MSG_FIELD]);}
-  inline QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[NOTIFICATION_MSG_FIELD]);}
-  inline QListWidget* checkField(void){return dynamic_cast<QListWidget*>(m_fieldWidgets[CHECK_FIELD]);}
+  WidgetMapT* itemList(void) {return& m_fieldWidgets;}
+  QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[NAME_FIELD]);}
+  QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[TYPE_FIELD]);}
+  QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_CALC_RULE_FIELD]);}
+  QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_PROP_RULE_FIELD]);}
+  QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[ICON_FIELD]);}
+  QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(m_fieldWidgets[DESCRIPTION_FIELD]);}
+  QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[ALARM_MSG_FIELD]);}
+  QTextEdit* notificationMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[NOTIFICATION_MSG_FIELD]);}
+  QListWidget* checkField(void){return dynamic_cast<QListWidget*>(m_fieldWidgets[CHECK_FIELD]);}
 
 public Q_SLOTS:
-  inline void handleSaveClick(void) { Q_EMIT saveClicked(); }
+  void handleSaveClick(void) { Q_EMIT saveClicked(); }
   void handleCloseClick(void){ Q_EMIT closeClicked(); }
-  inline void handleReturnPressed(void) { Q_EMIT returnPressed(); }
+  void handleReturnPressed(void) { Q_EMIT returnPressed(); }
   void handleNodeTypeChanged(const QString&);
   void handleNodeTypeActivated(const QString& text);
   void handleDataPointFilter(const QString& text);
