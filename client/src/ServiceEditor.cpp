@@ -30,7 +30,10 @@
 #include "utilsCore.hpp"
 
 typedef QList<QListWidgetItem*> CheckItemList;
-
+namespace {
+  const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
+  const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
+  }
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
@@ -119,15 +122,16 @@ ServiceEditor::~ServiceEditor()
 
 void ServiceEditor::addEvent(void)
 {
+  connect(nameField(), SIGNAL(returnPressed ()), this, SLOT(handleReturnPressed() ) );
+  connect(typeField(), SIGNAL(currentIndexChanged(const QString&)), this, SLOT(handleNodeTypeChanged( const QString& ) ) );
+  connect(typeField(), SIGNAL(activated(const QString&)), this, SLOT(handleNodeTypeActivated( const QString& ) ) );
   connect(m_dataPointSearchField, SIGNAL(returnPressed()), this, SLOT(handleDataPointFieldReturnPressed()));
   connect(m_dataPointSearchField, SIGNAL(textEdited(const QString&)), this, SLOT(handleDataPointFilter(const QString&)));
   connect(m_searchDataPointButton, SIGNAL(clicked()), this, SLOT(handleDataPointSearch()));
   connect(m_addDataPointButton, SIGNAL(clicked()), this, SLOT(handleAddDataPointEntry()));
+  connect(m_hostGroupFilterBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(handleUpdateDataPointsList()));
   connect(m_actionButtonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
   connect(m_actionButtonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
-  connect(nameField(), SIGNAL(returnPressed ()), this, SLOT(handleReturnPressed() ) );
-  connect(typeField(), SIGNAL(currentIndexChanged(const QString&)), this, SLOT(handleNodeTypeChanged( const QString& ) ) );
-  connect(typeField(), SIGNAL(activated(const QString&)), this, SLOT(handleNodeTypeActivated( const QString& ) ) );
 }
 
 
@@ -149,14 +153,26 @@ void ServiceEditor::layoutEditorComponents(void)
 void ServiceEditor::updateDataPoints(const ChecksT& checks, const QString& srcId)
 {
   m_dataPoints.clear();
+  m_hostGroupFilterBox->clear();
+
+  m_hostGroupFilterBox->addItem(ALL_HOST_GROUPS);
+
   for(ChecksT::const_iterator it=checks.begin(), end=checks.end(); it!=end; ++it) {
-    m_dataPoints.push_back(QString("%1:%2").arg(srcId, (it->second).id.c_str()));
+    QString entry = QString("%1:%2").arg(srcId, (it->second).id.c_str());
+    QStringList groups = QString::fromStdString((it->second).host_groups).split(",");
+    if (groups.isEmpty()) {
+      m_dataPoints[UNCLASSIFIED_HOST_GROUP].push_back(entry);
+      m_hostGroupFilterBox->addItem(UNCLASSIFIED_HOST_GROUP);
+    } else {
+      Q_FOREACH(const QString& group, groups) {
+        m_dataPoints[group].push_back(entry);
+        if (m_hostGroupFilterBox->findText(group) == -1)
+          m_hostGroupFilterBox->addItem(group);
+      }
+    }
   }
-  if (! m_dataPoints.isEmpty()) {
-    m_dataPoints.sort(Qt::CaseInsensitive);
-  }
-  checkField()->clear();
-  checkField()->addItems(m_dataPoints);
+
+  handleUpdateDataPointsList();
 }
 
 void ServiceEditor::setEnableFields(const bool& enable)
@@ -363,18 +379,20 @@ QLabel* ServiceEditor::createCheckFieldHelpIcon(void)
   return label;
 }
 
-
 void ServiceEditor::handleDataPointFilter(const QString& text)
 {
   checkField()->clear();
-  checkField()->addItems(m_dataPoints.filter(text));
+  //FIXME: don't work for all hosts
+  checkField()->addItems(m_dataPoints[m_hostGroupFilterBox->currentText()].filter(text));
   if (checkField()->count() == 0)
     m_dataPointActionButtons->setCurrentWidget(m_addDataPointButton);
 }
 
 void ServiceEditor::addAndSelectDataPointEntry(const QString& text)
 {
-  m_dataPoints.append(text);
+  m_dataPoints[UNCLASSIFIED_HOST_GROUP].append(text);
+  if (m_hostGroupFilterBox->findText(UNCLASSIFIED_HOST_GROUP) == -1)
+    m_hostGroupFilterBox->addItem(UNCLASSIFIED_HOST_GROUP);
   checkField()->addItem(text);
   QList<QListWidgetItem*> matchs = checkField()->findItems(text, Qt::MatchExactly);
 
@@ -403,4 +421,19 @@ void ServiceEditor::handleDataPointFieldReturnPressed(void)
   } else {
     handleAddDataPointEntry();
   }
+}
+
+
+void ServiceEditor::handleUpdateDataPointsList(void)
+{
+  checkField()->clear();
+  QString selectedGroup = m_hostGroupFilterBox->currentText();
+  if (selectedGroup == ALL_HOST_GROUPS) {
+    Q_FOREACH(const QStringList& entries, m_dataPoints) {
+      checkField()->addItems(entries);
+    }
+  } else {
+    checkField()->addItems(m_dataPoints[ selectedGroup ]);
+  }
+  // m_dataPoints.sort(Qt::CaseInsensitive);
 }

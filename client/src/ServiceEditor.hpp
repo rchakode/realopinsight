@@ -92,6 +92,7 @@ public Q_SLOTS:
   void handleDataPointSearch(void) { handleDataPointFilter(m_dataPointSearchField->text()); }
   void handleAddDataPointEntry(void) { addAndSelectDataPointEntry(m_dataPointSearchField->text());}
   void handleDataPointFieldReturnPressed(void);
+  void handleUpdateDataPointsList(void);
 
 Q_SIGNALS:
   void saveClicked(void);
@@ -106,7 +107,7 @@ private:
   WidgetMapT m_fieldWidgets;
   QGridLayout* m_mainLayout;
   QDialogButtonBox* m_actionButtonBox;
-  QStringList m_dataPoints;
+  QMap<QString, QStringList> m_dataPoints;
   QLineEdit* m_dataPointSearchField;
   QComboBox* m_hostGroupFilterBox;
   QGroupBox* m_checkFieldsGroup;
