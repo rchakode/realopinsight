@@ -114,8 +114,22 @@ ServiceEditor::~ServiceEditor()
   delete m_dataPointSearchField;
   delete m_actionButtonBox;
   delete m_mainLayout;
-
 }
+
+
+void ServiceEditor::addEvent(void)
+{
+  connect(m_dataPointSearchField, SIGNAL(returnPressed()), this, SLOT(handleDataPointFieldReturnPressed()));
+  connect(m_dataPointSearchField, SIGNAL(textEdited(const QString&)), this, SLOT(handleDataPointFilter(const QString&)));
+  connect(m_searchDataPointButton, SIGNAL(clicked()), this, SLOT(handleDataPointSearch()));
+  connect(m_addDataPointButton, SIGNAL(clicked()), this, SLOT(handleAddDataPointEntry()));
+  connect(m_actionButtonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
+  connect(m_actionButtonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
+  connect(nameField(), SIGNAL(returnPressed ()), this, SLOT(handleReturnPressed() ) );
+  connect(typeField(), SIGNAL(currentIndexChanged(const QString&)), this, SLOT(handleNodeTypeChanged( const QString& ) ) );
+  connect(typeField(), SIGNAL(activated(const QString&)), this, SLOT(handleNodeTypeActivated( const QString& ) ) );
+}
+
 
 void ServiceEditor::layoutEditorComponents(void)
 {
@@ -131,20 +145,6 @@ void ServiceEditor::layoutEditorComponents(void)
   layoutButtonBox();
   setEnableFields(false);
 }
-
-
-void ServiceEditor::addEvent(void)
-{
-  connect(m_searchDataPointButton, SIGNAL(clicked()), this, SLOT(handleDataPointSearch()));
-  connect(m_addDataPointButton, SIGNAL(clicked()), this, SLOT(handleAddDataPointEntry()));
-  connect(m_dataPointSearchField, SIGNAL(textEdited(const QString&)), this, SLOT(handleDataPointFilter(const QString&)));
-  connect(m_actionButtonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
-  connect(m_actionButtonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
-  connect(nameField(), SIGNAL(returnPressed ()), this, SLOT(handleReturnPressed() ) );
-  connect(typeField(), SIGNAL(currentIndexChanged(const QString&)), this, SLOT(handleNodeTypeChanged( const QString& ) ) );
-  connect(typeField(), SIGNAL(activated(const QString&)), this, SLOT(handleNodeTypeActivated( const QString& ) ) );
-}
-
 
 void ServiceEditor::updateDataPoints(const ChecksT& checks, const QString& srcId)
 {
@@ -392,4 +392,15 @@ void ServiceEditor::setCheckFieldsStyle(void)
   m_hostGroupFilterBox->setStyleSheet("border: none; background: white;");
   m_addDataPointButton->setStyleSheet("border: none;");
   m_searchDataPointButton->setStyleSheet("border: none;");
+}
+
+
+
+void ServiceEditor::handleDataPointFieldReturnPressed(void)
+{
+  if (m_dataPointActionButtons->currentWidget() == m_searchDataPointButton) {
+    handleDataPointSearch();
+  } else {
+    handleAddDataPointEntry();
+  }
 }
