@@ -91,6 +91,7 @@ public Q_SLOTS:
   void handleDataPointFilter(const QString& text);
   void handleDataPointSearch(void) { handleDataPointFilter(m_dataPointSearchField->text()); }
   void handleAddDataPointEntry(void) { addAndSelectDataPointEntry(m_dataPointSearchField->text());}
+  void handleDataPointFieldReturnPressed(void);
 
 Q_SIGNALS:
   void saveClicked(void);
