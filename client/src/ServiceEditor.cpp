@@ -382,8 +382,14 @@ QLabel* ServiceEditor::createCheckFieldHelpIcon(void)
 void ServiceEditor::handleDataPointFilter(const QString& text)
 {
   checkField()->clear();
-  //FIXME: don't work for all hosts
-  checkField()->addItems(m_dataPoints[m_hostGroupFilterBox->currentText()].filter(text));
+  QString selectedGroup = m_hostGroupFilterBox->currentText();
+  if (selectedGroup != ALL_HOST_GROUPS) {
+    checkField()->addItems(m_dataPoints[selectedGroup].filter(text));
+  } else {
+    Q_FOREACH(const QStringList& entries, m_dataPoints) {
+      checkField()->addItems(entries.filter(text));
+    }
+  }
   if (checkField()->count() == 0)
     m_dataPointActionButtons->setCurrentWidget(m_addDataPointButton);
 }
