@@ -526,7 +526,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
     if (_type == NodeType::ServiceNode) {
       if (node->type == NodeType::AlarmNode) {
         node->child_nodes.clear();
-        if (m_editor->updateNodeContent(node)) {
+        if (m_editor->updateNodeInfo(*node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
@@ -538,7 +538,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         m_editor->typeField()->setCurrentIndex(0);
         ngrt4n::alert(tr("Failed ! This action is not permitted for a leave service."));
       } else {
-        if (m_editor->updateNodeContent(node)) {
+        if (m_editor->updateNodeInfo(*node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
@@ -565,7 +565,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
-    if (m_editor->updateNodeContent(node)) {
+    if (m_editor->updateNodeInfo(*node)) {
       QTreeWidgetItem* selectedNodeItem = m_tree->findNodeItem(m_selectedNode);
       if (selectedNodeItem) {
         selectedNodeItem->setText(0, node->name);
@@ -584,7 +584,7 @@ void SvCreator::handleReturnPressed(void)
 {
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
-    if (m_editor->updateNodeContent(node)) {
+    if (m_editor->updateNodeInfo(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");

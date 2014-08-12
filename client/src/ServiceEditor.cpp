@@ -166,44 +166,20 @@ void ServiceEditor::setEnableFields(const bool& enable)
   m_fieldWidgets[NOTIFICATION_MSG_FIELD]->setEnabled(enable);
 }
 
-bool ServiceEditor::updateNodeContent(NodeListT& _nodes, const QString& _nodeId)
+bool ServiceEditor::updateNodeInfo(NodeT& _node)
 {
-  NodeListT::iterator node = static_cast<const NodeListT::iterator>(_nodes.find(_nodeId));
-  if( node != _nodes.end()) {
-    node->name = nameField()->text();
-    node->type = typeField()->currentIndex();
-    node->sev_crule = statusCalcRuleField()->currentIndex();
-    node->sev_prule = statusPropRuleField()->currentIndex();
-    node->icon = iconField()->currentText();
-    node->description = descriptionField()->toPlainText();
-    node->alarm_msg  = alarmMsgField()->toPlainText();
-    node->notification_msg = notificationMsgField()->toPlainText();
-    if(node->type == NodeType::AlarmNode) {
-      QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
-      if (! selectedItems.isEmpty())
-        node->child_nodes = selectedItems.at(0)->text();
-    }
-    return true;
-  }
-  return false;
-}
-
-
-bool ServiceEditor::updateNodeContent(NodeListT::iterator& _node)
-{
-  _node->name             = nameField()->text();
-  _node->type             = typeField()->currentIndex();
-  _node->sev_crule        = statusCalcRuleField()->currentIndex();
-  _node->sev_prule        = statusPropRuleField()->currentIndex();
-  _node->icon             = iconField()->currentText();
-  _node->description      = descriptionField()->toPlainText();
-  _node->alarm_msg        = alarmMsgField()->toPlainText();
-  _node->notification_msg = notificationMsgField()->toPlainText();
-  if(_node->type == NodeType::AlarmNode) {
-    //FIXME: factorization required
+  _node.name             = nameField()->text();
+  _node.type             = typeField()->currentIndex();
+  _node.sev_crule        = statusCalcRuleField()->currentIndex();
+  _node.sev_prule        = statusPropRuleField()->currentIndex();
+  _node.icon             = iconField()->currentText();
+  _node.description      = descriptionField()->toPlainText();
+  _node.alarm_msg        = alarmMsgField()->toPlainText();
+  _node.notification_msg = notificationMsgField()->toPlainText();
+  if(_node.type == NodeType::AlarmNode) {
     QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
     if (! selectedItems.isEmpty())
-      _node->child_nodes = selectedItems.at(0)->text();
+      _node.child_nodes = selectedItems.at(0)->text();
   }
 
   return true;

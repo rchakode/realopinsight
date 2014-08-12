@@ -67,8 +67,7 @@ public:
   void fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId);
   void fillFormWithNodeContent(const NodeT& _node);
   void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
-  bool updateNodeContent(NodeListT& _nodes, const QString& _nodeId);
-  bool updateNodeContent(NodeListT::iterator& _node);
+  bool updateNodeInfo(NodeT& _node);
   void updateDataPoints(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
 
