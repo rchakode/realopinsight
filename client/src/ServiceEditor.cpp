@@ -390,7 +390,9 @@ void ServiceEditor::handleDataPointFilter(const QString& text)
       checkField()->addItems(entries.filter(text));
     }
   }
-  if (checkField()->count() == 0)
+  if (checkField()->count() > 0)
+    m_dataPointActionButtons->setCurrentWidget(m_searchDataPointButton);
+  else
     m_dataPointActionButtons->setCurrentWidget(m_addDataPointButton);
 }
 
