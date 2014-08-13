@@ -159,7 +159,7 @@ void ServiceEditor::updateDataPoints(const ChecksT& checks, const QString& srcId
 
   for(ChecksT::const_iterator it=checks.begin(), end=checks.end(); it!=end; ++it) {
     QString entry = QString("%1:%2").arg(srcId, (it->second).id.c_str());
-    QStringList groups = QString::fromStdString((it->second).host_groups).split(",");
+    QStringList groups = QString::fromStdString((it->second).host_groups).split(ngrt4n::CHILD_SEP.c_str());
     if (groups.isEmpty()) {
       m_dataPoints[UNCLASSIFIED_HOST_GROUP].push_back(entry);
       m_hostGroupFilterBox->addItem(UNCLASSIFIED_HOST_GROUP);
@@ -240,7 +240,7 @@ void ServiceEditor::layoutLabelFields()
   ++m_currentRow;
   nameField()->setMaxLength( MAX_NODE_NAME );
   m_mainLayout->addWidget(m_fieldWidgets["nameLabel"], m_currentRow, 0);
-  m_mainLayout->addWidget(nameField(),m_currentRow,1,1,2);
+  m_mainLayout->addWidget(nameField(),m_currentRow, 1, 1, 2);
 }
 
 
@@ -248,12 +248,13 @@ void ServiceEditor::layoutDescriptionFields()
 {
   ++m_currentRow;
   m_mainLayout->addWidget(m_fieldWidgets["descriptionLabel"], m_currentRow, 0);
-  m_mainLayout->addWidget(descriptionField(),m_currentRow,1,1,2);
+  m_mainLayout->addWidget(descriptionField(),m_currentRow, 1, 1, 2);
 }
 
 
 void ServiceEditor::layoutTypeFields()
 {
+  ++m_currentRow;
   typeField()->addItem( NodeType::toString(NodeType::ServiceNode) );
   typeField()->addItem( NodeType::toString(NodeType::AlarmNode) );
   m_mainLayout->addWidget(m_fieldWidgets["typeLabel"], m_currentRow, 0);
