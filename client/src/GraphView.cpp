@@ -190,11 +190,10 @@ void GraphView::drawNode(const NodeT& _node)
   if (m_mnodes[_node.id].type == NodeType::AlarmNode)
     m_mnodes[_node.id].exp_icon->setVisible(false);
 
-  QString msg =  ngrt4n::getNodeToolTip(_node);
+  QString msg = ngrt4n::generateToolTip(_node);
   m_mnodes[_node.id].icon->setToolTip(msg);
   m_mnodes[_node.id].label->setToolTip(msg);
 
-  //FIXME: setNodePos(nid, labelOrigin);
   setNodePos(_node.id, QPointF(_node.pos_x, _node.pos_y));
 }
 
