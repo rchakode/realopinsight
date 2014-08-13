@@ -127,7 +127,6 @@ protected:
   void openRpcSession(SourceT& src);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
-  QString getNodeToolTip(const NodeT& _node);
 };
 
 #endif /* SVNAVIGATOR_HPP */

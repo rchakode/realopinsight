@@ -96,7 +96,7 @@ namespace ngrt4n
   StringPairT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
-  QString getNodeToolTip(const NodeT& _node);
+  QString generateToolTip(const NodeT& node);
   IconMapT nodeIcons();
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
   QStringList getAuthInfo(const QString& authString);

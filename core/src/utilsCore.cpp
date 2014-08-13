@@ -27,9 +27,17 @@
 
 
 namespace {
-  const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\nDescription: %2\nSeverity: %3\n   Calc. Rule: %4\n   Prop. Rule: %5"));
-  const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %6\nData Point: %7\nRaw Output: %8\nOther Details: %9"));
-  }
+  const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\n"
+                                                "Description: %2\n"
+                                                "Severity: %3\n"
+                                                "   Calc. Rule: %4\n"
+                                                "   Prop. Rule: %5"));
+  const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %1\n"
+                                                       "Groups: %2\n"
+                                                       "Data Point: %3\n"
+                                                       "Raw Output: %4\n"
+                                                       "Other Details: %5"));
+}
 
 QString ngrt4n::severityText(const qint32& _status)
 {
@@ -129,14 +137,14 @@ int ngrt4n::severityFromPropRule(const qint8& _critValue, const qint8& prule)
   ngrt4n::SeverityT result = static_cast<ngrt4n::SeverityT>(_critValue);
   SeverityHelper sh(static_cast<ngrt4n::SeverityT>(_critValue));
   switch(prule) {
-  case PropRules::Increased:
-    result = (++sh).getValue();
-    break;
-  case PropRules::Decreased:
-    result = (--sh).getValue();
-    break;
-  default:
-    break;
+    case PropRules::Increased:
+      result = (++sh).getValue();
+      break;
+    case PropRules::Decreased:
+      result = (--sh).getValue();
+      break;
+    default:
+      break;
   }
   return result;
 }
@@ -149,13 +157,13 @@ SeverityWeightInfoT ngrt4n::severityFromCalcRule(QVector<SeverityWeightInfoT>& d
   if (len >= 1) {
     qSort(data.begin(), data.end());
     switch (crule) {
-    case CalcRules::WeightedCriticity:
-      result = ngrt4n::meanSeverities(data[0], data[len - 1]);
-      break;
-    case CalcRules::HighCriticity:
-    default:
-      result = data[len-1];
-      break;
+      case CalcRules::WeightedCriticity:
+        result = ngrt4n::meanSeverities(data[0], data[len - 1]);
+        break;
+      case CalcRules::HighCriticity:
+      default:
+        result = data[len-1];
+        break;
     }
   }
   return result;
@@ -378,18 +386,19 @@ QPair<bool, int> ngrt4n::checkSourceId(const QString &id)
 }
 
 
-QString ngrt4n::getNodeToolTip(const NodeT& _node)
+QString ngrt4n::generateToolTip(const NodeT& node)
 {
-  QString toolTip = DEFAULT_TIP_PATTERN.arg(_node.name,
-                                            const_cast<QString&>(_node.description).replace("\n", " "),
-                                            ngrt4n::severityText(_node.sev),
-                                            CalcRules::label(_node.sev_crule),
-                                            PropRules::label(_node.sev_prule));
-  if (_node.type == NodeType::AlarmNode) {
-    toolTip += ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(_node.check.host).replace("\n", " "),
-                                              _node.child_nodes,
-                                              QString::fromStdString(_node.check.alarm_msg),
-                                              _node.actual_msg);
+  QString toolTip = DEFAULT_TIP_PATTERN.arg(node.name,
+                                            const_cast<QString&>(node.description).replace("\n", " "),
+                                            ngrt4n::severityText(node.sev),
+                                            CalcRules::label(node.sev_crule),
+                                            PropRules::label(node.sev_prule));
+  if (node.type == NodeType::AlarmNode) {
+    toolTip.append(ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(node.check.host).replace("\n", " "),
+                                                  QString::fromStdString(node.check.host_groups),
+                                                  node.child_nodes,
+                                                  QString::fromStdString(node.check.alarm_msg),
+                                                  node.actual_msg));
   }
   return toolTip;
 }
