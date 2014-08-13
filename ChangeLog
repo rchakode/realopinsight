@@ -1,6 +1,18 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.4
+  * Enhancement: Added ability to filter data points in the editor.
+    Useful notably when a huge number of data points has been imported,
+    this allows user to search/filter data points to handle according to
+    string patterns or related host groups. See ticket #39.
+    Thanks to Marc (B5r1oJ0A9G@Github) for his suggestions and feedback.
+  * Enhancement: host groups are now display on data points' tooltips in the
+    Operations Console
+  * Bug Fix: Fixed encoding problems on Livestatus backend when some data entries
+    seem to be ill-formed/incoherent after decoding. Ticket #38.
+    Thanks to zodrac@Github for the report, comments and for the test data.
+
 3.0.3
   * Fixed ticket #31 adding the ability from the editor to import data
     points from network-based Livestatus endpoints. This feature
