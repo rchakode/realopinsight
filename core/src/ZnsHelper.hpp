@@ -119,8 +119,8 @@ private :
   QString m_replyData;
   JsonHelper m_replyJsonData;
 
-  void
-  setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  std::string parseHostGroups(const QScriptValue& json);
 };
 
 #endif /* ZENOSSHELPER_HPP_ */
