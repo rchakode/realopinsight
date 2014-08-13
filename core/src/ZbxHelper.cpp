@@ -79,35 +79,35 @@ ZbxHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[Login] = "{\"jsonrpc\": \"2.0\", \
-      \"auth\": null, \
-      \"method\": \"user.login\", \
-      \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-      \"id\": %9}";
+                    \"auth\": null, \
+                    \"method\": \"user.login\", \
+                    \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
+                    \"id\": %9}";
   patterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
-      \"method\": \"apiinfo.version\", \
-      \"params\": [], \
-      \"auth\": \"%1\", \
-      \"id\": %9}";
+                         \"method\": \"apiinfo.version\", \
+                         \"params\": [], \
+                         \"auth\": \"%1\", \
+                         \"id\": %9}";
   patterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
-      \"auth\": \"%1\", \
-      \"method\": \"trigger.get\", \
-      \"params\": { \
-      \"filter\": {%2}, \
-      \"selectGroups\": [\"name\"], \
-      \"selectHosts\": [\"host\"], \
-      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-      \"limit\": -1}, \
-      \"id\": %9}";
+                      \"auth\": \"%1\", \
+                      \"method\": \"trigger.get\", \
+                      \"params\": { \
+                      \"filter\": {%2}, \
+                      \"selectGroups\": [\"name\"], \
+                      \"selectHosts\": [\"host\"], \
+                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+                      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+                      \"limit\": -1}, \
+                      \"id\": %9}";
   patterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
-      \"auth\": \"%1\", \
-      \"method\": \"trigger.get\", \
-      \"params\": { \
-      \"filter\": {%2}, \
-      \"select_hosts\": [\"host\"], \
-      \"output\":  \"extend\", \
-      \"limit\": -1}, \
-      \"id\": %9}";
+                         \"auth\": \"%1\", \
+                         \"method\": \"trigger.get\", \
+                         \"params\": { \
+                         \"filter\": {%2}, \
+                         \"select_hosts\": [\"host\"], \
+                         \"output\":  \"extend\", \
+                         \"limit\": -1}, \
+                         \"id\": %9}";
 
   return patterns;
 }
@@ -174,6 +174,7 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     m_lastError = tr("Bad auth string, should be in the form of login:password");
     return -1;
   }
+
   params.push_back(QString::number(Login));
   setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
   QNetworkReply* response = postRequest(Login, params);
@@ -191,23 +192,19 @@ ZbxHelper::openSession(const SourceT& srcInfo)
 int
 ZbxHelper::processLoginReply(QNetworkReply* reply)
 {
-  if (parseReply(reply) != 0){
+  if (parseReply(reply) != 0)
     return -1;
-  }
 
-  int returnValue = -1;
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   QString result = m_replyJsonData.getProperty("result").toString();
-  if (tid == ZbxHelper::Login
-      && ! result.isEmpty()) {
+  if (tid == ZbxHelper::Login && ! result.isEmpty()) {
     m_auth = result;
     m_isLogged = true;
-    returnValue = 0;
-  } else {
-    m_lastError = tr("Login failed");
+    return 0;
   }
+  m_lastError = tr("Login failed");
 
-  return returnValue;
+  return -1;
 }
 
 int
@@ -217,9 +214,9 @@ ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
   params.push_back(QString::number(ZbxHelper::ApiVersion));
   setSslPeerVerification(srcInfo.verify_ssl_peer);
   QNetworkReply* response = postRequest(ZbxHelper::ApiVersion, params);
-  if (! response || processGetApiVersionReply(response) !=0) {
+
+  if (! response || processGetApiVersionReply(response) !=0)
     return -1;
-  }
 
   return 0;
 }
@@ -227,32 +224,29 @@ ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
 int
 ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
 {
-  if (parseReply(reply) != 0){
+  if (parseReply(reply) != 0)
+    return -1;
+
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+
+  if (tid != ZbxHelper::ApiVersion) {
+    m_lastError = tr("the transaction id does not correspond to getApiVersion");
     return -1;
   }
 
-  int returnValue = -1;
-  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  if (tid == ZbxHelper::ApiVersion) {
-    setTrid(m_replyJsonData.getProperty("result").toString());
-    returnValue = 0;
-  } else {
-    m_lastError = tr("the transaction id does not correspond to getApiVersion");
-  }
+  setTrid(m_replyJsonData.getProperty("result").toString());
 
-  return returnValue;
+  return 0;
 }
 
 int
 ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 {
-  if (parseReply(reply) != 0){
+  if (parseReply(reply) != 0)
     return -1;
-  }
 
-  if (! checkRPCResultStatus()) {
+  if (! checkRPCResultStatus())
     return -1;
-  }
 
   // check weird reponset
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
@@ -335,14 +329,18 @@ std::string
 ZbxHelper::parseHostGroups(const QScriptValue& json)
 {
   std::string result("");
-  QScriptValueIterator iterGroups(json);
-  while (iterGroups.hasNext()) {
-    iterGroups.next();
-    if (iterGroups.flags() & QScriptValue::SkipInEnumeration)
+  QScriptValueIterator entryIter(json);
+  while (entryIter.hasNext()) {
+    entryIter.next();
+    if (entryIter.flags() & QScriptValue::SkipInEnumeration)
       continue;
-    QScriptValue groupData = iterGroups.value();
-    std::string groupName = groupData.property("name").toString().toStdString();
-    result = result.empty()? groupName : "," + groupName;
+    std::string name = entryIter.value().property("name").toString().toStdString();
+
+    if (result.empty())
+      result = name;
+    else
+      result.append(ngrt4n::CHILD_SEP).append(name);
+
   }
 
   return result;
@@ -353,13 +351,12 @@ std::string
 ZbxHelper::parseHost(const QScriptValue& json)
 {
   std::string result("");
-  QScriptValueIterator iterHosts(json);
-  while (iterHosts.hasNext()) {
-    iterHosts.next();
-    if (iterHosts.flags() & QScriptValue::SkipInEnumeration)
+  QScriptValueIterator entryIter(json);
+  while (entryIter.hasNext()) {
+    entryIter.next();
+    if (entryIter.flags() & QScriptValue::SkipInEnumeration)
       continue;
-    QScriptValue hostData = iterHosts.value();
-    result = hostData.property("host").toString().toStdString();
+    result = entryIter.value().property("host").toString().toStdString();
     break;
   }
 
