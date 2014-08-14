@@ -79,35 +79,35 @@ ZbxHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[Login] = "{\"jsonrpc\": \"2.0\", \
-      \"auth\": null, \
-      \"method\": \"user.login\", \
-      \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-      \"id\": %9}";
+                    \"auth\": null, \
+                    \"method\": \"user.login\", \
+                    \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
+                    \"id\": %9}";
   patterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
-      \"method\": \"apiinfo.version\", \
-      \"params\": [], \
-      \"auth\": \"%1\", \
-      \"id\": %9}";
+                         \"method\": \"apiinfo.version\", \
+                         \"params\": [], \
+                         \"auth\": \"%1\", \
+                         \"id\": %9}";
   patterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
-      \"auth\": \"%1\", \
-      \"method\": \"trigger.get\", \
-      \"params\": { \
-      \"filter\": {%2}, \
-      \"selectGroups\": [\"name\"], \
-      \"selectHosts\": [\"host\"], \
-      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-      \"limit\": -1}, \
-      \"id\": %9}";
+                      \"auth\": \"%1\", \
+                      \"method\": \"trigger.get\", \
+                      \"params\": { \
+                      \"filter\": {%2}, \
+                      \"selectGroups\": [\"name\"], \
+                      \"selectHosts\": [\"host\"], \
+                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+                      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+                      \"limit\": -1}, \
+                      \"id\": %9}";
   patterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
-      \"auth\": \"%1\", \
-      \"method\": \"trigger.get\", \
-      \"params\": { \
-      \"filter\": {%2}, \
-      \"select_hosts\": [\"host\"], \
-      \"output\":  \"extend\", \
-      \"limit\": -1}, \
-      \"id\": %9}";
+                         \"auth\": \"%1\", \
+                         \"method\": \"trigger.get\", \
+                         \"params\": { \
+                         \"filter\": {%2}, \
+                         \"select_hosts\": [\"host\"], \
+                         \"output\":  \"extend\", \
+                         \"limit\": -1}, \
+                         \"id\": %9}";
 
   return patterns;
 }
@@ -309,10 +309,12 @@ ZbxHelper::loadChecks(const SourceT& srcInfo,
   QStringList params;
   checks.clear();
   QString filter = "";
-  if (filterType == ngrt4n::GroupFilter) {
-    filter = filterValue.isEmpty() ? "" : QString("\"group\":[\"%1\"]").arg(filterValue);
-  } else {
-    filter = filterValue.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(filterValue);
+  if (! filterValue.isEmpty()) {
+    if (filterType == ngrt4n::GroupFilter) {
+      filter = QString("\"group\":[\"%1\"]").arg(filterValue);
+    } else {
+      filter = QString("\"host\":[\"%1\"]").arg(filterValue);
+    }
   }
   params.push_back(filter);
   params.push_back(QString::number(m_trid));
