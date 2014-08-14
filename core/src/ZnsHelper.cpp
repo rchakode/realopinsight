@@ -89,31 +89,31 @@ RequestListT ZnsHelper::requestsPatterns()
 {
   RequestListT list;
   list[Device] = "{\"action\": \"DeviceRouter\", "
-                 " \"method\": \"getDevices\", "
-                 " \"data\": [{ "
-                 " \"uid\": \"/zport/dmd/Devices\", "
-                 " \"sort\": \"name\", "
-                 " \"params\": {\"name\": \"%1\"}, "
-                 " \"keys\":[\"name\",\"uid\",\"groups\"] "
-                 "}], "
-                 " \"type\": \"rpc\", "
-                 " \"tid\": %2}";
+      " \"method\": \"getDevices\", "
+      " \"data\": [{ "
+      " \"uid\": \"/zport/dmd/Devices\", "
+      " \"sort\": \"name\", "
+      " \"params\": {\"%1\": \"%2\"}, "
+      " \"keys\":[\"name\",\"uid\",\"groups\"] "
+      "}], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %3}";
   list[Component] = "{\"action\": \"DeviceRouter\", "
-                    " \"method\": \"getComponents\", "
-                    " \"data\": [{ "
-                    " \"uid\": \"%1\", "
-                    " \"limit\": 1000, "
-                    " \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\",\"groups\"]"
-                    " }], "
-                    " \"type\": \"rpc\", "
-                    " \"tid\": %2}";
+      " \"method\": \"getComponents\", "
+      " \"data\": [{ "
+      " \"uid\": \"%1\", "
+      " \"limit\": 1000, "
+      " \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\",\"groups\"]"
+      " }], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
   list[DeviceInfo] = "{\"action\": \"DeviceRouter\", "
-                     " \"method\": \"getInfo\", "
-                     " \"data\": [{ "
-                     " \"uid\": \"%1\", "
-                     " \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\",\"groups\"] }], "
-                     " \"type\": \"rpc\", "
-                     " \"tid\": %2}";
+      " \"method\": \"getInfo\", "
+      " \"data\": [{ "
+      " \"uid\": \"%1\", "
+      " \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\",\"groups\"] }], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
   return list;
 }
 
@@ -345,7 +345,7 @@ ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
     processComponentReply(response, checks);
 
     //retrieve ping info
-    response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[DeviceInfo].arg(deviceUid, QString::number(DeviceInfo))));
+    response = postRequest(DeviceInfo, ngrt4n::toByteArray(ReqPatterns[DeviceInfo].arg(deviceUid, QString::number(DeviceInfo))));
     processDeviceInfoReply(response, checks);
   }
   return 0;
@@ -353,7 +353,10 @@ ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
 
 
 int
-ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+ZnsHelper::loadChecks(const SourceT& srcInfo,
+                      ChecksT& checks,
+                      const QString& filterValue,
+                      ngrt4n::RequestFilterT filterType)
 {
   setBaseUrl(srcInfo.mon_url);
 
@@ -361,17 +364,18 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
 
-  // check if login succeeded
   if (! m_isLogged)
     return -1;
 
   checks.clear();
   QNetworkReply* response = NULL;
 
-  // Finally retriev triggers related to the given host
-  // FIXME: if host empty get triggers from all hosts
   setRouterEndpoint(Device);
-  response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg(host, QString::number(Device))));
+  if (filterType == ngrt4n::GroupFilter) {
+    response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg("groups", filterValue, QString::number(Device))));
+  } else {
+    response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg("name", filterValue, QString::number(Device))));
+  }
 
   if (! response || processDeviceReply(response, checks) !=0) {
     return -1;

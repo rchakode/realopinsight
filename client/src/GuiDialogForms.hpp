@@ -14,7 +14,7 @@ public:
   CheckImportationSettingsForm(const QList<QString>& sourceList, bool statusFile);
 
   QString selectedSource(void) const {return m_sourceSelectionBox->currentText();}
-  QString selectedHost(void) const {return m_hostFilter->text();}
+  QString filter(void) const {return m_filter->text();}
   QString selectedStatusFile(void) const {return m_statusFile;}
 
 public Q_SLOTS:
@@ -22,7 +22,7 @@ public Q_SLOTS:
 
 private:
   QComboBox* m_sourceSelectionBox;
-  QLineEdit* m_hostFilter;
+  QLineEdit* m_filter;
   QLineEdit* m_statusFileArea;
   QString m_statusFile;
 };

@@ -79,35 +79,35 @@ ZbxHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[Login] = "{\"jsonrpc\": \"2.0\", \
-                    \"auth\": null, \
-                    \"method\": \"user.login\", \
-                    \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-                    \"id\": %9}";
+      \"auth\": null, \
+      \"method\": \"user.login\", \
+      \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
+      \"id\": %9}";
   patterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
-                         \"method\": \"apiinfo.version\", \
-                         \"params\": [], \
-                         \"auth\": \"%1\", \
-                         \"id\": %9}";
+      \"method\": \"apiinfo.version\", \
+      \"params\": [], \
+      \"auth\": \"%1\", \
+      \"id\": %9}";
   patterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
-                      \"auth\": \"%1\", \
-                      \"method\": \"trigger.get\", \
-                      \"params\": { \
-                      \"filter\": {%2}, \
-                      \"selectGroups\": [\"name\"], \
-                      \"selectHosts\": [\"host\"], \
-                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-                      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-                      \"limit\": -1}, \
-                      \"id\": %9}";
+      \"auth\": \"%1\", \
+      \"method\": \"trigger.get\", \
+      \"params\": { \
+      \"filter\": {%2}, \
+      \"selectGroups\": [\"name\"], \
+      \"selectHosts\": [\"host\"], \
+      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+      \"limit\": -1}, \
+      \"id\": %9}";
   patterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
-                         \"auth\": \"%1\", \
-                         \"method\": \"trigger.get\", \
-                         \"params\": { \
-                         \"filter\": {%2}, \
-                         \"select_hosts\": [\"host\"], \
-                         \"output\":  \"extend\", \
-                         \"limit\": -1}, \
-                         \"id\": %9}";
+      \"auth\": \"%1\", \
+      \"method\": \"trigger.get\", \
+      \"params\": { \
+      \"filter\": {%2}, \
+      \"select_hosts\": [\"host\"], \
+      \"output\":  \"extend\", \
+      \"limit\": -1}, \
+      \"id\": %9}";
 
   return patterns;
 }
@@ -295,7 +295,10 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 }
 
 int
-ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+ZbxHelper::loadChecks(const SourceT& srcInfo,
+                      ChecksT& checks,
+                      const QString& filterValue,
+                      ngrt4n::RequestFilterT filterType)
 {
   if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
@@ -305,8 +308,13 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
 
   QStringList params;
   checks.clear();
-  QString hostFilter = host.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(host);
-  params.push_back(hostFilter);
+  QString filter = "";
+  if (filterType == ngrt4n::GroupFilter) {
+    filter = filterValue.isEmpty() ? "" : QString("\"group\":[\"%1\"]").arg(filterValue);
+  } else {
+    filter = filterValue.isEmpty() ? "" : QString("\"host\":[\"%1\"]").arg(filterValue);
+  }
+  params.push_back(filter);
   params.push_back(QString::number(m_trid));
   QNetworkReply* response = postRequest(m_trid, params);
   if (! response || processTriggerReply(response, checks) !=0) {

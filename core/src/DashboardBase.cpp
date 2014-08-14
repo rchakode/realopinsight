@@ -132,7 +132,7 @@ void DashboardBase::runMonitor(SourceT& src)
         StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
         if (info.first != src.id) continue;
         ChecksT checks;
-        if (src.zns_handler->loadChecks(src, info.second, checks) == 0) {
+        if (src.zns_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
           updateCNodesWithChecks(checks, src);
         } else {
           updateDashboardOnError(src, src.zns_handler->lastError());
@@ -146,7 +146,7 @@ void DashboardBase::runMonitor(SourceT& src)
         if (info.first != src.id) continue;
 
         ChecksT checks;
-        if (src.zbx_handler->loadChecks(src, info.second, checks) == 0) {
+        if (src.zbx_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
           updateCNodesWithChecks(checks, src);
         } else {
           updateDashboardOnError(src, src.zbx_handler->lastError());

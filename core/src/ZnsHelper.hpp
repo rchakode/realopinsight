@@ -100,7 +100,10 @@ public:
   int
   processComponentReply(QNetworkReply* reply, ChecksT& checks);
   int
-  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
+  loadChecks(const SourceT& srcInfo,
+             ChecksT& checks,
+             const QString& filterValue,
+             ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
 
 
 public Q_SLOTS:
