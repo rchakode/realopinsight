@@ -68,10 +68,14 @@ QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestTyp
     QString filterPattern;
     switch(requestType) {
     case LsHelper::Host:
-      filterPattern = "Filter: name = %1\n";
+      filterPattern = "Filter: name = %1\n"
+          "Filter: host_groups ~ %1\n"
+          "Or: 2\n";
       break;
     case LsHelper::Service:
-      filterPattern = "Filter: host_name = %1\n";
+      filterPattern = "Filter: host_name = %1\n"
+          "Filter: host_groups ~ %1\n"
+          "Or: 2\n";
       break;
     default:
       break;
@@ -85,12 +89,9 @@ int LsHelper::loadChecks(const QString& host, ChecksT& checks)
 {
   checks.clear();
 
-  // get host data
-  if (makeRequest(prepareRequestData(host, LsHelper::Host), checks) != 0) {
+  if (makeRequest(prepareRequestData(host, LsHelper::Host), checks) != 0)
     return -1;
-  }
 
-  // get service data
   return makeRequest(prepareRequestData(host, LsHelper::Service), checks);
 }
 
