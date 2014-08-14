@@ -21,8 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
-#include "global.hpp"
+#include "Base.hpp"
 #include "Parser.hpp"
 #include "utilsCore.hpp"
 #include <QObject>

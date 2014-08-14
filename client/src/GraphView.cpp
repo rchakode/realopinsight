@@ -22,8 +22,6 @@
 #--------------------------------------------------------------------------#
  */
 
-
-#include "global.hpp"
 #include "GraphView.hpp"
 #include "StatsLegend.hpp"
 #include "DashboardBase.hpp"

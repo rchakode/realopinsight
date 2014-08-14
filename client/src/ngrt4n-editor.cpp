@@ -23,7 +23,6 @@
  */
 
 #include "utilsCore.hpp"
-#include "global.hpp"
 #include "Auth.hpp"
 #include "Base.hpp"
 #include "SvConfigCreator.hpp"

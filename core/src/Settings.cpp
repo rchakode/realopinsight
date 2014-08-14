@@ -26,7 +26,6 @@
 #include "Base.hpp"
 #include "Settings.hpp"
 #include "Preferences.hpp"
-#include "global.hpp"
 #include "utilsCore.hpp"
 #include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
