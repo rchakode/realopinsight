@@ -298,7 +298,7 @@ ZnsHelper::processDeviceInfoReply(QNetworkReply* reply, ChecksT& checks)
   QScriptValue deviceInfo(m_replyJsonData.getProperty("result").property("data"));
   QString dname = deviceInfo.property("name").toString();
   check.host = dname.toStdString();
-  check.id = ID_PATTERN.arg(check.host.c_str(), "ping").toStdString();
+  check.id = check.host; //FIXME: ??ID_PATTERN.arg(check.host.c_str(), "ping").toStdString();
   check.host_groups = parseHostGroups(deviceInfo.property("groups"));
   check.status = deviceInfo.property("status").toBool();
   check.last_state_change = ngrt4n::convertToTimet(deviceInfo.property("lastChanged").toString(),
