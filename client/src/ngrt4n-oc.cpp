@@ -22,7 +22,6 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "global.hpp"
 #include "Auth.hpp"
 #include "MainWindow.hpp"
 #include "SvConfigCreator.hpp"
