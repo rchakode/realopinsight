@@ -189,7 +189,7 @@ void SvCreator::importLivestatusChecks(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.selectedHost();
+    QString host = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     statusBar()->showMessage(tr("Loading checks from %1:%2:%3...")
@@ -213,15 +213,21 @@ void SvCreator::importZabbixTriggers(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.selectedHost();
+    QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     statusBar()->showMessage(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
 
     ChecksT checks;
     ZbxHelper handler;
-    int retcode = handler.loadChecks(srcInfo, host, checks);
+
+    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+
+    if (checks.empty()) {
+      int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+      treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    }
   }
 }
 
@@ -232,18 +238,20 @@ void SvCreator::importZenossComponents(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.selectedHost();
+    QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     statusBar()->showMessage(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
 
     ChecksT checks;
     ZnsHelper handler(srcInfo.mon_url);
-    int retcode = handler.openSession(srcInfo);
-    if (retcode == 0) {
-      retcode = handler.loadChecks(srcInfo, host, checks);
-    }
+    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+
+    if (checks.empty()) {
+      int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+      treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    }
   }
 }
 

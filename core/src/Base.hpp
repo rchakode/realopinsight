@@ -135,6 +135,16 @@ namespace ngrt4n {
     Collapsed = 0xFC
   };
 
+  enum {
+    XSCAL_FACTOR = 72,
+    YSCAL_FACTOR = 100
+  };
+
+  enum RequestFilterT {
+    HostFilter = 0,
+    GroupFilter = 1
+  };
+
   const std::string AdmUser = "ngrt4n_adm";
   const std::string OpUser = "ngrt4n_op";
   const std::string CHILD_SEP = ",";
@@ -146,7 +156,6 @@ namespace ngrt4n {
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
 
   } // namespace ngrt4n
-
 
 class PropRules {
 public:
@@ -377,16 +386,10 @@ struct SourceT {
 };
 
 typedef QHash<int, SourceT> SourceListT;
-
 typedef QMap<QString, QString> IconMapT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 typedef QPair<QString, QString> StringPairT;
-
-enum {
-  XSCAL_FACTOR = 72,
-  YSCAL_FACTOR = 100
-};
 
 
 #endif /* BASE_HPP */
