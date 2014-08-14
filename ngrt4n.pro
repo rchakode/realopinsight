@@ -76,7 +76,6 @@ HEADERS += \
     core/src/ZmqSocket.hpp \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
-    core/src/global.hpp \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \

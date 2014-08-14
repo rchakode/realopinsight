@@ -24,12 +24,12 @@
 
 #ifndef BASE_HPP
 #define BASE_HPP
-#include "global.hpp"
 #include <QtCore/QtGlobal>
 #include <QtCore>
 #include <QtXml>
 #include <QSettings>
 #include <memory>
+#include <unordered_map>
 
 
 #define INIT_TRANSLATION \
@@ -40,9 +40,18 @@
 
 #ifdef REALOPINSIGHT_WEB
 const QString APP_NAME = QObject::tr("%1 Ultimate").arg(REALOPINSIGHT_APPLICATION_NAME);
+const int MAX_FILE_UPLOAD = 2048; // 2MB
+const std::string LINK_HOME ="/home";
+const std::string LINK_LOAD ="/preview-view";
+const std::string LINK_IMPORT ="/upload-view";
+const std::string LINK_LOGIN ="/login";
+const std::string LINK_LOGOUT ="/logout";
+const std::string LINK_ADMIN_HOME ="/adm-console";
+const std::string LINK_OP_HOME ="/op-console";
 #else
 const QString APP_NAME = QObject::tr("%1 Workstation").arg(REALOPINSIGHT_APPLICATION_NAME);
 #endif
+
 const QString COMPANY = "RealOpInsight Labs";
 const QString USER_BN = "ngrt4n";
 const QString CORE_VERSION = REALOPINSIGHT_CORE_VERSION;
@@ -60,6 +69,84 @@ class LsHelper;
 class ZbxHelper;
 class ZnsHelper;
 class ZmqSocket;
+
+struct CheckT {
+  std::string id;
+  std::string host;
+  std::string check_command;
+  std::string last_state_change;
+  std::string alarm_msg;
+  std::string host_groups;
+  int status;
+};
+typedef std::unordered_map<std::string, CheckT> ChecksT;
+
+namespace ngrt4n {
+  enum ApiTypeT {
+    Nagios = 0,
+    Zabbix = 1,
+    Zenoss = 2,
+    Auto=99
+  };
+
+  enum SeverityT {
+    Unset = -1,
+    Normal = 0,
+    Minor = 1,
+    Major = 2,
+    Critical = 3,
+    Unknown = 4
+  };
+
+  enum NagiosStatusT {
+    NagiosOk = 0,
+    NagiosWarning = 1,
+    NagiosCritical = 2,
+    NagiosUnknown = 3
+  };
+
+  enum ZabbixSeverityT {
+    ZabbixClear = 0,
+    ZabbixInfo = 1,
+    ZabbixWarn = 2,
+    ZabbixAverage = 3,
+    ZabbixHigh = 4,
+    ZabbixDisaster = 5
+  };
+
+  enum ZenossSeverityT {
+    ZenossClear = 0,
+    ZenossDebug = 1,
+    ZenossInfo = 2,
+    ZenossWarning = 3,
+    ZenossError = 4,
+    ZenossCritical = 5
+  };
+
+  enum {
+    AdmUserRole = 100,
+    OpUserRole = 101
+  };
+
+  enum VisibilityT {
+    Hidden = 0x0,
+    Visible = 0x1,
+    Expanded = 0x2,
+    Collapsed = 0xFC
+  };
+
+  const std::string AdmUser = "ngrt4n_adm";
+  const std::string OpUser = "ngrt4n_op";
+  const std::string CHILD_SEP = ",";
+  const std::string TAG_ZABBIX_HOSTNAME = "\\{HOSTNAME\\}";
+  const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
+  const std::string TAG_HOSTNAME = "\\{hostname\\}";
+  const std::string TAG_CHECK = "\\{check_name\\}";
+  const std::string TAG_THERESHOLD = "\\{threshold\\}";
+  const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
+
+  } // namespace ngrt4n
+
 
 class PropRules {
 public:

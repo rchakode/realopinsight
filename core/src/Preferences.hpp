@@ -26,7 +26,6 @@
 #ifndef SNAVPREFERENCES_HPP_
 #define SNAVPREFERENCES_HPP_
 
-#include "global.hpp"
 #include "Settings.hpp"
 #include "Base.hpp"
 

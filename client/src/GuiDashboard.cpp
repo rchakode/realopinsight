@@ -22,7 +22,6 @@
 #--------------------------------------------------------------------------#
  */
 #include "GuiDashboard.hpp"
-#include "global.hpp"
 #include "utilsCore.hpp"
 #include "LsHelper.hpp"
 #include <QScriptValueIterator>
