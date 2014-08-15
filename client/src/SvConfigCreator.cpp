@@ -189,7 +189,7 @@ void SvCreator::importLivestatusChecks(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.selectedHost();
+    QString host = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     statusBar()->showMessage(tr("Loading checks from %1:%2:%3...")
@@ -213,15 +213,21 @@ void SvCreator::importZabbixTriggers(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.selectedHost();
+    QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     statusBar()->showMessage(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
 
     ChecksT checks;
     ZbxHelper handler;
-    int retcode = handler.loadChecks(srcInfo, host, checks);
+
+    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+
+    if (checks.empty()) {
+      int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+      treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    }
   }
 }
 
@@ -232,18 +238,20 @@ void SvCreator::importZenossComponents(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.selectedHost();
+    QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     statusBar()->showMessage(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
 
     ChecksT checks;
     ZnsHelper handler(srcInfo.mon_url);
-    int retcode = handler.openSession(srcInfo);
-    if (retcode == 0) {
-      retcode = handler.loadChecks(srcInfo, host, checks);
-    }
+    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+
+    if (checks.empty()) {
+      int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+      treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    }
   }
 }
 
@@ -253,7 +261,7 @@ void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const C
     statusBar()->showMessage(msg);
     statusBar()->setStyleSheet("background: red;");
   } else {
-    m_editor->loadChecks(checks, srcId);
+    m_editor->updateDataPoints(checks, srcId);
     statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
     statusBar()->setStyleSheet("background: transparent;");
   }
@@ -526,7 +534,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
     if (_type == NodeType::ServiceNode) {
       if (node->type == NodeType::AlarmNode) {
         node->child_nodes.clear();
-        if (m_editor->updateNodeContent(node)) {
+        if (m_editor->updateNodeInfo(*node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
@@ -538,7 +546,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
         m_editor->typeField()->setCurrentIndex(0);
         ngrt4n::alert(tr("Failed ! This action is not permitted for a leave service."));
       } else {
-        if (m_editor->updateNodeContent(node)) {
+        if (m_editor->updateNodeInfo(*node)) {
           m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
           m_hasLeftUpdates = true;
           statusBar()->showMessage(m_activeConfig%"*");
@@ -565,7 +573,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
-    if (m_editor->updateNodeContent(node)) {
+    if (m_editor->updateNodeInfo(*node)) {
       QTreeWidgetItem* selectedNodeItem = m_tree->findNodeItem(m_selectedNode);
       if (selectedNodeItem) {
         selectedNodeItem->setText(0, node->name);
@@ -584,7 +592,7 @@ void SvCreator::handleReturnPressed(void)
 {
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
-    if (m_editor->updateNodeContent(node)) {
+    if (m_editor->updateNodeInfo(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       statusBar()->showMessage(m_activeConfig%"*");

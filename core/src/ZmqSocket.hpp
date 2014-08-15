@@ -24,7 +24,6 @@
 
 #ifndef ZMQSOCKET_HPP
 #define ZMQSOCKET_HPP
-#include "global.hpp"
 #include <QtCore/QtGlobal>
 #include <string>
 #include <sstream>
@@ -48,7 +47,6 @@ public:
   int getServerSerial() const {return m_serverSerial;}
   QString lastError() const {return m_lastError;}
   void setServerUri (const std::string& uri) { m_serverUri = uri; }
-
 
 private:
   std::string m_serverUri;

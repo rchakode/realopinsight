@@ -22,7 +22,6 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "global.hpp"
 #include "SvNavigatorTree.hpp"
 #include "Parser.hpp"
 #include "utilsCore.hpp"

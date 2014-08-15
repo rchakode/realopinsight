@@ -22,7 +22,6 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "global.hpp"
 #include "utilsCore.hpp"
 #include "client/src/Auth.hpp"
 #include "client/src/MainWindow.hpp"

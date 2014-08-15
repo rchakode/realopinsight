@@ -76,7 +76,6 @@ HEADERS += \
     core/src/ZmqSocket.hpp \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
-    core/src/global.hpp \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \
@@ -99,7 +98,7 @@ SOURCES += \
 
 gui-base {
 QT += svg gui webkit
-PACKAGE_VERSION=3.0.3
+PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
     client/src/GraphView.hpp \
@@ -151,65 +150,6 @@ SOURCES	+= client/src/ngrt4n-editor.cpp
 TARGET = realopinsight-editor
 }
 
-web-base {
-PACKAGE_VERSION=3.0.2
-DEFINES *= REALOPINSIGHT_WEB
-DEFINES *= WT_NO_SLOT_MACROS
-
-LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
-        -lboost_signals -lboost_program_options -lboost_system \
-        -lboost_thread -lboost_regex -lboost_signals \
-        -lboost_filesystem -lboost_date_time
-
-INCLUDEPATH += wt/src \
-               wt/dbo \
-               wt/extlibs/wtwithqt
-
-HEADERS	+= wt/src/WebDashboard.hpp \
-    wt/src/WebMsgConsole.hpp \
-    wt/src/WebMap.hpp \
-    wt/src/WebTree.hpp \
-    wt/src/WebPieChart.hpp \
-    wt/src/WebMainUI.hpp \
-    wt/dbo/DbSession.hpp \
-    wt/dbo/UserMngtUI.hpp \
-    wt/dbo/DbObjects.hpp \
-    wt/dbo/ViewMgnt.hpp \
-    wt/src/WebUtils.hpp \
-    wt/src/AuthManager.hpp \
-    wt/src/WebPreferences.hpp \
-    wt/extlibs/wtwithqt/DispatchThread.h \
-    wt/extlibs/wtwithqt/WQApplication
-
-SOURCES	+= wt/src/WebDashboard.cpp \
-    wt/src/WebMsgConsole.cpp \
-    wt/src/ngrt4n-web.cpp \
-    wt/src/WebMap.cpp \
-    wt/src/WebTree.cpp \
-    wt/src/WebPieChart.cpp \
-    wt/src/WebMainUI.cpp \
-    wt/dbo/DbSession.cpp \
-    wt/dbo/UserMngtUI.cpp\
-    wt/dbo/ViewMgnt.cpp \
-    wt/src/WebUtils.cpp \
-    wt/src/AuthManager.cpp \
-    wt/src/WebPreferences.cpp \
-    wt/extlibs/wtwithqt/DispatchThread.C \
-    wt/extlibs/wtwithqt/WQApplication.C
-}
-
-
-webd {
-  TARGET = realopinsightd
-  LIBS += -lwthttp
-}
-
-web-fcgi {
-  DEFINES *= REALOPINSIGHT_WEB_FASTCGI
-  TARGET = realopinsight.fcgi
-  LIBS += -lwtfcgi
-}
-
 dflag {
 TARGET.path=$$(INSTALL_PREFIX)/bin
 MAN.path =$$(INSTALL_PREFIX)/share/man/man1
@@ -237,4 +177,3 @@ DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Eliana\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
-DEFINES *= "REALOPINSIGHT_WWW_ROOT='\"REALOPINSIGHT_WWW_ROOT_VALUE\"'"

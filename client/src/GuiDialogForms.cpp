@@ -9,7 +9,7 @@
 
 CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>& sourceList, bool statusFile)
   : m_sourceSelectionBox(NULL),
-    m_hostFilter(NULL),
+    m_filter(NULL),
     m_statusFileArea(NULL)
 {
   // build generic widgets
@@ -22,9 +22,9 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
   layout->addWidget(new QLabel(tr("Select source*"), this), 0, 0);
   layout->addWidget(m_sourceSelectionBox, 0, 1);
   if (! statusFile) {
-    layout->addWidget(new QLabel(tr("Host filter (optional)"), this), 1, 0);
-    m_hostFilter = new QLineEdit(this);
-    layout->addWidget(m_hostFilter, 1, 1);
+    layout->addWidget(new QLabel(tr("Host or group filter (optional)"), this), 1, 0);
+    m_filter = new QLineEdit(this);
+    layout->addWidget(m_filter, 1, 1);
   } else {
     QPushButton* fileBrowser = new QPushButton(tr("browse..."), this);
     m_statusFileArea = new QLineEdit(this);

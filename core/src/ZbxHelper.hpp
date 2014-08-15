@@ -32,8 +32,8 @@
 
 
 namespace {
-const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
-}
+  const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
+  }
 
 class ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
@@ -86,7 +86,10 @@ public:
   int
   processTriggerReply(QNetworkReply* reply, ChecksT& checks);
   int
-  loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks);
+  loadChecks(const SourceT& srcInfo,
+             ChecksT& checks,
+             const QString& filterValue,
+             ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
 
 
 public Q_SLOTS:
@@ -107,8 +110,9 @@ private :
   QString m_lastError;
   JsonHelper m_replyJsonData;
 
-  void
-  setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  std::string parseHostGroups(const QScriptValue& json);
+  std::string parseHost(const QScriptValue& json);
 };
 
 #endif /* ZABBIXHELPER_HPP_ */

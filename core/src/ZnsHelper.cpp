@@ -88,30 +88,32 @@ RequestListT ZnsHelper::contentTypes()
 RequestListT ZnsHelper::requestsPatterns()
 {
   RequestListT list;
-  list[Device] = "{\"action\": \"DeviceRouter\", \
-      \"method\": \"getDevices\", \
-      \"data\": [{\
-      \"uid\": \"/zport/dmd/Devices\", \
-      \"sort\": \"name\", \
-      \"params\": {\"name\": \"%1\"},  \
-      \"keys\":[\"name\",\"uid\"] }], \
-      \"type\": \"rpc\", \
-      \"tid\": %2}";
-  list[Component] = "{\"action\": \"DeviceRouter\", \
-      \"method\": \"getComponents\", \
-      \"data\": [{\
-      \"uid\": \"%1\", \
-      \"limit\": 1000, \
-      \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\"]}], \
-      \"type\": \"rpc\", \
-      \"tid\": %2}";
-  list[DeviceInfo] = "{\"action\": \"DeviceRouter\", \
-      \"method\": \"getInfo\", \
-      \"data\": [{\
-      \"uid\": \"%1\", \
-      \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\"] }], \
-      \"type\": \"rpc\", \
-      \"tid\": %2}";
+  list[Device] = "{\"action\": \"DeviceRouter\", "
+      " \"method\": \"getDevices\", "
+      " \"data\": [{ "
+      " \"uid\": \"/zport/dmd/Devices\", "
+      " \"sort\": \"name\", "
+      " \"params\": {\"%1\": \"%2\"}, "
+      " \"keys\":[\"name\",\"uid\",\"groups\"] "
+      "}], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %3}";
+  list[Component] = "{\"action\": \"DeviceRouter\", "
+      " \"method\": \"getComponents\", "
+      " \"data\": [{ "
+      " \"uid\": \"%1\", "
+      " \"limit\": 1000, "
+      " \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\",\"groups\"]"
+      " }], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
+  list[DeviceInfo] = "{\"action\": \"DeviceRouter\", "
+      " \"method\": \"getInfo\", "
+      " \"data\": [{ "
+      " \"uid\": \"%1\", "
+      " \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\",\"groups\"] }], "
+      " \"type\": \"rpc\", "
+      " \"tid\": %2}";
   return list;
 }
 
@@ -256,12 +258,13 @@ ZnsHelper::processComponentReply(QNetworkReply* reply, ChecksT& checks)
 
     check.id = ID_PATTERN.arg(dname, cname).toStdString();
     check.host = dname.toStdString();
+    check.host_groups = parseHostGroups(device.property("groups"));
     check.last_state_change = ngrt4n::convertToTimet(device.property("lastChanged").toString(),
                                                      "yyyy/MM/dd hh:mm:ss");
     QString severity =citem.property("severity").toString();
-    if (!severity.compare("clear", Qt::CaseInsensitive)) {
+    if (! severity.compare("clear", Qt::CaseInsensitive)) {
       check.status = ngrt4n::ZenossClear;
-      check.alarm_msg = tr("The %1 component is Up").arg(cname).toStdString();
+      check.alarm_msg = tr("%1 component is Up").arg(cname).toStdString();
     } else {
       check.status = citem.property("failSeverity").toInt32();
       check.alarm_msg = citem.property("status").toString().toStdString();
@@ -292,13 +295,13 @@ ZnsHelper::processDeviceInfoReply(QNetworkReply* reply, ChecksT& checks)
 
   // now treat successful result
   CheckT check;
-  QScriptValue devInfo(m_replyJsonData.getProperty("result").property("data"));
-  QString dname = devInfo.property("name").toString();
+  QScriptValue deviceInfo(m_replyJsonData.getProperty("result").property("data"));
+  QString dname = deviceInfo.property("name").toString();
   check.host = dname.toStdString();
-  check.id = check.host;
-  //FIXME: check.id = ID_PATTERN.arg(check.host.c_str(), "ping").toStdString();
-  check.status = devInfo.property("status").toBool();
-  check.last_state_change = ngrt4n::convertToTimet(devInfo.property("lastChanged").toString(),
+  check.id = check.host; //FIXME: ??ID_PATTERN.arg(check.host.c_str(), "ping").toStdString();
+  check.host_groups = parseHostGroups(deviceInfo.property("groups"));
+  check.status = deviceInfo.property("status").toBool();
+  check.last_state_change = ngrt4n::convertToTimet(deviceInfo.property("lastChanged").toString(),
                                                    "yyyy/MM/dd hh:mm:ss");
   if (check.status) {
     check.status = ngrt4n::ZenossClear;
@@ -317,13 +320,11 @@ ZnsHelper::processDeviceInfoReply(QNetworkReply* reply, ChecksT& checks)
 int
 ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
 {
-  if (parseReply(reply) != 0){
+  if (parseReply(reply) != 0)
     return -1;
-  }
 
-  if (! checkRPCResultStatus()) {
+  if (! checkRPCResultStatus())
     return -1;
-  }
 
   // check weird reponse
   qint32 tid = m_replyJsonData.getProperty("tid").toInt32();
@@ -344,7 +345,7 @@ ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
     processComponentReply(response, checks);
 
     //retrieve ping info
-    response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[DeviceInfo].arg(deviceUid, QString::number(DeviceInfo))));
+    response = postRequest(DeviceInfo, ngrt4n::toByteArray(ReqPatterns[DeviceInfo].arg(deviceUid, QString::number(DeviceInfo))));
     processDeviceInfoReply(response, checks);
   }
   return 0;
@@ -352,7 +353,10 @@ ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
 
 
 int
-ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& checks)
+ZnsHelper::loadChecks(const SourceT& srcInfo,
+                      ChecksT& checks,
+                      const QString& filterValue,
+                      ngrt4n::RequestFilterT filterType)
 {
   setBaseUrl(srcInfo.mon_url);
 
@@ -360,17 +364,18 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, const QString& host, ChecksT& chec
   if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
 
-  // check if login succeeded
   if (! m_isLogged)
     return -1;
 
   checks.clear();
   QNetworkReply* response = NULL;
 
-  // Finally retriev triggers related to the given host
-  // FIXME: if host empty get triggers from all hosts
   setRouterEndpoint(Device);
-  response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg(host, QString::number(Device))));
+  if (filterType == ngrt4n::GroupFilter) {
+    response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg("groups", filterValue, QString::number(Device))));
+  } else {
+    response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg("name", filterValue, QString::number(Device))));
+  }
 
   if (! response || processDeviceReply(response, checks) !=0) {
     return -1;
@@ -386,3 +391,23 @@ ZnsHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
     reply->ignoreSslErrors();
 }
 
+
+std::string
+ZnsHelper::parseHostGroups(const QScriptValue& json)
+{
+  std::string result("");
+  QScriptValueIterator entryIter(json);
+  while (entryIter.hasNext()) {
+    entryIter.next();
+    if (entryIter.flags() & QScriptValue::SkipInEnumeration)
+      continue;
+    std::string name = entryIter.value().property("name").toString().toStdString();
+
+    if (result.empty())
+      result = name;
+    else
+      result.append(ngrt4n::CHILD_SEP).append(name);
+  }
+
+  return result;
+}

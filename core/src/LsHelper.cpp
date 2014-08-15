@@ -54,11 +54,11 @@ QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestTyp
   switch(requestType) {
   case LsHelper::Host:
     data = "GET hosts\n"
-        "Columns: name state last_state_change check_command plugin_output\n";
+        "Columns: name state last_state_change check_command plugin_output groups\n";
     break;
   case LsHelper::Service:
     data = "GET services\n"
-        "Columns: host_name service_description state last_state_change check_command plugin_output\n";
+        "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n";
     break;
   default:
     break;
@@ -68,10 +68,14 @@ QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestTyp
     QString filterPattern;
     switch(requestType) {
     case LsHelper::Host:
-      filterPattern = "Filter: name = %1\n";
+      filterPattern = "Filter: name = %1\n"
+          "Filter: host_groups ~ %1\n"
+          "Or: 2\n";
       break;
     case LsHelper::Service:
-      filterPattern = "Filter: host_name = %1\n";
+      filterPattern = "Filter: host_name = %1\n"
+          "Filter: host_groups ~ %1\n"
+          "Or: 2\n";
       break;
     default:
       break;
@@ -85,12 +89,9 @@ int LsHelper::loadChecks(const QString& host, ChecksT& checks)
 {
   checks.clear();
 
-  // get host data
-  if (makeRequest(prepareRequestData(host, LsHelper::Host), checks) != 0) {
+  if (makeRequest(prepareRequestData(host, LsHelper::Host), checks) != 0)
     return -1;
-  }
 
-  // get service data
   return makeRequest(prepareRequestData(host, LsHelper::Service), checks);
 }
 
@@ -101,48 +102,48 @@ int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
     m_lastError = m_socketHandler->lastError();
     return -1;
   }
-  parseResult(m_socketHandler->lastResult(), checks);
+  parseResult(checks);
   return 0;
 }
 
 
-void LsHelper::parseResult(const QString& result, ChecksT& checks)
+void LsHelper::parseResult(ChecksT& checks)
 {
-  QString chkid = "";
   CheckT check;
   QString entry;
 
-  QTextStream stream(result.toLatin1(), QIODevice::ReadOnly);
+  QTextStream stream(&m_socketHandler->lastResult(), QIODevice::ReadWrite);
 
   while (!((entry = stream.readLine()).isNull())) {
     if (entry.isEmpty()) continue;
     QStringList fields = entry.split(";");
 
     switch( fields.size() ) {
-    case 5: // host response
-      chkid = fields[0].toLower();
+    case 6: // host
       check.id = check.host = fields[0].toStdString();
       check.status = fields[1].toInt();
       check.last_state_change = fields[2].toStdString();
       check.check_command = fields[3].toStdString();
       check.alarm_msg = fields[4].toStdString();
+      check.host_groups = fields[5].toStdString();
       break;
 
-    case 6: // service response
-      chkid = ID_PATTERN.arg(fields[0], fields[1]).toLower(); // fields[0] => hostname
+    case 7: // service
       check.host = fields[0].toStdString();
-      check.id = chkid.toStdString();
+      check.id = ID_PATTERN.arg(check.host.c_str(), fields[1]).toLower().toStdString();
       check.status = fields[2].toInt();
       check.last_state_change = fields[3].toStdString();
       check.check_command = fields[4].toStdString();
       check.alarm_msg = fields[5].toStdString();
+      check.host_groups = fields[6].toStdString();
       break;
 
     default:
-        qDebug()<< "unexpected entry: "<< entry;
+      qDebug()<< "unexpected entry: "<< entry;
       continue;
       break;
     }
-    checks.insert(std::pair<std::string, CheckT>(chkid.toStdString(), check));
+
+    checks.insert(std::pair<std::string, CheckT>(check.id, check));
   }
 }
