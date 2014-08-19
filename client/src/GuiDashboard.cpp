@@ -39,7 +39,7 @@ namespace {
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
   const qint32 CHART_WIDTH = 200;
   const qint32 CHART_HEIGHT = 200;
-}
+  }
 
 StringMapT GuiDashboard::propRules() {
   StringMapT map;
@@ -89,6 +89,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_rightSplitter->addWidget(m_viewPanel.get());
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
+  m_chart->setCoreData(m_cdata);
   addEvents();
 }
 
@@ -146,14 +147,14 @@ void GuiDashboard::updateMap(const NodeT& _node, const QString& _tip)
 
 void GuiDashboard::updateChart(void)
 {
-  m_chart->setStatsData(m_cdata->check_status_count);
-  m_chart->setNbStatEntries(m_cdata->cnodes.size());
   m_chart->repaint();
 }
 
 void GuiDashboard::updateEventFeeds(const NodeT& node)
 {
-  //TODO
+  if (node.id == ngrt4n::ROOT_ID) {
+    updateTrayInfo(node);
+  }
 }
 
 void GuiDashboard::buildTree(void)
@@ -309,18 +310,18 @@ void GuiDashboard::handleSettingsLoaded(void)
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-        case ngrt4n::Nagios:
-          it->icon = ":images/nagios-logo-n.png";
-          break;
-        case ngrt4n::Zabbix:
-          it->icon = ":images/zabbix-logo-z.png";
-          break;
-        case ngrt4n::Zenoss:
-          it->icon = ":images/zenoss-logo-o.png";
-          break;
-        default:
-          it->icon = "";
-          break;
+      case ngrt4n::Nagios:
+        it->icon = ":images/nagios-logo-n.png";
+        break;
+      case ngrt4n::Zabbix:
+        it->icon = ":images/zabbix-logo-z.png";
+        break;
+      case ngrt4n::Zenoss:
+        it->icon = ":images/zenoss-logo-o.png";
+        break;
+      default:
+        it->icon = "";
+        break;
       }
       m_sourceSelectionBox->addItem(QIcon(it->icon), it->id, QVariant(it->id));
     }

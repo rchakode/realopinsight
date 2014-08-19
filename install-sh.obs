@@ -151,8 +151,21 @@ install_daemon()
 check_prerequisites()
 {
   echo -n "DEBUG : Checking qmake => ${QMAKE:=`which qmake`}... "
-  [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
-  echo "done"
+  if [ -z $QMAKE ]; then
+    echo "no found"
+    echo -n "DEBUG : Checking qmake-qt4 => ${QMAKE:=`which qmake-qt4`}... "
+    if [ -z $QMAKE ]; then
+      echo "no found"
+      echo -n "DEBUG : Checking qmake-qt5 => ${QMAKE:=`which qmake-qt5`}... " 
+    fi
+  fi
+
+  if [ -z $QMAKE ]; then
+      echo "no found. FATAL."
+      exit 1
+  else
+    echo "done"
+  fi
  
   echo -n "DEBUG : Checking make => ${MAKE:=`which make`}... "
   [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
