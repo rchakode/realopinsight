@@ -30,10 +30,11 @@ ChartBase::ChartBase()
 
 void ChartBase::updateSeverityInfo(void)
 {
-  if (! m_cdata)
+  m_statsData.clear();
+  m_severityRatio.clear();
+  if (! m_cdata || m_cdata->cnodes.isEmpty())
     return;
 
-  m_statsData.clear();
   for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
        node != end; ++ node) {
     switch (node->sev) {
