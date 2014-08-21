@@ -36,9 +36,10 @@ public:
   JsonHelper(const QString& _data = "");
   void setData(const std::string& _data);
   void setData(const QString& _data);
+  QScriptValue data(void) const {return m_data;}
   QScriptValue getProperty(const std::string& key);
 private :
-  QScriptValue mdata;
+  QScriptValue m_data;
 };
 
 #endif // JSHELPER_HPP

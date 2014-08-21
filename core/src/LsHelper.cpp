@@ -24,10 +24,12 @@
 
 #include "LsHelper.hpp"
 #include "utilsCore.hpp"
-#include <QDir>
-#include <iostream>
 #include "utilsCore.hpp"
 #include "RawSocket.hpp"
+#include "JsonHelper.hpp"
+#include <iostream>
+#include <QDir>
+#include <QScriptValueIterator>
 
 LsHelper::LsHelper(const QString& host, int port)
   : m_socketHandler(new RawSocket(host, port))
@@ -54,11 +56,13 @@ QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestTyp
   switch(requestType) {
   case LsHelper::Host:
     data = "GET hosts\n"
-        "Columns: name state last_state_change check_command plugin_output groups\n";
+        "Columns: name state last_state_change check_command plugin_output groups\n"
+        "OutputFormat: json\n";
     break;
   case LsHelper::Service:
     data = "GET services\n"
-        "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n";
+        "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
+        "OutputFormat: json\n";
     break;
   default:
     break;
@@ -109,15 +113,23 @@ int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
 
 void LsHelper::parseResult(ChecksT& checks)
 {
-  CheckT check;
-  QString entry;
+  JsonHelper json(m_socketHandler->lastResult());
 
-  QTextStream stream(&m_socketHandler->lastResult(), QIODevice::ReadWrite);
+  QScriptValueIterator entryIter(json.data());
+  while (entryIter.hasNext()) {
+    entryIter.next();
+    if (entryIter.flags() & QScriptValue::SkipInEnumeration) continue;
+    QScriptValueIterator fieldIter(entryIter.value());
 
-  while (!((entry = stream.readLine()).isNull())) {
-    if (entry.isEmpty()) continue;
-    QStringList fields = entry.split(";");
+    QStringList fields;
+    fields.clear();
+    while (fieldIter.hasNext()) {
+      fieldIter.next();
+      if (fieldIter.flags() & QScriptValue::SkipInEnumeration) continue;
+      fields.push_back(fieldIter.value().toString());
+    }
 
+    CheckT check;
     switch( fields.size() ) {
     case 6: // host
       check.id = check.host = fields[0].toStdString();
@@ -139,7 +151,7 @@ void LsHelper::parseResult(ChecksT& checks)
       break;
 
     default:
-      qDebug()<< "unexpected entry: "<< entry;
+      qDebug()<< "unexpected entry: "<< entryIter.value().toString();
       continue;
       break;
     }

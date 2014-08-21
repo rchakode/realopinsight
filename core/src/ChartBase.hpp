@@ -32,15 +32,14 @@ class ChartBase
 {
 public:
   ChartBase();
-  void setStatsData(const CheckStatusCountT& statsData) {m_statsData = statsData;}
-  void setNbStatEntries(qint32 count) {m_nbStatsEntries = count;}
+  void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void updateSeverityInfo(void);
   QString buildTooltipText(void);
 
 protected:
+  CoreDataT* m_cdata;
   CheckStatusCountT m_statsData;
   qint32 m_nbStatsEntries;
-  QMap<int, int> m_severityCount;
   QMap<int, float> m_severityRatio;
 };
 

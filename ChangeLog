@@ -1,6 +1,14 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.5
+  * Fixed ticket #41 when chart is not well updated with
+    Livestatus backend
+  * Fixed version display in welcome message
+  * Use UTF8 as default character encoding system for Livestatus backend
+  * Now retrieve data from Livestatus basing JSON format. Aims to fix problem
+    with line break in message details. See ticket #43
+
 3.0.4
   * Added the ability to filter data points to import within
     the editor basing on host groups (see ticket #39). In addition

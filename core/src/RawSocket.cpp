@@ -26,7 +26,6 @@
 #include "RawSocket.hpp"
 #include <cerrno>
 #include <QDebug>
-#include <cstdlib>
 
 RawSocket::RawSocket(const QString& host, int port)
   : m_host(host),
@@ -83,18 +82,7 @@ int RawSocket::makeRequest(const QByteArray& data)
   int count = 0;
   m_lastResult.clear();
   while ((count = recv(sock, buffer, BUFFER_SIZE -1, 0)) > 0) {
-
-    wchar_t* wbuffer = new wchar_t[count+1];
-
-    int converted = mbstowcs(wbuffer, buffer, count);
-    if (converted == count) {
-      m_lastResult.append(QString::fromWCharArray(wbuffer, converted));
-    } else {
-      qDebug() << QObject::tr("Weird conversion from char* to wchar* failed: %1\n%2")
-                  .arg(buffer, QString::fromWCharArray(wbuffer));
-    }
-
-    delete [] wbuffer;
+    m_lastResult.append(QString::fromUtf8(buffer, count));
   }
 
   if (count < 0) {
