@@ -31,15 +31,15 @@ JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
 
 void JsonHelper::setData(const std::string& data)
 {
-  mdata = evaluate("(" + QString::fromStdString(data) + ")");
+  m_data = evaluate("(" + QString::fromStdString(data) + ")");
 }
 
 void JsonHelper::setData(const QString& data)
 {
-  mdata = evaluate("("+data+")");
+  m_data = evaluate("("+data+")");
 }
 
 QScriptValue JsonHelper::getProperty(const std::string& key)
 {
-  return mdata.property(QString::fromStdString(key)) ;
+  return m_data.property(QString::fromStdString(key)) ;
 }
