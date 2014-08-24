@@ -20,7 +20,7 @@
 
 set -u
 
-export REAlOPINSIGHT_TARGET_VERSION=2014b3
+export REAlOPINSIGHT_TARGET_VERSION=2014b4
 export REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}-x64_86.tar.gz
 export REALOPINSIGHT_APP_DIR=/opt/realopinsight
 export REALOPINSIGHT_WWW_DIR=/var/www/realopinsight
@@ -86,7 +86,49 @@ check_exit_code()
   fi
 }
 
+update_db_2014b3()
+{
+  echo -n "DEBUG : Updating database..."
+  su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem int not null default 0;" \
+                | sqlite3 /opt/realopinsight/data/realopinsight.db'
+				
+  check_exit_code
+}
+
+get_target_version_from_user()
+{
+  echo
+  echo "Which version of the software is current installed ?"
+  echo
+  echo "1) 3.0.0b1"
+  echo "2) 3.0.0b2"
+  echo "3) 2014b3"
+  echo "q) Quit"
+  echo
+  while true; do
+    read -p "Type response " rep
+    case $rep in
+	  1) INSTALLED_VERSION=3.0.0b1 
+	      break
+		  ;;
+	  2) INSTALLED_VERSION=3.0.0b2 
+	     break
+		 ;;
+	  3) INSTALLED_VERSION=2014b3; 
+	      break
+		  ;;
+	  q) exit 0 
+	      ;; 
+	  *) echo -n "Invalid input. ";; 
+    esac
+  done  
+}
+
+# start
 prompt_copyright
+
+# Get installed version
+get_target_version_from_user
 
 # Make backup
 make_backup
@@ -101,16 +143,13 @@ echo -n "DEBUG : Installing sqlite3 CLI..."
 apt-get install -y sqlite3
 check_exit_code
 
-echo -n "DEBUG : Updating database..."
-su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem int not null default 0;" \
-                | sqlite3 /opt/realopinsight/data/realopinsight.db'
-				
-check_exit_code
+if [ "${INSTALLED_VERSION}" == "3.0.1b1" ] || [ "${INSTALLED_VERSION}" == "3.0.1b2" ];
+  update_db_2014b3
+fi
 
 echo -n "DEBUG : Applying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
 tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
 check_exit_code
-
 
 echo -n "DEBUG : Restarting Apache..."
 /etc/init.d/apache2 start
