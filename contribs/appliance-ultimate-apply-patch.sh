@@ -31,7 +31,9 @@ export REAlOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
 make_backup()
 {
   echo -n "DEBUG : Backup current installation to ${REAlOPINSIGHT_BACKUP_FILE}..."
-  tar --same-owner -zcf ${REAlOPINSIGHT_BACKUP_FILE} ${REALOPINSIGHT_WWW_DIR} ${REALOPINSIGHT_APP_DIR}
+  tar --same-owner \
+      --exclude ${REALOPINSIGHT_APP_DIR}/run \
+      -zcf ${REAlOPINSIGHT_BACKUP_FILE} ${REALOPINSIGHT_WWW_DIR} ${REALOPINSIGHT_APP_DIR}
   if [ $? -eq 0 ]; then
     echo done
   else  
@@ -143,7 +145,7 @@ echo -n "DEBUG : Installing sqlite3 CLI..."
 apt-get install -y sqlite3
 check_exit_code
 
-if [ "${INSTALLED_VERSION}" == "3.0.1b1" ] || [ "${INSTALLED_VERSION}" == "3.0.1b2" ];
+if [ "${INSTALLED_VERSION}" == "3.0.1b1" ] || [ "${INSTALLED_VERSION}" == "3.0.1b2" ]; then
   update_db_2014b3
 fi
 

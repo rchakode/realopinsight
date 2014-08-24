@@ -20,7 +20,12 @@
 
 set -u 
 
-REAlOPINSIGHT_TARGET_VERSION=2014b3
+if [ $# -ne 1]; then
+  echo `basename $1` <version> 
+  exit 1
+fi
+
+REAlOPINSIGHT_TARGET_VERSION=$1
 REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}-x64_86.tar.gz
 REALOPINSIGHT_PREFIX=/opt
 REALOPINSIGHT_WWW=/var/www
