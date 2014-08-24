@@ -28,7 +28,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.0.4
+REALOPINSIGHT_CORE_VERSION=3.0.5
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
@@ -96,62 +96,8 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp
 
-gui-base {
-QT += svg gui webkit
-PACKAGE_VERSION=3.0.3
-HEADERS	+= client/src/Auth.hpp \
-    client/src/StatsLegend.hpp \
-    client/src/GraphView.hpp \
-    client/src/PieChart.hpp \
-    client/src/ServiceEditor.hpp \
-    client/src/SvConfigCreator.hpp \
-    client/src/GuiDashboard.hpp \
-    client/src/MainWindow.hpp \
-    client/src/SvNavigatorTree.hpp \
-    client/src/WebKit.hpp \
-    client/src/MsgConsole.hpp \
-    client/src/GuiPreferences.hpp \
-    client/src/GuiUtils.hpp \
-    client/src/GuiDialogForms.hpp
-
-SOURCES	+= client/src/Auth.cpp \
-    client/src/GuiUtils.cpp \
-    client/src/StatsLegend.cpp \
-    client/src/GraphView.cpp \
-    client/src/PieChart.cpp \
-    client/src/ServiceEditor.cpp \
-    client/src/SvConfigCreator.cpp \
-    client/src/GuiDashboard.cpp \
-    client/src/MainWindow.cpp \
-    client/src/SvNavigatorTree.cpp \
-    client/src/WebKit.cpp \
-    client/src/GuiPreferences.cpp \
-    client/src/MsgConsole.cpp \
-    client/src/GuiDialogForms.cpp
-}
-
-dist {
-SOURCES	+=
-TARGET = realopinsight-workstation
-}
-
-manager {
-SOURCES	+= client/src/ngrt4n-manager.cpp
-TARGET = realopinsight-manager
-}
-
-oc {
-SOURCES	+= client/src/ngrt4n-oc.cpp
-TARGET = realopinsight-oc
-}
-
-editor {
-SOURCES	+= client/src/ngrt4n-editor.cpp
-TARGET = realopinsight-editor
-}
-
 web-base {
-PACKAGE_VERSION=2014b3
+PACKAGE_VERSION=2014b4
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 

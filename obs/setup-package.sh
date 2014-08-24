@@ -6,10 +6,10 @@ set +x
 VERSION=$1
 DEFAULT_VERSION=X.Y.Z
 OBS_PROJECT="home:ngrt4n"
-OBS_PROJECT_DIR=/opt/dev/ngrt4n-qt/obs/$OBS_PROJECT
+OBS_PROJECT_DIR=$HOME/ngrt4n-qt/obs/$OBS_PROJECT
 PACKAGE_NAME=realopinsight-workstation-$VERSION
 DEFAULT_PACKAGE=realopinsight-workstation-$DEFAULT_VERSION
-DOWNLOAD_URL="file:///opt/dev/ngrt4n-qt/$PACKAGE_NAME.tar.gz"
+DOWNLOAD_URL="file://$HOME/ngrt4n-qt/$PACKAGE_NAME.tar.gz"
 WORKING_DIR=/tmp/$PACKAGE_NAME
 
 function usage
@@ -45,7 +45,7 @@ if [ -d $OBS_PROJECT_DIR ]; then
   cd $OBS_PROJECT_DIR
   osc up
 else
-  cd /tmp/
+  cd $HOME
   osc co $OBS_PROJECT
   cd $OBS_PROJECT
 fi

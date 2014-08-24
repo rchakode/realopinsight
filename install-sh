@@ -168,7 +168,7 @@ check_prerequisites()
 }
 
 install_default(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=manager ${dflag}
+  ${QMAKE} -config release ngrt4n-web.pro CONFIG+=gui-base CONFIG+=manager ${dflag}
   make -Bj${NCPU} 1>>install.log
   make install 1>>install.log
 }
@@ -204,12 +204,12 @@ install_workstation() {
 }
 
 install_webd() {
-  ${QMAKE} -config debug ngrt4n.pro CONFIG+=web-base CONFIG+=webd ${dflag}
+  ${QMAKE} -config debug ngrt4n-web.pro CONFIG+=web-base CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 install_fcgi() {
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
+  ${QMAKE} -config release ngrt4n-web.pro CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
