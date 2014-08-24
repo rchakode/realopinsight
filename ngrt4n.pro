@@ -58,7 +58,7 @@ DISTFILES += README.md \
     AUTHORS \
     images/*.png \
     images/built-in/*.png \
-    examples/{*.ngrt4n.xml,*.dat} \
+    examples/*.ngrt4n.xml \
     doc/man/*.gz \
     i18n/ngrt4n_*.qm
 
