@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
+<TS version="2.1" language="fr_FR">
 <context>
     <name>Auth</name>
     <message>
@@ -59,12 +59,12 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="15"/>
         <source>Import data | %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation de données | %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="23"/>
         <source>Select source*</source>
-        <translation>Sélectionner une source</translation>
+        <translation>Sélectionner une source*</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="26"/>
@@ -74,7 +74,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="30"/>
         <source>browse...</source>
-        <translation>Parcourir...</translation>
+        <translation>parcourir...</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="33"/>
@@ -111,7 +111,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="433"/>
         <source>Invalid authentication chain. Must be login:password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="594"/>
@@ -805,12 +805,12 @@ Autres détails : %9</translation>
     <message>
         <location filename="../wt/src/AuthManager.cpp" line="70"/>
         <source>%1 logged in. Session Id: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion de %1. ID session : %2</translation>
     </message>
     <message>
         <location filename="../wt/src/AuthManager.cpp" line="75"/>
         <source>%1 logged out</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnexion de %1 </translation>
     </message>
     <message>
         <location filename="../wt/src/AuthManager.cpp" line="113"/>
@@ -839,7 +839,7 @@ Autres détails : %9</translation>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="111"/>
         <source>Use custom SSL certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser un certificat personnalisé</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="134"/>
@@ -859,7 +859,7 @@ Autres détails : %9</translation>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="137"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location filename="../wt/src/WebPreferences.cpp" line="243"/>
@@ -886,7 +886,7 @@ Autres détails : %9</translation>
         <location filename="../wt/src/WebPreferences.cpp" line="548"/>
         <location filename="../wt/src/WebPreferences.cpp" line="566"/>
         <source>Please fix field(s) in red</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur, veuillez corriger les champs marqués en rouge</translation>
     </message>
     <message>
         <source>
@@ -1032,7 +1032,7 @@ Reporter des bugs: %7</translation>
     <message>
         <location filename="../wt/src/WebMainUI.cpp" line="502"/>
         <source>Views and Access Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Vues et gestion des accès</translation>
     </message>
     <message>
         <source>All Views and Access Control</source>
@@ -1055,117 +1055,125 @@ Copyright (c) 2010-%6 RealOpInsight Labs. All rights reserved
 Visit %7 for more information
 Report Bugs: %8
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1
+Version: %2 (%3)
+Core version: %4
+Release ID: %5
+Copyright (c) 2010-%6 RealOpInsight Labs. Tous les droits réservés
+Visiter %7 pour plus d&apos;information
+Reporter des bugs: %8
+</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="48"/>
         <source>WSAStartup failed </source>
-        <translation type="unfinished"></translation>
+        <translation>WSAStartup a terminé en erreur</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="88"/>
         <source>Failed receiving data</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors de l&apos;initialisation du handler de l&apos;annuaire</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="113"/>
         <source>Host down or unreachable %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Machine hors service ou inaccessible %1</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="116"/>
         <source>Connection failed due to timeout %1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion interrompue pour depassement de delai %1:%2</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="119"/>
         <source>Cannot assign requested address %1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;assigner l&apos;adresse de la requête %1:%2</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="122"/>
         <source>Network is down</source>
-        <translation type="unfinished"></translation>
+        <translation>Le réseau est inaccessible</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="125"/>
         <source>Connection reset by peer</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion reinitialisée par l&apos;autre pair</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="128"/>
         <source>Connection refused</source>
-        <translation type="unfinished">Connexion refusée</translation>
+        <translation>Connexion refusée</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="131"/>
         <source>Socket operation failed with error %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur socket : %1</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="161"/>
         <source>Connection etablished; server serial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion établie; N° de série du serveur : %1</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="164"/>
         <source>Weird response from the server (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Réponse inattendue réçue du serveur (%1)</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="169"/>
         <source>No response from server, retrying...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune réponse reçue du serveur, nouvelle tentatuve en cours...</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="174"/>
         <source>Unable to connect to ngrt4nd at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec de connexion à ngrt4nd à l&apos;adresse %1</translation>
     </message>
     <message>
         <location filename="../wt/src/LdapHelper.cpp" line="60"/>
         <source>Failed initializing annuary handler</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors de l&apos;initialisation du handler de l&apos;annuaire</translation>
     </message>
     <message>
         <location filename="../wt/src/LdapHelper.cpp" line="95"/>
         <source>Invalid LDAP URL: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>URL LDAP non valide : %1</translation>
     </message>
     <message>
         <location filename="../wt/src/LdapHelper.cpp" line="100"/>
         <source>Unitialized handler</source>
-        <translation type="unfinished"></translation>
+        <translation>Handler non initialisé</translation>
     </message>
     <message>
         <location filename="../wt/src/LdapHelper.cpp" line="119"/>
         <source>Authentication successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Authentification réussie</translation>
     </message>
     <message>
         <location filename="../wt/src/LdapHelper.cpp" line="135"/>
         <source>LDAP: Unitialized handler</source>
-        <translation type="unfinished"></translation>
+        <translation>Handler LDAP non initialisé</translation>
     </message>
     <message>
         <location filename="../wt/src/LdapHelper.cpp" line="160"/>
         <source>LDAP: Search failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>La recherche LDAP a échoué : %1</translation>
     </message>
     <message>
         <location filename="../wt/src/Validators.hpp" line="24"/>
         <source>Invalid %1 URI</source>
-        <translation type="unfinished"></translation>
+        <translation>URI  %1 non valide</translation>
     </message>
     <message>
         <location filename="../wt/src/Validators.hpp" line="45"/>
         <source>Bad hostname/IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;hôte ou adresse IP invalide</translation>
     </message>
     <message>
         <location filename="../wt/src/Validators.hpp" line="72"/>
         <source>File not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier non trouvé</translation>
     </message>
 </context>
 <context>
@@ -1294,7 +1302,7 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="195"/>
         <source>Loading checks from %1:%2:%3...</source>
-        <translation type="unfinished">Chargement des données de sondes à partir de %1:%2... {1:%2:%3.?}</translation>
+        <translation>Chargement de sondes à partir de %1:%2:%3...</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="219"/>
@@ -1314,7 +1322,7 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="539"/>
         <source>Failed ! This action is not permitted for a leave service.</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec ! Cette action n&apos;est pas permise sur ce type de service.</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="602"/>
@@ -1324,7 +1332,7 @@ Voir la documentatuon en ligne pour plus de détails.</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="676"/>
         <source>Import Z&amp;enoss Components</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des composants Z&amp;enoss</translation>
     </message>
     <message>
         <source>Select the Status File %</source>
@@ -1451,7 +1459,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="674"/>
         <source>Import Livestatus Checks</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des sondes à partir de Livestaus</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="675"/>
