@@ -324,7 +324,7 @@ void WebMainUI::openFileUploadDialog(void)
   
   m_uploader = new Wt::WFileUpload(container);
   m_uploader->uploaded().connect(std::bind(&WebMainUI::finishFileDialog, this, IMPORT));
-  m_uploader->setFileTextSize(ngrt4n::MAX_FILE_UPLOAD);
+  m_uploader->setFileTextSize(MAX_FILE_UPLOAD);
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
   
@@ -832,16 +832,16 @@ void WebMainUI::updateEventFeeds(void)
 void WebMainUI::handleInternalPath(void)
 {
   std::string path = Wt::WApplication::instance()->internalPath();
-  if (path == ngrt4n::LINK_LOAD) {
+  if (path == LINK_LOAD) {
     selectFileToOpen();
     setInternalPath("");
-  } else if (path == ngrt4n::LINK_IMPORT) {
+  } else if (path == LINK_IMPORT) {
     openFileUploadDialog();
     setInternalPath("");
-  } else if (path == ngrt4n::LINK_ADMIN_HOME) {
+  } else if (path == LINK_ADMIN_HOME) {
     showUserHome();
-  } else if (path == ngrt4n::LINK_LOGIN) {
-    wApp->redirect(ngrt4n::LINK_LOGIN);
+  } else if (path == LINK_LOGIN) {
+    wApp->redirect(LINK_LOGIN);
   } else {
     showMessage(Q_TR("Sorry, the request resource is not available or has been removed"),OperationError);
   }

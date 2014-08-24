@@ -90,6 +90,7 @@ WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* even
     m_eventFeedLayout(eventFeedLayout)
 {
   setupUI();
+  m_chart->setCoreData(m_cdata);
   addJsEventScript();
 }
 
@@ -131,8 +132,6 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  m_chart->setStatsData(m_cdata->check_status_count);
-  m_chart->setNbStatEntries(m_cdata->cnodes.size());
   m_chart->repaint();
 }
 

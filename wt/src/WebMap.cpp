@@ -179,7 +179,7 @@ void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
 {
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
                                           40 * m_scaleX, 40 * m_scaleY);
-  area->setToolTip(Wt::WString::fromUTF8(ngrt4n::getNodeToolTip(_node).toUtf8()));
+  area->setToolTip(Wt::WString::fromUTF8(ngrt4n::generateToolTip(_node).toUtf8()));
   addArea(area);
 }
 
@@ -187,7 +187,7 @@ void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos
 {
   Wt::WRectArea* area = new Wt::WRectArea(expIconPos.x() * m_scaleX, expIconPos.y() * m_scaleY,
                                           20 * m_scaleX, 20 * m_scaleY);
-  area->setToolTip(Wt::WString::fromUTF8(ngrt4n::getNodeToolTip(_node).toUtf8()));
+  area->setToolTip(Wt::WString::fromUTF8(ngrt4n::generateToolTip(_node).toUtf8()));
   area->clicked().connect(std::bind([=]() {expandCollapse(_node.id);}));
   addArea(area);
 }
@@ -218,7 +218,7 @@ void WebMap::updateThumbnail(void)
   static int roundCount = 0;
   double thumbWidth = 150; //change later
   double thumbHeight = 120;
-  double factor = (double)XSCAL_FACTOR/YSCAL_FACTOR;
+  double factor = (double)ngrt4n::XSCAL_FACTOR/ngrt4n::YSCAL_FACTOR;
   double thumbScaleY = thumbHeight/m_cdata->map_height;
   double thumbScaleX = factor * thumbHeight * thumbScaleY/m_cdata->map_height;
   thumbWidth = thumbScaleX*m_cdata->map_width + 20;

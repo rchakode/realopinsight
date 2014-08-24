@@ -122,7 +122,7 @@ void WebPieChart::repaint()
 {
   updateSeverityInfo();
 
-  for(auto it = std::begin(m_severityCount); it != std::end(m_severityCount); ++it) {
+  for(auto it = std::begin(m_statsData); it != std::end(m_statsData); ++it) {
     m_model->setData(it.key(), 0, ngrt4n::severityText(it.key()).toStdString());
     m_model->setData(it.key(), 1, it.value());
     m_legendBadges[it.key()]->setText(QString::number(it.value()).toStdString());
