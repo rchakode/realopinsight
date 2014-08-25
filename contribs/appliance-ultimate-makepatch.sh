@@ -20,8 +20,8 @@
 
 set -u 
 
-if [ $# -ne 1]; then
-  echo `basename $1` <version> 
+if [ $# -ne 1 ]; then
+  echo "`basename $0` <version>"
   exit 1
 fi
 
