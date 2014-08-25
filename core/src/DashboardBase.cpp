@@ -36,12 +36,15 @@
 #include <QNetworkCookie>
 #include <iostream>
 #include <algorithm>
-#include <zmq.h>
 #include <cassert>
-
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QUrlQuery>
+#endif
+
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#include "ZmqSocket.hpp"
+#include <zmq.h>
 #endif
 
 
@@ -156,12 +159,21 @@ void DashboardBase::runMonitor(SourceT& src)
     break;
   case ngrt4n::Nagios:
   default:
-    src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
+    if (src.use_ngrt4nd) {
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
+      runNgrt4ndUpdate(src);
+#else
+      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+#endif
+    } else {
+      runLivestatusUpdate(src);
+    }
     break;
   }
   finalizeUpdate(src);
 }
 
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
@@ -206,7 +218,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     }
   }
 }
-
+#endif //disable zmq
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {
@@ -428,8 +440,12 @@ void DashboardBase::openRpcSession(SourceT& src)
   switch(src.mon_type) {
   case ngrt4n::Nagios:
     if (src.use_ngrt4nd) {
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
       src.d4n_handler->setupSocket();
       src.d4n_handler->makeHandShake();
+#else
+      updateDashboardOnError(src, tr("This version is compiled without ngrt4nd support"));
+#endif
     } else {
       //src.ls_handler->setupSocket();
     }
@@ -500,12 +516,18 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
   switch (src.mon_type) {
   case ngrt4n::Nagios:
     if (src.use_ngrt4nd) {
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
       QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
       src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+      allocated = true;
+#else
+      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+      allocated = false;
+#endif
     } else {
       src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
+      allocated = true;
     }
-    allocated = true;
     break;
   case ngrt4n::Zabbix:
     src.zbx_handler = std::make_shared<ZbxHelper>(src.mon_url);
