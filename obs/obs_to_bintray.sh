@@ -11,6 +11,32 @@ shopt -s globstar
  
 # Redefine following variables to match your own usage
 
+
+VERBOSE=""
+BINTRAY_ACCOUNT=realopinsight
+BINTRAY_USER=realopinsight
+BINTRAY_APIKEY=83e88c775a0951eb64f271a88b1ae1a06161ad88
+
+WEBSITE_URL=http://realopinsight.com
+RELEASE_NOTES_URL=http://docs.realopinsight.com/latest/00_intro/release-notes.html
+ISSUE_TRACKER_URL=https://github.com/RealOpInsightLabs/realopinsight-workstation/issues
+VCS_URL=https://github.com/RealOpInsightLabs/realopinsight-workstation
+BASE_DESC=https://raw.githubusercontent.com/RealOpInsightLabs/realopinsight-workstation/master/README.md
+
+OBS_DOWNLOAD_DIR=$PWD'/download.opensuse.org/repositories/home\:/ngrt4n'
+OBS_DOWNLOAD_URL="http://download.opensuse.org/repositories/home:/"
+
+PACKAGES="realopinsight-workstation ngrt4n-d4n"
+PACKAGE_TYPES="deb rpm"
+
+DISTRIBS="Debian_7.0 Fedora_17 Fedora_18 Fedora_19  Fedora_20 openSUSE_12.1 openSUSE_12.2 openSUSE_12.3 openSUSE_Factory"
+
+DESCRIPTION="RealOpInsight is an open source business service monitoring
+dashboard toolkit that enables IT operations staff to deal with monitoring
+with focus on business. It supports Nagios, Zenoss, Zabbix, Shinken, Centreon, 
+Naemon, Icinga, op5 and more."
+
+
 usage()
 {
   echo "usage: `basename $0` [options]"
@@ -30,43 +56,24 @@ usage()
   echo "   Print this help"
 }
 
-VERBOSE=""
-BINTRAY_ACCOUNT=realopinsight
-BINTRAY_USER=realopinsight
-BINTRAY_APIKEY=83e88c775a0951eb64f271a88b1ae1a06161ad88
-BINTRAY_REPO=realopinsight
 
-WEBSITE_URL=http://realopinsight.com
-RELEASE_NOTES_URL=http://docs.realopinsight.com/latest/00_intro/release-notes.html
-ISSUE_TRACKER_URL=https://github.com/RealOpInsightLabs/realopinsight-workstation/issues
-VCS_URL=https://github.com/RealOpInsightLabs/realopinsight-workstation
-BASE_DESC=https://raw.githubusercontent.com/RealOpInsightLabs/realopinsight-workstation/master/README.md
-
-OBS_DOWNLOAD_DIR=$PWD'/download.opensuse.org/repositories/home\:/ngrt4n'
-OBS_DOWNLOAD_URL="http://download.opensuse.org/repositories/home:/"
-
-PACKAGES="realopinsight-workstation ngrt4n-d4n"
-
-DISTRIBS="Debian_7.0 Fedora_17 Fedora_18 Fedora_19  Fedora_20 openSUSE_12.1 openSUSE_12.2 openSUSE_12.3 openSUSE_Factory"
-
-DESCRIPTION="RealOpInsight is an open source business service monitoring
-dashboard toolkit that enables IT operations staff to deal with monitoring
-with focus on business. It supports Nagios, Zenoss, Zabbix, Shinken, Centreon, 
-Naemon, Icinga, op5 and more."
-
+get_file_extention()
+{
+  echo "$1" | awk -F . '{print $NF}'
+}
 
 get_package_name()
 {
-  PKG_FILE=$1
-  PKG_TYPE=`echo "$PKG_FILE" | awk -F . '{print $NF}'`
+  FILE=$1
+  PKG_TYPE=`get_file_extention $FILE`
   
   result=""
   case $PKG_TYPE in
     rpm) 
-      result=`rpm --queryformat "%{NAME}" -qp $PKG_FILE`
+      result=`rpm --queryformat "%{NAME}" -qp $FILE`
     ;;
     deb) 
-      result=`dpkg-deb --show  --showformat='${Package}' $PKG_FILE`
+      result=`dpkg-deb --show  --showformat='${Package}' $FILE`
     ;;  
     ?) echo "unknown package type"; 
     ;;    
@@ -77,16 +84,16 @@ get_package_name()
 
 get_package_version()
 {
-  PKG_FILE=$1
-  PKG_TYPE=`echo "$PKG_FILE" | awk -F . '{print $NF}'`
+  FILE=$1
+  PKG_TYPE=`echo "$FILE" | awk -F . '{print $NF}'`
   
   result=""
   case $PKG_TYPE in
     rpm) 
-      result=`rpm --queryformat "%{VERSION}" -qp $PKG_FILE`
+      result=`rpm --queryformat "%{VERSION}" -qp $FILE`
     ;;
     deb) 
-      result=`dpkg-deb --show  --showformat='${Version}' $PKG_FILE`
+      result=`dpkg-deb --show  --showformat='${Version}' $FILE`
     ;;  
     ?) echo "unknown package type"; 
     ;;    
@@ -98,13 +105,13 @@ get_package_version()
 
 get_package_release()
 {
-  PKG_FILE=$1
-  PKG_TYPE=`echo "$PKG_FILE" | awk -F . '{print $NF}'`
+  FILE=$1
+  PKG_TYPE=`echo "$FILE" | awk -F . '{print $NF}'`
   
   result=""
   case $PKG_TYPE in
     rpm) 
-      result=`rpm --queryformat "%{RELEASE}" -qp $PKG_FILE`
+      result=`rpm --queryformat "%{RELEASE}" -qp $FILE`
     ;;
     deb) 
       result=""
@@ -119,16 +126,16 @@ get_package_release()
 
 get_package_arch()
 {
-  PKG_FILE=$1
-  PKG_TYPE=`echo "$PKG_FILE" | awk -F . '{print $NF}'`
+  FILE=$1
+  PKG_TYPE=`echo "$FILE" | awk -F . '{print $NF}'`
   
   result=""
   case $PKG_TYPE in
     rpm) 
-      result=`rpm --queryformat "%{ARCH}" -qp $PKG_FILE`
+      result=`rpm --queryformat "%{ARCH}" -qp $FILE`
     ;;
     deb) 
-      result=`dpkg-deb --show  --showformat='${Architecture}' $PKG_FILE`
+      result=`dpkg-deb --show  --showformat='${Architecture}' $FILE`
     ;;  
     ?) echo "unknown package type"; 
     ;;    
@@ -149,13 +156,14 @@ download_obs_packages()
 
 create_packages()
 {
-  for PKG in $PACKAGES; do 
-      echo "@@@@@@@@@@@@@@@@@@@@@@"
-      echo "@@@ create package @@@"
-      echo "@@@@@@@@@@@@@@@@@@@@@@"
+  for PKG_TYPE in $PACKAGE_TYPES; do
+    for PKG in $PACKAGES; do 
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      echo "@@@ create package $PKG @@"
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@"
       curl $VERBOSE -u$BINTRAY_USER:$BINTRAY_APIKEY \
                -H "Content-Type: application/json" \
-               -X POST https://api.bintray.com/packages/$BINTRAY_ACCOUNT/$BINTRAY_REPO/ \
+               -X POST https://api.bintray.com/packages/$BINTRAY_ACCOUNT/$PKG_TYPE/ \
                --data "{ \"name\": \"$PKG\", 
                          \"desc\": \"$DESCRIPTION\", 
                          \"desc_url\": \"$BASE_DESC\",
@@ -165,6 +173,7 @@ create_packages()
                          \"labels\": [\"Nagios\",\"Zabbix\",\"Zenoss\",\"Centreon\",\"op5\",\"Icinga\"], 
                          \"licenses\": [\"GPL-3.0\"] }"  
       echo ""
+    done
   done
 }
 
@@ -173,24 +182,25 @@ create_package_versions()
   for DIST in $DISTRIBS; do 
   
     PKG_DIR="$OBS_DOWNLOAD_DIR/$DIST/*"
-    PKG_FILES=$(ls $PKG_DIR/*.{rpm,deb} 2>/dev/null)
+    FILES=$(ls $PKG_DIR/*.{rpm,deb} 2>/dev/null)
     
-    for PKG_FILE in  $PKG_FILES; do 
-    
-      PKG_NAME=`get_package_name $PKG_FILE`             #`rpm --queryformat "%{NAME}" -qp $PKG_FILE`
-      PKG_VERSION=`get_package_version $PKG_FILE`          # `rpm --queryformat "%{VERSION}" -qp $PKG_FILE`
-      PKG_RELEASE=`get_package_release $PKG_FILE`          # `rpm --queryformat "%{RELEASE}" -qp $PKG_FILE`
-      PKG_ARCH=`get_package_arch $PKG_FILE`             #`rpm --queryformat "%{ARCH}" -qp $PKG_FILE`
+    for FILE in $FILES; do 
+
+      PKG_TYPE=`get_file_extention $FILE`
+      PKG_NAME=`get_package_name $FILE`             #`rpm --queryformat "%{NAME}" -qp $FILE`
+      PKG_VERSION=`get_package_version $FILE`          # `rpm --queryformat "%{VERSION}" -qp $FILE`
+      PKG_RELEASE=`get_package_release $FILE`          # `rpm --queryformat "%{RELEASE}" -qp $FILE`
+      PKG_ARCH=`get_package_arch $FILE`             #`rpm --queryformat "%{ARCH}" -qp $FILE`
  
       echo "PKG_NAME=$PKG_NAME, PKG_VERSION=$PKG_VERSION, PKG_RELEASE=$PKG_RELEASE, PKG_ARCH=$PKG_ARCH"
       sleep 2
 
-      echo "@@@@@@@@@@@@@@@@@@@@@@"
-      echo "@@@ create version @@@"
-      echo "@@@@@@@@@@@@@@@@@@@@@@"
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      echo "@@@ create version $PKG_VERSION   "
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
       curl $VERBOSE -u$BINTRAY_USER:$BINTRAY_APIKEY \
                -H "Content-Type: application/json" \
-               -X POST https://api.bintray.com/packages/$BINTRAY_ACCOUNT/$BINTRAY_REPO/$PKG_NAME/versions/ \
+               -X POST https://api.bintray.com/packages/$BINTRAY_ACCOUNT/$PKG_TYPE/$PKG_NAME/versions/ \
                --data "{ \"name\": \"$DIST\", 
                       \"desc\": \"$RELEASE_NOTES_URL\", 
                       \"release_notes\": \"$RELEASE_NOTES_URL\",
@@ -206,26 +216,28 @@ upload_packages()
   for DIST in $DISTRIBS; do   
     
     PKG_DIR="$OBS_DOWNLOAD_DIR/$DIST/*"
-    PKG_FILES=$(ls $PKG_DIR/*.{rpm,deb} 2>/dev/null)
+    FILES=$(ls $PKG_DIR/*.{rpm,deb} 2>/dev/null)
     
-    for PKG_FILE in $PKG_FILES; do 
-    
-      ABS_PATH=$PKG_FILE
-      PKG_NAME=`get_package_name $ABS_PATH`             #`rpm --queryformat "%{NAME}" -qp $PKG_FILE`
-      PKG_VERSION=`get_package_version $ABS_PATH`          # `rpm --queryformat "%{VERSION}" -qp $PKG_FILE`
-      PKG_RELEASE=`get_package_release $ABS_PATH`          # `rpm --queryformat "%{RELEASE}" -qp $PKG_FILE`
-      PKG_ARCH=`get_package_arch $ABS_PATH`             #`rpm --queryformat "%{ARCH}" -qp $PKG_FILE`
+    for FILE in $FILES; do 
+      PKG_TYPE=`get_file_extention $FILE`
+      PKG_NAME=`get_package_name $FILE`             #`rpm --queryformat "%{NAME}" -qp $FILE`
+      PKG_VERSION=`get_package_version $FILE`          # `rpm --queryformat "%{VERSION}" -qp $FILE`
+      PKG_RELEASE=`get_package_release $FILE`          # `rpm --queryformat "%{RELEASE}" -qp $FILE`
+      PKG_ARCH=`get_package_arch $FILE`             #`rpm --queryformat "%{ARCH}" -qp $FILE`
+
       echo "PKG_NAME=$PKG_NAME, PKG_VERSION=$PKG_VERSION, PKG_RELEASE=$PKG_RELEASE, PKG_ARCH=$PKG_ARCH"
-      sleep 2
       
-      echo "@@@@@@@@@@@@@@@@@@@@@@"
-      echo "@@@ upload content @@@"
-      echo "@@@@@@@@@@@@@@@@@@@@@@"
-      #  curl $VERBOSEf -T $PKG_FILE -u$BINTRAY_USER:$BINTRAY_APIKEY -H "X-Bintray-Package:$PKG_NAME" -H "X-Bintray-Version:$DIST" https://api.bintray.com/content/$BINTRAY_ACCOUNT/$BINTRAY_REPO/$PKG_NAME-$PKG_VERSION-$PKG_RELEASE.$PKG_ARCH.rpm
-      curl $VERBOSE -T $PKG_FILE -u$BINTRAY_USER:$BINTRAY_APIKEY \
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      echo "@@@ uploading $FILE...   "
+      echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      #  curl $VERBOSEf -T $FILE -u$BINTRAY_USER:$BINTRAY_APIKEY \
+      #       -H "X-Bintray-Package:$PKG_NAME" \
+      #       -H "X-Bintray-Version:$DIST" \
+      #        https://api.bintray.com/content/$BINTRAY_ACCOUNT/$PKG_TYPE/$PKG_NAME-$PKG_VERSION-$PKG_RELEASE.$PKG_ARCH.rpm
+      curl $VERBOSE -T $FILE -u$BINTRAY_USER:$BINTRAY_APIKEY \
            -H "X-Bintray-Package:$PKG_NAME" \
            -H "X-Bintray-Version:$DIST" \
-           -X GET https://api.bintray.com/content/$BINTRAY_ACCOUNT/$BINTRAY_REPO/
+           -X PUT https://api.bintray.com/content/$BINTRAY_ACCOUNT/$PKG_TYPE/
       echo ""
     done
   done
@@ -234,17 +246,19 @@ upload_packages()
 
 publish_packages()
 {
-  for PKG in $PACKAGES; do 
-    for DIST in PKG_DISTS; do 
+  for PKG_TYPE in $PACKAGE_TYPES; do
+    for PKG in $PACKAGES; do 
+      for DIST in PKG_DISTS; do 
       
-      echo "@@@@@@@@@@@@@@@@@@@@@@@"
-      echo "@@@ publish content @@@"
-      echo "@@@@@@@@@@@@@@@@@@@@@@@"
-      curl $VERBOSE -u$BINTRAY_USER:$BINTRAY_APIKEY \
-           -H "Content-Type: application/json" \
-           -X POST https://api.bintray.com/content/$BINTRAY_ACCOUNT/$BINTRAY_REPO/$PKG/$DIST/publish \
-           --data '{ "discard": "false" }'
-      echo ""
+        echo "@@@@@@@@@@@@@@@@@@@@@@@"
+        echo "@@@ publish content @@@"
+        echo "@@@@@@@@@@@@@@@@@@@@@@@"
+        curl $VERBOSE -u$BINTRAY_USER:$BINTRAY_APIKEY \
+             -H "Content-Type: application/json" \
+             -X POST https://api.bintray.com/content/$BINTRAY_ACCOUNT/$PKG_TYPE/$PKG/$DIST/publish \
+             --data '{ "discard": "false" }'
+        echo ""
+      done
     done
   done
 }
