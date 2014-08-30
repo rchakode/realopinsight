@@ -2,7 +2,7 @@
 #
 
 #set -e 
-set -x
+#set -x
 set -u
 shopt -s globstar
 
