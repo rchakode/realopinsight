@@ -237,7 +237,7 @@ upload_packages()
       curl $VERBOSE -T $FILE -u$BINTRAY_USER:$BINTRAY_APIKEY \
            -H "X-Bintray-Package:$PKG_NAME" \
            -H "X-Bintray-Version:$DIST" \
-           -X PUT https://api.bintray.com/content/$BINTRAY_ACCOUNT/$PKG_TYPE/
+            https://api.bintray.com/content/$BINTRAY_ACCOUNT/$PKG_TYPE/$PKG_NAME-$PKG_VERSION-$DIST.$PKG_ARCH.rpm
       echo ""
     done
   done
