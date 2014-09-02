@@ -93,6 +93,9 @@ public Q_SLOTS:
   void handleAddDataPointEntry(void) { addAndSelectDataPointEntry(m_dataPointSearchField->text());}
   void handleDataPointFieldReturnPressed(void);
   void handleUpdateDataPointsList(void);
+  void handleAddThreshold(void);
+  void handleRemoveThreshold(void);
+  void handleThresholdRulesChanged(void);
 
 Q_SIGNALS:
   void saveClicked(void);
@@ -136,7 +139,7 @@ private:
     IconButton(const QString& path, QWidget*parent = 0) : QPushButton(QIcon(path), "", parent) {
       setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
       setParent(parent);
-      setStyleSheet("border:none;");
+      //setStyleSheet("border:none;");
       setFixedSize(QSize(24, 24));
     }
   };
@@ -154,7 +157,12 @@ private:
   QPushButton* m_searchDataPointButton;
   QPushButton* m_addDataPointButton;
   WeightBox* m_weightBox;
-  WeightBox* m_failureWeightBox;
+  WeightBox* m_thresholdWeightBox;
+  QComboBox* m_thresholdInSeverityBox;
+  QComboBox* m_thresholdOutSeverityBox;
+  QComboBox* m_thresholdRulesBox;
+  IconButton* m_addThresholdButton;
+  IconButton* m_removeThresholdButton;
 
   void addEvent(void);
   void layoutLabelFields(void);

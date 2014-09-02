@@ -33,7 +33,7 @@ typedef QList<QListWidgetItem*> CheckItemList;
 namespace {
   const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
-  }
+}
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
@@ -93,6 +93,11 @@ void ServiceEditor::addEvent(void)
   connect(m_hostGroupFilterBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(handleUpdateDataPointsList()));
   connect(m_actionButtonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
   connect(m_actionButtonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
+
+
+  connect(m_addThresholdButton, SIGNAL(clicked()), this, SLOT(handleAddThreshold()));
+  connect(m_removeThresholdButton, SIGNAL(clicked()), this, SLOT(handleRemoveThreshold()));
+  connect(m_thresholdRulesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(handleThresholdRulesChanged()));
 }
 
 
@@ -175,8 +180,8 @@ void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
-  statusCalcRuleField()->setCurrentText(CalcRules(_node.sev_crule).toString());
-  statusPropRuleField()->setCurrentText(PropRules(_node.sev_prule).toString());
+  statusCalcRuleField()->setCurrentIndex( statusCalcRuleField()->findText( CalcRules(_node.sev_crule).toString() ));
+  statusPropRuleField()->setCurrentIndex( statusPropRuleField()->findText( PropRules(_node.sev_prule).toString() ));
   iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
   descriptionField()->setText(_node.description);
   alarmMsgField()->setText(_node.alarm_msg);
@@ -241,10 +246,17 @@ void ServiceEditor::layoutStatusCalcFields(void)
     statusCalcRuleField()->addItem(rule, rules.value(rule));
   }
 
-  QComboBox* thresholdInSeverityBox = new QComboBox(this);
-  QComboBox* thresholdOutSeverityBox = new QComboBox(this);
-  QComboBox* thresholdRulesBox = new QComboBox(this);
-  thresholdRulesBox->addItem(tr("Select rule to delete"));
+  QHBoxLayout* detailsFieldLayout = new QHBoxLayout();
+  detailsFieldLayout->addWidget(new QLabel(tr("If threshold of"), this), 0);
+  detailsFieldLayout->addWidget(m_thresholdWeightBox = new WeightBox(WeightThreshold, this));
+  detailsFieldLayout->addWidget(m_thresholdInSeverityBox = new QComboBox(this), 2);
+  detailsFieldLayout->addWidget(new QLabel(tr("set to"), this), 1);
+  detailsFieldLayout->addWidget(m_thresholdOutSeverityBox = new QComboBox(this),  2);
+  detailsFieldLayout->addWidget(m_addThresholdButton = new IconButton(":images/built-in/document-add_32x32.png", this), 1);
+  detailsFieldLayout->addWidget(m_thresholdRulesBox = new QComboBox(this), 5);
+  detailsFieldLayout->addWidget(m_removeThresholdButton = new IconButton(":images/built-in/document-remove_32x32.png", this), 1);
+
+  m_thresholdRulesBox->addItem(tr("Select rule to remove"));
 
   QMap<qint8, Severity> allSeverities;
   allSeverities.insert(ngrt4n::Normal, Severity(ngrt4n::Normal));
@@ -254,18 +266,9 @@ void ServiceEditor::layoutStatusCalcFields(void)
   allSeverities.insert(ngrt4n::Unknown, Severity(ngrt4n::Unknown));
 
   Q_FOREACH(const Severity& sev, allSeverities) {
-    thresholdInSeverityBox->addItem(sev.toString(), sev.valueString());
-    thresholdOutSeverityBox->addItem(sev.toString(), sev.valueString());
+    m_thresholdInSeverityBox->addItem(sev.toString(), sev.valueString());
+    m_thresholdOutSeverityBox->addItem(sev.toString(), sev.valueString());
   }
-  QHBoxLayout* detailsFieldLayout = new QHBoxLayout();
-  detailsFieldLayout->addWidget(new QLabel(tr("If threshold of"), this), 0);
-  detailsFieldLayout->addWidget(m_failureWeightBox = new WeightBox(WeightThreshold, this));
-  detailsFieldLayout->addWidget(thresholdInSeverityBox, 5);
-  detailsFieldLayout->addWidget(new QLabel(tr("set to"), this), 1);
-  detailsFieldLayout->addWidget(thresholdOutSeverityBox,  5);
-  detailsFieldLayout->addWidget(new IconButton(":images/built-in/document-add_32x32.png", this), 1);
-  detailsFieldLayout->addWidget(thresholdRulesBox, 5);
-  detailsFieldLayout->addWidget(new IconButton(":images/built-in/document-remove_32x32.png", this), 1);
 
   ++m_currentRow;
   m_mainLayout->addWidget(new QLabel(tr("Severiry Calculation Rule"), this), m_currentRow, 0);
@@ -476,5 +479,28 @@ void ServiceEditor::handleUpdateDataPointsList(void)
   } else {
     checkField()->addItems(m_dataPoints[ selectedGroup ]);
   }
-  // m_dataPoints.sort(Qt::CaseInsensitive);
+}
+
+
+void ServiceEditor::handleAddThreshold(void)
+{
+  QString valueText = QString::number(m_thresholdWeightBox->value());
+  QString inSev = m_thresholdInSeverityBox->itemData(m_thresholdInSeverityBox->currentIndex()).toString();
+  QString outSev = m_thresholdOutSeverityBox->itemData(m_thresholdOutSeverityBox->currentIndex()).toString();
+  QString text = QString("set %1\% %2 to %3").arg(valueText, m_thresholdInSeverityBox->currentText(), m_thresholdOutSeverityBox->currentText());
+  QString data = QString("%1x%2=%3").arg(valueText, inSev, outSev);
+
+  if (m_thresholdRulesBox->findData(data) == -1)
+    m_thresholdRulesBox->addItem(text,data);
+}
+
+void ServiceEditor::handleRemoveThreshold(void)
+{
+  if (m_thresholdRulesBox->currentIndex() > 0)
+    m_thresholdRulesBox->removeItem(m_thresholdRulesBox->currentIndex());
+}
+
+void ServiceEditor::handleThresholdRulesChanged(void)
+{
+  m_removeThresholdButton->setEnabled(m_thresholdRulesBox->count() > 1);
 }
