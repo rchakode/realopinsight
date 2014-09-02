@@ -37,29 +37,8 @@ namespace {
                                                        "Data Point: %3\n"
                                                        "Raw Output: %4\n"
                                                        "Other Details: %5"));
-}
-
-QString ngrt4n::severityText(const qint32& _status)
-{
-  switch(static_cast<ngrt4n::SeverityT>(_status))
-  {
-    case ngrt4n::Normal:
-      return QObject::tr("Normal");
-      break;
-    case ngrt4n::Minor:
-      return  QObject::tr("Minor");
-      break;
-    case ngrt4n::Major:
-      return  QObject::tr("Major");
-      break;
-    case ngrt4n::Critical:
-      return  QObject::tr("Critical");
-      break;
-    default:
-      break;
   }
-  return QObject::tr("Unknown");
-}
+
 
 void ngrt4n::clear(CoreDataT& _cdata)
 {
@@ -74,77 +53,77 @@ QString ngrt4n::getAbsolutePath(const QString& _path)
   return fileInfo.absoluteFilePath();
 }
 
-ngrt4n::SeverityT ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity)
+qint8 ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity)
 {
-  int criticity = ngrt4n::Unknown;
+  qint8 criticity = ngrt4n::Unknown;
   if(_monitor == ngrt4n::Nagios) {
     switch(_statusOrSeverity) {
-      case ngrt4n::NagiosOk:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::NagiosWarning:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::NagiosCritical:
-        criticity = ngrt4n::Critical;
-        break;
-      default:
-        break;
+    case ngrt4n::NagiosOk:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::NagiosWarning:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::NagiosCritical:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
     }
   } else if (_monitor == ngrt4n::Zabbix) {
     switch(_statusOrSeverity) {
-      case ngrt4n::ZabbixClear:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::ZabbixInfo:
-      case ngrt4n::ZabbixWarn:
-        criticity = ngrt4n::Minor;
-        break;
-      case ngrt4n::ZabbixAverage:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::ZabbixHigh:
-      case ngrt4n::ZabbixDisaster:
-        criticity = ngrt4n::Critical;
-        break;
-      default:
-        break;
+    case ngrt4n::ZabbixClear:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::ZabbixInfo:
+    case ngrt4n::ZabbixWarn:
+      criticity = ngrt4n::Minor;
+      break;
+    case ngrt4n::ZabbixAverage:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::ZabbixHigh:
+    case ngrt4n::ZabbixDisaster:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
     }
   } else if (_monitor == ngrt4n::Zenoss){
     switch(_statusOrSeverity) {
-      case ngrt4n::ZenossClear:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::ZenossDebug:
-        criticity = ngrt4n::Minor;
-        break;
-      case ngrt4n::ZenossWarning:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::ZenossError:
-      case ngrt4n::ZenossCritical:
-        criticity = ngrt4n::Critical;
-        break;
-      default:
-        break;
+    case ngrt4n::ZenossClear:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::ZenossDebug:
+      criticity = ngrt4n::Minor;
+      break;
+    case ngrt4n::ZenossWarning:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::ZenossError:
+    case ngrt4n::ZenossCritical:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
     }
   }
   return static_cast<ngrt4n::SeverityT>(criticity);
 }
 
-int ngrt4n::severityFromPropRule(const qint8& _critValue, const qint8& prule)
+qint8 ngrt4n::severityFromPropRule(qint8 mysev, qint8 prule)
 {
-  ngrt4n::SeverityT result = static_cast<ngrt4n::SeverityT>(_critValue);
-  SeverityHelper sh(static_cast<ngrt4n::SeverityT>(_critValue));
+  qint8 result = static_cast<ngrt4n::SeverityT>(mysev);
+  Severity sevObj(static_cast<ngrt4n::SeverityT>(mysev));
   switch(prule) {
-    case PropRules::Increased:
-      result = (++sh).getValue();
-      break;
-    case PropRules::Decreased:
-      result = (--sh).getValue();
-      break;
-    default:
-      break;
+  case PropRules::Increased:
+    result = (++sevObj).value();
+    break;
+  case PropRules::Decreased:
+    result = (--sevObj).value();
+    break;
+  default:
+    break;
   }
   return result;
 }
@@ -157,13 +136,13 @@ SeverityWeightInfoT ngrt4n::severityFromCalcRule(QVector<SeverityWeightInfoT>& d
   if (len >= 1) {
     qSort(data.begin(), data.end());
     switch (crule) {
-      case CalcRules::WeightedCriticity:
-        result = ngrt4n::meanSeverities(data[0], data[len - 1]);
-        break;
-      case CalcRules::HighCriticity:
-      default:
-        result = data[len-1];
-        break;
+    case CalcRules::AverageSeverity:
+      result = ngrt4n::meanSeverities(data[0], data[len - 1]);
+      break;
+    case CalcRules::WorstSeverity:
+    default:
+      result = data[len-1];
+      break;
     }
   }
   return result;
@@ -199,20 +178,20 @@ QString ngrt4n::getIconPath(int _severity)
 {
   QString ipath("images/built-in/unknown.png");
   switch (static_cast<ngrt4n::SeverityT>(_severity)) {
-    case ngrt4n::Normal:
-      ipath = "images/built-in/normal.png";
-      break;
-    case ngrt4n::Minor:
-      ipath = "images/built-in/minor.png";
-      break;
-    case ngrt4n::Major:
-      ipath = "images/built-in/major.png";
-      break;
-    case ngrt4n::Critical:
-      ipath = "images/built-in/critical.png";
-      break;
-    default:
-      break;
+  case ngrt4n::Normal:
+    ipath = "images/built-in/normal.png";
+    break;
+  case ngrt4n::Minor:
+    ipath = "images/built-in/minor.png";
+    break;
+  case ngrt4n::Major:
+    ipath = "images/built-in/major.png";
+    break;
+  case ngrt4n::Critical:
+    ipath = "images/built-in/critical.png";
+    break;
+  default:
+    break;
   }
   return ipath;
 }
@@ -390,9 +369,9 @@ QString ngrt4n::generateToolTip(const NodeT& node)
 {
   QString toolTip = DEFAULT_TIP_PATTERN.arg(node.name,
                                             const_cast<QString&>(node.description).replace("\n", " "),
-                                            ngrt4n::severityText(node.sev),
-                                            CalcRules::label(node.sev_crule),
-                                            PropRules::label(node.sev_prule));
+                                            Severity(node.sev).toString(),
+                                            CalcRules(node.sev_crule).toString(),
+                                            PropRules(node.sev_prule).toString());
   if (node.type == NodeType::AlarmNode) {
     toolTip.append(ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(node.check.host).replace("\n", " "),
                                                   QString::fromStdString(node.check.host_groups),

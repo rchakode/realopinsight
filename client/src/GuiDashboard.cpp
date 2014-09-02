@@ -43,18 +43,16 @@ namespace {
 
 StringMapT GuiDashboard::propRules() {
   StringMapT map;
-  map.insert(PropRules::label(PropRules::Unchanged), PropRules::toString(PropRules::Unchanged));
-  map.insert(PropRules::label(PropRules::Decreased), PropRules::toString(PropRules::Decreased));
-  map.insert(PropRules::label(PropRules::Increased), PropRules::toString(PropRules::Increased));
+  map.insert(PropRules(PropRules::Unchanged).toString(), PropRules(PropRules::Unchanged).valueString());
+  map.insert(PropRules(PropRules::Decreased).toString(), PropRules(PropRules::Decreased).valueString());
+  map.insert(PropRules(PropRules::Increased).toString(), PropRules(PropRules::Increased).valueString());
   return map;
 }
 
 StringMapT GuiDashboard::calcRules() {
   StringMapT map;
-  map.insert(CalcRules::label(CalcRules::HighCriticity),
-             CalcRules::toString(CalcRules::HighCriticity));
-  map.insert(CalcRules::label(CalcRules::WeightedCriticity),
-             CalcRules::toString(CalcRules::WeightedCriticity));
+  map.insert(CalcRules(CalcRules::WorstSeverity).toString(), CalcRules(CalcRules::WorstSeverity).valueString());
+  map.insert(CalcRules(CalcRules::AverageSeverity).toString(),CalcRules(CalcRules::AverageSeverity).valueString());
   return map;
 }
 
@@ -283,7 +281,7 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
-                                                 ngrt4n::severityText(_node.sev).toUpper());
+                                                 Severity(_node.sev).toString().toUpper());
 
   m_trayIcon->showMessage(title, msg, icon);
   m_trayIcon->setToolTip(title%"\n"%msg);

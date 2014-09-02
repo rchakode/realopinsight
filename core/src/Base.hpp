@@ -165,15 +165,14 @@ public:
     Increased = 2
   };
 
-  static QString toString(PropRulesT rule) {
-    return QString::number(rule);
+  PropRules(int rule) : m_rule(rule) {}
+
+  QString valueString(void) {
+    return QString::number(m_rule);
   }
 
-  static QString label(qint32 rule) {
-    return label(static_cast<PropRulesT>(rule));
-  }
-  static QString label(PropRulesT rule) {
-    switch(rule) {
+  QString toString(void) {
+    switch( static_cast<PropRulesT>(m_rule) ) {
     case Unchanged: return QObject::tr("Unchanged");
     case Decreased: return QObject::tr("Decreased");
     case Increased: return QObject::tr("Increased");
@@ -181,20 +180,44 @@ public:
 
     return QObject::tr("Unchanged");
   }
+
+
+
+private:
+  int m_rule;
 };
 
 
 class CalcRules {
 public:
   enum CalcRulesT{
-    HighCriticity = 0,
-    WeightedCriticity = 1
+    WorstSeverity = 0,
+    AverageSeverity = 1,
+    WeightedThresholdSeverity = 2
   };
-  static QString toString(CalcRulesT rule) { return QString::number(rule);}
-  static QString label(qint32 rule) { return label(static_cast<CalcRulesT>(rule));}
-  static QString label(CalcRulesT rule) {
-    if (rule == WeightedCriticity) return QObject::tr("Average");
-    return QObject::tr("High Severity");}
+
+  CalcRules(int rule) : m_rule(rule) {}
+  QString valueString(void) { return QString::number(m_rule);}
+
+  QString toString(void) const {
+    QString result = QObject::tr("Default");
+    switch (m_rule) {
+    case AverageSeverity:
+      result = "Average";
+      break;
+    case WeightedThresholdSeverity:
+      result = "Weighted Thresholds";
+      break;
+    case WorstSeverity:
+    default:
+      result = QObject::tr("Worst Severity");
+      break;
+    }
+    return result;
+  }
+
+private:
+  int m_rule;
 };
 
 class NodeType {
@@ -203,7 +226,7 @@ public:
     ServiceNode = 0,
     AlarmNode = 1
   };
-  static QString toString(int _type ) {
+  static QString toString(int _type) {
     if (_type == AlarmNode )
       return QObject::tr("Native Check");
     return QObject::tr("Business Process");
@@ -211,102 +234,126 @@ public:
 };
 
 
-class SeverityHelper {
+class Severity {
 public:
-  SeverityHelper(ngrt4n::SeverityT _value): value(_value) {}
-  void setValue(ngrt4n::SeverityT _value) {value = _value;}
-  ngrt4n::SeverityT getValue() const {return value;}
+  Severity(int sev): m_sev(sev) {}
 
-  SeverityHelper operator *(SeverityHelper& sh) const {
-    switch(value) {
+  void setValue(int _value) {m_sev = _value;}
+  int value() const {return m_sev;}
+
+  QString valueString(void) const {return QString::number(m_sev);}
+
+  QString toString(void) const {
+    switch( m_sev )
+    {
+      case ngrt4n::Normal:
+        return QObject::tr("Normal");
+        break;
+      case ngrt4n::Minor:
+        return  QObject::tr("Minor");
+        break;
+      case ngrt4n::Major:
+        return  QObject::tr("Major");
+        break;
+      case ngrt4n::Critical:
+        return  QObject::tr("Critical");
+        break;
+      default:
+        break;
+    }
+    return QObject::tr("Unknown");
+  }
+
+  Severity operator *(Severity& sev) const {
+    switch(m_sev) {
     case ngrt4n::Critical:
-      return SeverityHelper(value);
+      return Severity(m_sev);
       break;
     case ngrt4n::Normal:
-      return sh;
+      return sev;
       break;
     case ngrt4n::Minor:
-      if(sh.value == ngrt4n::Critical ||
-         sh.value == ngrt4n::Major ||
-         sh.value == ngrt4n::Unknown)
-        return sh;
+      if(sev.m_sev == ngrt4n::Critical ||
+         sev.m_sev == ngrt4n::Major ||
+         sev.m_sev == ngrt4n::Unknown)
+        return sev;
 
-      return SeverityHelper(value);
+      return Severity(m_sev);
       break;
     case ngrt4n::Major:
-      if(sh.value == ngrt4n::Critical ||
-         sh.value == ngrt4n::Unknown)
-        return sh;
+      if(sev.m_sev == ngrt4n::Critical ||
+         sev.m_sev == ngrt4n::Unknown)
+        return sev;
 
-      return SeverityHelper(value);
+      return Severity(m_sev);
       break;
     default:
       // MonitorBroker::CRITICITY_UNKNOWN
-      if(sh.value == ngrt4n::Critical)
-        return sh;
+      if(sev.m_sev == ngrt4n::Critical)
+        return sev;
       break;
     }  //end switch
 
-    return SeverityHelper(ngrt4n::Unknown);
+    return Severity(ngrt4n::Unknown);
   }
 
 
-  SeverityHelper operator / (SeverityHelper& st) const {
-    if(value == st.value)
+  Severity operator / (Severity& st) const {
+    if(m_sev == st.m_sev)
       return st;
 
-    if(value == ngrt4n::Critical ||
-       st.value == ngrt4n::Critical)
-      return SeverityHelper(ngrt4n::Critical);
+    if(m_sev == ngrt4n::Critical ||
+       st.m_sev == ngrt4n::Critical)
+      return Severity(ngrt4n::Critical);
 
-    if(value == ngrt4n::Unknown ||
-       st.value == ngrt4n::Unknown)
-      return SeverityHelper(ngrt4n::Unknown);
+    if(m_sev == ngrt4n::Unknown ||
+       st.m_sev == ngrt4n::Unknown)
+      return Severity(ngrt4n::Unknown);
 
-    if(value == ngrt4n::Major ||
-       st.value == ngrt4n::Major)
-      return SeverityHelper(ngrt4n::Major);
+    if(m_sev == ngrt4n::Major ||
+       st.m_sev == ngrt4n::Major)
+      return Severity(ngrt4n::Major);
 
-    if(value == ngrt4n::Minor ||
-       st.value == ngrt4n::Minor)
-      return SeverityHelper(ngrt4n::Minor);
+    if(m_sev == ngrt4n::Minor ||
+       st.m_sev == ngrt4n::Minor)
+      return Severity(ngrt4n::Minor);
 
-    return SeverityHelper(ngrt4n::Normal);
+    return Severity(ngrt4n::Normal);
   }
 
-  SeverityHelper operator ++() {
-    switch(value) {
+  Severity operator ++() {
+    switch(m_sev) {
     case ngrt4n::Minor:
-      return SeverityHelper(ngrt4n::Major);
+      return Severity(ngrt4n::Major);
       break;
     case ngrt4n::Major:
-      return SeverityHelper(ngrt4n::Critical);
+      return Severity(ngrt4n::Critical);
       break;
     default:
       //leave unchanged
       break;
     }
-    return SeverityHelper(value);
+    return Severity(m_sev);
   }
 
-  SeverityHelper operator--() {
+  Severity operator--() {
 
-    switch(value) {
+    switch(m_sev) {
     case ngrt4n::Critical:
-      return SeverityHelper(ngrt4n::Major);
+      return Severity(ngrt4n::Major);
       break;
     case ngrt4n::Major:
-      return SeverityHelper(ngrt4n::Minor);
+      return Severity(ngrt4n::Minor);
       break;
     default:
       //leave unchanged
       break;
     }
-    return SeverityHelper(value);
+    return Severity(m_sev);
   }
 
 private:
-  ngrt4n::SeverityT value;
+  int m_sev;
 };
 
 struct NodeT {
@@ -332,7 +379,7 @@ struct NodeT {
   double pos_y;
   NodeT():
     sev_crule(PropRules::Unchanged),
-    sev_prule(CalcRules::HighCriticity),
+    sev_prule(CalcRules::WorstSeverity),
     sev(ngrt4n::Unknown),
     weight(1){}
 };

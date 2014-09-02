@@ -102,6 +102,45 @@ Q_SIGNALS:
 
 
 private:
+  enum WeightType {
+    WeightNormalized = 0,
+    WeightThreshold = 1
+  };
+
+  class WeightBox : public QDoubleSpinBox {
+  public:
+    WeightBox(qint8 weightType, QWidget* parent = 0) : QDoubleSpinBox(parent) {
+
+      switch (weightType) {
+      case WeightThreshold:
+        setRange(0, 100);
+        setValue(100);
+        setDecimals(0);
+        setSingleStep(5);
+        setSuffix(tr(" %"));
+        break;
+      case WeightNormalized:
+      default:
+        setRange(0, 1);
+        setValue(0.1);
+        setDecimals(1);
+        setSingleStep(0.05);
+        break;
+      }
+    }
+  };
+
+
+  class IconButton : public QPushButton {
+  public:
+    IconButton(const QString& path, QWidget*parent = 0) : QPushButton(QIcon(path), "", parent) {
+      setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+      setParent(parent);
+      setStyleSheet("border:none;");
+      setFixedSize(QSize(24, 24));
+    }
+  };
+
   qint32 m_rows;
   qint16 m_currentRow;
   WidgetMapT m_fieldWidgets;
@@ -114,12 +153,15 @@ private:
   QStackedWidget* m_dataPointActionButtons;
   QPushButton* m_searchDataPointButton;
   QPushButton* m_addDataPointButton;
+  WeightBox* m_weightBox;
+  WeightBox* m_failureWeightBox;
 
   void addEvent(void);
   void layoutLabelFields(void);
   void layoutDescriptionFields(void);
   void layoutTypeFields(void);
-  void layoutStatusHandlingFields(void);
+  void layoutStatusCalcFields(void);
+  void layoutStatusPropFields(void);
   void layoutAlarmMsgFields(void);
   void layoutNotificationMsgFields(void);
   void layoutIconFields(void);

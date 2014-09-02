@@ -54,19 +54,26 @@ namespace {
   } //namespace
 
 StringMapT DashboardBase::propRules() {
+  PropRules unchanged(PropRules::Unchanged);
+  PropRules decreased(PropRules::Decreased);
+  PropRules increased(PropRules::Increased);
+
   StringMapT map;
-  map.insert(PropRules::label(PropRules::Unchanged), PropRules::toString(PropRules::Unchanged));
-  map.insert(PropRules::label(PropRules::Decreased), PropRules::toString(PropRules::Decreased));
-  map.insert(PropRules::label(PropRules::Increased), PropRules::toString(PropRules::Increased));
+  map.insert(unchanged.toString(), unchanged.valueString());
+  map.insert(decreased.toString(), decreased.valueString());
+  map.insert(increased.toString(), increased.valueString());
   return map;
 }
 
 StringMapT DashboardBase::calcRules() {
+  CalcRules worst(CalcRules::WorstSeverity);
+  CalcRules average(CalcRules::AverageSeverity);
+  CalcRules weighted(CalcRules::WeightedThresholdSeverity);
+
   StringMapT map;
-  map.insert(CalcRules::label(CalcRules::HighCriticity),
-             CalcRules::toString(CalcRules::HighCriticity));
-  map.insert(CalcRules::label(CalcRules::WeightedCriticity),
-             CalcRules::toString(CalcRules::WeightedCriticity));
+  map.insert(worst.toString(), worst.valueString());
+  map.insert(average.toString(), average.valueString());
+  map.insert(weighted.toString(), weighted.valueString());
   return map;
 }
 

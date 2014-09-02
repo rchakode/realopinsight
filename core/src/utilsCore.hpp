@@ -75,11 +75,10 @@ namespace ngrt4n
   inline QString libVersion(void)
   { return PKG_VERSION; }
 
-  QString severityText(const qint32& _status);
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
-  ngrt4n::SeverityT severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity);
-  int severityFromPropRule(const qint8& _criticity, const qint8& prule);
+  qint8 severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity);
+  qint8 severityFromPropRule(qint8 mysev, qint8 prule);
   SeverityWeightInfoT severityFromCalcRule(QVector<SeverityWeightInfoT>& data, int crule);
   SeverityWeightInfoT meanSeverities(const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2);
   QString getIconPath(int _severity);
