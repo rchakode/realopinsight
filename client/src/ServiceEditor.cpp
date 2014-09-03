@@ -28,12 +28,13 @@
 #include "GraphView.hpp"
 #include "DashboardBase.hpp"
 #include "utilsCore.hpp"
+#include "ThresholdHelper.hpp"
 
 typedef QList<QListWidgetItem*> CheckItemList;
 namespace {
   const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
-}
+  }
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
@@ -93,8 +94,6 @@ void ServiceEditor::addEvent(void)
   connect(m_hostGroupFilterBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(handleUpdateDataPointsList()));
   connect(m_actionButtonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
   connect(m_actionButtonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
-
-
   connect(m_addThresholdButton, SIGNAL(clicked()), this, SLOT(handleAddThreshold()));
   connect(m_removeThresholdButton, SIGNAL(clicked()), this, SLOT(handleRemoveThreshold()));
   connect(m_thresholdRulesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(handleThresholdRulesChanged()));
@@ -159,6 +158,8 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
   _node.description      = descriptionField()->toPlainText();
   _node.alarm_msg        = alarmMsgField()->toPlainText();
   _node.notification_msg = notificationMsgField()->toPlainText();
+  _node.thresholds = ThresholdHelper::dataToList( thresholdsData() );
+
   if(_node.type == NodeType::AlarmNode) {
     QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
     if (! selectedItems.isEmpty())
@@ -168,15 +169,14 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
   return true;
 }
 
-void ServiceEditor::fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId)
+void ServiceEditor::fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId)
 {
   NodeListT::const_iterator node = nodes.find(nodeId);
-  if( node != nodes.end()) fillFormWithNodeContent(node);
+  if (node != nodes.end())
+    fillInEditorWithContent(*node);
 }
 
-
-
-void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
+void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
@@ -186,6 +186,16 @@ void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
   descriptionField()->setText(_node.description);
   alarmMsgField()->setText(_node.alarm_msg);
   notificationMsgField()->setText(_node.notification_msg);
+
+  // thresholds entries
+  m_thresholdRulesBox->clear();
+  Q_FOREACH(const ThresholdT& th, _node.thresholds) {
+    ThresholdHelper thHelper(th.weight, th.sev_in, th.sev_out);
+    if (thHelper.isValid())
+      m_thresholdRulesBox->addItem(thHelper.toString(), thHelper.data());
+    else
+      Q_EMIT errorOccurred(tr("Invalid threshold rule: %1").arg(thHelper.data()));
+  }
 
   if (_node.type == NodeType::AlarmNode) {
     QStringList childNodes = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
@@ -255,8 +265,7 @@ void ServiceEditor::layoutStatusCalcFields(void)
   detailsFieldLayout->addWidget(m_addThresholdButton = new IconButton(":images/built-in/document-add_32x32.png", this), 1);
   detailsFieldLayout->addWidget(m_thresholdRulesBox = new QComboBox(this), 5);
   detailsFieldLayout->addWidget(m_removeThresholdButton = new IconButton(":images/built-in/document-remove_32x32.png", this), 1);
-
-  m_thresholdRulesBox->addItem(tr("Select rule to remove"));
+  m_removeThresholdButton->setEnabled(false);
 
   QMap<qint8, Severity> allSeverities;
   allSeverities.insert(ngrt4n::Normal, Severity(ngrt4n::Normal));
@@ -484,23 +493,42 @@ void ServiceEditor::handleUpdateDataPointsList(void)
 
 void ServiceEditor::handleAddThreshold(void)
 {
-  QString valueText = QString::number(m_thresholdWeightBox->value());
-  QString inSev = m_thresholdInSeverityBox->itemData(m_thresholdInSeverityBox->currentIndex()).toString();
-  QString outSev = m_thresholdOutSeverityBox->itemData(m_thresholdOutSeverityBox->currentIndex()).toString();
-  QString text = QString("set %1\% %2 to %3").arg(valueText, m_thresholdInSeverityBox->currentText(), m_thresholdOutSeverityBox->currentText());
-  QString data = QString("%1x%2=%3").arg(valueText, inSev, outSev);
+  qint32 inSev = m_thresholdInSeverityBox->itemData(m_thresholdInSeverityBox->currentIndex()).toInt();
+  qint32 outSev = m_thresholdOutSeverityBox->itemData(m_thresholdOutSeverityBox->currentIndex()).toInt();
+  ThresholdHelper th(m_thresholdWeightBox->value() / 100, ThresholdHelper::toValidSeverity(inSev), ThresholdHelper::toValidSeverity(outSev));
+  QString data = th.data();
 
   if (m_thresholdRulesBox->findData(data) == -1)
-    m_thresholdRulesBox->addItem(text,data);
+    m_thresholdRulesBox->addItem(th.toString(), data);
+  else {
+    Q_EMIT errorOccurred(tr("Rule already set"));
+  }
 }
 
 void ServiceEditor::handleRemoveThreshold(void)
 {
-  if (m_thresholdRulesBox->currentIndex() > 0)
+  if (m_thresholdRulesBox->currentIndex() >= 0)
     m_thresholdRulesBox->removeItem(m_thresholdRulesBox->currentIndex());
 }
 
+
 void ServiceEditor::handleThresholdRulesChanged(void)
 {
-  m_removeThresholdButton->setEnabled(m_thresholdRulesBox->count() > 1);
+  bool enable = m_thresholdRulesBox->count() > 0;
+  m_removeThresholdButton->setEnabled(enable);
+  m_thresholdRulesBox->setEnabled(enable);
+}
+
+QString ServiceEditor::thresholdsData(void) const
+{
+  QString result = "";
+  int nbEntries = m_thresholdRulesBox->count();
+  for (int index = 0; index < nbEntries; ++index) {
+    if (! result.isEmpty())
+      result.append( ngrt4n::CHILD_SEP.c_str() );
+
+    result.append( m_thresholdRulesBox->itemData(index).toString() );
+  }
+
+  return result;
 }

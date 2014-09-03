@@ -64,9 +64,8 @@ public:
   virtual ~ServiceEditor();
 
   void layoutEditorComponents(void);
-  void fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId);
-  void fillFormWithNodeContent(const NodeT& _node);
-  void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
+  void fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId);
+  void fillInEditorWithContent(const NodeT& _node);
   bool updateNodeInfo(NodeT& _node);
   void updateDataPoints(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
@@ -102,6 +101,7 @@ Q_SIGNALS:
   void closeClicked(void);
   void returnPressed(void);
   void nodeTypeActivated(qint32);
+  void errorOccurred(QString);
 
 
 private:
@@ -178,6 +178,7 @@ private:
   QLabel* createCheckFieldHelpIcon(void);
   void setCheckFieldsStyle(void);
   void addAndSelectDataPointEntry(const QString& text);
+  QString thresholdsData(void) const;
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */

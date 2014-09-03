@@ -154,6 +154,7 @@ namespace ngrt4n {
   const std::string TAG_CHECK = "\\{check_name\\}";
   const std::string TAG_THERESHOLD = "\\{threshold\\}";
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
+  const double WEIGHT_UNIT = 0.1;
 
   } // namespace ngrt4n
 
@@ -246,20 +247,20 @@ public:
   QString toString(void) const {
     switch( m_sev )
     {
-      case ngrt4n::Normal:
-        return QObject::tr("Normal");
-        break;
-      case ngrt4n::Minor:
-        return  QObject::tr("Minor");
-        break;
-      case ngrt4n::Major:
-        return  QObject::tr("Major");
-        break;
-      case ngrt4n::Critical:
-        return  QObject::tr("Critical");
-        break;
-      default:
-        break;
+    case ngrt4n::Normal:
+      return QObject::tr("Normal");
+      break;
+    case ngrt4n::Minor:
+      return  QObject::tr("Minor");
+      break;
+    case ngrt4n::Major:
+      return  QObject::tr("Major");
+      break;
+    case ngrt4n::Critical:
+      return  QObject::tr("Critical");
+      break;
+    default:
+      break;
     }
     return QObject::tr("Unknown");
   }
@@ -356,6 +357,12 @@ private:
   int m_sev;
 };
 
+struct ThresholdT {
+  double weight;
+  int sev_in;
+  int sev_out;
+};
+
 struct NodeT {
   QString id;
   QString name;
@@ -370,18 +377,18 @@ struct NodeT {
   QString actual_msg;
   qint32 sev;
   qint32 sev_prop;
-  int weight;
+  double weight;
   QString child_nodes;
   CheckT check;
+  QVector<ThresholdT> thresholds;
   bool monitored;
   qint8 visibility;
   double pos_x;
   double pos_y;
-  NodeT():
-    sev_crule(PropRules::Unchanged),
+  NodeT(): sev_crule(PropRules::Unchanged),
     sev_prule(CalcRules::WorstSeverity),
     sev(ngrt4n::Unknown),
-    weight(1){}
+    weight(ngrt4n::WEIGHT_UNIT){}
 };
 
 struct SeverityWeightInfoT {

@@ -24,6 +24,7 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "utilsCore.hpp"
+#include "ThresholdHelper.hpp"
 #include <QObject>
 
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
@@ -85,10 +86,17 @@ bool Parser::process(bool console)
     node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
+
+    if (node.sev_crule == CalcRules::WeightedThresholdSeverity) {
+      QString thdata = service.firstChildElement("Thresholds").text().trimmed();
+      node.thresholds = ThresholdHelper::dataToList(thdata);
+    }
+
     node.check.status = -1;
     if (node.icon.isEmpty()) {
       node.icon = ngrt4n::DEFAULT_ICON;
     }
+
     if (node.type == NodeType::AlarmNode) {
       node.visibility = ngrt4n::Visible;
       StringPairT info = ngrt4n::splitHostCheckInfo(node.child_nodes);
