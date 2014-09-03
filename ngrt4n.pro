@@ -85,7 +85,8 @@ HEADERS += \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \
-    core/src/RawSocket.hpp
+    core/src/RawSocket.hpp \
+    core/src/Threshold.hpp
 
 
 SOURCES += \
@@ -99,7 +100,8 @@ SOURCES += \
     core/src/utilsCore.cpp \
     core/src/ChartBase.cpp \
     core/src/JsonHelper.cpp \
-    core/src/RawSocket.cpp
+    core/src/RawSocket.cpp \
+    core/src/Threshold.cpp
 
 gui-base {
 QT += svg gui webkit
