@@ -114,18 +114,18 @@ private:
 
       switch (weightType) {
       case WeightThreshold:
+        setDecimals(0);
         setRange(0, 100);
         setValue(100);
-        setDecimals(0);
-        setSingleStep(5);
+        setSingleStep(100 * 100 * ngrt4n::WEIGHT_UNIT);
         setSuffix(tr(" %"));
         break;
       case WeightNormalized:
       default:
-        setRange(ngrt4n::THRESHOLD_WEIGHT_MIN, ngrt4n::THRESHOLD_WEIGHT_MAX);
-        setValue(ngrt4n::THRESHOLD_WEIGHT_UNIT);
-        setSingleStep(ngrt4n::THRESHOLD_WEIGHT_UNIT);
         setDecimals(1);
+        setRange(ngrt4n::WEIGHT_MIN, ngrt4n::WEIGHT_MAX);
+        setValue(ngrt4n::WEIGHT_UNIT);
+        setSingleStep(ngrt4n::WEIGHT_UNIT);
         break;
       }
     }

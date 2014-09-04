@@ -154,9 +154,9 @@ namespace ngrt4n {
   const std::string TAG_CHECK = "\\{check_name\\}";
   const std::string TAG_THERESHOLD = "\\{threshold\\}";
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
-  const double THRESHOLD_WEIGHT_UNIT = 0.1;
-  const double THRESHOLD_WEIGHT_MIN = 0;
-  const double THRESHOLD_WEIGHT_MAX = 1;
+  const double WEIGHT_UNIT = 0.1;
+  const double WEIGHT_MIN = 0;
+  const double WEIGHT_MAX = 1;
 
   } // namespace ngrt4n
 
@@ -388,7 +388,7 @@ struct NodeT {
   NodeT(): sev_crule(PropRules::Unchanged),
     sev_prule(CalcRules::WorstSeverity),
     sev(ngrt4n::Unknown),
-    weight(ngrt4n::THRESHOLD_WEIGHT_UNIT){}
+    weight(ngrt4n::WEIGHT_UNIT){}
 };
 
 struct SeverityWeightInfoT {
