@@ -168,9 +168,7 @@ public:
 
   PropRules(int rule) : m_rule(rule) {}
 
-  QString valueString(void) {
-    return QString::number(m_rule);
-  }
+  QString data(void) { return QString::number(m_rule); }
 
   QString toString(void) {
     switch( static_cast<PropRulesT>(m_rule) ) {
@@ -198,16 +196,16 @@ public:
   };
 
   CalcRules(int rule) : m_rule(rule) {}
-  QString valueString(void) { return QString::number(m_rule);}
 
+  QString data(void) { return QString::number(m_rule);}
   QString toString(void) const {
     QString result = QObject::tr("Default");
     switch (m_rule) {
     case AverageSeverity:
-      result = "Average";
+      result = QObject::tr("Average");
       break;
     case WeightedThresholdSeverity:
-      result = "Weighted Thresholds";
+      result = QObject::tr("Weighted Thresholds");
       break;
     case WorstSeverity:
     default:

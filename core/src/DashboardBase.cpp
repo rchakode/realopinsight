@@ -59,9 +59,9 @@ StringMapT DashboardBase::propRules() {
   PropRules increased(PropRules::Increased);
 
   StringMapT map;
-  map.insert(unchanged.toString(), unchanged.valueString());
-  map.insert(decreased.toString(), decreased.valueString());
-  map.insert(increased.toString(), increased.valueString());
+  map.insert(unchanged.toString(), unchanged.data());
+  map.insert(decreased.toString(), decreased.data());
+  map.insert(increased.toString(), increased.data());
   return map;
 }
 
@@ -71,9 +71,9 @@ StringMapT DashboardBase::calcRules() {
   CalcRules weighted(CalcRules::WeightedThresholdSeverity);
 
   StringMapT map;
-  map.insert(worst.toString(), worst.valueString());
-  map.insert(average.toString(), average.valueString());
-  map.insert(weighted.toString(), weighted.valueString());
+  map.insert(worst.toString(), worst.data());
+  map.insert(average.toString(), average.data());
+  map.insert(weighted.toString(), weighted.data());
   return map;
 }
 

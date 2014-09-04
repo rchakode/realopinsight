@@ -43,16 +43,16 @@ namespace {
 
 StringMapT GuiDashboard::propRules() {
   StringMapT map;
-  map.insert(PropRules(PropRules::Unchanged).toString(), PropRules(PropRules::Unchanged).valueString());
-  map.insert(PropRules(PropRules::Decreased).toString(), PropRules(PropRules::Decreased).valueString());
-  map.insert(PropRules(PropRules::Increased).toString(), PropRules(PropRules::Increased).valueString());
+  map.insert(PropRules(PropRules::Unchanged).toString(), PropRules(PropRules::Unchanged).data());
+  map.insert(PropRules(PropRules::Decreased).toString(), PropRules(PropRules::Decreased).data());
+  map.insert(PropRules(PropRules::Increased).toString(), PropRules(PropRules::Increased).data());
   return map;
 }
 
 StringMapT GuiDashboard::calcRules() {
   StringMapT map;
-  map.insert(CalcRules(CalcRules::WorstSeverity).toString(), CalcRules(CalcRules::WorstSeverity).valueString());
-  map.insert(CalcRules(CalcRules::AverageSeverity).toString(),CalcRules(CalcRules::AverageSeverity).valueString());
+  map.insert(CalcRules(CalcRules::WorstSeverity).toString(), CalcRules(CalcRules::WorstSeverity).data());
+  map.insert(CalcRules(CalcRules::AverageSeverity).toString(),CalcRules(CalcRules::AverageSeverity).data());
   return map;
 }
 

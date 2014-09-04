@@ -152,8 +152,8 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
 {
   _node.name             = nameField()->text();
   _node.type             = typeField()->currentIndex();
-  _node.sev_crule        = statusCalcRuleField()->currentIndex();
-  _node.sev_prule        = statusPropRuleField()->currentIndex();
+  _node.sev_crule        = statusCalcRuleField()->itemData( statusCalcRuleField()->currentIndex() ).toInt();
+  _node.sev_prule        = statusPropRuleField()->itemData( statusPropRuleField()->currentIndex() ).toInt();
   _node.icon             = iconField()->currentText();
   _node.description      = descriptionField()->toPlainText();
   _node.alarm_msg        = alarmMsgField()->toPlainText();
@@ -180,8 +180,8 @@ void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
-  statusCalcRuleField()->setCurrentIndex( statusCalcRuleField()->findText( CalcRules(_node.sev_crule).toString() ));
-  statusPropRuleField()->setCurrentIndex( statusPropRuleField()->findText( PropRules(_node.sev_prule).toString() ));
+  statusCalcRuleField()->setCurrentIndex( statusCalcRuleField()->findData( CalcRules(_node.sev_crule).data() ));
+  statusPropRuleField()->setCurrentIndex( statusPropRuleField()->findText( PropRules(_node.sev_prule).data() ));
   iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
   descriptionField()->setText(_node.description);
   alarmMsgField()->setText(_node.alarm_msg);
