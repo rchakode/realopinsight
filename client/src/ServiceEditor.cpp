@@ -338,7 +338,7 @@ void ServiceEditor::layoutIconFields()
   m_fieldWidgets[ICON_FIELD] = new QComboBox(this);
 
   IconMapT icons = ngrt4n::nodeIcons();
-  QString header = QString("-->Select a icon (Default is %1)").arg(ngrt4n::DEFAULT_ICON);
+  QString header = QString("-->Select an icon (Default is %1)").arg(ngrt4n::DEFAULT_ICON);
   iconField()->addItem(header, icons.value(ngrt4n::DEFAULT_ICON));
   Q_FOREACH(const QString& label, icons.keys()) {
     QString path = icons.value(label);
