@@ -589,7 +589,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 void SvCreator::handleShowOnlineResources(void)
 {
   QDesktopServices launcher;
-  launcher.openUrl(QUrl(PKG_URL));
+  launcher.openUrl(QUrl(DOCS_URL));
 }
 
 void SvCreator::handleShowAbout(void)

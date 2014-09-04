@@ -183,7 +183,7 @@ void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
   m_calcRulesBox->setCurrentIndex( m_calcRulesBox->findData( CalcRules(_node.sev_crule).data() ));
-  m_propRulesBox->setCurrentIndex( m_propRulesBox->findText( PropRules(_node.sev_prule).data() ));
+  m_propRulesBox->setCurrentIndex( m_propRulesBox->findData( PropRules(_node.sev_prule).data() ));
   m_weightBox->setValue(_node.weight);
   iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
   descriptionField()->setText(_node.description);
@@ -429,8 +429,20 @@ QLabel* ServiceEditor::createCheckFieldHelpIcon(void)
                         "\n * For Zenoss it follows the patterns 'device_name/component_name'"
                         "\n    E.g. localhost/httpd, localhost"
                         "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
-                        "\nSee the online documentation for further details."
+                        "\nSee the online documentation for further details: http://docs.realopinsight.com/."
                         ));
+  label->setWhatsThis(tr("This depends on your monitoring configuration:"
+                         "\n * For Nagios this follows the patterns 'host_name/service_name'"
+                         "\n    E.g. mysql-server.example.com/Current Load."
+                         "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
+                         "\n * For Zabbix it follows the pattern 'host_name/trigger_name'"
+                         "\n    E.g. Zabbix server/Zabbix http poller processes more than 75% busy"
+                         "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
+                         "\n * For Zenoss it follows the patterns 'device_name/component_name'"
+                         "\n    E.g. localhost/httpd, localhost"
+                         "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
+                         "\nSee the online documentation for further details: http://docs.realopinsight.com/."
+                         ));
   return label;
 }
 

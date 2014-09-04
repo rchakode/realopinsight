@@ -104,7 +104,7 @@ void GuiDashboard::handleChangePasswordAction(void)
 void GuiDashboard::handleShowOnlineResources(void)
 {
   QDesktopServices appLauncher;
-  appLauncher.openUrl(QUrl("http://RealOpInsight.com/"));
+  appLauncher.openUrl(DOCS_URL);
 }
 
 void GuiDashboard::handleShowAbout(void)
