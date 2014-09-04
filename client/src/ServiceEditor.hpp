@@ -137,7 +137,6 @@ private:
     IconButton(const QString& path, QWidget*parent = 0) : QPushButton(QIcon(path), "", parent) {
       setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
       setParent(parent);
-      //setStyleSheet("border:none;");
       setFixedSize(QSize(24, 24));
     }
   };
