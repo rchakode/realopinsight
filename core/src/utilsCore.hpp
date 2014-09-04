@@ -79,8 +79,8 @@ namespace ngrt4n
   QString getAbsolutePath(const QString& _path);
   qint8 severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity);
   qint8 severityFromPropRule(qint8 mysev, qint8 prule);
-  SeverityWeightInfoT severityFromCalcRule(QVector<SeverityWeightInfoT>& data, int crule);
-  SeverityWeightInfoT meanSeverities(const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2);
+  AggregateSeverityInfoT severityFromCalcRule(QVector<AggregateSeverityInfoT>& data, int crule);
+  AggregateSeverityInfoT meanSeverities(const AggregateSeverityInfoT& s1, const AggregateSeverityInfoT& s2);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(NodeListT& bpnodes, NodeListT& cnodes,const QString& nodeId, NodeListT::iterator& node);

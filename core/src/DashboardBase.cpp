@@ -358,32 +358,33 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   }
 }
 
-SeverityWeightInfoT DashboardBase::updateNodeStates(const QString& _nodeId)
+AggregateSeverityInfoT DashboardBase::updateNodeStates(const QString& _nodeId)
 {
-  SeverityWeightInfoT result;
+  AggregateSeverityInfoT result;
 
   NodeListT::iterator node;
   if (! ngrt4n::findNode(m_cdata, _nodeId, node)) {
-    result.weight = 0;
+    result.sev_weights.clear();
     return result;
   }
 
   if (node->child_nodes.isEmpty()) {
+    result.sev_weights.clear();
     result.sev = ngrt4n::Unknown;
-    result.weight = node->weight;
+    result.sev_weights[result.sev] = node->weight;
     return result;
   }
 
   if (node->type == NodeType::AlarmNode) {
     result.sev = node->sev_prop;
-    result.weight = node->weight;
+    result.sev_weights[result.sev] = node->weight;
     return result;
   }
 
-  QVector<SeverityWeightInfoT> childSeverityInfos;
+  QVector<AggregateSeverityInfoT> childSeverityInfos;
   Q_FOREACH (const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     result = updateNodeStates(childId);
-    if (result.weight > 0)
+    if (! result.sev_weights.isEmpty()) //FIXME: result.weight > 0
       childSeverityInfos.push_back( result );
   }
 

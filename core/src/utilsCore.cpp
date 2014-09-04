@@ -128,9 +128,9 @@ qint8 ngrt4n::severityFromPropRule(qint8 mysev, qint8 prule)
   return result;
 }
 
-SeverityWeightInfoT ngrt4n::severityFromCalcRule(QVector<SeverityWeightInfoT>& data, int crule)
+AggregateSeverityInfoT ngrt4n::severityFromCalcRule(QVector<AggregateSeverityInfoT>& data, int crule)
 {
-  SeverityWeightInfoT result;
+  AggregateSeverityInfoT result;
 
   int len = data.size();
   if (len >= 1) {
@@ -148,10 +148,10 @@ SeverityWeightInfoT ngrt4n::severityFromCalcRule(QVector<SeverityWeightInfoT>& d
   return result;
 }
 
-SeverityWeightInfoT ngrt4n::meanSeverities(const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2)
+AggregateSeverityInfoT ngrt4n::meanSeverities(const AggregateSeverityInfoT& s1, const AggregateSeverityInfoT& s2)
 {
-  SeverityWeightInfoT result;
-  result.weight = (s1.weight + s2.weight) / 2;
+  AggregateSeverityInfoT result;
+  //FIXME: result.sev_weights = (s1.sev_weights + s2.sev_weights) / 2;
 
   if (s1.sev == s2.sev) {
     result.sev = s1.sev;

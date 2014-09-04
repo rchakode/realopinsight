@@ -392,11 +392,11 @@ struct NodeT {
     weight(ngrt4n::WEIGHT_UNIT){}
 };
 
-struct SeverityWeightInfoT {
+struct AggregateSeverityInfoT {
   int sev;
-  int weight;
-  SeverityWeightInfoT() : sev(ngrt4n::Unknown), weight(1){}
-  friend bool operator < (const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2) {
+  QMap<int, double> sev_weights;
+  AggregateSeverityInfoT() : sev(ngrt4n::Unknown) {}
+  friend bool operator < (const AggregateSeverityInfoT& s1, const AggregateSeverityInfoT& s2) {
     return s1.sev < s2.sev;
   }
 };
