@@ -80,6 +80,7 @@ bool Parser::process(bool console)
     node.sev = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
+    node.weight = service.attribute("weight").toDouble();
     node.icon = service.firstChildElement("Icon").text().trimmed();
     node.name = service.firstChildElement("Name").text().trimmed();
     node.description = service.firstChildElement("Description").text().trimmed();

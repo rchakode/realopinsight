@@ -679,8 +679,8 @@ void SvCreator::recordData(const QString& _path)
 
 QString SvCreator::generateNodeXml(const NodeT& node)
 {
-  QString xml = QString("<Service id=\"%1\" statusCalcRule=\"%2\" statusPropRule=\"%3\">\n"
-                        ).arg(node.id, QString::number(node.sev_crule), QString::number(node.sev_prule));
+  QString xml = QString("<Service id=\"%1\" statusCalcRule=\"%2\" statusPropRule=\"%3\" weight=\"%4\">\n"
+                        ).arg(node.id, QString::number(node.sev_crule), QString::number(node.sev_prule), QString::number(node.weight));
 
   xml.append( QString(" <Name>%1</Name>\n").arg(node.name) )
       .append( QString(" <Icon>%1</Icon>\n").arg(node.icon) )

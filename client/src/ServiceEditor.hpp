@@ -29,6 +29,7 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "Settings.hpp"
+#include <QWidget>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QtWidgets>
@@ -40,8 +41,6 @@
 const qint32 MAX_NODE_NAME = 255;
 const QString NAME_FIELD = "name";
 const QString TYPE_FIELD = "type";
-const QString STATUS_CALC_RULE_FIELD = "StatusCalcRules";
-const QString STATUS_PROP_RULE_FIELD = "StatusPropRules";
 const QString ICON_FIELD = "icon";
 const QString DESCRIPTION_FIELD = "description";
 const QString ALARM_MSG_FIELD = "alarmMsg";
@@ -73,8 +72,6 @@ public:
   WidgetMapT* itemList(void) {return& m_fieldWidgets;}
   QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[NAME_FIELD]);}
   QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[TYPE_FIELD]);}
-  QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_CALC_RULE_FIELD]);}
-  QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_PROP_RULE_FIELD]);}
   QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[ICON_FIELD]);}
   QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(m_fieldWidgets[DESCRIPTION_FIELD]);}
   QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[ALARM_MSG_FIELD]);}
@@ -95,6 +92,7 @@ public Q_SLOTS:
   void handleAddThreshold(void);
   void handleRemoveThreshold(void);
   void handleThresholdRulesChanged(void);
+  void handleCalcRuleChanged(void);
 
 Q_SIGNALS:
   void saveClicked(void);
@@ -124,10 +122,10 @@ private:
         break;
       case WeightNormalized:
       default:
-        setRange(0, 1);
-        setValue(0.1);
+        setRange(ngrt4n::THRESHOLD_WEIGHT_MIN, ngrt4n::THRESHOLD_WEIGHT_MAX);
+        setValue(ngrt4n::THRESHOLD_WEIGHT_UNIT);
+        setSingleStep(ngrt4n::THRESHOLD_WEIGHT_UNIT);
         setDecimals(1);
-        setSingleStep(0.05);
         break;
       }
     }
@@ -156,6 +154,8 @@ private:
   QStackedWidget* m_dataPointActionButtons;
   QPushButton* m_searchDataPointButton;
   QPushButton* m_addDataPointButton;
+  QComboBox* m_calcRulesBox;
+  QComboBox* m_propRulesBox;
   WeightBox* m_weightBox;
   WeightBox* m_thresholdWeightBox;
   QComboBox* m_thresholdInSeverityBox;
@@ -163,6 +163,7 @@ private:
   QComboBox* m_thresholdRulesBox;
   IconButton* m_addThresholdButton;
   IconButton* m_removeThresholdButton;
+  QFrame* m_thresholdFrame;
 
   void addEvent(void);
   void layoutLabelFields(void);

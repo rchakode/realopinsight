@@ -34,7 +34,7 @@ typedef QList<QListWidgetItem*> CheckItemList;
 namespace {
   const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
-  }
+}
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
@@ -97,6 +97,7 @@ void ServiceEditor::addEvent(void)
   connect(m_addThresholdButton, SIGNAL(clicked()), this, SLOT(handleAddThreshold()));
   connect(m_removeThresholdButton, SIGNAL(clicked()), this, SLOT(handleRemoveThreshold()));
   connect(m_thresholdRulesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(handleThresholdRulesChanged()));
+  connect(m_calcRulesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(handleCalcRuleChanged()));
 }
 
 
@@ -152,15 +153,16 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
 {
   _node.name             = nameField()->text();
   _node.type             = typeField()->currentIndex();
-  _node.sev_crule        = statusCalcRuleField()->itemData( statusCalcRuleField()->currentIndex() ).toInt();
-  _node.sev_prule        = statusPropRuleField()->itemData( statusPropRuleField()->currentIndex() ).toInt();
+  _node.sev_crule        = m_calcRulesBox->itemData( m_calcRulesBox->currentIndex() ).toInt();
+  _node.sev_prule        = m_propRulesBox->itemData( m_propRulesBox->currentIndex() ).toInt();
   _node.icon             = iconField()->currentText();
   _node.description      = descriptionField()->toPlainText();
   _node.alarm_msg        = alarmMsgField()->toPlainText();
   _node.notification_msg = notificationMsgField()->toPlainText();
+  _node.weight           = m_weightBox->value();
   _node.thresholds = ThresholdHelper::dataToList( thresholdsData() );
 
-  if(_node.type == NodeType::AlarmNode) {
+  if (_node.type == NodeType::AlarmNode) {
     QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
     if (! selectedItems.isEmpty())
       _node.child_nodes = selectedItems.at(0)->text();
@@ -180,8 +182,9 @@ void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
-  statusCalcRuleField()->setCurrentIndex( statusCalcRuleField()->findData( CalcRules(_node.sev_crule).data() ));
-  statusPropRuleField()->setCurrentIndex( statusPropRuleField()->findText( PropRules(_node.sev_prule).data() ));
+  m_calcRulesBox->setCurrentIndex( m_calcRulesBox->findData( CalcRules(_node.sev_crule).data() ));
+  m_propRulesBox->setCurrentIndex( m_propRulesBox->findText( PropRules(_node.sev_prule).data() ));
+  m_weightBox->setValue(_node.weight);
   iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
   descriptionField()->setText(_node.description);
   alarmMsgField()->setText(_node.alarm_msg);
@@ -248,24 +251,31 @@ void ServiceEditor::layoutTypeFields()
 
 void ServiceEditor::layoutStatusCalcFields(void)
 {
-  m_fieldWidgets[STATUS_CALC_RULE_FIELD] = new QComboBox(this);
-  statusCalcRuleField()->setInsertPolicy(QComboBox::InsertAtBottom);
+  m_calcRulesBox = new QComboBox(this);
+  m_calcRulesBox->setInsertPolicy(QComboBox::InsertAtBottom);
 
   StringMapT rules = DashboardBase::calcRules();
   Q_FOREACH(const QString& rule, rules.keys()) {
-    statusCalcRuleField()->addItem(rule, rules.value(rule));
+    m_calcRulesBox->addItem(rule, rules.value(rule));
   }
 
-  QHBoxLayout* detailsFieldLayout = new QHBoxLayout();
-  detailsFieldLayout->addWidget(new QLabel(tr("If threshold of"), this), 0);
-  detailsFieldLayout->addWidget(m_thresholdWeightBox = new WeightBox(WeightThreshold, this));
-  detailsFieldLayout->addWidget(m_thresholdInSeverityBox = new QComboBox(this), 2);
-  detailsFieldLayout->addWidget(new QLabel(tr("set to"), this), 1);
-  detailsFieldLayout->addWidget(m_thresholdOutSeverityBox = new QComboBox(this),  2);
-  detailsFieldLayout->addWidget(m_addThresholdButton = new IconButton(":images/built-in/document-add_32x32.png", this), 1);
-  detailsFieldLayout->addWidget(m_thresholdRulesBox = new QComboBox(this), 5);
-  detailsFieldLayout->addWidget(m_removeThresholdButton = new IconButton(":images/built-in/document-remove_32x32.png", this), 1);
+  QHBoxLayout* thresholdFieldsLayout = new QHBoxLayout();
+  thresholdFieldsLayout->addWidget(new QLabel(tr("If threshold of"), this), 0);
+  thresholdFieldsLayout->addWidget(m_thresholdWeightBox = new WeightBox(WeightThreshold, this));
+  thresholdFieldsLayout->addWidget(m_thresholdInSeverityBox = new QComboBox(this), 2);
+  thresholdFieldsLayout->addWidget(new QLabel(tr("set to"), this), 1);
+  thresholdFieldsLayout->addWidget(m_thresholdOutSeverityBox = new QComboBox(this),  2);
+  thresholdFieldsLayout->addWidget(m_addThresholdButton = new IconButton(":images/built-in/document-add_32x32.png", this), 1);
+  thresholdFieldsLayout->addWidget(m_thresholdRulesBox = new QComboBox(this), 5);
+  thresholdFieldsLayout->addWidget(m_removeThresholdButton = new IconButton(":images/built-in/document-remove_32x32.png", this), 1);
+
+  m_thresholdFrame = new QFrame(this);
+  m_thresholdFrame->setLayout(thresholdFieldsLayout);
   m_removeThresholdButton->setEnabled(false);
+
+  m_addThresholdButton->setToolTip(tr("Add rule"));
+  m_removeThresholdButton->setToolTip(tr("Remove rule"));
+
 
   QMap<qint8, Severity> allSeverities;
   allSeverities.insert(ngrt4n::Normal, Severity(ngrt4n::Normal));
@@ -281,17 +291,17 @@ void ServiceEditor::layoutStatusCalcFields(void)
 
   ++m_currentRow;
   m_mainLayout->addWidget(new QLabel(tr("Severiry Calculation Rule"), this), m_currentRow, 0);
-  m_mainLayout->addWidget(statusCalcRuleField(), m_currentRow, 1);
-  m_mainLayout->addLayout(detailsFieldLayout, m_currentRow, 2);
+  m_mainLayout->addWidget(m_calcRulesBox, m_currentRow, 1);
+  m_mainLayout->addWidget(m_thresholdFrame, m_currentRow, 2);
 }
 
 void ServiceEditor::layoutStatusPropFields(void)
 {
-  m_fieldWidgets[STATUS_PROP_RULE_FIELD] = new QComboBox(this);
-  statusPropRuleField()->setInsertPolicy(QComboBox::InsertAtBottom);
+  m_propRulesBox = new QComboBox(this);
+  m_propRulesBox->setInsertPolicy(QComboBox::InsertAtBottom);
   StringMapT rules = DashboardBase::propRules();
   Q_FOREACH(const QString& rule, rules.keys()) {
-    statusPropRuleField()->addItem(rule, rules.value(rule));
+    m_propRulesBox->addItem(rule, rules.value(rule));
   }
 
   QHBoxLayout* weightFieldLayout = new QHBoxLayout();
@@ -300,7 +310,7 @@ void ServiceEditor::layoutStatusPropFields(void)
 
   ++m_currentRow;
   m_mainLayout->addWidget(new QLabel(tr("Severity Propagation Rule"), this), m_currentRow, 0);
-  m_mainLayout->addWidget(statusPropRuleField(), m_currentRow, 1);
+  m_mainLayout->addWidget(m_propRulesBox, m_currentRow, 1);
   m_mainLayout->addLayout(weightFieldLayout, m_currentRow, 2, Qt::AlignLeft);
 }
 
@@ -531,4 +541,11 @@ QString ServiceEditor::thresholdsData(void) const
   }
 
   return result;
+}
+
+
+void ServiceEditor::handleCalcRuleChanged(void)
+{
+  m_thresholdFrame->setEnabled( m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt()
+                                == static_cast<int>(CalcRules::WeightedThresholdSeverity) );
 }
