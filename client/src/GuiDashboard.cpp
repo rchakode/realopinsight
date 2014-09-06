@@ -51,8 +51,8 @@ StringMapT GuiDashboard::propRules() {
 
 StringMapT GuiDashboard::calcRules() {
   StringMapT map;
-  map.insert(CalcRules(CalcRules::WorstSeverity).toString(), CalcRules(CalcRules::WorstSeverity).data());
-  map.insert(CalcRules(CalcRules::AverageSeverity).toString(),CalcRules(CalcRules::AverageSeverity).data());
+  map.insert(CalcRules(CalcRules::Worst).toString(), CalcRules(CalcRules::Worst).data());
+  map.insert(CalcRules(CalcRules::Average).toString(),CalcRules(CalcRules::Average).data());
   return map;
 }
 

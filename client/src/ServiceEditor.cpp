@@ -547,5 +547,5 @@ QString ServiceEditor::thresholdsData(void) const
 void ServiceEditor::handleCalcRuleChanged(void)
 {
   m_thresholdFrame->setEnabled( m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt()
-                                == static_cast<int>(CalcRules::WeightedThresholdSeverity) );
+                                == static_cast<int>(CalcRules::Weighted) );
 }

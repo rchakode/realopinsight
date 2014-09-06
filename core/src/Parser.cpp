@@ -26,6 +26,7 @@
 #include "utilsCore.hpp"
 #include "ThresholdHelper.hpp"
 #include <QObject>
+#include <QtXml>
 
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
@@ -45,7 +46,7 @@ Parser::~Parser()
 
 bool Parser::process(bool console)
 {
-  QString graphContent ="";
+  QString graphContent = "";
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
@@ -88,7 +89,7 @@ bool Parser::process(bool console)
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
 
-    if (node.sev_crule == CalcRules::WeightedThresholdSeverity) {
+    if (node.sev_crule == CalcRules::Weighted) {
       QString thdata = service.firstChildElement("Thresholds").text().trimmed();
       node.thresholds = ThresholdHelper::dataToList(thdata);
     }

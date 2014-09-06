@@ -26,7 +26,6 @@
 #define BASE_HPP
 #include <QtCore/QtGlobal>
 #include <QtCore>
-#include <QtXml>
 #include <QSettings>
 #include <memory>
 #include <unordered_map>
@@ -155,9 +154,9 @@ namespace ngrt4n {
   const std::string TAG_CHECK = "\\{check_name\\}";
   const std::string TAG_THERESHOLD = "\\{threshold\\}";
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
-  const double WEIGHT_UNIT = 0.1;
+  const double WEIGHT_UNIT = 1.0;
   const double WEIGHT_MIN = 0;
-  const double WEIGHT_MAX = 1;
+  const double WEIGHT_MAX = 10;
 
   } // namespace ngrt4n
 
@@ -193,9 +192,9 @@ private:
 class CalcRules {
 public:
   enum CalcRulesT{
-    WorstSeverity = 0,
-    AverageSeverity = 1,
-    WeightedThresholdSeverity = 2
+    Worst = 0,
+    Average = 1,
+    Weighted = 2
   };
 
   CalcRules(int rule) : m_rule(rule) {}
@@ -204,13 +203,13 @@ public:
   QString toString(void) const {
     QString result = QObject::tr("Default");
     switch (m_rule) {
-    case AverageSeverity:
+    case Average:
       result = QObject::tr("Average");
       break;
-    case WeightedThresholdSeverity:
+    case Weighted:
       result = QObject::tr("Weighted Threshold");
       break;
-    case WorstSeverity:
+    case Worst:
     default:
       result = QObject::tr("Worst Severity");
       break;
@@ -244,6 +243,8 @@ public:
   int value() const {return m_sev;}
 
   QString valueString(void) const {return QString::number(m_sev);}
+
+  bool isValid() {return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
 
   QString toString(void) const {
     switch( m_sev )
@@ -387,7 +388,7 @@ struct NodeT {
   double pos_x;
   double pos_y;
   NodeT(): sev_crule(PropRules::Unchanged),
-    sev_prule(CalcRules::WorstSeverity),
+    sev_prule(CalcRules::Worst),
     sev(ngrt4n::Unknown),
     weight(ngrt4n::WEIGHT_UNIT){}
 };

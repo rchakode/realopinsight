@@ -136,10 +136,10 @@ AggregateSeverityInfoT ngrt4n::severityFromCalcRule(QVector<AggregateSeverityInf
   if (len >= 1) {
     qSort(data.begin(), data.end());
     switch (crule) {
-    case CalcRules::AverageSeverity:
+    case CalcRules::Average:
       result = ngrt4n::meanSeverities(data[0], data[len - 1]);
       break;
-    case CalcRules::WorstSeverity:
+    case CalcRules::Worst:
     default:
       result = data[len-1];
       break;

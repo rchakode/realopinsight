@@ -43,13 +43,10 @@ public:
   int sevIn(void) const {return m_sevIn;}
   int sevOut(void) const {return m_sevOut;}
   ThresholdT toThreshold(void) const;
-  bool isValid(void) { return isValidWeight(m_weight) && isValidSeverity(m_sevIn) && isValidSeverity(m_sevOut); }
+  bool isValid(void) { return isValidWeight(m_weight) && Severity(m_sevIn).isValid() && Severity(m_sevOut).isValid(); }
   static double toValidWeight(double val) { return isValidWeight(val) ? val : -1.0; }
-  static int toValidSeverity(int val) { return isValidSeverity(val) ? val : -1; }
+  static int toValidSeverity(int val) { return Severity(val).isValid() ? val : -1; }
   static bool isValidWeight(double val) {return val >= 0.0 && val <= 1.0;}
-  static bool isValidSeverity(double val) {
-    return val >= static_cast<int>(ngrt4n::Normal)
-        && val <= static_cast<int>(ngrt4n::Unknown);}
   QString toString(void);
   QString data(void);
   static QString listToData(const QVector<ThresholdT>& ths);

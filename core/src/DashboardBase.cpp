@@ -66,9 +66,9 @@ StringMapT DashboardBase::propRules() {
 }
 
 StringMapT DashboardBase::calcRules() {
-  CalcRules worst(CalcRules::WorstSeverity);
-  CalcRules average(CalcRules::AverageSeverity);
-  CalcRules weighted(CalcRules::WeightedThresholdSeverity);
+  CalcRules worst(CalcRules::Worst);
+  CalcRules average(CalcRules::Average);
+  CalcRules weighted(CalcRules::Weighted);
 
   StringMapT map;
   map.insert(worst.toString(), worst.data());
@@ -127,7 +127,7 @@ void DashboardBase::runMonitor()
       Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
-  updateNodeStates(rootNode().id);
+  updateNodeStatus(rootNode().id);
   updateChart();
   ++m_updateCounter;
   Q_EMIT updateFinished();
@@ -358,7 +358,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   }
 }
 
-AggregateSeverityInfoT DashboardBase::updateNodeStates(const QString& _nodeId)
+AggregateSeverityInfoT DashboardBase::updateNodeStatus(const QString& _nodeId)
 {
   AggregateSeverityInfoT result;
 
@@ -383,8 +383,8 @@ AggregateSeverityInfoT DashboardBase::updateNodeStates(const QString& _nodeId)
 
   QVector<AggregateSeverityInfoT> childSeverityInfos;
   Q_FOREACH (const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
-    result = updateNodeStates(childId);
-    if (! result.sev_weights.isEmpty()) //FIXME: result.weight > 0
+    result = updateNodeStatus(childId);
+    if (! node->weight > 0)
       childSeverityInfos.push_back( result );
   }
 

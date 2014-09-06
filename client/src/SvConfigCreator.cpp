@@ -335,7 +335,7 @@ NodeT* SvCreator::createNode(const QString& id,
   node->parent = parent;
   node->type = NodeType::ServiceNode;
   node->sev = ngrt4n::Unknown;
-  node->sev_crule = CalcRules::WorstSeverity;
+  node->sev_crule = CalcRules::Worst;
   node->sev_prule = PropRules::Unchanged;
   node->icon = ngrt4n::DEFAULT_ICON;
   node->child_nodes = QString();
@@ -689,7 +689,7 @@ QString SvCreator::generateNodeXml(const NodeT& node)
       .append( QString(" <NotificationMsg>%1</NotificationMsg>\n").arg(node.notification_msg) )
       .append( QString(" <SubServices>%1</SubServices>\n").arg(node.child_nodes) ) ;
 
-  if (node.sev_crule == CalcRules::WeightedThresholdSeverity) {
+  if (node.sev_crule == CalcRules::Weighted) {
 
     xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholds)) );
   }

@@ -67,7 +67,7 @@ public Q_SLOTS:
   void runLivestatusUpdate(const SourceT& src);
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
-  AggregateSeverityInfoT updateNodeStates(const QString& _node);
+  AggregateSeverityInfoT updateNodeStatus(const QString& _node);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}

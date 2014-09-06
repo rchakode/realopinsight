@@ -86,7 +86,8 @@ HEADERS += \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
-    core/src/ThresholdHelper.hpp
+    core/src/ThresholdHelper.hpp \
+    core/src/SeverityManager.hpp
 
 
 SOURCES += \
@@ -101,7 +102,8 @@ SOURCES += \
     core/src/ChartBase.cpp \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
-    core/src/ThresholdHelper.cpp
+    core/src/ThresholdHelper.cpp \
+    core/src/SeverityManager.cpp
 
 gui-base {
 QT += svg gui webkit
@@ -184,3 +186,9 @@ DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Eliana\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
+
+
+unittests {
+SOURCES += core/src/unittests.cpp
+QT += testlib
+}
