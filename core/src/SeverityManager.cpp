@@ -74,7 +74,7 @@ int SeverityManager::aggregatedSeverity(int crule)
   int result = ngrt4n::Unknown;
   switch (crule) {
   case CalcRules::Average:
-    result = (m_maxEssentialSev > m_maxSev)? m_maxEssentialSev : qMax(m_maxEssentialSev, averageSeverity());
+    result = averageSeverity();
     break;
   case CalcRules::Weighted:
     result = weightedSeverity();
@@ -89,16 +89,16 @@ int SeverityManager::aggregatedSeverity(int crule)
 
 int SeverityManager::averageSeverity(void)
 {
-  double sumSev = 0;
-  double count = 0;
+  double severityScore = 0;
+  double weightSum = 0;
   Q_FOREACH(int sev, m_weights.keys()) {
     double weight = m_weights[sev];
     if (weight > 0) {
-      sumSev += weight * static_cast<int>(sev);
-      count += weight * ngrt4n::WEIGHT_UNIT;
+      severityScore += weight * static_cast<double>(sev);
+      weightSum += weight * ngrt4n::WEIGHT_UNIT;
     }
   }
-  return qCeil(sumSev / count);
+  return qRound(severityScore / weightSum);
 }
 
 int SeverityManager::weightedSeverity(void)

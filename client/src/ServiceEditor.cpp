@@ -546,6 +546,7 @@ QString ServiceEditor::thresholdsData(void) const
 
 void ServiceEditor::handleCalcRuleChanged(void)
 {
-  m_thresholdFrame->setEnabled( m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt()
-                                == static_cast<int>(CalcRules::Weighted) );
+  int crule = m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt();
+  m_thresholdFrame->setEnabled(crule == static_cast<int>(CalcRules::Weighted)
+                               || crule == static_cast<int>(CalcRules::Average));
 }

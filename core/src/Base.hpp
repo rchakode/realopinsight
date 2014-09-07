@@ -365,6 +365,28 @@ struct ThresholdT {
   int sev_out;
 };
 
+struct ThresholdLessthanFnt {
+  bool operator () (const ThresholdT& th1, const ThresholdT& th2)
+  {
+    if (th1.sev_out < th2.sev_out)
+      return true;
+
+    if (th1.sev_out == th2.sev_out) {
+      if (th1.sev_in < th2.sev_in)
+        return true;
+
+      if (th1.sev_in == th2.sev_in)
+        return th1.weight < th2.weight;
+
+      return false;
+    }
+
+    return false;
+  }
+};
+
+
+
 struct NodeT {
   QString id;
   QString name;

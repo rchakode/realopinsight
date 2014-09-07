@@ -89,9 +89,15 @@ bool Parser::process(bool console)
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
 
-    if (node.sev_crule == CalcRules::Weighted) {
+    if (node.weight <= 0) {
+      node.weight = ngrt4n::WEIGHT_UNIT;
+    }
+
+    if (node.sev_crule == CalcRules::Weighted
+        || node.sev_crule == CalcRules::Average) {
       QString thdata = service.firstChildElement("Thresholds").text().trimmed();
       node.thresholds = ThresholdHelper::dataToList(thdata);
+      qSort(node.thresholds.begin(), node.thresholds.end(), ThresholdLessthanFnt());
     }
 
     node.check.status = -1;
