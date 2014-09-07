@@ -260,10 +260,11 @@ void ServiceEditor::layoutStatusCalcFields(void)
   }
 
   QHBoxLayout* thresholdFieldsLayout = new QHBoxLayout();
-  thresholdFieldsLayout->addWidget(new QLabel(tr("If threshold of"), this), 0);
+  thresholdFieldsLayout->addWidget(new QLabel(tr("If"), this), 0);
   thresholdFieldsLayout->addWidget(m_thresholdWeightBox = new WeightBox(WeightThreshold, this));
+  thresholdFieldsLayout->addWidget(new QLabel(tr("Of"), this), 0);
   thresholdFieldsLayout->addWidget(m_thresholdInSeverityBox = new QComboBox(this), 2);
-  thresholdFieldsLayout->addWidget(new QLabel(tr("set to"), this), 1);
+  thresholdFieldsLayout->addWidget(new QLabel(tr("Set To"), this), 1);
   thresholdFieldsLayout->addWidget(m_thresholdOutSeverityBox = new QComboBox(this),  2);
   thresholdFieldsLayout->addWidget(m_addThresholdButton = new IconButton(":images/built-in/document-add_32x32.png", this), 1);
   thresholdFieldsLayout->addWidget(m_thresholdRulesBox = new QComboBox(this), 5);
@@ -305,7 +306,7 @@ void ServiceEditor::layoutStatusPropFields(void)
   }
 
   QHBoxLayout* weightFieldLayout = new QHBoxLayout();
-  weightFieldLayout->addWidget(new QLabel(tr("Weight Factor"), this), 1);
+  weightFieldLayout->addWidget(new QLabel(tr("Weight"), this), 1);
   weightFieldLayout->addWidget(m_weightBox = new WeightBox(WeightNormalized, this), 10, Qt::AlignLeft);
 
   ++m_currentRow;
@@ -547,6 +548,5 @@ QString ServiceEditor::thresholdsData(void) const
 void ServiceEditor::handleCalcRuleChanged(void)
 {
   int crule = m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt();
-  m_thresholdFrame->setEnabled(crule == static_cast<int>(CalcRules::Weighted)
-                               || crule == static_cast<int>(CalcRules::Average));
+  m_thresholdFrame->setEnabled(crule == static_cast<int>(CalcRules::Weighted));
 }
