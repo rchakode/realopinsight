@@ -5,8 +5,7 @@ Naemon, Icinga, op5, and more.
 
 
 RealOpInsight Workstation is released under the terms of GPLv3 License.
-See the LICENSE file.Prior to the installation, you may need to read
-the license offer.
+See the LICENSE file.
  
 
 INSTALLATION
