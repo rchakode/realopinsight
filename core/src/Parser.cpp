@@ -68,6 +68,7 @@ bool Parser::process(bool console)
 
   xmlRoot = xmlDoc.documentElement();
   m_cdata->monitor = xmlRoot.attribute("monitor").toInt();
+  m_cdata->format_version = xmlRoot.attribute("compat").toDouble();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
   NodeT node;
@@ -81,7 +82,6 @@ bool Parser::process(bool console)
     node.sev = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
-    node.weight = service.attribute("weight").toDouble();
     node.icon = service.firstChildElement("Icon").text().trimmed();
     node.name = service.firstChildElement("Name").text().trimmed();
     node.description = service.firstChildElement("Description").text().trimmed();
@@ -89,21 +89,16 @@ bool Parser::process(bool console)
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
 
-    if (node.weight <= 0) {
-      node.weight = ngrt4n::WEIGHT_UNIT;
-    }
+    node.weight = (m_cdata->format_version >= 3.1) ? service.attribute("weight").toDouble() : ngrt4n::WEIGHT_UNIT;
 
-    if (node.sev_crule == CalcRules::Weighted
-        || node.sev_crule == CalcRules::Average) {
+    if (node.sev_crule == CalcRules::Weighted) {
       QString thdata = service.firstChildElement("Thresholds").text().trimmed();
       node.thresholds = ThresholdHelper::dataToList(thdata);
       qSort(node.thresholds.begin(), node.thresholds.end(), ThresholdLessthanFnt());
     }
 
     node.check.status = -1;
-    if (node.icon.isEmpty()) {
-      node.icon = ngrt4n::DEFAULT_ICON;
-    }
+    if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
 
     if (node.type == NodeType::AlarmNode) {
       node.visibility = ngrt4n::Visible;
@@ -111,12 +106,9 @@ bool Parser::process(bool console)
       m_cdata->hosts[info.first] << info.second;
 
       QString srcid = ngrt4n::getSourceIdFromStr(info.first);
-
       if (srcid.isEmpty()) {
         srcid = ngrt4n::sourceId(0);
-        if (console) {
-          node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
-        }
+        if (console) node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
       }
       m_cdata->sources.insert(srcid);
       m_cdata->cnodes.insert(node.id, node);
@@ -131,10 +123,8 @@ bool Parser::process(bool console)
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
 
-  if (console)
-    return parseDotResult();
-  else
-    return true;
+
+  return console ? parseDotResult() : true;
 }
 
 void Parser::updateNodeHierachy(QString& _graphContent)

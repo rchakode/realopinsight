@@ -98,6 +98,11 @@ namespace ngrt4n {
     Unknown = 4
   };
 
+  struct AggregatedSeverityT {
+    int sev;
+    double weight;
+  };
+
   enum NagiosStatusT {
     NagiosOk = 0,
     NagiosWarning = 1,
@@ -413,16 +418,32 @@ struct NodeT {
     sev_prule(CalcRules::Worst),
     sev(ngrt4n::Unknown),
     weight(ngrt4n::WEIGHT_UNIT){}
-};
 
-struct AggregateSeverityInfoT {
-  int sev;
-  QMap<int, double> sev_weights;
-  AggregateSeverityInfoT() : sev(ngrt4n::Unknown) {}
-  friend bool operator < (const AggregateSeverityInfoT& s1, const AggregateSeverityInfoT& s2) {
-    return s1.sev < s2.sev;
+  QString toString(void) const {
+    QString tip = QObject::tr("Service: %1\n"
+                              "Description: %2\n"
+                              "Severity: %3\n"
+                              "   Calc. Rule: %4\n"
+                              "   Prop. Rule: %5").arg(name,
+                                                       const_cast<QString&>(description).replace("\n", " "),
+                                                       Severity(sev).toString(),
+                                                       CalcRules(sev_crule).toString(),
+                                                       PropRules(sev_prule).toString());
+    if (type == NodeType::AlarmNode) {
+      tip.append(QObject::tr("\nTarget Host: %1\n"
+                             "Groups: %2\n"
+                             "Data Point: %3\n"
+                             "Raw Output: %4\n"
+                             "Other Details: %5").arg(QString::fromStdString(check.host).replace("\n", " "),
+                                                      QString::fromStdString(check.host_groups),
+                                                      child_nodes,
+                                                      QString::fromStdString(check.alarm_msg),
+                                                      actual_msg));
+    }
+    return tip;
   }
 };
+
 
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, NodeT> NodeListT;
@@ -436,6 +457,7 @@ typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
   qint8 monitor;
+  double format_version;
   NodeListT bpnodes;
   NodeListT cnodes;
   CheckStatusCountT check_status_count;

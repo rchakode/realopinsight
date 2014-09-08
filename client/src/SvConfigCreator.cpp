@@ -650,7 +650,7 @@ void SvCreator::recordData(const QString& _path)
     QTextStream outStream(&file);
 
     outStream << "<?xml version=\"1.0\"?>\n"
-              << QString("<ServiceView compat=\"2.0\" monitor=\"%1\">\n").arg( QString::number(m_cdata->monitor) )
+              << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(m_cdata->monitor) )
               << generateNodeXml(*m_root);
 
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {

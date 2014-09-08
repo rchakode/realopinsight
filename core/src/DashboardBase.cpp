@@ -27,6 +27,7 @@
 #include "utilsCore.hpp"
 #include "JsonHelper.hpp"
 #include "LsHelper.hpp"
+#include "SeverityManager.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <QSystemTrayIcon>
@@ -127,7 +128,7 @@ void DashboardBase::runMonitor()
       Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
-  updateNodeStatus(rootNode().id);
+  computeNodeSeverity(rootNode().id);
   updateChart();
   ++m_updateCounter;
   Q_EMIT updateFinished();
@@ -284,9 +285,8 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  QString info = ngrt4n::generateToolTip(_node);
-  updateTree(_node, info);
-  updateMap(_node, info);
+  updateTree(_node, _node.toString());
+  updateMap(_node, _node.toString());
   updateMsgConsole(_node);
   updateEventFeeds(_node);
 }
@@ -314,12 +314,11 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
   _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
-  _node.sev_prop = ngrt4n::severityFromPropRule(_node.sev, _node.sev_prule);
+  _node.sev_prop = SeverityManager::propagatedSeverity(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
-  if (_node.check.host == "-") {
+  if (_node.check.host == "-")
     return;
-  }
 
   if (m_cdata->monitor == ngrt4n::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
@@ -328,8 +327,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
   }
 
-  if (_node.sev == ngrt4n::Normal)
-  {
+  if (_node.sev == ngrt4n::Normal) {
     if (_node.notification_msg.isEmpty()) {
       return ;
     } else {
@@ -340,13 +338,16 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   } else {
     _node.actual_msg = _node.alarm_msg;
   }
+
   regexp.setPattern(ngrt4n::TAG_HOSTNAME.c_str());
   _node.actual_msg.replace(regexp, _node.check.host.c_str());
   auto info = QString(_node.check.id.c_str()).split("/");
+
   if (info.length() > 1) {
     regexp.setPattern(ngrt4n::TAG_CHECK.c_str());
     _node.actual_msg.replace(regexp, info[1]);
   }
+
   if (m_cdata->monitor == ngrt4n::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
@@ -358,44 +359,44 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   }
 }
 
-AggregateSeverityInfoT DashboardBase::updateNodeStatus(const QString& _nodeId)
+ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _nodeId)
 {
-  AggregateSeverityInfoT result;
+  ngrt4n::AggregatedSeverityT result;
 
   NodeListT::iterator node;
   if (! ngrt4n::findNode(m_cdata, _nodeId, node)) {
-    result.sev_weights.clear();
+    result.sev = ngrt4n::Unknown;
+    result.weight = ngrt4n::WEIGHT_UNIT;
     return result;
   }
 
+  result.weight = node->weight;
+
   if (node->child_nodes.isEmpty()) {
-    result.sev_weights.clear();
     result.sev = ngrt4n::Unknown;
-    result.sev_weights[result.sev] = node->weight;
     return result;
   }
 
   if (node->type == NodeType::AlarmNode) {
     result.sev = node->sev_prop;
-    result.sev_weights[result.sev] = node->weight;
     return result;
   }
 
-  QVector<AggregateSeverityInfoT> childSeverityInfos;
-  Q_FOREACH (const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
-    result = updateNodeStatus(childId);
-    if (! node->weight > 0)
-      childSeverityInfos.push_back( result );
+  SeverityManager severityManager(node->thresholds);
+
+  Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+    result = computeNodeSeverity(childId);
+    severityManager.addSeverity(result.sev, result.weight);
   }
 
-  result = ngrt4n::severityFromCalcRule(childSeverityInfos, node->sev_crule);
-  node->sev = result.sev;
-  node->sev_prop = ngrt4n::severityFromPropRule(node->sev, node->sev_prule);
-  result.sev = node->sev_prop;
+  node->sev = severityManager.aggregatedSeverity(node->sev_crule);
+  node->sev_prop = severityManager.propagatedSeverity(node->sev, node->sev_prule);
 
-  QString details = ngrt4n::generateToolTip(*node);
-  updateMap(*node, details);
-  updateTree(*node, details);
+  result.sev = node->sev_prop;
+  result.weight = node->weight;
+
+  updateMap(*node, node->toString());
+  updateTree(*node, node->toString());
 
   return result;
 }

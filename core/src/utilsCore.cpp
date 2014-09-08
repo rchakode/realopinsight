@@ -25,21 +25,6 @@
 #include "utilsCore.hpp"
 #include <QFileInfo>
 
-
-namespace {
-  const QString DEFAULT_TIP_PATTERN(QObject::tr("Service: %1\n"
-                                                "Description: %2\n"
-                                                "Severity: %3\n"
-                                                "   Calc. Rule: %4\n"
-                                                "   Prop. Rule: %5"));
-  const QString ALARM_SPECIFIC_TIP_PATTERN(QObject::tr("\nTarget Host: %1\n"
-                                                       "Groups: %2\n"
-                                                       "Data Point: %3\n"
-                                                       "Raw Output: %4\n"
-                                                       "Other Details: %5"));
-  }
-
-
 void ngrt4n::clear(CoreDataT& _cdata)
 {
   _cdata.cnodes.clear();
@@ -109,68 +94,6 @@ qint8 ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrS
     }
   }
   return static_cast<ngrt4n::SeverityT>(criticity);
-}
-
-qint8 ngrt4n::severityFromPropRule(qint8 mysev, qint8 prule)
-{
-  qint8 result = static_cast<ngrt4n::SeverityT>(mysev);
-  Severity sevObj(static_cast<ngrt4n::SeverityT>(mysev));
-  switch(prule) {
-  case PropRules::Increased:
-    result = (++sevObj).value();
-    break;
-  case PropRules::Decreased:
-    result = (--sevObj).value();
-    break;
-  default:
-    break;
-  }
-  return result;
-}
-
-AggregateSeverityInfoT ngrt4n::severityFromCalcRule(QVector<AggregateSeverityInfoT>& data, int crule)
-{
-  AggregateSeverityInfoT result;
-
-  int len = data.size();
-  if (len >= 1) {
-    qSort(data.begin(), data.end());
-    switch (crule) {
-    case CalcRules::Average:
-      result = ngrt4n::meanSeverities(data[0], data[len - 1]);
-      break;
-    case CalcRules::Worst:
-    default:
-      result = data[len-1];
-      break;
-    }
-  }
-  return result;
-}
-
-AggregateSeverityInfoT ngrt4n::meanSeverities(const AggregateSeverityInfoT& s1, const AggregateSeverityInfoT& s2)
-{
-  AggregateSeverityInfoT result;
-  //FIXME: result.sev_weights = (s1.sev_weights + s2.sev_weights) / 2;
-
-  if (s1.sev == s2.sev) {
-    result.sev = s1.sev;
-    return result;
-  }
-
-  if (s1.sev == ngrt4n::Unset || s1.sev == ngrt4n::Unset) {
-    result.sev = ngrt4n::Unset;
-    return result;
-  }
-
-  if (s1.sev == ngrt4n::Unknown || s1.sev == ngrt4n::Unknown) {
-    result.sev = ngrt4n::Unknown;
-    return result;
-  }
-
-  result.sev = (s1.sev + s2.sev) / 2;
-
-  return result;
 }
 
 
@@ -362,24 +285,6 @@ QPair<bool, int> ngrt4n::checkSourceId(const QString &id)
     }
   }
   return QPair<bool, int>(valid, index);
-}
-
-
-QString ngrt4n::generateToolTip(const NodeT& node)
-{
-  QString toolTip = DEFAULT_TIP_PATTERN.arg(node.name,
-                                            const_cast<QString&>(node.description).replace("\n", " "),
-                                            Severity(node.sev).toString(),
-                                            CalcRules(node.sev_crule).toString(),
-                                            PropRules(node.sev_prule).toString());
-  if (node.type == NodeType::AlarmNode) {
-    toolTip.append(ALARM_SPECIFIC_TIP_PATTERN.arg(QString::fromStdString(node.check.host).replace("\n", " "),
-                                                  QString::fromStdString(node.check.host_groups),
-                                                  node.child_nodes,
-                                                  QString::fromStdString(node.check.alarm_msg),
-                                                  node.actual_msg));
-  }
-  return toolTip;
 }
 
 IconMapT ngrt4n::nodeIcons() {

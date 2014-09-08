@@ -16,6 +16,7 @@ void SeverityManager::reset(void)
 {
   m_weights.clear();
   m_thresholds.clear();
+  m_thresholdsLimits.clear();
   m_count = 0;
   m_totalWeight = 0;
 
@@ -36,7 +37,7 @@ void SeverityManager::reset(void)
 void SeverityManager::addSeverity(int value, double weight)
 {
   if (! Severity(value).isValid())
-    m_weights[ngrt4n::Unknown] += weight;
+    value = ngrt4n::Unknown;
 
   m_totalWeight += weight;
   m_weights[value] += weight;
@@ -92,6 +93,24 @@ int SeverityManager::aggregatedSeverity(int crule)
   return result;
 }
 
+
+int SeverityManager::propagatedSeverity(int sev, int prule)
+{
+  qint8 result = static_cast<ngrt4n::SeverityT>(sev);
+  Severity sevHelper(static_cast<ngrt4n::SeverityT>(sev));
+  switch(prule) {
+  case PropRules::Increased:
+    result = (++sevHelper).value();
+    break;
+  case PropRules::Decreased:
+    result = (--sevHelper).value();
+    break;
+  default:
+    break;
+  }
+  return result;
+}
+
 int SeverityManager::averageSeverity(void)
 {
   double severityScore = 0;
@@ -114,7 +133,7 @@ int SeverityManager::weightedSeverity(void)
   while (index >= 0 && thresholdReached == -1) {
     QMap<int, double>::iterator th = m_thresholds.find(m_thresholdsLimits[index].sev_in);
     if (th != m_thresholds.end() && (*th >= m_thresholdsLimits[index].weight))
-        thresholdReached = m_thresholdsLimits[index].sev_out;
+      thresholdReached = m_thresholdsLimits[index].sev_out;
 
     --index;
   }

@@ -78,9 +78,6 @@ namespace ngrt4n
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
   qint8 severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity);
-  qint8 severityFromPropRule(qint8 mysev, qint8 prule);
-  AggregateSeverityInfoT severityFromCalcRule(QVector<AggregateSeverityInfoT>& data, int crule);
-  AggregateSeverityInfoT meanSeverities(const AggregateSeverityInfoT& s1, const AggregateSeverityInfoT& s2);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(NodeListT& bpnodes, NodeListT& cnodes,const QString& nodeId, NodeListT::iterator& node);
@@ -95,7 +92,6 @@ namespace ngrt4n
   StringPairT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
-  QString generateToolTip(const NodeT& node);
   IconMapT nodeIcons();
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
   QStringList getAuthInfo(const QString& authString);

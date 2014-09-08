@@ -2,17 +2,17 @@
 #include <QCoreApplication>
 #include <QtTest/QTest>
 
-class TestSeverAggregation : public QObject
+class TestSeverityAggregation : public QObject
 {
   Q_OBJECT
 
 public:
-  TestSeverAggregation(void)
+  TestSeverityAggregation(void)
   {
     m_severityManager = new SeverityManager(QVector<ThresholdT>());
   }
 
-  ~TestSeverAggregation()
+  ~TestSeverityAggregation()
   {
     delete m_severityManager;
   }
@@ -20,14 +20,16 @@ public:
 private Q_SLOTS:
   void testAddSeverity(void);
   void testAverage(void);
-  void testWeighted(void);
+  void testWeighted1(void);
+  void testWeighted2(void);
+  void testWeighted3(void);
   void testWorst(void);
 
 private:
   SeverityManager* m_severityManager;
 };
 
-void TestSeverAggregation::testAddSeverity(void)
+void TestSeverityAggregation::testAddSeverity(void)
 {
   m_severityManager->addSeverity(ngrt4n::Normal, ngrt4n::WEIGHT_UNIT);
   m_severityManager->addSeverity(ngrt4n::Major, 0);
@@ -40,12 +42,12 @@ void TestSeverAggregation::testAddSeverity(void)
   QCOMPARE(m_severityManager->maxSev(), Severity(ngrt4n::Major).value());
 }
 
-void TestSeverAggregation::testAverage(void)
+void TestSeverityAggregation::testAverage(void)
 {
   QCOMPARE(m_severityManager->aggregatedSeverity(CalcRules::Average), static_cast<int>(ngrt4n::Minor));
 }
 
-void TestSeverAggregation::testWeighted(void)
+void TestSeverityAggregation::testWeighted1(void)
 {
   m_severityManager->displayWeight();
   m_severityManager->addThresholdLimit({0.5, ngrt4n::Major, ngrt4n::Critical});
@@ -56,16 +58,57 @@ void TestSeverAggregation::testWeighted(void)
 
   m_severityManager->addThresholdLimit({0.3, ngrt4n::Major, ngrt4n::Critical});
   QCOMPARE(m_severityManager->weightedSeverity(), static_cast<int>(ngrt4n::Critical));
-
-//  m_severityManager->addSeverity(ngrt4n::Critical, ngrt4n::WEIGHT_UNIT);
-//  m_severityManager->addSeverity(ngrt4n::Unknown, ngrt4n::WEIGHT_UNIT);
 }
 
-void TestSeverAggregation::testWorst(void)
+void TestSeverityAggregation::testWeighted2(void)
 {
-  QCOMPARE(m_severityManager->aggregatedSeverity(CalcRules::Worst), Severity(ngrt4n::Major).value());
+  m_severityManager->reset();
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Normal, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Normal, ngrt4n::WEIGHT_UNIT);
+
+  m_severityManager->displayWeight();
+
+  m_severityManager->addThresholdLimit({0.75, ngrt4n::Minor, ngrt4n::Major});
+  QCOMPARE(m_severityManager->weightedSeverity(), m_severityManager->averageSeverity());
+  QCOMPARE(m_severityManager->weightedSeverity(), static_cast<int>(ngrt4n::Minor));
+
+  m_severityManager->addThresholdLimit({0.6, ngrt4n::Minor, ngrt4n::Major});
+  QCOMPARE(m_severityManager->weightedSeverity(), static_cast<int>(ngrt4n::Major));
+
+  m_severityManager->addThresholdLimit({0.5, ngrt4n::Major, ngrt4n::Critical});
+  QCOMPARE(m_severityManager->weightedSeverity(), static_cast<int>(ngrt4n::Major));
 }
 
-QTEST_MAIN(TestSeverAggregation)
+
+
+void TestSeverityAggregation::testWeighted3(void)
+{
+  m_severityManager->reset();
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Normal, ngrt4n::WEIGHT_UNIT);
+
+  m_severityManager->displayWeight();
+
+  m_severityManager->addThresholdLimit({0.6, ngrt4n::Minor, ngrt4n::Major});
+  m_severityManager->addThresholdLimit({0.8, ngrt4n::Minor, ngrt4n::Critical});
+  QCOMPARE(m_severityManager->weightedSeverity(), static_cast<int>(ngrt4n::Critical));
+}
+
+void TestSeverityAggregation::testWorst(void)
+{
+  m_severityManager->reset();
+  m_severityManager->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Major, 3 * ngrt4n::WEIGHT_UNIT);
+  m_severityManager->addSeverity(ngrt4n::Unset, 3 * ngrt4n::WEIGHT_UNIT);
+  QCOMPARE(m_severityManager->aggregatedSeverity(CalcRules::Worst), static_cast<int>(ngrt4n::Unknown));
+}
+
+QTEST_MAIN(TestSeverityAggregation)
 #include "unittests.moc"
 
