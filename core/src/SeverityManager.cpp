@@ -2,7 +2,7 @@
 #include "SeverityManager.hpp"
 
 
-SeverityManager::SeverityManager(QMap<int, ThresholdT> thresholdLimits)
+SeverityManager::SeverityManager(const QVector<ThresholdT>& thresholdLimits)
   : m_count(0),
     m_totalWeight(0),
     m_maxSev(ngrt4n::Normal),
@@ -47,6 +47,11 @@ void SeverityManager::addSeverity(int value, double weight)
 
   updateThresholds();
   ++m_count;
+}
+
+void SeverityManager::addThresholdLimit(const ThresholdT& th)
+{
+  m_thresholdsLimits.push_back(th);
 }
 
 QString SeverityManager::thresholdsToString(void)
@@ -103,13 +108,19 @@ int SeverityManager::averageSeverity(void)
 
 int SeverityManager::weightedSeverity(void)
 {
-  for (int sev = static_cast<int>(ngrt4n::Unknown); sev >= static_cast<int>(ngrt4n::Normal); --sev) {
-    QMap<int, ThresholdT>::ConstIterator thlimit = m_thresholdsLimits.find(sev);
-    if (thlimit != m_thresholdsLimits.end()) {
-      if (thlimit->weight > 0.0 && m_thresholds[sev] >= thlimit->weight)
-        return thlimit->sev_out;
-    }
+  int thresholdReached = -1;
+  int index = m_thresholdsLimits.size() - 1;
+
+  while (index >= 0 && thresholdReached == -1) {
+    QMap<int, double>::iterator th = m_thresholds.find(m_thresholdsLimits[index].sev_in);
+    if (th != m_thresholds.end() && (*th >= m_thresholdsLimits[index].weight))
+        thresholdReached = m_thresholdsLimits[index].sev_out;
+
+    --index;
   }
+
+  if (thresholdReached != -1)
+    return qMax(thresholdReached, averageSeverity());
 
   return averageSeverity();
 }

@@ -5,11 +5,14 @@
 class SeverityManager
 {
 public:
-  SeverityManager(QMap<int, ThresholdT> thresholdLimits);
+  SeverityManager(const QVector<ThresholdT>& thresholdLimits);
   void reset(void);
   void addSeverity(int aggregatedSeverity, double weight);
+  void addThresholdLimit(const ThresholdT& th);
   QString thresholdsToString(void);
   void updateThresholds(void) { Q_FOREACH(int sev, m_weights.keys()) m_thresholds[sev] = m_weights[sev] / m_totalWeight;}
+
+  void displayWeight(void) { Q_FOREACH(int sev, m_weights.keys()) qDebug()<<Severity(sev).toString() <<  m_thresholds[sev];}
   int aggregatedSeverity(int crule);
   int averageSeverity(void);
   int weightedSeverity(void);
@@ -25,7 +28,7 @@ private:
   int m_maxEssentialSev;
   QMap<int, double> m_weights;
   QMap<int, double> m_thresholds;
-  QMap<int, ThresholdT> m_thresholdsLimits;
+  QVector<ThresholdT> m_thresholdsLimits;
 };
 
 
