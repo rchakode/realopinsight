@@ -27,7 +27,7 @@
 #include "utilsCore.hpp"
 #include "JsonHelper.hpp"
 #include "LsHelper.hpp"
-#include "SeverityManager.hpp"
+#include "SeverityAggregator.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <QSystemTrayIcon>
@@ -315,7 +315,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
   _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
-  _node.sev_prop = SeverityManager::propagatedSeverity(_node.sev, _node.sev_prule);
+  _node.sev_prop = SeverityAggregator::propagate(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
   if (_node.check.host == "-")
@@ -383,15 +383,15 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
     return result;
   }
 
-  SeverityManager severityManager(node->thresholdLimits);
+  SeverityAggregator severityManager(node->thresholdLimits);
 
   Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     result = computeNodeSeverity(childId);
     severityManager.addSeverity(result.sev, result.weight);
   }
 
-  node->sev = severityManager.aggregatedSeverity(node->sev_crule);
-  node->sev_prop = severityManager.propagatedSeverity(node->sev, node->sev_prule);
+  node->sev = severityManager.aggregate(node->sev_crule);
+  node->sev_prop = severityManager.propagate(node->sev, node->sev_prule);
 
   result.sev = node->sev_prop;
   result.weight = node->weight;

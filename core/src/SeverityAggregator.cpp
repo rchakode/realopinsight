@@ -1,8 +1,8 @@
 #include "Base.hpp"
-#include "SeverityManager.hpp"
+#include "SeverityAggregator.hpp"
 
 
-SeverityManager::SeverityManager(const QVector<ThresholdT>& thresholdLimits)
+SeverityAggregator::SeverityAggregator(const QVector<ThresholdT>& thresholdLimits)
   : m_count(0),
     m_totalWeight(0),
     m_maxSev(ngrt4n::Normal),
@@ -12,7 +12,7 @@ SeverityManager::SeverityManager(const QVector<ThresholdT>& thresholdLimits)
   reset();
 }
 
-void SeverityManager::reset(void)
+void SeverityAggregator::reset(void)
 {
   m_weights.clear();
   m_thresholds.clear();
@@ -34,7 +34,7 @@ void SeverityManager::reset(void)
 
 }
 
-void SeverityManager::addSeverity(int value, double weight)
+void SeverityAggregator::addSeverity(int value, double weight)
 {
   if (! Severity(value).isValid())
     value = ngrt4n::Unknown;
@@ -50,13 +50,13 @@ void SeverityManager::addSeverity(int value, double weight)
   ++m_count;
 }
 
-void SeverityManager::addThresholdLimit(const ThresholdT& th)
+void SeverityAggregator::addThresholdLimit(const ThresholdT& th)
 {
   m_thresholdsLimits.push_back(th);
   qSort(m_thresholdsLimits.begin(), m_thresholdsLimits.end(), ThresholdLessthanFnt());
 }
 
-QString SeverityManager::toString(void)
+QString SeverityAggregator::toString(void)
 {
   return QObject::tr(
         "Unknown: %1\%; Critical: %2\%; Major: %3\%; Minor: %4\%; Normal: %5\%; ")
@@ -68,7 +68,7 @@ QString SeverityManager::toString(void)
 }
 
 
-int SeverityManager::aggregatedSeverity(int crule)
+int SeverityAggregator::aggregate(int crule)
 {
   m_thresholdExceededMsg.clear();
   if (m_thresholds.isEmpty())
@@ -77,10 +77,10 @@ int SeverityManager::aggregatedSeverity(int crule)
   int result = ngrt4n::Unknown;
   switch (crule) {
   case CalcRules::Average:
-    result = averageSeverity();
+    result = weightedAverage();
     break;
   case CalcRules::Weighted:
-    result = weightedSeverity();
+    result = thresholdAverage();
     break;
   case CalcRules::Worst:
   default:
@@ -91,7 +91,7 @@ int SeverityManager::aggregatedSeverity(int crule)
 }
 
 
-int SeverityManager::propagatedSeverity(int sev, int prule)
+int SeverityAggregator::propagate(int sev, int prule)
 {
   qint8 result = static_cast<ngrt4n::SeverityT>(sev);
   Severity sevHelper(static_cast<ngrt4n::SeverityT>(sev));
@@ -108,7 +108,7 @@ int SeverityManager::propagatedSeverity(int sev, int prule)
   return result;
 }
 
-int SeverityManager::averageSeverity(void)
+int SeverityAggregator::weightedAverage(void)
 {
   double severityScore = 0;
   double weightSum = 0;
@@ -122,7 +122,7 @@ int SeverityManager::averageSeverity(void)
   return qRound(severityScore / weightSum);
 }
 
-int SeverityManager::weightedSeverity(void)
+int SeverityAggregator::thresholdAverage(void)
 {
   int thresholdReached = -1;
   int index = m_thresholdsLimits.size() - 1;
@@ -133,15 +133,15 @@ int SeverityManager::weightedSeverity(void)
     if (thvalue != m_thresholds.end() && (*thvalue >= th.weight)) {
       thresholdReached = m_thresholdsLimits[index].sev_out;
       m_thresholdExceededMsg = QObject::tr("%1 events exceeded %2\% and set to %3").arg(Severity(th.sev_in).toString(),
-                                                                                         QString::number(100 * th.weight),
-                                                                                         Severity(th.sev_out).toString()
-                                                                                         );
+                                                                                        QString::number(100 * th.weight),
+                                                                                        Severity(th.sev_out).toString()
+                                                                                        );
     }
     --index;
   }
 
   if (thresholdReached != -1)
-    return qMax(thresholdReached, averageSeverity());
+    return qMax(thresholdReached, weightedAverage());
 
-  return averageSeverity();
+  return weightedAverage();
 }

@@ -87,7 +87,7 @@ HEADERS += \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
-    core/src/SeverityManager.hpp
+    core/src/SeverityAggregator.hpp
 
 
 SOURCES += \
@@ -103,7 +103,7 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/SeverityManager.cpp
+    core/src/SeverityAggregator.cpp
 
 gui-base {
 QT += svg gui webkit
