@@ -95,8 +95,8 @@ void TestSeverityAggregation::testWeighted3(void)
 
   m_severityManager->displayWeight();
 
-  m_severityManager->addThresholdLimit({0.6, ngrt4n::Minor, ngrt4n::Major});
   m_severityManager->addThresholdLimit({0.8, ngrt4n::Minor, ngrt4n::Critical});
+  m_severityManager->addThresholdLimit({0.6, ngrt4n::Minor, ngrt4n::Major});
   QCOMPARE(m_severityManager->weightedSeverity(), static_cast<int>(ngrt4n::Critical));
 }
 

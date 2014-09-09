@@ -409,7 +409,7 @@ struct NodeT {
   double weight;
   QString child_nodes;
   CheckT check;
-  QVector<ThresholdT> thresholds;
+  QVector<ThresholdT> thresholdLimits;
   bool monitored;
   qint8 visibility;
   double pos_x;
@@ -420,6 +420,7 @@ struct NodeT {
     weight(ngrt4n::WEIGHT_UNIT){}
 
   QString toString(void) const {
+    //FIXME: add details about weithed threshold
     QString tip = QObject::tr("Service: %1\n"
                               "Description: %2\n"
                               "Severity: %3\n"

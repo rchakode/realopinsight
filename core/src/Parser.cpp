@@ -93,8 +93,8 @@ bool Parser::process(bool console)
 
     if (node.sev_crule == CalcRules::Weighted) {
       QString thdata = service.firstChildElement("Thresholds").text().trimmed();
-      node.thresholds = ThresholdHelper::dataToList(thdata);
-      qSort(node.thresholds.begin(), node.thresholds.end(), ThresholdLessthanFnt());
+      node.thresholdLimits = ThresholdHelper::dataToList(thdata);
+      qSort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
     }
 
     node.check.status = -1;

@@ -53,6 +53,7 @@ void SeverityManager::addSeverity(int value, double weight)
 void SeverityManager::addThresholdLimit(const ThresholdT& th)
 {
   m_thresholdsLimits.push_back(th);
+  qSort(m_thresholdsLimits.begin(), m_thresholdsLimits.end(), ThresholdLessthanFnt());
 }
 
 QString SeverityManager::thresholdsToString(void)

@@ -382,7 +382,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
     return result;
   }
 
-  SeverityManager severityManager(node->thresholds);
+  SeverityManager severityManager(node->thresholdLimits);
 
   Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     result = computeNodeSeverity(childId);

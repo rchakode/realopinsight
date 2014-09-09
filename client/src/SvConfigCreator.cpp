@@ -339,7 +339,7 @@ NodeT* SvCreator::createNode(const QString& id,
   node->sev_prule = PropRules::Unchanged;
   node->icon = ngrt4n::DEFAULT_ICON;
   node->child_nodes = QString();
-  node->thresholds = QVector<ThresholdT>();
+  node->thresholdLimits = QVector<ThresholdT>();
   return node;
 }
 
@@ -691,7 +691,7 @@ QString SvCreator::generateNodeXml(const NodeT& node)
 
   if (node.sev_crule == CalcRules::Weighted) {
 
-    xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholds)) );
+    xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)) );
   }
 
   xml.append("</Service>\n");

@@ -160,7 +160,7 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
   _node.alarm_msg        = alarmMsgField()->toPlainText();
   _node.notification_msg = notificationMsgField()->toPlainText();
   _node.weight           = m_weightBox->value();
-  _node.thresholds = ThresholdHelper::dataToList( thresholdsData() );
+  _node.thresholdLimits = ThresholdHelper::dataToList( thresholdsData() );
 
   if (_node.type == NodeType::AlarmNode) {
     QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
@@ -192,7 +192,7 @@ void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
 
   // thresholds entries
   m_thresholdRulesBox->clear();
-  Q_FOREACH(const ThresholdT& th, _node.thresholds) {
+  Q_FOREACH(const ThresholdT& th, _node.thresholdLimits) {
     ThresholdHelper thHelper(th.weight, th.sev_in, th.sev_out);
     if (thHelper.isValid())
       m_thresholdRulesBox->addItem(thHelper.toString(), thHelper.data());
