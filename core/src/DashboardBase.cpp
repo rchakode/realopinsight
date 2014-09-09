@@ -52,7 +52,7 @@
 namespace {
   const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-  } //namespace
+} //namespace
 
 StringMapT DashboardBase::propRules() {
   PropRules unchanged(PropRules::Unchanged);
@@ -139,44 +139,44 @@ void DashboardBase::runMonitor(SourceT& src)
   prepareUpdate(src);
   openRpcSession(src);
   switch(src.mon_type) {
-  case ngrt4n::Zenoss:
-    Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
-      if (info.first != src.id) continue;
-      ChecksT checks;
-      if (src.zns_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, src.zns_handler->lastError());
+    case ngrt4n::Zenoss:
+      Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+        StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
+        if (info.first != src.id) continue;
+        ChecksT checks;
+        if (src.zns_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
+          updateCNodesWithChecks(checks, src);
+        } else {
+          updateDashboardOnError(src, src.zns_handler->lastError());
+        }
       }
-    }
-    break;
-  case ngrt4n::Zabbix:
-    Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceHostInfo(hostItem);
+      break;
+    case ngrt4n::Zabbix:
+      Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
+        StringPairT info = ngrt4n::splitSourceHostInfo(hostItem);
 
-      if (info.first != src.id) continue;
+        if (info.first != src.id) continue;
 
-      ChecksT checks;
-      if (src.zbx_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, src.zbx_handler->lastError());
+        ChecksT checks;
+        if (src.zbx_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
+          updateCNodesWithChecks(checks, src);
+        } else {
+          updateDashboardOnError(src, src.zbx_handler->lastError());
+        }
       }
-    }
-    break;
-  case ngrt4n::Nagios:
-  default:
-    if (src.use_ngrt4nd) {
+      break;
+    case ngrt4n::Nagios:
+    default:
+      if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
-      runNgrt4ndUpdate(src);
+        runNgrt4ndUpdate(src);
 #else
-      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+        updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
 #endif
-    } else {
-      runLivestatusUpdate(src);
-    }
-    break;
+      } else {
+        runLivestatusUpdate(src);
+      }
+      break;
   }
   finalizeUpdate(src);
 }
@@ -269,24 +269,25 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-  case ngrt4n::Nagios:
-    msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
-    break;
-  case ngrt4n::Zabbix:
-  case ngrt4n::Zenoss:
-    msg = msg.arg(src.id, src.mon_url);
-    break;
-  default:
-    msg = msg.arg(src.id, "undefined source type");
-    break;
+    case ngrt4n::Nagios:
+      msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
+      break;
+    case ngrt4n::Zabbix:
+    case ngrt4n::Zenoss:
+      msg = msg.arg(src.id, src.mon_url);
+      break;
+    default:
+      msg = msg.arg(src.id, "undefined source type");
+      break;
   }
   Q_EMIT updateStatusBar(msg);
 }
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  updateTree(_node, _node.toString());
-  updateMap(_node, _node.toString());
+  QString tooltip = _node.toString();
+  updateTree(_node, tooltip);
+  updateMap(_node, tooltip);
   updateMsgConsole(_node);
   updateEventFeeds(_node);
 }
@@ -395,8 +396,9 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
   result.sev = node->sev_prop;
   result.weight = node->weight;
 
-  updateMap(*node, node->toString());
-  updateTree(*node, node->toString());
+  QString tooltip = node->toString();
+  updateMap(*node, tooltip);
+  updateTree(*node, tooltip);
 
   return result;
 }
@@ -424,14 +426,14 @@ void DashboardBase::openRpcSession(int srcId)
   SourceListT::Iterator src = m_sources.find(srcId);
   if (src != m_sources.end()) {
     switch (src->mon_type) {
-    case ngrt4n::Zabbix:
-      src->zbx_handler->setIsLogged(false);
-      break;
-    case ngrt4n::Zenoss:
-      src->zns_handler->setIsLogged(false);
-      break;
-    default:
-      break;
+      case ngrt4n::Zabbix:
+        src->zbx_handler->setIsLogged(false);
+        break;
+      case ngrt4n::Zenoss:
+        src->zns_handler->setIsLogged(false);
+        break;
+      default:
+        break;
     }
   }
   openRpcSession(*src);
@@ -447,26 +449,26 @@ void DashboardBase::openRpcSession(SourceT& src)
   }
 
   switch(src.mon_type) {
-  case ngrt4n::Nagios:
-    if (src.use_ngrt4nd) {
+    case ngrt4n::Nagios:
+      if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
-      src.d4n_handler->setupSocket();
-      src.d4n_handler->makeHandShake();
+        src.d4n_handler->setupSocket();
+        src.d4n_handler->makeHandShake();
 #else
-      updateDashboardOnError(src, tr("This version is compiled without ngrt4nd support"));
+        updateDashboardOnError(src, tr("This version is compiled without ngrt4nd support"));
 #endif
-    } else {
-      //src.ls_handler->setupSocket();
-    }
-    break;
-  case ngrt4n::Zabbix:
-    src.zbx_handler->openSession(src);
-    break;
-  case ngrt4n::Zenoss:
-    src.zns_handler->openSession(src);
-    break;
-  default:
-    break;
+      } else {
+        //src.ls_handler->setupSocket();
+      }
+      break;
+    case ngrt4n::Zabbix:
+      src.zbx_handler->openSession(src);
+      break;
+    case ngrt4n::Zenoss:
+      src.zns_handler->openSession(src);
+      break;
+    default:
+      break;
   }
 }
 
@@ -523,33 +525,33 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
   }
 
   switch (src.mon_type) {
-  case ngrt4n::Nagios:
-    if (src.use_ngrt4nd) {
+    case ngrt4n::Nagios:
+      if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
-      QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
-      src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
-      allocated = true;
+        QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
+        src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+        allocated = true;
 #else
-      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
-      allocated = false;
+        updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+        allocated = false;
 #endif
-    } else {
-      src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
+      } else {
+        src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
+        allocated = true;
+      }
+      break;
+    case ngrt4n::Zabbix:
+      src.zbx_handler = std::make_shared<ZbxHelper>(src.mon_url);
       allocated = true;
-    }
-    break;
-  case ngrt4n::Zabbix:
-    src.zbx_handler = std::make_shared<ZbxHelper>(src.mon_url);
-    allocated = true;
-    break;
-  case ngrt4n::Zenoss:
-    src.zns_handler = std::make_shared<ZnsHelper>(src.mon_url);
-    allocated = true;
-    break;
-  default:
-    updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
-    allocated = false;
-    break;
+      break;
+    case ngrt4n::Zenoss:
+      src.zns_handler = std::make_shared<ZnsHelper>(src.mon_url);
+      allocated = true;
+      break;
+    default:
+      updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
+      allocated = false;
+      break;
   }
 
   return allocated;
