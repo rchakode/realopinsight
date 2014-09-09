@@ -248,8 +248,7 @@ public:
   int value() const {return m_sev;}
 
   QString valueString(void) const {return QString::number(m_sev);}
-
-  bool isValid() {return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
+  bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
 
   QString toString(void) const {
     switch( m_sev )
@@ -419,17 +418,34 @@ struct NodeT {
     sev(ngrt4n::Unknown),
     weight(ngrt4n::WEIGHT_UNIT){}
 
+  QString thresholdsToString(void) const {
+    QString result;
+    Q_FOREACH(const ThresholdT& th, thresholdLimits) {
+      result.append( QString("%1\% of %2=>%3; ").arg(QString::number(100 * th.weight),
+                                                     Severity(th.sev_in).toString(),
+                                                     Severity(th.sev_out).toString())
+                     );
+    }
+
+    return result;
+  }
+
   QString toString(void) const {
-    //FIXME: add details about weithed threshold
     QString tip = QObject::tr("Service: %1\n"
                               "Description: %2\n"
                               "Severity: %3\n"
-                              "   Calc. Rule: %4\n"
+                              "   Calc. Rule: %4%9\n"   // the param  %9 will be filled if details required
                               "   Prop. Rule: %5").arg(name,
                                                        const_cast<QString&>(description).replace("\n", " "),
                                                        Severity(sev).toString(),
                                                        CalcRules(sev_crule).toString(),
                                                        PropRules(sev_prule).toString());
+    if (sev_crule == CalcRules::Weighted) {
+      tip.arg( QString("(%1)").arg(thresholdsToString()) );
+    } else {
+      tip.arg("");
+    }
+
     if (type == NodeType::AlarmNode) {
       tip.append(QObject::tr("\nTarget Host: %1\n"
                              "Groups: %2\n"
@@ -439,7 +455,8 @@ struct NodeT {
                                                       QString::fromStdString(check.host_groups),
                                                       child_nodes,
                                                       QString::fromStdString(check.alarm_msg),
-                                                      actual_msg));
+                                                      actual_msg)
+                 );
     }
     return tip;
   }

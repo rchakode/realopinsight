@@ -56,7 +56,7 @@ void SeverityManager::addThresholdLimit(const ThresholdT& th)
   qSort(m_thresholdsLimits.begin(), m_thresholdsLimits.end(), ThresholdLessthanFnt());
 }
 
-QString SeverityManager::thresholdsToString(void)
+QString SeverityManager::thresholdsText(void)
 {
   return QObject::tr(
         "Unknown  : %1 \%\n"
