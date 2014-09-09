@@ -70,7 +70,7 @@ public Q_SLOTS:
   void importZabbixTriggers(void);
   void importZenossComponents(void);
   void importLivestatusChecks(void);
-  void handleErrorOccurred(QString msg){ngrt4n::alert(msg);}
+  void handleErrorOccurred(QString msg);
 
 protected:
   virtual void contextMenuEvent( QContextMenuEvent *);
@@ -96,7 +96,7 @@ private:
 
   void loadFile(const QString &);
   void recordData(const QString &);
-  void recordNode(QTextStream& stream, const NodeT & node);
+  QString generateNodeXml(const NodeT & node);
   bool updateServiceNode(NodeListT& , const QString &);
   void loadMenu(void);
   void unloadMenu(void);
@@ -104,6 +104,7 @@ private:
   void resize(void);
   NodeT* createNode(const QString& id, const QString& label, const QString& parent);
   int parseStatusFile(const QString& _path, ChecksT& _checks);
+  void showStatusMsg(const QString& msg, bool error);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

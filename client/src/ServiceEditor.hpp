@@ -29,6 +29,7 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "Settings.hpp"
+#include <QWidget>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QtWidgets>
@@ -40,8 +41,6 @@
 const qint32 MAX_NODE_NAME = 255;
 const QString NAME_FIELD = "name";
 const QString TYPE_FIELD = "type";
-const QString STATUS_CALC_RULE_FIELD = "StatusCalcRules";
-const QString STATUS_PROP_RULE_FIELD = "StatusPropRules";
 const QString ICON_FIELD = "icon";
 const QString DESCRIPTION_FIELD = "description";
 const QString ALARM_MSG_FIELD = "alarmMsg";
@@ -64,9 +63,8 @@ public:
   virtual ~ServiceEditor();
 
   void layoutEditorComponents(void);
-  void fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId);
-  void fillFormWithNodeContent(const NodeT& _node);
-  void fillFormWithNodeContent(NodeListT::const_iterator nodeIt) {fillFormWithNodeContent(*nodeIt);}
+  void fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId);
+  void fillInEditorWithContent(const NodeT& _node);
   bool updateNodeInfo(NodeT& _node);
   void updateDataPoints(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
@@ -74,8 +72,6 @@ public:
   WidgetMapT* itemList(void) {return& m_fieldWidgets;}
   QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[NAME_FIELD]);}
   QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[TYPE_FIELD]);}
-  QComboBox* statusCalcRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_CALC_RULE_FIELD]);}
-  QComboBox* statusPropRuleField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[STATUS_PROP_RULE_FIELD]);}
   QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[ICON_FIELD]);}
   QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(m_fieldWidgets[DESCRIPTION_FIELD]);}
   QTextEdit* alarmMsgField(void){return dynamic_cast<QTextEdit*>(m_fieldWidgets[ALARM_MSG_FIELD]);}
@@ -93,15 +89,58 @@ public Q_SLOTS:
   void handleAddDataPointEntry(void) { addAndSelectDataPointEntry(m_dataPointSearchField->text());}
   void handleDataPointFieldReturnPressed(void);
   void handleUpdateDataPointsList(void);
+  void handleAddThreshold(void);
+  void handleRemoveThreshold(void);
+  void handleThresholdRulesChanged(void);
+  void handleCalcRuleChanged(void);
 
 Q_SIGNALS:
   void saveClicked(void);
   void closeClicked(void);
   void returnPressed(void);
   void nodeTypeActivated(qint32);
+  void errorOccurred(QString);
 
 
 private:
+  enum WeightType {
+    WeightNormalized = 0,
+    WeightThreshold = 1
+  };
+
+  class WeightBox : public QDoubleSpinBox {
+  public:
+    WeightBox(qint8 weightType, QWidget* parent = 0) : QDoubleSpinBox(parent) {
+
+      switch (weightType) {
+      case WeightThreshold:
+        setDecimals(0);
+        setRange(0, 100);
+        setValue(100);
+        setSingleStep(100 * 100 * ngrt4n::WEIGHT_UNIT);
+        setSuffix(tr(" %"));
+        break;
+      case WeightNormalized:
+      default:
+        setDecimals(1);
+        setRange(ngrt4n::WEIGHT_MIN, ngrt4n::WEIGHT_MAX);
+        setValue(ngrt4n::WEIGHT_UNIT);
+        setSingleStep(ngrt4n::WEIGHT_UNIT);
+        break;
+      }
+    }
+  };
+
+
+  class IconButton : public QPushButton {
+  public:
+    IconButton(const QString& path, QWidget*parent = 0) : QPushButton(QIcon(path), "", parent) {
+      setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+      setParent(parent);
+      setFixedSize(QSize(24, 24));
+    }
+  };
+
   qint32 m_rows;
   qint16 m_currentRow;
   WidgetMapT m_fieldWidgets;
@@ -114,12 +153,23 @@ private:
   QStackedWidget* m_dataPointActionButtons;
   QPushButton* m_searchDataPointButton;
   QPushButton* m_addDataPointButton;
+  QComboBox* m_calcRulesBox;
+  QComboBox* m_propRulesBox;
+  WeightBox* m_weightBox;
+  WeightBox* m_thresholdWeightBox;
+  QComboBox* m_thresholdInSeverityBox;
+  QComboBox* m_thresholdOutSeverityBox;
+  QComboBox* m_thresholdRulesBox;
+  IconButton* m_addThresholdButton;
+  IconButton* m_removeThresholdButton;
+  QFrame* m_thresholdFrame;
 
   void addEvent(void);
   void layoutLabelFields(void);
   void layoutDescriptionFields(void);
   void layoutTypeFields(void);
-  void layoutStatusHandlingFields(void);
+  void layoutStatusCalcFields(void);
+  void layoutStatusPropFields(void);
   void layoutAlarmMsgFields(void);
   void layoutNotificationMsgFields(void);
   void layoutIconFields(void);
@@ -128,6 +178,7 @@ private:
   QLabel* createCheckFieldHelpIcon(void);
   void setCheckFieldsStyle(void);
   void addAndSelectDataPointEntry(const QString& text);
+  QString thresholdsData(void) const;
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */

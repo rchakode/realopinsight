@@ -343,9 +343,10 @@ QString GuiPreferences::style()
       "         stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
       "         stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
       "}"
-      "QGraphicsView {"
-      " background: #F8F8FF;"
-      "}"
+      "QGraphicsView { background: #F8F8FF;}"
+      "QLineEdit { border: none }"
+      "QComboBox { border: none; background: white; }"
+      "QAbstractSpinBox { border: none; background: white; }"
       ;
   return styleSheet;
 }

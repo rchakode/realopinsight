@@ -81,10 +81,11 @@ int RawSocket::makeRequest(const QByteArray& data)
   char buffer[BUFFER_SIZE];
   int count = 0;
   m_lastResult.clear();
-  while ((count = recv(sock, buffer, BUFFER_SIZE -1, 0)) > 0)
-    m_lastResult.append(buffer);
+  while ((count = recv(sock, buffer, BUFFER_SIZE -1, 0)) > 0) {
+    m_lastResult.append(QString::fromUtf8(buffer, count));
+  }
 
-  if (count< 0) {
+  if (count < 0) {
     m_lastError = QObject::tr("Failed receiving data");
     return -1;
   }

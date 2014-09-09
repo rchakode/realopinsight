@@ -26,7 +26,6 @@
 #define BASE_HPP
 #include <QtCore/QtGlobal>
 #include <QtCore>
-#include <QtXml>
 #include <QSettings>
 #include <memory>
 #include <unordered_map>
@@ -57,6 +56,7 @@ const QString USER_BN = "ngrt4n";
 const QString CORE_VERSION = REALOPINSIGHT_CORE_VERSION;
 const QString PKG_VERSION = REALOPINSIGHT_PACKAGE_VERSION;
 const QString PKG_URL = REALOPINSIGHT_PACKAGE_URL;
+const QString DOCS_URL = REALOPINSIGHT_GET_HELP_URL;
 const QString REL_NAME = REALOPINSIGHT_RELEASE_NAME;
 const QString REL_YEAR = REALOPINSIGHT_RELEASE_YEAR;
 const QString REPORT_BUG = REALOPINSIGHT_BUG_REPORT_EMAIL;
@@ -96,6 +96,11 @@ namespace ngrt4n {
     Major = 2,
     Critical = 3,
     Unknown = 4
+  };
+
+  struct AggregatedSeverityT {
+    int sev;
+    double weight;
   };
 
   enum NagiosStatusT {
@@ -154,6 +159,9 @@ namespace ngrt4n {
   const std::string TAG_CHECK = "\\{check_name\\}";
   const std::string TAG_THERESHOLD = "\\{threshold\\}";
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
+  const double WEIGHT_UNIT = 1.0;
+  const double WEIGHT_MIN = 0;
+  const double WEIGHT_MAX = 10;
 
   } // namespace ngrt4n
 
@@ -165,15 +173,12 @@ public:
     Increased = 2
   };
 
-  static QString toString(PropRulesT rule) {
-    return QString::number(rule);
-  }
+  PropRules(int rule) : m_rule(rule) {}
 
-  static QString label(qint32 rule) {
-    return label(static_cast<PropRulesT>(rule));
-  }
-  static QString label(PropRulesT rule) {
-    switch(rule) {
+  QString data(void) { return QString::number(m_rule); }
+
+  QString toString(void) {
+    switch( static_cast<PropRulesT>(m_rule) ) {
     case Unchanged: return QObject::tr("Unchanged");
     case Decreased: return QObject::tr("Decreased");
     case Increased: return QObject::tr("Increased");
@@ -181,20 +186,44 @@ public:
 
     return QObject::tr("Unchanged");
   }
+
+
+
+private:
+  int m_rule;
 };
 
 
 class CalcRules {
 public:
   enum CalcRulesT{
-    HighCriticity = 0,
-    WeightedCriticity = 1
+    Worst = 0,
+    Average = 1,
+    Weighted = 2
   };
-  static QString toString(CalcRulesT rule) { return QString::number(rule);}
-  static QString label(qint32 rule) { return label(static_cast<CalcRulesT>(rule));}
-  static QString label(CalcRulesT rule) {
-    if (rule == WeightedCriticity) return QObject::tr("Average");
-    return QObject::tr("High Severity");}
+
+  CalcRules(int rule) : m_rule(rule) {}
+
+  QString data(void) { return QString::number(m_rule);}
+  QString toString(void) const {
+    QString result = QObject::tr("Default");
+    switch (m_rule) {
+    case Average:
+      result = QObject::tr("Average");
+      break;
+    case Weighted:
+      result = QObject::tr("Weighted Threshold");
+      break;
+    case Worst:
+    default:
+      result = QObject::tr("Worst Severity");
+      break;
+    }
+    return result;
+  }
+
+private:
+  int m_rule;
 };
 
 class NodeType {
@@ -203,7 +232,7 @@ public:
     ServiceNode = 0,
     AlarmNode = 1
   };
-  static QString toString(int _type ) {
+  static QString toString(int _type) {
     if (_type == AlarmNode )
       return QObject::tr("Native Check");
     return QObject::tr("Business Process");
@@ -211,103 +240,156 @@ public:
 };
 
 
-class SeverityHelper {
+class Severity {
 public:
-  SeverityHelper(ngrt4n::SeverityT _value): value(_value) {}
-  void setValue(ngrt4n::SeverityT _value) {value = _value;}
-  ngrt4n::SeverityT getValue() const {return value;}
+  Severity(int sev): m_sev(sev) {}
 
-  SeverityHelper operator *(SeverityHelper& sh) const {
-    switch(value) {
-    case ngrt4n::Critical:
-      return SeverityHelper(value);
-      break;
+  void setValue(int _value) {m_sev = _value;}
+  int value() const {return m_sev;}
+
+  QString valueString(void) const {return QString::number(m_sev);}
+  bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
+
+  QString toString(void) const {
+    switch( m_sev )
+    {
     case ngrt4n::Normal:
-      return sh;
+      return QObject::tr("Normal");
       break;
     case ngrt4n::Minor:
-      if(sh.value == ngrt4n::Critical ||
-         sh.value == ngrt4n::Major ||
-         sh.value == ngrt4n::Unknown)
-        return sh;
-
-      return SeverityHelper(value);
+      return  QObject::tr("Minor");
       break;
     case ngrt4n::Major:
-      if(sh.value == ngrt4n::Critical ||
-         sh.value == ngrt4n::Unknown)
-        return sh;
+      return  QObject::tr("Major");
+      break;
+    case ngrt4n::Critical:
+      return  QObject::tr("Critical");
+      break;
+    default:
+      break;
+    }
+    return QObject::tr("Unknown");
+  }
 
-      return SeverityHelper(value);
+  Severity operator *(Severity& sev) const {
+    switch(m_sev) {
+    case ngrt4n::Critical:
+      return Severity(m_sev);
+      break;
+    case ngrt4n::Normal:
+      return sev;
+      break;
+    case ngrt4n::Minor:
+      if(sev.m_sev == ngrt4n::Critical ||
+         sev.m_sev == ngrt4n::Major ||
+         sev.m_sev == ngrt4n::Unknown)
+        return sev;
+
+      return Severity(m_sev);
+      break;
+    case ngrt4n::Major:
+      if(sev.m_sev == ngrt4n::Critical ||
+         sev.m_sev == ngrt4n::Unknown)
+        return sev;
+
+      return Severity(m_sev);
       break;
     default:
       // MonitorBroker::CRITICITY_UNKNOWN
-      if(sh.value == ngrt4n::Critical)
-        return sh;
+      if(sev.m_sev == ngrt4n::Critical)
+        return sev;
       break;
     }  //end switch
 
-    return SeverityHelper(ngrt4n::Unknown);
+    return Severity(ngrt4n::Unknown);
   }
 
 
-  SeverityHelper operator / (SeverityHelper& st) const {
-    if(value == st.value)
+  Severity operator / (Severity& st) const {
+    if(m_sev == st.m_sev)
       return st;
 
-    if(value == ngrt4n::Critical ||
-       st.value == ngrt4n::Critical)
-      return SeverityHelper(ngrt4n::Critical);
+    if(m_sev == ngrt4n::Critical ||
+       st.m_sev == ngrt4n::Critical)
+      return Severity(ngrt4n::Critical);
 
-    if(value == ngrt4n::Unknown ||
-       st.value == ngrt4n::Unknown)
-      return SeverityHelper(ngrt4n::Unknown);
+    if(m_sev == ngrt4n::Unknown ||
+       st.m_sev == ngrt4n::Unknown)
+      return Severity(ngrt4n::Unknown);
 
-    if(value == ngrt4n::Major ||
-       st.value == ngrt4n::Major)
-      return SeverityHelper(ngrt4n::Major);
+    if(m_sev == ngrt4n::Major ||
+       st.m_sev == ngrt4n::Major)
+      return Severity(ngrt4n::Major);
 
-    if(value == ngrt4n::Minor ||
-       st.value == ngrt4n::Minor)
-      return SeverityHelper(ngrt4n::Minor);
+    if(m_sev == ngrt4n::Minor ||
+       st.m_sev == ngrt4n::Minor)
+      return Severity(ngrt4n::Minor);
 
-    return SeverityHelper(ngrt4n::Normal);
+    return Severity(ngrt4n::Normal);
   }
 
-  SeverityHelper operator ++() {
-    switch(value) {
+  Severity operator ++() {
+    switch(m_sev) {
     case ngrt4n::Minor:
-      return SeverityHelper(ngrt4n::Major);
+      return Severity(ngrt4n::Major);
       break;
     case ngrt4n::Major:
-      return SeverityHelper(ngrt4n::Critical);
+      return Severity(ngrt4n::Critical);
       break;
     default:
       //leave unchanged
       break;
     }
-    return SeverityHelper(value);
+    return Severity(m_sev);
   }
 
-  SeverityHelper operator--() {
+  Severity operator--() {
 
-    switch(value) {
+    switch(m_sev) {
     case ngrt4n::Critical:
-      return SeverityHelper(ngrt4n::Major);
+      return Severity(ngrt4n::Major);
       break;
     case ngrt4n::Major:
-      return SeverityHelper(ngrt4n::Minor);
+      return Severity(ngrt4n::Minor);
       break;
     default:
       //leave unchanged
       break;
     }
-    return SeverityHelper(value);
+    return Severity(m_sev);
   }
 
 private:
-  ngrt4n::SeverityT value;
+  int m_sev;
 };
+
+struct ThresholdT {
+  double weight;
+  int sev_in;
+  int sev_out;
+};
+
+struct ThresholdLessthanFnt {
+  bool operator () (const ThresholdT& th1, const ThresholdT& th2)
+  {
+    if (th1.sev_out < th2.sev_out)
+      return true;
+
+    if (th1.sev_out == th2.sev_out) {
+      if (th1.sev_in < th2.sev_in)
+        return true;
+
+      if (th1.sev_in == th2.sev_in)
+        return th1.weight < th2.weight;
+
+      return false;
+    }
+
+    return false;
+  }
+};
+
+
 
 struct NodeT {
   QString id;
@@ -323,28 +405,66 @@ struct NodeT {
   QString actual_msg;
   qint32 sev;
   qint32 sev_prop;
-  int weight;
+  double weight;
   QString child_nodes;
   CheckT check;
+  QVector<ThresholdT> thresholdLimits;
   bool monitored;
   qint8 visibility;
   double pos_x;
   double pos_y;
-  NodeT():
-    sev_crule(PropRules::Unchanged),
-    sev_prule(CalcRules::HighCriticity),
+  NodeT(): sev_crule(PropRules::Unchanged),
+    sev_prule(CalcRules::Worst),
     sev(ngrt4n::Unknown),
-    weight(1){}
-};
+    weight(ngrt4n::WEIGHT_UNIT){}
 
-struct SeverityWeightInfoT {
-  int sev;
-  int weight;
-  SeverityWeightInfoT() : sev(ngrt4n::Unknown), weight(1){}
-  friend bool operator < (const SeverityWeightInfoT& s1, const SeverityWeightInfoT& s2) {
-    return s1.sev < s2.sev;
+  QString thresholdsToString(void) const {
+    QString result = "";
+    if (sev_crule == CalcRules::Weighted) {
+      Q_FOREACH(const ThresholdT& th, thresholdLimits) {
+        result.append( QString("%1\% of %2 => %3; ").arg(QString::number(100 * th.weight),
+                                                         Severity(th.sev_in).toString(),
+                                                         Severity(th.sev_out).toString())
+                       );
+      }
+
+      return "("+result+")";
+    }
+
+    return result;
+  }
+
+  QString toString(void) const {
+
+    QString tip = QObject::tr("Service: %1"
+                              "\nDescription: %2"
+                              "\nSeverity: %3"
+                              "\nCalc. Rule: %4 %9"   // the param  %9 will be filled if details required
+                              "\nProp. Rule: %5").arg(name,
+                                                      const_cast<QString&>(description).replace("\n", " "),
+                                                      Severity(sev).toString(),
+                                                      CalcRules(sev_crule).toString(),
+                                                      PropRules(sev_prule).toString(),
+                                                      thresholdsToString());
+
+    if (type == NodeType::AlarmNode) {
+      tip.append(QObject::tr("\nTarget Host: %1"
+                             "\nGroups: %2"
+                             "\nData Point: %3"
+                             "\nRaw Output: %4"
+                             "\nOther Details: %5").arg(QString::fromStdString(check.host).replace("\n", " "),
+                                                        QString::fromStdString(check.host_groups),
+                                                        child_nodes,
+                                                        QString::fromStdString(check.alarm_msg),
+                                                        actual_msg)
+                 );
+    } else {
+      tip.append(QObject::tr("\nSummary Child Status: %1").arg(actual_msg));
+    }
+    return tip;
   }
 };
+
 
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, NodeT> NodeListT;
@@ -358,6 +478,7 @@ typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
   qint8 monitor;
+  double format_version;
   NodeListT bpnodes;
   NodeListT cnodes;
   CheckStatusCountT check_status_count;

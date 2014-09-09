@@ -28,20 +28,27 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.0.5
+REALOPINSIGHT_CORE_VERSION=3.1.0
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
-DEFINES *= WIN32
-DEFINES *= WIN32_LEAN_AND_MEAN
-INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
-LIBS += -lws2_32 -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
-}
-unix {
-LIBS += -lzmq
+  DEFINES *= WIN32
+  DEFINES *= WIN32_LEAN_AND_MEAN
+  LIBS += -lws2_32
 }
 
-DEFINES *= BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
+disbalezmq {
+  DEFINES *= REALOPINSIGHT_DISABLE_ZMQ
+} else {
+  HEADERS += core/src/ZmqSocket.hpp
+  SOURCES += core/src/ZmqSocket.cpp
+  win32 {
+    INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
+    LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
+  } else {
+    LIBS += -lzmq
+  }
+}
 
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
@@ -73,13 +80,14 @@ HEADERS += \
     core/src/ZbxHelper.hpp \
     core/src/ZnsHelper.hpp \
     core/src/Settings.hpp \
-    core/src/ZmqSocket.hpp \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \
-    core/src/RawSocket.hpp
+    core/src/RawSocket.hpp \
+    core/src/ThresholdHelper.hpp \
+    core/src/SeverityAggregator.hpp
 
 
 SOURCES += \
@@ -88,13 +96,14 @@ SOURCES += \
     core/src/ZbxHelper.cpp \
     core/src/ZnsHelper.cpp \
     core/src/Settings.cpp \
-    core/src/ZmqSocket.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
     core/src/utilsCore.cpp \
     core/src/ChartBase.cpp \
     core/src/JsonHelper.cpp \
-    core/src/RawSocket.cpp
+    core/src/RawSocket.cpp \
+    core/src/ThresholdHelper.cpp \
+    core/src/SeverityAggregator.cpp
 
 gui-base {
 QT += svg gui webkit
@@ -177,3 +186,9 @@ DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Eliana\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
+
+
+unittests {
+SOURCES += core/src/unittests.cpp
+QT += testlib
+}

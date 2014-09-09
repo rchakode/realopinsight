@@ -28,43 +28,19 @@
 #include "GraphView.hpp"
 #include "DashboardBase.hpp"
 #include "utilsCore.hpp"
+#include "ThresholdHelper.hpp"
 
 typedef QList<QListWidgetItem*> CheckItemList;
 namespace {
   const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
-  }
+}
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
     m_mainLayout(new QGridLayout(this)),
     m_actionButtonBox(new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close))
 {
-  m_fieldWidgets["nameLabel"] = new QLabel(tr("Name"), this);
-  m_fieldWidgets[NAME_FIELD] = new QLineEdit(this);
-
-  m_fieldWidgets["typeLabel"] = new QLabel(tr("Type"), this);
-  m_fieldWidgets[TYPE_FIELD] = new QComboBox(this);
-
-  m_fieldWidgets["iconNameLabel"] = new QLabel(tr("Icon"), this);
-  m_fieldWidgets[ICON_FIELD] = new QComboBox(this);
-
-  m_fieldWidgets["priorityLabel"] = new QLabel(tr("Severity Handling Rules"), this);
-  m_fieldWidgets[STATUS_CALC_RULE_FIELD] = new QComboBox(this);
-  m_fieldWidgets[STATUS_PROP_RULE_FIELD] = new QComboBox(this);
-
-  m_fieldWidgets["descriptionLabel"] = new QLabel(tr("Description"), this);
-  m_fieldWidgets[DESCRIPTION_FIELD] = new QTextEdit(this);
-
-  m_fieldWidgets["alarmMsgLabel"] = new QLabel(tr("Alarm Message"), this);
-  m_fieldWidgets[ALARM_MSG_FIELD]  = new QTextEdit();
-
-  m_fieldWidgets["notificationMsgLabel"] = new QLabel(tr("Notification Message"), this);
-  m_fieldWidgets[NOTIFICATION_MSG_FIELD] = new QTextEdit(this);
-
-  m_fieldWidgets["lowLevelAlarmsLabel"] = new QLabel(tr("Data Point"), this);
-  m_fieldWidgets[CHECK_FIELD] = new QListWidget();
-
   m_checkFieldsGroup = new QGroupBox(this);
 
   m_dataPointSearchField = new QLineEdit(this);
@@ -77,9 +53,7 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
   m_dataPointActionButtons = new QStackedWidget(this);
   m_dataPointActionButtons->addWidget(m_searchDataPointButton);
   m_dataPointActionButtons->addWidget(m_addDataPointButton);
-
   layoutEditorComponents();
-
   addEvent();
 }
 
@@ -119,6 +93,10 @@ ServiceEditor::~ServiceEditor()
   delete m_mainLayout;
 }
 
+  delete m_dataPointSearchField;
+  delete m_actionButtonBox;
+  delete m_mainLayout;
+}
 
 void ServiceEditor::addEvent(void)
 {
@@ -132,6 +110,10 @@ void ServiceEditor::addEvent(void)
   connect(m_hostGroupFilterBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(handleUpdateDataPointsList()));
   connect(m_actionButtonBox, SIGNAL(accepted()), this, SLOT(handleSaveClick()));
   connect(m_actionButtonBox, SIGNAL(rejected()), this, SLOT(handleCloseClick()));
+  connect(m_addThresholdButton, SIGNAL(clicked()), this, SLOT(handleAddThreshold()));
+  connect(m_removeThresholdButton, SIGNAL(clicked()), this, SLOT(handleRemoveThreshold()));
+  connect(m_thresholdRulesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(handleThresholdRulesChanged()));
+  connect(m_calcRulesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(handleCalcRuleChanged()));
 }
 
 
@@ -140,7 +122,8 @@ void ServiceEditor::layoutEditorComponents(void)
   m_currentRow = 0;
   layoutLabelFields();
   layoutTypeFields();
-  layoutStatusHandlingFields();
+  layoutStatusCalcFields();
+  layoutStatusPropFields();
   layoutIconFields();
   layoutDescriptionFields();
   layoutAlarmMsgFields();
@@ -186,13 +169,16 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
 {
   _node.name             = nameField()->text();
   _node.type             = typeField()->currentIndex();
-  _node.sev_crule        = statusCalcRuleField()->currentIndex();
-  _node.sev_prule        = statusPropRuleField()->currentIndex();
+  _node.sev_crule        = m_calcRulesBox->itemData( m_calcRulesBox->currentIndex() ).toInt();
+  _node.sev_prule        = m_propRulesBox->itemData( m_propRulesBox->currentIndex() ).toInt();
   _node.icon             = iconField()->currentText();
   _node.description      = descriptionField()->toPlainText();
   _node.alarm_msg        = alarmMsgField()->toPlainText();
   _node.notification_msg = notificationMsgField()->toPlainText();
-  if(_node.type == NodeType::AlarmNode) {
+  _node.weight           = m_weightBox->value();
+  _node.thresholdLimits = ThresholdHelper::dataToList( thresholdsData() );
+
+  if (_node.type == NodeType::AlarmNode) {
     QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
     if (! selectedItems.isEmpty())
       _node.child_nodes = selectedItems.at(0)->text();
@@ -201,24 +187,34 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
   return true;
 }
 
-void ServiceEditor::fillFormWithNodeContent(const NodeListT& nodes, const QString& nodeId)
+void ServiceEditor::fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId)
 {
   NodeListT::const_iterator node = nodes.find(nodeId);
-  if( node != nodes.end()) fillFormWithNodeContent(node);
+  if (node != nodes.end())
+    fillInEditorWithContent(*node);
 }
 
-
-
-void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
+void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
-  statusCalcRuleField()->setCurrentIndex(_node.sev_crule);
-  statusPropRuleField()->setCurrentIndex(_node.sev_prule);
+  m_calcRulesBox->setCurrentIndex( m_calcRulesBox->findData( CalcRules(_node.sev_crule).data() ));
+  m_propRulesBox->setCurrentIndex( m_propRulesBox->findData( PropRules(_node.sev_prule).data() ));
+  m_weightBox->setValue(_node.weight);
   iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
   descriptionField()->setText(_node.description);
   alarmMsgField()->setText(_node.alarm_msg);
   notificationMsgField()->setText(_node.notification_msg);
+
+  // thresholds entries
+  m_thresholdRulesBox->clear();
+  Q_FOREACH(const ThresholdT& th, _node.thresholdLimits) {
+    ThresholdHelper thHelper(th.weight, th.sev_in, th.sev_out);
+    if (thHelper.isValid())
+      m_thresholdRulesBox->addItem(thHelper.toString(), thHelper.data());
+    else
+      Q_EMIT errorOccurred(tr("Invalid threshold rule: %1").arg(thHelper.data()));
+  }
 
   if (_node.type == NodeType::AlarmNode) {
     QStringList childNodes = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
@@ -237,87 +233,156 @@ void ServiceEditor::fillFormWithNodeContent(const NodeT& _node)
 
 void ServiceEditor::layoutLabelFields()
 {
+  QLineEdit* inputWidget = new QLineEdit(this);
+  inputWidget->setMaxLength( MAX_NODE_NAME );
+  m_fieldWidgets[NAME_FIELD] = inputWidget;
+
   ++m_currentRow;
-  nameField()->setMaxLength( MAX_NODE_NAME );
-  m_mainLayout->addWidget(m_fieldWidgets["nameLabel"], m_currentRow, 0);
+  m_mainLayout->addWidget(new QLabel(tr("Name"), this), m_currentRow, 0);
   m_mainLayout->addWidget(nameField(),m_currentRow, 1, 1, 2);
-}
-
-
 void ServiceEditor::layoutDescriptionFields()
-{
+  m_fieldWidgets[DESCRIPTION_FIELD] = new QTextEdit(this);
+
   ++m_currentRow;
-  m_mainLayout->addWidget(m_fieldWidgets["descriptionLabel"], m_currentRow, 0);
+  m_mainLayout->addWidget(new QLabel(tr("Description"), this), m_currentRow, 0);
   m_mainLayout->addWidget(descriptionField(),m_currentRow, 1, 1, 2);
 }
 
 
 void ServiceEditor::layoutTypeFields()
 {
+  QComboBox* inputWidget = new QComboBox(this);
+  inputWidget->addItem( NodeType::toString(NodeType::ServiceNode) );
+  inputWidget->addItem( NodeType::toString(NodeType::AlarmNode) );
+  m_fieldWidgets[TYPE_FIELD] = inputWidget;
+
   ++m_currentRow;
-  typeField()->addItem( NodeType::toString(NodeType::ServiceNode) );
-  typeField()->addItem( NodeType::toString(NodeType::AlarmNode) );
-  m_mainLayout->addWidget(m_fieldWidgets["typeLabel"], m_currentRow, 0);
-  m_mainLayout->addWidget(typeField(),m_currentRow,1,1,2);
+  m_mainLayout->addWidget(new QLabel(tr("Type"), this), m_currentRow, 0);
+  m_mainLayout->addWidget(typeField(), m_currentRow, 1, 1, 2);
 }
 
-void ServiceEditor::layoutStatusHandlingFields(void)
+void ServiceEditor::layoutStatusCalcFields(void)
 {
-  ++m_currentRow;
-  StringMapT crules = DashboardBase::calcRules();
-  QString defaultRule = CalcRules::label(CalcRules::HighCriticity);
-  statusCalcRuleField()->addItem(tr("Calculation rule (Default is %1)").arg(defaultRule), CalcRules::HighCriticity);
+  m_calcRulesBox = new QComboBox(this);
+  m_calcRulesBox->setInsertPolicy(QComboBox::InsertAtBottom);
 
-  Q_FOREACH(const QString& rule, crules.keys()) {
-    statusCalcRuleField()->addItem(rule, crules.value(rule));
+  StringMapT rules = DashboardBase::calcRules();
+  Q_FOREACH(const QString& rule, rules.keys()) {
+    m_calcRulesBox->addItem(rule, rules.value(rule));
   }
-  StringMapT prules = DashboardBase::propRules();
-  defaultRule = PropRules::label(PropRules::Unchanged);
-  statusPropRuleField()->addItem(tr("Propagation rule (Default is %1)").arg(defaultRule), PropRules::Unchanged);
-  Q_FOREACH(const QString& rule, prules.keys()) {
-    statusPropRuleField()->addItem(rule, prules.value(rule));
+
+  QHBoxLayout* thresholdFieldsLayout = new QHBoxLayout();
+  thresholdFieldsLayout->addWidget(new QLabel(tr("If"), this), 0);
+  thresholdFieldsLayout->addWidget(m_thresholdWeightBox = new WeightBox(WeightThreshold, this));
+  thresholdFieldsLayout->addWidget(new QLabel(tr("Of"), this), 0);
+  thresholdFieldsLayout->addWidget(m_thresholdInSeverityBox = new QComboBox(this), 2);
+  thresholdFieldsLayout->addWidget(new QLabel(tr("Set To"), this), 1);
+  thresholdFieldsLayout->addWidget(m_thresholdOutSeverityBox = new QComboBox(this),  2);
+  thresholdFieldsLayout->addWidget(m_addThresholdButton = new IconButton(":images/built-in/document-add_32x32.png", this), 1);
+  thresholdFieldsLayout->addWidget(m_thresholdRulesBox = new QComboBox(this), 5);
+  thresholdFieldsLayout->addWidget(m_removeThresholdButton = new IconButton(":images/built-in/document-remove_32x32.png", this), 1);
+
+  m_thresholdFrame = new QFrame(this);
+  m_thresholdFrame->setLayout(thresholdFieldsLayout);
+  m_removeThresholdButton->setEnabled(false);
+
+  m_addThresholdButton->setToolTip(tr("Add rule"));
+  m_removeThresholdButton->setToolTip(tr("Remove rule"));
+
+
+  QMap<qint8, Severity> allSeverities;
+  allSeverities.insert(ngrt4n::Normal, Severity(ngrt4n::Normal));
+  allSeverities.insert(ngrt4n::Minor, Severity(ngrt4n::Minor));
+  allSeverities.insert(ngrt4n::Major, Severity(ngrt4n::Major));
+  allSeverities.insert(ngrt4n::Critical, Severity(ngrt4n::Critical));
+  allSeverities.insert(ngrt4n::Unknown, Severity(ngrt4n::Unknown));
+
+  Q_FOREACH(const Severity& sev, allSeverities) {
+    m_thresholdInSeverityBox->addItem(sev.toString(), sev.valueString());
+    m_thresholdOutSeverityBox->addItem(sev.toString(), sev.valueString());
   }
-  m_mainLayout->addWidget(m_fieldWidgets["priorityLabel"], m_currentRow, 0);
-  m_mainLayout->addWidget(statusCalcRuleField(),m_currentRow,1);
-  m_mainLayout->addWidget(statusPropRuleField(),m_currentRow,2);
+
+  ++m_currentRow;
+  m_mainLayout->addWidget(new QLabel(tr("Severiry Calculation Rule"), this), m_currentRow, 0);
+  m_mainLayout->addWidget(m_calcRulesBox, m_currentRow, 1);
+  m_mainLayout->addWidget(m_thresholdFrame, m_currentRow, 2);
+}
+
+void ServiceEditor::layoutStatusPropFields(void)
+{
+  m_propRulesBox = new QComboBox(this);
+  m_propRulesBox->setInsertPolicy(QComboBox::InsertAtBottom);
+  StringMapT rules = DashboardBase::propRules();
+  Q_FOREACH(const QString& rule, rules.keys()) {
+    m_propRulesBox->addItem(rule, rules.value(rule));
+  }
+
+  QHBoxLayout* weightFieldLayout = new QHBoxLayout();
+  weightFieldLayout->addWidget(new QLabel(tr("Weight"), this), 1);
+  weightFieldLayout->addWidget(m_weightBox = new WeightBox(WeightNormalized, this), 10, Qt::AlignLeft);
+
+  ++m_currentRow;
+  m_mainLayout->addWidget(new QLabel(tr("Severity Propagation Rule"), this), m_currentRow, 0);
+  m_mainLayout->addWidget(m_propRulesBox, m_currentRow, 1);
+  m_mainLayout->addLayout(weightFieldLayout, m_currentRow, 2, Qt::AlignLeft);
 }
 
 void ServiceEditor::layoutAlarmMsgFields()
 {
+  m_fieldWidgets[ALARM_MSG_FIELD] = new QTextEdit();
+
   ++m_currentRow;
-  m_mainLayout->addWidget(m_fieldWidgets["alarmMsgLabel"], m_currentRow, 0);
-  m_mainLayout->addWidget(alarmMsgField(),m_currentRow,1,1,2);
+  m_mainLayout->addWidget(new QLabel(tr("Alarm Message"), this), m_currentRow, 0);
+  m_mainLayout->addWidget(alarmMsgField(),m_currentRow, 1, 1, 2);
 }
 
 
 void ServiceEditor::layoutNotificationMsgFields()
 {
+  m_fieldWidgets[NOTIFICATION_MSG_FIELD] = new QTextEdit(this);
   ++m_currentRow;
-  m_mainLayout->addWidget(m_fieldWidgets["notificationMsgLabel"], m_currentRow, 0);
-  m_mainLayout->addWidget(notificationMsgField(),m_currentRow,1,1,2);
+  m_mainLayout->addWidget(new QLabel(tr("Notification Message"), this), m_currentRow, 0);
+  m_mainLayout->addWidget(notificationMsgField(), m_currentRow, 1, 1, 2);
 }
 
 
 void ServiceEditor::layoutIconFields()
 {
-  ++m_currentRow;
+  m_fieldWidgets[ICON_FIELD] = new QComboBox(this);
+
   IconMapT icons = ngrt4n::nodeIcons();
-  QString header = "-->Select a icon (Default is " + ngrt4n::DEFAULT_ICON + ")";
+  QString header = QString(tr("-->Select an icon (Default is %1)")).arg(ngrt4n::DEFAULT_ICON);
   iconField()->addItem(header, icons.value(ngrt4n::DEFAULT_ICON));
   Q_FOREACH(const QString& label, icons.keys()) {
     QString path = icons.value(label);
     iconField()->addItem(QIcon(path), label, icons.value(path));
   }
-  m_mainLayout->addWidget(m_fieldWidgets["iconNameLabel"], m_currentRow, 0);
+
+  ++m_currentRow;
+  m_mainLayout->addWidget(new QLabel(tr("Icon"), this), m_currentRow, 0);
   m_mainLayout->addWidget(iconField(), m_currentRow, 1, 1, 2);
 }
 
 
 void ServiceEditor::layoutCheckField(void)
 {
-  ++m_currentRow;
+  m_fieldWidgets[CHECK_FIELD] = new QListWidget();
+
+  m_checkFieldsGroup = new QGroupBox(this);
+
+  m_dataPointSearchField = new QLineEdit(this);
+  m_dataPointSearchField->setPlaceholderText(tr("Set or search data point..."));
+  m_hostGroupFilterBox = new QComboBox(this);
+  m_hostGroupFilterBox->addItem(tr("Select host group"));
+
+  m_searchDataPointButton = new IconButton(":images/built-in/search_32x28.png", this);
+  m_addDataPointButton = new IconButton(":images/built-in/document-add_32x32.png", this);
+  m_dataPointActionButtons = new QStackedWidget(this);
+  m_dataPointActionButtons->addWidget(m_searchDataPointButton);
+  m_dataPointActionButtons->addWidget(m_addDataPointButton);
+
   QHBoxLayout* labelLayout = new QHBoxLayout();
-  labelLayout->addWidget(m_fieldWidgets["lowLevelAlarmsLabel"]);
+  labelLayout->addWidget(new QLabel(tr("Data Point"), this));
   labelLayout->addWidget(createCheckFieldHelpIcon());
 
   QGridLayout* fieldsLayout = new QGridLayout();
@@ -328,6 +393,8 @@ void ServiceEditor::layoutCheckField(void)
   fieldsLayout->addWidget(checkField(), 1, 0, 1, 3);
 
   m_checkFieldsGroup->setLayout(fieldsLayout);
+
+  ++m_currentRow;
   m_mainLayout->addLayout(labelLayout, m_currentRow, 0, 1, 1);
   m_mainLayout->addWidget(m_checkFieldsGroup, m_currentRow, 1, 1, 3);
 
@@ -375,7 +442,7 @@ QLabel* ServiceEditor::createCheckFieldHelpIcon(void)
                         "\n * For Zenoss it follows the patterns 'device_name/component_name'"
                         "\n    E.g. localhost/httpd, localhost"
                         "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
-                        "\nSee the online documentation for further details."
+                        "\nSee the online documentation for further details: http://docs.realopinsight.com/."
                         ));
   return label;
 }
@@ -427,13 +494,22 @@ void ServiceEditor::handleDataPointFieldReturnPressed(void)
 {
   if (m_dataPointActionButtons->currentWidget() == m_searchDataPointButton) {
     handleDataPointSearch();
-  } else {
     handleAddDataPointEntry();
-  }
+}
+
+
+void ServiceEditor::setCheckFieldsStyle(void)
+{
+  checkField()->setStyleSheet("border: none; background: white;");
+  m_dataPointSearchField->setStyleSheet("border: none; background: white;");
+  m_hostGroupFilterBox->setStyleSheet("border: none; background: white;");
+  m_addDataPointButton->setStyleSheet("border: none;");
+  m_searchDataPointButton->setStyleSheet("border: none;");
 }
 
 
 void ServiceEditor::handleUpdateDataPointsList(void)
+void ServiceEditor::handleDataPointFieldReturnPressed(void)
 {
   checkField()->clear();
   QString selectedGroup = m_hostGroupFilterBox->currentText();
@@ -444,5 +520,54 @@ void ServiceEditor::handleUpdateDataPointsList(void)
   } else {
     checkField()->addItems(m_dataPoints[ selectedGroup ]);
   }
-  // m_dataPoints.sort(Qt::CaseInsensitive);
+}
+
+
+void ServiceEditor::handleAddThreshold(void)
+{
+  qint32 inSev = m_thresholdInSeverityBox->itemData(m_thresholdInSeverityBox->currentIndex()).toInt();
+  qint32 outSev = m_thresholdOutSeverityBox->itemData(m_thresholdOutSeverityBox->currentIndex()).toInt();
+  ThresholdHelper th(m_thresholdWeightBox->value() / 100, ThresholdHelper::toValidSeverity(inSev), ThresholdHelper::toValidSeverity(outSev));
+  QString data = th.data();
+
+  if (m_thresholdRulesBox->findData(data) == -1)
+    m_thresholdRulesBox->addItem(th.toString(), data);
+  else {
+    Q_EMIT errorOccurred(tr("Rule already set"));
+  }
+}
+
+void ServiceEditor::handleRemoveThreshold(void)
+{
+  if (m_thresholdRulesBox->currentIndex() >= 0)
+    m_thresholdRulesBox->removeItem(m_thresholdRulesBox->currentIndex());
+}
+
+
+void ServiceEditor::handleThresholdRulesChanged(void)
+{
+  bool enable = m_thresholdRulesBox->count() > 0;
+  m_removeThresholdButton->setEnabled(enable);
+  m_thresholdRulesBox->setEnabled(enable);
+}
+
+QString ServiceEditor::thresholdsData(void) const
+{
+  QString result = "";
+  int nbEntries = m_thresholdRulesBox->count();
+  for (int index = 0; index < nbEntries; ++index) {
+    if (! result.isEmpty())
+      result.append( ngrt4n::CHILD_SEP.c_str() );
+
+    result.append( m_thresholdRulesBox->itemData(index).toString() );
+  }
+
+  return result;
+}
+
+
+void ServiceEditor::handleCalcRuleChanged(void)
+{
+  int crule = m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt();
+  m_thresholdFrame->setEnabled(crule == static_cast<int>(CalcRules::Weighted));
 }

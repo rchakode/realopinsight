@@ -1,6 +1,11 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.0.6
+  * Make the compilation of ngrt4nd optional removing the requirement
+    on ZeroMQ, which is not always natively available on all operating
+    systems (e.g. Red Hat, Centos).
+
 3.0.5
   * Fixed ticket #41 when chart is not well updated with
     Livestatus backend
