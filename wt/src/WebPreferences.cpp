@@ -543,7 +543,7 @@ bool WebPreferences::validateMonitoringSettingsFields(void)
 {
   if (m_monitorTypeField->validate() == Wt::WValidator::Valid
       && m_livestatusPortField->validate() == Wt::WValidator::Valid
-      && m_monitorTypeField->currentIndex() == 0)
+      && m_monitorTypeField->currentIndex() != 0)
     return true;
 
   m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
