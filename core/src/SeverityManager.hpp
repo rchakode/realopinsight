@@ -10,7 +10,7 @@ public:
   void reset(const QVector<ThresholdT>& thresholdLimits) {reset(); m_thresholdsLimits = thresholdLimits;}
   void addSeverity(int value, double weight);
   void addThresholdLimit(const ThresholdT& th);
-  QString thresholdsText(void);
+  QString toString(void);
   void updateThresholds(void) { Q_FOREACH(int sev, m_weights.keys()) m_thresholds[sev] = m_weights[sev] / m_totalWeight; }
   int aggregatedSeverity(int crule);
   static int propagatedSeverity(int sev, int prule);
@@ -21,6 +21,7 @@ public:
   int count(void) const {return m_count;}
   double totalWeight(void) const {return m_totalWeight;}
   void displayWeight(void) { Q_FOREACH(int sev, m_weights.keys()) qDebug()<<Severity(sev).toString() <<  m_thresholds[sev]; }
+  QString thresholdExceededMsg(void) const {return m_thresholdExceededMsg;}
 
 private:
   int m_count;
@@ -28,6 +29,7 @@ private:
   int m_minSev;
   int m_maxSev;
   int m_maxEssentialSev;
+  QString m_thresholdExceededMsg;
   QMap<int, double> m_weights;
   QMap<int, double> m_thresholds;
   QVector<ThresholdT> m_thresholdsLimits;

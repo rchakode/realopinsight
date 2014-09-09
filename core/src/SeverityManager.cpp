@@ -56,25 +56,21 @@ void SeverityManager::addThresholdLimit(const ThresholdT& th)
   qSort(m_thresholdsLimits.begin(), m_thresholdsLimits.end(), ThresholdLessthanFnt());
 }
 
-QString SeverityManager::thresholdsText(void)
+QString SeverityManager::toString(void)
 {
   return QObject::tr(
-        "Unknown  : %1 \%\n"
-        "Critical : %2 \%\n"
-        "Major    : %3 \%\n"
-        "Minor    : %4 \%\n"
-        "Normal   : %5 \%\n"
-        )
-      .arg(QString::number(m_thresholds[ngrt4n::Unknown]))
-      .arg(QString::number(m_thresholds[ngrt4n::Critical]))
-      .arg(QString::number(m_thresholds[ngrt4n::Major]))
-      .arg(QString::number(m_thresholds[ngrt4n::Minor]))
-      .arg(QString::number(m_thresholds[ngrt4n::Normal]));
+        "Unknown: %1\%; Critical: %2\%; Major: %3\%; Minor: %4\%; Normal: %5\%; ")
+      .arg(QString::number(100 * m_thresholds[ngrt4n::Unknown]))
+      .arg(QString::number(100 * m_thresholds[ngrt4n::Critical]))
+      .arg(QString::number(100 * m_thresholds[ngrt4n::Major]))
+      .arg(QString::number(100 * m_thresholds[ngrt4n::Minor]))
+      .arg(QString::number(100 * m_thresholds[ngrt4n::Normal]));
 }
 
 
 int SeverityManager::aggregatedSeverity(int crule)
 {
+  m_thresholdExceededMsg.clear();
   if (m_thresholds.isEmpty())
     return ngrt4n::Normal;
 
@@ -132,10 +128,15 @@ int SeverityManager::weightedSeverity(void)
   int index = m_thresholdsLimits.size() - 1;
 
   while (index >= 0 && thresholdReached == -1) {
-    QMap<int, double>::iterator th = m_thresholds.find(m_thresholdsLimits[index].sev_in);
-    if (th != m_thresholds.end() && (*th >= m_thresholdsLimits[index].weight))
+    ThresholdT th = m_thresholdsLimits[index];
+    QMap<int, double>::iterator thvalue = m_thresholds.find(th.sev_in);
+    if (thvalue != m_thresholds.end() && (*thvalue >= th.weight)) {
       thresholdReached = m_thresholdsLimits[index].sev_out;
-
+      m_thresholdExceededMsg = QObject::tr("%1 events exceeded %2\% and set to %3").arg(Severity(th.sev_in).toString(),
+                                                                                         QString::number(100 * th.weight),
+                                                                                         Severity(th.sev_out).toString()
+                                                                                         );
+    }
     --index;
   }
 

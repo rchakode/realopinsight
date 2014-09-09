@@ -39,7 +39,7 @@ MainWindow::MainWindow(const qint32& _userRole,
   handleTabChanged(0);
   addEvents();
   m_dashboard->initialize(m_preferences);
-  resetTimer(m_preferences->updateInterval());
+  m_dashboard->setTimerId( startTimer(1000 * m_preferences->updateInterval()) );
 }
 
 
