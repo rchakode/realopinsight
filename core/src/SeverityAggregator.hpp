@@ -11,11 +11,11 @@ public:
   void addSeverity(int value, double weight);
   void addThresholdLimit(const ThresholdT& th);
   QString toString(void);
-  void updateThresholds(void) { Q_FOREACH(int sev, m_weights.keys()) m_thresholds[sev] = m_weights[sev] / m_totalWeight; }
+  void updateThresholds(void);
   int aggregate(int crule);
   static int propagate(int sev, int prule);
   int weightedAverage(void);
-  int thresholdAverage(void);
+  int weightedAverageWithThresholds(void);
   int minSev(void) const {return m_minSev;}
   int maxSev(void) const {return m_maxSev;}
   int count(void) const {return m_count;}
@@ -28,7 +28,7 @@ private:
   double m_totalWeight;
   int m_minSev;
   int m_maxSev;
-  int m_maxEssentialSev;
+  int m_essentialSev;
   QString m_thresholdExceededMsg;
   QMap<int, double> m_weights;
   QMap<int, double> m_thresholds;

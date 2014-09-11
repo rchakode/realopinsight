@@ -23,6 +23,7 @@ private Q_SLOTS:
   void testWeighted1(void);
   void testWeighted2(void);
   void testWeighted3(void);
+  void testWeighted4(void);
   void testWorst(void);
 
 private:
@@ -51,13 +52,13 @@ void TestSeverityAggregation::testWeighted1(void)
 {
   m_severityAggregator->displayWeight();
   m_severityAggregator->addThresholdLimit({0.5, ngrt4n::Major, ngrt4n::Critical});
-  QCOMPARE(m_severityAggregator->thresholdAverage(), m_severityAggregator->weightedAverage());
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), m_severityAggregator->weightedAverage());
 
   m_severityAggregator->addThresholdLimit({0.5, ngrt4n::Minor, ngrt4n::Major});
-  QCOMPARE(m_severityAggregator->thresholdAverage(), static_cast<int>(ngrt4n::Major));
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Major));
 
   m_severityAggregator->addThresholdLimit({0.3, ngrt4n::Major, ngrt4n::Critical});
-  QCOMPARE(m_severityAggregator->thresholdAverage(), static_cast<int>(ngrt4n::Critical));
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Critical));
 }
 
 void TestSeverityAggregation::testWeighted2(void)
@@ -72,14 +73,14 @@ void TestSeverityAggregation::testWeighted2(void)
   m_severityAggregator->displayWeight();
 
   m_severityAggregator->addThresholdLimit({0.75, ngrt4n::Minor, ngrt4n::Major});
-  QCOMPARE(m_severityAggregator->thresholdAverage(), m_severityAggregator->weightedAverage());
-  QCOMPARE(m_severityAggregator->thresholdAverage(), static_cast<int>(ngrt4n::Minor));
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), m_severityAggregator->weightedAverage());
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Minor));
 
   m_severityAggregator->addThresholdLimit({0.6, ngrt4n::Minor, ngrt4n::Major});
-  QCOMPARE(m_severityAggregator->thresholdAverage(), static_cast<int>(ngrt4n::Major));
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Major));
 
   m_severityAggregator->addThresholdLimit({0.5, ngrt4n::Major, ngrt4n::Critical});
-  QCOMPARE(m_severityAggregator->thresholdAverage(), static_cast<int>(ngrt4n::Major));
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Major));
 }
 
 
@@ -98,8 +99,25 @@ void TestSeverityAggregation::testWeighted3(void)
   m_severityAggregator->addThresholdLimit({0.8, ngrt4n::Minor, ngrt4n::Critical});
   m_severityAggregator->addThresholdLimit({0.6, ngrt4n::Minor, ngrt4n::Major});
   qDebug()<< m_severityAggregator->thresholdExceededMsg();
-  QCOMPARE(m_severityAggregator->thresholdAverage(), static_cast<int>(ngrt4n::Critical));
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Critical));
 }
+
+void TestSeverityAggregation::testWeighted4(void)
+{
+  m_severityAggregator->reset();
+  m_severityAggregator->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityAggregator->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityAggregator->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityAggregator->addSeverity(ngrt4n::Minor, ngrt4n::WEIGHT_UNIT);
+  m_severityAggregator->addSeverity(ngrt4n::Critical, ngrt4n::WEIGHT_MAX);
+
+  m_severityAggregator->displayWeight();
+
+  m_severityAggregator->addThresholdLimit({0.8, ngrt4n::Minor, ngrt4n::Major});
+  qDebug()<< m_severityAggregator->thresholdExceededMsg();
+  QCOMPARE(m_severityAggregator->weightedAverageWithThresholds(), static_cast<int>(ngrt4n::Critical));
+}
+
 
 void TestSeverityAggregation::testWorst(void)
 {

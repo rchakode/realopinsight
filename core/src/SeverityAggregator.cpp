@@ -6,7 +6,7 @@ SeverityAggregator::SeverityAggregator(const QVector<ThresholdT>& thresholdLimit
   : m_count(0),
     m_totalWeight(0),
     m_maxSev(ngrt4n::Normal),
-    m_maxEssentialSev(ngrt4n::Normal),
+    m_essentialSev(ngrt4n::Normal),
     m_thresholdsLimits(thresholdLimits)
 {
   reset();
@@ -39,13 +39,14 @@ void SeverityAggregator::addSeverity(int value, double weight)
   if (! Severity(value).isValid())
     value = ngrt4n::Unknown;
 
-  m_totalWeight += weight;
   m_weights[value] += weight;
-  m_minSev =qMin(m_minSev, value);
-  m_maxSev = qMax(m_maxSev, value);
-  if (weight == ngrt4n::WEIGHT_MAX)
-    m_maxEssentialSev = qMax(m_maxEssentialSev, value);
-
+  if (weight != 0) {
+    m_totalWeight += weight;
+    m_minSev = qMin(m_minSev, value);
+    m_maxSev = qMax(m_maxSev, value);
+    if (weight == ngrt4n::WEIGHT_MAX)
+      m_essentialSev = qMax(m_essentialSev, value);
+  }
   updateThresholds();
   ++m_count;
 }
@@ -54,6 +55,15 @@ void SeverityAggregator::addThresholdLimit(const ThresholdT& th)
 {
   m_thresholdsLimits.push_back(th);
   qSort(m_thresholdsLimits.begin(), m_thresholdsLimits.end(), ThresholdLessthanFnt());
+}
+
+
+void SeverityAggregator::updateThresholds(void)
+{
+  if (m_totalWeight > 0)
+    Q_FOREACH(int sev, m_weights.keys()) m_thresholds[sev] = m_weights[sev] / m_totalWeight;
+  else
+    Q_FOREACH(int sev, m_weights.keys()) m_thresholds[sev] = std::numeric_limits<double>::max();
 }
 
 QString SeverityAggregator::toString(void)
@@ -80,7 +90,7 @@ int SeverityAggregator::aggregate(int crule)
     result = weightedAverage();
     break;
   case CalcRules::Weighted:
-    result = thresholdAverage();
+    result = weightedAverageWithThresholds();
     break;
   case CalcRules::Worst:
   default:
@@ -119,10 +129,10 @@ int SeverityAggregator::weightedAverage(void)
       weightSum += weight * ngrt4n::WEIGHT_UNIT;
     }
   }
-  return qRound(severityScore / weightSum);
+  return qMax(qRound(severityScore / weightSum), m_essentialSev);
 }
 
-int SeverityAggregator::thresholdAverage(void)
+int SeverityAggregator::weightedAverageWithThresholds(void)
 {
   int thresholdReached = -1;
   int index = m_thresholdsLimits.size() - 1;
