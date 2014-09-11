@@ -439,13 +439,16 @@ struct NodeT {
     QString tip = QObject::tr("Service: %1"
                               "\nDescription: %2"
                               "\nSeverity: %3"
-                              "\nCalc. Rule: %4 %9"   // the param  %9 will be filled if details required
-                              "\nProp. Rule: %5").arg(name,
-                                                      const_cast<QString&>(description).replace("\n", " "),
-                                                      Severity(sev).toString(),
-                                                      CalcRules(sev_crule).toString(),
-                                                      PropRules(sev_prule).toString(),
-                                                      thresholdsToString());
+                              "\nProp. Rule: %4"
+                              "\nWeight: %5"
+                              "\nCalc. Rule: %6 %9"   // the param  %9 will be filled if details required
+                              ).arg(name,
+                                    const_cast<QString&>(description).replace("\n", " "),
+                                    Severity(sev).toString(),
+                                    PropRules(sev_prule).toString(),
+                                    PropRules(weight).toString(),
+                                    CalcRules(sev_crule).toString(),
+                                    thresholdsToString());
 
     if (type == NodeType::AlarmNode) {
       tip.append(QObject::tr("\nTarget Host: %1"
