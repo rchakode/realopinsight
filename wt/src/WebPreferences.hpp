@@ -134,6 +134,7 @@ private:
   bool validateMonitoringSettingsFields(void);
   bool validateAuthSettingsFields(void);
   void showLdapSslSettings(bool display);
+  void showLivestatusSettings(int monitorTypeIndex);
 };
 
 #endif // WEBSESSION_HPP

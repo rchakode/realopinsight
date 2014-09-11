@@ -282,6 +282,8 @@ void WebPreferences::fillFromSource(int _index)
     m_dontVerifyCertificateField->setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
     m_updateIntervalField->setValue(updateInterval());
 
+    showLivestatusSettings(m_monitorTypeField->currentIndex());
+
     // this triggers a signal
     setCurrentSourceIndex(_index);
   }
@@ -539,19 +541,45 @@ void WebPreferences::showLdapSslSettings(bool display)
 }
 
 
+void WebPreferences::showLivestatusSettings(int monitorTypeIndex)
+{
+  switch (monitorTypeIndex) {
+    case 1:
+      wApp->doJavaScript("$('#livetstatus-section').show();");
+      break;
+    default:
+      wApp->doJavaScript("$('#livetstatus-section').hide();");
+      break;
+  }
+}
+
 bool WebPreferences::validateMonitoringSettingsFields(void)
 {
-  if (m_monitorTypeField->validate() == Wt::WValidator::Valid
-      && m_livestatusPortField->validate() == Wt::WValidator::Valid
-      && m_monitorTypeField->currentIndex() != 0)
-    return true;
-
-  if (m_monitorTypeField->currentIndex() == 0)
+  if (m_monitorTypeField->currentIndex() == 0) {
     m_errorOccurred.emit(QObject::tr("Monitor type not set").toStdString());
-  else
-    m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+    return false;
+  }
 
-  return false;
+  //  if ( (m_monitorTypeField->currentIndex() == 1
+  //        && m_livestatusHostField->validate() != Wt::WValidator::Valid
+  //        )
+  //       || (m_monitorTypeField->currentIndex() == 1
+  //           && m_livestatusPortField->validate() != Wt::WValidator::Valid
+  //           )
+  //       ) {
+  //    m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+  //    return false;
+  //  }
+
+  if (m_monitorTypeField->currentIndex() > 1
+      && m_monitorUrlField->validate() != Wt::WValidator::Valid
+      ) {
+    m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+    return false;
+
+  }
+
+  return true;
 }
 
 
@@ -579,17 +607,11 @@ void WebPreferences::addEvent(void)
   m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
   m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
   m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
+  m_monitorTypeField->activated().connect(this, &WebPreferences::showLivestatusSettings);
+
 
   m_sourceBox->changed().connect(std::bind([=]() {
     fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
-  }));
-
-  m_monitorTypeField->changed().connect(std::bind([=]() {
-    if (m_monitorTypeField->currentIndex() != 1) {
-      wApp->doJavaScript("$('#livetstatus-section').hide();");
-    } else {
-      wApp->doJavaScript("$('#livetstatus-section').show();");
-    }
   }));
 
   m_showAuthStringField->changed().connect(std::bind([=](){
