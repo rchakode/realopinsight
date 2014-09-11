@@ -546,7 +546,11 @@ bool WebPreferences::validateMonitoringSettingsFields(void)
       && m_monitorTypeField->currentIndex() != 0)
     return true;
 
-  m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+  if (m_monitorTypeField->currentIndex() == 0)
+    m_errorOccurred.emit(QObject::tr("Monitor type not set").toStdString());
+  else
+    m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+
   return false;
 }
 

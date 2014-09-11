@@ -28,7 +28,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.0.5
+REALOPINSIGHT_CORE_VERSION=3.1.0
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
@@ -80,7 +80,9 @@ HEADERS += \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \
-    core/src/RawSocket.hpp
+    core/src/RawSocket.hpp \
+    core/src/ThresholdHelper.hpp \
+    core/src/SeverityAggregator.hpp
 
 SOURCES += \
     core/src/Parser.cpp \
@@ -94,10 +96,12 @@ SOURCES += \
     core/src/utilsCore.cpp \
     core/src/ChartBase.cpp \
     core/src/JsonHelper.cpp \
-    core/src/RawSocket.cpp
+    core/src/RawSocket.cpp \
+    core/src/ThresholdHelper.cpp \
+    core/src/SeverityAggregator.cpp
 
 web-base {
-PACKAGE_VERSION=2014b4
+PACKAGE_VERSION=2014rc1
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 

@@ -218,7 +218,7 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
 
-  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(ngrt4n::severityText(node.sev),
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(Severity(node.sev).toString(),
                                                                                  node.child_nodes).toStdString());
   anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(m_widget);}));
 
