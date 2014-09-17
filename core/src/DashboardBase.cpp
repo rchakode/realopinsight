@@ -27,7 +27,7 @@
 #include "utilsCore.hpp"
 #include "JsonHelper.hpp"
 #include "LsHelper.hpp"
-#include "SeverityAggregator.hpp"
+#include "StatusAggregator.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <QSystemTrayIcon>
@@ -315,7 +315,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
   _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
-  _node.sev_prop = SeverityAggregator::propagate(_node.sev, _node.sev_prule);
+  _node.sev_prop = StatusAggregator::propagate(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
   if (_node.check.host == "-")
@@ -383,7 +383,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
     return result;
   }
 
-  SeverityAggregator severityManager(node->thresholdLimits);
+  StatusAggregator severityManager(node->thresholdLimits);
 
   Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     result = computeNodeSeverity(childId);
