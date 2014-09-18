@@ -91,6 +91,7 @@ HEADERS += \
 
 
 SOURCES += \
+    core/src/Base.cpp \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
@@ -103,8 +104,7 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/StatusAggregator.cpp \
-    core/src/Base.cpp
+    core/src/StatusAggregator.cpp
 
 gui-base {
 QT += svg gui webkit
