@@ -175,14 +175,7 @@ public:
 
   PropRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule); }
-  QString toString(void) {
-    switch( static_cast<PropRulesT>(m_rule) ) {
-    case Unchanged: return QObject::tr("Unchanged");
-    case Decreased: return QObject::tr("Decreased");
-    case Increased: return QObject::tr("Increased");
-    }
-    return QObject::tr("Unchanged");
-  }
+  QString toString(void) const;
 
 private:
   int m_rule;
@@ -199,22 +192,7 @@ public:
 
   CalcRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule);}
-  QString toString(void) const {
-    QString result = QObject::tr("Default");
-    switch (m_rule) {
-    case Average:
-      result = QObject::tr("Average");
-      break;
-    case Weighted:
-      result = QObject::tr("Weighted Threshold");
-      break;
-    case Worst:
-    default:
-      result = QObject::tr("Worst Severity");
-      break;
-    }
-    return result;
-  }
+  QString toString(void) const;
 
 private:
   int m_rule;
@@ -226,11 +204,7 @@ public:
     ServiceNode = 0,
     AlarmNode = 1
   };
-  static QString toString(int _type) {
-    if (_type == AlarmNode )
-      return QObject::tr("Native Check");
-    return QObject::tr("Business Process");
-  }
+  static QString toString(int _type);
 };
 
 
@@ -241,107 +215,11 @@ public:
   int value() const {return m_sev;}
   QString valueString(void) const {return QString::number(m_sev);}
   bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
-  QString toString(void) const {
-    switch(m_sev) {
-    case ngrt4n::Normal:
-      return QObject::tr("Normal");
-      break;
-    case ngrt4n::Minor:
-      return QObject::tr("Minor");
-      break;
-    case ngrt4n::Major:
-      return QObject::tr("Major");
-      break;
-    case ngrt4n::Critical:
-      return QObject::tr("Critical");
-      break;
-    default:
-      break;
-    }
-    return QObject::tr("Unknown");
-  }
-
-  Severity operator *(Severity& sev) const {
-    switch(m_sev) {
-    case ngrt4n::Critical:
-      return Severity(m_sev);
-      break;
-    case ngrt4n::Normal:
-      return sev;
-      break;
-    case ngrt4n::Minor:
-      if(sev.m_sev == ngrt4n::Critical ||
-         sev.m_sev == ngrt4n::Major ||
-         sev.m_sev == ngrt4n::Unknown)
-        return sev;
-      return Severity(m_sev);
-      break;
-    case ngrt4n::Major:
-      if(sev.m_sev == ngrt4n::Critical ||
-         sev.m_sev == ngrt4n::Unknown)
-        return sev;
-      return Severity(m_sev);
-      break;
-    default:
-      // MonitorBroker::CRITICITY_UNKNOWN
-      if(sev.m_sev == ngrt4n::Critical)
-        return sev;
-      break;
-    }  //end switch
-    return Severity(ngrt4n::Unknown);
-  }
-
-
-  Severity operator / (Severity& st) const {
-    if(m_sev == st.m_sev)
-      return st;
-
-    if(m_sev == ngrt4n::Critical ||
-       st.m_sev == ngrt4n::Critical)
-      return Severity(ngrt4n::Critical);
-
-    if(m_sev == ngrt4n::Unknown ||
-       st.m_sev == ngrt4n::Unknown)
-      return Severity(ngrt4n::Unknown);
-
-    if(m_sev == ngrt4n::Major ||
-       st.m_sev == ngrt4n::Major)
-      return Severity(ngrt4n::Major);
-
-    if(m_sev == ngrt4n::Minor ||
-       st.m_sev == ngrt4n::Minor)
-      return Severity(ngrt4n::Minor);
-
-    return Severity(ngrt4n::Normal);
-  }
-
-  Severity operator ++() {
-    switch(m_sev) {
-    case ngrt4n::Minor:
-      return Severity(ngrt4n::Major);
-      break;
-    case ngrt4n::Major:
-      return Severity(ngrt4n::Critical);
-      break;
-    default://leave as is
-      break;
-    }
-    return Severity(m_sev);
-  }
-
-  Severity operator--() {
-    switch(m_sev) {
-    case ngrt4n::Critical:
-      return Severity(ngrt4n::Major);
-      break;
-    case ngrt4n::Major:
-      return Severity(ngrt4n::Minor);
-      break;
-    default: //leave as is
-      break;
-    }
-    return Severity(m_sev);
-  }
+  QString toString(void) const;
+  Severity operator *(Severity& sev) const;
+  Severity operator / (Severity& st) const;
+  Severity operator ++();
+  Severity operator--();
 
 private:
   int m_sev;
@@ -368,11 +246,9 @@ struct ThresholdLessthanFnt {
 
       return false;
     }
-
     return false;
   }
 };
-
 
 
 struct NodeT {
@@ -402,51 +278,8 @@ struct NodeT {
     sev(ngrt4n::Unknown),
     weight(ngrt4n::WEIGHT_UNIT){}
 
-  QString thresholdsToString(void) const {
-    QString result = "";
-    if (sev_crule == CalcRules::Weighted) {
-      Q_FOREACH(const ThresholdT& th, thresholdLimits) {
-        result.append( QString("%1\% of %2 => %3; ").arg(QString::number(100 * th.weight),
-                                                         Severity(th.sev_in).toString(),
-                                                         Severity(th.sev_out).toString())
-                       );
-      }
-      return QString("(%1)").arg(result);
-    }
-    return result;
-  }
-
-  QString toString(void) const {
-    QString tip = QObject::tr("Service: %1"
-                              "\nDescription: %2"
-                              "\nSeverity: %3"
-                              "\nProp. Rule: %4"
-                              "\nWeight: %5"
-                              "\nCalc. Rule: %6 %9"   // the param  %9 will be filled if details required
-                              ).arg(name,
-                                    const_cast<QString&>(description).replace("\n", " "),
-                                    Severity(sev).toString(),
-                                    PropRules(sev_prule).toString(),
-                                    PropRules(weight).toString(),
-                                    CalcRules(sev_crule).toString(),
-                                    thresholdsToString());
-
-    if (type == NodeType::AlarmNode) {
-      tip.append(QObject::tr("\nTarget Host: %1"
-                             "\nGroups: %2"
-                             "\nData Point: %3"
-                             "\nRaw Output: %4"
-                             "\nOther Details: %5").arg(QString::fromStdString(check.host).replace("\n", " "),
-                                                        QString::fromStdString(check.host_groups),
-                                                        child_nodes,
-                                                        QString::fromStdString(check.alarm_msg),
-                                                        actual_msg)
-                 );
-    } else {
-      tip.append(QObject::tr("\nSummary Child Status: %1").arg(actual_msg));
-    }
-    return tip;
-  }
+  QString thresholdsToString(void) const;
+  QString toString(void) const;
 };
 
 
