@@ -174,20 +174,15 @@ public:
   };
 
   PropRules(int rule) : m_rule(rule) {}
-
   QString data(void) { return QString::number(m_rule); }
-
   QString toString(void) {
     switch( static_cast<PropRulesT>(m_rule) ) {
     case Unchanged: return QObject::tr("Unchanged");
     case Decreased: return QObject::tr("Decreased");
     case Increased: return QObject::tr("Increased");
     }
-
     return QObject::tr("Unchanged");
   }
-
-
 
 private:
   int m_rule;
@@ -203,7 +198,6 @@ public:
   };
 
   CalcRules(int rule) : m_rule(rule) {}
-
   QString data(void) { return QString::number(m_rule);}
   QString toString(void) const {
     QString result = QObject::tr("Default");
@@ -243,27 +237,23 @@ public:
 class Severity {
 public:
   Severity(int sev): m_sev(sev) {}
-
   void setValue(int _value) {m_sev = _value;}
   int value() const {return m_sev;}
-
   QString valueString(void) const {return QString::number(m_sev);}
   bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
-
   QString toString(void) const {
-    switch( m_sev )
-    {
+    switch(m_sev) {
     case ngrt4n::Normal:
       return QObject::tr("Normal");
       break;
     case ngrt4n::Minor:
-      return  QObject::tr("Minor");
+      return QObject::tr("Minor");
       break;
     case ngrt4n::Major:
-      return  QObject::tr("Major");
+      return QObject::tr("Major");
       break;
     case ngrt4n::Critical:
-      return  QObject::tr("Critical");
+      return QObject::tr("Critical");
       break;
     default:
       break;
@@ -284,14 +274,12 @@ public:
          sev.m_sev == ngrt4n::Major ||
          sev.m_sev == ngrt4n::Unknown)
         return sev;
-
       return Severity(m_sev);
       break;
     case ngrt4n::Major:
       if(sev.m_sev == ngrt4n::Critical ||
          sev.m_sev == ngrt4n::Unknown)
         return sev;
-
       return Severity(m_sev);
       break;
     default:
@@ -300,7 +288,6 @@ public:
         return sev;
       break;
     }  //end switch
-
     return Severity(ngrt4n::Unknown);
   }
 
@@ -336,15 +323,13 @@ public:
     case ngrt4n::Major:
       return Severity(ngrt4n::Critical);
       break;
-    default:
-      //leave unchanged
+    default://leave as is
       break;
     }
     return Severity(m_sev);
   }
 
   Severity operator--() {
-
     switch(m_sev) {
     case ngrt4n::Critical:
       return Severity(ngrt4n::Major);
@@ -352,8 +337,7 @@ public:
     case ngrt4n::Major:
       return Severity(ngrt4n::Minor);
       break;
-    default:
-      //leave unchanged
+    default: //leave as is
       break;
     }
     return Severity(m_sev);
@@ -427,15 +411,12 @@ struct NodeT {
                                                          Severity(th.sev_out).toString())
                        );
       }
-
-      return "("+result+")";
+      return QString("(%1)").arg(result);
     }
-
     return result;
   }
 
   QString toString(void) const {
-
     QString tip = QObject::tr("Service: %1"
                               "\nDescription: %2"
                               "\nSeverity: %3"
@@ -514,6 +495,4 @@ typedef QMap<QString, QString> IconMapT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 typedef QPair<QString, QString> StringPairT;
-
-
 #endif /* BASE_HPP */
