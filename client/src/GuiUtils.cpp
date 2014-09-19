@@ -67,7 +67,7 @@ QIcon ngrt4n::severityIcon(int _severity)
 
 QString ngrt4n::getWelcomeMsg(const QString& utility)
 {
-  return QObject::tr("       > %1 %2 %3 (codename: %4)"
+  return QObject::tr("       > %1 %2 - %3 (codename: %4)"
                      "\n        >> Realease ID: %5"
                      "\n        >> Copyright (C) 2010 - %6 RealOpInsight Labs. All rights reserved"
                      "\n        >> For bug reporting instructions, see: <%7>").arg(APP_NAME,

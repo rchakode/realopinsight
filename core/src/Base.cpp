@@ -197,7 +197,7 @@ QString NodeT::toString(void) const
                                      description.isEmpty()? "-" : const_cast<QString&>(description).replace("\n", " "),
                                      Severity(sev).toString(),
                                      PropRules(sev_prule).toString(),
-                                     (weight == ngrt4n::WEIGHT_MAX)? QObject::tr("Essential"): QString::number(weight),
+                                     (weight == ngrt4n::WEIGHT_MAX)? QObject::tr("Essential") : QString::number(weight),
                                      CalcRules(sev_crule).toString(),
                                      thresholdsToString());
 
