@@ -278,7 +278,7 @@ struct NodeT {
     sev(ngrt4n::Unknown),
     weight(ngrt4n::WEIGHT_UNIT){}
 
-  QString thresholdsToString(void) const;
+  QString toThresholdsString(void) const;
   QString toString(void) const;
 };
 

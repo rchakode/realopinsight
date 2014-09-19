@@ -395,11 +395,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
 
   result.sev = node->sev_prop;
   result.weight = node->weight;
-  node->actual_msg = severityManager.toString();
-
-  if (! severityManager.thresholdExceededMsg().isEmpty())
-    node->actual_msg.append(QString("\n\t%1").arg(severityManager.thresholdExceededMsg()));
-
+  node->actual_msg = severityManager.toDetailsString();
   QString tooltip = node->toString();
   updateMap(*node, tooltip);
   updateTree(*node, tooltip);

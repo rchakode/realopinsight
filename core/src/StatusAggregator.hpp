@@ -10,7 +10,7 @@ public:
   void resetData(const QVector<ThresholdT>& thresholdLimits) {resetData(); m_thresholdsLimits = thresholdLimits;}
   void addSeverity(int value, double weight);
   void addThresholdLimit(const ThresholdT& th);
-  QString toString(void);
+  QString toDetailsString(void);
   void updateThresholds(void);
   int aggregate(int crule);
   static int propagate(int sev, int prule);

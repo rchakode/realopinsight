@@ -69,15 +69,20 @@ void StatusAggregator::updateThresholds(void)
     Q_FOREACH(int sev, m_severityWeightsMap.keys()) m_statusRatios[sev] = std::numeric_limits<double>::max();
 }
 
-QString StatusAggregator::toString(void)
+QString StatusAggregator::toDetailsString(void)
 {
-  return QObject::tr(
-        "Unknown: %1\%; Critical: %2\%; Major: %3\%; Minor: %4\%; Normal: %5\%; ")
-      .arg(QString::number(100 * m_statusRatios[ngrt4n::Unknown]))
-      .arg(QString::number(100 * m_statusRatios[ngrt4n::Critical]))
-      .arg(QString::number(100 * m_statusRatios[ngrt4n::Major]))
-      .arg(QString::number(100 * m_statusRatios[ngrt4n::Minor]))
-      .arg(QString::number(100 * m_statusRatios[ngrt4n::Normal]));
+  return QObject::tr("Unknown: %1\%; "
+                     "Critical: %2\%; "
+                     "Major: %3\%; "
+                     "Minor: %4\%; "
+                     "Normal: %5\%;"
+                     "\nComments: %6")
+      .arg(QString::number(qRound(100 * m_statusRatios[ngrt4n::Unknown])))
+      .arg(QString::number(qRound(100 * m_statusRatios[ngrt4n::Critical])))
+      .arg(QString::number(qRound(100 * m_statusRatios[ngrt4n::Major])))
+      .arg(QString::number(qRound(100 * m_statusRatios[ngrt4n::Minor])))
+      .arg(QString::number(qRound(100 * m_statusRatios[ngrt4n::Normal])))
+      .arg(m_thresholdExceededMsg.isEmpty()? "-" : m_thresholdExceededMsg);
 }
 
 
@@ -100,6 +105,12 @@ int StatusAggregator::aggregate(int crule)
     result = m_maxSeverity;
     break;
   }
+
+  if (result == m_maxEssential && m_maxEssential != ngrt4n::Normal)
+    m_thresholdExceededMsg
+        .append("; ")
+        .append(QObject::tr("Status impacted by problems on essential services"));
+
   return result;
 }
 
