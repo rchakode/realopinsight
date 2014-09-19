@@ -187,7 +187,7 @@ public:
   enum CalcRulesT{
     Worst = 0,
     Average = 1,
-    Weighted = 2
+    WeightedAverageWithThresholds = 2
   };
 
   CalcRules(int rule) : m_rule(rule) {}
@@ -201,8 +201,8 @@ private:
 class NodeType {
 public:
   enum {
-    ServiceNode = 0,
-    AlarmNode = 1
+    BusinessService = 0,
+    ITService = 1
   };
   static QString toString(int _type);
 };

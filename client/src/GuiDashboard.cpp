@@ -216,7 +216,7 @@ void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, _nodeId, node)
       && ! node->child_nodes.isEmpty()) {
-    if (node->type == NodeType::AlarmNode) {
+    if (node->type == NodeType::ITService) {
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {
       QStringList childIds = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());

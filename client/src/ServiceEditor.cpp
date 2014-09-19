@@ -34,7 +34,7 @@ typedef QList<QListWidgetItem*> CheckItemList;
 namespace {
   const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
-}
+  }
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
@@ -149,7 +149,7 @@ void ServiceEditor::setEnableFields(const bool& enable)
   m_fieldWidgets[NOTIFICATION_MSG_FIELD]->setEnabled(enable);
 }
 
-bool ServiceEditor::updateNodeInfo(NodeT& _node)
+bool ServiceEditor::updateNodeInfoFromEditorContents(NodeT& _node)
 {
   _node.name             = nameField()->text();
   _node.type             = typeField()->currentIndex();
@@ -162,7 +162,7 @@ bool ServiceEditor::updateNodeInfo(NodeT& _node)
   _node.weight           = m_weightBox->value();
   _node.thresholdLimits = ThresholdHelper::dataToList( thresholdsData() );
 
-  if (_node.type == NodeType::AlarmNode) {
+  if (_node.type == NodeType::ITService) {
     QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
     if (! selectedItems.isEmpty())
       _node.child_nodes = selectedItems.at(0)->text();
@@ -193,14 +193,18 @@ void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
   // thresholds entries
   m_thresholdRulesBox->clear();
   Q_FOREACH(const ThresholdT& th, _node.thresholdLimits) {
-    ThresholdHelper thHelper(th.weight, th.sev_in, th.sev_out);
-    if (thHelper.isValid())
-      m_thresholdRulesBox->addItem(thHelper.toString(), thHelper.data());
-    else
-      Q_EMIT errorOccurred(tr("Invalid threshold rule: %1").arg(thHelper.data()));
+    ThresholdHelper thresholdHelper(th.weight, th.sev_in, th.sev_out);
+    if (_node.sev_crule == CalcRules::WeightedAverageWithThresholds
+        && ! thresholdHelper.isValid()
+        ) {
+      Q_EMIT errorOccurred(tr("Invalid threshold rule: %1").arg(thresholdHelper.data()));
+    } else {
+      m_thresholdRulesBox->addItem(thresholdHelper.toString(), thresholdHelper.data());
+      m_thresholdRulesBox->setCurrentIndex(m_thresholdRulesBox->count() - 1);
+    }
   }
 
-  if (_node.type == NodeType::AlarmNode) {
+  if (_node.type == NodeType::ITService) {
     QStringList childNodes = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
     QStringList::iterator childNodeIt = childNodes.begin();
     if (childNodeIt != childNodes.end()) {
@@ -240,8 +244,8 @@ void ServiceEditor::layoutDescriptionFields()
 void ServiceEditor::layoutTypeFields()
 {
   QComboBox* inputWidget = new QComboBox(this);
-  inputWidget->addItem( NodeType::toString(NodeType::ServiceNode) );
-  inputWidget->addItem( NodeType::toString(NodeType::AlarmNode) );
+  inputWidget->addItem( NodeType::toString(NodeType::BusinessService) );
+  inputWidget->addItem( NodeType::toString(NodeType::ITService) );
   m_fieldWidgets[TYPE_FIELD] = inputWidget;
 
   ++m_currentRow;
@@ -398,7 +402,7 @@ void ServiceEditor::layoutButtonBox(void)
 
 void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 {
-  if(_text == NodeType::toString(NodeType::AlarmNode)) {
+  if(_text == NodeType::toString(NodeType::ITService)) {
     setEnableFields(true);
   } else {
     setEnableFields(false);
@@ -408,10 +412,10 @@ void ServiceEditor::handleNodeTypeChanged( const QString& _text)
 
 void ServiceEditor::handleNodeTypeActivated( const QString& _text)
 {
-  if(_text == NodeType::toString(NodeType::AlarmNode)) {
-    Q_EMIT nodeTypeActivated( NodeType::AlarmNode );
+  if(_text == NodeType::toString(NodeType::ITService)) {
+    Q_EMIT nodeTypeActivated(NodeType::ITService);
   } else {
-    Q_EMIT nodeTypeActivated( NodeType::ServiceNode );
+    Q_EMIT nodeTypeActivated(NodeType::BusinessService);
   }
 }
 
@@ -509,9 +513,10 @@ void ServiceEditor::handleAddThreshold(void)
   ThresholdHelper th(m_thresholdWeightBox->value() / 100, ThresholdHelper::toValidSeverity(inSev), ThresholdHelper::toValidSeverity(outSev));
   QString data = th.data();
 
-  if (m_thresholdRulesBox->findData(data) == -1)
+  if (m_thresholdRulesBox->findData(data) == -1) {
     m_thresholdRulesBox->addItem(th.toString(), data);
-  else {
+    m_thresholdRulesBox->setCurrentIndex(m_thresholdRulesBox->count() - 1);
+  } else {
     Q_EMIT errorOccurred(tr("Rule already set"));
   }
 }
@@ -548,5 +553,5 @@ QString ServiceEditor::thresholdsData(void) const
 void ServiceEditor::handleCalcRuleChanged(void)
 {
   int crule = m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt();
-  m_thresholdFrame->setEnabled(crule == static_cast<int>(CalcRules::Weighted));
+  m_thresholdFrame->setEnabled(crule == static_cast<int>(CalcRules::WeightedAverageWithThresholds));
 }

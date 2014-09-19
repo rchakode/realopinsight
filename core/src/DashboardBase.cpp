@@ -69,7 +69,7 @@ StringMapT DashboardBase::propRules() {
 StringMapT DashboardBase::calcRules() {
   CalcRules worst(CalcRules::Worst);
   CalcRules average(CalcRules::Average);
-  CalcRules weighted(CalcRules::Weighted);
+  CalcRules weighted(CalcRules::WeightedAverageWithThresholds);
 
   StringMapT map;
   map.insert(worst.toString(), worst.data());
@@ -378,7 +378,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
     return result;
   }
 
-  if (node->type == NodeType::AlarmNode) {
+  if (node->type == NodeType::ITService) {
     result.sev = node->sev_prop;
     return result;
   }

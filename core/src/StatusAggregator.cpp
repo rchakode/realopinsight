@@ -92,7 +92,7 @@ int StatusAggregator::aggregate(int crule)
   case CalcRules::Average:
     result = weightedAverage();
     break;
-  case CalcRules::Weighted:
+  case CalcRules::WeightedAverageWithThresholds:
     result = weightedAverageWithThresholds();
     break;
   case CalcRules::Worst:

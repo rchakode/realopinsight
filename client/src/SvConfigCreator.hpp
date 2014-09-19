@@ -52,16 +52,16 @@ public Q_SLOTS:
   void copySelected(void);
   void pasteFromSelected(void);
   void deleteNode(void);
-  void deleteNode(const QString &);
+  void deleteNode(const QString& _nodeId);
   void open(void);
   void save(void);
   void saveAs(void);
   int treatCloseAction(const bool& = true);
-  void fillEditorFromService( QTreeWidgetItem*);
+  void fillEditorFromService(QTreeWidgetItem* _item);
   void handleReturnPressed(void);
-  void handleSelectedNodeChanged( void);
-  void handleTreeNodeMoved(QString);
-  void handleNodeTypeActivated(qint32);
+  void handleSelectedNodeChanged(void);
+  void handleTreeNodeMoved(const QString& nodeId);
+  void handleNodeTypeActivated(qint32 selectedNodeType);
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
@@ -94,10 +94,9 @@ private:
   NodeT* m_clipboardData;
   NodeListIteratorT m_root;
 
-  void loadFile(const QString &);
-  void recordData(const QString &);
+  void loadFile(const QString& path);
+  void recordData(const QString& path);
   QString generateNodeXml(const NodeT & node);
-  bool updateServiceNode(NodeListT& , const QString &);
   void loadMenu(void);
   void unloadMenu(void);
   void addEvents(void);

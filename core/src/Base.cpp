@@ -40,10 +40,10 @@ QString CalcRules::toString(void) const
   QString result = QObject::tr("Default");
   switch (m_rule) {
   case Average:
-    result = QObject::tr("Average");
+    result = QObject::tr("Weighted Average");
     break;
-  case Weighted:
-    result = QObject::tr("Weighted Threshold");
+  case WeightedAverageWithThresholds:
+    result = QObject::tr("Weighted Average With Thresholds");
     break;
   case Worst:
   default:
@@ -56,9 +56,9 @@ QString CalcRules::toString(void) const
 
 QString NodeType::toString(int _type)
 {
-  if (_type == AlarmNode )
-    return QObject::tr("Native Check");
-  return QObject::tr("Business Process");
+  if (_type == ITService )
+    return QObject::tr("IT Service");
+  return QObject::tr("Business Service");
 }
 
 QString Severity::toString(void) const
@@ -174,7 +174,7 @@ Severity Severity::operator--()
 QString NodeT::thresholdsToString(void) const
 {
   QString result = "";
-  if (sev_crule == CalcRules::Weighted) {
+  if (sev_crule == CalcRules::WeightedAverageWithThresholds) {
     Q_FOREACH(const ThresholdT& th, thresholdLimits) {
       result.append(QString("%1\% of %2 => %3; ").arg(QString::number(100 * th.weight),
                                                       Severity(th.sev_in).toString(),
@@ -201,7 +201,7 @@ QString NodeT::toString(void) const
                                      CalcRules(sev_crule).toString(),
                                      thresholdsToString());
 
-  if (type == NodeType::AlarmNode) {
+  if (type == NodeType::ITService) {
     result.append(QObject::tr("\nHost: %1"
                               "\nGroups: %2"
                               "\nData Point: %3"
