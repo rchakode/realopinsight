@@ -87,10 +87,11 @@ HEADERS += \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
-    core/src/SeverityAggregator.hpp
+    core/src/StatusAggregator.hpp
 
 
 SOURCES += \
+    core/src/Base.cpp \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
@@ -103,7 +104,7 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/SeverityAggregator.cpp
+    core/src/StatusAggregator.cpp
 
 gui-base {
 QT += svg gui webkit
@@ -175,14 +176,14 @@ INSTALLS += TARGET MAN
 INCLUDEPATH += core/src/
 RESOURCES += ngrt4n.qrc
 
-DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"1400095511\""
+DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"1411075325\""
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= "REALOPINSIGHT_BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Eliana\"'"
+DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Diegom\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"

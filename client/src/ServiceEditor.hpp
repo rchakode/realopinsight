@@ -65,7 +65,7 @@ public:
   void layoutEditorComponents(void);
   void fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId);
   void fillInEditorWithContent(const NodeT& _node);
-  bool updateNodeInfo(NodeT& _node);
+  bool updateNodeInfoFromEditorContents(NodeT& _node);
   void updateDataPoints(const ChecksT& checks, const QString& srcId);
   void setEnableFields(const bool& enable);
 
@@ -117,7 +117,7 @@ private:
         setDecimals(0);
         setRange(0, 100);
         setValue(100);
-        setSingleStep(100 * 100 * ngrt4n::WEIGHT_UNIT);
+        setSingleStep(5);
         setSuffix(tr(" %"));
         break;
       case WeightNormalized:

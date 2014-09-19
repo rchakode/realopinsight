@@ -75,9 +75,9 @@ bool Parser::process(bool console)
   qint32 serviceCount = services.length();
   for (qint32 srv = 0; srv < serviceCount; ++srv) {
     QDomElement service = services.item(srv).toElement();
-    node.id = service.attribute("id").trimmed();
-    node.parent = "";
+    node.parent.clear();
     node.monitored = false;
+    node.id = service.attribute("id").trimmed();
     node.type = service.attribute("type").toInt();
     node.sev = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
@@ -88,10 +88,9 @@ bool Parser::process(bool console)
     node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-
     node.weight = (m_cdata->format_version >= 3.1) ? service.attribute("weight").toDouble() : ngrt4n::WEIGHT_UNIT;
 
-    if (node.sev_crule == CalcRules::Weighted) {
+    if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
       QString thdata = service.firstChildElement("Thresholds").text().trimmed();
       node.thresholdLimits = ThresholdHelper::dataToList(thdata);
       qSort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
@@ -100,7 +99,7 @@ bool Parser::process(bool console)
     node.check.status = -1;
     if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
 
-    if (node.type == NodeType::AlarmNode) {
+    if (node.type == NodeType::ITService) {
       node.visibility = ngrt4n::Visible;
       StringPairT info = ngrt4n::splitHostCheckInfo(node.child_nodes);
       m_cdata->hosts[info.first] << info.second;
