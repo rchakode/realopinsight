@@ -180,7 +180,7 @@ QString NodeT::thresholdsToString(void) const
                                                       Severity(th.sev_in).toString(),
                                                       Severity(th.sev_out).toString()));
     }
-    return QString("(%1)").arg(result);
+    return QString("\nThreshold Limits: %1").arg(result);
   }
   return result;
 }
@@ -192,7 +192,8 @@ QString NodeT::toString(void) const
                                "\nSeverity: %3"
                                "\nProp. Rule: %4"
                                "\nWeight: %5"
-                               "\nCalc. Rule: %6 %9"   // the param  %9 will be filled if details required
+                               "\nCalc. Rule: %6"
+                               "%9"   // the param  %9 will be filled if details required
                                ).arg(name,
                                      description.isEmpty()? "-" : const_cast<QString&>(description).replace("\n", " "),
                                      Severity(sev).toString(),

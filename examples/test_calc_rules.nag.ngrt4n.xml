@@ -9,6 +9,14 @@
  <SubServices>ngrt4nsrv20142919112956960,ngrt4nsrv20144019114049060,ngrt4nsrv20144019114050785,ngrt4nsrv20144019114051779</SubServices>
  <Thresholds>0.6x1=2,0.65x2=3</Thresholds>
 </Service>
+<Service id="ngrt4nsrv20144019114049060"  type="1"  statusCalcRule="0"  statusPropRule="0"  weight="1"> 
+ <Name>web server 1</Name>
+ <Icon>Business Process</Icon>
+ <Description></Description>
+ <AlarmMsg></AlarmMsg>
+ <NotificationMsg></NotificationMsg>
+ <SubServices>Source0:web-server01</SubServices>
+</Service>
 <Service id="ngrt4nsrv20144019114051779"  type="1"  statusCalcRule="0"  statusPropRule="0"  weight="1"> 
  <Name>web server 3</Name>
  <Icon>Business Process</Icon>
@@ -32,13 +40,5 @@
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
  <SubServices>Source0:load-balancer</SubServices>
-</Service>
-<Service id="ngrt4nsrv20144019114049060"  type="1"  statusCalcRule="0"  statusPropRule="0"  weight="1"> 
- <Name>web server 1</Name>
- <Icon>Business Process</Icon>
- <Description></Description>
- <AlarmMsg></AlarmMsg>
- <NotificationMsg></NotificationMsg>
- <SubServices>Source0:web-server01</SubServices>
 </Service>
 </ServiceView>

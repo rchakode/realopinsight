@@ -88,8 +88,8 @@ namespace ngrt4n
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
   QStringList sourceTypes(void);
   QStringList sourceIndexes(void);
-  StringPairT splitHostCheckInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
-  StringPairT splitSourceHostInfo(const QString& info); /* return <source, hostaddr> */
+  StringPairT splitDataPointInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
+  StringPairT splitSourceDataPointInfo(const QString& info); /* return <source, hostaddr> */
   QString getSourceIdFromStr(const QString& str);
   QPair<bool, int> checkSourceId(const QString& id);
   IconMapT nodeIcons();

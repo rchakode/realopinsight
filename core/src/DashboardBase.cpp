@@ -141,7 +141,7 @@ void DashboardBase::runMonitor(SourceT& src)
   switch(src.mon_type) {
   case ngrt4n::Zenoss:
     Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
+      StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
       if (info.first != src.id) continue;
       ChecksT checks;
       if (src.zns_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
@@ -153,7 +153,7 @@ void DashboardBase::runMonitor(SourceT& src)
     break;
   case ngrt4n::Zabbix:
     Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceHostInfo(hostItem);
+      StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
 
       if (info.first != src.id) continue;
 
@@ -204,10 +204,10 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     if (cnode->child_nodes.isEmpty()) {
       cnode->sev = ngrt4n::Unknown;
     } else {
-      QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
-      if (info.first == src.id) {
+      StringPairT sourceDataPointInfo = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
+      if (sourceDataPointInfo.first == src.id) {
         // Retrieve data
-        QString requestData = QString("%1:%2").arg(src.auth, info.second);
+        QString requestData = QString("%1:%2").arg(src.auth, sourceDataPointInfo.second);
         src.d4n_handler->send(requestData.toStdString());
         JsonHelper jsHelper(src.d4n_handler->recv().c_str());
 
@@ -241,7 +241,7 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
-    QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(hostit.key());
+    QPair<QString, QString> info = ngrt4n::splitSourceDataPointInfo(hostit.key());
     if (info.first == src.id) {
       ChecksT checks;
       if (src.ls_handler->loadChecks(info.second, checks) == 0) {
@@ -294,7 +294,7 @@ void DashboardBase::updateDashboard(const NodeT& _node)
 
 void DashboardBase::updateCNodesWithCheck(const CheckT& check, const SourceT& src)
 {
-  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode!=end; ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode!=end; ++cnode) {
     if (cnode->child_nodes.toLower() == ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower()) {
       cnode->check = check;
       computeStatusInfo(*cnode, src);
@@ -483,7 +483,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     Q_EMIT updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode) {
-    StringPairT info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
+    StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
 
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
@@ -598,10 +598,12 @@ void DashboardBase::computeFirstSrcIndex(void)
 
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
-  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode!=end; ++cnode) {
-    QString prefix = QString("%1:").arg(src.id);
-    if (! cnode->monitored && cnode->child_nodes.startsWith(prefix, Qt::CaseInsensitive)) {
-      ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode->child_nodes), cnode->check);
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode != end; ++cnode) {
+    QString srcPrefix = QString("%1:").arg(src.id);
+    if (! cnode->monitored && cnode->child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
+      ngrt4n::setCheckOnError(ngrt4n::Unset,
+                              tr("Undefined service (%1)").arg(cnode->child_nodes),
+                              cnode->check);
       computeStatusInfo(*cnode, src);
       updateDashboard(*cnode);
     }
