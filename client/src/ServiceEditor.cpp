@@ -497,11 +497,13 @@ void ServiceEditor::handleUpdateDataPointsList(void)
   checkField()->clear();
   QString selectedGroup = m_hostGroupFilterBox->currentText();
   if (selectedGroup == ALL_HOST_GROUPS) {
-    Q_FOREACH(const QStringList& entries, m_dataPoints) {
+    Q_FOREACH(QStringList entries, m_dataPoints) {
+      entries.sort();
       checkField()->addItems(entries);
     }
   } else {
-    checkField()->addItems(m_dataPoints[ selectedGroup ]);
+    m_dataPoints[selectedGroup].sort();
+    checkField()->addItems(m_dataPoints[selectedGroup]);
   }
 }
 
