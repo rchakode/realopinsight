@@ -41,18 +41,6 @@ ServiceEditor::ServiceEditor(QWidget* _parent )
     m_mainLayout(new QGridLayout(this)),
     m_actionButtonBox(new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close))
 {
-  m_checkFieldsGroup = new QGroupBox(this);
-
-  m_dataPointSearchField = new QLineEdit(this);
-  m_dataPointSearchField->setPlaceholderText(tr("Set or search data point..."));
-  m_hostGroupFilterBox = new QComboBox(this);
-  m_hostGroupFilterBox->addItem(tr("Select host group"));
-
-  m_searchDataPointButton = new QPushButton(QIcon(":images/built-in/search_32x28.png"), "", this);
-  m_addDataPointButton = new QPushButton(QIcon(":images/built-in/add_32x32.png"), "", this);
-  m_dataPointActionButtons = new QStackedWidget(this);
-  m_dataPointActionButtons->addWidget(m_searchDataPointButton);
-  m_dataPointActionButtons->addWidget(m_addDataPointButton);
   layoutEditorComponents();
   addEvent();
 }
@@ -93,10 +81,6 @@ ServiceEditor::~ServiceEditor()
   delete m_mainLayout;
 }
 
-  delete m_dataPointSearchField;
-  delete m_actionButtonBox;
-  delete m_mainLayout;
-}
 
 void ServiceEditor::addEvent(void)
 {
@@ -244,7 +228,11 @@ void ServiceEditor::layoutLabelFields()
   ++m_currentRow;
   m_mainLayout->addWidget(new QLabel(tr("Name"), this), m_currentRow, 0);
   m_mainLayout->addWidget(nameField(),m_currentRow, 1, 1, 2);
+}
+
+
 void ServiceEditor::layoutDescriptionFields()
+{
   m_fieldWidgets[DESCRIPTION_FIELD] = new QTextEdit(this);
 
   ++m_currentRow;
@@ -498,22 +486,13 @@ void ServiceEditor::handleDataPointFieldReturnPressed(void)
 {
   if (m_dataPointActionButtons->currentWidget() == m_searchDataPointButton) {
     handleDataPointSearch();
+  } else {
     handleAddDataPointEntry();
-}
-
-
-void ServiceEditor::setCheckFieldsStyle(void)
-{
-  checkField()->setStyleSheet("border: none; background: white;");
-  m_dataPointSearchField->setStyleSheet("border: none; background: white;");
-  m_hostGroupFilterBox->setStyleSheet("border: none; background: white;");
-  m_addDataPointButton->setStyleSheet("border: none;");
-  m_searchDataPointButton->setStyleSheet("border: none;");
+  }
 }
 
 
 void ServiceEditor::handleUpdateDataPointsList(void)
-void ServiceEditor::handleDataPointFieldReturnPressed(void)
 {
   checkField()->clear();
   QString selectedGroup = m_hostGroupFilterBox->currentText();
