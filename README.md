@@ -15,8 +15,8 @@ This component needs to be installed on the user workstation.
 Dependencies
 ==
 
-- gcc-c++ >= 4.6.3
-- Qt >= 4.6.3 (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript)
+- gcc-c++ >= 4.7
+- Qt >= 4.7 (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript)
 - libzmq (librairies and development files)
 - graphviz
  

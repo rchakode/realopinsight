@@ -185,6 +185,7 @@ void GuiPreferences::createPreferenceWindow(void)
 
   m_languageBoxField->addItem("English", "en");
   m_languageBoxField->addItem("Francais", "fr");
+  m_languageBoxField->setCurrentIndex(m_languageBoxField->findData(m_settings->language()));
 
   qint32 line = 0;
   m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
@@ -515,7 +516,6 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
 
   sync();
 
-  m_settings->applyLanguageChanged();
   emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
   if (! m_updatedSources.contains(index)) {

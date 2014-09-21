@@ -141,16 +141,9 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
   return true;
 }
 
-QString Settings::language(void) const
+QString Settings::language(void)
 {
-  QString lang = entry(GLOBAL_LANGUAGE_KEY);
+  QString lang = Settings().entry(GLOBAL_LANGUAGE_KEY);
   return lang.isEmpty()? QLocale::system().name() : lang;
 }
 
-void Settings::applyLanguageChanged(void)
-{
-  QTranslator translator;
-  translator.load(QString(":i18n/ngrt4n_%1").arg(language()));
-  qApp->installTranslator(&translator);
-  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-}
