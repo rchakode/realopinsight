@@ -8,7 +8,7 @@
 # it under the terms of the GNU General Public License as published by            #
 # the Free Software Foundation, either version 3 of the License, or               #
 # (at your option) any later version.                                             #
-#	                                                                          #
+#	                                                                              #
 # The Software is distributed in the hope that it will be useful,                 #
 # but WITHOUT ANY WARRANTY; without even the implied warranty or                  #
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the	                  #
@@ -17,17 +17,39 @@
 # You should have received a copy of the GNU General Public License               #
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.	          #
 #---------------------------------------------------------------------------------#
-    
-%define binprefix     realopinsight
-    
-Name:           realopinsight-workstation
+     
+%define binprefix          realopinsight
+%define package_basename   realopinsight-workstation
+%define distrib_info       generic
+%define target_version     X.Y.Z
+%define tarball_basename   %{package_basename}-%{target_version}
+%define tarball            %{tarball_basename}.tar.gz
+
+%if 0%{?fedora_version}
+  %define distrib_info fedora%{?fedora_version}
+%endif
+
+%if 0%{?suse_version}
+  %define distrib_info    suse%{?suse_version}
+%endif
+ 
+%if 0%{?rhel_version}
+  %define distrib_info    rhel%{?rhel_version}
+%endif
+
+%if 0%{?centos_version}
+  %define distrib_info    centos%{?centos_version}
+%endif
+
+ 
+Name:           %{package_basename}
 Summary:    	Workstation Edition of RealOpInsight Software
-Version:        X.Y.Z
-Release:        build<CI_CNT>.<B_CNT>
+Version:        %{target_version}
+Release:        %{distrib_info}.built<CI_CNT>.<B_CNT>
 Group:          System/Monitoring
 License:        GPLv3
 URL:            http://ReolOpInsight.com
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{tarball}
 BuildRoot:      %_tmppath/%name-%version-build
 
 
@@ -65,23 +87,27 @@ Shinken, GroundWork, and many other common monitoring
 systems. 
 
 %prep
-%setup -q
+%setup -q -n %{tarball_basename}
 
 %build
-#TODO
+# NA
 
 %install
-bash ./install-sh.obs -d %{buildroot}%{_prefix}
+%if 0%{?rhel_version} || 0%{?centos_version}
+  bash ./install-sh -d %{buildroot}%{_prefix} -z
+%else
+  bash ./install-sh -d %{buildroot}%{_prefix}
+%endif
 
 %clean
 make clean
 rm -rf %{buildroot}
 
 %post
-#TODO
+# NA
 
 %postun
-#TODO
+# NA
 
 %files
 %defattr(-,root,root)
@@ -95,5 +121,5 @@ rm -rf %{buildroot}
 %doc examples
 
 %changelog
-* Tue May 13 2014 bugs@realopinsight.com
-- See the web site (http://RealOpInsight.com) to learn what changed in the different versions of the software
+* Sun Sep 21 2014 bugs@realopinsight.com
+- See http://RealOpInsight.com to learn what's news in your version of the software
