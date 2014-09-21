@@ -30,12 +30,14 @@
 #include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
 
+
 const QString Settings::UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Settings::ADM_UNSERNAME_KEY = "/Auth/admUser";
 const QString Settings::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
+const QString Settings::LANGUAGE_KEY = "/General/language";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
@@ -78,6 +80,7 @@ void Settings::init(void)
     QString passwd = QCryptographicHash::hash(ngrt4n::OpUser.c_str(), QCryptographicHash::Md5) ;
     QSettings::setValue(Settings::OP_PASSWD_KEY, passwd);
   }
+
   sync();
 }
 
@@ -127,4 +130,18 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
   _src.verify_ssl_peer = jsHelper.getProperty("verify_ssl_peer").toInt32();
 
   return true;
+}
+
+QString Settings::language(void) const
+{
+  QString lang = entry(LANGUAGE_KEY);
+  return lang.isEmpty()? QLocale::system().name() : lang;
+}
+
+void Settings::applyLanguageChanged(void)
+{
+  QTranslator translator;
+  translator.load(QString(":i18n/ngrt4n_%1").arg(language()));
+  qApp->installTranslator(&translator);
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 }

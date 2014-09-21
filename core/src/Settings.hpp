@@ -42,11 +42,13 @@ public:
   void setKeyValue(const QString & _key, const QString & _value);
   qint32 updateInterval() const;
   void setEntry(const QString& key, const QString& value);
-  QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
+  QString entry(const QString& key) const {return QSettings::value(key).toString();}
   bool loadSource(qint32 _idx, SourceT& _src);
   bool loadSource(const QString& _id, SourceT& _src);
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
+  QString language(void) const;
+  void applyLanguageChanged(void);
 
   static const QString UPDATE_INTERVAL_KEY;
   static const QString ADM_UNSERNAME_KEY;
@@ -54,6 +56,7 @@ public:
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
   static const QString SRC_BUCKET_KEY;
+  static const QString LANGUAGE_KEY;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

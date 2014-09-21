@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
+<TS version="2.1" language="fr_FR">
 <context>
     <name>Auth</name>
     <message>
@@ -37,8 +37,8 @@
         <location filename="../client/src/Auth.cpp" line="57"/>
         <source>
 Copyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.</source>
-        <translation>
-Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translation>
+        <translation type="unfinished">
+Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
     <message>
         <location filename="../client/src/Auth.cpp" line="91"/>
@@ -56,7 +56,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="25"/>
         <source>Host or group filter (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitre d&apos;hôte ou de groupe (optionnel)</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="29"/>
@@ -94,12 +94,12 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="447"/>
         <source>Invalid authentication chain. Must be login:password</source>
-        <translation type="unfinished"></translation>
+        <translation>Chaine d&apos;authentification invalide. Doit être de la forme login:mot_de_passe</translation>
     </message>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="458"/>
         <source>This version is compiled without ngrt4nd support</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette version du logiciel est compilée sans le support de ngrt4nd</translation>
     </message>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="601"/>
@@ -379,7 +379,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/MainWindow.cpp" line="36"/>
         <source>%1 - Operations Console</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - Console des Opérations</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="86"/>
@@ -474,7 +474,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/MainWindow.cpp" line="131"/>
         <source>Sto&amp;p</source>
-        <translation>&amp;ArrÃªter</translation>
+        <translation>&amp;Arrêter</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="132"/>
@@ -509,17 +509,17 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/MainWindow.cpp" line="177"/>
         <source>%1 - %2 - Operations Console</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2 - Console des Opérations</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="223"/>
         <source>updating...</source>
-        <translation></translation>
+        <translation>mise à jour...</translation>
     </message>
     <message>
         <location filename="../client/src/MainWindow.cpp" line="225"/>
         <source>update completed</source>
-        <translation>mise Ã  jour terminée</translation>
+        <translation>mise à  jour terminée</translation>
     </message>
 </context>
 <context>
@@ -535,7 +535,10 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
  &gt;&gt; Realease ID: %5
  &gt;&gt; Copyright (C) 2010 - %6 RealOpInsight Labs. All rights reserved
  &gt;&gt; For bug reporting instructions, see: &lt;%7&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;%1 %2 %3 (nom de code : %4)
+ &gt;&gt; Realease ID : %5
+ &gt;&gt; Copyright (C) 2010 - %6 RealOpInsight Labs. Tous droits réservés
+ &gt;&gt; Reporter des anomalies : &lt;%7&gt;</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="41"/>
@@ -550,7 +553,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="43"/>
         <source>Host</source>
-        <translation>Serveur/périphérique</translation>
+        <translation>IP/nom d&apos;hôte</translation>
     </message>
     <message>
         <location filename="../client/src/MsgConsole.cpp" line="44"/>
@@ -686,7 +689,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
         <location filename="../core/src/DashboardBase.cpp" line="174"/>
         <location filename="../core/src/DashboardBase.cpp" line="535"/>
         <source>This version is compiled without ngrt4nd support</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette version du logiciel est comilée sans le support de ngrt4nd</translation>
     </message>
     <message>
         <location filename="../core/src/DashboardBase.cpp" line="270"/>
@@ -716,32 +719,32 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous les droits réservés.</translati
     <message>
         <location filename="../core/src/Base.cpp" line="40"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeur par défaut</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="43"/>
         <source>Weighted Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Moyenne pondérée</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="46"/>
         <source>Weighted Average With Thresholds</source>
-        <translation type="unfinished"></translation>
+        <translation>Moyenne pondérée avec seuils</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="50"/>
         <source>Worst Severity</source>
-        <translation type="unfinished"></translation>
+        <translation>Sévérité la plus importante</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="60"/>
         <source>IT Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Service IT</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="61"/>
         <source>Business Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Service métier</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="68"/>
@@ -777,12 +780,18 @@ Prop. Rule: %4
 Weight: %5
 Calc. Rule: %6
 Thresholds: %9</source>
-        <translation type="unfinished"></translation>
+        <translation>Service : %1
+Description : %2
+Sévérité : %3
+Règle de calcul : %4
+Poids : %5
+Règle de calcul : %6
+Seuils : %9</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="201"/>
         <source>Essential</source>
-        <translation type="unfinished"></translation>
+        <translation>Essentiel</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="206"/>
@@ -792,13 +801,19 @@ Groups: %2
 Data Point: %3
 Raw Output: %4
 Other Details: %5</source>
-        <translation type="unfinished"></translation>
+        <translation>
+IP/nom d&apos;hôte : %1
+Groupe : %2
+Point de donnée : %3
+Sortie brute : %4
+Autres détails : %5</translation>
     </message>
     <message>
         <location filename="../core/src/Base.cpp" line="216"/>
         <source>
 Child Statuses: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Status des fils : %1</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="232"/>
@@ -811,98 +826,106 @@ Copyright (c) 2010-%6 RealOpInsight Labs. All rights reserved
 Visit %7 for more information
 Report Bugs: %8
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1
+Version : %2 (%3)
+Version noyeau : %4
+Release ID: %5
+Copyright (c) 2010-%6 RealOpInsight Labs. Tous droits réservés
+Visiter %7 pour plus d&apos;informations
+Reporter des anomalies : %8</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="35"/>
         <source>Unclassified Hosts</source>
-        <translation type="unfinished"></translation>
+        <translation>Systèmes hôtes non classifiés</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="36"/>
         <source>All Hosts</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les noeuds</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="48"/>
         <source>WSAStartup failed </source>
-        <translation type="unfinished"></translation>
+        <translation>WSAStartup a échoué</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="89"/>
         <source>Failed receiving data</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors de la reception de données</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="114"/>
         <source>Host down or unreachable %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hôte hors service ou inaccessible : %1</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="117"/>
         <source>Connection failed due to timeout %1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion échouée pour cause de délai d&apos;attente %1:%2</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="120"/>
         <source>Cannot assign requested address %1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;assigner l&apos;adresse de connexion %1:%2</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="123"/>
         <source>Network is down</source>
-        <translation type="unfinished"></translation>
+        <translation>Réseau inaccessible</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="126"/>
         <source>Connection reset by peer</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion reinitialisée par l&apos;autre pair</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="129"/>
         <source>Connection refused</source>
-        <translation type="unfinished">Connexion refusée</translation>
+        <translation>Connexion refusée</translation>
     </message>
     <message>
         <location filename="../core/src/RawSocket.cpp" line="132"/>
         <source>Socket operation failed with error %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec d&apos;opération réseau avec le code %1</translation>
     </message>
     <message>
         <location filename="../core/src/StatusAggregator.cpp" line="74"/>
         <source>Unknown: %1%; Critical: %2%; Major: %3%; Minor: %4%; Normal: %5%;
 Comments: %6</source>
-        <translation type="unfinished"></translation>
+        <translation>Indéfini : %1%; Critique : %2%; Majeur : %3%; Mineur : %4%; Normal : %5%;
+Commentaires : %6</translation>
     </message>
     <message>
         <location filename="../core/src/StatusAggregator.cpp" line="112"/>
         <source>Status impacted by problems on essential services</source>
-        <translation type="unfinished"></translation>
+        <translation>Statut impacté par des problèmes sur des services essentiels</translation>
     </message>
     <message>
         <location filename="../core/src/StatusAggregator.cpp" line="159"/>
         <source>%1 events exceeded %2% and set to %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Des événements %1 ont dépassés le seuil de %2%, nouveau statut : %3</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="161"/>
         <source>Connection etablished; server serial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion établie; série du serveur : %1</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="164"/>
         <source>Weird response from the server (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Réponse anormale reçue du serveur (%1)</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="169"/>
         <source>No response from server, retrying...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de réponse réçue du serveur, nouvelle tentative...</translation>
     </message>
     <message>
         <location filename="../core/src/ZmqSocket.cpp" line="174"/>
         <source>Unable to connect to ngrt4nd at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de se connecter à ngrt4nd à l&apos;adresse %1</translation>
     </message>
 </context>
 <context>
@@ -925,7 +948,7 @@ Comments: %6</source>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="200"/>
         <source>Invalid threshold rule: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Règle de seuil invalide : %1</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="239"/>
@@ -935,42 +958,42 @@ Comments: %6</source>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="267"/>
         <source>If</source>
-        <translation type="unfinished"></translation>
+        <translation>Si</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="269"/>
         <source>Of</source>
-        <translation type="unfinished"></translation>
+        <translation>De</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="271"/>
         <source>Set To</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir à </translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="281"/>
         <source>Add rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter la règle</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="282"/>
         <source>Remove rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer la règle</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="298"/>
         <source>Severiry Calculation Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Règle de caclul de sévérité</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="313"/>
         <source>Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Poids</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="317"/>
         <source>Severity Propagation Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Règle de propagation de sévérité</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="327"/>
@@ -985,22 +1008,22 @@ Comments: %6</source>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="346"/>
         <source>--&gt;Select an icon (Default is %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>--&gt; Sélectionner une icône (valeur par défaut : %1)</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="366"/>
         <source>Set or search data point...</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir ou rechercher un point de donnée...</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="368"/>
         <source>Select host group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner un groupe de d&apos;hôte</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="377"/>
         <source>Data Point</source>
-        <translation>Source de données</translation>
+        <translation>Point de donnée</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="427"/>
@@ -1015,17 +1038,26 @@ Comments: %6</source>
     E.g. localhost/httpd, localhost
     From RealOpInsght 3.0 and higher, both the host part and the service are required.
 See the online documentation for further details: http://docs.realopinsight.com/.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
+* Pour Nagios et les systèmes similaires comme Shinken; c&amp;apos;est de la forme &amp;apos;host_name/service_name&amp;apos; or juste &amp;apos;host_name&amp;apos;
+    Ex. mysql-server.example.com/Current Load, mysql-server.example.com
+    Si seulement la partie host_name est définie la source de données sera assignée au ping.
+ * Pour Zabbix, c&amp;apos;est de la forme &amp;apos;host_name/trigger_name&amp;apos;
+    Ex. Zabbix server/Zabbix http poller processes more than 75% busy
+ * Pour Zenoss c&amp;apos;est de la forme &amp;apos;device_name/component_name&amp;apos; ou juste &amp;apos;device_name&amp;apos;
+    E.g. localhost/httpd, localhost
+    Si seulement la partie host_name est définie la source de données sera assignée au ping.
+Voir la documentatuon en ligne pour plus de détails.</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="522"/>
         <source>Rule already set</source>
-        <translation type="unfinished"></translation>
+        <translation>Règle déjà définie</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.hpp" line="121"/>
         <source> %</source>
-        <translation type="unfinished"></translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -1075,7 +1107,7 @@ See the online documentation for further details: http://docs.realopinsight.com/
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="222"/>
         <source>Loading checks from %1:%2:%3...</source>
-        <translation type="unfinished">Chargement des données de sondes à partir de %1:%2... {1:%2:%3.?}</translation>
+        <translation>Chargement des données à partir de %1:%2:%3...</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="246"/>
@@ -1090,37 +1122,37 @@ See the online documentation for further details: http://docs.realopinsight.com/
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="291"/>
         <source>%1 entries imported</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 entrées importées</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="356"/>
         <source>This action is not allowed on the target service</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette action n&apos;est pas permise avec le service cible</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="624"/>
         <source>* unsaved changes left</source>
-        <translation type="unfinished"></translation>
+        <translation>* changements non enregistrés</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="632"/>
         <source>Saving in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement dans le fichier %1...</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="636"/>
         <source>Cannot open file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier: %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="670"/>
         <source>File saved: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>fichier enregistré: %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="731"/>
         <source>Import Z&amp;enoss Components</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des composants Z&amp;enoss</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="301"/>
@@ -1184,7 +1216,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
         <location filename="../client/src/SvConfigCreator.cpp" line="579"/>
         <location filename="../client/src/SvConfigCreator.cpp" line="607"/>
         <source>* Unsaved changes left</source>
-        <translation type="unfinished"></translation>
+        <translation>* Changement non enregistrés</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="572"/>
@@ -1227,7 +1259,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="729"/>
         <source>Import Livestatus Checks</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des données Livestatus</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="730"/>
@@ -1354,7 +1386,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../core/src/ZnsHelper.cpp" line="267"/>
         <source>%1 component is Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Le composant %1 est actif</translation>
     </message>
     <message>
         <location filename="../core/src/ZnsHelper.cpp" line="292"/>

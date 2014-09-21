@@ -77,8 +77,8 @@ void Auth::authentificate(void)
 {
   QString userName = m_loginField->text();
   QString userPasswd = QCryptographicHash::hash(ngrt4n::toByteArray(m_passwordField->text()), QCryptographicHash::Md5);
-  QString rootPasswd =  settings->setEntry(Settings::ADM_PASSWD_KEY);
-  QString opPasswd =  settings->setEntry(Settings::OP_PASSWD_KEY);
+  QString rootPasswd =  settings->entry(Settings::ADM_PASSWD_KEY);
+  QString opPasswd =  settings->entry(Settings::OP_PASSWD_KEY);
   if(	! rootPasswd.isEmpty()
       && userName == QString::fromStdString(ngrt4n::AdmUser)
       && userPasswd == rootPasswd ) {

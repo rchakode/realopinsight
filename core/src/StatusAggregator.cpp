@@ -106,11 +106,13 @@ int StatusAggregator::aggregate(int crule)
     break;
   }
 
-  if (result == m_maxEssential && m_maxEssential != ngrt4n::Normal)
-    m_thresholdExceededMsg
-        .append("; ")
-        .append(QObject::tr("Status impacted by problems on essential services"));
-
+  if (result == m_maxEssential && m_maxEssential != ngrt4n::Normal) {
+    QString msg = QObject::tr("Status impacted by problems on essential services");
+    if (m_thresholdExceededMsg.isEmpty())
+      m_thresholdExceededMsg = msg;
+    else
+      m_thresholdExceededMsg.append("\n\t").append(msg);
+  }
   return result;
 }
 
