@@ -47,8 +47,7 @@ public:
   bool loadSource(const QString& _id, SourceT& _src);
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
-  QString language(void) const;
-  void applyLanguageChanged(void);
+  static QString language(void);
 
   static const QString UPDATE_INTERVAL_KEY;
   static const QString ADM_UNSERNAME_KEY;

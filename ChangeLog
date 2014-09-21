@@ -8,8 +8,8 @@ RealOpInsight ChangeLog
     With this, you can for example deal with situations such as, essential services
     (i.e. services required for your business services), neutral services (i.e. services
     without any impact on your business services), etc.
-  * Modified average calculation rule algorithm to take into account the weights of
-    direct subservices when calculating the status of a service (Weighted Average).
+  * Modified the average calculation rule algorithm to take into account the weights
+    of direct subservices when calculating the status of a service (Weighted Average).
   * Added new status calculation rule (Weighted Average With Thresholds), based on
     weighted average along with status escalation thresholds (see ticket #47).
     This rule improves the simple weighted average rule described above. In addition,
