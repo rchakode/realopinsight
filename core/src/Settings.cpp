@@ -30,6 +30,7 @@
 #include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
 
+const QString Settings::LANGUAGE_KEY = "/General/language";
 const QString Settings::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
 const QString Settings::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Settings::AUTH_ADM_UNSERNAME_KEY = "/Auth/admUser";
@@ -88,6 +89,7 @@ void Settings::init(void)
     QString passwd = QCryptographicHash::hash(ngrt4n::OpUser.c_str(), QCryptographicHash::Md5) ;
     QSettings::setValue(Settings::AUTH_OP_PASSWD_KEY, passwd);
   }
+
   sync();
 }
 
@@ -137,4 +139,18 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
   _src.verify_ssl_peer = jsHelper.getProperty("verify_ssl_peer").toInt32();
 
   return true;
+}
+
+QString Settings::language(void) const
+{
+  QString lang = entry(LANGUAGE_KEY);
+  return lang.isEmpty()? QLocale::system().name() : lang;
+}
+
+void Settings::applyLanguageChanged(void)
+{
+  QTranslator translator;
+  translator.load(QString(":i18n/ngrt4n_%1").arg(language()));
+  qApp->installTranslator(&translator);
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 }

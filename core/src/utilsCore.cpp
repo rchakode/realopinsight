@@ -239,8 +239,8 @@ QStringList ngrt4n::sourceIndexes(void)
 }
 
 
-/* return <[sourcei:]hostaddr, checkid> */
-StringPairT ngrt4n::splitHostCheckInfo(const QString& info)
+/* return <[SourceId:]hostaddr, checkid> */
+StringPairT ngrt4n::splitDataPointInfo(const QString& info)
 {
   int pos = info.indexOf("/");
   QString second = ((pos == -1)? "ping" : info.mid(pos+1));
@@ -250,7 +250,7 @@ StringPairT ngrt4n::splitHostCheckInfo(const QString& info)
 
 
 /* return <source, hostaddr> */
-StringPairT ngrt4n::splitSourceHostInfo(const QString& info)
+StringPairT ngrt4n::splitSourceDataPointInfo(const QString& info)
 {
   int pos = info.indexOf(":");
   QString first;

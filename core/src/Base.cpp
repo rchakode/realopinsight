@@ -171,7 +171,7 @@ Severity Severity::operator--()
 }
 
 
-QString NodeT::thresholdsToString(void) const
+QString NodeT::toThresholdsString(void) const
 {
   QString result = "";
   if (sev_crule == CalcRules::WeightedAverageWithThresholds) {
@@ -180,9 +180,9 @@ QString NodeT::thresholdsToString(void) const
                                                       Severity(th.sev_in).toString(),
                                                       Severity(th.sev_out).toString()));
     }
-    return QString("(%1)").arg(result);
+    return result;
   }
-  return result;
+  return "-";
 }
 
 QString NodeT::toString(void) const
@@ -192,14 +192,15 @@ QString NodeT::toString(void) const
                                "\nSeverity: %3"
                                "\nProp. Rule: %4"
                                "\nWeight: %5"
-                               "\nCalc. Rule: %6 %9"   // the param  %9 will be filled if details required
+                               "\nCalc. Rule: %6"
+                               "\nThresholds: %9"   // the param  %9 will be filled if details required
                                ).arg(name,
                                      description.isEmpty()? "-" : const_cast<QString&>(description).replace("\n", " "),
                                      Severity(sev).toString(),
                                      PropRules(sev_prule).toString(),
                                      (weight == ngrt4n::WEIGHT_MAX)? QObject::tr("Essential") : QString::number(weight),
                                      CalcRules(sev_crule).toString(),
-                                     thresholdsToString());
+                                     toThresholdsString());
 
   if (type == NodeType::ITService) {
     result.append(QObject::tr("\nHost: %1"
@@ -212,7 +213,7 @@ QString NodeT::toString(void) const
                                                          QString::fromStdString(check.alarm_msg),
                                                          actual_msg));
   } else {
-    result.append(QObject::tr("\nSummary of Child Statuses: %1").arg(actual_msg));
+    result.append(QObject::tr("\nChild Statuses: %1").arg(actual_msg));
   }
   return result;
 }

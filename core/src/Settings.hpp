@@ -43,11 +43,13 @@ public:
   QString keyValue(const QString & _key) {return QSettings::value(_key).toString();}
   qint32 updateInterval() const;
   void setEntry(const QString& key, const QString& value);
-  QString setEntry(const QString& key) const {return QSettings::value(key).toString();}
+  QString entry(const QString& key) const {return QSettings::value(key).toString();}
   bool loadSource(qint32 _idx, SourceT& _src);
   bool loadSource(const QString& _id, SourceT& _src);
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
+  QString language(void) const;
+  void applyLanguageChanged(void);
 
   static const QString GLOBAL_SRC_BUCKET_KEY;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
@@ -56,6 +58,7 @@ public:
   static const QString AUTH_ADM_PASSWD_KEY;
   static const QString AUTH_OP_PASSWD_KEY;
   static const QString AUTH_MODE_KEY;
+  static const QString LANGUAGE_KEY;
   static const QString AUTH_LDAP_SERVER_URI;
   static const QString AUTH_LDAP_BIND_USER_DN;
   static const QString AUTH_LDAP_BIND_USER_PASSWORD;

@@ -9,8 +9,7 @@ RealOpInsight ChangeLog
   * Make the compilation of ngrt4nd optional removing the requirement
     on ZeroMQ, which is not always natively available on all operating
     systems (e.g. Red Hat, Centos).
-  * Fixed ticket #47 related to bad validation when adding sources in
-    the ultimate edition.
+  * Added option to set language in preference settings
 
 3.0.5
   * Fixed ticket #41 when chart is not well updated with

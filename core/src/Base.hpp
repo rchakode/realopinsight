@@ -33,7 +33,7 @@
 
 #define INIT_TRANSLATION \
   QTranslator translator; \
-  translator.load(QString(":i18n/ngrt4n_%1").arg(QLocale::system().name())); \
+  translator.load(QString(":i18n/ngrt4n_%1").arg(Settings().language())); \
   app->installTranslator(&translator); \
   QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
@@ -57,6 +57,8 @@ const QString CORE_VERSION = REALOPINSIGHT_CORE_VERSION;
 const QString PKG_VERSION = REALOPINSIGHT_PACKAGE_VERSION;
 const QString PKG_URL = REALOPINSIGHT_PACKAGE_URL;
 const QString DOCS_URL = REALOPINSIGHT_GET_HELP_URL;
+const QString DOCS_EDITOR_CONTEXT_URL = REALOPINSIGHT_EDITOR_HELP_URL;
+const QString DOCS_EDITOR_DATA_POINT_CONTEXT = REALOPINSIGHT_DATA_POINT_CONTEXT_URL;
 const QString REL_NAME = REALOPINSIGHT_RELEASE_NAME;
 const QString REL_YEAR = REALOPINSIGHT_RELEASE_YEAR;
 const QString REPORT_BUG = REALOPINSIGHT_BUG_REPORT_EMAIL;
@@ -278,7 +280,7 @@ struct NodeT {
     sev(ngrt4n::Unknown),
     weight(ngrt4n::WEIGHT_UNIT){}
 
-  QString thresholdsToString(void) const;
+  QString toThresholdsString(void) const;
   QString toString(void) const;
 };
 

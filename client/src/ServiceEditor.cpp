@@ -38,8 +38,7 @@ namespace {
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
-    m_mainLayout(new QGridLayout(this)),
-    m_actionButtonBox(new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close))
+    m_mainLayout(new QGridLayout(this))
 {
   layoutEditorComponents();
   addEvent();
@@ -396,8 +395,10 @@ void ServiceEditor::layoutCheckField(void)
 
 void ServiceEditor::layoutButtonBox(void)
 {
-  ++m_currentRow;
-  m_mainLayout->addWidget(m_actionButtonBox, m_currentRow, 2);
+  m_actionButtonBox = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Close);
+  m_actionButtonBox->button(QDialogButtonBox::Save)->setText(tr("Save"));
+  m_actionButtonBox->button(QDialogButtonBox::Close)->setText(tr("Fermer"));
+  m_mainLayout->addWidget(m_actionButtonBox, ++m_currentRow, 2);
 }
 
 void ServiceEditor::handleNodeTypeChanged( const QString& _text)
@@ -422,20 +423,17 @@ void ServiceEditor::handleNodeTypeActivated( const QString& _text)
 
 QLabel* ServiceEditor::createCheckFieldHelpIcon(void)
 {
-  QLabel* label = new QLabel();
+  QString dataPointHelpUrl = QString("%1/%2#%3").arg(DOCS_URL, DOCS_EDITOR_CONTEXT_URL, DOCS_EDITOR_DATA_POINT_CONTEXT);
+  QLabel* label = new QLabel(this);
   label ->setPixmap(QPixmap(":images/built-in/help.png"));
-  label ->setToolTip(tr("This depends on your monitoring configuration:"
-                        "\n * For Nagios, this follows the patterns 'host_name/service_name'"
-                        "\n    E.g. mysql-server.example.com/Current Load."
-                        "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
-                        "\n * For Zabbix, it follows the pattern 'host_name/trigger_name'"
-                        "\n    E.g. Zabbix server/Zabbix http poller processes more than 75% busy"
-                        "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
-                        "\n * For Zenoss, it follows the patterns 'device_name/component_name'"
-                        "\n    E.g. localhost/httpd, localhost"
-                        "\n    From RealOpInsght 3.0 and higher, both the host part and the service are required."
-                        "\nSee the online documentation for further details: http://docs.realopinsight.com/."
-                        ));
+  label ->setToolTip(tr("Click to open help"));
+  label->setTextFormat(Qt::RichText);
+  label->setText(QString("<a href=\"%1\" alt=\"%2\">"
+                         "<img src=\":images/built-in/help.png\" />"
+                         "</a>"
+                         ).arg(dataPointHelpUrl, tr("Click to open help")));
+  label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  label->setOpenExternalLinks(true);
   return label;
 }
 

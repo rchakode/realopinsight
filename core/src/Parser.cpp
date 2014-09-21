@@ -101,17 +101,17 @@ bool Parser::process(bool console)
 
     if (node.type == NodeType::ITService) {
       node.visibility = ngrt4n::Visible;
-      StringPairT info = ngrt4n::splitHostCheckInfo(node.child_nodes);
-      m_cdata->hosts[info.first] << info.second;
+      StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
+      m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
 
-      QString srcid = ngrt4n::getSourceIdFromStr(info.first);
+      QString srcid = ngrt4n::getSourceIdFromStr(dataPointInfo.first);
       if (srcid.isEmpty()) {
         srcid = ngrt4n::sourceId(0);
         if (console) node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
       }
       m_cdata->sources.insert(srcid);
       m_cdata->cnodes.insert(node.id, node);
-    } else { // means a BP node
+    } else { // i.e. a business service
       node.visibility = ngrt4n::Visible | ngrt4n::Expanded;
       m_cdata->bpnodes.insert(node.id, node);
     }

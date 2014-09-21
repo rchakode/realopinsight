@@ -70,8 +70,8 @@ DISTFILES += README.md \
     i18n/ngrt4n_*.qm
 
 TRANSLATIONS += i18n/ngrt4n_fr.ts
-
 CODECFORSRC = UTF-8
+CODECFORTR  = UTF-8
 
 HEADERS += \
     core/src/Base.hpp \
@@ -187,6 +187,8 @@ DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Diegom\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
+DEFINES *= "REALOPINSIGHT_EDITOR_HELP_URL='\"/latest/01_workstation/editor-manual.html\"'"
+DEFINES *= "REALOPINSIGHT_DATA_POINT_CONTEXT_URL='\"data-point\"'"
 
 
 unittests {
