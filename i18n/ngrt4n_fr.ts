@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="fr_FR">
 <context>
     <name>Auth</name>
     <message>
@@ -38,7 +37,7 @@
         <location filename="../client/src/Auth.cpp" line="57"/>
         <source>
 Copyright (c) 2010-%1 RealOpInsight Labs. All rights reserved.</source>
-        <translation type="unfinished">
+        <translation>
 Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
     <message>
@@ -297,7 +296,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="447"/>
         <source>Password updated</source>
-        <translation>Mot de passe mis Ã  jour</translation>
+        <translation>Mot de passe mis à jour</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="451"/>
@@ -317,7 +316,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="531"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
-        <translation>Point d&apos;accès Ã  Livestatus ou Ã  ngrt4nd</translation>
+        <translation>Point d&apos;accès à Livestatus ou à  ngrt4nd</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="533"/>
@@ -352,7 +351,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="583"/>
         <source>Update Interval</source>
-        <translation>Intervalle de mise Ã  jour</translation>
+        <translation>Intervalle de mise à jour</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="587"/>
@@ -362,7 +361,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="589"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue</translation>
     </message>
     <message>
         <location filename="../client/src/GuiPreferences.cpp" line="595"/>
@@ -1034,18 +1033,18 @@ Commentaires : %6</translation>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="399"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="400"/>
         <source>Fermer</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="429"/>
         <location filename="../client/src/ServiceEditor.cpp" line="434"/>
         <source>Click to open help</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquer pour ouvrir l&apos;aide</translation>
     </message>
     <message>
         <location filename="../client/src/ServiceEditor.cpp" line="520"/>

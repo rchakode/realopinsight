@@ -270,6 +270,7 @@ void GuiPreferences::disableFieldIfRequired(void)
     m_showAuthInfoChkbx->setEnabled(false);
     m_useNgrt4ndChkbx->setEnabled(false);
     m_verifySslPeerChkBx->setEnabled(false);
+    m_languageBoxField->setEnabled(false);
   }
 }
 
