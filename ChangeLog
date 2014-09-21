@@ -1,15 +1,25 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
-3.1.0 (Diegom)
-  * Added service weighting support along with new status calculation
-    rules allowing to deal with weighted average, essential services,
-    neutral services, as well as threshold-based status escalation.
-    See tickets #45 and #45 for details.
-  * Make the compilation of ngrt4nd optional removing the requirement
-    on ZeroMQ, which is not always natively available on all operating
-    systems (e.g. Red Hat, Centos).
-  * Added option to set language in preference settings
+  * Added the support of weighting services (see ticket #45). Weighting enables
+    you to associate a weight factor with a service. The weight factor can be any
+    real number between ``min=0`` and ``max=10``, determining how important the
+    service is to its parent service compared to other sibling services.
+    With this, you can for example deal with situations such as, essential services
+    (i.e. services required for your business services), neutral services (i.e. services
+    without any impact on your business services), etc.
+  * Modified average calculation rule algorithm to take into account the weights of
+    direct subservices when calculating the status of a service (Weighted Average).
+  * Added new status calculation rule (Weighted Average With Thresholds), based on
+    weighted average along with status escalation thresholds (see ticket #47).
+    This rule improves the simple weighted average rule described above. In addition,
+    it provides the ability to escalate a severity when given thresholds of similar
+    events are reached. For example, you may want to escalate the severity from Major
+    to Critical if more than 50% of services are in Major state.
+  * Added the ability to set the application language via preference settings.
+  * Other changes include the ability to make the compilation of ngrt4nd optional.
+    This removes the requirement on ZeroMQ which is not natively available on
+    some versions of Red Hat-based operating systems (e.g. Red Hat/CentOS 6).
 
 3.0.5
   * Fixed ticket #41 when chart is not well updated with
