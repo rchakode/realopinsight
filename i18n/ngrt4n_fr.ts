@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR">
+<TS version="2.0" language="fr_FR">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>Auth</name>
     <message>
@@ -239,137 +240,142 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
         <translation>Ne pas vérifier le pair SSL</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="189"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="194"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
         <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="205"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="210"/>
         <source>C&amp;hange password</source>
         <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="210"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="215"/>
         <source>Change Password | %1</source>
         <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="213"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="218"/>
         <source>Current Password</source>
         <translation>Mot de passe actuel</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="215"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="220"/>
         <source>New password</source>
         <translation>Nouveau mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="217"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="222"/>
         <source>Retype new password</source>
         <translation>Confirmation</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="230"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="235"/>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="357"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="362"/>
         <source>Browser requires realm authentication | %1</source>
         <translation>La page demandée requiert une authentification | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="360"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="365"/>
         <source>Login</source>
         <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="363"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="368"/>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="367"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="372"/>
         <source>Submit</source>
         <translation>Soumettre</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="441"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="447"/>
         <source>Password updated</source>
         <translation>Mot de passe mis Ã  jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="445"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="451"/>
         <source>Sorry the passwords do not match</source>
         <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="448"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="454"/>
         <source>Authentication failed</source>
         <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="478"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="484"/>
         <source>Update Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="520"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="531"/>
         <source>Livestatus/Ngrt4nd Endpoint</source>
         <translation>Point d&apos;accès Ã  Livestatus ou Ã  ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="522"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="533"/>
         <source>Server Address</source>
         <translation>Adresse du serveur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="524"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="535"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="557"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="568"/>
         <source>Sources</source>
         <translation>Sources</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="560"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="571"/>
         <source>Monitor Web URL*</source>
         <translation>Adresse web du moniteur*</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="562"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="573"/>
         <source>Select a monitor type</source>
         <translation>Selectionner le type de moniteur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="568"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="579"/>
         <source>Auth String</source>
         <translation>Chaine d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="572"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="583"/>
         <source>Update Interval</source>
         <translation>Intervalle de mise Ã  jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="576"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="587"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="581"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="589"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../client/src/GuiPreferences.cpp" line="595"/>
         <source>Common Settings</source>
         <translation>Paramètres généraux</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="613"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="627"/>
         <source>Select source index | %1</source>
         <translation>Sélectionner l&apos;index de la source | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="614"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="628"/>
         <source>Please select the index of the source</source>
         <translation>Veuillez sélectionner l&apos;index de la source</translation>
     </message>
@@ -816,7 +822,7 @@ Child Statuses: %1</source>
 Status des fils : %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="232"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="237"/>
         <source>
 %1
 Version: %2 (%3)
@@ -898,12 +904,12 @@ Comments: %6</source>
 Commentaires : %6</translation>
     </message>
     <message>
-        <location filename="../core/src/StatusAggregator.cpp" line="112"/>
+        <location filename="../core/src/StatusAggregator.cpp" line="110"/>
         <source>Status impacted by problems on essential services</source>
         <translation>Statut impacté par des problèmes sur des services essentiels</translation>
     </message>
     <message>
-        <location filename="../core/src/StatusAggregator.cpp" line="159"/>
+        <location filename="../core/src/StatusAggregator.cpp" line="161"/>
         <source>%1 events exceeded %2% and set to %3</source>
         <translation>Des événements %1 ont dépassés le seuil de %2%, nouveau statut : %3</translation>
     </message>
@@ -931,126 +937,118 @@ Commentaires : %6</translation>
 <context>
     <name>ServiceEditor</name>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="229"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="228"/>
         <source>Name</source>
         <translation>Etiquette</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="252"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="251"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="354"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="353"/>
         <source>Icon</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="200"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="199"/>
         <source>Invalid threshold rule: %1</source>
         <translation>Règle de seuil invalide : %1</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="239"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="238"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="267"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="266"/>
         <source>If</source>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="269"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="268"/>
         <source>Of</source>
         <translation>De</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="271"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="270"/>
         <source>Set To</source>
         <translation>Définir à </translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="281"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="280"/>
         <source>Add rule</source>
         <translation>Ajouter la règle</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="282"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="281"/>
         <source>Remove rule</source>
         <translation>Supprimer la règle</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="298"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="297"/>
         <source>Severiry Calculation Rule</source>
         <translation>Règle de caclul de sévérité</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="313"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="312"/>
         <source>Weight</source>
         <translation>Poids</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="317"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="316"/>
         <source>Severity Propagation Rule</source>
         <translation>Règle de propagation de sévérité</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="327"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="326"/>
         <source>Alarm Message</source>
         <translation>Message d&apos;alarme</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="336"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="335"/>
         <source>Notification Message</source>
         <translation>Message de notification</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="346"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="345"/>
         <source>--&gt;Select an icon (Default is %1)</source>
         <translation>--&gt; Sélectionner une icône (valeur par défaut : %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="366"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="365"/>
         <source>Set or search data point...</source>
         <translation>Définir ou rechercher un point de donnée...</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="368"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="367"/>
         <source>Select host group</source>
         <translation>Sélectionner un groupe de d&apos;hôte</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="377"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="376"/>
         <source>Data Point</source>
         <translation>Point de donnée</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="427"/>
-        <source>This depends on your monitoring configuration:
- * For Nagios, this follows the patterns &apos;host_name/service_name&apos;
-    E.g. mysql-server.example.com/Current Load.
-    From RealOpInsght 3.0 and higher, both the host part and the service are required.
- * For Zabbix, it follows the pattern &apos;host_name/trigger_name&apos;
-    E.g. Zabbix server/Zabbix http poller processes more than 75% busy
-    From RealOpInsght 3.0 and higher, both the host part and the service are required.
- * For Zenoss, it follows the patterns &apos;device_name/component_name&apos;
-    E.g. localhost/httpd, localhost
-    From RealOpInsght 3.0 and higher, both the host part and the service are required.
-See the online documentation for further details: http://docs.realopinsight.com/.</source>
-        <translation>Selon la configuration de votre système de supervision, la définition des sources de données fonctionne comme suit :
-* Pour Nagios et les systèmes similaires comme Shinken; c&amp;apos;est de la forme &amp;apos;host_name/service_name&amp;apos; or juste &amp;apos;host_name&amp;apos;
-    Ex. mysql-server.example.com/Current Load, mysql-server.example.com
-    Si seulement la partie host_name est définie la source de données sera assignée au ping.
- * Pour Zabbix, c&amp;apos;est de la forme &amp;apos;host_name/trigger_name&amp;apos;
-    Ex. Zabbix server/Zabbix http poller processes more than 75% busy
- * Pour Zenoss c&amp;apos;est de la forme &amp;apos;device_name/component_name&amp;apos; ou juste &amp;apos;device_name&amp;apos;
-    E.g. localhost/httpd, localhost
-    Si seulement la partie host_name est définie la source de données sera assignée au ping.
-Voir la documentatuon en ligne pour plus de détails.</translation>
+        <location filename="../client/src/ServiceEditor.cpp" line="399"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="522"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="400"/>
+        <source>Fermer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../client/src/ServiceEditor.cpp" line="429"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="434"/>
+        <source>Click to open help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../client/src/ServiceEditor.cpp" line="520"/>
         <source>Rule already set</source>
         <translation>Règle déjà définie</translation>
     </message>
