@@ -62,9 +62,9 @@ DISTFILES += README.md \
     doc/man/*.gz \
     i18n/ngrt4n_*.qm
 
-TRANSLATIONS += i18n/ngrt4n_fr.ts
-
+TRANSLATIONS += resources/i18n/ngrt4n_fr.ts
 CODECFORSRC = UTF-8
+CODECFORTR  = UTF-8
 
 HEADERS += \
     core/src/Base.hpp \
