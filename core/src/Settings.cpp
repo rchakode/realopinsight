@@ -135,7 +135,6 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
 QString Settings::language(void)
 {
   QString lang = Settings().entry(LANGUAGE_KEY);
-  qDebug()<< lang;
   return lang.isEmpty()? QLocale::system().name() : lang;
 }
 
