@@ -31,6 +31,7 @@
 #include "Auth.hpp"
 #include "GuiDialogForms.hpp"
 #include "LsHelper.hpp"
+#include "ThresholdHelper.hpp"
 
 namespace {
   const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
@@ -59,7 +60,7 @@ SvCreator::SvCreator(const qint32& _userRole)
   m_mainSplitter->addWidget(m_editor);
   setCentralWidget(m_mainSplitter);
   resize();
-  statusBar()->showMessage(tr("Open or edit a file via the File menu"));
+  showStatusMsg(tr("Open or edit a file via the File menu"), false);
 }
 
 SvCreator::~SvCreator()
@@ -72,6 +73,32 @@ SvCreator::~SvCreator()
   unloadMenu();
 }
 
+
+void SvCreator::addEvents(void)
+{
+  connect(m_subMenus["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newView()));
+  connect(m_subMenus["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
+  connect(m_subMenus["CopySelected"],SIGNAL(triggered(bool)),this,SLOT(copySelected()));
+  connect(m_subMenus["PasteFromSelected"],SIGNAL(triggered(bool)),this,SLOT(pasteFromSelected()));
+  connect(m_subMenus["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
+  connect(m_subMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
+  connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
+  connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
+  connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
+  connect(m_subMenus["ImportLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importLivestatusChecks()));
+  connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
+  connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
+  connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
+  connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
+  connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
+  connect(m_editor,SIGNAL(saveClicked()),this,SLOT(save()));
+  connect(m_editor,SIGNAL(closeClicked()),this,SLOT(treatCloseAction()));
+  connect(m_editor,SIGNAL(returnPressed()),this,SLOT(handleReturnPressed()));
+  connect(m_editor,SIGNAL(nodeTypeActivated(qint32)),this,SLOT(handleNodeTypeActivated(qint32)));
+  connect(m_editor,SIGNAL(errorOccurred(QString)),this, SLOT(handleErrorOccurred(QString)));
+  connect(m_tree,SIGNAL(itemSelectionChanged()),this,SLOT(handleSelectedNodeChanged()));
+  connect(m_tree,SIGNAL(treeNodeMoved(QString)),this,SLOT(handleTreeNodeMoved(QString)));
+}
 
 void SvCreator::contextMenuEvent(QContextMenuEvent*_event)
 {
@@ -104,7 +131,7 @@ void SvCreator::load(const QString& _path)
   addEvents();
   loadFile(_path);
   setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
-  statusBar()->showMessage(tr("Loaded."));
+  showStatusMsg(tr("Loaded."), false);
   show();
 }
 
@@ -136,7 +163,7 @@ void SvCreator::loadFile(const QString& _path)
       exit(1);
     } else {
       m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-      m_editor->fillFormWithNodeContent(*m_root);
+      m_editor->fillInEditorWithContent(*m_root);
       m_tree->build();
       fillEditorFromService(m_tree->rootItem());
       m_activeConfig = ngrt4n::getAbsolutePath(_path);
@@ -172,12 +199,12 @@ void SvCreator::importNagiosChecks(void)
     SourceT srcInfo = sourceInfos[srcId];
 
     if (! path.isNull() && ! path.isEmpty()) {
-      statusBar()->showMessage(tr("Loading checks from %1:%2...").arg(srcId, path));
+      showStatusMsg(tr("Loading checks from %1:%2...").arg(srcId, path), false);
       ChecksT checks;
       int retcode = parseStatusFile(path, checks);
       treatCheckLoadResults(retcode, srcInfo.id, checks, tr("Error while parsing the file"));
     } else {
-      statusBar()->showMessage(tr("No file selected"));
+      showStatusMsg(tr("No file selected"), true);
     }
   }
 }
@@ -192,8 +219,8 @@ void SvCreator::importLivestatusChecks(void)
     QString host = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    statusBar()->showMessage(tr("Loading checks from %1:%2:%3...")
-                             .arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)));
+    showStatusMsg(tr("Loading checks from %1:%2:%3...")
+                  .arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)), true);
 
     ChecksT checks;
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
@@ -216,7 +243,7 @@ void SvCreator::importZabbixTriggers(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    statusBar()->showMessage(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
+    showStatusMsg(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), true);
 
     ChecksT checks;
     ZbxHelper handler;
@@ -241,7 +268,7 @@ void SvCreator::importZenossComponents(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    statusBar()->showMessage(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url));
+    showStatusMsg(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), true);
 
     ChecksT checks;
     ZnsHelper handler(srcInfo.mon_url);
@@ -258,14 +285,13 @@ void SvCreator::importZenossComponents(void)
 void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const ChecksT& checks, const QString& msg)
 {
   if (retCode != 0) {
-    statusBar()->showMessage(msg);
-    statusBar()->setStyleSheet("background: red;");
+    showStatusMsg(msg, true);
   } else {
     m_editor->updateDataPoints(checks, srcId);
-    statusBar()->showMessage(tr("%1 triggers imported").arg(checks.size()));
-    statusBar()->setStyleSheet("background: transparent;");
+    showStatusMsg(tr("%1 entries imported").arg(checks.size()), false);
   }
 }
+
 
 void SvCreator::newView(void)
 {
@@ -276,7 +302,7 @@ void SvCreator::newView(void)
     m_root = m_cdata->bpnodes.insert(node->id, *node);
     m_tree->addNode(*node);
     m_tree->update();
-    m_editor->fillFormWithNodeContent(*node);
+    m_editor->fillInEditorWithContent(*node);
     m_selectedNode = node->id;
     m_hasLeftUpdates = true;
     m_activeConfig.clear();
@@ -307,28 +333,28 @@ NodeT* SvCreator::createNode(const QString& id,
   node->id = id;
   node->name = label;
   node->parent = parent;
-  node->type = NodeType::ServiceNode;
+  node->type = NodeType::BusinessService;
   node->sev = ngrt4n::Unknown;
-  node->sev_crule = CalcRules::HighCriticity;
+  node->sev_crule = CalcRules::Worst;
   node->sev_prule = PropRules::Unchanged;
   node->icon = ngrt4n::DEFAULT_ICON;
   node->child_nodes = QString();
+  node->thresholdLimits = QVector<ThresholdT>();
   return node;
 }
 
 void SvCreator::insertFromSelected(const NodeT& node)
 {
   NodeListT::iterator pnode = m_cdata->bpnodes.find(m_selectedNode);
-  if (pnode == m_cdata->bpnodes.end() ||
-      pnode->type == NodeType::AlarmNode) {
-    ngrt4n::alert(tr("This action not allowed on the target node"));
-    return;
+  if (pnode != m_cdata->bpnodes.end() && pnode->type != NodeType::ITService) {
+    pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? CHILD_SEPERATOR % node.id : node.id;
+    QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
+    m_cdata->bpnodes.insert(node.id, node);
+    m_tree->setCurrentItem(lastItem);
+    fillEditorFromService(lastItem);
+  } else {
+    ngrt4n::alert(tr("This action is not allowed on the target service"));
   }
-  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? CHILD_SEPERATOR % node.id : node.id;
-  QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
-  m_cdata->bpnodes.insert(node.id, node);
-  m_tree->setCurrentItem(lastItem);
-  fillEditorFromService(lastItem);
 }
 
 
@@ -353,7 +379,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
   if (! ngrt4n::findNode(m_cdata, _nodeId, node))
     return;
 
-  if (node->type == NodeType::ServiceNode
+  if (node->type == NodeType::BusinessService
       && ! node->child_nodes.isEmpty()) {
     Q_FOREACH(const QString& checkId, node->child_nodes.split(CHILD_SEPERATOR)) {
       deleteNode(checkId);
@@ -371,7 +397,7 @@ void SvCreator::deleteNode(const QString& _nodeId)
     if (pNode != m_cdata->bpnodes.end()) {
       pNode->child_nodes.remove(regex);
     }
-    if (node->type == NodeType::AlarmNode) {
+    if (node->type == NodeType::ITService) {
       m_cdata->cnodes.remove(_nodeId);
     } else {
       m_cdata->bpnodes.remove(_nodeId);
@@ -410,9 +436,11 @@ void SvCreator::pasteFromSelected(void)
 
 void SvCreator::save(void)
 {
+  //FIXME: this change the value of combo box
   if (! m_selectedNode.isEmpty()) {
     fillEditorFromService(m_tree->findNodeItem(m_selectedNode));
   }
+
   if (m_activeConfig.isEmpty()) {
     saveAs();
   } else {
@@ -435,7 +463,7 @@ void SvCreator::saveAs(void)
   if (path.isNull()) {
     QString msg = tr("The path is not valid!");
     ngrt4n::alert(msg);
-    statusBar()->showMessage(msg);
+    showStatusMsg(msg, true);
   } else {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
@@ -496,20 +524,20 @@ void SvCreator::handleSelectedNodeChanged(void)
 }
 
 
-void SvCreator::handleTreeNodeMoved(QString _node_id)
+void SvCreator::handleTreeNodeMoved(const QString& nodeId)
 {
-  QTreeWidgetItem* item =  m_tree->findNodeItem(_node_id);
+  QTreeWidgetItem* item =  m_tree->findNodeItem(nodeId);
   if (item != NULL) {
 
     QTreeWidgetItem* tnodeP = item->parent();
     if (tnodeP) {
-      NodeListT::iterator nodeIt = m_cdata->bpnodes.find(_node_id);
+      NodeListT::iterator nodeIt = m_cdata->bpnodes.find(nodeId);
 
       if (nodeIt != m_cdata->bpnodes.end()) {
         /* Remove the node on its old parent's child list*/
-        QRegExp regex ("|^" + _node_id + CHILD_SEPERATOR +
-                       "|^" + _node_id + "$" +
-                       "|" + CHILD_SEPERATOR + _node_id);
+        QRegExp regex ("|^" + nodeId + CHILD_SEPERATOR +
+                       "|^" + nodeId + "$" +
+                       "|" + CHILD_SEPERATOR + nodeId);
         NodeListT::iterator pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
         if (pNodeIt != m_cdata->bpnodes.end()) {
           pNodeIt->child_nodes.remove(regex);
@@ -519,40 +547,37 @@ void SvCreator::handleTreeNodeMoved(QString _node_id)
         nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
         pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
         if (pNodeIt != m_cdata->bpnodes.end()) {
-          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")? CHILD_SEPERATOR + _node_id : _node_id;
+          pNodeIt->child_nodes += (pNodeIt->child_nodes != "")? CHILD_SEPERATOR + nodeId : nodeId;
         }
       }
     }
   }
 }
 
-
-void SvCreator::handleNodeTypeActivated(qint32 _type)
+void SvCreator::handleNodeTypeActivated(qint32 targetType)
 {
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
-  if (node != m_cdata->bpnodes.end()) {
-    if (_type == NodeType::ServiceNode) {
-      if (node->type == NodeType::AlarmNode) {
-        node->child_nodes.clear();
-        if (m_editor->updateNodeInfo(*node)) {
-          m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
-          m_hasLeftUpdates = true;
-          statusBar()->showMessage(m_activeConfig%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
-        }
+  if (node == m_cdata->bpnodes.end()) {
+    return; // nothing to do
+  }
+
+  int currentType = node->type;
+  if (targetType == NodeType::BusinessService) {
+    if (currentType == NodeType::ITService) {
+      node->child_nodes.clear();
+      if (m_editor->updateNodeInfoFromEditorContents(*node)) {
+        m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
+        m_hasLeftUpdates = true;
+        showStatusMsg(tr("* Unsaved changes left"), false);
+        setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
       }
-    } else {
-      if (node->type == NodeType::ServiceNode && ! node->child_nodes.isEmpty()) {
-        m_editor->typeField()->setCurrentIndex(0);
-        ngrt4n::alert(tr("Failed ! This action is not permitted for a leave service."));
-      } else {
-        if (m_editor->updateNodeInfo(*node)) {
-          m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
-          m_hasLeftUpdates = true;
-          statusBar()->showMessage(m_activeConfig%"*");
-          setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
-        }
-      }
+    }
+  } else { // current type is business service
+    if (m_editor->updateNodeInfoFromEditorContents(*node)) {
+      m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
+      m_hasLeftUpdates = true;
+      showStatusMsg(tr("* Unsaved changes left"), false);
+      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
     }
   }
 }
@@ -560,7 +585,7 @@ void SvCreator::handleNodeTypeActivated(qint32 _type)
 void SvCreator::handleShowOnlineResources(void)
 {
   QDesktopServices launcher;
-  launcher.openUrl(QUrl(PKG_URL));
+  launcher.openUrl(QUrl(DOCS_URL));
 }
 
 void SvCreator::handleShowAbout(void)
@@ -573,18 +598,19 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
-    if (m_editor->updateNodeInfo(*node)) {
+    if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       QTreeWidgetItem* selectedNodeItem = m_tree->findNodeItem(m_selectedNode);
       if (selectedNodeItem) {
         selectedNodeItem->setText(0, node->name);
       }
       m_hasLeftUpdates = true;
-      statusBar()->showMessage(m_activeConfig%"*");
+      showStatusMsg(tr("* Unsaved changes left"), false);
       setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
     }
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) m_editor->fillFormWithNodeContent(node);
+  if (ngrt4n::findNode(m_cdata, m_selectedNode, node))
+    m_editor->fillInEditorWithContent(*node);
 }
 
 
@@ -592,22 +618,22 @@ void SvCreator::handleReturnPressed(void)
 {
   NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
   if (node != m_cdata->bpnodes.end()) {
-    if (m_editor->updateNodeInfo(*node)) {
+    if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
-      statusBar()->showMessage(m_activeConfig%"*");
+      showStatusMsg(tr("* unsaved changes left"), false);
       setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
     }
   }
 }
 
-void SvCreator::recordData(const QString& _path)
+void SvCreator::recordData(const QString& path)
 {
-  statusBar()->showMessage(tr("saving %1").arg(_path));
+  showStatusMsg(tr("Saving in %1...").arg(path), false);
 
-  QFile file(_path);
+  QFile file(path);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    statusBar()->showMessage(tr("Unable to open the file '%1'").arg(_path));
+    showStatusMsg(tr("Cannot open file: %1").arg(path), true);
     return;
   }
   m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
@@ -615,44 +641,65 @@ void SvCreator::recordData(const QString& _path)
     file.close();
     QString msg =  tr("The hierarchy does not have root");
     ngrt4n::alert(msg);
-    statusBar()->showMessage(msg);
+    showStatusMsg(msg, true);
   } else {
-    QTextStream ofile(&file);
-    ofile << "<?xml version=\"1.0\"?>\n"
-             "<ServiceView compat=\"2.0\" monitor=\""<< m_cdata->monitor<< "\">\n";
-    recordNode(ofile,*m_root);
+    QTextStream outStream(&file);
+
+    outStream << "<?xml version=\"1.0\"?>\n"
+              << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(m_cdata->monitor) )
+              << generateNodeXml(*m_root);
+
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
       if (service.id == ngrt4n::ROOT_ID || service.parent.isEmpty())
         continue;
-      recordNode(ofile, service);
+      outStream << generateNodeXml(service);
     }
+
     Q_FOREACH(const NodeT& service, m_cdata->cnodes) {
       if (service.parent.isEmpty())
         continue;
-      recordNode(ofile, service);
+      outStream << generateNodeXml(service);
     }
-    ofile << "</ServiceView>\n";
+
+    outStream << "</ServiceView>\n";
+
     file.close();
 
     m_hasLeftUpdates = false;
-    statusBar()->clearMessage();
-    m_activeConfig = ngrt4n::getAbsolutePath(_path);
-    statusBar()->showMessage(tr("saved %1").arg(m_activeConfig));
+    m_activeConfig = ngrt4n::getAbsolutePath(path);
+    showStatusMsg(tr("File saved: %1").arg(m_activeConfig), false);
     setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
   }
 }
 
-void SvCreator::recordNode(QTextStream& stream, const NodeT& node)
+QString SvCreator::generateNodeXml(const NodeT& node)
 {
-  stream << "<Service id=\""<<node.id<<"\" type=\""<<node.type
-         << "\" statusCalcRule=\""<<node.sev_crule<< "\" statusPropRule=\""<<node.sev_prule<< "\">\n"
-         << " <Name>"<<node.name<<"</Name>\n"
-         << " <Icon>"<<node.icon<<"</Icon>\n"
-         << " <Description>"<<node.description<<"</Description>\n"
-         << " <AlarmMsg>"<< node.alarm_msg<<"</AlarmMsg>\n"
-         << " <NotificationMsg>"<<node.notification_msg<<"</NotificationMsg>\n"
-         << " <SubServices>"<<node.child_nodes<<"</SubServices>\n"
-         << "</Service>\n";
+  QString xml = QString("<Service id=\"%1\" "
+                        " type=\"%2\" "
+                        " statusCalcRule=\"%3\" "
+                        " statusPropRule=\"%4\" "
+                        " weight=\"%5\"> \n"
+                        ).arg(node.id,
+                              QString::number(node.type),
+                              QString::number(node.sev_crule),
+                              QString::number(node.sev_prule),
+                              QString::number(node.weight));
+
+  xml.append( QString(" <Name>%1</Name>\n").arg(node.name) )
+      .append( QString(" <Icon>%1</Icon>\n").arg(node.icon) )
+      .append( QString(" <Description>%1</Description>\n").arg(node.description) )
+      .append( QString(" <AlarmMsg>%1</AlarmMsg>\n").arg(node.alarm_msg) )
+      .append( QString(" <NotificationMsg>%1</NotificationMsg>\n").arg(node.notification_msg) )
+      .append( QString(" <SubServices>%1</SubServices>\n").arg(node.child_nodes) ) ;
+
+  if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
+
+    xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)) );
+  }
+
+  xml.append("</Service>\n");
+
+  return xml;
 }
 
 void SvCreator::resize()
@@ -760,27 +807,17 @@ int SvCreator::parseStatusFile(const QString& path, ChecksT& checks)
   return 0;
 }
 
-void SvCreator::addEvents(void)
+
+void SvCreator::handleErrorOccurred(QString msg)
 {
-  connect(m_subMenus["NewFile"],SIGNAL(triggered(bool)),this,SLOT(newView()));
-  connect(m_subMenus["NewNode"],SIGNAL(triggered(bool)),this,SLOT(newNode()));
-  connect(m_subMenus["CopySelected"],SIGNAL(triggered(bool)),this,SLOT(copySelected()));
-  connect(m_subMenus["PasteFromSelected"],SIGNAL(triggered(bool)),this,SLOT(pasteFromSelected()));
-  connect(m_subMenus["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
-  connect(m_subMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
-  connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
-  connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
-  connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
-  connect(m_subMenus["ImportLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importLivestatusChecks()));
-  connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
-  connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
-  connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
-  connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
-  connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
-  connect(m_editor,SIGNAL(saveClicked()),this,SLOT(save()));
-  connect(m_editor,SIGNAL(closeClicked()),this,SLOT(treatCloseAction()));
-  connect(m_editor,SIGNAL(returnPressed()),this,SLOT(handleReturnPressed()));
-  connect(m_editor,SIGNAL(nodeTypeActivated(qint32)),this,SLOT(handleNodeTypeActivated(qint32)));
-  connect(m_tree,SIGNAL(itemSelectionChanged()),this,SLOT(handleSelectedNodeChanged()));
-  connect(m_tree,SIGNAL(treeNodeMoved(QString)),this,SLOT(handleTreeNodeMoved(QString)));
+  showStatusMsg(msg, true);
+}
+
+void SvCreator::showStatusMsg(const QString& msg, bool error)
+{
+  statusBar()->showMessage(msg);
+  if (error)
+    statusBar()->setStyleSheet("background: red;");
+  else
+    statusBar()->setStyleSheet("background: transparent;");
 }

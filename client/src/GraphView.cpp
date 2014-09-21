@@ -185,12 +185,12 @@ void GraphView::drawNode(const NodeT& _node)
       m_mnodes[_node.id].exp_icon->setData(0, nodeData),
       m_scene->addItem(m_mnodes[_node.id].exp_icon),
       m_mnodes[_node.id].exp_icon->setZValue(0);
-  if (m_mnodes[_node.id].type == NodeType::AlarmNode)
+  if (m_mnodes[_node.id].type == NodeType::ITService)
     m_mnodes[_node.id].exp_icon->setVisible(false);
 
-  QString msg = ngrt4n::generateToolTip(_node);
-  m_mnodes[_node.id].icon->setToolTip(msg);
-  m_mnodes[_node.id].label->setToolTip(msg);
+  QString tooltip = _node.toString();
+  m_mnodes[_node.id].icon->setToolTip(tooltip);
+  m_mnodes[_node.id].label->setToolTip(tooltip);
 
   setNodePos(_node.id, QPointF(_node.pos_x, _node.pos_y));
 }
@@ -225,7 +225,7 @@ void GraphView::setNodeVisible(const QString& _nodeId,
     gnode->expand = _visible;
     gnode->label->setVisible(_visible);
     gnode->icon->setVisible(_visible);
-    if (gnode->type == NodeType::ServiceNode)
+    if (gnode->type == NodeType::BusinessService)
       gnode->exp_icon->setVisible(_visible);
     if (_visible) {
       QPixmap expandIcon(m_icons[ngrt4n::PLUS], 0, Qt::AutoColor);

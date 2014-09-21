@@ -33,13 +33,13 @@ MainWindow::MainWindow(const qint32& _userRole,
     m_dashboard(new GuiDashboard(_userRole, _config)),
     m_contextMenu(new QMenu(this))
 {
-  QMainWindow::setWindowTitle(tr("%1 Operations Console").arg(APP_NAME));
+  QMainWindow::setWindowTitle(tr("%1 - Operations Console").arg(APP_NAME));
   loadMenus();
   setCentralWidget(m_dashboard->getWidget());
   handleTabChanged(0);
   addEvents();
   m_dashboard->initialize(m_preferences);
-  resetTimer(m_preferences->updateInterval());
+  m_dashboard->setTimerId( startTimer(1000 * m_preferences->updateInterval()) );
 }
 
 
@@ -174,7 +174,7 @@ void MainWindow::render(void)
   show();
   if (! m_dashboard->lastErrorState()) {
     m_dashboard->scalPaneContentsToViewPort();
-    QMainWindow::setWindowTitle(tr("%1 - %2 Operations Console")
+    QMainWindow::setWindowTitle(tr("%1 - %2 - Operations Console")
                                 .arg(m_dashboard->rootNode().name, APP_NAME));
     handleRefresh();
   } else {

@@ -59,13 +59,15 @@ public:
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}
 
 public Q_SLOTS:
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
+  void runNgrt4ndUpdate(const SourceT& src);
+#endif
   void runMonitor();
   void runMonitor(SourceT& src);
-  void runNgrt4ndUpdate(const SourceT& src);
   void runLivestatusUpdate(const SourceT& src);
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
-  SeverityWeightInfoT updateNodeStates(const QString& _node);
+  ngrt4n::AggregatedSeverityT computeNodeSeverity(const QString& _node);
   bool allocSourceHandler(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}

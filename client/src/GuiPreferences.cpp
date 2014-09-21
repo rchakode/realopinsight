@@ -166,20 +166,25 @@ void GuiPreferences::createPreferenceWindow(void)
 {
   m_dialog->setWindowTitle(tr("Monitoring Settings | %1").arg(APP_NAME));
 
-  m_monitorUrlField = new QLineEdit();
-  m_monitorTypeField = new QComboBox();
-  m_updateIntervalField = new QSpinBox();
-  m_sockAddrField = new QLineEdit();
-  m_sockPortField = new QLineEdit();
-  m_serverPassField = new QLineEdit();
-  m_applySettingBtn = new QPushButton(tr("&Apply settings"));
-  m_addAsSourceBtn = new QPushButton(tr("Add a&s Source"));
-  m_deleteSourceBtn = new QPushButton(tr("&Delete Source"));
-  m_showAuthInfoChkbx = new QCheckBox(tr("&Show in clear"));
-  m_useNgrt4ndChkbx = new QCheckBox(tr("Use &Ngrt4nd"));
-  m_verifySslPeerChkBx = new QCheckBox(tr("Don't verify SSL peer (https)"));
+  m_monitorUrlField = new QLineEdit(m_dialog);
+  m_monitorTypeField = new QComboBox(m_dialog);
+  m_updateIntervalField = new QSpinBox(m_dialog);
+  m_sockAddrField = new QLineEdit(m_dialog);
+  m_sockPortField = new QLineEdit(m_dialog);
+  m_serverPassField = new QLineEdit(m_dialog);
+  m_applySettingBtn = new QPushButton(tr("&Apply settings"), m_dialog);
+  m_addAsSourceBtn = new QPushButton(tr("Add a&s Source"), m_dialog);
+  m_deleteSourceBtn = new QPushButton(tr("&Delete Source"), m_dialog);
+  m_showAuthInfoChkbx = new QCheckBox(tr("&Show in clear"), m_dialog);
+  m_useNgrt4ndChkbx = new QCheckBox(tr("Use &Ngrt4nd"), m_dialog);
+  m_verifySslPeerChkBx = new QCheckBox(tr("Don't verify SSL peer (https)"), m_dialog);
+  m_languageBoxField = new QComboBox(m_dialog);
+
   m_serverPassField->setEchoMode(QLineEdit::Password);
   m_sockPortField->setValidator(new QIntValidator(1, 65535, m_sockPortField));
+
+  m_languageBoxField->addItem("English", "en");
+  m_languageBoxField->addItem("Francais", "fr");
 
   qint32 line = 0;
   m_mainLayout->addWidget(createCommonGrp(), line, 0, 1, 3);
@@ -265,6 +270,7 @@ void GuiPreferences::disableFieldIfRequired(void)
     m_showAuthInfoChkbx->setEnabled(false);
     m_useNgrt4ndChkbx->setEnabled(false);
     m_verifySslPeerChkBx->setEnabled(false);
+    m_languageBoxField->setEnabled(false);
   }
 }
 
@@ -343,10 +349,10 @@ QString GuiPreferences::style()
       "         stop: 0 #9DC6DD, stop: 0.25 #F1F1F1,"
       "         stop: 0.4 #FFBB69, stop: 0.55 #F1F1F1, stop: 1.0 #9DC6DD);"
       "}"
-      "QGraphicsView {"
-      " background: #F8F8FF;"
-      "}"
+      "QGraphicsView { background: #F8F8FF;}"
       "QLineEdit { border: none }"
+      "QComboBox { border: none; background: white; }"
+      "QAbstractSpinBox { border: none; background: white; }"
       ;
   return styleSheet;
 }
@@ -400,6 +406,7 @@ void GuiPreferences::updateFields(void)
     m_useNgrt4ndChkbx->setCheckState(Qt::Unchecked);
     m_verifySslPeerChkBx->setCheckState(Qt::Unchecked);
     m_updateIntervalField->setValue(updateInterval());
+    m_languageBoxField->setCurrentIndex(m_languageBoxField->findData(m_settings->language()));
   }
 }
 
@@ -499,9 +506,14 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
   setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   setEntry(Settings::UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
+  setEntry(Settings::LANGUAGE_KEY, m_languageBoxField->currentData().toString());
+
   setSourceState(index, true);
   setEntry(Settings::SRC_BUCKET_KEY, getSourceStatesSerialized());
+
   sync();
+
+  m_settings->applyLanguageChanged();
   emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
   if (! m_updatedSources.contains(index)) {
@@ -574,6 +586,9 @@ QGroupBox* GuiPreferences::createCommonGrp(void)
       m_updateIntervalField->setMaximum(1200),
       lyt->addWidget(m_updateIntervalField, line, 1),
       lyt->addWidget(new QLabel(tr("seconds")), line, 2);
+
+  lyt->addWidget(new QLabel(tr("Language")), ++line, 0),
+      lyt->addWidget(m_languageBoxField);
 
   lyt->setColumnStretch(0, 0);
   lyt->setColumnStretch(1, 1);

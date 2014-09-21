@@ -27,6 +27,7 @@
 #include "utilsCore.hpp"
 #include "JsonHelper.hpp"
 #include "LsHelper.hpp"
+#include "StatusAggregator.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <QSystemTrayIcon>
@@ -36,12 +37,15 @@
 #include <QNetworkCookie>
 #include <iostream>
 #include <algorithm>
-#include <zmq.h>
 #include <cassert>
-
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QUrlQuery>
+#endif
+
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#include "ZmqSocket.hpp"
+#include <zmq.h>
 #endif
 
 
@@ -51,19 +55,26 @@ namespace {
   } //namespace
 
 StringMapT DashboardBase::propRules() {
+  PropRules unchanged(PropRules::Unchanged);
+  PropRules decreased(PropRules::Decreased);
+  PropRules increased(PropRules::Increased);
+
   StringMapT map;
-  map.insert(PropRules::label(PropRules::Unchanged), PropRules::toString(PropRules::Unchanged));
-  map.insert(PropRules::label(PropRules::Decreased), PropRules::toString(PropRules::Decreased));
-  map.insert(PropRules::label(PropRules::Increased), PropRules::toString(PropRules::Increased));
+  map.insert(unchanged.toString(), unchanged.data());
+  map.insert(decreased.toString(), decreased.data());
+  map.insert(increased.toString(), increased.data());
   return map;
 }
 
 StringMapT DashboardBase::calcRules() {
+  CalcRules worst(CalcRules::Worst);
+  CalcRules average(CalcRules::Average);
+  CalcRules weighted(CalcRules::WeightedAverageWithThresholds);
+
   StringMapT map;
-  map.insert(CalcRules::label(CalcRules::HighCriticity),
-             CalcRules::toString(CalcRules::HighCriticity));
-  map.insert(CalcRules::label(CalcRules::WeightedCriticity),
-             CalcRules::toString(CalcRules::WeightedCriticity));
+  map.insert(worst.toString(), worst.data());
+  map.insert(average.toString(), average.data());
+  map.insert(weighted.toString(), weighted.data());
   return map;
 }
 
@@ -117,7 +128,7 @@ void DashboardBase::runMonitor()
       Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
-  updateNodeStates(rootNode().id);
+  computeNodeSeverity(rootNode().id);
   updateChart();
   ++m_updateCounter;
   Q_EMIT updateFinished();
@@ -130,7 +141,7 @@ void DashboardBase::runMonitor(SourceT& src)
   switch(src.mon_type) {
   case ngrt4n::Zenoss:
     Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceHostInfo(hitem);
+      StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
       if (info.first != src.id) continue;
       ChecksT checks;
       if (src.zns_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
@@ -142,7 +153,7 @@ void DashboardBase::runMonitor(SourceT& src)
     break;
   case ngrt4n::Zabbix:
     Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceHostInfo(hostItem);
+      StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
 
       if (info.first != src.id) continue;
 
@@ -156,12 +167,21 @@ void DashboardBase::runMonitor(SourceT& src)
     break;
   case ngrt4n::Nagios:
   default:
-    src.use_ngrt4nd? runNgrt4ndUpdate(src) : runLivestatusUpdate(src);
+    if (src.use_ngrt4nd) {
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
+      runNgrt4ndUpdate(src);
+#else
+      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+#endif
+    } else {
+      runLivestatusUpdate(src);
+    }
     break;
   }
   finalizeUpdate(src);
 }
 
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
@@ -184,10 +204,10 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     if (cnode->child_nodes.isEmpty()) {
       cnode->sev = ngrt4n::Unknown;
     } else {
-      QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
-      if (info.first == src.id) {
+      StringPairT sourceDataPointInfo = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
+      if (sourceDataPointInfo.first == src.id) {
         // Retrieve data
-        QString requestData = QString("%1:%2").arg(src.auth, info.second);
+        QString requestData = QString("%1:%2").arg(src.auth, sourceDataPointInfo.second);
         src.d4n_handler->send(requestData.toStdString());
         JsonHelper jsHelper(src.d4n_handler->recv().c_str());
 
@@ -206,7 +226,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     }
   }
 }
-
+#endif //disable zmq
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {
@@ -221,7 +241,7 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
-    QPair<QString, QString> info = ngrt4n::splitSourceHostInfo(hostit.key());
+    QPair<QString, QString> info = ngrt4n::splitSourceDataPointInfo(hostit.key());
     if (info.first == src.id) {
       ChecksT checks;
       if (src.ls_handler->loadChecks(info.second, checks) == 0) {
@@ -265,16 +285,16 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
-  QString info = ngrt4n::generateToolTip(_node);
-  updateTree(_node, info);
-  updateMap(_node, info);
+  QString tooltip = _node.toString();
+  updateTree(_node, tooltip);
+  updateMap(_node, tooltip);
   updateMsgConsole(_node);
   updateEventFeeds(_node);
 }
 
 void DashboardBase::updateCNodesWithCheck(const CheckT& check, const SourceT& src)
 {
-  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode!=end; ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode!=end; ++cnode) {
     if (cnode->child_nodes.toLower() == ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower()) {
       cnode->check = check;
       computeStatusInfo(*cnode, src);
@@ -295,12 +315,11 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
   _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
-  _node.sev_prop = ngrt4n::severityFromPropRule(_node.sev, _node.sev_prule);
+  _node.sev_prop = StatusAggregator::propagate(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
 
-  if (_node.check.host == "-") {
+  if (_node.check.host == "-")
     return;
-  }
 
   if (m_cdata->monitor == ngrt4n::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
@@ -309,8 +328,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
   }
 
-  if (_node.sev == ngrt4n::Normal)
-  {
+  if (_node.sev == ngrt4n::Normal) {
     if (_node.notification_msg.isEmpty()) {
       return ;
     } else {
@@ -321,13 +339,16 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   } else {
     _node.actual_msg = _node.alarm_msg;
   }
+
   regexp.setPattern(ngrt4n::TAG_HOSTNAME.c_str());
   _node.actual_msg.replace(regexp, _node.check.host.c_str());
   auto info = QString(_node.check.id.c_str()).split("/");
+
   if (info.length() > 1) {
     regexp.setPattern(ngrt4n::TAG_CHECK.c_str());
     _node.actual_msg.replace(regexp, info[1]);
   }
+
   if (m_cdata->monitor == ngrt4n::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
@@ -339,43 +360,45 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   }
 }
 
-SeverityWeightInfoT DashboardBase::updateNodeStates(const QString& _nodeId)
+ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _nodeId)
 {
-  SeverityWeightInfoT result;
+  ngrt4n::AggregatedSeverityT result;
 
   NodeListT::iterator node;
   if (! ngrt4n::findNode(m_cdata, _nodeId, node)) {
-    result.weight = 0;
+    result.sev = ngrt4n::Unknown;
+    result.weight = ngrt4n::WEIGHT_UNIT;
     return result;
   }
+
+  result.weight = node->weight;
 
   if (node->child_nodes.isEmpty()) {
     result.sev = ngrt4n::Unknown;
-    result.weight = node->weight;
     return result;
   }
 
-  if (node->type == NodeType::AlarmNode) {
+  if (node->type == NodeType::ITService) {
     result.sev = node->sev_prop;
-    result.weight = node->weight;
     return result;
   }
 
-  QVector<SeverityWeightInfoT> childSeverityInfos;
-  Q_FOREACH (const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
-    result = updateNodeStates(childId);
-    if (result.weight > 0)
-      childSeverityInfos.push_back( result );
+  StatusAggregator severityManager(node->thresholdLimits);
+
+  Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+    result = computeNodeSeverity(childId);
+    severityManager.addSeverity(result.sev, result.weight);
   }
 
-  result = ngrt4n::severityFromCalcRule(childSeverityInfos, node->sev_crule);
-  node->sev = result.sev;
-  node->sev_prop = ngrt4n::severityFromPropRule(node->sev, node->sev_prule);
-  result.sev = node->sev_prop;
+  node->sev = severityManager.aggregate(node->sev_crule);
+  node->sev_prop = severityManager.propagate(node->sev, node->sev_prule);
 
-  QString details = ngrt4n::generateToolTip(*node);
-  updateMap(*node, details);
-  updateTree(*node, details);
+  result.sev = node->sev_prop;
+  result.weight = node->weight;
+  node->actual_msg = severityManager.toDetailsString();
+  QString tooltip = node->toString();
+  updateMap(*node, tooltip);
+  updateTree(*node, tooltip);
 
   return result;
 }
@@ -428,8 +451,12 @@ void DashboardBase::openRpcSession(SourceT& src)
   switch(src.mon_type) {
   case ngrt4n::Nagios:
     if (src.use_ngrt4nd) {
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
       src.d4n_handler->setupSocket();
       src.d4n_handler->makeHandShake();
+#else
+      updateDashboardOnError(src, tr("This version is compiled without ngrt4nd support"));
+#endif
     } else {
       //src.ls_handler->setupSocket();
     }
@@ -452,7 +479,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     Q_EMIT updateStatusBar(msg);
   }
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode) {
-    StringPairT info = ngrt4n::splitSourceHostInfo(cnode->child_nodes);
+    StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
 
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
@@ -500,12 +527,18 @@ bool DashboardBase::allocSourceHandler(SourceT& src)
   switch (src.mon_type) {
   case ngrt4n::Nagios:
     if (src.use_ngrt4nd) {
+#ifndef REALOPINSIGHT_DISABLE_ZMQ
       QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
       src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
+      allocated = true;
+#else
+      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+      allocated = false;
+#endif
     } else {
       src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
+      allocated = true;
     }
-    allocated = true;
     break;
   case ngrt4n::Zabbix:
     src.zbx_handler = std::make_shared<ZbxHelper>(src.mon_url);
@@ -561,10 +594,12 @@ void DashboardBase::computeFirstSrcIndex(void)
 
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
-  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode!=end; ++cnode) {
-    QString prefix = QString("%1:").arg(src.id);
-    if (! cnode->monitored && cnode->child_nodes.startsWith(prefix, Qt::CaseInsensitive)) {
-      ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode->child_nodes), cnode->check);
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode != end; ++cnode) {
+    QString srcPrefix = QString("%1:").arg(src.id);
+    if (! cnode->monitored && cnode->child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
+      ngrt4n::setCheckOnError(ngrt4n::Unset,
+                              tr("Undefined service (%1)").arg(cnode->child_nodes),
+                              cnode->check);
       computeStatusInfo(*cnode, src);
       updateDashboard(*cnode);
     }

@@ -1,8 +1,8 @@
 /*
- * Settings.hpp
+ * Threshold.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 23-03-2014                                                 #
+# Last Update: 06-09-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,45 +22,40 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SETTINGS_HPP
-#define SETTINGS_HPP
-#include <QString>
-#include <QSettings>
+#ifndef THRESHOLD_HPP
+#define THRESHOLD_HPP
+
 #include "Base.hpp"
-#include <ctime>
+#include <QCoreApplication>
+#include <QString>
+#include <QStringList>
+#include <QDebug>
+#include <QVector>
 
 
-class Settings : public QSettings
+class ThresholdHelper
 {
-  Q_OBJECT
 public:
-  Settings();
-  Settings(const QString& path);
-  virtual ~Settings(void);
+  ThresholdHelper(const QString& th);
+  ThresholdHelper(double weight, int sevIn, int sevOut);
+  void parseThreshold(const QString& th);
+  double weight(void) const {return m_weight;}
+  int sevIn(void) const {return m_sevIn;}
+  int sevOut(void) const {return m_sevOut;}
+  ThresholdT toThreshold(void) const;
+  bool isValid(void) { return isValidWeight(m_weight) && Severity(m_sevIn).isValid() && Severity(m_sevOut).isValid(); }
+  static double toValidWeight(double val) { return isValidWeight(val) ? val : -1.0; }
+  static int toValidSeverity(int val) { return Severity(val).isValid() ? val : -1; }
+  static bool isValidWeight(double val) {return val >= 0.0 && val <= 1.0;}
+  QString toString(void);
+  QString data(void);
+  static QString listToData(const QVector<ThresholdT>& ths);
+  static QVector<ThresholdT> dataToList(const QString& data);
 
-  void init(void);
-  void setKeyValue(const QString & _key, const QString & _value);
-  qint32 updateInterval() const;
-  void setEntry(const QString& key, const QString& value);
-  QString entry(const QString& key) const {return QSettings::value(key).toString();}
-  bool loadSource(qint32 _idx, SourceT& _src);
-  bool loadSource(const QString& _id, SourceT& _src);
-  bool setSource(const QString& _info, SourceT& _src);
-  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
-  QString language(void) const;
-  void applyLanguageChanged(void);
-
-  static const QString UPDATE_INTERVAL_KEY;
-  static const QString ADM_UNSERNAME_KEY;
-  static const QString OP_UNSERNAME_KEY;
-  static const QString ADM_PASSWD_KEY;
-  static const QString OP_PASSWD_KEY;
-  static const QString SRC_BUCKET_KEY;
-  static const QString LANGUAGE_KEY;
-
-Q_SIGNALS:
-  void timerIntervalChanged(qint32);
+private:
+  double m_weight;
+  int m_sevIn;
+  int m_sevOut;
 };
 
-
-#endif // SETTINGS_HPP
+#endif // THRESHOLD_HPP

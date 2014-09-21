@@ -112,6 +112,7 @@ private:
   QList<qint8> m_updatedSources;
   QCheckBox* m_verifySslPeerChkBx;
   QVector<QRadioButton*> m_sourceBtns;
+  QComboBox* m_languageBoxField;
   bool m_cancelled;
   QLineEdit* m_realmLoginField;
   QLineEdit* m_realmPasswdField;

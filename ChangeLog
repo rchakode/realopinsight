@@ -1,6 +1,16 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.1.0 (Furor)
+  * Added service weighting support along with new status calculation
+    rules allowing to deal with weighted average, essential services,
+    neutral services, as well as threshold-based status escalation.
+    See tickets #45 and #45 for details.
+  * Make the compilation of ngrt4nd optional removing the requirement
+    on ZeroMQ, which is not always natively available on all operating
+    systems (e.g. Red Hat, Centos).
+  * Added option to set language in preference settings
+
 3.0.5
   * Fixed ticket #41 when chart is not well updated with
     Livestatus backend
@@ -58,7 +68,7 @@ RealOpInsight ChangeLog
     the console after preferences changed
   * Added french translation for new string added by changes
 
-3.0.0
+3.0.0 (Eliana)
   * Changed command line names: ngrt4n-oc -> realopinsight-oc, 
     ngrt4n-manager -> realopinsight-manager, ngrt4n-editor -> 
     realopinsight-editor

@@ -24,7 +24,9 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "utilsCore.hpp"
+#include "ThresholdHelper.hpp"
 #include <QObject>
+#include <QtXml>
 
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
@@ -44,7 +46,7 @@ Parser::~Parser()
 
 bool Parser::process(bool console)
 {
-  QString graphContent ="";
+  QString graphContent = "";
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
@@ -66,15 +68,16 @@ bool Parser::process(bool console)
 
   xmlRoot = xmlDoc.documentElement();
   m_cdata->monitor = xmlRoot.attribute("monitor").toInt();
+  m_cdata->format_version = xmlRoot.attribute("compat").toDouble();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
   NodeT node;
   qint32 serviceCount = services.length();
   for (qint32 srv = 0; srv < serviceCount; ++srv) {
     QDomElement service = services.item(srv).toElement();
-    node.id = service.attribute("id").trimmed();
-    node.parent = "";
+    node.parent.clear();
     node.monitored = false;
+    node.id = service.attribute("id").trimmed();
     node.type = service.attribute("type").toInt();
     node.sev = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
@@ -85,26 +88,30 @@ bool Parser::process(bool console)
     node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
     node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
     node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-    node.check.status = -1;
-    if (node.icon.isEmpty()) {
-      node.icon = ngrt4n::DEFAULT_ICON;
+    node.weight = (m_cdata->format_version >= 3.1) ? service.attribute("weight").toDouble() : ngrt4n::WEIGHT_UNIT;
+
+    if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
+      QString thdata = service.firstChildElement("Thresholds").text().trimmed();
+      node.thresholdLimits = ThresholdHelper::dataToList(thdata);
+      qSort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
     }
-    if (node.type == NodeType::AlarmNode) {
+
+    node.check.status = -1;
+    if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
+
+    if (node.type == NodeType::ITService) {
       node.visibility = ngrt4n::Visible;
-      StringPairT info = ngrt4n::splitHostCheckInfo(node.child_nodes);
-      m_cdata->hosts[info.first] << info.second;
+      StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
+      m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
 
-      QString srcid = ngrt4n::getSourceIdFromStr(info.first);
-
+      QString srcid = ngrt4n::getSourceIdFromStr(dataPointInfo.first);
       if (srcid.isEmpty()) {
         srcid = ngrt4n::sourceId(0);
-        if (console) {
-          node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
-        }
+        if (console) node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
       }
       m_cdata->sources.insert(srcid);
       m_cdata->cnodes.insert(node.id, node);
-    } else { // means a BP node
+    } else { // i.e. a business service
       node.visibility = ngrt4n::Visible | ngrt4n::Expanded;
       m_cdata->bpnodes.insert(node.id, node);
     }
@@ -115,10 +122,8 @@ bool Parser::process(bool console)
   graphContent += m_dotFooter;
   saveCoordinatesFile(graphContent);
 
-  if (console)
-    return parseDotResult();
-  else
-    return true;
+
+  return console ? parseDotResult() : true;
 }
 
 void Parser::updateNodeHierachy(QString& _graphContent)

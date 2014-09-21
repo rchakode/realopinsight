@@ -92,7 +92,7 @@ void MsgConsole::updateNodeMsg(const NodeT& _node)
   mmodel->item(index, 0)->setText(QDateTime::fromTime_t(itemText.toUInt()).toString());
   mmodel->item(index, 0)->setData(itemText, Qt::UserRole);
 
-  mmodel->item(index, 1)->setText(ngrt4n::severityText(_node.sev));
+  mmodel->item(index, 1)->setText(Severity(_node.sev).toString());
   mmodel->item(index, 1)->setData(-1*_node.sev, Qt::UserRole);
   mmodel->item(index, 1)->setBackground(QBrush(ngrt4n::severityQColor(_node.sev)));
 
@@ -136,7 +136,7 @@ void MsgConsole::clearNormalMsg(void)
   qint32 index = 0;
   qint32 nbRows = mmodel->rowCount();
   while (index < nbRows) {
-    if (mmodel->item(index, 1)->text() == ngrt4n::severityText(ngrt4n::Normal)) {
+    if (mmodel->item(index, 1)->text() == Severity(ngrt4n::Normal).toString()) {
       mmodel->removeRow(index);
       --nbRows;
     } else {

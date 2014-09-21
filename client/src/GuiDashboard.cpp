@@ -43,18 +43,16 @@ namespace {
 
 StringMapT GuiDashboard::propRules() {
   StringMapT map;
-  map.insert(PropRules::label(PropRules::Unchanged), PropRules::toString(PropRules::Unchanged));
-  map.insert(PropRules::label(PropRules::Decreased), PropRules::toString(PropRules::Decreased));
-  map.insert(PropRules::label(PropRules::Increased), PropRules::toString(PropRules::Increased));
+  map.insert(PropRules(PropRules::Unchanged).toString(), PropRules(PropRules::Unchanged).data());
+  map.insert(PropRules(PropRules::Decreased).toString(), PropRules(PropRules::Decreased).data());
+  map.insert(PropRules(PropRules::Increased).toString(), PropRules(PropRules::Increased).data());
   return map;
 }
 
 StringMapT GuiDashboard::calcRules() {
   StringMapT map;
-  map.insert(CalcRules::label(CalcRules::HighCriticity),
-             CalcRules::toString(CalcRules::HighCriticity));
-  map.insert(CalcRules::label(CalcRules::WeightedCriticity),
-             CalcRules::toString(CalcRules::WeightedCriticity));
+  map.insert(CalcRules(CalcRules::Worst).toString(), CalcRules(CalcRules::Worst).data());
+  map.insert(CalcRules(CalcRules::Average).toString(),CalcRules(CalcRules::Average).data());
   return map;
 }
 
@@ -106,7 +104,7 @@ void GuiDashboard::handleChangePasswordAction(void)
 void GuiDashboard::handleShowOnlineResources(void)
 {
   QDesktopServices appLauncher;
-  appLauncher.openUrl(QUrl("http://RealOpInsight.com/"));
+  appLauncher.openUrl(DOCS_URL);
 }
 
 void GuiDashboard::handleShowAbout(void)
@@ -218,7 +216,7 @@ void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
   NodeListT::iterator node;
   if (ngrt4n::findNode(m_cdata, _nodeId, node)
       && ! node->child_nodes.isEmpty()) {
-    if (node->type == NodeType::AlarmNode) {
+    if (node->type == NodeType::ITService) {
       m_filteredMsgConsole->updateNodeMsg(node);
     } else {
       QStringList childIds = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
@@ -283,7 +281,7 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
-                                                 ngrt4n::severityText(_node.sev).toUpper());
+                                                 Severity(_node.sev).toString().toUpper());
 
   m_trayIcon->showMessage(title, msg, icon);
   m_trayIcon->setToolTip(title%"\n"%msg);
