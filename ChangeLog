@@ -1,7 +1,7 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
-3.1.0 (Furor)
+3.1.0 (Diegom)
   * Added service weighting support along with new status calculation
     rules allowing to deal with weighted average, essential services,
     neutral services, as well as threshold-based status escalation.
