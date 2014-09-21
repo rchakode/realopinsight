@@ -30,7 +30,7 @@
 #include "JsonHelper.hpp"
 #include <QtScript/QScriptEngine>
 
-const QString Settings::LANGUAGE_KEY = "/General/language";
+const QString Settings::GLOBAL_LANGUAGE_KEY = "/General/language";
 const QString Settings::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
 const QString Settings::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Settings::AUTH_ADM_UNSERNAME_KEY = "/Auth/admUser";
@@ -143,7 +143,7 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
 
 QString Settings::language(void) const
 {
-  QString lang = entry(LANGUAGE_KEY);
+  QString lang = entry(GLOBAL_LANGUAGE_KEY);
   return lang.isEmpty()? QLocale::system().name() : lang;
 }
 

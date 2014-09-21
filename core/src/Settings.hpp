@@ -51,6 +51,7 @@ public:
   QString language(void) const;
   void applyLanguageChanged(void);
 
+  static const QString GLOBAL_LANGUAGE_KEY;
   static const QString GLOBAL_SRC_BUCKET_KEY;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
   static const QString AUTH_ADM_UNSERNAME_KEY;
@@ -58,7 +59,6 @@ public:
   static const QString AUTH_ADM_PASSWD_KEY;
   static const QString AUTH_OP_PASSWD_KEY;
   static const QString AUTH_MODE_KEY;
-  static const QString LANGUAGE_KEY;
   static const QString AUTH_LDAP_SERVER_URI;
   static const QString AUTH_LDAP_BIND_USER_DN;
   static const QString AUTH_LDAP_BIND_USER_PASSWORD;

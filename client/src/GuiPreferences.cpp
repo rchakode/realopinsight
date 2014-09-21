@@ -508,7 +508,7 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   src.verify_ssl_peer = (m_verifySslPeerChkBx->checkState() == Qt::Unchecked);
   setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   setEntry(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text());
-  setEntry(Settings::LANGUAGE_KEY, m_languageBoxField->currentData().toString());
+  setEntry(Settings::GLOBAL_LANGUAGE_KEY, m_languageBoxField->currentData().toString());
 
   setSourceState(index, true);
   setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
