@@ -76,15 +76,14 @@ HEADERS += \
     core/src/ZmqSocket.hpp \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
-    core/src/global.hpp \
     core/src/utilsCore.hpp \
     core/src/ChartBase.hpp \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
-    core/src/SeverityAggregator.hpp
+    core/src/StatusAggregator.hpp
 
-SOURCES += \
+SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
@@ -98,7 +97,7 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/SeverityAggregator.cpp
+    core/src/StatusAggregator.cpp
 
 web-base {
 PACKAGE_VERSION=2014b5

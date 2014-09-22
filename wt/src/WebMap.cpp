@@ -138,7 +138,7 @@ void WebMap::drawNode(const NodeT& _node, bool drawIcon)
       m_painter->drawImage(iconPos, GImage(ngrt4n::getPathFromQtResource(ICONS[_node.icon]),40,40));
     } else { /* thumbnail: do nothing*/ }
 
-    if( _node.type == NodeType::ServiceNode) {
+    if( _node.type == NodeType::BusinessService) {
       if (_node.visibility & ngrt4n::Expanded) {
         m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::MINUS]),19,18));
       } else {
@@ -273,7 +273,7 @@ void WebMap::expandCollapse(const QString& nodeId)
 
 void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
 {
-  if (node.type != NodeType::AlarmNode && ! node.child_nodes.isEmpty()) {
+  if (node.type != NodeType::ITService && ! node.child_nodes.isEmpty()) {
     for (const auto & childId: node.child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
       NodeListIteratorT child;
       if(ngrt4n::findNode(m_cdata, childId, child)) {
