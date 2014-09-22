@@ -29,7 +29,16 @@ OBS_DOWNLOAD_URL="http://download.opensuse.org/repositories/home:/"
 PACKAGES="realopinsight-workstation ngrt4n-d4n"
 PACKAGE_TYPES="deb rpm"
 
-DISTRIBS="Debian_7.0 Fedora_17 Fedora_18 Fedora_19  Fedora_20 openSUSE_12.1 openSUSE_12.2 openSUSE_12.3 openSUSE_Factory"
+DISTRIBS="Debian_7.0 
+          Fedora_17 
+		  Fedora_18 
+		  Fedora_19  
+		  Fedora_20 
+		  openSUSE_12.1 
+		  openSUSE_12.2 
+		  openSUSE_12.3 
+		  CentOS_7
+		  RHEL_7"
 
 DESCRIPTION="RealOpInsight is an open source business service monitoring
 dashboard toolkit that enables IT operations staff to deal with monitoring
