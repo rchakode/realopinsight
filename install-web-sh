@@ -142,7 +142,7 @@ while getopts m:d:n:zph name ; do
     ;;
     n) NCPU=$OPTARG
     ;;
-    z) export QT_CONFIG_EXT="${QT_CONFIG_EXT} CONFIG+=disbalezmq";
+    z) export QT_CONFIG_EXT="${QT_CONFIG_EXT} CONFIG+=minimal";
     ;;	
     p) export DISABLE_PROMPT="True";
     ;;	

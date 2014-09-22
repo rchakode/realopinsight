@@ -37,11 +37,15 @@ win32 {
   LIBS += -lws2_32
 }
 
-disbalezmq {
+minimal {
   DEFINES *= REALOPINSIGHT_DISABLE_ZMQ
+  DEFINES *= REALOPINSIGHT_DISABLE_BROWSER
 } else {
-  HEADERS += core/src/ZmqSocket.hpp
-  SOURCES += core/src/ZmqSocket.cpp
+  QT +=  webkit
+  HEADERS += core/src/ZmqSocket.hpp \
+             client/src/WebKit.hpp
+  SOURCES += core/src/ZmqSocket.cpp\
+             client/src/WebKit.cpp
   win32 {
     INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
     LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
@@ -107,7 +111,7 @@ SOURCES += \
     core/src/StatusAggregator.cpp
 
 gui-base {
-QT += svg gui webkit
+QT += svg gui
 PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"
 HEADERS	+= client/src/Auth.hpp \
     client/src/StatsLegend.hpp \
@@ -118,7 +122,6 @@ HEADERS	+= client/src/Auth.hpp \
     client/src/GuiDashboard.hpp \
     client/src/MainWindow.hpp \
     client/src/SvNavigatorTree.hpp \
-    client/src/WebKit.hpp \
     client/src/MsgConsole.hpp \
     client/src/GuiPreferences.hpp \
     client/src/GuiUtils.hpp \
@@ -134,7 +137,6 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/GuiDashboard.cpp \
     client/src/MainWindow.cpp \
     client/src/SvNavigatorTree.cpp \
-    client/src/WebKit.cpp \
     client/src/GuiPreferences.cpp \
     client/src/MsgConsole.cpp \
     client/src/GuiDialogForms.cpp

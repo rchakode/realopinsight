@@ -27,11 +27,13 @@
 #include "SvConfigCreator.hpp"
 #include "GraphView.hpp"
 #include "utilsCore.hpp"
-#include "GuiDashboard.hpp"
 #include "Auth.hpp"
 #include "GuiDialogForms.hpp"
 #include "LsHelper.hpp"
 #include "ThresholdHelper.hpp"
+#include "GuiPreferences.hpp"
+#include "ZbxHelper.hpp"
+#include "ZnsHelper.hpp"
 
 namespace {
   const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";

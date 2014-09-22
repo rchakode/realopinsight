@@ -1,5 +1,6 @@
 #include "Base.hpp"
 #include "StatusAggregator.hpp"
+#include <cfloat>
 
 
 StatusAggregator::StatusAggregator(const QVector<ThresholdT>& thresholdLimits)
@@ -66,7 +67,7 @@ void StatusAggregator::updateThresholds(void)
   if (m_nonEssentialTotalWeight > 0)
     Q_FOREACH(int sev, m_severityWeightsMap.keys()) m_statusRatios[sev] = m_severityWeightsMap[sev] / m_nonEssentialTotalWeight;
   else
-    Q_FOREACH(int sev, m_severityWeightsMap.keys()) m_statusRatios[sev] = std::numeric_limits<double>::max();
+    Q_FOREACH(int sev, m_severityWeightsMap.keys()) m_statusRatios[sev] = DBL_MAX;
 }
 
 QString StatusAggregator::toDetailsString(void)
