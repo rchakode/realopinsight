@@ -29,7 +29,6 @@
 #include "Base.hpp"
 #include "PieChart.hpp"
 #include "Parser.hpp"
-#include "WebKit.hpp"
 #include "MsgConsole.hpp"
 #include "GraphView.hpp"
 #include "SvNavigatorTree.hpp"
@@ -38,6 +37,10 @@
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
 #include "DashboardBase.hpp"
+
+#ifndef REALOPINSIGHT_DISABLE_BROWSER
+#include "WebKit.hpp"
+#endif
 
 class QScriptValueIterator;
 class QSystemTrayIcon;
