@@ -17,9 +17,10 @@ RealOpInsight ChangeLog
     events are reached. For example, you may want to escalate the severity from Major
     to Critical if more than 50% of services are in Major state.
   * Added the ability to set the application language via preference settings.
-  * Other changes include the ability to make the compilation of ngrt4nd optional.
-    This removes the requirement on ZeroMQ which is not natively available on
-    some versions of Red Hat-based operating systems (e.g. Red Hat/CentOS 6).
+  * Other changes include the ability to make the compilation of ngrt4nd and the
+    embedded web browser optional.
+    This removes the requirement on ZeroMQ and QtWebKit which are not natively
+    available on some versions of Red Hat-based operating systems (e.g. Red Hat/CentOS 6).
 
 3.0.5
   * Fixed ticket #41 when chart is not well updated with

@@ -259,9 +259,6 @@ void MainWindow::addEvents(void)
   connect(m_subMenus["ChangeMonitoringSettings"], SIGNAL(triggered(bool)), this, SLOT(handleChangeMonitoringSettingsAction(void)));
   connect(m_subMenus["ShowAbout"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleShowAbout()));
   connect(m_subMenus["ShowOnlineResources"], SIGNAL(triggered(bool)), m_dashboard, SLOT(handleShowOnlineResources()));
-  connect(m_subMenus["BrowserBack"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(back()));
-  connect(m_subMenus["BrowserForward"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(forward()));
-  connect(m_subMenus["BrowserStop"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(stop()));
   connect(m_subMenus["FullScreen"], SIGNAL(toggled(bool)), this, SLOT(toggleFullScreen(bool)));
   connect(m_subMenus["TroubleView"], SIGNAL(toggled(bool)), m_dashboard, SLOT(toggleTroubleView(bool)));
   connect(m_subMenus["IncreaseMsgFont"], SIGNAL(toggled(bool)), m_dashboard, SLOT(toggleIncreaseMsgFont(bool)));
@@ -271,4 +268,11 @@ void MainWindow::addEvents(void)
   connect(m_dashboard, SIGNAL(updateStatusBar(const QString&)), this, SLOT(handleUpdateStatusBar(const QString&)));
   connect(m_dashboard, SIGNAL(updateInprogress()), this, SLOT(handleUpdateIntprogress()));
   connect(m_dashboard, SIGNAL(updateFinished()), this, SLOT(handleUpdateFinished()));
+
+
+#ifndef REALOPINSIGHT_DISABLE_BROWSER
+  connect(m_subMenus["BrowserBack"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(back()));
+  connect(m_subMenus["BrowserForward"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(forward()));
+  connect(m_subMenus["BrowserStop"], SIGNAL(triggered(bool)), m_dashboard->getBrowser(), SLOT(stop()));
+#endif
 }

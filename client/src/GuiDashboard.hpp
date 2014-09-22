@@ -62,7 +62,6 @@ public:
   bool hideChart(void);
   void setMsgPaneToolBar(const QList<QAction*>& menuAtions);
   GraphView* getMap(void) const {return m_map.get();}
-  WebKit* getBrowser(void) const {return m_browser.get();}
   static StringMapT propRules();
   static StringMapT calcRules();
 
@@ -79,18 +78,26 @@ public Q_SLOTS:
   void handleTabChanged(int index) {Q_EMIT centralTabChanged(index);}
   void toggleTroubleView(bool _toggled);
   void toggleIncreaseMsgFont(bool _toggled);
-  void handleSourceBxItemChanged(int index);
-  void handleUpdateSourceUrl(void);
   void handleSettingsLoaded(void);
 
 Q_SIGNALS:
   void sortEventConsole(void);
   void centralTabChanged(int);
 
+#ifndef REALOPINSIGHT_DISABLE_BROWSER
+public:
+  WebKit* getBrowser(void) const {return m_browser.get();}
+public Q_SLOTS:
+  void handleSourceBxItemChanged(int index);
+  void handleUpdateSourceUrl(void);
+private:
+  std::unique_ptr<WebKit> m_browser;
+  void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
+#endif
+
 protected:
   virtual void updateTrayInfo(const NodeT& _node);
   QTabWidget* builtMsgPane(void);
-  void changeBrowserUrl(const QString& sid, const QString& url, const QString& icon);
   virtual void buildMap(void);
   virtual void updateMap(const NodeT& _node, const QString& _tip);
   virtual void buildTree(void);
@@ -112,7 +119,6 @@ private:
   std::unique_ptr<QSplitter> m_lelfSplitter;
   std::unique_ptr<QSplitter> m_rightSplitter;
   std::unique_ptr<QTabWidget> m_viewPanel;
-  std::unique_ptr<WebKit> m_browser;
   std::unique_ptr<GraphView> m_map;
   std::unique_ptr<SvNavigatorTree> m_tree;
   std::unique_ptr<MsgConsole> m_msgConsole;
