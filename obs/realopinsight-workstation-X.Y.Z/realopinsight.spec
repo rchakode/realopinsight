@@ -55,9 +55,7 @@ BuildRoot:      %_tmppath/%name-%version-build
 
 BuildRequires:  gcc-c++  
 
-%if 0%{?centos_version}
-BuildRequires:  libzmq3
-%else
+%if 0%{?suse_version} || 0%{?fedora_version}
 BuildRequires:  zeromq-devel
 %endif
 
@@ -68,6 +66,10 @@ BuildRequires:  libqt4 >= 4.6.3 libqt4-devel libQtWebKit4 libQtWebKit-devel
 %if 0%{?fedora}
 BuildRequires:  libgcc glibc gcc-c++ libstdc++ qt >= 4.6.3 qt4-devel
 BuildRequires:  qtwebkit qtwebkit qt-webkit-devel
+%endif
+
+%if 0%{?rhel_version} || 0%{?centos_version}
+BuildRequires: qt qt-devel
 %endif
 
 
@@ -94,9 +96,9 @@ systems.
 
 %install
 %if 0%{?rhel_version} || 0%{?centos_version}
-  bash ./install-sh -d %{buildroot}%{_prefix} -z
+  bash ./install-sh -d %{buildroot}%{_prefix} -z -p 
 %else
-  bash ./install-sh -d %{buildroot}%{_prefix}
+  bash ./install-sh -d %{buildroot}%{_prefix} -p 
 %endif
 
 %clean
