@@ -34,6 +34,8 @@ typedef QList<QListWidgetItem*> CheckItemList;
 namespace {
   const QString UNCLASSIFIED_HOST_GROUP = QObject::tr("Unclassified Hosts");
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
+  const QString DOCS_EDITOR_CONTEXT_URL = REALOPINSIGHT_EDITOR_HELP_URL;
+  const QString DOCS_EDITOR_DATA_POINT_CONTEXT = REALOPINSIGHT_DATA_POINT_CONTEXT_URL;
   }
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
