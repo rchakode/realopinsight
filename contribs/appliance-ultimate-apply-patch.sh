@@ -20,7 +20,7 @@
 
 set -u
 
-export REAlOPINSIGHT_TARGET_VERSION=2014b4
+export REAlOPINSIGHT_TARGET_VERSION=X.Y.Z
 export REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}-x64_86.tar.gz
 export REALOPINSIGHT_APP_DIR=/opt/realopinsight
 export REALOPINSIGHT_WWW_DIR=/var/www/realopinsight
@@ -105,6 +105,7 @@ get_target_version_from_user()
   echo "1) 3.0.0b1"
   echo "2) 3.0.0b2"
   echo "3) 2014b3"
+  echo "4) 2014b4"
   echo "q) Quit"
   echo
   while true; do
@@ -116,7 +117,7 @@ get_target_version_from_user()
 	  2) INSTALLED_VERSION=3.0.0b2 
 	     break
 		 ;;
-	  3) INSTALLED_VERSION=2014b3; 
+	  3|4) INSTALLED_VERSION="2014b3/b4"; 
 	      break
 		  ;;
 	  q) exit 0 

@@ -24,7 +24,8 @@ if [ $# -ne 1 ]; then
   echo "`basename $0` <version>"
   exit 1
 fi
-
+MAKE_PATCH_SCRIPT=contribs/appliance-ultimate-apply-patch.sh
+VERSION_TEMPLATE=X.Y.Z
 REAlOPINSIGHT_TARGET_VERSION=$1
 REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}-x64_86.tar.gz
 REALOPINSIGHT_PREFIX=/opt
@@ -38,7 +39,10 @@ tar --same-owner \
     --exclude ${REALOPINSIGHT_WWW}/realopinsight/run \
     -zcf ${RELEASE_TARBALL_BASENAME}/${REAlOPINSIGHT_PATCH_TARBALL} ${REALOPINSIGHT_WWW}/realopinsight
 	
-cp contribs/appliance-ultimate-apply-patch.sh ${RELEASE_TARBALL_BASENAME}
+sed "s/$VERSION_TEMPLATE/$REAlOPINSIGHT_TARGET_VERSION/g" $MAKE_PATCH_SCRIPT \
+     > ${RELEASE_TARBALL_BASENAME}/`basename $MAKE_PATCH_SCRIPT`
 cp contribs/README_UPDATE ${RELEASE_TARBALL_BASENAME}
+
+chmod +x ${RELEASE_TARBALL_BASENAME}/*.sh
 
 tar zcf ${RELEASE_TARBALL_BASENAME}.tar.gz ${RELEASE_TARBALL_BASENAME}
