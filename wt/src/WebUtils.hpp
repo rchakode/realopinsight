@@ -59,6 +59,7 @@ namespace ngrt4n {
   bool isValidUri(const QString& addr, const QString& schemePrefix, bool nopath);
   bool isValidHostAddr(const QString& addr);
   std::string md5Hash(const std::string& input);
+  void googleAnalyticsLogger(void);
 } //Namespace
 
 #endif // WEBUTILS_HPP
