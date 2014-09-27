@@ -31,7 +31,6 @@
 #include <QDateTime>
 #include <Wt/WColor>
 #include <Wt/WApplication>
-#include <Wt/WEnvironment>
 #include <memory>
 
 
@@ -234,5 +233,5 @@ std::string ngrt4n::md5Hash(const std::string& input)
 void ngrt4n::googleAnalyticsLogger(void)
 {
   wApp->doJavaScript("if (window.ga) ga('send','pageview','"
-                     + wApp->environment().deploymentPath() + wApp->internalPath() + "');");
+                     + environment().deploymentPath() + internalPath() + "');");
 }
