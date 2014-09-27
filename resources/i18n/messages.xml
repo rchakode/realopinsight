@@ -104,7 +104,7 @@
             should connect to your monitoring servers to retrieve status data
             to always keep your monitoring view up-to-date.
             </p>
-            <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html#setting-up-monitoring-sources"
+            <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
           </div>
   </div>
