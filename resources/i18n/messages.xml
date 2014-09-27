@@ -80,7 +80,7 @@
 
 
 <message id="getting-started.tpl">
-  <!-- 1st thumnail -->
+  <!-- Describe thumnail -->
   <div class="span-one-third">
        <div class="thumbnail">
           <div class="title">Describe</div>
@@ -95,13 +95,14 @@
        </div>
   </div>
 
-  <!-- 2nd thumnail -->
+  <!-- Setting thumnail -->
   <div class="span-one-third">
           <div class="thumbnail">
-            <div class="title">Assign</div>
-            <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-            <p>Once created, upload the description file into the RealOpInsight Datastore.
-            Then preview and check that the view suits your monitoring needs.
+            <div class="title">Setting</div>
+            <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
+            <p>Run the Configuration Manager to set when and how RealOpInsight
+            should connect to your monitoring servers to retrieve status data,
+            in order to update your monitoring view.
             </p>
             <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html#setting-up-monitoring-sources"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
@@ -109,14 +110,27 @@
   </div>
 
 
-  <!-- Third thumnail -->
+  <!-- Preview thumnail -->
+  <div class="span-one-third">
+          <div class="thumbnail">
+            <div class="title">Preview</div>
+            <img src="images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Dashboard Preview" />
+            <p>Once created, upload the description file into RealOpInsight Datastore.
+            Then, preview them to check that it suits your monitoring needs.
+            </p>
+            <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
+            class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+          </div>
+  </div>
+
+
+  <!-- Assign thumnail -->
    <div class="span-one-third">
       <div class="thumbnail">
-         <div class="title">Operate</div>
-         <img src="images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Editor" />
-         <p>Enable the access to your monitoring data by setting when and how
-         the RealOpInsight engine can connect to your monitoring servers to retrieve status data.
-         And finally, assign the views to your operations staff to let them operate.
+         <div class="title">Assign</div>
+         <img src="images/built-in/thumbnails/assign-view.png" alt="RealOpInsight View Access Control" />
+         <p>Run the View Access Control Manager Interface to set who of your operations staff members
+         can access and operate the view.
          </p>
          <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
          class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
