@@ -98,7 +98,7 @@
   <!-- Setting thumnail -->
   <div class="span-one-third">
           <div class="thumbnail">
-            <div class="title">Setting</div>
+            <div class="title">Setting Up</div>
             <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
             <p>Run the Configuration Manager to set when and how RealOpInsight
             should connect to your monitoring servers to retrieve status data
