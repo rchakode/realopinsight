@@ -128,10 +128,10 @@
   <!-- Assign thumnail -->
    <div class="span-one-third">
       <div class="thumbnail">
-         <div class="title">Assign</div>
+         <div class="title">Assign and Operate</div>
          <img src="images/built-in/thumbnails/assign-view.png" alt="RealOpInsight View Access Control" />
          <p>Run the View Access Control Manager to set who of your operations staff members
-         can access and operate the view.
+         can access and operate the view. Then, let your operation staff do the rest.
          </p>
          <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
          class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
