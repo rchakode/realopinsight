@@ -86,7 +86,7 @@
           <div class="title">Describe</div>
           <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
           <p>Define the description file that govern your business service platform.
-          The RealOpInsight Editor will assist to create and edit the description file
+          The RealOpInsight Editor shall assist in creating and editing your description files
           in an easy, simple and effective way
           </p>
           <p><a href="http://docs.realopinsight.com/latest/01_workstation/editor-manual.html"
@@ -101,8 +101,8 @@
             <div class="title">Setting</div>
             <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
             <p>Run the Configuration Manager to set when and how RealOpInsight
-            should connect to your monitoring servers to retrieve status data,
-            in order to update your monitoring view.
+            should connect to your monitoring servers to retrieve status data
+            to always keep your monitoring view up-to-date.
             </p>
             <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html#setting-up-monitoring-sources"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
@@ -124,12 +124,13 @@
   </div>
 
 
+  <div class="clearfix"> </div>
   <!-- Assign thumnail -->
    <div class="span-one-third">
       <div class="thumbnail">
          <div class="title">Assign</div>
          <img src="images/built-in/thumbnails/assign-view.png" alt="RealOpInsight View Access Control" />
-         <p>Run the View Access Control Manager Interface to set who of your operations staff members
+         <p>Run the View Access Control Manager to set who of your operations staff members
          can access and operate the view.
          </p>
          <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
