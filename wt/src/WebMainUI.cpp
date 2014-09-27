@@ -525,7 +525,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
         if (retCode != 0) {
           showMessage(m_dbSession->lastError(), OperationError);
         } else {
-          showMessage("Successul updated", OperationSuccess);
+          showMessage("Updated successfully", OperationSuccess);
           m_dbUserManager->resetUserForm();
         }
       }, std::placeholders::_1));
@@ -636,7 +636,6 @@ void WebMainUI::createPasswordPanel(void)
   m_changePasswordPanel = new UserFormView(&(m_dbSession->loggedUser()),
                                            changedPassword,
                                            userForm);
-  //m_changePasswordPanel->closeTriggered().connect(std::bind([=](){m_changePasswordPanel->accept();}));
   m_changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
                                                                      const std::string& lastpass,
                                                                      const std::string& pass) {
@@ -644,7 +643,7 @@ void WebMainUI::createPasswordPanel(void)
     if (ret != 0) {
       showMessage(Q_TR("Change password failed, see details in log."), OperationError);
     } else {
-      showMessage(Q_TR("Successul password updated."), OperationSuccess);
+      showMessage(Q_TR("Password updated successfully"), OperationSuccess);
     }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }

@@ -85,11 +85,12 @@
        <div class="thumbnail">
           <div class="title">Describe</div>
           <img src="images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-          <p>Define the description files that govern your business platforms.
-          The RealOpInsight Editor will assist you to deal with this in an
-          easy and simple way
+          <p>Define the description file that govern your business service platform.
+          The RealOpInsight Editor will assist to create and edit the description file
+          in an easy, simple and effective way
           </p>
-          <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
+          <p><a href="http://docs.realopinsight.com/latest/01_workstation/editor-manual.html"
+          class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
           </p>
        </div>
   </div>
@@ -99,10 +100,11 @@
           <div class="thumbnail">
             <div class="title">Assign</div>
             <img src="images/built-in/thumbnails/setting.png" alt="RealOpInsight Editor" />
-            <p>Once created, upload the description files into the RealOpInsight Datastore.
-            Then check preview them to ensure they suit your monitoring needs.
+            <p>Once created, upload the description file into the RealOpInsight Datastore.
+            Then preview and check that the view suits your monitoring needs.
             </p>
-            <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+            <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html#setting-up-monitoring-sources"
+            class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
           </div>
   </div>
 
@@ -116,7 +118,8 @@
          the RealOpInsight engine can connect to your monitoring servers to retrieve status data.
          And finally, assign the views to your operations staff to let them operate.
          </p>
-         <p><a href="http://docs.realopinsight.com/" class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+         <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
+         class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
       </div>
    </div>
  </message>
