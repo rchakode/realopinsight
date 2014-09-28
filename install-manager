@@ -27,6 +27,7 @@ VERSION_BKR="1.0"
 WT_VERSION=3.3.2
 WT_SRC_DIR=wt/extlibs
 BASE_BUILD_DIR=`pwd`
+QT_PROJECT_FILE=ngrt4n-web.pro
 
 # Print help
 #
@@ -168,19 +169,19 @@ check_prerequisites()
 }
 
 install_default(){
-  ${QMAKE} -config release ngrt4n-web.pro CONFIG+=gui-base CONFIG+=manager ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=gui-base CONFIG+=manager ${dflag}
   make -Bj${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_editor(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=editor ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=gui-base CONFIG+=editor ${dflag}
   make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
 
 install_oc(){
-  ${QMAKE} -config release ngrt4n.pro CONFIG+=gui-base CONFIG+=oc ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=gui-base CONFIG+=oc ${dflag}
   make -j${NCPU} 1>>install.log
   make install 1>>install.log
 }
@@ -204,12 +205,12 @@ install_workstation() {
 }
 
 install_webd() {
-  ${QMAKE} -config debug ngrt4n-web.pro CONFIG+=web-base CONFIG+=webd ${dflag}
+  ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=web-base CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 install_fcgi() {
-  ${QMAKE} -config release ngrt4n-web.pro CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
@@ -248,10 +249,10 @@ install_ultimate() {
   check_prerequisites
     
   echo "DEBUG : Patching the project file for REALOPINSIGHT_WWW_ROOT_VALUE..."
-  sed --in-place 's!REALOPINSIGHT_WWW_ROOT_VALUE!'"${REALOPINSIGHT_WWW}"'!' ngrt4n.pro
+  sed --in-place 's!REALOPINSIGHT_WWW_ROOT_VALUE!'"${REALOPINSIGHT_WWW}"'!' $QT_PROJECT_FILE
   
   echo "DEBUG : Generating locale file"
-  lrelease ngrt4n.pro
+  lrelease $QT_PROJECT_FILE
  
   if [ ! -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
     echo "DEBUG : Building RealOpInsight Standalone..."
