@@ -84,8 +84,9 @@ void AuthManager::createLoginView(void)
 
 void AuthManager::createLoggedInView(void)
 {
-  m_dbSession->setLoggedUser();
+  ngrt4n::googleAnalyticsLogger();
 
+  m_dbSession->setLoggedUser();
   DbLoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
 

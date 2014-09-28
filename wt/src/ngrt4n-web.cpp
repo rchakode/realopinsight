@@ -33,8 +33,7 @@ protected:
     messageResourceBundle().use(m_docroot+"resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
     requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
-    //require(m_dirroot+"resources/js/google-analytics.js");
-    ngrt4n::googleAnalyticsLogger();
+    require(m_dirroot+"resources/js/ga.js");
     m_dbSession = new DbSession();
     root()->setId("wrapper");
     root()->addWidget(new AuthManager(m_dbSession));
