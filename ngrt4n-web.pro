@@ -100,7 +100,7 @@ SOURCES +=  core/src/Base.cpp \
     core/src/StatusAggregator.cpp
 
 web-base {
-PACKAGE_VERSION=2014b5
+PACKAGE_VERSION=2014b6
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 
