@@ -1,6 +1,7 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.1.0
   * Added the support of weighting services (see ticket #45). Weighting enables
     you to associate a weight factor with a service. The weight factor can be any
     real number between ``min=0`` and ``max=10``, determining how important the
