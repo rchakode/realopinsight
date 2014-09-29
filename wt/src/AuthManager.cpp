@@ -84,7 +84,10 @@ void AuthManager::createLoginView(void)
 
 void AuthManager::createLoggedInView(void)
 {
+
+#ifdef ENABLE_ANALYTICS
   ngrt4n::googleAnalyticsLogger();
+#endif
 
   m_dbSession->setLoggedUser();
   DbLoginSession sessionInfo;

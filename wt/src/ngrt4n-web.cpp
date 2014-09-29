@@ -33,7 +33,9 @@ protected:
     messageResourceBundle().use(m_docroot+"resources/i18n/messages");
     setTheme(new Wt::WBootstrapTheme());
     requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
+#ifdef ENABLE_ANALYTICS
     require(m_dirroot+"resources/js/ga.js");
+#endif
     m_dbSession = new DbSession();
     root()->setId("wrapper");
     root()->addWidget(new AuthManager(m_dbSession));
