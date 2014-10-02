@@ -383,19 +383,19 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
     return result;
   }
 
-  StatusAggregator severityManager(node->thresholdLimits);
+  StatusAggregator severityAggregator;
 
   Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     result = computeNodeSeverity(childId);
-    severityManager.addSeverity(result.sev, result.weight);
+    severityAggregator.addSeverity(result.sev, result.weight);
   }
 
-  node->sev = severityManager.aggregate(node->sev_crule);
-  node->sev_prop = severityManager.propagate(node->sev, node->sev_prule);
+  node->sev = severityAggregator.aggregate(node->sev_crule, node->thresholdLimits);
+  node->sev_prop = severityAggregator.propagate(node->sev, node->sev_prule);
 
   result.sev = node->sev_prop;
   result.weight = node->weight;
-  node->actual_msg = severityManager.toDetailsString();
+  node->actual_msg = severityAggregator.toDetailsString();
   QString tooltip = node->toString();
   updateMap(*node, tooltip);
   updateTree(*node, tooltip);

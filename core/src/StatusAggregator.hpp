@@ -5,17 +5,16 @@
 class StatusAggregator
 {
 public:
-  StatusAggregator(const QVector<ThresholdT>& thresholdLimits);
+  explicit StatusAggregator(void);
   void resetData(void);
-  void resetData(const QVector<ThresholdT>& thresholdLimits) {resetData(); m_thresholdsLimits = thresholdLimits;}
   void addSeverity(int value, double weight);
-  void addThresholdLimit(const ThresholdT& th);
+  void addThresholdLimit(QVector<ThresholdT>& thresholdsLimits, const ThresholdT& th);
   QString toDetailsString(void);
   void updateThresholds(void);
-  int aggregate(int crule);
+  int aggregate(int crule, const QVector<ThresholdT>& thresholdsLimits);
   static int propagate(int sev, int prule);
   int weightedAverage(void);
-  int weightedAverageWithThresholds(void);
+  int weightedAverageWithThresholds(const QVector<ThresholdT>& thresholdsLimits);
   int minSev(void) const {return m_minSeverity;}
   int maxSev(void) const {return m_maxSeverity;}
   int count(void) const {return m_count;}
@@ -33,7 +32,6 @@ private:
   QString m_thresholdExceededMsg;
   QMap<int, double> m_severityWeightsMap;
   QMap<int, double> m_statusRatios;
-  QVector<ThresholdT> m_thresholdsLimits;
 };
 
 
