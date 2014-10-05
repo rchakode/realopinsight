@@ -76,10 +76,10 @@ private:
   double m_translateY;
   Wt::WImage* m_thumbnail;
 
-  void drawNode(const NodeT& _node, bool drawIcon = true);
-  void drawEdge(const QString& _parentId, const QString& _childId);
-  void createNodeLink(const NodeT& _node, const Wt::WPointF& pos);
-  void createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos);
+  void drawNode(const NodeT& node, bool drawIcon = true);
+  void drawEdge(const QString& parentId, const QString& childId);
+  void createNodeLink(const NodeT& node, const Wt::WPointF& pos);
+  void createExpIconLink(const NodeT& node, const Wt::WPointF& expIconPos);
   void setPreferredMethod(void);
   void setJavaScriptMember(void);
   void handleContainedSizeChanged(double w, double h);

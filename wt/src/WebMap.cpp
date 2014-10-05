@@ -121,46 +121,57 @@ void WebMap::drawMap(void)
  * @brief WebMap::drawNode
  * Set node position, set pen, then draw image, nav-icon and text.
  * The order is important !
- * @param _node
+ * @param node
  * @param drawIcon
  */
-void WebMap::drawNode(const NodeT& _node, bool drawIcon)
+void WebMap::drawNode(const NodeT& node, bool drawIcon)
 {
-  if (_node.visibility & ngrt4n::Visible) {
+  if (node.visibility & ngrt4n::Visible) {
 
     m_painter->save();
 
-    Wt::WPointF iconPos(_node.pos_x - 20 + m_translateX,  _node.pos_y - 24 + m_translateY);
-    Wt::WPointF labelPos(_node.pos_x + m_translateX, _node.pos_y + m_translateY);
-    Wt::WPointF expIconPos(_node.pos_x - 10 + m_translateX, _node.pos_y + 15 + m_translateY);
-    m_painter->setPen(Wt::WPen(ngrt4n::severityWColor(_node.sev)));
+    Wt::WPointF iconPos(node.pos_x - 20 + m_translateX,  node.pos_y - 24 + m_translateY);
+    Wt::WPointF labelPos(node.pos_x + m_translateX, node.pos_y + m_translateY);
+    Wt::WPointF expIconPos(node.pos_x - 10 + m_translateX, node.pos_y + 15 + m_translateY);
+
+    m_painter->setPen(Wt::WPen(Wt::WColor(255, 255, 255, 0)));
+    m_painter->setBrush(Wt::WBrush(ngrt4n::severityWColor(node.sev)));
+
+    m_painter->drawRect(labelPos.x() - node.text_w / 2,
+                        labelPos.y() - node.text_h / 2,
+                        node.text_w,
+                        node.text_h);
+
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(ngrt4n::getPathFromQtResource(ICONS[_node.icon]),40,40));
+      m_painter->drawImage(iconPos, GImage(ngrt4n::getPathFromQtResource(ICONS[node.icon]),40,40));
     } else { /* thumbnail: do nothing*/ }
 
-    if( _node.type == NodeType::BusinessService) {
-      if (_node.visibility & ngrt4n::Expanded) {
+    if( node.type == NodeType::BusinessService) {
+      if (node.visibility & ngrt4n::Expanded) {
         m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::MINUS]),19,18));
       } else {
         m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::PLUS]),19,18));
       }
-      createExpIconLink(_node, expIconPos);
+      createExpIconLink(node, expIconPos);
     }
+
+
+    m_painter->setPen(Wt::WPen(Wt::WColor("#000000")));
     m_painter->drawText(labelPos.x(), labelPos.y(),
                         Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                        Wt::AlignCenter, Wt::WString(_node.name.toStdString()));
-    createNodeLink(_node, iconPos);
+                        Wt::AlignCenter, Wt::WString(node.name.toStdString()));
+    createNodeLink(node, iconPos);
 
     m_painter->restore();
   }
 }
 
-void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
+void WebMap::drawEdge(const QString& parentId, const QString& childId)
 {
   NodeListT::Iterator parent;
   NodeListT::Iterator child;
-  if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, _parentId, parent)
-      && ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, _childId, child))
+  if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, parentId, parent)
+      && ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, child))
   {
     if (parent->visibility & ngrt4n::Expanded) {
       m_painter->save();
@@ -175,11 +186,11 @@ void WebMap::drawEdge(const QString& _parentId, const QString& _childId)
   }
 }
 
-void WebMap::createNodeLink(const NodeT& _node, const Wt::WPointF& pos)
+void WebMap::createNodeLink(const NodeT& node, const Wt::WPointF& pos)
 {
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
                                           40 * m_scaleX, 40 * m_scaleY);
-  area->setToolTip(Wt::WString::fromUTF8(_node.toString().toStdString()));
+  area->setToolTip(Wt::WString::fromUTF8(node.toString().toStdString()));
   addArea(area);
 }
 
