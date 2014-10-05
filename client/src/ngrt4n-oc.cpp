@@ -31,14 +31,14 @@
 #include <QObject>
 #include <iostream>
 
-QString  usage = "usage: %1 [OPTION] [view_config]\n"
+QString  usage = "usage: %1 [OPTION] [description_file]\n"
     "Options: \n"
     "	-c\n"
-    "	   Launch the configuration utility\n"
+    "	   Launches the Configuration Manager\n"
     "	-v\n"
-    "	  Print version and license information.\n"
+    "	  Prints version and license information.\n"
     "	-h \n"
-    "	   Print this help.\n";
+    "	   Prints this help.\n";
 
 int main(int argc, char **argv)
 {
@@ -88,16 +88,16 @@ int main(int argc, char **argv)
   QString file = (argc >= 2)? argv[1] : "";
   if (file.isEmpty()) {
     info->clearMessage();
-    info->showMessage(QObject::tr("You need to select a configuration file!"),
+    info->showMessage(QObject::tr("You need to select a description file!"),
                       Qt::AlignCenter|Qt::AlignCenter);
     ngrt4n::delay(1); info->finish(0);
     file = QFileDialog::getOpenFileName(0,
-                                        QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
+                                        QObject::tr("%1 | Select a description file").arg(APP_NAME),
                                         ".",
                                         QObject::tr("Xml files (*.xml);;All files (*)"));
 
     if (file.isNull() || file.isEmpty()) {
-      ngrt4n::alert(QObject::tr("No configuration file selected, the program will exit!"));
+      ngrt4n::alert(QObject::tr("No description file selected, the program will exit!"));
       exit(1);
     }
   }
