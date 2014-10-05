@@ -213,8 +213,11 @@ void Parser::parseDotResult(const QString& _plainDot)
         NodeListT::Iterator node;
         QString nid = splitedLine[1].trimmed();
         if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
-          node->pos_x = splitedLine[2].trimmed().toFloat() * ngrt4n::XSCAL_FACTOR;
-          node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toFloat() * ngrt4n::YSCAL_FACTOR;
+          node->pos_x = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
+          node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
+
+          node->text_w = splitedLine[4].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
+          node->text_h = splitedLine[5].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
         }
       } else if (splitedLine[0] == "edge") {
         // multiInsert since a node can have several childs
