@@ -30,12 +30,12 @@
 #include <iostream>
 #include <getopt.h>
 
-QString  usage = "usage: %1 [OPTION] [view_config]\n"
+QString  usage = "usage: %1 [OPTION] [description_file]\n"
     "Options: \n"
     "	-v\n"
-    "	  Print version and license information.\n"
+    "	  Prints version and license information.\n"
     "	-h \n"
-    "	   Print this help.\n";
+    "	   Prints this help.\n";
 
 int main(int argc, char **argv)
 {
