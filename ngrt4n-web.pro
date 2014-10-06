@@ -28,20 +28,12 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.1.0
+
+REALOPINSIGHT_CORE_VERSION=3.1.1
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
+PACKAGE_VERSION=2014b7
 
-win32 {
-DEFINES *= WIN32
-DEFINES *= WIN32_LEAN_AND_MEAN
-INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
-LIBS += -lws2_32 -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
-}
-unix {
 LIBS += -lzmq
-}
-
-DEFINES *= BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
@@ -81,7 +73,8 @@ HEADERS += \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
-    core/src/StatusAggregator.hpp
+    core/src/StatusAggregator.hpp \
+    wt/src/RealOpInsightQApp.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -98,11 +91,6 @@ SOURCES +=  core/src/Base.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp
-
-web-base {
-PACKAGE_VERSION=2014b6
-DEFINES *= REALOPINSIGHT_WEB
-DEFINES *= WT_NO_SLOT_MACROS
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
@@ -131,8 +119,8 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/LdapHelper.hpp\
     wt/dbo/ViewAclManagement.hpp \
     wt/dbo/UserManagement.hpp \
-    wt/src/AuthModelProxy.hpp
-
+    wt/src/AuthModelProxy.hpp \
+    wt/src/ReportCollector.hpp
 
 
 SOURCES	+= wt/src/WebDashboard.cpp \
@@ -151,9 +139,8 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/LdapHelper.cpp \
     wt/dbo/UserManagement.cpp \
     wt/dbo/ViewAclManagement.cpp \
-    wt/src/AuthModelProxy.cpp
-}
-
+    wt/src/AuthModelProxy.cpp \
+    wt/src/ReportCollector.cpp
 
 webd {
   TARGET = realopinsightd
@@ -182,8 +169,13 @@ INSTALLS += TARGET MAN
 INCLUDEPATH += core/src/
 RESOURCES += ngrt4n.qrc
 
-DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"1400095511\""
+
+DEFINES *= REALOPINSIGHT_WEB
+DEFINES *= WT_NO_SLOT_MACROS
+DEFINES *= BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 DEFINES *= QT_USE_QSTRINGBUILDER
+
+DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"`date +%s`\""
 DEFINES *= "REALOPINSIGHT_BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
