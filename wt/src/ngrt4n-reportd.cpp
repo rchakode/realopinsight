@@ -1,6 +1,9 @@
 
 #include "RealOpInsightQApp.hpp"
 #include <Wt/WApplication>
+#include "DbSession.hpp"
+#include "WQApplication"
+#include <Wt/WServer>
 
 
 class WebApp : public Wt::WQApplication

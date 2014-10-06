@@ -24,6 +24,9 @@
 
 #ifndef REALOPINSIGHTQAPP_HPP
 #define REALOPINSIGHTQAPP_HPP
+#include <QApplication>
+#include "WebUtils.hpp"
+
 
 
 class RealOpInsightQApp : public QCoreApplication
