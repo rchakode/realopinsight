@@ -205,12 +205,12 @@ install_workstation() {
 }
 
 install_webd() {
-  ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=web-base CONFIG+=webd ${dflag}
+  ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 install_fcgi() {
-  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-base CONFIG+=web-fcgi ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-fcgi ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
