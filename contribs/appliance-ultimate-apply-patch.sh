@@ -104,8 +104,7 @@ get_target_version_from_user()
   echo
   echo "1) 3.0.0b1"
   echo "2) 3.0.0b2"
-  echo "3) 2014b3"
-  echo "4) 2014b4"
+  echo "3) Other"
   echo "q) Quit"
   echo
   while true; do
@@ -117,7 +116,7 @@ get_target_version_from_user()
 	  2) INSTALLED_VERSION=3.0.0b2 
 	     break
 		 ;;
-	  3|4) INSTALLED_VERSION="2014b3/b4"; 
+          3) INSTALLED_VERSION="Other";
 	      break
 		  ;;
 	  q) exit 0 
