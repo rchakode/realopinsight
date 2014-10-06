@@ -125,7 +125,6 @@ HEADERS	+= wt/src/WebDashboard.hpp \
 
 SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/WebMsgConsole.cpp \
-    wt/src/ngrt4n-web.cpp \
     wt/src/WebMap.cpp \
     wt/src/WebTree.cpp \
     wt/src/WebPieChart.cpp \
@@ -143,14 +142,21 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/ReportCollector.cpp
 
 webd {
+  SOURCES += wt/src/ngrt4n-web.cpp
   TARGET = realopinsightd
   LIBS += -lwthttp
 }
 
 web-fcgi {
+  SOURCES += wt/src/ngrt4n-web.cpp
   DEFINES *= REALOPINSIGHT_WEB_FASTCGI
   TARGET = realopinsight.fcgi
   LIBS += -lwtfcgi
+}
+
+web-reportd {
+  SOURCES += wt/src/ngrt4n-reportd.cpp
+  TARGET = realopinsight-repord
 }
 
 dflag {

@@ -1,14 +1,6 @@
 
-#include <QCoreApplication>
-#include "WQApplication"
-#include "WebUtils.hpp"
-#include "AuthManager.hpp"
-#include "DbSession.hpp"
-#include "WebMainUI.hpp"
 #include "RealOpInsightQApp.hpp"
-#include <Wt/WBootstrapTheme>
-#include <Wt/WServer>
-#include <Wt/WEnvironment>
+#include <Wt/WApplication>
 
 
 class WebApp : public Wt::WQApplication
@@ -20,28 +12,7 @@ public:
 protected:
   virtual void create()
   {
-#ifdef REALOPINSIGHT_WEB_FASTCGI
-    m_dirroot = "";
-    m_docroot = "";
-#else
-    m_dirroot = "/";
-    m_docroot = docRoot() +  m_dirroot;
-#endif
-
-    setTwoPhaseRenderingThreshold(0);
-    useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
-    useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
-    messageResourceBundle().use(m_docroot+"resources/i18n/messages");
-    setTheme(new Wt::WBootstrapTheme());
-    requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
-
-#ifdef ENABLE_ANALYTICS
-    require(m_dirroot+"resources/js/ga.js");
-#endif
-
     m_dbSession = new DbSession();
-    root()->setId("wrapper");
-    root()->addWidget(new AuthManager(m_dbSession));
   }
 
   virtual void destroy()
@@ -64,7 +35,6 @@ Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
 int main(int argc, char **argv)
 {
   RealOpInsightQApp qtApp (argc, argv);
-  Q_INIT_RESOURCE(ngrt4n);
 
   try {
     std::string configurationFile = "/opt/realopinsight/etc/wt_config.xml";
