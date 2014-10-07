@@ -118,16 +118,17 @@ public:
   }
 };
 
-
 class DbBiReportT {
-  size_t timestamp;
+
+public:
+  long timestamp;
   double status;
   double normal;
   double minor;
   double major;
   double critical;
   double unknown;
-
+  dbo::ptr<DbViewT> view;
 
   template<class Action>
   void persist(Action& a) {
@@ -138,6 +139,7 @@ class DbBiReportT {
     dbo::field(a, major, "major");
     dbo::field(a, critical, "critical");
     dbo::field(a, unknown, "unknown");
+    dbo::belongsTo(a, view, "view");
   }
 };
 
@@ -171,6 +173,7 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DbUserT> DbUsersT;
 typedef std::list<DbViewT> DbViewsT;
 typedef std::list<DbLoginSession> LoginSessionListT;
+typedef std::list<DbBiReportT> DbBiReportsT;
 typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
 typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;
