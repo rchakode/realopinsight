@@ -74,8 +74,8 @@ HEADERS += \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
-    wt/src/RealOpInsightQApp.hpp \
-    wt/src/QosCollector.hpp
+    wt/src/QosCollector.hpp \
+    wt/src/Applications.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \

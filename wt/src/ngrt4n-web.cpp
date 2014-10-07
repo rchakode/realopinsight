@@ -1,59 +1,15 @@
 
 #include <QCoreApplication>
+#include <Wt/WServer>
 #include "WQApplication"
 #include "WebUtils.hpp"
 #include "AuthManager.hpp"
 #include "DbSession.hpp"
 #include "WebMainUI.hpp"
-#include "RealOpInsightQApp.hpp"
-#include <Wt/WBootstrapTheme>
-#include <Wt/WServer>
-#include <Wt/WEnvironment>
+#include "Applications.hpp"
 
 
-class WebApp : public Wt::WQApplication
-{
-public:
-  WebApp(const Wt::WEnvironment& env)
-    : WQApplication(env, true) {}
 
-protected:
-  virtual void create()
-  {
-#ifdef REALOPINSIGHT_WEB_FASTCGI
-    m_dirroot = "";
-    m_docroot = "";
-#else
-    m_dirroot = "/";
-    m_docroot = docRoot() +  m_dirroot;
-#endif
-
-    setTwoPhaseRenderingThreshold(0);
-    useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
-    useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
-    messageResourceBundle().use(m_docroot+"resources/i18n/messages");
-    setTheme(new Wt::WBootstrapTheme());
-    requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
-
-#ifdef ENABLE_ANALYTICS
-    require(m_dirroot+"resources/js/ga.js");
-#endif
-
-    m_dbSession = new DbSession();
-    root()->setId("wrapper");
-    root()->addWidget(new AuthManager(m_dbSession));
-  }
-
-  virtual void destroy()
-  {
-    delete m_dbSession;
-  }
-
-private:
-  DbSession* m_dbSession;
-  std::string m_dirroot;
-  std::string m_docroot;
-};
 
 Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
 {

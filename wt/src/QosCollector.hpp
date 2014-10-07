@@ -25,20 +25,27 @@
 #ifndef REPORTCOLLECTOR_HPP
 #define REPORTCOLLECTOR_HPP
 #include "DashboardBase.hpp"
+#include "DbObjects.hpp"
+#include "ChartBase.hpp"
+#include "DbSession.hpp"
 
 class QosCollector : public DashboardBase
 {
 public:
-  QosCollector(const QString& descriptionFile);
+  QosCollector(const QString& descriptionFile, DbSession* dbSession);
 
 protected:
+  virtual void updateChart(void);
   virtual void buildMap(void) {}
   virtual void updateMap(const NodeT& _node, const QString& _tip) {}
   virtual void buildTree(void) {}
   virtual void updateTree(const NodeT& _node, const QString& _tip){}
   virtual void updateMsgConsole(const NodeT& _node) {}
-  virtual void updateChart(void) {}
   virtual void updateEventFeeds(const NodeT& node) {}
+
+private:
+  ChartBase m_chartBase;
+  DbSession* m_dbSession;
 };
 
 #endif // REPORTCOLLECTOR_HPP

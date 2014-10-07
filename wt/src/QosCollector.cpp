@@ -24,7 +24,19 @@
 
 #include "QosCollector.hpp"
 
-QosCollector::QosCollector(const QString& descriptionFile)
-  : DashboardBase(descriptionFile)
+QosCollector::QosCollector(const QString& descriptionFile, DbSession* dbSession)
+  : DashboardBase(descriptionFile),
+    m_dbSession(dbSession)
 {
+}
+
+
+void QosCollector::updateChart(void)
+{
+  m_chartBase.setCoreData(m_cdata);
+  m_chartBase.updateSeverityInfo();
+
+  DbQosEntryT qosEntry;
+
+ m_dbSession->addQosEntry(qosEntry);
 }

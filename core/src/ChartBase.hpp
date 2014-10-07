@@ -35,6 +35,7 @@ public:
   void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void updateSeverityInfo(void);
   QString buildTooltipText(void);
+  double statusRatio(int status) const { return m_severityRatio[status]; }
 
 protected:
   CoreDataT* m_cdata;

@@ -1,36 +1,12 @@
 
-#include "RealOpInsightQApp.hpp"
+#include "Applications.hpp"
 #include <Wt/WApplication>
-#include "DbSession.hpp"
-#include "WQApplication"
 #include "QosCollector.hpp"
 
-class WebApp : public Wt::WQApplication
+
+ReportCollectorApp* createRealOpInsightWApplication(const Wt::WEnvironment& env)
 {
-public:
-  WebApp(const Wt::WEnvironment& env)
-    : WQApplication(env, true) {}
-
-protected:
-  virtual void create()
-  {
-    m_dbSession = new DbSession();
-  }
-
-  virtual void destroy()
-  {
-    delete m_dbSession;
-  }
-
-private:
-  DbSession* m_dbSession;
-  std::string m_dirroot;
-  std::string m_docroot;
-};
-
-Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
-{
-  return new WebApp(env);
+  return new ReportCollectorApp(env);
 }
 
 
@@ -39,7 +15,8 @@ int main(int argc, char **argv)
   RealOpInsightQApp qtApp (argc, argv);
 
   try {
-    QosCollector biCollector("");
+    DbSession dbSession;
+    QosCollector biCollector("", &dbSession);
   } catch (dbo::Exception& ex){
     std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
     exit(1);

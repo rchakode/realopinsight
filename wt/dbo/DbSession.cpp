@@ -58,7 +58,7 @@ void DbSession::setupDb(void)
   mapClass<DbViewT>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DbLoginSession>("login_session");
-  mapClass<DbQosReportT>("qosreport");
+  mapClass<DbQosEntryT>("qosentry");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
   initDb();
@@ -438,6 +438,7 @@ int DbSession::addSession(const DbLoginSession& session)
 }
 
 
+
 int DbSession::checkUserCookie(const DbLoginSession& session)
 {
   int retCode = -1;
@@ -445,10 +446,10 @@ int DbSession::checkUserCookie(const DbLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     LoginSessionCollectionT sessions = find<DbLoginSession>()
-        .where("username=? AND session_id=? AND status = ?")
-        .bind(session.username)
-        .bind(session.sessionId)
-        .bind(DbLoginSession::ExpiredCookie);
+                                       .where("username=? AND session_id=? AND status = ?")
+                                       .bind(session.username)
+                                       .bind(session.sessionId)
+                                       .bind(DbLoginSession::ExpiredCookie);
     retCode = sessions.size()? DbLoginSession::ActiveCookie : DbLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
@@ -456,5 +457,23 @@ int DbSession::checkUserCookie(const DbLoginSession& session)
   }
   transaction.commit();
 
+  return retCode;
+}
+
+
+int DbSession::addQosEntry(const DbQosEntryT& qosEntry)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    DbQosEntryT* qosPtr(new DbQosEntryT());
+    *qosPtr =  qosEntry;
+    add(qosPtr);
+    retCode = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to add QoS enry. More details in log.";
+    LOG("error", ex.what());
+  }
+  transaction.commit();
   return retCode;
 }

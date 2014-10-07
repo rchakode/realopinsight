@@ -65,10 +65,12 @@ public:
   void updateUserList(void);
   DbUsersT& userList(void) {return m_userList;}
 
-  int addView(const DbViewT& view);
+  int addView(const DbViewT& qos);
   int deleteView(std::string vname);
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
+
+  int addQosEntry(const DbQosEntryT& qos);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);
