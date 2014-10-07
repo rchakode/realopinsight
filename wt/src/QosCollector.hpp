@@ -32,7 +32,8 @@
 class QosCollector : public DashboardBase
 {
 public:
-  QosCollector(const QString& descriptionFile, DbSession* dbSession);
+  QosCollector(const QString& descriptionFile);
+  DbQosInfoT qosInfo(void) const {return m_qosInfo;}
 
 protected:
   virtual void updateChart(void);
@@ -45,7 +46,7 @@ protected:
 
 private:
   ChartBase m_chartBase;
-  DbSession* m_dbSession;
+  DbQosInfoT m_qosInfo;
 };
 
 #endif // REPORTCOLLECTOR_HPP

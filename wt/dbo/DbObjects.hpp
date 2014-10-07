@@ -37,7 +37,7 @@ namespace dbo = Wt::Dbo;
 class DbViewT;
 class DbUserT;
 class DbLoginSession;
-class DbQosEntryT;
+class DbQosInfoT;
 
 namespace Wt {
   namespace Dbo {
@@ -66,7 +66,7 @@ public:
   std::string path;
   int service_count;
   dbo::collection< dbo::ptr<DbUserT> > users;
-  dbo::collection< dbo::ptr<DbQosEntryT> > qosreports;
+  dbo::collection< dbo::ptr<DbQosInfoT> > qosreports;
 
   template<class Action>
   void persist(Action& a) {
@@ -118,16 +118,16 @@ public:
   }
 };
 
-class DbQosEntryT {
+class DbQosInfoT {
 
 public:
   long timestamp;
   int status;
-  double normal;
-  double minor;
-  double major;
-  double critical;
-  double unknown;
+  float normal;
+  float minor;
+  float major;
+  float critical;
+  float unknown;
   dbo::ptr<DbViewT> view;
 
   template<class Action>
@@ -173,7 +173,7 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DbUserT> DbUsersT;
 typedef std::list<DbViewT> DbViewsT;
 typedef std::list<DbLoginSession> LoginSessionListT;
-typedef std::list<DbQosEntryT> DbQoSEntriesT;
+typedef std::list<DbQosInfoT> DbQosInfoListT;
 typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
 typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;

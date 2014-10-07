@@ -70,7 +70,7 @@ public:
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
 
-  int addQosEntry(const DbQosEntryT& qos);
+  int addQosInfo(const DbQosInfoT& qos);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);

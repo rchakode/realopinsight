@@ -23,10 +23,10 @@
  */
 
 #include "QosCollector.hpp"
+#include "ctime"
 
-QosCollector::QosCollector(const QString& descriptionFile, DbSession* dbSession)
-  : DashboardBase(descriptionFile),
-    m_dbSession(dbSession)
+QosCollector::QosCollector(const QString& descriptionFile)
+  : DashboardBase(descriptionFile)
 {
 }
 
@@ -36,7 +36,11 @@ void QosCollector::updateChart(void)
   m_chartBase.setCoreData(m_cdata);
   m_chartBase.updateSeverityInfo();
 
-  DbQosEntryT qosEntry;
-
- m_dbSession->addQosEntry(qosEntry);
+  m_qosInfo.timestamp = time(NULL);
+  m_qosInfo.status = rootNode().sev;
+  m_qosInfo.normal = m_chartBase.statusRatio(ngrt4n::Normal);
+  m_qosInfo.minor = m_chartBase.statusRatio(ngrt4n::Minor);
+  m_qosInfo.major = m_chartBase.statusRatio(ngrt4n::Major);
+  m_qosInfo.critical = m_chartBase.statusRatio(ngrt4n::Critical);
+  m_qosInfo.unknown = m_chartBase.statusRatio(ngrt4n::Unknown);
 }

@@ -47,7 +47,7 @@ void Logger::log(const std::string& level, const std::string& msg)
 {
   Wt::WLogEntry logEntry = Wt::WLogger::entry(level);
   logEntry << Wt::WLogger::timestamp << Wt::WLogger::sep
-           << '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
+           //<< '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
            << '[' << level << ']' << Wt::WLogger::sep
            << msg;
 }

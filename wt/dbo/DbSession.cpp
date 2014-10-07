@@ -58,7 +58,7 @@ void DbSession::setupDb(void)
   mapClass<DbViewT>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DbLoginSession>("login_session");
-  mapClass<DbQosEntryT>("qosentry");
+  mapClass<DbQosInfoT>("qosentry");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
   initDb();
@@ -461,13 +461,13 @@ int DbSession::checkUserCookie(const DbLoginSession& session)
 }
 
 
-int DbSession::addQosEntry(const DbQosEntryT& qosEntry)
+int DbSession::addQosInfo(const DbQosInfoT& qosInfo)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    DbQosEntryT* qosPtr(new DbQosEntryT());
-    *qosPtr =  qosEntry;
+    DbQosInfoT* qosPtr(new DbQosInfoT());
+    *qosPtr =  qosInfo;
     add(qosPtr);
     retCode = 0;
   } catch (const dbo::Exception& ex) {
