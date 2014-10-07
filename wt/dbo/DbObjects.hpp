@@ -37,6 +37,7 @@ namespace dbo = Wt::Dbo;
 class DbViewT;
 class DbUserT;
 class DbLoginSession;
+class DbBiReportT;
 
 namespace Wt {
   namespace Dbo {
@@ -65,6 +66,7 @@ public:
   std::string path;
   int service_count;
   dbo::collection< dbo::ptr<DbUserT> > users;
+  dbo::collection< dbo::ptr<DbBiReportT> > bireports;
 
   template<class Action>
   void persist(Action& a) {
@@ -72,6 +74,7 @@ public:
     dbo::field(a, path, "path");
     dbo::field(a, service_count, "service_count");
     dbo::hasMany(a, users, dbo::ManyToMany, "user_view");
+    dbo::hasMany(a, bireports, dbo::ManyToOne, "view");
   }
 };
 
@@ -115,6 +118,28 @@ public:
   }
 };
 
+
+class DbBiReportT {
+  size_t timestamp;
+  double status;
+  double normal;
+  double minor;
+  double major;
+  double critical;
+  double unknown;
+
+
+  template<class Action>
+  void persist(Action& a) {
+    dbo::field(a, timestamp, "timestamp");
+    dbo::field(a, status, "status");
+    dbo::field(a, normal, "normal");
+    dbo::field(a, minor, "minor");
+    dbo::field(a, major, "major");
+    dbo::field(a, critical, "critical");
+    dbo::field(a, unknown, "unknown");
+  }
+};
 
 class DbLoginSession
 {
