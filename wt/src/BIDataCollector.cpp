@@ -22,9 +22,9 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "ReportCollector.hpp"
+#include "BIDataCollector.hpp"
 
-ReportCollector::ReportCollector(const QString& descriptionFile)
+BIDataCollector::BIDataCollector(const QString& descriptionFile)
   : DashboardBase(descriptionFile)
 {
 }

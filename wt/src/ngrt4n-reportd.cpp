@@ -3,8 +3,7 @@
 #include <Wt/WApplication>
 #include "DbSession.hpp"
 #include "WQApplication"
-#include <Wt/WServer>
-
+#include "BIDataCollector.hpp"
 
 class WebApp : public Wt::WQApplication
 {
@@ -40,15 +39,7 @@ int main(int argc, char **argv)
   RealOpInsightQApp qtApp (argc, argv);
 
   try {
-    std::string configurationFile = "/opt/realopinsight/etc/wt_config.xml";
-    Wt::WServer server(argv[0], configurationFile);
-    server.setServerConfiguration(argc, argv);
-    server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication, "", "favicon.ico");
-
-    if (server.start()) {
-      Wt::WServer::waitForShutdown();
-      server.stop();
-    }
+    BIDataCollector biCollector("");
   } catch (dbo::Exception& ex){
     std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
     exit(1);

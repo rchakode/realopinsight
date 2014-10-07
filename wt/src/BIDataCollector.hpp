@@ -26,10 +26,19 @@
 #define REPORTCOLLECTOR_HPP
 #include "DashboardBase.hpp"
 
-class ReportCollector : public DashboardBase
+class BIDataCollector : public DashboardBase
 {
 public:
-  ReportCollector(const QString& descriptionFile);
+  BIDataCollector(const QString& descriptionFile);
+
+protected:
+  virtual void buildMap(void) {}
+  virtual void updateMap(const NodeT& _node, const QString& _tip) {}
+  virtual void buildTree(void) {}
+  virtual void updateTree(const NodeT& _node, const QString& _tip){}
+  virtual void updateMsgConsole(const NodeT& _node) {}
+  virtual void updateChart(void) {}
+  virtual void updateEventFeeds(const NodeT& node) {}
 };
 
 #endif // REPORTCOLLECTOR_HPP

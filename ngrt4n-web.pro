@@ -74,7 +74,8 @@ HEADERS += \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
-    wt/src/RealOpInsightQApp.hpp
+    wt/src/RealOpInsightQApp.hpp \
+    wt/src/BIDataCollector.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -90,7 +91,8 @@ SOURCES +=  core/src/Base.cpp \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/StatusAggregator.cpp
+    core/src/StatusAggregator.cpp \
+    wt/src/BIDataCollector.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
@@ -119,8 +121,7 @@ HEADERS	+= wt/src/WebDashboard.hpp \
     wt/src/LdapHelper.hpp\
     wt/dbo/ViewAclManagement.hpp \
     wt/dbo/UserManagement.hpp \
-    wt/src/AuthModelProxy.hpp \
-    wt/src/ReportCollector.hpp
+    wt/src/AuthModelProxy.hpp
 
 
 SOURCES	+= wt/src/WebDashboard.cpp \
@@ -138,8 +139,7 @@ SOURCES	+= wt/src/WebDashboard.cpp \
     wt/src/LdapHelper.cpp \
     wt/dbo/UserManagement.cpp \
     wt/dbo/ViewAclManagement.cpp \
-    wt/src/AuthModelProxy.cpp \
-    wt/src/ReportCollector.cpp
+    wt/src/AuthModelProxy.cpp
 
 webd {
   SOURCES += wt/src/ngrt4n-web.cpp
