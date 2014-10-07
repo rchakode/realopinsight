@@ -58,7 +58,7 @@ void DbSession::setupDb(void)
   mapClass<DbViewT>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DbLoginSession>("login_session");
-  mapClass<DbQosInfoT>("qosentry");
+  mapClass<DbQosInfoT>("qosinfo");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
   initDb();
@@ -446,10 +446,10 @@ int DbSession::checkUserCookie(const DbLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     LoginSessionCollectionT sessions = find<DbLoginSession>()
-                                       .where("username=? AND session_id=? AND status = ?")
-                                       .bind(session.username)
-                                       .bind(session.sessionId)
-                                       .bind(DbLoginSession::ExpiredCookie);
+        .where("username=? AND session_id=? AND status = ?")
+        .bind(session.username)
+        .bind(session.sessionId)
+        .bind(DbLoginSession::ExpiredCookie);
     retCode = sessions.size()? DbLoginSession::ActiveCookie : DbLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
@@ -466,10 +466,12 @@ int DbSession::addQosInfo(const DbQosInfoT& qosInfo)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    DbQosInfoT* qosPtr(new DbQosInfoT());
-    *qosPtr =  qosInfo;
-    add(qosPtr);
+    DbQosInfoT* qosDboPtr = new DbQosInfoT();
+    *qosDboPtr = qosInfo;
+    qosDboPtr->view = find<DbViewT>().where("name=?").bind(qosInfo.viewname);;
+    add(qosDboPtr);
     retCode = 0;
+    LOG("notice", Q_TR("QoS entry added: ") + qosInfo.toString());
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add QoS enry. More details in log.";
     LOG("error", ex.what());

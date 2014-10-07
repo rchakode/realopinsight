@@ -31,6 +31,7 @@
 #include <string>
 #include <set>
 #include <Wt/WDateTime>
+#include <QString>
 
 namespace dbo = Wt::Dbo;
 
@@ -129,6 +130,7 @@ public:
   float critical;
   float unknown;
   dbo::ptr<DbViewT> view;
+  std::string viewname; // not persisted, duplication for non db mode
 
   template<class Action>
   void persist(Action& a) {
@@ -140,6 +142,17 @@ public:
     dbo::field(a, critical, "critical");
     dbo::field(a, unknown, "unknown");
     dbo::belongsTo(a, view, "view");
+  }
+
+  std::string toString(void) const {
+    return QString("%1,%2,%3,%4,%5,%6,%7")
+        .arg(viewname.c_str(),
+             QString::number(status),
+             QString::number(normal),
+             QString::number(minor),
+             QString::number(major),
+             QString::number(critical),
+             QString::number(unknown)).toStdString();
   }
 };
 
@@ -173,9 +186,10 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DbUserT> DbUsersT;
 typedef std::list<DbViewT> DbViewsT;
 typedef std::list<DbLoginSession> LoginSessionListT;
-typedef std::list<DbQosInfoT> DbQosInfoListT;
+typedef std::list<DbQosInfoT> DbQosInfosT;
 typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
+typedef dbo::collection< dbo::ptr<DbQosInfoT> > QosInfoCollectionT;
 typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;
 
 #endif // USER_HPP

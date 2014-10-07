@@ -37,10 +37,11 @@ void QosCollector::updateChart(void)
   m_chartBase.updateSeverityInfo();
 
   m_qosInfo.timestamp = time(NULL);
-  m_qosInfo.status = rootNode().sev;
-  m_qosInfo.normal = m_chartBase.statusRatio(ngrt4n::Normal);
-  m_qosInfo.minor = m_chartBase.statusRatio(ngrt4n::Minor);
-  m_qosInfo.major = m_chartBase.statusRatio(ngrt4n::Major);
-  m_qosInfo.critical = m_chartBase.statusRatio(ngrt4n::Critical);
-  m_qosInfo.unknown = m_chartBase.statusRatio(ngrt4n::Unknown);
+  m_qosInfo.viewname  = rootNode().name.toStdString();
+  m_qosInfo.status    = rootNode().sev;
+  m_qosInfo.normal    = m_chartBase.statusRatio(ngrt4n::Normal);
+  m_qosInfo.minor     = m_chartBase.statusRatio(ngrt4n::Minor);
+  m_qosInfo.major     = m_chartBase.statusRatio(ngrt4n::Major);
+  m_qosInfo.critical  = m_chartBase.statusRatio(ngrt4n::Critical);
+  m_qosInfo.unknown   = m_chartBase.statusRatio(ngrt4n::Unknown);
 }

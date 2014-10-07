@@ -107,33 +107,27 @@ protected:
   virtual void create()
   {
     m_dbSession = new DbSession();
-    root()->addWidget(new AuthManager(m_dbSession));
 
     WebPreferences* preferences = new WebPreferences();
     m_dbSession->updateUserList();
 
-    // Preparing qos collectors
     std::vector<QosCollector*> mycollectors;
     for (auto view: m_dbSession->viewList()) {
       QosCollector* collector =  new QosCollector(view.path.c_str());
       collector->initialize(preferences);
       mycollectors.push_back(collector);
     }
-    // handle monitoring
-    while (1) {
-      qDebug()<< "Starting monitoring loop";
-      for (auto collector: mycollectors) {
-        collector->runMonitor();
-        m_dbSession->addQosInfo(collector->qosInfo());
-      }
 
-      sleep(5);
+    LOG("notice", Q_TR("Collecting QoS data..."));
+    for (auto collector: mycollectors) {
+      collector->runMonitor();
+      m_dbSession->addQosInfo(collector->qosInfo());
     }
+
     // free up resources
     for (auto collector: mycollectors) {
       delete collector;
     }
-
   }
 
   virtual void destroy()

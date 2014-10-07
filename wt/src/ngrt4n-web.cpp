@@ -16,6 +16,11 @@ Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
   return new WebApp(env);
 }
 
+ReportCollectorApp* createQosCollectorApplication(const Wt::WEnvironment& env)
+{
+  return new ReportCollectorApp(env);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -27,6 +32,7 @@ int main(int argc, char **argv)
     Wt::WServer server(argv[0], configurationFile);
     server.setServerConfiguration(argc, argv);
     server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication, "", "favicon.ico");
+    server.addEntryPoint(Wt::Application, &createQosCollectorApplication, "/sample-qos-info", "favicon.ico");
 
     if (server.start()) {
       Wt::WServer::waitForShutdown();
