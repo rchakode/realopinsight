@@ -37,7 +37,7 @@ namespace dbo = Wt::Dbo;
 class DbViewT;
 class DbUserT;
 class DbLoginSession;
-class DbBiReportT;
+class DbQosReportT;
 
 namespace Wt {
   namespace Dbo {
@@ -66,7 +66,7 @@ public:
   std::string path;
   int service_count;
   dbo::collection< dbo::ptr<DbUserT> > users;
-  dbo::collection< dbo::ptr<DbBiReportT> > bireports;
+  dbo::collection< dbo::ptr<DbQosReportT> > qosreports;
 
   template<class Action>
   void persist(Action& a) {
@@ -74,7 +74,7 @@ public:
     dbo::field(a, path, "path");
     dbo::field(a, service_count, "service_count");
     dbo::hasMany(a, users, dbo::ManyToMany, "user_view");
-    dbo::hasMany(a, bireports, dbo::ManyToOne, "view");
+    dbo::hasMany(a, qosreports, dbo::ManyToOne, "view");
   }
 };
 
@@ -118,11 +118,11 @@ public:
   }
 };
 
-class DbBiReportT {
+class DbQosReportT {
 
 public:
   long timestamp;
-  double status;
+  int status;
   double normal;
   double minor;
   double major;
@@ -173,7 +173,7 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DbUserT> DbUsersT;
 typedef std::list<DbViewT> DbViewsT;
 typedef std::list<DbLoginSession> LoginSessionListT;
-typedef std::list<DbBiReportT> DbBiReportsT;
+typedef std::list<DbQosReportT> DbQoSReportsT;
 typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
 typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;

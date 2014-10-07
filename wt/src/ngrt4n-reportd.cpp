@@ -3,7 +3,7 @@
 #include <Wt/WApplication>
 #include "DbSession.hpp"
 #include "WQApplication"
-#include "BIDataCollector.hpp"
+#include "QosCollector.hpp"
 
 class WebApp : public Wt::WQApplication
 {
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   RealOpInsightQApp qtApp (argc, argv);
 
   try {
-    BIDataCollector biCollector("");
+    QosCollector biCollector("");
   } catch (dbo::Exception& ex){
     std::cerr << QObject::tr("[FATAL] %1").arg(ex.what()).toStdString();
     exit(1);

@@ -1,5 +1,5 @@
 /*
- * ReportCollector.cpp
+ * ReportCollector.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 06-10-2014                                                  #
@@ -22,9 +22,23 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "BIDataCollector.hpp"
+#ifndef REPORTCOLLECTOR_HPP
+#define REPORTCOLLECTOR_HPP
+#include "DashboardBase.hpp"
 
-BIDataCollector::BIDataCollector(const QString& descriptionFile)
-  : DashboardBase(descriptionFile)
+class QosCollector : public DashboardBase
 {
-}
+public:
+  QosCollector(const QString& descriptionFile);
+
+protected:
+  virtual void buildMap(void) {}
+  virtual void updateMap(const NodeT& _node, const QString& _tip) {}
+  virtual void buildTree(void) {}
+  virtual void updateTree(const NodeT& _node, const QString& _tip){}
+  virtual void updateMsgConsole(const NodeT& _node) {}
+  virtual void updateChart(void) {}
+  virtual void updateEventFeeds(const NodeT& node) {}
+};
+
+#endif // REPORTCOLLECTOR_HPP

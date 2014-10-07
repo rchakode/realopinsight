@@ -75,7 +75,7 @@ HEADERS += \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
     wt/src/RealOpInsightQApp.hpp \
-    wt/src/BIDataCollector.hpp
+    wt/src/QosCollector.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -92,7 +92,7 @@ SOURCES +=  core/src/Base.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
-    wt/src/BIDataCollector.cpp
+    wt/src/QosCollector.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \

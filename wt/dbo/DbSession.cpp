@@ -58,7 +58,7 @@ void DbSession::setupDb(void)
   mapClass<DbViewT>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DbLoginSession>("login_session");
-  mapClass<DbBiReportT>("bireports");
+  mapClass<DbQosReportT>("qosreport");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
   initDb();
