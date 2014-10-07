@@ -55,7 +55,6 @@ WebPreferences::WebPreferences(void)
   m_sourceBox->setModel(m_sourceBoxModel.get());
 
 
-
   m_monitorTypeField.reset(new Wt::WComboBox(this));
   m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
   for (const auto& srcid: ngrt4n::sourceTypes()) {

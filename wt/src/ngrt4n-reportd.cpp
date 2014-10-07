@@ -1,10 +1,10 @@
 
 #include "Applications.hpp"
 #include <Wt/WApplication>
-#include "QosCollector.hpp"
+#include <Wt/WServer>
 
 
-ReportCollectorApp* createRealOpInsightWApplication(const Wt::WEnvironment& env)
+ReportCollectorApp* createQosCollectorApplication(const Wt::WEnvironment& env)
 {
   return new ReportCollectorApp(env);
 }
@@ -15,30 +15,15 @@ int main(int argc, char **argv)
   RealOpInsightQApp qtApp (argc, argv);
 
   try {
-    DbSession dbSession;
-    WebPreferences preferences;
-    dbSession.updateUserList();
+    std::string configurationFile = "/opt/realopinsight/etc/wt_config.xml";
+    Wt::WServer server(argv[0], configurationFile);
+    server.setServerConfiguration(argc, argv);
+    server.addEntryPoint(Wt::Application, &createQosCollectorApplication, "", "favicon.ico");
 
-    // Preparing qos collectors
-    std::vector<QosCollector*> mycollectors;
-    for (auto view: dbSession.viewList()) {
-      QosCollector* collector =  new QosCollector(view.path.c_str());
-      collector->initialize(&preferences);
-      mycollectors.push_back(collector);
-    }
-    // handle monitoring
-    while (1) {
-      qDebug()<< "Starting monitoring loop";
-      for (auto collector: mycollectors) {
-        collector->runMonitor();
-        dbSession.addQosInfo(collector->qosInfo());
-      }
+    if (server.start()) {
 
-      sleep(5);
-    }
-    // free up resources
-    for (auto collector: mycollectors) {
-      delete collector;
+      Wt::WServer::waitForShutdown();
+      server.stop();
     }
 
   } catch (dbo::Exception& ex){
