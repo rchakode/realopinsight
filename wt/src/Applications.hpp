@@ -108,6 +108,13 @@ protected:
   {
     m_dbSession = new DbSession();
 
+    // only accept request from local loop
+    std::string clientIp = environment().clientAddress();
+    if (clientIp != "127.0.0.1" && clientIp != "localhost") {
+      LOG("warn", "External QoS sampling request rejected");
+      return ;
+    }
+
     WebPreferences* preferences = new WebPreferences();
     m_dbSession->updateUserList();
 
