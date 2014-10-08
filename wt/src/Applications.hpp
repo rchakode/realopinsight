@@ -118,9 +118,10 @@ protected:
     WebPreferences* preferences = new WebPreferences();
     m_dbSession->updateUserList();
 
+    long now = time(NULL);
     std::vector<QosCollector*> mycollectors;
     for (auto view: m_dbSession->viewList()) {
-      QosCollector* collector =  new QosCollector(view.path.c_str());
+      QosCollector* collector = new QosCollector(view.path.c_str());
       collector->initialize(preferences);
       mycollectors.push_back(collector);
     }
@@ -128,7 +129,9 @@ protected:
     LOG("notice", Q_TR("Collecting QoS data..."));
     for (auto collector: mycollectors) {
       collector->runMonitor();
-      m_dbSession->addQosInfo(collector->qosInfo());
+      DbQosInfoT qosInfo = collector->qosInfo();
+      qosInfo.timestamp = now;
+      m_dbSession->addQosInfo(qosInfo);
     }
 
     // free up resources

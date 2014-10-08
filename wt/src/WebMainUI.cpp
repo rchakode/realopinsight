@@ -28,6 +28,7 @@
 #include "ViewAclManagement.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
+#include "WebBiReportBuilder.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -762,6 +763,17 @@ void WebMainUI::initOperatorDashboard(void)
       ++thumbIndex;
     }
   }
+
+  //FIXME: TOBE REMOVED
+  DbQosInfosT qosInfos;
+  qDebug()<<"YOO1";
+  if (m_dbSession->fetchQosInfos(qosInfos) == 0) {
+    qDebug()<<"YOO";
+    thumbLayout->addWidget(new WebBiReportBuilder(qosInfos["Hosting Platform"]), thumbIndex / 4, thumbIndex % 4);
+    ++thumbIndex;
+  }
+
+
   if (thumbIndex > 0) {
     startDashbaordUpdate();
   } else {

@@ -71,6 +71,7 @@ public:
   int revokeView(const std::string& uname, const std::string& vname);
 
   int addQosInfo(const DbQosInfoT& qos);
+  int fetchQosInfos(DbQosInfosT& qosInfos);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);

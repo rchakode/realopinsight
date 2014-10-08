@@ -473,7 +473,28 @@ int DbSession::addQosInfo(const DbQosInfoT& qosInfo)
     retCode = 0;
     LOG("notice", Q_TR("QoS entry added: ") + qosInfo.toString());
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to add QoS enry. More details in log.";
+    m_lastError = "Failed to add QoS entry. More details in log.";
+    LOG("error", ex.what());
+  }
+  transaction.commit();
+  return retCode;
+}
+
+
+
+int DbSession::fetchQosInfos(DbQosInfosT& qosInfos)
+{
+  int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    QosInfoCollectionT entries = find<DbQosInfoT>();
+    for (auto &entry : entries) {
+      entry.modify()->viewname = entry->view->name;
+      qosInfos[entry->viewname].push_back(*entry);
+    }
+    retCode = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to fetch QoS entries. More details in log.";
     LOG("error", ex.what());
   }
   transaction.commit();

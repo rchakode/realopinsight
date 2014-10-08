@@ -32,6 +32,7 @@
 #include <set>
 #include <Wt/WDateTime>
 #include <QString>
+#include <QMap>
 
 namespace dbo = Wt::Dbo;
 
@@ -186,7 +187,7 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DbUserT> DbUsersT;
 typedef std::list<DbViewT> DbViewsT;
 typedef std::list<DbLoginSession> LoginSessionListT;
-typedef std::list<DbQosInfoT> DbQosInfosT;
+typedef QMap<std::string, std::list<DbQosInfoT> > DbQosInfosT;
 typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
 typedef dbo::collection< dbo::ptr<DbQosInfoT> > QosInfoCollectionT;
