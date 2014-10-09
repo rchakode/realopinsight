@@ -49,7 +49,7 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
     addSeries(series);
   }
 
-  setBackground(Wt::WColor(220, 220, 220));
+ // setBackground(Wt::WColor(220, 220, 220));
   setModel(m_model);
   setXSeriesColumn(0);
   setLegendEnabled(true);
@@ -57,4 +57,5 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateScale);
   setPlotAreaPadding(40, Wt::Left | Wt::Top | Wt::Bottom);
   setPlotAreaPadding(120, Wt::Right);
+  resize(350, 200);
 }

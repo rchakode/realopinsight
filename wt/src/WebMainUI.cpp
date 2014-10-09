@@ -739,18 +739,23 @@ void WebMainUI::initOperatorDashboard(void)
   Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WGridLayout* thumbLayout = new Wt::WGridLayout(thumbs);
   
-  
+  Wt::WContainerWidget* bigraphs = new Wt::WContainerWidget(m_mainWidget);
+  Wt::WGridLayout* bigraphsLayout = new Wt::WGridLayout(bigraphs);
+
   Wt::WContainerWidget* eventFeeds = new Wt::WContainerWidget(m_mainWidget);
   m_eventFeedLayout = new Wt::WVBoxLayout(eventFeeds);
   
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
-  m_operatorHomeTpl->bindWidget("contents", thumbs);
+  m_operatorHomeTpl->bindWidget("thumbnails", thumbs);
+  m_operatorHomeTpl->bindWidget("bigraphs", bigraphs);
   m_operatorHomeTpl->bindWidget("event-feeds", eventFeeds);
   m_dashtabs->addTab(m_operatorHomeTpl, Q_TR("Operations Console"));
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
+
+  // Build view thumbnails
   int thumbIndex = 0;
   for (const auto& view: m_dbSession->viewList()) {
     WebDashboard* dashboard;
@@ -764,13 +769,15 @@ void WebMainUI::initOperatorDashboard(void)
     }
   }
 
-  //FIXME: TOBE REMOVED
+
+  //Build BI reports
   ViewQosDataMapT qosInfos;
-  qDebug()<<"YOO1";
   if (m_dbSession->fetchQosInfos(qosInfos) == 0) {
-    qDebug()<<"YOO";
-    thumbLayout->addWidget(new WebBiReportBuilder(qosInfos["Hosting Platform"]), thumbIndex / 4, thumbIndex % 4);
-    ++thumbIndex;
+    int biIndex = 0;
+    for (const auto& view: m_dbSession->viewList()) {
+      bigraphsLayout->addWidget(new WebBiReportBuilder(qosInfos[view.name]), biIndex / 2, biIndex % 2);
+      ++biIndex;
+    }
   }
 
 
