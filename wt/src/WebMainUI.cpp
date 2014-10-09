@@ -28,7 +28,7 @@
 #include "ViewAclManagement.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "WebBiReportBuilder.hpp"
+#include "WebBiCharts.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -776,7 +776,7 @@ void WebMainUI::initOperatorDashboard(void)
   if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
     int biIndex = 0;
     for (const auto& view: m_dbSession->viewList()) {
-      bigraphsLayout->addWidget(new WebBiReportBuilder(view.name, qosInfos[view.name]), biIndex / 2, biIndex % 2);
+      bigraphsLayout->addWidget(new RawQosTrendsChart(view.name, qosInfos[view.name]), biIndex / 2, biIndex % 2);
       ++biIndex;
     }
   }

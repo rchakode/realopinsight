@@ -22,13 +22,39 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebBiReportBuilder.hpp"
+#include "WebBiCharts.hpp"
 #include "WebUtils.hpp"
 #include <QDebug>
 
-WebBiReportBuilder::WebBiReportBuilder(const std::string& name,
-                                       const std::list<DbQosDataT>& data,
-                                       Wt::WContainerWidget* parent)
+
+
+QosTrendsChart::QosTrendsChart(const std::string& name,
+                               const std::list<DbQosDataT>& data,
+                               Wt::WContainerWidget* parent)
+  : Wt::Chart::WCartesianChart(parent)
+{
+//  setTitle(name);
+//  std::list<DbQosDataT> toPlot;
+
+//  if (! data.empty())
+//    toPlot.push_back(data.front());
+
+//  std::list<DbQosDataT>::const_iterator qosit = data.begin();
+
+//  DbQosDataT last = toPlot.back();
+//  while (++qosit, qosit != data.end()) {
+//    if (last.status != qosit->status) {
+//      last = *qosit;
+//      toPlot.push_back(last);
+//    }
+//  }
+  resize(350, 150);
+}
+
+
+RawQosTrendsChart::RawQosTrendsChart(const std::string& name,
+                                     const std::list<DbQosDataT>& data,
+                                     Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
     m_model(new Wt::WStandardItemModel(data.size(), 7, this))
 {
@@ -43,29 +69,29 @@ WebBiReportBuilder::WebBiReportBuilder(const std::string& name,
   m_model->setHeaderData(5, Q_TR("% Critical"));
   m_model->setHeaderData(6, Q_TR("% Unknown"));
 
-  m_row = 0;
+  int row = 0;
   for (const auto& entry : data) {
     Wt::WDateTime date;
     date.setTime_t(entry.timestamp);
-    m_model->setData(m_row, 0, date);
+    m_model->setData(row, 0, date);
 
-    m_model->setData(m_row, 1, entry.status);
+    m_model->setData(row, 1, entry.status);
 
     float cum = entry.normal;
-    m_model->setData(m_row, 2, cum);
+    m_model->setData(row, 2, cum);
 
     cum += entry.minor;
-    m_model->setData(m_row, 3, cum);
+    m_model->setData(row, 3, cum);
 
     cum += entry.major;
-    m_model->setData(m_row, 4, cum);
+    m_model->setData(row, 4, cum);
 
     cum += entry.critical;
-    m_model->setData(m_row, 5, cum);
+    m_model->setData(row, 5, cum);
 
     cum += entry.unknown;
-    m_model->setData(m_row, 6, cum);
-    ++m_row;
+    m_model->setData(row, 6, cum);
+    ++row;
   }
 
   setBackground(Wt::WColor(248, 254, 252));

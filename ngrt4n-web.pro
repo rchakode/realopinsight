@@ -76,7 +76,7 @@ HEADERS += \
     core/src/StatusAggregator.hpp \
     wt/src/QosCollector.hpp \
     wt/src/Applications.hpp \
-    wt/src/WebBiReportBuilder.hpp
+    wt/src/WebBiCharts.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -94,7 +94,7 @@ SOURCES +=  core/src/Base.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
     wt/src/QosCollector.cpp \
-    wt/src/WebBiReportBuilder.cpp
+    wt/src/WebBiCharts.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \

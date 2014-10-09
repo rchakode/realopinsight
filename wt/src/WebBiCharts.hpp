@@ -40,16 +40,27 @@
 #include "DbObjects.hpp"
 
 
-class WebBiReportBuilder : public Wt::Chart::WCartesianChart
+class QosTrendsChart : public Wt::Chart::WCartesianChart
 {
 public:
-  WebBiReportBuilder(const std::string& name,
+  QosTrendsChart(const std::string& name,
+                     const std::list<DbQosDataT>& data,
+                     Wt::WContainerWidget* parent=0);
+
+private:
+};
+
+
+class RawQosTrendsChart : public Wt::Chart::WCartesianChart
+{
+public:
+  RawQosTrendsChart(const std::string& name,
                      const std::list<DbQosDataT>& data,
                      Wt::WContainerWidget* parent=0);
 
 private:
   Wt::WStandardItemModel* m_model;
-  int m_row;
 };
+
 
 #endif // WEBBIREPORTBUILDER_HPP
