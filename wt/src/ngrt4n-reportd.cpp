@@ -32,31 +32,10 @@
 #include "WebPreferences.hpp"
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
+#include <unistd.h>
 
-
-int main(int argc, char **argv)
+void runCollector(int period, bool foreground)
 {
-
-  int period = 5;
-  bool ok;
-  int opt;
-  if ((opt = getopt(argc, argv, "t:h")) != -1) {
-    switch (opt) {
-      case 't':
-        period = QString(optarg).toInt(&ok);
-        if (! ok || period < 1)
-          period = 1;
-        break;
-      case 'h':
-        break;
-      default:
-        break;
-    }
-  }
-
-  // convert period in seconds
-  period *= 60;
-
   std::unique_ptr<DbSession> dbSession(new DbSession());
   std::unique_ptr<WebPreferencesBase> preferences(new WebPreferencesBase());
   while(1) {
@@ -82,6 +61,11 @@ int main(int argc, char **argv)
       qosInfo.timestamp = now;
       try {
         dbSession->addQosInfo(qosInfo);
+        if (foreground) {
+          std::cerr << dbSession->lastError()<<"\n";
+        } else {
+          LOG("notice", dbSession->lastError());
+        }
       } catch(const std::exception& ex) {
         std::cerr << ex.what() <<"\n";
       }
@@ -94,6 +78,52 @@ int main(int argc, char **argv)
 
     sleep(period);
   }
+}
+
+int main(int argc, char **argv)
+{
+
+  int period = 5;
+  bool ok;
+  int opt;
+  bool foreground = true;
+  if ((opt = getopt(argc, argv, "t:dh")) != -1) {
+    switch (opt) {
+      case 't':
+        period = QString(optarg).toInt(&ok);
+        if (! ok || period < 1)
+          period = 1;
+        break;
+      case 'd':
+        foreground = false;
+        break;
+      case 'h':
+        break;
+      default:
+        break;
+    }
+  }
+
+  period *= 60;
+  std::string startupMsg = QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)).toStdString();
+  if (! foreground) {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+      std::cerr << "Fork failed \n";
+      exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+      LOG("notice", startupMsg);
+      setsid();
+      runCollector(period, foreground); // convert period in seconds
+    } else {
+      exit(EXIT_SUCCESS);
+    }
+  } else {
+    std::cerr << startupMsg <<"\n";
+    runCollector(period, foreground); // convert period in seconds
+  }
+
 
   return 0;
 }

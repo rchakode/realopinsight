@@ -29,6 +29,7 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
   : Wt::Chart::WCartesianChart(parent),
     m_model(new Wt::WStandardItemModel(this))
 {
+  qDebug()<< "size: "<< data.size();
   m_row = 0;
   for (const auto& entry : data) {
     Wt::WDateTime date;
@@ -43,11 +44,9 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
     ++m_row;
   }
 
-  for (int i = 2; i <= 6; ++i) {
-    Wt::Chart::WDataSeries series(i, Wt::Chart::LineSeries);
-    series.setShadow(Wt::WShadow(3, 3, Wt::WColor(0, 0, 0, 127), 3));
-    addSeries(series);
-  }
+  Wt::Chart::WDataSeries series(6, Wt::Chart::LineSeries);
+  series.setShadow(Wt::WShadow(3, 3, Wt::WColor(0, 0, 0, 127), 3));
+  addSeries(series);
 
  // setBackground(Wt::WColor(220, 220, 220));
   setModel(m_model);

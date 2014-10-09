@@ -471,7 +471,7 @@ int DbSession::addQosInfo(const DbQosDataT& qosInfo)
     qosDboPtr->view = find<DbViewT>().where("name=?").bind(qosInfo.viewname);;
     add(qosDboPtr);
     retCode = 0;
-    LOG("notice", Q_TR("QoS entry added: ") + qosInfo.toString());
+    m_lastError = Q_TR("QoS entry added: ") + qosInfo.toString();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add QoS entry. More details in log.";
     LOG("error", ex.what());
