@@ -482,12 +482,14 @@ int DbSession::addQosInfo(const DbQosDataT& qosInfo)
 
 
 
-int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos)
+int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos, long fromDate, long toDate)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    QosInfoCollectionT entries = find<DbQosDataT>();
+    QosInfoCollectionT entries = find<DbQosDataT>()
+        .where("timestamp >= ? AND timestamp <= ?")
+        .bind(fromDate).bind(toDate);
     for (auto &entry : entries) {
       entry.modify()->viewname = entry->view->name;
       qosInfos[entry->viewname].push_back(*entry);

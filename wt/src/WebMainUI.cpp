@@ -770,9 +770,10 @@ void WebMainUI::initOperatorDashboard(void)
   }
 
 
-  //Build BI reports
+  //Build BI reports for last 30 days: 30 * 24 * 3600
   ViewQosDataMapT qosInfos;
-  if (m_dbSession->fetchQosInfos(qosInfos) == 0) {
+  long now = time(NULL);
+  if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
     int biIndex = 0;
     for (const auto& view: m_dbSession->viewList()) {
       bigraphsLayout->addWidget(new WebBiReportBuilder(view.name, qosInfos[view.name]), biIndex / 2, biIndex % 2);

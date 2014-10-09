@@ -36,6 +36,7 @@
 #include <Wt/Auth/Dbo/AuthInfo>
 #include <Wt/Auth/Dbo/UserDatabase>
 #include <Wt/Auth/Login>
+#include <climits>
 
 typedef Wt::Auth::Dbo::AuthInfo<DbUserT> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
@@ -71,7 +72,7 @@ public:
   int revokeView(const std::string& uname, const std::string& vname);
 
   int addQosInfo(const DbQosDataT& qos);
-  int fetchQosInfos(ViewQosDataMapT& qosInfos);
+  int fetchQosInfos(ViewQosDataMapT& qosInfos, long fromDate=0, long toDate = LONG_MAX);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);

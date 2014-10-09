@@ -45,7 +45,6 @@ WebBiReportBuilder::WebBiReportBuilder(const std::string& name,
 
   m_row = 0;
   for (const auto& entry : data) {
-
     Wt::WDateTime date;
     date.setTime_t(entry.timestamp);
     m_model->setData(m_row, 0, date);
@@ -82,6 +81,7 @@ WebBiReportBuilder::WebBiReportBuilder(const std::string& name,
     Wt::WColor color = ngrt4n::severityWColor(i - 2);
     serie.setPen(color);
     serie.setBrush(color);
+    serie.setStacked(true);
     serie.setFillRange(Wt::Chart::MinimumValueFill);
     addSeries(serie);
   }
