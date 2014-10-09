@@ -29,7 +29,6 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
   : Wt::Chart::WCartesianChart(parent),
     m_model(new Wt::WStandardItemModel(this))
 {
-  qDebug() << data.size()<<" SIZEEEEEEEE";
   m_row = 0;
   for (const auto& entry : data) {
     Wt::WDateTime date;

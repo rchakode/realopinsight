@@ -159,7 +159,6 @@ web-fcgi {
 web-reportd {
   SOURCES += wt/src/ngrt4n-reportd.cpp
   TARGET = realopinsight-repord
-  LIBS += -lcurl
 }
 
 dflag {

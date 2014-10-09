@@ -37,15 +37,15 @@
 int main(int argc, char **argv)
 {
 
-  int period = 60;
+  int period = 5;
   bool ok;
   int opt;
   if ((opt = getopt(argc, argv, "t:h")) != -1) {
     switch (opt) {
       case 't':
         period = QString(optarg).toInt(&ok);
-        if (! ok || period < 60)
-          period = 60;
+        if (! ok || period < 1)
+          period = 1;
         break;
       case 'h':
         break;
@@ -54,32 +54,45 @@ int main(int argc, char **argv)
     }
   }
 
+  // convert period in seconds
+  period *= 60;
+
   std::unique_ptr<DbSession> dbSession(new DbSession());
+  std::unique_ptr<WebPreferencesBase> preferences(new WebPreferencesBase());
   while(1) {
 
-    WebPreferencesBase* preferences = new WebPreferencesBase();
-    dbSession->updateUserList();
+    try {
+      dbSession->updateUserList();
+    } catch(const std::exception& ex) {
+      std::cerr << ex.what() <<"\n";
+    }
 
-    long now = time(NULL);
     std::vector<QosCollector*> mycollectors;
     for (auto view: dbSession->viewList()) {
       QosCollector* collector = new QosCollector(view.path.c_str());
-      collector->initialize(preferences);
+      collector->initialize(preferences.get());
       mycollectors.push_back(collector);
     }
 
     LOG("notice", Q_TR("Collecting QoS data..."));
+    long now = time(NULL);
     for (auto collector: mycollectors) {
       collector->runMonitor();
       DbQosDataT qosInfo = collector->qosInfo();
       qosInfo.timestamp = now;
-      dbSession->addQosInfo(qosInfo);
+      try {
+        dbSession->addQosInfo(qosInfo);
+      } catch(const std::exception& ex) {
+        std::cerr << ex.what() <<"\n";
+      }
     }
 
-    // free up resources
+    // clean up data
     for (auto collector: mycollectors) {
       delete collector;
     }
+
+    sleep(period);
   }
 
   return 0;
