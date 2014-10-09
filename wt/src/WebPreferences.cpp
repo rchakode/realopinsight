@@ -43,8 +43,15 @@ namespace {
   const std::string LDAP_VERSION3_TEXT = "LDAPv3";
 }
 
+WebPreferencesBase::WebPreferencesBase(void)
+  : Preferences("/opt/realopinsight/etc/realopinsight.conf")
+{
+
+}
+
 WebPreferences::WebPreferences(void)
-  : Preferences("/opt/realopinsight/etc/realopinsight.conf"),
+  : WebPreferencesBase(),
+    Wt::WContainerWidget(),
     m_errorOccurred(this),
     m_authSystemChanged(this)
 {

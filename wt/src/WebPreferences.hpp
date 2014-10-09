@@ -40,8 +40,25 @@
 
 class QString;
 
+class WebPreferencesBase : public Preferences
+{
+public:
+  WebPreferencesBase(void);
 
-class WebPreferences : public Preferences, public Wt::WContainerWidget
+protected :
+  virtual void fillFromSource(int _index) {}
+  virtual void updateAllSourceWidgetStates(void) {}
+  virtual void updateFields(void) {}
+  virtual void saveAsSource(const qint32& idx, const QString& type){}
+
+protected Q_SLOTS:
+  virtual void applyChanges(void) {}
+  virtual void handleCancel(void) {}
+  virtual void addAsSource(void) {}
+  virtual void deleteSource(void){}
+};
+
+class WebPreferences : public WebPreferencesBase, public Wt::WContainerWidget
 {
 public:
   enum InputTypeT {

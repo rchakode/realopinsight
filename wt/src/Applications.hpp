@@ -32,7 +32,6 @@
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
 #include "AuthManager.hpp"
-#include "QosCollector.hpp"
 
 
 class RealOpInsightQApp : public QCoreApplication
@@ -93,60 +92,6 @@ private:
   DbSession* m_dbSession;
   std::string m_dirroot;
   std::string m_docroot;
-};
-
-class ReportCollectorApp : public Wt::WQApplication
-{
-public:
-  ReportCollectorApp(const Wt::WEnvironment& env)
-    : WQApplication(env, true) {}
-
-  DbSession* dbSession(void) {return m_dbSession;}
-
-protected:
-  virtual void create()
-  {
-    m_dbSession = new DbSession();
-
-    // only accept request from local loop
-    std::string clientIp = environment().clientAddress();
-    if (clientIp != "127.0.0.1" && clientIp != "localhost") {
-      LOG("warn", "External QoS sampling request rejected");
-      return ;
-    }
-
-    WebPreferences* preferences = new WebPreferences();
-    m_dbSession->updateUserList();
-
-    long now = time(NULL);
-    std::vector<QosCollector*> mycollectors;
-    for (auto view: m_dbSession->viewList()) {
-      QosCollector* collector = new QosCollector(view.path.c_str());
-      collector->initialize(preferences);
-      mycollectors.push_back(collector);
-    }
-
-    LOG("notice", Q_TR("Collecting QoS data..."));
-    for (auto collector: mycollectors) {
-      collector->runMonitor();
-      DbQosInfoT qosInfo = collector->qosInfo();
-      qosInfo.timestamp = now;
-      m_dbSession->addQosInfo(qosInfo);
-    }
-
-    // free up resources
-    for (auto collector: mycollectors) {
-      delete collector;
-    }
-  }
-
-  virtual void destroy()
-  {
-    delete m_dbSession;
-  }
-
-private:
-  DbSession* m_dbSession;
 };
 
 

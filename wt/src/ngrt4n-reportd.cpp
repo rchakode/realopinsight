@@ -22,63 +22,16 @@
 #--------------------------------------------------------------------------#
  */
 
-/***************************************************************************
- *                                  _   _ ____  _
- *  Project                     ___| | | |  _ \| |
- *                             / __| | | | |_) | |
- *                            | (__| |_| |  _ <| |___
- *                             \___|\___/|_| \_\_____|
- *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
- *
- * This software is licensed as described in the file COPYING, which
- * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
- *
- * You may opt to use, copy, modify, merge, publish, distribute and/or sell
- * copies of the Software, and permit persons to whom the Software is
- * furnished to do so, under the terms of the COPYING file.
- *
- * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
- * KIND, either express or implied.
- *
- ***************************************************************************/
-/* Example source code to show how the callback function can be used to
- * download data into a chunk of memory instead of storing it in a file.
- */
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <curl/curl.h>
 #include <QString>
 #include <getopt.h>
 #include <unistd.h>
-
-struct MemoryStruct {
-  char *memory;
-  size_t size;
-};
-
-
-static size_t
-WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
-{
-  size_t realsize = size * nmemb;
-  struct MemoryStruct* mem = (struct MemoryStruct *)userp;
-
-  mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
-  if(mem->memory == NULL) {
-    printf("not enough memory (realloc returned NULL)\n");
-    return 0;
-  }
-
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
-
-  return realsize;
-}
+#include "DbSession.hpp"
+#include "WebPreferences.hpp"
+#include "QosCollector.hpp"
+#include "WebUtils.hpp"
 
 
 int main(int argc, char **argv)
@@ -101,41 +54,32 @@ int main(int argc, char **argv)
     }
   }
 
-
+  std::unique_ptr<DbSession> dbSession(new DbSession());
   while(1) {
-    CURL *curl_handle;
-    CURLcode res;
 
-    struct MemoryStruct chunk;
+    WebPreferencesBase* preferences = new WebPreferencesBase();
+    dbSession->updateUserList();
 
-    chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
-    chunk.size = 0;    /* no data at this point */
-
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl_handle = curl_easy_init();
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://localhost:9090/sample-qos-info");
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
-    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-    /* get it! */
-    res = curl_easy_perform(curl_handle);
-
-    /* check for errors */
-    if(res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-    } else {
-      printf("%lu bytes retrieved\n", (long)chunk.size);
+    long now = time(NULL);
+    std::vector<QosCollector*> mycollectors;
+    for (auto view: dbSession->viewList()) {
+      QosCollector* collector = new QosCollector(view.path.c_str());
+      collector->initialize(preferences);
+      mycollectors.push_back(collector);
     }
 
-    /* cleanup curl stuff */
-    curl_easy_cleanup(curl_handle);
+    LOG("notice", Q_TR("Collecting QoS data..."));
+    for (auto collector: mycollectors) {
+      collector->runMonitor();
+      DbQosInfoT qosInfo = collector->qosInfo();
+      qosInfo.timestamp = now;
+      dbSession->addQosInfo(qosInfo);
+    }
 
-    if (chunk.memory)
-      free(chunk.memory);
-
-    sleep(period);
-    /* we're done with libcurl, so clean it up */
-    curl_global_cleanup();
+    // free up resources
+    for (auto collector: mycollectors) {
+      delete collector;
+    }
   }
 
   return 0;
