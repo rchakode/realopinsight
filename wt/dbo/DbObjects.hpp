@@ -146,8 +146,9 @@ public:
   }
 
   std::string toString(void) const {
-    return QString("%1,%2,%3,%4,%5,%6,%7")
-        .arg(viewname.c_str(),
+    return QString("%1,%2,%3,%4,%5,%6,%7, %8")
+        .arg(QString::number(timestamp),
+             viewname.c_str(),
              QString::number(status),
              QString::number(normal),
              QString::number(minor),

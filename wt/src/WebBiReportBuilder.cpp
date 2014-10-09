@@ -26,10 +26,15 @@
 #include "WebUtils.hpp"
 #include <QDebug>
 
-WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WContainerWidget* parent)
+WebBiReportBuilder::WebBiReportBuilder(const std::string& name,
+                                       const std::list<DbQosDataT>& data,
+                                       Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
     m_model(new Wt::WStandardItemModel(data.size(), 7, this))
 {
+  setTitle(name);
+  setModel(m_model);
+
   m_model->setHeaderData(0, Q_TR("Date/time"));
   m_model->setHeaderData(1, Q_TR("Status"));
   m_model->setHeaderData(2, Q_TR("% Normal"));
@@ -40,29 +45,45 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
 
   m_row = 0;
   for (const auto& entry : data) {
+
     Wt::WDateTime date;
     date.setTime_t(entry.timestamp);
-    m_model->setData(m_row, 0, date.date());
+    m_model->setData(m_row, 0, date);
+
     m_model->setData(m_row, 1, entry.status);
-    m_model->setData(m_row, 2, entry.normal);
-    m_model->setData(m_row, 3, entry.minor);
-    m_model->setData(m_row, 4, entry.major);
-    m_model->setData(m_row, 5, entry.critical);
-    m_model->setData(m_row, 6, entry.unknown);
+
+    float cum = entry.normal;
+    m_model->setData(m_row, 2, cum);
+
+    cum += entry.minor;
+    m_model->setData(m_row, 3, cum);
+
+    cum += entry.major;
+    m_model->setData(m_row, 4, cum);
+
+    cum += entry.critical;
+    m_model->setData(m_row, 5, cum);
+
+    cum += entry.unknown;
+    m_model->setData(m_row, 6, cum);
     ++m_row;
   }
 
-  // setBackground(Wt::WColor(220, 220, 220));
-  setModel(m_model);
+  setBackground(Wt::WColor(248, 254, 252));
   setXSeriesColumn(0);
   setLegendEnabled(true);
   setType(Wt::Chart::ScatterPlot);
-  axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateScale);
+  axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
   setPlotAreaPadding(40, Wt::Left | Wt::Top | Wt::Bottom);
   setPlotAreaPadding(120, Wt::Right);
 
-  Wt::Chart::WDataSeries series(6, Wt::Chart::LineSeries);
-  series.setShadow(Wt::WShadow(3, 3, Wt::WColor(0, 0, 0, 127), 3));
-  addSeries(series);
-  resize(350, 200);
+  for (int i = 6; i>=2; --i) {
+    Wt::Chart::WDataSeries serie(i, Wt::Chart::CurveSeries);
+    Wt::WColor color = ngrt4n::severityWColor(i - 2);
+    serie.setPen(color);
+    serie.setBrush(color);
+    serie.setFillRange(Wt::Chart::MinimumValueFill);
+    addSeries(serie);
+  }
+  resize(350, 150);
 }

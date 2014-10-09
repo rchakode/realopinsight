@@ -495,6 +495,7 @@ int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos)
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to fetch QoS entries. More details in log.";
+    qDebug()<< ex.what();
     LOG("error", ex.what());
   }
   transaction.commit();

@@ -775,7 +775,7 @@ void WebMainUI::initOperatorDashboard(void)
   if (m_dbSession->fetchQosInfos(qosInfos) == 0) {
     int biIndex = 0;
     for (const auto& view: m_dbSession->viewList()) {
-      bigraphsLayout->addWidget(new WebBiReportBuilder(qosInfos[view.name]), biIndex / 2, biIndex % 2);
+      bigraphsLayout->addWidget(new WebBiReportBuilder(view.name, qosInfos[view.name]), biIndex / 2, biIndex % 2);
       ++biIndex;
     }
   }
