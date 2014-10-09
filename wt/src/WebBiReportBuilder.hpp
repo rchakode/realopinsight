@@ -43,7 +43,7 @@
 class WebBiReportBuilder : public Wt::Chart::WCartesianChart
 {
 public:
-  WebBiReportBuilder(const std::list<DbQosInfoT>& data, Wt::WContainerWidget* parent=0);
+  WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WContainerWidget* parent=0);
 
 private:
   Wt::WStandardItemModel* m_model;

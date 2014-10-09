@@ -765,7 +765,7 @@ void WebMainUI::initOperatorDashboard(void)
   }
 
   //FIXME: TOBE REMOVED
-  DbQosInfosT qosInfos;
+  ViewQosDataMapT qosInfos;
   qDebug()<<"YOO1";
   if (m_dbSession->fetchQosInfos(qosInfos) == 0) {
     qDebug()<<"YOO";

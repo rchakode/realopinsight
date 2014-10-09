@@ -25,7 +25,7 @@
 #include "WebBiReportBuilder.hpp"
 #include <QDebug>
 
-WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosInfoT>& data, Wt::WContainerWidget* parent)
+WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
     m_model(new Wt::WStandardItemModel(this))
 {

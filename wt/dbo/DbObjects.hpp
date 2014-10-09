@@ -39,7 +39,7 @@ namespace dbo = Wt::Dbo;
 class DbViewT;
 class DbUserT;
 class DbLoginSession;
-class DbQosInfoT;
+class DbQosDataT;
 
 namespace Wt {
   namespace Dbo {
@@ -68,7 +68,7 @@ public:
   std::string path;
   int service_count;
   dbo::collection< dbo::ptr<DbUserT> > users;
-  dbo::collection< dbo::ptr<DbQosInfoT> > qosreports;
+  dbo::collection< dbo::ptr<DbQosDataT> > qosreports;
 
   template<class Action>
   void persist(Action& a) {
@@ -120,7 +120,7 @@ public:
   }
 };
 
-class DbQosInfoT {
+class DbQosDataT {
 
 public:
   long timestamp;
@@ -187,10 +187,10 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DbUserT> DbUsersT;
 typedef std::list<DbViewT> DbViewsT;
 typedef std::list<DbLoginSession> LoginSessionListT;
-typedef QMap<std::string, std::list<DbQosInfoT> > DbQosInfosT;
+typedef QMap<std::string, std::list<DbQosDataT> > ViewQosDataMapT;
 typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
 typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
-typedef dbo::collection< dbo::ptr<DbQosInfoT> > QosInfoCollectionT;
+typedef dbo::collection< dbo::ptr<DbQosDataT> > QosInfoCollectionT;
 typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;
 
 #endif // USER_HPP

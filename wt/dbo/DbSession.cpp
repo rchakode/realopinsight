@@ -58,7 +58,7 @@ void DbSession::setupDb(void)
   mapClass<DbViewT>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DbLoginSession>("login_session");
-  mapClass<DbQosInfoT>("qosinfo");
+  mapClass<DbQosDataT>("qosdata");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
   initDb();
@@ -461,12 +461,12 @@ int DbSession::checkUserCookie(const DbLoginSession& session)
 }
 
 
-int DbSession::addQosInfo(const DbQosInfoT& qosInfo)
+int DbSession::addQosInfo(const DbQosDataT& qosInfo)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    DbQosInfoT* qosDboPtr = new DbQosInfoT();
+    DbQosDataT* qosDboPtr = new DbQosDataT();
     *qosDboPtr = qosInfo;
     qosDboPtr->view = find<DbViewT>().where("name=?").bind(qosInfo.viewname);;
     add(qosDboPtr);
@@ -482,12 +482,12 @@ int DbSession::addQosInfo(const DbQosInfoT& qosInfo)
 
 
 
-int DbSession::fetchQosInfos(DbQosInfosT& qosInfos)
+int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    QosInfoCollectionT entries = find<DbQosInfoT>();
+    QosInfoCollectionT entries = find<DbQosDataT>();
     for (auto &entry : entries) {
       entry.modify()->viewname = entry->view->name;
       qosInfos[entry->viewname].push_back(*entry);

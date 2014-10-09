@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     LOG("notice", Q_TR("Collecting QoS data..."));
     for (auto collector: mycollectors) {
       collector->runMonitor();
-      DbQosInfoT qosInfo = collector->qosInfo();
+      DbQosDataT qosInfo = collector->qosInfo();
       qosInfo.timestamp = now;
       dbSession->addQosInfo(qosInfo);
     }
