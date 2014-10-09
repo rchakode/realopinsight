@@ -23,18 +23,26 @@
  */
 
 #include "WebBiReportBuilder.hpp"
+#include "WebUtils.hpp"
 #include <QDebug>
 
 WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
-    m_model(new Wt::WStandardItemModel(this))
+    m_model(new Wt::WStandardItemModel(data.size(), 7, this))
 {
-  qDebug()<< "size: "<< data.size();
+  m_model->setHeaderData(0, Q_TR("Date/time"));
+  m_model->setHeaderData(1, Q_TR("Status"));
+  m_model->setHeaderData(2, Q_TR("% Normal"));
+  m_model->setHeaderData(3, Q_TR("% Minor"));
+  m_model->setHeaderData(4, Q_TR("% Major"));
+  m_model->setHeaderData(5, Q_TR("% Critical"));
+  m_model->setHeaderData(6, Q_TR("% Unknown"));
+
   m_row = 0;
   for (const auto& entry : data) {
     Wt::WDateTime date;
     date.setTime_t(entry.timestamp);
-    m_model->setData(m_row, 0, date);
+    m_model->setData(m_row, 0, date.date());
     m_model->setData(m_row, 1, entry.status);
     m_model->setData(m_row, 2, entry.normal);
     m_model->setData(m_row, 3, entry.minor);
@@ -44,11 +52,7 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
     ++m_row;
   }
 
-  Wt::Chart::WDataSeries series(6, Wt::Chart::LineSeries);
-  series.setShadow(Wt::WShadow(3, 3, Wt::WColor(0, 0, 0, 127), 3));
-  addSeries(series);
-
- // setBackground(Wt::WColor(220, 220, 220));
+  // setBackground(Wt::WColor(220, 220, 220));
   setModel(m_model);
   setXSeriesColumn(0);
   setLegendEnabled(true);
@@ -56,5 +60,9 @@ WebBiReportBuilder::WebBiReportBuilder(const std::list<DbQosDataT>& data, Wt::WC
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateScale);
   setPlotAreaPadding(40, Wt::Left | Wt::Top | Wt::Bottom);
   setPlotAreaPadding(120, Wt::Right);
+
+  Wt::Chart::WDataSeries series(6, Wt::Chart::LineSeries);
+  series.setShadow(Wt::WShadow(3, 3, Wt::WColor(0, 0, 0, 127), 3));
+  addSeries(series);
   resize(350, 200);
 }

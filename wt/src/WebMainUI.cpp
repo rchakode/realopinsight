@@ -780,7 +780,6 @@ void WebMainUI::initOperatorDashboard(void)
     }
   }
 
-
   if (thumbIndex > 0) {
     startDashbaordUpdate();
   } else {
