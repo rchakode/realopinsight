@@ -33,23 +33,37 @@ QosTrendsChart::QosTrendsChart(const std::string& name,
                                Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent)
 {
-//  setTitle(name);
-//  std::list<DbQosDataT> toPlot;
+  setTitle(name);
 
-//  if (! data.empty())
-//    toPlot.push_back(data.front());
+  filteringPlottingData(data);
 
-//  std::list<DbQosDataT>::const_iterator qosit = data.begin();
-
-//  DbQosDataT last = toPlot.back();
-//  while (++qosit, qosit != data.end()) {
-//    if (last.status != qosit->status) {
-//      last = *qosit;
-//      toPlot.push_back(last);
-//    }
-//  }
   resize(350, 150);
 }
+
+
+void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
+{
+  std::list<DbQosDataT>::const_iterator qosit = data.begin();
+  m_plotData.clear();
+
+  if (! data.empty()) {
+    m_plotData.push_back({qosit->timestamp, qosit->status});
+    TimeStatusT last = m_plotData.back();
+    while (++qosit, qosit != data.end()) {
+      if (last.status != qosit->status) {
+        last = {qosit->timestamp, qosit->status};
+        m_plotData.push_back({qosit->timestamp, qosit->status});
+      }
+    }
+  }
+}
+
+
+void QosTrendsChart::paintEvent(Wt::WPaintDevice * 	paintDevice)
+{
+
+}
+
 
 
 RawQosTrendsChart::RawQosTrendsChart(const std::string& name,

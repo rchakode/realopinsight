@@ -38,16 +38,29 @@
 #include <Wt/WShadow>
 #include <Wt/WStandardItemModel>
 #include "DbObjects.hpp"
+#include <QList>
 
 
 class QosTrendsChart : public Wt::Chart::WCartesianChart
 {
 public:
   QosTrendsChart(const std::string& name,
-                     const std::list<DbQosDataT>& data,
-                     Wt::WContainerWidget* parent=0);
+                 const std::list<DbQosDataT>& data,
+                 Wt::WContainerWidget* parent=0);
+
+protected:
+  virtual void paintEvent(Wt::WPaintDevice * 	paintDevice);
 
 private:
+  struct TimeStatusT {
+    long timestamp;
+    int status;
+  };
+  typedef QList<TimeStatusT> TimeStatusesT;
+  TimeStatusesT m_plotData;
+
+
+  void filteringPlottingData(const std::list<DbQosDataT>& data);
 };
 
 
@@ -55,10 +68,11 @@ class RawQosTrendsChart : public Wt::Chart::WCartesianChart
 {
 public:
   RawQosTrendsChart(const std::string& name,
-                     const std::list<DbQosDataT>& data,
-                     Wt::WContainerWidget* parent=0);
+                    const std::list<DbQosDataT>& data,
+                    Wt::WContainerWidget* parent=0);
 
 private:
+
   Wt::WStandardItemModel* m_model;
 };
 
