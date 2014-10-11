@@ -98,7 +98,7 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
       previousIt = currentIt;
     }
     textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
-    drawRotatedLegendText(painter, textLegend, x2 + 150, TEXT_TOP_CORNER_Y, -80);
+    drawRotatedLegendText(painter, textLegend, x2 - 100, TEXT_TOP_CORNER_Y, -80);
   }
 }
 

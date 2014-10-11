@@ -311,9 +311,10 @@ legend {
 }
 
 .view-thumbnail {
+  cursor: pointer;
   cursor: hand;
 }
 
 .bi-chart {
-  background-color: #EFF8FB;
+  background-color: #f8f8ff;
 }
