@@ -309,3 +309,7 @@ body, html {
 legend {
  border: none; 
 }
+
+.view-thumbnail {
+  cursor: hand;
+}

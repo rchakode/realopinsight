@@ -762,9 +762,11 @@ void WebMainUI::initOperatorDashboard(void)
     loadView(view.path, dashboard);
     if (dashboard) {
       Wt::WTemplate* thumb = getDashboardThumbnail(dashboard);
+      thumb->setStyleClass("view-thumbnail");
       thumb->clicked().connect(std::bind([=](){ openViewTab(dashboard->getWidget());}));
       QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(openViewTab(Wt::WWidget*)));
       thumbLayout->addWidget(thumb, thumbIndex / 4, thumbIndex % 4);
+
       ++thumbIndex;
     }
   }
