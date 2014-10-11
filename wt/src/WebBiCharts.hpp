@@ -51,6 +51,8 @@ public:
   QosTrendsChart(const std::string& viewName,
                  const std::list<DbQosDataT>& data,
                  Wt::WContainerWidget* parent=0);
+  std::string viewName() const {return m_viewName;}
+  void updateData(const std::list<DbQosDataT>& data);
 
 protected:
   virtual void paintEvent(Wt::WPaintDevice * 	paintDevice);
@@ -67,7 +69,6 @@ private:
   double m_sla;
 
 
-
   void filteringPlottingData(const std::list<DbQosDataT>& data);
   void updateCountNormal(int status) {if (status == ngrt4n::Normal) ++m_countNormal;}
   void drawRotatedLegendText(Wt::WPainter& painter,
@@ -75,6 +76,9 @@ private:
                              double x, double y,
                              double angle,
                              double shiftLegendXPos = 0);
+  std::string slaText(void) {
+    return QObject::tr("QoS trends - Current SLA: %1\%").arg(QString::number(m_sla, 'f', 2)).toStdString();
+  }
 };
 
 
@@ -84,11 +88,15 @@ public:
   RawQosTrendsChart(const std::string& viewName,
                     const std::list<DbQosDataT>& data,
                     Wt::WContainerWidget* parent=0);
+  std::string viewName() const {return m_viewName;}
 
 private:
 
   Wt::WStandardItemModel* m_model;
   std::string m_viewName;
+
+  Wt::WFont customTitleFont(void);
+  void setChartTitle(void);
 };
 
 

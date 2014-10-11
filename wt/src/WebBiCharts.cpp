@@ -49,7 +49,13 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
   setMargin(5, Wt::Top | Wt::Bottom);
   setMargin(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Right);
   setLayoutSizeAware(true);
+  updateData(data);
+}
+
+void QosTrendsChart::updateData(const std::list<DbQosDataT>& data)
+{
   filteringPlottingData(data);
+  update();
 }
 
 void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
@@ -107,10 +113,13 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     drawRotatedLegendText(painter, ngrt4n::timet2String(lastPoint.timestamp),
                           BI_CHART_WIDTH, TEXT_TOP_CORNER_Y, -90, -15);
 
-    painter.drawText(0, 0,
+    //FIXME:
+
+    painter.setPen(LEGEND_TEXT_COLOR); // invisible
+    painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
                      Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                     Wt::AlignLeft,
-                     QObject::tr("SLA: %1 \%").arg(QString::number(m_sla, 'f', 2)).toStdString());
+                     Wt::AlignCenter,
+                     slaText());
   }
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
@@ -194,5 +203,19 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
     addSeries(serie);
   }
 
+  setChartTitle();
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
+}
+
+
+Wt::WFont RawQosTrendsChart::customTitleFont(void)
+{
+  Wt::WFont ft;
+  return ft;
+}
+
+void RawQosTrendsChart::setChartTitle(void)
+{
+  setTitle(Q_TR("IT Problem Trends"));
+  setTitleFont(customTitleFont());
 }

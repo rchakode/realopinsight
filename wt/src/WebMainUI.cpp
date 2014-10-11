@@ -28,7 +28,6 @@
 #include "ViewAclManagement.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "WebBiCharts.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -778,11 +777,11 @@ void WebMainUI::initOperatorDashboard(void)
   if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
     int biIndex = 0;
     for (const auto& view: m_dbSession->viewList()) {
-      bigraphsLayout->addWidget(new Wt::WText(
-                                  QObject::tr("<h5>%1</h5>").arg(view.name.c_str()).toStdString(),
-                                  Wt::XHTMLText), biIndex, 0, 1, 2, Wt::AlignLeft);
-      bigraphsLayout->addWidget(new QosTrendsChart(view.name, qosInfos[view.name]), ++biIndex, 0);
-      bigraphsLayout->addWidget(new RawQosTrendsChart(view.name, qosInfos[view.name]), biIndex, 1);
+      m_qosCharts[view.name] = new QosTrendsChart(view.name, qosInfos[view.name]);
+      m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, qosInfos[view.name]);
+      bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0, 1, 2, Wt::AlignLeft);
+      bigraphsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
+      bigraphsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
       ++biIndex;
     }
   }

@@ -29,6 +29,7 @@
 #include "WebDashboard.hpp"
 #include "DbSession.hpp"
 #include "UserManagement.hpp"
+#include "WebBiCharts.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/WTabWidget>
@@ -88,6 +89,8 @@ private:
   };
   typedef std::map<QString, WebDashboard*> DashboardListT;
   typedef std::map<QString, Wt::WMenuItem*> DashTabWidgetsT;
+  typedef std::map<std::string, QosTrendsChart*> QosTrendsChartList;
+  typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartList;
 
   /** Signals */
   Wt::Signal<void> m_terminateSession;
@@ -124,6 +127,8 @@ private:
   WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
   DashTabWidgetsT m_dashTabWidgets;
+  QosTrendsChartList m_qosCharts;
+  RawQosTrendsChartList m_rawQosCharts;
 
 
   /** member methods with return value*/
