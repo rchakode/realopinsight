@@ -36,15 +36,16 @@
 #include <Wt/WPaintedWidget>
 #include <Wt/WItemDelegate>
 #include <Wt/WShadow>
+#include <Wt/WPaintedWidget>
 #include <Wt/WStandardItemModel>
 #include "DbObjects.hpp"
 #include <QList>
 
 
-class QosTrendsChart : public Wt::Chart::WCartesianChart
+class QosTrendsChart : public  Wt::WPaintedWidget
 {
 public:
-  QosTrendsChart(const std::string& name,
+  QosTrendsChart(const std::string& viewName,
                  const std::list<DbQosDataT>& data,
                  Wt::WContainerWidget* parent=0);
 
@@ -57,7 +58,8 @@ private:
     int status;
   };
   typedef QList<TimeStatusT> TimeStatusesT;
-  TimeStatusesT m_plotData;
+  TimeStatusesT m_plottingPoints;
+  std::string m_viewName;
 
 
   void filteringPlottingData(const std::list<DbQosDataT>& data);
@@ -67,13 +69,14 @@ private:
 class RawQosTrendsChart : public Wt::Chart::WCartesianChart
 {
 public:
-  RawQosTrendsChart(const std::string& name,
+  RawQosTrendsChart(const std::string& viewName,
                     const std::list<DbQosDataT>& data,
                     Wt::WContainerWidget* parent=0);
 
 private:
 
   Wt::WStandardItemModel* m_model;
+  std::string m_viewName;
 };
 
 

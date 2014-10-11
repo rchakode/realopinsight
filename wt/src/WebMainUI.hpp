@@ -125,33 +125,34 @@ private:
   Wt::WVBoxLayout* m_eventFeedLayout;
   DashTabWidgetsT m_dashTabWidgets;
 
+
+  /** member methods with return value*/
+  Wt::WAnchor* createLogoLink(void);
+  Wt::WTemplate* getDashboardThumbnail(WebDashboard* dashboard);
+  Wt::WWidget* createSettingPage(void);
+  Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
+  Wt::WComboBox* createViewSelector(void);
+
+  /** member methods without return value*/
   void addEvents(void);
   void createMainUI(void);
   void setupProfileMenus(void);
   void setupMenus(void);
-  Wt::WAnchor* createLogoLink(void);
   void openFileUploadDialog(void);
   void selectFileToOpen(void);
   void initOperatorDashboard(void);
   void loadView(const std::string& path, WebDashboard*& dashboard);
-  Wt::WTemplate* getDashboardThumbnail(WebDashboard* dashboard);
   void finishFileDialog(int action);
   void scaleMap(double factor);
-  Wt::WWidget* createSettingPage(void);
-  Wt::WAnchor* createAnchorForHomeLink(const std::string& title,const std::string& desc,const std::string& internalPath);
   void createAccountPanel(void);
   void createPasswordPanel(void);
   void createAboutDialog(void);
-  Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
-  Wt::WComboBox* createViewSelector(void);
   void showMessage(const std::string& msg, int status);
   void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);
   void startDashbaordUpdate(void);
   void updateEventFeeds(void);
-
-
   void handleInternalPath(void);
   void handleAuthSystemChanged(int authSystem);
   void handleLdapUsersMenu(void);

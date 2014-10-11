@@ -25,54 +25,82 @@
 #include "WebBiCharts.hpp"
 #include "WebUtils.hpp"
 #include <QDebug>
+#include <Wt/WPainter>
 
 
+namespace {
+  const double BI_CHART_WIDTH = 300;
+  const double BI_CHART_HEIGHT = 150;
+}
 
-QosTrendsChart::QosTrendsChart(const std::string& name,
+QosTrendsChart::QosTrendsChart(const std::string& viewName,
                                const std::list<DbQosDataT>& data,
                                Wt::WContainerWidget* parent)
-  : Wt::Chart::WCartesianChart(parent)
+  : Wt::WPaintedWidget(parent),
+    m_viewName(viewName)
 {
-  setTitle(name);
-
   filteringPlottingData(data);
-
-  resize(350, 150);
 }
 
 
 void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
 {
   std::list<DbQosDataT>::const_iterator qosit = data.begin();
-  m_plotData.clear();
+  m_plottingPoints.clear();
 
   if (! data.empty()) {
-    m_plotData.push_back({qosit->timestamp, qosit->status});
-    TimeStatusT last = m_plotData.back();
+    m_plottingPoints.push_back({qosit->timestamp, qosit->status});
+    TimeStatusT last = m_plottingPoints.back();
     while (++qosit, qosit != data.end()) {
       if (last.status != qosit->status) {
         last = {qosit->timestamp, qosit->status};
-        m_plotData.push_back({qosit->timestamp, qosit->status});
+        m_plottingPoints.push_back(last);
       }
     }
+    // always insert the last point, could be duplicated...
+    --qosit;
+    m_plottingPoints.push_back({qosit->timestamp, qosit->status});
   }
 }
 
 
-void QosTrendsChart::paintEvent(Wt::WPaintDevice * 	paintDevice)
+void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 {
+  Wt::WPainter painter(paintDevice);
+  if (! m_plottingPoints.empty()) {
+    TimeStatusT firstPoint = m_plottingPoints.front();
+    TimeStatusesT::ConstIterator currentIt = m_plottingPoints.begin();
+    TimeStatusesT::ConstIterator previousIt = m_plottingPoints.begin();
+    while (++currentIt, currentIt != m_plottingPoints.end()) {
+      painter.setPen(Wt::WColor(0, 0, 0, 0)); // invisible
+      painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
+      double x1 = previousIt->timestamp - firstPoint.timestamp;
+      double x2 = currentIt->timestamp - firstPoint.timestamp;
+      painter.drawRect(x1, 0, x2, 50);
+
+
+      painter.setPen(Wt::WColor(125, 125, 125));
+      painter.drawText(x1, 60,
+                       Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+                       Wt::AlignCenter,
+                       ngrt4n::wHumanTimeText(currentIt->timestamp));
+      previousIt = currentIt;
+    }
+  }
+
+  resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
 }
 
 
 
-RawQosTrendsChart::RawQosTrendsChart(const std::string& name,
+RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
                                      const std::list<DbQosDataT>& data,
                                      Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
-    m_model(new Wt::WStandardItemModel(data.size(), 7, this))
+    m_model(new Wt::WStandardItemModel(data.size(), 7, this)),
+    m_viewName(viewName)
 {
-  setTitle(name);
   setModel(m_model);
 
   m_model->setHeaderData(0, Q_TR("Date/time"));
@@ -125,5 +153,6 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& name,
     serie.setFillRange(Wt::Chart::MinimumValueFill);
     addSeries(serie);
   }
-  resize(350, 150);
+
+  resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
 }

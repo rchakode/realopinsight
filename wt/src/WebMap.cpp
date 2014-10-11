@@ -159,7 +159,8 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
     m_painter->setPen(Wt::WPen(Wt::WColor("#000000")));
     m_painter->drawText(labelPos.x(), labelPos.y(),
                         Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                        Wt::AlignCenter, Wt::WString(node.name.toStdString()));
+                        Wt::AlignCenter,
+                        Wt::WString(node.name.toStdString()));
     createNodeLink(node, iconPos);
 
     m_painter->restore();

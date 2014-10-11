@@ -47,7 +47,7 @@ void Logger::log(const std::string& level, const std::string& msg)
 {
   Wt::WLogEntry logEntry = Wt::WLogger::entry(level);
   logEntry << Wt::WLogger::timestamp << Wt::WLogger::sep
-           //<< '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
+              //<< '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
            << '[' << level << ']' << Wt::WLogger::sep
            << msg;
 }
@@ -83,24 +83,24 @@ std::string ngrt4n::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-  case ngrt4n::Normal:
-    cssClass.append("severity-normal");
-    break;
-  case ngrt4n::Minor:
-    cssClass.append("severity-minor");
-    break;
-  case ngrt4n::Major:
-    cssClass.append("severity-major");
-    break;
-  case ngrt4n::Critical:
-    cssClass.append("severity-critical");
-    break;
-  case ngrt4n::Unknown:
-    cssClass.append("severity-unknown");
-    break;
-  default:
-    cssClass.append("default-item-background");
-    break;
+    case ngrt4n::Normal:
+      cssClass.append("severity-normal");
+      break;
+    case ngrt4n::Minor:
+      cssClass.append("severity-minor");
+      break;
+    case ngrt4n::Major:
+      cssClass.append("severity-major");
+      break;
+    case ngrt4n::Critical:
+      cssClass.append("severity-critical");
+      break;
+    case ngrt4n::Unknown:
+      cssClass.append("severity-unknown");
+      break;
+    default:
+      cssClass.append("default-item-background");
+      break;
   }
   return cssClass;
 }
@@ -139,11 +139,18 @@ std::string ngrt4n::timeTextFromQtTimeText(const std::string& qtimeText)
 }
 
 
-Wt::WString ngrt4n::wHumanTimeText(const std::string& mytime_t)
+
+Wt::WString ngrt4n::wHumanTimeText(long mytime_t)
 {
   Wt::WDateTime t;
-  t.setTime_t(QString(mytime_t.c_str()).toUInt());
+  t.setTime_t(mytime_t);
   return t.toString();
+}
+
+
+Wt::WString ngrt4n::wHumanTimeText(const std::string& mytime_t)
+{
+  return wHumanTimeText( QString(mytime_t.c_str()).toUInt() );
 }
 
 Wt::WString ngrt4n::wTimeToNow(const std::string& mytime_t)
@@ -171,22 +178,22 @@ Wt::WColor ngrt4n::severityWColor(const int& _criticity)
 {
   Wt::WColor color;
   switch (static_cast<ngrt4n::SeverityT>(_criticity)) {
-  case ngrt4n::Normal:
-    color = Wt::WColor("#00ff00");
-    break;
-  case ngrt4n::Minor:
-    color = Wt::WColor("#ffff00");
-    break;
-  case ngrt4n::Major:
-    color = Wt::WColor("#ffa500");
-    break;
-  case ngrt4n::Critical:
-    color = Wt::WColor("#ff0000");
-    break;
-  case ngrt4n::Unknown:
-  default:
-    color = Wt::WColor(" #c0c0c0");
-    break;
+    case ngrt4n::Normal:
+      color = Wt::WColor("#00ff00");
+      break;
+    case ngrt4n::Minor:
+      color = Wt::WColor("#ffff00");
+      break;
+    case ngrt4n::Major:
+      color = Wt::WColor("#ffa500");
+      break;
+    case ngrt4n::Critical:
+      color = Wt::WColor("#ff0000");
+      break;
+    case ngrt4n::Unknown:
+    default:
+      color = Wt::WColor(" #c0c0c0");
+      break;
   }
   return color;
 }
@@ -234,3 +241,4 @@ void ngrt4n::googleAnalyticsLogger(void)
 {
   wApp->doJavaScript("ga('create', 'UA-8836482-12', 'auto'); ga('send', 'pageview');");
 }
+
