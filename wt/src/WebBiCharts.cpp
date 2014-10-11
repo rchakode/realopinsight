@@ -28,10 +28,15 @@
 
 
 namespace {
-  const double BI_CHART_WIDTH = 300;
-  const double BI_CHART_HEIGHT = 150;
-  const double BI_CHART_MARGIN = 25;
+  const double BI_CHART_AREA_WIDTH = 300;
+  const double BI_CHART_AREA_HEIGHT = 150;
+  const double BI_CHART_AREA_MARGIN = 25;
+  const double BI_CHART_WIDTH = BI_CHART_AREA_WIDTH;
   const double BI_CHART_TREND_HEIGHT = 50;
+  const double AREA_TOP_CORNER_Y = BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
+  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
+  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
+  const Wt::WColor TRANSPARENT_COLOR = Wt::WColor(0, 0, 0, 0);
 }
 
 QosTrendsChart::QosTrendsChart(const std::string& viewName,
@@ -42,80 +47,90 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
 {
   setStyleClass("bi-chart");
   setMargin(5, Wt::Top | Wt::Bottom);
-  setMargin(BI_CHART_MARGIN, Wt::Left | Wt::Right);
-  setLayoutSizeAware(false);
-  resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
+  setMargin(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Right);
+  setLayoutSizeAware(true);
   filteringPlottingData(data);
 }
-
 
 void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
 {
   std::list<DbQosDataT>::const_iterator qosit = data.begin();
   m_plottingData.clear();
+  m_countNormal = 0;
 
   if (! data.empty()) {
     m_plottingData.push_back({qosit->timestamp, qosit->status});
     TimeStatusT last = m_plottingData.back();
+    updateCountNormal(last.status);
     while (++qosit, qosit != data.end()) {
       if (last.status != qosit->status) {
         last = {qosit->timestamp, qosit->status};
         m_plottingData.push_back(last);
       }
+      updateCountNormal(qosit->status);
     }
     // always insert the last point, could be duplicated...
     --qosit;
     m_plottingData.push_back({qosit->timestamp, qosit->status});
+    m_sla = (double)m_countNormal / data.size();
   }
 }
 
 
 void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 {
-  const Wt::WColor TRANSPARENT_COLOR = Wt::WColor(0, 0, 0, 0);
-  const double AREA_TOP_CORNER_Y = BI_CHART_HEIGHT - BI_CHART_MARGIN - BI_CHART_TREND_HEIGHT;
-  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
-
   if (! m_plottingData.empty()) {
+
     TimeStatusT firstPoint = m_plottingData.front();
+    TimeStatusT lastPoint = m_plottingData.last();
+    const double SCALING_FACTOR = BI_CHART_WIDTH / (double)(lastPoint.timestamp - firstPoint.timestamp);
+
     TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
     TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
     double x1 = 0;
     double x2 = 0;
-    Wt::WString textLegend = "";
     Wt::WPainter painter(paintDevice);
     painter.setPen(TRANSPARENT_COLOR); // invisible
     while (++currentIt, currentIt != m_plottingData.end()) {
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
-      x1 = previousIt->timestamp - firstPoint.timestamp;
-      x2 = currentIt->timestamp - firstPoint.timestamp;
-      textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
+      x1 = SCALING_FACTOR * (previousIt->timestamp - firstPoint.timestamp);
+      x2 = SCALING_FACTOR * (currentIt->timestamp - firstPoint.timestamp);
 
       painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
-      drawRotatedLegendText(painter, textLegend, x1, TEXT_TOP_CORNER_Y, -80);
+      drawRotatedLegendText(painter,
+                            ngrt4n::timet2String(previousIt->timestamp),
+                            x1, TEXT_TOP_CORNER_Y, -90);
 
       previousIt = currentIt;
     }
-    textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
-    drawRotatedLegendText(painter, textLegend, x2 - 100, TEXT_TOP_CORNER_Y, -80);
+    drawRotatedLegendText(painter, ngrt4n::timet2String(lastPoint.timestamp),
+                          BI_CHART_WIDTH, TEXT_TOP_CORNER_Y, -90, -15);
+
+    painter.drawText(0, 0,
+                     Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+                     Wt::AlignLeft,
+                     QObject::tr("SLA: %1 \%").arg(QString::number(m_sla, 'f', 2)).toStdString());
   }
+  resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
 
 
 void QosTrendsChart::drawRotatedLegendText(Wt::WPainter& painter,
                                            const Wt::WString& text,
-                                           double x, double y, double angle)
+                                           double x,
+                                           double y,
+                                           double angle,
+                                           double shiftLegendXPos)
 {
-  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
-
   painter.save();
   painter.setPen(LEGEND_TEXT_COLOR);
-  painter.translate(x, y);
+  painter.drawLine(x, y, x, y + BI_CHART_TREND_HEIGHT + 10);
+  painter.translate(x + shiftLegendXPos, y);
   painter.rotate(angle);
   painter.drawText(0, 0,
                    Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                   Wt::AlignLeft | Wt::AlignLeft,
+                   Wt::AlignLeft,
                    text);
   painter.restore();
 }
@@ -130,7 +145,7 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
 {
   setStyleClass("bi-chart");
   setLegendEnabled(false);
-  setPlotAreaPadding(BI_CHART_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
+  setPlotAreaPadding(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
   setModel(m_model);
@@ -179,5 +194,5 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
     addSeries(serie);
   }
 
-  resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
+  resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }

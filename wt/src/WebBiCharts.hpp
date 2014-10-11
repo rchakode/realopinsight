@@ -26,6 +26,7 @@
 #define WEBBIREPORTBUILDER_HPP
 
 #include "DbObjects.hpp"
+#include "Base.hpp"
 #include <QList>
 #include<fstream>
 #include <Wt/Chart/WCartesianChart>
@@ -62,12 +63,18 @@ private:
   typedef QList<TimeStatusT> TimeStatusesT;
   TimeStatusesT m_plottingData;
   std::string m_viewName;
+  long m_countNormal;
+  double m_sla;
+
 
 
   void filteringPlottingData(const std::list<DbQosDataT>& data);
+  void updateCountNormal(int status) {if (status == ngrt4n::Normal) ++m_countNormal;}
   void drawRotatedLegendText(Wt::WPainter& painter,
-                       const Wt::WString& text,
-                       double x, double y, double angle);
+                             const Wt::WString& text,
+                             double x, double y,
+                             double angle,
+                             double shiftLegendXPos = 0);
 };
 
 
