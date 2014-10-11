@@ -25,6 +25,7 @@
 #include "WebUtils.hpp"
 #include "WebMap.hpp"
 #include <iostream>
+#include <fstream>
 #include "utilsCore.hpp"
 #include "WebPieChart.hpp"
 #include <Wt/WPointF>
@@ -34,7 +35,6 @@
 #include <Wt/WWidget>
 #include <Wt/WScrollBar>
 #include <Wt/WSvgImage>
-#include<fstream>
 #include <boost/filesystem/operations.hpp>
 
 namespace {
@@ -260,6 +260,7 @@ void WebMap::updateThumbnail(void)
   }
   std::ofstream output(WWW_ROOT + "/" + m_thumbnailPath);
   thumbnailImg.write(output);
+  output.close();
 
   m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
 }

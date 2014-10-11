@@ -25,6 +25,9 @@
 #ifndef WEBBIREPORTBUILDER_HPP
 #define WEBBIREPORTBUILDER_HPP
 
+#include "DbObjects.hpp"
+#include <QList>
+#include<fstream>
 #include <Wt/Chart/WCartesianChart>
 #include <Wt/Chart/WDataSeries>
 #include <Wt/WAbstractItemModel>
@@ -38,9 +41,8 @@
 #include <Wt/WShadow>
 #include <Wt/WPaintedWidget>
 #include <Wt/WStandardItemModel>
-#include "DbObjects.hpp"
-#include <QList>
-
+#include <Wt/WPainter>
+#include <Wt/WSvgImage>
 
 class QosTrendsChart : public  Wt::WPaintedWidget
 {
@@ -63,6 +65,9 @@ private:
 
 
   void filteringPlottingData(const std::list<DbQosDataT>& data);
+  void drawRotatedLegendText(Wt::WPainter& painter,
+                       const Wt::WString& text,
+                       double x, double y, double angle);
 };
 
 

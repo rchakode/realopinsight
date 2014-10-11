@@ -25,12 +25,13 @@
 #include "WebBiCharts.hpp"
 #include "WebUtils.hpp"
 #include <QDebug>
-#include <Wt/WPainter>
 
 
 namespace {
   const double BI_CHART_WIDTH = 300;
   const double BI_CHART_HEIGHT = 150;
+  const double BI_CHART_MARGIN = 25;
+  const double BI_CHART_TREND_HEIGHT = 50;
 }
 
 QosTrendsChart::QosTrendsChart(const std::string& viewName,
@@ -39,7 +40,9 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
   : Wt::WPaintedWidget(parent),
     m_viewName(viewName)
 {
-  setMargin(5, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
+  setStyleClass("bi-chart");
+  setMargin(5, Wt::Top | Wt::Bottom);
+  setMargin(BI_CHART_MARGIN, Wt::Left | Wt::Right);
   setLayoutSizeAware(false);
   resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
   filteringPlottingData(data);
@@ -69,41 +72,51 @@ void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
 
 void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 {
-  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0);
   const Wt::WColor TRANSPARENT_COLOR = Wt::WColor(0, 0, 0, 0);
-  const double TOP_CORNER_Y = 0;
-  const double BOTTOM_CORNER_Y = 50;
+  const double AREA_TOP_CORNER_Y = BI_CHART_HEIGHT - BI_CHART_MARGIN - BI_CHART_TREND_HEIGHT;
+  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
 
   if (! m_plottingData.empty()) {
     TimeStatusT firstPoint = m_plottingData.front();
     TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
     TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
-    Wt::WPainter painter(paintDevice);
     double x1 = 0;
     double x2 = 0;
+    Wt::WString textLegend = "";
+    Wt::WPainter painter(paintDevice);
+    painter.setPen(TRANSPARENT_COLOR); // invisible
     while (++currentIt, currentIt != m_plottingData.end()) {
-      painter.setPen(TRANSPARENT_COLOR); // invisible
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
       x1 = previousIt->timestamp - firstPoint.timestamp;
       x2 = currentIt->timestamp - firstPoint.timestamp;
-      painter.drawRect(x1, TOP_CORNER_Y, x2, BOTTOM_CORNER_Y);
-
-      painter.setPen(LEGEND_TEXT_COLOR);
-      painter.drawText(x1, BOTTOM_CORNER_Y + 10,
-                       Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                       Wt::AlignLeft,
-                       ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm"));
+      painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
+      textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
+      drawRotatedLegendText(painter, textLegend, x1, TEXT_TOP_CORNER_Y, -80);
       previousIt = currentIt;
     }
-    //    painter.setPen(LEGEND_TEXT_COLOR);
-    //    painter.drawText(x1, 60,
-    //                     Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-    //                     Wt::AlignLeft,
-    //                     ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm"));
+    textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
+    drawRotatedLegendText(painter, textLegend, x2 - 100, TEXT_TOP_CORNER_Y, -80);
   }
 }
 
+
+void QosTrendsChart::drawRotatedLegendText(Wt::WPainter& painter,
+                                           const Wt::WString& text,
+                                           double x, double y, double angle)
+{
+  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
+
+  painter.save();
+  painter.setPen(LEGEND_TEXT_COLOR);
+  painter.translate(x, y);
+  painter.rotate(angle);
+  painter.drawText(0, 0,
+                   Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+                   Wt::AlignLeft | Wt::AlignLeft,
+                   text);
+  painter.restore();
+}
 
 
 RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
@@ -113,9 +126,9 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
     m_model(new Wt::WStandardItemModel(data.size(), 7, this)),
     m_viewName(viewName)
 {
+  setStyleClass("bi-chart");
   setLegendEnabled(false);
-  setPlotAreaPadding(40, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
-  setBackground(Wt::WColor(248, 254, 252));
+  setPlotAreaPadding(BI_CHART_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
   setModel(m_model);
