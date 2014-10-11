@@ -58,7 +58,7 @@ private:
     int status;
   };
   typedef QList<TimeStatusT> TimeStatusesT;
-  TimeStatusesT m_plottingPoints;
+  TimeStatusesT m_plottingData;
   std::string m_viewName;
 
 

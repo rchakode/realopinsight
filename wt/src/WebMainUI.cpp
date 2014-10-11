@@ -774,11 +774,12 @@ void WebMainUI::initOperatorDashboard(void)
   ViewQosDataMapT qosInfos;
   long now = time(NULL);
   if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
-    bigraphsLayout->addWidget(new Wt::WText(Q_TR("<h5 align=\"center\">QoS and SLA</h5>"), Wt::XHTMLText), 0, 0);
-    bigraphsLayout->addWidget(new Wt::WText(Q_TR("<h5 align=\"center\">IT Problem Trends</h5>"), Wt::XHTMLText), 0, 1);
-    int biIndex = 1;
+    int biIndex = 0;
     for (const auto& view: m_dbSession->viewList()) {
-      bigraphsLayout->addWidget(new QosTrendsChart(view.name, qosInfos[view.name]), biIndex, 0);
+      bigraphsLayout->addWidget(new Wt::WText(
+                                  QObject::tr("<h5>%1</h5>").arg(view.name.c_str()).toStdString(),
+                                  Wt::XHTMLText), biIndex, 0, 1, 2, Wt::AlignLeft);
+      bigraphsLayout->addWidget(new QosTrendsChart(view.name, qosInfos[view.name]), ++biIndex, 0);
       bigraphsLayout->addWidget(new RawQosTrendsChart(view.name, qosInfos[view.name]), biIndex, 1);
       ++biIndex;
     }

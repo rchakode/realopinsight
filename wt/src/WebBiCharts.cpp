@@ -39,6 +39,9 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
   : Wt::WPaintedWidget(parent),
     m_viewName(viewName)
 {
+  setMargin(5, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
+  setLayoutSizeAware(false);
+  resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
   filteringPlottingData(data);
 }
 
@@ -46,50 +49,59 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
 void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
 {
   std::list<DbQosDataT>::const_iterator qosit = data.begin();
-  m_plottingPoints.clear();
+  m_plottingData.clear();
 
   if (! data.empty()) {
-    m_plottingPoints.push_back({qosit->timestamp, qosit->status});
-    TimeStatusT last = m_plottingPoints.back();
+    m_plottingData.push_back({qosit->timestamp, qosit->status});
+    TimeStatusT last = m_plottingData.back();
     while (++qosit, qosit != data.end()) {
       if (last.status != qosit->status) {
         last = {qosit->timestamp, qosit->status};
-        m_plottingPoints.push_back(last);
+        m_plottingData.push_back(last);
       }
     }
     // always insert the last point, could be duplicated...
     --qosit;
-    m_plottingPoints.push_back({qosit->timestamp, qosit->status});
+    m_plottingData.push_back({qosit->timestamp, qosit->status});
   }
 }
 
 
 void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 {
-  Wt::WPainter painter(paintDevice);
-  if (! m_plottingPoints.empty()) {
-    TimeStatusT firstPoint = m_plottingPoints.front();
-    TimeStatusesT::ConstIterator currentIt = m_plottingPoints.begin();
-    TimeStatusesT::ConstIterator previousIt = m_plottingPoints.begin();
-    while (++currentIt, currentIt != m_plottingPoints.end()) {
-      painter.setPen(Wt::WColor(0, 0, 0, 0)); // invisible
+  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0);
+  const Wt::WColor TRANSPARENT_COLOR = Wt::WColor(0, 0, 0, 0);
+  const double TOP_CORNER_Y = 0;
+  const double BOTTOM_CORNER_Y = 50;
+
+  if (! m_plottingData.empty()) {
+    TimeStatusT firstPoint = m_plottingData.front();
+    TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
+    TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
+    Wt::WPainter painter(paintDevice);
+    double x1 = 0;
+    double x2 = 0;
+    while (++currentIt, currentIt != m_plottingData.end()) {
+      painter.setPen(TRANSPARENT_COLOR); // invisible
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
-      double x1 = previousIt->timestamp - firstPoint.timestamp;
-      double x2 = currentIt->timestamp - firstPoint.timestamp;
-      painter.drawRect(x1, 0, x2, 50);
+      x1 = previousIt->timestamp - firstPoint.timestamp;
+      x2 = currentIt->timestamp - firstPoint.timestamp;
+      painter.drawRect(x1, TOP_CORNER_Y, x2, BOTTOM_CORNER_Y);
 
-
-      painter.setPen(Wt::WColor(125, 125, 125));
-      painter.drawText(x1, 60,
+      painter.setPen(LEGEND_TEXT_COLOR);
+      painter.drawText(x1, BOTTOM_CORNER_Y + 10,
                        Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                       Wt::AlignCenter,
-                       ngrt4n::wHumanTimeText(currentIt->timestamp));
+                       Wt::AlignLeft,
+                       ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm"));
       previousIt = currentIt;
     }
+    //    painter.setPen(LEGEND_TEXT_COLOR);
+    //    painter.drawText(x1, 60,
+    //                     Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+    //                     Wt::AlignLeft,
+    //                     ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm"));
   }
-
-  resize(BI_CHART_WIDTH, BI_CHART_HEIGHT);
 }
 
 
@@ -101,6 +113,11 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
     m_model(new Wt::WStandardItemModel(data.size(), 7, this)),
     m_viewName(viewName)
 {
+  setLegendEnabled(false);
+  setPlotAreaPadding(40, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
+  setBackground(Wt::WColor(248, 254, 252));
+  setType(Wt::Chart::ScatterPlot);
+  axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
   setModel(m_model);
 
   m_model->setHeaderData(0, Q_TR("Date/time"));
@@ -136,14 +153,7 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
     ++row;
   }
 
-  setBackground(Wt::WColor(248, 254, 252));
   setXSeriesColumn(0);
-  setLegendEnabled(true);
-  setType(Wt::Chart::ScatterPlot);
-  axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
-  setPlotAreaPadding(40, Wt::Left | Wt::Top | Wt::Bottom);
-  setPlotAreaPadding(120, Wt::Right);
-
   for (int i = 6; i>=2; --i) {
     Wt::Chart::WDataSeries serie(i, Wt::Chart::CurveSeries);
     Wt::WColor color = ngrt4n::severityWColor(i - 2);

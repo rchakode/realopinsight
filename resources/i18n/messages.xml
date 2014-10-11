@@ -146,8 +146,8 @@
        <div class="ngrt4n-content">
          <legend>Summary of Business Service Health</legend>
            ${thumbnails}
-           <hr />
            <legend>BI Reports</legend>
+           <hr width="40%" />
            ${bigraphs}
        </div>
     </div>

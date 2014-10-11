@@ -51,6 +51,7 @@ namespace ngrt4n {
   Wt::WWidget* footer(void);
   std::string sqliteDbPath(void);
   std::string timeTextFromQtTimeText(const std::string& qtimeText);
+  Wt::WString timet2String(long mytime_t, const std::string& format);
   Wt::WString wHumanTimeText(long mytime_t);
   Wt::WString wHumanTimeText(const std::string& mytime_t);
   Wt::WString wTimeToNow(const std::string& mytime_t);

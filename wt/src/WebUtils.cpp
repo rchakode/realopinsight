@@ -150,24 +150,28 @@ Wt::WString ngrt4n::wHumanTimeText(long mytime_t)
 
 Wt::WString ngrt4n::wHumanTimeText(const std::string& mytime_t)
 {
-  return wHumanTimeText( QString(mytime_t.c_str()).toUInt() );
+  return wHumanTimeText(QString(mytime_t.c_str()).toUInt() );
 }
 
 Wt::WString ngrt4n::wTimeToNow(const std::string& mytime_t)
 {
-  Wt::WDateTime t;
-  t.setTime_t(QString(mytime_t.c_str()).toUInt());
-
-  return t.timeTo(Wt::WDateTime::currentDateTime());
+  Wt::WDateTime dt;
+  dt.setTime_t(QString(mytime_t.c_str()).toUInt());
+  return dt.timeTo(Wt::WDateTime::currentDateTime());
 }
 
+Wt::WString ngrt4n::timet2String(long mytime_t, const std::string& format)
+{
+  Wt::WDateTime dt;
+  dt.setTime_t(mytime_t);
+  return dt.toString(format);
+}
 
 Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
 {
   Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
                                               " <i class=\"%1\"></i>"
-                                              "</span>")
-                                  .arg(iconClasses.c_str()).toStdString(),
+                                              "</span>").arg(iconClasses.c_str()).toStdString(),
                                   Wt::XHTMLText);
   link->setToolTip(tip);
   return link;
