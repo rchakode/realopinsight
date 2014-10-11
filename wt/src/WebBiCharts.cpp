@@ -90,13 +90,15 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 
       x1 = previousIt->timestamp - firstPoint.timestamp;
       x2 = currentIt->timestamp - firstPoint.timestamp;
-      painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
       textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
+
+      painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
       drawRotatedLegendText(painter, textLegend, x1, TEXT_TOP_CORNER_Y, -80);
+
       previousIt = currentIt;
     }
     textLegend = ngrt4n::timet2String(previousIt->timestamp, "dd/MM-hh:mm");
-    drawRotatedLegendText(painter, textLegend, x2 - 100, TEXT_TOP_CORNER_Y, -80);
+    drawRotatedLegendText(painter, textLegend, x2 + 150, TEXT_TOP_CORNER_Y, -80);
   }
 }
 
