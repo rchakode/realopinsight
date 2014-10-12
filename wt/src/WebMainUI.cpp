@@ -51,6 +51,8 @@
   "$(\"#ngrt4n-content-pane\").height(windowHeight - top);" \
   "$(\"#ngrt4n-side-pane\").height(windowHeight - top);"
 
+#define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
+
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
     m_terminateSession(this),
@@ -940,10 +942,8 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 
 void WebMainUI::updateBiCharts(void)
 {
-  //BI reports for last 30 days: 30 * 24 * 3600
   ViewQosDataMapT qosInfos;
-  long now = time(NULL);
-  if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
+  if (m_dbSession->fetchQosInfos(qosInfos, LAST_30_DAYS) == 0) {
     m_dbSession->updateViewList(m_dbSession->loggedUser().username);
     for (const auto& view: m_dbSession->viewList()) {
       updateViewBiCharts(view.name, qosInfos[view.name]);

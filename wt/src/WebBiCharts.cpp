@@ -172,6 +172,7 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
   setPlotAreaPadding(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
+  updateData(data);
 }
 
 

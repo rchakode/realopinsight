@@ -129,6 +129,7 @@ private:
   DashTabWidgetsT m_dashTabWidgets;
   QosTrendsChartList m_qosCharts;
   RawQosTrendsChartList m_rawQosCharts;
+  ViewQosDataMapT m_qosData;
 
 
   /** member methods with return value*/
