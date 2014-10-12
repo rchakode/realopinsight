@@ -177,7 +177,7 @@ void SvCreator::loadFile(const QString& _path)
 void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 {
   GuiPreferences preferences(Auth::OpUserRole, Preferences::NoForm);
-  preferences.initSourceStatesFromData();
+  preferences.updateSourceStates();
   SourceT srcInfo;
   QStringList sourceList;
   for (int i = 0; i< MAX_SRCS; ++i) {

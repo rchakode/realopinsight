@@ -41,6 +41,7 @@ Preferences::Preferences(void)
     m_currentSourceIndex(0),
     m_sourceStates(new QBitArray(MAX_SRCS))
 {
+  updateSourceStates();
 }
 
 
@@ -52,7 +53,6 @@ Preferences::~Preferences()
 
 void Preferences::loadProperties(void)
 {
-  setSourceStatesFromData(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
   updateAllSourceWidgetStates();
   updateFields();
 }
@@ -65,23 +65,20 @@ QString Preferences::getSourceStatesSerialized(void)
   return str;
 }
 
-void Preferences::initSourceStatesFromData(void)
+void Preferences::updateSourceStates(void)
 {
-  setSourceStatesFromData(m_settings->value(Settings::SRC_BUCKET_KEY).toString());
-}
-
-void Preferences::setSourceStatesFromData(const QString& str)
-{
-  if (str.isEmpty()) {
+  QString content = m_settings->value(Settings::SRC_BUCKET_KEY).toString();
+  if (content.isEmpty()) {
     for (int i=0; i < MAX_SRCS; ++i) {
       m_sourceStates->setBit(i, false);
     }
   } else {
     for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, str.at(i) == '1');
+      m_sourceStates->setBit(i, content.at(i) == '1');
     }
   }
 }
+
 
 
 int Preferences::firstSourceSet()
