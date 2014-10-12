@@ -1,6 +1,11 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.1.1
+  * Fixed problem when the average calculation rule with threshold always returns
+    average severity
+  * Misc fixes on contextual messages
+
 3.1.0
   * Added the support of weighting services (see ticket #45). Weighting enables
     you to associate a weight factor with a service. The weight factor can be any
