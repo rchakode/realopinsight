@@ -273,6 +273,8 @@ struct NodeT {
   qint8 visibility;
   double pos_x;
   double pos_y;
+  double text_w;
+  double text_h;
   NodeT(): sev_crule(PropRules::Unchanged),
     sev_prule(CalcRules::Worst),
     sev(ngrt4n::Unknown),

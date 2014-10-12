@@ -33,18 +33,18 @@
 #include <QTranslator>
 #include <QObject>
 
-QString  usage = "usage: %1 [OPTION] [view_config]\n"
+QString  usage = "usage: %1 [OPTION] [description_file]\n"
     "Options: \n"
     "	-c\n"
-    "	   Launch the configuration utility\n"
+    "	   Launches the Configuration Manager\n"
     "	-e [view_config]\n"
-    "	   Run the VE utility and load the file view_config if specified\n"
+    "	   Runs the Editor and loads the given description file specified\n"
     "	-d view_config\n"
-    "	   Run the Operations Console and load the file view_config\n"
+    "	   Runs the Operations Console and loads the given description file specified\n"
     "	-v\n"
-    "	  Print version and license information.\n"
+    "	  Prints version and licenses information.\n"
     "	-h \n"
-    "	   Print this help.\n";
+    "	   Prints this help.\n";
 
 
 int main(int argc, char **argv)
@@ -95,15 +95,15 @@ int main(int argc, char **argv)
     ngrt4n::delay(1);
     if (file == "") {
       info->clearMessage();
-      info->showMessage(QObject::tr("You need to select a configuration file!"), Qt::AlignCenter|Qt::AlignCenter);
+      info->showMessage(QObject::tr("You need to select a description file!"), Qt::AlignCenter|Qt::AlignCenter);
       ngrt4n::delay(1); info->finish(0);
       file = QFileDialog::getOpenFileName(0,
-                                          QObject::tr("%1 | Select a configuration file").arg(APP_NAME),
+                                          QObject::tr("%1 | Select a description file").arg(APP_NAME),
                                           ".",
                                           QObject::tr("Xml files (*.xml);;All files (*)"));
 
       if (!file.length()){
-        ngrt4n::alert(QObject::tr("No configuration file has been selected and the program will exit!"));
+        ngrt4n::alert(QObject::tr("No description file has been selected and the program will exit!"));
         exit (1);
       }
 

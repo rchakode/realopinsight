@@ -3,8 +3,7 @@
 #include <cfloat>
 
 
-StatusAggregator::StatusAggregator(const QVector<ThresholdT>& thresholdLimits)
-  : m_thresholdsLimits(thresholdLimits)
+StatusAggregator::StatusAggregator(void)
 {
   resetData();
 }
@@ -12,8 +11,8 @@ StatusAggregator::StatusAggregator(const QVector<ThresholdT>& thresholdLimits)
 void StatusAggregator::resetData(void)
 {
   m_severityWeightsMap.clear();
+  m_thresholdExceededMsg.clear();
   m_statusRatios.clear();
-  m_thresholdsLimits.clear();
   m_count = 0;
   m_essentialCount = 0;
   m_nonEssentialTotalWeight = 0;
@@ -55,10 +54,10 @@ void StatusAggregator::addSeverity(int value, double weight)
   ++m_count;
 }
 
-void StatusAggregator::addThresholdLimit(const ThresholdT& th)
+void StatusAggregator::addThresholdLimit(QVector<ThresholdT>& thresholdsLimits, const ThresholdT& th)
 {
-  m_thresholdsLimits.push_back(th);
-  qSort(m_thresholdsLimits.begin(), m_thresholdsLimits.end(), ThresholdLessthanFnt());
+  thresholdsLimits.push_back(th);
+  qSort(thresholdsLimits.begin(), thresholdsLimits.end(), ThresholdLessthanFnt());
 }
 
 
@@ -87,7 +86,7 @@ QString StatusAggregator::toDetailsString(void)
 }
 
 
-int StatusAggregator::aggregate(int crule)
+int StatusAggregator::aggregate(int crule, const QVector<ThresholdT>& thresholdsLimits)
 {
   m_thresholdExceededMsg.clear();
   if (m_statusRatios.isEmpty())
@@ -99,7 +98,7 @@ int StatusAggregator::aggregate(int crule)
     result = weightedAverage();
     break;
   case CalcRules::WeightedAverageWithThresholds:
-    result = weightedAverageWithThresholds();
+    result = weightedAverageWithThresholds(thresholdsLimits);
     break;
   case CalcRules::Worst:
   default:
@@ -149,16 +148,16 @@ int StatusAggregator::weightedAverage(void)
   return qMax(qRound(severityScore / weightSum), m_maxEssential);
 }
 
-int StatusAggregator::weightedAverageWithThresholds(void)
+int StatusAggregator::weightedAverageWithThresholds(const QVector<ThresholdT>& thresholdsLimits)
 {
   int thresholdReached = -1;
-  int index = m_thresholdsLimits.size() - 1;
+  int index = thresholdsLimits.size() - 1;
 
   while (index >= 0 && thresholdReached == -1) {
-    ThresholdT th = m_thresholdsLimits[index];
+    ThresholdT th = thresholdsLimits[index];
     QMap<int, double>::iterator thvalue = m_statusRatios.find(th.sev_in);
     if (thvalue != m_statusRatios.end() && (*thvalue >= th.weight)) {
-      thresholdReached = m_thresholdsLimits[index].sev_out;
+      thresholdReached = thresholdsLimits[index].sev_out;
       m_thresholdExceededMsg = QObject::tr("%1 events exceeded %2\% and set to %3").arg(Severity(th.sev_in).toString(),
                                                                                         QString::number(100 * th.weight),
                                                                                         Severity(th.sev_out).toString()
