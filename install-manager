@@ -214,6 +214,11 @@ install_fcgi() {
   make -j${NCPU} 1>>install.log
 }
 
+install_reportd() {
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-reportd ${dflag}
+  make -j${NCPU} 1>>install.log
+}
+
 install_ultimate() {
   echo "==>Installing RealOpInsight Ultimate..."
 
@@ -262,6 +267,9 @@ install_ultimate() {
   else
     echo "DEBUG : Building RealOpInsight for FastCGI..."
     install_fcgi
+
+    echo "DEBUG : Building QoS Data collector"
+    install_reportd
   fi
 
   echo "DEBUG : Installing setting files..."
@@ -272,6 +280,7 @@ install_ultimate() {
     REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
   fi
   install -d ${REALOPINSIGHT_CONFIG}
+  install -d ${REALOPINSIGHT_CONFIG}/bin
   install -d ${REALOPINSIGHT_CONFIG}/etc
   install -d ${REALOPINSIGHT_CONFIG}/data
   install -d ${REALOPINSIGHT_CONFIG}/log
@@ -282,6 +291,7 @@ install_ultimate() {
   install contribs/index.html ${REALOPINSIGHT_WWW}/
   install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
   install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
+  install -m 755 realopinsight-reportd ${REALOPINSIGHT_CONFIG}/bin
   
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
