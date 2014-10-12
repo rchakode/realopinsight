@@ -90,10 +90,16 @@ check_exit_code()
 
 update_db_2014b3()
 {
-  echo -n "DEBUG : Updating database..."
-  su - ${REALOPINSIGHT_WWW_USER} -c'echo "ALTER TABLE user ADD COLUMN authsystem int not null default 0;" \
-                | sqlite3 /opt/realopinsight/data/realopinsight.db'
-				
+  echo -n "DEBUG : Updating database to 2014b3..."
+  su - ${REALOPINSIGHT_WWW_USER} -c "sqlite3 /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b3.sql"
+  check_exit_code
+}
+
+
+update_db_2014b7()
+{
+  echo -n "DEBUG : Updating database to 2014b7..."
+  su - ${REALOPINSIGHT_WWW_USER} -c "sqlite3 /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b7.sql"
   check_exit_code
 }
 
@@ -104,19 +110,23 @@ get_target_version_from_user()
   echo
   echo "1) 3.0.0b1"
   echo "2) 3.0.0b2"
-  echo "3) Other"
+  echo "3) from 2014b3 to 2014b6"
+  echo "4) Other"
   echo "q) Quit"
   echo
   while true; do
     read -p "Type response " rep
     case $rep in
-	  1) INSTALLED_VERSION=3.0.0b1 
+          1) INSTALLED_VERSION="3.0.0b1"
 	      break
 		  ;;
-	  2) INSTALLED_VERSION=3.0.0b2 
+          2) INSTALLED_VERSION="3.0.0b2"
 	     break
 		 ;;
-          3) INSTALLED_VERSION="Other";
+          3) INSTALLED_VERSION="2014b3-2014b6"
+             break
+                 ;;
+          4) INSTALLED_VERSION="Other";
 	      break
 		  ;;
 	  q) exit 0 
@@ -145,16 +155,23 @@ echo -n "DEBUG : Installing sqlite3 CLI..."
 apt-get install -y sqlite3
 check_exit_code
 
-if [ "${INSTALLED_VERSION}" == "3.0.1b1" ] || [ "${INSTALLED_VERSION}" == "3.0.1b2" ]; then
+
+echo -n "DEBUG : Updating database..."
+if [ "${INSTALLED_VERSION}" == "3.0.0b1" ] || [ "${INSTALLED_VERSION}" == "3.0.0b2" ]; then
   update_db_2014b3
 fi
+
+if [ "${INSTALLED_VERSION}" == "2014b3-2014b6" ]; then
+  update_db_2014b7
+fi
+
 
 echo -n "DEBUG : Applying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
 tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
 check_exit_code
 
 echo -n "DEBUG : Restarting Apache..."
-/etc/init.d/apache2 start
+service apache2 restart
 check_exit_code
 
 echo "DEBUG: Upgrade completed. Backup file: ${REAlOPINSIGHT_BACKUP_FILE}"

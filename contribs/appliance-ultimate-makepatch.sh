@@ -41,7 +41,14 @@ tar --same-owner \
 	
 sed "s/$VERSION_TEMPLATE/$REAlOPINSIGHT_TARGET_VERSION/g" $MAKE_PATCH_SCRIPT \
      > ${RELEASE_TARBALL_BASENAME}/`basename $MAKE_PATCH_SCRIPT`
-cp contribs/README_UPDATE ${RELEASE_TARBALL_BASENAME}
+
+
+# copy the README FILE
+cp contribs/README_UPDATE ${RELEASE_TARBALL_BASENAME}/
+
+# copy database patch scripts
+mkdir ${RELEASE_TARBALL_BASENAME}/sql
+cp -r contribs/sql/*.sql ${RELEASE_TARBALL_BASENAME}/sql/
 
 chmod +x ${RELEASE_TARBALL_BASENAME}/*.sh
 
