@@ -305,7 +305,7 @@ bool DbSession::findView(const std::string& vname, DbViewT& view)
 void DbSession::initDb(void)
 {
   try {
-    WebPreferences pref;
+    WebPreferencesBase pref;
     if (pref.getDbState() != 1) {
       createTables();
       DbUserT adm;

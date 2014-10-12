@@ -265,11 +265,13 @@ install_ultimate() {
     install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
     install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
   else
-    echo "DEBUG : Building RealOpInsight for FastCGI..."
+    echo -n "DEBUG : Building RealOpInsight for FastCGI..."
     install_fcgi
+    echo done
 
-    echo "DEBUG : Building QoS Data collector"
+    echo -n "DEBUG : Building QoS Data collector..."
     install_reportd
+    echo done
   fi
 
   echo "DEBUG : Installing setting files..."

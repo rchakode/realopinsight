@@ -442,7 +442,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
         dashboardWidget = NULL;
       }
     }
-  } catch (const std::bad_alloc& ex) {
+  } catch (const std::bad_alloc&) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     LOG("error", errorMsg);
     delete dashboardWidget;

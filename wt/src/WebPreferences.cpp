@@ -46,7 +46,6 @@ namespace {
 WebPreferencesBase::WebPreferencesBase(void)
   : Preferences("/opt/realopinsight/etc/realopinsight.conf")
 {
-
 }
 
 

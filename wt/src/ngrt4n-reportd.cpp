@@ -50,6 +50,7 @@ void runCollector(int period, bool foreground)
     for (auto view: dbSession->viewList()) {
       QosCollector* collector = new QosCollector(view.path.c_str());
       collector->initialize(preferences.get());
+      collector->initSettings(preferences.get());
       mycollectors.push_back(collector);
     }
 
