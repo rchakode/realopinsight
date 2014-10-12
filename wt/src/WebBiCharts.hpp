@@ -89,11 +89,11 @@ public:
                     const std::list<DbQosDataT>& data,
                     Wt::WContainerWidget* parent=0);
   std::string viewName() const {return m_viewName;}
+  void updateData(const std::list<DbQosDataT>& data);
 
 private:
-
-  Wt::WStandardItemModel* m_model;
   std::string m_viewName;
+  Wt::WStandardItemModel* m_model;
 
   Wt::WFont customTitleFont(void);
   void setChartTitle(void);

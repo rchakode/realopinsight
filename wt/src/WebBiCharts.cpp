@@ -39,6 +39,13 @@ namespace {
   const Wt::WColor TRANSPARENT_COLOR = Wt::WColor(0, 0, 0, 0);
 }
 
+
+/**
+ * @brief QosTrendsChart::QosTrendsChart
+ * @param viewName
+ * @param data
+ * @param parent
+ */
 QosTrendsChart::QosTrendsChart(const std::string& viewName,
                                const std::list<DbQosDataT>& data,
                                Wt::WContainerWidget* parent)
@@ -145,52 +152,83 @@ void QosTrendsChart::drawRotatedLegendText(Wt::WPainter& painter,
 }
 
 
+
+
+/**
+ * @brief RawQosTrendsChart::RawQosTrendsChart
+ * @param viewName
+ * @param data
+ * @param parent
+ */
 RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
                                      const std::list<DbQosDataT>& data,
                                      Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
-    m_model(new Wt::WStandardItemModel(data.size(), 7, this)),
-    m_viewName(viewName)
+    m_viewName(viewName),
+    m_model(NULL)
 {
   setStyleClass("bi-chart");
   setLegendEnabled(false);
   setPlotAreaPadding(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
-  setModel(m_model);
+}
 
-  m_model->setHeaderData(0, Q_TR("Date/time"));
-  m_model->setHeaderData(1, Q_TR("Status"));
-  m_model->setHeaderData(2, Q_TR("% Normal"));
-  m_model->setHeaderData(3, Q_TR("% Minor"));
-  m_model->setHeaderData(4, Q_TR("% Major"));
-  m_model->setHeaderData(5, Q_TR("% Critical"));
-  m_model->setHeaderData(6, Q_TR("% Unknown"));
+
+Wt::WFont RawQosTrendsChart::customTitleFont(void)
+{
+  Wt::WFont ft;
+  return ft;
+}
+
+void RawQosTrendsChart::setChartTitle(void)
+{
+  setTitle(Q_TR("IT Problem Trends"));
+  setTitleFont(customTitleFont());
+}
+
+void RawQosTrendsChart::updateData(const std::list<DbQosDataT>& data)
+{
+  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
+
+
+  model->setHeaderData(0, Q_TR("Date/time"));
+  model->setHeaderData(1, Q_TR("Status"));
+  model->setHeaderData(2, Q_TR("% Normal"));
+  model->setHeaderData(3, Q_TR("% Minor"));
+  model->setHeaderData(4, Q_TR("% Major"));
+  model->setHeaderData(5, Q_TR("% Critical"));
+  model->setHeaderData(6, Q_TR("% Unknown"));
 
   int row = 0;
   for (const auto& entry : data) {
     Wt::WDateTime date;
     date.setTime_t(entry.timestamp);
-    m_model->setData(row, 0, date);
+    model->setData(row, 0, date);
 
-    m_model->setData(row, 1, entry.status);
+    model->setData(row, 1, entry.status);
 
     float cum = entry.normal;
-    m_model->setData(row, 2, cum);
+    model->setData(row, 2, cum);
 
     cum += entry.minor;
-    m_model->setData(row, 3, cum);
+    model->setData(row, 3, cum);
 
     cum += entry.major;
-    m_model->setData(row, 4, cum);
+    model->setData(row, 4, cum);
 
     cum += entry.critical;
-    m_model->setData(row, 5, cum);
+    model->setData(row, 5, cum);
 
     cum += entry.unknown;
-    m_model->setData(row, 6, cum);
+    model->setData(row, 6, cum);
     ++row;
   }
+
+  setModel(model);
+  if (m_model)
+    delete m_model;
+  m_model = model;
 
   setXSeriesColumn(0);
   for (int i = 6; i>=2; --i) {
@@ -205,17 +243,4 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
 
   setChartTitle();
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
-}
-
-
-Wt::WFont RawQosTrendsChart::customTitleFont(void)
-{
-  Wt::WFont ft;
-  return ft;
-}
-
-void RawQosTrendsChart::setChartTitle(void)
-{
-  setTitle(Q_TR("IT Problem Trends"));
-  setTitleFont(customTitleFont());
 }

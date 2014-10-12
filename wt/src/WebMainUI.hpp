@@ -165,6 +165,8 @@ private:
   void handleNewUserMenu(void);
   void handleViewAclMenu(void);
   void handleUserEnableStatusChanged(int status, std::string data);
+  void updateBiCharts(void);
+  void updateViewBiCharts(const std::string& viewName, const std::list<DbQosDataT>& qosInfos);
 };
 
 #endif // MAINWEBWINDOW_HPP

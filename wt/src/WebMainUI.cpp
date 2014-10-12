@@ -274,6 +274,8 @@ void WebMainUI::handleRefresh(void)
     m_dashTabWidgets[dash.second->rootNode().name]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
   }
 
+  updateBiCharts();
+
   // Set notification only for operator console
   if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
     for(auto ptype: problemTypeCount) {
@@ -771,19 +773,14 @@ void WebMainUI::initOperatorDashboard(void)
   }
 
 
-  //Build BI reports for last 30 days: 30 * 24 * 3600
-  ViewQosDataMapT qosInfos;
-  long now = time(NULL);
-  if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
-    int biIndex = 0;
-    for (const auto& view: m_dbSession->viewList()) {
-      m_qosCharts[view.name] = new QosTrendsChart(view.name, qosInfos[view.name]);
-      m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, qosInfos[view.name]);
-      bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0, 1, 2, Wt::AlignLeft);
-      bigraphsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
-      bigraphsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
-      ++biIndex;
-    }
+  int biIndex = 0;
+  for (const auto& view: m_dbSession->viewList()) {
+    m_qosCharts[view.name] = new QosTrendsChart(view.name, std::list<DbQosDataT>());
+    m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, std::list<DbQosDataT>());
+    bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0, 1, 2, Wt::AlignLeft);
+    bigraphsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
+    bigraphsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
+    ++biIndex;
   }
 
   if (thumbIndex > 0) {
@@ -940,3 +937,27 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
   }
 }
 
+
+void WebMainUI::updateBiCharts(void)
+{
+  //BI reports for last 30 days: 30 * 24 * 3600
+  ViewQosDataMapT qosInfos;
+  long now = time(NULL);
+  if (m_dbSession->fetchQosInfos(qosInfos, now - 30 * 24 * 3600, now) == 0) {
+    m_dbSession->updateViewList(m_dbSession->loggedUser().username);
+    for (const auto& view: m_dbSession->viewList()) {
+      updateViewBiCharts(view.name, qosInfos[view.name]);
+    }
+  }
+}
+
+void WebMainUI::updateViewBiCharts(const std::string& viewName, const std::list<DbQosDataT>& data)
+{
+  QosTrendsChartList::iterator qosChart = m_qosCharts.find(viewName);
+  if (qosChart != m_qosCharts.end())
+    qosChart->second->updateData(data);
+
+  RawQosTrendsChartList::iterator rawQosChart = m_rawQosCharts.find(viewName);
+  if (rawQosChart != m_rawQosCharts.end())
+    rawQosChart->second->updateData(data);
+}
