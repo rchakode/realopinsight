@@ -46,9 +46,9 @@ static const uint qt_meta_data_GuiDashboard[] = {
      342,  336,   13,   13, 0x0a,
      373,  364,   13,   13, 0x0a,
      397,  364,   13,   13, 0x0a,
-     425,  336,   13,   13, 0x0a,
-     456,   13,   13,   13, 0x0a,
-     480,   13,   13,   13, 0x0a,
+     425,   13,   13,   13, 0x0a,
+     448,  336,   13,   13, 0x0a,
+     479,   13,   13,   13, 0x0a,
 
        0        // eod
 };
@@ -68,8 +68,9 @@ static const char qt_meta_stringdata_GuiDashboard[] = {
     "handleTabChanged(int)\0_toggled\0"
     "toggleTroubleView(bool)\0"
     "toggleIncreaseMsgFont(bool)\0"
+    "handleSettingsLoaded()\0"
     "handleSourceBxItemChanged(int)\0"
-    "handleUpdateSourceUrl()\0handleSettingsLoaded()\0"
+    "handleUpdateSourceUrl()\0"
 };
 
 void GuiDashboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -92,9 +93,9 @@ void GuiDashboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 11: _t->handleTabChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 12: _t->toggleTroubleView((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 13: _t->toggleIncreaseMsgFont((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 14: _t->handleSourceBxItemChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 15: _t->handleUpdateSourceUrl(); break;
-        case 16: _t->handleSettingsLoaded(); break;
+        case 14: _t->handleSettingsLoaded(); break;
+        case 15: _t->handleSourceBxItemChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 16: _t->handleUpdateSourceUrl(); break;
         default: ;
         }
     }

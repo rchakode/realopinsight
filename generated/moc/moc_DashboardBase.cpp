@@ -41,23 +41,23 @@ static const uint qt_meta_data_DashboardBase[] = {
      202,   14,   14,   14, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     219,   14,   14,   14, 0x0a,
-     236,  232,   14,   14, 0x0a,
-     257,  232,   14,   14, 0x0a,
-     283,  232,   14,   14, 0x0a,
+     223,  219,   14,   14, 0x0a,
+     249,   14,   14,   14, 0x0a,
+     262,  219,   14,   14, 0x0a,
+     283,  219,   14,   14, 0x0a,
      312,   14,   14,   14, 0x0a,
-     328,  232,   14,   14, 0x0a,
-     377,  371,  351,   14, 0x0a,
-     408,  232,  403,   14, 0x0a,
-     441,  437,   14,   14, 0x0a,
-     483,   34,   14,   14, 0x0a,
-     526,  512,   14,   14, 0x0a,
-     562,   14,  551,   14, 0x0a,
-     577,   14,  570,   14, 0x0a,
-     588,   14,  403,   14, 0x0a,
-     613,  607,   14,   14, 0x0a,
-     651,   14,  639,   14, 0x0a,
-     665,   14,  661,   14, 0x0a,
+     328,  219,   14,   14, 0x0a,
+     385,  379,  351,   14, 0x0a,
+     419,  219,  414,   14, 0x0a,
+     452,  448,   14,   14, 0x0a,
+     494,   34,   14,   14, 0x0a,
+     537,  523,   14,   14, 0x0a,
+     573,   14,  562,   14, 0x0a,
+     588,   14,  581,   14, 0x0a,
+     599,   14,  414,   14, 0x0a,
+     624,  618,   14,   14, 0x0a,
+     662,   14,  650,   14, 0x0a,
+     676,   14,  672,   14, 0x0a,
 
        0        // eod
 };
@@ -69,12 +69,12 @@ static const char qt_meta_stringdata_DashboardBase[] = {
     "timerIntervalChanged(qint32)\0"
     "errorOccurred(QString)\0dashboardLinkSelected()\0"
     "updateInprogress()\0updateFinished()\0"
-    "runMonitor()\0src\0runMonitor(SourceT&)\0"
-    "runNgrt4ndUpdate(SourceT)\0"
+    "src\0runNgrt4ndUpdate(SourceT)\0"
+    "runMonitor()\0runMonitor(SourceT&)\0"
     "runLivestatusUpdate(SourceT)\0"
     "resetStatData()\0prepareUpdate(SourceT)\0"
-    "SeverityWeightInfoT\0_node\0"
-    "updateNodeStates(QString)\0bool\0"
+    "ngrt4n::AggregatedSeverityT\0_node\0"
+    "computeNodeSeverity(QString)\0bool\0"
     "allocSourceHandler(SourceT&)\0ids\0"
     "handleSourceSettingsChanged(QList<qint8>)\0"
     "handleErrorOccurred(QString)\0preferencePtr\0"
@@ -99,14 +99,14 @@ void DashboardBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 6: _t->dashboardLinkSelected(); break;
         case 7: _t->updateInprogress(); break;
         case 8: _t->updateFinished(); break;
-        case 9: _t->runMonitor(); break;
-        case 10: _t->runMonitor((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
-        case 11: _t->runNgrt4ndUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 9: _t->runNgrt4ndUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 10: _t->runMonitor(); break;
+        case 11: _t->runMonitor((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
         case 12: _t->runLivestatusUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
         case 13: _t->resetStatData(); break;
         case 14: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 15: { SeverityWeightInfoT _r = _t->updateNodeStates((*reinterpret_cast< const QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< SeverityWeightInfoT*>(_a[0]) = _r; }  break;
+        case 15: { ngrt4n::AggregatedSeverityT _r = _t->computeNodeSeverity((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< ngrt4n::AggregatedSeverityT*>(_a[0]) = _r; }  break;
         case 16: { bool _r = _t->allocSourceHandler((*reinterpret_cast< SourceT(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
         case 17: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;

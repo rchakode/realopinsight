@@ -36,26 +36,26 @@ static const uint qt_meta_data_SvCreator[] = {
       62,   10,   10,   10, 0x0a,
       77,   10,   10,   10, 0x0a,
       97,   10,   10,   10, 0x0a,
-     110,   10,   10,   10, 0x0a,
-     130,   10,   10,   10, 0x0a,
-     137,   10,   10,   10, 0x0a,
-     144,   10,   10,   10, 0x0a,
-     157,   10,  153,   10, 0x0a,
-     180,   10,  153,   10, 0x2a,
-     199,   10,   10,   10, 0x0a,
-     239,   10,   10,   10, 0x0a,
-     261,   10,   10,   10, 0x0a,
-     289,   10,   10,   10, 0x0a,
-     318,   10,   10,   10, 0x0a,
-     350,   10,   10,   10, 0x0a,
-     378,   10,   10,   10, 0x0a,
-     413,  396,   10,   10, 0x0a,
-     482,  457,   10,   10, 0x0a,
-     533,   10,   10,   10, 0x0a,
-     554,   10,   10,   10, 0x0a,
-     577,   10,   10,   10, 0x0a,
-     602,   10,   10,   10, 0x0a,
-     631,  627,   10,   10, 0x0a,
+     118,  110,   10,   10, 0x0a,
+     138,   10,   10,   10, 0x0a,
+     145,   10,   10,   10, 0x0a,
+     152,   10,   10,   10, 0x0a,
+     165,   10,  161,   10, 0x0a,
+     188,   10,  161,   10, 0x2a,
+     213,  207,   10,   10, 0x0a,
+     253,   10,   10,   10, 0x0a,
+     275,   10,   10,   10, 0x0a,
+     310,  303,   10,   10, 0x0a,
+     356,  339,   10,   10, 0x0a,
+     388,   10,   10,   10, 0x0a,
+     416,   10,   10,   10, 0x0a,
+     451,  434,   10,   10, 0x0a,
+     520,  495,   10,   10, 0x0a,
+     571,   10,   10,   10, 0x0a,
+     592,   10,   10,   10, 0x0a,
+     615,   10,   10,   10, 0x0a,
+     640,   10,   10,   10, 0x0a,
+     669,  665,   10,   10, 0x0a,
 
        0        // eod
 };
@@ -64,13 +64,13 @@ static const char qt_meta_stringdata_SvCreator[] = {
     "SvCreator\0\0newView()\0newNode()\0node\0"
     "insertFromSelected(NodeT)\0copySelected()\0"
     "pasteFromSelected()\0deleteNode()\0"
-    "deleteNode(QString)\0open()\0save()\0"
-    "saveAs()\0int\0treatCloseAction(bool)\0"
-    "treatCloseAction()\0"
+    "_nodeId\0deleteNode(QString)\0open()\0"
+    "save()\0saveAs()\0int\0treatCloseAction(bool)\0"
+    "treatCloseAction()\0_item\0"
     "fillEditorFromService(QTreeWidgetItem*)\0"
     "handleReturnPressed()\0handleSelectedNodeChanged()\0"
-    "handleTreeNodeMoved(QString)\0"
-    "handleNodeTypeActivated(qint32)\0"
+    "nodeId\0handleTreeNodeMoved(QString)\0"
+    "selectedNodeType\0handleNodeTypeActivated(qint32)\0"
     "handleShowOnlineResources()\0"
     "handleShowAbout()\0type,sourceInfos\0"
     "fetchSourceList(int,QMap<QString,SourceT>&)\0"
@@ -105,7 +105,7 @@ void SvCreator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 12: _t->fillEditorFromService((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1]))); break;
         case 13: _t->handleReturnPressed(); break;
         case 14: _t->handleSelectedNodeChanged(); break;
-        case 15: _t->handleTreeNodeMoved((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 15: _t->handleTreeNodeMoved((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 16: _t->handleNodeTypeActivated((*reinterpret_cast< qint32(*)>(_a[1]))); break;
         case 17: _t->handleShowOnlineResources(); break;
         case 18: _t->handleShowAbout(); break;
