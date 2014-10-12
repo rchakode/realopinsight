@@ -49,6 +49,7 @@ WebPreferencesBase::WebPreferencesBase(void)
 
 }
 
+
 WebPreferences::WebPreferences(void)
   : WebPreferencesBase(),
     Wt::WContainerWidget(),

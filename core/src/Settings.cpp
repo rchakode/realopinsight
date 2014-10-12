@@ -31,6 +31,7 @@
 #include <QtScript/QScriptEngine>
 
 const QString Settings::GLOBAL_LANGUAGE_KEY = "/General/language";
+const QString Settings::GLOBAL_DB_STATE_KEY = "/General/DbState";
 const QString Settings::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
 const QString Settings::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 const QString Settings::AUTH_ADM_UNSERNAME_KEY = "/Auth/admUser";

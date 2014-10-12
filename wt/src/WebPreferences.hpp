@@ -44,6 +44,8 @@ class WebPreferencesBase : public Preferences
 {
 public:
   WebPreferencesBase(void);
+  int getDbState(void) { return value(Settings::GLOBAL_DB_STATE_KEY, "0").toInt();}
+  void setDbState(int state) {setEntry(Settings::GLOBAL_DB_STATE_KEY, QString::number(state));}
 
 protected :
   virtual void fillFromSource(int _index) {}

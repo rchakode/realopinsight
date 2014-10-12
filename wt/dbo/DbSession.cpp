@@ -23,6 +23,7 @@
  */
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
+#include "WebPreferences.hpp"
 #include <QFile>
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/Identity>
@@ -304,16 +305,20 @@ bool DbSession::findView(const std::string& vname, DbViewT& view)
 void DbSession::initDb(void)
 {
   try {
-    createTables();
-    DbUserT adm;
-    adm.username = "admin";
-    adm.password = "password";
-    adm.firstname = "Default";
-    adm.lastname = "Administrator";
-    adm.role = DbUserT::AdmRole;
-    adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
-    addUser(adm);
-    LOG("info", "Database created: "+m_dbPath);
+    WebPreferences pref;
+    if (pref.getDbState() != 1) {
+      createTables();
+      DbUserT adm;
+      adm.username = "admin";
+      adm.password = "password";
+      adm.firstname = "Default";
+      adm.lastname = "Administrator";
+      adm.role = DbUserT::AdmRole;
+      adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
+      addUser(adm);
+      pref.setDbState(1);
+      LOG("info", Q_TR("Database created: ")+m_dbPath);
+    }
   } catch (dbo::Exception& ex) {
     LOG("error", "Failed initializing the database");
     LOG("error", ex.what());

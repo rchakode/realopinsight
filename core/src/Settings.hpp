@@ -53,6 +53,7 @@ public:
   static const QString GLOBAL_LANGUAGE_KEY;
   static const QString GLOBAL_SRC_BUCKET_KEY;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
+  static const QString GLOBAL_DB_STATE_KEY;
   static const QString AUTH_ADM_UNSERNAME_KEY;
   static const QString AUTH_OP_UNSERNAME_KEY;
   static const QString AUTH_ADM_PASSWD_KEY;
