@@ -22,16 +22,17 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "DbSession.hpp"
+#include "WebPreferences.hpp"
+#include "QosCollector.hpp"
+#include "WebUtils.hpp"
+#include "Applications.hpp"
+#include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <QString>
 #include <getopt.h>
-#include <unistd.h>
-#include "DbSession.hpp"
-#include "WebPreferences.hpp"
-#include "QosCollector.hpp"
-#include "WebUtils.hpp"
 #include <unistd.h>
 
 void runCollector(int period, bool foreground)
@@ -84,6 +85,7 @@ void runCollector(int period, bool foreground)
 int main(int argc, char **argv)
 {
 
+  RealOpInsightQApp qtApp (argc, argv);
   int period = 5;
   bool ok;
   int opt;
@@ -126,5 +128,5 @@ int main(int argc, char **argv)
   }
 
 
-  return 0;
+  return qtApp.exec();
 }

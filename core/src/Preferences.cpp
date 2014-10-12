@@ -35,7 +35,9 @@ Preferences::Preferences(const QString& settingFile)
     m_currentSourceIndex(0),
     m_sourceStates(new QBitArray(MAX_SRCS))
 {
+  updateSourceStates();
 }
+
 Preferences::Preferences(void)
   : m_settings(new Settings()),
     m_currentSourceIndex(0),
@@ -67,7 +69,7 @@ QString Preferences::getSourceStatesSerialized(void)
 
 void Preferences::updateSourceStates(void)
 {
-  QString content = m_settings->value(Settings::SRC_BUCKET_KEY).toString();
+  QString content = m_settings->value(Settings::GLOBAL_SRC_BUCKET_KEY).toString();
   if (content.isEmpty()) {
     for (int i=0; i < MAX_SRCS; ++i) {
       m_sourceStates->setBit(i, false);
