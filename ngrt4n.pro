@@ -197,3 +197,6 @@ unittests {
 SOURCES += core/src/unittests.cpp
 QT += testlib
 }
+
+OTHER_FILES += \
+    contribs/sql/update_2014b7.sql
