@@ -98,7 +98,8 @@ int main(int argc, char **argv)
   }
 
   period *= 60;
-  std::string startupMsg = QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)).toStdString();
+  
+  REPORTD_LOG("notice", QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)).toStdString());
   runCollector(period); // convert period in seconds
 
   return qtApp.exec();
