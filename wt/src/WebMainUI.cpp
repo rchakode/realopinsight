@@ -261,8 +261,7 @@ void WebMainUI::resetTimer(qint32 interval)
 void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
-  m_mainWidget->setDisabled(true);
-  
+
   std::map<int, int> problemTypeCount;
   problemTypeCount[ngrt4n::Normal]   = 0;
   problemTypeCount[ngrt4n::Minor]    = 0;
@@ -271,6 +270,7 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
 
+  int currentView = 1;
   for (auto& dash : m_dashboards) {
     dash.second->initSettings(m_preferences);
     dash.second->runMonitor();
@@ -280,10 +280,13 @@ void WebMainUI::handleRefresh(void)
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
     }
-    m_dashTabWidgets[dash.second->rootNode().name]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
+
+    QString viewName = dash.second->rootNode().name;
+    m_dashTabWidgets[viewName]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
+    updateViewBiCharts(viewName.toStdString());
+    ++currentView;
   }
 
-  updateBiCharts();
 
   // Set notification only for operator console
   if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
@@ -298,8 +301,6 @@ void WebMainUI::handleRefresh(void)
     updateEventFeeds();
   } // notification section
   startTimer();
-
-  m_mainWidget->setDisabled(false);
 }
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
@@ -953,25 +954,25 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 
 void WebMainUI::updateBiCharts(void)
 {
-  long epochStartDate =  Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();
-  long epochEndDate =  Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();
-  ViewQosDataMapT qosInfos;
   for (const auto& view: m_dbSession->viewList()) {
-    if (m_dbSession->fetchQosInfos(qosInfos, view.name, epochStartDate, epochEndDate) == 0) {
-      updateViewBiCharts(view.name, qosInfos[view.name]);
-    }
+    updateViewBiCharts(view.name);
   }
 }
 
-void WebMainUI::updateViewBiCharts(const std::string& viewName, const std::list<DbQosDataT>& data)
+void WebMainUI::updateViewBiCharts(const std::string& viewName)
 {
-  QosTrendsChartList::iterator qosChart = m_qosCharts.find(viewName);
-  if (qosChart != m_qosCharts.end())
-    qosChart->second->updateData(data);
-
-  RawQosTrendsChartList::iterator rawQosChart = m_rawQosCharts.find(viewName);
-  if (rawQosChart != m_rawQosCharts.end())
-    rawQosChart->second->updateData(data);
+  long epochStartDate =  Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();
+  long epochEndDate =  Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();
+  ViewQosDataMapT qosData;
+  if (m_dbSession->fetchQosInfos(qosData, viewName, epochStartDate, epochEndDate) == 0) {
+    QosTrendsChartList::iterator qosChart = m_qosCharts.find(viewName);
+    if (qosChart != m_qosCharts.end()) {
+      qosChart->second->updateData(qosData[viewName]);
+    }
+    RawQosTrendsChartList::iterator rawQosChart = m_rawQosCharts.find(viewName);
+    if (rawQosChart != m_rawQosCharts.end())
+      rawQosChart->second->updateData(qosData[viewName]);
+  }
 }
 
 

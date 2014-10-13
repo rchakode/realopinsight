@@ -36,10 +36,13 @@
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
 #include <Wt/WDatePicker>
+#include <Wt/WProgressBar>
+#include <Wt/WDialog>
 
 class AuthManager;
 class ViewAclManagement;
 class WebPreferences;
+
 
 class WebMainUI : public QObject, public Wt::WContainerWidget
 {
@@ -172,7 +175,7 @@ private:
   void handleViewAclMenu(void);
   void handleUserEnableStatusChanged(int status, std::string data);
   void updateBiCharts(void);
-  void updateViewBiCharts(const std::string& viewName, const std::list<DbQosDataT>& qosInfos);
+  void updateViewBiCharts(const std::string& viewName);
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
 };
