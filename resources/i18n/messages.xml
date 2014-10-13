@@ -146,7 +146,7 @@
        <div class="ngrt4n-content">
          <legend>Summary of Business Service Health</legend>
            ${thumbnails}
-           <legend>BI Reports</legend>
+           <legend>BI Reports - From ${report-start-date} to ${report-end-date} ${report-apply-filter-btn}</legend>
            <hr width="40%" />
            ${bigraphs}
        </div>

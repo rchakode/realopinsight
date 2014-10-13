@@ -67,7 +67,10 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
     m_currentDashboardPtr(NULL),
-    m_eventFeedLayout(NULL)
+    m_eventFeedLayout(NULL),
+    m_reportStartDatePicker(NULL),
+    m_reportEndDatePicker(NULL),
+    m_reportApplyBtn(NULL)
 {
   m_preferences->setEnabledInputs(false);
   createMainUI();
@@ -99,6 +102,10 @@ void WebMainUI::addEvents(void)
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
+
+  if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
+    m_reportApplyBtn->clicked().connect(this, &WebMainUI::updateBiCharts);
+  }
 }
 
 void WebMainUI::showUserHome(void)
@@ -254,7 +261,7 @@ void WebMainUI::resetTimer(qint32 interval)
 void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
-  m_mainWidget->disable();
+  m_mainWidget->setDisabled(true);
   
   std::map<int, int> problemTypeCount;
   problemTypeCount[ngrt4n::Normal]   = 0;
@@ -291,7 +298,8 @@ void WebMainUI::handleRefresh(void)
     updateEventFeeds();
   } // notification section
   startTimer();
-  m_mainWidget->enable();
+
+  m_mainWidget->setDisabled(false);
 }
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
@@ -751,6 +759,9 @@ void WebMainUI::initOperatorDashboard(void)
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
   m_operatorHomeTpl->bindWidget("thumbnails", thumbs);
+  m_operatorHomeTpl->bindWidget("report-start-date", m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS));
+  m_operatorHomeTpl->bindWidget("report-end-date", m_reportEndDatePicker = createReportDatePicker( time(NULL) ));
+  m_operatorHomeTpl->bindWidget("report-apply-filter-btn", m_reportApplyBtn = new Wt::WPushButton(Q_TR("Apply")));
   m_operatorHomeTpl->bindWidget("bigraphs", bigraphs);
   m_operatorHomeTpl->bindWidget("event-feeds", eventFeeds);
   m_dashtabs->addTab(m_operatorHomeTpl, Q_TR("Operations Console"));
@@ -942,9 +953,11 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 
 void WebMainUI::updateBiCharts(void)
 {
+  long epochStartDate =  Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();
+  long epochEndDate =  Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();
   ViewQosDataMapT qosInfos;
   for (const auto& view: m_dbSession->viewList()) {
-    if (m_dbSession->fetchQosInfos(qosInfos, view.name, LAST_30_DAYS) == 0) {
+    if (m_dbSession->fetchQosInfos(qosInfos, view.name, epochStartDate, epochEndDate) == 0) {
       updateViewBiCharts(view.name, qosInfos[view.name]);
     }
   }
@@ -959,4 +972,17 @@ void WebMainUI::updateViewBiCharts(const std::string& viewName, const std::list<
   RawQosTrendsChartList::iterator rawQosChart = m_rawQosCharts.find(viewName);
   if (rawQosChart != m_rawQosCharts.end())
     rawQosChart->second->updateData(data);
+}
+
+
+Wt::WDatePicker* WebMainUI::createReportDatePicker(long epochDatetime)
+{
+  Wt::WDateTime dt;
+  dt.setTime_t(epochDatetime);
+
+  Wt::WDatePicker *picker = new Wt::WDatePicker(this);
+  picker->setFormat("dd-MM-yyyy");
+  picker->setDate(dt.date());
+
+  return picker;
 }

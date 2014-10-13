@@ -35,6 +35,7 @@
 #include <Wt/WTabWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
+#include <Wt/WDatePicker>
 
 class AuthManager;
 class ViewAclManagement;
@@ -131,6 +132,10 @@ private:
   RawQosTrendsChartList m_rawQosCharts;
   ViewQosDataMapT m_qosData;
 
+  Wt::WDatePicker* m_reportStartDatePicker;
+  Wt::WDatePicker* m_reportEndDatePicker;
+  Wt::WPushButton* m_reportApplyBtn;
+
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -168,6 +173,8 @@ private:
   void handleUserEnableStatusChanged(int status, std::string data);
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName, const std::list<DbQosDataT>& qosInfos);
+
+  Wt::WDatePicker* createReportDatePicker(long epochDatetime);
 };
 
 #endif // MAINWEBWINDOW_HPP
