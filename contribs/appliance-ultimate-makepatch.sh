@@ -50,6 +50,12 @@ cp contribs/README_UPDATE ${RELEASE_TARBALL_BASENAME}/
 mkdir ${RELEASE_TARBALL_BASENAME}/sql
 cp -r contribs/sql/*.sql ${RELEASE_TARBALL_BASENAME}/sql/
 
-chmod +x ${RELEASE_TARBALL_BASENAME}/*.sh
+# copy rc scripts
+mkdir ${RELEASE_TARBALL_BASENAME}/init.d
+cp contribs/init.d/realopinsight-reportd.debian ${RELEASE_TARBALL_BASENAME}/init.d/
 
+chmod +x ${RELEASE_TARBALL_BASENAME}/*.sh
 tar zcf ${RELEASE_TARBALL_BASENAME}.tar.gz ${RELEASE_TARBALL_BASENAME}
+
+
+

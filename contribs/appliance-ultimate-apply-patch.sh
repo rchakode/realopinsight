@@ -136,6 +136,23 @@ get_target_version_from_user()
   done  
 }
 
+restarting_apache()
+{
+  echo -n "DEBUG : Restarting Apache..."
+  service apache2 restart
+  check_exit_code
+}
+
+
+setting_up_reportd()
+{
+  echo "DEBUG : Setting up RealOpInsight QoS data collector"
+  install -m 755 init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
+  update-rc.d realopinsight-reportd defaults
+  service realopinsight-reportd restart
+}
+
+
 # start
 prompt_copyright
 
@@ -170,9 +187,11 @@ echo -n "DEBUG : Applying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
 tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
 check_exit_code
 
-echo -n "DEBUG : Restarting Apache..."
-service apache2 restart
-check_exit_code
+
+setting_up_reportd
+
+restarting_apache
+
 
 echo "DEBUG: Upgrade completed. Backup file: ${REAlOPINSIGHT_BACKUP_FILE}"
 

@@ -282,7 +282,7 @@ install_ultimate() {
     REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
   fi
   install -d ${REALOPINSIGHT_CONFIG}
-  install -d ${REALOPINSIGHT_CONFIG}/bin
+  install -d ${REALOPINSIGHT_CONFIG}/sbin
   install -d ${REALOPINSIGHT_CONFIG}/etc
   install -d ${REALOPINSIGHT_CONFIG}/data
   install -d ${REALOPINSIGHT_CONFIG}/log
@@ -293,7 +293,8 @@ install_ultimate() {
   install contribs/index.html ${REALOPINSIGHT_WWW}/
   install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
   install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
-  install -m 755 realopinsight-reportd ${REALOPINSIGHT_CONFIG}/bin
+  install -m 755 realopinsight-reportd ${REALOPINSIGHT_CONFIG}/sbin
+  install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
   
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
@@ -312,6 +313,10 @@ install_ultimate() {
   a2enconf realopinsight-ultimate || true 
   service apache2 reload
   
+  echo "DEBUG : Setting up RealOpInsight QoS data collector"
+  update-rc.d realopinsight-reportd defaults
+  service realopinsight-reportd restart
+
   echo "==>Installation completed"
 }
 
