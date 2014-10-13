@@ -76,10 +76,10 @@ void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
     TimeStatusT last = m_plottingData.back();
     updateCountNormal(last.status);
     while (++qosit, qosit != data.end()) {
-      if (last.status != qosit->status) {
-        last = {qosit->timestamp, qosit->status};
-        m_plottingData.push_back(last);
-      }
+      //if (last.status != qosit->status) {
+      last = {qosit->timestamp, qosit->status};
+      m_plottingData.push_back(last);
+      //}
       updateCountNormal(qosit->status);
     }
     // always insert the last point, could be duplicated...
@@ -104,6 +104,9 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     double x2 = 0;
     Wt::WPainter painter(paintDevice);
     painter.setPen(TRANSPARENT_COLOR); // invisible
+    drawRotatedLegendText(painter,
+                          ngrt4n::timet2String(previousIt->timestamp),
+                          x1, TEXT_TOP_CORNER_Y, -90);
     while (++currentIt, currentIt != m_plottingData.end()) {
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
@@ -111,9 +114,10 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
       x2 = SCALING_FACTOR * (currentIt->timestamp - firstPoint.timestamp);
 
       painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
-      drawRotatedLegendText(painter,
-                            ngrt4n::timet2String(previousIt->timestamp),
-                            x1, TEXT_TOP_CORNER_Y, -90);
+      if (previousIt->status != currentIt->status)
+        drawRotatedLegendText(painter,
+                              ngrt4n::timet2String(previousIt->timestamp),
+                              x1, TEXT_TOP_CORNER_Y, -90);
 
       previousIt = currentIt;
     }
@@ -130,7 +134,6 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
   }
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
-
 
 void QosTrendsChart::drawRotatedLegendText(Wt::WPainter& painter,
                                            const Wt::WString& text,
