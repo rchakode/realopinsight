@@ -35,12 +35,11 @@
 #include <getopt.h>
 #include <unistd.h>
 
-void runCollector(int period, bool foreground)
+void runCollector(int period)
 {
   std::unique_ptr<DbSession> dbSession(new DbSession());
   std::unique_ptr<WebPreferencesBase> preferences(new WebPreferencesBase());
   while(1) {
-
     try {
       dbSession->updateUserList();
     } catch(const std::exception& ex) {
@@ -63,11 +62,7 @@ void runCollector(int period, bool foreground)
       qosInfo.timestamp = now;
       try {
         dbSession->addQosInfo(qosInfo);
-        if (foreground) {
-          std::cerr << dbSession->lastError()<<"\n";
-        } else {
-          REPORTD_LOG("notice", dbSession->lastError());
-        }
+        REPORTD_LOG("notice", dbSession->lastError());
       } catch(const std::exception& ex) {
         std::cerr << ex.what() <<"\n";
       }
@@ -84,21 +79,16 @@ void runCollector(int period, bool foreground)
 
 int main(int argc, char **argv)
 {
-
   RealOpInsightQApp qtApp (argc, argv);
   int period = 5;
   bool ok;
   int opt;
-  bool foreground = true;
   if ((opt = getopt(argc, argv, "t:dh")) != -1) {
     switch (opt) {
       case 't':
         period = QString(optarg).toInt(&ok);
         if (! ok || period < 1)
           period = 1;
-        break;
-      case 'd':
-        foreground = false;
         break;
       case 'h':
         break;
@@ -109,24 +99,7 @@ int main(int argc, char **argv)
 
   period *= 60;
   std::string startupMsg = QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)).toStdString();
-  if (! foreground) {
-    pid_t pid = fork();
-
-    if (pid < 0) {
-      std::cerr << "Fork failed \n";
-      exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-      REPORTD_LOG("notice", startupMsg);
-      setsid();
-      runCollector(period, foreground); // convert period in seconds
-    } else {
-      exit(EXIT_SUCCESS);
-    }
-  } else {
-    std::cerr << startupMsg <<"\n";
-    runCollector(period, foreground); // convert period in seconds
-  }
-
+  runCollector(period); // convert period in seconds
 
   return qtApp.exec();
 }
