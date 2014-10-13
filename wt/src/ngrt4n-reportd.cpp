@@ -55,7 +55,7 @@ void runCollector(int period, bool foreground)
       mycollectors.push_back(collector);
     }
 
-    LOG("notice", Q_TR("Collecting QoS data..."));
+    REPORTD_LOG("notice", Q_TR("Collecting QoS data..."));
     long now = time(NULL);
     for (auto collector: mycollectors) {
       collector->runMonitor();
@@ -66,7 +66,7 @@ void runCollector(int period, bool foreground)
         if (foreground) {
           std::cerr << dbSession->lastError()<<"\n";
         } else {
-          LOG("notice", dbSession->lastError());
+          REPORTD_LOG("notice", dbSession->lastError());
         }
       } catch(const std::exception& ex) {
         std::cerr << ex.what() <<"\n";
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
       std::cerr << "Fork failed \n";
       exit(EXIT_FAILURE);
     } else if (pid == 0) {
-      LOG("notice", startupMsg);
+      REPORTD_LOG("notice", startupMsg);
       setsid();
       runCollector(period, foreground); // convert period in seconds
     } else {

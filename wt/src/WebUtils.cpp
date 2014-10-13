@@ -54,6 +54,7 @@ void Logger::log(const std::string& level, const std::string& msg)
 
 
 Logger logger("/opt/realopinsight/log/realopinsight.log");
+Logger loggerReportd("/opt/realopinsight/log/realopinsight-reportd.log");
 
 void ngrt4n::showMessage(int exitCode,
                          const std::string& errorMsg,
@@ -206,6 +207,12 @@ void ngrt4n::log(const std::string& level, const std::string& msg)
 {
   logger.log(level, msg);
 }
+
+void ngrt4n::logReportd(const std::string& level, const std::string& msg)
+{
+  loggerReportd.log(level, msg);
+}
+
 
 
 bool ngrt4n::isValidUri(const QString& addr, const QString& schemePrefix, bool nopath)

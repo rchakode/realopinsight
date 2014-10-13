@@ -40,6 +40,7 @@ public:
 };
 
 #define LOG(level, msg) ngrt4n::log(level, msg)
+#define REPORTD_LOG(level, msg) ngrt4n::logReportd(level, msg)
 
 class QString;
 namespace ngrt4n {
@@ -58,6 +59,7 @@ namespace ngrt4n {
   Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip);
   Wt::WColor severityWColor(const int& _criticity);
   void log(const std::string& level, const std::string& msg);
+  void logReportd(const std::string& level, const std::string& msg);
   bool isValidUri(const QString& addr, const QString& schemePrefix, bool nopath);
   bool isValidHostAddr(const QString& addr);
   std::string md5Hash(const std::string& input);
