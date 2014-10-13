@@ -943,9 +943,8 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 void WebMainUI::updateBiCharts(void)
 {
   ViewQosDataMapT qosInfos;
-  if (m_dbSession->fetchQosInfos(qosInfos, LAST_30_DAYS) == 0) {
-    m_dbSession->updateViewList(m_dbSession->loggedUser().username);
-    for (const auto& view: m_dbSession->viewList()) {
+  for (const auto& view: m_dbSession->viewList()) {
+    if (m_dbSession->fetchQosInfos(qosInfos, view.name, LAST_30_DAYS) == 0) {
       updateViewBiCharts(view.name, qosInfos[view.name]);
     }
   }

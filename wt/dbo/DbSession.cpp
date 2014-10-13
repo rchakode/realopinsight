@@ -487,18 +487,33 @@ int DbSession::addQosInfo(const DbQosDataT& qosInfo)
 
 
 
-int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos, long fromDate, long toDate)
+int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos,
+                             const std::string& viewName,
+                             long fromDate,
+                             long toDate)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    QosInfoCollectionT entries = find<DbQosDataT>()
-        .where("timestamp >= ? AND timestamp <= ?")
-        .bind(fromDate).bind(toDate);
+    QosInfoCollectionT entries;
+    if (viewName.empty()) {
+      entries = find<DbQosDataT>()
+          .where("timestamp >= ? AND timestamp <= ?")
+          .orderBy("timestamp")
+          .bind(fromDate).bind(toDate);
+    } else {
+      entries = find<DbQosDataT>()
+          .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
+          .orderBy("timestamp")
+          .bind(viewName).bind(fromDate).bind(toDate);
+    }
+
+    qosInfos.clear();
     for (auto &entry : entries) {
       entry.modify()->viewname = entry->view->name;
       qosInfos[entry->viewname].push_back(*entry);
     }
+
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to fetch QoS entries. More details in log.";

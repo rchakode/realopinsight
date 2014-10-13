@@ -236,7 +236,7 @@ void RawQosTrendsChart::updateData(const std::list<DbQosDataT>& data)
 
   setXSeriesColumn(0);
   for (int i = 6; i>=2; --i) {
-    Wt::Chart::WDataSeries serie(i, Wt::Chart::CurveSeries);
+    Wt::Chart::WDataSeries serie(i, Wt::Chart::LineSeries);
     Wt::WColor color = ngrt4n::severityWColor(i - 2);
     serie.setPen(color);
     serie.setBrush(color);
