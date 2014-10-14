@@ -261,6 +261,7 @@ void WebMainUI::resetTimer(qint32 interval)
 void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
+  m_reportApplyBtn->setDisabled(true);
 
   std::map<int, int> problemTypeCount;
   problemTypeCount[ngrt4n::Normal]   = 0;
@@ -300,6 +301,8 @@ void WebMainUI::handleRefresh(void)
     }
     updateEventFeeds();
   } // notification section
+
+  m_reportApplyBtn->setDisabled(false);
   startTimer();
 }
 
@@ -984,6 +987,7 @@ Wt::WDatePicker* WebMainUI::createReportDatePicker(long epochDatetime)
   Wt::WDatePicker *picker = new Wt::WDatePicker(this);
   picker->setFormat("dd-MM-yyyy");
   picker->setDate(dt.date());
+  picker->setWidth(120);
 
   return picker;
 }

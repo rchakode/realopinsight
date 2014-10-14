@@ -65,12 +65,11 @@ private:
   typedef QList<TimeStatusT> TimeStatusesT;
   TimeStatusesT m_plottingData;
   std::string m_viewName;
-  long m_countNormal;
+  long m_normalTimeCount;
   double m_sla;
 
 
-  void filteringPlottingData(const std::list<DbQosDataT>& data);
-  void updateCountNormal(int status) {if (status == ngrt4n::Normal) ++m_countNormal;}
+  void processPlottingData(const std::list<DbQosDataT>& data);
   void drawRotatedLegendText(Wt::WPainter& painter,
                              const Wt::WString& text,
                              double x, double y,

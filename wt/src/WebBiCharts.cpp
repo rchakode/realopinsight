@@ -61,31 +61,32 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
 
 void QosTrendsChart::updateData(const std::list<DbQosDataT>& data)
 {
-  filteringPlottingData(data);
+  processPlottingData(data);
   update();
 }
 
-void QosTrendsChart::filteringPlottingData(const std::list<DbQosDataT>& data)
+void QosTrendsChart::processPlottingData(const std::list<DbQosDataT>& data)
 {
   std::list<DbQosDataT>::const_iterator qosit = data.begin();
   m_plottingData.clear();
-  m_countNormal = 0;
+  m_normalTimeCount = 0;
 
   if (! data.empty()) {
-    m_plottingData.push_back({qosit->timestamp, qosit->status});
-    TimeStatusT last = m_plottingData.back();
-    updateCountNormal(last.status);
+    TimeStatusT last = {qosit->timestamp, qosit->status};
+    m_plottingData.push_back(last);
     while (++qosit, qosit != data.end()) {
-      //if (last.status != qosit->status) {
-      last = {qosit->timestamp, qosit->status};
-      m_plottingData.push_back(last);
-      //}
-      updateCountNormal(qosit->status);
+      TimeStatusT current = {qosit->timestamp, qosit->status};
+      m_plottingData.push_back(current);
+      if (last.status == ngrt4n::Normal) {
+        m_normalTimeCount += current.timestamp - last.timestamp;
+      }
+      last = m_plottingData.back();
     }
-    // always insert the last point, could be duplicated...
-    --qosit;
-    m_plottingData.push_back({qosit->timestamp, qosit->status});
-    m_sla = (double)m_countNormal / data.size();
+    long diff = (m_plottingData.back().timestamp - m_plottingData.front().timestamp);
+    if (diff > 0)
+      m_sla = 100 * ((double)m_normalTimeCount / diff);
+    else
+      m_sla = (m_plottingData.back().status == ngrt4n::Normal) ? 100 : 0;
   }
 }
 
