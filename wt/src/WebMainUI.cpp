@@ -995,7 +995,7 @@ Wt::WContainerWidget* WebMainUI::createReportPeriodSelectionPane(void)
   Wt::WContainerWidget* container = new Wt::WContainerWidget();
   Wt::WHBoxLayout* layout = new Wt::WHBoxLayout(container);
 
-  layout->addWidget(new Wt::WText(Q_TR("BI Reports")));
+  layout->addWidget(new Wt::WText(Q_TR("BI Reports: ")));
   layout->addWidget(m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS));
   layout->addWidget(new Wt::WText(Q_TR("To")));
   layout->addWidget(m_reportEndDatePicker = createReportDatePicker(time(NULL)));
