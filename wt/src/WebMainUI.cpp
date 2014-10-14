@@ -70,7 +70,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_eventFeedLayout(NULL),
     m_reportStartDatePicker(NULL),
     m_reportEndDatePicker(NULL),
-    m_reportApplyBtn(NULL)
+    m_reportApplyAnchor(NULL)
 {
   m_preferences->setEnabledInputs(false);
   createMainUI();
@@ -104,7 +104,7 @@ void WebMainUI::addEvents(void)
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
 
   if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
-    m_reportApplyBtn->clicked().connect(this, &WebMainUI::updateBiCharts);
+    m_reportApplyAnchor->clicked().connect(this, &WebMainUI::updateBiCharts);
   }
 }
 
@@ -261,7 +261,7 @@ void WebMainUI::resetTimer(qint32 interval)
 void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
-  m_reportApplyBtn->setDisabled(true);
+  m_reportApplyAnchor->setDisabled(true);
 
   std::map<int, int> problemTypeCount;
   problemTypeCount[ngrt4n::Normal]   = 0;
@@ -302,7 +302,7 @@ void WebMainUI::handleRefresh(void)
     updateEventFeeds();
   } // notification section
 
-  m_reportApplyBtn->setDisabled(false);
+  m_reportApplyAnchor->setDisabled(false);
   startTimer();
 }
 
@@ -992,14 +992,14 @@ Wt::WDatePicker* WebMainUI::createReportDatePicker(long epochDatetime)
 
 Wt::WContainerWidget* WebMainUI::createReportPeriodSelectionPane(void)
 {
-  Wt::WContainerWidget* container = new Wt::WContainerWidget(m_mainWidget);
+  Wt::WContainerWidget* container = new Wt::WContainerWidget();
   Wt::WHBoxLayout* layout = new Wt::WHBoxLayout(container);
 
-  layout->addWidget(new Wt::WText(Q_TR("BI Reports - From")));
+  layout->addWidget(new Wt::WText(Q_TR("BI Reports")));
   layout->addWidget(m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS));
   layout->addWidget(new Wt::WText(Q_TR("To")));
   layout->addWidget(m_reportEndDatePicker = createReportDatePicker(time(NULL)));
-  layout->addWidget(m_reportApplyBtn = new Wt::WPushButton(Q_TR("Apply")));
+  layout->addWidget(m_reportApplyAnchor = new Wt::WAnchor(Wt::WLink("#"), Q_TR("Apply")));
 
   return container;
 }

@@ -137,7 +137,7 @@ private:
 
   Wt::WDatePicker* m_reportStartDatePicker;
   Wt::WDatePicker* m_reportEndDatePicker;
-  Wt::WPushButton* m_reportApplyBtn;
+  Wt::WAnchor* m_reportApplyBtn;
 
 
   /** member methods with return value*/
