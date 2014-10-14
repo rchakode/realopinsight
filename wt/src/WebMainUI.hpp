@@ -178,6 +178,7 @@ private:
   void updateViewBiCharts(const std::string& viewName);
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
+  Wt::WContainerWidget* createReportPeriodSelectionPane(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

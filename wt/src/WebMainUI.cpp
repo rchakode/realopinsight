@@ -763,9 +763,7 @@ void WebMainUI::initOperatorDashboard(void)
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
   m_operatorHomeTpl->bindWidget("thumbnails", thumbs);
-  m_operatorHomeTpl->bindWidget("report-start-date", m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS));
-  m_operatorHomeTpl->bindWidget("report-end-date", m_reportEndDatePicker = createReportDatePicker( time(NULL) ));
-  m_operatorHomeTpl->bindWidget("report-apply-filter-btn", m_reportApplyBtn = new Wt::WPushButton(Q_TR("Apply")));
+  m_operatorHomeTpl->bindWidget("report-period-header-pane", createReportPeriodSelectionPane());
   m_operatorHomeTpl->bindWidget("bigraphs", bigraphs);
   m_operatorHomeTpl->bindWidget("event-feeds", eventFeeds);
   m_dashtabs->addTab(m_operatorHomeTpl, Q_TR("Operations Console"));
@@ -989,4 +987,19 @@ Wt::WDatePicker* WebMainUI::createReportDatePicker(long epochDatetime)
   picker->setDate(dt.date());
   picker->setStyleClass("inline");
   return picker;
+}
+
+
+Wt::WContainerWidget* WebMainUI::createReportPeriodSelectionPane(void)
+{
+  Wt::WContainerWidget* container = new Wt::WContainerWidget(m_mainWidget);
+  Wt::WHBoxLayout* layout = new Wt::WHBoxLayout(container);
+
+  layout->addWidget(new Wt::WText(Q_TR("BI Reports - From")));
+  layout->addWidget(m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS));
+  layout->addWidget(new Wt::WText(Q_TR("To")));
+  layout->addWidget(m_reportEndDatePicker = createReportDatePicker(time(NULL)));
+  layout->addWidget(m_reportApplyBtn = new Wt::WPushButton(Q_TR("Apply")));
+
+  return container;
 }
