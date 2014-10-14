@@ -987,7 +987,6 @@ Wt::WDatePicker* WebMainUI::createReportDatePicker(long epochDatetime)
   Wt::WDatePicker *picker = new Wt::WDatePicker(this);
   picker->setFormat("dd-MM-yyyy");
   picker->setDate(dt.date());
-  picker->setWidth(120);
-
+  picker->setStyleClass("inline");
   return picker;
 }
