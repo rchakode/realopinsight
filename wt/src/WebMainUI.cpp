@@ -53,6 +53,18 @@
 
 #define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
 
+void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Response& response)
+{
+  response.setMimeType("text/csv");
+  ViewQosDataMapT qosData;
+  if (m_mainUiClass->dbSession()->fetchQosData(qosData,
+                                               m_viewName,
+                                               m_mainUiClass->reportStartTime(),
+                                               m_mainUiClass->reportEndTime()) == 0) {
+    for(const auto& entry: qosData[m_viewName])
+      response.out() << entry.toString() << std::endl;
+  }
+}
 
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
@@ -1014,15 +1026,3 @@ Wt::WAnchor* WebMainUI::createReportCsvDownloadLink(const std::string& viewName)
   return anchor;
 }
 
-void WebMainUI::CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Response& response)
-{
-  response.setMimeType("text/csv");
-  ViewQosDataMapT qosData;
-  if (m_mainUiClass->dbSession()->fetchQosData(qosData,
-                                               m_viewName,
-                                               m_mainUiClass->reportStartTime(),
-                                               m_mainUiClass->reportEndTime()) == 0) {
-    for(const auto& entry: qosData[m_viewName])
-      response.out() << entry.toString() << std::endl;
-  }
-}

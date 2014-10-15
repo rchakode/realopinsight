@@ -44,7 +44,21 @@
 class AuthManager;
 class ViewAclManagement;
 class WebPreferences;
+class WebMainUI;
 
+class CsvReportResource : public Wt::WResource
+{
+public:
+  CsvReportResource(WebMainUI* mainUiClass, const std::string& viewName, Wt::WObject *parent = 0)
+    : Wt::WResource(parent),
+      m_mainUiClass(mainUiClass),
+      m_viewName(viewName) { suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName)); }
+  ~CsvReportResource(){ beingDeleted(); }
+  void handleRequest(const Wt::Http::Request&, Wt::Http::Response& response);
+private:
+  WebMainUI* m_mainUiClass;
+  std::string m_viewName;
+};
 
 class WebMainUI : public QObject, public Wt::WContainerWidget
 {
@@ -82,6 +96,8 @@ public:
   Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
   virtual void 	refresh () {handleRefresh();}
   DbSession* dbSession(void) {return m_dbSession;}
+  long reportStartTime(void){ return Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();}
+  long reportEndTime(void) {return Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();}
 
 
 public Q_SLOTS:
@@ -90,20 +106,6 @@ public Q_SLOTS:
   void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
 
 private:
-  class CsvReportResource : public Wt::WResource
-  {
-  public:
-    CsvReportResource(WebMainUI* mainUiClass, const std::string& viewName, Wt::WObject *parent = 0)
-      : Wt::WResource(parent),
-        m_mainUiClass(mainUiClass),
-        m_viewName(viewName) { suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName)); }
-    ~CsvReportResource(){ beingDeleted(); }
-    void handleRequest(const Wt::Http::Request&, Wt::Http::Response& response);
-  private:
-    WebMainUI* m_mainUiClass;
-    std::string m_viewName;
-  };
-
   enum FileDialogAction {
     IMPORT = 0,
     OPEN = 1
@@ -197,8 +199,6 @@ private:
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WAnchor* createReportCsvDownloadLink(const std::string& viewName);
-  long reportStartTime(void){ return Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();}
-  long reportEndTime(void) {return Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();}
 };
 
 #endif // MAINWEBWINDOW_HPP
