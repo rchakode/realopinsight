@@ -56,6 +56,7 @@
 void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Response& response)
 {
   response.setMimeType("text/csv");
+  response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
   ViewQosDataMapT qosData;
   if (m_mainUiClass->dbSession()->fetchQosData(qosData,
                                                m_viewName,
@@ -806,7 +807,7 @@ void WebMainUI::initOperatorDashboard(void)
     m_qosCharts[view.name] = new QosTrendsChart(view.name, std::list<DbQosDataT>());
     m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, std::list<DbQosDataT>());
     bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
-    bigraphsLayout->addWidget(createReportCsvDownloadLink(view.name), biIndex, 1, Wt::AlignLeft);
+    bigraphsLayout->addWidget(createReportCsvDownloadLink(view.name), biIndex, 1, Wt::AlignRight);
 
     bigraphsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
     bigraphsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
@@ -1022,6 +1023,7 @@ Wt::WAnchor* WebMainUI::createReportCsvDownloadLink(const std::string& viewName)
 {
   Wt::WResource *csvResource = new CsvReportResource(this, viewName, m_mainWidget);
   Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink(csvResource), new Wt::WImage("images/built-in/csv-file.png"), m_mainWidget);
+  anchor->setToolTip(Q_TR("Download data as CSV file"));
   anchor->setTarget(Wt::TargetNewWindow);
   return anchor;
 }
