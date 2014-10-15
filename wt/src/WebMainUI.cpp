@@ -53,6 +53,7 @@
 
 #define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
 
+
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
     m_terminateSession(this),
@@ -1002,4 +1003,13 @@ Wt::WContainerWidget* WebMainUI::createReportSectionHeader(void)
   layout->addWidget(m_reportApplyAnchor = new Wt::WAnchor(Wt::WLink("#"), Q_TR("Apply")), 1);
 
   return container;
+}
+
+
+Wt::WAnchor* WebMainUI::createReportCsvDownloadLink(void)
+{
+  Wt::WResource *textResource = new MyResource(container);
+  Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink(textResource), "Download file", container);
+  anchor->setTarget(Wt::TargetNewWindow);
+  return anchor;
 }

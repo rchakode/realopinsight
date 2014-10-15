@@ -87,6 +87,31 @@ public Q_SLOTS:
   void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
 
 private:
+  class CsvDownloadResource : public Wt::WResource
+  {
+  public:
+    CsvDownloadResource(const std::string& viewName, Wt::WObject *parent = 0)
+      : Wt::WResource(parent),
+        m_viewName(viewName)
+    {
+      suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName));
+    }
+
+    ~CsvDownloadResource()
+    {
+      beingDeleted();
+    }
+
+    void handleRequest(const Wt::Http::Request &request,
+                       Wt::Http::Response &response) {
+      response.setMimeType("plain/css");
+      response.out() << "1,2,3" << std::endl;
+    }
+
+  private:
+    std::string m_viewName;
+  };
+
   enum FileDialogAction {
     IMPORT = 0,
     OPEN = 1
@@ -179,6 +204,7 @@ private:
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
+  Wt::WAnchor* createReportCsvDownloadLink(void);
 };
 
 #endif // MAINWEBWINDOW_HPP
