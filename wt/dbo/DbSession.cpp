@@ -466,17 +466,17 @@ int DbSession::checkUserCookie(const DbLoginSession& session)
 }
 
 
-int DbSession::addQosInfo(const DbQosDataT& qosInfo)
+int DbSession::addQosData(const DbQosDataT& qosData)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
     DbQosDataT* qosDboPtr = new DbQosDataT();
-    *qosDboPtr = qosInfo;
-    qosDboPtr->view = find<DbViewT>().where("name=?").bind(qosInfo.viewname);;
+    *qosDboPtr = qosData;
+    qosDboPtr->view = find<DbViewT>().where("name=?").bind(qosData.viewname);;
     add(qosDboPtr);
     retCode = 0;
-    m_lastError = Q_TR("QoS entry added: ") + qosInfo.toString();
+    m_lastError = Q_TR("QoS entry added: ") + qosData.toString();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add QoS entry. More details in log.";
     LOG("error", ex.what());
@@ -487,7 +487,7 @@ int DbSession::addQosInfo(const DbQosDataT& qosInfo)
 
 
 
-int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos,
+int DbSession::fetchQosData(ViewQosDataMapT& qosDataMap,
                              const std::string& viewName,
                              long fromDate,
                              long toDate)
@@ -508,10 +508,10 @@ int DbSession::fetchQosInfos(ViewQosDataMapT& qosInfos,
           .bind(viewName).bind(fromDate).bind(toDate);
     }
 
-    qosInfos.clear();
+    qosDataMap.clear();
     for (auto &entry : entries) {
       entry.modify()->viewname = entry->view->name;
-      qosInfos[entry->viewname].push_back(*entry);
+      qosDataMap[entry->viewname].push_back(*entry);
     }
 
     retCode = 0;

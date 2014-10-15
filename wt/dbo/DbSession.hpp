@@ -71,8 +71,8 @@ public:
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
 
-  int addQosInfo(const DbQosDataT& qos);
-  int fetchQosInfos(ViewQosDataMapT& qosInfos,
+  int addQosData(const DbQosDataT& qosData);
+  int fetchQosData(ViewQosDataMapT& qosDataMap,
                     const std::string& viewName,
                     long fromDate=0,
                     long toDate = LONG_MAX);
