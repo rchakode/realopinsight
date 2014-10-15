@@ -793,7 +793,9 @@ void WebMainUI::initOperatorDashboard(void)
   for (const auto& view: m_dbSession->viewList()) {
     m_qosCharts[view.name] = new QosTrendsChart(view.name, std::list<DbQosDataT>());
     m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, std::list<DbQosDataT>());
-    bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0, 1, 2, Wt::AlignLeft);
+    bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
+    bigraphsLayout->addWidget(createReportCsvDownloadLink(view.name), biIndex, 1, Wt::AlignLeft);
+
     bigraphsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
     bigraphsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
     ++biIndex;
