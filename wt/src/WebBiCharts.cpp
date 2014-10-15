@@ -52,6 +52,7 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
   : Wt::WPaintedWidget(parent),
     m_viewName(viewName)
 {
+  setLayoutSizeAware(false);
   setStyleClass("bi-chart");
   setMargin(5, Wt::Top | Wt::Bottom);
   setMargin(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Right);
@@ -171,6 +172,7 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
     m_viewName(viewName),
     m_model(NULL)
 {
+  setLayoutSizeAware(false);
   setStyleClass("bi-chart");
   setLegendEnabled(false);
   setPlotAreaPadding(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
