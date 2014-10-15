@@ -995,9 +995,9 @@ Wt::WContainerWidget* WebMainUI::createReportSectionHeader(void)
   Wt::WContainerWidget* container = new Wt::WContainerWidget();
   Wt::WHBoxLayout* layout = new Wt::WHBoxLayout(container);
 
-  layout->addWidget(new Wt::WText(Q_TR("BI Reports")), 1);
+  layout->addWidget(new Wt::WText(Q_TR("BI Reports Period")), 1);
   layout->addWidget(m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS), 1);
-  layout->addWidget(new Wt::WText(Q_TR("To")), 1);
+  layout->addWidget(new Wt::WText(Q_TR("-")), 1);
   layout->addWidget(m_reportEndDatePicker = createReportDatePicker(time(NULL)), 1);
   layout->addWidget(m_reportApplyAnchor = new Wt::WAnchor(Wt::WLink("#"), Q_TR("Apply")), 1);
 
