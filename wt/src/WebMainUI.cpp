@@ -1013,3 +1013,16 @@ Wt::WAnchor* WebMainUI::createReportCsvDownloadLink(const std::string& viewName)
   anchor->setTarget(Wt::TargetNewWindow);
   return anchor;
 }
+
+void WebMainUI::CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Response& response)
+{
+  response.setMimeType("text/csv");
+  ViewQosDataMapT qosData;
+  if (m_mainUiClass->dbSession()->fetchQosData(qosData,
+                                               m_viewName,
+                                               m_mainUiClass->reportStartTime(),
+                                               m_mainUiClass->reportEndTime()) == 0) {
+    for(const auto& entry: qosData[m_viewName])
+      response.out() << entry.toString() << std::endl;
+  }
+}

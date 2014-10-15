@@ -96,27 +96,9 @@ private:
     CsvReportResource(WebMainUI* mainUiClass, const std::string& viewName, Wt::WObject *parent = 0)
       : Wt::WResource(parent),
         m_mainUiClass(mainUiClass),
-        m_viewName(viewName)
-    {
-      suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName));
-    }
-
-    ~CsvReportResource(){
-      beingDeleted();
-    }
-
-    void handleRequest(const Wt::Http::Request &request,
-                       Wt::Http::Response &response) {
-      response.setMimeType("text/csv");
-      ViewQosDataMapT qosData;
-      if (m_mainUiClass->dbSession()->fetchQosData(qosData,
-                                                    m_viewName,
-                                                    m_mainUiClass->reportStartTime(),
-                                                    m_mainUiClass->reportEndTime()) == 0) {
-       for(const auto& entry: qosData[m_viewName])
-         response.out() << entry.toString() << std::endl;
-      }
-    }
+        m_viewName(viewName) { suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName)); }
+    ~CsvReportResource(){ beingDeleted(); }
+    void handleRequest(const Wt::Http::Request&, Wt::Http::Response& response);
   private:
     WebMainUI* m_mainUiClass;
     std::string m_viewName;
