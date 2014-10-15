@@ -46,31 +46,21 @@ void runCollector(int period)
       std::cerr << ex.what() <<"\n";
     }
 
-    std::vector<QosCollector*> mycollectors;
-    for (auto view: dbSession->viewList()) {
-      QosCollector* collector = new QosCollector(view.path.c_str());
-      collector->initialize(preferences.get());
-      collector->initSettings(preferences.get());
-      mycollectors.push_back(collector);
-    }
-
     REPORTD_LOG("notice", Q_TR("Collecting QoS data..."));
     long now = time(NULL);
-    for (auto collector: mycollectors) {
-      collector->runMonitor();
-      DbQosDataT qosInfo = collector->qosInfo();
+    for (auto view: dbSession->viewList()) {
+      QosCollector collector(view.path.c_str());
+      collector.initialize(preferences.get());
+      collector.initSettings(preferences.get());
+      collector.runMonitor();
+      DbQosDataT qosInfo = collector.qosInfo();
       qosInfo.timestamp = now;
       try {
         dbSession->addQosInfo(qosInfo);
         REPORTD_LOG("notice", dbSession->lastError());
       } catch(const std::exception& ex) {
-        std::cerr << ex.what() <<"\n";
+        REPORTD_LOG("warn", ex.what());
       }
-    }
-
-    // clean up data
-    for (auto collector: mycollectors) {
-      delete collector;
     }
 
     sleep(period);
