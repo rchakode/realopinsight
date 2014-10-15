@@ -965,10 +965,8 @@ void WebMainUI::updateBiCharts(void)
 
 void WebMainUI::updateViewBiCharts(const std::string& viewName)
 {
-  long epochStartDate =  Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();
-  long epochEndDate =  Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();
   ViewQosDataMapT qosData;
-  if (m_dbSession->fetchQosInfos(qosData, viewName, epochStartDate, epochEndDate) == 0) {
+  if (m_dbSession->fetchQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
     QosTrendsChartList::iterator qosChart = m_qosCharts.find(viewName);
     if (qosChart != m_qosCharts.end()) {
       qosChart->second->updateData(qosData[viewName]);
@@ -1010,7 +1008,7 @@ Wt::WContainerWidget* WebMainUI::createReportSectionHeader(void)
 
 Wt::WAnchor* WebMainUI::createReportCsvDownloadLink(const std::string& viewName)
 {
-  Wt::WResource *csvResource = new CsvReportResource(viewName, m_mainWidget);
+  Wt::WResource *csvResource = new CsvReportResource(this, viewName, m_mainWidget);
   Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink(csvResource), "Download file", m_mainWidget);
   anchor->setTarget(Wt::TargetNewWindow);
   return anchor;

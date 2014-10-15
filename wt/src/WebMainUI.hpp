@@ -81,6 +81,7 @@ public:
   void handleRefresh(void);
   Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
   virtual void 	refresh () {handleRefresh();}
+  DbSession* dbSession(void) {return m_dbSession;}
 
 
 public Q_SLOTS:
@@ -92,9 +93,11 @@ private:
   class CsvReportResource : public Wt::WResource
   {
   public:
-    CsvReportResource(const std::string& viewName, Wt::WObject *parent = 0)
+    CsvReportResource(WebMainUI* mainUiClass, const std::string& viewName, Wt::WObject *parent = 0)
       : Wt::WResource(parent),
-        m_viewName(viewName){
+        m_mainUiClass(mainUiClass),
+        m_viewName(viewName)
+    {
       suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName));
     }
 
@@ -104,10 +107,18 @@ private:
 
     void handleRequest(const Wt::Http::Request &request,
                        Wt::Http::Response &response) {
-      response.setMimeType("plain/css");
-      response.out() << "1,2,3" << std::endl;
+      response.setMimeType("text/csv");
+      ViewQosDataMapT qosData;
+      if (m_mainUiClass->dbSession()->fetchQosData(qosData,
+                                                    m_viewName,
+                                                    m_mainUiClass->reportStartTime(),
+                                                    m_mainUiClass->reportEndTime()) == 0) {
+       for(const auto& entry: qosData[m_viewName])
+         response.out() << entry.toString() << std::endl;
+      }
     }
   private:
+    WebMainUI* m_mainUiClass;
     std::string m_viewName;
   };
 
@@ -204,6 +215,8 @@ private:
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WAnchor* createReportCsvDownloadLink(const std::string& viewName);
+  long reportStartTime(void){ return Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();}
+  long reportEndTime(void) {return Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();}
 };
 
 #endif // MAINWEBWINDOW_HPP
