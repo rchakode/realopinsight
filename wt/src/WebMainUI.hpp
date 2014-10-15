@@ -38,6 +38,8 @@
 #include <Wt/WDatePicker>
 #include <Wt/WProgressBar>
 #include <Wt/WDialog>
+#include <Wt/Http/Request>
+#include <Wt/Http/Response>
 
 class AuthManager;
 class ViewAclManagement;
@@ -87,18 +89,16 @@ public Q_SLOTS:
   void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
 
 private:
-  class CsvDownloadResource : public Wt::WResource
+  class CsvReportResource : public Wt::WResource
   {
   public:
-    CsvDownloadResource(const std::string& viewName, Wt::WObject *parent = 0)
+    CsvReportResource(const std::string& viewName, Wt::WObject *parent = 0)
       : Wt::WResource(parent),
-        m_viewName(viewName)
-    {
+        m_viewName(viewName){
       suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName));
     }
 
-    ~CsvDownloadResource()
-    {
+    ~CsvReportResource(){
       beingDeleted();
     }
 
@@ -107,7 +107,6 @@ private:
       response.setMimeType("plain/css");
       response.out() << "1,2,3" << std::endl;
     }
-
   private:
     std::string m_viewName;
   };
@@ -204,7 +203,7 @@ private:
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
-  Wt::WAnchor* createReportCsvDownloadLink(void);
+  Wt::WAnchor* createReportCsvDownloadLink(const std::string& viewName);
 };
 
 #endif // MAINWEBWINDOW_HPP
