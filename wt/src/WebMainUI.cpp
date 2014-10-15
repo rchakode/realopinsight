@@ -1021,7 +1021,7 @@ Wt::WContainerWidget* WebMainUI::createReportSectionHeader(void)
 Wt::WAnchor* WebMainUI::createReportCsvDownloadLink(const std::string& viewName)
 {
   Wt::WResource *csvResource = new CsvReportResource(this, viewName, m_mainWidget);
-  Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink(csvResource), "Download file", m_mainWidget);
+  Wt::WAnchor *anchor = new Wt::WAnchor(Wt::WLink(csvResource), new Wt::WImage("images/built-in/csv-file.png"), m_mainWidget);
   anchor->setTarget(Wt::TargetNewWindow);
   return anchor;
 }

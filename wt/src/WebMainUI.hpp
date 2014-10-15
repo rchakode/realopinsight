@@ -52,7 +52,7 @@ public:
   CsvReportResource(WebMainUI* mainUiClass, const std::string& viewName, Wt::WObject *parent = 0)
     : Wt::WResource(parent),
       m_mainUiClass(mainUiClass),
-      m_viewName(viewName) { suggestFileName(Wt::WString("realopinsight-{0}-report.csv").arg(viewName)); }
+      m_viewName(viewName) { suggestFileName(Wt::WString("RealOpInsight-{1}-bireport.csv").arg(QString(viewName.c_str()).replace(" ", "_").toStdString())); }
   ~CsvReportResource(){ beingDeleted(); }
   void handleRequest(const Wt::Http::Request&, Wt::Http::Response& response);
 private:
