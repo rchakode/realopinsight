@@ -56,7 +56,7 @@ void runCollector(int period)
       DbQosDataT qosInfo = collector.qosInfo();
       qosInfo.timestamp = now;
       try {
-        dbSession->addQosInfo(qosInfo);
+        dbSession->addQosData(qosInfo);
         REPORTD_LOG("notice", dbSession->lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", ex.what());
