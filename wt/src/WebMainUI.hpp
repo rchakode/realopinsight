@@ -198,7 +198,7 @@ private:
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
-  Wt::WAnchor* createReportCsvDownloadLink(const std::string& viewName);
+  Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
 };
 
 #endif // MAINWEBWINDOW_HPP
