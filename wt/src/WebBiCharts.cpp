@@ -25,6 +25,7 @@
 #include "WebBiCharts.hpp"
 #include "WebUtils.hpp"
 #include <QDebug>
+#include <Wt/WRectArea>
 
 
 namespace {
@@ -103,11 +104,9 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
     double x1 = 0;
     double x2 = 0;
+    double lastXTooltip = 0;
     Wt::WPainter painter(paintDevice);
     painter.setPen(TRANSPARENT_COLOR); // invisible
-    drawRotatedLegendText(painter,
-                          ngrt4n::timet2String(previousIt->timestamp),
-                          x1, TEXT_TOP_CORNER_Y, -90);
     while (++currentIt, currentIt != m_plottingData.end()) {
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
@@ -115,19 +114,15 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
       x2 = SCALING_FACTOR * (currentIt->timestamp - firstPoint.timestamp);
 
       painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
-      if (previousIt->status != currentIt->status)
-        drawRotatedLegendText(painter,
-                              ngrt4n::timet2String(previousIt->timestamp),
-                              x1, TEXT_TOP_CORNER_Y, -90);
+      if (previousIt->status != currentIt->status) {
+        addRangeToolTip(lastXTooltip, x2);
+        lastXTooltip = x2;
+      }
 
       previousIt = currentIt;
     }
-    drawRotatedLegendText(painter, ngrt4n::timet2String(lastPoint.timestamp),
-                          BI_CHART_WIDTH, TEXT_TOP_CORNER_Y, -90, -15);
+    addRangeToolTip(lastXTooltip, x2);
 
-    //FIXME:
-
-    painter.setPen(LEGEND_TEXT_COLOR); // invisible
     painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
                      Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
                      Wt::AlignCenter,
@@ -136,23 +131,13 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
 
-void QosTrendsChart::drawRotatedLegendText(Wt::WPainter& painter,
-                                           const Wt::WString& text,
-                                           double x,
-                                           double y,
-                                           double angle,
-                                           double shiftLegendXPos)
+void QosTrendsChart::addRangeToolTip(double x1, double x2)
 {
-  painter.save();
-  painter.setPen(LEGEND_TEXT_COLOR);
-  painter.drawLine(x, y, x, y + BI_CHART_TREND_HEIGHT + 10);
-  painter.translate(x + shiftLegendXPos, y);
-  painter.rotate(angle);
-  painter.drawText(0, 0,
-                   Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                   Wt::AlignLeft,
-                   text);
-  painter.restore();
+  long startTime = m_plottingData.front().timestamp;
+  Wt::WRectArea* area = new Wt::WRectArea(x1, AREA_TOP_CORNER_Y, x2 - x1, BI_CHART_TREND_HEIGHT);
+  area->setToolTip(Wt::WString("{1} - {2}").arg(ngrt4n::timet2String(x1 + startTime))
+                   .arg(ngrt4n::timet2String(x2 + startTime)));
+  addArea(area);
 }
 
 

@@ -70,11 +70,7 @@ private:
 
 
   void processPlottingData(const std::list<DbQosDataT>& data);
-  void drawRotatedLegendText(Wt::WPainter& painter,
-                             const Wt::WString& text,
-                             double x, double y,
-                             double angle,
-                             double shiftLegendXPos = 0);
+  void addRangeToolTip(double x1, double x2);
   std::string slaText(void) {
     return QObject::tr("QoS trends - Current SLA: %1\%").arg(QString::number(m_sla, 'f', 2)).toStdString();
   }
