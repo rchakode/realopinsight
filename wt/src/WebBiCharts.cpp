@@ -123,6 +123,7 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     }
     addRangeToolTip(lastXTooltip, x2);
 
+    painter.setPen(LEGEND_TEXT_COLOR); // black
     painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
                      Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
                      Wt::AlignCenter,
