@@ -135,7 +135,7 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 void QosTrendsChart::addRangeToolTip(double x1, double x2)
 {
   long startTime = m_plottingData.front().timestamp;
-  Wt::WRectArea* area = new Wt::WRectArea(x1, AREA_TOP_CORNER_Y, x2 - x1, BI_CHART_TREND_HEIGHT);
+  Wt::WRectArea* area = new Wt::WRectArea(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
   area->setToolTip(Wt::WString("{1} - {2}").arg(ngrt4n::timet2String(x1 + startTime))
                    .arg(ngrt4n::timet2String(x2 + startTime)));
   addArea(area);
