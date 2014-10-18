@@ -65,15 +65,18 @@ private:
   typedef QList<TimeStatusT> TimeStatusesT;
   TimeStatusesT m_plottingData;
   std::string m_viewName;
-  long m_normalTimeCount;
   double m_sla;
+  long m_normalTimeCount;
+  double m_coordinateScalingFactor;
+  TimeStatusT m_firstPoint;
 
 
   void processPlottingData(const std::list<DbQosDataT>& data);
-  void addRangeToolTip(double x1, double x2);
+  void addRangeToolTip(double x1, double x2, long t1, long t2);
   std::string slaText(void) {
     return QObject::tr("QoS trends - Current SLA: %1\%").arg(QString::number(m_sla, 'f', 2)).toStdString();
   }
+  double convertToCoordinate(long timestamp) { return m_coordinateScalingFactor * (timestamp - m_firstPoint.timestamp);}
 };
 
 

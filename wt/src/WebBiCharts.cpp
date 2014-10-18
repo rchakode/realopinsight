@@ -96,32 +96,38 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 {
   if (! m_plottingData.empty()) {
 
-    TimeStatusT firstPoint = m_plottingData.front();
+    m_firstPoint = m_plottingData.front();
     TimeStatusT lastPoint = m_plottingData.last();
-    const double SCALING_FACTOR = BI_CHART_WIDTH / (double)(lastPoint.timestamp - firstPoint.timestamp);
+    m_coordinateScalingFactor = BI_CHART_WIDTH / (double)(lastPoint.timestamp - m_firstPoint.timestamp);
 
     TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
     TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
-    double x1 = 0;
-    double x2 = 0;
-    double lastXTooltip = 0;
+    double xAxis = 0;
+    double width = 0;
+    double lastTooltipAxis = 0;
+    double lastTooltipTimestamp = m_firstPoint.timestamp;
+    double tooltipWidth = 0;
     Wt::WPainter painter(paintDevice);
     painter.setPen(TRANSPARENT_COLOR); // invisible
     while (++currentIt, currentIt != m_plottingData.end()) {
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
-      x1 = SCALING_FACTOR * (previousIt->timestamp - firstPoint.timestamp);
-      x2 = SCALING_FACTOR * (currentIt->timestamp - firstPoint.timestamp);
+      xAxis = convertToCoordinate(previousIt->timestamp);
+      width = convertToCoordinate(currentIt->timestamp) - xAxis;
 
-      painter.drawRect(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
-      if (previousIt->status != currentIt->status) {
-        addRangeToolTip(lastXTooltip, x2);
-        lastXTooltip = x2;
+      painter.drawRect(xAxis, AREA_TOP_CORNER_Y, width, BI_CHART_TREND_HEIGHT);
+      if (currentIt->status != previousIt->status) {
+        tooltipWidth = width + xAxis - lastTooltipAxis;
+        addRangeToolTip(lastTooltipAxis, tooltipWidth, lastTooltipTimestamp, currentIt->timestamp);
+        lastTooltipAxis = xAxis + width;
+        lastTooltipTimestamp = currentIt->timestamp;
       }
 
       previousIt = currentIt;
     }
-    addRangeToolTip(lastXTooltip, x2);
+
+    tooltipWidth = convertToCoordinate(m_plottingData.last().timestamp) - lastTooltipAxis;
+    addRangeToolTip(lastTooltipAxis, tooltipWidth, lastTooltipTimestamp, m_plottingData.last().timestamp);
 
     painter.setPen(LEGEND_TEXT_COLOR); // black
     painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
@@ -132,12 +138,10 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
 
-void QosTrendsChart::addRangeToolTip(double x1, double x2)
+void QosTrendsChart::addRangeToolTip(double x1, double width, long t1, long t2)
 {
-  long startTime = m_plottingData.front().timestamp;
-  Wt::WRectArea* area = new Wt::WRectArea(x1, AREA_TOP_CORNER_Y, x2, BI_CHART_TREND_HEIGHT);
-  area->setToolTip(Wt::WString("{1} - {2}").arg(ngrt4n::timet2String(x1 + startTime))
-                   .arg(ngrt4n::timet2String(x2 + startTime)));
+  Wt::WRectArea* area = new Wt::WRectArea(x1, AREA_TOP_CORNER_Y, width, BI_CHART_TREND_HEIGHT);
+  area->setToolTip(Wt::WString("{1} - {2}").arg(ngrt4n::timet2String(t1)).arg(ngrt4n::timet2String(t2)));
   addArea(area);
 }
 
