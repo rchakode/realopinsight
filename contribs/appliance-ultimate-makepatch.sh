@@ -38,8 +38,8 @@ mkdir ${RELEASE_TARBALL_BASENAME}
 tar --same-owner \
     --exclude ${REALOPINSIGHT_WWW}/realopinsight/run \
     -zcf ${RELEASE_TARBALL_BASENAME}/${REAlOPINSIGHT_PATCH_TARBALL} \
-    ${REALOPINSIGHT_WWW}/realopinsight
-    ${REALOPINSIGHT_PREFIX}/realopinsight/sbin
+    ${REALOPINSIGHT_WWW}/realopinsight \
+    ${REALOPINSIGHT_PREFIX}/realopinsight/sbin/ \
     ${REALOPINSIGHT_PREFIX}/realopinsight/etc/wt_config.xml
 	
 sed "s/$VERSION_TEMPLATE/$REAlOPINSIGHT_TARGET_VERSION/g" $MAKE_PATCH_SCRIPT \
