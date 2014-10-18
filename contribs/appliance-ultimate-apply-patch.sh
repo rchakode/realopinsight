@@ -101,7 +101,7 @@ update_db_2014b7()
   echo -n "DEBUG : Updating database to 2014b7..."
   su - ${REALOPINSIGHT_WWW_USER} -c "sqlite3 /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b7.sql"
   check_exit_code
-  su - ${REALOPINSIGHT_WWW_USER} -c 'printf "[%%General]\nDbState=1\n" >> /opt/realopinsight/etc/realopinsight.conf'
+  su - ${REALOPINSIGHT_WWW_USER} -c 'printf "\n[%%General]\nDbState=1\n" >> /opt/realopinsight/etc/realopinsight.conf'
   echo "database upgraded to 2014b7"
 }
 
