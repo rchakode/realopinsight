@@ -112,7 +112,7 @@ get_target_version_from_user()
   echo
   echo "1) 3.0.0b1"
   echo "2) 3.0.0b2"
-  echo "3) from 2014b3 to 2014b6"
+  echo "3) 2014b3 | 2014b4 | 2014b5 | 2014b6"
   echo "4) Other"
   echo "q) Quit"
   echo
