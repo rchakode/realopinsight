@@ -64,6 +64,7 @@ void QosTrendsChart::updateData(const std::list<DbQosDataT>& data)
 {
   processPlottingData(data);
   update();
+  resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
 
 void QosTrendsChart::processPlottingData(const std::list<DbQosDataT>& data)
@@ -135,7 +136,6 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
                      Wt::AlignCenter,
                      slaText());
   }
-  resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
 
 void QosTrendsChart::addRangeToolTip(double x1, double width, long t1, long t2)
