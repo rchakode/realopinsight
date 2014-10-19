@@ -99,42 +99,45 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 
     m_firstPoint = m_plottingData.front();
     TimeStatusT lastPoint = m_plottingData.last();
-    m_coordinateScalingFactor = BI_CHART_WIDTH / (double)(lastPoint.timestamp - m_firstPoint.timestamp);
+    m_xScalingFactor = BI_CHART_WIDTH / (double)(lastPoint.timestamp - m_firstPoint.timestamp);
 
     TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
     TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
-    double xAxis = 0;
+    double x1Axis = 0;
+    double x2Axis = 0;
+    double lastTooltipXAxis = 0;
     double width = 0;
-    double lastTooltipAxis = 0;
-    double lastTooltipTimestamp = m_firstPoint.timestamp;
     double tooltipWidth = 0;
+    double lastTooltipTimestamp = m_firstPoint.timestamp;
+
     Wt::WPainter painter(paintDevice);
+    painter.scale(m_xScalingFactor, 1);
     painter.setPen(TRANSPARENT_COLOR); // invisible
     while (++currentIt, currentIt != m_plottingData.end()) {
       painter.setBrush(ngrt4n::severityWColor(currentIt->status));
 
-      xAxis = convertToCoordinate(previousIt->timestamp);
-      width = convertToCoordinate(currentIt->timestamp) - xAxis;
+      x1Axis = computeXAxis(previousIt->timestamp);
+      x2Axis = computeXAxis(currentIt->timestamp);
+      width = x2Axis - x1Axis;
+      painter.drawRect(x1Axis, AREA_TOP_CORNER_Y, width, BI_CHART_TREND_HEIGHT);
 
-      painter.drawRect(xAxis, AREA_TOP_CORNER_Y, width, BI_CHART_TREND_HEIGHT);
       if (currentIt->status != previousIt->status) {
-        tooltipWidth = width + xAxis - lastTooltipAxis;
-        addRangeToolTip(lastTooltipAxis, tooltipWidth, lastTooltipTimestamp, currentIt->timestamp);
-        lastTooltipAxis = xAxis + width;
+        tooltipWidth = m_xScalingFactor * x2Axis - lastTooltipXAxis;
+        addRangeToolTip(lastTooltipXAxis, tooltipWidth, lastTooltipTimestamp, currentIt->timestamp);
+        lastTooltipXAxis = m_xScalingFactor * x2Axis;
         lastTooltipTimestamp = currentIt->timestamp;
       }
 
       previousIt = currentIt;
     }
 
-    tooltipWidth = convertToCoordinate(m_plottingData.last().timestamp) - lastTooltipAxis;
-    addRangeToolTip(lastTooltipAxis, tooltipWidth, lastTooltipTimestamp, m_plottingData.last().timestamp);
+    width = computeXAxis(m_plottingData.last().timestamp) - lastTooltipXAxis;
+    addRangeToolTip(lastTooltipXAxis, width, lastTooltipTimestamp, m_plottingData.last().timestamp);
 
-    painter.setPen(LEGEND_TEXT_COLOR); // black
+    painter.setPen(LEGEND_TEXT_COLOR);
     painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
                      Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                     Wt::AlignCenter,
-                     slaText());
+                     Wt::AlignCenter, slaText());
   }
 }
 

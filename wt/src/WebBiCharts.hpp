@@ -67,7 +67,7 @@ private:
   std::string m_viewName;
   double m_sla;
   long m_normalTimeCount;
-  double m_coordinateScalingFactor;
+  double m_xScalingFactor;
   TimeStatusT m_firstPoint;
 
 
@@ -76,7 +76,7 @@ private:
   std::string slaText(void) {
     return QObject::tr("QoS trends - Current SLA: %1\%").arg(QString::number(m_sla, 'f', 2)).toStdString();
   }
-  double convertToCoordinate(long timestamp) { return m_coordinateScalingFactor * (timestamp - m_firstPoint.timestamp);}
+  double computeXAxis(long timestamp) { return timestamp - m_firstPoint.timestamp;}
 };
 
 
