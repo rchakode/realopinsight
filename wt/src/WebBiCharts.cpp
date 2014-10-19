@@ -111,6 +111,7 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     double lastTooltipTimestamp = m_firstPoint.timestamp;
 
     Wt::WPainter painter(paintDevice);
+    painter.save();
     painter.scale(m_xScalingFactor, 1);
     painter.setPen(TRANSPARENT_COLOR); // invisible
     while (++currentIt, currentIt != m_plottingData.end()) {
@@ -134,6 +135,7 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     width = computeXAxis(m_plottingData.last().timestamp) - lastTooltipXAxis;
     addRangeToolTip(lastTooltipXAxis, width, lastTooltipTimestamp, m_plottingData.last().timestamp);
 
+    painter.restore();
     painter.setPen(LEGEND_TEXT_COLOR);
     painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
                      Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
