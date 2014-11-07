@@ -52,7 +52,7 @@
 namespace {
   const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-  } //namespace
+} //namespace
 
 StringMapT DashboardBase::propRules() {
   PropRules unchanged(PropRules::Unchanged);
@@ -137,46 +137,47 @@ void DashboardBase::runMonitor()
 void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
-  openRpcSession(src);
   switch(src.mon_type) {
-  case ngrt4n::Zenoss:
-    Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
-      if (info.first != src.id) continue;
-      ChecksT checks;
-      if (src.zns_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, src.zns_handler->lastError());
+    case ngrt4n::Zenoss:
+      Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+        StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
+        if (info.first != src.id) continue;
+        ChecksT checks;
+        ZnsHelper znsBroker(src.mon_url);
+        if (znsBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
+          updateCNodesWithChecks(checks, src);
+        } else {
+          updateDashboardOnError(src, znsBroker.lastError());
+        }
       }
-    }
-    break;
-  case ngrt4n::Zabbix:
-    Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
+      break;
+    case ngrt4n::Zabbix:
+      Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
+        StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
 
-      if (info.first != src.id) continue;
+        if (info.first != src.id) continue;
 
-      ChecksT checks;
-      if (src.zbx_handler->loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, src.zbx_handler->lastError());
+        ChecksT checks;
+        ZbxHelper zbxBroker(src.mon_url);
+        if (zbxBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
+          updateCNodesWithChecks(checks, src);
+        } else {
+          updateDashboardOnError(src, zbxBroker.lastError());
+        }
       }
-    }
-    break;
-  case ngrt4n::Nagios:
-  default:
-    if (src.use_ngrt4nd) {
+      break;
+    case ngrt4n::Nagios:
+    default:
+      if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
-      runNgrt4ndUpdate(src);
+        runNgrt4ndUpdate(src);
 #else
-      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+        updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
 #endif
-    } else {
-      runLivestatusUpdate(src);
-    }
-    break;
+      } else {
+        runLivestatusUpdate(src);
+      }
+      break;
   }
   finalizeUpdate(src);
 }
@@ -188,13 +189,15 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
 
   // Check if the handler is connected
-  if (! src.d4n_handler->isReady()) {
-    updateDashboardOnError(src, src.d4n_handler->lastError());
+  ZmqSocket d4nBroker(QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)).toStdString(),
+                      ZMQ_REQ);
+  if (! d4nBroker.isReady()) {
+    updateDashboardOnError(src, d4nBroker.lastError());
     return;
   }
 
-  if (src.d4n_handler->getServerSerial() < 110) {
-    QString errmsg = tr("The server serial %1 is not supported").arg(src.d4n_handler->getServerSerial());
+  if (d4nBroker.getServerSerial() < 110) {
+    QString errmsg = tr("The server serial %1 is not supported").arg(d4nBroker.getServerSerial());
     updateDashboardOnError(src, errmsg);
     return;
   }
@@ -208,8 +211,8 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
       if (sourceDataPointInfo.first == src.id) {
         // Retrieve data
         QString requestData = QString("%1:%2").arg(src.auth, sourceDataPointInfo.second);
-        src.d4n_handler->send(requestData.toStdString());
-        JsonHelper jsHelper(src.d4n_handler->recv().c_str());
+        d4nBroker.send(requestData.toStdString());
+        JsonHelper jsHelper(d4nBroker.recv().c_str());
 
         // Treat data
         qint32 ret = jsHelper.getProperty("return_code").toInt32();
@@ -230,8 +233,9 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {
-  if (src.ls_handler->setupSocket() != 0) {
-    updateDashboardOnError(src, src.ls_handler->lastError());
+  LsHelper lsBroker(src.ls_addr, src.ls_port);
+  if (lsBroker.setupSocket() != 0) {
+    updateDashboardOnError(src, lsBroker.lastError());
     return;
   }
 
@@ -244,10 +248,10 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
     QPair<QString, QString> info = ngrt4n::splitSourceDataPointInfo(hostit.key());
     if (info.first == src.id) {
       ChecksT checks;
-      if (src.ls_handler->loadChecks(info.second, checks) == 0) {
+      if (lsBroker.loadChecks(info.second, checks) == 0) {
         updateCNodesWithChecks(checks, src);
       } else {
-        updateDashboardOnError(src, src.ls_handler->lastError());
+        updateDashboardOnError(src, lsBroker.lastError());
         break;
       }
     }
@@ -269,16 +273,16 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-  case ngrt4n::Nagios:
-    msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
-    break;
-  case ngrt4n::Zabbix:
-  case ngrt4n::Zenoss:
-    msg = msg.arg(src.id, src.mon_url);
-    break;
-  default:
-    msg = msg.arg(src.id, "undefined source type");
-    break;
+    case ngrt4n::Nagios:
+      msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
+      break;
+    case ngrt4n::Zabbix:
+    case ngrt4n::Zenoss:
+      msg = msg.arg(src.id, src.mon_url);
+      break;
+    default:
+      msg = msg.arg(src.id, "undefined source type");
+      break;
   }
   Q_EMIT updateStatusBar(msg);
 }
@@ -413,66 +417,6 @@ QStringList DashboardBase::getAuthInfo(int srcId)
 }
 
 
-void DashboardBase::openRpcSessions(void)
-{
-  for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end();
-       src != end; ++src) {
-    openRpcSession(*src);
-  }
-}
-
-void DashboardBase::openRpcSession(int srcId)
-{
-  SourceListT::Iterator src = m_sources.find(srcId);
-  if (src != m_sources.end()) {
-    switch (src->mon_type) {
-    case ngrt4n::Zabbix:
-      src->zbx_handler->setIsLogged(false);
-      break;
-    case ngrt4n::Zenoss:
-      src->zns_handler->setIsLogged(false);
-      break;
-    default:
-      break;
-    }
-  }
-  openRpcSession(*src);
-}
-
-
-void DashboardBase::openRpcSession(SourceT& src)
-{
-  QStringList authParams = ngrt4n::getAuthInfo(src.auth);
-  if (authParams.size() != 2 && src.mon_type != ngrt4n::Nagios) {
-    updateDashboardOnError(src, tr("Invalid authentication chain. Must be login:password"));
-    return;
-  }
-
-  switch(src.mon_type) {
-  case ngrt4n::Nagios:
-    if (src.use_ngrt4nd) {
-#ifndef REALOPINSIGHT_DISABLE_ZMQ
-      src.d4n_handler->setupSocket();
-      src.d4n_handler->makeHandShake();
-#else
-      updateDashboardOnError(src, tr("This version is compiled without ngrt4nd support"));
-#endif
-    } else {
-      //src.ls_handler->setupSocket();
-    }
-    break;
-  case ngrt4n::Zabbix:
-    src.zbx_handler->openSession(src);
-    break;
-  case ngrt4n::Zenoss:
-    src.zns_handler->openSession(src);
-    break;
-  default:
-    break;
-  }
-}
-
-
 void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (! msg.isEmpty()) {
@@ -498,7 +442,9 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (preferencePtr->isSetSource(srcinfo.second)) {
-        if (preferencePtr->loadSource(*id, src) && allocSourceHandler(src)) {
+
+        if (preferencePtr->loadSource(*id, src)) {
+          checkStandaloneSourceType(src);
           m_sources.insert(srcinfo.second, src);
         } else {
           src.id = *id;
@@ -517,62 +463,25 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
   Q_EMIT settingsLoaded();
 }
 
-bool DashboardBase::allocSourceHandler(SourceT& src)
+void DashboardBase::checkStandaloneSourceType(SourceT& src)
 {
-  bool allocated = false;
   if (m_cdata->monitor != ngrt4n::Auto) {
     src.mon_type = m_cdata->monitor;
   }
-
-  switch (src.mon_type) {
-  case ngrt4n::Nagios:
-    if (src.use_ngrt4nd) {
-#ifndef REALOPINSIGHT_DISABLE_ZMQ
-      QString uri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port));
-      src.d4n_handler = std::make_shared<ZmqSocket>(uri.toStdString(), ZMQ_REQ);
-      allocated = true;
-#else
-      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
-      allocated = false;
-#endif
-    } else {
-      src.ls_handler = std::make_shared<LsHelper>(src.ls_addr, src.ls_port);
-      allocated = true;
-    }
-    break;
-  case ngrt4n::Zabbix:
-    src.zbx_handler = std::make_shared<ZbxHelper>(src.mon_url);
-    allocated = true;
-    break;
-  case ngrt4n::Zenoss:
-    src.zns_handler = std::make_shared<ZnsHelper>(src.mon_url);
-    allocated = true;
-    break;
-  default:
-    updateDashboardOnError(src, tr("%1: undefined monitor (%2)").arg(src.id, src.mon_type));
-    allocated = false;
-    break;
-  }
-
-  return allocated;
 }
 
 void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
 {
-  if (ids.size() > 0)
-  {
+  if (! ids.isEmpty()) {
     Q_FOREACH (const qint8& id, ids) {
       SourceT newsrc;
       m_preferences->loadSource(id, newsrc);
-      if (allocSourceHandler(newsrc)) {
-        SourceListT::Iterator olddata = m_sources.find(id);
-        if (olddata != m_sources.end()) {
-          m_sources.erase(olddata);
-        }
-        m_sources.insert(id, newsrc);
-      } else {
-        Q_EMIT errorOccurred(tr("Can't allocate handler for source %1").arg(id));
+      checkStandaloneSourceType(newsrc);
+      SourceListT::Iterator olddata = m_sources.find(id);
+      if (olddata != m_sources.end()) {
+        m_sources.erase(olddata);
       }
+      m_sources.insert(id, newsrc);
     }
     runMonitor();
     Q_EMIT updateSourceUrl();

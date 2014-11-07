@@ -68,7 +68,7 @@ public Q_SLOTS:
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
   ngrt4n::AggregatedSeverityT computeNodeSeverity(const QString& _node);
-  bool allocSourceHandler(SourceT& src);
+  void checkStandaloneSourceType(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
   virtual void initialize(Preferences* preferencePtr);
@@ -124,9 +124,6 @@ protected:
   void updateCNodesWithCheck(const CheckT & check, const SourceT& src);
   void updateCNodesWithChecks(const ChecksT& checks, const SourceT& src);
   QStringList getAuthInfo(int srcId);
-  void openRpcSessions(void);
-  void openRpcSession(int srcId);
-  void openRpcSession(SourceT& src);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
 };
