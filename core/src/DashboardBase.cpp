@@ -52,7 +52,7 @@
 namespace {
   const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
   const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
-} //namespace
+  } //namespace
 
 StringMapT DashboardBase::propRules() {
   PropRules unchanged(PropRules::Unchanged);
@@ -138,46 +138,48 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
   switch(src.mon_type) {
-    case ngrt4n::Zenoss:
-      Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-        StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
-        if (info.first != src.id) continue;
+  case ngrt4n::Zenoss: {
+    ZnsHelper znsBroker(src.mon_url);
+    Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+      StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
+      if (info.first == src.id) {
         ChecksT checks;
-        ZnsHelper znsBroker(src.mon_url);
         if (znsBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
           updateCNodesWithChecks(checks, src);
         } else {
           updateDashboardOnError(src, znsBroker.lastError());
         }
       }
-      break;
-    case ngrt4n::Zabbix:
-      Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
-        StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
-
-        if (info.first != src.id) continue;
-
+    }
+    break;
+  }
+  case ngrt4n::Zabbix: {
+    ZbxHelper zbxBroker(src.mon_url);
+    Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
+      StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
+      if (info.first == src.id) {
         ChecksT checks;
-        ZbxHelper zbxBroker(src.mon_url);
         if (zbxBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
           updateCNodesWithChecks(checks, src);
         } else {
           updateDashboardOnError(src, zbxBroker.lastError());
         }
       }
-      break;
-    case ngrt4n::Nagios:
-    default:
-      if (src.use_ngrt4nd) {
+    }
+    break;
+  }
+  case ngrt4n::Nagios:
+  default:
+    if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
-        runNgrt4ndUpdate(src);
+      runNgrt4ndUpdate(src);
 #else
-        updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+      updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
 #endif
-      } else {
-        runLivestatusUpdate(src);
-      }
-      break;
+    } else {
+      runLivestatusUpdate(src);
+    }
+    break;
   }
   finalizeUpdate(src);
 }
@@ -189,8 +191,11 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
 
   // Check if the handler is connected
-  ZmqSocket d4nBroker(QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)).toStdString(),
-                      ZMQ_REQ);
+  std::string ngrt4ndUri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)).toStdString();
+  ZmqSocket d4nBroker(ngrt4ndUri, ZMQ_REQ);
+
+  d4nBroker.setupSocket();
+  d4nBroker.makeHandShake();
   if (! d4nBroker.isReady()) {
     updateDashboardOnError(src, d4nBroker.lastError());
     return;
@@ -203,7 +208,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
   }
 
   // Now start doing the job
-  for (NodeListIteratorT cnode=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode!=end; ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode != end; ++cnode) {
     if (cnode->child_nodes.isEmpty()) {
       cnode->sev = ngrt4n::Unknown;
     } else {
@@ -273,16 +278,16 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-    case ngrt4n::Nagios:
-      msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
-      break;
-    case ngrt4n::Zabbix:
-    case ngrt4n::Zenoss:
-      msg = msg.arg(src.id, src.mon_url);
-      break;
-    default:
-      msg = msg.arg(src.id, "undefined source type");
-      break;
+  case ngrt4n::Nagios:
+    msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
+    break;
+  case ngrt4n::Zabbix:
+  case ngrt4n::Zenoss:
+    msg = msg.arg(src.id, src.mon_url);
+    break;
+  default:
+    msg = msg.arg(src.id, "undefined source type");
+    break;
   }
   Q_EMIT updateStatusBar(msg);
 }
