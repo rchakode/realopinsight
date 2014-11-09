@@ -28,7 +28,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.1.1
+REALOPINSIGHT_CORE_VERSION=3.1.2
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
@@ -110,7 +110,6 @@ SOURCES += \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp
 
-gui-base {
 QT += svg gui
 PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"
 HEADERS	+= client/src/Auth.hpp \
@@ -140,7 +139,6 @@ SOURCES	+= client/src/Auth.cpp \
     client/src/GuiPreferences.cpp \
     client/src/MsgConsole.cpp \
     client/src/GuiDialogForms.cpp
-}
 
 dist {
 SOURCES	+=

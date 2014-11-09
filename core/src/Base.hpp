@@ -65,11 +65,6 @@ const QString REL_INFO = QString("%1/%2").arg(PKG_VERSION, REL_YEAR);
 const QString ID_PATTERN("%1/%2");
 const qint32 MAX_SRCS = 10;
 
-class LsHelper;
-class ZbxHelper;
-class ZnsHelper;
-class ZmqSocket;
-
 struct CheckT {
   std::string id;
   std::string host;
@@ -319,10 +314,6 @@ struct SourceT {
   QString auth;
   qint8 verify_ssl_peer;
   QString icon;
-  std::shared_ptr<ZmqSocket> d4n_handler;
-  std::shared_ptr<LsHelper> ls_handler;
-  std::shared_ptr<ZbxHelper> zbx_handler;
-  std::shared_ptr<ZnsHelper> zns_handler;
 };
 
 typedef QHash<int, SourceT> SourceListT;

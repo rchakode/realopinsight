@@ -2,9 +2,13 @@
 RealOpInsight ChangeLog
 ###############################
 3.1.1
-  * Fixed problem when the average calculation rule with threshold always returns
-    average severity
-  * Misc fixes on contextual messages
+  * Fixed problem when the average calculation rule with thresholds always returns
+    average severity.
+  * Added the ability to compile RealOpInsight Workstation without the support of ZMQ
+    and QtWebkit. This aims to provide a minimal software that can work on Linux
+    distributions, such as RedHat and CentOS, whose certain versions do not natively
+    provide packages for the aforementioned tools.
+  * Misc typos related to contextual messages.
 
 3.1.0
   * Added the support of weighting services (see ticket #45). Weighting enables
