@@ -138,36 +138,12 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
   switch(src.mon_type) {
-  case ngrt4n::Zenoss: {
-    ZnsHelper znsBroker(src.mon_url);
-    Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
-      if (info.first == src.id) {
-        ChecksT checks;
-        if (znsBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-          updateCNodesWithChecks(checks, src);
-        } else {
-          updateDashboardOnError(src, znsBroker.lastError());
-        }
-      }
-    }
+  case ngrt4n::Zenoss:
+    runZenossUpdate(src);
     break;
-  }
-  case ngrt4n::Zabbix: {
-    ZbxHelper zbxBroker(src.mon_url);
-    Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
-      StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
-      if (info.first == src.id) {
-        ChecksT checks;
-        if (zbxBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-          updateCNodesWithChecks(checks, src);
-        } else {
-          updateDashboardOnError(src, zbxBroker.lastError());
-        }
-      }
-    }
+  case ngrt4n::Zabbix:
+    runZabbixUpdate(src);
     break;
-  }
   case ngrt4n::Nagios:
   default:
     if (src.use_ngrt4nd) {
@@ -185,6 +161,7 @@ void DashboardBase::runMonitor(SourceT& src)
 }
 
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
+
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
@@ -234,7 +211,40 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     }
   }
 }
-#endif //disable zmq
+#endif //#ifndef REALOPINSIGHT_DISABLE_ZMQ
+
+void DashboardBase::runZabbixUpdate(const SourceT& src)
+{
+  ZbxHelper zbxBroker(src.mon_url);
+  Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
+    StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
+    if (info.first == src.id) {
+      ChecksT checks;
+      if (zbxBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
+        updateCNodesWithChecks(checks, src);
+      } else {
+        updateDashboardOnError(src, zbxBroker.lastError());
+      }
+    }
+  }
+}
+
+
+void DashboardBase::runZenossUpdate(const SourceT& src)
+{
+  ZnsHelper znsBroker(src.mon_url);
+  Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+    StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
+    if (info.first == src.id) {
+      ChecksT checks;
+      if (znsBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
+        updateCNodesWithChecks(checks, src);
+      } else {
+        updateDashboardOnError(src, znsBroker.lastError());
+      }
+    }
+  }
+}
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {
