@@ -50,13 +50,14 @@
 
             <div class="accordion-group" id="viewMenuBlock">
               <div class="accordion-heading">
-                 <i class="fa fa-cogs fa-fw pull-left"></i> Account &amp; Settings
+                 <i class="fa fa-cogs fa-fw pull-left"></i> Settings
               </div>
             <div class="accordion-body collapse in">
               <div class="accordion-inner">
                <ul class="nav">
                 <li><i class="fa fa-cog pull-left"></i> ${menu-monitoring-settings}</li>
                 <li id="menu-auth-settings"><i class="fa fa-lock pull-left"></i> ${menu-auth-settings}</li>
+                <li id="menu-notification-settings"><i class="fa fa-mail-forward pull-left"></i> ${menu-notification-settings}</li>
                 <li><i class="fa fa-plus pull-left"></i> ${menu-my-account}</li>
                 <li><a href="#"><i class="fa fa-key fa-fw pull-left"></i> ${menu-change-password}</a></li>
               </ul>
@@ -487,6 +488,18 @@
         </div>
       </fieldset> <!-- id="ldap-auth-setting-section" -->
     </div> <!-- id="auth-section" -->
+
+
+  <!-- Notification section -->
+    <div id="notification-section">
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label">Type&nbsp;</label>
+          <span>${notification-type}</span>
+        </div>
+      </fieldset>
+   </div> <!-- id="auth-section" -->
+
 
     <!-- form buttons -->
     <div class="form-actions">

@@ -125,7 +125,6 @@ WebPreferences::WebPreferences(void)
   m_ldapBindUserDnField.reset(new Wt::WLineEdit(this));
   m_ldapBindUserDnField->setEmptyText("cn=Manager,ou=devops,dc=example,dc=com");
 
-
   m_ldapBindUserPasswordField.reset(new Wt::WLineEdit(this));
   m_ldapBindUserPasswordField->setEchoMode(Wt::WLineEdit::Password);
   m_ldapBindUserPasswordField->setText("mysecretpassword");
@@ -456,21 +455,29 @@ void WebPreferences::addToSourceBox(int sourceGlobalIndex)
 
 
 
-
 void WebPreferences::showAuthSettings(void)
 {
   loadAuthSettings();
   showAuthSettingsWidgets(true);
   showMonitoringSettingsWidgets(false);
+  showNotificationSettingsWidgets(false);
 }
 
-void WebPreferences::showMonitoringSettings(void)
+void WebPreferences::showAuthSettingsWidgets(bool display)
 {
-  fillFromSource(firstSourceSet());
-  showMonitoringSettingsWidgets(true);
-  showAuthSettingsWidgets(false);
+  std::string v = display? "true" : "false";
+  wApp->doJavaScript(Wt::WString("$('#auth-section').toggle({1});"
+                                 "$('#save-auth-setting-button').toggle({1});").arg(v).toUTF8());
+  switch (m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt()) {
+    case LDAP:
+      wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
+      break;
+    case BuiltIn:
+    default:
+      wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
+      break;
+  }
 }
-
 
 void WebPreferences::saveAuthSettings(void)
 {
@@ -514,6 +521,16 @@ void WebPreferences::loadAuthSettings(void)
   showLdapSslSettings(useMySslCert == Wt::Checked);
 }
 
+
+void WebPreferences::showMonitoringSettings(void)
+{
+  fillFromSource(firstSourceSet());
+  showMonitoringSettingsWidgets(true);
+  showAuthSettingsWidgets(false);
+  showNotificationSettingsWidgets(false);
+}
+
+
 void WebPreferences::showMonitoringSettingsWidgets(bool display)
 {
   std::string v = display? "true" : "false";
@@ -524,20 +541,17 @@ void WebPreferences::showMonitoringSettingsWidgets(bool display)
 }
 
 
-void WebPreferences::showAuthSettingsWidgets(bool display)
+void WebPreferences::showNotificationSettings(void)
+{
+  loadAuthSettings();
+  showAuthSettingsWidgets(true);
+  showMonitoringSettingsWidgets(false);
+}
+
+void WebPreferences::showNotificationSettingsWidgets(bool display)
 {
   std::string v = display? "true" : "false";
-  wApp->doJavaScript(Wt::WString("$('#auth-section').toggle({1});"
-                                 "$('#save-auth-setting-button').toggle({1});").arg(v).toUTF8());
-  switch (m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt()) {
-    case LDAP:
-      wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
-      break;
-    case BuiltIn:
-    default:
-      wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
-      break;
-  }
+  wApp->doJavaScript(Wt::WString("$('#notification-section').toggle({1});").arg(v).toUTF8());
 }
 
 void WebPreferences::showLdapSslSettings(bool display)
@@ -545,7 +559,6 @@ void WebPreferences::showLdapSslSettings(bool display)
   std::string v = display ? "true" : "false";
   wApp->doJavaScript(Wt::WString("$('#ldap-custom-ssl-settings').toggle({1});").arg(v).toUTF8());
 }
-
 
 void WebPreferences::showLivestatusSettings(int monitorTypeIndex)
 {

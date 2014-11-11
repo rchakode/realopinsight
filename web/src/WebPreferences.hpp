@@ -81,10 +81,12 @@ public:
 
   virtual void setEnabledInputs(bool enable);
   void hideUnrequiredFields(void);
-  void showAuthSettings(void);
   void showMonitoringSettings(void);
   void showMonitoringSettingsWidgets(bool display);
+  void showAuthSettings(void);
   void showAuthSettingsWidgets(bool display);
+  void showNotificationSettings(void);
+  void showNotificationSettingsWidgets(bool display);
   std::string getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString();}
   std::string getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString();}
   std::string getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE).toStdString();}

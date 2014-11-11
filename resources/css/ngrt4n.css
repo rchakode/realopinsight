@@ -174,7 +174,7 @@ body, html {
 
 .admin-page #ngrt4n-side-pane {
   float: left;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .admin-page #ngrt4n-side-pane .ngrt4n-content {

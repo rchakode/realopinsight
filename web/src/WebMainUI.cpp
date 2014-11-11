@@ -210,13 +210,13 @@ void WebMainUI::setupProfileMenus(void)
   Wt::WMenuItem* curItem = NULL;
   if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
 
-    curItem = profilePopupMenu->addItem(tr("Show Account & Settings").toStdString());
+    curItem = profilePopupMenu->addItem(tr("Show Settings").toStdString());
     curItem->triggered().connect(std::bind([=]() {
       if (m_showSettingTab) {
         if (m_dashtabs->count() > 1) {
           m_dashtabs->setTabHidden(0, false);
           m_dashtabs->setCurrentIndex(0);
-          curItem->setText(tr("Hide Account & Settings").toStdString());
+          curItem->setText(tr("Hide Settings").toStdString());
           wApp->doJavaScript("$('#userMenuBlock').hide(); "
                              "$('#viewMenuBlock').hide();"
                              "$('#menu-auth-settings').hide();");
@@ -599,22 +599,33 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // monitoring settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Monitoring Settings"));
+  link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
   settingPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText(Q_TR("Monitoring Settings"));
+    m_adminPanelTitle->setText(Q_TR("Setting up Monitoring Sources"));
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
     m_preferences->showMonitoringSettings();
   }));
 
   // auth settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Auth Settings"));
+  link = new Wt::WAnchor("#", Q_TR("Authentication"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
+    m_mgntContentWidgets->setCurrentWidget(m_preferences);
+    m_preferences->showAuthSettings();
+  }));
+
+  // notification settings menu
+  m_mgntContentWidgets->addWidget(m_preferences);
+  link = new Wt::WAnchor("#", Q_TR("Notification"));
+  settingPageTpl->bindWidget("menu-notification-settings", link);
+  m_menuLinks.insert(MenuAuthSettings, link);
+  link->clicked().connect(std::bind([=](){
+    m_adminPanelTitle->setText(Q_TR("Notification Settings"));
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
     m_preferences->showAuthSettings();
   }));
