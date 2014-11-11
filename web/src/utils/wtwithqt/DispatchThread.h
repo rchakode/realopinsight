@@ -26,7 +26,7 @@
 #ifndef DISPATCH_THREAD_H_
 #define DISPATCH_THREAD_H_
 
-#include <QThread>
+#include <QtCore/QThread>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 

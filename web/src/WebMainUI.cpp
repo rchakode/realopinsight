@@ -22,10 +22,10 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "dbo/ViewAclManagement.hpp"
 #include "WebPreferences.hpp"
 #include "AuthManager.hpp"
 #include "WebMainUI.hpp"
-#include "ViewAclManagement.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include <Wt/WApplication>

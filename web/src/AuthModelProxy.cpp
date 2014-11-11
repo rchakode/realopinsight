@@ -22,8 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "dbo/UserManagement.hpp"
 #include "AuthModelProxy.hpp"
-#include "UserManagement.hpp"
 #include "WebUtils.hpp"
 #include "Validators.hpp"
 #include "LdapHelper.hpp"

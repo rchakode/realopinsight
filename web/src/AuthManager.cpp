@@ -22,9 +22,9 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "dbo/DbSession.hpp"
 #include "WebUtils.hpp"
 #include "WebMainUI.hpp"
-#include "DbSession.hpp"
 #include "AuthManager.hpp"
 #include "AuthModelProxy.hpp"
 #include <Wt/Auth/Login>

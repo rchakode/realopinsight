@@ -58,6 +58,9 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 CODECFORSRC = UTF-8
 CODECFORTR  = UTF-8
 
+
+INCLUDEPATH += web/src
+
 HEADERS += \
     core/src/Base.hpp \
     core/src/Parser.hpp \
@@ -74,9 +77,27 @@ HEADERS += \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
-    wt/src/QosCollector.hpp \
-    wt/src/Applications.hpp \
-    wt/src/WebBiCharts.hpp
+    web/src/dbo/DbSession.hpp \
+    web/src/dbo/DbObjects.hpp \
+    web/src/dbo/ViewAclManagement.hpp \
+    web/src/dbo/UserManagement.hpp \
+    web/src/WebDashboard.hpp \
+    web/src/WebMsgConsole.hpp \
+    web/src/WebMap.hpp \
+    web/src/WebTree.hpp \
+    web/src/WebPieChart.hpp \
+    web/src/WebMainUI.hpp \
+    web/src/WebUtils.hpp \
+    web/src/AuthManager.hpp \
+    web/src/WebPreferences.hpp \
+    web/src/utils/wtwithqt/DispatchThread.h \
+    web/src/utils/wtwithqt/WQApplication \
+    web/src/Validators.hpp \
+    web/src/LdapHelper.hpp\
+    web/src/AuthModelProxy.hpp \
+    web/src/QosCollector.hpp \
+    web/src/Applications.hpp \
+    web/src/WebBiCharts.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -93,8 +114,24 @@ SOURCES +=  core/src/Base.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
-    wt/src/QosCollector.cpp \
-    wt/src/WebBiCharts.cpp
+    web/src/dbo/DbSession.cpp \
+    web/src/dbo/UserManagement.cpp \
+    web/src/dbo/ViewAclManagement.cpp \
+    web/src/QosCollector.cpp \
+    web/src/WebBiCharts.cpp \
+    web/src/WebDashboard.cpp \
+    web/src/WebMsgConsole.cpp \
+    web/src/WebMap.cpp \
+    web/src/WebTree.cpp \
+    web/src/WebPieChart.cpp \
+    web/src/WebMainUI.cpp \
+    web/src/WebUtils.cpp \
+    web/src/AuthManager.cpp \
+    web/src/WebPreferences.cpp \
+    web/src/utils/wtwithqt/DispatchThread.C \
+    web/src/utils/wtwithqt/WQApplication.C \
+    web/src/LdapHelper.cpp \
+    web/src/AuthModelProxy.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
@@ -102,62 +139,21 @@ LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_filesystem -lboost_date_time \
         -lldap
 
-INCLUDEPATH += wt/src \
-               wt/dbo \
-               wt/extlibs/wtwithqt
-
-HEADERS	+= wt/src/WebDashboard.hpp \
-    wt/src/WebMsgConsole.hpp \
-    wt/src/WebMap.hpp \
-    wt/src/WebTree.hpp \
-    wt/src/WebPieChart.hpp \
-    wt/src/WebMainUI.hpp \
-    wt/dbo/DbSession.hpp \
-    wt/dbo/DbObjects.hpp \
-    wt/src/WebUtils.hpp \
-    wt/src/AuthManager.hpp \
-    wt/src/WebPreferences.hpp \
-    wt/extlibs/wtwithqt/DispatchThread.h \
-    wt/extlibs/wtwithqt/WQApplication \
-    wt/src/Validators.hpp \
-    wt/src/LdapHelper.hpp\
-    wt/dbo/ViewAclManagement.hpp \
-    wt/dbo/UserManagement.hpp \
-    wt/src/AuthModelProxy.hpp
-
-
-SOURCES	+= wt/src/WebDashboard.cpp \
-    wt/src/WebMsgConsole.cpp \
-    wt/src/WebMap.cpp \
-    wt/src/WebTree.cpp \
-    wt/src/WebPieChart.cpp \
-    wt/src/WebMainUI.cpp \
-    wt/dbo/DbSession.cpp \
-    wt/src/WebUtils.cpp \
-    wt/src/AuthManager.cpp \
-    wt/src/WebPreferences.cpp \
-    wt/extlibs/wtwithqt/DispatchThread.C \
-    wt/extlibs/wtwithqt/WQApplication.C \
-    wt/src/LdapHelper.cpp \
-    wt/dbo/UserManagement.cpp \
-    wt/dbo/ViewAclManagement.cpp \
-    wt/src/AuthModelProxy.cpp
-
 webd {
-  SOURCES += wt/src/ngrt4n-web.cpp
+  SOURCES += web/src/ngrt4n-web.cpp
   TARGET = realopinsightd
   LIBS += -lwthttp
 }
 
 web-fcgi {
-  SOURCES += wt/src/ngrt4n-web.cpp
+  SOURCES += web/src/ngrt4n-web.cpp
   DEFINES *= REALOPINSIGHT_WEB_FASTCGI
   TARGET = realopinsight.fcgi
   LIBS += -lwtfcgi
 }
 
 web-reportd {
-  SOURCES += wt/src/ngrt4n-reportd.cpp
+  SOURCES += web/src/ngrt4n-reportd.cpp
   TARGET = realopinsight-reportd
 }
 

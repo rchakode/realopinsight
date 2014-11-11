@@ -25,12 +25,12 @@
 #ifndef REALOPINSIGHTQAPP_HPP
 #define REALOPINSIGHTQAPP_HPP
 #include <QApplication>
+#include "utils/wtwithqt/WQApplication"
+#include "dbo/DbSession.hpp"
 #include <Wt/WBootstrapTheme>
 #include <Wt/WContainerWidget>
 #include <Wt/WEnvironment>
-#include "WQApplication"
 #include "WebUtils.hpp"
-#include "DbSession.hpp"
 #include "AuthManager.hpp"
 
 

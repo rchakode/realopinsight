@@ -22,10 +22,10 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "dbo/DbObjects.hpp"
 #include "LdapHelper.hpp"
 #include "Settings.hpp"
 #include "WebUtils.hpp"
-#include "DbObjects.hpp"
 #include <ctime>
 
 namespace {

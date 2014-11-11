@@ -23,11 +23,11 @@
  */
 
 #include <QCoreApplication>
+#include "dbo/DbSession.hpp"
+#include "utils/wtwithqt/WQApplication"
 #include <Wt/WServer>
-#include "WQApplication"
 #include "WebUtils.hpp"
 #include "AuthManager.hpp"
-#include "DbSession.hpp"
 #include "WebMainUI.hpp"
 #include "Applications.hpp"
 

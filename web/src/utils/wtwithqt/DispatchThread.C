@@ -23,7 +23,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "WQApplication"
-
 #include "DispatchThread.h"
 
 namespace Wt {

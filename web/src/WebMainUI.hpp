@@ -26,9 +26,9 @@
 #ifndef MAINWEBWINDOW_HPP
 #define MAINWEBWINDOW_HPP
 
+#include "dbo/DbSession.hpp"
+#include "dbo/UserManagement.hpp"
 #include "WebDashboard.hpp"
-#include "DbSession.hpp"
-#include "UserManagement.hpp"
 #include "WebBiCharts.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>

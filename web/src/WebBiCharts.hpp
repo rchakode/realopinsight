@@ -25,10 +25,10 @@
 #ifndef WEBBIREPORTBUILDER_HPP
 #define WEBBIREPORTBUILDER_HPP
 
-#include "DbObjects.hpp"
+#include "dbo/DbObjects.hpp"
 #include "Base.hpp"
 #include <QList>
-#include<fstream>
+#include <fstream>
 #include <Wt/Chart/WCartesianChart>
 #include <Wt/Chart/WDataSeries>
 #include <Wt/WAbstractItemModel>
