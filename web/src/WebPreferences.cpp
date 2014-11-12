@@ -63,6 +63,8 @@ WebPreferences::WebPreferences(void)
 
   createLdapSettingsFields();
 
+  createNotificationSettingsFields();
+
   createButtons();
 
   addEvent();
@@ -162,6 +164,17 @@ void WebPreferences::createSourceSettingsFields(void)
 }
 
 
+void WebPreferences::createNotificationSettingsFields(void)
+{
+  m_notificationTypeBox.reset(new Wt::WComboBox(this));
+  m_smtpServerAddrField.reset(new Wt::WLineEdit(this));
+  m_smtpServerPortField.reset(new Wt::WLineEdit(this));
+  m_smtpUseSslField.reset(new Wt::WCheckBox(this));
+  m_smtpUsernameField.reset(new Wt::WLineEdit(this));
+  m_smtpPasswordField.reset(new Wt::WLineEdit(this));
+}
+
+
 void WebPreferences::createButtons(void)
 {
   m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
@@ -194,10 +207,12 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
 
+
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
   tpl->bindWidget("save-auth-settings-button", m_saveAuthSettingsBtn.get());
+
 
   tpl->bindWidget("authentication-mode", m_authenticationModeField.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUriField.get());
@@ -209,6 +224,14 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("ldap-bind-user-password", m_ldapBindUserPasswordField.get());
   tpl->bindWidget("ldap-uid-attribute", m_ldapIdField.get());
   tpl->bindWidget("ldap-user-search-base", m_ldapSearchBaseField.get());
+
+
+  tpl->bindWidget("notification-type", m_notificationTypeBox.get());
+  tpl->bindWidget("notification-mail-smtp-server", m_smtpServerAddrField.get());
+  tpl->bindWidget("notification-mail-smtp-port", m_smtpServerPortField.get());
+  tpl->bindWidget("notification-mail-smtp-use-ssl", m_smtpUseSslField.get());
+  tpl->bindWidget("notification-mail-smtp-username", m_smtpUsernameField.get());
+  tpl->bindWidget("notification-mail-smtp-password", m_smtpPasswordField.get());
 }
 
 std::string WebPreferences::getLdapIdField(void) const
@@ -541,6 +564,12 @@ void WebPreferences::loadAuthSettings(void)
 }
 
 
+void WebPreferences::loadNotificationSettings(void)
+{
+
+}
+
+
 void WebPreferences::showMonitoringSettings(void)
 {
   fillFromSource(firstSourceSet());
@@ -562,8 +591,9 @@ void WebPreferences::showMonitoringSettingsWidgets(bool display)
 
 void WebPreferences::showNotificationSettings(void)
 {
-  loadAuthSettings();
-  showAuthSettingsWidgets(true);
+  loadNotificationSettings();
+  showNotificationSettingsWidgets(true);
+  showAuthSettingsWidgets(false);
   showMonitoringSettingsWidgets(false);
 }
 

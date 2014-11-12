@@ -142,10 +142,19 @@ private:
   std::unique_ptr<Wt::WLineEdit> m_ldapSslCertFileField;
   std::unique_ptr<Wt::WLineEdit> m_ldapSslCaFileField;
 
+  // notification settings properties
+  std::unique_ptr<Wt::WComboBox> m_notificationTypeBox;
+  std::unique_ptr<Wt::WLineEdit> m_smtpServerAddrField;
+  std::unique_ptr<Wt::WLineEdit> m_smtpServerPortField;
+  std::unique_ptr<Wt::WCheckBox> m_smtpUseSslField;
+  std::unique_ptr<Wt::WLineEdit> m_smtpUsernameField;
+  std::unique_ptr<Wt::WLineEdit> m_smtpPasswordField;
+
 
   void createLdapSettingsFields(void);
   void createAuthSettingsFields(void);
   void createSourceSettingsFields(void);
+  void createNotificationSettingsFields(void);
   void createButtons(void);
 
   void addEvent(void);
@@ -157,6 +166,7 @@ private:
   void bindFormWidget(void);
   void saveAuthSettings(void);
   void loadAuthSettings(void);
+  void loadNotificationSettings(void);
   bool validateMonitoringSettingsFields(void);
   bool validateAuthSettingsFields(void);
   void showLdapSslSettings(bool display);

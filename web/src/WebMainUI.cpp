@@ -627,7 +627,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Notification Settings"));
     m_mgntContentWidgets->setCurrentWidget(m_preferences);
-    m_preferences->showAuthSettings();
+    m_preferences->showNotificationSettings();
   }));
 
   // my account menu
