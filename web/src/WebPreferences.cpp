@@ -57,55 +57,26 @@ WebPreferences::WebPreferences(void)
 {
   this->setMargin(0, Wt::All);
 
-  m_sourceBox.reset(new Wt::WComboBox(this));
-  m_sourceBoxModel.reset(new Wt::WStringListModel(m_sourceBox.get()));
-  m_sourceBox->setModel(m_sourceBoxModel.get());
+  createAuthSettingsFields();
+
+  createSourceSettingsFields();
+
+  createLdapSettingsFields();
+
+  createButtons();
+
+  addEvent();
+  bindFormWidget();
+  loadProperties();
+}
 
 
-  m_monitorTypeField.reset(new Wt::WComboBox(this));
-  m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
-  for (const auto& srcid: ngrt4n::sourceTypes()) {
-    m_monitorTypeField->addItem(srcid.toStdString());
-  }
+WebPreferences::~WebPreferences()
+{
+}
 
-  m_monitorUrlField.reset(new Wt::WLineEdit(this));
-  m_monitorUrlField->setValidator(new UriValidator("http", false, this));
-  m_monitorUrlField->setEmptyText("Set the url to the monitor web interface");
-
-  m_authStringField.reset(new Wt::WLineEdit(this));
-  m_authStringField->setEchoMode(Wt::WLineEdit::Password);
-  m_authStringField->setEmptyText("Set the authentication string");
-
-  m_showAuthStringField.reset(new Wt::WCheckBox(QObject::tr("Show in clear").toStdString(), this));
-
-  // set livestatus server
-  m_livestatusHostField.reset(new Wt::WLineEdit(this));
-  m_livestatusHostField->setEmptyText("hostname/IP");
-  m_livestatusHostField->setValidator(new HostValidator(this));
-
-  // set livestatus port field
-  m_livestatusPortField.reset(new Wt::WLineEdit(this));
-  m_livestatusPortField->setWidth(50);
-  m_livestatusPortField->setValidator(new PortValidator(this));
-  m_livestatusPortField->setEmptyText("port");
-  m_livestatusPortField->setMaxLength(5);
-
-  // other fields
-  m_useNgrt4ndField.reset(new Wt::WCheckBox(QObject::tr("Use ngrt4nd").toStdString(), this));
-  m_dontVerifyCertificateField.reset(new Wt::WCheckBox(QObject::tr("Don't verify SSL certificate").toStdString(),this));
-
-  // update interval field
-  m_updateIntervalField.reset(new Wt::WSpinBox(this));
-  m_updateIntervalField->setMinimum(5);
-  m_updateIntervalField->setMaximum(1200);
-  m_updateIntervalField->setValue(Preferences::updateInterval());
-
-  // Authentication settings
-  m_authenticationModeField.reset(new Wt::WComboBox(this));
-  m_authenticationModeField->addItem(Q_TR("Built-in"));
-  m_authenticationModeField->addItem(Q_TR("LDAP"));
-
-  // LDAP fields
+void WebPreferences::createLdapSettingsFields(void)
+{
   m_ldapServerUriField.reset(new Wt::WLineEdit(this));
   m_ldapServerUriField->setValidator(new UriValidator("ldap", true, this));
   m_ldapServerUriField->setEmptyText("ldap://localhost:389");
@@ -134,9 +105,65 @@ WebPreferences::WebPreferences(void)
 
   m_ldapSearchBaseField.reset(new Wt::WLineEdit(this));
   m_ldapSearchBaseField->setEmptyText("ou=devops,dc=example,dc=com");
+}
 
 
-  // buttons
+void WebPreferences::createAuthSettingsFields(void)
+{
+  m_authenticationModeField.reset(new Wt::WComboBox(this));
+  m_authenticationModeField->addItem(Q_TR("Built-in"));
+  m_authenticationModeField->addItem(Q_TR("LDAP"));
+
+  m_authStringField.reset(new Wt::WLineEdit(this));
+  m_authStringField->setEchoMode(Wt::WLineEdit::Password);
+  m_authStringField->setEmptyText("Set the authentication string");
+  m_showAuthStringField.reset(new Wt::WCheckBox(QObject::tr("Show in clear").toStdString(), this));
+}
+
+
+void WebPreferences::createSourceSettingsFields(void)
+{
+  m_sourceBox.reset(new Wt::WComboBox(this));
+  m_sourceBoxModel.reset(new Wt::WStringListModel(m_sourceBox.get()));
+  m_sourceBox->setModel(m_sourceBoxModel.get());
+
+
+  m_monitorTypeField.reset(new Wt::WComboBox(this));
+  m_monitorTypeField->addItem(ngrt4n::tr("-- Select a type --"));
+  for (const auto& srcid: ngrt4n::sourceTypes()) {
+    m_monitorTypeField->addItem(srcid.toStdString());
+  }
+
+  m_monitorUrlField.reset(new Wt::WLineEdit(this));
+  m_monitorUrlField->setValidator(new UriValidator("http", false, this));
+  m_monitorUrlField->setEmptyText("Set the url to the monitor web interface");
+
+  // set livestatus server
+  m_livestatusHostField.reset(new Wt::WLineEdit(this));
+  m_livestatusHostField->setEmptyText("hostname/IP");
+  m_livestatusHostField->setValidator(new HostValidator(this));
+
+  // set livestatus port field
+  m_livestatusPortField.reset(new Wt::WLineEdit(this));
+  m_livestatusPortField->setWidth(50);
+  m_livestatusPortField->setValidator(new PortValidator(this));
+  m_livestatusPortField->setEmptyText("port");
+  m_livestatusPortField->setMaxLength(5);
+
+  // other fields
+  m_useNgrt4ndField.reset(new Wt::WCheckBox(QObject::tr("Use ngrt4nd").toStdString(), this));
+  m_dontVerifyCertificateField.reset(new Wt::WCheckBox(QObject::tr("Don't verify SSL certificate").toStdString(),this));
+
+  // update interval field
+  m_updateIntervalField.reset(new Wt::WSpinBox(this));
+  m_updateIntervalField->setMinimum(5);
+  m_updateIntervalField->setMaximum(1200);
+  m_updateIntervalField->setValue(Preferences::updateInterval());
+}
+
+
+void WebPreferences::createButtons(void)
+{
   m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
   m_addAsSourceBtn.reset(new Wt::WPushButton(QObject::tr("Add as source").toStdString(), this));
   m_deleteSourceBtn.reset(new Wt::WPushButton(QObject::tr("Delete source").toStdString(), this));
@@ -150,16 +177,8 @@ WebPreferences::WebPreferences(void)
   m_applyChangeBtn->setDisabled(true);
   m_addAsSourceBtn->setDisabled(true);
   m_deleteSourceBtn->setDisabled(true);
-
-  addEvent();
-  bindFormWidget();
-  loadProperties();
 }
 
-
-WebPreferences::~WebPreferences()
-{
-}
 
 void WebPreferences::bindFormWidget(void)
 {

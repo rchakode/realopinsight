@@ -143,6 +143,11 @@ private:
   std::unique_ptr<Wt::WLineEdit> m_ldapSslCaFileField;
 
 
+  void createLdapSettingsFields(void);
+  void createAuthSettingsFields(void);
+  void createSourceSettingsFields(void);
+  void createButtons(void);
+
   void addEvent(void);
   void promptUser(int inputType);
   void handleInput(const std::string& input, int inputType);
