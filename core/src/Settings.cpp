@@ -48,6 +48,12 @@ const QString Settings::AUTH_LDAP_ID_FIELD = "/Auth/ldapIdField";
 const QString Settings::AUTH_LDAP_SSL_USE_CERT = "/Auth/ldapSslUseCert";
 const QString Settings::AUTH_LDAP_SSL_CERT_FILE = "/Auth/ldapSslCertFile";
 const QString Settings::AUTH_LDAP_SSL_CA_FILE = "/Auth/ldapSslCaFile";
+const QString Settings::NOTIF_TYPE = "/Notification/type";
+const QString Settings::NOTIF_MAIL_SMTP_SERVER_ADRR = "/Notification/mailSmtpServer";
+const QString Settings::NOTIF_MAIL_SMTP_SERVER_PORT = "/Notification/mailSmtpPort";
+const QString Settings::NOTIF_MAIL_SMTP_USE_SSL = "/Notification/mailSmtpUseSsl";
+const QString Settings::NOTIF_MAIL_SMTP_USERNAME = "/Notification/mailSmtpUsername";
+const QString Settings::NOTIF_MAIL_SMTP_PASSWORD = "/Notification/mailSmtpPassword";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {

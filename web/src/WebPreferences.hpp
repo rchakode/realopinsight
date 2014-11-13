@@ -94,10 +94,16 @@ public:
   std::string getLdapIdField(void) const;
   int getLdapVersion(void) const;
   int getAuthenticationMode(void) const;
-  bool getLdapSslUseMyCert(void) const;
-  std::string getLdapSslCertFile(void) const;
-  std::string getLdapSslCaFile(void) const;
+  bool getLdapSslUseMyCert(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;}
+  std::string getLdapSslCertFile(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CERT_FILE).toStdString();}
+  std::string getLdapSslCaFile(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CA_FILE).toStdString();}
   static std::string authTypeString(int authSystem);
+  int getNotificationType(void) const { return m_settings->keyValue(Settings::NOTIF_TYPE).toInt();}
+  std::string getSmtpServerAddr(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();}
+  std::string getSmtpServerPort(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();}
+  std::string getSmtpUsername(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USERNAME).toStdString();}
+  std::string getSmtpPassword(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
+  int getSmtpUseSsl(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
 
 protected:
   virtual void applyChanges(void);
@@ -165,8 +171,8 @@ private:
   void addToSourceBox(int sourceGlobalIndex);
   void bindFormWidget(void);
   void saveAuthSettings(void);
-  void loadAuthSettings(void);
-  void loadNotificationSettings(void);
+  void fillInAuthSettings(void);
+  void fillInNotificationSettings(void);
   bool validateMonitoringSettingsFields(void);
   bool validateAuthSettingsFields(void);
   void showLdapSslSettings(bool display);

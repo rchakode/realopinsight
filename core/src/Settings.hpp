@@ -68,6 +68,12 @@ public:
   static const QString AUTH_LDAP_SSL_USE_CERT;
   static const QString AUTH_LDAP_SSL_CERT_FILE;
   static const QString AUTH_LDAP_SSL_CA_FILE;
+  static const QString NOTIF_TYPE;
+  static const QString NOTIF_MAIL_SMTP_SERVER_ADRR;
+  static const QString NOTIF_MAIL_SMTP_SERVER_PORT;
+  static const QString NOTIF_MAIL_SMTP_USE_SSL;
+  static const QString NOTIF_MAIL_SMTP_USERNAME;
+  static const QString NOTIF_MAIL_SMTP_PASSWORD;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

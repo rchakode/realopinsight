@@ -172,6 +172,7 @@ void WebPreferences::createNotificationSettingsFields(void)
   m_smtpUseSslField.reset(new Wt::WCheckBox(this));
   m_smtpUsernameField.reset(new Wt::WLineEdit(this));
   m_smtpPasswordField.reset(new Wt::WLineEdit(this));
+  m_smtpPasswordField->setEchoMode(Wt::WLineEdit::Password);
 }
 
 
@@ -260,22 +261,6 @@ int WebPreferences::getAuthenticationMode(void) const
   return val;
 }
 
-
-bool WebPreferences::getLdapSslUseMyCert(void) const
-{
-  return m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;
-}
-
-std::string WebPreferences::getLdapSslCertFile(void) const
-{
-  return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CERT_FILE).toStdString();
-}
-
-std::string WebPreferences::getLdapSslCaFile(void) const
-{
-  return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CA_FILE).toStdString();
-}
-
 std::string WebPreferences::authTypeString(int authSystem)
 {
   if (authSystem == LDAP)
@@ -361,7 +346,7 @@ void WebPreferences::updateFields(void)
     m_addAsSourceBtn->setDisabled(false);
     m_deleteSourceBtn->setDisabled(false);
   }
-  loadAuthSettings();
+  fillInAuthSettings();
 }
 
 void WebPreferences::saveAsSource(const qint32& index, const QString& type)
@@ -499,7 +484,7 @@ void WebPreferences::addToSourceBox(int sourceGlobalIndex)
 
 void WebPreferences::showAuthSettings(void)
 {
-  loadAuthSettings();
+  fillInAuthSettings();
   showAuthSettingsWidgets(true);
   showMonitoringSettingsWidgets(false);
   showNotificationSettingsWidgets(false);
@@ -545,7 +530,7 @@ void WebPreferences::saveAuthSettings(void)
   }
 }
 
-void WebPreferences::loadAuthSettings(void)
+void WebPreferences::fillInAuthSettings(void)
 {
   m_authenticationModeField->setCurrentIndex(getAuthenticationMode());
   m_ldapServerUriField->setText(getLdapServerUri());
@@ -564,9 +549,14 @@ void WebPreferences::loadAuthSettings(void)
 }
 
 
-void WebPreferences::loadNotificationSettings(void)
+void WebPreferences::fillInNotificationSettings(void)
 {
-
+  m_notificationTypeBox->setCurrentIndex( getNotificationType() );
+  m_smtpServerAddrField->setText( getSmtpServerAddr() );
+  m_smtpServerPortField->setText( getSmtpServerPort() );
+  m_smtpUseSslField->setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
+  m_smtpUsernameField->setText( getSmtpUsername() );
+  m_smtpPasswordField->setText( getSmtpUsername() );
 }
 
 
@@ -591,7 +581,7 @@ void WebPreferences::showMonitoringSettingsWidgets(bool display)
 
 void WebPreferences::showNotificationSettings(void)
 {
-  loadNotificationSettings();
+  fillInNotificationSettings();
   showNotificationSettingsWidgets(true);
   showAuthSettingsWidgets(false);
   showMonitoringSettingsWidgets(false);
