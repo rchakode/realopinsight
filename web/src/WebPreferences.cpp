@@ -49,6 +49,37 @@ WebPreferencesBase::WebPreferencesBase(void)
 }
 
 
+int WebPreferencesBase::getLdapVersion(void) const
+{
+  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
+  if (val != LDAP_VERSION3_TEXT)
+    return LDAP_VERSION2;
+
+  return LDAP_VERSION3;
+}
+
+
+int WebPreferencesBase::getAuthenticationMode(void) const
+{
+  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
+  if (val != LDAP)
+    return BuiltIn;
+  return val;
+}
+
+
+
+std::string WebPreferencesBase::getLdapIdField(void) const
+{
+  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
+  if (val.isEmpty())
+    return "uid";
+
+  return val.toStdString();
+}
+
+
+
 WebPreferences::WebPreferences(void)
   : WebPreferencesBase(),
     Wt::WContainerWidget(),
@@ -166,13 +197,24 @@ void WebPreferences::createSourceSettingsFields(void)
 
 void WebPreferences::createNotificationSettingsFields(void)
 {
-  m_notificationTypeBox.reset(new Wt::WComboBox(this));
   m_smtpServerAddrField.reset(new Wt::WLineEdit(this));
+  m_smtpServerAddrField->setEmptyText(Q_TR("smtp.example.com"));
+
   m_smtpServerPortField.reset(new Wt::WLineEdit(this));
+  m_smtpServerPortField->setEmptyText(Q_TR("25"));
+
   m_smtpUseSslField.reset(new Wt::WCheckBox(this));
+
   m_smtpUsernameField.reset(new Wt::WLineEdit(this));
+  m_smtpUsernameField->setEmptyText(Q_TR("opuser"));
+
   m_smtpPasswordField.reset(new Wt::WLineEdit(this));
   m_smtpPasswordField->setEchoMode(Wt::WLineEdit::Password);
+  m_smtpPasswordField->setEmptyText(Q_TR("*******"));
+
+  m_notificationTypeBox.reset(new Wt::WComboBox(this));
+  m_notificationTypeBox->addItem(Q_TR("No notification"));
+  m_notificationTypeBox->addItem(Q_TR("Email"));
 }
 
 
@@ -235,39 +277,6 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("notification-mail-smtp-password", m_smtpPasswordField.get());
 }
 
-std::string WebPreferences::getLdapIdField(void) const
-{
-  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
-  if (val.isEmpty())
-    return "uid";
-
-  return val.toStdString();
-}
-
-int WebPreferences::getLdapVersion(void) const
-{
-  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
-  if (val != LDAP_VERSION3_TEXT)
-    return LDAP_VERSION2;
-
-  return LDAP_VERSION3;
-}
-
-int WebPreferences::getAuthenticationMode(void) const
-{
-  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
-  if (val != LDAP)
-    return BuiltIn;
-  return val;
-}
-
-std::string WebPreferences::authTypeString(int authSystem)
-{
-  if (authSystem == LDAP)
-    return "LDAP";
-
-  return "Built-in";
-}
 
 void WebPreferences::applyChanges(void)
 {
@@ -549,7 +558,7 @@ void WebPreferences::fillInAuthSettings(void)
 }
 
 
-void WebPreferences::fillInNotificationSettings(void)
+void WebPreferences::fillInEmailNotificationSettings(void)
 {
   m_notificationTypeBox->setCurrentIndex( getNotificationType() );
   m_smtpServerAddrField->setText( getSmtpServerAddr() );
@@ -581,7 +590,7 @@ void WebPreferences::showMonitoringSettingsWidgets(bool display)
 
 void WebPreferences::showNotificationSettings(void)
 {
-  fillInNotificationSettings();
+  fillInEmailNotificationSettings();
   showNotificationSettingsWidgets(true);
   showAuthSettingsWidgets(false);
   showMonitoringSettingsWidgets(false);
