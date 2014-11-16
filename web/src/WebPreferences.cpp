@@ -108,6 +108,23 @@ WebPreferences::~WebPreferences()
 {
 }
 
+
+void WebPreferences::addEvent(void)
+{
+  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
+  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
+  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
+  m_monitorTypeField->activated().connect(this, &WebPreferences::showLivestatusSettings);
+  m_authSettingsSaveBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
+  m_notificationSettingsSaveBtn->clicked().connect(this, &WebPreferences::saveNotificationSettings);
+  m_notificationTypeBox->changed().connect(this, &WebPreferences::updateEmailFieldsEnabledState);
+  m_sourceBox->changed().connect(this, &WebPreferences::handleSourceBoxChanged);
+  m_authenticationModeField->changed().connect(this, &WebPreferences::handleAuthTypeChanged);
+  m_showAuthStringField->changed().connect(this, &WebPreferences::handleShowAuthStringChanged);
+  m_ldapSslUseCertField->changed().connect(this, &WebPreferences::handleLdapUseSslChanged);
+}
+
+
 void WebPreferences::createLdapSettingsFields(void)
 {
   m_ldapServerUriField.reset(new Wt::WLineEdit(this));
@@ -195,27 +212,6 @@ void WebPreferences::createSourceSettingsFields(void)
 }
 
 
-void WebPreferences::createNotificationSettingsFields(void)
-{
-  m_smtpServerAddrField.reset(new Wt::WLineEdit(this));
-  m_smtpServerAddrField->setEmptyText(Q_TR("smtp.example.com"));
-
-  m_smtpServerPortField.reset(new Wt::WLineEdit(this));
-  m_smtpServerPortField->setEmptyText(Q_TR("25"));
-
-  m_smtpUseSslField.reset(new Wt::WCheckBox(this));
-
-  m_smtpUsernameField.reset(new Wt::WLineEdit(this));
-  m_smtpUsernameField->setEmptyText(Q_TR("opuser"));
-
-  m_smtpPasswordField.reset(new Wt::WLineEdit(this));
-  m_smtpPasswordField->setEchoMode(Wt::WLineEdit::Password);
-  m_smtpPasswordField->setEmptyText(Q_TR("*******"));
-
-  m_notificationTypeBox.reset(new Wt::WComboBox(this));
-  m_notificationTypeBox->addItem(Q_TR("No notification"));
-  m_notificationTypeBox->addItem(Q_TR("Email"));
-}
 
 
 void WebPreferences::createButtons(void)
@@ -223,12 +219,12 @@ void WebPreferences::createButtons(void)
   m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
   m_addAsSourceBtn.reset(new Wt::WPushButton(QObject::tr("Add as source").toStdString(), this));
   m_deleteSourceBtn.reset(new Wt::WPushButton(QObject::tr("Delete source").toStdString(), this));
-  m_saveAuthSettingsBtn.reset(new Wt::WPushButton(QObject::tr("Save").toStdString(), this));
+  m_authSettingsSaveBtn.reset(new Wt::WPushButton(QObject::tr("Save").toStdString(), this));
 
   m_applyChangeBtn->setStyleClass("btn btn-success");
   m_addAsSourceBtn->setStyleClass("btn btn-info");
   m_deleteSourceBtn->setStyleClass("btn btn-danger");
-  m_saveAuthSettingsBtn->setStyleClass("btn btn-info");
+  m_authSettingsSaveBtn->setStyleClass("btn btn-info");
 
   m_applyChangeBtn->setDisabled(true);
   m_addAsSourceBtn->setDisabled(true);
@@ -254,7 +250,7 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
-  tpl->bindWidget("save-auth-settings-button", m_saveAuthSettingsBtn.get());
+  tpl->bindWidget("auth-settings-save-button", m_authSettingsSaveBtn.get());
 
 
   tpl->bindWidget("authentication-mode", m_authenticationModeField.get());
@@ -270,6 +266,7 @@ void WebPreferences::bindFormWidget(void)
 
 
   tpl->bindWidget("notification-type", m_notificationTypeBox.get());
+  tpl->bindWidget("notification-settings-save-button", m_notificationSettingsSaveBtn.get());
   tpl->bindWidget("notification-mail-smtp-server", m_smtpServerAddrField.get());
   tpl->bindWidget("notification-mail-smtp-port", m_smtpServerPortField.get());
   tpl->bindWidget("notification-mail-smtp-use-ssl", m_smtpUseSslField.get());
@@ -503,7 +500,7 @@ void WebPreferences::showAuthSettingsWidgets(bool display)
 {
   std::string v = display? "true" : "false";
   wApp->doJavaScript(Wt::WString("$('#auth-section').toggle({1});"
-                                 "$('#save-auth-setting-button').toggle({1});").arg(v).toUTF8());
+                                 "$('#auth-setting-save-button').toggle({1});").arg(v).toUTF8());
   switch (m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt()) {
     case LDAP:
       wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
@@ -539,6 +536,7 @@ void WebPreferences::saveAuthSettings(void)
   }
 }
 
+
 void WebPreferences::fillInAuthSettings(void)
 {
   m_authenticationModeField->setCurrentIndex(getAuthenticationMode());
@@ -557,16 +555,6 @@ void WebPreferences::fillInAuthSettings(void)
   showLdapSslSettings(useMySslCert == Wt::Checked);
 }
 
-
-void WebPreferences::fillInEmailNotificationSettings(void)
-{
-  m_notificationTypeBox->setCurrentIndex( getNotificationType() );
-  m_smtpServerAddrField->setText( getSmtpServerAddr() );
-  m_smtpServerPortField->setText( getSmtpServerPort() );
-  m_smtpUseSslField->setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
-  m_smtpUsernameField->setText( getSmtpUsername() );
-  m_smtpPasswordField->setText( getSmtpUsername() );
-}
 
 
 void WebPreferences::showMonitoringSettings(void)
@@ -587,20 +575,6 @@ void WebPreferences::showMonitoringSettingsWidgets(bool display)
                                  "$('#delete-source-settings-button').toggle({1});").arg(v).toUTF8());
 }
 
-
-void WebPreferences::showNotificationSettings(void)
-{
-  fillInEmailNotificationSettings();
-  showNotificationSettingsWidgets(true);
-  showAuthSettingsWidgets(false);
-  showMonitoringSettingsWidgets(false);
-}
-
-void WebPreferences::showNotificationSettingsWidgets(bool display)
-{
-  std::string v = display? "true" : "false";
-  wApp->doJavaScript(Wt::WString("$('#notification-section').toggle({1});").arg(v).toUTF8());
-}
 
 void WebPreferences::showLdapSslSettings(bool display)
 {
@@ -626,17 +600,6 @@ bool WebPreferences::validateMonitoringSettingsFields(void)
     m_errorOccurred.emit(QObject::tr("Monitor type not set").toStdString());
     return false;
   }
-
-  //  if ( (m_monitorTypeField->currentIndex() == 1
-  //        && m_livestatusHostField->validate() != Wt::WValidator::Valid
-  //        )
-  //       || (m_monitorTypeField->currentIndex() == 1
-  //           && m_livestatusPortField->validate() != Wt::WValidator::Valid
-  //           )
-  //       ) {
-  //    m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
-  //    return false;
-  //  }
 
   if (m_monitorTypeField->currentIndex() > 1
       && m_monitorUrlField->validate() != Wt::WValidator::Valid
@@ -668,44 +631,102 @@ bool WebPreferences::validateAuthSettingsFields(void)
 }
 
 
-void WebPreferences::addEvent(void)
+void WebPreferences::handleAuthTypeChanged(void)
 {
-  m_applyChangeBtn->clicked().connect(this, &WebPreferences::applyChanges);
-  m_addAsSourceBtn->clicked().connect(this, &WebPreferences::addAsSource);
-  m_deleteSourceBtn->clicked().connect(this, &WebPreferences::deleteSource);
-  m_saveAuthSettingsBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
-  m_monitorTypeField->activated().connect(this, &WebPreferences::showLivestatusSettings);
+  switch (m_authenticationModeField->currentIndex()) {
+    case LDAP:
+      wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
+      break;
+    case BuiltIn: // BUILT-IN
+    default:
+      wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
+      break;
+  }
+}
+
+void WebPreferences::handleShowAuthStringChanged(void)
+{
+  if (m_showAuthStringField->isChecked()) {
+    m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
+  } else {
+    m_authStringField->setEchoMode(Wt::WLineEdit::Password);
+  }
+}
+
+void WebPreferences::handleLdapUseSslChanged(void)
+{
+  if (m_ldapSslUseCertField->checkState() == Wt::Checked) {
+    wApp->doJavaScript("$('#ldap-custom-ssl-settings').show();");
+  } else {
+    wApp->doJavaScript("$('#ldap-custom-ssl-settings').hide();");
+  }
+}
 
 
-  m_sourceBox->changed().connect(std::bind([=]() {
-    fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));
-  }));
+void WebPreferences::createNotificationSettingsFields(void)
+{
+  m_smtpServerAddrField.reset(new Wt::WLineEdit(this));
+  m_smtpServerAddrField->setEmptyText(Q_TR("smtp.example.com"));
 
-  m_showAuthStringField->changed().connect(std::bind([=](){
-    if (m_showAuthStringField->isChecked()) {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Normal);
-    } else {
-      m_authStringField->setEchoMode(Wt::WLineEdit::Password);
-    }
-  }));
+  m_smtpServerPortField.reset(new Wt::WLineEdit(this));
+  m_smtpServerPortField->setEmptyText(Q_TR("25"));
 
-  m_authenticationModeField->changed().connect(std::bind([=]() {
-    switch (m_authenticationModeField->currentIndex()) {
-      case LDAP:
-        wApp->doJavaScript("$('#ldap-auth-setting-section').show();");
-        break;
-      case BuiltIn: // BUILT-IN
-      default:
-        wApp->doJavaScript("$('#ldap-auth-setting-section').hide();");
-        break;
-    }
-  }));
+  m_smtpUseSslField.reset(new Wt::WCheckBox(this));
 
-  m_ldapSslUseCertField->changed().connect(std::bind([=](){
-    if (m_ldapSslUseCertField->checkState() == Wt::Checked) {
-      wApp->doJavaScript("$('#ldap-custom-ssl-settings').show();");
-    } else {
-      wApp->doJavaScript("$('#ldap-custom-ssl-settings').hide();");
-    }
-  }));
+  m_smtpUsernameField.reset(new Wt::WLineEdit(this));
+  m_smtpUsernameField->setEmptyText(Q_TR("opuser"));
+
+  m_smtpPasswordField.reset(new Wt::WLineEdit(this));
+  m_smtpPasswordField->setEchoMode(Wt::WLineEdit::Password);
+  m_smtpPasswordField->setEmptyText(Q_TR("*******"));
+
+  m_notificationTypeBox.reset(new Wt::WComboBox(this));
+  m_notificationTypeBox->addItem(Q_TR("No notification"));
+  m_notificationTypeBox->addItem(Q_TR("Email"));
+
+  m_notificationSettingsSaveBtn.reset(new Wt::WPushButton(QObject::tr("Save").toStdString(), this));
+  m_notificationSettingsSaveBtn->setStyleClass("btn btn-info");
+}
+
+
+void WebPreferences::saveNotificationSettings(void)
+{
+
+}
+
+void WebPreferences::fillInNotificationSettings(void)
+{
+  m_notificationTypeBox->setCurrentIndex( getNotificationType() );
+  m_smtpServerAddrField->setText( getSmtpServerAddr() );
+  m_smtpServerPortField->setText( getSmtpServerPort() );
+  m_smtpUseSslField->setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
+  m_smtpUsernameField->setText( getSmtpUsername() );
+  m_smtpPasswordField->setText( getSmtpUsername() );
+  updateEmailFieldsEnabledState();
+}
+
+void WebPreferences::showNotificationSettings(void)
+{
+  fillInNotificationSettings();
+  showNotificationSettingsWidgets(true);
+  showAuthSettingsWidgets(false);
+  showMonitoringSettingsWidgets(false);
+}
+
+void WebPreferences::showNotificationSettingsWidgets(bool display)
+{
+  std::string v = display? "true" : "false";
+  wApp->doJavaScript(Wt::WString("$('#notification-section').toggle({1});"
+                                 "$('#notification-setting-save-button').toggle({1});").arg(v).toUTF8());
+}
+
+
+void WebPreferences::updateEmailFieldsEnabledState(void)
+{
+  bool enable = m_notificationTypeBox->currentIndex() == EmailNotification;
+  m_smtpServerAddrField->setEnabled(enable);
+  m_smtpServerPortField->setEnabled(enable);
+  m_smtpUseSslField->setEnabled(enable);
+  m_smtpUsernameField->setEnabled(enable);
+  m_smtpPasswordField->setEnabled(enable);
 }

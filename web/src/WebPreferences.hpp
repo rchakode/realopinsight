@@ -48,6 +48,11 @@ public:
     LDAP = 1
   };
 
+  enum NotificationTypeT {
+    NoNotification = 0,
+    EmailNotification = 1
+  };
+
   WebPreferencesBase(void);
   int getDbState(void) { return value(Settings::GLOBAL_DB_STATE_KEY, "0").toInt();}
   void setDbState(int state) {setEntry(Settings::GLOBAL_DB_STATE_KEY, QString::number(state));}
@@ -72,7 +77,7 @@ public:
 
 
 protected :
-  virtual void fillFromSource(int _index) {}
+  virtual void fillFromSource(int srcIndex) {}
   virtual void updateAllSourceWidgetStates(void) {}
   virtual void updateFields(void) {}
   virtual void saveAsSource(const qint32& idx, const QString& type){}
@@ -146,7 +151,7 @@ private:
   std::unique_ptr<Wt::WLineEdit> m_ldapBindUserPasswordField;
   std::unique_ptr<Wt::WLineEdit> m_ldapIdField;
   std::unique_ptr<Wt::WLineEdit> m_ldapSearchBaseField;
-  std::unique_ptr<Wt::WPushButton> m_saveAuthSettingsBtn;
+  std::unique_ptr<Wt::WPushButton> m_authSettingsSaveBtn;
   std::unique_ptr<Wt::WCheckBox> m_ldapSslUseCertField;
   std::unique_ptr<Wt::WLineEdit> m_ldapSslCertFileField;
   std::unique_ptr<Wt::WLineEdit> m_ldapSslCaFileField;
@@ -158,7 +163,7 @@ private:
   std::unique_ptr<Wt::WCheckBox> m_smtpUseSslField;
   std::unique_ptr<Wt::WLineEdit> m_smtpUsernameField;
   std::unique_ptr<Wt::WLineEdit> m_smtpPasswordField;
-
+  std::unique_ptr<Wt::WPushButton> m_notificationSettingsSaveBtn;
 
   void createLdapSettingsFields(void);
   void createAuthSettingsFields(void);
@@ -174,12 +179,18 @@ private:
   void addToSourceBox(int sourceGlobalIndex);
   void bindFormWidget(void);
   void saveAuthSettings(void);
+  void saveNotificationSettings(void);
   void fillInAuthSettings(void);
-  void fillInEmailNotificationSettings(void);
+  void fillInNotificationSettings(void);
   bool validateMonitoringSettingsFields(void);
   bool validateAuthSettingsFields(void);
   void showLdapSslSettings(bool display);
   void showLivestatusSettings(int monitorTypeIndex);
+  void updateEmailFieldsEnabledState(void);
+  void handleSourceBoxChanged(void) { fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));}
+  void handleAuthTypeChanged(void);
+  void handleShowAuthStringChanged(void);
+  void handleLdapUseSslChanged(void);
 };
 
 #endif // WEBSESSION_HPP

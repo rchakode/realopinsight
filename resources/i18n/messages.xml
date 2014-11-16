@@ -524,7 +524,8 @@
 
     <!-- form buttons -->
     <div class="form-actions">
-      <span id="save-auth-setting-button">${save-auth-settings-button}</span>
+      <span id="auth-setting-save-button">${auth-settings-save-button}</span>
+      <span id="notification-setting-save-button">${notification-settings-save-button}</span>
       <span id="apply-source-settings-button">${apply-change-button}</span>
       <span id="add-as-source-settings-button">${add-as-source-button}</span>
       <span id="delete-source-settings-button">${delete-button}</span>
