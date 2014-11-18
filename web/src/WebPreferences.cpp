@@ -353,6 +353,7 @@ void WebPreferences::updateFields(void)
     m_deleteSourceBtn->setDisabled(false);
   }
   fillInAuthSettings();
+  fillInNotificationSettings();
 }
 
 void WebPreferences::saveAsSource(const qint32& index, const QString& type)
@@ -691,7 +692,14 @@ void WebPreferences::createNotificationSettingsFields(void)
 
 void WebPreferences::saveNotificationSettings(void)
 {
-
+  m_settings->setEntry(Settings::NOTIF_TYPE, QString::number(m_notificationTypeBox->currentIndex()));
+  if (m_notificationTypeBox->currentIndex() == EmailNotification) {
+    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerAddrField->text().toUTF8().c_str());
+    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpServerPortField->text().toUTF8().c_str());
+    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField->text().toUTF8().c_str());
+    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField->text().toUTF8().c_str());
+    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField->checkState()));
+  }
 }
 
 void WebPreferences::fillInNotificationSettings(void)
@@ -699,18 +707,19 @@ void WebPreferences::fillInNotificationSettings(void)
   m_notificationTypeBox->setCurrentIndex( getNotificationType() );
   m_smtpServerAddrField->setText( getSmtpServerAddr() );
   m_smtpServerPortField->setText( getSmtpServerPort() );
-  m_smtpUseSslField->setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
   m_smtpUsernameField->setText( getSmtpUsername() );
-  m_smtpPasswordField->setText( getSmtpUsername() );
+  m_smtpPasswordField->setEchoMode(Wt::WLineEdit::Password);
+  m_smtpPasswordField->setText( getSmtpPassword() );
+  m_smtpUseSslField->setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
   updateEmailFieldsEnabledState();
 }
 
 void WebPreferences::showNotificationSettings(void)
 {
-  fillInNotificationSettings();
-  showNotificationSettingsWidgets(true);
   showAuthSettingsWidgets(false);
   showMonitoringSettingsWidgets(false);
+  showNotificationSettingsWidgets(true);
+  fillInNotificationSettings();
 }
 
 void WebPreferences::showNotificationSettingsWidgets(bool display)

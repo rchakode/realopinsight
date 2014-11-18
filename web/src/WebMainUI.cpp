@@ -610,7 +610,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // auth settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Authentication"));
+  link = new Wt::WAnchor("#", Q_TR("Authentication Options"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
@@ -621,7 +621,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // notification settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Notification"));
+  link = new Wt::WAnchor("#", Q_TR("Notification Options"));
   settingPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){

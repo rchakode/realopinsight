@@ -504,17 +504,17 @@
                <span>${notification-mail-smtp-server}</span>
              </div>
              <div class="control-group">
-               <label class="control-label">Port&nbsp;</label>
+               <label class="control-label">SMTP Port&nbsp;</label>
                <span>${notification-mail-smtp-port}</span>
                <span>Enable SSL</span>
                <span>${notification-mail-smtp-use-ssl}</span>
              </div>
              <div class="control-group">
-               <label class="control-label">Username&nbsp;</label>
+               <label class="control-label">SMTP Username&nbsp;</label>
                <span>${notification-mail-smtp-username}</span>
              </div>
              <div class="control-group">
-               <label class="control-label">Password&nbsp;</label>
+               <label class="control-label">SMTP Password&nbsp;</label>
                <span>${notification-mail-smtp-password}</span>
              </div>
           </div> <!-- id="mail-notification-settings" -->
