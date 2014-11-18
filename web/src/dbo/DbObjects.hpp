@@ -36,15 +36,31 @@
 
 namespace dbo = Wt::Dbo;
 
-class DbViewT;
-class DbUserT;
-class DbLoginSession;
-class DbQosDataT;
+/** holds View info like a wt::dbo object*/
+class DboView;
+
+/** holds User info like a wt::dbo object*/
+class DboUser;
+
+/** holds LoginSession info like a wt::dbo object*/
+class DboLoginSession;
+
+/** holds QoS data without wt::dbo specific properties*/
+struct QosDataT;
+
+/** holds QoS data info like a wt::dbo object*/
+class DboQosData;
+
+/** holds Notification info like a wt::dbo object*/
+class DboNotification;
+
+/** holds Notification info without dbo specific info*/
+struct NotificationT;
 
 namespace Wt {
   namespace Dbo {
     template<>
-    struct dbo_traits<DbViewT> : public dbo_default_traits
+    struct dbo_traits<DboView> : public dbo_default_traits
     {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
@@ -52,7 +68,7 @@ namespace Wt {
     };
 
     template<>
-    struct dbo_traits<DbUserT> : public dbo_default_traits
+    struct dbo_traits<DboUser> : public dbo_default_traits
     {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
@@ -61,14 +77,15 @@ namespace Wt {
   }
 }
 
-class DbViewT
+class DboView
 {
 public:
   std::string name;
   std::string path;
   int service_count;
-  dbo::collection< dbo::ptr<DbUserT> > users;
-  dbo::collection< dbo::ptr<DbQosDataT> > qosreports;
+  dbo::collection< dbo::ptr<DboUser> > users;
+  dbo::collection< dbo::ptr<DboQosData> > qosdatas;
+  dbo::collection< dbo::ptr<DboNotification> > notifications;
 
   template<class Action>
   void persist(Action& a) {
@@ -76,12 +93,13 @@ public:
     dbo::field(a, path, "path");
     dbo::field(a, service_count, "service_count");
     dbo::hasMany(a, users, dbo::ManyToMany, "user_view");
-    dbo::hasMany(a, qosreports, dbo::ManyToOne, "view");
+    dbo::hasMany(a, qosdatas, dbo::ManyToOne, "view");
+    dbo::hasMany(a, notifications, dbo::ManyToOne, "view");
   }
 };
 
 
-class DbUserT {
+class DboUser {
 public:
   enum RoleT {
     AdmRole = 100,
@@ -96,8 +114,9 @@ public:
   int role;
   std::string registrationDate;
   int authsystem; // e.g. LDAP or BuiltIn
-  dbo::collection< dbo::ptr<DbViewT> > views;
-  dbo::collection< dbo::ptr<DbLoginSession> > sessions;
+  dbo::collection< dbo::ptr<DboView> > views;
+  dbo::collection< dbo::ptr<DboLoginSession> > sessions;
+  dbo::collection< dbo::ptr<DboNotification> > ack_notifications;
 
   template<class Action>
   void persist(Action& a) {
@@ -110,6 +129,7 @@ public:
     dbo::field(a, authsystem, "authsystem");
     dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
     dbo::hasMany(a, sessions, dbo::ManyToMany);
+    dbo::hasMany(a, ack_notifications, dbo::ManyToOne, "ack_user");
   }
 
   static std::string role2Text(int role) {
@@ -120,8 +140,33 @@ public:
   }
 };
 
-class DbQosDataT {
+/** holds QoS data without wt::dbo specific info */
+struct QosDataT {
+  long timestamp;
+  int status;
+  float normal;
+  float minor;
+  float major;
+  float critical;
+  float unknown;
+  std::string view_name;
 
+  std::string toString(void) const {
+    return QString("%1,%2,%3,%4,%5,%6,%7, %8")
+        .arg(QString::number(timestamp),
+             view_name.c_str(),
+             QString::number(status),
+             QString::number(normal),
+             QString::number(minor),
+             QString::number(major),
+             QString::number(critical),
+             QString::number(unknown)).toStdString();
+  }
+};
+
+
+/** holds QoS data like wt::dbo class */
+class DboQosData {
 public:
   long timestamp;
   int status;
@@ -130,8 +175,32 @@ public:
   float major;
   float critical;
   float unknown;
-  dbo::ptr<DbViewT> view;
-  std::string viewname; // not persisted, duplication for non db mode
+  dbo::ptr<DboView> view;
+
+  void setData(const QosDataT& data)
+  {
+    timestamp = data.timestamp;
+    status = data.status;
+    normal = data.normal;
+    minor = data.minor;
+    major = data.major;
+    critical = data.critical;
+    unknown = data.unknown;
+  }
+
+  QosDataT data(void) const
+  {
+    QosDataT d;
+    d.timestamp = timestamp;
+    d.status = status;
+    d.normal = normal;
+    d.minor = minor;
+    d.major = major;
+    d.critical = critical;
+    d.unknown = unknown;
+    d.view_name = view->name;
+    return d;
+  }
 
   template<class Action>
   void persist(Action& a) {
@@ -148,7 +217,7 @@ public:
   std::string toString(void) const {
     return QString("%1,%2,%3,%4,%5,%6,%7, %8")
         .arg(QString::number(timestamp),
-             viewname.c_str(),
+             view->name.c_str(),
              QString::number(status),
              QString::number(normal),
              QString::number(minor),
@@ -158,7 +227,7 @@ public:
   }
 };
 
-class DbLoginSession
+class DboLoginSession
 {
 public:
   enum {
@@ -169,8 +238,8 @@ public:
 
   std::string username;
   std::string sessionId;
-  Wt::WDateTime firstAccess;
-  Wt::WDateTime lastAccess;
+  std::string firstAccess;
+  std::string lastAccess;
   int status;
 
   template<class Action>
@@ -183,15 +252,44 @@ public:
   }
 };
 
+/** holds notification info without wt::dbo specific properties (e.g dbo pointers)*/
+struct NotificationT {
+  long timestamp;
+  long ack_timestamp;
+  long ack_status;
+  std::string view_name;
+  std::string ack_username;
+};
+
+/** holds notification info like a wt::dbo object */
+class DboNotification
+{
+public:
+  long timestamp;
+  int ack_status;
+  long ack_timestamp;
+  dbo::ptr<DboView> view;
+  dbo::ptr<DboUser> ack_user;
+
+  template<class Action>
+  void persist(Action& a) {
+    dbo::field(a, timestamp, "timestamp");
+    dbo::field(a, ack_status, "ack_status");
+    dbo::field(a, ack_timestamp, "ack_timestamp");
+    dbo::belongsTo(a, view, "view");
+    dbo::belongsTo(a, ack_user, "ack_user");
+  }
+};
 
 typedef std::set<std::string> UserViewsT;
-typedef std::list<DbUserT> DbUsersT;
-typedef std::list<DbViewT> DbViewsT;
-typedef std::list<DbLoginSession> LoginSessionListT;
-typedef QMap<std::string, std::list<DbQosDataT> > ViewQosDataMapT;
-typedef dbo::collection< dbo::ptr<DbUserT> > UserCollectionT;
-typedef dbo::collection< dbo::ptr<DbViewT> > ViewCollectionT;
-typedef dbo::collection< dbo::ptr<DbQosDataT> > QosInfoCollectionT;
-typedef dbo::collection< dbo::ptr<DbLoginSession> > LoginSessionCollectionT;
+typedef std::list<DboUser> DbUsersT;
+typedef std::list<DboView> DbViewsT;
+typedef std::list<DboLoginSession> LoginSessionListT;
+typedef std::list<QosDataT> QosDataList;
+typedef QMap<std::string, std::list<QosDataT> > QosDataByViewMapT;
+typedef dbo::collection< dbo::ptr<DboUser> > UserCollectionT;
+typedef dbo::collection< dbo::ptr<DboView> > ViewCollectionT;
+typedef dbo::collection< dbo::ptr<DboQosData> > QosInfoCollectionT;
+typedef dbo::collection< dbo::ptr<DboLoginSession> > LoginSessionCollectionT;
 
 #endif // USER_HPP

@@ -38,7 +38,7 @@
 #include <Wt/Auth/Login>
 #include <climits>
 
-typedef Wt::Auth::Dbo::AuthInfo<DbUserT> AuthInfo;
+typedef Wt::Auth::Dbo::AuthInfo<DboUser> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
 class DbSession : public dbo::Session
@@ -54,25 +54,25 @@ public:
   Wt::Auth::Login& loginObject(void);
   bool isLogged(void) {return loginObject().loggedIn();}
   void configureAuth(void);
-  const DbUserT& loggedUser(void)const {return m_loggedUser;}
+  const DboUser& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(void);
 
-  int addUser(const DbUserT& user);
-  int updateUser(DbUserT user);
+  int addUser(const DboUser& user);
+  int updateUser(DboUser user);
   int deleteUser(std::string uname);
   int deleteAuthSystemUsers(int authSystem);
-  bool findUser(const std::string& username, DbUserT& user);
+  bool findUser(const std::string& username, DboUser& user);
   int updatePassword(const std::string& uname, const std::string& currentPass,const std::string& newPass);
   void updateUserList(void);
   DbUsersT& userList(void) {return m_userList;}
 
-  int addView(const DbViewT& qos);
+  int addView(const DboView& qos);
   int deleteView(std::string vname);
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
 
-  int addQosData(const DbQosDataT& qosData);
-  int fetchQosData(ViewQosDataMapT& qosDataMap,
+  int addQosData(const QosDataT& qosData);
+  int fetchQosData(QosDataByViewMapT& qosDataMap,
                     const std::string& viewName,
                     long fromDate=0,
                     long toDate = LONG_MAX);
@@ -80,19 +80,19 @@ public:
   void updateViewList(void);
   void updateViewList(const std::string& uname);
   DbViewsT& viewList(void) {return m_viewList;}
-  bool findView(const std::string& vname, DbViewT& view);
+  bool findView(const std::string& vname, DboView& view);
 
   void updateUserViewList(void);
   UserViewsT& userViewList(void) {return m_userViewList;}
 
-  int addSession(const DbLoginSession& session);
-  int checkUserCookie(const DbLoginSession& session);
+  int addSession(const DboLoginSession& session);
+  int checkUserCookie(const DboLoginSession& session);
 
 private:
   std::string m_dbPath;
   dbo::backend::Sqlite3* m_sqlite3Db;
   UserDatabase* m_dbUsers;
-  DbUserT m_loggedUser;
+  DboUser m_loggedUser;
   DbUsersT m_userList;
   DbViewsT m_viewList;
   UserViewsT m_userViewList;

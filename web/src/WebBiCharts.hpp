@@ -48,11 +48,9 @@
 class QosTrendsChart : public  Wt::WPaintedWidget
 {
 public:
-  QosTrendsChart(const std::string& viewName,
-                 const std::list<DbQosDataT>& data,
-                 Wt::WContainerWidget* parent=0);
+  QosTrendsChart(const std::string& viewName, const QosDataList& data, Wt::WContainerWidget* parent=0);
   std::string viewName() const {return m_viewName;}
-  void updateData(const std::list<DbQosDataT>& data);
+  void updateData(const QosDataList& data);
 
 protected:
   virtual void paintEvent(Wt::WPaintDevice * 	paintDevice);
@@ -71,7 +69,7 @@ private:
   TimeStatusT m_firstPoint;
 
 
-  void processPlottingData(const std::list<DbQosDataT>& data);
+  void processPlottingData(const QosDataList& data);
   void addRangeToolTip(double x1, double x2, long t1, long t2);
   std::string slaText(void) {
     return QObject::tr("QoS trends - Current SLA: %1\%").arg(QString::number(m_sla, 'f', 2)).toStdString();
@@ -83,11 +81,9 @@ private:
 class RawQosTrendsChart : public Wt::Chart::WCartesianChart
 {
 public:
-  RawQosTrendsChart(const std::string& viewName,
-                    const std::list<DbQosDataT>& data,
-                    Wt::WContainerWidget* parent=0);
+  RawQosTrendsChart(const std::string& viewName, const QosDataList& data, Wt::WContainerWidget* parent=0);
   std::string viewName() const {return m_viewName;}
-  void updateData(const std::list<DbQosDataT>& data);
+  void updateData(const QosDataList& data);
 
 private:
   std::string m_viewName;

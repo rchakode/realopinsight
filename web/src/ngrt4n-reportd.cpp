@@ -53,7 +53,7 @@ void runCollector(int period)
       collector.initialize(preferences.get());
       collector.initSettings(preferences.get());
       collector.runMonitor();
-      DbQosDataT qosInfo = collector.qosInfo();
+      QosDataT qosInfo = collector.qosInfo();
       qosInfo.timestamp = now;
       try {
         dbSession->addQosData(qosInfo);

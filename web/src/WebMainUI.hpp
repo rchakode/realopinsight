@@ -152,7 +152,7 @@ private:
   DashTabWidgetsT m_dashTabWidgets;
   QosTrendsChartList m_qosCharts;
   RawQosTrendsChartList m_rawQosCharts;
-  ViewQosDataMapT m_qosData;
+  QosDataByViewMapT m_qosData;
 
   Wt::WDatePicker* m_reportStartDatePicker;
   Wt::WDatePicker* m_reportEndDatePicker;

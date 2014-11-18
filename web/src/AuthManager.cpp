@@ -57,11 +57,13 @@ void AuthManager::handleAuthentication(void)
 {
   if (m_dbSession->isLogged()) {
     m_dbSession->setLoggedUser();
-    DbLoginSession sessionInfo;
+    DboLoginSession sessionInfo;
     sessionInfo.username = m_dbSession->loggedUser().username;
     sessionInfo.sessionId = wApp->sessionId();
-    sessionInfo.firstAccess =sessionInfo.lastAccess = Wt::WDateTime::currentDateTime();
-    sessionInfo.status = DbLoginSession::ActiveCookie;
+    sessionInfo.firstAccess
+        = sessionInfo.lastAccess
+        = Wt::WDateTime::currentDateTime().toString().toUTF8();
+    sessionInfo.status = DboLoginSession::ActiveCookie;
 
     m_dbSession->addSession(sessionInfo);
     wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
@@ -90,7 +92,7 @@ void AuthManager::createLoggedInView(void)
 #endif
 
   m_dbSession->setLoggedUser();
-  DbLoginSession sessionInfo;
+  DboLoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
 
   setTemplateText(tr("Wt.Auth.template.logged-in"));

@@ -82,9 +82,9 @@ public:
   static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
 
-  UserFormModel(const DbUserT* user, bool changePassword, bool userForm, Wt::WObject *parent = 0);
+  UserFormModel(const DboUser* user, bool changePassword, bool userForm, Wt::WObject *parent = 0);
   void setWritable(bool writtable);
-  void setData(const DbUserT& user);
+  void setData(const DboUser& user);
 
 private:
   static const int MAX_LENGTH = 25;
@@ -105,9 +105,9 @@ public:
     CREATE_USER = 1,
     UPDATE_USER = 2
   };
-  UserFormView(const DbUserT* user, bool changePassword, bool userForm);
+  UserFormView(const DboUser* user, bool changePassword, bool userForm);
   ~UserFormView(void);
-  Wt::Signal<DbUserT>& validated(void) {return m_validated;}
+  Wt::Signal<DboUser>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
   Wt::Signal<std::string, std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
   Wt::Signal<void>& closeTriggered(void) {return m_close;}
@@ -116,13 +116,13 @@ public:
   void resetValidationState(bool writtable);
 
 private:
-  DbUserT m_user;
+  DboUser m_user;
   bool m_changePassword;
   UserFormModel* m_model;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
 
-  Wt::Signal<DbUserT> m_validated;
+  Wt::Signal<DboUser> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
   Wt::Signal<std::string, std::string, std::string> m_changePasswordTriggered;
   Wt::Signal<void> m_close;
@@ -148,7 +148,7 @@ public:
 
   void updateDbUsers(void);
   Wt::WWidget* dbUserListWidget(void) {return m_dbUserListWidget;}
-  Wt::WPanel* createUserPanel(const DbUserT& user);
+  Wt::WPanel* createUserPanel(const DboUser& user);
   UserFormView* userForm() {return m_userForm;}
   Wt::WContainerWidget* userListContainer(void) {return m_usersListContainer;}
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}

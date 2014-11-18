@@ -47,9 +47,7 @@ namespace {
  * @param data
  * @param parent
  */
-QosTrendsChart::QosTrendsChart(const std::string& viewName,
-                               const std::list<DbQosDataT>& data,
-                               Wt::WContainerWidget* parent)
+QosTrendsChart::QosTrendsChart(const std::string& viewName, const std::list<QosDataT>& data, Wt::WContainerWidget* parent)
   : Wt::WPaintedWidget(parent),
     m_viewName(viewName)
 {
@@ -60,16 +58,16 @@ QosTrendsChart::QosTrendsChart(const std::string& viewName,
   updateData(data);
 }
 
-void QosTrendsChart::updateData(const std::list<DbQosDataT>& data)
+void QosTrendsChart::updateData(const QosDataList& data)
 {
   processPlottingData(data);
   update();
   resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
 }
 
-void QosTrendsChart::processPlottingData(const std::list<DbQosDataT>& data)
+void QosTrendsChart::processPlottingData(const QosDataList& data)
 {
-  std::list<DbQosDataT>::const_iterator qosit = data.begin();
+  QosDataList::const_iterator qosit = data.begin();
   m_plottingData.clear();
   m_normalTimeCount = 0;
 
@@ -159,9 +157,7 @@ void QosTrendsChart::addRangeToolTip(double x1, double width, long t1, long t2)
  * @param data
  * @param parent
  */
-RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName,
-                                     const std::list<DbQosDataT>& data,
-                                     Wt::WContainerWidget* parent)
+RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName, const QosDataList& data, Wt::WContainerWidget* parent)
   : Wt::Chart::WCartesianChart(parent),
     m_viewName(viewName),
     m_model(NULL)
@@ -187,7 +183,7 @@ void RawQosTrendsChart::setChartTitle(void)
   setTitleFont(customTitleFont());
 }
 
-void RawQosTrendsChart::updateData(const std::list<DbQosDataT>& data)
+void RawQosTrendsChart::updateData(const QosDataList& data)
 {
   Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
 

@@ -57,7 +57,7 @@ void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Respon
 {
   response.setMimeType("text/csv");
   response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
-  ViewQosDataMapT qosData;
+  QosDataByViewMapT qosData;
   if (m_mainUiClass->dbSession()->fetchQosData(qosData,
                                                m_viewName,
                                                m_mainUiClass->reportStartTime(),
@@ -117,7 +117,7 @@ void WebMainUI::addEvents(void)
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
 
-  if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
+  if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     m_reportApplyAnchor->clicked().connect(this, &WebMainUI::updateBiCharts);
   }
 }
@@ -125,7 +125,7 @@ void WebMainUI::addEvents(void)
 void WebMainUI::showUserHome(void)
 {
   std::string homeTabTitle = "Home";
-  if (m_dbSession->loggedUser().role == DbUserT::AdmRole) {
+  if (m_dbSession->loggedUser().role == DboUser::AdmRole) {
     homeTabTitle = tr("Account & Settings").toStdString();
   } else {
     homeTabTitle =  tr("Operations Console").toStdString();
@@ -143,7 +143,7 @@ void WebMainUI::showUserHome(void)
   m_dashtabs->addStyleClass("wrapper-container");
   m_dashtabs->addTab(createSettingPage(), tr("Account & Settings").toStdString());
   
-  if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
+  if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     initOperatorDashboard();
     m_dashtabs->setTabHidden(0, true);
     m_dashtabs->setCurrentIndex(1);
@@ -169,7 +169,7 @@ void WebMainUI::setupProfileMenus(void)
   Wt::WMenu* profileMenu = new Wt::WMenu();
   m_navbar->addMenu(profileMenu, Wt::AlignRight);
   
-  if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
+  if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
 
     Wt::WTemplate* notificationBlock = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
@@ -208,7 +208,7 @@ void WebMainUI::setupProfileMenus(void)
   profileMenu->addItem(profileMenuItem);
   
   Wt::WMenuItem* curItem = NULL;
-  if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
+  if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
 
     curItem = profilePopupMenu->addItem(tr("Show Settings").toStdString());
     curItem->triggered().connect(std::bind([=]() {
@@ -304,7 +304,7 @@ void WebMainUI::handleRefresh(void)
 
 
   // Set notification only for operator console
-  if (m_dbSession->loggedUser().role != DbUserT::AdmRole) {
+  if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     for(auto ptype: problemTypeCount) {
       m_notificationBoxes[ptype.first]->setText(QString::number(ptype.second).toStdString());
       if (ptype.second > 0) {
@@ -404,7 +404,7 @@ void WebMainUI::finishFileDialog(int action)
             file.copy(dest);
             file.remove();
 
-            DbViewT view;
+            DboView view;
             view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
@@ -498,7 +498,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
-    case DbUserT::AdmRole: {
+    case DboUser::AdmRole: {
       m_preferences->setEnabledInputs(true);
       // Start menu
       std::string menuText = QObject::tr("Welcome").toStdString();
@@ -661,7 +661,7 @@ void WebMainUI::createAccountPanel(void)
   bool changedPassword(false);
   bool isUserForm(true);
   m_userAccountForm = new UserFormView(&(m_dbSession->loggedUser()), changedPassword, isUserForm);
-  m_userAccountForm->validated().connect(std::bind([=](DbUserT userToUpdate) {
+  m_userAccountForm->validated().connect(std::bind([=](DboUser userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage(Q_TR("Update failed, see details in log."), OperationError);
@@ -703,7 +703,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   item->setText(Q_TR("-- Select a description file --"));
   viewSelectorModel->appendRow(item);
   
-  Q_FOREACH(const DbViewT& view, views) {
+  Q_FOREACH(const DboView& view, views) {
     item = new Wt::WStandardItem();
     item->setText(view.name);
     item->setData(view.path, Wt::UserRole);
@@ -815,8 +815,8 @@ void WebMainUI::initOperatorDashboard(void)
 
   int biIndex = 0;
   for (const auto& view: m_dbSession->viewList()) {
-    m_qosCharts[view.name] = new QosTrendsChart(view.name, std::list<DbQosDataT>());
-    m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, std::list<DbQosDataT>());
+    m_qosCharts[view.name] = new QosTrendsChart(view.name, QosDataList());
+    m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, QosDataList());
     bigraphsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
     bigraphsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
 
@@ -989,7 +989,7 @@ void WebMainUI::updateBiCharts(void)
 
 void WebMainUI::updateViewBiCharts(const std::string& viewName)
 {
-  ViewQosDataMapT qosData;
+  QosDataByViewMapT qosData;
   if (m_dbSession->fetchQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
     QosTrendsChartList::iterator qosChart = m_qosCharts.find(viewName);
     if (qosChart != m_qosCharts.end()) {
