@@ -610,7 +610,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
 
   // auth settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Authentication Options"));
+  link = new Wt::WAnchor("#", Q_TR("User Authentication"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
