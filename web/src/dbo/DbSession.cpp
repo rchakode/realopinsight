@@ -29,6 +29,7 @@
 #include <Wt/Auth/Identity>
 #include <Wt/Auth/PasswordStrengthValidator>
 
+
 DbSession::DbSession(void)
   : m_dbPath(ngrt4n::sqliteDbPath())
 {
@@ -496,21 +497,21 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap,
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    DboQosDataCollectionT entries;
+    DboQosDataCollectionT dbEntries;
     if (viewName.empty()) {
-      entries = find<DboQosData>()
+      dbEntries = find<DboQosData>()
           .where("timestamp >= ? AND timestamp <= ?")
           .orderBy("timestamp")
           .bind(fromDate).bind(toDate);
     } else {
-      entries = find<DboQosData>()
+      dbEntries = find<DboQosData>()
           .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
           .orderBy("timestamp")
           .bind(viewName).bind(fromDate).bind(toDate);
     }
 
     qosDataMap.clear();
-    for (auto &entry : entries) {
+    for (auto& entry : dbEntries) {
       qosDataMap[entry->view->name].push_back(entry->data());
     }
 
@@ -532,7 +533,11 @@ int DbSession::addNotification(const NotificationT& data)
   dbo::Transaction transaction(*this);
   try {
     DboNotification* entryPtr = new DboNotification();
-    entryPtr->setData(data);
+    entryPtr->ack_status = DboNotification::Active;
+    entryPtr->timestamp = data.timestamp;
+    entryPtr->ack_timestamp = -1;
+    entryPtr->view = find<DboView>().where("name=?").bind(data.view_name);
+    entryPtr->ack_user = find<DboUser>().where("name=?").bind(data.ack_username);;
     add(entryPtr);
     retCode = 0;
   } catch (const dbo::Exception& ex) {
@@ -548,17 +553,58 @@ int DbSession::addNotification(const NotificationT& data)
 int DbSession::acknowledgeAllNotification(const std::string& viewName)
 {
   int retCode = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    DboNotificationQosDataCollectionT dbEntries;
+    if (viewName.empty()) { //ack all
+      dbEntries = find<DboNotification>()
+          .where("ack_status = ?")
+          .bind(DboNotification::Active);
+    } else {  // ack specific
+      dbEntries = find<DboNotification>()
+          .where("ack_status = ? AND view_name = ?")
+          .bind(DboNotification::Active).bind(viewName);
+    }
 
-
-
+    // now set ack_status to acknowledge
+    for (auto& entry : dbEntries) {
+      entry.modify()->ack_status = DboNotification::Acknowledged;
+    }
+    retCode = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Database error: failed when acknowledging notifications.";
+    LOG("error", ex.what());
+  }
+  transaction.commit();
   return retCode;
 }
 
-int DbSession::fetchLastNotification(const std::string& viewName)
+int DbSession::fetchLastNotifications(NotificationListT& notifications, const std::string& viewName)
 {
   int retCode = -1;
 
+  try {
+    DboNotificationQosDataCollectionT dbEntries;
+    if (viewName.empty()) { //ack all
+      dbEntries = find<DboNotification>()
+          .where("ack_status = ?")
+          .bind(DboNotification::Active);
+    } else {  // ack specific
+      dbEntries = find<DboNotification>()
+          .where("ack_status = ? AND view_name = ?")
+          .bind(DboNotification::Active).bind(viewName);
+    }
 
+    // now set ack_status to acknowledge
+    notifications.clear();
+    for (auto& entry : dbEntries) {
+      notifications.push_back(entry->data());
+    }
+    retCode = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Database error: failed query last notifications.";
+    LOG("error", ex.what());
+  }
 
   return retCode;
 }

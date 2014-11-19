@@ -186,7 +186,6 @@ public:
     major = data.major;
     critical = data.critical;
     unknown = data.unknown;
-    view = find<DboView>().where("name=?").bind(data.view_name);
   }
 
   QosDataT data(void) const
@@ -277,6 +276,17 @@ public:
   dbo::ptr<DboView> view;
   dbo::ptr<DboUser> ack_user;
 
+  NotificationT data(void) const
+  {
+    NotificationT d;
+    d.timestamp = timestamp;
+    d.ack_status = ack_status;
+    d.ack_timestamp = ack_timestamp;
+    d.view_name = view->name;
+    d.ack_username = ack_user->username;
+    return d;
+  }
+
   template<class Action>
   void persist(Action& a) {
     dbo::field(a, timestamp, "timestamp");
@@ -292,10 +302,12 @@ typedef std::list<DboUser> DbUsersT;
 typedef std::list<DboView> DbViewsT;
 typedef std::list<DboLoginSession> LoginSessionListT;
 typedef std::list<QosDataT> QosDataList;
+typedef std::list<NotificationT> NotificationListT;
 typedef QMap<std::string, std::list<QosDataT> > QosDataByViewMapT;
 typedef dbo::collection< dbo::ptr<DboUser> > DboUserCollectionT;
 typedef dbo::collection< dbo::ptr<DboView> > DboViewCollectionT;
 typedef dbo::collection< dbo::ptr<DboQosData> > DboQosDataCollectionT;
+typedef dbo::collection< dbo::ptr<DboNotification> > DboNotificationQosDataCollectionT;
 typedef dbo::collection< dbo::ptr<DboLoginSession> > DboLoginSessionCollectionT;
 
 #endif // USER_HPP
