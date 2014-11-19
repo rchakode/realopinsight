@@ -1,5 +1,5 @@
 -- This script allows to update RealOpInsight Ultimate database
--- from the version 2014b3 or higher, to the version 2014b7
+-- Target Version: from v2014b3 to v2014b6
 -- Copyright (c) 2014 RealOpInsight Labs
 -- Author Rodrigue Chakode <Rodrigue.Chakode@gmail.com>
 -- Creation Date: 12/10/2014
