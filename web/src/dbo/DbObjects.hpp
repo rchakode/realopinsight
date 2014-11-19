@@ -293,9 +293,9 @@ typedef std::list<DboView> DbViewsT;
 typedef std::list<DboLoginSession> LoginSessionListT;
 typedef std::list<QosDataT> QosDataList;
 typedef QMap<std::string, std::list<QosDataT> > QosDataByViewMapT;
-typedef dbo::collection< dbo::ptr<DboUser> > UserCollectionT;
-typedef dbo::collection< dbo::ptr<DboView> > ViewCollectionT;
-typedef dbo::collection< dbo::ptr<DboQosData> > QosInfoCollectionT;
-typedef dbo::collection< dbo::ptr<DboLoginSession> > LoginSessionCollectionT;
+typedef dbo::collection< dbo::ptr<DboUser> > DboUserCollectionT;
+typedef dbo::collection< dbo::ptr<DboView> > DboViewCollectionT;
+typedef dbo::collection< dbo::ptr<DboQosData> > DboQosDataCollectionT;
+typedef dbo::collection< dbo::ptr<DboLoginSession> > DboLoginSessionCollectionT;
 
 #endif // USER_HPP

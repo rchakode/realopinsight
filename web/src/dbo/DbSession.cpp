@@ -72,7 +72,7 @@ int DbSession::addUser(const DboUser& user)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    UserCollectionT users = find<DboUser>().where("name=?").bind(user.username);
+    DboUserCollectionT users = find<DboUser>().where("name=?").bind(user.username);
     if (users.size() > 0) {
       m_lastError = "Failed: a user with the same username already exist.";
       LOG("error", m_lastError);
@@ -250,7 +250,7 @@ void DbSession::updateUserList(void)
   try {
     m_userList.clear();
     dbo::Transaction transaction(*this);
-    UserCollectionT users = find<DboUser>();
+    DboUserCollectionT users = find<DboUser>();
     for (auto &user : users) {
       m_userList.push_back(*user);
     }
@@ -265,7 +265,7 @@ void DbSession::updateViewList(void)
   try {
     m_viewList.clear();
     dbo::Transaction transaction(*this);
-    ViewCollectionT views = find<DboView>();
+    DboViewCollectionT views = find<DboView>();
     for (auto& view :views) {
       m_viewList.push_back(*view);
     }
@@ -331,7 +331,7 @@ int DbSession::addView(const DboView& view)
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    ViewCollectionT views = find<DboView>().where("name=?").bind(view.name);
+    DboViewCollectionT views = find<DboView>().where("name=?").bind(view.name);
     if (views.size() > 0) {
       m_lastError = "Failed: a view with the same name already exist.";
       LOG("error", m_lastError);
@@ -375,7 +375,7 @@ void DbSession::updateUserViewList(void)
 {
   m_userViewList.clear();
   dbo::Transaction transaction(*this);
-  UserCollectionT users = find<DboUser>();
+  DboUserCollectionT users = find<DboUser>();
   for (auto& user : users) {
     for (const auto& view: user->views) {
       m_userViewList.insert(user->username+":"+view->name);
@@ -451,7 +451,7 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
 
   dbo::Transaction transaction(*this);
   try {
-    LoginSessionCollectionT sessions = find<DboLoginSession>()
+    DboLoginSessionCollectionT sessions = find<DboLoginSession>()
         .where("username=? AND session_id=? AND status = ?")
         .bind(session.username)
         .bind(session.sessionId)
@@ -496,7 +496,7 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap,
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    QosInfoCollectionT entries;
+    DboQosDataCollectionT entries;
     if (viewName.empty()) {
       entries = find<DboQosData>()
           .where("timestamp >= ? AND timestamp <= ?")
