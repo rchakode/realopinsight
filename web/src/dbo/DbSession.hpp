@@ -88,6 +88,10 @@ public:
   int addSession(const DboLoginSession& session);
   int checkUserCookie(const DboLoginSession& session);
 
+  int addNotification(const NotificationT& data);
+  int acknowledgeAllNotification(const std::string& viewName);
+  int fetchLastNotification(const std::string& viewName);
+
 private:
   std::string m_dbPath;
   dbo::backend::Sqlite3* m_sqlite3Db;

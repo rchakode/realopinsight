@@ -186,6 +186,7 @@ public:
     major = data.major;
     critical = data.critical;
     unknown = data.unknown;
+    view = find<DboView>().where("name=?").bind(data.view_name);
   }
 
   QosDataT data(void) const
@@ -265,6 +266,11 @@ struct NotificationT {
 class DboNotification
 {
 public:
+  enum AckStatusT {
+    Active,
+    Acknowledged
+  };
+
   long timestamp;
   int ack_status;
   long ack_timestamp;

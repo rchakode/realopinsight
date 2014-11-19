@@ -475,9 +475,9 @@ int DbSession::addQosData(const QosDataT& qosData)
     DboQosData* qosDboPtr = new DboQosData();
     qosDboPtr->setData(qosData);
     qosDboPtr->view = find<DboView>().where("name=?").bind(qosData.view_name);;
-    dbo::ptr<DboQosData> dbEntry = add(qosDboPtr);
+    dbo::ptr<DboQosData> dboEntry = add(qosDboPtr);
     retCode = 0;
-    m_lastError = Q_TR("QoS entry added: ") + dbEntry->toString();
+    m_lastError = Q_TR("QoS entry added: ") + dboEntry->toString();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add QoS entry. More details in log.";
     LOG("error", ex.what());
@@ -521,5 +521,44 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap,
     LOG("error", ex.what());
   }
   transaction.commit();
+  return retCode;
+}
+
+
+int DbSession::addNotification(const NotificationT& data)
+{
+  int retCode = -1;
+
+  dbo::Transaction transaction(*this);
+  try {
+    DboNotification* entryPtr = new DboNotification();
+    entryPtr->setData(data);
+    add(entryPtr);
+    retCode = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to add notification entry into database.";
+    LOG("error", ex.what());
+  }
+
+  transaction.commit();
+  return retCode;
+}
+
+
+int DbSession::acknowledgeAllNotification(const std::string& viewName)
+{
+  int retCode = -1;
+
+
+
+  return retCode;
+}
+
+int DbSession::fetchLastNotification(const std::string& viewName)
+{
+  int retCode = -1;
+
+
+
   return retCode;
 }
