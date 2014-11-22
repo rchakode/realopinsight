@@ -71,5 +71,6 @@
         <file>images/built-in/search_32x28.png</file>
         <file>images/built-in/document-add_32x32.png</file>
         <file>images/built-in/document-remove_32x32.png</file>
+        <file>images/built-in/import-pandora.png</file>
     </qresource>
 </RCC>

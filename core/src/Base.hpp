@@ -124,6 +124,14 @@ namespace ngrt4n {
     ZenossCritical = 5
   };
 
+  enum PandoraSeverityT {
+    PandoraMaintenance = 0,
+    PandoraInformation = 1,
+    PandoraNormal = 2,
+    PandoraWarning = 3,
+    PandoraCritical = 4
+  };
+
   enum {
     AdmUserRole = 100,
     OpUserRole = 101

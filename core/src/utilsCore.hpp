@@ -77,14 +77,14 @@ namespace ngrt4n
 
   void clear(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
-  qint8 severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity);
+  qint8 severityFromProbeStatus(const int& monitorType, const int& statusValue);
   QString getIconPath(int _severity);
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
   bool findNode(NodeListT& bpnodes, NodeListT& cnodes,const QString& nodeId, NodeListT::iterator& node);
   bool findNode(const NodeListT& bpnodes, const NodeListT& cnodes, const QString& nodeId, NodeListT::const_iterator& node);
   bool findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node);
   QString sourceData2Json(const SourceT& src);
-  qint32 convert2ApiType(const QString& str);
+  qint32 convertToSourceType(const QString& str);
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
   QStringList sourceTypes(void);
   QStringList sourceIndexes(void);

@@ -69,6 +69,7 @@ public Q_SLOTS:
   void importNagiosChecks(void);
   void importZabbixTriggers(void);
   void importZenossComponents(void);
+  void importPandoraModules(void);
   void importLivestatusChecks(void);
   void handleErrorOccurred(QString msg);
 

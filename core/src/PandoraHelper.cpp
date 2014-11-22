@@ -37,15 +37,14 @@ const RequestListT PandoraHelper::ReqPatterns = PandoraHelper::requestsPatterns(
 
 PandoraHelper::PandoraHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
-    m_apiUri(baseUrl%PANDORA_API_CONTEXT),
     m_reqHandler(new QNetworkRequest()),
-    m_trid(-1),
+    m_pandoraVersion("UNKNOWN"),
     m_evlHandler(new QEventLoop(this)),
     m_isLogged(false)
 {
-  m_reqHandler->setRawHeader("Content-Type", "application/json");
+  setBaseUrl(baseUrl);
   m_reqHandler->setUrl(QUrl(m_apiUri));
-
+  m_reqHandler->setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 }
 
 PandoraHelper::~PandoraHelper()
@@ -54,18 +53,23 @@ PandoraHelper::~PandoraHelper()
   delete m_evlHandler;
 }
 
-QNetworkReply*
-PandoraHelper::postRequest(const qint32 & reqId, const QStringList & params)
+void
+PandoraHelper::setBaseUrl(const QString& url)
 {
-  QString request;
-  if (reqId == Login) {
-    request = ReqPatterns[reqId];
-  } else {
-    request = ReqPatterns[reqId].arg(m_auth);
-  }
+  m_apiUri = QString("%1/%2").arg(url, PANDORA_API_CONTEXT);
+  m_reqHandler->setUrl(QUrl(m_apiUri));
+}
+
+QNetworkReply*
+PandoraHelper::postRequest(const qint32& reqId, const QStringList& params)
+{
+  QString request = ReqPatterns[reqId];
   Q_FOREACH(const QString &param, params) {
     request = request.arg(param);
   }
+
+  request = request.arg(m_pandoraApiPass, m_pandoraUsername, m_pandoraPassword);
+
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
@@ -78,37 +82,21 @@ RequestListT
 PandoraHelper::requestsPatterns()
 {
   RequestListT patterns;
-  patterns[Login] = "{\"jsonrpc\": \"2.0\", \
-                    \"auth\": null, \
-                    \"method\": \"user.login\", \
-                    \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-                    \"id\": %9}";
-  patterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
-                         \"method\": \"apiinfo.version\", \
-                         \"params\": [], \
-                         \"auth\": \"%1\", \
-                         \"id\": %9}";
-  patterns[Module] = "{\"jsonrpc\": \"2.0\", \
-                      \"auth\": \"%1\", \
-                      \"method\": \"trigger.get\", \
-                      \"params\": { \
-                      \"filter\": {%2}, \
-                      \"selectGroups\": [\"name\"], \
-                      \"selectHosts\": [\"host\"], \
-                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-                      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-                      \"limit\": -1}, \
-                      \"id\": %9}";
-  patterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
-                         \"auth\": \"%1\", \
-                         \"method\": \"trigger.get\", \
-                         \"params\": { \
-                         \"filter\": {%2}, \
-                         \"select_hosts\": [\"host\"], \
-                         \"output\":  \"extend\", \
-                         \"limit\": -1}, \
-                         \"id\": %9}";
-
+  patterns[LoginTest] =
+      "op=get"
+      "&op2=test"
+      "&apipass=%1"
+      "&user=%2"
+      "&pass=%3";
+  patterns[GetTreeAgents] =
+      "op=get"
+      "&op2=tree_agents"
+      "&return_type=csv"
+      "&other=;|,|type_row,group_name,agent_name,module_name,module_utimestamp,module_state,module_last_status,module_data"
+      "&other_mode=url_encode_separator_|"
+      "&apipass=%1"
+      "&user=%2"
+      "&pass=%3";
   return patterns;
 }
 
@@ -122,207 +110,91 @@ PandoraHelper::setSslPeerVerification(bool verifyPeer)
   }
 }
 
-void
-PandoraHelper::setTrid(const QString& apiv)
-{
-  qint32 vnum = apiv.mid(0, 3).remove(".").toInt();
-  if (vnum < 14) {
-    m_trid = TriggerV18;
-  } else {
-    m_trid = Module;
-  }
-}
-
 int
-PandoraHelper::parseReply(QNetworkReply* reply)
+PandoraHelper::processReply(QNetworkReply* reply, QString& data)
 {
   reply->deleteLater();
 
   // check for error in network communication
   if (reply->error() != QNetworkReply::NoError) {
-    m_lastError = tr("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
+    m_lastError = tr("Pandora: %1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
     return -1;
   }
 
-  // now read data
-  QString data = reply->readAll();
-  m_replyJsonData.setData(data);
+  // now read and process respnse data
+  data = reply->readAll();
+  if (data == "auth error") {
+    m_lastError = tr("Pandora: authentication failed");
+    return -1;
+  }
+
+  if (data.startsWith("OK"))
+    return parseLoginTestResult(data);
 
   return 0;
-}
-
-bool
-PandoraHelper::checkRPCResultStatus(void)
-{
-  QString errmsg = m_replyJsonData.getProperty("error").property("data").toString();
-  if (errmsg.isEmpty()) {
-    errmsg = m_replyJsonData.getProperty("error").property("message").toString();
-  }
-  if (! errmsg.isEmpty()) {
-    m_lastError = errmsg;
-    return false;
-  }
-  return true;
 }
 
 int
 PandoraHelper::openSession(const SourceT& srcInfo)
 {
   setBaseUrl(srcInfo.mon_url);
-  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
-  if (params.size() != 2) {
-    m_lastError = tr("Bad auth string, should be in the form of login:password");
+  if (checkCredentialsInfo(srcInfo.auth) != 0)
     return -1;
-  }
 
-  params.push_back(QString::number(Login));
   setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
-  QNetworkReply* response = postRequest(Login, params);
+  QNetworkReply* response = postRequest(LoginTest, QStringList());
 
-  if (! response || processLoginReply(response) !=0)
+  if (! response)
     return -1;
 
-  // Get the API version
-  if (fecthApiVersion(srcInfo) != 0)
-    return -1;
-
-  return 0;
+  QString data;
+  return processReply(response, data);
 }
 
 int
-PandoraHelper::processLoginReply(QNetworkReply* reply)
+PandoraHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& agentName)
 {
-  if (parseReply(reply) != 0)
+  checks.clear();
+
+  if (checkCredentialsInfo(srcInfo.auth) != 0)
     return -1;
 
-  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  QString result = m_replyJsonData.getProperty("result").toString();
-  if (tid == PandoraHelper::Login && ! result.isEmpty()) {
-    m_auth = result;
-    m_isLogged = true;
-    return 0;
-  }
-  m_lastError = tr("Login failed");
+  setBaseUrl(srcInfo.mon_url);
 
-  return -1;
-}
+  //  QStringList params;
+  //  params.push_back(agentName);
+  QNetworkReply* response = postRequest(GetTreeAgents, QStringList());
 
-int
-PandoraHelper::fecthApiVersion(const SourceT& srcInfo)
-{
-  QStringList params;
-  params.push_back(QString::number(PandoraHelper::ApiVersion));
-  setSslPeerVerification(srcInfo.verify_ssl_peer);
-  QNetworkReply* response = postRequest(PandoraHelper::ApiVersion, params);
-
-  if (! response || processGetApiVersionReply(response) !=0)
+  if (! response)
     return -1;
 
-  return 0;
-}
-
-int
-PandoraHelper::processGetApiVersionReply(QNetworkReply* reply)
-{
-  if (parseReply(reply) != 0)
-    return -1;
-
-  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-
-  if (tid != PandoraHelper::ApiVersion) {
-    m_lastError = tr("the transaction id does not correspond to getApiVersion");
-    return -1;
-  }
-
-  setTrid(m_replyJsonData.getProperty("result").toString());
-
-  return 0;
+  return processModuleReply(response, checks);
 }
 
 int
 PandoraHelper::processModuleReply(QNetworkReply* reply, ChecksT& checks)
 {
-  if (parseReply(reply) != 0)
+  QString data;
+  if (processReply(reply, data) != 0)
     return -1;
+  QTextStream streamReader(&data, QIODevice::ReadWrite);
 
-  if (! checkRPCResultStatus())
-    return -1;
-
-  // check weird reponset
-  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  if (tid != PandoraHelper::Module && PandoraHelper::TriggerV18) {
-    m_lastError = tr("Weird response received from the server");
-    return -1;
-  }
-
-  // now treat successful result
-  QScriptValueIterator trigger(m_replyJsonData.getProperty("result"));
-  while (trigger.hasNext()) {
-
-    trigger.next();
-    if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
-
-    QScriptValue triggerData = trigger.value();
-    QString triggerName = triggerData.property("description").toString();
-
-    CheckT check;
-    check.host = parseHost(triggerData.property("hosts"));
-    check.host_groups = parseHostGroups(triggerData.property("groups"));
-    check.check_command = triggerName.toStdString();
-    check.status = triggerData.property("value").toInt32();
-    if (check.status == ngrt4n::ZabbixClear) {
-      check.alarm_msg = "OK ("+triggerName.toStdString()+")";
-    } else {
-      check.alarm_msg = triggerData.property("error").toString().toStdString();
-      check.status = triggerData.property("priority").toInteger();
-    }
-
-    if (tid == PandoraHelper::TriggerV18) {
-      check.last_state_change = triggerData.property("lastchange").toString().toStdString();
-    } else {
-      QScriptValueIterator item(triggerData.property("items"));
-      if (item.hasNext()) {
-        item.next();
-        if (item.flags()&QScriptValue::SkipInEnumeration) continue;
-        QScriptValue itemData = item.value();
-        check.last_state_change = itemData.property("lastclock").toString().toStdString();
-      }
-    }
-    check.id = ID_PATTERN.arg(check.host.c_str(), triggerName).toStdString();
-    checks.insert(std::pair<std::string, CheckT>(check.id, check));
-  }
-  return 0;
-}
-
-int
-PandoraHelper::loadChecks(const SourceT& srcInfo,
-                      ChecksT& checks,
-                      const QString& filterValue,
-                      ngrt4n::RequestFilterT filterType)
-{
-  if (! m_isLogged && openSession(srcInfo) != 0)
-    return -1;
-
-  if (! m_isLogged)
-    return -1;
-
-  QStringList params;
   checks.clear();
-  QString filter = "";
-  if (! filterValue.isEmpty()) {
-    if (filterType == ngrt4n::GroupFilter) {
-      filter = QString("\"group\":[\"%1\"]").arg(filterValue);
-    } else {
-      filter = QString("\"host\":[\"%1\"]").arg(filterValue);
-    }
-  }
-  params.push_back(filter);
-  params.push_back(QString::number(m_trid));
-  QNetworkReply* response = postRequest(m_trid, params);
-  if (! response || processModuleReply(response, checks) !=0) {
-    return -1;
+      CheckT check;
+  QString line;
+  while (line = streamReader.readLine(), ! line.isNull()) {
+    /** line :: 0=type_row;1=group_name;2=agent_name;3=module_name;4=module_utimestamp;5=module_state;module_last_statu;module_data */
+    QStringList fields = line.split(";");
+    check.host_groups = fields[1].toStdString();
+    check.host = fields[2].toStdString();
+    check.last_state_change = fields[4].toStdString();
+    check.status = fields[5].toInt();
+    check.alarm_msg = fields[7].toStdString();
+    check.id = QString("%1/%2").arg(fields[2], fields[3]).toStdString(); /* agent_name/module_name */
+    checks[check.id] = check;
   }
 
+  //FIXME: treat data => be implemented
   return 0;
 }
 
@@ -371,4 +243,33 @@ PandoraHelper::parseHost(const QScriptValue& json)
   }
 
   return result;
+}
+
+int PandoraHelper::parseLoginTestResult(const QString& data)
+{
+  QStringList fields = data.split(",");
+  if (fields.size() != 3 || fields[0].toLower() != "ok"){
+    m_lastError =  tr("Bad login test result: %1").arg(data);
+    return -1;
+  }
+  m_isLogged = true;
+  m_pandoraVersion = fields[1];
+  return 0;
+}
+
+
+
+int PandoraHelper::checkCredentialsInfo(const QString& authString)
+{
+  QStringList params = authString.split(":");
+  if (params.size() != 3) {
+    m_lastError = tr("Bad auth string, should be in the form of login:password:apipass");
+    return -1;
+  }
+
+  m_pandoraUsername = params[0];
+  m_pandoraPassword = params[1];
+  m_pandoraApiPass  = params[2];
+
+  return 0;
 }

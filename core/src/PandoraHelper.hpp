@@ -22,8 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef ZABBIXHELPER_HPP_
-#define ZABBIXHELPER_HPP_
+#ifndef PANDORAHELPER_HPP_
+#define PANDORAHELPER_HPP_
 #include "Base.hpp"
 #include "JsonHelper.hpp"
 #include <QtNetwork/QNetworkReply>
@@ -32,38 +32,34 @@
 
 
 namespace {
-  const QString PANDORA_API_CONTEXT = "/include/api.php";
+  const QString PANDORA_API_CONTEXT = "/pandora_console/include/api.php";
   }
 
 class PandoraHelper : public QNetworkAccessManager {
   Q_OBJECT
 public:
   enum {
-    Login=1,
-    ApiVersion=2,
-    Module=3
+    LoginTest=1,
+    GetModuleInfo=2,
+    GetTreeAgents = 3
   };
   static const RequestListT ReqPatterns;
 
 public:
-  PandoraHelper(const QString& baseUrl="http://localhost/zabbix");
+  PandoraHelper(const QString& baseUrl="http://localhost/");
   virtual ~PandoraHelper();
+  int
+  loadChecks(const SourceT& srcInfo,  ChecksT& checks, const QString& agentName);
   QNetworkReply*
   postRequest(const qint32& reqId, const QStringList& params);
   void
-  setBaseUrl(const QString& url) {m_apiUri = url%PANDORA_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
-  void
-  setTrid(const QString& apiv);
-  int
-  getTrid(void) const {return m_trid;}
+  setBaseUrl(const QString& url);
+  QString
+  getPandoraVersion(void) const {return m_pandoraVersion;}
   void
   setIsLogged(bool state) {m_isLogged = state;}
   bool
   getIsLogged(void) const {return m_isLogged;}
-  void
-  setAuth(const QString& auth) {m_auth = auth;}
-  QString
-  getAuth(void) const {return m_auth;}
   QString
   lastError(void) const {return m_lastError;}
   QString
@@ -71,24 +67,11 @@ public:
   void
   setSslPeerVerification(bool verifyPeer);
   int
-  parseReply(QNetworkReply* reply);
-  bool
-  checkRPCResultStatus(void);
+  processReply(QNetworkReply* reply, QString& data);
   int
   openSession(const SourceT& srcInfo);
   int
-  processLoginReply(QNetworkReply* reply);
-  int
-  fecthApiVersion(const SourceT& srcInfo);
-  int
-  processGetApiVersionReply(QNetworkReply* reply);
-  int
   processModuleReply(QNetworkReply* reply, ChecksT& checks);
-  int
-  loadChecks(const SourceT& srcInfo,
-             ChecksT& checks,
-             const QString& filterValue,
-             ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
 
 
 public Q_SLOTS:
@@ -100,18 +83,22 @@ Q_SIGNALS:
 private :
   QString m_apiUri;
   QNetworkRequest* m_reqHandler;
-  int m_trid;
+  QString m_pandoraVersion;
   static RequestListT requestsPatterns();
   QEventLoop* m_evlHandler;
   bool m_isLogged;
-  QString m_auth;
+  QString m_pandoraUsername;
+  QString m_pandoraPassword;
+  QString m_pandoraApiPass;
   QSslConfiguration m_sslConfig;
   QString m_lastError;
-  JsonHelper m_replyJsonData;
+  QString m_replyData;
 
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);
   std::string parseHost(const QScriptValue& json);
+  int parseLoginTestResult(const QString& data);
+  int checkCredentialsInfo(const QString& authString);
 };
 
-#endif /* ZABBIXHELPER_HPP_ */
+#endif /* PANDORAHELPER_HPP_ */

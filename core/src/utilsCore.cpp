@@ -38,11 +38,11 @@ QString ngrt4n::getAbsolutePath(const QString& _path)
   return fileInfo.absoluteFilePath();
 }
 
-qint8 ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrSeverity)
+qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusValue)
 {
   qint8 criticity = ngrt4n::Unknown;
-  if(_monitor == ngrt4n::Nagios) {
-    switch(_statusOrSeverity) {
+  if (monitorType == ngrt4n::Nagios) {
+    switch(statusValue) {
     case ngrt4n::NagiosOk:
       criticity = ngrt4n::Normal;
       break;
@@ -55,8 +55,8 @@ qint8 ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrS
     default:
       break;
     }
-  } else if (_monitor == ngrt4n::Zabbix) {
-    switch(_statusOrSeverity) {
+  } else if (monitorType == ngrt4n::Zabbix) {
+    switch(statusValue) {
     case ngrt4n::ZabbixClear:
       criticity = ngrt4n::Normal;
       break;
@@ -74,8 +74,8 @@ qint8 ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrS
     default:
       break;
     }
-  } else if (_monitor == ngrt4n::Zenoss){
-    switch(_statusOrSeverity) {
+  } else if (monitorType == ngrt4n::Zenoss){
+    switch(statusValue) {
     case ngrt4n::ZenossClear:
       criticity = ngrt4n::Normal;
       break;
@@ -87,6 +87,24 @@ qint8 ngrt4n::severityFromProbeStatus(const int& _monitor, const int& _statusOrS
       break;
     case ngrt4n::ZenossError:
     case ngrt4n::ZenossCritical:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
+    }
+  } else if (monitorType == ngrt4n::Pandora) {
+    switch(statusValue) {
+    case ngrt4n::PandoraMaintenance:
+    case ngrt4n::PandoraNormal:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::PandoraInformation:
+      criticity = ngrt4n::Minor;
+      break;
+    case ngrt4n::PandoraWarning:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::PandoraCritical:
       criticity = ngrt4n::Critical;
       break;
     default:
@@ -191,21 +209,6 @@ QString ngrt4n::sourceData2Json(const SourceT& src)
                           QString::number(src.verify_ssl_peer));
 }
 
-qint32 ngrt4n::convert2ApiType(const QString& str)
-{
-  QStringList types = sourceTypes();
-  int type;
-  if (str == types[ngrt4n::Nagios])
-    type = ngrt4n::Nagios;
-  else if (str == types[ngrt4n::Zabbix])
-    type = ngrt4n::Zabbix;
-  else if (str == types[ngrt4n::Zenoss])
-    type = ngrt4n::Zenoss;
-  else
-    type = ngrt4n::Auto;
-
-  return type;
-}
 
 
 void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
@@ -217,12 +220,33 @@ void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidChec
   invalidCheck.alarm_msg = msg.toStdString();
 }
 
+
 QStringList ngrt4n::sourceTypes(void)
 {
   return QStringList() << "Nagios-like"
                        << "Zabbix"
-                       << "Zenoss";
+                       << "Zenoss"
+                       << "Pandora FMS";
 }
+
+qint32 ngrt4n::convertToSourceType(const QString& str)
+{
+  QStringList types = sourceTypes();
+  int type;
+  if (str == types[ngrt4n::Nagios])
+    type = ngrt4n::Nagios;
+  else if (str == types[ngrt4n::Zabbix])
+    type = ngrt4n::Zabbix;
+  else if (str == types[ngrt4n::Zenoss])
+    type = ngrt4n::Zenoss;
+  else if (str == types[ngrt4n::Pandora])
+    type = ngrt4n::Pandora;
+  else
+    type = ngrt4n::Auto;
+
+  return type;
+}
+
 
 QStringList ngrt4n::sourceIndexes(void)
 {

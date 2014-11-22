@@ -34,6 +34,7 @@
 #include "GuiPreferences.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
+#include "PandoraHelper.hpp"
 
 namespace {
   const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
@@ -90,6 +91,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importLivestatusChecks()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
+  connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
   connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
   connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
@@ -245,7 +247,7 @@ void SvCreator::importZabbixTriggers(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), true);
+    showStatusMsg(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
     ZbxHelper handler;
@@ -270,7 +272,7 @@ void SvCreator::importZenossComponents(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), true);
+    showStatusMsg(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
     ZnsHelper handler(srcInfo.mon_url);
@@ -281,6 +283,26 @@ void SvCreator::importZenossComponents(void)
       int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
       treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
     }
+  }
+}
+
+void SvCreator::importPandoraModules(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Pandora, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString agentName = importationSettingForm.filter();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    showStatusMsg(tr("Loading Pandora agents data from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
+
+    ChecksT checks;
+    PandoraHelper handler(srcInfo.mon_url);
+    int retcode = handler.loadChecks(srcInfo, checks, agentName);
+
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }
 
@@ -730,7 +752,9 @@ void SvCreator::loadMenu(void)
       m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
       m_subMenus["ImportLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
       m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
-      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
+      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components")),
+      m_subMenus["ImportPandoraModules"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
+
   m_menus["FILE"]->addSeparator(),
       m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
       m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
@@ -758,6 +782,7 @@ void SvCreator::loadMenu(void)
   m_toolBar->addAction(m_subMenus["ImportLivestatusChecks"]);
   m_toolBar->addAction(m_subMenus["ImportZabbixTriggers"]);
   m_toolBar->addAction(m_subMenus["ImportZenossComponents"]);
+  m_toolBar->addAction(m_subMenus["ImportPandoraModules"]);
   setMenuBar(m_menuBar);
   addToolBar(m_toolBar);
 }
