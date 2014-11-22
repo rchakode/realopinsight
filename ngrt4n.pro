@@ -91,7 +91,8 @@ HEADERS += \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
-    core/src/StatusAggregator.hpp
+    core/src/StatusAggregator.hpp \
+    core/src/PandoraHelper.hpp
 
 
 SOURCES += \
@@ -108,7 +109,8 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/StatusAggregator.cpp
+    core/src/StatusAggregator.cpp \
+    core/src/PandoraHelper.cpp
 
 QT += svg gui
 PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"

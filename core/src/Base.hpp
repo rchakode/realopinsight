@@ -78,10 +78,11 @@ typedef std::unordered_map<std::string, CheckT> ChecksT;
 
 namespace ngrt4n {
   enum ApiTypeT {
-    Nagios = 0,
-    Zabbix = 1,
-    Zenoss = 2,
-    Auto=99
+    Nagios  = 0,
+    Zabbix  = 1,
+    Zenoss  = 2,
+    Pandora = 3,
+    Auto    = 99
   };
 
   enum SeverityT {
