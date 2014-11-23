@@ -92,7 +92,7 @@ PandoraHelper::requestsPatterns()
       "op=get"
       "&op2=tree_agents"
       "&return_type=csv"
-      "&other=;|,|type_row,group_name,agent_name,module_name,module_utimestamp,module_state,module_last_status,module_data"
+      "&other=?|,|type_row,group_name,agent_name,module_name,module_description,module_data,module_state,module_utimestamp"
       "&other_mode=url_encode_separator_|"
       "&apipass=%1"
       "&user=%2"
@@ -161,12 +161,12 @@ PandoraHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString
 
   setBaseUrl(srcInfo.mon_url);
 
-  //  QStringList params;
-  //  params.push_back(agentName);
   QNetworkReply* response = postRequest(GetTreeAgents, QStringList());
 
   if (! response)
     return -1;
+
+  m_agentFilter = agentName;
 
   return processModuleReply(response, checks);
 }
@@ -180,21 +180,54 @@ PandoraHelper::processModuleReply(QNetworkReply* reply, ChecksT& checks)
   QTextStream streamReader(&data, QIODevice::ReadWrite);
 
   checks.clear();
-      CheckT check;
+  CheckT check;
   QString line;
+  QString currentAgentName = "";
+  QString currentGroupName = "";
   while (line = streamReader.readLine(), ! line.isNull()) {
-    /** line :: 0=type_row;1=group_name;2=agent_name;3=module_name;4=module_utimestamp;5=module_state;module_last_statu;module_data */
-    QStringList fields = line.split(";");
-    check.host_groups = fields[1].toStdString();
-    check.host = fields[2].toStdString();
-    check.last_state_change = fields[4].toStdString();
-    check.status = fields[5].toInt();
-    check.alarm_msg = fields[7].toStdString();
-    check.id = QString("%1/%2").arg(fields[2], fields[3]).toStdString(); /* agent_name/module_name */
-    checks[check.id] = check;
+    /** line :: type_row,group_name,agent_name,module_name,module_description,module_data,module_state,module_utimestamp */
+
+    QStringList fields = line.split("?");
+    if (fields.size() != 8) {
+      qDebug()<< tr("Invalid module entry: %1").arg(line);
+      continue;
+    }
+
+    if (! fields.isEmpty()) {
+      if (fields[0] == "group") {
+        currentGroupName = fields[1];
+      } else if (fields[0] == "agent")  {
+        currentAgentName = fields[2];
+      } else if (fields[0] == "module") {
+        QString moduleName        = fields[3].replace("&#x20;", " ");
+        QString moduleDescription = fields[4].replace("&#x20;", " ");
+        QString moduleValue       = fields[5].replace("&#x20;", " ");
+        QString moduleState       = fields[6];
+        QString moduleUTimestamp  = fields[7];
+        check.host = currentAgentName.toStdString();
+        check.id = QString("%1/%2").arg(currentAgentName, moduleName).toStdString(); /* agent_name/module_name */
+        check.host_groups = currentGroupName.toStdString();
+        check.status = moduleState.toInt();
+        check.last_state_change = moduleUTimestamp.toStdString();
+
+        if (! moduleDescription.isEmpty()) {
+          check.alarm_msg = tr("%1 value is %2").arg(moduleDescription, moduleValue).toStdString();
+        } else {
+          check.alarm_msg = tr("%1 value is %2").arg(moduleName, moduleValue).toStdString();
+        }
+
+        if (m_agentFilter.isEmpty() || currentGroupName == m_agentFilter || currentAgentName == m_agentFilter) {
+          checks.insert(std::pair<std::string, CheckT>(check.id, check));
+        }
+      }
+    }
   }
 
-  //FIXME: treat data => be implemented
+  if (! data.isEmpty() && checks.empty()) {
+    m_lastError = tr("Pandora Error: %1").arg(data);
+    return -1;
+  }
+
   return 0;
 }
 

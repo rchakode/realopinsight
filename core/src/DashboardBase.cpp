@@ -259,16 +259,15 @@ void DashboardBase::runZenossUpdate(const SourceT& src)
 void DashboardBase::runPandoraUpdate(const SourceT& src)
 {
   PandoraHelper pandoraBroker(src.mon_url);
-  Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
-    StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
-    if (info.first == src.id) {
-      ChecksT checks;
-      if (pandoraBroker.loadChecks(src, checks, info.second) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, pandoraBroker.lastError());
-      }
-    }
+  ChecksT checks;
+  // Since the fetching of Pandora modules is based on
+  // the get_tree_agents API, this call with EMPTY host/group filter
+  // shall load all the modules
+  // Hence we don't have to iterate through hosts like with the other backends
+  if (pandoraBroker.loadChecks(src, checks, "") == 0) {
+    updateCNodesWithChecks(checks, src);
+  } else {
+    updateDashboardOnError(src, pandoraBroker.lastError());
   }
 }
 

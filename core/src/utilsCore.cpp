@@ -94,12 +94,8 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     }
   } else if (monitorType == ngrt4n::Pandora) {
     switch(statusValue) {
-    case ngrt4n::PandoraMaintenance:
     case ngrt4n::PandoraNormal:
       criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::PandoraInformation:
-      criticity = ngrt4n::Minor;
       break;
     case ngrt4n::PandoraWarning:
       criticity = ngrt4n::Major;
@@ -107,7 +103,9 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     case ngrt4n::PandoraCritical:
       criticity = ngrt4n::Critical;
       break;
+    case ngrt4n::PandoraUnknown:
     default:
+      criticity = ngrt4n::Unknown;
       break;
     }
   }

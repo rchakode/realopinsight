@@ -32,7 +32,7 @@
 
 
 namespace {
-  const QString PANDORA_API_CONTEXT = "/pandora_console/include/api.php";
+  const QString PANDORA_API_CONTEXT = "pandora_console/include/api.php";
   }
 
 class PandoraHelper : public QNetworkAccessManager {
@@ -93,6 +93,7 @@ private :
   QSslConfiguration m_sslConfig;
   QString m_lastError;
   QString m_replyData;
+  QString m_agentFilter;
 
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);

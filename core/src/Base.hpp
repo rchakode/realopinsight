@@ -86,12 +86,12 @@ namespace ngrt4n {
   };
 
   enum SeverityT {
-    Unset = -1,
-    Normal = 0,
-    Minor = 1,
-    Major = 2,
+    Unset    = -1,
+    Normal   = 0,
+    Minor    = 1,
+    Major    = 2,
     Critical = 3,
-    Unknown = 4
+    Unknown  = 4
   };
 
   struct AggregatedSeverityT {
@@ -100,47 +100,46 @@ namespace ngrt4n {
   };
 
   enum NagiosStatusT {
-    NagiosOk = 0,
-    NagiosWarning = 1,
+    NagiosOk       = 0,
+    NagiosWarning  = 1,
     NagiosCritical = 2,
-    NagiosUnknown = 3
+    NagiosUnknown  = 3
   };
 
   enum ZabbixSeverityT {
-    ZabbixClear = 0,
-    ZabbixInfo = 1,
-    ZabbixWarn = 2,
-    ZabbixAverage = 3,
-    ZabbixHigh = 4,
+    ZabbixClear    = 0,
+    ZabbixInfo     = 1,
+    ZabbixWarn     = 2,
+    ZabbixAverage  = 3,
+    ZabbixHigh     = 4,
     ZabbixDisaster = 5
   };
 
   enum ZenossSeverityT {
-    ZenossClear = 0,
-    ZenossDebug = 1,
-    ZenossInfo = 2,
-    ZenossWarning = 3,
-    ZenossError = 4,
+    ZenossClear    = 0,
+    ZenossDebug    = 1,
+    ZenossInfo     = 2,
+    ZenossWarning  = 3,
+    ZenossError    = 4,
     ZenossCritical = 5
   };
 
   enum PandoraSeverityT {
-    PandoraMaintenance = 0,
-    PandoraInformation = 1,
-    PandoraNormal = 2,
-    PandoraWarning = 3,
-    PandoraCritical = 4
+    PandoraNormal   = 0,
+    PandoraCritical = 1,
+    PandoraWarning  = 2,
+    PandoraUnknown  = 3
   };
 
   enum {
     AdmUserRole = 100,
-    OpUserRole = 101
+    OpUserRole  = 101
   };
 
   enum VisibilityT {
-    Hidden = 0x0,
-    Visible = 0x1,
-    Expanded = 0x2,
+    Hidden    = 0x0,
+    Visible   = 0x1,
+    Expanded  = 0x2,
     Collapsed = 0xFC
   };
 
@@ -150,22 +149,22 @@ namespace ngrt4n {
   };
 
   enum RequestFilterT {
-    HostFilter = 0,
+    HostFilter  = 0,
     GroupFilter = 1
   };
 
-  const std::string AdmUser = "ngrt4n_adm";
-  const std::string OpUser = "ngrt4n_op";
+  const std::string AdmUser   = "ngrt4n_adm";
+  const std::string OpUser    = "ngrt4n_op";
   const std::string CHILD_SEP = ",";
-  const std::string TAG_ZABBIX_HOSTNAME = "\\{HOSTNAME\\}";
+  const std::string TAG_ZABBIX_HOSTNAME  = "\\{HOSTNAME\\}";
   const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
-  const std::string TAG_HOSTNAME = "\\{hostname\\}";
-  const std::string TAG_CHECK = "\\{check_name\\}";
+  const std::string TAG_HOSTNAME   = "\\{hostname\\}";
+  const std::string TAG_CHECK      = "\\{check_name\\}";
   const std::string TAG_THERESHOLD = "\\{threshold\\}";
   const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
   const double WEIGHT_UNIT = 1.0;
-  const double WEIGHT_MIN = 0;
-  const double WEIGHT_MAX = 10;
+  const double WEIGHT_MIN  = 0;
+  const double WEIGHT_MAX  = 10;
 
   } // namespace ngrt4n
 
