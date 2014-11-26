@@ -530,6 +530,7 @@ int DbSession::addNotification(const NotificationT& data)
 
   dbo::Transaction transaction(*this);
   try {
+
     DboNotification* entryPtr = new DboNotification();
     entryPtr->ack_status = DboNotification::Active;
     entryPtr->timestamp = data.timestamp;
@@ -537,6 +538,7 @@ int DbSession::addNotification(const NotificationT& data)
     entryPtr->view = find<DboView>().where("name=?").bind(data.view_name);
     entryPtr->ack_user = find<DboUser>().where("name=?").bind(data.ack_username);;
     add(entryPtr);
+
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add notification entry into database.";
@@ -564,6 +566,7 @@ int DbSession::acknowledgeAllNotifications(const std::string& username)
         notifDbEntry.modify()->ack_timestamp = ackTimestamp;
       }
     }
+
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed when acknowledging notifications.";
@@ -594,6 +597,7 @@ int DbSession::fetchActiveNotifications(NotificationListT& notifications, const 
     for (auto& entry : dbEntries) {
       notifications.push_back(entry->data());
     }
+
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed query last notifications.";
