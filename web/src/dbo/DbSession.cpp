@@ -316,7 +316,7 @@ void DbSession::initDb(void)
       adm.firstname = "Default";
       adm.lastname = "Administrator";
       adm.role = DboUser::AdmRole;
-      adm.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
+      adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
       addUser(adm);
       pref.setDbState(1);
       LOG("info", Q_TR("Database created: ")+m_dbPath);
@@ -524,7 +524,7 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
 }
 
 
-int DbSession::addNotification(const NotificationT& data)
+int DbSession::addNotification(const std::string& viewName, int viewStatus)
 {
   int retCode = -1;
 
@@ -532,11 +532,11 @@ int DbSession::addNotification(const NotificationT& data)
   try {
 
     DboNotification* entryPtr = new DboNotification();
+    entryPtr->timestamp = time(NULL);
+    entryPtr->view = find<DboView>().where("name=?").bind(viewName);
+    entryPtr->view_status = viewStatus;
     entryPtr->ack_status = DboNotification::Active;
-    entryPtr->timestamp = data.timestamp;
     entryPtr->ack_timestamp = -1;
-    entryPtr->view = find<DboView>().where("name=?").bind(data.view_name);
-    entryPtr->ack_user = find<DboUser>().where("name=?").bind(data.ack_username);;
     add(entryPtr);
 
     retCode = 0;
