@@ -18,40 +18,45 @@ NotificationTest::NotificationTest()
   user1.lastname = TEST_USER1;
   user1.role = DboUser::OpRole;
   user1.registrationDate = QDateTime::currentDateTime().toString().toStdString();
-  dbSession.addUser(user1);
-
 
   DboView view1;
   view1.name = TEST_VIEW1;
   view1.service_count = 30;
   view1.path = "/dev/null";
-  dbSession.addView(view1);
 
+  dbSession.addUser(user1);
+  dbSession.addView(view1);
   dbSession.assignView(TEST_USER1, TEST_VIEW1);
 }
 
 NotificationTest::~NotificationTest()
 {
+  dbSession.deleteUser(TEST_USER1);
+  dbSession.deleteUser(TEST_VIEW1);
 }
 
 void NotificationTest::testAddNotification(void)
 {
+  NotificationListT notifications;
   QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
+  QCOMPARE(1, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
 }
 
 void NotificationTest::testAcknowledgeAllUserViewNotifications(void)
 {
-  QCOMPARE(false, true);
+  NotificationListT notifications;
+  QCOMPARE(0, dbSession.acknowledgeAllActiveNotifications(TEST_USER1));
+  QCOMPARE(0, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
 }
 
-void NotificationTest::fecthAllActiveNotifications(void)
+void NotificationTest::fecthActiveNotifications(void)
 {
-  QCOMPARE(false, true);
-}
-
-void NotificationTest::fecthLastViewActiveNotification(void)
-{
-  QCOMPARE(false, true);
+  NotificationListT notifications;
+  QCOMPARE(0, dbSession.acknowledgeAllActiveNotifications("admin"));
+  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
+  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Major));
+  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Critical));
+  QCOMPARE(3, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
 }
 
 

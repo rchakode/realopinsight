@@ -198,7 +198,7 @@ public:
     d.major = major;
     d.critical = critical;
     d.unknown = unknown;
-    d.view_name = view->name;
+    d.view_name = view ? view->name : "";
     return d;
   }
 
@@ -267,8 +267,9 @@ class DboNotification
 {
 public:
   enum AckStatusT {
-    Active,
-    Acknowledged
+    Unset = 0,
+    Active = 1,
+    Acknowledged = 2
   };
 
   long timestamp;
@@ -282,18 +283,18 @@ public:
   {
     NotificationT d;
     d.timestamp = timestamp;
-    d.view_name = view->name;
+    d.view_name = view? view->name : "";
     d.view_status = view_status;
     d.ack_status = ack_status;
     d.ack_timestamp = ack_timestamp;
-    d.ack_username = ack_user->username;
+    d.ack_username = ack_user ? ack_user->username : "";
     return d;
   }
 
   template<class Action>
   void persist(Action& a) {
     dbo::field(a, timestamp, "timestamp");
-    dbo::field(a, view_status, "ack_status");
+    dbo::field(a, view_status, "view_status");
     dbo::field(a, ack_status, "ack_status");
     dbo::field(a, ack_timestamp, "ack_timestamp");
     dbo::belongsTo(a, view, "view");

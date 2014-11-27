@@ -13,6 +13,5 @@ public:
 private Q_SLOTS:
   void testAddNotification(void);
   void testAcknowledgeAllUserViewNotifications(void);
-  void fecthAllActiveNotifications(void);
-  void fecthLastViewActiveNotification(void);
+  void fecthActiveNotifications(void);
 };

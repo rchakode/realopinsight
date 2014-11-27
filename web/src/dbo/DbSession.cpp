@@ -516,8 +516,7 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to fetch QoS entries. More details in log.";
-    qDebug()<< ex.what();
-    LOG("error", ex.what());
+    LOG("error", QObject::tr("DbSession::fetchQosData: %1").arg(ex.what()).toStdString());
   }
   transaction.commit();
   return retCode;
@@ -529,6 +528,7 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
   int retCode = -1;
 
   dbo::Transaction transaction(*this);
+
   try {
 
     DboNotification* entryPtr = new DboNotification();
@@ -542,37 +542,57 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
     retCode = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add notification entry into database.";
-    LOG("error", ex.what());
+    LOG("error", QObject::tr("DbSession::addNotification: %1").arg(ex.what()).toStdString());
   }
 
   transaction.commit();
+
   return retCode;
 }
 
 
-int DbSession::acknowledgeAllNotifications(const std::string& username)
+int DbSession::acknowledgeAllActiveNotifications(const std::string& username)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<DboUser> userDbEntry = find<DboUser>().where("name = ?").bind(username);
-    long ackTimestamp = time(NULL);
-    DboViewCollectionT views = userDbEntry->views;
-    for (auto& viewDbPtr : views) {
-      DboNotificationCollectionT notifications = viewDbPtr->notifications;
-      for (auto& notifDbEntry: notifications) {
-        notifDbEntry.modify()->ack_status = DboNotification::Acknowledged;
-        notifDbEntry.modify()->ack_user = userDbEntry;
-        notifDbEntry.modify()->ack_timestamp = ackTimestamp;
-      }
-    }
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(username);
 
-    retCode = 0;
+    if (! dboUser) {
+
+      m_lastError = QObject::tr("No user with username %1)").arg(username.c_str()).toStdString();
+      LOG("error", QObject::tr("DbSession::acknowledgeAllActiveNotifications: %1").arg(m_lastError.c_str()).toStdString());
+
+    } else {
+
+      long ackTimestamp = time(NULL);
+      DboViewCollectionT dboViews;
+
+      if (dboUser->role == DboUser::AdmRole) {
+        dboViews = find<DboView>();
+      } else {
+        dboViews = dboUser->views;
+      }
+
+      for (auto& dboView : dboViews) {
+        DboNotificationCollectionT dboNotifications = dboView->notifications;
+        for (auto& notifDbEntry: dboNotifications) {
+          notifDbEntry.modify()->ack_status = DboNotification::Acknowledged;
+          notifDbEntry.modify()->ack_user = dboUser;
+          notifDbEntry.modify()->ack_timestamp = ackTimestamp;
+        }
+      }
+
+      retCode = 0;
+
+    }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed when acknowledging notifications.";
-    LOG("error", ex.what());
+    LOG("error", QObject::tr("DbSession::acknowledgeAllActiveNotifications: %1").arg(ex.what()).toStdString());
   }
+
   transaction.commit();
+
   return retCode;
 }
 
@@ -580,29 +600,34 @@ int DbSession::fetchActiveNotifications(NotificationListT& notifications, const 
 {
   int retCode = -1;
 
+  dbo::Transaction transaction(*this);
+
   try {
-    DboNotificationCollectionT dbEntries;
+    DboNotificationCollectionT dbNotifications;
     if (viewName.empty()) { //ack all
-      dbEntries = find<DboNotification>()
+      dbNotifications = find<DboNotification>()
                   .where("ack_status = ?")
                   .bind(DboNotification::Active);
     } else {  // ack specific
-      dbEntries = find<DboNotification>()
+      dbNotifications = find<DboNotification>()
                   .where("ack_status = ? AND view_name = ?")
-                  .bind(DboNotification::Active).bind(viewName);
+                  .bind(DboNotification::Active)
+                  .bind(viewName);
     }
 
     // now set ack_status to acknowledge
     notifications.clear();
-    for (auto& entry : dbEntries) {
-      notifications.push_back(entry->data());
-    }
+      for (auto& entry : dbNotifications) {
+        notifications.push_back(entry->data());
+      }
 
-    retCode = 0;
+    retCode = notifications.size();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed query last notifications.";
-    LOG("error", ex.what());
+    LOG("error", QObject::tr("DbSession::fetchActiveNotifications: %1").arg(ex.what()).toStdString());
   }
+
+  transaction.commit();
 
   return retCode;
 }
