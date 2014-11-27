@@ -88,7 +88,7 @@ public:
 
   int addNotification(const NotificationT& data);
   int acknowledgeAllNotifications(const std::string& username);
-  int fetchLastNotifications(NotificationListT& notifications, const std::string& viewName);
+  int fetchActiveNotifications(NotificationListT& notifications, const std::string& viewName);
 
 private:
   std::string m_dbPath;

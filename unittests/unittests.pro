@@ -16,4 +16,5 @@ INCLUDEPATH = ../client/src ../core/src
 
 HEADERS += ../core/src/LsHelper.hpp
 
-SOURCES += tst_mklshelpertest.cpp
+SOURCES += tst_mklshelpertest.cpp \
+    web_foundation_unittest.cpp

@@ -573,7 +573,7 @@ int DbSession::acknowledgeAllNotifications(const std::string& username)
   return retCode;
 }
 
-int DbSession::fetchLastNotifications(NotificationListT& notifications, const std::string& viewName)
+int DbSession::fetchActiveNotifications(NotificationListT& notifications, const std::string& viewName)
 {
   int retCode = -1;
 

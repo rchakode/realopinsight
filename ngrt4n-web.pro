@@ -157,12 +157,18 @@ web-reportd {
   TARGET = realopinsight-reportd
 }
 
+web-foundation-unittests {
+  QT += testlib
+  TARGET = web-foundation-unittests
+  SOURCES += web/src/web_foundation_unittests.cpp
+}
+
 dflag {
-TARGET.path=$$(INSTALL_PREFIX)/bin
-MAN.path =$$(INSTALL_PREFIX)/share/man/man1
+  TARGET.path=$$(INSTALL_PREFIX)/bin
+  MAN.path =$$(INSTALL_PREFIX)/share/man/man1
 } else {
-TARGET.path=/usr/local/bin
-MAN.path = /usr/share/man/man1
+  TARGET.path=/usr/local/bin
+  MAN.path = /usr/share/man/man1
 }
 
 TARGET.files = $${TARGET}
