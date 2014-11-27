@@ -160,6 +160,7 @@ web-reportd {
 web-foundation-unittests {
   QT += testlib
   TARGET = web-foundation-unittests
+  HEADERS += web/src/web_foundation_unittests.hpp
   SOURCES += web/src/web_foundation_unittests.cpp
 }
 
