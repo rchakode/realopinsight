@@ -72,10 +72,8 @@ public:
   int revokeView(const std::string& uname, const std::string& vname);
 
   int addQosData(const QosDataT& qosData);
-  int fetchQosData(QosDataByViewMapT& qosDataMap,
-                    const std::string& viewName,
-                    long fromDate=0,
-                    long toDate = LONG_MAX);
+  int fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName,
+                   long fromDate = 0, long toDate = LONG_MAX);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);

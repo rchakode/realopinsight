@@ -489,10 +489,8 @@ int DbSession::addQosData(const QosDataT& qosData)
 
 
 
-int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap,
-                            const std::string& viewName,
-                            long fromDate,
-                            long toDate)
+int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName,
+                            long fromDate, long toDate)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
