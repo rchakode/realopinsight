@@ -255,6 +255,7 @@ public:
 /** holds notification info without wt::dbo specific properties (e.g dbo pointers)*/
 struct NotificationT {
   long timestamp;
+  int view_status;
   long ack_timestamp;
   long ack_status;
   std::string view_name;
@@ -271,6 +272,7 @@ public:
   };
 
   long timestamp;
+  int view_status;
   int ack_status;
   long ack_timestamp;
   dbo::ptr<DboView> view;
@@ -280,9 +282,10 @@ public:
   {
     NotificationT d;
     d.timestamp = timestamp;
+    d.view_name = view->name;
+    d.view_status = view_status;
     d.ack_status = ack_status;
     d.ack_timestamp = ack_timestamp;
-    d.view_name = view->name;
     d.ack_username = ack_user->username;
     return d;
   }
@@ -290,6 +293,7 @@ public:
   template<class Action>
   void persist(Action& a) {
     dbo::field(a, timestamp, "timestamp");
+    dbo::field(a, view_status, "ack_status");
     dbo::field(a, ack_status, "ack_status");
     dbo::field(a, ack_timestamp, "ack_timestamp");
     dbo::belongsTo(a, view, "view");
