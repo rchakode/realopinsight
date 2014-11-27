@@ -307,7 +307,7 @@ typedef QMap<std::string, std::list<QosDataT> > QosDataByViewMapT;
 typedef dbo::collection< dbo::ptr<DboUser> > DboUserCollectionT;
 typedef dbo::collection< dbo::ptr<DboView> > DboViewCollectionT;
 typedef dbo::collection< dbo::ptr<DboQosData> > DboQosDataCollectionT;
-typedef dbo::collection< dbo::ptr<DboNotification> > DboNotificationQosDataCollectionT;
+typedef dbo::collection< dbo::ptr<DboNotification> > DboNotificationCollectionT;
 typedef dbo::collection< dbo::ptr<DboLoginSession> > DboLoginSessionCollectionT;
 
 #endif // USER_HPP

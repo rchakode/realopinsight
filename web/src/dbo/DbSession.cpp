@@ -453,10 +453,10 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     DboLoginSessionCollectionT sessions = find<DboLoginSession>()
-        .where("username=? AND session_id=? AND status = ?")
-        .bind(session.username)
-        .bind(session.sessionId)
-        .bind(DboLoginSession::ExpiredCookie);
+                                          .where("username=? AND session_id=? AND status = ?")
+                                          .bind(session.username)
+                                          .bind(session.sessionId)
+                                          .bind(DboLoginSession::ExpiredCookie);
     retCode = sessions.size()? DboLoginSession::ActiveCookie : DboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
@@ -498,14 +498,14 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
     DboQosDataCollectionT dbEntries;
     if (viewName.empty()) {
       dbEntries = find<DboQosData>()
-          .where("timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(fromDate).bind(toDate);
+                  .where("timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(fromDate).bind(toDate);
     } else {
       dbEntries = find<DboQosData>()
-          .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(viewName).bind(fromDate).bind(toDate);
+                  .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(viewName).bind(fromDate).bind(toDate);
     }
 
     qosDataMap.clear();
@@ -548,25 +548,21 @@ int DbSession::addNotification(const NotificationT& data)
 }
 
 
-int DbSession::acknowledgeAllNotification(const std::string& viewName)
+int DbSession::acknowledgeAllNotifications(const std::string& username)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    DboNotificationQosDataCollectionT dbEntries;
-    if (viewName.empty()) { //ack all
-      dbEntries = find<DboNotification>()
-          .where("ack_status = ?")
-          .bind(DboNotification::Active);
-    } else {  // ack specific
-      dbEntries = find<DboNotification>()
-          .where("ack_status = ? AND view_name = ?")
-          .bind(DboNotification::Active).bind(viewName);
-    }
-
-    // now set ack_status to acknowledge
-    for (auto& entry : dbEntries) {
-      entry.modify()->ack_status = DboNotification::Acknowledged;
+    dbo::ptr<DboUser> userDbEntry = find<DboUser>().where("name = ?").bind(username);
+    long ackTimestamp = time(NULL);
+    DboViewCollectionT views = userDbEntry->views;
+    for (auto& viewDbPtr : views) {
+      DboNotificationCollectionT notifications = viewDbPtr->notifications;
+      for (auto& notifDbEntry: notifications) {
+        notifDbEntry.modify()->ack_status = DboNotification::Acknowledged;
+        notifDbEntry.modify()->ack_user = userDbEntry;
+        notifDbEntry.modify()->ack_timestamp = ackTimestamp;
+      }
     }
     retCode = 0;
   } catch (const dbo::Exception& ex) {
@@ -582,15 +578,15 @@ int DbSession::fetchLastNotifications(NotificationListT& notifications, const st
   int retCode = -1;
 
   try {
-    DboNotificationQosDataCollectionT dbEntries;
+    DboNotificationCollectionT dbEntries;
     if (viewName.empty()) { //ack all
       dbEntries = find<DboNotification>()
-          .where("ack_status = ?")
-          .bind(DboNotification::Active);
+                  .where("ack_status = ?")
+                  .bind(DboNotification::Active);
     } else {  // ack specific
       dbEntries = find<DboNotification>()
-          .where("ack_status = ? AND view_name = ?")
-          .bind(DboNotification::Active).bind(viewName);
+                  .where("ack_status = ? AND view_name = ?")
+                  .bind(DboNotification::Active).bind(viewName);
     }
 
     // now set ack_status to acknowledge
