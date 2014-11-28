@@ -281,10 +281,12 @@ void DbSession::updateViewList(const std::string& uname)
   try {
     m_viewList.clear();
     dbo::Transaction transaction(*this);
+
     dbo::ptr<DboUser> userDboPtr = find<DboUser>().where("name=?").bind(uname);
     for (auto& view : userDboPtr.modify()->views) {
       m_viewList.push_back(*view);
     }
+
     transaction.commit();
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
@@ -358,10 +360,12 @@ int DbSession::deleteView(std::string vname)
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
+
     execute("DELETE FROM user_view WHERE view_name=?;").bind(vname);
     execute("DELETE FROM view WHERE name=?;").bind(vname);
-    retCode = 0;
+
     transaction.commit();
+    retCode = 0;
   } catch (const dbo::Exception& ex) {
     retCode = 1;
     m_lastError = ex.what();
@@ -392,11 +396,13 @@ int DbSession::assignView(const std::string& uname, const std::string& vname)
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
+
     dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(uname);
     dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
-    retCode = 0;
+
     transaction.commit();
+    retCode = 0;
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
@@ -409,11 +415,35 @@ int DbSession::revokeView(const std::string& uname, const std::string& vname)
   int retCode = -1;
   try {
     dbo::Transaction transaction(*this);
+
     dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(uname);
     dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.erase(dboViewPtr);
     retCode = 0;
+
     transaction.commit();
+  } catch (const dbo::Exception& ex) {
+    LOG("error", ex.what());
+  }
+  return retCode;
+}
+
+
+int DbSession::fetchAssignedUserEmails(const std::string& viewName, QStringList& emails)
+{
+  int retCode = -1;
+  try {
+    dbo::collection<std::string> results = query<std::string>("SELECT user.email"
+                                                              " FROM user, user_view")
+                                           .where("user.name = user_view.user_name AND user_view.view_name = ?")
+                                           .bind(viewName);
+
+    emails.clear();
+    for (const auto& entry : results) {
+      emails.push_back(QString::fromStdString(entry));
+    }
+
+    retCode = 0;
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
@@ -453,10 +483,10 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     DboLoginSessionCollectionT sessions = find<DboLoginSession>()
-        .where("username=? AND session_id=? AND status = ?")
-        .bind(session.username)
-        .bind(session.sessionId)
-        .bind(DboLoginSession::ExpiredCookie);
+                                          .where("username=? AND session_id=? AND status = ?")
+                                          .bind(session.username)
+                                          .bind(session.sessionId)
+                                          .bind(DboLoginSession::ExpiredCookie);
     retCode = sessions.size()? DboLoginSession::ActiveCookie : DboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
@@ -489,8 +519,7 @@ int DbSession::addQosData(const QosDataT& qosData)
 
 
 
-int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName,
-                            long fromDate, long toDate)
+int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate, long toDate)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
@@ -498,14 +527,14 @@ int DbSession::fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
     DboQosDataCollectionT dbEntries;
     if (viewName.empty()) {
       dbEntries = find<DboQosData>()
-          .where("timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(fromDate).bind(toDate);
+                  .where("timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(fromDate).bind(toDate);
     } else {
       dbEntries = find<DboQosData>()
-          .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(viewName).bind(fromDate).bind(toDate);
+                  .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(viewName).bind(fromDate).bind(toDate);
     }
 
     qosDataMap.clear();
@@ -578,14 +607,14 @@ int DbSession::acknowledgeAllActiveNotifications(const std::string& userName, co
         DboNotificationCollectionT dboNotifications;
         if (! viewName.empty()) {
           dboNotifications = find<DboNotification>()
-              .where("ack_status != ? AND view_name = ?")
-              .bind(DboNotification::Acknowledged)
-              .bind(viewName);
+                             .where("ack_status != ? AND view_name = ?")
+                             .bind(DboNotification::Acknowledged)
+                             .bind(viewName);
         } else {
           dboNotifications = find<DboNotification>()
-              .where("ack_status != ? AND view_name = ?")
-              .bind(DboNotification::Acknowledged)
-              .bind(dboView->name);
+                             .where("ack_status != ? AND view_name = ?")
+                             .bind(DboNotification::Acknowledged)
+                             .bind(dboView->name);
         }
         for (auto& notifDbEntry: dboNotifications) {
           notifDbEntry.modify()->ack_status = DboNotification::Acknowledged;
@@ -618,15 +647,15 @@ int DbSession::fetchActiveNotifications(NotificationListT& notifications, const 
     DboNotificationCollectionT dbNotifications;
     if (viewName.empty()) { //ack all
       dbNotifications = find<DboNotification>()
-          .where("ack_status = ?")
-          .bind(DboNotification::Active)
-          .orderBy("view_status DESC");
+                        .where("ack_status = ?")
+                        .bind(DboNotification::Active)
+                        .orderBy("view_status DESC");
     } else {  // ack specific
       dbNotifications = find<DboNotification>()
-          .where("ack_status = ? AND view_name = ?")
-          .bind(DboNotification::Active)
-          .bind(viewName)
-          .orderBy("view_status DESC");
+                        .where("ack_status = ? AND view_name = ?")
+                        .bind(DboNotification::Active)
+                        .bind(viewName)
+                        .orderBy("view_status DESC");
     }
 
     // now set ack_status to acknowledge

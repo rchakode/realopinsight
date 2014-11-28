@@ -62,7 +62,7 @@ public:
   int deleteUser(std::string uname);
   int deleteAuthSystemUsers(int authSystem);
   bool findUser(const std::string& username, DboUser& user);
-  int updatePassword(const std::string& uname, const std::string& currentPass,const std::string& newPass);
+  int updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
   void updateUserList(void);
   DbUsersT& userList(void) {return m_userList;}
 
@@ -70,10 +70,10 @@ public:
   int deleteView(std::string vname);
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
+  int fetchAssignedUserEmails(const std::string& viewName, QStringList& emails);
 
   int addQosData(const QosDataT& qosData);
-  int fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName,
-                   long fromDate = 0, long toDate = LONG_MAX);
+  int fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate = 0, long toDate = LONG_MAX);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);

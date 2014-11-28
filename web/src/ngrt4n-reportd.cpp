@@ -94,8 +94,8 @@ void sendEmailNotification(const NodeT& serviceInfo,
 }
 
 void handleNotification(const NodeT& serviceInfo,
-                        DbSession* dbSession,
                         const QosDataT& qosData,
+                        DbSession* dbSession,
                         const WebPreferencesBase& preferences)
 {
   NotificationListT notifications;
@@ -117,9 +117,13 @@ void handleNotification(const NodeT& serviceInfo,
       }
     }
   } else {
-    //FIXME: send mail :: service recovery
-    if ()
-    dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+    if (count > 0) { // if there were problems
+      NotificationT lastNotification = notifications.front();
+      if (lastNotification.view_status != serviceInfo.sev) { // service recovered
+        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, recipients, preferences);
+        dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+      }
+    }
   }
 }
 
@@ -146,7 +150,7 @@ void runCollector(int period)
       qosInfo.timestamp = now;
       try {
         dbSession.addQosData(qosInfo);
-        handleNotification(collector.rootNode(), &dbSession, preferences);
+        handleNotification(collector.rootNode(), qosInfo, &dbSession, preferences);
         REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", ex.what());
