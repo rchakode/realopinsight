@@ -706,7 +706,7 @@ void WebPreferences::fillInNotificationSettings(void)
 {
   m_notificationTypeBox->setCurrentIndex( getNotificationType() );
   m_smtpServerAddrField->setText( getSmtpServerAddr() );
-  m_smtpServerPortField->setText( getSmtpServerPort() );
+  m_smtpServerPortField->setText( getSmtpServerPortText() );
   m_smtpUsernameField->setText( getSmtpUsername() );
   m_smtpPasswordField->setEchoMode(Wt::WLineEdit::Password);
   m_smtpPasswordField->setText( getSmtpPassword() );

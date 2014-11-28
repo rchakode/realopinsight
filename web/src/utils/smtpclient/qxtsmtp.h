@@ -47,6 +47,7 @@ class QxtSmtpPrivate;
 class QXT_NETWORK_EXPORT QxtSmtp : public QObject
 {
     Q_OBJECT
+
 public:
     enum SmtpError
     {

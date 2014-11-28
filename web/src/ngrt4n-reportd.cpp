@@ -27,6 +27,7 @@
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
 #include "Applications.hpp"
+#include "utils/smtpclient/MailSender.hpp"
 #include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
@@ -35,7 +36,63 @@
 #include <getopt.h>
 #include <unistd.h>
 
-void handleNotification(DbSession* dbSession, const NodeT& rootNode)
+namespace {
+  const QString EMAIL_NOTIFICATION_SUBJECT_TEMPLATE = "%1: The State of Service %2 is %3";
+  const QString EMAIL_NOTIFICATION_CONTENT_TEMPLATE = "%1: The State of Service %2 is %3" // %1 = {PROBLEM, RECOVERY}
+                                                      "-----------------------------"
+                                                      "Check Time: %4"
+                                                      "State: %5"
+                                                      "Last State: %6"
+                                                      "\n"
+                                                      "Service Details:"
+                                                      "--------------------"
+                                                      "%7" // Print root node details
+                                                      "\n"
+                                                      "Additional Information"
+                                                      "-----------------------------"
+                                                      "%8" // Print stats related to IT services (QoS entry)
+                                                      "\n";
+}
+
+void sendEmailNotification(const NodeT& serviceInfo,
+                           int lastState,
+                           const QosDataT& qosData,
+                           const WebPreferencesBase& preferences)
+{
+
+  QString typeNotification = (lastState != ngrt4n::Normal && serviceInfo.sev == ngrt4n::Normal) ? "RECOVERY": "PROBLEM";
+  QString stateString = Severity(serviceInfo.sev).toString();
+  QString lastStateString = Severity(lastState).toString();
+
+  QString emailSubject = EMAIL_NOTIFICATION_SUBJECT_TEMPLATE.arg(
+                           typeNotification,
+                           serviceInfo.name,
+                           stateString);
+
+  QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
+                           typeNotification,
+                           serviceInfo.name,
+                           stateString,
+                           ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
+                           stateString,
+                           lastStateString,
+                           serviceInfo.toString(),
+                           qosData.toString().c_str() //FIXME: create human-readable string
+                           );
+
+  MailSender mailSender(QString::fromStdString( preferences.getSmtpServerAddr() ),
+                        preferences.getSmtpServerPort(),
+                        QString::fromStdString( preferences.getSmtpUsername() ),
+                        QString::fromStdString( preferences.getSmtpPassword() ),
+                        preferences.getSmtpUseSsl());
+
+  mailSender.send("sender",
+                  "recipiend",
+                  emailSubject,
+                  emailContent);
+}
+
+void handleNotification(const NodeT& rootNode, DbSession* dbSession, const WebPreferencesBase& preferences)
 {
   NotificationListT notifications;
   std::string viewName = viewName;
@@ -78,7 +135,7 @@ void runCollector(int period)
       qosInfo.timestamp = now;
       try {
         dbSession.addQosData(qosInfo);
-        handleNotification(&dbSession, collector.rootNode());
+        handleNotification(collector.rootNode(), &dbSession, preferences);
         REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", ex.what());
@@ -110,7 +167,7 @@ int main(int argc, char **argv)
   }
 
   period *= 60;
-  
+
   REPORTD_LOG("notice", QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)).toStdString());
   runCollector(period); // convert period in seconds
 
