@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "DbSession.hpp"
+#include "dbo/DbSession.hpp"
 #include "WebPreferences.hpp"
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
@@ -35,29 +35,51 @@
 #include <getopt.h>
 #include <unistd.h>
 
+void handleNotification(DbSession* dbSession, const NodeT& rootNode)
+{
+  NotificationListT notifications;
+  std::string viewName = viewName;
+  int count = dbSession->fetchActiveNotifications(notifications, viewName);
+  if (rootNode.sev != ngrt4n::Normal) {
+    if (count <= 0) {
+      //FIXME: send mail:: new notif
+      dbSession->addNotification(viewName, rootNode.sev);
+    } else {
+      //FIXME: send mail:: severity changde
+      dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+      dbSession->addNotification(viewName, rootNode.sev);
+    }
+  } else {
+    //FIXME: send mail :: service recovery
+    dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+  }
+}
+
 void runCollector(int period)
 {
-  std::unique_ptr<DbSession> dbSession(new DbSession());
-  std::unique_ptr<WebPreferencesBase> preferences(new WebPreferencesBase());
+  DbSession dbSession;
+  WebPreferencesBase preferences;
   while(1) {
     try {
-      dbSession->updateUserList();
+      dbSession.updateUserList();
     } catch(const std::exception& ex) {
       std::cerr << ex.what() <<"\n";
     }
 
     REPORTD_LOG("notice", Q_TR("Collecting QoS data..."));
     long now = time(NULL);
-    for (auto view: dbSession->viewList()) {
+    for (auto view: dbSession.viewList()) {
       QosCollector collector(view.path.c_str());
-      collector.initialize(preferences.get());
-      collector.initSettings(preferences.get());
+      collector.initialize( & preferences );
+      collector.initSettings( & preferences );
       collector.runMonitor();
+
       QosDataT qosInfo = collector.qosInfo();
       qosInfo.timestamp = now;
       try {
-        dbSession->addQosData(qosInfo);
-        REPORTD_LOG("notice", dbSession->lastError());
+        dbSession.addQosData(qosInfo);
+        handleNotification(&dbSession, collector.rootNode());
+        REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", ex.what());
       }
