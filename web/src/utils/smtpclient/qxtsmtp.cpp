@@ -184,13 +184,13 @@ void QxtSmtpPrivate::socketError(QAbstractSocket::SocketError err)
 {
     if (err == QAbstractSocket::SslHandshakeFailedError)
     {
-        emit qxt_p().encryptionFailed();
-        emit qxt_p().encryptionFailed( socket->errorString().toLatin1() );
+        Q_EMIT qxt_p().encryptionFailed();
+        Q_EMIT qxt_p().encryptionFailed( socket->errorString().toLatin1() );
     }
     else if (state == StartState)
     {
-        emit qxt_p().connectionFailed();
-        emit qxt_p().connectionFailed( socket->errorString().toLatin1() );
+        Q_EMIT qxt_p().connectionFailed();
+        Q_EMIT qxt_p().connectionFailed( socket->errorString().toLatin1() );
     }
 }
 
@@ -210,8 +210,8 @@ void QxtSmtpPrivate::socketRead()
             if (code[0] != '2')
             {
                 state = Disconnected;
-                emit qxt_p().connectionFailed();
-                emit qxt_p().connectionFailed(line);
+                Q_EMIT qxt_p().connectionFailed();
+                Q_EMIT qxt_p().connectionFailed(line);
                 socket->disconnectFromHost();
             }
             else
@@ -247,21 +247,21 @@ void QxtSmtpPrivate::socketRead()
             if (code[0] == '2')
             {
                 state = Authenticated;
-                emit qxt_p().authenticated();
+                Q_EMIT qxt_p().authenticated();
             }
             else
             {
                 state = Disconnected;
-                emit qxt_p().authenticationFailed();
-                emit qxt_p().authenticationFailed( line );
+                Q_EMIT qxt_p().authenticationFailed();
+                Q_EMIT qxt_p().authenticationFailed( line );
                 socket->disconnectFromHost();
             }
             break;
         case MailToSent:
         case RcptAckPending:
             if (code[0] != '2') {
-                emit qxt_p().mailFailed( pending.first().first, code.toInt() );
-                emit qxt_p().mailFailed(pending.first().first, code.toInt(), line);
+                Q_EMIT qxt_p().mailFailed( pending.first().first, code.toInt() );
+                Q_EMIT qxt_p().mailFailed(pending.first().first, code.toInt(), line);
 				// pending.removeFirst();
 				// DO NOT remove it, the body sent state needs this message to assigned the next mail failed message that will 
 				// the sendNext 
@@ -283,19 +283,19 @@ void QxtSmtpPrivate::socketRead()
 				// be necessary since I commented out the removeFirst
 				if (code[0] != '2')
 				{
-					emit qxt_p().mailFailed(pending.first().first, code.toInt() );
-					emit qxt_p().mailFailed(pending.first().first, code.toInt(), line);
+          Q_EMIT qxt_p().mailFailed(pending.first().first, code.toInt() );
+          Q_EMIT qxt_p().mailFailed(pending.first().first, code.toInt(), line);
 				}
 				else
-					emit qxt_p().mailSent(pending.first().first);
+          Q_EMIT qxt_p().mailSent(pending.first().first);
 	            pending.removeFirst();
 			}
             sendNext();
             break;
         case Resetting:
             if (code[0] != '2') {
-                emit qxt_p().connectionFailed();
-                emit qxt_p().connectionFailed( line );
+                Q_EMIT qxt_p().connectionFailed();
+                Q_EMIT qxt_p().connectionFailed( line );
             }
             else {
                 state = Waiting;
@@ -312,7 +312,7 @@ void QxtSmtpPrivate::socketRead()
 void QxtSmtpPrivate::ehlo()
 {
     QByteArray address = "127.0.0.1";
-    foreach(const QHostAddress& addr, QNetworkInterface::allAddresses())
+    Q_FOREACH(const QHostAddress& addr, QNetworkInterface::allAddresses())
     {
         if (addr == QHostAddress::LocalHost || addr == QHostAddress::LocalHostIPv6)
             continue;
@@ -390,7 +390,7 @@ void QxtSmtpPrivate::authenticate()
     if (!extensions.contains("AUTH") || username.isEmpty() || password.isEmpty())
     {
         state = Authenticated;
-        emit qxt_p().authenticated();
+        Q_EMIT qxt_p().authenticated();
     }
     else
     {
@@ -410,7 +410,7 @@ void QxtSmtpPrivate::authenticate()
         else
         {
             state = Authenticated;
-            emit qxt_p().authenticated();
+            Q_EMIT qxt_p().authenticated();
         }
     }
 }
@@ -529,7 +529,7 @@ void QxtSmtpPrivate::sendNext()
     {
         // if there are no additional mails to send, finish up
         state = Waiting;
-        emit qxt_p().finished();
+        Q_EMIT qxt_p().finished();
         return;
     }
 
@@ -546,8 +546,8 @@ void QxtSmtpPrivate::sendNext()
     if (recipients.count() == 0)
     {
         // can't send an e-mail with no recipients
-        emit qxt_p().mailFailed(pending.first().first, QxtSmtp::NoRecipients );
-        emit qxt_p().mailFailed(pending.first().first, QxtSmtp::NoRecipients, QByteArray( "e-mail has no recipients" ) );
+        Q_EMIT qxt_p().mailFailed(pending.first().first, QxtSmtp::NoRecipients );
+        Q_EMIT qxt_p().mailFailed(pending.first().first, QxtSmtp::NoRecipients, QByteArray( "e-mail has no recipients" ) );
         pending.removeFirst();
         sendNext();
         return;
@@ -558,7 +558,7 @@ void QxtSmtpPrivate::sendNext()
     socket->write("mail from:<" + qxt_extract_address(msg.sender()) + ">\r\n");
     if (extensions.contains("PIPELINING"))  // almost all do nowadays
     {
-        foreach(const QString& rcpt, recipients)
+        Q_FOREACH(const QString& rcpt, recipients)
         {
             socket->write("rcpt to:<" + qxt_extract_address(rcpt) + ">\r\n");
         }
@@ -577,16 +577,16 @@ void QxtSmtpPrivate::sendNextRcpt(const QByteArray& code, const QByteArray&line)
 
     if (code[0] != '2')
     {
-        // on failure, emit a warning signal
+        // on failure, Q_EMIT a warning signal
         if (!mailAck)
         {
-            emit qxt_p().senderRejected(messageID, msg.sender());
-            emit qxt_p().senderRejected(messageID, msg.sender(), line );
+            Q_EMIT qxt_p().senderRejected(messageID, msg.sender());
+            Q_EMIT qxt_p().senderRejected(messageID, msg.sender(), line );
         }
         else
         {
-            emit qxt_p().recipientRejected(messageID, msg.sender());
-            emit qxt_p().recipientRejected(messageID, msg.sender(), line);
+            Q_EMIT qxt_p().recipientRejected(messageID, msg.sender());
+            Q_EMIT qxt_p().recipientRejected(messageID, msg.sender(), line);
         }
     }
     else if (!mailAck)
@@ -604,8 +604,8 @@ void QxtSmtpPrivate::sendNextRcpt(const QByteArray& code, const QByteArray&line)
         if (rcptAck == 0)
         {
             // no recipients were considered valid
-            emit qxt_p().mailFailed(messageID, code.toInt() );
-            emit qxt_p().mailFailed(messageID, code.toInt(), line);
+            Q_EMIT qxt_p().mailFailed(messageID, code.toInt() );
+            Q_EMIT qxt_p().mailFailed(messageID, code.toInt(), line);
             pending.removeFirst();
             sendNext();
         }
@@ -636,8 +636,8 @@ void QxtSmtpPrivate::sendBody(const QByteArray& code, const QByteArray & line)
 
     if (code[0] != '3')
     {
-        emit qxt_p().mailFailed(messageID, code.toInt() );
-        emit qxt_p().mailFailed(messageID, code.toInt(), line);
+        Q_EMIT qxt_p().mailFailed(messageID, code.toInt() );
+        Q_EMIT qxt_p().mailFailed(messageID, code.toInt(), line);
         pending.removeFirst();
         sendNext();
         return;

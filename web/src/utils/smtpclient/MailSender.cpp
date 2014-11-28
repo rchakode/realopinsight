@@ -21,6 +21,11 @@ void MailSender::send(const QString& sender,
                       const QString& body)
 {
   QxtMailMessage message;
+
+  message.setExtraHeader("From", sender);
+  message.setExtraHeader("MIME-Version", "1.0");
+  message.setExtraHeader("Content-Type", "text/html; charset=ISO-8859-1");
+
   message.setSender(sender);
   message.addRecipient(recipient);
   message.setSubject(subject);

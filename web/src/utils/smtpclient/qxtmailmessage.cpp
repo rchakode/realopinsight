@@ -202,7 +202,7 @@ void QxtMailMessage::setExtraHeaders(const QHash<QString, QString>& a)
 {
     QHash<QString, QString>& headers = qxt_d->extraHeaders;
     headers.clear();
-    foreach(const QString& key, a.keys())
+    Q_FOREACH(const QString& key, a.keys())
     {
         headers[key.toLower()] = a[key];
     }
@@ -273,7 +273,7 @@ QByteArray qxt_fold_mime_header(const QString& key, const QString& value, QTextC
     if (!value.contains("=?") && latin1->canEncode(value))
     {
         bool firstWord = true;
-        foreach(const QByteArray& word, value.toLatin1().split(' '))
+        Q_FOREACH(const QByteArray& word, value.toLatin1().split(' '))
         {
             if (line.size() > 78)
             {
@@ -420,7 +420,7 @@ QByteArray QxtMailMessage::rfc2822() const
         }
     }
 
-    foreach(const QString& r, qxt_d->extraHeaders.keys())
+    Q_FOREACH(const QString& r, qxt_d->extraHeaders.keys())
     {
         if ((r.toLower() == "content-type" || r.toLower() == "content-transfer-encoding") && attach.count())
         {
@@ -570,7 +570,7 @@ QByteArray QxtMailMessage::rfc2822() const
 
     if (attach.count())
     {
-        foreach(const QString& filename, attach.keys())
+        Q_FOREACH(const QString& filename, attach.keys())
         {
             rv += "--" + qxt_d->boundary + "\r\n";
             rv += qxt_fold_mime_header("Content-Disposition", QDir(filename).dirName(), latin1, "attachment; filename=");
@@ -713,7 +713,7 @@ void QxtRfc2822Parser::parseBody(QxtMailMessagePrivate* msg)
 
 //        qDebug("found%s boundary delimiter at position %d.", last?" last":"", beginSecond);
 //        qDebug("%d captures", bndRe.numCaptures());
-//        foreach(QString capture, bndRe.capturedTexts())
+//        Q_FOREACH(QString capture, bndRe.capturedTexts())
 //        {
 //            qDebug("->%s<-", capture.toLatin1().data());
 //        }
@@ -726,7 +726,7 @@ void QxtRfc2822Parser::parseBody(QxtMailMessagePrivate* msg)
             QString partBody;
             parseEntity(part, partHeaders, partBody);
 //            qDebug("Part headers:");
-//            foreach (QString key, partHeaders.keys())
+//            Q_FOREACH (QString key, partHeaders.keys())
 //            {
 //                qDebug("%s: %s", key.toLatin1().data(), partHeaders[key].toLatin1().data());
 //            }

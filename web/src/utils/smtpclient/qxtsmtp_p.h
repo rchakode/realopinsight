@@ -95,7 +95,7 @@ public:
     void sendNextRcpt(const QByteArray& code, const QByteArray & line);
     void sendBody(const QByteArray& code, const QByteArray & line);
 
-public slots:
+public Q_SLOTS:
     void socketError(QAbstractSocket::SocketError err);
     void socketRead();
 

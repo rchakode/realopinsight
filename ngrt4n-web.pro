@@ -79,11 +79,14 @@ HEADERS += \
     core/src/StatusAggregator.hpp \
     web/src/utils/wtwithqt/DispatchThread.h \
     web/src/utils/wtwithqt/WQApplication \
-    web/src/utils/smtpclient/qxthmac.cpp \
-    web/src/utils/smtpclient/qxtmailattachment.cpp \
-    web/src/utils/smtpclient/qxtmailmessage.cpp \
-    web/src/utils/smtpclient/qxtsmtp.cpp \
-    web/src/utils/smtpclient/MailSender.cpp \
+    web/src/utils/smtpclient/qxtglobal.h \
+    web/src/utils/smtpclient/qxtsmtp.h \
+    web/src/utils/smtpclient/qxtsmtp_p.h \
+    web/src/utils/smtpclient/qxtmail_p.h \
+    web/src/utils/smtpclient/qxthmac.h \
+    web/src/utils/smtpclient/qxtmailmessage.h \
+    web/src/utils/smtpclient/qxtmailattachment.h \
+    web/src/utils/smtpclient/MailSender.hpp \
     web/src/dbo/DbSession.hpp \
     web/src/dbo/DbObjects.hpp \
     web/src/dbo/ViewAclManagement.hpp \
@@ -121,14 +124,11 @@ SOURCES +=  core/src/Base.cpp \
     core/src/StatusAggregator.cpp \
     web/src/utils/wtwithqt/DispatchThread.C \
     web/src/utils/wtwithqt/WQApplication.C \
-    web/src/utils/smtpclient/qxtglobal.h \
-    web/src/utils/smtpclient/qxtsmtp.h \
-    web/src/utils/smtpclient/qxtsmtp_p.h \
-    web/src/utils/smtpclient/qxtmail_p.h \
-    web/src/utils/smtpclient/qxthmac.h \
-    web/src/utils/smtpclient/qxtmailmessage.h \
-    web/src/utils/smtpclient/qxtmailattachment.h \
-    web/src/utils/smtpclient/MailSender.hpp \
+    web/src/utils/smtpclient/qxthmac.cpp \
+    web/src/utils/smtpclient/qxtmailattachment.cpp \
+    web/src/utils/smtpclient/qxtmailmessage.cpp \
+    web/src/utils/smtpclient/qxtsmtp.cpp \
+    web/src/utils/smtpclient/MailSender.cpp \
     web/src/dbo/DbSession.cpp \
     web/src/dbo/UserManagement.cpp \
     web/src/dbo/ViewAclManagement.cpp \
