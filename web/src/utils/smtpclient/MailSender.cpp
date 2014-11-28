@@ -16,7 +16,7 @@ MailSender::MailSender(const QString& smtpHost,
 }
 
 void MailSender::send(const QString& sender,
-                      const QString& recipient,
+                      const QStringList& recipients,
                       const QString& subject,
                       const QString& body)
 {
@@ -26,8 +26,11 @@ void MailSender::send(const QString& sender,
   message.setExtraHeader("MIME-Version", "1.0");
   message.setExtraHeader("Content-Type", "text/html; charset=ISO-8859-1");
 
+  Q_FOREACH(const QString& recipient, recipients) {
+    message.addRecipient(recipient);
+  }
+
   message.setSender(sender);
-  message.addRecipient(recipient);
   message.setSubject(subject);
   message.setBody(body);
 

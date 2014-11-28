@@ -57,6 +57,7 @@ namespace {
 void sendEmailNotification(const NodeT& serviceInfo,
                            int lastState,
                            const QosDataT& qosData,
+                           const QStringList& recipients,
                            const WebPreferencesBase& preferences)
 {
 
@@ -87,27 +88,37 @@ void sendEmailNotification(const NodeT& serviceInfo,
                         preferences.getSmtpUseSsl());
 
   mailSender.send("sender",
-                  "recipiend",
+                  recipients,
                   emailSubject,
                   emailContent);
 }
 
-void handleNotification(const NodeT& rootNode, DbSession* dbSession, const WebPreferencesBase& preferences)
+void handleNotification(const NodeT& serviceInfo,
+                        DbSession* dbSession,
+                        const QosDataT& qosData,
+                        const WebPreferencesBase& preferences)
 {
   NotificationListT notifications;
   std::string viewName = viewName;
+  QStringList recipients ; //FIXME: set from database
   int count = dbSession->fetchActiveNotifications(notifications, viewName);
-  if (rootNode.sev != ngrt4n::Normal) {
-    if (count <= 0) {
-      //FIXME: send mail:: new notif
-      dbSession->addNotification(viewName, rootNode.sev);
-    } else {
-      //FIXME: send mail:: severity changde
-      dbSession->acknowledgeAllActiveNotifications("admin", viewName);
-      dbSession->addNotification(viewName, rootNode.sev);
+  if (serviceInfo.sev != ngrt4n::Normal) {
+    if (count <= 0) { // send new notif
+      sendEmailNotification(serviceInfo, ngrt4n::Normal, qosData, recipients, preferences);
+      dbSession->addNotification(viewName, serviceInfo.sev);
+    } else { //
+      NotificationT lastNotification = notifications.front();
+      if (lastNotification.view_status != serviceInfo.sev) { //severity changed
+        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, recipients, preferences);
+        dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+        dbSession->addNotification(viewName, serviceInfo.sev);
+      } else {
+        // FIXME: repeating notification: escalate it?
+      }
     }
   } else {
     //FIXME: send mail :: service recovery
+    if ()
     dbSession->acknowledgeAllActiveNotifications("admin", viewName);
   }
 }

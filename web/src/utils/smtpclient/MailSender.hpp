@@ -14,7 +14,7 @@ public:
              bool disableSsl);
 
   void send(const QString& sender,
-            const QString& recipient,
+            const QStringList& recipients,
             const QString& subject,
             const QString& body);
 
