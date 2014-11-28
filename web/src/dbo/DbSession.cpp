@@ -551,16 +551,16 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
 }
 
 
-int DbSession::acknowledgeAllActiveNotifications(const std::string& username)
+int DbSession::acknowledgeAllActiveNotifications(const std::string& userName, const std::string& viewName)
 {
   int retCode = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(username);
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
 
     if (! dboUser) {
 
-      m_lastError = QObject::tr("No user with username %1)").arg(username.c_str()).toStdString();
+      m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
       LOG("error", QObject::tr("DbSession::acknowledgeAllActiveNotifications: %1").arg(m_lastError.c_str()).toStdString());
 
     } else {
@@ -575,7 +575,18 @@ int DbSession::acknowledgeAllActiveNotifications(const std::string& username)
       }
 
       for (auto& dboView : dboViews) {
-        DboNotificationCollectionT dboNotifications = dboView->notifications;
+        DboNotificationCollectionT dboNotifications;
+        if (! viewName.empty()) {
+          dboNotifications = find<DboNotification>()
+                             .where("ack_status != ? AND view_name = ?")
+                             .bind(DboNotification::Acknowledged)
+                             .bind(viewName);
+        } else {
+          dboNotifications = find<DboNotification>()
+                             .where("ack_status != ? AND view_name = ?")
+                             .bind(DboNotification::Acknowledged)
+                             .bind(dboView->name);
+        }
         for (auto& notifDbEntry: dboNotifications) {
           notifDbEntry.modify()->ack_status = DboNotification::Acknowledged;
           notifDbEntry.modify()->ack_user = dboUser;
@@ -596,6 +607,7 @@ int DbSession::acknowledgeAllActiveNotifications(const std::string& username)
   return retCode;
 }
 
+
 int DbSession::fetchActiveNotifications(NotificationListT& notifications, const std::string& viewName)
 {
   int retCode = -1;
@@ -606,20 +618,20 @@ int DbSession::fetchActiveNotifications(NotificationListT& notifications, const 
     DboNotificationCollectionT dbNotifications;
     if (viewName.empty()) { //ack all
       dbNotifications = find<DboNotification>()
-                  .where("ack_status = ?")
-                  .bind(DboNotification::Active);
+                        .where("ack_status = ?")
+                        .bind(DboNotification::Active);
     } else {  // ack specific
       dbNotifications = find<DboNotification>()
-                  .where("ack_status = ? AND view_name = ?")
-                  .bind(DboNotification::Active)
-                  .bind(viewName);
+                        .where("ack_status = ? AND view_name = ?")
+                        .bind(DboNotification::Active)
+                        .bind(viewName);
     }
 
     // now set ack_status to acknowledge
     notifications.clear();
-      for (auto& entry : dbNotifications) {
-        notifications.push_back(entry->data());
-      }
+    for (auto& entry : dbNotifications) {
+      notifications.push_back(entry->data());
+    }
 
     retCode = notifications.size();
   } catch (const dbo::Exception& ex) {

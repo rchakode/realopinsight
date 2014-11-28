@@ -87,7 +87,7 @@ public:
   int checkUserCookie(const DboLoginSession& session);
 
   int addNotification(const std::string& viewName, int viewStatus);
-  int acknowledgeAllActiveNotifications(const std::string& username);
+  int acknowledgeAllActiveNotifications(const std::string& userName, const std::string& viewName);
   int fetchActiveNotifications(NotificationListT& notifications, const std::string& viewName);
 
 private:
