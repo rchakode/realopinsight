@@ -39,19 +39,19 @@
 namespace {
   const QString EMAIL_NOTIFICATION_SUBJECT_TEMPLATE = "%1: The State of Service %2 is %3";
   const QString EMAIL_NOTIFICATION_CONTENT_TEMPLATE = "%1: The State of Service %2 is %3" // %1 = {PROBLEM, RECOVERY}
-                                                      "-----------------------------"
-                                                      "Check Time: %4"
-                                                      "State: %5"
-                                                      "Last State: %6"
-                                                      "\n"
-                                                      "Service Details:"
-                                                      "--------------------"
-                                                      "%7" // Print root node details
-                                                      "\n"
-                                                      "Additional Information"
-                                                      "-----------------------------"
-                                                      "%8" // Print stats related to IT services (QoS entry)
-                                                      "\n";
+      "-----------------------------"
+      "Check Time: %4"
+      "State: %5"
+      "Last State: %6"
+      "\n"
+      "Service Details:"
+      "--------------------"
+      "%7" // Print root node details
+      "\n"
+      "Additional Information"
+      "-----------------------------"
+      "%8" // Print stats related to IT services (QoS entry)
+      "\n";
 }
 
 void sendEmailNotification(const NodeT& serviceInfo,
@@ -66,20 +66,20 @@ void sendEmailNotification(const NodeT& serviceInfo,
   QString lastStateString = Severity(lastState).toString();
 
   QString emailSubject = EMAIL_NOTIFICATION_SUBJECT_TEMPLATE.arg(
-                           typeNotification,
-                           serviceInfo.name,
-                           stateString);
+        typeNotification,
+        serviceInfo.name,
+        stateString);
 
   QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
-                           typeNotification,
-                           serviceInfo.name,
-                           stateString,
-                           ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
-                           stateString,
-                           lastStateString,
-                           serviceInfo.toString(),
-                           qosData.toString().c_str() //FIXME: create human-readable string
-                           );
+        typeNotification,
+        serviceInfo.name,
+        stateString,
+        ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
+        stateString,
+        lastStateString,
+        serviceInfo.toString(),
+        qosData.toString().c_str() //FIXME: create human-readable string
+        );
 
   MailSender mailSender(QString::fromStdString( preferences.getSmtpServerAddr() ),
                         preferences.getSmtpServerPort(),
@@ -98,18 +98,24 @@ void handleNotification(const NodeT& serviceInfo,
                         DbSession* dbSession,
                         const WebPreferencesBase& preferences)
 {
-  NotificationListT notifications;
-  std::string viewName = viewName;
-  QStringList recipients ; //FIXME: set from database
-  int count = dbSession->fetchActiveNotifications(notifications, viewName);
+
+  std::string viewName = serviceInfo.name.toStdString();
+
+  QStringList notificationRecipients;
+  if (dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0)
+    return;
+
+  NotificationListT activeNotifications;
+  int count = dbSession->fetchActiveNotifications(activeNotifications, viewName);
+
   if (serviceInfo.sev != ngrt4n::Normal) {
     if (count <= 0) { // send new notif
-      sendEmailNotification(serviceInfo, ngrt4n::Normal, qosData, recipients, preferences);
+      sendEmailNotification(serviceInfo, ngrt4n::Normal, qosData, notificationRecipients, preferences);
       dbSession->addNotification(viewName, serviceInfo.sev);
     } else { //
-      NotificationT lastNotification = notifications.front();
+      NotificationT lastNotification = activeNotifications.front();
       if (lastNotification.view_status != serviceInfo.sev) { //severity changed
-        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, recipients, preferences);
+        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, notificationRecipients, preferences);
         dbSession->acknowledgeAllActiveNotifications("admin", viewName);
         dbSession->addNotification(viewName, serviceInfo.sev);
       } else {
@@ -118,13 +124,14 @@ void handleNotification(const NodeT& serviceInfo,
     }
   } else {
     if (count > 0) { // if there were problems
-      NotificationT lastNotification = notifications.front();
+      NotificationT lastNotification = activeNotifications.front();
       if (lastNotification.view_status != serviceInfo.sev) { // service recovered
-        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, recipients, preferences);
+        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, notificationRecipients, preferences);
         dbSession->acknowledgeAllActiveNotifications("admin", viewName);
       }
     }
   }
+
 }
 
 void runCollector(int period)
@@ -140,10 +147,18 @@ void runCollector(int period)
 
     REPORTD_LOG("notice", Q_TR("Collecting QoS data..."));
     long now = time(NULL);
-    for (auto view: dbSession.viewList()) {
+    for (const auto& view: dbSession.viewList()) {
+
       QosCollector collector(view.path.c_str());
-      collector.initialize( & preferences );
-      collector.initSettings( & preferences );
+      collector.initialize(&preferences);
+
+      // skip the view if initialization failed
+      if (collector.lastErrorState()) {
+        LOG("error", collector.lastErrorMsg().toStdString());
+        continue;
+      }
+
+      collector.initSettings(&preferences);
       collector.runMonitor();
 
       QosDataT qosInfo = collector.qosInfo();

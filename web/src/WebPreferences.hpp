@@ -55,7 +55,7 @@ public:
 
   WebPreferencesBase(void);
   int getDbState(void) { return value(Settings::GLOBAL_DB_STATE_KEY, "0").toInt();}
-  void setDbState(int state) {setEntry(Settings::GLOBAL_DB_STATE_KEY, QString::number(state));}
+  void setDbState(int state) {setEntry(Settings::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
 
   std::string getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString();}
   std::string getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString();}

@@ -70,7 +70,7 @@ public:
   int deleteView(std::string vname);
   int assignView(const std::string& uname, const std::string& vname);
   int revokeView(const std::string& uname, const std::string& vname);
-  int fetchAssignedUserEmails(const std::string& viewName, QStringList& emails);
+  int fetchAssignedUserEmails(QStringList& emails, const std::string& viewName);
 
   int addQosData(const QosDataT& qosData);
   int fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate = 0, long toDate = LONG_MAX);

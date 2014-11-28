@@ -16,6 +16,7 @@ NotificationTest::NotificationTest()
   user1.password = TEST_USER1;
   user1.firstname = TEST_USER1;
   user1.lastname = TEST_USER1;
+  user1.email = QString("%1@example.com").arg(TEST_USER1.c_str()).toStdString();
   user1.role = DboUser::OpRole;
   user1.registrationDate = QDateTime::currentDateTime().toString().toStdString();
 
@@ -50,7 +51,7 @@ void NotificationTest::testAcknowledgeAllUserViewNotifications(void)
   QCOMPARE(0, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
 }
 
-void NotificationTest::fecthActiveNotifications(void)
+void NotificationTest::testFecthActiveNotifications(void)
 {
   NotificationListT notifications;
   QCOMPARE(0, dbSession.acknowledgeAllActiveNotifications("admin", ""));
@@ -60,5 +61,13 @@ void NotificationTest::fecthActiveNotifications(void)
   QCOMPARE(3, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
 }
 
+
+
+void NotificationTest::testFecthAssignedUserEmails(void)
+{
+  QStringList emails;
+  QCOMPARE(1, dbSession.fetchAssignedUserEmails(emails, TEST_VIEW1));
+  QCOMPARE(0, dbSession.fetchAssignedUserEmails(emails, "admin"));
+}
 
 QTEST_MAIN(NotificationTest)
