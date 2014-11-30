@@ -32,7 +32,7 @@ NotificationTest::NotificationTest()
 
 NotificationTest::~NotificationTest()
 {
-  dbSession.acknowledgeAllActiveNotifications(TEST_USER1, "");
+  dbSession.changeNotificationStatus(TEST_USER1, "");
   dbSession.deleteUser(TEST_USER1);
   dbSession.deleteUser(TEST_VIEW1);
 }
@@ -41,24 +41,24 @@ void NotificationTest::testAddNotification(void)
 {
   NotificationListT notifications;
   QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
-  QCOMPARE(1, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
+  QCOMPARE(1, dbSession.fetchNotificationData(notifications, TEST_VIEW1));
 }
 
 void NotificationTest::testAcknowledgeAllUserViewNotifications(void)
 {
   NotificationListT notifications;
-  QCOMPARE(0, dbSession.acknowledgeAllActiveNotifications(TEST_USER1, ""));
-  QCOMPARE(0, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
+  QCOMPARE(0, dbSession.changeNotificationStatus(TEST_USER1, ""));
+  QCOMPARE(0, dbSession.fetchNotificationData(notifications, TEST_VIEW1));
 }
 
 void NotificationTest::testFecthActiveNotifications(void)
 {
   NotificationListT notifications;
-  QCOMPARE(0, dbSession.acknowledgeAllActiveNotifications("admin", ""));
+  QCOMPARE(0, dbSession.changeNotificationStatus("admin", ""));
   QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
   QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Major));
   QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Critical));
-  QCOMPARE(3, dbSession.fetchActiveNotifications(notifications, TEST_VIEW1));
+  QCOMPARE(3, dbSession.fetchNotificationData(notifications, TEST_VIEW1));
 }
 
 

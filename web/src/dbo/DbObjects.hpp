@@ -256,7 +256,7 @@ public:
 struct NotificationT {
   long timestamp;
   int view_status;
-  long ack_timestamp;
+  long last_change;
   long ack_status;
   std::string view_name;
   std::string ack_username;
@@ -267,15 +267,15 @@ class DboNotification
 {
 public:
   enum AckStatusT {
-    Unset = 0,
-    Active = 1,
+    Closed = 0,
+    Open = 1,
     Acknowledged = 2
   };
 
   long timestamp;
   int view_status;
   int ack_status;
-  long ack_timestamp;
+  long last_change;
   dbo::ptr<DboView> view;
   dbo::ptr<DboUser> ack_user;
 
@@ -286,7 +286,7 @@ public:
     d.view_name = view? view->name : "";
     d.view_status = view_status;
     d.ack_status = ack_status;
-    d.ack_timestamp = ack_timestamp;
+    d.last_change = last_change;
     d.ack_username = ack_user ? ack_user->username : "";
     return d;
   }
@@ -296,7 +296,7 @@ public:
     dbo::field(a, timestamp, "timestamp");
     dbo::field(a, view_status, "view_status");
     dbo::field(a, ack_status, "ack_status");
-    dbo::field(a, ack_timestamp, "ack_timestamp");
+    dbo::field(a, last_change, "last_change");
     dbo::belongsTo(a, view, "view");
     dbo::belongsTo(a, ack_user, "ack_user");
   }

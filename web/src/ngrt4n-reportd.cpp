@@ -102,34 +102,47 @@ void handleNotification(const NodeT& serviceInfo,
   std::string viewName = serviceInfo.name.toStdString();
 
   QStringList notificationRecipients;
-  if (dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0)
+  if (dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0) {
+    REPORTD_LOG("debug", QString("No notification recipients for view: %1").arg(viewName.c_str()).toStdString());
     return;
+  }
 
-  NotificationListT activeNotifications;
-  int count = dbSession->fetchActiveNotifications(activeNotifications, viewName);
-
-  if (serviceInfo.sev != ngrt4n::Normal) {
-    if (count <= 0) { // send new notif
+  NotificationT notificationData;
+  int succeeded = dbSession->fetchNotificationData(notificationData, viewName);
+  if (serviceInfo.sev != ngrt4n::Normal) { //proble state
+    if (succeeded != 0 || notificationData.ack_status == DboNotification::Closed) { // send new notification
       sendEmailNotification(serviceInfo, ngrt4n::Normal, qosData, notificationRecipients, preferences);
-      dbSession->addNotification(viewName, serviceInfo.sev);
-    } else { //
-      NotificationT lastNotification = activeNotifications.front();
-      if (lastNotification.view_status != serviceInfo.sev) { //severity changed
-        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, notificationRecipients, preferences);
-        dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+      if (succeeded != 0) {
+        dbSession->addNotification(viewName, serviceInfo.sev);
+      } else  {
+        dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
+      }
+    } else {
+      if (notificationData.view_status != serviceInfo.sev) { //severity changed
+        sendEmailNotification(serviceInfo, notificationData.view_status, qosData, notificationRecipients, preferences);
+        dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
         dbSession->addNotification(viewName, serviceInfo.sev);
       } else {
-        // FIXME: repeating notification: escalate it?
+        if (notificationData.ack_status != DboNotification::Acknowledged) {
+          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(serviceInfo.sev).toString()).toStdString());
+          // FIXME: escalate it?
+        } else {
+          //FIXME:
+        }
+        //REPORTD_LOG("error",
+        //            QString("The service %1 is still in %2 state (Acknowledged on %)")
+        //            .arg(viewName.c_str(), Severity(serviceInfo.sev).toString(), ngrt4n::timet2String(lastNotificationData.last_change)).toStdString());
+        //        }
       }
     }
-  } else {
-    if (count > 0) { // if there were problems
-      NotificationT lastNotification = activeNotifications.front();
-      if (lastNotification.view_status != serviceInfo.sev) { // service recovered
-        sendEmailNotification(serviceInfo, lastNotification.view_status, qosData, notificationRecipients, preferences);
-        dbSession->acknowledgeAllActiveNotifications("admin", viewName);
+  } else {  // normal state
+    if (succeeded > 0) { // if there were problems
+      if (notificationData.view_status != serviceInfo.sev) { // service recovered
+        sendEmailNotification(serviceInfo, notificationData.view_status, qosData, notificationRecipients, preferences);
       }
     }
+    dbSession->changeNotificationStatus("admin", viewName, DboNotification::Closed);
+    dbSession->changeNotificationStatus("admin", viewName, DboNotification::Closed);
   }
 
 }
@@ -154,7 +167,7 @@ void runCollector(int period)
 
       // skip the view if initialization failed
       if (collector.lastErrorState()) {
-        LOG("error", collector.lastErrorMsg().toStdString());
+        REPORTD_LOG("error", collector.lastErrorMsg().toStdString());
         continue;
       }
 
