@@ -58,8 +58,8 @@ public:
   void setLoggedUser(void);
 
   int addUser(const DboUser& user);
-  int updateUser(DboUser user);
-  int deleteUser(std::string uname);
+  int updateUser(const DboUser& user);
+  int deleteUser(const std::string& username);
   int deleteAuthSystemUsers(int authSystem);
   bool findUser(const std::string& username, DboUser& user);
   int updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
@@ -87,6 +87,7 @@ public:
   int checkUserCookie(const DboLoginSession& session);
 
   int addNotification(const std::string& viewName, int viewStatus);
+  int deleteNotifications(const std::string& viewame);
   int changeNotificationStatus(const std::string& userName, const std::string& viewName, int newStatus);
   int fetchNotificationData(NotificationT& notification, const std::string& viewName);
 

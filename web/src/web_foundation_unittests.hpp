@@ -1,6 +1,7 @@
 
 #include <QtTest>
 #include <QObject>
+#include "dbo/DbSession.hpp"
 
 class NotificationTest : public QObject
 {
@@ -12,7 +13,12 @@ public:
 
 private Q_SLOTS:
   void testAddNotification(void);
-  void testAcknowledgeAllUserViewNotifications(void);
-  void testFecthActiveNotifications(void);
+  void testAcknowledgeNotification(void);
+  void testCloseNotification(void);
   void testFecthAssignedUserEmails(void);
+  void testDeleteNotification(void);
+
+
+private:
+  DbSession m_dbSession;
 };

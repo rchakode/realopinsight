@@ -98,7 +98,7 @@ int DbSession::addUser(const DboUser& user)
   return retValue;
 }
 
-int DbSession::updateUser(DboUser user)
+int DbSession::updateUser(const DboUser& user)
 {
   int retValue = -1;
   try {
@@ -150,12 +150,13 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
   return retValue;
 }
 
-int DbSession::deleteUser(std::string uname)
+
+int DbSession::deleteUser(const std::string& username)
 {
   int retValue = -1;
   try {
     dbo::Transaction transaction(*this);
-    dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(uname);
+    dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(username);
     usr.remove();
     retValue = 0;
     transaction.commit();
@@ -581,6 +582,26 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
 
   transaction.commit();
 
+  return retValue;
+}
+
+
+int DbSession::deleteNotifications(const std::string& viewame)
+{
+  int retValue = -1;
+  try {
+    dbo::Transaction transaction(*this);
+    DboNotificationCollectionT dbEntries = find<DboNotification>().where("view_name=?").bind(viewame);
+    for (auto & entry : dbEntries)
+      entry.remove();
+
+    retValue = 0;
+    transaction.commit();
+  } catch (const dbo::Exception& ex) {
+    retValue = 1;
+    LOG("error", QObject::tr("DbSession::deleteNotification: %1").arg(ex.what()).toStdString());
+  }
+  updateUserList();
   return retValue;
 }
 

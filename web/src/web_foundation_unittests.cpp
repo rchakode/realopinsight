@@ -1,9 +1,7 @@
 
 #include "web_foundation_unittests.hpp"
-#include "dbo/DbSession.hpp"
 #include "Base.hpp"
 
-DbSession dbSession;
 namespace {
   const std::string TEST_USER1 = "test_user1";
   const std::string TEST_VIEW1 = "view1";
@@ -25,49 +23,55 @@ NotificationTest::NotificationTest()
   view1.service_count = 30;
   view1.path = "/dev/null";
 
-  dbSession.addUser(user1);
-  dbSession.addView(view1);
-  dbSession.assignView(TEST_USER1, TEST_VIEW1);
+  m_dbSession.addUser(user1);
+  m_dbSession.addView(view1);
+  m_dbSession.assignView(TEST_USER1, TEST_VIEW1);
 }
 
 NotificationTest::~NotificationTest()
 {
-  dbSession.changeNotificationStatus(TEST_USER1, "");
-  dbSession.deleteUser(TEST_USER1);
-  dbSession.deleteUser(TEST_VIEW1);
+  m_dbSession.deleteUser(TEST_USER1);
+  m_dbSession.deleteUser(TEST_VIEW1);
 }
-
-void NotificationTest::testAddNotification(void)
-{
-  NotificationListT notifications;
-  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
-  QCOMPARE(1, dbSession.fetchNotificationData(notifications, TEST_VIEW1));
-}
-
-void NotificationTest::testAcknowledgeAllUserViewNotifications(void)
-{
-  NotificationListT notifications;
-  QCOMPARE(0, dbSession.changeNotificationStatus(TEST_USER1, ""));
-  QCOMPARE(0, dbSession.fetchNotificationData(notifications, TEST_VIEW1));
-}
-
-void NotificationTest::testFecthActiveNotifications(void)
-{
-  NotificationListT notifications;
-  QCOMPARE(0, dbSession.changeNotificationStatus("admin", ""));
-  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
-  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Major));
-  QCOMPARE(0, dbSession.addNotification(TEST_VIEW1, ngrt4n::Critical));
-  QCOMPARE(3, dbSession.fetchNotificationData(notifications, TEST_VIEW1));
-}
-
 
 
 void NotificationTest::testFecthAssignedUserEmails(void)
 {
   QStringList emails;
-  QCOMPARE(1, dbSession.fetchAssignedUserEmails(emails, TEST_VIEW1));
-  QCOMPARE(0, dbSession.fetchAssignedUserEmails(emails, "admin"));
+  QCOMPARE(1, m_dbSession.fetchAssignedUserEmails(emails, TEST_VIEW1));
+  QCOMPARE(0, m_dbSession.fetchAssignedUserEmails(emails, "admin"));
+}
+
+void NotificationTest::testAddNotification(void)
+{
+  QCOMPARE(0, m_dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
+
+  NotificationT notification;
+  QCOMPARE(0, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
+  QCOMPARE((long)DboNotification::Open, notification.ack_status);
+}
+
+void NotificationTest::testAcknowledgeNotification(void)
+{
+  QCOMPARE(0, m_dbSession.changeNotificationStatus(TEST_USER1, TEST_VIEW1, DboNotification::Acknowledged));
+
+  NotificationT notification;
+  QCOMPARE(0, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
+  QCOMPARE((long)DboNotification::Acknowledged, notification.ack_status);
+}
+
+void NotificationTest::testCloseNotification(void)
+{
+  QCOMPARE(0, m_dbSession.changeNotificationStatus(TEST_USER1, TEST_VIEW1, DboNotification::Closed));
+
+  NotificationT notification;
+  QCOMPARE(0, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
+  QCOMPARE((long)DboNotification::Closed, notification.ack_status);
+}
+
+void NotificationTest::testDeleteNotification(void)
+{
+  QCOMPARE(0, m_dbSession.deleteNotifications(TEST_VIEW1));
 }
 
 QTEST_MAIN(NotificationTest)

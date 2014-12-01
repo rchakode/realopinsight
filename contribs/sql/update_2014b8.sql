@@ -8,12 +8,13 @@
 CREATE TABLE "notification" (
   "id" integer primary key autoincrement,
   "version" integer not null,
-  "timestamp" integer not null,
+  "timestamp" bigint not null,
   "view_status" integer not null,
   "ack_status" integer not null,
-  "ack_timestamp" integer not null,
+  "last_change" bigint not null,
   "view_name" text,
   "ack_user_name" text,
  constraint "fk_notification_view" foreign key ("view_name") references "view" ("name"),
  constraint "fk_notification_ack_user" foreign key ("ack_user_name") references "user" ("name")
 );
+
