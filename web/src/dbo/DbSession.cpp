@@ -568,10 +568,10 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
 
     DboNotification* entryPtr = new DboNotification();
     entryPtr->timestamp = time(NULL);
+    entryPtr->last_change = entryPtr->timestamp;
     entryPtr->view = find<DboView>().where("name=?").bind(viewName);
     entryPtr->view_status = viewStatus;
     entryPtr->ack_status = DboNotification::Open;
-    entryPtr->last_change = -1;
     add(entryPtr);
 
     retValue = 0;

@@ -1,24 +1,24 @@
 #include "MailSender.hpp"
-
+#include "WebUtils.hpp"
 
 MailSender::MailSender(const QString& smtpHost,
                        int port,
                        const QString& username,
                        const QString& password,
-                       bool disableSsl)
+                       bool useStartSsl)
   : QxtSmtp()
 {
   addEvents();
   setUsername(username.toAscii());
   setPassword(password.toAscii());
-  setStartTlsDisabled(disableSsl);
-  connectToSecureHost(smtpHost, port);
+  setStartTlsDisabled(! useStartSsl);
+  connectToHost(smtpHost, port);
 }
 
-void MailSender::send(const QString& sender,
-                      const QStringList& recipients,
-                      const QString& subject,
-                      const QString& body)
+int MailSender::send(const QString& sender,
+                     const QStringList& recipients,
+                     const QString& subject,
+                     const QString& body)
 {
   QxtMailMessage message;
 
@@ -30,41 +30,52 @@ void MailSender::send(const QString& sender,
     message.addRecipient(recipient);
   }
 
-  message.setSender(sender);
+  message.setSender(QString("%1 <%2>").arg(APP_NAME, sender));
   message.setSubject(subject);
   message.setBody(body);
 
-  QxtSmtp::send(message);
+  int messageId = QxtSmtp::send(message);
+  m_spool.insert(messageId, message);
+  return m_eventSynchonizer.exec();
 }
 
 void MailSender::handleConnectionFailed(const QByteArray& msg)
 {
-  qDebug()<< "connection failed: "<<msg;
+  REPORTD_LOG("error", tr("[MailSender] connection error: %1").arg(QString(msg)).toStdString());
+  m_eventSynchonizer.exit(-1);
 }
 
 void MailSender::handleMailFailed(int mailID, int errorCode, const QByteArray& msg)
 {
-  qDebug()<< "Mail failed: " << mailID  << errorCode << msg;
+  m_spool.remove(mailID);
+  REPORTD_LOG("error", tr("[MailSender] Sending error %1: %2. Mail Id: %3")
+              .arg(QString::number(errorCode), msg, QString::number(mailID)).toStdString());
+  m_eventSynchonizer.exit(-1);
 }
 
 void MailSender::handleSenderRejected(int mailID, const QString& address, const QByteArray & msg)
 {
-  qDebug()<< "Mail sender rejected: " << mailID  << address << msg;
+  m_spool.remove(mailID);
+  REPORTD_LOG("error", tr("[MailSender] Mail sender has been rejected. Address: %1. Message %2, Mail Id: %3")
+              .arg(address, QString(msg), QString::number(mailID)).toStdString());
+  m_eventSynchonizer.exit(-1);
 }
+
+void MailSender::handleMailSent(int mailID)
+{
+  m_spool.remove(mailID);
+  REPORTD_LOG("info", tr("[MailSender] Mail sent. Mail Id: %3").arg(QString::number(mailID)).toStdString());
+  m_eventSynchonizer.exit(0);
+}
+
 
 void MailSender::addEvents(void)
 {
-  connect(this, SIGNAL(connectionFailed(const QByteArray&)),
-          this, SLOT(handleConnectionFailed(const QByteArray&)));
-  connect(this, SIGNAL(authenticationFailed(const QByteArray&)),
-          this, SLOT(handleConnectionFailed(const QByteArray&)));
-  connect(this, SIGNAL(encryptionFailed(const QByteArray&)),
-          this, SLOT(handleConnectionFailed(const QByteArray&)));
-  connect(this, SIGNAL(mailFailed(int, int, const QByteArray&)),
-          this, SLOT(handleMailFailed(int, int, const QByteArray&)));
-  connect(this, SIGNAL(senderRejected(int, const QString&, const QByteArray&)),
-          this, SLOT(handleSenderRejected(int, const QString&, const QByteArray&)));
-  connect(this, SIGNAL(recipientRejected(int, const QString&, const QByteArray&)),
-          this, SLOT(handleSenderRejected(int, const QString&, const QByteArray&)));
+  connect(this, SIGNAL(connectionFailed(const QByteArray&)), this, SLOT(handleConnectionFailed(const QByteArray&)));
+  connect(this, SIGNAL(authenticationFailed(const QByteArray&)), this, SLOT(handleConnectionFailed(const QByteArray&)));
+  connect(this, SIGNAL(encryptionFailed(const QByteArray&)), this, SLOT(handleConnectionFailed(const QByteArray&)));
+  connect(this, SIGNAL(mailFailed(int, int, const QByteArray&)), this, SLOT(handleMailFailed(int, int, const QByteArray&)));
+  connect(this, SIGNAL(senderRejected(int, const QString&, const QByteArray&)), this, SLOT(handleSenderRejected(int, const QString&, const QByteArray&)));
+  connect(this, SIGNAL(recipientRejected(int, const QString&, const QByteArray&)), this, SLOT(handleSenderRejected(int, const QString&, const QByteArray&)));
   connect(this, SIGNAL(mailSent(int)), this, SLOT(handleMailSent(int)));
 }

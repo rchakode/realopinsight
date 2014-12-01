@@ -27,6 +27,7 @@
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
 #include "Applications.hpp"
+#include "Notificator.hpp"
 #include "utils/smtpclient/MailSender.hpp"
 #include <unistd.h>
 #include <cstdio>
@@ -36,121 +37,11 @@
 #include <getopt.h>
 #include <unistd.h>
 
-namespace {
-  const QString EMAIL_NOTIFICATION_SUBJECT_TEMPLATE = "%1: The State of Service %2 is %3";
-  const QString EMAIL_NOTIFICATION_CONTENT_TEMPLATE = "%1: The State of Service %2 is %3" // %1 = {PROBLEM, RECOVERY}
-      "-----------------------------"
-      "Check Time: %4"
-      "State: %5"
-      "Last State: %6"
-      "\n"
-      "Service Details:"
-      "--------------------"
-      "%7" // Print root node details
-      "\n"
-      "Additional Information"
-      "-----------------------------"
-      "%8" // Print stats related to IT services (QoS entry)
-      "\n";
-}
-
-void sendEmailNotification(const NodeT& serviceInfo,
-                           int lastState,
-                           const QosDataT& qosData,
-                           const QStringList& recipients,
-                           const WebPreferencesBase& preferences)
-{
-
-  QString typeNotification = (lastState != ngrt4n::Normal && serviceInfo.sev == ngrt4n::Normal) ? "RECOVERY": "PROBLEM";
-  QString stateString = Severity(serviceInfo.sev).toString();
-  QString lastStateString = Severity(lastState).toString();
-
-  QString emailSubject = EMAIL_NOTIFICATION_SUBJECT_TEMPLATE.arg(
-        typeNotification,
-        serviceInfo.name,
-        stateString);
-
-  QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
-        typeNotification,
-        serviceInfo.name,
-        stateString,
-        ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
-        stateString,
-        lastStateString,
-        serviceInfo.toString(),
-        qosData.toString().c_str() //FIXME: create human-readable string
-        );
-
-  MailSender mailSender(QString::fromStdString( preferences.getSmtpServerAddr() ),
-                        preferences.getSmtpServerPort(),
-                        QString::fromStdString( preferences.getSmtpUsername() ),
-                        QString::fromStdString( preferences.getSmtpPassword() ),
-                        preferences.getSmtpUseSsl());
-
-  mailSender.send("sender",
-                  recipients,
-                  emailSubject,
-                  emailContent);
-}
-
-void handleNotification(const NodeT& serviceInfo,
-                        const QosDataT& qosData,
-                        DbSession* dbSession,
-                        const WebPreferencesBase& preferences)
-{
-
-  std::string viewName = serviceInfo.name.toStdString();
-
-  QStringList notificationRecipients;
-  if (dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0) {
-    REPORTD_LOG("debug", QString("No notification recipients for view: %1").arg(viewName.c_str()).toStdString());
-    return;
-  }
-
-  NotificationT notificationData;
-  int succeeded = dbSession->fetchNotificationData(notificationData, viewName);
-  if (serviceInfo.sev != ngrt4n::Normal) { //proble state
-    if (succeeded != 0 || notificationData.ack_status == DboNotification::Closed) { // send new notification
-      sendEmailNotification(serviceInfo, ngrt4n::Normal, qosData, notificationRecipients, preferences);
-      if (succeeded != 0) {
-        dbSession->addNotification(viewName, serviceInfo.sev);
-      } else  {
-        dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
-      }
-    } else {
-      if (notificationData.view_status != serviceInfo.sev) { //severity changed
-        sendEmailNotification(serviceInfo, notificationData.view_status, qosData, notificationRecipients, preferences);
-        dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
-        dbSession->addNotification(viewName, serviceInfo.sev);
-      } else {
-        if (notificationData.ack_status != DboNotification::Acknowledged) {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(serviceInfo.sev).toString()).toStdString());
-          // FIXME: escalate it?
-        } else {
-          //FIXME:
-        }
-        //REPORTD_LOG("error",
-        //            QString("The service %1 is still in %2 state (Acknowledged on %)")
-        //            .arg(viewName.c_str(), Severity(serviceInfo.sev).toString(), ngrt4n::timet2String(lastNotificationData.last_change)).toStdString());
-        //        }
-      }
-    }
-  } else {  // normal state
-    if (succeeded > 0) { // if there were problems
-      if (notificationData.view_status != serviceInfo.sev) { // service recovered
-        sendEmailNotification(serviceInfo, notificationData.view_status, qosData, notificationRecipients, preferences);
-      }
-    }
-    dbSession->changeNotificationStatus("admin", viewName, DboNotification::Closed);
-    dbSession->changeNotificationStatus("admin", viewName, DboNotification::Closed);
-  }
-
-}
-
 void runCollector(int period)
 {
   DbSession dbSession;
   WebPreferencesBase preferences;
+  Notificator notificator(&dbSession);
   while(1) {
     try {
       dbSession.updateUserList();
@@ -178,7 +69,7 @@ void runCollector(int period)
       qosInfo.timestamp = now;
       try {
         dbSession.addQosData(qosInfo);
-        handleNotification(collector.rootNode(), qosInfo, &dbSession, preferences);
+        notificator.handleNotification(collector.rootNode(), qosInfo);
         REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", ex.what());
@@ -191,7 +82,7 @@ void runCollector(int period)
 
 int main(int argc, char **argv)
 {
-  RealOpInsightQApp qtApp (argc, argv);
+  RealOpInsightQApp qtApp(argc, argv);
   int period = 5;
   bool ok;
   int opt;

@@ -1,6 +1,7 @@
 #ifndef MAILSENDER_HPP
 #define MAILSENDER_HPP
 #include "qxtsmtp.h"
+#include <QEventLoop>
 
 class MailSender : public QxtSmtp
 {
@@ -13,18 +14,21 @@ public:
              const QString& password,
              bool disableSsl);
 
-  void send(const QString& sender,
-            const QStringList& recipients,
-            const QString& subject,
-            const QString& body);
+  int send(const QString& sender,
+           const QStringList& recipients,
+           const QString& subject,
+           const QString& body);
 
 protected Q_SLOTS:
   void handleConnectionFailed(const QByteArray& msg);
   void handleMailFailed(int mailID, int errorCode, const QByteArray& msg);
   void handleSenderRejected(int mailID, const QString& address, const QByteArray & msg);
-  void handleMailSent(int mailID) {qDebug()<< "mail sent "<< mailID;}
+  void handleMailSent(int mailID);
 
 private:
   void addEvents(void);
+
+  QEventLoop m_eventSynchonizer;
+  QMap<int, QxtMailMessage> m_spool;
 };
 #endif // MAILSENDER_HPP

@@ -105,7 +105,8 @@ HEADERS += \
     web/src/AuthModelProxy.hpp \
     web/src/QosCollector.hpp \
     web/src/Applications.hpp \
-    web/src/WebBiCharts.hpp
+    web/src/WebBiCharts.hpp \
+    web/src/Notificator.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -144,7 +145,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/AuthManager.cpp \
     web/src/WebPreferences.cpp \
     web/src/LdapHelper.cpp \
-    web/src/AuthModelProxy.cpp
+    web/src/AuthModelProxy.cpp \
+    web/src/Notificator.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
