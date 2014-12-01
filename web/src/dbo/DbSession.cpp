@@ -586,14 +586,22 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
 }
 
 
-int DbSession::deleteNotifications(const std::string& viewame)
+int DbSession::flushNotifications(const std::string& viewame)
 {
   int retValue = -1;
   try {
     dbo::Transaction transaction(*this);
-    DboNotificationCollectionT dbEntries = find<DboNotification>().where("view_name=?").bind(viewame);
-    for (auto & entry : dbEntries)
+
+    DboNotificationCollectionT dbEntries;
+    if (! viewame.empty()) {
+      dbEntries = find<DboNotification>().where("view_name=?").bind(viewame);
+    } else {
+      dbEntries = find<DboNotification>().where("view_name=?");
+    }
+
+    for (auto & entry : dbEntries) {
       entry.remove();
+    }
 
     retValue = 0;
     transaction.commit();

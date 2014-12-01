@@ -16,7 +16,7 @@ private Q_SLOTS:
   void testAcknowledgeNotification(void);
   void testCloseNotification(void);
   void testFecthAssignedUserEmails(void);
-  void testDeleteNotification(void);
+  void testFlushNotification(void);
 
 
 private:

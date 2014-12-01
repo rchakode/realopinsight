@@ -69,9 +69,9 @@ void NotificationTest::testCloseNotification(void)
   QCOMPARE((long)DboNotification::Closed, notification.ack_status);
 }
 
-void NotificationTest::testDeleteNotification(void)
+void NotificationTest::testFlushNotification(void)
 {
-  QCOMPARE(0, m_dbSession.deleteNotifications(TEST_VIEW1));
+  QCOMPARE(0, m_dbSession.flushNotifications(TEST_VIEW1));
 }
 
 QTEST_MAIN(NotificationTest)
