@@ -19,16 +19,23 @@ public:
            const QString& subject,
            const QString& body);
 
+  QString lastError(void) const {return m_lastError;}
+
 protected Q_SLOTS:
+  void connected(void);
   void handleConnectionFailed(const QByteArray& msg);
   void handleMailFailed(int mailID, int errorCode, const QByteArray& msg);
   void handleSenderRejected(int mailID, const QString& address, const QByteArray & msg);
   void handleMailSent(int mailID);
 
 private:
-  void addEvents(void);
-
+  QString m_host;
+  int m_port;
+  QString m_lastError;
   QEventLoop m_eventSynchonizer;
   QMap<int, QxtMailMessage> m_spool;
+
+  void addEvents(void);
+
 };
 #endif // MAILSENDER_HPP
