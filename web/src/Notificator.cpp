@@ -111,10 +111,10 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
         m_dbSession->addNotification(viewName, node.sev);
       } else {
         if (notificationData.ack_status != DboNotification::Acknowledged) {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
+          REPORTD_LOG("error", QString("Service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
           // FIXME: escalate it?
         } else {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state (Acknowledged)").arg(viewName.c_str(), Severity(node.sev).toString()));
+          REPORTD_LOG("error", QString("Service %1 is still in %2 state, but has been acknowledged").arg(viewName.c_str(), Severity(node.sev).toString()));
           //FIXME: log acknowledge info ?
         }
       }
