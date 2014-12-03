@@ -47,7 +47,7 @@ void NotificationTest::testAddNotification(void)
   QCOMPARE(0, m_dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
 
   NotificationT notification;
-  QCOMPARE(0, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
+  QCOMPARE(true, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
   QCOMPARE((long)DboNotification::Open, notification.ack_status);
 }
 
@@ -56,7 +56,7 @@ void NotificationTest::testAcknowledgeNotification(void)
   QCOMPARE(0, m_dbSession.changeNotificationStatus(TEST_USER1, TEST_VIEW1, DboNotification::Acknowledged));
 
   NotificationT notification;
-  QCOMPARE(0, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
+  QCOMPARE(true, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
   QCOMPARE((long)DboNotification::Acknowledged, notification.ack_status);
 }
 
@@ -65,7 +65,7 @@ void NotificationTest::testCloseNotification(void)
   QCOMPARE(0, m_dbSession.changeNotificationStatus(TEST_USER1, TEST_VIEW1, DboNotification::Closed));
 
   NotificationT notification;
-  QCOMPARE(0, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
+  QCOMPARE(true, m_dbSession.fetchNotificationData(notification, TEST_VIEW1));
   QCOMPARE((long)DboNotification::Closed, notification.ack_status);
 }
 

@@ -61,9 +61,10 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastState, const 
   if (lastState != ngrt4n::Normal && node.sev == ngrt4n::Normal) {
     emailSubject = QString("%1 - Recovery").arg(node.name);
   } else {
-    emailSubject = QString("%1 - %2 Problem").arg(node.name, stateString);
+    emailSubject = QString("%1 - %2 State Problem").arg(node.name, stateString);
   }
 
+  REPORTD_LOG("info", emailSubject);
 
   QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
         emailSubject,
@@ -72,9 +73,14 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastState, const 
         lastStateString,
         node.toString().replace("\n", "<br />"));
 
-  m_mailSender->send("rodrigue_in@yahoo.fr", recipients, emailSubject,  emailContent);
 
-  m_eventSynchonizer.exec();
+  int retCode = m_mailSender->send(m_preferences.getSmtpUsername().c_str(),
+                                   recipients,
+                                   emailSubject,
+                                   emailContent);
+
+  std::string logLevel = (retCode == 0) ? "info" : "error";
+  REPORTD_LOG(logLevel, QObject::tr("[Notificator] %1").arg(m_mailSender->lastError()));
 }
 
 void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
@@ -83,16 +89,17 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
 
   QStringList notificationRecipients;
   if (m_dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0) {
-    REPORTD_LOG("debug", QString("No notification recipients for view: %1").arg(viewName.c_str()).toStdString());
+    REPORTD_LOG("info", QString("No notification recipients for view: %1").arg(viewName.c_str()));
     return;
   }
 
   NotificationT notificationData;
-  int succeeded = m_dbSession->fetchNotificationData(notificationData, viewName);
+  bool notifiticationEntryFound = m_dbSession->fetchNotificationData(notificationData, viewName);
   if (node.sev != ngrt4n::Normal) { //proble state
-    if (succeeded != 0 || notificationData.ack_status == DboNotification::Closed) { // send new notification
+    if (! notifiticationEntryFound || notificationData.ack_status == DboNotification::Closed) { // send new notification
       sendEmailNotification(node, ngrt4n::Normal, qosData, notificationRecipients);
-      if (succeeded != 0) {
+
+      if (! notifiticationEntryFound) {
         m_dbSession->addNotification(viewName, node.sev);
       } else  {
         m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
@@ -104,20 +111,16 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
         m_dbSession->addNotification(viewName, node.sev);
       } else {
         if (notificationData.ack_status != DboNotification::Acknowledged) {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()).toStdString());
+          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
           // FIXME: escalate it?
         } else {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state (Acknowledged)").arg(viewName.c_str(), Severity(node.sev).toString()).toStdString());
-          //FIXME:
-          //REPORTD_LOG("error",
-          //            QString("The service %1 is still in %2 state (Acknowledged on %)")
-          //            .arg(viewName.c_str(), Severity(serviceInfo.sev).toString(), ngrt4n::timet2String(lastNotificationData.last_change)).toStdString());
-          //        }
+          REPORTD_LOG("error", QString("The service %1 is still in %2 state (Acknowledged)").arg(viewName.c_str(), Severity(node.sev).toString()));
+          //FIXME: log acknowledge info ?
         }
       }
     }
   } else {  // normal state
-    if (succeeded > 0) { // if there were problems
+    if (notifiticationEntryFound) { // if there were problems
       if (notificationData.view_status != node.sev) { // service recovered
         sendEmailNotification(node, notificationData.view_status, qosData, notificationRecipients);
       }

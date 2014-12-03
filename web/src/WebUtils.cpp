@@ -213,6 +213,10 @@ void ngrt4n::logReportd(const std::string& level, const std::string& msg)
   loggerReportd.log(level, msg);
 }
 
+void ngrt4n::logReportd(const std::string& level, const QString& msg)
+{
+  loggerReportd.log(level, msg.toStdString());
+}
 
 
 bool ngrt4n::isValidUri(const QString& addr, const QString& schemePrefix, bool nopath)

@@ -89,7 +89,7 @@ public:
   int addNotification(const std::string& viewName, int viewStatus);
   int flushNotifications(const std::string& viewame);
   int changeNotificationStatus(const std::string& userName, const std::string& viewName, int newStatus);
-  int fetchNotificationData(NotificationT& notification, const std::string& viewName);
+  bool fetchNotificationData(NotificationT& notification, const std::string& viewName);
 
 private:
   std::string m_dbPath;

@@ -665,9 +665,9 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
 }
 
 
-int DbSession::fetchNotificationData(NotificationT& notification, const std::string& viewName)
+bool DbSession::fetchNotificationData(NotificationT& notification, const std::string& viewName)
 {
-  int retValue = -1;
+  bool found = false;
 
   dbo::Transaction transaction(*this);
 
@@ -676,7 +676,7 @@ int DbSession::fetchNotificationData(NotificationT& notification, const std::str
       dbo::ptr<DboNotification> dbNotifEntry = find<DboNotification>().where("view_name = ?").bind(viewName);
       if (dbNotifEntry) {
         notification = dbNotifEntry->data();
-        retValue = 0;
+        found = true;
       }
     }
   } catch (const dbo::Exception& ex) {
@@ -686,5 +686,5 @@ int DbSession::fetchNotificationData(NotificationT& notification, const std::str
 
   transaction.commit();
 
-  return retValue;
+  return found;
 }

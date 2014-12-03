@@ -49,7 +49,6 @@ void runCollector(int period)
       std::cerr << ex.what() <<"\n";
     }
 
-    REPORTD_LOG("notice", Q_TR("Collecting QoS data..."));
     long now = time(NULL);
     for (const auto& view: dbSession.viewList()) {
 
@@ -58,7 +57,7 @@ void runCollector(int period)
 
       // skip the view if initialization failed
       if (collector.lastErrorState()) {
-        REPORTD_LOG("error", collector.lastErrorMsg().toStdString());
+        REPORTD_LOG("error", collector.lastErrorMsg());
         continue;
       }
 
@@ -72,7 +71,7 @@ void runCollector(int period)
         notificator.handleNotification(collector.rootNode(), qosInfo);
         REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
-        REPORTD_LOG("warn", ex.what());
+        REPORTD_LOG("warn", std::string(ex.what()));
       }
     }
 
@@ -102,7 +101,7 @@ int main(int argc, char **argv)
 
   period *= 60;
 
-  REPORTD_LOG("notice", QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)).toStdString());
+  REPORTD_LOG("notice", QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)));
   runCollector(period); // convert period in seconds
 
   return qtApp.exec();
