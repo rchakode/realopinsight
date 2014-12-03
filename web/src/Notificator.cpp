@@ -54,6 +54,11 @@ Notificator::Notificator(DbSession* dbSession)
 
 void Notificator::sendEmailNotification(const NodeT& node, int lastState, const QosDataT& qosData, const QStringList& recipients)
 {
+  if (m_preferences.getNotificationType() != WebPreferencesBase::EmailNotification) {
+    // do nothing and exit
+    return;
+  }
+
   QString stateString = Severity(node.sev).toString();
   QString lastStateString = Severity(lastState).toString();
 
@@ -67,11 +72,11 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastState, const 
   REPORTD_LOG("info", emailSubject);
 
   QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
-        emailSubject,
-        ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
-        stateString,
-        lastStateString,
-        node.toString().replace("\n", "<br />"));
+                           emailSubject,
+                           ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
+                           stateString,
+                           lastStateString,
+                           node.toString().replace("\n", "<br />"));
 
 
   int retCode = m_mailSender->send(m_preferences.getSmtpUsername().c_str(),

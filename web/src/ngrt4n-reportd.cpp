@@ -68,7 +68,9 @@ void runCollector(int period)
       qosInfo.timestamp = now;
       try {
         dbSession.addQosData(qosInfo);
-        notificator.handleNotification(collector.rootNode(), qosInfo);
+        if (preferences.getNotificationType() != WebPreferencesBase::NoNotification) {
+          notificator.handleNotification(collector.rootNode(), qosInfo);
+        }
         REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", std::string(ex.what()));
