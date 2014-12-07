@@ -28,6 +28,7 @@
 
 #include "dbo/DbSession.hpp"
 #include "dbo/UserManagement.hpp"
+#include "dbo/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
 #include "WebBiCharts.hpp"
 #include <Wt/WTimer>

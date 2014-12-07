@@ -53,7 +53,6 @@ class UserFormModel;
 class UserFormView;
 class DbUserManager;
 class DbUserTable;
-class LdapUserManager;
 
 class ConfirmPasswordValidator : public Wt::WValidator
 {
@@ -168,45 +167,5 @@ private:
   Wt::WTemplate* m_dbUserListWidget;
 };
 
-
-
-/**
- * @brief The LdapUserTable class
- */
-class LdapUserManager : public Wt::WTableView
-{
-public:
-  enum EnableOperationT {
-    EnableAuthSuccess,
-    DisableAuthSuccess,
-    GenericError
-  };
-
-  LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
-  int updateUserList(void);
-  std::string lastError(void) const {return m_lastError.toStdString();}
-
-  Wt::Signal<int, std::string>& userEnableStatusChanged(void) {return m_userEnableStatusChanged;}
-
-private:
-  /** Signals **/
-  Wt::Signal<int, std::string> m_userEnableStatusChanged;
-
-  /** other members **/
-  QString m_lastError;
-  Wt::WStandardItemModel* m_model;
-  DbSession* m_dbSession;
-  LdapUserMapT m_users;
-  std::string m_ldapUidField;
-
-  void addEvent(void);
-  void setModelHeader(void);
-  void addUserRow(const LdapUserAttrsT& userInfo, bool imported);
-  Wt::WStandardItem* createEntryItem(const std::string& text, const std::string& data);
-  Wt::WStandardItem* createImportationItem(const std::string& data, bool alreadyImported);
-  void handleImportationAction(Wt::WStandardItem* item);
-  std::string getItemData(Wt::WStandardItem* item);
-  int insertIntoDatabase(const LdapUserAttrsT& userInfo);
-};
 
 #endif // USERFORM_HPP
