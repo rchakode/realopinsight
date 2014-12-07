@@ -107,7 +107,8 @@ HEADERS += \
     web/src/Applications.hpp \
     web/src/WebBiCharts.hpp \
     web/src/Notificator.hpp \
-    web/src/dbo/LdapUserManager.hpp
+    web/src/dbo/LdapUserManager.hpp \
+    web/src/dbo/NotificationManager.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -148,7 +149,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/LdapHelper.cpp \
     web/src/AuthModelProxy.cpp \
     web/src/Notificator.cpp \
-    web/src/dbo/LdapUserManager.cpp
+    web/src/dbo/LdapUserManager.cpp \
+    web/src/dbo/NotificationManager.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \

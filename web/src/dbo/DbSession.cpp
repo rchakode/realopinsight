@@ -696,9 +696,13 @@ int DbSession::fetchUserRelatedNotifications(NotificationListT& notifications, c
     } else {
       DboNotificationCollectionT dboNotifications;
       if (dboUser->role == DboUser::AdmRole) {
-        dboNotifications = find<DboNotification>();
+        dboNotifications = find<DboNotification>()
+            .orderBy("last_change");
       } else {
-        dboNotifications = find<DboNotification>().where("user_name = ?").bind(userName);
+        dboNotifications = find<DboNotification>()
+            .where("user_name = ?")
+            .bind(userName)
+            .orderBy("last_change");
       }
 
       notifications.clear();
