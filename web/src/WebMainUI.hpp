@@ -194,8 +194,10 @@ private:
   void handleNewUserMenu(void);
   void handleViewAclMenu(void);
   void handleUserEnableStatusChanged(int status, std::string data);
+  void handleShowHideSettingsMenus(Wt::WMenuItem* menuItem);
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
+  void createNotificationManagerWindow(void);
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);

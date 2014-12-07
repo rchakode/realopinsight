@@ -283,11 +283,11 @@ body, html {
 }
 
 
-.notification-container {
+.notification-icons-container {
   margin-top: 10px;
 }
 
-.notification-container span,
+.notification-icons-container span,
 .chart .badge {
   color: #000000;
 }
@@ -296,11 +296,11 @@ body, html {
  margin-left: 5px; 
 }
 
-.notification-container .badge {
+.notification-icons-container .badge {
   box-shadow:1px 1px 1px gray;
 }
 
-#notification-flag {
+#notification-icon-flag {
   color: #c0c0c0;
   text-shadow: 1px 1px 1px #ccc;
   font-size: 1.5em;

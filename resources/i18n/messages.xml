@@ -145,10 +145,10 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-         <legend>Summary of Business Service Health</legend>
+           <legend>Summary of Monitored Services</legend>
            ${thumbnails}
-           <legend>${report-period-header-pane}</legend>
-           <hr width="40%" />
+           <legend>Reports</legend>
+           ${report-period-header-pane}
            ${bigraphs}
        </div>
     </div>
@@ -558,8 +558,8 @@
  <div style="float: right;">${close-button}</div>
 </message>
 <message id="notification.block.tpl">
-   <div class="notification-container">
-   <i class="fa fa-bell" id="notification-flag"></i>
+   <div class="notification-icons-container">
+   <sup>${manage-all-notification-icon}</sup>
    <sup>${minor-count}</sup>
    <sup>${major-count}</sup>
    <sup>${critical-count}</sup>

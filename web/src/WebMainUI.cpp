@@ -28,6 +28,7 @@
 #include "WebMainUI.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
+#include "dbo/NotificationManager.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -171,34 +172,47 @@ void WebMainUI::setupProfileMenus(void)
   
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
 
-    Wt::WTemplate* notificationBlock = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+    Wt::WTemplate* notificationIconsContainer
+        = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+
+    Wt::WText* manageAllNotificationIcon = new Wt::WText(" ");
+    notificationIconsContainer->setStyleClass("fa fa-bell");
+    notificationIconsContainer->setHidden(false);
+    notificationIconsContainer->bindWidget("manage-all-notification-icon", manageAllNotificationIcon);
+
+    createNotificationManagerWindow();
+
+    //FIXME: Manage notifications
+//    Wt::WDialog* notificationManager = createDialog("Manage Notifications",
+//                                                    new NotificationManager(m_dbSession, m_mainWidget));
+//    notificationIconsContainer->clicked().connect(notificationManager, &Wt::WDialog::show);
 
     m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
     m_notificationBoxes[ngrt4n::Normal]->setHidden(true);
-    notificationBlock->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
+    notificationIconsContainer->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
 
     m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
     m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
-    notificationBlock->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
+    notificationIconsContainer->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
 
     m_notificationBoxes[ngrt4n::Major] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Major]->setStyleClass("badge severity-major");
     m_notificationBoxes[ngrt4n::Major]->setHidden(true);
-    notificationBlock->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
+    notificationIconsContainer->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
 
     m_notificationBoxes[ngrt4n::Critical] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Critical]->setStyleClass("badge severity-critical");
     m_notificationBoxes[ngrt4n::Critical]->setHidden(true);
-    notificationBlock->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
+    notificationIconsContainer->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
 
     m_notificationBoxes[ngrt4n::Unknown] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Unknown]->setStyleClass("badge severity-unknown");
     m_notificationBoxes[ngrt4n::Unknown]->setHidden(true);
-    notificationBlock->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
+    notificationIconsContainer->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
 
-    m_navbar->addWidget(notificationBlock, Wt::AlignRight);
+    m_navbar->addWidget(notificationIconsContainer, Wt::AlignRight);
   }
   
   Wt::WMenuItem* profileMenuItem
@@ -207,39 +221,42 @@ void WebMainUI::setupProfileMenus(void)
   profileMenuItem->setMenu(profilePopupMenu);
   profileMenu->addItem(profileMenuItem);
   
-  Wt::WMenuItem* curItem = NULL;
+  Wt::WMenuItem* currentMenuItem = NULL;
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
-
-    curItem = profilePopupMenu->addItem(tr("Show Settings").toStdString());
-    curItem->triggered().connect(std::bind([=]() {
-      if (m_showSettingTab) {
-        if (m_dashtabs->count() > 1) {
-          m_dashtabs->setTabHidden(0, false);
-          m_dashtabs->setCurrentIndex(0);
-          curItem->setText(tr("Hide Settings").toStdString());
-          wApp->doJavaScript("$('#userMenuBlock').hide(); "
-                             "$('#viewMenuBlock').hide();"
-                             "$('#menu-auth-settings').hide();");
-          m_preferences->showAuthSettingsWidgets(false);
-        }
-      } else {
-        if (m_dashtabs->count() > 1) {
-          m_dashtabs->setTabHidden(0, true);
-          m_dashtabs->setCurrentIndex(1);
-          curItem->setText(tr("Show Account & Settings").toStdString());
-        }
-      }
-      m_showSettingTab = ! m_showSettingTab;
-    }));
-
+    currentMenuItem = profilePopupMenu->addItem(tr("Show Settings").toStdString());
+    currentMenuItem->triggered().connect(std::bind(&WebMainUI::handleShowHideSettingsMenus, this, currentMenuItem));
   }
 
-  curItem = profilePopupMenu->addItem(tr("Help").toStdString());
-  curItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
-  curItem->setLinkTarget(Wt::TargetNewWindow);
+  currentMenuItem = profilePopupMenu->addItem(tr("Help").toStdString());
+  currentMenuItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
+  currentMenuItem->setLinkTarget(Wt::TargetNewWindow);
 
   profilePopupMenu->addItem("About")->triggered().connect(m_aboutDialog, &Wt::WDialog::show);
 }
+
+
+void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
+{
+  if (m_showSettingTab) {
+    if (m_dashtabs->count() > 1) {
+      m_dashtabs->setTabHidden(0, false);
+      m_dashtabs->setCurrentIndex(0);
+      menuItem->setText(tr("Hide Settings").toStdString());
+      wApp->doJavaScript("$('#userMenuBlock').hide(); "
+                         "$('#viewMenuBlock').hide();"
+                         "$('#menu-auth-settings').hide();");
+      m_preferences->showAuthSettingsWidgets(false);
+    }
+  } else {
+    if (m_dashtabs->count() > 1) {
+      m_dashtabs->setTabHidden(0, true);
+      m_dashtabs->setCurrentIndex(1);
+      menuItem->setText(tr("Show Account & Settings").toStdString());
+    }
+  }
+  m_showSettingTab = ! m_showSettingTab;
+}
+
 
 void WebMainUI::setupMenus(void)
 {
@@ -1020,7 +1037,7 @@ Wt::WContainerWidget* WebMainUI::createReportSectionHeader(void)
   Wt::WContainerWidget* container = new Wt::WContainerWidget();
   Wt::WHBoxLayout* layout = new Wt::WHBoxLayout(container);
 
-  layout->addWidget(new Wt::WText(Q_TR("BI Reports Period")), 1);
+  layout->addWidget(new Wt::WText(Q_TR("Select a period")), 1);
   layout->addWidget(m_reportStartDatePicker = createReportDatePicker(LAST_30_DAYS), 1);
   layout->addWidget(new Wt::WText(Q_TR("-")), 1);
   layout->addWidget(m_reportEndDatePicker = createReportDatePicker(time(NULL)), 1);
@@ -1040,3 +1057,9 @@ Wt::WContainerWidget* WebMainUI::createReportExportLinks(const std::string& view
   return anchor;
 }
 
+
+
+void WebMainUI::createNotificationManagerWindow(void)
+{
+
+}
