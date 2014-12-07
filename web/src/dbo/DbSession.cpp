@@ -586,7 +586,7 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
 }
 
 
-int DbSession::flushNotifications(const std::string& viewame)
+int DbSession::fetchUserRelatedNotifications(const std::string& viewame)
 {
   int retValue = -1;
   try {
@@ -620,17 +620,13 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
-
     if (! dboUser) {
-
       m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
       LOG("error", QObject::tr("DbSession::changeNotificationStatus: %1").arg(m_lastError.c_str()).toStdString());
-
     } else {
 
       long ackTimestamp = time(NULL);
       DboViewCollectionT dboViews;
-
       if (dboUser->role == DboUser::AdmRole) {
         dboViews = find<DboView>();
       } else {
@@ -650,9 +646,7 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
           notifDbEntry.modify()->last_change = ackTimestamp;
         }
       }
-
       retValue = 0;
-
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed changing notification state.";
@@ -665,7 +659,7 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
 }
 
 
-bool DbSession::fetchNotificationData(NotificationT& notification, const std::string& viewName)
+bool DbSession::fetchNotificationInfo(NotificationT& notification, const std::string& viewName)
 {
   bool found = false;
 
@@ -680,11 +674,45 @@ bool DbSession::fetchNotificationData(NotificationT& notification, const std::st
       }
     }
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Database error: failed query last notifications.";
+    m_lastError = "Failed fetching notification data";
     LOG("error", QObject::tr("DbSession::fetchNotificationData: %1").arg(ex.what()).toStdString());
   }
 
   transaction.commit();
 
   return found;
+}
+
+
+int DbSession::fetchUserRelatedNotifications(NotificationListT& notifications, const std::string& userName)
+{
+  int retValue = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
+    if (! dboUser) {
+      m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
+      LOG("error", QObject::tr("DbSession::fetchUserRelatedNotifications: %1").arg(m_lastError.c_str()).toStdString());
+    } else {
+      DboNotificationCollectionT dboNotifications;
+      if (dboUser->role == DboUser::AdmRole) {
+        dboNotifications = find<DboNotification>();
+      } else {
+        dboNotifications = find<DboNotification>().where("user_name = ?").bind(userName);
+      }
+
+      notifications.clear();
+      for (const auto& entry: dboNotifications)
+        notifications.push_back(entry->data());
+
+      retValue = notifications.size();
+    }
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed fetching user related notifications";
+    LOG("error", QObject::tr("DbSession::fetchUserRelatedNotifications: %1").arg(ex.what()).toStdString());
+  }
+
+  transaction.commit();
+
+  return retValue;
 }

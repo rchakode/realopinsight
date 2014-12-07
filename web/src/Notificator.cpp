@@ -99,7 +99,7 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
   }
 
   NotificationT notificationData;
-  bool notifiticationEntryFound = m_dbSession->fetchNotificationData(notificationData, viewName);
+  bool notifiticationEntryFound = m_dbSession->fetchNotificationInfo(notificationData, viewName);
   if (node.sev != ngrt4n::Normal) { //proble state
     if (! notifiticationEntryFound || notificationData.ack_status == DboNotification::Closed) { // send new notification
       sendEmailNotification(node, ngrt4n::Normal, qosData, notificationRecipients);
