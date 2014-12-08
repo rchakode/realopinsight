@@ -28,7 +28,6 @@
 #include "WebMainUI.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "dbo/NotificationManager.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -120,6 +119,7 @@ void WebMainUI::addEvents(void)
 
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     m_reportApplyAnchor->clicked().connect(this, &WebMainUI::updateBiCharts);
+    m_mainNotificationIcon->clicked().connect(m_notificationManager, &WebNotificationManager::show);
   }
 }
 
@@ -172,47 +172,41 @@ void WebMainUI::setupProfileMenus(void)
   
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
 
-    Wt::WTemplate* notificationIconsContainer
-        = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+    m_notificationManager = new WebNotificationManager(m_dbSession, m_mainWidget);
 
-    Wt::WText* manageAllNotificationIcon = new Wt::WText(" ");
-    notificationIconsContainer->setStyleClass("fa fa-bell");
-    notificationIconsContainer->setHidden(false);
-    notificationIconsContainer->bindWidget("manage-all-notification-icon", manageAllNotificationIcon);
+    Wt::WTemplate* notificationSectionTpl = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
-    createNotificationManagerWindow();
-
-    //FIXME: Manage notifications
-//    Wt::WDialog* notificationManager = createDialog("Manage Notifications",
-//                                                    new NotificationManager(m_dbSession, m_mainWidget));
-//    notificationIconsContainer->clicked().connect(notificationManager, &Wt::WDialog::show);
+    m_mainNotificationIcon = new Wt::WText(" ");
+    m_mainNotificationIcon->setStyleClass("fa fa-bell");
+    m_mainNotificationIcon->setHidden(false);
+    notificationSectionTpl->bindWidget("manage-all-notification-icon", m_mainNotificationIcon);
 
     m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
     m_notificationBoxes[ngrt4n::Normal]->setHidden(true);
-    notificationIconsContainer->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
+    notificationSectionTpl->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
 
     m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
     m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
-    notificationIconsContainer->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
+    notificationSectionTpl->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
 
     m_notificationBoxes[ngrt4n::Major] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Major]->setStyleClass("badge severity-major");
     m_notificationBoxes[ngrt4n::Major]->setHidden(true);
-    notificationIconsContainer->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
+    notificationSectionTpl->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
 
     m_notificationBoxes[ngrt4n::Critical] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Critical]->setStyleClass("badge severity-critical");
     m_notificationBoxes[ngrt4n::Critical]->setHidden(true);
-    notificationIconsContainer->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
+    notificationSectionTpl->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
 
     m_notificationBoxes[ngrt4n::Unknown] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Unknown]->setStyleClass("badge severity-unknown");
     m_notificationBoxes[ngrt4n::Unknown]->setHidden(true);
-    notificationIconsContainer->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
+    notificationSectionTpl->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
 
-    m_navbar->addWidget(notificationIconsContainer, Wt::AlignRight);
+    m_navbar->addWidget(notificationSectionTpl, Wt::AlignRight);
   }
   
   Wt::WMenuItem* profileMenuItem
@@ -1057,9 +1051,3 @@ Wt::WContainerWidget* WebMainUI::createReportExportLinks(const std::string& view
   return anchor;
 }
 
-
-
-void WebMainUI::createNotificationManagerWindow(void)
-{
-
-}

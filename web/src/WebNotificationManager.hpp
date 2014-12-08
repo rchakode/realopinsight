@@ -1,8 +1,8 @@
 /*
-# NotificationManager.cpp
+# WebNotificationManager.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 07-12-2014                                                  #
+# Last Update: 08-12-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,53 +22,20 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "NotificationManager.hpp"
-#include "WebUtils.hpp"
+#ifndef WEBNOTIFICATIONMANAGER_HPP
+#define WEBNOTIFICATIONMANAGER_HPP
+#include <Wt/WDialog>
+#include "dbo/DbSession.hpp"
+#include "dbo/NotificationTableView.hpp"
 
-NotificationManager::NotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WTableView(parent),
-    m_ackStatuschanged(this),
-    m_model(new Wt::WStandardItemModel(0, 5, this)),
-    m_dbSession(dbSession)
+class WebNotificationManager : public Wt::WDialog
 {
-  setSortingEnabled(true);
-  setLayoutSizeAware(true);
-  setColumnResizeEnabled(true);
-  setSelectable(true);
-  setSelectionMode(Wt::SingleSelection);
-  setSelectionBehavior(Wt::SelectRows);
-  setHeaderHeight(26);
-  setAlternatingRowColors(true);
+public:
+  WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent=0);
+  ~WebNotificationManager();
 
-  setModelHeader();
-  setModel(m_model);
-  addEvent();
-}
+private:
+  NotificationTableView* m_notificationTableView;
+};
 
-/**
- * @brief Add signa/slot event handling
- */
-void NotificationManager::addEvent()
-{
-  m_model->itemChanged().connect(this, &NotificationManager::handleAckStatusChanged);
-}
-
-
-/**
- * @brief Set the table view header
- */
-void NotificationManager::setModelHeader(void)
-{
-  m_model->setHeaderData(0, Q_TR("Last Change"));
-  m_model->setHeaderData(1, Q_TR("Service Name"));
-  m_model->setHeaderData(2, Q_TR("Status"));
-  m_model->setHeaderData(3, Q_TR("Ack Status"));
-  m_model->setHeaderData(4, Q_TR("Ack User"));
-}
-
-void NotificationManager::handleAckStatusChanged(Wt::WStandardItem* item)
-{
-  if (item->isCheckable()) {
-    //TODO
-  }
-}
+#endif // WEBNOTIFICATIONMANAGER_HPP

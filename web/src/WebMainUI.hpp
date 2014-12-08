@@ -31,6 +31,7 @@
 #include "dbo/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
 #include "WebBiCharts.hpp"
+#include "WebNotificationManager.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/WTabWidget>
@@ -126,7 +127,11 @@ private:
   Wt::WContainerWidget* m_mainWidget;
   Settings* m_settings;
   Wt::WText* m_infoBox;
+
+  WebNotificationManager* m_notificationManager;
+  Wt::WText* m_mainNotificationIcon;
   std::map<int, Wt::WText*> m_notificationBoxes;
+
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   WebPreferences* m_preferences;
@@ -197,7 +202,6 @@ private:
   void handleShowHideSettingsMenus(Wt::WMenuItem* menuItem);
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
-  void createNotificationManagerWindow(void);
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);

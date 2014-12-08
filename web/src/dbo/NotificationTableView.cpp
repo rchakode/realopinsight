@@ -1,5 +1,5 @@
 /*
-# NotificationManager.hpp
+# NotificationManager.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 07-12-2014                                                  #
@@ -22,33 +22,53 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef NOTIFICATIONMANAGER_HPP
-#define NOTIFICATIONMANAGER_HPP
+#include "NotificationTableView.hpp"
+#include "WebUtils.hpp"
 
-#include "dbo/DbSession.hpp"
-#include <Wt/WTableView>
-#include <Wt/WStandardItemModel>
-#include <Wt/WStandardItem>
-
-class NotificationManager : public Wt::WTableView
+NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent)
+  : Wt::WTableView(parent),
+    m_ackStatuschanged(this),
+    m_model(new Wt::WStandardItemModel(0, 5, this)),
+    m_dbSession(dbSession)
 {
-public:
-  NotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
-  Wt::Signal<int, std::string>& ackStatuschanged(void) {return m_ackStatuschanged;}
+  setSortingEnabled(true);
+  setLayoutSizeAware(true);
+  setColumnResizeEnabled(true);
+  setSelectable(true);
+  setSelectionMode(Wt::SingleSelection);
+  setSelectionBehavior(Wt::SelectRows);
+  setHeaderHeight(26);
+  setAlternatingRowColors(true);
 
-private:
-  /** Signals **/
-  Wt::Signal<int, std::string> m_ackStatuschanged;
+  setModelHeader();
+  setModel(m_model);
+  addEvent();
+}
 
-  /** other members **/
-  QString m_lastError;
-  Wt::WStandardItemModel* m_model;
-  DbSession* m_dbSession;
+/**
+ * @brief Add signa/slot event handling
+ */
+void NotificationTableView::addEvent()
+{
+  m_model->itemChanged().connect(this, &NotificationTableView::handleAckStatusChanged);
+}
 
 
-  void addEvent(void);
-  void setModelHeader(void);
-  void handleAckStatusChanged(Wt::WStandardItem* item);
-};
+/**
+ * @brief Set the table view header
+ */
+void NotificationTableView::setModelHeader(void)
+{
+  m_model->setHeaderData(0, Q_TR("Last Change"));
+  m_model->setHeaderData(1, Q_TR("Service Name"));
+  m_model->setHeaderData(2, Q_TR("Severity"));
+  m_model->setHeaderData(3, Q_TR("Ack Status"));
+  m_model->setHeaderData(4, Q_TR("Ack User"));
+}
 
-#endif // NOTIFICATIONMANAGER_HPP
+void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
+{
+  if (item->isCheckable()) {
+    //TODO
+  }
+}
