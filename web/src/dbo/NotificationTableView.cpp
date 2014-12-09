@@ -27,7 +27,7 @@
 
 NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
-    m_ackStatuschanged(this),
+    m_ackStatusChanged(this),
     m_model(new Wt::WStandardItemModel(0, 5, this)),
     m_dbSession(dbSession)
 {
@@ -45,18 +45,12 @@ NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContaine
   addEvent();
 }
 
-/**
- * @brief Add signa/slot event handling
- */
 void NotificationTableView::addEvent()
 {
   m_model->itemChanged().connect(this, &NotificationTableView::handleAckStatusChanged);
 }
 
 
-/**
- * @brief Set the table view header
- */
 void NotificationTableView::setModelHeader(void)
 {
   m_model->setHeaderData(0, Q_TR("Service Name"));
@@ -66,9 +60,46 @@ void NotificationTableView::setModelHeader(void)
   m_model->setHeaderData(4, Q_TR("Ack User"));
 }
 
+
+void NotificationTableView::updateEntries(void)
+{
+  setDisabled(true);
+  NotificationListT notifications;
+  m_model->clear();
+  int count = m_dbSession->fetchUserRelatedNotifications(notifications, m_dbSession->loggedUser().username);
+  if (count > 0) {
+    for (const auto& entry : notifications)
+      addNotificationEntry(entry);
+  } else if (count <= 0) {
+    // FIXME: handle error
+  }
+  setDisabled(false);
+}
+
+void NotificationTableView::addNotificationEntry(const NotificationT& notifData)
+{
+  int row = m_model->rowCount();
+  m_model->setItem(row, 0, ngrt4n::createStandardItem(notifData.view_name, notifData.view_name));
+  m_model->setItem(row, 1, ngrt4n::createStandardItem(Severity(notifData.view_status).toString().toStdString(), notifData.view_name));
+  m_model->setItem(row, 2, ngrt4n::createStandardItem(ngrt4n::timet2String(notifData.last_change).toUTF8(), notifData.view_name) );
+  m_model->setItem(row, 3, ngrt4n::createCheckableStandardIItem(notifData.view_name, notifData.ack_status == DboNotification::Acknowledged));
+  m_model->setItem(row, 3, ngrt4n::createStandardItem(notifData.ack_username, notifData.view_name));
+}
+
 void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
 {
   if (item->isCheckable()) {
-    //TODO
+    std::string viewName = ngrt4n::getItemData(item);
+    if (item->checkState() == Wt::Checked) {
+      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username,
+                                            viewName,
+                                            DboNotification::Acknowledged);
+      // FIXME: handle error?
+    } else {
+      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username,
+                                            viewName,
+                                            DboNotification::Open);
+      // FIXME: handle error?
+    }
   }
 }

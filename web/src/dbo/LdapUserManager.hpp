@@ -64,10 +64,7 @@ private:
   void addEvent(void);
   void setModelHeader(void);
   void addUserRow(const LdapUserAttrsT& userInfo, bool imported);
-  Wt::WStandardItem* createEntryItem(const std::string& text, const std::string& data);
-  Wt::WStandardItem* createImportationItem(const std::string& data, bool alreadyImported);
   void handleImportationAction(Wt::WStandardItem* item);
-  std::string getItemData(Wt::WStandardItem* item);
   int insertIntoDatabase(const LdapUserAttrsT& userInfo);
 };
 

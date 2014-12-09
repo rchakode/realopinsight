@@ -36,6 +36,7 @@ public:
 
 private:
   NotificationTableView* m_notificationTableView;
+
 };
 
 #endif // WEBNOTIFICATIONMANAGER_HPP

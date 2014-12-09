@@ -65,6 +65,10 @@ namespace ngrt4n {
   bool isValidHostAddr(const QString& addr);
   std::string md5Hash(const std::string& input);
   void googleAnalyticsLogger(void);
+
+  Wt::WStandardItem* createStandardItem(const std::string& text, const std::string& data);
+  Wt::WStandardItem* createCheckableStandardIItem(const std::string& data, bool checked);
+  std::string getItemData(Wt::WStandardItem* item);
 } //Namespace
 
 #endif // WEBUTILS_HPP

@@ -113,33 +113,18 @@ void LdapUserManager::addUserRow(const LdapUserAttrsT& userInfo, bool imported)
 {
   int row = m_model->rowCount();
   std::string dn = userInfo["dn"];
-  m_model->setItem(row, 0, createEntryItem(dn, dn));
-  m_model->setItem(row, 1, createEntryItem(userInfo["cn"], dn));
-  m_model->setItem(row, 2, createEntryItem(userInfo[m_ldapUidField], dn));
-  m_model->setItem(row, 3, createEntryItem(userInfo["mail"], dn));
-  m_model->setItem(row, 4, createImportationItem(dn, imported));
-}
-
-Wt::WStandardItem* LdapUserManager::createEntryItem(const std::string& text, const std::string& data)
-{
-  Wt::WStandardItem* item = new Wt::WStandardItem(text);
-  item->setData(data, Wt::UserRole);
-  return item;
-}
-
-Wt::WStandardItem* LdapUserManager::createImportationItem(const std::string& data, bool alreadyImported)
-{
-  Wt::WStandardItem* item = createEntryItem("", data);
-  item->setCheckable(true);
-  item->setChecked(alreadyImported);
-  return item;
+  m_model->setItem(row, 0, ngrt4n::createStandardItem(dn, dn));
+  m_model->setItem(row, 1, ngrt4n::createStandardItem(userInfo["cn"], dn));
+  m_model->setItem(row, 2, ngrt4n::createStandardItem(userInfo[m_ldapUidField], dn));
+  m_model->setItem(row, 3, ngrt4n::createStandardItem(userInfo["mail"], dn));
+  m_model->setItem(row, 4, ngrt4n::createCheckableStandardIItem(dn, imported));
 }
 
 
 void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
 {
   if (item->isCheckable()) {
-    std::string ldapDn = getItemData(item);
+    std::string ldapDn = ngrt4n::getItemData(item);
     LdapUserMapT::ConstIterator userInfo =  m_users.find(ldapDn);
     if (userInfo != m_users.end()) {
       std::string username = (*userInfo)[m_ldapUidField];
@@ -155,23 +140,9 @@ void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
         }
       }
     } else {
-      m_userEnableStatusChanged.emit(GenericError,
-                                     Q_TR("User DN not found in the directory: ")+ldapDn);
+      m_userEnableStatusChanged.emit(GenericError, Q_TR("User DN not found in the directory: ")+ldapDn);
     }
   }
-}
-
-
-std::string LdapUserManager::getItemData(Wt::WStandardItem* item)
-{
-  std::string data;
-  try {
-    data = boost::any_cast<std::string>(item->data(Wt::UserRole));
-  } catch(...) {
-    data = "";
-  }
-
-  return data;
 }
 
 
