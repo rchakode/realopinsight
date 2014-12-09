@@ -128,8 +128,8 @@ private:
   Settings* m_settings;
   Wt::WText* m_infoBox;
 
+  Wt::WWidget* m_mainNotificationManagerIcon;
   WebNotificationManager* m_notificationManager;
-  Wt::WText* m_mainNotificationIcon;
   std::map<int, Wt::WText*> m_notificationBoxes;
 
   AuthManager* m_authManager;
@@ -200,12 +200,15 @@ private:
   void handleViewAclMenu(void);
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowHideSettingsMenus(Wt::WMenuItem* menuItem);
+  void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
+  Wt::WWidget* createMainNotificationIcon(void);
+
 };
 
 #endif // MAINWEBWINDOW_HPP

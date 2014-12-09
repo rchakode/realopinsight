@@ -116,11 +116,6 @@ void WebMainUI::addEvents(void)
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
-
-  if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
-    m_reportApplyAnchor->clicked().connect(this, &WebMainUI::updateBiCharts);
-    m_mainNotificationIcon->clicked().connect(m_notificationManager, &WebNotificationManager::show);
-  }
 }
 
 void WebMainUI::showUserHome(void)
@@ -176,10 +171,7 @@ void WebMainUI::setupProfileMenus(void)
 
     Wt::WTemplate* notificationSectionTpl = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
-    m_mainNotificationIcon = new Wt::WText(" ");
-    m_mainNotificationIcon->setStyleClass("fa fa-bell");
-    m_mainNotificationIcon->setHidden(false);
-    notificationSectionTpl->bindWidget("manage-all-notification-icon", m_mainNotificationIcon);
+    notificationSectionTpl->bindWidget("main-notification-icon", m_mainNotificationManagerIcon = createMainNotificationIcon());
 
     m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
     m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
@@ -228,6 +220,15 @@ void WebMainUI::setupProfileMenus(void)
   profilePopupMenu->addItem("About")->triggered().connect(m_aboutDialog, &Wt::WDialog::show);
 }
 
+
+Wt::WWidget* WebMainUI::createMainNotificationIcon(void)
+{
+   Wt::WPushButton* widget = new Wt::WPushButton(" ");
+   widget->setStyleClass("fa fa-bell btn btn-danger");
+   widget->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
+   widget->setToolTip(Q_TR("Manage notifications"));
+   return widget;
+}
 
 void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
 {
@@ -1036,6 +1037,9 @@ Wt::WContainerWidget* WebMainUI::createReportSectionHeader(void)
   layout->addWidget(new Wt::WText(Q_TR("-")), 1);
   layout->addWidget(m_reportEndDatePicker = createReportDatePicker(time(NULL)), 1);
   layout->addWidget(m_reportApplyAnchor = new Wt::WAnchor(Wt::WLink("#"), Q_TR("Apply")), 1);
+
+  // Event
+  m_reportApplyAnchor->clicked().connect(this, &WebMainUI::updateBiCharts);
 
   return container;
 }

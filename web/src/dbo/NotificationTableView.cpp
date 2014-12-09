@@ -59,9 +59,9 @@ void NotificationTableView::addEvent()
  */
 void NotificationTableView::setModelHeader(void)
 {
-  m_model->setHeaderData(0, Q_TR("Last Change"));
-  m_model->setHeaderData(1, Q_TR("Service Name"));
-  m_model->setHeaderData(2, Q_TR("Severity"));
+  m_model->setHeaderData(0, Q_TR("Service Name"));
+  m_model->setHeaderData(1, Q_TR("Severity"));
+  m_model->setHeaderData(2, Q_TR("Last Change"));
   m_model->setHeaderData(3, Q_TR("Ack Status"));
   m_model->setHeaderData(4, Q_TR("Ack User"));
 }
