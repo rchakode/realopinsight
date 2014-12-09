@@ -34,6 +34,8 @@ public:
   WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   ~WebNotificationManager();
 
+  void show(void);
+
 private:
   NotificationTableView* m_notificationTableView;
 

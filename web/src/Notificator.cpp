@@ -94,7 +94,7 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
 
   QStringList notificationRecipients;
   if (m_dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0) {
-    REPORTD_LOG("info", QString("No notification recipients for view: %1").arg(viewName.c_str()));
+    REPORTD_LOG("info", QString("No notification recipients for view %1").arg(viewName.c_str()));
     return;
   }
 

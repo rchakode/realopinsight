@@ -66,6 +66,7 @@ void NotificationTableView::updateEntries(void)
   setDisabled(true);
   NotificationListT notifications;
   m_model->clear();
+  setModelHeader();
   int count = m_dbSession->fetchUserRelatedNotifications(notifications, m_dbSession->loggedUser().username);
   if (count > 0) {
     for (const auto& entry : notifications)

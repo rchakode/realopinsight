@@ -42,3 +42,10 @@ WebNotificationManager::~WebNotificationManager()
 {
   delete m_notificationTableView;
 }
+
+
+void WebNotificationManager::show(void)
+{
+  m_notificationTableView->updateEntries();
+  Wt::WDialog::show();
+}
