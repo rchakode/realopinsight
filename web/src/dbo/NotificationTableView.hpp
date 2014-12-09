@@ -35,15 +35,12 @@ class NotificationTableView : public Wt::WTableView
 {
 public:
   NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
-  Wt::Signal<int, std::string>& ackStatuschanged(void) {return m_ackStatusChanged;}
-  void updateEntries(void);
+  int updateEntries(void);
+  std::string lastError(void) const {return m_lastError;}
 
 private:
-  /** Signals **/
-  Wt::Signal<int, std::string> m_ackStatusChanged;
-
   /** other members **/
-  QString m_lastError;
+  std::string m_lastError;
   Wt::WStandardItemModel* m_model;
   DbSession* m_dbSession;
 

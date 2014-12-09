@@ -33,12 +33,16 @@ class WebNotificationManager : public Wt::WDialog
 public:
   WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   ~WebNotificationManager();
-
+  Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
   void show(void);
 
 private:
-  NotificationTableView* m_notificationTableView;
+  /** Signals **/
+  Wt::Signal<int, std::string> m_operationCompleted;
 
+
+  /** other members **/
+  NotificationTableView* m_notificationTableView;
 };
 
 #endif // WEBNOTIFICATIONMANAGER_HPP

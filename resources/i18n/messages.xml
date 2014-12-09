@@ -9,6 +9,7 @@
 <message id="beta-message">
   <span><sup class="severity-major">Beta</sup>&nbsp;</span>
 </message>
+
 <message id="admin-home.tpl">
   <div class="admin-page">
     <!-- Menu pane -->

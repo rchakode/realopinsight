@@ -102,7 +102,7 @@ public:
   WebPreferences(void);
   virtual ~WebPreferences();
 
-  Wt::Signal<std::string>& errorOccurred() { return m_errorOccurred; }
+  Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
   Wt::Signal<int>& authSystemChanged() { return m_authSystemChanged; }
 
   virtual void setEnabledInputs(bool enable);
@@ -125,7 +125,7 @@ protected:
   virtual void deleteSource(void);
 
 private:
-  Wt::Signal<std::string> m_errorOccurred;
+  Wt::Signal<int, std::string> m_operationCompleted;
   Wt::Signal<int> m_authSystemChanged;
 
   // monitoring settings properties

@@ -31,6 +31,7 @@
 #include "dbo/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
 #include "WebBiCharts.hpp"
+#include "WebUtils.hpp"
 #include "WebNotificationManager.hpp"
 #include <Wt/WTimer>
 #include <Wt/WApplication>
@@ -80,11 +81,6 @@ class WebMainUI : public QObject, public Wt::WContainerWidget
     MenuChangePassword
   };
 
-  enum OperationStatusT {
-    OperationSuccess,
-    OperationError
-  };
-
 public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
@@ -104,7 +100,7 @@ public:
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
-  void handleLibError(QString msg) {showMessage(msg.toStdString(), OperationSuccess);}
+  void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
   void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
 
 private:
@@ -168,13 +164,14 @@ private:
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
   Wt::WTemplate* getDashboardThumbnail(WebDashboard* dashboard);
-  Wt::WWidget* createSettingPage(void);
+  Wt::WWidget* createAdminPage(void);
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);
 
   /** member methods without return value*/
   void addEvents(void);
   void createMainUI(void);
+  void setupInfoBox(void);
   void setupProfileMenus(void);
   void setupMenus(void);
   void openFileUploadDialog(void);
@@ -186,7 +183,7 @@ private:
   void createAccountPanel(void);
   void createPasswordPanel(void);
   void createAboutDialog(void);
-  void showMessage(const std::string& msg, int status);
+  void showMessage(int status, const std::string& msg);
   void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);
@@ -203,6 +200,7 @@ private:
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
+  void setupNotificationManager(void);
 
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);

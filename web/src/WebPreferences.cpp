@@ -83,7 +83,7 @@ std::string WebPreferencesBase::getLdapIdField(void) const
 WebPreferences::WebPreferences(void)
   : WebPreferencesBase(),
     Wt::WContainerWidget(),
-    m_errorOccurred(this),
+    m_operationCompleted(this),
     m_authSystemChanged(this)
 {
   this->setMargin(0, Wt::All);
@@ -279,11 +279,11 @@ void WebPreferences::applyChanges(void)
 {
   if (validateMonitoringSettingsFields()) {
     if ( m_monitorTypeField->currentIndex() <= 0) {
-      m_errorOccurred.emit(QObject::tr("Bad monitor type").toStdString());
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad monitor type").toStdString());
       return;
     }
     if (currentSourceIndex() < 0) {
-      m_errorOccurred.emit(QObject::tr("Bad index for source (%1)").arg(currentSourceIndex()).toStdString());
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad index for source (%1)").arg(currentSourceIndex()).toStdString());
       return;
     }
     saveAsSource(currentSourceIndex(), m_monitorTypeField->currentText().toUTF8().c_str());
@@ -598,14 +598,14 @@ void WebPreferences::showLivestatusSettings(int monitorTypeIndex)
 bool WebPreferences::validateMonitoringSettingsFields(void)
 {
   if (m_monitorTypeField->currentIndex() == 0) {
-    m_errorOccurred.emit(QObject::tr("Monitor type not set").toStdString());
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Monitor type not set").toStdString());
     return false;
   }
 
   if (m_monitorTypeField->currentIndex() > 1
       && m_monitorUrlField->validate() != Wt::WValidator::Valid
       ) {
-    m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Please fix field(s) in red").toStdString());
     return false;
 
   }
@@ -627,7 +627,7 @@ bool WebPreferences::validateAuthSettingsFields(void)
       && m_ldapIdField->validate() == Wt::WValidator::Valid)
     return true;
 
-  m_errorOccurred.emit(QObject::tr("Please fix field(s) in red").toStdString());
+  m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Please fix field(s) in red").toStdString());
   return false;
 }
 

@@ -27,7 +27,6 @@
 
 NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
-    m_ackStatusChanged(this),
     m_model(new Wt::WStandardItemModel(0, 5, this)),
     m_dbSession(dbSession)
 {
@@ -56,35 +55,39 @@ void NotificationTableView::setModelHeader(void)
   m_model->setHeaderData(0, Q_TR("Service Name"));
   m_model->setHeaderData(1, Q_TR("Severity"));
   m_model->setHeaderData(2, Q_TR("Last Change"));
-  m_model->setHeaderData(3, Q_TR("Ack Status"));
-  m_model->setHeaderData(4, Q_TR("Ack User"));
+  m_model->setHeaderData(3, Q_TR("Acknowledge"));
+  m_model->setHeaderData(4, Q_TR("Updated by"));
 }
 
 
-void NotificationTableView::updateEntries(void)
+int NotificationTableView::updateEntries(void)
 {
   setDisabled(true);
   NotificationListT notifications;
-  m_model->clear();
-  setModelHeader();
   int count = m_dbSession->fetchUserRelatedNotifications(notifications, m_dbSession->loggedUser().username);
   if (count > 0) {
+    m_model->clear();
     for (const auto& entry : notifications)
       addNotificationEntry(entry);
+    setModelHeader();
   } else if (count <= 0) {
-    // FIXME: handle error
+    m_lastError = m_dbSession->lastError();
   }
   setDisabled(false);
+  return count;
 }
 
 void NotificationTableView::addNotificationEntry(const NotificationT& notifData)
 {
   int row = m_model->rowCount();
+  Wt::WStandardItem* severityItem = ngrt4n::createStandardItem(Severity(notifData.view_status).toStdString(), notifData.view_name);
+  severityItem->setStyleClass(ngrt4n::severityCssClass(notifData.view_status));
+
   m_model->setItem(row, 0, ngrt4n::createStandardItem(notifData.view_name, notifData.view_name));
-  m_model->setItem(row, 1, ngrt4n::createStandardItem(Severity(notifData.view_status).toString().toStdString(), notifData.view_name));
+  m_model->setItem(row, 1, severityItem);
   m_model->setItem(row, 2, ngrt4n::createStandardItem(ngrt4n::timet2String(notifData.last_change).toUTF8(), notifData.view_name) );
   m_model->setItem(row, 3, ngrt4n::createCheckableStandardIItem(notifData.view_name, notifData.ack_status == DboNotification::Acknowledged));
-  m_model->setItem(row, 3, ngrt4n::createStandardItem(notifData.ack_username, notifData.view_name));
+  m_model->setItem(row, 4, ngrt4n::createStandardItem(notifData.ack_username, notifData.view_name));
 }
 
 void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
@@ -102,5 +105,6 @@ void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
                                             DboNotification::Open);
       // FIXME: handle error?
     }
+    updateEntries();
   }
 }

@@ -27,7 +27,8 @@
 #include <Wt/WPushButton>
 
 WebNotificationManager::WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WDialog(Q_TR("Manage Notifications"), parent)
+  : Wt::WDialog(Q_TR("Manage Notifications"), parent),
+    m_operationCompleted(this)
 {
   m_notificationTableView = new NotificationTableView(dbSession, this->contents());
   Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
@@ -46,6 +47,9 @@ WebNotificationManager::~WebNotificationManager()
 
 void WebNotificationManager::show(void)
 {
-  m_notificationTableView->updateEntries();
-  Wt::WDialog::show();
+  if (m_notificationTableView->updateEntries() < 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, m_notificationTableView->lastError());
+  } else {
+    Wt::WDialog::show();
+  }
 }

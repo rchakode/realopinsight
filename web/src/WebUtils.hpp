@@ -26,6 +26,7 @@
 #define WEBUTILS_HPP
 
 #include "Settings.hpp"
+#include <QString>
 #include <Wt/WText>
 #include <Wt/WLogger>
 
@@ -42,8 +43,14 @@ public:
 #define LOG(level, msg) ngrt4n::log(level, msg)
 #define REPORTD_LOG(level, msg) ngrt4n::logReportd(level, msg)
 
-class QString;
+
 namespace ngrt4n {
+
+  enum OperationStatusT {
+    OperationSucceeded,
+    OperationFailed
+  };
+
   void showMessage(int exitCode, const std::string& errorMsg,
                    const std::string& successMsg, Wt::WText* infoBox);
   std::string tr(const std::string& msg);

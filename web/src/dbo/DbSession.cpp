@@ -24,6 +24,7 @@
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
 #include "WebPreferences.hpp"
+#include <tuple>
 #include <QFile>
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/Identity>
@@ -695,24 +696,38 @@ int DbSession::fetchUserRelatedNotifications(NotificationListT& notifications, c
       LOG("error", QObject::tr("DbSession::fetchUserRelatedNotifications: %1").arg(m_lastError.c_str()).toStdString());
     } else {
       DboNotificationCollectionT dboNotifications;
-      if (dboUser->role == DboUser::AdmRole) {
-        dboNotifications = find<DboNotification>()
-            .orderBy("last_change");
-      } else {
-        dboNotifications = find<DboNotification>()
-            .where("user_name = ?")
-            .bind(userName)
-            .orderBy("last_change");
-      }
-
       notifications.clear();
-      for (const auto& entry: dboNotifications)
-        notifications.push_back(entry->data());
+      if (dboUser->role == DboUser::AdmRole) {
+        dboNotifications = find<DboNotification>().orderBy("last_change");
+        for (const auto& entry: dboNotifications)
+          notifications.push_back(entry->data());
+      } else {
+
+        std::string sql = QString("SELECT n.view_name, view_status, ack_status, last_change, ack_user_name"
+                                  " FROM notification n, user_view uv"
+                                  " WHERE uv.user_name = '%1'"
+                                  "   AND n.view_name = uv.view_name"
+                                  " ORDER BY last_change"
+                                  ).arg(userName.c_str()).toStdString();
+
+        dbo::collection< boost::tuple<std::string, int, int, int, std::string> >
+            results = query< boost::tuple<std::string, int, int, int, std::string> >(sql);
+
+        for (const auto& entry: results) {
+          NotificationT data;
+          data.view_name    = boost::get<0>(entry);
+          data.view_status  = boost::get<1>(entry);
+          data.ack_status   = boost::get<2>(entry);
+          data.last_change  = boost::get<3>(entry);
+          data.ack_username = boost::get<4>(entry);
+          notifications.push_back(data);
+        }
+      }
 
       retValue = notifications.size();
     }
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed fetching user related notifications";
+    m_lastError = "Query failed when fetching notification data";
     LOG("error", QObject::tr("DbSession::fetchUserRelatedNotifications: %1").arg(ex.what()).toStdString());
   }
 

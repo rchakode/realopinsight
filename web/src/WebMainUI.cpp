@@ -92,6 +92,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   createPasswordPanel();
   createAboutDialog();
   setupMenus();
+  setupInfoBox();
   showUserHome();
   addEvents();
   doJavaScript(RESIZE_PANES);
@@ -110,7 +111,7 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  m_preferences->errorOccurred().connect(std::bind(&WebMainUI::showMessage, this, std::placeholders::_1, OperationError));
+  m_preferences->operationCompleted().connect(this, &WebMainUI::showMessage);
   m_preferences->authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
@@ -137,7 +138,7 @@ void WebMainUI::showUserHome(void)
   // data for CSS styling
   m_mainWidget->setId("maincontainer");
   m_dashtabs->addStyleClass("wrapper-container");
-  m_dashtabs->addTab(createSettingPage(), tr("Account & Settings").toStdString());
+  m_dashtabs->addTab(createAdminPage(), tr("Account & Settings").toStdString());
   
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     initOperatorDashboard();
@@ -160,14 +161,20 @@ void WebMainUI::createMainUI(void)
 }
 
 
+void WebMainUI::setupInfoBox(void)
+{
+  m_infoBox = new Wt::WText();
+  m_infoBox->hide();
+  m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
+}
+
 void WebMainUI::setupProfileMenus(void)
 {
   Wt::WMenu* profileMenu = new Wt::WMenu();
   m_navbar->addMenu(profileMenu, Wt::AlignRight);
   
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
-
-    m_notificationManager = new WebNotificationManager(m_dbSession, m_mainWidget);
+    setupNotificationManager();
 
     Wt::WTemplate* notificationSectionTpl = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
@@ -223,11 +230,11 @@ void WebMainUI::setupProfileMenus(void)
 
 Wt::WWidget* WebMainUI::createMainNotificationIcon(void)
 {
-   Wt::WPushButton* widget = new Wt::WPushButton(" ");
-   widget->setStyleClass("fa fa-bell btn btn-danger");
-   widget->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
-   widget->setToolTip(Q_TR("Manage notifications"));
-   return widget;
+  Wt::WPushButton* widget = new Wt::WPushButton(" ");
+  widget->setStyleClass("fa fa-bell btn btn-danger");
+  widget->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
+  widget->setToolTip(Q_TR("Manage notifications"));
+  return widget;
 }
 
 void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
@@ -239,8 +246,12 @@ void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
       menuItem->setText(tr("Hide Settings").toStdString());
       wApp->doJavaScript("$('#userMenuBlock').hide(); "
                          "$('#viewMenuBlock').hide();"
-                         "$('#menu-auth-settings').hide();");
+                         "$('#menu-auth-settings').hide();"
+                         "$('#menu-notification-settings').hide();");
+
       m_preferences->showAuthSettingsWidgets(false);
+      m_preferences->showMonitoringSettingsWidgets(false);
+
     }
   } else {
     if (m_dashtabs->count() > 1) {
@@ -387,7 +398,7 @@ void WebMainUI::openFileUploadDialog(void)
   
   // React to a file upload problem.
   m_uploader->fileTooLarge().connect(std::bind([=] () {
-    showMessage(tr("File too large.").toStdString(), OperationError);
+    showMessage(ngrt4n::OperationFailed, tr("File too large.").toStdString());
   }));
   m_fileUploadDialog->show();
 }
@@ -408,7 +419,7 @@ void WebMainUI::finishFileDialog(int action)
           if (! parser.process(false)) {
             std::string msg = tr("Invalid description file").toStdString();
             LOG("warn", msg);
-            showMessage(msg, OperationError);
+            showMessage(ngrt4n::OperationFailed, msg);
           } else {
             std::string filename = m_uploader->clientFileName().toUTF8();
             QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
@@ -421,7 +432,7 @@ void WebMainUI::finishFileDialog(int action)
             view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
             view.path = dest.toStdString();
             if (m_dbSession->addView(view) != 0){
-              showMessage(m_dbSession->lastError(), OperationError);
+              showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
             } else {
               QString msg = tr("View added. "
                                " Name: %1\n - "
@@ -429,7 +440,7 @@ void WebMainUI::finishFileDialog(int action)
                                " Path: %3").arg(view.name.c_str(),
                                                 QString::number(view.service_count),
                                                 view.path.c_str());
-              showMessage(msg.toStdString(), OperationSuccess);
+              showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
             }
           }
         }
@@ -443,7 +454,7 @@ void WebMainUI::finishFileDialog(int action)
         loadView(m_selectedFile, dashbord);
         m_selectedFile.clear();
       } else {
-        showMessage(tr("No file selected").toStdString(), OperationError);
+        showMessage(ngrt4n::OperationFailed, tr("No file selected").toStdString());
       }
       break;
     default:
@@ -457,12 +468,12 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
     dashboardWidget = NULL;
     dashboardWidget = new WebDashboard(path.c_str(), m_eventFeedLayout);
     if (! dashboardWidget) {
-      showMessage("Cannot allocate the dashboard widget", OperationError);
+      showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return ;
     }
     dashboardWidget->initialize(m_preferences);
     if (dashboardWidget->lastErrorState()) {
-      showMessage(dashboardWidget->lastErrorMsg().toStdString(), OperationError);
+      showMessage(ngrt4n::OperationFailed, dashboardWidget->lastErrorMsg().toStdString());
       delete dashboardWidget;
       dashboardWidget = NULL;
     } else {
@@ -474,8 +485,8 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
         tab->triggered().connect(std::bind([=]() { m_currentDashboardPtr = dashboardWidget; }));
         m_dashTabWidgets.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
       } else {
-        showMessage(tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString(),
-                    OperationError);
+        showMessage(ngrt4n::OperationFailed,
+                    tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
         delete dashboardWidget;
         dashboardWidget = NULL;
       }
@@ -484,7 +495,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     LOG("error", errorMsg);
     delete dashboardWidget;
-    showMessage(errorMsg, OperationError);
+    showMessage(ngrt4n::OperationFailed, errorMsg);
   }
 }
 
@@ -495,28 +506,26 @@ void WebMainUI::scaleMap(double factor)
   }
 }
 
-Wt::WWidget* WebMainUI::createSettingPage(void)
+Wt::WWidget* WebMainUI::createAdminPage(void)
 {
-  m_infoBox = new Wt::WText();
-  m_infoBox->hide();
-  m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
-
   m_mgntContentWidgets = new Wt::WStackedWidget(m_mainWidget);
 
-  Wt::WTemplate* settingPageTpl = new Wt::WTemplate(Wt::WString::tr("admin-home.tpl"));
-  settingPageTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText(m_mainWidget));
-  settingPageTpl->bindWidget("contents", m_mgntContentWidgets);
-  settingPageTpl->bindWidget("info-box", m_infoBox);
+  Wt::WTemplate* adminPageTpl = new Wt::WTemplate(Wt::WString::tr("admin-home.tpl"));
+  adminPageTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText(m_mainWidget));
+  adminPageTpl->bindWidget("contents", m_mgntContentWidgets);
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
     case DboUser::AdmRole: {
+
+      adminPageTpl->bindWidget("info-box", m_infoBox);
       m_preferences->setEnabledInputs(true);
+
       // Start menu
       std::string menuText = QObject::tr("Welcome").toStdString();
       std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
-      settingPageTpl->bindWidget("menu-get-started", link);
+      adminPageTpl->bindWidget("menu-get-started", link);
       Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
       m_mgntContentWidgets->addWidget(getStartPage);
       link->clicked().connect(std::bind([=](){
@@ -529,7 +538,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       menuText = QObject::tr("Import").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
-      settingPageTpl->bindWidget("menu-import", link);
+      adminPageTpl->bindWidget("menu-import", link);
       m_menuLinks.insert(MenuImport, link);
 
       // menu preview
@@ -537,7 +546,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       menuText = QObject::tr("Preview").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       link->clicked().connect(this, &WebMainUI::selectFileToOpen);
-      settingPageTpl->bindWidget("menu-preview", link);
+      adminPageTpl->bindWidget("menu-preview", link);
       m_menuLinks.insert(MenuPreview, link);
 
       // Create view management form
@@ -557,7 +566,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       // link views and acl
       link = new Wt::WAnchor("#", menuText);
       link->clicked().connect(this, &WebMainUI::handleViewAclMenu);
-      settingPageTpl->bindWidget("menu-all-views", link);
+      adminPageTpl->bindWidget("menu-all-views", link);
       m_menuLinks.insert(MenuViewAndAcl, link);
 
       // User menus
@@ -565,9 +574,9 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       m_mgntContentWidgets->addWidget(m_dbUserManager->userForm());
       m_dbUserManager->updateCompleted().connect(std::bind([=](int retCode) {
         if (retCode != 0) {
-          showMessage(m_dbSession->lastError(), OperationError);
+          showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
         } else {
-          showMessage("Updated successfully", OperationSuccess);
+          showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
           m_dbUserManager->resetUserForm();
         }
       }, std::placeholders::_1));
@@ -575,14 +584,14 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       // link new user
       link = new Wt::WAnchor("#", Q_TR("New User"));
       link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
-      settingPageTpl->bindWidget("menu-new-user", link);
+      adminPageTpl->bindWidget("menu-new-user", link);
       m_menuLinks.insert(MenuNewUser, link);
 
       // built-in menu
       m_mgntContentWidgets->addWidget(m_dbUserManager->dbUserListWidget());
       link = new Wt::WAnchor("#", Q_TR("All Users"));
       link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
-      settingPageTpl->bindWidget("menu-builin-users", link);
+      adminPageTpl->bindWidget("menu-builin-users", link);
       m_menuLinks.insert(MenuBuiltInUsers, link);
 
 
@@ -592,19 +601,21 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
       link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
       link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
       m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
-      settingPageTpl->bindWidget("menu-ldap-users", link);
+      adminPageTpl->bindWidget("menu-ldap-users", link);
       m_menuLinks.insert(MenuLdapUsers, link);
 
     }
       break;
     default: {
+      adminPageTpl->bindEmpty("info-box");
       wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
-      settingPageTpl->bindEmpty("menu-get-started");
-      settingPageTpl->bindEmpty("menu-import");
-      settingPageTpl->bindEmpty("menu-preview");
-      settingPageTpl->bindEmpty("menu-all-views");
-      settingPageTpl->bindEmpty("menu-new-user");
-      settingPageTpl->bindEmpty("menu-all-users");
+      adminPageTpl->bindEmpty("menu-get-started");
+      adminPageTpl->bindEmpty("menu-import");
+      adminPageTpl->bindEmpty("menu-preview");
+      adminPageTpl->bindEmpty("menu-all-views");
+      adminPageTpl->bindEmpty("menu-new-user");
+      adminPageTpl->bindEmpty("menu-all-users");
+      adminPageTpl->bindEmpty("menu-notification-settings");
     }
       break;
   }
@@ -612,7 +623,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   // monitoring settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
-  settingPageTpl->bindWidget("menu-monitoring-settings", link);
+  adminPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Setting up Monitoring Sources"));
@@ -623,7 +634,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   // auth settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", Q_TR("User Authentication"));
-  settingPageTpl->bindWidget("menu-auth-settings", link);
+  adminPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
@@ -634,7 +645,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   // notification settings menu
   m_mgntContentWidgets->addWidget(m_preferences);
   link = new Wt::WAnchor("#", Q_TR("Notification Options"));
-  settingPageTpl->bindWidget("menu-notification-settings", link);
+  adminPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Notification Settings"));
@@ -645,7 +656,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   // my account menu
   m_mgntContentWidgets->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", Q_TR("My Account"));
-  settingPageTpl->bindWidget("menu-my-account", link);
+  adminPageTpl->bindWidget("menu-my-account", link);
   m_menuLinks.insert(MenuMyAccount, link);
   link->clicked().connect(std::bind([=](){
     m_userAccountForm->resetValidationState(false);
@@ -656,7 +667,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
   // change password settings
   m_mgntContentWidgets->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password");
-  settingPageTpl->bindWidget("menu-change-password", link);
+  adminPageTpl->bindWidget("menu-change-password", link);
   m_menuLinks.insert(MenuChangePassword, link);
   link->clicked().connect(std::bind([=](){
     m_mgntContentWidgets->setCurrentWidget(m_changePasswordPanel);
@@ -664,7 +675,7 @@ Wt::WWidget* WebMainUI::createSettingPage(void)
     m_adminPanelTitle->setText("Change password");
   }));
 
-  return settingPageTpl;
+  return adminPageTpl;
 }
 
 
@@ -676,9 +687,9 @@ void WebMainUI::createAccountPanel(void)
   m_userAccountForm->validated().connect(std::bind([=](DboUser userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
-      showMessage(Q_TR("Update failed, see details in log."), OperationError);
+      showMessage(ngrt4n::OperationFailed, Q_TR("Update failed, see details in log."));
     } else {
-      showMessage(Q_TR("Update completed."), OperationSuccess);
+      showMessage(ngrt4n::OperationSucceeded, Q_TR("Update completed."));
     }}, std::placeholders::_1));
 }
 
@@ -694,9 +705,9 @@ void WebMainUI::createPasswordPanel(void)
                                                                      const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
     if (ret != 0) {
-      showMessage(Q_TR("Change password failed, see details in log."), OperationError);
+      showMessage(ngrt4n::OperationFailed, Q_TR("Change password failed, see details in log."));
     } else {
-      showMessage(Q_TR("Password updated successfully"), OperationSuccess);
+      showMessage(ngrt4n::OperationSucceeded, Q_TR("Password updated successfully"));
     }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
@@ -738,13 +749,13 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 }
 
 
-void WebMainUI::showMessage(const std::string& msg, int status)
+void WebMainUI::showMessage(int status, const std::string& msg)
 {
   switch (status) {
-    case OperationSuccess:
+    case ngrt4n::OperationSucceeded:
       showMessageClass(msg, "alert alert-success");
       break;
-    case OperationError:
+    case ngrt4n::OperationFailed:
       showMessageClass(msg, "alert alert-warning");
       break;
     default:
@@ -875,7 +886,7 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
     return false;
     QString errMsg = tr("Unable to create the directory (%1)").arg(dir.absolutePath());
     LOG("error", errMsg.toStdString());
-    showMessage(errMsg.toStdString(), OperationError);
+    showMessage(ngrt4n::OperationFailed, errMsg.toStdString());
   }  else {
     ret = true;
     if (cleanContent) dir.remove("*");
@@ -917,7 +928,8 @@ void WebMainUI::handleInternalPath(void)
   } else if (path == LINK_LOGIN) {
     wApp->redirect(LINK_LOGIN);
   } else {
-    showMessage(Q_TR("Sorry, the request resource is not available or has been removed"),OperationError);
+    showMessage(ngrt4n::OperationFailed,
+                Q_TR("Sorry, the request resource is not available or has been removed"));
   }
 }
 
@@ -939,11 +951,11 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 void WebMainUI::handleLdapUsersMenu(void)
 {
   if (m_preferences->getAuthenticationMode() != WebPreferences::LDAP) {
-    showMessage(Q_TR("Denied. LDAP authentication is disabled"), OperationError);
+    showMessage(ngrt4n::OperationFailed, Q_TR("Denied. LDAP authentication is disabled"));
   } else {
     m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
     if (m_ldapUserManager->updateUserList() <= 0) {
-      showMessage(m_ldapUserManager->lastError(), OperationError);
+      showMessage(ngrt4n::OperationFailed, m_ldapUserManager->lastError());
     }
     m_adminPanelTitle->setText(Q_TR("Manage LDAP Users"));
   }
@@ -978,13 +990,15 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 {
   switch (status) {
     case LdapUserManager::EnableAuthSuccess:
-      showMessage(Q_TR("LDAP authentication enabled for user ") + data, OperationSuccess);
+      showMessage(ngrt4n::OperationSucceeded,
+                  Q_TR("LDAP authentication enabled for user ") + data);
       break;
     case LdapUserManager::DisableAuthSuccess:
-      showMessage(Q_TR("LDAP authentication disabled for user ") + data, OperationSuccess);
+      showMessage(ngrt4n::OperationSucceeded,
+                  Q_TR("LDAP authentication disabled for user ") + data);
       break;
     case LdapUserManager::GenericError:
-      showMessage(data, OperationError);
+      showMessage(ngrt4n::OperationFailed, data);
       break;
     default:
       break;
@@ -1055,3 +1069,9 @@ Wt::WContainerWidget* WebMainUI::createReportExportLinks(const std::string& view
   return anchor;
 }
 
+
+void WebMainUI::setupNotificationManager(void)
+{
+  m_notificationManager = new WebNotificationManager(m_dbSession, m_mainWidget);
+  m_notificationManager->operationCompleted().connect(this, &WebMainUI::showMessage);
+}

@@ -211,6 +211,7 @@ public:
   QString valueString(void) const {return QString::number(m_sev);}
   bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
   QString toString(void) const;
+  std::string toStdString(void) const;
   Severity operator *(Severity& sev) const;
   Severity operator / (Severity& st) const;
   Severity operator ++();

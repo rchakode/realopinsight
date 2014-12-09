@@ -82,6 +82,11 @@ QString Severity::toString(void) const
   return QObject::tr("Unknown");
 }
 
+std::string Severity::toStdString(void) const
+{
+  return toString().toStdString();
+}
+
 
 Severity Severity::operator *(Severity& sev) const
 {
