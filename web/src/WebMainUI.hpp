@@ -101,7 +101,7 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
-  void openViewTab(Wt::WWidget* viewWidget) {m_dashtabs->setCurrentWidget(viewWidget);}
+  void openViewTab(Wt::WWidget* viewWidget) {m_dashboardContainer->setCurrentWidget(viewWidget);}
 
 private:
   enum FileDialogAction {
@@ -109,7 +109,6 @@ private:
     OPEN = 1
   };
   typedef std::map<QString, WebDashboard*> DashboardListT;
-  typedef std::map<QString, Wt::WMenuItem*> DashTabWidgetsT;
   typedef std::map<std::string, QosTrendsChart*> QosTrendsChartList;
   typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartList;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
@@ -137,7 +136,7 @@ private:
   Wt::WStackedWidget* m_contents;
   Wt::WStackedWidget* m_mgntContentWidgets;
   Wt::WNavigationBar* m_navbar;
-  Wt::WTabWidget* m_dashtabs;
+  Wt::WStackedWidget* m_dashboardContainer;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
@@ -153,7 +152,6 @@ private:
   bool m_showSettingTab;
   WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
-  DashTabWidgetsT m_dashTabWidgets;
   QosTrendsChartList m_qosCharts;
   RawQosTrendsChartList m_rawQosCharts;
   QosDataByViewMapT m_qosData;

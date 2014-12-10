@@ -78,7 +78,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_preferences(new WebPreferences()),
-    m_dashtabs(new Wt::WTabWidget()),
+    m_dashboardContainer(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
     m_currentDashboardPtr(NULL),
@@ -138,13 +138,13 @@ void WebMainUI::showUserHome(void)
   
   // data for CSS styling
   m_mainWidget->setId("maincontainer");
-  m_dashtabs->addStyleClass("wrapper-container");
-  m_dashtabs->addTab(createAdminPage(), tr("Account & Settings").toStdString());
+  m_dashboardContainer->addStyleClass("wrapper-container");
+  m_dashboardContainer->addWidget(createAdminPage());
   
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     initOperatorDashboard();
-    m_dashtabs->setTabHidden(0, true);
-    m_dashtabs->setCurrentIndex(1);
+    //FIXME: m_dashtabs->setTabHidden(0, true);
+    m_dashboardContainer->setCurrentIndex(1);
   }
 }
 
@@ -158,7 +158,7 @@ void WebMainUI::createMainUI(void)
   // Create a container for stacked contents
   m_contents = new Wt::WStackedWidget(m_mainWidget);
   m_contents->setId("stackcontentarea");
-  m_contents->addWidget(m_dashtabs);
+  m_contents->addWidget(m_dashboardContainer);
 }
 
 
@@ -241,9 +241,9 @@ Wt::WWidget* WebMainUI::createMainNotificationIcon(void)
 void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
 {
   if (m_showSettingTab) {
-    if (m_dashtabs->count() > 1) {
-      m_dashtabs->setTabHidden(0, false);
-      m_dashtabs->setCurrentIndex(0);
+    if (m_dashboardContainer->count() > 1) {
+      //FIXME: m_dashtabs->setTabHidden(0, false);
+      m_dashboardContainer->setCurrentIndex(0);
       menuItem->setText(tr("Hide Settings").toStdString());
       wApp->doJavaScript("$('#userMenuBlock').hide(); "
                          "$('#viewMenuBlock').hide();"
@@ -255,9 +255,9 @@ void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
 
     }
   } else {
-    if (m_dashtabs->count() > 1) {
-      m_dashtabs->setTabHidden(0, true);
-      m_dashtabs->setCurrentIndex(1);
+    if (m_dashboardContainer->count() > 1) {
+      //FIXME: m_dashtabs->setTabHidden(0, true);
+      m_dashboardContainer->setCurrentIndex(1);
       menuItem->setText(tr("Show Account & Settings").toStdString());
     }
   }
@@ -324,7 +324,6 @@ void WebMainUI::handleRefresh(void)
     if (thumbItem != m_thumbnailItems.end()) {
       (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbItem)->setToolTip(dashboard->tooltip());
-      m_dashTabWidgets[viewName]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
       updateViewBiCharts(viewName.toStdString());
     }
     ++currentView;
@@ -467,39 +466,37 @@ void WebMainUI::finishFileDialog(int action)
   }
 }
 
-void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboardWidget)
+void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
 {
   try {
-    dashboardWidget = NULL;
-    dashboardWidget = new WebDashboard(path.c_str(), m_eventFeedLayout);
-    if (! dashboardWidget) {
+    dashboard = NULL;
+    dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
+    if (! dashboard) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return ;
     }
-    dashboardWidget->initialize(m_preferences);
-    if (dashboardWidget->lastErrorState()) {
-      showMessage(ngrt4n::OperationFailed, dashboardWidget->lastErrorMsg().toStdString());
-      delete dashboardWidget;
-      dashboardWidget = NULL;
+    dashboard->initialize(m_preferences);
+    if (dashboard->lastErrorState()) {
+      showMessage(ngrt4n::OperationFailed, dashboard->lastErrorMsg().toStdString());
+      delete dashboard;
+      dashboard = NULL;
     } else {
-      QString platformName = dashboardWidget->rootNode().name;
+      QString platformName = dashboard->rootNode().name;
       std::pair<DashboardListT::iterator, bool> result;
-      result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboardWidget));
+      result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
       if (result.second) {
-        Wt::WMenuItem* tab = m_dashtabs->addTab(dashboardWidget->getWidget(), platformName.toStdString());
-        tab->triggered().connect(std::bind([=]() { m_currentDashboardPtr = dashboardWidget; }));
-        m_dashTabWidgets.insert(std::pair<QString, Wt::WMenuItem*>(platformName, tab));
+        m_dashboardContainer->addWidget(dashboard->getWidget());
       } else {
         showMessage(ngrt4n::OperationFailed,
                     tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
-        delete dashboardWidget;
-        dashboardWidget = NULL;
+        delete dashboard;
+        dashboard = NULL;
       }
     }
   } catch (const std::bad_alloc&) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     LOG("error", errorMsg);
-    delete dashboardWidget;
+    delete dashboard;
     showMessage(ngrt4n::OperationFailed, errorMsg);
   }
 }
@@ -557,14 +554,15 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
       // Create view management form
       menuText = QObject::tr("Views and Access Control").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
-      m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
-        DashTabWidgetsT::iterator tabItem = m_dashTabWidgets.find(viewName.c_str());
-        if (tabItem != m_dashTabWidgets.end()) {
-          m_dashtabs->removeTab(tabItem->second);
-          delete tabItem->second;
-          m_dashTabWidgets.erase(tabItem->first);
-        }
-      }, std::placeholders::_1));
+      //FIXME: removed view from stacked widget
+      //      m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
+      //        DashboardItemsT::iterator dashboardItemIter = m_dashboardItems.find(viewName.c_str());
+      //        if (dashboardItemIter != m_dashboardItems.end()) {
+      //          m_dashboardContainer->removeWidget(dashboardItemIter->second);
+      //          delete (*dashboardItemIter);
+      //          m_dashboardItems.remove(viewName);
+      //        }
+      //      }, std::placeholders::_1));
       m_mgntContentWidgets->addWidget(m_viewAccessPermissionForm);
 
 
@@ -819,7 +817,7 @@ void WebMainUI::initOperatorDashboard(void)
   m_operatorHomeTpl->bindWidget("report-period-header-pane", createReportSectionHeader());
   m_operatorHomeTpl->bindWidget("bigraphs", bigraphs);
   m_operatorHomeTpl->bindWidget("event-feeds", eventFeeds);
-  m_dashtabs->addTab(m_operatorHomeTpl, Q_TR("Operations Console"));
+  m_dashboardContainer->addWidget(m_operatorHomeTpl);
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
