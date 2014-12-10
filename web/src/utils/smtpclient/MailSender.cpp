@@ -8,7 +8,8 @@ MailSender::MailSender(const QString& smtpHost,
                        bool useStartSsl)
   : QxtSmtp(),
     m_host(smtpHost),
-    m_port(port)
+    m_port(port),
+    m_connected(false)
 {
   addEvents();
   setUsername(username.toAscii());
@@ -21,10 +22,11 @@ int MailSender::send(const QString& sender,
                      const QString& subject,
                      const QString& body)
 {
-  connectToHost(m_host, m_port);
-
-  if (m_eventSynchonizer.exec() != 0)
-    return -1;
+  if (! m_connected) {
+    connectToHost(m_host, m_port);
+    if (m_eventSynchonizer.exec() != 0)
+      return -1;
+  }
 
   QxtMailMessage message;
 
@@ -44,18 +46,19 @@ int MailSender::send(const QString& sender,
   m_spool.insert(messageId, message);
   int exitCode = m_eventSynchonizer.exec();
 
-  disconnectFromHost();
   return exitCode;
 }
 
 
 void MailSender::handleConnected(void)
 {
+  m_connected = true;
   m_eventSynchonizer.exit(0);
 }
 
 void MailSender::handleConnectionFailed(const QByteArray& msg)
 {
+  m_connected = false;
   m_lastError = tr("SMTP connection failed: %1").arg(QString(msg));
   m_eventSynchonizer.exit(-1);
 }

@@ -42,6 +42,8 @@ namespace {
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
   const std::string WWW_ROOT = REALOPINSIGHT_WWW_ROOT;
+  const double THUMBNAIL_WIDTH = 75;
+  const double THUMBNAIL_HEIGHT = 50;
 }
 
 WebMap::WebMap(CoreDataT* _cdata)
@@ -228,16 +230,15 @@ void WebMap::handleContainedSizeChanged(double w, double h)
 void WebMap::updateThumbnail(void)
 {
   static int roundCount = 0;
-  double thumbWidth = 150; //change later
-  double thumbHeight = 120;
+  double thumbWidth = THUMBNAIL_WIDTH; //change later
   double factor = (double)ngrt4n::XSCAL_FACTOR/ngrt4n::YSCAL_FACTOR;
-  double thumbScaleY = thumbHeight/m_cdata->map_height;
-  double thumbScaleX = factor * thumbHeight * thumbScaleY/m_cdata->map_height;
+  double thumbScaleY = THUMBNAIL_HEIGHT/m_cdata->map_height;
+  double thumbScaleX = factor * THUMBNAIL_HEIGHT * thumbScaleY/m_cdata->map_height;
   thumbWidth = thumbScaleX*m_cdata->map_width + 20;
 
   m_translateY = 10;
   m_translateY = 0;
-  Wt::WSvgImage thumbnailImg(thumbWidth, thumbHeight + m_translateY);
+  Wt::WSvgImage thumbnailImg(thumbWidth, THUMBNAIL_HEIGHT + m_translateY);
 
   m_painter.reset(new Wt::WPainter(&thumbnailImg));
   m_painter->scale(thumbScaleX, thumbScaleY);

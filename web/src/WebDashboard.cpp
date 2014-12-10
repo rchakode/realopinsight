@@ -104,6 +104,7 @@ void WebDashboard::initialize(Preferences* preferencePtr)
   DashboardBase::initialize(preferencePtr);
   if (! DashboardBase::lastErrorState()) {
     m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
+    m_thumbnailProblemDetailsBar = new Wt::WLabel("", m_widget);
   } else {
     LOG("error", m_lastErrorMsg.toStdString());
     Q_EMIT errorOccurred(m_lastErrorMsg);
@@ -146,10 +147,9 @@ void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
   m_map->updateNode(_node, _tip);
 }
 
-void WebDashboard::updateThumbnail(void)
+void WebDashboard::updateThumbnailInfo(void)
 {
-  m_thumbnailTitleBar->setStyleClass(ngrt4n::severityCssClass(rootNode().sev));
-  m_map->thumbnail()->setToolTip(m_chart->buildTooltipText().toStdString());
+  m_thumbnailProblemDetailsBar->setText(m_chart->problemsDetailsText());
 }
 
 

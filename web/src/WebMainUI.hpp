@@ -112,6 +112,8 @@ private:
   typedef std::map<QString, Wt::WMenuItem*> DashTabWidgetsT;
   typedef std::map<std::string, QosTrendsChart*> QosTrendsChartList;
   typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartList;
+  typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
+  ThumbnailMapT m_thumbnailItems;
 
   /** Signals */
   Wt::Signal<void> m_terminateSession;
@@ -160,10 +162,8 @@ private:
   Wt::WDatePicker* m_reportEndDatePicker;
   Wt::WAnchor* m_reportApplyAnchor;
 
-
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
-  Wt::WTemplate* getDashboardThumbnail(WebDashboard* dashboard);
   Wt::WWidget* createAdminPage(void);
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);

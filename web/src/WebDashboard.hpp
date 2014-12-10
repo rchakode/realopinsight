@@ -28,6 +28,7 @@
 #include "DashboardBase.hpp"
 #include "WebTree.hpp"
 #include "WebPieChart.hpp"
+#include "WebUtils.hpp"
 #include <Wt/WGridLayout>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>
@@ -52,11 +53,14 @@ public:
   Wt::WWidget* getWidget(void) const {return m_widget;}
   void updateMap(void);
   WebMap* map(void) const {return m_map;}
-  void updateThumbnail(void);
+  void updateThumbnailInfo(void);
   Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
   Wt::WLabel* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
+  Wt::WLabel* thumbnailProblemDetailBar(void) {return m_thumbnailProblemDetailsBar;}
+  std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
   void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
   virtual void initialize(Preferences* preferencePtr);
+  std::string tooltip(void) const {return m_chart->toStdString();}
 
 
 protected:
@@ -79,6 +83,7 @@ private:
   WebMsgConsole* m_msgConsole;
   WebPieChart* m_chart;
   Wt::WLabel* m_thumbnailTitleBar;
+  Wt::WLabel* m_thumbnailProblemDetailsBar;
   Wt::WVBoxLayout* m_eventFeedLayout;
   EventFeedItemsT m_eventFeedItems;
 

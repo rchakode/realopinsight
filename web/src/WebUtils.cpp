@@ -107,6 +107,63 @@ std::string ngrt4n::severityCssClass(int severity)
   return cssClass;
 }
 
+std::string ngrt4n::severityHtmlColor(int severity)
+{
+  std::string color = "#000000";
+  switch (static_cast<ngrt4n::SeverityT>(severity)) {
+    case ngrt4n::Normal:
+      color = "#00ff00";
+      break;
+    case ngrt4n::Minor:
+      color ="#ffff00";
+      break;
+    case ngrt4n::Major:
+      color = "#ffa500";
+      break;
+    case ngrt4n::Critical:
+      color = "#ff0000";
+      break;
+    case ngrt4n::Unknown:
+    default:
+      color = "#c0c0c0";
+      break;
+  }
+  return color;
+}
+
+
+Wt::WColor ngrt4n::severityWColor(int severity)
+{
+  return Wt::WColor(severityHtmlColor(severity));
+}
+
+std::string ngrt4n::thumbnailCssClass(int severity)
+{
+  std::string cssClass = "";
+  switch(severity) {
+    case ngrt4n::Normal:
+      cssClass.append("btn btn-normal");
+      break;
+    case ngrt4n::Minor:
+      cssClass.append("btn btn-minor");
+      break;
+    case ngrt4n::Major:
+      cssClass.append("btn btn-major");
+      break;
+    case ngrt4n::Critical:
+      cssClass.append("btn btn-critical");
+      break;
+    case ngrt4n::Unknown:
+      cssClass.append("btn btn-unknown");
+      break;
+    default:
+      cssClass.append("btn btn-unknown");
+      break;
+  }
+  return cssClass;
+}
+
+
 std::string ngrt4n::getPathFromQtResource(const QString& qtPath, const std::string& docRoot)
 {
   return docRoot+qtPath.mid(2, -1).toStdString();
@@ -177,31 +234,6 @@ Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, c
                                   Wt::XHTMLText);
   link->setToolTip(tip);
   return link;
-}
-
-
-Wt::WColor ngrt4n::severityWColor(const int& _criticity)
-{
-  Wt::WColor color;
-  switch (static_cast<ngrt4n::SeverityT>(_criticity)) {
-    case ngrt4n::Normal:
-      color = Wt::WColor("#00ff00");
-      break;
-    case ngrt4n::Minor:
-      color = Wt::WColor("#ffff00");
-      break;
-    case ngrt4n::Major:
-      color = Wt::WColor("#ffa500");
-      break;
-    case ngrt4n::Critical:
-      color = Wt::WColor("#ff0000");
-      break;
-    case ngrt4n::Unknown:
-    default:
-      color = Wt::WColor(" #c0c0c0");
-      break;
-  }
-  return color;
 }
 
 void ngrt4n::log(const std::string& level, const std::string& msg)

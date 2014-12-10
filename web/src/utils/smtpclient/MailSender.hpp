@@ -29,6 +29,7 @@ protected Q_SLOTS:
 private:
   QString m_host;
   int m_port;
+  bool m_connected;
   QString m_lastError;
   QEventLoop m_eventSynchonizer;
   QMap<int, QxtMailMessage> m_spool;

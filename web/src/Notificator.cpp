@@ -31,13 +31,13 @@ namespace {
       "<h2>%1</h2>" // %1 = {PROBLEM, RECOVERY}
       "<hr />"
       "<p>"
-      "Check Time: %2  <br />"
-      "State:      %3  <br />"
-      "Last State: %4  <br />"
+      "Last Change: %2  <br />"
+      "Current Status:<span style=\"background-color: %3;\"> %4 </span><br />"
+      "Last Status: <span style=\"background-color: %5;\"> %6 </span>  <br />"
       "</p>"
       "<h2>Service Details</h2>"
       "<hr />"
-      "%5";   // Print root node details\n"
+      "%7";   // Print root node details\n"
 }
 
 
@@ -52,31 +52,35 @@ Notificator::Notificator(DbSession* dbSession)
 }
 
 
-void Notificator::sendEmailNotification(const NodeT& node, int lastState, const QosDataT& qosData, const QStringList& recipients)
+void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const QosDataT& qosData, const QStringList& recipients)
 {
   if (m_preferences.getNotificationType() != WebPreferencesBase::EmailNotification) {
     // do nothing and exit
     return;
   }
 
-  QString stateString = Severity(node.sev).toString();
-  QString lastStateString = Severity(lastState).toString();
+  QString statusString = Severity(node.sev).toString().toUpper();
+  QString statusHtmlColor = QString::fromStdString(ngrt4n::severityHtmlColor(node.sev));
+  QString lastStateString = Severity(lastStatus).toString().toUpper();
+  QString lastStatusHtmlColor = QString::fromStdString(ngrt4n::severityHtmlColor(lastStatus));
 
   QString emailSubject;
-  if (lastState != ngrt4n::Normal && node.sev == ngrt4n::Normal) {
+  if (lastStatus != ngrt4n::Normal && node.sev == ngrt4n::Normal) {
     emailSubject = QString("%1 - Recovery").arg(node.name);
   } else {
-    emailSubject = QString("%1 - %2 State Problem").arg(node.name, stateString);
+    emailSubject = QString("%1 - %2 Status Problem").arg(node.name, statusString);
   }
 
   REPORTD_LOG("info", emailSubject);
 
   QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
-                           emailSubject,
-                           ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
-                           stateString,
-                           lastStateString,
-                           node.toString().replace("\n", "<br />"));
+        emailSubject,
+        ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
+        statusHtmlColor,
+        statusString,
+        lastStatusHtmlColor,
+        lastStateString,
+        node.toString().replace("\n", "<br />"));
 
 
   int retCode = m_mailSender->send(m_preferences.getSmtpUsername().c_str(),

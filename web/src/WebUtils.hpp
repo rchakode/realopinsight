@@ -55,6 +55,9 @@ namespace ngrt4n {
                    const std::string& successMsg, Wt::WText* infoBox);
   std::string tr(const std::string& msg);
   std::string severityCssClass(int severity);
+  std::string severityHtmlColor(int severity);
+  std::string thumbnailCssClass(int severity);
+  Wt::WColor severityWColor(int severity);
   std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
   Wt::WWidget* footer(void);
   std::string sqliteDbPath(void);
@@ -64,7 +67,6 @@ namespace ngrt4n {
   Wt::WString wHumanTimeText(const std::string& mytime_t);
   Wt::WString wTimeToNow(const std::string& mytime_t);
   Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip);
-  Wt::WColor severityWColor(const int& _criticity);
   void log(const std::string& level, const std::string& msg);
   void logReportd(const std::string& level, const std::string& msg);
   void logReportd(const std::string& level, const QString& msg);

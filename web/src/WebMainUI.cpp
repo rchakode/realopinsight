@@ -308,21 +308,25 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Critical] = 0;
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
-
   int currentView = 1;
-  for (auto& dash : m_dashboards) {
-    dash.second->initSettings(m_preferences);
-    dash.second->runMonitor();
-    dash.second->updateMap();
-    dash.second->updateThumbnail();
-    int platformSeverity = qMin(dash.second->rootNode().sev, (int)ngrt4n::Unknown);
-    if (platformSeverity != ngrt4n::Normal) {
-      ++problemTypeCount[platformSeverity];
-    }
+  for (auto& entry : m_dashboards) {
+    WebDashboard* dashboard = entry.second;
+    dashboard->initSettings(m_preferences);
+    dashboard->runMonitor();
+    dashboard->updateMap();
+    dashboard->updateThumbnailInfo();
 
-    QString viewName = dash.second->rootNode().name;
-    m_dashTabWidgets[viewName]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
-    updateViewBiCharts(viewName.toStdString());
+    int platformSeverity = qMin(dashboard->rootNode().sev, (int)ngrt4n::Unknown);
+    if (platformSeverity != ngrt4n::Normal) ++problemTypeCount[platformSeverity];
+
+    QString viewName = dashboard->rootNode().name;
+    ThumbnailMapT::Iterator thumbItem = m_thumbnailItems.find(viewName.toStdString());
+    if (thumbItem != m_thumbnailItems.end()) {
+      (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
+      (*thumbItem)->setToolTip(dashboard->tooltip());
+      m_dashTabWidgets[viewName]->setStyleClass( ngrt4n::severityCssClass(platformSeverity) );
+      updateViewBiCharts(viewName.toStdString());
+    }
     ++currentView;
   }
 
@@ -826,12 +830,18 @@ void WebMainUI::initOperatorDashboard(void)
     WebDashboard* dashboard;
     loadView(view.path, dashboard);
     if (dashboard) {
-      Wt::WTemplate* thumb = getDashboardThumbnail(dashboard);
-      thumb->setStyleClass("btn view-thumbnail");
-      thumb->clicked().connect(std::bind([=](){ openViewTab(dashboard->getWidget());}));
-      QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(openViewTab(Wt::WWidget*)));
-      thumbLayout->addWidget(thumb, thumbIndex / THUMBNAILS_PER_ROW, thumbIndex % THUMBNAILS_PER_ROW);
 
+      Wt::WTemplate* thumbItem = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
+      thumbItem->setStyleClass("btn btn-unknown");
+      thumbItem->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
+      thumbItem->bindWidget("thumb-image", dashboard->thumbnail());
+      thumbItem->bindWidget("thumb-problem-details", dashboard->thumbnailProblemDetailBar());
+      thumbItem->clicked().connect(std::bind([=](){ openViewTab(dashboard->getWidget());}));
+
+      QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(openViewTab(Wt::WWidget*)));
+      thumbLayout->addWidget(thumbItem, thumbIndex / THUMBNAILS_PER_ROW, thumbIndex % THUMBNAILS_PER_ROW);
+
+      m_thumbnailItems.insert(view.name, thumbItem);
       ++thumbIndex;
     }
   }
@@ -856,14 +866,6 @@ void WebMainUI::initOperatorDashboard(void)
   }
 }
 
-
-Wt::WTemplate* WebMainUI::getDashboardThumbnail(WebDashboard* dashboard)
-{
-  Wt::WTemplate * tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
-  tpl->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
-  tpl->bindWidget("thumb-image", dashboard->thumbnail());
-  return tpl;
-}
 
 void WebMainUI::setInternalPath(const std::string& path)
 {

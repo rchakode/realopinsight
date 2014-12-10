@@ -36,6 +36,16 @@ public:
   void updateSeverityInfo(void);
   QString buildTooltipText(void);
   double statusRatio(int status) const { return m_severityRatio[status]; }
+  std::string toStdString(void) {return buildTooltipText().toStdString();}
+  int problemCount(void) {
+    return m_statsData[ngrt4n::Minor]
+        + m_statsData[ngrt4n::Major]
+        + m_statsData[ngrt4n::Critical]
+        + m_statsData[ngrt4n::Unknown];}
+  std::string problemsDetailsText(void) {
+    return QObject::tr("%1/%2 IT service problems")
+        .arg(QString::number(problemCount()))
+        .arg(QString::number(m_cdata->cnodes.size())).toStdString();}
 
 protected:
   CoreDataT* m_cdata;
