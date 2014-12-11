@@ -78,7 +78,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_preferences(new WebPreferences()),
-    m_dashboardContainer(new Wt::WStackedWidget()),
+    m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_showSettingTab(true),
     m_currentDashboardPtr(NULL),
@@ -104,7 +104,7 @@ WebMainUI::~WebMainUI()
   delete m_preferences;
   delete m_fileUploadDialog;
   delete m_navbar;
-  delete m_contents;
+  delete m_mainStackedContents;
   delete m_mainWidget;
   LOG("debug", "Session closed");
 }
@@ -138,27 +138,69 @@ void WebMainUI::showUserHome(void)
   
   // data for CSS styling
   m_mainWidget->setId("maincontainer");
-  m_dashboardContainer->addStyleClass("wrapper-container");
-  m_dashboardContainer->addWidget(createAdminPage());
+  m_dashboardStackedContents->addStyleClass("wrapper-container");
+  m_dashboardStackedContents->addWidget(createAdminPage());
   
   if (m_dbSession->loggedUser().role != DboUser::AdmRole) {
     initOperatorDashboard();
     //FIXME: m_dashtabs->setTabHidden(0, true);
-    m_dashboardContainer->setCurrentIndex(1);
+    m_dashboardStackedContents->setCurrentIndex(1);
   }
 }
 
 void WebMainUI::createMainUI(void)
 {
-  m_navbar = new Wt::WNavigationBar(m_mainWidget);
+  m_mainWidget->addWidget( createNavivationBar() );
+  m_mainWidget->addWidget( createBreadCrumbsBar() );
+  m_mainWidget->addWidget( createMainStackedContent() );
+}
+
+
+Wt::WNavigationBar* WebMainUI::createNavivationBar(void)
+{
+  m_navbar = new Wt::WNavigationBar();
   m_navbar->setResponsive(true);
   m_navbar->addWidget(createLogoLink(), Wt::AlignLeft);
   m_navbar->addWidget(new Wt::WTemplate(Wt::WString::tr("beta-message")));
-  
-  // Create a container for stacked contents
-  m_contents = new Wt::WStackedWidget(m_mainWidget);
-  m_contents->setId("stackcontentarea");
-  m_contents->addWidget(m_dashboardContainer);
+
+  return m_navbar;
+}
+
+Wt::WWidget* WebMainUI::createBreadCrumbsBar(void)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("breadcrumbs-bar.tpl"));
+  tpl->bindWidget("show-settings-link", createShowSettingsBreadCrumbsLink());
+  tpl->bindWidget("show-home-link", createShowHomeBreadCrumbsLink());
+  tpl->bindWidget("show-view-link", createShowViewBreadCrumbsLink());
+  return tpl;
+}
+
+Wt::WStackedWidget* WebMainUI::createMainStackedContent(void)
+{
+  m_mainStackedContents = new Wt::WStackedWidget();
+  m_mainStackedContents->setId("stackcontentarea");
+  m_mainStackedContents->addWidget(m_dashboardStackedContents);
+
+  return m_mainStackedContents;
+}
+
+
+Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
+{
+  Wt::WAnchor* link = new Wt::WAnchor("#", "Settings");
+  return link;
+}
+
+Wt::WAnchor* WebMainUI::createShowHomeBreadCrumbsLink(void)
+{
+  Wt::WAnchor* link = new Wt::WAnchor("#", "Home");
+  return link;
+}
+
+Wt::WAnchor* WebMainUI::createShowViewBreadCrumbsLink(void)
+{
+  Wt::WAnchor* link = new Wt::WAnchor("#", "Show View");
+  return link;
 }
 
 
@@ -241,9 +283,8 @@ Wt::WWidget* WebMainUI::createMainNotificationIcon(void)
 void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
 {
   if (m_showSettingTab) {
-    if (m_dashboardContainer->count() > 1) {
-      //FIXME: m_dashtabs->setTabHidden(0, false);
-      m_dashboardContainer->setCurrentIndex(0);
+    if (m_dashboardStackedContents->count() > 1) {
+      m_dashboardStackedContents->setCurrentIndex(0);
       menuItem->setText(tr("Hide Settings").toStdString());
       wApp->doJavaScript("$('#userMenuBlock').hide(); "
                          "$('#viewMenuBlock').hide();"
@@ -255,9 +296,8 @@ void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
 
     }
   } else {
-    if (m_dashboardContainer->count() > 1) {
-      //FIXME: m_dashtabs->setTabHidden(0, true);
-      m_dashboardContainer->setCurrentIndex(1);
+    if (m_dashboardStackedContents->count() > 1) {
+      m_dashboardStackedContents->setCurrentIndex(1);
       menuItem->setText(tr("Show Account & Settings").toStdString());
     }
   }
@@ -485,7 +525,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
       std::pair<DashboardListT::iterator, bool> result;
       result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
       if (result.second) {
-        m_dashboardContainer->addWidget(dashboard->getWidget());
+        m_dashboardStackedContents->addWidget(dashboard->getWidget());
       } else {
         showMessage(ngrt4n::OperationFailed,
                     tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
@@ -510,11 +550,11 @@ void WebMainUI::scaleMap(double factor)
 
 Wt::WWidget* WebMainUI::createAdminPage(void)
 {
-  m_mgntContentWidgets = new Wt::WStackedWidget(m_mainWidget);
+  m_adminStackedContents = new Wt::WStackedWidget(m_mainWidget);
 
   Wt::WTemplate* adminPageTpl = new Wt::WTemplate(Wt::WString::tr("admin-home.tpl"));
   adminPageTpl->bindWidget("title", m_adminPanelTitle = new Wt::WText(m_mainWidget));
-  adminPageTpl->bindWidget("contents", m_mgntContentWidgets);
+  adminPageTpl->bindWidget("contents", m_adminStackedContents);
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
@@ -529,9 +569,9 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       adminPageTpl->bindWidget("menu-get-started", link);
       Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
-      m_mgntContentWidgets->addWidget(getStartPage);
+      m_adminStackedContents->addWidget(getStartPage);
       link->clicked().connect(std::bind([=](){
-        m_mgntContentWidgets->setCurrentWidget(getStartPage);
+        m_adminStackedContents->setCurrentWidget(getStartPage);
         m_adminPanelTitle->setText(contentTitle);
       }));
       m_menuLinks.insert(MenuWelcome, link);
@@ -563,7 +603,7 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
       //          m_dashboardItems.remove(viewName);
       //        }
       //      }, std::placeholders::_1));
-      m_mgntContentWidgets->addWidget(m_viewAccessPermissionForm);
+      m_adminStackedContents->addWidget(m_viewAccessPermissionForm);
 
 
       // link views and acl
@@ -574,7 +614,7 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
 
       // User menus
       m_dbUserManager = new DbUserManager(m_dbSession);
-      m_mgntContentWidgets->addWidget(m_dbUserManager->userForm());
+      m_adminStackedContents->addWidget(m_dbUserManager->userForm());
       m_dbUserManager->updateCompleted().connect(std::bind([=](int retCode) {
         if (retCode != 0) {
           showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
@@ -591,7 +631,7 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
       m_menuLinks.insert(MenuNewUser, link);
 
       // built-in menu
-      m_mgntContentWidgets->addWidget(m_dbUserManager->dbUserListWidget());
+      m_adminStackedContents->addWidget(m_dbUserManager->dbUserListWidget());
       link = new Wt::WAnchor("#", Q_TR("All Users"));
       link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
       adminPageTpl->bindWidget("menu-builin-users", link);
@@ -600,7 +640,7 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
 
       // ldap user menu
       m_ldapUserManager = new LdapUserManager(m_dbSession);
-      m_mgntContentWidgets->addWidget(m_ldapUserManager);
+      m_adminStackedContents->addWidget(m_ldapUserManager);
       link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
       link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
       m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
@@ -624,56 +664,56 @@ Wt::WWidget* WebMainUI::createAdminPage(void)
   }
 
   // monitoring settings menu
-  m_mgntContentWidgets->addWidget(m_preferences);
+  m_adminStackedContents->addWidget(m_preferences);
   link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
   adminPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Setting up Monitoring Sources"));
-    m_mgntContentWidgets->setCurrentWidget(m_preferences);
+    m_adminStackedContents->setCurrentWidget(m_preferences);
     m_preferences->showMonitoringSettings();
   }));
 
   // auth settings menu
-  m_mgntContentWidgets->addWidget(m_preferences);
+  m_adminStackedContents->addWidget(m_preferences);
   link = new Wt::WAnchor("#", Q_TR("User Authentication"));
   adminPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
-    m_mgntContentWidgets->setCurrentWidget(m_preferences);
+    m_adminStackedContents->setCurrentWidget(m_preferences);
     m_preferences->showAuthSettings();
   }));
 
   // notification settings menu
-  m_mgntContentWidgets->addWidget(m_preferences);
+  m_adminStackedContents->addWidget(m_preferences);
   link = new Wt::WAnchor("#", Q_TR("Notification Options"));
   adminPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Notification Settings"));
-    m_mgntContentWidgets->setCurrentWidget(m_preferences);
+    m_adminStackedContents->setCurrentWidget(m_preferences);
     m_preferences->showNotificationSettings();
   }));
 
   // my account menu
-  m_mgntContentWidgets->addWidget(m_userAccountForm);
+  m_adminStackedContents->addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", Q_TR("My Account"));
   adminPageTpl->bindWidget("menu-my-account", link);
   m_menuLinks.insert(MenuMyAccount, link);
   link->clicked().connect(std::bind([=](){
     m_userAccountForm->resetValidationState(false);
-    m_mgntContentWidgets->setCurrentWidget(m_userAccountForm);
+    m_adminStackedContents->setCurrentWidget(m_userAccountForm);
     m_adminPanelTitle->setText(Q_TR("My Account"));
   }));
 
   // change password settings
-  m_mgntContentWidgets->addWidget(m_changePasswordPanel);
+  m_adminStackedContents->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password");
   adminPageTpl->bindWidget("menu-change-password", link);
   m_menuLinks.insert(MenuChangePassword, link);
   link->clicked().connect(std::bind([=](){
-    m_mgntContentWidgets->setCurrentWidget(m_changePasswordPanel);
+    m_adminStackedContents->setCurrentWidget(m_changePasswordPanel);
     m_changePasswordPanel->reset();
     m_adminPanelTitle->setText("Change password");
   }));
@@ -802,8 +842,8 @@ void WebMainUI::createAboutDialog(void)
 
 void WebMainUI::initOperatorDashboard(void)
 {
-  Wt::WContainerWidget* thumbs = new Wt::WContainerWidget(m_mainWidget);
-  Wt::WGridLayout* thumbLayout = new Wt::WGridLayout(thumbs);
+  Wt::WContainerWidget* thumbnailsContainer = new Wt::WContainerWidget(m_mainWidget);
+  Wt::WGridLayout* thumbLayout = new Wt::WGridLayout(thumbnailsContainer);
   
   Wt::WContainerWidget* bigraphs = new Wt::WContainerWidget(m_mainWidget);
   Wt::WGridLayout* bigraphsLayout = new Wt::WGridLayout(bigraphs);
@@ -813,11 +853,11 @@ void WebMainUI::initOperatorDashboard(void)
   
   Wt::WTemplate* m_operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl->bindWidget("info-box", m_infoBox);
-  m_operatorHomeTpl->bindWidget("thumbnails", thumbs);
+  m_operatorHomeTpl->bindWidget("thumbnails", thumbnailsContainer);
   m_operatorHomeTpl->bindWidget("report-period-header-pane", createReportSectionHeader());
   m_operatorHomeTpl->bindWidget("bigraphs", bigraphs);
   m_operatorHomeTpl->bindWidget("event-feeds", eventFeeds);
-  m_dashboardContainer->addWidget(m_operatorHomeTpl);
+  m_dashboardStackedContents->addWidget(m_operatorHomeTpl);
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
@@ -954,7 +994,7 @@ void WebMainUI::handleLdapUsersMenu(void)
   if (m_preferences->getAuthenticationMode() != WebPreferences::LDAP) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Denied. LDAP authentication is disabled"));
   } else {
-    m_mgntContentWidgets->setCurrentWidget(m_ldapUserManager);
+    m_adminStackedContents->setCurrentWidget(m_ldapUserManager);
     if (m_ldapUserManager->updateUserList() <= 0) {
       showMessage(ngrt4n::OperationFailed, m_ldapUserManager->lastError());
     }
@@ -965,7 +1005,7 @@ void WebMainUI::handleLdapUsersMenu(void)
 
 void WebMainUI::handleBuiltInUsersMenu(void)
 {
-  m_mgntContentWidgets->setCurrentWidget(m_dbUserManager->dbUserListWidget());
+  m_adminStackedContents->setCurrentWidget(m_dbUserManager->dbUserListWidget());
   m_dbUserManager->updateDbUsers();
   m_adminPanelTitle->setText(Q_TR("Manage Users"));
 }
@@ -974,14 +1014,14 @@ void WebMainUI::handleBuiltInUsersMenu(void)
 void WebMainUI::handleNewUserMenu(void)
 {
   m_dbUserManager->userForm()->reset();
-  m_mgntContentWidgets->setCurrentWidget(m_dbUserManager->userForm());
+  m_adminStackedContents->setCurrentWidget(m_dbUserManager->userForm());
   m_adminPanelTitle->setText(Q_TR("Create New User"));
 }
 
 
 void  WebMainUI::handleViewAclMenu(void)
 {
-  m_mgntContentWidgets->setCurrentWidget(m_viewAccessPermissionForm);
+  m_adminStackedContents->setCurrentWidget(m_viewAccessPermissionForm);
   m_viewAccessPermissionForm->resetModelData();
   m_adminPanelTitle->setText(Q_TR("Manage Views and Access Control"));
 }

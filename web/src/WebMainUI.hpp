@@ -101,7 +101,7 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
-  void openViewTab(Wt::WWidget* viewWidget) {m_dashboardContainer->setCurrentWidget(viewWidget);}
+  void openViewTab(Wt::WWidget* viewWidget) {m_dashboardStackedContents->setCurrentWidget(viewWidget);}
 
 private:
   enum FileDialogAction {
@@ -133,10 +133,10 @@ private:
   DbSession* m_dbSession;
   WebPreferences* m_preferences;
   Wt::WTimer m_timer;
-  Wt::WStackedWidget* m_contents;
-  Wt::WStackedWidget* m_mgntContentWidgets;
+  Wt::WStackedWidget* m_mainStackedContents;
+  Wt::WStackedWidget* m_adminStackedContents;
   Wt::WNavigationBar* m_navbar;
-  Wt::WStackedWidget* m_dashboardContainer;
+  Wt::WStackedWidget* m_dashboardStackedContents;
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
@@ -200,6 +200,12 @@ private:
   void updateViewBiCharts(const std::string& viewName);
   void setupNotificationManager(void);
 
+  Wt::WNavigationBar* createNavivationBar(void);
+  Wt::WWidget* createBreadCrumbsBar(void);
+  Wt::WStackedWidget* createMainStackedContent(void);
+  Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
+  Wt::WAnchor* createShowHomeBreadCrumbsLink(void);
+  Wt::WAnchor* createShowViewBreadCrumbsLink(void);
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
