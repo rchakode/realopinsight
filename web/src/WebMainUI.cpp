@@ -350,7 +350,6 @@ void WebMainUI::resetTimer(qint32 interval)
 void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
-  m_reportApplyAnchor->setDisabled(true);
 
   std::map<int, int> problemTypeCount;
   problemTypeCount[ngrt4n::Normal]   = 0;
@@ -380,7 +379,6 @@ void WebMainUI::handleRefresh(void)
     ++currentView;
   }
 
-
   // Set notification only for operator console
   if (! m_dbSession->isLoggedAdmin()) {
     for(auto ptype: problemTypeCount) {
@@ -394,7 +392,6 @@ void WebMainUI::handleRefresh(void)
     updateEventFeeds();
   } // notification section
 
-  m_reportApplyAnchor->setDisabled(false);
   startTimer();
 }
 
