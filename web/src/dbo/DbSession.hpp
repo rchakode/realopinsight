@@ -53,6 +53,7 @@ public:
   Wt::Auth::PasswordService* passwordAuthentificator(void);
   Wt::Auth::Login& loginObject(void);
   bool isLogged(void) {return loginObject().loggedIn();}
+  bool isLoggedAdmin(void) {return loggedUser().role == DboUser::AdmRole;}
   void configureAuth(void);
   const DboUser& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(void);

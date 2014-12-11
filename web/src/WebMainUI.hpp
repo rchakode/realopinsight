@@ -101,16 +101,18 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
-  void openViewTab(Wt::WWidget* viewWidget) {m_dashboardStackedContents->setCurrentWidget(viewWidget);}
+  void showDashboardWidget(Wt::WWidget* viewWidget) {
+    if (viewWidget) m_dashboardStackedContents->setCurrentWidget(viewWidget);
+  }
 
 private:
   enum FileDialogAction {
     IMPORT = 0,
     OPEN = 1
   };
-  typedef std::map<QString, WebDashboard*> DashboardListT;
-  typedef std::map<std::string, QosTrendsChart*> QosTrendsChartList;
-  typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartList;
+  typedef std::map<QString, WebDashboard*> DashboardMapT;
+  typedef std::map<std::string, QosTrendsChart*> QosTrendsChartMapT;
+  typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
   ThumbnailMapT m_thumbnailItems;
 
@@ -122,6 +124,7 @@ private:
   std::string m_rootDir;
   std::string m_confdir;
   Wt::WContainerWidget* m_mainWidget;
+  Wt::WWidget* m_settingsPageWidget;
   Settings* m_settings;
   Wt::WText* m_infoBox;
 
@@ -140,7 +143,7 @@ private:
   Wt::WDialog* m_fileUploadDialog;
   Wt::WFileUpload* m_uploader;
   std::string m_selectedFile;
-  DashboardListT m_dashboards;
+  DashboardMapT m_dashboards;
   DbUserManager* m_dbUserManager;
   LdapUserManager* m_ldapUserManager;
   UserFormView* m_userAccountForm;
@@ -152,17 +155,19 @@ private:
   bool m_showSettingTab;
   WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
-  QosTrendsChartList m_qosCharts;
-  RawQosTrendsChartList m_rawQosCharts;
+  QosTrendsChartMapT m_qosCharts;
+  RawQosTrendsChartMapT m_rawQosCharts;
   QosDataByViewMapT m_qosData;
 
   Wt::WDatePicker* m_reportStartDatePicker;
   Wt::WDatePicker* m_reportEndDatePicker;
   Wt::WAnchor* m_reportApplyAnchor;
 
+  Wt::WComboBox* m_breadCrumbsViewBox;
+
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
-  Wt::WWidget* createAdminPage(void);
+  Wt::WWidget* createSettingsPage(void);
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);
 
@@ -204,8 +209,8 @@ private:
   Wt::WWidget* createBreadCrumbsBar(void);
   Wt::WStackedWidget* createMainStackedContent(void);
   Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
-  Wt::WAnchor* createShowHomeBreadCrumbsLink(void);
-  Wt::WAnchor* createShowViewBreadCrumbsLink(void);
+  Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
+  Wt::WWidget* createShowViewBreadCrumbsLink(void);
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
