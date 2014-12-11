@@ -392,3 +392,8 @@ legend {
   background-color: #999999;
   border-color: #999999;
 }
+
+.breadcrumb {
+  margin: 0;
+  background-color: #f8f8ff;
+}
