@@ -60,28 +60,9 @@ body, html {
 }
 
 /* these classes come from from bootstrap */
-.navbar { 
+.navbar {
   margin: 0;
   padding: 0;
-}
-.nav-tabs {
-  margin: 0;
-  padding: 0;
-}
-
-.nav-pills {
-  margin: 0;
-  padding: 0;
-}
-
-.nav-tabs > .active > a,
-.nav-tabs > .active > a:hover {
-  background-color: #9dc6dd;
-}
-
-.nav-pills > .active > a,
-.nav-pills > .active > a:hover {
-  background-color: #9dc6dd;
 }
 
 .accordion-heading {
