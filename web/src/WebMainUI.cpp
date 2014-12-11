@@ -81,7 +81,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_preferences(new WebPreferences()),
     m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
-    m_showSettingTab(true),
     m_currentDashboardPtr(NULL),
     m_eventFeedLayout(NULL),
     m_reportStartDatePicker(NULL),
@@ -141,7 +140,7 @@ void WebMainUI::showUserHome(void)
   m_mainWidget->setId("maincontainer");
   m_dashboardStackedContents->addStyleClass("wrapper-container");
   m_dashboardStackedContents->addWidget(m_settingsPageWidget = createSettingsPage());
-  
+
   if (! m_dbSession->isLoggedAdmin()) {
     initOperatorDashboard();
     //FIXME: m_dashtabs->setTabHidden(0, true);
@@ -171,8 +170,12 @@ Wt::WWidget* WebMainUI::createBreadCrumbsBar(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("breadcrumbs-bar.tpl"));
   tpl->bindWidget("show-settings-link", createShowSettingsBreadCrumbsLink());
-  tpl->bindWidget("show-home-link", createShowOpsHomeBreadCrumbsLink());
   tpl->bindWidget("show-view-link", createShowViewBreadCrumbsLink());
+  if (! m_dbSession->isLoggedAdmin()) {
+    tpl->bindWidget("show-home-link", createShowOpsHomeBreadCrumbsLink());
+  } else {
+    tpl->bindEmpty("show-home-link");
+  }
   return tpl;
 }
 
@@ -189,37 +192,40 @@ Wt::WStackedWidget* WebMainUI::createMainStackedContent(void)
 Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
 {
   Wt::WAnchor* link = new Wt::WAnchor("#", "Settings");
-  link->clicked().connect(std::bind(&WebMainUI::showDashboardWidget, this, m_settingsPageWidget));
+  link->clicked().connect(std::bind([=]{
+    if (! m_dbSession->isLoggedAdmin()) hideAdminSettingsMenu();
+    showDashboardWidget(m_settingsPageWidget);
+    m_selectViewBreadCrumbsBox->setCurrentIndex(-1);
+  }));
   return link;
 }
 
 Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
 {
-  Wt::WAnchor* link = NULL;
-  if (! m_dbSession->isLoggedAdmin())
-    link = new Wt::WAnchor("#", "Admin Home");
-  else
-    link = new Wt::WAnchor("#", "Ops Home");
-
+  Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
+  link->clicked().connect(std::bind([=]{
+    if (! m_dbSession->isLoggedAdmin()) {
+      //FIXME:
+    }
+  }));
   return link;
 }
 
 Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
 {
-  m_breadCrumbsViewBox = new Wt::WComboBox();
-  m_breadCrumbsViewBox->setMargin(0);
-  m_breadCrumbsViewBox->addItem(Q_TR("Select a view"));
+  m_selectViewBreadCrumbsBox = new Wt::WComboBox();
+  m_selectViewBreadCrumbsBox->setMargin(0);
+  m_selectViewBreadCrumbsBox->addItem(Q_TR("Select a view"));
 
-  m_breadCrumbsViewBox->changed().connect(std::bind([=](){
-    QString selectedViewName = QString::fromStdString( m_breadCrumbsViewBox->currentText().toUTF8() );
+  m_selectViewBreadCrumbsBox->changed().connect(std::bind([=](){
+    QString selectedViewName = QString::fromStdString( m_selectViewBreadCrumbsBox->currentText().toUTF8() );
     DashboardMapT::iterator dashboardIter = m_dashboards.find(selectedViewName);
-    qDebug() << selectedViewName;
     if (dashboardIter != m_dashboards.end()) {
       WebDashboard* dashboard = dashboardIter->second;
       showDashboardWidget(dashboard->getWidget());
     }
   }));
-  return m_breadCrumbsViewBox;
+  return m_selectViewBreadCrumbsBox;
 }
 
 
@@ -270,19 +276,12 @@ void WebMainUI::setupProfileMenus(void)
     m_navbar->addWidget(notificationSectionTpl, Wt::AlignRight);
   }
   
-  Wt::WMenuItem* profileMenuItem
-      = new Wt::WMenuItem(tr("Signed in as %1").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
+  Wt::WMenuItem* profileMenuItem = new Wt::WMenuItem(tr("Signed in as %1").arg(m_dbSession->loggedUserName()).toStdString());
   Wt::WPopupMenu* profilePopupMenu = new Wt::WPopupMenu();
   profileMenuItem->setMenu(profilePopupMenu);
   profileMenu->addItem(profileMenuItem);
-  
-  Wt::WMenuItem* currentMenuItem = NULL;
-  if (! m_dbSession->isLoggedAdmin()) {
-    currentMenuItem = profilePopupMenu->addItem(tr("Show Settings").toStdString());
-    currentMenuItem->triggered().connect(std::bind(&WebMainUI::handleShowHideSettingsMenus, this, currentMenuItem));
-  }
 
-  currentMenuItem = profilePopupMenu->addItem(tr("Help").toStdString());
+  Wt::WMenuItem* currentMenuItem = profilePopupMenu->addItem(tr("Help").toStdString());
   currentMenuItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
   currentMenuItem->setLinkTarget(Wt::TargetNewWindow);
 
@@ -299,29 +298,16 @@ Wt::WWidget* WebMainUI::createMainNotificationIcon(void)
   return widget;
 }
 
-void WebMainUI::handleShowHideSettingsMenus(Wt::WMenuItem* menuItem)
+void WebMainUI::hideAdminSettingsMenu(void)
 {
-  if (m_showSettingTab) {
-    if (m_dashboardStackedContents->count() > 1) {
-      m_dashboardStackedContents->setCurrentIndex(0);
-      menuItem->setText(tr("Hide Settings").toStdString());
-      wApp->doJavaScript("$('#userMenuBlock').hide(); "
-                         "$('#viewMenuBlock').hide();"
-                         "$('#menu-auth-settings').hide();"
-                         "$('#menu-notification-settings').hide();");
-
-      m_preferences->showAuthSettingsWidgets(false);
-      m_preferences->showMonitoringSettingsWidgets(false);
-
-    }
-  } else {
-    if (m_dashboardStackedContents->count() > 1) {
-      m_dashboardStackedContents->setCurrentIndex(1);
-      menuItem->setText(tr("Show Account & Settings").toStdString());
-    }
-  }
-  m_showSettingTab = ! m_showSettingTab;
+  m_preferences->showAuthSettingsWidgets(false);
+  m_preferences->showNotificationSettingsWidgets(false);
+  wApp->doJavaScript("$('#userMenuBlock').hide(); "
+                     "$('#viewMenuBlock').hide();"
+                     "$('#menu-auth-settings').hide();"
+                     "$('#menu-notification-settings').hide();");
 }
+
 
 
 void WebMainUI::setupMenus(void)
@@ -545,7 +531,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
       result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
       if (result.second) {
         m_dashboardStackedContents->addWidget(dashboard->getWidget());
-        m_breadCrumbsViewBox->addItem(platformName.toStdString());
+        m_selectViewBreadCrumbsBox->addItem(platformName.toStdString());
       } else {
         showMessage(ngrt4n::OperationFailed,
                     tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());

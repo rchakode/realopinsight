@@ -101,9 +101,9 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
-  void showDashboardWidget(Wt::WWidget* viewWidget) {
-    if (viewWidget) m_dashboardStackedContents->setCurrentWidget(viewWidget);
-  }
+  void showDashboardWidget(Wt::WWidget* widget) {if (widget) m_dashboardStackedContents->setCurrentWidget(widget);
+        else
+        qDebug()<< "NULL";}
 
 private:
   enum FileDialogAction {
@@ -152,7 +152,6 @@ private:
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;
   Wt::WText* m_adminPanelTitle;
-  bool m_showSettingTab;
   WebDashboard* m_currentDashboardPtr;
   Wt::WVBoxLayout* m_eventFeedLayout;
   QosTrendsChartMapT m_qosCharts;
@@ -163,7 +162,7 @@ private:
   Wt::WDatePicker* m_reportEndDatePicker;
   Wt::WAnchor* m_reportApplyAnchor;
 
-  Wt::WComboBox* m_breadCrumbsViewBox;
+  Wt::WComboBox* m_selectViewBreadCrumbsBox;
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -199,11 +198,11 @@ private:
   void handleNewUserMenu(void);
   void handleViewAclMenu(void);
   void handleUserEnableStatusChanged(int status, std::string data);
-  void handleShowHideSettingsMenus(Wt::WMenuItem* menuItem);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
   void setupNotificationManager(void);
+  void hideAdminSettingsMenu(void);
 
   Wt::WNavigationBar* createNavivationBar(void);
   Wt::WWidget* createBreadCrumbsBar(void);

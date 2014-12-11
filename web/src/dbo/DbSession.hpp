@@ -57,6 +57,7 @@ public:
   void configureAuth(void);
   const DboUser& loggedUser(void)const {return m_loggedUser;}
   void setLoggedUser(void);
+  QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
 
   int addUser(const DboUser& user);
   int updateUser(const DboUser& user);
