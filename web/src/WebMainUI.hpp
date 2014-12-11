@@ -89,7 +89,6 @@ public:
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void startTimer(void);
-  Wt::WContainerWidget* get(void) {return m_mainWidget;}
   void handleRefresh(void);
   Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
   virtual void 	refresh () {handleRefresh();}

@@ -146,7 +146,6 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
-           <!-- <legend>Summary of Monitored Services</legend> -->
            ${thumbnails}
            <legend>Reports</legend>
            ${report-period-header-pane}
