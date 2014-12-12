@@ -195,7 +195,7 @@ Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
       if (! m_dbSession->isLoggedAdmin()) {
         hideAdminSettingsMenu();
       }
-      showDashboardWidget(m_settingsPageWidget);
+      setWidgetAsFrontStackedWidget(m_settingsPageWidget);
       m_selectViewBreadCrumbsBox->setCurrentIndex(0);
     }
   }));
@@ -207,7 +207,7 @@ Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
   Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
   link->clicked().connect(std::bind([=]{
     if (m_operatorHomeDashboardWidget) {
-      showDashboardWidget(m_operatorHomeDashboardWidget);
+      setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
       m_selectViewBreadCrumbsBox->setCurrentIndex(0);
     }
   }));
@@ -217,20 +217,23 @@ Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
 Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
 {
   m_selectViewBreadCrumbsBox = new Wt::WComboBox();
-  m_selectViewBreadCrumbsBox->setMargin(0);
-  m_selectViewBreadCrumbsBox->addItem(Q_TR("Home"));
+  if (! m_dbSession->isLoggedAdmin()) {
+    m_selectViewBreadCrumbsBox->addItem(Q_TR("Executive View"));
+  } else {
+    m_selectViewBreadCrumbsBox->addItem(Q_TR("Admin Home"));
+  }
 
   m_selectViewBreadCrumbsBox->changed().connect(std::bind([=](){
     QString selectedViewName = QString::fromStdString( m_selectViewBreadCrumbsBox->currentText().toUTF8() );
     DashboardMapT::Iterator dashboardIter = m_dashboards.find(selectedViewName);
     if (dashboardIter != m_dashboards.end()) {
       m_currentDashboard = *dashboardIter;
-      showDashboardWidget(m_currentDashboard->getWidget());
+      setDashboardAsFrontStackedWidget(m_currentDashboard);
     } else {
       if (! m_dbSession->isLoggedAdmin()) {
-        showDashboardWidget(m_operatorHomeDashboardWidget);
+        setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
       } else {
-        showDashboardWidget(m_settingsPageWidget);
+        setWidgetAsFrontStackedWidget(m_settingsPageWidget);
       }
       m_currentDashboard = NULL;
     }
@@ -867,15 +870,14 @@ void WebMainUI::initOperatorDashboard(void)
     WebDashboard* dashboard;
     loadView(view.path, dashboard);
     if (dashboard) {
-
       Wt::WTemplate* thumbItem = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
       thumbItem->setStyleClass("btn btn-unknown");
       thumbItem->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
       thumbItem->bindWidget("thumb-image", dashboard->thumbnail());
       thumbItem->bindWidget("thumb-problem-details", dashboard->thumbnailProblemDetailBar());
-      thumbItem->clicked().connect(std::bind([=](){ showDashboardWidget(dashboard->getWidget());}));
+      thumbItem->clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
 
-      QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(showDashboardWidget(Wt::WWidget*)));
+      QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(setWidgetAsFrontStackedWidget(Wt::WWidget*)));
       thumbLayout->addWidget(thumbItem, thumbIndex / THUMBNAILS_PER_ROW, thumbIndex % THUMBNAILS_PER_ROW);
 
       m_thumbnailItems.insert(view.name, thumbItem);
@@ -1137,4 +1139,20 @@ void WebMainUI::setupNotificationManager(void)
 {
   m_notificationManager = new WebNotificationManager(m_dbSession, m_mainWidget);
   m_notificationManager->operationCompleted().connect(this, &WebMainUI::showMessage);
+}
+
+
+void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
+{
+  if (dashboard) {
+    setWidgetAsFrontStackedWidget(dashboard->getWidget());
+    dashboard->triggerResizeComponents();
+  }
+}
+
+void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
+{
+  if (widget) {
+    m_dashboardStackedContents->setCurrentWidget(widget);
+  }
 }

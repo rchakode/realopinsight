@@ -39,42 +39,7 @@
 #include <Wt/WImage>
 #include <Wt/WTemplate>
 
-#define ROOT_DIV wApp->root()->id()
-#define TREEVIEW_DIV m_tree->id()
-#define MAP_DIV m_map->id()
-#define MAP_SCROLL_AREA_DIV m_map->get()->id()
-#define CHART_SCROLL_AREA_DIV m_chart->get()->id()
-#define MSG_CONSOLE_DIV m_msgConsole->id()
-#define MAP_AREA_HEIGHT_RATIO "0.4"
 
-/**
-  This fonction take as parameter the height of the navigation window
-  Important : the size of stacked container corresponds to the size of the windows
-  minus the size of the navbar (40)
-  */
-#define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
-  computeWindowHeight \
-  "var contentHeight = wh - 40;" \
-  "$('#stackcontentarea').height(contentHeight);" \
-  "var treeHeight=contentHeight*0.6 - 25;" \
-  "var chartAreaHeight=contentHeight - treeHeight - 25;" \
-  "var mapAreaHeight=contentHeight*"+std::string(MAP_AREA_HEIGHT_RATIO)+" - 25;" \
-  "var msgConsoleHeight=contentHeight - mapAreaHeight - 25;" \
-  "$('#wrapper').height(wh);" \
-  "$('#maincontainer').height(wh);" \
-  "$('#"+ROOT_DIV+"').height(wh);" \
-  "$('#"+TREEVIEW_DIV+"').height(treeHeight);" \
-  "$('#"+MAP_SCROLL_AREA_DIV+"').height(mapAreaHeight);" \
-  "$('#"+CHART_SCROLL_AREA_DIV+"').height(chartAreaHeight);" \
-  "$('#"+MSG_CONSOLE_DIV+"').height(msgConsoleHeight);"
-
-#define JS_AUTO_RESIZING_FUNCTION \
-  "function(self, width, height) {" \
-  JS_AUTO_RESIZING_SCRIPT("wh=height;") \
-  "var mapHeight = height*0.45 - 25;" \
-  "var mapWidth = $('#"+MAP_SCROLL_AREA_DIV+"').width();" \
-  "Wt.emit("+MAP_DIV+", 'containerSizeChanged', mapWidth, mapHeight);" \
-  "}"
 
 namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
@@ -192,7 +157,7 @@ void WebDashboard::setupUI(void)
 void WebDashboard::addJsEventScript(void)
 {
   m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
-  m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));
+  triggerResizeComponents();
 }
 
 void WebDashboard::updateEventFeeds(const NodeT &node)

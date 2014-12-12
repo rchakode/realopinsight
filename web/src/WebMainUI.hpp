@@ -100,7 +100,8 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
-  void showDashboardWidget(Wt::WWidget* widget) {if (widget) m_dashboardStackedContents->setCurrentWidget(widget);}
+  void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
+  void setWidgetAsFrontStackedWidget(Wt::WWidget* widget);
 
 private:
   enum FileDialogAction {
