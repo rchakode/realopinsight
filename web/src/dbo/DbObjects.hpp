@@ -92,7 +92,7 @@ public:
     dbo::id(a, name, "name");
     dbo::field(a, path, "path");
     dbo::field(a, service_count, "service_count");
-    dbo::hasMany(a, users, dbo::ManyToMany, "user_view");
+    dbo::hasMany(a, users,dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
     dbo::hasMany(a, qosdatas, dbo::ManyToOne, "view");
     dbo::hasMany(a, notifications, dbo::ManyToOne, "view");
   }
@@ -115,7 +115,6 @@ public:
   std::string registrationDate;
   int authsystem; // e.g. LDAP or BuiltIn
   dbo::collection< dbo::ptr<DboView> > views;
-  dbo::collection< dbo::ptr<DboLoginSession> > sessions;
   dbo::collection< dbo::ptr<DboNotification> > ack_notifications;
 
   template<class Action>
@@ -127,8 +126,7 @@ public:
     dbo::field(a, role, "role");
     dbo::field(a, registrationDate, "registrationDate");
     dbo::field(a, authsystem, "authsystem");
-    dbo::hasMany(a, views, dbo::ManyToMany, "user_view");
-    dbo::hasMany(a, sessions, dbo::ManyToMany);
+    dbo::hasMany(a, views, dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
     dbo::hasMany(a, ack_notifications, dbo::ManyToOne, "ack_user");
   }
 
