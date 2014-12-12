@@ -105,6 +105,13 @@ update_db_2014b7()
   echo "database upgraded to 2014b7"
 }
 
+update_db_2014b7()
+{
+  echo -n "DEBUG : Updating database to 2014b8..."
+  su - ${REALOPINSIGHT_WWW_USER} -c "sqlite3 /opt/realopinsight/data/realopinsight.db < $PWD/sql/db_2014b8.sql"
+  check_exit_code
+}
+
 get_target_version_from_user()
 {
   echo
@@ -128,7 +135,10 @@ get_target_version_from_user()
           3) INSTALLED_VERSION="2014b3-2014b6"
              break
                  ;;
-          4) INSTALLED_VERSION="Other";
+          4) INSTALLED_VERSION="2014b7"
+             break
+                 ;;                 
+          5) INSTALLED_VERSION="Other";
 	      break
 		  ;;
 	  q) exit 0 
@@ -179,10 +189,16 @@ echo -n "DEBUG : Updating database..."
 if [ "${INSTALLED_VERSION}" == "3.0.0b1" ] || [ "${INSTALLED_VERSION}" == "3.0.0b2" ]; then
   update_db_2014b3
   update_db_2014b7
+  update_db_2014b8
 fi
 
 if [ "${INSTALLED_VERSION}" == "2014b3-2014b6" ]; then
   update_db_2014b7
+  update_db_2014b8
+fi
+
+if [ "${INSTALLED_VERSION}" == "2014b7" ]; then
+  update_db_2014b8
 fi
 
 
