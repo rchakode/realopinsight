@@ -218,7 +218,7 @@ Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
 {
   m_selectViewBreadCrumbsBox = new Wt::WComboBox();
   m_selectViewBreadCrumbsBox->setMargin(0);
-  m_selectViewBreadCrumbsBox->addItem(Q_TR("Tactical Overview"));
+  m_selectViewBreadCrumbsBox->addItem(Q_TR("Home"));
 
   m_selectViewBreadCrumbsBox->changed().connect(std::bind([=](){
     QString selectedViewName = QString::fromStdString( m_selectViewBreadCrumbsBox->currentText().toUTF8() );
@@ -227,7 +227,11 @@ Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
       m_currentDashboard = *dashboardIter;
       showDashboardWidget(m_currentDashboard->getWidget());
     } else {
-      showDashboardWidget(m_operatorHomeDashboardWidget);
+      if (! m_dbSession->isLoggedAdmin()) {
+        showDashboardWidget(m_operatorHomeDashboardWidget);
+      } else {
+        showDashboardWidget(m_settingsPageWidget);
+      }
       m_currentDashboard = NULL;
     }
   }));
