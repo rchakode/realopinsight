@@ -125,16 +125,13 @@ void WebMainUI::showUserHome(void)
 {
   std::string homeTabTitle = "Home";
   if (m_dbSession->isLoggedAdmin()) {
-    homeTabTitle = tr("Administration").toStdString();
+    homeTabTitle = tr("%1 - Administration").arg(APP_NAME).toStdString();
   } else {
-    homeTabTitle =  tr("Operations Console").toStdString();
+    homeTabTitle =  tr("%1 - Operations Console").arg(APP_NAME).toStdString();
   }
   
   std::string pageTitle = homeTabTitle;
-  pageTitle.append(" - ")
-      .append(m_dbSession->loggedUser().username)
-      .append(" - ")
-      .append(APP_NAME.toStdString());
+  pageTitle.append(" - ").append(m_dbSession->loggedUser().username);
 
   wApp->setTitle(pageTitle);
   

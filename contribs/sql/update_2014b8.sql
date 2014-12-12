@@ -5,6 +5,26 @@
 -- Creation Date: 19/11/2014
 
 
+-- Modify table
+-- table qosdata
+ALTER TABLE qosdata DROP FOREIGN KEY fk_qosdata_view;
+ALTER TABLE qosdata ADD constraint fk_qosdata_view
+foreign key ("view_name") references "view" ("name") on delete cascade;
+
+-- table user_view
+ALTER TABLE user_view DROP FOREIGN KEY fk_user_view_key1;
+ALTER TABLE user_view
+   ADD constraint fk_user_view_key1
+   foreign key ("user_name") references "user" ("name") on delete cascade;
+
+ALTER TABLE user_view
+   DROP FOREIGN KEY "fk_user_view_key2";
+ALTER TABLE user_view
+   ADD constraint "fk_user_view_key2"
+   foreign key ("view_name") references "view" ("name") on delete cascade;
+
+
+-- create new table
 CREATE TABLE "notification" (
   "id" integer primary key autoincrement,
   "version" integer not null,
@@ -14,7 +34,7 @@ CREATE TABLE "notification" (
   "last_change" bigint not null,
   "view_name" text,
   "ack_user_name" text,
- constraint "fk_notification_view" foreign key ("view_name") references "view" ("name"),
- constraint "fk_notification_ack_user" foreign key ("ack_user_name") references "user" ("name")
+ constraint "fk_notification_view" foreign key ("view_name") references "view" ("name") on delete cascade,
+ constraint "fk_notification_ack_user" foreign key ("ack_user_name") references "user" ("name") on delete cascade
 );
 
