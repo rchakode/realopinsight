@@ -66,7 +66,6 @@ protected:
 
 private:
   Wt::WStandardItemModel* m_model;
-  int m_rowCount;
 
   int findServiceRow(const std::string& _id);
   void updateSeverityItem(Wt::WStandardItem* item, int severity);

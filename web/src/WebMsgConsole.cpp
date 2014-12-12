@@ -32,8 +32,7 @@ namespace {
 }
 
 WebMsgConsole::WebMsgConsole()
-  : WTableView(0),
-    m_rowCount(0)
+  : WTableView(0)
 {
   setSortingEnabled(true);
   setLayoutSizeAware(true);
@@ -114,14 +113,13 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
 
 void WebMsgConsole::addMsg(const NodeT&  _node)
 {
-  m_model->setItem(m_rowCount, 0, createDateTimeItem(_node.check.last_state_change, m_rowCount));
-  m_model->setItem(m_rowCount, 1, createSeverityItem(_node));
-  m_model->setItem(m_rowCount, 2, createItem(_node.check.host, m_rowCount));
-  m_model->setItem(m_rowCount, 3, createItem(_node.name.toStdString(), m_rowCount));
-  m_model->setItem(m_rowCount, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), m_rowCount));
-  m_model->setItem(m_rowCount, 5, createItem(_node.id.toStdString(), m_rowCount));
-
-  ++m_rowCount;
+  int row = m_model->rowCount();
+  m_model->setItem(row, 0, createDateTimeItem(_node.check.last_state_change, row));
+  m_model->setItem(row, 1, createSeverityItem(_node));
+  m_model->setItem(row, 2, createItem(_node.check.host, row));
+  m_model->setItem(row, 3, createItem(_node.name.toStdString(), row));
+  m_model->setItem(row, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), row));
+  m_model->setItem(row, 5, createItem(_node.id.toStdString(), row));
 }
 
 Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
