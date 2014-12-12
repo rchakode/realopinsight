@@ -146,6 +146,7 @@
     <div class="info-box">${info-box}</div>
     <div id="ngrt4n-content-pane">
        <div class="ngrt4n-content">
+           <legend>Tactical Overview</legend>
            ${thumbnails}
            <legend>Reports</legend>
            ${report-period-header-pane}
