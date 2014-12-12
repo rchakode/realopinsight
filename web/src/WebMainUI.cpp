@@ -82,7 +82,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_preferences(new WebPreferences()),
     m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
-    m_currentDashboardPtr(NULL),
+    m_currentDashboard(NULL),
     m_eventFeedLayout(NULL),
     m_reportStartDatePicker(NULL),
     m_reportEndDatePicker(NULL),
@@ -125,7 +125,7 @@ void WebMainUI::showUserHome(void)
 {
   std::string homeTabTitle = "Home";
   if (m_dbSession->isLoggedAdmin()) {
-    homeTabTitle = tr("Account & Settings").toStdString();
+    homeTabTitle = tr("Administration").toStdString();
   } else {
     homeTabTitle =  tr("Operations Console").toStdString();
   }
@@ -135,6 +135,7 @@ void WebMainUI::showUserHome(void)
       .append(m_dbSession->loggedUser().username)
       .append(" - ")
       .append(APP_NAME.toStdString());
+
   wApp->setTitle(pageTitle);
   
   // data for CSS styling
@@ -144,8 +145,7 @@ void WebMainUI::showUserHome(void)
 
   if (! m_dbSession->isLoggedAdmin()) {
     initOperatorDashboard();
-    //FIXME: m_dashtabs->setTabHidden(0, true);
-    m_dashboardStackedContents->setCurrentIndex(1);
+    m_dashboardStackedContents->setCurrentWidget(m_operatorHomeDashboardWidget);
   }
 }
 
@@ -207,7 +207,7 @@ Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
 
 Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
 {
-  Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Console");
+  Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
   link->clicked().connect(std::bind([=]{
     if (m_operatorHomeDashboardWidget) {
       showDashboardWidget(m_operatorHomeDashboardWidget);
@@ -221,14 +221,17 @@ Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
 {
   m_selectViewBreadCrumbsBox = new Wt::WComboBox();
   m_selectViewBreadCrumbsBox->setMargin(0);
-  m_selectViewBreadCrumbsBox->addItem(Q_TR("Select a view"));
+  m_selectViewBreadCrumbsBox->addItem(Q_TR("Tactical Overview"));
 
   m_selectViewBreadCrumbsBox->changed().connect(std::bind([=](){
     QString selectedViewName = QString::fromStdString( m_selectViewBreadCrumbsBox->currentText().toUTF8() );
-    DashboardMapT::iterator dashboardIter = m_dashboards.find(selectedViewName);
+    DashboardMapT::Iterator dashboardIter = m_dashboards.find(selectedViewName);
     if (dashboardIter != m_dashboards.end()) {
-      WebDashboard* dashboard = dashboardIter->second;
-      showDashboardWidget(dashboard->getWidget());
+      m_currentDashboard = *dashboardIter;
+      showDashboardWidget(m_currentDashboard->getWidget());
+    } else {
+      showDashboardWidget(m_operatorHomeDashboardWidget);
+      m_currentDashboard = NULL;
     }
   }));
   return m_selectViewBreadCrumbsBox;
@@ -359,8 +362,7 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
   int currentView = 1;
-  for (auto& entry : m_dashboards) {
-    WebDashboard* dashboard = entry.second;
+  for (auto& dashboard : m_dashboards) {
     dashboard->initSettings(m_preferences);
     dashboard->runMonitor();
     dashboard->updateMap();
@@ -530,16 +532,17 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
       dashboard = NULL;
     } else {
       QString platformName = dashboard->rootNode().name;
-      std::pair<DashboardMapT::iterator, bool> result;
-      result = m_dashboards.insert(std::pair<QString, WebDashboard*>(platformName, dashboard));
-      if (result.second) {
-        m_dashboardStackedContents->addWidget(dashboard->getWidget());
-        m_selectViewBreadCrumbsBox->addItem(platformName.toStdString());
-      } else {
+      DashboardMapT::Iterator result = m_dashboards.find(platformName);
+      if (result != m_dashboards.end()) {
         showMessage(ngrt4n::OperationFailed,
-                    tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
+                    tr("A platfom with the same name "
+                       "already loaded (%1)").arg(platformName).toStdString());
         delete dashboard;
         dashboard = NULL;
+      } else {
+        m_dashboards.insert(platformName, dashboard);
+        m_dashboardStackedContents->addWidget(dashboard->getWidget());
+        m_selectViewBreadCrumbsBox->addItem(platformName.toStdString());
       }
     }
   } catch (const std::bad_alloc&) {
@@ -552,8 +555,8 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
 
 void WebMainUI::scaleMap(double factor)
 {
-  if (m_currentDashboardPtr) {
-    m_currentDashboardPtr->map()->scaleMap(factor);
+  if (m_currentDashboard) {
+    m_currentDashboard->map()->scaleMap(factor);
   }
 }
 
@@ -602,15 +605,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
       // Create view management form
       menuText = QObject::tr("Views and Access Control").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
-      //FIXME: removed view from stacked widget
-      //      m_viewAccessPermissionForm->viewDeleted().connect(std::bind([=](std::string viewName) {
-      //        DashboardItemsT::iterator dashboardItemIter = m_dashboardItems.find(viewName.c_str());
-      //        if (dashboardItemIter != m_dashboardItems.end()) {
-      //          m_dashboardContainer->removeWidget(dashboardItemIter->second);
-      //          delete (*dashboardItemIter);
-      //          m_dashboardItems.remove(viewName);
-      //        }
-      //      }, std::placeholders::_1));
+      m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
       m_adminStackedContents->addWidget(m_viewAccessPermissionForm);
 
 
@@ -1038,6 +1033,18 @@ void  WebMainUI::handleViewAclMenu(void)
   m_adminStackedContents->setCurrentWidget(m_viewAccessPermissionForm);
   m_viewAccessPermissionForm->resetModelData();
   m_adminPanelTitle->setText(Q_TR("Manage Views and Access Control"));
+}
+
+
+void WebMainUI::handleDeleteView(const std::string& viewName)
+{
+  DashboardMapT::Iterator dashboardIter = m_dashboards.find(viewName.c_str());
+  if (dashboardIter != m_dashboards.end()) {
+    WebDashboard* dashboard = *dashboardIter;
+    m_dashboardStackedContents->removeWidget(dashboard->getWidget());
+    delete (*dashboardIter);
+    m_dashboards.remove(viewName.c_str());
+  }
 }
 
 

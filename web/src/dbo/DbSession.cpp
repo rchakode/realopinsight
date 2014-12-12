@@ -29,7 +29,20 @@
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/Identity>
 #include <Wt/Auth/PasswordStrengthValidator>
+#include <Wt/Dbo/Exception>
 
+namespace Wt {
+  namespace Dbo {
+    namespace backend {
+      class Sqlite3Exception : public Exception
+      {
+      public:
+        Sqlite3Exception(const std::string& msg)
+          : Exception(msg) { }
+      };
+    }
+  }
+}
 
 DbSession::DbSession(void)
   : m_dbPath(ngrt4n::sqliteDbPath())
@@ -125,8 +138,8 @@ int DbSession::updateUser(const DboUser& user)
 int DbSession::updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newpass)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
     Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
     switch (m_passAuthService->verifyPassword(dbuser, currentPass)) {
       case Wt::Auth::PasswordValid:
@@ -142,11 +155,11 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
       default:m_lastError = "Unknown error concerning your current password";
         break;
     }
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     retValue = -1;
     LOG("error", ex.what());
   }
+  transaction.commit();
   updateUserList();
   return retValue;
 }
@@ -155,16 +168,16 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
 int DbSession::deleteUser(const std::string& username)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
     dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(username);
     usr.remove();
     retValue = 0;
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     retValue = 1;
     LOG("error", ex.what());
   }
+  transaction.commit();
   updateUserList();
   return retValue;
 }
@@ -173,16 +186,16 @@ int DbSession::deleteUser(const std::string& username)
 int DbSession::deleteAuthSystemUsers(int authSystem)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
     dbo::ptr<DboUser> usr = find<DboUser>().where("authsystem=?").bind(authSystem);
     usr.remove();
     retValue = 0;
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     retValue = 1;
     LOG("error", ex.what());
   }
+  transaction.commit();
   updateUserList();
   return retValue;
 }
@@ -237,62 +250,60 @@ void DbSession::configureAuth(void)
 
 void DbSession::setLoggedUser(void)
 {
+  dbo::Transaction transaction(*this);
   try {
     std::string dbUserId = loginObject().user().id();
-    dbo::Transaction transaction(*this);
     dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(dbUserId);
     m_loggedUser = *(info.modify()->user());
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
+  transaction.commit();
 }
 
 void DbSession::updateUserList(void)
 {
+  dbo::Transaction transaction(*this);
   try {
     m_userList.clear();
-    dbo::Transaction transaction(*this);
     DboUserCollectionT users = find<DboUser>();
     for (auto &user : users) {
       m_userList.push_back(*user);
     }
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
+  transaction.commit();
 }
 
 void DbSession::updateViewList(void)
 {
+  dbo::Transaction transaction(*this);
   try {
     m_viewList.clear();
-    dbo::Transaction transaction(*this);
     DboViewCollectionT views = find<DboView>();
     for (auto& view : views) {
       m_viewList.push_back(*view);
     }
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
+  transaction.commit();
 }
 
 void DbSession::updateViewList(const std::string& uname)
 {
+  dbo::Transaction transaction(*this);
   try {
     m_viewList.clear();
-    dbo::Transaction transaction(*this);
-
     dbo::ptr<DboUser> userDboPtr = find<DboUser>().where("name=?").bind(uname);
     for (auto& view : userDboPtr.modify()->views) {
       m_viewList.push_back(*view);
     }
-
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     LOG("error", ex.what());
   }
+  transaction.commit();
 }
 
 bool DbSession::findView(const std::string& vname, DboView& view)
@@ -350,29 +361,32 @@ int DbSession::addView(const DboView& view)
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the view. More details in log.";
     LOG("error", ex.what());
+  } catch(const std::exception& ex) {
+    m_lastError = ex.what();
+    LOG("error", QObject::tr("DbSession::deleteView: %1").arg(ex.what()).toStdString());
   }
+
   transaction.commit();
   updateViewList();
   return retValue;
 }
 
 
-int DbSession::deleteView(std::string vname)
+int DbSession::deleteView(std::string viewName)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
-
-    execute("DELETE FROM user_view WHERE view_name=?;").bind(vname);
-    execute("DELETE FROM view WHERE name=?;").bind(vname);
-
-    transaction.commit();
+    execute("DELETE FROM view WHERE name = ?;").bind(viewName);
     retValue = 0;
-  } catch (const dbo::Exception& ex) {
-    retValue = 1;
+  } catch (const Wt::Dbo::backend::Sqlite3Exception& ex) {
     m_lastError = ex.what();
-    LOG("error", ex.what());
+    LOG("error", QObject::tr("DbSession::deleteView: %1").arg(ex.what()).toStdString());
+  } catch (const dbo::Exception& ex) {
+    m_lastError = ex.what();
+    LOG("error", QObject::tr("DbSession::deleteView: %1").arg(ex.what()).toStdString());
   }
+  transaction.commit();
   updateViewList();
   return retValue;
 }
@@ -393,38 +407,43 @@ void DbSession::updateUserViewList(void)
 
 
 
-int DbSession::assignView(const std::string& uname, const std::string& vname)
+int DbSession::assignView(const std::string& userName, const std::string& vname)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
-
-    dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(uname);
+    dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(userName);
     dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
-
-    transaction.commit();
     retValue = 0;
   } catch (const dbo::Exception& ex) {
     LOG("error", QObject::tr("DbSession::assignView: %1").arg(ex.what()).toStdString());
+  } catch(const std::exception& ex) {
+    m_lastError = ex.what();
+    LOG("error", QObject::tr("DbSession::deleteView: %1").arg(ex.what()).toStdString());
   }
+
+  transaction.commit();
   return retValue;
 }
 
 
-int DbSession::revokeView(const std::string& uname, const std::string& vname)
+int DbSession::revokeView(const std::string& userName, const std::string& viewName)
 {
   int retValue = -1;
   try {
     dbo::Transaction transaction(*this);
 
-    dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(uname);
-    dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
-    dboUserPtr.modify()->views.erase(dboViewPtr);
+    dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userName);
+    dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewName);
+    userPtr.modify()->views.erase(viewPtr);
     retValue = 0;
 
     transaction.commit();
   } catch (const dbo::Exception& ex) {
+    LOG("error", QObject::tr("DbSession::revokeView: %1").arg(ex.what()).toStdString());
+  } catch(const std::exception& ex) {
+    m_lastError = ex.what();
     LOG("error", QObject::tr("DbSession::revokeView: %1").arg(ex.what()).toStdString());
   }
   return retValue;
@@ -434,9 +453,8 @@ int DbSession::revokeView(const std::string& uname, const std::string& vname)
 int DbSession::fetchAssignedUserEmails(QStringList& emails, const std::string& viewName)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
-
     std::string sql = QString("SELECT user.email"
                               " FROM user, user_view"
                               " WHERE user.name = user_view.user_name"
@@ -449,11 +467,11 @@ int DbSession::fetchAssignedUserEmails(QStringList& emails, const std::string& v
     for (const auto& entry : results) {
       emails.push_back(QString::fromStdString(entry));
     }
-    transaction.commit();
     retValue = emails.size();
   } catch (const dbo::Exception& ex) {
     LOG("error", QObject::tr("DbSession::fetchAssignedUserEmails: %1").arg(ex.what()).toStdString());
   }
+  transaction.commit();
   return retValue;
 }
 

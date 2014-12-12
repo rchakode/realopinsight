@@ -211,7 +211,7 @@ public:
     dbo::field(a, major, "major");
     dbo::field(a, critical, "critical");
     dbo::field(a, unknown, "unknown");
-    dbo::belongsTo(a, view, "view");
+    dbo::belongsTo(a, view, "view", dbo::OnDeleteCascade);
   }
 
   std::string toString(void) const {
@@ -297,8 +297,8 @@ public:
     dbo::field(a, view_status, "view_status");
     dbo::field(a, ack_status, "ack_status");
     dbo::field(a, last_change, "last_change");
-    dbo::belongsTo(a, view, "view");
-    dbo::belongsTo(a, ack_user, "ack_user");
+    dbo::belongsTo(a, view, "view", dbo::OnDeleteCascade);
+    dbo::belongsTo(a, ack_user, "ack_user", dbo::OnDeleteCascade);
   }
 };
 

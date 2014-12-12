@@ -85,7 +85,7 @@ public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
   void showUserHome(void);
-  QString getConfig (void) const {return m_currentDashboardPtr->config();}
+  QString getConfig (void) const {return m_currentDashboard->config();}
   void enable(void) {m_mainWidget->enable();}
   void disbale(void) {m_mainWidget->disable();}
   void startTimer(void);
@@ -107,7 +107,7 @@ private:
     IMPORT = 0,
     OPEN = 1
   };
-  typedef std::map<QString, WebDashboard*> DashboardMapT;
+  typedef QMap<QString, WebDashboard*> DashboardMapT;
   typedef std::map<std::string, QosTrendsChart*> QosTrendsChartMapT;
   typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
@@ -150,7 +150,7 @@ private:
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;
   Wt::WText* m_adminPanelTitle;
-  WebDashboard* m_currentDashboardPtr;
+  WebDashboard* m_currentDashboard;
   Wt::WVBoxLayout* m_eventFeedLayout;
   QosTrendsChartMapT m_qosCharts;
   RawQosTrendsChartMapT m_rawQosCharts;
@@ -195,6 +195,7 @@ private:
   void handleBuiltInUsersMenu(void);
   void handleNewUserMenu(void);
   void handleViewAclMenu(void);
+  void handleDeleteView(const std::string& viewName);
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void updateBiCharts(void);

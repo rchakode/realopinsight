@@ -69,9 +69,9 @@ public:
   DbUsersT& userList(void) {return m_userList;}
 
   int addView(const DboView& qos);
-  int deleteView(std::string vname);
-  int assignView(const std::string& uname, const std::string& vname);
-  int revokeView(const std::string& uname, const std::string& vname);
+  int deleteView(std::string viewName);
+  int assignView(const std::string& userName, const std::string& viewName);
+  int revokeView(const std::string& userName, const std::string& viewName);
   int fetchAssignedUserEmails(QStringList& emails, const std::string& viewName);
 
   int addQosData(const QosDataT& qosData);

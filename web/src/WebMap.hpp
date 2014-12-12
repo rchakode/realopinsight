@@ -34,10 +34,10 @@
 #include <Wt/WScrollArea>
 #include <Wt/WImage>
 #include <QtGlobal>
+#include <QString>
 
 struct CoreDataT;
 struct NodeT;
-class QString;
 
 class WebMap : public Wt::WPaintedWidget
 {

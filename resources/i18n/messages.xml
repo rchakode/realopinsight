@@ -568,8 +568,8 @@
 <message id="breadcrumbs-bar.tpl">
 <ol class="breadcrumb">
   <li>${show-settings-link}</li>
-  <li> > ${show-home-link}</li>
-  <li> > Show View ${show-view-link}</li>
+  <li> | ${show-home-link}</li>
+  <li> | Display View ${show-view-link}</li>
 </ol>
 </message>
 </messages>

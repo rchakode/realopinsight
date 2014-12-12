@@ -257,10 +257,8 @@ void ViewAclManagement::setSelectedViews(Wt::WSelectionBox* list, Wt::WStandardI
 {
   m_selectedViews.clear();
   for (auto index : list->selectedIndexes()) {
-    std::cout << itemText(model, index) << "\n";
     m_selectedViews.insert(itemText(model, index));
   }
-
 }
 
 void ViewAclManagement::removeViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
