@@ -37,7 +37,6 @@ namespace {
   const double AREA_TOP_CORNER_Y = BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
   const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
   const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
-  const Wt::WColor TRANSPARENT_COLOR = Wt::WColor(0, 0, 0, 0);
 }
 
 
@@ -111,9 +110,11 @@ void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
     Wt::WPainter painter(paintDevice);
     painter.save();
     painter.scale(m_xScalingFactor, 1);
-    painter.setPen(TRANSPARENT_COLOR); // invisible
     while (++currentIt, currentIt != m_plottingData.end()) {
-      painter.setBrush(ngrt4n::severityWColor(currentIt->status));
+
+      Wt::WColor color = ngrt4n::severityWColor(currentIt->status);
+      painter.setPen(color); // invisible
+      painter.setBrush(color);
 
       x1Axis = computeXAxis(previousIt->timestamp);
       x2Axis = computeXAxis(currentIt->timestamp);
