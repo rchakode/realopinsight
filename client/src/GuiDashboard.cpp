@@ -362,6 +362,9 @@ void GuiDashboard::handleSettingsLoaded(void)
       case ngrt4n::Zenoss:
         it->icon = ":images/zenoss-logo-o.png";
         break;
+      case ngrt4n::Pandora:
+        it->icon = ":images/pandora-logo-p.png";
+        break;
       default:
         it->icon = "";
         break;
