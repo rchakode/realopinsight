@@ -14,7 +14,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>Source2:localhost.localdomain/Status</SubServices>
+ <SubServices>localhost.localdomain/Status</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145323215313399"  type="1"  statusCalcRule="0"  statusPropRule="0"  weight="1"> 
  <Name>CPU Load</Name>
@@ -22,7 +22,7 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>Source2:localhost.localdomain/System_Load_AVG</SubServices>
+ <SubServices>localhost.localdomain/System_Load_AVG</SubServices>
 </Service>
 <Service id="ngrt4nsrv20145323215334573"  type="1"  statusCalcRule="0"  statusPropRule="0"  weight="1"> 
  <Name>Free Memory</Name>
@@ -30,6 +30,6 @@
  <Description></Description>
  <AlarmMsg></AlarmMsg>
  <NotificationMsg></NotificationMsg>
- <SubServices>Source2:localhost.localdomain/Free_RAM</SubServices>
+ <SubServices>localhost.localdomain/Free_RAM</SubServices>
 </Service>
 </ServiceView>

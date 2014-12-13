@@ -55,7 +55,7 @@ public:
   static const QString ADM_PASSWD_KEY;
   static const QString OP_PASSWD_KEY;
   static const QString SRC_BUCKET_KEY;
-  static const QString LANGUAGE_KEY;
+  static const QString GLOBAL_LANGUAGE_KEY;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

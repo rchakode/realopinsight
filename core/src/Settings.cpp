@@ -37,7 +37,7 @@ const QString Settings::OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Settings::ADM_PASSWD_KEY = "/Auth/admPasswd";
 const QString Settings::OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString Settings::SRC_BUCKET_KEY = "/Sources/buckets";
-const QString Settings::LANGUAGE_KEY = "/General/language";
+const QString Settings::GLOBAL_LANGUAGE_KEY = "/General/language";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
@@ -134,7 +134,7 @@ bool Settings::setSource(const QString& _info, SourceT& _src)
 
 QString Settings::language(void)
 {
-  QString lang = Settings().entry(LANGUAGE_KEY);
+  QString lang = Settings().entry(GLOBAL_LANGUAGE_KEY);
   return lang.isEmpty()? QLocale::system().name() : lang;
 }
 
