@@ -1,6 +1,12 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.2.0 (ibericus)
+  * Added to suppport to Pandora FMS monitoring backends.
+  * Now set the default propagated severity to Unknown to avoid
+    some inconsistency in status propagation.
+  * Misc minor bug fixes
+
 3.1.1
   * Fixed problem when the average calculation rule with thresholds always returns
     average severity.
