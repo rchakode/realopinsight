@@ -63,11 +63,12 @@ INCLUDEPATH += web/src
 
 HEADERS += \
     core/src/Base.hpp \
+    core/src/Settings.hpp \
     core/src/Parser.hpp \
     core/src/Preferences.hpp \
     core/src/ZbxHelper.hpp \
     core/src/ZnsHelper.hpp \
-    core/src/Settings.hpp \
+    core/src/PandoraHelper.hpp \
     core/src/ZmqSocket.hpp \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
@@ -112,12 +113,13 @@ HEADERS += \
     web/src/dbo/NotificationTableView.hpp
 
 SOURCES +=  core/src/Base.cpp \
+    core/src/Settings.cpp \
     core/src/Parser.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
     core/src/ZnsHelper.cpp \
-    core/src/Settings.cpp \
     core/src/ZmqSocket.cpp \
+    core/src/PandoraHelper.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
     core/src/utilsCore.cpp \

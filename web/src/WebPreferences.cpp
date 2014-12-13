@@ -364,7 +364,7 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   // source-specific settings
   SourceT src;
   src.id = ngrt4n::sourceId(index);
-  src.mon_type = ngrt4n::convert2ApiType(type);
+  src.mon_type = ngrt4n::convertToSourceType(type);
   src.mon_url = m_monitorUrlField->text().toUTF8().c_str();
   src.ls_addr = m_livestatusHostField->text().toUTF8().c_str();
   src.ls_port = QString(m_livestatusPortField->text().toUTF8().c_str()).toInt();
