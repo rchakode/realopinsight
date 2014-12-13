@@ -22,7 +22,7 @@ static const uint qt_meta_data_DashboardBase[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      26,   14, // methods
+      29,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -45,19 +45,22 @@ static const uint qt_meta_data_DashboardBase[] = {
      249,   14,   14,   14, 0x0a,
      262,  219,   14,   14, 0x0a,
      283,  219,   14,   14, 0x0a,
-     312,   14,   14,   14, 0x0a,
-     328,  219,   14,   14, 0x0a,
-     385,  379,  351,   14, 0x0a,
-     419,  219,  414,   14, 0x0a,
-     452,  448,   14,   14, 0x0a,
-     494,   34,   14,   14, 0x0a,
-     537,  523,   14,   14, 0x0a,
-     573,   14,  562,   14, 0x0a,
-     588,   14,  581,   14, 0x0a,
-     599,   14,  414,   14, 0x0a,
-     624,  618,   14,   14, 0x0a,
-     662,   14,  650,   14, 0x0a,
-     676,   14,  672,   14, 0x0a,
+     312,  219,   14,   14, 0x0a,
+     337,  219,   14,   14, 0x0a,
+     362,  219,   14,   14, 0x0a,
+     388,   14,   14,   14, 0x0a,
+     404,  219,   14,   14, 0x0a,
+     461,  455,  427,   14, 0x0a,
+     490,  219,   14,   14, 0x0a,
+     530,  526,   14,   14, 0x0a,
+     572,   34,   14,   14, 0x0a,
+     615,  601,   14,   14, 0x0a,
+     651,   14,  640,   14, 0x0a,
+     666,   14,  659,   14, 0x0a,
+     682,   14,  677,   14, 0x0a,
+     707,  701,   14,   14, 0x0a,
+     745,   14,  733,   14, 0x0a,
+     759,   14,  755,   14, 0x0a,
 
        0        // eod
 };
@@ -72,16 +75,20 @@ static const char qt_meta_stringdata_DashboardBase[] = {
     "src\0runNgrt4ndUpdate(SourceT)\0"
     "runMonitor()\0runMonitor(SourceT&)\0"
     "runLivestatusUpdate(SourceT)\0"
-    "resetStatData()\0prepareUpdate(SourceT)\0"
+    "runZabbixUpdate(SourceT)\0"
+    "runZenossUpdate(SourceT)\0"
+    "runPandoraUpdate(SourceT)\0resetStatData()\0"
+    "prepareUpdate(SourceT)\0"
     "ngrt4n::AggregatedSeverityT\0_node\0"
-    "computeNodeSeverity(QString)\0bool\0"
-    "allocSourceHandler(SourceT&)\0ids\0"
-    "handleSourceSettingsChanged(QList<qint8>)\0"
+    "computeNodeSeverity(QString)\0"
+    "checkStandaloneSourceType(SourceT&)\0"
+    "ids\0handleSourceSettingsChanged(QList<qint8>)\0"
     "handleErrorOccurred(QString)\0preferencePtr\0"
     "initialize(Preferences*)\0CoreDataT*\0"
-    "cdata()\0qint32\0userRole()\0showOnlyTroubles()\0"
-    "value\0setShowOnlyTroubles(bool)\0"
-    "SourceListT\0sources()\0int\0firstSrcIndex()\0"
+    "cdata()\0qint32\0userRole()\0bool\0"
+    "showOnlyTroubles()\0value\0"
+    "setShowOnlyTroubles(bool)\0SourceListT\0"
+    "sources()\0int\0firstSrcIndex()\0"
 };
 
 void DashboardBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -103,25 +110,27 @@ void DashboardBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 10: _t->runMonitor(); break;
         case 11: _t->runMonitor((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
         case 12: _t->runLivestatusUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 13: _t->resetStatData(); break;
-        case 14: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
-        case 15: { ngrt4n::AggregatedSeverityT _r = _t->computeNodeSeverity((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 13: _t->runZabbixUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 14: _t->runZenossUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 15: _t->runPandoraUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 16: _t->resetStatData(); break;
+        case 17: _t->prepareUpdate((*reinterpret_cast< const SourceT(*)>(_a[1]))); break;
+        case 18: { ngrt4n::AggregatedSeverityT _r = _t->computeNodeSeverity((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< ngrt4n::AggregatedSeverityT*>(_a[0]) = _r; }  break;
-        case 16: { bool _r = _t->allocSourceHandler((*reinterpret_cast< SourceT(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
-        case 17: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
-        case 18: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 19: _t->initialize((*reinterpret_cast< Preferences*(*)>(_a[1]))); break;
-        case 20: { CoreDataT* _r = _t->cdata();
+        case 19: _t->checkStandaloneSourceType((*reinterpret_cast< SourceT(*)>(_a[1]))); break;
+        case 20: _t->handleSourceSettingsChanged((*reinterpret_cast< QList<qint8>(*)>(_a[1]))); break;
+        case 21: _t->handleErrorOccurred((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 22: _t->initialize((*reinterpret_cast< Preferences*(*)>(_a[1]))); break;
+        case 23: { CoreDataT* _r = _t->cdata();
             if (_a[0]) *reinterpret_cast< CoreDataT**>(_a[0]) = _r; }  break;
-        case 21: { qint32 _r = _t->userRole();
+        case 24: { qint32 _r = _t->userRole();
             if (_a[0]) *reinterpret_cast< qint32*>(_a[0]) = _r; }  break;
-        case 22: { bool _r = _t->showOnlyTroubles();
+        case 25: { bool _r = _t->showOnlyTroubles();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
-        case 23: _t->setShowOnlyTroubles((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 24: { SourceListT _r = _t->sources();
+        case 26: _t->setShowOnlyTroubles((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 27: { SourceListT _r = _t->sources();
             if (_a[0]) *reinterpret_cast< SourceListT*>(_a[0]) = _r; }  break;
-        case 25: { int _r = _t->firstSrcIndex();
+        case 28: { int _r = _t->firstSrcIndex();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         default: ;
         }
@@ -160,9 +169,9 @@ int DashboardBase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 26)
+        if (_id < 29)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 26;
+        _id -= 29;
     }
     return _id;
 }
