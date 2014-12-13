@@ -27,6 +27,7 @@
 #include "utilsCore.hpp"
 #include "JsonHelper.hpp"
 #include "LsHelper.hpp"
+#include "PandoraHelper.hpp"
 #include "StatusAggregator.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
@@ -141,9 +142,15 @@ void DashboardBase::runMonitor(SourceT& src)
   case ngrt4n::Zenoss:
     runZenossUpdate(src);
     break;
+
   case ngrt4n::Zabbix:
     runZabbixUpdate(src);
     break;
+
+  case ngrt4n::Pandora:
+    runPandoraUpdate(src);
+    break;
+
   case ngrt4n::Nagios:
   default:
     if (src.use_ngrt4nd) {
@@ -213,6 +220,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 }
 #endif //#ifndef REALOPINSIGHT_DISABLE_ZMQ
 
+
 void DashboardBase::runZabbixUpdate(const SourceT& src)
 {
   ZbxHelper zbxBroker(src.mon_url);
@@ -230,6 +238,7 @@ void DashboardBase::runZabbixUpdate(const SourceT& src)
 }
 
 
+
 void DashboardBase::runZenossUpdate(const SourceT& src)
 {
   ZnsHelper znsBroker(src.mon_url);
@@ -245,6 +254,23 @@ void DashboardBase::runZenossUpdate(const SourceT& src)
     }
   }
 }
+
+
+void DashboardBase::runPandoraUpdate(const SourceT& src)
+{
+  PandoraHelper pandoraBroker(src.mon_url);
+  ChecksT checks;
+  // Since the fetching of Pandora modules is based on
+  // the get_tree_agents API, this call with EMPTY host/group filter
+  // shall load all the modules
+  // Hence we don't have to iterate through hosts like with the other backends
+  if (pandoraBroker.loadChecks(src, checks, "") == 0) {
+    updateCNodesWithChecks(checks, src);
+  } else {
+    updateDashboardOnError(src, pandoraBroker.lastError());
+  }
+}
+
 
 void DashboardBase::runLivestatusUpdate(const SourceT& src)
 {

@@ -28,7 +28,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.1.2
+REALOPINSIGHT_CORE_VERSION=3.2.0
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
@@ -91,7 +91,8 @@ HEADERS += \
     core/src/JsonHelper.hpp \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
-    core/src/StatusAggregator.hpp
+    core/src/StatusAggregator.hpp \
+    core/src/PandoraHelper.hpp
 
 
 SOURCES += \
@@ -108,7 +109,8 @@ SOURCES += \
     core/src/JsonHelper.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
-    core/src/StatusAggregator.cpp
+    core/src/StatusAggregator.cpp \
+    core/src/PandoraHelper.cpp
 
 QT += svg gui
 PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"
@@ -183,7 +185,7 @@ DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Diegom\"'"
+DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Conkeror\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"

@@ -34,13 +34,18 @@
 #include "GuiPreferences.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
+#include "PandoraHelper.hpp"
 
 namespace {
-  const QString NAG_SOURCE="Nagios-based source (*.nag.ngrt4n.xml)";
-  const QString ZBX_SOURCE="Zabbix-based source (*.zbx.ngrt4n.xml)";
-  const QString ZNS_SOURCE="Zenoss-based source (*.zns.ngrt4n.xml)";
-  const QString MULTI_SOURCES ="Multi-sources (*.ms.ngrt4n.xml)";
+  const QString NAG_SOURCE     = "Nagios description file (*.nag.ngrt4n.xml)";
+  const QString ZBX_SOURCE     = "Zabbix description file (*.zbx.ngrt4n.xml)";
+  const QString ZNS_SOURCE     = "Zenoss description file (*.zns.ngrt4n.xml)";
+  const QString PANDORA_SOURCE = "Pandora FMS description file (*.pfms.ngrt4n.xml)";
+  const QString MULTI_SOURCES  = "Multi-source description file (*.ms.ngrt4n.xml)";
   const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
+  const QString FILE_FILTER =
+      QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
+      .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
   }
 
 SvCreator::SvCreator(const qint32& _userRole)
@@ -90,6 +95,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importLivestatusChecks()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
+  connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
   connect(m_subMenus["ShowAbout"],SIGNAL(triggered(bool)),this,SLOT(handleShowAbout()));
   connect(m_subMenus["ShowOnlineResources"],SIGNAL(triggered(bool)),this,SLOT(handleShowOnlineResources()));
@@ -144,10 +150,7 @@ void SvCreator::open(void)
   path = QFileDialog::getOpenFileName(this,
                                       tr("%1 | Select target file").arg(APP_NAME),
                                       ".",
-                                      tr("%1;;%2;;%3;;%4;;Xml files(*.xml);;All files(*)").arg(NAG_SOURCE,
-                                                                                               ZBX_SOURCE,
-                                                                                               ZNS_SOURCE,
-                                                                                               MULTI_SOURCES));
+                                      FILE_FILTER);
   if (! path.isNull() && ! path.isEmpty())
     loadFile(path);
 }
@@ -245,7 +248,7 @@ void SvCreator::importZabbixTriggers(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), true);
+    showStatusMsg(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
     ZbxHelper handler;
@@ -270,7 +273,7 @@ void SvCreator::importZenossComponents(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), true);
+    showStatusMsg(tr("Loading components from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
     ZnsHelper handler(srcInfo.mon_url);
@@ -281,6 +284,26 @@ void SvCreator::importZenossComponents(void)
       int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
       treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
     }
+  }
+}
+
+void SvCreator::importPandoraModules(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Pandora, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString agentName = importationSettingForm.filter();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    showStatusMsg(tr("Loading Pandora agents data from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
+
+    ChecksT checks;
+    PandoraHelper handler(srcInfo.mon_url);
+    int retcode = handler.loadChecks(srcInfo, checks, agentName);
+
+    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }
 
@@ -456,10 +479,7 @@ void SvCreator::saveAs(void)
   QString path = QFileDialog::getSaveFileName(this,
                                               tr("Select the destination file | %1").arg(APP_NAME),
                                               m_activeConfig,
-                                              QString("%1;;%2;;%3;;%4;;").arg(NAG_SOURCE,
-                                                                              ZBX_SOURCE,
-                                                                              ZNS_SOURCE,
-                                                                              MULTI_SOURCES),
+                                              FILE_FILTER,
                                               &filter);
 
   if (path.isNull()) {
@@ -477,6 +497,9 @@ void SvCreator::saveAs(void)
     } else if (filter == NAG_SOURCE){
       m_cdata->monitor = ngrt4n::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
+    } else if (filter == PANDORA_SOURCE) {
+      m_cdata->monitor = ngrt4n::Pandora;
+      if (fileInfo.suffix().isEmpty()) path.append(".pfms.ngrt4n.xml");
     } else {
       m_cdata->monitor = ngrt4n::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
@@ -730,7 +753,9 @@ void SvCreator::loadMenu(void)
       m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
       m_subMenus["ImportLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
       m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
-      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
+      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components")),
+      m_subMenus["ImportPandoraModules"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
+
   m_menus["FILE"]->addSeparator(),
       m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
       m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
@@ -758,6 +783,7 @@ void SvCreator::loadMenu(void)
   m_toolBar->addAction(m_subMenus["ImportLivestatusChecks"]);
   m_toolBar->addAction(m_subMenus["ImportZabbixTriggers"]);
   m_toolBar->addAction(m_subMenus["ImportZenossComponents"]);
+  m_toolBar->addAction(m_subMenus["ImportPandoraModules"]);
   setMenuBar(m_menuBar);
   addToolBar(m_toolBar);
 }

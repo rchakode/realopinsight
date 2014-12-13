@@ -500,7 +500,7 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   SourceT src;
   src.id = ngrt4n::sourceId(index);
-  src.mon_type = ngrt4n::convert2ApiType(type);
+  src.mon_type = ngrt4n::convertToSourceType(type);
   src.mon_url = m_monitorUrlField->text();
   src.ls_addr = m_sockAddrField->text();
   src.ls_port = m_sockPortField->text().toInt();
@@ -519,7 +519,6 @@ void GuiPreferences::saveAsSource(const qint32& index, const QString& type)
   emitTimerIntervalChanged(1000 * m_updateIntervalField->text().toInt());
 
   if (! m_updatedSources.contains(index)) {
-    //FIXME: consider only if source is used in the loaded service view?
     m_updatedSources.push_back(index);
   }
 
