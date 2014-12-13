@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR">
+<TS version="2.0" language="fr_FR">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>Auth</name>
     <message>
@@ -82,54 +83,34 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
 <context>
     <name>DashboardBase</name>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="128"/>
+        <location filename="../core/src/DashboardBase.cpp" line="129"/>
         <source>The default source is not yet set</source>
         <translation>La source par défaut n&apos;est encore pas configuré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="197"/>
+        <location filename="../core/src/DashboardBase.cpp" line="189"/>
         <source>The server serial %1 is not supported</source>
         <translation>La série %1de ngrt4nd n&apos;est plus supporté </translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="447"/>
-        <source>Invalid authentication chain. Must be login:password</source>
-        <translation>Chaine d&apos;authentification invalide. Doit être de la forme login:mot_de_passe</translation>
-    </message>
-    <message>
-        <location filename="../core/src/DashboardBase.cpp" line="458"/>
-        <source>This version is compiled without ngrt4nd support</source>
-        <translation>Cette version du logiciel est compilée sans le support de ngrt4nd</translation>
-    </message>
-    <message>
-        <location filename="../core/src/DashboardBase.cpp" line="601"/>
+        <location filename="../core/src/DashboardBase.cpp" line="551"/>
         <source>Undefined service (%1)</source>
         <translation>Service non défini (%1)</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="574"/>
-        <source>Can&apos;t allocate handler for source %1</source>
-        <translation>Ne peut allouer le handler pour la source %1</translation>
-    </message>
-    <message>
-        <location filename="../core/src/DashboardBase.cpp" line="505"/>
+        <location filename="../core/src/DashboardBase.cpp" line="492"/>
         <source>Cannot set handler for %1</source>
         <translation>Echec lors de l&apos;initialisation du hanldler de %1</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="509"/>
+        <location filename="../core/src/DashboardBase.cpp" line="496"/>
         <source>%1 is not set</source>
         <translation>%1 n&apos;est pas configuré</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="512"/>
+        <location filename="../core/src/DashboardBase.cpp" line="499"/>
         <source>Cannot handle source (%1)</source>
         <translation>Echec lors de l&apos;initialisation du hanldler de %1</translation>
-    </message>
-    <message>
-        <location filename="../core/src/DashboardBase.cpp" line="552"/>
-        <source>%1: undefined monitor (%2)</source>
-        <translation>%1 : moniteur supporté (%2)</translation>
     </message>
 </context>
 <context>
@@ -149,39 +130,39 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
 <context>
     <name>GuiDashboard</name>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="75"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="102"/>
         <source>Map</source>
         <translation>Cartographie</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="77"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="107"/>
         <source>Web Browser</source>
         <translation>Navigateur Web</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="209"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="254"/>
         <source>Messages related to &apos;%2&apos; - %1</source>
         <translation>Messages relatifs au service &apos;%2&apos; - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="282"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="327"/>
         <source> - %1 Problem%2
  - Level of Impact: %3</source>
         <translation> - %1 incident%2
  - Niveau d&apos;impact : %3</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="283"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="328"/>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="298"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="343"/>
         <source>Message Console</source>
         <translation>Console des messages</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiDashboard.cpp" line="353"/>
+        <location filename="../client/src/GuiDashboard.cpp" line="56"/>
         <source>Web Browser (%1)</source>
         <translation>Navigateur Web (%1)</translation>
     </message>
@@ -239,77 +220,77 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
         <translation>Ne pas vérifier le pair SSL</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="194"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="195"/>
         <source>(*) Required for Zabbix and Zenoss.</source>
         <translation>(*) Réquis pour Zabbix et Zenoss.</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="210"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="211"/>
         <source>C&amp;hange password</source>
         <translation>C&amp;hanger mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="215"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="216"/>
         <source>Change Password | %1</source>
         <translation>Changer mot de passe | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="218"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="219"/>
         <source>Current Password</source>
         <translation>Mot de passe actuel</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="220"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="221"/>
         <source>New password</source>
         <translation>Nouveau mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="222"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="223"/>
         <source>Retype new password</source>
         <translation>Confirmation</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="235"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="236"/>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="362"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="364"/>
         <source>Browser requires realm authentication | %1</source>
         <translation>La page demandée requiert une authentification | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="365"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="367"/>
         <source>Login</source>
         <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="368"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="370"/>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="372"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="374"/>
         <source>Submit</source>
         <translation>Soumettre</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="447"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="449"/>
         <source>Password updated</source>
         <translation>Mot de passe mis à jour</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="451"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="453"/>
         <source>Sorry the passwords do not match</source>
         <translation>Désolé, les deux mots de passe ne correspondent pas</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="454"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="456"/>
         <source>Authentication failed</source>
         <translation>Echec d&apos;authentification</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="484"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="486"/>
         <source>Update Actions</source>
         <translation>Actions</translation>
     </message>
@@ -528,6 +509,45 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
 </context>
 <context>
+    <name>PandoraHelper</name>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="120"/>
+        <source>Pandora: %1 (%2)</source>
+        <translation>Pandora: %1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="127"/>
+        <source>Pandora: authentication failed</source>
+        <translation>Pandora: echec d&apos;authentification </translation>
+    </message>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="192"/>
+        <source>Invalid module entry: %1</source>
+        <translation>Module indéfini: %1</translation>
+    </message>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="214"/>
+        <location filename="../core/src/PandoraHelper.cpp" line="216"/>
+        <source>%1 value is %2</source>
+        <translation>La valeur du module %1vaut %2 </translation>
+    </message>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="227"/>
+        <source>Pandora Error: %1</source>
+        <translation>Pandora a retourné une erreur: %1</translation>
+    </message>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="285"/>
+        <source>Bad login test result: %1</source>
+        <translation>Résultat inattendu: %1</translation>
+    </message>
+    <message>
+        <location filename="../core/src/PandoraHelper.cpp" line="299"/>
+        <source>Bad auth string, should be in the form of login:password:apipass</source>
+        <translation>Chaine d&apos;auhentification invalide: doit être sous la forme login:motdepasse:apimotdepasse</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../client/src/GuiUtils.cpp" line="60"/>
@@ -572,7 +592,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDashboard.cpp" line="38"/>
-        <location filename="../core/src/DashboardBase.cpp" line="53"/>
+        <location filename="../core/src/DashboardBase.cpp" line="54"/>
         <source>Failed to connect to %1 (%2)</source>
         <translation>Echec lors de la connexion Ã  %1 (%2)</translation>
     </message>
@@ -584,14 +604,14 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="98"/>
         <location filename="../client/src/ngrt4n-oc.cpp" line="91"/>
-        <source>You need to select a configuration file!</source>
-        <translation>Vous devez sélectionner un fichier de configuration!</translation>
+        <source>You need to select a description file!</source>
+        <translation>Veuillez sélectionner un fichier de description!</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="101"/>
         <location filename="../client/src/ngrt4n-oc.cpp" line="95"/>
-        <source>%1 | Select a configuration file</source>
-        <translation>%1 | Sélectionner un fichier de configuration</translation>
+        <source>%1 | Select a description file</source>
+        <translation>%1 | Sélectionner un fichier de description</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="103"/>
@@ -601,8 +621,8 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-manager.cpp" line="106"/>
-        <source>No configuration file has been selected and the program will exit!</source>
-        <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
+        <source>No description file has been selected and the program will exit!</source>
+        <translation>Aucun fichier de description n&apos;a été sélectionné et le programme va se terminer!</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-oc.cpp" line="52"/>
@@ -611,8 +631,8 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     </message>
     <message>
         <location filename="../client/src/ngrt4n-oc.cpp" line="100"/>
-        <source>No configuration file selected, the program will exit!</source>
-        <translation>Aucun fichier de configuration n&apos;a été sélectionné et le programme ne peut etre chargé!</translation>
+        <source>No description file selected, the program will exit!</source>
+        <translation>Aucun fichier de description n&apos;a été sélectionné et le programme va se terminer!</translation>
     </message>
     <message>
         <location filename="../core/src/ChartBase.cpp" line="71"/>
@@ -691,13 +711,12 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
         <translation>Incrémenté</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="174"/>
-        <location filename="../core/src/DashboardBase.cpp" line="535"/>
+        <location filename="../core/src/DashboardBase.cpp" line="160"/>
         <source>This version is compiled without ngrt4nd support</source>
         <translation>Cette version du logiciel est comilée sans le support de ngrt4nd</translation>
     </message>
     <message>
-        <location filename="../core/src/DashboardBase.cpp" line="270"/>
+        <location filename="../core/src/DashboardBase.cpp" line="315"/>
         <source>updating %1 (%2)...</source>
         <translation>mise à jour %1 (%2)...</translation>
     </message>
@@ -821,7 +840,7 @@ Child Statuses: %1</source>
 Status des fils : %1</translation>
     </message>
     <message>
-        <location filename="../client/src/GuiPreferences.cpp" line="237"/>
+        <location filename="../client/src/GuiPreferences.cpp" line="238"/>
         <source>
 %1
 Version: %2 (%3)
@@ -936,118 +955,118 @@ Commentaires : %6</translation>
 <context>
     <name>ServiceEditor</name>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="228"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="230"/>
         <source>Name</source>
         <translation>Etiquette</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="251"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="253"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="353"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="355"/>
         <source>Icon</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="199"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="201"/>
         <source>Invalid threshold rule: %1</source>
         <translation>Règle de seuil invalide : %1</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="238"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="240"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="266"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="268"/>
         <source>If</source>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="268"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="270"/>
         <source>Of</source>
         <translation>De</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="270"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="272"/>
         <source>Set To</source>
         <translation>Définir à </translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="280"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="282"/>
         <source>Add rule</source>
         <translation>Ajouter la règle</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="281"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="283"/>
         <source>Remove rule</source>
         <translation>Supprimer la règle</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="297"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="299"/>
         <source>Severiry Calculation Rule</source>
         <translation>Règle de caclul de sévérité</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="312"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="314"/>
         <source>Weight</source>
         <translation>Poids</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="316"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="318"/>
         <source>Severity Propagation Rule</source>
         <translation>Règle de propagation de sévérité</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="326"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="328"/>
         <source>Alarm Message</source>
         <translation>Message d&apos;alarme</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="335"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="337"/>
         <source>Notification Message</source>
         <translation>Message de notification</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="345"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="347"/>
         <source>--&gt;Select an icon (Default is %1)</source>
         <translation>--&gt; Sélectionner une icône (valeur par défaut : %1)</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="365"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="367"/>
         <source>Set or search data point...</source>
         <translation>Définir ou rechercher un point de donnée...</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="367"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="369"/>
         <source>Select host group</source>
         <translation>Sélectionner un groupe de d&apos;hôte</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="376"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="378"/>
         <source>Data Point</source>
         <translation>Point de donnée</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="399"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="401"/>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="400"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="402"/>
         <source>Fermer</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="429"/>
-        <location filename="../client/src/ServiceEditor.cpp" line="434"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="431"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="436"/>
         <source>Click to open help</source>
         <translation>Cliquer pour ouvrir l&apos;aide</translation>
     </message>
     <message>
-        <location filename="../client/src/ServiceEditor.cpp" line="520"/>
+        <location filename="../client/src/ServiceEditor.cpp" line="522"/>
         <source>Rule already set</source>
         <translation>Règle déjà définie</translation>
     </message>
@@ -1060,256 +1079,261 @@ Commentaires : %6</translation>
 <context>
     <name>SvCreator</name>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="63"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="70"/>
         <source>Open or edit a file via the File menu</source>
         <translation>Créer un fichier ou ouvrir un fichier existant via le menu Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="133"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="170"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="671"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="141"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="175"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="696"/>
         <source>%1 Editor - %2</source>
         <translation> Editeur %1 - %2</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="134"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="142"/>
         <source>Loaded.</source>
         <translation>Chargement terminé.</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="143"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="151"/>
         <source>%1 | Select target file</source>
         <translation>%1 | Sélectionner le fichier cible</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="145"/>
-        <source>%1;;%2;;%3;;%4;;Xml files(*.xml);;All files(*)</source>
-        <translation>%1;;%2;;%3;;%4;;Fichiers Xml (*.xml);;Tous les fichiers (*)</translation>
-    </message>
-    <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="202"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="207"/>
         <source>Loading checks from %1:%2...</source>
         <translation>Chargement des données de sondes à partir de %1:%2...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="205"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="210"/>
         <source>Error while parsing the file</source>
         <translation>Erreur lors du traitement du fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="207"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="212"/>
         <source>No file selected</source>
         <translation>Aucun fichier sélectionné</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="222"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="227"/>
         <source>Loading checks from %1:%2:%3...</source>
         <translation>Chargement des données à partir de %1:%2:%3...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="246"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="251"/>
         <source>Loading triggers from %1:%2...</source>
         <translation>Chargement des données de déclencheurs à partir de %1:%2...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="271"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="276"/>
         <source>Loading components from %1:%2...</source>
         <translation>Chargements des données de composants à partir de %1:%2... </translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="291"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="316"/>
         <source>%1 entries imported</source>
         <translation>%1 entrées importées</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="356"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="381"/>
         <source>This action is not allowed on the target service</source>
         <translation>Cette action n&apos;est pas permise avec le service cible</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="624"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="649"/>
         <source>* unsaved changes left</source>
         <translation>* changements non enregistrés</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="632"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="657"/>
         <source>Saving in %1...</source>
         <translation>Enregistrement dans le fichier %1...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="636"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="661"/>
         <source>Cannot open file: %1</source>
         <translation>Impossible d&apos;ouvrir le fichier: %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="670"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="695"/>
         <source>File saved: %1</source>
         <translation>fichier enregistré: %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="731"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="756"/>
         <source>Import Z&amp;enoss Components</source>
         <translation>Importer des composants Z&amp;enoss</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="301"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="326"/>
         <source>New View</source>
         <translation>Nouvelle vue de service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="309"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="300"/>
+        <source>Loading Pandora agents data from %1:%2...</source>
+        <translation>Chargement de données d&apos;agents à partir de %1:%2...</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="334"/>
         <source>%1 Editor - unsaved document*</source>
         <translation>Editeur %1 - document non enregistré*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="318"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="343"/>
         <source>sub service %1</source>
         <translation>sous service %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="330"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="355"/>
         <source>Out of memory. the application will exit</source>
         <translation>Mémoire indisponible, l&apos;application va se terminer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="364"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="389"/>
         <source>Do you really want to delete the service and its sub services?</source>
         <translation>Voulez-vous vraiment suppimer le service?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="365"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="390"/>
         <source>Deleting service - %1 Editor</source>
         <translation>Suppression de service  - Editeur %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="432"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="457"/>
         <source>There is no data in the clipboard!</source>
         <translation>Il n&apos;y a pas de données dans le presse papier!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="455"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="480"/>
         <source>Select the destination file | %1</source>
         <translation>Sélectionner le fichier de destination | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="464"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="486"/>
         <source>The path is not valid!</source>
         <translation>Chemin invalide!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="493"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="518"/>
         <source>Save change? - %1</source>
         <translation>Enregistrer les mises Ã  jour ? - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="494"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="519"/>
         <source>The document has changed.
 Do you want to save the changes?</source>
         <translation>Le document n&apos;a été modifiée.
 Voulez-vous enregistrer les mises Ã  jour?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="571"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="579"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="607"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="596"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="604"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="632"/>
         <source>* Unsaved changes left</source>
         <translation>* Changement non enregistrés</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="572"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="580"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="608"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="625"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="597"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="605"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="633"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="650"/>
         <source>%1 Editor - %2*</source>
         <translation>Editeur %1 - %2*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="642"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="667"/>
         <source>The hierarchy does not have root</source>
         <translation>La hiérarchie n&apos;a pas de racine</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="718"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="743"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="721"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="746"/>
         <source>&amp;Open</source>
         <translation>&amp;Ouvrir</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="723"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="748"/>
         <source>&amp;Save</source>
         <translation>&amp;Enregistrer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="725"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="750"/>
         <source>Save &amp;As...</source>
         <translation>Enregistrer &amp;sous...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="728"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="753"/>
         <source>Import Na&amp;gios Checks</source>
         <translation>Importer des sondes Na&amp;gios</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="729"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="754"/>
         <source>Import Livestatus Checks</source>
         <translation>Importer des données Livestatus</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="730"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="755"/>
         <source>Import Za&amp;bbix Triggers</source>
         <translation>Importer des déclencheurs Za&amp;bbix</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="768"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="757"/>
+        <source>Import &amp;Pandora Modules</source>
+        <translation>Importer des modules de &amp;Pandora FMS</translation>
+    </message>
+    <message>
+        <location filename="../client/src/SvConfigCreator.cpp" line="796"/>
         <source>ERROR: Unable to open the file %1</source>
         <translation>ERREUR: Ne peut ouvrir le fichier %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="733"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="760"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="735"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="762"/>
         <source>&amp;Edition</source>
         <translation>&amp;Edition</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="736"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="763"/>
         <source>&amp;Add sub service</source>
         <translation>&amp;Ajouter sous service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="739"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="766"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="742"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="769"/>
         <source>&amp;Paste</source>
         <translation>Co&amp;ller</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="745"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="772"/>
         <source>&amp;Delete</source>
         <translation>&amp;Supprimer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="748"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="775"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="749"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="776"/>
         <source>Online &amp;Resources</source>
         <translation>&amp;Ressources en ligne</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="752"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="779"/>
         <source>&amp;About %1</source>
         <translation>&amp;A propos de %1</translation>
     </message>
