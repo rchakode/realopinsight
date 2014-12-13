@@ -100,6 +100,7 @@ public:
   virtual void initialize(Preferences* preferencePtr);
   std::string tooltip(void) const {return m_chart->toStdString();}
   void triggerResizeComponents(void) {m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
+  void handleShowOnlyTroubleEvents(bool showOnlyTrouble);
 
 
 protected:

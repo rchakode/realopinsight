@@ -29,6 +29,7 @@
 
 namespace {
   const qint32 ID_COLUMN = 5;
+  const int TABLE_COLUMN_COUNT = ID_COLUMN + 1;
 }
 
 WebMsgConsole::WebMsgConsole()
@@ -42,15 +43,8 @@ WebMsgConsole::WebMsgConsole()
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
 
-  m_model = new Wt::WStandardItemModel(0, ID_COLUMN+1);
-  m_model->setHeaderData(0, Wt::Horizontal,Q_TR("Date & Hour"), Wt::DisplayRole);
-  m_model->setHeaderData(1, Wt::Horizontal,Q_TR("Severity"), Wt::DisplayRole);
-  m_model->setHeaderData(2, Wt::Horizontal,Q_TR("Host"), Wt::DisplayRole);
-  m_model->setHeaderData(3, Wt::Horizontal,Q_TR("Service"), Wt::DisplayRole);
-  m_model->setHeaderData(4, Wt::Horizontal,Q_TR("Message"), Wt::DisplayRole);
-  m_model->setHeaderData(ID_COLUMN, Wt::Horizontal,Q_TR("Service ID"), Wt::UserRole);
-  hideColumn(ID_COLUMN);
-
+  m_model = new Wt::WStandardItemModel(0, TABLE_COLUMN_COUNT);
+  setModelHeaders();
   setModel();
 }
 
@@ -66,6 +60,18 @@ void WebMsgConsole::setModel(void)
   sproxy->setDynamicSortFilter(true);
   sproxy->setFilterRole(Wt::UserRole);
   WTableView::setModel(sproxy);
+}
+
+void WebMsgConsole::setModelHeaders(void)
+{
+  m_model->insertColumns(0, TABLE_COLUMN_COUNT);
+  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Date & Hour"), Wt::DisplayRole);
+  m_model->setHeaderData(1, Wt::Horizontal, Q_TR("Severity"), Wt::DisplayRole);
+  m_model->setHeaderData(2, Wt::Horizontal, Q_TR("Host"), Wt::DisplayRole);
+  m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Service"), Wt::DisplayRole);
+  m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Message"), Wt::DisplayRole);
+  m_model->setHeaderData(ID_COLUMN, Wt::Horizontal, Q_TR("Service ID"), Wt::UserRole);
+  hideColumn(ID_COLUMN);
 }
 
 void  WebMsgConsole::layoutSizeChanged(int width, int)

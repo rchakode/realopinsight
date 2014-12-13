@@ -195,3 +195,13 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
   tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
   return tpl;
 }
+
+
+void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble)
+{
+  m_showOnlyTroubles = showOnlyTrouble;
+  m_widget->setDisabled(true);
+  m_msgConsole->clearAll();
+  runMonitor();
+  m_widget->setDisabled(false);
+}

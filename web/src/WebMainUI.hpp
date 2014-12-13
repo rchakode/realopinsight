@@ -162,6 +162,7 @@ private:
   Wt::WAnchor* m_reportApplyAnchor;
 
   Wt::WComboBox* m_selectViewBreadCrumbsBox;
+  Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -199,6 +200,7 @@ private:
   void handleDeleteView(const std::string& viewName);
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
+  void handleDisplayOnlyTroubleStateChanged(void);
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
   void setupNotificationManager(void);
@@ -209,7 +211,8 @@ private:
   Wt::WStackedWidget* createMainStackedContent(void);
   Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
   Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
-  Wt::WWidget* createShowViewBreadCrumbsLink(void);
+  Wt::WComboBox* createShowViewBreadCrumbsLink(void);
+  Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);

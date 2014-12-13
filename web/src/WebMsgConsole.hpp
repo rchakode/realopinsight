@@ -49,8 +49,9 @@ class WebMsgConsole : public Wt::WTableView
 {
 public:
   WebMsgConsole();
-  virtual
-  ~WebMsgConsole();
+  virtual ~WebMsgConsole();
+  void clearAll(void) {m_model->clear(); setModelHeaders();}
+
 
   Wt::WStandardItemModel* getRenderingModel(void) const {return m_model;}
   void addMsg(const NodeT&  _node);
@@ -70,6 +71,7 @@ private:
   int findServiceRow(const std::string& _id);
   void updateSeverityItem(Wt::WStandardItem* item, int severity);
   void setModel(void);
+  void setModelHeaders(void);
 };
 
 #endif /* NGRT4NMSGPANEL_HPP_ */

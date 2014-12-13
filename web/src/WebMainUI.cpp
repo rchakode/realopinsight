@@ -167,8 +167,10 @@ Wt::WNavigationBar* WebMainUI::createNavivationBar(void)
 Wt::WWidget* WebMainUI::createBreadCrumbsBar(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("breadcrumbs-bar.tpl"));
+
   tpl->bindWidget("show-settings-link", createShowSettingsBreadCrumbsLink());
-  tpl->bindWidget("show-view-link", createShowViewBreadCrumbsLink());
+  tpl->bindWidget("display-view-selection-box", m_selectViewBreadCrumbsBox = createShowViewBreadCrumbsLink());
+  tpl->bindWidget("display-only-trouble-event-box", m_displayOnlyTroubleEventsBox = createDisplayOnlyTroubleBreadCrumbsLink());
   if (! m_dbSession->isLoggedAdmin()) {
     tpl->bindWidget("show-home-link", createShowOpsHomeBreadCrumbsLink());
   } else {
@@ -214,22 +216,24 @@ Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
   return link;
 }
 
-Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
+Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
 {
-  m_selectViewBreadCrumbsBox = new Wt::WComboBox();
+  Wt::WComboBox* selectionBox = new Wt::WComboBox();
   if (! m_dbSession->isLoggedAdmin()) {
-    m_selectViewBreadCrumbsBox->addItem(Q_TR("Executive View"));
+    selectionBox->addItem(Q_TR("Executive View"));
   } else {
-    m_selectViewBreadCrumbsBox->addItem(Q_TR("Admin Home"));
+    selectionBox->addItem(Q_TR("Admin Home"));
   }
 
-  m_selectViewBreadCrumbsBox->changed().connect(std::bind([=](){
-    QString selectedViewName = QString::fromStdString( m_selectViewBreadCrumbsBox->currentText().toUTF8() );
+  selectionBox->changed().connect(std::bind([=](){
+    QString selectedViewName = QString::fromStdString( selectionBox->currentText().toUTF8() );
     DashboardMapT::Iterator dashboardIter = m_dashboards.find(selectedViewName);
     if (dashboardIter != m_dashboards.end()) {
       m_currentDashboard = *dashboardIter;
       setDashboardAsFrontStackedWidget(m_currentDashboard);
+      m_displayOnlyTroubleEventsBox->setHidden(false);
     } else {
+      m_displayOnlyTroubleEventsBox->setHidden(true);
       if (! m_dbSession->isLoggedAdmin()) {
         setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
       } else {
@@ -238,9 +242,23 @@ Wt::WWidget* WebMainUI::createShowViewBreadCrumbsLink(void)
       m_currentDashboard = NULL;
     }
   }));
-  return m_selectViewBreadCrumbsBox;
+  return selectionBox;
 }
 
+Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
+{
+  Wt::WCheckBox* checkBox = new Wt::WCheckBox(Q_TR("Display only trouble events"));
+  checkBox->changed().connect(this, &WebMainUI::handleDisplayOnlyTroubleStateChanged);
+  checkBox->setHidden(true);
+  return checkBox;
+}
+
+void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
+{
+  if (m_displayOnlyTroubleEventsBox) {
+    m_currentDashboard->handleShowOnlyTroubleEvents(m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked);
+  }
+}
 
 void WebMainUI::setupInfoBox(void)
 {

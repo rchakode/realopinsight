@@ -31,10 +31,13 @@
  * @brief LdapUserTable::LdapUserTable
  * @param parent
  */
+namespace {
+  const int TABLE_COLUMN_COUNT = 5;
+}
 LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
     m_userEnableStatusChanged(this),
-    m_model(new Wt::WStandardItemModel(0, 5, this)),
+    m_model(new Wt::WStandardItemModel(0, TABLE_COLUMN_COUNT, this)),
     m_dbSession(dbSession)
 {
   setSortingEnabled(true);
@@ -64,6 +67,7 @@ void LdapUserManager::addEvent()
  */
 void LdapUserManager::setModelHeader(void)
 {
+  m_model->insertColumns(0, TABLE_COLUMN_COUNT);
   m_model->setHeaderData(0, Q_TR("DN"));
   m_model->setHeaderData(1, Q_TR("Full Name"));
   m_model->setHeaderData(2, Q_TR("UID"));
@@ -94,6 +98,7 @@ int LdapUserManager::updateUserList(void)
                                    filter,
                                    m_users);
   m_model->clear();
+  setModelHeader();
   if (count <= 0) {
     m_lastError = ldapHelper.lastError();
   } else {
@@ -102,7 +107,6 @@ int LdapUserManager::updateUserList(void)
       bool imported = m_dbSession->findUser(userInfo[m_ldapUidField], dbUserInfo);
       addUserRow(userInfo, imported);
     }
-    setModelHeader();
   }
   setDisabled(false);
   return count;

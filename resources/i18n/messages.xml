@@ -570,7 +570,7 @@
 <ol class="breadcrumb">
   <li>${show-settings-link}</li>
   <li> | ${show-home-link}</li>
-  <li> | Display view ${show-view-link}</li>
+  <li> | Display view ${display-view-selection-box} ${display-only-trouble-event-box}</li>
 </ol>
 </message>
 </messages>
