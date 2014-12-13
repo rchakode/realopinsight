@@ -79,7 +79,7 @@ bool Parser::process(bool console)
     node.monitored = false;
     node.id = service.attribute("id").trimmed();
     node.type = service.attribute("type").toInt();
-    node.sev = ngrt4n::Unknown;
+    node.sev = node.sev_prop = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
     node.icon = service.firstChildElement("Icon").text().trimmed();
