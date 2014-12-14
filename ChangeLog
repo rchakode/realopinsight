@@ -1,6 +1,16 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.2.0 (ibericus)
+  * Added support for Pandora FMS monitoring backends. Based on
+    Pandora FMS's API, any versions of Pandora FMS starting from
+    version 4.0.2 should be fully compatible. Older versions may not
+    work if your Pandora FMS is protected by a password, because the
+    name of the password parameter has been changed since then.
+  * Now sets the default propagation severity to Unknown
+    in order to fix some inconsistencies in status propagation.
+  * Misc fixes to simplify code and improve performances
+
 3.1.1
   * Fixed problem when the average calculation rule with thresholds always returns
     average severity.
