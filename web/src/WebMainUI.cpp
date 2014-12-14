@@ -200,7 +200,7 @@ Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
         hideAdminSettingsMenu();
       }
       setWidgetAsFrontStackedWidget(m_settingsPageWidget);
-      m_selectViewBreadCrumbsBox->setCurrentIndex(0);
+      resetViewSelectionBox();
     }
   }));
   return link;
@@ -212,7 +212,7 @@ Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
   link->clicked().connect(std::bind([=]{
     if (m_operatorHomeDashboardWidget) {
       setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
-      m_selectViewBreadCrumbsBox->setCurrentIndex(0);
+      resetViewSelectionBox();
     }
   }));
   return link;
@@ -227,21 +227,21 @@ Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
     selectionBox->addItem(Q_TR("Admin Home"));
   }
 
-  selectionBox->changed().connect(std::bind([=](){
+  selectionBox->changed().connect(std::bind([=]() {
     QString selectedViewName = QString::fromStdString( selectionBox->currentText().toUTF8() );
     DashboardMapT::Iterator dashboardIter = m_dashboards.find(selectedViewName);
     if (dashboardIter != m_dashboards.end()) {
-      m_currentDashboard = *dashboardIter;
       setDashboardAsFrontStackedWidget(m_currentDashboard);
       m_displayOnlyTroubleEventsBox->setHidden(false);
+      m_currentDashboard = *dashboardIter;
     } else {
+      m_currentDashboard = NULL;
       m_displayOnlyTroubleEventsBox->setHidden(true);
       if (! m_dbSession->isLoggedAdmin()) {
         setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
       } else {
         setWidgetAsFrontStackedWidget(m_settingsPageWidget);
       }
-      m_currentDashboard = NULL;
     }
   }));
   return selectionBox;
@@ -257,7 +257,7 @@ Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
 
 void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
 {
-  if (m_displayOnlyTroubleEventsBox) {
+  if (m_displayOnlyTroubleEventsBox && m_currentDashboard) {
     m_currentDashboard->handleShowOnlyTroubleEvents(m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked);
   }
 }
@@ -536,6 +536,7 @@ void WebMainUI::finishFileDialog(int action)
       if (! m_selectedFile.empty()) {
         WebDashboard* dashbord;
         loadView(m_selectedFile, dashbord);
+        setDashboardAsFrontStackedWidget(dashbord);
         m_selectedFile.clear();
       } else {
         showMessage(ngrt4n::OperationFailed, tr("No file selected").toStdString());
@@ -813,7 +814,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   viewSelector->setCurrentIndex(0);
   
   // Set selection action
-  viewSelector->activated().connect(std::bind([=]() {
+  viewSelector->changed().connect(std::bind([=]() {
     int index = viewSelector->currentIndex();
     Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(viewSelector->model());
     if (index>0) {
@@ -901,9 +902,12 @@ void WebMainUI::initOperatorDashboard(void)
       thumbItem->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
       thumbItem->bindWidget("thumb-image", dashboard->thumbnail());
       thumbItem->bindWidget("thumb-problem-details", dashboard->thumbnailProblemDetailBar());
-      thumbItem->clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
 
+      /** signal/slot events */
+      thumbItem->clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
       QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(setWidgetAsFrontStackedWidget(Wt::WWidget*)));
+
+      /** add to layout */
       thumbLayout->addWidget(thumbItem, thumbIndex / THUMBNAILS_PER_ROW, thumbIndex % THUMBNAILS_PER_ROW);
 
       m_thumbnailItems.insert(view.name, thumbItem);
@@ -1174,6 +1178,10 @@ void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
   if (dashboard) {
     setWidgetAsFrontStackedWidget(dashboard->getWidget());
     dashboard->triggerResizeComponents();
+    int index = m_selectViewBreadCrumbsBox->findText(dashboard->rootNode().name.toStdString());
+    m_selectViewBreadCrumbsBox->setCurrentIndex(index);
+    m_displayOnlyTroubleEventsBox->setHidden(false);
+    m_currentDashboard = dashboard;
   }
 }
 

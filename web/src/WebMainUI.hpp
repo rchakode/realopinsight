@@ -33,6 +33,7 @@
 #include "WebBiCharts.hpp"
 #include "WebUtils.hpp"
 #include "WebNotificationManager.hpp"
+#include <Wt/WComboBox>
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/WTabWidget>
@@ -102,6 +103,7 @@ public Q_SLOTS:
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
   void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
   void setWidgetAsFrontStackedWidget(Wt::WWidget* widget);
+  void resetViewSelectionBox(void) { m_selectViewBreadCrumbsBox->setCurrentIndex(0); m_displayOnlyTroubleEventsBox->setHidden(true);}
 
 private:
   enum FileDialogAction {
