@@ -26,11 +26,10 @@
 #include "WebUtils.hpp"
 
 namespace {
-  const int COLUMN_COUNT = 5;
+  const int COLUMN_COUNT = 6;
 }
 NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
-    m_model(new Wt::WStandardItemModel(0, COLUMN_COUNT, this)),
     m_dbSession(dbSession)
 {
   setSortingEnabled(true);
@@ -40,10 +39,10 @@ NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContaine
   setSelectionMode(Wt::SingleSelection);
   setSelectionBehavior(Wt::SelectRows);
   setHeaderHeight(26);
-  setAlternatingRowColors(true);
 
-  setModelHeader();
+  m_model = new Wt::WStandardItemModel(0, COLUMN_COUNT);
   setModel(m_model);
+  setModelHeader();
   addEvent();
 }
 
@@ -56,11 +55,13 @@ void NotificationTableView::addEvent()
 void NotificationTableView::setModelHeader(void)
 {
   m_model->insertColumns(0, COLUMN_COUNT);
+
   m_model->setHeaderData(0, Q_TR("Service Name"));
   m_model->setHeaderData(1, Q_TR("Severity"));
-  m_model->setHeaderData(2, Q_TR("Last Change"));
-  m_model->setHeaderData(3, Q_TR("Acknowledge"));
-  m_model->setHeaderData(4, Q_TR("Updated by"));
+  m_model->setHeaderData(2, Q_TR("Notification"));
+  m_model->setHeaderData(3, Q_TR("Last Notification"));
+  m_model->setHeaderData(4, Q_TR("Acknowledged"));
+  m_model->setHeaderData(5, Q_TR("Updated by"));
 }
 
 
@@ -98,14 +99,24 @@ void NotificationTableView::addServiceEntry(const NodeT& service,
 {
   int row = m_model->rowCount();
   std::string serviceName = service.name.toStdString();
-
   m_model->setItem(row, 0, ngrt4n::createStandardItem(serviceName, serviceName));
   m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(service));
-
   if (hasNotification) {
-    m_model->setItem(row, 2, ngrt4n::createStandardItem(ngrt4n::timet2String(notification.last_change).toUTF8(), serviceName) );
-    m_model->setItem(row, 3, ngrt4n::createCheckableStandardItem(serviceName, notification.ack_status == DboNotification::Acknowledged));
-    m_model->setItem(row, 4, ngrt4n::createStandardItem(notification.ack_username, serviceName));
+    m_model->setItem(row, 2, ngrt4n::createStandardItem(Q_TR("Enabled"), serviceName) );
+    m_model->setItem(row, 3, ngrt4n::createStandardItem(ngrt4n::timet2String(notification.last_change).toUTF8(), serviceName) );
+    m_model->setItem(row, 4, ngrt4n::createCheckableStandardItem(serviceName, notification.ack_status == DboNotification::Acknowledged));
+    m_model->setItem(row, 5, ngrt4n::createStandardItem(notification.ack_username, serviceName));
+  } else {
+    m_model->setItem(row, 2, ngrt4n::createStandardItem(Q_TR("Disabled"), serviceName) );
+    m_model->setItem(row, 3, ngrt4n::createStandardItem("", serviceName));
+    m_model->setItem(row, 4, ngrt4n::createStandardItem("", serviceName));
+    m_model->setItem(row, 5, ngrt4n::createStandardItem("", serviceName));
+  }
+
+  // Deal with row alternate
+  if (row & 1) {
+    for (int i:  {0, 2, 3, 4, 5})
+      m_model->item(row, i)->setStyleClass(ngrt4n::severityCssClass(-1));
   }
 }
 

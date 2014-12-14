@@ -29,12 +29,12 @@
 WebNotificationManager::WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WDialog(Q_TR("Manage Notifications"), parent),
     m_operationCompleted(this)
-{
-  m_infoBox =  new Wt::WText("", this->contents());
+{;
   m_notificationTableView = new NotificationTableView(dbSession, this->contents());
   Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
   closeButton->clicked().connect(this, &Wt::WDialog::accept);
 
+  m_infoBox = new Wt::WText("", this->footer());
   setStyleClass("Wt-dialog");
   titleBar()->setStyleClass("titlebar");
 }
@@ -51,11 +51,10 @@ void WebNotificationManager::show(void)
   if (m_notificationTableView->update() != 0) {
     m_infoBox->setHidden(false);
     m_infoBox->setText(m_notificationTableView->lastError());
-    m_infoBox->setStyleClass("alert alert-warning");
-    //m_operationCompleted.emit(ngrt4n::OperationFailed, m_notificationTableView->lastError());
+    m_infoBox->setStyleClass("text-danger");
   } else {
     m_infoBox->setHidden(true);
-    m_infoBox->setStyleClass("alert alert-normal");
+    m_infoBox->setStyleClass("text-muted");
   }
   Wt::WDialog::show();
 }

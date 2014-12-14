@@ -277,6 +277,7 @@ void WebMainUI::setupProfileMenus(void)
   if (! m_dbSession->isLoggedAdmin()) {
     m_notificationManager = createNotificationManager();
     m_notificationSection = createNotificationSection();
+    m_notificationSection->setToolTip(Q_TR("Manage notifications"));
     m_navbar->addWidget(m_notificationSection, Wt::AlignRight);
   }
   
