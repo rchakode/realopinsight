@@ -231,9 +231,8 @@ Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
     QString selectedViewName = QString::fromStdString( selectionBox->currentText().toUTF8() );
     DashboardMapT::Iterator dashboardIter = m_dashboards.find(selectedViewName);
     if (dashboardIter != m_dashboards.end()) {
-      setDashboardAsFrontStackedWidget(m_currentDashboard);
+      setDashboardAsFrontStackedWidget(*dashboardIter);
       m_displayOnlyTroubleEventsBox->setHidden(false);
-      m_currentDashboard = *dashboardIter;
     } else {
       m_currentDashboard = NULL;
       m_displayOnlyTroubleEventsBox->setHidden(true);
