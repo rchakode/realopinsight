@@ -77,6 +77,8 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_settingsPageWidget(NULL),
     m_operatorHomeDashboardWidget(NULL),
     m_settings (new Settings()),
+    m_notificationManager(NULL),
+    m_notificationSection(NULL),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_preferences(new WebPreferences()),
@@ -273,38 +275,9 @@ void WebMainUI::setupProfileMenus(void)
   m_navbar->addMenu(profileMenu, Wt::AlignRight);
   
   if (! m_dbSession->isLoggedAdmin()) {
-    setupNotificationManager();
-
-    Wt::WTemplate* notificationSectionTpl = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
-
-    notificationSectionTpl->bindWidget("main-notification-icon", m_mainNotificationManagerIcon = createMainNotificationIcon());
-
-    m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
-    m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
-    m_notificationBoxes[ngrt4n::Normal]->setHidden(true);
-    notificationSectionTpl->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
-
-    m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
-    m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
-    m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
-    notificationSectionTpl->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
-
-    m_notificationBoxes[ngrt4n::Major] = new Wt::WText("0");
-    m_notificationBoxes[ngrt4n::Major]->setStyleClass("badge severity-major");
-    m_notificationBoxes[ngrt4n::Major]->setHidden(true);
-    notificationSectionTpl->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
-
-    m_notificationBoxes[ngrt4n::Critical] = new Wt::WText("0");
-    m_notificationBoxes[ngrt4n::Critical]->setStyleClass("badge severity-critical");
-    m_notificationBoxes[ngrt4n::Critical]->setHidden(true);
-    notificationSectionTpl->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
-
-    m_notificationBoxes[ngrt4n::Unknown] = new Wt::WText("0");
-    m_notificationBoxes[ngrt4n::Unknown]->setStyleClass("badge severity-unknown");
-    m_notificationBoxes[ngrt4n::Unknown]->setHidden(true);
-    notificationSectionTpl->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
-
-    m_navbar->addWidget(notificationSectionTpl, Wt::AlignRight);
+    m_notificationManager = createNotificationManager();
+    m_notificationSection = createNotificationSection();
+    m_navbar->addWidget(m_notificationSection, Wt::AlignRight);
   }
   
   Wt::WMenuItem* profileMenuItem = new Wt::WMenuItem(tr("Signed in as %1").arg(m_dbSession->loggedUserName()).toStdString());
@@ -319,15 +292,41 @@ void WebMainUI::setupProfileMenus(void)
   profilePopupMenu->addItem("About")->triggered().connect(m_aboutDialog, &Wt::WDialog::show);
 }
 
-
-Wt::WWidget* WebMainUI::createMainNotificationIcon(void)
+Wt::WWidget* WebMainUI::createNotificationSection(void)
 {
-  Wt::WPushButton* widget = new Wt::WPushButton(" ");
-  widget->setStyleClass("fa fa-bell btn btn-danger");
-  widget->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
-  widget->setToolTip(Q_TR("Manage notifications"));
-  return widget;
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
+
+  m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
+  m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
+  m_notificationBoxes[ngrt4n::Normal]->setHidden(true);
+  tpl->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
+
+  m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
+  m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
+  m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
+  tpl->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
+
+  m_notificationBoxes[ngrt4n::Major] = new Wt::WText("0");
+  m_notificationBoxes[ngrt4n::Major]->setStyleClass("badge severity-major");
+  m_notificationBoxes[ngrt4n::Major]->setHidden(true);
+  tpl->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
+
+  m_notificationBoxes[ngrt4n::Critical] = new Wt::WText("0");
+  m_notificationBoxes[ngrt4n::Critical]->setStyleClass("badge severity-critical");
+  m_notificationBoxes[ngrt4n::Critical]->setHidden(true);
+  tpl->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
+
+  m_notificationBoxes[ngrt4n::Unknown] = new Wt::WText("0");
+  m_notificationBoxes[ngrt4n::Unknown]->setStyleClass("btn btn-unknown");
+  m_notificationBoxes[ngrt4n::Unknown]->setHidden(true);
+  tpl->bindWidget("unknown-count", m_notificationBoxes[ngrt4n::Unknown]);
+
+  tpl->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
+
+  return tpl;
 }
+
+
 
 void WebMainUI::hideAdminSettingsMenu(void)
 {
@@ -383,6 +382,11 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Critical] = 0;
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
+  // clear the notification manager when applicable
+  if (m_notificationManager) {
+    m_notificationManager->clearAllServicesData();
+  }
+
   int currentView = 1;
   for (auto& dashboard : m_dashboards) {
     dashboard->initSettings(m_preferences);
@@ -390,29 +394,32 @@ void WebMainUI::handleRefresh(void)
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
 
-    int platformSeverity = qMin(dashboard->rootNode().sev, (int)ngrt4n::Unknown);
-    if (platformSeverity != ngrt4n::Normal) ++problemTypeCount[platformSeverity];
+    NodeT rootService = dashboard->rootNode();
+    int platformSeverity = qMin(rootService.sev, static_cast<int>(ngrt4n::Unknown));
+    if (platformSeverity != ngrt4n::Normal) {
+      ++problemTypeCount[platformSeverity];
+      if (m_notificationManager) {
+        m_notificationManager->updateServiceData(rootService);
+      }
+    }
 
-    QString viewName = dashboard->rootNode().name;
-    ThumbnailMapT::Iterator thumbItem = m_thumbnailItems.find(viewName.toStdString());
+    std::string rootServiceName =  rootService.name.toStdString();
+    ThumbnailMapT::Iterator thumbItem = m_thumbnailItems.find(rootServiceName);
     if (thumbItem != m_thumbnailItems.end()) {
       (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbItem)->setToolTip(dashboard->tooltip());
-      updateViewBiCharts(viewName.toStdString());
+      updateViewBiCharts(rootServiceName);
     }
     ++currentView;
   }
 
-  // Set notification only for operator console
+  // Display notifications only on operator console
   if (! m_dbSession->isLoggedAdmin()) {
-    for(auto ptype: problemTypeCount) {
-      m_notificationBoxes[ptype.first]->setText(QString::number(ptype.second).toStdString());
-      if (ptype.second > 0) {
-        m_notificationBoxes[ptype.first]->setHidden(false);
-      } else {
-        m_notificationBoxes[ptype.first]->setHidden(true);
-      }
+    for(auto severityEntry: problemTypeCount) {
+      m_notificationBoxes[severityEntry.first]->setText(QString::number(severityEntry.second).toStdString());
+      m_notificationBoxes[severityEntry.first]->setHidden(severityEntry.second <= 0);
     }
+
     updateEventFeeds();
   } // notification section
 
@@ -1153,10 +1160,11 @@ Wt::WContainerWidget* WebMainUI::createReportExportLinks(const std::string& view
 }
 
 
-void WebMainUI::setupNotificationManager(void)
+WebNotificationManager* WebMainUI::createNotificationManager(void)
 {
-  m_notificationManager = new WebNotificationManager(m_dbSession, m_mainWidget);
-  m_notificationManager->operationCompleted().connect(this, &WebMainUI::showMessage);
+  WebNotificationManager* notificationManager = new WebNotificationManager(m_dbSession, m_mainWidget);
+  notificationManager->operationCompleted().connect(this, &WebMainUI::showMessage);
+  return notificationManager;
 }
 
 

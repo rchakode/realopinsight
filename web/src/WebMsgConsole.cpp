@@ -94,7 +94,7 @@ void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
       addMsg(*node);
     } else {
       m_model->item(index, 0)->setText(ngrt4n::humanTimeText(node->check.last_state_change));
-      updateSeverityItem(m_model->item(index, 1), node->sev);
+      ngrt4n::updateSeverityItem(m_model->item(index, 1), node->sev);
       m_model->item(index, 2)->setText(node->check.host);
       m_model->item(index, 3)->setText(node->name.toStdString()); //optional
       m_model->item(index, 4)->setText(node->actual_msg.toStdString());
@@ -109,7 +109,7 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
     addMsg(_node);
   } else {
     m_model->item(index, 0)->setText(ngrt4n::humanTimeText(_node.check.last_state_change));
-    updateSeverityItem(m_model->item(index, 1), _node.sev);
+    ngrt4n::updateSeverityItem(m_model->item(index, 1), _node.sev);
     m_model->item(index, 2)->setText(_node.check.host);
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
     m_model->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
@@ -121,7 +121,7 @@ void WebMsgConsole::addMsg(const NodeT&  _node)
 {
   int row = m_model->rowCount();
   m_model->setItem(row, 0, createDateTimeItem(_node.check.last_state_change, row));
-  m_model->setItem(row, 1, createSeverityItem(_node));
+  m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(_node));
   m_model->setItem(row, 2, createItem(_node.check.host, row));
   m_model->setItem(row, 3, createItem(_node.name.toStdString(), row));
   m_model->setItem(row, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), row));
@@ -135,14 +135,6 @@ Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
   return item;
 }
 
-Wt::WStandardItem* WebMsgConsole::createSeverityItem(const NodeT& _node)
-{
-  Wt::WStandardItem* item = new Wt::WStandardItem();
-  item->setData(QString::number(_node.sev).toStdString(), Wt::UserRole);
-  item->setText(Severity(_node.sev).toString().toStdString());
-  updateSeverityItem(item, _node.sev);
-  return item;
-}
 
 Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck, int row)
 {
@@ -163,11 +155,4 @@ int WebMsgConsole::findServiceRow(const std::string& _id)
         m_model->item(index, ID_COLUMN)->text() != _id) { ++index;}
 
   return (index >= nbRows)? -1 : index;
-}
-
-
-void WebMsgConsole::updateSeverityItem(Wt::WStandardItem* item, int severity)
-{
-  item->setText(Severity(severity).toString().toStdString());
-  item->setStyleClass(ngrt4n::severityCssClass(severity));
 }

@@ -76,7 +76,9 @@ namespace ngrt4n {
   void googleAnalyticsLogger(void);
 
   Wt::WStandardItem* createStandardItem(const std::string& text, const std::string& data);
-  Wt::WStandardItem* createCheckableStandardIItem(const std::string& data, bool checked);
+  Wt::WStandardItem* createCheckableStandardItem(const std::string& data, bool checked);
+  Wt::WStandardItem* createSeverityStandardItem(const NodeT& _node);
+  void updateSeverityItem(Wt::WStandardItem* item, int severity);
   std::string getItemData(Wt::WStandardItem* item);
 } //Namespace
 

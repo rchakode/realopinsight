@@ -127,8 +127,8 @@ private:
   Settings* m_settings;
   Wt::WText* m_infoBox;
 
-  Wt::WWidget* m_mainNotificationManagerIcon;
   WebNotificationManager* m_notificationManager;
+  Wt::WWidget* m_notificationSection;
   std::map<int, Wt::WText*> m_notificationBoxes;
 
   AuthManager* m_authManager;
@@ -203,9 +203,9 @@ private:
   void handleDisplayOnlyTroubleStateChanged(void);
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
-  void setupNotificationManager(void);
   void hideAdminSettingsMenu(void);
 
+  WebNotificationManager* createNotificationManager(void);
   Wt::WNavigationBar* createNavivationBar(void);
   Wt::WWidget* createBreadCrumbsBar(void);
   Wt::WStackedWidget* createMainStackedContent(void);
@@ -216,7 +216,7 @@ private:
   Wt::WDatePicker* createReportDatePicker(long epochDatetime);
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
-  Wt::WWidget* createMainNotificationIcon(void);
+  Wt::WWidget* createNotificationSection(void);
   Wt::WWidget* createOperatorHomeDashboardWidget(Wt::WContainerWidget* thumbnailsContainer,
                                                  Wt::WContainerWidget* reportsContainer,
                                                  Wt::WContainerWidget* eventFeedContainer);

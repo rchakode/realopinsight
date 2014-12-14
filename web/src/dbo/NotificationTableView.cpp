@@ -25,9 +25,12 @@
 #include "NotificationTableView.hpp"
 #include "WebUtils.hpp"
 
+namespace {
+  const int COLUMN_COUNT = 5;
+}
 NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WTableView(parent),
-    m_model(new Wt::WStandardItemModel(0, 5, this)),
+    m_model(new Wt::WStandardItemModel(0, COLUMN_COUNT, this)),
     m_dbSession(dbSession)
 {
   setSortingEnabled(true);
@@ -52,6 +55,7 @@ void NotificationTableView::addEvent()
 
 void NotificationTableView::setModelHeader(void)
 {
+  m_model->insertColumns(0, COLUMN_COUNT);
   m_model->setHeaderData(0, Q_TR("Service Name"));
   m_model->setHeaderData(1, Q_TR("Severity"));
   m_model->setHeaderData(2, Q_TR("Last Change"));
@@ -60,51 +64,63 @@ void NotificationTableView::setModelHeader(void)
 }
 
 
-int NotificationTableView::updateEntries(void)
+int NotificationTableView::update(void)
 {
+  int retCode = -1;
   setDisabled(true);
-  NotificationListT notifications;
-  int count = m_dbSession->fetchUserRelatedNotifications(notifications, m_dbSession->loggedUser().username);
-  if (count > 0) {
-    m_model->clear();
-    for (const auto& entry : notifications)
-      addNotificationEntry(entry);
-    setModelHeader();
-  } else if (count <= 0) {
+  NotificationMapT notifications;
+  int result = m_dbSession->fetchUserRelatedNotifications(notifications, m_dbSession->loggedUser().username);
+  if (result < 0) {
     m_lastError = m_dbSession->lastError();
+  } else {
+    m_model->clear();
+    setModelHeader();
+    for (const auto& service : m_services) {
+      NotificationMapT::Iterator notificationIter = notifications.find(service.name.toStdString());
+      bool found = (notificationIter != notifications.end());
+      if (notificationIter != notifications.end()) {
+        addServiceEntry(service, found, *notificationIter);
+      } else {
+        addServiceEntry(service, found, NotificationT());
+      }
+    }
+    retCode = 0;
   }
   setDisabled(false);
-  return count;
+  return retCode;
 }
 
-void NotificationTableView::addNotificationEntry(const NotificationT& notifData)
+
+
+void NotificationTableView::addServiceEntry(const NodeT& service,
+                                            bool hasNotification,
+                                            const NotificationT& notification)
 {
   int row = m_model->rowCount();
-  Wt::WStandardItem* severityItem = ngrt4n::createStandardItem(Severity(notifData.view_status).toStdString(), notifData.view_name);
-  severityItem->setStyleClass(ngrt4n::severityCssClass(notifData.view_status));
+  std::string serviceName = service.name.toStdString();
 
-  m_model->setItem(row, 0, ngrt4n::createStandardItem(notifData.view_name, notifData.view_name));
-  m_model->setItem(row, 1, severityItem);
-  m_model->setItem(row, 2, ngrt4n::createStandardItem(ngrt4n::timet2String(notifData.last_change).toUTF8(), notifData.view_name) );
-  m_model->setItem(row, 3, ngrt4n::createCheckableStandardIItem(notifData.view_name, notifData.ack_status == DboNotification::Acknowledged));
-  m_model->setItem(row, 4, ngrt4n::createStandardItem(notifData.ack_username, notifData.view_name));
+  m_model->setItem(row, 0, ngrt4n::createStandardItem(serviceName, serviceName));
+  m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(service));
+
+  if (hasNotification) {
+    m_model->setItem(row, 2, ngrt4n::createStandardItem(ngrt4n::timet2String(notification.last_change).toUTF8(), serviceName) );
+    m_model->setItem(row, 3, ngrt4n::createCheckableStandardItem(serviceName, notification.ack_status == DboNotification::Acknowledged));
+    m_model->setItem(row, 4, ngrt4n::createStandardItem(notification.ack_username, serviceName));
+  }
 }
+
 
 void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
 {
   if (item->isCheckable()) {
     std::string viewName = ngrt4n::getItemData(item);
     if (item->checkState() == Wt::Checked) {
-      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username,
-                                            viewName,
-                                            DboNotification::Acknowledged);
+      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username, viewName, DboNotification::Acknowledged);
       // FIXME: handle error?
     } else {
-      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username,
-                                            viewName,
-                                            DboNotification::Open);
+      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
       // FIXME: handle error?
     }
-    updateEntries();
+    update();
   }
 }

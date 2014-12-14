@@ -305,7 +305,7 @@ typedef std::list<DboUser> DbUsersT;
 typedef std::list<DboView> DbViewsT;
 typedef std::list<DboLoginSession> LoginSessionListT;
 typedef std::list<QosDataT> QosDataList;
-typedef std::list<NotificationT> NotificationListT;
+typedef QMap<std::string, NotificationT> NotificationMapT;
 typedef QMap<std::string, std::list<QosDataT> > QosDataByViewMapT;
 typedef dbo::collection< dbo::ptr<DboUser> > DboUserCollectionT;
 typedef dbo::collection< dbo::ptr<DboView> > DboViewCollectionT;

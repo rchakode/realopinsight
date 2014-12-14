@@ -121,7 +121,7 @@ void LdapUserManager::addUserRow(const LdapUserAttrsT& userInfo, bool imported)
   m_model->setItem(row, 1, ngrt4n::createStandardItem(userInfo["cn"], dn));
   m_model->setItem(row, 2, ngrt4n::createStandardItem(userInfo[m_ldapUidField], dn));
   m_model->setItem(row, 3, ngrt4n::createStandardItem(userInfo["mail"], dn));
-  m_model->setItem(row, 4, ngrt4n::createCheckableStandardIItem(dn, imported));
+  m_model->setItem(row, 4, ngrt4n::createCheckableStandardItem(dn, imported));
 }
 
 

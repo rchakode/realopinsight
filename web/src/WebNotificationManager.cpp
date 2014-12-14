@@ -30,6 +30,7 @@ WebNotificationManager::WebNotificationManager(DbSession* dbSession, Wt::WContai
   : Wt::WDialog(Q_TR("Manage Notifications"), parent),
     m_operationCompleted(this)
 {
+  m_infoBox =  new Wt::WText("", this->contents());
   m_notificationTableView = new NotificationTableView(dbSession, this->contents());
   Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
   closeButton->clicked().connect(this, &Wt::WDialog::accept);
@@ -47,9 +48,14 @@ WebNotificationManager::~WebNotificationManager()
 
 void WebNotificationManager::show(void)
 {
-  if (m_notificationTableView->updateEntries() < 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, m_notificationTableView->lastError());
+  if (m_notificationTableView->update() != 0) {
+    m_infoBox->setHidden(false);
+    m_infoBox->setText(m_notificationTableView->lastError());
+    m_infoBox->setStyleClass("alert alert-warning");
+    //m_operationCompleted.emit(ngrt4n::OperationFailed, m_notificationTableView->lastError());
   } else {
-    Wt::WDialog::show();
+    m_infoBox->setHidden(true);
+    m_infoBox->setStyleClass("alert alert-normal");
   }
+  Wt::WDialog::show();
 }

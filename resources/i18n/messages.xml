@@ -562,7 +562,7 @@
 
 <message id="notification.block.tpl">
    <div class="notification-icons-container">
-   ${main-notification-icon} <sup>${minor-count}</sup> <sup>${major-count}</sup> <sup>${critical-count}</sup> <sup>${unknown-count}</sup>
+   <sup>${minor-count}</sup> <sup>${major-count}</sup> <sup>${critical-count}</sup> <sup>${unknown-count}</sup>
    </div>
 </message>
 

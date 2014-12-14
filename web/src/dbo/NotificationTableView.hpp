@@ -25,6 +25,7 @@
 #ifndef NOTIFICATIONMANAGER_HPP
 #define NOTIFICATIONMANAGER_HPP
 
+#include "Base.hpp"
 #include "dbo/DbSession.hpp"
 #include "dbo/DbObjects.hpp"
 #include <Wt/WTableView>
@@ -35,19 +36,22 @@ class NotificationTableView : public Wt::WTableView
 {
 public:
   NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
-  int updateEntries(void);
+  int update(void);
   std::string lastError(void) const {return m_lastError;}
+  void clearAllServicesData(void) { m_services.clear(); }
+  void updateServiceData(const NodeT& node) { m_services[node.name] = node; }
 
 private:
   /** other members **/
   std::string m_lastError;
   Wt::WStandardItemModel* m_model;
   DbSession* m_dbSession;
+  NodeListT m_services;
 
   void addEvent(void);
   void setModelHeader(void);
   void handleAckStatusChanged(Wt::WStandardItem* item);
-  void addNotificationEntry(const NotificationT& notifData);
+  void addServiceEntry(const NodeT& service, bool hasNotification, const NotificationT& notification);
 };
 
 #endif // NOTIFICATIONMANAGER_HPP

@@ -703,7 +703,7 @@ bool DbSession::fetchNotificationInfo(NotificationT& notification, const std::st
 }
 
 
-int DbSession::fetchUserRelatedNotifications(NotificationListT& notifications, const std::string& userName)
+int DbSession::fetchUserRelatedNotifications(NotificationMapT& notifications, const std::string& userName)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
@@ -717,8 +717,10 @@ int DbSession::fetchUserRelatedNotifications(NotificationListT& notifications, c
       notifications.clear();
       if (dboUser->role == DboUser::AdmRole) {
         dboNotifications = find<DboNotification>().orderBy("last_change");
-        for (const auto& entry: dboNotifications)
-          notifications.push_back(entry->data());
+        for (const auto& entry: dboNotifications) {
+          NotificationT data = entry->data();
+          notifications.insert(data.view_name, data);
+        }
       } else {
 
         std::string sql = QString("SELECT n.view_name, view_status, ack_status, last_change, ack_user_name"
@@ -738,7 +740,7 @@ int DbSession::fetchUserRelatedNotifications(NotificationListT& notifications, c
           data.ack_status   = boost::get<2>(entry);
           data.last_change  = boost::get<3>(entry);
           data.ack_username = boost::get<4>(entry);
-          notifications.push_back(data);
+          notifications.insert(data.view_name, data);
         }
       }
 

@@ -24,7 +24,10 @@
 
 #ifndef WEBNOTIFICATIONMANAGER_HPP
 #define WEBNOTIFICATIONMANAGER_HPP
+
+#include <QMap>
 #include <Wt/WDialog>
+#include "Base.hpp"
 #include "dbo/DbSession.hpp"
 #include "dbo/NotificationTableView.hpp"
 
@@ -35,6 +38,8 @@ public:
   ~WebNotificationManager();
   Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
   void show(void);
+  void clearAllServicesData(void) {m_notificationTableView->clearAllServicesData(); }
+  void updateServiceData(const NodeT& node) { m_notificationTableView->updateServiceData(node); }
 
 private:
   /** Signals **/
@@ -42,6 +47,7 @@ private:
 
 
   /** other members **/
+  Wt::WText* m_infoBox;
   NotificationTableView* m_notificationTableView;
 };
 

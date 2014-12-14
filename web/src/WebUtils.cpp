@@ -298,12 +298,27 @@ Wt::WStandardItem* ngrt4n::createStandardItem(const std::string& text, const std
   return item;
 }
 
-Wt::WStandardItem* ngrt4n::createCheckableStandardIItem(const std::string& data, bool checked)
+Wt::WStandardItem* ngrt4n::createCheckableStandardItem(const std::string& data, bool checked)
 {
   Wt::WStandardItem* item = createStandardItem("", data);
   item->setCheckable(true);
   item->setChecked(checked);
   return item;
+}
+
+Wt::WStandardItem* ngrt4n::createSeverityStandardItem(const NodeT& _node)
+{
+  Wt::WStandardItem* item = new Wt::WStandardItem();
+  item->setData(QString::number(_node.sev).toStdString(), Wt::UserRole);
+  item->setText(Severity(_node.sev).toString().toStdString());
+  updateSeverityItem(item, _node.sev);
+  return item;
+}
+
+void ngrt4n::updateSeverityItem(Wt::WStandardItem* item, int severity)
+{
+  item->setText(Severity(severity).toString().toStdString());
+  item->setStyleClass(ngrt4n::severityCssClass(severity));
 }
 
 std::string ngrt4n::getItemData(Wt::WStandardItem* item)

@@ -58,7 +58,6 @@ public:
   void updateNodeMsgs(const NodeListT& _cnodes);
   void updateNodeMsg(const NodeT& _node);
   Wt::WStandardItem* createItem(const Wt::WString& text, int row);
-  Wt::WStandardItem* createSeverityItem(const NodeT& _node);
   Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck, int row);
 
 
@@ -69,7 +68,6 @@ private:
   Wt::WStandardItemModel* m_model;
 
   int findServiceRow(const std::string& _id);
-  void updateSeverityItem(Wt::WStandardItem* item, int severity);
   void setModel(void);
   void setModelHeaders(void);
 };
