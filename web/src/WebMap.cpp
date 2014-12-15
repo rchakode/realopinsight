@@ -42,8 +42,8 @@ namespace {
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
   const std::string WWW_ROOT = REALOPINSIGHT_WWW_ROOT;
-  const double THUMBNAIL_WIDTH = 75;
-  const double THUMBNAIL_HEIGHT = 50;
+  const double THUMBNAIL_WIDTH = 140;
+  const double THUMBNAIL_HEIGHT = 70;
 }
 
 WebMap::WebMap(CoreDataT* _cdata)
@@ -231,9 +231,8 @@ void WebMap::updateThumbnail(void)
 {
   static int roundCount = 0;
   double thumbWidth = THUMBNAIL_WIDTH; //change later
-  double factor = (double)ngrt4n::XSCAL_FACTOR/ngrt4n::YSCAL_FACTOR;
   double thumbScaleY = THUMBNAIL_HEIGHT/m_cdata->map_height;
-  double thumbScaleX = factor * THUMBNAIL_HEIGHT * thumbScaleY/m_cdata->map_height;
+  double thumbScaleX = THUMBNAIL_HEIGHT * thumbScaleY/m_cdata->map_height;
   thumbWidth = thumbScaleX*m_cdata->map_width + 20;
 
   m_translateY = 10;

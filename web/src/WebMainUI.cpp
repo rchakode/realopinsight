@@ -296,22 +296,22 @@ Wt::WWidget* WebMainUI::createNotificationSection(void)
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("notification.block.tpl"));
 
   m_notificationBoxes[ngrt4n::Normal] = new Wt::WText("0");
-  m_notificationBoxes[ngrt4n::Normal]->setStyleClass("badge severity-normal");
+  m_notificationBoxes[ngrt4n::Normal]->setStyleClass("btn btn-normal");
   m_notificationBoxes[ngrt4n::Normal]->setHidden(true);
   tpl->bindWidget("normal-count", m_notificationBoxes[ngrt4n::Normal]);
 
   m_notificationBoxes[ngrt4n::Minor] = new Wt::WText("0");
-  m_notificationBoxes[ngrt4n::Minor]->setStyleClass("badge severity-minor");
+  m_notificationBoxes[ngrt4n::Minor]->setStyleClass("btn btn-minor");
   m_notificationBoxes[ngrt4n::Minor]->setHidden(true);
   tpl->bindWidget("minor-count", m_notificationBoxes[ngrt4n::Minor]);
 
   m_notificationBoxes[ngrt4n::Major] = new Wt::WText("0");
-  m_notificationBoxes[ngrt4n::Major]->setStyleClass("badge severity-major");
+  m_notificationBoxes[ngrt4n::Major]->setStyleClass("btn btn-major");
   m_notificationBoxes[ngrt4n::Major]->setHidden(true);
   tpl->bindWidget("major-count", m_notificationBoxes[ngrt4n::Major]);
 
   m_notificationBoxes[ngrt4n::Critical] = new Wt::WText("0");
-  m_notificationBoxes[ngrt4n::Critical]->setStyleClass("badge severity-critical");
+  m_notificationBoxes[ngrt4n::Critical]->setStyleClass("btn btn-critical");
   m_notificationBoxes[ngrt4n::Critical]->setHidden(true);
   tpl->bindWidget("critical-count", m_notificationBoxes[ngrt4n::Critical]);
 

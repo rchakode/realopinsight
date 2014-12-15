@@ -43,7 +43,7 @@ public:
         + m_statsData[ngrt4n::Critical]
         + m_statsData[ngrt4n::Unknown];}
   std::string problemsDetailsText(void) {
-    return QObject::tr("%1/%2 IT services in problem")
+    return QObject::tr("%1/%2 IT problems")
         .arg(QString::number(problemCount()))
         .arg(QString::number(m_cdata->cnodes.size())).toStdString();}
 

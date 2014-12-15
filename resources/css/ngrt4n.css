@@ -119,9 +119,6 @@ body, html {
   background: -linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
 }
 
-.ngrt4n-thumbnail {
-  height: 120px;
-}
 
 #ngrt4n-content-pane {
   float: left;

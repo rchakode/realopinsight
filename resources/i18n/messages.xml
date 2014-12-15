@@ -165,7 +165,7 @@
 <message id="dashboard-thumbnail.tpl">
    <div>
       <h4>${thumb-titlebar}</h4>
-      <div class="ngrt4n-thumbnail">${thumb-image}</div>
+      <div>${thumb-image}</div>
       <div>${thumb-problem-details}</div>
   </div>
 </message>
