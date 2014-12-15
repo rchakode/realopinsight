@@ -105,7 +105,7 @@ update_db_2014b7()
   echo "database upgraded to 2014b7"
 }
 
-update_db_2014b7()
+update_db_2014b8()
 {
   echo -n "DEBUG : Updating database to 2014b8..."
   su - ${REALOPINSIGHT_WWW_USER} -c "sqlite3 /opt/realopinsight/data/realopinsight.db < $PWD/sql/db_2014b8.sql"
