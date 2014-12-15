@@ -61,7 +61,7 @@ void NotificationTableView::setModelHeader(void)
   m_model->setHeaderData(2, Q_TR("Notification"));
   m_model->setHeaderData(3, Q_TR("Last Notification"));
   m_model->setHeaderData(4, Q_TR("Acknowledged"));
-  m_model->setHeaderData(5, Q_TR("Updated by"));
+  m_model->setHeaderData(5, Q_TR("Last Updated by"));
 }
 
 
@@ -132,6 +132,5 @@ void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
       m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
       // FIXME: handle error?
     }
-    update();
   }
 }

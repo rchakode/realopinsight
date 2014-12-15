@@ -722,7 +722,6 @@ int DbSession::fetchUserRelatedNotifications(NotificationMapT& notifications, co
           notifications.insert(data.view_name, data);
         }
       } else {
-
         std::string sql = QString("SELECT n.view_name, view_status, ack_status, last_change, ack_user_name"
                                   " FROM notification n, user_view uv"
                                   " WHERE uv.user_name = '%1'"

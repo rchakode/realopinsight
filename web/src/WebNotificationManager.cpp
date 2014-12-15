@@ -29,12 +29,14 @@
 WebNotificationManager::WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent)
   : Wt::WDialog(Q_TR("Manage Notifications"), parent),
     m_operationCompleted(this)
-{;
+{
   m_notificationTableView = new NotificationTableView(dbSession, this->contents());
+
+  m_infoBox = new Wt::WText("", this->footer());
+
   Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
   closeButton->clicked().connect(this, &Wt::WDialog::accept);
 
-  m_infoBox = new Wt::WText("", this->footer());
   setStyleClass("Wt-dialog");
   titleBar()->setStyleClass("titlebar");
 }
