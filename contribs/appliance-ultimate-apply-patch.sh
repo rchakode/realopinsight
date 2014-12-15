@@ -114,15 +114,17 @@ update_db_2014b7()
 
 get_target_version_from_user()
 {
+
   echo
-  echo "Which version of the software is current installed ?"
+  echo "Which version of RealOpInsight Ultimate is current installed ?"
   echo
   echo "1) 3.0.0b1"
   echo "2) 3.0.0b2"
   echo "3) 2014b3 | 2014b4 | 2014b5 | 2014b6"
-  echo "4) Other"
+  echo "4) 2014b7"
   echo "q) Quit"
   echo
+  
   while true; do
     read -p "Type response " rep
     case $rep in
@@ -132,18 +134,15 @@ get_target_version_from_user()
           2) INSTALLED_VERSION="3.0.0b2"
 	     break
 		 ;;
-          3) INSTALLED_VERSION="2014b3-2014b6"
+         3) INSTALLED_VERSION="2014b3-2014b6"
              break
-                 ;;
-          4) INSTALLED_VERSION="2014b7"
+         ;;
+         4) INSTALLED_VERSION="2014b7"
              break
-                 ;;                 
-          5) INSTALLED_VERSION="Other";
-	      break
-		  ;;
-	  q) exit 0 
+         ;;     
+	    q) exit 0 
 	      ;; 
-	  *) echo -n "Invalid input. ";; 
+	    *) echo -n "Invalid input. ";; 
     esac
   done  
 }
