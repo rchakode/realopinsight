@@ -52,7 +52,6 @@
   "$(\"#ngrt4n-side-pane\").height(windowHeight - top);"
 
 #define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
-const int THUMBNAILS_PER_ROW = 8;
 
 void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Response& response)
 {
@@ -892,6 +891,7 @@ void WebMainUI::initOperatorDashboard(void)
 
   // Build view thumbnails
   int thumbIndex = 0;
+  int thumbnailsPerRow = m_preferences->getDashboardThumbnailsPerRow();
   for (const auto& view: m_dbSession->viewList()) {
     WebDashboard* dashboard;
     loadView(view.path, dashboard);
@@ -907,7 +907,7 @@ void WebMainUI::initOperatorDashboard(void)
       QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(setWidgetAsFrontStackedWidget(Wt::WWidget*)));
 
       /** add to layout */
-      thumbLayout->addWidget(thumbItem, thumbIndex / THUMBNAILS_PER_ROW, thumbIndex % THUMBNAILS_PER_ROW);
+      thumbLayout->addWidget(thumbItem, thumbIndex / thumbnailsPerRow, thumbIndex % thumbnailsPerRow);
 
       m_thumbnailItems.insert(view.name, thumbItem);
       ++thumbIndex;

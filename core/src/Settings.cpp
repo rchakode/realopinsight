@@ -54,6 +54,7 @@ const QString Settings::NOTIF_MAIL_SMTP_SERVER_PORT = "/Notification/mailSmtpPor
 const QString Settings::NOTIF_MAIL_SMTP_USE_SSL = "/Notification/mailSmtpUseSsl";
 const QString Settings::NOTIF_MAIL_SMTP_USERNAME = "/Notification/mailSmtpUsername";
 const QString Settings::NOTIF_MAIL_SMTP_PASSWORD = "/Notification/mailSmtpPassword";
+const QString Settings::DASHBOARD_THUMBNAILS_PER_ROW = "/Dashboard/thumbnailsPerRow";
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {

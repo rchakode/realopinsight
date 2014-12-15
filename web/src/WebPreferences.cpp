@@ -41,6 +41,7 @@
 namespace {
   const std::string LDAP_VERSION2_TEXT = "LDAPv2";
   const std::string LDAP_VERSION3_TEXT = "LDAPv3";
+  const int DASHBOARD_DEFAULT_THUMBNAIL_PER_ROW  = 5;
 }
 
 WebPreferencesBase::WebPreferencesBase(void)
@@ -64,6 +65,7 @@ int WebPreferencesBase::getAuthenticationMode(void) const
   int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
   if (val != LDAP)
     return BuiltIn;
+
   return val;
 }
 
@@ -78,6 +80,14 @@ std::string WebPreferencesBase::getLdapIdField(void) const
   return val.toStdString();
 }
 
+
+int WebPreferencesBase::getDashboardThumbnailsPerRow(void) const
+{
+  int value = m_settings->keyValue(Settings::DASHBOARD_THUMBNAILS_PER_ROW).toInt();
+  if (value <= 0)
+    return DASHBOARD_DEFAULT_THUMBNAIL_PER_ROW;
+  return value;
+}
 
 
 WebPreferences::WebPreferences(void)
