@@ -1,4 +1,4 @@
-#define Version "3.1.1"
+#define Version "3.2.0"
 #define Application "RealOpInsight Workstation" 
 [Setup]          
 AppName={#Application}     
@@ -52,7 +52,8 @@ Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\libstdc++-6.dll" ; DestDir: "{app}"
 Source: "C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin\libwinpthread-1.dll" ; DestDir: "{app}"
                                            
 Source: C:\Dev\qt-build\release\*  ; DestDir: "{app}" 
-Source: "..\examples\small_hosting_platform.*.ngrt4n.xml" ; DestDir: "{app}\examples" 
+Source: "..\examples\small_hosting_platform.*.ngrt4n.xml" ; DestDir: "{app}\examples"  
+Source: "..\examples\pandora*.ngrt4n.xml" ; DestDir: "{app}\examples" 
 Source: "icon.ico" ; DestDir: "{app}\icons"         
 Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
 Source: "..\i18n\ngrt4n_*.qm" ; DestDir: "{app}\i18n" 
