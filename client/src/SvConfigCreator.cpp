@@ -161,7 +161,7 @@ void SvCreator::loadFile(const QString& _path)
   if (_path == NULL) {
     newView();
   } else {
-    ngrt4n::clear(*m_cdata);
+    ngrt4n::clearCoreData(*m_cdata);
     Parser parser(_path, m_cdata);
     if (! parser.process(false)) {
       ngrt4n::alert(parser.lastErrorMsg());
@@ -321,7 +321,7 @@ void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const C
 void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
-    ngrt4n::clear(*m_cdata);
+    ngrt4n::clearCoreData(*m_cdata);
     m_tree->resetData();
     NodeT* node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
     m_root = m_cdata->bpnodes.insert(node->id, *node);

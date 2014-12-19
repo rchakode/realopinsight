@@ -54,24 +54,33 @@ ZbxHelper::~ZbxHelper()
   delete m_evlHandler;
 }
 
-QNetworkReply*
+int
 ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
 {
   QString request;
+
   if (reqId == GetLogin) {
     request = ReqPatterns[reqId];
   } else {
     request = ReqPatterns[reqId].arg(m_auth);
   }
+
   Q_FOREACH(const QString &param, params) {
     request = request.arg(param);
   }
+
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
+
   connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+
   m_evlHandler->exec();
-  return reply;
+
+  if (! reply || parseReply(reply) !=0)
+    return -1;
+
+  return 0;
 }
 
 RequestListT
@@ -88,7 +97,7 @@ ZbxHelper::requestsPatterns()
                             \"params\": [], \
                             \"auth\": \"%1\", \
                             \"id\": %9}";
-  patterns[GetTriggersbyHostGroup] = "{\"jsonrpc\": \"2.0\", \
+  patterns[GetTriggersByHostGroup] = "{\"jsonrpc\": \"2.0\", \
                                      \"auth\": \"%1\", \
                                      \"method\": \"trigger.get\", \
                                      \"params\": { \
@@ -108,6 +117,26 @@ ZbxHelper::requestsPatterns()
                                         \"output\":  \"extend\", \
                                         \"limit\": -1}, \
                                         \"id\": %9}";
+  patterns[GetItServiceTriggersByIds] = "{\"jsonrpc\": \"2.0\", \
+                                        \"auth\": \"%1\", \
+                                        \"method\": \"trigger.get\", \
+                                        \"params\": { \
+                                        \"triggerids\": [\"%2\"], \
+                                        \"selectGroups\": [\"name\"], \
+                                        \"selectHosts\": [\"host\"], \
+                                        \"selectItems\": [\"key_\",\"name\"], \
+                                        \"output\": [\"description\"], \
+                                        \"limit\": -1}, \
+                                        \"id\": %9}";
+  patterns[GetItServices] = "{\"jsonrpc\": \"2.0\", \
+                            \"auth\": \"%1\", \
+                            \"method\": \"service.get\", \
+                            \"params\": { \
+                            \"output\": \"extend\", \
+                            \"selectDependencies\": \"extend\", \
+                            \"selectTrigger\": \"extend\" \
+                            \"}, \
+                            \"id\": %9}";
 
   return patterns;
 }
@@ -129,7 +158,7 @@ ZbxHelper::setTrid(const QString& apiv)
   if (vnum < 14) {
     m_trid = GetTriggersByHostGroupV18;
   } else {
-    m_trid = GetTriggersbyHostGroup;
+    m_trid = GetTriggersByHostGroup;
   }
 }
 
@@ -175,9 +204,11 @@ ZbxHelper::openSession(const SourceT& srcInfo)
 
   params.push_back(QString::number(GetLogin));
   setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
-  QNetworkReply* response = postRequest(GetLogin, params);
 
-  if (! response || processLoginReply(response) !=0)
+  if (postRequest(GetLogin, params) != 0)
+    return -1;
+
+  if (processLoginReply() !=0)
     return -1;
 
   // Get the API version
@@ -188,11 +219,8 @@ ZbxHelper::openSession(const SourceT& srcInfo)
 }
 
 int
-ZbxHelper::processLoginReply(QNetworkReply* reply)
+ZbxHelper::processLoginReply(void)
 {
-  if (parseReply(reply) != 0)
-    return -1;
-
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   QString result = m_replyJsonData.getProperty("result").toString();
   if (tid == ZbxHelper::GetLogin && ! result.isEmpty()) {
@@ -209,21 +237,22 @@ int
 ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
 {
   QStringList params;
+
   params.push_back(QString::number(ZbxHelper::GetApiVersion));
   setSslPeerVerification(srcInfo.verify_ssl_peer);
-  QNetworkReply* response = postRequest(ZbxHelper::GetApiVersion, params);
 
-  if (! response || processGetApiVersionReply(response) !=0)
+  if (postRequest(ZbxHelper::GetApiVersion, params) != 0)
+    return -1;
+
+  if (processGetApiVersionReply() !=0)
     return -1;
 
   return 0;
 }
 
 int
-ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
+ZbxHelper::processGetApiVersionReply(void)
 {
-  if (parseReply(reply) != 0)
-    return -1;
 
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
 
@@ -238,17 +267,14 @@ ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
 }
 
 int
-ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
+ZbxHelper::processTriggerReply(ChecksT& checks)
 {
-  if (parseReply(reply) != 0)
-    return -1;
-
   if (! checkRPCResultStatus())
     return -1;
 
   // check weird reponset
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  if (tid != GetTriggersbyHostGroup && GetTriggersByHostGroupV18) {
+  if (tid != GetTriggersByHostGroup && GetTriggersByHostGroupV18) {
     m_lastError = tr("Weird response received from the server");
     return -1;
   }
@@ -296,6 +322,8 @@ int
 ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
                       const QString& filterValue, ngrt4n::RequestFilterT filterType)
 {
+  checks.clear();
+
   if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
 
@@ -303,7 +331,6 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
     return -1;
 
   QStringList params;
-  checks.clear();
   QString filter = "";
   if (! filterValue.isEmpty()) {
     if (filterType == ngrt4n::GroupFilter) {
@@ -314,10 +341,12 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
   }
   params.push_back(filter);
   params.push_back(QString::number(m_trid));
-  QNetworkReply* response = postRequest(m_trid, params);
-  if (! response || processTriggerReply(response, checks) !=0) {
+
+  if (postRequest(m_trid, params) != 0)
     return -1;
-  }
+
+  if (processTriggerReply(checks) !=0)
+    return -1;
 
   return 0;
 }
@@ -327,6 +356,7 @@ int
 ZbxHelper::importITServices(CoreDataT& cdata)
 {
   int retCode = 0;
+  ngrt4n::clearCoreData(cdata);
 
   return retCode;
 }

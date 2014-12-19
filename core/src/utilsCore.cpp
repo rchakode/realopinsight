@@ -25,7 +25,7 @@
 #include "utilsCore.hpp"
 #include <QFileInfo>
 
-void ngrt4n::clear(CoreDataT& _cdata)
+void ngrt4n::clearCoreData(CoreDataT& _cdata)
 {
   _cdata.cnodes.clear();
   _cdata.bpnodes.clear();

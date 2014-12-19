@@ -41,9 +41,9 @@ public:
   enum {
     GetLogin=1,
     GetApiVersion=2,
-    GetTriggersbyHostGroup=3,
+    GetTriggersByHostGroup=3,
     GetTriggersByHostGroupV18=4,
-    GetTriggersByIds = 6,
+    GetItServiceTriggersByIds = 6,
     GetItServices = 5
   };
   static const RequestListT ReqPatterns;
@@ -51,7 +51,7 @@ public:
 public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
-  QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
+  int postRequest(const qint32& reqId, const QStringList& params);
   void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
   void setTrid(const QString& apiv);
   QString lastError(void) const {return m_lastError;}
@@ -82,10 +82,10 @@ private :
   QString m_lastError;
   JsonHelper m_replyJsonData;
 
-  int processLoginReply(QNetworkReply* reply);
+  int processLoginReply(void);
   int fecthApiVersion(const SourceT& srcInfo);
-  int processGetApiVersionReply(QNetworkReply* reply);
-  int processTriggerReply(QNetworkReply* reply, ChecksT& checks);
+  int processGetApiVersionReply(void);
+  int processTriggerReply(ChecksT& checks);
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);
   std::string parseHost(const QScriptValue& json);

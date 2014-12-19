@@ -75,7 +75,7 @@ namespace ngrt4n
   inline QString libVersion(void)
   { return PKG_VERSION; }
 
-  void clear(CoreDataT& _cdata);
+  void clearCoreData(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
   qint8 severityFromProbeStatus(const int& monitorType, const int& statusValue);
   QString getIconPath(int _severity);
