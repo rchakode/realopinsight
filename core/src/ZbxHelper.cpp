@@ -58,7 +58,7 @@ QNetworkReply*
 ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
 {
   QString request;
-  if (reqId == Login) {
+  if (reqId == GetLogin) {
     request = ReqPatterns[reqId];
   } else {
     request = ReqPatterns[reqId].arg(m_auth);
@@ -78,36 +78,36 @@ RequestListT
 ZbxHelper::requestsPatterns()
 {
   RequestListT patterns;
-  patterns[Login] = "{\"jsonrpc\": \"2.0\", \
-                    \"auth\": null, \
-                    \"method\": \"user.login\", \
-                    \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
-                    \"id\": %9}";
-  patterns[ApiVersion] = "{\"jsonrpc\": \"2.0\", \
-                         \"method\": \"apiinfo.version\", \
-                         \"params\": [], \
-                         \"auth\": \"%1\", \
-                         \"id\": %9}";
-  patterns[Trigger] = "{\"jsonrpc\": \"2.0\", \
-                      \"auth\": \"%1\", \
-                      \"method\": \"trigger.get\", \
-                      \"params\": { \
-                      \"filter\": {%2}, \
-                      \"selectGroups\": [\"name\"], \
-                      \"selectHosts\": [\"host\"], \
-                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-                      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-                      \"limit\": -1}, \
-                      \"id\": %9}";
-  patterns[TriggerV18] = "{\"jsonrpc\": \"2.0\", \
-                         \"auth\": \"%1\", \
-                         \"method\": \"trigger.get\", \
-                         \"params\": { \
-                         \"filter\": {%2}, \
-                         \"select_hosts\": [\"host\"], \
-                         \"output\":  \"extend\", \
-                         \"limit\": -1}, \
-                         \"id\": %9}";
+  patterns[GetLogin] = "{\"jsonrpc\": \"2.0\", \
+                       \"auth\": null, \
+                       \"method\": \"user.login\", \
+                       \"params\": {\"user\": \"%1\",\"password\": \"%2\"}, \
+                       \"id\": %9}";
+  patterns[GetApiVersion] = "{\"jsonrpc\": \"2.0\", \
+                            \"method\": \"apiinfo.version\", \
+                            \"params\": [], \
+                            \"auth\": \"%1\", \
+                            \"id\": %9}";
+  patterns[GetTriggersbyHostGroup] = "{\"jsonrpc\": \"2.0\", \
+                                     \"auth\": \"%1\", \
+                                     \"method\": \"trigger.get\", \
+                                     \"params\": { \
+                                     \"filter\": {%2}, \
+                                     \"selectGroups\": [\"name\"], \
+                                     \"selectHosts\": [\"host\"], \
+                                     \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+                                     \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+                                     \"limit\": -1}, \
+                                     \"id\": %9}";
+  patterns[GetTriggersByHostGroupV18] = "{\"jsonrpc\": \"2.0\", \
+                                        \"auth\": \"%1\", \
+                                        \"method\": \"trigger.get\", \
+                                        \"params\": { \
+                                        \"filter\": {%2}, \
+                                        \"select_hosts\": [\"host\"], \
+                                        \"output\":  \"extend\", \
+                                        \"limit\": -1}, \
+                                        \"id\": %9}";
 
   return patterns;
 }
@@ -127,9 +127,9 @@ ZbxHelper::setTrid(const QString& apiv)
 {
   qint32 vnum = apiv.mid(0, 3).remove(".").toInt();
   if (vnum < 14) {
-    m_trid = TriggerV18;
+    m_trid = GetTriggersByHostGroupV18;
   } else {
-    m_trid = Trigger;
+    m_trid = GetTriggersbyHostGroup;
   }
 }
 
@@ -145,9 +145,7 @@ ZbxHelper::parseReply(QNetworkReply* reply)
   }
 
   // now read data
-  QString data = reply->readAll();
-  m_replyJsonData.setData(data);
-
+  m_replyJsonData.setData( QString( reply->readAll() )) ;
   return 0;
 }
 
@@ -175,9 +173,9 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     return -1;
   }
 
-  params.push_back(QString::number(Login));
+  params.push_back(QString::number(GetLogin));
   setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
-  QNetworkReply* response = postRequest(Login, params);
+  QNetworkReply* response = postRequest(GetLogin, params);
 
   if (! response || processLoginReply(response) !=0)
     return -1;
@@ -197,7 +195,7 @@ ZbxHelper::processLoginReply(QNetworkReply* reply)
 
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   QString result = m_replyJsonData.getProperty("result").toString();
-  if (tid == ZbxHelper::Login && ! result.isEmpty()) {
+  if (tid == ZbxHelper::GetLogin && ! result.isEmpty()) {
     m_auth = result;
     m_isLogged = true;
     return 0;
@@ -211,9 +209,9 @@ int
 ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
 {
   QStringList params;
-  params.push_back(QString::number(ZbxHelper::ApiVersion));
+  params.push_back(QString::number(ZbxHelper::GetApiVersion));
   setSslPeerVerification(srcInfo.verify_ssl_peer);
-  QNetworkReply* response = postRequest(ZbxHelper::ApiVersion, params);
+  QNetworkReply* response = postRequest(ZbxHelper::GetApiVersion, params);
 
   if (! response || processGetApiVersionReply(response) !=0)
     return -1;
@@ -229,12 +227,12 @@ ZbxHelper::processGetApiVersionReply(QNetworkReply* reply)
 
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
 
-  if (tid != ZbxHelper::ApiVersion) {
+  if (tid != ZbxHelper::GetApiVersion) {
     m_lastError = tr("the transaction id does not correspond to getApiVersion");
     return -1;
   }
 
-  setTrid(m_replyJsonData.getProperty("result").toString());
+  setTrid( m_replyJsonData.getProperty("result").toString() );
 
   return 0;
 }
@@ -250,7 +248,7 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 
   // check weird reponset
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  if (tid != ZbxHelper::Trigger && ZbxHelper::TriggerV18) {
+  if (tid != GetTriggersbyHostGroup && GetTriggersByHostGroupV18) {
     m_lastError = tr("Weird response received from the server");
     return -1;
   }
@@ -277,7 +275,7 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
       check.status = triggerData.property("priority").toInteger();
     }
 
-    if (tid == ZbxHelper::TriggerV18) {
+    if (tid == GetTriggersByHostGroupV18) {
       check.last_state_change = triggerData.property("lastchange").toString().toStdString();
     } else {
       QScriptValueIterator item(triggerData.property("items"));
@@ -295,10 +293,8 @@ ZbxHelper::processTriggerReply(QNetworkReply* reply, ChecksT& checks)
 }
 
 int
-ZbxHelper::loadChecks(const SourceT& srcInfo,
-                      ChecksT& checks,
-                      const QString& filterValue,
-                      ngrt4n::RequestFilterT filterType)
+ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
+                      const QString& filterValue, ngrt4n::RequestFilterT filterType)
 {
   if (! m_isLogged && openSession(srcInfo) != 0)
     return -1;
@@ -324,6 +320,15 @@ ZbxHelper::loadChecks(const SourceT& srcInfo,
   }
 
   return 0;
+}
+
+
+int
+ZbxHelper::importITServices(CoreDataT& cdata)
+{
+  int retCode = 0;
+
+  return retCode;
 }
 
 void

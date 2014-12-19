@@ -39,57 +39,29 @@ class ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
 public:
   enum {
-    Login=1,
-    ApiVersion=2,
-    Trigger=3,
-    TriggerV18=4
+    GetLogin=1,
+    GetApiVersion=2,
+    GetTriggersbyHostGroup=3,
+    GetTriggersByHostGroupV18=4,
+    GetTriggersByIds = 6,
+    GetItServices = 5
   };
   static const RequestListT ReqPatterns;
 
 public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
-  QNetworkReply*
-  postRequest(const qint32& reqId, const QStringList& params);
-  void
-  setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
-  void
-  setTrid(const QString& apiv);
-  int
-  getTrid(void) const {return m_trid;}
-  void
-  setIsLogged(bool state) {m_isLogged = state;}
-  bool
-  getIsLogged(void) const {return m_isLogged;}
-  void
-  setAuth(const QString& auth) {m_auth = auth;}
-  QString
-  getAuth(void) const {return m_auth;}
-  QString
-  lastError(void) const {return m_lastError;}
-  QString
-  getApiEndpoint(void) const {return m_apiUri;}
-  void
-  setSslPeerVerification(bool verifyPeer);
-  int
-  parseReply(QNetworkReply* reply);
-  bool
-  checkRPCResultStatus(void);
-  int
-  openSession(const SourceT& srcInfo);
-  int
-  processLoginReply(QNetworkReply* reply);
-  int
-  fecthApiVersion(const SourceT& srcInfo);
-  int
-  processGetApiVersionReply(QNetworkReply* reply);
-  int
-  processTriggerReply(QNetworkReply* reply, ChecksT& checks);
-  int
-  loadChecks(const SourceT& srcInfo,
-             ChecksT& checks,
-             const QString& filterValue,
-             ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
+  QNetworkReply* postRequest(const qint32& reqId, const QStringList& params);
+  void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
+  void setTrid(const QString& apiv);
+  QString lastError(void) const {return m_lastError;}
+  void setSslPeerVerification(bool verifyPeer);
+  int parseReply(QNetworkReply* reply);
+  bool checkRPCResultStatus(void);
+  int openSession(const SourceT& srcInfo);
+  int loadChecks(const SourceT& srcInfo, ChecksT& checks,
+             const QString& filterValue, ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
+  int importITServices(CoreDataT& cdata);
 
 
 public Q_SLOTS:
@@ -110,9 +82,14 @@ private :
   QString m_lastError;
   JsonHelper m_replyJsonData;
 
+  int processLoginReply(QNetworkReply* reply);
+  int fecthApiVersion(const SourceT& srcInfo);
+  int processGetApiVersionReply(QNetworkReply* reply);
+  int processTriggerReply(QNetworkReply* reply, ChecksT& checks);
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);
   std::string parseHost(const QScriptValue& json);
+
 };
 
 #endif /* ZABBIXHELPER_HPP_ */
