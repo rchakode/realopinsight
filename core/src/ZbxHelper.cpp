@@ -425,14 +425,14 @@ int ZbxHelper::processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT
       cdata.bpnodes.insert(node.id, node);
     }
 
-    appendDependencies(serviceJsonData.property("dependencies"), dependencies);
+    processAppendDependenciesJsonValue(serviceJsonData.property("dependencies"), dependencies);
   }
 
   return 0;
 }
 
 
-void ZbxHelper::appendDependencies(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies)
+void ZbxHelper::processAppendDependenciesJsonValue(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies)
 {
 
 }

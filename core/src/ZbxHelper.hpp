@@ -95,7 +95,7 @@ private :
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string processHostGroupsJsonValue(const QScriptValue& hostGroupJsonValue);
   std::string processHostJsonValue(const QScriptValue& hostJsonValue);
-  void appendDependencies(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies);
+  void processAppendDependenciesJsonValue(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies);
 
 };
 
