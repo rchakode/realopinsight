@@ -104,8 +104,7 @@ ZbxHelper::requestsPatterns()
                             \"method\": \"service.get\", \
                             \"params\": { \
                             \"output\": \"extend\", \
-                            \"selectDependencies\": \"extend\", \
-                            \"selectTrigger\": \"extend\" \
+                            \"selectDependencies\": \"extend\" \
                             \"}, \
                             \"id\": %9}";
 
@@ -300,8 +299,8 @@ ZbxHelper::processTriggerReply(ChecksT& checks)
     QString triggerName = triggerData.property("description").toString();
 
     CheckT check;
-    check.host = parseHost(triggerData.property("hosts"));
-    check.host_groups = parseHostGroups(triggerData.property("groups"));
+    check.host = processHostJsonValue(triggerData.property("hosts"));
+    check.host_groups = processHostGroupsJsonValue(triggerData.property("groups"));
     check.check_command = triggerName.toStdString();
     check.status = triggerData.property("value").toInt32();
     if (check.status == ngrt4n::ZabbixClear) {
@@ -364,6 +363,8 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   ngrt4n::clearCoreData(cdata);
 
+  cdata.monitor = ngrt4n::Zabbix;
+
   if (! checkLogin(srcInfo))
     return -1;
 
@@ -371,18 +372,22 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   if (postRequest(GetItServices, params) != 0)
     return -1;
 
-  DataPointTriggerIds dataPointTriggerIds;
-  if (processItServiceReply(cdata, dataPointTriggerIds))
+  ItServiceTriggerIdsT triggerIds;
+  ItServiceDependenciesMapT dependencies;
+  if (processItServiceReply(cdata, dependencies, triggerIds))
     return -1;
 
-  if (setDataPoints(cdata.cnodes, srcInfo.id, dataPointTriggerIds) != 0)
+  if (setServiceDependencies(cdata.bpnodes, cdata.cnodes, dependencies) != 0)
+    return -1;
+
+  if (setItServiceDataPoints(cdata.cnodes, srcInfo.id, triggerIds) != 0)
     return -1;
 
   return 0;
 }
 
 
-int ZbxHelper::processItServiceReply(CoreDataT& cdata, DataPointTriggerIds& triggerIds)
+int ZbxHelper::processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT& dependencies, ItServiceTriggerIdsT& triggerIds)
 {
   if (! backendReturnedSuccessResult())
     return -1;
@@ -419,13 +424,25 @@ int ZbxHelper::processItServiceReply(CoreDataT& cdata, DataPointTriggerIds& trig
       node.type = NodeType::BusinessService;
       cdata.bpnodes.insert(node.id, node);
     }
+
+    appendDependencies(serviceJsonData.property("dependencies"), dependencies);
   }
 
   return 0;
 }
 
 
-int ZbxHelper::setDataPoints(NodeListT& cnodes, const QString& sourceId, const DataPointTriggerIds& triggerIds)
+void ZbxHelper::appendDependencies(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies)
+{
+
+}
+
+int ZbxHelper::setServiceDependencies(NodeListT& bpnodes, NodeListT& cnodes, const ItServiceDependenciesMapT& dependencies)
+{
+  return 0;
+}
+
+int ZbxHelper::setItServiceDataPoints(NodeListT& cnodes, const QString& sourceId, const ItServiceTriggerIdsT& triggerIds)
 {
 
   return 0;
@@ -441,10 +458,10 @@ ZbxHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
 
 
 std::string
-ZbxHelper::parseHostGroups(const QScriptValue& json)
+ZbxHelper::processHostGroupsJsonValue(const QScriptValue& hostGroupJsonValue)
 {
   std::string result("");
-  QScriptValueIterator entryIter(json);
+  QScriptValueIterator entryIter(hostGroupJsonValue);
   while (entryIter.hasNext()) {
     entryIter.next();
     if (entryIter.flags() & QScriptValue::SkipInEnumeration)
@@ -463,10 +480,10 @@ ZbxHelper::parseHostGroups(const QScriptValue& json)
 
 
 std::string
-ZbxHelper::parseHost(const QScriptValue& json)
+ZbxHelper::processHostJsonValue(const QScriptValue& hostJsonValue)
 {
   std::string result("");
-  QScriptValueIterator entryIter(json);
+  QScriptValueIterator entryIter(hostJsonValue);
   while (entryIter.hasNext()) {
     entryIter.next();
     if (entryIter.flags() & QScriptValue::SkipInEnumeration)

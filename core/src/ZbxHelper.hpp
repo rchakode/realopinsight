@@ -71,7 +71,8 @@ Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
-  typedef QSet<int> DataPointTriggerIds;
+  typedef QSet<int> ItServiceTriggerIdsT;
+  typedef QMap<QString, QString> ItServiceDependenciesMapT;
   QString m_apiUri;
   QNetworkRequest* m_reqHandler;
   int m_trid;
@@ -88,11 +89,13 @@ private :
   int fecthApiVersion(const SourceT& srcInfo);
   int processGetApiVersionReply(void);
   int processTriggerReply(ChecksT& checks);
-  int processItServiceReply(CoreDataT& cdata, DataPointTriggerIds& triggerIds);
-  int setDataPoints(NodeListT& cnodes, const QString& sourceId, const DataPointTriggerIds& dataPointTriggerIds);
+  int processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT& dependencies, ItServiceTriggerIdsT& triggerIds);
+  int setServiceDependencies(NodeListT& bpnodes, NodeListT& cnodes, const ItServiceDependenciesMapT& dependencies);
+  int setItServiceDataPoints(NodeListT& cnodes, const QString& sourceId, const ItServiceTriggerIdsT& dataPointTriggerIds);
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
-  std::string parseHostGroups(const QScriptValue& json);
-  std::string parseHost(const QScriptValue& json);
+  std::string processHostGroupsJsonValue(const QScriptValue& hostGroupJsonValue);
+  std::string processHostJsonValue(const QScriptValue& hostJsonValue);
+  void appendDependencies(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies);
 
 };
 
