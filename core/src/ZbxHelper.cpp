@@ -54,35 +54,6 @@ ZbxHelper::~ZbxHelper()
   delete m_evlHandler;
 }
 
-int
-ZbxHelper::postRequest(const qint32 & reqId, const QStringList & params)
-{
-  QString request;
-
-  if (reqId == GetLogin) {
-    request = ReqPatterns[reqId];
-  } else {
-    request = ReqPatterns[reqId].arg(m_auth);
-  }
-
-  Q_FOREACH(const QString &param, params) {
-    request = request.arg(param);
-  }
-
-  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
-  setSslReplyErrorHandlingOptions(reply);
-
-  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
-  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
-
-  m_evlHandler->exec();
-
-  if (! reply || parseReply(reply) !=0)
-    return -1;
-
-  return 0;
-}
-
 RequestListT
 ZbxHelper::requestsPatterns()
 {
@@ -140,6 +111,37 @@ ZbxHelper::requestsPatterns()
 
   return patterns;
 }
+
+
+int
+ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
+{
+  QString request;
+
+  if (reqId == GetLogin) {
+    request = ReqPatterns[reqId];
+  } else {
+    request = ReqPatterns[reqId].arg(m_auth);
+  }
+
+  Q_FOREACH(const QString &param, params) {
+    request = request.arg(param);
+  }
+
+  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
+  setSslReplyErrorHandlingOptions(reply);
+
+  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+
+  m_evlHandler->exec();
+
+  if (! reply || parseReply(reply) !=0)
+    return -1;
+
+  return 0;
+}
+
 
 void
 ZbxHelper::setSslPeerVerification(bool verifyPeer)
@@ -238,7 +240,7 @@ ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
 {
   QStringList params;
 
-  params.push_back(QString::number(ZbxHelper::GetApiVersion));
+  params.push_back(QString::number(GetApiVersion));
   setSslPeerVerification(srcInfo.verify_ssl_peer);
 
   if (postRequest(ZbxHelper::GetApiVersion, params) != 0)
@@ -355,10 +357,24 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
 int
 ZbxHelper::importITServices(CoreDataT& cdata)
 {
-  int retCode = 0;
   ngrt4n::clearCoreData(cdata);
 
-  return retCode;
+  QStringList params(QString::number(GetItServices));
+  if (postRequest(GetItServices, params) != 0)
+    return -1;
+
+  if (processItServiceReply(cdata))
+    return -1;
+
+  return 0;
+}
+
+
+int ZbxHelper::processItServiceReply(CoreDataT& cdata)
+{
+
+
+  return 0;
 }
 
 void

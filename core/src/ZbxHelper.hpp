@@ -51,7 +51,7 @@ public:
 public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
-  int postRequest(const qint32& reqId, const QStringList& params);
+  int postRequest(qint32 reqId, const QStringList& params);
   void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
   void setTrid(const QString& apiv);
   QString lastError(void) const {return m_lastError;}
@@ -86,6 +86,7 @@ private :
   int fecthApiVersion(const SourceT& srcInfo);
   int processGetApiVersionReply(void);
   int processTriggerReply(ChecksT& checks);
+  int processItServiceReply(CoreDataT& cdata);
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);
   std::string parseHost(const QScriptValue& json);
