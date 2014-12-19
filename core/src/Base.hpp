@@ -196,6 +196,7 @@ public:
   CalcRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule);}
   QString toString(void) const;
+  static ngrt4n::AggregatedSeverityT fromZabbixCalcRule(int zabbixCalcRule);
 
 private:
   int m_rule;

@@ -57,11 +57,11 @@ public:
   QString lastError(void) const {return m_lastError;}
   void setSslPeerVerification(bool verifyPeer);
   int parseReply(QNetworkReply* reply);
-  bool checkRPCResultStatus(void);
+  bool backendReturnedSuccessResult(void);
   int openSession(const SourceT& srcInfo);
   int loadChecks(const SourceT& srcInfo, ChecksT& checks,
              const QString& filterValue, ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
-  int importITServices(CoreDataT& cdata);
+  int loadITServices(const SourceT& srcInfo, CoreDataT& cdata);
 
 
 public Q_SLOTS:
@@ -71,6 +71,7 @@ Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
+  typedef QSet<int> DataPointTriggerIds;
   QString m_apiUri;
   QNetworkRequest* m_reqHandler;
   int m_trid;
@@ -82,11 +83,13 @@ private :
   QString m_lastError;
   JsonHelper m_replyJsonData;
 
+  bool checkLogin(const SourceT& srcInfo);
   int processLoginReply(void);
   int fecthApiVersion(const SourceT& srcInfo);
   int processGetApiVersionReply(void);
   int processTriggerReply(ChecksT& checks);
-  int processItServiceReply(CoreDataT& cdata);
+  int processItServiceReply(CoreDataT& cdata, DataPointTriggerIds& triggerIds);
+  int setDataPoints(NodeListT& cnodes, const QString& sourceId, const DataPointTriggerIds& dataPointTriggerIds);
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);
   std::string parseHost(const QScriptValue& json);

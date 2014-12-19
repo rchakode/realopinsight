@@ -95,8 +95,8 @@ ZbxHelper::requestsPatterns()
                                         \"triggerids\": [\"%2\"], \
                                         \"selectGroups\": [\"name\"], \
                                         \"selectHosts\": [\"host\"], \
-                                        \"selectItems\": [\"key_\",\"name\"], \
-                                        \"output\": [\"description\"], \
+                                        \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+                                        \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
                                         \"limit\": -1}, \
                                         \"id\": %9}";
   patterns[GetItServices] = "{\"jsonrpc\": \"2.0\", \
@@ -112,6 +112,14 @@ ZbxHelper::requestsPatterns()
   return patterns;
 }
 
+
+bool ZbxHelper::checkLogin(const SourceT& srcInfo)
+{
+  if (! m_isLogged && openSession(srcInfo) != 0)
+    return -1;
+
+  return m_isLogged;
+}
 
 int
 ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
@@ -181,17 +189,17 @@ ZbxHelper::parseReply(QNetworkReply* reply)
 }
 
 bool
-ZbxHelper::checkRPCResultStatus(void)
+ZbxHelper::backendReturnedSuccessResult(void)
 {
-  QString errmsg = m_replyJsonData.getProperty("error").property("data").toString();
-  if (errmsg.isEmpty()) {
-    errmsg = m_replyJsonData.getProperty("error").property("message").toString();
-  }
-  if (! errmsg.isEmpty()) {
-    m_lastError = errmsg;
-    return false;
-  }
-  return true;
+  QString errData = m_replyJsonData.getProperty("error").property("data").toString();
+  QString errMsg = m_replyJsonData.getProperty("error").property("message").toString();
+
+  if (errData.isEmpty() && errMsg.isEmpty())
+    return true;
+
+  m_lastError = QString("%1%2%3").arg(errData, (errData.isEmpty()? "" : "; "), errMsg);
+
+  return false;
 }
 
 int
@@ -271,13 +279,13 @@ ZbxHelper::processGetApiVersionReply(void)
 int
 ZbxHelper::processTriggerReply(ChecksT& checks)
 {
-  if (! checkRPCResultStatus())
+  if (! backendReturnedSuccessResult())
     return -1;
 
   // check weird reponset
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   if (tid != GetTriggersByHostGroup && GetTriggersByHostGroupV18) {
-    m_lastError = tr("Weird response received from the server");
+    m_lastError = tr("Unexpected transaction id returned: %1").arg(QString::number(tid));
     return -1;
   }
 
@@ -286,7 +294,7 @@ ZbxHelper::processTriggerReply(ChecksT& checks)
   while (trigger.hasNext()) {
 
     trigger.next();
-    if (trigger.flags()&QScriptValue::SkipInEnumeration) continue;
+    if (trigger.flags() & QScriptValue::SkipInEnumeration) continue;
 
     QScriptValue triggerData = trigger.value();
     QString triggerName = triggerData.property("description").toString();
@@ -326,10 +334,7 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
 {
   checks.clear();
 
-  if (! m_isLogged && openSession(srcInfo) != 0)
-    return -1;
-
-  if (! m_isLogged)
+  if (! checkLogin(srcInfo))
     return -1;
 
   QStringList params;
@@ -355,24 +360,73 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
 
 
 int
-ZbxHelper::importITServices(CoreDataT& cdata)
+ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   ngrt4n::clearCoreData(cdata);
+
+  if (! checkLogin(srcInfo))
+    return -1;
 
   QStringList params(QString::number(GetItServices));
   if (postRequest(GetItServices, params) != 0)
     return -1;
 
-  if (processItServiceReply(cdata))
+  DataPointTriggerIds dataPointTriggerIds;
+  if (processItServiceReply(cdata, dataPointTriggerIds))
+    return -1;
+
+  if (setDataPoints(cdata.cnodes, srcInfo.id, dataPointTriggerIds) != 0)
     return -1;
 
   return 0;
 }
 
 
-int ZbxHelper::processItServiceReply(CoreDataT& cdata)
+int ZbxHelper::processItServiceReply(CoreDataT& cdata, DataPointTriggerIds& triggerIds)
 {
+  if (! backendReturnedSuccessResult())
+    return -1;
 
+  qint32 tid = m_replyJsonData.getProperty("id").toInt32();
+  if (tid != GetItServices) {
+    m_lastError = tr("Unexpected transaction id returned: %1, expected: %2").arg(QString::number(tid), QString::number(GetItServices));
+    return -1;
+  }
+
+  QScriptValueIterator serviceIter(m_replyJsonData.getProperty("result"));
+  while (serviceIter.hasNext()) {
+    serviceIter.next();
+    if (serviceIter.flags() & QScriptValue::SkipInEnumeration) continue;
+
+    QScriptValue serviceJsonData = serviceIter.value();
+
+    NodeT node;
+    node.id = serviceJsonData.property("serviceid").toString();
+    node.name = serviceJsonData.property("name").toString();
+    int statusCalculationAlgorithm = serviceJsonData.property("algorithm").toInt32();
+
+    ngrt4n::AggregatedSeverityT derivedSeverityInfo = CalcRules::fromZabbixCalcRule(statusCalculationAlgorithm);
+    node.sev_crule = derivedSeverityInfo.sev;
+    node.weight =  derivedSeverityInfo.weight;
+    node.sev_prule = PropRules::Unchanged;
+
+    int triggerId = serviceJsonData.property("triggerid").toInt32();
+    if (triggerId != 0) {
+      triggerIds.insert(triggerId);
+      node.type = NodeType::ITService;
+      cdata.cnodes.insert(node.id, node);
+    } else {
+      node.type = NodeType::BusinessService;
+      cdata.bpnodes.insert(node.id, node);
+    }
+  }
+
+  return 0;
+}
+
+
+int ZbxHelper::setDataPoints(NodeListT& cnodes, const QString& sourceId, const DataPointTriggerIds& triggerIds)
+{
 
   return 0;
 }
