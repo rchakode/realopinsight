@@ -50,6 +50,8 @@ bool Parser::process(bool console)
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
+  ngrt4n::clearCoreData(*m_cdata);
+
   QFile file(m_config);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
     m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_config);
