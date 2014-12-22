@@ -33,7 +33,7 @@
 
 namespace {
   const QString ZBX_API_CONTEXT = "/api_jsonrpc.php";
-  }
+}
 
 class ZbxHelper : public QNetworkAccessManager {
   Q_OBJECT
@@ -43,8 +43,8 @@ public:
     GetApiVersion=2,
     GetTriggersByHostGroup=3,
     GetTriggersByHostGroupV18=4,
-    GetItServiceTriggersByIds = 6,
-    GetItServices = 5
+    GetITServiceTriggersByIds = 6,
+    GetITServices = 5
   };
   static const RequestListT ReqPatterns;
 
@@ -58,9 +58,9 @@ public:
   void setSslPeerVerification(bool verifyPeer);
   int parseReply(QNetworkReply* reply);
   bool backendReturnedSuccessResult(void);
-  int openSession(const SourceT& srcInfo);
-  int loadChecks(const SourceT& srcInfo, ChecksT& checks,
-             const QString& filterValue, ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
+  int openSession(void);
+  int loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& filterValue,
+                 ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
   int loadITServices(const SourceT& srcInfo, CoreDataT& cdata);
 
 
@@ -71,31 +71,40 @@ Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
-  typedef QSet<int> ItServiceTriggerIdsT;
-  typedef QMap<QString, QString> ItServiceDependenciesMapT;
+  typedef QSet<int> ZabbixServiceTriggerIdsT;
+  typedef QMap<QString, QSet<QString> > ZabbixParentChildsDependenciesMapT;
+  typedef QMap<QString, QString> ZabbixChildParentDependenciesMapT;
   QString m_apiUri;
   QNetworkRequest* m_reqHandler;
   int m_trid;
   static RequestListT requestsPatterns();
   QEventLoop* m_evlHandler;
   bool m_isLogged;
+  SourceT m_sourceInfo;
   QString m_auth;
   QSslConfiguration m_sslConfig;
   QString m_lastError;
   JsonHelper m_replyJsonData;
 
-  bool checkLogin(const SourceT& srcInfo);
+  bool checkLogin(void);
   int processLoginReply(void);
-  int fecthApiVersion(const SourceT& srcInfo);
+  int fecthApiVersion(void);
   int processGetApiVersionReply(void);
-  int processTriggerReply(ChecksT& checks);
-  int processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT& dependencies, ItServiceTriggerIdsT& triggerIds);
-  int setServiceDependencies(NodeListT& bpnodes, NodeListT& cnodes, const ItServiceDependenciesMapT& dependencies);
-  int setItServiceDataPoints(NodeListT& cnodes, const QString& sourceId, const ItServiceTriggerIdsT& dataPointTriggerIds);
+  int processTriggerData(ChecksT& checks);
+  int processZabbixServiceData(CoreDataT& cdata,
+                                ZabbixParentChildsDependenciesMapT& parentChildsDependencies,
+                                ZabbixChildParentDependenciesMapT& childParentDependencies,
+                                ZabbixServiceTriggerIdsT& triggerIds);
+  int setBusinessServiceDependencies(NodeListT& bpnodes, const ZabbixParentChildsDependenciesMapT& parentChildsDependencies);
+  int setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTriggerIdsT& dataPointTriggerIds);
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string processHostGroupsJsonValue(const QScriptValue& hostGroupJsonValue);
   std::string processHostJsonValue(const QScriptValue& hostJsonValue);
-  void processAppendDependenciesJsonValue(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies);
+  void processAppendDependenciesJsonValue(const QScriptValue& depsJsonValue,
+                                          ZabbixParentChildsDependenciesMapT& parentChildsDependencies,
+                                          ZabbixChildParentDependenciesMapT& childParentDependencies);
+  ngrt4n::AggregatedSeverityT aggregationRuleFromZabbixCalcRule(int zabbixCalcRule);
+  QString getTriggersIdsJsonList(const ZabbixServiceTriggerIdsT& triggerIds);
 
 };
 

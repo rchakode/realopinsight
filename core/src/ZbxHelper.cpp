@@ -88,18 +88,18 @@ ZbxHelper::requestsPatterns()
                                         \"output\":  \"extend\", \
                                         \"limit\": -1}, \
                                         \"id\": %9}";
-  patterns[GetItServiceTriggersByIds] = "{\"jsonrpc\": \"2.0\", \
+  patterns[GetITServiceTriggersByIds] = "{\"jsonrpc\": \"2.0\", \
                                         \"auth\": \"%1\", \
                                         \"method\": \"trigger.get\", \
                                         \"params\": { \
-                                        \"triggerids\": [\"%2\"], \
+                                        \"triggerids\": %2, \
                                         \"selectGroups\": [\"name\"], \
                                         \"selectHosts\": [\"host\"], \
                                         \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-                                        \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
+                                        \"output\": [\"triggerid\",\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
                                         \"limit\": -1}, \
                                         \"id\": %9}";
-  patterns[GetItServices] = "{\"jsonrpc\": \"2.0\", \
+  patterns[GetITServices] = "{\"jsonrpc\": \"2.0\", \
                             \"auth\": \"%1\", \
                             \"method\": \"service.get\", \
                             \"params\": { \
@@ -112,9 +112,9 @@ ZbxHelper::requestsPatterns()
 }
 
 
-bool ZbxHelper::checkLogin(const SourceT& srcInfo)
+bool ZbxHelper::checkLogin(void)
 {
-  if (! m_isLogged && openSession(srcInfo) != 0)
+  if (! m_isLogged && openSession() != 0)
     return -1;
 
   return m_isLogged;
@@ -202,17 +202,17 @@ ZbxHelper::backendReturnedSuccessResult(void)
 }
 
 int
-ZbxHelper::openSession(const SourceT& srcInfo)
+ZbxHelper::openSession(void)
 {
-  setBaseUrl(srcInfo.mon_url);
-  QStringList params = ngrt4n::getAuthInfo(srcInfo.auth);
+  setBaseUrl(m_sourceInfo.mon_url);
+  QStringList params = ngrt4n::getAuthInfo(m_sourceInfo.auth);
   if (params.size() != 2) {
     m_lastError = tr("Bad auth string, should be in the form of login:password");
     return -1;
   }
 
   params.push_back(QString::number(GetLogin));
-  setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
+  setSslPeerVerification(m_sourceInfo.verify_ssl_peer != 0);
 
   if (postRequest(GetLogin, params) != 0)
     return -1;
@@ -221,7 +221,7 @@ ZbxHelper::openSession(const SourceT& srcInfo)
     return -1;
 
   // Get the API version
-  if (fecthApiVersion(srcInfo) != 0)
+  if (fecthApiVersion() != 0)
     return -1;
 
   return 0;
@@ -243,12 +243,12 @@ ZbxHelper::processLoginReply(void)
 }
 
 int
-ZbxHelper::fecthApiVersion(const SourceT& srcInfo)
+ZbxHelper::fecthApiVersion(void)
 {
   QStringList params;
 
   params.push_back(QString::number(GetApiVersion));
-  setSslPeerVerification(srcInfo.verify_ssl_peer);
+  setSslPeerVerification(m_sourceInfo.verify_ssl_peer);
 
   if (postRequest(ZbxHelper::GetApiVersion, params) != 0)
     return -1;
@@ -276,11 +276,8 @@ ZbxHelper::processGetApiVersionReply(void)
 }
 
 int
-ZbxHelper::processTriggerReply(ChecksT& checks)
+ZbxHelper::processTriggerData(ChecksT& checks)
 {
-  if (! backendReturnedSuccessResult())
-    return -1;
-
   // check weird reponset
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   if (tid != GetTriggersByHostGroup && GetTriggersByHostGroupV18) {
@@ -295,25 +292,26 @@ ZbxHelper::processTriggerReply(ChecksT& checks)
     trigger.next();
     if (trigger.flags() & QScriptValue::SkipInEnumeration) continue;
 
-    QScriptValue triggerData = trigger.value();
-    QString triggerName = triggerData.property("description").toString();
+    QScriptValue triggerJsonData = trigger.value();
+    QString triggerId = triggerJsonData.property("triggerid").toString();
+    QString triggerName = triggerJsonData.property("description").toString();
 
     CheckT check;
-    check.host = processHostJsonValue(triggerData.property("hosts"));
-    check.host_groups = processHostGroupsJsonValue(triggerData.property("groups"));
+    check.host = processHostJsonValue(triggerJsonData.property("hosts"));
+    check.host_groups = processHostGroupsJsonValue(triggerJsonData.property("groups"));
     check.check_command = triggerName.toStdString();
-    check.status = triggerData.property("value").toInt32();
+    check.status = triggerJsonData.property("value").toInt32();
     if (check.status == ngrt4n::ZabbixClear) {
       check.alarm_msg = "OK ("+triggerName.toStdString()+")";
     } else {
-      check.alarm_msg = triggerData.property("error").toString().toStdString();
-      check.status = triggerData.property("priority").toInteger();
+      check.alarm_msg = triggerJsonData.property("error").toString().toStdString();
+      check.status = triggerJsonData.property("priority").toInteger();
     }
 
     if (tid == GetTriggersByHostGroupV18) {
-      check.last_state_change = triggerData.property("lastchange").toString().toStdString();
+      check.last_state_change = triggerJsonData.property("lastchange").toString().toStdString();
     } else {
-      QScriptValueIterator item(triggerData.property("items"));
+      QScriptValueIterator item(triggerJsonData.property("items"));
       if (item.hasNext()) {
         item.next();
         if (item.flags()&QScriptValue::SkipInEnumeration) continue;
@@ -322,18 +320,20 @@ ZbxHelper::processTriggerReply(ChecksT& checks)
       }
     }
     check.id = ID_PATTERN.arg(check.host.c_str(), triggerName).toStdString();
-    checks.insert(std::pair<std::string, CheckT>(check.id, check));
+    checks.insert(triggerId.toStdString(), check);
   }
   return 0;
 }
 
 int
-ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
-                      const QString& filterValue, ngrt4n::RequestFilterT filterType)
+ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& filterValue,
+                      ngrt4n::RequestFilterT filterType)
 {
+  m_sourceInfo = srcInfo;
+
   checks.clear();
 
-  if (! checkLogin(srcInfo))
+  if (! checkLogin())
     return -1;
 
   QStringList params;
@@ -351,7 +351,10 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
   if (postRequest(m_trid, params) != 0)
     return -1;
 
-  if (processTriggerReply(checks) !=0)
+  if (! backendReturnedSuccessResult())
+    return -1;
+
+  if (processTriggerData(checks) !=0)
     return -1;
 
   return 0;
@@ -361,40 +364,47 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
 int
 ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
+  m_sourceInfo = srcInfo;
+
   ngrt4n::clearCoreData(cdata);
 
   cdata.monitor = ngrt4n::Zabbix;
 
-  if (! checkLogin(srcInfo))
+  if (! checkLogin())
     return -1;
 
-  QStringList params(QString::number(GetItServices));
-  if (postRequest(GetItServices, params) != 0)
+  QStringList params(QString::number(GetITServices));
+  if (postRequest(GetITServices, params) != 0)
     return -1;
 
-  ItServiceTriggerIdsT triggerIds;
-  ItServiceDependenciesMapT dependencies;
-  if (processItServiceReply(cdata, dependencies, triggerIds))
+  if (! backendReturnedSuccessResult())
     return -1;
 
-  if (setServiceDependencies(cdata.bpnodes, cdata.cnodes, dependencies) != 0)
+  ZabbixServiceTriggerIdsT triggerIds;
+  ZabbixParentChildsDependenciesMapT parentChildsDependencies;
+  ZabbixChildParentDependenciesMapT childParentDependencies;
+
+  if (processZabbixServiceData(cdata, parentChildsDependencies, childParentDependencies, triggerIds))
     return -1;
 
-  if (setItServiceDataPoints(cdata.cnodes, srcInfo.id, triggerIds) != 0)
+  if (setBusinessServiceDependencies(cdata.bpnodes, parentChildsDependencies) != 0)
+    return -1;
+
+  if (setITServiceDataPoint(cdata.cnodes, triggerIds) != 0)
     return -1;
 
   return 0;
 }
 
 
-int ZbxHelper::processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT& dependencies, ItServiceTriggerIdsT& triggerIds)
+int ZbxHelper::processZabbixServiceData(CoreDataT& cdata,
+                                        ZabbixParentChildsDependenciesMapT& parentChildsDependencies,
+                                        ZabbixChildParentDependenciesMapT& childParentDependencies,
+                                        ZabbixServiceTriggerIdsT& triggerIds)
 {
-  if (! backendReturnedSuccessResult())
-    return -1;
-
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-  if (tid != GetItServices) {
-    m_lastError = tr("Unexpected transaction id returned: %1, expected: %2").arg(QString::number(tid), QString::number(GetItServices));
+  if (tid != GetITServices) {
+    m_lastError = tr("Unexpected transaction id returned: %1, expected: %2").arg(QString::number(tid), QString::number(GetITServices));
     return -1;
   }
 
@@ -408,11 +418,12 @@ int ZbxHelper::processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT
     NodeT node;
     node.id = serviceJsonData.property("serviceid").toString();
     node.name = serviceJsonData.property("name").toString();
-    int statusCalculationAlgorithm = serviceJsonData.property("algorithm").toInt32();
 
-    ngrt4n::AggregatedSeverityT derivedSeverityInfo = CalcRules::fromZabbixCalcRule(statusCalculationAlgorithm);
-    node.sev_crule = derivedSeverityInfo.sev;
-    node.weight =  derivedSeverityInfo.weight;
+    int zabbixCalcRule = serviceJsonData.property("algorithm").toInt32();
+    ngrt4n::AggregatedSeverityT aggregationRule = aggregationRuleFromZabbixCalcRule(zabbixCalcRule);
+
+    node.sev_crule = aggregationRule.sev;
+    node.weight =  aggregationRule.weight;
     node.sev_prule = PropRules::Unchanged;
 
     int triggerId = serviceJsonData.property("triggerid").toInt32();
@@ -425,27 +436,97 @@ int ZbxHelper::processItServiceReply(CoreDataT& cdata, ItServiceDependenciesMapT
       cdata.bpnodes.insert(node.id, node);
     }
 
-    processAppendDependenciesJsonValue(serviceJsonData.property("dependencies"), dependencies);
+    processAppendDependenciesJsonValue(serviceJsonData.property("dependencies"), parentChildsDependencies, childParentDependencies);
   }
 
   return 0;
 }
 
-
-void ZbxHelper::processAppendDependenciesJsonValue(const QScriptValue& depsJsonValue, ItServiceDependenciesMapT& dependencies)
+ngrt4n::AggregatedSeverityT ZbxHelper::aggregationRuleFromZabbixCalcRule(int zabbixCalcRule)
 {
-
+  ngrt4n::AggregatedSeverityT result;
+  result.sev = CalcRules::Average;
+  result.weight = ngrt4n::WEIGHT_UNIT;
+  switch (zabbixCalcRule) {
+    case 0:
+      result.weight = 0;
+      break;
+    case 1:
+      result.sev = CalcRules::Worst;
+      break;
+    case 2: // default
+    default:
+      result.sev = CalcRules::Average;
+      break;
+  }
+  return result;
 }
 
-int ZbxHelper::setServiceDependencies(NodeListT& bpnodes, NodeListT& cnodes, const ItServiceDependenciesMapT& dependencies)
+
+
+void ZbxHelper::processAppendDependenciesJsonValue(const QScriptValue& dependenviesJsonValue,
+                                                   ZabbixParentChildsDependenciesMapT& parentChildsDependencies,
+                                                   ZabbixChildParentDependenciesMapT& childParentDependencies)
 {
+  QScriptValueIterator entryIter(dependenviesJsonValue);
+  while (entryIter.hasNext()) {
+    entryIter.next();
+    if (entryIter.flags() & QScriptValue::SkipInEnumeration) continue;
+    QScriptValue entryContent = entryIter.value();
+    QString parent = entryContent.property("serviceupid").toString();
+    QString child = entryContent.property("servicedownid").toString();
+    parentChildsDependencies[parent].insert(child);
+    childParentDependencies.insert(child, parent);
+  }
+}
+
+int ZbxHelper::setBusinessServiceDependencies(NodeListT& bpnodes, const ZabbixParentChildsDependenciesMapT& parentChildsDependencies)
+{
+  ZabbixParentChildsDependenciesMapT::ConstIterator relationIter = parentChildsDependencies.begin();
+  while (relationIter != parentChildsDependencies.end()) {
+
+    NodeListT::Iterator bpnode = bpnodes.find(relationIter.key());
+    if (bpnode != bpnodes.end()) {
+      bpnode->child_nodes = QStringList( relationIter.value().values() ).join(ngrt4n::CHILD_SEP.c_str());
+    }
+
+    ++relationIter;
+  }
   return 0;
 }
 
-int ZbxHelper::setItServiceDataPoints(NodeListT& cnodes, const QString& sourceId, const ItServiceTriggerIdsT& triggerIds)
+int ZbxHelper::setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTriggerIdsT& triggerIds)
 {
+  QStringList params(getTriggersIdsJsonList(triggerIds));
+  params.push_back(QString::number(GetITServiceTriggersByIds));
+
+  if (postRequest(GetITServices, params) != 0)
+    return -1;
+
+  if (! backendReturnedSuccessResult())
+    return -1;
+
+  ChecksT checks;
+  if (processTriggerData(checks) != 0)
+    return -1;
 
   return 0;
+}
+
+
+QString ZbxHelper::getTriggersIdsJsonList(const ZabbixServiceTriggerIdsT& triggerIds)
+{
+  QString result = "";
+  if (! triggerIds.isEmpty()) {
+    ZabbixServiceTriggerIdsT::ConstIterator idIter = triggerIds.begin();
+    result = QString("\"%1\"").arg(*idIter);
+    ++idIter;
+    while (idIter != triggerIds.end()) {
+      result.append(QString(",\"%1\"").arg( QString("\"%1\"").arg(*idIter)));
+      ++ idIter;
+    }
+  }
+  return QString("[%1]").arg(result);
 }
 
 void
@@ -494,3 +575,6 @@ ZbxHelper::processHostJsonValue(const QScriptValue& hostJsonValue)
 
   return result;
 }
+
+
+
