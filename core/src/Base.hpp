@@ -74,7 +74,7 @@ struct CheckT {
   std::string host_groups;
   int status;
 };
-typedef std::unordered_map<std::string, CheckT> ChecksT;
+typedef QMap<std::string, CheckT> ChecksT;
 
 namespace ngrt4n {
   enum ApiTypeT {
@@ -196,7 +196,6 @@ public:
   CalcRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule);}
   QString toString(void) const;
-  static ngrt4n::AggregatedSeverityT fromZabbixCalcRule(int zabbixCalcRule);
 
 private:
   int m_rule;

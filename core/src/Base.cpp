@@ -54,26 +54,6 @@ QString CalcRules::toString(void) const
 }
 
 
-ngrt4n::AggregatedSeverityT
-CalcRules::fromZabbixCalcRule(int zabbixCalcRule)
-{
-  ngrt4n::AggregatedSeverityT result;
-  result.sev = CalcRules::Average;
-  result.weight = ngrt4n::WEIGHT_UNIT;
-  switch (zabbixCalcRule) {
-    case 0:
-      result.weight = 0;
-      break;
-    case 1:
-      result.sev = CalcRules::Worst;
-      break;
-    case 2: // default
-    default:
-      result.sev = CalcRules::Average;
-      break;
-  }
-  return result;
-}
 
 
 

@@ -156,6 +156,6 @@ void LsHelper::parseResult(ChecksT& checks)
       break;
     }
 
-    checks.insert(std::pair<std::string, CheckT>(check.id, check));
+    checks.insert(check.id, check);
   }
 }

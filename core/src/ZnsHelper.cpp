@@ -269,7 +269,7 @@ ZnsHelper::processComponentReply(QNetworkReply* reply, ChecksT& checks)
       check.status = citem.property("failSeverity").toInt32();
       check.alarm_msg = citem.property("status").toString().toStdString();
     }
-    checks.insert(std::pair<std::string, CheckT>(check.id, check));
+    checks.insert(check.id, check);
   }
 
   return 0;
@@ -310,7 +310,7 @@ ZnsHelper::processDeviceInfoReply(QNetworkReply* reply, ChecksT& checks)
     check.status = ngrt4n::ZenossCritical;
     check.alarm_msg = tr("The host '%1' is Down").arg(dname).toStdString();
   }
-  checks.insert(std::pair<std::string, CheckT>(check.id, check));
+  checks.insert(check.id, check);
 
   return 0;
 }
