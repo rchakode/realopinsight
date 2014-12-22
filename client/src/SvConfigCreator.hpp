@@ -56,6 +56,7 @@ public Q_SLOTS:
   void open(void);
   void save(void);
   void saveAs(void);
+  QString selectFileDestinationPath(void);
   int treatCloseAction(const bool& = true);
   void fillEditorFromService(QTreeWidgetItem* _item);
   void handleReturnPressed(void);
@@ -65,9 +66,10 @@ public Q_SLOTS:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
-  void treatCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
+  void processCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
   void importNagiosChecks(void);
   void importZabbixTriggers(void);
+  void importZabbixITServices(void);
   void importZenossComponents(void);
   void importPandoraModules(void);
   void importLivestatusChecks(void);
@@ -105,6 +107,7 @@ private:
   NodeT* createNode(const QString& id, const QString& label, const QString& parent);
   int parseStatusFile(const QString& _path, ChecksT& _checks);
   void showStatusMsg(const QString& msg, bool error);
+  void handleInvalidPathError(void);
 };
 
 #endif /* SNAVSVCREATOR_H_ */
