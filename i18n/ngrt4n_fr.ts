@@ -853,7 +853,7 @@ Report Bugs: %8
         <translation>
 %1
 Version : %2 (%3)
-Version noyeau : %4
+Version noyau : %4
 Release ID: %5
 Copyright (c) 2010-%6 RealOpInsight Labs. Tous droits réservés
 Visiter %7 pour plus d&apos;informations

@@ -1,6 +1,17 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.2.1
+  * Added the ability to import existing Zabbix IT services configuration
+    into the RealOpInsight Editor. The configurations of those Zabbix IT
+    services can thus be easily saved in a RealOpInsight-compatible
+    description file.
+  * Added the ability to import existing Nagios BPI configuration file
+    (bpi.conf). The resulting configurations can thus be easily saved in
+    a RealOpInsight-compatible description file.
+  * The generation of the ids of services is now based on UUID to fix
+    some problems  related to the duplication of generated ids.
+
 3.2.0 (ibericus)
   * Added support for Pandora FMS monitoring backends. Based on
     Pandora FMS's API, any versions of Pandora FMS starting from
