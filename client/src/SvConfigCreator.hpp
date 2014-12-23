@@ -72,7 +72,8 @@ public Q_SLOTS:
   void importZabbixITServices(void);
   void importZenossComponents(void);
   void importPandoraModules(void);
-  void importLivestatusChecks(void);
+  void importNagiosLivestatusChecks(void);
+  void importNagiosBPIConf(void);
   void handleErrorOccurred(QString msg);
 
 protected:
@@ -104,10 +105,18 @@ private:
   void unloadMenu(void);
   void addEvents(void);
   void resize(void);
-  NodeT* createNode(const QString& id, const QString& label, const QString& parent);
+  NodeT createNode(const QString& id, const QString& label, const QString& parent);
   int parseStatusFile(const QString& _path, ChecksT& _checks);
   void showStatusMsg(const QString& msg, bool error);
   void handleInvalidPathError(void);
+  bool isValidPath(const QString& path) {return (! path.isNull() && ! path.trimmed().isEmpty()); }
+  void refreshAllComponents(void);
+  int extractNagiosBPIGroupMembers(const QString& parentServiceId,
+                                    const QString& sourceId,
+                                    const QString& bpiGroupMembersChain,
+                                    NodeListT& bpnodes,
+                                    NodeListT& cnodes,
+                                    QString& childNodeChain);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

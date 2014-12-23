@@ -7,10 +7,10 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>& sourceList, bool statusFile)
+CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>& sourceList, bool importFile)
   : m_sourceSelectionBox(NULL),
     m_filter(NULL),
-    m_statusFileArea(NULL)
+    m_selectedFileTextField(NULL)
 {
   // build generic widgets
   m_sourceSelectionBox = new QComboBox(this);
@@ -21,16 +21,16 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
   QGridLayout* layout = new QGridLayout(this);
   layout->addWidget(new QLabel(tr("Select source*"), this), 0, 0);
   layout->addWidget(m_sourceSelectionBox, 0, 1);
-  if (! statusFile) {
+  if (! importFile) {
     layout->addWidget(new QLabel(tr("Host or group filter (optional)"), this), 1, 0);
     m_filter = new QLineEdit(this);
     layout->addWidget(m_filter, 1, 1);
   } else {
     QPushButton* fileBrowser = new QPushButton(tr("browse..."), this);
-    m_statusFileArea = new QLineEdit(this);
-    m_statusFileArea->setReadOnly(true);
-    layout->addWidget(new QLabel(tr("Status file"), this), 1, 0);
-    layout->addWidget(m_statusFileArea, 1, 1);
+    m_selectedFileTextField = new QLineEdit(this);
+    m_selectedFileTextField->setReadOnly(true);
+    layout->addWidget(new QLabel(tr("Select a file"), this), 1, 0);
+    layout->addWidget(m_selectedFileTextField, 1, 1);
     layout->addWidget(fileBrowser, 1, 2);
     connect(fileBrowser, SIGNAL(clicked()), this, SLOT(handleSelectStatusFile()));
   }
@@ -49,13 +49,13 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
 
 void CheckImportationSettingsForm::handleSelectStatusFile(void)
 {
-  m_statusFile = QFileDialog::getOpenFileName(this,
+  m_selectedFile = QFileDialog::getOpenFileName(this,
                                               tr("Select a status file | %1").arg(APP_NAME),
                                               ".",
                                               tr("Data files (*.dat);;All files (*)"));
-  if (m_statusFile.isNull()) {
-    m_statusFile = QString();
+  if (m_selectedFile.isNull()) {
+    m_selectedFile = QString();
   } else {
-    m_statusFileArea->setText(m_statusFile);
+    m_selectedFileTextField->setText(m_selectedFile);
   }
 }
