@@ -117,6 +117,7 @@ private:
                                     NodeListT& bpnodes,
                                     NodeListT& cnodes,
                                     QString& childNodeChain);
+  void updateWindowTitle(const QString& append);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

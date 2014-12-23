@@ -181,12 +181,7 @@ void SvCreator::refreshAllComponents(void)
   m_editor->fillInEditorWithContent(*m_root);
   m_tree->build();
   fillEditorFromService(m_tree->rootItem());
-
-  if (! m_activeConfig.isEmpty()) {
-    setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME, m_activeConfig));
-  } else {
-    setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME, m_root->name));
-  }
+  updateWindowTitle("*");
 }
 
 void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
@@ -842,17 +837,28 @@ void SvCreator::handleNodeTypeActivated(qint32 targetType)
       if (m_editor->updateNodeInfoFromEditorContents(*node)) {
         m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
         m_hasLeftUpdates = true;
-        showStatusMsg(tr("* Unsaved changes left"), false);
-        setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+        updateWindowTitle("*");
       }
     }
   } else { // current type is business service
     if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
-      showStatusMsg(tr("* Unsaved changes left"), false);
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+      updateWindowTitle("*");
     }
+  }
+}
+
+void SvCreator::updateWindowTitle(const QString& append)
+{
+  if (! m_activeConfig.isEmpty()) {
+    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_activeConfig, append));
+  } else {
+    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_root->name, append));
+  }
+
+  if (! append.isEmpty()) {
+    showStatusMsg(tr("* Unsaved changes left"), false);
   }
 }
 
@@ -879,7 +885,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
       }
       m_hasLeftUpdates = true;
       showStatusMsg(tr("* Unsaved changes left"), false);
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+      updateWindowTitle("*");
     }
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
@@ -895,8 +901,7 @@ void SvCreator::handleReturnPressed(void)
     if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
-      showStatusMsg(tr("* unsaved changes left"), false);
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+      updateWindowTitle("*");
     }
   }
 }

@@ -67,7 +67,7 @@ Copyright (c) 2010-%1 RealOpInsight Labs. Tous droits réservés.</translation>
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="32"/>
         <source>Select a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner un fichier</translation>
     </message>
     <message>
         <location filename="../client/src/GuiDialogForms.cpp" line="53"/>
@@ -954,7 +954,7 @@ Commentaires : %6</translation>
     <message>
         <location filename="../core/src/ThresholdHelper.cpp" line="80"/>
         <source>Set %1% %2 To %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Escalader %1% %2 vers %3</translation>
     </message>
 </context>
 <context>
@@ -1127,27 +1127,27 @@ Commentaires : %6</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="277"/>
         <source>Nagios BPI Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Services Nagios BPI</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="290"/>
         <source>Group definition must end with &apos;{&apos; at line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>La définition d&apos;un groupe doit se terminer par un caractère &apos;{&apos;, voir ligne %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="297"/>
         <source>Bad group definition at line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Définitionn de groupe erronée %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="326"/>
         <source>Bad group attribute definition at line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mauvaise définition d&apos;attribut à la ligne %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="429"/>
         <source>Bad service entry %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mauvaise définition de service %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="457"/>
@@ -1157,17 +1157,17 @@ Commentaires : %6</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="481"/>
         <source>Loading IT services from %1:%2...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chargement de services à partir de %1:%2... </translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="487"/>
         <source>The importation of IT services failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;importation de service a échoué: %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="491"/>
         <source>The importation of IT services is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;importation de services est maitenant terminée</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="508"/>
@@ -1187,7 +1187,7 @@ Commentaires : %6</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="718"/>
         <source>Invalid path</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin de fichier invalide</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="898"/>
@@ -1317,7 +1317,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1004"/>
         <source>Import Nagios BPI Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer une configuration Nagios BPI</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1005"/>
@@ -1327,7 +1327,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1006"/>
         <source>Import Zabbix IT Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des services IT Zabbix</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1008"/>
@@ -1431,17 +1431,17 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../core/src/ZbxHelper.cpp" line="277"/>
         <source>Unexpected transaction id: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifiant de transaction erroné : %1</translation>
     </message>
     <message>
         <location filename="../core/src/ZbxHelper.cpp" line="391"/>
         <source>Zabbix IT Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Services IT Zabbix</translation>
     </message>
     <message>
         <location filename="../core/src/ZbxHelper.cpp" line="420"/>
         <source>Unexpected transaction id: %1, expected: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifiant de transaction inattendu : %1, valeur attendue %2</translation>
     </message>
 </context>
 <context>
