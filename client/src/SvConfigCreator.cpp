@@ -363,20 +363,15 @@ void SvCreator::importNagiosBPIConfig(void)
     if (parsingFailed) {
       break;
     } else {
-      qDebug() << "FIXME:" << "warningThreshold ="<< warningThreshold << "criticalThreshold = " << criticalThreshold;
       if (groupMembersCount > 0) {
-        //FIXME: thresholds do not work in the same way
-        //          if (warningThreshold > 0.0) {
-        //            currentNode->thresholdLimits.push_back({warningThreshold / groupMembersCount, ngrt4n::Major, ngrt4n::Critical});
-        //          }
-        //          if (warningThreshold > 0.0 ) {
-        //            currentNode->thresholdLimits.push_back({warningThreshold / groupMembersCount, ngrt4n::Major, ngrt4n::Critical});
-        //          }
+        if (warningThreshold > 0.0) {
+          currentNode->thresholdLimits.push_back({warningThreshold / groupMembersCount, ngrt4n::Major, ngrt4n::Major});
+        }
+        if (warningThreshold > 0.0 ) {
+          currentNode->thresholdLimits.push_back({criticalThreshold / groupMembersCount, ngrt4n::Critical, ngrt4n::Critical});
+        }
       }
     }
-    /// FIXME: deduce calculation rule according to groupMembersCount,
-    /// warningThreshold, criticalThreshold...
-    /// m_cdata->bpnodes.insert(currentNode.id, currentNode);
   }
 
   if (parsingFailed) {

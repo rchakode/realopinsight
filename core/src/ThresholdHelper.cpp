@@ -77,8 +77,8 @@ ThresholdT ThresholdHelper::toThreshold(void) const
 QString ThresholdHelper::toString(void)
 {
   if (isValid())
-    return QString("Set %1\% %2 To %3"
-                   ).arg(QString::number(m_weight * 100), Severity(m_sevIn).toString(), Severity(m_sevOut).toString());
+    return QObject::tr("Set %1\% %2 To %3")
+        .arg(QString::number(m_weight * 100), Severity(m_sevIn).toString(), Severity(m_sevOut).toString());
   return QString();
 }
 

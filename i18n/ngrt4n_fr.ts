@@ -951,6 +951,11 @@ Commentaires : %6</translation>
         <source>Unable to connect to ngrt4nd at %1</source>
         <translation>Impossible de se connecter à ngrt4nd à l&apos;adresse %1</translation>
     </message>
+    <message>
+        <location filename="../core/src/ThresholdHelper.cpp" line="80"/>
+        <source>Set %1% %2 To %3</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ServiceEditor</name>
@@ -1085,7 +1090,7 @@ Commentaires : %6</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="143"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="950"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="945"/>
         <source>%1 Editor - %2</source>
         <translation> Editeur %1 - %2</translation>
     </message>
@@ -1140,242 +1145,242 @@ Commentaires : %6</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="434"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="429"/>
         <source>Bad service entry %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="462"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="457"/>
         <source>Loading triggers from %1:%2...</source>
         <translation>Chargement des données de déclencheurs à partir de %1:%2...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="486"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="481"/>
         <source>Loading IT services from %1:%2...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="492"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="487"/>
         <source>The importation of IT services failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="496"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="491"/>
         <source>The importation of IT services is completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="513"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="508"/>
         <source>Loading components from %1:%2...</source>
         <translation>Chargements des données de composants à partir de %1:%2... </translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="553"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="548"/>
         <source>%1 entries imported</source>
         <translation>%1 entrées importées</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="613"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="608"/>
         <source>This action is not allowed on the target service</source>
         <translation>Cette action n&apos;est pas permise avec le service cible</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="723"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="718"/>
         <source>Invalid path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="903"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="898"/>
         <source>* unsaved changes left</source>
         <translation>* changements non enregistrés</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="911"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="906"/>
         <source>Saving in %1...</source>
         <translation>Enregistrement dans le fichier %1...</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="265"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="915"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="910"/>
         <source>Cannot open file: %1</source>
         <translation>Impossible d&apos;ouvrir le fichier: %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="949"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="944"/>
         <source>File saved: %1</source>
         <translation>fichier enregistré: %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1012"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1007"/>
         <source>Import Z&amp;enoss Components</source>
         <translation>Importer des composants Z&amp;enoss</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="565"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="560"/>
         <source>New View</source>
         <translation>Nouvelle vue de service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="537"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="532"/>
         <source>Loading Pandora agents data from %1:%2...</source>
         <translation>Chargement de données d&apos;agents à partir de %1:%2...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="582"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="577"/>
         <source>sub service %1</source>
         <translation>sous service %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="621"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="616"/>
         <source>Do you really want to delete the service and its sub services?</source>
         <translation>Voulez-vous vraiment suppimer le service?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="622"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="617"/>
         <source>Deleting service - %1 Editor</source>
         <translation>Suppression de service  - Editeur %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="689"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="684"/>
         <source>There is no data in the clipboard!</source>
         <translation>Il n&apos;y a pas de données dans le presse papier!</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="735"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="730"/>
         <source>Select the destination file | %1</source>
         <translation>Sélectionner le fichier de destination | %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="772"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="767"/>
         <source>Save change? - %1</source>
         <translation>Enregistrer les mises Ã  jour ? - %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="773"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="768"/>
         <source>The document has changed.
 Do you want to save the changes?</source>
         <translation>Le document n&apos;a été modifiée.
 Voulez-vous enregistrer les mises Ã  jour?</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="850"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="858"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="886"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="845"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="853"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="881"/>
         <source>* Unsaved changes left</source>
         <translation>* Changement non enregistrés</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="186"/>
         <location filename="../client/src/SvConfigCreator.cpp" line="188"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="851"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="859"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="887"/>
-        <location filename="../client/src/SvConfigCreator.cpp" line="904"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="846"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="854"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="882"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="899"/>
         <source>%1 Editor - %2*</source>
         <translation>Editeur %1 - %2*</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="921"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="916"/>
         <source>The hierarchy does not have root</source>
         <translation>La hiérarchie n&apos;a pas de racine</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="997"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="992"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1000"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="995"/>
         <source>&amp;Open</source>
         <translation>&amp;Ouvrir</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1002"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="997"/>
         <source>&amp;Save</source>
         <translation>&amp;Enregistrer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1004"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="999"/>
         <source>Save &amp;As...</source>
         <translation>Enregistrer &amp;sous...</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1007"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1002"/>
         <source>Import Na&amp;gios Checks</source>
         <translation>Importer des sondes Na&amp;gios</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1008"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1003"/>
         <source>Import Livestatus Checks</source>
         <translation>Importer des données Livestatus</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1009"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1004"/>
         <source>Import Nagios BPI Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1010"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1005"/>
         <source>Import Za&amp;bbix Triggers</source>
         <translation>Importer des déclencheurs Za&amp;bbix</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1011"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1006"/>
         <source>Import Zabbix IT Services</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1013"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1008"/>
         <source>Import &amp;Pandora Modules</source>
         <translation>Importer des modules de &amp;Pandora FMS</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1052"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1047"/>
         <source>ERROR: Unable to open the file %1</source>
         <translation>ERREUR: Ne peut ouvrir le fichier %1</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1016"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1011"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1018"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1013"/>
         <source>&amp;Edition</source>
         <translation>&amp;Edition</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1019"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1014"/>
         <source>&amp;Add sub service</source>
         <translation>&amp;Ajouter sous service</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1022"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1017"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copier</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1025"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1020"/>
         <source>&amp;Paste</source>
         <translation>Co&amp;ller</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1028"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1023"/>
         <source>&amp;Delete</source>
         <translation>&amp;Supprimer</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1031"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1026"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1032"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1027"/>
         <source>Online &amp;Resources</source>
         <translation>&amp;Ressources en ligne</translation>
     </message>
     <message>
-        <location filename="../client/src/SvConfigCreator.cpp" line="1035"/>
+        <location filename="../client/src/SvConfigCreator.cpp" line="1030"/>
         <source>&amp;About %1</source>
         <translation>&amp;A propos de %1</translation>
     </message>
