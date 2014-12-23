@@ -93,7 +93,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["SaveAs"], SIGNAL(triggered(bool)), this, SLOT(saveAs()));
   connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
   connect(m_subMenus["ImportNagiosLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosLivestatusChecks()));
-  connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConf()));
+  connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
   connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServices()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
@@ -250,7 +250,7 @@ void SvCreator::importNagiosLivestatusChecks(void)
 }
 
 
-void SvCreator::importNagiosBPIConf(void)
+void SvCreator::importNagiosBPIConfig(void)
 {
   QMap<QString, SourceT> sourceInfos;
   fetchSourceList(ngrt4n::Nagios, sourceInfos);
@@ -274,7 +274,7 @@ void SvCreator::importNagiosBPIConf(void)
   QTextStream streamReader(&file);
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;
-  rootService.name = "Nagios BPI Services";
+  rootService.name = tr("Nagios BPI Services");
 
   ngrt4n::clearCoreData(*m_cdata);
   while (line = streamReader.readLine(), ! line.isNull()) {
@@ -342,8 +342,10 @@ void SvCreator::importNagiosBPIConf(void)
           }
         }
       } else if (fields[0] == "members") {
-        groupMembersCount = extractNagiosBPIGroupMembers(currentNode->id, sourceId, fields[1],
-            m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes);
+        groupMembersCount = extractNagiosBPIGroupMembers(
+                              currentNode->id, sourceId,
+                              fields[1], m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes);
+
         if (groupMembersCount < 0) {
           parsingFailed = true;
           break;
@@ -361,7 +363,7 @@ void SvCreator::importNagiosBPIConf(void)
     if (parsingFailed) {
       break;
     } else {
-      qDebug() << "warningThreshold ="<< warningThreshold << "criticalThreshold = " << criticalThreshold;
+      qDebug() << "FIXME:" << "warningThreshold ="<< warningThreshold << "criticalThreshold = " << criticalThreshold;
       if (groupMembersCount > 0) {
         //FIXME: thresholds do not work in the same way
         //          if (warningThreshold > 0.0) {
@@ -417,7 +419,7 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
           memberNode = bpnodes.insert(memberId, createNode(memberId, memberId, parentServiceId));
         }
         memberNode->weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
-        currentChildNodeId = memberId;
+        currentChildNodeId = memberId.trimmed();
       } else {
         QStringList fields = memberId.split(";");
         if (fields.size() == 2) {
@@ -476,7 +478,7 @@ void SvCreator::importZabbixITServices(void)
 {
   QMap<QString, SourceT> sourceInfos;
   fetchSourceList(ngrt4n::Zabbix, sourceInfos);
-  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
     SourceT srcInfo = sourceInfos[srcId];
@@ -926,14 +928,9 @@ void SvCreator::recordData(const QString& path)
               << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(m_cdata->monitor) )
               << generateNodeXml(*m_root);
 
-    int in = 0;
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
-      if (service.id != ngrt4n::ROOT_ID
-          && ! service.parent.isEmpty()) {
+      if (service.id != ngrt4n::ROOT_ID && ! service.parent.isEmpty()) {
         outStream << generateNodeXml(service);
-        qDebug()<< ++in<< generateNodeXml(service);
-      } else {
-        qDebug()<< ++in<< service.id<< service.parent;
       }
     }
 
@@ -1009,7 +1006,7 @@ void SvCreator::loadMenu(void)
   m_menus["FILE"]->addSeparator(),
       m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
       m_subMenus["ImportNagiosLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
-      m_subMenus["ImportNagiosBPIConf"] = m_menus["FILE"]->addAction(tr("Import Nagios BPI Config")),
+      m_subMenus["ImportNagiosBPIConf"] = m_menus["FILE"]->addAction(tr("Import Nagios BPI Configuration")),
       m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
       m_subMenus["ImportZabbixITServices"] = m_menus["FILE"]->addAction(tr("Import Zabbix IT Services")),
       m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components")),

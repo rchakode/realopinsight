@@ -73,7 +73,7 @@ public Q_SLOTS:
   void importZenossComponents(void);
   void importPandoraModules(void);
   void importNagiosLivestatusChecks(void);
-  void importNagiosBPIConf(void);
+  void importNagiosBPIConfig(void);
   void handleErrorOccurred(QString msg);
 
 protected:

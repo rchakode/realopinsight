@@ -388,7 +388,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;
-  rootService.name = "root";
+  rootService.name = tr("Zabbix IT Services");
   rootService.type = NodeType::BusinessService;
   rootService.child_nodes = extractTopParentServices(cdata.bpnodes, childParentDependencies);
   cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
