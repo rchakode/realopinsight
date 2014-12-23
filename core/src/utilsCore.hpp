@@ -58,7 +58,7 @@ namespace ngrt4n
   { return QDateTime::fromTime_t(QString(mytime_t.c_str()).toUInt()).toString().toStdString(); }
 
   inline QString genNodeId()
-  { return QString("ngrt4nsrv%2%1").arg(QUuid::createUuid().toString().replace("{", "-"), QDateTime::currentDateTime().toString("yyyymmddHHmmss")); }
+  { return QString("ngrt4nsrv%1").arg(QUuid::createUuid().toString().replace("{", "").replace("}", "").replace("-","")); }
 
   inline QString sourceId(const qint32& idx)
   { return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));}
