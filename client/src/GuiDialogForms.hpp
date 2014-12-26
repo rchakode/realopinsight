@@ -13,7 +13,7 @@ class CheckImportationSettingsForm: public QDialog
 public:
   CheckImportationSettingsForm(const QList<QString>& sourceList, bool importFile);
 
-  QString selectedSource(void) const {return m_sourceSelectionBox->currentText();}
+  QString selectedSource(void) const {return m_sourceSelectionBox->currentText().trimmed();}
   QString filter(void) const {return m_filter->text();}
   QString selectedFile(void) const {return m_selectedFile;}
 

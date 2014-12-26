@@ -50,9 +50,9 @@ CheckImportationSettingsForm::CheckImportationSettingsForm(const QList<QString>&
 void CheckImportationSettingsForm::handleSelectStatusFile(void)
 {
   m_selectedFile = QFileDialog::getOpenFileName(this,
-                                              tr("Select a status file | %1").arg(APP_NAME),
+                                              tr("Select a file | %1").arg(APP_NAME),
                                               ".",
-                                              tr("Data files (*.dat);;All files (*)"));
+                                              tr("Data files (*.dat);;Config files (*.conf);;All files (*)"));
   if (m_selectedFile.isNull()) {
     m_selectedFile = QString();
   } else {

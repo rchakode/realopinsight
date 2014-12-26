@@ -287,7 +287,7 @@ ZbxHelper::processTriggerData(ChecksT& checks)
 
     QScriptValue triggerJsonData = trigger.value();
     QString triggerId = triggerJsonData.property("triggerid").toString();
-    QString triggerName = triggerJsonData.property("description").toString();
+    QString triggerName = triggerJsonData.property("description").toString().trimmed();
 
     CheckT check;
     check.host = processHostJsonValue(triggerJsonData.property("hosts"));
@@ -550,10 +550,11 @@ int ZbxHelper::setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTrigg
     if (cnode != cnodes.end()) {
       ChecksT::ConstIterator dataPoint = dataPoints.find(serviceTriggerLink.value().toStdString());
       if (dataPoint != dataPoints.end()) {
-        cnode->child_nodes = QString("%1:%2").arg(m_sourceInfo.id, dataPoint.value().id.c_str());
+        cnode->child_nodes = QString("%1:%2").arg(m_sourceInfo.id.trimmed(),
+                                                  QString::fromStdString(dataPoint.value().id).trimmed());
       } else {
         cnode->child_nodes = "";
-        qDebug()<< "Not trigger associated to service: "<< cnodes[serviceTriggerLink.key()].name;
+        qDebug()<< "Not trigger associated to the service: "<< cnodes[serviceTriggerLink.key()].name;
       }
     }
     ++serviceTriggerLink;
@@ -602,7 +603,6 @@ ZbxHelper::processHostGroupsJsonValue(const QScriptValue& hostGroupJsonValue)
       result = name;
     else
       result.append(ngrt4n::CHILD_SEP).append(name);
-
   }
 
   return result;
@@ -618,7 +618,7 @@ ZbxHelper::processHostJsonValue(const QScriptValue& hostJsonValue)
     entryIter.next();
     if (entryIter.flags() & QScriptValue::SkipInEnumeration)
       continue;
-    result = entryIter.value().property("host").toString().toStdString();
+    result = entryIter.value().property("host").toString().trimmed().toStdString();
     break;
   }
 

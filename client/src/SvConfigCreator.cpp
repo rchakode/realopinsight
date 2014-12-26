@@ -417,7 +417,7 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
           QString generatedNodeName = QString("%1 on %2").arg(fields[1], fields[0]);
           NodeT cnode = createNode(currentChildNodeId, generatedNodeName, parentServiceId);
           cnode.type = NodeType::ITService;
-          cnode.child_nodes = QString("%1:%2/%3").arg(sourceId, fields[0], fields[1]);
+          cnode.child_nodes = QString("%1:%2/%3").arg(sourceId, fields[0].trimmed(), fields[1].trimmed());
           cnode.weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
           cnodes.insert(cnode.id, cnode);
         } else {
