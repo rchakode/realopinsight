@@ -118,6 +118,7 @@ private:
                                     NodeListT& cnodes,
                                     QString& childNodeChain);
   void updateWindowTitle(const QString& append);
+  void attachOrphanedNodesToRoot(NodeListT& allnodes, NodeT& root);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

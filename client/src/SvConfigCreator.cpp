@@ -46,7 +46,7 @@ namespace {
   const QString FILE_FILTER =
       QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
       .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
-}
+  }
 
 SvCreator::SvCreator(const qint32& _userRole)
   : m_userRole (_userRole),
@@ -328,18 +328,20 @@ void SvCreator::importNagiosBPIConfig(void)
       } else if (fields[0] == "desc") {
         currentNode->description = fields[1];
       } else if (fields[0] == "primary") {
-        if (fields[1] == "1") {
+        if (fields[1].trimmed().toInt() == 1) {
           currentNode->parent = rootService.id;
           if (rootService.child_nodes.isEmpty()) {
             rootService.child_nodes = currentNode->id;
           } else {
             rootService.child_nodes += QString::fromStdString(ngrt4n::CHILD_SEP) + currentNode->id;
           }
+        } else {
+          //FIXME: find parent service
         }
       } else if (fields[0] == "members") {
         groupMembersCount = extractNagiosBPIGroupMembers(
-                              currentNode->id, sourceId,
-                              fields[1], m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes);
+              currentNode->id, sourceId,
+              fields[1], m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes);
 
         if (groupMembersCount < 0) {
           parsingFailed = true;
@@ -372,10 +374,24 @@ void SvCreator::importNagiosBPIConfig(void)
   if (parsingFailed) {
     ngrt4n::clearCoreData(*m_cdata);
   } else {
+    attachOrphanedNodesToRoot(m_cdata->bpnodes, rootService);
+    attachOrphanedNodesToRoot(m_cdata->cnodes, rootService);
     m_cdata->bpnodes.insert(rootService.id, rootService);
   }
   file.close();
   refreshAllComponents();
+}
+
+void SvCreator::attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root)
+{
+  for (NodeListT::Iterator node = nodes.begin(); node != nodes.end(); ++node) {
+    if (node->parent.isEmpty()) {
+      node->parent = root.id;
+      if (! root.child_nodes.isEmpty())
+        root.child_nodes.append(ngrt4n::CHILD_Q_SEP);
+      root.child_nodes.append(node->id);
+    }
+  }
 }
 
 
@@ -612,11 +628,11 @@ void SvCreator::deleteNode(void)
   msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(APP_NAME));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec()) {
-    case QMessageBox::Yes:
-      deleteNode(m_selectedNode);
-      break;
-    default:
-      break;
+  case QMessageBox::Yes:
+    deleteNode(m_selectedNode);
+    break;
+  default:
+    break;
   }
 }
 
@@ -763,16 +779,16 @@ int SvCreator::treatCloseAction(const bool& _close)
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
       mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
       switch (mbox.exec()) {
-        case QMessageBox::Yes:
-          save();
-          break;
-        case QMessageBox::Cancel:
-          enforceClose = false;
-          ret = 1;
-          break;
-        case QMessageBox::Discard:
-        default:
-          break;
+      case QMessageBox::Yes:
+        save();
+        break;
+      case QMessageBox::Cancel:
+        enforceClose = false;
+        ret = 1;
+        break;
+      case QMessageBox::Discard:
+      default:
+        break;
       }
     }
     if (enforceClose)
