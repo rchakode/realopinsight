@@ -327,17 +327,6 @@ void SvCreator::importNagiosBPIConfig(void)
         currentNode->name = fields[1];
       } else if (fields[0] == "desc") {
         currentNode->description = fields[1];
-      } else if (fields[0] == "primary") {
-        if (fields[1].trimmed().toInt() == 1) {
-          currentNode->parent = rootService.id;
-          if (rootService.child_nodes.isEmpty()) {
-            rootService.child_nodes = currentNode->id;
-          } else {
-            rootService.child_nodes += QString::fromStdString(ngrt4n::CHILD_SEP) + currentNode->id;
-          }
-        } else {
-          //FIXME: find parent service
-        }
       } else if (fields[0] == "members") {
         groupMembersCount = extractNagiosBPIGroupMembers(
               currentNode->id, sourceId,
@@ -423,6 +412,8 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
         NodeListT::Iterator memberNode = bpnodes.find(memberId);
         if (memberNode == bpnodes.end()) {
           memberNode = bpnodes.insert(memberId, createNode(memberId, memberId, parentServiceId));
+        } else {
+          memberNode->parent = parentServiceId;
         }
         memberNode->weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
         currentChildNodeId = memberId.trimmed();
