@@ -301,7 +301,7 @@ void SvCreator::importNagiosBPIConfig(void)
       currentNode = m_cdata->bpnodes.insert(groudId, createNode(groudId, "", ""));
     }
 
-    currentNode->sev_crule = CalcRules::WeightedAverageWithThresholds;
+    currentNode->sev_crule = CalcRules::Worst;
 
     // now parse group config
     int groupMembersCount = 0;
@@ -328,14 +328,18 @@ void SvCreator::importNagiosBPIConfig(void)
       } else if (fields[0] == "desc") {
         currentNode->description = fields[1];
       } else if (fields[0] == "members") {
-        groupMembersCount = extractNagiosBPIGroupMembers(
-              currentNode->id, sourceId,
-              fields[1], m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes);
-
+        bool hasCluster = false;
+        QString members = fields[1];
+        groupMembersCount = extractNagiosBPIGroupMembers(currentNode->id, sourceId, members,
+                                                         m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes,
+                                                         hasCluster);
         if (groupMembersCount < 0) {
           parsingFailed = true;
           break;
+        } else {
+          currentNode->sev_crule = hasCluster ? CalcRules::Average : CalcRules::Worst;
         }
+
       } else if (fields[0] == "warning_threshold") {
         warningThreshold = fields[1].toFloat();
       } else if (fields[0] == "critical_threshold") {
@@ -350,6 +354,9 @@ void SvCreator::importNagiosBPIConfig(void)
       break;
     } else {
       if (groupMembersCount > 0) {
+        if (warningThreshold > 0 || criticalThreshold > 0) {
+          currentNode->sev_crule = CalcRules::WeightedAverageWithThresholds;
+        }
         if (warningThreshold > 0.0) {
           currentNode->thresholdLimits.push_back({warningThreshold / groupMembersCount, ngrt4n::Major, ngrt4n::Major});
         }
@@ -389,9 +396,11 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
                                             const QString& bpiGroupMembersChain,
                                             NodeListT& bpnodes,
                                             NodeListT& cnodes,
-                                            QString& childNodesChain)
+                                            QString& childNodesChain,
+                                            bool& hasCluster)
 {
   int childCount = 0;
+  hasCluster = false;
   QStringList members = bpiGroupMembersChain.split(",");
   if (! members.isEmpty()) {
 
@@ -404,6 +413,7 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
       bool isGroupMember = member.startsWith("$");
       int start = isGroupMember ? 1 : 0;
       int count = (isClusterMember || isEssentialMember) ? member.size() - (start + 2) : member.size() - start;
+      if (isClusterMember) hasCluster = true;
 
       QString memberId = member.mid(start, count);
       QString currentChildNodeId = "";

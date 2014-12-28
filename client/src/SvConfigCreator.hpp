@@ -116,7 +116,8 @@ private:
                                     const QString& bpiGroupMembersChain,
                                     NodeListT& bpnodes,
                                     NodeListT& cnodes,
-                                    QString& childNodeChain);
+                                    QString& childNodeChain,
+                                   bool& hasCluster);
   void updateWindowTitle(const QString& append);
   void attachOrphanedNodesToRoot(NodeListT& allnodes, NodeT& root);
 };
