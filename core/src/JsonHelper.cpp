@@ -21,7 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-
+#include <QDebug>
 #include "JsonHelper.hpp"
 
 JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()

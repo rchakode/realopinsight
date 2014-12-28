@@ -90,10 +90,12 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["DeleteNode"],SIGNAL(triggered(bool)),this,SLOT(deleteNode()));
   connect(m_subMenus["Open"],SIGNAL(triggered(bool)),this,SLOT(open()));
   connect(m_subMenus["Save"],SIGNAL(triggered(bool)),this,SLOT(save()));
-  connect(m_subMenus["SaveAs"],SIGNAL(triggered(bool)),this,SLOT(saveAs()));
+  connect(m_subMenus["SaveAs"], SIGNAL(triggered(bool)), this, SLOT(saveAs()));
   connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
-  connect(m_subMenus["ImportLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importLivestatusChecks()));
+  connect(m_subMenus["ImportNagiosLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosLivestatusChecks()));
+  connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
+  connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServices()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
@@ -151,8 +153,7 @@ void SvCreator::open(void)
                                       tr("%1 | Select target file").arg(APP_NAME),
                                       ".",
                                       FILE_FILTER);
-  if (! path.isNull() && ! path.isEmpty())
-    loadFile(path);
+  if (isValidPath(path)) loadFile(path);
 }
 
 
@@ -161,20 +162,26 @@ void SvCreator::loadFile(const QString& _path)
   if (_path == NULL) {
     newView();
   } else {
-    ngrt4n::clear(*m_cdata);
     Parser parser(_path, m_cdata);
     if (! parser.process(false)) {
       ngrt4n::alert(parser.lastErrorMsg());
       exit(1);
     } else {
-      m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-      m_editor->fillInEditorWithContent(*m_root);
-      m_tree->build();
-      fillEditorFromService(m_tree->rootItem());
       m_activeConfig = ngrt4n::getAbsolutePath(_path);
-      setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
+      refreshAllComponents();
     }
   }
+}
+
+void SvCreator::refreshAllComponents(void)
+{
+  m_hasLeftUpdates = true;
+
+  m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+  m_editor->fillInEditorWithContent(*m_root);
+  m_tree->build();
+  fillEditorFromService(m_tree->rootItem());
+  updateWindowTitle("*");
 }
 
 void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
@@ -200,21 +207,21 @@ void SvCreator::importNagiosChecks(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString path = importationSettingForm.selectedStatusFile();
+    QString path = importationSettingForm.selectedFile();
     SourceT srcInfo = sourceInfos[srcId];
 
-    if (! path.isNull() && ! path.isEmpty()) {
+    if (! isValidPath(path) ) {
       showStatusMsg(tr("Loading checks from %1:%2...").arg(srcId, path), false);
       ChecksT checks;
       int retcode = parseStatusFile(path, checks);
-      treatCheckLoadResults(retcode, srcInfo.id, checks, tr("Error while parsing the file"));
+      processCheckLoadResults(retcode, srcInfo.id, checks, tr("Error while parsing the file"));
     } else {
       showStatusMsg(tr("No file selected"), true);
     }
   }
 }
 
-void SvCreator::importLivestatusChecks(void)
+void SvCreator::importNagiosLivestatusChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
   fetchSourceList(ngrt4n::Nagios, sourceInfos);
@@ -233,10 +240,221 @@ void SvCreator::importLivestatusChecks(void)
     if (retcode == 0) {
       retcode = handler.loadChecks(host, checks);
     }
-    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    processCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }
 
+
+void SvCreator::importNagiosBPIConfig(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
+  if (importationSettingForm.exec() != QDialog::Accepted) {
+    return;
+  }
+
+
+  QFile file(importationSettingForm.selectedFile());
+  if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    showStatusMsg(tr("Cannot open file: %1").arg(importationSettingForm.selectedFile()), true);
+    return;
+  }
+
+  QString sourceId = importationSettingForm.selectedSource();
+
+  bool parsingFailed = false;
+  QString line;
+  int lineIndex = 0;
+  QTextStream streamReader(&file);
+  NodeT rootService;
+  rootService.id = ngrt4n::ROOT_ID;
+  rootService.name = tr("Nagios BPI Services");
+
+  ngrt4n::clearCoreData(*m_cdata);
+  while (line = streamReader.readLine(), ! line.isNull()) {
+
+    ++lineIndex;
+
+    line = line.trimmed();
+    if ( line.startsWith("#")
+         || line.isEmpty()
+         || ! line.startsWith("define")) continue;
+
+    if (! line.endsWith("{")) {
+      showStatusMsg(tr("Group definition must end with '{' at line %1").arg(QString::number(lineIndex)), true);
+      parsingFailed = true;
+      break;
+    }
+
+    QStringList fields = line.mid(0, line.size() - 1).trimmed().split(" ");
+    if (fields.size() != 2) {
+      showStatusMsg(tr("Bad group definition at line %1").arg(QString::number(lineIndex)), true);
+      parsingFailed = true;
+      break;
+    }
+
+    QString groudId = fields[1];
+
+    NodeListT::Iterator currentNode = m_cdata->bpnodes.find(groudId);
+    if (currentNode == m_cdata->bpnodes.end()) {
+      currentNode = m_cdata->bpnodes.insert(groudId, createNode(groudId, "", ""));
+    }
+
+    currentNode->sev_crule = CalcRules::Worst;
+
+    // now parse group config
+    int groupMembersCount = 0;
+    float warningThreshold  = 0;
+    float criticalThreshold = 0;
+    while (line = streamReader.readLine(), ! line.isNull()) {
+
+      ++lineIndex;
+
+      line = line.trimmed();
+
+      if (line.isEmpty()) continue;
+      if (line == "}") break;
+
+      fields = line.split("=");
+      if (fields.size() != 2) {
+        showStatusMsg(tr("Bad group attribute definition at line %1").arg(QString::number(lineIndex)), true);
+        parsingFailed = true;
+        break;
+      }
+
+      if (fields[0] == "title") {
+        currentNode->name = fields[1];
+      } else if (fields[0] == "desc") {
+        currentNode->description = fields[1];
+      } else if (fields[0] == "members") {
+        bool hasCluster = false;
+        QString members = fields[1];
+        groupMembersCount = extractNagiosBPIGroupMembers(currentNode->id, sourceId, members,
+                                                         m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes,
+                                                         hasCluster);
+        if (groupMembersCount < 0) {
+          parsingFailed = true;
+          break;
+        } else {
+          currentNode->sev_crule = hasCluster ? CalcRules::Average : CalcRules::Worst;
+        }
+
+      } else if (fields[0] == "warning_threshold") {
+        warningThreshold = fields[1].toFloat();
+      } else if (fields[0] == "critical_threshold") {
+        criticalThreshold = fields[1].toFloat();
+      } else if (fields[0] == "priority") {
+        /// not applicable
+      }
+    }
+
+
+    if (parsingFailed) {
+      break;
+    } else {
+      if (groupMembersCount > 0) {
+        if (warningThreshold > 0 || criticalThreshold > 0) {
+          currentNode->sev_crule = CalcRules::WeightedAverageWithThresholds;
+        }
+        if (warningThreshold > 0.0) {
+          currentNode->thresholdLimits.push_back({warningThreshold / groupMembersCount, ngrt4n::Major, ngrt4n::Major});
+        }
+        if (warningThreshold > 0.0 ) {
+          currentNode->thresholdLimits.push_back({criticalThreshold / groupMembersCount, ngrt4n::Critical, ngrt4n::Critical});
+        }
+      }
+    }
+  }
+
+  if (parsingFailed) {
+    ngrt4n::clearCoreData(*m_cdata);
+  } else {
+    attachOrphanedNodesToRoot(m_cdata->bpnodes, rootService);
+    attachOrphanedNodesToRoot(m_cdata->cnodes, rootService);
+    m_cdata->bpnodes.insert(rootService.id, rootService);
+  }
+  file.close();
+  refreshAllComponents();
+}
+
+void SvCreator::attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root)
+{
+  for (NodeListT::Iterator node = nodes.begin(); node != nodes.end(); ++node) {
+    if (node->parent.isEmpty()) {
+      node->parent = root.id;
+      if (! root.child_nodes.isEmpty())
+        root.child_nodes.append(ngrt4n::CHILD_Q_SEP);
+      root.child_nodes.append(node->id);
+    }
+  }
+}
+
+
+int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
+                                            const QString& sourceId,
+                                            const QString& bpiGroupMembersChain,
+                                            NodeListT& bpnodes,
+                                            NodeListT& cnodes,
+                                            QString& childNodesChain,
+                                            bool& hasCluster)
+{
+  int childCount = 0;
+  hasCluster = false;
+  QStringList members = bpiGroupMembersChain.split(",");
+  if (! members.isEmpty()) {
+
+    Q_FOREACH(const QString& member, members) {
+
+      if (member.isEmpty()) continue;
+
+      bool isClusterMember = member.endsWith(";&");
+      bool isEssentialMember = member.endsWith(";|");
+      bool isGroupMember = member.startsWith("$");
+      int start = isGroupMember ? 1 : 0;
+      int count = (isClusterMember || isEssentialMember) ? member.size() - (start + 2) : member.size() - start;
+      if (isClusterMember) hasCluster = true;
+
+      QString memberId = member.mid(start, count);
+      QString currentChildNodeId = "";
+
+      if (isGroupMember) {
+        NodeListT::Iterator memberNode = bpnodes.find(memberId);
+        if (memberNode == bpnodes.end()) {
+          memberNode = bpnodes.insert(memberId, createNode(memberId, memberId, parentServiceId));
+        } else {
+          memberNode->parent = parentServiceId;
+        }
+        memberNode->weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
+        currentChildNodeId = memberId.trimmed();
+      } else {
+        QStringList fields = memberId.split(";");
+        if (fields.size() == 2) {
+          currentChildNodeId = ngrt4n::genNodeId();
+          QString generatedNodeName = QString("%1 on %2").arg(fields[1], fields[0]);
+          NodeT cnode = createNode(currentChildNodeId, generatedNodeName, parentServiceId);
+          cnode.type = NodeType::ITService;
+          cnode.child_nodes = QString("%1:%2/%3").arg(sourceId, fields[0].trimmed(), fields[1].trimmed());
+          cnode.weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
+          cnodes.insert(cnode.id, cnode);
+        } else {
+          showStatusMsg(tr("Bad service entry %1").arg(memberId), true);
+          childCount = -1;
+          break;
+        }
+      }
+
+      if (childNodesChain.isEmpty()) {
+        childNodesChain = currentChildNodeId;
+      } else {
+        childNodesChain += QString::fromStdString(ngrt4n::CHILD_SEP) + currentChildNodeId;
+      }
+      ++childCount;
+    }
+  }
+
+  return childCount;
+}
 
 void SvCreator::importZabbixTriggers(void)
 {
@@ -254,14 +472,40 @@ void SvCreator::importZabbixTriggers(void)
     ZbxHelper handler;
 
     int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
-    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    processCheckLoadResults(retcode, srcId, checks, handler.lastError());
 
     if (checks.empty()) {
       int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
-      treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+      processCheckLoadResults(retcode, srcId, checks, handler.lastError());
     }
   }
 }
+
+void SvCreator::importZabbixITServices(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    showStatusMsg(tr("Loading IT services from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
+
+    //CoreDataT* cdata = new CoreDataT();
+    ZbxHelper handler;
+
+    if (handler.loadITServices(srcInfo, *m_cdata) != 0) {
+      showStatusMsg(tr("The importation of IT services failed: %1").arg(handler.lastError()), true);
+    } else {
+      m_activeConfig.clear();// = ngrt4n::getAbsolutePath(_path);
+      refreshAllComponents();
+      showStatusMsg(tr("The importation of IT services is completed"), false);
+    }
+  }
+}
+
+
 
 void SvCreator::importZenossComponents(void)
 {
@@ -278,11 +522,11 @@ void SvCreator::importZenossComponents(void)
     ChecksT checks;
     ZnsHelper handler(srcInfo.mon_url);
     int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
-    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    processCheckLoadResults(retcode, srcId, checks, handler.lastError());
 
     if (checks.empty()) {
       int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
-      treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+      processCheckLoadResults(retcode, srcId, checks, handler.lastError());
     }
   }
 }
@@ -303,11 +547,11 @@ void SvCreator::importPandoraModules(void)
     PandoraHelper handler(srcInfo.mon_url);
     int retcode = handler.loadChecks(srcInfo, checks, agentName);
 
-    treatCheckLoadResults(retcode, srcId, checks, handler.lastError());
+    processCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
 }
 
-void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const ChecksT& checks, const QString& msg)
+void SvCreator::processCheckLoadResults(int retCode, const QString& srcId, const ChecksT& checks, const QString& msg)
 {
   if (retCode != 0) {
     showStatusMsg(msg, true);
@@ -321,50 +565,45 @@ void SvCreator::treatCheckLoadResults(int retCode, const QString& srcId, const C
 void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
-    ngrt4n::clear(*m_cdata);
-    m_tree->resetData();
-    NodeT* node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
-    m_root = m_cdata->bpnodes.insert(node->id, *node);
-    m_tree->addNode(*node);
-    m_tree->update();
-    m_editor->fillInEditorWithContent(*node);
-    m_selectedNode = node->id;
-    m_hasLeftUpdates = true;
+    ngrt4n::clearCoreData(*m_cdata);
     m_activeConfig.clear();
-    setWindowTitle(tr("%1 Editor - unsaved document*").arg(APP_NAME));
+
+    m_tree->clearTree();
+    NodeT node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
+    m_root = m_cdata->bpnodes.insert(node.id, node);
+
+    refreshAllComponents();
   }
 }
+
+//m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+//m_editor->fillInEditorWithContent(*m_root);
+//m_tree->build();
+//fillEditorFromService(m_tree->rootItem());
+//setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
 
 
 void SvCreator::newNode(void)
 {
   static int count = 1;
-  NodeT* node = createNode(ngrt4n::genNodeId(),
-                           tr("sub service %1").arg(QString::number(count)),
-                           m_selectedNode);
-  insertFromSelected(*node);
+  QString label = tr("sub service %1").arg(QString::number(count));
+  insertFromSelected(createNode(ngrt4n::genNodeId(),label , m_selectedNode));
   ++count;
 }
 
-NodeT* SvCreator::createNode(const QString& id,
-                             const QString& label,
-                             const QString& parent)
+NodeT SvCreator::createNode(const QString& id, const QString& label,const QString& parent)
 {
-  NodeT* node = new NodeT;
-  if (! node) {
-    ngrt4n::alert(tr("Out of memory. the application will exit"));
-    exit(1);
-  }
-  node->id = id;
-  node->name = label;
-  node->parent = parent;
-  node->type = NodeType::BusinessService;
-  node->sev = ngrt4n::Unknown;
-  node->sev_crule = CalcRules::Worst;
-  node->sev_prule = PropRules::Unchanged;
-  node->icon = ngrt4n::DEFAULT_ICON;
-  node->child_nodes = QString();
-  node->thresholdLimits = QVector<ThresholdT>();
+  NodeT node;
+  node.id = id;
+  node.name = label;
+  node.parent = parent;
+  node.type = NodeType::BusinessService;
+  node.sev = ngrt4n::Unknown;
+  node.sev_crule = CalcRules::Worst;
+  node.sev_prule = PropRules::Unchanged;
+  node.icon = ngrt4n::DEFAULT_ICON;
+  node.child_nodes = QString();
+  node.thresholdLimits = QVector<ThresholdT>();
   return node;
 }
 
@@ -466,15 +705,38 @@ void SvCreator::save(void)
     fillEditorFromService(m_tree->findNodeItem(m_selectedNode));
   }
 
-  if (m_activeConfig.isEmpty()) {
-    saveAs();
-  } else {
+  if (m_activeConfig.isEmpty())
+    m_activeConfig = selectFileDestinationPath();
+
+  if (! m_activeConfig.isEmpty())
     recordData(m_activeConfig);
-  }
+  else
+    handleInvalidPathError();
 }
+
 
 void SvCreator::saveAs(void)
 {
+  m_activeConfig = selectFileDestinationPath();
+  if (! m_activeConfig.isEmpty()) {
+    recordData(m_activeConfig);
+  } else {
+    handleInvalidPathError();
+  }
+}
+
+void SvCreator::handleInvalidPathError(void)
+{
+  QString msg = tr("Invalid path");
+  ngrt4n::alert(msg);
+  showStatusMsg(msg, true);
+}
+
+
+QString SvCreator::selectFileDestinationPath(void)
+{
+  QString result = "";
+
   QString filter;
   QString path = QFileDialog::getSaveFileName(this,
                                               tr("Select the destination file | %1").arg(APP_NAME),
@@ -482,11 +744,7 @@ void SvCreator::saveAs(void)
                                               FILE_FILTER,
                                               &filter);
 
-  if (path.isNull()) {
-    QString msg = tr("The path is not valid!");
-    ngrt4n::alert(msg);
-    showStatusMsg(msg, true);
-  } else {
+  if (! path.isNull()) {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
       m_cdata->monitor = ngrt4n::Zabbix;
@@ -504,8 +762,11 @@ void SvCreator::saveAs(void)
       m_cdata->monitor = ngrt4n::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
-    recordData(path);
+
+    result = path;
   }
+
+  return result;
 }
 
 int SvCreator::treatCloseAction(const bool& _close)
@@ -593,17 +854,28 @@ void SvCreator::handleNodeTypeActivated(qint32 targetType)
       if (m_editor->updateNodeInfoFromEditorContents(*node)) {
         m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
         m_hasLeftUpdates = true;
-        showStatusMsg(tr("* Unsaved changes left"), false);
-        setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+        updateWindowTitle("*");
       }
     }
   } else { // current type is business service
     if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
-      showStatusMsg(tr("* Unsaved changes left"), false);
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+      updateWindowTitle("*");
     }
+  }
+}
+
+void SvCreator::updateWindowTitle(const QString& append)
+{
+  if (! m_activeConfig.isEmpty()) {
+    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_activeConfig, append));
+  } else {
+    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_root->name, append));
+  }
+
+  if (! append.isEmpty()) {
+    showStatusMsg(tr("* Unsaved changes left"), false);
   }
 }
 
@@ -630,7 +902,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
       }
       m_hasLeftUpdates = true;
       showStatusMsg(tr("* Unsaved changes left"), false);
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+      updateWindowTitle("*");
     }
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
@@ -646,8 +918,7 @@ void SvCreator::handleReturnPressed(void)
     if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
-      showStatusMsg(tr("* unsaved changes left"), false);
-      setWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+      updateWindowTitle("*");
     }
   }
 }
@@ -675,9 +946,9 @@ void SvCreator::recordData(const QString& path)
               << generateNodeXml(*m_root);
 
     Q_FOREACH(const NodeT& service, m_cdata->bpnodes) {
-      if (service.id == ngrt4n::ROOT_ID || service.parent.isEmpty())
-        continue;
-      outStream << generateNodeXml(service);
+      if (service.id != ngrt4n::ROOT_ID && ! service.parent.isEmpty()) {
+        outStream << generateNodeXml(service);
+      }
     }
 
     Q_FOREACH(const NodeT& service, m_cdata->cnodes) {
@@ -751,8 +1022,10 @@ void SvCreator::loadMenu(void)
       m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
   m_menus["FILE"]->addSeparator(),
       m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
-      m_subMenus["ImportLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
+      m_subMenus["ImportNagiosLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
+      m_subMenus["ImportNagiosBPIConf"] = m_menus["FILE"]->addAction(tr("Import Nagios BPI Configuration")),
       m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
+      m_subMenus["ImportZabbixITServices"] = m_menus["FILE"]->addAction(tr("Import Zabbix IT Services")),
       m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components")),
       m_subMenus["ImportPandoraModules"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
 
@@ -780,7 +1053,7 @@ void SvCreator::loadMenu(void)
   m_toolBar->addAction(m_subMenus["Save"]);
   m_toolBar->addAction(m_subMenus["Open"]);
   m_toolBar->addAction(m_subMenus["ImportNagiosChecks"]);
-  m_toolBar->addAction(m_subMenus["ImportLivestatusChecks"]);
+  m_toolBar->addAction(m_subMenus["ImportNagiosLivestatusChecks"]);
   m_toolBar->addAction(m_subMenus["ImportZabbixTriggers"]);
   m_toolBar->addAction(m_subMenus["ImportZenossComponents"]);
   m_toolBar->addAction(m_subMenus["ImportPandoraModules"]);

@@ -46,9 +46,12 @@ Parser::~Parser()
 
 bool Parser::process(bool console)
 {
+  ngrt4n::clearCoreData(*m_cdata);
+
   QString graphContent = "";
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
+
 
   QFile file(m_config);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {

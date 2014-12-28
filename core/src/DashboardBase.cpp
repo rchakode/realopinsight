@@ -352,7 +352,7 @@ void DashboardBase::updateCNodesWithCheck(const CheckT& check, const SourceT& sr
 void DashboardBase::updateCNodesWithChecks(const ChecksT& checks, const SourceT& src)
 {
   for (ChecksT::const_iterator check=checks.begin(), end = checks.end(); check!=end; ++check) {
-    updateCNodesWithCheck(check->second, src);
+    updateCNodesWithCheck(*check, src);
   }
 }
 

@@ -74,7 +74,7 @@ struct CheckT {
   std::string host_groups;
   int status;
 };
-typedef std::unordered_map<std::string, CheckT> ChecksT;
+typedef QMap<std::string, CheckT> ChecksT;
 
 namespace ngrt4n {
   enum ApiTypeT {
@@ -156,6 +156,7 @@ namespace ngrt4n {
   const std::string AdmUser   = "ngrt4n_adm";
   const std::string OpUser    = "ngrt4n_op";
   const std::string CHILD_SEP = ",";
+  const QString CHILD_Q_SEP = QString::fromStdString(CHILD_SEP);
   const std::string TAG_ZABBIX_HOSTNAME  = "\\{HOSTNAME\\}";
   const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
   const std::string TAG_HOSTNAME   = "\\{hostname\\}";

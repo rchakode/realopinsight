@@ -31,10 +31,10 @@
 
 namespace {
   const QString SRC_BASENAME = "Source";
-}
+  }
 
 namespace ngrt4n
-{
+  {
   const int DefaultPort = 1983;
   const int DefaultUpdateInterval = 300;
   const int MaxMsg = 512;
@@ -58,7 +58,12 @@ namespace ngrt4n
   { return QDateTime::fromTime_t(QString(mytime_t.c_str()).toUInt()).toString().toStdString(); }
 
   inline QString genNodeId()
-  { return "ngrt4nsrv"+QDateTime::currentDateTime().toString("yyyymmddHHmmsszzz"); }
+  {
+    static int i = 0;
+    return QString("ngrt4nsrv%1%2")
+        .arg(QUuid::createUuid().toString().replace("{", "").replace("}", "").replace("-",""))
+        .arg(QString::number(++i));
+  }
 
   inline QString sourceId(const qint32& idx)
   { return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));}
@@ -75,7 +80,7 @@ namespace ngrt4n
   inline QString libVersion(void)
   { return PKG_VERSION; }
 
-  void clear(CoreDataT& _cdata);
+  void clearCoreData(CoreDataT& _cdata);
   QString getAbsolutePath(const QString& _path);
   qint8 severityFromProbeStatus(const int& monitorType, const int& statusValue);
   QString getIconPath(int _severity);
@@ -95,6 +100,6 @@ namespace ngrt4n
   IconMapT nodeIcons();
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
   QStringList getAuthInfo(const QString& authString);
-} //NAMESPACE
+  } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

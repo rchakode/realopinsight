@@ -217,7 +217,7 @@ PandoraHelper::processModuleReply(QNetworkReply* reply, ChecksT& checks)
         }
 
         if (m_agentFilter.isEmpty() || currentGroupName == m_agentFilter || currentAgentName == m_agentFilter) {
-          checks.insert(std::pair<std::string, CheckT>(check.id, check));
+          checks.insert(check.id, check);
         }
       }
     }

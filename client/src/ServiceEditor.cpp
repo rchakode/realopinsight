@@ -125,9 +125,9 @@ void ServiceEditor::updateDataPoints(const ChecksT& checks, const QString& srcId
 
   m_hostGroupFilterBox->addItem(ALL_HOST_GROUPS);
 
-  for(ChecksT::const_iterator it=checks.begin(), end=checks.end(); it!=end; ++it) {
-    QString entry = QString("%1:%2").arg(srcId, (it->second).id.c_str());
-    QStringList groups = QString::fromStdString((it->second).host_groups).split(ngrt4n::CHILD_SEP.c_str());
+  for(ChecksT::const_iterator checkIter=checks.begin(), end=checks.end(); checkIter!=end; ++checkIter) {
+    QString entry = QString("%1:%2").arg(srcId, (*checkIter).id.c_str());
+    QStringList groups = QString::fromStdString((*checkIter).host_groups).split(ngrt4n::CHILD_SEP.c_str());
     if (groups.isEmpty()) {
       m_dataPoints[UNCLASSIFIED_HOST_GROUP].push_back(entry);
       m_hostGroupFilterBox->addItem(UNCLASSIFIED_HOST_GROUP);

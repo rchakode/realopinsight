@@ -27,9 +27,9 @@
 QString PropRules::toString(void) const
 {
   switch( static_cast<PropRulesT>(m_rule) ) {
-  case Unchanged: return QObject::tr("Unchanged");
-  case Decreased: return QObject::tr("Decreased");
-  case Increased: return QObject::tr("Increased");
+    case Unchanged: return QObject::tr("Unchanged");
+    case Decreased: return QObject::tr("Decreased");
+    case Increased: return QObject::tr("Increased");
   }
   return QObject::tr("Unchanged");
 }
@@ -39,19 +39,22 @@ QString CalcRules::toString(void) const
 {
   QString result = QObject::tr("Default");
   switch (m_rule) {
-  case Average:
-    result = QObject::tr("Weighted Average");
-    break;
-  case WeightedAverageWithThresholds:
-    result = QObject::tr("Weighted Average With Thresholds");
-    break;
-  case Worst:
-  default:
-    result = QObject::tr("Worst Severity");
-    break;
+    case Average:
+      result = QObject::tr("Weighted Average");
+      break;
+    case WeightedAverageWithThresholds:
+      result = QObject::tr("Weighted Average With Thresholds");
+      break;
+    case Worst:
+    default:
+      result = QObject::tr("Worst Severity");
+      break;
   }
   return result;
 }
+
+
+
 
 
 QString NodeType::toString(int _type)
@@ -64,20 +67,20 @@ QString NodeType::toString(int _type)
 QString Severity::toString(void) const
 {
   switch(m_sev) {
-  case ngrt4n::Normal:
-    return QObject::tr("Normal");
-    break;
-  case ngrt4n::Minor:
-    return QObject::tr("Minor");
-    break;
-  case ngrt4n::Major:
-    return QObject::tr("Major");
-    break;
-  case ngrt4n::Critical:
-    return QObject::tr("Critical");
-    break;
-  default:
-    break;
+    case ngrt4n::Normal:
+      return QObject::tr("Normal");
+      break;
+    case ngrt4n::Minor:
+      return QObject::tr("Minor");
+      break;
+    case ngrt4n::Major:
+      return QObject::tr("Major");
+      break;
+    case ngrt4n::Critical:
+      return QObject::tr("Critical");
+      break;
+    default:
+      break;
   }
   return QObject::tr("Unknown");
 }
@@ -91,30 +94,30 @@ std::string Severity::toStdString(void) const
 Severity Severity::operator *(Severity& sev) const
 {
   switch(m_sev) {
-  case ngrt4n::Critical:
-    return Severity(m_sev);
-    break;
-  case ngrt4n::Normal:
-    return sev;
-    break;
-  case ngrt4n::Minor:
-    if(sev.m_sev == ngrt4n::Critical ||
-       sev.m_sev == ngrt4n::Major ||
-       sev.m_sev == ngrt4n::Unknown)
+    case ngrt4n::Critical:
+      return Severity(m_sev);
+      break;
+    case ngrt4n::Normal:
       return sev;
-    return Severity(m_sev);
-    break;
-  case ngrt4n::Major:
-    if(sev.m_sev == ngrt4n::Critical ||
-       sev.m_sev == ngrt4n::Unknown)
-      return sev;
-    return Severity(m_sev);
-    break;
-  default:
-    // MonitorBroker::CRITICITY_UNKNOWN
-    if(sev.m_sev == ngrt4n::Critical)
-      return sev;
-    break;
+      break;
+    case ngrt4n::Minor:
+      if(sev.m_sev == ngrt4n::Critical ||
+         sev.m_sev == ngrt4n::Major ||
+         sev.m_sev == ngrt4n::Unknown)
+        return sev;
+      return Severity(m_sev);
+      break;
+    case ngrt4n::Major:
+      if(sev.m_sev == ngrt4n::Critical ||
+         sev.m_sev == ngrt4n::Unknown)
+        return sev;
+      return Severity(m_sev);
+      break;
+    default:
+      // MonitorBroker::CRITICITY_UNKNOWN
+      if(sev.m_sev == ngrt4n::Critical)
+        return sev;
+      break;
   }  //end switch
   return Severity(ngrt4n::Unknown);
 }
@@ -147,14 +150,14 @@ Severity Severity::operator / (Severity& st) const
 Severity Severity::operator ++()
 {
   switch(m_sev) {
-  case ngrt4n::Minor:
-    return Severity(ngrt4n::Major);
-    break;
-  case ngrt4n::Major:
-    return Severity(ngrt4n::Critical);
-    break;
-  default://leave as is
-    break;
+    case ngrt4n::Minor:
+      return Severity(ngrt4n::Major);
+      break;
+    case ngrt4n::Major:
+      return Severity(ngrt4n::Critical);
+      break;
+    default://leave as is
+      break;
   }
   return Severity(m_sev);
 }
@@ -163,14 +166,14 @@ Severity Severity::operator ++()
 Severity Severity::operator--()
 {
   switch(m_sev) {
-  case ngrt4n::Critical:
-    return Severity(ngrt4n::Major);
-    break;
-  case ngrt4n::Major:
-    return Severity(ngrt4n::Minor);
-    break;
-  default: //leave as is
-    break;
+    case ngrt4n::Critical:
+      return Severity(ngrt4n::Major);
+      break;
+    case ngrt4n::Major:
+      return Severity(ngrt4n::Minor);
+      break;
+    default: //leave as is
+      break;
   }
   return Severity(m_sev);
 }

@@ -56,6 +56,7 @@ public Q_SLOTS:
   void open(void);
   void save(void);
   void saveAs(void);
+  QString selectFileDestinationPath(void);
   int treatCloseAction(const bool& = true);
   void fillEditorFromService(QTreeWidgetItem* _item);
   void handleReturnPressed(void);
@@ -65,12 +66,14 @@ public Q_SLOTS:
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
-  void treatCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
+  void processCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
   void importNagiosChecks(void);
   void importZabbixTriggers(void);
+  void importZabbixITServices(void);
   void importZenossComponents(void);
   void importPandoraModules(void);
-  void importLivestatusChecks(void);
+  void importNagiosLivestatusChecks(void);
+  void importNagiosBPIConfig(void);
   void handleErrorOccurred(QString msg);
 
 protected:
@@ -102,9 +105,21 @@ private:
   void unloadMenu(void);
   void addEvents(void);
   void resize(void);
-  NodeT* createNode(const QString& id, const QString& label, const QString& parent);
+  NodeT createNode(const QString& id, const QString& label, const QString& parent);
   int parseStatusFile(const QString& _path, ChecksT& _checks);
   void showStatusMsg(const QString& msg, bool error);
+  void handleInvalidPathError(void);
+  bool isValidPath(const QString& path) {return (! path.isNull() && ! path.trimmed().isEmpty()); }
+  void refreshAllComponents(void);
+  int extractNagiosBPIGroupMembers(const QString& parentServiceId,
+                                    const QString& sourceId,
+                                    const QString& bpiGroupMembersChain,
+                                    NodeListT& bpnodes,
+                                    NodeListT& cnodes,
+                                    QString& childNodeChain,
+                                   bool& hasCluster);
+  void updateWindowTitle(const QString& append);
+  void attachOrphanedNodesToRoot(NodeListT& allnodes, NodeT& root);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

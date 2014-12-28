@@ -38,13 +38,14 @@ public:
 
   void update(void);
 
-  void resetData(void) {m_items.clear();}
+  void clearTree(void) {m_items.clear();}
   void build(void);
   QTreeWidgetItem* rootItem(void) {return m_items[ngrt4n::ROOT_ID];}
   QTreeWidgetItem* addNode(const NodeT &, const bool & = false );
   QTreeWidgetItem* findNodeItem(const QString& _nodeId);
   void removeNodeItem(const QString& _nodeId) {m_items.remove(_nodeId);}
   void updateNodeItem(const NodeT& _node, const QString& _tip);
+  void resetData(CoreDataT* cdata) {m_cdata = cdata;}
 
 Q_SIGNALS:
   void treeNodeMoved( QString _nodeId );

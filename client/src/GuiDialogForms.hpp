@@ -11,11 +11,11 @@ class CheckImportationSettingsForm: public QDialog
 {
   Q_OBJECT
 public:
-  CheckImportationSettingsForm(const QList<QString>& sourceList, bool statusFile);
+  CheckImportationSettingsForm(const QList<QString>& sourceList, bool importFile);
 
-  QString selectedSource(void) const {return m_sourceSelectionBox->currentText();}
+  QString selectedSource(void) const {return m_sourceSelectionBox->currentText().trimmed();}
   QString filter(void) const {return m_filter->text();}
-  QString selectedStatusFile(void) const {return m_statusFile;}
+  QString selectedFile(void) const {return m_selectedFile;}
 
 public Q_SLOTS:
   void handleSelectStatusFile(void);
@@ -23,8 +23,8 @@ public Q_SLOTS:
 private:
   QComboBox* m_sourceSelectionBox;
   QLineEdit* m_filter;
-  QLineEdit* m_statusFileArea;
-  QString m_statusFile;
+  QLineEdit* m_selectedFileTextField;
+  QString m_selectedFile;
 };
 
 #endif // DIALOGFORMS_HPP
