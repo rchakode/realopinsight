@@ -1,4 +1,4 @@
-RealOpinsight is a business service monitoring toolkit that enables you to manage your IT while focusing on the services you provide. Working as add-on for existing monitoring systems, it provides specialized dashboard features and capabilities useful to monitor effectively the health of business applications and cloud services. RealOpinsight supports Nagios, Zenoss, Zabbix, Shinken, Centreon, Naemon, Icinga, op5, and more. 
+RealOpinsight is a business service monitoring toolkit that enables you to manage your IT while focusing on the services you provide. Working as add-on for existing monitoring systems, it provides specialized dashboard features and capabilities useful to monitor effectively the health of business applications and cloud services. RealOpinsight supports Nagios, Zenoss, Zabbix, Pandora FMS, Shinken, Centreon, Naemon, Icinga, op5, and more. 
 
 RealOpInsight Workstation is released under the terms of GPLv3 License. See the LICENSE file.
  
