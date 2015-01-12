@@ -1,4 +1,4 @@
-Source: realopinsight
+Source: realopinsight-workstation
 Section: admin
 Priority: extra
 Maintainer: Rodrigue Chakode <bugs@realopinsight.com>
@@ -8,7 +8,7 @@ Homepage: http://realopinsight.com
 #Vcs-Git: git://git.debian.org/collab-maint/realopinsight.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/realopinsight.git;a=summary
 
-Package: realopinsight
+Package: realopinsight-workstation
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, graphviz
 Description: This software provides advanced dashboard management capabilities
