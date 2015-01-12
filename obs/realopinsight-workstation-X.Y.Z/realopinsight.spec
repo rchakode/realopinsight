@@ -43,7 +43,7 @@
 
  
 Name:           %{package_basename}
-Summary:    	Workstation Edition of RealOpInsight Software
+Summary:    	Provides GUI tools for RealOpInsight Workstation
 Version:        %{target_version}
 Release:        %{distrib_info}.built<CI_CNT>.<B_CNT>
 Group:          System/Monitoring

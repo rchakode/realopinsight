@@ -6,7 +6,7 @@
 
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
-export app_name=realopinsight
+export app_name=realopinsight-workstation
 export install_root=debian/${app_name}
 export prefix_dir=${install_root}/usr
 export bin_prefix=realopinsight

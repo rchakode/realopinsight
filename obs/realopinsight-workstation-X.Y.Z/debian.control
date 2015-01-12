@@ -11,6 +11,6 @@ Homepage: http://realopinsight.com
 Package: realopinsight-workstation
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, graphviz
-Description: This software provides advanced dashboard management capabilities
- on top of common open source monitoring systems such as Nagios, Zabbix, Icinga,
- GroundWork, Centreon, Shinken and op5 Monitor.
+Description: Provides GUI tools for RealOpInsight Workstation
+  RealOpInsight enables business service management on top of Nagios, Zabbix, Icinga, 
+  Pandora FMS, Icingan Centreon, op5, Shinken and many other monitoring systems. 
