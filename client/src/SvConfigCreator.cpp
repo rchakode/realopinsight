@@ -1107,10 +1107,10 @@ void SvCreator::loadMenu(void)
   m_menus[MENU_IMPORTATION] = m_menuBar->addMenu(tr("&Importation"));
   m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks as Data Points")),
       m_subMenus["ImportNagiosLivestatusChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks as Data Points")),
-      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as a Business View"));
+      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers as Data Points")),
-      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business Views"));
+      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business View"));
   m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as Host-based Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
