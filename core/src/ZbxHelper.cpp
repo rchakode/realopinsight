@@ -365,10 +365,8 @@ int
 ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   m_sourceInfo = srcInfo;
-
   ngrt4n::clearCoreData(cdata);
-
-  cdata.monitor = ngrt4n::Zabbix;
+  cdata.monitor = ngrt4n::Auto;
 
   if (! checkLogin())
     return -1;
