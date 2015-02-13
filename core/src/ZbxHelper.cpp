@@ -71,6 +71,7 @@ ZbxHelper::requestsPatterns()
                                      \"auth\": \"%1\", \
                                      \"method\": \"trigger.get\", \
                                      \"params\": { \
+                                     \"active\": true, \
                                      \"filter\": {%2}, \
                                      \"selectGroups\": [\"name\"], \
                                      \"selectHosts\": [\"host\"], \
@@ -82,6 +83,7 @@ ZbxHelper::requestsPatterns()
                                         \"auth\": \"%1\", \
                                         \"method\": \"trigger.get\", \
                                         \"params\": { \
+                                        \"active\": true, \
                                         \"filter\": {%2}, \
                                         \"select_hosts\": [\"host\"], \
                                         \"output\":  \"extend\", \
@@ -91,6 +93,7 @@ ZbxHelper::requestsPatterns()
                                \"auth\": \"%1\", \
                                \"method\": \"trigger.get\", \
                                \"params\": { \
+                               \"active\": true, \
                                \"triggerids\": %2, \
                                \"selectGroups\": [\"name\"], \
                                \"selectHosts\": [\"host\"], \
