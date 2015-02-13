@@ -502,16 +502,16 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
           showStatusMsg(tr("Host trigger importation failed: %1").arg(handler.lastError()), true);
         }
       }
+
       // handle results
       if (! checks.empty()) {
         ngrt4n::clearCoreData(*m_cdata);
-        m_cdata->monitor = ngrt4n::Zabbix;
+        m_cdata->monitor = ngrt4n::Auto;
 
         NodeT root;
         root.id = ngrt4n::ROOT_ID;
-        root.name = tr("Zabbix IT Services");
+        root.name = tr("Zabbix Services");
         root.type = NodeType::BusinessService;
-        //FIXME: root.child_nodes = extractTopParentServices(cdata.bpnodes, childParentDependencies);
 
         NodeT hostNode;
         NodeT triggerNode;
@@ -519,7 +519,6 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
         triggerNode.type = NodeType::ITService;
 
         for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-
           hostNode.id = hostNode.name = hostNode.description = QString::fromStdString(check->host);
           hostNode.id.replace(" ", "").replace("/", "");
           hostNode.parent = root.id;
@@ -527,7 +526,7 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
           triggerNode.id = ngrt4n::genNodeId();
           triggerNode.parent = hostNode.id;
           triggerNode.name = QString::fromStdString(check->id);
-          triggerNode.child_nodes = QString::fromStdString(check->id); //FIXME: append source id ?
+          triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, check->id.c_str());
 
           NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
           if (hostIterPos != m_cdata->bpnodes.end()) {
