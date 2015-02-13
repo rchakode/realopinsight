@@ -37,16 +37,16 @@
 #include "PandoraHelper.hpp"
 
 namespace {
-  const QString NAG_SOURCE     = "Nagios description file (*.nag.ngrt4n.xml)";
-  const QString ZBX_SOURCE     = "Zabbix description file (*.zbx.ngrt4n.xml)";
-  const QString ZNS_SOURCE     = "Zenoss description file (*.zns.ngrt4n.xml)";
-  const QString PANDORA_SOURCE = "Pandora FMS description file (*.pfms.ngrt4n.xml)";
-  const QString MULTI_SOURCES  = "Multi-source description file (*.ms.ngrt4n.xml)";
-  const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
-  const QString FILE_FILTER =
-      QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
-      .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
-  }
+const QString NAG_SOURCE     = "Nagios description file (*.nag.ngrt4n.xml)";
+const QString ZBX_SOURCE     = "Zabbix description file (*.zbx.ngrt4n.xml)";
+const QString ZNS_SOURCE     = "Zenoss description file (*.zns.ngrt4n.xml)";
+const QString PANDORA_SOURCE = "Pandora FMS description file (*.pfms.ngrt4n.xml)";
+const QString MULTI_SOURCES  = "Multi-source description file (*.ms.ngrt4n.xml)";
+const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
+const QString FILE_FILTER =
+    QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
+    .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
+}
 
 SvCreator::SvCreator(const qint32& _userRole)
   : m_userRole (_userRole),
@@ -96,6 +96,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
   connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServices()));
+  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(automaticImportZabbixTriggers()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
@@ -466,14 +467,12 @@ void SvCreator::importZabbixTriggers(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Loading triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
+    showStatusMsg(tr("Importing Zabbix triggers from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
     ZbxHelper handler;
-
     int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     processCheckLoadResults(retcode, srcId, checks, handler.lastError());
-
     if (checks.empty()) {
       int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
       processCheckLoadResults(retcode, srcId, checks, handler.lastError());
@@ -492,19 +491,44 @@ void SvCreator::importZabbixITServices(void)
 
     showStatusMsg(tr("Loading IT services from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
-    //CoreDataT* cdata = new CoreDataT();
     ZbxHelper handler;
-
     if (handler.loadITServices(srcInfo, *m_cdata) != 0) {
       showStatusMsg(tr("The importation of IT services failed: %1").arg(handler.lastError()), true);
     } else {
-      m_activeConfig.clear();// = ngrt4n::getAbsolutePath(_path);
+      m_activeConfig.clear();
       refreshAllComponents();
       showStatusMsg(tr("The importation of IT services is completed"), false);
     }
   }
 }
 
+void SvCreator::automaticImportZabbixTriggers(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString filter = importationSettingForm.filter();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    showStatusMsg(tr("%1: Importing Zabbix triggers (%2:%3...)").arg(Q_FUNC_INFO, srcInfo.id, srcInfo.mon_url), false);
+
+    ChecksT checks;
+    ZbxHelper handler;
+    if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
+      showStatusMsg(tr("Group trigger importation failed: %1").arg(handler.lastError()), true);
+    } else {
+      if (checks.empty()) {
+        if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
+          showStatusMsg(tr("%1: Host trigger importation failed: %2").arg(Q_FUNC_INFO, handler.lastError()), true);
+        } else {
+          //handle check
+        }
+      }
+    }
+  }
+}
 
 
 void SvCreator::importZenossComponents(void)
@@ -575,13 +599,6 @@ void SvCreator::newView(void)
     refreshAllComponents();
   }
 }
-
-//m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-//m_editor->fillInEditorWithContent(*m_root);
-//m_tree->build();
-//fillEditorFromService(m_tree->rootItem());
-//setWindowTitle(tr("%1 Editor - %2").arg(APP_NAME).arg(m_activeConfig));
-
 
 void SvCreator::newNode(void)
 {
@@ -1011,45 +1028,56 @@ void SvCreator::resize()
 
 void SvCreator::loadMenu(void)
 {
-  m_menus["FILE"] = m_menuBar->addMenu(tr("&File"));
-  m_subMenus["NewFile"] = m_menus["FILE"]->addAction("New &File"),
+  const QString MENU_FILE="FILE";
+  const QString MENU_EDITION="EDITION";
+  const QString MENU_IMPORTATION="IMPORTATION";
+  const QString MENU_HELP="HELP";
+  m_menus[MENU_FILE] = m_menuBar->addMenu(tr("&File"));
+  m_subMenus["NewFile"] = m_menus[MENU_FILE]->addAction("New &File"),
       m_subMenus["NewFile"]->setShortcut(QKeySequence::New);
-  m_subMenus["Open"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
+  m_subMenus["Open"] = m_menus[MENU_FILE]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
       m_subMenus["Open"]->setShortcut(QKeySequence::Open);
-  m_subMenus["Save"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("&Save")),
+  m_subMenus["Save"] = m_menus[MENU_FILE]->addAction(QIcon(":images/built-in/disket.png"), tr("&Save")),
       m_subMenus["Save"]->setShortcut(QKeySequence::Save);
-  m_subMenus["SaveAs"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
+  m_subMenus["SaveAs"] = m_menus[MENU_FILE]->addAction(QIcon(":images/built-in/disket.png"), tr("Save &As...")),
       m_subMenus["SaveAs"]->setShortcut(QKeySequence::SaveAs);
-  m_menus["FILE"]->addSeparator(),
-      m_subMenus["ImportNagiosChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks")),
-      m_subMenus["ImportNagiosLivestatusChecks"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks")),
-      m_subMenus["ImportNagiosBPIConf"] = m_menus["FILE"]->addAction(tr("Import Nagios BPI Configuration")),
-      m_subMenus["ImportZabbixTriggers"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers")),
-      m_subMenus["ImportZabbixITServices"] = m_menus["FILE"]->addAction(tr("Import Zabbix IT Services")),
-      m_subMenus["ImportZenossComponents"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components")),
-      m_subMenus["ImportPandoraModules"] = m_menus["FILE"]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
-
-  m_menus["FILE"]->addSeparator(),
-      m_subMenus["Quit"] = m_menus["FILE"]->addAction(tr("&Quit")),
+  m_menus[MENU_FILE]->addSeparator(),
+      m_subMenus["Quit"] = m_menus[MENU_FILE]->addAction(tr("&Quit")),
       m_subMenus["Quit"]->setShortcut(QKeySequence::Quit);
-  m_menus["EDITION"] = m_menuBar->addMenu(tr("&Edition"));
-  m_subMenus["NewNode"] = m_menus["EDITION"]->addAction(tr("&Add sub service")),
+
+  m_menus[MENU_EDITION] = m_menuBar->addMenu(tr("&Edition"));
+  m_subMenus["NewNode"] = m_menus[MENU_EDITION]->addAction(tr("&Add sub service")),
       m_nodeContextMenu->addAction(m_subMenus["NewNode"]),
       m_subMenus["NewNode"]->setShortcut(QKeySequence::AddTab);
-  m_subMenus["CopySelected"] = m_menus["EDITION"]->addAction(tr("&Copy")),
+  m_subMenus["CopySelected"] = m_menus[MENU_EDITION]->addAction(tr("&Copy")),
       m_nodeContextMenu->addAction(m_subMenus["CopySelected"]),
       m_subMenus["CopySelected"]->setShortcut(QKeySequence::Copy);
-  m_subMenus["PasteFromSelected"] = m_menus["EDITION"]->addAction(tr("&Paste")),
+  m_subMenus["PasteFromSelected"] = m_menus[MENU_EDITION]->addAction(tr("&Paste")),
       m_nodeContextMenu->addAction(m_subMenus["PasteFromSelected"]),
       m_subMenus["PasteFromSelected"]->setShortcut(QKeySequence::Paste);
-  m_subMenus["DeleteNode"] = m_menus["EDITION"]->addAction(tr("&Delete")),
+  m_subMenus["DeleteNode"] = m_menus[MENU_EDITION]->addAction(tr("&Delete")),
       m_subMenus["DeleteNode"]->setShortcut(QKeySequence::Delete),
       m_nodeContextMenu->addAction(m_subMenus["DeleteNode"]);
-  m_menus["HELP"] = m_menuBar->addMenu(tr("&Help"));
-  m_subMenus["ShowOnlineResources"] = m_menus["HELP"]->addAction(tr("Online &Resources")),
+
+  m_menus[MENU_IMPORTATION] = m_menuBar->addMenu(tr("&Importation"));
+  m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checksas as Data Points")),
+      m_subMenus["ImportNagiosLivestatusChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks as Data Points")),
+      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as a Description File"));
+  m_menus[MENU_IMPORTATION]->addSeparator(),
+      m_subMenus["ImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers as Data Points")),
+      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as a Description File"));
+  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as a Bundle Description File"));
+  m_menus[MENU_IMPORTATION]->addSeparator(),
+      m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
+  m_menus[MENU_IMPORTATION]->addSeparator(),
+      m_subMenus["ImportPandoraModules"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
+
+  m_menus[MENU_HELP] = m_menuBar->addMenu(tr("&Help"));
+  m_subMenus["ShowOnlineResources"] = m_menus[MENU_HELP]->addAction(tr("Online &Resources")),
       m_subMenus["ShowOnlineResources"]->setShortcut(QKeySequence::HelpContents);
-  m_menus["HELP"]->addSeparator(),
-      m_subMenus["ShowAbout"] = m_menus["HELP"]->addAction(tr("&About %1").arg(APP_NAME));
+  m_menus[MENU_HELP]->addSeparator(),
+      m_subMenus["ShowAbout"] = m_menus[MENU_HELP]->addAction(tr("&About %1").arg(APP_NAME));
+
   m_toolBar->addAction(m_subMenus["Save"]);
   m_toolBar->addAction(m_subMenus["Open"]);
   m_toolBar->addAction(m_subMenus["ImportNagiosChecks"]);
