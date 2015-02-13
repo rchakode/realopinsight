@@ -94,9 +94,9 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportNagiosChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosChecks()));
   connect(m_subMenus["ImportNagiosLivestatusChecks"],SIGNAL(triggered(bool)),this,SLOT(importNagiosLivestatusChecks()));
   connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
-  connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggers()));
-  connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServices()));
-  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(automaticImportZabbixTriggers()));
+  connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsDataPoints()));
+  connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServicesAsBusinessViews()));
+  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsBundleBusinessView()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
@@ -169,12 +169,12 @@ void SvCreator::loadFile(const QString& _path)
       exit(1);
     } else {
       m_activeConfig = ngrt4n::getAbsolutePath(_path);
-      refreshAllComponents();
+      refreshUIWidgets();
     }
   }
 }
 
-void SvCreator::refreshAllComponents(void)
+void SvCreator::refreshUIWidgets(void)
 {
   m_hasLeftUpdates = true;
 
@@ -376,7 +376,7 @@ void SvCreator::importNagiosBPIConfig(void)
     m_cdata->bpnodes.insert(rootService.id, rootService);
   }
   file.close();
-  refreshAllComponents();
+  refreshUIWidgets();
 }
 
 void SvCreator::attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root)
@@ -457,7 +457,7 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
   return childCount;
 }
 
-void SvCreator::importZabbixTriggers(void)
+void SvCreator::importZabbixTriggersAsDataPoints(void)
 {
   QMap<QString, SourceT> sourceInfos;
   fetchSourceList(ngrt4n::Zabbix, sourceInfos);
@@ -480,7 +480,80 @@ void SvCreator::importZabbixTriggers(void)
   }
 }
 
-void SvCreator::importZabbixITServices(void)
+void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
+{
+  QMap<QString, SourceT> sourceInfos;
+  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
+  if (importationSettingForm.exec() == QDialog::Accepted) {
+    QString srcId = importationSettingForm.selectedSource();
+    QString filter = importationSettingForm.filter();
+    SourceT srcInfo = sourceInfos[srcId];
+
+    showStatusMsg(tr("Importing Zabbix triggers (%1:%2...)").arg(srcInfo.id, srcInfo.mon_url), false);
+
+    ChecksT checks;
+    ZbxHelper handler;
+    if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
+      showStatusMsg(tr("Group trigger importation failed: %1").arg(handler.lastError()), true);
+    } else {
+      if (checks.empty()) {
+        if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
+          showStatusMsg(tr("Host trigger importation failed: %1").arg(handler.lastError()), true);
+        }
+      }
+      // handle results
+      if (! checks.empty()) {
+        ngrt4n::clearCoreData(*m_cdata);
+        m_cdata->monitor = ngrt4n::Zabbix;
+
+        NodeT root;
+        root.id = ngrt4n::ROOT_ID;
+        root.name = tr("Zabbix IT Services");
+        root.type = NodeType::BusinessService;
+        //FIXME: root.child_nodes = extractTopParentServices(cdata.bpnodes, childParentDependencies);
+
+        NodeT hostNode;
+        NodeT triggerNode;
+        hostNode.type = NodeType::BusinessService;
+        triggerNode.type = NodeType::ITService;
+
+        for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
+
+          hostNode.id = hostNode.name = hostNode.description = QString::fromStdString(check->host);
+          hostNode.id.replace(" ", "").replace("/", "");
+          hostNode.parent = root.id;
+
+          triggerNode.id = ngrt4n::genNodeId();
+          triggerNode.parent = hostNode.id;
+          triggerNode.name = QString::fromStdString(check->id);
+          triggerNode.child_nodes = QString::fromStdString(check->id); //FIXME: append source id ?
+
+          NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
+          if (hostIterPos != m_cdata->bpnodes.end()) {
+            hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+          } else {
+            hostNode.child_nodes = triggerNode.id;
+            if (root.child_nodes.isEmpty()) {
+              root.child_nodes = hostNode.id;
+            } else {
+              root.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
+            }
+            m_cdata->bpnodes.insert(hostNode.id, hostNode);
+          }
+          m_cdata->cnodes.insert(triggerNode.id, triggerNode);
+        }
+
+        // finally insert the root node and update UI widgets
+        m_cdata->bpnodes.insert(ngrt4n::ROOT_ID, root);
+        refreshUIWidgets();
+      }
+    }
+  }
+}
+
+
+void SvCreator::importZabbixITServicesAsBusinessViews(void)
 {
   QMap<QString, SourceT> sourceInfos;
   fetchSourceList(ngrt4n::Zabbix, sourceInfos);
@@ -496,39 +569,12 @@ void SvCreator::importZabbixITServices(void)
       showStatusMsg(tr("The importation of IT services failed: %1").arg(handler.lastError()), true);
     } else {
       m_activeConfig.clear();
-      refreshAllComponents();
+      refreshUIWidgets();
       showStatusMsg(tr("The importation of IT services is completed"), false);
     }
   }
 }
 
-void SvCreator::automaticImportZabbixTriggers(void)
-{
-  QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
-  CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
-  if (importationSettingForm.exec() == QDialog::Accepted) {
-    QString srcId = importationSettingForm.selectedSource();
-    QString filter = importationSettingForm.filter();
-    SourceT srcInfo = sourceInfos[srcId];
-
-    showStatusMsg(tr("%1: Importing Zabbix triggers (%2:%3...)").arg(Q_FUNC_INFO, srcInfo.id, srcInfo.mon_url), false);
-
-    ChecksT checks;
-    ZbxHelper handler;
-    if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
-      showStatusMsg(tr("Group trigger importation failed: %1").arg(handler.lastError()), true);
-    } else {
-      if (checks.empty()) {
-        if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
-          showStatusMsg(tr("%1: Host trigger importation failed: %2").arg(Q_FUNC_INFO, handler.lastError()), true);
-        } else {
-          //handle check
-        }
-      }
-    }
-  }
-}
 
 
 void SvCreator::importZenossComponents(void)
@@ -596,7 +642,7 @@ void SvCreator::newView(void)
     NodeT node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
     m_root = m_cdata->bpnodes.insert(node.id, node);
 
-    refreshAllComponents();
+    refreshUIWidgets();
   }
 }
 
@@ -1060,13 +1106,13 @@ void SvCreator::loadMenu(void)
       m_nodeContextMenu->addAction(m_subMenus["DeleteNode"]);
 
   m_menus[MENU_IMPORTATION] = m_menuBar->addMenu(tr("&Importation"));
-  m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checksas as Data Points")),
+  m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks as Data Points")),
       m_subMenus["ImportNagiosLivestatusChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks as Data Points")),
-      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as a Description File"));
+      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as a Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers as Data Points")),
-      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as a Description File"));
-  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as a Bundle Description File"));
+      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business Views"));
+  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as Host-based Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
