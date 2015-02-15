@@ -495,13 +495,15 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
     ChecksT checks;
     ZbxHelper handler;
     if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
-      showStatusMsg(tr("Group trigger importation failed: %1").arg(handler.lastError()), true);
+      showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
     } else {
       if (checks.empty()) {
         if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
-          showStatusMsg(tr("Host trigger importation failed: %1").arg(handler.lastError()), true);
+          showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
         }
       }
+
+      showStatusMsg(tr("%1 trigger(s) imported").arg(QString::number(checks.size())), false);
 
       // handle results
       if (! checks.empty()) {
@@ -510,7 +512,7 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
 
         NodeT root;
         root.id = ngrt4n::ROOT_ID;
-        root.name = tr("Zabbix Services");
+        root.name = filter.isEmpty() ? tr("Zabbix Services") : filter;
         root.type = NodeType::BusinessService;
 
         NodeT hostNode;
@@ -1111,7 +1113,7 @@ void SvCreator::loadMenu(void)
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers as Data Points")),
       m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business View"));
-  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as Host-based Business View"));
+  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as Host/Group-based Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
   m_menus[MENU_IMPORTATION]->addSeparator(),

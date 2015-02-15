@@ -72,7 +72,7 @@ ZbxHelper::requestsPatterns()
                                      \"method\": \"trigger.get\", \
                                      \"params\": { \
                                      \"active\": true, \
-                                     \"filter\": {%2}, \
+                                     \%2 \
                                      \"selectGroups\": [\"name\"], \
                                      \"selectHosts\": [\"host\"], \
                                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
@@ -84,7 +84,7 @@ ZbxHelper::requestsPatterns()
                                         \"method\": \"trigger.get\", \
                                         \"params\": { \
                                         \"active\": true, \
-                                        \"filter\": {%2}, \
+                                        \%2 \
                                         \"select_hosts\": [\"host\"], \
                                         \"output\":  \"extend\", \
                                         \"limit\": -1}, \
@@ -134,6 +134,7 @@ ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
     request = request.arg(myparam);
   }
 
+  qDebug()<< request;
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
 
@@ -340,15 +341,16 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& fi
     return -1;
 
   QStringList params;
-  QString filter = "";
   if (! filterValue.isEmpty()) {
     if (filterType == ngrt4n::GroupFilter) {
-      filter = QString("\"group\":[\"%1\"]").arg(filterValue);
+      params.push_back( QString("\"group\": \"%1\",").arg(filterValue) );
     } else {
-      filter = QString("\"host\":[\"%1\"]").arg(filterValue);
+      params.push_back( QString("\"host\": \"%1\",").arg(filterValue) );
     }
+  } else {
+    params.push_back("");
   }
-  params.push_back(filter);
+  //params.push_back(filter);
   params.push_back(QString::number(m_trid));
 
   if (postRequest(m_trid, params) != 0)
