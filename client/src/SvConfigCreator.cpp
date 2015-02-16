@@ -527,8 +527,9 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
 
           triggerNode.id = ngrt4n::genNodeId();
           triggerNode.parent = hostNode.id;
-          triggerNode.name = QString::fromStdString(check->id);
-          triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, check->id.c_str());
+          QString checkId = QString::fromStdString(check->id);
+          triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+          triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
 
           NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
           if (hostIterPos != m_cdata->bpnodes.end()) {
