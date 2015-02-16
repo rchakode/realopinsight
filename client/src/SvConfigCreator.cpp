@@ -521,10 +521,14 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
         triggerNode.type = NodeType::ITService;
 
         for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-          hostNode.id = hostNode.name = hostNode.description = QString::fromStdString(check->host);
-          hostNode.id.replace(" ", "").replace("/", "");
           hostNode.parent = root.id;
-
+          hostNode.name = hostNode.description = QString::fromStdString(check->host);
+          hostNode.id = "";
+          Q_FOREACH(QChar c, hostNode.name) {
+            if (c.isLetterOrNumber()) {
+              hostNode.id.append(c);
+            }
+          }
           triggerNode.id = ngrt4n::genNodeId();
           triggerNode.parent = hostNode.id;
           QString checkId = QString::fromStdString(check->id);

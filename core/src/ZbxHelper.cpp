@@ -134,7 +134,6 @@ ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
     request = request.arg(myparam);
   }
 
-  qDebug()<< request;
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
 
