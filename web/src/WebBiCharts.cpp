@@ -29,12 +29,14 @@
 
 
 namespace {
-  const double BI_CHART_AREA_WIDTH = 300;
-  const double BI_CHART_AREA_HEIGHT = 150;
+  const double BI_RAW_CHART_AREA_WIDTH = 400;
+  const double BI_RAW_CHART_AREA_HEIGHT = 150;
+  const double BI_QOS_CHART_AREA_WIDTH = 250;
+  const double BI_QOS_CHART_AREA_HEIGHT = 150;
   const double BI_CHART_AREA_MARGIN = 25;
-  const double BI_CHART_WIDTH = BI_CHART_AREA_WIDTH;
+  const double BI_CHART_WIDTH = BI_QOS_CHART_AREA_WIDTH;
   const double BI_CHART_TREND_HEIGHT = 50;
-  const double AREA_TOP_CORNER_Y = BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
+  const double AREA_TOP_CORNER_Y = BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
   const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
   const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
 }
@@ -48,7 +50,17 @@ namespace {
  */
 QosTrendsChart::QosTrendsChart(const std::string& viewName, const std::list<QosDataT>& data, Wt::WContainerWidget* parent)
   : Wt::WPaintedWidget(parent),
-    m_viewName(viewName)
+    m_viewName(viewName),
+    m_slaNormal(0),
+    m_slaMinor(0),
+    m_slaMajor(0),
+    m_slaCritical(0),
+    m_slaUnknown(0),
+    m_timeNormal(0),
+    m_timeMinor(0),
+    m_timeMajor(0),
+    m_timeCritical(0),
+    m_timeUnknown(0)
 {
   setStyleClass("bi-chart");
   setMargin(5, Wt::Top | Wt::Bottom);
@@ -61,14 +73,18 @@ void QosTrendsChart::updateData(const QosDataList& data)
 {
   processPlottingData(data);
   update();
-  resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
+  resize(BI_QOS_CHART_AREA_WIDTH, BI_QOS_CHART_AREA_HEIGHT);
 }
 
 void QosTrendsChart::processPlottingData(const QosDataList& data)
 {
   QosDataList::const_iterator qosit = data.begin();
   m_plottingData.clear();
-  m_normalTimeCount = 0;
+  m_timeNormal   = 0;
+  m_timeMinor    = 0;
+  m_timeMajor    = 0;
+  m_timeCritical = 0;
+  m_timeUnknown  = 0;
 
   if (! data.empty()) {
     TimeStatusT last = {qosit->timestamp, qosit->status};
@@ -76,69 +92,150 @@ void QosTrendsChart::processPlottingData(const QosDataList& data)
     while (++qosit, qosit != data.end()) {
       TimeStatusT current = {qosit->timestamp, qosit->status};
       m_plottingData.push_back(current);
-      if (last.status == ngrt4n::Normal) {
-        m_normalTimeCount += current.timestamp - last.timestamp;
+      switch(last.status) {
+        case ngrt4n::Normal:
+          m_timeNormal += current.timestamp - last.timestamp;
+          break;
+        case ngrt4n::Minor:
+          m_timeMinor += current.timestamp - last.timestamp;
+          break;
+        case ngrt4n::Major:
+          m_timeMajor += current.timestamp - last.timestamp;
+          break;
+        case ngrt4n::Critical:
+          m_timeCritical += current.timestamp - last.timestamp;
+          break;
+        case ngrt4n::Unknown:
+          m_timeUnknown += current.timestamp - last.timestamp;
+        default:
+          break;
       }
       last = m_plottingData.back();
     }
     long diff = (m_plottingData.back().timestamp - m_plottingData.front().timestamp);
-    if (diff > 0)
-      m_sla = 100 * ((double)m_normalTimeCount / diff);
-    else
-      m_sla = (m_plottingData.back().status == ngrt4n::Normal) ? 100 : 0;
+    if (diff > 0) {
+      m_slaNormal   = 100 * ((double)m_timeNormal / diff);
+      m_slaMinor    = 100 * ((double)m_timeMinor / diff);
+      m_slaMajor    = 100 * ((double)m_timeMajor / diff);
+      m_slaCritical = 100 * ((double)m_timeCritical / diff);
+    } else {
+      m_slaNormal   = (m_plottingData.back().status == ngrt4n::Normal) ? 100 : 0;
+      m_slaMinor    = (m_plottingData.back().status == ngrt4n::Minor) ? 100 : 0;
+      m_slaMajor    = (m_plottingData.back().status == ngrt4n::Major) ? 100 : 0;
+      m_slaCritical = (m_plottingData.back().status == ngrt4n::Critical) ? 100 : 0;
+    }
+    m_slaUnknown = 100 - (m_slaNormal + m_slaMinor + m_slaMajor + m_slaCritical);
   }
 }
 
+void QosTrendsChart::paintSlaBar(Wt::WPaintDevice* paintDevice)
+{
+
+  m_firstPoint = m_plottingData.front();
+  TimeStatusT lastPoint = m_plottingData.last();
+  m_xScalingFactor = BI_CHART_WIDTH / (double)(lastPoint.timestamp - m_firstPoint.timestamp);
+
+  TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
+  TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
+  double x1Axis = 0;
+  double x2Axis = 0;
+  double lastTooltipXAxis = 0;
+  double width = 0;
+  double tooltipWidth = 0;
+  double lastTooltipTimestamp = m_firstPoint.timestamp;
+
+  Wt::WPainter painter(paintDevice);
+  painter.save();
+  painter.scale(m_xScalingFactor, 1);
+  while (++currentIt, currentIt != m_plottingData.end()) {
+
+    Wt::WColor color = ngrt4n::severityWColor(currentIt->status);
+    painter.setPen(color);
+    painter.setBrush(color);
+
+    x1Axis = computeXAxis(previousIt->timestamp);
+    x2Axis = computeXAxis(currentIt->timestamp);
+    width = x2Axis - x1Axis;
+    painter.drawRect(x1Axis, AREA_TOP_CORNER_Y, width, BI_CHART_TREND_HEIGHT);
+
+    if (currentIt->status != previousIt->status) {
+      tooltipWidth = m_xScalingFactor * x2Axis - lastTooltipXAxis;
+      addRangeToolTip(lastTooltipXAxis, tooltipWidth, lastTooltipTimestamp, currentIt->timestamp);
+      lastTooltipXAxis = m_xScalingFactor * x2Axis;
+      lastTooltipTimestamp = currentIt->timestamp;
+    }
+
+    previousIt = currentIt;
+  }
+
+  width = computeXAxis(m_plottingData.last().timestamp) - lastTooltipXAxis;
+  addRangeToolTip(lastTooltipXAxis, width, lastTooltipTimestamp, m_plottingData.last().timestamp);
+
+  painter.restore();
+  painter.setPen(LEGEND_TEXT_COLOR);
+  painter.drawText(BI_QOS_CHART_AREA_WIDTH / 2, BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
+                   Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+                   Wt::AlignCenter, slaText());
+}
+
+
+void QosTrendsChart::paintSlaChord(Wt::WPaintDevice* paintDevice)
+{
+  Wt::WPainter painter(paintDevice);
+
+  double chordX  = (BI_QOS_CHART_AREA_WIDTH - BI_QOS_CHART_AREA_HEIGHT) / 2;
+  double chordY  = BI_CHART_AREA_MARGIN;
+  double startAngle = 0;
+  double spanAngle = 180 * 16;
+
+  Wt::WColor color = ngrt4n::severityWColor(ngrt4n::Normal);
+  painter.setPen(color);
+  painter.setBrush(color);
+  spanAngle = 28.8 * m_slaNormal;
+  painter.drawChord(chordX,chordY,BI_QOS_CHART_AREA_HEIGHT,BI_QOS_CHART_AREA_HEIGHT,startAngle, spanAngle);
+
+  color = ngrt4n::severityWColor(ngrt4n::Minor);
+  painter.setPen(color);
+  painter.setBrush(color);
+  startAngle += spanAngle;
+  spanAngle = 28.8 * m_slaMinor;
+  painter.drawChord(chordX,chordY,BI_QOS_CHART_AREA_HEIGHT,BI_QOS_CHART_AREA_HEIGHT,startAngle, spanAngle);
+
+  color = ngrt4n::severityWColor(ngrt4n::Major);
+  painter.setPen(color);
+  painter.setBrush(color);
+  startAngle += spanAngle;
+  spanAngle = 28.8 * m_slaMajor;
+  painter.drawChord(chordX,chordY,BI_QOS_CHART_AREA_HEIGHT,BI_QOS_CHART_AREA_HEIGHT,startAngle, spanAngle);
+
+  color = ngrt4n::severityWColor(ngrt4n::Critical);
+  painter.setPen(color);
+  painter.setBrush(color);
+  startAngle += spanAngle;
+  spanAngle = 28.8 * m_slaCritical;
+  painter.drawChord(chordX,chordY,BI_QOS_CHART_AREA_HEIGHT,BI_QOS_CHART_AREA_HEIGHT,startAngle, spanAngle);
+
+  color = ngrt4n::severityWColor(ngrt4n::Unknown);
+  painter.setPen(color);
+  painter.setBrush(color);
+  startAngle += spanAngle;
+  spanAngle = 28.8 * m_slaUnknown;
+  painter.drawChord(chordX,chordY,BI_QOS_CHART_AREA_HEIGHT,BI_QOS_CHART_AREA_HEIGHT,startAngle, spanAngle);
+
+  painter.setPen(LEGEND_TEXT_COLOR);
+  painter.drawText(BI_QOS_CHART_AREA_WIDTH / 2, BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
+                   Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+                   Wt::AlignCenter, slaText());
+
+}
 
 void QosTrendsChart::paintEvent(Wt::WPaintDevice* paintDevice)
 {
+
+  paintSlaChord(paintDevice);
   if (! m_plottingData.empty()) {
-
-    m_firstPoint = m_plottingData.front();
-    TimeStatusT lastPoint = m_plottingData.last();
-    m_xScalingFactor = BI_CHART_WIDTH / (double)(lastPoint.timestamp - m_firstPoint.timestamp);
-
-    TimeStatusesT::ConstIterator currentIt = m_plottingData.begin();
-    TimeStatusesT::ConstIterator previousIt = m_plottingData.begin();
-    double x1Axis = 0;
-    double x2Axis = 0;
-    double lastTooltipXAxis = 0;
-    double width = 0;
-    double tooltipWidth = 0;
-    double lastTooltipTimestamp = m_firstPoint.timestamp;
-
-    Wt::WPainter painter(paintDevice);
-    painter.save();
-    painter.scale(m_xScalingFactor, 1);
-    while (++currentIt, currentIt != m_plottingData.end()) {
-
-      Wt::WColor color = ngrt4n::severityWColor(currentIt->status);
-      painter.setPen(color); // invisible
-      painter.setBrush(color);
-
-      x1Axis = computeXAxis(previousIt->timestamp);
-      x2Axis = computeXAxis(currentIt->timestamp);
-      width = x2Axis - x1Axis;
-      painter.drawRect(x1Axis, AREA_TOP_CORNER_Y, width, BI_CHART_TREND_HEIGHT);
-
-      if (currentIt->status != previousIt->status) {
-        tooltipWidth = m_xScalingFactor * x2Axis - lastTooltipXAxis;
-        addRangeToolTip(lastTooltipXAxis, tooltipWidth, lastTooltipTimestamp, currentIt->timestamp);
-        lastTooltipXAxis = m_xScalingFactor * x2Axis;
-        lastTooltipTimestamp = currentIt->timestamp;
-      }
-
-      previousIt = currentIt;
-    }
-
-    width = computeXAxis(m_plottingData.last().timestamp) - lastTooltipXAxis;
-    addRangeToolTip(lastTooltipXAxis, width, lastTooltipTimestamp, m_plottingData.last().timestamp);
-
-    painter.restore();
-    painter.setPen(LEGEND_TEXT_COLOR);
-    painter.drawText(BI_CHART_AREA_WIDTH / 2, BI_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN + 5,
-                     Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
-                     Wt::AlignCenter, slaText());
+    //paintSlaBar(paintDevice);
+    paintSlaChord(paintDevice);
   }
 }
 
@@ -239,5 +336,5 @@ void RawQosTrendsChart::updateData(const QosDataList& data)
   }
 
   setChartTitle();
-  resize(BI_CHART_AREA_WIDTH, BI_CHART_AREA_HEIGHT);
+  resize(BI_RAW_CHART_AREA_WIDTH, BI_RAW_CHART_AREA_HEIGHT);
 }

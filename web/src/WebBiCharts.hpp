@@ -63,19 +63,30 @@ private:
   typedef QList<TimeStatusT> TimeStatusesT;
   TimeStatusesT m_plottingData;
   std::string m_viewName;
-  double m_sla;
-  long m_normalTimeCount;
+  double m_slaNormal;
+  double m_slaMinor;
+  double m_slaMajor;
+  double m_slaCritical;
+  double m_slaUnknown;
+  long m_timeNormal;
+  long m_timeMinor;
+  long m_timeMajor;
+  long m_timeCritical;
+  long m_timeUnknown;
   double m_xScalingFactor;
   TimeStatusT m_firstPoint;
 
 
   void processPlottingData(const QosDataList& data);
   void addRangeToolTip(double x1, double x2, long t1, long t2);
-  std::string slaText(void) {
-    return QObject::tr("QoS trends - Current SLA: %1\%").arg(QString::number(m_sla, 'f', 2)).toStdString();
-  }
-  double computeXAxis(long timestamp) { return timestamp - m_firstPoint.timestamp;}
+  std::string slaText(void) {return QObject::tr("QoS Trend - SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
+  double computeXAxis(long timestamp) {return timestamp - m_firstPoint.timestamp;}
+  void paintSlaBar(Wt::WPaintDevice* paintDevice);
+  void paintSlaChord(Wt::WPaintDevice* paintDevice);
 };
+
+
+
 
 
 class RawQosTrendsChart : public Wt::Chart::WCartesianChart
@@ -85,9 +96,12 @@ public:
   std::string viewName() const {return m_viewName;}
   void updateData(const QosDataList& data);
 
+
+
 private:
   std::string m_viewName;
   Wt::WStandardItemModel* m_model;
+
 
   Wt::WFont customTitleFont(void);
   void setChartTitle(void);

@@ -38,7 +38,7 @@ LIBS += -lzmq
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
 RCC_DIR = generated/rcc
-QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-local-typedefs
+QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-literal-suffix -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs
 
 DISTFILES += README.md \
     install-sh \
