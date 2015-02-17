@@ -68,8 +68,9 @@ public Q_SLOTS:
   void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
   void processCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
   void importNagiosChecks(void);
-  void importZabbixTriggers(void);
-  void importZabbixITServices(void);
+  void importZabbixTriggersAsDataPoints(void);
+  void importZabbixTriggersAsBundleBusinessView(void);
+  void importZabbixITServicesAsBusinessViews(void);
   void importZenossComponents(void);
   void importPandoraModules(void);
   void importNagiosLivestatusChecks(void);
@@ -110,13 +111,13 @@ private:
   void showStatusMsg(const QString& msg, bool error);
   void handleInvalidPathError(void);
   bool isValidPath(const QString& path) {return (! path.isNull() && ! path.trimmed().isEmpty()); }
-  void refreshAllComponents(void);
+  void refreshUIWidgets(void);
   int extractNagiosBPIGroupMembers(const QString& parentServiceId,
-                                    const QString& sourceId,
-                                    const QString& bpiGroupMembersChain,
-                                    NodeListT& bpnodes,
-                                    NodeListT& cnodes,
-                                    QString& childNodeChain,
+                                   const QString& sourceId,
+                                   const QString& bpiGroupMembersChain,
+                                   NodeListT& bpnodes,
+                                   NodeListT& cnodes,
+                                   QString& childNodeChain,
                                    bool& hasCluster);
   void updateWindowTitle(const QString& append);
   void attachOrphanedNodesToRoot(NodeListT& allnodes, NodeT& root);

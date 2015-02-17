@@ -28,7 +28,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.2.1
+REALOPINSIGHT_CORE_VERSION=3.2.2
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
@@ -197,6 +197,3 @@ unittests {
 SOURCES += core/src/unittests.cpp
 QT += testlib
 }
-
-OTHER_FILES += \
-    contribs/sql/update_2014b7.sql

@@ -293,7 +293,6 @@ struct NodeT {
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, NodeT> NodeListT;
 typedef NodeListT::Iterator NodeListIteratorT;
-typedef CheckT CheckT;
 typedef QHash<QString, CheckT> CheckListT;
 typedef CheckListT::Iterator CheckListIterT;
 typedef CheckListT::ConstIterator CheckListCstIterT;

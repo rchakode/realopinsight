@@ -1,6 +1,16 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.2.2
+  * Added ability to automatically import Zabbix triggers as host/group-based
+    business view
+  * Just active hosts are now considered when importing Zabbix triggers.
+    This has as benefit to limit the amount of data queried and transfered
+    over the network.
+  * Reorganizing the Editor menus by moving all menus related to data
+    importation under a new main menu directly through the menu bar.
+
+
 3.2.1
   * Added the ability import existing Zabbix IT services configuration
     via the RealOpInsight Editor. The result of the importation can
