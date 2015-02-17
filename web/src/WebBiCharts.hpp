@@ -79,7 +79,7 @@ private:
 
   void processPlottingData(const QosDataList& data);
   void addRangeToolTip(double x1, double x2, long t1, long t2);
-  std::string slaText(void) {return QObject::tr("QoS Trend - SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
+  std::string slaText(void) {return QObject::tr("QoS Trends - SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
   double computeXAxis(long timestamp) {return timestamp - m_firstPoint.timestamp;}
   void paintSlaBar(Wt::WPaintDevice* paintDevice);
   void paintSlaChord(Wt::WPaintDevice* paintDevice);
