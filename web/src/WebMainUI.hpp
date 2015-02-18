@@ -125,7 +125,7 @@ private:
   std::string m_confdir;
   Wt::WContainerWidget* m_mainWidget;
   Wt::WWidget* m_settingsPageWidget;
-  Wt::WWidget* m_operatorHomeDashboardWidget;
+	Wt::WTemplate* m_opsHomeTpl;
   Settings* m_settings;
   Wt::WText* m_infoBox;
 
@@ -219,9 +219,7 @@ private:
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
   Wt::WWidget* createNotificationSection(void);
-  Wt::WWidget* createOperatorHomeDashboardWidget(Wt::WContainerWidget* thumbnailsContainer,
-                                                 Wt::WContainerWidget* reportsContainer,
-                                                 Wt::WContainerWidget* eventFeedContainer);
+	Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
 };
 
 #endif // MAINWEBWINDOW_HPP

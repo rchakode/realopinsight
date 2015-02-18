@@ -148,7 +148,7 @@
        <div class="ngrt4n-content">
            <legend>Tactical Overview</legend>
            ${thumbnails}
-           <legend>Reports</legend>
+           <legend>${bi-report-title}</legend>
            ${report-period-header-pane}
            ${bigraphs}
        </div>

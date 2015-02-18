@@ -74,7 +74,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_confdir(m_rootDir.append("/data")),
     m_mainWidget(new Wt::WContainerWidget(this)),
     m_settingsPageWidget(NULL),
-    m_operatorHomeDashboardWidget(NULL),
+		m_opsHomeTpl(NULL),
     m_settings (new Settings()),
     m_notificationManager(NULL),
     m_notificationSection(NULL),
@@ -143,7 +143,7 @@ void WebMainUI::showUserHome(void)
 
   if (! m_dbSession->isLoggedAdmin()) {
     initOperatorDashboard();
-    m_dashboardStackedContents->setCurrentWidget(m_operatorHomeDashboardWidget);
+		m_dashboardStackedContents->setCurrentWidget(m_opsHomeTpl);
   }
 }
 
@@ -209,8 +209,8 @@ Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
 {
   Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
   link->clicked().connect(std::bind([=]{
-    if (m_operatorHomeDashboardWidget) {
-      setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
+		if (m_opsHomeTpl) {
+			setWidgetAsFrontStackedWidget(m_opsHomeTpl);
       resetViewSelectionBox();
     }
   }));
@@ -236,7 +236,7 @@ Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
       m_currentDashboard = NULL;
       m_displayOnlyTroubleEventsBox->setHidden(true);
       if (! m_dbSession->isLoggedAdmin()) {
-        setWidgetAsFrontStackedWidget(m_operatorHomeDashboardWidget);
+				setWidgetAsFrontStackedWidget(m_opsHomeTpl);
       } else {
         setWidgetAsFrontStackedWidget(m_settingsPageWidget);
       }
@@ -876,15 +876,12 @@ void WebMainUI::initOperatorDashboard(void)
 {
   Wt::WContainerWidget* thumbnailsContainer = new Wt::WContainerWidget(m_mainWidget);
   Wt::WGridLayout* thumbLayout = new Wt::WGridLayout(thumbnailsContainer);
-  
-  Wt::WContainerWidget* reportsContainer = new Wt::WContainerWidget(m_mainWidget);
-  Wt::WGridLayout* reportsLayout = new Wt::WGridLayout(reportsContainer);
 
   Wt::WContainerWidget* eventFeedsContainer = new Wt::WContainerWidget(m_mainWidget);
   m_eventFeedLayout = new Wt::WVBoxLayout();
   eventFeedsContainer->setLayout(m_eventFeedLayout);
-  m_operatorHomeDashboardWidget = createOperatorHomeDashboardWidget(thumbnailsContainer, reportsContainer, eventFeedsContainer);
-  m_dashboardStackedContents->addWidget(m_operatorHomeDashboardWidget);
+	m_opsHomeTpl = createOpsHomeTpl(thumbnailsContainer, eventFeedsContainer);
+	m_dashboardStackedContents->addWidget(m_opsHomeTpl);
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
@@ -914,16 +911,28 @@ void WebMainUI::initOperatorDashboard(void)
     }
   }
 
-  int biIndex = 0;
-  for (const auto& view: m_dbSession->viewList()) {
-    m_qosCharts[view.name] = new QosTrendsChart(view.name, QosDataList());
-    m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, QosDataList());
-    reportsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
-    reportsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
-    reportsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
-    reportsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
-    ++biIndex;
-  }
+	int dashboardMode = m_dbSession->loggedUser().dashboardMode;
+	if (dashboardMode == DboUser::CompleteDashboard) {
+		Wt::WContainerWidget* reportContainer = new Wt::WContainerWidget(m_mainWidget);
+		Wt::WGridLayout* reportsLayout = new Wt::WGridLayout(reportContainer);
+		int biIndex = 0;
+		for (const auto& view: m_dbSession->viewList()) {
+			m_qosCharts[view.name] = new QosTrendsChart(view.name, QosDataList());
+			m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, QosDataList());
+			reportsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
+			reportsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
+			reportsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
+			reportsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
+			++biIndex;
+		}
+		m_opsHomeTpl->bindString("bi-report-title", Q_TR("Reports"));
+		m_opsHomeTpl->bindWidget("report-period-header-pane", createReportSectionHeader());
+		m_opsHomeTpl->bindWidget("bigraphs", reportContainer);
+	} else {
+		m_opsHomeTpl->bindEmpty("bi-report-title");
+		m_opsHomeTpl->bindEmpty("report-period-header-pane");
+		m_opsHomeTpl->bindEmpty("bigraphs");
+	}
 
   if (thumbIndex > 0) {
     startDashbaordUpdate();
@@ -933,15 +942,11 @@ void WebMainUI::initOperatorDashboard(void)
 }
 
 
-Wt::WWidget* WebMainUI::createOperatorHomeDashboardWidget(Wt::WContainerWidget* thumbnailsContainer,
-                                                          Wt::WContainerWidget* reportsContainer,
-                                                          Wt::WContainerWidget* eventFeedContainer)
+Wt::WTemplate* WebMainUI::createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer)
 {
   Wt::WTemplate* operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   operatorHomeTpl->bindWidget("info-box", m_infoBox);
-  operatorHomeTpl->bindWidget("thumbnails", thumbnailsContainer);
-  operatorHomeTpl->bindWidget("report-period-header-pane", createReportSectionHeader());
-  operatorHomeTpl->bindWidget("bigraphs", reportsContainer);
+	operatorHomeTpl->bindWidget("thumbnails", thumbnailsContainer);
   operatorHomeTpl->bindWidget("event-feeds", eventFeedContainer);
   return operatorHomeTpl;
 }
