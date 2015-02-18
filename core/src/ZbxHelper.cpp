@@ -137,8 +137,8 @@ ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
 
-  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
-  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+	connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+	connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 
   m_evlHandler->exec();
 

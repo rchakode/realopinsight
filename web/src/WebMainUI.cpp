@@ -407,7 +407,9 @@ void WebMainUI::handleRefresh(void)
     if (thumbItem != m_thumbnailItems.end()) {
       (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbItem)->setToolTip(dashboard->tooltip());
-      updateViewBiCharts(rootServiceName);
+			if (m_dbSession->loggedUser().dashboardMode == DboUser::CompleteDashboard) {
+				updateViewBiCharts(rootServiceName);
+			}
     }
     ++currentView;
   }

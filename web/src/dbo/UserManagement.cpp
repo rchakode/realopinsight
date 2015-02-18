@@ -193,7 +193,7 @@ UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userF
 	setFormWidget(UserFormModel::EmailField, new Wt::WLineEdit());
 	setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
 	setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
-	setFormWidget(UserFormModel::DashboardDisplayMode, createDashboardModeField());
+	setFormWidget(UserFormModel::DashboardDisplayMode, m_dashboardModeBoxField = createDashboardModeField());
 
 	if (user) {
 		m_user = *user;
@@ -306,6 +306,7 @@ void UserFormView::process(void)
 			m_user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
 			m_user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
 			m_user.role = DboUser::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
+			m_user.dashboardMode = m_dashboardModeBoxField->currentIndex();
 			m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
 			m_validated.emit(m_user);
 		}
@@ -323,10 +324,10 @@ void UserFormView::handleDeleteRequest(void)
 	confirmationBox->buttonClicked().connect(std::bind([=] () {
 																											 if (confirmationBox->buttonResult() == Wt::Yes) {
 																											 m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
-}
-delete confirmationBox;
-}));
-confirmationBox->show();
+		}
+		delete confirmationBox;
+	}));
+	confirmationBox->show();
 }
 
 
@@ -373,8 +374,8 @@ void UserFormView::createChangePasswordDialog(void)
 											const std::string& newPass){
 										m_changePasswordTriggered.emit(login, currentPass, newPass);
 				m_changePasswordDialog->accept();
-}, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
+	}, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+	changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
 }
 
 
@@ -385,15 +386,15 @@ Wt::WComboBox* UserFormView::createDashboardModeField(void)
 	Wt::WStandardItem* selectionItem = NULL;
 	selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::CompleteDashboard));
 	selectionItem->setData(DboUser::CompleteDashboard, Wt::UserRole);
-	selectionModel->setItem(0, 0, selectionItem);
-
-	selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::TileDashboard));
-	selectionItem->setData(DboUser::TileDashboard, Wt::UserRole);
-	selectionModel->setItem(1, 0, selectionItem);
+	selectionModel->setItem(DboUser::CompleteDashboard, 0, selectionItem);
 
 	selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::NoReportDashboard));
 	selectionItem->setData(DboUser::NoReportDashboard, Wt::UserRole);
-	selectionModel->setItem(2, 0, selectionItem);
+	selectionModel->setItem(DboUser::NoReportDashboard, 0, selectionItem);
+
+	selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::TileDashboard));
+	selectionItem->setData(DboUser::TileDashboard, Wt::UserRole);
+	selectionModel->setItem(DboUser::TileDashboard, 0, selectionItem);
 
 	Wt::WComboBox* fieldWidget = new Wt::WComboBox();
 	fieldWidget->setModel(selectionModel);

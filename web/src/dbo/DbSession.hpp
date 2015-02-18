@@ -59,11 +59,11 @@ public:
   void setLoggedUser(void);
   QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
 
-  int addUser(const DboUserT& user);
-  int updateUser(const DboUserT& user);
+	int addUser(const DboUserT& userInfo);
+	int updateUser(const DboUserT& userInfo);
   int deleteUser(const std::string& username);
   int deleteAuthSystemUsers(int authSystem);
-  bool findUser(const std::string& username, DboUserT& user);
+	bool findUser(const std::string& username, DboUserT& user);
   int updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
   void updateUserList(void);
   DbUsersT& userList(void) {return m_userList;}

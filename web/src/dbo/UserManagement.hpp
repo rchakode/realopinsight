@@ -121,6 +121,7 @@ private:
   UserFormModel* m_model;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
+	Wt::WComboBox* m_dashboardModeBoxField;
 
 	Wt::Signal<DboUserT> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
