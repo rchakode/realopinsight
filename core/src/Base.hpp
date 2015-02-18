@@ -39,6 +39,7 @@
 
 #ifdef REALOPINSIGHT_WEB
 const QString APP_NAME = QObject::tr("%1 Ultimate").arg(REALOPINSIGHT_APPLICATION_NAME);
+// See also the parameter max-request-size in config file
 const int MAX_FILE_UPLOAD = 2048; // 2MB
 const std::string LINK_HOME ="/home";
 const std::string LINK_LOAD ="/preview-view";
