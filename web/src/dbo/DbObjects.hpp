@@ -33,6 +33,7 @@
 #include <Wt/WDateTime>
 #include <QString>
 #include <QMap>
+#include "WebUtils.hpp"
 
 namespace dbo = Wt::Dbo;
 
@@ -60,16 +61,14 @@ struct NotificationT;
 namespace Wt {
   namespace Dbo {
     template<>
-    struct dbo_traits<DboView> : public dbo_default_traits
-    {
+    struct dbo_traits<DboView> : public dbo_default_traits {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
       static const char* surrogateIdField() { return 0; }
     };
 
     template<>
-    struct dbo_traits<DboUser> : public dbo_default_traits
-    {
+    struct dbo_traits<DboUser> : public dbo_default_traits {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
       static const char* surrogateIdField() { return 0; }
@@ -118,7 +117,7 @@ public:
   };
 
   enum DashboardModeT {
-    DefaultDashboard = 0,
+    CompleteDashboard = 0,
     NoReportDashboard = 1,
     TileDashboard = 2
   };
@@ -180,6 +179,24 @@ public:
   }
   static int role2Int(const std::string& role) {
     return role == "Administrator" ? AdmRole : OpRole;
+  }
+  static std::string dashboardMode2Text(int mode) {
+    std::string result = Q_TR("Default");
+    switch(mode) {
+      case TileDashboard:
+        result = Q_TR("Tile/Screen");
+        break;
+      case NoReportDashboard:
+        result = Q_TR("No Report");
+        break;
+      case CompleteDashboard:
+      default:
+        result = Q_TR("Complete");
+        break;
+    }
+
+    return result;
+
   }
 };
 

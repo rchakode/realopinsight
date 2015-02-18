@@ -317,6 +317,15 @@
     </div>
      ${</if:role>}
 
+     ${<if:dashboard-mode>}
+    <div class="control-group">
+          <label for="${id:dashboard-mode}" class="control-label">Dashboard Display*</label>
+          <div class="controls">
+              ${dashboard-mode} <span class="help-inline">${dashboard-mode-info}</span>
+          </div>
+    </div>
+     ${</if:dashboard-mode>}
+
       ${<if:registration-date>}
     <div class="control-group">
           <label for="${id:registration-date}" class="control-label">Registration*</label>

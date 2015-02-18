@@ -599,7 +599,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
-    case DboUser::AdmRole: {
+		case DboUser::AdmRole: {
       settingPageTpl->bindWidget("info-box", m_infoBox);
       m_preferences->setEnabledInputs(true);
 
@@ -758,8 +758,9 @@ void WebMainUI::createAccountPanel(void)
 {
   bool changedPassword(false);
   bool isUserForm(true);
-  m_userAccountForm = new UserFormView(&(m_dbSession->loggedUser()), changedPassword, isUserForm);
-  m_userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
+	DboUserT userInfo = m_dbSession->loggedUser().data();
+	m_userAccountForm = new UserFormView(&userInfo, changedPassword, isUserForm);
+	m_userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Update failed, see details in log."));
@@ -772,9 +773,8 @@ void WebMainUI::createPasswordPanel(void)
 {
   bool changedPassword(true);
   bool userForm(true);
-  m_changePasswordPanel = new UserFormView(&(m_dbSession->loggedUser()),
-                                           changedPassword,
-                                           userForm);
+	DboUserT userInfo = m_dbSession->loggedUser().data();
+	m_changePasswordPanel = new UserFormView(&userInfo, changedPassword, userForm);
   m_changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
                                                                      const std::string& lastpass,
                                                                      const std::string& pass) {
