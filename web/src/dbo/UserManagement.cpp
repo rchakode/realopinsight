@@ -107,7 +107,6 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
 			setWritable(false);
 		} else {
 			setVisible(RegistrationDateField, false);
-			setVisible(DashboardDisplayMode, false);
 		}
 	}
 }
@@ -134,6 +133,7 @@ void UserFormModel::setData(const DboUserT & user)
 	setValue(LastNameField, user.lastname);
 	setValue(EmailField, user.email);
 	setValue(UserLevelField, DboUser::role2Text(user.role));
+	setValue(DashboardDisplayMode, DboUser::dashboardMode2Text(user.dashboardMode));
 	setValue(RegistrationDateField, user.registrationDate);
 }
 

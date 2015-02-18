@@ -333,6 +333,7 @@
               ${registration-date} <span class="help-inline">${registration-date-info}</span>
            </div>
     </div>
+
       ${</if:registration-date>}
     <div class="form-actions">
         <span>${submit-button}</span>
