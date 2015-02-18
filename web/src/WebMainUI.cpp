@@ -759,7 +759,7 @@ void WebMainUI::createAccountPanel(void)
   bool changedPassword(false);
   bool isUserForm(true);
   m_userAccountForm = new UserFormView(&(m_dbSession->loggedUser()), changedPassword, isUserForm);
-  m_userAccountForm->validated().connect(std::bind([=](DboUser userToUpdate) {
+  m_userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Update failed, see details in log."));

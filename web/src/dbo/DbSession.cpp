@@ -82,7 +82,7 @@ void DbSession::setupDb(void)
 }
 
 
-int DbSession::addUser(const DboUser& user)
+int DbSession::addUser(const DboUserT& user)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
@@ -98,8 +98,8 @@ int DbSession::addUser(const DboUser& user)
       info.modify()->setEmail(user.email);
       m_passAuthService->updatePassword(dbuser, user.password);
       DboUser* userTmpPtr(new DboUser());
-      *userTmpPtr = user;
-      info.modify()->setUser(add(userTmpPtr));
+      userTmpPtr->setData(user);
+      info.modify()->setUser( add(userTmpPtr) );
       dbuser.addIdentity(Wt::Auth::Identity::LoginName, user.username);
       retValue = 0;
     }
@@ -112,7 +112,7 @@ int DbSession::addUser(const DboUser& user)
   return retValue;
 }
 
-int DbSession::updateUser(const DboUser& user)
+int DbSession::updateUser(const DboUserT& user)
 {
   int retValue = -1;
   try {
@@ -201,7 +201,7 @@ int DbSession::deleteAuthSystemUsers(int authSystem)
 }
 
 
-bool DbSession::findUser(const std::string& username, DboUser& user)
+bool DbSession::findUser(const std::string& username, DboUserT& user)
 {
   DbUsersT::const_iterator it = std::find_if(m_userList.cbegin(),
                                              m_userList.cend(),
@@ -209,7 +209,7 @@ bool DbSession::findUser(const std::string& username, DboUser& user)
   bool found = false;
   if (it != m_userList.end()) {
     found = true;
-    user = *it;
+    user = it->data();
   }
   return found;
 }
@@ -325,7 +325,7 @@ void DbSession::initDb(void)
     WebPreferencesBase pref;
     if (pref.getDbState() != 1) {
       createTables();
-      DboUser adm;
+      DboUserT adm;
       adm.username = "admin";
       adm.password = "password";
       adm.firstname = "Default";

@@ -98,12 +98,29 @@ public:
   }
 };
 
+struct DboUserT {
+  std::string username;
+  std::string password;
+  std::string firstname;
+  std::string lastname;
+  std::string email;
+  int role;
+  std::string registrationDate;
+  int authsystem;
+  int dashboardMode;
+};
 
 class DboUser {
 public:
   enum RoleT {
     AdmRole = 100,
     OpRole = 101
+  };
+
+  enum DashboardModeT {
+    DefaultDashboard = 0,
+    NoReportDashboard = 1,
+    TileDashboard = 2
   };
 
   std::string username;
@@ -113,7 +130,9 @@ public:
   std::string email;
   int role;
   std::string registrationDate;
-  int authsystem; // e.g. LDAP or BuiltIn
+  int authsystem;
+  int dashboardMode;
+
   dbo::collection< dbo::ptr<DboView> > views;
   dbo::collection< dbo::ptr<DboNotification> > ack_notifications;
 
@@ -128,6 +147,32 @@ public:
     dbo::field(a, authsystem, "authsystem");
     dbo::hasMany(a, views, dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
     dbo::hasMany(a, ack_notifications, dbo::ManyToOne, "ack_user");
+  }
+
+  void setData(const DboUserT& userInfo) {
+    username = userInfo.username;
+    password = userInfo.password;
+    firstname = userInfo.firstname;
+    lastname = userInfo.lastname;
+    email = userInfo.email;
+    role = userInfo.role;
+    registrationDate = userInfo.registrationDate;
+    authsystem = userInfo.authsystem;
+    dashboardMode = userInfo.dashboardMode;
+  }
+
+  DboUserT data(void) const {
+    DboUserT u;
+    u.username = username;
+    u.password = password;
+    u.firstname = firstname;
+    u.lastname = lastname;
+    u.email = email;
+    u.role = role;
+    u.registrationDate = registrationDate;
+    u.authsystem = authsystem;
+    u.dashboardMode = dashboardMode;
+    return u;
   }
 
   static std::string role2Text(int role) {
