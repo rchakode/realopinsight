@@ -69,7 +69,7 @@ public Q_SLOTS:
   void processCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
   void importNagiosChecks(void);
   void importZabbixTriggersAsDataPoints(void);
-  void importZabbixTriggersAsHostBasedBusinessView(void);
+  void importChecksAsHostBasedBusinessView(void);
   void importZabbixITServicesAsBusinessViews(void);
   void importZenossComponents(void);
   void importPandoraModules(void);

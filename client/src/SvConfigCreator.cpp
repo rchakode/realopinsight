@@ -96,7 +96,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsDataPoints()));
   connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServicesAsBusinessViews()));
-  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsHostBasedBusinessView()));
+  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importChecksAsHostBasedBusinessView()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
@@ -193,7 +193,7 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
   QStringList sourceList;
   for (int i = 0; i< MAX_SRCS; ++i) {
     if (preferences.loadSource(i, srcInfo)) {
-      if (srcInfo.mon_type == type) {
+      if (srcInfo.mon_type == type || type == ngrt4n::Auto) {
         sourceList.push_back(srcInfo.id);
         sourceInfos.insert(srcInfo.id, srcInfo);
       }
@@ -480,10 +480,10 @@ void SvCreator::importZabbixTriggersAsDataPoints(void)
   }
 }
 
-void SvCreator::importZabbixTriggersAsHostBasedBusinessView(void)
+void SvCreator::importChecksAsHostBasedBusinessView(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(ngrt4n::Auto, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -493,67 +493,83 @@ void SvCreator::importZabbixTriggersAsHostBasedBusinessView(void)
     showStatusMsg(tr("Importing Zabbix triggers (%1:%2...)").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
-    ZbxHelper handler;
-    if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
-      showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
+    bool success = false;
+    if (srcInfo.mon_type == ngrt4n::Zabbix) {
+      ZbxHelper handler;
+      if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
+        showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
+      } else {
+        if (checks.empty()) {
+          if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
+            showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
+          }
+        }
+      }
+    } else if (srcInfo.mon_type == ngrt4n::Nagios) {
+      ChecksT checks;
+      LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
+      // FIXME: add support for hostgroup filtering
+      if (handler.setupSocket() == 0 && handler.loadChecks(host, checks) == 0) {
+        success = true;
+      } else {
+        showStatusMsg(tr("%1").arg(handler.lastError()), true);
+      }
     } else {
-      if (checks.empty()) {
-        if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
-          showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
-        }
-      }
+      //TODO: processing for other monitor
+      showStatusMsg(tr("Importation for monitor type %1 is not supported yet").arg(QString::number(srcInfo.mon_type)), true);
+    }
 
-      showStatusMsg(tr("%1 trigger(s) imported").arg(QString::number(checks.size())), false);
+    //FIXME: do not treat failing ?
+    showStatusMsg(tr("%1 entry(ies) imported").arg(QString::number(checks.size())), false);
 
-      // handle results
-      if (! checks.empty()) {
-        ngrt4n::clearCoreData(*m_cdata);
-        m_cdata->monitor = ngrt4n::Auto;
+    // handle results
+    if (! checks.empty()) {
+      ngrt4n::clearCoreData(*m_cdata);
+      m_cdata->monitor = ngrt4n::Auto;
 
-        NodeT root;
-        root.id = ngrt4n::ROOT_ID;
-        root.name = filter.isEmpty() ? tr("Zabbix Services") : filter;
-        root.type = NodeType::BusinessService;
+      NodeT root;
+      root.id = ngrt4n::ROOT_ID;
+      root.name = filter.isEmpty() ? tr("Zabbix Services") : filter;
+      root.type = NodeType::BusinessService;
 
-        NodeT hostNode;
-        NodeT triggerNode;
-        hostNode.type = NodeType::BusinessService;
-        triggerNode.type = NodeType::ITService;
+      NodeT hostNode;
+      NodeT triggerNode;
+      hostNode.type = NodeType::BusinessService;
+      triggerNode.type = NodeType::ITService;
 
-        for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-          hostNode.parent = root.id;
-          hostNode.name = hostNode.description = QString::fromStdString(check->host);
-          hostNode.id = "";
-          Q_FOREACH(QChar c, hostNode.name) {
-            if (c.isLetterOrNumber()) {
-              hostNode.id.append(c);
-            }
+      for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
+        hostNode.parent = root.id;
+        hostNode.name = hostNode.description = QString::fromStdString(check->host);
+        hostNode.id = "";
+        Q_FOREACH(QChar c, hostNode.name) {
+          if (c.isLetterOrNumber()) {
+            hostNode.id.append(c);
           }
-          triggerNode.id = ngrt4n::genNodeId();
-          triggerNode.parent = hostNode.id;
-          QString checkId = QString::fromStdString(check->id);
-          triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
-          triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
+        }
+        triggerNode.id = ngrt4n::genNodeId();
+        triggerNode.parent = hostNode.id;
+        QString checkId = QString::fromStdString(check->id);
+        triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+        triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
 
-          NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
-          if (hostIterPos != m_cdata->bpnodes.end()) {
-            hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+        NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
+        if (hostIterPos != m_cdata->bpnodes.end()) {
+          hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+        } else {
+          hostNode.child_nodes = triggerNode.id;
+          if (root.child_nodes.isEmpty()) {
+            root.child_nodes = hostNode.id;
           } else {
-            hostNode.child_nodes = triggerNode.id;
-            if (root.child_nodes.isEmpty()) {
-              root.child_nodes = hostNode.id;
-            } else {
-              root.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
-            }
-            m_cdata->bpnodes.insert(hostNode.id, hostNode);
+            root.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
           }
-          m_cdata->cnodes.insert(triggerNode.id, triggerNode);
+          m_cdata->bpnodes.insert(hostNode.id, hostNode);
         }
-
-        // finally insert the root node and update UI widgets
-        m_cdata->bpnodes.insert(ngrt4n::ROOT_ID, root);
-        refreshUIWidgets();
+        m_cdata->cnodes.insert(triggerNode.id, triggerNode);
       }
+
+      // finally insert the root node and update UI widgets
+      m_cdata->bpnodes.insert(ngrt4n::ROOT_ID, root);
+      refreshUIWidgets();
     }
   }
 }
