@@ -331,7 +331,7 @@ void WebMainUI::hideAdminSettingsMenu(void)
 {
   m_preferences->showAuthSettingsWidgets(false);
   m_preferences->showNotificationSettingsWidgets(false);
-  wApp->doJavaScript("$('#userMenuBlock').hide(); "
+	wApp->doJavaScript("$('#userMenuBlock').hide();"
                      "$('#viewMenuBlock').hide();"
                      "$('#menu-auth-settings').hide();"
                      "$('#menu-notification-settings').hide();");
@@ -407,7 +407,7 @@ void WebMainUI::handleRefresh(void)
     if (thumbItem != m_thumbnailItems.end()) {
       (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbItem)->setToolTip(dashboard->tooltip());
-			if (m_dbSession->loggedUser().dashboardMode == DboUser::CompleteDashboard) {
+			if (m_dbSession->isCompleteUserDashboard()) {
 				updateViewBiCharts(rootServiceName);
 			}
     }
@@ -911,10 +911,21 @@ void WebMainUI::initOperatorDashboard(void)
       m_thumbnailItems.insert(view.name, thumbItem);
       ++thumbIndex;
     }
-  }
+	}
 
-	int dashboardMode = m_dbSession->loggedUser().dashboardMode;
-	if (dashboardMode == DboUser::CompleteDashboard) {
+	showConditionalUiWidgets();
+
+  if (thumbIndex > 0) {
+    startDashbaordUpdate();
+  } else {
+    thumbLayout->addWidget(new Wt::WText(tr("No view to display").toStdString()), 0, 0);
+  }
+}
+
+
+void WebMainUI::showConditionalUiWidgets(void)
+{
+	if (m_dbSession->isCompleteUserDashboard()) {
 		Wt::WContainerWidget* reportContainer = new Wt::WContainerWidget(m_mainWidget);
 		Wt::WGridLayout* reportsLayout = new Wt::WGridLayout(reportContainer);
 		int biIndex = 0;
@@ -934,15 +945,16 @@ void WebMainUI::initOperatorDashboard(void)
 		m_opsHomeTpl->bindEmpty("bi-report-title");
 		m_opsHomeTpl->bindEmpty("report-period-header-pane");
 		m_opsHomeTpl->bindEmpty("bigraphs");
+		if (m_dbSession->isTileUserDashboard()) {
+			doJavaScript("$('#ngrt4n-side-pane').hide();");
+			doJavaScript("$('#ngrt4n-content-pane').width('100%');");
+		} else {
+			doJavaScript("$('#ngrt4n-side-pane').show();");
+			doJavaScript("$('#ngrt4n-content-pane').width('70%');");
+			doJavaScript("$('#ngrt4n-side-pane').width('28%');");
+		}
 	}
-
-  if (thumbIndex > 0) {
-    startDashbaordUpdate();
-  } else {
-    thumbLayout->addWidget(new Wt::WText(tr("No view to display").toStdString()), 0, 0);
-  }
 }
-
 
 Wt::WTemplate* WebMainUI::createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer)
 {

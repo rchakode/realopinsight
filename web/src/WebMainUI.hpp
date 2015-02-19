@@ -164,7 +164,7 @@ private:
   Wt::WAnchor* m_reportApplyAnchor;
 
   Wt::WComboBox* m_selectViewBreadCrumbsBox;
-  Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
+	Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -206,6 +206,7 @@ private:
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
   void hideAdminSettingsMenu(void);
+	void showConditionalUiWidgets(void);
 
   WebNotificationManager* createNotificationManager(void);
   Wt::WNavigationBar* createNavivationBar(void);

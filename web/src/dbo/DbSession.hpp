@@ -55,7 +55,10 @@ public:
   bool isLogged(void) {return loginObject().loggedIn();}
   bool isLoggedAdmin(void) {return loggedUser().role == DboUser::AdmRole;}
   void configureAuth(void);
-  const DboUser& loggedUser(void)const {return m_loggedUser;}
+	const DboUser& loggedUser(void) const {return m_loggedUser;}
+	bool isCompleteUserDashboard(void) const {return loggedUser().dashboardMode == DboUser::CompleteDashboard;}
+	bool isTileUserDashboard(void) const {return loggedUser().dashboardMode == DboUser::TileDashboard;}
+	bool isReportUserDashboard(void) const {return loggedUser().dashboardMode == DboUser::NoReportDashboard;}
   void setLoggedUser(void);
   QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
 
