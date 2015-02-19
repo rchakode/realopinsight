@@ -125,7 +125,7 @@ private:
   std::string m_confdir;
   Wt::WContainerWidget* m_mainWidget;
   Wt::WWidget* m_settingsPageWidget;
-	Wt::WTemplate* m_opsHomeTpl;
+  Wt::WTemplate* m_opsHomeTpl;
   Settings* m_settings;
   Wt::WText* m_infoBox;
 
@@ -164,7 +164,7 @@ private:
   Wt::WAnchor* m_reportApplyAnchor;
 
   Wt::WComboBox* m_selectViewBreadCrumbsBox;
-	Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
+  Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -206,7 +206,7 @@ private:
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
   void hideAdminSettingsMenu(void);
-	void showConditionalUiWidgets(void);
+  void showConditionalUiWidgets(void);
 
   WebNotificationManager* createNotificationManager(void);
   Wt::WNavigationBar* createNavivationBar(void);
@@ -220,7 +220,7 @@ private:
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
   Wt::WWidget* createNotificationSection(void);
-	Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
+  Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
 };
 
 #endif // MAINWEBWINDOW_HPP
