@@ -229,7 +229,7 @@ void SvCreator::importNagiosLivestatusChecks(void)
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.filter();
+    QString hostgroupFilter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     showStatusMsg(tr("Loading checks from %1:%2:%3...")
@@ -239,7 +239,7 @@ void SvCreator::importNagiosLivestatusChecks(void)
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
     int retcode = handler.setupSocket();
     if (retcode == 0) {
-      retcode = handler.loadChecks(host, checks);
+      retcode = handler.loadChecks(hostgroupFilter, checks);
     }
     processCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
