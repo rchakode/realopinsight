@@ -96,7 +96,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsDataPoints()));
   connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServicesAsBusinessViews()));
-  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsBundleBusinessView()));
+  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsHostBasedBusinessView()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
@@ -480,7 +480,7 @@ void SvCreator::importZabbixTriggersAsDataPoints(void)
   }
 }
 
-void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
+void SvCreator::importZabbixTriggersAsHostBasedBusinessView(void)
 {
   QMap<QString, SourceT> sourceInfos;
   fetchSourceList(ngrt4n::Zabbix, sourceInfos);
