@@ -493,7 +493,6 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
     showStatusMsg(tr("Importing Zabbix triggers (%1:%2...)").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
-    bool success = false;
     if (srcInfo.mon_type == ngrt4n::Zabbix) {
       ZbxHelper handler;
       if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
@@ -508,10 +507,8 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
     } else if (srcInfo.mon_type == ngrt4n::Nagios) {
       ChecksT checks;
       LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
-      // FIXME: add support for hostgroup filtering
-      if (handler.setupSocket() == 0 && handler.loadChecks(host, checks) == 0) {
-        success = true;
-      } else {
+      // FIXME: filter is now used as host name => add support for hostgroup filtering
+      if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
         showStatusMsg(tr("%1").arg(handler.lastError()), true);
       }
     } else {
