@@ -66,7 +66,7 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
 
   QString emailSubject;
   if (lastStatus != ngrt4n::Normal && node.sev == ngrt4n::Normal) {
-    emailSubject = QString("%1 - Recovery").arg(node.name);
+		emailSubject = QString("%1 - Recovered").arg(node.name);
   } else {
     emailSubject = QString("%1 - %2 Problem").arg(node.name, statusString);
   }
