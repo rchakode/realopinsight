@@ -70,7 +70,7 @@ int NotificationTableView::update(void)
   int retCode = -1;
   setDisabled(true);
   NotificationMapT notifications;
-  int result = m_dbSession->fetchUserRelatedNotifications(notifications, m_dbSession->loggedUser().username);
+  int result = m_dbSession->queryViewRelatedNotifications(notifications, m_dbSession->loggedUser().username);
   if (result < 0) {
     m_lastError = m_dbSession->lastError();
   } else {

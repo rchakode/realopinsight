@@ -75,10 +75,11 @@ public:
   int deleteView(std::string viewName);
   int assignView(const std::string& userName, const std::string& viewName);
   int revokeView(const std::string& userName, const std::string& viewName);
-  int fetchAssignedUserEmails(QStringList& emails, const std::string& viewName);
+	int queryAssignedUserEmails(QStringList& emails, const std::string& viewName);
 
   int addQosData(const QosDataT& qosData);
-  int fetchQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate = 0, long toDate = LONG_MAX);
+	int queryQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate = 0, long toDate = LONG_MAX);
+	int queryLastQosData(QosDataT& qosData, const std::string& viewName);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);
@@ -91,11 +92,10 @@ public:
   int addSession(const DboLoginSession& session);
   int checkUserCookie(const DboLoginSession& session);
 
-  int addNotification(const std::string& viewName, int viewStatus);
-  int fetchUserRelatedNotifications(const std::string& viewame);
+	int addNotification(const std::string& viewName, int viewStatus);
   int changeNotificationStatus(const std::string& userName, const std::string& viewName, int newStatus);
-  bool fetchNotificationInfo(NotificationT& notification, const std::string& viewName);
-  int fetchUserRelatedNotifications(NotificationMapT& notifications, const std::string& userName);
+	int queryNotificationInfo(NotificationT& notification,const std::string& viewName,int lastViewState);
+	int queryViewRelatedNotifications(NotificationMapT& notifications, const std::string& userName);
 
 private:
   std::string m_dbPath;

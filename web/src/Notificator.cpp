@@ -97,18 +97,18 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
   std::string viewName = node.name.toStdString();
 
   QStringList notificationRecipients;
-  if (m_dbSession->fetchAssignedUserEmails(notificationRecipients, viewName) <= 0) {
+	if (m_dbSession->queryAssignedUserEmails(notificationRecipients, viewName) <= 0) {
     REPORTD_LOG("info", QString("No notification recipients for view %1").arg(viewName.c_str()));
     return;
   }
 
   NotificationT notificationData;
-  bool notifiticationEntryFound = m_dbSession->fetchNotificationInfo(notificationData, viewName);
-  if (node.sev != ngrt4n::Normal) { //proble state
-    if (! notifiticationEntryFound || notificationData.ack_status == DboNotification::Closed) { // send new notification
+	int notifQueryResult = m_dbSession->queryNotificationInfo(notificationData, viewName);
+	if (node.sev != ngrt4n::Normal) { //problem state
+		if (notifQueryResult != 1 || notificationData.ack_status == DboNotification::Closed) { // send new notification
       sendEmailNotification(node, ngrt4n::Normal, qosData, notificationRecipients);
 
-      if (! notifiticationEntryFound) {
+			if (notifQueryResult != 1) {
         m_dbSession->addNotification(viewName, node.sev);
       } else  {
         m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
@@ -129,7 +129,7 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
       }
     }
   } else {  // normal state
-    if (notifiticationEntryFound) { // if there were problems
+		if (notifQueryResult == 1) { // if there were problems
       if (notificationData.view_status != node.sev) { // service recovered
         sendEmailNotification(node, notificationData.view_status, qosData, notificationRecipients);
       }
