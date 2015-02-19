@@ -94,7 +94,7 @@ public:
 
 	int addNotification(const std::string& viewName, int viewStatus);
   int changeNotificationStatus(const std::string& userName, const std::string& viewName, int newStatus);
-	int queryNotificationInfo(NotificationT& notification,const std::string& viewName,int lastViewState);
+	int queryNotificationInfo(NotificationT& notification,const std::string& viewName);
 	int queryViewRelatedNotifications(NotificationMapT& notifications, const std::string& userName);
 
 private:

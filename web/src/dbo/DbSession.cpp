@@ -70,7 +70,7 @@ DbSession::~DbSession()
 
 void DbSession::setupDb(void)
 {
-	mapClass<DboUser>("user");
+  mapClass<DboUser>("user");
   mapClass<DboView>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DboLoginSession>("login_session");
@@ -87,7 +87,7 @@ int DbSession::addUser(const DboUserT& userInfo)
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-		DboUserCollectionT users = find<DboUser>().where("name=?").bind(userInfo.username);
+    DboUserCollectionT users = find<DboUser>().where("name=?").bind(userInfo.username);
     if (users.size() > 0) {
       m_lastError = "Failed: a user with the same username already exist.";
       LOG("error", m_lastError);
@@ -95,17 +95,17 @@ int DbSession::addUser(const DboUserT& userInfo)
     } else {
       Wt::Auth::User dbuser = m_dbUsers->registerNew();
       dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
-			info.modify()->setEmail(userInfo.email);
-			m_passAuthService->updatePassword(dbuser, userInfo.password);
-			DboUser* userTmpPtr(new DboUser());
-			userTmpPtr->setData(userInfo);
-			info.modify()->setUser( add(userTmpPtr) );
-			dbuser.addIdentity(Wt::Auth::Identity::LoginName, userInfo.username);
+      info.modify()->setEmail(userInfo.email);
+      m_passAuthService->updatePassword(dbuser, userInfo.password);
+      DboUser* userTmpPtr(new DboUser());
+      userTmpPtr->setData(userInfo);
+      info.modify()->setUser( add(userTmpPtr) );
+      dbuser.addIdentity(Wt::Auth::Identity::LoginName, userInfo.username);
       retValue = 0;
     }
   } catch (const dbo::Exception& ex) {
-		m_lastError = "Failed to add the user.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    m_lastError = "Failed to add the user.";
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   updateUserList();
@@ -117,20 +117,20 @@ int DbSession::updateUser(const DboUserT& userInfo)
   int retValue = -1;
   try {
     dbo::Transaction transaction(*this);
-		dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(userInfo.username);
-		dbo::ptr<DboUser> userPtr = authInfo.modify()->user();
-		userPtr.modify()->username = userInfo.username;
-		userPtr.modify()->lastname = userInfo.lastname;
-		userPtr.modify()->firstname = userInfo.firstname;
-		userPtr.modify()->email = userInfo.email;
-		userPtr.modify()->role = userInfo.role;
-		userPtr.modify()->dashboardMode = userInfo.dashboardMode;
-		authInfo.modify()->setEmail(userInfo.email);
+    dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(userInfo.username);
+    dbo::ptr<DboUser> userPtr = authInfo.modify()->user();
+    userPtr.modify()->username = userInfo.username;
+    userPtr.modify()->lastname = userInfo.lastname;
+    userPtr.modify()->firstname = userInfo.firstname;
+    userPtr.modify()->email = userInfo.email;
+    userPtr.modify()->role = userInfo.role;
+    userPtr.modify()->dashboardMode = userInfo.dashboardMode;
+    authInfo.modify()->setEmail(userInfo.email);
     retValue = 0;
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-		m_lastError = "Failed to update the user.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    m_lastError = "Failed to update the user.";
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   updateUserList();
   return retValue;
@@ -158,7 +158,7 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
     }
   } catch (const dbo::Exception& ex) {
     retValue = -1;
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   updateUserList();
@@ -171,12 +171,12 @@ int DbSession::deleteUser(const std::string& username)
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-		dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(username);
+    dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(username);
     usr.remove();
     retValue = 0;
   } catch (const dbo::Exception& ex) {
     retValue = 1;
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   updateUserList();
@@ -189,12 +189,12 @@ int DbSession::deleteAuthSystemUsers(int authSystem)
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-		dbo::ptr<DboUser> usr = find<DboUser>().where("authsystem=?").bind(authSystem);
+    dbo::ptr<DboUser> usr = find<DboUser>().where("authsystem=?").bind(authSystem);
     usr.remove();
     retValue = 0;
   } catch (const dbo::Exception& ex) {
     retValue = 1;
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   updateUserList();
@@ -206,13 +206,13 @@ bool DbSession::findUser(const std::string& username, DboUserT& user)
 {
   DbUsersT::const_iterator it = std::find_if(m_userList.cbegin(),
                                              m_userList.cend(),
-																						 [&username](const DboUser& u){return u.username == username;});
-  bool found = false;
-  if (it != m_userList.end()) {
-    found = true;
-		user = it->data();
-  }
-  return found;
+                                             [&username](const DboUser& u){return u.username == username;});
+bool found = false;
+if (it != m_userList.end()) {
+  found = true;
+  user = it->data();
+}
+return found;
 }
 
 
@@ -257,7 +257,7 @@ void DbSession::setLoggedUser(void)
     dbo::ptr<AuthInfo> info = find<AuthInfo>().where("id=?").bind(dbUserId);
     m_loggedUser = *(info.modify()->user());
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
 }
@@ -267,12 +267,12 @@ void DbSession::updateUserList(void)
   dbo::Transaction transaction(*this);
   try {
     m_userList.clear();
-		DboUserCollectionT users = find<DboUser>();
+    DboUserCollectionT users = find<DboUser>();
     for (auto &user : users) {
       m_userList.push_back(*user);
     }
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
 }
@@ -287,7 +287,7 @@ void DbSession::updateViewList(void)
       m_viewList.push_back(*view);
     }
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
 }
@@ -297,12 +297,12 @@ void DbSession::updateViewList(const std::string& uname)
   dbo::Transaction transaction(*this);
   try {
     m_viewList.clear();
-		dbo::ptr<DboUser> userDboPtr = find<DboUser>().where("name=?").bind(uname);
+    dbo::ptr<DboUser> userDboPtr = find<DboUser>().where("name=?").bind(uname);
     for (auto& view : userDboPtr.modify()->views) {
       m_viewList.push_back(*view);
     }
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
 }
@@ -312,12 +312,12 @@ bool DbSession::findView(const std::string& vname, DboView& view)
   DbViewsT::const_iterator it = std::find_if(m_viewList.cbegin(),
                                              m_viewList.cend(),
                                              [&vname](const DboView& v){return v.name == vname;});
-  bool found = false;
-  if (it != m_viewList.end()) {
-    found = true;
-    view = *it;
-  }
-  return found;
+bool found = false;
+if (it != m_viewList.end()) {
+  found = true;
+  view = *it;
+}
+return found;
 }
 
 void DbSession::initDb(void)
@@ -326,12 +326,12 @@ void DbSession::initDb(void)
     WebPreferencesBase pref;
     if (pref.getDbState() != 1) {
       createTables();
-			DboUserT adm;
+      DboUserT adm;
       adm.username = "admin";
       adm.password = "password";
       adm.firstname = "Default";
       adm.lastname = "Administrator";
-			adm.role = DboUser::AdmRole;
+      adm.role = DboUser::AdmRole;
       adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
       addUser(adm);
       pref.setDbState(1);
@@ -339,7 +339,7 @@ void DbSession::initDb(void)
     }
   } catch (dbo::Exception& ex) {
     LOG("error", "Failed initializing the database");
-		LOG("error", QObject::tr("%1: Failed initializing the database. %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: Failed initializing the database. %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 }
 
@@ -351,7 +351,7 @@ int DbSession::addView(const DboView& view)
     DboViewCollectionT views = find<DboView>().where("name=?").bind(view.name);
     if (views.size() > 0) {
       m_lastError = "Failed: a view with the same name already exist.";
-			LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
+      LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
       retValue = 1;
     } else {
       DboView* viewTmpPtr(new DboView());
@@ -364,7 +364,7 @@ int DbSession::addView(const DboView& view)
     LOG("error", ex.what());
   } catch(const std::exception& ex) {
     m_lastError = ex.what();
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   transaction.commit();
@@ -381,11 +381,11 @@ int DbSession::deleteView(std::string viewName)
     execute("DELETE FROM view WHERE name = ?;").bind(viewName);
     retValue = 0;
   } catch (const Wt::Dbo::backend::Sqlite3Exception& ex) {
-		m_lastError = ex.what();
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    m_lastError = ex.what();
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   } catch (const dbo::Exception& ex) {
     m_lastError = ex.what();
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   updateViewList();
@@ -397,7 +397,7 @@ void DbSession::updateUserViewList(void)
 {
   m_userViewList.clear();
   dbo::Transaction transaction(*this);
-	DboUserCollectionT users = find<DboUser>();
+  DboUserCollectionT users = find<DboUser>();
   for (auto& user : users) {
     for (const auto& view: user->views) {
       m_userViewList.insert(user->username+":"+view->name);
@@ -413,15 +413,15 @@ int DbSession::assignView(const std::string& userName, const std::string& vname)
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-		dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(userName);
+    dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(userName);
     dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
     retValue = 0;
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   } catch(const std::exception& ex) {
     m_lastError = ex.what();
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   transaction.commit();
@@ -435,17 +435,17 @@ int DbSession::revokeView(const std::string& userName, const std::string& viewNa
   try {
     dbo::Transaction transaction(*this);
 
-		dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userName);
+    dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userName);
     dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewName);
     userPtr.modify()->views.erase(viewPtr);
     retValue = 0;
 
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   } catch(const std::exception& ex) {
     m_lastError = ex.what();
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   return retValue;
 }
@@ -470,7 +470,7 @@ int DbSession::queryAssignedUserEmails(QStringList& emails, const std::string& v
     }
     retValue = emails.size();
   } catch (const dbo::Exception& ex) {
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   return retValue;
@@ -494,7 +494,7 @@ int DbSession::addSession(const DboLoginSession& session)
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the session. More details in log.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   return retValue;
@@ -509,14 +509,14 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     DboLoginSessionCollectionT sessions = find<DboLoginSession>()
-        .where("username=? AND session_id=? AND status = ?")
-        .bind(session.username)
-        .bind(session.sessionId)
-        .bind(DboLoginSession::ExpiredCookie);
+                                          .where("username=? AND session_id=? AND status = ?")
+                                          .bind(session.username)
+                                          .bind(session.sessionId)
+                                          .bind(DboLoginSession::ExpiredCookie);
     retValue = sessions.size()? DboLoginSession::ActiveCookie : DboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
 
@@ -537,7 +537,7 @@ int DbSession::addQosData(const QosDataT& qosData)
     m_lastError = Q_TR("QoS entry added: ") + dboEntry->toString();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add QoS entry. More details in log.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   return retValue;
@@ -553,14 +553,14 @@ int DbSession::queryQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
     DboQosDataCollectionT dbEntries;
     if (viewName.empty()) {
       dbEntries = find<DboQosData>()
-          .where("timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(fromDate).bind(toDate);
+                  .where("timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(fromDate).bind(toDate);
     } else {
       dbEntries = find<DboQosData>()
-          .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(viewName).bind(fromDate).bind(toDate);
+                  .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(viewName).bind(fromDate).bind(toDate);
     }
 
     qosDataMap.clear();
@@ -571,7 +571,7 @@ int DbSession::queryQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
     retValue = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to fetch QoS entries. More details in log.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   return retValue;
@@ -580,17 +580,30 @@ int DbSession::queryQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
 
 int DbSession::queryLastQosData(QosDataT& qosData, const std::string& viewName)
 {
-	int retValue = -1;
-	dbo::Transaction transaction(*this);
-	try {
-		//FIXME:
-		retValue = 0;
-	} catch (const dbo::Exception& ex) {
-		m_lastError = "Failed to fetch QoS entries. More details in log.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
-	}
-	transaction.commit();
-	return retValue;
+  int retValue = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    DboQosDataCollectionT queryResults;
+    if (viewName.empty()) {
+      queryResults = find<DboQosData>()
+                 .orderBy("timestamp DESC")
+                 .limit(1);
+    } else {
+      queryResults = find<DboQosData>()
+                 .orderBy("timestamp DESC")
+                 .limit(1);
+    }
+
+    if (queryResults.size() == 1) {
+      retValue = 0;
+      qosData =  queryResults.begin()->modify()->data();
+    }
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to fetch last QoS entry.";
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+  }
+  transaction.commit();
+  return retValue;
 }
 
 
@@ -613,7 +626,7 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
     retValue = 0;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add notification entry into database.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   transaction.commit();
@@ -627,14 +640,14 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-		dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
     if (! dboUser) {
       m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
-			LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
+      LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
     } else {
       long ackTimestamp = time(NULL);
       DboViewCollectionT dboViews;
-			if (dboUser->role == DboUser::AdmRole) {
+      if (dboUser->role == DboUser::AdmRole) {
         dboViews = find<DboView>();
       } else {
         dboViews = dboUser->views;
@@ -644,8 +657,8 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
         DboNotificationCollectionT dboNotifications;
         std::string actualViewname = viewName.empty()? dboView->name : viewName;
         dboNotifications = find<DboNotification>()
-            .where("view_name = ?")
-            .bind(actualViewname);
+                           .where("view_name = ?")
+                           .bind(actualViewname);
 
         for (auto& notifDbEntry: dboNotifications) {
           notifDbEntry.modify()->ack_status = newStatus;
@@ -657,7 +670,7 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed changing notification state.";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   transaction.commit();
@@ -666,10 +679,9 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
 }
 
 
-int DbSession::queryNotificationInfo(NotificationT& notification,const std::string& viewName,int lastViewState)
+int DbSession::queryNotificationInfo(NotificationT& notification,const std::string& viewName)
 {
-	int result = 0;
-	lastViewState= ngrt4n::Unknown;
+  int result = 0;
 
   dbo::Transaction transaction(*this);
 
@@ -678,20 +690,19 @@ int DbSession::queryNotificationInfo(NotificationT& notification,const std::stri
       dbo::ptr<DboNotification> dbNotifEntry = find<DboNotification>().where("view_name = ?").bind(viewName);
       if (dbNotifEntry) {
         notification = dbNotifEntry->data();
-				lastViewState = notification.view_status;
-				result = 1;
-			} else {
+        result = 1;
+      } else {
 
-			}
+      }
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed fetching notification data";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   transaction.commit();
 
-	return result;
+  return result;
 }
 
 
@@ -700,14 +711,14 @@ int DbSession::queryViewRelatedNotifications(NotificationMapT& notifications, co
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-		dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
     if (! dboUser) {
       m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
       LOG("error", QObject::tr("DbSession::fetchUserRelatedNotifications: %1").arg(m_lastError.c_str()).toStdString());
     } else {
       DboNotificationCollectionT dboNotifications;
       notifications.clear();
-			if (dboUser->role == DboUser::AdmRole) {
+      if (dboUser->role == DboUser::AdmRole) {
         dboNotifications = find<DboNotification>().orderBy("last_change");
         for (const auto& entry: dboNotifications) {
           NotificationT data = entry->data();
@@ -739,7 +750,7 @@ int DbSession::queryViewRelatedNotifications(NotificationMapT& notifications, co
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Query failed when fetching notification data";
-		LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   transaction.commit();

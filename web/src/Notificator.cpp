@@ -66,7 +66,7 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
 
   QString emailSubject;
   if (lastStatus != ngrt4n::Normal && node.sev == ngrt4n::Normal) {
-		emailSubject = QString("%1 - Recovered").arg(node.name);
+    emailSubject = QString("%1 - Recovered").arg(node.name);
   } else {
     emailSubject = QString("%1 - %2 Problem").arg(node.name, statusString);
   }
@@ -92,30 +92,32 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
   REPORTD_LOG(logLevel, QObject::tr("[Notificator] %1").arg(m_mailSender->lastError()));
 }
 
-void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
+void Notificator::handleNotification(const NodeT& node,
+                                     const QosDataT& qosData,
+                                     const QosDataT& prevQosData)
 {
   std::string viewName = node.name.toStdString();
 
   QStringList notificationRecipients;
-	if (m_dbSession->queryAssignedUserEmails(notificationRecipients, viewName) <= 0) {
+  if (m_dbSession->queryAssignedUserEmails(notificationRecipients, viewName) <= 0) {
     REPORTD_LOG("info", QString("No notification recipients for view %1").arg(viewName.c_str()));
     return;
   }
 
   NotificationT notificationData;
-	int notifQueryResult = m_dbSession->queryNotificationInfo(notificationData, viewName);
-	if (node.sev != ngrt4n::Normal) { //problem state
-		if (notifQueryResult != 1 || notificationData.ack_status == DboNotification::Closed) { // send new notification
-      sendEmailNotification(node, ngrt4n::Normal, qosData, notificationRecipients);
+  int notifQueryResult = m_dbSession->queryNotificationInfo(notificationData, viewName);
+  if (node.sev != ngrt4n::Normal) { //problem state
+    if (notifQueryResult != 1 || notificationData.ack_status == DboNotification::Closed) { // send new notification
+      sendEmailNotification(node, prevQosData.status, qosData, notificationRecipients);
 
-			if (notifQueryResult != 1) {
+      if (notifQueryResult != 1) {
         m_dbSession->addNotification(viewName, node.sev);
       } else  {
         m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
       }
     } else {
       if (notificationData.view_status != node.sev) { //severity changed
-        sendEmailNotification(node, notificationData.view_status, qosData, notificationRecipients);
+        sendEmailNotification(node, prevQosData.status, qosData, notificationRecipients);
         m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
         m_dbSession->addNotification(viewName, node.sev);
       } else {
@@ -129,7 +131,7 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
       }
     }
   } else {  // normal state
-		if (notifQueryResult == 1) { // if there were problems
+    if (notifQueryResult == 1) { // if there were problems
       if (notificationData.view_status != node.sev) { // service recovered
         sendEmailNotification(node, notificationData.view_status, qosData, notificationRecipients);
       }
