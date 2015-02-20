@@ -1142,9 +1142,9 @@ void SvCreator::loadMenu(void)
       m_subMenus["ImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers as Data Points")),
       m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
-      m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
+      m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components as Data Points"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
-      m_subMenus["ImportPandoraModules"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
+      m_subMenus["ImportPandoraModules"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules as Data Points"));
 
   m_menus[MENU_HELP] = m_menuBar->addMenu(tr("&Help"));
   m_subMenus["ShowOnlineResources"] = m_menus[MENU_HELP]->addAction(tr("Online &Resources")),
