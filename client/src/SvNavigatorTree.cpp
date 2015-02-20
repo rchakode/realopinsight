@@ -31,7 +31,7 @@ SvNavigatorTree::SvNavigatorTree(CoreDataT* _cdata, const bool& _enableDrag, QWi
   : QTreeWidget(_parent),
     m_cdata(_cdata)
 {
-  setHeaderLabel(tr("TV Explorer"));
+  setHeaderLabel(tr("Explorer"));
   setColumnCount(1);
   setDragDropMode(QAbstractItemView::DragDrop);
   setDragEnabled(_enableDrag);
