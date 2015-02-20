@@ -44,7 +44,7 @@ LsHelper::~LsHelper()
 int LsHelper::setupSocket(void)
 {
   if (m_socketHandler->setupSocket()) {
-    m_lastError = m_socketHandler->lastError();
+    m_lastError = QString("%1: %2").arg(Q_FUNC_INFO, m_socketHandler->lastError());
     return -1;
   }
   return 0;
@@ -105,7 +105,7 @@ int LsHelper::loadChecks(const QString& hostgroupFilter, ChecksT& checks)
 int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
 {
   if (m_socketHandler->makeRequest(data) != 0) {
-    m_lastError = m_socketHandler->lastError();
+    m_lastError = QString("%1: %2").arg(Q_FUNC_INFO, m_socketHandler->lastError());
     return -1;
   }
   parseResult(checks);

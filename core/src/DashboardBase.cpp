@@ -118,7 +118,7 @@ void DashboardBase::runMonitor()
   Q_EMIT updateInprogress();
   resetStatData();
   
-  if (m_cdata->monitor == Monitor::Auto) {
+  if (m_cdata->monitor == MonitorT::Auto) {
     for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end();
          src!=end; ++src) { runMonitor(*src);}
   } else {
@@ -139,19 +139,19 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
   switch(src.mon_type) {
-    case Monitor::Zenoss:
+    case MonitorT::Zenoss:
       runZenossUpdate(src);
       break;
 
-    case Monitor::Zabbix:
+    case MonitorT::Zabbix:
       runZabbixUpdate(src);
       break;
 
-    case Monitor::Pandora:
+    case MonitorT::Pandora:
       runPandoraUpdate(src);
       break;
 
-    case Monitor::Nagios:
+    case MonitorT::Nagios:
     default:
       if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
@@ -314,12 +314,12 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-    case Monitor::Nagios:
+    case MonitorT::Nagios:
       msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
       break;
-    case Monitor::Zabbix:
-    case Monitor::Zenoss:
-    case Monitor::Pandora:
+    case MonitorT::Zabbix:
+    case MonitorT::Zenoss:
+    case MonitorT::Pandora:
       msg = msg.arg(src.id, src.mon_url);
       break;
     default:
@@ -367,7 +367,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   if (_node.check.host == "-")
     return;
   
-  if (m_cdata->monitor == Monitor::Zabbix) {
+  if (m_cdata->monitor == MonitorT::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME2.c_str());
@@ -395,7 +395,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     _node.actual_msg.replace(regexp, info[1]);
   }
   
-  if (m_cdata->monitor == Monitor::Nagios) {
+  if (m_cdata->monitor == MonitorT::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
       regexp.setPattern(ngrt4n::TAG_THERESHOLD.c_str());
@@ -507,7 +507,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 
 void DashboardBase::checkStandaloneSourceType(SourceT& src)
 {
-  if (m_cdata->monitor != Monitor::Auto) {
+  if (m_cdata->monitor != MonitorT::Auto) {
     src.mon_type = m_cdata->monitor;
   }
 }

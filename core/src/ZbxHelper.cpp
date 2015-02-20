@@ -370,7 +370,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   m_sourceInfo = srcInfo;
   ngrt4n::clearCoreData(cdata);
-  cdata.monitor = Monitor::Auto;
+  cdata.monitor = MonitorT::Auto;
 
   if (! checkLogin())
     return -1;

@@ -76,7 +76,7 @@ struct CheckT {
 };
 typedef QMap<std::string, CheckT> ChecksT;
 
-class Monitor {
+class MonitorT {
   public:
     enum {
       Nagios  = 0,

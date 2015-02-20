@@ -41,7 +41,7 @@ QString ngrt4n::getAbsolutePath(const QString& _path)
 qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusValue)
 {
   qint8 criticity = ngrt4n::Unknown;
-  if (monitorType == Monitor::Nagios) {
+  if (monitorType == MonitorT::Nagios) {
     switch(statusValue) {
     case ngrt4n::NagiosOk:
       criticity = ngrt4n::Normal;
@@ -55,7 +55,7 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     default:
       break;
     }
-  } else if (monitorType == Monitor::Zabbix) {
+  } else if (monitorType == MonitorT::Zabbix) {
     switch(statusValue) {
     case ngrt4n::ZabbixClear:
       criticity = ngrt4n::Normal;
@@ -74,7 +74,7 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     default:
       break;
     }
-  } else if (monitorType == Monitor::Zenoss){
+  } else if (monitorType == MonitorT::Zenoss){
     switch(statusValue) {
     case ngrt4n::ZenossClear:
       criticity = ngrt4n::Normal;
@@ -92,7 +92,7 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     default:
       break;
     }
-  } else if (monitorType == Monitor::Pandora) {
+  } else if (monitorType == MonitorT::Pandora) {
     switch(statusValue) {
     case ngrt4n::PandoraNormal:
       criticity = ngrt4n::Normal;
@@ -231,16 +231,16 @@ qint32 ngrt4n::convertToSourceType(const QString& str)
 {
   QStringList types = sourceTypes();
   int type;
-  if (str == types[Monitor::Nagios])
-    type = Monitor::Nagios;
-  else if (str == types[Monitor::Zabbix])
-    type = Monitor::Zabbix;
-  else if (str == types[Monitor::Zenoss])
-    type = Monitor::Zenoss;
-  else if (str == types[Monitor::Pandora])
-    type = Monitor::Pandora;
+  if (str == types[MonitorT::Nagios])
+    type = MonitorT::Nagios;
+  else if (str == types[MonitorT::Zabbix])
+    type = MonitorT::Zabbix;
+  else if (str == types[MonitorT::Zenoss])
+    type = MonitorT::Zenoss;
+  else if (str == types[MonitorT::Pandora])
+    type = MonitorT::Pandora;
   else
-    type = Monitor::Auto;
+    type = MonitorT::Auto;
 
   return type;
 }

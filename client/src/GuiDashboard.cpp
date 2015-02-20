@@ -353,16 +353,16 @@ void GuiDashboard::handleSettingsLoaded(void)
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-      case Monitor::Nagios:
+      case MonitorT::Nagios:
         it->icon = ":images/nagios-logo-n.png";
         break;
-      case Monitor::Zabbix:
+      case MonitorT::Zabbix:
         it->icon = ":images/zabbix-logo-z.png";
         break;
-      case Monitor::Zenoss:
+      case MonitorT::Zenoss:
         it->icon = ":images/zenoss-logo-o.png";
         break;
-      case Monitor::Pandora:
+      case MonitorT::Pandora:
         it->icon = ":images/pandora-logo-p.png";
         break;
       default:
