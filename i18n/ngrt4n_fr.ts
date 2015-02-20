@@ -1267,14 +1267,14 @@ Commentaires : %6</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="869"/>
         <source>Save change? - %1</source>
-        <translation>Enregistrer les mises Ã  jour ? - %1</translation>
+        <translation>Enregistrer les mises à  jour ? - %1</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="870"/>
         <source>The document has changed.
 Do you want to save the changes?</source>
         <translation>Le document n&apos;a été modifiée.
-Voulez-vous enregistrer les mises Ã  jour?</translation>
+Voulez-vous enregistrer les mises à  jour?</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="962"/>
@@ -1367,7 +1367,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1122"/>
         <source>&amp;Add sub service</source>
-        <translation>&amp;Ajouter sous service</translation>
+        <translation type="unfinished">&amp;Ajouter un sous service</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1125"/>
@@ -1392,17 +1392,17 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1136"/>
         <source>Autogenerate Host/Group-based Business View</source>
-        <translation>Générer automatiquement des vues métiers par hôte ou groupe</translation>
+        <translation>Générer automatiquement une vue métier par groupement d&apos;hôtes</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1138"/>
         <source>Import Na&amp;gios Checks as Data Points</source>
-        <translation>Importer des checks Na&amp;gios comme des points de données</translation>
+        <translation>Importer des checks Na&amp;gios en tant que points de données</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1139"/>
         <source>Import Livestatus Checks as Data Points</source>
-        <translation>Importer des checks via Livestatus comme des points de données</translation>
+        <translation>Importer des checks via Livestatus en tant que points de données</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1140"/>
@@ -1412,7 +1412,7 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1142"/>
         <source>Import Za&amp;bbix Triggers as Data Points</source>
-        <translation>Importer des déclencheurs Za&amp;bbix comme des points de données</translation>
+        <translation>Importer des déclencheurs Za&amp;bbix en tant que points de données</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1143"/>
@@ -1422,12 +1422,12 @@ Voulez-vous enregistrer les mises Ã  jour?</translation>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1145"/>
         <source>Import Z&amp;enoss Components as Data Points</source>
-        <translation>Importer des composants Z&amp;enoss comme des points de données</translation>
+        <translation>Importer des composants Z&amp;enoss en tant que points de données</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1147"/>
         <source>Import &amp;Pandora Modules as Data Points</source>
-        <translation>Importer des modules &amp;Pandora comme des points de données</translation>
+        <translation>Importer des modules &amp;Pandora en tant que points de données</translation>
     </message>
     <message>
         <location filename="../client/src/SvConfigCreator.cpp" line="1149"/>
