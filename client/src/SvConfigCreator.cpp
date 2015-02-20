@@ -869,6 +869,9 @@ int SvCreator::treatCloseAction(const bool& _close)
       mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
       mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
+      mbox.button(QMessageBox::Yes)->setText(tr("Yes"));
+      mbox.button(QMessageBox::Cancel)->setText(tr("Cancel"));
+      mbox.button(QMessageBox::Discard)->setText(tr("Discard changes"));
       switch (mbox.exec()) {
         case QMessageBox::Yes:
           save();
@@ -1106,7 +1109,8 @@ void SvCreator::loadMenu(void)
   const QString MENU_IMPORTATION="IMPORTATION";
   const QString MENU_HELP="HELP";
   m_menus[MENU_FILE] = m_menuBar->addMenu(tr("&File"));
-  m_subMenus["NewFile"] = m_menus[MENU_FILE]->addAction("New &File"),
+  m_subMenus["NewFile"] = m_menus[MENU_FILE]->addAction("New &File");
+  m_menus[MENU_FILE]->addSeparator(),
       m_subMenus["NewFile"]->setShortcut(QKeySequence::New);
   m_subMenus["Open"] = m_menus[MENU_FILE]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
       m_subMenus["Open"]->setShortcut(QKeySequence::Open);
