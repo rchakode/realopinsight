@@ -193,7 +193,7 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
   QStringList sourceList;
   for (int i = 0; i< MAX_SRCS; ++i) {
     if (preferences.loadSource(i, srcInfo)) {
-      if (srcInfo.mon_type == type || type == ngrt4n::Auto) {
+      if (srcInfo.mon_type == type || type == Monitor::Auto) {
         sourceList.push_back(srcInfo.id);
         sourceInfos.insert(srcInfo.id, srcInfo);
       }
@@ -204,7 +204,7 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 void SvCreator::importNagiosChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  fetchSourceList(Monitor::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -225,7 +225,7 @@ void SvCreator::importNagiosChecks(void)
 void SvCreator::importNagiosLivestatusChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  fetchSourceList(Monitor::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -249,7 +249,7 @@ void SvCreator::importNagiosLivestatusChecks(void)
 void SvCreator::importNagiosBPIConfig(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  fetchSourceList(Monitor::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
   if (importationSettingForm.exec() != QDialog::Accepted) {
     return;
@@ -460,7 +460,7 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
 void SvCreator::importZabbixTriggersAsDataPoints(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(Monitor::Zabbix, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -483,7 +483,7 @@ void SvCreator::importZabbixTriggersAsDataPoints(void)
 void SvCreator::importChecksAsHostBasedBusinessView(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Auto, sourceInfos);
+  fetchSourceList(Monitor::Auto, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -493,7 +493,7 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
     showStatusMsg(tr("Importing data points %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
-    if (srcInfo.mon_type == ngrt4n::Zabbix) {
+    if (srcInfo.mon_type == Monitor::Zabbix) {
       ZbxHelper handler;
       if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
         showStatusMsg(tr("Data points importation failed: %1").arg(handler.lastError()), true);
@@ -504,7 +504,7 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
           }
         }
       }
-    } else if (srcInfo.mon_type == ngrt4n::Nagios) {
+    } else if (srcInfo.mon_type == Monitor::Nagios) {
       ChecksT checks;
       LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
       // FIXME: filter is now used as host name => add support for hostgroup filtering
@@ -522,7 +522,7 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
     // handle results
     if (! checks.empty()) {
       ngrt4n::clearCoreData(*m_cdata);
-      m_cdata->monitor = ngrt4n::Auto;
+      m_cdata->monitor = Monitor::Auto;
 
       NodeT root;
       root.id = ngrt4n::ROOT_ID;
@@ -576,7 +576,7 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
 void SvCreator::importZabbixITServicesAsBusinessViews(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(Monitor::Zabbix, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -600,7 +600,7 @@ void SvCreator::importZabbixITServicesAsBusinessViews(void)
 void SvCreator::importZenossComponents(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zenoss, sourceInfos);
+  fetchSourceList(Monitor::Zenoss, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -624,7 +624,7 @@ void SvCreator::importZenossComponents(void)
 void SvCreator::importPandoraModules(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Pandora, sourceInfos);
+  fetchSourceList(Monitor::Pandora, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -830,19 +830,19 @@ QString SvCreator::selectFileDestinationPath(void)
   if (! path.isNull()) {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
-      m_cdata->monitor = ngrt4n::Zabbix;
+      m_cdata->monitor = Monitor::Zabbix;
       if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
     } else if (filter == ZNS_SOURCE) {
-      m_cdata->monitor = ngrt4n::Zenoss;
+      m_cdata->monitor = Monitor::Zenoss;
       if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else if (filter == NAG_SOURCE){
-      m_cdata->monitor = ngrt4n::Nagios;
+      m_cdata->monitor = Monitor::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     } else if (filter == PANDORA_SOURCE) {
-      m_cdata->monitor = ngrt4n::Pandora;
+      m_cdata->monitor = Monitor::Pandora;
       if (fileInfo.suffix().isEmpty()) path.append(".pfms.ngrt4n.xml");
     } else {
-      m_cdata->monitor = ngrt4n::Auto;
+      m_cdata->monitor = Monitor::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
 

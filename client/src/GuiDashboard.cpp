@@ -353,16 +353,16 @@ void GuiDashboard::handleSettingsLoaded(void)
     if (m_cdata->sources.contains(it->id))
     {
       switch(it->mon_type) {
-      case ngrt4n::Nagios:
+      case Monitor::Nagios:
         it->icon = ":images/nagios-logo-n.png";
         break;
-      case ngrt4n::Zabbix:
+      case Monitor::Zabbix:
         it->icon = ":images/zabbix-logo-z.png";
         break;
-      case ngrt4n::Zenoss:
+      case Monitor::Zenoss:
         it->icon = ":images/zenoss-logo-o.png";
         break;
-      case ngrt4n::Pandora:
+      case Monitor::Pandora:
         it->icon = ":images/pandora-logo-p.png";
         break;
       default:

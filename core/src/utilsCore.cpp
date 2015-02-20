@@ -41,7 +41,7 @@ QString ngrt4n::getAbsolutePath(const QString& _path)
 qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusValue)
 {
   qint8 criticity = ngrt4n::Unknown;
-  if (monitorType == ngrt4n::Nagios) {
+  if (monitorType == Monitor::Nagios) {
     switch(statusValue) {
     case ngrt4n::NagiosOk:
       criticity = ngrt4n::Normal;
@@ -55,7 +55,7 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     default:
       break;
     }
-  } else if (monitorType == ngrt4n::Zabbix) {
+  } else if (monitorType == Monitor::Zabbix) {
     switch(statusValue) {
     case ngrt4n::ZabbixClear:
       criticity = ngrt4n::Normal;
@@ -74,7 +74,7 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     default:
       break;
     }
-  } else if (monitorType == ngrt4n::Zenoss){
+  } else if (monitorType == Monitor::Zenoss){
     switch(statusValue) {
     case ngrt4n::ZenossClear:
       criticity = ngrt4n::Normal;
@@ -92,7 +92,7 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
     default:
       break;
     }
-  } else if (monitorType == ngrt4n::Pandora) {
+  } else if (monitorType == Monitor::Pandora) {
     switch(statusValue) {
     case ngrt4n::PandoraNormal:
       criticity = ngrt4n::Normal;
@@ -231,16 +231,16 @@ qint32 ngrt4n::convertToSourceType(const QString& str)
 {
   QStringList types = sourceTypes();
   int type;
-  if (str == types[ngrt4n::Nagios])
-    type = ngrt4n::Nagios;
-  else if (str == types[ngrt4n::Zabbix])
-    type = ngrt4n::Zabbix;
-  else if (str == types[ngrt4n::Zenoss])
-    type = ngrt4n::Zenoss;
-  else if (str == types[ngrt4n::Pandora])
-    type = ngrt4n::Pandora;
+  if (str == types[Monitor::Nagios])
+    type = Monitor::Nagios;
+  else if (str == types[Monitor::Zabbix])
+    type = Monitor::Zabbix;
+  else if (str == types[Monitor::Zenoss])
+    type = Monitor::Zenoss;
+  else if (str == types[Monitor::Pandora])
+    type = Monitor::Pandora;
   else
-    type = ngrt4n::Auto;
+    type = Monitor::Auto;
 
   return type;
 }
