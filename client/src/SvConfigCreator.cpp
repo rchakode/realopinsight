@@ -490,17 +490,17 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Importing Zabbix triggers (%1:%2...)").arg(srcInfo.id, srcInfo.mon_url), false);
+    showStatusMsg(tr("Importing data points %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
     if (srcInfo.mon_type == ngrt4n::Zabbix) {
       ZbxHelper handler;
       if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
-        showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
+        showStatusMsg(tr("Data points importation failed: %1").arg(handler.lastError()), true);
       } else {
         if (checks.empty()) {
           if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
-            showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
+            showStatusMsg(tr("Data points importation failed: %1").arg(handler.lastError()), true);
           }
         }
       }
@@ -526,6 +526,7 @@ void SvCreator::importChecksAsHostBasedBusinessView(void)
 
       NodeT root;
       root.id = ngrt4n::ROOT_ID;
+      //FIXME: get monitor name
       root.name = filter.isEmpty() ? tr("Zabbix Services") : filter;
       root.type = NodeType::BusinessService;
 
