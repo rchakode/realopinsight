@@ -58,7 +58,7 @@ void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Respon
   response.setMimeType("text/csv");
   response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
   QosDataByViewMapT qosData;
-	if (m_mainUiClass->dbSession()->queryQosData(qosData,
+  if (m_mainUiClass->dbSession()->queryQosData(qosData,
                                                m_viewName,
                                                m_mainUiClass->reportStartTime(),
                                                m_mainUiClass->reportEndTime()) == 0) {
@@ -74,7 +74,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_confdir(m_rootDir.append("/data")),
     m_mainWidget(new Wt::WContainerWidget(this)),
     m_settingsPageWidget(NULL),
-		m_opsHomeTpl(NULL),
+    m_opsHomeTpl(NULL),
     m_settings (new Settings()),
     m_notificationManager(NULL),
     m_notificationSection(NULL),
@@ -143,7 +143,7 @@ void WebMainUI::showUserHome(void)
 
   if (! m_dbSession->isLoggedAdmin()) {
     initOperatorDashboard();
-		m_dashboardStackedContents->setCurrentWidget(m_opsHomeTpl);
+    m_dashboardStackedContents->setCurrentWidget(m_opsHomeTpl);
   }
 }
 
@@ -209,8 +209,8 @@ Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
 {
   Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
   link->clicked().connect(std::bind([=]{
-		if (m_opsHomeTpl) {
-			setWidgetAsFrontStackedWidget(m_opsHomeTpl);
+    if (m_opsHomeTpl) {
+      setWidgetAsFrontStackedWidget(m_opsHomeTpl);
       resetViewSelectionBox();
     }
   }));
@@ -236,7 +236,7 @@ Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
       m_currentDashboard = NULL;
       m_displayOnlyTroubleEventsBox->setHidden(true);
       if (! m_dbSession->isLoggedAdmin()) {
-				setWidgetAsFrontStackedWidget(m_opsHomeTpl);
+        setWidgetAsFrontStackedWidget(m_opsHomeTpl);
       } else {
         setWidgetAsFrontStackedWidget(m_settingsPageWidget);
       }
@@ -331,7 +331,7 @@ void WebMainUI::hideAdminSettingsMenu(void)
 {
   m_preferences->showAuthSettingsWidgets(false);
   m_preferences->showNotificationSettingsWidgets(false);
-	wApp->doJavaScript("$('#userMenuBlock').hide();"
+  wApp->doJavaScript("$('#userMenuBlock').hide();"
                      "$('#viewMenuBlock').hide();"
                      "$('#menu-auth-settings').hide();"
                      "$('#menu-notification-settings').hide();");
@@ -407,9 +407,9 @@ void WebMainUI::handleRefresh(void)
     if (thumbItem != m_thumbnailItems.end()) {
       (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbItem)->setToolTip(dashboard->tooltip());
-			if (m_dbSession->isCompleteUserDashboard()) {
-				updateViewBiCharts(rootServiceName);
-			}
+      if (m_dbSession->isCompleteUserDashboard()) {
+        updateViewBiCharts(rootServiceName);
+      }
     }
     ++currentView;
   }
@@ -601,7 +601,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
-		case DboUser::AdmRole: {
+    case DboUser::AdmRole: {
       settingPageTpl->bindWidget("info-box", m_infoBox);
       m_preferences->setEnabledInputs(true);
 
@@ -760,9 +760,9 @@ void WebMainUI::createAccountPanel(void)
 {
   bool changedPassword(false);
   bool isUserForm(true);
-	DboUserT userInfo = m_dbSession->loggedUser().data();
-	m_userAccountForm = new UserFormView(&userInfo, changedPassword, isUserForm);
-	m_userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
+  DboUserT userInfo = m_dbSession->loggedUser().data();
+  m_userAccountForm = new UserFormView(&userInfo, changedPassword, isUserForm);
+  m_userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Update failed, see details in log."));
@@ -775,8 +775,8 @@ void WebMainUI::createPasswordPanel(void)
 {
   bool changedPassword(true);
   bool userForm(true);
-	DboUserT userInfo = m_dbSession->loggedUser().data();
-	m_changePasswordPanel = new UserFormView(&userInfo, changedPassword, userForm);
+  DboUserT userInfo = m_dbSession->loggedUser().data();
+  m_changePasswordPanel = new UserFormView(&userInfo, changedPassword, userForm);
   m_changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
                                                                      const std::string& lastpass,
                                                                      const std::string& pass) {
@@ -882,8 +882,8 @@ void WebMainUI::initOperatorDashboard(void)
   Wt::WContainerWidget* eventFeedsContainer = new Wt::WContainerWidget(m_mainWidget);
   m_eventFeedLayout = new Wt::WVBoxLayout();
   eventFeedsContainer->setLayout(m_eventFeedLayout);
-	m_opsHomeTpl = createOpsHomeTpl(thumbnailsContainer, eventFeedsContainer);
-	m_dashboardStackedContents->addWidget(m_opsHomeTpl);
+  m_opsHomeTpl = createOpsHomeTpl(thumbnailsContainer, eventFeedsContainer);
+  m_dashboardStackedContents->addWidget(m_opsHomeTpl);
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
@@ -911,9 +911,9 @@ void WebMainUI::initOperatorDashboard(void)
       m_thumbnailItems.insert(view.name, thumbItem);
       ++thumbIndex;
     }
-	}
+  }
 
-	showConditionalUiWidgets();
+  showConditionalUiWidgets();
 
   if (thumbIndex > 0) {
     startDashbaordUpdate();
@@ -925,42 +925,42 @@ void WebMainUI::initOperatorDashboard(void)
 
 void WebMainUI::showConditionalUiWidgets(void)
 {
-	if (m_dbSession->isCompleteUserDashboard()) {
-		Wt::WContainerWidget* reportContainer = new Wt::WContainerWidget(m_mainWidget);
-		Wt::WGridLayout* reportsLayout = new Wt::WGridLayout(reportContainer);
-		int biIndex = 0;
-		for (const auto& view: m_dbSession->viewList()) {
-			m_qosCharts[view.name] = new QosTrendsChart(view.name, QosDataList());
-			m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, QosDataList());
-			reportsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
-			reportsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
-			reportsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
-			reportsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
-			++biIndex;
-		}
-		m_opsHomeTpl->bindString("bi-report-title", Q_TR("Reports"));
-		m_opsHomeTpl->bindWidget("report-period-header-pane", createReportSectionHeader());
-		m_opsHomeTpl->bindWidget("bigraphs", reportContainer);
-	} else {
-		m_opsHomeTpl->bindEmpty("bi-report-title");
-		m_opsHomeTpl->bindEmpty("report-period-header-pane");
-		m_opsHomeTpl->bindEmpty("bigraphs");
-		if (m_dbSession->isTileUserDashboard()) {
-			doJavaScript("$('#ngrt4n-side-pane').hide();");
-			doJavaScript("$('#ngrt4n-content-pane').width('100%');");
-		} else {
-			doJavaScript("$('#ngrt4n-side-pane').show();");
-			doJavaScript("$('#ngrt4n-content-pane').width('70%');");
-			doJavaScript("$('#ngrt4n-side-pane').width('28%');");
-		}
-	}
+  if (m_dbSession->isCompleteUserDashboard()) {
+    Wt::WContainerWidget* reportContainer = new Wt::WContainerWidget(m_mainWidget);
+    Wt::WGridLayout* reportsLayout = new Wt::WGridLayout(reportContainer);
+    int biIndex = 0;
+    for (const auto& view: m_dbSession->viewList()) {
+      m_qosCharts[view.name] = new QosTrendsChart(view.name, QosDataList());
+      m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, QosDataList());
+      reportsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
+      reportsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
+      reportsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
+      reportsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
+      ++biIndex;
+    }
+    m_opsHomeTpl->bindString("bi-report-title", Q_TR("Reports"));
+    m_opsHomeTpl->bindWidget("report-period-header-pane", createReportSectionHeader());
+    m_opsHomeTpl->bindWidget("bigraphs", reportContainer);
+  } else {
+    m_opsHomeTpl->bindEmpty("bi-report-title");
+    m_opsHomeTpl->bindEmpty("report-period-header-pane");
+    m_opsHomeTpl->bindEmpty("bigraphs");
+    if (m_dbSession->isTileUserDashboard()) {
+      doJavaScript("$('#ngrt4n-side-pane').hide();");
+      doJavaScript("$('#ngrt4n-content-pane').width('100%');");
+    } else {
+      doJavaScript("$('#ngrt4n-side-pane').show();");
+      doJavaScript("$('#ngrt4n-content-pane').width('70%');");
+      doJavaScript("$('#ngrt4n-side-pane').width('28%');");
+    }
+  }
 }
 
 Wt::WTemplate* WebMainUI::createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer)
 {
   Wt::WTemplate* operatorHomeTpl = new Wt::WTemplate(Wt::WString::tr("operator-home.tpl"));
   operatorHomeTpl->bindWidget("info-box", m_infoBox);
-	operatorHomeTpl->bindWidget("thumbnails", thumbnailsContainer);
+  operatorHomeTpl->bindWidget("thumbnails", thumbnailsContainer);
   operatorHomeTpl->bindWidget("event-feeds", eventFeedContainer);
   return operatorHomeTpl;
 }
@@ -1129,7 +1129,7 @@ void WebMainUI::updateBiCharts(void)
 void WebMainUI::updateViewBiCharts(const std::string& viewName)
 {
   QosDataByViewMapT qosData;
-	if (m_dbSession->queryQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
+  if (m_dbSession->queryQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
     QosTrendsChartMapT::iterator qosChart = m_qosCharts.find(viewName);
     if (qosChart != m_qosCharts.end()) {
       qosChart->second->updateData(qosData[viewName]);

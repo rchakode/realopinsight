@@ -206,64 +206,64 @@ UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userF
         bindEmpty("title");
         bindWidget("change-password-link", changedPwdButton);
         changedPwdButton->clicked().connect(std::bind([=, &user]() { m_changePasswordDialog->show();}));
-    } else {
-      bindEmpty("change-password-link");
+      } else {
+        bindEmpty("change-password-link");
+      }
     }
+  } else {
+    bindEmpty("change-password-link");
   }
-} else {
-bindEmpty("change-password-link");
-}
 
-// Bind buttons, but alter later
-submitButton = new Wt::WPushButton( Q_TR("Submit") );
-cancelButton = new Wt::WPushButton( Q_TR("Clear") );
-bindWidget("submit-button", submitButton);
-bindWidget("cancel-button", cancelButton);
+  // Bind buttons, but alter later
+  submitButton = new Wt::WPushButton( Q_TR("Submit") );
+  cancelButton = new Wt::WPushButton( Q_TR("Clear") );
+  bindWidget("submit-button", submitButton);
+  bindWidget("cancel-button", cancelButton);
 
-Wt::WString title = Wt::WString( Q_TR("User information") );
-if (user) {
-  submitButton->setStyleClass("btn btn-success");
-  if (changePassword) {
-    title = Wt::WString( Q_TR("Set password information") );
-    submitButton->setText( Q_TR("Change password") );
-    cancelButton->setText( Q_TR("Close") );
-    cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
-} else {
-createChangePasswordDialog();
-submitButton->setText( Q_TR("Update") );
-if (! userForm) {
-  cancelButton->setText( Q_TR("Delete") );
-  cancelButton->setStyleClass("btn btn-danger");
-  cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
-} else {
-cancelButton->setText( Q_TR("Close") );
-cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
-cancelButton->hide();
-}
-}
-} else {
-submitButton->setStyleClass("btn btn-success");
-cancelButton->clicked().connect(std::bind([=]() {m_model->reset(); updateView(m_model);}));
-}
+  Wt::WString title = Wt::WString( Q_TR("User information") );
+  if (user) {
+    submitButton->setStyleClass("btn btn-success");
+    if (changePassword) {
+      title = Wt::WString( Q_TR("Set password information") );
+      submitButton->setText( Q_TR("Change password") );
+      cancelButton->setText( Q_TR("Close") );
+      cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
+    } else {
+      createChangePasswordDialog();
+      submitButton->setText( Q_TR("Update") );
+      if (! userForm) {
+        cancelButton->setText( Q_TR("Delete") );
+        cancelButton->setStyleClass("btn btn-danger");
+        cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
+      } else {
+        cancelButton->setText( Q_TR("Close") );
+        cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
+        cancelButton->hide();
+      }
+    }
+  } else {
+    submitButton->setStyleClass("btn btn-success");
+    cancelButton->clicked().connect(std::bind([=]() {m_model->reset(); updateView(m_model);}));
+  }
 
-// If user, it's for update. At first time the fields are disable
-if (user && ! changePassword) {
-  submitButton->clicked().connect(std::bind([=](){
-                                              setWritable(true);
-                                  submitButton->clicked().connect(this, &UserFormView::process);
-}));
-} else {
-submitButton->clicked().connect(this, &UserFormView::process);
-}
+  // If user, it's for update. At first time the fields are disable
+  if (user && ! changePassword) {
+    submitButton->clicked().connect(std::bind([=](){
+      setWritable(true);
+      submitButton->clicked().connect(this, &UserFormView::process);
+    }));
+  } else {
+    submitButton->clicked().connect(this, &UserFormView::process);
+  }
 
-if (user && user->authsystem == WebPreferences::LDAP) {
-  if (submitButton) submitButton->setDisabled(true);
-  if (cancelButton) cancelButton->setDisabled(true);
-  if (changedPwdButton) changedPwdButton->setDisabled(true);
-}
+  if (user && user->authsystem == WebPreferences::LDAP) {
+    if (submitButton) submitButton->setDisabled(true);
+    if (cancelButton) cancelButton->setDisabled(true);
+    if (changedPwdButton) changedPwdButton->setDisabled(true);
+  }
 
-bindString("title", title);
-updateView(m_model);
+  bindString("title", title);
+  updateView(m_model);
 }
 
 UserFormView::~UserFormView(void)
@@ -317,17 +317,17 @@ void UserFormView::process(void)
 void UserFormView::handleDeleteRequest(void)
 {
   Wt::WMessageBox *confirmationBox = new Wt::WMessageBox
-                                     ("Warning !",
-                                      "<p>Do you really want to delete this user?</p>",
-                                      Wt::Information, Wt::Yes | Wt::No);
+      ("Warning !",
+       "<p>Do you really want to delete this user?</p>",
+       Wt::Information, Wt::Yes | Wt::No);
   confirmationBox->setModal(false);
   confirmationBox->buttonClicked().connect(std::bind([=] () {
-                                                       if (confirmationBox->buttonResult() == Wt::Yes) {
-                                                       m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
-}
-delete confirmationBox;
-}));
-confirmationBox->show();
+    if (confirmationBox->buttonResult() == Wt::Yes) {
+      m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
+    }
+    delete confirmationBox;
+  }));
+  confirmationBox->show();
 }
 
 
@@ -371,11 +371,11 @@ void UserFormView::createChangePasswordDialog(void)
   m_changePasswordDialog->contents()->addWidget(changedPasswdForm);
   changedPasswdForm->changePasswordTriggered().connect(
         std::bind([=](const std::string& login, const std::string& currentPass,
-                      const std::string& newPass){
-                    m_changePasswordTriggered.emit(login, currentPass, newPass);
-        m_changePasswordDialog->accept();
-}, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
+                  const std::string& newPass){
+    m_changePasswordTriggered.emit(login, currentPass, newPass);
+    m_changePasswordDialog->accept();
+  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+  changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
 }
 
 
@@ -443,33 +443,33 @@ Wt::WPanel* DbUserManager::createUserPanel(const DboUserT& user)
 
   // connect signal for add user
   form->validated().connect(std::bind([=](DboUserT userToUpdate) {
-                                        m_dbSession->updateUser(userToUpdate);
-                            m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
-}, std::placeholders::_1));
+    m_dbSession->updateUser(userToUpdate);
+    m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
+  }, std::placeholders::_1));
 
-// connect signal for change password
-form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
-                                                      const std::string& currentPass,
-                                                      const std::string& newPass) {
-                                                    m_updateCompleted.emit(m_dbSession->updatePassword(login, currentPass, newPass));
-                                        }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+  // connect signal for change password
+  form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
+                                                    const std::string& currentPass,
+                                                    const std::string& newPass) {
+    m_updateCompleted.emit(m_dbSession->updatePassword(login, currentPass, newPass));
+  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-// connect signal for delete user
-form->deleteTriggered().connect(std::bind([=](std::string username) {
-                                            m_updateCompleted.emit(m_dbSession->deleteUser(username));
-                                updateDbUsers();
-}, std::placeholders::_1));
+  // connect signal for delete user
+  form->deleteTriggered().connect(std::bind([=](std::string username) {
+    m_updateCompleted.emit(m_dbSession->deleteUser(username));
+    updateDbUsers();
+  }, std::placeholders::_1));
 
-Wt::WPanel *panel(new Wt::WPanel());
-panel->setTitle(Wt::WString("{1} ({2})")
-                .arg(user.username)
-                .arg(WebPreferences::authTypeString(user.authsystem)));
-panel->setAnimation(animation);
-panel->setCentralWidget(form);
-panel->setCollapsible(true);
-panel->setCollapsed(true);
+  Wt::WPanel *panel(new Wt::WPanel());
+  panel->setTitle(Wt::WString("{1} ({2})")
+                  .arg(user.username)
+                  .arg(WebPreferences::authTypeString(user.authsystem)));
+  panel->setAnimation(animation);
+  panel->setCentralWidget(form);
+  panel->setCollapsible(true);
+  panel->setCollapsed(true);
 
-return panel;
+  return panel;
 }
 
 
