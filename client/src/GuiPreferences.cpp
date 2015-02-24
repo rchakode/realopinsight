@@ -87,7 +87,6 @@ GuiPreferences::~GuiPreferences()
       delete m_realmPasswdField;
       break;
     case ShowAbout:
-      delete m_donateBtn;
       break;
     default:
       break;
@@ -234,7 +233,6 @@ void GuiPreferences::createChangePasswordForm(void)
 void GuiPreferences::organizeAbortWindow(void)
 {
   m_dialog->setWindowTitle(tr("About %1").arg(APP_NAME));
-  m_donateBtn = new ImageButton(":images/built-in/donate.png");
   QString about = QObject::tr("\n%1"
                               "\nVersion: %2 (%3)"
                               "\nCore version: %4"
@@ -251,7 +249,6 @@ void GuiPreferences::organizeAbortWindow(void)
                                                          REPORT_BUG);
   int line = 0;
   m_mainLayout->addWidget(new QLabel(about), line++, 0, 1, 2);
-  m_mainLayout->addWidget(m_donateBtn, line, 0, 1, 1, Qt::AlignLeft);
   m_mainLayout->addWidget(m_cancelBtn, line, 1, 1, 1, Qt::AlignRight);
 }
 
@@ -671,7 +668,6 @@ void GuiPreferences::addEvents(void)
       connect(m_changePwdBtn, SIGNAL(clicked()),  this, SLOT(changePasswd()));
       break;
     case ShowAbout:
-      connect(m_donateBtn, SIGNAL(clicked()),  this, SLOT(handleDonate()));
       break;
     case BasicLoginForm:
       break;

@@ -51,15 +51,15 @@
 
 
 namespace {
-  const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
-  const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
+const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
+const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 } //namespace
 
 StringMapT DashboardBase::propRules() {
   PropRules unchanged(PropRules::Unchanged);
   PropRules decreased(PropRules::Decreased);
   PropRules increased(PropRules::Increased);
-
+  
   StringMapT map;
   map.insert(unchanged.toString(), unchanged.data());
   map.insert(decreased.toString(), decreased.data());
@@ -71,7 +71,7 @@ StringMapT DashboardBase::calcRules() {
   CalcRules worst(CalcRules::Worst);
   CalcRules average(CalcRules::Average);
   CalcRules weighted(CalcRules::WeightedAverageWithThresholds);
-
+  
   StringMapT map;
   map.insert(worst.toString(), worst.data());
   map.insert(average.toString(), average.data());
@@ -117,8 +117,8 @@ void DashboardBase::runMonitor()
 {
   Q_EMIT updateInprogress();
   resetStatData();
-
-  if (m_cdata->monitor == ngrt4n::Auto) {
+  
+  if (m_cdata->monitor == MonitorT::Auto) {
     for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end();
          src!=end; ++src) { runMonitor(*src);}
   } else {
@@ -139,19 +139,19 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
   switch(src.mon_type) {
-    case ngrt4n::Zenoss:
+    case MonitorT::Zenoss:
       runZenossUpdate(src);
       break;
 
-    case ngrt4n::Zabbix:
+    case MonitorT::Zabbix:
       runZabbixUpdate(src);
       break;
 
-    case ngrt4n::Pandora:
+    case MonitorT::Pandora:
       runPandoraUpdate(src);
       break;
 
-    case ngrt4n::Nagios:
+    case MonitorT::Nagios:
     default:
       if (src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
@@ -173,24 +173,24 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
   CheckT invalidCheck;
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
-
+  
   // Check if the handler is connected
   std::string ngrt4ndUri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)).toStdString();
   ZmqSocket d4nBroker(ngrt4ndUri, ZMQ_REQ);
-
+  
   d4nBroker.setupSocket();
   d4nBroker.makeHandShake();
   if (! d4nBroker.isReady()) {
     updateDashboardOnError(src, d4nBroker.lastError());
     return;
   }
-
+  
   if (d4nBroker.getServerSerial() < 110) {
     QString errmsg = tr("The server serial %1 is not supported").arg(d4nBroker.getServerSerial());
     updateDashboardOnError(src, errmsg);
     return;
   }
-
+  
   // Now start doing the job
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode != end; ++cnode) {
     if (cnode->child_nodes.isEmpty()) {
@@ -202,7 +202,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
         QString requestData = QString("%1:%2").arg(src.auth, sourceDataPointInfo.second);
         d4nBroker.send(requestData.toStdString());
         JsonHelper jsHelper(d4nBroker.recv().c_str());
-
+        
         // Treat data
         qint32 ret = jsHelper.getProperty("return_code").toInt32();
         cnode->check.status = (ret!=0)? ngrt4n::NagiosUnknown : jsHelper.getProperty("status").toInt32();
@@ -210,7 +210,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
         cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
         cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
         cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
-
+        
         computeStatusInfo(*cnode, src);
         updateDashboard(*cnode);
         cnode->monitored = true;
@@ -279,10 +279,10 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
     updateDashboardOnError(src, lsBroker.lastError());
     return;
   }
-
+  
   CheckT invalidCheck;
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
-
+  
   QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
   while (hostit.hasNext()) {
     hostit.next();
@@ -314,11 +314,12 @@ void DashboardBase::prepareUpdate(const SourceT& src)
 {
   QString msg = QObject::tr("updating %1 (%2)...");
   switch(src.mon_type) {
-    case ngrt4n::Nagios:
+    case MonitorT::Nagios:
       msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
       break;
-    case ngrt4n::Zabbix:
-    case ngrt4n::Zenoss:
+    case MonitorT::Zabbix:
+    case MonitorT::Zenoss:
+    case MonitorT::Pandora:
       msg = msg.arg(src.id, src.mon_url);
       break;
     default:
@@ -362,17 +363,17 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
   _node.sev_prop = StatusAggregator::propagate(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
-
+  
   if (_node.check.host == "-")
     return;
-
-  if (m_cdata->monitor == ngrt4n::Zabbix) {
+  
+  if (m_cdata->monitor == MonitorT::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME2.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
   }
-
+  
   if (_node.sev == ngrt4n::Normal) {
     if (_node.notification_msg.isEmpty()) {
       return ;
@@ -384,17 +385,17 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   } else {
     _node.actual_msg = _node.alarm_msg;
   }
-
+  
   regexp.setPattern(ngrt4n::TAG_HOSTNAME.c_str());
   _node.actual_msg.replace(regexp, _node.check.host.c_str());
   auto info = QString(_node.check.id.c_str()).split("/");
-
+  
   if (info.length() > 1) {
     regexp.setPattern(ngrt4n::TAG_CHECK.c_str());
     _node.actual_msg.replace(regexp, info[1]);
   }
-
-  if (m_cdata->monitor == ngrt4n::Nagios) {
+  
+  if (m_cdata->monitor == MonitorT::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
       regexp.setPattern(ngrt4n::TAG_THERESHOLD.c_str());
@@ -408,43 +409,43 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
 ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _nodeId)
 {
   ngrt4n::AggregatedSeverityT result;
-
+  
   NodeListT::iterator node;
   if (! ngrt4n::findNode(m_cdata, _nodeId, node)) {
     result.sev = ngrt4n::Unknown;
     result.weight = ngrt4n::WEIGHT_UNIT;
     return result;
   }
-
+  
   result.weight = node->weight;
-
+  
   if (node->child_nodes.isEmpty()) {
     result.sev = ngrt4n::Unknown;
     return result;
   }
-
+  
   if (node->type == NodeType::ITService) {
     result.sev = node->sev_prop;
     return result;
   }
-
+  
   StatusAggregator severityAggregator;
-
+  
   Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     result = computeNodeSeverity(childId);
     severityAggregator.addSeverity(result.sev, result.weight);
   }
-
+  
   node->sev = severityAggregator.aggregate(node->sev_crule, node->thresholdLimits);
   node->sev_prop = severityAggregator.propagate(node->sev, node->sev_prule);
-
+  
   result.sev = node->sev_prop;
   result.weight = node->weight;
   node->actual_msg = severityAggregator.toDetailsString();
   QString tooltip = node->toString();
   updateMap(*node, tooltip);
   updateTree(*node, tooltip);
-
+  
   return result;
 }
 
@@ -466,7 +467,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
-
+    
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
     computeStatusInfo(*cnode, src);
     cnode->monitored = true;
@@ -483,7 +484,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (preferencePtr->isSetSource(srcinfo.second)) {
-
+        
         if (preferencePtr->loadSource(*id, src)) {
           checkStandaloneSourceType(src);
           m_sources.insert(srcinfo.second, src);
@@ -506,7 +507,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 
 void DashboardBase::checkStandaloneSourceType(SourceT& src)
 {
-  if (m_cdata->monitor != ngrt4n::Auto) {
+  if (m_cdata->monitor != MonitorT::Auto) {
     src.mon_type = m_cdata->monitor;
   }
 }

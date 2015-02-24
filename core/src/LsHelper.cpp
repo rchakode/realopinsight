@@ -44,66 +44,68 @@ LsHelper::~LsHelper()
 int LsHelper::setupSocket(void)
 {
   if (m_socketHandler->setupSocket()) {
-    m_lastError = m_socketHandler->lastError();
+    m_lastError = QString("%1: %2").arg(Q_FUNC_INFO, m_socketHandler->lastError());
     return -1;
   }
   return 0;
 }
 
-QByteArray LsHelper::prepareRequestData(const QString& host, ReqTypeT requestType)
+QByteArray LsHelper::prepareRequestData(const QString& hostgroupFilter, ReqTypeT requestType)
 {
   QString data = "";
   switch(requestType) {
   case LsHelper::Host:
     data = "GET hosts\n"
-        "Columns: name state last_state_change check_command plugin_output groups\n"
-        "OutputFormat: json\n";
+           "Columns: name state last_state_change check_command plugin_output groups\n"
+           "OutputFormat: json\n";
     break;
   case LsHelper::Service:
     data = "GET services\n"
-        "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
-        "OutputFormat: json\n";
+           "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
+           "OutputFormat: json\n";
     break;
   default:
     break;
   }
 
-  if (! host.isEmpty()) {
+  if (! hostgroupFilter.isEmpty()) {
     QString filterPattern;
     switch(requestType) {
     case LsHelper::Host:
-      filterPattern = "Filter: name = %1\n"
+      filterPattern =
+          "Filter: name = %1\n"
           "Filter: host_groups ~ %1\n"
           "Or: 2\n";
       break;
     case LsHelper::Service:
-      filterPattern = "Filter: host_name = %1\n"
+      filterPattern =
+          "Filter: host_name = %1\n"
           "Filter: host_groups ~ %1\n"
           "Or: 2\n";
       break;
     default:
       break;
     }
-    data.append(filterPattern.arg(host));
+    data.append(filterPattern.arg(hostgroupFilter));
   }
   return ngrt4n::toByteArray(data.append("\n"));
 }
 
-int LsHelper::loadChecks(const QString& host, ChecksT& checks)
+int LsHelper::loadChecks(const QString& hostgroupFilter, ChecksT& checks)
 {
   checks.clear();
 
-  if (makeRequest(prepareRequestData(host, LsHelper::Host), checks) != 0)
+  if (makeRequest(prepareRequestData(hostgroupFilter, LsHelper::Host), checks) != 0)
     return -1;
 
-  return makeRequest(prepareRequestData(host, LsHelper::Service), checks);
+  return makeRequest(prepareRequestData(hostgroupFilter, LsHelper::Service), checks);
 }
 
 
 int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
 {
   if (m_socketHandler->makeRequest(data) != 0) {
-    m_lastError = m_socketHandler->lastError();
+    m_lastError = QString("%1: %2").arg(Q_FUNC_INFO, m_socketHandler->lastError());
     return -1;
   }
   parseResult(checks);

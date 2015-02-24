@@ -40,12 +40,12 @@ public:
   ~LsHelper();
 
   int makeRequest(const QByteArray& data, ChecksT& checks);
-  int loadChecks(const QString& host, ChecksT& checks);
+  int loadChecks(const QString& hostgroupFilter, ChecksT& checks);
   QString lastError(void) const {return m_lastError;}
   int setupSocket(void);
 
   void parseResult(ChecksT& checks);
-  static QByteArray prepareRequestData(const QString& host, ReqTypeT requestType);
+  static QByteArray prepareRequestData(const QString& hostgroupFilter, ReqTypeT requestType);
 
 private:
   QString m_lastError;

@@ -1,7 +1,6 @@
 # ngrt4n.pro
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 24-03-2014                                                 #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -186,7 +185,7 @@ DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_URL='\"http://RealOpInsight.com\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"ibericus\"'"
-DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2014\"'"
+DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2015\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
 DEFINES *= "REALOPINSIGHT_EDITOR_HELP_URL='\"/latest/01_workstation/editor-manual.html\"'"

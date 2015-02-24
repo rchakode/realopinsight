@@ -2,13 +2,16 @@
 RealOpInsight ChangeLog
 ###############################
 3.2.2
-  * Added ability to automatically import Zabbix triggers as host/group-based
-    business view
-  * Just active hosts are now considered when importing Zabbix triggers.
-    This has as benefit to limit the amount of data queried and transfered
+  * Added ability to automatically generate host/group-based business views from
+    Zabbix triggers as well as from Nagios checks. The support of this feature with
+    other monitors are planned for next releases.
+  * Only active hosts are now considered when importing Zabbix triggers, bringing the
+    benefit to limit the amount of data queried and transfered
     over the network.
-  * Reorganizing the Editor menus by moving all menus related to data
-    importation under a new main menu directly through the menu bar.
+  * Misc reorganization in the Editor menus: all menu items related to data
+    importation are now accessible via a new specific Importation main menu
+  * Fixed the text of the menu Close in the Editor
+  * Misc code cleanup and improvements.
 
 
 3.2.1

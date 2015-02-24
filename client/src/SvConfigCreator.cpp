@@ -37,15 +37,15 @@
 #include "PandoraHelper.hpp"
 
 namespace {
-const QString NAG_SOURCE     = "Nagios description file (*.nag.ngrt4n.xml)";
-const QString ZBX_SOURCE     = "Zabbix description file (*.zbx.ngrt4n.xml)";
-const QString ZNS_SOURCE     = "Zenoss description file (*.zns.ngrt4n.xml)";
-const QString PANDORA_SOURCE = "Pandora FMS description file (*.pfms.ngrt4n.xml)";
-const QString MULTI_SOURCES  = "Multi-source description file (*.ms.ngrt4n.xml)";
-const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
-const QString FILE_FILTER =
-    QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
-    .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
+  const QString NAG_SOURCE     = "Nagios description file (*.nag.ngrt4n.xml)";
+  const QString ZBX_SOURCE     = "Zabbix description file (*.zbx.ngrt4n.xml)";
+  const QString ZNS_SOURCE     = "Zenoss description file (*.zns.ngrt4n.xml)";
+  const QString PANDORA_SOURCE = "Pandora FMS description file (*.pfms.ngrt4n.xml)";
+  const QString MULTI_SOURCES  = "Multi-source description file (*.ms.ngrt4n.xml)";
+  const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
+  const QString FILE_FILTER =
+      QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
+      .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
 }
 
 SvCreator::SvCreator(const qint32& _userRole)
@@ -96,7 +96,7 @@ void SvCreator::addEvents(void)
   connect(m_subMenus["ImportNagiosBPIConf"],SIGNAL(triggered(bool)),this,SLOT(importNagiosBPIConfig()));
   connect(m_subMenus["ImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsDataPoints()));
   connect(m_subMenus["ImportZabbixITServices"],SIGNAL(triggered(bool)),this,SLOT(importZabbixITServicesAsBusinessViews()));
-  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(importZabbixTriggersAsBundleBusinessView()));
+  connect(m_subMenus["AutomaticImportZabbixTriggers"],SIGNAL(triggered(bool)),this,SLOT(autogenerateHostBasedBusinessView()));
   connect(m_subMenus["ImportZenossComponents"],SIGNAL(triggered(bool)),this,SLOT(importZenossComponents()));
   connect(m_subMenus["ImportPandoraModules"],SIGNAL(triggered(bool)),this,SLOT(importPandoraModules()));
   connect(m_subMenus["Quit"],SIGNAL(triggered(bool)),this,SLOT(treatCloseAction()));
@@ -193,7 +193,7 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
   QStringList sourceList;
   for (int i = 0; i< MAX_SRCS; ++i) {
     if (preferences.loadSource(i, srcInfo)) {
-      if (srcInfo.mon_type == type) {
+      if (srcInfo.mon_type == type || type == MonitorT::Auto) {
         sourceList.push_back(srcInfo.id);
         sourceInfos.insert(srcInfo.id, srcInfo);
       }
@@ -204,7 +204,7 @@ void SvCreator::fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos)
 void SvCreator::importNagiosChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  fetchSourceList(MonitorT::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -225,11 +225,11 @@ void SvCreator::importNagiosChecks(void)
 void SvCreator::importNagiosLivestatusChecks(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  fetchSourceList(MonitorT::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
-    QString host = importationSettingForm.filter();
+    QString hostgroupFilter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
     showStatusMsg(tr("Loading checks from %1:%2:%3...")
@@ -239,7 +239,7 @@ void SvCreator::importNagiosLivestatusChecks(void)
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
     int retcode = handler.setupSocket();
     if (retcode == 0) {
-      retcode = handler.loadChecks(host, checks);
+      retcode = handler.loadChecks(hostgroupFilter, checks);
     }
     processCheckLoadResults(retcode, srcId, checks, handler.lastError());
   }
@@ -249,7 +249,7 @@ void SvCreator::importNagiosLivestatusChecks(void)
 void SvCreator::importNagiosBPIConfig(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Nagios, sourceInfos);
+  fetchSourceList(MonitorT::Nagios, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), true);
   if (importationSettingForm.exec() != QDialog::Accepted) {
     return;
@@ -460,7 +460,7 @@ int SvCreator::extractNagiosBPIGroupMembers(const QString& parentServiceId,
 void SvCreator::importZabbixTriggersAsDataPoints(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(MonitorT::Zabbix, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -480,80 +480,101 @@ void SvCreator::importZabbixTriggersAsDataPoints(void)
   }
 }
 
-void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
+void SvCreator::autogenerateHostBasedBusinessView(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(MonitorT::Auto, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
     QString filter = importationSettingForm.filter();
     SourceT srcInfo = sourceInfos[srcId];
 
-    showStatusMsg(tr("Importing Zabbix triggers (%1:%2...)").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ChecksT checks;
-    ZbxHelper handler;
-    if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
-      showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
+    QString errorMsg = "";
+    QString monitorName = MonitorT().toString(srcInfo.mon_type);
+    if (srcInfo.mon_type == MonitorT::Zabbix) {
+      showStatusMsg(tr("Importing triggers from Zabbix at %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
+
+      ZbxHelper handler;
+      if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
+        errorMsg = tr("%1 data points importation failed: %2").arg(monitorName, handler.lastError());
+      } else {
+        if (checks.empty()) {
+          if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
+            errorMsg = tr("%1 data points importation failed: %2").arg(monitorName, handler.lastError());
+          }
+        }
+      }
+    } else if (srcInfo.mon_type == MonitorT::Nagios) {
+      showStatusMsg(tr("Importing Nagios checks from Livestatus at %1:%2:%3...")
+                    .arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)), false);
+      ChecksT checks;
+      LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
+      if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
+        errorMsg = handler.lastError();
+      }
     } else {
-      if (checks.empty()) {
-        if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
-          showStatusMsg(tr("Trigger importation failed: %1").arg(handler.lastError()), true);
-        }
-      }
+      //TODO: to be implemented
+      errorMsg = tr("%1 monitor is not supported yet").arg(monitorName);
+    }
 
-      showStatusMsg(tr("%1 trigger(s) imported").arg(QString::number(checks.size())), false);
+    if (! errorMsg.isEmpty()) {
+      showStatusMsg(tr("Data points importation failed: %1").arg(errorMsg), true);
+    } else {
+      showStatusMsg(tr("%1 entry(ies) imported").arg(QString::number(checks.size())), false);
+    }
 
-      // handle results
-      if (! checks.empty()) {
-        ngrt4n::clearCoreData(*m_cdata);
-        m_cdata->monitor = ngrt4n::Auto;
+    // handle results
+    if (! checks.empty()) {
 
-        NodeT root;
-        root.id = ngrt4n::ROOT_ID;
-        root.name = filter.isEmpty() ? tr("Zabbix Services") : filter;
-        root.type = NodeType::BusinessService;
+      ngrt4n::clearCoreData(*m_cdata);
+      m_cdata->monitor = MonitorT::Auto;
 
-        NodeT hostNode;
-        NodeT triggerNode;
-        hostNode.type = NodeType::BusinessService;
-        triggerNode.type = NodeType::ITService;
+      NodeT root;
+      root.id = ngrt4n::ROOT_ID;
+      root.name = filter.isEmpty() ? tr("%1 Services").arg(monitorName) : filter;
+      root.type = NodeType::BusinessService;
 
-        for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-          hostNode.parent = root.id;
-          hostNode.name = hostNode.description = QString::fromStdString(check->host);
-          hostNode.id = "";
-          Q_FOREACH(QChar c, hostNode.name) {
-            if (c.isLetterOrNumber()) {
-              hostNode.id.append(c);
-            }
+      NodeT hostNode;
+      NodeT triggerNode;
+      hostNode.type = NodeType::BusinessService;
+      triggerNode.type = NodeType::ITService;
+
+      for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
+        hostNode.parent = root.id;
+        hostNode.name = hostNode.description = QString::fromStdString(check->host);
+        hostNode.id = "";
+        Q_FOREACH(QChar c, hostNode.name) {
+          if (c.isLetterOrNumber()) {
+            hostNode.id.append(c);
           }
-          triggerNode.id = ngrt4n::genNodeId();
-          triggerNode.parent = hostNode.id;
-          QString checkId = QString::fromStdString(check->id);
-          triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
-          triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
+        }
+        QString checkId = QString::fromStdString(check->id);
+        triggerNode.id = ngrt4n::genNodeId();
+        triggerNode.parent = hostNode.id;
+        triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+        triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
 
-          NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
-          if (hostIterPos != m_cdata->bpnodes.end()) {
-            hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+        NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
+        if (hostIterPos != m_cdata->bpnodes.end()) {
+          hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+        } else {
+          hostNode.child_nodes = triggerNode.id;
+          if (root.child_nodes.isEmpty()) {
+            root.child_nodes = hostNode.id;
           } else {
-            hostNode.child_nodes = triggerNode.id;
-            if (root.child_nodes.isEmpty()) {
-              root.child_nodes = hostNode.id;
-            } else {
-              root.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
-            }
-            m_cdata->bpnodes.insert(hostNode.id, hostNode);
+            root.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
           }
-          m_cdata->cnodes.insert(triggerNode.id, triggerNode);
+          m_cdata->bpnodes.insert(hostNode.id, hostNode);
         }
-
-        // finally insert the root node and update UI widgets
-        m_cdata->bpnodes.insert(ngrt4n::ROOT_ID, root);
-        refreshUIWidgets();
+        m_cdata->cnodes.insert(triggerNode.id, triggerNode);
       }
+
+      // finally insert the root node and update UI widgets
+      m_cdata->bpnodes.insert(ngrt4n::ROOT_ID, root);
+      refreshUIWidgets();
     }
   }
 }
@@ -562,7 +583,7 @@ void SvCreator::importZabbixTriggersAsBundleBusinessView(void)
 void SvCreator::importZabbixITServicesAsBusinessViews(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zabbix, sourceInfos);
+  fetchSourceList(MonitorT::Zabbix, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -586,7 +607,7 @@ void SvCreator::importZabbixITServicesAsBusinessViews(void)
 void SvCreator::importZenossComponents(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Zenoss, sourceInfos);
+  fetchSourceList(MonitorT::Zenoss, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -610,7 +631,7 @@ void SvCreator::importZenossComponents(void)
 void SvCreator::importPandoraModules(void)
 {
   QMap<QString, SourceT> sourceInfos;
-  fetchSourceList(ngrt4n::Pandora, sourceInfos);
+  fetchSourceList(MonitorT::Pandora, sourceInfos);
   CheckImportationSettingsForm importationSettingForm(sourceInfos.keys(), false);
   if (importationSettingForm.exec() == QDialog::Accepted) {
     QString srcId = importationSettingForm.selectedSource();
@@ -698,11 +719,11 @@ void SvCreator::deleteNode(void)
   msgBox.setWindowTitle(tr("Deleting service - %1 Editor").arg(APP_NAME));
   msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel);
   switch (msgBox.exec()) {
-  case QMessageBox::Yes:
-    deleteNode(m_selectedNode);
-    break;
-  default:
-    break;
+    case QMessageBox::Yes:
+      deleteNode(m_selectedNode);
+      break;
+    default:
+      break;
   }
 }
 
@@ -816,19 +837,19 @@ QString SvCreator::selectFileDestinationPath(void)
   if (! path.isNull()) {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
-      m_cdata->monitor = ngrt4n::Zabbix;
+      m_cdata->monitor = MonitorT::Zabbix;
       if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
     } else if (filter == ZNS_SOURCE) {
-      m_cdata->monitor = ngrt4n::Zenoss;
+      m_cdata->monitor = MonitorT::Zenoss;
       if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else if (filter == NAG_SOURCE){
-      m_cdata->monitor = ngrt4n::Nagios;
+      m_cdata->monitor = MonitorT::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     } else if (filter == PANDORA_SOURCE) {
-      m_cdata->monitor = ngrt4n::Pandora;
+      m_cdata->monitor = MonitorT::Pandora;
       if (fileInfo.suffix().isEmpty()) path.append(".pfms.ngrt4n.xml");
     } else {
-      m_cdata->monitor = ngrt4n::Auto;
+      m_cdata->monitor = MonitorT::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
 
@@ -848,17 +869,20 @@ int SvCreator::treatCloseAction(const bool& _close)
       mbox.setWindowTitle(tr("Save change? - %1").arg(APP_NAME));
       mbox.setText(tr("The document has changed.\nDo you want to save the changes?"));
       mbox.setStandardButtons(QMessageBox::Yes|QMessageBox::Cancel|QMessageBox::Discard);
+      mbox.button(QMessageBox::Yes)->setText(tr("Yes"));
+      mbox.button(QMessageBox::Cancel)->setText(tr("Cancel"));
+      mbox.button(QMessageBox::Discard)->setText(tr("Discard changes"));
       switch (mbox.exec()) {
-      case QMessageBox::Yes:
-        save();
-        break;
-      case QMessageBox::Cancel:
-        enforceClose = false;
-        ret = 1;
-        break;
-      case QMessageBox::Discard:
-      default:
-        break;
+        case QMessageBox::Yes:
+          save();
+          break;
+        case QMessageBox::Cancel:
+          enforceClose = false;
+          ret = 1;
+          break;
+        case QMessageBox::Discard:
+        default:
+          break;
       }
     }
     if (enforceClose)
@@ -1085,7 +1109,8 @@ void SvCreator::loadMenu(void)
   const QString MENU_IMPORTATION="IMPORTATION";
   const QString MENU_HELP="HELP";
   m_menus[MENU_FILE] = m_menuBar->addMenu(tr("&File"));
-  m_subMenus["NewFile"] = m_menus[MENU_FILE]->addAction("New &File"),
+  m_subMenus["NewFile"] = m_menus[MENU_FILE]->addAction("New &File");
+  m_menus[MENU_FILE]->addSeparator(),
       m_subMenus["NewFile"]->setShortcut(QKeySequence::New);
   m_subMenus["Open"] = m_menus[MENU_FILE]->addAction(QIcon(":images/built-in/folder.png"), tr("&Open")),
       m_subMenus["Open"]->setShortcut(QKeySequence::Open);
@@ -1112,17 +1137,18 @@ void SvCreator::loadMenu(void)
       m_nodeContextMenu->addAction(m_subMenus["DeleteNode"]);
 
   m_menus[MENU_IMPORTATION] = m_menuBar->addMenu(tr("&Importation"));
-  m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks as Data Points")),
+  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Autogenerate Host/Group-based Business View"));
+  m_menus[MENU_IMPORTATION]->addSeparator(),
+      m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks as Data Points")),
       m_subMenus["ImportNagiosLivestatusChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Livestatus Checks as Data Points")),
       m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Za&bbix Triggers as Data Points")),
       m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business View"));
-  m_subMenus["AutomaticImportZabbixTriggers"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix Triggers as Host/Group-based Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
-      m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components"));
+      m_subMenus["ImportZenossComponents"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zenoss.png"), tr("Import Z&enoss Components as Data Points"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
-      m_subMenus["ImportPandoraModules"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules"));
+      m_subMenus["ImportPandoraModules"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-pandora.png"), tr("Import &Pandora Modules as Data Points"));
 
   m_menus[MENU_HELP] = m_menuBar->addMenu(tr("&Help"));
   m_subMenus["ShowOnlineResources"] = m_menus[MENU_HELP]->addAction(tr("Online &Resources")),
