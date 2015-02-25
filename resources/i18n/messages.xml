@@ -164,9 +164,9 @@
 
 <message id="dashboard-thumbnail.tpl">
    <div>
-      <legend>${thumb-titlebar}</legend>
+      <h2>${thumb-titlebar}</h2>
       <div>${thumb-image}</div>
-      <div style="font-size: 18px;">${thumb-problem-details}</div>
+      <legend>${thumb-problem-details}</legend>
   </div>
 </message>
 
