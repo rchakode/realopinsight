@@ -326,6 +326,15 @@
     </div>
      ${</if:dashboard-mode>}
 
+     ${<if:dashboard-tilesperrow>}
+    <div class="control-group">
+          <label for="${id:dashboard-tilesperrow}" class="control-label">Dashboard Tiles Per Row*</label>
+          <div class="controls">
+              ${dashboard-tilesperrow} <span class="help-inline">${dashboard-tilesperrow-info}</span>
+          </div>
+    </div>
+     ${</if:dashboard-tilesperrow>}
+
       ${<if:registration-date>}
     <div class="control-group">
           <label for="${id:registration-date}" class="control-label">Registration*</label>

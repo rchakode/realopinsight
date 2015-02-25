@@ -6,4 +6,5 @@
 
 -- alter table user
 
-ALTER TABLE user ADD COLUMN dashboardmode int not null default 0;
+ALTER TABLE user ADD COLUMN dashboardDisplayMode int not null default 0;
+ALTER TABLE user ADD COLUMN dashboardTilesPerRow int not null default 5;

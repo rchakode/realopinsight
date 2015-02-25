@@ -56,9 +56,10 @@ public:
   bool isLoggedAdmin(void) {return loggedUser().role == DboUser::AdmRole;}
   void configureAuth(void);
 	const DboUser& loggedUser(void) const {return m_loggedUser;}
-	bool isCompleteUserDashboard(void) const {return loggedUser().dashboardMode == DboUser::CompleteDashboard;}
-	bool isTileUserDashboard(void) const {return loggedUser().dashboardMode == DboUser::TileDashboard;}
-	bool isReportUserDashboard(void) const {return loggedUser().dashboardMode == DboUser::NoReportDashboard;}
+	bool isCompleteUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::CompleteDashboard;}
+	bool isTileUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::TileDashboard;}
+	bool isReportUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::NoReportDashboard;}
+  int dashboardTilesPerRow(void) const {return (loggedUser().dashboardTilesPerRow <= 0 ? 5 : loggedUser().dashboardTilesPerRow);}
   void setLoggedUser(void);
   QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
 

@@ -75,7 +75,6 @@ public:
   std::string getSmtpUsername(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USERNAME).toStdString();}
   std::string getSmtpPassword(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
   int getSmtpUseSsl(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
-  int getDashboardThumbnailsPerRow(void) const;
 
 
 protected :

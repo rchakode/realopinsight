@@ -59,310 +59,315 @@ class DboNotification;
 struct NotificationT;
 
 namespace Wt {
-	namespace Dbo {
-		template<>
-		struct dbo_traits<DboView> : public dbo_default_traits {
-			typedef std::string IdType;
-			static IdType invalidId() { return std::string(); }
-			static const char* surrogateIdField() { return 0; }
-		};
+  namespace Dbo {
+    template<>
+    struct dbo_traits<DboView> : public dbo_default_traits {
+      typedef std::string IdType;
+      static IdType invalidId() { return std::string(); }
+      static const char* surrogateIdField() { return 0; }
+    };
 
-		template<>
-		struct dbo_traits<DboUser> : public dbo_default_traits {
-			typedef std::string IdType;
-			static IdType invalidId() { return std::string(); }
-			static const char* surrogateIdField() { return 0; }
-		};
-	}
+    template<>
+    struct dbo_traits<DboUser> : public dbo_default_traits {
+      typedef std::string IdType;
+      static IdType invalidId() { return std::string(); }
+      static const char* surrogateIdField() { return 0; }
+    };
+  }
 }
 
 class DboView
 {
 public:
-	std::string name;
-	std::string path;
-	int service_count;
-	dbo::collection< dbo::ptr<DboUser> > users;
-	dbo::collection< dbo::ptr<DboQosData> > qosdatas;
-	dbo::collection< dbo::ptr<DboNotification> > notifications;
+  std::string name;
+  std::string path;
+  int service_count;
+  dbo::collection< dbo::ptr<DboUser> > users;
+  dbo::collection< dbo::ptr<DboQosData> > qosdatas;
+  dbo::collection< dbo::ptr<DboNotification> > notifications;
 
-	template<class Action>
-	void persist(Action& a) {
-		dbo::id(a, name, "name");
-		dbo::field(a, path, "path");
-		dbo::field(a, service_count, "service_count");
-		dbo::hasMany(a, users,dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
-		dbo::hasMany(a, qosdatas, dbo::ManyToOne, "view");
-		dbo::hasMany(a, notifications, dbo::ManyToOne, "view");
-	}
+  template<class Action>
+  void persist(Action& a) {
+    dbo::id(a, name, "name");
+    dbo::field(a, path, "path");
+    dbo::field(a, service_count, "service_count");
+    dbo::hasMany(a, users,dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
+    dbo::hasMany(a, qosdatas, dbo::ManyToOne, "view");
+    dbo::hasMany(a, notifications, dbo::ManyToOne, "view");
+  }
 };
 
 struct DboUserT {
-	std::string username;
-	std::string password;
-	std::string firstname;
-	std::string lastname;
-	std::string email;
-	int role;
-	std::string registrationDate;
-	int authsystem;
-	int dashboardMode;
+  std::string username;
+  std::string password;
+  std::string firstname;
+  std::string lastname;
+  std::string email;
+  int role;
+  std::string registrationDate;
+  int authsystem;
+  int dashboardDisplayMode;
+  int dashboardTilesPerRow;
 };
 
 class DboUser {
 public:
-	enum RoleT {
-		AdmRole = 100,
-		OpRole = 101
-	};
+  enum RoleT {
+    AdmRole = 100,
+    OpRole = 101
+  };
 
-	enum DashboardModeT {
-		CompleteDashboard = 0,
-		NoReportDashboard = 1,
-		TileDashboard = 2
-	};
+  enum DashboardModeT {
+    CompleteDashboard = 0,
+    NoReportDashboard = 1,
+    TileDashboard = 2
+  };
 
-	std::string username;
-	std::string password;
-	std::string firstname;
-	std::string lastname;
-	std::string email;
-	int role;
-	std::string registrationDate;
-	int authsystem;
-	int dashboardMode;
+  std::string username;
+  std::string password;
+  std::string firstname;
+  std::string lastname;
+  std::string email;
+  int role;
+  std::string registrationDate;
+  int authsystem;
+  int dashboardDisplayMode;
+  int dashboardTilesPerRow;
 
-	dbo::collection< dbo::ptr<DboView> > views;
-	dbo::collection< dbo::ptr<DboNotification> > ack_notifications;
+  dbo::collection< dbo::ptr<DboView> > views;
+  dbo::collection< dbo::ptr<DboNotification> > ack_notifications;
 
-	template<class Action>
-	void persist(Action& a) {
-		dbo::id(a, username, "name");
-		dbo::field(a, firstname, "firstname");
-		dbo::field(a, lastname, "lastname");
-		dbo::field(a, email, "email");
-		dbo::field(a, role, "role");
-		dbo::field(a, registrationDate, "registrationDate");
-		dbo::field(a, authsystem, "authsystem");
-		dbo::field(a, dashboardMode, "dashboardmode");
-		dbo::hasMany(a, views, dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
-		dbo::hasMany(a, ack_notifications, dbo::ManyToOne, "ack_user");
-	}
+  template<class Action>
+  void persist(Action& a) {
+    dbo::id(a, username, "name");
+    dbo::field(a, firstname, "firstname");
+    dbo::field(a, lastname, "lastname");
+    dbo::field(a, email, "email");
+    dbo::field(a, role, "role");
+    dbo::field(a, registrationDate, "registrationDate");
+    dbo::field(a, authsystem, "authsystem");
+    dbo::field(a, dashboardDisplayMode, "dashboardDisplayMode");
+    dbo::field(a, dashboardTilesPerRow, "dashboardTilesPerRow");
+    dbo::hasMany(a, views, dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
+    dbo::hasMany(a, ack_notifications, dbo::ManyToOne, "ack_user");
+  }
 
-	void setData(const DboUserT& userInfo) {
-		username = userInfo.username;
-		password = userInfo.password;
-		firstname = userInfo.firstname;
-		lastname = userInfo.lastname;
-		email = userInfo.email;
-		role = userInfo.role;
-		registrationDate = userInfo.registrationDate;
-		authsystem = userInfo.authsystem;
-		dashboardMode = userInfo.dashboardMode;
-	}
+  void setData(const DboUserT& userInfo) {
+    username = userInfo.username;
+    password = userInfo.password;
+    firstname = userInfo.firstname;
+    lastname = userInfo.lastname;
+    email = userInfo.email;
+    role = userInfo.role;
+    registrationDate = userInfo.registrationDate;
+    authsystem = userInfo.authsystem;
+    dashboardDisplayMode = userInfo.dashboardDisplayMode;
+    dashboardTilesPerRow = userInfo.dashboardTilesPerRow;
+  }
 
-	DboUserT data(void) const {
-		DboUserT u;
-		u.username = username;
-		u.password = password;
-		u.firstname = firstname;
-		u.lastname = lastname;
-		u.email = email;
-		u.role = role;
-		u.registrationDate = registrationDate;
-		u.authsystem = authsystem;
-		u.dashboardMode = dashboardMode;
-		return u;
-	}
+  DboUserT data(void) const {
+    DboUserT u;
+    u.username = username;
+    u.password = password;
+    u.firstname = firstname;
+    u.lastname = lastname;
+    u.email = email;
+    u.role = role;
+    u.registrationDate = registrationDate;
+    u.authsystem = authsystem;
+    u.dashboardDisplayMode = dashboardDisplayMode;
+    u.dashboardTilesPerRow = dashboardTilesPerRow;
+    return u;
+  }
 
-	static std::string role2Text(int role) {
-		return role == AdmRole? "Administrator" : "Operator";
-	}
-	static int role2Int(const std::string& role) {
-		return role == "Administrator" ? AdmRole : OpRole;
-	}
-	static std::string dashboardMode2Text(int mode) {
-		std::string result = Q_TR("Default");
-		switch(mode) {
-			case TileDashboard:
-				result = Q_TR("Tile/Screen");
-				break;
-			case NoReportDashboard:
-				result = Q_TR("No Report");
-				break;
-			case CompleteDashboard:
-			default:
-				result = Q_TR("Complete");
-				break;
-		}
+  static std::string role2Text(int role) {
+    return role == AdmRole? "Administrator" : "Operator";
+  }
+  static int role2Int(const std::string& role) {
+    return role == "Administrator" ? AdmRole : OpRole;
+  }
+  static std::string dashboardMode2Text(int mode) {
+    std::string result = Q_TR("Default");
+    switch(mode) {
+      case TileDashboard:
+        result = Q_TR("Only Tiles");
+        break;
+      case NoReportDashboard:
+        result = Q_TR("No Report");
+        break;
+      case CompleteDashboard:
+      default:
+        result = Q_TR("Complete");
+        break;
+    }
 
-		return result;
+    return result;
 
-	}
+  }
 };
 
 /** holds QoS data without wt::dbo specific info */
 struct QosDataT {
-	long timestamp;
-	int status;
-	float normal;
-	float minor;
-	float major;
-	float critical;
-	float unknown;
-	std::string view_name;
+  long timestamp;
+  int status;
+  float normal;
+  float minor;
+  float major;
+  float critical;
+  float unknown;
+  std::string view_name;
 
   QosDataT() : status(ngrt4n::Unknown) {}
 
-	std::string toString(void) const {
-		return QString("%1,%2,%3,%4,%5,%6,%7, %8")
-				.arg(QString::number(timestamp),
-						 view_name.c_str(),
-						 QString::number(status),
-						 QString::number(normal),
-						 QString::number(minor),
-						 QString::number(major),
-						 QString::number(critical),
-						 QString::number(unknown)).toStdString();
-	}
+  std::string toString(void) const {
+    return QString("%1,%2,%3,%4,%5,%6,%7, %8")
+        .arg(QString::number(timestamp),
+             view_name.c_str(),
+             QString::number(status),
+             QString::number(normal),
+             QString::number(minor),
+             QString::number(major),
+             QString::number(critical),
+             QString::number(unknown)).toStdString();
+  }
 };
 
 
 /** holds QoS data like wt::dbo class */
 class DboQosData {
 public:
-	long timestamp;
-	int status;
-	float normal;
-	float minor;
-	float major;
-	float critical;
-	float unknown;
-	dbo::ptr<DboView> view;
+  long timestamp;
+  int status;
+  float normal;
+  float minor;
+  float major;
+  float critical;
+  float unknown;
+  dbo::ptr<DboView> view;
 
-	void setData(const QosDataT& data)
-	{
-		timestamp = data.timestamp;
-		status = data.status;
-		normal = data.normal;
-		minor = data.minor;
-		major = data.major;
-		critical = data.critical;
-		unknown = data.unknown;
-	}
+  void setData(const QosDataT& data)
+  {
+    timestamp = data.timestamp;
+    status = data.status;
+    normal = data.normal;
+    minor = data.minor;
+    major = data.major;
+    critical = data.critical;
+    unknown = data.unknown;
+  }
 
-	QosDataT data(void) const
-	{
-		QosDataT d;
-		d.timestamp = timestamp;
-		d.status = status;
-		d.normal = normal;
-		d.minor = minor;
-		d.major = major;
-		d.critical = critical;
-		d.unknown = unknown;
-		d.view_name = view ? view->name : "";
-		return d;
-	}
+  QosDataT data(void) const
+  {
+    QosDataT d;
+    d.timestamp = timestamp;
+    d.status = status;
+    d.normal = normal;
+    d.minor = minor;
+    d.major = major;
+    d.critical = critical;
+    d.unknown = unknown;
+    d.view_name = view ? view->name : "";
+    return d;
+  }
 
-	template<class Action>
-	void persist(Action& a) {
-		dbo::field(a, timestamp, "timestamp");
-		dbo::field(a, status, "status");
-		dbo::field(a, normal, "normal");
-		dbo::field(a, minor, "minor");
-		dbo::field(a, major, "major");
-		dbo::field(a, critical, "critical");
-		dbo::field(a, unknown, "unknown");
-		dbo::belongsTo(a, view, "view", dbo::OnDeleteCascade);
-	}
+  template<class Action>
+  void persist(Action& a) {
+    dbo::field(a, timestamp, "timestamp");
+    dbo::field(a, status, "status");
+    dbo::field(a, normal, "normal");
+    dbo::field(a, minor, "minor");
+    dbo::field(a, major, "major");
+    dbo::field(a, critical, "critical");
+    dbo::field(a, unknown, "unknown");
+    dbo::belongsTo(a, view, "view", dbo::OnDeleteCascade);
+  }
 
-	std::string toString(void) const {
-		return QString("%1,%2,%3,%4,%5,%6,%7, %8")
-				.arg(QString::number(timestamp),
-						 view->name.c_str(),
-						 QString::number(status),
-						 QString::number(normal),
-						 QString::number(minor),
-						 QString::number(major),
-						 QString::number(critical),
-						 QString::number(unknown)).toStdString();
-	}
+  std::string toString(void) const {
+    return QString("%1,%2,%3,%4,%5,%6,%7, %8")
+        .arg(QString::number(timestamp),
+             view->name.c_str(),
+             QString::number(status),
+             QString::number(normal),
+             QString::number(minor),
+             QString::number(major),
+             QString::number(critical),
+             QString::number(unknown)).toStdString();
+  }
 };
 
 class DboLoginSession
 {
 public:
-	enum {
-		ExpiredCookie = 0,
-		ActiveCookie = 1,
-		InvalidSession = 2
-	};
+  enum {
+    ExpiredCookie = 0,
+    ActiveCookie = 1,
+    InvalidSession = 2
+  };
 
-	std::string username;
-	std::string sessionId;
-	std::string firstAccess;
-	std::string lastAccess;
-	int status;
+  std::string username;
+  std::string sessionId;
+  std::string firstAccess;
+  std::string lastAccess;
+  int status;
 
-	template<class Action>
-	void persist(Action& a) {
-		dbo::field(a, username, "username");
-		dbo::field(a, sessionId, "session_id");
-		dbo::field(a, firstAccess, "first_access");
-		dbo::field(a, lastAccess, "last_access");
-		dbo::field(a, status, "status");
-	}
+  template<class Action>
+  void persist(Action& a) {
+    dbo::field(a, username, "username");
+    dbo::field(a, sessionId, "session_id");
+    dbo::field(a, firstAccess, "first_access");
+    dbo::field(a, lastAccess, "last_access");
+    dbo::field(a, status, "status");
+  }
 };
 
 /** holds notification info without wt::dbo specific properties (e.g dbo pointers)*/
 struct NotificationT {
-	long timestamp;
-	int view_status;
-	long last_change;
-	long ack_status;
-	std::string view_name;
-	std::string ack_username;
+  long timestamp;
+  int view_status;
+  long last_change;
+  long ack_status;
+  std::string view_name;
+  std::string ack_username;
 };
 
 /** holds notification info like a wt::dbo object */
 class DboNotification
 {
 public:
-	enum AckStatusT {
-		Closed = 0,
-		Open = 1,
-		Acknowledged = 2
-	};
+  enum AckStatusT {
+    Closed = 0,
+    Open = 1,
+    Acknowledged = 2
+  };
 
-	long timestamp;
-	int view_status;
-	int ack_status;
-	long last_change;
-	dbo::ptr<DboView> view;
-	dbo::ptr<DboUser> ack_user;
+  long timestamp;
+  int view_status;
+  int ack_status;
+  long last_change;
+  dbo::ptr<DboView> view;
+  dbo::ptr<DboUser> ack_user;
 
-	NotificationT data(void) const
-	{
-		NotificationT d;
-		d.timestamp = timestamp;
-		d.view_name = view? view->name : "";
-		d.view_status = view_status;
-		d.ack_status = ack_status;
-		d.last_change = last_change;
-		d.ack_username = ack_user ? ack_user->username : "";
-		return d;
-	}
+  NotificationT data(void) const
+  {
+    NotificationT d;
+    d.timestamp = timestamp;
+    d.view_name = view? view->name : "";
+    d.view_status = view_status;
+    d.ack_status = ack_status;
+    d.last_change = last_change;
+    d.ack_username = ack_user ? ack_user->username : "";
+    return d;
+  }
 
-	template<class Action>
-	void persist(Action& a) {
-		dbo::field(a, timestamp, "timestamp");
-		dbo::field(a, view_status, "view_status");
-		dbo::field(a, ack_status, "ack_status");
-		dbo::field(a, last_change, "last_change");
-		dbo::belongsTo(a, view, "view", dbo::OnDeleteCascade);
-		dbo::belongsTo(a, ack_user, "ack_user", dbo::OnDeleteCascade);
-	}
+  template<class Action>
+  void persist(Action& a) {
+    dbo::field(a, timestamp, "timestamp");
+    dbo::field(a, view_status, "view_status");
+    dbo::field(a, ack_status, "ack_status");
+    dbo::field(a, last_change, "last_change");
+    dbo::belongsTo(a, view, "view", dbo::OnDeleteCascade);
+    dbo::belongsTo(a, ack_user, "ack_user", dbo::OnDeleteCascade);
+  }
 };
 
 typedef std::set<std::string> UserViewsT;

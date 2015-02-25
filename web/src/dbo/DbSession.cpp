@@ -124,7 +124,8 @@ int DbSession::updateUser(const DboUserT& userInfo)
     userPtr.modify()->firstname = userInfo.firstname;
     userPtr.modify()->email = userInfo.email;
     userPtr.modify()->role = userInfo.role;
-    userPtr.modify()->dashboardMode = userInfo.dashboardMode;
+    userPtr.modify()->dashboardDisplayMode = userInfo.dashboardDisplayMode;
+    userPtr.modify()->dashboardTilesPerRow = userInfo.dashboardTilesPerRow;
     authInfo.modify()->setEmail(userInfo.email);
     retValue = 0;
     transaction.commit();

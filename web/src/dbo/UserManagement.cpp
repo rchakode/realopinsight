@@ -70,6 +70,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   addField(UserLevelField);
   addField(RegistrationDateField);
   addField(DashboardDisplayMode);
+  addField(DashboardTilesPerRow);
 
   setValidator(UsernameField, createNameValidator());;
   setValidator(PasswordField, createPasswordValidator());
@@ -98,6 +99,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
     setVisible(UserLevelField, false);
     setVisible(RegistrationDateField, false);
     setVisible(DashboardDisplayMode, false);
+    setVisible(DashboardTilesPerRow, false);
   } else {
     setVisible(CurrentPasswordField, false);
     if (user) {
@@ -119,6 +121,7 @@ void UserFormModel::setWritable(bool writtable)
   setReadOnly(LastNameField, readonly);
   setReadOnly(EmailField, readonly);
   setReadOnly(DashboardDisplayMode, readonly);
+  setReadOnly(DashboardTilesPerRow, readonly);
   if (readonly) {
     setReadOnly(UserLevelField, readonly);
   } else {
@@ -133,7 +136,8 @@ void UserFormModel::setData(const DboUserT & user)
   setValue(LastNameField, user.lastname);
   setValue(EmailField, user.email);
   setValue(UserLevelField, DboUser::role2Text(user.role));
-  setValue(DashboardDisplayMode, DboUser::dashboardMode2Text(user.dashboardMode));
+  setValue(DashboardDisplayMode, DboUser::dashboardMode2Text(user.dashboardDisplayMode));
+  setValue(DashboardTilesPerRow, user.dashboardTilesPerRow);
   setValue(RegistrationDateField, user.registrationDate);
 }
 
@@ -193,7 +197,8 @@ UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userF
   setFormWidget(UserFormModel::EmailField, new Wt::WLineEdit());
   setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
   setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
-  setFormWidget(UserFormModel::DashboardDisplayMode, m_dashboardModeBoxField = createDashboardModeField());
+  setFormWidget(UserFormModel::DashboardDisplayMode, m_dashboardDispalyModeField = createDashboardDisplayModeField());
+  setFormWidget(UserFormModel::DashboardTilesPerRow, m_dashboardTilesPerRowField = createDashboardTilesPerRowField());
 
   if (user) {
     m_user = *user;
@@ -306,7 +311,8 @@ void UserFormView::process(void)
       m_user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
       m_user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
       m_user.role = DboUser::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
-      m_user.dashboardMode = m_dashboardModeBoxField->currentIndex();
+      m_user.dashboardDisplayMode = m_dashboardDispalyModeField->currentIndex();
+      m_user.dashboardTilesPerRow = m_dashboardTilesPerRowField->value();
       m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
       m_validated.emit(m_user);
     }
@@ -380,7 +386,7 @@ void UserFormView::createChangePasswordDialog(void)
 
 
 
-Wt::WComboBox* UserFormView::createDashboardModeField(void)
+Wt::WComboBox* UserFormView::createDashboardDisplayModeField(void)
 {
   Wt::WStandardItemModel* selectionModel =  new Wt::WStandardItemModel(2, 1, this);
   Wt::WStandardItem* selectionItem = NULL;
@@ -401,6 +407,16 @@ Wt::WComboBox* UserFormView::createDashboardModeField(void)
 
   return fieldWidget;
 }
+
+Wt::WSpinBox* UserFormView::createDashboardTilesPerRowField(void)
+{
+  Wt::WSpinBox* spinbox = new Wt::WSpinBox();
+  spinbox->setMinimum(1);
+  spinbox->setMaximum(16);
+  spinbox->setValue(5);
+  return spinbox;
+}
+
 
 DbUserManager::DbUserManager(DbSession* dbSession)
   : m_updateCompleted(this),

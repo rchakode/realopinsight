@@ -41,7 +41,6 @@
 namespace {
   const std::string LDAP_VERSION2_TEXT = "LDAPv2";
   const std::string LDAP_VERSION3_TEXT = "LDAPv3";
-  const int DASHBOARD_DEFAULT_THUMBNAIL_PER_ROW  = 5;
 }
 
 WebPreferencesBase::WebPreferencesBase(void)
@@ -78,15 +77,6 @@ std::string WebPreferencesBase::getLdapIdField(void) const
     return "uid";
 
   return val.toStdString();
-}
-
-
-int WebPreferencesBase::getDashboardThumbnailsPerRow(void) const
-{
-  int value = m_settings->keyValue(Settings::DASHBOARD_THUMBNAILS_PER_ROW).toInt();
-  if (value <= 0)
-    return DASHBOARD_DEFAULT_THUMBNAIL_PER_ROW;
-  return value;
 }
 
 

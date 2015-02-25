@@ -81,6 +81,7 @@ public:
   static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
   static constexpr Wt::WFormModel::Field DashboardDisplayMode = "dashboard-mode";
+  static constexpr Wt::WFormModel::Field DashboardTilesPerRow = "dashboard-tilesperrow";
 
   UserFormModel(const DboUserT* user, bool changePassword, bool userForm, Wt::WObject *parent = 0);
   void setWritable(bool writtable);
@@ -121,7 +122,8 @@ private:
   UserFormModel* m_model;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
-  Wt::WComboBox* m_dashboardModeBoxField;
+  Wt::WComboBox* m_dashboardDispalyModeField;
+  Wt::WSpinBox* m_dashboardTilesPerRowField;
 
   Wt::Signal<DboUserT> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
@@ -134,7 +136,8 @@ private:
   Wt::WComboBox* createUserLevelField(void);
   Wt::WLineEdit* createPaswordField(void);
   void createChangePasswordDialog(void);
-  Wt::WComboBox* createDashboardModeField(void);
+  Wt::WComboBox* createDashboardDisplayModeField(void);
+  Wt::WSpinBox* createDashboardTilesPerRowField(void);
 };
 
 

@@ -890,7 +890,7 @@ void WebMainUI::initOperatorDashboard(void)
 
   // Build view thumbnails
   int thumbIndex = 0;
-  int thumbnailsPerRow = m_preferences->getDashboardThumbnailsPerRow();
+  int thumbnailsPerRow = m_dbSession->dashboardTilesPerRow();
   for (const auto& view: m_dbSession->viewList()) {
     WebDashboard* dashboard;
     loadView(view.path, dashboard);
