@@ -41,7 +41,7 @@
 const QString APP_NAME = QObject::tr("%1 Ultimate").arg(REALOPINSIGHT_APPLICATION_NAME);
 /// In complement, the parameter max-request-size in configuration file
 /// shall be set accordingly
-const int MAX_FILE_UPLOAD = 10 * 1024; // 2MB
+const int MAX_FILE_UPLOAD = 4 * 1024; // 4MB
 const std::string LINK_HOME ="/home";
 const std::string LINK_LOAD ="/preview-view";
 const std::string LINK_IMPORT ="/upload-view";

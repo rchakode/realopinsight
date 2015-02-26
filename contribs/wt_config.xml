@@ -245,8 +245,9 @@
 
            Maximum size of an incoming POST request. This value must be
            increased when the user is allowed to upload files.
+           32768 = 4MB
          -->
-	<max-request-size>1024</max-request-size>
+        <max-request-size>32768</max-request-size>
 
 	<!-- Session id length (number of characters) -->
 	<session-id-length>16</session-id-length>
