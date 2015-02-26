@@ -571,8 +571,8 @@
  <div>
    <h3>Copyrights</h3>
    <p>
-   Copyrights &copy; 2010-2014, Rodrigue Chakode.<br/>
-   Copyrights &copy; 2014, RealOpInsight Labs. <br />
+   Copyrights &copy; 2010-${release-year}, Rodrigue Chakode.<br/>
+   Copyrights &copy; ${release-year}, RealOpInsight Labs. <br />
    All rights reserved. <a href="http://legal.realopinsight.com/" target="_blank">Terms of Use</a>
    </p>
 </div>
