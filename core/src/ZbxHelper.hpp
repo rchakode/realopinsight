@@ -57,7 +57,7 @@ public:
   QString lastError(void) const {return m_lastError;}
   void setSslPeerVerification(bool verifyPeer);
   int parseReply(QNetworkReply* reply);
-  bool backendReturnedSuccessfulResult(void);
+  bool checkBackendSuccessfulResult(void);
   int openSession(void);
   int loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& filterValue,
                  ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);

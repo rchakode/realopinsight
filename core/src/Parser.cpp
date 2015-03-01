@@ -177,11 +177,11 @@ void Parser::saveCoordinatesFile(const QString& _content)
 bool Parser::parseDotResult(void)
 {
   bool error = false;
-  auto process = std::unique_ptr<QProcess>(new QProcess());
+  QProcess process;
   QString plainDotFile = m_dotFile%".plain";
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
-  int exitCode = process->execute("dot", arguments);
-  process->waitForFinished(60000);
+  int exitCode = process.execute("dot", arguments);
+  process.waitForFinished(60000);
   if (!exitCode) {
     parseDotResult(plainDotFile);
   } else {
@@ -189,8 +189,6 @@ bool Parser::parseDotResult(void)
     Q_EMIT errorOccurred(m_lastErrorMsg);
     error = true;
   }
-  process.reset(NULL);
-
   return ! error;
 }
 

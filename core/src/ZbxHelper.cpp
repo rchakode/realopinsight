@@ -66,13 +66,13 @@ ZbxHelper::requestsPatterns()
   patterns[GetApiVersion] = "{\"jsonrpc\": \"2.0\", \
                             \"method\": \"apiinfo.version\", \
                             \"params\": [], \
-                            \"auth\": \"%1\", \
                             \"id\": %9}";
   patterns[GetTriggersByHostGroup] = "{\"jsonrpc\": \"2.0\", \
                                      \"auth\": \"%1\", \
                                      \"method\": \"trigger.get\", \
                                      \"params\": { \
-                                     \"filter\": {%2}, \
+                                     \"active\": true, \
+                                     \%2 \
                                      \"selectGroups\": [\"name\"], \
                                      \"selectHosts\": [\"host\"], \
                                      \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
@@ -83,7 +83,8 @@ ZbxHelper::requestsPatterns()
                                         \"auth\": \"%1\", \
                                         \"method\": \"trigger.get\", \
                                         \"params\": { \
-                                        \"filter\": {%2}, \
+                                        \"active\": true, \
+                                        \%2 \
                                         \"select_hosts\": [\"host\"], \
                                         \"output\":  \"extend\", \
                                         \"limit\": -1}, \
@@ -92,6 +93,7 @@ ZbxHelper::requestsPatterns()
                                \"auth\": \"%1\", \
                                \"method\": \"trigger.get\", \
                                \"params\": { \
+                               \"active\": true, \
                                \"triggerids\": %2, \
                                \"selectGroups\": [\"name\"], \
                                \"selectHosts\": [\"host\"], \
@@ -111,8 +113,9 @@ ZbxHelper::requestsPatterns()
 
 bool ZbxHelper::checkLogin(void)
 {
-  if (! m_isLogged && openSession() != 0)
-    return -1;
+  if (! m_isLogged && openSession() != 0) {
+    m_isLogged = false;
+  }
 
   return m_isLogged;
 }
@@ -120,7 +123,13 @@ bool ZbxHelper::checkLogin(void)
 int
 ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
 {
-  QString request = (reqId == GetLogin)? ReqPatterns[reqId] : ReqPatterns[reqId].arg(m_auth);
+  QString request = "";
+  if (reqId == GetLogin || reqId == GetApiVersion) {
+    request = ReqPatterns[reqId] ;
+  } else {
+    request = ReqPatterns[reqId].arg(m_auth);
+  }
+
   Q_FOREACH(const QString& myparam, params) {
     request = request.arg(myparam);
   }
@@ -173,20 +182,21 @@ ZbxHelper::parseReply(QNetworkReply* reply)
   }
 
   // now read data
-  m_replyJsonData.setData( QString( reply->readAll() )) ;
+  QString data = QString(reply->readAll());
+  m_replyJsonData.setData( data ) ;
   return 0;
 }
 
 bool
-ZbxHelper::backendReturnedSuccessfulResult(void)
+ZbxHelper::checkBackendSuccessfulResult(void)
 {
-  QString errData = m_replyJsonData.getProperty("error").property("data").toString();
   QString errMsg = m_replyJsonData.getProperty("error").property("message").toString();
+  QString errData = m_replyJsonData.getProperty("error").property("data").toString();
 
   if (errData.isEmpty() && errMsg.isEmpty())
     return true;
 
-  m_lastError = QString("%1%2%3").arg(errData, (errData.isEmpty()? "" : "; "), errMsg);
+  m_lastError = QString("%1: %2").arg(errMsg, errData);
 
   return false;
 }
@@ -243,7 +253,7 @@ ZbxHelper::fecthApiVersion(void)
   if (postRequest(ZbxHelper::GetApiVersion, params) != 0)
     return -1;
 
-  if (processGetApiVersionReply() !=0)
+  if (processGetApiVersionReply() != 0)
     return -1;
 
   return 0;
@@ -252,16 +262,16 @@ ZbxHelper::fecthApiVersion(void)
 int
 ZbxHelper::processGetApiVersionReply(void)
 {
-
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
-
   if (tid != ZbxHelper::GetApiVersion) {
     m_lastError = tr("the transaction id does not correspond to getApiVersion");
     return -1;
   }
 
-  setTrid( m_replyJsonData.getProperty("result").toString() );
+  if (! checkBackendSuccessfulResult())
+    return -1;
 
+  setTrid( m_replyJsonData.getProperty("result").toString() );
   return 0;
 }
 
@@ -330,21 +340,22 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& fi
     return -1;
 
   QStringList params;
-  QString filter = "";
   if (! filterValue.isEmpty()) {
     if (filterType == ngrt4n::GroupFilter) {
-      filter = QString("\"group\":[\"%1\"]").arg(filterValue);
+      params.push_back( QString("\"group\": \"%1\",").arg(filterValue) );
     } else {
-      filter = QString("\"host\":[\"%1\"]").arg(filterValue);
+      params.push_back( QString("\"host\": \"%1\",").arg(filterValue) );
     }
+  } else {
+    params.push_back("");
   }
-  params.push_back(filter);
+  //params.push_back(filter);
   params.push_back(QString::number(m_trid));
 
   if (postRequest(m_trid, params) != 0)
     return -1;
 
-  if (! backendReturnedSuccessfulResult())
+  if (! checkBackendSuccessfulResult())
     return -1;
 
   if (processTriggerData(checks) !=0)
@@ -358,10 +369,8 @@ int
 ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   m_sourceInfo = srcInfo;
-
   ngrt4n::clearCoreData(cdata);
-
-  cdata.monitor = ngrt4n::Zabbix;
+  cdata.monitor = MonitorT::Auto;
 
   if (! checkLogin())
     return -1;
@@ -370,7 +379,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   if (postRequest(GetITServices, params) != 0)
     return -1;
 
-  if (! backendReturnedSuccessfulResult())
+  if (! checkBackendSuccessfulResult())
     return -1;
 
   ZabbixParentChildsDependenciesMapT parentChildsDependencies;
@@ -479,16 +488,16 @@ ngrt4n::AggregatedSeverityT ZbxHelper::aggregationRuleFromZabbixCalcRule(int zab
   result.sev = CalcRules::Average;
   result.weight = ngrt4n::WEIGHT_UNIT;
   switch (zabbixCalcRule) {
-    case 0:
-      result.weight = 0;
-      break;
-    case 1:
-      result.sev = CalcRules::Worst;
-      break;
-    case 2: // default
-    default:
-      result.sev = CalcRules::Average;
-      break;
+  case 0:
+    result.weight = 0;
+    break;
+  case 1:
+    result.sev = CalcRules::Worst;
+    break;
+  case 2: // default
+  default:
+    result.sev = CalcRules::Average;
+    break;
   }
   return result;
 }
@@ -537,7 +546,7 @@ int ZbxHelper::setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTrigg
   if (postRequest(GetTriggersByIds, params) != 0)
     return -1;
 
-  if (! backendReturnedSuccessfulResult())
+  if (! checkBackendSuccessfulResult())
     return -1;
 
   ChecksT dataPoints;

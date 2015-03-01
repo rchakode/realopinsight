@@ -399,7 +399,7 @@ void ServiceEditor::layoutButtonBox(void)
 {
   m_actionButtonBox = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Close);
   m_actionButtonBox->button(QDialogButtonBox::Save)->setText(tr("Save"));
-  m_actionButtonBox->button(QDialogButtonBox::Close)->setText(tr("Fermer"));
+  m_actionButtonBox->button(QDialogButtonBox::Close)->setText(tr("Close"));
   m_mainLayout->addWidget(m_actionButtonBox, ++m_currentRow, 2);
 }
 
