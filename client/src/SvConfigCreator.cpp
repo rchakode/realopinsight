@@ -510,7 +510,6 @@ void SvCreator::autogenerateHostBasedBusinessView(void)
     } else if (srcInfo.mon_type == MonitorT::Nagios) {
       showStatusMsg(tr("Importing Nagios checks from Livestatus at %1:%2:%3...")
                     .arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)), false);
-      ChecksT checks;
       LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
       if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
         errorMsg = handler.lastError();
@@ -538,9 +537,9 @@ void SvCreator::autogenerateHostBasedBusinessView(void)
       root.type = NodeType::BusinessService;
 
       NodeT hostNode;
-      NodeT triggerNode;
+      NodeT itemNode;
       hostNode.type = NodeType::BusinessService;
-      triggerNode.type = NodeType::ITService;
+      itemNode.type = NodeType::ITService;
 
       for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
         hostNode.parent = root.id;
@@ -552,16 +551,16 @@ void SvCreator::autogenerateHostBasedBusinessView(void)
           }
         }
         QString checkId = QString::fromStdString(check->id);
-        triggerNode.id = ngrt4n::genNodeId();
-        triggerNode.parent = hostNode.id;
-        triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
-        triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
+        itemNode.id = ngrt4n::genNodeId();
+        itemNode.parent = hostNode.id;
+        itemNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+        itemNode.child_nodes = QString::fromStdString("%1:%2").arg(srcId, checkId);
 
         NodeListIteratorT hostIterPos =  m_cdata->bpnodes.find(hostNode.id);
         if (hostIterPos != m_cdata->bpnodes.end()) {
-          hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+          hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(itemNode.id);
         } else {
-          hostNode.child_nodes = triggerNode.id;
+          hostNode.child_nodes = itemNode.id;
           if (root.child_nodes.isEmpty()) {
             root.child_nodes = hostNode.id;
           } else {
@@ -569,7 +568,7 @@ void SvCreator::autogenerateHostBasedBusinessView(void)
           }
           m_cdata->bpnodes.insert(hostNode.id, hostNode);
         }
-        m_cdata->cnodes.insert(triggerNode.id, triggerNode);
+        m_cdata->cnodes.insert(itemNode.id, itemNode);
       }
 
       // finally insert the root node and update UI widgets
