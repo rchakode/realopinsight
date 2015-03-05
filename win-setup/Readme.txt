@@ -1,6 +1,6 @@
 RealOpInsight Workstation Suite
 
-Copyright (c) 2010-2014 RealOpInsight Labs. All rights reserved.
+Copyright (c) 2010-2015 RealOpInsight Labs. All rights reserved.
 
 The suite provides the following programs:
 
