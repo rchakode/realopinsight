@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------ #
-# File: install-ultimate                                                   #
+# File: install-ultimate-distrib.sh                                        #
 # Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
 # Creation : 10-03-2015                                                    #
 #                                                                          #
