@@ -1,3 +1,13 @@
+# ------------------------------------------------------------------------ #
+# File: make-ultimate-distrib.sh                                           #
+# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
+# Creation : 10-03-2015                                                    #
+#                                                                          #
+# This Software is part of RealOpInsight Ultimate                          #
+#                                                                          #
+# Read legal notice & use terms: http://legal.realopinsight.com            #
+#--------------------------------------------------------------------------#
+
 #!/bin/bash
 
 set -u
