@@ -122,26 +122,28 @@ install_ultimate_distrib()
    
 
   echo "DEBUG : Creating destination file system..."
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/etc
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/data
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/log
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/run   # directory for session info and thumbnails
-  install -d ${WWW_INSTALL_PREFIX}
-  install -d ${WWW_INSTALL_PREFIX}/run      # directory for thumbnails
+  install -d ${REALOPINSIGHT_HOME}
+  install -d ${REALOPINSIGHT_HOME}/lib
+  install -d ${REALOPINSIGHT_HOME}/sbin
+  install -d ${REALOPINSIGHT_HOME}/etc
+  install -d ${REALOPINSIGHT_HOME}/data
+  install -d ${REALOPINSIGHT_HOME}/log
+  install -d ${REALOPINSIGHT_HOME}/run   # directory for session info and thumbnails
+  install -d ${REALOPINSIGHT_WWW_HOME}
+  install -d ${REALOPINSIGHT_WWW_HOME}/run      # directory for thumbnails
 
   echo "DEBUG : Setting file permissions..."
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
-  chown -R $WWW_USER:$WWW_GROUP ${WWW_INSTALL_PREFIX}/
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_HOME}/
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_WWW_HOME}/
 
   echo "DEBUG : Copying core distribution files..."
-  cp -r www/* ${WWW_INSTALL_PREFIX}/
-  chmod 755 ${WWW_INSTALL_PREFIX}/realopinsight.fcgi
-  install -m 755 sbin/realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  cp -r www/* ${REALOPINSIGHT_WWW_HOME}/
+  install -D -m 755 lib/* ${REALOPINSIGHT_HOME}/lib
+  install -m 755 sbin/realopinsight-reportd ${REALOPINSIGHT_HOME}/sbin
+  chmod 755 ${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi
   
   echo "Copying configuration files..."
-  install -m 600 etc/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
+  install -m 600 etc/wt_config.xml ${REALOPINSIGHT_HOME}/etc/
   install -m 600 etc/realopinsight-ultimate.conf $REALOPINSIGHT_WWW_CONFIG_PATH
   
   echo "DEBUG : Activating Apache's Specific Settings..."

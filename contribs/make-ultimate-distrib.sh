@@ -113,7 +113,7 @@ extract_init_scripts()
 
 copy_wt_config()
 {
-  install -m 644 $REALOPINSIGHT_INSTALL_PREFIX/etc/wt_config.xml $DISTRIB_PKG_NAME/etc/
+  install -m 644 $REALOPINSIGHT_HOME/etc/wt_config.xml $DISTRIB_PKG_NAME/etc/
 }
 
 
@@ -157,15 +157,15 @@ check_usage $@
 
 # set variables
 VERSION=$1
-REALOPINSIGHT_INSTALL_PREFIX=$(get_absolute_path $2)
+REALOPINSIGHT_HOME=$(get_absolute_path $2)
 WWW_DIR=$(get_absolute_path $3)
-REALOPINSIGHT_INSTALL_PREFIX="/opt/realopinsight"
+REALOPINSIGHT_HOME="/opt/realopinsight"
 DISTRIB_PKG_NAME="realopinsight-ultimate-distrib-${VERSION}-`uname -m`"
 INSTALL_MANIFEST="$DISTRIB_PKG_NAME/INSTALL.MANIFEST"
 INSTALLATION_FILE="/tmp/install-ultimate-distrib.sh"
 APACHE_CONFIG_DIR="/etc/apache2"
 FCGI_FILE="${WWW_DIR}/realopinsight.fcgi"
-REPORTD_FILE="$REALOPINSIGHT_INSTALL_PREFIX/sbin/realopinsight-reportd"
+REPORTD_FILE="$REALOPINSIGHT_HOME/sbin/realopinsight-reportd"
 REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
 WWW_USER=$(get_www_user)
 WWW_GROUP=$(get_user_group $WWW_USER)
@@ -184,8 +184,8 @@ copy_www_files
 extract_binary_file $REPORTD_FILE sbin
 extract_init_scripts
 
-echo "REALOPINSIGHT_INSTALL_PREFIX=$REALOPINSIGHT_INSTALL_PREFIX" >> $INSTALL_MANIFEST
-echo "WWW_INSTALL_PREFIX=$WWW_DIR" >> $INSTALL_MANIFEST
+echo "REALOPINSIGHT_HOME=$REALOPINSIGHT_HOME" >> $INSTALL_MANIFEST
+echo "REALOPINSIGHT_WWW_HOME=$WWW_DIR" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_CONFIG_PATH=$REALOPINSIGHT_WWW_CONFIG_PATH" >> $INSTALL_MANIFEST
 echo "WWW_USER=$WWW_USER" >> $INSTALL_MANIFEST
 echo "WWW_GROUP=$WWW_GROUP" >> $INSTALL_MANIFEST
