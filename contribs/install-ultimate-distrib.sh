@@ -8,11 +8,14 @@
 # Read legal notice & use terms: http://legal.realopinsight.com            #
 #--------------------------------------------------------------------------#
 
+#!/bin/bash
+
+
 set -e
 set -u
 
-if [ -e "INSTALL.MANIFEST" ]; then
-  . INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
+if [ -e ./INSTALL.MANIFEST ]; then
+  . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
 else
   echo "INSTALL.MANIFEST not found"
   exit 1
@@ -74,45 +77,39 @@ check_root_user()
   fi
 }
 
-set_realopinsight_www_config()
+
+install_initd_scripts()
 {
-  if [ -d ${WWW_CONFIG_ROOT}/conf-available ]; then
-    REALOPINSIGHT_WWW_CONFIG_FILE="${WWW_CONFIG_ROOT}/conf-available/realopinsight-ultimate.conf"
-  else
-    REALOPINSIGHT_WWW_CONFIG_FILE="${WWW_CONFIG_ROOT}/conf.d/realopinsight-ultimate.conf"
-  fi
+  install -m 755 scripts/init.d/realopinsight-reportd /etc/init.d/
+  update-rc.d realopinsight-reportd defaults
+}
+
+stop_services()
+{
+  service apache2 stop
+}
+
+start_services()
+{
+  service realopinsight-reportd start
+  service apache2 start
 }
 
 check_prerequisites()
 {
-  #TODO
+  echo "#TODO: check prerequisistes"
 }
 
 
-install_workstation() {
-  echo "==>Installing RealOpInsight Workstation..."  
-  check_prerequisites
-  echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
-  echo -n "DEBUG : Current component => Manager..."
-  install_default
-  echo "done"
-  
-  echo -n "DEBUG : Current component => Editor..."
-  install_editor
-  echo "done"
-  
-  echo -n "DEBUG : Current component => Operator Console..."
-  install_oc
-  echo "done"
-  echo "==>Installation completed"
-}
-
-install_ultimate_bundle() 
+install_ultimate_distrib() 
 {
   echo "==>Installing RealOpInsight Ultimate..."
 
   #check that user is root
   check_root_user
+  
+  # stop dependent services
+  stop_services || true
   
   # check www user (apache/nginx)
   check_www_user
@@ -120,68 +117,44 @@ install_ultimate_bundle()
   # check www group (apache/nginx)
   check_www_group
   
-  # set www configuration directory
-  set_www_config_directory
- 
   # check dependencies
   check_prerequisites
- 
-  if [ ! -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
-    echo "DEBUG : Building RealOpInsight Standalone..."
-    install_webd
-    install -m 755 realopinsightd  ${INSTALL_PREFIX}/
-    install -m 755 contribs/realopinsightctld  ${INSTALL_PREFIX}/
-  else
-    echo -n "DEBUG : Building RealOpInsight for FastCGI..."
-    install_fcgi
-    echo done
+   
 
-    echo -n "DEBUG : Building QoS Data collector..."
-    install_reportd
-    echo done
-  fi
-
-  echo "DEBUG : Installing configuration files..."
-  install -d ${INSTALL_PREFIX}
-  install -d ${INSTALL_PREFIX}/sbin
-  install -d ${INSTALL_PREFIX}/etc
-  install -d ${INSTALL_PREFIX}/data
-  install -d ${INSTALL_PREFIX}/log
-  install -d ${INSTALL_PREFIX}/run   # directory for session info and thumbnails
+  echo "DEBUG : Creating destination file system..."
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/etc
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/data
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/log
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/run   # directory for session info and thumbnails
   install -d ${WWW_INSTALL_PREFIX}
   install -d ${WWW_INSTALL_PREFIX}/run      # directory for thumbnails
-  install -d ${WWW_INSTALL_PREFIX}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
-  install contribs/index.html ${WWW_INSTALL_PREFIX}/
-  install -m 755 realopinsight.fcgi ${WWW_INSTALL_PREFIX}/
-  install -m 644 favicon.ico ${WWW_INSTALL_PREFIX}/
-  install -m 755 realopinsight-reportd ${INSTALL_PREFIX}/sbin
-  install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
-  
-  install -m 600 contribs/wt_config.xml ${INSTALL_PREFIX}/etc/
-  install resources/themes/img/glyphicons-halflings.png ${WWW_INSTALL_PREFIX}/resources/themes/bootstrap/img
-  install -m 600 contribs/apache-realopinsight-ultimate.conf ${REALOPINSIGHT_WWW_CONFIG_FILE}
-  cp -r resources ${WWW_INSTALL_PREFIX}/ 
-  cp -r images ${WWW_INSTALL_PREFIX}/
-  cp -r i18n ${WWW_INSTALL_PREFIX}/
-  
-  echo "DEBUG : Settings permissions and ..."
-  chown -R $WWW_USER:$WWW_GROUP ${INSTALL_PREFIX}/
+
+  echo "DEBUG : Setting file permissions..."
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
   chown -R $WWW_USER:$WWW_GROUP ${WWW_INSTALL_PREFIX}/
+
+  echo "DEBUG : Copying core distribution files..."
+  cp -r www/* ${WWW_INSTALL_PREFIX}/
+  chmod 755 ${WWW_INSTALL_PREFIX}/realopinsight.fcgi
+  install -m 755 sbin/realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   
-  echo "DEBUG : Settings Apache"
-  sed --in-place 's!WWW_INSTALL_PREFIX!'"${WWW_INSTALL_PREFIX}"'!' ${REALOPINSIGHT_WWW_CONFIG_FILE}
+  echo "Copying configuration files..."
+  install -m 600 etc/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
+  install -m 600 etc/realopinsight-ultimate.conf $REALOPINSIGHT_WWW_CONFIG_PATH
+  
+  echo "DEBUG : Activating Apache's Specific Settings..."
   a2enmod fastcgi || true
   a2enconf realopinsight-ultimate || true 
-  service apache2 reload
   
-  echo "DEBUG : Setting up RealOpInsight QoS data collector"
-  update-rc.d realopinsight-reportd defaults
-  service realopinsight-reportd restart
-
+  echo "Setting Up Init Scripts and Starting Services.."
+  install_initd_scripts
+  start_services
   echo "==>Installation completed"
 }
 
 prompt_copyright
-install_ultimate_bundle
+install_ultimate_distrib
 
 exit 0
