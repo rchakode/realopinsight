@@ -1,3 +1,13 @@
+# ------------------------------------------------------------------------ #
+# File: make-ultimate-distrib.sh                                        #
+# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
+# Creation : 10-03-2015                                                    #
+#                                                                          #
+# This Software is part of RealOpInsight Ultimate                          #
+#                                                                          #
+# Read legal notice & use terms: http://legal.realopinsight.com            #
+#--------------------------------------------------------------------------#
+
 #!/bin/bash
 
 set -u
@@ -78,7 +88,7 @@ extract_sbin_files()
 
 extract_fcgi_deps()
 {
-  FCGI_FILE="${WWW_DIR}/realopinsight.fcgi"
+  FCGI_FILE="${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi"
   if [ ! -e $FCGI_FILE ]; then
     echo "File not found: $FCGI_FILE"
     exit 1
@@ -90,7 +100,7 @@ extract_fcgi_deps()
 copy_www_files()
 {
   extract_fcgi_deps
-  cp --recursive $WWW_DIR/* $DISTRIB_PKG_NAME/www
+  cp --recursive $REALOPINSIGHT_WWW_HOME/* $DISTRIB_PKG_NAME/www
 }
 
 
@@ -108,7 +118,7 @@ copy_apache_config()
 
 extract_init_scripts()
 {
-  install -m 755 $REPORTD_INIT_SCRIPT $DISTRIB_PKG_NAME/scripts/init.d/$REPORTD_INIT_SCRIPT
+  install -m 755 $REPORTD_INIT_SCRIPT $DISTRIB_PKG_NAME/scripts/init.d/`basename $REPORTD_INIT_SCRIPT`
 }
 
 copy_wt_config()
@@ -142,7 +152,7 @@ get_user_group()
   fi
 
   USER=$1
-  GROUP=$(id $USER | cut -d' ' -f2 | awk -F "(" '{sub(")", "", $2); print $2}')
+  GROUP=$(id $USER | cut -d' ' -f2 | awk -F "(" '{sub("\)", "", $2); print $2}')
   echo $GROUP
 }
 
@@ -158,13 +168,14 @@ check_usage $@
 # set variables
 VERSION=$1
 REALOPINSIGHT_HOME=$(get_absolute_path $2)
-WWW_DIR=$(get_absolute_path $3)
-REALOPINSIGHT_HOME="/opt/realopinsight"
-DISTRIB_PKG_NAME="realopinsight-ultimate-distrib-${VERSION}-`uname -m`"
+REALOPINSIGHT_WWW_HOME=$(get_absolute_path $3)
+OS_NAME=$(echo `lsb_release -s -i` | tr '[:upper:]' '[:lower:]')
+OS_VERSION=$(echo `lsb_release -s -r` | awk '{sub("\\.", "", $0);sub("-", "", $0); sub(" ", "", $0);print $1}')
+DISTRIB_PKG_NAME="realopinsight-ultimate-v${VERSION}-${OS_NAME}${OS_VERSION}-`uname -m`"
 INSTALL_MANIFEST="$DISTRIB_PKG_NAME/INSTALL.MANIFEST"
 INSTALLATION_FILE="/tmp/install-ultimate-distrib.sh"
 APACHE_CONFIG_DIR="/etc/apache2"
-FCGI_FILE="${WWW_DIR}/realopinsight.fcgi"
+FCGI_FILE="${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi"
 REPORTD_FILE="$REALOPINSIGHT_HOME/sbin/realopinsight-reportd"
 REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
 WWW_USER=$(get_www_user)
@@ -185,7 +196,7 @@ extract_binary_file $REPORTD_FILE sbin
 extract_init_scripts
 
 echo "REALOPINSIGHT_HOME=$REALOPINSIGHT_HOME" >> $INSTALL_MANIFEST
-echo "REALOPINSIGHT_WWW_HOME=$WWW_DIR" >> $INSTALL_MANIFEST
+echo "REALOPINSIGHT_WWW_HOME=$REALOPINSIGHT_WWW_HOME" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_CONFIG_PATH=$REALOPINSIGHT_WWW_CONFIG_PATH" >> $INSTALL_MANIFEST
 echo "WWW_USER=$WWW_USER" >> $INSTALL_MANIFEST
 echo "WWW_GROUP=$WWW_GROUP" >> $INSTALL_MANIFEST
