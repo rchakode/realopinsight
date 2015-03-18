@@ -30,6 +30,7 @@ print_usage()
   echo "Usage: `basename $0`"
 }
 
+
 prompt_copyright()
 { 
   echo
@@ -55,7 +56,7 @@ prompt_copyright()
 check_www_user()
 {
   if [ -z "$WWW_USER" ]; then
-    echo "ERROR : WWW_USER not set"
+    echo "ERROR: WWW_USER not set"
 	exit 1
   fi
 }
@@ -63,7 +64,7 @@ check_www_user()
 check_www_group()
 {
   if [ -z "$WWW_GROUP" ]; then
-    echo "ERROR : WWW_GROUP not set"
+    echo "ERROR: WWW_GROUP not set"
 	exit 1
   fi  
 }
@@ -72,7 +73,7 @@ check_www_group()
 check_root_user()
 {
   if [ `id -u` -ne 0 ]; then 
-    echo "ERROR : root privileges are required"
+    echo "ERROR: root privileges are required"
     exit 1	
   fi
 }
@@ -84,20 +85,35 @@ install_initd_scripts()
   update-rc.d realopinsight-reportd defaults
 }
 
-stop_services()
-{
-  service apache2 stop
-}
 
 start_services()
 {
   service realopinsight-reportd start
-  service apache2 start
+  service apache2 reload
 }
+
 
 check_prerequisites()
 {
-  echo "#TODO: check prerequisistes"
+  APACHECTL=$(which apachectl) || true
+  if [ -z "APACHECTL" ]; then
+    echo "ERROR: Apache seems to be not installed. If yes, set your PATH variable suitably"
+    echo "To install it manually:"
+    echo " $ sudo apt-get install apache2"
+    exit 1
+  fi
+  
+  MOD_FASTCGI=$($APACHECTL -M | grep "fastcgi\_module") || true
+  if [ -z "$MOD_FASTCGI" ]; then
+    echo "ERROR: Apache Module mod_fastcgi is not enabled."
+    echo ""
+    echo "To install it manually:"
+    echo " $ sudo apt-get install libapache2-mod-fastcgi"
+    echo " $ a2enmod fastcgi"
+    echo "**NOTE**: On Ubuntu this package can be provided by the following repository:"
+    echo "          => http://us.archive.ubuntu.com/ubuntu/"
+    exit 1
+  fi
 }
 
 
@@ -108,9 +124,6 @@ install_ultimate_distrib()
   #check that user is root
   check_root_user
   
-  # stop dependent services
-  stop_services || true
-  
   # check www user (apache/nginx)
   check_www_user
   
@@ -120,8 +133,7 @@ install_ultimate_distrib()
   # check dependencies
   check_prerequisites
    
-
-  echo "DEBUG : Creating destination file system..."
+  echo "DEBUG: Creating destination file system..."
   install -d ${REALOPINSIGHT_HOME}
   install -d ${REALOPINSIGHT_HOME}/lib
   install -d ${REALOPINSIGHT_HOME}/sbin
@@ -132,25 +144,26 @@ install_ultimate_distrib()
   install -d ${REALOPINSIGHT_WWW_HOME}
   install -d ${REALOPINSIGHT_WWW_HOME}/run      # directory for thumbnails
 
-  echo "DEBUG : Setting file permissions..."
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_HOME}/
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_WWW_HOME}/
 
-  echo "DEBUG : Copying core distribution files..."
+  echo "DEBUG: Copying core distribution files..."
   cp -r www/* ${REALOPINSIGHT_WWW_HOME}/
   install -D -m 755 lib/* ${REALOPINSIGHT_HOME}/lib
   install -m 755 sbin/realopinsight-reportd ${REALOPINSIGHT_HOME}/sbin
   chmod 755 ${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi
   
-  echo "Copying configuration files..."
-  install -m 600 etc/wt_config.xml ${REALOPINSIGHT_HOME}/etc/
-  install -m 600 etc/realopinsight-ultimate.conf $REALOPINSIGHT_WWW_CONFIG_PATH
+  echo "DEBUG: Copying configuration files..."
+  install -m 644 etc/wt_config.xml ${REALOPINSIGHT_HOME}/etc/
+  install -m 644 etc/realopinsight-ultimate.conf $REALOPINSIGHT_WWW_CONFIG_PATH
   
-  echo "DEBUG : Activating Apache's Specific Settings..."
-  a2enmod fastcgi || true
-  a2enconf realopinsight-ultimate || true 
   
-  echo "Setting Up Init Scripts and Starting Services.."
+  echo "DEBUG: Setting file permissions..."
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_HOME}/{data,log,run}
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_WWW_HOME}/run
+  
+  echo "DEBUG: Activating Apache's Specific Settings..."
+  a2enconf realopinsight-ultimate
+  
+  echo "DEBUG: Setting Up Init Scripts and Starting Services.."
   install_initd_scripts
   start_services
   echo "==>Installation completed"
