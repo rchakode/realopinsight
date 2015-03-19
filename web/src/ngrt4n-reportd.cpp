@@ -42,6 +42,17 @@ void runCollector(int period)
   DbSession dbSession;
   WebPreferencesBase preferences;
   Notificator notificator(&dbSession);
+  QMap<std::string, QosDataT> lastQoSInfoMap;
+  QosDataT defaultQoSInfo;
+
+  defaultQoSInfo.timestamp = 0;
+  defaultQoSInfo.status =  ngrt4n::Unknown;
+  defaultQoSInfo.normal = 0;
+  defaultQoSInfo.minor = 0;
+  defaultQoSInfo.major = 0;
+  defaultQoSInfo.critical = 0;
+  defaultQoSInfo.unknown = 0;
+
   while(1) {
     try {
       dbSession.updateUserList();
@@ -69,8 +80,14 @@ void runCollector(int period)
       try {
         dbSession.addQosData(qosInfo);
         if (preferences.getNotificationType() != WebPreferencesBase::NoNotification) {
-          notificator.handleNotification(collector.rootNode(), qosInfo);
+          QMap<std::string, QosDataT>::ConstIterator lastQoSData = lastQoSInfoMap.find(qosInfo.view_name);
+          if (lastQoSData != lastQoSInfoMap.end()) {
+            notificator.handleNotification(collector.rootNode(), qosInfo, *lastQoSData);
+          } else {
+            notificator.handleNotification(collector.rootNode(), qosInfo, defaultQoSInfo);
+          }
         }
+        lastQoSInfoMap[qosInfo.view_name] = qosInfo;
         REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", std::string(ex.what()));
