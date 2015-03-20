@@ -32,8 +32,7 @@ class ChartBase
 {
 public:
   ChartBase();
-  void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
-  void updateSeverityInfo(void);
+  void updateStatsRatio(void);
   QString buildTooltipText(void);
   double statusRatio(int status) const { return m_severityRatio[status]; }
   std::string toStdString(void) {return buildTooltipText().toStdString();}
@@ -45,12 +44,12 @@ public:
   std::string problemsDetailsText(void) {
     return QObject::tr("%1/%2 IT problems")
         .arg(QString::number(problemCount()))
-        .arg(QString::number(m_cdata->cnodes.size())).toStdString();}
+        .arg(QString::number(m_dataCount)).toStdString();}
+  void updateStatsData(const CheckStatusCountT& statsData, int count);
 
 protected:
-  CoreDataT* m_cdata;
   CheckStatusCountT m_statsData;
-  qint32 m_nbStatsEntries;
+  qint32 m_dataCount;
   QMap<int, float> m_severityRatio;
 };
 

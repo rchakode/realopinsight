@@ -55,7 +55,6 @@ WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* even
     m_eventFeedLayout(eventFeedLayout)
 {
   setupUI();
-  m_chart->setCoreData(m_cdata);
   addJsEventScript();
 }
 
@@ -98,7 +97,13 @@ void WebDashboard::updateMsgConsole(const NodeT& _node)
 
 void WebDashboard::updateChart(void)
 {
-  m_chart->repaint();
+  qint32 statCount;
+  CheckStatusCountT statsData;
+  if (m_cdata) {
+    extractStatsData(statsData, statCount);
+    m_chart->updateStatsData(statsData, statCount);
+    m_chart->repaint();
+  }
 }
 
 void WebDashboard::buildMap(void)

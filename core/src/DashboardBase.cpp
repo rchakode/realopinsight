@@ -570,3 +570,31 @@ NodeT DashboardBase::rootNode(void)
   assert(root != m_cdata->bpnodes.end());
   return *root;
 }
+
+
+
+void DashboardBase::extractStatsData(CheckStatusCountT& statsData, qint32& count)
+{
+  count = m_cdata->cnodes.size();
+  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
+       node != end; ++ node) {
+    switch (node->sev) {
+    case ngrt4n::Normal:
+      ++statsData[ngrt4n::Normal];
+      break;
+    case ngrt4n::Minor:
+      ++statsData[ngrt4n::Minor];
+      break;
+    case ngrt4n::Major:
+      ++statsData[ngrt4n::Major];
+      break;
+    case ngrt4n::Critical:
+      ++statsData[ngrt4n::Critical];
+      break;
+    case ngrt4n::Unknown:
+    default:
+      ++statsData[ngrt4n::Unknown];
+      break;
+    }
+  }
+}

@@ -57,6 +57,7 @@ public:
   NodeT rootNode(void);
   bool lastErrorState() const {return m_lastErrorState;}
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}
+  void extractStatsData(CheckStatusCountT& statsData, qint32& count);
 
 public Q_SLOTS:
 #ifndef REALOPINSIGHT_DISABLE_ZMQ

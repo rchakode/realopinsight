@@ -33,8 +33,10 @@ QosCollector::QosCollector(const QString& descriptionFile)
 
 void QosCollector::updateChart(void)
 {
-  m_chartBase.setCoreData(m_cdata);
-  m_chartBase.updateSeverityInfo();
+  qint32 statCount;
+  CheckStatusCountT statsData;
+  extractStatsData(statsData, statCount);
+  m_chartBase.updateStatsData(statsData, statCount);
 
   m_qosInfo.timestamp = time(NULL);
   m_qosInfo.view_name  = rootNode().name.toStdString();

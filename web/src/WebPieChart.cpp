@@ -120,8 +120,6 @@ WebPieChart::~WebPieChart()
 
 void WebPieChart::repaint()
 {
-  updateSeverityInfo();
-
   for(auto it = std::begin(m_statsData); it != std::end(m_statsData); ++it) {
     m_model->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
     m_model->setData(it.key(), 1, it.value());
