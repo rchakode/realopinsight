@@ -112,6 +112,13 @@ update_db_2014b8()
   check_exit_code
 }
 
+update_db_2014b9()
+{
+  echo -n "DEBUG : Updating database to 2014b9..."
+  su - ${REALOPINSIGHT_WWW_USER} -c "sqlite3 /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b9.sql"
+  check_exit_code
+}
+
 get_target_version_from_user()
 {
 
@@ -122,26 +129,30 @@ get_target_version_from_user()
   echo "2) 3.0.0b2"
   echo "3) 2014b3 | 2014b4 | 2014b5 | 2014b6"
   echo "4) 2014b7"
-  echo "q) Quit"
+  echo "5) 2014b8"
+  echo "q|Q) Quit"
   echo
   
   while true; do
     read -p "Type response " rep
     case $rep in
           1) INSTALLED_VERSION="3.0.0b1"
-	      break
-		  ;;
+	           break
+		         ;;
           2) INSTALLED_VERSION="3.0.0b2"
-	     break
-		 ;;
+	           break
+		         ;;
          3) INSTALLED_VERSION="2014b3-2014b6"
              break
-         ;;
+             ;;
          4) INSTALLED_VERSION="2014b7"
              break
          ;;     
-	    q) exit 0 
-	      ;; 
+         5) INSTALLED_VERSION="2014b8"
+             break
+            ;;             
+	       q|Q) exit 0 
+	          ;; 
 	    *) echo -n "Invalid input. ";; 
     esac
   done  
@@ -189,17 +200,23 @@ if [ "${INSTALLED_VERSION}" == "3.0.0b1" ] || [ "${INSTALLED_VERSION}" == "3.0.0
   update_db_2014b3
   update_db_2014b7
   update_db_2014b8
+  update_db_2014b9
 fi
 
 if [ "${INSTALLED_VERSION}" == "2014b3-2014b6" ]; then
   update_db_2014b7
   update_db_2014b8
+  update_db_2014b9
 fi
 
 if [ "${INSTALLED_VERSION}" == "2014b7" ]; then
   update_db_2014b8
+  update_db_2014b9
 fi
 
+if [ "${INSTALLED_VERSION}" == "2014b8" ]; then
+  update_db_2014b9
+fi
 
 echo -n "DEBUG : Applying update from ${REAlOPINSIGHT_PATCH_TARBALL}..."
 tar --same-owner -zxf ${REAlOPINSIGHT_PATCH_TARBALL} -C /
@@ -212,5 +229,4 @@ restarting_apache
 
 
 echo "DEBUG: Upgrade completed. Backup file: ${REAlOPINSIGHT_BACKUP_FILE}"
-
 
