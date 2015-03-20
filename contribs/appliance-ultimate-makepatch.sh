@@ -1,7 +1,7 @@
 #!/bin/bash
 # ------------------------------------------------------------------------ #
 # File: appliance-ultimate-makepatch.sh                                    #
-# Copyright (c) 2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
+# Copyright (c) 2014-2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Creation : 08-08-2014                                                    #
 #                                                                          #
 # This Software is part of RealOpInsight Ultimate.                         #
@@ -19,28 +19,44 @@
 #--------------------------------------------------------------------------#
 
 set -u 
+set -e
 
-if [ $# -ne 1 ]; then
-  echo "`basename $0` <version>"
+print_usage()
+{
+  echo "`basename $0` <version> <install_prefix> <www_dir>"
+}
+
+get_absolute_path()
+{
+  path=$1
+  if [ "${path:0:1}" = "/" ]; then
+    echo "$path"
+  else
+    echo "$PWD/$path"
+  fi
+}
+
+if [ $# -ne 3 ]; then
+  print_usage
   exit 1
 fi
+
 MAKE_PATCH_SCRIPT=contribs/appliance-ultimate-apply-patch.sh
 VERSION_TEMPLATE=X.Y.Z
 REAlOPINSIGHT_TARGET_VERSION=$1
+REALOPINSIGHT_HOME=$(get_absolute_path $2)
+REALOPINSIGHT_WWW_HOME=$(get_absolute_path $3)
+
 REAlOPINSIGHT_PATCH_TARBALL=patch_${REAlOPINSIGHT_TARGET_VERSION}-x64_86.tar.gz
-REALOPINSIGHT_PREFIX=/opt
-REALOPINSIGHT_WWW=/var/www
-REALOPINSIGHT_WWW_USER=www-data 
-REALOPINSIGHT_WWW_GROUP=www-data
 RELEASE_TARBALL_BASENAME=realopinsight-ultimate-patch-${REAlOPINSIGHT_TARGET_VERSION}-x64_86
 
 mkdir ${RELEASE_TARBALL_BASENAME}
 tar --same-owner \
-    --exclude ${REALOPINSIGHT_WWW}/realopinsight/run \
+    --exclude ${REALOPINSIGHT_WWW_HOME}/realopinsight/run \
     -zcf ${RELEASE_TARBALL_BASENAME}/${REAlOPINSIGHT_PATCH_TARBALL} \
-    ${REALOPINSIGHT_WWW}/realopinsight \
-    ${REALOPINSIGHT_PREFIX}/realopinsight/sbin/ \
-    ${REALOPINSIGHT_PREFIX}/realopinsight/etc/wt_config.xml
+    ${REALOPINSIGHT_WWW_HOME}/ \
+    ${REALOPINSIGHT_HOME}/sbin/ \
+    ${REALOPINSIGHT_HOME}/etc/wt_config.xml
 	
 sed "s/$VERSION_TEMPLATE/$REAlOPINSIGHT_TARGET_VERSION/g" $MAKE_PATCH_SCRIPT \
      > ${RELEASE_TARBALL_BASENAME}/`basename $MAKE_PATCH_SCRIPT`
@@ -59,6 +75,3 @@ cp contribs/init.d/realopinsight-reportd.debian ${RELEASE_TARBALL_BASENAME}/init
 
 chmod +x ${RELEASE_TARBALL_BASENAME}/*.sh
 tar zcf ${RELEASE_TARBALL_BASENAME}.tar.gz ${RELEASE_TARBALL_BASENAME}
-
-
-
