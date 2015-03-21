@@ -85,15 +85,7 @@ WebPieChart::WebPieChart(void)
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
-  tpl->bindWidget("unknown-count", m_legendBadges[ngrt4n::Unknown] = new Wt::WText());
-  tpl->bindWidget("critical-count", m_legendBadges[ngrt4n::Critical] = new Wt::WText());
-  tpl->bindWidget("major-count", m_legendBadges[ngrt4n::Major] = new Wt::WText());
-  tpl->bindWidget("minor-count", m_legendBadges[ngrt4n::Minor] = new Wt::WText());
-  tpl->bindWidget("normal-count", m_legendBadges[ngrt4n::Normal] = new Wt::WText());
-  tpl->bindWidget("chart", this);
-
-  m_scrollArea->setWidget(tpl);
+  m_scrollArea->setWidget(createChartTemplate());
   m_scrollArea->setMargin(0, Wt::Top| Wt::Bottom);
 
   // Configure the header.
@@ -113,9 +105,31 @@ WebPieChart::WebPieChart(void)
   setPalette(new WebCharPalette(m_model));
 }
 
+
 WebPieChart::~WebPieChart()
 {
   delete m_model;
+}
+
+
+Wt::WTemplate* WebPieChart::createChartTemplate(void)
+{
+  Wt::WTemplate* m_chartTpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
+  m_chartTpl->bindWidget("chart-legend-bar", m_chartLegendBar = createChartLegendBar());
+  m_chartTpl->bindWidget("chart-content", this);
+  m_chartLegendBar->setHidden(true);
+  return m_chartTpl;
+}
+
+Wt::WTemplate* WebPieChart::createChartLegendBar(void)
+{
+  Wt::WTemplate* chartLegendBar = new Wt::WTemplate(Wt::WString::tr("chart-legend-bar.tpl"));
+  chartLegendBar->bindWidget("unknown-count", m_legendBadges[ngrt4n::Unknown] = new Wt::WText());
+  chartLegendBar->bindWidget("critical-count", m_legendBadges[ngrt4n::Critical] = new Wt::WText());
+  chartLegendBar->bindWidget("major-count", m_legendBadges[ngrt4n::Major] = new Wt::WText());
+  chartLegendBar->bindWidget("minor-count", m_legendBadges[ngrt4n::Minor] = new Wt::WText());
+  chartLegendBar->bindWidget("normal-count", m_legendBadges[ngrt4n::Normal] = new Wt::WText());
+  return chartLegendBar;
 }
 
 
@@ -128,6 +142,12 @@ void WebPieChart::repaint()
   }
   if (m_statsData[ngrt4n::Normal] > 0) {
     setExplode(ngrt4n::Normal, 0.3);
+  }
+  if (m_dataType == SLAData) {
+    m_chartLegendBar->setHidden(true);
+    setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_statsData[ngrt4n::Normal])).toStdString());
+  } else {
+    m_chartLegendBar->setHidden(false);
   }
   setToolTip(ChartBase::tooltipText());
 }

@@ -47,7 +47,7 @@
 #define TREEVIEW_DIV m_tree->id()
 #define MAP_DIV m_map->id()
 #define MAP_SCROLL_AREA_DIV m_map->get()->id()
-#define CHART_SCROLL_AREA_DIV m_chart->get()->id()
+#define CHART_SCROLL_AREA_DIV m_chart->getContainerArea()->id()
 #define MSG_CONSOLE_DIV m_msgConsole->id()
 #define MAP_AREA_HEIGHT_RATIO "0.4"
 

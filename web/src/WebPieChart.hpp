@@ -38,7 +38,7 @@ class WebPieChart : public Wt::Chart::WPieChart, public ChartBase
 public:
   WebPieChart();
   virtual ~WebPieChart();
-  Wt::WScrollArea* get(void) const  {return m_scrollArea;}
+  Wt::WScrollArea* getContainerArea(void) const  {return m_scrollArea;}
   void repaint();
   void setDataType(int dataType) {ChartBase::setDataType(dataType);}
 
@@ -46,6 +46,9 @@ private:
   Wt::WStandardItemModel* m_model;
   Wt::WScrollArea* m_scrollArea;
   std::map<int, Wt::WText*> m_legendBadges;
+  Wt::WTemplate* m_chartLegendBar;
+  Wt::WTemplate* createChartLegendBar(void);
+  Wt::WTemplate* createChartTemplate(void);
 };
 
 #endif // WEBPIECHART_HPP

@@ -403,16 +403,20 @@
   </div>
 </message>
 
-<message id="chart.tpl">
-<div class="chart">
- <legend>
+
+
+<message id="chart-legend-bar.tpl">
   <span class="badge severity-unknown">${unknown-count}</span>
   <span class="badge severity-critical">${critical-count}</span>
   <span class="badge severity-major">${major-count}</span>
   <span class="badge severity-minor">${minor-count}</span>
   <span class="badge severity-normal">${normal-count}</span>
- </legend>
-  ${chart}
+</message>
+
+<message id="chart.tpl">
+<div class="chart">
+  <div>${chart-legend-bar}</div>
+  <div>${chart-content}</div>
 </div>
 </message>
 

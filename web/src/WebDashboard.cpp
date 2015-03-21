@@ -143,7 +143,7 @@ void WebDashboard::setupUI(void)
   rightSubMainLayout->setSpacing(2);
 
   leftSubMainLayout->addWidget(m_tree);
-  leftSubMainLayout->addWidget(m_chart->get());
+  leftSubMainLayout->addWidget(m_chart->getContainerArea());
 
   rightSubMainLayout->addWidget(m_map->get());
   rightSubMainLayout->addWidget(m_msgConsole);
