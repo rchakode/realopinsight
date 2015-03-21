@@ -40,6 +40,7 @@ public:
   virtual ~WebPieChart();
   Wt::WScrollArea* get(void) const  {return m_scrollArea;}
   void repaint();
+  void setDataType(int dataType) {ChartBase::setDataType(dataType);}
 
 private:
   Wt::WStandardItemModel* m_model;

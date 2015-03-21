@@ -930,12 +930,15 @@ void WebMainUI::showConditionalUiWidgets(void)
     Wt::WGridLayout* reportsLayout = new Wt::WGridLayout(reportContainer);
     int biIndex = 0;
     for (const auto& view: m_dbSession->viewList()) {
-      m_qosCharts[view.name] = new QosTrendsChart(view.name, QosDataList());
-      m_rawQosCharts[view.name] = new RawQosTrendsChart(view.name, QosDataList());
+      WebPieChart* piechart = new WebPieChart();
+      RawQosTrendsChart* rawQosChart = new RawQosTrendsChart(view.name, QosDataList());
+      piechart->setDataType(ChartBase::TimeData);
       reportsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
       reportsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
-      reportsLayout->addWidget(m_qosCharts[view.name], ++biIndex, 0);
-      reportsLayout->addWidget(m_rawQosCharts[view.name], biIndex, 1);
+      reportsLayout->addWidget(piechart, ++biIndex, 0);
+      reportsLayout->addWidget(rawQosChart, biIndex, 1);
+      m_qosCharts[view.name] = piechart;
+      m_rawQosCharts[view.name] = rawQosChart;
       ++biIndex;
     }
     m_opsHomeTpl->bindString("bi-report-title", Q_TR("Reports"));
@@ -1132,7 +1135,13 @@ void WebMainUI::updateViewBiCharts(const std::string& viewName)
   if (m_dbSession->queryQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
     QosTrendsChartMapT::iterator qosChart = m_qosCharts.find(viewName);
     if (qosChart != m_qosCharts.end()) {
-      qosChart->second->updateData(qosData[viewName]);
+      SLADataManager slaManager(qosData[viewName]);
+      qosChart->second->setSeverityData(slaManager.normalDuration(),
+                                        slaManager.minorDuration(),
+                                        slaManager.majorDuration(),
+                                        slaManager.criticalDuration(),
+                                        slaManager.totalDuration());
+      qosChart->second->repaint();
     }
     RawQosTrendsChartMapT::iterator rawQosChart = m_rawQosCharts.find(viewName);
     if (rawQosChart != m_rawQosCharts.end())

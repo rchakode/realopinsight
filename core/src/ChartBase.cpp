@@ -25,6 +25,7 @@
 #include "ChartBase.hpp"
 
 ChartBase::ChartBase()
+  : m_dataType(RawData)
 {
 }
 
@@ -39,18 +40,46 @@ void ChartBase::updateStatsRatio(void)
 }
 
 
-QString ChartBase::buildTooltipText(void)
+std::string ChartBase::tooltipText(void)
 {
-  return QObject::tr("Normal: ")%QString::number(m_statsData[ngrt4n::Normal])%
-      "/"%QString::number(m_dataCount)%" ("%QString::number(m_severityRatio[ngrt4n::Normal], 'f', 0)%"%)"
-      %"\n"%QObject::tr("Minor: ")%QString::number(m_statsData[ngrt4n::Minor])%
-      "/"%QString::number(m_dataCount)%" ("%QString::number(m_severityRatio[ngrt4n::Minor], 'f', 0)%"%)"
-      %"\n"%QObject::tr("Major: ")%QString::number(m_statsData[ngrt4n::Major])%
-      "/"%QString::number(m_dataCount)%" ("%QString::number(m_severityRatio[ngrt4n::Major], 'f', 0)%"%)"
-      %"\n"%QObject::tr("Critical: ")%QString::number(m_statsData[ngrt4n::Critical])%"/"
-      %QString::number(m_dataCount)%" ("%QString::number(m_severityRatio[ngrt4n::Critical], 'f', 0) %"%)"
-      %"\n"%QObject::tr("Unknown: ")%QString::number(m_statsData[ngrt4n::Unknown])%
-      "/"%QString::number(m_dataCount)%" ("%QString::number(m_severityRatio[ngrt4n::Unknown], 'f', 0)%"%)";
+  QString normalText = "";
+  QString minorText = "";
+  QString majorText = "";
+  QString criticalText = "";
+  QString unknownText = "";
+  QString totalText = "";
+  if (m_dataType == TimeData) {
+    normalText   = timeFromSeconds(m_statsData[ngrt4n::Normal]);
+    minorText    = timeFromSeconds(m_statsData[ngrt4n::Minor]);
+    majorText    = timeFromSeconds(m_statsData[ngrt4n::Major]);
+    criticalText = timeFromSeconds(m_statsData[ngrt4n::Critical]);
+    unknownText  = timeFromSeconds(m_statsData[ngrt4n::Unknown]);
+  } else {
+    normalText   = QString::number(m_statsData[ngrt4n::Normal]);
+    minorText    = QString::number(m_statsData[ngrt4n::Minor]);
+    majorText    = QString::number(m_statsData[ngrt4n::Major]);
+    criticalText = QString::number(m_statsData[ngrt4n::Critical]);
+    unknownText  = QString::number(m_statsData[ngrt4n::Unknown]);
+    totalText    = "/"+QString::number(m_dataCount);
+  }
+  QString tooltip =
+      QString("Normal: %1% (%2%9) \n"
+              "Minor: %3% (%4%9)\n"
+              "Major: %5% (%6%9)\n"
+              "Critical: %7% (%8%9)\n").arg
+      (QString::number(m_severityRatio[ngrt4n::Normal],'f',0),
+      normalText,
+      QString::number(m_severityRatio[ngrt4n::Minor],'f',0),
+      minorText,
+      QString::number(m_severityRatio[ngrt4n::Major],'f',0),
+      majorText,
+      QString::number(m_severityRatio[ngrt4n::Critical],'f',0),
+      criticalText,
+      totalText);
+
+  return tooltip.append("Unknown: %1% (%2%3)").arg(
+        QString::number(m_severityRatio[ngrt4n::Unknown],'f',0),
+      unknownText, totalText).toStdString();
 }
 
 void ChartBase::updateStatsData(const CheckStatusCountT& statsData, int count)
@@ -58,4 +87,28 @@ void ChartBase::updateStatsData(const CheckStatusCountT& statsData, int count)
   m_statsData = statsData;
   m_dataCount = count;
   updateStatsRatio();
+}
+
+
+void ChartBase::setSeverityData(double normal, double minor, double major, double critical, double total)
+{
+  m_dataCount = total;
+  m_statsData[ngrt4n::Normal]   = normal;
+  m_statsData[ngrt4n::Minor]    = minor;
+  m_statsData[ngrt4n::Major]    = major;
+  m_statsData[ngrt4n::Critical] = critical;
+  m_statsData[ngrt4n::Unknown]  = total  - (normal + minor + major + critical);
+  updateStatsRatio();
+}
+
+QString ChartBase::timeFromSeconds(long seconds)
+{
+  QTime time;
+  time.addSecs(seconds);
+  QString hour = QString::number(time.hour());
+  QString min = QString::number(time.minute());
+  QString sec = QString::number(time.second());
+  return QString("%1:%2:%3").arg((hour.size() < 2 ? "0"+hour : hour),
+                                 (min.size() < 2 ? "0"+min : min),
+                                 (sec.size() < 2 ? "0"+sec : sec));
 }

@@ -111,7 +111,8 @@ private:
     OPEN = 1
   };
   typedef QMap<QString, WebDashboard*> DashboardMapT;
-  typedef std::map<std::string, QosTrendsChart*> QosTrendsChartMapT;
+  //FIXME: typedef std::map<std::string, QosTrendsChart*> QosTrendsChartMapT;
+  typedef std::map<std::string, WebPieChart*> QosTrendsChartMapT;
   typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
   ThumbnailMapT m_thumbnailItems;

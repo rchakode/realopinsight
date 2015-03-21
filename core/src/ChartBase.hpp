@@ -31,11 +31,15 @@
 class ChartBase
 {
 public:
+  enum {
+    RawData = 0,
+    TimeData = 1
+  };
   ChartBase();
   void updateStatsRatio(void);
-  QString buildTooltipText(void);
+  std::string tooltipText(void);
   double statusRatio(int status) const { return m_severityRatio[status]; }
-  std::string toStdString(void) {return buildTooltipText().toStdString();}
+  std::string toStdString(void) {return tooltipText();}
   int problemCount(void) {
     return m_statsData[ngrt4n::Minor]
         + m_statsData[ngrt4n::Major]
@@ -46,11 +50,15 @@ public:
         .arg(QString::number(problemCount()))
         .arg(QString::number(m_dataCount)).toStdString();}
   void updateStatsData(const CheckStatusCountT& statsData, int count);
+  void setSeverityData(double normal, double minor, double major, double critical, double total);
+  void setDataType(int dataType) {m_dataType = dataType;}
+  QString timeFromSeconds(long seconds);
 
 protected:
   CheckStatusCountT m_statsData;
   qint32 m_dataCount;
   QMap<int, float> m_severityRatio;
+  int m_dataType;
 };
 
 #endif // CHARTBASE_HPP

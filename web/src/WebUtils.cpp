@@ -212,10 +212,15 @@ Wt::WString ngrt4n::wHumanTimeText(const std::string& mytime_t)
   return wHumanTimeText(QString(mytime_t.c_str()).toUInt() );
 }
 
-Wt::WString ngrt4n::wTimeToNow(const std::string& mytime_t)
+Wt::WString ngrt4n::wTimeToNow(const std::string& myStrTime_t)
+{
+  return wTimeToNow(QString(myStrTime_t.c_str()).toUInt());
+}
+
+Wt::WString ngrt4n::wTimeToNow(long mytime_t)
 {
   Wt::WDateTime dt;
-  dt.setTime_t(QString(mytime_t.c_str()).toUInt());
+  dt.setTime_t(mytime_t);
   return dt.timeTo(Wt::WDateTime::currentDateTime());
 }
 

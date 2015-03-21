@@ -45,15 +45,17 @@
 #include <Wt/WPainter>
 #include <Wt/WSvgImage>
 
-class QosTrendsChart : public  Wt::WPaintedWidget
+class SLADataManager
 {
 public:
-  QosTrendsChart(const std::string& viewName, const QosDataList& data, Wt::WContainerWidget* parent=0);
-  std::string viewName() const {return m_viewName;}
-  void updateData(const QosDataList& data);
+  SLADataManager(const QosDataList& data);
 
-protected:
-  virtual void paintEvent(Wt::WPaintDevice * 	paintDevice);
+  double normalDuration(void) const {return m_normalDuration;}
+  double minorDuration(void) const {return m_minorDuration;}
+  double majorDuration(void) const {return m_majorDuration;}
+  double criticalDuration(void) const {return m_criticalDuration;}
+  double unknownDuration(void) const {return m_unknownDuration;}
+  double totalDuration(void) const {return m_totalDuration;}
 
 private:
   struct TimeStatusT {
@@ -62,27 +64,15 @@ private:
   };
   typedef QList<TimeStatusT> TimeStatusesT;
   TimeStatusesT m_plottingData;
-  std::string m_viewName;
-  double m_slaNormal;
-  double m_slaMinor;
-  double m_slaMajor;
-  double m_slaCritical;
-  double m_slaUnknown;
-  long m_timeNormal;
-  long m_timeMinor;
-  long m_timeMajor;
-  long m_timeCritical;
-  long m_timeUnknown;
-  double m_xScalingFactor;
-  TimeStatusT m_firstPoint;
+  long m_normalDuration;
+  long m_minorDuration;
+  long m_majorDuration;
+  long m_criticalDuration;
+  long m_unknownDuration;
+  long m_totalDuration;
 
-
-  void processPlottingData(const QosDataList& data);
-  void addRangeToolTip(double x1, double x2, long t1, long t2);
-  std::string slaText(void) {return QObject::tr("QoS Trends - SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
-  double computeXAxis(long timestamp) {return timestamp - m_firstPoint.timestamp;}
-  void paintSlaBar(Wt::WPaintDevice* paintDevice);
-  void paintSlaChord(Wt::WPaintDevice* paintDevice);
+  void processData(const QosDataList& data);
+  //FIXME: std::string slaText(void) {return QObject::tr("SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
 };
 
 

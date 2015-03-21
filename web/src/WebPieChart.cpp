@@ -126,5 +126,5 @@ void WebPieChart::repaint()
     m_legendBadges[it.key()]->setText(QString::number(it.value()).toStdString());
   }
 
-  setToolTip(ChartBase::buildTooltipText().toStdString());
+  setToolTip(ChartBase::tooltipText());
 }
