@@ -145,7 +145,7 @@ void WebPieChart::repaint()
   }
   if (m_dataType == SLAData) {
     m_chartLegendBar->setHidden(true);
-    setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_statsData[ngrt4n::Normal])).toStdString());
+    setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_severityRatio[ngrt4n::Normal])).toStdString());
   } else {
     m_chartLegendBar->setHidden(false);
   }
