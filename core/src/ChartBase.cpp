@@ -48,7 +48,7 @@ std::string ChartBase::tooltipText(void)
   QString criticalText = "";
   QString unknownText = "";
   QString totalText = "";
-  if (m_dataType == TimeData) {
+  if (m_dataType == SLAData) {
     normalText   = timeFromSeconds(m_statsData[ngrt4n::Normal]);
     minorText    = timeFromSeconds(m_statsData[ngrt4n::Minor]);
     majorText    = timeFromSeconds(m_statsData[ngrt4n::Major]);
@@ -63,10 +63,10 @@ std::string ChartBase::tooltipText(void)
     totalText    = "/"+QString::number(m_dataCount);
   }
   QString tooltip =
-      QString("Normal: %1% (%2%9) \n"
-              "Minor: %3% (%4%9)\n"
-              "Major: %5% (%6%9)\n"
-              "Critical: %7% (%8%9)\n").arg
+      QString("Normal: %1% - %2%9\n"
+              "Minor: %3%  - %4%9\n"
+              "Major: %5%  - %6%9\n"
+              "Critical: %7%  - %8%9\n").arg
       (QString::number(m_severityRatio[ngrt4n::Normal],'f',0),
       normalText,
       QString::number(m_severityRatio[ngrt4n::Minor],'f',0),
@@ -77,7 +77,7 @@ std::string ChartBase::tooltipText(void)
       criticalText,
       totalText);
 
-  return tooltip.append("Unknown: %1% (%2%3)").arg(
+  return tooltip.append("Unknown: %1% - %2%3").arg(
         QString::number(m_severityRatio[ngrt4n::Unknown],'f',0),
       unknownText, totalText).toStdString();
 }

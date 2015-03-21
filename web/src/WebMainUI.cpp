@@ -932,7 +932,7 @@ void WebMainUI::showConditionalUiWidgets(void)
     for (const auto& view: m_dbSession->viewList()) {
       WebPieChart* piechart = new WebPieChart();
       RawQosTrendsChart* rawQosChart = new RawQosTrendsChart(view.name, QosDataList());
-      piechart->setDataType(ChartBase::TimeData);
+      piechart->setDataType(ChartBase::SLAData);
       reportsLayout->addWidget(new Wt::WText(Wt::WString("<h5>{1}</h5>").arg(view.name),Wt::XHTMLText), biIndex, 0);
       reportsLayout->addWidget(createReportExportLinks(view.name), biIndex, 1, Wt::AlignRight);
       reportsLayout->addWidget(piechart, ++biIndex, 0);

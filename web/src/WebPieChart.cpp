@@ -54,15 +54,16 @@ public:
 
   Wt::WPen strokePen (int) const
   {
-    // Check value first
-    return Wt::WPen(Wt::WColor(255, 255, 255, 0));
+    // TODO: check value first
+    return Wt::WPen(Wt::WColor(255, 255, 255, 1));
   }
 
   Wt::WColor fontColor (int index) const
   {
-    // Check value first
+    // TOTO: check value first
     return Wt::WColor(255, 255, 255, 0);
   }
+
 
   virtual Wt::WColor color (int index) const
   {
@@ -97,14 +98,14 @@ WebPieChart::WebPieChart(void)
 
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
-  m_model->setHeaderData(0, Wt::WString("Item"));
-  m_model->setHeaderData(1, Wt::WString("Sales"));
+  m_model->setHeaderData(0, Wt::WString("Severity"));
+  m_model->setHeaderData(1, Wt::WString("Count"));
   m_model->insertRows(m_model->rowCount(), 5);
 
   // Draw the chart
   setLabelsColumn(0);    // Set the column that holds the labels.
   setDataColumn(1);      // Set the column that holds the data.
-  setDisplayLabels(Wt::Chart::Inside|Wt::Chart::TextPercentage); // Configure location and type of labels.
+  setDisplayLabels(Wt::Chart::NoLabels);
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
 
@@ -125,6 +126,8 @@ void WebPieChart::repaint()
     m_model->setData(it.key(), 1, it.value());
     m_legendBadges[it.key()]->setText(QString::number(it.value()).toStdString());
   }
-
+  if (m_statsData[ngrt4n::Normal] > 0) {
+    setExplode(ngrt4n::Normal, 0.3);
+  }
   setToolTip(ChartBase::tooltipText());
 }

@@ -33,7 +33,7 @@ class ChartBase
 public:
   enum {
     RawData = 0,
-    TimeData = 1
+    SLAData = 1
   };
   ChartBase();
   void updateStatsRatio(void);
