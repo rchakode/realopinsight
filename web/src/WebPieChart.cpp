@@ -140,12 +140,12 @@ void WebPieChart::repaint()
     m_model->setData(it.key(), 1, it.value());
     m_legendBadges[it.key()]->setText(QString::number(it.value()).toStdString());
   }
-  if (m_statsData[ngrt4n::Normal] > 0) {
-    setExplode(ngrt4n::Normal, 0.3);
-  }
   if (m_dataType == SLAData) {
     m_chartLegendBar->setHidden(true);
     setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_severityRatio[ngrt4n::Normal])).toStdString());
+    if (m_statsData[ngrt4n::Normal] > 0 && m_statsData[ngrt4n::Normal] < 100) {
+      setExplode(ngrt4n::Normal, 0.3);
+    }
   } else {
     m_chartLegendBar->setHidden(false);
   }
