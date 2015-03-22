@@ -143,7 +143,7 @@ void WebPieChart::repaint()
   if (m_dataType == SLAData) {
     m_chartLegendBar->setHidden(true);
     setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_severityRatio[ngrt4n::Normal])).toStdString());
-    if (m_statsData[ngrt4n::Normal] > 0 && m_statsData[ngrt4n::Normal] < 100) {
+    if (m_severityRatio[ngrt4n::Normal] > 0 && m_severityRatio[ngrt4n::Normal] < 100) {
       setExplode(ngrt4n::Normal, 0.3);
     }
   } else {
