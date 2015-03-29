@@ -28,18 +28,9 @@
 #include "Settings.hpp"
 #include <QString>
 #include <Wt/WText>
-#include <Wt/WLogger>
 
 
 #define Q_TR(s) QObject::tr(s).toStdString()
-
-
-class Logger : public Wt::WLogger {
-public:
-  Logger(const std::string& path);
-  void log(const std::string& level, const std::string& msg);
-};
-
 #define LOG(level, msg) ngrt4n::log(level, msg)
 #define REPORTD_LOG(level, msg) ngrt4n::logReportd(level, msg)
 

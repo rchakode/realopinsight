@@ -22,6 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "web/src/utils/Logger.hpp"
 #include "Base.hpp"
 #include "WebUtils.hpp"
 #include <Wt/WTemplate>
@@ -35,27 +36,8 @@
 #include <memory>
 
 
-
-Logger::Logger(const std::string& path)
-{
-  addField("datetime", false);
-  addField("session", false);
-  addField("type", false);
-  addField("message", true);
-  setFile(path);
-}
-void Logger::log(const std::string& level, const std::string& msg)
-{
-  Wt::WLogEntry logEntry = Wt::WLogger::entry(level);
-  logEntry << Wt::WLogger::timestamp << Wt::WLogger::sep
-              //<< '[' << wApp->sessionId() << ']' << Wt::WLogger::sep
-           << '[' << level << ']' << Wt::WLogger::sep
-           << msg;
-}
-
-
-Logger logger("/opt/realopinsight/log/realopinsight.log");
-Logger loggerReportd("/opt/realopinsight/log/realopinsight-reportd.log");
+Logger coreLogger(Logger::CoreLogger, "/opt/realopinsight/log/");
+Logger reportdLogger(Logger::ReportdLogger, "/opt/realopinsight/log/");
 
 void ngrt4n::showMessage(int exitCode,
                          const std::string& errorMsg,
@@ -243,17 +225,17 @@ Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, c
 
 void ngrt4n::log(const std::string& level, const std::string& msg)
 {
-  logger.log(level, msg);
+  coreLogger.log(level, msg);
 }
 
 void ngrt4n::logReportd(const std::string& level, const std::string& msg)
 {
-  loggerReportd.log(level, msg);
+  reportdLogger.log(level, msg);
 }
 
 void ngrt4n::logReportd(const std::string& level, const QString& msg)
 {
-  loggerReportd.log(level, msg.toStdString());
+  logReportd(level, msg.toStdString());
 }
 
 

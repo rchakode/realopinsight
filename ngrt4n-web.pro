@@ -88,6 +88,7 @@ HEADERS += \
     web/src/utils/smtpclient/qxtmailmessage.h \
     web/src/utils/smtpclient/qxtmailattachment.h \
     web/src/utils/smtpclient/MailSender.hpp \
+    web/src/utils/Logger.hpp \
     web/src/dbo/DbSession.hpp \
     web/src/dbo/DbObjects.hpp \
     web/src/dbo/ViewAclManagement.hpp \
@@ -135,6 +136,7 @@ SOURCES +=  core/src/Base.cpp \
     web/src/utils/smtpclient/qxtmailmessage.cpp \
     web/src/utils/smtpclient/qxtsmtp.cpp \
     web/src/utils/smtpclient/MailSender.cpp \
+    web/src/utils/Logger.cpp \
     web/src/dbo/DbSession.cpp \
     web/src/dbo/UserManagement.cpp \
     web/src/dbo/ViewAclManagement.cpp \
