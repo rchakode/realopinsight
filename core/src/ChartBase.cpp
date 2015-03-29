@@ -40,7 +40,7 @@ void ChartBase::updateStatsRatio(void)
 }
 
 
-std::string ChartBase::tooltipText(void)
+std::string ChartBase::defaultTooltipText(void)
 {
   QString normalText = "";
   QString minorText = "";
@@ -82,6 +82,7 @@ std::string ChartBase::tooltipText(void)
       unknownText, totalText).toStdString();
 }
 
+
 void ChartBase::updateStatsData(const CheckStatusCountT& statsData, int count)
 {
   m_statsData = statsData;
@@ -103,12 +104,35 @@ void ChartBase::setSeverityData(double normal, double minor, double major, doubl
 
 QString ChartBase::timeFromSeconds(long seconds)
 {
-  QTime time;
-  time.addSecs(seconds);
-  QString hour = QString::number(time.hour());
-  QString min = QString::number(time.minute());
-  QString sec = QString::number(time.second());
-  return QString("%1:%2:%3").arg((hour.size() < 2 ? "0"+hour : hour),
-                                 (min.size() < 2 ? "0"+min : min),
-                                 (sec.size() < 2 ? "0"+sec : sec));
+  int days = seconds / 86400; // 86400 = 60 * 60 * 24
+  int hours = (seconds / 3600) % 24;
+  int mins = (seconds / 60) % 60;
+  int secs = seconds % 60;
+
+  QString result = "Duration: ";
+  if (days > 0) {
+    result.append(QString::number(days)).append(" d");
+  }
+
+  if (hours < 9) {
+    result.append(QString("0%1").arg(QString::number(hours)));
+  } else {
+    result.append(QString::number(hours));
+  }
+  result.append(":");
+
+  if (mins < 9) {
+    result.append(QString("0%1").arg(QString::number(mins)));
+  } else {
+    result.append(QString::number(mins));
+  }
+  result.append(":");
+
+  if (secs < 9) {
+    result.append(QString("0%1").arg(QString::number(secs)));
+  } else {
+    result.append(QString::number(secs));
+  }
+
+  return result;
 }

@@ -37,9 +37,9 @@ public:
   };
   ChartBase();
   void updateStatsRatio(void);
-  std::string tooltipText(void);
+  std::string defaultTooltipText(void);
   double statusRatio(int status) const { return m_severityRatio[status]; }
-  std::string toStdString(void) {return tooltipText();}
+  std::string toStdString(void) {return defaultTooltipText();}
   int problemCount(void) {
     return m_statsData[ngrt4n::Minor]
         + m_statsData[ngrt4n::Major]

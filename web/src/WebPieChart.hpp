@@ -41,6 +41,7 @@ public:
   Wt::WScrollArea* getContainerArea(void) const  {return m_scrollArea;}
   void repaint();
   void setDataType(int dataType) {ChartBase::setDataType(dataType);}
+  std::string defaultTooltipText(void);
 
 private:
   Wt::WStandardItemModel* m_model;
