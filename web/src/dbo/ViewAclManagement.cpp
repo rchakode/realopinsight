@@ -219,12 +219,12 @@ void ViewAclManagement::deleteViews(void)
     if (m_dbSession->findView(vname, curView)) {
       if (m_dbSession->deleteView(vname) != 0) {
         outputMsg.append("- Failed to delete view: "+vname + " -");
-        LOG("warning", m_dbSession->lastError());
+        CORE_LOG("warning", m_dbSession->lastError());
       } else {
         if (! QFile(curView.path.c_str()).remove()) {
-          LOG("info", "Failed to removed file: "+curView.path);
+          CORE_LOG("info", "Failed to removed file: "+curView.path);
         } else {
-          LOG("info", "View removed: "+vname);
+          CORE_LOG("info", "View removed: "+vname);
           m_viewDeleted.emit(vname);
         }
       }

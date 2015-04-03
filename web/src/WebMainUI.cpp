@@ -108,7 +108,7 @@ WebMainUI::~WebMainUI()
   delete m_navbar;
   delete m_mainStackedContents;
   delete m_mainWidget;
-  LOG("debug", "Session closed");
+  CORE_LOG("debug", "Session closed");
 }
 
 
@@ -493,7 +493,7 @@ void WebMainUI::finishFileDialog(int action)
     case IMPORT:
       if (! m_uploader->empty()) {
         if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          LOG("debug", "Parsing the input file");
+          CORE_LOG("debug", "Parsing the input file");
           QString tmpFileName(m_uploader->spoolFileName().c_str());
           CoreDataT cdata;
 
@@ -502,7 +502,7 @@ void WebMainUI::finishFileDialog(int action)
 
           if (! parser.process(false)) {
             std::string msg = tr("Invalid description file").toStdString();
-            LOG("warn", msg);
+            CORE_LOG("warn", msg);
             showMessage(ngrt4n::OperationFailed, msg);
           } else {
             std::string filename = m_uploader->clientFileName().toUTF8();
@@ -578,7 +578,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
     }
   } catch (const std::bad_alloc&) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
-    LOG("error", errorMsg);
+    CORE_LOG("error", errorMsg);
     delete dashboard;
     showMessage(ngrt4n::OperationFailed, errorMsg);
   }
@@ -846,7 +846,7 @@ void WebMainUI::showMessageClass(const std::string& msg, std::string statusCssCl
   if (statusCssClass != "alert alert-success") {
     logLevel = "error";
   }
-  LOG(logLevel, msg);
+  CORE_LOG(logLevel, msg);
 
   m_infoBox->setText(msg);
   m_infoBox->setStyleClass(statusCssClass);
@@ -989,7 +989,7 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
   if (! dir.exists() && ! dir.mkdir(dir.absolutePath())) {
     return false;
     QString errMsg = tr("Unable to create the directory (%1)").arg(dir.absolutePath());
-    LOG("error", errMsg.toStdString());
+    CORE_LOG("error", errMsg.toStdString());
     showMessage(ngrt4n::OperationFailed, errMsg.toStdString());
   }  else {
     ret = true;

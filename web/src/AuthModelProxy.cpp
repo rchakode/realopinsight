@@ -76,9 +76,9 @@ bool AuthModelProxy::login(Wt::Auth::Login& login)
   if (result != 1) {
     std::string erroMsg  = Q_TR("LDAP authentication failed");
     m_loginFailed.emit(erroMsg);
-    LOG("error", QString("%1: %2").arg(erroMsg.c_str(), username).toStdString());
+    CORE_LOG("error", QString("%1: %2").arg(erroMsg.c_str(), username).toStdString());
   } else {
-    LOG("info", Q_TR("LDAP authentication succeeded: ")+username.toStdString());
+    CORE_LOG("info", Q_TR("LDAP authentication succeeded: ")+username.toStdString());
     return Wt::Auth::AuthModel::login(login);
   }
   return false;

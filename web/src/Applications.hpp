@@ -37,14 +37,15 @@
 class RealOpInsightQApp : public QCoreApplication
 {
 public:
-  RealOpInsightQApp(int& argc, char ** argv) : QCoreApplication(argc, argv) { }
-  virtual ~RealOpInsightQApp() { }
+  RealOpInsightQApp(int& argc, char ** argv)
+    : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
+  virtual ~RealOpInsightQApp() { ngrt4n::freeCoreLogger(); }
 
   virtual bool notify(QObject * receiver, QEvent * event) {
     try {
       return QCoreApplication::notify(receiver, event);
     } catch(std::exception& ex) {
-      LOG("fatal", ex.what());
+      CORE_LOG("fatal", ex.what());
     }
     return false;
   }

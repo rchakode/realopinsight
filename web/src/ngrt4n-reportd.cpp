@@ -39,6 +39,8 @@
 
 void runCollector(int period)
 {
+  ngrt4n::initReportdLogger();
+
   DbSession dbSession;
   WebPreferencesBase preferences;
   Notificator notificator(&dbSession);
@@ -96,11 +98,14 @@ void runCollector(int period)
 
     sleep(period);
   }
+
+  ngrt4n::freeReportdLogger();
 }
 
 int main(int argc, char **argv)
 {
   RealOpInsightQApp qtApp(argc, argv);
+
   int period = 5;
   bool ok;
   int opt;

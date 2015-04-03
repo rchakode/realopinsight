@@ -70,7 +70,7 @@ void WebDashboard::initialize(Preferences* preferencePtr)
     m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
     m_thumbnailProblemDetailsBar = new Wt::WLabel("", m_widget);
   } else {
-    LOG("error", m_lastErrorMsg.toStdString());
+    CORE_LOG("error", m_lastErrorMsg.toStdString());
     Q_EMIT errorOccurred(m_lastErrorMsg);
   }
 }

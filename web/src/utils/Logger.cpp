@@ -41,7 +41,7 @@ Logger::~Logger()
 
 void Logger::log(const std::string& logLevel, const std::string& msg)
 {
-  std::string logEntry = QString("%1[%2]: %3")
+  std::string logEntry = QString("%1 [%2] %3")
       .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:s"),
            logLevel.c_str(),msg.c_str()).toStdString();
   if(m_module == ReportdLogger) {

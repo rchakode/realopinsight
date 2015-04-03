@@ -31,7 +31,7 @@
 
 
 #define Q_TR(s) QObject::tr(s).toStdString()
-#define LOG(level, msg) ngrt4n::log(level, msg)
+#define CORE_LOG(level, msg) ngrt4n::logCore(level, msg)
 #define REPORTD_LOG(level, msg) ngrt4n::logReportd(level, msg)
 
 
@@ -59,7 +59,11 @@ namespace ngrt4n {
   Wt::WString wTimeToNow(const std::string& myStrTime_t);
   Wt::WString wTimeToNow(long mytime_t);
   Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip);
-  void log(const std::string& level, const std::string& msg);
+  void initCoreLogger(void);
+  void initReportdLogger(void);
+  void freeCoreLogger(void);
+  void freeReportdLogger(void);
+  void logCore(const std::string& level, const std::string& msg);
   void logReportd(const std::string& level, const std::string& msg);
   void logReportd(const std::string& level, const QString& msg);
   bool isValidUri(const QString& addr, const QString& schemePrefix, bool nopath);

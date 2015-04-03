@@ -36,8 +36,28 @@
 #include <memory>
 
 
-Logger coreLogger(Logger::CoreLogger, "/opt/realopinsight/log/");
-Logger reportdLogger(Logger::ReportdLogger, "/opt/realopinsight/log/");
+Logger* coreLogger = NULL;
+Logger* reportdLogger = NULL;
+void ngrt4n::initCoreLogger(void)
+{
+  coreLogger = new Logger(Logger::CoreLogger, "/opt/realopinsight/log/");
+}
+
+void ngrt4n::freeCoreLogger(void)
+{
+  delete coreLogger;
+}
+
+
+void ngrt4n::initReportdLogger(void)
+{
+  reportdLogger = new Logger(Logger::ReportdLogger, "/opt/realopinsight/log/");
+}
+
+void ngrt4n::freeReportdLogger(void)
+{
+  delete reportdLogger;
+}
 
 void ngrt4n::showMessage(int exitCode,
                          const std::string& errorMsg,
@@ -223,14 +243,22 @@ Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, c
   return link;
 }
 
-void ngrt4n::log(const std::string& level, const std::string& msg)
+void ngrt4n::logCore(const std::string& level, const std::string& msg)
 {
-  coreLogger.log(level, msg);
+  if (coreLogger) {
+    coreLogger->log(level, msg);
+  } else {
+    std::cerr << "DEBUG [" << level.c_str() << "] " << msg << std::endl;
+  }
 }
 
 void ngrt4n::logReportd(const std::string& level, const std::string& msg)
 {
-  reportdLogger.log(level, msg);
+  if (reportdLogger) {
+    reportdLogger->log(level, msg);
+  } else {
+    std::cerr << "DEBUG [" << level.c_str() << "] " << msg << std::endl;
+  }
 }
 
 void ngrt4n::logReportd(const std::string& level, const QString& msg)

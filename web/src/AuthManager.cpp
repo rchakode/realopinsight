@@ -70,10 +70,10 @@ void AuthManager::handleAuthentication(void)
 
     QString logMsg = QObject::tr("%1 logged in. Session Id: %2")
         .arg(m_dbSession->loggedUser().username.c_str(), sessionInfo.sessionId.c_str());
-    LOG("info",logMsg.toStdString());
+    CORE_LOG("info",logMsg.toStdString());
   } else {
     wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
-    LOG("info", QObject::tr("%1 logged out").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
+    CORE_LOG("info", QObject::tr("%1 logged out").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
   }
 }
 
