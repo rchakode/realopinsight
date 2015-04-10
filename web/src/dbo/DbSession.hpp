@@ -73,14 +73,14 @@ public:
   DbUsersT& userList(void) {return m_userList;}
 
   int addView(const DboView& qos);
-  int deleteView(std::string viewName);
-  int assignView(const std::string& userName, const std::string& viewName);
-  int revokeView(const std::string& userName, const std::string& viewName);
-	int queryAssignedUserEmails(QStringList& emails, const std::string& viewName);
+  int deleteView(std::string viewId);
+  int assignView(const std::string& userId, const std::string& viewId);
+  int revokeView(const std::string& userId, const std::string& viewId);
+  int listAssignedUsersEmails(QStringList& emails, const std::string& viewId);
 
   int addQosData(const QosDataT& qosData);
-	int queryQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate = 0, long toDate = LONG_MAX);
-	int queryLastQosData(QosDataT& qosData, const std::string& viewName);
+  int listQosData(QosDataByViewMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
+  int getLastQosData(QosDataT& qosData, const std::string& viewId);
 
   void updateViewList(void);
   void updateViewList(const std::string& uname);
@@ -93,10 +93,10 @@ public:
   int addSession(const DboLoginSession& session);
   int checkUserCookie(const DboLoginSession& session);
 
-	int addNotification(const std::string& viewName, int viewStatus);
-  int changeNotificationStatus(const std::string& userName, const std::string& viewName, int newStatus);
-	int queryNotificationInfo(NotificationT& notification,const std::string& viewName);
-	int queryViewRelatedNotifications(NotificationMapT& notifications, const std::string& userName);
+  int addNotification(const std::string& viewId, int viewStatus);
+  int updateNotificationStatus(const std::string& userId, const std::string& viewId, int notificationStatus);
+  void getLastNotificationInfo(NotificationT& lastNotifInfo, const std::string& viewId);
+  int listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
 
 private:
   std::string m_dbPath;

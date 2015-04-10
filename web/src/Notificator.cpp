@@ -92,52 +92,52 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
   REPORTD_LOG(logLevel, QObject::tr("[Notificator] %1").arg(m_mailSender->lastError()));
 }
 
-void Notificator::handleNotification(const NodeT& node,
-                                     const QosDataT& qosData,
-                                     const QosDataT& prevQosData)
+void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
 {
+  QosDataT lastQosData;
   std::string viewName = node.name.toStdString();
 
-  QStringList notificationRecipients;
-  if (m_dbSession->queryAssignedUserEmails(notificationRecipients, viewName) <= 0) {
+  QStringList recipients;
+  if (m_dbSession->listAssignedUsersEmails(recipients, viewName) <= 0) {
     REPORTD_LOG("info", QString("No notification recipients for view %1").arg(viewName.c_str()));
     return;
   }
 
-  NotificationT notificationData;
-  int notifQueryResult = m_dbSession->queryNotificationInfo(notificationData, viewName);
+  NotificationT lastNotifData;
+  m_dbSession->getLastNotificationInfo(lastNotifData, viewName);
   if (node.sev != ngrt4n::Normal) { //problem state
-    if (notifQueryResult != 1 || notificationData.ack_status == DboNotification::Closed) { // send new notification
-      sendEmailNotification(node, prevQosData.status, qosData, notificationRecipients);
+    if (lastNotifData.view_status == DboNotification::Unset
+        || lastNotifData.ack_status == DboNotification::Closed) { // send new notification
+      sendEmailNotification(node, lastQosData.status, qosData, recipients);
 
-      if (notifQueryResult != 1) {
+      if (lastNotifData.view_status == DboNotification::Unset) {
         m_dbSession->addNotification(viewName, node.sev);
       } else  {
-        m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
+        m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Open);
       }
     } else {
-      if (notificationData.view_status != node.sev) { //severity changed
-        sendEmailNotification(node, prevQosData.status, qosData, notificationRecipients);
-        m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Open);
+      if (lastNotifData.view_status != node.sev) { //severity changed
+        sendEmailNotification(node, lastQosData.status, qosData, recipients);
+        m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Open);
         m_dbSession->addNotification(viewName, node.sev);
       } else {
-        if (notificationData.ack_status != DboNotification::Acknowledged) {
-          REPORTD_LOG("error", QString("Service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
+        if (lastNotifData.ack_status != DboNotification::Acknowledged) {
+          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
           // FIXME: escalate it?
         } else {
-          REPORTD_LOG("error", QString("Service %1 is still in %2 state, but has been acknowledged").arg(viewName.c_str(), Severity(node.sev).toString()));
+          REPORTD_LOG("error", QString("The service %1 is still in %2 state, but has been acknowledged").arg(viewName.c_str(), Severity(node.sev).toString()));
           //FIXME: log acknowledge info ?
         }
       }
     }
   } else {  // normal state
-    if (notifQueryResult == 1) { // if there were problems
-      if (notificationData.view_status != node.sev) { // service recovered
-        sendEmailNotification(node, notificationData.view_status, qosData, notificationRecipients);
+    if (lastNotifData.view_status != DboNotification::Unset) {
+      if (lastNotifData.view_status != node.sev) { // service recovered
+        sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
       }
     }
-    m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Closed);
-    m_dbSession->changeNotificationStatus("admin", viewName, DboNotification::Closed);
+    m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Closed);
+    m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Closed);
   }
 }
 

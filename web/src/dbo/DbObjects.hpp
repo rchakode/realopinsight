@@ -328,6 +328,7 @@ struct NotificationT {
   long ack_status;
   std::string view_name;
   std::string ack_username;
+  NotificationT(): view_status(-1) { }
 };
 
 /** holds notification info like a wt::dbo object */
@@ -335,6 +336,7 @@ class DboNotification
 {
 public:
   enum AckStatusT {
+    Unset = -1,
     Closed = 0,
     Open = 1,
     Acknowledged = 2

@@ -3,13 +3,35 @@
 #include <fcntl.h>
 #include "WebUtils.hpp"
 
-const std::string Logger::m_lockSemaphoreName = "sem_lock_realopinsight_log";
+const std::string Logger::m_coreSemaphoreName = "realopinsight_core_log_sem";
+const std::string Logger::m_reportdSemaphoreName = "realopinsight_reportd_log_sem";
 
 Logger::Logger(int module, const std::string& logdir)
   : m_module(module)
 {
-  m_lockSemaphore = sem_open(m_lockSemaphoreName.c_str(), O_CREAT, S_IRUSR|S_IWUSR, 1);
-  if(m_lockSemaphore == SEM_FAILED) {
+  m_coreSemaphore = createSemaphoreOrDie(m_coreSemaphoreName);
+  m_reportdSemaphore = createSemaphoreOrDie(m_reportdSemaphoreName);
+  m_coreLogPath = QString("%1/realopinsight.log").arg(logdir.c_str()).toStdString();
+  m_monitorLogPath = QString("%1/realopinsight-reportd.log").arg(logdir.c_str()).toStdString();
+  m_coreLoggingStream.open(m_coreLogPath.c_str(), std::ios::out|std::ios::app);
+  monitorLoggingStream.open(m_monitorLogPath.c_str(), std::ios::out|std::ios::app);
+}
+
+
+Logger::~Logger()
+{
+  sem_close(m_coreSemaphore);
+  sem_close(m_reportdSemaphore);
+  m_coreLoggingStream.close();
+  monitorLoggingStream.close();
+}
+
+
+
+sem_t* Logger::createSemaphoreOrDie(const std::string& name)
+{
+  sem_t* mysem = sem_open(name.c_str(), O_CREAT, S_IRUSR|S_IWUSR, 1);
+  if (mysem == SEM_FAILED) {
     std::string errorMsg = Q_TR("The initialization of the logger semaphore has failed: ");
     switch (errno) {
       case EACCES:
@@ -21,23 +43,11 @@ Logger::Logger(int module, const std::string& logdir)
             .toStdString();
         break;
     }
-    qFatal(errorMsg.c_str());
+    qFatal("%s", errorMsg.c_str());
     exit(1);
   }
-
-  m_coreLogPath = QString("%1/realopinsight.log").arg(logdir.c_str()).toStdString();
-  m_monitorLogPath = QString("%1/realopinsight-reportd.log").arg(logdir.c_str()).toStdString();
-  m_coreLoggingStream.open(m_coreLogPath.c_str(), std::ios::out|std::ios::app);
-  monitorLoggingStream.open(m_monitorLogPath.c_str(), std::ios::out|std::ios::app);
+  return mysem;
 }
-
-
-Logger::~Logger()
-{
-  m_coreLoggingStream.close();
-  monitorLoggingStream.close();
-}
-
 
 void Logger::log(const std::string& logLevel, const std::string& msg)
 {
@@ -45,11 +55,13 @@ void Logger::log(const std::string& logLevel, const std::string& msg)
       .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:s"),
            logLevel.c_str(),msg.c_str()).toStdString();
   if(m_module == ReportdLogger) {
+    sem_wait(m_reportdSemaphore);
     monitorLoggingStream << logEntry << std::endl;
+    sem_post(m_reportdSemaphore);
   } else {
-    sem_wait(m_lockSemaphore);
+    sem_wait(m_coreSemaphore);
     m_coreLoggingStream << logEntry << std::endl;
-    sem_post(m_lockSemaphore);
+    sem_post(m_coreSemaphore);
   }
 }
 

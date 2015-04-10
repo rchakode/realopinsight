@@ -38,9 +38,7 @@ class Notificator : public QObject
 public:
   Notificator(DbSession* dbSession);
   void sendEmailNotification(const NodeT& node, int lastState, const QosDataT& qosData, const QStringList& recipients);
-  void handleNotification(const NodeT& node,
-                          const QosDataT& qosData,
-                          const QosDataT& prevQosData);
+  void handleNotification(const NodeT& node, const QosDataT& qosData);
 
 
 private:

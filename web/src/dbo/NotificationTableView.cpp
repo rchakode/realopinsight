@@ -70,7 +70,7 @@ int NotificationTableView::update(void)
   int retCode = -1;
   setDisabled(true);
   NotificationMapT notifications;
-  int result = m_dbSession->queryViewRelatedNotifications(notifications, m_dbSession->loggedUser().username);
+  int result = m_dbSession->listViewRelatedNotifications(notifications, m_dbSession->loggedUser().username);
   if (result < 0) {
     m_lastError = m_dbSession->lastError();
   } else {
@@ -126,10 +126,10 @@ void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
   if (item->isCheckable()) {
     std::string viewName = ngrt4n::getItemData(item);
     if (item->checkState() == Wt::Checked) {
-      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username, viewName, DboNotification::Acknowledged);
+      m_dbSession->updateNotificationStatus(m_dbSession->loggedUser().username, viewName, DboNotification::Acknowledged);
       // FIXME: handle error?
     } else {
-      m_dbSession->changeNotificationStatus(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
+      m_dbSession->updateNotificationStatus(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
       // FIXME: handle error?
     }
   }

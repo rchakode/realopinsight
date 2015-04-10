@@ -37,6 +37,13 @@
 #include <getopt.h>
 #include <unistd.h>
 
+
+void wait_for_interval(int interval)
+{
+  int remaining = interval;
+  while ((remaining = sleep(remaining)) > 0);
+}
+
 void runCollector(int period)
 {
   ngrt4n::initReportdLogger();
@@ -44,17 +51,6 @@ void runCollector(int period)
   DbSession dbSession;
   WebPreferencesBase preferences;
   Notificator notificator(&dbSession);
-  QMap<std::string, QosDataT> lastQoSInfoMap;
-  QosDataT defaultQoSInfo;
-
-  defaultQoSInfo.timestamp = 0;
-  defaultQoSInfo.status =  ngrt4n::Unknown;
-  defaultQoSInfo.normal = 0;
-  defaultQoSInfo.minor = 0;
-  defaultQoSInfo.major = 0;
-  defaultQoSInfo.critical = 0;
-  defaultQoSInfo.unknown = 0;
-
   while(1) {
     try {
       dbSession.updateUserList();
@@ -65,10 +61,10 @@ void runCollector(int period)
     long now = time(NULL);
     for (const auto& view: dbSession.viewList()) {
 
+      // initialize a collector for the current view.
+      // skip the view if the initialization failed
       QosCollector collector(view.path.c_str());
       collector.initialize(&preferences);
-
-      // skip the view if initialization failed
       if (collector.lastErrorState()) {
         REPORTD_LOG("error", collector.lastErrorMsg());
         continue;
@@ -82,21 +78,23 @@ void runCollector(int period)
       try {
         dbSession.addQosData(qosInfo);
         if (preferences.getNotificationType() != WebPreferencesBase::NoNotification) {
-          QMap<std::string, QosDataT>::ConstIterator lastQoSData = lastQoSInfoMap.find(qosInfo.view_name);
-          if (lastQoSData != lastQoSInfoMap.end()) {
-            notificator.handleNotification(collector.rootNode(), qosInfo, *lastQoSData);
+          pid_t pid = fork();
+          if (pid == 0) {
+            // child process: handle notification
+            REPORTD_LOG("notice", dbSession.lastError());
+            notificator.handleNotification(collector.rootNode(), qosInfo);
+            _Exit(0);
+          } else if (pid > 0) {
+            // parent process: do nothing
           } else {
-            notificator.handleNotification(collector.rootNode(), qosInfo, defaultQoSInfo);
+            REPORTD_LOG("warn", Q_TR("Can't fork process to handle notification"));
           }
         }
-        lastQoSInfoMap[qosInfo.view_name] = qosInfo;
-        REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", std::string(ex.what()));
       }
     }
-
-    sleep(period);
+    wait_for_interval(period);
   }
 
   ngrt4n::freeReportdLogger();

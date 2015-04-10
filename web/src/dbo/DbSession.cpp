@@ -208,12 +208,12 @@ bool DbSession::findUser(const std::string& username, DboUserT& user)
   DbUsersT::const_iterator it = std::find_if(m_userList.cbegin(),
                                              m_userList.cend(),
                                              [&username](const DboUser& u){return u.username == username;});
-bool found = false;
-if (it != m_userList.end()) {
-  found = true;
-  user = it->data();
-}
-return found;
+  bool found = false;
+  if (it != m_userList.end()) {
+    found = true;
+    user = it->data();
+  }
+  return found;
 }
 
 
@@ -313,12 +313,12 @@ bool DbSession::findView(const std::string& vname, DboView& view)
   DbViewsT::const_iterator it = std::find_if(m_viewList.cbegin(),
                                              m_viewList.cend(),
                                              [&vname](const DboView& v){return v.name == vname;});
-bool found = false;
-if (it != m_viewList.end()) {
-  found = true;
-  view = *it;
-}
-return found;
+  bool found = false;
+  if (it != m_viewList.end()) {
+    found = true;
+    view = *it;
+  }
+  return found;
 }
 
 void DbSession::initDb(void)
@@ -374,12 +374,12 @@ int DbSession::addView(const DboView& view)
 }
 
 
-int DbSession::deleteView(std::string viewName)
+int DbSession::deleteView(std::string viewId)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    execute("DELETE FROM view WHERE name = ?;").bind(viewName);
+    execute("DELETE FROM view WHERE name = ?;").bind(viewId);
     retValue = 0;
   } catch (const Wt::Dbo::backend::Sqlite3Exception& ex) {
     m_lastError = ex.what();
@@ -409,12 +409,12 @@ void DbSession::updateUserViewList(void)
 
 
 
-int DbSession::assignView(const std::string& userName, const std::string& vname)
+int DbSession::assignView(const std::string& userId, const std::string& vname)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(userName);
+    dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(userId);
     dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
     retValue = 0;
@@ -430,14 +430,14 @@ int DbSession::assignView(const std::string& userName, const std::string& vname)
 }
 
 
-int DbSession::revokeView(const std::string& userName, const std::string& viewName)
+int DbSession::revokeView(const std::string& userId, const std::string& viewId)
 {
   int retValue = -1;
   try {
     dbo::Transaction transaction(*this);
 
-    dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userName);
-    dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewName);
+    dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userId);
+    dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewId);
     userPtr.modify()->views.erase(viewPtr);
     retValue = 0;
 
@@ -452,7 +452,7 @@ int DbSession::revokeView(const std::string& userName, const std::string& viewNa
 }
 
 
-int DbSession::queryAssignedUserEmails(QStringList& emails, const std::string& viewName)
+int DbSession::listAssignedUsersEmails(QStringList& emails, const std::string& viewId)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
@@ -462,7 +462,7 @@ int DbSession::queryAssignedUserEmails(QStringList& emails, const std::string& v
                               " WHERE user.name = user_view.user_name"
                               "   AND user_view.view_name = '%1'"
                               "   AND user.email != ''"
-                              ).arg(viewName.c_str()).toStdString();
+                              ).arg(viewId.c_str()).toStdString();
 
     dbo::collection<std::string> results = query<std::string>(sql);
     emails.clear();
@@ -510,10 +510,10 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     DboLoginSessionCollectionT sessions = find<DboLoginSession>()
-                                          .where("username=? AND session_id=? AND status = ?")
-                                          .bind(session.username)
-                                          .bind(session.sessionId)
-                                          .bind(DboLoginSession::ExpiredCookie);
+        .where("username=? AND session_id=? AND status = ?")
+        .bind(session.username)
+        .bind(session.sessionId)
+        .bind(DboLoginSession::ExpiredCookie);
     retValue = sessions.size()? DboLoginSession::ActiveCookie : DboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session. More details in log.";
@@ -546,22 +546,22 @@ int DbSession::addQosData(const QosDataT& qosData)
 
 
 
-int DbSession::queryQosData(QosDataByViewMapT& qosDataMap, const std::string& viewName, long fromDate, long toDate)
+int DbSession::listQosData(QosDataByViewMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
     DboQosDataCollectionT dbEntries;
-    if (viewName.empty()) {
+    if (viewId.empty()) {
       dbEntries = find<DboQosData>()
-                  .where("timestamp >= ? AND timestamp <= ?")
-                  .orderBy("timestamp")
-                  .bind(fromDate).bind(toDate);
+          .where("timestamp >= ? AND timestamp <= ?")
+          .orderBy("timestamp")
+          .bind(fromDate).bind(toDate);
     } else {
       dbEntries = find<DboQosData>()
-                  .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
-                  .orderBy("timestamp")
-                  .bind(viewName).bind(fromDate).bind(toDate);
+          .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
+          .orderBy("timestamp")
+          .bind(viewId).bind(fromDate).bind(toDate);
     }
 
     qosDataMap.clear();
@@ -579,20 +579,20 @@ int DbSession::queryQosData(QosDataByViewMapT& qosDataMap, const std::string& vi
 }
 
 
-int DbSession::queryLastQosData(QosDataT& qosData, const std::string& viewName)
+int DbSession::getLastQosData(QosDataT& qosData, const std::string& viewId)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
     DboQosDataCollectionT queryResults;
-    if (viewName.empty()) {
+    if (viewId.empty()) {
       queryResults = find<DboQosData>()
-                 .orderBy("timestamp DESC")
-                 .limit(1);
+          .orderBy("timestamp DESC")
+          .limit(1);
     } else {
       queryResults = find<DboQosData>()
-                 .orderBy("timestamp DESC")
-                 .limit(1);
+          .orderBy("timestamp DESC")
+          .limit(1);
     }
 
     if (queryResults.size() == 1) {
@@ -608,7 +608,7 @@ int DbSession::queryLastQosData(QosDataT& qosData, const std::string& viewName)
 }
 
 
-int DbSession::addNotification(const std::string& viewName, int viewStatus)
+int DbSession::addNotification(const std::string& viewId, int viewStatus)
 {
   int retValue = -1;
 
@@ -619,7 +619,7 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
     DboNotification* entryPtr = new DboNotification();
     entryPtr->timestamp = time(NULL);
     entryPtr->last_change = entryPtr->timestamp;
-    entryPtr->view = find<DboView>().where("name=?").bind(viewName);
+    entryPtr->view = find<DboView>().where("name=?").bind(viewId);
     entryPtr->view_status = viewStatus;
     entryPtr->ack_status = DboNotification::Open;
     add(entryPtr);
@@ -636,35 +636,41 @@ int DbSession::addNotification(const std::string& viewName, int viewStatus)
 }
 
 
-int DbSession::changeNotificationStatus(const std::string& userName, const std::string& viewName, int newStatus)
+int DbSession::updateNotificationStatus(const std::string& userId, const std::string& viewId, int notificationStatus)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userId);
     if (! dboUser) {
-      m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
+      m_lastError = QObject::tr("No user with username %1)").arg(userId.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
     } else {
-      long ackTimestamp = time(NULL);
+      long lastChange = time(NULL);
       DboViewCollectionT dboViews;
       if (dboUser->role == DboUser::AdmRole) {
         dboViews = find<DboView>();
       } else {
         dboViews = dboUser->views;
       }
-
       for (auto& dboView : dboViews) {
-        DboNotificationCollectionT dboNotifications;
-        std::string actualViewname = viewName.empty()? dboView->name : viewName;
-        dboNotifications = find<DboNotification>()
-                           .where("view_name = ?")
-                           .bind(actualViewname);
 
-        for (auto& notifDbEntry: dboNotifications) {
-          notifDbEntry.modify()->ack_status = newStatus;
-          notifDbEntry.modify()->ack_user = dboUser;
-          notifDbEntry.modify()->last_change = ackTimestamp;
+        DboNotificationCollectionT notificationEntries;
+        std::string realViewId = viewId.empty()? dboView->name : viewId;
+        notificationEntries = find<DboNotification>()
+            .where("view_name = ?").bind(realViewId)
+            .orderBy("timestamp DESC")
+            .limit(1);
+
+        for (auto& notifDbEntry: notificationEntries) {
+          DboNotification* notifDbPtr = new DboNotification();
+          notifDbPtr->timestamp   = notifDbEntry->timestamp;
+          notifDbPtr->ack_user    = dboUser;
+          notifDbPtr->ack_status  = notificationStatus;
+          notifDbPtr->view        = dboView;
+          notifDbPtr->view_status = notifDbEntry->view_status;
+          notifDbPtr->last_change = lastChange;
+          add(notifDbPtr);
         }
       }
       retValue = 0;
@@ -680,20 +686,21 @@ int DbSession::changeNotificationStatus(const std::string& userName, const std::
 }
 
 
-int DbSession::queryNotificationInfo(NotificationT& notification,const std::string& viewName)
+void DbSession::getLastNotificationInfo(NotificationT& lastNotifInfo, const std::string& viewId)
 {
-  int result = 0;
+  lastNotifInfo = NotificationT();
 
   dbo::Transaction transaction(*this);
 
   try {
-    if (! viewName.empty()) {
-      dbo::ptr<DboNotification> dbNotifEntry = find<DboNotification>().where("view_name = ?").bind(viewName);
+    if (! viewId.empty()) {
+      dbo::ptr<DboNotification>
+          dbNotifEntry = find<DboNotification>()
+          .where("view_name = ?").bind(viewId)
+          .orderBy("timestamp DESC")
+          .limit(1);
       if (dbNotifEntry) {
-        notification = dbNotifEntry->data();
-        result = 1;
-      } else {
-
+        lastNotifInfo = dbNotifEntry->data();
       }
     }
   } catch (const dbo::Exception& ex) {
@@ -702,19 +709,17 @@ int DbSession::queryNotificationInfo(NotificationT& notification,const std::stri
   }
 
   transaction.commit();
-
-  return result;
 }
 
 
-int DbSession::queryViewRelatedNotifications(NotificationMapT& notifications, const std::string& userName)
+int DbSession::listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userName);
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userId);
     if (! dboUser) {
-      m_lastError = QObject::tr("No user with username %1)").arg(userName.c_str()).toStdString();
+      m_lastError = QObject::tr("No user with username %1)").arg(userId.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("DbSession::fetchUserRelatedNotifications: %1").arg(m_lastError.c_str()).toStdString());
     } else {
       DboNotificationCollectionT dboNotifications;
@@ -731,7 +736,7 @@ int DbSession::queryViewRelatedNotifications(NotificationMapT& notifications, co
                                   " WHERE uv.user_name = '%1'"
                                   "   AND n.view_name = uv.view_name"
                                   " ORDER BY last_change"
-                                  ).arg(userName.c_str()).toStdString();
+                                  ).arg(userId.c_str()).toStdString();
 
         dbo::collection< boost::tuple<std::string, int, int, int, std::string> >
             results = query< boost::tuple<std::string, int, int, int, std::string> >(sql);

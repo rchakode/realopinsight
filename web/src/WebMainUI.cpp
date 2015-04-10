@@ -58,7 +58,7 @@ void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Respon
   response.setMimeType("text/csv");
   response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
   QosDataByViewMapT qosData;
-  if (m_mainUiClass->dbSession()->queryQosData(qosData,
+  if (m_mainUiClass->dbSession()->listQosData(qosData,
                                                m_viewName,
                                                m_mainUiClass->reportStartTime(),
                                                m_mainUiClass->reportEndTime()) == 0) {
@@ -1132,7 +1132,7 @@ void WebMainUI::updateBiCharts(void)
 void WebMainUI::updateViewBiCharts(const std::string& viewName)
 {
   QosDataByViewMapT qosData;
-  if (m_dbSession->queryQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
+  if (m_dbSession->listQosData(qosData, viewName, reportStartTime(), reportEndTime()) == 0) {
     QosTrendsChartMapT::iterator qosChart = m_qosCharts.find(viewName);
     if (qosChart != m_qosCharts.end()) {
       SLADataManager slaManager(qosData[viewName]);
