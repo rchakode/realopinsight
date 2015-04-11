@@ -25,7 +25,7 @@
 #ifndef WEBSESSION_HPP
 #define WEBSESSION_HPP
 
-#include "Preferences.hpp"
+#include "WebPreferencesBase.hpp"
 #include <Wt/WDialog>
 #include <Wt/WRadioButton>
 #include <Wt/WLineEdit>
@@ -38,57 +38,6 @@
 #include <Wt/WLengthValidator>
 #include <memory>
 
-class QString;
-
-class WebPreferencesBase : public Preferences
-{
-public:
-  enum AuthenticationModeT {
-    BuiltIn = 0,
-    LDAP = 1
-  };
-
-  enum NotificationTypeT {
-    NoNotification = 0,
-    EmailNotification = 1
-  };
-
-  WebPreferencesBase(void);
-  int getDbState(void) { return value(Settings::GLOBAL_DB_STATE_KEY, "0").toInt();}
-  void setDbState(int state) {setEntry(Settings::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
-
-  std::string getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString();}
-  std::string getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString();}
-  std::string getLdapSearchBase(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SEARCH_BASE).toStdString();}
-  std::string getLdapBindUserPassword(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD).toStdString();}
-  std::string getLdapIdField(void) const;
-  int getLdapVersion(void) const;
-  int getAuthenticationMode(void) const;
-  bool getLdapSslUseMyCert(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;}
-  std::string getLdapSslCertFile(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CERT_FILE).toStdString();}
-  std::string getLdapSslCaFile(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CA_FILE).toStdString();}
-  static std::string authTypeString(int authSystem) {return (authSystem == LDAP) ? "LDAP" : "Built-in";}
-  int getNotificationType(void) const { return m_settings->keyValue(Settings::NOTIF_TYPE).toInt();}
-  std::string getSmtpServerAddr(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();}
-  std::string getSmtpServerPortText(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();}
-  int getSmtpServerPort(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_PORT).toInt();}
-  std::string getSmtpUsername(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USERNAME).toStdString();}
-  std::string getSmtpPassword(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
-  int getSmtpUseSsl(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
-
-
-protected :
-  virtual void fillFromSource(int srcIndex) {}
-  virtual void updateAllSourceWidgetStates(void) {}
-  virtual void updateFields(void) {}
-  virtual void saveAsSource(const qint32& idx, const QString& type){}
-
-protected Q_SLOTS:
-  virtual void applyChanges(void) {}
-  virtual void handleCancel(void) {}
-  virtual void addAsSource(void) {}
-  virtual void deleteSource(void){}
-};
 
 class WebPreferences : public WebPreferencesBase, public Wt::WContainerWidget
 {

@@ -26,7 +26,6 @@
 #include "WebUtils.hpp"
 #include "WebPreferences.hpp"
 #include "Validators.hpp"
-#include <ldap.h>
 #include <QString>
 #include <Wt/WTemplate>
 #include <Wt/WContainerWidget>
@@ -38,66 +37,18 @@
 #include <Wt/WApplication>
 
 
-namespace {
-  const std::string LDAP_VERSION2_TEXT = "LDAPv2";
-  const std::string LDAP_VERSION3_TEXT = "LDAPv3";
-}
-
-WebPreferencesBase::WebPreferencesBase(void)
-  : Preferences("/opt/realopinsight/etc/realopinsight.conf")
-{
-}
-
-
-int WebPreferencesBase::getLdapVersion(void) const
-{
-  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
-  if (val != LDAP_VERSION3_TEXT)
-    return LDAP_VERSION2;
-
-  return LDAP_VERSION3;
-}
-
-
-int WebPreferencesBase::getAuthenticationMode(void) const
-{
-  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
-  if (val != LDAP)
-    return BuiltIn;
-
-  return val;
-}
-
-
-
-std::string WebPreferencesBase::getLdapIdField(void) const
-{
-  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
-  if (val.isEmpty())
-    return "uid";
-
-  return val.toStdString();
-}
-
-
 WebPreferences::WebPreferences(void)
   : WebPreferencesBase(),
     Wt::WContainerWidget(),
     m_operationCompleted(this),
     m_authSystemChanged(this)
 {
-  this->setMargin(0, Wt::All);
-
+  setMargin(0, Wt::All);
   createAuthSettingsFields();
-
   createSourceSettingsFields();
-
   createLdapSettingsFields();
-
   createNotificationSettingsFields();
-
   createButtons();
-
   addEvent();
   bindFormWidget();
   loadProperties();
@@ -132,8 +83,8 @@ void WebPreferences::createLdapSettingsFields(void)
   m_ldapServerUriField->setEmptyText("ldap://localhost:389");
 
   m_ldapVersionField.reset(new Wt::WComboBox(this));
-  m_ldapVersionField->addItem(LDAP_VERSION3_TEXT);
-  m_ldapVersionField->addItem(LDAP_VERSION2_TEXT);
+  m_ldapVersionField->addItem(LDAP_VERSION3_LABEL);
+  m_ldapVersionField->addItem(LDAP_VERSION2_LABEL);
   m_ldapVersionField->setCurrentIndex(0);
 
   m_ldapSslUseCertField.reset(new Wt::WCheckBox(QObject::tr("Use custom SSL certificate").toStdString(), this));
