@@ -27,6 +27,7 @@
 #include "WebMainUI.hpp"
 #include "AuthManager.hpp"
 #include "AuthModelProxy.hpp"
+#include "WebLicenseActivation.hpp"
 #include <Wt/Auth/Login>
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/AbstractUserDatabase>
@@ -100,12 +101,13 @@ void AuthManager::createLoggedInView(void)
     m_mainUI = new WebMainUI(this);
     bindWidget("main-ui", m_mainUI);
 
-    long diffTimeSinceBuilt = time(NULL) - BUILD_TIME;
-    if (diffTimeSinceBuilt > 31556926) {
-      bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">This copy of the software is too old."
+    WebLicenseActivation licenseActivator;
+    if (! licenseActivator.isActivated(PKG_VERSION)) {
+      bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
+                                                "This copy of RealOpInsight Ultimate is not activated."
                                                 " Please go to"
                                                 " <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
-                                                " to get a new copy.</div>",
+                                                " to get an activation key.</div>",
                                                 Wt::XHTMLText));
     } else {
       bindEmpty("update-banner");

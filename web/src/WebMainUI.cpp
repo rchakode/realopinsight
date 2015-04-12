@@ -59,9 +59,9 @@ void CsvReportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Respon
   response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
   QosDataByViewMapT qosData;
   if (m_mainUiClass->dbSession()->listQosData(qosData,
-                                               m_viewName,
-                                               m_mainUiClass->reportStartTime(),
-                                               m_mainUiClass->reportEndTime()) == 0) {
+                                              m_viewName,
+                                              m_mainUiClass->reportStartTime(),
+                                              m_mainUiClass->reportEndTime()) == 0) {
     for(const auto& entry: qosData[m_viewName])
       response.out() << entry.toString() << std::endl;
   }
@@ -81,6 +81,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_preferences(new WebPreferences()),
+    m_licenseActivationForm(new WebLicenseActivation()),
     m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_currentDashboard(NULL),
@@ -104,6 +105,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 WebMainUI::~WebMainUI()
 {
   delete m_preferences;
+  delete m_licenseActivationForm;
   delete m_fileUploadDialog;
   delete m_navbar;
   delete m_mainStackedContents;
@@ -699,18 +701,18 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   // monitoring settings menu
   m_adminStackedContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
+  link = new Wt::WAnchor("#", Q_TR("Data Sources"));
   settingPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText(Q_TR("Setting up Monitoring Sources"));
+    m_adminPanelTitle->setText(Q_TR("Monitoring Data Sources"));
     m_adminStackedContents->setCurrentWidget(m_preferences);
     m_preferences->showMonitoringSettings();
   }));
 
   // auth settings menu
   m_adminStackedContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("User Authentication"));
+  link = new Wt::WAnchor("#", Q_TR("Authentication"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
@@ -721,7 +723,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   // notification settings menu
   m_adminStackedContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Notification Options"));
+  link = new Wt::WAnchor("#", Q_TR("Notification"));
   settingPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
@@ -729,6 +731,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
     m_adminStackedContents->setCurrentWidget(m_preferences);
     m_preferences->showNotificationSettings();
   }));
+
 
   // my account menu
   m_adminStackedContents->addWidget(m_userAccountForm);
@@ -750,6 +753,16 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
     m_adminStackedContents->setCurrentWidget(m_changePasswordPanel);
     m_changePasswordPanel->reset();
     m_adminPanelTitle->setText("Change password");
+  }));
+
+  // license activation menu
+  m_adminStackedContents->addWidget(m_licenseActivationForm);
+  link = new Wt::WAnchor("#", Q_TR("Activation"));
+  settingPageTpl->bindWidget("menu-license-activation", link);
+  m_menuLinks.insert(MenuAuthSettings, link);
+  link->clicked().connect(std::bind([=](){
+    m_adminPanelTitle->setText(Q_TR("License Activation"));
+    m_adminStackedContents->setCurrentWidget(m_licenseActivationForm);
   }));
 
   return settingPageTpl;

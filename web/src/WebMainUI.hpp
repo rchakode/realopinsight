@@ -33,6 +33,7 @@
 #include "WebBiCharts.hpp"
 #include "WebUtils.hpp"
 #include "WebNotificationManager.hpp"
+#include "WebLicenseActivation.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
 #include <Wt/WApplication>
@@ -137,6 +138,7 @@ private:
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   WebPreferences* m_preferences;
+  WebLicenseActivation* m_licenseActivationForm;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_mainStackedContents;
   Wt::WStackedWidget* m_adminStackedContents;

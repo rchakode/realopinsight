@@ -112,7 +112,8 @@ HEADERS += \
     web/src/dbo/LdapUserManager.hpp \
     web/src/WebNotificationManager.hpp \
     web/src/dbo/NotificationTableView.hpp \
-    web/src/WebPreferencesBase.hpp
+    web/src/WebPreferencesBase.hpp \
+    web/src/WebLicenseActivation.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Settings.cpp \
@@ -158,7 +159,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/dbo/LdapUserManager.cpp \
     web/src/WebNotificationManager.cpp \
     web/src/dbo/NotificationTableView.cpp \
-    web/src/WebPreferencesBase.cpp
+    web/src/WebPreferencesBase.cpp \
+    web/src/WebLicenseActivation.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \
