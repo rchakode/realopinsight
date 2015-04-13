@@ -1,5 +1,30 @@
+/*
+ * WebLicenseActivation.cpp
+# ------------------------------------------------------------------------ #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Creation: 12-04-2015                                                     #
+#                                                                          #
+# This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
+# by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
+#                                                                          #
+# RealOpInsight is free software: you can redistribute it and/or modify    #
+# it under the terms of the GNU General Public License as published by     #
+# the Free Software Foundation, either version 3 of the License, or        #
+# (at your option) any later version.                                      #
+#                                                                          #
+# The Software is distributed in the hope that it will be useful,          #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            #
+# GNU General Public License for more details.                             #
+#                                                                          #
+# You should have received a copy of the GNU General Public License        #
+# along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
+#--------------------------------------------------------------------------#
+ */
+ 
 #include "WebLicenseActivation.hpp"
 #include "WebUtils.hpp"
+#include <QHostInfo>
 
 WebLicenseActivation::WebLicenseActivation()
   : WebPreferencesBase(),
@@ -39,26 +64,13 @@ bool WebLicenseActivation::isActivated(const QString& version)
 
 bool WebLicenseActivation::checkLicenseKey(const QString& key, const QString& version)
 {
-  return isValidKey(key, getHostId(), getHostName(), version);
+  return isValidKey(key, getHostId(), QHostInfo::localHostName(), version);
 }
 
 
 bool WebLicenseActivation::isValidKey(const QString& key, const QString& hostid, const QString& hostname, const QString& version)
 {
   return key == genLicenseKey(hostid, hostname, version);
-}
-
-
-QString WebLicenseActivation::getHostName(void)
-{
-  char hostname[255];
-  size_t hostnameLen = 0;
-  if (gethostname(hostname, hostnameLen) != 0) {
-    hostnameLen = 0;
-    qDebug() << "Can't get hostname: gethostname failed";
-  }
-
-  return std::string(hostname, hostnameLen).c_str();
 }
 
 QString WebLicenseActivation::getHostId(void)
