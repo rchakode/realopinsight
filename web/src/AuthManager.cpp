@@ -90,27 +90,25 @@ void AuthManager::createLoggedInView(void)
 #ifdef ENABLE_ANALYTICS
   ngrt4n::googleAnalyticsLogger();
 #endif
+  setTemplateText(tr("Wt.Auth.template.logged-in"));
   m_dbSession->setLoggedUser();
   DboLoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
-
-  setTemplateText(tr("Wt.Auth.template.logged-in"));
+  WebLicenseActivation keyActivator;
   try {
-    m_mainUI = new WebMainUI(this);
-    bindWidget("main-ui", m_mainUI);
-    WebLicenseActivation licenseActivator;
-    if (! licenseActivator.isActivated(PKG_VERSION)) {
+    bindWidget("main-ui", m_mainUI = new WebMainUI(this));
+    if (! keyActivator.isActivated(PKG_VERSION) && m_dbSession->isLoggedAdmin()) {
       bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
-                                                "This copy of RealOpInsight Ultimate is not activated."
-                                                " Please go to"
-                                                " <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
-                                                " to get an activation key.</div>",
+                                                "You're running a non activated (limited) version of RealOpInsight Ultimate."
+                                                " Please go to <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
+                                                " in order to get a full-version activation key."
+                                                "</div>",
                                                 Wt::XHTMLText));
     } else {
       bindEmpty("update-banner");
     }
   } catch (const std::bad_alloc& ) {
-    bindWidget("main-ui", new Wt::WText("Error: no sufficient memory, please consider to upgrade your system !"));
+    bindWidget("main-ui", new Wt::WText("ERROR: You are running low on memory, please upgrade your system !"));
   }
 
   // create the logout button

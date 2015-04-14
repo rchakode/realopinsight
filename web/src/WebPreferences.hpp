@@ -43,8 +43,8 @@ class WebPreferences : public WebPreferencesBase, public Wt::WContainerWidget
 {
 public:
   enum InputTypeT {
-    SourceTypeInput=1,
-    SourceIndexInput=2
+    SourceTypeInput  = 1,
+    SourceIndexInput = 2
   };
 
 
