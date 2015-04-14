@@ -1,7 +1,7 @@
 /*
  * WebLicenseActivation.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Creation: 12-04-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
@@ -20,6 +20,7 @@
 # You should have received a copy of the GNU General Public License        #
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 # ------------------------------------------------------------------------ #
+*/
 
 #ifndef WEBLICENSEACTIVATION_HPP
 #define WEBLICENSEACTIVATION_HPP
@@ -34,16 +35,15 @@ public:
   WebLicenseActivation();
   void saveActivationKey(void);
   bool isActivated(const QString& version);
+  static QString genKey(const QString& hostid, const QString& hostname, const QString& version);
 
 private:
   Wt::WLineEdit* m_activationKeyField;
   Wt::WPushButton* m_activeBtn;
 
-  QString genLicenseKey(const QString& hostid, const QString& hostname, const QString& version);
   bool checkLicenseKey(const QString& key, const QString& version);
   bool isValidKey(const QString& key, const QString& hostid, const QString& hostname, const QString& version);
-  QString getHostId(void);
-
+  static QString getHostId(void);
 };
 
 #endif // WEBLICENSEACTIVATION_HPP

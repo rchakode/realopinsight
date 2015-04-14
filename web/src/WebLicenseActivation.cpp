@@ -1,7 +1,7 @@
 /*
  * WebLicenseActivation.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Creation: 12-04-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
@@ -21,7 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
- 
+
 #include "WebLicenseActivation.hpp"
 #include "WebUtils.hpp"
 #include <QHostInfo>
@@ -41,7 +41,7 @@ void WebLicenseActivation::saveActivationKey(void)
   sync();
 }
 
-QString WebLicenseActivation::genLicenseKey(const QString& hostid, const QString& hostname, const QString& version)
+QString WebLicenseActivation::genKey(const QString& hostid, const QString& hostname, const QString& version)
 {
   QCryptographicHash hasher(QCryptographicHash::Md5);
   hasher.addData(hostid.toLatin1());
@@ -62,6 +62,7 @@ bool WebLicenseActivation::isActivated(const QString& version)
   return checkLicenseKey(value(Settings::ACTIVATION_LICENSE_KEY, ""), version);
 }
 
+
 bool WebLicenseActivation::checkLicenseKey(const QString& key, const QString& version)
 {
   return isValidKey(key, getHostId(), QHostInfo::localHostName(), version);
@@ -70,10 +71,11 @@ bool WebLicenseActivation::checkLicenseKey(const QString& key, const QString& ve
 
 bool WebLicenseActivation::isValidKey(const QString& key, const QString& hostid, const QString& hostname, const QString& version)
 {
-  return key == genLicenseKey(hostid, hostname, version);
+  return key == genKey(hostid, hostname, version);
 }
+
 
 QString WebLicenseActivation::getHostId(void)
 {
-  return QString::number(gethostid());
+  return QString::number(static_cast<unsigned int>(gethostid()), 16);
 }

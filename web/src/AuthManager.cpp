@@ -87,11 +87,9 @@ void AuthManager::createLoginView(void)
 
 void AuthManager::createLoggedInView(void)
 {
-
 #ifdef ENABLE_ANALYTICS
   ngrt4n::googleAnalyticsLogger();
 #endif
-
   m_dbSession->setLoggedUser();
   DboLoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
@@ -100,7 +98,6 @@ void AuthManager::createLoggedInView(void)
   try {
     m_mainUI = new WebMainUI(this);
     bindWidget("main-ui", m_mainUI);
-
     WebLicenseActivation licenseActivator;
     if (! licenseActivator.isActivated(PKG_VERSION)) {
       bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
@@ -116,6 +113,7 @@ void AuthManager::createLoggedInView(void)
     bindWidget("main-ui", new Wt::WText("Error: no sufficient memory, please consider to upgrade your system !"));
   }
 
+  // create the logout button
   Wt::WImage* image = new Wt::WImage(Wt::WLink("images/built-in/logout.png"), m_mainUI);
   image->setToolTip(QObject::tr("Sign out").toStdString());
   image->clicked().connect(this, &AuthManager::logout);

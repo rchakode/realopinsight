@@ -193,6 +193,10 @@ web-foundation-unittests {
   SOURCES += web/src/web_foundation_unittests.cpp
 }
 
+web-genkey {
+  SOURCES += web/src/ngrt4n-genkey.cpp
+  TARGET = realopinsight-genkey
+}
 dflag {
   TARGET.path=$$(INSTALL_PREFIX)/bin
   MAN.path =$$(INSTALL_PREFIX)/share/man/man1
