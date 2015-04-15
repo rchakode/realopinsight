@@ -42,20 +42,22 @@ public:
   DbSession* session(void) {return m_dbSession;}
   void logout(void);
   bool isLogged(void);
-  WebPreferences* preferences(void) {return m_preferences;}
+  void setIsActivatedLicense(bool activated) {m_isActivatedLicense = activated;}
+  bool isActivatedLicense(void) const {return m_isActivatedLicense;}
 
 protected:
   virtual void createLoggedInView(void);
   virtual void createLoginView(void);
 
 private:
+  bool m_isActivatedLicense;
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
-  WebPreferences* m_preferences;
   Wt::WText* m_infoBox;
 
   void handleAuthentication(void);
   void handleLoginFailed(std::string data);
+  void checkLicense(void);
 };
 
 #endif // AUTHWIDGET_HPP

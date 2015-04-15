@@ -41,17 +41,24 @@
 
 AuthManager::AuthManager(DbSession* dbSession)
   : Wt::Auth::AuthWidget(dbSession->loginObject()),
+    m_isActivatedLicense(false),
     m_dbSession(dbSession),
     m_mainUI(NULL)
 {
+  checkLicense();
   AuthModelProxy* authModelProxy = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
   authModelProxy->loginFailed().connect(this, &AuthManager::handleLoginFailed);
-
   authModelProxy->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
   authModelProxy->addPasswordAuth(m_dbSession->passwordAuthentificator());
   setModel(authModelProxy);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
+}
+
+void AuthManager::checkLicense(void)
+{
+  WebLicenseActivation licenseValidator;
+  setIsActivatedLicense(licenseValidator.isActivated(PKG_VERSION));
 }
 
 void AuthManager::handleAuthentication(void)
@@ -94,10 +101,9 @@ void AuthManager::createLoggedInView(void)
   m_dbSession->setLoggedUser();
   DboLoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
-  WebLicenseActivation keyActivator;
   try {
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
-    if (! keyActivator.isActivated(PKG_VERSION) && m_dbSession->isLoggedAdmin()) {
+    if (! isActivatedLicense() && m_dbSession->isLoggedAdmin()) {
       bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
                                                 "You're running a non activated (limited) version of RealOpInsight Ultimate."
                                                 " Please go to <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
