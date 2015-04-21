@@ -439,7 +439,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectFileToOpen(void)
 {
-  m_fileUploadDialog->setWindowTitle(tr("Select the platform to preview").toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Preview | %1").arg(APP_NAME).toStdString());
   Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
   container->clear();
   
@@ -448,25 +448,26 @@ void WebMainUI::selectFileToOpen(void)
   
   // Provide a button to close the window
   Wt::WPushButton* finish(new Wt::WPushButton(tr("Preview").toStdString(), container));
-  finish->clicked().connect(std::bind(&WebMainUI::finishFileDialog, this, OPEN));
+  finish->clicked().connect(this, &WebMainUI::handlePreview);
   
   m_fileUploadDialog->show();
 }
 
 void WebMainUI::openFileUploadDialog(void)
 {
-  m_fileUploadDialog->setWindowTitle(tr("Import a description file").toStdString());
+  m_fileUploadDialog->setWindowTitle(tr("Importation | %1").arg(APP_NAME).toStdString());
   m_fileUploadDialog->setStyleClass("Wt-dialog");
-  Wt::WContainerWidget* container(new Wt::WContainerWidget(m_fileUploadDialog->contents()));
-  container->clear();
-  container->setMargin(10, Wt::All);
-  
+
+  Wt::WContainerWidget* container = m_fileUploadDialog->contents();
+  container->addWidget(new Wt::WText(Q_TR("<p>Select a description file</p>"), Wt::XHTMLText));
+
   m_uploader = new Wt::WFileUpload(container);
-  m_uploader->uploaded().connect(std::bind(&WebMainUI::finishFileDialog, this, IMPORT));
+  m_uploader->uploaded().connect(this, &WebMainUI::handleImportation);
   m_uploader->setFileTextSize(MAX_FILE_UPLOAD);
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
   
+
   // Provide a button to start uploading.
   Wt::WPushButton* uploadButton = new Wt::WPushButton(tr("Upload").toStdString(), container);
   uploadButton->clicked().connect(std::bind([=](){
@@ -476,6 +477,7 @@ void WebMainUI::openFileUploadDialog(void)
   
   // Provide a button to close the upload dialog
   Wt::WPushButton* close(new Wt::WPushButton(tr("Close").toStdString(), container));
+
   close->clicked().connect(std::bind([=](){
     uploadButton->enable();
     m_fileUploadDialog->accept();
@@ -489,65 +491,6 @@ void WebMainUI::openFileUploadDialog(void)
   m_fileUploadDialog->show();
 }
 
-void WebMainUI::finishFileDialog(int action)
-{
-  switch(action) {
-    case IMPORT:
-      if (! m_uploader->empty()) {
-        if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-          CORE_LOG("debug", "Parsing the input file");
-          QString tmpFileName(m_uploader->spoolFileName().c_str());
-          CoreDataT cdata;
-
-          Parser parser(tmpFileName ,&cdata);
-          connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
-
-          if (! parser.process(false)) {
-            std::string msg = tr("Invalid description file").toStdString();
-            CORE_LOG("warn", msg);
-            showMessage(ngrt4n::OperationFailed, msg);
-          } else {
-            std::string filename = m_uploader->clientFileName().toUTF8();
-            QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
-            QFile file(tmpFileName);
-            file.copy(dest);
-            file.remove();
-
-            DboView view;
-            view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-            view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-            view.path = dest.toStdString();
-            if (m_dbSession->addView(view) != 0){
-              showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
-            } else {
-              QString msg = tr("View added. "
-                               " Name: %1\n - "
-                               " Services: %2 -"
-                               " Path: %3").arg(view.name.c_str(),
-                                                QString::number(view.service_count),
-                                                view.path.c_str());
-              showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
-            }
-          }
-        }
-      }
-      break;
-    case OPEN:
-      m_fileUploadDialog->accept();
-      m_fileUploadDialog->contents()->clear();
-      if (! m_selectedFile.empty()) {
-        WebDashboard* dashbord;
-        loadView(m_selectedFile, dashbord);
-        setDashboardAsFrontStackedWidget(dashbord);
-        m_selectedFile.clear();
-      } else {
-        showMessage(ngrt4n::OperationFailed, tr("No file selected").toStdString());
-      }
-      break;
-    default:
-      break;
-  }
-}
 
 void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
 {
@@ -813,7 +756,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
   
   Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(m_mainWidget);
   Wt::WStandardItem *item = new Wt::WStandardItem();
-  item->setText(Q_TR("-- Select a description file --"));
+  item->setText(Q_TR("-- Select a business view --"));
   viewSelectorModel->appendRow(item);
   
   Q_FOREACH(const DboView& view, views) {
@@ -1229,5 +1172,64 @@ void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
 {
   if (widget) {
     m_dashboardStackedContents->setCurrentWidget(widget);
+  }
+}
+
+
+
+void WebMainUI::handleImportation(void)
+{
+  if (! m_uploader->empty()) {
+    if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+      CORE_LOG("debug", "Parsing the input file");
+      QString tmpFileName(m_uploader->spoolFileName().c_str());
+      CoreDataT cdata;
+
+      Parser parser(tmpFileName ,&cdata);
+      connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+
+      if (! parser.process(false)) {
+        std::string msg = tr("Invalid description file").toStdString();
+        CORE_LOG("warn", msg);
+        showMessage(ngrt4n::OperationFailed, msg);
+      } else {
+        std::string filename = m_uploader->clientFileName().toUTF8();
+        QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+        QFile file(tmpFileName);
+        file.copy(dest);
+        file.remove();
+
+        DboView view;
+        view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+        view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+        view.path = dest.toStdString();
+        if (m_dbSession->addView(view) != 0){
+          showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+        } else {
+          QString msg = tr("View added. "
+                           " Name: %1\n - "
+                           " Services: %2 -"
+                           " Path: %3").arg(view.name.c_str(),
+                                            QString::number(view.service_count),
+                                            view.path.c_str());
+          showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
+        }
+      }
+    }
+  }
+}
+
+
+void WebMainUI::handlePreview(void)
+{
+  m_fileUploadDialog->accept();
+  m_fileUploadDialog->contents()->clear();
+  if (! m_selectedFile.empty()) {
+    WebDashboard* dashbord;
+    loadView(m_selectedFile, dashbord);
+    setDashboardAsFrontStackedWidget(dashbord);
+    m_selectedFile.clear();
+  } else {
+    showMessage(ngrt4n::OperationFailed, tr("No item selected").toStdString());
   }
 }

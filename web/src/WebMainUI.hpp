@@ -175,26 +175,7 @@ private:
   Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
   Wt::WComboBox* createViewSelector(void);
 
-  /** member methods without return value*/
-  void addEvents(void);
-  void createMainUI(void);
-  void setupInfoBox(void);
-  void setupProfileMenus(void);
-  void setupMenus(void);
-  void openFileUploadDialog(void);
-  void selectFileToOpen(void);
-  void initOperatorDashboard(void);
-  void loadView(const std::string& path, WebDashboard*& dashboard);
-  void finishFileDialog(int action);
-  void scaleMap(double factor);
-  void createAccountPanel(void);
-  void createPasswordPanel(void);
-  void createAboutDialog(void);
-  void showMessage(int status, const std::string& msg);
-  void showMessageClass(const std::string& msg, std::string statusCssClass);
-  void setInternalPath(const std::string& path);
-  bool createDirectory(const std::string& path, bool cleanContent);
-  void startDashbaordUpdate(void);
+  /** callbacks */
   void updateEventFeeds(void);
   void handleInternalPath(void);
   void handleAuthSystemChanged(int authSystem);
@@ -206,6 +187,29 @@ private:
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void handleDisplayOnlyTroubleStateChanged(void);
+  void handleImportation(void);
+  void handlePreview(void);
+
+  /** other member functions */
+  void addEvents(void);
+  void createMainUI(void);
+  void setupInfoBox(void);
+  void setupProfileMenus(void);
+  void setupMenus(void);
+  void openFileUploadDialog(void);
+  void selectFileToOpen(void);
+  void initOperatorDashboard(void);
+  void loadView(const std::string& path, WebDashboard*& dashboard);
+
+  void scaleMap(double factor);
+  void createAccountPanel(void);
+  void createPasswordPanel(void);
+  void createAboutDialog(void);
+  void showMessage(int status, const std::string& msg);
+  void showMessageClass(const std::string& msg, std::string statusCssClass);
+  void setInternalPath(const std::string& path);
+  bool createDirectory(const std::string& path, bool cleanContent);
+  void startDashbaordUpdate(void);
   void updateBiCharts(void);
   void updateViewBiCharts(const std::string& viewName);
   void hideAdminSettingsMenu(void);
