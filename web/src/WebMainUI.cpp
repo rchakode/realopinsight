@@ -1182,16 +1182,16 @@ void WebMainUI::handleImportation(void)
         view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
         view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
         view.path = dest.toStdString();
-        if (m_dbSession->addView(view) != 0){
-          showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+        if (! m_authManager->isActivatedLicense()) {
+          showMessage(ngrt4n::OperationFailed, Q_TR("You run out of available importation tokens. Please consider to upgrade your license"));
         } else {
-          QString msg = tr("View added. "
-                           " Name: %1\n - "
-                           " Services: %2 -"
-                           " Path: %3").arg(view.name.c_str(),
-                                            QString::number(view.service_count),
-                                            view.path.c_str());
-          showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
+          if (m_dbSession->addView(view) != 0){
+            showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+          } else {
+            QString msg = tr("Added: %1 (%2 Services) - Path: %3")
+                .arg(view.name.c_str(), QString::number(view.service_count), view.path.c_str());
+            showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
+          }
         }
       }
     }
