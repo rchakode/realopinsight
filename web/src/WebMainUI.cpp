@@ -1230,6 +1230,6 @@ void WebMainUI::handlePreview(void)
     setDashboardAsFrontStackedWidget(dashbord);
     m_selectedFile.clear();
   } else {
-    showMessage(ngrt4n::OperationFailed, tr("No item selected").toStdString());
+    showMessage(ngrt4n::OperationFailed, tr("No item selected for preview").toStdString());
   }
 }
