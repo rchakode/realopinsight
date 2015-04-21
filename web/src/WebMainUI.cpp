@@ -119,7 +119,6 @@ void WebMainUI::addEvents(void)
   m_preferences->operationCompleted().connect(this, &WebMainUI::showMessage);
   m_preferences->authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
-  wApp->internalPathChanged().connect(this, &WebMainUI::handleInternalPath);
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
 }
@@ -971,26 +970,6 @@ void WebMainUI::startDashbaordUpdate(void)
 void WebMainUI::updateEventFeeds(void)
 {
   //FIXME: m_eventFeedLayout->addWidget(createEventFeedItem());
-}
-
-
-void WebMainUI::handleInternalPath(void)
-{
-  std::string path = Wt::WApplication::instance()->internalPath();
-  if (path == LINK_LOAD) {
-    selectFileToOpen();
-    setInternalPath("");
-  } else if (path == LINK_IMPORT) {
-    openFileUploadDialog();
-    setInternalPath("");
-  } else if (path == LINK_ADMIN_HOME) {
-    showUserHome();
-  } else if (path == LINK_LOGIN) {
-    wApp->redirect(LINK_LOGIN);
-  } else {
-    showMessage(ngrt4n::OperationFailed,
-                Q_TR("Sorry, the request resource is not available or has been removed"));
-  }
 }
 
 
