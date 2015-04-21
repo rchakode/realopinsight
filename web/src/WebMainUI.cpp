@@ -990,7 +990,7 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 void WebMainUI::handleLdapUsersMenu(void)
 {
   if (m_preferences->getAuthenticationMode() != WebPreferences::LDAP) {
-    showMessage(ngrt4n::OperationFailed, Q_TR("Denied. LDAP authentication is disabled"));
+    showMessage(ngrt4n::OperationFailed, Q_TR("Denied, please enable LDAP authentication first"));
   } else {
     m_adminStackedContents->setCurrentWidget(m_ldapUserManager);
     if (m_ldapUserManager->updateUserList() <= 0) {
