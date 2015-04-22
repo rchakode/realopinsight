@@ -39,7 +39,6 @@ WebLicenseActivation::WebLicenseActivation(const QString& version)
     m_lastError("")
 {
   checkInstanceActivationLevel();
-  qDebug() << "license "<< m_licenseLevel;
   bindWidget("activation-key-field", m_activationKeyField = new Wt::WLineEdit());
   bindWidget("activate-button", m_activeBtn = new Wt::WPushButton(Q_TR("Activate")));
   m_activeBtn->clicked().connect(this, &WebLicenseActivation::saveActivationKey);
