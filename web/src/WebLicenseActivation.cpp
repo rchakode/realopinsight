@@ -26,10 +26,20 @@
 #include "WebUtils.hpp"
 #include <QHostInfo>
 
-WebLicenseActivation::WebLicenseActivation()
+
+namespace {
+  int MAX_IT_SERVICES_PER_VIEW_STARTER = 50;
+}
+
+WebLicenseActivation::WebLicenseActivation(const QString& version)
   : WebPreferencesBase(),
-    Wt::WTemplate(Wt::WString::tr("license-activation-form.tpl"))
+    Wt::WTemplate(Wt::WString::tr("license-activation-form.tpl")),
+    m_licenseLevel(UltimateStarter),
+    m_version(version),
+    m_lastError("")
 {
+  checkInstanceActivationLevel();
+  qDebug() << "license "<< m_licenseLevel;
   bindWidget("activation-key-field", m_activationKeyField = new Wt::WLineEdit());
   bindWidget("activate-button", m_activeBtn = new Wt::WPushButton(Q_TR("Activate")));
   m_activeBtn->clicked().connect(this, &WebLicenseActivation::saveActivationKey);
@@ -41,41 +51,75 @@ void WebLicenseActivation::saveActivationKey(void)
   sync();
 }
 
-QString WebLicenseActivation::genKey(const QString& hostid, const QString& hostname, const QString& version)
+QString WebLicenseActivation::genKey(const QString& hostid, const QString& hostname, const QString& version, int package)
 {
   QCryptographicHash hasher(QCryptographicHash::Md5);
   hasher.addData(hostid.toLatin1());
   hasher.addData(hostname.toLatin1());
   hasher.addData(version.toLatin1());
-  QString key = "";
+  hasher.addData(QString::number(package).toLatin1());
+  QString serialKey = "";
   QByteArray md5 = hasher.result().toHex().toUpper();
   for (int i = 0; i < md5.length(); ++i) {
     if ((i != 0) && (i % 4 == 0))
-      key.append("-");
-    key += md5[i];
+      serialKey.append("-");
+    serialKey += md5[i];
   }
-  return key;
-}
-
-bool WebLicenseActivation::isActivated(const QString& version)
-{
-  return checkLicenseKey(value(Settings::ACTIVATION_LICENSE_KEY, ""), version);
+  return serialKey;
 }
 
 
-bool WebLicenseActivation::checkLicenseKey(const QString& key, const QString& version)
+bool WebLicenseActivation::checkKey(const QString& key, const QString& version, int package)
 {
-  return isValidKey(key, getHostId(), QHostInfo::localHostName(), version);
+  return isValidKey(key, getHostId(), QHostInfo::localHostName(), version, package);
 }
 
 
-bool WebLicenseActivation::isValidKey(const QString& key, const QString& hostid, const QString& hostname, const QString& version)
+void WebLicenseActivation::checkInstanceActivationLevel(void)
 {
-  return key == genKey(hostid, hostname, version);
+  QString licenseKey = getLicenseKey();
+  if (checkKey(licenseKey, m_version, UltimateStandard))
+    m_licenseLevel = UltimateStandard;
+  else if (checkKey(licenseKey, m_version, UltimateAdvanced))
+    m_licenseLevel = UltimateAdvanced;
+  else if (checkKey(licenseKey, m_version, UltimatePro))
+    m_licenseLevel = UltimatePro;
+  else if (checkKey(licenseKey, m_version, UltimateEnterprise))
+    m_licenseLevel = UltimateEnterprise;
+  else
+    m_licenseLevel = UltimateStarter;
+}
+
+bool WebLicenseActivation::isValidKey(const QString& key,
+                                      const QString& hostid, const QString& hostname,
+                                      const QString& version, int package)
+{
+  return key == genKey(hostid, hostname, version, package);
 }
 
 
 QString WebLicenseActivation::getHostId(void)
 {
   return QString::number(static_cast<unsigned int>(gethostid()), 16);
+}
+
+
+
+bool WebLicenseActivation::canHandleNewView(int currentViewCount, int newItServicesCount)
+{
+  bool success = false;
+  if (m_licenseLevel == UltimateStarter  && newItServicesCount > MAX_IT_SERVICES_PER_VIEW_STARTER) {
+    m_lastError = QObject::tr("The Starter license offer can handle up to %1 IT services. "
+                              " Purchase a license key online: http://realopinsight.com/"
+                              ).arg(QString::number(MAX_IT_SERVICES_PER_VIEW_STARTER));
+  } else {
+    success = (currentViewCount < m_licenseLevel);
+    if (! success) {
+      m_lastError = QObject::tr("Your license offer is limited to %1 views."
+                                " Purchase a license key online: http://realopinsight.com/"
+                                ).arg(QString::number(m_licenseLevel));
+    }
+  }
+
+  return success;
 }

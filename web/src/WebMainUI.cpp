@@ -81,7 +81,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_preferences(new WebPreferences()),
-    m_licenseActivationForm(new WebLicenseActivation()),
+    m_licenseActivator(new WebLicenseActivation(PKG_VERSION)),
     m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
     m_currentDashboard(NULL),
@@ -105,7 +105,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 WebMainUI::~WebMainUI()
 {
   delete m_preferences;
-  delete m_licenseActivationForm;
+  delete m_licenseActivator;
   delete m_fileUploadDialog;
   delete m_navbar;
   delete m_mainStackedContents;
@@ -698,13 +698,13 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   }));
 
   // license activation menu
-  m_adminStackedContents->addWidget(m_licenseActivationForm);
+  m_adminStackedContents->addWidget(m_licenseActivator);
   link = new Wt::WAnchor("#", Q_TR("Activation"));
   settingPageTpl->bindWidget("menu-license-activation", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("License Activation"));
-    m_adminStackedContents->setCurrentWidget(m_licenseActivationForm);
+    m_adminStackedContents->setCurrentWidget(m_licenseActivator);
   }));
 
   return settingPageTpl;
@@ -1182,8 +1182,8 @@ void WebMainUI::handleImportation(void)
         view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
         view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
         view.path = dest.toStdString();
-        if (! m_authManager->isActivatedLicense()) {
-          showMessage(ngrt4n::OperationFailed, Q_TR("You run out of available importation tokens. Please consider to upgrade your license"));
+        if (! m_licenseActivator->canHandleNewView(m_dbSession->viewCount(), cdata.cnodes.size()) ) {
+          showMessage(ngrt4n::OperationFailed, m_licenseActivator->lastError());
         } else {
           if (m_dbSession->addView(view) != 0){
             showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());

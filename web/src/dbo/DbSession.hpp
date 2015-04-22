@@ -55,19 +55,19 @@ public:
   bool isLogged(void) {return loginObject().loggedIn();}
   bool isLoggedAdmin(void) {return loggedUser().role == DboUser::AdmRole;}
   void configureAuth(void);
-	const DboUser& loggedUser(void) const {return m_loggedUser;}
-	bool isCompleteUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::CompleteDashboard;}
-	bool isTileUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::TileDashboard;}
-	bool isReportUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::NoReportDashboard;}
+  const DboUser& loggedUser(void) const {return m_loggedUser;}
+  bool isCompleteUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::CompleteDashboard;}
+  bool isTileUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::TileDashboard;}
+  bool isReportUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::NoReportDashboard;}
   int dashboardTilesPerRow(void) const {return (loggedUser().dashboardTilesPerRow <= 0 ? 5 : loggedUser().dashboardTilesPerRow);}
   void setLoggedUser(void);
   QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
 
-	int addUser(const DboUserT& userInfo);
-	int updateUser(const DboUserT& userInfo);
+  int addUser(const DboUserT& userInfo);
+  int updateUser(const DboUserT& userInfo);
   int deleteUser(const std::string& username);
   int deleteAuthSystemUsers(int authSystem);
-	bool findUser(const std::string& username, DboUserT& user);
+  bool findUser(const std::string& username, DboUserT& user);
   int updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
   void updateUserList(void);
   DbUsersT& userList(void) {return m_userList;}
@@ -85,6 +85,7 @@ public:
   void updateViewList(void);
   void updateViewList(const std::string& uname);
   DbViewsT& viewList(void) {return m_viewList;}
+  int viewCount(void) const {return m_viewList.size();}
   bool findView(const std::string& vname, DboView& view);
 
   void updateUserViewList(void);

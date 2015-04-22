@@ -30,6 +30,7 @@
 #include <Wt/WContainerWidget>
 #include <Wt/Auth/Login>
 #include "WebPreferences.hpp"
+#include "WebLicenseActivation.hpp"
 
 class DbSession;
 class WebMainUI;
@@ -42,8 +43,6 @@ public:
   DbSession* session(void) {return m_dbSession;}
   void logout(void);
   bool isLogged(void);
-  void setIsActivatedLicense(bool activated) {m_isActivatedLicense = activated;}
-  bool isActivatedLicense(void) const {return m_isActivatedLicense;}
 
 protected:
   virtual void createLoggedInView(void);
@@ -57,7 +56,7 @@ private:
 
   void handleAuthentication(void);
   void handleLoginFailed(std::string data);
-  void checkLicense(void);
+  bool checkLicense(void);
 };
 
 #endif // AUTHWIDGET_HPP

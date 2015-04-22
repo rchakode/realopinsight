@@ -74,8 +74,7 @@ protected :
   int currentSourceIndex(void) const {return m_currentSourceIndex;}
   void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
   void sync(void) {m_settings->sync();}
-  void setEntry(const QString& key, const QString& value) {m_settings->setEntry(key, value);}
-  QString value(const QString& key, const QString& defaultValue) {return m_settings->value(key, defaultValue).toString(); }
+  QString keyValue(const QString& key, const QString& defaultValue) {return m_settings->value(key, defaultValue).toString(); }
   void setKeyValue(const QString & _key, const QString & _value) { m_settings->setKeyValue(_key, _value); m_settings->sync();}
   bool getSourceState(int index) {return m_sourceStates->at(index);}
 

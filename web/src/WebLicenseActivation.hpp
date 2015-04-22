@@ -28,21 +28,42 @@
 #include <Wt/WTemplate>
 #include <Wt/WLineEdit>
 #include <Wt/WPushButton>
+#include <climits>
+
+
 
 class WebLicenseActivation : public WebPreferencesBase, public Wt::WTemplate
 {
 public:
-  WebLicenseActivation();
+  enum PackageT {
+    UltimateStarter = 5,
+    UltimateStandard = 20,
+    UltimateAdvanced = 50,
+    UltimatePro = 100,
+    UltimateEnterprise = INT_MAX
+  };
+
+  WebLicenseActivation(const QString& version);
+  std::string lastError() const {return m_lastError.toStdString(); }
   void saveActivationKey(void);
-  bool isActivated(const QString& version);
-  static QString genKey(const QString& hostid, const QString& hostname, const QString& version);
+  void checkInstanceActivationLevel(void);
+  bool checkLicense(void);
+  bool isActivatedInstance(void) {return m_licenseLevel > UltimateStarter;}
+  static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int package);
+  bool canHandleNewView(int currentViewCount, int newItServicesCount);
+
 
 private:
+  int m_licenseLevel;
+  QString m_version;
+  QString m_lastError;
   Wt::WLineEdit* m_activationKeyField;
   Wt::WPushButton* m_activeBtn;
 
-  bool checkLicenseKey(const QString& key, const QString& version);
-  bool isValidKey(const QString& key, const QString& hostid, const QString& hostname, const QString& version);
+  bool checkKey(const QString& key, const QString& version, int package);
+  bool isValidKey(const QString& key,
+                  const QString& hostid, const QString& hostname,
+                  const QString& version, int package);
   static QString getHostId(void);
 };
 

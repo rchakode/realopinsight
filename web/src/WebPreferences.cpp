@@ -248,7 +248,7 @@ void WebPreferences::deleteSource(void)
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBoxModel->removeRow(currentSourceIndex());
     setSourceState(currentSourceIndex(), false);
-    setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
+    setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
     sync();
     updateFields();
   }
@@ -310,7 +310,7 @@ void WebPreferences::updateFields(void)
 void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   // global settings
-  setEntry(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
+  setKeyValue(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField->text().toUTF8().c_str());
 
   // source-specific settings
   SourceT src;
@@ -322,9 +322,9 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   src.auth = m_authStringField->text().toUTF8().c_str();
   src.use_ngrt4nd = m_useNgrt4ndField->checkState();
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
-  setEntry(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
+  setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   setSourceState(index, true);
-  setEntry(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
+  setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
 
   // save changes
   sync();
@@ -468,20 +468,20 @@ void WebPreferences::saveAuthSettings(void)
 {
   // validate fields
   if (validateAuthSettingsFields()) {
-    setEntry(Settings::AUTH_MODE_KEY, QString::number(m_authenticationModeField->currentIndex()));
+    setKeyValue(Settings::AUTH_MODE_KEY, QString::number(m_authenticationModeField->currentIndex()));
     if (getAuthenticationMode() == LDAP) {
-      setEntry(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUriField->text().toUTF8().c_str());
-      setEntry(Settings::AUTH_LDAP_VERSION, m_ldapVersionField->currentText().toUTF8().c_str());
-      setEntry(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField->text().toUTF8().c_str());
-      setEntry(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField->text().toUTF8().c_str());
-      setEntry(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField->text().toUTF8().c_str());
-      setEntry(Settings::AUTH_LDAP_ID_FIELD, m_ldapIdField->text().toUTF8().c_str());
+      setKeyValue(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUriField->text().toUTF8().c_str());
+      setKeyValue(Settings::AUTH_LDAP_VERSION, m_ldapVersionField->currentText().toUTF8().c_str());
+      setKeyValue(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField->text().toUTF8().c_str());
+      setKeyValue(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField->text().toUTF8().c_str());
+      setKeyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField->text().toUTF8().c_str());
+      setKeyValue(Settings::AUTH_LDAP_ID_FIELD, m_ldapIdField->text().toUTF8().c_str());
 
       int useCert = m_ldapSslUseCertField->checkState();
-      setEntry(Settings::AUTH_LDAP_SSL_USE_CERT, QString::number(useCert));
+      setKeyValue(Settings::AUTH_LDAP_SSL_USE_CERT, QString::number(useCert));
       if (useCert == Wt::Checked) {
-        setEntry(Settings::AUTH_LDAP_SSL_CERT_FILE, m_ldapSslCertFileField->text().toUTF8().c_str());
-        setEntry(Settings::AUTH_LDAP_SSL_CA_FILE, m_ldapSslCaFileField->text().toUTF8().c_str());
+        setKeyValue(Settings::AUTH_LDAP_SSL_CERT_FILE, m_ldapSslCertFileField->text().toUTF8().c_str());
+        setKeyValue(Settings::AUTH_LDAP_SSL_CA_FILE, m_ldapSslCaFileField->text().toUTF8().c_str());
       }
     }
     m_authSystemChanged.emit(getAuthenticationMode());

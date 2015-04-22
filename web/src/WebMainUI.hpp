@@ -138,7 +138,7 @@ private:
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   WebPreferences* m_preferences;
-  WebLicenseActivation* m_licenseActivationForm;
+  WebLicenseActivation* m_licenseActivator;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_mainStackedContents;
   Wt::WStackedWidget* m_adminStackedContents;

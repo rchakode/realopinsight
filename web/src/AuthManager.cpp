@@ -45,7 +45,6 @@ AuthManager::AuthManager(DbSession* dbSession)
     m_dbSession(dbSession),
     m_mainUI(NULL)
 {
-  checkLicense();
   AuthModelProxy* authModelProxy = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
   authModelProxy->loginFailed().connect(this, &AuthManager::handleLoginFailed);
   authModelProxy->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
@@ -55,11 +54,13 @@ AuthManager::AuthManager(DbSession* dbSession)
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
 }
 
-void AuthManager::checkLicense(void)
+
+bool AuthManager::checkLicense(void)
 {
-  WebLicenseActivation licenseValidator;
-  setIsActivatedLicense(licenseValidator.isActivated(PKG_VERSION));
+  WebLicenseActivation licenseValidator(PKG_VERSION);
+  return licenseValidator.isActivatedInstance();
 }
+
 
 void AuthManager::handleAuthentication(void)
 {
@@ -103,11 +104,11 @@ void AuthManager::createLoggedInView(void)
   sessionInfo.username = m_dbSession->loggedUser().username;
   try {
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
-    if (! isActivatedLicense() && m_dbSession->isLoggedAdmin()) {
+    if (! checkLicense() && m_dbSession->isLoggedAdmin()) {
       bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
                                                 "You're running a non activated (limited) version of RealOpInsight Ultimate."
                                                 " Please go to <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
-                                                " in order to get a full-version activation key."
+                                                " in order to get an activation key."
                                                 "</div>",
                                                 Wt::XHTMLText));
     } else {
