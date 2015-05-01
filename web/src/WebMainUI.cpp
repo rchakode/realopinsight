@@ -649,7 +649,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   link->clicked().connect(std::bind([=](){
     m_adminPanelTitle->setText(Q_TR("Monitoring Data Sources"));
     m_adminStackedContents->setCurrentWidget(m_preferences);
-    m_preferences->showMonitoringSettings();
+    m_preferences->showSourceSettings();
   }));
 
   // auth settings menu

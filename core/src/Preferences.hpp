@@ -52,6 +52,7 @@ public:
   bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
   void setSourceState(int index, int value) {m_sourceStates->setBit(index, value);}
   virtual void updateSourceStates();
+  int countActiveSources(void);
 
 Q_SIGNALS:
   void urlChanged(QString);

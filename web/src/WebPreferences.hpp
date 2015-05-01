@@ -42,12 +42,6 @@
 class WebPreferences : public WebPreferencesBase, public Wt::WContainerWidget
 {
 public:
-  enum InputTypeT {
-    SourceTypeInput  = 1,
-    SourceIndexInput = 2
-  };
-
-
   WebPreferences(void);
   virtual ~WebPreferences();
 
@@ -56,8 +50,8 @@ public:
 
   virtual void setEnabledInputs(bool enable);
   void hideUnrequiredFields(void);
-  void showMonitoringSettings(void);
-  void showMonitoringSettingsWidgets(bool display);
+  void showSourceSettings(void);
+  void showSourcesSettingsWidgets(bool display);
   void showAuthSettings(void);
   void showAuthSettingsWidgets(bool display);
   void showNotificationSettings(void);
@@ -77,8 +71,8 @@ private:
   Wt::Signal<int, std::string> m_operationCompleted;
   Wt::Signal<int> m_authSystemChanged;
 
-  // monitoring settings properties
-  std::unique_ptr<Wt::WComboBox> m_sourceBox;
+  // source settings properties
+  std::unique_ptr<Wt::WComboBox> m_sourceSelectionBox;
   std::unique_ptr<Wt::WStringListModel> m_sourceBoxModel;
   std::unique_ptr<Wt::WLineEdit> m_monitorUrlField;
   std::unique_ptr<Wt::WLineEdit> m_authStringField;
@@ -92,6 +86,7 @@ private:
   std::unique_ptr<Wt::WPushButton> m_applyChangeBtn;
   std::unique_ptr<Wt::WPushButton> m_addAsSourceBtn;
   std::unique_ptr<Wt::WPushButton> m_deleteSourceBtn;
+  std::unique_ptr<Wt::WDialog> m_sourceIndexSelector;
 
   // auth settings properties
   std::unique_ptr<Wt::WComboBox> m_authenticationModeField;
@@ -122,8 +117,8 @@ private:
   void createButtons(void);
 
   void addEvent(void);
-  void promptUser(int inputType);
-  void handleInput(const std::string& input, int inputType);
+  Wt::WDialog* createSourceIndexSelector(void);
+  void handleSourceIndexSelected(Wt::WComboBox* inputBox);
   int getSourceGlobalIndex(int sourceBoxIndex);
   int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);
@@ -132,12 +127,12 @@ private:
   void saveNotificationSettings(void);
   void fillInAuthSettings(void);
   void fillInNotificationSettings(void);
-  bool validateMonitoringSettingsFields(void);
+  bool validateSourceSettingsFields(void);
   bool validateAuthSettingsFields(void);
   void showLdapSslSettings(bool display);
   void showLivestatusSettings(int monitorTypeIndex);
   void updateEmailFieldsEnabledState(void);
-  void handleSourceBoxChanged(void) { fillFromSource(getSourceGlobalIndex(m_sourceBox->currentIndex()));}
+  void handleSourceBoxChanged(void) { fillFromSource(getSourceGlobalIndex(m_sourceSelectionBox->currentIndex()));}
   void handleAuthTypeChanged(void);
   void handleShowAuthStringChanged(void);
   void handleLdapUseSslChanged(void);

@@ -69,7 +69,7 @@ void WebPreferences::addEvent(void)
   m_authSettingsSaveBtn->clicked().connect(this, &WebPreferences::saveAuthSettings);
   m_notificationSettingsSaveBtn->clicked().connect(this, &WebPreferences::saveNotificationSettings);
   m_notificationTypeBox->changed().connect(this, &WebPreferences::updateEmailFieldsEnabledState);
-  m_sourceBox->changed().connect(this, &WebPreferences::handleSourceBoxChanged);
+  m_sourceSelectionBox->changed().connect(this, &WebPreferences::handleSourceBoxChanged);
   m_authenticationModeField->changed().connect(this, &WebPreferences::handleAuthTypeChanged);
   m_showAuthStringField->changed().connect(this, &WebPreferences::handleShowAuthStringChanged);
   m_ldapSslUseCertField->changed().connect(this, &WebPreferences::handleLdapUseSslChanged);
@@ -124,9 +124,11 @@ void WebPreferences::createAuthSettingsFields(void)
 
 void WebPreferences::createSourceSettingsFields(void)
 {
-  m_sourceBox.reset(new Wt::WComboBox(this));
-  m_sourceBoxModel.reset(new Wt::WStringListModel(m_sourceBox.get()));
-  m_sourceBox->setModel(m_sourceBoxModel.get());
+  m_sourceIndexSelector.reset(createSourceIndexSelector());
+
+  m_sourceSelectionBox.reset(new Wt::WComboBox(this));
+  m_sourceBoxModel.reset(new Wt::WStringListModel(m_sourceSelectionBox.get()));
+  m_sourceSelectionBox->setModel(m_sourceBoxModel.get());
 
 
   m_monitorTypeField.reset(new Wt::WComboBox(this));
@@ -190,7 +192,7 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("monitor-auth-string", m_authStringField.get());
   tpl->bindWidget("monitor-url", m_monitorUrlField.get());
   tpl->bindWidget("monitor-type", m_monitorTypeField.get());
-  tpl->bindWidget("source-box", m_sourceBox.get());
+  tpl->bindWidget("source-box", m_sourceSelectionBox.get());
   tpl->bindWidget("dont-verify-ssl-certificate", m_dontVerifyCertificateField.get());
   tpl->bindWidget("update-interval", m_updateIntervalField.get());
   tpl->bindWidget("livestatus-server", m_livestatusHostField.get());
@@ -228,13 +230,13 @@ void WebPreferences::bindFormWidget(void)
 
 void WebPreferences::applyChanges(void)
 {
-  if (validateMonitoringSettingsFields()) {
+  if (validateSourceSettingsFields()) {
     if ( m_monitorTypeField->currentIndex() <= 0) {
-      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad monitor type").toStdString());
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid monitor type").toStdString());
       return;
     }
     if (currentSourceIndex() < 0) {
-      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad index for source (%1)").arg(currentSourceIndex()).toStdString());
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid data source index (%1)").arg(currentSourceIndex()).toStdString());
       return;
     }
     saveAsSource(currentSourceIndex(), m_monitorTypeField->currentText().toUTF8().c_str());
@@ -261,7 +263,7 @@ void WebPreferences::fillFromSource(int _index)
     SourceT src;
     loadSource(_index, src);
 
-    m_sourceBox->setValueText(ngrt4n::sourceId(_index).toStdString());
+    m_sourceSelectionBox->setValueText(ngrt4n::sourceId(_index).toStdString());
     m_monitorUrlField->setText(src.mon_url.toStdString());
     m_livestatusHostField->setText(src.ls_addr.toStdString());
     m_livestatusPortField->setText(QString::number(src.ls_port).toStdString());
@@ -297,7 +299,7 @@ void WebPreferences::updateFields(void)
   setCurrentSourceIndex(firstSourceSet());
   int curIndex = currentSourceIndex();
   if (curIndex >= 0) {
-    m_sourceBox->setCurrentIndex(curIndex);
+    m_sourceSelectionBox->setCurrentIndex(curIndex);
     fillFromSource(curIndex);
     m_applyChangeBtn->setDisabled(false);
     m_addAsSourceBtn->setDisabled(false);
@@ -332,70 +334,49 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   // emit signal a finilize
   emitTimerIntervalChanged(1000 * QString(m_updateIntervalField->text().toUTF8().c_str()).toInt());
   addToSourceBox(index);
-  m_sourceBox->setCurrentIndex(findSourceIndexInBox(index));
+  m_sourceSelectionBox->setCurrentIndex(findSourceIndexInBox(index));
 }
 
 
-void WebPreferences::promptUser(int inputType)
+Wt::WDialog* WebPreferences::createSourceIndexSelector(void)
 {
-
   Wt::WDialog* inputDialog = new Wt::WDialog();
   inputDialog->setStyleClass("Wt-dialog");
   inputDialog->titleBar()->setStyleClass("titlebar");
+  inputDialog->setWindowTitle(Q_TR("Select the source index"));
 
-  Wt::WComboBox *inputField = new Wt::WComboBox(inputDialog->contents());
-  std::string dialogTitle;
-  switch (inputType){
-    case SourceTypeInput:
-      dialogTitle = QObject::tr("Select source type").toStdString();
-      for (const auto& src : ngrt4n::sourceTypes())
-        inputField->addItem(src.toStdString());
-      break;
-    case SourceIndexInput:
-      dialogTitle = QObject::tr("Select the source index").toStdString();
-      for (const auto& src : ngrt4n::sourceIndexes())
-        inputField->addItem(src.toStdString());
-      break;
-    default:
-      break;
-  }
-  inputDialog->setWindowTitle(dialogTitle);
+  Wt::WComboBox* inputField = new Wt::WComboBox(inputDialog->contents());
+  for (const auto& src : ngrt4n::sourceIndexes()) inputField->addItem(src.toStdString());
+
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
+  ok->clicked().connect(std::bind(&WebPreferences::handleSourceIndexSelected, this, inputField));
   ok->setDefault(true);
 
   Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", inputDialog->footer());
   cancel->clicked().connect(inputDialog, &Wt::WDialog::reject);
+
   inputDialog->rejectWhenEscapePressed();
-
-  ok->clicked().connect(std::bind([=] () {
-    if (inputField->validate()) {
-      inputDialog->accept();
-      handleInput(inputField->currentText().toUTF8(), inputType);
-    }
-  }));
-
-  inputDialog->show();
+  return inputDialog;
 }
 
 
-void WebPreferences::handleInput(const std::string& input, int inputType)
+void WebPreferences::handleSourceIndexSelected(Wt::WComboBox* inputBox)
 {
-  switch(inputType) {
-    case SourceIndexInput:
-      setCurrentSourceIndex(input[0]-48);
-      applyChanges();
-      break;
-    default:
-      //Do nothing
-      break;
+  m_sourceIndexSelector->accept();
+  bool isValidIndex;
+  int index = QString::fromStdString(inputBox->currentText().toUTF8()).toInt(&isValidIndex);
+  if (isValidIndex) {
+    setCurrentSourceIndex(index);
+  } else {
+    setCurrentSourceIndex(-1);
   }
+  applyChanges();
 }
 
 void WebPreferences::addAsSource(void)
 {
-  if (validateMonitoringSettingsFields()) {
-    promptUser(SourceIndexInput);
-  }
+  if (validateSourceSettingsFields())
+    m_sourceIndexSelector->show();
 }
 
 void WebPreferences::setEnabledInputs(bool enable)
@@ -444,7 +425,7 @@ void WebPreferences::showAuthSettings(void)
 {
   fillInAuthSettings();
   showAuthSettingsWidgets(true);
-  showMonitoringSettingsWidgets(false);
+  showSourcesSettingsWidgets(false);
   showNotificationSettingsWidgets(false);
 }
 
@@ -509,16 +490,16 @@ void WebPreferences::fillInAuthSettings(void)
 
 
 
-void WebPreferences::showMonitoringSettings(void)
+void WebPreferences::showSourceSettings(void)
 {
   fillFromSource(firstSourceSet());
-  showMonitoringSettingsWidgets(true);
+  showSourcesSettingsWidgets(true);
   showAuthSettingsWidgets(false);
   showNotificationSettingsWidgets(false);
 }
 
 
-void WebPreferences::showMonitoringSettingsWidgets(bool display)
+void WebPreferences::showSourcesSettingsWidgets(bool display)
 {
   std::string v = display? "true" : "false";
   wApp->doJavaScript(Wt::WString("$('#monitoring-settings-section').toggle({1});"
@@ -546,7 +527,7 @@ void WebPreferences::showLivestatusSettings(int monitorTypeIndex)
   }
 }
 
-bool WebPreferences::validateMonitoringSettingsFields(void)
+bool WebPreferences::validateSourceSettingsFields(void)
 {
   if (m_monitorTypeField->currentIndex() == 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Monitor type not set").toStdString());
@@ -668,7 +649,7 @@ void WebPreferences::fillInNotificationSettings(void)
 void WebPreferences::showNotificationSettings(void)
 {
   showAuthSettingsWidgets(false);
-  showMonitoringSettingsWidgets(false);
+  showSourcesSettingsWidgets(false);
   showNotificationSettingsWidgets(true);
   fillInNotificationSettings();
 }

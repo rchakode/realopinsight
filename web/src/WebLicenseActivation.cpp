@@ -77,14 +77,14 @@ bool WebLicenseActivation::checkKey(const QString& key, const QString& version, 
 void WebLicenseActivation::checkInstanceActivationLevel(void)
 {
   QString licenseKey = getLicenseKey();
-  if (checkKey(licenseKey, m_version, UltimateStandard))
-    m_licenseLevel = UltimateStandard;
-  else if (checkKey(licenseKey, m_version, UltimateAdvanced))
-    m_licenseLevel = UltimateAdvanced;
-  else if (checkKey(licenseKey, m_version, UltimatePro))
-    m_licenseLevel = UltimatePro;
+  if (checkKey(licenseKey, m_version, UltimateSmallBusiness))
+    m_licenseLevel = UltimateSmallBusiness;
+  else if (checkKey(licenseKey, m_version, UltimateMiddleBusiness))
+    m_licenseLevel = UltimateMiddleBusiness;
   else if (checkKey(licenseKey, m_version, UltimateEnterprise))
     m_licenseLevel = UltimateEnterprise;
+  else if (checkKey(licenseKey, m_version, UltimateCorportate))
+    m_licenseLevel = UltimateCorportate;
   else
     m_licenseLevel = UltimateStarter;
 }
@@ -121,4 +121,28 @@ bool WebLicenseActivation::canHandleNewView(int currentViewCount, int newItServi
   }
 
   return success;
+}
+
+
+int WebLicenseActivation::maxAllowedSources(void) const
+{
+  int result = 1;
+  switch(m_licenseLevel) {
+    case UltimateCorportate:
+      result = MAX_SRCS;
+      break;
+    case UltimateEnterprise:
+      result = 5;
+      break;
+    case UltimateMiddleBusiness:
+      result = 2;
+      break;
+    case UltimateSmallBusiness:
+      result = 1;
+      break;
+    case UltimateStarter:
+    default:
+      break;
+  }
+  return result;
 }

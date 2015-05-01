@@ -67,6 +67,7 @@ QString Preferences::getSourceStatesSerialized(void)
   return str;
 }
 
+
 void Preferences::updateSourceStates(void)
 {
   QString content = m_settings->value(Settings::GLOBAL_SRC_BUCKET_KEY).toString();
@@ -82,16 +83,17 @@ void Preferences::updateSourceStates(void)
 }
 
 
-
 int Preferences::firstSourceSet()
 {
   int idx = 0;
   while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
-
   return ((idx < MAX_SRCS)? idx : -1);
 }
 
 
-
-
+int Preferences::countActiveSources(void)
+{
+  updateSourceStates();
+  return m_sourceStates->count();
+}
 

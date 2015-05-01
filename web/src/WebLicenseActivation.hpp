@@ -37,10 +37,10 @@ class WebLicenseActivation : public WebPreferencesBase, public Wt::WTemplate
 public:
   enum PackageT {
     UltimateStarter = 5,
-    UltimateStandard = 20,
-    UltimateAdvanced = 50,
-    UltimatePro = 100,
-    UltimateEnterprise = INT_MAX
+    UltimateSmallBusiness = 20,
+    UltimateMiddleBusiness = 50,
+    UltimateEnterprise = 100,
+    UltimateCorportate = INT_MAX
   };
 
   WebLicenseActivation(const QString& version);
@@ -51,6 +51,7 @@ public:
   bool isActivatedInstance(void) {return m_licenseLevel > UltimateStarter;}
   static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int package);
   bool canHandleNewView(int currentViewCount, int newItServicesCount);
+  int maxAllowedSources(void) const;
 
 
 private:
