@@ -365,7 +365,6 @@ void WebPreferences::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
 {
   m_sourceIndexSelector->accept();
   int maxAllowedViews = LicenseActivationBase(PKG_VERSION).maxAllowedSources();
-  qDebug() << activeSourcesCount() << maxAllowedViews;
   if (activeSourcesCount() < maxAllowedViews) {
     bool isValidIndex;
     int index = QString::fromStdString( inputBox->currentText().toUTF8() ).toInt(&isValidIndex);
