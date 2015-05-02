@@ -165,8 +165,6 @@ void WebPreferences::createSourceSettingsFields(void)
 }
 
 
-
-
 void WebPreferences::createButtons(void)
 {
   m_applyChangeBtn.reset(new Wt::WPushButton(QObject::tr("Apply changes").toStdString(), this));
@@ -185,6 +183,7 @@ void WebPreferences::createButtons(void)
 }
 
 
+
 void WebPreferences::bindFormWidget(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("setting-page.tpl"), this);
@@ -199,12 +198,10 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("livestatus-port", m_livestatusPortField.get());
   tpl->bindWidget("use-ngrt4nd", m_useNgrt4ndField.get());
 
-
   tpl->bindWidget("apply-change-button", m_applyChangeBtn.get());
   tpl->bindWidget("add-as-source-button", m_addAsSourceBtn.get());
   tpl->bindWidget("delete-button", m_deleteSourceBtn.get());
   tpl->bindWidget("auth-settings-save-button", m_authSettingsSaveBtn.get());
-
 
   tpl->bindWidget("authentication-mode", m_authenticationModeField.get());
   tpl->bindWidget("ldap-server-uri", m_ldapServerUriField.get());
@@ -216,7 +213,6 @@ void WebPreferences::bindFormWidget(void)
   tpl->bindWidget("ldap-bind-user-password", m_ldapBindUserPasswordField.get());
   tpl->bindWidget("ldap-uid-attribute", m_ldapIdField.get());
   tpl->bindWidget("ldap-user-search-base", m_ldapSearchBaseField.get());
-
 
   tpl->bindWidget("notification-type", m_notificationTypeBox.get());
   tpl->bindWidget("notification-settings-save-button", m_notificationSettingsSaveBtn.get());
@@ -230,19 +226,22 @@ void WebPreferences::bindFormWidget(void)
 
 void WebPreferences::applyChanges(void)
 {
-  if (validateSourceSettingsFields()) {
-    if ( m_monitorTypeField->currentIndex() <= 0) {
-      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid monitor type").toStdString());
-      return;
-    }
-    if (currentSourceIndex() < 0) {
-      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid data source index (%1)").arg(currentSourceIndex()).toStdString());
-      return;
-    }
-    saveAsSource(currentSourceIndex(), m_monitorTypeField->currentText().toUTF8().c_str());
+  if (! validateSourceSettingsFields())
+    return ;
 
+  if ( m_monitorTypeField->currentIndex() <= 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid monitor type").toStdString());
+    return;
   }
+
+  if (currentSourceIndex() < 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid data source index (%1)").arg(currentSourceIndex()).toStdString());
+    return;
+  }
+
+  saveAsSource(currentSourceIndex(), m_monitorTypeField->currentText().toUTF8().c_str());
 }
+
 
 void WebPreferences::deleteSource(void)
 {
@@ -250,7 +249,7 @@ void WebPreferences::deleteSource(void)
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBoxModel->removeRow(currentSourceIndex());
     setSourceState(currentSourceIndex(), false);
-    setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
+    setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
     sync();
     updateFields();
   }
@@ -309,6 +308,7 @@ void WebPreferences::updateFields(void)
   fillInNotificationSettings();
 }
 
+
 void WebPreferences::saveAsSource(const qint32& index, const QString& type)
 {
   // global settings
@@ -326,7 +326,7 @@ void WebPreferences::saveAsSource(const qint32& index, const QString& type)
   src.verify_ssl_peer = (m_dontVerifyCertificateField->checkState() == Wt::Checked);
   setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   setSourceState(index, true);
-  setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, getSourceStatesSerialized());
+  setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
 
   // save changes
   sync();
@@ -349,7 +349,7 @@ Wt::WDialog* WebPreferences::createSourceIndexSelector(void)
   for (const auto& src : ngrt4n::sourceIndexes()) inputField->addItem(src.toStdString());
 
   Wt::WPushButton *ok = new Wt::WPushButton("OK", inputDialog->footer());
-  ok->clicked().connect(std::bind(&WebPreferences::handleSourceIndexSelected, this, inputField));
+  ok->clicked().connect(std::bind(&WebPreferences::handleAddAsSourceOkAction, this, inputField));
   ok->setDefault(true);
 
   Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", inputDialog->footer());
@@ -360,7 +360,7 @@ Wt::WDialog* WebPreferences::createSourceIndexSelector(void)
 }
 
 
-void WebPreferences::handleSourceIndexSelected(Wt::WComboBox* inputBox)
+void WebPreferences::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
 {
   m_sourceIndexSelector->accept();
   bool isValidIndex;
@@ -373,11 +373,13 @@ void WebPreferences::handleSourceIndexSelected(Wt::WComboBox* inputBox)
   applyChanges();
 }
 
+
 void WebPreferences::addAsSource(void)
 {
   if (validateSourceSettingsFields())
     m_sourceIndexSelector->show();
 }
+
 
 void WebPreferences::setEnabledInputs(bool enable)
 {
@@ -409,6 +411,7 @@ int WebPreferences::findSourceIndexInBox(int sourceGlobalIndex)
   return index;
 }
 
+
 void WebPreferences::addToSourceBox(int sourceGlobalIndex)
 {
   int index = findSourceIndexInBox(sourceGlobalIndex);
@@ -420,7 +423,6 @@ void WebPreferences::addToSourceBox(int sourceGlobalIndex)
 }
 
 
-
 void WebPreferences::showAuthSettings(void)
 {
   fillInAuthSettings();
@@ -428,6 +430,7 @@ void WebPreferences::showAuthSettings(void)
   showSourcesSettingsWidgets(false);
   showNotificationSettingsWidgets(false);
 }
+
 
 void WebPreferences::showAuthSettingsWidgets(bool display)
 {
@@ -515,6 +518,7 @@ void WebPreferences::showLdapSslSettings(bool display)
   wApp->doJavaScript(Wt::WString("$('#ldap-custom-ssl-settings').toggle({1});").arg(v).toUTF8());
 }
 
+
 void WebPreferences::showLivestatusSettings(int monitorTypeIndex)
 {
   switch (monitorTypeIndex) {
@@ -526,6 +530,7 @@ void WebPreferences::showLivestatusSettings(int monitorTypeIndex)
       break;
   }
 }
+
 
 bool WebPreferences::validateSourceSettingsFields(void)
 {
@@ -577,6 +582,7 @@ void WebPreferences::handleAuthTypeChanged(void)
   }
 }
 
+
 void WebPreferences::handleShowAuthStringChanged(void)
 {
   if (m_showAuthStringField->isChecked()) {
@@ -585,6 +591,7 @@ void WebPreferences::handleShowAuthStringChanged(void)
     m_authStringField->setEchoMode(Wt::WLineEdit::Password);
   }
 }
+
 
 void WebPreferences::handleLdapUseSslChanged(void)
 {
@@ -634,6 +641,7 @@ void WebPreferences::saveNotificationSettings(void)
   }
 }
 
+
 void WebPreferences::fillInNotificationSettings(void)
 {
   m_notificationTypeBox->setCurrentIndex( getNotificationType() );
@@ -646,6 +654,7 @@ void WebPreferences::fillInNotificationSettings(void)
   updateEmailFieldsEnabledState();
 }
 
+
 void WebPreferences::showNotificationSettings(void)
 {
   showAuthSettingsWidgets(false);
@@ -653,6 +662,7 @@ void WebPreferences::showNotificationSettings(void)
   showNotificationSettingsWidgets(true);
   fillInNotificationSettings();
 }
+
 
 void WebPreferences::showNotificationSettingsWidgets(bool display)
 {

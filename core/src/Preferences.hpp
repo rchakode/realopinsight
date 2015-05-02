@@ -71,7 +71,7 @@ protected :
   virtual void updateFields(void) = 0;
   virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
   virtual int firstSourceSet(void);
-  QString getSourceStatesSerialized(void);
+  QString sourceStatesSerialized(void);
   int currentSourceIndex(void) const {return m_currentSourceIndex;}
   void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
   void sync(void) {m_settings->sync();}

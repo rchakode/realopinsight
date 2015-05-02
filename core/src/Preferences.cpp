@@ -60,7 +60,7 @@ void Preferences::loadProperties(void)
 }
 
 
-QString Preferences::getSourceStatesSerialized(void)
+QString Preferences::sourceStatesSerialized(void)
 {
   QString str = "";
   for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";

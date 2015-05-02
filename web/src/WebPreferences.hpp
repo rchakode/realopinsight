@@ -118,7 +118,7 @@ private:
 
   void addEvent(void);
   Wt::WDialog* createSourceIndexSelector(void);
-  void handleSourceIndexSelected(Wt::WComboBox* inputBox);
+  void handleAddAsSourceOkAction(Wt::WComboBox* inputBox);
   int getSourceGlobalIndex(int sourceBoxIndex);
   int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);
