@@ -32,7 +32,7 @@
 
 
 
-class WebLicenseActivation : public WebPreferencesBase, public Wt::WTemplate
+class LicenseActivationBase : public WebPreferencesBase
 {
 public:
   enum PackageT {
@@ -43,9 +43,8 @@ public:
     UltimateCorportate = INT_MAX
   };
 
-  WebLicenseActivation(const QString& version);
+  LicenseActivationBase(const QString& version);
   std::string lastError() const {return m_lastError.toStdString(); }
-  void saveActivationKey(void);
   void checkInstanceActivationLevel(void);
   bool checkLicense(void);
   bool isActivatedInstance(void) {return m_licenseLevel > UltimateStarter;}
@@ -58,14 +57,25 @@ private:
   int m_licenseLevel;
   QString m_version;
   QString m_lastError;
-  Wt::WLineEdit* m_activationKeyField;
-  Wt::WPushButton* m_activeBtn;
 
   bool checkKey(const QString& key, const QString& version, int package);
   bool isValidKey(const QString& key,
                   const QString& hostid, const QString& hostname,
                   const QString& version, int package);
   static QString getHostId(void);
+};
+
+
+
+class WebLicenseActivation : public LicenseActivationBase, public Wt::WTemplate
+{
+public:
+  WebLicenseActivation(const QString& version);
+  void saveActivationKey(void);
+
+private:
+  Wt::WLineEdit* m_activationKeyField;
+  Wt::WPushButton* m_activeBtn;
 };
 
 #endif // WEBLICENSEACTIVATION_HPP

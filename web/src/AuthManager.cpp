@@ -108,7 +108,7 @@ void AuthManager::createLoggedInView(void)
       bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
                                                 "You're running a non activated (limited) version of RealOpInsight Ultimate."
                                                 " Please go to <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
-                                                " in order to get an activation key."
+                                                " in order to get an activation license key."
                                                 "</div>",
                                                 Wt::XHTMLText));
     } else {

@@ -25,6 +25,7 @@
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "WebPreferences.hpp"
+#include "WebLicenseActivation.hpp"
 #include "Validators.hpp"
 #include <QString>
 #include <Wt/WTemplate>
@@ -363,14 +364,23 @@ Wt::WDialog* WebPreferences::createSourceIndexSelector(void)
 void WebPreferences::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
 {
   m_sourceIndexSelector->accept();
-  bool isValidIndex;
-  int index = QString::fromStdString(inputBox->currentText().toUTF8()).toInt(&isValidIndex);
-  if (isValidIndex) {
-    setCurrentSourceIndex(index);
+  int maxAllowedViews = LicenseActivationBase(PKG_VERSION).maxAllowedSources();
+  qDebug() << activeSourcesCount() << maxAllowedViews;
+  if (activeSourcesCount() < maxAllowedViews) {
+    bool isValidIndex;
+    int index = QString::fromStdString( inputBox->currentText().toUTF8() ).toInt(&isValidIndex);
+    if (isValidIndex) {
+      setCurrentSourceIndex(index);
+    } else {
+      setCurrentSourceIndex(-1);
+    }
+    applyChanges();
   } else {
-    setCurrentSourceIndex(-1);
+    m_operationCompleted.emit(ngrt4n::OperationFailed,
+                              QObject::tr("Can't add new data source."
+                                          " Your license allows a maximum of %1 data source(s)")
+                              .arg(QString::number(maxAllowedViews)).toStdString());
   }
-  applyChanges();
 }
 
 

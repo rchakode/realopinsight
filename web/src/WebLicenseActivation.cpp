@@ -1,5 +1,5 @@
 /*
- * WebLicenseActivation.cpp
+ * WebLicenseActivationBase.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Creation: 12-04-2015                                                     #
@@ -31,26 +31,16 @@ namespace {
   int MAX_IT_SERVICES_PER_VIEW_STARTER = 50;
 }
 
-WebLicenseActivation::WebLicenseActivation(const QString& version)
+LicenseActivationBase::LicenseActivationBase(const QString& version)
   : WebPreferencesBase(),
-    Wt::WTemplate(Wt::WString::tr("license-activation-form.tpl")),
     m_licenseLevel(UltimateStarter),
     m_version(version),
     m_lastError("")
 {
   checkInstanceActivationLevel();
-  bindWidget("activation-key-field", m_activationKeyField = new Wt::WLineEdit());
-  bindWidget("activate-button", m_activeBtn = new Wt::WPushButton(Q_TR("Activate")));
-  m_activeBtn->clicked().connect(this, &WebLicenseActivation::saveActivationKey);
 }
 
-void WebLicenseActivation::saveActivationKey(void)
-{
-  setKeyValue(Settings::ACTIVATION_LICENSE_KEY, m_activationKeyField->text().toUTF8().c_str());
-  sync();
-}
-
-QString WebLicenseActivation::genKey(const QString& hostid, const QString& hostname, const QString& version, int package)
+QString LicenseActivationBase::genKey(const QString& hostid, const QString& hostname, const QString& version, int package)
 {
   QCryptographicHash hasher(QCryptographicHash::Md5);
   hasher.addData(hostid.toLatin1());
@@ -68,13 +58,13 @@ QString WebLicenseActivation::genKey(const QString& hostid, const QString& hostn
 }
 
 
-bool WebLicenseActivation::checkKey(const QString& key, const QString& version, int package)
+bool LicenseActivationBase::checkKey(const QString& key, const QString& version, int package)
 {
   return isValidKey(key, getHostId(), QHostInfo::localHostName(), version, package);
 }
 
 
-void WebLicenseActivation::checkInstanceActivationLevel(void)
+void LicenseActivationBase::checkInstanceActivationLevel(void)
 {
   QString licenseKey = getLicenseKey();
   if (checkKey(licenseKey, m_version, UltimateSmallBusiness))
@@ -89,22 +79,22 @@ void WebLicenseActivation::checkInstanceActivationLevel(void)
     m_licenseLevel = UltimateStarter;
 }
 
-bool WebLicenseActivation::isValidKey(const QString& key,
-                                      const QString& hostid, const QString& hostname,
-                                      const QString& version, int package)
+bool LicenseActivationBase::isValidKey(const QString& key,
+                                       const QString& hostid, const QString& hostname,
+                                       const QString& version, int package)
 {
   return key == genKey(hostid, hostname, version, package);
 }
 
 
-QString WebLicenseActivation::getHostId(void)
+QString LicenseActivationBase::getHostId(void)
 {
   return QString::number(static_cast<unsigned int>(gethostid()), 16);
 }
 
 
 
-bool WebLicenseActivation::canHandleNewView(int currentViewCount, int newItServicesCount)
+bool LicenseActivationBase::canHandleNewView(int currentViewCount, int newItServicesCount)
 {
   bool success = false;
   if (m_licenseLevel == UltimateStarter  && newItServicesCount > MAX_IT_SERVICES_PER_VIEW_STARTER) {
@@ -124,7 +114,7 @@ bool WebLicenseActivation::canHandleNewView(int currentViewCount, int newItServi
 }
 
 
-int WebLicenseActivation::maxAllowedSources(void) const
+int LicenseActivationBase::maxAllowedSources(void) const
 {
   int result = 1;
   switch(m_licenseLevel) {
@@ -145,4 +135,22 @@ int WebLicenseActivation::maxAllowedSources(void) const
       break;
   }
   return result;
+}
+
+
+
+WebLicenseActivation::WebLicenseActivation(const QString& version)
+  : LicenseActivationBase(version),
+    Wt::WTemplate(Wt::WString::tr("license-activation-form.tpl"))
+{
+  bindWidget("activation-key-field", m_activationKeyField = new Wt::WLineEdit());
+  bindWidget("activate-button", m_activeBtn = new Wt::WPushButton(Q_TR("Activate")));
+  m_activeBtn->clicked().connect(this, &WebLicenseActivation::saveActivationKey);
+}
+
+
+void WebLicenseActivation::saveActivationKey(void)
+{
+  setKeyValue(Settings::ACTIVATION_LICENSE_KEY, m_activationKeyField->text().toUTF8().c_str());
+  sync();
 }

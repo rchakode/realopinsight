@@ -91,9 +91,9 @@ int Preferences::firstSourceSet()
 }
 
 
-int Preferences::countActiveSources(void)
+int Preferences::activeSourcesCount(void)
 {
   updateSourceStates();
-  return m_sourceStates->count();
+  return m_sourceStates->count(true);
 }
 
