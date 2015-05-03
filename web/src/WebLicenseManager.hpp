@@ -40,7 +40,7 @@ public:
     UltimateSmallBusiness = 20,
     UltimateMiddleBusiness = 50,
     UltimateEnterprise = 100,
-    UltimateCorportate = INT_MAX
+    UltimateCorportate = 1000000
   };
 
   LicenseActivationBase(const QString& version);
