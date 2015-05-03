@@ -227,6 +227,7 @@ private:
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
   Wt::WWidget* createNotificationSection(void);
   Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
+  void updateLicenseMgntForm();
 };
 
 #endif // MAINWEBWINDOW_HPP

@@ -72,6 +72,7 @@ class WebLicenseManager : public LicenseActivationBase, public Wt::WTemplate
 public:
   WebLicenseManager(const QString& version);
   void saveActivationKey(void);
+  void updateContent(void) {m_activationKeyField->setText(getLicenseKey().toStdString());}
 
 private:
   Wt::WLineEdit* m_activationKeyField;

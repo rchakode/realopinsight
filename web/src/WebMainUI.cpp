@@ -698,14 +698,16 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   }));
 
   // license activation menu
-  m_adminStackedContents->addWidget(m_licenseMngtForm);
-  link = new Wt::WAnchor("#", Q_TR("Activation"));
-  settingPageTpl->bindWidget("menu-license-activation", link);
-  m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText(Q_TR("License Activation"));
-    m_adminStackedContents->setCurrentWidget(m_licenseMngtForm);
-  }));
+  if (m_dbSession->isLoggedAdmin()) {
+    m_adminStackedContents->addWidget(m_licenseMngtForm);
+    link = new Wt::WAnchor("#", Q_TR("Activation"));
+    settingPageTpl->bindWidget("menu-license-activation", link);
+    m_menuLinks.insert(MenuAuthSettings, link);
+    link->clicked().connect(this, &WebMainUI::updateLicenseMgntForm);
+  } else {
+    settingPageTpl->bindEmpty("menu-license-activation");
+  }
+
 
   return settingPageTpl;
 }
@@ -1211,4 +1213,11 @@ void WebMainUI::handlePreview(void)
   } else {
     showMessage(ngrt4n::OperationFailed, tr("No item selected for preview").toStdString());
   }
+}
+
+void WebMainUI::updateLicenseMgntForm()
+{
+  m_adminPanelTitle->setText(Q_TR("License Activation"));
+  m_adminStackedContents->setCurrentWidget(m_licenseMngtForm);
+  m_licenseMngtForm->updateContent();
 }
