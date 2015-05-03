@@ -48,7 +48,7 @@ public:
   void checkInstanceActivationLevel(void);
   bool checkLicense(void);
   bool isActivatedInstance(void) {return m_licenseLevel > UltimateStarter;}
-  static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int package);
+  static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int licenseOffer);
   bool canHandleNewView(int currentViewCount, int newItServicesCount);
   int maxAllowedSources(void) const;
 

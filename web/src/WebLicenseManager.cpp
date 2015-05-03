@@ -40,12 +40,12 @@ LicenseActivationBase::LicenseActivationBase(const QString& version)
   checkInstanceActivationLevel();
 }
 
-QString LicenseActivationBase::genKey(const QString& hostid, const QString& hostname, const QString& version, int package)
+QString LicenseActivationBase::genKey(const QString& hostid, const QString& hostname, const QString& version, int licenseOffer)
 {
   QCryptographicHash hasher(QCryptographicHash::Md5);
   hasher.addData(hostid.toLatin1());
   hasher.addData(hostname.toLatin1());
-  hasher.addData(QString::number(package).toLatin1());
+  hasher.addData(QString::number(licenseOffer).toLatin1());
   if (version.length() > 4) {
     hasher.addData(version.mid(0, 4).toLatin1());
   } else {

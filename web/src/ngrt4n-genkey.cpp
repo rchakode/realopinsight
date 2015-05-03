@@ -23,7 +23,7 @@
  */
 
 
-#include "WebLicenseActivation.hpp"
+#include "WebLicenseManager.hpp"
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QString>
@@ -37,9 +37,10 @@ int main(int argc, char *argv[])
   QString hostId;
   QString hostName;
   QString appVersion;
+  int licenseOffer = LicenseActivationBase::UltimateStarter;
   int opt;
   bool printHelp = false;
-  while ((opt = getopt (argc, argv, "m:n:v:h")) != -1)
+  while ((opt = getopt (argc, argv, "m:n:v:l:h")) != -1)
     switch (opt) {
       case 'm':
         hostId = QString::fromUtf8(optarg, strlen(optarg));
@@ -49,6 +50,9 @@ int main(int argc, char *argv[])
         break;
       case 'v':
         appVersion = QString::fromUtf8(optarg, strlen(optarg));
+        break;
+      case 'l':
+        licenseOffer = QString::fromUtf8(optarg, strlen(optarg)).toInt();
         break;
       case 'h':
       default:
@@ -60,9 +64,15 @@ int main(int argc, char *argv[])
       || hostId.isEmpty()
       || hostName.isEmpty()
       || appVersion.isEmpty()) {
-    qDebug() << "Usage:\n    " << basename(argv[0]) << "-m <hostid> -n <hostname> -v <appversion>";
+    std::cerr << QObject::tr("Usage:\n    "
+                             "%1 -m <hostid> "
+                             " -n <hostname>"
+                             " -v <target_version>"
+                             " [-l <license_offer>]").arg(basename(argv[0])).toStdString()<< std::endl;
   } else {
-    qDebug() << WebLicenseActivation::genKey(hostId, hostName, appVersion);
+    std::cout << QObject::tr("License Key: %1")
+                 .arg(LicenseActivationBase::genKey(hostId, hostName, appVersion, licenseOffer)).toStdString()
+              << std::endl;
   }
 
   return a.exec();
