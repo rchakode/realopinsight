@@ -67,10 +67,10 @@ private:
 
 
 
-class WebLicenseActivation : public LicenseActivationBase, public Wt::WTemplate
+class WebLicenseManager : public LicenseActivationBase, public Wt::WTemplate
 {
 public:
-  WebLicenseActivation(const QString& version);
+  WebLicenseManager(const QString& version);
   void saveActivationKey(void);
 
 private:

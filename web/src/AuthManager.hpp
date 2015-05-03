@@ -30,7 +30,6 @@
 #include <Wt/WContainerWidget>
 #include <Wt/Auth/Login>
 #include "WebPreferences.hpp"
-#include "WebLicenseActivation.hpp"
 
 class DbSession;
 class WebMainUI;

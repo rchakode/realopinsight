@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebLicenseActivation.hpp"
+#include "WebLicenseManager.hpp"
 #include "WebUtils.hpp"
 #include <QHostInfo>
 
@@ -139,17 +139,17 @@ int LicenseActivationBase::maxAllowedSources(void) const
 
 
 
-WebLicenseActivation::WebLicenseActivation(const QString& version)
+WebLicenseManager::WebLicenseManager(const QString& version)
   : LicenseActivationBase(version),
     Wt::WTemplate(Wt::WString::tr("license-activation-form.tpl"))
 {
   bindWidget("activation-key-field", m_activationKeyField = new Wt::WLineEdit());
   bindWidget("activate-button", m_activeBtn = new Wt::WPushButton(Q_TR("Activate")));
-  m_activeBtn->clicked().connect(this, &WebLicenseActivation::saveActivationKey);
+  m_activeBtn->clicked().connect(this, &WebLicenseManager::saveActivationKey);
 }
 
 
-void WebLicenseActivation::saveActivationKey(void)
+void WebLicenseManager::saveActivationKey(void)
 {
   setKeyValue(Settings::ACTIVATION_LICENSE_KEY, m_activationKeyField->text().toUTF8().c_str());
   sync();

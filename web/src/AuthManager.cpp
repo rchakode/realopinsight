@@ -27,7 +27,7 @@
 #include "WebMainUI.hpp"
 #include "AuthManager.hpp"
 #include "AuthModelProxy.hpp"
-#include "WebLicenseActivation.hpp"
+#include "WebLicenseManager.hpp"
 #include <Wt/Auth/Login>
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/AbstractUserDatabase>
@@ -57,8 +57,7 @@ AuthManager::AuthManager(DbSession* dbSession)
 
 bool AuthManager::checkLicense(void)
 {
-  WebLicenseActivation licenseValidator(PKG_VERSION);
-  return licenseValidator.isActivatedInstance();
+  return LicenseActivationBase(PKG_VERSION).isActivatedInstance();
 }
 
 

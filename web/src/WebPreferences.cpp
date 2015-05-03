@@ -25,7 +25,7 @@
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "WebPreferences.hpp"
-#include "WebLicenseActivation.hpp"
+#include "WebLicenseManager.hpp"
 #include "Validators.hpp"
 #include <QString>
 #include <Wt/WTemplate>
