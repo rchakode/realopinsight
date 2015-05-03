@@ -60,20 +60,18 @@ int main(int argc, char *argv[])
         break;
     }
 
+  int ret = -1;
   if (printHelp
       || hostId.isEmpty()
       || hostName.isEmpty()
       || appVersion.isEmpty()) {
-    std::cerr << QObject::tr("Usage:\n    "
-                             "%1 -m <hostid> "
-                             " -n <hostname>"
-                             " -v <target_version>"
-                             " [-l <license_offer>]").arg(basename(argv[0])).toStdString()<< std::endl;
+    std::cerr << QObject::tr("usage: %1 -m <hostid> -n <hostname> -v <app_version> [-l <license_offer>]")
+                 .arg(basename(argv[0])).toStdString() << std::endl;
   } else {
-    std::cout << QObject::tr("License Key: %1")
-                 .arg(LicenseActivationBase::genKey(hostId, hostName, appVersion, licenseOffer)).toStdString()
+    std::cout << QObject::tr("License Key: %1").arg(LicenseActivationBase::genKey(hostId, hostName, appVersion, licenseOffer)).toStdString()
               << std::endl;
+    ret = 0;
   }
 
-  return a.exec();
+  return ret;
 }
