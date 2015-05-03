@@ -45,8 +45,12 @@ QString LicenseActivationBase::genKey(const QString& hostid, const QString& host
   QCryptographicHash hasher(QCryptographicHash::Md5);
   hasher.addData(hostid.toLatin1());
   hasher.addData(hostname.toLatin1());
-  hasher.addData(version.toLatin1());
   hasher.addData(QString::number(package).toLatin1());
+  if (version.length() > 4) {
+    hasher.addData(version.mid(0, 4).toLatin1());
+  } else {
+    hasher.addData(version.toLatin1());
+  }
   QString serialKey = "";
   QByteArray md5 = hasher.result().toHex().toUpper();
   for (int i = 0; i < md5.length(); ++i) {
