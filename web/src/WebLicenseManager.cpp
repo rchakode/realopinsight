@@ -142,6 +142,30 @@ int LicenseActivationBase::maxAllowedSources(void) const
 }
 
 
+std::string LicenseActivationBase::licenseOfferName(void) const
+{
+  std::string result = "Starter";
+  switch(m_licenseLevel) {
+    case UltimateCorportate:
+      result = "Corporate";
+      break;
+    case UltimateEnterprise:
+      result = "Enterprise";
+      break;
+    case UltimateMiddleBusiness:
+      result = "Middle Business";
+      break;
+    case UltimateSmallBusiness:
+      result = "Small Business";
+      break;
+    case UltimateStarter:
+    default:
+      break;
+  }
+  return result;
+}
+
+
 
 WebLicenseManager::WebLicenseManager(const QString& version)
   : LicenseActivationBase(version),

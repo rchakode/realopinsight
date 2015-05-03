@@ -569,6 +569,7 @@
        Version: ${corelib-version}<br />
        Codename: ${codename}<br />
        Release ID: ${release-id} <br />
+       License: ${license-offer} <br />
        Bug report: <a href="mailto:${bug-report-email}">${bug-report-email}</a>
     </p>
  </div>

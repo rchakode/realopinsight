@@ -51,6 +51,7 @@ public:
   static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int licenseOffer);
   bool canHandleNewView(int currentViewCount, int newItServicesCount);
   int maxAllowedSources(void) const;
+  std::string licenseOfferName(void) const;
 
 
 private:

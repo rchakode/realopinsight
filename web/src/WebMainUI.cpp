@@ -825,6 +825,7 @@ void WebMainUI::createAboutDialog(void)
   tpl->bindString("corelib-version", ngrt4n::libVersion().toStdString());
   tpl->bindString("codename", REL_NAME.toStdString());
   tpl->bindString("release-id", REL_INFO.toStdString());
+  tpl->bindString("license-offer", m_licenseMngtForm->licenseOfferName());
   tpl->bindString("release-year", REL_YEAR.toStdString());
   tpl->bindString("bug-report-email", REPORT_BUG.toStdString());
   tpl->bindWidget("close-button", closeButton);
