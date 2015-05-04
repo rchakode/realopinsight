@@ -367,7 +367,6 @@ int DbSession::addView(const DboView& view)
     m_lastError = ex.what();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
-
   transaction.commit();
   updateViewList();
   return retValue;
@@ -424,7 +423,6 @@ int DbSession::assignView(const std::string& userId, const std::string& vname)
     m_lastError = ex.what();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
-
   transaction.commit();
   return retValue;
 }
@@ -435,7 +433,6 @@ int DbSession::revokeView(const std::string& userId, const std::string& viewId)
   int retValue = -1;
   try {
     dbo::Transaction transaction(*this);
-
     dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userId);
     dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewId);
     userPtr.modify()->views.erase(viewPtr);
@@ -506,7 +503,6 @@ int DbSession::addSession(const DboLoginSession& session)
 int DbSession::checkUserCookie(const DboLoginSession& session)
 {
   int retValue = -1;
-
   dbo::Transaction transaction(*this);
   try {
     DboLoginSessionCollectionT sessions = find<DboLoginSession>()
@@ -520,7 +516,6 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-
   return retValue;
 }
 
@@ -611,9 +606,7 @@ int DbSession::getLastQosData(QosDataT& qosData, const std::string& viewId)
 int DbSession::addNotification(const std::string& viewId, int viewStatus)
 {
   int retValue = -1;
-
   dbo::Transaction transaction(*this);
-
   try {
 
     DboNotification* entryPtr = new DboNotification();
@@ -629,9 +622,7 @@ int DbSession::addNotification(const std::string& viewId, int viewStatus)
     m_lastError = "Failed to add notification entry into database.";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
-
   transaction.commit();
-
   return retValue;
 }
 
@@ -653,15 +644,14 @@ int DbSession::updateNotificationStatus(const std::string& userId, const std::st
       } else {
         dboViews = dboUser->views;
       }
-      for (auto& dboView : dboViews) {
 
+      for (auto& dboView : dboViews) {
         DboNotificationCollectionT notificationEntries;
         std::string realViewId = viewId.empty()? dboView->name : viewId;
         notificationEntries = find<DboNotification>()
             .where("view_name = ?").bind(realViewId)
             .orderBy("timestamp DESC")
             .limit(1);
-
         for (auto& notifDbEntry: notificationEntries) {
           DboNotification* notifDbPtr = new DboNotification();
           notifDbPtr->timestamp   = notifDbEntry->timestamp;
@@ -679,9 +669,7 @@ int DbSession::updateNotificationStatus(const std::string& userId, const std::st
     m_lastError = "Database error: failed changing notification state.";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
-
   transaction.commit();
-
   return retValue;
 }
 
@@ -689,9 +677,7 @@ int DbSession::updateNotificationStatus(const std::string& userId, const std::st
 void DbSession::getLastNotificationInfo(NotificationT& lastNotifInfo, const std::string& viewId)
 {
   lastNotifInfo = NotificationT();
-
   dbo::Transaction transaction(*this);
-
   try {
     if (! viewId.empty()) {
       dbo::ptr<DboNotification>
@@ -707,7 +693,6 @@ void DbSession::getLastNotificationInfo(NotificationT& lastNotifInfo, const std:
     m_lastError = "Failed fetching notification data";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
-
   transaction.commit();
 }
 
@@ -758,8 +743,6 @@ int DbSession::listViewRelatedNotifications(NotificationMapT& notifications, con
     m_lastError = "Query failed when fetching notification data";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
-
   transaction.commit();
-
   return retValue;
 }

@@ -106,10 +106,8 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
   NotificationT lastNotifData;
   m_dbSession->getLastNotificationInfo(lastNotifData, viewName);
   if (node.sev != ngrt4n::Normal) { //problem state
-    if (lastNotifData.view_status == DboNotification::Unset
-        || lastNotifData.ack_status == DboNotification::Closed) { // send new notification
+    if (lastNotifData.view_status == DboNotification::Unset || lastNotifData.ack_status == DboNotification::Closed) { // send new notification
       sendEmailNotification(node, lastQosData.status, qosData, recipients);
-
       if (lastNotifData.view_status == DboNotification::Unset) {
         m_dbSession->addNotification(viewName, node.sev);
       } else  {
