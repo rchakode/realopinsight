@@ -129,12 +129,11 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
       }
     }
   } else {  // normal state
-    if (lastNotifData.view_status != DboNotification::Unset) {
+    if (lastNotifData.view_status != DboNotification::Unset && lastNotifData.view_status != DboNotification::Closed) {
       if (lastNotifData.view_status != node.sev) { // service recovered
         sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
       }
     }
-    m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Closed);
     m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Closed);
   }
 }
