@@ -1,7 +1,7 @@
 # ngrt4n.pro
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 24-03-2014                                                 #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 24-03-2015                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -31,7 +31,7 @@ TEMPLATE = app
 
 REALOPINSIGHT_CORE_VERSION=3.2.2
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
-PACKAGE_VERSION=2015b9
+PACKAGE_VERSION=2015r1
 
 LIBS += -lzmq
 

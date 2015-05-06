@@ -7,7 +7,7 @@
 </message>
 
 <message id="beta-message">
-  <span><sup class="severity-major">Beta</sup>&nbsp;</span>
+  <span><sup class="severity-major"></sup>&nbsp;</span>
 </message>
 
 <message id="admin-home.tpl">
