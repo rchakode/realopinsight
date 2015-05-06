@@ -138,22 +138,19 @@ get_www_user()
 {
   WWW_USER=$(ps aux | egrep '(apache|httpd)' | egrep -v grep | grep -v root | tail -1 | cut -d' ' -f1)
   if [ -z $WWW_USER ]; then
-    echo "Not www user found"
-    exit 1
+    WWW_USER="UNSET"
   fi
   echo $WWW_USER
 }
 
 get_user_group()
 {
-  if [ -z "$1" ]; then
-    echo "Not user given"
-    exit 1
-  fi
-
   USER=$1
-  GROUP=$(id $USER | cut -d' ' -f2 | awk -F "(" '{sub("\)", "", $2); print $2}')
-  echo $GROUP
+  GROUP="UNSET"
+  if [ ! -z "$1" ]; then
+    GROUP=$(id $USER | cut -d' ' -f2 | awk -F "(" '{sub("\)", "", $2); print $2}')
+    echo $GROUP
+  fi
 }
 
 
@@ -181,7 +178,10 @@ REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
 WWW_USER=$(get_www_user)
 WWW_GROUP=$(get_user_group $WWW_USER)
 
-
+if [ $WWW_USER = "UNSET" ] || [ $WWW_GROUP = "UNSET" ]; then
+  echo "Invalid www_user:www_group => $WWW_USER:$WWW_GROUP"
+  exit 1
+fi
 
 # start processing
 check_file $FCGI_FILE
