@@ -95,7 +95,8 @@ public:
   int checkUserCookie(const DboLoginSession& session);
 
   int addNotification(const std::string& viewId, int viewStatus);
-  int updateNotificationStatus(const std::string& userId, const std::string& viewId, int newAckStatus);
+  int updateNotificationAckStatusForUser(const std::string& userId, const std::string& viewId, int newAckStatus);
+  int updateNotificationAckStatusForView(const std::string& userId, const std::string& viewId, int newAckStatus);
   void getLastNotificationInfo(NotificationT& lastNotifInfo, const std::string& viewId);
   int listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
 

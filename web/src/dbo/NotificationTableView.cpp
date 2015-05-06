@@ -126,10 +126,10 @@ void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
   if (item->isCheckable()) {
     std::string viewName = ngrt4n::getItemData(item);
     if (item->checkState() == Wt::Checked) {
-      m_dbSession->updateNotificationStatus(m_dbSession->loggedUser().username, viewName, DboNotification::Acknowledged);
+      m_dbSession->updateNotificationAckStatusForView(m_dbSession->loggedUser().username, viewName, DboNotification::Acknowledged);
       // FIXME: handle error?
     } else {
-      m_dbSession->updateNotificationStatus(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
+      m_dbSession->updateNotificationAckStatusForView(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
       // FIXME: handle error?
     }
   }

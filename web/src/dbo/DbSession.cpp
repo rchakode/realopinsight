@@ -627,7 +627,7 @@ int DbSession::addNotification(const std::string& viewId, int viewStatus)
 }
 
 
-int DbSession::updateNotificationStatus(const std::string& userId, const std::string& viewId, int newAckStatus)
+int DbSession::updateNotificationAckStatusForUser(const std::string& userId, const std::string& viewId, int newAckStatus)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
@@ -646,23 +646,54 @@ int DbSession::updateNotificationStatus(const std::string& userId, const std::st
       }
 
       for (auto& dboView : dboViews) {
-        DboNotificationCollectionT dboNotifEntries;
         std::string realViewId = viewId.empty()? dboView->name : viewId;
-        dboNotifEntries = find<DboNotification>()
+        dbo::ptr<DboNotification> notifDbEntry = find<DboNotification>()
             .where("view_name = ?").bind(realViewId)
             .orderBy("timestamp DESC")
             .limit(1);
-        for (auto& notifDbEntry: dboNotifEntries) {
-          DboNotification* notifDbPtr = new DboNotification();
-          notifDbPtr->timestamp   = notifDbEntry->timestamp;
-          notifDbPtr->ack_user    = dboUser;
-          notifDbPtr->ack_status  = newAckStatus;
-          notifDbPtr->view        = dboView;
-          notifDbPtr->view_status = notifDbEntry->view_status;
-          notifDbPtr->last_change = lastChange;
-          add(notifDbPtr);
-        }
+        DboNotification* notifDbPtr = new DboNotification();
+        notifDbPtr->ack_user    = dboUser;
+        notifDbPtr->ack_status  = newAckStatus;
+        notifDbPtr->view        = dboView;
+        notifDbPtr->last_change = lastChange;
+        notifDbPtr->view_status = notifDbEntry->view_status;
+        notifDbPtr->timestamp   = notifDbEntry->timestamp;
+        add(notifDbPtr);
       }
+      retValue = 0;
+    }
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Database error: failed changing notification state.";
+    CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+  }
+  transaction.commit();
+  return retValue;
+}
+
+
+int DbSession::updateNotificationAckStatusForView(const std::string& userId, const std::string& viewId, int newAckStatus)
+{
+  int retValue = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userId);
+    if (! dboUser) {
+      m_lastError = QObject::tr("No user with username %1)").arg(userId.c_str()).toStdString();
+      CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
+    } else {
+      long lastChange = time(NULL);
+      dbo::ptr<DboNotification> notifDbEntry = find<DboNotification>()
+          .where("view_name = ?").bind(viewId)
+          .orderBy("timestamp DESC")
+          .limit(1);
+      DboNotification* notifDbPtr = new DboNotification();
+      notifDbPtr->ack_user    = dboUser;
+      notifDbPtr->ack_status  = newAckStatus;
+      notifDbPtr->view        = find<DboView>().where("name = ?").bind(viewId);
+      notifDbPtr->last_change = lastChange;
+      notifDbPtr->timestamp   = notifDbEntry->timestamp;
+      notifDbPtr->view_status = notifDbEntry->view_status;
+      add(notifDbPtr);
       retValue = 0;
     }
   } catch (const dbo::Exception& ex) {

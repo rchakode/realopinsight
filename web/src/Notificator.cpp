@@ -111,12 +111,12 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
       if (lastNotifData.view_status == DboNotification::Unset) {
         m_dbSession->addNotification(viewName, node.sev);
       } else  {
-        m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Open);
+        m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Open);
       }
     } else {
       if (lastNotifData.view_status != node.sev) { //severity changed
         sendEmailNotification(node, lastQosData.status, qosData, recipients);
-        m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Closed);
+        m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
         m_dbSession->addNotification(viewName, node.sev);
       } else {
         if (lastNotifData.ack_status != DboNotification::Acknowledged) {
@@ -134,7 +134,7 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
         sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
       }
     }
-    m_dbSession->updateNotificationStatus("admin", viewName, DboNotification::Closed);
+    m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
   }
 }
 
