@@ -627,7 +627,7 @@ int DbSession::addNotification(const std::string& viewId, int viewStatus)
 }
 
 
-int DbSession::updateNotificationStatus(const std::string& userId, const std::string& viewId, int notificationStatus)
+int DbSession::updateNotificationStatus(const std::string& userId, const std::string& viewId, int newAckStatus)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
@@ -646,17 +646,17 @@ int DbSession::updateNotificationStatus(const std::string& userId, const std::st
       }
 
       for (auto& dboView : dboViews) {
-        DboNotificationCollectionT notificationEntries;
+        DboNotificationCollectionT dboNotifEntries;
         std::string realViewId = viewId.empty()? dboView->name : viewId;
-        notificationEntries = find<DboNotification>()
+        dboNotifEntries = find<DboNotification>()
             .where("view_name = ?").bind(realViewId)
             .orderBy("timestamp DESC")
             .limit(1);
-        for (auto& notifDbEntry: notificationEntries) {
+        for (auto& notifDbEntry: dboNotifEntries) {
           DboNotification* notifDbPtr = new DboNotification();
           notifDbPtr->timestamp   = notifDbEntry->timestamp;
           notifDbPtr->ack_user    = dboUser;
-          notifDbPtr->ack_status  = notificationStatus;
+          notifDbPtr->ack_status  = newAckStatus;
           notifDbPtr->view        = dboView;
           notifDbPtr->view_status = notifDbEntry->view_status;
           notifDbPtr->last_change = lastChange;
