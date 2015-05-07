@@ -1,6 +1,6 @@
 #!/bin/bash
 # ------------------------------------------------------------------------ #
-# File: realopinsight-export.sh                                            #
+# File: realopinsight-restore.sh                                            #
 # Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
 # Creation : 08-05-2015                                                    #
 #                                                                          #
