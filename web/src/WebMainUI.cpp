@@ -91,10 +91,10 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_reportApplyAnchor(NULL)
 {
   m_preferences->setEnabledInputs(false);
-  createMainUI();
-  createAccountPanel();
-  createPasswordPanel();
-  createAboutDialog();
+  setupMainUI();
+  m_userAccountForm = createAccountPanel();
+  m_changePasswordPanel = createPasswordPanel();
+  m_aboutDialog = createAboutDialog();
   setupMenus();
   setupInfoBox();
   showUserHome();
@@ -148,7 +148,7 @@ void WebMainUI::showUserHome(void)
   }
 }
 
-void WebMainUI::createMainUI(void)
+void WebMainUI::setupMainUI(void)
 {
   m_mainWidget->addWidget( createNavivationBar() );
   m_mainWidget->addWidget( createBreadCrumbsBar() );
@@ -713,30 +713,32 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 }
 
 
-void WebMainUI::createAccountPanel(void)
+UserFormView* WebMainUI::createAccountPanel(void)
 {
   bool changedPassword(false);
   bool isUserForm(true);
   DboUserT userInfo = m_dbSession->loggedUser().data();
-  m_userAccountForm = new UserFormView(&userInfo, changedPassword, isUserForm);
-  m_userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
+  UserFormView* userAccountForm = new UserFormView(&userInfo, changedPassword, isUserForm);
+  userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
     int ret = m_dbSession->updateUser(userToUpdate);
     if (ret != 0) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Update failed, see details in log."));
     } else {
       showMessage(ngrt4n::OperationSucceeded, Q_TR("Update completed."));
     }}, std::placeholders::_1));
+
+  return userAccountForm;
 }
 
-void WebMainUI::createPasswordPanel(void)
+UserFormView* WebMainUI::createPasswordPanel(void)
 {
   bool changedPassword(true);
   bool userForm(true);
   DboUserT userInfo = m_dbSession->loggedUser().data();
-  m_changePasswordPanel = new UserFormView(&userInfo, changedPassword, userForm);
-  m_changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
-                                                                     const std::string& lastpass,
-                                                                     const std::string& pass) {
+  UserFormView* changePasswordPanel = new UserFormView(&userInfo, changedPassword, userForm);
+  changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
+                                                                   const std::string& lastpass,
+                                                                   const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
     if (ret != 0) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Change password failed, see details in log."));
@@ -744,6 +746,8 @@ void WebMainUI::createPasswordPanel(void)
       showMessage(ngrt4n::OperationSucceeded, Q_TR("Password updated successfully"));
     }
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+  return changePasswordPanel;
 }
 
 
@@ -810,15 +814,15 @@ void WebMainUI::showMessageClass(const std::string& msg, std::string statusCssCl
   m_infoBox->show();
 }
 
-void WebMainUI::createAboutDialog(void)
+Wt::WDialog* WebMainUI::createAboutDialog(void)
 {
-  m_aboutDialog = new Wt::WDialog(m_mainWidget);
-  m_aboutDialog->setTitleBarEnabled(false);
-  m_aboutDialog->setStyleClass("Wt-dialog");
+  Wt::WDialog* dialog = new Wt::WDialog(m_mainWidget);
+  dialog->setTitleBarEnabled(false);
+  dialog->setStyleClass("Wt-dialog");
   
   Wt::WPushButton* closeButton(new Wt::WPushButton(tr("Close").toStdString()));
-  closeButton->clicked().connect(m_aboutDialog, &Wt::WDialog::accept);
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), m_aboutDialog->contents());
+  closeButton->clicked().connect(dialog, &Wt::WDialog::accept);
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), dialog->contents());
 
   tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
@@ -829,6 +833,8 @@ void WebMainUI::createAboutDialog(void)
   tpl->bindString("release-year", REL_YEAR.toStdString());
   tpl->bindString("bug-report-email", REPORT_BUG.toStdString());
   tpl->bindWidget("close-button", closeButton);
+
+  return dialog;
 }
 
 

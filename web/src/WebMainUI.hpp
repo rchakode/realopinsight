@@ -191,7 +191,7 @@ private:
 
   /** other member functions */
   void addEvents(void);
-  void createMainUI(void);
+  void setupMainUI(void);
   void setupInfoBox(void);
   void setupProfileMenus(void);
   void setupMenus(void);
@@ -201,9 +201,9 @@ private:
   void loadView(const std::string& path, WebDashboard*& dashboard);
 
   void scaleMap(double factor);
-  void createAccountPanel(void);
-  void createPasswordPanel(void);
-  void createAboutDialog(void);
+  UserFormView* createAccountPanel(void);
+  UserFormView* createPasswordPanel(void);
+  Wt::WDialog* createAboutDialog(void);
   void showMessage(int status, const std::string& msg);
   void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setInternalPath(const std::string& path);
