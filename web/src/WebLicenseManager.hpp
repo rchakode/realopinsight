@@ -36,7 +36,7 @@ class LicenseActivationBase : public WebPreferencesBase
 {
 public:
   enum PackageT {
-    UltimateStarter = 5,
+    UltimateStarter = 10,
     UltimateSmallBusiness = 20,
     UltimateMiddleBusiness = 50,
     UltimateEnterprise = 100,
@@ -49,7 +49,7 @@ public:
   bool checkLicense(void);
   bool isActivatedInstance(void) {return m_licenseLevel > UltimateStarter;}
   static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int licenseOffer);
-  bool canHandleNewView(int currentViewCount, int newItServicesCount);
+  bool canHandleNewView(int currentViewCount, int servicesCount);
   int maxAllowedSources(void) const;
   std::string licenseOfferName(void) const;
 

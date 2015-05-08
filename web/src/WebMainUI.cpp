@@ -1185,7 +1185,7 @@ void WebMainUI::handleImportation(void)
         view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
         view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
         view.path = dest.toStdString();
-        if (! m_licenseMngtForm->canHandleNewView(m_dbSession->viewCount(), cdata.cnodes.size()) ) {
+        if (! m_licenseMngtForm->canHandleNewView(m_dbSession->viewCount(), cdata.bpnodes.size() + cdata.cnodes.size()) ) {
           showMessage(ngrt4n::OperationFailed, m_licenseMngtForm->lastError());
         } else {
           if (m_dbSession->addView(view) != 0){

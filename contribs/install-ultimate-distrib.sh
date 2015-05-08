@@ -136,6 +136,7 @@ install_ultimate_distrib()
   echo "DEBUG: Creating destination file system..."
   install -d ${REALOPINSIGHT_HOME}
   install -d ${REALOPINSIGHT_HOME}/lib
+  install -d ${REALOPINSIGHT_HOME}/bin
   install -d ${REALOPINSIGHT_HOME}/sbin
   install -d ${REALOPINSIGHT_HOME}/etc
   install -d ${REALOPINSIGHT_HOME}/data
@@ -148,6 +149,8 @@ install_ultimate_distrib()
   echo "DEBUG: Copying core distribution files..."
   cp -r www/* ${REALOPINSIGHT_WWW_HOME}/
   install -D -m 755 lib/* ${REALOPINSIGHT_HOME}/lib
+  install -m 755 bin/realopinsight-backup ${REALOPINSIGHT_HOME}/bin
+  install -m 755 bin/realopinsight-restore ${REALOPINSIGHT_HOME}/bin
   install -m 755 sbin/realopinsight-reportd ${REALOPINSIGHT_HOME}/sbin
   chmod 755 ${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi
   

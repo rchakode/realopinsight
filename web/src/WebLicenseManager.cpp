@@ -28,7 +28,7 @@
 
 
 namespace {
-  int MAX_IT_SERVICES_PER_VIEW_STARTER = 50;
+  int MAX_SERVICES_PER_VIEW_STARTER = 20;
 }
 
 LicenseActivationBase::LicenseActivationBase(const QString& version)
@@ -98,18 +98,18 @@ QString LicenseActivationBase::getHostId(void)
 
 
 
-bool LicenseActivationBase::canHandleNewView(int currentViewCount, int newItServicesCount)
+bool LicenseActivationBase::canHandleNewView(int currentViewCount, int servicesCount)
 {
   bool success = false;
-  if (m_licenseLevel == UltimateStarter  && newItServicesCount > MAX_IT_SERVICES_PER_VIEW_STARTER) {
-    m_lastError = QObject::tr("The Starter license offer can handle up to %1 IT services. "
-                              " Purchase a license key online: http://realopinsight.com/"
-                              ).arg(QString::number(MAX_IT_SERVICES_PER_VIEW_STARTER));
+  if (m_licenseLevel == UltimateStarter  && servicesCount > MAX_SERVICES_PER_VIEW_STARTER) {
+    m_lastError = QObject::tr("The Starter license offer allows to handle at most %1 services. "
+                              " Please upgrade your license offer: http://realopinsight.com/"
+                              ).arg(QString::number(MAX_SERVICES_PER_VIEW_STARTER));
   } else {
     success = (currentViewCount < m_licenseLevel);
     if (! success) {
-      m_lastError = QObject::tr("Your license offer is limited to %1 views."
-                                " Purchase a license key online: http://realopinsight.com/"
+      m_lastError = QObject::tr("Your license offer allows to handle at %1 views."
+                                " Please upgrade your license offer: http://realopinsight.com/"
                                 ).arg(QString::number(m_licenseLevel));
     }
   }

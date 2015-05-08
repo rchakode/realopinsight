@@ -65,7 +65,7 @@ create_bundle_fs_tree()
      echo "Directory already exist: $DISTRIB_PKG_NAME"
      exit 1
   fi
-  mkdir -p $DISTRIB_PKG_NAME/{etc,lib,sbin,var,www,scripts/init.d}
+  mkdir -p $DISTRIB_PKG_NAME/{bin,sbin,lib,etc,var,www,scripts/init.d}
 }
 
 
@@ -116,14 +116,16 @@ copy_apache_config()
 }
 
 
-extract_init_scripts()
+extract_scripts()
 {
+  install -m 755 $REALOPINSIGHT_INSTALL_PREFIX/bin/realopinsight-backup $DISTRIB_PKG_NAME/bin
+  install -m 755 $REALOPINSIGHT_INSTALL_PREFIX/bin/realopinsight-restore $DISTRIB_PKG_NAME/bin
   install -m 755 $REPORTD_INIT_SCRIPT $DISTRIB_PKG_NAME/scripts/init.d/`basename $REPORTD_INIT_SCRIPT`
 }
 
 copy_wt_config()
 {
-  install -m 644 $REALOPINSIGHT_HOME/etc/wt_config.xml $DISTRIB_PKG_NAME/etc/
+  install -m 644 $REALOPINSIGHT_INSTALL_PREFIX/etc/wt_config.xml $DISTRIB_PKG_NAME/etc/
 }
 
 
@@ -164,7 +166,7 @@ check_usage $@
 
 # set variables
 VERSION=$1
-REALOPINSIGHT_HOME=$(get_absolute_path $2)
+REALOPINSIGHT_INSTALL_PREFIX=$(get_absolute_path $2)
 REALOPINSIGHT_WWW_HOME=$(get_absolute_path $3)
 OS_NAME=$(echo `lsb_release -s -i` | tr '[:upper:]' '[:lower:]')
 OS_VERSION=$(echo `lsb_release -s -r` | awk '{sub("\\.", "", $0);sub("-", "", $0); sub(" ", "", $0);print $1}')
@@ -173,7 +175,7 @@ INSTALL_MANIFEST="$DISTRIB_PKG_NAME/INSTALL.MANIFEST"
 INSTALLATION_FILE="$CONTRIBS_DIR/install-ultimate-distrib.sh"
 APACHE_CONFIG_DIR="/etc/apache2"
 FCGI_FILE="${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi"
-REPORTD_FILE="$REALOPINSIGHT_HOME/sbin/realopinsight-reportd"
+REPORTD_FILE="$REALOPINSIGHT_INSTALL_PREFIX/sbin/realopinsight-reportd"
 REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
 WWW_USER=$(get_www_user)
 WWW_GROUP=$(get_user_group $WWW_USER)
@@ -193,9 +195,9 @@ create_bundle_fs_tree
 copy_config_files
 copy_www_files
 extract_binary_file $REPORTD_FILE sbin
-extract_init_scripts
+extract_scripts
 
-echo "REALOPINSIGHT_HOME=$REALOPINSIGHT_HOME" >> $INSTALL_MANIFEST
+echo "REALOPINSIGHT_INSTALL_PREFIX=$REALOPINSIGHT_INSTALL_PREFIX" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_HOME=$REALOPINSIGHT_WWW_HOME" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_CONFIG_PATH=$REALOPINSIGHT_WWW_CONFIG_PATH" >> $INSTALL_MANIFEST
 echo "WWW_USER=$WWW_USER" >> $INSTALL_MANIFEST
