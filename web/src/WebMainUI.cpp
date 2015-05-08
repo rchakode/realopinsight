@@ -741,7 +741,7 @@ UserFormView* WebMainUI::createPasswordPanel(void)
                                                                    const std::string& pass) {
     int ret = m_dbSession->updatePassword(login, lastpass, pass);
     if (ret != 0) {
-      showMessage(ngrt4n::OperationFailed, Q_TR("Change password failed, see details in log."));
+      showMessage(ngrt4n::OperationFailed, Q_TR("Failed to change password"));
     } else {
       showMessage(ngrt4n::OperationSucceeded, Q_TR("Password updated successfully"));
     }
