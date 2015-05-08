@@ -232,7 +232,7 @@ install_ultimate() {
 	export REALOPINSIGHT_WWW_ROOT=/var/www
   fi  
  
-  export REALOPINSIGHT_CONFIG=/opt/realopinsight
+  export REALOPINSIGHT_INSTALL_PREFIX=/opt/realopinsight
   export REALOPINSIGHT_WWW=${REALOPINSIGHT_WWW_ROOT}/realopinsight
   export APACHE_ROOT=/etc/apache2
   
@@ -262,8 +262,8 @@ install_ultimate() {
   if [ ! -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
     echo "DEBUG : Building RealOpInsight Standalone..."
     install_webd
-    install -m 755 realopinsightd  ${REALOPINSIGHT_CONFIG}/
-    install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_CONFIG}/
+    install -m 755 realopinsightd  ${REALOPINSIGHT_INSTALL_PREFIX}/
+    install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_INSTALL_PREFIX}/
   else
     echo -n "DEBUG : Building RealOpInsight for FastCGI..."
     install_fcgi
@@ -281,22 +281,25 @@ install_ultimate() {
   else
     REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
   fi
-  install -d ${REALOPINSIGHT_CONFIG}
-  install -d ${REALOPINSIGHT_CONFIG}/sbin
-  install -d ${REALOPINSIGHT_CONFIG}/etc
-  install -d ${REALOPINSIGHT_CONFIG}/data
-  install -d ${REALOPINSIGHT_CONFIG}/log
-  install -d ${REALOPINSIGHT_CONFIG}/run   # directory for session info and thumbnails
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/bin
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/etc
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/data
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/log
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/run   # directory for session info and thumbnails
   install -d ${REALOPINSIGHT_WWW}
   install -d ${REALOPINSIGHT_WWW}/run      # directory for thumbnails
   install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
   install contribs/index.html ${REALOPINSIGHT_WWW}/
   install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
   install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
-  install -m 755 realopinsight-reportd ${REALOPINSIGHT_CONFIG}/sbin
+  install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
+  install -m 755 contribs/contribs/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
+  install -m 755 contribs/contribs/realopinsight-backup {REALOPINSIGHT_INSTALL_PREFIX}/bin/
   
-  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_CONFIG}/etc/
+  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
   install -m 600 contribs/apache-realopinsight-ultimate.conf ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
   cp -r resources ${REALOPINSIGHT_WWW}/ 
@@ -304,7 +307,7 @@ install_ultimate() {
   cp -r i18n ${REALOPINSIGHT_WWW}/
   
   echo "DEBUG : Settings permissions and ..."
-  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_CONFIG}/
+  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
   chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
   
   echo "DEBUG : Settings Apache"
