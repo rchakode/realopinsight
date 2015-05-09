@@ -296,8 +296,8 @@ install_ultimate() {
   install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
   install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
-  install -m 755 contribs/contribs/realopinsight-backup {REALOPINSIGHT_INSTALL_PREFIX}/bin/
-  install -m 755 contribs/contribs/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
+  install -m 755 contribs/realopinsight-backup ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
+  install -m 755 contribs/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
   
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
