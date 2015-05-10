@@ -36,7 +36,8 @@ REALOPINSIGHT_CONFIG_DIR="/opt/realopinsight/etc"
 REALOPINSIGHT_EXPORT_TARBALL=$1
 
 read -p "The restoration will reinitialize your database as well as configuration files. 
-         Do you want to continue? Type 'y' to confirm, other input to stop the script " rep
+         Do you want to continue? 
+         Type 'y' to confirm, other input to stop the script " rep
 OK="FALSE"
 case $rep in
 	y) OK="OK";;

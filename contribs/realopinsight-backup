@@ -31,12 +31,12 @@ if [ $# -ne 0 ]; then
   exit 1
 fi
 
-REALOPINSIGHT_DB="/opt/realopinsight/data/realopinsight.db"
+REALOPINSIGHT_DATA_DIR="/opt/realopinsight/data/"
 REALOPINSIGHT_CONFIG_DIR="/opt/realopinsight/etc"
 REALOPINSIGHT_EXPORT_TARBALL=realopinsight-ultimate-export-$(date +%F).tar.gz
 
 tar --same-owner -zcf ${REALOPINSIGHT_EXPORT_TARBALL} \
-    $REALOPINSIGHT_DB \
+    $REALOPINSIGHT_DATA_DIR \
     ${REALOPINSIGHT_CONFIG_DIR}
     
 echo "Backup File: ${REALOPINSIGHT_EXPORT_TARBALL}"
