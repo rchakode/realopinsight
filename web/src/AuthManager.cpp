@@ -104,11 +104,11 @@ void AuthManager::createLoggedInView(void)
   try {
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
     if (! checkLicense() && m_dbSession->isLoggedAdmin()) {
-      bindWidget("update-banner", new Wt::WText("<div class=\"alert alert-danger\">"
+      bindWidget("update-banner", new Wt::WText(Wt::WString::tr("<div class=\"alert alert-danger\">"
                                                 "You're running a non activated (limited) version of RealOpInsight Ultimate."
-                                                " Please go to <a href=\"http://realopinsight.com\">http://realopinsight.com</a>"
+                                                " Please go to <a href=\"{0}\">{0}</a>"
                                                 " in order to get an activation license key."
-                                                "</div>",
+                                                "</div>").arg(PKG_URL.toStdString()),
                                                 Wt::XHTMLText));
     } else {
       bindEmpty("update-banner");

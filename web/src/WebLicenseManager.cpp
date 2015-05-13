@@ -1,7 +1,7 @@
 /*
  * WebLicenseActivationBase.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)   #
 # Creation: 12-04-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
@@ -103,14 +103,14 @@ bool LicenseActivationBase::canHandleNewView(int currentViewCount, int servicesC
   bool success = false;
   if (m_licenseLevel == UltimateStarter  && servicesCount > MAX_SERVICES_PER_VIEW_STARTER) {
     m_lastError = QObject::tr("The Starter license offer allows to handle at most %1 services. "
-                              " Please upgrade your license offer: http://realopinsight.com/"
-                              ).arg(QString::number(MAX_SERVICES_PER_VIEW_STARTER));
+                              " Please upgrade your license offer: %1"
+                              ).arg(PKG_URL, QString::number(MAX_SERVICES_PER_VIEW_STARTER));
   } else {
     success = (currentViewCount < m_licenseLevel);
     if (! success) {
       m_lastError = QObject::tr("Your license offer allows to handle at %1 views."
-                                " Please upgrade your license offer: http://realopinsight.com/"
-                                ).arg(QString::number(m_licenseLevel));
+                                " Please upgrade your license offer: %1"
+                                ).arg(PKG_URL, QString::number(m_licenseLevel));
     }
   }
 
