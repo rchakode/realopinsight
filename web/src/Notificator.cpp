@@ -94,9 +94,7 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
 
 void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
 {
-  QosDataT lastQosData;
   std::string viewName = node.name.toStdString();
-
   QStringList recipients;
   if (m_dbSession->listAssignedUsersEmails(recipients, viewName) <= 0) {
     REPORTD_LOG("info", QString("No notification recipients for view %1").arg(viewName.c_str()));
@@ -105,36 +103,25 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
 
   NotificationT lastNotifData;
   m_dbSession->getLastNotificationInfo(lastNotifData, viewName);
-  if (node.sev != ngrt4n::Normal) { //problem state
-    if (lastNotifData.view_status == DboNotification::Unset || lastNotifData.ack_status == DboNotification::Closed) { // send new notification
-      sendEmailNotification(node, lastQosData.status, qosData, recipients);
-      if (lastNotifData.view_status == DboNotification::Unset) {
-        m_dbSession->addNotification(viewName, node.sev);
-      } else  {
-        m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Open);
-      }
-    } else {
-      if (lastNotifData.view_status != node.sev) { //severity changed
-        sendEmailNotification(node, lastQosData.status, qosData, recipients);
-        m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
-        m_dbSession->addNotification(viewName, node.sev);
-      } else {
-        if (lastNotifData.ack_status != DboNotification::Acknowledged) {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
-          // FIXME: escalate it?
-        } else {
-          REPORTD_LOG("error", QString("The service %1 is still in %2 state, but has been acknowledged").arg(viewName.c_str(), Severity(node.sev).toString()));
-          //FIXME: log acknowledge info ?
+  switch (node.sev) {
+    case  ngrt4n::Normal:
+      if (lastNotifData.view_status != DboNotification::Unset && lastNotifData.view_status != DboNotification::Closed) {
+        // check if service just recovered, if yes send recovery notification
+        if (lastNotifData.view_status != node.sev && lastNotifData.ack_status != DboNotification::Closed) {
+          sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
         }
       }
+      m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
+    break;
+  default:
+    if (lastNotifData.view_status != node.sev) {
+      sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
+      m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
+      m_dbSession->addNotification(viewName, node.sev);
+    } else {
+      REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
     }
-  } else {  // normal state
-    if (lastNotifData.view_status != DboNotification::Unset && lastNotifData.view_status != DboNotification::Closed) {
-      if (lastNotifData.view_status != node.sev) { // service recovered
-        sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
-      }
-    }
-    m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
+   break;
   }
 }
 
