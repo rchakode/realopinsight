@@ -430,7 +430,7 @@ void WebMainUI::handleRefresh(void)
 
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
-  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("http://realopinsight.com/"),
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink(PKG_URL.toStdString()),
                                         new Wt::WImage("images/built-in/logo-mini.png"));
   anchor->setTarget(Wt::TargetNewWindow);
   return anchor;
