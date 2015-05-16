@@ -104,17 +104,17 @@ void AuthManager::createLoggedInView(void)
   try {
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
     if (! checkLicense() && m_dbSession->isLoggedAdmin()) {
-      bindWidget("update-banner", new Wt::WText(Wt::WString::tr("<div class=\"alert alert-danger\">"
-                                                "You're running a non activated (limited) version of RealOpInsight Ultimate."
-                                                " Please go to <a href=\"{0}\">{0}</a>"
-                                                " in order to get an activation license key."
-                                                "</div>").arg(PKG_URL.toStdString()),
-                                                Wt::XHTMLText));
+      QString msg = QString("<div class=\"alert alert-danger\">"
+                            "You're running a non activated (limited) version of RealOpInsight Ultimate."
+                            " Please go to <a href=\"%1\">%1</a>"
+                            " in order to get an activation license key."
+                            "</div>").arg(PKG_URL);
+      bindString("update-banner", msg.toStdString());
     } else {
       bindEmpty("update-banner");
     }
   } catch (const std::bad_alloc& ) {
-    bindWidget("main-ui", new Wt::WText("ERROR: You are running low on memory, please upgrade your system !"));
+    bindString("main-ui", "ERROR: You are running low on memory, please upgrade your system !");
   }
 
   // create the logout button
