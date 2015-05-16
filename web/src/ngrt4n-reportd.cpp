@@ -58,9 +58,12 @@ void runCollector(int period)
       std::cerr << ex.what() <<"\n";
     }
 
+    QosDataList qosDataList;
+    NodeListT rootNodes;
+    qosDataList.clear();
+    rootNodes.clear();
     long now = time(NULL);
     for (const auto& view: dbSession.viewList()) {
-
       // initialize a collector for the current view.
       // skip the view if the initialization failed
       QosCollector collector(view.path.c_str());
@@ -69,30 +72,23 @@ void runCollector(int period)
         REPORTD_LOG("error", collector.lastErrorMsg());
         continue;
       }
-
       collector.initSettings(&preferences);
       collector.runMonitor();
-
-      QosDataT qosInfo = collector.qosInfo();
-      qosInfo.timestamp = now;
+      QosDataT qosData = collector.qosInfo();
+      qosData.timestamp = now;
+      qosDataList.push_back(qosData);
+      rootNodes[qosData.view_name.c_str()] = collector.rootNode();
       try {
-        dbSession.addQosData(qosInfo);
-        if (preferences.getNotificationType() != WebPreferencesBase::NoNotification) {
-          pid_t pid = fork();
-          if (pid == 0) {
-            // child process: handle notification
-            REPORTD_LOG("notice", dbSession.lastError());
-            notificator.handleNotification(collector.rootNode(), qosInfo);
-            _Exit(0);
-          } else if (pid > 0) {
-            // parent process: do nothing
-          } else {
-            REPORTD_LOG("warn", Q_TR("Can't fork process to handle notification"));
-          }
-        }
+        dbSession.addQosData(qosData);
+        REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", std::string(ex.what()));
       }
+    }
+    // now handle notifications if applicable
+    if (preferences.getNotificationType() != WebPreferencesBase::NoNotification) {
+      for (const auto qosEntry : qosDataList)
+        notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);
     }
     wait_for_interval(period);
   }

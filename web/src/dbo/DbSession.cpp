@@ -115,8 +115,8 @@ int DbSession::addUser(const DboUserT& userInfo)
 int DbSession::updateUser(const DboUserT& userInfo)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
     dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(userInfo.username);
     dbo::ptr<DboUser> userPtr = authInfo.modify()->user();
     userPtr.modify()->username = userInfo.username;
@@ -133,6 +133,7 @@ int DbSession::updateUser(const DboUserT& userInfo)
     m_lastError = "Failed to update the user.";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
+  transaction.commit();
   updateUserList();
   return retValue;
 }
@@ -431,20 +432,19 @@ int DbSession::assignView(const std::string& userId, const std::string& vname)
 int DbSession::revokeView(const std::string& userId, const std::string& viewId)
 {
   int retValue = -1;
+  dbo::Transaction transaction(*this);
   try {
-    dbo::Transaction transaction(*this);
     dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userId);
     dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewId);
     userPtr.modify()->views.erase(viewPtr);
     retValue = 0;
-
-    transaction.commit();
   } catch (const dbo::Exception& ex) {
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   } catch(const std::exception& ex) {
     m_lastError = ex.what();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
+  transaction.commit();
   return retValue;
 }
 
@@ -499,7 +499,6 @@ int DbSession::addSession(const DboLoginSession& session)
 }
 
 
-
 int DbSession::checkUserCookie(const DboLoginSession& session)
 {
   int retValue = -1;
@@ -525,10 +524,10 @@ int DbSession::addQosData(const QosDataT& qosData)
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    DboQosData* qosDboPtr = new DboQosData();
-    qosDboPtr->setData(qosData);
-    qosDboPtr->view = find<DboView>().where("name=?").bind(qosData.view_name);;
-    dbo::ptr<DboQosData> dboEntry = add(qosDboPtr);
+    DboQosData* ptr_qosDboData = new DboQosData();
+    ptr_qosDboData->setData(qosData);
+    ptr_qosDboData->view = find<DboView>().where("name=?").bind(qosData.view_name);;
+    dbo::ptr<DboQosData> dboEntry = add(ptr_qosDboData);
     retValue = 0;
     m_lastError = Q_TR("QoS entry added: ") + dboEntry->toString();
   } catch (const dbo::Exception& ex) {
@@ -539,6 +538,28 @@ int DbSession::addQosData(const QosDataT& qosData)
   return retValue;
 }
 
+
+int DbSession::addQosDataList(const QosDataList& qosDataList)
+{
+  int retValue = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    m_lastError.clear();
+    for (const auto& qosData : qosDataList) {
+      DboQosData* ptr_qosDboData = new DboQosData();
+      ptr_qosDboData->setData(qosData);
+      ptr_qosDboData->view = find<DboView>().where("name=?").bind(qosData.view_name);;
+      dbo::ptr<DboQosData> dboEntry = add(ptr_qosDboData);
+      m_lastError.append(Q_TR("QoS entry added: ")).append(dboEntry->toString());
+    }
+    retValue = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to add QoS entries to database.";
+    CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+  }
+  transaction.commit();
+  return retValue;
+}
 
 
 int DbSession::listQosData(QosDataByViewMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
@@ -608,7 +629,6 @@ int DbSession::addNotification(const std::string& viewId, int viewStatus)
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-
     DboNotification* entryPtr = new DboNotification();
     entryPtr->timestamp = time(NULL);
     entryPtr->last_change = entryPtr->timestamp;
@@ -767,7 +787,6 @@ int DbSession::listViewRelatedNotifications(NotificationMapT& notifications, con
           notifications.insert(data.view_name, data);
         }
       }
-
       retValue = notifications.size();
     }
   } catch (const dbo::Exception& ex) {

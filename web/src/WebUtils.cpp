@@ -34,6 +34,7 @@
 #include <Wt/WApplication>
 #include <Wt/WStandardItem>
 #include <memory>
+#include <fcntl.h>
 
 
 Logger* coreLogger = NULL;
@@ -346,5 +347,36 @@ std::string ngrt4n::getItemData(Wt::WStandardItem* item)
   }
 
   return data;
+}
+
+
+sem_t* ngrt4n::createSemaphoreOrDie(const std::string& sem_name)
+{
+  sem_t* my_sem = sem_open(sem_name.c_str(), O_CREAT, S_IRUSR|S_IWUSR, 1);
+  if (my_sem == SEM_FAILED) {
+    std::string errorMsg = Q_TR("Failed while initializing semaphore: ");
+    switch (errno) {
+      case EACCES:
+        errorMsg += QObject::tr("permission denied to access to the semaphore %1")
+            .arg(sem_name.c_str())
+            .toStdString();
+        break;
+      default:
+        errorMsg += QObject::tr("sem_open returned errno %1")
+            .arg(QString::number(errno))
+            .toStdString();
+        break;
+    }
+    CORE_LOG("fatal", errorMsg);
+    qFatal("%s", errorMsg.c_str());
+    exit(1);
+  }
+  return my_sem;
+}
+
+
+void ngrt4n::releaseSemaphore(sem_t* my_sem)
+{
+  sem_close(my_sem);
 }
 

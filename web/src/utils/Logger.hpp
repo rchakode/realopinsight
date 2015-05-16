@@ -1,7 +1,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-#include <semaphore.h>
+#include "WebUtils.hpp"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -20,7 +20,6 @@ public:
 
   void log(const std::string& logLevel, const std::string& msg);
   std::string getCoreLogPath(void) const {return m_coreLogPath; }
-  sem_t* createSemaphoreOrDie(const std::string& name);
 
 
 private:

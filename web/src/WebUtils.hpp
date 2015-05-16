@@ -25,6 +25,7 @@
 #ifndef WEBUTILS_HPP
 #define WEBUTILS_HPP
 
+#include "semaphore.h"
 #include "Settings.hpp"
 #include <QString>
 #include <Wt/WText>
@@ -76,6 +77,9 @@ namespace ngrt4n {
   Wt::WStandardItem* createSeverityStandardItem(const NodeT& _node);
   void updateSeverityItem(Wt::WStandardItem* item, int severity);
   std::string getItemData(Wt::WStandardItem* item);
+  sem_t* createSemaphoreOrDie(const std::string& sem_name);
+  void releaseSemaphore(sem_t* my_sem);
 } //Namespace
+
 
 #endif // WEBUTILS_HPP

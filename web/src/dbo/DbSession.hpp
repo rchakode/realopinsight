@@ -37,6 +37,7 @@
 #include <Wt/Auth/Dbo/UserDatabase>
 #include <Wt/Auth/Login>
 #include <climits>
+#include <semaphore.h>
 
 typedef Wt::Auth::Dbo::AuthInfo<DboUser> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
@@ -79,6 +80,7 @@ public:
   int listAssignedUsersEmails(QStringList& emails, const std::string& viewId);
 
   int addQosData(const QosDataT& qosData);
+  int addQosDataList(const QosDataList& qosDataList);
   int listQosData(QosDataByViewMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
   int getLastQosData(QosDataT& qosData, const std::string& viewId);
 
