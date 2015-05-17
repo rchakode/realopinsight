@@ -121,6 +121,7 @@ void WebMainUI::addEvents(void)
   wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
+  m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
 }
 
 void WebMainUI::showUserHome(void)
@@ -643,7 +644,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   // monitoring settings menu
   m_adminStackedContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Data Sources"));
+  link = new Wt::WAnchor("#", Q_TR("Monitoring Data Sources"));
   settingPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(std::bind([=](){
@@ -654,7 +655,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   // auth settings menu
   m_adminStackedContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Authentication"));
+  link = new Wt::WAnchor("#", Q_TR("Authentication Backend"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
@@ -665,7 +666,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
   // notification settings menu
   m_adminStackedContents->addWidget(m_preferences);
-  link = new Wt::WAnchor("#", Q_TR("Notification"));
+  link = new Wt::WAnchor("#", Q_TR("Notification Settings"));
   settingPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(std::bind([=](){
@@ -700,7 +701,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   // license activation menu
   if (m_dbSession->isLoggedAdmin()) {
     m_adminStackedContents->addWidget(m_licenseMngtForm);
-    link = new Wt::WAnchor("#", Q_TR("Activation"));
+    link = new Wt::WAnchor("#", Q_TR("Activation Key"));
     settingPageTpl->bindWidget("menu-license-activation", link);
     m_menuLinks.insert(MenuAuthSettings, link);
     link->clicked().connect(this, &WebMainUI::updateLicenseMgntForm);

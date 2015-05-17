@@ -46,8 +46,7 @@ public:
   LicenseActivationBase(const QString& version);
   std::string lastError() const {return m_lastError.toStdString(); }
   void checkInstanceActivationLevel(void);
-  bool checkLicense(void);
-  bool isActivatedInstance(void) {return m_licenseLevel > UltimateStarter;}
+  bool isActivatedInstance(void) const {return m_licenseLevel > UltimateStarter;}
   static QString genKey(const QString& hostid, const QString& hostname, const QString& version, int licenseOffer);
   bool canHandleNewView(int currentViewCount, int servicesCount);
   int maxAllowedSources(void) const;
@@ -74,8 +73,10 @@ public:
   WebLicenseManager(const QString& version);
   void saveActivationKey(void);
   void updateContent(void) {m_activationKeyField->setText(getLicenseKey().toStdString());}
+  Wt::Signal<int, std::string>& licenseKeyChanged(void) {return m_licenseSetStatus;}
 
 private:
+  Wt::Signal<int, std::string> m_licenseSetStatus;
   Wt::WLineEdit* m_activationKeyField;
   Wt::WPushButton* m_activeBtn;
 };

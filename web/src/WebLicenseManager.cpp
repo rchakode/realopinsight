@@ -169,7 +169,8 @@ std::string LicenseActivationBase::licenseOfferName(void) const
 
 WebLicenseManager::WebLicenseManager(const QString& version)
   : LicenseActivationBase(version),
-    Wt::WTemplate(Wt::WString::tr("license-activation-form.tpl"))
+    Wt::WTemplate (Wt::WString::tr("license-activation-form.tpl")),
+    m_licenseSetStatus(this)
 {
   bindWidget("activation-key-field", m_activationKeyField = new Wt::WLineEdit());
   bindWidget("activate-button", m_activeBtn = new Wt::WPushButton(Q_TR("Activate")));
@@ -181,4 +182,11 @@ void WebLicenseManager::saveActivationKey(void)
 {
   setKeyValue(Settings::ACTIVATION_LICENSE_KEY, m_activationKeyField->text().toUTF8().c_str());
   sync();
+  checkInstanceActivationLevel();
+  if (isActivatedInstance()) {
+    m_licenseSetStatus.emit(ngrt4n::OperationSucceeded,
+                            Q_TR("Congratulation! Your license offer is now: ")+licenseOfferName());
+  } else {
+    m_licenseSetStatus.emit(ngrt4n::OperationFailed, Q_TR("Oups! Invalid license token"));
+  }
 }
