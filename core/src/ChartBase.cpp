@@ -111,7 +111,7 @@ QString ChartBase::timeFromSeconds(long seconds)
 
   QString result = "Duration: ";
   if (days > 0) {
-    result.append(QString::number(days)).append(" d");
+    result.append(QString::number(days)).append("d");
   }
 
   if (hours < 9) {
