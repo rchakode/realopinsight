@@ -1,5 +1,5 @@
 /*
- * WebBiReportBuilder.cpp
+ * WebBiCharts.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
 # Last Update: 07-10-2014                                                  #
