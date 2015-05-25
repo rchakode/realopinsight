@@ -126,13 +126,13 @@ int LicenseActivationBase::maxAllowedSources(void) const
       result = MAX_SRCS;
       break;
     case UltimateEnterprise:
-      result = 5;
+      result = 10;
       break;
     case UltimateMiddleBusiness:
-      result = 2;
+      result = 4;
       break;
     case UltimateSmallBusiness:
-      result = 1;
+      result = 2;
       break;
     case UltimateStarter:
     default:
