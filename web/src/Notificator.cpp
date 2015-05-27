@@ -103,25 +103,26 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
 
   NotificationT lastNotifData;
   m_dbSession->getLastNotificationInfo(lastNotifData, viewName);
+  bool updateRequired = false;
   switch (node.sev) {
     case  ngrt4n::Normal:
-      if (lastNotifData.view_status != DboNotification::Unset && lastNotifData.view_status != DboNotification::Closed) {
-        // check if service just recovered, if yes send recovery notification
-        if (lastNotifData.view_status != node.sev && lastNotifData.ack_status != DboNotification::Closed) {
-          sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
-        }
+      if (lastNotifData.view_status != node.sev) {
+        updateRequired = true;
       }
-      m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
     break;
   default:
     if (lastNotifData.view_status != node.sev) {
-      sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
-      m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
-      m_dbSession->addNotification(viewName, node.sev);
+      updateRequired = true;
     } else {
       REPORTD_LOG("error", QString("The service %1 is still in %2 state").arg(viewName.c_str(), Severity(node.sev).toString()));
     }
    break;
   }
+  
+ if (updateRequired) {
+   sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
+   m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
+   m_dbSession->addNotification(viewName, node.sev);
+ }
 }
 
