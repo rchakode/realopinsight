@@ -185,8 +185,9 @@ void WebLicenseManager::saveActivationKey(void)
   checkInstanceActivationLevel();
   if (isActivatedInstance()) {
     m_licenseSetStatus.emit(ngrt4n::OperationSucceeded,
-                            Q_TR("Congratulation! Your license offer is now: ")+licenseOfferName());
+                            Q_TR("Congratulation! Your license offer is now activated: ")+licenseOfferName());
   } else {
-    m_licenseSetStatus.emit(ngrt4n::OperationFailed, Q_TR("Oups! Invalid license token"));
+    m_licenseSetStatus.emit(ngrt4n::OperationFailed,
+                            Q_TR("Oups! Invalid license token"));
   }
 }

@@ -1,13 +1,12 @@
-RealOpInsight Ultimate Update Patch
-===================================
+Installation of RealOpInsight Ultimate Distribution
+===================================================
 
-Copyright (c) 2014 RealOpInsight Labs. All right reserved.
+Copyright (c) 2015 RealOpInsight Labs. All right reserved.
 See the terms of use: http://legal.realopinsight.com/
 
-INSTALLING THE PATCH
-=====================
-To install the patch, execute the following command and follow 
-the installation process. Messages will guide you throughout the
-process. 
+INSTALLATION STEPS
+------------------
+Execute the following command to start the step-by-step installation process.
+Messages will guide you throughout the installation.
 
 sudo ./appliance-ultimate-apply-patch.sh 

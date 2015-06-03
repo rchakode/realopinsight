@@ -12,6 +12,7 @@
 
 set -u
 set -e
+set -x
 
 print_usage()
 {
@@ -54,7 +55,7 @@ extract_binary_deplibs()
   BIN_FILE=$1
   for f in $(ldd $BIN_FILE | awk '{print $3}'); do
     if [ -e $f ]; then
-      install -m 755 $f $DISTRIB_PKG_NAME/lib/
+      install -m 755 $f ${DISTRIB_PKG_NAME}/lib/
     fi
   done
 }
@@ -62,10 +63,10 @@ extract_binary_deplibs()
 create_bundle_fs_tree()
 { 
   if [ -d $DISTRIB_PKG_NAME ]; then
-     echo "Directory already exist: $DISTRIB_PKG_NAME"
+     echo "Directory already exist: ${DISTRIB_PKG_NAME}"
      exit 1
   fi
-  mkdir -p $DISTRIB_PKG_NAME/{bin,sbin,lib,etc,var,www,scripts/init.d}
+  mkdir -p ${DISTRIB_PKG_NAME}/{bin,sbin,lib,etc,var,www,sql,scripts/init.d}
 }
 
 
@@ -74,7 +75,7 @@ extract_binary_file()
   path=$1
   dest=$2
   extract_binary_deplibs $path
-  install -m 755 $path $DISTRIB_PKG_NAME/$dest
+  install -m 755 $path ${DISTRIB_PKG_NAME}/$dest
 }
 
 
@@ -100,7 +101,7 @@ extract_fcgi_deps()
 copy_www_files()
 {
   extract_fcgi_deps
-  cp --recursive $REALOPINSIGHT_WWW_HOME/* $DISTRIB_PKG_NAME/www
+  cp --recursive $REALOPINSIGHT_WWW_HOME/* ${DISTRIB_PKG_NAME}/www
 }
 
 
@@ -112,20 +113,20 @@ copy_apache_config()
     WWW_CONFIG_DIR="${APACHE_CONFIG_DIR}/conf.d"
   fi
   REALOPINSIGHT_WWW_CONFIG_PATH=${WWW_CONFIG_DIR}/realopinsight-ultimate.conf
-  install -m 644 $REALOPINSIGHT_WWW_CONFIG_PATH $DISTRIB_PKG_NAME/etc/
+  install -m 644 $REALOPINSIGHT_WWW_CONFIG_PATH ${DISTRIB_PKG_NAME}/etc/
 }
 
 
 extract_scripts()
 {
-  install -m 755 $REALOPINSIGHT_INSTALL_PREFIX/bin/realopinsight-backup $DISTRIB_PKG_NAME/bin
-  install -m 755 $REALOPINSIGHT_INSTALL_PREFIX/bin/realopinsight-restore $DISTRIB_PKG_NAME/bin
-  install -m 755 $REPORTD_INIT_SCRIPT $DISTRIB_PKG_NAME/scripts/init.d/`basename $REPORTD_INIT_SCRIPT`
+  install -m 755 ${REALOPINSIGHT_INSTALL_PREFIX}/bin/realopinsight-backup ${DISTRIB_PKG_NAME}/bin
+  install -m 755 ${REALOPINSIGHT_INSTALL_PREFIX}/bin/realopinsight-restore ${DISTRIB_PKG_NAME}/bin
+  install -m 755 $REPORTD_INIT_SCRIPT ${DISTRIB_PKG_NAME}/scripts/init.d/`basename $REPORTD_INIT_SCRIPT`
 }
 
 copy_wt_config()
 {
-  install -m 644 $REALOPINSIGHT_INSTALL_PREFIX/etc/wt_config.xml $DISTRIB_PKG_NAME/etc/
+  install -m 644 ${REALOPINSIGHT_INSTALL_PREFIX}/etc/wt_config.xml ${DISTRIB_PKG_NAME}/etc/
 }
 
 
@@ -145,6 +146,7 @@ get_www_user()
   echo $WWW_USER
 }
 
+
 get_user_group()
 {
   USER=$1
@@ -161,6 +163,20 @@ move_to_working_dir()
   cd /tmp
 }
 
+
+copy_readme_files()
+{
+  cp ${CONTRIBS_DIR}/README_INSTALL ${DISTRIB_PKG_NAME}/
+}
+
+
+copy_sql_patch_files()
+{
+  cp -r ${CONTRIBS_DIR}/sql/*.sql ${DISTRIB_PKG_NAME}/sql/
+}
+
+
+
 # check usage
 check_usage $@
 
@@ -168,14 +184,15 @@ check_usage $@
 VERSION=$1
 REALOPINSIGHT_INSTALL_PREFIX=$(get_absolute_path $2)
 REALOPINSIGHT_WWW_HOME=$(get_absolute_path $3)
-OS_NAME=$(echo `lsb_release -s -i` | tr '[:upper:]' '[:lower:]')
+OS_NAME=$(echo `lsb_release -s -i` | sed 's/ //g' | tr '[:upper:]' '[:lower:]')
 OS_VERSION=$(echo `lsb_release -s -r` | awk '{sub("\\.", "", $0);sub("-", "", $0); sub(" ", "", $0);print $1}')
 DISTRIB_PKG_NAME="realopinsight-ultimate-${VERSION}.${OS_NAME}${OS_VERSION}.`uname -m`"
-INSTALL_MANIFEST="$DISTRIB_PKG_NAME/INSTALL.MANIFEST"
-INSTALLATION_FILE="$CONTRIBS_DIR/install-ultimate-distrib.sh"
+INSTALL_MANIFEST="${DISTRIB_PKG_NAME}/INSTALL.MANIFEST"
+INSTALLATION_FILE="${CONTRIBS_DIR}/install-ultimate-distrib.sh"
 APACHE_CONFIG_DIR="/etc/apache2"
 FCGI_FILE="${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi"
-REPORTD_FILE="$REALOPINSIGHT_INSTALL_PREFIX/sbin/realopinsight-reportd"
+REPORTD_FILE="${REALOPINSIGHT_INSTALL_PREFIX}/sbin/realopinsight-reportd"
+SQLITE3=$(which sqlite3)
 REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
 WWW_USER=$(get_www_user)
 WWW_GROUP=$(get_user_group $WWW_USER)
@@ -195,16 +212,20 @@ create_bundle_fs_tree
 copy_config_files
 copy_www_files
 extract_binary_file $REPORTD_FILE sbin
-extract_scripts
+extract_binary_file ${SQLITE3} bin
 
-echo "REALOPINSIGHT_INSTALL_PREFIX=$REALOPINSIGHT_INSTALL_PREFIX" >> $INSTALL_MANIFEST
+extract_scripts
+copy_sql_patch_files
+copy_readme_files
+
+echo "REALOPINSIGHT_INSTALL_PREFIX=${REALOPINSIGHT_INSTALL_PREFIX}" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_HOME=$REALOPINSIGHT_WWW_HOME" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_CONFIG_PATH=$REALOPINSIGHT_WWW_CONFIG_PATH" >> $INSTALL_MANIFEST
 echo "WWW_USER=$WWW_USER" >> $INSTALL_MANIFEST
 echo "WWW_GROUP=$WWW_GROUP" >> $INSTALL_MANIFEST
 
 # make tarball
-install -m 755 $INSTALLATION_FILE $DISTRIB_PKG_NAME/
-tar zcf $DISTRIB_PKG_NAME.tar.gz $DISTRIB_PKG_NAME
+install -m 755 $INSTALLATION_FILE ${DISTRIB_PKG_NAME}/
+tar zcf ${DISTRIB_PKG_NAME}.tar.gz ${DISTRIB_PKG_NAME}
 
 exit 0

@@ -33,7 +33,11 @@ make_backup()
   echo -n "DEBUG : Backup current installation to ${REAlOPINSIGHT_BACKUP_FILE}..."
   tar --same-owner \
       --exclude ${REALOPINSIGHT_APP_DIR}/run \
-      -zcf ${REAlOPINSIGHT_BACKUP_FILE} ${REALOPINSIGHT_WWW_DIR} ${REALOPINSIGHT_APP_DIR}
+      -zcf \
+      ${REAlOPINSIGHT_BACKUP_FILE} \
+      ${REALOPINSIGHT_WWW_DIR} \
+      ${REALOPINSIGHT_APP_DIR}
+
   if [ $? -eq 0 ]; then
     echo done
   else  
@@ -53,6 +57,7 @@ make_restore()
 	exit 1
   fi
 }
+
 
 prompt_copyright()
 { 
