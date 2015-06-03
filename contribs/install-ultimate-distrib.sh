@@ -17,7 +17,7 @@ set -u
 if [ -e ./INSTALL.MANIFEST ]; then
   . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
   SQLITE3="$REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
-  export LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/bin:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/bin
 else
   echo "INSTALL.MANIFEST not found"
   exit 1
@@ -237,14 +237,14 @@ restore_backup_on_error()
 create_destination_fs_tree()
 {
   echo "DEBUG: Creating destination fs tree..."
-  install -d ${REALOPINSIGHT_HOME}
-  install -d ${REALOPINSIGHT_HOME}/lib
-  install -d ${REALOPINSIGHT_HOME}/bin
-  install -d ${REALOPINSIGHT_HOME}/sbin
-  install -d ${REALOPINSIGHT_HOME}/etc
-  install -d ${REALOPINSIGHT_HOME}/data
-  install -d ${REALOPINSIGHT_HOME}/log
-  install -d ${REALOPINSIGHT_HOME}/run   # directory for session info and thumbnails
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/lib
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/bin
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/etc
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/data
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/log
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/run   # directory for session info and thumbnails
   install -d ${REALOPINSIGHT_WWW_HOME}
   install -d ${REALOPINSIGHT_WWW_HOME}/run      # directory for thumbnails
 }
@@ -255,12 +255,12 @@ copy_distribution_files()
 {
   echo "DEBUG: Copying core distribution files..."
   cp -r www/* ${REALOPINSIGHT_WWW_HOME}/
-  install -D -m 755 lib/* ${REALOPINSIGHT_HOME}/lib
-  install -D -m 755 bin/* ${REALOPINSIGHT_HOME}/bin
-  install -D -m 755 sbin/* ${REALOPINSIGHT_HOME}/sbin
+  install -D -m 755 lib/* ${REALOPINSIGHT_INSTALL_PREFIX}/lib
+  install -D -m 755 bin/* ${REALOPINSIGHT_INSTALL_PREFIX}/bin
+  install -D -m 755 sbin/* ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   chmod 755 ${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi
   echo "DEBUG: Copying configuration files..."
-  install -m 644 etc/wt_config.xml ${REALOPINSIGHT_HOME}/etc/
+  install -m 644 etc/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
   install -m 644 etc/realopinsight-ultimate.conf $REALOPINSIGHT_WWW_CONFIG_PATH
 }
 
@@ -277,7 +277,7 @@ install_ultimate_distrib()
   copy_distribution_files
   
   echo "DEBUG: Setting file permissions..."
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_HOME}/{data,log,run}
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run}
   chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_WWW_HOME}/run
   
   echo "DEBUG: Activating Apache's Specific Settings..."
