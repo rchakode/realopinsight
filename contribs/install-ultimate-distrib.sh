@@ -98,7 +98,7 @@ stop_services()
 start_services()
 {
   service realopinsight-reportd restart
-  service apache2 reload
+  service apache2 start
 }
 
 
@@ -156,7 +156,7 @@ prompt_to_get_current_db_version()
 update_db_2014b8()
 {
   echo -n "DEBUG : Updating database to 2014b8..."
-  su - ${REALOPINSIGHT_WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b8.sql"
+  su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b8.sql"
   restore_backup_on_error
 }
 
@@ -165,7 +165,7 @@ update_db_2014b8()
 update_db_2015r1()
 {
   echo -n "DEBUG : Updating database to 2015r1..."
-  su - ${REALOPINSIGHT_WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2015r1.sql"
+  su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2015r1.sql"
   restore_backup_on_error
 }
 
