@@ -191,12 +191,12 @@ copy_sql_patch_files()
 check_usage $@
 
 # set variables
-VERSION=$1
+REALOPINSIGHT_VERSION=$1
 REALOPINSIGHT_INSTALL_PREFIX=$(get_absolute_path $2)
 REALOPINSIGHT_WWW_HOME=$(get_absolute_path $3)
 OS_NAME=$(echo `lsb_release -s -i` | sed 's/ //g' | tr '[:upper:]' '[:lower:]')
 OS_VERSION=$(echo `lsb_release -s -r` | awk '{sub("\\.", "", $0);sub("-", "", $0); sub(" ", "", $0);print $1}')
-DISTRIB_PKG_NAME="realopinsight-ultimate-${VERSION}.${OS_NAME}${OS_VERSION}.`uname -m`"
+DISTRIB_PKG_NAME="realopinsight-ultimate-${REALOPINSIGHT_VERSION}.${OS_NAME}${OS_VERSION}.`uname -m`"
 INSTALL_MANIFEST="${DISTRIB_PKG_NAME}/INSTALL.MANIFEST"
 INSTALLATION_FILE="${CONTRIBS_DIR}/install-ultimate-distrib.sh"
 APACHE_CONFIG_DIR="/etc/apache2"
@@ -228,6 +228,7 @@ extract_scripts
 copy_sql_patch_files
 copy_readme_files
 
+echo "REALOPINSIGHT_VERSION=$REALOPINSIGHT_VERSION" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_INSTALL_PREFIX=${REALOPINSIGHT_INSTALL_PREFIX}" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_HOME=$REALOPINSIGHT_WWW_HOME" >> $INSTALL_MANIFEST
 echo "REALOPINSIGHT_WWW_CONFIG_PATH=$REALOPINSIGHT_WWW_CONFIG_PATH" >> $INSTALL_MANIFEST

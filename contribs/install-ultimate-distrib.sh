@@ -1,3 +1,4 @@
+#!/bin/bash
 # ------------------------------------------------------------------------ #
 # File: install-ultimate-distrib.sh                                        #
 # Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
@@ -8,16 +9,14 @@
 # Read legal notice & use terms: http://legal.realopinsight.com            #
 #--------------------------------------------------------------------------#
 
-#!/bin/bash
-
 
 set -e
 set -u
 
 if [ -e ./INSTALL.MANIFEST ]; then
   . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
-  SQLITE3="$REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
-  export LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/bin
+  SQLITE3="LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/lib $REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
+  REAlOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
 else
   echo "INSTALL.MANIFEST not found"
   exit 1
@@ -269,6 +268,7 @@ copy_distribution_files()
 install_ultimate_distrib() 
 {
   echo "==>Installing RealOpInsight Ultimate..."
+  stop_services
   check_root_user
   check_www_user
   check_www_group
@@ -277,8 +277,8 @@ install_ultimate_distrib()
   copy_distribution_files
   
   echo "DEBUG: Setting file permissions..."
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run}
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_WWW_HOME}/run
+  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run} \
+                                ${REALOPINSIGHT_WWW_HOME}/run
   
   echo "DEBUG: Activating Apache's Specific Settings..."
   a2enconf realopinsight-ultimate
@@ -292,7 +292,7 @@ install_ultimate_distrib()
 
 upgrade_ultimate_distrib()
 {
-  echo "DEBUG : Upgrading RealOpInsight Ultimate to version ${REAlOPINSIGHT_TARGET_VERSION}..."
+  echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REAlOPINSIGHT_VERSION}..."
   stop_services
   make_backup
   reload_services
@@ -312,7 +312,7 @@ prompt_copyright
 echo
 echo "What do you want to do?"
 echo
-echo "i) New installation"
+echo "n) New installation"
 echo "u) Upgrade"
 echo "q|Q) Quit"
 echo
@@ -320,14 +320,11 @@ echo
 while true; do
   read -p "Type a response " rep
   case $rep in
-    i) install_ultimate_distrib
-       break
-    ;;
+    n) install_ultimate_distrib
+       break;;
     u) upgrade_ultimate_distrib
-       break
-    ;;
-    q|Q) exit 0
-        ;;
+       break;;
+    q|Q) break;;
     *) echo -n "Invalid input! ";;
     esac
 done
