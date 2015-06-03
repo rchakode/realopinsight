@@ -12,7 +12,6 @@
 
 set -u
 set -e
-set -x
 
 print_usage()
 {
@@ -32,11 +31,13 @@ check_usage()
 get_absolute_path()
 {
   path=$1
-  if [ "${path:0:1}" = "/" ]; then
-    echo "$path"
-  else
-    echo "$PWD/$path"
-  fi
+  case $path in
+    /*) 
+      ;;
+    *) path=$PWD/$path
+      ;;
+  esac
+  echo "$path"
 }
 
 
@@ -66,7 +67,16 @@ create_bundle_fs_tree()
      echo "Directory already exist: ${DISTRIB_PKG_NAME}"
      exit 1
   fi
-  mkdir -p ${DISTRIB_PKG_NAME}/{bin,sbin,lib,etc,var,www,sql,scripts/init.d}
+  install -d $DISTRIB_PKG_NAME
+  install -d $DISTRIB_PKG_NAME/bin
+  install -d $DISTRIB_PKG_NAME/sbin
+  install -d $DISTRIB_PKG_NAME/lib
+  install -d $DISTRIB_PKG_NAME/etc
+  install -d $DISTRIB_PKG_NAME/var
+  install -d $DISTRIB_PKG_NAME/www
+  install -d $DISTRIB_PKG_NAME/sql
+  install -d $DISTRIB_PKG_NAME/scripts
+  install -d $DISTRIB_PKG_NAME/scripts/init.d
 }
 
 
