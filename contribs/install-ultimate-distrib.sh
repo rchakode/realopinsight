@@ -16,7 +16,7 @@ set -u
 if [ -e ./INSTALL.MANIFEST ]; then
   . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
   SQLITE3="LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/lib $REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
-  REAlOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
+  REALOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
 else
   echo "INSTALL.MANIFEST not found"
   exit 1
@@ -189,11 +189,11 @@ upgrade_database()
 
 make_backup()
 {
-  echo -n "DEBUG : Backup current installation to ${REAlOPINSIGHT_BACKUP_FILE}..."
+  echo -n "DEBUG : Backup current installation to ${REALOPINSIGHT_BACKUP_FILE}..."
   tar --same-owner \
       --exclude ${REALOPINSIGHT_APP_DIR}/run \
       -zcf \
-      ${REAlOPINSIGHT_BACKUP_FILE} \
+      ${REALOPINSIGHT_BACKUP_FILE} \
       ${REALOPINSIGHT_WWW_DIR} \
       ${REALOPINSIGHT_APP_DIR}
 
@@ -209,8 +209,8 @@ make_backup()
 
 make_restore()
 {
-  echo -n "DEBUG : Restoring system from ${REAlOPINSIGHT_BACKUP_FILE} ..."
-  tar --same-owner -zxf ${REAlOPINSIGHT_BACKUP_FILE} -C /
+  echo -n "DEBUG : Restoring system from ${REALOPINSIGHT_BACKUP_FILE} ..."
+  tar --same-owner -zxf ${REALOPINSIGHT_BACKUP_FILE} -C /
   if [ $? -eq 0 ]; then
     echo "done"
   else
@@ -292,7 +292,7 @@ install_ultimate_distrib()
 
 upgrade_ultimate_distrib()
 {
-  echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REAlOPINSIGHT_VERSION}..."
+  echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
   stop_services
   make_backup
   reload_services
@@ -300,7 +300,7 @@ upgrade_ultimate_distrib()
   upgrade_database
   install_initd_scripts
   start_services
-  echo "DEBUG: Upgrade completed. Backup file: ${REAlOPINSIGHT_BACKUP_FILE}"
+  echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"
 }
 
 
