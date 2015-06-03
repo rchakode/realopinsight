@@ -191,11 +191,11 @@ make_backup()
 {
   echo -n "DEBUG : Backup current installation to ${REALOPINSIGHT_BACKUP_FILE}..."
   tar --same-owner \
-      --exclude ${REALOPINSIGHT_APP_DIR}/run \
+      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/run \
       -zcf \
       ${REALOPINSIGHT_BACKUP_FILE} \
-      ${REALOPINSIGHT_WWW_DIR} \
-      ${REALOPINSIGHT_APP_DIR}
+      ${REALOPINSIGHT_WWW_HOME} \
+      ${REALOPINSIGHT_INSTALL_PREFIX}
 
   if [ $? -eq 0 ]; then
     echo "done"
@@ -295,7 +295,6 @@ upgrade_ultimate_distrib()
   echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
   stop_services
   make_backup
-  reload_services
   copy_distribution_files
   upgrade_database
   install_initd_scripts
