@@ -162,7 +162,7 @@ get_user_group()
   USER=$1
   GROUP="UNSET"
   if [ ! -z "$1" ]; then
-    GROUP=$(id $USER | cut -d' ' -f2 | awk -F "(" '{sub("\)", "", $2); print $2}')
+    GROUP=$(id $USER | cut -d' ' -f2 | sed 's/[=(| )]/ /g' | awk '{print $3}')
     echo $GROUP
   fi
 }
