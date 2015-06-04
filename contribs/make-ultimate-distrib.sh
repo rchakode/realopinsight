@@ -212,6 +212,11 @@ if [ $WWW_USER = "UNSET" ] || [ $WWW_GROUP = "UNSET" ]; then
   exit 1
 fi
 
+if [ -z "$SQLITE3" ]; then
+  echo "sqlite3 not found"
+  exit 1
+fi
+
 # start processing
 check_file $FCGI_FILE
 check_file $REPORTD_FILE
