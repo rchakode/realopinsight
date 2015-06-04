@@ -52,6 +52,7 @@ private:
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
   Wt::WText* m_infoBox;
+  Wt::WText m_licenseMsgBox;
 
   void handleAuthentication(void);
   void handleLoginFailed(std::string data);

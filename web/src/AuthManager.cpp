@@ -104,12 +104,21 @@ void AuthManager::createLoggedInView(void)
   try {
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
     if (! checkLicense() && m_dbSession->isLoggedAdmin()) {
-      QString msg = QString("<div class=\"alert alert-danger\">"
-                            "You're running a non activated (limited) version of RealOpInsight Ultimate."
-                            " Please go to <a href=\"%1\">%1</a>"
-                            " in order to get an activation license key."
-                            "</div>").arg(PKG_URL);
-      bindString("update-banner", msg.toStdString());
+      // This is put into the code to avoid quick hack in translation file
+      Wt::WText* licenseMsgBox = new Wt::WText(
+            QString(
+              "<div id=\"license-msg-box\" class=\"alert alert-danger\">"
+              "You're running a non activated (limited) version of RealOpInsight Ultimate."
+              " Please go to <a href=\"%1\">%1</a>"
+              " in order to get an activation license key."
+              " <button id=\"btn-license-gotit\">Got it</button>"
+              " <script>$('#btn-license-gotit').click(function(){$('#license-msg-box').hide();});</script>"
+              "</div>").arg(PKG_URL)
+            .toStdString()
+            , Wt::XHTMLText);
+      licenseMsgBox->setToolTip(Q_TR("Click to hide this message"));
+      licenseMsgBox->clicked().connect(std::bind(  [=]{ licenseMsgBox->hide(); })  );
+      bindWidget("update-banner", licenseMsgBox);
     } else {
       bindEmpty("update-banner");
     }
