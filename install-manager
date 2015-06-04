@@ -314,7 +314,7 @@ install_ultimate() {
   sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
   a2enmod fastcgi || true
   a2enconf realopinsight-ultimate || true 
-  service apache2 reload
+  service apache2 restart
   
   echo "DEBUG : Setting up RealOpInsight QoS data collector"
   update-rc.d realopinsight-reportd defaults
