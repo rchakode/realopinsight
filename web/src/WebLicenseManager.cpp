@@ -28,7 +28,7 @@
 
 
 namespace {
-  int MAX_SERVICES_PER_VIEW_STARTER = 50;
+  int MAX_SERVICES_PER_VIEW_STARTER = 1024;
 }
 
 LicenseActivationBase::LicenseActivationBase(const QString& version)
