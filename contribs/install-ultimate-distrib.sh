@@ -116,10 +116,10 @@ check_prerequisites()
   if [ -z "$MOD_FASTCGI" ]; then
     echo "ERROR: Apache Module mod_fastcgi is not enabled."
     echo ""
-    echo "To install it manually:"
-    echo " $ sudo apt-get install libapache2-mod-fastcgi"
-    echo " $ a2enmod fastcgi"
-    echo "**NOTE**: On Ubuntu this package can be provided by the following repository:"
+    echo "  To install it manually:"
+    echo "    $ sudo apt-get install libapache2-mod-fastcgi"
+    echo "    $ a2enmod fastcgi"
+    echo "  **NOTE**: On Ubuntu this package can be provided by the following repository:"
     echo "          => http://us.archive.ubuntu.com/ubuntu/"
     exit 1
   fi
@@ -131,9 +131,9 @@ prompt_to_get_current_db_version()
   echo
   echo "Which version of RealOpInsight Ultimate is current installed ?"
   echo
-  echo "1) 2014b7"
-  echo "2) 2014b8"
-  echo "q|Q) Quit"
+  echo "    1) 2014b7"
+  echo "    2) 2014b8"
+  echo "    q|Q) Quit"
   echo
 
   while true; do
@@ -311,9 +311,9 @@ prompt_copyright
 echo
 echo "What do you want to do?"
 echo
-echo "n) New installation"
-echo "u) Upgrade"
-echo "q|Q) Quit"
+echo "    n) New installation"
+echo "    u) Upgrade"
+echo "    q|Q) Quit"
 echo
 
 while true; do
