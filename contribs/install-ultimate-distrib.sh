@@ -295,8 +295,8 @@ upgrade_ultimate_distrib()
   echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
   stop_services
   make_backup
-  copy_distribution_files
   upgrade_database
+  copy_distribution_files
   install_initd_scripts
   start_services
   echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"
