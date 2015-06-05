@@ -137,7 +137,7 @@ prompt_to_get_current_db_version()
   echo
 
   while true; do
-    read -p "Type a response " rep
+    read -p "Type a response: " rep
     case $rep in
          1) INSTALLED_VERSION="2014b7"
              break
@@ -317,7 +317,7 @@ echo "    q|Q) Quit"
 echo
 
 while true; do
-  read -p "Type a response " rep
+  read -p "Type a response: " rep
   case $rep in
     n) install_ultimate_distrib
        break;;
