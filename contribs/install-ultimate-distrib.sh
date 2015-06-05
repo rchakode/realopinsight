@@ -129,7 +129,7 @@ check_prerequisites()
 prompt_to_get_current_db_version()
 {
   echo
-  echo "Which version of RealOpInsight Ultimate is current installed ?"
+  echo "Which version of RealOpInsight Ultimate is currently installed ?"
   echo
   echo "    1) 2014b7"
   echo "    2) 2014b8"
