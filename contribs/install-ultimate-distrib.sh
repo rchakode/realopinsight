@@ -173,8 +173,6 @@ update_db_2015r1()
 
 upgrade_database()
 {
-  prompt_to_get_current_db_version
-
   if [ "${INSTALLED_VERSION}" == "2014b7" ]; then
     update_db_2014b8
     update_db_2015r1
@@ -293,10 +291,11 @@ install_ultimate_distrib()
 upgrade_ultimate_distrib()
 {
   echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
+  prompt_to_get_current_db_version
   stop_services
   make_backup
-  upgrade_database
   copy_distribution_files
+  upgrade_database
   install_initd_scripts
   start_services
   echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"
