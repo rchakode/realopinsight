@@ -36,7 +36,7 @@ class LicenseActivationBase : public WebPreferencesBase
 {
 public:
   enum PackageT {
-    UltimateStarter = 10,
+    UltimateStarter = 5,
     UltimateSmallBusiness = 20,
     UltimateMiddleBusiness = 50,
     UltimateEnterprise = 100,
