@@ -252,8 +252,9 @@ create_destination_fs_tree()
 
 copy_distribution_files()
 {
+  create_destination_fs_tree
   echo "DEBUG: Copying core distribution files..."
-  cp -r www/* ${REALOPINSIGHT_WWW_HOME}/
+  cp -rf www/* ${REALOPINSIGHT_WWW_HOME}/
   install -D -m 755 lib/* ${REALOPINSIGHT_INSTALL_PREFIX}/lib
   install -D -m 755 bin/* ${REALOPINSIGHT_INSTALL_PREFIX}/bin
   install -D -m 755 sbin/* ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
@@ -273,7 +274,6 @@ install_ultimate_distrib()
   check_www_user
   check_www_group
   check_prerequisites
-  create_destination_fs_tree
   copy_distribution_files
   
   echo "DEBUG: Setting file permissions..."
