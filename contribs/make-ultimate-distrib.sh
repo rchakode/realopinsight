@@ -207,7 +207,6 @@ WWW_GROUP=$(get_user_group $WWW_USER || echo "UNSET")
 
 REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
 SQLITE3=$(which sqlite3 || echo "")
-DOT=$(which dot || echo "")
 
 
 if [ $WWW_USER = "UNSET" ] || [ $WWW_GROUP = "UNSET" ]; then
@@ -221,13 +220,6 @@ if [ -z "$SQLITE3" ]; then
 fi
 
 
-if [ -z "$DOT" ]; then
-  echo "dot: command not found"
-  exit 1
-fi
-
-
-
 # start processing
 check_file $FCGI_FILE
 check_file $REPORTD_FILE
@@ -239,7 +231,6 @@ copy_config_files
 copy_www_files
 extract_binary_file $REPORTD_FILE sbin
 extract_binary_file ${SQLITE3} bin
-extract_binary_file ${DOT} bin
 
 extract_scripts
 copy_sql_patch_files
