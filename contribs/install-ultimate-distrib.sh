@@ -127,7 +127,7 @@ check_apache()
 
 check_graphviz()
 {
-  echo "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  echo "DEBUG: Checking Graphviz => ${DOT:=`which dot`}... "
   if [ -z "$DOT" ]; then
     echo "ERROR : Graphviz not found. To install it: sudo apt-get install graphviz"
     exit 1
@@ -171,7 +171,7 @@ prompt_to_get_current_db_version()
 
 update_db_2014b8()
 {
-  echo -n "DEBUG : Updating database to 2014b8..."
+  echo -n "DEBUG: Updating database to 2014b8..."
   su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b8.sql"
   restore_backup_on_error
 }
@@ -179,7 +179,7 @@ update_db_2014b8()
 
 update_db_2015r1()
 {
-  echo -n "DEBUG : Updating database to 2015r1..."
+  echo -n "DEBUG: Updating database to 2015r1..."
   su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2015r1.sql"
   restore_backup_on_error
 }
@@ -201,7 +201,7 @@ upgrade_database()
 
 make_backup()
 {
-  echo -n "DEBUG : Backup current installation to ${REALOPINSIGHT_BACKUP_FILE}..."
+  echo -n "DEBUG: Backup current installation to ${REALOPINSIGHT_BACKUP_FILE}..."
   tar --same-owner \
       --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/run \
       -zcf \
@@ -219,7 +219,7 @@ make_backup()
 
 make_restore()
 {
-  echo -n "DEBUG : Restoring system from ${REALOPINSIGHT_BACKUP_FILE} ..."
+  echo -n "DEBUG: Restoring system from ${REALOPINSIGHT_BACKUP_FILE} ..."
   tar --same-owner -zxf ${REALOPINSIGHT_BACKUP_FILE} -C /
   if [ $? -eq 0 ]; then
     echo "done"
@@ -311,7 +311,7 @@ install_ultimate_distrib()
 
 upgrade_ultimate_distrib()
 {
-  echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
+  echo "DEBUG: Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
   check_prerequisites
   prompt_to_get_current_db_version
   stop_services
