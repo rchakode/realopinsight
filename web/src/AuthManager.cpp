@@ -107,12 +107,10 @@ void AuthManager::createLoggedInView(void)
       // This is put into the code to avoid quick hack in translation file
       Wt::WText* licenseMsgBox = new Wt::WText(
             QString(
-              "<div id=\"license-msg-box\" class=\"alert alert-danger\">"
+              "<div class=\"alert alert-danger\">"
               "You're running a non activated (limited) version of RealOpInsight Ultimate."
-              " Please go to <a href=\"%1\">%1</a>"
-              " in order to get an activation license key."
-              " <button id=\"btn-license-gotit\">Got it</button>"
-              " <script>$('#btn-license-gotit').click(function(){$('#license-msg-box').hide();});</script>"
+              " Please go to %1 in order to get an activation license key."
+              " <button>Got it</button>"
               "</div>").arg(PKG_URL)
             .toStdString()
             , Wt::XHTMLText);
