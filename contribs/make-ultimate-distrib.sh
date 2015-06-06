@@ -202,10 +202,13 @@ INSTALLATION_FILE="${CONTRIBS_DIR}/install-ultimate-distrib.sh"
 APACHE_CONFIG_DIR="/etc/apache2"
 FCGI_FILE="${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi"
 REPORTD_FILE="${REALOPINSIGHT_INSTALL_PREFIX}/sbin/realopinsight-reportd"
-SQLITE3=$(which sqlite3 || echo "")
+WWW_USER=$(get_www_user || echo "UNSET")
+WWW_GROUP=$(get_user_group $WWW_USER || echo "UNSET")
+
 REPORTD_INIT_SCRIPT="/etc/init.d/realopinsight-reportd"
-WWW_USER=$(get_www_user)
-WWW_GROUP=$(get_user_group $WWW_USER)
+SQLITE3=$(which sqlite3 || echo "")
+DOT=$(which dot || echo "")
+
 
 if [ $WWW_USER = "UNSET" ] || [ $WWW_GROUP = "UNSET" ]; then
   echo "Invalid www_user:www_group => $WWW_USER:$WWW_GROUP"
@@ -213,9 +216,17 @@ if [ $WWW_USER = "UNSET" ] || [ $WWW_GROUP = "UNSET" ]; then
 fi
 
 if [ -z "$SQLITE3" ]; then
-  echo "sqlite3 not found"
+  echo "sqlite3: not found"
   exit 1
 fi
+
+
+if [ -z "$DOT" ]; then
+  echo "dot: command not found"
+  exit 1
+fi
+
+
 
 # start processing
 check_file $FCGI_FILE
@@ -228,6 +239,7 @@ copy_config_files
 copy_www_files
 extract_binary_file $REPORTD_FILE sbin
 extract_binary_file ${SQLITE3} bin
+extract_binary_file ${DOT} bin
 
 extract_scripts
 copy_sql_patch_files

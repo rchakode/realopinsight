@@ -28,7 +28,6 @@ SCRIPTNAME=/etc/init.d/$NAME
 USER=www-data
 DEFAULT_START_OPTIONS="--background --quiet --chuid $USER"
 DEFAULT_STOP_OPTIONS="--quiet --chuid $USER"
-echo "$DAEMON"
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0

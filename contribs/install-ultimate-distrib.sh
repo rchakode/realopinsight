@@ -247,7 +247,6 @@ create_destination_fs_tree()
 }
 
 
-
 copy_distribution_files()
 {
   create_destination_fs_tree
@@ -263,17 +262,15 @@ copy_distribution_files()
 }
 
 
-
 install_ultimate_distrib() 
 {
-  echo "==>Installing RealOpInsight Ultimate..."
+  echo "DEBUG: Starting the installation of RealOpInsight Ultimate $REALOPINSIGHT_VERSION..."
   stop_services
   check_root_user
   check_www_user
   check_www_group
   check_prerequisites
   copy_distribution_files
-  
   echo "DEBUG: Setting file permissions..."
   chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run} \
                                 ${REALOPINSIGHT_WWW_HOME}/run
