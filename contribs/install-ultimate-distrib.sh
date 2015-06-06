@@ -82,6 +82,8 @@ check_root_user()
 }
 
 
+
+
 install_initd_scripts()
 {
   install -m 755 scripts/init.d/realopinsight-reportd /etc/init.d/
@@ -102,7 +104,7 @@ start_services()
 }
 
 
-check_prerequisites()
+check_apache()
 {
   APACHECTL=$(which apachectl) || true
   if [ -z "APACHECTL" ]; then
@@ -111,7 +113,7 @@ check_prerequisites()
     echo " $ sudo apt-get install apache2"
     exit 1
   fi
-  
+
   MOD_FASTCGI=$($APACHECTL -M | grep "fastcgi\_module") || true
   if [ -z "$MOD_FASTCGI" ]; then
     echo "ERROR: Apache Module mod_fastcgi is not enabled."
@@ -123,6 +125,21 @@ check_prerequisites()
     echo "          => http://us.archive.ubuntu.com/ubuntu/"
     exit 1
   fi
+}
+
+
+check_graphiz()
+{
+  echo -n "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  [ -z "$DOT" ] && echo "ERROR : Graphviz not found." && exit 1
+  echo "done"
+}
+
+
+check_prerequisites()
+{
+  check_apache
+  check_graphviz
 }
 
 
