@@ -12,7 +12,7 @@
 
 set -e
 set -u
-
+set -x
 if [ -e ./INSTALL.MANIFEST ]; then
   . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
   SQLITE3="LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/lib $REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
@@ -131,7 +131,10 @@ check_apache()
 check_graphviz()
 {
   echo "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
-  [ -z "$DOT" ] && echo "ERROR : Graphviz not found. To install it: sudo apt-get install graphviz" && exit 1
+  if [ -z "$DOT" ]; then
+    echo "ERROR : Graphviz not found. To install it: sudo apt-get install graphviz"
+    exit 1
+  fi
 }
 
 
