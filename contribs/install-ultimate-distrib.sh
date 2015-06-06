@@ -116,7 +116,7 @@ check_apache()
 
   MOD_FCGID=$($APACHECTL -M | grep "fcgid\_module") || true
   if [ -z "$MOD_FCGID" ]; then
-    echo "ERROR: Apache Module mod_fastcgi is not enabled."
+    echo "ERROR: Apache Module mod_fcgid is not enabled."
     echo ""
     echo "  To install it manually:"
     echo "    $ sudo apt-get install libapache2-mod-fcgid"
