@@ -12,7 +12,10 @@
 
 set -e
 set -u
-set -x
+
+
+
+# Source the installation manifest and set misc variables
 if [ -e ./INSTALL.MANIFEST ]; then
   . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
   SQLITE3="LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/lib $REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
@@ -21,8 +24,6 @@ else
   echo "INSTALL.MANIFEST not found"
   exit 1
 fi
-
-
 
 
 # Print help
