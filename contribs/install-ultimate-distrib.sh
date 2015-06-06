@@ -14,15 +14,14 @@ set -e
 set -u
 
 
-
 # Source the installation manifest and set misc variables
-if [ -e ./INSTALL.MANIFEST ]; then
+if [ ! -e ./INSTALL.MANIFEST ]; then
+  echo "INSTALL.MANIFEST not found"
+  exit 1
+else
   . ./INSTALL.MANIFEST  # source path settings. e.g. WWW_USER
   SQLITE3="LD_LIBRARY_PATH=$REALOPINSIGHT_INSTALL_PREFIX/lib $REALOPINSIGHT_INSTALL_PREFIX/bin/sqlite3"
   REALOPINSIGHT_BACKUP_FILE=backup_`date +%Y-%M-%d_%H-%M-%S`.tar.gz
-else
-  echo "INSTALL.MANIFEST not found"
-  exit 1
 fi
 
 
@@ -115,19 +114,16 @@ check_apache()
     exit 1
   fi
 
-  MOD_FASTCGI=$($APACHECTL -M | grep "fastcgi\_module") || true
-  if [ -z "$MOD_FASTCGI" ]; then
+  MOD_FCGID=$($APACHECTL -M | grep "fcgid\_module") || true
+  if [ -z "$MOD_FCGID" ]; then
     echo "ERROR: Apache Module mod_fastcgi is not enabled."
     echo ""
     echo "  To install it manually:"
-    echo "    $ sudo apt-get install libapache2-mod-fastcgi"
-    echo "    $ a2enmod fastcgi"
-    echo "  **NOTE**: On Ubuntu this package can be provided by the following repository:"
-    echo "          => http://us.archive.ubuntu.com/ubuntu/"
+    echo "    $ sudo apt-get install libapache2-mod-fcgid"
+    echo "    $ a2enmod fcgid"
     exit 1
   fi
 }
-
 
 check_graphviz()
 {
@@ -141,10 +137,10 @@ check_graphviz()
 
 check_prerequisites()
 {
+  echo "DEBUG: checking prerequisites..."
   check_apache
   check_graphviz
 }
-
 
 prompt_to_get_current_db_version()
 {
@@ -181,14 +177,12 @@ update_db_2014b8()
 }
 
 
-
 update_db_2015r1()
 {
   echo -n "DEBUG : Updating database to 2015r1..."
   su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2015r1.sql"
   restore_backup_on_error
 }
-
 
 
 upgrade_database()
@@ -223,8 +217,6 @@ make_backup()
   fi
 }
 
-
-
 make_restore()
 {
   echo -n "DEBUG : Restoring system from ${REALOPINSIGHT_BACKUP_FILE} ..."
@@ -236,7 +228,6 @@ make_restore()
     exit 1
   fi
 }
-
 
 
 restore_backup_on_error()
@@ -282,6 +273,25 @@ copy_distribution_files()
 }
 
 
+
+apply_apache_settings()
+{
+  echo "DEBUG: Applying Apache settings..."
+  # create mod-fcgid socket path
+  APACHE_FCGI_SOCK=/var/lib/apache2/fcgid/sock
+  mkdir -p $APACHE_FCGI_SOCK
+  chown -R $WWW_USER:$WWW_GROUP $APACHE_FCGI_SOCK
+  
+  # Apply RealOpInsight Ultimate Apache settings
+  chown -R $WWW_USER:$WWW_GROUP \
+           ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run} \
+           ${REALOPINSIGHT_WWW_HOME}/run
+  
+  a2disconf realopinsight-ultimate || echo "a2disconf realopinsight-ultimate failed"
+  a2enconf realopinsight-ultimate
+}
+
+
 install_ultimate_distrib() 
 {
   echo "DEBUG: Starting the installation of RealOpInsight Ultimate $REALOPINSIGHT_VERSION..."
@@ -291,13 +301,7 @@ install_ultimate_distrib()
   check_www_group
   check_prerequisites
   copy_distribution_files
-  echo "DEBUG: Setting file permissions..."
-  chown -R $WWW_USER:$WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run} \
-                                ${REALOPINSIGHT_WWW_HOME}/run
-  
-  echo "DEBUG: Activating Apache's Specific Settings..."
-  a2enconf realopinsight-ultimate
-  
+  apply_apache_settings
   echo "DEBUG: Setting Up Init Scripts and Starting Services.."
   install_initd_scripts
   start_services
@@ -308,11 +312,13 @@ install_ultimate_distrib()
 upgrade_ultimate_distrib()
 {
   echo "DEBUG : Starting upgrade to RealOpInsight  Ultimate version ${REALOPINSIGHT_VERSION}..."
+  check_prerequisites
   prompt_to_get_current_db_version
   stop_services
   make_backup
   copy_distribution_files
   upgrade_database
+  apply_apache_settings
   install_initd_scripts
   start_services
   echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"
