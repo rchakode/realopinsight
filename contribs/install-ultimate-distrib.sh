@@ -128,11 +128,10 @@ check_apache()
 }
 
 
-check_graphiz()
+check_graphviz()
 {
-  echo -n "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
-  [ -z "$DOT" ] && echo "ERROR : Graphviz not found." && exit 1
-  echo "done"
+  echo "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
+  [ -z "$DOT" ] && echo "ERROR : Graphviz not found. To install it: sudo apt-get install graphviz" && exit 1
 }
 
 
