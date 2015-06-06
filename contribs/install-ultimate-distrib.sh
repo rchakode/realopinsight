@@ -284,7 +284,7 @@ apply_apache_settings()
   
   # Apply RealOpInsight Ultimate Apache settings
   chown -R $WWW_USER:$WWW_GROUP \
-           ${REALOPINSIGHT_INSTALL_PREFIX}/{data,log,run} \
+           ${REALOPINSIGHT_INSTALL_PREFIX}/{etc,data,log,run} \
            ${REALOPINSIGHT_WWW_HOME}/run
   
   a2disconf realopinsight-ultimate || echo "a2disconf realopinsight-ultimate failed"
