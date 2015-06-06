@@ -39,16 +39,16 @@ prompt_copyright()
   echo
   echo "Thanks for choosing RealOpInsight Ultimate."
   echo
-  echo "You are licensed to use this software under the terms of following licence: http://legal.realopinsight.com/"
+  echo "By installing this software, you accept its terms of use, as described here: http://legal.realopinsight.com/"
   echo
-  echo "Type 'y' to accept this license offer."
-  echo "Type 'n' to decline this license offer."
-  echo "Type 'r' to view this license offer."
+  echo "  Type 'y' to accept this license offer."
+  echo "  Type 'n' to decline this license offer."
+  echo "  Type 'r' to read the license offer."
   echo
   while true; do
     read -p "Do you accept the terms of the License ? y/N/r " rep
     case $rep in
-	  r) w3m http://legal.realopinsight.com ; echo ;;
+	  r) echo "Please read the terms of use at the following URL: http://legal.realopinsight.com" ; echo ;;
 	  y) break ;;
 	  *) exit 0 ;; 
     esac
