@@ -114,13 +114,13 @@ check_apache()
     exit 1
   fi
 
-  MOD_FCGID=$($APACHECTL -M | grep "fcgid\_module") || true
-  if [ -z "$MOD_FCGID" ]; then
-    echo "ERROR: Apache Module mod_fcgid is not enabled."
+  MOD_FASTCGID=$($APACHECTL -M | grep "fastcgi\_module") || true
+  if [ -z "$MOD_FASTCGID" ]; then
+    echo "ERROR: Apache Module mod_fastcgi is not enabled."
     echo ""
     echo "  To install it manually:"
-    echo "    $ sudo apt-get install libapache2-mod-fcgid"
-    echo "    $ a2enmod fcgid"
+    echo "    $ sudo apt-get install libapache2-mod-fastcgi"
+    echo "    $ a2enmod fastcgi"
     exit 1
   fi
 }
@@ -278,9 +278,9 @@ apply_apache_settings()
 {
   echo "DEBUG: Applying Apache settings..."
   # create mod-fcgid socket path
-  APACHE_FCGI_SOCK=/var/lib/apache2/fcgid/sock
-  mkdir -p $APACHE_FCGI_SOCK
-  chown -R $WWW_USER:$WWW_GROUP $APACHE_FCGI_SOCK
+  #APACHE_FCGI_SOCK=/var/lib/apache2/fcgid/sock
+  #mkdir -p $APACHE_FCGI_SOCK
+  #chown -R $WWW_USER:$WWW_GROUP $APACHE_FCGI_SOCK
   
   # Apply RealOpInsight Ultimate Apache settings
   chown -R $WWW_USER:$WWW_GROUP \
