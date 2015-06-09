@@ -9,4 +9,4 @@ INSTALLATION STEPS
 Execute the following command to start the step-by-step installation process.
 Messages will guide you throughout the installation.
 
-sudo ./appliance-ultimate-apply-patch.sh 
+sudo ./install-ultimate-distrib.sh
