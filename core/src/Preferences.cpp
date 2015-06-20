@@ -32,24 +32,16 @@
 
 Preferences::Preferences(const QString& settingFile)
   : m_settings(new Settings(settingFile)),
-    m_currentSourceIndex(0),
-    m_sourceStates(new QBitArray(MAX_SRCS))
+    m_currentSourceIndex(0)
 {
   updateSourceStates();
 }
 
 Preferences::Preferences(void)
   : m_settings(new Settings()),
-    m_currentSourceIndex(0),
-    m_sourceStates(new QBitArray(MAX_SRCS))
+    m_currentSourceIndex(0)
 {
   updateSourceStates();
-}
-
-
-Preferences::~Preferences()
-{
-  delete m_sourceStates;
 }
 
 
@@ -63,21 +55,29 @@ void Preferences::loadProperties(void)
 QString Preferences::sourceStatesSerialized(void)
 {
   QString str = "";
-  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates->at(i)? "1" : "0";
+  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates.at(i)? "1" : "0";
   return str;
+}
+
+
+
+void Preferences::resetSourceStates(void)
+{
+  m_sourceStates.clear();
+  m_sourceStates.resize(MAX_SRCS);
+  for (int i=0; i < MAX_SRCS; ++i) {
+    m_sourceStates.setBit(i, false);
+  }
 }
 
 
 void Preferences::updateSourceStates(void)
 {
+  resetSourceStates();
   QString content = m_settings->value(Settings::GLOBAL_SRC_BUCKET_KEY).toString();
-  if (content.isEmpty()) {
+  if (! content.isEmpty()) {
     for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, false);
-    }
-  } else {
-    for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates->setBit(i, content.at(i) == '1');
+      m_sourceStates.setBit(i, content.at(i) == '1');
     }
   }
 }
@@ -86,7 +86,7 @@ void Preferences::updateSourceStates(void)
 int Preferences::firstSourceSet()
 {
   int idx = 0;
-  while (idx < MAX_SRCS && ! m_sourceStates->at(idx)) {++idx;}
+  while (idx < MAX_SRCS && ! m_sourceStates.at(idx)) {++idx;}
   return ((idx < MAX_SRCS)? idx : -1);
 }
 
@@ -94,6 +94,6 @@ int Preferences::firstSourceSet()
 int Preferences::activeSourcesCount(void)
 {
   updateSourceStates();
-  return m_sourceStates->count(true);
+  return m_sourceStates.count(true);
 }
 

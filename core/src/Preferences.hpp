@@ -47,10 +47,9 @@ public:
 
   Preferences(const QString& settingFile);
   Preferences(void);
-  virtual ~Preferences();
-  QBitArray* getSourceStates() const { return m_sourceStates; }
-  bool isSetSource(int idx) {return (idx < MAX_SRCS && m_sourceStates)? m_sourceStates->at(idx) : false; }
-  void setSourceState(int index, int value) {m_sourceStates->setBit(index, value);}
+  QBitArray getSourceStates() const { return m_sourceStates; }
+  bool isSetSource(int idx) {return (idx < MAX_SRCS)? m_sourceStates.at(idx) : false; }
+  void setSourceState(int index, int value) {m_sourceStates.setBit(index, value);}
   virtual void updateSourceStates();
   int activeSourcesCount(void);
 
@@ -77,7 +76,7 @@ protected :
   void sync(void) {m_settings->sync();}
   QString keyValue(const QString& key, const QString& defaultValue) {return m_settings->value(key, defaultValue).toString(); }
   void setKeyValue(const QString & _key, const QString & _value) { m_settings->setKeyValue(_key, _value); m_settings->sync();}
-  bool getSourceState(int index) {return m_sourceStates->at(index);}
+  bool getSourceState(int index) {return m_sourceStates.at(index);}
 
 protected Q_SLOTS:
   virtual void applyChanges(void) = 0;
@@ -89,8 +88,10 @@ protected Q_SLOTS:
 protected:
   Settings* m_settings;
   int m_currentSourceIndex;
-  QBitArray* m_sourceStates;
+  QBitArray m_sourceStates;
 
+private:
+  void resetSourceStates(void);
 };
 
 
