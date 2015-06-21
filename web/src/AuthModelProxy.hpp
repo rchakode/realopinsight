@@ -25,7 +25,6 @@
 #ifndef LDAPAUTHMODEL_HPP
 #define LDAPAUTHMODEL_HPP
 
-#include "WebPreferences.hpp"
 #include <Wt/Auth/AuthModel>
 #include <Wt/Auth/Login>
 #include <QString>

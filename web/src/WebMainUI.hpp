@@ -34,6 +34,9 @@
 #include "WebUtils.hpp"
 #include "WebNotificationManager.hpp"
 #include "WebLicenseManager.hpp"
+#include "WebNotificationPreferences.hpp"
+#include "WebAuthPreferences.hpp"
+#include "WebDataSourcePreferences.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
 #include <Wt/WApplication>
@@ -48,7 +51,6 @@
 
 class AuthManager;
 class ViewAclManagement;
-class WebPreferences;
 class WebMainUI;
 
 class CsvReportResource : public Wt::WResource
@@ -137,7 +139,9 @@ private:
 
   AuthManager* m_authManager;
   DbSession* m_dbSession;
-  WebPreferences* m_preferences;
+  WebDataSourcePreferences m_dataSourceSettingsForm;
+  WebNotificationPreferences m_notificationSettingsForm;
+  WebAuthPreferences m_authSettingsForm;
   WebLicenseManager* m_licenseMngtForm;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_mainStackedContents;
@@ -188,6 +192,11 @@ private:
   void handleDisplayOnlyTroubleStateChanged(void);
   void handleImportation(void);
   void handlePreview(void);
+  void handleDataSourceSetup(void);
+  void handleAuthSetup(void);
+  void handleNotificationSetup(void);
+  void handleChangePassword(void);
+  void handleDisplayUserProfile(void);
 
   /** other member functions */
   void addEvents(void);
@@ -228,6 +237,8 @@ private:
   Wt::WWidget* createNotificationSection(void);
   Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
   void updateLicenseMgntForm();
+
+  void unbindWidgets(void);
 };
 
 #endif // MAINWEBWINDOW_HPP

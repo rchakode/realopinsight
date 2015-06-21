@@ -23,7 +23,7 @@
  */
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
-#include "WebPreferences.hpp"
+#include "WebPreferencesBase.hpp"
 #include <tuple>
 #include <QFile>
 #include <Wt/Auth/HashFunction>

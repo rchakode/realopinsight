@@ -29,7 +29,6 @@
 #include <Wt/Auth/AuthWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/Auth/Login>
-#include "WebPreferences.hpp"
 
 class DbSession;
 class WebMainUI;

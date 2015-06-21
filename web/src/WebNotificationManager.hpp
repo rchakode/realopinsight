@@ -36,6 +36,7 @@ class WebNotificationManager : public Wt::WDialog
 public:
   WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent=0);
   ~WebNotificationManager();
+
   Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
   void show(void);
   void clearAllServicesData(void) {m_notificationTableView->clearAllServicesData(); }

@@ -101,7 +101,6 @@ HEADERS += \
     web/src/WebMainUI.hpp \
     web/src/WebUtils.hpp \
     web/src/AuthManager.hpp \
-    web/src/WebPreferences.hpp \
     web/src/Validators.hpp \
     web/src/LdapHelper.hpp\
     web/src/AuthModelProxy.hpp \
@@ -113,7 +112,10 @@ HEADERS += \
     web/src/WebNotificationManager.hpp \
     web/src/dbo/NotificationTableView.hpp \
     web/src/WebPreferencesBase.hpp \
-    web/src/WebLicenseManager.hpp
+    web/src/WebLicenseManager.hpp \
+    web/src/WebAuthPreferences.hpp \
+    web/src/WebDataSourcePreferences.hpp \
+    web/src/WebNotificationPreferences.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Settings.cpp \
@@ -152,7 +154,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebMainUI.cpp \
     web/src/WebUtils.cpp \
     web/src/AuthManager.cpp \
-    web/src/WebPreferences.cpp \
     web/src/LdapHelper.cpp \
     web/src/AuthModelProxy.cpp \
     web/src/Notificator.cpp \
@@ -160,7 +161,10 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebNotificationManager.cpp \
     web/src/dbo/NotificationTableView.cpp \
     web/src/WebPreferencesBase.cpp \
-    web/src/WebLicenseManager.cpp
+    web/src/WebLicenseManager.cpp \
+    web/src/WebAuthPreferences.cpp \
+    web/src/WebDataSourcePreferences.cpp \
+    web/src/WebNotificationPreferences.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \

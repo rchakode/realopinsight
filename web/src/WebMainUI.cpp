@@ -23,7 +23,6 @@
  */
 
 #include "dbo/ViewAclManagement.hpp"
-#include "WebPreferences.hpp"
 #include "AuthManager.hpp"
 #include "WebMainUI.hpp"
 #include "utilsCore.hpp"
@@ -80,7 +79,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_notificationSection(NULL),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_preferences(new WebPreferences()),
     m_licenseMngtForm(new WebLicenseManager(PKG_VERSION)),
     m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_fileUploadDialog(createDialog(tr("Select file to preview | %1").arg(APP_NAME).toStdString())),
@@ -90,7 +88,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_reportEndDatePicker(NULL),
     m_reportApplyAnchor(NULL)
 {
-  m_preferences->setEnabledInputs(false);
   setupMainUI();
   m_userAccountForm = createAccountPanel();
   m_changePasswordPanel = createPasswordPanel();
@@ -104,7 +101,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
 WebMainUI::~WebMainUI()
 {
-  delete m_preferences;
+  unbindWidgets();
   delete m_licenseMngtForm;
   delete m_fileUploadDialog;
   delete m_navbar;
@@ -116,12 +113,14 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::addEvents(void)
 {
-  m_preferences->operationCompleted().connect(this, &WebMainUI::showMessage);
-  m_preferences->authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
-  wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
-  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+  m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
+  m_notificationSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
+  m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
+  m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
+  connect(m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+  wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
 }
 
 void WebMainUI::showUserHome(void)
@@ -331,8 +330,8 @@ Wt::WWidget* WebMainUI::createNotificationSection(void)
 
 void WebMainUI::hideAdminSettingsMenu(void)
 {
-  m_preferences->showAuthSettingsWidgets(false);
-  m_preferences->showNotificationSettingsWidgets(false);
+  m_notificationSettingsForm.setHidden(true);
+  m_authSettingsForm.setHidden(true);
   wApp->doJavaScript("$('#userMenuBlock').hide();"
                      "$('#viewMenuBlock').hide();"
                      "$('#menu-auth-settings').hide();"
@@ -390,7 +389,7 @@ void WebMainUI::handleRefresh(void)
 
   int currentView = 1;
   for (auto& dashboard : m_dashboards) {
-    dashboard->initSettings(m_preferences);
+    dashboard->initSettings(& m_dataSourceSettingsForm);
     dashboard->runMonitor();
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
@@ -501,7 +500,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return ;
     }
-    dashboard->initialize(m_preferences);
+    dashboard->initialize(& m_dataSourceSettingsForm);
     if (dashboard->lastErrorState()) {
       showMessage(ngrt4n::OperationFailed, dashboard->lastErrorMsg().toStdString());
       delete dashboard;
@@ -511,8 +510,7 @@ void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
       DashboardMapT::Iterator result = m_dashboards.find(platformName);
       if (result != m_dashboards.end()) {
         showMessage(ngrt4n::OperationFailed,
-                    tr("A platfom with the same name "
-                       "already loaded (%1)").arg(platformName).toStdString());
+                    tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
         delete dashboard;
         dashboard = NULL;
       } else {
@@ -548,7 +546,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   switch (m_dbSession->loggedUser().role) {
     case DboUser::AdmRole: {
       settingPageTpl->bindWidget("info-box", m_infoBox);
-      m_preferences->setEnabledInputs(true);
+      m_dataSourceSettingsForm.setEnabledInputs(true);
 
       // Start menu
       std::string menuText = QObject::tr("Welcome").toStdString();
@@ -643,37 +641,25 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   }
 
   // monitoring settings menu
-  m_adminStackedContents->addWidget(m_preferences);
+  m_adminStackedContents->addWidget(&m_dataSourceSettingsForm);
   link = new Wt::WAnchor("#", Q_TR("Monitoring Data Sources"));
   settingPageTpl->bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
-  link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText(Q_TR("Monitoring Data Sources"));
-    m_adminStackedContents->setCurrentWidget(m_preferences);
-    m_preferences->showSourceSettings();
-  }));
+  link->clicked().connect(this, &WebMainUI::handleDataSourceSetup);
 
   // auth settings menu
-  m_adminStackedContents->addWidget(m_preferences);
+  m_adminStackedContents->addWidget(&m_authSettingsForm);
   link = new Wt::WAnchor("#", Q_TR("Authentication Backend"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
-    m_adminStackedContents->setCurrentWidget(m_preferences);
-    m_preferences->showAuthSettings();
-  }));
+  link->clicked().connect(this, &WebMainUI::handleAuthSetup);
 
   // notification settings menu
-  m_adminStackedContents->addWidget(m_preferences);
+  m_adminStackedContents->addWidget(& m_notificationSettingsForm);
   link = new Wt::WAnchor("#", Q_TR("Notification Settings"));
   settingPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(std::bind([=](){
-    m_adminPanelTitle->setText(Q_TR("Notification Settings"));
-    m_adminStackedContents->setCurrentWidget(m_preferences);
-    m_preferences->showNotificationSettings();
-  }));
+  link->clicked().connect(this, &WebMainUI::handleNotificationSetup);
 
 
   // my account menu
@@ -681,22 +667,14 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   link = new Wt::WAnchor("#", Q_TR("My Account"));
   settingPageTpl->bindWidget("menu-my-account", link);
   m_menuLinks.insert(MenuMyAccount, link);
-  link->clicked().connect(std::bind([=](){
-    m_userAccountForm->resetValidationState(false);
-    m_adminStackedContents->setCurrentWidget(m_userAccountForm);
-    m_adminPanelTitle->setText(Q_TR("My Account"));
-  }));
+  link->clicked().connect(this, &WebMainUI::handleDisplayUserProfile);
 
   // change password settings
   m_adminStackedContents->addWidget(m_changePasswordPanel);
   link = new Wt::WAnchor("#", "Change Password");
   settingPageTpl->bindWidget("menu-change-password", link);
   m_menuLinks.insert(MenuChangePassword, link);
-  link->clicked().connect(std::bind([=](){
-    m_adminStackedContents->setCurrentWidget(m_changePasswordPanel);
-    m_changePasswordPanel->reset();
-    m_adminPanelTitle->setText("Change password");
-  }));
+  link->clicked().connect(this, &WebMainUI::handleChangePassword);
 
   // license activation menu
   if (m_dbSession->isLoggedAdmin()) {
@@ -711,6 +689,14 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
 
   return settingPageTpl;
+}
+
+
+void WebMainUI::handleDataSourceSetup(void)
+{
+  m_adminPanelTitle->setText(Q_TR("Monitoring Data Sources"));
+  m_adminStackedContents->setCurrentWidget(&m_dataSourceSettingsForm);
+  m_dataSourceSettingsForm.updateContents();
 }
 
 
@@ -986,12 +972,12 @@ void WebMainUI::updateEventFeeds(void)
 void WebMainUI::handleAuthSystemChanged(int authSystem)
 {
   switch (authSystem) {
-    case WebPreferences::LDAP:
+    case WebPreferencesBase::LDAP:
       m_menuLinks[MenuLdapUsers]->setDisabled(false);
       wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', false);");
       break;
     default:
-      m_dbSession->deleteAuthSystemUsers(WebPreferences::LDAP);
+      m_dbSession->deleteAuthSystemUsers(WebPreferencesBase::LDAP);
       wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', true);");
       break;
   }
@@ -999,7 +985,7 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 
 void WebMainUI::handleLdapUsersMenu(void)
 {
-  if (m_preferences->getAuthenticationMode() != WebPreferences::LDAP) {
+  if (m_authSettingsForm.getAuthenticationMode() != WebPreferencesBase::LDAP) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Denied, please enable LDAP authentication first"));
   } else {
     m_adminStackedContents->setCurrentWidget(m_ldapUserManager);
@@ -1223,9 +1209,51 @@ void WebMainUI::handlePreview(void)
   }
 }
 
+
+void WebMainUI::handleAuthSetup(void)
+{
+  m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
+  m_adminStackedContents->setCurrentWidget(&m_authSettingsForm);
+  m_authSettingsForm.updateContents();
+}
+
+
+void WebMainUI::handleNotificationSetup(void)
+{
+  m_adminPanelTitle->setText(Q_TR("Notification Settings"));
+  m_adminStackedContents->setCurrentWidget(& m_notificationSettingsForm);
+  m_notificationSettingsForm.updateContents();
+}
+
+
+void WebMainUI::handleDisplayUserProfile(void)
+{
+  m_userAccountForm->resetValidationState(false);
+  m_adminStackedContents->setCurrentWidget(m_userAccountForm);
+  m_adminPanelTitle->setText(Q_TR("My Account"));
+}
+
+void WebMainUI::handleChangePassword(void)
+{
+  m_adminStackedContents->setCurrentWidget(m_changePasswordPanel);
+  m_changePasswordPanel->reset();
+  m_adminPanelTitle->setText("Change password");
+}
+
+
+
 void WebMainUI::updateLicenseMgntForm()
 {
   m_adminPanelTitle->setText(Q_TR("License Activation"));
   m_adminStackedContents->setCurrentWidget(m_licenseMngtForm);
   m_licenseMngtForm->updateContent();
+}
+
+
+
+void WebMainUI::unbindWidgets(void)
+{
+  m_adminStackedContents->removeWidget(&m_dataSourceSettingsForm);
+  m_adminStackedContents->removeWidget(&m_notificationSettingsForm);
+  m_adminStackedContents->removeWidget(&m_authSettingsForm);
 }

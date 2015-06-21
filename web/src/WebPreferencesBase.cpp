@@ -1,7 +1,7 @@
 /*
  * WebPreferencesBase.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)        #
+# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
 # Creation: 11-04-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #

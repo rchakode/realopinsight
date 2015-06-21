@@ -21,7 +21,7 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-#include "WebPreferences.hpp"
+#include "WebAuthPreferences.hpp"
 #include "WebUtils.hpp"
 #include "LdapUserManager.hpp"
 #include <Wt/WStandardItemModel>
@@ -82,7 +82,7 @@ void LdapUserManager::setModelHeader(void)
 int LdapUserManager::updateUserList(void)
 {
   setDisabled(true);
-  WebPreferences preferences;
+  WebAuthPreferences preferences;
   m_ldapUidField = preferences.getLdapIdField();
   LdapHelper ldapHelper(preferences.getLdapServerUri(),
                         preferences.getLdapVersion(),
@@ -166,7 +166,7 @@ int LdapUserManager::insertIntoDatabase(const LdapUserAttrsT& userInfo)
   dbUser.firstname = userInfo["gn"];
   dbUser.lastname = userInfo["sn"];
   dbUser.role = DboUser::OpRole;
-  dbUser.authsystem = WebPreferences::LDAP;
+  dbUser.authsystem = WebPreferencesBase::LDAP;
 
   if (m_dbSession->addUser(dbUser) == 0) {
     m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
