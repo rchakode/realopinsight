@@ -652,14 +652,14 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   link = new Wt::WAnchor("#", Q_TR("Authentication Backend"));
   settingPageTpl->bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(this, &WebMainUI::handleAuthSetup);
+  link->clicked().connect(this, &WebMainUI::handleDisplayAuthSetup);
 
   // notification settings menu
   m_adminStackedContents->addWidget(& m_notificationSettingsForm);
   link = new Wt::WAnchor("#", Q_TR("Notification Settings"));
   settingPageTpl->bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(this, &WebMainUI::handleNotificationSetup);
+  link->clicked().connect(this, &WebMainUI::handleDisplayNotificationSetup);
 
 
   // my account menu
@@ -674,7 +674,7 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
   link = new Wt::WAnchor("#", "Change Password");
   settingPageTpl->bindWidget("menu-change-password", link);
   m_menuLinks.insert(MenuChangePassword, link);
-  link->clicked().connect(this, &WebMainUI::handleChangePassword);
+  link->clicked().connect(this, &WebMainUI::handleDisplayChangePassword);
 
   // license activation menu
   if (m_dbSession->isLoggedAdmin()) {
@@ -706,13 +706,7 @@ UserFormView* WebMainUI::createAccountPanel(void)
   bool isUserForm(true);
   DboUserT userInfo = m_dbSession->loggedUser().data();
   UserFormView* userAccountForm = new UserFormView(&userInfo, changedPassword, isUserForm);
-  userAccountForm->validated().connect(std::bind([=](DboUserT userToUpdate) {
-    int ret = m_dbSession->updateUser(userToUpdate);
-    if (ret != 0) {
-      showMessage(ngrt4n::OperationFailed, Q_TR("Update failed, see details in log."));
-    } else {
-      showMessage(ngrt4n::OperationSucceeded, Q_TR("Update completed."));
-    }}, std::placeholders::_1));
+  userAccountForm->validated().connect(this, &WebMainUI::handleUpdateUserAccount);
 
   return userAccountForm;
 }
@@ -723,18 +717,19 @@ UserFormView* WebMainUI::createPasswordPanel(void)
   bool userForm(true);
   DboUserT userInfo = m_dbSession->loggedUser().data();
   UserFormView* changePasswordPanel = new UserFormView(&userInfo, changedPassword, userForm);
-  changePasswordPanel->changePasswordTriggered().connect(std::bind([=](const std::string& login,
-                                                                   const std::string& lastpass,
-                                                                   const std::string& pass) {
-    int ret = m_dbSession->updatePassword(login, lastpass, pass);
-    if (ret != 0) {
-      showMessage(ngrt4n::OperationFailed, Q_TR("Failed to change password"));
-    } else {
-      showMessage(ngrt4n::OperationSucceeded, Q_TR("Password updated successfully"));
-    }
-  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
+  changePasswordPanel->changePasswordTriggered().connect(this, &WebMainUI::handleChangePassword);
   return changePasswordPanel;
+}
+
+
+
+void WebMainUI::handleUpdateErrcode(int code)
+{
+  if (code != 0) {
+    showMessage(ngrt4n::OperationFailed, Q_TR("Updated failed"));
+  } else {
+    showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
+  }
 }
 
 
@@ -1210,7 +1205,7 @@ void WebMainUI::handlePreview(void)
 }
 
 
-void WebMainUI::handleAuthSetup(void)
+void WebMainUI::handleDisplayAuthSetup(void)
 {
   m_adminPanelTitle->setText(Q_TR("Authentication Settings"));
   m_adminStackedContents->setCurrentWidget(&m_authSettingsForm);
@@ -1218,7 +1213,7 @@ void WebMainUI::handleAuthSetup(void)
 }
 
 
-void WebMainUI::handleNotificationSetup(void)
+void WebMainUI::handleDisplayNotificationSetup(void)
 {
   m_adminPanelTitle->setText(Q_TR("Notification Settings"));
   m_adminStackedContents->setCurrentWidget(& m_notificationSettingsForm);
@@ -1233,13 +1228,27 @@ void WebMainUI::handleDisplayUserProfile(void)
   m_adminPanelTitle->setText(Q_TR("My Account"));
 }
 
-void WebMainUI::handleChangePassword(void)
+
+void WebMainUI::handleUpdateUserAccount(const DboUserT& userToUpdate)
+{
+  int ret = m_dbSession->updateUser(userToUpdate);
+  handleUpdateErrcode(ret);
+}
+
+
+void WebMainUI::handleDisplayChangePassword(void)
 {
   m_adminStackedContents->setCurrentWidget(m_changePasswordPanel);
   m_changePasswordPanel->reset();
   m_adminPanelTitle->setText("Change password");
 }
 
+
+void WebMainUI::handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass)
+{
+  int ret = m_dbSession->updatePassword(login, lastpass, pass);
+  handleUpdateErrcode(ret);
+}
 
 
 void WebMainUI::updateLicenseMgntForm()

@@ -193,10 +193,13 @@ private:
   void handleImportation(void);
   void handlePreview(void);
   void handleDataSourceSetup(void);
-  void handleAuthSetup(void);
-  void handleNotificationSetup(void);
-  void handleChangePassword(void);
+  void handleDisplayAuthSetup(void);
+  void handleDisplayNotificationSetup(void);
+  void handleDisplayChangePassword(void);
+  void handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass);
   void handleDisplayUserProfile(void);
+  void handleUpdateUserAccount(const DboUserT& userToUpdate);
+  void handleUpdateErrcode(int code);
 
   /** other member functions */
   void addEvents(void);
