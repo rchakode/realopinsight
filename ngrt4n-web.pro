@@ -115,7 +115,8 @@ HEADERS += \
     web/src/WebLicenseManager.hpp \
     web/src/WebAuthPreferences.hpp \
     web/src/WebDataSourcePreferences.hpp \
-    web/src/WebNotificationPreferences.hpp
+    web/src/WebNotificationPreferences.hpp \
+    web/src/WebHostGroupServiceMap.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Settings.cpp \
@@ -164,7 +165,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebLicenseManager.cpp \
     web/src/WebAuthPreferences.cpp \
     web/src/WebDataSourcePreferences.cpp \
-    web/src/WebNotificationPreferences.cpp
+    web/src/WebNotificationPreferences.cpp \
+    web/src/WebHostGroupServiceMap.cpp
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \

@@ -27,6 +27,7 @@
               <div class="accordion-inner">
               <ul class="nav">
                <li><i class="fa fa-upload pull-left"></i> ${menu-import}</li>
+               <li><i class="fa fa-upload pull-left"></i> ${menu-auto-hostgroup-map}</li>
                <li><i class="fa fa-eye pull-left"></i> ${menu-preview}</li>
                <li><i class="icon-fixed-width icon-pencil pull-left"></i> ${menu-all-views}</li>
               </ul>
@@ -633,6 +634,25 @@
     </fieldset>
     <div class="form-actions">
       <span id="active-button">${activate-button}</span>
+    </div>
+  </form>
+</message>
+
+
+<message id="import-hostgroup-form.tpl">
+  <form class="form-horizontal">
+    <fieldset>
+      <div class="control-group">
+        <label class="control-label">Source&nbsp;</label>
+        <span>${source-list-field}</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Host/group filter&nbsp;</label>
+        <span>${host-group-filter}</span>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <span id="submit-button">${submit-button}</span>
     </div>
   </form>
 </message>

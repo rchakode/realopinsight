@@ -461,7 +461,7 @@ void WebMainUI::openFileUploadDialog(void)
   container->addWidget(new Wt::WText(Q_TR("<p>Select a description file</p>"), Wt::XHTMLText));
 
   m_uploader = new Wt::WFileUpload(container);
-  m_uploader->uploaded().connect(this, &WebMainUI::handleImportation);
+  m_uploader->uploaded().connect(this, &WebMainUI::handleImportDescriptionFile);
   m_uploader->setFileTextSize(MAX_FILE_UPLOAD);
   m_uploader->setProgressBar(new Wt::WProgressBar());
   m_uploader->setMargin(10, Wt::Right);
@@ -561,11 +561,20 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
       }));
       m_menuLinks.insert(MenuWelcome, link);
 
-      // menu view
-      menuText = QObject::tr("Import").toStdString();
+      // menu import view
+      menuText = QObject::tr("Import Description File").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
       link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
       settingPageTpl->bindWidget("menu-import", link);
+      m_menuLinks.insert(MenuImport, link);
+
+
+      // menu auto import host group
+      m_adminStackedContents->addWidget(&m_hostgroupServiceMap);
+      menuText = QObject::tr("Import Hostgroup as Service Map").toStdString();
+      link = new Wt::WAnchor("#", menuText, m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::handleHostGroupImportation);
+      settingPageTpl->bindWidget("menu-auto-hostgroup-map", link);
       m_menuLinks.insert(MenuImport, link);
 
       // menu preview
@@ -579,8 +588,8 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
       // Create view management form
       menuText = QObject::tr("Views and Access Control").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
-      m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
       m_adminStackedContents->addWidget(m_viewAccessPermissionForm);
+      m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
 
 
       // link views and acl
@@ -623,7 +632,6 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
       m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
       settingPageTpl->bindWidget("menu-ldap-users", link);
       m_menuLinks.insert(MenuLdapUsers, link);
-
     }
       break;
     default: {
@@ -1147,7 +1155,7 @@ void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
 
 
 
-void WebMainUI::handleImportation(void)
+void WebMainUI::handleImportDescriptionFile(void)
 {
   if (! m_uploader->empty()) {
     if (createDirectory(m_confdir, false)) { // false means don't clean the directory
@@ -1188,6 +1196,14 @@ void WebMainUI::handleImportation(void)
     }
   }
 }
+
+void WebMainUI::handleHostGroupImportation(void)
+{
+  m_adminPanelTitle->setText(Q_TR("Auto Import Hostgroup as Service Map"));
+  m_adminStackedContents->setCurrentWidget(&m_hostgroupServiceMap);
+  m_hostgroupServiceMap.updateContents();
+}
+
 
 
 void WebMainUI::handlePreview(void)
@@ -1265,4 +1281,6 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents->removeWidget(&m_dataSourceSettingsForm);
   m_adminStackedContents->removeWidget(&m_notificationSettingsForm);
   m_adminStackedContents->removeWidget(&m_authSettingsForm);
+  m_adminStackedContents->removeWidget(&m_hostgroupServiceMap);
 }
+

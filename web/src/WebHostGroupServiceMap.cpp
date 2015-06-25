@@ -1,8 +1,8 @@
 /*
- * WebPreferencesBase.cpp
+ * WebImportHostGroupMap.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
-# Creation: 11-04-2015                                                     #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Creation: 25-06-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,55 +22,54 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "WebHostGroupServiceMap.hpp"
+#include "WebUtils.hpp"
 
-#include "WebPreferencesBase.hpp"
-#include "utilsCore.hpp"
-#include <ldap.h>
+WebHostGroupServiceMap::WebHostGroupServiceMap()
+  : WebPreferencesBase(),
+    Wt::WTemplate(Wt::WString::tr("import-hostgroup-form.tpl"))
+{
+  updateFormWidgets();
+  bindFormWidgets();
+  addEvent();
+}
 
-WebPreferencesBase::WebPreferencesBase(void)
-  : Preferences("/opt/realopinsight/etc/realopinsight.conf")
+
+WebHostGroupServiceMap::~WebHostGroupServiceMap()
+{
+  unbindFormWidgets();
+}
+
+void WebHostGroupServiceMap::addEvent(void)
 {
 }
 
 
-int WebPreferencesBase::getLdapVersion(void) const
+void WebHostGroupServiceMap::updateFormWidgets(void)
 {
-  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
-  if (val != LDAP_VERSION3_LABEL)
-    return LDAP_VERSION2;
+  m_submitButton.setText(Q_TR("Submit"));
+  m_submitButton.setStyleClass("btn btn-info");
 
-  return LDAP_VERSION3;
-}
-
-
-int WebPreferencesBase::getAuthenticationMode(void) const
-{
-  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
-  if (val != LDAP)
-    return BuiltIn;
-
-  return val;
-}
-
-
-
-std::string WebPreferencesBase::getLdapIdField(void) const
-{
-  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
-  if (val.isEmpty())
-    return "uid";
-
-  return val.toStdString();
-}
-
-
-int WebPreferencesBase::activeSourceIds(QVector<std::string>& result)
-{
-  result.clear();
-  for (int i = 0; i < MAX_SRCS; ++i) {
-    if (m_sourceStates.at(i)) {
-      result.push_back(ngrt4n::sourceId(i).toStdString());
-    }
+  QVector<std::string> sourceIds;
+  if (activeSourceIds(sourceIds) > 0) {
+    m_sourceListBox.clear();
+    for(auto sid : sourceIds) m_sourceListBox.addItem(sid);
   }
-  return result.size();
 }
+
+
+void WebHostGroupServiceMap::bindFormWidgets(void)
+{
+  bindWidget("source-list-field", &m_sourceListBox);
+  bindWidget("host-group-filter", &m_hostGroupFilterField);
+  bindWidget("submit-button", &m_submitButton);
+}
+
+
+void WebHostGroupServiceMap::unbindFormWidgets(void)
+{
+  takeWidget("source-list-field");
+  takeWidget("host-group-filter");
+  takeWidget("submit-button");
+}
+

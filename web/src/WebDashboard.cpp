@@ -159,6 +159,13 @@ void WebDashboard::setupUI(void)
   rightSubMainLayout->setResizable(1);
 }
 
+
+void WebDashboard::unbindWidgets(void)
+{
+
+}
+
+
 void WebDashboard::addJsEventScript(void)
 {
   m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);

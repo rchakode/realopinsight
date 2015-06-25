@@ -128,6 +128,7 @@ private:
   EventFeedItemsT m_eventFeedItems;
 
   void setupUI(void);
+  void unbindWidgets(void);
   void addJsEventScript(void);
   void addEvents(void);
   Wt::WWidget* createEventFeedItem(const NodeT& node);

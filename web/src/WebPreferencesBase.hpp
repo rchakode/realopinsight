@@ -69,6 +69,7 @@ public:
   int getSmtpUseSsl(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
 
   QString getLicenseKey(void) {return keyValue(Settings::ACTIVATION_LICENSE_KEY, "");}
+  int activeSourceIds(QVector<std::string>& result);
 
 
 protected :

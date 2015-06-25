@@ -37,6 +37,7 @@
 #include "WebNotificationPreferences.hpp"
 #include "WebAuthPreferences.hpp"
 #include "WebDataSourcePreferences.hpp"
+#include "WebHostGroupServiceMap.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
 #include <Wt/WApplication>
@@ -143,6 +144,7 @@ private:
   WebNotificationPreferences m_notificationSettingsForm;
   WebAuthPreferences m_authSettingsForm;
   WebLicenseManager* m_licenseMngtForm;
+  WebHostGroupServiceMap m_hostgroupServiceMap;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_mainStackedContents;
   Wt::WStackedWidget* m_adminStackedContents;
@@ -190,7 +192,8 @@ private:
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void handleDisplayOnlyTroubleStateChanged(void);
-  void handleImportation(void);
+  void handleImportDescriptionFile(void);
+  void handleHostGroupImportation(void);
   void handlePreview(void);
   void handleDataSourceSetup(void);
   void handleDisplayAuthSetup(void);

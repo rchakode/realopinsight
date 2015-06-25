@@ -1,8 +1,8 @@
 /*
- * WebPreferencesBase.cpp
+ * WebImportHostGroupMap.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
-# Creation: 11-04-2015                                                     #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Creation: 25-06-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,55 +22,32 @@
 #--------------------------------------------------------------------------#
  */
 
+#ifndef WEBMANAGEHOSTGROUPMAPS_HPP
+#define WEBMANAGEHOSTGROUPMAPS_HPP
 
 #include "WebPreferencesBase.hpp"
-#include "utilsCore.hpp"
-#include <ldap.h>
+#include <Wt/WTemplate>
+#include <Wt/WPushButton>
+#include <Wt/WLineEdit>
+#include <Wt/WComboBox>
 
-WebPreferencesBase::WebPreferencesBase(void)
-  : Preferences("/opt/realopinsight/etc/realopinsight.conf")
+class WebHostGroupServiceMap : public WebPreferencesBase, public Wt::WTemplate
 {
-}
+public:
+  WebHostGroupServiceMap();
+  ~WebHostGroupServiceMap();
+  void updateContents(void) {}
 
 
-int WebPreferencesBase::getLdapVersion(void) const
-{
-  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
-  if (val != LDAP_VERSION3_LABEL)
-    return LDAP_VERSION2;
+private:
+  Wt::WComboBox m_sourceListBox;
+  Wt::WLineEdit m_hostGroupFilterField;
+  Wt::WPushButton m_submitButton;
 
-  return LDAP_VERSION3;
-}
+  void addEvent(void);
+  void updateFormWidgets(void);
+  void bindFormWidgets(void);
+  void unbindFormWidgets(void);
+};
 
-
-int WebPreferencesBase::getAuthenticationMode(void) const
-{
-  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
-  if (val != LDAP)
-    return BuiltIn;
-
-  return val;
-}
-
-
-
-std::string WebPreferencesBase::getLdapIdField(void) const
-{
-  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
-  if (val.isEmpty())
-    return "uid";
-
-  return val.toStdString();
-}
-
-
-int WebPreferencesBase::activeSourceIds(QVector<std::string>& result)
-{
-  result.clear();
-  for (int i = 0; i < MAX_SRCS; ++i) {
-    if (m_sourceStates.at(i)) {
-      result.push_back(ngrt4n::sourceId(i).toStdString());
-    }
-  }
-  return result.size();
-}
+#endif // WEBMANAGEHOSTGROUPMAPS_HPP
