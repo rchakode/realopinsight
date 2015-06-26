@@ -42,6 +42,7 @@ WebHostGroupServiceMap::~WebHostGroupServiceMap()
 
 void WebHostGroupServiceMap::addEvent(void)
 {
+  m_submitButton.clicked().connect(this, &WebHostGroupServiceMap::handleImportationSubmitted);
 }
 
 
@@ -73,3 +74,9 @@ void WebHostGroupServiceMap::unbindFormWidgets(void)
   takeWidget("submit-button");
 }
 
+
+
+void WebHostGroupServiceMap::handleImportationSubmitted(void)
+{
+
+}

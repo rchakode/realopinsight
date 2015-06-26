@@ -570,10 +570,10 @@ Wt::WWidget* WebMainUI::createSettingsPage(void)
 
 
       // menu auto import host group
-      m_adminStackedContents->addWidget(&m_hostgroupServiceMap);
+      m_adminStackedContents->addWidget(&m_autoHostgroupImporterForm);
       menuText = QObject::tr("Import Hostgroup as Service Map").toStdString();
       link = new Wt::WAnchor("#", menuText, m_mainWidget);
-      link->clicked().connect(this, &WebMainUI::handleHostGroupImportation);
+      link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
       settingPageTpl->bindWidget("menu-auto-hostgroup-map", link);
       m_menuLinks.insert(MenuImport, link);
 
@@ -1197,11 +1197,11 @@ void WebMainUI::handleImportDescriptionFile(void)
   }
 }
 
-void WebMainUI::handleHostGroupImportation(void)
+void WebMainUI::handleImportHostGroupAsMap(void)
 {
   m_adminPanelTitle->setText(Q_TR("Auto Import Hostgroup as Service Map"));
-  m_adminStackedContents->setCurrentWidget(&m_hostgroupServiceMap);
-  m_hostgroupServiceMap.updateContents();
+  m_adminStackedContents->setCurrentWidget(&m_autoHostgroupImporterForm);
+  m_autoHostgroupImporterForm.updateContents();
 }
 
 
@@ -1281,6 +1281,6 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents->removeWidget(&m_dataSourceSettingsForm);
   m_adminStackedContents->removeWidget(&m_notificationSettingsForm);
   m_adminStackedContents->removeWidget(&m_authSettingsForm);
-  m_adminStackedContents->removeWidget(&m_hostgroupServiceMap);
+  m_adminStackedContents->removeWidget(&m_autoHostgroupImporterForm);
 }
 

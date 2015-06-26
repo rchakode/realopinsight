@@ -48,6 +48,7 @@ private:
   void updateFormWidgets(void);
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
+  void handleImportationSubmitted(void);
 };
 
 #endif // WEBMANAGEHOSTGROUPMAPS_HPP

@@ -144,7 +144,7 @@ private:
   WebNotificationPreferences m_notificationSettingsForm;
   WebAuthPreferences m_authSettingsForm;
   WebLicenseManager* m_licenseMngtForm;
-  WebHostGroupServiceMap m_hostgroupServiceMap;
+  WebHostGroupServiceMap m_autoHostgroupImporterForm;
   Wt::WTimer m_timer;
   Wt::WStackedWidget* m_mainStackedContents;
   Wt::WStackedWidget* m_adminStackedContents;
@@ -193,7 +193,7 @@ private:
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void handleDisplayOnlyTroubleStateChanged(void);
   void handleImportDescriptionFile(void);
-  void handleHostGroupImportation(void);
+  void handleImportHostGroupAsMap(void);
   void handlePreview(void);
   void handleDataSourceSetup(void);
   void handleDisplayAuthSetup(void);
