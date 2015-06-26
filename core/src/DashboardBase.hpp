@@ -75,7 +75,6 @@ public Q_SLOTS:
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
   virtual void initialize(Preferences* preferencePtr);
-  CoreDataT* cdata(void) {return m_cdata;}
   qint32 userRole(void) const {return m_userRole;}
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
   void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
@@ -108,7 +107,7 @@ protected:
 
 protected:
   QString m_descriptionFile;
-  CoreDataT* m_cdata;
+  CoreDataT m_cdata;
   qint32 m_timerId;
   qint64 m_updateCounter;
   QString m_selectedNode;

@@ -54,9 +54,8 @@ SvCreator::SvCreator(const qint32& _userRole)
     m_activeConfig(""),
     m_selectedNode(""),
     m_settings(new Settings()),
-    m_cdata(new CoreDataT()),
     m_mainSplitter(new QSplitter(this)),
-    m_tree(new SvNavigatorTree(m_cdata, true)),
+    m_tree(new SvNavigatorTree(&m_cdata, true)),
     m_editor(new ServiceEditor()),
     m_menuBar(new QMenuBar(this)),
     m_toolBar(new QToolBar("Tool Bar")),
@@ -72,7 +71,6 @@ SvCreator::SvCreator(const qint32& _userRole)
 
 SvCreator::~SvCreator()
 {
-  delete m_cdata;
   delete m_tree;
   delete m_editor;
   delete m_mainSplitter;
@@ -163,7 +161,7 @@ void SvCreator::loadFile(const QString& _path)
   if (_path == NULL) {
     newView();
   } else {
-    Parser parser(_path, m_cdata);
+    Parser parser(_path, &m_cdata);
     if (! parser.process(false)) {
       ngrt4n::alert(parser.lastErrorMsg());
       exit(1);
@@ -178,7 +176,7 @@ void SvCreator::refreshUIWidgets(void)
 {
   m_hasLeftUpdates = true;
 
-  m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+  m_root = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
   m_editor->fillInEditorWithContent(*m_root);
   m_tree->build();
   fillEditorFromService(m_tree->rootItem());
@@ -272,7 +270,7 @@ void SvCreator::importNagiosBPIConfig(void)
   rootService.id = ngrt4n::ROOT_ID;
   rootService.name = tr("Nagios BPI Services");
 
-  ngrt4n::clearCoreData(*m_cdata);
+  ngrt4n::clearCoreData(m_cdata);
   while (line = streamReader.readLine(), ! line.isNull()) {
 
     ++lineIndex;
@@ -297,9 +295,9 @@ void SvCreator::importNagiosBPIConfig(void)
 
     QString groudId = fields[1];
 
-    NodeListT::Iterator currentNode = m_cdata->bpnodes.find(groudId);
-    if (currentNode == m_cdata->bpnodes.end()) {
-      currentNode = m_cdata->bpnodes.insert(groudId, createNode(groudId, "", ""));
+    NodeListT::Iterator currentNode = m_cdata.bpnodes.find(groudId);
+    if (currentNode == m_cdata.bpnodes.end()) {
+      currentNode = m_cdata.bpnodes.insert(groudId, createNode(groudId, "", ""));
     }
 
     currentNode->sev_crule = CalcRules::Worst;
@@ -332,7 +330,7 @@ void SvCreator::importNagiosBPIConfig(void)
         bool hasCluster = false;
         QString members = fields[1];
         groupMembersCount = extractNagiosBPIGroupMembers(currentNode->id, sourceId, members,
-                                                         m_cdata->bpnodes, m_cdata->cnodes, currentNode->child_nodes,
+                                                         m_cdata.bpnodes, m_cdata.cnodes, currentNode->child_nodes,
                                                          hasCluster);
         if (groupMembersCount < 0) {
           parsingFailed = true;
@@ -369,11 +367,11 @@ void SvCreator::importNagiosBPIConfig(void)
   }
 
   if (parsingFailed) {
-    ngrt4n::clearCoreData(*m_cdata);
+    ngrt4n::clearCoreData(m_cdata);
   } else {
-    attachOrphanedNodesToRoot(m_cdata->bpnodes, rootService);
-    attachOrphanedNodesToRoot(m_cdata->cnodes, rootService);
-    m_cdata->bpnodes.insert(rootService.id, rootService);
+    attachOrphanedNodesToRoot(m_cdata.bpnodes, rootService);
+    attachOrphanedNodesToRoot(m_cdata.cnodes, rootService);
+    m_cdata.bpnodes.insert(rootService.id, rootService);
   }
   file.close();
   refreshUIWidgets();
@@ -582,11 +580,11 @@ void SvCreator::handleImportHostGroupAsMap(void)
   }
 
   QString errorMsg;
-  if (importHostGroupAsMap(srcInfo, filter, *m_cdata, errorMsg) != 0) {
+  if (importHostGroupAsMap(srcInfo, filter, m_cdata, errorMsg) != 0) {
     showStatusMsg(tr("Data points importation failed: %1").arg(errorMsg), true);
   } else {
     refreshUIWidgets();
-    showStatusMsg(tr("%1 entry(ies) imported").arg(QString::number(m_cdata->cnodes.size())), false);
+    showStatusMsg(tr("%1 entry(ies) imported").arg(QString::number(m_cdata.cnodes.size())), false);
   }
 }
 
@@ -604,7 +602,7 @@ void SvCreator::importZabbixITServicesAsBusinessViews(void)
     showStatusMsg(tr("Loading IT services from %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
 
     ZbxHelper handler;
-    if (handler.loadITServices(srcInfo, *m_cdata) != 0) {
+    if (handler.loadITServices(srcInfo, m_cdata) != 0) {
       showStatusMsg(tr("The importation of IT services failed: %1").arg(handler.lastError()), true);
     } else {
       m_activeConfig.clear();
@@ -640,6 +638,8 @@ void SvCreator::importZenossComponents(void)
   }
 }
 
+
+
 void SvCreator::importPandoraModules(void)
 {
   QMap<QString, SourceT> sourceInfos;
@@ -674,12 +674,12 @@ void SvCreator::processCheckLoadResults(int retCode, const QString& srcId, const
 void SvCreator::newView(void)
 {
   if (treatCloseAction(false) == 0) {
-    ngrt4n::clearCoreData(*m_cdata);
+    ngrt4n::clearCoreData(m_cdata);
     m_activeConfig.clear();
 
     m_tree->clearTree();
     NodeT node = createNode(ngrt4n::ROOT_ID, tr("New View"), "");
-    m_root = m_cdata->bpnodes.insert(node.id, node);
+    m_root = m_cdata.bpnodes.insert(node.id, node);
 
     refreshUIWidgets();
   }
@@ -711,11 +711,11 @@ NodeT SvCreator::createNode(const QString& id, const QString& label,const QStrin
 
 void SvCreator::insertFromSelected(const NodeT& node)
 {
-  NodeListT::iterator pnode = m_cdata->bpnodes.find(m_selectedNode);
-  if (pnode != m_cdata->bpnodes.end() && pnode->type != NodeType::ITService) {
+  NodeListT::iterator pnode = m_cdata.bpnodes.find(m_selectedNode);
+  if (pnode != m_cdata.bpnodes.end() && pnode->type != NodeType::ITService) {
     pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? CHILD_SEPERATOR % node.id : node.id;
     QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
-    m_cdata->bpnodes.insert(node.id, node);
+    m_cdata.bpnodes.insert(node.id, node);
     m_tree->setCurrentItem(lastItem);
     fillEditorFromService(lastItem);
   } else {
@@ -742,7 +742,7 @@ void SvCreator::deleteNode(void)
 void SvCreator::deleteNode(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (! ngrt4n::findNode(m_cdata, _nodeId, node))
+  if (! ngrt4n::findNode(&m_cdata, _nodeId, node))
     return;
 
   if (node->type == NodeType::BusinessService
@@ -759,14 +759,14 @@ void SvCreator::deleteNode(const QString& _nodeId)
                   "|^" + _nodeId + "$" +
                   "|" + CHILD_SEPERATOR  + _nodeId);
 
-    NodeListT::iterator pNode = m_cdata->bpnodes.find(node->parent);
-    if (pNode != m_cdata->bpnodes.end()) {
+    NodeListT::iterator pNode = m_cdata.bpnodes.find(node->parent);
+    if (pNode != m_cdata.bpnodes.end()) {
       pNode->child_nodes.remove(regex);
     }
     if (node->type == NodeType::ITService) {
-      m_cdata->cnodes.remove(_nodeId);
+      m_cdata.cnodes.remove(_nodeId);
     } else {
-      m_cdata->bpnodes.remove(_nodeId);
+      m_cdata.bpnodes.remove(_nodeId);
     }
     m_tree->removeNodeItem(_nodeId);
     QTreeWidgetItem* obsolete = NULL;
@@ -779,10 +779,10 @@ void SvCreator::deleteNode(const QString& _nodeId)
 void SvCreator::copySelected(void)
 {
   NodeListIteratorT node;
-  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
+  if (ngrt4n::findNode(&m_cdata, m_selectedNode, node)) {
     if (! m_clipboardData)
       m_clipboardData = new NodeT;
-    *m_clipboardData =*node;
+    *m_clipboardData = *node;
     m_clipboardData->name+=" (Copy)";
     m_clipboardData->child_nodes.clear();
   }
@@ -849,19 +849,19 @@ QString SvCreator::selectFileDestinationPath(void)
   if (! path.isNull()) {
     QFileInfo fileInfo(path);
     if (filter == ZBX_SOURCE) {
-      m_cdata->monitor = MonitorT::Zabbix;
+      m_cdata.monitor = MonitorT::Zabbix;
       if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
     } else if (filter == ZNS_SOURCE) {
-      m_cdata->monitor = MonitorT::Zenoss;
+      m_cdata.monitor = MonitorT::Zenoss;
       if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
     } else if (filter == NAG_SOURCE){
-      m_cdata->monitor = MonitorT::Nagios;
+      m_cdata.monitor = MonitorT::Nagios;
       if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
     } else if (filter == PANDORA_SOURCE) {
-      m_cdata->monitor = MonitorT::Pandora;
+      m_cdata.monitor = MonitorT::Pandora;
       if (fileInfo.suffix().isEmpty()) path.append(".pfms.ngrt4n.xml");
     } else {
-      m_cdata->monitor = MonitorT::Auto;
+      m_cdata.monitor = MonitorT::Auto;
       if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     }
 
@@ -922,22 +922,22 @@ void SvCreator::handleTreeNodeMoved(const QString& nodeId)
 
     QTreeWidgetItem* tnodeP = item->parent();
     if (tnodeP) {
-      NodeListT::iterator nodeIt = m_cdata->bpnodes.find(nodeId);
+      NodeListT::iterator nodeIt = m_cdata.bpnodes.find(nodeId);
 
-      if (nodeIt != m_cdata->bpnodes.end()) {
+      if (nodeIt != m_cdata.bpnodes.end()) {
         /* Remove the node on its old parent's child list*/
         QRegExp regex ("|^" + nodeId + CHILD_SEPERATOR +
                        "|^" + nodeId + "$" +
                        "|" + CHILD_SEPERATOR + nodeId);
-        NodeListT::iterator pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
-        if (pNodeIt != m_cdata->bpnodes.end()) {
+        NodeListT::iterator pNodeIt = m_cdata.bpnodes.find(nodeIt->parent);
+        if (pNodeIt != m_cdata.bpnodes.end()) {
           pNodeIt->child_nodes.remove(regex);
         }
 
         /* Add the node on its new parent's child list*/
         nodeIt->parent = tnodeP->data(0, QTreeWidgetItem::UserType).toString();
-        pNodeIt = m_cdata->bpnodes.find(nodeIt->parent);
-        if (pNodeIt != m_cdata->bpnodes.end()) {
+        pNodeIt = m_cdata.bpnodes.find(nodeIt->parent);
+        if (pNodeIt != m_cdata.bpnodes.end()) {
           pNodeIt->child_nodes += (pNodeIt->child_nodes != "")? CHILD_SEPERATOR + nodeId : nodeId;
         }
       }
@@ -947,8 +947,8 @@ void SvCreator::handleTreeNodeMoved(const QString& nodeId)
 
 void SvCreator::handleNodeTypeActivated(qint32 targetType)
 {
-  NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
-  if (node == m_cdata->bpnodes.end()) {
+  NodeListT::iterator node = m_cdata.bpnodes.find(m_selectedNode);
+  if (node == m_cdata.bpnodes.end()) {
     return; // nothing to do
   }
 
@@ -999,7 +999,7 @@ void SvCreator::handleShowAbout(void)
 void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
-  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
+  if (ngrt4n::findNode(&m_cdata, m_selectedNode, node)) {
     if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       QTreeWidgetItem* selectedNodeItem = m_tree->findNodeItem(m_selectedNode);
       if (selectedNodeItem) {
@@ -1011,15 +1011,15 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
     }
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
-  if (ngrt4n::findNode(m_cdata, m_selectedNode, node))
+  if (ngrt4n::findNode(&m_cdata, m_selectedNode, node))
     m_editor->fillInEditorWithContent(*node);
 }
 
 
 void SvCreator::handleReturnPressed(void)
 {
-  NodeListT::iterator node = m_cdata->bpnodes.find(m_selectedNode);
-  if (node != m_cdata->bpnodes.end()) {
+  NodeListT::iterator node = m_cdata.bpnodes.find(m_selectedNode);
+  if (node != m_cdata.bpnodes.end()) {
     if (m_editor->updateNodeInfoFromEditorContents(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
@@ -1073,10 +1073,10 @@ void SvCreator::recordData(const QString& path)
 {
   QString errorMsg;
   showStatusMsg(tr("Saving in %1...").arg(path), false);
-  if (saveDataAsDescriptionFile(path, *m_cdata, errorMsg) != 0) {
+  if (saveDataAsDescriptionFile(path, m_cdata, errorMsg) != 0) {
     showStatusMsg(errorMsg, true);
   } else {
-    m_root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
+    m_root = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
     m_hasLeftUpdates = false;
     m_activeConfig = ngrt4n::getAbsolutePath(path);
     showStatusMsg(tr("File saved: %1").arg(m_activeConfig), false);

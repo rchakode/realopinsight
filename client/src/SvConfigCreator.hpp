@@ -91,7 +91,7 @@ private:
   QString m_activeConfig;
   QString m_selectedNode;
   Settings* m_settings;
-  CoreDataT* m_cdata;
+  CoreDataT m_cdata;
   QSplitter* m_mainSplitter;
   MenuListT m_menus;
   SubMenuListT m_subMenus;
