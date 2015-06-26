@@ -43,70 +43,70 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
   qint8 criticity = ngrt4n::Unknown;
   if (monitorType == MonitorT::Nagios) {
     switch(statusValue) {
-    case ngrt4n::NagiosOk:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::NagiosWarning:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::NagiosCritical:
-      criticity = ngrt4n::Critical;
-      break;
-    default:
-      break;
+      case ngrt4n::NagiosOk:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::NagiosWarning:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::NagiosCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        break;
     }
   } else if (monitorType == MonitorT::Zabbix) {
     switch(statusValue) {
-    case ngrt4n::ZabbixClear:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::ZabbixInfo:
-    case ngrt4n::ZabbixWarn:
-      criticity = ngrt4n::Minor;
-      break;
-    case ngrt4n::ZabbixAverage:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::ZabbixHigh:
-    case ngrt4n::ZabbixDisaster:
-      criticity = ngrt4n::Critical;
-      break;
-    default:
-      break;
+      case ngrt4n::ZabbixClear:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::ZabbixInfo:
+      case ngrt4n::ZabbixWarn:
+        criticity = ngrt4n::Minor;
+        break;
+      case ngrt4n::ZabbixAverage:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::ZabbixHigh:
+      case ngrt4n::ZabbixDisaster:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        break;
     }
   } else if (monitorType == MonitorT::Zenoss){
     switch(statusValue) {
-    case ngrt4n::ZenossClear:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::ZenossDebug:
-      criticity = ngrt4n::Minor;
-      break;
-    case ngrt4n::ZenossWarning:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::ZenossError:
-    case ngrt4n::ZenossCritical:
-      criticity = ngrt4n::Critical;
-      break;
-    default:
-      break;
+      case ngrt4n::ZenossClear:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::ZenossDebug:
+        criticity = ngrt4n::Minor;
+        break;
+      case ngrt4n::ZenossWarning:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::ZenossError:
+      case ngrt4n::ZenossCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        break;
     }
   } else if (monitorType == MonitorT::Pandora) {
     switch(statusValue) {
-    case ngrt4n::PandoraNormal:
-      criticity = ngrt4n::Normal;
-      break;
-    case ngrt4n::PandoraWarning:
-      criticity = ngrt4n::Major;
-      break;
-    case ngrt4n::PandoraCritical:
-      criticity = ngrt4n::Critical;
-      break;
-    case ngrt4n::PandoraUnknown:
-    default:
-      criticity = ngrt4n::Unknown;
-      break;
+      case ngrt4n::PandoraNormal:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::PandoraWarning:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::PandoraCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      case ngrt4n::PandoraUnknown:
+      default:
+        criticity = ngrt4n::Unknown;
+        break;
     }
   }
   return static_cast<ngrt4n::SeverityT>(criticity);
@@ -117,20 +117,20 @@ QString ngrt4n::getIconPath(int _severity)
 {
   QString ipath("images/built-in/unknown.png");
   switch (static_cast<ngrt4n::SeverityT>(_severity)) {
-  case ngrt4n::Normal:
-    ipath = "images/built-in/normal.png";
-    break;
-  case ngrt4n::Minor:
-    ipath = "images/built-in/minor.png";
-    break;
-  case ngrt4n::Major:
-    ipath = "images/built-in/major.png";
-    break;
-  case ngrt4n::Critical:
-    ipath = "images/built-in/critical.png";
-    break;
-  default:
-    break;
+    case ngrt4n::Normal:
+      ipath = "images/built-in/normal.png";
+      break;
+    case ngrt4n::Minor:
+      ipath = "images/built-in/minor.png";
+      break;
+    case ngrt4n::Major:
+      ipath = "images/built-in/major.png";
+      break;
+    case ngrt4n::Critical:
+      ipath = "images/built-in/critical.png";
+      break;
+    default:
+      break;
   }
   return ipath;
 }

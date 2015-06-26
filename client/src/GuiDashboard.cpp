@@ -92,8 +92,8 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
     m_lelfSplitter (new QSplitter()),
     m_rightSplitter (new QSplitter()),
     m_viewPanel (new QTabWidget()),
-    m_map (new GraphView(m_cdata)),
-    m_tree (new SvNavigatorTree(m_cdata)),
+    m_map (new GraphView(&m_cdata)),
+    m_tree (new SvNavigatorTree(&m_cdata)),
     m_msgConsole(new MsgConsole()),
     m_trayIcon(new QSystemTrayIcon(QIcon(":images/built-in/icon.png"))),
     m_sourceSelectionBox(new QComboBox()),
@@ -118,7 +118,7 @@ GuiDashboard::GuiDashboard(const qint32& _userRole, const QString& _config)
   m_rightSplitter->addWidget(m_viewPanel.get());
   m_rightSplitter->addWidget(builtMsgPane());
   m_rightSplitter->setOrientation(Qt::Vertical);
-  m_chart->setCoreData(m_cdata);
+  m_chart->setCoreData(&m_cdata);
   addEvents();
 }
 
@@ -166,7 +166,7 @@ void GuiDashboard::toggleTroubleView(bool _toggled)
   if (DashboardBase::showOnlyTroubles()) {
     m_msgConsole->clearNormalMsg();
   } else {
-    for (auto it = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
+    for (auto it = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end();
          it != end; ++it) m_msgConsole->updateNodeMsg(it);
     m_msgConsole->sortByColumn(1);
   }
@@ -222,8 +222,8 @@ void GuiDashboard::updateMsgConsole(const NodeT& _node)
 
 void GuiDashboard::expandNode(const QString& _nodeId, const bool& _expand, const qint32& _level)
 {
-  auto node = m_cdata->bpnodes.find(_nodeId);
-  if (node == m_cdata->bpnodes.end()) {
+  auto node = m_cdata.bpnodes.find(_nodeId);
+  if (node == m_cdata.bpnodes.end()) {
     return;
   }
   if (!node->child_nodes.isEmpty()) {
@@ -244,7 +244,7 @@ void GuiDashboard::filterNodeRelatedMsg(void)
 {
   m_filteredMsgConsole.reset(new MsgConsole());
   NodeListT::iterator node;
-  if (ngrt4n::findNode(m_cdata, m_selectedNode, node)) {
+  if (ngrt4n::findNode(&m_cdata, m_selectedNode, node)) {
     filterNodeRelatedMsg(m_selectedNode);
     QSize size(750, 400);
     m_filteredMsgConsole->resize(size.width(), size.height());
@@ -259,7 +259,7 @@ void GuiDashboard::filterNodeRelatedMsg(void)
 void GuiDashboard::filterNodeRelatedMsg(const QString& _nodeId)
 {
   NodeListT::iterator node;
-  if (ngrt4n::findNode(m_cdata, _nodeId, node)
+  if (ngrt4n::findNode(&m_cdata, _nodeId, node)
       && ! node->child_nodes.isEmpty()) {
     if (node->type == NodeType::ITService) {
       m_filteredMsgConsole->updateNodeMsg(node);
@@ -322,7 +322,7 @@ void GuiDashboard::updateTrayInfo(const NodeT& _node)
              _node.sev == ngrt4n::Major) {
     icon = QSystemTrayIcon::Warning;
   }
-  qint32 pbCount = m_cdata->cnodes.size() - m_cdata->check_status_count[ngrt4n::Normal];
+  qint32 pbCount = m_cdata.cnodes.size() - m_cdata.check_status_count[ngrt4n::Normal];
   QString title = APP_NAME%" - "%_node.name;
   QString msg = tr(" - %1 Problem%2\n"
                    " - Level of Impact: %3").arg(QString::number(pbCount), pbCount>1?tr("s"):"",
@@ -350,7 +350,7 @@ void GuiDashboard::handleSettingsLoaded(void)
   for (SourceListT::iterator it=m_sources.begin(),
        end = m_sources.end(); it != end; ++it)
   {
-    if (m_cdata->sources.contains(it->id))
+    if (m_cdata.sources.contains(it->id))
     {
       switch(it->mon_type) {
       case MonitorT::Nagios:

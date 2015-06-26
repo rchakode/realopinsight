@@ -44,9 +44,6 @@ public:
   void load( const QString&);
   QSize minimumSizeHint() const {return QSize(796, 640);}
   QSize sizeHint() const {return QSize(796, 640);}
-  static int importHostGroupAsMap(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg);
-  static int saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata, QString& errorMsg);
-  static QString generateNodeXml(const NodeT & node);
 
 public Q_SLOTS:
   void newView(void);
