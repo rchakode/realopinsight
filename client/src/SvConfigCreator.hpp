@@ -44,6 +44,9 @@ public:
   void load( const QString&);
   QSize minimumSizeHint() const {return QSize(796, 640);}
   QSize sizeHint() const {return QSize(796, 640);}
+  static int importHostGroupAsMap(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg);
+  static int saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata, QString& errorMsg);
+  static QString generateNodeXml(const NodeT & node);
 
 public Q_SLOTS:
   void newView(void);
@@ -69,13 +72,14 @@ public Q_SLOTS:
   void processCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
   void importNagiosChecks(void);
   void importZabbixTriggersAsDataPoints(void);
-  void autogenerateHostBasedBusinessView(void);
+  void handleImportHostGroupAsMap(void);
   void importZabbixITServicesAsBusinessViews(void);
   void importZenossComponents(void);
   void importPandoraModules(void);
   void importNagiosLivestatusChecks(void);
   void importNagiosBPIConfig(void);
   void handleErrorOccurred(QString msg);
+
 
 protected:
   virtual void contextMenuEvent( QContextMenuEvent *);
@@ -87,7 +91,7 @@ private:
   QString m_activeConfig;
   QString m_selectedNode;
   Settings* m_settings;
-  CoreDataT* m_cdata;
+  CoreDataT m_cdata;
   QSplitter* m_mainSplitter;
   MenuListT m_menus;
   SubMenuListT m_subMenus;
@@ -101,7 +105,6 @@ private:
 
   void loadFile(const QString& path);
   void recordData(const QString& path);
-  QString generateNodeXml(const NodeT & node);
   void loadMenu(void);
   void unloadMenu(void);
   void addEvents(void);

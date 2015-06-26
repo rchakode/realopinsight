@@ -81,7 +81,6 @@ StringMapT DashboardBase::calcRules() {
 
 DashboardBase::DashboardBase(const QString& descriptionFile)
   : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
-    m_cdata (new CoreDataT()),
     m_timerId(-1),
     m_updateCounter(0),
     m_showOnlyTroubles(false),
@@ -92,7 +91,6 @@ DashboardBase::DashboardBase(const QString& descriptionFile)
 
 DashboardBase::~DashboardBase()
 {
-  delete m_cdata;
 }
 
 void DashboardBase::initialize(Preferences* preferencePtr)
@@ -100,7 +98,7 @@ void DashboardBase::initialize(Preferences* preferencePtr)
   m_preferences = preferencePtr;
   m_lastErrorState = false;
   if (! m_descriptionFile.isEmpty()) {
-    Parser parser(m_descriptionFile, m_cdata);
+    Parser parser(m_descriptionFile, &m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
     if (parser.process(true)) {
       buildTree();
@@ -118,7 +116,7 @@ void DashboardBase::runMonitor()
   Q_EMIT updateInprogress();
   resetStatData();
   
-  if (m_cdata->monitor == MonitorT::Auto) {
+  if (m_cdata.monitor == MonitorT::Auto) {
     for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end();
          src!=end; ++src) { runMonitor(*src);}
   } else {
@@ -192,7 +190,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
   }
   
   // Now start doing the job
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end=m_cdata->cnodes.end(); cnode != end; ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(), end=m_cdata.cnodes.end(); cnode != end; ++cnode) {
     if (cnode->child_nodes.isEmpty()) {
       cnode->sev = ngrt4n::Unknown;
     } else {
@@ -224,7 +222,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 void DashboardBase::runZabbixUpdate(const SourceT& src)
 {
   ZbxHelper zbxBroker(src.mon_url);
-  Q_FOREACH (const QString& hostItem, m_cdata->hosts.keys()) {
+  Q_FOREACH (const QString& hostItem, m_cdata.hosts.keys()) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
     if (info.first == src.id) {
       ChecksT checks;
@@ -242,7 +240,7 @@ void DashboardBase::runZabbixUpdate(const SourceT& src)
 void DashboardBase::runZenossUpdate(const SourceT& src)
 {
   ZnsHelper znsBroker(src.mon_url);
-  Q_FOREACH (const QString& hitem, m_cdata->hosts.keys()) {
+  Q_FOREACH (const QString& hitem, m_cdata.hosts.keys()) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
     if (info.first == src.id) {
       ChecksT checks;
@@ -283,7 +281,7 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
   CheckT invalidCheck;
   ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
   
-  QHashIterator<QString, QStringList> hostit(m_cdata->hosts);
+  QHashIterator<QString, QStringList> hostit(m_cdata.hosts);
   while (hostit.hasNext()) {
     hostit.next();
     QPair<QString, QString> info = ngrt4n::splitSourceDataPointInfo(hostit.key());
@@ -302,11 +300,11 @@ void DashboardBase::runLivestatusUpdate(const SourceT& src)
 
 void DashboardBase::resetStatData(void)
 {
-  m_cdata->check_status_count[ngrt4n::Normal] = 0;
-  m_cdata->check_status_count[ngrt4n::Minor] = 0;
-  m_cdata->check_status_count[ngrt4n::Major] = 0;
-  m_cdata->check_status_count[ngrt4n::Critical] = 0;
-  m_cdata->check_status_count[ngrt4n::Unknown] = m_cdata->cnodes.size();
+  m_cdata.check_status_count[ngrt4n::Normal] = 0;
+  m_cdata.check_status_count[ngrt4n::Minor] = 0;
+  m_cdata.check_status_count[ngrt4n::Major] = 0;
+  m_cdata.check_status_count[ngrt4n::Critical] = 0;
+  m_cdata.check_status_count[ngrt4n::Unknown] = m_cdata.cnodes.size();
 }
 
 
@@ -340,7 +338,7 @@ void DashboardBase::updateDashboard(const NodeT& _node)
 
 void DashboardBase::updateCNodesWithCheck(const CheckT& check, const SourceT& src)
 {
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode!=end; ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end(); cnode!=end; ++cnode) {
     if (cnode->child_nodes.toLower() == ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower()) {
       cnode->check = check;
       computeStatusInfo(*cnode, src);
@@ -367,7 +365,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   if (_node.check.host == "-")
     return;
   
-  if (m_cdata->monitor == MonitorT::Zabbix) {
+  if (m_cdata.monitor == MonitorT::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
     _node.actual_msg.replace(regexp, _node.check.host.c_str());
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME2.c_str());
@@ -395,7 +393,7 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
     _node.actual_msg.replace(regexp, info[1]);
   }
   
-  if (m_cdata->monitor == MonitorT::Nagios) {
+  if (m_cdata.monitor == MonitorT::Nagios) {
     info = QString(_node.check.check_command.c_str()).split("!");
     if (info.length() >= 3) {
       regexp.setPattern(ngrt4n::TAG_THERESHOLD.c_str());
@@ -411,7 +409,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _n
   ngrt4n::AggregatedSeverityT result;
   
   NodeListT::iterator node;
-  if (! ngrt4n::findNode(m_cdata, _nodeId, node)) {
+  if (! ngrt4n::findNode(&m_cdata, _nodeId, node)) {
     result.sev = ngrt4n::Unknown;
     result.weight = ngrt4n::WEIGHT_UNIT;
     return result;
@@ -464,7 +462,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   if (! msg.isEmpty()) {
     Q_EMIT updateStatusBar(msg);
   }
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(); cnode != m_cdata->cnodes.end(); ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(); cnode != m_cdata.cnodes.end(); ++cnode) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
     
@@ -479,7 +477,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 {
   m_sources.clear();
   SourceT src;
-  for (auto id=m_cdata->sources.begin(), end = m_cdata->sources.end(); id != end; ++id)
+  for (auto id=m_cdata.sources.begin(), end = m_cdata.sources.end(); id != end; ++id)
   {
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
@@ -507,8 +505,8 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 
 void DashboardBase::checkStandaloneSourceType(SourceT& src)
 {
-  if (m_cdata->monitor != MonitorT::Auto) {
-    src.mon_type = m_cdata->monitor;
+  if (m_cdata.monitor != MonitorT::Auto) {
+    src.mon_type = m_cdata.monitor;
   }
 }
 
@@ -533,10 +531,10 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
 void DashboardBase::computeFirstSrcIndex(void)
 {
   m_firstSrcIndex = -1;
-  if (! m_cdata->sources.isEmpty()) {
+  if (! m_cdata.sources.isEmpty()) {
     SourceListT::Iterator cur = m_sources.begin();
     SourceListT::Iterator end = m_sources.end();
-    while (cur != end && ! m_cdata->sources.contains(cur->id)) ++cur;
+    while (cur != end && ! m_cdata.sources.contains(cur->id)) ++cur;
     if (cur != end) {
       m_firstSrcIndex = extractSourceIndex(cur->id);
     }
@@ -545,7 +543,7 @@ void DashboardBase::computeFirstSrcIndex(void)
 
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
-  for (NodeListIteratorT cnode = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); cnode != end; ++cnode) {
+  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end(); cnode != end; ++cnode) {
     QString srcPrefix = QString("%1:").arg(src.id);
     if (! cnode->monitored && cnode->child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
       ngrt4n::setCheckOnError(ngrt4n::Unset,
@@ -566,8 +564,8 @@ void DashboardBase::resetInterval()
 
 NodeT DashboardBase::rootNode(void)
 {
-  NodeListT::iterator root = m_cdata->bpnodes.find(ngrt4n::ROOT_ID);
-  assert(root != m_cdata->bpnodes.end());
+  NodeListT::iterator root = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
+  assert(root != m_cdata.bpnodes.end());
   return *root;
 }
 
