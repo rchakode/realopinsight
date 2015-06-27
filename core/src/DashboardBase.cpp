@@ -573,8 +573,8 @@ NodeT DashboardBase::rootNode(void)
 
 void DashboardBase::extractStatsData(CheckStatusCountT& statsData, qint32& count)
 {
-  count = m_cdata->cnodes.size();
-  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end();
+  count = m_cdata.cnodes.size();
+  for (NodeListT::ConstIterator node = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end();
        node != end; ++ node) {
     switch (node->sev) {
     case ngrt4n::Normal:

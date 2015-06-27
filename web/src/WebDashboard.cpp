@@ -48,8 +48,8 @@ namespace {
 WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
   : DashboardBase(descriptionFile),
     m_widget(new Wt::WContainerWidget()),
-    m_tree(new WebTree(m_cdata)),
-    m_map(new WebMap(m_cdata)),
+    m_tree(new WebTree(&m_cdata)),
+    m_map(new WebMap(&m_cdata)),
     m_msgConsole(new WebMsgConsole()),
     m_chart(new WebPieChart()),
     m_eventFeedLayout(eventFeedLayout)
@@ -99,11 +99,9 @@ void WebDashboard::updateChart(void)
 {
   qint32 statCount;
   CheckStatusCountT statsData;
-  if (m_cdata) {
-    extractStatsData(statsData, statCount);
-    m_chart->updateStatsData(statsData, statCount);
-    m_chart->repaint();
-  }
+  extractStatsData(statsData, statCount);
+  m_chart->updateStatsData(statsData, statCount);
+  m_chart->repaint();
 }
 
 void WebDashboard::buildMap(void)
