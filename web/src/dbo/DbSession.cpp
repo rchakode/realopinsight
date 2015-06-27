@@ -352,7 +352,7 @@ int DbSession::addView(const DboView& view)
   try {
     DboViewCollectionT views = find<DboView>().where("name=?").bind(view.name);
     if (views.size() > 0) {
-      m_lastError = "Failed: a view with the same name already exist.";
+      m_lastError = QObject::tr("Add view failed: a view named '%1' already exists").arg(view.name.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
       retValue = 1;
     } else {
@@ -362,7 +362,7 @@ int DbSession::addView(const DboView& view)
       retValue = 0;
     }
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to add the view. More details in log.";
+    m_lastError = "Add view failed, please check the log file";
     CORE_LOG("error", ex.what());
   } catch(const std::exception& ex) {
     m_lastError = ex.what();
@@ -491,7 +491,7 @@ int DbSession::addSession(const DboLoginSession& session)
       retValue = 1;
     }
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to add the session. More details in log.";
+    m_lastError = "Failed to add the session, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -511,7 +511,7 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
         .bind(DboLoginSession::ExpiredCookie);
     retValue = sessions.size()? DboLoginSession::ActiveCookie : DboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Error checking the session. More details in log.";
+    m_lastError = "Error checking the session, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -531,7 +531,7 @@ int DbSession::addQosData(const QosDataT& qosData)
     retValue = 0;
     m_lastError = Q_TR("QoS entry added: ") + dboEntry->toString();
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to add QoS entry. More details in log.";
+    m_lastError = "Failed to add QoS entry, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -587,7 +587,7 @@ int DbSession::listQosData(QosDataByViewMapT& qosDataMap, const std::string& vie
 
     retValue = 0;
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to fetch QoS entries. More details in log.";
+    m_lastError = "Failed to fetch QoS entries, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
