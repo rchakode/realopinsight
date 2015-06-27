@@ -37,9 +37,14 @@ public:
   WebHostGroupServiceMap();
   ~WebHostGroupServiceMap();
   void updateContents(void) {}
+  Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
 
 
 private:
+  /** Signal **/
+  Wt::Signal<int, std::string> m_operationCompleted;
+
+  /** other members **/
   Wt::WComboBox m_sourceListBox;
   Wt::WLineEdit m_hostGroupFilterField;
   Wt::WPushButton m_submitButton;

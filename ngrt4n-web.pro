@@ -31,7 +31,7 @@ TEMPLATE = app
 
 REALOPINSIGHT_CORE_VERSION=3.2.2
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
-PACKAGE_VERSION=2015r2.1
+PACKAGE_VERSION=2015r3
 
 LIBS += -lzmq
 
@@ -78,6 +78,7 @@ HEADERS += \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
+    core/src/DescriptionFileFactoryUtils.hpp \
     web/src/utils/wtwithqt/DispatchThread.h \
     web/src/utils/wtwithqt/WQApplication \
     web/src/utils/smtpclient/qxtglobal.h \
@@ -134,6 +135,7 @@ SOURCES +=  core/src/Base.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
+    core/src/DescriptionFileFactoryUtils.cpp \
     web/src/utils/wtwithqt/DispatchThread.C \
     web/src/utils/wtwithqt/WQApplication.C \
     web/src/utils/smtpclient/qxthmac.cpp \

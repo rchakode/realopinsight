@@ -97,3 +97,21 @@ int Preferences::activeSourcesCount(void)
   return m_sourceStates.count(true);
 }
 
+
+QMap<QString, SourceT>
+Preferences::fetchSourceList(int type)
+{
+  QMap<QString, SourceT> sourceList;
+  SourceT srcInfo;
+
+  updateSourceStates();
+  for (int i = 0; i< MAX_SRCS; ++i) {
+    if (loadSource(i, srcInfo)) {
+      if (srcInfo.mon_type == type || type == MonitorT::Auto) {
+        sourceList.insert(srcInfo.id, srcInfo);
+      }
+    }
+  }
+
+  return sourceList;
+}

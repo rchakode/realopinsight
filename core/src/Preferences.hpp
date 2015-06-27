@@ -52,6 +52,7 @@ public:
   void setSourceState(int index, int value) {m_sourceStates.setBit(index, value);}
   virtual void updateSourceStates();
   int activeSourcesCount(void);
+  QMap<QString, SourceT> fetchSourceList(int type);
 
 Q_SIGNALS:
   void urlChanged(QString);

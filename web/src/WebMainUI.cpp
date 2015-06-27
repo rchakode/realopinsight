@@ -116,6 +116,7 @@ void WebMainUI::addEvents(void)
   m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_notificationSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
+  m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
@@ -1159,15 +1160,15 @@ void WebMainUI::handleImportDescriptionFile(void)
 {
   if (! m_uploader->empty()) {
     if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-      CORE_LOG("debug", "Parsing the input file");
       QString tmpFileName(m_uploader->spoolFileName().c_str());
-      CoreDataT cdata;
+      CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
 
+      CoreDataT cdata;
       Parser parser(tmpFileName ,&cdata);
       connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
       if (! parser.process(false)) {
-        std::string msg = tr("Invalid description file").toStdString();
+        std::string msg = Q_TR("Invalid description file");
         CORE_LOG("warn", msg);
         showMessage(ngrt4n::OperationFailed, msg);
       } else {
@@ -1177,6 +1178,7 @@ void WebMainUI::handleImportDescriptionFile(void)
         file.copy(dest);
         file.remove();
 
+        //FIXME: move to a generic method (to be use for this and with auto hostgroup import)
         DboView view;
         view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
         view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
@@ -1187,7 +1189,8 @@ void WebMainUI::handleImportDescriptionFile(void)
           if (m_dbSession->addView(view) != 0){
             showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
           } else {
-            QString msg = tr("Added: %1 (%2 Services) - Path: %3")
+            QString msg =
+                QObject::tr("Added: %1 (%2 Services) - Path: %3")
                 .arg(view.name.c_str(), QString::number(view.service_count), view.path.c_str());
             showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
           }

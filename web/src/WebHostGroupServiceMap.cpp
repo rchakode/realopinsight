@@ -24,10 +24,13 @@
 
 #include "WebHostGroupServiceMap.hpp"
 #include "WebUtils.hpp"
+#include "utilsCore.hpp"
+#include "DescriptionFileFactoryUtils.hpp"
 
 WebHostGroupServiceMap::WebHostGroupServiceMap()
   : WebPreferencesBase(),
-    Wt::WTemplate(Wt::WString::tr("import-hostgroup-form.tpl"))
+    Wt::WTemplate(Wt::WString::tr("import-hostgroup-form.tpl")),
+    m_operationCompleted(this)
 {
   updateFormWidgets();
   bindFormWidgets();
@@ -67,6 +70,8 @@ void WebHostGroupServiceMap::bindFormWidgets(void)
 }
 
 
+
+
 void WebHostGroupServiceMap::unbindFormWidgets(void)
 {
   takeWidget("source-list-field");
@@ -78,5 +83,24 @@ void WebHostGroupServiceMap::unbindFormWidgets(void)
 
 void WebHostGroupServiceMap::handleImportationSubmitted(void)
 {
-
+  CoreDataT cdata;
+  QString errorMsg;
+  QMap<QString, SourceT> sourceList = fetchSourceList(MonitorT::Auto);
+  QString srcId = QString::fromStdString( m_sourceListBox.currentText().toUTF8() );
+  SourceT srcInfo = sourceList[srcId];
+  QString hostgroup = QString::fromStdString( m_hostGroupFilterField.text().toUTF8() );
+  if (ngrt4n::importHostGroupAsMap(srcInfo, hostgroup, cdata, errorMsg) != 0) {
+    std::string stdmsg = errorMsg.toStdString();
+    m_operationCompleted.emit(ngrt4n::OperationFailed, stdmsg);
+    CORE_LOG("error", stdmsg);
+  } else {
+    QString path = QString("/tmp/roi-hgi%1").arg(ngrt4n::genNodeId());
+    if (ngrt4n::saveDataAsDescriptionFile(path, cdata, errorMsg) != 0) {
+      std::string stdmsg = errorMsg.toStdString();
+      m_operationCompleted.emit(ngrt4n::OperationFailed, stdmsg);
+      CORE_LOG("error", stdmsg);
+    } else {
+      CORE_LOG("info", QObject::tr("Hostgroup imported: %1").arg(cdata.bpnodes[ngrt4n::ROOT_ID].name).toStdString());
+    }
+  }
 }
