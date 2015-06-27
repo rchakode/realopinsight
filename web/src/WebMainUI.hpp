@@ -243,8 +243,9 @@ private:
   Wt::WWidget* createNotificationSection(void);
   Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
   void updateLicenseMgntForm();
-
   void unbindWidgets(void);
+  void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);
+  void dbsaveBusinessServiceInfo(const CoreDataT& cdata, const QString& path);
 };
 
 #endif // MAINWEBWINDOW_HPP

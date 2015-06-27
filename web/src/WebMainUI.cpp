@@ -27,6 +27,7 @@
 #include "WebMainUI.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
+#include "DescriptionFileFactoryUtils.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -117,6 +118,7 @@ void WebMainUI::addEvents(void)
   m_notificationSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
+  m_autoHostgroupImporterForm.hostgroupSubmitted().connect(this, &WebMainUI::handleImportHostgroupSubmitted);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
@@ -1173,32 +1175,40 @@ void WebMainUI::handleImportDescriptionFile(void)
         showMessage(ngrt4n::OperationFailed, msg);
       } else {
         std::string filename = m_uploader->clientFileName().toUTF8();
-        QString dest = tr("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+        QString destPath = QString("%1/%2").arg(m_confdir.c_str(), filename.c_str());
         QFile file(tmpFileName);
-        file.copy(dest);
+        file.copy(destPath);
         file.remove();
-
-        //FIXME: move to a generic method (to be use for this and with auto hostgroup import)
-        DboView view;
-        view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
-        view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-        view.path = dest.toStdString();
-        if (! m_licenseMngtForm->canHandleNewView(m_dbSession->viewCount(), cdata.bpnodes.size() + cdata.cnodes.size()) ) {
-          showMessage(ngrt4n::OperationFailed, m_licenseMngtForm->lastError());
-        } else {
-          if (m_dbSession->addView(view) != 0){
-            showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
-          } else {
-            QString msg =
-                QObject::tr("Added: %1 (%2 Services) - Path: %3")
-                .arg(view.name.c_str(), QString::number(view.service_count), view.path.c_str());
-            showMessage(ngrt4n::OperationSucceeded, msg.toStdString());
-          }
-        }
+        dbsaveBusinessServiceInfo(cdata, destPath);
       }
     }
   }
 }
+
+
+void WebMainUI::dbsaveBusinessServiceInfo(const CoreDataT& cdata, const QString& path)
+{
+  DboView view;
+  view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
+  view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+  view.path = path.toStdString();
+  if (! m_licenseMngtForm->canHandleNewView(m_dbSession->viewCount(), cdata.bpnodes.size() + cdata.cnodes.size()) ) {
+    showMessage(ngrt4n::OperationFailed, m_licenseMngtForm->lastError());
+  } else {
+    if (m_dbSession->addView(view) != 0){
+      showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+    } else {
+      QString viewName(view.name.c_str());
+      QString viewPath(view.path.c_str());
+      QString srvCountStr = QString::number(view.service_count);
+      std::string msg = QObject::tr("Added: %1 (%2 Services) - Path: %3"
+                                    ).arg(viewName, srvCountStr, viewPath).toStdString();
+      showMessage(ngrt4n::OperationSucceeded, msg);
+      CORE_LOG("info", msg);
+    }
+  }
+}
+
 
 void WebMainUI::handleImportHostGroupAsMap(void)
 {
@@ -1287,3 +1297,26 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents->removeWidget(&m_autoHostgroupImporterForm);
 }
 
+
+
+void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup)
+{
+  CoreDataT cdata;
+  QString errorMsg;
+  if (ngrt4n::importHostGroupAsMap(srcInfo, hostgroup, cdata, errorMsg) != 0) {
+    std::string stdmsg = errorMsg.toStdString();
+    showMessage(ngrt4n::OperationFailed, stdmsg);
+    CORE_LOG("error", stdmsg);
+  } else {
+    NodeT rootNode = cdata.bpnodes[ngrt4n::ROOT_ID];
+    QString path = QString("%1/autoimport_%2.ms.ngrt4n.xml").arg(m_confdir.c_str(),
+                                                                 rootNode.name.replace(" ", "").toLower());
+    if (ngrt4n::saveDataAsDescriptionFile(path, cdata, errorMsg) != 0) {
+      std::string stdmsg = errorMsg.toStdString();
+      showMessage(ngrt4n::OperationFailed, stdmsg);
+      CORE_LOG("error", stdmsg);
+    } else {
+      dbsaveBusinessServiceInfo(cdata, path);
+    }
+  }
+}

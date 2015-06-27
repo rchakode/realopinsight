@@ -38,11 +38,13 @@ public:
   ~WebHostGroupServiceMap();
   void updateContents(void) {}
   Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
+  Wt::Signal<SourceT, QString>& hostgroupSubmitted() { return m_hostgroupSubmitted; }
 
 
 private:
   /** Signal **/
   Wt::Signal<int, std::string> m_operationCompleted;
+  Wt::Signal<SourceT, QString> m_hostgroupSubmitted;
 
   /** other members **/
   Wt::WComboBox m_sourceListBox;
@@ -53,7 +55,7 @@ private:
   void updateFormWidgets(void);
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
-  void handleImportationSubmitted(void);
+  void handleSubmitTriggerred(void);
 };
 
 #endif // WEBMANAGEHOSTGROUPMAPS_HPP
