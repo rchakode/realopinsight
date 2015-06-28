@@ -50,7 +50,6 @@ WebMap::WebMap(void)
   : WPaintedWidget(0),
     m_scaleX(1),
     m_scaleY(1),
-    m_scrollArea(new Wt::WScrollArea()),
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged"),
     m_loaded(this),
@@ -70,7 +69,7 @@ WebMap::~WebMap()
 
 void WebMap::setDefaultSettings(void)
 {
-  m_scrollArea->setWidget(this);
+  m_scrollArea.setWidget(this);
   setPreferredMethod();
   setLayoutSizeAware(true);
   setJavaScriptMember();
@@ -211,7 +210,7 @@ void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos
                                           20 * m_scaleX, 20 * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(_node.toString().toStdString()));
   area->clicked().connect(std::bind([=]() {expandCollapse(_node.id);}));
-  addArea(area);
+addArea(area);
 }
 
 void WebMap::updateNode(const NodeT&, const QString&)

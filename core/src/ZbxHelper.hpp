@@ -92,9 +92,9 @@ private :
   int processGetApiVersionReply(void);
   int processTriggerData(ChecksT& checks);
   int processZabbixITServiceData(CoreDataT& cdata,
-                               ZabbixParentChildsDependenciesMapT& parentChildsDependencies,
-                               ZabbixChildParentDependenciesMapT& childParentDependencies,
-                               ZabbixServiceTriggerDependenciesMapT& serviceTriggerDependencies);
+                                 ZabbixParentChildsDependenciesMapT& parentChildsDependencies,
+                                 ZabbixChildParentDependenciesMapT& childParentDependencies,
+                                 ZabbixServiceTriggerDependenciesMapT& serviceTriggerDependencies);
   QString extractTopParentServices(const NodeListT& bpnodes, const ZabbixChildParentDependenciesMapT& childParentDependencies);
   int setBusinessServiceDependencies(NodeListT& bpnodes, const ZabbixParentChildsDependenciesMapT& parentChildsDependencies);
   int setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTriggerDependenciesMapT& serviceTriggerDependencies);

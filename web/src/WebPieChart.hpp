@@ -30,6 +30,7 @@
 #include <Wt/WColor>
 #include <Wt/WPaintDevice>
 #include <Wt/WContainerWidget>
+#include <Wt/WScrollArea>
 #include <Wt/WText>
 #include "ChartBase.hpp"
 
@@ -38,14 +39,14 @@ class WebPieChart : public Wt::Chart::WPieChart, public ChartBase
 public:
   WebPieChart();
   virtual ~WebPieChart();
-  Wt::WScrollArea* getContainerArea(void) const  {return m_scrollArea;}
+  Wt::WScrollArea* getWidget(void)  {return &m_scrollArea;}
   void repaint();
   void setDataType(int dataType) {ChartBase::setDataType(dataType);}
   std::string defaultTooltipText(void);
 
 private:
   Wt::WStandardItemModel* m_model;
-  Wt::WScrollArea* m_scrollArea;
+  Wt::WScrollArea m_scrollArea;
   std::map<int, Wt::WText*> m_legendBadges;
   Wt::WTemplate* m_chartLegendBar;
   Wt::WTemplate* createChartLegendBar(void);

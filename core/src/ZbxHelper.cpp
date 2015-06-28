@@ -137,8 +137,8 @@ ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
   QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
 
-	connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
-	connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
+  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 
   m_evlHandler->exec();
 
@@ -488,16 +488,16 @@ ngrt4n::AggregatedSeverityT ZbxHelper::aggregationRuleFromZabbixCalcRule(int zab
   result.sev = CalcRules::Average;
   result.weight = ngrt4n::WEIGHT_UNIT;
   switch (zabbixCalcRule) {
-  case 0:
-    result.weight = 0;
-    break;
-  case 1:
-    result.sev = CalcRules::Worst;
-    break;
-  case 2: // default
-  default:
-    result.sev = CalcRules::Average;
-    break;
+    case 0:
+      result.weight = 0;
+      break;
+    case 1:
+      result.sev = CalcRules::Worst;
+      break;
+    case 2: // default
+    default:
+      result.sev = CalcRules::Average;
+      break;
   }
   return result;
 }

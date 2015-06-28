@@ -30,12 +30,6 @@
 #include <QIntValidator>
 #include <QRegExpValidator>
 
-Preferences::Preferences(const QString& settingFile)
-  : m_settings(new Settings(settingFile)),
-    m_currentSourceIndex(0)
-{
-  updateSourceStates();
-}
 
 Preferences::Preferences(void)
   : m_settings(new Settings()),
@@ -44,6 +38,18 @@ Preferences::Preferences(void)
   updateSourceStates();
 }
 
+Preferences::Preferences(const QString& settingFile)
+  : m_settings(new Settings(settingFile)),
+    m_currentSourceIndex(0)
+{
+  updateSourceStates();
+}
+
+
+Preferences::~Preferences(void)
+{
+  delete m_settings;
+}
 
 void Preferences::loadProperties(void)
 {

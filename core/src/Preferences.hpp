@@ -45,8 +45,9 @@ public:
     NoForm
   };
 
-  Preferences(const QString& settingFile);
   Preferences(void);
+  Preferences(const QString& settingFile);
+  ~Preferences(void);
   QBitArray getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS)? m_sourceStates.at(idx) : false; }
   void setSourceState(int index, int value) {m_sourceStates.setBit(index, value);}

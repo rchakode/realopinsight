@@ -46,8 +46,8 @@
 #define ROOT_DIV wApp->root()->id()
 #define TREEVIEW_DIV m_tree.id()
 #define MAP_DIV m_map.id()
-#define MAP_SCROLL_AREA_DIV m_map.get()->id()
-#define CHART_SCROLL_AREA_DIV m_chart.getContainerArea()->id()
+#define MAP_SCROLL_AREA_DIV m_map.getWidget()->id()
+#define CHART_SCROLL_AREA_DIV m_chart.getWidget()->id()
 #define MSG_CONSOLE_DIV m_msgConsole.id()
 #define MAP_AREA_HEIGHT_RATIO "0.4"
 
@@ -117,7 +117,6 @@ Q_SIGNALS:
 
 private:
   typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;
-  Wt::WContainerWidget m_widget;
   WebTree m_tree;
   WebMap m_map;
   WebMsgConsole m_msgConsole;
@@ -127,7 +126,12 @@ private:
   Wt::WVBoxLayout* m_eventFeedLayout;
   EventFeedItemsT m_eventFeedItems;
 
-  void setupUI(void);
+  Wt::WContainerWidget m_widget;
+  Wt::WHBoxLayout* m_mainLayout;
+  Wt::WVBoxLayout m_leftSubMainLayout;
+  Wt::WVBoxLayout m_rightSubMainLayout;
+
+  void bindFormWidgets(void);
   void unbindWidgets(void);
   void addJsEventScript(void);
   void addEvents(void);

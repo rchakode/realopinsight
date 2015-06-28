@@ -46,7 +46,7 @@ public:
   virtual ~WebMap();
   void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void drawMap(void);
-  Wt::WScrollArea* get(void) const {return m_scrollArea;}
+  Wt::WScrollArea* getWidget(void) {return &m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
   Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
@@ -67,7 +67,7 @@ private:
   double m_scaleX;
   double m_scaleY;
   std::shared_ptr<Wt::WPainter> m_painter;
-  Wt::WScrollArea* m_scrollArea;
+  Wt::WScrollArea m_scrollArea;
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;
   Wt::Signal<void> m_loaded;

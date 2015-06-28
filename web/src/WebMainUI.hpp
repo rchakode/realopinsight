@@ -49,6 +49,8 @@
 #include <Wt/WDialog>
 #include <Wt/Http/Request>
 #include <Wt/Http/Response>
+#include <Wt/WNavigationBar>
+#include <Wt/WFileUpload>
 
 class AuthManager;
 class ViewAclManagement;
@@ -91,11 +93,11 @@ public:
   virtual ~WebMainUI();
   void showUserHome(void);
   QString getConfig (void) const {return m_currentDashboard->config();}
-  void enable(void) {m_mainWidget->enable();}
-  void disbale(void) {m_mainWidget->disable();}
+  void enable(void) {m_mainWidget.enable();}
+  void disbale(void) {m_mainWidget.disable();}
   void startTimer(void);
   void handleRefresh(void);
-  Wt::Signal<void>& terminateSession(void) {return m_terminateSession;}
+  Wt::Signal<void>& terminateSession(void) {return sessionTerminated;}
   virtual void 	refresh () {handleRefresh();}
   DbSession* dbSession(void) {return m_dbSession;}
   long reportStartTime(void){ return Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();}
@@ -115,23 +117,23 @@ private:
     OPEN = 1
   };
   typedef QMap<QString, WebDashboard*> DashboardMapT;
-  //FIXME: typedef std::map<std::string, QosTrendsChart*> QosTrendsChartMapT;
   typedef std::map<std::string, WebPieChart*> QosTrendsChartMapT;
   typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
   ThumbnailMapT m_thumbnailItems;
 
   /** Signals */
-  Wt::Signal<void> m_terminateSession;
+  Wt::Signal<void> sessionTerminated;
 
   /** Private members **/
   QMap<int,Wt::WAnchor*> m_menuLinks;
   std::string m_rootDir;
   std::string m_confdir;
-  Wt::WContainerWidget* m_mainWidget;
-  Wt::WWidget* m_settingsPageWidget;
-  Wt::WTemplate* m_opsHomeTpl;
-  Settings* m_settings;
+  Wt::WContainerWidget m_mainWidget;
+  Wt::WTemplate m_settingsPageTpl;
+  Wt::WTemplate m_operatorHomeTpl;
+  Wt::WTemplate m_breadcrumbsBar;
+  Settings m_settings;
   Wt::WText* m_infoBox;
 
   WebNotificationManager* m_notificationManager;
@@ -146,12 +148,13 @@ private:
   WebLicenseManager* m_licenseMngtForm;
   WebHostGroupServiceMap m_autoHostgroupImporterForm;
   Wt::WTimer m_timer;
-  Wt::WStackedWidget* m_mainStackedContents;
-  Wt::WStackedWidget* m_adminStackedContents;
-  Wt::WNavigationBar* m_navbar;
-  Wt::WStackedWidget* m_dashboardStackedContents;
-  Wt::WDialog* m_fileUploadDialog;
-  Wt::WFileUpload* m_uploader;
+  Wt::WStackedWidget m_mainStackedContents;
+  Wt::WStackedWidget m_adminStackedContents;
+  Wt::WNavigationBar m_navbar;
+  Wt::WStackedWidget m_dashboardStackedContents;
+  Wt::WDialog m_fileUploadDialog;
+  Wt::WDialog m_previewDialog;
+  Wt::WFileUpload m_fileUploader;
   std::string m_selectedFile;
   DashboardMapT m_dashboards;
   DbUserManager* m_dbUserManager;
@@ -161,24 +164,25 @@ private:
   ViewAclManagement* m_viewAccessPermissionForm;
   Wt::WDialog* m_aboutDialog;
   int m_assignedDashboardCount;
-  Wt::WText* m_adminPanelTitle;
+  Wt::WText m_adminPanelTitle;
   WebDashboard* m_currentDashboard;
   Wt::WVBoxLayout* m_eventFeedLayout;
+
+
   QosTrendsChartMapT m_qosCharts;
   RawQosTrendsChartMapT m_rawQosCharts;
-  QosDataByViewMapT m_qosData;
-
   Wt::WDatePicker* m_reportStartDatePicker;
   Wt::WDatePicker* m_reportEndDatePicker;
   Wt::WAnchor* m_reportApplyAnchor;
+
 
   Wt::WComboBox* m_selectViewBreadCrumbsBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
-  Wt::WWidget* createSettingsPage(void);
-  Wt::WDialog* createDialog(const std::string& title, Wt::WWidget* content=0);
+  void setupSettingsPage(void);
+  void setupDialogsStyle(void);
   Wt::WComboBox* createViewSelector(void);
 
   /** callbacks */
@@ -211,7 +215,7 @@ private:
   void setupProfileMenus(void);
   void setupMenus(void);
   void openFileUploadDialog(void);
-  void selectFileToOpen(void);
+  void selectItem4Preview(void);
   void initOperatorDashboard(void);
   void loadView(const std::string& path, WebDashboard*& dashboard);
 
@@ -229,10 +233,11 @@ private:
   void hideAdminSettingsMenu(void);
   void showConditionalUiWidgets(void);
 
+  void setupNavivationBar(void);
+  void setupMainStackedContent(void);
+  void setupBreadCrumbsBar(void);
+  void setupOperatorHomePage(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
   WebNotificationManager* createNotificationManager(void);
-  Wt::WNavigationBar* createNavivationBar(void);
-  Wt::WWidget* createBreadCrumbsBar(void);
-  Wt::WStackedWidget* createMainStackedContent(void);
   Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
   Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
   Wt::WComboBox* createShowViewBreadCrumbsLink(void);
@@ -241,7 +246,6 @@ private:
   Wt::WContainerWidget* createReportSectionHeader(void);
   Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
   Wt::WWidget* createNotificationSection(void);
-  Wt::WTemplate* createOpsHomeTpl(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
   void updateLicenseMgntForm();
   void unbindWidgets(void);
   void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);

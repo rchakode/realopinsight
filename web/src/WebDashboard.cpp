@@ -51,12 +51,13 @@ WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* even
 {
   m_tree.setCoreData(&m_cdata);
   m_map.setCoreData(&m_cdata);
-  setupUI();
+  bindFormWidgets();
   addJsEventScript();
 }
 
 WebDashboard::~WebDashboard()
 {
+  unbindWidgets();
 }
 
 void WebDashboard::initialize(Preferences* preferencePtr)
@@ -119,41 +120,45 @@ void WebDashboard::updateMap(void)
   m_map.drawMap();
 }
 
-void WebDashboard::setupUI(void)
+void WebDashboard::bindFormWidgets(void)
 {
-  Wt::WHBoxLayout* mainLayout(new Wt::WHBoxLayout(&m_widget));
-  Wt::WVBoxLayout* leftSubMainLayout(new Wt::WVBoxLayout());
-  Wt::WVBoxLayout* rightSubMainLayout(new Wt::WVBoxLayout());
+  m_widget.setLayout(m_mainLayout = new Wt::WHBoxLayout());
 
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  leftSubMainLayout->setContentsMargins(0, 0, 0, 0);
-  rightSubMainLayout->setContentsMargins(0, 0, 0, 0);
+  m_mainLayout->setContentsMargins(0, 0, 0, 0);
+  m_leftSubMainLayout.setContentsMargins(0, 0, 0, 0);
+  m_rightSubMainLayout.setContentsMargins(0, 0, 0, 0);
 
-  mainLayout->setSpacing(2);
-  leftSubMainLayout->setSpacing(2);
-  rightSubMainLayout->setSpacing(2);
+  m_mainLayout->setSpacing(2);
+  m_leftSubMainLayout.setSpacing(2);
+  m_rightSubMainLayout.setSpacing(2);
 
-  leftSubMainLayout->addWidget(&m_tree);
-  leftSubMainLayout->addWidget(m_chart.getContainerArea());
+  m_leftSubMainLayout.addWidget(&m_tree);
+  m_leftSubMainLayout.addWidget(m_chart.getWidget());
 
-  rightSubMainLayout->addWidget(m_map.get());
-  rightSubMainLayout->addWidget(&m_msgConsole);
-  mainLayout->addLayout(leftSubMainLayout);
-  mainLayout->addLayout(rightSubMainLayout);
+  m_rightSubMainLayout.addWidget(m_map.getWidget());
+  m_rightSubMainLayout.addWidget(&m_msgConsole);
+  m_mainLayout->addLayout(&m_leftSubMainLayout);
+  m_mainLayout->addLayout(&m_rightSubMainLayout);
 
-  leftSubMainLayout->setResizable(0);
-  mainLayout->setResizable(0);
-  mainLayout->setResizable(1);
-  mainLayout->setResizable(0);
-  mainLayout->setResizable(1);
-  rightSubMainLayout->setResizable(0);
-  rightSubMainLayout->setResizable(1);
+  m_leftSubMainLayout.setResizable(0);
+  m_mainLayout->setResizable(0);
+  m_mainLayout->setResizable(1);
+  m_mainLayout->setResizable(0);
+  m_mainLayout->setResizable(1);
+  m_rightSubMainLayout.setResizable(0);
+  m_rightSubMainLayout.setResizable(1);
 }
 
 
 void WebDashboard::unbindWidgets(void)
 {
-
+  m_leftSubMainLayout.removeWidget(&m_tree);
+  m_leftSubMainLayout.removeWidget(m_chart.getWidget());
+  m_rightSubMainLayout.removeWidget(m_map.getWidget());
+  m_rightSubMainLayout.removeWidget(&m_msgConsole);
+  m_mainLayout->removeItem(&m_leftSubMainLayout);
+  m_mainLayout->removeItem(&m_rightSubMainLayout);
+  m_widget.clear();
 }
 
 
@@ -162,6 +167,7 @@ void WebDashboard::addJsEventScript(void)
   m_widget.setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
   triggerResizeComponents();
 }
+
 
 void WebDashboard::updateEventFeeds(const NodeT &node)
 {
@@ -190,13 +196,13 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
                                                                                  node.child_nodes).toStdString());
   anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(&m_widget);}));
 
-  tpl->bindWidget("event-feed-title", anchor);
-  tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
-  tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
-  tpl->bindString("event-feed-details", node.check.alarm_msg);
-  tpl->bindString("platform", rootNode().name.toStdString());
-  tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
-  return tpl;
+tpl->bindWidget("event-feed-title", anchor);
+tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
+tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
+tpl->bindString("event-feed-details", node.check.alarm_msg);
+tpl->bindString("platform", rootNode().name.toStdString());
+tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
+return tpl;
 }
 
 

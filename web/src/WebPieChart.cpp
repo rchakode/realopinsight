@@ -28,7 +28,6 @@
 #include <QDebug>
 #include <Wt/WPainter>
 #include <Wt/WPen>
-#include <Wt/WScrollArea>
 #include <Wt/Chart/WChartPalette>
 #include <Wt/WTemplate>
 #include "WebUtils.hpp"
@@ -76,8 +75,7 @@ private:
 
 WebPieChart::WebPieChart(void)
   : Wt::Chart::WPieChart(),
-    m_model(new Wt::WStandardItemModel(this)),
-    m_scrollArea(new Wt::WScrollArea())
+    m_model(new Wt::WStandardItemModel(this))
 {
   setModel(m_model);
 
@@ -85,8 +83,8 @@ WebPieChart::WebPieChart(void)
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
-  m_scrollArea->setWidget(createChartTemplate());
-  m_scrollArea->setMargin(0, Wt::Top| Wt::Bottom);
+  m_scrollArea.setWidget(createChartTemplate());
+  m_scrollArea.setMargin(0, Wt::Top| Wt::Bottom);
 
   // Configure the header.
   m_model->insertColumns(m_model->columnCount(), 2);
@@ -182,16 +180,16 @@ std::string WebPieChart::defaultTooltipText(void)
               "Major: %5%  - %6%9\n"
               "Critical: %7%  - %8%9\n").arg
       (QString::number(m_severityRatio[ngrt4n::Normal],'f',0),
-      normalText,
-      QString::number(m_severityRatio[ngrt4n::Minor],'f',0),
-      minorText,
-      QString::number(m_severityRatio[ngrt4n::Major],'f',0),
-      majorText,
-      QString::number(m_severityRatio[ngrt4n::Critical],'f',0),
-      criticalText,
-      totalText);
+       normalText,
+       QString::number(m_severityRatio[ngrt4n::Minor],'f',0),
+       minorText,
+       QString::number(m_severityRatio[ngrt4n::Major],'f',0),
+       majorText,
+       QString::number(m_severityRatio[ngrt4n::Critical],'f',0),
+       criticalText,
+       totalText);
 
   return tooltip.append("Unknown: %1% - %2%3").arg(
         QString::number(m_severityRatio[ngrt4n::Unknown],'f',0),
-      unknownText, totalText).toStdString();
+        unknownText, totalText).toStdString();
 }
