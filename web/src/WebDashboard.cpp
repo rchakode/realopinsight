@@ -47,28 +47,24 @@ namespace {
 
 WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
   : DashboardBase(descriptionFile),
-    m_widget(new Wt::WContainerWidget()),
-    m_tree(new WebTree(&m_cdata)),
-    m_map(new WebMap(&m_cdata)),
-    m_msgConsole(new WebMsgConsole()),
-    m_chart(new WebPieChart()),
     m_eventFeedLayout(eventFeedLayout)
 {
+  m_tree.setCoreData(&m_cdata);
+  m_map.setCoreData(&m_cdata);
   setupUI();
   addJsEventScript();
 }
 
 WebDashboard::~WebDashboard()
 {
-  delete m_widget; // Other widget are deleted through the hierarchy
 }
 
 void WebDashboard::initialize(Preferences* preferencePtr)
 {
   DashboardBase::initialize(preferencePtr);
   if (! DashboardBase::lastErrorState()) {
-    m_thumbnailTitleBar = new Wt::WLabel(rootNode().name.toStdString(), m_widget);
-    m_thumbnailProblemDetailsBar = new Wt::WLabel("", m_widget);
+    m_thumbnailTitleBar.setText( rootNode().name.toStdString() );
+    m_thumbnailProblemDetailsBar.setText("");
   } else {
     CORE_LOG("error", m_lastErrorMsg.toStdString());
     Q_EMIT errorOccurred(m_lastErrorMsg);
@@ -77,22 +73,19 @@ void WebDashboard::initialize(Preferences* preferencePtr)
 
 void WebDashboard::buildTree(void)
 {
-  m_tree->build();
+  m_tree.build();
 }
 
 
 void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 {
-  m_tree->updateNodeItem(_node, _tip);
+  m_tree.updateNodeItem(_node, _tip);
 }
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (! m_showOnlyTroubles
-      || (m_showOnlyTroubles && _node.sev != ngrt4n::Normal))
-  {
-    m_msgConsole->updateNodeMsg(_node);
-  }
+  if (! m_showOnlyTroubles || (m_showOnlyTroubles && _node.sev != ngrt4n::Normal))
+    m_msgConsole.updateNodeMsg(_node);
 }
 
 void WebDashboard::updateChart(void)
@@ -100,35 +93,35 @@ void WebDashboard::updateChart(void)
   qint32 statCount;
   CheckStatusCountT statsData;
   extractStatsData(statsData, statCount);
-  m_chart->updateStatsData(statsData, statCount);
-  m_chart->repaint();
+  m_chart.updateStatsData(statsData, statCount);
+  m_chart.repaint();
 }
 
 void WebDashboard::buildMap(void)
 {
-  m_map->drawMap();
+  m_map.drawMap();
 }
 
 
 void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 {
-  m_map->updateNode(_node, _tip);
+  m_map.updateNode(_node, _tip);
 }
 
 void WebDashboard::updateThumbnailInfo(void)
 {
-  m_thumbnailProblemDetailsBar->setText(m_chart->problemsDetailsText());
+  m_thumbnailProblemDetailsBar.setText(m_chart.problemsDetailsText());
 }
 
 
 void WebDashboard::updateMap(void)
 {
-  m_map->drawMap();
+  m_map.drawMap();
 }
 
 void WebDashboard::setupUI(void)
 {
-  Wt::WHBoxLayout* mainLayout(new Wt::WHBoxLayout(m_widget));
+  Wt::WHBoxLayout* mainLayout(new Wt::WHBoxLayout(&m_widget));
   Wt::WVBoxLayout* leftSubMainLayout(new Wt::WVBoxLayout());
   Wt::WVBoxLayout* rightSubMainLayout(new Wt::WVBoxLayout());
 
@@ -140,11 +133,11 @@ void WebDashboard::setupUI(void)
   leftSubMainLayout->setSpacing(2);
   rightSubMainLayout->setSpacing(2);
 
-  leftSubMainLayout->addWidget(m_tree);
-  leftSubMainLayout->addWidget(m_chart->getContainerArea());
+  leftSubMainLayout->addWidget(&m_tree);
+  leftSubMainLayout->addWidget(m_chart.getContainerArea());
 
-  rightSubMainLayout->addWidget(m_map->get());
-  rightSubMainLayout->addWidget(m_msgConsole);
+  rightSubMainLayout->addWidget(m_map.get());
+  rightSubMainLayout->addWidget(&m_msgConsole);
   mainLayout->addLayout(leftSubMainLayout);
   mainLayout->addLayout(rightSubMainLayout);
 
@@ -166,7 +159,7 @@ void WebDashboard::unbindWidgets(void)
 
 void WebDashboard::addJsEventScript(void)
 {
-  m_widget->setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
+  m_widget.setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
   triggerResizeComponents();
 }
 
@@ -195,7 +188,7 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(Severity(node.sev).toString(),
                                                                                  node.child_nodes).toStdString());
-  anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(m_widget);}));
+  anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(&m_widget);}));
 
   tpl->bindWidget("event-feed-title", anchor);
   tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
@@ -210,8 +203,8 @@ Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
 void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble)
 {
   m_showOnlyTroubles = showOnlyTrouble;
-  m_widget->setDisabled(true);
-  m_msgConsole->clearAll();
+  m_widget.setDisabled(true);
+  m_msgConsole.clearAll();
   runMonitor();
-  m_widget->setDisabled(false);
+  m_widget.setDisabled(false);
 }

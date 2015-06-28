@@ -25,10 +25,21 @@
 #include "WebTree.hpp"
 #include "utilsCore.hpp"
 
-WebTree::WebTree(CoreDataT* _cdata)
+WebTree::WebTree(void)
   : Wt::WTreeView(0),
-    m_model (new Wt::WStandardItemModel()),
-    m_cdata(_cdata)
+    m_model(new Wt::WStandardItemModel())
+{
+  setDefaultSettings();
+}
+
+
+WebTree::~WebTree()
+{
+  delete m_model;
+}
+
+
+void WebTree::setDefaultSettings(void)
 {
   setHeaderHeight(0);
   setSelectionMode(Wt::SingleSelection);
@@ -37,10 +48,6 @@ WebTree::WebTree(CoreDataT* _cdata)
   setColumnWidth(0, 500);
 }
 
-WebTree::~WebTree()
-{
-  delete m_model;
-}
 
 
 void WebTree::build(void)

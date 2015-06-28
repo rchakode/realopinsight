@@ -46,9 +46,8 @@ namespace {
   const double THUMBNAIL_HEIGHT = 70;
 }
 
-WebMap::WebMap(CoreDataT* _cdata)
+WebMap::WebMap(void)
   : WPaintedWidget(0),
-    m_cdata(_cdata),
     m_scaleX(1),
     m_scaleY(1),
     m_scrollArea(new Wt::WScrollArea()),
@@ -60,6 +59,17 @@ WebMap::WebMap(CoreDataT* _cdata)
     m_translateY(0),
     m_thumbnail(new Wt::WImage())
 {
+  setDefaultSettings();
+}
+
+
+WebMap::~WebMap()
+{
+}
+
+
+void WebMap::setDefaultSettings(void)
+{
   m_scrollArea->setWidget(this);
   setPreferredMethod();
   setLayoutSizeAware(true);
@@ -67,9 +77,7 @@ WebMap::WebMap(CoreDataT* _cdata)
   m_containerSizeChanged.connect(this, &WebMap::handleContainedSizeChanged);
 }
 
-WebMap::~WebMap()
-{
-}
+
 
 void WebMap::setPreferredMethod(void)
 {

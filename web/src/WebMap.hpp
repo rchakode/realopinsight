@@ -42,10 +42,10 @@ struct NodeT;
 class WebMap : public Wt::WPaintedWidget
 {
 public:
-  WebMap(CoreDataT* _cdata);
+  WebMap(void);
   virtual ~WebMap();
+  void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void drawMap(void);
-
   Wt::WScrollArea* get(void) const {return m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
@@ -76,6 +76,7 @@ private:
   double m_translateY;
   Wt::WImage* m_thumbnail;
 
+  void setDefaultSettings(void);
   void drawNode(const NodeT& node, bool drawIcon = true);
   void drawEdge(const QString& parentId, const QString& childId);
   void createNodeLink(const NodeT& node, const Wt::WPointF& pos);

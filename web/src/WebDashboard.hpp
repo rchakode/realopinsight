@@ -44,11 +44,11 @@
 #include <Wt/WApplication>
 
 #define ROOT_DIV wApp->root()->id()
-#define TREEVIEW_DIV m_tree->id()
-#define MAP_DIV m_map->id()
-#define MAP_SCROLL_AREA_DIV m_map->get()->id()
-#define CHART_SCROLL_AREA_DIV m_chart->getContainerArea()->id()
-#define MSG_CONSOLE_DIV m_msgConsole->id()
+#define TREEVIEW_DIV m_tree.id()
+#define MAP_DIV m_map.id()
+#define MAP_SCROLL_AREA_DIV m_map.get()->id()
+#define CHART_SCROLL_AREA_DIV m_chart.getContainerArea()->id()
+#define MSG_CONSOLE_DIV m_msgConsole.id()
 #define MAP_AREA_HEIGHT_RATIO "0.4"
 
 /**
@@ -88,18 +88,18 @@ class WebDashboard : public DashboardBase
 public:
   WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout=NULL);
   virtual ~WebDashboard();
-  Wt::WWidget* getWidget(void) const {return m_widget;}
+  Wt::WContainerWidget* getWidget(void) {return &m_widget;}
   void updateMap(void);
-  WebMap* map(void) const {return m_map;}
+  WebMap* map(void) {return &m_map;}
   void updateThumbnailInfo(void);
-  Wt::WImage* thumbnail(void) const {return m_map->thumbnail();}
-  Wt::WLabel* thumbnailTitleBar(void) {return m_thumbnailTitleBar;}
-  Wt::WLabel* thumbnailProblemDetailBar(void) {return m_thumbnailProblemDetailsBar;}
+  Wt::WImage* thumbnail(void) const {return m_map.thumbnail();}
+  Wt::WLabel* thumbnailTitleBar(void) {return &m_thumbnailTitleBar;}
+  Wt::WLabel* thumbnailProblemDetailBar(void) {return &m_thumbnailProblemDetailsBar;}
   std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
   void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
   virtual void initialize(Preferences* preferencePtr);
-  std::string tooltip(void) const {return m_chart->toStdString();}
-  void triggerResizeComponents(void) {m_widget->doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
+  std::string tooltip(void) {return m_chart.toStdString();}
+  void triggerResizeComponents(void) { m_widget.doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
   void handleShowOnlyTroubleEvents(bool showOnlyTrouble);
 
 
@@ -117,13 +117,13 @@ Q_SIGNALS:
 
 private:
   typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;
-  Wt::WContainerWidget* m_widget;
-  WebTree* m_tree;
-  WebMap* m_map;
-  WebMsgConsole* m_msgConsole;
-  WebPieChart* m_chart;
-  Wt::WLabel* m_thumbnailTitleBar;
-  Wt::WLabel* m_thumbnailProblemDetailsBar;
+  Wt::WContainerWidget m_widget;
+  WebTree m_tree;
+  WebMap m_map;
+  WebMsgConsole m_msgConsole;
+  WebPieChart m_chart;
+  Wt::WLabel m_thumbnailTitleBar;
+  Wt::WLabel m_thumbnailProblemDetailsBar;
   Wt::WVBoxLayout* m_eventFeedLayout;
   EventFeedItemsT m_eventFeedItems;
 

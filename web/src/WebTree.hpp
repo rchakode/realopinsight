@@ -35,14 +35,12 @@
 class WebTree : public Wt::WTreeView
 {
 public:
-  WebTree(CoreDataT* _cdata);
+  WebTree();
   virtual ~WebTree();
-
+  void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   Wt::WStandardItemModel* renderingModel(void) const {return m_model;}
   void setRenderingModel(Wt::WStandardItem* _item) const {return m_model->appendRow(_item);}
   void updateNodeItem(const NodeT& _node, const QString& _tip);
-
-
   void build(void);
   void update(void);
   void update(Wt::WStandardItem * _rItem) { setRenderingModel(_rItem); update(); }
@@ -53,6 +51,7 @@ private:
   CoreDataT* m_cdata;
   WebTreeItemsT m_items;
 
+  void setDefaultSettings(void);
   Wt::WStandardItem* createItem(const NodeT& _node);
   Wt::WStandardItem* findNodeItem(const QString& _nodeId);
 };
