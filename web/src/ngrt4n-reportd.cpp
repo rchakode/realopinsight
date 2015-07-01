@@ -23,7 +23,7 @@
  */
 
 #include "dbo/DbSession.hpp"
-#include "WebPreferences.hpp"
+#include "WebPreferencesBase.hpp"
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
 #include "Applications.hpp"
