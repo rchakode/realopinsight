@@ -53,9 +53,9 @@ public:
   Wt::Signal<void>& loaded(void) {return m_loaded;}
   void updateThumbnail(void);
   std::string thumbnailPath(void) {return m_thumbnailPath;}
-  Wt::WImage* thumbnail(void) const {return m_thumbnail;}
+  Wt::WImage* thumbnailImage(void) {return &m_thumbnailImage;}
   void emitLoaded(void) const {m_loaded.emit();}
-  void setThumbnailTooltip(const std::string& tooltip) {m_thumbnail->setToolTip(tooltip);}
+  void setThumbnailTooltip(const std::string& tooltip) {m_thumbnailImage.setToolTip(tooltip);}
 
 
 protected:
@@ -74,7 +74,7 @@ private:
   std::string m_thumbnailPath;
   double m_translateX;
   double m_translateY;
-  Wt::WImage* m_thumbnail;
+  Wt::WImage m_thumbnailImage;
 
   void setDefaultSettings(void);
   void drawNode(const NodeT& node, bool drawIcon = true);

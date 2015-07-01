@@ -120,6 +120,7 @@ private:
   typedef std::map<std::string, WebPieChart*> QosTrendsChartMapT;
   typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
+  //FIXME: clear template before clean
   ThumbnailMapT m_thumbnailItems;
 
   /** Signals */
@@ -166,18 +167,23 @@ private:
   int m_assignedDashboardCount;
   Wt::WText m_adminPanelTitle;
   WebDashboard* m_currentDashboard;
-  Wt::WVBoxLayout* m_eventFeedLayout;
 
-
+  /** Related to QoS Charts **/
   QosTrendsChartMapT m_qosCharts;
   RawQosTrendsChartMapT m_rawQosCharts;
   Wt::WDatePicker* m_reportStartDatePicker;
   Wt::WDatePicker* m_reportEndDatePicker;
   Wt::WAnchor* m_reportApplyAnchor;
 
-
   Wt::WComboBox* m_selectViewBreadCrumbsBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
+
+  /** executive view widgets **/
+  Wt::WContainerWidget m_eventFeedsContainer;
+  Wt::WVBoxLayout m_eventFeedLayout;
+  Wt::WContainerWidget m_thumbnailContainer;
+  Wt::WGridLayout m_thumbnailLayout;
+
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -217,7 +223,7 @@ private:
   void openFileUploadDialog(void);
   void selectItem4Preview(void);
   void initOperatorDashboard(void);
-  void loadView(const std::string& path, WebDashboard*& dashboard);
+  WebDashboard* loadView(const std::string& path);
 
   void scaleMap(double factor);
   UserFormView* createAccountPanel(void);
@@ -248,8 +254,13 @@ private:
   Wt::WWidget* createNotificationSection(void);
   void updateLicenseMgntForm();
   void unbindWidgets(void);
+  void unbindThumbnailWidgets(void);
+  void unbindDashboardWidgets(void);
   void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);
   void dbsaveBusinessServiceInfo(const CoreDataT& cdata, const QString& path);
+
+  Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
+  void clearThumbnailTemplate(Wt::WTemplate* tpl);
 };
 
 #endif // MAINWEBWINDOW_HPP

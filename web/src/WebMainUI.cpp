@@ -75,9 +75,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_licenseMngtForm(new WebLicenseManager(PKG_VERSION)),
-    m_dashboardStackedContents(new Wt::WStackedWidget()),
     m_currentDashboard(NULL),
-    m_eventFeedLayout(NULL),
     m_reportStartDatePicker(NULL),
     m_reportEndDatePicker(NULL),
     m_reportApplyAnchor(NULL)
@@ -108,10 +106,8 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::unbindWidgets(void)
 {
-  for (auto dashboard : m_dashboards) m_dashboardStackedContents.removeWidget(dashboard->getWidget());
-  m_dashboardStackedContents.removeWidget(&m_settingsPageTpl);
-  m_dashboardStackedContents.removeWidget(&m_operatorHomeTpl);
-  m_mainStackedContents.removeWidget(&m_dashboardStackedContents);
+  unbindThumbnailWidgets();
+  unbindDashboardWidgets();
 
   m_adminStackedContents.removeWidget(&m_dataSourceSettingsForm);
   m_adminStackedContents.removeWidget(&m_notificationSettingsForm);
@@ -123,13 +119,32 @@ void WebMainUI::unbindWidgets(void)
   //FIXME unbind conditionnaly other widgets
   m_settingsPageTpl.takeWidget("title");
   m_settingsPageTpl.takeWidget("contents");
+
   m_settingsPageTpl.clear();
+  m_breadcrumbsBar.clear();
+  m_breadcrumbsBar.clear();
 
   m_mainWidget.removeWidget(&m_navbar);
   m_mainWidget.removeWidget(&m_breadcrumbsBar);
   m_mainWidget.removeWidget(&m_mainStackedContents);
 
   removeWidget(& m_mainWidget);
+}
+
+
+void WebMainUI::unbindThumbnailWidgets(void)
+{
+  for (ThumbnailMapT::Iterator thumb = m_thumbnailItems.begin(); thumb != m_thumbnailItems.end(); ++thumb)
+    clearThumbnailTemplate(*thumb);
+}
+
+
+void WebMainUI::unbindDashboardWidgets(void)
+{
+  for (auto dashboard : m_dashboards) m_dashboardStackedContents.removeWidget(dashboard->getWidget());
+  m_dashboardStackedContents.removeWidget(&m_settingsPageTpl);
+  m_dashboardStackedContents.removeWidget(&m_operatorHomeTpl);
+  m_mainStackedContents.removeWidget(&m_dashboardStackedContents);
 }
 
 
@@ -422,10 +437,10 @@ void WebMainUI::handleRefresh(void)
     }
 
     std::string rootServiceName =  rootService.name.toStdString();
-    ThumbnailMapT::Iterator thumbItem = m_thumbnailItems.find(rootServiceName);
-    if (thumbItem != m_thumbnailItems.end()) {
-      (*thumbItem)->setStyleClass(dashboard->thumbnailCssClass());
-      (*thumbItem)->setToolTip(dashboard->tooltip());
+    ThumbnailMapT::Iterator thumbnailItem = m_thumbnailItems.find(rootServiceName);
+    if (thumbnailItem != m_thumbnailItems.end()) {
+      (*thumbnailItem)->setStyleClass(dashboard->thumbnailCssClass());
+      (*thumbnailItem)->setToolTip(dashboard->tooltip());
       if (m_dbSession->isCompleteUserDashboard()) {
         updateViewBiCharts(rootServiceName);
       }
@@ -511,40 +526,40 @@ void WebMainUI::openFileUploadDialog(void)
 }
 
 
-void WebMainUI::loadView(const std::string& path, WebDashboard*& dashboard)
+WebDashboard* WebMainUI::loadView(const std::string& path)
 {
+  WebDashboard* dashboard = NULL;
   try {
-    dashboard = NULL;
-    dashboard = new WebDashboard(path.c_str(), m_eventFeedLayout);
+    dashboard = new WebDashboard(path.c_str(), &m_eventFeedLayout);
     if (! dashboard) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
-      return ;
-    }
-    dashboard->initialize(& m_dataSourceSettingsForm);
-    if (dashboard->lastErrorState()) {
-      showMessage(ngrt4n::OperationFailed, dashboard->lastErrorMsg().toStdString());
-      delete dashboard;
-      dashboard = NULL;
     } else {
-      QString platformName = dashboard->rootNode().name;
-      DashboardMapT::Iterator result = m_dashboards.find(platformName);
-      if (result != m_dashboards.end()) {
-        showMessage(ngrt4n::OperationFailed,
-                    tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
-        delete dashboard;
-        dashboard = NULL;
+      dashboard->initialize(& m_dataSourceSettingsForm);
+      if (dashboard->lastErrorState()) {
+        showMessage(ngrt4n::OperationFailed, dashboard->lastErrorMsg().toStdString());
+        delete dashboard, dashboard = NULL;
       } else {
-        m_dashboards.insert(platformName, dashboard);
-        m_dashboardStackedContents.addWidget(dashboard->getWidget());
-        m_selectViewBreadCrumbsBox->addItem(platformName.toStdString());
+        QString platformName = dashboard->rootNode().name;
+        DashboardMapT::Iterator result = m_dashboards.find(platformName);
+        if (result != m_dashboards.end()) {
+          showMessage(ngrt4n::OperationFailed,
+                      tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
+          delete dashboard, dashboard = NULL;
+        } else {
+          m_dashboards.insert(platformName, dashboard);
+          m_dashboardStackedContents.addWidget(dashboard->getWidget());
+          m_selectViewBreadCrumbsBox->addItem(platformName.toStdString());
+        }
       }
     }
   } catch (const std::bad_alloc&) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     CORE_LOG("error", errorMsg);
-    delete dashboard;
+    delete dashboard, dashboard = NULL;
     showMessage(ngrt4n::OperationFailed, errorMsg);
   }
+
+  return dashboard;
 }
 
 void WebMainUI::scaleMap(double factor)
@@ -589,7 +604,7 @@ void WebMainUI::setupSettingsPage(void)
 
       // menu auto import host group
       m_adminStackedContents.addWidget(&m_autoHostgroupImporterForm);
-      menuText = QObject::tr("Import Hostgroup as Service Map").toStdString();
+      menuText = QObject::tr("Quick View Builder").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
       m_settingsPageTpl.bindWidget("menu-auto-hostgroup-map", link);
@@ -845,14 +860,7 @@ Wt::WDialog* WebMainUI::createAboutDialog(void)
 
 void WebMainUI::initOperatorDashboard(void)
 {
-  Wt::WContainerWidget* thumbnailsContainer = new Wt::WContainerWidget(&m_mainWidget);
-  Wt::WGridLayout* thumbLayout = new Wt::WGridLayout(thumbnailsContainer);
-
-  Wt::WContainerWidget* eventFeedsContainer = new Wt::WContainerWidget(&m_mainWidget);
-  m_eventFeedLayout = new Wt::WVBoxLayout();
-  eventFeedsContainer->setLayout(m_eventFeedLayout);
-  setupOperatorHomePage(thumbnailsContainer, eventFeedsContainer);
-  m_dashboardStackedContents.addWidget(&m_operatorHomeTpl);
+  setupOperatorHomePage(&m_thumbnailContainer, &m_eventFeedsContainer);
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
@@ -861,23 +869,27 @@ void WebMainUI::initOperatorDashboard(void)
   int thumbIndex = 0;
   int thumbnailsPerRow = m_dbSession->dashboardTilesPerRow();
   for (const auto& view: m_dbSession->viewList()) {
-    WebDashboard* dashboard;
-    loadView(view.path, dashboard);
+    WebDashboard* dashboard = loadView(view.path);
     if (dashboard) {
-      Wt::WTemplate* thumbItem = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
-      thumbItem->setStyleClass("btn btn-unknown");
-      thumbItem->bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
-      thumbItem->bindWidget("thumb-image", dashboard->thumbnail());
-      thumbItem->bindWidget("thumb-problem-details", dashboard->thumbnailProblemDetailBar());
+      //      Wt::WTemplate thumbnailTpl ;
+      //      thumbnailTpl.setTemplateText(Wt::WString::tr("dashboard-thumbnail.tpl"));
+      //      thumbnailTpl.setStyleClass("btn btn-unknown");
+      //      thumbnailTpl.bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
+      //      thumbnailTpl.bindWidget("thumb-image", dashboard->thumbnail());
+      //      thumbnailTpl.bindWidget("thumb-problem-details", dashboard->thumbnailProblemDetailBar());
 
-      /** signal/slot events */
-      thumbItem->clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
+      //      /** signal/slot events */
+      //      thumbnailTpl.clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
+
+      Wt::WTemplate* thumbnailWidget = createThumbnailWidget(dashboard->thumbnailTitleBar(),
+                                                             dashboard->thumbnailProblemDetailBar(),
+                                                             dashboard->thumbnail());
+      m_thumbnailLayout.addWidget(thumbnailWidget, thumbIndex / thumbnailsPerRow, thumbIndex % thumbnailsPerRow);
+      m_thumbnailItems.insert(view.name, thumbnailWidget);
+
       QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(setWidgetAsFrontStackedWidget(Wt::WWidget*)));
+      thumbnailWidget->clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
 
-      /** add to layout */
-      thumbLayout->addWidget(thumbItem, thumbIndex / thumbnailsPerRow, thumbIndex % thumbnailsPerRow);
-
-      m_thumbnailItems.insert(view.name, thumbItem);
       ++thumbIndex;
     }
   }
@@ -887,10 +899,27 @@ void WebMainUI::initOperatorDashboard(void)
   if (thumbIndex > 0) {
     startDashbaordUpdate();
   } else {
-    thumbLayout->addWidget(new Wt::WText(tr("No view to display").toStdString()), 0, 0);
+    m_thumbnailLayout.addWidget(new Wt::WText(tr("No view to display").toStdString()), 0, 0);
   }
 }
 
+
+Wt::WTemplate* WebMainUI::createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget)
+{
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("dashboard-thumbnail.tpl"));
+  tpl->setStyleClass("btn btn-unknown");
+  tpl->bindWidget("thumb-titlebar", titleWidget);
+  tpl->bindWidget("thumb-problem-details", problemWidget);
+  tpl->bindWidget("thumb-image", imageWidget);
+  return tpl;
+}
+
+void WebMainUI::clearThumbnailTemplate(Wt::WTemplate* tpl)
+{
+  tpl->takeWidget("thumb-titlebar");
+  tpl->takeWidget("thumb-problem-details");
+  tpl->takeWidget("thumb-image");
+}
 
 void WebMainUI::showConditionalUiWidgets(void)
 {
@@ -931,10 +960,16 @@ void WebMainUI::showConditionalUiWidgets(void)
 
 void WebMainUI::setupOperatorHomePage(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer)
 {
+  //FIXME: unbind it
+  m_thumbnailContainer.setLayout(&m_thumbnailLayout);
+  //FIXME: unbind it
+  m_eventFeedsContainer.setLayout(&m_eventFeedLayout);
   m_operatorHomeTpl.setTemplateText(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl.bindWidget("info-box", m_infoBox);
   m_operatorHomeTpl.bindWidget("thumbnails", thumbnailsContainer);
   m_operatorHomeTpl.bindWidget("event-feeds", eventFeedContainer);
+  //FIXME: unbind it
+  m_dashboardStackedContents.addWidget(&m_operatorHomeTpl);
 }
 
 void WebMainUI::setInternalPath(const std::string& path)
@@ -1239,8 +1274,7 @@ void WebMainUI::handlePreview(void)
   m_previewDialog.accept();
   m_previewDialog.contents()->clear();
   if (! m_selectedFile.empty()) {
-    WebDashboard* dashbord;
-    loadView(m_selectedFile, dashbord);
+    WebDashboard* dashbord = loadView(m_selectedFile);
     setDashboardAsFrontStackedWidget(dashbord);
     m_selectedFile.clear();
   } else {

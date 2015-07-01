@@ -92,7 +92,7 @@ public:
   void updateMap(void);
   WebMap* map(void) {return &m_map;}
   void updateThumbnailInfo(void);
-  Wt::WImage* thumbnail(void) const {return m_map.thumbnail();}
+  Wt::WImage* thumbnail(void) {return m_map.thumbnailImage();}
   Wt::WLabel* thumbnailTitleBar(void) {return &m_thumbnailTitleBar;}
   Wt::WLabel* thumbnailProblemDetailBar(void) {return &m_thumbnailProblemDetailsBar;}
   std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}

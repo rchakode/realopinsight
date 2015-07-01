@@ -55,8 +55,7 @@ WebMap::WebMap(void)
     m_loaded(this),
     m_thumbnailPath(""),
     m_translateX(0),
-    m_translateY(0),
-    m_thumbnail(new Wt::WImage())
+    m_translateY(0)
 {
   setDefaultSettings();
 }
@@ -269,7 +268,7 @@ void WebMap::updateThumbnail(void)
   thumbnailImg.write(output);
   output.close();
 
-  m_thumbnail->setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
+  m_thumbnailImage.setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
 }
 
 
