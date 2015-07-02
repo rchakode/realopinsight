@@ -74,17 +74,17 @@ OpManagerHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[GetDeviceByName]             = "/device/listDevices?"
-                                          "apiKey=%1"
-                                          "&deviceName=%2";
+      "apiKey=%1"
+      "&deviceName=%2";
   patterns[GetDeviceByType]             = "/device/listDevices?"
-                                          "apiKey=%1"
-                                          "&type=%2";
+      "apiKey=%1"
+      "&type=%2";
   patterns[GetDeviceByCategory]         = "/device/listDevices?"
-                                          "apiKey=%1"
-                                          "&Category=%2";
+      "apiKey=%1"
+      "&Category=%2";
   patterns[GetDeviceAssociatedMonitors] = "/device/getAssociatedMonitors?"
-                                          "apiKey=%1"
-                                          "&name=%2";
+      "apiKey=%1"
+      "&name=%2";
   return patterns;
 }
 
@@ -104,19 +104,18 @@ OpManagerHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, int filterT
 {
   checks.clear();
 
-  if (checkCredentialsInfo(srcInfo.auth) != 0)
-    return -1;
-
   setBaseUrl(srcInfo.mon_url);
   setApiKey(srcInfo.auth);
 
   QStringList params = (QStringList() << m_apiKey << filter);
-  QNetworkReply* response = postRequest(filterType, params);
-  response->deleteLater();
-  data = response->readAll();
+  QNetworkReply* reply = postRequest(filterType, params);
 
-  processDeviceData(data, deviceList);
-  Q_FOREACH(const QString& device, deviceList) { fetchAndAppendDeviceMonitors(device, checks); }
+  reply->deleteLater();
+  QString data = reply->readAll();
+
+  processDevicesData(data, checks);
+
+  Q_FOREACH(const CheckT& check, checks) { fetchAndAppendDeviceMonitors(check.host.c_str(), checks); }
 
   return 0;
 }
@@ -126,10 +125,13 @@ int
 OpManagerHelper::fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks)
 {
   QStringList params = (QStringList() << m_apiKey << deviceName);
-  QNetworkReply* response = postRequest(GetDeviceAssociatedMonitors, params);
-  response->deleteLater();
-  data = response->readAll();
-  processMonitorData(data, checks);
+  QNetworkReply* reply = postRequest(GetDeviceAssociatedMonitors, params);
+
+  reply->deleteLater();
+  QString data = reply->readAll();
+
+  processMonitorsData(data, checks);
+
   return 0;
 }
 
@@ -141,6 +143,19 @@ OpManagerHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
   reply->setSslConfiguration(m_sslConfig);
   if (m_sslConfig.peerVerifyMode() == QSslSocket::VerifyNone)
     reply->ignoreSslErrors();
+}
+
+
+
+void OpManagerHelper::processDevicesData(const QString& data, ChecksT& checks)
+{
+
+}
+
+
+void OpManagerHelper::processMonitorsData(const QString& data, ChecksT& checks)
+{
+
 }
 
 

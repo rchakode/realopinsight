@@ -84,6 +84,8 @@ private :
   QString m_replyData;
 
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  void processDevicesData(const QString& data, ChecksT& checks);
+  void processMonitorsData(const QString& data, ChecksT& checks);
   std::string parseHostGroups(const QScriptValue& json);
   std::string parseHost(const QScriptValue& json);
 };

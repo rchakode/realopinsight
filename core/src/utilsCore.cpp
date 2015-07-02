@@ -224,7 +224,8 @@ QStringList ngrt4n::sourceTypes(void)
   return QStringList() << "Nagios-like"
                        << "Zabbix"
                        << "Zenoss"
-                       << "Pandora FMS";
+                       << "Pandora FMS"
+                       << "ManageEngine OpManager";
 }
 
 qint32 ngrt4n::convertToSourceType(const QString& str)
@@ -239,6 +240,8 @@ qint32 ngrt4n::convertToSourceType(const QString& str)
     type = MonitorT::Zenoss;
   else if (str == types[MonitorT::Pandora])
     type = MonitorT::Pandora;
+  else if (str == types[MonitorT::OpManager])
+    type = MonitorT::OpManager;
   else
     type = MonitorT::Auto;
 

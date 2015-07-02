@@ -962,8 +962,8 @@ void SvCreator::loadMenu(void)
       m_subMenus["ImportHostGroupAsBusinessView"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Host/Group as Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks as Data Points")),
-      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Nagios BPI Configuration as Business View")),
-      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Zabbix IT Services as Business View"));
+      m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Nagios BPI Configuration as Business View")),
+      m_subMenus["ImportZabbixITServices"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-zabbix.png"), tr("Import Zabbix IT Services as Business View"));
 
   m_menus[MENU_HELP] = m_menuBar->addMenu(tr("&Help"));
   m_subMenus["ShowOnlineResources"] = m_menus[MENU_HELP]->addAction(tr("Online &Resources")),

@@ -95,7 +95,7 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
   int retcode = -1;
   if (srcInfo.mon_type == MonitorT::Nagios) {
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
-    if (handler.setupSocket() == 0 || handler.loadChecks(filter, checks) != 0) {
+    if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
       retcode = -1;
     }
     errorMsg = handler.lastError();
@@ -117,6 +117,8 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
     PandoraHelper handler(srcInfo.mon_url);
     retcode = handler.loadChecks(srcInfo, checks, filter);
     errorMsg = handler.lastError();
+  } else {
+    errorMsg = QObject::tr("Unknown data source type");
   }
 
   return retcode;
