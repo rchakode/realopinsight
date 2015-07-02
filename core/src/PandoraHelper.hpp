@@ -32,7 +32,7 @@
 
 
 namespace {
-  const QString PANDORA_API_CONTEXT = "pandora_console/include/api.php";
+  const QString PANDORAFMS_API_CONTEXT = "pandora_console/include/api.php";
   }
 
 class PandoraHelper : public QNetworkAccessManager {
@@ -49,9 +49,9 @@ public:
   PandoraHelper(const QString& baseUrl="http://localhost/");
   virtual ~PandoraHelper();
   int
-  loadChecks(const SourceT& srcInfo,  ChecksT& checks, const QString& agentName);
+  loadChecks(const SourceT& srcInfo,  ChecksT& checks, const QString& filter);
   QNetworkReply*
-  postRequest(const qint32& reqId, const QStringList& params);
+  postRequest(int reqId, const QStringList& params);
   void
   setBaseUrl(const QString& url);
   QString
@@ -71,7 +71,7 @@ public:
   int
   openSession(const SourceT& srcInfo);
   int
-  processModuleReply(QNetworkReply* reply, ChecksT& checks);
+  processModuleReply(QNetworkReply* reply, ChecksT& checks, const QString& filter);
 
 
 public Q_SLOTS:
@@ -93,7 +93,6 @@ private :
   QSslConfiguration m_sslConfig;
   QString m_lastError;
   QString m_replyData;
-  QString m_agentFilter;
 
   void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
   std::string parseHostGroups(const QScriptValue& json);

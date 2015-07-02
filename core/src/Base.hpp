@@ -83,6 +83,7 @@ public:
     Zabbix  = 1,
     Zenoss  = 2,
     Pandora = 3,
+    OpManager = 4,
     Auto    = 99
   };
 
@@ -99,7 +100,10 @@ public:
         value = QObject::tr("Zenoss");
         break;
       case Pandora:
-        value = QObject::tr("Pandora");
+        value = QObject::tr("Pandora FMS");
+        break;
+      case OpManager:
+        value = QObject::tr("ManageEngine OpManager");
         break;
       case Auto:
       default:

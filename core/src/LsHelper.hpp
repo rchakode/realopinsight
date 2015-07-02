@@ -49,7 +49,6 @@ public:
 
 private:
   QString m_lastError;
-  QEventLoop* m_evloop;
   RawSocket* m_socketHandler;
 };
 

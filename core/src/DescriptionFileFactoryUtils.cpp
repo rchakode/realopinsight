@@ -26,31 +26,19 @@
 #include "utilsCore.hpp"
 #include "ZbxHelper.hpp"
 #include "LsHelper.hpp"
+#include "ZnsHelper.hpp"
+#include "PandoraHelper.hpp"
+#include "OpManagerHelper.hpp"
 #include "ThresholdHelper.hpp"
 
-int ngrt4n::importHostGroupAsMap(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg)
+
+int ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg)
 {
   ChecksT checks;
-  QString monitorName = MonitorT::toString(srcInfo.mon_type);
-  if (srcInfo.mon_type == MonitorT::Zabbix) {
-    ZbxHelper handler;
-    if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter) != 0) {
-      errorMsg = QObject::tr("%1 data points importation failed: %2").arg(monitorName, handler.lastError());
-    } else {
-      if (checks.empty()) {
-        if (handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter) != 0) {
-          errorMsg = QObject::tr("%1 data points importation failed: %2").arg(monitorName, handler.lastError());
-        }
-      }
-    }
-  } else if (srcInfo.mon_type == MonitorT::Nagios) {
-    LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
-    if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
-      errorMsg = handler.lastError();
-    }
-  } else {
-    //TODO: to be implemented
-    errorMsg = QObject::tr("%1 monitor is not supported yet").arg(monitorName);
+
+  if (importMonitorItemAsDataPoints(srcInfo, filter, checks, errorMsg) != 0) {
+    errorMsg = MonitorT::toString(srcInfo.mon_type).append(": ").append(errorMsg);
+    return -1;
   }
 
   // handle results
@@ -60,7 +48,7 @@ int ngrt4n::importHostGroupAsMap(const SourceT& srcInfo, const QString& filter, 
 
     NodeT root;
     root.id = ngrt4n::ROOT_ID;
-    root.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(monitorName) : filter;
+    root.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MonitorT::toString(srcInfo.mon_type)) : filter;
     root.type = NodeType::BusinessService;
 
     NodeT hostNode;
@@ -98,7 +86,40 @@ int ngrt4n::importHostGroupAsMap(const SourceT& srcInfo, const QString& filter, 
     cdata.bpnodes.insert(ngrt4n::ROOT_ID, root);
   }
 
-  return errorMsg.isEmpty()? 0 : -1;
+  return 0;
+}
+
+
+int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks, QString& errorMsg)
+{
+  int retcode = -1;
+  if (srcInfo.mon_type == MonitorT::Nagios) {
+    LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
+    if (handler.setupSocket() == 0 || handler.loadChecks(filter, checks) != 0) {
+      retcode = -1;
+    }
+    errorMsg = handler.lastError();
+  } else if (srcInfo.mon_type == MonitorT::Zabbix) {
+    ZbxHelper handler;
+    retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+    if (checks.empty()) {
+      retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+    }
+    errorMsg = handler.lastError();
+  } else if (srcInfo.mon_type == MonitorT::Zenoss) {
+    ZnsHelper handler(srcInfo.mon_url);
+    retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+    if (checks.empty()) {
+      retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+    }
+    errorMsg = handler.lastError();
+  } else if (srcInfo.mon_type == MonitorT::Pandora) {
+    PandoraHelper handler(srcInfo.mon_url);
+    retcode = handler.loadChecks(srcInfo, checks, filter);
+    errorMsg = handler.lastError();
+  }
+
+  return retcode;
 }
 
 

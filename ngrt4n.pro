@@ -92,7 +92,8 @@ HEADERS += \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
     core/src/PandoraHelper.hpp \
-    core/src/DescriptionFileFactoryUtils.hpp
+    core/src/DescriptionFileFactoryUtils.hpp \
+    core/src/OpManagerHelper.hpp
 
 
 SOURCES += \
@@ -111,7 +112,8 @@ SOURCES += \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
     core/src/PandoraHelper.cpp \
-    core/src/DescriptionFileFactoryUtils.cpp
+    core/src/DescriptionFileFactoryUtils.cpp \
+    core/src/OpManagerHelper.cpp
 
 QT += svg gui
 PACKAGE_VERSION="-$${REALOPINSIGHT_CORE_VERSION}"
