@@ -74,17 +74,17 @@ OpManagerHelper::requestsPatterns()
 {
   RequestListT patterns;
   patterns[GetDeviceByName]             = "/device/listDevices?"
-      "apiKey=%1"
-      "&deviceName=%2";
+                                          "apiKey=%1"
+                                          "&deviceName=%2";
   patterns[GetDeviceByType]             = "/device/listDevices?"
-      "apiKey=%1"
-      "&type=%2";
+                                          "apiKey=%1"
+                                          "&type=%2";
   patterns[GetDeviceByCategory]         = "/device/listDevices?"
-      "apiKey=%1"
-      "&Category=%2";
+                                          "apiKey=%1"
+                                          "&Category=%2";
   patterns[GetDeviceAssociatedMonitors] = "/device/getAssociatedMonitors?"
-      "apiKey=%1"
-      "&name=%2";
+                                          "apiKey=%1"
+                                          "&name=%2";
   return patterns;
 }
 
@@ -130,7 +130,7 @@ OpManagerHelper::fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT
   reply->deleteLater();
   QString data = reply->readAll();
 
-  processMonitorsData(data, checks);
+  processMonitorsData(data, deviceName, checks);
 
   return 0;
 }
@@ -149,51 +149,134 @@ OpManagerHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
 
 void OpManagerHelper::processDevicesData(const QString& data, ChecksT& checks)
 {
+  JsonHelper json(data);
 
-}
-
-
-void OpManagerHelper::processMonitorsData(const QString& data, ChecksT& checks)
-{
-
-}
-
-
-std::string
-OpManagerHelper::parseHostGroups(const QScriptValue& json)
-{
-  std::string result("");
-  QScriptValueIterator entryIter(json);
-  while (entryIter.hasNext()) {
-    entryIter.next();
-    if (entryIter.flags() & QScriptValue::SkipInEnumeration)
-      continue;
-    std::string name = entryIter.value().property("name").toString().toStdString();
-
-    if (result.empty())
-      result = name;
-    else
-      result.append(ngrt4n::CHILD_SEP).append(name);
-
+  QScriptValueIterator deviceIt(json.data());
+  while (deviceIt.hasNext()) {
+    deviceIt.next(); if (deviceIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    QScriptValue deviceJsonObject = deviceIt.value();
+    CheckT check;
+    check.host = deviceJsonObject.property("deviceName").toString().toStdString();
+    check.status = deviceJsonObject.property("numericStatus").toInt32();
+    //FIXME: last update time ?
+    check.last_state_change = checkLastChangeDate();
+    check.id = check.host + "/ping";
+    //FIXME: set other properties ?
+    checks.insert(check.id, check);
   }
-
-  return result;
 }
 
 
-std::string
-OpManagerHelper::parseHost(const QScriptValue& json)
+void OpManagerHelper::processMonitorsData(const QString& data, const QString& deviceName, ChecksT& checks)
 {
-  std::string result("");
-  QScriptValueIterator entryIter(json);
-  while (entryIter.hasNext()) {
-    entryIter.next();
-    if (entryIter.flags() & QScriptValue::SkipInEnumeration)
-      continue;
-    result = entryIter.value().property("host").toString().toStdString();
-    break;
-  }
-
-  return result;
+  JsonHelper json(data);
+  parseNtServiceMonitors(json.getProperty("ntServiceMonitors"), deviceName, checks);
+  parseScriptMonitors(json.getProperty("scriptMonitors"), deviceName, checks);
+  parsePerformanceMonitors(json.getProperty("performanceMonitors"), deviceName, checks);
+  parseUrlMonitors(json.getProperty("urlMonitors"), deviceName, checks);
+  parseEvenLogMonitors(json.getProperty("eventlogMonitors"), deviceName, checks);
+  parseFolderMonitors(json.getProperty("folderMonitors"), deviceName, checks);
+  parseFileMonitors(json.getProperty("fileMonitors").property("ntServiceMonitors"), deviceName, checks);
+  parseServerMonitors(json.getProperty("serverMonitors"), deviceName, checks);
+  parseProcessMonitors(json.getProperty("processMonitors"), deviceName, checks);
 }
+
+
+void
+OpManagerHelper::parseNtServiceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+
+void
+OpManagerHelper::parseScriptMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+void
+OpManagerHelper::parsePerformanceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+void
+OpManagerHelper::parseUrlMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+void
+OpManagerHelper::parseEvenLogMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+void
+OpManagerHelper::parseFolderMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+void
+OpManagerHelper::parseFileMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+void
+OpManagerHelper::parseServerMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+  }
+}
+
+
+void
+OpManagerHelper::parseProcessMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    CheckT check;
+    QScriptValue entryValue = entryIt.value();
+    check.host = deviceName.toStdString();
+    check.id = QString("%1/%2").arg(deviceName, entryValue.property("name").toString()).toStdString();
+    check.status = entryValue.property("status").toInt32();
+    check.last_state_change = checkLastChangeDate();
+    checks.insert(check.id, check);
+  }
+}
+
+
 
