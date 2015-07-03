@@ -50,18 +50,23 @@ OpManagerHelper::~OpManagerHelper()
 void
 OpManagerHelper::setBaseUrl(const QString& url)
 {
-  m_apiUri = QString("%1/%2").arg(url, OPMANAGER_API_CONTEXT);
+  if (url.endsWith("/")) {
+    m_apiUri = QString("%1%2").arg(url, OPMANAGER_API_CONTEXT);
+  } else {
+    m_apiUri = QString("%1/%2").arg(url, OPMANAGER_API_CONTEXT);
+  }
   m_reqHandler.setUrl(QUrl(m_apiUri));
 }
 
 QNetworkReply*
 OpManagerHelper::postRequest(int reqId, const QStringList& params)
 {
-  QString request = ReqPatterns[reqId];
-  Q_FOREACH(const QString& param, params) { request = request.arg(param); }
-  request = request.arg(m_apiKey);
+  QString requestContext = ReqPatterns[reqId];
+  Q_FOREACH(const QString& param, params) { requestContext = requestContext.arg(param); }
+  QString reqUrl = QString("%1%2").arg(m_apiUri, requestContext);
+  m_reqHandler.setUrl(QUrl(reqUrl));
 
-  QNetworkReply* reply = QNetworkAccessManager::post(m_reqHandler, ngrt4n::toByteArray(request));
+  QNetworkReply* reply = QNetworkAccessManager::get(m_reqHandler);
   setSslReplyErrorHandlingOptions(reply);
   connect(reply, SIGNAL(finished()), &m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
@@ -73,18 +78,20 @@ RequestListT
 OpManagerHelper::requestsPatterns()
 {
   RequestListT patterns;
-  patterns[GetDeviceByName]             = "/device/listDevices?"
-                                          "apiKey=%1"
-                                          "&deviceName=%2";
-  patterns[GetDeviceByType]             = "/device/listDevices?"
-                                          "apiKey=%1"
-                                          "&type=%2";
-  patterns[GetDeviceByCategory]         = "/device/listDevices?"
-                                          "apiKey=%1"
-                                          "&Category=%2";
-  patterns[GetDeviceAssociatedMonitors] = "/device/getAssociatedMonitors?"
-                                          "apiKey=%1"
-                                          "&name=%2";
+  patterns[ListAllDevices]               = "/device/listDevices?"
+                                           "apiKey=%1";
+  patterns[ListDeviceByName]             = "/device/listDevices?"
+                                           "apiKey=%1"
+                                           "&deviceName=%2";
+  patterns[ListDeviceByType]             = "/device/listDevices?"
+                                           "apiKey=%1"
+                                           "&type=%2";
+  patterns[ListDeviceByCategory]         = "/device/listDevices?"
+                                           "apiKey=%1"
+                                           "&Category=%2";
+  patterns[ListDeviceAssociatedMonitors] = "/device/getAssociatedMonitors?"
+                                           "apiKey=%1"
+                                           "&name=%2";
   return patterns;
 }
 
@@ -100,21 +107,29 @@ OpManagerHelper::setSslPeerVerification(bool verifyPeer)
 
 
 int
-OpManagerHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, int filterType, const QString& filter)
+OpManagerHelper::loadChecks(const SourceT& srcInfo, int filterType, const QString& filter, ChecksT& checks)
 {
   checks.clear();
 
   setBaseUrl(srcInfo.mon_url);
   setApiKey(srcInfo.auth);
 
-  QStringList params = (QStringList() << m_apiKey << filter);
+  QStringList params(m_apiKey);
+  if (filterType != ListAllDevices) params.push_back(filter);
   QNetworkReply* reply = postRequest(filterType, params);
 
   reply->deleteLater();
   QString data = reply->readAll();
+  //FIXME: generalize error handling
+  if (reply->error() != QNetworkReply::NoError) {
+    m_lastError = reply->errorString();
+    return -1;
+  }
+
+  if (errorData(data))
+    return -1;
 
   processDevicesData(data, checks);
-
   Q_FOREACH(const CheckT& check, checks) { fetchAndAppendDeviceMonitors(check.host.c_str(), checks); }
 
   return 0;
@@ -125,12 +140,16 @@ int
 OpManagerHelper::fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks)
 {
   QStringList params = (QStringList() << m_apiKey << deviceName);
-  QNetworkReply* reply = postRequest(GetDeviceAssociatedMonitors, params);
+  QNetworkReply* reply = postRequest(ListDeviceAssociatedMonitors, params);
 
   reply->deleteLater();
   QString data = reply->readAll();
 
+  if (errorData(data))
+    return -1;
+
   processMonitorsData(data, deviceName, checks);
+
 
   return 0;
 }
@@ -145,7 +164,18 @@ OpManagerHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
     reply->ignoreSslErrors();
 }
 
-
+bool OpManagerHelper::errorData(const QString& data)
+{
+  JsonHelper jsonHelper(data);
+  bool success = jsonHelper.getProperty("error").toString().isEmpty();
+  if (! success) {
+    m_lastError = jsonHelper.getProperty("error").property("message").toString();
+  } else {
+    m_lastError = jsonHelper.getProperty("message").toString();
+    success = m_lastError.isEmpty();
+  }
+  return ! success;
+}
 
 void OpManagerHelper::processDevicesData(const QString& data, ChecksT& checks)
 {
@@ -277,6 +307,4 @@ OpManagerHelper::parseProcessMonitors(const QScriptValue& json, const QString& d
     checks.insert(check.id, check);
   }
 }
-
-
 

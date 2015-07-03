@@ -457,17 +457,8 @@ void SvCreator::handleImportHostGroupAsBusinessView(void)
   if (requestImportationInfo(srcInfo, filter) != 0)
     return ;
 
-  if (srcInfo.mon_type == MonitorT::Zabbix) {
-    showStatusMsg(tr("Importing triggers from Zabbix at %1:%2...").arg(srcInfo.id, srcInfo.mon_url), false);
-  } else if (srcInfo.mon_type == MonitorT::Nagios) {
-    showStatusMsg(tr("Importing Nagios checks from Livestatus at %1:%2:%3...").arg(srcInfo.id, srcInfo.ls_addr, QString::number(srcInfo.ls_port)), false);
-  } else {
-    //TODO: to be implemented
-    QString monitorName = MonitorT::toString(srcInfo.mon_type);
-    showStatusMsg(tr("%1 monitor is not supported yet").arg(monitorName), false);
-    return;
-  }
-
+  QString monitorName = MonitorT::toString(srcInfo.mon_type);
+  showStatusMsg(tr("Importing data point from %1 at %2:%3...").arg(monitorName, srcInfo.id, srcInfo.mon_url), false);
   QString errorMsg;
   if (ngrt4n::importHostGroupAsBusinessView(srcInfo, filter, m_cdata, errorMsg) != 0) {
     showStatusMsg(tr("Data points importation failed: %1").arg(errorMsg), true);

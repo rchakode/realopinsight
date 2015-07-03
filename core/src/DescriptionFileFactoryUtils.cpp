@@ -117,6 +117,21 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
     PandoraHelper handler(srcInfo.mon_url);
     retcode = handler.loadChecks(srcInfo, checks, filter);
     errorMsg = handler.lastError();
+  } if (srcInfo.mon_type == MonitorT::OpManager) {
+    OpManagerHelper handler(srcInfo.mon_url);
+    if (filter.isEmpty()) {
+      retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListAllDevices, filter, checks);
+    } else {
+      retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByName, filter, checks);
+      if (checks.empty()) {
+        retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByCategory, filter, checks);
+        if (checks.empty()) {
+          retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByType, filter, checks);
+        }
+      }
+    }
+
+    errorMsg = handler.lastError();
   } else {
     errorMsg = QObject::tr("Unknown data source type");
   }

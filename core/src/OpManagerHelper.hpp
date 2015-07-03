@@ -32,17 +32,18 @@
 
 
 namespace {
-  const QString OPMANAGER_API_CONTEXT = "/api/json/";
+  const QString OPMANAGER_API_CONTEXT = "api/json";
 }
 
 class OpManagerHelper : public QNetworkAccessManager {
     Q_OBJECT
   public:
     enum {
-      GetDeviceByName = 0,
-      GetDeviceByType = 1,
-      GetDeviceByCategory = 2,
-      GetDeviceAssociatedMonitors = 3
+      ListAllDevices = 0,
+      ListDeviceByName = 1,
+      ListDeviceByType = 2,
+      ListDeviceByCategory = 4,
+      ListDeviceAssociatedMonitors = 5
     };
     static const RequestListT ReqPatterns;
 
@@ -50,7 +51,7 @@ class OpManagerHelper : public QNetworkAccessManager {
     OpManagerHelper(const QString& baseUrl="http://localhost/");
     virtual ~OpManagerHelper();
     int
-    loadChecks(const SourceT& srcInfo,  ChecksT& checks, int filterType, const QString& filter);
+    loadChecks(const SourceT& srcInfo, int filterType, const QString& filter, ChecksT& checks);
     int
     fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks);
     QNetworkReply*
@@ -82,7 +83,7 @@ class OpManagerHelper : public QNetworkAccessManager {
     QSslConfiguration m_sslConfig;
     QString m_lastError;
     QString m_replyData;
-
+    bool errorData(const QString& data);
     void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
     void processDevicesData(const QString& data, ChecksT& checks);
     void processMonitorsData(const QString& data, const QString& deviceName, ChecksT& checks);
@@ -96,6 +97,7 @@ class OpManagerHelper : public QNetworkAccessManager {
     void parseServerMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
     void parseProcessMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
     std::string checkLastChangeDate(void) {return QDateTime::currentDateTime().toString("ddd MMMM d yy").toStdString();}
+
 };
 
 #endif /* OPMANAGERHELPERR_HPP_ */
