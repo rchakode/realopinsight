@@ -958,8 +958,8 @@ void SvCreator::loadMenu(void)
       m_nodeContextMenu->addAction(m_subMenus["DeleteNode"]);
 
   m_menus[MENU_IMPORTATION] = m_menuBar->addMenu(tr("&Importation")),
-      m_subMenus["ImportMonitorItemsAsDataPoints"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-livestatus.png"), tr("Import Monitor Items as Data Points")),
-      m_subMenus["ImportHostGroupAsBusinessView"] = m_menus[MENU_IMPORTATION]->addAction(tr("Import Host/Group as Business View"));
+      m_subMenus["ImportMonitorItemsAsDataPoints"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/download.png"), tr("Import Monitor Items as Data Points")),
+      m_subMenus["ImportHostGroupAsBusinessView"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/tree_view.png"), tr("Import Host/Group as Business View"));
   m_menus[MENU_IMPORTATION]->addSeparator(),
       m_subMenus["ImportNagiosChecks"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Na&gios Checks as Data Points")),
       m_subMenus["ImportNagiosBPIConf"] = m_menus[MENU_IMPORTATION]->addAction(QIcon(":images/built-in/import-nagios.png"), tr("Import Nagios BPI Configuration as Business View")),
