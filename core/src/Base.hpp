@@ -160,6 +160,14 @@ namespace ngrt4n {
     PandoraUnknown  = 3
   };
 
+  enum OpManagerSeverityT {
+    OpManagerCritical  = 1,
+    OpManagerTrouble   = 2,
+    OpManagerAttention = 3,
+    OpManagerDown      = 4,
+    OpManagerClear     = 5
+  };
+
   enum {
     AdmUserRole = 100,
     OpUserRole  = 101

@@ -50,22 +50,8 @@ class OpManagerHelper : public QNetworkAccessManager {
   public:
     OpManagerHelper(const QString& baseUrl="http://localhost/");
     virtual ~OpManagerHelper();
-    int
-    loadChecks(const SourceT& srcInfo, int filterType, const QString& filter, ChecksT& checks);
-    int
-    fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks);
-    QNetworkReply*
-    postRequest(int reqId, const QStringList& params);
-    void
-    setBaseUrl(const QString& url);
-    void
-    setApiKey(const QString& key) {m_apiKey = key;}
-    QString
-    lastError(void) const {return m_lastError;}
-    QString
-    getApiEndpoint(void) const {return m_apiUri;}
-    void
-    setSslPeerVerification(bool verifyPeer);
+    int loadChecks(const SourceT& srcInfo, int filterType, const QString& filter, ChecksT& checks);
+    QString lastError(void) const {return m_lastError;}
 
 
   public Q_SLOTS:
@@ -83,20 +69,26 @@ class OpManagerHelper : public QNetworkAccessManager {
     QSslConfiguration m_sslConfig;
     QString m_lastError;
     QString m_replyData;
-    bool errorData(const QString& data);
+
+    QNetworkReply* postRequest(int reqId, const QStringList& params);
+    int fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks);
+    void setBaseUrl(const QString& url);
+    void setApiKey(const QString& key) {m_apiKey = key;}
+    void setSslPeerVerification(bool verifyPeer);
+    bool checkJsonData(const QString& data);
     void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
-    void processDevicesData(const QString& data, ChecksT& checks);
-    void processMonitorsData(const QString& data, const QString& deviceName, ChecksT& checks);
-    void parseNtServiceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& check);
-    void parseScriptMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parsePerformanceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parseUrlMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parseEvenLogMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parseFolderMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parseFileMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parseServerMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    void parseProcessMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    std::string checkLastChangeDate(void) {return QDateTime::currentDateTime().toString("ddd MMMM d yy").toStdString();}
+    static void processDevicesJsonData(const QScriptValue& data, ChecksT& checks);
+    static void processMonitorsJsonData(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseNtServiceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& check);
+    static void parseScriptMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parsePerformanceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseUrlMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseEvenLogMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseFolderMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseFileMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseServerMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void parseProcessMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static std::string currentLastChangeDate(void) {return QDateTime::currentDateTime().toString("ddd MMMM d yy").toStdString();}
 
 };
 

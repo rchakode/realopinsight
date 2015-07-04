@@ -88,7 +88,7 @@ OpManagerHelper::requestsPatterns()
                                            "&type=%2";
   patterns[ListDeviceByCategory]         = "/device/listDevices?"
                                            "apiKey=%1"
-                                           "&Category=%2";
+                                           "&category=%2";
   patterns[ListDeviceAssociatedMonitors] = "/device/getAssociatedMonitors?"
                                            "apiKey=%1"
                                            "&name=%2";
@@ -126,10 +126,10 @@ OpManagerHelper::loadChecks(const SourceT& srcInfo, int filterType, const QStrin
     return -1;
   }
 
-  if (errorData(data))
+  if (checkJsonData(data))
     return -1;
 
-  processDevicesData(data, checks);
+  processDevicesJsonData(JsonHelper(data).data(), checks);
   Q_FOREACH(const CheckT& check, checks) { fetchAndAppendDeviceMonitors(check.host.c_str(), checks); }
 
   return 0;
@@ -145,11 +145,10 @@ OpManagerHelper::fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT
   reply->deleteLater();
   QString data = reply->readAll();
 
-  if (errorData(data))
+  if (checkJsonData(data))
     return -1;
 
-  processMonitorsData(data, deviceName, checks);
-
+  processMonitorsJsonData(JsonHelper(data).data(), deviceName, checks);
 
   return 0;
 }
@@ -164,9 +163,14 @@ OpManagerHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
     reply->ignoreSslErrors();
 }
 
-bool OpManagerHelper::errorData(const QString& data)
+bool OpManagerHelper::checkJsonData(const QString& data)
 {
   JsonHelper jsonHelper(data);
+  if (! jsonHelper.isGood()) {
+    m_lastError = jsonHelper.lastError();
+    return jsonHelper.isGood();
+  }
+
   bool success = jsonHelper.getProperty("error").toString().isEmpty();
   if (! success) {
     m_lastError = jsonHelper.getProperty("error").property("message").toString();
@@ -177,11 +181,9 @@ bool OpManagerHelper::errorData(const QString& data)
   return ! success;
 }
 
-void OpManagerHelper::processDevicesData(const QString& data, ChecksT& checks)
+void OpManagerHelper::processDevicesJsonData(const QScriptValue& json, ChecksT& checks)
 {
-  JsonHelper json(data);
-
-  QScriptValueIterator deviceIt(json.data());
+  QScriptValueIterator deviceIt(json);
   while (deviceIt.hasNext()) {
     deviceIt.next(); if (deviceIt.flags() & QScriptValue::SkipInEnumeration) continue;
     QScriptValue deviceJsonObject = deviceIt.value();
@@ -189,7 +191,7 @@ void OpManagerHelper::processDevicesData(const QString& data, ChecksT& checks)
     check.host = deviceJsonObject.property("deviceName").toString().toStdString();
     check.status = deviceJsonObject.property("numericStatus").toInt32();
     //FIXME: last update time ?
-    check.last_state_change = checkLastChangeDate();
+    check.last_state_change = currentLastChangeDate();
     check.id = check.host + "/ping";
     //FIXME: set other properties ?
     checks.insert(check.id, check);
@@ -197,18 +199,21 @@ void OpManagerHelper::processDevicesData(const QString& data, ChecksT& checks)
 }
 
 
-void OpManagerHelper::processMonitorsData(const QString& data, const QString& deviceName, ChecksT& checks)
+void OpManagerHelper::processMonitorsJsonData(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
 {
-  JsonHelper json(data);
-  parseNtServiceMonitors(json.getProperty("ntServiceMonitors"), deviceName, checks);
-  parseScriptMonitors(json.getProperty("scriptMonitors"), deviceName, checks);
-  parsePerformanceMonitors(json.getProperty("performanceMonitors"), deviceName, checks);
-  parseUrlMonitors(json.getProperty("urlMonitors"), deviceName, checks);
-  parseEvenLogMonitors(json.getProperty("eventlogMonitors"), deviceName, checks);
-  parseFolderMonitors(json.getProperty("folderMonitors"), deviceName, checks);
-  parseFileMonitors(json.getProperty("fileMonitors").property("ntServiceMonitors"), deviceName, checks);
-  parseServerMonitors(json.getProperty("serverMonitors"), deviceName, checks);
-  parseProcessMonitors(json.getProperty("processMonitors"), deviceName, checks);
+  typedef void (*ParseMonitorJson)(const QScriptValue&, const QString&, ChecksT&);
+  QMap<QString, ParseMonitorJson> parsers;
+  parsers["ntServiceMonitors"] = &OpManagerHelper::parseNtServiceMonitors;
+  parsers["scriptMonitors"] = &OpManagerHelper::parseScriptMonitors;
+  parsers["performanceMonitors"] = &OpManagerHelper::parsePerformanceMonitors;
+  parsers["urlMonitors"] = &OpManagerHelper::parseUrlMonitors;
+  parsers["eventlogMonitors"] = &OpManagerHelper::parseEvenLogMonitors;
+  parsers["folderMonitors"] = &OpManagerHelper::parseFolderMonitors;
+  parsers["serverMonitors"] = &OpManagerHelper::parseServerMonitors;
+  parsers["processMonitors"] = &OpManagerHelper::parseProcessMonitors;
+
+  Q_FOREACH(const QString& parserName, parsers.keys())
+    parsers[parserName](json.property(parserName).property("monitors"), deviceName, checks);
 }
 
 
@@ -303,7 +308,7 @@ OpManagerHelper::parseProcessMonitors(const QScriptValue& json, const QString& d
     check.host = deviceName.toStdString();
     check.id = QString("%1/%2").arg(deviceName, entryValue.property("name").toString()).toStdString();
     check.status = entryValue.property("status").toInt32();
-    check.last_state_change = checkLastChangeDate();
+    check.last_state_change = currentLastChangeDate();
     checks.insert(check.id, check);
   }
 }

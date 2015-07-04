@@ -108,6 +108,25 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
         criticity = ngrt4n::Unknown;
         break;
     }
+  } else  if (monitorType == MonitorT::OpManager) {
+    switch(statusValue) {
+      case ngrt4n::OpManagerClear:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::OpManagerAttention:
+        criticity = ngrt4n::Minor;
+        break;
+      case ngrt4n::OpManagerTrouble:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::OpManagerDown:
+      case ngrt4n::OpManagerCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      default:
+        criticity = ngrt4n::Unknown;
+        break;
+    }
   }
   return static_cast<ngrt4n::SeverityT>(criticity);
 }
