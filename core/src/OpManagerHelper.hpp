@@ -71,24 +71,26 @@ class OpManagerHelper : public QNetworkAccessManager {
     QString m_replyData;
 
     QNetworkReply* postRequest(int reqId, const QStringList& params);
-    int fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks);
+    int fetchAndAppendDeviceMonitors(const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     void setBaseUrl(const QString& url);
     void setApiKey(const QString& key) {m_apiKey = key;}
     void setSslPeerVerification(bool verifyPeer);
     bool checkJsonData(const QString& data);
     void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
     static void processDevicesJsonData(const QScriptValue& data, ChecksT& checks);
-    static void processMonitorsJsonData(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseNtServiceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& check);
-    static void parseScriptMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parsePerformanceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseUrlMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseEvenLogMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseFolderMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseFileMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseServerMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
-    static void parseProcessMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks);
+    static void processMonitorsJsonData(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseNtServiceMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& check);
+    static void parseScriptMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parsePerformanceMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseUrlMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseEvenLogMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseFolderMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseFileMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseServerMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
+    static void parseProcessMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     static std::string currentLastChangeDate(void) {return QDateTime::currentDateTime().toString("ddd MMMM d yy").toStdString();}
+    static std::string statusAlarmMessage(const QString& itemName, const QString& itemType, int status);
+    static int statusFromIconPath(const QString& iconPath);
 
 };
 

@@ -130,16 +130,16 @@ OpManagerHelper::loadChecks(const SourceT& srcInfo, int filterType, const QStrin
     return -1;
 
   processDevicesJsonData(JsonHelper(data).data(), checks);
-  Q_FOREACH(const CheckT& check, checks) { fetchAndAppendDeviceMonitors(check.host.c_str(), checks); }
+  Q_FOREACH(const CheckT& check, checks) { fetchAndAppendDeviceMonitors(check.host, check.host_groups, checks); }
 
   return 0;
 }
 
 
 int
-OpManagerHelper::fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT& checks)
+OpManagerHelper::fetchAndAppendDeviceMonitors(const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
-  QStringList params = (QStringList() << m_apiKey << deviceName);
+  QStringList params = (QStringList() << m_apiKey << deviceName.c_str());
   QNetworkReply* reply = postRequest(ListDeviceAssociatedMonitors, params);
 
   reply->deleteLater();
@@ -148,7 +148,7 @@ OpManagerHelper::fetchAndAppendDeviceMonitors(const QString& deviceName, ChecksT
   if (checkJsonData(data))
     return -1;
 
-  processMonitorsJsonData(JsonHelper(data).data(), deviceName, checks);
+  processMonitorsJsonData(JsonHelper(data).data(), deviceName, deviceGroups, checks);
 
   return 0;
 }
@@ -187,21 +187,23 @@ void OpManagerHelper::processDevicesJsonData(const QScriptValue& json, ChecksT& 
   while (deviceIt.hasNext()) {
     deviceIt.next(); if (deviceIt.flags() & QScriptValue::SkipInEnumeration) continue;
     QScriptValue deviceJsonObject = deviceIt.value();
+    QString deviceName = deviceJsonObject.property("deviceName").toString();
     CheckT check;
-    check.host = deviceJsonObject.property("deviceName").toString().toStdString();
-    check.status = deviceJsonObject.property("numericStatus").toInt32();
-    //FIXME: last update time ?
-    check.last_state_change = currentLastChangeDate();
+    check.host = deviceName.toStdString();
     check.id = check.host + "/ping";
-    //FIXME: set other properties ?
+    check.status = deviceJsonObject.property("numericStatus").toInt32();
+    check.alarm_msg = statusAlarmMessage(deviceName, "device", check.status);
+    check.last_state_change = currentLastChangeDate(); //FIXME: last update time ?
+    check.host_groups = QString("%1,%2").arg(deviceJsonObject.property("category").toString(),
+                                             deviceJsonObject.property("type").toString()).toStdString();
     checks.insert(check.id, check);
   }
 }
 
 
-void OpManagerHelper::processMonitorsJsonData(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+void OpManagerHelper::processMonitorsJsonData(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
-  typedef void (*ParseMonitorJson)(const QScriptValue&, const QString&, ChecksT&);
+  typedef void (*ParseMonitorJson)(const QScriptValue&, const std::string&, const std::string&, ChecksT&);
   QMap<QString, ParseMonitorJson> parsers;
   parsers["ntServiceMonitors"] = &OpManagerHelper::parseNtServiceMonitors;
   parsers["scriptMonitors"] = &OpManagerHelper::parseScriptMonitors;
@@ -213,12 +215,12 @@ void OpManagerHelper::processMonitorsJsonData(const QScriptValue& json, const QS
   parsers["processMonitors"] = &OpManagerHelper::parseProcessMonitors;
 
   Q_FOREACH(const QString& parserName, parsers.keys())
-    parsers[parserName](json.property(parserName).property("monitors"), deviceName, checks);
+    parsers[parserName](json.property(parserName).property("monitors"), deviceName, deviceGroups, checks);
 }
 
 
 void
-OpManagerHelper::parseNtServiceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parseNtServiceMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
@@ -229,7 +231,7 @@ OpManagerHelper::parseNtServiceMonitors(const QScriptValue& json, const QString&
 
 
 void
-OpManagerHelper::parseScriptMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parseScriptMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
@@ -239,7 +241,14 @@ OpManagerHelper::parseScriptMonitors(const QScriptValue& json, const QString& de
 
 
 void
-OpManagerHelper::parsePerformanceMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parsePerformanceMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
+{
+  //nothing to do
+}
+
+
+void
+OpManagerHelper::parseUrlMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
@@ -249,7 +258,7 @@ OpManagerHelper::parsePerformanceMonitors(const QScriptValue& json, const QStrin
 
 
 void
-OpManagerHelper::parseUrlMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parseEvenLogMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
@@ -259,7 +268,7 @@ OpManagerHelper::parseUrlMonitors(const QScriptValue& json, const QString& devic
 
 
 void
-OpManagerHelper::parseEvenLogMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parseFolderMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
@@ -269,17 +278,7 @@ OpManagerHelper::parseEvenLogMonitors(const QScriptValue& json, const QString& d
 
 
 void
-OpManagerHelper::parseFolderMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
-{
-  QScriptValueIterator entryIt(json);
-  while (entryIt.hasNext()) {
-    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
-  }
-}
-
-
-void
-OpManagerHelper::parseFileMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parseFileMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
@@ -288,28 +287,84 @@ OpManagerHelper::parseFileMonitors(const QScriptValue& json, const QString& devi
 }
 
 void
-OpManagerHelper::parseServerMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
-{
-  QScriptValueIterator entryIt(json);
-  while (entryIt.hasNext()) {
-    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
-  }
-}
-
-
-void
-OpManagerHelper::parseProcessMonitors(const QScriptValue& json, const QString& deviceName, ChecksT& checks)
+OpManagerHelper::parseServerMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
     entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
     CheckT check;
     QScriptValue entryValue = entryIt.value();
-    check.host = deviceName.toStdString();
-    check.id = QString("%1/%2").arg(deviceName, entryValue.property("name").toString()).toStdString();
-    check.status = entryValue.property("status").toInt32();
+    QString entryName = entryValue.property("name").toString();
+    check.id = QString("%1/%2").arg(deviceName.c_str(), entryName).toStdString();
+    check.host = deviceName;
+    check.host_groups = deviceGroups;
+    check.status = statusFromIconPath( entryValue.property("status").toString() );
     check.last_state_change = currentLastChangeDate();
+    check.alarm_msg = statusAlarmMessage(entryName, "server", check.status);
     checks.insert(check.id, check);
   }
 }
 
+
+void
+OpManagerHelper::parseProcessMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
+{
+  QScriptValueIterator entryIt(json);
+  while (entryIt.hasNext()) {
+    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    CheckT check;
+    QScriptValue entryValue = entryIt.value();
+    QString entryName = entryValue.property("name").toString();
+    check.id = QString("%1/%2").arg(deviceName.c_str(), entryName).toStdString();
+    check.host = deviceName;
+    check.host_groups = deviceGroups;
+    check.status = entryValue.property("status").toInt32();
+    check.last_state_change = currentLastChangeDate();
+    check.alarm_msg = statusAlarmMessage(entryName, "process", check.status);
+    checks.insert(check.id, check);
+  }
+}
+
+std::string OpManagerHelper::statusAlarmMessage(const QString& itemName, const QString& itemType, int status)
+{
+  QString result = QObject::tr("Unknown status: %1").arg(QString::number(status));
+  switch (status) {
+    case 5:
+      result = QObject::tr("%1[%2] The status is clear").arg(itemName, itemType);
+      break;
+    case 4:
+      result = QObject::tr("%1 [%2]: The status is offline/inaccessible").arg(itemName, itemType);
+      break;
+    case 3:
+      result = QObject::tr("%1 [%2]: The status requires attention").arg(itemName, itemType);
+      break;
+    case 2:
+      result = QObject::tr("%1 [%2]: The status is in trouble").arg(itemName, itemType);
+      break;
+    case 1:
+      result = QObject::tr("%1 [%2]: The status is critical").arg(itemName, itemType);
+      break;
+    default:
+      break;
+  }
+  return result.toStdString();
+}
+
+
+int OpManagerHelper::statusFromIconPath(const QString& iconPath)
+{
+  int result = 1;
+  QString bs = ngrt4n::basename(iconPath);
+
+  if (bs.indexOf("status1") != -1)
+    result = 1;
+  else if (bs.indexOf("status2") != -1)
+    result = 2;
+  else if (bs.indexOf("status3") != -1)
+    result = 3;
+  else if (bs.indexOf("status4") != -1)
+    result = 4;
+  else if (bs.indexOf("status5") != -1)
+    result = 5;
+  return result;
+}

@@ -38,15 +38,11 @@
 #include "DescriptionFileFactoryUtils.hpp"
 
 namespace {
-  const QString NAG_SOURCE     = "Nagios description file (*.nag.ngrt4n.xml)";
-  const QString ZBX_SOURCE     = "Zabbix description file (*.zbx.ngrt4n.xml)";
-  const QString ZNS_SOURCE     = "Zenoss description file (*.zns.ngrt4n.xml)";
-  const QString PANDORA_SOURCE = "Pandora FMS description file (*.pfms.ngrt4n.xml)";
-  const QString MULTI_SOURCES  = "Multi-source description file (*.ms.ngrt4n.xml)";
+  const QString MULTI_SOURCES  = "Generic description file (*.ms.ngrt4n.xml)";
   const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
   const QString FILE_FILTER =
-      QString("%1;;%2;;%3;;%4;;%5;;Xml files(*.xml);;All files(*)")
-      .arg(NAG_SOURCE, ZBX_SOURCE, ZNS_SOURCE, PANDORA_SOURCE, MULTI_SOURCES);
+      QString("%1;;Xml files(*.xml);;All files(*)")
+      .arg(MULTI_SOURCES);
 }
 
 SvCreator::SvCreator(const qint32& _userRole)
@@ -694,7 +690,6 @@ void SvCreator::handleInvalidPathError(void)
 
 QString SvCreator::selectFileDestinationPath(void)
 {
-  QString result = "";
 
   QString filter;
   QString path = QFileDialog::getSaveFileName(this,
@@ -703,25 +698,10 @@ QString SvCreator::selectFileDestinationPath(void)
                                               FILE_FILTER,
                                               &filter);
 
+  QString result = "";
   if (! path.isNull()) {
     QFileInfo fileInfo(path);
-    if (filter == ZBX_SOURCE) {
-      m_cdata.monitor = MonitorT::Zabbix;
-      if (fileInfo.suffix().isEmpty()) path.append(".zbx.ngrt4n.xml");
-    } else if (filter == ZNS_SOURCE) {
-      m_cdata.monitor = MonitorT::Zenoss;
-      if (fileInfo.suffix().isEmpty()) path.append(".zns.ngrt4n.xml");
-    } else if (filter == NAG_SOURCE){
-      m_cdata.monitor = MonitorT::Nagios;
-      if (fileInfo.suffix().isEmpty()) path.append(".nag.ngrt4n.xml");
-    } else if (filter == PANDORA_SOURCE) {
-      m_cdata.monitor = MonitorT::Pandora;
-      if (fileInfo.suffix().isEmpty()) path.append(".pfms.ngrt4n.xml");
-    } else {
-      m_cdata.monitor = MonitorT::Auto;
-      if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
-    }
-
+    if (fileInfo.suffix().isEmpty()) path.append(".ms.ngrt4n.xml");
     result = path;
   }
 

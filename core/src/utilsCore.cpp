@@ -119,10 +119,10 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
       case ngrt4n::OpManagerTrouble:
         criticity = ngrt4n::Major;
         break;
-      case ngrt4n::OpManagerDown:
       case ngrt4n::OpManagerCritical:
         criticity = ngrt4n::Critical;
         break;
+      case ngrt4n::OpManagerDown:
       default:
         criticity = ngrt4n::Unknown;
         break;
@@ -382,4 +382,16 @@ QStringList ngrt4n::getAuthInfo(const QString& authString)
     authInfo.push_back(authString.mid(pos+1, -1));
   }
   return authInfo;
+}
+
+
+
+QString ngrt4n::basename(const QString& path)
+{
+  int lastSlash = path.lastIndexOf('/');
+
+  if (lastSlash < 0)
+    return path;
+
+  return path.mid(lastSlash + 1, -1);
 }
