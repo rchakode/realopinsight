@@ -210,7 +210,8 @@ void OpManagerHelper::processMonitorsJsonData(const QScriptValue& json, const st
   parsers["performanceMonitors"] = &OpManagerHelper::parsePerformanceMonitors;
   parsers["urlMonitors"] = &OpManagerHelper::parseUrlMonitors;
   parsers["eventlogMonitors"] = &OpManagerHelper::parseEvenLogMonitors;
-  parsers["folderMonitors"] = &OpManagerHelper::parseFolderMonitors;
+  parsers["folderMonitors"] = &OpManagerHelper::parseFileMonitors;
+  parsers["fileMonitors"] = &OpManagerHelper::parseFileMonitors;
   parsers["serverMonitors"] = &OpManagerHelper::parseServerMonitors;
   parsers["processMonitors"] = &OpManagerHelper::parseProcessMonitors;
 
@@ -253,6 +254,19 @@ OpManagerHelper::parseUrlMonitors(const QScriptValue& json, const std::string& d
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
     entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    CheckT check;
+    QScriptValue entryValue = entryIt.value();
+    QString entryName = entryValue.property("urlName").toString();
+    QString url = entryValue.property("url").toString();
+    QString availPercentage = entryValue.property("availPercentage").toString();
+    QString stateText = entryValue.property("state").toString();
+    check.id = QString("%1/%2").arg(deviceName.c_str(), entryName).toStdString();
+    check.host = deviceName;
+    check.host_groups = deviceGroups;
+    check.status = entryValue.property("status").toInt32();
+    check.last_state_change = currentLastChangeDate();
+    check.alarm_msg = QObject::tr("Check URL: %1 - availability: %2 - state: %3").arg(url, availPercentage, stateText).toStdString();
+    checks.insert(check.id, check);
   }
 }
 
@@ -268,21 +282,24 @@ OpManagerHelper::parseEvenLogMonitors(const QScriptValue& json, const std::strin
 
 
 void
-OpManagerHelper::parseFolderMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
-{
-  QScriptValueIterator entryIt(json);
-  while (entryIt.hasNext()) {
-    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
-  }
-}
-
-
-void
 OpManagerHelper::parseFileMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
     entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    CheckT check;
+    QScriptValue entryValue = entryIt.value();
+    QString entryName = entryValue.property("monitorname").toString();
+    QString path = entryValue.property("folderpath").toString() + entryValue.property("filepath").toString();
+    QString exist = entryValue.property("FolderExist").toString() + entryValue.property("FileExist").toString();
+    QString stateText = entryValue.property("state").toString();
+    check.id = QString("%1/%2").arg(deviceName.c_str(), entryName).toStdString();
+    check.host = deviceName;
+    check.host_groups = deviceGroups;
+    check.status = entryValue.property("status").toInt32();
+    check.last_state_change = currentLastChangeDate();
+    check.alarm_msg = QObject::tr("Check Path: %1 - exist: %2 - state: %3").arg(path, exist, stateText).toStdString();
+    checks.insert(check.id, check);
   }
 }
 

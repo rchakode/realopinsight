@@ -84,11 +84,10 @@ class OpManagerHelper : public QNetworkAccessManager {
     static void parsePerformanceMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     static void parseUrlMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     static void parseEvenLogMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
-    static void parseFolderMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     static void parseFileMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     static void parseServerMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
     static void parseProcessMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks);
-    static std::string currentLastChangeDate(void) {return QDateTime::currentDateTime().toString("ddd MMMM d yy").toStdString();}
+    static std::string currentLastChangeDate(void) {return QString::number( QDateTime::currentDateTime().toTime_t() ).toStdString();}
     static std::string statusAlarmMessage(const QString& itemName, const QString& itemType, int status);
     static int statusFromIconPath(const QString& iconPath);
 
