@@ -226,6 +226,16 @@ OpManagerHelper::parseNtServiceMonitors(const QScriptValue& json, const std::str
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
     entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    CheckT check;
+    QScriptValue entryValue = entryIt.value();
+    QString entryName = entryValue.property("serviceName").toString();
+    check.id = QString("%1/%2").arg(deviceName.c_str(), entryName).toStdString();
+    check.host = deviceName;
+    check.host_groups = deviceGroups;
+    check.status = statusFromIconPath( entryValue.property("status").toString() );
+    check.last_state_change = currentLastChangeDate();
+    check.alarm_msg = statusAlarmMessage(entryName, "ntservice", check.status);
+    checks.insert(check.id, check);
   }
 }
 
@@ -237,6 +247,16 @@ OpManagerHelper::parseScriptMonitors(const QScriptValue& json, const std::string
   QScriptValueIterator entryIt(json);
   while (entryIt.hasNext()) {
     entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
+    CheckT check;
+    QScriptValue entryValue = entryIt.value();
+    QString entryName = entryValue.property("displayName").toString();
+    check.id = QString("%1/%2").arg(deviceName.c_str(), entryName).toStdString();
+    check.host = deviceName;
+    check.host_groups = deviceGroups;
+    check.status = statusFromIconPath( entryValue.property("statusIcon").toString() );
+    check.last_state_change = currentLastChangeDate();
+    check.alarm_msg = statusAlarmMessage(entryName, "script", check.status);
+    checks.insert(check.id, check);
   }
 }
 
@@ -244,7 +264,7 @@ OpManagerHelper::parseScriptMonitors(const QScriptValue& json, const std::string
 void
 OpManagerHelper::parsePerformanceMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
-  //nothing to do
+  /** do nothing right now: cannot find status information in  the returned json **/
 }
 
 
@@ -274,10 +294,7 @@ OpManagerHelper::parseUrlMonitors(const QScriptValue& json, const std::string& d
 void
 OpManagerHelper::parseEvenLogMonitors(const QScriptValue& json, const std::string& deviceName, const std::string& deviceGroups, ChecksT& checks)
 {
-  QScriptValueIterator entryIt(json);
-  while (entryIt.hasNext()) {
-    entryIt.next(); if (entryIt.flags() & QScriptValue::SkipInEnumeration) continue;
-  }
+  /** do nothing right now: cannot find status information in  the returned json **/
 }
 
 
@@ -347,19 +364,19 @@ std::string OpManagerHelper::statusAlarmMessage(const QString& itemName, const Q
   QString result = QObject::tr("Unknown status: %1").arg(QString::number(status));
   switch (status) {
     case 5:
-      result = QObject::tr("%1[%2] The status is clear").arg(itemName, itemType);
+      result = QObject::tr("%1[%2] Status is clear").arg(itemName, itemType);
       break;
     case 4:
-      result = QObject::tr("%1 [%2]: The status is offline/inaccessible").arg(itemName, itemType);
+      result = QObject::tr("%1 [%2]: Status is offline/inaccessible").arg(itemName, itemType);
       break;
     case 3:
-      result = QObject::tr("%1 [%2]: The status requires attention").arg(itemName, itemType);
+      result = QObject::tr("%1 [%2]: Status requires attention").arg(itemName, itemType);
       break;
     case 2:
-      result = QObject::tr("%1 [%2]: The status is in trouble").arg(itemName, itemType);
+      result = QObject::tr("%1 [%2]: Status is in trouble").arg(itemName, itemType);
       break;
     case 1:
-      result = QObject::tr("%1 [%2]: The status is critical").arg(itemName, itemType);
+      result = QObject::tr("%1 [%2]: Status is critical").arg(itemName, itemType);
       break;
     default:
       break;
