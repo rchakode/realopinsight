@@ -31,10 +31,10 @@
 
 namespace {
   const QString SRC_BASENAME = "Source";
-  }
+}
 
 namespace ngrt4n
-  {
+{
   const int DefaultPort = 1983;
   const int DefaultUpdateInterval = 300;
   const int MaxMsg = 512;
@@ -100,8 +100,8 @@ namespace ngrt4n
   IconMapT nodeIcons();
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
   QStringList getAuthInfo(const QString& authString);
+  QString basename(const QString& path);
 
-
-  } //NAMESPACE
+} //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

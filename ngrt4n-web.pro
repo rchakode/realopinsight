@@ -79,6 +79,7 @@ HEADERS += \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
     core/src/DescriptionFileFactoryUtils.hpp \
+    core/src/OpManagerHelper.hpp \
     web/src/utils/wtwithqt/DispatchThread.h \
     web/src/utils/wtwithqt/WQApplication \
     web/src/utils/smtpclient/qxtglobal.h \
@@ -136,6 +137,7 @@ SOURCES +=  core/src/Base.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
     core/src/DescriptionFileFactoryUtils.cpp \
+    core/src/OpManagerHelper.cpp \
     web/src/utils/wtwithqt/DispatchThread.C \
     web/src/utils/wtwithqt/WQApplication.C \
     web/src/utils/smtpclient/qxthmac.cpp \
@@ -169,6 +171,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebDataSourcePreferences.cpp \
     web/src/WebNotificationPreferences.cpp \
     web/src/WebHostGroupServiceMap.cpp
+
+
 
 LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_signals -lboost_program_options -lboost_system \

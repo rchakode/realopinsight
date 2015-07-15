@@ -28,7 +28,9 @@
 #include "JsonHelper.hpp"
 #include "LsHelper.hpp"
 #include "PandoraHelper.hpp"
+#include "OpManagerHelper.hpp"
 #include "StatusAggregator.hpp"
+#include "DescriptionFileFactoryUtils.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <QSystemTrayIcon>
@@ -51,8 +53,8 @@
 
 
 namespace {
-const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
-const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
+  const QString SERVICE_OFFLINE_MSG(QObject::tr("Failed to connect to %1 (%2)"));
+  const QString JSON_ERROR_MSG("{\"return_code\": \"-1\", \"message\": \""%SERVICE_OFFLINE_MSG%"\"}");
 } //namespace
 
 StringMapT DashboardBase::propRules() {
@@ -136,32 +138,16 @@ void DashboardBase::runMonitor()
 void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
-  switch(src.mon_type) {
-    case MonitorT::Zenoss:
-      runZenossUpdate(src);
-      break;
-
-    case MonitorT::Zabbix:
-      runZabbixUpdate(src);
-      break;
-
-    case MonitorT::Pandora:
-      runPandoraUpdate(src);
-      break;
-
-    case MonitorT::Nagios:
-    default:
-      if (src.use_ngrt4nd) {
+  if (src.mon_type == MonitorT::Nagios && src.use_ngrt4nd) {
 #ifndef REALOPINSIGHT_DISABLE_ZMQ
-        runNgrt4ndUpdate(src);
+    runNgrt4ndUpdate(src);
 #else
-        updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
+    updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
 #endif
-      } else {
-        runLivestatusUpdate(src);
-      }
-      break;
+  } else {
+    runDataSourceUpdate(src);
   }
+
   finalizeUpdate(src);
 }
 
@@ -218,79 +204,18 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 }
 #endif //#ifndef REALOPINSIGHT_DISABLE_ZMQ
 
-
-void DashboardBase::runZabbixUpdate(const SourceT& src)
+void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
 {
-  ZbxHelper zbxBroker(src.mon_url);
-  Q_FOREACH (const QString& hostItem, m_cdata.hosts.keys()) {
-    StringPairT info = ngrt4n::splitSourceDataPointInfo(hostItem);
-    if (info.first == src.id) {
-      ChecksT checks;
-      if (zbxBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, zbxBroker.lastError());
-      }
-    }
-  }
-}
-
-
-
-void DashboardBase::runZenossUpdate(const SourceT& src)
-{
-  ZnsHelper znsBroker(src.mon_url);
+  //FIXME: avoid iteration for Pandora FMS => all modules are fetched once
   Q_FOREACH (const QString& hitem, m_cdata.hosts.keys()) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
-    if (info.first == src.id) {
+    if (info.first == srcInfo.id) {
+      QString errorMsg;
       ChecksT checks;
-      if (znsBroker.loadChecks(src, checks, info.second, ngrt4n::HostFilter) == 0) {
-        updateCNodesWithChecks(checks, src);
+      if (ngrt4n::importMonitorItemAsDataPoints(srcInfo, info.second, checks, errorMsg) == 0) {
+        updateCNodesWithChecks(checks, srcInfo);
       } else {
-        updateDashboardOnError(src, znsBroker.lastError());
-      }
-    }
-  }
-}
-
-
-void DashboardBase::runPandoraUpdate(const SourceT& src)
-{
-  PandoraHelper pandoraBroker(src.mon_url);
-  ChecksT checks;
-  // Since the fetching of Pandora modules is based on
-  // the get_tree_agents API, this call with EMPTY host/group filter
-  // shall load all the modules
-  // Hence we don't have to iterate through hosts like with the other backends
-  if (pandoraBroker.loadChecks(src, checks, "") == 0) {
-    updateCNodesWithChecks(checks, src);
-  } else {
-    updateDashboardOnError(src, pandoraBroker.lastError());
-  }
-}
-
-
-void DashboardBase::runLivestatusUpdate(const SourceT& src)
-{
-  LsHelper lsBroker(src.ls_addr, src.ls_port);
-  if (lsBroker.setupSocket() != 0) {
-    updateDashboardOnError(src, lsBroker.lastError());
-    return;
-  }
-  
-  CheckT invalidCheck;
-  ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
-  
-  QHashIterator<QString, QStringList> hostit(m_cdata.hosts);
-  while (hostit.hasNext()) {
-    hostit.next();
-    QPair<QString, QString> info = ngrt4n::splitSourceDataPointInfo(hostit.key());
-    if (info.first == src.id) {
-      ChecksT checks;
-      if (lsBroker.loadChecks(info.second, checks) == 0) {
-        updateCNodesWithChecks(checks, src);
-      } else {
-        updateDashboardOnError(src, lsBroker.lastError());
+        updateDashboardOnError(srcInfo, errorMsg);
         break;
       }
     }
@@ -318,6 +243,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
     case MonitorT::Zabbix:
     case MonitorT::Zenoss:
     case MonitorT::Pandora:
+    case MonitorT::OpManager:
       msg = msg.arg(src.id, src.mon_url);
       break;
     default:

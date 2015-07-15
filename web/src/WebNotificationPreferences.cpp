@@ -40,8 +40,7 @@
 
 WebNotificationPreferences::WebNotificationPreferences(void)
   : WebPreferencesBase(),
-    Wt::WTemplate(Wt::WString::tr("notification-settings-form.tpl")),
-    m_operationCompleted(this)
+    Wt::WTemplate(Wt::WString::tr("notification-settings-form.tpl"))
 {
   setMargin(0, Wt::All);
   createFormWidgets();
@@ -112,7 +111,7 @@ void WebNotificationPreferences::saveChanges(void)
     m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField.text().toUTF8().c_str());
     m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField.text().toUTF8().c_str());
     m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField.checkState()));
-    m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Notification settings updated"));
+    Q_EMIT operationCompleted(ngrt4n::OperationSucceeded, Q_TR("Notification settings updated"));
   }
 }
 

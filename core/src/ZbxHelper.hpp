@@ -52,7 +52,7 @@ public:
   ZbxHelper(const QString& baseUrl="http://localhost/zabbix");
   virtual ~ZbxHelper();
   int postRequest(qint32 reqId, const QStringList& params);
-  void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler->setUrl(QUrl(m_apiUri));}
+  void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler.setUrl(QUrl(m_apiUri));}
   void setTrid(const QString& apiv);
   QString lastError(void) const {return m_lastError;}
   void setSslPeerVerification(bool verifyPeer);
@@ -65,20 +65,20 @@ public:
 
 
 public Q_SLOTS:
-  void processError(const QNetworkReply::NetworkError& code) { m_evlHandler->exit(code);}
+  void processError(const QNetworkReply::NetworkError& code) { m_evlHandler.exit(code);}
 
 Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
+  static RequestListT requestsPatterns();
   typedef QMap<QString, QSet<QString> > ZabbixParentChildsDependenciesMapT;
   typedef QMap<QString, QString> ZabbixChildParentDependenciesMapT;
   typedef QMap<QString, QString> ZabbixServiceTriggerDependenciesMapT;
   QString m_apiUri;
-  QNetworkRequest* m_reqHandler;
+  QNetworkRequest m_reqHandler;
+  QEventLoop m_evlHandler;
   int m_trid;
-  static RequestListT requestsPatterns();
-  QEventLoop* m_evlHandler;
   bool m_isLogged;
   SourceT m_sourceInfo;
   QString m_auth;

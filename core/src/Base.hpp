@@ -77,6 +77,7 @@ public:
     Zabbix  = 1,
     Zenoss  = 2,
     Pandora = 3,
+    OpManager = 4,
     Auto    = 99
   };
 
@@ -93,7 +94,10 @@ public:
         value = QObject::tr("Zenoss");
         break;
       case Pandora:
-        value = QObject::tr("Pandora");
+        value = QObject::tr("Pandora FMS");
+        break;
+      case OpManager:
+        value = QObject::tr("ManageEngine OpManager");
         break;
       case Auto:
       default:
@@ -148,6 +152,14 @@ namespace ngrt4n {
     PandoraCritical = 1,
     PandoraWarning  = 2,
     PandoraUnknown  = 3
+  };
+
+  enum OpManagerSeverityT {
+    OpManagerCritical  = 1,
+    OpManagerTrouble   = 2,
+    OpManagerAttention = 3,
+    OpManagerDown      = 4,
+    OpManagerClear     = 5
   };
 
   enum {

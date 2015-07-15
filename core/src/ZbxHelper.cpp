@@ -38,20 +38,16 @@ const RequestListT ZbxHelper::ReqPatterns = ZbxHelper::requestsPatterns();
 ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
     m_apiUri(baseUrl%ZBX_API_CONTEXT),
-    m_reqHandler(new QNetworkRequest()),
     m_trid(-1),
-    m_evlHandler(new QEventLoop(this)),
     m_isLogged(false)
 {
-  m_reqHandler->setRawHeader("Content-Type", "application/json");
-  m_reqHandler->setUrl(QUrl(m_apiUri));
+  m_reqHandler.setRawHeader("Content-Type", "application/json");
+  m_reqHandler.setUrl(QUrl(m_apiUri));
 
 }
 
 ZbxHelper::~ZbxHelper()
 {
-  delete m_reqHandler;
-  delete m_evlHandler;
 }
 
 RequestListT
@@ -134,15 +130,15 @@ ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
     request = request.arg(myparam);
   }
 
-  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, ngrt4n::toByteArray(request));
+  QNetworkReply* reply = QNetworkAccessManager::post(m_reqHandler, ngrt4n::toByteArray(request));
   setSslReplyErrorHandlingOptions(reply);
 
-  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+  connect(reply, SIGNAL(finished()), &m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
 
-  m_evlHandler->exec();
+  m_evlHandler.exec();
 
-  if (! reply || parseReply(reply) !=0)
+  if (! reply || parseReply(reply) != 0)
     return -1;
 
   return 0;

@@ -13,17 +13,17 @@ class CheckImportationSettingsForm: public QDialog
 public:
   CheckImportationSettingsForm(const QList<QString>& sourceList, bool importFile);
 
-  QString selectedSource(void) const {return m_sourceSelectionBox->currentText().trimmed();}
-  QString filter(void) const {return m_filter->text();}
+  QString selectedSource(void) const {return m_sourceSelectionBox.currentText().trimmed();}
+  QString filter(void) const {return m_filter.text();}
   QString selectedFile(void) const {return m_selectedFile;}
 
 public Q_SLOTS:
   void handleSelectStatusFile(void);
 
 private:
-  QComboBox* m_sourceSelectionBox;
-  QLineEdit* m_filter;
-  QLineEdit* m_selectedFileTextField;
+  QComboBox m_sourceSelectionBox;
+  QLineEdit m_filter;
+  QLineEdit m_selectedFileTextField;
   QString m_selectedFile;
 };
 

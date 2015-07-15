@@ -40,33 +40,29 @@ const RequestListT ZnsHelper::Routers = ZnsHelper::routers();
 ZnsHelper::ZnsHelper(const QString& baseUrl)
   : QNetworkAccessManager(),
     m_apiBaseUrl(baseUrl),
-    m_reqHandler(new QNetworkRequest()),
-    m_evlHandler(new QEventLoop(this)),
     m_isLogged(false)
 {
-  m_reqHandler->setUrl(QUrl(m_apiBaseUrl+ZNS_API_CONTEXT));
+  m_reqHandler.setUrl(QUrl(m_apiBaseUrl+ZNS_API_CONTEXT));
 }
 
 ZnsHelper::~ZnsHelper()
 {
-  delete m_reqHandler;
-  delete m_evlHandler;
 }
 
 void ZnsHelper::setBaseUrl(const QString& url)
 {
   m_apiBaseUrl = url;
-  m_reqHandler->setUrl(QUrl(m_apiBaseUrl+ZNS_LOGIN_API_CONTEXT));
+  m_reqHandler.setUrl(QUrl(m_apiBaseUrl+ZNS_LOGIN_API_CONTEXT));
 }
 
-QNetworkReply* ZnsHelper::postRequest(const qint32& reqType, const QByteArray& data)
+QNetworkReply* ZnsHelper::postRequest(int reqType, const QByteArray& data)
 {
-  m_reqHandler->setRawHeader("Content-Type", ngrt4n::toByteArray(ContentTypes[reqType]));
-  QNetworkReply* reply = QNetworkAccessManager::post(*m_reqHandler, data);
+  m_reqHandler.setRawHeader("Content-Type", ngrt4n::toByteArray(ContentTypes[reqType]));
+  QNetworkReply* reply = QNetworkAccessManager::post(m_reqHandler, data);
   setSslReplyErrorHandlingOptions(reply);
-  connect(reply, SIGNAL(finished()), m_evlHandler, SLOT(quit()));
+  connect(reply, SIGNAL(finished()), &m_evlHandler, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(processError(QNetworkReply::NetworkError)));
-  m_evlHandler->exec();
+  m_evlHandler.exec();
   return reply;
 }
 
@@ -353,10 +349,8 @@ ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
 
 
 int
-ZnsHelper::loadChecks(const SourceT& srcInfo,
-                      ChecksT& checks,
-                      const QString& filterValue,
-                      ngrt4n::RequestFilterT filterType)
+ZnsHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
+                      const QString& filterValue, ngrt4n::RequestFilterT filterType)
 {
   setBaseUrl(srcInfo.mon_url);
 

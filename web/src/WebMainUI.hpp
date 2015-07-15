@@ -110,6 +110,7 @@ public Q_SLOTS:
   void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
   void setWidgetAsFrontStackedWidget(Wt::WWidget* widget);
   void resetViewSelectionBox(void) { m_selectViewBreadCrumbsBox->setCurrentIndex(0); m_displayOnlyTroubleEventsBox->setHidden(true);}
+  void showMessage(int status, const std::string& msg);
 
 private:
   enum FileDialogAction {
@@ -229,7 +230,6 @@ private:
   UserFormView* createAccountPanel(void);
   UserFormView* createPasswordPanel(void);
   Wt::WDialog* createAboutDialog(void);
-  void showMessage(int status, const std::string& msg);
   void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);

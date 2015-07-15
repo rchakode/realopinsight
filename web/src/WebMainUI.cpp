@@ -150,8 +150,8 @@ void WebMainUI::unbindDashboardWidgets(void)
 
 void WebMainUI::addEvents(void)
 {
+  QObject::connect(&m_dataSourceSettingsForm, SIGNAL(operationCompleted()), this, SLOT(showMessage()));
   m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
-  m_notificationSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.hostgroupSubmitted().connect(this, &WebMainUI::handleImportHostgroupSubmitted);
@@ -1343,7 +1343,7 @@ void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QSt
 {
   CoreDataT cdata;
   QString errorMsg;
-  if (ngrt4n::importHostGroupAsMap(srcInfo, hostgroup, cdata, errorMsg) != 0) {
+  if (ngrt4n::importHostGroupAsBusinessView(srcInfo, hostgroup, cdata, errorMsg) != 0) {
     std::string stdmsg = errorMsg.toStdString();
     showMessage(ngrt4n::OperationFailed, stdmsg);
     CORE_LOG("error", stdmsg);

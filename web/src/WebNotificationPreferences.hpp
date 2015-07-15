@@ -42,19 +42,20 @@
 
 class WebNotificationPreferences : public WebPreferencesBase, public Wt::WTemplate
 {
+  Q_OBJECT
 public:
   WebNotificationPreferences(void);
   virtual ~WebNotificationPreferences(void);
   void updateContents(void) { updateFields(); }
-  Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
+
+
+Q_SIGNALS:
+  void operationCompleted(int, std::string);
 
 protected:
   virtual void updateFields(void);
 
 private:
-  /** Signal **/
-  Wt::Signal<int, std::string> m_operationCompleted;
-
   Wt::WComboBox m_notificationTypeBox;
   Wt::WLineEdit m_smtpServerAddrField;
   Wt::WLineEdit m_smtpServerPortField;

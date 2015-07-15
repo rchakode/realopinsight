@@ -108,6 +108,25 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
         criticity = ngrt4n::Unknown;
         break;
     }
+  } else  if (monitorType == MonitorT::OpManager) {
+    switch(statusValue) {
+      case ngrt4n::OpManagerClear:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::OpManagerAttention:
+        criticity = ngrt4n::Minor;
+        break;
+      case ngrt4n::OpManagerTrouble:
+        criticity = ngrt4n::Major;
+        break;
+      case ngrt4n::OpManagerCritical:
+        criticity = ngrt4n::Critical;
+        break;
+      case ngrt4n::OpManagerDown:
+      default:
+        criticity = ngrt4n::Unknown;
+        break;
+    }
   }
   return static_cast<ngrt4n::SeverityT>(criticity);
 }
@@ -224,7 +243,8 @@ QStringList ngrt4n::sourceTypes(void)
   return QStringList() << "Nagios-like"
                        << "Zabbix"
                        << "Zenoss"
-                       << "Pandora FMS";
+                       << "Pandora FMS"
+                       << "ManageEngine OpManager";
 }
 
 qint32 ngrt4n::convertToSourceType(const QString& str)
@@ -239,6 +259,8 @@ qint32 ngrt4n::convertToSourceType(const QString& str)
     type = MonitorT::Zenoss;
   else if (str == types[MonitorT::Pandora])
     type = MonitorT::Pandora;
+  else if (str == types[MonitorT::OpManager])
+    type = MonitorT::OpManager;
   else
     type = MonitorT::Auto;
 
@@ -360,4 +382,16 @@ QStringList ngrt4n::getAuthInfo(const QString& authString)
     authInfo.push_back(authString.mid(pos+1, -1));
   }
   return authInfo;
+}
+
+
+
+QString ngrt4n::basename(const QString& path)
+{
+  int lastSlash = path.lastIndexOf('/');
+
+  if (lastSlash < 0)
+    return path;
+
+  return path.mid(lastSlash + 1, -1);
 }

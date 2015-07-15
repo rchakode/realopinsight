@@ -28,7 +28,8 @@
 #include "Base.hpp"
 
 namespace ngrt4n {
-  int importHostGroupAsMap(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg);
+  int importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg);
+  int importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks, QString& errorMsg);
   int saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata, QString& errorMsg);
   QString generateNodeXml(const NodeT & node);
 }

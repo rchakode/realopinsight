@@ -62,15 +62,15 @@ public:
   void
   setBaseUrl(const QString & url);
   QNetworkReply*
-  postRequest(const qint32 & reqId,  const QByteArray & data);
+  postRequest(int reqId,  const QByteArray & data);
   void
   setRouterEndpoint(const int & reqType);
   QString
-  getRequestEndpoint(void) const {return m_reqHandler->url().toString();}
+  getRequestEndpoint(void) const {return m_reqHandler.url().toString();}
   void
-  setRequestEndpoint(const QString & url) {m_reqHandler->setUrl(QUrl(url));}
+  setRequestEndpoint(const QString & url) {m_reqHandler.setUrl(QUrl(url));}
   void
-  setRequestEndpoint(const QUrl & url) {m_reqHandler->setUrl(url);}
+  setRequestEndpoint(const QUrl & url) {m_reqHandler.setUrl(url);}
   QString
   getApiContextEndpoint(void) const {return m_apiBaseUrl+ZNS_API_CONTEXT;}
   QString
@@ -100,22 +100,20 @@ public:
   int
   processComponentReply(QNetworkReply* reply, ChecksT& checks);
   int
-  loadChecks(const SourceT& srcInfo,
-             ChecksT& checks,
-             const QString& filterValue,
+  loadChecks(const SourceT& srcInfo, ChecksT& checks,  const QString& filterValue,
              ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
 
 
 public Q_SLOTS:
-  void processError(const QNetworkReply::NetworkError& code) {m_evlHandler->exit(code);}
+  void processError(const QNetworkReply::NetworkError& code) { m_evlHandler.exit(code); }
 
 Q_SIGNALS:
   void propagateError(QNetworkReply::NetworkError);
 
 private :
   QString m_apiBaseUrl;
-  QNetworkRequest* m_reqHandler;
-  QEventLoop* m_evlHandler;
+  QNetworkRequest m_reqHandler;
+  QEventLoop m_evlHandler;
   bool m_isLogged;
   QSslConfiguration m_sslConfig;
   QString m_lastError;
