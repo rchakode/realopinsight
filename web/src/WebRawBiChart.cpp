@@ -1,8 +1,8 @@
 /*
- * WebBiCharts.cpp
+ * WebBiRawChart.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 07-10-2014                                                  #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Creation: 17-07-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,82 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebBiCharts.hpp"
-#include "WebUtils.hpp"
-#include <QDebug>
-#include <Wt/WRectArea>
-
-
-namespace {
-  const double BI_RAW_CHART_AREA_WIDTH = 400;
-  const double BI_RAW_CHART_AREA_HEIGHT = 150;
-  const double BI_QOS_CHART_AREA_WIDTH = 250;
-  const double BI_QOS_CHART_AREA_HEIGHT = 150;
-  const double BI_CHART_AREA_MARGIN = 25;
-  const double BI_CHART_WIDTH = BI_QOS_CHART_AREA_WIDTH;
-  const double BI_CHART_TREND_HEIGHT = 50;
-  const double AREA_TOP_CORNER_Y = BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
-  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
-  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
-}
-
-
-/**
- * @brief QosTrendsChart::QosTrendsChart
- * @param viewName
- * @param data
- * @param parent
- */
-SLADataManager::SLADataManager(const std::list<QosDataT>& data)
-  : m_normalDuration(0),
-    m_minorDuration(0),
-    m_majorDuration(0),
-    m_criticalDuration(0),
-    m_unknownDuration(0)
-{
-  processData(data);
-}
-
-void SLADataManager::processData(const QosDataList& data)
-{
-  QosDataList::const_iterator qosit = data.begin();
-  m_plottingData.clear();
-  m_normalDuration   = 0;
-  m_minorDuration    = 0;
-  m_majorDuration    = 0;
-  m_criticalDuration = 0;
-  m_unknownDuration  = 0;
-  m_totalDuration    = 1;
-
-  if (! data.empty()) {
-    TimeStatusT last = {qosit->timestamp, qosit->status};
-    m_plottingData.push_back(last);
-    while (++qosit, qosit != data.end()) {
-      TimeStatusT current = {qosit->timestamp, qosit->status};
-      m_plottingData.push_back(current);
-      switch(last.status) {
-        case ngrt4n::Normal:
-          m_normalDuration += current.timestamp - last.timestamp;
-          break;
-        case ngrt4n::Minor:
-          m_minorDuration += current.timestamp - last.timestamp;
-          break;
-        case ngrt4n::Major:
-          m_majorDuration += current.timestamp - last.timestamp;
-          break;
-        case ngrt4n::Critical:
-          m_criticalDuration += current.timestamp - last.timestamp;
-          break;
-        case ngrt4n::Unknown:
-          m_unknownDuration += current.timestamp - last.timestamp;
-        default:
-          break;
-      }
-      last = m_plottingData.back();
-    }
-    m_totalDuration = (m_plottingData.back().timestamp - m_plottingData.front().timestamp);
-  }
-}
+#include "WebBiRawChart.hpp"
 
 
 /**
@@ -106,8 +31,8 @@ void SLADataManager::processData(const QosDataList& data)
  * @param data
  * @param parent
  */
-RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName, const QosDataList& data, Wt::WContainerWidget* parent)
-  : Wt::Chart::WCartesianChart(parent),
+WebBiRawChart::WebBiRawChart(void)
+  : Wt::Chart::WCartesianChart(0),
     m_viewName(viewName),
     m_model(NULL)
 {
@@ -116,26 +41,30 @@ RawQosTrendsChart::RawQosTrendsChart(const std::string& viewName, const QosDataL
   setPlotAreaPadding(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
-  updateData(data);
 }
 
 
-Wt::WFont RawQosTrendsChart::customTitleFont(void)
+void WebBiRawChart::initialize(const std::string& viewName, const QosDataList& data)
+{
+  setViewName(viewName);
+  updateData(data);
+}
+
+Wt::WFont WebBiRawChart::customTitleFont(void)
 {
   Wt::WFont ft;
   return ft;
 }
 
-void RawQosTrendsChart::setChartTitle(void)
+void WebBiRawChart::setChartTitle(void)
 {
   setTitle(Q_TR("IT Problem Trends"));
   setTitleFont(customTitleFont());
 }
 
-void RawQosTrendsChart::updateData(const QosDataList& data)
+void WebBiRawChart::updateData(const QosDataList& data)
 {
   Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
-
 
   model->setHeaderData(0, Q_TR("Date/time"));
   model->setHeaderData(1, Q_TR("Status"));

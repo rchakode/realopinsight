@@ -108,7 +108,6 @@ HEADERS += \
     web/src/AuthModelProxy.hpp \
     web/src/QosCollector.hpp \
     web/src/Applications.hpp \
-    web/src/WebBiCharts.hpp \
     web/src/Notificator.hpp \
     web/src/dbo/LdapUserManager.hpp \
     web/src/WebNotificationManager.hpp \
@@ -118,7 +117,12 @@ HEADERS += \
     web/src/WebAuthPreferences.hpp \
     web/src/WebDataSourcePreferences.hpp \
     web/src/WebNotificationPreferences.hpp \
-    web/src/WebHostGroupServiceMap.hpp
+    web/src/WebHostGroupServiceMap.hpp \
+    web/src/WebCsvReportResource.hpp \
+    web/src/WebBiDateFilter.hpp \
+    web/src/WebBiDashlet.hpp \
+    web/src/WebBiRawChart.hpp \
+    web/src/WebBiSlaChart.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Settings.cpp \
@@ -150,7 +154,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/dbo/UserManagement.cpp \
     web/src/dbo/ViewAclManagement.cpp \
     web/src/QosCollector.cpp \
-    web/src/WebBiCharts.cpp \
     web/src/WebDashboard.cpp \
     web/src/WebMsgConsole.cpp \
     web/src/WebMap.cpp \
@@ -170,7 +173,12 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebAuthPreferences.cpp \
     web/src/WebDataSourcePreferences.cpp \
     web/src/WebNotificationPreferences.cpp \
-    web/src/WebHostGroupServiceMap.cpp
+    web/src/WebHostGroupServiceMap.cpp \
+    web/src/WebCsvReportResource.cpp \
+    web/src/WebRawBiChart.cpp \
+    web/src/WebBiDashlet.cpp \
+    web/src/WebBiDateFilter.cpp \
+    web/src/WebBiSlaChart.cpp
 
 
 

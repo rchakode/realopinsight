@@ -94,9 +94,6 @@ void AuthManager::createLoginView(void)
 
 void AuthManager::createLoggedInView(void)
 {
-#ifdef ENABLE_ANALYTICS
-  ngrt4n::googleAnalyticsLogger();
-#endif
   setTemplateText(tr("Wt.Auth.template.logged-in"));
   m_dbSession->setLoggedUser();
   DboLoginSession sessionInfo;

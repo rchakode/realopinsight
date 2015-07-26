@@ -122,7 +122,7 @@ void WebDashboard::updateMap(void)
 
 void WebDashboard::bindFormWidgets(void)
 {
-  m_widget.setLayout(m_mainLayout = new Wt::WHBoxLayout());
+  setLayout(m_mainLayout = new Wt::WHBoxLayout());
 
   m_mainLayout->setContentsMargins(0, 0, 0, 0);
   m_leftSubMainLayout.setContentsMargins(0, 0, 0, 0);
@@ -133,7 +133,7 @@ void WebDashboard::bindFormWidgets(void)
   m_rightSubMainLayout.setSpacing(2);
 
   m_leftSubMainLayout.addWidget(&m_tree);
-  m_leftSubMainLayout.addWidget(m_chart.getWidget());
+  m_leftSubMainLayout.addWidget(&m_chart);
 
   m_rightSubMainLayout.addWidget(m_map.getWidget());
   m_rightSubMainLayout.addWidget(&m_msgConsole);
@@ -153,18 +153,18 @@ void WebDashboard::bindFormWidgets(void)
 void WebDashboard::unbindWidgets(void)
 {
   m_leftSubMainLayout.removeWidget(&m_tree);
-  m_leftSubMainLayout.removeWidget(m_chart.getWidget());
+  m_leftSubMainLayout.removeWidget(&m_chart);
   m_rightSubMainLayout.removeWidget(m_map.getWidget());
   m_rightSubMainLayout.removeWidget(&m_msgConsole);
   m_mainLayout->removeItem(&m_leftSubMainLayout);
   m_mainLayout->removeItem(&m_rightSubMainLayout);
-  m_widget.clear();
+  clear();
 }
 
 
 void WebDashboard::addJsEventScript(void)
 {
-  m_widget.setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
+  setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
   triggerResizeComponents();
 }
 
@@ -180,7 +180,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
     }
     // FIXME: need optimization to avoid removing and readding the same item
     if (node.sev != ngrt4n::Normal) {
-      Wt::WWidget* widget = createEventFeedItem(node);
+      Wt::WWidget* widget = createEventFeedTpl(node);
       m_eventFeedLayout->insertWidget(0, widget);
       m_eventFeedItems.insert(node.id, widget);
     }
@@ -188,29 +188,27 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
 }
 
 
-Wt::WWidget* WebDashboard::createEventFeedItem(const NodeT& node)
+Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(Severity(node.sev).toString(),                                                                                 node.child_nodes).toStdString());
+  anchor->clicked().connect(this, &WebDashboard::handleDashboardSelected);
 
-  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(Severity(node.sev).toString(),
-                                                                                 node.child_nodes).toStdString());
-  anchor->clicked().connect(std::bind([&](){Q_EMIT dashboardSelected(&m_widget);}));
-
-tpl->bindWidget("event-feed-title", anchor);
-tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
-tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
-tpl->bindString("event-feed-details", node.check.alarm_msg);
-tpl->bindString("platform", rootNode().name.toStdString());
-tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
-return tpl;
+  tpl->bindWidget("event-feed-title", anchor);
+  tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
+  tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
+  tpl->bindString("event-feed-details", node.check.alarm_msg);
+  tpl->bindString("platform", rootNode().name.toStdString());
+  tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
+  return tpl;
 }
 
 
 void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble)
 {
   m_showOnlyTroubles = showOnlyTrouble;
-  m_widget.setDisabled(true);
+  setDisabled(true);
   m_msgConsole.clearAll();
   runMonitor();
-  m_widget.setDisabled(false);
+  setDisabled(false);
 }

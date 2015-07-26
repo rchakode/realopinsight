@@ -1,8 +1,8 @@
 /*
- * WebBiCharts.hpp
+ * WebBiSlaChart.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 07-10-2014                                                  #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Creation: 26-07-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,33 +22,14 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBBIREPORTBUILDER_HPP
-#define WEBBIREPORTBUILDER_HPP
+#ifndef WEBBISLACHART_HPP
+#define WEBBISLACHART_HPP
 
-#include "dbo/DbObjects.hpp"
-#include "Base.hpp"
-#include <QList>
-#include <fstream>
-#include <Wt/Chart/WCartesianChart>
-#include <Wt/Chart/WDataSeries>
-#include <Wt/WAbstractItemModel>
-#include <Wt/WAbstractItemView>
-#include <Wt/WApplication>
-#include <Wt/WContainerWidget>
-#include <Wt/WDate>
-#include <Wt/WEnvironment>
-#include <Wt/WPaintedWidget>
-#include <Wt/WItemDelegate>
-#include <Wt/WShadow>
-#include <Wt/WPaintedWidget>
-#include <Wt/WStandardItemModel>
-#include <Wt/WPainter>
-#include <Wt/WSvgImage>
 
-class SLADataManager
+class WebBiSlaChart
 {
 public:
-  SLADataManager(const QosDataList& data);
+  WebBiSlaChart(const QosDataList& data);
 
   double normalDuration(void) const {return m_normalDuration;}
   double minorDuration(void) const {return m_minorDuration;}
@@ -75,27 +56,4 @@ private:
   //FIXME: std::string slaText(void) {return QObject::tr("SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
 };
 
-
-
-
-
-class RawQosTrendsChart : public Wt::Chart::WCartesianChart
-{
-public:
-  RawQosTrendsChart(const std::string& viewName, const QosDataList& data, Wt::WContainerWidget* parent=0);
-  std::string viewName() const {return m_viewName;}
-  void updateData(const QosDataList& data);
-
-
-
-private:
-  std::string m_viewName;
-  Wt::WStandardItemModel* m_model;
-
-
-  Wt::WFont customTitleFont(void);
-  void setChartTitle(void);
-};
-
-
-#endif // WEBBIREPORTBUILDER_HPP
+#endif // WEBBISLACHART_HPP

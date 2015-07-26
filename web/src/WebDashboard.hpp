@@ -47,7 +47,7 @@
 #define TREEVIEW_DIV m_tree.id()
 #define MAP_DIV m_map.id()
 #define MAP_SCROLL_AREA_DIV m_map.getWidget()->id()
-#define CHART_SCROLL_AREA_DIV m_chart.getWidget()->id()
+#define CHART_SCROLL_AREA_DIV m_chart.id()
 #define MSG_CONSOLE_DIV m_msgConsole.id()
 #define MAP_AREA_HEIGHT_RATIO "0.4"
 
@@ -81,14 +81,13 @@
   "}"
 
 
-class WebDashboard : public DashboardBase
+class WebDashboard : public DashboardBase, public Wt::WContainerWidget
 {
   Q_OBJECT
 
 public:
   WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout=NULL);
   virtual ~WebDashboard();
-  Wt::WContainerWidget* getWidget(void) {return &m_widget;}
   void updateMap(void);
   WebMap* map(void) {return &m_map;}
   void updateThumbnailInfo(void);
@@ -99,8 +98,10 @@ public:
   void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
   virtual void initialize(Preferences* preferencePtr);
   std::string tooltip(void) {return m_chart.toStdString();}
-  void triggerResizeComponents(void) { m_widget.doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
+  void triggerResizeComponents(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
   void handleShowOnlyTroubleEvents(bool showOnlyTrouble);
+  //FIXME:
+  void handleDashboardSelected(void) {/*Q_EMIT dashboardSelected(dynamic_cast<Wt::WWidget*>(&this));*/}
 
 
 protected:
@@ -126,7 +127,6 @@ private:
   Wt::WVBoxLayout* m_eventFeedLayout;
   EventFeedItemsT m_eventFeedItems;
 
-  Wt::WContainerWidget m_widget;
   Wt::WHBoxLayout* m_mainLayout;
   Wt::WVBoxLayout m_leftSubMainLayout;
   Wt::WVBoxLayout m_rightSubMainLayout;
@@ -135,7 +135,7 @@ private:
   void unbindWidgets(void);
   void addJsEventScript(void);
   void addEvents(void);
-  Wt::WWidget* createEventFeedItem(const NodeT& node);
+  Wt::WWidget* createEventFeedTpl(const NodeT& node);
 };
 
 

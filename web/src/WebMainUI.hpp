@@ -30,7 +30,7 @@
 #include "dbo/UserManagement.hpp"
 #include "dbo/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
-#include "WebBiCharts.hpp"
+#include "WebBiDashlet.hpp"
 #include "WebUtils.hpp"
 #include "WebNotificationManager.hpp"
 #include "WebLicenseManager.hpp"
@@ -38,13 +38,13 @@
 #include "WebAuthPreferences.hpp"
 #include "WebDataSourcePreferences.hpp"
 #include "WebHostGroupServiceMap.hpp"
+#include "WebCsvReportResource.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
 #include <Wt/WApplication>
 #include <Wt/WTabWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
-#include <Wt/WDatePicker>
 #include <Wt/WProgressBar>
 #include <Wt/WDialog>
 #include <Wt/Http/Request>
@@ -56,20 +56,10 @@ class AuthManager;
 class ViewAclManagement;
 class WebMainUI;
 
-class CsvReportResource : public Wt::WResource
-{
-public:
-  CsvReportResource(WebMainUI* mainUiClass, const std::string& viewName, Wt::WObject *parent = 0)
-    : Wt::WResource(parent),
-      m_mainUiClass(mainUiClass),
-      m_viewName(viewName) { suggestFileName(Wt::WString("RealOpInsight_{1}_bireport.csv").arg(QString(viewName.c_str()).replace(" ", "_").toStdString())); }
-  ~CsvReportResource(){ beingDeleted(); }
-  void handleRequest(const Wt::Http::Request&, Wt::Http::Response& response);
-private:
-  WebMainUI* m_mainUiClass;
-  std::string m_viewName;
-};
 
+/**
+ * @brief The WebMainUI class
+ */
 class WebMainUI : public QObject, public Wt::WContainerWidget
 {
   Q_OBJECT
@@ -100,9 +90,6 @@ public:
   Wt::Signal<void>& terminateSession(void) {return sessionTerminated;}
   virtual void 	refresh () {handleRefresh();}
   DbSession* dbSession(void) {return m_dbSession;}
-  long reportStartTime(void){ return Wt::WDateTime(m_reportStartDatePicker->date()).toTime_t();}
-  long reportEndTime(void) {return Wt::WDateTime(m_reportEndDatePicker->date()).toTime_t();}
-
 
 public Q_SLOTS:
   void resetTimer(qint32 interval);
@@ -117,17 +104,19 @@ private:
     IMPORT = 0,
     OPEN = 1
   };
-  typedef QMap<QString, WebDashboard*> DashboardMapT;
-  typedef std::map<std::string, WebPieChart*> QosTrendsChartMapT;
-  typedef std::map<std::string, RawQosTrendsChart*> RawQosTrendsChartMapT;
-  typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
-  //FIXME: clear template before clean
-  ThumbnailMapT m_thumbnailItems;
 
   /** Signals */
   Wt::Signal<void> sessionTerminated;
 
+  typedef QMap<QString, WebDashboard*> DashboardMapT;
+  typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
+
+
+  //FIXME: clear template before clean
+  ThumbnailMapT m_thumbnailItems;
+
   /** Private members **/
+  QosDataByViewMapT m_qosDataMap;
   QMap<int,Wt::WAnchor*> m_menuLinks;
   std::string m_rootDir;
   std::string m_confdir;
@@ -168,13 +157,6 @@ private:
   int m_assignedDashboardCount;
   Wt::WText m_adminPanelTitle;
   WebDashboard* m_currentDashboard;
-
-  /** Related to QoS Charts **/
-  QosTrendsChartMapT m_qosCharts;
-  RawQosTrendsChartMapT m_rawQosCharts;
-  Wt::WDatePicker* m_reportStartDatePicker;
-  Wt::WDatePicker* m_reportEndDatePicker;
-  Wt::WAnchor* m_reportApplyAnchor;
 
   Wt::WComboBox* m_selectViewBreadCrumbsBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
@@ -248,9 +230,6 @@ private:
   Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
   Wt::WComboBox* createShowViewBreadCrumbsLink(void);
   Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
-  Wt::WDatePicker* createReportDatePicker(long epochDatetime);
-  Wt::WContainerWidget* createReportSectionHeader(void);
-  Wt::WContainerWidget* createReportExportLinks(const std::string& viewName);
   Wt::WWidget* createNotificationSection(void);
   void updateLicenseMgntForm();
   void unbindWidgets(void);

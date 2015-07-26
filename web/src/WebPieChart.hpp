@@ -25,32 +25,53 @@
 #ifndef WEBPIECHART_HPP
 #define WEBPIECHART_HPP
 
+#include "ChartBase.hpp"
+#include "WebUtils.hpp"
 #include <Wt/WStandardItemModel>
 #include <Wt/Chart/WPieChart>
 #include <Wt/WColor>
-#include <Wt/WPaintDevice>
-#include <Wt/WContainerWidget>
+#include <Wt/Chart/WChartPalette>
 #include <Wt/WScrollArea>
 #include <Wt/WText>
-#include "ChartBase.hpp"
+#include <Wt/WTemplate>
+#include <Wt/WPen>
 
-class WebPieChart : public Wt::Chart::WPieChart, public ChartBase
+
+class WebCharPalette : public Wt::Chart::WChartPalette
 {
 public:
-  WebPieChart();
+  WebCharPalette(Wt::WStandardItemModel* model) : m_model(model) { }
+  void setModel(Wt::WStandardItemModel* model) {m_model = model;}
+  virtual Wt::WBrush brush (int index) const { return Wt::WBrush(ngrt4n::severityWColor(index));}
+  virtual Wt::WPen borderPen (int index) const { return Wt::WPen(Wt::WColor(255, 255, 255, 0)); }
+  Wt::WPen strokePen (int) const { /* TODO: check value first */ return Wt::WPen(Wt::WColor(255, 255, 255, 1)); }
+  Wt::WColor fontColor (int index) const { /* TOTO: check value first */ return Wt::WColor(255, 255, 255, 0);}
+  virtual Wt::WColor color (int index) const { return Wt::WColor(255, 255, 255, 0); }
+
+private:
+  Wt::WStandardItemModel* m_model;
+};
+
+
+class WebPieChart : public Wt::WTemplate, public ChartBase
+{
+public:
+  WebPieChart(void);
+  WebPieChart(int dataType);
   virtual ~WebPieChart();
-  Wt::WScrollArea* getWidget(void)  {return &m_scrollArea;}
   void repaint();
   void setDataType(int dataType) {ChartBase::setDataType(dataType);}
   std::string defaultTooltipText(void);
 
 private:
-  Wt::WStandardItemModel* m_model;
-  Wt::WScrollArea m_scrollArea;
-  std::map<int, Wt::WText*> m_legendBadges;
-  Wt::WTemplate* m_chartLegendBar;
-  Wt::WTemplate* createChartLegendBar(void);
-  Wt::WTemplate* createChartTemplate(void);
+  Wt::Chart::WPieChart m_piechart;
+  std::map<int, Wt::WText> m_legendBadges;
+  Wt::WTemplate m_mainChartTpl;
+  Wt::WTemplate m_chartLegendBarTpl;
+  void setupChartLegendBarTemplate(void);
+  void setupMainChartTemplate(void);
+  void bindFormWidgets(void);
+  void unbindFormWidgets(void);
 };
 
 #endif // WEBPIECHART_HPP

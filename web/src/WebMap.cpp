@@ -63,6 +63,7 @@ WebMap::WebMap(void)
 
 WebMap::~WebMap()
 {
+  m_scrollArea.takeWidget();
 }
 
 

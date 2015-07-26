@@ -27,127 +27,108 @@
 #include <QString>
 #include <QDebug>
 #include <Wt/WPainter>
-#include <Wt/WPen>
-#include <Wt/Chart/WChartPalette>
-#include <Wt/WTemplate>
-#include "WebUtils.hpp"
+#include <Wt/WScrollBar>
 
-class WebCharPalette : public Wt::Chart::WChartPalette
-{
-public:
-  WebCharPalette(Wt::WStandardItemModel* model):
-    m_model(model)
-  {
-
-  }
-
-  virtual Wt::WBrush brush (int index) const
-  {
-    return Wt::WBrush(ngrt4n::severityWColor(index));
-  }
-
-  virtual Wt::WPen borderPen (int index) const
-  {
-    return Wt::WPen(Wt::WColor(255, 255, 255, 0));
-  }
-
-  Wt::WPen strokePen (int) const
-  {
-    // TODO: check value first
-    return Wt::WPen(Wt::WColor(255, 255, 255, 1));
-  }
-
-  Wt::WColor fontColor (int index) const
-  {
-    // TOTO: check value first
-    return Wt::WColor(255, 255, 255, 0);
-  }
-
-
-  virtual Wt::WColor color (int index) const
-  {
-    return Wt::WColor(255, 255, 255, 0);
-  }
-
-private:
-  Wt::WStandardItemModel* m_model;
-};
 
 WebPieChart::WebPieChart(void)
-  : Wt::Chart::WPieChart(),
-    m_model(new Wt::WStandardItemModel(this))
+  : Wt::WTemplate(Wt::WString::tr("chart.tpl")),
+    ChartBase()
 {
-  setModel(m_model);
+  setDataType(RawData);
+}
 
-  resize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
-  setMargin(0, Wt::Top);
-  setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
+WebPieChart::WebPieChart(int dataType)
+  : Wt::WTemplate(Wt::WString::tr("chart.tpl")),
+    ChartBase()
+{
+  setDataType(dataType);
+  // Configure the piechart model
+  m_piechart.setModel(new Wt::WStandardItemModel());
+  m_piechart.model()->insertColumns(m_piechart.model()->columnCount(), 2);
+  m_piechart.model()->setHeaderData(0, Wt::WString("Severity"));
+  m_piechart.model()->setHeaderData(1, Wt::WString("Count"));
+  m_piechart.model()->insertRows(m_piechart.model()->rowCount(), 5);
 
-  m_scrollArea.setWidget(createChartTemplate());
-  m_scrollArea.setMargin(0, Wt::Top| Wt::Bottom);
-
-  // Configure the header.
-  m_model->insertColumns(m_model->columnCount(), 2);
-  m_model->setHeaderData(0, Wt::WString("Severity"));
-  m_model->setHeaderData(1, Wt::WString("Count"));
-  m_model->insertRows(m_model->rowCount(), 5);
-
-  // Draw the chart
-  setLabelsColumn(0);    // Set the column that holds the labels.
-  setDataColumn(1);      // Set the column that holds the data.
-  setDisplayLabels(Wt::Chart::NoLabels);
-  setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
-  setShadowEnabled(true);
-
-  setPlotAreaPadding(0, Wt::All);
-  setPalette(new WebCharPalette(m_model));
+  bindFormWidgets();
 }
 
 
 WebPieChart::~WebPieChart()
 {
-  delete m_model;
+  unbindFormWidgets();
 }
 
 
-Wt::WTemplate* WebPieChart::createChartTemplate(void)
+void WebPieChart::bindFormWidgets(void)
 {
-  Wt::WTemplate* m_chartTpl = new Wt::WTemplate(Wt::WString::tr("chart.tpl"));
-  m_chartTpl->bindWidget("chart-legend-bar", m_chartLegendBar = createChartLegendBar());
-  m_chartTpl->bindWidget("chart-content", this);
-  m_chartLegendBar->setHidden(true);
-  return m_chartTpl;
+  resize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
+  setMargin(0, Wt::Top);
+  setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
+
+  setupMainChartTemplate();
+
+  // Draw the chart
+  m_piechart.setLabelsColumn(0);    // Set the column that holds the labels.
+  m_piechart.setDataColumn(1);      // Set the column that holds the data.
+  m_piechart.setDisplayLabels(Wt::Chart::NoLabels);
+  m_piechart.setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
+  m_piechart.setShadowEnabled(true);
+
+  m_piechart.setPlotAreaPadding(0, Wt::All);
+  Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(m_piechart.model());
+  m_piechart.setPalette(new WebCharPalette(model));
 }
 
-Wt::WTemplate* WebPieChart::createChartLegendBar(void)
+
+void WebPieChart::unbindFormWidgets(void)
 {
-  Wt::WTemplate* chartLegendBar = new Wt::WTemplate(Wt::WString::tr("chart-legend-bar.tpl"));
-  chartLegendBar->bindWidget("unknown-count", m_legendBadges[ngrt4n::Unknown] = new Wt::WText());
-  chartLegendBar->bindWidget("critical-count", m_legendBadges[ngrt4n::Critical] = new Wt::WText());
-  chartLegendBar->bindWidget("major-count", m_legendBadges[ngrt4n::Major] = new Wt::WText());
-  chartLegendBar->bindWidget("minor-count", m_legendBadges[ngrt4n::Minor] = new Wt::WText());
-  chartLegendBar->bindWidget("normal-count", m_legendBadges[ngrt4n::Normal] = new Wt::WText());
-  return chartLegendBar;
+  m_chartLegendBarTpl.takeWidget("unknown-count");
+  m_chartLegendBarTpl.takeWidget("critical-count");
+  m_chartLegendBarTpl.takeWidget("major-count");
+  m_chartLegendBarTpl.takeWidget("minor-count");
+  m_chartLegendBarTpl.takeWidget("normal-count");
+  takeWidget("chart-legend-bar");
+  takeWidget("chart-content");
+}
+
+
+
+void WebPieChart::setupMainChartTemplate(void)
+{
+  setupChartLegendBarTemplate();
+  bindWidget("chart-legend-bar", &m_chartLegendBarTpl);
+  bindWidget("chart-content", &m_piechart);
+}
+
+void WebPieChart::setupChartLegendBarTemplate(void)
+{
+  m_chartLegendBarTpl.setTemplateText(Wt::WString::tr("chart-legend-bar.tpl"));
+  m_chartLegendBarTpl.bindWidget("unknown-count", &m_legendBadges[ngrt4n::Unknown]);
+  m_chartLegendBarTpl.bindWidget("critical-count", &m_legendBadges[ngrt4n::Critical]);
+  m_chartLegendBarTpl.bindWidget("major-count", &m_legendBadges[ngrt4n::Major]);
+  m_chartLegendBarTpl.bindWidget("minor-count", &m_legendBadges[ngrt4n::Minor]);
+  m_chartLegendBarTpl.bindWidget("normal-count", &m_legendBadges[ngrt4n::Normal]);
+  m_chartLegendBarTpl.setHidden(true);
 }
 
 
 void WebPieChart::repaint()
 {
   for(auto it = std::begin(m_statsData); it != std::end(m_statsData); ++it) {
-    m_model->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
-    m_model->setData(it.key(), 1, it.value());
-    m_legendBadges[it.key()]->setText(QString::number(it.value()).toStdString());
+    m_piechart.model()->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
+    m_piechart.model()->setData(it.key(), 1, it.value());
+    m_legendBadges[it.key()].setText(QString::number(it.value()).toStdString());
   }
   if (m_dataType == SLAData) {
-    m_chartLegendBar->setHidden(true);
-    setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_severityRatio[ngrt4n::Normal])).toStdString());
+    m_chartLegendBarTpl.setHidden(true);
+    m_piechart.setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_severityRatio[ngrt4n::Normal])).toStdString());
     if (m_severityRatio[ngrt4n::Normal] > 0 && m_severityRatio[ngrt4n::Normal] < 100) {
-      setExplode(ngrt4n::Normal, 0.3);
+      m_piechart.setExplode(ngrt4n::Normal, 0.3);
     }
-    setToolTip(ChartBase::defaultTooltipText());
+    m_piechart.setToolTip(ChartBase::defaultTooltipText());
   } else {
-    m_chartLegendBar->setHidden(false);
-    setToolTip(ChartBase::defaultTooltipText());
+    m_chartLegendBarTpl.setHidden(false);
+    m_piechart.setToolTip(ChartBase::defaultTooltipText());
   }
 }
 

@@ -151,8 +151,7 @@
            <legend>Tactical Overview</legend>
            ${thumbnails}
            <legend>${bi-report-title}</legend>
-           ${report-period-header-pane}
-           ${bigraphs}
+           ${bi-report-dashlet}
        </div>
     </div>
     <!-- Event Feeds Pane -->
