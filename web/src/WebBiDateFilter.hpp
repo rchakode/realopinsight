@@ -31,14 +31,24 @@
 #include <Wt/WDatePicker>
 #include <Wt/WHBoxLayout>
 #include <Wt/WAnchor>
+#include <QObject>
+#include <QDebug>
 
-class WebBiDateFilter : public  Wt::WContainerWidget
+class WebBiDateFilter : public QObject, public  Wt::WContainerWidget
 {
+  Q_OBJECT
+
+public:
   WebBiDateFilter(void);
   ~WebBiDateFilter();
   long epochStartTime(void){ return Wt::WDateTime(m_startDatePicker.date()).toTime_t();}
   long epochEndTime(void) {return Wt::WDateTime(m_endDatePicker.date()).toTime_t();}
 
+public Q_SLOTS:
+  void handleApplyButtonSubmitted(void) {Q_EMIT reportPeriodChanged(epochStartTime(), epochEndTime()); }
+
+Q_SIGNALS:
+  void reportPeriodChanged(long start, long end);
 
 private:
   Wt::WHBoxLayout* m_layout;
@@ -53,8 +63,8 @@ private:
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
   void setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime);
+  void setupSubmitButton(void);
 };
-
 
 
 #endif // WEBBIDATEFILTER_HPP

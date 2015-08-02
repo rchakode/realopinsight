@@ -86,7 +86,7 @@ class WebDashboard : public DashboardBase, public Wt::WContainerWidget
   Q_OBJECT
 
 public:
-  WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout=NULL);
+  WebDashboard(const QString& descriptionFile);
   virtual ~WebDashboard();
   void updateMap(void);
   WebMap* map(void) {return &m_map;}
@@ -95,13 +95,12 @@ public:
   Wt::WLabel* thumbnailTitleBar(void) {return &m_thumbnailTitleBar;}
   Wt::WLabel* thumbnailProblemDetailBar(void) {return &m_thumbnailProblemDetailsBar;}
   std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
-  void setEventFeedLayout(Wt::WVBoxLayout* layout) {m_eventFeedLayout = layout;}
   virtual void initialize(Preferences* preferencePtr);
   std::string tooltip(void) {return m_chart.toStdString();}
   void triggerResizeComponents(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
   void handleShowOnlyTroubleEvents(bool showOnlyTrouble);
-  //FIXME:
-  void handleDashboardSelected(void) {/*Q_EMIT dashboardSelected(dynamic_cast<Wt::WWidget*>(&this));*/}
+  Wt::WVBoxLayout* eventFeedLayout(void) {return &m_eventFeedLayout;}
+  void handleDashboardSelected(std::string viewName) {Q_EMIT dashboardSelected(viewName);}
 
 
 protected:
@@ -114,7 +113,7 @@ protected:
   virtual void updateEventFeeds(const NodeT& node);
 
 Q_SIGNALS:
-  void dashboardSelected(Wt::WWidget* widget);
+  void dashboardSelected(std::string viewName);
 
 private:
   typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;
@@ -124,7 +123,7 @@ private:
   WebPieChart m_chart;
   Wt::WLabel m_thumbnailTitleBar;
   Wt::WLabel m_thumbnailProblemDetailsBar;
-  Wt::WVBoxLayout* m_eventFeedLayout;
+  Wt::WVBoxLayout m_eventFeedLayout;
   EventFeedItemsT m_eventFeedItems;
 
   Wt::WHBoxLayout* m_mainLayout;

@@ -36,21 +36,34 @@
 
 
 
-class WebBiDashlet : public Wt::WContainerWidget
+class WebBiDashlet : public QObject, public Wt::WContainerWidget
 {
+  Q_OBJECT
+
+public:
   WebBiDashlet();
   ~WebBiDashlet();
   void initialize(const DbViewsT& viewList);
-  void update(const QosDataByViewMapT& qosDataMap, const std::string& viewName);
+  void updateViewCharts (const std::string& viewName, const QosDataByViewMapT& qosDataMap);
+  long startTime(void) {return m_filterHeader.epochStartTime();}
+  long endTime(void) {return m_filterHeader.epochEndTime();}
+
+public Q_SLOTS:
+  void handleReportPeriodChanged(long start, long end) { Q_EMIT reportPeriodChanged(start, end);}
+
+Q_SIGNALS:
+  void reportPeriodChanged(long start, long end);
+
 
 private:
   Wt::WGridLayout* m_layout;
-  WebBiDateFilter m_filter;
+  WebBiDateFilter m_filterHeader;
   QMap<std::string, Wt::WText*> m_chartTitleMap;
-  QMap<std::string, WebPieChart*> m_qosChartMap;
+  QMap<std::string, WebPieChart*> m_slaPiechartMap;
   QMap<std::string, WebBiRawChart*> m_itProblemChartMap;
   QMap<std::string, WebCsvExportIcon*> m_csvExportLinkMap;
 
+  void addEvent(void);
   Wt::WText* createTitleWidget(const std::string& viewName);
 };
 

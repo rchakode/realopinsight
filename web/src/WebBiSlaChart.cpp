@@ -29,22 +29,7 @@
 #include <Wt/WRectArea>
 
 
-namespace {
-  const double BI_RAW_CHART_AREA_WIDTH = 400;
-  const double BI_RAW_CHART_AREA_HEIGHT = 150;
-  const double BI_QOS_CHART_AREA_WIDTH = 250;
-  const double BI_QOS_CHART_AREA_HEIGHT = 150;
-  const double BI_CHART_AREA_MARGIN = 25;
-  const double BI_CHART_WIDTH = BI_QOS_CHART_AREA_WIDTH;
-  const double BI_CHART_TREND_HEIGHT = 50;
-  const double AREA_TOP_CORNER_Y = BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
-  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
-  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
-}
-
-
-
-WebBiSlaChart::WebBiSlaChart(const std::list<QosDataT>& data)
+WebBiSlaData::WebBiSlaData(const std::list<QosDataT>& data)
   : m_normalDuration(0),
     m_minorDuration(0),
     m_majorDuration(0),
@@ -54,7 +39,7 @@ WebBiSlaChart::WebBiSlaChart(const std::list<QosDataT>& data)
   processData(data);
 }
 
-void WebBiSlaChart::processData(const QosDataList& data)
+void WebBiSlaData::processData(const QosDataList& data)
 {
   QosDataList::const_iterator qosit = data.begin();
   m_plottingData.clear();

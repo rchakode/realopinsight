@@ -45,9 +45,8 @@ namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
 }
 
-WebDashboard::WebDashboard(const QString& descriptionFile, Wt::WVBoxLayout* eventFeedLayout)
-  : DashboardBase(descriptionFile),
-    m_eventFeedLayout(eventFeedLayout)
+WebDashboard::WebDashboard(const QString& descriptionFile)
+  : DashboardBase(descriptionFile)
 {
   m_tree.setCoreData(&m_cdata);
   m_map.setCoreData(&m_cdata);
@@ -152,6 +151,7 @@ void WebDashboard::bindFormWidgets(void)
 
 void WebDashboard::unbindWidgets(void)
 {
+  m_eventFeedLayout.clear();
   m_leftSubMainLayout.removeWidget(&m_tree);
   m_leftSubMainLayout.removeWidget(&m_chart);
   m_rightSubMainLayout.removeWidget(m_map.getWidget());
@@ -171,19 +171,17 @@ void WebDashboard::addJsEventScript(void)
 
 void WebDashboard::updateEventFeeds(const NodeT &node)
 {
-  if (m_eventFeedLayout) {
-    EventFeedItemsT::Iterator feed = m_eventFeedItems.find(node.id);
-    if (feed != m_eventFeedItems.end()) {
-      m_eventFeedLayout->removeWidget(*feed);
-      delete *feed;
-      m_eventFeedItems.erase(feed);
-    }
-    // FIXME: need optimization to avoid removing and readding the same item
-    if (node.sev != ngrt4n::Normal) {
-      Wt::WWidget* widget = createEventFeedTpl(node);
-      m_eventFeedLayout->insertWidget(0, widget);
-      m_eventFeedItems.insert(node.id, widget);
-    }
+  EventFeedItemsT::Iterator feed = m_eventFeedItems.find(node.id);
+  if (feed != m_eventFeedItems.end()) {
+    m_eventFeedLayout.removeWidget(*feed);
+    delete *feed;
+    m_eventFeedItems.erase(feed);
+  }
+  // FIXME: need optimization to avoid removing and readding the same item
+  if (node.sev != ngrt4n::Normal) {
+    Wt::WWidget* widget = createEventFeedTpl(node);
+    m_eventFeedLayout.insertWidget(0, widget);
+    m_eventFeedItems.insert(node.id, widget);
   }
 }
 
@@ -192,13 +190,19 @@ Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(Severity(node.sev).toString(),                                                                                 node.child_nodes).toStdString());
-  anchor->clicked().connect(this, &WebDashboard::handleDashboardSelected);
 
+  std::string viewName = rootNode().name.toStdString();
+
+  anchor->clicked().connect(std::bind(&WebDashboard::handleDashboardSelected,
+                                      this,
+                                      viewName)
+                            );
+  //FIXME: clear widget
   tpl->bindWidget("event-feed-title", anchor);
   tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
   tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
   tpl->bindString("event-feed-details", node.check.alarm_msg);
-  tpl->bindString("platform", rootNode().name.toStdString());
+  tpl->bindString("platform", viewName);
   tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
   return tpl;
 }

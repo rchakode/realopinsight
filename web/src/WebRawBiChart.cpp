@@ -23,17 +23,25 @@
  */
 
 #include "WebBiRawChart.hpp"
+#include <Wt/WStandardItemModel>
 
 
-/**
- * @brief RawQosTrendsChart::RawQosTrendsChart
- * @param viewName
- * @param data
- * @param parent
- */
+namespace {
+  const double BI_RAW_CHART_AREA_WIDTH = 400;
+  const double BI_RAW_CHART_AREA_HEIGHT = 150;
+  const double BI_QOS_CHART_AREA_WIDTH = 250;
+  const double BI_QOS_CHART_AREA_HEIGHT = 150;
+  const double BI_CHART_AREA_MARGIN = 25;
+  const double BI_CHART_WIDTH = BI_QOS_CHART_AREA_WIDTH;
+  const double BI_CHART_TREND_HEIGHT = 50;
+  const double AREA_TOP_CORNER_Y = BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
+  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
+  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
+}
+
 WebBiRawChart::WebBiRawChart(void)
   : Wt::Chart::WCartesianChart(0),
-    m_viewName(viewName),
+    m_viewName(""),
     m_model(NULL)
 {
   setStyleClass("bi-chart");

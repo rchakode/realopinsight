@@ -25,6 +25,7 @@
 #ifndef WEBBIRAWCHART_HPP
 #define WEBBIRAWCHART_HPP
 
+#include "dbo/DbObjects.hpp"
 #include <Wt/Chart/WCartesianChart>
 
 class WebBiRawChart : public Wt::Chart::WCartesianChart

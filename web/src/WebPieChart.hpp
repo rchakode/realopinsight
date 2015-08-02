@@ -37,27 +37,23 @@
 #include <Wt/WPen>
 
 
-class WebCharPalette : public Wt::Chart::WChartPalette
+class WebChartPalette : public Wt::Chart::WChartPalette
 {
 public:
-  WebCharPalette(Wt::WStandardItemModel* model) : m_model(model) { }
-  void setModel(Wt::WStandardItemModel* model) {m_model = model;}
+  WebChartPalette(void) { }
   virtual Wt::WBrush brush (int index) const { return Wt::WBrush(ngrt4n::severityWColor(index));}
   virtual Wt::WPen borderPen (int index) const { return Wt::WPen(Wt::WColor(255, 255, 255, 0)); }
   Wt::WPen strokePen (int) const { /* TODO: check value first */ return Wt::WPen(Wt::WColor(255, 255, 255, 1)); }
   Wt::WColor fontColor (int index) const { /* TOTO: check value first */ return Wt::WColor(255, 255, 255, 0);}
   virtual Wt::WColor color (int index) const { return Wt::WColor(255, 255, 255, 0); }
-
-private:
-  Wt::WStandardItemModel* m_model;
 };
 
 
 class WebPieChart : public Wt::WTemplate, public ChartBase
 {
 public:
-  WebPieChart(void);
   WebPieChart(int dataType);
+  WebPieChart(void);
   virtual ~WebPieChart();
   void repaint();
   void setDataType(int dataType) {ChartBase::setDataType(dataType);}
@@ -68,10 +64,12 @@ private:
   std::map<int, Wt::WText> m_legendBadges;
   Wt::WTemplate m_mainChartTpl;
   Wt::WTemplate m_chartLegendBarTpl;
-  void setupChartLegendBarTemplate(void);
-  void setupMainChartTemplate(void);
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
+
+  void setupChartPalette(void);
+  void setupChartStyle(void);
+  void setupPieChartModel(void);
 };
 
 #endif // WEBPIECHART_HPP

@@ -23,37 +23,52 @@
  */
 
 #include "WebBiDashlet.hpp"
+#include "WebBiRawChart.hpp"
 #include <ctime>
 
 
 WebBiDashlet::WebBiDashlet()
-  : m_layout(new Wt::WGridLayout())
 {
+  m_layout = new Wt::WGridLayout();
   setLayout(m_layout);
+  addEvent();
+
 }
-
-
 
 WebBiDashlet::~WebBiDashlet()
 {
+  m_layout->removeWidget(&m_filterHeader); // explicitely delete m_filter, since not a pointer
+  clear(); // shall delete m_layout and its contents
+}
+
+
+void WebBiDashlet::addEvent(void)
+{
+  QObject::connect(&m_filterHeader, SIGNAL(reportPeriodChanged(long, long)),
+                   this, SLOT(handleReportPeriodChanged(long, long)));
 }
 
 void WebBiDashlet::initialize(const DbViewsT& viewList)
 {
-  //TODO: dont use pointer for chart widgets ?
   int rowIndex = 0;
+  m_layout->addWidget(&m_filterHeader, rowIndex, 0, 1, 2);
+
   for (const auto& view: viewList) {
+
+    //FIXME: dont use pointer for chart widgets
+    // or think of deleting explicitely chart objects
     m_chartTitleMap.insert(view.name, createTitleWidget(view.name));
     m_csvExportLinkMap.insert(view.name, new WebCsvExportIcon());
-    m_itProblemChartMap.insert(view.name, new RawQosTrendsChart(view.name, QosDataList()));
-    m_qosChartMap.insert(view.name, new WebPieChart(ChartBase::SLAData));
-
-    m_layout->addWidget(m_chartTitleMap[view.name], rowIndex, 0);
-    m_layout->addWidget(m_csvExportLinkMap[view.name], rowIndex, 1, Wt::AlignRight);
-    m_layout->addWidget(m_qosChartMap[view.name], ++rowIndex, 0);
-    m_layout->addWidget(m_itProblemChartMap[view.name], rowIndex, 1);
+    m_itProblemChartMap.insert(view.name, new WebBiRawChart());
+    m_slaPiechartMap.insert(view.name, new WebPieChart(ChartBase::SLAData));
 
     ++rowIndex;
+    m_layout->addWidget(m_chartTitleMap[view.name], rowIndex, 0);
+    m_layout->addWidget(m_csvExportLinkMap[view.name], rowIndex, 1, 1, Wt::AlignRight);
+
+    ++rowIndex;
+    m_layout->addWidget(m_slaPiechartMap[view.name], rowIndex, 0);
+    m_layout->addWidget(m_itProblemChartMap[view.name], rowIndex, 1);
   }
 }
 
@@ -65,28 +80,29 @@ Wt::WText* WebBiDashlet::createTitleWidget(const std::string& viewName)
 }
 
 
-void WebBiDashlet::update(const QosDataByViewMapT& qosDataMap, const std::string& viewName)
+void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataByViewMapT& qosDataMap)
 {
   QosDataByViewMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewName);
   if (iterQosDataSet ==  qosDataMap.end())
     return; // stop process
 
-  // update qos chart when applicable
-  QMap<std::string, WebPieChart*>::iterator iterQosChart = m_qosChartMap.find(viewName);
-  if (iterQosChart == m_qosChartMap.end()) {
-    WebBISLAChart slaManager(*iterQosDataSet);
-    iterQosChart->setSeverityData(slaManager.normalDuration(),
-                                  slaManager.minorDuration(),
-                                  slaManager.majorDuration(),
-                                  slaManager.criticalDuration(),
-                                  slaManager.totalDuration());
-    iterQosChart->repaint();
+  // Here we have: iterQosDataSet !=  qosDataMap.end()
+  // So update qos chart when applicable
+  QMap<std::string, WebPieChart*>::iterator iterSlaPiechart = m_slaPiechartMap.find(viewName);
+  if (iterSlaPiechart != m_slaPiechartMap.end()) {
+    WebBiSlaData slaData(*iterQosDataSet);
+    (*iterSlaPiechart)->setSeverityData(slaData.normalDuration(),
+                                        slaData.minorDuration(),
+                                        slaData.majorDuration(),
+                                        slaData.criticalDuration(),
+                                        slaData.totalDuration());
+    (*iterSlaPiechart)->repaint();
   }
 
   // update IT problem chart when applicable
-  QMap<std::string, RawQosTrendsChart*>::iterator iterItProblemChart = m_itProblemChartMap.find(viewName);
-  if (iterItProblemChart != m_itProblemChartMap.end())
-    iterItProblemChart->updateData(*iterQosDataSet);
-
+  QMap<std::string, WebBiRawChart*>::iterator iterProblemTrendsChart = m_itProblemChartMap.find(viewName);
+  if (iterProblemTrendsChart != m_itProblemChartMap.end()) {
+    (*iterProblemTrendsChart)->updateData(*iterQosDataSet);
+  }
 }
 

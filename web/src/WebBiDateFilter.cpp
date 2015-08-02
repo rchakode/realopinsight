@@ -25,6 +25,7 @@
 
 
 #include "WebBiDateFilter.hpp"
+#include "WebUtils.hpp"
 
 
 #define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
@@ -34,6 +35,7 @@ WebBiDateFilter::WebBiDateFilter(void)
 {
   setupDatePicker(&m_startDatePicker, LAST_30_DAYS);
   setupDatePicker(&m_endDatePicker, time(NULL));
+  setupSubmitButton();
   addEvent();
   bindFormWidgets();
 }
@@ -46,38 +48,45 @@ WebBiDateFilter::~WebBiDateFilter()
 
 void WebBiDateFilter::addEvent(void)
 {
-  //FIXME: m_reportApplyAnchor->clicked().connect(this, &WebMainUI::updateBiCharts);
+  m_applyFilterBtn.clicked().connect(this, &WebBiDateFilter::handleApplyButtonSubmitted);
 }
 
 
 void WebBiDateFilter::bindFormWidgets(void)
 {
-  m_layout->addWidget( &m_promptTextLabel,    1);
-  m_layout->addWidget( &m_startDatePicker,    1);
-  m_layout->addWidget( &m_dateSeparatorLabel, 1);
-  m_layout->addWidget( &m_endDatePicker,      1);
-  m_layout->addWidget( &m_applyFilterBtn,     1);
+  m_layout->addWidget(&m_promptTextLabel,    1);
+  m_layout->addWidget(&m_startDatePicker,    1);
+  m_layout->addWidget(&m_dateSeparatorLabel, 1);
+  m_layout->addWidget(&m_endDatePicker,      1);
+  m_layout->addWidget(&m_applyFilterBtn,     1);
 }
 
 
 void WebBiDateFilter::unbindFormWidgets(void)
 {
-  m_layout->removeWidget(& m_promptTextLabel);
-  m_layout->removeWidget(& m_startDatePicker);
-  m_layout->removeWidget(& m_dateSeparatorLabel, 1);
-  m_layout->removeWidget(& m_endDatePicker);
-  m_layout->removeWidget(& m_applyFilterBtn);
+  m_layout->removeWidget(&m_promptTextLabel);
+  m_layout->removeWidget(&m_startDatePicker);
+  m_layout->removeWidget(&m_dateSeparatorLabel);
+  m_layout->removeWidget(&m_endDatePicker);
+  m_layout->removeWidget(&m_applyFilterBtn);
 }
 
 
 void WebBiDateFilter::setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime)
 {
-  Wt::WDateTime dt;
-  dt.setTime_t(defaultEpochTime);
-  datePicker->setFormat("dd-MM-yyyy");
-  datePicker->setDate(dt.date().addDays(1));
-  datePicker->setStyleClass("inline");
-  return datePicker;
+  if (datePicker) {
+    Wt::WDateTime dt;
+    dt.setTime_t(defaultEpochTime);
+    datePicker->setFormat("dd-MM-yyyy");
+    datePicker->setDate(dt.date().addDays(1));
+    datePicker->setStyleClass("inline");
+  }
+}
+
+void WebBiDateFilter::setupSubmitButton(void)
+{
+  m_applyFilterBtn.setLink(Wt::WLink("#"));
+  m_applyFilterBtn.setText(Q_TR("Apply"));
 }
 
 

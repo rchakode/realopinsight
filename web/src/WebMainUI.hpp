@@ -47,8 +47,6 @@
 #include <Wt/WSignal>
 #include <Wt/WProgressBar>
 #include <Wt/WDialog>
-#include <Wt/Http/Request>
-#include <Wt/Http/Response>
 #include <Wt/WNavigationBar>
 #include <Wt/WFileUpload>
 
@@ -96,8 +94,17 @@ public Q_SLOTS:
   void handleLibError(QString msg) {showMessage(ngrt4n::OperationSucceeded, msg.toStdString());}
   void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
   void setWidgetAsFrontStackedWidget(Wt::WWidget* widget);
-  void resetViewSelectionBox(void) { m_selectViewBreadCrumbsBox->setCurrentIndex(0); m_displayOnlyTroubleEventsBox->setHidden(true);}
+  void resetViewSelectionBox(void) { m_selectViewBox->setCurrentIndex(0); m_displayOnlyTroubleEventsBox->setHidden(true);}
   void showMessage(int status, const std::string& msg);
+  void handleDashboardSelected(std::string viewName);
+  void handleReportPeriodChanged(long start, long end);
+  void handleShowExecutiveView(void);
+  void handleShowSettingsView(void);
+  void handleNewViewSelected(void);
+  void handleUploadSubmitButton(void);
+  void handleUploadCancelButton(void);
+
+
 
 private:
   enum FileDialogAction {
@@ -107,16 +114,10 @@ private:
 
   /** Signals */
   Wt::Signal<void> sessionTerminated;
-
   typedef QMap<QString, WebDashboard*> DashboardMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
 
-
-  //FIXME: clear template before clean
-  ThumbnailMapT m_thumbnailItems;
-
   /** Private members **/
-  QosDataByViewMapT m_qosDataMap;
   QMap<int,Wt::WAnchor*> m_menuLinks;
   std::string m_rootDir;
   std::string m_confdir;
@@ -143,11 +144,19 @@ private:
   Wt::WStackedWidget m_adminStackedContents;
   Wt::WNavigationBar m_navbar;
   Wt::WStackedWidget m_dashboardStackedContents;
+
+
   Wt::WDialog m_fileUploadDialog;
   Wt::WDialog m_previewDialog;
   Wt::WFileUpload m_fileUploader;
+  Wt::WPushButton m_uploadButton;
+  Wt::WPushButton m_uploadSubmitButton;
+  Wt::WPushButton m_uploadCancelButton;
+  Wt::WProgressBar m_uploadProgressBar;
+
+
   std::string m_selectedFile;
-  DashboardMapT m_dashboards;
+  DashboardMapT m_dashboardMap;
   DbUserManager* m_dbUserManager;
   LdapUserManager* m_ldapUserManager;
   UserFormView* m_userAccountForm;
@@ -158,15 +167,19 @@ private:
   Wt::WText m_adminPanelTitle;
   WebDashboard* m_currentDashboard;
 
-  Wt::WComboBox* m_selectViewBreadCrumbsBox;
+  Wt::WComboBox* m_selectViewBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
-  /** executive view widgets **/
+  /** Executive View widgets **/
+  Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WContainerWidget m_eventFeedsContainer;
-  Wt::WVBoxLayout m_eventFeedLayout;
-  Wt::WContainerWidget m_thumbnailContainer;
-  Wt::WGridLayout m_thumbnailLayout;
 
+  Wt::WGridLayout* m_thumbsLayout;
+  Wt::WContainerWidget m_thumbsContainer;
+  ThumbnailMapT m_thumbsWidgets;
+
+  /** BI dashlet **/
+  WebBiDashlet m_biDashlet;
 
   /** member methods with return value*/
   Wt::WAnchor* createLogoLink(void);
@@ -203,7 +216,7 @@ private:
   void setupInfoBox(void);
   void setupProfileMenus(void);
   void setupMenus(void);
-  void openFileUploadDialog(void);
+  void setupFileUploadDialog(void);
   void selectItem4Preview(void);
   void initOperatorDashboard(void);
   WebDashboard* loadView(const std::string& path);
@@ -216,15 +229,13 @@ private:
   void setInternalPath(const std::string& path);
   bool createDirectory(const std::string& path, bool cleanContent);
   void startDashbaordUpdate(void);
-  void updateBiCharts(void);
-  void updateViewBiCharts(const std::string& viewName);
   void hideAdminSettingsMenu(void);
   void showConditionalUiWidgets(void);
 
   void setupNavivationBar(void);
   void setupMainStackedContent(void);
   void setupBreadCrumbsBar(void);
-  void setupOperatorHomePage(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer);
+
   WebNotificationManager* createNotificationManager(void);
   Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
   Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
@@ -232,14 +243,19 @@ private:
   Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
   Wt::WWidget* createNotificationSection(void);
   void updateLicenseMgntForm();
+
   void unbindWidgets(void);
-  void unbindThumbnailWidgets(void);
+  void bindExecutiveViewWidgets(void);
+  void unbindExecutiveViewWidgets(void);
   void unbindDashboardWidgets(void);
+  void unbindStackedWidgets(void);
+
   void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);
-  void dbsaveBusinessServiceInfo(const CoreDataT& cdata, const QString& path);
+  void saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path);
 
   Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
   void clearThumbnailTemplate(Wt::WTemplate* tpl);
+  void fetchQosData(QosDataByViewMapT& qosDataMap, long start, long end);
 };
 
 #endif // MAINWEBWINDOW_HPP

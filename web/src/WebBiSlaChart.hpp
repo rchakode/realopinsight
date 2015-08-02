@@ -25,11 +25,12 @@
 #ifndef WEBBISLACHART_HPP
 #define WEBBISLACHART_HPP
 
+#include "dbo/DbObjects.hpp"
 
-class WebBiSlaChart
+class WebBiSlaData
 {
 public:
-  WebBiSlaChart(const QosDataList& data);
+  WebBiSlaData(const QosDataList& data);
 
   double normalDuration(void) const {return m_normalDuration;}
   double minorDuration(void) const {return m_minorDuration;}
@@ -37,6 +38,7 @@ public:
   double criticalDuration(void) const {return m_criticalDuration;}
   double unknownDuration(void) const {return m_unknownDuration;}
   double totalDuration(void) const {return m_totalDuration;}
+
 
 private:
   struct TimeStatusT {
@@ -53,7 +55,6 @@ private:
   long m_totalDuration;
 
   void processData(const QosDataList& data);
-  //FIXME: std::string slaText(void) {return QObject::tr("SLA: %1\%").arg(QString::number(m_slaNormal,'f',2)).toStdString();}
 };
 
 #endif // WEBBISLACHART_HPP

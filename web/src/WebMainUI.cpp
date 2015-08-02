@@ -73,8 +73,9 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   setupMenus();
   setupInfoBox();
   showUserHome();
-  addEvents();
+  setupFileUploadDialog();
   doJavaScript(RESIZE_PANES);
+  addEvents();
 }
 
 WebMainUI::~WebMainUI()
@@ -89,8 +90,9 @@ WebMainUI::~WebMainUI()
 
 void WebMainUI::unbindWidgets(void)
 {
-  unbindThumbnailWidgets();
   unbindDashboardWidgets();
+  unbindExecutiveViewWidgets();
+  unbindStackedWidgets();
 
   m_adminStackedContents.removeWidget(&m_dataSourceSettingsForm);
   m_adminStackedContents.removeWidget(&m_notificationSettingsForm);
@@ -115,25 +117,49 @@ void WebMainUI::unbindWidgets(void)
 }
 
 
-void WebMainUI::unbindThumbnailWidgets(void)
+
+void WebMainUI::unbindExecutiveViewWidgets(void)
 {
-  for (ThumbnailMapT::Iterator thumb = m_thumbnailItems.begin(); thumb != m_thumbnailItems.end(); ++thumb)
+  for (ThumbnailMapT::Iterator thumb = m_thumbsWidgets.begin();
+       thumb != m_thumbsWidgets.end();
+       ++thumb)
+  {
     clearThumbnailTemplate(*thumb);
+    m_thumbsLayout->removeWidget(*thumb);
+  }
+
+  m_thumbsContainer.clear();
+  m_operatorHomeTpl.takeWidget("thumbnails");
+
+  m_eventFeedsContainer.clear();
+  m_operatorHomeTpl.takeWidget("event-feeds");
+
+  m_operatorHomeTpl.takeWidget("bi-report-dashlet");
 }
 
 
 void WebMainUI::unbindDashboardWidgets(void)
 {
-  for (auto dashboard : m_dashboards) m_dashboardStackedContents.removeWidget(dashboard);
+  for (auto dashboardItem : m_dashboardMap) {
+    m_eventFeedLayout->removeItem(dashboardItem->eventFeedLayout());
+    m_dashboardStackedContents.removeWidget(dashboardItem);
+  }
+}
+
+
+void WebMainUI::unbindStackedWidgets(void)
+{
   m_dashboardStackedContents.removeWidget(&m_settingsPageTpl);
   m_dashboardStackedContents.removeWidget(&m_operatorHomeTpl);
   m_mainStackedContents.removeWidget(&m_dashboardStackedContents);
 }
 
-
 void WebMainUI::addEvents(void)
 {
-  QObject::connect(&m_dataSourceSettingsForm, SIGNAL(operationCompleted()), this, SLOT(showMessage()));
+  //FIXME: clean it? wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
+  QObject::connect(&m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
+  QObject::connect(&m_biDashlet, SIGNAL(reportPeriodChanged(long,long)), this, SLOT(handleReportPeriodChanged(long, long)));
+  m_selectViewBox->changed().connect(this, &WebMainUI::handleNewViewSelected);
   m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
@@ -141,9 +167,12 @@ void WebMainUI::addEvents(void)
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
-  connect(&m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
-  wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
+  m_uploadSubmitButton.clicked().connect(this, &WebMainUI::handleUploadSubmitButton);
+  m_uploadCancelButton.clicked().connect(this, &WebMainUI::handleUploadCancelButton);
+  m_fileUploader.uploaded().connect(this, &WebMainUI::handleImportDescriptionFile);
+  m_fileUploader.fileTooLarge().connect(std::bind(&WebMainUI::showMessage, this, ngrt4n::OperationFailed, Q_TR("File too large.")));
 }
+
 
 void WebMainUI::showUserHome(void)
 {
@@ -195,7 +224,7 @@ void WebMainUI::setupBreadCrumbsBar(void)
 {
   m_breadcrumbsBar.setTemplateText(Wt::WString::tr("breadcrumbs-bar.tpl"));
   m_breadcrumbsBar.bindWidget("show-settings-link", createShowSettingsBreadCrumbsLink());
-  m_breadcrumbsBar.bindWidget("display-view-selection-box", m_selectViewBreadCrumbsBox = createShowViewBreadCrumbsLink());
+  m_breadcrumbsBar.bindWidget("display-view-selection-box", m_selectViewBox = createShowViewBreadCrumbsLink());
   m_breadcrumbsBar.bindWidget("display-only-trouble-event-box", m_displayOnlyTroubleEventsBox = createDisplayOnlyTroubleBreadCrumbsLink());
   if (! m_dbSession->isLoggedAdmin()) {
     m_breadcrumbsBar.bindWidget("show-home-link", createShowOpsHomeBreadCrumbsLink());
@@ -214,52 +243,42 @@ void WebMainUI::setupMainStackedContent(void)
 Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
 {
   Wt::WAnchor* link = new Wt::WAnchor("#", "Settings");
-  link->clicked().connect(std::bind([=] {
-                                      if (! m_dbSession->isLoggedAdmin()) {
-                                      hideAdminSettingsMenu();
-}
-setWidgetAsFrontStackedWidget(&m_settingsPageTpl);
-resetViewSelectionBox();
-}));
-return link;
+  link->clicked().connect(this, &WebMainUI::handleShowSettingsView);
+  return link;
 }
 
 Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
 {
   Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
-  link->clicked().connect(std::bind([=] {
-                                      setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
-                          resetViewSelectionBox();
-}));
-return link;
+  link->clicked().connect(this, &WebMainUI::handleShowExecutiveView);
+  return link;
 }
+
+
+void WebMainUI::handleShowSettingsView(void)
+{
+  if (! m_dbSession->isLoggedAdmin()) {
+    hideAdminSettingsMenu();
+  }
+  setWidgetAsFrontStackedWidget(&m_settingsPageTpl);
+}
+
+void WebMainUI::handleShowExecutiveView(void)
+{
+  setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
+  resetViewSelectionBox();
+}
+
 
 Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
 {
-  Wt::WComboBox* selectionBox = new Wt::WComboBox();
+  Wt::WComboBox* cbox = new Wt::WComboBox();
   if (! m_dbSession->isLoggedAdmin()) {
-    selectionBox->addItem(Q_TR("Executive View"));
+    cbox->addItem(Q_TR("Executive View"));
   } else {
-    selectionBox->addItem(Q_TR("Admin Home"));
+    cbox->addItem(Q_TR("Admin Home"));
   }
-
-  selectionBox->changed().connect(std::bind([=]() {
-                                              QString selectedViewName = QString::fromStdString( selectionBox->currentText().toUTF8() );
-                                  DashboardMapT::Iterator dashboardIter = m_dashboards.find(selectedViewName);
-      if (dashboardIter != m_dashboards.end()) {
-    setDashboardAsFrontStackedWidget(*dashboardIter);
-    m_displayOnlyTroubleEventsBox->setHidden(false);
-  } else {
-    m_currentDashboard = NULL;
-    m_displayOnlyTroubleEventsBox->setHidden(true);
-    if (! m_dbSession->isLoggedAdmin()) {
-      setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
-    } else {
-      setWidgetAsFrontStackedWidget(&m_settingsPageTpl);
-    }
-  }
-}));
-return selectionBox;
+  return cbox;
 }
 
 Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
@@ -270,12 +289,7 @@ Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
   return checkBox;
 }
 
-void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
-{
-  if (m_displayOnlyTroubleEventsBox && m_currentDashboard) {
-    m_currentDashboard->handleShowOnlyTroubleEvents(m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked);
-  }
-}
+
 
 void WebMainUI::setupInfoBox(void)
 {
@@ -388,6 +402,8 @@ void WebMainUI::resetTimer(qint32 interval)
   m_timer.start();
 }
 
+
+
 void WebMainUI::handleRefresh(void)
 {
   m_timer.stop();
@@ -404,8 +420,11 @@ void WebMainUI::handleRefresh(void)
     m_notificationManager->clearAllServicesData();
   }
 
+  QosDataByViewMapT qosDataMap;
+  fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
   int currentView = 1;
-  for (auto& dashboard : m_dashboards) {
+
+  for (auto& dashboard : m_dashboardMap) {
     dashboard->initSettings(& m_dataSourceSettingsForm);
     dashboard->runMonitor();
     dashboard->updateMap();
@@ -420,13 +439,13 @@ void WebMainUI::handleRefresh(void)
       }
     }
 
-    std::string rootServiceName =  rootService.name.toStdString();
-    ThumbnailMapT::Iterator thumbnailItem = m_thumbnailItems.find(rootServiceName);
-    if (thumbnailItem != m_thumbnailItems.end()) {
+    std::string viewName =  rootService.name.toStdString();
+    ThumbnailMapT::Iterator thumbnailItem = m_thumbsWidgets.find(viewName);
+    if (thumbnailItem != m_thumbsWidgets.end()) {
       (*thumbnailItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbnailItem)->setToolTip(dashboard->tooltip());
       if (m_dbSession->isCompleteUserDashboard()) {
-        updateViewBiCharts(rootServiceName);
+        m_biDashlet.updateViewCharts(viewName, qosDataMap);
       }
     }
     ++currentView;
@@ -445,6 +464,171 @@ void WebMainUI::handleRefresh(void)
   startTimer();
 }
 
+
+
+void WebMainUI::handleImportHostGroupAsMap(void)
+{
+  m_adminPanelTitle.setText(Q_TR("Auto Import Hostgroup as Service Map"));
+  m_adminStackedContents.setCurrentWidget(&m_autoHostgroupImporterForm);
+  m_autoHostgroupImporterForm.updateContents();
+}
+
+
+
+void WebMainUI::handlePreview(void)
+{
+  m_previewDialog.accept();
+  m_previewDialog.contents()->clear();
+  if (! m_selectedFile.empty()) {
+    WebDashboard* dashbord = loadView(m_selectedFile);
+    setDashboardAsFrontStackedWidget(dashbord);
+    m_selectedFile.clear();
+  } else {
+    showMessage(ngrt4n::OperationFailed, tr("No item selected for preview").toStdString());
+  }
+}
+
+
+void WebMainUI::handleDisplayAuthSetup(void)
+{
+  m_adminPanelTitle.setText(Q_TR("Authentication Settings"));
+  m_adminStackedContents.setCurrentWidget(&m_authSettingsForm);
+  m_authSettingsForm.updateContents();
+}
+
+
+void WebMainUI::handleDisplayNotificationSetup(void)
+{
+  m_adminPanelTitle.setText(Q_TR("Notification Settings"));
+  m_adminStackedContents.setCurrentWidget(&m_notificationSettingsForm);
+  m_notificationSettingsForm.updateContents();
+}
+
+
+void WebMainUI::handleDisplayUserProfile(void)
+{
+  m_userAccountForm->resetValidationState(false);
+  m_adminStackedContents.setCurrentWidget(m_userAccountForm);
+  m_adminPanelTitle.setText(Q_TR("My Account"));
+}
+
+
+void WebMainUI::handleUpdateUserAccount(const DboUserT& userToUpdate)
+{
+  int ret = m_dbSession->updateUser(userToUpdate);
+  handleUpdateErrcode(ret);
+}
+
+
+void WebMainUI::handleDisplayChangePassword(void)
+{
+  m_adminStackedContents.setCurrentWidget(m_changePasswordPanel);
+  m_changePasswordPanel->reset();
+  m_adminPanelTitle.setText("Change password");
+}
+
+
+void WebMainUI::handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass)
+{
+  int ret = m_dbSession->updatePassword(login, lastpass, pass);
+  handleUpdateErrcode(ret);
+}
+
+
+void WebMainUI::updateLicenseMgntForm()
+{
+  m_adminPanelTitle.setText(Q_TR("License Activation"));
+  m_adminStackedContents.setCurrentWidget(m_licenseMngtForm);
+  m_licenseMngtForm->updateContent();
+}
+
+
+
+
+void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup)
+{
+  CoreDataT cdata;
+  QString errorMsg;
+  if (ngrt4n::importHostGroupAsBusinessView(srcInfo, hostgroup, cdata, errorMsg) != 0) {
+    std::string stdmsg = errorMsg.toStdString();
+    showMessage(ngrt4n::OperationFailed, stdmsg);
+    CORE_LOG("error", stdmsg);
+  } else {
+    NodeT rootNode = cdata.bpnodes[ngrt4n::ROOT_ID];
+    QString path = QString("%1/autoimport_%2.ms.ngrt4n.xml").arg(m_confdir.c_str(),
+                                                                 rootNode.name.replace(" ", "").toLower());
+    if (ngrt4n::saveDataAsDescriptionFile(path, cdata, errorMsg) != 0) {
+      std::string stdmsg = errorMsg.toStdString();
+      showMessage(ngrt4n::OperationFailed, stdmsg);
+      CORE_LOG("error", stdmsg);
+    } else {
+      saveViewInfoIntoDatabase(cdata, path);
+    }
+  }
+}
+
+
+void WebMainUI::handleReportPeriodChanged(long start, long end)
+{
+  QosDataByViewMapT qosDataMap;
+  fetchQosData(qosDataMap, start, end);
+  Q_FOREACH(const std::string& viewName, qosDataMap.keys())
+    m_biDashlet.updateViewCharts(viewName, qosDataMap);
+}
+
+void WebMainUI::handleDataSourceSetup(void)
+{
+  m_adminPanelTitle.setText(Q_TR("Monitoring Data Sources"));
+  m_adminStackedContents.setCurrentWidget(&m_dataSourceSettingsForm);
+  m_dataSourceSettingsForm.updateContents();
+}
+
+
+void WebMainUI::handleNewViewSelected(void)
+{
+  std::string selectedViewName = m_selectViewBox->currentText().toUTF8();
+  DashboardMapT::Iterator dashboardIter = m_dashboardMap.find(selectedViewName.c_str());
+  if (dashboardIter != m_dashboardMap.end()) {
+    setDashboardAsFrontStackedWidget(*dashboardIter);
+    m_displayOnlyTroubleEventsBox->setHidden(false);
+  } else {
+    m_currentDashboard = NULL;
+    m_displayOnlyTroubleEventsBox->setHidden(true);
+    if (! m_dbSession->isLoggedAdmin()) {
+      setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
+    } else {
+      setWidgetAsFrontStackedWidget(&m_settingsPageTpl);
+    }
+  }
+}
+
+
+void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
+{
+  if (m_displayOnlyTroubleEventsBox && m_currentDashboard) {
+    m_currentDashboard->handleShowOnlyTroubleEvents(m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked);
+  }
+}
+
+void WebMainUI::handleUploadSubmitButton(void)
+{
+  m_uploadSubmitButton.disable();
+  m_fileUploadDialog.accept();
+  m_fileUploader.upload();
+  //FIXME: m_fileUploadDialog.contents()->clear();
+}
+
+
+
+void WebMainUI::handleUploadCancelButton(void)
+{
+  m_uploadSubmitButton.enable();
+  m_fileUploadDialog.accept();
+  //FIXME: m_fileUploadDialog.contents()->clear();
+}
+
+
+
 Wt::WAnchor* WebMainUI::createLogoLink(void)
 {
   Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink(PKG_URL.toStdString()),
@@ -452,6 +636,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
   anchor->setTarget(Wt::TargetNewWindow);
   return anchor;
 }
+
 
 void WebMainUI::selectItem4Preview(void)
 {
@@ -471,8 +656,9 @@ void WebMainUI::selectItem4Preview(void)
 }
 
 
-void WebMainUI::openFileUploadDialog(void)
+void WebMainUI::setupFileUploadDialog(void)
 {
+  //FIXME: setup exclusively objects
   m_fileUploadDialog.setWindowTitle(tr("Importation | %1").arg(APP_NAME).toStdString());
   m_fileUploadDialog.setStyleClass("Wt-dialog");
 
@@ -480,70 +666,56 @@ void WebMainUI::openFileUploadDialog(void)
   fileDialogContents->addWidget(new Wt::WText(Q_TR("<p>Select a description file</p>"), Wt::XHTMLText));
 
   fileDialogContents->addWidget(&m_fileUploader);
-  m_fileUploader.uploaded().connect(this, &WebMainUI::handleImportDescriptionFile);
   m_fileUploader.setFileTextSize(MAX_FILE_UPLOAD);
-  m_fileUploader.setProgressBar(new Wt::WProgressBar());
+  m_fileUploader.setProgressBar(&m_uploadProgressBar);
   m_fileUploader.setMargin(10, Wt::Right);
-  
 
   // Provide a button to start uploading.
-  Wt::WPushButton* uploadButton = new Wt::WPushButton(tr("Upload").toStdString(), fileDialogContents);
-  uploadButton->clicked().connect(std::bind([=](){
-                                              m_fileUploader.upload();
-                                  uploadButton->disable();
-}));
-
-// Provide a button to close the upload dialog
-Wt::WPushButton* close(new Wt::WPushButton(tr("Close").toStdString(), fileDialogContents));
-
-close->clicked().connect(std::bind([=](){
-                                     uploadButton->enable();
-                         m_fileUploadDialog.accept();
-m_fileUploadDialog.contents()->clear();
-}));
-
-// React to a file upload problem.
-m_fileUploader.fileTooLarge().connect(std::bind([=] () {
-                                                  showMessage(ngrt4n::OperationFailed, tr("File too large.").toStdString());
-                                      }));
-m_fileUploadDialog.show();
+  m_uploadSubmitButton.setText(Q_TR("Upload"));
+  m_uploadCancelButton.setText(Q_TR("Close"));
+  fileDialogContents->addWidget(&m_uploadSubmitButton);
+  fileDialogContents->addWidget(&m_uploadCancelButton);
 }
 
 
 WebDashboard* WebMainUI::loadView(const std::string& path)
 {
-  WebDashboard* dashboard = NULL;
+  WebDashboard* dashboardItem = NULL;
   try {
-    dashboard = new WebDashboard(path.c_str(), &m_eventFeedLayout);
-    if (! dashboard) {
+    dashboardItem = new WebDashboard(path.c_str());
+    //should be remove when destructing the object
+    m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
+    if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
     } else {
-      dashboard->initialize(& m_dataSourceSettingsForm);
-      if (dashboard->lastErrorState()) {
-        showMessage(ngrt4n::OperationFailed, dashboard->lastErrorMsg().toStdString());
-        delete dashboard, dashboard = NULL;
+      dashboardItem->initialize(& m_dataSourceSettingsForm);
+      if (dashboardItem->lastErrorState()) {
+        showMessage(ngrt4n::OperationFailed, dashboardItem->lastErrorMsg().toStdString());
+        delete dashboardItem, dashboardItem = NULL;
       } else {
-        QString platformName = dashboard->rootNode().name;
-        DashboardMapT::Iterator result = m_dashboards.find(platformName);
-        if (result != m_dashboards.end()) {
+        QString platformName = dashboardItem->rootNode().name;
+        DashboardMapT::Iterator result = m_dashboardMap.find(platformName);
+        if (result != m_dashboardMap.end()) {
           showMessage(ngrt4n::OperationFailed,
-                      tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
-          delete dashboard, dashboard = NULL;
+                      tr("A platfom with the same "
+                         "name is already loaded (%1)"
+                         ).arg(platformName).toStdString());
+          delete dashboardItem, dashboardItem = NULL;
         } else {
-          m_dashboards.insert(platformName, dashboard);
-          m_dashboardStackedContents.addWidget(dashboard);
-          m_selectViewBreadCrumbsBox->addItem(platformName.toStdString());
+          m_dashboardMap.insert(platformName, dashboardItem);
+          m_dashboardStackedContents.addWidget(dashboardItem);
+          m_selectViewBox->addItem(platformName.toStdString());
         }
       }
     }
   } catch (const std::bad_alloc&) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     CORE_LOG("error", errorMsg);
-    delete dashboard, dashboard = NULL;
+    delete dashboardItem, dashboardItem = NULL;
     showMessage(ngrt4n::OperationFailed, errorMsg);
   }
 
-  return dashboard;
+  return dashboardItem;
 }
 
 void WebMainUI::scaleMap(double factor)
@@ -581,7 +753,7 @@ void WebMainUI::setupSettingsPage(void)
       // menu import view
       menuText = QObject::tr("Import Description File").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-      link->clicked().connect(this, &WebMainUI::openFileUploadDialog);
+      link->clicked().connect(&m_fileUploadDialog, &Wt::WDialog::show);
       m_settingsPageTpl.bindWidget("menu-import", link);
       m_menuLinks.insert(MenuImport, link);
 
@@ -714,13 +886,6 @@ m_settingsPageTpl.bindEmpty("menu-license-activation");
 }
 
 
-void WebMainUI::handleDataSourceSetup(void)
-{
-  m_adminPanelTitle.setText(Q_TR("Monitoring Data Sources"));
-  m_adminStackedContents.setCurrentWidget(&m_dataSourceSettingsForm);
-  m_dataSourceSettingsForm.updateContents();
-}
-
 
 UserFormView* WebMainUI::createAccountPanel(void)
 {
@@ -844,47 +1009,40 @@ Wt::WDialog* WebMainUI::createAboutDialog(void)
 
 void WebMainUI::initOperatorDashboard(void)
 {
-  setupOperatorHomePage(&m_thumbnailContainer, &m_eventFeedsContainer);
+  bindExecutiveViewWidgets();
+  bindExecutiveViewWidgets();
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
   m_assignedDashboardCount = m_dbSession->viewList().size();
 
   // Build view thumbnails
   int thumbIndex = 0;
-  int thumbnailsPerRow = m_dbSession->dashboardTilesPerRow();
-  for (const auto& view: m_dbSession->viewList()) {
-    WebDashboard* dashboard = loadView(view.path);
-    if (dashboard) {
-      //      Wt::WTemplate thumbnailTpl ;
-      //      thumbnailTpl.setTemplateText(Wt::WString::tr("dashboard-thumbnail.tpl"));
-      //      thumbnailTpl.setStyleClass("btn btn-unknown");
-      //      thumbnailTpl.bindWidget("thumb-titlebar", dashboard->thumbnailTitleBar());
-      //      thumbnailTpl.bindWidget("thumb-image", dashboard->thumbnail());
-      //      thumbnailTpl.bindWidget("thumb-problem-details", dashboard->thumbnailProblemDetailBar());
+  int thumbPerRow = m_dbSession->dashboardTilesPerRow();
+  for (const auto& view : m_dbSession->viewList()) {
+    WebDashboard* dashboardItem = loadView(view.path);
+    if (dashboardItem) {
+      Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(),
+                                                         dashboardItem->thumbnailProblemDetailBar(),
+                                                         dashboardItem->thumbnail());
+      int rowIndex = thumbIndex / thumbPerRow;
+      int colIndex = thumbIndex % thumbPerRow;
+      m_thumbsLayout->addWidget(thumbWidget, rowIndex, colIndex); // take the ownership of the widget
+      m_thumbsWidgets.insert(view.name, thumbWidget);
 
-      //      /** signal/slot events */
-      //      thumbnailTpl.clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
+      QObject::connect(dashboardItem, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
+      thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, view.name));
 
-      Wt::WTemplate* thumbnailWidget = createThumbnailWidget(dashboard->thumbnailTitleBar(),
-                                                             dashboard->thumbnailProblemDetailBar(),
-                                                             dashboard->thumbnail());
-      m_thumbnailLayout.addWidget(thumbnailWidget, thumbIndex / thumbnailsPerRow, thumbIndex % thumbnailsPerRow);
-      m_thumbnailItems.insert(view.name, thumbnailWidget);
-
-      QObject::connect(dashboard, SIGNAL(dashboardSelected(Wt::WWidget*)), this, SLOT(setWidgetAsFrontStackedWidget(Wt::WWidget*)));
-      thumbnailWidget->clicked().connect(std::bind([=](){ setDashboardAsFrontStackedWidget(dashboard);}));
-
-    ++thumbIndex;
+      ++thumbIndex;
+    }
   }
-}
 
-showConditionalUiWidgets();
+  showConditionalUiWidgets();
 
-if (thumbIndex > 0) {
-  startDashbaordUpdate();
-} else {
-m_thumbnailLayout.addWidget(new Wt::WText(tr("No view to display").toStdString()), 0, 0);
-}
+  if (thumbIndex > 0) {
+    startDashbaordUpdate();
+  } else {
+    showMessage(ngrt4n::OperationFailed, Q_TR("No view to display"));
+  }
 }
 
 
@@ -909,6 +1067,7 @@ void WebMainUI::showConditionalUiWidgets(void)
 {
   if (m_dbSession->isCompleteUserDashboard()) {
     m_biDashlet.initialize(m_dbSession->viewList());
+
     m_operatorHomeTpl.bindString("bi-report-title", Q_TR("Reports"));
     m_operatorHomeTpl.bindWidget("bi-report-dashlet", &m_biDashlet);
   } else {
@@ -925,16 +1084,16 @@ void WebMainUI::showConditionalUiWidgets(void)
   }
 }
 
-void WebMainUI::setupOperatorHomePage(Wt::WContainerWidget* thumbnailsContainer, Wt::WContainerWidget* eventFeedContainer)
+void WebMainUI::bindExecutiveViewWidgets(void)
 {
-  //FIXME: unbind it
-  m_thumbnailContainer.setLayout(&m_thumbnailLayout);
-  //FIXME: unbind it
-  m_eventFeedsContainer.setLayout(&m_eventFeedLayout);
+  m_thumbsContainer.setLayout(m_thumbsLayout = new Wt::WGridLayout());
+  m_eventFeedsContainer.setLayout(m_eventFeedLayout = new Wt::WVBoxLayout());
+
   m_operatorHomeTpl.setTemplateText(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl.bindWidget("info-box", m_infoBox);
-  m_operatorHomeTpl.bindWidget("thumbnails", thumbnailsContainer);
-  m_operatorHomeTpl.bindWidget("event-feeds", eventFeedContainer);
+  m_operatorHomeTpl.bindWidget("thumbnails", &m_thumbsContainer);
+  m_operatorHomeTpl.bindWidget("event-feeds", &m_eventFeedsContainer);
+
   //FIXME: unbind it
   m_dashboardStackedContents.addWidget(&m_operatorHomeTpl);
 }
@@ -1043,12 +1202,12 @@ void  WebMainUI::handleViewAclMenu(void)
 
 void WebMainUI::handleDeleteView(const std::string& viewName)
 {
-  DashboardMapT::Iterator dashboardIter = m_dashboards.find(viewName.c_str());
-  if (dashboardIter != m_dashboards.end()) {
+  DashboardMapT::Iterator dashboardIter = m_dashboardMap.find(viewName.c_str());
+  if (dashboardIter != m_dashboardMap.end()) {
     WebDashboard* dashboard = *dashboardIter;
     m_dashboardStackedContents.removeWidget(dashboard);
     delete (*dashboardIter);
-    m_dashboards.remove(viewName.c_str());
+    m_dashboardMap.remove(viewName.c_str());
   }
 }
 
@@ -1073,14 +1232,6 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 }
 
 
-void WebMainUI::updateBiCharts(void)
-{
-  for (const auto& view: m_dbSession->viewList()) {
-    updateViewBiCharts(view.name);
-  }
-}
-
-
 WebNotificationManager* WebMainUI::createNotificationManager(void)
 {
   WebNotificationManager* notificationManager = new WebNotificationManager(m_dbSession, &m_mainWidget);
@@ -1094,19 +1245,23 @@ void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
   if (dashboard) {
     setWidgetAsFrontStackedWidget(dashboard);
     dashboard->triggerResizeComponents();
-    int index = m_selectViewBreadCrumbsBox->findText(dashboard->rootNode().name.toStdString());
-    m_selectViewBreadCrumbsBox->setCurrentIndex(index);
+    int index = m_selectViewBox->findText(dashboard->rootNode().name.toStdString());
+    m_selectViewBox->setCurrentIndex(index);
     m_displayOnlyTroubleEventsBox->setHidden(false);
     m_currentDashboard = dashboard;
   }
 }
 
+void WebMainUI::handleDashboardSelected(std::string viewName)
+{
+  DashboardMapT::Iterator iterDashboardItem = m_dashboardMap.find(viewName.c_str());
+  if (iterDashboardItem != m_dashboardMap.end()) setDashboardAsFrontStackedWidget(*iterDashboardItem);
+}
+
 
 void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
 {
-  if (widget) {
-    m_dashboardStackedContents.setCurrentWidget(widget);
-  }
+  if (widget) m_dashboardStackedContents.setCurrentWidget(widget);
 }
 
 
@@ -1132,14 +1287,14 @@ void WebMainUI::handleImportDescriptionFile(void)
         QFile file(tmpFileName);
         file.copy(destPath);
         file.remove();
-        dbsaveBusinessServiceInfo(cdata, destPath);
+        saveViewInfoIntoDatabase(cdata, destPath);
       }
     }
   }
 }
 
 
-void WebMainUI::dbsaveBusinessServiceInfo(const CoreDataT& cdata, const QString& path)
+void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path)
 {
   DboView view;
   view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
@@ -1163,103 +1318,11 @@ void WebMainUI::dbsaveBusinessServiceInfo(const CoreDataT& cdata, const QString&
 }
 
 
-void WebMainUI::handleImportHostGroupAsMap(void)
+
+void WebMainUI::fetchQosData(QosDataByViewMapT& qosDataMap, long start, long end)
 {
-  m_adminPanelTitle.setText(Q_TR("Auto Import Hostgroup as Service Map"));
-  m_adminStackedContents.setCurrentWidget(&m_autoHostgroupImporterForm);
-  m_autoHostgroupImporterForm.updateContents();
-}
-
-
-
-void WebMainUI::handlePreview(void)
-{
-  m_previewDialog.accept();
-  m_previewDialog.contents()->clear();
-  if (! m_selectedFile.empty()) {
-    WebDashboard* dashbord = loadView(m_selectedFile);
-    setDashboardAsFrontStackedWidget(dashbord);
-    m_selectedFile.clear();
-  } else {
-    showMessage(ngrt4n::OperationFailed, tr("No item selected for preview").toStdString());
-  }
-}
-
-
-void WebMainUI::handleDisplayAuthSetup(void)
-{
-  m_adminPanelTitle.setText(Q_TR("Authentication Settings"));
-  m_adminStackedContents.setCurrentWidget(&m_authSettingsForm);
-  m_authSettingsForm.updateContents();
-}
-
-
-void WebMainUI::handleDisplayNotificationSetup(void)
-{
-  m_adminPanelTitle.setText(Q_TR("Notification Settings"));
-  m_adminStackedContents.setCurrentWidget(&m_notificationSettingsForm);
-  m_notificationSettingsForm.updateContents();
-}
-
-
-void WebMainUI::handleDisplayUserProfile(void)
-{
-  m_userAccountForm->resetValidationState(false);
-  m_adminStackedContents.setCurrentWidget(m_userAccountForm);
-  m_adminPanelTitle.setText(Q_TR("My Account"));
-}
-
-
-void WebMainUI::handleUpdateUserAccount(const DboUserT& userToUpdate)
-{
-  int ret = m_dbSession->updateUser(userToUpdate);
-  handleUpdateErrcode(ret);
-}
-
-
-void WebMainUI::handleDisplayChangePassword(void)
-{
-  m_adminStackedContents.setCurrentWidget(m_changePasswordPanel);
-  m_changePasswordPanel->reset();
-  m_adminPanelTitle.setText("Change password");
-}
-
-
-void WebMainUI::handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass)
-{
-  int ret = m_dbSession->updatePassword(login, lastpass, pass);
-  handleUpdateErrcode(ret);
-}
-
-
-void WebMainUI::updateLicenseMgntForm()
-{
-  m_adminPanelTitle.setText(Q_TR("License Activation"));
-  m_adminStackedContents.setCurrentWidget(m_licenseMngtForm);
-  m_licenseMngtForm->updateContent();
-}
-
-
-
-
-void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup)
-{
-  CoreDataT cdata;
-  QString errorMsg;
-  if (ngrt4n::importHostGroupAsBusinessView(srcInfo, hostgroup, cdata, errorMsg) != 0) {
-    std::string stdmsg = errorMsg.toStdString();
-    showMessage(ngrt4n::OperationFailed, stdmsg);
-    CORE_LOG("error", stdmsg);
-  } else {
-    NodeT rootNode = cdata.bpnodes[ngrt4n::ROOT_ID];
-    QString path = QString("%1/autoimport_%2.ms.ngrt4n.xml").arg(m_confdir.c_str(),
-                                                                 rootNode.name.replace(" ", "").toLower());
-    if (ngrt4n::saveDataAsDescriptionFile(path, cdata, errorMsg) != 0) {
-      std::string stdmsg = errorMsg.toStdString();
-      showMessage(ngrt4n::OperationFailed, stdmsg);
-      CORE_LOG("error", stdmsg);
-    } else {
-      dbsaveBusinessServiceInfo(cdata, path);
-    }
-  }
+  m_dbSession->listQosData(qosDataMap,
+                           "", /** viewName: empty means all entries **/
+                           start,
+                           end);
 }

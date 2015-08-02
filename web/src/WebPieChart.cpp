@@ -30,26 +30,21 @@
 #include <Wt/WScrollBar>
 
 
-WebPieChart::WebPieChart(void)
-  : Wt::WTemplate(Wt::WString::tr("chart.tpl")),
-    ChartBase()
-{
-  setDataType(RawData);
-}
 
 WebPieChart::WebPieChart(int dataType)
   : Wt::WTemplate(Wt::WString::tr("chart.tpl")),
     ChartBase()
 {
   setDataType(dataType);
-  // Configure the piechart model
-  m_piechart.setModel(new Wt::WStandardItemModel());
-  m_piechart.model()->insertColumns(m_piechart.model()->columnCount(), 2);
-  m_piechart.model()->setHeaderData(0, Wt::WString("Severity"));
-  m_piechart.model()->setHeaderData(1, Wt::WString("Count"));
-  m_piechart.model()->insertRows(m_piechart.model()->rowCount(), 5);
-
+  setupChartPalette();
+  setupPieChartModel();
   bindFormWidgets();
+  setupChartStyle();
+}
+
+WebPieChart::WebPieChart(void)
+  : WebPieChart(RawData) // delegating construction
+{
 }
 
 
@@ -59,26 +54,39 @@ WebPieChart::~WebPieChart()
 }
 
 
-void WebPieChart::bindFormWidgets(void)
+void WebPieChart::setupChartPalette(void)
+{
+  WebChartPalette* palette = new WebChartPalette();
+  m_piechart.setPalette(palette); //take the ownership of the palette pointer
+}
+
+
+void WebPieChart::setupPieChartModel(void)
+{
+  Wt::WStandardItemModel* model = new Wt::WStandardItemModel();
+
+  model->insertColumns(model->columnCount(), 2);
+  model->setHeaderData(0, Wt::WString("Severity"));
+  model->setHeaderData(1, Wt::WString("Count"));
+  model->insertRows(model->rowCount(), 5);
+
+  m_piechart.setModel(model); // take ownership of the pointer
+}
+
+
+void WebPieChart::setupChartStyle(void)
 {
   resize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
-  setupMainChartTemplate();
-
-  // Draw the chart
   m_piechart.setLabelsColumn(0);    // Set the column that holds the labels.
   m_piechart.setDataColumn(1);      // Set the column that holds the data.
   m_piechart.setDisplayLabels(Wt::Chart::NoLabels);
   m_piechart.setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   m_piechart.setShadowEnabled(true);
-
   m_piechart.setPlotAreaPadding(0, Wt::All);
-  Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(m_piechart.model());
-  m_piechart.setPalette(new WebCharPalette(model));
 }
-
 
 void WebPieChart::unbindFormWidgets(void)
 {
@@ -91,16 +99,7 @@ void WebPieChart::unbindFormWidgets(void)
   takeWidget("chart-content");
 }
 
-
-
-void WebPieChart::setupMainChartTemplate(void)
-{
-  setupChartLegendBarTemplate();
-  bindWidget("chart-legend-bar", &m_chartLegendBarTpl);
-  bindWidget("chart-content", &m_piechart);
-}
-
-void WebPieChart::setupChartLegendBarTemplate(void)
+void WebPieChart::bindFormWidgets(void)
 {
   m_chartLegendBarTpl.setTemplateText(Wt::WString::tr("chart-legend-bar.tpl"));
   m_chartLegendBarTpl.bindWidget("unknown-count", &m_legendBadges[ngrt4n::Unknown]);
@@ -109,6 +108,9 @@ void WebPieChart::setupChartLegendBarTemplate(void)
   m_chartLegendBarTpl.bindWidget("minor-count", &m_legendBadges[ngrt4n::Minor]);
   m_chartLegendBarTpl.bindWidget("normal-count", &m_legendBadges[ngrt4n::Normal]);
   m_chartLegendBarTpl.setHidden(true);
+
+  bindWidget("chart-legend-bar", &m_chartLegendBarTpl);
+  bindWidget("chart-content", &m_piechart);
 }
 
 
@@ -119,10 +121,15 @@ void WebPieChart::repaint()
     m_piechart.model()->setData(it.key(), 1, it.value());
     m_legendBadges[it.key()].setText(QString::number(it.value()).toStdString());
   }
+
   if (m_dataType == SLAData) {
     m_chartLegendBarTpl.setHidden(true);
-    m_piechart.setTitle(QObject::tr("SLA: %1%").arg(QString::number(m_severityRatio[ngrt4n::Normal])).toStdString());
-    if (m_severityRatio[ngrt4n::Normal] > 0 && m_severityRatio[ngrt4n::Normal] < 100) {
+    m_piechart.setTitle(QObject::tr("SLA: %1%")
+                        .arg(QString::number(m_severityRatio[ngrt4n::Normal]))
+                        .toStdString()
+                        );
+    if (m_severityRatio[ngrt4n::Normal] > 0
+        && m_severityRatio[ngrt4n::Normal] < 100) {
       m_piechart.setExplode(ngrt4n::Normal, 0.3);
     }
     m_piechart.setToolTip(ChartBase::defaultTooltipText());

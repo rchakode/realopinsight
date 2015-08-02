@@ -1,13 +1,16 @@
 #include "WebCsvReportResource.hpp"
+#include <Wt/Http/Request>
+#include <Wt/Http/Response>
+#include <Wt/WImage>
 
 
 
 WebCsvExportResource::WebCsvExportResource(void)
   : Wt::WResource()
 {
-  std::string viewFilename = QString(viewName.c_str()).replace(" ", "_").toStdString();
+  std::string pathbasename = QString(m_viewName.c_str()).replace(" ", "_").toStdString();
   suggestFileName(Wt::WString("RealOpInsight_{1}_bireport.csv")
-                  .arg(viewFilename));
+                  .arg(pathbasename));
 }
 
 
