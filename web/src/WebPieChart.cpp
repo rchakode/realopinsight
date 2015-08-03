@@ -32,13 +32,14 @@
 
 
 WebPieChart::WebPieChart(int dataType)
-  : Wt::WTemplate(Wt::WString::tr("chart.tpl")),
-    ChartBase()
+  : ChartBase(),
+    Wt::Chart::WPieChart()
+  //Wt::WTemplate(Wt::WString::tr("chart.tpl")),
+
 {
   setDataType(dataType);
   setupChartPalette();
   setupPieChartModel();
-  bindFormWidgets();
   setupChartStyle();
 }
 
@@ -50,14 +51,13 @@ WebPieChart::WebPieChart(void)
 
 WebPieChart::~WebPieChart()
 {
-  unbindFormWidgets();
 }
 
 
 void WebPieChart::setupChartPalette(void)
 {
   WebChartPalette* palette = new WebChartPalette();
-  m_piechart.setPalette(palette); //take the ownership of the palette pointer
+  setPalette(palette); //take the ownership of the palette pointer
 }
 
 
@@ -70,7 +70,7 @@ void WebPieChart::setupPieChartModel(void)
   model->setHeaderData(1, Wt::WString("Count"));
   model->insertRows(model->rowCount(), 5);
 
-  m_piechart.setModel(model); // take ownership of the pointer
+  setModel(model); // take ownership of the pointer
 }
 
 
@@ -80,63 +80,36 @@ void WebPieChart::setupChartStyle(void)
   setMargin(0, Wt::Top);
   setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
-  m_piechart.setLabelsColumn(0);    // Set the column that holds the labels.
-  m_piechart.setDataColumn(1);      // Set the column that holds the data.
-  m_piechart.setDisplayLabels(Wt::Chart::NoLabels);
-  m_piechart.setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
-  m_piechart.setShadowEnabled(true);
-  m_piechart.setPlotAreaPadding(0, Wt::All);
-}
-
-void WebPieChart::unbindFormWidgets(void)
-{
-  m_chartLegendBarTpl.takeWidget("unknown-count");
-  m_chartLegendBarTpl.takeWidget("critical-count");
-  m_chartLegendBarTpl.takeWidget("major-count");
-  m_chartLegendBarTpl.takeWidget("minor-count");
-  m_chartLegendBarTpl.takeWidget("normal-count");
-  takeWidget("chart-legend-bar");
-  takeWidget("chart-content");
-}
-
-void WebPieChart::bindFormWidgets(void)
-{
-  m_chartLegendBarTpl.setTemplateText(Wt::WString::tr("chart-legend-bar.tpl"));
-  m_chartLegendBarTpl.bindWidget("unknown-count", &m_legendBadges[ngrt4n::Unknown]);
-  m_chartLegendBarTpl.bindWidget("critical-count", &m_legendBadges[ngrt4n::Critical]);
-  m_chartLegendBarTpl.bindWidget("major-count", &m_legendBadges[ngrt4n::Major]);
-  m_chartLegendBarTpl.bindWidget("minor-count", &m_legendBadges[ngrt4n::Minor]);
-  m_chartLegendBarTpl.bindWidget("normal-count", &m_legendBadges[ngrt4n::Normal]);
-  m_chartLegendBarTpl.setHidden(true);
-
-  bindWidget("chart-legend-bar", &m_chartLegendBarTpl);
-  bindWidget("chart-content", &m_piechart);
+  setLabelsColumn(0);    // Set the column that holds the labels.
+  setDataColumn(1);      // Set the column that holds the data.
+  setDisplayLabels(Wt::Chart::NoLabels);
+  setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
+  setShadowEnabled(true);
+  setPlotAreaPadding(0, Wt::All);
 }
 
 
 void WebPieChart::repaint()
 {
   for(auto it = std::begin(m_statsData); it != std::end(m_statsData); ++it) {
-    m_piechart.model()->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
-    m_piechart.model()->setData(it.key(), 1, it.value());
-    m_legendBadges[it.key()].setText(QString::number(it.value()).toStdString());
+    model()->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
+    model()->setData(it.key(), 1, it.value());
   }
 
   if (m_dataType == SLAData) {
-    m_chartLegendBarTpl.setHidden(true);
-    m_piechart.setTitle(QObject::tr("SLA: %1%")
-                        .arg(QString::number(m_severityRatio[ngrt4n::Normal]))
-                        .toStdString()
-                        );
+    setTitle(QObject::tr("SLA: %1%")
+             .arg(QString::number(m_severityRatio[ngrt4n::Normal]))
+             .toStdString()
+             );
     if (m_severityRatio[ngrt4n::Normal] > 0
         && m_severityRatio[ngrt4n::Normal] < 100) {
-      m_piechart.setExplode(ngrt4n::Normal, 0.3);
+      setExplode(ngrt4n::Normal, 0.3);
     }
-    m_piechart.setToolTip(ChartBase::defaultTooltipText());
+    setToolTip(ChartBase::defaultTooltipText());
   } else {
-    m_chartLegendBarTpl.setHidden(false);
-    m_piechart.setToolTip(ChartBase::defaultTooltipText());
+    setToolTip(ChartBase::defaultTooltipText());
   }
+  refresh();
 }
 
 

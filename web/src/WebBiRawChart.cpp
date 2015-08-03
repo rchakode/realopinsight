@@ -39,9 +39,9 @@ namespace {
   const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
 }
 
-WebBiRawChart::WebBiRawChart(void)
+WebBiRawChart::WebBiRawChart(const std::string& viewName)
   : Wt::Chart::WCartesianChart(0),
-    m_viewName(""),
+    m_viewName(viewName),
     m_model(NULL)
 {
   setStyleClass("bi-chart");
@@ -51,12 +51,6 @@ WebBiRawChart::WebBiRawChart(void)
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
 }
 
-
-void WebBiRawChart::initialize(const std::string& viewName, const QosDataList& data)
-{
-  setViewName(viewName);
-  updateData(data);
-}
 
 Wt::WFont WebBiRawChart::customTitleFont(void)
 {
@@ -90,30 +84,27 @@ void WebBiRawChart::updateData(const QosDataList& data)
 
     model->setData(row, 1, entry.status);
 
-    float cum = entry.normal;
-    model->setData(row, 2, cum);
+    float sev = entry.normal;
+    model->setData(row, 2, sev);
 
-    cum += entry.minor;
-    model->setData(row, 3, cum);
+    sev += entry.minor;
+    model->setData(row, 3, sev);
 
-    cum += entry.major;
-    model->setData(row, 4, cum);
+    sev += entry.major;
+    model->setData(row, 4, sev);
 
-    cum += entry.critical;
-    model->setData(row, 5, cum);
+    sev += entry.critical;
+    model->setData(row, 5, sev);
 
-    cum += entry.unknown;
-    model->setData(row, 6, cum);
+    sev += entry.unknown;
+    model->setData(row, 6, sev);
     ++row;
   }
 
-  setModel(model);
-  if (m_model)
-    delete m_model;
-  m_model = model;
+  updateModel(model);
 
   setXSeriesColumn(0);
-  for (int i = 6; i>=2; --i) {
+  for (int i = 6; i >= 2; --i) {
     Wt::Chart::WDataSeries serie(i, Wt::Chart::LineSeries);
     Wt::WColor color = ngrt4n::severityWColor(i - 2);
     serie.setPen(color);
@@ -123,6 +114,16 @@ void WebBiRawChart::updateData(const QosDataList& data)
     addSeries(serie);
   }
 
-  setChartTitle();
   resize(BI_RAW_CHART_AREA_WIDTH, BI_RAW_CHART_AREA_HEIGHT);
+  repaint();
+  setChartTitle();
+}
+
+
+void WebBiRawChart::updateModel(Wt::WStandardItemModel* model)
+{
+  setModel(model);
+  if (m_model)
+    delete m_model;
+  m_model = model;
 }

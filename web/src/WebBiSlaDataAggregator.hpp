@@ -27,10 +27,10 @@
 
 #include "dbo/DbObjects.hpp"
 
-class WebBiSlaData
+class WebBiSlaDataAggregator
 {
 public:
-  WebBiSlaData(const QosDataList& data);
+  WebBiSlaDataAggregator(const QosDataList& data);
 
   double normalDuration(void) const {return m_normalDuration;}
   double minorDuration(void) const {return m_minorDuration;}

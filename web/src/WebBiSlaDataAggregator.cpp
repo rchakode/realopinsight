@@ -23,13 +23,13 @@
  */
 
 
-#include "WebBiSlaChart.hpp"
+#include "WebBiSlaDataAggregator.hpp"
 #include "WebUtils.hpp"
 #include <QDebug>
 #include <Wt/WRectArea>
 
 
-WebBiSlaData::WebBiSlaData(const std::list<QosDataT>& data)
+WebBiSlaDataAggregator::WebBiSlaDataAggregator(const std::list<QosDataT>& data)
   : m_normalDuration(0),
     m_minorDuration(0),
     m_majorDuration(0),
@@ -39,9 +39,9 @@ WebBiSlaData::WebBiSlaData(const std::list<QosDataT>& data)
   processData(data);
 }
 
-void WebBiSlaData::processData(const QosDataList& data)
+void WebBiSlaDataAggregator::processData(const QosDataList& data)
 {
-  QosDataList::const_iterator qosit = data.begin();
+  QosDataList::const_iterator iterData = data.begin();
   m_plottingData.clear();
   m_normalDuration   = 0;
   m_minorDuration    = 0;
@@ -51,10 +51,10 @@ void WebBiSlaData::processData(const QosDataList& data)
   m_totalDuration    = 1;
 
   if (! data.empty()) {
-    TimeStatusT last = {qosit->timestamp, qosit->status};
+    TimeStatusT last = {iterData->timestamp, iterData->status};
     m_plottingData.push_back(last);
-    while (++qosit, qosit != data.end()) {
-      TimeStatusT current = {qosit->timestamp, qosit->status};
+    while (++iterData, iterData != data.end()) {
+      TimeStatusT current = {iterData->timestamp, iterData->status};
       m_plottingData.push_back(current);
       switch(last.status) {
         case ngrt4n::Normal:

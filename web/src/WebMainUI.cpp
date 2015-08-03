@@ -113,7 +113,7 @@ void WebMainUI::unbindWidgets(void)
   m_mainWidget.removeWidget(&m_breadcrumbsBar);
   m_mainWidget.removeWidget(&m_mainStackedContents);
 
-  removeWidget(& m_mainWidget);
+  removeWidget(&m_mainWidget);
 }
 
 

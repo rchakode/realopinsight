@@ -25,7 +25,7 @@
 #ifndef WEBBIDASHLET_HPP
 #define WEBBIDASHLET_HPP
 
-#include "WebBiSlaChart.hpp"
+#include "WebBiSlaDataAggregator.hpp"
 #include "WebBiRawChart.hpp"
 #include "WebPieChart.hpp"
 #include "WebBiDateFilter.hpp"
@@ -58,8 +58,8 @@ Q_SIGNALS:
 private:
   Wt::WGridLayout* m_layout;
   WebBiDateFilter m_filterHeader;
-  QMap<std::string, Wt::WText*> m_chartTitleMap;
-  QMap<std::string, WebPieChart*> m_slaPiechartMap;
+  QMap<std::string, Wt::WText*> m_slaChartTitleMap;
+  QMap<std::string, WebPieChart*> m_slaPieChartMap;
   QMap<std::string, WebBiRawChart*> m_itProblemChartMap;
   QMap<std::string, WebCsvExportIcon*> m_csvExportLinkMap;
 

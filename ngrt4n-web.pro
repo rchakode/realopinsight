@@ -122,7 +122,7 @@ HEADERS += \
     web/src/WebBiDateFilter.hpp \
     web/src/WebBiDashlet.hpp \
     web/src/WebBiRawChart.hpp \
-    web/src/WebBiSlaChart.hpp
+    web/src/WebBiSlaDataAggregator.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Settings.cpp \
@@ -175,10 +175,10 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebNotificationPreferences.cpp \
     web/src/WebHostGroupServiceMap.cpp \
     web/src/WebCsvReportResource.cpp \
-    web/src/WebRawBiChart.cpp \
     web/src/WebBiDashlet.cpp \
     web/src/WebBiDateFilter.cpp \
-    web/src/WebBiSlaChart.cpp
+    web/src/WebBiSlaDataAggregator.cpp \
+    web/src/WebBiRawChart.cpp
 
 
 

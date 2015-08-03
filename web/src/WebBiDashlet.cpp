@@ -29,15 +29,15 @@
 
 WebBiDashlet::WebBiDashlet()
 {
-  m_layout = new Wt::WGridLayout();
-  setLayout(m_layout);
+  setLayout(m_layout = new Wt::WGridLayout());
   addEvent();
 
 }
 
 WebBiDashlet::~WebBiDashlet()
 {
-  m_layout->removeWidget(&m_filterHeader); // explicitely delete m_filter, since not a pointer
+  // explicitely delete m_filter, since not a pointer
+  m_layout->removeWidget(&m_filterHeader);
   clear(); // shall delete m_layout and its contents
 }
 
@@ -51,24 +51,22 @@ void WebBiDashlet::addEvent(void)
 void WebBiDashlet::initialize(const DbViewsT& viewList)
 {
   int rowIndex = 0;
-  m_layout->addWidget(&m_filterHeader, rowIndex, 0, 1, 2);
-
+  m_layout->addWidget(&m_filterHeader, rowIndex, 0, 1, 2, Wt::AlignRight);
   for (const auto& view: viewList) {
-
     //FIXME: dont use pointer for chart widgets
     // or think of deleting explicitely chart objects
-    m_chartTitleMap.insert(view.name, createTitleWidget(view.name));
+    m_slaChartTitleMap.insert(view.name, createTitleWidget(view.name));
     m_csvExportLinkMap.insert(view.name, new WebCsvExportIcon());
-    m_itProblemChartMap.insert(view.name, new WebBiRawChart());
-    m_slaPiechartMap.insert(view.name, new WebPieChart(ChartBase::SLAData));
+    m_itProblemChartMap.insert(view.name, new WebBiRawChart(view.name));
+    m_slaPieChartMap.insert(view.name, new WebPieChart(ChartBase::SLAData));
 
     ++rowIndex;
-    m_layout->addWidget(m_chartTitleMap[view.name], rowIndex, 0);
+    m_layout->addWidget(m_slaChartTitleMap[view.name], rowIndex, 0);
     m_layout->addWidget(m_csvExportLinkMap[view.name], rowIndex, 1, 1, Wt::AlignRight);
 
     ++rowIndex;
-    m_layout->addWidget(m_slaPiechartMap[view.name], rowIndex, 0);
-    m_layout->addWidget(m_itProblemChartMap[view.name], rowIndex, 1);
+    m_layout->addWidget(m_itProblemChartMap[view.name], rowIndex, 0);
+    m_layout->addWidget(m_slaPieChartMap[view.name], rowIndex, 1);
   }
 }
 
@@ -88,9 +86,9 @@ void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataBy
 
   // Here we have: iterQosDataSet !=  qosDataMap.end()
   // So update qos chart when applicable
-  QMap<std::string, WebPieChart*>::iterator iterSlaPiechart = m_slaPiechartMap.find(viewName);
-  if (iterSlaPiechart != m_slaPiechartMap.end()) {
-    WebBiSlaData slaData(*iterQosDataSet);
+  QMap<std::string, WebPieChart*>::iterator iterSlaPiechart = m_slaPieChartMap.find(viewName);
+  if (iterSlaPiechart != m_slaPieChartMap.end()) {
+    WebBiSlaDataAggregator slaData(*iterQosDataSet);
     (*iterSlaPiechart)->setSeverityData(slaData.normalDuration(),
                                         slaData.minorDuration(),
                                         slaData.majorDuration(),

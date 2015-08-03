@@ -49,7 +49,7 @@ public:
 };
 
 
-class WebPieChart : public Wt::WTemplate, public ChartBase
+class WebPieChart : public ChartBase, public Wt::Chart::WPieChart
 {
 public:
   WebPieChart(int dataType);
@@ -60,13 +60,6 @@ public:
   std::string defaultTooltipText(void);
 
 private:
-  Wt::Chart::WPieChart m_piechart;
-  std::map<int, Wt::WText> m_legendBadges;
-  Wt::WTemplate m_mainChartTpl;
-  Wt::WTemplate m_chartLegendBarTpl;
-  void bindFormWidgets(void);
-  void unbindFormWidgets(void);
-
   void setupChartPalette(void);
   void setupChartStyle(void);
   void setupPieChartModel(void);

@@ -36,14 +36,13 @@ void WebCsvExportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Res
 WebCsvExportIcon::WebCsvExportIcon(void)
   : Wt::WAnchor()
 {
-  setToolTip(Q_TR("Download data as CSV file"));
+  setToolTip(Q_TR("Export data in a CSV file"));
   setTarget(Wt::TargetNewWindow);
   // note that the ownership of the resource is not translated to the link
   setLink( Wt::WLink(&m_csvResource) );
   // the ownership of the image is transfered to the Anchor
   setImage( new Wt::WImage("images/built-in/csv-file.png") );
 }
-
 
 
 void WebCsvExportIcon::updateData(QosDataList* qosData, const std::string& viewName)

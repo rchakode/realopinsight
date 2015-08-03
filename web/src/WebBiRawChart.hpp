@@ -31,8 +31,7 @@
 class WebBiRawChart : public Wt::Chart::WCartesianChart
 {
 public:
-  WebBiRawChart(void);
-  void initialize(const std::string& viewName, const QosDataList& data);
+  WebBiRawChart(const std::string& viewName);
   void setViewName(const std::string& viewName) {m_viewName = viewName;}
   std::string viewName() const {return m_viewName;}
   void updateData(const QosDataList& data);
@@ -44,6 +43,7 @@ private:
 
   Wt::WFont customTitleFont(void);
   void setChartTitle(void);
+  void updateModel(Wt::WStandardItemModel* model);
 };
 
 #endif // WEBBIRAWCHART_HPP
