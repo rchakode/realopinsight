@@ -217,13 +217,6 @@ web-genkey {
   SOURCES += web/src/ngrt4n-genkey.cpp
   TARGET = realopinsight-genkey
 }
-dflag {
-  TARGET.path=$$(INSTALL_PREFIX)/bin
-  MAN.path =$$(INSTALL_PREFIX)/share/man/man1
-} else {
-  TARGET.path=/usr/local/bin
-  MAN.path = /usr/share/man/man1
-}
 
 TARGET.files = $${TARGET}
 MAN.files = doc/man/realopinsight-manager.1.gz doc/man/realopinsight-oc.1.gz doc/man/realopinsight-editor.1.gz
@@ -239,8 +232,8 @@ DEFINES *= WT_NO_SLOT_MACROS
 DEFINES *= BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 DEFINES *= QT_USE_QSTRINGBUILDER
 
+
 DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"`date +%s`\""
-DEFINES *= "REALOPINSIGHT_BUILTIN_USER_PREFIX='\"ngrt4n\"'"
 DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_VERSION='\"$${PACKAGE_VERSION}\"'"
@@ -249,4 +242,3 @@ DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Hawkeye\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2015\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"support@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
-DEFINES *= "REALOPINSIGHT_WWW_ROOT='\"REALOPINSIGHT_WWW_ROOT_VALUE\"'"

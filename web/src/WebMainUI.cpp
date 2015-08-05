@@ -222,6 +222,7 @@ void WebMainUI::setupNavivationBar(void)
 
 void WebMainUI::setupBreadCrumbsBar(void)
 {
+  //FIXME: avoid using pointers
   m_breadcrumbsBar.setTemplateText(Wt::WString::tr("breadcrumbs-bar.tpl"));
   m_breadcrumbsBar.bindWidget("show-settings-link", createShowSettingsBreadCrumbsLink());
   m_breadcrumbsBar.bindWidget("display-view-selection-box", m_selectViewBox = createShowViewBreadCrumbsLink());
@@ -283,7 +284,7 @@ Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
 
 Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
 {
-  Wt::WCheckBox* checkBox = new Wt::WCheckBox(Q_TR("Display only trouble events"));
+  Wt::WCheckBox* checkBox = new Wt::WCheckBox(Q_TR("Display only problems"));
   checkBox->changed().connect(this, &WebMainUI::handleDisplayOnlyTroubleStateChanged);
   checkBox->setHidden(true);
   return checkBox;
@@ -380,11 +381,11 @@ void WebMainUI::setupMenus(void)
   text->clicked().connect(this, &WebMainUI::handleRefresh);
   m_navbar.addWidget(text);
   
-  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-in", "Zoom the console map in");
+  text = ngrt4n::createFontAwesomeTextButton("fa fa-search-plus", "Zoom the console map in");
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
   m_navbar.addWidget(text);
   
-  text = ngrt4n::createFontAwesomeTextButton("icon-zoom-out","Zoom the console map out");
+  text = ngrt4n::createFontAwesomeTextButton("fa fa-search-minus","Zoom the console map out");
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
   m_navbar.addWidget(text);
 }

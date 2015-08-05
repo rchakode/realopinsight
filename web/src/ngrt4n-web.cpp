@@ -32,8 +32,6 @@
 #include "Applications.hpp"
 
 
-
-
 Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
 {
   return new WebApp(env);

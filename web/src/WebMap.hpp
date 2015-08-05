@@ -52,10 +52,10 @@ public:
   Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
   Wt::Signal<void>& loaded(void) {return m_loaded;}
   void updateThumbnail(void);
-  std::string thumbnailPath(void) {return m_thumbnailPath;}
-  Wt::WImage* thumbnailImage(void) {return &m_thumbnailImage;}
+  std::string thumbnailPath(void) {return m_thumbUrlPath;}
+  Wt::WImage* thumbnailImage(void) {return &m_thumbImage;}
   void emitLoaded(void) const {m_loaded.emit();}
-  void setThumbnailTooltip(const std::string& tooltip) {m_thumbnailImage.setToolTip(tooltip);}
+  void setThumbnailTooltip(const std::string& tooltip) {m_thumbImage.setToolTip(tooltip);}
 
 
 protected:
@@ -71,10 +71,10 @@ private:
   bool m_initialLoading;
   Wt::JSignal<double, double> m_containerSizeChanged;
   Wt::Signal<void> m_loaded;
-  std::string m_thumbnailPath;
+  std::string m_thumbUrlPath;
   double m_translateX;
   double m_translateY;
-  Wt::WImage m_thumbnailImage;
+  Wt::WImage m_thumbImage;
 
   void setDefaultSettings(void);
   void drawNode(const NodeT& node, bool drawIcon = true);
@@ -86,6 +86,7 @@ private:
   void handleContainedSizeChanged(double w, double h);
   void expandCollapse(const QString& nodeId);
   void applyVisibilityToChild(const NodeT& node, qint8 mask);
+  void removeThumdImage(void);
 };
 
 #endif /* WEBSERVICEMAP_HPP */

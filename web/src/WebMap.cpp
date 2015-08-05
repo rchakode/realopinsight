@@ -41,7 +41,6 @@ namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
-  const std::string WWW_ROOT = REALOPINSIGHT_WWW_ROOT;
   const double THUMBNAIL_WIDTH = 140;
   const double THUMBNAIL_HEIGHT = 70;
 }
@@ -53,7 +52,7 @@ WebMap::WebMap(void)
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged"),
     m_loaded(this),
-    m_thumbnailPath(""),
+    m_thumbUrlPath(""),
     m_translateX(0),
     m_translateY(0)
 {
@@ -63,6 +62,7 @@ WebMap::WebMap(void)
 
 WebMap::~WebMap()
 {
+  removeThumdImage();
   m_scrollArea.takeWidget();
 }
 
@@ -262,14 +262,14 @@ void WebMap::updateThumbnail(void)
   m_painter->end();
 
   // Now save the image
-  if (m_thumbnailPath.empty()) {
-    m_thumbnailPath=boost::filesystem::unique_path("run/thumb-%%%%%%.svg").string();
+  if (m_thumbUrlPath.empty()) {
+    m_thumbUrlPath = boost::filesystem::unique_path("/run/thumb-%%%%%%.svg").string();
   }
-  std::ofstream output(WWW_ROOT + "/" + m_thumbnailPath);
+  std::ofstream output(wApp->docRoot() + m_thumbUrlPath);
   thumbnailImg.write(output);
   output.close();
 
-  m_thumbnailImage.setImageLink(m_thumbnailPath+"?"+QString::number(++roundCount).toStdString());
+  m_thumbImage.setImageLink(m_thumbUrlPath+"?"+QString::number(++roundCount).toStdString());
 }
 
 
@@ -306,4 +306,12 @@ void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
       }
     }
   }
+}
+
+
+void WebMap::removeThumdImage(void)
+{
+  qDebug()<< "removing thumb file";
+  QFile file(m_thumbUrlPath.c_str());
+  file.remove();
 }
