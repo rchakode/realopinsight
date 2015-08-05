@@ -55,7 +55,10 @@ class WebApp : public Wt::WQApplication
 {
 public:
   WebApp(const Wt::WEnvironment& env)
-    : WQApplication(env, true) {}
+    : WQApplication(env, true)
+  {
+    m_theme.setVersion(Wt::WBootstrapTheme::Version3);
+  }
 
 protected:
   virtual void create()
@@ -72,7 +75,7 @@ protected:
     useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
     useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
     messageResourceBundle().use(m_docroot+"resources/i18n/messages");
-    setTheme(new Wt::WBootstrapTheme());
+    setTheme(&m_theme);
     requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
 
 #ifdef ENABLE_ANALYTICS
@@ -90,6 +93,7 @@ protected:
   }
 
 private:
+  Wt::WBootstrapTheme m_theme;
   DbSession* m_dbSession;
   std::string m_dirroot;
   std::string m_docroot;

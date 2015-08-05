@@ -682,12 +682,17 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
 {
   WebDashboard* dashboardItem = NULL;
   try {
+    //FIXME: check that the pointer is properly deleted
     dashboardItem = new WebDashboard(path.c_str());
-    //should be remove when destructing the object
-    m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
     } else {
+      if (m_eventFeedLayout) {
+        // the inner layout is explicitely removed
+        // when the object is destroyed
+        m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
+      }
+
       dashboardItem->initialize(& m_dataSourceSettingsForm);
       if (dashboardItem->lastErrorState()) {
         showMessage(ngrt4n::OperationFailed, dashboardItem->lastErrorMsg().toStdString());
