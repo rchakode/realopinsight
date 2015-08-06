@@ -76,6 +76,7 @@ public:
   static const QString NOTIF_MAIL_SMTP_PASSWORD;
   static const QString DASHBOARD_THUMBNAILS_PER_ROW;
   static const QString ACTIVATION_LICENSE_KEY;
+  static const QString ACTIVATION_GOT_WARNING;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

@@ -62,7 +62,7 @@ void WebBiDashlet::initialize(const DbViewsT& viewList)
 
     ++rowIndex;
     m_layout->addWidget(m_slaChartTitleMap[view.name], rowIndex, 0);
-    m_layout->addWidget(m_csvExportLinkMap[view.name], rowIndex, 1, 1, Wt::AlignRight);
+    m_layout->addWidget(m_csvExportLinkMap[view.name], rowIndex, 1, Wt::AlignRight);
 
     ++rowIndex;
     m_layout->addWidget(m_itProblemChartMap[view.name], rowIndex, 0);

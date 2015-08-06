@@ -70,6 +70,8 @@ public:
 
   QString getLicenseKey(void) {return keyValue(Settings::ACTIVATION_LICENSE_KEY, "");}
   int activeSourceIds(QVector<std::string>& result);
+  void handleIGotLicenseWarning(void) {m_settings->setEntry(Settings::ACTIVATION_GOT_WARNING, "1");}
+  bool gotLicenseWarning(void) const {return ! m_settings->entry(Settings::ACTIVATION_GOT_WARNING).isEmpty();}
 
 
 protected :

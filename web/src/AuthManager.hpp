@@ -51,10 +51,13 @@ private:
   DbSession* m_dbSession;
   WebMainUI* m_mainUI;
   Wt::WText* m_infoBox;
+  Wt::WText* m_licenseWarningBox;
 
   void handleAuthentication(void);
   void handleLoginFailed(std::string data);
+  void handleIGotLicenseWarning(void);
   bool checkLicense(void);
+
 };
 
 #endif // AUTHWIDGET_HPP

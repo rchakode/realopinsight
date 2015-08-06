@@ -145,12 +145,12 @@
 
  <message id="operator-home.tpl">
     <!-- Content Pane -->
-    <div class="info-box">${info-box}</div>
+    <div class="info-box col-sm-12">${info-box}</div>
     <div id="ngrt4n-content-pane" class="col-sm-8">
        <div class="ngrt4n-content">
-           <legend>Tactical Overview</legend>
+           <legend>&nbsp;Tactical Overview</legend>
            ${thumbnails}
-           <legend>${bi-report-title}</legend>
+           <legend>&nbsp;${bi-report-title}</legend>
            ${bi-report-dashlet}
        </div>
     </div>
@@ -615,12 +615,15 @@
 </message>
 
 <message id="breadcrumbs-bar.tpl">
-<ol class="list-inline">
-  <li>${show-settings-link}</li>
-  <li>${show-home-link}</li>
-  <li>${display-view-selection-box}</li>
-  <li>${display-only-trouble-event-box}</li>
-</ol>
+<div class="col-sm-12">
+    <ol class="list-inline">
+    <li>${show-settings-link}</li>
+    <li>${show-home-link}</li>
+    <li>Available views:</li>
+    <li>${display-view-selection-box}</li>
+    <li>${display-only-trouble-event-box}</li>
+  </ol>
+</div>
 </message>
 
 

@@ -70,14 +70,14 @@ void AuthManager::handleAuthentication(void)
     sessionInfo.sessionId = wApp->sessionId();
     sessionInfo.firstAccess
         = sessionInfo.lastAccess
-        = Wt::WDateTime::currentDateTime().toString().toUTF8();
+          = Wt::WDateTime::currentDateTime().toString().toUTF8();
     sessionInfo.status = DboLoginSession::ActiveCookie;
 
     m_dbSession->addSession(sessionInfo);
     wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
 
     QString logMsg = QObject::tr("%1 logged in. Session Id: %2")
-        .arg(m_dbSession->loggedUser().username.c_str(), sessionInfo.sessionId.c_str());
+                     .arg(m_dbSession->loggedUser().username.c_str(), sessionInfo.sessionId.c_str());
     CORE_LOG("info",logMsg.toStdString());
   } else {
     wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
@@ -102,18 +102,18 @@ void AuthManager::createLoggedInView(void)
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
     if (! checkLicense() && m_dbSession->isLoggedAdmin()) {
       // This is put into the code to avoid quick hack in translation file
-      Wt::WText* licenseMsgBox = new Wt::WText(
-            QString(
-              "<div class=\"alert alert-danger\">"
-              "You're running a non activated (limited) version of RealOpInsight Ultimate."
-              " Please go to %1 in order to get an activation license key."
-              " <button>Got it</button>"
-              "</div>").arg(PKG_URL)
-            .toStdString()
-            , Wt::XHTMLText);
-      licenseMsgBox->setToolTip(Q_TR("Click to hide this message"));
-      licenseMsgBox->clicked().connect(std::bind(  [=]{ licenseMsgBox->hide(); })  );
-      bindWidget("update-banner", licenseMsgBox);
+      m_licenseWarningBox = new Wt::WText();
+      m_licenseWarningBox->setTextFormat(Wt::XHTMLText);
+      m_licenseWarningBox->setText(QString(
+                                     "<div class=\"alert alert-danger\">"
+                                     "You're running a non activated (limited) version of RealOpInsight Ultimate."
+                                     " Please go to %1 in order to get an activation license key."
+                                     " <button>Got it</button>"
+                                     "</div>").arg(PKG_URL)
+                                   .toStdString() );
+      m_licenseWarningBox->setToolTip(Q_TR("Click to hide this message"));
+      m_licenseWarningBox->clicked().connect(this, &AuthManager::handleIGotLicenseWarning);
+      bindWidget("update-banner", m_licenseWarningBox);
     } else {
       bindEmpty("update-banner");
     }
@@ -145,5 +145,13 @@ void AuthManager::handleLoginFailed(std::string data)
 {
   m_infoBox->setText(data);
   m_infoBox->setStyleClass("alert alert-danger");
+}
+
+
+void AuthManager::handleIGotLicenseWarning(void)
+{
+  m_licenseWarningBox->hide();
+  WebPreferencesBase preferences;
+  preferences.handleIGotLicenseWarning();
 }
 

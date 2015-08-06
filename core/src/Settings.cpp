@@ -56,6 +56,8 @@ const QString Settings::NOTIF_MAIL_SMTP_USERNAME = "/Notification/mailSmtpUserna
 const QString Settings::NOTIF_MAIL_SMTP_PASSWORD = "/Notification/mailSmtpPassword";
 const QString Settings::DASHBOARD_THUMBNAILS_PER_ROW = "/Dashboard/thumbnailsPerRow";
 const QString Settings::ACTIVATION_LICENSE_KEY = "/Activation/licenseKey";
+const QString Settings::ACTIVATION_GOT_WARNING = "/Activation/gotLicenseWarning";
+
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))
 {
