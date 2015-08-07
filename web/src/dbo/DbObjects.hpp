@@ -220,7 +220,7 @@ struct QosDataT {
   QosDataT() : status(ngrt4n::Unknown) {}
 
   std::string toString(void) const {
-    return QString("%1,%2,%3,%4,%5,%6,%7, %8")
+    return QString("%1,%2,%3,%4,%5,%6,%7,%8")
         .arg(QString::number(timestamp),
              view_name.c_str(),
              QString::number(status),

@@ -50,9 +50,9 @@ void WebBiDashlet::addEvent(void)
 
 void WebBiDashlet::initialize(const DbViewsT& viewList)
 {
-  int rowIndex = 0;
-  m_layout->addWidget(&m_filterHeader, rowIndex, 0, 1, 2, Wt::AlignRight);
-  for (const auto& view: viewList) {
+  int row = 0;
+  m_layout->addWidget(&m_filterHeader, row, 0, 1, 2, Wt::AlignRight);
+  for (const auto& view : viewList) {
     //FIXME: dont use pointer for chart widgets
     // or think of deleting explicitely chart objects
     m_slaChartTitleMap.insert(view.name, createTitleWidget(view.name));
@@ -60,13 +60,13 @@ void WebBiDashlet::initialize(const DbViewsT& viewList)
     m_itProblemChartMap.insert(view.name, new WebBiRawChart(view.name));
     m_slaPieChartMap.insert(view.name, new WebPieChart(ChartBase::SLAData));
 
-    ++rowIndex;
-    m_layout->addWidget(m_slaChartTitleMap[view.name], rowIndex, 0);
-    m_layout->addWidget(m_csvExportLinkMap[view.name], rowIndex, 1, Wt::AlignRight);
+    ++row;
+    m_layout->addWidget(m_slaChartTitleMap[view.name], row, 0);
+    m_layout->addWidget(m_csvExportLinkMap[view.name], row, 1, Wt::AlignRight);
 
-    ++rowIndex;
-    m_layout->addWidget(m_itProblemChartMap[view.name], rowIndex, 0);
-    m_layout->addWidget(m_slaPieChartMap[view.name], rowIndex, 1);
+    ++row;
+    m_layout->addWidget(m_itProblemChartMap[view.name], row, 0);
+    m_layout->addWidget(m_slaPieChartMap[view.name], row, 1);
   }
 }
 
@@ -101,6 +101,12 @@ void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataBy
   QMap<std::string, WebBiRawChart*>::iterator iterProblemTrendsChart = m_itProblemChartMap.find(viewName);
   if (iterProblemTrendsChart != m_itProblemChartMap.end()) {
     (*iterProblemTrendsChart)->updateData(*iterQosDataSet);
+  }
+
+  // update QoS data for export
+  QMap<std::string, WebCsvExportIcon*>::iterator iterCsvExportItem = m_csvExportLinkMap.find(viewName);
+  if (iterCsvExportItem != m_csvExportLinkMap.end()) {
+    //FIXME: (*iterCsvExportItem)->updateData(viewName, &(*iterQosDataSet));
   }
 }
 

@@ -6,16 +6,24 @@
 
 
 WebCsvExportResource::WebCsvExportResource(void)
-  : Wt::WResource()
+  : Wt::WResource(),
+    m_qosData(NULL)
 {
-  std::string pathbasename = QString(m_viewName.c_str()).replace(" ", "_").toStdString();
-  suggestFileName(Wt::WString("RealOpInsight_{1}_bireport.csv")
-                  .arg(pathbasename));
+}
+
+void WebCsvExportResource::setExportFileName(void)
+{
+  if (! m_viewName.empty()) {
+    std::string escapedBaseName = QString(m_viewName.c_str()).replace(" ", "_").toStdString();
+    suggestFileName(Wt::WString("RealOpInsight_REPORT_{1}.csv")
+                    .arg(escapedBaseName));
+  } else {
+    suggestFileName("RealOpInsight_REPORT_UNSET_VIEW.csv");
+  }
 }
 
 
-
-void WebCsvExportResource::updateData(QosDataList* qosData, const std::string& viewName)
+void WebCsvExportResource::updateData(const std::string& viewName, QosDataList* qosData)
 {
   m_qosData = qosData;
   m_viewName = viewName;
@@ -24,6 +32,7 @@ void WebCsvExportResource::updateData(QosDataList* qosData, const std::string& v
 
 void WebCsvExportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Response& response)
 {
+  setExportFileName();
   response.setMimeType("text/csv");
   response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
   if (m_qosData) {
@@ -45,7 +54,7 @@ WebCsvExportIcon::WebCsvExportIcon(void)
 }
 
 
-void WebCsvExportIcon::updateData(QosDataList* qosData, const std::string& viewName)
+void WebCsvExportIcon::updateData(const std::string& viewName, QosDataList* qosData)
 {
-  m_csvResource.updateData(qosData, viewName);
+  m_csvResource.updateData(viewName, qosData);
 }
