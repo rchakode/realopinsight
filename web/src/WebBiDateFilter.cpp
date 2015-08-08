@@ -78,7 +78,7 @@ void WebBiDateFilter::setupDatePicker(Wt::WDatePicker* datePicker, long defaultE
     Wt::WDateTime dt;
     dt.setTime_t(defaultEpochTime);
     datePicker->setFormat("dd-MM-yyyy");
-    datePicker->setDate(dt.date().addDays(1));
+    datePicker->setDate(dt.date());
     datePicker->setStyleClass("inline");
   }
 }

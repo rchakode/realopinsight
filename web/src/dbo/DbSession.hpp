@@ -81,7 +81,7 @@ public:
 
   int addQosData(const QosDataT& qosData);
   int addQosDataList(const QosDataList& qosDataList);
-  int listQosData(QosDataByViewMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
+  int listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
   int getLastQosData(QosDataT& qosData, const std::string& viewId);
 
   void updateViewList(void);

@@ -10,14 +10,14 @@ class WebCsvExportResource : public Wt::WResource
 public:
   WebCsvExportResource(void);
   ~WebCsvExportResource(){ beingDeleted(); }
-  void updateData(const std::string& viewName, QosDataList* qosData);
+  void updateData(const std::string& viewName, const QosDataList& qosData);
   void setExportFileName(void);
 
   virtual void handleRequest(const Wt::Http::Request&, Wt::Http::Response& response);
 
 
 private:
-  QosDataList* m_qosData;
+  QosDataList m_qosData;
   std::string m_viewName;
 };
 
@@ -27,7 +27,7 @@ class WebCsvExportIcon : public Wt::WAnchor
 {
 public:
   WebCsvExportIcon(void);
-  void updateData(const std::string& viewName, QosDataList* qosData);
+  void updateData(const std::string& viewName, const QosDataList& qosData);
 
 private:
   WebCsvExportResource m_csvResource;

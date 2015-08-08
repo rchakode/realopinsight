@@ -64,14 +64,15 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_currentDashboard(NULL)
 {
   addWidget(&m_mainWidget);
+  setupInfoBox();
   setupMainUI();
-
   setupDialogsStyle();
+
   m_userAccountForm = createAccountPanel();
   m_changePasswordPanel = createPasswordPanel();
   m_aboutDialog = createAboutDialog();
+
   setupMenus();
-  setupInfoBox();
   showUserHome();
   setupFileUploadDialog();
   doJavaScript(RESIZE_PANES);
@@ -98,12 +99,14 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents.removeWidget(&m_notificationSettingsForm);
   m_adminStackedContents.removeWidget(&m_authSettingsForm);
   m_adminStackedContents.removeWidget(&m_autoHostgroupImporterForm);
+  m_adminStackedContents.removeWidget(&m_adminHomePageTpl);
 
   m_fileUploadDialog.contents()->removeWidget(&m_fileUploader);
 
   //FIXME unbind conditionnaly other widgets
   m_settingsPageTpl.takeWidget("title");
   m_settingsPageTpl.takeWidget("contents");
+  m_settingsPageTpl.takeWidget("info-box");
 
   m_settingsPageTpl.clear();
   m_breadcrumbsBar.clear();
@@ -130,11 +133,10 @@ void WebMainUI::unbindExecutiveViewWidgets(void)
 
   m_thumbsContainer.clear();
   m_operatorHomeTpl.takeWidget("thumbnails");
-
   m_eventFeedsContainer.clear();
   m_operatorHomeTpl.takeWidget("event-feeds");
-
   m_operatorHomeTpl.takeWidget("bi-report-dashlet");
+  m_operatorHomeTpl.takeWidget("info-box");
 }
 
 
@@ -294,9 +296,9 @@ Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
 
 void WebMainUI::setupInfoBox(void)
 {
-  m_infoBox = new Wt::WText();
-  m_infoBox->hide();
-  m_infoBox->clicked().connect(std::bind([=](){m_infoBox->hide();}));
+  m_infoBox.setId("info-box");
+  m_infoBox.hide();
+  m_infoBox.clicked().connect(&m_infoBox, &Wt::WText::hide);
 }
 
 void WebMainUI::setupProfileMenus(void)
@@ -421,7 +423,7 @@ void WebMainUI::handleRefresh(void)
     m_notificationManager->clearAllServicesData();
   }
 
-  QosDataByViewMapT qosDataMap;
+  QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
   int currentView = 1;
 
@@ -517,7 +519,7 @@ void WebMainUI::handleDisplayUserProfile(void)
 void WebMainUI::handleUpdateUserAccount(const DboUserT& userToUpdate)
 {
   int ret = m_dbSession->updateUser(userToUpdate);
-  handleUpdateErrcode(ret);
+  handleErrcode(ret);
 }
 
 
@@ -532,7 +534,7 @@ void WebMainUI::handleDisplayChangePassword(void)
 void WebMainUI::handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass)
 {
   int ret = m_dbSession->updatePassword(login, lastpass, pass);
-  handleUpdateErrcode(ret);
+  handleErrcode(ret);
 }
 
 
@@ -571,10 +573,14 @@ void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QSt
 
 void WebMainUI::handleReportPeriodChanged(long start, long end)
 {
-  QosDataByViewMapT qosDataMap;
+  QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, start, end);
   Q_FOREACH(const std::string& viewName, qosDataMap.keys())
     m_biDashlet.updateViewCharts(viewName, qosDataMap);
+  showMessage(ngrt4n::OperationSucceeded, Q_TR("Reports updated: ")
+              .append(ngrt4n::wHumanTimeText(start).toUTF8())
+              .append(" - ")
+              .append(ngrt4n::wHumanTimeText(end).toUTF8()));
 }
 
 void WebMainUI::handleDataSourceSetup(void)
@@ -740,20 +746,16 @@ void WebMainUI::setupSettingsPage(void)
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
     case DboUser::AdmRole: {
-      m_settingsPageTpl.bindWidget("info-box", m_infoBox);
+      m_settingsPageTpl.bindWidget("info-box", &m_infoBox);
       m_dataSourceSettingsForm.setEnabledInputs(true);
 
       // Start menu
       std::string menuText = QObject::tr("Welcome").toStdString();
-      std::string contentTitle = QObject::tr("Getting Started in 3 Simple Steps !").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       m_settingsPageTpl.bindWidget("menu-get-started", link);
-      Wt::WWidget* getStartPage = new Wt::WTemplate(Wt::WString::tr("getting-started.tpl"));
-      m_adminStackedContents.addWidget(getStartPage);
-      link->clicked().connect(std::bind([=](){
-                                          m_adminStackedContents.setCurrentWidget(getStartPage);
-                              m_adminPanelTitle.setText(contentTitle);
-      }));
+      m_adminHomePageTpl.setTemplateText(Wt::WString::tr("getting-started.tpl"));
+      m_adminStackedContents.addWidget(&m_adminHomePageTpl);
+      link->clicked().connect(this, &WebMainUI::handleShowAdminHome);
       m_menuLinks.insert(MenuWelcome, link);
 
       // menu import view
@@ -796,99 +798,92 @@ void WebMainUI::setupSettingsPage(void)
       // User menus
       m_dbUserManager = new DbUserManager(m_dbSession);
       m_adminStackedContents.addWidget(m_dbUserManager->userForm());
-      m_dbUserManager->updateCompleted().connect(std::bind([=](int retCode) {
-                                                             if (retCode != 0) {
-                                                             showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
-  } else {
-    showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
-    m_dbUserManager->resetUserForm();
+      m_dbUserManager->updateCompleted().connect(this, &WebMainUI::handleUserUpdatedCompleted);
+
+      // link new user
+      link = new Wt::WAnchor("#", Q_TR("New User"));
+      link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
+      m_settingsPageTpl.bindWidget("menu-new-user", link);
+      m_menuLinks.insert(MenuNewUser, link);
+
+      // built-in menu
+      m_adminStackedContents.addWidget(m_dbUserManager->dbUserListWidget());
+      link = new Wt::WAnchor("#", Q_TR("All Users"));
+      link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
+      m_settingsPageTpl.bindWidget("menu-builin-users", link);
+      m_menuLinks.insert(MenuBuiltInUsers, link);
+
+
+      // ldap user menu
+      m_ldapUserManager = new LdapUserManager(m_dbSession);
+      m_adminStackedContents.addWidget(m_ldapUserManager);
+      link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
+      link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
+      m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
+      m_settingsPageTpl.bindWidget("menu-ldap-users", link);
+      m_menuLinks.insert(MenuLdapUsers, link);
+    }
+      break;
+    default: {
+      m_settingsPageTpl.bindEmpty("info-box");
+      wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
+      m_settingsPageTpl.bindEmpty("menu-get-started");
+      m_settingsPageTpl.bindEmpty("menu-import");
+      m_settingsPageTpl.bindEmpty("menu-preview");
+      m_settingsPageTpl.bindEmpty("menu-all-views");
+      m_settingsPageTpl.bindEmpty("menu-new-user");
+      m_settingsPageTpl.bindEmpty("menu-all-users");
+      m_settingsPageTpl.bindEmpty("menu-notification-settings");
+    }
+      break;
   }
-}, std::placeholders::_1));
 
-// link new user
-link = new Wt::WAnchor("#", Q_TR("New User"));
-link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
-m_settingsPageTpl.bindWidget("menu-new-user", link);
-m_menuLinks.insert(MenuNewUser, link);
+  // monitoring settings menu
+  m_adminStackedContents.addWidget(&m_dataSourceSettingsForm);
+  link = new Wt::WAnchor("#", Q_TR("Monitoring Data Sources"));
+  m_settingsPageTpl.bindWidget("menu-monitoring-settings", link);
+  m_menuLinks.insert(MenuMonitoringSettings, link);
+  link->clicked().connect(this, &WebMainUI::handleDataSourceSetup);
 
-// built-in menu
-m_adminStackedContents.addWidget(m_dbUserManager->dbUserListWidget());
-link = new Wt::WAnchor("#", Q_TR("All Users"));
-link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
-m_settingsPageTpl.bindWidget("menu-builin-users", link);
-m_menuLinks.insert(MenuBuiltInUsers, link);
-
-
-// ldap user menu
-m_ldapUserManager = new LdapUserManager(m_dbSession);
-m_adminStackedContents.addWidget(m_ldapUserManager);
-link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
-link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
-m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
-m_settingsPageTpl.bindWidget("menu-ldap-users", link);
-m_menuLinks.insert(MenuLdapUsers, link);
-}
-break;
-default: {
-m_settingsPageTpl.bindEmpty("info-box");
-wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
-m_settingsPageTpl.bindEmpty("menu-get-started");
-m_settingsPageTpl.bindEmpty("menu-import");
-m_settingsPageTpl.bindEmpty("menu-preview");
-m_settingsPageTpl.bindEmpty("menu-all-views");
-m_settingsPageTpl.bindEmpty("menu-new-user");
-m_settingsPageTpl.bindEmpty("menu-all-users");
-m_settingsPageTpl.bindEmpty("menu-notification-settings");
-}
-break;
-}
-
-// monitoring settings menu
-m_adminStackedContents.addWidget(&m_dataSourceSettingsForm);
-link = new Wt::WAnchor("#", Q_TR("Monitoring Data Sources"));
-m_settingsPageTpl.bindWidget("menu-monitoring-settings", link);
-m_menuLinks.insert(MenuMonitoringSettings, link);
-link->clicked().connect(this, &WebMainUI::handleDataSourceSetup);
-
-// auth settings menu
-m_adminStackedContents.addWidget(&m_authSettingsForm);
-link = new Wt::WAnchor("#", Q_TR("Authentication Backend"));
-m_settingsPageTpl.bindWidget("menu-auth-settings", link);
-m_menuLinks.insert(MenuAuthSettings, link);
-link->clicked().connect(this, &WebMainUI::handleDisplayAuthSetup);
-
-// notification settings menu
-m_adminStackedContents.addWidget(&m_notificationSettingsForm);
-link = new Wt::WAnchor("#", Q_TR("Notification Settings"));
-m_settingsPageTpl.bindWidget("menu-notification-settings", link);
-m_menuLinks.insert(MenuAuthSettings, link);
-link->clicked().connect(this, &WebMainUI::handleDisplayNotificationSetup);
-
-
-// my account menu
-m_adminStackedContents.addWidget(m_userAccountForm);
-link = new Wt::WAnchor("#", Q_TR("My Account"));
-m_settingsPageTpl.bindWidget("menu-my-account", link);
-m_menuLinks.insert(MenuMyAccount, link);
-link->clicked().connect(this, &WebMainUI::handleDisplayUserProfile);
-
-// change password settings
-m_adminStackedContents.addWidget(m_changePasswordPanel);
-link = new Wt::WAnchor("#", "Change Password");
-m_settingsPageTpl.bindWidget("menu-change-password", link);
-m_menuLinks.insert(MenuChangePassword, link);
-link->clicked().connect(this, &WebMainUI::handleDisplayChangePassword);
-
-// license activation menu
-if (m_dbSession->isLoggedAdmin()) {
-  m_adminStackedContents.addWidget(m_licenseMngtForm);
-  link = new Wt::WAnchor("#", Q_TR("Activation Key"));
-  m_settingsPageTpl.bindWidget("menu-license-activation", link);
+  // auth settings menu
+  m_adminStackedContents.addWidget(&m_authSettingsForm);
+  link = new Wt::WAnchor("#", Q_TR("Authentication Backend"));
+  m_settingsPageTpl.bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(this, &WebMainUI::updateLicenseMgntForm);
-} else {
-m_settingsPageTpl.bindEmpty("menu-license-activation");
-}
+  link->clicked().connect(this, &WebMainUI::handleDisplayAuthSetup);
+
+  // notification settings menu
+  m_adminStackedContents.addWidget(&m_notificationSettingsForm);
+  link = new Wt::WAnchor("#", Q_TR("Notification Settings"));
+  m_settingsPageTpl.bindWidget("menu-notification-settings", link);
+  m_menuLinks.insert(MenuAuthSettings, link);
+  link->clicked().connect(this, &WebMainUI::handleDisplayNotificationSetup);
+
+
+  // my account menu
+  m_adminStackedContents.addWidget(m_userAccountForm);
+  link = new Wt::WAnchor("#", Q_TR("My Account"));
+  m_settingsPageTpl.bindWidget("menu-my-account", link);
+  m_menuLinks.insert(MenuMyAccount, link);
+  link->clicked().connect(this, &WebMainUI::handleDisplayUserProfile);
+
+  // change password settings
+  m_adminStackedContents.addWidget(m_changePasswordPanel);
+  link = new Wt::WAnchor("#", "Change Password");
+  m_settingsPageTpl.bindWidget("menu-change-password", link);
+  m_menuLinks.insert(MenuChangePassword, link);
+  link->clicked().connect(this, &WebMainUI::handleDisplayChangePassword);
+
+  // license activation menu
+  if (m_dbSession->isLoggedAdmin()) {
+    m_adminStackedContents.addWidget(m_licenseMngtForm);
+    link = new Wt::WAnchor("#", Q_TR("Activation Key"));
+    m_settingsPageTpl.bindWidget("menu-license-activation", link);
+    m_menuLinks.insert(MenuAuthSettings, link);
+    link->clicked().connect(this, &WebMainUI::updateLicenseMgntForm);
+  } else {
+    m_settingsPageTpl.bindEmpty("menu-license-activation");
+  }
 }
 
 
@@ -916,9 +911,9 @@ UserFormView* WebMainUI::createPasswordPanel(void)
 
 
 
-void WebMainUI::handleUpdateErrcode(int code)
+void WebMainUI::handleErrcode(int errcode)
 {
-  if (code != 0) {
+  if (errcode != 0) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Updated failed"));
   } else {
     showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
@@ -926,6 +921,22 @@ void WebMainUI::handleUpdateErrcode(int code)
 }
 
 
+
+void WebMainUI::handleUserUpdatedCompleted(int errcode)
+{
+  if (errcode != 0) {
+    showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+  } else {
+    showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
+    m_dbUserManager->resetUserForm();
+  }
+}
+
+void WebMainUI::handleShowAdminHome(void)
+{
+  m_adminStackedContents.setCurrentWidget(&m_adminHomePageTpl);
+  m_adminPanelTitle.setText(Q_TR("Getting Started in 3 Simple Steps !"));
+}
 
 Wt::WComboBox* WebMainUI::createViewSelector(void)
 {
@@ -984,9 +995,9 @@ void WebMainUI::showMessageClass(const std::string& msg, std::string statusCssCl
   }
   CORE_LOG(logLevel, msg);
 
-  m_infoBox->setText(msg);
-  m_infoBox->setStyleClass(statusCssClass);
-  m_infoBox->show();
+  m_infoBox.setText(msg);
+  m_infoBox.setStyleClass(statusCssClass);
+  m_infoBox.show();
 }
 
 Wt::WDialog* WebMainUI::createAboutDialog(void)
@@ -1096,7 +1107,7 @@ void WebMainUI::bindExecutiveViewWidgets(void)
   m_eventFeedsContainer.setLayout(m_eventFeedLayout = new Wt::WVBoxLayout());
 
   m_operatorHomeTpl.setTemplateText(Wt::WString::tr("operator-home.tpl"));
-  m_operatorHomeTpl.bindWidget("info-box", m_infoBox);
+  m_operatorHomeTpl.bindWidget("info-box", &m_infoBox);
   m_operatorHomeTpl.bindWidget("thumbnails", &m_thumbsContainer);
   m_operatorHomeTpl.bindWidget("event-feeds", &m_eventFeedsContainer);
 
@@ -1325,7 +1336,7 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
 
 
 
-void WebMainUI::fetchQosData(QosDataByViewMapT& qosDataMap, long start, long end)
+void WebMainUI::fetchQosData(QosDataListMapT& qosDataMap, long start, long end)
 {
   m_dbSession->listQosData(qosDataMap,
                            "", /** viewName: empty means all entries **/

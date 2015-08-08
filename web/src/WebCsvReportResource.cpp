@@ -6,9 +6,9 @@
 
 
 WebCsvExportResource::WebCsvExportResource(void)
-  : Wt::WResource(),
-    m_qosData(NULL)
+  : Wt::WResource()
 {
+  m_qosData.clear();
 }
 
 void WebCsvExportResource::setExportFileName(void)
@@ -23,9 +23,9 @@ void WebCsvExportResource::setExportFileName(void)
 }
 
 
-void WebCsvExportResource::updateData(const std::string& viewName, QosDataList* qosData)
+void WebCsvExportResource::updateData(const std::string& viewName, const QosDataList& qosData)
 {
-  m_qosData = qosData;
+  std::copy(qosData.begin(), qosData.end(), std::back_inserter(m_qosData));
   m_viewName = viewName;
 }
 
@@ -34,11 +34,8 @@ void WebCsvExportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Res
 {
   setExportFileName();
   response.setMimeType("text/csv");
-  response.out() << "Timestamp,View,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
-  if (m_qosData) {
-    for(const auto& entry: *m_qosData)
-      response.out() << entry.toString() << std::endl;
-  }
+  response.out() << "Timestamp,View Name,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
+  for (const auto& entry: m_qosData) response.out() << entry.toString() << std::endl;
 }
 
 
@@ -54,7 +51,7 @@ WebCsvExportIcon::WebCsvExportIcon(void)
 }
 
 
-void WebCsvExportIcon::updateData(const std::string& viewName, QosDataList* qosData)
+void WebCsvExportIcon::updateData(const std::string& viewName, const QosDataList& qosData)
 {
   m_csvResource.updateData(viewName, qosData);
 }

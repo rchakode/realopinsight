@@ -168,6 +168,12 @@ body, html {
   /* white-space: nowrap; */
 }
 
+#info-box {
+  position: absolute;
+  z-index: 100;
+  right: 0;
+}
+
 .info-box {
   z-index: 100; 
 }

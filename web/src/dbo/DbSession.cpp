@@ -562,7 +562,7 @@ int DbSession::addQosDataList(const QosDataList& qosDataList)
 }
 
 
-int DbSession::listQosData(QosDataByViewMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
+int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);

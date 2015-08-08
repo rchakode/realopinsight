@@ -42,7 +42,7 @@ public:
   WebBiDateFilter(void);
   ~WebBiDateFilter();
   long epochStartTime(void){ return Wt::WDateTime(m_startDatePicker.date()).toTime_t();}
-  long epochEndTime(void) {return Wt::WDateTime(m_endDatePicker.date()).toTime_t();}
+  long epochEndTime(void) {return Wt::WDateTime(m_endDatePicker.date()).toTime_t() + 86399;}
 
 public Q_SLOTS:
   void handleApplyButtonSubmitted(void) {Q_EMIT reportPeriodChanged(epochStartTime(), epochEndTime()); }

@@ -44,7 +44,7 @@ public:
   WebBiDashlet();
   ~WebBiDashlet();
   void initialize(const DbViewsT& viewList);
-  void updateViewCharts (const std::string& viewName, const QosDataByViewMapT& qosDataMap);
+  void updateViewCharts (const std::string& viewName, const QosDataListMapT& qosDataMap);
   long startTime(void) {return m_filterHeader.epochStartTime();}
   long endTime(void) {return m_filterHeader.epochEndTime();}
 

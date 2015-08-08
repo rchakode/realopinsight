@@ -36,9 +36,10 @@ WebBiDashlet::WebBiDashlet()
 
 WebBiDashlet::~WebBiDashlet()
 {
-  // explicitely delete m_filter, since not a pointer
+  // just remove m_filter from the layout, since not a pointer
   m_layout->removeWidget(&m_filterHeader);
-  clear(); // shall delete m_layout and its contents
+  m_layout->clear(); // delete all contents
+  clear(); // delete m_layout
 }
 
 
@@ -78,9 +79,9 @@ Wt::WText* WebBiDashlet::createTitleWidget(const std::string& viewName)
 }
 
 
-void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataByViewMapT& qosDataMap)
+void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataListMapT& qosDataMap)
 {
-  QosDataByViewMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewName);
+  QosDataListMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewName);
   if (iterQosDataSet ==  qosDataMap.end())
     return; // stop process
 
@@ -106,7 +107,7 @@ void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataBy
   // update QoS data for export
   QMap<std::string, WebCsvExportIcon*>::iterator iterCsvExportItem = m_csvExportLinkMap.find(viewName);
   if (iterCsvExportItem != m_csvExportLinkMap.end()) {
-    //FIXME: (*iterCsvExportItem)->updateData(viewName, &(*iterQosDataSet));
+    (*iterCsvExportItem)->updateData(viewName, *iterQosDataSet);
   }
 }
 

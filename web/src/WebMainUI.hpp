@@ -107,7 +107,8 @@ public Q_SLOTS:
 
 
 private:
-  enum FileDialogAction {
+  enum FileDialogAction
+  {
     IMPORT = 0,
     OPEN = 1
   };
@@ -125,8 +126,9 @@ private:
   Wt::WTemplate m_settingsPageTpl;
   Wt::WTemplate m_operatorHomeTpl;
   Wt::WTemplate m_breadcrumbsBar;
+  Wt::WTemplate m_adminHomePageTpl;
   Settings m_settings;
-  Wt::WText* m_infoBox;
+  Wt::WText m_infoBox;
 
   WebNotificationManager* m_notificationManager;
   Wt::WWidget* m_notificationSection;
@@ -208,7 +210,9 @@ private:
   void handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass);
   void handleDisplayUserProfile(void);
   void handleUpdateUserAccount(const DboUserT& userToUpdate);
-  void handleUpdateErrcode(int code);
+  void handleErrcode(int errcode);
+  void handleUserUpdatedCompleted(int errcode);
+  void handleShowAdminHome(void);
 
   /** other member functions */
   void addEvents(void);
@@ -255,7 +259,7 @@ private:
 
   Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
   void clearThumbnailTemplate(Wt::WTemplate* tpl);
-  void fetchQosData(QosDataByViewMapT& qosDataMap, long start, long end);
+  void fetchQosData(QosDataListMapT& qosDataMap, long start, long end);
 };
 
 #endif // MAINWEBWINDOW_HPP
