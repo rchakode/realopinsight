@@ -215,8 +215,7 @@
               ${user-name}
           </div>
         </div>
-
-          ${block:Wt.Auth.field password}
+        ${block:Wt.Auth.field password}
         ${</if:passwords>}
 
         ${<if:oauth>}

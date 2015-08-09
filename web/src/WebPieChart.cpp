@@ -34,13 +34,13 @@
 WebPieChart::WebPieChart(int dataType)
   : ChartBase(),
     Wt::Chart::WPieChart()
-  //Wt::WTemplate(Wt::WString::tr("chart.tpl")),
 
 {
   setDataType(dataType);
   setupChartPalette();
   setupPieChartModel();
   setupChartStyle();
+  setTitleFont(ngrt4n::chartTitleFont());
 }
 
 WebPieChart::WebPieChart(void)
@@ -76,14 +76,12 @@ void WebPieChart::setupChartStyle(void)
 {
   resize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
   setMargin(0, Wt::Top);
-  setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
-
-  setLabelsColumn(0);    // Set the column that holds the labels.
-  setDataColumn(1);      // Set the column that holds the data.
+  setPlotAreaPadding(0, Wt::All);
   setDisplayLabels(Wt::Chart::NoLabels);
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
-  setPlotAreaPadding(0, Wt::All);
+  setLabelsColumn(0);    // Set the column that holds the labels.
+  setDataColumn(1);      // Set the column that holds the data.
 }
 
 

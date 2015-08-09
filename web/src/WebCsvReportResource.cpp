@@ -25,6 +25,7 @@ void WebCsvExportResource::setExportFileName(void)
 
 void WebCsvExportResource::updateData(const std::string& viewName, const QosDataList& qosData)
 {
+  m_qosData.clear();
   std::copy(qosData.begin(), qosData.end(), std::back_inserter(m_qosData));
   m_viewName = viewName;
 }

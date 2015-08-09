@@ -79,6 +79,7 @@ namespace ngrt4n {
   std::string getItemData(Wt::WStandardItem* item);
   sem_t* createSemaphoreOrDie(const std::string& sem_name);
   void releaseSemaphore(sem_t* my_sem);
+  Wt::WFont chartTitleFont(void);
 } //Namespace
 
 

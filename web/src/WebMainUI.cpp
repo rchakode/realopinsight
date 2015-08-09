@@ -50,7 +50,6 @@
   "$(\"#ngrt4n-side-pane\").height(windowHeight - top);"
 
 
-
 WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
     sessionTerminated(this),
@@ -63,6 +62,11 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_licenseMngtForm(new WebLicenseManager(PKG_VERSION)),
     m_currentDashboard(NULL)
 {
+  m_mainWidget.setId("maincontainer");
+  m_mainStackedContents.setId("stackcontentarea");
+  m_infoBox.setId("info-box");
+  m_dashboardStackedContents.addStyleClass("wrapper-container");
+
   addWidget(&m_mainWidget);
   setupInfoBox();
   setupMainUI();
@@ -184,19 +188,11 @@ void WebMainUI::showUserHome(void)
   } else {
     homeTabTitle =  tr("%1 - Operations Console").arg(APP_NAME).toStdString();
   }
-  
   std::string pageTitle = homeTabTitle;
   pageTitle.append(" - ").append(m_dbSession->loggedUser().username);
-
   wApp->setTitle(pageTitle);
-  
-  // data for CSS styling
-  m_mainWidget.setId("maincontainer");
-  m_dashboardStackedContents.addStyleClass("wrapper-container");
-
   setupSettingsPage();
   m_dashboardStackedContents.addWidget(&m_settingsPageTpl);
-
   if (! m_dbSession->isLoggedAdmin()) {
     initOperatorDashboard();
     m_dashboardStackedContents.setCurrentWidget(&m_operatorHomeTpl);
@@ -238,7 +234,6 @@ void WebMainUI::setupBreadCrumbsBar(void)
 
 void WebMainUI::setupMainStackedContent(void)
 {
-  m_mainStackedContents.setId("stackcontentarea");
   m_mainStackedContents.addWidget(&m_dashboardStackedContents);
 }
 
@@ -296,7 +291,6 @@ Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
 
 void WebMainUI::setupInfoBox(void)
 {
-  m_infoBox.setId("info-box");
   m_infoBox.hide();
   m_infoBox.clicked().connect(&m_infoBox, &Wt::WText::hide);
 }
@@ -1090,16 +1084,21 @@ void WebMainUI::showConditionalUiWidgets(void)
   } else {
     m_operatorHomeTpl.bindEmpty("bi-report-title");
     m_operatorHomeTpl.bindEmpty("bi-report-dashlet");
-    if (m_dbSession->isTileUserDashboard()) {
+
+    if (m_dbSession->displayOnlyTiles()) {
       doJavaScript("$('#ngrt4n-side-pane').hide();");
-      doJavaScript("$('#ngrt4n-content-pane').width('100%');");
+      doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-12');");
     } else {
       doJavaScript("$('#ngrt4n-side-pane').show();");
-      doJavaScript("$('#ngrt4n-content-pane').width('70%');");
-      doJavaScript("$('#ngrt4n-side-pane').width('28%');");
+      //doJavaScript("$('#ngrt4n-content-pane').width('70%');");
+      //doJavaScript("$('#ngrt4n-side-pane').width('28%');");
+      doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-8');");
+      doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
     }
+
   }
 }
+
 
 void WebMainUI::bindExecutiveViewWidgets(void)
 {

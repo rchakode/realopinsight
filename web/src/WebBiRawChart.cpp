@@ -40,19 +40,13 @@ WebBiRawChart::WebBiRawChart(const std::string& viewName)
   setLegendEnabled(false);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
+  setTitleFont(ngrt4n::chartTitleFont());
 }
 
-
-Wt::WFont WebBiRawChart::customTitleFont(void)
-{
-  Wt::WFont ft;
-  return ft;
-}
 
 void WebBiRawChart::setChartTitle(void)
 {
-  setTitle(Q_TR("IT Problems (%)"));
-  //setTitleFont(customTitleFont());
+  setTitle(Q_TR("Trends - % IT Problems"));
 }
 
 void WebBiRawChart::updateData(const QosDataList& data)
@@ -60,8 +54,6 @@ void WebBiRawChart::updateData(const QosDataList& data)
   resize(BI_RAW_CHART_AREA_WIDTH, BI_RAW_CHART_AREA_HEIGHT);
   setMargin(0, Wt::Top);
   setPlotAreaPadding(50, Wt::Top);
-  //setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
-  //setPlotAreaPadding(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
   Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
   model->setHeaderData(0, Q_TR("Date/time"));

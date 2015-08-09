@@ -41,7 +41,6 @@ private:
   std::string m_viewName;
   Wt::WStandardItemModel* m_dataModel;
 
-  Wt::WFont customTitleFont(void);
   void setChartTitle(void);
   void resetDataModel(Wt::WStandardItemModel* model);
 };
