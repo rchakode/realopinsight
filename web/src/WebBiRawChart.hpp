@@ -39,11 +39,11 @@ public:
 
 private:
   std::string m_viewName;
-  Wt::WStandardItemModel* m_model;
+  Wt::WStandardItemModel* m_dataModel;
 
   Wt::WFont customTitleFont(void);
   void setChartTitle(void);
-  void updateModel(Wt::WStandardItemModel* model);
+  void resetDataModel(Wt::WStandardItemModel* model);
 };
 
 #endif // WEBBIRAWCHART_HPP

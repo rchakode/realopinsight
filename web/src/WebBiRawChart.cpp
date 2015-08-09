@@ -28,25 +28,16 @@
 
 namespace {
   const double BI_RAW_CHART_AREA_WIDTH = 400;
-  const double BI_RAW_CHART_AREA_HEIGHT = 150;
-  const double BI_QOS_CHART_AREA_WIDTH = 250;
-  const double BI_QOS_CHART_AREA_HEIGHT = 150;
-  const double BI_CHART_AREA_MARGIN = 25;
-  const double BI_CHART_WIDTH = BI_QOS_CHART_AREA_WIDTH;
-  const double BI_CHART_TREND_HEIGHT = 50;
-  const double AREA_TOP_CORNER_Y = BI_QOS_CHART_AREA_HEIGHT - BI_CHART_AREA_MARGIN - BI_CHART_TREND_HEIGHT;
-  const double TEXT_TOP_CORNER_Y = AREA_TOP_CORNER_Y - 5;
-  const Wt::WColor LEGEND_TEXT_COLOR = Wt::WColor(0, 0, 0); // black
+  const double BI_RAW_CHART_AREA_HEIGHT = 175;
 }
 
 WebBiRawChart::WebBiRawChart(const std::string& viewName)
   : Wt::Chart::WCartesianChart(0),
     m_viewName(viewName),
-    m_model(NULL)
+    m_dataModel(NULL)
 {
   setStyleClass("bi-chart");
   setLegendEnabled(false);
-  setPlotAreaPadding(BI_CHART_AREA_MARGIN, Wt::Left | Wt::Top | Wt::Bottom | Wt::Right);
   setType(Wt::Chart::ScatterPlot);
   axis(Wt::Chart::XAxis).setScale(Wt::Chart::DateTimeScale);
 }
@@ -60,14 +51,19 @@ Wt::WFont WebBiRawChart::customTitleFont(void)
 
 void WebBiRawChart::setChartTitle(void)
 {
-  setTitle(Q_TR("IT Problem Trends"));
-  setTitleFont(customTitleFont());
+  setTitle(Q_TR("IT Problems (%)"));
+  //setTitleFont(customTitleFont());
 }
 
 void WebBiRawChart::updateData(const QosDataList& data)
 {
-  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
+  resize(BI_RAW_CHART_AREA_WIDTH, BI_RAW_CHART_AREA_HEIGHT);
+  setMargin(0, Wt::Top);
+  setPlotAreaPadding(50, Wt::Top);
+  //setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
+  //setPlotAreaPadding(Wt::WLength::Auto, Wt::Left | Wt::Right);
 
+  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
   model->setHeaderData(0, Q_TR("Date/time"));
   model->setHeaderData(1, Q_TR("Status"));
   model->setHeaderData(2, Q_TR("% Normal"));
@@ -101,7 +97,7 @@ void WebBiRawChart::updateData(const QosDataList& data)
     ++row;
   }
 
-  updateModel(model);
+  resetDataModel(model);
 
   setXSeriesColumn(0);
   for (int i = 6; i >= 2; --i) {
@@ -114,16 +110,14 @@ void WebBiRawChart::updateData(const QosDataList& data)
     addSeries(serie);
   }
 
-  resize(BI_RAW_CHART_AREA_WIDTH, BI_RAW_CHART_AREA_HEIGHT);
-  repaint();
   setChartTitle();
 }
 
 
-void WebBiRawChart::updateModel(Wt::WStandardItemModel* model)
+void WebBiRawChart::resetDataModel(Wt::WStandardItemModel* model)
 {
   setModel(model);
-  if (m_model)
-    delete m_model;
-  m_model = model;
+  if (m_dataModel)
+    delete m_dataModel;
+  m_dataModel = model;
 }

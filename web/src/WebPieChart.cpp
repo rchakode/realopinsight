@@ -63,14 +63,12 @@ void WebPieChart::setupChartPalette(void)
 
 void WebPieChart::setupPieChartModel(void)
 {
-  Wt::WStandardItemModel* model = new Wt::WStandardItemModel();
-
-  model->insertColumns(model->columnCount(), 2);
-  model->setHeaderData(0, Wt::WString("Severity"));
-  model->setHeaderData(1, Wt::WString("Count"));
-  model->insertRows(model->rowCount(), 5);
-
-  setModel(model); // take ownership of the pointer
+  Wt::WStandardItemModel* dataModel = new Wt::WStandardItemModel();
+  dataModel->insertColumns(dataModel->columnCount(), 2);
+  dataModel->setHeaderData(0, Wt::WString("Severity"));
+  dataModel->setHeaderData(1, Wt::WString("Count"));
+  dataModel->insertRows(dataModel->rowCount(), 5);
+  setModel(dataModel); // take ownership of the pointer
 }
 
 
