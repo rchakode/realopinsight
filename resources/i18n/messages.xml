@@ -384,24 +384,20 @@
 </message>
 
 <message id="view-assignment-tpl">
-  <div class="row">
-    <div class="span-one-third">
-      <div class="center">${user-selector}</div>
-    </div>
-    <div class="span-one-third">&nbsp;</div>
-    <div class="span-one-third">&nbsp;</div>
+<div>
+  <div class="col-sm-3">
+    ${user-selector}
+    ${assigned-views}
   </div>
-  <div class="row">
-    <div class="span-one-third">
-      <div class="center">${assigned-views}</div>
-    </div>
-    <div class="span-one-third">
-      <div class="center">${button-assign}</div>
-      <div class="center">${button-revoke}</div>
-      <div class="center">${delete-view-button}</div>
-    </div>
-    <div class="span-one-third">${non-assigned-views}</div>
+  <div class="col-sm-2">
+    ${button-assign}
+    ${button-revoke}
+    ${delete-view-button}
   </div>
+  <div class="col-sm-3">
+    ${non-assigned-views}
+  </div>
+</div>
 </message>
 
 
