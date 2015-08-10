@@ -365,6 +365,9 @@ void GuiDashboard::handleSettingsLoaded(void)
       case MonitorT::Pandora:
         it->icon = ":images/pandora-logo-p.png";
         break;
+      case MonitorT::OpManager:
+        it->icon = ":images/opmanager-logo-p.png";
+        break;
       default:
         it->icon = "";
         break;

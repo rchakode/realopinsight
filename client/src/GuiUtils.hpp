@@ -57,7 +57,6 @@ namespace ngrt4n {
   void alert(const QString & msg);
   QIcon severityIcon(int _severity);
   QString getWelcomeMsg(const QString& utility);
-  QString basename(char* path);
 }
 
 #endif // GUIUTILS_HPP

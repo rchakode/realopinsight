@@ -56,12 +56,12 @@ PandoraHelper::~PandoraHelper()
 void
 PandoraHelper::setBaseUrl(const QString& url)
 {
-  m_apiUri = QString("%1/%2").arg(url, PANDORA_API_CONTEXT);
+  m_apiUri = QString("%1/%2").arg(url, PANDORAFMS_API_CONTEXT);
   m_reqHandler->setUrl(QUrl(m_apiUri));
 }
 
 QNetworkReply*
-PandoraHelper::postRequest(const qint32& reqId, const QStringList& params)
+PandoraHelper::postRequest(int reqId, const QStringList& params)
 {
   QString request = ReqPatterns[reqId];
   Q_FOREACH(const QString &param, params) {
@@ -152,7 +152,7 @@ PandoraHelper::openSession(const SourceT& srcInfo)
 }
 
 int
-PandoraHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& agentName)
+PandoraHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& filter)
 {
   checks.clear();
 
@@ -166,13 +166,11 @@ PandoraHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString
   if (! response)
     return -1;
 
-  m_agentFilter = agentName;
-
-  return processModuleReply(response, checks);
+  return processModuleReply(response, checks, filter);
 }
 
 int
-PandoraHelper::processModuleReply(QNetworkReply* reply, ChecksT& checks)
+PandoraHelper::processModuleReply(QNetworkReply* reply, ChecksT& checks, const QString& filter)
 {
   QString data;
   if (processReply(reply, data) != 0)
@@ -216,7 +214,7 @@ PandoraHelper::processModuleReply(QNetworkReply* reply, ChecksT& checks)
           check.alarm_msg = tr("%1 value is %2").arg(moduleName, moduleValue).toStdString();
         }
 
-        if (m_agentFilter.isEmpty() || currentGroupName == m_agentFilter || currentAgentName == m_agentFilter) {
+        if (filter.isEmpty() || currentGroupName == filter || currentAgentName == filter) {
           checks.insert(check.id, check);
         }
       }

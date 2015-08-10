@@ -34,12 +34,18 @@ class JsonHelper : public QScriptEngine
 {
 public:
   JsonHelper(const QString& _data = "");
-  void setData(const std::string& _data);
-  void setData(const QString& _data);
+  void setData(const std::string& data);
+  void setData(const QString& data);
+  bool isGood() const {return m_isGood;}
+  QString lastError(void) const {return m_lastError;}
   QScriptValue data(void) const {return m_data;}
   QScriptValue getProperty(const std::string& key);
+
+
 private :
   QScriptValue m_data;
+  bool m_isGood;
+  QString m_lastError;
 };
 
 #endif // JSHELPER_HPP

@@ -67,15 +67,12 @@ public Q_SLOTS:
   void handleShowAbout(void);
   void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
   void processCheckLoadResults(int retCode,  const QString& srcId, const ChecksT& checks, const QString& msg);
-  void importNagiosChecks(void);
-  void importZabbixTriggersAsDataPoints(void);
-  void handleImportHostGroupAsMap(void);
-  void importZabbixITServicesAsBusinessViews(void);
-  void importZenossComponents(void);
-  void importPandoraModules(void);
-  void importNagiosLivestatusChecks(void);
-  void importNagiosBPIConfig(void);
+  void handleImportHostGroupAsBusinessView(void);
+  void handleImportMonitorItemsAsDataPoints(void);
+  void handleImportZabbixITServicesAsBusinessView(void);
+  void handleImportNagiosBPIConfigAsBusinessView(void);
   void handleErrorOccurred(QString msg);
+  void importNagiosChecks(void);
 
 
 protected:
@@ -121,6 +118,7 @@ private:
                                    bool& hasCluster);
   void updateWindowTitle(const QString& append);
   void attachOrphanedNodesToRoot(NodeListT& allnodes, NodeT& root);
+  int requestImportationInfo(SourceT& srcInfo, QString& filter);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

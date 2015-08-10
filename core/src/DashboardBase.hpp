@@ -64,10 +64,7 @@ public Q_SLOTS:
 #endif
   void runMonitor();
   void runMonitor(SourceT& src);
-  void runLivestatusUpdate(const SourceT& src);
-  void runZabbixUpdate(const SourceT& src);
-  void runZenossUpdate(const SourceT& src);
-  void runPandoraUpdate(const SourceT& src);
+  void runDataSourceUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
   ngrt4n::AggregatedSeverityT computeNodeSeverity(const QString& _node);

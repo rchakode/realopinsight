@@ -32,11 +32,15 @@ JsonHelper::JsonHelper(const QString& _data) : QScriptEngine()
 void JsonHelper::setData(const std::string& data)
 {
   m_data = evaluate("(" + QString::fromStdString(data) + ")");
+  m_isGood = ! hasUncaughtException();
+  if (! m_isGood) {
+    m_lastError = tr("Unexpected data: %1").arg(data.c_str());
+  }
 }
 
 void JsonHelper::setData(const QString& data)
 {
-  m_data = evaluate("("+data+")");
+  setData(data.toStdString());
 }
 
 QScriptValue JsonHelper::getProperty(const std::string& key)
