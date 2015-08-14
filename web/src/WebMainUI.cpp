@@ -60,13 +60,9 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_licenseMngtForm(new WebLicenseManager(PKG_VERSION)),
-    m_currentDashboard(NULL)
+    m_currentDashboard(NULL),
+    m_fileUploader(NULL)
 {
-  m_mainWidget.setId("maincontainer");
-  m_mainStackedContents.setId("stackcontentarea");
-  m_infoBox.setId("info-box");
-  m_dashboardStackedContents.addStyleClass("wrapper-container");
-
   addWidget(&m_mainWidget);
   setupInfoBox();
   setupMainUI();
@@ -78,16 +74,21 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
   setupMenus();
   showUserHome();
-  setupFileUploadDialog();
+  setupUploadForm();
   doJavaScript(RESIZE_PANES);
   addEvents();
+
+
+  m_infoBox.setId("info-box");
+  m_mainWidget.setId("maincontainer");
+  m_mainStackedContents.setId("stackcontentarea");
+  m_dashboardStackedContents.addStyleClass("wrapper-container");
 }
 
 WebMainUI::~WebMainUI()
 {
   unbindWidgets();
   delete m_licenseMngtForm;
-  clear();
   CORE_LOG("debug", "Session closed");
 }
 
@@ -105,22 +106,23 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents.removeWidget(&m_autoHostgroupImporterForm);
   m_adminStackedContents.removeWidget(&m_adminHomePageTpl);
 
-  m_fileUploadDialog.contents()->removeWidget(&m_fileUploader);
+  m_uploadForm.contents()->removeWidget(&m_uploadFormTitle);
+  m_uploadForm.contents()->removeWidget(&m_uploadSubmitButton);
+  m_uploadForm.contents()->removeWidget(&m_uploadCancelButton);
 
-  //FIXME unbind conditionnaly other widgets
   m_settingsPageTpl.takeWidget("title");
   m_settingsPageTpl.takeWidget("contents");
   m_settingsPageTpl.takeWidget("info-box");
-
   m_settingsPageTpl.clear();
+
   m_breadcrumbsBar.clear();
   m_breadcrumbsBar.clear();
 
   m_mainWidget.removeWidget(&m_navbar);
   m_mainWidget.removeWidget(&m_breadcrumbsBar);
   m_mainWidget.removeWidget(&m_mainStackedContents);
-
   removeWidget(&m_mainWidget);
+  clear();
 }
 
 
@@ -136,8 +138,8 @@ void WebMainUI::unbindExecutiveViewWidgets(void)
   }
 
   m_thumbsContainer.clear();
-  m_operatorHomeTpl.takeWidget("thumbnails");
   m_eventFeedsContainer.clear();
+  m_operatorHomeTpl.takeWidget("thumbnails");
   m_operatorHomeTpl.takeWidget("event-feeds");
   m_operatorHomeTpl.takeWidget("bi-report-dashlet");
   m_operatorHomeTpl.takeWidget("info-box");
@@ -162,7 +164,6 @@ void WebMainUI::unbindStackedWidgets(void)
 
 void WebMainUI::addEvents(void)
 {
-  //FIXME: clean it? wApp->globalKeyPressed().connect(std::bind([=](const Wt::WKeyEvent& event){}, std::placeholders::_1));
   QObject::connect(&m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   QObject::connect(&m_biDashlet, SIGNAL(reportPeriodChanged(long,long)), this, SLOT(handleReportPeriodChanged(long, long)));
   m_selectViewBox->changed().connect(this, &WebMainUI::handleNewViewSelected);
@@ -175,8 +176,6 @@ void WebMainUI::addEvents(void)
   m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
   m_uploadSubmitButton.clicked().connect(this, &WebMainUI::handleUploadSubmitButton);
   m_uploadCancelButton.clicked().connect(this, &WebMainUI::handleUploadCancelButton);
-  m_fileUploader.uploaded().connect(this, &WebMainUI::handleImportDescriptionFile);
-  m_fileUploader.fileTooLarge().connect(std::bind(&WebMainUI::showMessage, this, ngrt4n::OperationFailed, Q_TR("File too large.")));
 }
 
 
@@ -476,10 +475,10 @@ void WebMainUI::handlePreview(void)
 {
   m_previewDialog.accept();
   m_previewDialog.contents()->clear();
-  if (! m_selectedFile.empty()) {
-    WebDashboard* dashbord = loadView(m_selectedFile);
+  if (! m_fileToPreview.empty()) {
+    WebDashboard* dashbord = loadView(m_fileToPreview);
     setDashboardAsFrontStackedWidget(dashbord);
-    m_selectedFile.clear();
+    m_fileToPreview.clear();
   } else {
     showMessage(ngrt4n::OperationFailed, tr("No item selected for preview").toStdString());
   }
@@ -614,9 +613,9 @@ void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
 void WebMainUI::handleUploadSubmitButton(void)
 {
   m_uploadSubmitButton.disable();
-  m_fileUploadDialog.accept();
-  m_fileUploader.upload();
-  //FIXME: m_fileUploadDialog.contents()->clear();
+  m_uploadForm.accept();
+  m_fileUploader->upload();
+  m_uploadSubmitButton.enable();
 }
 
 
@@ -624,8 +623,22 @@ void WebMainUI::handleUploadSubmitButton(void)
 void WebMainUI::handleUploadCancelButton(void)
 {
   m_uploadSubmitButton.enable();
-  m_fileUploadDialog.accept();
-  //FIXME: m_fileUploadDialog.contents()->clear();
+  m_uploadForm.accept();
+}
+
+
+
+void WebMainUI::handleUploadFileTooLarge(void)
+{
+  WebMainUI::showMessage(ngrt4n::OperationFailed, Q_TR("File too large."));
+}
+
+
+
+void WebMainUI::handleShowUploadForm(void)
+{
+  resetFileUploader();
+  m_uploadForm.show();
 }
 
 
@@ -657,25 +670,26 @@ void WebMainUI::selectItem4Preview(void)
 }
 
 
-void WebMainUI::setupFileUploadDialog(void)
+void WebMainUI::setupUploadForm(void)
 {
-  //FIXME: setup exclusively objects
-  m_fileUploadDialog.setWindowTitle(tr("Importation | %1").arg(APP_NAME).toStdString());
-  m_fileUploadDialog.setStyleClass("Wt-dialog");
+  m_fileUploader = new Wt::WFileUpload();
+  m_fileUploader->setFileTextSize(MAX_FILE_UPLOAD);
+  m_fileUploader->setProgressBar(new Wt::WProgressBar()); // take the ownership of the progressbar
+  m_fileUploader->setMargin(10, Wt::Right);
 
-  Wt::WContainerWidget* fileDialogContents = m_fileUploadDialog.contents();
-  fileDialogContents->addWidget(new Wt::WText(Q_TR("<p>Select a description file</p>"), Wt::XHTMLText));
+  m_uploadFormTitle.setText(Q_TR("<p>Select a description file</p>"));
+  m_uploadFormTitle.setTextFormat(Wt::XHTMLText);
 
-  fileDialogContents->addWidget(&m_fileUploader);
-  m_fileUploader.setFileTextSize(MAX_FILE_UPLOAD);
-  m_fileUploader.setProgressBar(&m_uploadProgressBar);
-  m_fileUploader.setMargin(10, Wt::Right);
-
-  // Provide a button to start uploading.
   m_uploadSubmitButton.setText(Q_TR("Upload"));
   m_uploadCancelButton.setText(Q_TR("Close"));
-  fileDialogContents->addWidget(&m_uploadSubmitButton);
-  fileDialogContents->addWidget(&m_uploadCancelButton);
+
+  m_uploadForm.contents()->addWidget(&m_uploadFormTitle);
+  m_uploadForm.contents()->addWidget(m_fileUploader);
+  m_uploadForm.contents()->addWidget(&m_uploadSubmitButton);
+  m_uploadForm.contents()->addWidget(&m_uploadCancelButton);
+
+  m_uploadForm.setStyleClass("Wt-dialog");
+  m_uploadForm.setWindowTitle(tr("Importation | %1").arg(APP_NAME).toStdString());
 }
 
 
@@ -755,7 +769,7 @@ void WebMainUI::setupSettingsPage(void)
       // menu import view
       menuText = QObject::tr("Import Description File").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-      link->clicked().connect(&m_fileUploadDialog, &Wt::WDialog::show);
+      link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
       m_settingsPageTpl.bindWidget("menu-import", link);
       m_menuLinks.insert(MenuImport, link);
 
@@ -959,7 +973,7 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
                                               int index = viewSelector->currentIndex();
                                   Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(viewSelector->model());
       if (index>0) {
-    m_selectedFile = boost::any_cast<std::string>(model->item(index, 0)->data());
+    m_fileToPreview = boost::any_cast<std::string>(model->item(index, 0)->data());
   }
 }));
 
@@ -1021,10 +1035,8 @@ Wt::WDialog* WebMainUI::createAboutDialog(void)
 void WebMainUI::initOperatorDashboard(void)
 {
   bindExecutiveViewWidgets();
-  bindExecutiveViewWidgets();
 
   m_dbSession->updateViewList(m_dbSession->loggedUser().username);
-  m_assignedDashboardCount = m_dbSession->viewList().size();
 
   // Build view thumbnails
   int thumbIndex = 0;
@@ -1078,24 +1090,19 @@ void WebMainUI::showConditionalUiWidgets(void)
 {
   if (m_dbSession->isCompleteUserDashboard()) {
     m_biDashlet.initialize(m_dbSession->viewList());
-
     m_operatorHomeTpl.bindString("bi-report-title", Q_TR("Reports"));
     m_operatorHomeTpl.bindWidget("bi-report-dashlet", &m_biDashlet);
   } else {
     m_operatorHomeTpl.bindEmpty("bi-report-title");
     m_operatorHomeTpl.bindEmpty("bi-report-dashlet");
-
     if (m_dbSession->displayOnlyTiles()) {
       doJavaScript("$('#ngrt4n-side-pane').hide();");
       doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-12');");
     } else {
       doJavaScript("$('#ngrt4n-side-pane').show();");
-      //doJavaScript("$('#ngrt4n-content-pane').width('70%');");
-      //doJavaScript("$('#ngrt4n-side-pane').width('28%');");
       doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-8');");
       doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
     }
-
   }
 }
 
@@ -1104,13 +1111,10 @@ void WebMainUI::bindExecutiveViewWidgets(void)
 {
   m_thumbsContainer.setLayout(m_thumbsLayout = new Wt::WGridLayout());
   m_eventFeedsContainer.setLayout(m_eventFeedLayout = new Wt::WVBoxLayout());
-
   m_operatorHomeTpl.setTemplateText(Wt::WString::tr("operator-home.tpl"));
   m_operatorHomeTpl.bindWidget("info-box", &m_infoBox);
   m_operatorHomeTpl.bindWidget("thumbnails", &m_thumbsContainer);
   m_operatorHomeTpl.bindWidget("event-feeds", &m_eventFeedsContainer);
-
-  //FIXME: unbind it
   m_dashboardStackedContents.addWidget(&m_operatorHomeTpl);
 }
 
@@ -1121,8 +1125,8 @@ void WebMainUI::setInternalPath(const std::string& path)
 
 void WebMainUI::setupDialogsStyle(void)
 {
-  m_fileUploadDialog.setStyleClass("Wt-dialog");
-  m_fileUploadDialog.titleBar()->setStyleClass("titlebar");
+  m_uploadForm.setStyleClass("Wt-dialog");
+  m_uploadForm.titleBar()->setStyleClass("titlebar");
   m_previewDialog.setStyleClass("Wt-dialog");
   m_previewDialog.titleBar()->setStyleClass("titlebar");
 }
@@ -1284,9 +1288,11 @@ void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
 
 void WebMainUI::handleImportDescriptionFile(void)
 {
-  if (! m_fileUploader.empty()) {
+  if (m_fileUploader->empty()) {
+    showMessage(ngrt4n::OperationFailed, Q_TR("No file selected"));
+  } else {
     if (createDirectory(m_confdir, false)) { // false means don't clean the directory
-      QString tmpFileName(m_fileUploader.spoolFileName().c_str());
+      QString tmpFileName(m_fileUploader->spoolFileName().c_str());
       CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
 
       CoreDataT cdata;
@@ -1298,7 +1304,7 @@ void WebMainUI::handleImportDescriptionFile(void)
         CORE_LOG("warn", msg);
         showMessage(ngrt4n::OperationFailed, msg);
       } else {
-        std::string filename = m_fileUploader.clientFileName().toUTF8();
+        std::string filename = m_fileUploader->clientFileName().toUTF8();
         QString destPath = QString("%1/%2").arg(m_confdir.c_str(), filename.c_str());
         QFile file(tmpFileName);
         file.copy(destPath);
@@ -1338,7 +1344,23 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
 void WebMainUI::fetchQosData(QosDataListMapT& qosDataMap, long start, long end)
 {
   m_dbSession->listQosData(qosDataMap,
-                           "", /** viewName: empty means all entries **/
+                           "", /** viewName: empty means all views **/
                            start,
                            end);
+}
+
+
+
+void WebMainUI::resetFileUploader(void)
+{
+  Wt::WFileUpload* old = m_fileUploader;
+  m_fileUploader = new Wt::WFileUpload();
+  m_fileUploader->setProgressBar(new Wt::WProgressBar()); // take the ownership of the progressbar
+  m_fileUploader->uploaded().connect(this, &WebMainUI::handleImportDescriptionFile);
+  m_fileUploader->fileTooLarge().connect(this, &WebMainUI::handleUploadFileTooLarge);
+  m_uploadForm.contents()->insertBefore(m_fileUploader, &m_uploadSubmitButton);
+  if (old) {
+    m_uploadForm.contents()->removeWidget(old);
+    delete old;
+  }
 }

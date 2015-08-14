@@ -101,8 +101,6 @@ public Q_SLOTS:
   void handleShowExecutiveView(void);
   void handleShowSettingsView(void);
   void handleNewViewSelected(void);
-  void handleUploadSubmitButton(void);
-  void handleUploadCancelButton(void);
 
 
 
@@ -112,13 +110,14 @@ private:
     IMPORT = 0,
     OPEN = 1
   };
-
   /** Signals */
   Wt::Signal<void> sessionTerminated;
   typedef QMap<QString, WebDashboard*> DashboardMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
 
+
   /** Private members **/
+  Wt::WTimer m_timer;
   QMap<int,Wt::WAnchor*> m_menuLinks;
   std::string m_rootDir;
   std::string m_confdir;
@@ -129,65 +128,51 @@ private:
   Wt::WTemplate m_adminHomePageTpl;
   Settings m_settings;
   Wt::WText m_infoBox;
-
   WebNotificationManager* m_notificationManager;
   Wt::WWidget* m_notificationSection;
-  std::map<int, Wt::WText*> m_notificationBoxes;
-
   AuthManager* m_authManager;
   DbSession* m_dbSession;
-  WebDataSourcePreferences m_dataSourceSettingsForm;
-  WebNotificationPreferences m_notificationSettingsForm;
-  WebAuthPreferences m_authSettingsForm;
   WebLicenseManager* m_licenseMngtForm;
-  WebHostGroupServiceMap m_autoHostgroupImporterForm;
-  Wt::WTimer m_timer;
-  Wt::WStackedWidget m_mainStackedContents;
-  Wt::WStackedWidget m_adminStackedContents;
-  Wt::WNavigationBar m_navbar;
-  Wt::WStackedWidget m_dashboardStackedContents;
-
-
-  Wt::WDialog m_fileUploadDialog;
-  Wt::WDialog m_previewDialog;
-  Wt::WFileUpload m_fileUploader;
-  Wt::WPushButton m_uploadButton;
-  Wt::WPushButton m_uploadSubmitButton;
-  Wt::WPushButton m_uploadCancelButton;
-  Wt::WProgressBar m_uploadProgressBar;
-
-
-  std::string m_selectedFile;
-  DashboardMapT m_dashboardMap;
+  std::map<int, Wt::WText*> m_notificationBoxes;
   DbUserManager* m_dbUserManager;
   LdapUserManager* m_ldapUserManager;
   UserFormView* m_userAccountForm;
   UserFormView* m_changePasswordPanel;
   ViewAclManagement* m_viewAccessPermissionForm;
   Wt::WDialog* m_aboutDialog;
-  int m_assignedDashboardCount;
-  Wt::WText m_adminPanelTitle;
   WebDashboard* m_currentDashboard;
-
   Wt::WComboBox* m_selectViewBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
+  WebDataSourcePreferences m_dataSourceSettingsForm;
+  WebNotificationPreferences m_notificationSettingsForm;
+  WebAuthPreferences m_authSettingsForm;
+  WebHostGroupServiceMap m_autoHostgroupImporterForm;
+  Wt::WNavigationBar m_navbar;
+  Wt::WStackedWidget m_mainStackedContents;
+  Wt::WStackedWidget m_adminStackedContents;
+  Wt::WStackedWidget m_dashboardStackedContents;
+
+  DashboardMapT m_dashboardMap;
+  Wt::WText m_adminPanelTitle;
+  Wt::WDialog m_previewDialog;
+  std::string m_fileToPreview;
+
+  /** For file upload **/
+  Wt::WFileUpload* m_fileUploader;
+  Wt::WPushButton m_uploadSubmitButton;
+  Wt::WPushButton m_uploadCancelButton;
+  Wt::WText m_uploadFormTitle;
+  Wt::WDialog m_uploadForm;
+
   /** Executive View widgets **/
   Wt::WVBoxLayout* m_eventFeedLayout;
-  Wt::WContainerWidget m_eventFeedsContainer;
-
   Wt::WGridLayout* m_thumbsLayout;
+  Wt::WContainerWidget m_eventFeedsContainer;
   Wt::WContainerWidget m_thumbsContainer;
   ThumbnailMapT m_thumbsWidgets;
-
-  /** BI dashlet **/
   WebBiDashlet m_biDashlet;
 
-  /** member methods with return value*/
-  Wt::WAnchor* createLogoLink(void);
-  void setupSettingsPage(void);
-  void setupDialogsStyle(void);
-  Wt::WComboBox* createViewSelector(void);
 
   /** callbacks */
   void updateEventFeeds(void);
@@ -213,53 +198,56 @@ private:
   void handleErrcode(int errcode);
   void handleUserUpdatedCompleted(int errcode);
   void handleShowAdminHome(void);
+  void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);
+  void handleUploadSubmitButton(void);
+  void handleUploadCancelButton(void);
+  void handleUploadFileTooLarge(void);
+  void handleShowUploadForm(void);
 
   /** other member functions */
+  void scaleMap(double factor);
   void addEvents(void);
+  void selectItem4Preview(void);
+  void initOperatorDashboard(void);
+  void setInternalPath(const std::string& path);
+  void startDashbaordUpdate(void);
+  void hideAdminSettingsMenu(void);
+  void showConditionalUiWidgets(void);
+  void showMessageClass(const std::string& msg, std::string statusCssClass);
+  void setupSettingsPage(void);
+  void setupDialogsStyle(void);
   void setupMainUI(void);
   void setupInfoBox(void);
   void setupProfileMenus(void);
   void setupMenus(void);
-  void setupFileUploadDialog(void);
-  void selectItem4Preview(void);
-  void initOperatorDashboard(void);
-  WebDashboard* loadView(const std::string& path);
-
-  void scaleMap(double factor);
-  UserFormView* createAccountPanel(void);
-  UserFormView* createPasswordPanel(void);
-  Wt::WDialog* createAboutDialog(void);
-  void showMessageClass(const std::string& msg, std::string statusCssClass);
-  void setInternalPath(const std::string& path);
-  bool createDirectory(const std::string& path, bool cleanContent);
-  void startDashbaordUpdate(void);
-  void hideAdminSettingsMenu(void);
-  void showConditionalUiWidgets(void);
-
+  void setupUploadForm(void);
   void setupNavivationBar(void);
   void setupMainStackedContent(void);
   void setupBreadCrumbsBar(void);
-
-  WebNotificationManager* createNotificationManager(void);
-  Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
-  Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
-  Wt::WComboBox* createShowViewBreadCrumbsLink(void);
-  Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
-  Wt::WWidget* createNotificationSection(void);
   void updateLicenseMgntForm();
-
   void unbindWidgets(void);
   void bindExecutiveViewWidgets(void);
   void unbindExecutiveViewWidgets(void);
   void unbindDashboardWidgets(void);
   void unbindStackedWidgets(void);
-
-  void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);
   void saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path);
-
-  Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
   void clearThumbnailTemplate(Wt::WTemplate* tpl);
   void fetchQosData(QosDataListMapT& qosDataMap, long start, long end);
+  bool createDirectory(const std::string& path, bool cleanContent);
+  void resetFileUploader(void);
+  WebDashboard* loadView(const std::string& path);
+  WebNotificationManager* createNotificationManager(void);
+  Wt::WComboBox* createViewSelector(void);
+  UserFormView* createAccountPanel(void);
+  UserFormView* createPasswordPanel(void);
+  Wt::WDialog* createAboutDialog(void);
+  Wt::WAnchor* createLogoLink(void);
+  Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
+  Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
+  Wt::WComboBox* createShowViewBreadCrumbsLink(void);
+  Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
+  Wt::WWidget* createNotificationSection(void);
+  Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
 };
 
 #endif // MAINWEBWINDOW_HPP
