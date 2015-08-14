@@ -612,9 +612,7 @@
 <message id="breadcrumbs-bar.tpl">
 <div class="col-sm-12">
     <ol class="list-inline">
-    <li>${show-settings-link}</li>
-    <li>${show-home-link}</li>
-    <li>Available views:</li>
+    <li>Active view</li>
     <li>${display-view-selection-box}</li>
     <li>${display-only-trouble-event-box}</li>
   </ol>

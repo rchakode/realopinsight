@@ -63,14 +63,15 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_currentDashboard(NULL),
     m_fileUploader(NULL)
 {
+  m_breadcrumbsBar = createBreadCrumbsBarTpl();
+  m_userAccountForm = createAccountPanel();
+  m_changePasswordPanel = createPasswordPanel();
+  m_aboutDialog = createAboutDialog();
+
   addWidget(&m_mainWidget);
   setupInfoBox();
   setupMainUI();
   setupDialogsStyle();
-
-  m_userAccountForm = createAccountPanel();
-  m_changePasswordPanel = createPasswordPanel();
-  m_aboutDialog = createAboutDialog();
 
   setupMenus();
   showUserHome();
@@ -115,11 +116,8 @@ void WebMainUI::unbindWidgets(void)
   m_settingsPageTpl.takeWidget("info-box");
   m_settingsPageTpl.clear();
 
-  m_breadcrumbsBar.clear();
-  m_breadcrumbsBar.clear();
-
+  m_breadcrumbsBar->clear();
   m_mainWidget.removeWidget(&m_navbar);
-  m_mainWidget.removeWidget(&m_breadcrumbsBar);
   m_mainWidget.removeWidget(&m_mainStackedContents);
   removeWidget(&m_mainWidget);
   clear();
@@ -172,7 +170,7 @@ void WebMainUI::addEvents(void)
   m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.hostgroupSubmitted().connect(this, &WebMainUI::handleImportHostgroupSubmitted);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
-  m_timer.timeout().connect(this, &WebMainUI::handleRefresh);
+  m_globalTimer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
   m_uploadSubmitButton.clicked().connect(this, &WebMainUI::handleUploadSubmitButton);
   m_uploadCancelButton.clicked().connect(this, &WebMainUI::handleUploadCancelButton);
@@ -202,9 +200,7 @@ void WebMainUI::setupMainUI(void)
 {
   setupNavivationBar();
   setupMainStackedContent();
-  setupBreadCrumbsBar();
   m_mainWidget.addWidget(&m_navbar);
-  m_mainWidget.addWidget(&m_breadcrumbsBar);
   m_mainWidget.addWidget(&m_mainStackedContents);
 }
 
@@ -217,18 +213,12 @@ void WebMainUI::setupNavivationBar(void)
 }
 
 
-void WebMainUI::setupBreadCrumbsBar(void)
+Wt::WTemplate* WebMainUI::createBreadCrumbsBarTpl(void)
 {
-  //FIXME: avoid using pointers
-  m_breadcrumbsBar.setTemplateText(Wt::WString::tr("breadcrumbs-bar.tpl"));
-  m_breadcrumbsBar.bindWidget("show-settings-link", createShowSettingsBreadCrumbsLink());
-  m_breadcrumbsBar.bindWidget("display-view-selection-box", m_selectViewBox = createShowViewBreadCrumbsLink());
-  m_breadcrumbsBar.bindWidget("display-only-trouble-event-box", m_displayOnlyTroubleEventsBox = createDisplayOnlyTroubleBreadCrumbsLink());
-  if (! m_dbSession->isLoggedAdmin()) {
-    m_breadcrumbsBar.bindWidget("show-home-link", createShowOpsHomeBreadCrumbsLink());
-  } else {
-    m_breadcrumbsBar.bindEmpty("show-home-link");
-  }
+  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("breadcrumbs-bar.tpl"));
+  tpl->bindWidget("display-view-selection-box", m_selectViewBox = createShowViewBreadCrumbsLink());
+  tpl->bindWidget("display-only-trouble-event-box", m_displayOnlyTroubleEventsBox = createDisplayOnlyTroubleBreadCrumbsLink());
+  return tpl;
 }
 
 void WebMainUI::setupMainStackedContent(void)
@@ -236,20 +226,6 @@ void WebMainUI::setupMainStackedContent(void)
   m_mainStackedContents.addWidget(&m_dashboardStackedContents);
 }
 
-
-Wt::WAnchor* WebMainUI::createShowSettingsBreadCrumbsLink(void)
-{
-  Wt::WAnchor* link = new Wt::WAnchor("#", "Settings");
-  link->clicked().connect(this, &WebMainUI::handleShowSettingsView);
-  return link;
-}
-
-Wt::WAnchor* WebMainUI::createShowOpsHomeBreadCrumbsLink(void)
-{
-  Wt::WAnchor* link = new Wt::WAnchor("#", "Ops Home");
-  link->clicked().connect(this, &WebMainUI::handleShowExecutiveView);
-  return link;
-}
 
 
 void WebMainUI::handleShowSettingsView(void)
@@ -280,7 +256,7 @@ Wt::WComboBox* WebMainUI::createShowViewBreadCrumbsLink(void)
 
 Wt::WCheckBox* WebMainUI::createDisplayOnlyTroubleBreadCrumbsLink()
 {
-  Wt::WCheckBox* checkBox = new Wt::WCheckBox(Q_TR("Display only problems"));
+  Wt::WCheckBox* checkBox = new Wt::WCheckBox(Q_TR("Show only problems"));
   checkBox->changed().connect(this, &WebMainUI::handleDisplayOnlyTroubleStateChanged);
   checkBox->setHidden(true);
   return checkBox;
@@ -311,11 +287,18 @@ void WebMainUI::setupProfileMenus(void)
   profileMenuItem->setMenu(profilePopupMenu);
   profileMenu->addItem(profileMenuItem);
 
+  // link Settings
+  profilePopupMenu->addItem(tr("Settings").toStdString())
+      ->clicked().connect(this, &WebMainUI::handleShowSettingsView);
+
+  // link Help
   Wt::WMenuItem* currentMenuItem = profilePopupMenu->addItem(tr("Help").toStdString());
   currentMenuItem->setLink(Wt::WLink(Wt::WLink::Url, REALOPINSIGHT_GET_HELP_URL));
   currentMenuItem->setLinkTarget(Wt::TargetNewWindow);
 
-  profilePopupMenu->addItem("About")->triggered().connect(m_aboutDialog, &Wt::WDialog::show);
+  // link About
+  profilePopupMenu->addItem("About")
+      ->triggered().connect(m_aboutDialog, &Wt::WDialog::show);
 }
 
 Wt::WWidget* WebMainUI::createNotificationSection(void)
@@ -383,26 +366,28 @@ void WebMainUI::setupMenus(void)
   text = ngrt4n::createFontAwesomeTextButton("fa fa-search-minus","Zoom the console map out");
   text->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
   m_navbar.addWidget(text);
+  // m_navbar will take the ownership on m_breadcrumbsBar
+  m_navbar.addWidget(m_breadcrumbsBar);
 }
 
 void WebMainUI::startTimer(void)
 {
-  m_timer.setInterval(1000 * m_settings.updateInterval());
-  m_timer.start();
+  m_globalTimer.setInterval(1000 * m_settings.updateInterval());
+  m_globalTimer.start();
 }
 
 void WebMainUI::resetTimer(qint32 interval)
 {
-  m_timer.stop();
-  m_timer.setInterval(interval);
-  m_timer.start();
+  m_globalTimer.stop();
+  m_globalTimer.setInterval(interval);
+  m_globalTimer.start();
 }
 
 
 
 void WebMainUI::handleRefresh(void)
 {
-  m_timer.stop();
+  m_globalTimer.stop();
 
   std::map<int, int> problemTypeCount;
   problemTypeCount[ngrt4n::Normal]   = 0;

@@ -117,17 +117,17 @@ private:
 
 
   /** Private members **/
-  Wt::WTimer m_timer;
+  Settings m_settings;
+  Wt::WTimer m_globalTimer;
+  Wt::WText m_infoBox;
   QMap<int,Wt::WAnchor*> m_menuLinks;
   std::string m_rootDir;
   std::string m_confdir;
   Wt::WContainerWidget m_mainWidget;
   Wt::WTemplate m_settingsPageTpl;
   Wt::WTemplate m_operatorHomeTpl;
-  Wt::WTemplate m_breadcrumbsBar;
   Wt::WTemplate m_adminHomePageTpl;
-  Settings m_settings;
-  Wt::WText m_infoBox;
+  Wt::WTemplate* m_breadcrumbsBar;
   WebNotificationManager* m_notificationManager;
   Wt::WWidget* m_notificationSection;
   AuthManager* m_authManager;
@@ -223,7 +223,6 @@ private:
   void setupUploadForm(void);
   void setupNavivationBar(void);
   void setupMainStackedContent(void);
-  void setupBreadCrumbsBar(void);
   void updateLicenseMgntForm();
   void unbindWidgets(void);
   void bindExecutiveViewWidgets(void);
@@ -236,14 +235,13 @@ private:
   bool createDirectory(const std::string& path, bool cleanContent);
   void resetFileUploader(void);
   WebDashboard* loadView(const std::string& path);
+  Wt::WTemplate* createBreadCrumbsBarTpl(void);
   WebNotificationManager* createNotificationManager(void);
   Wt::WComboBox* createViewSelector(void);
   UserFormView* createAccountPanel(void);
   UserFormView* createPasswordPanel(void);
   Wt::WDialog* createAboutDialog(void);
   Wt::WAnchor* createLogoLink(void);
-  Wt::WAnchor* createShowSettingsBreadCrumbsLink(void);
-  Wt::WAnchor* createShowOpsHomeBreadCrumbsLink(void);
   Wt::WComboBox* createShowViewBreadCrumbsLink(void);
   Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
   Wt::WWidget* createNotificationSection(void);
