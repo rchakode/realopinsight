@@ -190,7 +190,7 @@ LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
 
 webd {
   SOURCES += web/src/ngrt4n-web.cpp
-  TARGET = realopinsightd
+  TARGET = realopinsight-server
   LIBS += -lwthttp
 }
 

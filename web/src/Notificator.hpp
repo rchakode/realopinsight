@@ -43,7 +43,7 @@ public:
 
 private:
   std::unique_ptr<MailSender> m_mailSender;
-  WebNotificationPreferences m_preferences;
+  WebPreferencesBase m_preferences;
   DbSession* m_dbSession;
   QEventLoop m_eventSynchonizer;
 };

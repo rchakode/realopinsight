@@ -21,13 +21,13 @@
 
 set -e
 
-APP="ngrt4n"
-APP_PREFIX="/usr/local"
-VERSION_BKR="1.0"
-WT_VERSION=3.3.2
+WT_VERSION=3.3.4
 WT_SRC_DIR=wt/extlibs
 BASE_BUILD_DIR=`pwd`
 QT_PROJECT_FILE=ngrt4n-web.pro
+REALOPINSIGHT_USER=realopinsight
+REALOPINSIGHT_INSTALL_PREFIX=/opt/realopinsight
+REALOPINSIGHT_WWW=${REALOPINSIGHT_INSTALL_PREFIX}/www
 
 # Print help
 #
@@ -114,8 +114,8 @@ install_wt()
   mkdir build && cd build
   
   echo "DEBUG : Run cmake"
-  cmake ..  -DWEBUSER=${REALOPINSIGHT_WWW_USER} \
-            -DWEBGROUP=REALOPINSIGHT_WWW_GROUP \
+  cmake ..  -DWEBUSER=${WWW_USER} \
+            -DWEBGROUP=${WWW_GROUP} \
             -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick
 			
   echo "DEBUG : Building..."
@@ -131,23 +131,6 @@ install_wt()
   cd ${BASE_BUILD_DIR}   
 }
 
-install_daemon()
-{  
-  echo "==>Installing the Daemon Service for Nagios..."  
-  echo -n "DEBUG : Checking prerequises..." 
-  ./configure --prefix=${INSTALL_PREFIX} 1>>install.log
-  echo done
-  
-  echo -n "DEBUG : Compiling..."
-  make -Bj${NCPU} 1>>install.log
-  echo done
-  
-  echo -n "DEBUG : Installation..."
-  make install 1>>install.log
-  cd ..
-  echo "done" 
-  echo "==>Installation completed"
-}
 
 check_prerequisites()
 {
@@ -174,42 +157,12 @@ install_default(){
   make install 1>>install.log
 }
 
-install_editor(){
-  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=gui-base CONFIG+=editor ${dflag}
-  make -j${NCPU} 1>>install.log
-  make install 1>>install.log
-}
-
-install_oc(){
-  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=gui-base CONFIG+=oc ${dflag}
-  make -j${NCPU} 1>>install.log
-  make install 1>>install.log
-}
-
-install_workstation() {
-  echo "==>Installing RealOpInsight Workstation..."  
-  check_prerequisites
-  echo "DEBUG : Installation directory => ${INSTALL_PREFIX}"
-  echo -n "DEBUG : Current component => Manager..."
-  install_default
-  echo "done"
-  
-  echo -n "DEBUG : Current component => Editor..."
-  install_editor
-  echo "done"
-  
-  echo -n "DEBUG : Current component => Operator Console..."
-  install_oc
-  echo "done"
-  echo "==>Installation completed"
-}
-
-install_webd() {
+build_standalone_binary() {
   ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
-install_fcgi() {
+build_fcgi_binary() {
   ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-fcgi ${dflag}
   make -j${NCPU} 1>>install.log
 }
@@ -226,26 +179,9 @@ install_ultimate() {
     echo "ERROR : root privileges are required"
     exit 1	
   fi
-  
-  if [ -z "$REALOPINSIGHT_WWW_ROOT" ]; then
-    echo "DEBUG : REALOPINSIGHT_WWW_ROOT not set, using /var/www"
-	export REALOPINSIGHT_WWW_ROOT=/var/www
-  fi  
- 
-  export REALOPINSIGHT_INSTALL_PREFIX=/opt/realopinsight
-  export REALOPINSIGHT_WWW=${REALOPINSIGHT_WWW_ROOT}/realopinsight
-  export APACHE_ROOT=/etc/apache2
-  
-  # check credential requirements
-  if [ -z "$REALOPINSIGHT_WWW_USER" ]; then
-    echo "ERROR : REALOPINSIGHT_WWW_USER not set"
-	exit 1
-  fi
-  
-  if [ -z "$REALOPINSIGHT_WWW_GROUP" ]; then
-    echo "ERROR : REALOPINSIGHT_WWW_GROUP not set"
-	exit 1
-  fi  
+
+  # create $REALOPINSIGHT_USER user if not exist
+  id $REALOPINSIGHT_USER || useradd $REALOPINSIGHT_USER
   
   #echo "DEBUG : Installing Wt and other dependencies..."
   #install_wt
@@ -253,34 +189,18 @@ install_ultimate() {
   # check dependencies
   check_prerequisites
     
-  echo "DEBUG : Patching the project file for REALOPINSIGHT_WWW_ROOT_VALUE..."
-  sed --in-place 's!REALOPINSIGHT_WWW_ROOT_VALUE!'"${REALOPINSIGHT_WWW}"'!' $QT_PROJECT_FILE
-  
   echo "DEBUG : Generating locale file"
   lrelease $QT_PROJECT_FILE
- 
-  if [ ! -z "${REALOPINSIGHT_BUILD_DEBUG}" ]; then
-    echo "DEBUG : Building RealOpInsight Standalone..."
-    install_webd
-    install -m 755 realopinsightd  ${REALOPINSIGHT_INSTALL_PREFIX}/
-    install -m 755 contribs/realopinsightctld  ${REALOPINSIGHT_INSTALL_PREFIX}/
-  else
-    echo -n "DEBUG : Building RealOpInsight for FastCGI..."
-    install_fcgi
-    echo done
 
-    echo -n "DEBUG : Building QoS Data collector..."
-    install_reportd
-    echo done
-  fi
+  echo "DEBUG : Building RealOpInsight Standalone..."
+  build_standalone_binary
+  echo "DEBUG : Building RealOpInsight for FastCGI..."
+  build_fcgi_binary
+
+  echo "DEBUG : Building QoS Data collector..."
+  install_reportd
 
   echo "DEBUG : Installing setting files..."
-
-  if [ -d ${APACHE_ROOT}/conf-available ]; then
-    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf-available
-  else
-    REALOPINSIGHT_WWW_CONFIG_DIR=${APACHE_ROOT}/conf.d
-  fi
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/bin
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
@@ -291,33 +211,35 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_WWW}
   install -d ${REALOPINSIGHT_WWW}/run      # directory for thumbnails
   install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
-  install contribs/index.html ${REALOPINSIGHT_WWW}/
-  install -m 755 realopinsight.fcgi ${REALOPINSIGHT_WWW}/
-  install -m 644 favicon.ico ${REALOPINSIGHT_WWW}/
+
+
+  echo "DEBUG : Installing binaries and init.d scripts..."
+  install -m 755 realopinsight-server ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-reportd
   install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
+  update-rc.d realopinsight-server defaults
+  update-rc.d realopinsight-reportd defaults
+
   install -m 755 contribs/realopinsight-backup ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
   install -m 755 contribs/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
   
   install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
-  install -m 600 contribs/apache-realopinsight-ultimate.conf ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
-  cp -r resources ${REALOPINSIGHT_WWW}/ 
-  cp -r images ${REALOPINSIGHT_WWW}/
-  cp -r i18n ${REALOPINSIGHT_WWW}/
+
+  cp -r favicon.ico \
+        i18n \
+        images \
+        resources
+        ${REALOPINSIGHT_WWW}/
   
-  echo "DEBUG : Settings permissions and ..."
-  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
-  chown -R $REALOPINSIGHT_WWW_USER:$REALOPINSIGHT_WWW_GROUP ${REALOPINSIGHT_WWW}/
+  echo "DEBUG : Settings permissions for installation directory..."
+  chmod -m 644 ${REALOPINSIGHT_WWW}/favicon.ico
+  chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_USER ${REALOPINSIGHT_INSTALL_PREFIX}/
+
   
-  echo "DEBUG : Settings Apache"
-  sed --in-place 's!REALOPINSIGHT_WWW!'"${REALOPINSIGHT_WWW}"'!' ${REALOPINSIGHT_WWW_CONFIG_DIR}/realopinsight-ultimate.conf
-  a2enmod fastcgi || true
-  a2enconf realopinsight-ultimate || true 
-  service apache2 restart
-  
-  echo "DEBUG : Setting up RealOpInsight QoS data collector"
-  update-rc.d realopinsight-reportd defaults
+  echo "DEBUG : Starting services..."
+  service realopinsight-server restart
   service realopinsight-reportd restart
 
   echo "==>Installation completed"
@@ -350,10 +272,8 @@ if ! echo $NCPU | egrep -q '^[0-9]+$'; then
     exit 1
 fi
 
-export NCPU
-
 prompt_copyright
-
+export NCPU
 echo "DEBUG: Initializing setup with $NCPU CPU..."
 
 if [ -z "${install_prefix}" ] ; then
@@ -377,12 +297,8 @@ if [ -z "$MODULE" ]; then
 fi
  
 case ${MODULE} in
-  daemon|workstation|ultimate) install_${MODULE}
+  ultimate) install_${MODULE}
     ;;
-  all) install_daemon 
-       install_workstation
-       install_ultimate
-   ;;  
      
   *)echo "Unknown module : ${MODULE}" ; 
      exit 2;;

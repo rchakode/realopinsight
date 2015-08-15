@@ -1,36 +1,39 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          realopinsight-reportd
+# Provides:          realopinsight-server
 # Required-Start:    $network
 # Required-Stop:     $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: realopinsight-reportd  initscript
-# Description:       This script allows to manage the RealOpInsight QoS
-#                    Data Collector daemon (realopinsight-reportd).
+# Short-Description: realopinsight-server  initscript
+# Description:       This script allows to manage the RealOpInsight Ultimate's
+#                    http server (realopinsightd).
 ### END INIT INFO
 
 # Author: Rodrigue Chakode <rodrigue.chakode@realopinsight.com>
-# Copyright (c) 2014 RealOpInsight Labs
+# Copyright (c) 2015 RealOpInsight Labs
 
 # Do NOT "set -e"
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="RealOpInsight QoS Data Collector"
-NAME=realopinsight-reportd
+DESC="RealOpInsight Ultimate http server"
+NAME=realopinsight-server
 ENV_CMD=/usr/bin/env
-REPORTD_USER=realopinsight
-REPORTD_BINARY=/opt/realopinsight/sbin/$NAME
-REPORTD_ARGS="-t 5"
-EXEC_COMMAND="LD_LIBRARY_PATH=/opt/realopinsight/lib $REPORTD_BINARY $REPORTD_ARGS"
+HTTP_USER=realopinsight
+HTTP_SERVER_BINARY=/opt/realopinsight/sbin/$NAME
+HTTP_SERVER_PORT=4583
+HTTP_SERVER_ADDR=0.0.0.0
+HTTP_SERVER_ROOT=/opt/realopinsight/www
+HTTP_SERVER_ARGS="--docroot $HTTP_SERVER_ROOT --http-address $HTTP_SERVER_ADDR --http-port $HTTP_SERVER_PORT --deploy /realopinsight"
+EXEC_COMMAND="LD_LIBRARY_PATH=/opt/realopinsight/lib $HTTP_SERVER_BINARY $HTTP_SERVER_ARGS"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
-DEFAULT_START_OPTIONS="--background --quiet --chuid $REPORTD_USER"
-DEFAULT_STOP_OPTIONS="--quiet --chuid $REPORTD_USER"
+DEFAULT_START_OPTIONS="--background --quiet --chuid $HTTP_USER"
+DEFAULT_STOP_OPTIONS="--quiet --chuid $HTTP_USER"
 
 # Exit if the package is not installed
-[ -x "$REPORTD_BINARY" ] || exit 0
+[ -x "$HTTP_SERVER_BINARY" ] || exit 0
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
@@ -69,7 +72,7 @@ do_start()
 #
 do_stop()
 {
-        PIDS=$(ps -edf | grep $REPORTD_BINARY | grep -v grep | awk '{print $2}')
+        PIDS=$(ps -edf | grep $HTTP_SERVER_BINARY | grep -v grep | awk '{print $2}')
         for pid in $PIDS; do kill -TERM $pid; done
         RETVAL=$?
         [ $RETVAL -eq 0 ] && rm -f $PIDFILE
@@ -108,7 +111,7 @@ case "$1" in
 	esac
 	;;
   status)
-       status_of_proc "$REPORTD_BINARY" "$NAME" && exit 0 || exit $?
+       status_of_proc "$HTTP_SERVER_BINARY" "$NAME" && exit 0 || exit $?
        ;;
   #reload|force-reload)
 	#
