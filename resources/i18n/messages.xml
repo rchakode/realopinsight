@@ -484,7 +484,7 @@
     <div id="notification-section">
       <fieldset>
         <div class="control-group">
-          <label class="control-label">Type&nbsp;</label>
+          <label class="control-label">Monitor type&nbsp;</label>
           <span>${notification-type}</span>
          </div>
           <!-- mail notification settings -->
@@ -526,7 +526,6 @@
 <div class="form-horizontal">
   <div id="monitoring-settings-section">
      <fieldset>
-       <h6>General Settings</h6>
        <div class="control-group">
          <label class="control-label">Source&nbsp;</label>
          <span>${source-box}</span>
@@ -534,33 +533,41 @@
          <span>${monitor-type}</span>
        </div>
        <div class="control-group">
-        <label class="control-label">Update Interval&nbsp;</label>
+        <label class="control-label">Update Interval (seconds)&nbsp;</label>
         <span>${update-interval}</span>
-        <span>&nbsp;seconds</span>
        </div>
      </fieldset>
 
      <fieldset>
-       <h6>Monitor Network Access</h6>
        <div class="control-group">
-         <label class="control-label">URL&nbsp;</label>
+         <label class="control-label">Web URL&nbsp;</label>
          <span>${monitor-url}</span>
+       </div>
+       <div class="control-group">
+         <label class="control-label">Don't verify SSL certificate&nbsp;</label>
          <span>${dont-verify-ssl-certificate}</span>
        </div>
        <div class="control-group">
          <label class="control-label">Auth String&nbsp;</label>
          <span>${monitor-auth-string}</span>
+       </div>
+       <div class="control-group">
+         <label class="control-label">Show auth string in clear&nbsp;</label>
          <span>${show-in-clear}</span>
        </div>
      </fieldset>
 
     <fieldset id="livetstatus-section">
-      <h6>Livestatus Socket</h6>
       <div class="control-group">
-        <label class="control-label">Host&nbsp;</label>
+        <label class="control-label">Livestatus Host&nbsp;</label>
         <span>${livestatus-server}</span>
-        <span>Port</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Livestatus Port&nbsp;</label>
         <span>${livestatus-port}</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Use ngrt4nd instead of Livestatus&nbsp;</label>
         <span>${use-ngrt4nd}</span>
       </div>
     </fieldset>  <!-- id="livetstatus-section" -->

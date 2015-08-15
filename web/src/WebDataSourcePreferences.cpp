@@ -225,9 +225,6 @@ void WebDataSourcePreferences::updateFields(void)
   if (curIndex >= 0) {
     m_sourceSelectionBox.setCurrentIndex(curIndex);
     fillFromSource(curIndex);
-    m_applyChangeBtn.setDisabled(false);
-    m_addAsSourceBtn.setDisabled(false);
-    m_deleteSourceBtn.setDisabled(false);
   }
 }
 

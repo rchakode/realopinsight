@@ -563,7 +563,7 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
 
 void WebMainUI::handleDataSourceSetup(void)
 {
-  m_adminPanelTitle.setText(Q_TR("Monitoring Data Sources"));
+  m_adminPanelTitle.setText(Q_TR("Manage Monitoring Data Sources"));
   m_adminStackedContents.setCurrentWidget(&m_dataSourceSettingsForm);
   m_dataSourceSettingsForm.updateContents();
 }

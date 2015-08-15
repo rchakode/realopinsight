@@ -33,6 +33,8 @@
 WebBiDateFilter::WebBiDateFilter(void)
   : m_layout(new Wt::WHBoxLayout(this))
 {
+  m_promptTextLabel.setText("Start date");
+  m_dateSeparatorLabel.setText(Q_TR("End date"));
   setupDatePicker(&m_startDatePicker, LAST_30_DAYS);
   setupDatePicker(&m_endDatePicker, time(NULL));
   setupSubmitButton();
