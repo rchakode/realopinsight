@@ -751,20 +751,19 @@ void WebMainUI::setupSettingsPage(void)
       link->clicked().connect(this, &WebMainUI::handleShowAdminHome);
       m_menuLinks.insert(MenuWelcome, link);
 
-      // menu import view
-      menuText = QObject::tr("Import Description File").toStdString();
-      link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-      link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
-      m_settingsPageTpl.bindWidget("menu-import", link);
-      m_menuLinks.insert(MenuImport, link);
-
-
       // menu auto import host group
       m_adminStackedContents.addWidget(&m_autoHostgroupImporterForm);
       menuText = QObject::tr("Quick View Builder").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
       m_settingsPageTpl.bindWidget("menu-auto-hostgroup-map", link);
+      m_menuLinks.insert(MenuImport, link);
+
+      // menu import view
+      menuText = QObject::tr("Import Description File").toStdString();
+      link = new Wt::WAnchor("#", menuText, &m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
+      m_settingsPageTpl.bindWidget("menu-import", link);
       m_menuLinks.insert(MenuImport, link);
 
       // menu preview
