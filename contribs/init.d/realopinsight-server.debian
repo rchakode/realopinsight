@@ -18,17 +18,19 @@
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="RealOpInsight Ultimate http server"
-NAME=realopinsight-server
+PROG_NAME=realopinsight-server
 ENV_CMD=/usr/bin/env
 HTTP_USER=realopinsight
-HTTP_SERVER_BINARY=/opt/realopinsight/sbin/$NAME
+HTTP_SERVER_INSTALL_PREFIX=/opt/realopinsight
+HTTP_SERVER_BINARY=$HTTP_SERVER_INSTALL_PREFIX/sbin/$PROG_NAME
 HTTP_SERVER_PORT=4583
 HTTP_SERVER_ADDR=0.0.0.0
-HTTP_SERVER_ROOT=/opt/realopinsight/www
-HTTP_SERVER_ARGS="--docroot $HTTP_SERVER_ROOT --http-address $HTTP_SERVER_ADDR --http-port $HTTP_SERVER_PORT --deploy /realopinsight"
-EXEC_COMMAND="LD_LIBRARY_PATH=/opt/realopinsight/lib $HTTP_SERVER_BINARY $HTTP_SERVER_ARGS"
-PIDFILE=/var/run/$NAME.pid
-SCRIPTNAME=/etc/init.d/$NAME
+HTTP_WT_CONFIG_XML=$HTTP_SERVER_INSTALL_PREFIX/etc/wt_config.xml
+HTTP_SERVER_DOC_ROOT=$HTTP_SERVER_INSTALL_PREFIX/www
+HTTP_SERVER_ARGS="--docroot $HTTP_SERVER_DOC_ROOT --http-address $HTTP_SERVER_ADDR --http-port $HTTP_SERVER_PORT --deploy /realopinsight"
+EXEC_COMMAND="LD_LIBRARY_PATH=/opt/realopinsight/lib WT_CONFIG_XML=$HTTP_WT_CONFIG_XML $HTTP_SERVER_BINARY $HTTP_SERVER_ARGS"
+PIDFILE=/var/run/$PROG_NAME.pid
+SCRIPTNAME=/etc/init.d/$PROG_NAME
 DEFAULT_START_OPTIONS="--background --quiet --chuid $HTTP_USER"
 DEFAULT_STOP_OPTIONS="--quiet --chuid $HTTP_USER"
 
@@ -36,7 +38,7 @@ DEFAULT_STOP_OPTIONS="--quiet --chuid $HTTP_USER"
 [ -x "$HTTP_SERVER_BINARY" ] || exit 0
 
 # Read configuration variable file if it is present
-[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+[ -r /etc/default/$PROG_NAME ] && . /etc/default/$PROG_NAME
 
 # Load the VERBOSE setting and other rcS variables
 #. /lib/init/vars.sh
@@ -89,13 +91,13 @@ do_reload() {
 	# restarting (for example, when it is sent a SIGHUP),
 	# then implement that here.
 	#
-	start-stop-daemon --stop $DEFAULT_START_OPTIONS --signal 1 --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop $DEFAULT_START_OPTIONS --signal 1 --pidfile $PIDFILE --name $PROG_NAME
 	return 0
 }
 
 case "$1" in
   start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$PROG_NAME"
 	do_start
 	case "$?" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -103,7 +105,7 @@ case "$1" in
 	esac
 	;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$PROG_NAME"
 	do_stop
 	case "$?" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -111,14 +113,14 @@ case "$1" in
 	esac
 	;;
   status)
-       status_of_proc "$HTTP_SERVER_BINARY" "$NAME" && exit 0 || exit $?
+       status_of_proc "$HTTP_SERVER_BINARY" "$PROG_NAME" && exit 0 || exit $?
        ;;
   #reload|force-reload)
 	#
 	# If do_reload() is not implemented then leave this commented out
 	# and leave 'force-reload' as an alias for 'restart'.
 	#
-	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#log_daemon_msg "Reloading $DESC" "$PROG_NAME"
 	#do_reload
 	#log_end_msg $?
 	#;;
@@ -127,7 +129,7 @@ case "$1" in
 	# If the "reload" option is implemented then remove the
 	# 'force-reload' alias
 	#
-	log_daemon_msg "Restarting $DESC" "$NAME"
+	log_daemon_msg "Restarting $DESC" "$PROG_NAME"
 	do_stop
 	case "$?" in
 	  0|1)
