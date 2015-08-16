@@ -230,7 +230,7 @@ install_ultimate() {
   cp -r favicon.ico \
         i18n \
         images \
-        resources
+        resources \
         ${REALOPINSIGHT_WWW}/
   
   echo "DEBUG : Settings permissions for installation directory..."
