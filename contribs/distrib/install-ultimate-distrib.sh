@@ -179,10 +179,10 @@ make_backup()
 {
   echo -n "DEBUG: Backup current installation to ${REALOPINSIGHT_BACKUP_FILE}..."
   tar --same-owner \
-      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/run \
+      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/run \  # fcgi session dir (deprecated)
+      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/www/run \   # thumbnails dir
       -zcf \
       ${REALOPINSIGHT_BACKUP_FILE} \
-      ${REALOPINSIGHT_WWW_HOME} \
       ${REALOPINSIGHT_INSTALL_PREFIX}
 
   if [ $? -eq 0 ]; then
@@ -228,9 +228,8 @@ create_destination_fs_tree()
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/etc
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/data
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/log
-  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/run   # directory for session info and thumbnails
-  install -d ${REALOPINSIGHT_WWW_HOME}
-  install -d ${REALOPINSIGHT_WWW_HOME}/run      # directory for thumbnails
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/www   # directory for storing www files
+  install -d ${REALOPINSIGHT_INSTALL_PREFIX}/www/run   # directory for storing thumbnails
 }
 
 
@@ -238,14 +237,11 @@ copy_distribution_files()
 {
   create_destination_fs_tree
   echo "DEBUG: Copying core distribution files..."
-  cp -rf www/* ${REALOPINSIGHT_WWW_HOME}/
-  install -D -m 755 lib/* ${REALOPINSIGHT_INSTALL_PREFIX}/lib
-  install -D -m 755 bin/* ${REALOPINSIGHT_INSTALL_PREFIX}/bin
-  install -D -m 755 sbin/* ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
-  chmod 755 ${REALOPINSIGHT_WWW_HOME}/realopinsight.fcgi
-  echo "DEBUG: Copying configuration files..."
+  cp -rf www/* ${REALOPINSIGHT_INSTALL_PREFIX}/www/
+  install -D -m 755 lib/* ${REALOPINSIGHT_INSTALL_PREFIX}/lib/
+  install -D -m 755 bin/* ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
+  install -D -m 755 sbin/* ${REALOPINSIGHT_INSTALL_PREFIX}/sbin/
   install -m 644 etc/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
-  install -m 644 etc/realopinsight-ultimate.conf $REALOPINSIGHT_WWW_CONFIG_PATH
 }
 
 
@@ -271,6 +267,12 @@ install_ultimate_distrib()
   echo "==>Installation completed"
 }
 
+clear_deprecated_settings()
+{
+  a2disconf realopinsight-ultimate
+  service apache2 restart
+  rm -rf $REALOPINSIGHT_INSTALL_PREFIX/run # old fcgi session data
+}
 
 upgrade_ultimate_distrib()
 {
@@ -283,14 +285,13 @@ upgrade_ultimate_distrib()
   upgrade_database
   apply_permissions
   install_initd_scripts
+  clear_deprecated_settings
   start_services
   echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"
 }
 
 
-
 prompt_copyright
-
 
 
 echo
