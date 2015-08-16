@@ -221,10 +221,10 @@ install_ultimate() {
   update-rc.d realopinsight-server defaults
   update-rc.d realopinsight-reportd defaults
 
-  install -m 755 contribs/realopinsight-backup ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
-  install -m 755 contribs/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
+  install -m 755 contribs/backup/realopinsight-backup ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
+  install -m 755 contribs/backup/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
   
-  install -m 600 contribs/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
+  install -m 600 contribs/etc/wt_config.xml ${REALOPINSIGHT_INSTALL_PREFIX}/etc/
   install resources/themes/img/glyphicons-halflings.png ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img
 
   cp -r favicon.ico \
