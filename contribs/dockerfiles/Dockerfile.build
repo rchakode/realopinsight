@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
     libfcgi \
     libfcgi-dev \
     libgraphicsmagick++1-dev \
+    libldap2-dev \
     libpango1.0-dev \
     libqt4-dev \
     libqt4-webkit \

@@ -48,7 +48,7 @@ usage()
 prompt_copyright()
 { 
   echo
-  echo "Thanks for choosing RealOpInsight Workstation."
+  echo "Thanks for choosing RealOpInsight."
   echo
   echo "You are licensed to use this software under the terms of GNU GPL-v3 License."
   echo
@@ -103,8 +103,8 @@ install_wt()
                   libboost-filesystem1.54-dev \
                   libboost-date-time1.54-dev \
                   libboost-random1.54-dev \
-                  libfcgi libfcgi-dev \
-                  apache2 libapache2-mod-fastcgi \
+                  libldap2-dev \
+                  libfcgi libfcgi-dev
                   > /dev/null
 				  
   echo "DEBUG : Downloading wt..."
@@ -216,7 +216,7 @@ install_ultimate() {
   echo "DEBUG : Installing binaries and init.d scripts..."
   install -m 755 realopinsight-server ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
-  install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-service
+  install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-server
   install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
   update-rc.d realopinsight-server defaults
   update-rc.d realopinsight-reportd defaults
@@ -288,14 +288,6 @@ if [ `id -u` -ne 0 ]; then
   echo "WARNING: You must have read/write permissions on the target directory ($INSTALL_PREFIX)"
 fi 
 
-if [ -z "$MODULE" ]; then
-  if [ -e src/server/ngrt4nd.cpp ]; then
-    MODULE=daemon;
-  else
-    MODULE=workstation
-  fi
-fi
- 
 case ${MODULE} in
   ultimate) install_${MODULE}
     ;;
