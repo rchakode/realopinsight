@@ -13,6 +13,9 @@
 set -e
 set -u
 
+REALOPINSIGHT_USER=realopinsight
+REALOPINSIGHT_GROUP=$REALOPINSIGHT_USER
+
 
 # Source the installation manifest and set misc variables
 if [ ! -e ./INSTALL.MANIFEST ]; then
@@ -56,20 +59,13 @@ prompt_copyright()
 }
 
 
-check_www_user()
+check_realopinsight_user()
 {
+  if $REALOPINSIGHT_USER || useradd $REALOPINSIGHT_USER
   if [ -z "$WWW_USER" ]; then
     echo "ERROR: WWW_USER not set"
 	exit 1
   fi
-}
-
-check_www_group()
-{
-  if [ -z "$WWW_GROUP" ]; then
-    echo "ERROR: WWW_GROUP not set"
-	exit 1
-  fi  
 }
 
 
@@ -86,43 +82,24 @@ check_root_user()
 
 install_initd_scripts()
 {
+  echo "DEBUG: Setting Up Init Scripts and Starting Services.."
+  install -m 755 scripts/init.d/realopinsight-server /etc/init.d/
   install -m 755 scripts/init.d/realopinsight-reportd /etc/init.d/
+  update-rc.d realopinsight-server defaults
   update-rc.d realopinsight-reportd defaults
 }
 
 stop_services()
 {
+  service realopinsight-server stop || true
   service realopinsight-reportd stop || true
-  service apache2 stop || true
 }
 
 
 start_services()
 {
-  service realopinsight-reportd restart
-  service apache2 start
-}
-
-
-check_apache()
-{
-  APACHECTL=$(which apachectl) || true
-  if [ -z "APACHECTL" ]; then
-    echo "ERROR: Apache seems to be not installed. If yes, set your PATH variable suitably"
-    echo "To install it manually:"
-    echo " $ sudo apt-get install apache2"
-    exit 1
-  fi
-
-  MOD_FASTCGID=$($APACHECTL -M | grep "fastcgi\_module") || true
-  if [ -z "$MOD_FASTCGID" ]; then
-    echo "ERROR: Apache Module mod_fastcgi is not enabled."
-    echo ""
-    echo "  To install it manually:"
-    echo "    $ sudo apt-get install libapache2-mod-fastcgi"
-    echo "    $ a2enmod fastcgi"
-    exit 1
-  fi
+  service realopinsight-reportd start
+  service realopinsight-server start
 }
 
 check_graphviz()
@@ -138,7 +115,6 @@ check_graphviz()
 check_prerequisites()
 {
   echo "DEBUG: checking prerequisites..."
-  check_apache
   check_graphviz
 }
 
@@ -274,21 +250,10 @@ copy_distribution_files()
 
 
 
-apply_apache_settings()
+apply_permissions()
 {
-  echo "DEBUG: Applying Apache settings..."
-  # create mod-fcgid socket path
-  #APACHE_FCGI_SOCK=/var/lib/apache2/fcgid/sock
-  #mkdir -p $APACHE_FCGI_SOCK
-  #chown -R $WWW_USER:$WWW_GROUP $APACHE_FCGI_SOCK
-  
-  # Apply RealOpInsight Ultimate Apache settings
-  chown -R $WWW_USER:$WWW_GROUP \
-           ${REALOPINSIGHT_INSTALL_PREFIX}/{etc,data,log,run} \
-           ${REALOPINSIGHT_WWW_HOME}/run
-  
-  a2disconf realopinsight-ultimate || echo "a2disconf realopinsight-ultimate failed"
-  a2enconf realopinsight-ultimate
+  echo "DEBUG: Applying permissions..."
+  chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}
 }
 
 
@@ -297,12 +262,10 @@ install_ultimate_distrib()
   echo "DEBUG: Starting the installation of RealOpInsight Ultimate $REALOPINSIGHT_VERSION..."
   stop_services
   check_root_user
-  check_www_user
-  check_www_group
+  check_realopinsight_user
   check_prerequisites
   copy_distribution_files
-  apply_apache_settings
-  echo "DEBUG: Setting Up Init Scripts and Starting Services.."
+  apply_permissions
   install_initd_scripts
   start_services
   echo "==>Installation completed"
@@ -318,7 +281,7 @@ upgrade_ultimate_distrib()
   make_backup
   copy_distribution_files
   upgrade_database
-  apply_apache_settings
+  apply_permissions
   install_initd_scripts
   start_services
   echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"

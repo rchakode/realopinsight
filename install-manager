@@ -216,7 +216,7 @@ install_ultimate() {
   echo "DEBUG : Installing binaries and init.d scripts..."
   install -m 755 realopinsight-server ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
-  install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-reportd
+  install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-service
   install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
   update-rc.d realopinsight-server defaults
   update-rc.d realopinsight-reportd defaults

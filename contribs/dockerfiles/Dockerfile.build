@@ -1,0 +1,59 @@
+# Dockerfile for building the Docker distribution of RealOpInsight Ultimate
+
+FROM ubuntu:14.04
+MAINTAINER RealOpInsight Labs <support@realopinsight.com>
+ENV WT_DISTRIB_BASENAME wt-3.3.4
+ENV WT_TARBALL ${WT_DISTRIB_BASENAME}.tar.gz
+
+COPY ./container-entrypoint.sh /
+ENTRYPOINT ["/bin/bash", "/container-entrypoint.sh"]
+
+RUN apt-get update && apt-get install -y \
+	cmake  \
+    openssh-server \
+    openssh-client \
+	g++ \
+    graphviz \
+	make \
+	libboost-program-options1.54 \
+	libboost-system1.54 \
+	libboost-thread1.54 \
+	libboost-regex1.54 \
+	libboost-signals1.54  \
+	libboost-filesystem1.54 \
+	libboost-date-time1.54 \
+	libboost-program-options1.54-dev \
+	libboost-system1.54-dev \
+	libboost-thread1.54-dev \
+	libboost-regex1.54-dev \
+	libboost-signals1.54-dev \
+	libboost-filesystem1.54-dev \
+	libboost-date-time1.54-dev \
+	libboost-random1.54-dev \
+	libfcgi \
+	libfcgi-dev \
+	libgraphicsmagick++1-dev \
+	libpango1.0-dev \
+	libqt4-dev \
+	libqt4-webkit \
+	libsqlite-dev \
+	libssl-dev \
+	libzmq1 \
+	libzmq-dev
+
+
+COPY $WT_TARBALL /tmp/
+
+WORKDIR /tmp
+RUN tar zxf $WT_TARBALL
+
+WORKDIR $WT_DISTRIB_BASENAME
+RUN ["/bin/bash", "-c", "mkdir build && cd build && cmake .. -DWEBUSER=www-data -DWEBGROUP=www-data -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick && make install"]
+
+WORKDIR /tmp
+
+
+RUN rm -rf $WT_TARBALL $WT_DISTRIB_BASENAME 
+
+WORKDIR $HOME
+
