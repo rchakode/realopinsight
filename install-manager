@@ -234,7 +234,7 @@ install_ultimate() {
         ${REALOPINSIGHT_WWW}/
   
   echo "DEBUG : Settings permissions for installation directory..."
-  chmod -m 644 ${REALOPINSIGHT_WWW}/favicon.ico
+  chmod 644 ${REALOPINSIGHT_WWW}/favicon.ico
   chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
 
   
