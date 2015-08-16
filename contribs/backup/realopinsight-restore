@@ -46,11 +46,13 @@ esac
     
 if [ $OK = "OK" ]; then
   echo "Performing the restoration"
-  echo "Stopping Apache"x 
-  service apache2 stop
+  echo "Stopping RealOpInsight services"
+  service realopinsight-server stop
+  service realopinsight-reportd stop
   tar --same-owner -zxf  ${REALOPINSIGHT_EXPORT_TARBALL} -C /
-  echo "Restarting Apache"
-  service apache2 start 
+  echo "Restarting RealOpInsight services"
+  service realopinsight-server start
+  service realopinsight-reportd start
   echo "Restoration complete."
 else
   echo "Leaving the restoration script. No change has been made on the system."
