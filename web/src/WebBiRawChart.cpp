@@ -101,7 +101,6 @@ void WebBiRawChart::updateData(const QosDataList& data)
     serie.setFillRange(Wt::Chart::MinimumValueFill);
     addSeries(serie);
   }
-
   setChartTitle();
 }
 
@@ -109,7 +108,6 @@ void WebBiRawChart::updateData(const QosDataList& data)
 void WebBiRawChart::resetDataModel(Wt::WStandardItemModel* model)
 {
   setModel(model);
-  if (m_dataModel)
-    delete m_dataModel;
+  if (m_dataModel) delete m_dataModel;
   m_dataModel = model;
 }

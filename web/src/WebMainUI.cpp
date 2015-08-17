@@ -387,6 +387,10 @@ void WebMainUI::resetTimer(qint32 interval)
 
 void WebMainUI::handleRefresh(void)
 {
+  QString logMsg;
+  logMsg = QObject::tr("console update triggered (operator: %1, session: %2)")
+           .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
+  CORE_LOG("info", logMsg.toStdString());
   m_globalTimer.stop();
 
   std::map<int, int> problemTypeCount;
@@ -397,29 +401,22 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
   // clear the notification manager when applicable
-  if (m_notificationManager) {
-    m_notificationManager->clearAllServicesData();
-  }
+  m_notificationManager->clearAllServicesData();
 
   QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
   int currentView = 1;
-
   for (auto& dashboard : m_dashboardMap) {
     dashboard->initSettings(& m_dataSourceSettingsForm);
     dashboard->runMonitor();
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
-
     NodeT rootService = dashboard->rootNode();
     int platformSeverity = qMin(rootService.sev, static_cast<int>(ngrt4n::Unknown));
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
-      if (m_notificationManager) {
-        m_notificationManager->updateServiceData(rootService);
-      }
+      m_notificationManager->updateServiceData(rootService);
     }
-
     std::string viewName =  rootService.name.toStdString();
     ThumbnailMapT::Iterator thumbnailItem = m_thumbsWidgets.find(viewName);
     if (thumbnailItem != m_thumbsWidgets.end()) {
@@ -431,18 +428,20 @@ void WebMainUI::handleRefresh(void)
     }
     ++currentView;
   }
-
   // Display notifications only on operator console
   if (! m_dbSession->isLoggedAdmin()) {
     for(auto severityEntry: problemTypeCount) {
       m_notificationBoxes[severityEntry.first]->setText(QString::number(severityEntry.second).toStdString());
       m_notificationBoxes[severityEntry.first]->setHidden(severityEntry.second <= 0);
     }
-
     updateEventFeeds();
   } // notification section
 
   startTimer();
+
+  logMsg = QObject::tr("console update completed (operator: %1, session: %2)")
+           .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
+  CORE_LOG("info", logMsg.toStdString());
 }
 
 
@@ -1135,14 +1134,11 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
 
 void WebMainUI::startDashbaordUpdate(void)
 {
-  Wt::WTimer* tmpTimer(new Wt::WTimer);
+  Wt::WTimer* tmpTimer(new Wt::WTimer());
   tmpTimer->setInterval(2000);
   tmpTimer->start();
-  tmpTimer->timeout().connect(std::bind([=](){
-                                          tmpTimer->stop();
-                              delete tmpTimer;
-      handleRefresh();
-}));
+  tmpTimer->timeout().connect(std::bind([=](){tmpTimer->stop();
+                              delete tmpTimer; handleRefresh();}));
 }
 
 
