@@ -121,29 +121,15 @@ body, html {
 
 
 #ngrt4n-content-pane {
-/*
-  width: 70%;
-  margin-left: 5px;
-  float: left;
-*/
   overflow: auto;
 }
 
 #ngrt4n-side-pane {
-/*
-  float: right;
-  width: 29%;
-  margin-left: 5px;
-*/
   overflow: auto;
 }
 
 #ngrt4n-content-pane .ngrt4n-content, 
 #ngrt4n-side-pane .ngrt4n-content {
-/*
-  width: 98%;
-  height: 100%;
-*/
   border-radius: 5px;
   overflow: auto;
   background-color: #ffffff;
