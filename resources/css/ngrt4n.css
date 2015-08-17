@@ -211,12 +211,6 @@ body, html {
   padding: 5;
 }
 
-.span-one-third {
-  position: relative;
-  width: 31%;
-  margin: 1%;
-}
-
 .center {
   width: 25%;
   margin-left: auto;
