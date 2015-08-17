@@ -26,6 +26,7 @@ WT_SRC_DIR=wt/extlibs
 BASE_BUILD_DIR=`pwd`
 QT_PROJECT_FILE=ngrt4n-web.pro
 REALOPINSIGHT_USER=realopinsight
+REALOPINSIGHT_GROUP=$REALOPINSIGHT_USER
 REALOPINSIGHT_INSTALL_PREFIX=/opt/realopinsight
 REALOPINSIGHT_WWW=${REALOPINSIGHT_INSTALL_PREFIX}/www
 
@@ -158,16 +159,19 @@ install_default(){
 }
 
 build_standalone_binary() {
+  echo "DEBUG : Building RealOpInsight Ultimate http server..."
   ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 build_fcgi_binary() {
+  echo "DEBUG : Building RealOpInsight for FastCGI..."
   ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-fcgi ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 install_reportd() {
+  echo "DEBUG : Building QoS Data collector..."
   ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-reportd ${dflag}
   make -j${NCPU} 1>>install.log
 }
@@ -192,12 +196,8 @@ install_ultimate() {
   echo "DEBUG : Generating locale file"
   lrelease $QT_PROJECT_FILE
 
-  echo "DEBUG : Building RealOpInsight Standalone..."
   build_standalone_binary
-  echo "DEBUG : Building RealOpInsight for FastCGI..."
-  build_fcgi_binary
-
-  echo "DEBUG : Building QoS Data collector..."
+  #build_fcgi_binary
   install_reportd
 
   echo "DEBUG : Installing setting files..."
@@ -235,7 +235,7 @@ install_ultimate() {
   
   echo "DEBUG : Settings permissions for installation directory..."
   chmod -m 644 ${REALOPINSIGHT_WWW}/favicon.ico
-  chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_USER ${REALOPINSIGHT_INSTALL_PREFIX}/
+  chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
 
   
   echo "DEBUG : Starting services..."
