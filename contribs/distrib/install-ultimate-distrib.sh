@@ -61,11 +61,7 @@ prompt_copyright()
 
 check_realopinsight_user()
 {
-  if $REALOPINSIGHT_USER || useradd $REALOPINSIGHT_USER
-  if [ -z "$WWW_USER" ]; then
-    echo "ERROR: WWW_USER not set"
-	exit 1
-  fi
+  id $REALOPINSIGHT_USER || useradd $REALOPINSIGHT_USER
 }
 
 
@@ -125,6 +121,7 @@ prompt_to_get_current_db_version()
   echo
   echo "    1) 2014b7"
   echo "    2) 2014b8"
+  echo "    3) 2015r1/2015r2"
   echo "    q|Q) Quit"
   echo
 
@@ -135,6 +132,9 @@ prompt_to_get_current_db_version()
              break
          ;;
          2) INSTALLED_VERSION="2014b8"
+             break
+         ;;
+         3) INSTALLED_VERSION="2015r12"
              break
          ;;
          q|Q) exit 0
@@ -169,8 +169,7 @@ upgrade_database()
   elif [ "${INSTALLED_VERSION}" == "2014b8" ]; then
     update_db_2015r1
   else
-    echo "Unknown version ${INSTALLED_VERSION}"
-    exit 1
+    echo "DEBUG: No database updates"
   fi
 }
 

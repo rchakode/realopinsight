@@ -18,13 +18,13 @@ REALOPINSIGHT_GROUP=realopinsight
 
 print_usage()
 {
-  echo "`basename $0` <version> <install_prefix> <www_dir>"
+  echo "`basename $0` <version>"
 }
 
 
 check_usage()
 {
-  if [ $# -ne 3 ]; then
+  if [ $# -ne 1 ]; then
     print_usage
     exit 1
   fi
@@ -137,7 +137,7 @@ move_to_working_dir()
 
 copy_readme_files()
 {
-  cp ${CONTRIBS_DIR}/README_INSTALL ${DISTRIB_PKG_NAME}/
+  cp ${CONTRIBS_DIR}/distrib/README_INSTALL ${DISTRIB_PKG_NAME}/
 }
 
 
@@ -153,8 +153,7 @@ check_usage $@
 
 # set variables
 REALOPINSIGHT_VERSION=$1
-REALOPINSIGHT_INSTALL_PREFIX=$(get_absolute_path $2)
-REALOPINSIGHT_WWW_HOME=$(get_absolute_path $3)
+REALOPINSIGHT_INSTALL_PREFIX=/opt/realopinsight
 OS_NAME=$(echo `lsb_release -s -i` | sed 's/ //g' | tr '[:upper:]' '[:lower:]')
 OS_VERSION=$(echo `lsb_release -s -r` | awk '{sub("\\.", "", $0);sub("-", "", $0); sub(" ", "", $0);print $1}')
 DISTRIB_PKG_NAME="realopinsight-ultimate-${REALOPINSIGHT_VERSION}.${OS_NAME}${OS_VERSION}.`uname -m`"
