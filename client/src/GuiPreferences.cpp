@@ -191,7 +191,7 @@ void GuiPreferences::createPreferenceWindow(void)
   m_mainLayout->addWidget(createScktGrp(), ++line, 0, 1, 3);
   m_mainLayout->addWidget(m_cancelBtn, ++line, 0, Qt::AlignLeft),
       m_mainLayout->addWidget(createUpdateBtnsGrp(), line, 1, 1, 2, Qt::AlignRight);
-  m_mainLayout->addWidget(new QLabel(tr("(*) Required for Zabbix and Zenoss.")), ++line, 0, 1, 3);
+  m_mainLayout->addWidget(new QLabel(tr("(*) Required for Pandora FMS, OpManager, Zabbix, Zenoss.")), ++line, 0, 1, 3);
 
   m_mainLayout->setColumnStretch(0, 0);
   m_mainLayout->setColumnStretch(1, 6);
