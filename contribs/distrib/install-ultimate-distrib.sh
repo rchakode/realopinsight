@@ -10,8 +10,13 @@
 #--------------------------------------------------------------------------#
 
 
-set -e
 set -u
+set -e
+
+GREEN_COLOR="\\033[1;32m"
+DEFAULT_COLOR="\\033[0;39m"
+RED_COLOR="\\033[1;31m"
+
 
 REALOPINSIGHT_USER=realopinsight
 REALOPINSIGHT_GROUP=$REALOPINSIGHT_USER
@@ -149,7 +154,6 @@ update_db_2014b8()
 {
   echo -n "DEBUG: Updating database to 2014b8..."
   su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2014b8.sql"
-  restore_backup_on_error
 }
 
 
@@ -157,7 +161,6 @@ update_db_2015r1()
 {
   echo -n "DEBUG: Updating database to 2015r1..."
   su - ${WWW_USER} -c "${SQLITE3} /opt/realopinsight/data/realopinsight.db < $PWD/sql/update_2015r1.sql"
-  restore_backup_on_error
 }
 
 
@@ -178,8 +181,8 @@ make_backup()
 {
   echo -n "DEBUG: Backup current installation to ${REALOPINSIGHT_BACKUP_FILE}..."
   tar --same-owner \
-      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/run \  # fcgi session dir (deprecated)
-      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/www/run \   # thumbnails dir
+      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/run \
+      --exclude ${REALOPINSIGHT_INSTALL_PREFIX}/www/run \
       -zcf \
       ${REALOPINSIGHT_BACKUP_FILE} \
       ${REALOPINSIGHT_INSTALL_PREFIX}
@@ -248,6 +251,7 @@ copy_distribution_files()
 apply_permissions()
 {
   echo "DEBUG: Applying permissions..."
+  check_realopinsight_user
   chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}
 }
 
@@ -257,13 +261,12 @@ install_ultimate_distrib()
   echo "DEBUG: Starting the installation of RealOpInsight Ultimate $REALOPINSIGHT_VERSION..."
   stop_services
   check_root_user
-  check_realopinsight_user
   check_prerequisites
   copy_distribution_files
   apply_permissions
   install_initd_scripts
   start_services
-  echo "==>Installation completed"
+  echo -e " $GREEN_COLOR ==>Installation completed $DEFAULT_COLOR"
 }
 
 clear_deprecated_settings()
@@ -281,12 +284,12 @@ upgrade_ultimate_distrib()
   stop_services
   make_backup
   copy_distribution_files
-  upgrade_database
+  upgrade_database || upgrade_database
   apply_permissions
   install_initd_scripts
   clear_deprecated_settings
   start_services
-  echo "DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE}"
+  echo -e " $GREEN_COLOR DEBUG: Upgrade completed. Backup file: ${REALOPINSIGHT_BACKUP_FILE} $DEFAULT_COLOR"
 }
 
 
@@ -314,8 +317,8 @@ while true; do
     esac
 done
 
-echo "+=================================================+"
-echo "| Web Access: http://$HOSTNAME:4583/realopinsight |"
-echo "+=================================================+"
+echo -e " $RED_COLOR Please reboot the server before the first use: sudo reboot $DEFAULT_COLOR                         "
+echo -e " $GREEN_COLOR Web Access: http://$HOSTNAME:4583/realopinsight$DEFAULT_COLOR "
+echo -e "+==========================================================================+"
 
 exit 0
