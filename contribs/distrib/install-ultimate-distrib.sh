@@ -309,7 +309,10 @@ while true; do
     u) upgrade_ultimate_distrib
        break;;
     q|Q) break;;
-    *) echo -n "Invalid input! ";;
+    *) echo -n "Invalid input! "
+       exit 1;;
     esac
 done
+
+echo " Web Access: http://$HOSTNAME:4583/realopinsight"
 exit 0
