@@ -314,5 +314,8 @@ while true; do
     esac
 done
 
-echo " Web Access: http://$HOSTNAME:4583/realopinsight"
+echo "+=================================================+"
+echo "| Web Access: http://$HOSTNAME:4583/realopinsight |"
+echo "+=================================================+"
+
 exit 0
