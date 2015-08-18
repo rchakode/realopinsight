@@ -1,6 +1,12 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.3.0
+  * Added support of ManageEngine OpManager
+  * Generalization of automatic importation of views based-on hosts and
+    hostgroups for all supported monitors
+  * Misc code refactoring and improvments
+
 3.2.2
   * Added ability to automatically generate host/group-based business views from
     Zabbix triggers as well as from Nagios checks. The support of this feature with
