@@ -27,7 +27,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += no_keywords
 TEMPLATE = app
-REALOPINSIGHT_CORE_VERSION=3.3.0
+REALOPINSIGHT_CORE_VERSION=3.3.1
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 
 win32 {
@@ -46,8 +46,8 @@ minimal {
   SOURCES += core/src/ZmqSocket.cpp\
              client/src/WebKit.cpp
   win32 {
-    INCLUDEPATH += $$PWD/../../../ZeroMQ-2.2.0/include
-    LIBS += -L$$PWD/../../../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
+    INCLUDEPATH += $$PWD/../ZeroMQ-2.2.0/include
+    LIBS += -L$$PWD/../ZeroMQ-2.2.0/bin -llibzmq-v100-mt
   } else {
     LIBS += -lzmq
   }
