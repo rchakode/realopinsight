@@ -35,7 +35,6 @@
 int ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg)
 {
   ChecksT checks;
-
   if (importMonitorItemAsDataPoints(srcInfo, filter, checks, errorMsg) != 0) {
     errorMsg = MonitorT::toString(srcInfo.mon_type).append(": ").append(errorMsg);
     return -1;
@@ -94,30 +93,39 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
 {
   int retcode = -1;
   if (srcInfo.mon_type == MonitorT::Nagios) {
+    /* Nagios monitor ::  only Livestatus is now officially supported */
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
     if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
       retcode = -1;
     }
     errorMsg = handler.lastError();
+
   } else if (srcInfo.mon_type == MonitorT::Zabbix) {
+    /* Zabbix monitor */
     ZbxHelper handler;
     retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     }
     errorMsg = handler.lastError();
+
   } else if (srcInfo.mon_type == MonitorT::Zenoss) {
+    /* Zenoss monitor */
     ZnsHelper handler(srcInfo.mon_url);
     retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     }
     errorMsg = handler.lastError();
+
   } else if (srcInfo.mon_type == MonitorT::Pandora) {
+    /* Panadora FMS monitor */
     PandoraHelper handler(srcInfo.mon_url);
     retcode = handler.loadChecks(srcInfo, checks, filter);
     errorMsg = handler.lastError();
-  } if (srcInfo.mon_type == MonitorT::OpManager) {
+
+  } else if (srcInfo.mon_type == MonitorT::OpManager) {
+    /* OpManager monitor */
     OpManagerHelper handler(srcInfo.mon_url);
     if (filter.isEmpty()) {
       retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListAllDevices, filter, checks);
@@ -130,7 +138,6 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
         }
       }
     }
-
     errorMsg = handler.lastError();
   } else {
     errorMsg = QObject::tr("Unknown data source type");

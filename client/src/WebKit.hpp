@@ -39,7 +39,7 @@ class WebKit : public QWebView
   Q_OBJECT
 
 public:
-  WebKit(const QString& = "http://realopinsight.com/en/index.php?page=contribute", QWidget* = 0);
+  WebKit(const QString& = "http://realopinsight.com/princing-and-comparison", QWidget* = 0);
   virtual ~WebKit() ;
 
 public Q_SLOTS:
