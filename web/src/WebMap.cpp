@@ -41,8 +41,8 @@ namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
-  const double THUMBNAIL_WIDTH = 140;
-  const double THUMBNAIL_HEIGHT = 70;
+  const double THUMBNAIL_WIDTH = 120;
+  const double THUMBNAIL_HEIGHT = 60;
 }
 
 WebMap::WebMap(void)
@@ -99,7 +99,7 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 
   // Draw edges
   for (auto edge=std::begin(m_cdata->edges); edge != std::end(m_cdata->edges); ++edge) {
-    (edge.key(), edge.value());
+    drawEdge(edge.key(), edge.value());
   }
   // Draw bpnodes
   for(const auto& node : m_cdata->bpnodes) {
@@ -242,11 +242,11 @@ void WebMap::handleContainedSizeChanged(double w, double h)
   }
 }
 
-void WebMap::updateThumbnail(void)
+void WebMap:: updateThumbnail(void)
 {
   static int roundCount = 0;
+  double thumbScaleX = THUMBNAIL_WIDTH / m_cdata->map_width;
   double thumbScaleY = THUMBNAIL_HEIGHT / m_cdata->map_height;
-  double thumbScaleX = THUMBNAIL_WIDTH / m_cdata->map_height;
 
   m_translateX = 10;
   m_translateY = 0;
@@ -265,7 +265,7 @@ void WebMap::updateThumbnail(void)
 
   // Now save the image
   if (m_thumbUrlPath.empty()) {
-    m_thumbUrlPath = QString("/run/thumb-%1").arg(toBase64RootNodeName()).toStdString();
+    m_thumbUrlPath = QString("/run/thumb-%1.svg").arg(toBase64RootNodeName()).toStdString();
   }
   std::ofstream output(wApp->docRoot() + m_thumbUrlPath);
   thumbnailImg.write(output);
