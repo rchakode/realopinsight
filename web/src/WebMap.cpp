@@ -98,17 +98,21 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Draw edges
-  for (auto edge=std::begin(m_cdata->edges); edge != std::end(m_cdata->edges); ++edge) { drawEdge(edge.key(), edge.value());}
-
-  // Draw nodes
-  for(const auto& node : m_cdata->bpnodes) drawNode(node);
-  for(const auto& node : m_cdata->cnodes) drawNode(node);
+  for (auto edge=std::begin(m_cdata->edges); edge != std::end(m_cdata->edges); ++edge) {
+    (edge.key(), edge.value());
+  }
+  // Draw bpnodes
+  for(const auto& node : m_cdata->bpnodes) {
+    drawNode(node);
+  }
+  // Draw cnodes
+  for(const auto& node : m_cdata->cnodes) {
+    drawNode(node);
+  }
 
   m_painter->end();
 
-  if(m_initialLoading) {
-    m_loaded.emit();
-  }
+  if (m_initialLoading) m_loaded.emit();
 }
 
 
@@ -121,8 +125,7 @@ void WebMap::layoutSizeChanged(int width, int height )
 void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX,
-                             m_cdata->map_height * m_scaleY);
+  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX, m_cdata->map_height * m_scaleY);
   updateThumbnail();
 }
 
@@ -198,19 +201,24 @@ void WebMap::drawEdge(const QString& parentId, const QString& childId)
 
 void WebMap::createNodeLink(const NodeT& node, const Wt::WPointF& pos)
 {
-  Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX, pos.y() * m_scaleY,
-                                          40 * m_scaleX, 40 * m_scaleY);
+  Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX,
+                                          pos.y() * m_scaleY,
+                                          40 * m_scaleX,
+                                          40 * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(node.toString().toStdString()));
   addArea(area);
 }
 
 void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos)
 {
-  Wt::WRectArea* area = new Wt::WRectArea(expIconPos.x() * m_scaleX, expIconPos.y() * m_scaleY,
-                                          20 * m_scaleX, 20 * m_scaleY);
+  Wt::WRectArea* area = new Wt::WRectArea(expIconPos.x() * m_scaleX,
+                                          expIconPos.y() * m_scaleY,
+                                          20 * m_scaleX,
+                                          20 * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(_node.toString().toStdString()));
-  area->clicked().connect(std::bind([=]() {expandCollapse(_node.id);}));
-addArea(area);
+  //TODO: test the replacement expression :: area->clicked().connect(std::bind([=]() {expandCollapse(_node.id);}));
+  area->clicked().connect(std::bind(&WebMap::expandCollapse, this, _node.id));
+  addArea(area);
 }
 
 void WebMap::updateNode(const NodeT&, const QString&)
@@ -237,39 +245,33 @@ void WebMap::handleContainedSizeChanged(double w, double h)
 void WebMap::updateThumbnail(void)
 {
   static int roundCount = 0;
-  double thumbWidth = THUMBNAIL_WIDTH; //change later
-  double thumbScaleY = THUMBNAIL_HEIGHT/m_cdata->map_height;
-  double thumbScaleX = THUMBNAIL_HEIGHT * thumbScaleY/m_cdata->map_height;
-  thumbWidth = thumbScaleX*m_cdata->map_width + 20;
+  double thumbScaleY = THUMBNAIL_HEIGHT / m_cdata->map_height;
+  double thumbScaleX = THUMBNAIL_WIDTH / m_cdata->map_height;
 
-  m_translateY = 10;
+  m_translateX = 10;
   m_translateY = 0;
-  Wt::WSvgImage thumbnailImg(thumbWidth, THUMBNAIL_HEIGHT + m_translateY);
+  Wt::WSvgImage thumbnailImg(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT + m_translateY);
 
   m_painter.reset(new Wt::WPainter(&thumbnailImg));
   m_painter->scale(thumbScaleX, thumbScaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
-  // Draw edges
-  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end();
-       edge != end; ++edge) { drawEdge(edge.key(), edge.value());}
-
-  // Draw nodes
-  bool drawIcon = false;
-  for(const auto& node : m_cdata->bpnodes) drawNode(node, drawIcon);
-  for(const auto& node : m_cdata->cnodes) drawNode(node, drawIcon);
+  // Just draw edges for thumbnails
+  for (StringListT::Iterator edge = m_cdata->edges.begin(), end = m_cdata->edges.end(); edge != end; ++edge) {
+    drawEdge(edge.key(), edge.value());
+  }
 
   m_painter->end();
 
   // Now save the image
   if (m_thumbUrlPath.empty()) {
-    m_thumbUrlPath = boost::filesystem::unique_path("/run/thumb-%%%%%%.svg").string();
+    m_thumbUrlPath = QString("/run/thumb-%1").arg(toBase64RootNodeName()).toStdString();
   }
   std::ofstream output(wApp->docRoot() + m_thumbUrlPath);
   thumbnailImg.write(output);
   output.close();
 
-  m_thumbImage.setImageLink(m_thumbUrlPath+"?"+QString::number(++roundCount).toStdString());
+  m_thumbImage.setImageLink (m_thumbUrlPath+"?"+QString::number(++roundCount).toStdString());
 }
 
 
@@ -311,7 +313,19 @@ void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
 
 void WebMap::removeThumdImage(void)
 {
-  qDebug()<< "removing thumb file";
   QFile file(m_thumbUrlPath.c_str());
   file.remove();
+}
+
+
+QString WebMap::toBase64RootNodeName(void)
+{
+  QString rootNodeName = "";
+  if (m_cdata) {
+    NodeListT::ConstIterator rootNodeIt;
+    if (ngrt4n::findNode(m_cdata->bpnodes, ngrt4n::ROOT_ID, rootNodeIt)){
+      rootNodeName = rootNodeIt->name;
+    }
+  }
+  return ngrt4n::toByteArray(rootNodeName).toBase64();
 }

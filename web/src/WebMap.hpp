@@ -87,6 +87,7 @@ private:
   void expandCollapse(const QString& nodeId);
   void applyVisibilityToChild(const NodeT& node, qint8 mask);
   void removeThumdImage(void);
+  QString toBase64RootNodeName(void);
 };
 
 #endif /* WEBSERVICEMAP_HPP */
