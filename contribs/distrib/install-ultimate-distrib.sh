@@ -126,7 +126,7 @@ prompt_to_get_current_db_version()
   echo
   echo "    1) 2014b7"
   echo "    2) 2014b8"
-  echo "    3) 2015r1/2015r2/2015r3.b1"
+  echo "    3) 2015r1/2015r2"
   echo "    4) 2015r3.b1"
   echo "    q|Q) Quit"
   echo
