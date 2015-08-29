@@ -126,7 +126,8 @@ prompt_to_get_current_db_version()
   echo
   echo "    1) 2014b7"
   echo "    2) 2014b8"
-  echo "    3) 2015r1/2015r2"
+  echo "    3) 2015r1/2015r2/2015r3.b1"
+  echo "    4) 2015r3.b1"
   echo "    q|Q) Quit"
   echo
 
@@ -139,7 +140,10 @@ prompt_to_get_current_db_version()
          2) INSTALLED_VERSION="2014b8"
              break
          ;;
-         3) INSTALLED_VERSION="2015r12"
+         3) INSTALLED_VERSION="2015r1_XOR_2015r2"
+             break
+         ;;
+         4) INSTALLED_VERSION="2015r3b1"
              break
          ;;
          q|Q) exit 0
@@ -271,9 +275,15 @@ install_ultimate_distrib()
 
 clear_deprecated_settings()
 {
-  a2disconf realopinsight-ultimate
-  service apache2 restart
-  rm -rf $REALOPINSIGHT_INSTALL_PREFIX/run # old fcgi session data
+  if [ "${INSTALLED_VERSION}" == "2015r1_XOR_2015r2" ]; then
+    # clear old Apache2/FastCGI settings
+    a2disconf realopinsight-ultimate
+    service apache2 restart
+    rm -rf $REALOPINSIGHT_INSTALL_PREFIX/run # old fcgi session data
+  fi
+
+  # clear old thumbnails : shall exist later to version 2015r3.b1
+  rm -rf ${REALOPINSIGHT_INSTALL_PREFIX}/www/run/*
 }
 
 upgrade_ultimate_distrib()
