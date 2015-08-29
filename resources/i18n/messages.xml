@@ -189,7 +189,7 @@
 <message id="Wt.Auth.field">
   <![CDATA[
     ${<if:{1}>}
-  <div class="control-group">
+  <div class="col-sm-12 form-group">
     <label for="${id:{1}}" class="control-label">
         ${tr:Wt.Auth.{1}}
     </label>
@@ -207,7 +207,7 @@
 
     <div class="form-horizontal">
         ${<if:passwords>}
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label for="${id:user-name}" class="control-label">
               ${user-name-label}
           </label>
@@ -219,7 +219,7 @@
         ${</if:passwords>}
 
         ${<if:oauth>}
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <div class="controls">
             <p>Or login using:</p>
               ${icons}
@@ -246,7 +246,7 @@
 <message id="userForm-template">
   <div class="form-horizontal">
     ${<if:user-name>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
         <label for="${id:user-name}" class="control-label">Login*</label>
         <div class="controls">
             ${user-name} <span class="help-inline">${user-name-info}</span>
@@ -255,7 +255,7 @@
     ${</if:user-name>}
 
     ${<if:current-password>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
         <label for="${id:current-password}" class="control-label">Current password*</label>
         <div class="controls">
            ${current-password} <span class="help-inline">${current-password-info}</span>
@@ -264,7 +264,7 @@
     ${</if:current-password>}
 
     ${<if:password>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
           <label for="${id:password}" class="control-label">Password*</label>
           <div class="controls">
               ${password}<span class="help-inline">${password-info}</span>
@@ -273,7 +273,7 @@
     ${</if:password>}
 
     ${<if:confirm-password>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
           <label for="${id:confirm-password}" class="control-label">Verify password*</label>
           <div class="controls">
               ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
@@ -282,7 +282,7 @@
     ${</if:confirm-password>}
 
     ${<if:first-name>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
         <label for="${id:first-name}" class="control-label">First name*</label>
         <div class="controls">
             ${first-name} <span class="help-inline">${first-name-info}</span>
@@ -291,7 +291,7 @@
     ${</if:first-name>}
 
     ${<if:last-name>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
         <label for="${id:last-name}" class="control-label">Last name*</label>
         <div class="controls">
             ${last-name} <span class="help-inline">${last-name-info}</span>
@@ -300,7 +300,7 @@
     ${</if:last-name>}
 
     ${<if:email>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
         <label for="${id:email}" class="control-label">Email*</label>
         <div class="controls">
             ${email} <span class="help-inline">${email-info}</span>
@@ -309,7 +309,7 @@
     ${</if:email>}
 
     ${<if:role>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
           <label for="${id:role}" class="control-label">User level*</label>
           <div class="controls">
               ${role} <span class="help-inline">${role-info}</span>
@@ -318,7 +318,7 @@
     ${</if:role>}
 
     ${<if:dashboard-mode>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
           <label for="${id:dashboard-mode}" class="control-label">Dashboard Display*</label>
           <div class="controls">
               ${dashboard-mode} <span class="help-inline">${dashboard-mode-info}</span>
@@ -327,7 +327,7 @@
     ${</if:dashboard-mode>}
 
     ${<if:dashboard-tilesperrow>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
           <label for="${id:dashboard-tilesperrow}" class="control-label">Dashboard Tiles Per Row*</label>
           <div class="controls">
               ${dashboard-tilesperrow} <span class="help-inline">${dashboard-tilesperrow-info}</span>
@@ -336,7 +336,7 @@
     ${</if:dashboard-tilesperrow>}
 
     ${<if:registration-date>}
-    <div class="control-group">
+    <div class="col-sm-12 form-group">
           <label for="${id:registration-date}" class="control-label">Registration*</label>
           <div class="controls">
               ${registration-date} <span class="help-inline">${registration-date-info}</span>
@@ -421,47 +421,47 @@
 
     <div id="auth-section">
       <fieldset>
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">Authentication Mode&nbsp;</label>
           <span>${authentication-mode}</span>
         </div>
       </fieldset>
       <fieldset id="ldap-auth-setting-section">
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">Server URI&nbsp;</label>
           <span>${ldap-server-uri}</span>
           <span>${ldap-version}</span>
         </div>
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">&nbsp;</label>
           <label class="control-label">Use Custom SSL Certificate&nbsp;</label>
           <span>${ldap-ssl-use-custom-settings}</span>
         </div>
         <!-- custom ssl settings -->
         <div id="ldap-custom-ssl-settings">
-           <div class="control-group">
+           <div class="col-sm-12 form-group">
              <label class="control-label">Certificate File&nbsp;</label>
              <span>${ldap-ssl-cert-file}</span>
            </div>
-           <div  class="control-group">
+           <div  class="col-sm-12 form-group">
              <label class="control-label">CA File&nbsp;</label>
              <span>${ldap-ssl-ca-file}</span>
            </div>
         </div> <!-- id="ldap-custom-ssl-settings" -->
 
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">Bind User DN&nbsp;</label>
           <span>${ldap-bind-user-dn}</span>
         </div>
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">Bind User Password&nbsp;</label>
           <span>${ldap-bind-user-password}</span>
         </div>
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">User Search Base&nbsp;</label>
           <span>${ldap-user-search-base}</span>
         </div>
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">User ID Attribute&nbsp;</label>
           <span>${ldap-uid-attribute}</span>
         </div>
@@ -484,27 +484,27 @@
 
     <div id="notification-section">
       <fieldset>
-        <div class="control-group">
+        <div class="col-sm-12 form-group">
           <label class="control-label">Monitor type&nbsp;</label>
           <span>${notification-type}</span>
          </div>
           <!-- mail notification settings -->
           <div id="mail-notification-settings">
-             <div class="control-group">
+             <div class="col-sm-12 form-group">
                <label class="control-label">SMTP Server&nbsp;</label>
                <span>${notification-mail-smtp-server}</span>
              </div>
-             <div class="control-group">
+             <div class="col-sm-12 form-group">
                <label class="control-label">SMTP Port&nbsp;</label>
                <span>${notification-mail-smtp-port}</span>
                <span>Enable SSL</span>
                <span>${notification-mail-smtp-use-ssl}</span>
              </div>
-             <div class="control-group">
+             <div class="col-sm-12 form-group">
                <label class="control-label">SMTP Username&nbsp;</label>
                <span>${notification-mail-smtp-username}</span>
              </div>
-             <div class="control-group">
+             <div class="col-sm-12 form-group">
                <label class="control-label">SMTP Password&nbsp;</label>
                <span>${notification-mail-smtp-password}</span>
              </div>
@@ -527,47 +527,47 @@
 <div class="form-horizontal">
   <div id="monitoring-settings-section">
      <fieldset>
-       <div class="control-group">
+       <div class="col-sm-12 form-group">
          <label class="control-label">Source&nbsp;</label>
          <span>${source-box}</span>
          <span>Type&nbsp;</span>
          <span>${monitor-type}</span>
        </div>
-       <div class="control-group">
+       <div class="col-sm-12 form-group">
         <label class="control-label">Update Interval (seconds)&nbsp;</label>
         <span>${update-interval}</span>
        </div>
      </fieldset>
 
      <fieldset>
-       <div class="control-group">
+       <div class="col-sm-12 form-group">
          <label class="control-label">Web URL&nbsp;</label>
          <span>${monitor-url}</span>
        </div>
-       <div class="control-group">
+       <div class="col-sm-12 form-group">
          <label class="control-label">Don't verify SSL certificate&nbsp;</label>
          <span>${dont-verify-ssl-certificate}</span>
        </div>
-       <div class="control-group">
+       <div class="col-sm-12 form-group">
          <label class="control-label">Auth String&nbsp;</label>
          <span>${monitor-auth-string}</span>
        </div>
-       <div class="control-group">
+       <div class="col-sm-12 form-group">
          <label class="control-label">Show auth string in clear&nbsp;</label>
          <span>${show-in-clear}</span>
        </div>
      </fieldset>
 
     <fieldset id="livetstatus-section">
-      <div class="control-group">
+      <div class="col-sm-12 form-group">
         <label class="control-label">Livestatus Host&nbsp;</label>
         <span>${livestatus-server}</span>
       </div>
-      <div class="control-group">
+      <div class="col-sm-12 form-group">
         <label class="control-label">Livestatus Port&nbsp;</label>
         <span>${livestatus-port}</span>
       </div>
-      <div class="control-group">
+      <div class="col-sm-12 form-group">
         <label class="control-label">Use ngrt4nd instead of Livestatus&nbsp;</label>
         <span>${use-ngrt4nd}</span>
       </div>
@@ -631,7 +631,7 @@
 <message id="license-activation-form.tpl">
   <form class="form-horizontal">
     <fieldset>
-      <div class="control-group">
+      <div class="col-sm-12 form-group">
         <label class="control-label">Activation Key&nbsp;</label>
         <span>${activation-key-field}</span>
       </div>
@@ -646,11 +646,11 @@
 <message id="import-hostgroup-form.tpl">
   <form class="form-horizontal">
     <fieldset>
-      <div class="control-group">
+      <div class="col-sm-12 form-group">
         <label class="control-label">Source&nbsp;</label>
         <span>${source-list-field}</span>
       </div>
-      <div class="control-group">
+      <div class="col-sm-12 form-group">
         <label class="control-label">Host/group filter&nbsp;</label>
         <span>${host-group-filter}</span>
       </div>
