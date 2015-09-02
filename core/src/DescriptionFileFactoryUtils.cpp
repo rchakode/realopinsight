@@ -95,11 +95,10 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
   if (srcInfo.mon_type == MonitorT::Nagios) {
     /* Nagios monitor ::  only Livestatus is now officially supported */
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
-    if (handler.setupSocket() != 0 || handler.loadChecks(filter, checks) != 0) {
-      retcode = -1;
+    if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
+      retcode = 0;
     }
     errorMsg = handler.lastError();
-
   } else if (srcInfo.mon_type == MonitorT::Zabbix) {
     /* Zabbix monitor */
     ZbxHelper handler;
