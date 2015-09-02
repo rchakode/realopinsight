@@ -45,7 +45,7 @@ print_usage()
 prompt_copyright()
 { 
   echo
-  echo "Thanks for choosing RealOpInsight Ultimate."
+  echo "Thanks for choosing RealOpInsight Ultimate, version $REALOPINSIGHT_VERSION."
   echo
   echo "By installing this software, you accept its terms of use."
   echo
@@ -127,7 +127,7 @@ prompt_to_get_current_db_version()
   echo "    1) 2014b7"
   echo "    2) 2014b8"
   echo "    3) 2015r1/2015r2"
-  echo "    4) 2015r3.b1"
+  echo "    4) 2015r3.b1/2015r3"
   echo "    q|Q) Quit"
   echo
 
@@ -143,7 +143,7 @@ prompt_to_get_current_db_version()
          3) INSTALLED_VERSION="2015r1_XOR_2015r2"
              break
          ;;
-         4) INSTALLED_VERSION="2015r3b1"
+         4) INSTALLED_VERSION="2015r3b1_XOR_2015r3"
              break
          ;;
          q|Q) exit 0
