@@ -36,7 +36,7 @@ class WebHostGroupServiceMap : public WebPreferencesBase, public Wt::WTemplate
 public:
   WebHostGroupServiceMap();
   ~WebHostGroupServiceMap();
-  void updateContents(void) {}
+  void updateDataSourceList(void);
   Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
   Wt::Signal<SourceT, QString>& hostgroupSubmitted() { return m_hostgroupSubmitted; }
 

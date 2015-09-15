@@ -43,22 +43,27 @@ WebHostGroupServiceMap::~WebHostGroupServiceMap()
   unbindFormWidgets();
 }
 
+
 void WebHostGroupServiceMap::addEvent(void)
 {
   m_submitButton.clicked().connect(this, &WebHostGroupServiceMap::handleSubmitTriggerred);
 }
 
 
-void WebHostGroupServiceMap::updateFormWidgets(void)
+void WebHostGroupServiceMap::updateDataSourceList(void)
 {
-  m_submitButton.setText(Q_TR("Submit"));
-  m_submitButton.setStyleClass("btn btn-info");
-
   QVector<std::string> sourceIds;
   if (activeSourceIds(sourceIds) > 0) {
     m_sourceListBox.clear();
     for(auto sid : sourceIds) m_sourceListBox.addItem(sid);
   }
+}
+
+void WebHostGroupServiceMap::updateFormWidgets(void)
+{
+  m_submitButton.setText(Q_TR("Submit"));
+  m_submitButton.setStyleClass("btn btn-info");
+  updateDataSourceList();
 }
 
 

@@ -128,8 +128,6 @@ private:
   Wt::WTemplate m_operatorHomeTpl;
   Wt::WTemplate m_adminHomePageTpl;
   Wt::WTemplate* m_breadcrumbsBar;
-  WebNotificationManager* m_notificationManager;
-  Wt::WWidget* m_notificationSection;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   WebLicenseManager* m_licenseMngtForm;
@@ -166,8 +164,10 @@ private:
   Wt::WDialog m_uploadForm;
 
   /** Executive View widgets **/
-  Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WGridLayout* m_thumbsLayout;
+  WebNotificationManager* m_notificationManager;
+  Wt::WWidget* m_notificationSection;
+  Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WContainerWidget m_eventFeedsContainer;
   Wt::WContainerWidget m_thumbsContainer;
   ThumbnailMapT m_thumbsWidgets;

@@ -55,13 +55,15 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     sessionTerminated(this),
     m_rootDir("/opt/realopinsight"),
     m_confdir(m_rootDir.append("/data")),
-    m_notificationManager(NULL),
-    m_notificationSection(NULL),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_licenseMngtForm(new WebLicenseManager(PKG_VERSION)),
     m_currentDashboard(NULL),
-    m_fileUploader(NULL)
+    m_fileUploader(NULL),
+    m_thumbsLayout(NULL),
+    m_notificationManager(NULL),
+    m_notificationSection(NULL),
+    m_eventFeedLayout(NULL)
 {
   m_breadcrumbsBar = createBreadCrumbsBarTpl();
   m_userAccountForm = createAccountPanel();
@@ -147,7 +149,7 @@ void WebMainUI::unbindExecutiveViewWidgets(void)
 void WebMainUI::unbindDashboardWidgets(void)
 {
   for (auto dashboardItem : m_dashboardMap) {
-    m_eventFeedLayout->removeItem(dashboardItem->eventFeedLayout());
+    if (m_eventFeedLayout) m_eventFeedLayout->removeItem(dashboardItem->eventFeedLayout());
     m_dashboardStackedContents.removeWidget(dashboardItem);
   }
 }
@@ -401,7 +403,7 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
   // clear the notification manager when applicable
-  m_notificationManager->clearAllServicesData();
+  if (m_notificationManager) m_notificationManager->clearAllServicesData();
 
   QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
@@ -415,7 +417,7 @@ void WebMainUI::handleRefresh(void)
     int platformSeverity = qMin(rootService.sev, static_cast<int>(ngrt4n::Unknown));
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
-      m_notificationManager->updateServiceData(rootService);
+      if (m_notificationManager) m_notificationManager->updateServiceData(rootService);
     }
     std::string viewName =  rootService.name.toStdString();
     ThumbnailMapT::Iterator thumbnailItem = m_thumbsWidgets.find(viewName);
@@ -450,7 +452,7 @@ void WebMainUI::handleImportHostGroupAsMap(void)
 {
   m_adminPanelTitle.setText(Q_TR("Auto Import Hostgroup as Service Map"));
   m_adminStackedContents.setCurrentWidget(&m_autoHostgroupImporterForm);
-  m_autoHostgroupImporterForm.updateContents();
+  m_autoHostgroupImporterForm.updateDataSourceList();
 }
 
 
@@ -686,11 +688,9 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
     } else {
-      if (m_eventFeedLayout) {
-        // the inner layout is explicitely removed
-        // when the object is destroyed
-        m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
-      }
+      // the inner layout is explicitely removed
+      // when the object is destroyed
+      if (m_eventFeedLayout) m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
 
       dashboardItem->initialize(& m_dataSourceSettingsForm);
       if (dashboardItem->lastErrorState()) {
