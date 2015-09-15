@@ -38,7 +38,7 @@ const RequestListT ZbxHelper::ReqPatterns = ZbxHelper::requestsPatterns();
 ZbxHelper::ZbxHelper(const QString & baseUrl)
   : QNetworkAccessManager(),
     m_apiUri(baseUrl%ZBX_API_CONTEXT),
-    m_trid(-1),
+    m_getTriggersByHostOrGroupApiVersion(-1),
     m_isLogged(false)
 {
   m_reqHandler.setRawHeader("Content-Type", "application/json");
@@ -63,7 +63,7 @@ ZbxHelper::requestsPatterns()
                             \"method\": \"apiinfo.version\", \
                             \"params\": [], \
                             \"id\": %9}";
-  patterns[GetTriggersByHostGroup] = "{\"jsonrpc\": \"2.0\", \
+  patterns[GetTriggersByHostOrGroup] = "{\"jsonrpc\": \"2.0\", \
                                      \"auth\": \"%1\", \
                                      \"method\": \"trigger.get\", \
                                      \"params\": { \
@@ -75,7 +75,7 @@ ZbxHelper::requestsPatterns()
                                      \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
                                      \"limit\": -1}, \
                                      \"id\": %9}";
-  patterns[GetTriggersByHostGroupV18] = "{\"jsonrpc\": \"2.0\", \
+  patterns[GetTriggersByHostOrGroupV18] = "{\"jsonrpc\": \"2.0\", \
                                         \"auth\": \"%1\", \
                                         \"method\": \"trigger.get\", \
                                         \"params\": { \
@@ -156,13 +156,13 @@ ZbxHelper::setSslPeerVerification(bool verifyPeer)
 }
 
 void
-ZbxHelper::setTrid(const QString& apiv)
+ZbxHelper::setApiVersion(const QString& apiv)
 {
   qint32 vnum = apiv.mid(0, 3).remove(".").toInt();
   if (vnum < 14) {
-    m_trid = GetTriggersByHostGroupV18;
+    m_getTriggersByHostOrGroupApiVersion = GetTriggersByHostOrGroupV18;
   } else {
-    m_trid = GetTriggersByHostGroup;
+    m_getTriggersByHostOrGroupApiVersion = GetTriggersByHostOrGroup;
   }
 }
 
@@ -267,7 +267,7 @@ ZbxHelper::processGetApiVersionReply(void)
   if (! checkBackendSuccessfulResult())
     return -1;
 
-  setTrid( m_replyJsonData.getProperty("result").toString() );
+  setApiVersion( m_replyJsonData.getProperty("result").toString() );
   return 0;
 }
 
@@ -277,8 +277,8 @@ ZbxHelper::processTriggerData(ChecksT& checks)
   // check weird reponset
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
 
-  if (tid != GetTriggersByHostGroup
-      && tid != GetTriggersByHostGroupV18
+  if (tid != GetTriggersByHostOrGroup
+      && tid != GetTriggersByHostOrGroupV18
       && tid != GetTriggersByIds) {
     m_lastError = tr("Unexpected transaction id: %1").arg(QString::number(tid));
     return -1;
@@ -307,7 +307,7 @@ ZbxHelper::processTriggerData(ChecksT& checks)
       check.status = triggerJsonData.property("priority").toInteger();
     }
 
-    if (tid == GetTriggersByHostGroupV18) {
+    if (tid == GetTriggersByHostOrGroupV18) {
       check.last_state_change = triggerJsonData.property("lastchange").toString().toStdString();
     } else {
       QScriptValueIterator item(triggerJsonData.property("items"));
@@ -340,15 +340,16 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& fi
     if (filterType == ngrt4n::GroupFilter) {
       params.push_back( QString("\"group\": \"%1\",").arg(filterValue) );
     } else {
-      params.push_back( QString("\"host\": \"%1\",").arg(filterValue) );
+      //params.push_back( QString("\"host\": \"%1\",").arg(filterValue) );
+      params.push_back( QString("\"filter\": { \"host\":[\"%1\"]},").arg(filterValue) );
     }
   } else {
     params.push_back("");
   }
   //params.push_back(filter);
-  params.push_back(QString::number(m_trid));
+  params.push_back(QString::number(m_getTriggersByHostOrGroupApiVersion));
 
-  if (postRequest(m_trid, params) != 0)
+  if (postRequest(m_getTriggersByHostOrGroupApiVersion, params) != 0)
     return -1;
 
   if (! checkBackendSuccessfulResult())
