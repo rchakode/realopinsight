@@ -1,6 +1,9 @@
 ###############################
 RealOpInsight ChangeLog
 ###############################
+3.3.3
+  * Fixed ticket #82 when host-based filtering with Zabbix 2.2 series doesn't work
+
 3.3.2
   * Fix regression related to the fix of ticket #78 when Nagios/Livestatus source was not recognized properly.
 
