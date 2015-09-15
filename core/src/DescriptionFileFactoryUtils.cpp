@@ -106,6 +106,7 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     }
+    qDebug()<< srcInfo.id << filter<< checks.size();
     errorMsg = handler.lastError();
 
   } else if (srcInfo.mon_type == MonitorT::Zenoss) {

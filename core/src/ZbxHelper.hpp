@@ -41,8 +41,8 @@ public:
   enum {
     GetLogin=1,
     GetApiVersion=2,
-    GetTriggersByHostGroup=3,
-    GetTriggersByHostGroupV18=4,
+    GetTriggersByHostOrGroup=3,
+    GetTriggersByHostOrGroupV18=4,
     GetTriggersByIds = 6,
     GetITServices = 5
   };
@@ -53,7 +53,7 @@ public:
   virtual ~ZbxHelper();
   int postRequest(qint32 reqId, const QStringList& params);
   void setBaseUrl(const QString& url) {m_apiUri = url%ZBX_API_CONTEXT; m_reqHandler.setUrl(QUrl(m_apiUri));}
-  void setTrid(const QString& apiv);
+  void setApiVersion(const QString& apiv);
   QString lastError(void) const {return m_lastError;}
   void setSslPeerVerification(bool verifyPeer);
   int parseReply(QNetworkReply* reply);
@@ -78,7 +78,7 @@ private :
   QString m_apiUri;
   QNetworkRequest m_reqHandler;
   QEventLoop m_evlHandler;
-  int m_trid;
+  int m_getTriggersByHostOrGroupApiVersion;
   bool m_isLogged;
   SourceT m_sourceInfo;
   QString m_auth;
