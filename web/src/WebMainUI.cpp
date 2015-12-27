@@ -519,7 +519,7 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 
 void WebMainUI::updateLicenseMgntForm()
 {
-  m_adminPanelTitle.setText(Q_TR("License Activation"));
+  m_adminPanelTitle.setText(Q_TR("Confirm Donation"));
   m_adminStackedContents.setCurrentWidget(m_licenseMngtForm);
   m_licenseMngtForm->updateContent();
 }
@@ -868,7 +868,7 @@ void WebMainUI::setupSettingsPage(void)
   // license activation menu
   if (m_dbSession->isLoggedAdmin()) {
     m_adminStackedContents.addWidget(m_licenseMngtForm);
-    link = new Wt::WAnchor("#", Q_TR("Activation Key"));
+    link = new Wt::WAnchor("#", Q_TR("Confirm Donation"));
     m_settingsPageTpl.bindWidget("menu-license-activation", link);
     m_menuLinks.insert(MenuAuthSettings, link);
     link->clicked().connect(this, &WebMainUI::updateLicenseMgntForm);

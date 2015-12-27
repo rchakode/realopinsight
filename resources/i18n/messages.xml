@@ -596,7 +596,7 @@
        Version: ${corelib-version}<br />
        Codename: ${codename}<br />
        Release ID: ${release-id} <br />
-       License: ${license-offer} <br />
+       Sponsorship: ${license-offer} <br />
        Bug report: <a href="mailto:${bug-report-email}">${bug-report-email}</a>
     </p>
  </div>
@@ -632,7 +632,7 @@
   <form class="form-horizontal">
     <fieldset>
       <div class="col-sm-12 form-group">
-        <label class="control-label">Activation Key&nbsp;</label>
+        <label class="control-label">Donation Code&nbsp;</label>
         <span>${activation-key-field}</span>
       </div>
     </fieldset>

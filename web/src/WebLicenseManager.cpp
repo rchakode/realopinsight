@@ -100,6 +100,9 @@ QString LicenseActivationBase::getHostId(void)
 
 bool LicenseActivationBase::canHandleNewView(int currentViewCount, int servicesCount)
 {
+  //FIXME: comment this line to start handle activation and the related limitations
+  return true;
+
   bool success = false;
   if (m_licenseLevel == UltimateStarter  && servicesCount > MAX_SERVICES_PER_VIEW_STARTER) {
     m_lastError = QObject::tr("The Starter license offer allows to handle at most %1 services. "
@@ -144,19 +147,19 @@ int LicenseActivationBase::maxAllowedSources(void) const
 
 std::string LicenseActivationBase::licenseOfferName(void) const
 {
-  std::string result = "Starter";
+  std::string result = "Not yet a sponsor";
   switch(m_licenseLevel) {
     case UltimateCorportate:
-      result = "Corporate";
+      result = "Platinium";
       break;
     case UltimateEnterprise:
-      result = "Enterprise";
+      result = "Gold";
       break;
     case UltimateMiddleBusiness:
-      result = "Middle Business";
+      result = "Silver";
       break;
     case UltimateSmallBusiness:
-      result = "Small Business";
+      result = "Bronze";
       break;
     case UltimateStarter:
     default:
@@ -185,9 +188,9 @@ void WebLicenseManager::saveActivationKey(void)
   checkInstanceActivationLevel();
   if (isActivatedInstance()) {
     m_licenseSetStatus.emit(ngrt4n::OperationSucceeded,
-                            Q_TR("Congratulation! Your license offer is now activated: ")+licenseOfferName());
+                            QString("Congratulation! You are now a %1 sponsor").arg(licenseOfferName().c_str()).toStdString());
   } else {
     m_licenseSetStatus.emit(ngrt4n::OperationFailed,
-                            Q_TR("Oups! Invalid license token"));
+                            Q_TR("Oups! Invalid donation code"));
   }
 }

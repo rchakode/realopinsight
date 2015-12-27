@@ -106,11 +106,9 @@ void AuthManager::createLoggedInView(void)
       m_licenseWarningBox->setTextFormat(Wt::XHTMLText);
       m_licenseWarningBox->setText(QString(
                                      "<div class=\"alert alert-danger\">"
-                                     "You're running a non activated (limited) version of RealOpInsight Ultimate."
-                                     " Please go to %1 in order to get an activation license key."
-                                     " <button>Got it</button>"
-                                     "</div>").arg(PKG_URL)
-                                   .toStdString() );
+                                     "Please donate to support the development of RealOpInsight Ultimate."
+                                     " <button>Click here to donate now and hide this message!</button>"
+                                     "</div>").toStdString() );
       m_licenseWarningBox->setToolTip(Q_TR("Click to hide this message"));
       m_licenseWarningBox->clicked().connect(this, &AuthManager::handleIGotLicenseWarning);
       bindWidget("update-banner", m_licenseWarningBox);
@@ -150,7 +148,8 @@ void AuthManager::handleLoginFailed(std::string data)
 
 void AuthManager::handleIGotLicenseWarning(void)
 {
-  m_licenseWarningBox->hide();
+  //FIXME: m_licenseWarningBox->hide();
+  wApp->doJavaScript("window.open('"+DONATION_URL.toStdString()+"','_blank');");
   WebPreferencesBase preferences;
   preferences.handleIGotLicenseWarning();
 }
