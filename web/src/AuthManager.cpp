@@ -38,6 +38,7 @@
 #include <Wt/WImage>
 #include <Wt/WApplication>
 #include <Wt/WEnvironment>
+#include <ctime>
 
 AuthManager::AuthManager(DbSession* dbSession)
   : Wt::Auth::AuthWidget(dbSession->loginObject()),
@@ -52,12 +53,6 @@ AuthManager::AuthManager(DbSession* dbSession)
   setModel(authModelProxy);
   setRegistrationEnabled(false);
   m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
-}
-
-
-bool AuthManager::checkLicense(void)
-{
-  return LicenseActivationBase(PKG_VERSION).isActivatedInstance();
 }
 
 
@@ -90,6 +85,21 @@ void AuthManager::createLoginView(void)
   Wt::Auth::AuthWidget::createLoginView();
   bindWidget("footer", ngrt4n::footer());
   bindWidget("info-box", m_infoBox = new Wt::WText());
+
+  bool trialExpired = false;
+  if (TRIAL_PERIOD >= 0) {
+    trialExpired = trialPeriodExpired();
+    Wt::WString endTrialDateTime = ngrt4n::wHumanTimeText(endTrialPeriod());
+    Wt::WString info = "";
+    if (trialExpired) {
+      info = Wt::WString("Your trial period has expired on {1}").arg( endTrialDateTime );
+    } else {
+      info = Wt::WString("Your trial period will expire on {1}").arg( endTrialDateTime );
+    }
+    handleLoginFailed(info.toUTF8());
+  }
+
+  setDisabled(trialExpired);
 }
 
 void AuthManager::createLoggedInView(void)
@@ -104,11 +114,18 @@ void AuthManager::createLoggedInView(void)
       // This is put into the code to avoid quick hack in translation file
       m_licenseWarningBox = new Wt::WText();
       m_licenseWarningBox->setTextFormat(Wt::XHTMLText);
-      m_licenseWarningBox->setText(QString(
-                                     "<div class=\"alert alert-danger\">"
-                                     "Please donate to support the development of RealOpInsight Ultimate."
-                                     " <button>Click here to donate now and hide this message!</button>"
-                                     "</div>").toStdString() );
+      std::string warningMsg = "";
+
+      warningMsg = "<div class=\"alert alert-danger\">"
+                   "We are using a trial version of RealOpInsight Ultimate."
+                   " <button>Please click here to purchase now!</button>"
+                   "</div>";
+      //        warningMsg = "<div class=\"alert alert-danger\">"
+      //                     "Please donate to support the development of RealOpInsight Ultimate."
+      //                     " <button>Click here to donate now and hide this message!</button>"
+      //                     "</div>";
+
+      m_licenseWarningBox->setText(warningMsg);
       m_licenseWarningBox->setToolTip(Q_TR("Click to hide this message"));
       m_licenseWarningBox->clicked().connect(this, &AuthManager::handleIGotLicenseWarning);
       bindWidget("update-banner", m_licenseWarningBox);
@@ -154,3 +171,23 @@ void AuthManager::handleIGotLicenseWarning(void)
   preferences.handleIGotLicenseWarning();
 }
 
+bool AuthManager::checkLicense(void)
+{
+  return LicenseActivationBase(PKG_VERSION).isActivatedInstance();
+}
+
+
+bool AuthManager::trialPeriodExpired(void)
+{
+  if (TRIAL_PERIOD == -1)
+    return false;
+
+  long now = time(NULL);
+
+  return (now > endTrialPeriod());
+}
+
+long AuthManager::endTrialPeriod(void)
+{
+  return BUILD_TIME + TRIAL_PERIOD * 86400;
+}

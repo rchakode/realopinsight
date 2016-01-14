@@ -57,7 +57,8 @@ private:
   void handleLoginFailed(std::string data);
   void handleIGotLicenseWarning(void);
   bool checkLicense(void);
-
+  bool trialPeriodExpired(void);
+  long endTrialPeriod(void);
 };
 
 #endif // AUTHWIDGET_HPP
