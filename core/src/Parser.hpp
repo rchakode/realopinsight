@@ -54,6 +54,7 @@ private:
   void saveCoordinatesFile(const QString& _content);
   bool parseDotResult(void);
   void parseDotResult(const QString& dotfile);
+  static QString getEspacedNodeLabel(const QString& rawLabel);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

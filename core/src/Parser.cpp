@@ -129,15 +129,20 @@ bool Parser::process(bool console)
   return console ? parseDotResult() : true;
 }
 
+
+QString Parser::getEspacedNodeLabel(const QString& rawLabel)
+{
+  QString label = rawLabel;
+  return label.replace(' ', '#').replace("\"", " ").replace("'", " ");
+}
+
+
 void Parser::updateNodeHierachy(QString& _graphContent)
 {
   _graphContent = "\n";
-  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),
-       end = m_cdata->bpnodes.end();
-       node != end; ++node) {
+  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); node != end; ++node) {
 
-    QString nname = node->name;
-    _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+    _graphContent = "\t"%node->id%"[label=\""%getEspacedNodeLabel(node->name)%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
       QStringList ids = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
       Q_FOREACH(const QString& nid, ids) {
@@ -151,11 +156,8 @@ void Parser::updateNodeHierachy(QString& _graphContent)
     }
   }
 
-  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(),
-       end = m_cdata->cnodes.end();
-       node != end; ++node) {
-    QString nname = node->name;
-    _graphContent = "\t"%node->id%"[label=\""%nname.replace(' ', '#')%"\"];\n"%_graphContent;
+  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); node != end; ++node) {
+    _graphContent = "\t"%node->id%"[label=\""%getEspacedNodeLabel(node->name)%"\"];\n"%_graphContent;
   }
 }
 
@@ -179,6 +181,7 @@ bool Parser::parseDotResult(void)
   bool error = false;
   QProcess process;
   QString plainDotFile = m_dotFile%".plain";
+  qDebug() << m_dotFile;
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
   int exitCode = process.execute("dot", arguments);
   process.waitForFinished(60000);
