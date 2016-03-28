@@ -38,10 +38,10 @@ Parser::Parser(const QString& _config, CoreDataT* _cdata)
 
 Parser::~Parser()
 {
-  QFile dotFile;
-  if (dotFile.exists(m_dotFile)) dotFile.remove(m_dotFile);
-  if (dotFile.exists(m_dotFile+".plain")) dotFile.remove(m_dotFile+".plain");
-  dotFile.close();
+  QFile fileHandler;
+  if (fileHandler.exists(m_dotFile+".plain")) fileHandler.remove(m_dotFile+".plain");
+  if (fileHandler.exists(m_dotFile) && m_lastErrorMsg.isEmpty()) fileHandler.remove(m_dotFile);
+  fileHandler.close();
 }
 
 bool Parser::process(bool console)
@@ -133,7 +133,7 @@ bool Parser::process(bool console)
 QString Parser::getEspacedNodeLabel(const QString& rawLabel)
 {
   QString label = rawLabel;
-  return label.replace(' ', '#').replace("\"", " ").replace("'", " ");
+  return label.replace(' ', '#').replace("\"", " ").replace("'", " ").replace("-", " ");
 }
 
 
@@ -181,14 +181,13 @@ bool Parser::parseDotResult(void)
   bool error = false;
   QProcess process;
   QString plainDotFile = m_dotFile%".plain";
-  qDebug() << m_dotFile;
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
   int exitCode = process.execute("dot", arguments);
   process.waitForFinished(60000);
   if (!exitCode) {
     parseDotResult(plainDotFile);
   } else {
-    m_lastErrorMsg = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
+    m_lastErrorMsg = QObject::tr("The graph engine exited on error (code: %1, file: %2").arg(QString::number(exitCode), m_dotFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     error = true;
   }
