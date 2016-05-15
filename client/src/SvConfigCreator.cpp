@@ -576,7 +576,7 @@ void SvCreator::insertFromSelected(const NodeT& node)
     return; // finish if not node found
 
   if (pnode->type != NodeType::BusinessService) {
-    ngrt4n::alert(tr("Action not allowed on this type of service <%1>").arg(NodeType::toString(pnode->type)));
+    ngrt4n::alert(tr("Action not allowed on %1").arg(NodeType::toString(pnode->type)));
     return;
   }
 
