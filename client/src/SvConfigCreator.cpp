@@ -173,7 +173,7 @@ void SvCreator::refreshUIWidgets(void)
   m_hasLeftUpdates = true;
 
   m_root = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
-  m_editor->fillInEditorWithContent(*m_root);
+  m_editor->fillInEditorFields(*m_root);
   m_tree->build();
   fillEditorFromService(m_tree->rootItem());
   updateWindowTitle("*");
@@ -329,11 +329,18 @@ void SvCreator::handleImportNagiosBPIConfigAsBusinessView(void)
         if (warningThreshold > 0 || criticalThreshold > 0) {
           currentNode->sev_crule = CalcRules::WeightedAverageWithThresholds;
         }
+        ThresholdT threshold;
         if (warningThreshold > 0.0) {
-          currentNode->thresholdLimits.push_back({warningThreshold / groupMembersCount, ngrt4n::Major, ngrt4n::Major});
+          threshold.weight = warningThreshold / groupMembersCount;
+          threshold.sev_in = ngrt4n::Major;
+          threshold.sev_out = ngrt4n::Major;
+          currentNode->thresholdLimits.push_back(threshold);
         }
         if (warningThreshold > 0.0 ) {
-          currentNode->thresholdLimits.push_back({criticalThreshold / groupMembersCount, ngrt4n::Critical, ngrt4n::Critical});
+          threshold.weight = criticalThreshold / groupMembersCount;
+          threshold.sev_in = ngrt4n::Critical;
+          threshold.sev_out = ngrt4n::Critical;
+          currentNode->thresholdLimits.push_back(threshold);
         }
       }
     }
@@ -565,15 +572,20 @@ NodeT SvCreator::createNode(const QString& id, const QString& label,const QStrin
 void SvCreator::insertFromSelected(const NodeT& node)
 {
   NodeListT::iterator pnode = m_cdata.bpnodes.find(m_selectedNode);
-  if (pnode != m_cdata.bpnodes.end() && pnode->type != NodeType::ITService) {
-    pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? CHILD_SEPERATOR % node.id : node.id;
-    QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
-    m_cdata.bpnodes.insert(node.id, node);
-    m_tree->setCurrentItem(lastItem);
-    fillEditorFromService(lastItem);
-  } else {
-    ngrt4n::alert(tr("This action is not allowed on the target service"));
+  if (pnode == m_cdata.bpnodes.end())
+    return; // finish if not node found
+
+  if (pnode->type != NodeType::BusinessService) {
+    ngrt4n::alert(tr("Action not allowed on this type of service <%1>").arg(NodeType::toString(pnode->type)));
+    return;
   }
+
+  pnode->child_nodes += (!(pnode->child_nodes).isEmpty())? CHILD_SEPERATOR % node.id : node.id;
+  QTreeWidgetItem* lastItem = m_tree->addNode(node, true);
+  m_cdata.bpnodes.insert(node.id, node);
+  m_tree->setCurrentItem(lastItem);
+  fillEditorFromService(lastItem);
+
 }
 
 
@@ -782,41 +794,76 @@ void SvCreator::handleTreeNodeMoved(const QString& nodeId)
   }
 }
 
-void SvCreator::handleNodeTypeActivated(qint32 targetType)
+void SvCreator::updateNodeInfo(NodeT& node)
+{
+  if (m_editor->setNodeFromEditor(node)) {
+    m_tree->findNodeItem(m_selectedNode)->setText(0, node.name);
+    m_hasLeftUpdates = true;
+    updateWindowTitle(tr("%1 Editor - %2*").arg(APP_NAME).arg(m_activeConfig));
+  }
+}
+
+void SvCreator::changeNodeTypeToITService(NodeT& node)
+{
+  if (node.type == NodeType::BusinessService && ! node.child_nodes.isEmpty()) {
+    ngrt4n::alert(tr("Action not permitted for a service having a sub service"));
+    m_editor->typeField()->setCurrentIndex(node.type);
+  } else {
+    updateNodeInfo(node);
+  }
+}
+
+void SvCreator::changeNodeTypeToBusinessService(NodeT& node)
+{
+  node.child_nodes.clear();
+  updateNodeInfo(node);
+}
+
+
+void SvCreator::changeNodeTypeToExternalService(NodeT& node)
+{
+  changeNodeTypeToITService(node);
+//  switch (node.type) {
+//    case NodeType::ITService:
+//      break;
+//    case NodeType::BusinessService:
+//      break;
+//    default:
+//      break;
+//  }
+}
+
+void SvCreator::handleNodeTypeActivated(qint32 newNodeType)
 {
   NodeListT::iterator node = m_cdata.bpnodes.find(m_selectedNode);
   if (node == m_cdata.bpnodes.end()) {
     return; // nothing to do
   }
 
-  int currentType = node->type;
-  if (targetType == NodeType::BusinessService) {
-    if (currentType == NodeType::ITService) {
-      node->child_nodes.clear();
-      if (m_editor->updateNodeInfoFromEditorContents(*node)) {
-        m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
-        m_hasLeftUpdates = true;
-        updateWindowTitle("*");
-      }
-    }
-  } else { // current type is business service
-    if (m_editor->updateNodeInfoFromEditorContents(*node)) {
-      m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
-      m_hasLeftUpdates = true;
-      updateWindowTitle("*");
-    }
+  switch(newNodeType) {
+    case NodeType::ITService:
+      changeNodeTypeToITService(*node);
+      break;
+    case NodeType::BusinessService:
+      changeNodeTypeToBusinessService(*node);
+      break;
+    case NodeType::ExternalService:
+      changeNodeTypeToExternalService(*node);
+      break;
+    default:
+      break;
   }
 }
 
-void SvCreator::updateWindowTitle(const QString& append)
+void SvCreator::updateWindowTitle(const QString& textToAppend)
 {
   if (! m_activeConfig.isEmpty()) {
-    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_activeConfig, append));
+    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_activeConfig, textToAppend));
   } else {
-    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_root->name, append));
+    setWindowTitle(tr("%1 Editor - %2%3").arg(APP_NAME, m_root->name, textToAppend));
   }
 
-  if (! append.isEmpty()) {
+  if (! textToAppend.isEmpty()) {
     showStatusMsg(tr("* Unsaved changes left"), false);
   }
 }
@@ -837,7 +884,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
 {
   NodeListT::iterator node;
   if (ngrt4n::findNode(&m_cdata, m_selectedNode, node)) {
-    if (m_editor->updateNodeInfoFromEditorContents(*node)) {
+    if (m_editor->setNodeFromEditor(*node)) {
       QTreeWidgetItem* selectedNodeItem = m_tree->findNodeItem(m_selectedNode);
       if (selectedNodeItem) {
         selectedNodeItem->setText(0, node->name);
@@ -849,7 +896,7 @@ void SvCreator::fillEditorFromService(QTreeWidgetItem* _item)
   }
   m_selectedNode = _item->data(0, QTreeWidgetItem::UserType).toString();
   if (ngrt4n::findNode(&m_cdata, m_selectedNode, node))
-    m_editor->fillInEditorWithContent(*node);
+    m_editor->fillInEditorFields(*node);
 }
 
 
@@ -857,7 +904,7 @@ void SvCreator::handleReturnPressed(void)
 {
   NodeListT::iterator node = m_cdata.bpnodes.find(m_selectedNode);
   if (node != m_cdata.bpnodes.end()) {
-    if (m_editor->updateNodeInfoFromEditorContents(*node)) {
+    if (m_editor->setNodeFromEditor(*node)) {
       m_tree->findNodeItem(m_selectedNode)->setText(0, node->name);
       m_hasLeftUpdates = true;
       updateWindowTitle("*");

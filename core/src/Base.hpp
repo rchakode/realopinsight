@@ -213,11 +213,9 @@ public:
     Decreased = 1,
     Increased = 2
   };
-
   PropRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule); }
   QString toString(void) const;
-
 private:
   int m_rule;
 };
@@ -230,11 +228,9 @@ public:
     Average = 1,
     WeightedAverageWithThresholds = 2
   };
-
   CalcRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule);}
   QString toString(void) const;
-
 private:
   int m_rule;
 };
@@ -243,9 +239,15 @@ class NodeType {
 public:
   enum {
     BusinessService = 0,
-    ITService = 1
+    ITService = 1,
+    ExternalService = 2
   };
   static QString toString(int _type);
+  static int toInt(const QString& strType);
+private:
+  static const QString ITServiceText;
+  static const QString BusinessServiceText;
+  static const QString ExternalServiceText;
 };
 
 

@@ -36,7 +36,7 @@ namespace {
   const QString ALL_HOST_GROUPS = QObject::tr("All Hosts");
   const QString DOCS_EDITOR_CONTEXT_URL = REALOPINSIGHT_EDITOR_HELP_URL;
   const QString DOCS_EDITOR_DATA_POINT_CONTEXT = REALOPINSIGHT_DATA_POINT_CONTEXT_URL;
-  }
+}
 
 ServiceEditor::ServiceEditor(QWidget* _parent )
   : QWidget(_parent),
@@ -78,6 +78,7 @@ ServiceEditor::~ServiceEditor()
   delete m_checkFieldsGroup;
   delete m_hostGroupFilterBox;
   delete m_dataPointSearchField;
+  delete m_externalServiceField;
   delete m_actionButtonBox;
   delete m_mainLayout;
 }
@@ -115,7 +116,8 @@ void ServiceEditor::layoutEditorComponents(void)
   layoutNotificationMsgFields();
   layoutCheckField();
   layoutButtonBox();
-  setEnableFields(false);
+  enableDataPointFields(false);
+  showExternalServiceFields(false);
 }
 
 void ServiceEditor::updateDataPoints(const ChecksT& checks, const QString& srcId)
@@ -143,48 +145,66 @@ void ServiceEditor::updateDataPoints(const ChecksT& checks, const QString& srcId
   handleUpdateDataPointsList();
 }
 
-void ServiceEditor::setEnableFields(const bool& enable)
+void ServiceEditor::enableDataPointFields(bool enable)
 {
   m_checkFieldsGroup->setEnabled(enable);
   m_fieldWidgets[ALARM_MSG_FIELD]->setEnabled(enable);
   m_fieldWidgets[NOTIFICATION_MSG_FIELD]->setEnabled(enable);
 }
 
-bool ServiceEditor::updateNodeInfoFromEditorContents(NodeT& _node)
+
+void ServiceEditor::showExternalServiceFields(bool enable)
+{
+  m_externalServiceField->setVisible(enable);
+}
+
+
+
+bool ServiceEditor::setNodeFromEditor(NodeT& _node)
 {
   _node.name             = nameField()->text();
   _node.type             = typeField()->currentIndex();
-  _node.sev_crule        = m_calcRulesBox->itemData( m_calcRulesBox->currentIndex() ).toInt();
-  _node.sev_prule        = m_propRulesBox->itemData( m_propRulesBox->currentIndex() ).toInt();
+  _node.sev_crule        = m_calcRulesBox->itemData(m_calcRulesBox->currentIndex()).toInt();
+  _node.sev_prule        = m_propRulesBox->itemData(m_propRulesBox->currentIndex()).toInt();
   _node.icon             = iconField()->currentText();
   _node.description      = descriptionField()->toPlainText();
   _node.alarm_msg        = alarmMsgField()->toPlainText();
   _node.notification_msg = notificationMsgField()->toPlainText();
   _node.weight           = m_weightBox->value();
-  _node.thresholdLimits = ThresholdHelper::dataToList( thresholdsData() );
+  _node.thresholdLimits = ThresholdHelper::dataToList(thresholdsData());
 
-  if (_node.type == NodeType::ITService) {
-    QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
-    if (! selectedItems.isEmpty())
-      _node.child_nodes = selectedItems.at(0)->text();
+  switch (_node.type) {
+    case NodeType::ITService:
+    {
+      QList<QListWidgetItem*> selectedItems = checkField()->selectedItems();
+      if (! selectedItems.isEmpty()) _node.child_nodes = selectedItems.at(0)->text();
+    }
+      break;
+
+    case NodeType::ExternalService:
+      _node.child_nodes = m_externalServiceField->text();
+      break;
+
+    case NodeType::BusinessService:
+    default:
+      break;
   }
 
   return true;
 }
 
-void ServiceEditor::fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId)
+void ServiceEditor::fillInEditorFields(const NodeListT& nodes, const QString& nodeId)
 {
   NodeListT::const_iterator node = nodes.find(nodeId);
-  if (node != nodes.end())
-    fillInEditorWithContent(*node);
+  if (node != nodes.end()) fillInEditorFields(*node);
 }
 
-void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
+void ServiceEditor::fillInEditorFields(const NodeT& _node)
 {
   nameField()->setText(_node.name);
   typeField()->setCurrentIndex(_node.type);
-  m_calcRulesBox->setCurrentIndex( m_calcRulesBox->findData( CalcRules(_node.sev_crule).data() ));
-  m_propRulesBox->setCurrentIndex( m_propRulesBox->findData( PropRules(_node.sev_prule).data() ));
+  m_calcRulesBox->setCurrentIndex(m_calcRulesBox->findData(CalcRules(_node.sev_crule).data()));
+  m_propRulesBox->setCurrentIndex(m_propRulesBox->findData(PropRules(_node.sev_prule).data()));
   m_weightBox->setValue(_node.weight);
   iconField()->setCurrentIndex(iconField()->findText((_node.icon)));
   descriptionField()->setText(_node.description);
@@ -205,18 +225,32 @@ void ServiceEditor::fillInEditorWithContent(const NodeT& _node)
     }
   }
 
-  if (_node.type == NodeType::ITService) {
-    QStringList childNodes = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-    QStringList::iterator childNodeIt = childNodes.begin();
-    if (childNodeIt != childNodes.end()) {
-      QString checkId = (*childNodeIt).trimmed();
-      QList<QListWidgetItem*> matchs = checkField()->findItems(checkId, Qt::MatchExactly);
-      if (! matchs.isEmpty()) {
-        checkField()->setCurrentItem(matchs.at(0));
-      } else {
-        addAndSelectDataPointEntry(checkId);
+  switch(_node.type) {
+    case NodeType::ITService:
+    {
+      m_externalServiceField->clear();
+      QStringList childNodes = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
+      QStringList::iterator childNodeIt = childNodes.begin();
+      if (childNodeIt != childNodes.end()) {
+        QString checkId = (*childNodeIt).trimmed();
+        QList<QListWidgetItem*> matchs = checkField()->findItems(checkId, Qt::MatchExactly);
+        if (! matchs.isEmpty()) {
+          checkField()->setCurrentItem(matchs.at(0));
+        } else {
+          addAndSelectDataPointEntry(checkId);
+        }
       }
     }
+      break;
+
+    case NodeType::ExternalService:
+      m_externalServiceField->setText(_node.child_nodes);
+      break;
+
+    case NodeType::BusinessService:
+    default:
+      m_externalServiceField->clear();
+      break;
   }
 }
 
@@ -244,14 +278,19 @@ void ServiceEditor::layoutDescriptionFields()
 
 void ServiceEditor::layoutTypeFields()
 {
-  QComboBox* inputWidget = new QComboBox(this);
-  inputWidget->addItem( NodeType::toString(NodeType::BusinessService) );
-  inputWidget->addItem( NodeType::toString(NodeType::ITService) );
-  m_fieldWidgets[TYPE_FIELD] = inputWidget;
+  QComboBox* typeSelectionBox = new QComboBox(this);
+  typeSelectionBox->addItem(NodeType::toString(NodeType::BusinessService));
+  typeSelectionBox->addItem(NodeType::toString(NodeType::ITService));
+  typeSelectionBox->addItem(NodeType::toString(NodeType::ExternalService));
+  m_fieldWidgets[TYPE_FIELD] = typeSelectionBox;
+
+  m_externalServiceField = new QLineEdit(this);
+  m_externalServiceField->setPlaceholderText(tr("Set the name of the external service"));
 
   ++m_currentRow;
   m_mainLayout->addWidget(new QLabel(tr("Type"), this), m_currentRow, 0);
-  m_mainLayout->addWidget(typeField(), m_currentRow, 1, 1, 2);
+  m_mainLayout->addWidget(typeField(), m_currentRow, 1, 1, 1);
+  m_mainLayout->addWidget(m_externalServiceField, m_currentRow, 2, 1, 1);
 }
 
 void ServiceEditor::layoutStatusCalcFields(void)
@@ -371,6 +410,7 @@ void ServiceEditor::layoutCheckField(void)
   m_searchDataPointButton = new IconButton(":images/built-in/search_32x28.png", this);
   m_addDataPointButton = new IconButton(":images/built-in/document-add_32x32.png", this);
   m_dataPointActionButtons = new QStackedWidget(this);
+  m_dataPointActionButtons->setMaximumSize(QSize(24, 24));
   m_dataPointActionButtons->addWidget(m_searchDataPointButton);
   m_dataPointActionButtons->addWidget(m_addDataPointButton);
 
@@ -382,7 +422,6 @@ void ServiceEditor::layoutCheckField(void)
   fieldsLayout->addWidget(m_hostGroupFilterBox, 0, 0, 1, 1);
   fieldsLayout->addWidget(m_dataPointSearchField, 0, 1, 1, 1);
   fieldsLayout->addWidget(m_dataPointActionButtons, 0, 2, 1, 1);
-  m_dataPointActionButtons->setMaximumSize(QSize(24, 24));
   fieldsLayout->addWidget(checkField(), 1, 0, 1, 3);
 
   m_checkFieldsGroup->setLayout(fieldsLayout);
@@ -403,22 +442,42 @@ void ServiceEditor::layoutButtonBox(void)
   m_mainLayout->addWidget(m_actionButtonBox, ++m_currentRow, 2);
 }
 
-void ServiceEditor::handleNodeTypeChanged( const QString& _text)
+void ServiceEditor::handleNodeTypeChanged(const QString& typeText)
 {
-  if(_text == NodeType::toString(NodeType::ITService)) {
-    setEnableFields(true);
-  } else {
-    setEnableFields(false);
-    checkField()->setCurrentRow(0);
+  int type = NodeType::toInt(typeText);
+  switch (type) {
+    case NodeType::ITService:
+      enableDataPointFields(true);
+      showExternalServiceFields(false);
+      break;
+    case NodeType::BusinessService:
+      enableDataPointFields(false);
+      showExternalServiceFields(false);
+      checkField()->setCurrentRow(0);
+      break;
+    case NodeType::ExternalService:
+      showExternalServiceFields(true);
+      break;
+    default:
+      break;
   }
 }
 
-void ServiceEditor::handleNodeTypeActivated( const QString& _text)
+void ServiceEditor::handleNodeTypeActivated(const QString& typeText)
 {
-  if(_text == NodeType::toString(NodeType::ITService)) {
-    Q_EMIT nodeTypeActivated(NodeType::ITService);
-  } else {
-    Q_EMIT nodeTypeActivated(NodeType::BusinessService);
+  int type = NodeType::toInt(typeText);
+  switch (type) {
+    case NodeType::ITService:
+      Q_EMIT nodeTypeActivated(NodeType::ITService);
+      break;
+    case NodeType::BusinessService:
+      Q_EMIT nodeTypeActivated(NodeType::BusinessService);
+      break;
+    case NodeType::ExternalService:
+      Q_EMIT nodeTypeActivated(NodeType::ExternalService);
+      break;
+    default:
+      break;
   }
 }
 
