@@ -130,7 +130,7 @@ bool Parser::process(bool console)
 }
 
 
-QString Parser::getEspacedNodeLabel(const QString& rawLabel)
+QString Parser::espacedNodeLabel(const QString& rawLabel)
 {
   QString label = rawLabel;
   return label.replace(' ', '#').replace("\"", " ").replace("'", " ").replace("-", " ");
@@ -142,7 +142,7 @@ void Parser::updateNodeHierachy(QString& _graphContent)
   _graphContent = "\n";
   for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); node != end; ++node) {
 
-    _graphContent = "\t"%node->id%"[label=\""%getEspacedNodeLabel(node->name)%"\"];\n"%_graphContent;
+    _graphContent = "\t"%node->id%"[label=\""%espacedNodeLabel(node->name)%"\"];\n"%_graphContent;
     if (node->child_nodes != "") {
       QStringList ids = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
       Q_FOREACH(const QString& nid, ids) {
@@ -157,7 +157,7 @@ void Parser::updateNodeHierachy(QString& _graphContent)
   }
 
   for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); node != end; ++node) {
-    _graphContent = "\t"%node->id%"[label=\""%getEspacedNodeLabel(node->name)%"\"];\n"%_graphContent;
+    _graphContent = "\t"%node->id%"[label=\""%espacedNodeLabel(node->name)%"\"];\n"%_graphContent;
   }
 }
 
