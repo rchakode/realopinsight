@@ -32,8 +32,8 @@ const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
 
-Parser::Parser(const QString& _config, CoreDataT* _cdata)
-  : m_config(_config),
+Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata)
+  : m_descriptionFile(_descriptionFile),
     m_cdata(_cdata){}
 
 Parser::~Parser()
@@ -44,18 +44,19 @@ Parser::~Parser()
   fileHandler.close();
 }
 
-bool Parser::process(bool console)
+bool Parser::process(bool consoleMode)
 {
+  m_consoleMode = consoleMode;
   ngrt4n::clearCoreData(*m_cdata);
 
-  QString graphContent = "";
+  m_dotContent.clear();
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
 
-  QFile file(m_config);
+  QFile file(m_descriptionFile);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_config);
+    m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_descriptionFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
     return false;
@@ -63,7 +64,7 @@ bool Parser::process(bool console)
 
   if (!xmlDoc.setContent(&file)) {
     file.close();
-    m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_config);
+    m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_descriptionFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     return false;
   }
@@ -102,31 +103,25 @@ bool Parser::process(bool console)
     node.check.status = -1;
     if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
 
-    if (node.type == NodeType::ITService) {
-      node.visibility = ngrt4n::Visible;
-      StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
-      m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
-
-      QString srcid = ngrt4n::getSourceIdFromStr(dataPointInfo.first);
-      if (srcid.isEmpty()) {
-        srcid = ngrt4n::sourceId(0);
-        if (console) node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
-      }
-      m_cdata->sources.insert(srcid);
-      m_cdata->cnodes.insert(node.id, node);
-    } else { // i.e. a business service
-      node.visibility = ngrt4n::Visible | ngrt4n::Expanded;
-      m_cdata->bpnodes.insert(node.id, node);
+    switch(node.type) {
+      case NodeType::BusinessService:
+        insertBusinessServiceNode(node);
+        break;
+      case NodeType::ITService:
+        insertITServiceNode(node);
+        break;
+      case NodeType::ExternalService:
+        insertExternalServiceNode(node);
+        break;
+      default:
+        break;
     }
   }
 
-  updateNodeHierachy(graphContent);
-  graphContent = m_dotHeader + graphContent;
-  graphContent += m_dotFooter;
-  saveCoordinatesFile(graphContent);
+  updateNodeHierachy();
+  saveCoordinatesFile();
 
-
-  return console ? parseDotResult() : true;
+  return m_consoleMode ? parseDotResult() : true;
 }
 
 
@@ -137,12 +132,11 @@ QString Parser::espacedNodeLabel(const QString& rawLabel)
 }
 
 
-void Parser::updateNodeHierachy(QString& _graphContent)
+void Parser::updateNodeHierachy(void)
 {
-  _graphContent = "\n";
+  m_dotContent = "\n";
   for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); node != end; ++node) {
-
-    _graphContent = "\t"%node->id%"[label=\""%espacedNodeLabel(node->name)%"\"];\n"%_graphContent;
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(node->id, espacedNodeLabel(node->name)));
     if (node->child_nodes != "") {
       QStringList ids = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
       Q_FOREACH(const QString& nid, ids) {
@@ -150,18 +144,18 @@ void Parser::updateNodeHierachy(QString& _graphContent)
         auto childNode = m_cdata->cnodes.find(nidTrimmed);
         if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nidTrimmed, childNode)) {
           childNode->parent = node->id;
-          _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
+          m_dotContent.append(QString("\t%1--%2\n").arg(node->id, childNode->id));
         }
       }
     }
   }
 
   for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); node != end; ++node) {
-    _graphContent = "\t"%node->id%"[label=\""%espacedNodeLabel(node->name)%"\"];\n"%_graphContent;
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(node->id, espacedNodeLabel(node->name)));
   }
 }
 
-void Parser::saveCoordinatesFile(const QString& _content)
+void Parser::saveCoordinatesFile(void)
 {
   m_dotFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(m_dotFile);
@@ -172,7 +166,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
     exit(1);
   }
   QTextStream fstream(&file);
-  fstream << _content;
+  fstream << m_dotHeader << m_dotContent << m_dotFooter;
   file.close();
 }
 
@@ -230,5 +224,54 @@ void Parser::parseDotResult(const QString& _plainDot)
       }
     }
     qfile.close();
+  }
+}
+
+
+void Parser::insertITServiceNode(NodeT& node)
+{
+  node.visibility = ngrt4n::Visible;
+  StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
+  m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
+
+  QString srcid = ngrt4n::getSourceIdFromStr(dataPointInfo.first);
+  if (srcid.isEmpty()) {
+    srcid = ngrt4n::sourceId(0);
+    if (m_consoleMode) node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
+  }
+  m_cdata->sources.insert(srcid);
+  m_cdata->cnodes.insert(node.id, node);
+}
+
+
+void Parser::insertBusinessServiceNode(NodeT& node)
+{
+  node.visibility = ngrt4n::Visible|ngrt4n::Expanded;
+  m_cdata->bpnodes.insert(node.id, node);
+}
+
+
+void Parser::insertExternalServiceNode(NodeT& node)
+{
+  if (! m_consoleMode) {
+    m_cdata->bpnodes.insert(node.id, node);
+    return;
+  }
+
+  QString path = QString("%1/%2.ms.ngrt4n.xml")
+                 .arg(QFileInfo(m_descriptionFile).dir().absolutePath())
+                 .arg(node.child_nodes);
+
+  CoreDataT cdata;
+  Parser parser(path, &cdata);
+  //FIXME: connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
+  if (parser.process(true)) {
+    NodeListT::Iterator rootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
+    if (rootNodeIt != cdata.bpnodes.end()) {
+      m_dotContent.append("\n%1").arg(parser.dotContent().replace(ngrt4n::ROOT_ID, node.id));
+      rootNodeIt->id = node.id;
+      m_cdata->bpnodes.unite(cdata.bpnodes);
+      m_cdata->cnodes.unite(cdata.cnodes);
+    }
   }
 }

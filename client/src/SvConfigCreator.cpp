@@ -823,14 +823,6 @@ void SvCreator::changeNodeTypeToBusinessService(NodeT& node)
 void SvCreator::changeNodeTypeToExternalService(NodeT& node)
 {
   changeNodeTypeToITService(node);
-//  switch (node.type) {
-//    case NodeType::ITService:
-//      break;
-//    case NodeType::BusinessService:
-//      break;
-//    default:
-//      break;
-//  }
 }
 
 void SvCreator::handleNodeTypeActivated(qint32 newNodeType)
