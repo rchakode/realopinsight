@@ -206,7 +206,6 @@ QString ngrt4n::generateNodeXml(const NodeT& node)
       .append( QString(" <SubServices>%1</SubServices>\n").arg(node.child_nodes) ) ;
 
   if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
-
     xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)) );
   }
 

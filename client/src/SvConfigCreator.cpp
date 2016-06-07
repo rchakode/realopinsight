@@ -158,7 +158,7 @@ void SvCreator::loadFile(const QString& _path)
     newView();
   } else {
     Parser parser(_path, &m_cdata);
-    if (! parser.process(false)) {
+    if (! parser.process(Parser::ParsingModeEditor)) {
       ngrt4n::alert(parser.lastErrorMsg());
       exit(1);
     } else {

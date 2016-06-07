@@ -26,18 +26,27 @@
 #define SNAVPARSESVCONFIG_H_
 
 #include "Base.hpp"
+#include "utilsCore.hpp"
 
 
 class Parser : public QObject
 {
   Q_OBJECT
 public:
+  static const int ParsingModeEditor = 0;
+  static const int ParsingModeDashboard = 1;
+  static const int ParsingModeExternamService = 2;
+
+public:
   Parser(const QString& _descriptionFile, CoreDataT* _cdata);
   virtual ~Parser();
-  bool process(bool consoleMode);
+  bool process(int parsingMode);
   QString dotContent(void) const {return m_dotContent;}
   QString dotFile(void) const { return m_dotFile; }
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}
+
+public Q_SLOTS :
+  void handleErrorOccurred(QString msg) { Q_EMIT errorOccurred(msg);}
 
 Q_SIGNALS:
   void errorOccurred(QString msg);
@@ -51,7 +60,7 @@ private:
   QString m_descriptionFile;
   CoreDataT* m_cdata;
   QString m_lastErrorMsg;
-  bool m_consoleMode;
+  int m_parsingMode;
 
   void updateNodeHierachy(void);
   void saveCoordinatesFile(void);

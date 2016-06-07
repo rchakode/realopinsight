@@ -102,10 +102,12 @@ void DashboardBase::initialize(Preferences* preferencePtr)
   if (! m_descriptionFile.isEmpty()) {
     Parser parser(m_descriptionFile, &m_cdata);
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
-    if (parser.process(true)) {
+    if (parser.process(Parser::ParsingModeDashboard)) {
       buildTree();
       buildMap();
       initSettings(m_preferences);
+
+
     } else {
       m_lastErrorState = true;
       m_lastErrorMsg = parser.lastErrorMsg();
