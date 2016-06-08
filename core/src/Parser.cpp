@@ -291,6 +291,8 @@ void Parser::insertExternalServiceNode(NodeT& node)
       cdata.bpnodes.insert(innerRootNode.id, innerRootNode); // now reinsert the map with its current id
       m_cdata->bpnodes.unite(cdata.bpnodes);
       m_cdata->cnodes.unite(cdata.cnodes);
+      m_cdata->hosts.unite(cdata.hosts);
+      m_cdata->sources.unite(cdata.sources);
     } else {
       qDebug() << QObject::tr("Invalid graph after parsing external description file: %1").arg(path);
     }

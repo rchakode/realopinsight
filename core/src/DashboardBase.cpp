@@ -106,8 +106,6 @@ void DashboardBase::initialize(Preferences* preferencePtr)
       buildTree();
       buildMap();
       initSettings(m_preferences);
-
-
     } else {
       m_lastErrorState = true;
       m_lastErrorMsg = parser.lastErrorMsg();
@@ -119,10 +117,9 @@ void DashboardBase::runMonitor()
 {
   Q_EMIT updateInprogress();
   resetStatData();
-  
+
   if (m_cdata.monitor == MonitorT::Auto) {
-    for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end();
-         src!=end; ++src) { runMonitor(*src);}
+    for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src) { runMonitor(*src);}
   } else {
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
@@ -405,8 +402,7 @@ void DashboardBase::initSettings(Preferences* preferencePtr)
 {
   m_sources.clear();
   SourceT src;
-  for (auto id=m_cdata.sources.begin(), end = m_cdata.sources.end(); id != end; ++id)
-  {
+  for (auto id = m_cdata.sources.begin(), end = m_cdata.sources.end(); id != end; ++id) {
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (preferencePtr->isSetSource(srcinfo.second)) {
