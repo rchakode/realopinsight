@@ -33,7 +33,6 @@
 #include "WebBiDashlet.hpp"
 #include "WebUtils.hpp"
 #include "WebNotificationManager.hpp"
-#include "WebLicenseManager.hpp"
 #include "WebNotificationPreferences.hpp"
 #include "WebAuthPreferences.hpp"
 #include "WebDataSourcePreferences.hpp"
@@ -130,7 +129,6 @@ private:
   Wt::WTemplate* m_breadcrumbsBar;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
-  WebLicenseManager* m_licenseMngtForm;
   std::map<int, Wt::WText*> m_notificationBoxes;
   DbUserManager* m_dbUserManager;
   LdapUserManager* m_ldapUserManager;
@@ -223,7 +221,6 @@ private:
   void setupUploadForm(void);
   void setupNavivationBar(void);
   void setupMainStackedContent(void);
-  void updateLicenseMgntForm();
   void unbindWidgets(void);
   void bindExecutiveViewWidgets(void);
   void unbindExecutiveViewWidgets(void);

@@ -57,7 +57,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_confdir(m_rootDir.append("/data")),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_licenseMngtForm(new WebLicenseManager(PKG_VERSION)),
     m_currentDashboard(NULL),
     m_fileUploader(NULL),
     m_thumbsLayout(NULL),
@@ -91,7 +90,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 WebMainUI::~WebMainUI()
 {
   unbindWidgets();
-  delete m_licenseMngtForm;
   CORE_LOG("debug", "Session closed");
 }
 
@@ -173,7 +171,6 @@ void WebMainUI::addEvents(void)
   m_autoHostgroupImporterForm.hostgroupSubmitted().connect(this, &WebMainUI::handleImportHostgroupSubmitted);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   m_globalTimer.timeout().connect(this, &WebMainUI::handleRefresh);
-  m_licenseMngtForm->licenseKeyChanged().connect(this, &WebMainUI::showMessage);
   m_uploadSubmitButton.clicked().connect(this, &WebMainUI::handleUploadSubmitButton);
   m_uploadCancelButton.clicked().connect(this, &WebMainUI::handleUploadCancelButton);
 }
@@ -517,16 +514,6 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 }
 
 
-void WebMainUI::updateLicenseMgntForm()
-{
-  m_adminPanelTitle.setText(Q_TR("Confirm Donation"));
-  m_adminStackedContents.setCurrentWidget(m_licenseMngtForm);
-  m_licenseMngtForm->updateContent();
-}
-
-
-
-
 void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup)
 {
   CoreDataT cdata;
@@ -864,17 +851,6 @@ void WebMainUI::setupSettingsPage(void)
   m_settingsPageTpl.bindWidget("menu-change-password", link);
   m_menuLinks.insert(MenuChangePassword, link);
   link->clicked().connect(this, &WebMainUI::handleDisplayChangePassword);
-
-  // license activation menu
-  if (m_dbSession->isLoggedAdmin()) {
-    m_adminStackedContents.addWidget(m_licenseMngtForm);
-    link = new Wt::WAnchor("#", Q_TR("Confirm Donation"));
-    m_settingsPageTpl.bindWidget("menu-license-activation", link);
-    m_menuLinks.insert(MenuAuthSettings, link);
-    link->clicked().connect(this, &WebMainUI::updateLicenseMgntForm);
-  } else {
-    m_settingsPageTpl.bindEmpty("menu-license-activation");
-  }
 }
 
 
@@ -1006,7 +982,6 @@ Wt::WDialog* WebMainUI::createAboutDialog(void)
   tpl->bindString("corelib-version", ngrt4n::libVersion().toStdString());
   tpl->bindString("codename", REL_NAME.toStdString());
   tpl->bindString("release-id", REL_INFO.toStdString());
-  tpl->bindString("license-offer", m_licenseMngtForm->licenseOfferName());
   tpl->bindString("release-year", REL_YEAR.toStdString());
   tpl->bindString("bug-report-email", REPORT_BUG.toStdString());
   tpl->bindWidget("close-button", closeButton);
@@ -1302,20 +1277,17 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
   view.name = cdata.bpnodes[ngrt4n::ROOT_ID].name.toStdString();
   view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
   view.path = path.toStdString();
-  if (! m_licenseMngtForm->canHandleNewView(m_dbSession->viewCount(), cdata.bpnodes.size() + cdata.cnodes.size()) ) {
-    showMessage(ngrt4n::OperationFailed, m_licenseMngtForm->lastError());
+
+  if (m_dbSession->addView(view) != 0){
+    showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
   } else {
-    if (m_dbSession->addView(view) != 0){
-      showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
-    } else {
-      QString viewName(view.name.c_str());
-      QString viewPath(view.path.c_str());
-      QString srvCountStr = QString::number(view.service_count);
-      std::string msg = QObject::tr("Added: %1 (%2 Services) - Path: %3"
-                                    ).arg(viewName, srvCountStr, viewPath).toStdString();
-      showMessage(ngrt4n::OperationSucceeded, msg);
-      CORE_LOG("info", msg);
-    }
+    QString viewName(view.name.c_str());
+    QString viewPath(view.path.c_str());
+    QString srvCountStr = QString::number(view.service_count);
+    std::string msg = QObject::tr("Added: %1 (%2 Services) - Path: %3"
+                                  ).arg(viewName, srvCountStr, viewPath).toStdString();
+    showMessage(ngrt4n::OperationSucceeded, msg);
+    CORE_LOG("info", msg);
   }
 }
 

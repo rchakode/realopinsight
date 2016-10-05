@@ -27,7 +27,6 @@
 #include "WebMainUI.hpp"
 #include "AuthManager.hpp"
 #include "AuthModelProxy.hpp"
-#include "WebLicenseManager.hpp"
 #include <Wt/Auth/Login>
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/AbstractUserDatabase>
@@ -85,21 +84,6 @@ void AuthManager::createLoginView(void)
   Wt::Auth::AuthWidget::createLoginView();
   bindWidget("footer", ngrt4n::footer());
   bindWidget("info-box", m_infoBox = new Wt::WText());
-
-  bool trialExpired = false;
-  if (TRIAL_PERIOD >= 0) {
-    trialExpired = trialPeriodExpired();
-    Wt::WString endTrialDateTime = ngrt4n::wHumanTimeText(endTrialPeriod());
-    Wt::WString info = "";
-    if (trialExpired) {
-      info = Wt::WString("Your trial period has expired on {1}").arg( endTrialDateTime );
-    } else {
-      info = Wt::WString("Your trial period will expire on {1}").arg( endTrialDateTime );
-    }
-    handleLoginFailed(info.toUTF8());
-  }
-
-  setDisabled(trialExpired);
 }
 
 void AuthManager::createLoggedInView(void)
@@ -110,28 +94,7 @@ void AuthManager::createLoggedInView(void)
   sessionInfo.username = m_dbSession->loggedUser().username;
   try {
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
-    if (! checkLicense() && m_dbSession->isLoggedAdmin()) {
-      // This is put into the code to avoid quick hack in translation file
-      m_licenseWarningBox = new Wt::WText();
-      m_licenseWarningBox->setTextFormat(Wt::XHTMLText);
-      std::string warningMsg = "";
-
-      warningMsg = "<div class=\"alert alert-danger\">"
-                   "We are using a trial version of RealOpInsight Ultimate."
-                   " <button>Please click here to purchase now!</button>"
-                   "</div>";
-      //        warningMsg = "<div class=\"alert alert-danger\">"
-      //                     "Please donate to support the development of RealOpInsight Ultimate."
-      //                     " <button>Click here to donate now and hide this message!</button>"
-      //                     "</div>";
-
-      m_licenseWarningBox->setText(warningMsg);
-      m_licenseWarningBox->setToolTip(Q_TR("Click to hide this message"));
-      m_licenseWarningBox->clicked().connect(this, &AuthManager::handleIGotLicenseWarning);
-      bindWidget("update-banner", m_licenseWarningBox);
-    } else {
-      bindEmpty("update-banner");
-    }
+    bindEmpty("update-banner");
   } catch (const std::bad_alloc& ) {
     bindString("main-ui", "ERROR: You are running low on memory, please upgrade your system !");
   }
@@ -160,34 +123,4 @@ void AuthManager::handleLoginFailed(std::string data)
 {
   m_infoBox->setText(data);
   m_infoBox->setStyleClass("alert alert-danger");
-}
-
-
-void AuthManager::handleIGotLicenseWarning(void)
-{
-  //FIXME: m_licenseWarningBox->hide();
-  wApp->doJavaScript("window.open('"+DONATION_URL.toStdString()+"','_blank');");
-  WebPreferencesBase preferences;
-  preferences.handleIGotLicenseWarning();
-}
-
-bool AuthManager::checkLicense(void)
-{
-  return LicenseActivationBase(PKG_VERSION).isActivatedInstance();
-}
-
-
-bool AuthManager::trialPeriodExpired(void)
-{
-  if (TRIAL_PERIOD == -1)
-    return false;
-
-  long now = time(NULL);
-
-  return (now > endTrialPeriod());
-}
-
-long AuthManager::endTrialPeriod(void)
-{
-  return BUILD_TIME + TRIAL_PERIOD * 86400;
 }

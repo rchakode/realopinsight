@@ -113,7 +113,6 @@ HEADERS += \
     web/src/WebNotificationManager.hpp \
     web/src/dbo/NotificationTableView.hpp \
     web/src/WebPreferencesBase.hpp \
-    web/src/WebLicenseManager.hpp \
     web/src/WebAuthPreferences.hpp \
     web/src/WebDataSourcePreferences.hpp \
     web/src/WebNotificationPreferences.hpp \
@@ -169,7 +168,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebNotificationManager.cpp \
     web/src/dbo/NotificationTableView.cpp \
     web/src/WebPreferencesBase.cpp \
-    web/src/WebLicenseManager.cpp \
     web/src/WebAuthPreferences.cpp \
     web/src/WebDataSourcePreferences.cpp \
     web/src/WebNotificationPreferences.cpp \

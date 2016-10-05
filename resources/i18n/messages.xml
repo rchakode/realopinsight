@@ -60,7 +60,6 @@
                 <li> ${menu-monitoring-settings}</li>
                 <li id="menu-auth-settings"> ${menu-auth-settings}</li>
                 <li id="menu-notification-settings"> ${menu-notification-settings}</li>
-                <li id="menu-license-activation"> ${menu-license-activation}</li>
                 <li> ${menu-my-account}</li>
                 <li><a href="#"> ${menu-change-password}</a></li>
               </ul>
@@ -596,7 +595,6 @@
        Version: ${corelib-version}<br />
        Codename: ${codename}<br />
        Release ID: ${release-id} <br />
-       Sponsorship: ${license-offer} <br />
        Bug report: <a href="mailto:${bug-report-email}">${bug-report-email}</a>
     </p>
  </div>
@@ -625,21 +623,6 @@
     <li>${display-only-trouble-event-box}</li>
   </ol>
 </div>
-</message>
-
-
-<message id="license-activation-form.tpl">
-  <form class="form-horizontal">
-    <fieldset>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Donation Code&nbsp;</label>
-        <span>${activation-key-field}</span>
-      </div>
-    </fieldset>
-    <div class="form-actions">
-      <span id="active-button">${activate-button}</span>
-    </div>
-  </form>
 </message>
 
 
