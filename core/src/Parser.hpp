@@ -26,35 +26,50 @@
 #define SNAVPARSESVCONFIG_H_
 
 #include "Base.hpp"
+#include "utilsCore.hpp"
 
 
 class Parser : public QObject
 {
   Q_OBJECT
 public:
-  Parser(const QString& _config, CoreDataT* _cdata);
+  static const int ParsingModeEditor = 0;
+  static const int ParsingModeDashboard = 1;
+  static const int ParsingModeExternamService = 2;
+
+public:
+  Parser(const QString& _descriptionFile, CoreDataT* _cdata);
   virtual ~Parser();
-  bool process(bool console);
+  bool process(int parsingMode);
+  QString dotContent(void) const {return m_dotContent;}
   QString dotFile(void) const { return m_dotFile; }
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}
+
+public Q_SLOTS :
+  void handleErrorOccurred(QString msg) { Q_EMIT errorOccurred(msg);}
 
 Q_SIGNALS:
   void errorOccurred(QString msg);
 
+
 private:
   static const QString m_dotHeader;
   static const QString m_dotFooter;
+  QString m_dotContent;
   QString m_dotFile;
-  QString m_config;
+  QString m_descriptionFile;
   CoreDataT* m_cdata;
   QString m_lastErrorMsg;
-  bool m_console;
+  int m_parsingMode;
 
-  void updateNodeHierachy(QString& _graphContent);
-  void saveCoordinatesFile(const QString& _content);
+  void updateNodeHierachy(void);
+  void saveCoordinatesFile(void);
   bool parseDotResult(void);
   void parseDotResult(const QString& dotfile);
-  static QString getEspacedNodeLabel(const QString& rawLabel);
+  static QString espacedNodeLabel(const QString& rawLabel);
+  void insertITServiceNode(NodeT& node);
+  void insertBusinessServiceNode(NodeT& node);
+  void insertExternalServiceNode(NodeT& node);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

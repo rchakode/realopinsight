@@ -24,6 +24,10 @@
 
 #include "Base.hpp"
 
+const QString NodeType::ITServiceText = QObject::tr("IT Service");
+const QString NodeType::BusinessServiceText = QObject::tr("Business Service");
+const QString NodeType::ExternalServiceText = QObject::tr("External Service");
+
 QString PropRules::toString(void) const
 {
   switch( static_cast<PropRulesT>(m_rule) ) {
@@ -54,15 +58,41 @@ QString CalcRules::toString(void) const
 }
 
 
-
-
-
-QString NodeType::toString(int _type)
+QString NodeType::toString(int type)
 {
-  if (_type == ITService )
-    return QObject::tr("IT Service");
-  return QObject::tr("Business Service");
+  QString result = QObject::tr("Undefined Service Type");
+  switch (type) {
+    case ITService:
+      result = ITServiceText;
+      break;
+    case BusinessService:
+      result = BusinessServiceText;
+      break;
+    case ExternalService:
+      result = ExternalServiceText;
+      break;
+    default:
+      break;
+  }
+
+  return result;
 }
+
+
+int NodeType::toInt(const QString& strType)
+{
+
+  int result = -1;
+  if (strType == ITServiceText)
+    result = ITService;
+  else if (strType == ExternalServiceText)
+    result = ExternalService;
+  else if (strType == BusinessServiceText)
+    result = BusinessService;
+
+  return result;
+}
+
 
 QString Severity::toString(void) const
 {

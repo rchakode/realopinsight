@@ -62,7 +62,7 @@ public Q_SLOTS:
   void handleReturnPressed(void);
   void handleSelectedNodeChanged(void);
   void handleTreeNodeMoved(const QString& nodeId);
-  void handleNodeTypeActivated(qint32 selectedNodeType);
+  void handleNodeTypeActivated(qint32 newNodeType);
   void handleShowOnlineResources(void);
   void handleShowAbout(void);
   void fetchSourceList(int type, QMap<QString, SourceT>& sourceInfos);
@@ -116,9 +116,13 @@ private:
                                    NodeListT& cnodes,
                                    QString& childNodeChain,
                                    bool& hasCluster);
-  void updateWindowTitle(const QString& append);
+  void updateWindowTitle(const QString& textToAppend);
   void attachOrphanedNodesToRoot(NodeListT& allnodes, NodeT& root);
   int requestImportationInfo(SourceT& srcInfo, QString& filter);
+  void changeNodeTypeToITService(NodeT& node);
+  void changeNodeTypeToBusinessService(NodeT& node);
+  void changeNodeTypeToExternalService(NodeT& node);
+  void updateNodeInfo(NodeT& node);
 };
 
 #endif /* SNAVSVCREATOR_H_ */

@@ -39,16 +39,16 @@ SvNavigatorTree::SvNavigatorTree(CoreDataT* _cdata, const bool& _enableDrag, QWi
 
 void SvNavigatorTree::dropEvent(QDropEvent * _event)
 {
-  QTreeWidgetItem* tnode = itemAt(_event->pos());
-  if(tnode && m_cdata) {
-    NodeListT::iterator  node = m_cdata->bpnodes.find(tnode->data(0, QTreeWidgetItem::UserType).toString());
-    if(node != m_cdata->bpnodes.end()) {
-      if(node->type != NodeType::ITService) {
+  QTreeWidgetItem* targetTreeNode = itemAt(_event->pos());
+  if (targetTreeNode && m_cdata) {
+    NodeListT::iterator  targetNode = m_cdata->bpnodes.find(targetTreeNode->data(0, QTreeWidgetItem::UserType).toString());
+    if (targetNode != m_cdata->bpnodes.end()) {
+      if (targetNode->type != NodeType::BusinessService) {
+        ngrt4n::alert(tr("Action not allowed on %1").arg(NodeType::toString(targetNode->type)));
+      } else {
         _event->setDropAction(Qt::MoveAction);
         QTreeWidget::dropEvent(_event);
         Q_EMIT treeNodeMoved(m_selectedNode);
-      } else {
-        ngrt4n::alert(tr("Dropping is not allowed on the target node"));
       }
     }
   }
@@ -81,11 +81,11 @@ QTreeWidgetItem* SvNavigatorTree::addNode(const NodeT& _node,
   }
 
   nitem = findNodeItem(_node.id); //FIXME : avoid research
-  if (_node.type != NodeType::ITService && ! _node.child_nodes.isEmpty()) {
+  if (_node.type == NodeType::BusinessService && ! _node.child_nodes.isEmpty()) {
     QStringList cids = _node.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
     Q_FOREACH (const QString& cid, cids) {
       GuiTreeItemListT::iterator chkit = m_items.find(cid);
-      if(chkit == m_items.end()) {
+      if (chkit == m_items.end()) {
         m_items[cid] = new QTreeWidgetItem(QTreeWidgetItem::UserType);
         nitem->addChild(m_items[cid]);
       } else {

@@ -39,17 +39,14 @@
 
 
 const qint32 MAX_NODE_NAME = 255;
-const QString NAME_FIELD = "name";
-const QString TYPE_FIELD = "type";
-const QString ICON_FIELD = "icon";
-const QString DESCRIPTION_FIELD = "description";
-const QString ALARM_MSG_FIELD = "alarmMsg";
-const QString NOTIFICATION_MSG_FIELD = "notificationMsg";
-const QString CHECK_FIELD = "CheckField";
-const QString CHECK_FILTER_FIELD = "Search...";
-const QString CHECK_HOST_GROUP_FIELD = "Select Host Group";
-const QString HIGH_CRITICITY_CALC_RULE_FIELD = "Higher Severity";
-const QString WEIGHTED_CALC_RULE_FIELD = "Equal-weighted Severity";
+const QString NAME_FIELD = "NAME_FIELD_ID";
+const QString TYPE_FIELD = "TYPE_FIELD_ID";
+const QString EXTERNAL_SERVICE_NAME = "EXTERNAL_SERVICE_FIELD_ID";
+const QString ICON_FIELD = "ICON_FIELD_ID";
+const QString DESCRIPTION_FIELD = "DESCRIPTION_FIELD_ID";
+const QString ALARM_MSG_FIELD = "ALARM_MSG_ID";
+const QString NOTIFICATION_MSG_FIELD = "NOTIFICATION_FIELD_ID";
+const QString CHECK_FIELD = "CHECK_FIELD_ID";
 
 class ServiceEditor : public QWidget
 {
@@ -63,14 +60,14 @@ public:
   virtual ~ServiceEditor();
 
   void layoutEditorComponents(void);
-  void fillInEditorWithContent(const NodeListT& nodes, const QString& nodeId);
-  void fillInEditorWithContent(const NodeT& _node);
-  bool updateNodeInfoFromEditorContents(NodeT& _node);
+  void fillInEditorFields(const NodeListT& nodes, const QString& nodeId);
+  void fillInEditorFields(const NodeT& _node);
+  bool setNodeFromEditor(NodeT& _node);
   void updateDataPoints(const ChecksT& checks, const QString& srcId);
-  void setEnableFields(const bool& enable);
 
   WidgetMapT* itemList(void) {return& m_fieldWidgets;}
   QLineEdit* nameField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[NAME_FIELD]);}
+  QLineEdit* externalServiceField(void){return dynamic_cast<QLineEdit*>(m_fieldWidgets[EXTERNAL_SERVICE_NAME]);}
   QComboBox* typeField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[TYPE_FIELD]);}
   QComboBox* iconField(void) const {return dynamic_cast<QComboBox*>(m_fieldWidgets[ICON_FIELD]);}
   QTextEdit* descriptionField(void) const {return dynamic_cast<QTextEdit*>(m_fieldWidgets[DESCRIPTION_FIELD]);}
@@ -82,8 +79,8 @@ public Q_SLOTS:
   void handleSaveClick(void) { Q_EMIT saveClicked(); }
   void handleCloseClick(void){ Q_EMIT closeClicked(); }
   void handleReturnPressed(void) { Q_EMIT returnPressed(); }
-  void handleNodeTypeChanged(const QString&);
-  void handleNodeTypeActivated(const QString& text);
+  void handleNodeTypeChanged(const QString& typeText);
+  void handleNodeTypeActivated(const QString& typeText);
   void handleDataPointFilter(const QString& text);
   void handleDataPointSearch(void) { handleDataPointFilter(m_dataPointSearchField->text()); }
   void handleAddDataPointEntry(void) { addAndSelectDataPointEntry(m_dataPointSearchField->text());}
@@ -146,6 +143,7 @@ private:
   WidgetMapT m_fieldWidgets;
   QGridLayout* m_mainLayout;
   QDialogButtonBox* m_actionButtonBox;
+  QLineEdit* m_externalServiceField;
   QMap<QString, QStringList> m_dataPoints;
   QLineEdit* m_dataPointSearchField;
   QComboBox* m_hostGroupFilterBox;
@@ -179,6 +177,9 @@ private:
   void setCheckFieldsStyle(void);
   void addAndSelectDataPointEntry(const QString& text);
   QString thresholdsData(void) const;
+
+  void enableDataPointFields(bool enable);
+  void showExternalServiceFields(bool enable);
 };
 
 #endif /* SNAVSERVICEEDITOR_H_ */

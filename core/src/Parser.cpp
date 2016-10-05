@@ -27,35 +27,37 @@
 #include "ThresholdHelper.hpp"
 #include <QObject>
 #include <QtXml>
+#include <iostream>
 
 const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
 
-Parser::Parser(const QString& _config, CoreDataT* _cdata)
-  : m_config(_config),
+Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata)
+  : m_descriptionFile(_descriptionFile),
     m_cdata(_cdata){}
 
 Parser::~Parser()
 {
-  QFile dotFile;
-  if (dotFile.exists(m_dotFile)) dotFile.remove(m_dotFile);
-  if (dotFile.exists(m_dotFile+".plain")) dotFile.remove(m_dotFile+".plain");
-  dotFile.close();
+  QFile fileHandler;
+  if (fileHandler.exists(m_dotFile+".plain")) fileHandler.remove(m_dotFile+".plain");
+  if (fileHandler.exists(m_dotFile) && m_lastErrorMsg.isEmpty()) fileHandler.remove(m_dotFile);
+  fileHandler.close();
 }
 
-bool Parser::process(bool console)
+bool Parser::process(int parsingMode)
 {
+  m_parsingMode = parsingMode;
   ngrt4n::clearCoreData(*m_cdata);
 
-  QString graphContent = "";
+  m_dotContent.clear();
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
 
 
-  QFile file(m_config);
+  QFile file(m_descriptionFile);
   if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_config);
+    m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_descriptionFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
     return false;
@@ -63,7 +65,7 @@ bool Parser::process(bool console)
 
   if (!xmlDoc.setContent(&file)) {
     file.close();
-    m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_config);
+    m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_descriptionFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     return false;
   }
@@ -102,66 +104,70 @@ bool Parser::process(bool console)
     node.check.status = -1;
     if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
 
-    if (node.type == NodeType::ITService) {
-      node.visibility = ngrt4n::Visible;
-      StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
-      m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
-
-      QString srcid = ngrt4n::getSourceIdFromStr(dataPointInfo.first);
-      if (srcid.isEmpty()) {
-        srcid = ngrt4n::sourceId(0);
-        if (console) node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
-      }
-      m_cdata->sources.insert(srcid);
-      m_cdata->cnodes.insert(node.id, node);
-    } else { // i.e. a business service
-      node.visibility = ngrt4n::Visible | ngrt4n::Expanded;
-      m_cdata->bpnodes.insert(node.id, node);
+    switch(node.type) {
+      case NodeType::BusinessService:
+        insertBusinessServiceNode(node);
+        break;
+      case NodeType::ITService:
+        insertITServiceNode(node);
+        break;
+      case NodeType::ExternalService:
+        insertExternalServiceNode(node);
+        break;
+      default:
+        break;
     }
   }
 
-  updateNodeHierachy(graphContent);
-  graphContent = m_dotHeader + graphContent;
-  graphContent += m_dotFooter;
-  saveCoordinatesFile(graphContent);
+  updateNodeHierachy();
+  saveCoordinatesFile();
 
+  if (m_parsingMode == ParsingModeDashboard)
+    return parseDotResult();
 
-  return console ? parseDotResult() : true;
+  return true;
 }
 
 
-QString Parser::getEspacedNodeLabel(const QString& rawLabel)
+QString Parser::espacedNodeLabel(const QString& rawLabel)
 {
   QString label = rawLabel;
-  return label.replace(' ', '#').replace("\"", " ").replace("'", " ");
+  return label.replace("'", " ").replace("-", " ").replace("\"", " ").replace(' ', '#');
 }
 
 
-void Parser::updateNodeHierachy(QString& _graphContent)
+void Parser::updateNodeHierachy(void)
 {
-  _graphContent = "\n";
-  for (NodeListT::ConstIterator node = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); node != end; ++node) {
+  m_dotContent.append("\n");
+  // add business service dependencies
+  for (NodeListT::ConstIterator bpnode = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); bpnode != end; ++bpnode) {
+    // Set node label
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(bpnode->id, espacedNodeLabel(bpnode->name)));
 
-    _graphContent = "\t"%node->id%"[label=\""%getEspacedNodeLabel(node->name)%"\"];\n"%_graphContent;
-    if (node->child_nodes != "") {
-      QStringList ids = node->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-      Q_FOREACH(const QString& nid, ids) {
-        QString nidTrimmed = nid.trimmed();
-        auto childNode = m_cdata->cnodes.find(nidTrimmed);
-        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nidTrimmed, childNode)) {
-          childNode->parent = node->id;
-          _graphContent += "\t" + node->id%"--"%childNode->id%"\n";
+    // create the dependency when applicable
+    if (! bpnode->child_nodes.isEmpty()) {
+      QStringList childNodeIdList = bpnode->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
+      Q_FOREACH(const QString& childNodeId, childNodeIdList) {
+        QString childNodeIdTrimmed = childNodeId.trimmed();
+        NodeListIteratorT childNode;
+        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childNodeIdTrimmed, childNode)) {
+          childNode->parent = bpnode->id;
+          m_dotContent.append(QString("\t%1--%2\n").arg(bpnode->id, childNode->id));
+        } else {
+          qDebug()<< QObject::tr("Failed to found child dependency for node '%1' => %2").arg(bpnode->id, childNodeIdTrimmed);
         }
       }
     }
   }
 
+  // Set IT service nodes' labels
   for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); node != end; ++node) {
-    _graphContent = "\t"%node->id%"[label=\""%getEspacedNodeLabel(node->name)%"\"];\n"%_graphContent;
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(node->id, espacedNodeLabel(node->name)));
   }
+
 }
 
-void Parser::saveCoordinatesFile(const QString& _content)
+void Parser::saveCoordinatesFile(void)
 {
   m_dotFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(m_dotFile);
@@ -172,7 +178,7 @@ void Parser::saveCoordinatesFile(const QString& _content)
     exit(1);
   }
   QTextStream fstream(&file);
-  fstream << _content;
+  fstream << m_dotHeader << m_dotContent << m_dotFooter;
   file.close();
 }
 
@@ -181,19 +187,19 @@ bool Parser::parseDotResult(void)
   bool error = false;
   QProcess process;
   QString plainDotFile = m_dotFile%".plain";
-  qDebug() << m_dotFile;
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
   int exitCode = process.execute("dot", arguments);
   process.waitForFinished(60000);
-  if (!exitCode) {
+  if (! exitCode) {
     parseDotResult(plainDotFile);
   } else {
-    m_lastErrorMsg = QObject::tr("The graph engine exited with the code %1").arg(exitCode);
+    m_lastErrorMsg = QObject::tr("The graph engine exited on error (code: %1, file: %2").arg(QString::number(exitCode), m_dotFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     error = true;
   }
   return ! error;
 }
+
 
 void Parser::parseDotResult(const QString& _plainDot)
 {
@@ -231,5 +237,67 @@ void Parser::parseDotResult(const QString& _plainDot)
       }
     }
     qfile.close();
+  }
+}
+
+
+void Parser::insertITServiceNode(NodeT& node)
+{
+  node.visibility = ngrt4n::Visible;
+  StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
+  m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
+
+  QString srcid = ngrt4n::getSourceIdFromStr(dataPointInfo.first);
+  if (srcid.isEmpty()) {
+    srcid = ngrt4n::sourceId(0);
+    if (m_parsingMode == ParsingModeDashboard) {
+      node.child_nodes = ngrt4n::realCheckId(srcid, node.child_nodes);
+    }
+  }
+  m_cdata->sources.insert(srcid);
+  m_cdata->cnodes.insert(node.id, node);
+}
+
+
+void Parser::insertBusinessServiceNode(NodeT& node)
+{
+  node.visibility = ngrt4n::Visible|ngrt4n::Expanded;
+  m_cdata->bpnodes.insert(node.id, node);
+}
+
+
+void Parser::insertExternalServiceNode(NodeT& node)
+{
+  if (m_parsingMode == ParsingModeEditor) {
+    m_cdata->bpnodes.insert(node.id, node);
+    return; // in editor mode, add the service in the map and return
+  }
+
+  QString baseDir = QFileInfo(m_descriptionFile).dir().absolutePath();
+  QString path = QString("%1/%2.ms.ngrt4n.xml").arg(baseDir).arg(node.child_nodes);
+
+  CoreDataT cdata;
+  Parser parser(path, &cdata);
+  if (parser.process(ParsingModeExternamService)) {
+    NodeListT::Iterator innerRootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
+
+    if (innerRootNodeIt != cdata.bpnodes.end()) {
+      // update default id for root node
+      innerRootNodeIt->id = node.id;
+      innerRootNodeIt->visibility = ngrt4n::Visible|ngrt4n::Expanded;
+      NodeT innerRootNode = *innerRootNodeIt; // backup the node content
+      cdata.bpnodes.remove(ngrt4n::ROOT_ID);  // Point to innerRootNodeIt, but its key is ngrt4n::ROOT_ID.
+                                              // We remove it to avoid duplication when joining the two hashs
+      cdata.bpnodes.insert(innerRootNode.id, innerRootNode); // now reinsert the map with its current id
+      m_cdata->bpnodes.unite(cdata.bpnodes);
+      m_cdata->cnodes.unite(cdata.cnodes);
+      m_cdata->hosts.unite(cdata.hosts);
+      m_cdata->sources.unite(cdata.sources);
+    } else {
+      qDebug() << QObject::tr("Invalid graph after parsing external description file: %1").arg(path);
+    }
+  } else {
+    m_lastErrorMsg = parser.lastErrorMsg();
+    qDebug() << m_lastErrorMsg;
   }
 }
