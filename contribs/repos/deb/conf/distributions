@@ -1,8 +1,0 @@
-Origin: RealOpInsight Labs
-Label: Maintained by Rodrigue Chakode <Rodrigue.Chakode@realopinsight.com>
-Suite: stable
-Codename: wheezy
-Version: all
-Architectures: i386 amd64 source
-Components: main
-Description: Debian 7 (Wheezy) repository for RealOpInsight's Software 

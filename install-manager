@@ -38,7 +38,7 @@ usage()
   echo "Usage: `basename $0` [OPTION]"
   echo "OPTIONS"
   echo "	-d <install_dir>"
-  echo "	  Sets the installation directory,  default is /usr/local."
+  echo "	  Sets the installation directory,  default is /opt/realopinsight."
   echo "	-n <ncpu>"
   echo "	  Sets the number of cpu to use for the compilation"
   echo "	-h"
