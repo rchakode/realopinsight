@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>RealOpInsight - Overview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="css/bootswatch.min.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="../bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="#" class="navbar-brand"><img src="./images/logo-mini.png" /></a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+
+          <ul class="nav navbar-nav navbar-right">
+             <li class="dropdown">
+                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Products<span class="caret"></span></a>
+                <ul class="dropdown-menu" aria-labelledby="themes">
+                  <li><a tabindex="-1" href="http://go.realopinsight.com">Overview</a></li>
+                  <li class="divider"></li>
+                  <li><a tabindex="-1" href="#">RealOpinsight</a></li>
+                  <li><a tabindex="-1" href="#">Ultimate RealOpinsight</a></li>
+                  <li class="divider"></li>
+                  <li><a tabindex="-1" href="#">Products Comparison</a></li>
+               </ul>
+            </li>
+            <li><a href="#">Pricing</a></li> 
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">Resources<span class="caret"></span></a>
+              <ul class="dropdown-menu" aria-labelledby="download">
+                <li><a tabindex="-1" href="#">Screenshots</a></li>
+                <li> <a href="http://labs.realopinsiht.com">QuickStart Tutorials</a></li>
+                <li> <a href="http://labs.realopinsiht.com">Documentation</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">About<span class="caret"></span></a>
+              <ul class="dropdown-menu" aria-labelledby="download">
+                <li> <a href="http://labs.realopinsiht.com">Blog</a></li>
+                <li><a tabindex="-1" href="#">Company</a></li>
+                <li><a href="#" target="_blank">Contact us</a></li>
+              </ul>
+            </li>            
+            <li><a href="#" target="_blank">Support</a></li>
+          </ul>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="container"> 
+      <div class="row">  <!-- row header -->
+        <div class="col-md-12 col-lg-12">
+          <div class="page-header" id="banner">
+            <div class="jumbotron">
+            <h1>Design For Modern IT Monitoring</h1>
+              <p>Monitoring at scale, with focus on business.</p>
+              <p><a class="btn btn-default btn-lg" role="button">Learn more</a></p>
+            </div>
+            <div class="row"> <!-- row quicklinks -->
+              <div class="col-sm-12 col-md-4 col-lg-4">
+                <p class="text-center">
+                  <a class="btn btn-success btn-lg" role="button">Download Now !</a>
+                </p>
+              </div>
+              <div class="col-sm-12 col-md-4 col-lg-4">
+               <p class="text-center">
+                <a class="btn btn-danger btn-lg" role="button">Try It Now!</a>
+               </p>
+              </div>
+              <div class="col-sm-12 col-md-4 col-lg-4">
+                <p class="text-center">
+                 <a class="btn btn-primary btn-lg" role="button">Free Trial</a>
+                </p>
+              </div>
+            </div> <!-- row quicklinks -->
+          </div> <!-- header banner -->
+       </div>
+      </div>  <!-- row header -->
+  
+      <div class="row"> <!-- row thumbnail -->
+        <div class="col-sm-12 col-md-4 col-lg-4">
+           <div class="thumbnail">
+              <div class="caption">
+                <h3>Unified Management</h3>
+                <p>Aggregate and manage events on distributed and heterogeneous environments 
+comprising of on-premise and/or cloud resources with a powerful and easy to use event 
+management system that provides business-centric dashboard management over various kinds of monitoring systems including Nagios, Zabbix, Zenoss, Icinga, Centreon, Shinken, op5, etc. 
+<a href="#">Read more</a></p>
+             </div>
+            </div>
+          </div>
+
+          <div class="col-sm-12 col-md-4 col-lg-4">
+              <div class="thumbnail">
+              <div class="caption">
+                <h3>Foster Productivity</h3>
+                <p>With advanced user roles and dashboard assignment management, fosters the 
+productivity of your operations staff by providing the right information to the right user, and at 
+the right time. RealOpInsight serves as a platform for democratizing monitoring. 
+<a href="#">Read more</a></p>
+             </div>
+            </div>            
+          </div>
+
+          <div class="col-sm-12 col-md-4 col-lg-4">
+             <div class="thumbnail">
+              <div class="caption">
+                <h3>Easy Integration</h3>
+                <p>RealOpInsight has a very low footprint in terms of complexity, 
+while providing full control of administration requirements, such as role, access control, 
+authentication and integration to external systems such as LDAP. Its advanced configuration 
+UI addresses key IT cost concerns with scalable configurations. 
+<a href="#">Read more</a>
+                </p>
+             </div>
+            </div>             
+          </div>
+
+      </div> <!-- row thumbnail -->
+
+
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">   
+            <ul class="list-unstyled">
+              <li class="pull-right"><a href="#top">Back to top</a></li>
+              <li><a href="http://labs.realopinsight.com/">Blog</a></li>
+              <li><a href="https://twitter.com/ngrt4n">Twitter</a></li>
+              <li><a href="#" target="_blank">Contact us</a></li>
+            </ul>
+          <p>Copyright &copy; 2010-2013 NGRT4N Project. All Rights Reserved.
+             <a href="http://realopinsight.com/en/index.php/page/legal">Legal Notice</a>.
+          </p>
+          </div>
+        </div>
+        
+      </footer>
+    
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootswatch.js"></script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+# To deny PHPs
+<Files ~ "\.(php|php3|php4|php5|phtml|pl|cgi)$">                                                                              
+  order deny,allow                                                                                                            
+  deny from all                                                                                                               
+</Files>  
