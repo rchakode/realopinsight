@@ -27,22 +27,22 @@ Quick Installation
 
 Assuming you ha a quick installation you will need Ubuntu 14.04 LTS 64 bits:
 
-# Checkout the latest source package from Github
+#. Checkout the latest source package from Github
 ```
 $git clone https://github.com/RealOpInsightLabs/realopinsight-ultimate.git
 ```
-# Move to the source directory
+#. Move to the source directory
 ```
 $ cd realopinsight-ultimate
 ```
 
-# Launch the installation
+#. Launch the installation
 ```
 $ sudo ./install-manager -m ultimate
 ```
 Then wait that the installation completes.
 
-# Move forward
+#. Move forward
 Please go to RealOpInsight Ultimate documentation website at http://docs.realopinsight.com, 
 go throughout our tutorials and user/administrator manuals to start mastering the software. 
 
