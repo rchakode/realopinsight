@@ -26,7 +26,7 @@ Quick Installation
 ==================
 
 You just have to follow the next steps, assuming you have a Ubuntu 14.04 LTS 64 bits with all the above dependencies installed.
-*$* indicates to a terminal prompt.
+*$* indicates a terminal prompt.
 
 1. Checkout the latest source package from Github
 
