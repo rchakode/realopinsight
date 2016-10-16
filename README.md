@@ -25,12 +25,13 @@ For building and running RealOpInsight Ultimate, you will need the following:
 Quick Installation
 ==================
 
-Assuming you ha a quick installation you will need Ubuntu 14.04 LTS 64 bits:
+You just have to follow the next steps, assuming you have a Ubuntu 14.04 LTS 64 bits with all the above dependencies installed.
+*$* indicates to a terminal prompt.
 
 1. Checkout the latest source package from Github
 
   ```
-  $git clone https://github.com/RealOpInsightLabs/realopinsight-ultimate.git
+  $ git clone https://github.com/RealOpInsightLabs/realopinsight-ultimate.git
   ```
 2. Move to the source directory
 
