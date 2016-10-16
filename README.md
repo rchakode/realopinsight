@@ -35,7 +35,7 @@ Assuming you ha a quick installation you will need Ubuntu 14.04 LTS 64 bits:
 2. Move to the source directory
 
   ```
-  $ cd realopinsight-ultimate
+  $ cd realopinsight-ultimate/
   ```
 
 3. Launch the installation
