@@ -1,6 +1,7 @@
 # ngrt4n.pro
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Copyright (c) 2010-2016 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update : 23-10-2016                                                 #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -18,6 +19,7 @@
 # You should have received a copy of the GNU General Public License        #
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.    #
 #--------------------------------------------------------------------------#
+
 
 QT	+= core xml network script
 
@@ -188,7 +190,7 @@ DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_URL='\"http://RealOpInsight.com\"'"
-DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Universe\"'"
+DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Camaraos\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2016\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"bugs@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
