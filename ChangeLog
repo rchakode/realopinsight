@@ -1,6 +1,12 @@
-###############################
-RealOpInsight ChangeLog
-###############################
+############################################
+# ChangeLog  - RealOpInsight Core Features #
+############################################
+3.3.4
+  * Fixed #52 adding capability to link to external business services
+  * Now keep Graphviz files on error in order to give more troubleshooting data
+  * Fixed ticket #86 when some special characters make Graphviz parsing with  fails
+
+
 3.3.3
   * Fixed ticket #82 when host-based filtering with Zabbix 2.2 series doesn't work
 
