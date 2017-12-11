@@ -22,18 +22,12 @@
 
 QT	+= core xml network script
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-  QT += widgets webkitwidgets
-}
-
 CONFIG += no_keywords
 TEMPLATE = app
 
 REALOPINSIGHT_CORE_VERSION=3.3.4
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
 PACKAGE_VERSION=2016r1
-
-LIBS += -lzmq
 
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
@@ -69,7 +63,6 @@ HEADERS += \
     core/src/ZbxHelper.hpp \
     core/src/ZnsHelper.hpp \
     core/src/PandoraHelper.hpp \
-    core/src/ZmqSocket.hpp \
     core/src/LsHelper.hpp \
     core/src/DashboardBase.hpp \
     core/src/utilsCore.hpp \
@@ -129,7 +122,6 @@ SOURCES +=  core/src/Base.cpp \
     core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
     core/src/ZnsHelper.cpp \
-    core/src/ZmqSocket.cpp \
     core/src/PandoraHelper.cpp \
     core/src/LsHelper.cpp \
     core/src/DashboardBase.cpp \
@@ -185,6 +177,14 @@ LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_thread -lboost_regex -lboost_signals \
         -lboost_filesystem -lboost_date_time \
         -lldap
+
+enable-ngrt4nd {
+  DEFINES *= "REALOPINSIGHT_ENABLE_ZMQ=true"
+  HEADERS += core/src/ZmqSocket.hpp
+  SOURCES += core/src/ZmqSocket.cpp
+  LIBS += -lzmq
+}
+
 
 webd {
   SOURCES += web/src/ngrt4n-web.cpp

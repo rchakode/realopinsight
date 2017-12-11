@@ -60,7 +60,7 @@ public:
   void extractStatsData(CheckStatusCountT& statsData, qint32& count);
 
 public Q_SLOTS:
-#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#ifdef REALOPINSIGHT_ENABLE_ZMQ
   void runNgrt4ndUpdate(const SourceT& src);
 #endif
   void runMonitor();

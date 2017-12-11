@@ -46,7 +46,7 @@
 #   include <QUrlQuery>
 #endif
 
-#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#ifdef REALOPINSIGHT_ENABLE_ZMQ
 #include "ZmqSocket.hpp"
 #include <zmq.h>
 #endif
@@ -138,7 +138,7 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
   if (src.mon_type == MonitorT::Nagios && src.use_ngrt4nd) {
-#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#ifdef REALOPINSIGHT_ENABLE_ZMQ
     runNgrt4ndUpdate(src);
 #else
     updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
@@ -150,7 +150,7 @@ void DashboardBase::runMonitor(SourceT& src)
   finalizeUpdate(src);
 }
 
-#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#ifdef REALOPINSIGHT_ENABLE_ZMQ
 
 void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
 {
@@ -201,7 +201,7 @@ void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
     }
   }
 }
-#endif //#ifndef REALOPINSIGHT_DISABLE_ZMQ
+#endif //#ifndef REALOPINSIGHT_ENABLE_ZMQ
 
 void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
 {

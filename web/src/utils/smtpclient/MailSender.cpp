@@ -12,8 +12,8 @@ MailSender::MailSender(const QString& smtpHost,
     m_connected(false)
 {
   addEvents();
-  setUsername(username.toAscii());
-  setPassword(password.toAscii());
+  setUsername(username.toLatin1());
+  setPassword(password.toLatin1());
   setStartTlsDisabled(! useStartSsl);
 }
 
