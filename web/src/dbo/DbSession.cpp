@@ -36,22 +36,22 @@ namespace Wt {
     namespace backend {
       class Sqlite3Exception : public Exception
       {
-      public:
-        Sqlite3Exception(const std::string& msg)
-          : Exception(msg) { }
+        public:
+          Sqlite3Exception(const std::string& msg)
+            : Exception(msg) { }
       };
     }
   }
 }
 
 DbSession::DbSession(void)
-  : m_dbPath(ngrt4n::sqliteDbPath())
+  : m_sqlitePath(ngrt4n::sqliteDbPath())
 {
-  m_dbUsers = new UserDatabase(*this);
+  m_dboUserDb = new UserDatabase(*this);
   m_passAuthService = new Wt::Auth::PasswordService(m_basicAuthService);
-  m_sqlite3Db = new Wt::Dbo::backend::Sqlite3(m_dbPath);
-  m_sqlite3Db->setProperty("show-queries", "false");
-  setConnection(*m_sqlite3Db);
+  m_dboSqliteDb = new Wt::Dbo::backend::Sqlite3(m_sqlitePath);
+  m_dboSqliteDb->setProperty("show-queries", "false");
+  setConnection(*m_dboSqliteDb);
 
   // do this before anything
   configureAuth();
@@ -63,8 +63,8 @@ DbSession::DbSession(void)
 
 DbSession::~DbSession()
 {
-  delete m_dbUsers;
-  delete m_sqlite3Db;
+  delete m_dboUserDb;
+  delete m_dboSqliteDb;
   delete m_passAuthService;
 }
 
@@ -93,8 +93,8 @@ int DbSession::addUser(const DboUserT& userInfo)
       CORE_LOG("error", m_lastError);
       retValue = 1;
     } else {
-      Wt::Auth::User dbuser = m_dbUsers->registerNew();
-      dbo::ptr<AuthInfo> info = m_dbUsers->find(dbuser);
+      Wt::Auth::User dbuser = m_dboUserDb->registerNew();
+      dbo::ptr<AuthInfo> info = m_dboUserDb->find(dbuser);
       info.modify()->setEmail(userInfo.email);
       m_passAuthService->updatePassword(dbuser, userInfo.password);
       DboUser* userTmpPtr(new DboUser());
@@ -143,20 +143,20 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    Wt::Auth::User dbuser = m_dbUsers->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
+    Wt::Auth::User dbuser = m_dboUserDb->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
     switch (m_passAuthService->verifyPassword(dbuser, currentPass)) {
-      case Wt::Auth::PasswordValid:
-        m_passAuthService->updatePassword(dbuser, newpass);
-        retValue = 0;
-        break;
-      case Wt::Auth::PasswordInvalid:
-        m_lastError = "Your current password doesn't match";
-        break;
-      case Wt::Auth::LoginThrottling:
-        m_lastError = "The account has been blocked. Retry later or contact your administrator";
-        break;
-      default:m_lastError = "Unknown error concerning your current password";
-        break;
+    case Wt::Auth::PasswordValid:
+      m_passAuthService->updatePassword(dbuser, newpass);
+      retValue = 0;
+      break;
+    case Wt::Auth::PasswordInvalid:
+      m_lastError = "Your current password doesn't match";
+      break;
+    case Wt::Auth::LoginThrottling:
+      m_lastError = "The account has been blocked. Retry later or contact your administrator";
+      break;
+    default:m_lastError = "Unknown error concerning your current password";
+      break;
     }
   } catch (const dbo::Exception& ex) {
     retValue = -1;
@@ -337,7 +337,7 @@ void DbSession::initDb(void)
       adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
       addUser(adm);
       pref.setDbState(1);
-      CORE_LOG("info", Q_TR("Database created: ")+m_dbPath);
+      CORE_LOG("info", Q_TR("Database created: ")+m_sqlitePath);
     }
   } catch (dbo::Exception& ex) {
     CORE_LOG("error", "Failed initializing the database");

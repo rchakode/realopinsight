@@ -49,7 +49,7 @@ public:
   ~DbSession();
   void setupDb(void);
   std::string lastError(void) const {return m_lastError;}
-  Wt::Auth::AbstractUserDatabase& users() const {return *m_dbUsers;}
+  Wt::Auth::AbstractUserDatabase& users() const {return *m_dboUserDb;}
   Wt::Auth::AuthService& auth();
   Wt::Auth::PasswordService* passwordAuthentificator(void);
   Wt::Auth::Login& loginObject(void);
@@ -103,9 +103,9 @@ public:
   int listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
 
 private:
-  std::string m_dbPath;
-  dbo::backend::Sqlite3* m_sqlite3Db;
-  UserDatabase* m_dbUsers;
+  std::string m_sqlitePath;
+  dbo::backend::Sqlite3* m_dboSqliteDb;
+  UserDatabase* m_dboUserDb;
   DboUser m_loggedUser;
   DbUsersT m_userList;
   DbViewsT m_viewList;
