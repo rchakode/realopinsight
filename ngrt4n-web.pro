@@ -25,9 +25,9 @@ QT	+= core xml network script
 CONFIG += no_keywords
 TEMPLATE = app
 
-REALOPINSIGHT_CORE_VERSION=3.3.4
+REALOPINSIGHT_CORE_VERSION=3.4.0
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
-PACKAGE_VERSION=2016r1
+PACKAGE_VERSION=2017b1
 
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
@@ -178,14 +178,6 @@ LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
         -lboost_filesystem -lboost_date_time \
         -lldap
 
-enable-ngrt4nd {
-  DEFINES *= "REALOPINSIGHT_ENABLE_ZMQ=true"
-  HEADERS += core/src/ZmqSocket.hpp
-  SOURCES += core/src/ZmqSocket.cpp
-  LIBS += -lzmq
-}
-
-
 webd {
   SOURCES += web/src/ngrt4n-web.cpp
   TARGET = realopinsight-server
@@ -211,11 +203,6 @@ web-foundation-unittests {
   SOURCES += web/src/web_foundation_unittests.cpp
 }
 
-web-genkey {
-  SOURCES += web/src/ngrt4n-genkey.cpp
-  TARGET = realopinsight-genkey
-}
-
 TARGET.files = $${TARGET}
 MAN.files = doc/man/realopinsight-manager.1.gz doc/man/realopinsight-oc.1.gz doc/man/realopinsight-editor.1.gz
 INSTALLS += TARGET MAN
@@ -232,13 +219,12 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 
 
 DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"`date +%s`\""
-DEFINES *= "REALOPINSIGHT_TRIAL_PERIOD=\"30\""
 DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_VERSION='\"$${PACKAGE_VERSION}\"'"
 DEFINES *= "REALOPINSIGHT_PACKAGE_URL='\"http://realopinsight.com\"'"
-DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Universe\"'"
-DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2016\"'"
+DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Galactica\"'"
+DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2017\"'"
 DEFINES *= "REALOPINSIGHT_BUG_REPORT_EMAIL='\"support@realopinsight.com\"'"
 DEFINES *= "REALOPINSIGHT_GET_HELP_URL='\"http://docs.realopinsight.com/\"'"
-DEFINES *= "REALOPINSIGHT_DONATION_URL='\"http://realopinsight.com/products/pricing-and-purchase\"'"
+DEFINES *= "REALOPINSIGHT_DONATION_URL='\"http://realopinsight.com/products/donation\"'"

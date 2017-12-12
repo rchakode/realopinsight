@@ -27,7 +27,6 @@
 #include <QtScript/QScriptEngine>
 #include <QtScript/QScriptValueIterator>
 #include <QDebug>
-#include <QMessageBox>
 #include <QNetworkCookieJar>
 #include <QSslConfiguration>
 #include <QNetworkCookie>

@@ -33,9 +33,7 @@
 #include "DescriptionFileFactoryUtils.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
-#include <QSystemTrayIcon>
 #include <sstream>
-#include <QStatusBar>
 #include <QObject>
 #include <QNetworkCookie>
 #include <iostream>
@@ -44,11 +42,6 @@
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QUrlQuery>
-#endif
-
-#ifdef REALOPINSIGHT_ENABLE_ZMQ
-#include "ZmqSocket.hpp"
-#include <zmq.h>
 #endif
 
 
@@ -138,70 +131,13 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
   if (src.mon_type == MonitorT::Nagios && src.use_ngrt4nd) {
-#ifdef REALOPINSIGHT_ENABLE_ZMQ
-    runNgrt4ndUpdate(src);
-#else
     updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
-#endif
   } else {
     runDataSourceUpdate(src);
   }
 
   finalizeUpdate(src);
 }
-
-#ifdef REALOPINSIGHT_ENABLE_ZMQ
-
-void DashboardBase::runNgrt4ndUpdate(const SourceT& src)
-{
-  CheckT invalidCheck;
-  ngrt4n::setCheckOnError(ngrt4n::Unknown, "", invalidCheck);
-  
-  // Check if the handler is connected
-  std::string ngrt4ndUri = QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)).toStdString();
-  ZmqSocket d4nBroker(ngrt4ndUri, ZMQ_REQ);
-  
-  d4nBroker.setupSocket();
-  d4nBroker.makeHandShake();
-  if (! d4nBroker.isReady()) {
-    updateDashboardOnError(src, d4nBroker.lastError());
-    return;
-  }
-  
-  if (d4nBroker.getServerSerial() < 110) {
-    QString errmsg = tr("The server serial %1 is not supported").arg(d4nBroker.getServerSerial());
-    updateDashboardOnError(src, errmsg);
-    return;
-  }
-  
-  // Now start doing the job
-  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(), end=m_cdata.cnodes.end(); cnode != end; ++cnode) {
-    if (cnode->child_nodes.isEmpty()) {
-      cnode->sev = ngrt4n::Unknown;
-    } else {
-      StringPairT sourceDataPointInfo = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
-      if (sourceDataPointInfo.first == src.id) {
-        // Retrieve data
-        QString requestData = QString("%1:%2").arg(src.auth, sourceDataPointInfo.second);
-        d4nBroker.send(requestData.toStdString());
-        JsonHelper jsHelper(d4nBroker.recv().c_str());
-        
-        // Treat data
-        qint32 ret = jsHelper.getProperty("return_code").toInt32();
-        cnode->check.status = (ret!=0)? ngrt4n::NagiosUnknown : jsHelper.getProperty("status").toInt32();
-        cnode->check.host = jsHelper.getProperty("host").toString().toStdString();
-        cnode->check.last_state_change = jsHelper.getProperty("lastchange").toString().toStdString();
-        cnode->check.check_command = jsHelper.getProperty("command").toString().toStdString();
-        cnode->check.alarm_msg = jsHelper.getProperty("message").toString().toStdString();
-        
-        computeStatusInfo(*cnode, src);
-        updateDashboard(*cnode);
-        cnode->monitored = true;
-      }
-    }
-  }
-}
-#endif //#ifndef REALOPINSIGHT_ENABLE_ZMQ
 
 void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
 {

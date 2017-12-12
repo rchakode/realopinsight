@@ -28,7 +28,6 @@
 #include <QtScript/QScriptValueIterator>
 #include <QtScript/QScriptEngine>
 #include <QDebug>
-#include <QMessageBox>
 #include <QSslConfiguration>
 
 

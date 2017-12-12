@@ -17,7 +17,7 @@ For building and running RealOpInsight Ultimate, you will need the following:
 
 - Ubuntu 14.04 LTS 64 bits
 - GCC-C++ >= 4.7
-- Qt version 4.7 or higher (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript)
+- Qt => tested with version 5.5 (required modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript)
 - ZeroMQ (tested with version >=2.2 and <=3.x)
 - Graphviz
 - Wt Web Toolkit version 3.3.4 or higher

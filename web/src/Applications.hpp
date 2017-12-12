@@ -24,7 +24,6 @@
 
 #ifndef REALOPINSIGHTQAPP_HPP
 #define REALOPINSIGHTQAPP_HPP
-#include <QApplication>
 #include "utils/wtwithqt/WQApplication"
 #include "dbo/DbSession.hpp"
 #include <Wt/WBootstrapTheme>

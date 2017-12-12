@@ -29,7 +29,6 @@
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "Preferences.hpp"
-#include "ZmqSocket.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
 
@@ -60,9 +59,6 @@ public:
   void extractStatsData(CheckStatusCountT& statsData, qint32& count);
 
 public Q_SLOTS:
-#ifdef REALOPINSIGHT_ENABLE_ZMQ
-  void runNgrt4ndUpdate(const SourceT& src);
-#endif
   void runMonitor();
   void runMonitor(SourceT& src);
   void runDataSourceUpdate(const SourceT& srcInfo);
