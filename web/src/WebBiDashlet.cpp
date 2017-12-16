@@ -54,8 +54,7 @@ void WebBiDashlet::initialize(const DbViewsT& viewList)
   int row = 0;
   m_layout->addWidget(&m_filterHeader, row, 0, 1, 2, Wt::AlignRight);
   for (const auto& view : viewList) {
-    //FIXME: dont use pointer for chart widgets
-    // or think of deleting explicitely chart objects
+    //FIXME: dont use pointer for chart widgets or think of deleting explicitely chart objects
     m_slaChartTitleMap.insert(view.name, createTitleWidget(view.name));
     m_csvExportLinkMap.insert(view.name, new WebCsvExportIcon());
     m_itProblemChartMap.insert(view.name, new WebBiRawChart(view.name));

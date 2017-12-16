@@ -35,67 +35,85 @@
 
 class RealOpInsightQApp : public QCoreApplication
 {
-public:
-  RealOpInsightQApp(int& argc, char ** argv)
-    : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
-  virtual ~RealOpInsightQApp() { ngrt4n::freeCoreLogger(); }
+  public:
+    RealOpInsightQApp(int& argc, char ** argv)
+      : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
+    virtual ~RealOpInsightQApp() { ngrt4n::freeCoreLogger(); }
 
-  virtual bool notify(QObject * receiver, QEvent * event) {
-    try {
-      return QCoreApplication::notify(receiver, event);
-    } catch(std::exception& ex) {
-      CORE_LOG("fatal", ex.what());
+    virtual bool notify(QObject * receiver, QEvent * event) {
+      try {
+        return QCoreApplication::notify(receiver, event);
+      } catch(std::exception& ex) {
+        CORE_LOG("fatal", ex.what());
+      }
+      return false;
     }
-    return false;
-  }
 };
 
 class WebApp : public Wt::WQApplication
 {
-public:
-  WebApp(const Wt::WEnvironment& env)
-    : WQApplication(env, true)
-  {
-    m_theme.setVersion(Wt::WBootstrapTheme::Version3);
-  }
+  public:
+    WebApp(const Wt::WEnvironment& env)
+      : WQApplication(env, true)
+    {
+      m_theme.setVersion(Wt::WBootstrapTheme::Version3);
+    }
 
-protected:
-  virtual void create()
-  {
+  protected:
+    virtual void create()
+    {
 #ifdef REALOPINSIGHT_WEB_FASTCGI
-    m_dirroot = "";
-    m_docroot = "";
+      m_dirroot = "";
+      m_docroot = "";
 #else
-    m_dirroot = "/";
-    m_docroot = docRoot() +  m_dirroot;
+      m_dirroot = "/";
+      m_docroot = docRoot() +  m_dirroot;
 #endif
 
-    setTwoPhaseRenderingThreshold(0);
-    useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
-    useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
-    messageResourceBundle().use(m_docroot+"resources/i18n/messages");
-    setTheme(&m_theme);
-    requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
+      setTwoPhaseRenderingThreshold(0);
+      useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
+      useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
+      messageResourceBundle().use(m_docroot+"resources/i18n/messages");
+      setTheme(&m_theme);
+      requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
 
 #ifdef ENABLE_ANALYTICS
-    require(m_dirroot+"resources/js/ga.js");
+      require(m_dirroot+"resources/js/ga.js");
 #endif
 
-    m_dbSession = new DbSession();
-    root()->setId("wrapper");
-    root()->addWidget(new AuthManager(m_dbSession));
-  }
+      WebPreferencesBase preference;
+      int dbType = preference.getDbType();
+      std::string db = "";
+      if (dbType == PostgresqlDb) {
+        CORE_LOG("info", Q_TR("Using PostgreSQL database"));
+        db = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
+            .arg(preference.getDbServerAddr())
+            .arg(preference.getDbServerPort())
+            .arg(preference.getDbName())
+            .arg(preference.getDbUser())
+            .arg(preference.getDbPassword())
+            .toUTF8();
+      } else { // use Sqlite3 as default database
+        CORE_LOG("info", Q_TR("Using Sqlite3 database"));
+        db = ngrt4n::sqliteDbPath();
+      }
 
-  virtual void destroy()
-  {
-    delete m_dbSession;
-  }
+      m_dbSession = new DbSession(dbType, db);
 
-private:
-  Wt::WBootstrapTheme m_theme;
-  DbSession* m_dbSession;
-  std::string m_dirroot;
-  std::string m_docroot;
+      root()->setId("wrapper");
+      root()->addWidget(new AuthManager(m_dbSession));
+    }
+
+    virtual void destroy()
+    {
+      delete m_dbSession;
+    }
+
+  private:
+    Wt::WBootstrapTheme m_theme;
+    DbSession* m_dbSession;
+    std::string m_dirroot;
+    std::string m_docroot;
 };
 
 

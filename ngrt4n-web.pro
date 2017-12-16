@@ -172,10 +172,18 @@ SOURCES +=  core/src/Base.cpp \
 
 
 
-LIBS += -lwt -lwtdbo -lwtdbosqlite3 \
-        -lboost_signals -lboost_program_options -lboost_system \
-        -lboost_thread -lboost_regex -lboost_signals \
-        -lboost_filesystem -lboost_date_time \
+LIBS += -lwt \
+        -lwtdbo \
+        -lwtdbosqlite3 \
+        -lwtdbopostgres \
+        -lboost_signals \
+        -lboost_program_options \
+        -lboost_system \
+        -lboost_thread \
+        -lboost_regex \
+        -lboost_signals \
+        -lboost_filesystem \
+        -lboost_date_time \
         -lldap
 
 webd {

@@ -30,6 +30,7 @@
 #include <Wt/Auth/PasswordVerifier>
 #include <Wt/Dbo/Dbo>
 #include <Wt/Dbo/backend/Sqlite3>
+#include <Wt/Dbo/backend/Postgres>
 #include <Wt/Auth/PasswordService>
 #include <Wt/Auth/User>
 #include <Wt/WGlobal>
@@ -42,10 +43,20 @@
 typedef Wt::Auth::Dbo::AuthInfo<DboUser> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
+enum {
+  Sqlite3Db = 0,
+  PostgresqlDb = 1
+};
+
+enum {
+  DbNotInitialized = 0,
+  DbInitialized = 1
+};
+
 class DbSession : public dbo::Session
 {
 public:
-  DbSession(void);
+  DbSession(int dbType, const std::string& db);
   ~DbSession();
   void setupDb(void);
   std::string lastError(void) const {return m_lastError;}
@@ -103,8 +114,9 @@ public:
   int listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
 
 private:
-  std::string m_sqlitePath;
-  dbo::backend::Sqlite3* m_dboSqliteDb;
+  dbo::SqlConnection* m_dboSqlConncetion;
+
+
   UserDatabase* m_dboUserDb;
   DboUser m_loggedUser;
   DbUsersT m_userList;

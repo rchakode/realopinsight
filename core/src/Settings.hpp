@@ -54,6 +54,15 @@ public:
   static const QString GLOBAL_SRC_BUCKET_KEY;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
   static const QString GLOBAL_DB_STATE_KEY;
+
+
+  static const QString DB_TYPE;
+  static const QString DB_SERVER_ADDRT;
+  static const QString DB_SERVER_PORT;
+  static const QString DB_NAME;
+  static const QString DB_USER;
+  static const QString DB_PASSWORD;
+
   static const QString AUTH_ADM_UNSERNAME_KEY;
   static const QString AUTH_OP_UNSERNAME_KEY;
   static const QString AUTH_ADM_PASSWD_KEY;
@@ -68,15 +77,15 @@ public:
   static const QString AUTH_LDAP_SSL_USE_CERT;
   static const QString AUTH_LDAP_SSL_CERT_FILE;
   static const QString AUTH_LDAP_SSL_CA_FILE;
+
   static const QString NOTIF_TYPE;
   static const QString NOTIF_MAIL_SMTP_SERVER_ADRR;
   static const QString NOTIF_MAIL_SMTP_SERVER_PORT;
   static const QString NOTIF_MAIL_SMTP_USE_SSL;
   static const QString NOTIF_MAIL_SMTP_USERNAME;
   static const QString NOTIF_MAIL_SMTP_PASSWORD;
+
   static const QString DASHBOARD_THUMBNAILS_PER_ROW;
-  static const QString ACTIVATION_LICENSE_KEY;
-  static const QString ACTIVATION_GOT_WARNING;
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

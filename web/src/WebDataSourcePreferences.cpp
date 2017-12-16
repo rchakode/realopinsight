@@ -290,16 +290,16 @@ void WebDataSourcePreferences::renderSourceIndexSelector(void)
   m_sourceIndexSelector.titleBar()->setStyleClass("titlebar");
   m_sourceIndexSelector.setWindowTitle(Q_TR("Select the source index"));
 
-  //FIXME: memory leak ?
+  //FIXME: check if this cause memory leak ?
   Wt::WComboBox* inputField = new Wt::WComboBox(m_sourceIndexSelector.contents());
   for (const auto& src : ngrt4n::sourceIndexes()) inputField->addItem(src.toStdString());
 
-  //FIXME: memory leak ?
+  //FIXME: check if this cause memory leak ?
   Wt::WPushButton *ok = new Wt::WPushButton("OK", m_sourceIndexSelector.footer());
   ok->clicked().connect(std::bind(&WebDataSourcePreferences::handleAddAsSourceOkAction, this, inputField));
   ok->setDefault(true);
 
-  //FIXME: memory leak ?
+  //FIXME: check if this cause memory leak ?
   Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", m_sourceIndexSelector.footer());
   cancel->clicked().connect(&m_sourceIndexSelector, &Wt::WDialog::reject);
 }

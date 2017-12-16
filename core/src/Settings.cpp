@@ -34,6 +34,16 @@ const QString Settings::GLOBAL_LANGUAGE_KEY = "/General/language";
 const QString Settings::GLOBAL_DB_STATE_KEY = "/General/DbState";
 const QString Settings::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
 const QString Settings::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
+
+
+const QString Settings::DB_TYPE = "/Database/dbType";
+const QString Settings::DB_SERVER_ADDRT = "/Database/dbServerAddr";
+const QString Settings::DB_SERVER_PORT = "/Database/dbServerPort";
+const QString Settings::DB_NAME = "/Database/dbName";
+const QString Settings::DB_USER = "/Database/dbUser";
+const QString Settings::DB_PASSWORD = "/Database/dbPassword";
+
+
 const QString Settings::AUTH_ADM_UNSERNAME_KEY = "/Auth/admUser";
 const QString Settings::AUTH_OP_UNSERNAME_KEY = "/Auth/opUsername";
 const QString Settings::AUTH_ADM_PASSWD_KEY = "/Auth/admPasswd";
@@ -48,15 +58,15 @@ const QString Settings::AUTH_LDAP_ID_FIELD = "/Auth/ldapIdField";
 const QString Settings::AUTH_LDAP_SSL_USE_CERT = "/Auth/ldapSslUseCert";
 const QString Settings::AUTH_LDAP_SSL_CERT_FILE = "/Auth/ldapSslCertFile";
 const QString Settings::AUTH_LDAP_SSL_CA_FILE = "/Auth/ldapSslCaFile";
+
 const QString Settings::NOTIF_TYPE = "/Notification/notificationType";
 const QString Settings::NOTIF_MAIL_SMTP_SERVER_ADRR = "/Notification/mailSmtpServer";
 const QString Settings::NOTIF_MAIL_SMTP_SERVER_PORT = "/Notification/mailSmtpPort";
 const QString Settings::NOTIF_MAIL_SMTP_USE_SSL = "/Notification/mailSmtpUseSsl";
 const QString Settings::NOTIF_MAIL_SMTP_USERNAME = "/Notification/mailSmtpUsername";
 const QString Settings::NOTIF_MAIL_SMTP_PASSWORD = "/Notification/mailSmtpPassword";
+
 const QString Settings::DASHBOARD_THUMBNAILS_PER_ROW = "/Dashboard/thumbnailsPerRow";
-const QString Settings::ACTIVATION_LICENSE_KEY = "/Activation/licenseKey";
-const QString Settings::ACTIVATION_GOT_WARNING = "/Activation/gotLicenseWarning";
 
 
 Settings::Settings(): QSettings(COMPANY.toLower(), APP_NAME.toLower().replace(" ", "-"))

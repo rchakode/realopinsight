@@ -44,16 +44,28 @@ namespace Wt {
   }
 }
 
-DbSession::DbSession(void)
-  : m_sqlitePath(ngrt4n::sqliteDbPath())
+DbSession::DbSession(int dbType, const std::string& db)
 {
   m_dboUserDb = new UserDatabase(*this);
   m_passAuthService = new Wt::Auth::PasswordService(m_basicAuthService);
-  m_dboSqliteDb = new Wt::Dbo::backend::Sqlite3(m_sqlitePath);
-  m_dboSqliteDb->setProperty("show-queries", "false");
-  setConnection(*m_dboSqliteDb);
 
-  // do this before anything
+  switch (dbType) {
+  case PostgresqlDb:
+    m_dboSqlConncetion = new Wt::Dbo::backend::Postgres(db);
+    m_dboSqlConncetion->setProperty("show-queries", "false");
+    setConnection(*m_dboSqlConncetion);
+    break;
+
+    // Sqlite3 is the default database
+  case Sqlite3Db:
+  default:
+    m_dboSqlConncetion = new Wt::Dbo::backend::Sqlite3(db);
+    m_dboSqlConncetion->setProperty("show-queries", "false");
+    setConnection(*m_dboSqlConncetion);
+    break;
+  }
+
+  // do this before doing anything to avoid authorized access
   configureAuth();
 
   setupDb();
@@ -64,7 +76,7 @@ DbSession::DbSession(void)
 DbSession::~DbSession()
 {
   delete m_dboUserDb;
-  delete m_dboSqliteDb;
+  delete m_dboSqlConncetion;
   delete m_passAuthService;
 }
 
@@ -326,7 +338,7 @@ void DbSession::initDb(void)
 {
   try {
     WebPreferencesBase pref;
-    if (pref.getDbState() != 1) {
+    if (pref.dbInitializationState() != DbInitialized) {
       createTables();
       DboUserT adm;
       adm.username = "admin";
@@ -336,8 +348,8 @@ void DbSession::initDb(void)
       adm.role = DboUser::AdmRole;
       adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
       addUser(adm);
-      pref.setDbState(1);
-      CORE_LOG("info", Q_TR("Database created: ")+m_sqlitePath);
+      pref.updateDbInitializationState(1);
+      CORE_LOG("info", Q_TR("Database initialized"));
     }
   } catch (dbo::Exception& ex) {
     CORE_LOG("error", "Failed initializing the database");

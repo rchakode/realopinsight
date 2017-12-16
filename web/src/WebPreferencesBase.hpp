@@ -46,8 +46,15 @@ public:
   };
 
   WebPreferencesBase(void);
-  int getDbState(void) { return keyValue(Settings::GLOBAL_DB_STATE_KEY, "0").toInt();}
-  void setDbState(int state) {setKeyValue(Settings::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
+  int dbInitializationState(void) { return keyValue(Settings::GLOBAL_DB_STATE_KEY, "0").toInt();}
+  void updateDbInitializationState(int state) {setKeyValue(Settings::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
+  
+  int getDbType(void) const { return m_settings->keyValue(Settings::DB_TYPE).toInt();}
+  std::string getDbServerAddr(void) const { return m_settings->keyValue(Settings::DB_SERVER_ADDRT).toStdString();}
+  int getDbServerPort(void) const { return m_settings->keyValue(Settings::DB_SERVER_PORT).toInt();}
+  std::string getDbName(void) const { return m_settings->keyValue(Settings::DB_NAME).toStdString();}
+  std::string getDbUser(void) const { return m_settings->keyValue(Settings::DB_USER).toStdString();}
+  std::string getDbPassword(void) const { return m_settings->keyValue(Settings::DB_PASSWORD).toStdString();}
 
   std::string getLdapServerUri(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_SERVER_URI).toStdString();}
   std::string getLdapBindUserDn(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_DN).toStdString();}
@@ -55,12 +62,14 @@ public:
   std::string getLdapBindUserPassword(void) const { return m_settings->keyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD).toStdString();}
   std::string getLdapIdField(void) const;
   int getLdapVersion(void) const;
-  int getAuthenticationMode(void) const;
   bool getLdapSslUseMyCert(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;}
   std::string getLdapSslCertFile(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CERT_FILE).toStdString();}
   std::string getLdapSslCaFile(void) const {return m_settings->keyValue(Settings::AUTH_LDAP_SSL_CA_FILE).toStdString();}
+
+  int getAuthenticationMode(void) const;
   static std::string authTypeString(int authSystem) {return (authSystem == LDAP) ? "LDAP" : "Built-in";}
   int getNotificationType(void) const { return m_settings->keyValue(Settings::NOTIF_TYPE).toInt();}
+
   std::string getSmtpServerAddr(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();}
   std::string getSmtpServerPortText(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();}
   int getSmtpServerPort(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_SERVER_PORT).toInt();}
@@ -68,10 +77,7 @@ public:
   std::string getSmtpPassword(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
   int getSmtpUseSsl(void) const { return m_settings->keyValue(Settings::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
 
-  QString getLicenseKey(void) {return keyValue(Settings::ACTIVATION_LICENSE_KEY, "");}
   int activeSourceIds(QVector<std::string>& result);
-  void handleIGotLicenseWarning(void) {m_settings->setEntry(Settings::ACTIVATION_GOT_WARNING, "1");}
-  bool gotLicenseWarning(void) const {return ! m_settings->entry(Settings::ACTIVATION_GOT_WARNING).isEmpty();}
 
 
 protected :
