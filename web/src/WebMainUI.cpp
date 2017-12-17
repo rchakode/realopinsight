@@ -127,10 +127,7 @@ void WebMainUI::unbindWidgets(void)
 
 void WebMainUI::unbindExecutiveViewWidgets(void)
 {
-  for (ThumbnailMapT::Iterator thumb = m_thumbsWidgets.begin();
-       thumb != m_thumbsWidgets.end();
-       ++thumb)
-  {
+  for (ThumbnailMapT::Iterator thumb = m_thumbsWidgets.begin(); thumb != m_thumbsWidgets.end(); ++thumb) {
     clearThumbnailTemplate(*thumb);
     m_thumbsLayout->removeWidget(*thumb);
   }
