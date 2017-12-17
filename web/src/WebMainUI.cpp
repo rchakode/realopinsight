@@ -132,8 +132,13 @@ void WebMainUI::unbindExecutiveViewWidgets(void)
     m_thumbsLayout->removeWidget(*thumb);
   }
 
-  m_thumbsContainer.clear();
-  m_eventFeedsContainer.clear();
+  if (m_thumbsLayout && m_thumbsLayout->children().size() > 0) {
+    m_thumbsContainer.clear();
+  }
+  if (m_eventFeedLayout && m_eventFeedLayout->children().size() > 0) {
+    m_eventFeedsContainer.clear();
+  }
+
   m_operatorHomeTpl.takeWidget("thumbnails");
   m_operatorHomeTpl.takeWidget("event-feeds");
   m_operatorHomeTpl.takeWidget("bi-report-dashlet");
