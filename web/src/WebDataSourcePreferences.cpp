@@ -86,7 +86,7 @@ void WebDataSourcePreferences::createFormWidgets(void)
 
   // buttons
   m_applyChangeBtn.setText( Q_TR("Apply changes") );
-  m_addAsSourceBtn.setText( Q_TR("Add as source") );
+  m_addAsSourceBtn.setText( Q_TR("Add as new source") );
   m_deleteSourceBtn.setText( Q_TR("Delete source") );
   m_applyChangeBtn.setStyleClass("btn btn-success");
   m_addAsSourceBtn.setStyleClass("btn btn-info");

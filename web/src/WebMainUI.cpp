@@ -277,7 +277,7 @@ void WebMainUI::setupProfileMenus(void)
   if (! m_dbSession->isLoggedAdmin()) {
     m_notificationManager = createNotificationManager();
     m_notificationSection = createNotificationSection();
-    m_notificationSection->setToolTip(Q_TR("Manage notifications"));
+    m_notificationSection->setToolTip(Q_TR("Manage notification settings"));
     m_navbar.addWidget(m_notificationSection, Wt::AlignRight);
   }
   
@@ -551,7 +551,7 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
 
 void WebMainUI::handleDataSourceSetup(void)
 {
-  m_adminPanelTitle.setText(Q_TR("Manage Monitoring Data Sources"));
+  m_adminPanelTitle.setText(Q_TR("Monitoring Sources"));
   m_adminStackedContents.setCurrentWidget(&m_dataSourceSettingsForm);
   m_dataSourceSettingsForm.updateContents();
 }
@@ -739,14 +739,14 @@ void WebMainUI::setupSettingsPage(void)
 
       // menu auto import host group
       m_adminStackedContents.addWidget(&m_autoHostgroupImporterForm);
-      menuText = QObject::tr("Quick View Builder").toStdString();
+      menuText = QObject::tr("Quick Builder").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
       m_settingsPageTpl.bindWidget("menu-auto-hostgroup-map", link);
       m_menuLinks.insert(MenuImport, link);
 
       // menu import view
-      menuText = QObject::tr("Import Description File").toStdString();
+      menuText = QObject::tr("Import File").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
       m_settingsPageTpl.bindWidget("menu-import", link);
@@ -761,7 +761,7 @@ void WebMainUI::setupSettingsPage(void)
       m_menuLinks.insert(MenuPreview, link);
 
       // Create view management form
-      menuText = QObject::tr("Views and Access Control").toStdString();
+      menuText = QObject::tr("Access Control").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
       m_adminStackedContents.addWidget(m_viewAccessPermissionForm);
       m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
@@ -818,21 +818,21 @@ void WebMainUI::setupSettingsPage(void)
 
   // monitoring settings menu
   m_adminStackedContents.addWidget(&m_dataSourceSettingsForm);
-  link = new Wt::WAnchor("#", Q_TR("Monitoring Data Sources"));
+  link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
   m_settingsPageTpl.bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
   link->clicked().connect(this, &WebMainUI::handleDataSourceSetup);
 
   // auth settings menu
   m_adminStackedContents.addWidget(&m_authSettingsForm);
-  link = new Wt::WAnchor("#", Q_TR("Authentication Backend"));
+  link = new Wt::WAnchor("#", Q_TR("Authentication"));
   m_settingsPageTpl.bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(this, &WebMainUI::handleDisplayAuthSetup);
 
   // notification settings menu
   m_adminStackedContents.addWidget(&m_notificationSettingsForm);
-  link = new Wt::WAnchor("#", Q_TR("Notification Settings"));
+  link = new Wt::WAnchor("#", Q_TR("Notification"));
   m_settingsPageTpl.bindWidget("menu-notification-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
   link->clicked().connect(this, &WebMainUI::handleDisplayNotificationSetup);
@@ -1146,7 +1146,7 @@ void WebMainUI::handleLdapUsersMenu(void)
     if (m_ldapUserManager->updateUserList() <= 0) {
       showMessage(ngrt4n::OperationFailed, m_ldapUserManager->lastError());
     }
-    m_adminPanelTitle.setText(Q_TR("Manage LDAP Users"));
+    m_adminPanelTitle.setText(Q_TR("LDAP Users"));
   }
 }
 
@@ -1155,7 +1155,7 @@ void WebMainUI::handleBuiltInUsersMenu(void)
 {
   m_adminStackedContents.setCurrentWidget(m_dbUserManager->dbUserListWidget());
   m_dbUserManager->updateDbUsers();
-  m_adminPanelTitle.setText(Q_TR("Manage Users"));
+  m_adminPanelTitle.setText(Q_TR("Users"));
 }
 
 
@@ -1171,7 +1171,7 @@ void  WebMainUI::handleViewAclMenu(void)
 {
   m_adminStackedContents.setCurrentWidget(m_viewAccessPermissionForm);
   m_viewAccessPermissionForm->resetModelData();
-  m_adminPanelTitle.setText(Q_TR("Manage Views and Access Control"));
+  m_adminPanelTitle.setText(Q_TR("Views and Access Control"));
 }
 
 
