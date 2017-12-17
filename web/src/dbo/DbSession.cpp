@@ -338,6 +338,7 @@ void DbSession::initDb(void)
 {
   try {
     WebPreferencesBase pref;
+    //TODO provide the reset of dbInitializationState when switching to a new database type
     if (pref.dbInitializationState() != DbInitialized) {
       createTables();
       DboUserT adm;
@@ -348,7 +349,7 @@ void DbSession::initDb(void)
       adm.role = DboUser::AdmRole;
       adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
       addUser(adm);
-      pref.updateDbInitializationState(1);
+      pref.updateDbInitializationState(DbInitialized);
       CORE_LOG("info", Q_TR("Database initialized"));
     }
   } catch (dbo::Exception& ex) {
