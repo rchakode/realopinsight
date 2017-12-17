@@ -20,6 +20,7 @@ For building and running RealOpInsight Ultimate, you will need the following:
 - Qt version 5.5 with the following modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript. Other versions may work but are not tested.
 - Graphviz
 - Wt Web Toolkit version 3.3.4 or higher
+- OpenLdap development files
  
 Quick Installation
 ==================
@@ -48,5 +49,14 @@ You just have to follow the next steps, assuming you have a Ubuntu 14.04 LTS 64 
 4. Move forward
   Please go to RealOpInsight Ultimate documentation website at http://docs.realopinsight.com, 
   go throughout our tutorials and user/administrator manuals to start mastering the software. 
+
+Security note about integration with PostgreSQL
+==============================================
+It's worth to note that the role in PostgreSQL does not need:
+
+* to be a superuser
+* to be allowed to create databases
+* to be allowed to create more new roles
+
 
 
