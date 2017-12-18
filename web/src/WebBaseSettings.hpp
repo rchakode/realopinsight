@@ -25,6 +25,7 @@
 #define WEBBASESETTINGS_HPP
 
 #include "BaseSettings.hpp"
+#include "dbo/DbSession.hpp"
 #include <Wt/WCheckBox>
 
 
@@ -45,11 +46,11 @@ public:
   };
 
   WebBaseSettings(void);
-  int dbInitializationState(void) { return keyValue(SettingsHandler::GLOBAL_DB_STATE_KEY, "0").toInt();}
+  int dbInitializationState(void) { return keyValue(SettingsHandler::GLOBAL_DB_STATE_KEY, QString::number(DbNotInitialized)).toInt();}
   void updateDbInitializationState(int state) {setKeyValue(SettingsHandler::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
   
   int getDbType(void) const { return m_settings->keyValue(SettingsHandler::DB_TYPE).toInt();}
-  std::string getDbServerAddr(void) const { return m_settings->keyValue(SettingsHandler::DB_SERVER_ADDRT).toStdString();}
+  std::string getDbServerAddr(void) const { return m_settings->keyValue(SettingsHandler::DB_SERVER_ADDR).toStdString();}
   int getDbServerPort(void) const { return m_settings->keyValue(SettingsHandler::DB_SERVER_PORT).toInt();}
   std::string getDbName(void) const { return m_settings->keyValue(SettingsHandler::DB_NAME).toStdString();}
   std::string getDbUser(void) const { return m_settings->keyValue(SettingsHandler::DB_USER).toStdString();}

@@ -36,6 +36,7 @@
 #include "WebNotificationSettings.hpp"
 #include "WebAuthSettings.hpp"
 #include "WebDataSourceSettings.hpp"
+#include "WebDatabaseSettings.hpp"
 #include "WebHostGroupServiceMap.hpp"
 #include "WebCsvReportResource.hpp"
 #include <Wt/WComboBox>
@@ -71,6 +72,8 @@ class WebMainUI : public QObject, public Wt::WContainerWidget
     MenuLdapUsers,
     MenuMonitoringSettings,
     MenuAuthSettings,
+    MenuNotificationSettings,
+    MenuDatabaseSettings,
     MenuMyAccount,
     MenuChangePassword
   };
@@ -143,6 +146,8 @@ private:
   WebDataSourceSettings m_dataSourceSettingsForm;
   WebNotificationSettings m_notificationSettingsForm;
   WebAuthSettings m_authSettingsForm;
+  WebDatabaseSettings m_databaseSettingsForm;
+
   WebHostGroupServiceMap m_autoHostgroupImporterForm;
   Wt::WNavigationBar m_navbar;
   Wt::WStackedWidget m_mainStackedContents;
@@ -186,12 +191,13 @@ private:
   void handleImportDescriptionFile(void);
   void handleImportHostGroupAsMap(void);
   void handlePreview(void);
-  void handleDataSourceSetup(void);
-  void handleDisplayAuthSetup(void);
-  void handleDisplayNotificationSetup(void);
+  void handleDataSourceSettings(void);
+  void handleAuthSettings(void);
+  void handleNotificationSettings(void);
+  void handleDatabaseSettings(void);
   void handleDisplayChangePassword(void);
   void handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass);
-  void handleDisplayUserProfile(void);
+  void handleUserProfileSettings(void);
   void handleUpdateUserAccount(const DboUserT& userToUpdate);
   void handleErrcode(int errcode);
   void handleUserUpdatedCompleted(int errcode);

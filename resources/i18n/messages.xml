@@ -60,6 +60,7 @@
                 <li> ${menu-monitoring-settings}</li>
                 <li id="menu-auth-settings"> ${menu-auth-settings}</li>
                 <li id="menu-notification-settings"> ${menu-notification-settings}</li>
+                <li id="menu-database-settings"> ${menu-database-settings}</li>
                 <li> ${menu-my-account}</li>
                 <li><a href="#"> ${menu-change-password}</a></li>
               </ul>
@@ -478,50 +479,6 @@
 
 
 
-<message id="notification-settings-form.tpl">
-  <div class="form-horizontal">
-
-    <div id="notification-section">
-      <fieldset>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Notification type&nbsp;</label>
-          <span>${notification-type}</span>
-         </div>
-          <!-- mail notification settings -->
-          <div id="mail-notification-settings">
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Server&nbsp;</label>
-               <span>${notification-mail-smtp-server}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Port&nbsp;</label>
-               <span>${notification-mail-smtp-port}</span>
-               <span>Enable SSL</span>
-               <span>${notification-mail-smtp-use-ssl}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Username&nbsp;</label>
-               <span>${notification-mail-smtp-username}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Password&nbsp;</label>
-               <span>${notification-mail-smtp-password}</span>
-             </div>
-          </div> <!-- id="mail-notification-settings" -->
-      </fieldset>
-   </div> <!-- id="auth-section" -->
-
-
-    <!-- form buttons -->
-    <div class="form-actions">
-      <span id="notification-setting-save-button">${notification-settings-save-button}</span>
-    </div>
-</div> <!-- class="form-hoizontal" -->
-</message>
-
-
-
-
 <message id="data-source-settings-form.tpl">
 <div class="form-horizontal">
   <div id="monitoring-settings-section">
@@ -643,4 +600,51 @@
     </div>
   </form>
 </message>
+
+
+
+
+
+<message id="database-settings-form.tpl">
+  <div class="form-horizontal">
+
+    <div id="database-section">
+      <fieldset>
+        <div class="col-sm-12 form-group">
+          <label class="control-label">Database type&nbsp;</label>
+          <span>${database-type}</span>
+         </div>
+          <div id="database-settings">
+             <div class="col-sm-12 form-group">
+               <label class="control-label">Database Server&nbsp;</label>
+               <span>${database-server-addr}</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">Server Port&nbsp;</label>
+               <span>${database-server-port}</span>
+               <span>Database name</span>
+               <span>${database-name}</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">Database User&nbsp;</label>
+               <span>${database-user}</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">Database Password&nbsp;</label>
+               <span>${database-password}</span>
+             </div>
+          </div>
+      </fieldset>
+    </div>
+
+    <!-- form buttons -->
+    <div class="form-actions">
+      <span id="database-settings-save">${database-settings-save}</span>
+    </div>
+
+  </div>
+</message>
+
+
+
 </messages>

@@ -36,7 +36,7 @@ const QString SettingsHandler::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInte
 
 
 const QString SettingsHandler::DB_TYPE = "/Database/dbType";
-const QString SettingsHandler::DB_SERVER_ADDRT = "/Database/dbServerAddr";
+const QString SettingsHandler::DB_SERVER_ADDR = "/Database/dbServerAddr";
 const QString SettingsHandler::DB_SERVER_PORT = "/Database/dbServerPort";
 const QString SettingsHandler::DB_NAME = "/Database/dbName";
 const QString SettingsHandler::DB_USER = "/Database/dbUser";

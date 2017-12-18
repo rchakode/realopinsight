@@ -110,6 +110,7 @@ HEADERS += \
     web/src/WebMsgDialog.hpp \
     web/src/WebEventConsole.hpp \
     web/src/WebNotificationSettings.hpp \
+    web/src/WebDatabaseSettings.hpp \
     web/src/WebDataSourceSettings.hpp \
     web/src/WebBaseSettings.hpp \
     web/src/WebAuthSettings.hpp \
@@ -164,6 +165,7 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebMsgDialog.cpp \
     web/src/WebEventConsole.cpp \
     web/src/WebNotificationSettings.cpp \
+    web/src/WebDatabaseSettings.cpp \
     web/src/WebBaseSettings.cpp \
     web/src/WebAuthSettings.cpp \
     web/src/WebDataSourceSettings.cpp \

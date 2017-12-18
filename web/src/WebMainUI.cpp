@@ -470,7 +470,7 @@ void WebMainUI::handlePreview(void)
 }
 
 
-void WebMainUI::handleDisplayAuthSetup(void)
+void WebMainUI::handleAuthSettings(void)
 {
   m_adminPanelTitle.setText(Q_TR("Authentication Settings"));
   m_adminStackedContents.setCurrentWidget(&m_authSettingsForm);
@@ -478,7 +478,7 @@ void WebMainUI::handleDisplayAuthSetup(void)
 }
 
 
-void WebMainUI::handleDisplayNotificationSetup(void)
+void WebMainUI::handleNotificationSettings(void)
 {
   m_adminPanelTitle.setText(Q_TR("Notification Settings"));
   m_adminStackedContents.setCurrentWidget(&m_notificationSettingsForm);
@@ -486,7 +486,15 @@ void WebMainUI::handleDisplayNotificationSetup(void)
 }
 
 
-void WebMainUI::handleDisplayUserProfile(void)
+void WebMainUI::handleDatabaseSettings(void)
+{
+  m_adminPanelTitle.setText(Q_TR("Database Settings"));
+  m_adminStackedContents.setCurrentWidget(&m_databaseSettingsForm);
+  m_databaseSettingsForm.updateContents();
+}
+
+
+void WebMainUI::handleUserProfileSettings(void)
 {
   m_userAccountForm->resetValidationState(false);
   m_adminStackedContents.setCurrentWidget(m_userAccountForm);
@@ -551,7 +559,7 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
               .append(ngrt4n::wHumanTimeText(end).toUTF8()));
 }
 
-void WebMainUI::handleDataSourceSetup(void)
+void WebMainUI::handleDataSourceSettings(void)
 {
   m_adminPanelTitle.setText(Q_TR("Monitoring Sources"));
   m_adminStackedContents.setCurrentWidget(&m_dataSourceSettingsForm);
@@ -823,29 +831,35 @@ void WebMainUI::setupSettingsPage(void)
   link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
   m_settingsPageTpl.bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
-  link->clicked().connect(this, &WebMainUI::handleDataSourceSetup);
+  link->clicked().connect(this, &WebMainUI::handleDataSourceSettings);
 
   // auth settings menu
   m_adminStackedContents.addWidget(&m_authSettingsForm);
   link = new Wt::WAnchor("#", Q_TR("Authentication"));
   m_settingsPageTpl.bindWidget("menu-auth-settings", link);
   m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(this, &WebMainUI::handleDisplayAuthSetup);
+  link->clicked().connect(this, &WebMainUI::handleAuthSettings);
 
   // notification settings menu
   m_adminStackedContents.addWidget(&m_notificationSettingsForm);
   link = new Wt::WAnchor("#", Q_TR("Notification"));
   m_settingsPageTpl.bindWidget("menu-notification-settings", link);
-  m_menuLinks.insert(MenuAuthSettings, link);
-  link->clicked().connect(this, &WebMainUI::handleDisplayNotificationSetup);
+  m_menuLinks.insert(MenuNotificationSettings, link);
+  link->clicked().connect(this, &WebMainUI::handleNotificationSettings);
 
+  // Database settings menu
+  m_adminStackedContents.addWidget(&m_databaseSettingsForm);
+  link = new Wt::WAnchor("#", Q_TR("Database"));
+  m_settingsPageTpl.bindWidget("menu-database-settings", link);
+  m_menuLinks.insert(MenuDatabaseSettings, link);
+  link->clicked().connect(this, &WebMainUI::handleDatabaseSettings);
 
   // my account menu
   m_adminStackedContents.addWidget(m_userAccountForm);
   link = new Wt::WAnchor("#", Q_TR("My Account"));
   m_settingsPageTpl.bindWidget("menu-my-account", link);
   m_menuLinks.insert(MenuMyAccount, link);
-  link->clicked().connect(this, &WebMainUI::handleDisplayUserProfile);
+  link->clicked().connect(this, &WebMainUI::handleUserProfileSettings);
 
   // change password settings
   m_adminStackedContents.addWidget(m_changePasswordPanel);

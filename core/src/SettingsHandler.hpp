@@ -56,7 +56,7 @@ public:
 
 
   static const QString DB_TYPE;
-  static const QString DB_SERVER_ADDRT;
+  static const QString DB_SERVER_ADDR;
   static const QString DB_SERVER_PORT;
   static const QString DB_NAME;
   static const QString DB_USER;
