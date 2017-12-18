@@ -88,7 +88,7 @@ DashboardBase::~DashboardBase()
 {
 }
 
-void DashboardBase::initialize(Preferences* preferencePtr)
+void DashboardBase::initialize(BaseSettings* preferencePtr)
 {
   m_preferences = preferencePtr;
   m_lastErrorState = false;
@@ -334,7 +334,7 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   }
 }
 
-void DashboardBase::initSettings(Preferences* preferencePtr)
+void DashboardBase::initSettings(BaseSettings* preferencePtr)
 {
   m_sources.clear();
   SourceT src;

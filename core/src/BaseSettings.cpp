@@ -1,8 +1,7 @@
 /*
- * Preferences.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 23-03-2014                                                 #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -23,7 +22,7 @@
  */
 
 
-#include "Preferences.hpp"
+#include "BaseSettings.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
 #include <sstream>
@@ -31,34 +30,34 @@
 #include <QRegExpValidator>
 
 
-Preferences::Preferences(void)
-  : m_settings(new Settings()),
+BaseSettings::BaseSettings(void)
+  : m_settings(new SettingsHandler()),
     m_currentSourceIndex(0)
 {
   updateSourceStates();
 }
 
-Preferences::Preferences(const QString& settingFile)
-  : m_settings(new Settings(settingFile)),
+BaseSettings::BaseSettings(const QString& settingFile)
+  : m_settings(new SettingsHandler(settingFile)),
     m_currentSourceIndex(0)
 {
   updateSourceStates();
 }
 
 
-Preferences::~Preferences(void)
+BaseSettings::~BaseSettings(void)
 {
   delete m_settings;
 }
 
-void Preferences::loadProperties(void)
+void BaseSettings::loadProperties(void)
 {
   updateAllSourceWidgetStates();
   updateFields();
 }
 
 
-QString Preferences::sourceStatesSerialized(void)
+QString BaseSettings::sourceStatesSerialized(void)
 {
   QString str = "";
   for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates.at(i)? "1" : "0";
@@ -67,7 +66,7 @@ QString Preferences::sourceStatesSerialized(void)
 
 
 
-void Preferences::resetSourceStates(void)
+void BaseSettings::resetSourceStates(void)
 {
   m_sourceStates.clear();
   m_sourceStates.resize(MAX_SRCS);
@@ -77,10 +76,10 @@ void Preferences::resetSourceStates(void)
 }
 
 
-void Preferences::updateSourceStates(void)
+void BaseSettings::updateSourceStates(void)
 {
   resetSourceStates();
-  QString content = m_settings->value(Settings::GLOBAL_SRC_BUCKET_KEY).toString();
+  QString content = m_settings->value(SettingsHandler::GLOBAL_SRC_BUCKET_KEY).toString();
   if (! content.isEmpty()) {
     for (int i=0; i < MAX_SRCS; ++i) {
       m_sourceStates.setBit(i, content.at(i) == '1');
@@ -89,7 +88,7 @@ void Preferences::updateSourceStates(void)
 }
 
 
-int Preferences::firstSourceSet()
+int BaseSettings::firstSourceSet()
 {
   int idx = 0;
   while (idx < MAX_SRCS && ! m_sourceStates.at(idx)) {++idx;}
@@ -97,7 +96,7 @@ int Preferences::firstSourceSet()
 }
 
 
-int Preferences::activeSourcesCount(void)
+int BaseSettings::activeSourcesCount(void)
 {
   updateSourceStates();
   return m_sourceStates.count(true);
@@ -105,7 +104,7 @@ int Preferences::activeSourcesCount(void)
 
 
 QMap<QString, SourceT>
-Preferences::fetchSourceList(int type)
+BaseSettings::fetchSourceList(int type)
 {
   QMap<QString, SourceT> sourceList;
   SourceT srcInfo;

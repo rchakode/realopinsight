@@ -25,7 +25,7 @@
 #include "UserManagement.hpp"
 #include "DbSession.hpp"
 #include "WebUtils.hpp"
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include <Wt/WMenu>
 #include <Wt/WPanel>
 #include <Wt/WComboBox>
@@ -261,7 +261,7 @@ UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userF
     submitButton->clicked().connect(this, &UserFormView::process);
   }
 
-  if (user && user->authsystem == WebPreferencesBase::LDAP) {
+  if (user && user->authsystem == WebBaseSettings::LDAP) {
     if (submitButton) submitButton->setDisabled(true);
     if (cancelButton) cancelButton->setDisabled(true);
     if (changedPwdButton) changedPwdButton->setDisabled(true);
@@ -479,7 +479,7 @@ Wt::WPanel* DbUserManager::createUserPanel(const DboUserT& user)
   Wt::WPanel *panel(new Wt::WPanel());
   panel->setTitle(Wt::WString("{1} ({2})")
                   .arg(user.username)
-                  .arg(WebPreferencesBase::authTypeString(user.authsystem)));
+                  .arg(WebBaseSettings::authTypeString(user.authsystem)));
   panel->setAnimation(animation);
   panel->setCentralWidget(form);
   panel->setCollapsible(true);

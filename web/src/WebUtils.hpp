@@ -26,7 +26,7 @@
 #define WEBUTILS_HPP
 
 #include "semaphore.h"
-#include "Settings.hpp"
+#include "SettingsHandler.hpp"
 #include <QString>
 #include <Wt/WText>
 

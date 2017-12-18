@@ -1,8 +1,7 @@
 /*
- * WebSettingUI.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 21-06-2015                                                     #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -24,7 +23,7 @@
 
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "WebAuthPreferences.hpp"
+#include "WebAuthSettings.hpp"
 #include "Validators.hpp"
 #include <QString>
 #include <Wt/WTemplate>
@@ -37,8 +36,8 @@
 #include <Wt/WApplication>
 
 
-WebAuthPreferences::WebAuthPreferences(void)
-  : WebPreferencesBase(),
+WebAuthSettings::WebAuthSettings(void)
+  : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("auth-settings-form.tpl")),
     m_operationCompleted(this),
     m_authSystemChanged(this)
@@ -53,21 +52,21 @@ WebAuthPreferences::WebAuthPreferences(void)
 }
 
 
-WebAuthPreferences::~WebAuthPreferences()
+WebAuthSettings::~WebAuthSettings()
 {
   unbindFormWidgets();
 }
 
 
-void WebAuthPreferences::addEvent(void)
+void WebAuthSettings::addEvent(void)
 {
-  m_authSettingsSaveBtn.clicked().connect(this, &WebAuthPreferences::saveChanges);
-  m_authenticationModeField.changed().connect(this, &WebAuthPreferences::handleAuthTypeChanged);
-  m_ldapSslUseCertField.changed().connect(this, &WebAuthPreferences::handleLdapUseSslChanged);
+  m_authSettingsSaveBtn.clicked().connect(this, &WebAuthSettings::saveChanges);
+  m_authenticationModeField.changed().connect(this, &WebAuthSettings::handleAuthTypeChanged);
+  m_ldapSslUseCertField.changed().connect(this, &WebAuthSettings::handleLdapUseSslChanged);
 }
 
 
-void WebAuthPreferences::createLdapSettingsFields(void)
+void WebAuthSettings::createLdapSettingsFields(void)
 {
   m_ldapServerUriField.setValidator(new UriValidator("ldap", true, this));
   m_ldapServerUriField.setEmptyText("ldap://localhost:389");
@@ -86,7 +85,7 @@ void WebAuthPreferences::createLdapSettingsFields(void)
 
 
 
-void WebAuthPreferences::createAuthSettingsFields(void)
+void WebAuthSettings::createAuthSettingsFields(void)
 {
   m_authenticationModeField.addItem(Q_TR("Built-in"));
   m_authenticationModeField.addItem(Q_TR("LDAP"));
@@ -99,7 +98,7 @@ void WebAuthPreferences::createAuthSettingsFields(void)
 
 
 
-void WebAuthPreferences::createButtons(void)
+void WebAuthSettings::createButtons(void)
 {
   m_authSettingsSaveBtn.setText( Q_TR("Save") );
   m_authSettingsSaveBtn.setStyleClass("btn btn-info");
@@ -107,7 +106,7 @@ void WebAuthPreferences::createButtons(void)
 
 
 
-void WebAuthPreferences::bindFormWidgets(void)
+void WebAuthSettings::bindFormWidgets(void)
 {
   bindWidget("auth-settings-save-button", &m_authSettingsSaveBtn);
   bindWidget("authentication-mode", &m_authenticationModeField);
@@ -123,7 +122,7 @@ void WebAuthPreferences::bindFormWidgets(void)
 }
 
 
-void WebAuthPreferences::unbindFormWidgets(void)
+void WebAuthSettings::unbindFormWidgets(void)
 {
   takeWidget("auth-settings-save-button");
   takeWidget("authentication-mode");
@@ -139,24 +138,24 @@ void WebAuthPreferences::unbindFormWidgets(void)
 }
 
 
-void WebAuthPreferences::saveChanges(void)
+void WebAuthSettings::saveChanges(void)
 {
   // validate fields
   if (validateAuthSettingsFields()) {
-    setKeyValue(Settings::AUTH_MODE_KEY, QString::number(m_authenticationModeField.currentIndex()));
+    setKeyValue(SettingsHandler::AUTH_MODE_KEY, QString::number(m_authenticationModeField.currentIndex()));
     if (getAuthenticationMode() == LDAP) {
-      setKeyValue(Settings::AUTH_LDAP_SERVER_URI, m_ldapServerUriField.text().toUTF8().c_str());
-      setKeyValue(Settings::AUTH_LDAP_VERSION, m_ldapVersionField.currentText().toUTF8().c_str());
-      setKeyValue(Settings::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField.text().toUTF8().c_str());
-      setKeyValue(Settings::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField.text().toUTF8().c_str());
-      setKeyValue(Settings::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField.text().toUTF8().c_str());
-      setKeyValue(Settings::AUTH_LDAP_ID_FIELD, m_ldapIdField.text().toUTF8().c_str());
+      setKeyValue(SettingsHandler::AUTH_LDAP_SERVER_URI, m_ldapServerUriField.text().toUTF8().c_str());
+      setKeyValue(SettingsHandler::AUTH_LDAP_VERSION, m_ldapVersionField.currentText().toUTF8().c_str());
+      setKeyValue(SettingsHandler::AUTH_LDAP_SEARCH_BASE, m_ldapSearchBaseField.text().toUTF8().c_str());
+      setKeyValue(SettingsHandler::AUTH_LDAP_BIND_USER_DN, m_ldapBindUserDnField.text().toUTF8().c_str());
+      setKeyValue(SettingsHandler::AUTH_LDAP_BIND_USER_PASSWORD, m_ldapBindUserPasswordField.text().toUTF8().c_str());
+      setKeyValue(SettingsHandler::AUTH_LDAP_ID_FIELD, m_ldapIdField.text().toUTF8().c_str());
 
       int useCert = m_ldapSslUseCertField.checkState();
-      setKeyValue(Settings::AUTH_LDAP_SSL_USE_CERT, QString::number(useCert));
+      setKeyValue(SettingsHandler::AUTH_LDAP_SSL_USE_CERT, QString::number(useCert));
       if (useCert == Wt::Checked) {
-        setKeyValue(Settings::AUTH_LDAP_SSL_CERT_FILE, m_ldapSslCertFileField.text().toUTF8().c_str());
-        setKeyValue(Settings::AUTH_LDAP_SSL_CA_FILE, m_ldapSslCaFileField.text().toUTF8().c_str());
+        setKeyValue(SettingsHandler::AUTH_LDAP_SSL_CERT_FILE, m_ldapSslCertFileField.text().toUTF8().c_str());
+        setKeyValue(SettingsHandler::AUTH_LDAP_SSL_CA_FILE, m_ldapSslCaFileField.text().toUTF8().c_str());
       }
     }
     m_authSystemChanged.emit(getAuthenticationMode());
@@ -166,7 +165,7 @@ void WebAuthPreferences::saveChanges(void)
 
 
 
-void WebAuthPreferences::showLdapSslSettings(bool display)
+void WebAuthSettings::showLdapSslSettings(bool display)
 {
   std::string v = display ? "true" : "false";
   wApp->doJavaScript(Wt::WString("$('#ldap-custom-ssl-settings').toggle({1});").arg(v).toUTF8());
@@ -174,7 +173,7 @@ void WebAuthPreferences::showLdapSslSettings(bool display)
 
 
 
-bool WebAuthPreferences::validateAuthSettingsFields(void)
+bool WebAuthSettings::validateAuthSettingsFields(void)
 {
   if (m_authenticationModeField.currentIndex() == BuiltIn)
     return true;
@@ -192,7 +191,7 @@ bool WebAuthPreferences::validateAuthSettingsFields(void)
 }
 
 
-void WebAuthPreferences::handleAuthTypeChanged(void)
+void WebAuthSettings::handleAuthTypeChanged(void)
 {
   switch (m_authenticationModeField.currentIndex()) {
     case LDAP:
@@ -206,7 +205,7 @@ void WebAuthPreferences::handleAuthTypeChanged(void)
 }
 
 
-void WebAuthPreferences::handleShowAuthStringChanged(void)
+void WebAuthSettings::handleShowAuthStringChanged(void)
 {
   if (m_showAuthStringField.isChecked()) {
     m_authStringField.setEchoMode(Wt::WLineEdit::Normal);
@@ -216,7 +215,7 @@ void WebAuthPreferences::handleShowAuthStringChanged(void)
 }
 
 
-void WebAuthPreferences::handleLdapUseSslChanged(void)
+void WebAuthSettings::handleLdapUseSslChanged(void)
 {
   if (m_ldapSslUseCertField.checkState() == Wt::Checked) {
     wApp->doJavaScript("$('#ldap-custom-ssl-settings').show();");
@@ -226,18 +225,18 @@ void WebAuthPreferences::handleLdapUseSslChanged(void)
 }
 
 
-void WebAuthPreferences::updateFields(void)
+void WebAuthSettings::updateFields(void)
 {
   m_authenticationModeField.setCurrentIndex(getAuthenticationMode());
   m_ldapServerUriField.setText(getLdapServerUri());
-  m_ldapVersionField.setValueText(m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString());
+  m_ldapVersionField.setValueText(m_settings->keyValue(SettingsHandler::AUTH_LDAP_VERSION).toStdString());
   m_ldapSearchBaseField.setText(getLdapSearchBase());
   m_ldapBindUserDnField.setText(getLdapBindUserDn());
   m_ldapBindUserPasswordField.setText(getLdapBindUserPassword());
   m_ldapIdField.setText(getLdapIdField());
 
   // optional settings related if secure LDAP
-  Wt::CheckState useMySslCert = static_cast<Wt::CheckState>(m_settings->keyValue(Settings::AUTH_LDAP_SSL_USE_CERT).toInt());
+  Wt::CheckState useMySslCert = static_cast<Wt::CheckState>(m_settings->keyValue(SettingsHandler::AUTH_LDAP_SSL_USE_CERT).toInt());
   m_ldapSslUseCertField.setCheckState(useMySslCert);
   m_ldapSslCertFileField.setText(getLdapSslCertFile());
   m_ldapSslCaFileField.setText(getLdapSslCaFile());

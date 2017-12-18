@@ -1,8 +1,7 @@
 /*
- * WebPreferencesBase.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 21-06-2015                                                     #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -24,7 +23,7 @@
 
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "WebNotificationPreferences.hpp"
+#include "WebNotificationSettings.hpp"
 #include "Validators.hpp"
 #include <QString>
 #include <Wt/WTemplate>
@@ -37,8 +36,8 @@
 #include <Wt/WApplication>
 
 
-WebNotificationPreferences::WebNotificationPreferences(void)
-  : WebPreferencesBase(),
+WebNotificationSettings::WebNotificationSettings(void)
+  : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("notification-settings-form.tpl"))
 {
   setMargin(0, Wt::All);
@@ -49,21 +48,21 @@ WebNotificationPreferences::WebNotificationPreferences(void)
 }
 
 
-WebNotificationPreferences::~WebNotificationPreferences(void)
+WebNotificationSettings::~WebNotificationSettings(void)
 {
   unbindFormWidgets();
 }
 
 
-void WebNotificationPreferences::addEvent(void)
+void WebNotificationSettings::addEvent(void)
 {
-  m_notificationSettingsSaveBtn.clicked().connect(this, &WebNotificationPreferences::saveChanges);
-  m_notificationTypeBox.changed().connect(this, &WebNotificationPreferences::updateEmailFieldsEnabledState);
+  m_notificationSettingsSaveBtn.clicked().connect(this, &WebNotificationSettings::saveChanges);
+  m_notificationTypeBox.changed().connect(this, &WebNotificationSettings::updateEmailFieldsEnabledState);
 }
 
 
 
-void WebNotificationPreferences::bindFormWidgets(void)
+void WebNotificationSettings::bindFormWidgets(void)
 {
   bindWidget("notification-type", &m_notificationTypeBox);
   bindWidget("notification-settings-save-button", &m_notificationSettingsSaveBtn);
@@ -75,7 +74,7 @@ void WebNotificationPreferences::bindFormWidgets(void)
 }
 
 
-void WebNotificationPreferences::unbindFormWidgets(void)
+void WebNotificationSettings::unbindFormWidgets(void)
 {
   takeWidget("notification-type");
   takeWidget("notification-settings-save-button");
@@ -87,7 +86,7 @@ void WebNotificationPreferences::unbindFormWidgets(void)
 }
 
 
-void WebNotificationPreferences::createFormWidgets(void)
+void WebNotificationSettings::createFormWidgets(void)
 {
   m_smtpServerAddrField.setEmptyText(Q_TR("smtp.example.com"));
   m_smtpServerPortField.setEmptyText(Q_TR("25"));
@@ -101,21 +100,21 @@ void WebNotificationPreferences::createFormWidgets(void)
 }
 
 
-void WebNotificationPreferences::saveChanges(void)
+void WebNotificationSettings::saveChanges(void)
 {
-  m_settings->setEntry(Settings::NOTIF_TYPE, QString::number(m_notificationTypeBox.currentIndex()));
+  m_settings->setEntry(SettingsHandler::NOTIF_TYPE, QString::number(m_notificationTypeBox.currentIndex()));
   if (m_notificationTypeBox.currentIndex() == EmailNotification) {
-    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerAddrField.text().toUTF8().c_str());
-    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpServerPortField.text().toUTF8().c_str());
-    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField.text().toUTF8().c_str());
-    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField.text().toUTF8().c_str());
-    m_settings->setEntry(Settings::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField.checkState()));
+    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerAddrField.text().toUTF8().c_str());
+    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpServerPortField.text().toUTF8().c_str());
+    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField.text().toUTF8().c_str());
+    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField.text().toUTF8().c_str());
+    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField.checkState()));
     Q_EMIT operationCompleted(ngrt4n::OperationSucceeded, Q_TR("Notification settings updated"));
   }
 }
 
 
-void WebNotificationPreferences::updateEmailFieldsEnabledState(void)
+void WebNotificationSettings::updateEmailFieldsEnabledState(void)
 {
   bool enable = m_notificationTypeBox.currentIndex() == EmailNotification;
   m_smtpServerAddrField.setEnabled(enable);
@@ -126,7 +125,7 @@ void WebNotificationPreferences::updateEmailFieldsEnabledState(void)
 }
 
 
-void WebNotificationPreferences::updateFields(void)
+void WebNotificationSettings::updateFields(void)
 {
   m_notificationTypeBox.setCurrentIndex( getNotificationType() );
   m_smtpServerAddrField.setText( getSmtpServerAddr() );

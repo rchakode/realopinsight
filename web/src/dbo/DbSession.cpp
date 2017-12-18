@@ -23,7 +23,7 @@
  */
 #include "WebUtils.hpp"
 #include "DbSession.hpp"
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include <tuple>
 #include <QFile>
 #include <Wt/Auth/HashFunction>
@@ -337,7 +337,7 @@ bool DbSession::findView(const std::string& vname, DboView& view)
 void DbSession::initDb(void)
 {
   try {
-    WebPreferencesBase pref;
+    WebBaseSettings pref;
     //TODO provide the reset of dbInitializationState when switching to a new database type
     if (pref.dbInitializationState() != DbInitialized) {
       createTables();

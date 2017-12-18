@@ -28,7 +28,7 @@
 #include <QString>
 #include "Base.hpp"
 #include "Parser.hpp"
-#include "Preferences.hpp"
+#include "BaseSettings.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
 
@@ -45,7 +45,7 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void initSettings(Preferences* preferencePtr);
+  void initSettings(BaseSettings* preferencePtr);
   qint64 updateCounter(void) const {return m_updateCounter;}
   QString config(void) const {return m_descriptionFile;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
@@ -68,7 +68,7 @@ public Q_SLOTS:
   void checkStandaloneSourceType(SourceT& src);
   void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
-  virtual void initialize(Preferences* preferencePtr);
+  virtual void initialize(BaseSettings* preferencePtr);
   qint32 userRole(void) const {return m_userRole;}
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
   void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
@@ -113,7 +113,7 @@ protected:
   int m_firstSrcIndex;
   bool m_lastErrorState;
   QString m_lastErrorMsg;
-  Preferences* m_preferences;
+  BaseSettings* m_preferences;
 
 protected:
   void resetInterval(void);

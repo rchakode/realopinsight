@@ -57,9 +57,7 @@ INCLUDEPATH += web/src
 
 HEADERS += \
     core/src/Base.hpp \
-    core/src/Settings.hpp \
     core/src/Parser.hpp \
-    core/src/Preferences.hpp \
     core/src/ZbxHelper.hpp \
     core/src/ZnsHelper.hpp \
     core/src/PandoraHelper.hpp \
@@ -89,7 +87,6 @@ HEADERS += \
     web/src/dbo/ViewAclManagement.hpp \
     web/src/dbo/UserManagement.hpp \
     web/src/WebDashboard.hpp \
-    web/src/WebMsgConsole.hpp \
     web/src/WebMap.hpp \
     web/src/WebTree.hpp \
     web/src/WebPieChart.hpp \
@@ -103,23 +100,24 @@ HEADERS += \
     web/src/Applications.hpp \
     web/src/Notificator.hpp \
     web/src/dbo/LdapUserManager.hpp \
-    web/src/WebNotificationManager.hpp \
     web/src/dbo/NotificationTableView.hpp \
-    web/src/WebPreferencesBase.hpp \
-    web/src/WebAuthPreferences.hpp \
-    web/src/WebDataSourcePreferences.hpp \
-    web/src/WebNotificationPreferences.hpp \
     web/src/WebHostGroupServiceMap.hpp \
     web/src/WebCsvReportResource.hpp \
     web/src/WebBiDateFilter.hpp \
     web/src/WebBiDashlet.hpp \
     web/src/WebBiRawChart.hpp \
-    web/src/WebBiSlaDataAggregator.hpp
+    web/src/WebBiSlaDataAggregator.hpp \
+    web/src/WebMsgDialog.hpp \
+    web/src/WebEventConsole.hpp \
+    web/src/WebNotificationSettings.hpp \
+    web/src/WebDataSourceSettings.hpp \
+    web/src/WebBaseSettings.hpp \
+    web/src/WebAuthSettings.hpp \
+    core/src/SettingsHandler.hpp \
+    core/src/BaseSettings.hpp
 
 SOURCES +=  core/src/Base.cpp \
-    core/src/Settings.cpp \
     core/src/Parser.cpp \
-    core/src/Preferences.cpp \
     core/src/ZbxHelper.cpp \
     core/src/ZnsHelper.cpp \
     core/src/PandoraHelper.cpp \
@@ -146,7 +144,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/dbo/ViewAclManagement.cpp \
     web/src/QosCollector.cpp \
     web/src/WebDashboard.cpp \
-    web/src/WebMsgConsole.cpp \
     web/src/WebMap.cpp \
     web/src/WebTree.cpp \
     web/src/WebPieChart.cpp \
@@ -157,18 +154,21 @@ SOURCES +=  core/src/Base.cpp \
     web/src/AuthModelProxy.cpp \
     web/src/Notificator.cpp \
     web/src/dbo/LdapUserManager.cpp \
-    web/src/WebNotificationManager.cpp \
     web/src/dbo/NotificationTableView.cpp \
-    web/src/WebPreferencesBase.cpp \
-    web/src/WebAuthPreferences.cpp \
-    web/src/WebDataSourcePreferences.cpp \
-    web/src/WebNotificationPreferences.cpp \
     web/src/WebHostGroupServiceMap.cpp \
     web/src/WebCsvReportResource.cpp \
     web/src/WebBiDashlet.cpp \
     web/src/WebBiDateFilter.cpp \
     web/src/WebBiSlaDataAggregator.cpp \
-    web/src/WebBiRawChart.cpp
+    web/src/WebBiRawChart.cpp \
+    web/src/WebMsgDialog.cpp \
+    web/src/WebEventConsole.cpp \
+    web/src/WebNotificationSettings.cpp \
+    web/src/WebBaseSettings.cpp \
+    web/src/WebAuthSettings.cpp \
+    web/src/WebDataSourceSettings.cpp \
+    core/src/SettingsHandler.cpp \
+    core/src/BaseSettings.cpp
 
 
 

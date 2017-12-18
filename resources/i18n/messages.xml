@@ -484,7 +484,7 @@
     <div id="notification-section">
       <fieldset>
         <div class="col-sm-12 form-group">
-          <label class="control-label">Monitor type&nbsp;</label>
+          <label class="control-label">Notification type&nbsp;</label>
           <span>${notification-type}</span>
          </div>
           <!-- mail notification settings -->

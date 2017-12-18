@@ -59,7 +59,7 @@ WebDashboard::~WebDashboard()
   unbindWidgets();
 }
 
-void WebDashboard::initialize(Preferences* preferencePtr)
+void WebDashboard::initialize(BaseSettings* preferencePtr)
 {
   DashboardBase::initialize(preferencePtr);
   if (! DashboardBase::lastErrorState()) {

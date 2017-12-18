@@ -1,8 +1,8 @@
 /*
- * WebPreferencesBase.cpp
+# WebNotificationManager.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
-# Creation: 11-04-2015                                                     #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Last Update: 08-12-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,55 +22,41 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "WebMsgDialog.hpp"
+#include "WebUtils.hpp"
+#include <Wt/WPushButton>
 
-#include "WebPreferencesBase.hpp"
-#include "utilsCore.hpp"
-#include <ldap.h>
-
-WebPreferencesBase::WebPreferencesBase(void)
-  : Preferences("/opt/realopinsight/etc/realopinsight.conf")
+WebMsgDialog::WebMsgDialog(DbSession* dbSession, Wt::WContainerWidget* parent)
+  : Wt::WDialog(Q_TR("Manage Notifications"), parent),
+    m_operationCompleted(this)
 {
+  m_notificationTableView = new NotificationTableView(dbSession, this->contents());
+
+  m_infoBox = new Wt::WText("", this->footer());
+
+  Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
+  closeButton->clicked().connect(this, &Wt::WDialog::accept);
+
+  setStyleClass("Wt-dialog");
+  titleBar()->setStyleClass("titlebar");
 }
 
 
-int WebPreferencesBase::getLdapVersion(void) const
+WebMsgDialog::~WebMsgDialog()
 {
-  std::string val = m_settings->keyValue(Settings::AUTH_LDAP_VERSION).toStdString();
-  if (val != LDAP_VERSION3_LABEL)
-    return LDAP_VERSION2;
-
-  return LDAP_VERSION3;
+  delete m_notificationTableView;
 }
 
 
-int WebPreferencesBase::getAuthenticationMode(void) const
+void WebMsgDialog::show(void)
 {
-  int val = m_settings->keyValue(Settings::AUTH_MODE_KEY).toInt();
-  if (val != LDAP)
-    return BuiltIn;
-
-  return val;
-}
-
-
-
-std::string WebPreferencesBase::getLdapIdField(void) const
-{
-  QString val = m_settings->keyValue(Settings::AUTH_LDAP_ID_FIELD);
-  if (val.isEmpty())
-    return "uid";
-
-  return val.toStdString();
-}
-
-
-int WebPreferencesBase::activeSourceIds(QVector<std::string>& result)
-{
-  result.clear();
-  for (int i = 0; i < MAX_SRCS; ++i) {
-    if (m_sourceStates.at(i)) {
-      result.push_back(ngrt4n::sourceId(i).toStdString());
-    }
+  if (m_notificationTableView->update() != 0) {
+    m_infoBox->setHidden(false);
+    m_infoBox->setText(m_notificationTableView->lastError());
+    m_infoBox->setStyleClass("text-danger");
+  } else {
+    m_infoBox->setHidden(true);
+    m_infoBox->setStyleClass("text-muted");
   }
-  return result.size();
+  Wt::WDialog::show();
 }

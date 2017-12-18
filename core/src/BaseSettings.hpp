@@ -1,8 +1,7 @@
 /*
- * Preferences.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 23-03-2014                                                  #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -23,14 +22,14 @@
  */
 
 
-#ifndef SNAVPREFERENCES_HPP_
-#define SNAVPREFERENCES_HPP_
+#ifndef BASESETTINGS_HPP_
+#define BASESETTINGS_HPP_
 
-#include "Settings.hpp"
+#include "SettingsHandler.hpp"
 #include "Base.hpp"
 
 
-class Preferences: public QObject
+class BaseSettings: public QObject
 {
   Q_OBJECT
 
@@ -45,9 +44,9 @@ public:
     NoForm
   };
 
-  Preferences(void);
-  Preferences(const QString& settingFile);
-  ~Preferences(void);
+  BaseSettings(void);
+  BaseSettings(const QString& settingFile);
+  ~BaseSettings(void);
   QBitArray getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS)? m_sourceStates.at(idx) : false; }
   void setSourceState(int index, int value) {m_sourceStates.setBit(index, value);}
@@ -88,7 +87,7 @@ protected Q_SLOTS:
   void emitTimerIntervalChanged(qint32 _interval) {m_settings->emitTimerIntervalChanged(_interval);}
 
 protected:
-  Settings* m_settings;
+  SettingsHandler* m_settings;
   int m_currentSourceIndex;
   QBitArray m_sourceStates;
 
@@ -97,4 +96,4 @@ private:
 };
 
 
-#endif /* SNAVPREFERENCES_HPP_ */
+#endif /* BASESETTINGS_HPP_ */

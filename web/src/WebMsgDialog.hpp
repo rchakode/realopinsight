@@ -1,8 +1,7 @@
 /*
-# WebNotificationManager.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 08-12-2014                                                  #
+# Last Update: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,41 +21,34 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebNotificationManager.hpp"
-#include "WebUtils.hpp"
-#include <Wt/WPushButton>
+#ifndef WEBMSGDIALOG_HPP
+#define WEBMSGDIALOG_HPP
 
-WebNotificationManager::WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WDialog(Q_TR("Manage Notifications"), parent),
-    m_operationCompleted(this)
+#include <QMap>
+#include <Wt/WDialog>
+#include "Base.hpp"
+#include "dbo/DbSession.hpp"
+#include "dbo/NotificationTableView.hpp"
+
+class WebMsgDialog : public Wt::WDialog
 {
-  m_notificationTableView = new NotificationTableView(dbSession, this->contents());
+public:
+  WebMsgDialog(DbSession* dbSession, Wt::WContainerWidget* parent=0);
+  ~WebMsgDialog();
 
-  m_infoBox = new Wt::WText("", this->footer());
+  Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
+  void show(void);
+  void clearAllServicesData(void) {m_notificationTableView->clearAllServicesData(); }
+  void updateServiceData(const NodeT& node) { m_notificationTableView->updateServiceData(node); }
 
-  Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
-  closeButton->clicked().connect(this, &Wt::WDialog::accept);
-
-  setStyleClass("Wt-dialog");
-  titleBar()->setStyleClass("titlebar");
-}
-
-
-WebNotificationManager::~WebNotificationManager()
-{
-  delete m_notificationTableView;
-}
+private:
+  /** Signals **/
+  Wt::Signal<int, std::string> m_operationCompleted;
 
 
-void WebNotificationManager::show(void)
-{
-  if (m_notificationTableView->update() != 0) {
-    m_infoBox->setHidden(false);
-    m_infoBox->setText(m_notificationTableView->lastError());
-    m_infoBox->setStyleClass("text-danger");
-  } else {
-    m_infoBox->setHidden(true);
-    m_infoBox->setStyleClass("text-muted");
-  }
-  Wt::WDialog::show();
-}
+  /** other members **/
+  Wt::WText* m_infoBox;
+  NotificationTableView* m_notificationTableView;
+};
+
+#endif // WEBMSGDIALOG_HPP

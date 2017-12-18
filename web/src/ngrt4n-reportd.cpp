@@ -23,7 +23,7 @@
  */
 
 #include "dbo/DbSession.hpp"
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
 #include "Applications.hpp"
@@ -49,7 +49,7 @@ void runCollector(int period)
   ngrt4n::initReportdLogger();
 
   DbSession dbSession;
-  WebPreferencesBase preferences;
+  WebBaseSettings preferences;
   Notificator notificator(&dbSession);
   while(1) {
     try {
@@ -86,7 +86,7 @@ void runCollector(int period)
       }
     }
     // now handle notifications if applicable
-    if (preferences.getNotificationType() != WebPreferencesBase::NoNotification) {
+    if (preferences.getNotificationType() != WebBaseSettings::NoNotification) {
       for (const auto qosEntry : qosDataList)
         notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);
     }

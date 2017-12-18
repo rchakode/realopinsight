@@ -25,13 +25,13 @@
 #ifndef WEBMANAGEHOSTGROUPMAPS_HPP
 #define WEBMANAGEHOSTGROUPMAPS_HPP
 
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include <Wt/WTemplate>
 #include <Wt/WPushButton>
 #include <Wt/WLineEdit>
 #include <Wt/WComboBox>
 
-class WebHostGroupServiceMap : public WebPreferencesBase, public Wt::WTemplate
+class WebHostGroupServiceMap : public WebBaseSettings, public Wt::WTemplate
 {
 public:
   WebHostGroupServiceMap();

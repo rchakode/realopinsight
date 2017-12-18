@@ -1,8 +1,7 @@
 /*
- * Settings.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update : 23-03-2014                                                 #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,21 +21,21 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef SETTINGS_HPP
-#define SETTINGS_HPP
+#ifndef SETTINGSHANDLER_HPP
+#define SETTINGSHANDLER_HPP
 #include <QString>
 #include <QSettings>
 #include "Base.hpp"
 #include <ctime>
 
 
-class Settings : public QSettings
+class SettingsHandler : public QSettings
 {
   Q_OBJECT
 public:
-  Settings();
-  Settings(const QString& path);
-  virtual ~Settings(void);
+  SettingsHandler();
+  SettingsHandler(const QString& path);
+  virtual ~SettingsHandler(void);
 
   void init(void);
   void setKeyValue(const QString & _key, const QString & _value);
@@ -92,4 +91,4 @@ Q_SIGNALS:
 };
 
 
-#endif // SETTINGS_HPP
+#endif // SETTINGSHANDLER_HPP

@@ -27,7 +27,7 @@
 #include "utilsCore.hpp"
 
 WebHostGroupServiceMap::WebHostGroupServiceMap()
-  : WebPreferencesBase(),
+  : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("import-hostgroup-form.tpl")),
     m_operationCompleted(this),
     m_hostgroupSubmitted(this)

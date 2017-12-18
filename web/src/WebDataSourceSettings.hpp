@@ -1,8 +1,7 @@
 /*
- * WebDataSourcePreferences.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 21-06-2015                                                     #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -24,10 +23,10 @@
 
 
 
-#ifndef WEBDATASOURCEPREFERENCES_HPP
-#define WEBDATASOURCEPREFERENCES_HPP
+#ifndef WEBDATASOURCESETTINGS_HPP
+#define WEBDATASOURCESETTINGS_HPP
 
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include "Validators.hpp"
 #include <Wt/WLineEdit>
 #include <Wt/WComboBox>
@@ -37,11 +36,11 @@
 #include <Wt/WTemplate>
 #include <Wt/WSpinBox>
 
-class WebDataSourcePreferences : public WebPreferencesBase, public Wt::WTemplate
+class WebDataSourceSettings : public WebBaseSettings, public Wt::WTemplate
 {
 public:
-  WebDataSourcePreferences();
-  virtual ~WebDataSourcePreferences();
+  WebDataSourceSettings();
+  virtual ~WebDataSourceSettings();
   Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
   void updateContents(void) { loadProperties();}
   void setEnabledInputs(bool enable);
@@ -95,4 +94,4 @@ private:
   void handleShowAuthStringChanged(void);
 };
 
-#endif // WEBDATASOURCEPREFERENCES_HPP
+#endif // WEBDATASOURCESETTINGS_HPP

@@ -1,8 +1,7 @@
 /*
- * WebDataSourcePreferences.cpp
-# ------------------------------------------------------------------------ #
+ # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 21-06-2015                                                     #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -24,13 +23,13 @@
 
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "WebDataSourcePreferences.hpp"
+#include "WebDataSourceSettings.hpp"
 #include <Wt/WSpinBox>
 #include <Wt/WApplication>
 
 
-WebDataSourcePreferences::WebDataSourcePreferences()
-  : WebPreferencesBase(),
+WebDataSourceSettings::WebDataSourceSettings()
+  : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("data-source-settings-form.tpl")),
     m_operationCompleted(this)
 {
@@ -42,13 +41,13 @@ WebDataSourcePreferences::WebDataSourcePreferences()
 }
 
 
-WebDataSourcePreferences::~WebDataSourcePreferences()
+WebDataSourceSettings::~WebDataSourceSettings()
 {
   unbindFormWidgets();
 }
 
 
-void WebDataSourcePreferences::createFormWidgets(void)
+void WebDataSourceSettings::createFormWidgets(void)
 {
   renderSourceIndexSelector();
 
@@ -77,7 +76,7 @@ void WebDataSourcePreferences::createFormWidgets(void)
   // update interval field
   m_updateIntervalField.setMinimum(5);
   m_updateIntervalField.setMaximum(1200);
-  m_updateIntervalField.setValue(Preferences::updateInterval());
+  m_updateIntervalField.setValue(BaseSettings::updateInterval());
 
   m_authStringField.setEchoMode(Wt::WLineEdit::Password);
   m_authStringField.setEmptyText( Q_TR("Set the authentication string") );
@@ -94,7 +93,7 @@ void WebDataSourcePreferences::createFormWidgets(void)
 }
 
 
-void WebDataSourcePreferences::bindFormWidgets(void)
+void WebDataSourceSettings::bindFormWidgets(void)
 {
   bindWidget("show-in-clear", &m_showAuthStringField);
   bindWidget("monitor-auth-string", &m_authStringField);
@@ -112,7 +111,7 @@ void WebDataSourcePreferences::bindFormWidgets(void)
 }
 
 
-void WebDataSourcePreferences::unbindFormWidgets(void)
+void WebDataSourceSettings::unbindFormWidgets(void)
 {
   takeWidget("show-in-clear");
   takeWidget("monitor-auth-string");
@@ -130,19 +129,19 @@ void WebDataSourcePreferences::unbindFormWidgets(void)
 }
 
 
-void WebDataSourcePreferences::addEvent(void)
+void WebDataSourceSettings::addEvent(void)
 {
-  m_applyChangeBtn.clicked().connect(this, &WebDataSourcePreferences::applyChanges);
-  m_addAsSourceBtn.clicked().connect(this, &WebDataSourcePreferences::addAsSource);
-  m_deleteSourceBtn.clicked().connect(this, &WebDataSourcePreferences::deleteSource);
-  m_monitorTypeField.activated().connect(this, &WebDataSourcePreferences::showLivestatusSettings);
-  m_sourceSelectionBox.changed().connect(this, &WebDataSourcePreferences::handleSourceBoxChanged);
-  m_showAuthStringField.changed().connect(this, &WebDataSourcePreferences::handleShowAuthStringChanged);
+  m_applyChangeBtn.clicked().connect(this, &WebDataSourceSettings::applyChanges);
+  m_addAsSourceBtn.clicked().connect(this, &WebDataSourceSettings::addAsSource);
+  m_deleteSourceBtn.clicked().connect(this, &WebDataSourceSettings::deleteSource);
+  m_monitorTypeField.activated().connect(this, &WebDataSourceSettings::showLivestatusSettings);
+  m_sourceSelectionBox.changed().connect(this, &WebDataSourceSettings::handleSourceBoxChanged);
+  m_showAuthStringField.changed().connect(this, &WebDataSourceSettings::handleShowAuthStringChanged);
 }
 
 
 
-bool WebDataSourcePreferences::validateSourceSettingsFields(void)
+bool WebDataSourceSettings::validateSourceSettingsFields(void)
 {
   if (m_monitorTypeField.currentIndex() == 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Monitor type not set"));
@@ -156,7 +155,7 @@ bool WebDataSourcePreferences::validateSourceSettingsFields(void)
 }
 
 
-void WebDataSourcePreferences::applyChanges(void)
+void WebDataSourceSettings::applyChanges(void)
 {
   if (! validateSourceSettingsFields())
     return ;
@@ -176,7 +175,7 @@ void WebDataSourcePreferences::applyChanges(void)
 
 
 
-void WebDataSourcePreferences::addAsSource(void)
+void WebDataSourceSettings::addAsSource(void)
 {
   if (validateSourceSettingsFields())
     m_sourceIndexSelector.show();
@@ -184,20 +183,20 @@ void WebDataSourcePreferences::addAsSource(void)
 
 
 
-void WebDataSourcePreferences::deleteSource(void)
+void WebDataSourceSettings::deleteSource(void)
 {
   int curIndex = currentSourceIndex();
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBoxModel.removeRow(currentSourceIndex());
     setSourceState(currentSourceIndex(), false);
-    setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
+    setKeyValue(SettingsHandler::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
     sync();
     updateFields();
   }
 }
 
 
-void WebDataSourcePreferences::updateAllSourceWidgetStates(void)
+void WebDataSourceSettings::updateAllSourceWidgetStates(void)
 {
   std::vector< Wt::WString > activeSourceLabels;
   std::vector< int > activeSourceIndexes;
@@ -217,7 +216,7 @@ void WebDataSourcePreferences::updateAllSourceWidgetStates(void)
 }
 
 
-void WebDataSourcePreferences::updateFields(void)
+void WebDataSourceSettings::updateFields(void)
 {
   setCurrentSourceIndex(firstSourceSet());
   int curIndex = currentSourceIndex();
@@ -228,10 +227,10 @@ void WebDataSourcePreferences::updateFields(void)
 }
 
 
-void WebDataSourcePreferences::saveAsSource(const qint32& index, const QString& type)
+void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& type)
 {
   // global settings
-  setKeyValue(Settings::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
+  setKeyValue(SettingsHandler::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
 
   // source-specific settings
   SourceT src;
@@ -245,7 +244,7 @@ void WebDataSourcePreferences::saveAsSource(const qint32& index, const QString& 
   src.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
   setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   setSourceState(index, true);
-  setKeyValue(Settings::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
+  setKeyValue(SettingsHandler::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
 
   // save changes
   sync();
@@ -257,7 +256,7 @@ void WebDataSourcePreferences::saveAsSource(const qint32& index, const QString& 
 }
 
 
-void WebDataSourcePreferences::fillFromSource(int _index)
+void WebDataSourceSettings::fillFromSource(int _index)
 {
   if (_index >= 0 && _index < MAX_SRCS) {
     SourceT src;
@@ -281,7 +280,7 @@ void WebDataSourcePreferences::fillFromSource(int _index)
 }
 
 
-void WebDataSourcePreferences::renderSourceIndexSelector(void)
+void WebDataSourceSettings::renderSourceIndexSelector(void)
 {
   m_sourceSelectionBox.setModel(&m_sourceBoxModel);
   m_sourceIndexSelector.rejectWhenEscapePressed();
@@ -296,7 +295,7 @@ void WebDataSourcePreferences::renderSourceIndexSelector(void)
 
   //FIXME: check if this cause memory leak ?
   Wt::WPushButton *ok = new Wt::WPushButton("OK", m_sourceIndexSelector.footer());
-  ok->clicked().connect(std::bind(&WebDataSourcePreferences::handleAddAsSourceOkAction, this, inputField));
+  ok->clicked().connect(std::bind(&WebDataSourceSettings::handleAddAsSourceOkAction, this, inputField));
   ok->setDefault(true);
 
   //FIXME: check if this cause memory leak ?
@@ -306,7 +305,7 @@ void WebDataSourcePreferences::renderSourceIndexSelector(void)
 
 
 
-void WebDataSourcePreferences::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
+void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
 {
   m_sourceIndexSelector.accept();
   bool isValidIndex;
@@ -322,7 +321,7 @@ void WebDataSourcePreferences::handleAddAsSourceOkAction(Wt::WComboBox* inputBox
 
 
 
-int WebDataSourcePreferences::getSourceGlobalIndex(int sourceBoxIndex)
+int WebDataSourceSettings::getSourceGlobalIndex(int sourceBoxIndex)
 {
   boost::any value =
       static_cast<Wt::WAbstractItemModel*>(
@@ -332,7 +331,7 @@ int WebDataSourcePreferences::getSourceGlobalIndex(int sourceBoxIndex)
 }
 
 
-int WebDataSourcePreferences::findSourceIndexInBox(int sourceGlobalIndex)
+int WebDataSourceSettings::findSourceIndexInBox(int sourceGlobalIndex)
 {
   int index = m_sourceBoxModel.rowCount() - 1;
   while (index >= 0 && (getSourceGlobalIndex(index) != sourceGlobalIndex)) --index;
@@ -340,7 +339,7 @@ int WebDataSourcePreferences::findSourceIndexInBox(int sourceGlobalIndex)
 }
 
 
-void WebDataSourcePreferences::addToSourceBox(int sourceGlobalIndex)
+void WebDataSourceSettings::addToSourceBox(int sourceGlobalIndex)
 {
   int index = findSourceIndexInBox(sourceGlobalIndex);
   if (index < 0) {
@@ -351,7 +350,7 @@ void WebDataSourcePreferences::addToSourceBox(int sourceGlobalIndex)
 }
 
 
-void WebDataSourcePreferences::setEnabledInputs(bool enable)
+void WebDataSourceSettings::setEnabledInputs(bool enable)
 {
   m_monitorUrlField.setEnabled(enable);
   m_authStringField.setEnabled(enable);
@@ -369,13 +368,13 @@ void WebDataSourcePreferences::setEnabledInputs(bool enable)
 
 
 
-void WebDataSourcePreferences::handleSourceBoxChanged(void)
+void WebDataSourceSettings::handleSourceBoxChanged(void)
 {
   fillFromSource(getSourceGlobalIndex(m_sourceSelectionBox.currentIndex()));
 }
 
 
-void WebDataSourcePreferences::showLivestatusSettings(int monitorTypeIndex)
+void WebDataSourceSettings::showLivestatusSettings(int monitorTypeIndex)
 {
   switch (monitorTypeIndex) {
     case 1:
@@ -388,7 +387,7 @@ void WebDataSourcePreferences::showLivestatusSettings(int monitorTypeIndex)
 }
 
 
-void WebDataSourcePreferences::handleShowAuthStringChanged(void)
+void WebDataSourceSettings::handleShowAuthStringChanged(void)
 {
   if (m_showAuthStringField.isChecked()) {
     m_authStringField.setEchoMode(Wt::WLineEdit::Normal);

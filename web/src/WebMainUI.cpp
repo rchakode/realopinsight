@@ -1128,12 +1128,12 @@ void WebMainUI::updateEventFeeds(void)
 void WebMainUI::handleAuthSystemChanged(int authSystem)
 {
   switch (authSystem) {
-    case WebPreferencesBase::LDAP:
+    case WebBaseSettings::LDAP:
       m_menuLinks[MenuLdapUsers]->setDisabled(false);
       wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', false);");
       break;
     default:
-      m_dbSession->deleteAuthSystemUsers(WebPreferencesBase::LDAP);
+      m_dbSession->deleteAuthSystemUsers(WebBaseSettings::LDAP);
       wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', true);");
       break;
   }
@@ -1141,7 +1141,7 @@ void WebMainUI::handleAuthSystemChanged(int authSystem)
 
 void WebMainUI::handleLdapUsersMenu(void)
 {
-  if (m_authSettingsForm.getAuthenticationMode() != WebPreferencesBase::LDAP) {
+  if (m_authSettingsForm.getAuthenticationMode() != WebBaseSettings::LDAP) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Denied, please enable LDAP authentication first"));
   } else {
     m_adminStackedContents.setCurrentWidget(m_ldapUserManager);
@@ -1209,9 +1209,9 @@ void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 }
 
 
-WebNotificationManager* WebMainUI::createNotificationManager(void)
+WebMsgDialog* WebMainUI::createNotificationManager(void)
 {
-  WebNotificationManager* notificationManager = new WebNotificationManager(m_dbSession, &m_mainWidget);
+  WebMsgDialog* notificationManager = new WebMsgDialog(m_dbSession, &m_mainWidget);
   notificationManager->operationCompleted().connect(this, &WebMainUI::showMessage);
   return notificationManager;
 }

@@ -1,8 +1,7 @@
 /*
- * WebPreferencesBase.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 21-06-2015                                                     #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,10 +21,10 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBNOTIFICATIONPREFERENCES_HPP
-#define WEBNOTIFICATIONPREFERENCES_HPP
+#ifndef WEBNOTIFICATIONSETTINGS_HPP
+#define WEBNOTIFICATIONSETTINGS_HPP
 
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include <Wt/WDialog>
 #include <Wt/WRadioButton>
 #include <Wt/WLineEdit>
@@ -40,12 +39,12 @@
 #include <memory>
 
 
-class WebNotificationPreferences : public WebPreferencesBase, public Wt::WTemplate
+class WebNotificationSettings : public WebBaseSettings, public Wt::WTemplate
 {
   Q_OBJECT
 public:
-  WebNotificationPreferences(void);
-  virtual ~WebNotificationPreferences(void);
+  WebNotificationSettings(void);
+  virtual ~WebNotificationSettings(void);
   void updateContents(void) { updateFields(); }
 
 
@@ -74,4 +73,4 @@ private:
   void handleLdapUseSslChanged(void);
 };
 
-#endif // WEBNOTIFICATIONPREFERENCES_HPP
+#endif // WEBNOTIFICATIONSETTINGS_HPP

@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebAuthPreferences.hpp"
+#include "WebAuthSettings.hpp"
 #include "dbo/UserManagement.hpp"
 #include "AuthModelProxy.hpp"
 #include "WebUtils.hpp"
@@ -43,10 +43,10 @@ AuthModelProxy::AuthModelProxy(const Wt::Auth::AuthService& baseAuth,
 
 bool AuthModelProxy::login(Wt::Auth::Login& login)
 {
-  WebAuthPreferences preferences;
+  WebAuthSettings preferences;
 
   // Check authentication mode
-  if (preferences.getAuthenticationMode() == WebPreferencesBase::BuiltIn)
+  if (preferences.getAuthenticationMode() == WebBaseSettings::BuiltIn)
     return Wt::Auth::AuthModel::login(login);
 
   QString username = QString::fromStdString(valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8());

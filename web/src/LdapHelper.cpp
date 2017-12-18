@@ -24,7 +24,7 @@
 
 #include "dbo/DbObjects.hpp"
 #include "LdapHelper.hpp"
-#include "Settings.hpp"
+#include "SettingsHandler.hpp"
 #include "WebUtils.hpp"
 #include <ctime>
 

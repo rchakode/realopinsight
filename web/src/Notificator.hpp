@@ -26,7 +26,7 @@
 #define NOTIFICATOR_H
 #include "Base.hpp"
 #include "dbo/DbSession.hpp"
-#include "WebNotificationPreferences.hpp"
+#include "WebNotificationSettings.hpp"
 #include "utils/smtpclient/MailSender.hpp"
 #include <QObject>
 #include <QString>
@@ -43,7 +43,7 @@ public:
 
 private:
   std::unique_ptr<MailSender> m_mailSender;
-  WebPreferencesBase m_preferences;
+  WebBaseSettings m_preferences;
   DbSession* m_dbSession;
   QEventLoop m_eventSynchonizer;
 };

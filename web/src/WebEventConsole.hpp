@@ -22,8 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef NGRT4NMSGPANEL_HPP_
-#define NGRT4NMSGPANEL_HPP_
+#ifndef WEBEVENTCONSOLE_HPP
+#define WEBEVENTCONSOLE_HPP
 #include <Wt/WTableView>
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
@@ -72,4 +72,4 @@ private:
   void setModelHeaders(void);
 };
 
-#endif /* NGRT4NMSGPANEL_HPP_ */
+#endif /* WEBEVENTCONSOLE_HPP */

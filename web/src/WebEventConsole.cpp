@@ -23,7 +23,7 @@
  */
 
 #include "WebUtils.hpp"
-#include "WebMsgConsole.hpp"
+#include "WebEventConsole.hpp"
 #include "utilsCore.hpp"
 #include <Wt/WDateTime>
 

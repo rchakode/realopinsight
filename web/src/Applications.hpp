@@ -81,17 +81,17 @@ class WebApp : public Wt::WQApplication
       require(m_dirroot+"resources/js/ga.js");
 #endif
 
-      WebPreferencesBase preference;
-      int dbType = preference.getDbType();
+      WebBaseSettings settings;
+      int dbType = settings.getDbType();
       std::string db = "";
       if (dbType == PostgresqlDb) {
         CORE_LOG("info", Q_TR("Using PostgreSQL database"));
         db = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
-            .arg(preference.getDbServerAddr())
-            .arg(preference.getDbServerPort())
-            .arg(preference.getDbName())
-            .arg(preference.getDbUser())
-            .arg(preference.getDbPassword())
+            .arg(settings.getDbServerAddr())
+            .arg(settings.getDbServerPort())
+            .arg(settings.getDbName())
+            .arg(settings.getDbUser())
+            .arg(settings.getDbPassword())
             .toUTF8();
       } else { // use Sqlite3 as default database
         CORE_LOG("info", Q_TR("Using Sqlite3 database"));

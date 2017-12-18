@@ -1,8 +1,7 @@
 /*
- * WebAuthPreferences.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 21-06-2015                                                     #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,10 +21,10 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBAUTHPREFERENCES_HPP
-#define WEBAUTHPREFERENCES_HPP
+#ifndef WEBAUTHSETTINGS_HPP
+#define WEBAUTHSETTINGS_HPP
 
-#include "WebPreferencesBase.hpp"
+#include "WebBaseSettings.hpp"
 #include <Wt/WTemplate>
 #include <Wt/WDialog>
 #include <Wt/WRadioButton>
@@ -40,11 +39,11 @@
 #include <memory>
 
 
-class WebAuthPreferences : public WebPreferencesBase, public Wt::WTemplate
+class WebAuthSettings : public WebBaseSettings, public Wt::WTemplate
 {
 public:
-  WebAuthPreferences(void);
-  virtual ~WebAuthPreferences();
+  WebAuthSettings(void);
+  virtual ~WebAuthSettings();
   void updateContents(void) { updateFields(); }
   Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
   Wt::Signal<int>& authSystemChanged() { return m_authSystemChanged; }
@@ -88,4 +87,4 @@ private:
   void handleLdapUseSslChanged(void);
 };
 
-#endif // WEBAUTHPREFERENCES_HPP
+#endif // WEBAUTHSETTINGS_HPP

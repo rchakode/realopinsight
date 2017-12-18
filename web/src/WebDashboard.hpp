@@ -36,7 +36,7 @@
 #include <Wt/WMenu>
 #include <Wt/WMenuItem>
 #include <Wt/WStackedWidget>
-#include "WebMsgConsole.hpp"
+#include "WebEventConsole.hpp"
 #include "WebMap.hpp"
 #include <Wt/WLocalizedStrings>
 #include <Wt/WLabel>
@@ -95,7 +95,7 @@ public:
   Wt::WLabel* thumbnailTitleBar(void) {return &m_thumbnailTitleBar;}
   Wt::WLabel* thumbnailProblemDetailBar(void) {return &m_thumbnailProblemDetailsBar;}
   std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
-  virtual void initialize(Preferences* preferencePtr);
+  virtual void initialize(BaseSettings* preferencePtr);
   std::string tooltip(void) {return m_chart.toStdString();}
   void triggerResizeComponents(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
   void handleShowOnlyTroubleEvents(bool showOnlyTrouble);

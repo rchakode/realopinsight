@@ -32,10 +32,10 @@
 #include "WebDashboard.hpp"
 #include "WebBiDashlet.hpp"
 #include "WebUtils.hpp"
-#include "WebNotificationManager.hpp"
-#include "WebNotificationPreferences.hpp"
-#include "WebAuthPreferences.hpp"
-#include "WebDataSourcePreferences.hpp"
+#include "WebMsgDialog.hpp"
+#include "WebNotificationSettings.hpp"
+#include "WebAuthSettings.hpp"
+#include "WebDataSourceSettings.hpp"
 #include "WebHostGroupServiceMap.hpp"
 #include "WebCsvReportResource.hpp"
 #include <Wt/WComboBox>
@@ -116,7 +116,7 @@ private:
 
 
   /** Private members **/
-  Settings m_settings;
+  SettingsHandler m_settings;
   Wt::WTimer m_globalTimer;
   Wt::WText m_infoBox;
   QMap<int,Wt::WAnchor*> m_menuLinks;
@@ -140,9 +140,9 @@ private:
   Wt::WComboBox* m_selectViewBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
-  WebDataSourcePreferences m_dataSourceSettingsForm;
-  WebNotificationPreferences m_notificationSettingsForm;
-  WebAuthPreferences m_authSettingsForm;
+  WebDataSourceSettings m_dataSourceSettingsForm;
+  WebNotificationSettings m_notificationSettingsForm;
+  WebAuthSettings m_authSettingsForm;
   WebHostGroupServiceMap m_autoHostgroupImporterForm;
   Wt::WNavigationBar m_navbar;
   Wt::WStackedWidget m_mainStackedContents;
@@ -163,7 +163,7 @@ private:
 
   /** Executive View widgets **/
   Wt::WGridLayout* m_thumbsLayout;
-  WebNotificationManager* m_notificationManager;
+  WebMsgDialog* m_notificationManager;
   Wt::WWidget* m_notificationSection;
   Wt::WVBoxLayout* m_eventFeedLayout;
   Wt::WContainerWidget m_eventFeedsContainer;
@@ -233,7 +233,7 @@ private:
   void resetFileUploader(void);
   WebDashboard* loadView(const std::string& path);
   Wt::WTemplate* createBreadCrumbsBarTpl(void);
-  WebNotificationManager* createNotificationManager(void);
+  WebMsgDialog* createNotificationManager(void);
   Wt::WComboBox* createViewSelector(void);
   UserFormView* createAccountPanel(void);
   UserFormView* createPasswordPanel(void);

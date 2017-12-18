@@ -1,8 +1,7 @@
 /*
-# WebNotificationManager.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Update: 08-12-2014                                                  #
+# Copyright (c) 2015 Rodrigue Chakode (rodrigue.chakode@gmail.com)         #
+# Last Change: 17-12-2017                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,34 +21,55 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBNOTIFICATIONMANAGER_HPP
-#define WEBNOTIFICATIONMANAGER_HPP
 
-#include <QMap>
-#include <Wt/WDialog>
-#include "Base.hpp"
-#include "dbo/DbSession.hpp"
-#include "dbo/NotificationTableView.hpp"
+#include "WebBaseSettings.hpp"
+#include "utilsCore.hpp"
+#include <ldap.h>
 
-class WebNotificationManager : public Wt::WDialog
+WebBaseSettings::WebBaseSettings(void)
+  : BaseSettings("/opt/realopinsight/etc/realopinsight.conf")
 {
-public:
-  WebNotificationManager(DbSession* dbSession, Wt::WContainerWidget* parent=0);
-  ~WebNotificationManager();
-
-  Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
-  void show(void);
-  void clearAllServicesData(void) {m_notificationTableView->clearAllServicesData(); }
-  void updateServiceData(const NodeT& node) { m_notificationTableView->updateServiceData(node); }
-
-private:
-  /** Signals **/
-  Wt::Signal<int, std::string> m_operationCompleted;
+}
 
 
-  /** other members **/
-  Wt::WText* m_infoBox;
-  NotificationTableView* m_notificationTableView;
-};
+int WebBaseSettings::getLdapVersion(void) const
+{
+  std::string val = m_settings->keyValue(SettingsHandler::AUTH_LDAP_VERSION).toStdString();
+  if (val != LDAP_VERSION3_LABEL)
+    return LDAP_VERSION2;
 
-#endif // WEBNOTIFICATIONMANAGER_HPP
+  return LDAP_VERSION3;
+}
+
+
+int WebBaseSettings::getAuthenticationMode(void) const
+{
+  int val = m_settings->keyValue(SettingsHandler::AUTH_MODE_KEY).toInt();
+  if (val != LDAP)
+    return BuiltIn;
+
+  return val;
+}
+
+
+
+std::string WebBaseSettings::getLdapIdField(void) const
+{
+  QString val = m_settings->keyValue(SettingsHandler::AUTH_LDAP_ID_FIELD);
+  if (val.isEmpty())
+    return "uid";
+
+  return val.toStdString();
+}
+
+
+int WebBaseSettings::activeSourceIds(QVector<std::string>& result)
+{
+  result.clear();
+  for (int i = 0; i < MAX_SRCS; ++i) {
+    if (m_sourceStates.at(i)) {
+      result.push_back(ngrt4n::sourceId(i).toStdString());
+    }
+  }
+  return result.size();
+}

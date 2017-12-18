@@ -54,7 +54,7 @@ Notificator::Notificator(DbSession* dbSession)
 
 void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const QosDataT& qosData, const QStringList& recipients)
 {
-  if (m_preferences.getNotificationType() != WebPreferencesBase::EmailNotification) {
+  if (m_preferences.getNotificationType() != WebBaseSettings::EmailNotification) {
     // do nothing and exit
     return;
   }
