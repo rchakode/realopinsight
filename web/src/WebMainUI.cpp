@@ -106,6 +106,7 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents.removeWidget(&m_authSettingsForm);
   m_adminStackedContents.removeWidget(&m_autoHostgroupImporterForm);
   m_adminStackedContents.removeWidget(&m_adminHomePageTpl);
+  m_adminStackedContents.removeWidget(&m_databaseSettingsForm);
 
   m_uploadForm.contents()->removeWidget(&m_uploadFormTitle);
   m_uploadForm.contents()->removeWidget(&m_uploadSubmitButton);
