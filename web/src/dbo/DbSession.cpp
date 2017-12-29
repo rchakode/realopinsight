@@ -68,9 +68,11 @@ DbSession::DbSession(int dbType, const std::string& db)
   // do this before doing anything to avoid unauthorized access
   configureAuth();
 
-  setupDb();
-  updateUserList();
-  updateViewList();
+  setupDbMapping();
+  if (WebBaseSettings().dbInitializationState() != DbInitialized && initDb() == 0) {
+    updateUserList();
+    updateViewList();
+  }
 }
 
 DbSession::~DbSession()
@@ -80,7 +82,7 @@ DbSession::~DbSession()
   delete m_passAuthService;
 }
 
-void DbSession::setupDb(void)
+void DbSession::setupDbMapping(void)
 {
   mapClass<DboUser>("user");
   mapClass<DboView>("view");
@@ -90,10 +92,6 @@ void DbSession::setupDb(void)
   mapClass<DboNotification>("notification");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
-  //TODO provide the reset of dbInitializationState when switching to a new database type
-  if (WebBaseSettings().dbInitializationState() != DbInitialized) {
-    initDb();
-  }
 }
 
 
@@ -337,8 +335,9 @@ bool DbSession::findView(const std::string& vname, DboView& view)
   return found;
 }
 
-void DbSession::initDb(void)
+int DbSession::initDb(void)
 {
+  int  rc = -1;
   try {
     createTables();
     DboUserT adm;
@@ -351,10 +350,12 @@ void DbSession::initDb(void)
     addUser(adm);
     WebBaseSettings().updateDbInitializationState(DbInitialized);
     CORE_LOG("info", Q_TR("Database initialized"));
+    rc = 0;
   } catch (dbo::Exception& ex) {
-    CORE_LOG("error", "Failed initializing the database");
     CORE_LOG("error", QObject::tr("%1: Failed initializing the database. %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
+
+  return rc;
 }
 
 int DbSession::addView(const DboView& view)

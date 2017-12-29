@@ -83,6 +83,8 @@
 </message>
 
 
+
+
 <message id="getting-started.tpl">
   <!-- Describe thumnail -->
   <div class="col-sm-4">
@@ -604,6 +606,47 @@
 
 
 
+<message id="notification-settings-form.tpl">
+  <div class="form-horizontal">
+
+    <div id="notification-section">
+      <fieldset>
+        <div class="col-sm-12 form-group">
+          <label class="control-label">Notification type&nbsp;</label>
+          <span>${notification-type}</span>
+         </div>
+          <!-- mail notification settings -->
+          <div id="mail-notification-settings">
+             <div class="col-sm-12 form-group">
+               <label class="control-label">SMTP Server&nbsp;</label>
+               <span>${notification-mail-smtp-server}</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">SMTP Port&nbsp;</label>
+               <span>${notification-mail-smtp-port}</span>
+               <span>Enable SSL</span>
+               <span>${notification-mail-smtp-use-ssl}</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">SMTP Username&nbsp;</label>
+               <span>${notification-mail-smtp-username}</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">SMTP Password&nbsp;</label>
+               <span>${notification-mail-smtp-password}</span>
+             </div>
+          </div> <!-- id="mail-notification-settings" -->
+      </fieldset>
+   </div> <!-- id="auth-section" -->
+
+
+    <!-- form buttons -->
+    <div class="form-actions">
+      <span id="notification-setting-save-button">${notification-settings-save-button}</span>
+    </div>
+</div> <!-- class="form-hoizontal" -->
+</message>
+
 
 <message id="database-settings-form.tpl">
   <div class="form-horizontal">
@@ -641,7 +684,8 @@
 
     <!-- form buttons -->
     <div class="form-actions">
-      <span id="database-settings-save">${database-settings-save}</span>
+      <span id="database-save-settings-bt">${database-save-settings-btn}</span>
+      <span id="database-save-and-initialize-btn">${database-save-and-initialize-btn}</span>
     </div>
 
   </div>

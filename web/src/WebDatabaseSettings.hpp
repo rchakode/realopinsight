@@ -47,6 +47,7 @@ public:
   WebDatabaseSettings(void);
   virtual ~WebDatabaseSettings(void);
   void updateContents(void);
+  Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
 
 
 Q_SIGNALS:
@@ -56,6 +57,7 @@ protected:
   virtual void updateFields(void);
 
 private:
+  Wt::Signal<int, std::string> m_operationCompleted;
   Wt::WComboBox m_dbTypeBox;
   Wt::WLineEdit m_dbServerAddrField;
   Wt::WLineEdit m_dbServerPortField;
@@ -63,6 +65,7 @@ private:
   Wt::WLineEdit m_dbUserField;
   Wt::WLineEdit m_dbPasswordField;
   Wt::WPushButton m_saveBtn;
+  Wt::WPushButton m_saveAndInitBtn;
 
   void createFormWidgets(void);
 
@@ -70,6 +73,7 @@ private:
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
   void saveChanges(void);
+  void saveChangesAndInitializeDb();
   void updateFieldEnabledState(void);
   void handleLdapUseSslChanged(void);
 };

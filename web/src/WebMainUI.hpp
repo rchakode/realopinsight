@@ -103,6 +103,7 @@ public Q_SLOTS:
   void handleShowExecutiveView(void);
   void handleShowSettingsView(void);
   void handleNewViewSelected(void);
+  void handleDatabaseChanges(int status, const std::string& msg);
 
 
 

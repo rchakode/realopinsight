@@ -59,6 +59,7 @@ WebDatabaseSettings::~WebDatabaseSettings(void)
 void WebDatabaseSettings::addEvent(void)
 {
   m_saveBtn.clicked().connect(this, &WebDatabaseSettings::saveChanges);
+  m_saveAndInitBtn.clicked().connect(this, &WebDatabaseSettings::saveChangesAndInitializeDb);
   m_dbTypeBox.changed().connect(this, &WebDatabaseSettings::updateFieldEnabledState);
 }
 
@@ -67,7 +68,8 @@ void WebDatabaseSettings::addEvent(void)
 void WebDatabaseSettings::bindFormWidgets(void)
 {
   bindWidget("database-type", &m_dbTypeBox);
-  bindWidget("database-settings-save", &m_saveBtn);
+  bindWidget("database-save-settings-btn", &m_saveBtn);
+  bindWidget("database-save-and-initialize-btn", &m_saveAndInitBtn);
   bindWidget("database-server-addr", &m_dbServerAddrField);
   bindWidget("database-server-port", &m_dbServerPortField);
   bindWidget("database-name", &m_dbNameField);
@@ -79,7 +81,9 @@ void WebDatabaseSettings::bindFormWidgets(void)
 void WebDatabaseSettings::unbindFormWidgets(void)
 {
   takeWidget("database-type");
-  takeWidget("database-settings-save");
+  takeWidget("database-save-settings-btn");
+  takeWidget("database-save-and-initialize-btn");
+
   takeWidget("database-server-addr");
   takeWidget("database-server-port");
   takeWidget("database-name");
@@ -92,14 +96,11 @@ void WebDatabaseSettings::createFormWidgets(void)
 {
   m_dbTypeBox.addItem(Q_TR("Sqlite3"));
   m_dbTypeBox.addItem(Q_TR("PostgreSQL"));
-  m_dbServerAddrField.setEmptyText(Q_TR("127.0.0.1"));
-  m_dbServerPortField.setEmptyText(Q_TR("5432"));
-  m_dbUserField.setEmptyText(Q_TR("realopinsight"));
-  m_dbNameField.setEmptyText(Q_TR("realopinsight"));
   m_dbPasswordField.setEchoMode(Wt::WLineEdit::Password);
-  m_dbPasswordField.setEmptyText(Q_TR("*******"));
   m_saveBtn.setText( Q_TR("Save") );
   m_saveBtn.setStyleClass("btn btn-info");
+  m_saveAndInitBtn.setText( Q_TR("Save and Initialize Database") );
+  m_saveAndInitBtn.setStyleClass("btn btn-info");
 }
 
 
@@ -112,8 +113,15 @@ void WebDatabaseSettings::saveChanges(void)
     m_settings->setEntry(SettingsHandler::DB_USER, m_dbUserField.text().toUTF8().c_str());
     m_settings->setEntry(SettingsHandler::DB_PASSWORD, m_dbPasswordField.text().toUTF8().c_str());
     m_settings->setEntry(SettingsHandler::DB_NAME, m_dbNameField.text().toUTF8().c_str());
-    Q_EMIT operationCompleted(ngrt4n::OperationSucceeded, Q_TR("Database settings updated"));
+    m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
+    CORE_LOG("info", Q_TR("Database settings updated"));
   }
+}
+
+void WebDatabaseSettings::saveChangesAndInitializeDb(void)
+{
+  saveChanges();
+  m_operationCompleted.emit(ngrt4n::DatabaseInitializationRequired, Q_TR("Database initilization is required"));
 }
 
 

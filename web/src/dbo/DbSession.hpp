@@ -58,7 +58,8 @@ class DbSession : public dbo::Session
 public:
   DbSession(int dbType, const std::string& db);
   ~DbSession();
-  void setupDb(void);
+  void setupDbMapping(void);
+  int initDb(void);
   std::string lastError(void) const {return m_lastError;}
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dboUserDb;}
   Wt::Auth::AuthService& auth();
@@ -128,7 +129,6 @@ private:
   Wt::Auth::PasswordService* m_passAuthService;
 
   std::string hashPassword(const std::string& pass);
-  void initDb(void);
 };
 
 #endif // DBSESSION_HPP
