@@ -90,7 +90,10 @@ void DbSession::setupDb(void)
   mapClass<DboNotification>("notification");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
-  initDb();
+  //TODO provide the reset of dbInitializationState when switching to a new database type
+  if (WebBaseSettings().dbInitializationState() != DbInitialized) {
+    initDb();
+  }
 }
 
 
@@ -337,21 +340,17 @@ bool DbSession::findView(const std::string& vname, DboView& view)
 void DbSession::initDb(void)
 {
   try {
-    WebBaseSettings pref;
-    //TODO provide the reset of dbInitializationState when switching to a new database type
-    if (pref.dbInitializationState() != DbInitialized) {
-      createTables();
-      DboUserT adm;
-      adm.username = "admin";
-      adm.password = "password";
-      adm.firstname = "Default";
-      adm.lastname = "Administrator";
-      adm.role = DboUser::AdmRole;
-      adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
-      addUser(adm);
-      pref.updateDbInitializationState(DbInitialized);
-      CORE_LOG("info", Q_TR("Database initialized"));
-    }
+    createTables();
+    DboUserT adm;
+    adm.username = "admin";
+    adm.password = "password";
+    adm.firstname = "Default";
+    adm.lastname = "Administrator";
+    adm.role = DboUser::AdmRole;
+    adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
+    addUser(adm);
+    WebBaseSettings().updateDbInitializationState(DbInitialized);
+    CORE_LOG("info", Q_TR("Database initialized"));
   } catch (dbo::Exception& ex) {
     CORE_LOG("error", "Failed initializing the database");
     CORE_LOG("error", QObject::tr("%1: Failed initializing the database. %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
