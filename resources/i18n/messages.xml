@@ -611,26 +611,28 @@
     <div id="database-section">
       <fieldset>
         <div class="col-sm-12 form-group">
-          <label class="control-label">Database type&nbsp;</label>
+          <label class="control-label">Database Type&nbsp;</label>
           <span>${database-type}</span>
          </div>
           <div id="database-settings">
              <div class="col-sm-12 form-group">
-               <label class="control-label">Database Server&nbsp;</label>
+               <label class="control-label">Server Address&nbsp;</label>
                <span>${database-server-addr}</span>
              </div>
              <div class="col-sm-12 form-group">
                <label class="control-label">Server Port&nbsp;</label>
                <span>${database-server-port}</span>
-               <span>Database name</span>
+             </div>
+             <div class="col-sm-12 form-group">
+               <label class="control-label">Database Name&nbsp;</label>
                <span>${database-name}</span>
              </div>
              <div class="col-sm-12 form-group">
-               <label class="control-label">Database User&nbsp;</label>
+               <label class="control-label">Username&nbsp;</label>
                <span>${database-user}</span>
              </div>
              <div class="col-sm-12 form-group">
-               <label class="control-label">Database Password&nbsp;</label>
+               <label class="control-label">Password&nbsp;</label>
                <span>${database-password}</span>
              </div>
           </div>
