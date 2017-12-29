@@ -65,7 +65,7 @@ DbSession::DbSession(int dbType, const std::string& db)
     break;
   }
 
-  // do this before doing anything to avoid authorized access
+  // do this before doing anything to avoid unauthorized access
   configureAuth();
 
   setupDb();
