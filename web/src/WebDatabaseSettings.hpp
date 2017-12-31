@@ -62,18 +62,17 @@ private:
   Wt::WLineEdit m_dbServerAddrField;
   Wt::WLineEdit m_dbServerPortField;
   Wt::WLineEdit m_dbNameField;
+  Wt::WCheckBox m_dbEmptyState;
   Wt::WLineEdit m_dbUserField;
   Wt::WLineEdit m_dbPasswordField;
-  Wt::WPushButton m_saveBtn;
-  Wt::WPushButton m_saveAndInitBtn;
+  Wt::WPushButton m_saveSettingsBtn;
 
   void createFormWidgets(void);
 
   void addEvent(void);
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
-  void saveChanges(void);
-  void saveChangesAndInitializeDb();
+  void saveSettings(void);
   void updateFieldEnabledState(void);
   void handleLdapUseSslChanged(void);
 };

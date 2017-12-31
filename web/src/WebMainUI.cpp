@@ -170,7 +170,7 @@ void WebMainUI::addEvents(void)
   m_selectViewBox->changed().connect(this, &WebMainUI::handleNewViewSelected);
   m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
-  m_databaseSettingsForm.operationCompleted().connect(this, &WebMainUI::handleDatabaseChanges);
+  m_databaseSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_autoHostgroupImporterForm.hostgroupSubmitted().connect(this, &WebMainUI::handleImportHostgroupSubmitted);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
@@ -584,26 +584,6 @@ void WebMainUI::handleNewViewSelected(void)
     } else {
       setWidgetAsFrontStackedWidget(&m_settingsPageTpl);
     }
-  }
-}
-
-
-void WebMainUI::handleDatabaseChanges(int status, const std::string& msg)
-{
-  switch (status) {
-  case ngrt4n::DatabaseInitializationRequired:
-    if (m_dbSession->initDb() != 0) {
-      showMessage(ngrt4n::OperationFailed, "Failed to initialize the database, please check log");
-    } else {
-      showMessage(ngrt4n::OperationSucceeded, "Database initialized");
-    }
-    break;
-
-  case ngrt4n::OperationFailed:
-  case ngrt4n::OperationSucceeded:
-  default:
-    showMessage(status, msg);
-    break;
   }
 }
 

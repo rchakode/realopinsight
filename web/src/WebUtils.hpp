@@ -40,8 +40,7 @@ namespace ngrt4n {
 
   enum OperationStatusT {
     OperationSucceeded,
-    OperationFailed,
-    DatabaseInitializationRequired
+    OperationFailed
   };
 
   void showMessage(int exitCode, const std::string& errorMsg,

@@ -58,8 +58,7 @@ WebDatabaseSettings::~WebDatabaseSettings(void)
 
 void WebDatabaseSettings::addEvent(void)
 {
-  m_saveBtn.clicked().connect(this, &WebDatabaseSettings::saveChanges);
-  m_saveAndInitBtn.clicked().connect(this, &WebDatabaseSettings::saveChangesAndInitializeDb);
+  m_saveSettingsBtn.clicked().connect(this, &WebDatabaseSettings::saveSettings);
   m_dbTypeBox.changed().connect(this, &WebDatabaseSettings::updateFieldEnabledState);
 }
 
@@ -68,11 +67,11 @@ void WebDatabaseSettings::addEvent(void)
 void WebDatabaseSettings::bindFormWidgets(void)
 {
   bindWidget("database-type", &m_dbTypeBox);
-  bindWidget("database-save-settings-btn", &m_saveBtn);
-  bindWidget("database-save-and-initialize-btn", &m_saveAndInitBtn);
+  bindWidget("database-save-settings-btn", &m_saveSettingsBtn);
   bindWidget("database-server-addr", &m_dbServerAddrField);
   bindWidget("database-server-port", &m_dbServerPortField);
   bindWidget("database-name", &m_dbNameField);
+  bindWidget("database-empty-state", &m_dbEmptyState);
   bindWidget("database-user", &m_dbUserField);
   bindWidget("database-password", &m_dbPasswordField);
 }
@@ -82,11 +81,10 @@ void WebDatabaseSettings::unbindFormWidgets(void)
 {
   takeWidget("database-type");
   takeWidget("database-save-settings-btn");
-  takeWidget("database-save-and-initialize-btn");
-
   takeWidget("database-server-addr");
   takeWidget("database-server-port");
   takeWidget("database-name");
+  takeWidget("database-empty-state");
   takeWidget("database-user");
   takeWidget("database-password");
 }
@@ -97,31 +95,32 @@ void WebDatabaseSettings::createFormWidgets(void)
   m_dbTypeBox.addItem(Q_TR("Sqlite3"));
   m_dbTypeBox.addItem(Q_TR("PostgreSQL"));
   m_dbPasswordField.setEchoMode(Wt::WLineEdit::Password);
-  m_saveBtn.setText( Q_TR("Save") );
-  m_saveBtn.setStyleClass("btn btn-info");
-  m_saveAndInitBtn.setText( Q_TR("Save and Initialize Database") );
-  m_saveAndInitBtn.setStyleClass("btn btn-info");
+  m_saveSettingsBtn.setText(Q_TR("Save"));
+  m_saveSettingsBtn.setToolTip(Q_TR("Changes will be saved. Then you should disconnect manually to have the changes take effect"));
+  m_saveSettingsBtn.setStyleClass("btn btn-info");
 }
 
 
-void WebDatabaseSettings::saveChanges(void)
+void WebDatabaseSettings::saveSettings(void)
 {
   m_settings->setEntry(SettingsHandler::DB_TYPE, QString::number(m_dbTypeBox.currentIndex()));
+
+  if (m_dbEmptyState.checkState() == Wt::Checked) {
+    updateDbInitializationState(DbNotInitialized);
+  } else {
+    updateDbInitializationState(DbInitialized);
+  }
+
   if (m_dbTypeBox.currentIndex() == PostgresqlDb) {
     m_settings->setEntry(SettingsHandler::DB_SERVER_ADDR, m_dbServerAddrField.text().toUTF8().c_str());
     m_settings->setEntry(SettingsHandler::DB_SERVER_PORT, m_dbServerPortField.text().toUTF8().c_str());
     m_settings->setEntry(SettingsHandler::DB_USER, m_dbUserField.text().toUTF8().c_str());
     m_settings->setEntry(SettingsHandler::DB_PASSWORD, m_dbPasswordField.text().toUTF8().c_str());
     m_settings->setEntry(SettingsHandler::DB_NAME, m_dbNameField.text().toUTF8().c_str());
+
     m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
     CORE_LOG("info", Q_TR("Database settings updated"));
   }
-}
-
-void WebDatabaseSettings::saveChangesAndInitializeDb(void)
-{
-  saveChanges();
-  m_operationCompleted.emit(ngrt4n::DatabaseInitializationRequired, Q_TR("Database initilization is required"));
 }
 
 
@@ -138,14 +137,14 @@ void WebDatabaseSettings::updateFieldEnabledState(void)
 
 void WebDatabaseSettings::updateFields(void)
 {
-    m_dbTypeBox.setCurrentIndex( getDbType() );
-    m_dbServerAddrField.setText( getDbServerAddr() );
-    m_dbServerPortField.setText( QString::number(getDbServerPort()).toStdString().c_str() );
-    m_dbUserField.setText( getDbUser() );
-    m_dbPasswordField.setEchoMode(Wt::WLineEdit::Password);
-    m_dbPasswordField.setText( getDbPassword() );
-    m_dbNameField.setText( getDbName() );
-    updateFieldEnabledState();
+  m_dbTypeBox.setCurrentIndex( getDbType() );
+  m_dbServerAddrField.setText( getDbServerAddr() );
+  m_dbServerPortField.setText( QString::number(getDbServerPort()).toStdString().c_str() );
+  m_dbUserField.setText( getDbUser() );
+  m_dbPasswordField.setEchoMode(Wt::WLineEdit::Password);
+  m_dbPasswordField.setText( getDbPassword() );
+  m_dbNameField.setText( getDbName() );
+  updateFieldEnabledState();
 }
 
 

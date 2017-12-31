@@ -669,6 +669,8 @@
              <div class="col-sm-12 form-group">
                <label class="control-label">Database Name&nbsp;</label>
                <span>${database-name}</span>
+               <span>Empty database (to be initialized) ?</span>
+               <span>${database-empty-state}</span>
              </div>
              <div class="col-sm-12 form-group">
                <label class="control-label">Username&nbsp;</label>
@@ -685,7 +687,6 @@
     <!-- form buttons -->
     <div class="form-actions">
       <span id="database-save-settings-bt">${database-save-settings-btn}</span>
-      <span id="database-save-and-initialize-btn">${database-save-and-initialize-btn}</span>
     </div>
 
   </div>
