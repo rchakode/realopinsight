@@ -109,7 +109,8 @@ void AuthManager::createLoggedInView(void)
 void AuthManager::logout(void)
 {
   m_dbSession->loginObject().logout();
-  refresh();
+  // reload the application => don't use refresh();
+  wApp->doJavaScript("location.reload();");
 }
 
 

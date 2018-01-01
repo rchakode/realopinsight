@@ -120,7 +120,7 @@ void WebDatabaseSettings::saveSettings(void)
     m_settings->setEntry(SettingsHandler::DB_NAME, m_dbNameField.text().toUTF8().c_str());
   }
 
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved. Please *disconnect* and *reconnect* to have the changes take effect"));
   CORE_LOG("info", Q_TR("Database settings updated"));
 }
 
