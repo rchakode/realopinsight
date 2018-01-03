@@ -34,7 +34,7 @@ WebBaseSettings::WebBaseSettings(void)
 
 int WebBaseSettings::getLdapVersion(void) const
 {
-  std::string val = m_settings->keyValue(SettingsHandler::AUTH_LDAP_VERSION).toStdString();
+  std::string val = m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_VERSION).toStdString();
   if (val != LDAP_VERSION3_LABEL)
     return LDAP_VERSION2;
 
@@ -44,7 +44,7 @@ int WebBaseSettings::getLdapVersion(void) const
 
 int WebBaseSettings::getAuthenticationMode(void) const
 {
-  int val = m_settings->keyValue(SettingsHandler::AUTH_MODE_KEY).toInt();
+  int val = m_settingFactory->keyValue(SettingFactory::AUTH_MODE_KEY).toInt();
   if (val != LDAP)
     return BuiltIn;
 
@@ -55,7 +55,7 @@ int WebBaseSettings::getAuthenticationMode(void) const
 
 std::string WebBaseSettings::getLdapIdField(void) const
 {
-  QString val = m_settings->keyValue(SettingsHandler::AUTH_LDAP_ID_FIELD);
+  QString val = m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_ID_FIELD);
   if (val.isEmpty())
     return "uid";
 

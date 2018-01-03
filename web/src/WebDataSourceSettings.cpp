@@ -189,7 +189,7 @@ void WebDataSourceSettings::deleteSource(void)
   if (curIndex >= 0 && curIndex < MAX_SRCS) {
     m_sourceBoxModel.removeRow(currentSourceIndex());
     setSourceState(currentSourceIndex(), false);
-    setKeyValue(SettingsHandler::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
+    setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
     sync();
     updateFields();
   }
@@ -230,7 +230,7 @@ void WebDataSourceSettings::updateFields(void)
 void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& type)
 {
   // global settings
-  setKeyValue(SettingsHandler::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
+  setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
 
   // source-specific settings
   SourceT src;
@@ -244,7 +244,7 @@ void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& typ
   src.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
   setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
   setSourceState(index, true);
-  setKeyValue(SettingsHandler::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
+  setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
 
   // save changes
   sync();

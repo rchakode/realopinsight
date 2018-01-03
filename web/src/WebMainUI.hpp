@@ -119,7 +119,7 @@ private:
 
 
   /** Private members **/
-  SettingsHandler m_settings;
+  SettingFactory m_settings;
   Wt::WTimer m_globalTimer;
   Wt::WText m_infoBox;
   QMap<int,Wt::WAnchor*> m_menuLinks;

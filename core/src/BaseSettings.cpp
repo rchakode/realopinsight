@@ -31,14 +31,14 @@
 
 
 BaseSettings::BaseSettings(void)
-  : m_settings(new SettingsHandler()),
+  : m_settingFactory(new SettingFactory()),
     m_currentSourceIndex(0)
 {
   updateSourceStates();
 }
 
 BaseSettings::BaseSettings(const QString& settingFile)
-  : m_settings(new SettingsHandler(settingFile)),
+  : m_settingFactory(new SettingFactory(settingFile)),
     m_currentSourceIndex(0)
 {
   updateSourceStates();
@@ -47,7 +47,7 @@ BaseSettings::BaseSettings(const QString& settingFile)
 
 BaseSettings::~BaseSettings(void)
 {
-  delete m_settings;
+  delete m_settingFactory;
 }
 
 void BaseSettings::loadProperties(void)
@@ -79,7 +79,7 @@ void BaseSettings::resetSourceStates(void)
 void BaseSettings::updateSourceStates(void)
 {
   resetSourceStates();
-  QString content = m_settings->value(SettingsHandler::GLOBAL_SRC_BUCKET_KEY).toString();
+  QString content = m_settingFactory->value(SettingFactory::GLOBAL_SRC_BUCKET_KEY).toString();
   if (! content.isEmpty()) {
     for (int i=0; i < MAX_SRCS; ++i) {
       m_sourceStates.setBit(i, content.at(i) == '1');

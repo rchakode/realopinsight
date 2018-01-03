@@ -46,36 +46,36 @@ public:
   };
 
   WebBaseSettings(void);
-  int dbInitializationState(void) { return keyValue(SettingsHandler::GLOBAL_DB_STATE_KEY, QString::number(DbNotInitialized)).toInt();}
-  void updateDbInitializationState(int state) {setKeyValue(SettingsHandler::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
+  int dbInitializationState(void) { return keyValue(SettingFactory::GLOBAL_DB_STATE_KEY, QString::number(DbNotInitialized)).toInt();}
+  void updateDbInitializationState(int state) {setKeyValue(SettingFactory::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
   
-  int getDbType(void) const { return m_settings->keyValue(SettingsHandler::DB_TYPE).toInt();}
-  std::string getDbServerAddr(void) const { return m_settings->keyValue(SettingsHandler::DB_SERVER_ADDR).toStdString();}
-  int getDbServerPort(void) const { return m_settings->keyValue(SettingsHandler::DB_SERVER_PORT).toInt();}
-  std::string getDbName(void) const { return m_settings->keyValue(SettingsHandler::DB_NAME).toStdString();}
-  std::string getDbUser(void) const { return m_settings->keyValue(SettingsHandler::DB_USER).toStdString();}
-  std::string getDbPassword(void) const { return m_settings->keyValue(SettingsHandler::DB_PASSWORD).toStdString();}
+  int getDbType(void) const { return m_settingFactory->keyValue(SettingFactory::DB_TYPE).toInt();}
+  std::string getDbServerAddr(void) const { return m_settingFactory->keyValue(SettingFactory::DB_SERVER_ADDR).toStdString();}
+  int getDbServerPort(void) const { return m_settingFactory->keyValue(SettingFactory::DB_SERVER_PORT).toInt();}
+  std::string getDbName(void) const { return m_settingFactory->keyValue(SettingFactory::DB_NAME).toStdString();}
+  std::string getDbUser(void) const { return m_settingFactory->keyValue(SettingFactory::DB_USER).toStdString();}
+  std::string getDbPassword(void) const { return m_settingFactory->keyValue(SettingFactory::DB_PASSWORD).toStdString();}
 
-  std::string getLdapServerUri(void) const { return m_settings->keyValue(SettingsHandler::AUTH_LDAP_SERVER_URI).toStdString();}
-  std::string getLdapBindUserDn(void) const { return m_settings->keyValue(SettingsHandler::AUTH_LDAP_BIND_USER_DN).toStdString();}
-  std::string getLdapSearchBase(void) const { return m_settings->keyValue(SettingsHandler::AUTH_LDAP_SEARCH_BASE).toStdString();}
-  std::string getLdapBindUserPassword(void) const { return m_settings->keyValue(SettingsHandler::AUTH_LDAP_BIND_USER_PASSWORD).toStdString();}
+  std::string getLdapServerUri(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SERVER_URI).toStdString();}
+  std::string getLdapBindUserDn(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_BIND_USER_DN).toStdString();}
+  std::string getLdapSearchBase(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SEARCH_BASE).toStdString();}
+  std::string getLdapBindUserPassword(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_BIND_USER_PASSWORD).toStdString();}
   std::string getLdapIdField(void) const;
   int getLdapVersion(void) const;
-  bool getLdapSslUseMyCert(void) const {return m_settings->keyValue(SettingsHandler::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;}
-  std::string getLdapSslCertFile(void) const {return m_settings->keyValue(SettingsHandler::AUTH_LDAP_SSL_CERT_FILE).toStdString();}
-  std::string getLdapSslCaFile(void) const {return m_settings->keyValue(SettingsHandler::AUTH_LDAP_SSL_CA_FILE).toStdString();}
+  bool getLdapSslUseMyCert(void) const {return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;}
+  std::string getLdapSslCertFile(void) const {return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SSL_CERT_FILE).toStdString();}
+  std::string getLdapSslCaFile(void) const {return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SSL_CA_FILE).toStdString();}
 
   int getAuthenticationMode(void) const;
   static std::string authTypeString(int authSystem) {return (authSystem == LDAP) ? "LDAP" : "Built-in";}
-  int getNotificationType(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_TYPE).toInt();}
+  int getNotificationType(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_TYPE).toInt();}
 
-  std::string getSmtpServerAddr(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();}
-  std::string getSmtpServerPortText(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();}
-  int getSmtpServerPort(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_PORT).toInt();}
-  std::string getSmtpUsername(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_MAIL_SMTP_USERNAME).toStdString();}
-  std::string getSmtpPassword(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
-  int getSmtpUseSsl(void) const { return m_settings->keyValue(SettingsHandler::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
+  std::string getSmtpServerAddr(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();}
+  std::string getSmtpServerPortText(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();}
+  int getSmtpServerPort(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT).toInt();}
+  std::string getSmtpUsername(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_USERNAME).toStdString();}
+  std::string getSmtpPassword(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
+  int getSmtpUseSsl(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
 
   int activeSourceIds(QVector<std::string>& result);
 

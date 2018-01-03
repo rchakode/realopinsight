@@ -114,8 +114,8 @@ HEADERS += \
     web/src/WebDataSourceSettings.hpp \
     web/src/WebBaseSettings.hpp \
     web/src/WebAuthSettings.hpp \
-    core/src/SettingsHandler.hpp \
-    core/src/BaseSettings.hpp
+    core/src/BaseSettings.hpp \
+    core/src/SettingFactory.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -169,8 +169,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebBaseSettings.cpp \
     web/src/WebAuthSettings.cpp \
     web/src/WebDataSourceSettings.cpp \
-    core/src/SettingsHandler.cpp \
-    core/src/BaseSettings.cpp
+    core/src/BaseSettings.cpp \
+    core/src/SettingFactory.cpp
 
 
 

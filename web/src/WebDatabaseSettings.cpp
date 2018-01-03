@@ -103,7 +103,7 @@ void WebDatabaseSettings::createFormWidgets(void)
 
 void WebDatabaseSettings::saveSettings(void)
 {
-  m_settings->setEntry(SettingsHandler::DB_TYPE, QString::number(m_dbTypeBox.currentIndex()));
+  m_settingFactory->setEntry(SettingFactory::DB_TYPE, QString::number(m_dbTypeBox.currentIndex()));
 
   if (m_dbEmptyState.checkState() == Wt::Checked) {
     updateDbInitializationState(DbNotInitialized);
@@ -113,11 +113,11 @@ void WebDatabaseSettings::saveSettings(void)
 
   // save PostgreSQL settings if applicable
   if (m_dbTypeBox.currentIndex() == PostgresqlDb) {
-    m_settings->setEntry(SettingsHandler::DB_SERVER_ADDR, m_dbServerAddrField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::DB_SERVER_PORT, m_dbServerPortField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::DB_USER, m_dbUserField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::DB_PASSWORD, m_dbPasswordField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::DB_NAME, m_dbNameField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::DB_SERVER_ADDR, m_dbServerAddrField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::DB_SERVER_PORT, m_dbServerPortField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::DB_USER, m_dbUserField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::DB_PASSWORD, m_dbPasswordField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::DB_NAME, m_dbNameField.text().toUTF8().c_str());
   }
 
   m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved. Please *disconnect* and *reconnect* to have the changes take effect"));

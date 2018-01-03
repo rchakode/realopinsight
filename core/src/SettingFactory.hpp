@@ -29,13 +29,13 @@
 #include <ctime>
 
 
-class SettingsHandler : public QSettings
+class SettingFactory : public QSettings
 {
   Q_OBJECT
 public:
-  SettingsHandler();
-  SettingsHandler(const QString& path);
-  virtual ~SettingsHandler(void);
+  SettingFactory();
+  SettingFactory(const QString& path);
+  virtual ~SettingFactory(void);
 
   void init(void);
   void setKeyValue(const QString & _key, const QString & _value);
@@ -48,7 +48,7 @@ public:
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
   static QString language(void);
-  int getGraphLayout(void) const {return entry(SettingsHandler::GLOBAL_GRAPH_LAYOUT).toInt();}
+  int getGraphLayout(void) const {return entry(SettingFactory::GLOBAL_GRAPH_LAYOUT).toInt();}
 
   static const QString GLOBAL_LANGUAGE_KEY;
   static const QString GLOBAL_SRC_BUCKET_KEY;

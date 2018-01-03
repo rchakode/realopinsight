@@ -102,13 +102,13 @@ void WebNotificationSettings::createFormWidgets(void)
 
 void WebNotificationSettings::saveChanges(void)
 {
-  m_settings->setEntry(SettingsHandler::NOTIF_TYPE, QString::number(m_notificationTypeBox.currentIndex()));
+  m_settingFactory->setEntry(SettingFactory::NOTIF_TYPE, QString::number(m_notificationTypeBox.currentIndex()));
   if (m_notificationTypeBox.currentIndex() == EmailNotification) {
-    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerAddrField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpServerPortField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField.text().toUTF8().c_str());
-    m_settings->setEntry(SettingsHandler::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField.checkState()));
+    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerAddrField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpServerPortField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField.text().toUTF8().c_str());
+    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField.checkState()));
     Q_EMIT operationCompleted(ngrt4n::OperationSucceeded, Q_TR("Notification settings updated"));
   }
 }
