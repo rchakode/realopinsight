@@ -40,8 +40,12 @@ Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata)
 Parser::~Parser()
 {
   QFile fileHandler;
-  if (fileHandler.exists(m_dotFile+".plain")) fileHandler.remove(m_dotFile+".plain");
-  if (fileHandler.exists(m_dotFile) && m_lastErrorMsg.isEmpty()) fileHandler.remove(m_dotFile);
+  if (fileHandler.exists(m_dotFile+".plain")) {
+    fileHandler.remove(m_dotFile+".plain");
+  }
+  if (fileHandler.exists(m_dotFile) && m_lastErrorMsg.isEmpty()) {
+    fileHandler.remove(m_dotFile);
+  }
   fileHandler.close();
 }
 
