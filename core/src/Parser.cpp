@@ -33,9 +33,14 @@ const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
 const QString Parser::m_dotFooter = "}";
 
 
-Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata)
+Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout)
   : m_descriptionFile(_descriptionFile),
-    m_cdata(_cdata){}
+    m_cdata(_cdata),
+    m_parsingMode(_parsingMode),
+    m_graphLayout(_graphLayout)
+{
+
+}
 
 Parser::~Parser()
 {
@@ -49,9 +54,8 @@ Parser::~Parser()
   fileHandler.close();
 }
 
-bool Parser::process(int parsingMode)
+bool Parser::process(void)
 {
-  m_parsingMode = parsingMode;
   ngrt4n::clearCoreData(*m_cdata);
 
   m_dotContent.clear();
@@ -109,17 +113,17 @@ bool Parser::process(int parsingMode)
     if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
 
     switch(node.type) {
-      case NodeType::BusinessService:
-        insertBusinessServiceNode(node);
-        break;
-      case NodeType::ITService:
-        insertITServiceNode(node);
-        break;
-      case NodeType::ExternalService:
-        insertExternalServiceNode(node);
-        break;
-      default:
-        break;
+    case NodeType::BusinessService:
+      insertBusinessServiceNode(node);
+      break;
+    case NodeType::ITService:
+      insertITServiceNode(node);
+      break;
+    case NodeType::ExternalService:
+      insertExternalServiceNode(node);
+      break;
+    default:
+      break;
     }
   }
 
@@ -173,7 +177,7 @@ void Parser::updateNodeHierachy(void)
 
 void Parser::saveCoordinatesFile(void)
 {
-  m_dotFile = QDir::tempPath()%"/graphviz-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
+  m_dotFile = QDir::tempPath()%"/realopinsight-gen-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   QFile file(m_dotFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
     m_lastErrorMsg = QObject::tr("Unable into write the file %1").arg(m_dotFile);
@@ -190,16 +194,27 @@ bool Parser::parseDotResult(void)
 {
   bool error = false;
   QProcess process;
-  QString plainDotFile = m_dotFile%".plain";
+  QString plainDotFile = m_dotFile % ".plain";
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainDotFile << m_dotFile;
-  int exitCode = process.execute("dot", arguments);
+
+  int exitCode = -2;
+  switch (m_graphLayout) {
+  case NeatoLayout:
+    exitCode = process.execute("neato", arguments);
+    break;
+  case DotLayout: //use dot as default
+  default:
+    exitCode = process.execute("dot", arguments);
+    break;
+  }
+
   process.waitForFinished(60000);
-  if (! exitCode) {
-    parseDotResult(plainDotFile);
-  } else {
+  if (exitCode != 0) {
     m_lastErrorMsg = QObject::tr("The graph engine exited on error (code: %1, file: %2").arg(QString::number(exitCode), m_dotFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     error = true;
+  } else {
+    parseDotResult(plainDotFile);
   }
   return ! error;
 }
@@ -274,15 +289,15 @@ void Parser::insertExternalServiceNode(NodeT& node)
 {
   if (m_parsingMode == ParsingModeEditor) {
     m_cdata->bpnodes.insert(node.id, node);
-    return; // in editor mode, add the service in the map and return
+    return; // in edition mode, just add the service in the map and return
   }
 
   QString baseDir = QFileInfo(m_descriptionFile).dir().absolutePath();
   QString path = QString("%1/%2.ms.ngrt4n.xml").arg(baseDir).arg(node.child_nodes);
 
   CoreDataT cdata;
-  Parser parser(path, &cdata);
-  if (parser.process(ParsingModeExternamService)) {
+  Parser parser(path, &cdata, Parser::ParsingModeExternalService, m_graphLayout);
+  if (parser.process()) {
     NodeListT::Iterator innerRootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
 
     if (innerRootNodeIt != cdata.bpnodes.end()) {
@@ -291,7 +306,7 @@ void Parser::insertExternalServiceNode(NodeT& node)
       innerRootNodeIt->visibility = ngrt4n::Visible|ngrt4n::Expanded;
       NodeT innerRootNode = *innerRootNodeIt; // backup the node content
       cdata.bpnodes.remove(ngrt4n::ROOT_ID);  // Point to innerRootNodeIt, but its key is ngrt4n::ROOT_ID.
-                                              // We remove it to avoid duplication when joining the two hashs
+      // We remove it to avoid duplication when joining the two hashs
       cdata.bpnodes.insert(innerRootNode.id, innerRootNode); // now reinsert the map with its current id
       m_cdata->bpnodes.unite(cdata.bpnodes);
       m_cdata->cnodes.unite(cdata.cnodes);

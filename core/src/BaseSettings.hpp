@@ -53,6 +53,7 @@ public:
   virtual void updateSourceStates();
   int activeSourcesCount(void);
   QMap<QString, SourceT> fetchSourceList(int type);
+  int getGraphLayout(void) const {return m_settings->getGraphLayout();}
 
 Q_SIGNALS:
   void urlChanged(QString);

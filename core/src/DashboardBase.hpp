@@ -113,7 +113,7 @@ protected:
   int m_firstSrcIndex;
   bool m_lastErrorState;
   QString m_lastErrorMsg;
-  BaseSettings* m_preferences;
+  BaseSettings* m_baseSettings;
 
 protected:
   void resetInterval(void);

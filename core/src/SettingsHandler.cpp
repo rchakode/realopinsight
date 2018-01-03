@@ -31,9 +31,9 @@
 
 const QString SettingsHandler::GLOBAL_LANGUAGE_KEY = "/General/language";
 const QString SettingsHandler::GLOBAL_DB_STATE_KEY = "/General/DbState";
+const QString SettingsHandler::GLOBAL_GRAPH_LAYOUT = "/General/graphLayout";
 const QString SettingsHandler::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
 const QString SettingsHandler::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
-
 
 const QString SettingsHandler::DB_TYPE = "/Database/dbType";
 const QString SettingsHandler::DB_SERVER_ADDR = "/Database/dbServerAddr";

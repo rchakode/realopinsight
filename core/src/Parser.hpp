@@ -35,12 +35,16 @@ class Parser : public QObject
 public:
   static const int ParsingModeEditor = 0;
   static const int ParsingModeDashboard = 1;
-  static const int ParsingModeExternamService = 2;
+  static const int ParsingModeExternalService = 2;
+
+
+  static const int DotLayout = 1;
+  static const int NeatoLayout = 2;
 
 public:
-  Parser(const QString& _descriptionFile, CoreDataT* _cdata);
+  Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout);
   virtual ~Parser();
-  bool process(int parsingMode);
+  bool process(void);
   QString dotContent(void) const {return m_dotContent;}
   QString dotFile(void) const { return m_dotFile; }
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}
@@ -61,6 +65,7 @@ private:
   CoreDataT* m_cdata;
   QString m_lastErrorMsg;
   int m_parsingMode;
+  int m_graphLayout;
 
   void updateNodeHierachy(void);
   void saveCoordinatesFile(void);

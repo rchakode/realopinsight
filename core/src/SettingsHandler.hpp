@@ -48,11 +48,13 @@ public:
   bool setSource(const QString& _info, SourceT& _src);
   void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
   static QString language(void);
+  int getGraphLayout(void) const {return entry(SettingsHandler::GLOBAL_GRAPH_LAYOUT).toInt();}
 
   static const QString GLOBAL_LANGUAGE_KEY;
   static const QString GLOBAL_SRC_BUCKET_KEY;
-  static const QString GLOBAL_UPDATE_INTERVAL_KEY;
   static const QString GLOBAL_DB_STATE_KEY;
+  static const QString GLOBAL_GRAPH_LAYOUT;
+  static const QString GLOBAL_UPDATE_INTERVAL_KEY;
 
 
   static const QString DB_TYPE;

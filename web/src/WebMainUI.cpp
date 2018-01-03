@@ -1269,10 +1269,10 @@ void WebMainUI::handleImportDescriptionFile(void)
       CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
 
       CoreDataT cdata;
-      Parser parser(tmpFileName ,&cdata);
+      Parser parser(tmpFileName ,&cdata, Parser::ParsingModeEditor, m_settings.getGraphLayout());
       connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-      if (! parser.process(false)) {
+      if (! parser.process()) {
         std::string msg = Q_TR("Invalid description file");
         CORE_LOG("warn", msg);
         showMessage(ngrt4n::OperationFailed, msg);

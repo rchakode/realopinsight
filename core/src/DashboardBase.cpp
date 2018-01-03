@@ -90,15 +90,15 @@ DashboardBase::~DashboardBase()
 
 void DashboardBase::initialize(BaseSettings* preferencePtr)
 {
-  m_preferences = preferencePtr;
+  m_baseSettings = preferencePtr;
   m_lastErrorState = false;
   if (! m_descriptionFile.isEmpty()) {
-    Parser parser(m_descriptionFile, &m_cdata);
+    Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, m_baseSettings->getGraphLayout());
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
-    if (parser.process(Parser::ParsingModeDashboard)) {
+    if (parser.process()) {
       buildTree();
       buildMap();
-      initSettings(m_preferences);
+      initSettings(m_baseSettings);
     } else {
       m_lastErrorState = true;
       m_lastErrorMsg = parser.lastErrorMsg();
@@ -375,7 +375,7 @@ void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
   if (! ids.isEmpty()) {
     Q_FOREACH (const qint8& id, ids) {
       SourceT newsrc;
-      m_preferences->loadSource(id, newsrc);
+      m_baseSettings->loadSource(id, newsrc);
       checkStandaloneSourceType(newsrc);
       SourceListT::Iterator olddata = m_sources.find(id);
       if (olddata != m_sources.end()) {
@@ -418,7 +418,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
 
 void DashboardBase::resetInterval()
 {
-  m_interval = 1000 * m_preferences->updateInterval();
+  m_interval = 1000 * m_baseSettings->updateInterval();
   timerIntervalChanged(m_interval);
 }
 
