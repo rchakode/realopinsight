@@ -130,9 +130,6 @@ bool Parser::process(void)
   updateNodeHierachy();
   saveCoordinatesFile();
 
-  if (m_parsingMode == ParsingModeDashboard)
-    return parseDotResult();
-
   return true;
 }
 
@@ -214,49 +211,63 @@ bool Parser::parseDotResult(void)
     Q_EMIT errorOccurred(m_lastErrorMsg);
     error = true;
   } else {
-    parseDotResult(plainDotFile);
+    return parseDotResult(plainDotFile);
   }
   return ! error;
 }
 
 
-void Parser::parseDotResult(const QString& _plainDot)
+bool Parser::parseDotResult(const QString& _plainDot)
 {
   QStringList splitedLine;
   QFile qfile(_plainDot);
-  if (qfile.open(QFile::ReadOnly)) {
-    QRegExp regexSep("[ ]+");
-    QTextStream coodFileStream(& qfile);
-    QString line;
-
-    //First parse the header
-    if(line = coodFileStream.readLine(0), ! line.isNull()) {
-      splitedLine = line.split (regexSep);
-      m_cdata->map_width = splitedLine[2].trimmed().toFloat() * ngrt4n::XSCAL_FACTOR;
-      m_cdata->map_height = splitedLine[3].trimmed().toFloat() * ngrt4n::YSCAL_FACTOR;
-    }
-
-    while (line = coodFileStream.readLine(0), ! line.isNull()) {
-      splitedLine = line.split (regexSep);
-      if (splitedLine[0] == "node") {
-        NodeListT::Iterator node;
-        QString nid = splitedLine[1].trimmed();
-        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
-          node->pos_x = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-          node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-
-          node->text_w = splitedLine[4].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-          node->text_h = splitedLine[5].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-        }
-      } else if (splitedLine[0] == "edge") {
-        // multiInsert since a node can have several childs
-        m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
-      } else if (splitedLine[0] == "stop") {
-        break;
-      }
-    }
-    qfile.close();
+  if (! qfile.open(QFile::ReadOnly)) {
+    m_lastErrorMsg = QObject::tr("Failed to open file: %1").arg(_plainDot);
+    return false;
   }
+
+  QRegExp regexSep("[ ]+");
+  QTextStream coodFileStream(& qfile);
+  QString line;
+
+  //start parsing
+  if(line = coodFileStream.readLine(0), line.isNull()) {
+    m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(_plainDot);
+    return false;
+  }
+
+  splitedLine = line.split (regexSep);
+  if (splitedLine.size() != 4 || splitedLine[0] != "graph") {
+    m_lastErrorMsg = QObject::tr("Invalid graphviz entry: %1").arg(line);
+    return false;
+  }
+
+  m_cdata->map_width = splitedLine[2].trimmed().toFloat() * ngrt4n::XSCAL_FACTOR;
+  m_cdata->map_height = splitedLine[3].trimmed().toFloat() * ngrt4n::YSCAL_FACTOR;
+
+
+  while (line = coodFileStream.readLine(0), ! line.isNull()) {
+    splitedLine = line.split (regexSep);
+    if (splitedLine[0] == "node") {
+      NodeListT::Iterator node;
+      QString nid = splitedLine[1].trimmed();
+      if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
+        node->pos_x = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
+        node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
+
+        node->text_w = splitedLine[4].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
+        node->text_h = splitedLine[5].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
+      }
+    } else if (splitedLine[0] == "edge") {
+      // multiInsert since a node can have several childs
+      m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
+    } else if (splitedLine[0] == "stop") {
+      break;
+    }
+  }
+  qfile.close();
+
+  return true;
 }
 
 
