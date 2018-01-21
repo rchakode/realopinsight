@@ -91,13 +91,13 @@ void WebMap::setJavaScriptMember(void)
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
-  m_translateX = 0;
-  m_translateY = 0;
+  m_translateX = qAbs(m_cdata->min_x);
+  m_translateY = qAbs(m_cdata->min_y);
   m_painter.reset(new Wt::WPainter(_pdevice));
   m_painter->scale(m_scaleX, m_scaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
-  // Draw edges
+  // Draw edges before nodes
   for (auto edge=std::begin(m_cdata->edges); edge != std::end(m_cdata->edges); ++edge) {
     drawEdge(edge.key(), edge.value());
   }

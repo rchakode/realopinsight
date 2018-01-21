@@ -31,50 +31,46 @@
 
 class Parser : public QObject
 {
-  Q_OBJECT
-public:
-  static const int ParsingModeEditor = 0;
-  static const int ParsingModeDashboard = 1;
-  static const int ParsingModeExternalService = 2;
+    Q_OBJECT
+  public:
+    static const int ParsingModeEditor = 0;
+    static const int ParsingModeDashboard = 1;
+    static const int ParsingModeExternalService = 2;
+
+  public:
+    Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout);
+    virtual ~Parser();
+    bool process(void);
+    bool computeCoordinates(void);
+    QString dotContent(void) const {return m_dotContent;}
+    QString dotFile(void) const { return m_dotFile; }
+    QString lastErrorMsg(void) const {return m_lastErrorMsg;}
+
+  public Q_SLOTS :
+    void handleErrorOccurred(QString msg) { Q_EMIT errorOccurred(msg);}
+
+  Q_SIGNALS:
+    void errorOccurred(QString msg);
 
 
-  static const int DotLayout = 1;
-  static const int NeatoLayout = 2;
+  private:
+    static const QString m_dotHeader;
+    static const QString m_dotFooter;
+    QString m_dotContent;
+    QString m_dotFile;
+    QString m_descriptionFile;
+    CoreDataT* m_cdata;
+    QString m_lastErrorMsg;
+    int m_parsingMode;
+    int m_graphLayout;
 
-public:
-  Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout);
-  virtual ~Parser();
-  bool process(void);
-  bool parseDotResult(void);
-  QString dotContent(void) const {return m_dotContent;}
-  QString dotFile(void) const { return m_dotFile; }
-  QString lastErrorMsg(void) const {return m_lastErrorMsg;}
-
-public Q_SLOTS :
-  void handleErrorOccurred(QString msg) { Q_EMIT errorOccurred(msg);}
-
-Q_SIGNALS:
-  void errorOccurred(QString msg);
-
-
-private:
-  static const QString m_dotHeader;
-  static const QString m_dotFooter;
-  QString m_dotContent;
-  QString m_dotFile;
-  QString m_descriptionFile;
-  CoreDataT* m_cdata;
-  QString m_lastErrorMsg;
-  int m_parsingMode;
-  int m_graphLayout;
-
-  void updateNodeHierachy(void);
-  void saveCoordinatesFile(void);
-  bool parseDotResult(const QString& dotfile);
-  static QString espacedNodeLabel(const QString& rawLabel);
-  void insertITServiceNode(NodeT& node);
-  void insertBusinessServiceNode(NodeT& node);
-  void insertExternalServiceNode(NodeT& node);
+    void updateNodeHierachy(void);
+    void saveCoordinatesFile(void);
+    bool computeCoordinates(const QString& dotfile);
+    static QString espacedNodeLabel(const QString& rawLabel);
+    void insertITServiceNode(NodeT& node);
+    void insertBusinessServiceNode(NodeT& node);
+    void insertExternalServiceNode(NodeT& node);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

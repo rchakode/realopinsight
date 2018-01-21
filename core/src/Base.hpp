@@ -32,10 +32,10 @@
 
 
 #define INIT_TRANSLATION \
-  QTranslator translator; \
-  translator.load(QString(":i18n/ngrt4n_%1").arg(Settings().language())); \
-  app->installTranslator(&translator); \
-  QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
+ QTranslator translator; \
+ translator.load(QString(":i18n/ngrt4n_%1").arg(Settings().language())); \
+ app->installTranslator(&translator); \
+ QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
 #ifdef REALOPINSIGHT_WEB
 const QString APP_NAME = QObject::tr("%1 Ultimate").arg(REALOPINSIGHT_APPLICATION_NAME);
@@ -72,174 +72,180 @@ struct CheckT {
 typedef QMap<std::string, CheckT> ChecksT;
 
 class MonitorT {
-public:
+ public:
   enum {
-    Nagios  = 0,
-    Zabbix  = 1,
-    Zenoss  = 2,
-    Pandora = 3,
-    OpManager = 4,
-    Auto    = 99
+   Nagios  = 0,
+   Zabbix  = 1,
+   Zenoss  = 2,
+   Pandora = 3,
+   OpManager = 4,
+   Auto    = 99
   };
 
   static QString toString(int type) {
-    QString value = QObject::tr("Undefined");
-    switch (type) {
-      case Nagios:
-        value = QObject::tr("Nagios");
-        break;
-      case Zabbix:
-        value = QObject::tr("Zabbix");
-        break;
-      case Zenoss:
-        value = QObject::tr("Zenoss");
-        break;
-      case Pandora:
-        value = QObject::tr("Pandora FMS");
-        break;
-      case OpManager:
-        value = QObject::tr("ManageEngine OpManager");
-        break;
-      case Auto:
-      default:
-        break;
-    }
-    return value;
+   QString value = QObject::tr("Undefined");
+   switch (type) {
+    case Nagios:
+     value = QObject::tr("Nagios");
+     break;
+    case Zabbix:
+     value = QObject::tr("Zabbix");
+     break;
+    case Zenoss:
+     value = QObject::tr("Zenoss");
+     break;
+    case Pandora:
+     value = QObject::tr("Pandora FMS");
+     break;
+    case OpManager:
+     value = QObject::tr("ManageEngine OpManager");
+     break;
+    case Auto:
+    default:
+     break;
+   }
+   return value;
   }
 };
 
 namespace ngrt4n {
-  enum SeverityT {
-    Unset    = -1,
-    Normal   = 0,
-    Minor    = 1,
-    Major    = 2,
-    Critical = 3,
-    Unknown  = 4
-  };
+ enum SeverityT {
+  Unset    = -1,
+  Normal   = 0,
+  Minor    = 1,
+  Major    = 2,
+  Critical = 3,
+  Unknown  = 4
+ };
 
-  struct AggregatedSeverityT {
-    int sev;
-    double weight;
-  };
+ struct AggregatedSeverityT {
+   int sev;
+   double weight;
+ };
 
-  enum NagiosStatusT {
-    NagiosOk       = 0,
-    NagiosWarning  = 1,
-    NagiosCritical = 2,
-    NagiosUnknown  = 3
-  };
+ enum NagiosStatusT {
+  NagiosOk       = 0,
+  NagiosWarning  = 1,
+  NagiosCritical = 2,
+  NagiosUnknown  = 3
+ };
 
-  enum ZabbixSeverityT {
-    ZabbixClear    = 0,
-    ZabbixInfo     = 1,
-    ZabbixWarn     = 2,
-    ZabbixAverage  = 3,
-    ZabbixHigh     = 4,
-    ZabbixDisaster = 5
-  };
+ enum ZabbixSeverityT {
+  ZabbixClear    = 0,
+  ZabbixInfo     = 1,
+  ZabbixWarn     = 2,
+  ZabbixAverage  = 3,
+  ZabbixHigh     = 4,
+  ZabbixDisaster = 5
+ };
 
-  enum ZenossSeverityT {
-    ZenossClear    = 0,
-    ZenossDebug    = 1,
-    ZenossInfo     = 2,
-    ZenossWarning  = 3,
-    ZenossError    = 4,
-    ZenossCritical = 5
-  };
+ enum ZenossSeverityT {
+  ZenossClear    = 0,
+  ZenossDebug    = 1,
+  ZenossInfo     = 2,
+  ZenossWarning  = 3,
+  ZenossError    = 4,
+  ZenossCritical = 5
+ };
 
-  enum PandoraSeverityT {
-    PandoraNormal   = 0,
-    PandoraCritical = 1,
-    PandoraWarning  = 2,
-    PandoraUnknown  = 3
-  };
+ enum PandoraSeverityT {
+  PandoraNormal   = 0,
+  PandoraCritical = 1,
+  PandoraWarning  = 2,
+  PandoraUnknown  = 3
+ };
 
-  enum OpManagerSeverityT {
-    OpManagerCritical  = 1,
-    OpManagerTrouble   = 2,
-    OpManagerAttention = 3,
-    OpManagerDown      = 4,
-    OpManagerClear     = 5
-  };
+ enum OpManagerSeverityT {
+  OpManagerCritical  = 1,
+  OpManagerTrouble   = 2,
+  OpManagerAttention = 3,
+  OpManagerDown      = 4,
+  OpManagerClear     = 5
+ };
 
-  enum {
-    AdmUserRole = 100,
-    OpUserRole  = 101
-  };
+ enum {
+  AdmUserRole = 100,
+  OpUserRole  = 101
+ };
 
-  enum VisibilityT {
-    Hidden    = 0x0,
-    Visible   = 0x1,
-    Expanded  = 0x2,
-    Collapsed = 0xFC
-  };
+ enum VisibilityT {
+  Hidden    = 0x0,
+  Visible   = 0x1,
+  Expanded  = 0x2,
+  Collapsed = 0xFC
+ };
 
-  enum {
-    XSCAL_FACTOR = 72,
-    YSCAL_FACTOR = 100
-  };
+ enum {
+  XSCAL_FACTOR = 72,
+  YSCAL_FACTOR = 100
+ };
 
-  enum RequestFilterT {
-    HostFilter  = 0,
-    GroupFilter = 1
-  };
+ enum RequestFilterT {
+  HostFilter  = 0,
+  GroupFilter = 1
+ };
 
-  const std::string AdmUser   = "ngrt4n_adm";
-  const std::string OpUser    = "ngrt4n_op";
-  const std::string CHILD_SEP = ",";
-  const QString CHILD_Q_SEP = QString::fromStdString(CHILD_SEP);
-  const std::string TAG_ZABBIX_HOSTNAME  = "\\{HOSTNAME\\}";
-  const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
-  const std::string TAG_HOSTNAME   = "\\{hostname\\}";
-  const std::string TAG_CHECK      = "\\{check_name\\}";
-  const std::string TAG_THERESHOLD = "\\{threshold\\}";
-  const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
-  const double WEIGHT_UNIT = 1.0;
-  const double WEIGHT_MIN  = 0;
-  const double WEIGHT_MAX  = 10;
+
+ enum GraphLayoutT {
+   DotLayout = 1,
+   NeatoLayout = 2
+ };
+
+ const std::string AdmUser   = "ngrt4n_adm";
+ const std::string OpUser    = "ngrt4n_op";
+ const std::string CHILD_SEP = ",";
+ const QString CHILD_Q_SEP = QString::fromStdString(CHILD_SEP);
+ const std::string TAG_ZABBIX_HOSTNAME  = "\\{HOSTNAME\\}";
+ const std::string TAG_ZABBIX_HOSTNAME2 = "\\{HOST.NAME\\}";
+ const std::string TAG_HOSTNAME   = "\\{hostname\\}";
+ const std::string TAG_CHECK      = "\\{check_name\\}";
+ const std::string TAG_THERESHOLD = "\\{threshold\\}";
+ const std::string TAG_PLUGIN_OUTPUT = "\\{plugin_output\\}";
+ const double WEIGHT_UNIT = 1.0;
+ const double WEIGHT_MIN  = 0;
+ const double WEIGHT_MAX  = 10;
 
 } // namespace ngrt4n
 
 class PropRules {
-public:
+ public:
   enum PropRulesT{
-    Unchanged = 0,
-    Decreased = 1,
-    Increased = 2
+   Unchanged = 0,
+   Decreased = 1,
+   Increased = 2
   };
   PropRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule); }
   QString toString(void) const;
-private:
+ private:
   int m_rule;
 };
 
 
 class CalcRules {
-public:
+ public:
   enum CalcRulesT{
-    Worst = 0,
-    Average = 1,
-    WeightedAverageWithThresholds = 2
+   Worst = 0,
+   Average = 1,
+   WeightedAverageWithThresholds = 2
   };
   CalcRules(int rule) : m_rule(rule) {}
   QString data(void) { return QString::number(m_rule);}
   QString toString(void) const;
-private:
+ private:
   int m_rule;
 };
 
 class NodeType {
-public:
+ public:
   enum {
-    BusinessService = 0,
-    ITService = 1,
-    ExternalService = 2
+   BusinessService = 0,
+   ITService = 1,
+   ExternalService = 2
   };
   static QString toString(int _type);
   static int toInt(const QString& strType);
-private:
+ private:
   static const QString ITServiceText;
   static const QString BusinessServiceText;
   static const QString ExternalServiceText;
@@ -247,7 +253,7 @@ private:
 
 
 class Severity {
-public:
+ public:
   Severity(int sev): m_sev(sev) {}
   void setValue(int _value) {m_sev = _value;}
   int value() const {return m_sev;}
@@ -260,7 +266,7 @@ public:
   Severity operator ++();
   Severity operator--();
 
-private:
+ private:
   int m_sev;
 };
 
@@ -273,19 +279,19 @@ struct ThresholdT {
 struct ThresholdLessthanFnt {
   bool operator () (const ThresholdT& th1, const ThresholdT& th2)
   {
-    if (th1.sev_out < th2.sev_out)
-      return true;
+   if (th1.sev_out < th2.sev_out)
+    return true;
 
-    if (th1.sev_out == th2.sev_out) {
-      if (th1.sev_in < th2.sev_in)
-        return true;
+   if (th1.sev_out == th2.sev_out) {
+    if (th1.sev_in < th2.sev_in)
+     return true;
 
-      if (th1.sev_in == th2.sev_in)
-        return th1.weight < th2.weight;
+    if (th1.sev_in == th2.sev_in)
+     return th1.weight < th2.weight;
 
-      return false;
-    }
     return false;
+   }
+   return false;
   }
 };
 
@@ -334,6 +340,9 @@ typedef QHash<QString, QStringList> HostListT;
 typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
+  qint8 graph_mode;
+  double min_x;
+  double min_y;
   qint8 monitor;
   double format_version;
   NodeListT bpnodes;
