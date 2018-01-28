@@ -392,7 +392,7 @@ void WebMainUI::handleRefresh(void)
 {
   QString logMsg;
   logMsg = QObject::tr("console update triggered (operator: %1, session: %2)")
-      .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
+           .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
   CORE_LOG("info", logMsg.toStdString());
   m_globalTimer.stop();
 
@@ -443,7 +443,7 @@ void WebMainUI::handleRefresh(void)
   startTimer();
 
   logMsg = QObject::tr("console update completed (operator: %1, session: %2)")
-      .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
+           .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
   CORE_LOG("info", logMsg.toStdString());
 }
 
@@ -736,96 +736,96 @@ void WebMainUI::setupSettingsPage(void)
 
   Wt::WAnchor* link = NULL;
   switch (m_dbSession->loggedUser().role) {
-  case DboUser::AdmRole: {
-    m_settingsPageTpl.bindWidget("info-box", &m_infoBox);
-    m_dataSourceSettingsForm.setEnabledInputs(true);
+    case DboUser::AdmRole: {
+      m_settingsPageTpl.bindWidget("info-box", &m_infoBox);
+      m_dataSourceSettingsForm.setEnabledInputs(true);
 
-    // Start menu
-    std::string menuText = QObject::tr("Welcome").toStdString();
-    link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-    m_settingsPageTpl.bindWidget("menu-get-started", link);
-    m_adminHomePageTpl.setTemplateText(Wt::WString::tr("getting-started.tpl"));
-    m_adminStackedContents.addWidget(&m_adminHomePageTpl);
-    link->clicked().connect(this, &WebMainUI::handleShowAdminHome);
-    m_menuLinks.insert(MenuWelcome, link);
+      // Start menu
+      std::string menuText = QObject::tr("Welcome").toStdString();
+      link = new Wt::WAnchor("#", menuText, &m_mainWidget);
+      m_settingsPageTpl.bindWidget("menu-get-started", link);
+      m_adminHomePageTpl.setTemplateText(Wt::WString::tr("getting-started.tpl"));
+      m_adminStackedContents.addWidget(&m_adminHomePageTpl);
+      link->clicked().connect(this, &WebMainUI::handleShowAdminHome);
+      m_menuLinks.insert(MenuWelcome, link);
 
-    // menu auto import host group
-    m_adminStackedContents.addWidget(&m_autoHostgroupImporterForm);
-    menuText = QObject::tr("Quick Builder").toStdString();
-    link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-    link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
-    m_settingsPageTpl.bindWidget("menu-auto-hostgroup-map", link);
-    m_menuLinks.insert(MenuImport, link);
+      // menu auto import host group
+      m_adminStackedContents.addWidget(&m_autoHostgroupImporterForm);
+      menuText = QObject::tr("Quick Builder").toStdString();
+      link = new Wt::WAnchor("#", menuText, &m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
+      m_settingsPageTpl.bindWidget("menu-auto-hostgroup-map", link);
+      m_menuLinks.insert(MenuImport, link);
 
-    // menu import view
-    menuText = QObject::tr("Import File").toStdString();
-    link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-    link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
-    m_settingsPageTpl.bindWidget("menu-import", link);
-    m_menuLinks.insert(MenuImport, link);
+      // menu import view
+      menuText = QObject::tr("Import File").toStdString();
+      link = new Wt::WAnchor("#", menuText, &m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
+      m_settingsPageTpl.bindWidget("menu-import", link);
+      m_menuLinks.insert(MenuImport, link);
 
-    // menu preview
+      // menu preview
 
-    menuText = QObject::tr("Preview").toStdString();
-    link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-    link->clicked().connect(this, &WebMainUI::selectItem4Preview);
-    m_settingsPageTpl.bindWidget("menu-preview", link);
-    m_menuLinks.insert(MenuPreview, link);
+      menuText = QObject::tr("Preview").toStdString();
+      link = new Wt::WAnchor("#", menuText, &m_mainWidget);
+      link->clicked().connect(this, &WebMainUI::selectItem4Preview);
+      m_settingsPageTpl.bindWidget("menu-preview", link);
+      m_menuLinks.insert(MenuPreview, link);
 
-    // Create view management form
-    menuText = QObject::tr("Access Control").toStdString();
-    m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
-    m_adminStackedContents.addWidget(m_viewAccessPermissionForm);
-    m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
-
-
-    // link views and acl
-    link = new Wt::WAnchor("#", menuText);
-    link->clicked().connect(this, &WebMainUI::handleViewAclMenu);
-    m_settingsPageTpl.bindWidget("menu-all-views", link);
-    m_menuLinks.insert(MenuViewAndAcl, link);
-
-    // User menus
-    m_dbUserManager = new DbUserManager(m_dbSession);
-    m_adminStackedContents.addWidget(m_dbUserManager->userForm());
-    m_dbUserManager->updateCompleted().connect(this, &WebMainUI::handleUserUpdatedCompleted);
-
-    // link new user
-    link = new Wt::WAnchor("#", Q_TR("New User"));
-    link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
-    m_settingsPageTpl.bindWidget("menu-new-user", link);
-    m_menuLinks.insert(MenuNewUser, link);
-
-    // built-in menu
-    m_adminStackedContents.addWidget(m_dbUserManager->dbUserListWidget());
-    link = new Wt::WAnchor("#", Q_TR("All Users"));
-    link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
-    m_settingsPageTpl.bindWidget("menu-builin-users", link);
-    m_menuLinks.insert(MenuBuiltInUsers, link);
+      // Create view management form
+      menuText = QObject::tr("Access Control").toStdString();
+      m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
+      m_adminStackedContents.addWidget(m_viewAccessPermissionForm);
+      m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
 
 
-    // ldap user menu
-    m_ldapUserManager = new LdapUserManager(m_dbSession);
-    m_adminStackedContents.addWidget(m_ldapUserManager);
-    link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
-    link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
-    m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
-    m_settingsPageTpl.bindWidget("menu-ldap-users", link);
-    m_menuLinks.insert(MenuLdapUsers, link);
-  }
-    break;
-  default: {
-    m_settingsPageTpl.bindEmpty("info-box");
-    wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
-    m_settingsPageTpl.bindEmpty("menu-get-started");
-    m_settingsPageTpl.bindEmpty("menu-import");
-    m_settingsPageTpl.bindEmpty("menu-preview");
-    m_settingsPageTpl.bindEmpty("menu-all-views");
-    m_settingsPageTpl.bindEmpty("menu-new-user");
-    m_settingsPageTpl.bindEmpty("menu-all-users");
-    m_settingsPageTpl.bindEmpty("menu-notification-settings");
-  }
-    break;
+      // link views and acl
+      link = new Wt::WAnchor("#", menuText);
+      link->clicked().connect(this, &WebMainUI::handleViewAclMenu);
+      m_settingsPageTpl.bindWidget("menu-all-views", link);
+      m_menuLinks.insert(MenuViewAndAcl, link);
+
+      // User menus
+      m_dbUserManager = new DbUserManager(m_dbSession);
+      m_adminStackedContents.addWidget(m_dbUserManager->userForm());
+      m_dbUserManager->updateCompleted().connect(this, &WebMainUI::handleUserUpdatedCompleted);
+
+      // link new user
+      link = new Wt::WAnchor("#", Q_TR("New User"));
+      link->clicked().connect(this, &WebMainUI::handleNewUserMenu);
+      m_settingsPageTpl.bindWidget("menu-new-user", link);
+      m_menuLinks.insert(MenuNewUser, link);
+
+      // built-in menu
+      m_adminStackedContents.addWidget(m_dbUserManager->dbUserListWidget());
+      link = new Wt::WAnchor("#", Q_TR("All Users"));
+      link->clicked().connect(this, &WebMainUI::handleBuiltInUsersMenu);
+      m_settingsPageTpl.bindWidget("menu-builin-users", link);
+      m_menuLinks.insert(MenuBuiltInUsers, link);
+
+
+      // ldap user menu
+      m_ldapUserManager = new LdapUserManager(m_dbSession);
+      m_adminStackedContents.addWidget(m_ldapUserManager);
+      link = new Wt::WAnchor("#", Q_TR("LDAP Users"));
+      link->clicked().connect(this, &WebMainUI::handleLdapUsersMenu);
+      m_ldapUserManager->userEnableStatusChanged().connect(this, &WebMainUI::handleUserEnableStatusChanged);
+      m_settingsPageTpl.bindWidget("menu-ldap-users", link);
+      m_menuLinks.insert(MenuLdapUsers, link);
+    }
+      break;
+    default: {
+      m_settingsPageTpl.bindEmpty("info-box");
+      wApp->doJavaScript("$('#userMenuBlock').hide(); $('#viewMenuBlock').hide();");
+      m_settingsPageTpl.bindEmpty("menu-get-started");
+      m_settingsPageTpl.bindEmpty("menu-import");
+      m_settingsPageTpl.bindEmpty("menu-preview");
+      m_settingsPageTpl.bindEmpty("menu-all-views");
+      m_settingsPageTpl.bindEmpty("menu-new-user");
+      m_settingsPageTpl.bindEmpty("menu-all-users");
+      m_settingsPageTpl.bindEmpty("menu-notification-settings");
+    }
+      break;
   }
 
   // monitoring settings menu
@@ -961,14 +961,14 @@ Wt::WComboBox* WebMainUI::createViewSelector(void)
 void WebMainUI::showMessage(int status, const std::string& msg)
 {
   switch (status) {
-  case ngrt4n::OperationSucceeded:
-    showMessageClass(msg, "alert alert-success");
-    break;
-  case ngrt4n::OperationFailed:
-    showMessageClass(msg, "alert alert-warning");
-    break;
-  default:
-    break;
+    case ngrt4n::OperationSucceeded:
+      showMessageClass(msg, "alert alert-success");
+      break;
+    case ngrt4n::OperationFailed:
+      showMessageClass(msg, "alert alert-warning");
+      break;
+    default:
+      break;
   }
 }
 
@@ -1144,14 +1144,14 @@ void WebMainUI::updateEventFeeds(void)
 void WebMainUI::handleAuthSystemChanged(int authSystem)
 {
   switch (authSystem) {
-  case WebBaseSettings::LDAP:
-    m_menuLinks[MenuLdapUsers]->setDisabled(false);
-    wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', false);");
-    break;
-  default:
-    m_dbSession->deleteAuthSystemUsers(WebBaseSettings::LDAP);
-    wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', true);");
-    break;
+    case WebBaseSettings::LDAP:
+      m_menuLinks[MenuLdapUsers]->setDisabled(false);
+      wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', false);");
+      break;
+    default:
+      m_dbSession->deleteAuthSystemUsers(WebBaseSettings::LDAP);
+      wApp->doJavaScript("$('#menu-ldap-users').prop('disabled', true);");
+      break;
   }
 }
 
@@ -1208,19 +1208,19 @@ void WebMainUI::handleDeleteView(const std::string& viewName)
 void WebMainUI::handleUserEnableStatusChanged(int status, std::string data)
 {
   switch (status) {
-  case LdapUserManager::EnableAuthSuccess:
-    showMessage(ngrt4n::OperationSucceeded,
-                Q_TR("LDAP authentication enabled for user ") + data);
-    break;
-  case LdapUserManager::DisableAuthSuccess:
-    showMessage(ngrt4n::OperationSucceeded,
-                Q_TR("LDAP authentication disabled for user ") + data);
-    break;
-  case LdapUserManager::GenericError:
-    showMessage(ngrt4n::OperationFailed, data);
-    break;
-  default:
-    break;
+    case LdapUserManager::EnableAuthSuccess:
+      showMessage(ngrt4n::OperationSucceeded,
+                  Q_TR("LDAP authentication enabled for user ") + data);
+      break;
+    case LdapUserManager::DisableAuthSuccess:
+      showMessage(ngrt4n::OperationSucceeded,
+                  Q_TR("LDAP authentication disabled for user ") + data);
+      break;
+    case LdapUserManager::GenericError:
+      showMessage(ngrt4n::OperationFailed, data);
+      break;
+    default:
+      break;
   }
 }
 
@@ -1272,7 +1272,7 @@ void WebMainUI::handleImportDescriptionFile(void)
       Parser parser(tmpFileName ,&cdata, Parser::ParsingModeEditor, m_settings.getGraphLayout());
       connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
 
-      if (! parser.process()) {
+      if (! parser.parse()) {
         std::string msg = Q_TR("Invalid description file");
         CORE_LOG("warn", msg);
         showMessage(ngrt4n::OperationFailed, msg);

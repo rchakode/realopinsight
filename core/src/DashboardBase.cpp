@@ -95,7 +95,7 @@ void DashboardBase::initialize(BaseSettings* preferencePtr)
   if (! m_descriptionFile.isEmpty()) {
     Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, m_baseSettings->getGraphLayout());
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
-    if (parser.process() && parser.computeCoordinates()) {
+    if (parser.process()) {
       buildTree();
       buildMap();
       initSettings(m_baseSettings);

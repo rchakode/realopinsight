@@ -42,6 +42,7 @@ Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingM
 
 }
 
+
 Parser::~Parser()
 {
   QFile fileHandler;
@@ -55,6 +56,18 @@ Parser::~Parser()
 }
 
 bool Parser::process(void)
+{
+  bool success = false;
+  if (parse()) {
+    updateNodeHierachy();
+    saveCoordinatesFile();
+     success = computeCoordinates();
+  }
+
+  return success;
+}
+
+bool Parser::parse(void)
 {
   ngrt4n::clearCoreData(*m_cdata);
 
@@ -126,9 +139,6 @@ bool Parser::process(void)
         break;
     }
   }
-
-  updateNodeHierachy();
-  saveCoordinatesFile();
 
   return true;
 }
@@ -269,79 +279,6 @@ bool Parser::computeCoordinates(void)
 }
 
 
-bool Parser::computeCoordinates(const QString& _plainDot)
-{
-  QStringList splitedLine;
-  QFile qfile(_plainDot);
-  if (! qfile.open(QFile::ReadOnly)) {
-    m_lastErrorMsg = QObject::tr("Failed to open file: %1").arg(_plainDot);
-    return false;
-  }
-
-  QRegExp regexSep("[ ]+");
-  QTextStream coodFileStream(& qfile);
-  QString line;
-
-  //start parsing
-  if(line = coodFileStream.readLine(0), line.isNull()) {
-    m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(_plainDot);
-    return false;
-  }
-
-  splitedLine = line.split (regexSep);
-  if (splitedLine.size() != 4 || splitedLine[0] != "graph") {
-    m_lastErrorMsg = QObject::tr("Invalid graphviz entry: %1").arg(line);
-    return false;
-  }
-
-  m_cdata->map_width = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-  m_cdata->map_height = splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-  m_cdata->min_x = 0;
-  m_cdata->min_y = 0;
-  m_cdata->graph_mode = m_graphLayout;
-
-  while (line = coodFileStream.readLine(0), ! line.isNull()) {
-    splitedLine = line.split (regexSep);
-    if (splitedLine[0] == "node") {
-      NodeListT::Iterator node;
-      QString nid = splitedLine[1].trimmed();
-      if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
-        switch (m_graphLayout) {
-          case ngrt4n::NeatoLayout:
-            node->pos_x = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-            node->pos_y =  splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-            node->text_w = splitedLine[4].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-            node->text_h = splitedLine[5].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-            m_cdata->min_x = qMin<double>(m_cdata->min_x, node->pos_x);
-            m_cdata->min_y = qMin<double>(m_cdata->min_y, node->pos_y);
-            break;
-
-          case ngrt4n::DotLayout:
-            node->pos_x = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-            node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-            node->text_w = splitedLine[4].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-            node->text_h = splitedLine[5].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-            break;
-          default:
-            break;
-        }
-
-      }
-    } else if (splitedLine[0] == "edge") {
-      // multiInsert because a node can have several childs
-      m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
-    } else if (splitedLine[0] == "stop") {
-      break;
-    }
-  }
-  qfile.close();
-
-
-  m_cdata->map_width = m_cdata->map_width + qAbs(m_cdata->min_x);
-  m_cdata->map_height = m_cdata->map_height + qAbs(m_cdata->min_y);
-
-  return true;
-}
 
 
 void Parser::insertITServiceNode(NodeT& node)
@@ -381,7 +318,7 @@ void Parser::insertExternalServiceNode(NodeT& node)
 
   CoreDataT cdata;
   Parser parser(path, &cdata, Parser::ParsingModeExternalService, m_graphLayout);
-  if (parser.process()) {
+  if (parser.parse()) {
     NodeListT::Iterator innerRootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
 
     if (innerRootNodeIt != cdata.bpnodes.end()) {

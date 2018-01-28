@@ -41,6 +41,7 @@ class Parser : public QObject
     Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout);
     virtual ~Parser();
     bool process(void);
+    bool parse(void);
     bool computeCoordinates(void);
     QString dotContent(void) const {return m_dotContent;}
     QString dotFile(void) const { return m_dotFile; }
@@ -66,7 +67,6 @@ class Parser : public QObject
 
     void updateNodeHierachy(void);
     void saveCoordinatesFile(void);
-    bool computeCoordinates(const QString& dotfile);
     static QString espacedNodeLabel(const QString& rawLabel);
     void insertITServiceNode(NodeT& node);
     void insertBusinessServiceNode(NodeT& node);
