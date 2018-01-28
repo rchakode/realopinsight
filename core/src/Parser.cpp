@@ -61,7 +61,7 @@ bool Parser::process(void)
   if (parse()) {
     updateNodeHierachy();
     saveCoordinatesFile();
-     success = computeCoordinates();
+    success = computeCoordinates();
   }
 
   return success;
@@ -242,11 +242,14 @@ bool Parser::computeCoordinates(void)
     return false;
   }
 
-  m_cdata->map_width = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-  m_cdata->map_height = splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
+  const ScaleFactors SCALE_FACTORS(m_graphLayout);
+  m_cdata->graph_mode = m_graphLayout;
+  m_cdata->map_width = splitedLine[2].trimmed().toDouble() * SCALE_FACTORS.x();
+  m_cdata->map_height = splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
   m_cdata->min_x = 0;
   m_cdata->min_y = 0;
-  m_cdata->graph_mode = m_graphLayout;
+  double max_text_w = 0;
+  double max_text_h = 0;
 
   while (line = coodFileStream.readLine(0), ! line.isNull()) {
     splitedLine = line.split (regexSep);
@@ -254,12 +257,14 @@ bool Parser::computeCoordinates(void)
       NodeListT::Iterator node;
       QString nid = splitedLine[1].trimmed();
       if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
-        node->pos_x = splitedLine[2].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-        node->pos_y =  splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
-        node->text_w = splitedLine[4].trimmed().toDouble() * ngrt4n::XSCAL_FACTOR;
-        node->text_h = splitedLine[5].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
+        node->pos_x = splitedLine[2].trimmed().toDouble() * SCALE_FACTORS.x();
+        node->pos_y =  splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
+        node->text_w = splitedLine[4].trimmed().toDouble() * SCALE_FACTORS.x();
+        node->text_h = splitedLine[5].trimmed().toDouble() * SCALE_FACTORS.y();
         m_cdata->min_x = qMin<double>(m_cdata->min_x, node->pos_x);
         m_cdata->min_y = qMin<double>(m_cdata->min_y, node->pos_y);
+        max_text_w = qMax(max_text_w, node->text_w);
+        max_text_h = qMax(max_text_h, node->text_h);
         //node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
       }
     } else if (splitedLine[0] == "edge") {
@@ -272,8 +277,12 @@ bool Parser::computeCoordinates(void)
 
   qfile.close();
 
-  m_cdata->map_width = m_cdata->map_width + qAbs(m_cdata->min_x);
-  m_cdata->map_height = m_cdata->map_height + qAbs(m_cdata->min_y);
+  if (m_graphLayout == ngrt4n::NeatoLayout) {
+    m_cdata->min_x -= (max_text_w * 0.6);
+    m_cdata->min_y -= (max_text_h * 0.6);
+  }
+  m_cdata->map_width += qAbs(m_cdata->min_x);
+  m_cdata->map_height += qAbs(m_cdata->min_y);
 
   return true;
 }
