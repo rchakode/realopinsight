@@ -1248,13 +1248,17 @@ void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
 void WebMainUI::handleDashboardSelected(std::string viewName)
 {
   DashboardMapT::Iterator iterDashboardItem = m_dashboardMap.find(viewName.c_str());
-  if (iterDashboardItem != m_dashboardMap.end()) setDashboardAsFrontStackedWidget(*iterDashboardItem);
+  if (iterDashboardItem != m_dashboardMap.end()) {
+    setDashboardAsFrontStackedWidget(*iterDashboardItem);
+  }
 }
 
 
 void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
 {
-  if (widget) m_dashboardStackedContents.setCurrentWidget(widget);
+  if (widget) {
+    m_dashboardStackedContents.setCurrentWidget(widget);
+  }
 }
 
 
