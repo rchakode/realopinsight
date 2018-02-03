@@ -38,12 +38,9 @@ public:
   WebTree();
   virtual ~WebTree();
   void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
-  Wt::WStandardItemModel* renderingModel(void) const {return m_model;}
-  void setRenderingModel(Wt::WStandardItem* _item) const {return m_model->appendRow(_item);}
   void updateNodeItem(const NodeT& _node, const QString& _tip);
   void build(void);
-  void update(void);
-  void update(Wt::WStandardItem * _rItem) { setRenderingModel(_rItem); update(); }
+  void applyModel(Wt::WStandardItem* _rootItem);
 
 private:
   typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
