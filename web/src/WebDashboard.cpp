@@ -1,5 +1,5 @@
 /*
- * WebDashboard.hpp
+ * WebDashboard.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2012 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 19-09-2013                                                 #
@@ -142,8 +142,8 @@ void WebDashboard::bindFormWidgets(void)
   m_leftSubMainLayout.setResizable(0);
   m_mainLayout->setResizable(0);
   m_mainLayout->setResizable(1);
-  m_mainLayout->setResizable(0);
-  m_mainLayout->setResizable(1);
+  m_leftSubMainLayout.setResizable(0);
+  m_leftSubMainLayout.setResizable(1);
   m_rightSubMainLayout.setResizable(0);
   m_rightSubMainLayout.setResizable(1);
 }

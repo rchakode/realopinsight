@@ -71,6 +71,8 @@ HEADERS += \
     core/src/StatusAggregator.hpp \
     core/src/DescriptionFileFactoryUtils.hpp \
     core/src/OpManagerHelper.hpp \
+    core/src/BaseSettings.hpp \
+    core/src/SettingFactory.hpp \
     web/src/utils/wtwithqt/DispatchThread.h \
     web/src/utils/wtwithqt/WQApplication \
     web/src/utils/smtpclient/qxtglobal.h \
@@ -113,9 +115,8 @@ HEADERS += \
     web/src/WebDatabaseSettings.hpp \
     web/src/WebDataSourceSettings.hpp \
     web/src/WebBaseSettings.hpp \
-    web/src/WebAuthSettings.hpp \
-    core/src/BaseSettings.hpp \
-    core/src/SettingFactory.hpp
+    web/src/WebAuthSettings.hpp \ \
+    web/src/WebEditor.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -131,7 +132,9 @@ SOURCES +=  core/src/Base.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
     core/src/DescriptionFileFactoryUtils.cpp \
-    core/src/OpManagerHelper.cpp \
+    core/src/OpManagerHelper.cpp  \
+    core/src/BaseSettings.cpp \
+    core/src/SettingFactory.cpp \
     web/src/utils/wtwithqt/DispatchThread.C \
     web/src/utils/wtwithqt/WQApplication.C \
     web/src/utils/smtpclient/qxthmac.cpp \
@@ -169,8 +172,7 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebBaseSettings.cpp \
     web/src/WebAuthSettings.cpp \
     web/src/WebDataSourceSettings.cpp \
-    core/src/BaseSettings.cpp \
-    core/src/SettingFactory.cpp
+    web/src/WebEditor.cpp
 
 
 
@@ -214,8 +216,7 @@ web-foundation-unittests {
 }
 
 TARGET.files = $${TARGET}
-MAN.files = doc/man/realopinsight-manager.1.gz doc/man/realopinsight-oc.1.gz doc/man/realopinsight-editor.1.gz
-INSTALLS += TARGET MAN
+INSTALLS += TARGET
 
 
 INCLUDEPATH += core/src/

@@ -43,8 +43,7 @@ namespace ngrt4n {
     OperationFailed
   };
 
-  void showMessage(int exitCode, const std::string& errorMsg,
-                   const std::string& successMsg, Wt::WText* infoBox);
+  void showMessage(int exitCode, const std::string& errorMsg, const std::string& successMsg, Wt::WText* infoBox);
   std::string tr(const std::string& msg);
   std::string severityCssClass(int severity);
   std::string severityHtmlColor(int severity);

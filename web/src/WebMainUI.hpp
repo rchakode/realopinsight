@@ -39,6 +39,7 @@
 #include "WebDatabaseSettings.hpp"
 #include "WebHostGroupServiceMap.hpp"
 #include "WebCsvReportResource.hpp"
+#include "WebEditor.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
 #include <Wt/WApplication>
@@ -126,7 +127,7 @@ private:
   std::string m_rootDir;
   std::string m_confdir;
   Wt::WContainerWidget m_mainWidget;
-  Wt::WTemplate m_settingsPageTpl;
+  Wt::WTemplate m_settingsMainPageTpl;
   Wt::WTemplate m_operatorHomeTpl;
   Wt::WTemplate m_adminHomePageTpl;
   Wt::WTemplate* m_breadcrumbsBar;
@@ -147,6 +148,7 @@ private:
   WebNotificationSettings m_notificationSettingsForm;
   WebAuthSettings m_authSettingsForm;
   WebDatabaseSettings m_databaseSettingsForm;
+  //WebEditor m_webEditor;
 
   WebHostGroupServiceMap m_autoHostgroupImporterForm;
   Wt::WNavigationBar m_navbar;
@@ -245,8 +247,6 @@ private:
   UserFormView* createPasswordPanel(void);
   Wt::WDialog* createAboutDialog(void);
   Wt::WAnchor* createLogoLink(void);
-  Wt::WComboBox* createShowViewBreadCrumbsLink(void);
-  Wt::WCheckBox* createDisplayOnlyTroubleBreadCrumbsLink();
   Wt::WWidget* createNotificationSection(void);
   Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
 };
