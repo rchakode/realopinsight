@@ -103,7 +103,6 @@ HEADERS += \
     web/src/Notificator.hpp \
     web/src/dbo/LdapUserManager.hpp \
     web/src/dbo/NotificationTableView.hpp \
-    web/src/WebHostGroupServiceMap.hpp \
     web/src/WebCsvReportResource.hpp \
     web/src/WebBiDateFilter.hpp \
     web/src/WebBiDashlet.hpp \
@@ -159,7 +158,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/Notificator.cpp \
     web/src/dbo/LdapUserManager.cpp \
     web/src/dbo/NotificationTableView.cpp \
-    web/src/WebHostGroupServiceMap.cpp \
     web/src/WebCsvReportResource.cpp \
     web/src/WebBiDashlet.cpp \
     web/src/WebBiDateFilter.cpp \

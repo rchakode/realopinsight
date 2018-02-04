@@ -40,7 +40,7 @@ public:
   void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void updateNodeItem(const NodeT& _node, const QString& _tip);
   void build(void);
-  void applyModel(Wt::WStandardItem* _rootItem);
+  void renewModel(Wt::WStandardItem* _rootItem);
 
 private:
   typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;

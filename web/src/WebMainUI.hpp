@@ -37,7 +37,6 @@
 #include "WebAuthSettings.hpp"
 #include "WebDataSourceSettings.hpp"
 #include "WebDatabaseSettings.hpp"
-#include "WebHostGroupServiceMap.hpp"
 #include "WebCsvReportResource.hpp"
 #include "WebEditor.hpp"
 #include <Wt/WComboBox>
@@ -148,9 +147,8 @@ private:
   WebNotificationSettings m_notificationSettingsForm;
   WebAuthSettings m_authSettingsForm;
   WebDatabaseSettings m_databaseSettingsForm;
-  //WebEditor m_webEditor;
+  WebEditor m_webEditor;
 
-  WebHostGroupServiceMap m_autoHostgroupImporterForm;
   Wt::WNavigationBar m_navbar;
   Wt::WStackedWidget m_mainStackedContents;
   Wt::WStackedWidget m_adminStackedContents;
@@ -191,7 +189,7 @@ private:
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
   void handleDisplayOnlyTroubleStateChanged(void);
   void handleImportDescriptionFile(void);
-  void handleImportHostGroupAsMap(void);
+  void handleLaunchEditor(void);
   void handlePreview(void);
   void handleDataSourceSettings(void);
   void handleAuthSettings(void);
@@ -204,7 +202,8 @@ private:
   void handleErrcode(int errcode);
   void handleUserUpdatedCompleted(int errcode);
   void handleShowAdminHome(void);
-  void handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup);
+  //FIXME void handleImportHostgroup(const SourceT& srcInfo, const QString& hostgroup) no longer needed?
+  void handleImportHostgroup(const SourceT& srcInfo, const QString& hostgroup);
   void handleUploadSubmitButton(void);
   void handleUploadCancelButton(void);
   void handleUploadFileTooLarge(void);

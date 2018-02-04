@@ -29,6 +29,7 @@ WebTree::WebTree(void)
   : Wt::WTreeView(0),
     m_model(new Wt::WStandardItemModel())
 {
+  setModel(m_model);
   setDefaultSettings();
 }
 
@@ -69,14 +70,16 @@ void WebTree::build(void)
     }
   }
 
-  applyModel(m_items[ngrt4n::ROOT_ID]);
+  renewModel(m_items[ngrt4n::ROOT_ID]);
 }
 
-void WebTree::applyModel(Wt::WStandardItem* _rootItem)
+void WebTree::renewModel(Wt::WStandardItem* _rootItem)
 {
+  Wt::WStandardItemModel* oldModel = m_model;
+  m_model = new Wt::WStandardItemModel();
   m_model->appendRow(_rootItem);
   setModel(m_model);
-  expandToDepth(2); //TODO: check before
+  delete oldModel;
 }
 
 

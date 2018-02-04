@@ -104,7 +104,7 @@ void WebMainUI::unbindWidgets(void)
   m_adminStackedContents.removeWidget(&m_dataSourceSettingsForm);
   m_adminStackedContents.removeWidget(&m_notificationSettingsForm);
   m_adminStackedContents.removeWidget(&m_authSettingsForm);
-  m_adminStackedContents.removeWidget(&m_autoHostgroupImporterForm);
+  m_adminStackedContents.removeWidget(&m_webEditor);
   m_adminStackedContents.removeWidget(&m_adminHomePageTpl);
   m_adminStackedContents.removeWidget(&m_databaseSettingsForm);
 
@@ -170,8 +170,6 @@ void WebMainUI::addEvents(void)
   m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_databaseSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
-  m_autoHostgroupImporterForm.operationCompleted().connect(this, &WebMainUI::showMessage);
-  m_autoHostgroupImporterForm.hostgroupSubmitted().connect(this, &WebMainUI::handleImportHostgroupSubmitted);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
   m_globalTimer.timeout().connect(this, &WebMainUI::handleRefresh);
   m_uploadSubmitButton.clicked().connect(this, &WebMainUI::handleUploadSubmitButton);
@@ -192,7 +190,6 @@ void WebMainUI::showUserHome(void)
   wApp->setTitle(pageTitle);
   setupSettingsPage();
   m_dashboardStackedContents.addWidget(&m_settingsMainPageTpl);
-  //m_dashboardStackedContents.addWidget(&m_webEditor);
   if (! m_dbSession->isLoggedAdmin()) {
     initOperatorDashboard();
     m_dashboardStackedContents.setCurrentWidget(&m_operatorHomeTpl);
@@ -443,11 +440,10 @@ void WebMainUI::handleRefresh(void)
 
 
 
-void WebMainUI::handleImportHostGroupAsMap(void)
+void WebMainUI::handleLaunchEditor(void)
 {
-  m_adminPanelTitle.setText(Q_TR("Auto Import Hostgroup as Service Map"));
-  m_adminStackedContents.setCurrentWidget(&m_autoHostgroupImporterForm);
-  m_autoHostgroupImporterForm.updateDataSourceList();
+  m_adminPanelTitle.setText(Q_TR("Editor"));
+  m_adminStackedContents.setCurrentWidget(&m_webEditor);
 }
 
 
@@ -520,7 +516,7 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 }
 
 
-void WebMainUI::handleImportHostgroupSubmitted(const SourceT& srcInfo, const QString& hostgroup)
+void WebMainUI::handleImportHostgroup(const SourceT& srcInfo, const QString& hostgroup)
 {
   CoreDataT cdata;
   QString errorMsg;
@@ -577,7 +573,6 @@ void WebMainUI::handleNewViewSelected(void)
       setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
     } else {
       setWidgetAsFrontStackedWidget(&m_settingsMainPageTpl);
-      //setWidgetAsFrontStackedWidget(&m_webEditor);
     }
   }
 }
@@ -742,12 +737,12 @@ void WebMainUI::setupSettingsPage(void)
       link->clicked().connect(this, &WebMainUI::handleShowAdminHome);
       m_menuLinks.insert(MenuWelcome, link);
 
-      // menu auto import host group
-      m_adminStackedContents.addWidget(&m_autoHostgroupImporterForm);
-      menuText = QObject::tr("Quick Builder").toStdString();
+      // menu editor
+      m_adminStackedContents.addWidget(&m_webEditor);
+      menuText = QObject::tr("Editor").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
-      link->clicked().connect(this, &WebMainUI::handleImportHostGroupAsMap);
-      m_settingsMainPageTpl.bindWidget("menu-auto-hostgroup-map", link);
+      link->clicked().connect(this, &WebMainUI::handleLaunchEditor);
+      m_settingsMainPageTpl.bindWidget("menu-editor", link);
       m_menuLinks.insert(MenuImport, link);
 
       // menu import view
