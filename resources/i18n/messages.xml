@@ -585,20 +585,40 @@
 </message>
 
 
-<message id="import-hostgroup-form.tpl">
+<message id="editor-fields-form.tpl">
   <form class="form-horizontal">
     <fieldset>
       <div class="col-sm-12 form-group">
-        <label class="control-label">Source&nbsp;</label>
-        <span>${source-list-field}</span>
+        <label class="control-label">Name&nbsp;</label>
+        <span>${name-field}</span>
       </div>
       <div class="col-sm-12 form-group">
-        <label class="control-label">Host/group filter&nbsp;</label>
-        <span>${host-group-filter}</span>
+        <label class="control-label">Type&nbsp;</label>
+        <span>${type-field}</span>
+      </div>
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Severity Calculation Rule&nbsp;</label>
+        <span>${calc-rule-field}</span>
+      </div>
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Severity Propagation Rule&nbsp;</label>
+        <span>${prop-rule-field}</span>
+      </div>
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Icon&nbsp;</label>
+        <span>${icon-field}</span>
+      </div>
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Description&nbsp;</label>
+        <span>${description-field}</span>
+      </div>
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Monitoring Data&nbsp;</label>
+        <span>${monitoring-item-field}</span>
       </div>
     </fieldset>
     <div class="form-actions">
-      <span id="submit-button">${submit-button}</span>
+      <span id="submit-button">${save-button}</span>
     </div>
   </form>
 </message>

@@ -56,9 +56,9 @@ WebEditor::~WebEditor()
 }
 
 
-void  WebEditor::openDescriptionFile(const QString& path)
+void  WebEditor::openViewFile(const QString& path)
 {
-//TODO: m_tree.setCoreData(&m_cdata);
+  //TODO: m_tree.setCoreData(&m_cdata);
 }
 
 void WebEditor::bindFormWidgets(void)
@@ -66,28 +66,66 @@ void WebEditor::bindFormWidgets(void)
   setLayout(m_mainLayout = new Wt::WHBoxLayout());
 
   m_mainLayout->setContentsMargins(0, 0, 0, 0);
-  m_leftSubMainLayout.setContentsMargins(0, 0, 0, 0);
-  m_rightSubMainLayout.setContentsMargins(0, 0, 0, 0);
 
 
-  m_leftSubMainLayout.addWidget(&m_tree);
-   //FIXME: bind the editor widget instead of the map one => m_rightSubMainLayout.addWidget(m_map.getWidget());
-  m_mainLayout->addLayout(&m_leftSubMainLayout);
-  m_mainLayout->addLayout(&m_rightSubMainLayout);
+  m_mainLayout->addWidget(&m_tree);
+  m_mainLayout->addWidget(&m_fieldEditionPane);
 
   m_mainLayout->setSpacing(2);
   m_mainLayout->setResizable(0);
   m_mainLayout->setResizable(1);
+
+  bindEditionForm();
 }
 
 
 void WebEditor::unbindWidgets(void)
 {
-  m_leftSubMainLayout.removeWidget(&m_tree);
-   //FIXME: unbing editor widget of the map one => m_rightSubMainLayout.removeWidget(m_map.getWidget());
-  m_mainLayout->removeItem(&m_leftSubMainLayout);
-  m_mainLayout->removeItem(&m_rightSubMainLayout);
+  m_mainLayout->removeWidget(&m_tree);
+  m_mainLayout->removeWidget(&m_fieldEditionPane);
   clear();
+}
+
+
+
+void WebEditor::bindEditionForm(void)
+{
+  m_saveBtn.setText(Q_TR("Save"));
+
+  // set node type values
+  m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
+  m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
+  m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
+
+  // set icon type values
+  QString header = QString(Q_TR("-->Select an icon (Default is %1)").c_str()).arg(ngrt4n::DEFAULT_ICON);
+  m_iconBox.addItem(header.toStdString());
+  Q_FOREACH(const QString& label, ngrt4n::nodeIcons().keys()) {
+    //QString path = icons.value(label);
+    m_iconBox.addItem(label.toStdString());
+  }
+
+  // set propagation rules
+  Q_FOREACH(const QString& rule, DashboardBase::propRules().keys()) {
+    m_propRuleBox.addItem(rule.toStdString());
+  }
+
+  // set calculation rules
+  Q_FOREACH(const QString& rule, DashboardBase::calcRules().keys()) {
+    m_calcRuleBox.addItem(rule.toStdString());
+  }
+
+
+  // bind template fields
+  m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
+  m_fieldEditionPane.bindWidget("name-field", &m_nameField);
+  m_fieldEditionPane.bindWidget("type-field", &m_typeField);
+  m_fieldEditionPane.bindWidget("calc-rule-field", &m_calcRuleBox);
+  m_fieldEditionPane.bindWidget("prop-rule-field", &m_propRuleBox);
+  m_fieldEditionPane.bindWidget("icon-field", &m_iconBox);
+  m_fieldEditionPane.bindWidget("description-field", &m_descField);
+  m_fieldEditionPane.bindWidget("monitoring-item-field", &m_checkItemField);
+  m_fieldEditionPane.bindWidget("save-button", &m_saveBtn);
 }
 
 

@@ -40,6 +40,10 @@
 #include <Wt/WLabel>
 #include <QHash>
 #include <Wt/WApplication>
+#include <Wt/WTemplate>
+#include <Wt/WLineEdit>
+#include <Wt/WTextArea>
+#include <Wt/WComboBox>
 
 
 
@@ -53,14 +57,24 @@ public:
 private:
   WebTree m_tree;
   Wt::WHBoxLayout* m_mainLayout;
-  Wt::WVBoxLayout m_leftSubMainLayout;
-  Wt::WVBoxLayout m_rightSubMainLayout;
+  Wt::WTemplate m_fieldEditionPane;
 
-  void openDescriptionFile(const QString& path);
+  Wt::WLineEdit m_nameField;
+  Wt::WComboBox m_typeField;
+  Wt::WComboBox m_iconBox;
+  Wt::WComboBox m_calcRuleBox;
+  Wt::WComboBox m_propRuleBox;
+  Wt::WTextArea m_descField;
+  Wt::WComboBox m_checkItemField;
+  Wt::WPushButton m_saveBtn;
+
+
+  void openViewFile(const QString& path);
   void bindFormWidgets(void);
   void unbindWidgets(void);
   void addEvents(void);
   void buildTree(void);
+  void bindEditionForm(void);
 };
 
 
