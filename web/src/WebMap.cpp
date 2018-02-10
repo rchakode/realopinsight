@@ -155,14 +155,14 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
                         node.text_h);
 
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(ngrt4n::getPathFromQtResource(ICONS[node.icon]),40,40));
+      m_painter->drawImage(iconPos, GImage(ICONS[node.icon],40,40));
     } else { /* thumbnail: do nothing*/ }
 
     if( node.type == NodeType::BusinessService) {
       if (node.visibility & ngrt4n::Expanded) {
-        m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::MINUS]),19,18));
+        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::MINUS],19,18));
       } else {
-        m_painter->drawImage(expIconPos,GImage(ngrt4n::getPathFromQtResource(ICONS[ngrt4n::PLUS]),19,18));
+        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::PLUS],19,18));
       }
       createExpIconLink(node, expIconPos);
     }

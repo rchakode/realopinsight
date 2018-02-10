@@ -193,14 +193,12 @@ Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
 
   std::string viewName = rootNode().name.toStdString();
 
-  anchor->clicked().connect(std::bind(&WebDashboard::handleDashboardSelected,
-                                      this,
-                                      viewName)
-                            );
+  anchor->clicked().connect(std::bind(&WebDashboard::handleDashboardSelected, this, viewName));
+
   //FIXME: clear widget
   tpl->bindWidget("event-feed-title", anchor);
   tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
-  tpl->bindString("event-feed-icon", ngrt4n::getPathFromQtResource(ICONS[node.icon]));
+  tpl->bindString("event-feed-icon", ICONS[node.icon]);
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", viewName);
   tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));

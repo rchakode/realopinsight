@@ -49,7 +49,6 @@ namespace ngrt4n {
   std::string severityHtmlColor(int severity);
   std::string thumbnailCssClass(int severity);
   Wt::WColor severityWColor(int severity);
-  std::string getPathFromQtResource(const QString& qtPath, const std::string& docRoot="");
   Wt::WWidget* footer(void);
   std::string sqliteDbPath(void);
   std::string timeTextFromQtTimeText(const std::string& qtimeText);

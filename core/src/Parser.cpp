@@ -123,7 +123,9 @@ bool Parser::parse(void)
     }
 
     node.check.status = -1;
-    if (node.icon.isEmpty()) node.icon = ngrt4n::DEFAULT_ICON;
+    if (node.icon.isEmpty()) {
+      node.icon = ngrt4n::DEFAULT_ICON;
+    }
 
     switch(node.type) {
       case NodeType::BusinessService:

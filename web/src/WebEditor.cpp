@@ -98,23 +98,26 @@ void WebEditor::bindEditionForm(void)
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
 
   // set icon type values
-  QString header = QString(Q_TR("-->Select an icon (Default is %1)").c_str()).arg(ngrt4n::DEFAULT_ICON);
-  m_iconBox.addItem(header.toStdString());
-  Q_FOREACH(const QString& label, ngrt4n::nodeIcons().keys()) {
-    //QString path = icons.value(label);
-    m_iconBox.addItem(label.toStdString());
+  m_iconBox.addItem(QObject::tr("-->elect an icon (Default is %1)").arg(ngrt4n::DEFAULT_ICON).toStdString());
+  for (const auto& icon: ngrt4n::nodeIcons().keys()) {
+    m_iconBox.addItem(icon.toStdString());
   }
 
+
   // set propagation rules
+  m_propRuleBox.addItem(QObject::tr("-->Select a rule (Default is %1)").arg(PropRules(PropRules::Unchanged).toString()).toStdString());
   Q_FOREACH(const QString& rule, DashboardBase::propRules().keys()) {
     m_propRuleBox.addItem(rule.toStdString());
   }
 
   // set calculation rules
+  m_calcRuleBox.addItem(QObject::tr("-->Select a rule (Default is %1)").arg(CalcRules(CalcRules::Worst).toString()).toStdString());
   Q_FOREACH(const QString& rule, DashboardBase::calcRules().keys()) {
     m_calcRuleBox.addItem(rule.toStdString());
   }
 
+  // styling buttons
+  m_saveBtn.setStyleClass("btn btn-info");
 
   // bind template fields
   m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));

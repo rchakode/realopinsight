@@ -167,12 +167,6 @@ std::string ngrt4n::thumbnailCssClass(int severity)
 }
 
 
-std::string ngrt4n::getPathFromQtResource(const QString& qtPath, const std::string& docRoot)
-{
-  return docRoot+qtPath.mid(2, -1).toStdString();
-}
-
-
 Wt::WWidget* ngrt4n::footer(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));

@@ -391,7 +391,7 @@ class ScaleFactors {
 
 
 typedef QHash<int, SourceT> SourceListT;
-typedef QMap<QString, QString> IconMapT;
+typedef QMap<QString, std::string> IconMapT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 typedef QPair<QString, QString> StringPairT;
