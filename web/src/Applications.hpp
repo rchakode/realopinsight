@@ -40,9 +40,9 @@ class RealOpInsightQApp : public QCoreApplication
       : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
     virtual ~RealOpInsightQApp() { ngrt4n::freeCoreLogger(); }
 
-    virtual bool notify(QObject * receiver, QEvent * event) {
+    virtual bool notify(QObject* receiver, QEvent* event) {
       try {
-        return QCoreApplication::notify(receiver, event);
+        if (event) return QCoreApplication::notify(receiver, event);
       } catch(std::exception& ex) {
         CORE_LOG("fatal", ex.what());
       }

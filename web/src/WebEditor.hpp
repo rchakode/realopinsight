@@ -53,12 +53,14 @@ class WebEditor : public Wt::WContainerWidget
 public:
   WebEditor(void);
   virtual ~WebEditor();
+  void reload(void);
 
 private:
+  CoreDataT m_cdata;
   WebTree m_tree;
+
   Wt::WHBoxLayout* m_mainLayout;
   Wt::WTemplate m_fieldEditionPane;
-
   Wt::WLineEdit m_nameField;
   Wt::WComboBox m_typeField;
   Wt::WComboBox m_iconBox;
@@ -69,12 +71,24 @@ private:
   Wt::WPushButton m_saveBtn;
 
 
+  Wt::WPopupMenu m_editionContextMenu;
+  Wt::WMenuItem* m_menuAddSubService;
+  Wt::WMenuItem* m_menuDeleteService;
+
+
   void openViewFile(const QString& path);
   void bindFormWidgets(void);
   void unbindWidgets(void);
   void addEvents(void);
   void buildTree(void);
   void bindEditionForm(void);
+  void newView(void);
+  NodeT createNode(const QString& id, const QString& label,const QString& parent);
+
+
+  void activateTreeEditionFeatures(void);
+  void showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent);
+  void handleTreeContextMenu(Wt::WMenuItem*);
 };
 
 

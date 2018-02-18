@@ -442,8 +442,9 @@ void WebMainUI::handleRefresh(void)
 
 void WebMainUI::handleLaunchEditor(void)
 {
-  m_adminPanelTitle.setText(Q_TR("Editor"));
+  m_adminPanelTitle.setText(Q_TR("Service Editor"));
   m_adminStackedContents.setCurrentWidget(&m_webEditor);
+  m_webEditor.reload();
 }
 
 
@@ -739,7 +740,7 @@ void WebMainUI::setupSettingsPage(void)
 
       // menu editor
       m_adminStackedContents.addWidget(&m_webEditor);
-      menuText = QObject::tr("Editor").toStdString();
+      menuText = QObject::tr("Service Editor").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleLaunchEditor);
       m_settingsMainPageTpl.bindWidget("menu-editor", link);

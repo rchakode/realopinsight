@@ -24,13 +24,15 @@
 
 #include "WebTree.hpp"
 #include "utilsCore.hpp"
+#include "WebUtils.hpp"
+#include <Wt/WLength>
 
 WebTree::WebTree(void)
   : Wt::WTreeView(0),
-    m_model(new Wt::WStandardItemModel())
+    m_model(new Wt::WStandardItemModel(0,1))
 {
   setModel(m_model);
-  setDefaultSettings();
+  activateDashboardFeatures();
 }
 
 
@@ -40,7 +42,7 @@ WebTree::~WebTree()
 }
 
 
-void WebTree::setDefaultSettings(void)
+void WebTree::activateDashboardFeatures(void)
 {
   setHeaderHeight(0);
   setSelectionMode(Wt::SingleSelection);
@@ -49,6 +51,13 @@ void WebTree::setDefaultSettings(void)
   setColumnWidth(0, 500);
 }
 
+
+void WebTree::activateEditionFeatures(void)
+{
+  setHeaderHeight(Wt::WLength(20));
+  setDragEnabled(true);
+  setDropsEnabled(true);
+}
 
 
 void WebTree::build(void)
@@ -77,7 +86,10 @@ void WebTree::renewModel(Wt::WStandardItem* _rootItem)
 {
   Wt::WStandardItemModel* oldModel = m_model;
   m_model = new Wt::WStandardItemModel();
+
   m_model->appendRow(_rootItem);
+  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Service Exporer"));
+
   setModel(m_model);
   delete oldModel;
 }
@@ -107,4 +119,7 @@ void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
     item->setToolTip(Wt::WString::fromUTF8(_tip.toStdString()));
   }
 }
+
+
+
 

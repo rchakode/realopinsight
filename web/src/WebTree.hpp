@@ -30,27 +30,32 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 #include <Wt/WModelIndex>
+#include <Wt/WPopupMenu>
 #include "Base.hpp"
 
 class WebTree : public Wt::WTreeView
 {
-public:
-  WebTree();
-  virtual ~WebTree();
-  void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
-  void updateNodeItem(const NodeT& _node, const QString& _tip);
-  void build(void);
-  void renewModel(Wt::WStandardItem* _rootItem);
 
-private:
-  typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
-  Wt::WStandardItemModel* m_model;
-  CoreDataT* m_cdata;
-  WebTreeItemsT m_items;
 
-  void setDefaultSettings(void);
-  Wt::WStandardItem* createItem(const NodeT& _node);
-  Wt::WStandardItem* findNodeItem(const QString& _nodeId);
+  public:
+    WebTree(void);
+    virtual ~WebTree();
+    void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
+    void updateNodeItem(const NodeT& _node, const QString& _tip);
+    void build(void);
+    void renewModel(Wt::WStandardItem* _rootItem);
+    void activateEditionFeatures(void);
+
+  private:
+    typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
+    Wt::WStandardItemModel* m_model;
+    CoreDataT* m_cdata;
+    WebTreeItemsT m_items;
+
+    void activateDashboardFeatures(void);
+    Wt::WStandardItem* createItem(const NodeT& _node);
+    Wt::WStandardItem* findNodeItem(const QString& _nodeId);
+
 };
 
 #endif /* WEBSERVICETREE_HPP */

@@ -38,6 +38,7 @@
 #include <Wt/WLink>
 #include <Wt/WImage>
 #include <Wt/WTemplate>
+#include <Wt/WPoint>
 
 
 
@@ -46,8 +47,10 @@ namespace {
 }
 
 WebEditor::WebEditor(void) {
-
+  m_tree.setCoreData(&m_cdata);
+  activateTreeEditionFeatures();
   bindFormWidgets();
+  newView();
 }
 
 WebEditor::~WebEditor()
@@ -129,6 +132,80 @@ void WebEditor::bindEditionForm(void)
   m_fieldEditionPane.bindWidget("description-field", &m_descField);
   m_fieldEditionPane.bindWidget("monitoring-item-field", &m_checkItemField);
   m_fieldEditionPane.bindWidget("save-button", &m_saveBtn);
+}
+
+
+NodeT WebEditor::createNode(const QString& id, const QString& label,const QString& parent)
+{
+  NodeT node;
+  node.id = id;
+  node.name = label;
+  node.parent = parent;
+  node.type = NodeType::BusinessService;
+  node.sev = ngrt4n::Unknown;
+  node.sev_crule = CalcRules::Worst;
+  node.sev_prule = PropRules::Unchanged;
+  node.icon = ngrt4n::DEFAULT_ICON;
+  node.child_nodes = QString();
+  node.thresholdLimits = QVector<ThresholdT>();
+  return node;
+}
+
+void WebEditor::newView(void)
+{
+  //FIXME: if (treatCloseAction(false) == 0) {
+  ngrt4n::clearCoreData(m_cdata);
+  //FIXME: m_activeConfig.clear();
+
+  //FIXME: m_tree.clearTree();
+  NodeT node = createNode(ngrt4n::ROOT_ID, QObject::tr("New View"), "");
+  m_cdata.bpnodes.insert(node.id, node);
+  reload();
+
+  //FIXME: refreshUIWidgets();
+  //FIXME:}
+}
+void WebEditor::reload(void)
+{
+  //FIXME: m_hasLeftUpdates = true;
+
+  //FIXME: fillInEditorFields(m_cdata.bpnodes.find(ngrt4n::ROOT_ID));
+  m_tree.build();
+  //fillEditorFromService(m_tree.rootItem());
+  //FIXME: updateWindowTitle("*");
+}
+
+
+void WebEditor::activateTreeEditionFeatures()
+{
+  m_tree.activateEditionFeatures();
+
+  m_menuAddSubService = m_editionContextMenu.addItem("Add sub service");
+  m_menuAddSubService->triggered().connect(this, &WebEditor::handleTreeContextMenu);
+
+
+  m_menuDeleteService = m_editionContextMenu.addItem("Delete service");
+  //setAttributeValue("oncontextmenu", "event.cancelBubble = true; event.returnValue = false; return false;");
+
+  m_tree.doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
+}
+
+void WebEditor::showTreeContextMenu(void)
+{
+  Wt::WModelIndexSet sitems = m_tree.selectedIndexes();
+  if (sitems.empty()) {
+    return;
+  }
+
+  //sitem = *sitems.cbegin()
+
+  m_editionContextMenu.popup(Wt::WPoint(50, 50));
+
+}
+
+void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
+{
+  qDebug() << menu->text().toUTF8().c_str();
 }
 
 
