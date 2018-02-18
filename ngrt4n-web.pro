@@ -34,6 +34,7 @@ MOC_DIR = generated/moc
 RCC_DIR = generated/rcc
 QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-literal-suffix -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs
 
+
 DISTFILES += README.md \
     install-sh \
     install-sh.obs \
@@ -52,8 +53,9 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 CODECFORSRC = UTF-8
 CODECFORTR  = UTF-8
 
+INCLUDEPATH += $(WT_ROOT)/include \
+               web/src
 
-INCLUDEPATH += web/src
 
 HEADERS += \
     core/src/Base.hpp \
@@ -173,8 +175,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebEditor.cpp
 
 
-
-LIBS += -lwt \
+LIBS += -L"$(WT_ROOT)/lib" \
+        -lwt \
         -lwtdbo \
         -lwtdbosqlite3 \
         -lwtdbopostgres \

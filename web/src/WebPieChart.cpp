@@ -63,12 +63,12 @@ void WebPieChart::setupChartPalette(void)
 
 void WebPieChart::setupPieChartModel(void)
 {
-  Wt::WStandardItemModel* dataModel = new Wt::WStandardItemModel();
-  dataModel->insertColumns(dataModel->columnCount(), 2);
-  dataModel->setHeaderData(0, Wt::WString("Severity"));
-  dataModel->setHeaderData(1, Wt::WString("Count"));
-  dataModel->insertRows(dataModel->rowCount(), 5);
-  setModel(dataModel); // take ownership of the pointer
+  m_model = new Wt::WStandardItemModel();
+  m_model->insertColumns(m_model->columnCount(), 2);
+  m_model->setHeaderData(0, Wt::WString("Severity"));
+  m_model->setHeaderData(1, Wt::WString("Count"));
+  m_model->insertRows(m_model->rowCount(), 5);
+  setModel(m_model); // take ownership of the pointer
 }
 
 
@@ -88,8 +88,8 @@ void WebPieChart::setupChartStyle(void)
 void WebPieChart::repaint()
 {
   for(auto it = std::begin(m_statsData); it != std::end(m_statsData); ++it) {
-    model()->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
-    model()->setData(it.key(), 1, it.value());
+    m_model->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
+    m_model->setData(it.key(), 1, it.value());
   }
 
   if (m_dataType == SLAData) {

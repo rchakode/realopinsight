@@ -190,7 +190,7 @@ void WebEditor::activateTreeEditionFeatures()
   m_tree.doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
 }
 
-void WebEditor::showTreeContextMenu(void)
+void WebEditor::showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent event)
 {
   Wt::WModelIndexSet sitems = m_tree.selectedIndexes();
   if (sitems.empty()) {
@@ -199,7 +199,8 @@ void WebEditor::showTreeContextMenu(void)
 
   //sitem = *sitems.cbegin()
 
-  m_editionContextMenu.popup(Wt::WPoint(50, 50));
+
+  m_editionContextMenu.popup(event);
 
 }
 
