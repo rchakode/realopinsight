@@ -32,30 +32,31 @@
 #include <Wt/WModelIndex>
 #include <Wt/WPopupMenu>
 #include "Base.hpp"
+#include "utilsCore.hpp"
 
 class WebTree : public Wt::WTreeView
 {
-
-
   public:
     WebTree(void);
     virtual ~WebTree();
     void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
     void updateNodeItem(const NodeT& _node, const QString& _tip);
     void build(void);
-    void renewModel(Wt::WStandardItem* _rootItem);
+    void renewModel(void);
     void activateEditionFeatures(void);
+    Wt::WStandardItem* addTreeEntry(const NodeT& _node, bool _bindToParent);
+    QString getTreeItemId(const Wt::WModelIndex& _index) const;
+    void expandRoot(void);
 
   private:
     typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
     Wt::WStandardItemModel* m_model;
     CoreDataT* m_cdata;
-    WebTreeItemsT m_items;
+    WebTreeItemsT m_treeItems;
 
     void activateDashboardFeatures(void);
-    Wt::WStandardItem* createItem(const NodeT& _node);
-    Wt::WStandardItem* findNodeItem(const QString& _nodeId);
-
+    Wt::WStandardItem* findTreeItem(const QString& _nodeId);
+    void bindChildToParent(const QString& childId, const QString& parentId);
 };
 
 #endif /* WEBSERVICETREE_HPP */

@@ -44,8 +44,7 @@
 #include <Wt/WLineEdit>
 #include <Wt/WTextArea>
 #include <Wt/WComboBox>
-
-
+#include <QMap>
 
 
 class WebEditor : public Wt::WContainerWidget
@@ -54,10 +53,21 @@ public:
   WebEditor(void);
   virtual ~WebEditor();
   void reload(void);
+  Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
 
 private:
+  enum {
+    MENU_ADD_SUBSERVICE = 1,
+    MENU_DELETE_SUBSERVICE
+  };
+  const static QMap<int, std::string> MENU_TEXTS;
+
+  Wt::Signal<int, std::string> m_operationCompleted;
+
   CoreDataT m_cdata;
   WebTree m_tree;
+
+  Wt::WModelIndex m_treeSelectedIndex;
 
   Wt::WHBoxLayout* m_mainLayout;
   Wt::WTemplate m_fieldEditionPane;
@@ -83,12 +93,14 @@ private:
   void buildTree(void);
   void bindEditionForm(void);
   void newView(void);
-  NodeT createNode(const QString& id, const QString& label,const QString& parent);
 
 
   void activateTreeEditionFeatures(void);
   void showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent);
   void handleTreeContextMenu(Wt::WMenuItem*);
+  void handleKeyPressed(Wt::WKeyEvent event);
+  void handleTreeItemSelectionChanged(void);
+  void addNewSubService(const Wt::WModelIndex& parentIndex);
 };
 
 

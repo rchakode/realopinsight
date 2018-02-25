@@ -44,9 +44,17 @@
 
 namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
+  const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
 }
 
-WebEditor::WebEditor(void) {
+const QMap<int, std::string> WebEditor::MENU_TEXTS = {
+  {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add sub service")},
+  {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete sub service")}
+};
+
+WebEditor::WebEditor(void) :
+  m_operationCompleted(this)
+{
   m_tree.setCoreData(&m_cdata);
   activateTreeEditionFeatures();
   bindFormWidgets();
@@ -135,21 +143,6 @@ void WebEditor::bindEditionForm(void)
 }
 
 
-NodeT WebEditor::createNode(const QString& id, const QString& label,const QString& parent)
-{
-  NodeT node;
-  node.id = id;
-  node.name = label;
-  node.parent = parent;
-  node.type = NodeType::BusinessService;
-  node.sev = ngrt4n::Unknown;
-  node.sev_crule = CalcRules::Worst;
-  node.sev_prule = PropRules::Unchanged;
-  node.icon = ngrt4n::DEFAULT_ICON;
-  node.child_nodes = QString();
-  node.thresholdLimits = QVector<ThresholdT>();
-  return node;
-}
 
 void WebEditor::newView(void)
 {
@@ -158,7 +151,7 @@ void WebEditor::newView(void)
   //FIXME: m_activeConfig.clear();
 
   //FIXME: m_tree.clearTree();
-  NodeT node = createNode(ngrt4n::ROOT_ID, QObject::tr("New View"), "");
+  NodeT node(ngrt4n::ROOT_ID, QObject::tr("New View"), "");
   m_cdata.bpnodes.insert(node.id, node);
   reload();
 
@@ -180,33 +173,90 @@ void WebEditor::activateTreeEditionFeatures()
 {
   m_tree.activateEditionFeatures();
 
-  m_menuAddSubService = m_editionContextMenu.addItem("Add sub service");
-  m_menuAddSubService->triggered().connect(this, &WebEditor::handleTreeContextMenu);
+  m_editionContextMenu.addItem("images/plus.png", MENU_TEXTS[MENU_ADD_SUBSERVICE])
+      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
 
+  m_editionContextMenu.addItem("images/minus.png", MENU_TEXTS[MENU_DELETE_SUBSERVICE])
+      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
 
-  m_menuDeleteService = m_editionContextMenu.addItem("Delete service");
-  //setAttributeValue("oncontextmenu", "event.cancelBubble = true; event.returnValue = false; return false;");
-
+  m_tree.selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
   m_tree.doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
+  m_tree.keyPressed().connect(this, &WebEditor::handleKeyPressed);
 }
 
-void WebEditor::showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent event)
+
+void WebEditor::handleTreeItemSelectionChanged(void)
 {
-  Wt::WModelIndexSet sitems = m_tree.selectedIndexes();
-  if (sitems.empty()) {
-    return;
+  Wt::WModelIndexSet selectedTreeItems = m_tree.selectedIndexes();
+  if (! selectedTreeItems.empty()) {
+    m_treeSelectedIndex = *(selectedTreeItems.begin());
+  } else {
+    m_treeSelectedIndex = Wt::WModelIndex();
   }
-
-  //sitem = *sitems.cbegin()
-
-
-  m_editionContextMenu.popup(event);
-
 }
+
+
+void WebEditor::showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent event) {
+  if (m_treeSelectedIndex.isValid()) {
+    m_editionContextMenu.popup(event);
+  }
+}
+
 
 void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
 {
-  qDebug() << menu->text().toUTF8().c_str();
+  std::string triggeredMenu = menu->text().toUTF8();
+
+  if (triggeredMenu == MENU_TEXTS[ MENU_ADD_SUBSERVICE ]) {
+    addNewSubService(m_treeSelectedIndex);
+  } else if (triggeredMenu == MENU_TEXTS[ MENU_DELETE_SUBSERVICE ] ) {
+
+  }
 }
 
 
+void WebEditor::handleKeyPressed(Wt::WKeyEvent event)
+{
+  if (event.key() == Wt::Key_C) {
+    addNewSubService(m_treeSelectedIndex);
+  }
+}
+
+void WebEditor::addNewSubService(const Wt::WModelIndex& parentTreeIndex)
+{
+  if (! parentTreeIndex.isValid()) {
+    return ;
+  }
+
+  QString parentSrvId = m_tree.getTreeItemId(parentTreeIndex);
+  NodeT childSrvInfo(ngrt4n::genNodeId(), "New service", parentSrvId);
+
+  NodeListT::iterator pnode = m_cdata.bpnodes.find(parentSrvId);
+  if (pnode == m_cdata.bpnodes.end()) {
+    CORE_LOG("debug", QObject::tr("Not node found with parent id: %1").arg(parentSrvId).toStdString());
+    return;
+  }
+
+  m_cdata.bpnodes.insert(childSrvInfo.id, childSrvInfo);
+
+  if (pnode->type != NodeType::BusinessService) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on %1").arg(NodeType::toString(childSrvInfo.type)).toStdString());
+    return;
+  }
+
+  if (pnode->child_nodes.isEmpty()) {
+    pnode->child_nodes = childSrvInfo.id;
+  } else {
+    pnode->child_nodes.append(CHILD_SEPERATOR % childSrvInfo.id);
+  }
+
+
+  bool bindToParent = true;
+  Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrvInfo, bindToParent);
+
+  Wt::WModelIndexSet itemsToSelect;
+  m_tree.expand(parentTreeIndex);
+  itemsToSelect.insert(subSrvItem->index());
+  m_tree.setSelectedIndexes(itemsToSelect);
+  //FIXME: fillEditorFromService(lastItem);
+}

@@ -46,7 +46,7 @@ void WebTree::activateDashboardFeatures(void)
 {
   setHeaderHeight(0);
   setSelectionMode(Wt::SingleSelection);
-  setSelectable(true);
+  setSelectable(false);
   setSelectionBehavior(Wt::SelectItems);
   setColumnWidth(0, 500);
 }
@@ -62,62 +62,96 @@ void WebTree::activateEditionFeatures(void)
 
 void WebTree::build(void)
 {
+  bool bindToParent = false;
   // Create a item for each individual service
   for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();  node != end; ++node) {
-    m_items.insertMulti(node->id, WebTree::createItem(*node));
+    WebTree::addTreeEntry(*node, bindToParent);
   }
 
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();  node != end; ++node) {
-    m_items.insertMulti(node->id, WebTree::createItem(*node));
+    WebTree::addTreeEntry(*node, bindToParent);
   }
 
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
-    Wt::WStandardItem* parent = findNodeItem(edge.key());
-    Wt::WStandardItem* child = findNodeItem(edge.value());
-    if (parent && child) {
-      parent->appendRow(child);
-    }
+    bindChildToParent(edge.value(), edge.key());
   }
 
-  renewModel(m_items[ngrt4n::ROOT_ID]);
+  renewModel();
 }
 
-void WebTree::renewModel(Wt::WStandardItem* _rootItem)
+void WebTree::renewModel(void)
 {
   Wt::WStandardItemModel* oldModel = m_model;
   m_model = new Wt::WStandardItemModel();
 
-  m_model->appendRow(_rootItem);
+  m_model->appendRow(m_treeItems[ngrt4n::ROOT_ID]);
   m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Service Exporer"));
 
   setModel(m_model);
   delete oldModel;
+
+  expandRoot();
+}
+
+void WebTree::expandRoot(void) {
+  if (m_treeItems[ngrt4n::ROOT_ID]) {
+    expand(m_treeItems[ngrt4n::ROOT_ID]->index());
+  }
 }
 
 
 
-Wt::WStandardItem* WebTree::createItem(const NodeT& _node)
+Wt::WStandardItem* WebTree::addTreeEntry(const NodeT& _node, bool _bindToParent)
 {
   Wt::WStandardItem* item = new Wt::WStandardItem();
+
   item->setText(Wt::WString(_node.name.toStdString()));
   item->setIcon("images/built-in/unknown.png");
   item->setData(_node.id, Wt::UserRole);
+
+  m_treeItems.insertMulti(_node.id, item);
+
+  if (_bindToParent) {
+    bindChildToParent(_node.id, _node.parent);
+  }
+
   return item;
 }
 
-Wt::WStandardItem* WebTree::findNodeItem(const QString& _nodeId)
+
+Wt::WStandardItem* WebTree::findTreeItem(const QString& _nodeId)
 {
-  WebTreeItemsT::iterator tnode = m_items.find(_nodeId);
-  return (tnode != m_items.end())? *tnode : NULL;
+  WebTreeItemsT::iterator tnode = m_treeItems.find(_nodeId);
+  return (tnode != m_treeItems.end())? *tnode : NULL;
+}
+
+void WebTree::bindChildToParent(const QString& childId, const QString& parentId)
+{
+  Wt::WStandardItem* parentItem = findTreeItem(parentId);
+  Wt::WStandardItem* childItem = findTreeItem(childId);
+  if (parentItem && childItem) {
+    parentItem->appendRow(childItem);
+  }
 }
 
 void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
 {
-  Wt::WStandardItem* item = findNodeItem(_node.id);
+  Wt::WStandardItem* item = findTreeItem(_node.id);
   if (item) {
     item->setIcon(ngrt4n::getIconPath(_node.sev).toStdString());
     item->setToolTip(Wt::WString::fromUTF8(_tip.toStdString()));
   }
+}
+
+QString WebTree::getTreeItemId(const Wt::WModelIndex& _index) const {
+
+  Wt::WStandardItem* item = m_model->itemFromIndex(_index);
+
+  if (! item) {
+    return "";
+  }
+
+  return boost::any_cast<QString>(item->data(Wt::UserRole));
 }
 
 

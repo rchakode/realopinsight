@@ -298,16 +298,16 @@ struct NodeT {
     QString id;
     QString name;
     qint32 type;
+    qint32 sev;
     qint32 sev_crule;
     qint32 sev_prule;
+    qint32 sev_prop;
     QString icon;
     QString description;
     QString parent;
     QString alarm_msg;
     QString notification_msg;
     QString actual_msg;
-    qint32 sev;
-    qint32 sev_prop;
     double weight;
     QString child_nodes;
     CheckT check;
@@ -318,10 +318,22 @@ struct NodeT {
     double pos_y;
     double text_w;
     double text_h;
-    NodeT(): sev_crule(PropRules::Unchanged),
-      sev_prule(CalcRules::Worst),
+
+    NodeT() :
       sev(ngrt4n::Unknown),
-      weight(ngrt4n::WEIGHT_UNIT){}
+      sev_crule(PropRules::Unchanged),
+      sev_prule(CalcRules::Worst),
+      weight(ngrt4n::WEIGHT_UNIT) {}
+
+    NodeT(const QString& id, const QString& label,const QString& parent):
+      id(id),
+      name(label),
+      type(NodeType::BusinessService),
+      sev(ngrt4n::Unknown),
+      sev_crule(PropRules::Unchanged),
+      sev_prule(CalcRules::Worst),
+      parent(parent),
+      weight(ngrt4n::WEIGHT_UNIT) {}
 
     QString toThresholdsString(void) const;
     QString toString(void) const;

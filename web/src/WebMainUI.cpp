@@ -740,6 +740,7 @@ void WebMainUI::setupSettingsPage(void)
 
       // menu editor
       m_adminStackedContents.addWidget(&m_webEditor);
+      m_webEditor.operationCompleted().connect(this, &WebMainUI::showMessage);
       menuText = QObject::tr("Service Editor").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleLaunchEditor);
