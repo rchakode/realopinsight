@@ -109,9 +109,10 @@ void WebEditor::bindEditionForm(void)
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
 
   // set icon type values
-  m_iconBox.addItem(QObject::tr("-->elect an icon (Default is %1)").arg(ngrt4n::DEFAULT_ICON).toStdString());
+  m_iconBox.addItem(QObject::tr("-->Select an icon (Default is %1)").arg(ngrt4n::DEFAULT_ICON).toStdString());
   for (const auto& icon: ngrt4n::nodeIcons().keys()) {
     m_iconBox.addItem(icon.toStdString());
+    m_iconIndexMap[icon] = m_iconBox.currentIndex();
   }
 
 
@@ -119,12 +120,14 @@ void WebEditor::bindEditionForm(void)
   m_propRuleBox.addItem(QObject::tr("-->Select a rule (Default is %1)").arg(PropRules(PropRules::Unchanged).toString()).toStdString());
   Q_FOREACH(const QString& rule, DashboardBase::propRules().keys()) {
     m_propRuleBox.addItem(rule.toStdString());
+    m_propRuleIndexMap[rule] = m_propRuleBox.currentIndex();
   }
 
   // set calculation rules
   m_calcRuleBox.addItem(QObject::tr("-->Select a rule (Default is %1)").arg(CalcRules(CalcRules::Worst).toString()).toStdString());
   Q_FOREACH(const QString& rule, DashboardBase::calcRules().keys()) {
     m_calcRuleBox.addItem(rule.toStdString());
+    m_calcRuleIndexMap[rule] = m_calcRuleBox.currentIndex();
   }
 
   // styling buttons
@@ -138,7 +141,7 @@ void WebEditor::bindEditionForm(void)
   m_fieldEditionPane.bindWidget("prop-rule-field", &m_propRuleBox);
   m_fieldEditionPane.bindWidget("icon-field", &m_iconBox);
   m_fieldEditionPane.bindWidget("description-field", &m_descField);
-  m_fieldEditionPane.bindWidget("monitoring-item-field", &m_checkItemField);
+  m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointField);
   m_fieldEditionPane.bindWidget("save-button", &m_saveBtn);
 }
 
@@ -151,7 +154,7 @@ void WebEditor::newView(void)
   //FIXME: m_activeConfig.clear();
 
   //FIXME: m_tree.clearTree();
-  NodeT node(ngrt4n::ROOT_ID, QObject::tr("New View"), "");
+  NodeT node(ngrt4n::ROOT_ID, QObject::tr("New service view"), "");
   m_cdata.bpnodes.insert(node.id, node);
   reload();
 
@@ -187,17 +190,23 @@ void WebEditor::activateTreeEditionFeatures()
 
 void WebEditor::handleTreeItemSelectionChanged(void)
 {
+  if (m_currentTreeItemIndex.isValid()) {
+    //TODO save the editor content first
+  }
+
   Wt::WModelIndexSet selectedTreeItems = m_tree.selectedIndexes();
   if (! selectedTreeItems.empty()) {
-    m_treeSelectedIndex = *(selectedTreeItems.begin());
+    m_currentTreeItemIndex = *(selectedTreeItems.begin());
+    QString currentNodeId = m_tree.getNodeIdFromTreeItem(m_currentTreeItemIndex);
+    fillInEditorFromNodeInfo(currentNodeId);
   } else {
-    m_treeSelectedIndex = Wt::WModelIndex();
+    m_currentTreeItemIndex = Wt::WModelIndex();
   }
 }
 
 
 void WebEditor::showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent event) {
-  if (m_treeSelectedIndex.isValid()) {
+  if (m_currentTreeItemIndex.isValid()) {
     m_editionContextMenu.popup(event);
   }
 }
@@ -208,32 +217,32 @@ void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
   std::string triggeredMenu = menu->text().toUTF8();
 
   if (triggeredMenu == MENU_TEXTS[ MENU_ADD_SUBSERVICE ]) {
-    addNewSubService(m_treeSelectedIndex);
+    addNewSubService(m_currentTreeItemIndex);
   } else if (triggeredMenu == MENU_TEXTS[ MENU_DELETE_SUBSERVICE ] ) {
-
+    //TODO delete service
   }
 }
 
 
 void WebEditor::handleKeyPressed(Wt::WKeyEvent event)
 {
-  if (event.key() == Wt::Key_C) {
-    addNewSubService(m_treeSelectedIndex);
+  if (event.modifiers() == Wt::ShiftModifier && event.key() == Wt::Key_C) {
+    addNewSubService(m_currentTreeItemIndex);
   }
 }
 
-void WebEditor::addNewSubService(const Wt::WModelIndex& parentTreeIndex)
+void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
 {
-  if (! parentTreeIndex.isValid()) {
+  if (! currentTreeItemIndex.isValid()) {
     return ;
   }
 
-  QString parentSrvId = m_tree.getTreeItemId(parentTreeIndex);
-  NodeT childSrvInfo(ngrt4n::genNodeId(), "New service", parentSrvId);
+  QString currentSrvId = m_tree.getNodeIdFromTreeItem(currentTreeItemIndex);
+  NodeT childSrvInfo(ngrt4n::genNodeId(), "New service", currentSrvId);
 
-  NodeListT::iterator pnode = m_cdata.bpnodes.find(parentSrvId);
+  NodeListT::iterator pnode = m_cdata.bpnodes.find(currentSrvId);
   if (pnode == m_cdata.bpnodes.end()) {
-    CORE_LOG("debug", QObject::tr("Not node found with parent id: %1").arg(parentSrvId).toStdString());
+    CORE_LOG("debug", QObject::tr("Not node found with parent id: %1").arg(currentSrvId).toStdString());
     return;
   }
 
@@ -255,8 +264,23 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& parentTreeIndex)
   Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrvInfo, bindToParent);
 
   Wt::WModelIndexSet itemsToSelect;
-  m_tree.expand(parentTreeIndex);
+  m_tree.expand(currentTreeItemIndex);
   itemsToSelect.insert(subSrvItem->index());
   m_tree.setSelectedIndexes(itemsToSelect);
   //FIXME: fillEditorFromService(lastItem);
+}
+
+
+void WebEditor::fillInEditorFromNodeInfo(const QString& nodeId)
+{
+  NodeListT::const_iterator nodeIter;
+  if (ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, nodeIter)) {
+    m_nameField.setText(nodeIter->name.toStdString());
+    m_descField.setText(nodeIter->description.toStdString());
+    m_typeField.setCurrentIndex(nodeIter->type);
+    m_iconBox.setCurrentIndex(m_iconIndexMap[nodeIter->icon]);
+    m_calcRuleBox.setCurrentIndex(m_calcRuleIndexMap[ CalcRules(nodeIter->sev_crule).toString() ] );
+    m_propRuleBox.setCurrentIndex((int)m_propRuleIndexMap[ PropRules(nodeIter->sev_prule).toString()  ]);
+    m_dataPointField.setText(nodeIter->child_nodes.toStdString());
+  }
 }

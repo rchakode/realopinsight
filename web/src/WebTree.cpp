@@ -143,7 +143,7 @@ void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
   }
 }
 
-QString WebTree::getTreeItemId(const Wt::WModelIndex& _index) const {
+QString WebTree::getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 
   Wt::WStandardItem* item = m_model->itemFromIndex(_index);
 

@@ -67,7 +67,7 @@ private:
   CoreDataT m_cdata;
   WebTree m_tree;
 
-  Wt::WModelIndex m_treeSelectedIndex;
+  Wt::WModelIndex m_currentTreeItemIndex;
 
   Wt::WHBoxLayout* m_mainLayout;
   Wt::WTemplate m_fieldEditionPane;
@@ -77,13 +77,17 @@ private:
   Wt::WComboBox m_calcRuleBox;
   Wt::WComboBox m_propRuleBox;
   Wt::WTextArea m_descField;
-  Wt::WComboBox m_checkItemField;
+  Wt::WLineEdit m_dataPointField;
   Wt::WPushButton m_saveBtn;
 
 
   Wt::WPopupMenu m_editionContextMenu;
   Wt::WMenuItem* m_menuAddSubService;
   Wt::WMenuItem* m_menuDeleteService;
+
+  QMap<QString, int> m_iconIndexMap;
+  QMap<QString, int> m_calcRuleIndexMap;
+  QMap<QString, int> m_propRuleIndexMap;
 
 
   void openViewFile(const QString& path);
@@ -100,7 +104,8 @@ private:
   void handleTreeContextMenu(Wt::WMenuItem*);
   void handleKeyPressed(Wt::WKeyEvent event);
   void handleTreeItemSelectionChanged(void);
-  void addNewSubService(const Wt::WModelIndex& parentIndex);
+  void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
+  void fillInEditorFromNodeInfo(const QString& nodeId);
 };
 
 
