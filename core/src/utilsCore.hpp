@@ -60,7 +60,7 @@ namespace ngrt4n
   inline QString genNodeId()
   {
     static int i = 0;
-    return QString("ngrt4nsrv%1%2")
+    return QString("%1%2")
         .arg(QUuid::createUuid().toString().replace("{", "").replace("}", "").replace("-",""))
         .arg(QString::number(++i));
   }
