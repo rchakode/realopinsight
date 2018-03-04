@@ -146,7 +146,6 @@ void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
 QString WebTree::getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 
   Wt::WStandardItem* item = m_model->itemFromIndex(_index);
-
   if (! item) {
     return "";
   }
@@ -155,5 +154,10 @@ QString WebTree::getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 }
 
 
-
-
+void WebTree::updateItemLabel(const QString& _nodeId, const QString& label)
+{
+  auto item = m_treeItems.find(_nodeId);
+  if (item != m_treeItems.end()) {
+    (*item)->setText(label.toStdString());
+  }
+}

@@ -78,7 +78,6 @@ void WebEditor::bindFormWidgets(void)
 
   m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
-
   m_mainLayout->addWidget(&m_tree);
   m_mainLayout->addWidget(&m_fieldEditionPane);
 
@@ -190,15 +189,12 @@ void WebEditor::activateTreeEditionFeatures()
 
 void WebEditor::handleTreeItemSelectionChanged(void)
 {
-  if (m_currentTreeItemIndex.isValid()) {
-    //TODO save the editor content first
-  }
+  updateNodeDataFromEditor(m_formerSelectedNodeId);
 
   Wt::WModelIndexSet selectedTreeItems = m_tree.selectedIndexes();
   if (! selectedTreeItems.empty()) {
     m_currentTreeItemIndex = *(selectedTreeItems.begin());
-    QString currentNodeId = m_tree.getNodeIdFromTreeItem(m_currentTreeItemIndex);
-    fillInEditorFromNodeInfo(currentNodeId);
+    fillInEditorFieldsFromCurrentSelection();
   } else {
     m_currentTreeItemIndex = Wt::WModelIndex();
   }
@@ -267,20 +263,39 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
   m_tree.expand(currentTreeItemIndex);
   itemsToSelect.insert(subSrvItem->index());
   m_tree.setSelectedIndexes(itemsToSelect);
-  //FIXME: fillEditorFromService(lastItem);
 }
 
 
-void WebEditor::fillInEditorFromNodeInfo(const QString& nodeId)
+void WebEditor::fillInEditorFieldsFromCurrentSelection(void)
 {
-  NodeListT::const_iterator nodeIter;
-  if (ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, nodeIter)) {
-    m_nameField.setText(nodeIter->name.toStdString());
-    m_descField.setText(nodeIter->description.toStdString());
-    m_typeField.setCurrentIndex(nodeIter->type);
-    m_iconBox.setCurrentIndex(m_iconIndexMap[nodeIter->icon]);
-    m_calcRuleBox.setCurrentIndex(m_calcRuleIndexMap[ CalcRules(nodeIter->sev_crule).toString() ] );
-    m_propRuleBox.setCurrentIndex((int)m_propRuleIndexMap[ PropRules(nodeIter->sev_prule).toString()  ]);
-    m_dataPointField.setText(nodeIter->child_nodes.toStdString());
+  QString nodeId = m_tree.getNodeIdFromTreeItem(m_currentTreeItemIndex);
+  NodeListT::const_iterator node_cit;
+
+  if (ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_cit)) {
+    m_formerSelectedNodeId = nodeId;
+    m_nameField.setText(node_cit->name.toStdString());
+    m_descField.setText(node_cit->description.toStdString());
+    m_typeField.setCurrentIndex(node_cit->type);
+    m_iconBox.setCurrentIndex(m_iconIndexMap[node_cit->icon]);
+    m_calcRuleBox.setCurrentIndex(m_calcRuleIndexMap[ CalcRules(node_cit->sev_crule).toString() ] );
+    m_propRuleBox.setCurrentIndex(m_propRuleIndexMap[ PropRules(node_cit->sev_prule).toString()  ]);
+    m_dataPointField.setText(node_cit->child_nodes.toStdString());
+  }
+}
+
+
+void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
+{
+  NodeListT::iterator node_it;
+  if (ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_it)) {
+    node_it->name =  QString::fromStdString(m_nameField.text().toUTF8());
+    node_it->description =  QString::fromStdString(m_descField.text().toUTF8());
+    node_it->type =  m_typeField.currentIndex();
+    node_it->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
+    node_it->sev_crule  = m_calcRuleIndexMap[ QString::fromStdString(m_calcRuleBox.currentText().toUTF8())];
+    node_it->sev_prule  = m_propRuleIndexMap[ QString::fromStdString(m_propRuleBox.currentText().toUTF8())];;
+    node_it->child_nodes  = QString::fromStdString(m_dataPointField.text().toUTF8());
+
+    m_tree.updateItemLabel(nodeId, node_it->name);
   }
 }

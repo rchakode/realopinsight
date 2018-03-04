@@ -68,6 +68,7 @@ private:
   WebTree m_tree;
 
   Wt::WModelIndex m_currentTreeItemIndex;
+  QString m_formerSelectedNodeId;
 
   Wt::WHBoxLayout* m_mainLayout;
   Wt::WTemplate m_fieldEditionPane;
@@ -105,7 +106,8 @@ private:
   void handleKeyPressed(Wt::WKeyEvent event);
   void handleTreeItemSelectionChanged(void);
   void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
-  void fillInEditorFromNodeInfo(const QString& nodeId);
+  void fillInEditorFieldsFromCurrentSelection(void);
+  void updateNodeDataFromEditor(const QString& nodeId);
 };
 
 

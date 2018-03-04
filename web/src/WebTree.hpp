@@ -47,6 +47,7 @@ class WebTree : public Wt::WTreeView
     Wt::WStandardItem* addTreeEntry(const NodeT& _node, bool _bindToParent);
     QString getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
     void expandRoot(void);
+    void updateItemLabel(const QString& _nodeId, const QString& label);
 
   private:
     typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
