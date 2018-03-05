@@ -87,8 +87,6 @@ private:
   Wt::WMenuItem* m_menuDeleteService;
 
   QMap<QString, int> m_iconIndexMap;
-  QMap<QString, int> m_calcRuleIndexMap;
-  QMap<QString, int> m_propRuleIndexMap;
 
 
   void openViewFile(const QString& path);
@@ -102,12 +100,16 @@ private:
 
   void activateTreeEditionFeatures(void);
   void showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent);
+  void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
+  void fillInEditorFromCurrentSelection(void);
+  void updateNodeDataFromEditor(const QString& nodeId);
+
+
+
   void handleTreeContextMenu(Wt::WMenuItem*);
   void handleKeyPressed(Wt::WKeyEvent event);
   void handleTreeItemSelectionChanged(void);
-  void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
-  void fillInEditorFieldsFromCurrentSelection(void);
-  void updateNodeDataFromEditor(const QString& nodeId);
+  void handleNodeLabelChanged(void);
 };
 
 

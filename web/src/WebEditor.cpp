@@ -100,44 +100,49 @@ void WebEditor::unbindWidgets(void)
 
 void WebEditor::bindEditionForm(void)
 {
+  m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
+
+  // name field
+  m_fieldEditionPane.bindWidget("name-field", &m_nameField);
+  m_nameField.blurred().connect(this, &WebEditor::handleNodeLabelChanged);
+
+  // buttons
   m_saveBtn.setText(Q_TR("Save"));
+  m_saveBtn.setStyleClass("btn btn-info");
 
   // set node type values
+  m_fieldEditionPane.bindWidget("type-field", &m_typeField);
+
   m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
 
   // set icon type values
-  m_iconBox.addItem(QObject::tr("-->Select an icon (Default is %1)").arg(ngrt4n::DEFAULT_ICON).toStdString());
   for (const auto& icon: ngrt4n::nodeIcons().keys()) {
+    int index = m_iconBox.count();
     m_iconBox.addItem(icon.toStdString());
-    m_iconIndexMap[icon] = m_iconBox.currentIndex();
+    m_iconIndexMap[icon] =index;
+
+    if (icon == ngrt4n::DEFAULT_ICON) {
+      m_iconBox.setCurrentIndex(index);
+    }
   }
 
-
-  // set propagation rules
-  m_propRuleBox.addItem(QObject::tr("-->Select a rule (Default is %1)").arg(PropRules(PropRules::Unchanged).toString()).toStdString());
-  Q_FOREACH(const QString& rule, DashboardBase::propRules().keys()) {
-    m_propRuleBox.addItem(rule.toStdString());
-    m_propRuleIndexMap[rule] = m_propRuleBox.currentIndex();
-  }
-
-  // set calculation rules
-  m_calcRuleBox.addItem(QObject::tr("-->Select a rule (Default is %1)").arg(CalcRules(CalcRules::Worst).toString()).toStdString());
-  Q_FOREACH(const QString& rule, DashboardBase::calcRules().keys()) {
-    m_calcRuleBox.addItem(rule.toStdString());
-    m_calcRuleIndexMap[rule] = m_calcRuleBox.currentIndex();
-  }
-
-  // styling buttons
-  m_saveBtn.setStyleClass("btn btn-info");
-
-  // bind template fields
-  m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
-  m_fieldEditionPane.bindWidget("name-field", &m_nameField);
-  m_fieldEditionPane.bindWidget("type-field", &m_typeField);
-  m_fieldEditionPane.bindWidget("calc-rule-field", &m_calcRuleBox);
+  // propagation rule field
   m_fieldEditionPane.bindWidget("prop-rule-field", &m_propRuleBox);
+
+  m_propRuleBox.addItem(PropRules(PropRules::Unchanged).toString().toStdString());
+  m_propRuleBox.addItem(PropRules(PropRules::Decreased).toString().toStdString());
+  m_propRuleBox.addItem(PropRules(PropRules::Increased).toString().toStdString());
+
+
+  // calculation rules field
+  m_fieldEditionPane.bindWidget("calc-rule-field", &m_calcRuleBox);
+  m_calcRuleBox.addItem(CalcRules(CalcRules::Worst).toString().toStdString());
+  m_calcRuleBox.addItem(CalcRules(CalcRules::Average).toString().toStdString());
+  m_calcRuleBox.addItem(CalcRules(CalcRules::WeightedAverageWithThresholds).toString().toStdString());
+
+
   m_fieldEditionPane.bindWidget("icon-field", &m_iconBox);
   m_fieldEditionPane.bindWidget("description-field", &m_descField);
   m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointField);
@@ -153,13 +158,23 @@ void WebEditor::newView(void)
   //FIXME: m_activeConfig.clear();
 
   //FIXME: m_tree.clearTree();
-  NodeT node(ngrt4n::ROOT_ID, QObject::tr("New service view"), "");
-  m_cdata.bpnodes.insert(node.id, node);
-  reload();
+  NodeT node;
 
-  //FIXME: refreshUIWidgets();
-  //FIXME:}
+  node.id = ngrt4n::ROOT_ID;
+  node.name = QObject::tr("New service view");
+  node.type = NodeType::BusinessService;
+  node.parent = "";
+  node.sev_prule = PropRules::Unchanged;
+  node.sev_crule = CalcRules::Worst;
+  node.weight = ngrt4n::WEIGHT_UNIT;
+  node.icon = ngrt4n::DEFAULT_ICON;
+
+  m_cdata.bpnodes.insert(node.id, node);
+
+  reload();
 }
+
+
 void WebEditor::reload(void)
 {
   //FIXME: m_hasLeftUpdates = true;
@@ -194,7 +209,7 @@ void WebEditor::handleTreeItemSelectionChanged(void)
   Wt::WModelIndexSet selectedTreeItems = m_tree.selectedIndexes();
   if (! selectedTreeItems.empty()) {
     m_currentTreeItemIndex = *(selectedTreeItems.begin());
-    fillInEditorFieldsFromCurrentSelection();
+    fillInEditorFromCurrentSelection();
   } else {
     m_currentTreeItemIndex = Wt::WModelIndex();
   }
@@ -234,30 +249,40 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
   }
 
   QString currentSrvId = m_tree.getNodeIdFromTreeItem(currentTreeItemIndex);
-  NodeT childSrvInfo(ngrt4n::genNodeId(), "New service", currentSrvId);
 
-  NodeListT::iterator pnode = m_cdata.bpnodes.find(currentSrvId);
-  if (pnode == m_cdata.bpnodes.end()) {
+  NodeT childSrv;
+  childSrv.id = ngrt4n::genNodeId();
+  childSrv.name = "New service";
+  childSrv.type = NodeType::BusinessService;
+  childSrv.sev_prule = PropRules::Unchanged;
+  childSrv.sev_crule = CalcRules::Worst;
+  childSrv.weight = ngrt4n::WEIGHT_UNIT;
+  childSrv.icon = ngrt4n::DEFAULT_ICON;
+  childSrv.parent = currentSrvId;
+
+
+  NodeListT::iterator parentSrv = m_cdata.bpnodes.find(currentSrvId);
+  if (parentSrv == m_cdata.bpnodes.end()) {
     CORE_LOG("debug", QObject::tr("Not node found with parent id: %1").arg(currentSrvId).toStdString());
     return;
   }
 
-  m_cdata.bpnodes.insert(childSrvInfo.id, childSrvInfo);
+  m_cdata.bpnodes.insert(childSrv.id, childSrv);
 
-  if (pnode->type != NodeType::BusinessService) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on %1").arg(NodeType::toString(childSrvInfo.type)).toStdString());
+  if (parentSrv->type != NodeType::BusinessService) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on parent node type: %1").arg(NodeType::toString(parentSrv->type)).toStdString());
     return;
   }
 
-  if (pnode->child_nodes.isEmpty()) {
-    pnode->child_nodes = childSrvInfo.id;
+  if (parentSrv->child_nodes.isEmpty()) {
+    parentSrv->child_nodes = childSrv.id;
   } else {
-    pnode->child_nodes.append(CHILD_SEPERATOR % childSrvInfo.id);
+    parentSrv->child_nodes.append(CHILD_SEPERATOR % childSrv.id);
   }
 
 
   bool bindToParent = true;
-  Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrvInfo, bindToParent);
+  Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrv, bindToParent);
 
   Wt::WModelIndexSet itemsToSelect;
   m_tree.expand(currentTreeItemIndex);
@@ -266,7 +291,7 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
 }
 
 
-void WebEditor::fillInEditorFieldsFromCurrentSelection(void)
+void WebEditor::fillInEditorFromCurrentSelection(void)
 {
   QString nodeId = m_tree.getNodeIdFromTreeItem(m_currentTreeItemIndex);
   NodeListT::const_iterator node_cit;
@@ -277,8 +302,8 @@ void WebEditor::fillInEditorFieldsFromCurrentSelection(void)
     m_descField.setText(node_cit->description.toStdString());
     m_typeField.setCurrentIndex(node_cit->type);
     m_iconBox.setCurrentIndex(m_iconIndexMap[node_cit->icon]);
-    m_calcRuleBox.setCurrentIndex(m_calcRuleIndexMap[ CalcRules(node_cit->sev_crule).toString() ] );
-    m_propRuleBox.setCurrentIndex(m_propRuleIndexMap[ PropRules(node_cit->sev_prule).toString()  ]);
+    m_calcRuleBox.setCurrentIndex(node_cit->sev_crule);
+    m_propRuleBox.setCurrentIndex(node_cit->sev_prule);
     m_dataPointField.setText(node_cit->child_nodes.toStdString());
   }
 }
@@ -292,10 +317,14 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
     node_it->description =  QString::fromStdString(m_descField.text().toUTF8());
     node_it->type =  m_typeField.currentIndex();
     node_it->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
-    node_it->sev_crule  = m_calcRuleIndexMap[ QString::fromStdString(m_calcRuleBox.currentText().toUTF8())];
-    node_it->sev_prule  = m_propRuleIndexMap[ QString::fromStdString(m_propRuleBox.currentText().toUTF8())];;
+    node_it->sev_crule  = m_calcRuleBox.currentIndex();
+    node_it->sev_prule  = m_propRuleBox.currentIndex();
     node_it->child_nodes  = QString::fromStdString(m_dataPointField.text().toUTF8());
-
-    m_tree.updateItemLabel(nodeId, node_it->name);
   }
+}
+
+
+void WebEditor::handleNodeLabelChanged(void)
+{
+  m_tree.updateItemLabel(m_formerSelectedNodeId, m_nameField.text().toUTF8().c_str());
 }

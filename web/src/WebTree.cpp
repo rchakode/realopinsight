@@ -134,7 +134,7 @@ void WebTree::bindChildToParent(const QString& childId, const QString& parentId)
   }
 }
 
-void WebTree::updateNodeItem(const NodeT& _node, const QString& _tip)
+void WebTree::updateItemDecoration(const NodeT& _node, const QString& _tip)
 {
   Wt::WStandardItem* item = findTreeItem(_node.id);
   if (item) {

@@ -79,7 +79,7 @@ void WebDashboard::buildTree(void)
 
 void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 {
-  m_tree.updateNodeItem(_node, _tip);
+  m_tree.updateItemDecoration(_node, _tip);
 }
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)

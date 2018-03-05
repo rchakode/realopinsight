@@ -319,22 +319,6 @@ struct NodeT {
     double text_w;
     double text_h;
 
-    NodeT() :
-      sev(ngrt4n::Unknown),
-      sev_crule(PropRules::Unchanged),
-      sev_prule(CalcRules::Worst),
-      weight(ngrt4n::WEIGHT_UNIT) {}
-
-    NodeT(const QString& id, const QString& label,const QString& parent):
-      id(id),
-      name(label),
-      type(NodeType::BusinessService),
-      sev(ngrt4n::Unknown),
-      sev_crule(PropRules::Unchanged),
-      sev_prule(CalcRules::Worst),
-      parent(parent),
-      weight(ngrt4n::WEIGHT_UNIT) {}
-
     QString toThresholdsString(void) const;
     QString toString(void) const;
 };

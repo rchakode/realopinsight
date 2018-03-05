@@ -40,7 +40,7 @@ class WebTree : public Wt::WTreeView
     WebTree(void);
     virtual ~WebTree();
     void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
-    void updateNodeItem(const NodeT& _node, const QString& _tip);
+    void updateItemDecoration(const NodeT& _node, const QString& _tip);
     void build(void);
     void renewModel(void);
     void activateEditionFeatures(void);
