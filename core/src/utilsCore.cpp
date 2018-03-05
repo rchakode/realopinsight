@@ -363,8 +363,8 @@ IconMapT ngrt4n::nodeIcons() {
   icons["Memory Usage"] = "images/memory-usage.png";
   icons["Resource Utilization"] = "images/resource-usage.png";
   icons["Performance"] = "images/performance.png";
-  icons[PLUS] = "images/plus.png";
-  icons[MINUS] = "images/minus.png";
+  icons[PLUS] = "images/built-in/nav-plus.png";
+  icons[MINUS] = "images/built-in/nav-minus.png";
   icons["Nagios Basic Logo"] = "images/nagios-logo-n.png";
   icons["Zabbix Basic Logo"] = "images/zabbix-logo-z.png";
   icons["Zenoss Basic Logo"] = "images/zenoss-logo-o.png";

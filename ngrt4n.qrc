@@ -1,12 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file>images/built-in/icon.png</file>
-        <file>images/built-in/disket.png</file>
         <file>images/built-in/camera.png</file>
         <file>images/built-in/zoomout.png</file>
         <file>images/built-in/zoomin.png</file>
         <file>images/built-in/refresh.png</file>
-        <file>images/built-in/folder.png</file>
         <file>images/built-in/normal.png</file>
         <file>images/built-in/major.png</file>
         <file>images/built-in/minor.png</file>
@@ -19,8 +17,6 @@
         <file>images/service.png</file>
         <file>images/switch.png</file>
         <file>images/windows.png</file>
-        <file>images/minus.png</file>
-        <file>images/plus.png</file>
         <file>images/router.png</file>
         <file>images/check.png</file>
         <file>images/network.png</file>
@@ -74,5 +70,8 @@
         <file>images/built-in/import-pandora.png</file>
         <file>images/built-in/download.png</file>
         <file>images/built-in/tree_view.png</file>
+        <file>images/built-in/save.png</file>
+        <file>images/built-in/rename.png</file>
+        <file>images/built-in/new.png</file>
     </qresource>
 </RCC>

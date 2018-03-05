@@ -587,6 +587,15 @@
 
 <message id="editor-fields-form.tpl">
   <form class="form-horizontal">
+  <fieldset>
+    <div class="pull-right">
+      <span id="save-current-view">${save-current-view}</span>
+      <span id="new-service-view">${new-service-view}</span>
+      <span id="open-service-view">${open-service-view}</span>
+      <span id="rename-current-view">${rename-current-view}</span>
+    </div>
+    </fieldset>
+
     <fieldset>
       <div class="col-sm-12 form-group">
         <label class="control-label">Name&nbsp;</label>
@@ -617,9 +626,6 @@
         <span>${monitoring-item-field}</span>
       </div>
     </fieldset>
-    <div class="form-actions">
-      <span id="submit-button">${save-button}</span>
-    </div>
   </form>
 </message>
 
