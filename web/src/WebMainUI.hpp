@@ -38,6 +38,7 @@
 #include "WebDataSourceSettings.hpp"
 #include "WebDatabaseSettings.hpp"
 #include "WebCsvReportResource.hpp"
+#include "WebViewSelector.hpp"
 #include "WebEditor.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
@@ -156,8 +157,7 @@ private:
 
   DashboardMapT m_dashboardMap;
   Wt::WText m_adminPanelTitle;
-  Wt::WDialog m_previewDialog;
-  std::string m_fileToPreview;
+  ViewSelectorDialog m_askPreviewDialog;
 
   /** For file upload **/
   Wt::WFileUpload* m_fileUploader;
@@ -190,7 +190,7 @@ private:
   void handleDisplayOnlyTroubleStateChanged(void);
   void handleImportDescriptionFile(void);
   void handleLaunchEditor(void);
-  void handlePreview(void);
+  void handlePreview(const std::string& viewPath);
   void handleDataSourceSettings(void);
   void handleAuthSettings(void);
   void handleNotificationSettings(void);
@@ -241,7 +241,6 @@ private:
   WebDashboard* loadView(const std::string& path);
   Wt::WTemplate* createBreadCrumbsBarTpl(void);
   WebMsgDialog* createNotificationManager(void);
-  Wt::WComboBox* createViewSelector(void);
   UserFormView* createAccountPanel(void);
   UserFormView* createPasswordPanel(void);
   Wt::WDialog* createAboutDialog(void);

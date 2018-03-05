@@ -28,6 +28,7 @@
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "DescriptionFileFactoryUtils.hpp"
+#include "WebViewSelector.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -449,16 +450,11 @@ void WebMainUI::handleLaunchEditor(void)
 
 
 
-void WebMainUI::handlePreview(void)
+void WebMainUI::handlePreview(const std::string& viewPath)
 {
-  m_previewDialog.accept();
-  m_previewDialog.contents()->clear();
-  if (! m_fileToPreview.empty()) {
-    WebDashboard* dashbord = loadView(m_fileToPreview);
+  WebDashboard* dashbord = loadView(viewPath); // FIXME expect viewpath not name
+  if (dashbord) {
     setDashboardAsFrontStackedWidget(dashbord);
-    m_fileToPreview.clear();
-  } else {
-    showMessage(ngrt4n::OperationFailed, tr("No item selected for preview").toStdString());
   }
 }
 
@@ -630,19 +626,11 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectItem4Preview(void)
 {
-  //FIXME: allocate pointers once
-  m_previewDialog.setWindowTitle(tr("Preview | %1").arg(APP_NAME).toStdString());
-  Wt::WContainerWidget* fileUploadContents(new Wt::WContainerWidget(m_previewDialog.contents()));
-  fileUploadContents->clear();
+  m_askPreviewDialog.updateContent(m_dbSession->viewList());
+  //  FIXME Wt::WPushButton* finish = new Wt::WPushButton(tr("Preview").toStdString(), container);
+  //  FIXME finish->clicked().connect(this, &WebMainUI::handlePreview);
   
-  fileUploadContents->setMargin(10, Wt::All);
-  fileUploadContents->addWidget(createViewSelector());
-  
-  // Provide a button to close the window
-  Wt::WPushButton* finish(new Wt::WPushButton(tr("Preview").toStdString(), fileUploadContents));
-  finish->clicked().connect(this, &WebMainUI::handlePreview);
-  
-  m_previewDialog.show();
+  m_askPreviewDialog.show();
 }
 
 
@@ -671,6 +659,11 @@ void WebMainUI::setupUploadForm(void)
 
 WebDashboard* WebMainUI::loadView(const std::string& path)
 {
+  if (path.empty()) {
+    showMessage(ngrt4n::OperationFailed, Q_TR("Empty path"));
+    return NULL;
+  }
+
   WebDashboard* dashboardItem = NULL;
   try {
     //FIXME: check that the pointer is properly deleted
@@ -913,39 +906,7 @@ void WebMainUI::handleShowAdminHome(void)
   m_adminPanelTitle.setText(Q_TR("Getting Started in 3 Simple Steps !"));
 }
 
-Wt::WComboBox* WebMainUI::createViewSelector(void)
-{
-  DbViewsT views = m_dbSession->viewList();
-  
-  Wt::WComboBox* viewSelector = new Wt::WComboBox();
-  viewSelector->setMargin(10, Wt::Right);
-  
-  Wt::WStandardItemModel* viewSelectorModel = new Wt::WStandardItemModel(&m_mainWidget);
-  Wt::WStandardItem *item = new Wt::WStandardItem();
-  item->setText(Q_TR("-- Select a business view --"));
-  viewSelectorModel->appendRow(item);
-  
-  Q_FOREACH(const DboView& view, views) {
-    item = new Wt::WStandardItem();
-    item->setText(view.name);
-    item->setData(view.path, Wt::UserRole);
-    viewSelectorModel->appendRow(item);
-  }
-  
-  viewSelector->setModel(viewSelectorModel);
-  viewSelector->setCurrentIndex(0);
-  
-  // Set selection action
-  viewSelector->changed().connect(std::bind([=]() {
-    int index = viewSelector->currentIndex();
-    Wt::WStandardItemModel* model = static_cast<Wt::WStandardItemModel*>(viewSelector->model());
-    if (index>0) {
-      m_fileToPreview = boost::any_cast<std::string>(model->item(index, 0)->data());
-    }
-  }));
 
-  return viewSelector;
-}
 
 
 void WebMainUI::showMessage(int status, const std::string& msg)
@@ -1093,8 +1054,9 @@ void WebMainUI::setupDialogsStyle(void)
 {
   m_uploadForm.setStyleClass("Wt-dialog");
   m_uploadForm.titleBar()->setStyleClass("titlebar");
-  m_previewDialog.setStyleClass("Wt-dialog");
-  m_previewDialog.titleBar()->setStyleClass("titlebar");
+  m_askPreviewDialog.setStyleClass("Wt-dialog");
+  m_askPreviewDialog.titleBar()->setStyleClass("titlebar");
+  m_askPreviewDialog.viewSelected().connect(this, &WebMainUI::handlePreview);
 }
 
 

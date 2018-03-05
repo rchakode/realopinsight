@@ -117,7 +117,8 @@ HEADERS += \
     web/src/WebDataSourceSettings.hpp \
     web/src/WebBaseSettings.hpp \
     web/src/WebAuthSettings.hpp \ \
-    web/src/WebEditor.hpp
+    web/src/WebEditor.hpp \
+    web/src/WebViewSelector.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -172,7 +173,8 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebBaseSettings.cpp \
     web/src/WebAuthSettings.cpp \
     web/src/WebDataSourceSettings.cpp \
-    web/src/WebEditor.cpp
+    web/src/WebEditor.cpp \
+    web/src/WebViewSelector.cpp
 
 
 LIBS += -L"$(WT_ROOT)/lib" \
