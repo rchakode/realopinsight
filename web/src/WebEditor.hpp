@@ -92,12 +92,12 @@ private:
   QMap<QString, int> m_iconIndexMap;
 
 
-  void openViewFile(const QString& path);
-  void bindFormWidgets(void);
+  void openServiceView(void);
+  void bindMainPanes(void);
   void unbindWidgets(void);
   void addEvents(void);
   void buildTree(void);
-  void bindEditionForm(void);
+  void bindFormWidgets(void);
   void newView(void);
 
 

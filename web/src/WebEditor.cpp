@@ -57,8 +57,8 @@ WebEditor::WebEditor(void) :
 {
   m_tree.setCoreData(&m_cdata);
   activateTreeEditionFeatures();
+  bindMainPanes();
   bindFormWidgets();
-  newView();
 }
 
 WebEditor::~WebEditor()
@@ -67,12 +67,12 @@ WebEditor::~WebEditor()
 }
 
 
-void  WebEditor::openViewFile(const QString& path)
+void  WebEditor::openServiceView(void)
 {
   //TODO: m_tree.setCoreData(&m_cdata);
 }
 
-void WebEditor::bindFormWidgets(void)
+void WebEditor::bindMainPanes(void)
 {
   setLayout(m_mainLayout = new Wt::WHBoxLayout());
 
@@ -84,8 +84,6 @@ void WebEditor::bindFormWidgets(void)
   m_mainLayout->setSpacing(2);
   m_mainLayout->setResizable(0);
   m_mainLayout->setResizable(1);
-
-  bindEditionForm();
 }
 
 
@@ -98,18 +96,19 @@ void WebEditor::unbindWidgets(void)
 
 
 
-void WebEditor::bindEditionForm(void)
+void WebEditor::bindFormWidgets(void)
 {
   m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
 
-
   // new service button
+  m_newServiceViewBtn.clicked().connect(this, &WebEditor::newView);
   m_newServiceViewBtn.setImageLink(Wt::WLink("images/built-in/new.png"));
   m_newServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("new-service-view", &m_newServiceViewBtn);
 
 
   // open service button
+  m_openServiceViewBtn.clicked().connect(this, &WebEditor::openServiceView);
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
