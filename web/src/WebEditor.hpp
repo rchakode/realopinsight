@@ -25,9 +25,8 @@
 #ifndef WEBEDITOR_HPP
 #define WEBEDITOR_HPP
 
-#include "DashboardBase.hpp"
+#include "dbo/DbSession.hpp"
 #include "WebTree.hpp"
-#include "WebUtils.hpp"
 #include <Wt/WGridLayout>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>
@@ -49,18 +48,25 @@
 
 class WebEditor : public Wt::WContainerWidget
 {
+
+  enum {
+    MENU_ADD_SUBSERVICE = 1,
+    MENU_DELETE_SUBSERVICE
+  };
+
 public:
   WebEditor(void);
   virtual ~WebEditor();
   void reload(void);
   Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
+  void setDbSession(DbSession* _dbSession) {m_dbSession = _dbSession;}
+  void setConfigDir(const QString& _dirPath) {m_configDir = _dirPath;}
 
 private:
-  enum {
-    MENU_ADD_SUBSERVICE = 1,
-    MENU_DELETE_SUBSERVICE
-  };
-  const static QMap<int, std::string> MENU_TEXTS;
+  const static QMap<int, std::string> MENU_LABELS;
+
+  DbSession* m_dbSession;
+  QString m_configDir;
 
   Wt::Signal<int, std::string> m_operationCompleted;
 
@@ -84,7 +90,6 @@ private:
   Wt::WImage m_openServiceViewBtn;
   Wt::WImage m_saveCurrentViewBtn;
 
-
   Wt::WPopupMenu m_editionContextMenu;
   Wt::WMenuItem* m_menuAddSubService;
   Wt::WMenuItem* m_menuDeleteService;
@@ -92,13 +97,11 @@ private:
   QMap<QString, int> m_iconIndexMap;
 
 
-  void openServiceView(void);
   void bindMainPanes(void);
   void unbindWidgets(void);
   void addEvents(void);
   void buildTree(void);
   void bindFormWidgets(void);
-  void newView(void);
 
 
   void activateTreeEditionFeatures(void);
@@ -108,11 +111,13 @@ private:
   void updateNodeDataFromEditor(const QString& nodeId);
 
 
-
   void handleTreeContextMenu(Wt::WMenuItem*);
   void handleKeyPressed(Wt::WKeyEvent event);
   void handleTreeItemSelectionChanged(void);
   void handleNodeLabelChanged(void);
+  void handleNewView(void);
+  void handleSaveView(void);
+  void handleOpenServiceView(void);
 };
 
 

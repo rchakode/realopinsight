@@ -26,6 +26,7 @@
 #include "WebEditor.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
+#include "DescriptionFileFactoryUtils.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -47,7 +48,7 @@ namespace {
   const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
 }
 
-const QMap<int, std::string> WebEditor::MENU_TEXTS = {
+const QMap<int, std::string> WebEditor::MENU_LABELS = {
   {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add sub service")},
   {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete sub service")}
 };
@@ -67,7 +68,7 @@ WebEditor::~WebEditor()
 }
 
 
-void  WebEditor::openServiceView(void)
+void  WebEditor::handleOpenServiceView(void)
 {
   //TODO: m_tree.setCoreData(&m_cdata);
 }
@@ -102,7 +103,7 @@ void WebEditor::bindFormWidgets(void)
 
   // new service button
   m_newServiceViewBtn.setToolTip(Q_TR("Create a new service view"));
-  m_newServiceViewBtn.clicked().connect(this, &WebEditor::newView);
+  m_newServiceViewBtn.clicked().connect(this, &WebEditor::handleNewView);
   m_newServiceViewBtn.setImageLink(Wt::WLink("images/built-in/new.png"));
   m_newServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("new-service-view", &m_newServiceViewBtn);
@@ -110,13 +111,14 @@ void WebEditor::bindFormWidgets(void)
 
   // open service button
   m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
-  m_openServiceViewBtn.clicked().connect(this, &WebEditor::openServiceView);
+  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenServiceView);
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
 
   // save service button
   m_saveCurrentViewBtn.setToolTip(Q_TR("Save changes"));
+  m_saveCurrentViewBtn.clicked().connect(this, &WebEditor::handleSaveView);
   m_saveCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/save.png"));
   m_saveCurrentViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("save-current-view", &m_saveCurrentViewBtn);
@@ -166,7 +168,7 @@ void WebEditor::bindFormWidgets(void)
 
 
 
-void WebEditor::newView(void)
+void WebEditor::handleNewView(void)
 {
   //FIXME: if (treatCloseAction(false) == 0) {
   ngrt4n::clearCoreData(m_cdata);
@@ -205,10 +207,10 @@ void WebEditor::activateTreeEditionFeatures()
 {
   m_tree.activateEditionFeatures();
 
-  m_editionContextMenu.addItem("images/plus.png", MENU_TEXTS[MENU_ADD_SUBSERVICE])
+  m_editionContextMenu.addItem("images/plus.png", MENU_LABELS[MENU_ADD_SUBSERVICE])
       ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
 
-  m_editionContextMenu.addItem("images/minus.png", MENU_TEXTS[MENU_DELETE_SUBSERVICE])
+  m_editionContextMenu.addItem("images/minus.png", MENU_LABELS[MENU_DELETE_SUBSERVICE])
       ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
 
   m_tree.selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
@@ -242,9 +244,9 @@ void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
 {
   std::string triggeredMenu = menu->text().toUTF8();
 
-  if (triggeredMenu == MENU_TEXTS[ MENU_ADD_SUBSERVICE ]) {
+  if (triggeredMenu == MENU_LABELS[ MENU_ADD_SUBSERVICE ]) {
     addNewSubService(m_currentTreeItemIndex);
-  } else if (triggeredMenu == MENU_TEXTS[ MENU_DELETE_SUBSERVICE ] ) {
+  } else if (triggeredMenu == MENU_LABELS[ MENU_DELETE_SUBSERVICE ] ) {
     //TODO delete service
   }
 }
@@ -342,4 +344,44 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
 void WebEditor::handleNodeLabelChanged(void)
 {
   m_tree.updateItemLabel(m_formerSelectedNodeId, m_nameField.text().toUTF8().c_str());
+  updateNodeDataFromEditor(m_formerSelectedNodeId);
 }
+
+
+void WebEditor::handleSaveView(void)
+{
+  NodeListIteratorT rootNode = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
+  if (rootNode == m_cdata.bpnodes.end()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Invalid or incompleted view"));
+    return ;
+  }
+
+  QString path = QString("%1/%2.ms.ngrt4n.xml").arg(m_configDir, rootNode->name);
+  QString errorMsg;
+
+
+  updateNodeDataFromEditor(m_formerSelectedNodeId);
+
+  int ret = ngrt4n::saveDataAsDescriptionFile(path, m_cdata, errorMsg);
+
+  if (ret != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
+    return ;
+  }
+
+  DboView viewDbo;
+
+  viewDbo.name = rootNode->name.toStdString();
+  viewDbo.service_count = m_cdata.bpnodes.size() + m_cdata.cnodes.size();
+  viewDbo.path = path.toStdString();
+
+  ret = m_dbSession->addView(viewDbo);
+
+  if (ret != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());
+    CORE_LOG("info", m_dbSession->lastError());
+  } else {
+    m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
+  }
+}
+

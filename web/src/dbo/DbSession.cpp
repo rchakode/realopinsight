@@ -365,7 +365,7 @@ int DbSession::addView(const DboView& view)
   try {
     DboViewCollectionT views = find<DboView>().where("name=?").bind(view.name);
     if (views.size() > 0) {
-      m_lastError = QObject::tr("Add view failed: a view named '%1' already exists").arg(view.name.c_str()).toStdString();
+      m_lastError = QObject::tr("Failed: a view named '%1' already exists").arg(view.name.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
       retValue = 1;
     } else {
