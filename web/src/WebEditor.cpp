@@ -280,30 +280,29 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
 
   NodeListT::iterator parentSrv = m_cdata.bpnodes.find(currentSrvId);
   if (parentSrv == m_cdata.bpnodes.end()) {
-    CORE_LOG("debug", QObject::tr("Not node found with parent id: %1").arg(currentSrvId).toStdString());
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No parent node found with id: %1").arg(currentSrvId).toStdString());
     return;
   }
 
   m_cdata.bpnodes.insert(childSrv.id, childSrv);
 
   if (parentSrv->type != NodeType::BusinessService) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on parent node type: %1").arg(NodeType::toString(parentSrv->type)).toStdString());
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on node type: %1").arg(NodeType::toString(parentSrv->type)).toStdString());
     return;
   }
 
   if (parentSrv->child_nodes.isEmpty()) {
     parentSrv->child_nodes = childSrv.id;
   } else {
-    parentSrv->child_nodes.append(CHILD_SEPERATOR % childSrv.id);
+    parentSrv->child_nodes += (CHILD_SEPERATOR % childSrv.id);
   }
-
 
   bool bindToParent = true;
   Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrv, bindToParent);
 
   Wt::WModelIndexSet itemsToSelect;
-  m_tree.expand(currentTreeItemIndex);
   itemsToSelect.insert(subSrvItem->index());
+  m_tree.expand(currentTreeItemIndex);
   m_tree.setSelectedIndexes(itemsToSelect);
 }
 
