@@ -55,7 +55,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   : Wt::WContainerWidget(),
     sessionTerminated(this),
     m_rootDir("/opt/realopinsight"),
-    m_confdir(m_rootDir.append("/data")),
+    m_configDir(m_rootDir.append("/data")),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
     m_currentDashboard(NULL),
@@ -69,6 +69,9 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   m_userAccountForm = createAccountPanel();
   m_changePasswordPanel = createPasswordPanel();
   m_aboutDialog = createAboutDialog();
+
+  m_webEditor.setConfigDir(m_configDir);
+  m_webEditor.setDbSession(m_dbSession);
 
   addWidget(&m_mainWidget);
   setupInfoBox();
@@ -523,8 +526,7 @@ void WebMainUI::handleImportHostgroup(const SourceT& srcInfo, const QString& hos
     CORE_LOG("error", stdmsg);
   } else {
     NodeT rootNode = cdata.bpnodes[ngrt4n::ROOT_ID];
-    QString path = QString("%1/autoimport_%2.ms.ngrt4n.xml").arg(m_confdir.c_str(),
-                                                                 rootNode.name.replace(" ", "").toLower());
+    QString path = QString("%1/autoimport_%2.ms.ngrt4n.xml").arg(m_configDir, rootNode.name.replace(" ", "").toLower());
     if (ngrt4n::saveDataAsDescriptionFile(path, cdata, errorMsg) != 0) {
       std::string stdmsg = errorMsg.toStdString();
       showMessage(ngrt4n::OperationFailed, stdmsg);
@@ -1220,7 +1222,7 @@ void WebMainUI::handleImportDescriptionFile(void)
   if (m_fileUploader->empty()) {
     showMessage(ngrt4n::OperationFailed, Q_TR("No file selected"));
   } else {
-    if (createDirectory(m_confdir, false)) { // false means don't clean the directory
+    if (createDirectory(m_configDir.toStdString(), false)) { // false means don't clean the directory
       QString tmpFileName(m_fileUploader->spoolFileName().c_str());
       CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
 
@@ -1234,7 +1236,7 @@ void WebMainUI::handleImportDescriptionFile(void)
         showMessage(ngrt4n::OperationFailed, msg);
       } else {
         std::string filename = m_fileUploader->clientFileName().toUTF8();
-        QString destPath = QString("%1/%2").arg(m_confdir.c_str(), filename.c_str());
+        QString destPath = QString("%1/%2").arg(m_configDir, filename.c_str());
         QFile file(tmpFileName);
         file.copy(destPath);
         file.remove();

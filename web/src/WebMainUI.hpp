@@ -124,8 +124,8 @@ private:
   Wt::WTimer m_globalTimer;
   Wt::WText m_infoBox;
   QMap<int,Wt::WAnchor*> m_menuLinks;
-  std::string m_rootDir;
-  std::string m_confdir;
+  QString m_rootDir;
+  QString m_configDir;
   Wt::WContainerWidget m_mainWidget;
   Wt::WTemplate m_settingsMainPageTpl;
   Wt::WTemplate m_operatorHomeTpl;
