@@ -592,7 +592,6 @@
       <span id="save-current-view">${save-current-view}</span>
       <span id="new-service-view">${new-service-view}</span>
       <span id="open-service-view">${open-service-view}</span>
-      <span id="rename-current-view">${rename-current-view}</span>
     </div>
     </fieldset>
 

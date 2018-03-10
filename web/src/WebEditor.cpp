@@ -101,6 +101,7 @@ void WebEditor::bindFormWidgets(void)
   m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
 
   // new service button
+  m_newServiceViewBtn.setToolTip(Q_TR("Create a new service view"));
   m_newServiceViewBtn.clicked().connect(this, &WebEditor::newView);
   m_newServiceViewBtn.setImageLink(Wt::WLink("images/built-in/new.png"));
   m_newServiceViewBtn.setStyleClass("btn");
@@ -108,20 +109,17 @@ void WebEditor::bindFormWidgets(void)
 
 
   // open service button
+  m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
   m_openServiceViewBtn.clicked().connect(this, &WebEditor::openServiceView);
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
 
   // save service button
+  m_saveCurrentViewBtn.setToolTip(Q_TR("Save changes"));
   m_saveCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/save.png"));
   m_saveCurrentViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("save-current-view", &m_saveCurrentViewBtn);
-
-  // rename service button
-  m_renameCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/rename.png"));
-  m_renameCurrentViewBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("rename-current-view", &m_renameCurrentViewBtn);
 
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);

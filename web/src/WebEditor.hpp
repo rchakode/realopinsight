@@ -79,9 +79,9 @@ private:
   Wt::WComboBox m_propRuleBox;
   Wt::WTextArea m_descField;
   Wt::WLineEdit m_dataPointField;
+
   Wt::WImage m_newServiceViewBtn;
   Wt::WImage m_openServiceViewBtn;
-  Wt::WImage m_renameCurrentViewBtn;
   Wt::WImage m_saveCurrentViewBtn;
 
 
