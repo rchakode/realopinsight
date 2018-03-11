@@ -194,12 +194,8 @@ void WebEditor::handleNewView(void)
 
 void WebEditor::reload(void)
 {
-  //FIXME: m_hasLeftUpdates = true;
-
-  //FIXME: fillInEditorFields(m_cdata.bpnodes.find(ngrt4n::ROOT_ID));
   m_tree.build();
-  //fillEditorFromService(m_tree.rootItem());
-  //FIXME: updateWindowTitle("*");
+  m_tree.selectRootNode();
 }
 
 
@@ -368,13 +364,13 @@ void WebEditor::handleSaveView(void)
     return ;
   }
 
-  DboView viewDbo;
+  DboView viewObj;
 
-  viewDbo.name = rootNode->name.toStdString();
-  viewDbo.service_count = m_cdata.bpnodes.size() + m_cdata.cnodes.size();
-  viewDbo.path = path.toStdString();
+  viewObj.name = rootNode->name.toStdString();
+  viewObj.service_count = m_cdata.bpnodes.size() + m_cdata.cnodes.size();
+  viewObj.path = path.toStdString();
 
-  ret = m_dbSession->addView(viewDbo);
+  ret = m_dbSession->addView(viewObj);
 
   if (ret != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());

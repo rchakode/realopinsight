@@ -46,7 +46,8 @@ class WebTree : public Wt::WTreeView
     void activateEditionFeatures(void);
     Wt::WStandardItem* addTreeEntry(const NodeT& _node, bool _bindToParent);
     QString getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
-    void expandRoot(void);
+    void expandRootNode(void);
+    void selectRootNode(void);
     void updateItemLabel(const QString& _nodeId, const QString& label);
 
   private:

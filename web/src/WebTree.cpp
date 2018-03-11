@@ -90,16 +90,26 @@ void WebTree::renewModel(void)
   setModel(m_model);
   delete oldModel;
 
-  expandRoot();
+  expandRootNode();
 }
 
-void WebTree::expandRoot(void) {
-  if (m_treeItems[ngrt4n::ROOT_ID]) {
-    expand(m_treeItems[ngrt4n::ROOT_ID]->index());
+
+void WebTree::expandRootNode(void)
+{
+  auto root = m_treeItems[ngrt4n::ROOT_ID];
+  if (root) {
+    expand(root->index());
   }
 }
 
 
+void WebTree::selectRootNode(void)
+{
+  auto root = m_treeItems[ngrt4n::ROOT_ID];
+  if (root) {
+    select(root->index());
+  }
+}
 
 Wt::WStandardItem* WebTree::addTreeEntry(const NodeT& _node, bool _bindToParent)
 {
