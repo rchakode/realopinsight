@@ -157,7 +157,7 @@ private:
 
   DashboardMapT m_dashboardMap;
   Wt::WText m_adminPanelTitle;
-  ViewSelectorDialog m_askPreviewDialog;
+  ViewSelectorDialog m_previewSelectorDialog;
 
   /** For file upload **/
   Wt::WFileUpload* m_fileUploader;

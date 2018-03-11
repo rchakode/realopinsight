@@ -628,11 +628,8 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectItem4Preview(void)
 {
-  m_askPreviewDialog.updateContent(m_dbSession->viewList());
-  //  FIXME Wt::WPushButton* finish = new Wt::WPushButton(tr("Preview").toStdString(), container);
-  //  FIXME finish->clicked().connect(this, &WebMainUI::handlePreview);
-  
-  m_askPreviewDialog.show();
+  m_previewSelectorDialog.updateContent(m_dbSession->viewList());
+  m_previewSelectorDialog.show();
 }
 
 
@@ -1056,9 +1053,9 @@ void WebMainUI::setupDialogsStyle(void)
 {
   m_uploadForm.setStyleClass("Wt-dialog");
   m_uploadForm.titleBar()->setStyleClass("titlebar");
-  m_askPreviewDialog.setStyleClass("Wt-dialog");
-  m_askPreviewDialog.titleBar()->setStyleClass("titlebar");
-  m_askPreviewDialog.viewSelected().connect(this, &WebMainUI::handlePreview);
+  m_previewSelectorDialog.setStyleClass("Wt-dialog");
+  m_previewSelectorDialog.titleBar()->setStyleClass("titlebar");
+  m_previewSelectorDialog.viewSelected().connect(this, &WebMainUI::handlePreview);
 }
 
 
