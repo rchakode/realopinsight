@@ -1220,29 +1220,36 @@ void WebMainUI::handleImportDescriptionFile(void)
 {
   if (m_fileUploader->empty()) {
     showMessage(ngrt4n::OperationFailed, Q_TR("No file selected"));
-  } else {
-    if (createDirectory(m_configDir.toStdString(), false)) { // false means don't clean the directory
-      QString tmpFileName(m_fileUploader->spoolFileName().c_str());
-      CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
-
-      CoreDataT cdata;
-      Parser parser(tmpFileName ,&cdata, Parser::ParsingModeEditor, m_settings.getGraphLayout());
-      connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
-
-      if (! parser.parse()) {
-        std::string msg = Q_TR("Invalid description file");
-        CORE_LOG("warn", msg);
-        showMessage(ngrt4n::OperationFailed, msg);
-      } else {
-        std::string filename = m_fileUploader->clientFileName().toUTF8();
-        QString destPath = QString("%1/%2").arg(m_configDir, filename.c_str());
-        QFile file(tmpFileName);
-        file.copy(destPath);
-        file.remove();
-        saveViewInfoIntoDatabase(cdata, destPath);
-      }
-    }
+    return;
   }
+
+  bool success = createDirectory(m_configDir.toStdString(), false); // false means don't clean the directory
+
+  if (! success) {
+    showMessage(ngrt4n::OperationFailed, Q_TR("Can't create configuration directory"));
+    return ;
+  }
+
+  QString tmpFileName(m_fileUploader->spoolFileName().c_str());
+  CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
+
+  CoreDataT cdata;
+  Parser parser(tmpFileName ,&cdata, Parser::ParsingModeEditor, m_settings.getGraphLayout());
+  connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleLibError(QString)));
+
+  if (! parser.parse()) {
+    std::string msg = Q_TR("Invalid description file");
+    CORE_LOG("warn", msg);
+    showMessage(ngrt4n::OperationFailed, msg);
+    return ;
+  }
+
+  std::string filename = m_fileUploader->clientFileName().toUTF8();
+  QString destPath = QString("%1/%2").arg(m_configDir, filename.c_str());
+  QFile file(tmpFileName);
+  file.copy(destPath);
+  file.remove();
+  saveViewInfoIntoDatabase(cdata, destPath);
 }
 
 
