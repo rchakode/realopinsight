@@ -190,7 +190,7 @@ private:
   void handleDisplayOnlyTroubleStateChanged(void);
   void handleImportDescriptionFile(void);
   void handleLaunchEditor(void);
-  void handlePreview(const std::string& viewPath);
+  void handlePreviewFile(const std::string& path);
   void handleDataSourceSettings(void);
   void handleAuthSettings(void);
   void handleNotificationSettings(void);
@@ -220,7 +220,7 @@ private:
   void showConditionalUiWidgets(void);
   void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setupSettingsPage(void);
-  void setupDialogsStyle(void);
+  void configureDialogWidget(void);
   void setupMainUI(void);
   void setupInfoBox(void);
   void setupProfileMenus(void);

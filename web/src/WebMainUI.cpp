@@ -76,7 +76,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   addWidget(&m_mainWidget);
   setupInfoBox();
   setupMainUI();
-  setupDialogsStyle();
+  configureDialogWidget();
 
   setupMenus();
   showUserHome();
@@ -453,9 +453,9 @@ void WebMainUI::handleLaunchEditor(void)
 
 
 
-void WebMainUI::handlePreview(const std::string& viewPath)
+void WebMainUI::handlePreviewFile(const std::string& path)
 {
-  WebDashboard* dashbord = loadView(viewPath); // FIXME expect viewpath not name
+  WebDashboard* dashbord = loadView(path); // FIXME expect viewpath not name
   if (dashbord) {
     setDashboardAsFrontStackedWidget(dashbord);
   }
@@ -670,8 +670,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
     } else {
-      // the inner layout is explicitely removed
-      // when the object is destroyed
+      // the inner layout is explicitely removed when the object is destroyed
       if (m_eventFeedLayout) m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
 
       dashboardItem->initialize(& m_dataSourceSettingsForm);
@@ -1049,13 +1048,16 @@ void WebMainUI::setInternalPath(const std::string& path)
   wApp->setInternalPath(path);
 }
 
-void WebMainUI::setupDialogsStyle(void)
+
+void WebMainUI::configureDialogWidget(void)
 {
   m_uploadForm.setStyleClass("Wt-dialog");
   m_uploadForm.titleBar()->setStyleClass("titlebar");
   m_previewSelectorDialog.setStyleClass("Wt-dialog");
   m_previewSelectorDialog.titleBar()->setStyleClass("titlebar");
-  m_previewSelectorDialog.viewSelected().connect(this, &WebMainUI::handlePreview);
+
+  // bind dialog events
+  m_previewSelectorDialog.viewSelected().connect(this, &WebMainUI::handlePreviewFile);
 }
 
 
