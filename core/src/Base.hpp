@@ -343,6 +343,13 @@ struct CoreDataT {
     StringListT edges;
     double map_height;
     double map_width;
+
+    void clear(void) {
+      cnodes.clear();
+      bpnodes.clear();
+      edges.clear();
+      monitor = MonitorT::Auto;
+    }
 };
 
 

@@ -42,7 +42,7 @@ int ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString&
 
   // handle results
   if (! checks.empty()) {
-    ngrt4n::clearCoreData(cdata);
+    cdata.clear();
     cdata.monitor = MonitorT::Auto;
 
     NodeT root;

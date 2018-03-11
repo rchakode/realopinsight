@@ -69,7 +69,7 @@ bool Parser::process(void)
 
 bool Parser::parse(void)
 {
-  ngrt4n::clearCoreData(*m_cdata);
+  m_cdata->clear();
 
   m_dotContent.clear();
   QDomDocument xmlDoc;
