@@ -262,7 +262,7 @@ void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
 }
 
 
-void WebEditor::handleKeyPressed(Wt::WKeyEvent event)
+void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
 {
   if (event.modifiers() == Wt::ShiftModifier && event.key() == Wt::Key_C) {
     addNewSubService(m_currentTreeItemIndex);
@@ -275,45 +275,41 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
     return ;
   }
 
-  QString currentSrvId = m_tree.getNodeIdFromTreeItem(currentTreeItemIndex);
+  m_tree.expand(currentTreeItemIndex);
+  QString selectedSrvId = m_tree.getNodeIdFromTreeItem(currentTreeItemIndex);
 
   NodeT childSrv;
-  childSrv.id = ngrt4n::genNodeId();
+  childSrv.id = ngrt4n::generateNodeId();
   childSrv.name = "New service";
   childSrv.type = NodeType::BusinessService;
   childSrv.sev_prule = PropRules::Unchanged;
   childSrv.sev_crule = CalcRules::Worst;
   childSrv.weight = ngrt4n::WEIGHT_UNIT;
   childSrv.icon = ngrt4n::DEFAULT_ICON;
-  childSrv.parent = currentSrvId;
-
-
-  NodeListT::iterator parentSrv = m_cdata.bpnodes.find(currentSrvId);
-  if (parentSrv == m_cdata.bpnodes.end()) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No parent node found with id: %1").arg(currentSrvId).toStdString());
-    return;
-  }
+  childSrv.parent = selectedSrvId;
 
   m_cdata.bpnodes.insert(childSrv.id, childSrv);
 
-  if (parentSrv->type != NodeType::BusinessService) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on node type: %1").arg(NodeType::toString(parentSrv->type)).toStdString());
+  auto selectedSrvIt = m_cdata.bpnodes.find(selectedSrvId);
+  if (selectedSrvIt == m_cdata.bpnodes.end()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No parent node found with id: %1").arg(selectedSrvId).toStdString());
     return;
   }
 
-  if (parentSrv->child_nodes.isEmpty()) {
-    parentSrv->child_nodes = childSrv.id;
-  } else {
-    parentSrv->child_nodes += (CHILD_SEPERATOR % childSrv.id);
+  if (selectedSrvIt->type != NodeType::BusinessService) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on node type: %1").arg(NodeType::toString(selectedSrvIt->type)).toStdString());
+    return;
   }
+
+  //  if (selectedSrvIt->child_nodes.isEmpty()) {
+  //    selectedSrvIt->child_nodes = childSrv.id;
+  //  } else {
+  //    selectedSrvIt->child_nodes += (CHILD_SEPERATOR % childSrv.id);
+  //  }
 
   bool bindToParent = true;
   Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrv, bindToParent);
-
-  Wt::WModelIndexSet itemsToSelect;
-  itemsToSelect.insert(subSrvItem->index());
-  m_tree.expand(currentTreeItemIndex);
-  m_tree.setSelectedIndexes(itemsToSelect);
+  m_tree.select(subSrvItem->index());
 }
 
 
@@ -357,6 +353,9 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
   node_it->sev_crule  = m_calcRuleBox.currentIndex();
   node_it->sev_prule  = m_propRuleBox.currentIndex();
   node_it->child_nodes = QString::fromStdString(m_dataPointField.text().toUTF8());
+
+  //FIXME: handleNodeLabelChanged();
+  m_tree.updateItemLabel(nodeId, node_it->name);
 }
 
 
@@ -365,6 +364,7 @@ void WebEditor::handleNodeLabelChanged(void)
   m_tree.updateItemLabel(m_formerSelectedNodeId, m_nameField.text().toUTF8().c_str());
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 }
+
 
 
 void WebEditor::handleSaveView(void)
@@ -380,6 +380,7 @@ void WebEditor::handleSaveView(void)
 
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
+  fixChildParentDependencies();
 
   int ret = ngrt4n::saveDataAsDescriptionFile(path, m_cdata, errorMsg);
 
@@ -403,4 +404,33 @@ void WebEditor::handleSaveView(void)
     m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
   }
 }
+
+
+void WebEditor::fixChildParentDependencies(void)
+{
+  for(const auto& srv_it: m_cdata.bpnodes) {
+    setParentChildDependency(srv_it.id, srv_it.parent);
+  }
+
+  for(const auto& srv_it: m_cdata.cnodes) {
+    setParentChildDependency(srv_it.id, srv_it.parent);
+  }
+}
+
+
+void WebEditor::setParentChildDependency(const QString& childId, const QString& parentId)
+{
+  auto parent_it = m_cdata.bpnodes.find(parentId);
+  if (parent_it == m_cdata.bpnodes.end()) {
+    return ;
+  }
+
+  if (parent_it->child_nodes.isEmpty()) {
+    parent_it->child_nodes = childId;
+  } else {
+    parent_it->child_nodes += (CHILD_SEPERATOR % childId);
+  }
+}
+
+
 

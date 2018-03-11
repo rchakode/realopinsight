@@ -113,9 +113,12 @@ private:
   void fillInEditorFromCurrentSelection(void);
   void updateNodeDataFromEditor(const QString& nodeId);
 
+  void fixChildParentDependencies(void);
+  void setParentChildDependency(const QString& childId, const QString& parentId);
+
 
   void handleTreeContextMenu(Wt::WMenuItem*);
-  void handleKeyPressed(Wt::WKeyEvent event);
+  void handleKeyPressed(const Wt::WKeyEvent& event);
   void handleTreeItemSelectionChanged(void);
   void handleNodeLabelChanged(void);
   void handleNewView(void);

@@ -46,11 +46,11 @@ Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingM
 Parser::~Parser()
 {
   QFile fileHandler;
-  if (fileHandler.exists(m_dotFile+".plain")) {
-    fileHandler.remove(m_dotFile+".plain");
+  if (fileHandler.exists(m_plainFile)) {
+    fileHandler.remove(m_plainFile);
   }
   if (fileHandler.exists(m_dotFile) && m_lastErrorMsg.isEmpty()) {
-    fileHandler.remove(m_dotFile);
+    //FIXME: fileHandler.remove(m_dotFile);
   }
   fileHandler.close();
 }
@@ -59,7 +59,7 @@ bool Parser::process(void)
 {
   bool success = false;
   if (parse()) {
-    updateNodeHierachy();
+    buildDotContentAndCheckDependencies();
     saveCoordinatesFile();
     success = computeCoordinates();
   }
@@ -153,25 +153,20 @@ QString Parser::espacedNodeLabel(const QString& rawLabel)
 }
 
 
-void Parser::updateNodeHierachy(void)
+void Parser::buildDotContentAndCheckDependencies(void)
 {
   m_dotContent.append("\n");
-  // add business service dependencies
   for (NodeListT::ConstIterator bpnode = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); bpnode != end; ++bpnode) {
-    // Set node label
     m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(bpnode->id, espacedNodeLabel(bpnode->name)));
-
-    // create the dependency when applicable
     if (! bpnode->child_nodes.isEmpty()) {
-      QStringList childNodeIdList = bpnode->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-      Q_FOREACH(const QString& childNodeId, childNodeIdList) {
-        QString childNodeIdTrimmed = childNodeId.trimmed();
-        NodeListIteratorT childNode;
-        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childNodeIdTrimmed, childNode)) {
-          childNode->parent = bpnode->id;
-          m_dotContent.append(QString("\t%1--%2\n").arg(bpnode->id, childNode->id));
+      QStringList children = bpnode->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
+      Q_FOREACH(const QString& childId, children) {
+        NodeListIteratorT childIt;
+        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childIt)) {
+          childIt->parent = bpnode->id;
+          m_dotContent.append(QString("\t%1--%2\n").arg(bpnode->id, childIt->id));
         } else {
-          qDebug()<< QObject::tr("Failed to found child dependency for node '%1' => %2").arg(bpnode->id, childNodeIdTrimmed);
+          qDebug()<< QObject::tr("Failed to found child dependency for node '%1' => %2").arg(bpnode->id, childId);
         }
       }
     }
@@ -187,6 +182,7 @@ void Parser::updateNodeHierachy(void)
 void Parser::saveCoordinatesFile(void)
 {
   m_dotFile = QDir::tempPath()%"/realopinsight-gen-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
+  m_plainFile = m_dotFile % ".plain";
   QFile file(m_dotFile);
   if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
     m_lastErrorMsg = QObject::tr("Unable into write the file %1").arg(m_dotFile);
@@ -202,8 +198,7 @@ void Parser::saveCoordinatesFile(void)
 bool Parser::computeCoordinates(void)
 {
   QProcess process;
-  QString plainGraphizOutputFile = m_dotFile % ".plain";
-  QStringList arguments = QStringList() << "-Tplain"<< "-o" << plainGraphizOutputFile << m_dotFile;
+  QStringList arguments = QStringList() << "-Tplain"<< "-o" << m_plainFile << m_dotFile;
 
   int exitCode = -2;
   switch (m_graphLayout) {
@@ -223,9 +218,9 @@ bool Parser::computeCoordinates(void)
     return false;
   }
 
-  QFile qfile(plainGraphizOutputFile);
+  QFile qfile(m_plainFile);
   if (! qfile.open(QFile::ReadOnly)) {
-    m_lastErrorMsg = QObject::tr("Failed to open file: %1").arg(plainGraphizOutputFile);
+    m_lastErrorMsg = QObject::tr("Failed to open file: %1").arg(m_plainFile);
     return false;
   }
 
@@ -233,7 +228,7 @@ bool Parser::computeCoordinates(void)
   QTextStream coodFileStream(& qfile);
   QString line;
   if(line = coodFileStream.readLine(0), line.isNull()) {
-    m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(plainGraphizOutputFile);
+    m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(m_plainFile);
     return false;
   }
 
@@ -352,3 +347,6 @@ void Parser::insertExternalServiceNode(NodeT& node)
     qDebug() << m_lastErrorMsg;
   }
 }
+
+
+

@@ -61,7 +61,7 @@ int ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString&
       hostNode.id = "";
       Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
       QString checkId = QString::fromStdString(check->id);
-      triggerNode.id = ngrt4n::genNodeId();
+      triggerNode.id = ngrt4n::generateNodeId();
       triggerNode.parent = hostNode.id;
       triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
       triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);

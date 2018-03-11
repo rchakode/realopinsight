@@ -59,13 +59,14 @@ class Parser : public QObject
     static const QString m_dotFooter;
     QString m_dotContent;
     QString m_dotFile;
+    QString m_plainFile;
     QString m_descriptionFile;
     CoreDataT* m_cdata;
     QString m_lastErrorMsg;
     int m_parsingMode;
     int m_graphLayout;
 
-    void updateNodeHierachy(void);
+    void buildDotContentAndCheckDependencies(void);
     void saveCoordinatesFile(void);
     static QString espacedNodeLabel(const QString& rawLabel);
     void insertITServiceNode(NodeT& node);
