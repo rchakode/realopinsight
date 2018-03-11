@@ -448,7 +448,7 @@ void WebMainUI::handleLaunchEditor(void)
 {
   m_adminPanelTitle.setText(Q_TR("Service Editor"));
   m_adminStackedContents.setCurrentWidget(&m_webEditor);
-  m_webEditor.reload();
+  m_webEditor.refreshContent();
 }
 
 

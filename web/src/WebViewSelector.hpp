@@ -17,6 +17,8 @@ private:
   void handleSelectionChanged(void);
 };
 
+
+
 class ViewSelectorDialog: public Wt::WDialog
 {
 public:

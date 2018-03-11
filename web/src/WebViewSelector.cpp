@@ -45,17 +45,18 @@ void ViewListSelector::handleSelectionChanged(void)
 
 ViewSelectorDialog::ViewSelectorDialog()
 {
-  setWindowTitle(QObject::tr("Preview | %1").arg(APP_NAME).toStdString());
+  m_okBtn.clicked().connect(this, &ViewSelectorDialog::handleAccept);
+
   Wt::WDialog::contents()->addWidget(&m_container);
 
   m_container.clear();
   m_container.setMargin(10, Wt::All);
 
-  m_okBtn.clicked().connect(this, &ViewSelectorDialog::handleAccept);
-  m_okBtn.setText(Q_TR("Preview"));
-
   m_container.addWidget(&m_viewListSelector);
   m_container.addWidget(&m_okBtn);
+
+  m_okBtn.setText(Q_TR("Apply"));
+  setWindowTitle(Q_TR("View Selector"));
 }
 
 

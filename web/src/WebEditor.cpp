@@ -27,6 +27,7 @@
 #include "Base.hpp"
 #include "utilsCore.hpp"
 #include "DescriptionFileFactoryUtils.hpp"
+#include "Parser.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -56,8 +57,7 @@ const QMap<int, std::string> WebEditor::MENU_LABELS = {
 WebEditor::WebEditor(void) :
   m_operationCompleted(this)
 {
-  m_tree.setCoreData(&m_cdata);
-  activateTreeEditionFeatures();
+  prepareTreeToEdition();
   bindMainPanes();
   bindFormWidgets();
 }
@@ -67,11 +67,42 @@ WebEditor::~WebEditor()
   unbindWidgets();
 }
 
-
-void  WebEditor::handleOpenServiceView(void)
+void WebEditor::prepareTreeToEdition()
 {
-  //TODO: m_tree.setCoreData(&m_cdata);
+  m_tree.setCoreData(&m_cdata);
+
+  m_tree.activateEditionFeatures();
+
+  m_editionContextMenu.addItem("images/plus.png", MENU_LABELS[MENU_ADD_SUBSERVICE])
+      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
+
+  m_editionContextMenu.addItem("images/minus.png", MENU_LABELS[MENU_DELETE_SUBSERVICE])
+      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
+
+  m_tree.selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
+  m_tree.doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
+  m_tree.keyPressed().connect(this, &WebEditor::handleKeyPressed);
 }
+
+void  WebEditor::handleOpenButton(void)
+{
+  m_openSelectorDialog.updateContent(m_dbSession->viewList());
+  m_openSelectorDialog.show();
+}
+
+
+void  WebEditor::handleOpenFile(const std::string& path)
+{
+  Parser parser(path.c_str(), &m_cdata, Parser::ParsingModeEditor, ngrt4n::DotLayout);
+  bool success = parser.process();
+  if (! success) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, parser.lastErrorMsg().toStdString());
+    return ;
+  }
+
+  refreshContent();
+}
+
 
 void WebEditor::bindMainPanes(void)
 {
@@ -111,7 +142,8 @@ void WebEditor::bindFormWidgets(void)
 
   // open service button
   m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
-  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenServiceView);
+  m_openSelectorDialog.viewSelected().connect(this, &WebEditor::handleOpenFile);
+  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenButton);
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
@@ -170,11 +202,8 @@ void WebEditor::bindFormWidgets(void)
 
 void WebEditor::handleNewView(void)
 {
-  //FIXME: if (treatCloseAction(false) == 0) {
-  ngrt4n::clearCoreData(m_cdata);
-  //FIXME: m_activeConfig.clear();
+  m_cdata.clear();
 
-  //FIXME: m_tree.clearTree();
   NodeT node;
 
   node.id = ngrt4n::ROOT_ID;
@@ -188,31 +217,16 @@ void WebEditor::handleNewView(void)
 
   m_cdata.bpnodes.insert(node.id, node);
 
-  reload();
+  refreshContent();
 }
 
 
-void WebEditor::reload(void)
+void WebEditor::refreshContent(void)
 {
   m_tree.build();
   m_tree.selectRootNode();
 }
 
-
-void WebEditor::activateTreeEditionFeatures()
-{
-  m_tree.activateEditionFeatures();
-
-  m_editionContextMenu.addItem("images/plus.png", MENU_LABELS[MENU_ADD_SUBSERVICE])
-      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
-
-  m_editionContextMenu.addItem("images/minus.png", MENU_LABELS[MENU_DELETE_SUBSERVICE])
-      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
-
-  m_tree.selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
-  m_tree.doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
-  m_tree.keyPressed().connect(this, &WebEditor::handleKeyPressed);
-}
 
 
 void WebEditor::handleTreeItemSelectionChanged(void)
@@ -308,31 +322,41 @@ void WebEditor::fillInEditorFromCurrentSelection(void)
   QString nodeId = m_tree.getNodeIdFromTreeItem(m_currentTreeItemIndex);
   NodeListT::const_iterator node_cit;
 
-  if (ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_cit)) {
-    m_formerSelectedNodeId = nodeId;
-    m_nameField.setText(node_cit->name.toStdString());
-    m_descField.setText(node_cit->description.toStdString());
-    m_typeField.setCurrentIndex(node_cit->type);
-    m_iconBox.setCurrentIndex(m_iconIndexMap[node_cit->icon]);
-    m_calcRuleBox.setCurrentIndex(node_cit->sev_crule);
-    m_propRuleBox.setCurrentIndex(node_cit->sev_prule);
+  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_cit);
+  if (! success) {
+    return;
+  }
+
+  m_formerSelectedNodeId = nodeId;
+  m_nameField.setText(node_cit->name.toStdString());
+  m_descField.setText(node_cit->description.toStdString());
+  m_typeField.setCurrentIndex(node_cit->type);
+  m_iconBox.setCurrentIndex(m_iconIndexMap[node_cit->icon]);
+  m_calcRuleBox.setCurrentIndex(node_cit->sev_crule);
+  m_propRuleBox.setCurrentIndex(node_cit->sev_prule);
+
+  if (node_cit->type == NodeType::ITService) {
     m_dataPointField.setText(node_cit->child_nodes.toStdString());
   }
+
 }
 
 
 void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
 {
   NodeListT::iterator node_it;
-  if (ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_it)) {
-    node_it->name =  QString::fromStdString(m_nameField.text().toUTF8());
-    node_it->description =  QString::fromStdString(m_descField.text().toUTF8());
-    node_it->type =  m_typeField.currentIndex();
-    node_it->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
-    node_it->sev_crule  = m_calcRuleBox.currentIndex();
-    node_it->sev_prule  = m_propRuleBox.currentIndex();
-    node_it->child_nodes  = QString::fromStdString(m_dataPointField.text().toUTF8());
+  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_it);
+  if (! success) {
+    return ;
   }
+
+  node_it->name =  QString::fromStdString(m_nameField.text().toUTF8());
+  node_it->description =  QString::fromStdString(m_descField.text().toUTF8());
+  node_it->type =  m_typeField.currentIndex();
+  node_it->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
+  node_it->sev_crule  = m_calcRuleBox.currentIndex();
+  node_it->sev_prule  = m_propRuleBox.currentIndex();
+  node_it->child_nodes = QString::fromStdString(m_dataPointField.text().toUTF8());
 }
 
 

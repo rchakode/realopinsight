@@ -26,6 +26,7 @@
 #define WEBEDITOR_HPP
 
 #include "dbo/DbSession.hpp"
+#include "WebViewSelector.hpp"
 #include "WebTree.hpp"
 #include <Wt/WGridLayout>
 #include <Wt/WVBoxLayout>
@@ -57,7 +58,7 @@ class WebEditor : public Wt::WContainerWidget
 public:
   WebEditor(void);
   virtual ~WebEditor();
-  void reload(void);
+  void refreshContent(void);
   Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
   void setDbSession(DbSession* _dbSession) {m_dbSession = _dbSession;}
   void setConfigDir(const QString& _dirPath) {m_configDir = _dirPath;}
@@ -90,6 +91,8 @@ private:
   Wt::WImage m_openServiceViewBtn;
   Wt::WImage m_saveCurrentViewBtn;
 
+  ViewSelectorDialog m_openSelectorDialog;
+
   Wt::WPopupMenu m_editionContextMenu;
   Wt::WMenuItem* m_menuAddSubService;
   Wt::WMenuItem* m_menuDeleteService;
@@ -104,7 +107,7 @@ private:
   void bindFormWidgets(void);
 
 
-  void activateTreeEditionFeatures(void);
+  void prepareTreeToEdition(void);
   void showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent);
   void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
   void fillInEditorFromCurrentSelection(void);
@@ -117,7 +120,8 @@ private:
   void handleNodeLabelChanged(void);
   void handleNewView(void);
   void handleSaveView(void);
-  void handleOpenServiceView(void);
+  void handleOpenButton(void);
+  void handleOpenFile(const std::string& path);
 };
 
 
