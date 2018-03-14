@@ -143,7 +143,7 @@ int DbSession::updateUser(const DboUserT& userInfo)
     retValue = 0;
     transaction.commit();
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to update the user.";
+    m_lastError = "Failed to update user";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -307,7 +307,7 @@ void DbSession::updateViewList(void)
   transaction.commit();
 }
 
-void DbSession::updateViewList(const std::string& uname)
+void DbSession::updateViewListByAssignedUser(const std::string& uname)
 {
   dbo::Transaction transaction(*this);
   try {
@@ -335,6 +335,7 @@ bool DbSession::findView(const std::string& vname, DboView& view)
   return found;
 }
 
+
 int DbSession::initDb(void)
 {
   int  rc = -1;
@@ -358,21 +359,22 @@ int DbSession::initDb(void)
   return rc;
 }
 
-int DbSession::addView(const DboView& view)
+
+int DbSession::addView(const DboView& vInfo)
 {
-  int retValue = -1;
+  int rc = -1;
   dbo::Transaction transaction(*this);
   try {
-    DboViewCollectionT views = find<DboView>().where("name=?").bind(view.name);
+    DboViewCollectionT views = find<DboView>().where("name=?").bind(vInfo.name);
     if (views.size() > 0) {
-      m_lastError = QObject::tr("Failed: a view named '%1' already exists").arg(view.name.c_str()).toStdString();
+      m_lastError = QObject::tr("Failed: a view with name '%1' already exists").arg(vInfo.name.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
-      retValue = 1;
+      rc = 1;
     } else {
       DboView* viewTmpPtr(new DboView());
-      *viewTmpPtr =  view;
+      *viewTmpPtr =  vInfo;
       add(viewTmpPtr);
-      retValue = 0;
+      rc = 0;
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Add view failed, please check the log file";
@@ -383,16 +385,35 @@ int DbSession::addView(const DboView& view)
   }
   transaction.commit();
   updateViewList();
-  return retValue;
+  return rc;
 }
 
 
-int DbSession::deleteView(std::string viewId)
+int DbSession::updateViewWithPath(const DboView& vinfo, const std::string& vpath)
+{
+  int rc = -1;
+  dbo::Transaction transaction(*this);
+  try {
+    dbo::ptr<DboView> viewDbo = find<DboView>().where("path=?").bind(vpath);
+    viewDbo.modify()->name = vinfo.name;
+    viewDbo.modify()->service_count = vinfo.service_count;
+    transaction.commit();
+    rc = 0;
+  } catch (const dbo::Exception& ex) {
+    m_lastError = "Failed to update view";
+    CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+  }
+  transaction.commit();
+  return rc;
+}
+
+
+int DbSession::deleteViewWithName(const std::string& vname)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
   try {
-    execute("DELETE FROM view WHERE name = ?;").bind(viewId);
+    execute("DELETE FROM view WHERE name = ?;").bind(vname);
     retValue = 0;
   } catch (const Wt::Dbo::backend::Sqlite3Exception& ex) {
     m_lastError = ex.what();
@@ -405,6 +426,7 @@ int DbSession::deleteView(std::string viewId)
   updateViewList();
   return retValue;
 }
+
 
 
 void DbSession::updateUserViewList(void)
@@ -462,7 +484,7 @@ int DbSession::revokeView(const std::string& userId, const std::string& viewId)
 }
 
 
-int DbSession::listAssignedUsersEmails(QStringList& emails, const std::string& viewId)
+int DbSession::listAssignedUsersEmails(QStringList& emails, const std::string& vname)
 {
   int retValue = -1;
   dbo::Transaction transaction(*this);
@@ -472,7 +494,7 @@ int DbSession::listAssignedUsersEmails(QStringList& emails, const std::string& v
                               " WHERE user.name = user_view.user_name"
                               "   AND user_view.view_name = '%1'"
                               "   AND user.email != ''"
-                              ).arg(viewId.c_str()).toStdString();
+                              ).arg(vname.c_str()).toStdString();
 
     dbo::collection<std::string> results = query<std::string>(sql);
     emails.clear();
@@ -504,7 +526,7 @@ int DbSession::addSession(const DboLoginSession& session)
       retValue = 1;
     }
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to add the session, please check the log file";
+    m_lastError = "Failed to add session, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();

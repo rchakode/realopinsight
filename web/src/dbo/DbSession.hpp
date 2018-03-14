@@ -85,11 +85,12 @@ public:
   void updateUserList(void);
   DbUsersT& userList(void) {return m_userList;}
 
-  int addView(const DboView& qos);
-  int deleteView(std::string viewId);
-  int assignView(const std::string& userId, const std::string& viewId);
-  int revokeView(const std::string& userId, const std::string& viewId);
-  int listAssignedUsersEmails(QStringList& emails, const std::string& viewId);
+  int addView(const DboView& vinfo);
+  int updateViewWithPath(const DboView& vinfo, const std::string& vpath);
+  int deleteViewWithName(const std::string& vname);
+  int assignView(const std::string& userId, const std::string& vname);
+  int revokeView(const std::string& userId, const std::string& vname);
+  int listAssignedUsersEmails(QStringList& emails, const std::string& vname);
 
   int addQosData(const QosDataT& qosData);
   int addQosDataList(const QosDataList& qosDataList);
@@ -97,7 +98,7 @@ public:
   int getLastQosData(QosDataT& qosData, const std::string& viewId);
 
   void updateViewList(void);
-  void updateViewList(const std::string& uname);
+  void updateViewListByAssignedUser(const std::string& uname);
   DbViewsT& viewList(void) {return m_viewList;}
   int viewCount(void) const {return m_viewList.size();}
   bool findView(const std::string& vname, DboView& view);
