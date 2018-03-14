@@ -74,6 +74,7 @@ private:
   CoreDataT m_cdata;
   WebTree m_tree;
 
+  std::string m_currentFilePath;
   Wt::WModelIndex m_currentTreeItemIndex;
   QString m_formerSelectedNodeId;
 

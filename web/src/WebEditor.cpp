@@ -101,6 +101,8 @@ void  WebEditor::handleOpenFile(const std::string& path)
   }
 
   refreshContent();
+
+  m_currentFilePath = path;
 }
 
 
@@ -279,7 +281,7 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
   QString selectedSrvId = m_tree.getNodeIdFromTreeItem(currentTreeItemIndex);
 
   NodeT childSrv;
-  childSrv.id = ngrt4n::generateNodeId();
+  childSrv.id = ngrt4n::generateId();
   childSrv.name = "New service";
   childSrv.type = NodeType::BusinessService;
   childSrv.sev_prule = PropRules::Unchanged;
@@ -375,35 +377,52 @@ void WebEditor::handleSaveView(void)
     return ;
   }
 
-  QString path = QString("%1/%2.ms.ngrt4n.xml").arg(m_configDir, rootNode->name);
-  QString errorMsg;
+  std::string destPath = "";
+  if (m_currentFilePath.empty()) {
+    destPath = QString("%1/%2.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId()).toStdString();
+  } else {
+    destPath = m_currentFilePath;
+  }
 
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
   fixChildParentDependencies();
 
-  int ret = ngrt4n::saveDataAsDescriptionFile(path, m_cdata, errorMsg);
+  QString errorMsg;
+  int rc = ngrt4n::saveDataAsDescriptionFile(destPath.c_str(), m_cdata, errorMsg);
 
-  if (ret != 0) {
+  if (rc != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
     return ;
   }
 
-  DboView viewObj;
+  DboView vinfo;
+  vinfo.name = rootNode->name.toStdString();
+  vinfo.service_count = m_cdata.bpnodes.size() + m_cdata.cnodes.size();
+  vinfo.path = destPath;
 
-  viewObj.name = rootNode->name.toStdString();
-  viewObj.service_count = m_cdata.bpnodes.size() + m_cdata.cnodes.size();
-  viewObj.path = path.toStdString();
-
-  ret = m_dbSession->addView(viewObj);
-
-  if (ret != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());
-    CORE_LOG("info", m_dbSession->lastError());
+  // save view in database if it's the 1st time
+  if (m_currentFilePath.empty()) {
+    rc = m_dbSession->addView(vinfo);
+    if (rc != 0) {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());
+      CORE_LOG("info", m_dbSession->lastError());
+      return ;
+    }
   } else {
-    m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
+    rc = m_dbSession->updateViewWithPath(vinfo, destPath);
+    if (rc != 0) {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());
+      CORE_LOG("info", m_dbSession->lastError());
+      return ;
+    }
   }
+
+  m_currentFilePath = destPath;
+
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
 }
+
 
 
 void WebEditor::fixChildParentDependencies(void)
