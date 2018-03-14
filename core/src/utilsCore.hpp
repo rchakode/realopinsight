@@ -57,7 +57,7 @@ namespace ngrt4n
   inline std::string humanTimeText(const std::string& mytime_t)
   { return QDateTime::fromTime_t(QString(mytime_t.c_str()).toUInt()).toString().toStdString(); }
 
-  inline QString generateNodeId()
+  inline QString generateId()
   {
     static int i = 0;
     return QString("roi_%1%2")
