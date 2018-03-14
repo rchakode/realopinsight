@@ -960,7 +960,7 @@ void WebMainUI::initOperatorDashboard(void)
 {
   bindExecutiveViewWidgets();
 
-  m_dbSession->updateViewList(m_dbSession->loggedUser().username);
+  m_dbSession->updateViewListByAssignedUser(m_dbSession->loggedUser().username);
 
   // Build view thumbnails
   int thumbIndex = 0;
