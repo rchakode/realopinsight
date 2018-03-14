@@ -217,7 +217,7 @@ void ViewAclManagement::deleteViews(void)
   for (const auto& vname : m_selectedViews) {
     DboView curView;
     if (m_dbSession->findView(vname, curView)) {
-      if (m_dbSession->deleteView(vname) != 0) {
+      if (m_dbSession->deleteViewWithName(vname) != 0) {
         outputMsg.append("- Failed to delete view: "+vname + " -");
         CORE_LOG("warning", m_dbSession->lastError());
       } else {
