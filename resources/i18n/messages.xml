@@ -27,7 +27,7 @@
               <div class="accordion-inner">
               <ul class="nav">
               <li> ${menu-editor}</li>
-               <li> ${menu-import}</li>
+               <li> ${menu-import-service-file}</li>
                <li> ${menu-preview}</li>
                <li> ${menu-all-views}</li>
               </ul>
@@ -592,6 +592,7 @@
       <span id="save-current-view">${save-current-view}</span>
       <span id="new-service-view">${new-service-view}</span>
       <span id="open-service-view">${open-service-view}</span>
+      <span id="import-native-config">${import-native-config}</span>
     </div>
     </fieldset>
 

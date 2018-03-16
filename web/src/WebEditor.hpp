@@ -26,7 +26,7 @@
 #define WEBEDITOR_HPP
 
 #include "dbo/DbSession.hpp"
-#include "WebViewSelector.hpp"
+#include "WebInputSelector.hpp"
 #include "WebTree.hpp"
 #include <Wt/WGridLayout>
 #include <Wt/WVBoxLayout>
@@ -91,8 +91,10 @@ private:
   Wt::WImage m_newServiceViewBtn;
   Wt::WImage m_openServiceViewBtn;
   Wt::WImage m_saveCurrentViewBtn;
+  Wt::WImage m_importNativeConfigBtn;
 
-  ViewSelectorDialog m_openSelectorDialog;
+  InputSelector m_openViewSelector;
+  InputSelector m_importNativeConfigSelector;
 
   Wt::WPopupMenu m_editionContextMenu;
   Wt::WMenuItem* m_menuAddSubService;
@@ -124,8 +126,10 @@ private:
   void handleNodeLabelChanged(void);
   void handleNewView(void);
   void handleSaveView(void);
-  void handleOpenButton(void);
+  void handleOpenViewButton(void);
   void handleOpenFile(const std::string& path);
+  void handleImportNativeConfigButton(void);
+  void importNativeConfig(const SourceT& sinfo, const QString& hostgroup);
 };
 
 

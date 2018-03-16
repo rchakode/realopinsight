@@ -84,10 +84,10 @@ void WebEditor::prepareTreeToEdition()
   m_tree.keyPressed().connect(this, &WebEditor::handleKeyPressed);
 }
 
-void  WebEditor::handleOpenButton(void)
+void  WebEditor::handleOpenViewButton(void)
 {
-  m_openSelectorDialog.updateContent(m_dbSession->viewList());
-  m_openSelectorDialog.show();
+  m_openViewSelector.updateContentWithViewList(m_dbSession->viewList());
+  m_openViewSelector.show();
 }
 
 
@@ -144,8 +144,8 @@ void WebEditor::bindFormWidgets(void)
 
   // open service button
   m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
-  m_openSelectorDialog.viewSelected().connect(this, &WebEditor::handleOpenFile);
-  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenButton);
+  m_openViewSelector.itemSelected().connect(this, &WebEditor::handleOpenFile);
+  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenViewButton);
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
@@ -156,6 +156,13 @@ void WebEditor::bindFormWidgets(void)
   m_saveCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/save.png"));
   m_saveCurrentViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("save-current-view", &m_saveCurrentViewBtn);
+
+  // import native button
+  m_importNativeConfigBtn.setToolTip(Q_TR("Import of native monitoring settings as service tree"));
+  m_importNativeConfigBtn.clicked().connect(this, &WebEditor::handleImportNativeConfigButton);
+  m_importNativeConfigBtn.setImageLink(Wt::WLink("images/built-in/import.png"));
+  m_importNativeConfigBtn.setStyleClass("btn");
+  m_fieldEditionPane.bindWidget("import-native-config", &m_importNativeConfigBtn);
 
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);
@@ -303,12 +310,6 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
     return;
   }
 
-  //  if (selectedSrvIt->child_nodes.isEmpty()) {
-  //    selectedSrvIt->child_nodes = childSrv.id;
-  //  } else {
-  //    selectedSrvIt->child_nodes += (CHILD_SEPERATOR % childSrv.id);
-  //  }
-
   bool bindToParent = true;
   Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrv, bindToParent);
   m_tree.select(subSrvItem->index());
@@ -356,7 +357,6 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
   node_it->sev_prule  = m_propRuleBox.currentIndex();
   node_it->child_nodes = QString::fromStdString(m_dataPointField.text().toUTF8());
 
-  //FIXME: handleNodeLabelChanged();
   m_tree.updateItemLabel(nodeId, node_it->name);
 }
 
@@ -453,3 +453,31 @@ void WebEditor::setParentChildDependency(const QString& childId, const QString& 
 
 
 
+void WebEditor::handleImportNativeConfigButton(void)
+{
+  m_importNativeConfigSelector.updateContentWithSourceList(SourceListT());
+  m_importNativeConfigSelector.show();
+}
+
+
+
+void WebEditor::importNativeConfig(const SourceT& sinfo, const QString& hostgroup)
+{
+  QString errorMsg;
+  CoreDataT cdata;
+  int rc = ngrt4n::importHostGroupAsBusinessView(sinfo, hostgroup, cdata, errorMsg);
+  if (rc != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
+    return  ;
+  }
+
+  QString destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
+  rc = ngrt4n::saveDataAsDescriptionFile(destPath, cdata, errorMsg);
+  if (rc != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
+    return ;
+  }
+
+  //TODO saveViewInfoIntoDatabase(cdata, path);
+
+}

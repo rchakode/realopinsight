@@ -38,7 +38,7 @@
 #include "WebDataSourceSettings.hpp"
 #include "WebDatabaseSettings.hpp"
 #include "WebCsvReportResource.hpp"
-#include "WebViewSelector.hpp"
+#include "WebInputSelector.hpp"
 #include "WebEditor.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WTimer>
@@ -65,6 +65,7 @@ class WebMainUI : public QObject, public Wt::WContainerWidget
 
   enum MenuEntriesT {
     MenuWelcome,
+    MenuEditor,
     MenuImport,
     MenuPreview,
     MenuViewAndAcl,
@@ -157,7 +158,7 @@ private:
 
   DashboardMapT m_dashboardMap;
   Wt::WText m_adminPanelTitle;
-  ViewSelectorDialog m_previewSelectorDialog;
+  InputSelector m_previewSelectorDialog;
 
   /** For file upload **/
   Wt::WFileUpload* m_fileUploader;
@@ -202,8 +203,6 @@ private:
   void handleErrcode(int errcode);
   void handleUserUpdatedCompleted(int errcode);
   void handleShowAdminHome(void);
-  //FIXME void handleImportHostgroup(const SourceT& srcInfo, const QString& hostgroup) no longer needed?
-  void handleImportHostgroup(const SourceT& srcInfo, const QString& hostgroup);
   void handleUploadSubmitButton(void);
   void handleUploadCancelButton(void);
   void handleUploadFileTooLarge(void);

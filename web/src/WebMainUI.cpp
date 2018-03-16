@@ -28,7 +28,7 @@
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "DescriptionFileFactoryUtils.hpp"
-#include "WebViewSelector.hpp"
+#include "WebInputSelector.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
@@ -515,27 +515,6 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 }
 
 
-void WebMainUI::handleImportHostgroup(const SourceT& srcInfo, const QString& hostgroup)
-{
-  CoreDataT cdata;
-  QString errorMsg;
-  if (ngrt4n::importHostGroupAsBusinessView(srcInfo, hostgroup, cdata, errorMsg) != 0) {
-    std::string stdmsg = errorMsg.toStdString();
-    showMessage(ngrt4n::OperationFailed, stdmsg);
-    CORE_LOG("error", stdmsg);
-  } else {
-    NodeT rootNode = cdata.bpnodes[ngrt4n::ROOT_ID];
-    QString path = QString("%1/autoimport_%2.ms.ngrt4n.xml").arg(m_configDir, rootNode.name.replace(" ", "").toLower());
-    if (ngrt4n::saveDataAsDescriptionFile(path, cdata, errorMsg) != 0) {
-      std::string stdmsg = errorMsg.toStdString();
-      showMessage(ngrt4n::OperationFailed, stdmsg);
-      CORE_LOG("error", stdmsg);
-    } else {
-      saveViewInfoIntoDatabase(cdata, path);
-    }
-  }
-}
-
 
 void WebMainUI::handleReportPeriodChanged(long start, long end)
 {
@@ -627,7 +606,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectItem4Preview(void)
 {
-  m_previewSelectorDialog.updateContent(m_dbSession->viewList());
+  m_previewSelectorDialog.updateContentWithViewList(m_dbSession->viewList());
   m_previewSelectorDialog.show();
 }
 
@@ -735,13 +714,13 @@ void WebMainUI::setupSettingsPage(void)
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleLaunchEditor);
       m_settingsMainPageTpl.bindWidget("menu-editor", link);
-      m_menuLinks.insert(MenuImport, link);
+      m_menuLinks.insert(MenuEditor, link);
 
       // menu import view
-      menuText = QObject::tr("Import File").toStdString();
+      menuText = QObject::tr("Import Service File").toStdString();
       link = new Wt::WAnchor("#", menuText, &m_mainWidget);
       link->clicked().connect(this, &WebMainUI::handleShowUploadForm);
-      m_settingsMainPageTpl.bindWidget("menu-import", link);
+      m_settingsMainPageTpl.bindWidget("menu-import-service-file", link);
       m_menuLinks.insert(MenuImport, link);
 
       // menu preview
@@ -1056,7 +1035,7 @@ void WebMainUI::configureDialogWidget(void)
   m_previewSelectorDialog.titleBar()->setStyleClass("titlebar");
 
   // bind dialog events
-  m_previewSelectorDialog.viewSelected().connect(this, &WebMainUI::handlePreviewFile);
+  m_previewSelectorDialog.itemSelected().connect(this, &WebMainUI::handlePreviewFile);
 }
 
 
