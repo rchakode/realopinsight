@@ -86,14 +86,25 @@
 
 
 <message id="getting-started.tpl">
+
+    <!-- Setting thumnail -->
+    <div class="col-sm-3">
+            <div class="thumbnail">
+              <div class="title">Configure access to monitoring sources</div>
+              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
+              <p>Allow RealOpInsight to connect to your monitoring servers to retrieve monitoring data needed to keep your service views up-to-date.
+              </p>
+              <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html"
+              class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+            </div>
+    </div>
+
   <!-- Describe thumnail -->
-  <div class="col-sm-4">
+  <div class="col-sm-3">
        <div class="thumbnail">
-          <div class="title">Describe</div>
+          <div class="title">Edit service views</div>
           <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-          <p>Define the description file that govern your business service platform.
-          The RealOpInsight Editor shall assist in creating and editing your description files
-          in an easy, simple and effective way
+          <p>Use RealOpInsight Editor to easily design service dependencies and rules that govern your business.
           </p>
           <p><a href="http://docs.realopinsight.com/latest/01_workstation/editor-manual.html"
           class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
@@ -101,28 +112,13 @@
        </div>
   </div>
 
-  <!-- Setting thumnail -->
-  <div class="col-sm-4">
-          <div class="thumbnail">
-            <div class="title">Setting Up</div>
-            <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
-            <p>Run the Configuration Manager to set when and how RealOpInsight
-            should connect to your monitoring servers to retrieve status data
-            to always keep your monitoring view up-to-date.
-            </p>
-            <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html"
-            class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-          </div>
-  </div>
-
 
   <!-- Preview thumnail -->
-  <div class="col-sm-4">
+  <div class="col-sm-3">
           <div class="thumbnail">
-            <div class="title">Preview</div>
+            <div class="title">Preview to validate settings</div>
             <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Dashboard Preview" />
-            <p>Once created, upload the description file into RealOpInsight Datastore.
-            Then, preview them to check that it suits your monitoring needs.
+            <p>Use the built-in preview feature to ensure that everything is defined as expected.
             </p>
             <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
@@ -132,12 +128,11 @@
 
   <div class="clearfix">&nbsp;</div>
   <!-- Assign thumnail -->
-   <div class="col-sm-4">
+   <div class="col-sm-3">
       <div class="thumbnail">
-         <div class="title">Assign and Let Operate</div>
+         <div class="title">Assign and let operate</div>
          <img src="/images/built-in/thumbnails/assign-view.png" alt="RealOpInsight View Access Control" />
-         <p>Run the View Access Control Manager to set who of your operations staff members
-         can access and operate the view. Then, let your operation staff do the rest.
+         <p>Our friendly view access manager let you set operators that can access and operate the view.
          </p>
          <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
          class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
