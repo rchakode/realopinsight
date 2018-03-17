@@ -95,13 +95,15 @@ void DashboardBase::initialize(BaseSettings* preferencePtr)
   if (! m_descriptionFile.isEmpty()) {
     Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, m_baseSettings->getGraphLayout());
     connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
-    if (parser.process()) {
+
+    int rc = parser.process();
+    if (rc != 0) {
+      m_lastErrorState = true;
+      m_lastErrorMsg = parser.lastErrorMsg();
+    } else {
       buildTree();
       buildMap();
       initSettings(m_baseSettings);
-    } else {
-      m_lastErrorState = true;
-      m_lastErrorMsg = parser.lastErrorMsg();
     }
   }
 }
@@ -145,12 +147,12 @@ void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
   Q_FOREACH (const QString& hitem, m_cdata.hosts.keys()) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
     if (info.first == srcInfo.id) {
-      QString errorMsg;
       ChecksT checks;
-      if (ngrt4n::importMonitorItemAsDataPoints(srcInfo, info.second, checks, errorMsg) == 0) {
+      auto importResult = ngrt4n::importMonitorItemAsDataPoints(srcInfo, info.second, checks);
+      if (importResult.first == 0) {
         updateCNodesWithChecks(checks, srcInfo);
       } else {
-        updateDashboardOnError(srcInfo, errorMsg);
+        updateDashboardOnError(srcInfo, importResult.second);
         break;
       }
     }

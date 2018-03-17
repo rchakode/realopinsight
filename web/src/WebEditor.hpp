@@ -129,6 +129,8 @@ private:
   void handleOpenViewButton(void);
   void handleOpenFile(const std::string& path);
   void handleImportNativeConfigButton(void);
+
+  std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);
   void importNativeConfig(const SourceT& sinfo, const QString& hostgroup);
 };
 

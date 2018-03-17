@@ -40,9 +40,9 @@ class Parser : public QObject
   public:
     Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout);
     virtual ~Parser();
-    bool process(void);
-    bool parse(void);
-    bool computeCoordinates(void);
+    int process(void);
+    int parse(void);
+    int computeCoordinates(void);
     QString dotContent(void) const {return m_dotContent;}
     QString dotFile(void) const { return m_dotFile; }
     QString lastErrorMsg(void) const {return m_lastErrorMsg;}

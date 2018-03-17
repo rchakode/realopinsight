@@ -55,19 +55,19 @@ Parser::~Parser()
   fileHandler.close();
 }
 
-bool Parser::process(void)
+int Parser::process(void)
 {
-  bool success = false;
-  if (parse()) {
+  int rc = parse();
+  if (rc == 0) {
     buildDotContentAndCheckDependencies();
     saveCoordinatesFile();
-    success = computeCoordinates();
+    rc = computeCoordinates();
   }
 
-  return success;
+  return rc;
 }
 
-bool Parser::parse(void)
+int Parser::parse(void)
 {
   m_cdata->clear();
 
@@ -81,15 +81,16 @@ bool Parser::parse(void)
     m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_descriptionFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
-    return false;
+    return -1;
   }
 
   if (!xmlDoc.setContent(&file)) {
     file.close();
     m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_descriptionFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
-    return false;
+    return -1;
   }
+
   file.close(); // The content of the file is already in memory
 
   xmlRoot = xmlDoc.documentElement();
@@ -142,7 +143,7 @@ bool Parser::parse(void)
     }
   }
 
-  return true;
+  return 0;
 }
 
 
@@ -195,7 +196,7 @@ void Parser::saveCoordinatesFile(void)
   file.close();
 }
 
-bool Parser::computeCoordinates(void)
+int Parser::computeCoordinates(void)
 {
   QProcess process;
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << m_plainFile << m_dotFile;
@@ -215,13 +216,13 @@ bool Parser::computeCoordinates(void)
   if (exitCode != 0) {
     m_lastErrorMsg = QObject::tr("The graph engine exited on error (code: %1, file: %2").arg(QString::number(exitCode), m_dotFile);
     Q_EMIT errorOccurred(m_lastErrorMsg);
-    return false;
+    return -1;
   }
 
   QFile qfile(m_plainFile);
   if (! qfile.open(QFile::ReadOnly)) {
     m_lastErrorMsg = QObject::tr("Failed to open file: %1").arg(m_plainFile);
-    return false;
+    return -1;
   }
 
   //start parsing
@@ -229,14 +230,14 @@ bool Parser::computeCoordinates(void)
   QString line;
   if(line = coodFileStream.readLine(0), line.isNull()) {
     m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(m_plainFile);
-    return false;
+    return -1;
   }
 
   QRegExp regexSep("[ ]+");
   QStringList splitedLine = line.split (regexSep);
   if (splitedLine.size() != 4 || splitedLine[0] != "graph") {
     m_lastErrorMsg = QObject::tr("Invalid graphviz entry: %1").arg(line);
-    return false;
+    return -1;
   }
 
   const ScaleFactors SCALE_FACTORS(m_graphLayout);
@@ -281,7 +282,7 @@ bool Parser::computeCoordinates(void)
   m_cdata->map_width += qAbs(m_cdata->min_x);
   m_cdata->map_height += qAbs(m_cdata->min_y);
 
-  return true;
+  return 0;
 }
 
 
@@ -324,27 +325,30 @@ void Parser::insertExternalServiceNode(NodeT& node)
 
   CoreDataT cdata;
   Parser parser(path, &cdata, Parser::ParsingModeExternalService, m_graphLayout);
-  if (parser.parse()) {
-    NodeListT::Iterator innerRootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
 
-    if (innerRootNodeIt != cdata.bpnodes.end()) {
-      // update default id for root node
-      innerRootNodeIt->id = node.id;
-      innerRootNodeIt->visibility = ngrt4n::Visible|ngrt4n::Expanded;
-      NodeT innerRootNode = *innerRootNodeIt; // backup the node content
-      cdata.bpnodes.remove(ngrt4n::ROOT_ID);  // Point to innerRootNodeIt, but its key is ngrt4n::ROOT_ID.
-      // We remove it to avoid duplication when joining the two hashs
-      cdata.bpnodes.insert(innerRootNode.id, innerRootNode); // now reinsert the map with its current id
-      m_cdata->bpnodes.unite(cdata.bpnodes);
-      m_cdata->cnodes.unite(cdata.cnodes);
-      m_cdata->hosts.unite(cdata.hosts);
-      m_cdata->sources.unite(cdata.sources);
-    } else {
-      qDebug() << QObject::tr("Invalid graph after parsing external description file: %1").arg(path);
-    }
-  } else {
+  int rc = parser.parse();
+
+  if (rc == 0) {
     m_lastErrorMsg = parser.lastErrorMsg();
-    qDebug() << m_lastErrorMsg;
+    return;
+  }
+
+  NodeListT::Iterator innerRootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
+
+  if (innerRootNodeIt != cdata.bpnodes.end()) {
+    // update default id for root node
+    innerRootNodeIt->id = node.id;
+    innerRootNodeIt->visibility = ngrt4n::Visible|ngrt4n::Expanded;
+    NodeT innerRootNode = *innerRootNodeIt; // backup the node content
+    cdata.bpnodes.remove(ngrt4n::ROOT_ID);  // Point to innerRootNodeIt, but its key is ngrt4n::ROOT_ID.
+    // We remove it to avoid duplication when joining the two hashs
+    cdata.bpnodes.insert(innerRootNode.id, innerRootNode); // now reinsert the map with its current id
+    m_cdata->bpnodes.unite(cdata.bpnodes);
+    m_cdata->cnodes.unite(cdata.cnodes);
+    m_cdata->hosts.unite(cdata.hosts);
+    m_cdata->sources.unite(cdata.sources);
+  } else {
+    qDebug() << QObject::tr("Invalid graph after parsing external description file: %1").arg(path);
   }
 }
 

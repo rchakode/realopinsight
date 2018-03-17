@@ -94,7 +94,9 @@ void  WebEditor::handleOpenViewButton(void)
 void  WebEditor::handleOpenFile(const std::string& path)
 {
   Parser parser(path.c_str(), &m_cdata, Parser::ParsingModeEditor, ngrt4n::DotLayout);
+
   bool success = parser.process();
+
   if (! success) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, parser.lastErrorMsg().toStdString());
     return ;
@@ -371,12 +373,6 @@ void WebEditor::handleNodeLabelChanged(void)
 
 void WebEditor::handleSaveView(void)
 {
-  NodeListIteratorT rootNode = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
-  if (rootNode == m_cdata.bpnodes.end()) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Invalid or incompleted view"));
-    return ;
-  }
-
   std::string destPath = "";
   if (m_currentFilePath.empty()) {
     destPath = QString("%1/%2.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId()).toStdString();
@@ -386,41 +382,61 @@ void WebEditor::handleSaveView(void)
 
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
+
   fixChildParentDependencies();
 
-  QString errorMsg;
-  int rc = ngrt4n::saveDataAsDescriptionFile(destPath.c_str(), m_cdata, errorMsg);
+  auto saveStatus = saveContentToFile(m_cdata, destPath.c_str());
 
-  if (rc != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
-    return ;
+  if (saveStatus.first != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
+  } else {
+    m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
+    m_currentFilePath = destPath;
+  }
+
+}
+
+
+std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, const QString& destPath)
+{
+
+  NodeListIteratorT rootService = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
+  if (rootService == m_cdata.bpnodes.end()) {
+    return std::make_pair(-1, QObject::tr("Invalid or incompleted view"));
+  }
+
+  std::pair<int, QString> saveResult = ngrt4n::saveDataAsDescriptionFile(destPath, cdata);
+
+  if (saveResult.first != 0) {
+    return std::make_pair(-1, saveResult.second);
   }
 
   DboView vinfo;
-  vinfo.name = rootNode->name.toStdString();
-  vinfo.service_count = m_cdata.bpnodes.size() + m_cdata.cnodes.size();
-  vinfo.path = destPath;
+  vinfo.name = rootService->name.toStdString();
+  vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+  vinfo.path = destPath.toStdString();
 
   // save view in database if it's the 1st time
   if (m_currentFilePath.empty()) {
-    rc = m_dbSession->addView(vinfo);
+
+    int rc = m_dbSession->addView(vinfo);
+
     if (rc != 0) {
-      m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());
-      CORE_LOG("info", m_dbSession->lastError());
-      return ;
+      CORE_LOG("error", m_dbSession->lastError());
+      return std::make_pair(rc,  m_dbSession->lastError().c_str());
     }
-  } else {
-    rc = m_dbSession->updateViewWithPath(vinfo, destPath);
-    if (rc != 0) {
-      m_operationCompleted.emit(ngrt4n::OperationFailed, m_dbSession->lastError());
-      CORE_LOG("info", m_dbSession->lastError());
-      return ;
-    }
+
+    return std::make_pair(0, "");
   }
 
-  m_currentFilePath = destPath;
+  int rc = m_dbSession->updateViewWithPath(vinfo, destPath.toStdString());
 
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
+  if (rc != 0) {
+    CORE_LOG("error", m_dbSession->lastError());
+    return std::make_pair(rc, m_dbSession->lastError().c_str());
+  }
+
+  return std::make_pair(0, "");
 }
 
 
@@ -463,18 +479,19 @@ void WebEditor::handleImportNativeConfigButton(void)
 
 void WebEditor::importNativeConfig(const SourceT& sinfo, const QString& hostgroup)
 {
-  QString errorMsg;
   CoreDataT cdata;
-  int rc = ngrt4n::importHostGroupAsBusinessView(sinfo, hostgroup, cdata, errorMsg);
-  if (rc != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
+  auto importStatus = ngrt4n::importHostGroupAsBusinessView(sinfo, hostgroup, cdata);
+  if (importStatus.first != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, importStatus.second.toStdString());
     return  ;
   }
 
   QString destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
-  rc = ngrt4n::saveDataAsDescriptionFile(destPath, cdata, errorMsg);
-  if (rc != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, errorMsg.toStdString());
+
+  auto saveStatus = saveContentToFile(cdata, destPath);
+
+  if (saveStatus.first != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
     return ;
   }
 

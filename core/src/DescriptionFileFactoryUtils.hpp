@@ -28,9 +28,9 @@
 #include "Base.hpp"
 
 namespace ngrt4n {
-  int importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg);
-  int importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks, QString& errorMsg);
-  int saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata, QString& errorMsg);
+  std::pair<int, QString> importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata);
+  std::pair<int, QString> importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks);
+  std::pair<int, QString> saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata);
   QString generateNodeXml(const NodeT & node);
 }
 

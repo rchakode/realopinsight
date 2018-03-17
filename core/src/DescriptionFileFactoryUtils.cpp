@@ -32,12 +32,12 @@
 #include "ThresholdHelper.hpp"
 
 
-int ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata, QString& errorMsg)
+std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata)
 {
   ChecksT checks;
-  if (importMonitorItemAsDataPoints(srcInfo, filter, checks, errorMsg) != 0) {
-    errorMsg = MonitorT::toString(srcInfo.mon_type).append(": ").append(errorMsg);
-    return -1;
+  auto importResult = importMonitorItemAsDataPoints(srcInfo, filter, checks);
+  if (importResult.first != 0) {
+    return std::make_pair(-1, MonitorT::toString(srcInfo.mon_type).append(": ").append(importResult.second));
   }
 
   // handle results
@@ -85,46 +85,60 @@ int ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString&
     cdata.bpnodes.insert(ngrt4n::ROOT_ID, root);
   }
 
-  return 0;
+  return std::make_pair(-1, "");
 }
 
 
-int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks, QString& errorMsg)
+std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
 {
   int retcode = -1;
+
+  // Nagios
   if (srcInfo.mon_type == MonitorT::Nagios) {
-    /* Nagios monitor ::  only Livestatus is now officially supported */
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
     if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
       retcode = 0;
     }
-    errorMsg = handler.lastError();
-  } else if (srcInfo.mon_type == MonitorT::Zabbix) {
-    /* Zabbix monitor */
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+  // Zabbix
+  if (srcInfo.mon_type == MonitorT::Zabbix) {
     ZbxHelper handler;
     retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     }
-    errorMsg = handler.lastError();
 
-  } else if (srcInfo.mon_type == MonitorT::Zenoss) {
-    /* Zenoss monitor */
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  // Zenoss
+  if (srcInfo.mon_type == MonitorT::Zenoss) {
     ZnsHelper handler(srcInfo.mon_url);
     retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     }
-    errorMsg = handler.lastError();
 
-  } else if (srcInfo.mon_type == MonitorT::Pandora) {
-    /* Panadora FMS monitor */
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  // Pandora
+  if (srcInfo.mon_type == MonitorT::Pandora) {
     PandoraHelper handler(srcInfo.mon_url);
     retcode = handler.loadChecks(srcInfo, checks, filter);
-    errorMsg = handler.lastError();
 
-  } else if (srcInfo.mon_type == MonitorT::OpManager) {
-    /* OpManager monitor */
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  // OpManager
+  if (srcInfo.mon_type == MonitorT::OpManager) {
     OpManagerHelper handler(srcInfo.mon_url);
     if (filter.isEmpty()) {
       retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListAllDevices, filter, checks);
@@ -137,28 +151,26 @@ int ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString&
         }
       }
     }
-    errorMsg = handler.lastError();
-  } else {
-    errorMsg = QObject::tr("Unknown data source type");
+
+    return std::make_pair(retcode, handler.lastError());
   }
 
-  return retcode;
+
+  return std::make_pair(-1, QObject::tr("Unknown data source type"));
 }
 
 
-int ngrt4n::saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata, QString& errorMsg)
+std::pair<int, QString> ngrt4n::saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata)
 {
   QFile file(path);
   if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    errorMsg = QObject::tr("Cannot open file: %1").arg(path);
-    return -1;
+    return std::make_pair(-1, QObject::tr("Cannot open file: %1").arg(path));
   }
 
   NodeListT::ConstIterator rootNode = cdata.bpnodes.find(ngrt4n::ROOT_ID);
   if (rootNode == cdata.bpnodes.end()) {
     file.close();
-    errorMsg = QObject::tr("The hierarchy does not have root");
-    return -1;
+    return std::make_pair(-1, QObject::tr("The hierarchy does not have root"));
   }
 
   QTextStream outStream(&file);
@@ -181,7 +193,7 @@ int ngrt4n::saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdat
   outStream << "</ServiceView>\n";
 
   file.close();
-  return 0;
+  return std::make_pair(0, "");;
 }
 
 
