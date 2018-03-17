@@ -86,7 +86,7 @@ void WebTree::renewModel(void)
   m_model = new Wt::WStandardItemModel();
 
   m_model->appendRow(m_treeItems[ngrt4n::ROOT_ID]);
-  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Service Exporer"));
+  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Tree Explorer"));
 
   setModel(m_model);
   delete oldModel;

@@ -28,6 +28,7 @@
 #include "utilsCore.hpp"
 #include "DescriptionFileFactoryUtils.hpp"
 #include "Parser.hpp"
+#include "WebBaseSettings.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -86,8 +87,8 @@ void WebEditor::prepareTreeToEdition()
 
 void  WebEditor::handleOpenViewButton(void)
 {
-  m_openViewSelector.updateContentWithViewList(m_dbSession->viewList());
-  m_openViewSelector.show();
+  m_openViewDialog.updateContentWithViewList(m_dbSession->viewList());
+  m_openViewDialog.show();
 }
 
 
@@ -138,11 +139,11 @@ void WebEditor::bindFormWidgets(void)
 
   // new service button
   m_newServiceViewBtn.setToolTip(Q_TR("Create a new service view"));
-  m_newServiceViewBtn.clicked().connect(this, &WebEditor::handleNewView);
   m_newServiceViewBtn.setImageLink(Wt::WLink("images/built-in/new.png"));
   m_newServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("new-service-view", &m_newServiceViewBtn);
 
+  m_newServiceViewBtn.clicked().connect(this, &WebEditor::handleNewViewButton);
 
   // open service button
   m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
@@ -151,21 +152,24 @@ void WebEditor::bindFormWidgets(void)
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
 
   m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenViewButton);
-  m_openViewSelector.dataSelectionTriggered().connect(this, &WebEditor::handleOpenFile);
+  m_openViewDialog.dataSelectionTriggered().connect(this, &WebEditor::handleOpenFile);
 
   // save service button
   m_saveCurrentViewBtn.setToolTip(Q_TR("Save changes"));
-  m_saveCurrentViewBtn.clicked().connect(this, &WebEditor::handleSaveView);
   m_saveCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/save.png"));
   m_saveCurrentViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("save-current-view", &m_saveCurrentViewBtn);
 
+  m_saveCurrentViewBtn.clicked().connect(this, &WebEditor::handleSaveViewButton);
+
   // import native button
   m_importNativeConfigBtn.setToolTip(Q_TR("Import of native monitoring settings as service tree"));
-  m_importNativeConfigBtn.clicked().connect(this, &WebEditor::handleImportNativeConfigButton);
   m_importNativeConfigBtn.setImageLink(Wt::WLink("images/built-in/import.png"));
   m_importNativeConfigBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("import-native-config", &m_importNativeConfigBtn);
+
+  m_importNativeConfigBtn.clicked().connect(this, &WebEditor::handleImportNativeConfigButton);
+  m_importNativeConfigDialog.dataSelectionTriggered().connect(this, &WebEditor::importNativeConfig);
 
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);
@@ -212,7 +216,7 @@ void WebEditor::bindFormWidgets(void)
 
 
 
-void WebEditor::handleNewView(void)
+void WebEditor::handleNewViewButton(void)
 {
   m_cdata.clear();
 
@@ -384,7 +388,7 @@ void WebEditor::handleNodeLabelChanged(void)
 
 
 
-void WebEditor::handleSaveView(void)
+void WebEditor::handleSaveViewButton(void)
 {
   std::string destPath = "";
   if (m_currentFilePath.empty()) {
@@ -484,16 +488,32 @@ void WebEditor::setParentChildDependency(const QString& childId, const QString& 
 
 void WebEditor::handleImportNativeConfigButton(void)
 {
-  m_importNativeConfigSelector.updateContentWithSourceList(SourceListT());
-  m_importNativeConfigSelector.show();
+  WebBaseSettings settings;
+  auto sources = settings.fetchSourceList(MonitorT::Auto);
+
+  m_importNativeConfigDialog.updateContentWithSourceList(sources.keys());
+  m_importNativeConfigDialog.show();
 }
 
 
 
-void WebEditor::importNativeConfig(const SourceT& sinfo, const QString& hostgroup)
+void WebEditor::importNativeConfig(const std::string& srcId, const std::string& groupFilter)
 {
+  WebBaseSettings settings;
+
+  auto q_srcId = QString::fromStdString(srcId);
+
+  auto sources = settings.fetchSourceList(MonitorT::Auto);
+
+  auto src = sources.constFind(q_srcId);
+
+  if (src == sources.cend()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No source with id: %1").arg(q_srcId).toStdString());
+    return ;
+  }
+
   CoreDataT cdata;
-  auto importStatus = ngrt4n::importHostGroupAsBusinessView(sinfo, hostgroup, cdata);
+  auto importStatus = ngrt4n::importHostGroupAsBusinessView(*src, groupFilter.c_str(), cdata);
   if (importStatus.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importStatus.second.toStdString());
     return  ;
@@ -508,6 +528,6 @@ void WebEditor::importNativeConfig(const SourceT& sinfo, const QString& hostgrou
     return ;
   }
 
-  //TODO saveViewInfoIntoDatabase(cdata, path);
 
+  handleOpenFile(destPath.toStdString(), "");
 }

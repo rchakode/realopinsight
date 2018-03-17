@@ -93,8 +93,8 @@ private:
   Wt::WImage m_saveCurrentViewBtn;
   Wt::WImage m_importNativeConfigBtn;
 
-  InputSelector m_openViewSelector;
-  InputSelector m_importNativeConfigSelector;
+  InputSelector m_openViewDialog;
+  InputSelector m_importNativeConfigDialog;
 
   Wt::WPopupMenu m_editionContextMenu;
   Wt::WMenuItem* m_menuAddSubService;
@@ -125,14 +125,15 @@ private:
   void handleKeyPressed(const Wt::WKeyEvent& event);
   void handleTreeItemSelectionChanged(void);
   void handleNodeLabelChanged(void);
-  void handleNewView(void);
-  void handleSaveView(void);
+  void handleNewViewButton(void);
+  void handleSaveViewButton(void);
   void handleOpenViewButton(void);
   void handleOpenFile(const std::string& path, const std::string& option);
   void handleImportNativeConfigButton(void);
 
+
+  void importNativeConfig(const std::string& srcId, const std::string& groupFilter);
   std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);
-  void importNativeConfig(const SourceT& sinfo, const QString& hostgroup);
 };
 
 

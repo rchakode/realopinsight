@@ -31,7 +31,7 @@ void ListSelector::updateContentWithViewList(const DbViewsT& vlist)
   setCurrentIndex(0);
 }
 
-void ListSelector::updateContentWithSourceList(const SourceListT& vlist)
+void ListSelector::updateContentWithSourceList(const QList<QString>& sids)
 {
   m_selectedItemData.clear();
   Wt::WStandardItemModel* dataModel = static_cast<Wt::WStandardItemModel*>(Wt::WComboBox::model());
@@ -41,10 +41,10 @@ void ListSelector::updateContentWithSourceList(const SourceListT& vlist)
   item->setText(Q_TR("-- Please select an item --"));
   dataModel->appendRow(item);
 
-  for(const auto& source: vlist) {
+  for(const auto& id: sids) {
     item = new Wt::WStandardItem();
-    item->setText(source.id.toStdString());
-    item->setData(source.id.toStdString(), Wt::UserRole);
+    item->setText(id.toStdString());
+    item->setData(id.toStdString(), Wt::UserRole);
     dataModel->appendRow(item);
   }
 
@@ -100,9 +100,9 @@ void InputSelector::updateContentWithViewList(const DbViewsT& vlist)
 }
 
 
-void InputSelector::updateContentWithSourceList(const SourceListT& slist)
+void InputSelector::updateContentWithSourceList(const QList<QString>& sids)
 {
-  m_listSelector.updateContentWithSourceList(slist);
+  m_listSelector.updateContentWithSourceList(sids);
   m_optionField.setHidden(false);
   m_optionField.setPlaceholderText(Q_TR("Set hostgroup to filter on (optional)"));
 }

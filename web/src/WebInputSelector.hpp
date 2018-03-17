@@ -14,7 +14,7 @@ public:
   ListSelector(void);
   std::string selectedItemData (void) const {return m_selectedItemData;}
   void updateContentWithViewList(const DbViewsT& vlist);
-  void updateContentWithSourceList(const SourceListT& slist);
+  void updateContentWithSourceList(const QList<QString>& sids);
 
 private:
   std::string m_selectedItemData;
@@ -30,7 +30,7 @@ public:
   ~InputSelector();
   Wt::Signal<std::string, std::string>& dataSelectionTriggered(void) {return m_dataSelectionTriggered;}
   void updateContentWithViewList(const DbViewsT& vlist);
-  void updateContentWithSourceList(const SourceListT& slist);
+  void updateContentWithSourceList(const QList<QString>& slist);
 
 private:
   Wt::Signal<std::string, std::string> m_dataSelectionTriggered;
