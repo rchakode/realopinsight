@@ -452,7 +452,7 @@ void WebMainUI::handleLaunchEditor(void)
 
 
 
-void WebMainUI::handlePreviewFile(const std::string& path)
+void WebMainUI::handlePreviewFile(const std::string& path, const std::string& option)
 {
   WebDashboard* dashbord = loadView(path); // FIXME expect viewpath not name
   if (dashbord) {
@@ -1035,7 +1035,7 @@ void WebMainUI::configureDialogWidget(void)
   m_previewSelectorDialog.titleBar()->setStyleClass("titlebar");
 
   // bind dialog events
-  m_previewSelectorDialog.itemSelected().connect(this, &WebMainUI::handlePreviewFile);
+  m_previewSelectorDialog.dataSelectionTriggered().connect(this, &WebMainUI::handlePreviewFile);
 }
 
 

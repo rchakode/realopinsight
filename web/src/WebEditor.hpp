@@ -114,6 +114,7 @@ private:
   void showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent);
   void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
   void fillInEditorFromCurrentSelection(void);
+  void fillInEditorFromNodeInfo(const NodeT& ninfo);
   void updateNodeDataFromEditor(const QString& nodeId);
 
   void fixChildParentDependencies(void);
@@ -127,7 +128,7 @@ private:
   void handleNewView(void);
   void handleSaveView(void);
   void handleOpenViewButton(void);
-  void handleOpenFile(const std::string& path);
+  void handleOpenFile(const std::string& path, const std::string& option);
   void handleImportNativeConfigButton(void);
 
   std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);

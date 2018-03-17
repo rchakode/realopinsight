@@ -91,13 +91,13 @@ void  WebEditor::handleOpenViewButton(void)
 }
 
 
-void  WebEditor::handleOpenFile(const std::string& path)
+void  WebEditor::handleOpenFile(const std::string& path, const std::string& option)
 {
   Parser parser(path.c_str(), &m_cdata, Parser::ParsingModeEditor, ngrt4n::DotLayout);
 
-  bool success = parser.process();
+  int rc = parser.process();
 
-  if (! success) {
+  if (rc != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, parser.lastErrorMsg().toStdString());
     return ;
   }
@@ -146,11 +146,12 @@ void WebEditor::bindFormWidgets(void)
 
   // open service button
   m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
-  m_openViewSelector.itemSelected().connect(this, &WebEditor::handleOpenFile);
-  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenViewButton);
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
+
+  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenViewButton);
+  m_openViewSelector.dataSelectionTriggered().connect(this, &WebEditor::handleOpenFile);
 
   // save service button
   m_saveCurrentViewBtn.setToolTip(Q_TR("Save changes"));
@@ -235,7 +236,13 @@ void WebEditor::handleNewView(void)
 void WebEditor::refreshContent(void)
 {
   m_tree.build();
-  m_tree.selectRootNode();
+
+  auto rnode = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
+
+  if (rnode != m_cdata.bpnodes.end()) {
+    fillInEditorFromNodeInfo(*rnode);
+    m_tree.selectRootNode();
+  }
 }
 
 
@@ -328,18 +335,24 @@ void WebEditor::fillInEditorFromCurrentSelection(void)
     return;
   }
 
+  fillInEditorFromNodeInfo(*node_cit);
+
   m_formerSelectedNodeId = nodeId;
-  m_nameField.setText(node_cit->name.toStdString());
-  m_descField.setText(node_cit->description.toStdString());
-  m_typeField.setCurrentIndex(node_cit->type);
-  m_iconBox.setCurrentIndex(m_iconIndexMap[node_cit->icon]);
-  m_calcRuleBox.setCurrentIndex(node_cit->sev_crule);
-  m_propRuleBox.setCurrentIndex(node_cit->sev_prule);
+}
 
-  if (node_cit->type == NodeType::ITService) {
-    m_dataPointField.setText(node_cit->child_nodes.toStdString());
+
+void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
+{
+  m_nameField.setText(ninfo.name.toStdString());
+  m_descField.setText(ninfo.description.toStdString());
+  m_typeField.setCurrentIndex(ninfo.type);
+  m_iconBox.setCurrentIndex(m_iconIndexMap[ninfo.icon]);
+  m_calcRuleBox.setCurrentIndex(ninfo.sev_crule);
+  m_propRuleBox.setCurrentIndex(ninfo.sev_prule);
+
+  if (ninfo.type == NodeType::ITService) {
+    m_dataPointField.setText(ninfo.child_nodes.toStdString());
   }
-
 }
 
 

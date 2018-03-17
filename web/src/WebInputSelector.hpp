@@ -28,17 +28,17 @@ class InputSelector: public Wt::WDialog
 public:
   InputSelector();
   ~InputSelector();
-  Wt::Signal<std::string>& itemSelected(void) {return m_itemSelected;}
+  Wt::Signal<std::string, std::string>& dataSelectionTriggered(void) {return m_dataSelectionTriggered;}
   void updateContentWithViewList(const DbViewsT& vlist);
   void updateContentWithSourceList(const SourceListT& slist);
 
 private:
-  Wt::Signal<std::string> m_itemSelected;
+  Wt::Signal<std::string, std::string> m_dataSelectionTriggered;
 
   Wt::WContainerWidget m_container;
   Wt::WVBoxLayout* m_mainLayout;
   ListSelector m_listSelector;
-  Wt::WLineEdit m_filterField;
+  Wt::WLineEdit m_optionField;
   Wt::WPushButton m_okBtn;
 
   void handleAccept(void);

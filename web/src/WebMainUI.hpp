@@ -191,7 +191,7 @@ private:
   void handleDisplayOnlyTroubleStateChanged(void);
   void handleImportDescriptionFile(void);
   void handleLaunchEditor(void);
-  void handlePreviewFile(const std::string& path);
+  void handlePreviewFile(const std::string& path, const std::string& option);
   void handleDataSourceSettings(void);
   void handleAuthSettings(void);
   void handleNotificationSettings(void);

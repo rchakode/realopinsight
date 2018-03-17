@@ -56,7 +56,7 @@ void ListSelector::handleSelectionChanged(void)
 {
   int index = currentIndex();
   Wt::WStandardItemModel* dataModel = static_cast<Wt::WStandardItemModel*>(this->model());
-  if (index>0) {
+  if (index > 0) {
     m_selectedItemData = boost::any_cast<std::string>(dataModel->item(index, 0)->data());
   }
 }
@@ -78,7 +78,7 @@ InputSelector::InputSelector():
   m_container.setLayout(m_mainLayout);
 
   m_mainLayout->addWidget(&m_listSelector);
-  m_mainLayout->addWidget(&m_filterField);
+  m_mainLayout->addWidget(&m_optionField);
   m_mainLayout->addWidget(&m_okBtn);
 }
 
@@ -87,7 +87,7 @@ InputSelector::InputSelector():
 InputSelector::~InputSelector()
 {
   m_mainLayout->removeWidget(&m_okBtn);
-  m_mainLayout->removeWidget(&m_filterField);
+  m_mainLayout->removeWidget(&m_optionField);
   m_mainLayout->removeWidget(&m_listSelector);
   m_container.clear();
   Wt::WDialog::contents()->removeWidget(&m_container);
@@ -96,20 +96,20 @@ InputSelector::~InputSelector()
 void InputSelector::updateContentWithViewList(const DbViewsT& vlist)
 {
   m_listSelector.updateContentWithViewList(vlist);
-  m_filterField.setHidden(true);
+  m_optionField.setHidden(true);
 }
 
 
 void InputSelector::updateContentWithSourceList(const SourceListT& slist)
 {
   m_listSelector.updateContentWithSourceList(slist);
-  m_filterField.setHidden(false);
-  m_filterField.setPlaceholderText(Q_TR("Set hostgroup to filter on (optional)"));
+  m_optionField.setHidden(false);
+  m_optionField.setPlaceholderText(Q_TR("Set hostgroup to filter on (optional)"));
 }
 
 
 void InputSelector::handleAccept(void)
 {
   Wt::WDialog::accept();
-  m_itemSelected.emit(m_listSelector.selectedItemData());
+  m_dataSelectionTriggered.emit(m_listSelector.selectedItemData(), m_optionField.text().toUTF8());
 }

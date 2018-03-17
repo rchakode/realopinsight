@@ -1,5 +1,5 @@
 /*
- * WebServiceTree.hpp
+ * WebTree.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update : 23-03-2014                                                 #
@@ -22,17 +22,17 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBSERVICETREE_HPP
-#define WEBSERVICETREE_HPP
+#ifndef WEBTREE_HPP
+#define WEBTREE_HPP
 
 
+#include "Base.hpp"
+#include "utilsCore.hpp"
 #include <Wt/WTreeView>
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 #include <Wt/WModelIndex>
 #include <Wt/WPopupMenu>
-#include "Base.hpp"
-#include "utilsCore.hpp"
 
 class WebTree : public Wt::WTreeView
 {
@@ -61,4 +61,4 @@ class WebTree : public Wt::WTreeView
     void bindChildToParent(const QString& childId, const QString& parentId);
 };
 
-#endif /* WEBSERVICETREE_HPP */
+#endif /* WEBTREE_HPP */
