@@ -203,12 +203,12 @@ int Parser::computeCoordinates(void)
 
   int exitCode = -2;
   switch (m_graphLayout) {
-    case ngrt4n::NeatoLayout:
-      exitCode = process.execute("neato", arguments);
-      break;
-    case ngrt4n::DotLayout: //use dot as default
-    default:
+    case ngrt4n::DotLayout:
       exitCode = process.execute("dot", arguments);
+      break;
+    case ngrt4n::NeatoLayout: //use dot as default
+    default:
+      exitCode = process.execute("neato", arguments);
       break;
   }
 

@@ -376,7 +376,7 @@ class ScaleFactors {
       const double GREAT_SCALE_FACTOR = 100;
       switch (graphLayout) {
         case ngrt4n::NeatoLayout:
-          m_factors = {2 * LESS_SCALE_FACTOR, LESS_SCALE_FACTOR};
+          m_factors = {3 * LESS_SCALE_FACTOR, 2 * LESS_SCALE_FACTOR};
           break;
         case ngrt4n::DotLayout:
         default:
