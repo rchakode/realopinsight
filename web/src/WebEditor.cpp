@@ -417,8 +417,9 @@ void WebEditor::handleSaveViewButton(void)
 std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, const QString& destPath)
 {
 
-  NodeListIteratorT rootService = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
-  if (rootService == m_cdata.bpnodes.end()) {
+  auto rootService = cdata.bpnodes.constFind(ngrt4n::ROOT_ID);
+
+  if (rootService == cdata.bpnodes.cend()) {
     return std::make_pair(-1, QObject::tr("Invalid or incompleted view"));
   }
 
@@ -514,12 +515,16 @@ void WebEditor::importNativeConfig(const std::string& srcId, const std::string& 
 
   CoreDataT cdata;
   auto importStatus = ngrt4n::importHostGroupAsBusinessView(*src, groupFilter.c_str(), cdata);
+
   if (importStatus.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importStatus.second.toStdString());
     return  ;
   }
 
   QString destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
+
+  for (auto n: cdata.bpnodes)
+  qDebug() << "cdata.bpnodes.size()" << n.id << n.name;
 
   auto saveStatus = saveContentToFile(cdata, destPath);
 

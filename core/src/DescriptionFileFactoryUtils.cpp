@@ -34,58 +34,62 @@
 
 std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata)
 {
+  const auto MONITOR_NAME = MonitorT::toString(srcInfo.mon_type);
+
   ChecksT checks;
   auto importResult = importMonitorItemAsDataPoints(srcInfo, filter, checks);
   if (importResult.first != 0) {
-    return std::make_pair(-1, MonitorT::toString(srcInfo.mon_type).append(": ").append(importResult.second));
+    return std::make_pair(-1, QObject::tr("%1: %2").arg(MONITOR_NAME, importResult.second));
   }
 
   // handle results
-  if (! checks.empty()) {
-    cdata.clear();
-    cdata.monitor = MonitorT::Auto;
-
-    NodeT root;
-    root.id = ngrt4n::ROOT_ID;
-    root.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MonitorT::toString(srcInfo.mon_type)) : filter;
-    root.type = NodeType::BusinessService;
-
-    NodeT hostNode;
-    NodeT triggerNode;
-    hostNode.type = NodeType::BusinessService;
-    triggerNode.type = NodeType::ITService;
-
-    for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-      hostNode.parent = root.id;
-      hostNode.name = hostNode.description = QString::fromStdString(check->host);
-      hostNode.id = "";
-      Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
-      QString checkId = QString::fromStdString(check->id);
-      triggerNode.id = ngrt4n::generateId();
-      triggerNode.parent = hostNode.id;
-      triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
-      triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
-
-      NodeListIteratorT hostIterPos =  cdata.bpnodes.find(hostNode.id);
-      if (hostIterPos != cdata.bpnodes.end()) {
-        hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
-      } else {
-        hostNode.child_nodes = triggerNode.id;
-        if (root.child_nodes.isEmpty()) {
-          root.child_nodes = hostNode.id;
-        } else {
-          root.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
-        }
-        cdata.bpnodes.insert(hostNode.id, hostNode);
-      }
-      cdata.cnodes.insert(triggerNode.id, triggerNode);
-    }
-
-    // finally insert the root node and update UI widgets
-    cdata.bpnodes.insert(ngrt4n::ROOT_ID, root);
+  if (checks.empty()) {
+    return std::make_pair(-1, QObject::tr("Import from %1 (filter: %2): no item found").arg(MONITOR_NAME, filter));
   }
 
-  return std::make_pair(-1, "");
+  cdata.clear();
+  cdata.monitor = MonitorT::Auto;
+
+  NodeT rootService;
+  rootService.id = ngrt4n::ROOT_ID;
+  rootService.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MONITOR_NAME) : filter;
+  rootService.type = NodeType::BusinessService;
+
+  NodeT hostNode;
+  NodeT triggerNode;
+  hostNode.type = NodeType::BusinessService;
+  triggerNode.type = NodeType::ITService;
+
+  for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
+    hostNode.parent = rootService.id;
+    hostNode.name = hostNode.description = QString::fromStdString(check->host);
+    hostNode.id = "";
+    Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
+    QString checkId = QString::fromStdString(check->id);
+    triggerNode.id = ngrt4n::generateId();
+    triggerNode.parent = hostNode.id;
+    triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+    triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
+
+    NodeListIteratorT hostIterPos =  cdata.bpnodes.find(hostNode.id);
+    if (hostIterPos != cdata.bpnodes.end()) {
+      hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+    } else {
+      hostNode.child_nodes = triggerNode.id;
+      if (rootService.child_nodes.isEmpty()) {
+        rootService.child_nodes = hostNode.id;
+      } else {
+        rootService.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
+      }
+      cdata.bpnodes.insert(hostNode.id, hostNode);
+    }
+    cdata.cnodes.insert(triggerNode.id, triggerNode);
+  }
+
+  // finally insert the root node and update UI widgets
+  cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
+
+  return std::make_pair(0, "");
 }
 
 
