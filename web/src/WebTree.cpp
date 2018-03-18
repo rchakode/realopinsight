@@ -63,13 +63,14 @@ void WebTree::activateEditionFeatures(void)
 void WebTree::build(void)
 {
   bool bindToParent = false;
+  bool selectItemAfterProcessing = false;
 
   for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();  node != end; ++node) {
-    WebTree::addTreeEntry(*node, bindToParent);
+    WebTree::newTreeItem(*node, bindToParent, selectItemAfterProcessing);
   }
 
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();  node != end; ++node) {
-    WebTree::addTreeEntry(*node, bindToParent);
+    WebTree::newTreeItem(*node, bindToParent, selectItemAfterProcessing);
   }
 
   for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
@@ -97,9 +98,9 @@ void WebTree::renewModel(void)
 
 void WebTree::expandRootNode(void)
 {
-  auto root = m_treeItems[ngrt4n::ROOT_ID];
-  if (root) {
-    expand(root->index());
+  auto ritem = m_treeItems[ngrt4n::ROOT_ID];
+  if (ritem) {
+    expand(ritem->index());
   }
 }
 
@@ -112,7 +113,7 @@ void WebTree::selectRootNode(void)
   }
 }
 
-Wt::WStandardItem* WebTree::addTreeEntry(const NodeT& _node, bool _bindToParent)
+void WebTree::newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing)
 {
   auto item = new Wt::WStandardItem();
 
@@ -126,7 +127,9 @@ Wt::WStandardItem* WebTree::addTreeEntry(const NodeT& _node, bool _bindToParent)
     bindChildToParent(_node.id, _node.parent);
   }
 
-  return item;
+  if (_selectItemAfterProcessing) {
+    select(item->index());
+  }
 }
 
 
@@ -140,7 +143,7 @@ void WebTree::bindChildToParent(const QString& childId, const QString& parentId)
 {
   auto parentItem = findTreeItem(parentId);
   auto childItem = findTreeItem(childId);
-  if (parentItem && childItem) {
+  if (parentItem != NULL && childItem != NULL) {
     parentItem->appendRow(childItem);
   }
 }

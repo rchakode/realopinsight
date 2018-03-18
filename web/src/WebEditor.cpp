@@ -324,8 +324,8 @@ void WebEditor::addNewSubService(const Wt::WModelIndex& currentTreeItemIndex)
   }
 
   bool bindToParent = true;
-  Wt::WStandardItem* subSrvItem = m_tree.addTreeEntry(childSrv, bindToParent);
-  m_tree.select(subSrvItem->index());
+  bool selectItemAfterProcessing = true;
+  m_tree.newTreeItem(childSrv, bindToParent, selectItemAfterProcessing);
 }
 
 

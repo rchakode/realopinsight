@@ -44,7 +44,7 @@ class WebTree : public Wt::WTreeView
     void build(void);
     void renewModel(void);
     void activateEditionFeatures(void);
-    Wt::WStandardItem* addTreeEntry(const NodeT& _node, bool _bindToParent);
+    void newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing);
     QString getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
     void expandRootNode(void);
     void selectRootNode(void);
@@ -55,6 +55,7 @@ class WebTree : public Wt::WTreeView
     Wt::WStandardItemModel* m_model;
     CoreDataT* m_cdata;
     WebTreeItemsT m_treeItems;
+    Wt::WModelIndex m_lastItemIndex;
 
     void activateDashboardFeatures(void);
     Wt::WStandardItem* findTreeItem(const QString& _nodeId);
