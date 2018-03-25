@@ -62,10 +62,12 @@ void WebTree::activateEditionFeatures(void)
 
 void WebTree::build(void)
 {
+  m_treeItems.clear();
+
   bool bindToParent = false;
   bool selectItemAfterProcessing = false;
 
-  for(NodeListT::ConstIterator node  = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();  node != end; ++node) {
+  for(NodeListT::ConstIterator node = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();  node != end; ++node) {
     WebTree::newTreeItem(*node, bindToParent, selectItemAfterProcessing);
   }
 
@@ -73,7 +75,7 @@ void WebTree::build(void)
     WebTree::newTreeItem(*node, bindToParent, selectItemAfterProcessing);
   }
 
-  for (StringListT::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
+  for (QMultiMap<QString, QString>::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
     bindChildToParent(edge.value(), edge.key());
   }
 
@@ -84,32 +86,32 @@ void WebTree::build(void)
 void WebTree::renewModel(void)
 {
   Wt::WStandardItemModel* oldModel = m_model;
+
   m_model = new Wt::WStandardItemModel();
 
   m_model->appendRow(m_treeItems[ngrt4n::ROOT_ID]);
+
   m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Tree Explorer"));
 
   setModel(m_model);
   delete oldModel;
-
-  expandRootNode();
 }
 
 
-void WebTree::expandRootNode(void)
+
+void WebTree::expandNodeById(const QString& nodeId)
 {
-  auto ritem = m_treeItems[ngrt4n::ROOT_ID];
-  if (ritem) {
-    expand(ritem->index());
+  auto item = m_treeItems[nodeId];
+  if (item) {
+    expand(item->index());
   }
 }
 
-
-void WebTree::selectRootNode(void)
+void WebTree::selectNodeById(const QString& nodeId)
 {
-  auto root = m_treeItems[ngrt4n::ROOT_ID];
-  if (root) {
-    select(root->index());
+  auto item = m_treeItems[nodeId];
+  if (item) {
+    select(item->index());
   }
 }
 
@@ -120,8 +122,9 @@ void WebTree::newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectIt
   item->setText(Wt::WString(_node.name.toStdString()));
   item->setIcon("images/built-in/unknown.png");
   item->setData(_node.id, Wt::UserRole);
+  //FIXME item->setFlags(item->flags() | Wt::ItemFlag::ItemIsDragEnabled | Wt::ItemFlag::ItemIsDropEnabled) ;
 
-  m_treeItems.insertMulti(_node.id, item);
+  m_treeItems.insert(_node.id, item);
 
   if (_bindToParent) {
     bindChildToParent(_node.id, _node.parent);
@@ -133,31 +136,54 @@ void WebTree::newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectIt
 }
 
 
-Wt::WStandardItem* WebTree::findTreeItem(const QString& _nodeId)
+void WebTree::dropParentChildDependency(const QString& parentId, const QString& childId)
+{
+  auto parentItem = findItemByNodeId(parentId);
+  auto childItem = findItemByNodeId(childId);
+
+  if (! parentItem || ! childItem) {
+    return ;
+  }
+
+  select(parentItem->index());
+
+  childItem->takeColumn(0);
+
+//  childItem->takeColumn(0);
+
+//  auto childIndex = childItem->index();
+
+//  parentItem->takeChild(childIndex.row(), childIndex.column());
+}
+
+
+Wt::WStandardItem* WebTree::findItemByNodeId(const QString& _nodeId)
 {
   auto item = m_treeItems.find(_nodeId);
   return (item != m_treeItems.end())? *item : NULL;
 }
 
+
 void WebTree::bindChildToParent(const QString& childId, const QString& parentId)
 {
-  auto parentItem = findTreeItem(parentId);
-  auto childItem = findTreeItem(childId);
+  auto parentItem = findItemByNodeId(parentId);
+  auto childItem = findItemByNodeId(childId);
   if (parentItem != NULL && childItem != NULL) {
     parentItem->appendRow(childItem);
   }
 }
 
+
 void WebTree::updateItemDecoration(const NodeT& _node, const QString& _tip)
 {
-  auto item = findTreeItem(_node.id);
+  auto item = findItemByNodeId(_node.id);
   if (item) {
     item->setIcon(ngrt4n::getIconPath(_node.sev).toStdString());
     item->setToolTip(Wt::WString::fromUTF8(_tip.toStdString()));
   }
 }
 
-QString WebTree::getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
+QString WebTree::findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 
   auto item = m_model->itemFromIndex(_index);
   if (! item) {
@@ -168,9 +194,9 @@ QString WebTree::getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 }
 
 
-void WebTree::updateItemLabel(const QString& _nodeId, const QString& label)
+void WebTree::updateItemLabel(const QString& nodeId, const QString& label)
 {
-  auto item = findTreeItem(_nodeId);
+  auto item = findItemByNodeId(nodeId);
   if (item) {
     item->setText(label.toStdString());
   }

@@ -75,7 +75,7 @@ private:
   WebTree m_tree;
 
   std::string m_currentFilePath;
-  Wt::WModelIndex m_currentTreeItemIndex;
+  Wt::WModelIndex m_selectedTreeItemIndex;
   QString m_formerSelectedNodeId;
 
   Wt::WHBoxLayout* m_mainLayout;
@@ -110,21 +110,27 @@ private:
   void bindFormWidgets(void);
 
 
-  void prepareTreeToEdition(void);
+  void configureTreeComponent(void);
+  void enableContextMenus(void);
   void showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent);
-  void addNewSubService(const Wt::WModelIndex& currentTreeItemIndex);
+  void addSubServiceFromTreeNodeIndex(const Wt::WModelIndex& index);
+  void removeServiceByTreeNodeIndex(const Wt::WModelIndex& index);
   void fillInEditorFromCurrentSelection(void);
   void fillInEditorFromNodeInfo(const NodeT& ninfo);
   void updateNodeDataFromEditor(const QString& nodeId);
 
-  void fixChildParentDependencies(void);
+  void fixParentChildrenDependencies(void);
   void setParentChildDependency(const QString& childId, const QString& parentId);
+  void removeNode(const NodeT& ninfo);
 
+  QList<NodeT> findDescendantNodes(const QString& nodeId);
+  void renewParentChildEdges(void);
 
   void handleTreeContextMenu(Wt::WMenuItem*);
   void handleKeyPressed(const Wt::WKeyEvent& event);
   void handleTreeItemSelectionChanged(void);
   void handleNodeLabelChanged(void);
+  void handleNodeTypeChanged(int type);
   void handleNewViewButton(void);
   void handleSaveViewButton(void);
   void handleOpenViewButton(void);

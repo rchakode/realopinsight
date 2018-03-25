@@ -327,7 +327,6 @@ typedef QHash<QString, NodeT> NodeListT;
 typedef NodeListT::Iterator NodeListIteratorT;
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, QStringList> HostListT;
-typedef QMultiMap<QString, QString> StringListT;
 
 struct CoreDataT {
     qint8 graph_mode;
@@ -340,7 +339,7 @@ struct CoreDataT {
     CheckStatusCountT check_status_count;
     HostListT hosts;
     QSet<QString> sources;
-    StringListT edges;
+    QMultiMap<QString, QString>  edges;
     double map_height;
     double map_width;
 
@@ -376,7 +375,7 @@ class ScaleFactors {
       const double GREAT_SCALE_FACTOR = 100;
       switch (graphLayout) {
         case ngrt4n::NeatoLayout:
-          m_factors = {3 * LESS_SCALE_FACTOR, 2 * LESS_SCALE_FACTOR};
+          m_factors = {2 * LESS_SCALE_FACTOR, 3 * LESS_SCALE_FACTOR};
           break;
         case ngrt4n::DotLayout:
         default:

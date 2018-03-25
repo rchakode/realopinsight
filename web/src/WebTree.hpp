@@ -45,20 +45,19 @@ class WebTree : public Wt::WTreeView
     void renewModel(void);
     void activateEditionFeatures(void);
     void newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing);
-    QString getNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
-    void expandRootNode(void);
-    void selectRootNode(void);
-    void updateItemLabel(const QString& _nodeId, const QString& label);
+    void dropParentChildDependency(const QString& parentId, const QString& childId);
+    QString findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
+    void expandNodeById(const QString& nodeId);
+    void selectNodeById(const QString& nodeId);
+    void updateItemLabel(const QString& nodeId, const QString& label);
 
   private:
-    typedef QMap<QString,  Wt::WStandardItem*> WebTreeItemsT;
     Wt::WStandardItemModel* m_model;
     CoreDataT* m_cdata;
-    WebTreeItemsT m_treeItems;
-    Wt::WModelIndex m_lastItemIndex;
+    QMap<QString,  Wt::WStandardItem*> m_treeItems;
 
     void activateDashboardFeatures(void);
-    Wt::WStandardItem* findTreeItem(const QString& _nodeId);
+    Wt::WStandardItem* findItemByNodeId(const QString& _nodeId);
     void bindChildToParent(const QString& childId, const QString& parentId);
 };
 

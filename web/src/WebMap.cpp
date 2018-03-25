@@ -257,7 +257,7 @@ void WebMap:: updateThumbnail(void)
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
 
   // Just draw edges for thumbnails
-  for (StringListT::Iterator edge = m_cdata->edges.begin(), end = m_cdata->edges.end(); edge != end; ++edge) {
+  for (QMultiMap<QString, QString>::Iterator edge = m_cdata->edges.begin(), end = m_cdata->edges.end(); edge != end; ++edge) {
     drawEdge(edge.key(), edge.value());
   }
 
