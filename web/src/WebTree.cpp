@@ -62,17 +62,20 @@ void WebTree::activateEditionFeatures(void)
 
 void WebTree::build(void)
 {
+  // just clear m_treeItems, because the containing pointer shall be deleted with the tree model
   m_treeItems.clear();
 
+
+  // now reconstruct the tree
   bool bindToParent = false;
   bool selectItemAfterProcessing = false;
 
   for(NodeListT::ConstIterator node = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();  node != end; ++node) {
-    WebTree::newTreeItem(*node, bindToParent, selectItemAfterProcessing);
+    WebTree::addTreeItem(*node, bindToParent, selectItemAfterProcessing);
   }
 
   for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();  node != end; ++node) {
-    WebTree::newTreeItem(*node, bindToParent, selectItemAfterProcessing);
+    WebTree::addTreeItem(*node, bindToParent, selectItemAfterProcessing);
   }
 
   for (QMultiMap<QString, QString>::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
@@ -115,7 +118,7 @@ void WebTree::selectNodeById(const QString& nodeId)
   }
 }
 
-void WebTree::newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing)
+void WebTree::addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing)
 {
   auto item = new Wt::WStandardItem();
 
@@ -135,26 +138,34 @@ void WebTree::newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectIt
   }
 }
 
+// TODO WebTree::dropParentChildDependency to be investigated: This approach of deleting an item raises segfault, even if it seems more efficient
+//
+//void WebTree::dropParentChildDependency(const QString& parentId, const QString& childId)
+//{
+//  auto parentItem = findItemByNodeId(parentId);
+//  auto childItem = findItemByNodeId(childId);
 
-void WebTree::dropParentChildDependency(const QString& parentId, const QString& childId)
-{
-  auto parentItem = findItemByNodeId(parentId);
-  auto childItem = findItemByNodeId(childId);
+//  if (! parentItem || ! childItem) {
+//    return ;
+//  }
 
-  if (! parentItem || ! childItem) {
-    return ;
-  }
+//  //select(parentItem->index());
 
-  select(parentItem->index());
+//  std::vector<Wt::WStandardItem *> items = parentItem->takeColumn(0);
+//  for (auto cur: items) {
 
-  childItem->takeColumn(0);
+//    if (! cur) continue;
 
-//  childItem->takeColumn(0);
+//    QString id = boost::any_cast<QString>(cur->data(Wt::UserRole));
+//    if (id != childId) {
+//      parentItem->appendRow(cur);
+//    } else {
+//      m_treeItems.remove(childId);
+//      delete cur;
+//    }
 
-//  auto childIndex = childItem->index();
-
-//  parentItem->takeChild(childIndex.row(), childIndex.column());
-}
+//  }
+//}
 
 
 Wt::WStandardItem* WebTree::findItemByNodeId(const QString& _nodeId)
@@ -194,10 +205,10 @@ QString WebTree::findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 }
 
 
-void WebTree::updateItemLabel(const QString& nodeId, const QString& label)
+void WebTree::updateItemLabel(const QString& nodeId, const std::string& label)
 {
   auto item = findItemByNodeId(nodeId);
   if (item) {
-    item->setText(label.toStdString());
+    item->setText(label);
   }
 }

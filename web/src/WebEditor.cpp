@@ -80,7 +80,7 @@ void WebEditor::enableContextMenus() {
 
 void WebEditor::configureTreeComponent()
 {
-  m_tree.setCoreData(&m_cdata);
+  m_tree.setCdata(&m_cdata);
   m_tree.activateEditionFeatures();
 
   m_tree.selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
@@ -301,7 +301,7 @@ void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
     case Wt::Key_C:
       addSubServiceFromTreeNodeIndex(m_selectedTreeItemIndex);
       break;
-    case Wt::Key_D:
+    case Wt::Key_X:
       removeServiceByTreeNodeIndex(m_selectedTreeItemIndex);
       break;
     default:
@@ -346,12 +346,8 @@ void WebEditor::addSubServiceFromTreeNodeIndex(const Wt::WModelIndex& index)
 
   bool bindToParent = true;
   bool selectItemAfterProcessing = true;
-  m_tree.newTreeItem(childSrv, bindToParent, selectItemAfterProcessing);
+  m_tree.addTreeItem(childSrv, bindToParent, selectItemAfterProcessing);
 }
-
-
-
-
 
 
 void WebEditor::removeServiceByTreeNodeIndex(const Wt::WModelIndex& index)
@@ -368,32 +364,43 @@ void WebEditor::removeServiceByTreeNodeIndex(const Wt::WModelIndex& index)
     return ;
   }
 
-  qDebug() << ninfoIt->name;
+  int depth = findNodeDepth(*ninfoIt);
+  auto parentId = ninfoIt->parent;
 
-  auto descendants = findDescendantNodes(nodeId);
+  m_formerSelectedNodeId.clear();
 
-  qDebug() << descendants.size();
-
-
-  //FIXME: m_tree.dropParentChildDependency(ninfoIt->parent, nodeIt->id);
-
-  for (const auto& node: descendants) {
-    removeNode(node);
+  // check it's the root node, and forbid the deletion
+  if (depth == 1 || parentId.isEmpty()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Operation not allowed on root node"));
+    return ;
   }
 
-  auto parentId = ninfoIt->parent;
-  removeNode(*ninfoIt);
+  // FIXME: This approach currently raises segfault, even if it seems more efficient
+  // m_tree.dropParentChildDependency(ninfoIt->parent, ninfoIt->id);
 
-  renewParentChildEdges();
+  // find all the descendant nodes
+  auto descendants = findDescendantNodes(nodeId);
 
+  // find descendants from m_cdata
+  for (const auto& node: descendants) {
+    removeNodeFromCdata(node);
+  }
+
+  // remove the node itself from m_cdata
+  removeNodeFromCdata(*ninfoIt);
+
+  // reconstruct m_cdata.edges
+  bindParentChildEdges();
+
+  // rebuild the tree
   m_tree.build();
-  m_tree.expandNodeById(parentId);
-  m_tree.selectNodeById(parentId);
+  m_tree.expandToDepth(depth > 1 ? depth -1 : 1);
+  //m_tree.selectNodeById(parentId);
 
 }
 
 
-void WebEditor::removeNode(const NodeT& ninfo)
+void WebEditor::removeNodeFromCdata(const NodeT& ninfo)
 {
   if (ninfo.type == NodeType::ITService) {
     m_cdata.cnodes.remove(ninfo.id);
@@ -426,8 +433,25 @@ QList<NodeT> WebEditor::findDescendantNodes(const QString& nodeId) {
   return descendants;
 }
 
+int WebEditor::findNodeDepth(const NodeT& ninfo)
+{
+  if (ninfo.id == ngrt4n::ROOT_ID) {
+    return 1;
+  }
 
-void WebEditor::renewParentChildEdges(void)
+  NodeListT::const_iterator parentNodeIt;
+
+  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, ninfo.parent, parentNodeIt);
+
+  if (! success) {
+    return -1;
+  }
+
+  return findNodeDepth(*parentNodeIt) + 1;
+}
+
+
+void WebEditor::bindParentChildEdges(void)
 {
   m_cdata.edges.clear();
   for (const auto& node:  m_cdata.bpnodes) {
@@ -488,13 +512,13 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
   node_it->sev_prule  = m_propRuleBox.currentIndex();
   node_it->child_nodes = QString::fromStdString(m_dataPointField.text().toUTF8());
 
-  m_tree.updateItemLabel(nodeId, node_it->name);
+  m_tree.updateItemLabel(nodeId, node_it->name.toStdString());
 }
 
 
 void WebEditor::handleNodeLabelChanged(void)
 {
-  m_tree.updateItemLabel(m_formerSelectedNodeId, m_nameField.text().toUTF8().c_str());
+  m_tree.updateItemLabel(m_formerSelectedNodeId, m_nameField.text().toUTF8());
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 }
 

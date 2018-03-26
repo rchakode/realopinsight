@@ -39,17 +39,17 @@ class WebTree : public Wt::WTreeView
   public:
     WebTree(void);
     virtual ~WebTree();
-    void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
+    void setCdata(CoreDataT* cdata) {m_cdata = cdata;}
     void updateItemDecoration(const NodeT& _node, const QString& _tip);
     void build(void);
     void renewModel(void);
     void activateEditionFeatures(void);
-    void newTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing);
-    void dropParentChildDependency(const QString& parentId, const QString& childId);
+    void addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing);
+    //void dropParentChildDependency(const QString& parentId, const QString& childId);
     QString findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
     void expandNodeById(const QString& nodeId);
     void selectNodeById(const QString& nodeId);
-    void updateItemLabel(const QString& nodeId, const QString& label);
+    void updateItemLabel(const QString& nodeId, const std::string& label);
 
   private:
     Wt::WStandardItemModel* m_model;

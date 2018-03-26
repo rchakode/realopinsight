@@ -121,10 +121,11 @@ private:
 
   void fixParentChildrenDependencies(void);
   void setParentChildDependency(const QString& childId, const QString& parentId);
-  void removeNode(const NodeT& ninfo);
+  void removeNodeFromCdata(const NodeT& ninfo);
 
   QList<NodeT> findDescendantNodes(const QString& nodeId);
-  void renewParentChildEdges(void);
+  int findNodeDepth(const NodeT& ninfo);
+  void bindParentChildEdges(void);
 
   void handleTreeContextMenu(Wt::WMenuItem*);
   void handleKeyPressed(const Wt::WKeyEvent& event);

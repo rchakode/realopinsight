@@ -48,7 +48,7 @@ namespace {
 WebDashboard::WebDashboard(const QString& descriptionFile)
   : DashboardBase(descriptionFile)
 {
-  m_tree.setCoreData(&m_cdata);
+  m_tree.setCdata(&m_cdata);
   m_map.setCoreData(&m_cdata);
   bindFormWidgets();
   addJsEventScript();
