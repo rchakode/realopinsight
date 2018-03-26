@@ -26,6 +26,7 @@
 #define BASESETTINGS_HPP_
 
 #include "SettingFactory.hpp"
+#include "utilsCore.hpp"
 #include "Base.hpp"
 
 
@@ -49,11 +50,11 @@ public:
   ~BaseSettings(void);
   QBitArray getSourceStates() const { return m_sourceStates; }
   bool isSetSource(int idx) {return (idx < MAX_SRCS)? m_sourceStates.at(idx) : false; }
-  void setSourceState(int index, int value) {m_sourceStates.setBit(index, value);}
+  void setSourceState(int index, int value) { m_sourceStates.setBit(index, value);}
   virtual void updateSourceStates();
   int activeSourcesCount(void);
   QMap<QString, SourceT> fetchSourceList(int type);
-  int getGraphLayout(void) const {return m_settingFactory->getGraphLayout();}
+  int getGraphLayout(void) const;
 
 Q_SIGNALS:
   void urlChanged(QString);
@@ -61,9 +62,9 @@ Q_SIGNALS:
   void errorOccurred(QString msg);
 
 public Q_SLOTS:
-  qint32 updateInterval(void) const {return m_settingFactory->updateInterval();}
-  bool loadSource(qint32 _id, SourceT& _src) {return m_settingFactory->loadSource(_id, _src);}
-  bool loadSource(const QString& _id, SourceT& _src) {return m_settingFactory->loadSource(_id, _src);}
+  qint32 updateInterval(void) const;
+  bool loadSource(qint32 _id, SourceT& _src);
+  bool loadSource(const QString& _id, SourceT& _src);
 
 protected :
   virtual void fillFromSource(int _index) = 0;
@@ -75,17 +76,17 @@ protected :
   QString sourceStatesSerialized(void);
   int currentSourceIndex(void) const {return m_currentSourceIndex;}
   void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
-  void sync(void) {m_settingFactory->sync();}
-  QString keyValue(const QString& key, const QString& defaultValue) {return m_settingFactory->value(key, defaultValue).toString(); }
-  void setKeyValue(const QString & _key, const QString & _value) { m_settingFactory->setKeyValue(_key, _value); m_settingFactory->sync();}
-  bool getSourceState(int index) {return m_sourceStates.at(index);}
+  void sync(void);
+  QString keyValue(const QString& key, const QString& defaultValue);
+  void setKeyValue(const QString & _key, const QString & _value);
+  bool getSourceState(int index);
 
 protected Q_SLOTS:
   virtual void applyChanges(void) = 0;
   virtual void handleCancel(void) = 0;
   virtual void addAsSource(void) = 0;
   virtual void deleteSource(void) = 0;
-  void emitTimerIntervalChanged(qint32 _interval) {m_settingFactory->emitTimerIntervalChanged(_interval);}
+  void emitTimerIntervalChanged(qint32 _interval);
 
 protected:
   SettingFactory* m_settingFactory;

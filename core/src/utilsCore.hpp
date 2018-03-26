@@ -81,25 +81,52 @@ namespace ngrt4n
   { return PKG_VERSION; }
 
   QString getAbsolutePath(const QString& _path);
+
   qint8 severityFromProbeStatus(const int& monitorType, const int& statusValue);
+
   QString getIconPath(int _severity);
+
   bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
+
   bool findNode(NodeListT& bpnodes, NodeListT& cnodes,const QString& nodeId, NodeListT::iterator& node);
+
   bool findNode(const NodeListT& bpnodes, const NodeListT& cnodes, const QString& nodeId, NodeListT::const_iterator& node);
+
   bool findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node);
+
   QString sourceData2Json(const SourceT& src);
+
   qint32 convertToSourceType(const QString& str);
+
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
+
   QStringList sourceTypes(void);
+
   QStringList sourceIndexes(void);
+
   StringPairT splitDataPointInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
+
   StringPairT splitSourceDataPointInfo(const QString& info); /* return <source, hostaddr> */
+
   QString getSourceIdFromStr(const QString& str);
+
   QPair<bool, int> checkSourceId(const QString& id);
+
   IconMapT nodeIcons();
+
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
+
   QStringList getAuthInfo(const QString& authString);
+
   QString basename(const QString& path);
+
+  std::pair<int, QString> importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata);
+
+  std::pair<int, QString> importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks);
+
+  std::pair<int, QString> saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata);
+
+  QString generateNodeXml(const NodeT & node);
 
 } //NAMESPACE
 

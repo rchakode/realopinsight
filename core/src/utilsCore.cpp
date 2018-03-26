@@ -23,6 +23,13 @@
  */
 
 #include "utilsCore.hpp"
+#include "ZbxHelper.hpp"
+#include "LsHelper.hpp"
+#include "ZnsHelper.hpp"
+#include "PandoraHelper.hpp"
+#include "OpManagerHelper.hpp"
+#include "ThresholdHelper.hpp"
+
 #include <QFileInfo>
 
 
@@ -388,3 +395,203 @@ QString ngrt4n::basename(const QString& path)
 
   return path.mid(lastSlash + 1, -1);
 }
+
+
+std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata)
+{
+  const auto MONITOR_NAME = MonitorT::toString(srcInfo.mon_type);
+
+  ChecksT checks;
+  auto importResult = importMonitorItemAsDataPoints(srcInfo, filter, checks);
+  if (importResult.first != 0) {
+    return std::make_pair(-1, QObject::tr("%1: %2").arg(MONITOR_NAME, importResult.second));
+  }
+
+  // handle results
+  if (checks.empty()) {
+    return std::make_pair(-1, QObject::tr("Import from %1 (filter: %2): no item found").arg(MONITOR_NAME, filter));
+  }
+
+  cdata.clear();
+  cdata.monitor = MonitorT::Auto;
+
+  NodeT rootService;
+  rootService.id = ngrt4n::ROOT_ID;
+  rootService.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MONITOR_NAME) : filter;
+  rootService.type = NodeType::BusinessService;
+
+  NodeT hostNode;
+  NodeT triggerNode;
+  hostNode.type = NodeType::BusinessService;
+  triggerNode.type = NodeType::ITService;
+
+  for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
+    hostNode.parent = rootService.id;
+    hostNode.name = hostNode.description = QString::fromStdString(check->host);
+    hostNode.id = "";
+    Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
+    QString checkId = QString::fromStdString(check->id);
+    triggerNode.id = ngrt4n::generateId();
+    triggerNode.parent = hostNode.id;
+    triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+    triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
+
+    NodeListIteratorT hostIterPos =  cdata.bpnodes.find(hostNode.id);
+    if (hostIterPos != cdata.bpnodes.end()) {
+      hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+    } else {
+      hostNode.child_nodes = triggerNode.id;
+      if (rootService.child_nodes.isEmpty()) {
+        rootService.child_nodes = hostNode.id;
+      } else {
+        rootService.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
+      }
+      cdata.bpnodes.insert(hostNode.id, hostNode);
+    }
+    cdata.cnodes.insert(triggerNode.id, triggerNode);
+  }
+
+  // finally insert the root node and update UI widgets
+  cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
+
+  return std::make_pair(0, "");
+}
+
+
+std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
+{
+  int retcode = -1;
+
+  // Nagios
+  if (srcInfo.mon_type == MonitorT::Nagios) {
+    LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
+    if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
+      retcode = 0;
+    }
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+  // Zabbix
+  if (srcInfo.mon_type == MonitorT::Zabbix) {
+    ZbxHelper handler;
+    retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+    if (checks.empty()) {
+      retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+    }
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  // Zenoss
+  if (srcInfo.mon_type == MonitorT::Zenoss) {
+    ZnsHelper handler(srcInfo.mon_url);
+    retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+    if (checks.empty()) {
+      retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+    }
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  // Pandora
+  if (srcInfo.mon_type == MonitorT::Pandora) {
+    PandoraHelper handler(srcInfo.mon_url);
+    retcode = handler.loadChecks(srcInfo, checks, filter);
+
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  // OpManager
+  if (srcInfo.mon_type == MonitorT::OpManager) {
+    OpManagerHelper handler(srcInfo.mon_url);
+    if (filter.isEmpty()) {
+      retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListAllDevices, filter, checks);
+    } else {
+      retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByName, filter, checks);
+      if (checks.empty()) {
+        retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByCategory, filter, checks);
+        if (checks.empty()) {
+          retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByType, filter, checks);
+        }
+      }
+    }
+
+    return std::make_pair(retcode, handler.lastError());
+  }
+
+
+  return std::make_pair(-1, QObject::tr("Unknown data source type"));
+}
+
+
+std::pair<int, QString> ngrt4n::saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata)
+{
+  QFile file(path);
+  if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
+    return std::make_pair(-1, QObject::tr("Cannot open file: %1").arg(path));
+  }
+
+  NodeListT::ConstIterator rootNode = cdata.bpnodes.find(ngrt4n::ROOT_ID);
+  if (rootNode == cdata.bpnodes.end()) {
+    file.close();
+    return std::make_pair(-1, QObject::tr("The hierarchy does not have root"));
+  }
+
+  QTextStream outStream(&file);
+  outStream << "<?xml version=\"1.0\"?>\n"
+            << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(cdata.monitor) )
+            << generateNodeXml(*rootNode);
+
+  Q_FOREACH(const NodeT& service, cdata.bpnodes) {
+    if (service.id != ngrt4n::ROOT_ID && ! service.parent.isEmpty()) {
+      outStream << generateNodeXml(service);
+    }
+  }
+
+  Q_FOREACH(const NodeT& service, cdata.cnodes) {
+    if (! service.parent.isEmpty()) {
+      outStream << generateNodeXml(service);
+    }
+  }
+
+  outStream << "</ServiceView>\n";
+
+  file.close();
+  return std::make_pair(0, "");;
+}
+
+
+QString ngrt4n::generateNodeXml(const NodeT& node)
+{
+  QString xml = QString("<Service id=\"%1\" "
+                        " type=\"%2\" "
+                        " statusCalcRule=\"%3\" "
+                        " statusPropRule=\"%4\" "
+                        " weight=\"%5\"> \n"
+                        ).arg(node.id,
+                              QString::number(node.type),
+                              QString::number(node.sev_crule),
+                              QString::number(node.sev_prule),
+                              QString::number(node.weight));
+
+  xml.append( QString(" <Name>%1</Name>\n").arg(node.name) )
+      .append( QString(" <Icon>%1</Icon>\n").arg(node.icon) )
+      .append( QString(" <Description>%1</Description>\n").arg(node.description) )
+      .append( QString(" <AlarmMsg>%1</AlarmMsg>\n").arg(node.alarm_msg) )
+      .append( QString(" <NotificationMsg>%1</NotificationMsg>\n").arg(node.notification_msg) )
+      .append( QString(" <SubServices>%1</SubServices>\n").arg(node.child_nodes) ) ;
+
+  if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
+    xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)) );
+  }
+
+  xml.append("</Service>\n");
+
+  return xml;
+}
+

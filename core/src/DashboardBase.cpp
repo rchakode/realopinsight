@@ -30,7 +30,6 @@
 #include "PandoraHelper.hpp"
 #include "OpManagerHelper.hpp"
 #include "StatusAggregator.hpp"
-#include "DescriptionFileFactoryUtils.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <sstream>

@@ -27,7 +27,6 @@
 #include "WebMainUI.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
-#include "DescriptionFileFactoryUtils.hpp"
 #include "WebInputSelector.hpp"
 #include <Wt/WApplication>
 #include <Wt/WToolBar>

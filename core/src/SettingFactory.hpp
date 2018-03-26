@@ -23,9 +23,10 @@
 
 #ifndef SETTINGSHANDLER_HPP
 #define SETTINGSHANDLER_HPP
+#include "Base.hpp"
+#include "utilsCore.hpp"
 #include <QString>
 #include <QSettings>
-#include "Base.hpp"
 #include <ctime>
 
 
@@ -33,29 +34,11 @@ class SettingFactory : public QSettings
 {
   Q_OBJECT
 public:
-  SettingFactory();
-  SettingFactory(const QString& path);
-  virtual ~SettingFactory(void);
-
-  void init(void);
-  void setKeyValue(const QString & _key, const QString & _value);
-  QString keyValue(const QString & _key) {return QSettings::value(_key).toString();}
-  qint32 updateInterval() const;
-  void setEntry(const QString& key, const QString& value);
-  QString entry(const QString& key) const {return QSettings::value(key).toString();}
-  bool loadSource(qint32 _idx, SourceT& _src);
-  bool loadSource(const QString& _id, SourceT& _src);
-  bool setSource(const QString& _info, SourceT& _src);
-  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
-  static QString language(void);
-  int getGraphLayout(void) const {return entry(SettingFactory::GLOBAL_GRAPH_LAYOUT).toInt();}
-
   static const QString GLOBAL_LANGUAGE_KEY;
   static const QString GLOBAL_SRC_BUCKET_KEY;
   static const QString GLOBAL_DB_STATE_KEY;
   static const QString GLOBAL_GRAPH_LAYOUT;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
-
 
   static const QString DB_TYPE;
   static const QString DB_SERVER_ADDR;
@@ -87,6 +70,37 @@ public:
   static const QString NOTIF_MAIL_SMTP_PASSWORD;
 
   static const QString DASHBOARD_THUMBNAILS_PER_ROW;
+
+  SettingFactory();
+
+  SettingFactory(const QString& path);
+
+  virtual ~SettingFactory(void);
+
+  void init(void);
+
+  void setKeyValue(const QString & _key, const QString & _value);
+
+  QString keyValue(const QString & _key) {return QSettings::value(_key).toString();}
+
+  qint32 updateInterval() const;
+
+  void setEntry(const QString& key, const QString& value);
+
+  QString entry(const QString& key) const {return QSettings::value(key).toString();}
+
+  bool loadSource(qint32 _idx, SourceT& _src);
+
+  bool loadSource(const QString& _id, SourceT& _src);
+
+  bool setSource(const QString& _info, SourceT& _src);
+
+  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
+
+  static QString language(void);
+
+  int getGraphLayout(void) const;
+
 
 Q_SIGNALS:
   void timerIntervalChanged(qint32);

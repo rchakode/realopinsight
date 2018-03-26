@@ -120,3 +120,50 @@ BaseSettings::fetchSourceList(int type)
 
   return sourceList;
 }
+
+int BaseSettings::getGraphLayout(void) const
+{
+  return m_settingFactory->getGraphLayout();
+}
+
+qint32 BaseSettings::updateInterval(void) const
+{
+  return m_settingFactory->updateInterval();
+}
+
+bool BaseSettings::loadSource(qint32 _id, SourceT& _src)
+{
+  return m_settingFactory->loadSource(_id, _src);
+}
+
+bool BaseSettings::loadSource(const QString& _id, SourceT& _src)
+{
+  return m_settingFactory->loadSource(_id, _src);
+}
+
+
+void BaseSettings::sync(void)
+{
+  m_settingFactory->sync();
+}
+
+QString BaseSettings::keyValue(const QString& key, const QString& defaultValue)
+{
+  return m_settingFactory->value(key, defaultValue).toString();
+}
+
+void BaseSettings::setKeyValue(const QString & _key, const QString & _value)
+{
+  m_settingFactory->setKeyValue(_key, _value); m_settingFactory->sync();
+}
+
+bool BaseSettings::getSourceState(int index)
+{
+  return m_sourceStates.at(index);
+}
+
+
+void BaseSettings::emitTimerIntervalChanged(qint32 _interval)
+{
+  m_settingFactory->emitTimerIntervalChanged(_interval);
+}

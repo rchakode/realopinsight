@@ -113,6 +113,12 @@ void SettingFactory::init(void)
   sync();
 }
 
+
+int SettingFactory::getGraphLayout(void) const
+{
+  return entry(SettingFactory::GLOBAL_GRAPH_LAYOUT).toInt();
+}
+
 void SettingFactory::setKeyValue(const QString & _key, const QString & _value)
 {
   setValue(_key, _value.trimmed()) ;

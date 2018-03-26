@@ -71,7 +71,6 @@ HEADERS += \
     core/src/RawSocket.hpp \
     core/src/ThresholdHelper.hpp \
     core/src/StatusAggregator.hpp \
-    core/src/DescriptionFileFactoryUtils.hpp \
     core/src/OpManagerHelper.hpp \
     core/src/BaseSettings.hpp \
     core/src/SettingFactory.hpp \
@@ -133,7 +132,6 @@ SOURCES +=  core/src/Base.cpp \
     core/src/RawSocket.cpp \
     core/src/ThresholdHelper.cpp \
     core/src/StatusAggregator.cpp \
-    core/src/DescriptionFileFactoryUtils.cpp \
     core/src/OpManagerHelper.cpp  \
     core/src/BaseSettings.cpp \
     core/src/SettingFactory.cpp \

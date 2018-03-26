@@ -26,7 +26,6 @@
 #include "WebEditor.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
-#include "DescriptionFileFactoryUtils.hpp"
 #include "Parser.hpp"
 #include "WebBaseSettings.hpp"
 #include <boost/lexical_cast.hpp>
