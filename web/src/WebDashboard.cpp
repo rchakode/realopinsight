@@ -74,6 +74,7 @@ void WebDashboard::initialize(BaseSettings* preferencePtr)
 void WebDashboard::buildTree(void)
 {
   m_tree.build();
+  m_tree.expandNodeById(ngrt4n::ROOT_ID);
 }
 
 
