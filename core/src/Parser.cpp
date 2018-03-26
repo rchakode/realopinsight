@@ -249,21 +249,27 @@ int Parser::computeCoordinates(void)
   double max_text_w = 0;
   double max_text_h = 0;
 
+  int x_index = 2;
+  int y_index = 3;
+//  if (m_graphLayout == ngrt4n::NeatoLayout) {
+//    x_index = 3;
+//    y_index = 2;
+//  }
+
   while (line = coodFileStream.readLine(0), ! line.isNull()) {
     splitedLine = line.split (regexSep);
     if (splitedLine[0] == "node") {
       NodeListT::Iterator node;
       QString nid = splitedLine[1].trimmed();
       if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
-        node->pos_x = splitedLine[2].trimmed().toDouble() * SCALE_FACTORS.x();
-        node->pos_y =  splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
+        node->pos_x = splitedLine[x_index].trimmed().toDouble() * SCALE_FACTORS.x();
+        node->pos_y =  splitedLine[y_index].trimmed().toDouble() * SCALE_FACTORS.y();
         node->text_w = splitedLine[4].trimmed().toDouble() * SCALE_FACTORS.x();
         node->text_h = splitedLine[5].trimmed().toDouble() * SCALE_FACTORS.y();
         m_cdata->min_x = qMin<double>(m_cdata->min_x, node->pos_x);
         m_cdata->min_y = qMin<double>(m_cdata->min_y, node->pos_y);
         max_text_w = qMax(max_text_w, node->text_w);
         max_text_h = qMax(max_text_h, node->text_h);
-        //node->pos_y = m_cdata->map_height - splitedLine[3].trimmed().toDouble() * ngrt4n::YSCAL_FACTOR;
       }
     } else if (splitedLine[0] == "edge") {
       // multiInsert because a node can have several childs
@@ -279,13 +285,12 @@ int Parser::computeCoordinates(void)
     m_cdata->min_x -= (max_text_w * 0.6);
     m_cdata->min_y -= (max_text_h * 0.6);
   }
+
   m_cdata->map_width += qAbs(m_cdata->min_x);
   m_cdata->map_height += qAbs(m_cdata->min_y);
 
   return 0;
 }
-
-
 
 
 void Parser::insertITServiceNode(NodeT& node)
