@@ -893,6 +893,9 @@ void WebMainUI::showMessage(int status, const std::string& msg)
     case ngrt4n::OperationFailed:
       showMessageClass(msg, "alert alert-warning");
       break;
+    case ngrt4n::OperationInProgress:
+      showMessageClass(msg, "alert alert-secondary");
+      break;
     default:
       break;
   }

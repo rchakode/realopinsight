@@ -138,35 +138,6 @@ void WebTree::addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectIt
   }
 }
 
-// TODO WebTree::dropParentChildDependency to be investigated: This approach of deleting an item raises segfault, even if it seems more efficient
-//
-//void WebTree::dropParentChildDependency(const QString& parentId, const QString& childId)
-//{
-//  auto parentItem = findItemByNodeId(parentId);
-//  auto childItem = findItemByNodeId(childId);
-
-//  if (! parentItem || ! childItem) {
-//    return ;
-//  }
-
-//  //select(parentItem->index());
-
-//  std::vector<Wt::WStandardItem *> items = parentItem->takeColumn(0);
-//  for (auto cur: items) {
-
-//    if (! cur) continue;
-
-//    QString id = boost::any_cast<QString>(cur->data(Wt::UserRole));
-//    if (id != childId) {
-//      parentItem->appendRow(cur);
-//    } else {
-//      m_treeItems.remove(childId);
-//      delete cur;
-//    }
-
-//  }
-//}
-
 
 Wt::WStandardItem* WebTree::findItemByNodeId(const QString& _nodeId)
 {
@@ -196,12 +167,23 @@ void WebTree::updateItemDecoration(const NodeT& _node, const QString& _tip)
 
 QString WebTree::findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
 
+  if (! _index.isValid()) {
+    return "";
+  }
+
   auto item = m_model->itemFromIndex(_index);
   if (! item) {
     return "";
   }
 
-  return boost::any_cast<QString>(item->data(Wt::UserRole));
+  QString id = "";
+  try {
+    id = boost::any_cast<QString>(item->data(Wt::UserRole));
+  } catch(...) {
+    id = "";
+  }
+
+  return id;
 }
 
 

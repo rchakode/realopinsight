@@ -131,6 +131,11 @@ void WebEditor::unbindWidgets(void)
 {
   m_mainLayout->removeWidget(&m_tree);
   m_mainLayout->removeWidget(&m_fieldEditionPane);
+  m_dataPointItemsLayout->removeWidget(&m_dataPointField);
+  m_dataPointItemsLayout->removeWidget(&m_dataPointSourceField);
+  m_dataPointItemsLayout->removeWidget(&m_dataPointGroupField);
+  m_typeItemsLayout->removeWidget(&m_typeField);
+  m_typeItemsLayout->removeWidget(&m_typeExternalServiceNameField);
   clear();
 }
 
@@ -180,13 +185,18 @@ void WebEditor::bindFormWidgets(void)
 
 
   // set node type values
-  m_fieldEditionPane.bindWidget("type-field", &m_typeField);
+  m_fieldEditionPane.bindWidget("type-field", &m_typeItemsContainer);
+
+  m_typeItemsContainer.setLayout(m_typeItemsLayout = new Wt::WHBoxLayout());
+  m_typeItemsLayout->addWidget(&m_typeField);
+  m_typeItemsLayout->addWidget(&m_typeExternalServiceNameField);
 
   m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
 
   m_typeField.activated().connect(this, &WebEditor::handleNodeTypeChanged);
+  m_typeExternalServiceNameField.setHidden(true);
 
   // set icon type values
   for (const auto& icon: ngrt4n::nodeIcons().keys()) {
@@ -206,17 +216,52 @@ void WebEditor::bindFormWidgets(void)
   m_propRuleBox.addItem(PropRules(PropRules::Decreased).toString().toStdString());
   m_propRuleBox.addItem(PropRules(PropRules::Increased).toString().toStdString());
 
-
   // calculation rules field
   m_fieldEditionPane.bindWidget("calc-rule-field", &m_calcRuleBox);
   m_calcRuleBox.addItem(CalcRules(CalcRules::Worst).toString().toStdString());
   m_calcRuleBox.addItem(CalcRules(CalcRules::Average).toString().toStdString());
   m_calcRuleBox.addItem(CalcRules(CalcRules::WeightedAverageWithThresholds).toString().toStdString());
 
-
   m_fieldEditionPane.bindWidget("icon-field", &m_iconBox);
   m_fieldEditionPane.bindWidget("description-field", &m_descField);
-  m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointField);
+
+  // data point-related field and widgets
+  m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointItemsContainer);
+
+  m_dataPointItemsContainer.setLayout(m_dataPointItemsLayout = new Wt::WHBoxLayout());
+  m_dataPointItemsLayout->addWidget(&m_dataPointSourceField);
+  m_dataPointItemsLayout->addWidget(&m_dataPointGroupField);
+  m_dataPointItemsLayout->addWidget(&m_dataPointField);
+
+  m_dataPointSourceField.activated().connect(this, &WebEditor::handleDataPointSourceSelected);
+
+  // options auto completion
+  Wt::WSuggestionPopup::Options dataPointSuggestionOptions;
+  dataPointSuggestionOptions.highlightBeginTag = "<span class=\"highlight\">";
+  dataPointSuggestionOptions.highlightEndTag = "</span>";
+  dataPointSuggestionOptions.listSeparator = ',';
+  dataPointSuggestionOptions.whitespace = " \\n";
+  dataPointSuggestionOptions.wordSeparators = "-., \":\\n;";
+  dataPointSuggestionOptions.appendReplacedText = ", ";
+
+  m_dataPointListPopup.reset(new Wt::WSuggestionPopup(
+                               Wt::WSuggestionPopup::generateMatcherJS(dataPointSuggestionOptions),
+                               Wt::WSuggestionPopup::generateReplacerJS(dataPointSuggestionOptions)
+                               ));
+  m_dataPointListPopup->forEdit(&m_dataPointField);
+  m_dataPointField.setPlaceholderText(Q_TR("Type a monitoring data point"));
+
+  m_dataPointListModel.reset(new Wt::WStringListModel());
+  m_dataPointListPopup.get()->setModel(static_cast<Wt::WStringListModel*>(m_dataPointListModel.get()));
+
+  WebBaseSettings settings;
+  m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
+  for (const auto& sinfo: settings.fetchSourceList(MonitorT::Auto)) {
+    m_dataPointSourceField.addItem(sinfo.id.toStdString());
+  }
+
+
+  m_dataPointGroupField.addItem(Q_TR("Set a group for filtering"));
 }
 
 
@@ -489,8 +534,10 @@ void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
   m_calcRuleBox.setCurrentIndex(ninfo.sev_crule);
   m_propRuleBox.setCurrentIndex(ninfo.sev_prule);
 
-  if (ninfo.type == NodeType::ITService) {
+  if (ninfo.type ==  NodeType::ITService) {
     m_dataPointField.setText(ninfo.child_nodes.toStdString());
+  } else if (NodeType::ExternalService) {
+    m_typeExternalServiceNameField.setValueText(ninfo.child_nodes.toStdString());
   }
 }
 
@@ -509,7 +556,12 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
   node_it->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
   node_it->sev_crule  = m_calcRuleBox.currentIndex();
   node_it->sev_prule  = m_propRuleBox.currentIndex();
-  node_it->child_nodes = QString::fromStdString(m_dataPointField.text().toUTF8());
+
+  if (node_it->type ==  NodeType::ITService) {
+    node_it->child_nodes = QString::fromStdString( m_dataPointField.text().toUTF8() );
+  } else if (NodeType::ExternalService && m_typeExternalServiceNameField.currentIndex() != 0) {
+    node_it->child_nodes = QString::fromStdString( m_typeExternalServiceNameField.currentText().toUTF8() );
+  }
 
   m_tree.updateItemLabel(nodeId, node_it->name.toStdString());
 }
@@ -524,34 +576,30 @@ void WebEditor::handleNodeLabelChanged(void)
 
 void WebEditor::handleNodeTypeChanged(int type)
 {
+  m_typeExternalServiceNameField.setHidden(type != NodeType::ExternalService);
+  m_dataPointItemsContainer.setDisabled(type != NodeType::ITService);
+
   QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
-
-  NodeListT::iterator nodeIt;
-
-  if ( ! ngrt4n::findNode(&m_cdata, nodeId, nodeIt) ) {
+  NodeListT::ConstIterator ninfoIt;
+  if ( ! ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, ninfoIt) ) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No service selected"));
     return ;
   }
 
-  auto descendants = findDescendantNodes(nodeId);
+  if (type == NodeType::ITService || type == NodeType::ExternalService) {
+    if (! findDescendantNodes(nodeId).empty()) {
+      m_typeField.setCurrentIndex(ninfoIt->type);
+      m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
+    }
 
-  switch (type) {
-
-    case NodeType::ITService:
-    case NodeType::ExternalService:
-
-      if (! descendants.empty()) {
-        m_typeField.setCurrentIndex(nodeIt->type);
-        m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
+    if (type == NodeType::ExternalService) {
+      m_typeExternalServiceNameField.clear();
+      m_typeExternalServiceNameField.addItem(Q_TR("Please select an external service"));
+      for (const auto& v: m_dbSession->viewList()) {
+        m_typeExternalServiceNameField.addItem(v.name);
       }
-      // Do nothing otherwise
-      break;
-
-    case NodeType::BusinessService:
-    default:
-      // Do nothing otherwise
-      break;
+    }
   }
-
 }
 
 
@@ -563,7 +611,6 @@ void WebEditor::handleSaveViewButton(void)
   } else {
     destPath = m_currentFilePath;
   }
-
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 
@@ -681,17 +728,14 @@ void WebEditor::importNativeConfig(const std::string& srcId, const std::string& 
   }
 
   CoreDataT cdata;
-  auto importStatus = ngrt4n::importHostGroupAsBusinessView(*src, groupFilter.c_str(), cdata);
+  auto importResult = ngrt4n::importHostGroupAsBusinessView(*src, groupFilter.c_str(), cdata);
 
-  if (importStatus.first != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, importStatus.second.toStdString());
+  if (importResult.first != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return  ;
   }
 
   QString destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
-
-  for (auto n: cdata.bpnodes)
-    qDebug() << "cdata.bpnodes.size()" << n.id << n.name;
 
   auto saveStatus = saveContentToFile(cdata, destPath);
 
@@ -702,4 +746,59 @@ void WebEditor::importNativeConfig(const std::string& srcId, const std::string& 
 
 
   handleOpenFile(destPath.toStdString(), "");
+}
+
+void WebEditor::handleDataPointSourceSelected(int index)
+{
+  m_operationCompleted.emit(ngrt4n::OperationInProgress, Q_TR("Import of monitoring data in progress..."));
+
+  auto srcId = QString::fromStdString(m_dataPointSourceField.itemText(index).toUTF8());
+
+  SourceT srcInfo;
+  WebBaseSettings settings;
+
+  if (! settings.loadSource(srcId, srcInfo)) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Cannot load source info"));
+    return ;
+  }
+
+  ChecksT checks;
+  auto importResult = ngrt4n::importMonitorItemAsDataPoints(srcInfo, "", checks);
+
+  if (importResult.first != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
+    return;
+  }
+
+  const std::string ALL_GROUPS = Q_TR("All groups");
+  const std::string NO_GROUP = Q_TR("Unclassified");
+
+  m_dataPointListModel->removeRows(0, m_dataPointListModel->rowCount());
+  m_dataPointGroupField.clear();
+
+  m_dataPointGroupField.addItem(ALL_GROUPS);
+
+  for (const auto& check: checks) {
+
+    std::string entry = QString("%1:%2").arg(srcId, check.id.c_str()).toStdString();
+    QStringList groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_SEP.c_str());
+
+    if (! groups.isEmpty()) {
+      for (const auto& group: groups) {
+        auto gpKey = group.toStdString();
+        m_importedDataPointMappedByGroup[gpKey].push_back(entry);
+        if (m_dataPointGroupField.findText(gpKey) > 0) {
+          m_dataPointGroupField.addItem(gpKey);
+        }
+      }
+    } else {
+      m_importedDataPointMappedByGroup[NO_GROUP.c_str()].push_back(entry);
+      m_dataPointGroupField.addItem(NO_GROUP);
+    }
+
+  }
+
+  //FIXME: handleUpdateDataPointsList();
+
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Import of monitoring data in progress..."));
 }

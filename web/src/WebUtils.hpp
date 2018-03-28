@@ -40,7 +40,8 @@ namespace ngrt4n {
 
   enum OperationStatusT {
     OperationSucceeded,
-    OperationFailed
+    OperationFailed,
+    OperationInProgress
   };
 
   void showMessage(int exitCode, const std::string& errorMsg, const std::string& successMsg, Wt::WText* infoBox);

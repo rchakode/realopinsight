@@ -29,7 +29,6 @@
 #include "WebInputSelector.hpp"
 #include "WebTree.hpp"
 #include <Wt/WGridLayout>
-#include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>
 #include <Wt/WPushButton>
 #include <Wt/WMenu>
@@ -45,6 +44,8 @@
 #include <Wt/WTextArea>
 #include <Wt/WComboBox>
 #include <QMap>
+#include <Wt/WSuggestionPopup>
+#include <Wt/WStringListModel>
 
 
 class WebEditor : public Wt::WContainerWidget
@@ -81,12 +82,26 @@ private:
   Wt::WHBoxLayout* m_mainLayout;
   Wt::WTemplate m_fieldEditionPane;
   Wt::WLineEdit m_nameField;
-  Wt::WComboBox m_typeField;
   Wt::WComboBox m_iconBox;
   Wt::WComboBox m_calcRuleBox;
   Wt::WComboBox m_propRuleBox;
   Wt::WTextArea m_descField;
+
+  // node type-related field and widgets
+  Wt::WComboBox m_typeField;
+  Wt::WComboBox m_typeExternalServiceNameField;
+  Wt::WContainerWidget m_typeItemsContainer;
+  Wt::WHBoxLayout* m_typeItemsLayout;
+
+  // data point-related field and widgets
   Wt::WLineEdit m_dataPointField;
+  Wt::WComboBox m_dataPointGroupField;
+  Wt::WComboBox m_dataPointSourceField;
+  Wt::WContainerWidget m_dataPointItemsContainer;
+  Wt::WHBoxLayout* m_dataPointItemsLayout;
+  std::unique_ptr<Wt::WSuggestionPopup> m_dataPointListPopup;
+  std::unique_ptr<Wt::WStringListModel> m_dataPointListModel;
+  QMap<std::string,  std::vector< Wt::WString > > m_importedDataPointMappedByGroup;
 
   Wt::WImage m_newServiceViewBtn;
   Wt::WImage m_openServiceViewBtn;
@@ -137,10 +152,11 @@ private:
   void handleOpenViewButton(void);
   void handleOpenFile(const std::string& path, const std::string& option);
   void handleImportNativeConfigButton(void);
-
+  void handleDataPointSourceSelected(int index);
 
   void importNativeConfig(const std::string& srcId, const std::string& groupFilter);
   std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);
+
 };
 
 
