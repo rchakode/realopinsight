@@ -733,7 +733,7 @@ void WebMainUI::setupSettingsPage(void)
       m_menuLinks.insert(MenuPreview, link);
 
       // Create view management form
-      menuText = QObject::tr("Access Control").toStdString();
+      menuText = QObject::tr("Manage Views").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
       m_adminStackedContents.addWidget(m_viewAccessPermissionForm);
       m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);
