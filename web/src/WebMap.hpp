@@ -72,11 +72,9 @@ private:
   Wt::JSignal<double, double> m_containerSizeChanged;
   Wt::Signal<void> m_loaded;
   std::string m_thumbUrlPath;
-  double m_translateX;
   double m_translateY;
   Wt::WImage m_thumbImage;
 
-  void setDefaultSettings(void);
   void drawNode(const NodeT& node, bool drawIcon = true);
   void drawEdge(const QString& parentId, const QString& childId);
   void createNodeLink(const NodeT& node, const Wt::WPointF& pos);

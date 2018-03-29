@@ -52,22 +52,7 @@ WebMap::WebMap(void)
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged"),
     m_loaded(this),
-    m_thumbUrlPath(""),
-    m_translateX(0),
-    m_translateY(0)
-{
-  setDefaultSettings();
-}
-
-
-WebMap::~WebMap()
-{
-  removeThumdImage();
-  m_scrollArea.takeWidget();
-}
-
-
-void WebMap::setDefaultSettings(void)
+    m_thumbUrlPath("")
 {
   m_scrollArea.setWidget(this);
   setPreferredMethod();
@@ -76,6 +61,12 @@ void WebMap::setDefaultSettings(void)
   m_containerSizeChanged.connect(this, &WebMap::handleContainedSizeChanged);
 }
 
+
+WebMap::~WebMap()
+{
+  removeThumdImage();
+  m_scrollArea.takeWidget();
+}
 
 
 void WebMap::setPreferredMethod(void)
@@ -91,8 +82,6 @@ void WebMap::setJavaScriptMember(void)
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 {
-  m_translateX = qAbs(m_cdata->min_x);
-  m_translateY = qAbs(m_cdata->min_y);
   m_painter.reset(new Wt::WPainter(_pdevice));
   m_painter->scale(m_scaleX, m_scaleY);
   m_painter->setRenderHint(Wt::WPainter::Antialiasing);
@@ -142,37 +131,47 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
 
     m_painter->save();
 
-    Wt::WPointF iconPos(node.pos_x - 20 + m_translateX,  node.pos_y - 24 + m_translateY);
-    Wt::WPointF labelPos(node.pos_x + m_translateX, node.pos_y + m_translateY);
-    Wt::WPointF expIconPos(node.pos_x - 10 + m_translateX, node.pos_y + 15 + m_translateY);
+    double base_x = node.pos_x + m_cdata->min_x;
+    double base_y = node.pos_y + m_cdata->min_y;
+    Wt::WPointF iconPos(base_x - 20,  base_y - 24);
+    Wt::WPointF labelPos(base_x, base_y);
+    Wt::WPointF expIconPos(base_x - 10, base_y + 15);
 
     m_painter->setPen(Wt::WPen(Wt::WColor(255, 255, 255, 0)));
     m_painter->setBrush(Wt::WBrush(ngrt4n::severityWColor(node.sev)));
 
-    m_painter->drawRect(labelPos.x() - node.text_w / 2,
-                        labelPos.y() - node.text_h / 2,
-                        node.text_w,
-                        node.text_h);
+    const double ICON_SIDE = 40.0;
+    const double COLOR_BORDER_SIZE = 5.0;
+    const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
+    const double MAX_LABEL_LENGTH = 15;
+
+    m_painter->drawRect(iconPos.x() - COLOR_BORDER_SIZE,
+                        iconPos.y() - COLOR_BORDER_SIZE,
+                        ICON_SIDE + COLOR_BORDER_DOUBLE_SIZE,
+                        ICON_SIDE + COLOR_BORDER_DOUBLE_SIZE);
 
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(ICONS[node.icon],40,40));
+      m_painter->drawImage(iconPos, GImage(ICONS[node.icon], ICON_SIDE, ICON_SIDE));
     } else { /* thumbnail: do nothing*/ }
 
     if( node.type == NodeType::BusinessService) {
       if (node.visibility & ngrt4n::Expanded) {
-        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::MINUS],19,18));
+        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::MINUS], 19, 18));
       } else {
-        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::PLUS],19,18));
+        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::PLUS], 19, 18));
       }
       createExpIconLink(node, expIconPos);
     }
 
-
     m_painter->setPen(Wt::WPen(Wt::WColor("#000000")));
-    m_painter->drawText(labelPos.x(), labelPos.y(),
-                        Wt::WLength::Auto.toPixels(), Wt::WLength::Auto.toPixels(),
+
+    std::string label = (node.name.size() <= MAX_LABEL_LENGTH) ? node.name.toStdString() : node.name.toStdString().substr(0, MAX_LABEL_LENGTH) + "...";
+    m_painter->drawText(labelPos.x(),
+                        labelPos.y(),
+                        Wt::WLength::Auto.toPixels(),
+                        Wt::WLength::Auto.toPixels(),
                         Wt::AlignCenter,
-                        Wt::WString(node.name.toStdString()));
+                        label);
     createNodeLink(node, iconPos);
 
     m_painter->restore();
@@ -191,8 +190,8 @@ void WebMap::drawEdge(const QString& parentId, const QString& childId)
       Wt::WPen pen(ngrt4n::severityWColor(child->sev_prop));
       m_painter->setPen(pen);
 
-      Wt::WPointF edgeP1(parent->pos_x + m_translateX, parent->pos_y + 24 + m_translateY);
-      Wt::WPointF edgeP2(child->pos_x + m_translateX, child->pos_y - 24 + m_translateY);
+      Wt::WPointF edgeP1(parent->pos_x + m_cdata->min_x, parent->pos_y + 24 + m_cdata->min_y);
+      Wt::WPointF edgeP2(child->pos_x + m_cdata->min_x, child->pos_y - 24 + m_cdata->min_y);
       m_painter->drawLine(edgeP1, edgeP2);
       m_painter->restore();
     }
@@ -248,9 +247,7 @@ void WebMap:: updateThumbnail(void)
   double thumbScaleX = THUMBNAIL_WIDTH / m_cdata->map_width;
   double thumbScaleY = THUMBNAIL_HEIGHT / m_cdata->map_height;
 
-  m_translateX = 10;
-  m_translateY = 0;
-  Wt::WSvgImage thumbnailImg(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT + m_translateY);
+  Wt::WSvgImage thumbnailImg(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
 
   m_painter.reset(new Wt::WPainter(&thumbnailImg));
   m_painter->scale(thumbScaleX, thumbScaleY);
