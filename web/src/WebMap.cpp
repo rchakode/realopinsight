@@ -129,7 +129,10 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
 {
   if (node.visibility & ngrt4n::Visible) {
 
-    m_painter->save();
+    const double ICON_SIDE = 40.0;
+    const double COLOR_BORDER_SIZE = 5.0;
+    const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
+    const double MAX_LABEL_LENGTH = 15;
 
     double base_x = node.pos_x + m_cdata->min_x;
     double base_y = node.pos_y + m_cdata->min_y;
@@ -137,13 +140,11 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
     Wt::WPointF labelPos(base_x, base_y);
     Wt::WPointF expIconPos(base_x - 10, base_y + 15);
 
+
+    m_painter->save();
+
     m_painter->setPen(Wt::WPen(Wt::WColor(255, 255, 255, 0)));
     m_painter->setBrush(Wt::WBrush(ngrt4n::severityWColor(node.sev)));
-
-    const double ICON_SIDE = 40.0;
-    const double COLOR_BORDER_SIZE = 5.0;
-    const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
-    const double MAX_LABEL_LENGTH = 15;
 
     m_painter->drawRect(iconPos.x() - COLOR_BORDER_SIZE,
                         iconPos.y() - COLOR_BORDER_SIZE,

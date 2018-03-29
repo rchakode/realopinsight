@@ -282,8 +282,10 @@ int Parser::computeCoordinates(void)
     m_cdata->min_y -= (max_text_h * 0.6);
   }
 
-  m_cdata->min_x = qAbs(m_cdata->min_x);
-  m_cdata->min_y = qAbs(m_cdata->min_y);
+  const double MAP_BORDER_WIDTH = 50.0;
+
+  m_cdata->min_x = qAbs(m_cdata->min_x) + MAP_BORDER_WIDTH;
+  m_cdata->min_y = qAbs(m_cdata->min_y) + MAP_BORDER_WIDTH;
   m_cdata->map_width += m_cdata->min_x;
   m_cdata->map_height += m_cdata->min_y;
 
