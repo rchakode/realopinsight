@@ -145,7 +145,7 @@ private:
   void handleKeyPressed(const Wt::WKeyEvent& event);
   void handleTreeItemSelectionChanged(void);
   void handleNodeLabelChanged(void);
-  void handleNodeTypeChanged(int type);
+  void handleNodeTypeChanged(void);
   void handleNewViewButton(void);
   void handleSaveViewButton(void);
   void handleOpenViewButton(void);

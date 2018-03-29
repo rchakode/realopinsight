@@ -195,7 +195,7 @@ void WebEditor::bindFormWidgets(void)
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
 
-  m_typeField.activated().connect(this, &WebEditor::handleNodeTypeChanged);
+  m_typeField.changed().connect(this, &WebEditor::handleNodeTypeChanged);
   m_typeExternalServiceNameField.setHidden(true);
 
   // set icon type values
@@ -533,6 +533,9 @@ void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
   } else if (NodeType::ExternalService) {
     m_typeExternalServiceNameField.setValueText(ninfo.child_nodes.toStdString());
   }
+
+  m_typeExternalServiceNameField.setHidden(ninfo.type != NodeType::ExternalService);
+  m_dataPointItemsContainer.setDisabled(ninfo.type != NodeType::ITService);
 }
 
 
@@ -586,8 +589,10 @@ void WebEditor::handleNodeLabelChanged(void)
 }
 
 
-void WebEditor::handleNodeTypeChanged(int type)
+void WebEditor::handleNodeTypeChanged(void)
 {
+  const int type = m_typeField.currentIndex();
+
   m_typeExternalServiceNameField.setHidden(type != NodeType::ExternalService);
   m_dataPointItemsContainer.setDisabled(type != NodeType::ITService);
 
