@@ -251,10 +251,6 @@ int Parser::computeCoordinates(void)
 
   int x_index = 2;
   int y_index = 3;
-//  if (m_graphLayout == ngrt4n::NeatoLayout) {
-//    x_index = 3;
-//    y_index = 2;
-//  }
 
   while (line = coodFileStream.readLine(0), ! line.isNull()) {
     splitedLine = line.split (regexSep);
