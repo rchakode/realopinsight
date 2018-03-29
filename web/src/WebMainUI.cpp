@@ -71,6 +71,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
   m_webEditor.setConfigDir(m_configDir);
   m_webEditor.setDbSession(m_dbSession);
+  m_webEditor.refreshDynamicContents();
 
   addWidget(&m_mainWidget);
   setupInfoBox();
@@ -447,6 +448,7 @@ void WebMainUI::handleLaunchEditor(void)
 {
   m_adminPanelTitle.setText(Q_TR("Service Editor"));
   m_adminStackedContents.setCurrentWidget(&m_webEditor);
+  m_webEditor.refreshDynamicContents();
 }
 
 
@@ -886,33 +888,36 @@ void WebMainUI::handleShowAdminHome(void)
 
 void WebMainUI::showMessage(int status, const std::string& msg)
 {
+  std::string logLevel = "debug";
+  std::string cssClass = "alert alert-success";
+  bool hidden = false;
+
   switch (status) {
     case ngrt4n::OperationSucceeded:
-      showMessageClass(msg, "alert alert-success");
+      cssClass = "alert alert-success";
+      logLevel = "info";
       break;
     case ngrt4n::OperationFailed:
-      showMessageClass(msg, "alert alert-warning");
+      cssClass = "alert alert-warning";
+      logLevel = "warn";
       break;
     case ngrt4n::OperationInProgress:
-      showMessageClass(msg, "alert alert-secondary");
+      cssClass = "alert alert-primary";
+      logLevel = "error";
       break;
     default:
+      m_infoBox.hide();
+      hidden = true;
       break;
   }
-}
 
-void WebMainUI::showMessageClass(const std::string& msg, std::string statusCssClass)
-{
-  std::string logLevel = "info";
-  if (statusCssClass != "alert alert-success") {
-    logLevel = "error";
-  }
   CORE_LOG(logLevel, msg);
 
   m_infoBox.setText(msg);
-  m_infoBox.setStyleClass(statusCssClass);
-  m_infoBox.show();
+  m_infoBox.setStyleClass(cssClass);
+  m_infoBox.setHidden(hidden);
 }
+
 
 Wt::WDialog* WebMainUI::createAboutDialog(void)
 {

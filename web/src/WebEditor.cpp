@@ -106,7 +106,7 @@ void  WebEditor::handleOpenFile(const std::string& path, const std::string& opti
     return ;
   }
 
-  refreshContent();
+  rebuiltTree();
 
   m_currentFilePath = path;
 }
@@ -229,11 +229,13 @@ void WebEditor::bindFormWidgets(void)
   m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointItemsContainer);
 
   m_dataPointItemsContainer.setLayout(m_dataPointItemsLayout = new Wt::WHBoxLayout());
-  m_dataPointItemsLayout->addWidget(&m_dataPointSourceField);
-  m_dataPointItemsLayout->addWidget(&m_dataPointGroupField);
-  m_dataPointItemsLayout->addWidget(&m_dataPointField);
+  m_dataPointItemsLayout->addWidget(&m_dataPointSourceField, 1);
+  m_dataPointItemsLayout->addWidget(&m_dataPointGroupField, 1);
+  m_dataPointItemsLayout->addWidget(&m_dataPointField, 3);
+  m_dataPointItemsContainer.setDisabled(true);
 
-  m_dataPointSourceField.activated().connect(this, &WebEditor::handleDataPointSourceSelected);
+  m_dataPointSourceField.activated().connect(this, &WebEditor::handleDataPointSourceChanged);
+  m_dataPointGroupField.activated().connect(this, &WebEditor::handleDataPointGroupChanged);
 
   // options auto completion
   Wt::WSuggestionPopup::Options dataPointSuggestionOptions;
@@ -253,13 +255,6 @@ void WebEditor::bindFormWidgets(void)
 
   m_dataPointListModel.reset(new Wt::WStringListModel());
   m_dataPointListPopup.get()->setModel(static_cast<Wt::WStringListModel*>(m_dataPointListModel.get()));
-
-  WebBaseSettings settings;
-  m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
-  for (const auto& sinfo: settings.fetchSourceList(MonitorT::Auto)) {
-    m_dataPointSourceField.addItem(sinfo.id.toStdString());
-  }
-
 
   m_dataPointGroupField.addItem(Q_TR("Set a group for filtering"));
 }
@@ -283,16 +278,15 @@ void WebEditor::handleNewViewButton(void)
 
   m_cdata.bpnodes.insert(node.id, node);
 
-  refreshContent();
+  rebuiltTree();
 }
 
 
-void WebEditor::refreshContent(void)
+void WebEditor::rebuiltTree(void)
 {
   m_tree.build();
 
   auto rnode = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
-
   if (rnode != m_cdata.bpnodes.end()) {
     fillInEditorFromNodeInfo(*rnode);
     m_tree.expandNodeById(ngrt4n::ROOT_ID);
@@ -566,6 +560,24 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
   m_tree.updateItemLabel(nodeId, node_it->name.toStdString());
 }
 
+void WebEditor::refreshDynamicContents(void)
+{
+  m_dataPointSourceField.clear();
+
+  WebBaseSettings settings;
+  m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
+  for (const auto& sinfo: settings.fetchSourceList(MonitorT::Auto)) {
+    m_dataPointSourceField.addItem(sinfo.id.toStdString());
+  }
+
+  m_typeExternalServiceNameField.clear();
+
+  m_typeExternalServiceNameField.addItem(Q_TR("Please select an external service"));
+  for (const auto& v: m_dbSession->viewList()) {
+    m_typeExternalServiceNameField.addItem(v.name);
+  }
+}
+
 
 void WebEditor::handleNodeLabelChanged(void)
 {
@@ -590,14 +602,6 @@ void WebEditor::handleNodeTypeChanged(int type)
     if (! findDescendantNodes(nodeId).empty()) {
       m_typeField.setCurrentIndex(ninfoIt->type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
-    }
-
-    if (type == NodeType::ExternalService) {
-      m_typeExternalServiceNameField.clear();
-      m_typeExternalServiceNameField.addItem(Q_TR("Please select an external service"));
-      for (const auto& v: m_dbSession->viewList()) {
-        m_typeExternalServiceNameField.addItem(v.name);
-      }
     }
   }
 }
@@ -748,7 +752,7 @@ void WebEditor::importNativeConfig(const std::string& srcId, const std::string& 
   handleOpenFile(destPath.toStdString(), "");
 }
 
-void WebEditor::handleDataPointSourceSelected(int index)
+void WebEditor::handleDataPointSourceChanged(int index)
 {
   m_operationCompleted.emit(ngrt4n::OperationInProgress, Q_TR("Import of monitoring data in progress..."));
 
@@ -762,9 +766,13 @@ void WebEditor::handleDataPointSourceSelected(int index)
     return ;
   }
 
+  if (! m_dataPointsListBySource[srcId].empty()) {
+    m_operationCompleted.emit(ngrt4n::OperationFinished, Q_TR("Nothing to do"));
+    return ;
+  }
+
   ChecksT checks;
   auto importResult = ngrt4n::importMonitorItemAsDataPoints(srcInfo, "", checks);
-
   if (importResult.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return;
@@ -777,28 +785,38 @@ void WebEditor::handleDataPointSourceSelected(int index)
   m_dataPointGroupField.clear();
 
   m_dataPointGroupField.addItem(ALL_GROUPS);
-
   for (const auto& check: checks) {
-
-    std::string entry = QString("%1:%2").arg(srcId, check.id.c_str()).toStdString();
+    std::string dataPoint = QString("%1:%2").arg(srcId, check.id.c_str()).toStdString();
     QStringList groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_SEP.c_str());
 
-    if (! groups.isEmpty()) {
+    if (groups.isEmpty()) {
+      m_dataPointsListByGroup[NO_GROUP.c_str()].push_back(dataPoint);
+      m_dataPointGroupField.addItem(NO_GROUP);
+    } else {
       for (const auto& group: groups) {
         auto gpKey = group.toStdString();
-        m_importedDataPointMappedByGroup[gpKey].push_back(entry);
-        if (m_dataPointGroupField.findText(gpKey) > 0) {
+        m_dataPointsListByGroup[gpKey].push_back(dataPoint);
+        if (m_dataPointGroupField.findText(gpKey) < 0) {
           m_dataPointGroupField.addItem(gpKey);
         }
       }
-    } else {
-      m_importedDataPointMappedByGroup[NO_GROUP.c_str()].push_back(entry);
-      m_dataPointGroupField.addItem(NO_GROUP);
+      m_dataPointsListBySource[srcId].push_back(dataPoint);
     }
 
   }
 
-  //FIXME: handleUpdateDataPointsList();
+  m_dataPointListModel->setStringList(m_dataPointsListBySource[srcId]);
 
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Import of monitoring data in progress..."));
+  m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for %1").arg(srcId).toStdString());
+
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Import completed"));
+}
+
+
+void WebEditor::handleDataPointGroupChanged(int index)
+{
+  std::string group = m_dataPointGroupField.currentText().toUTF8();
+  m_dataPointListModel->setStringList(m_dataPointsListByGroup[group]);
+
+  m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for '%1' group").arg(group.c_str()).toStdString());
 }

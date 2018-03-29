@@ -59,18 +59,17 @@ class WebEditor : public Wt::WContainerWidget
 public:
   WebEditor(void);
   virtual ~WebEditor();
-  void refreshContent(void);
+  void rebuiltTree(void);
   Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
   void setDbSession(DbSession* _dbSession) {m_dbSession = _dbSession;}
   void setConfigDir(const QString& _dirPath) {m_configDir = _dirPath;}
+  void refreshDynamicContents(void);
 
 private:
   const static QMap<int, std::string> MENU_LABELS;
-
+  Wt::Signal<int, std::string> m_operationCompleted;
   DbSession* m_dbSession;
   QString m_configDir;
-
-  Wt::Signal<int, std::string> m_operationCompleted;
 
   CoreDataT m_cdata;
   WebTree m_tree;
@@ -101,7 +100,8 @@ private:
   Wt::WHBoxLayout* m_dataPointItemsLayout;
   std::unique_ptr<Wt::WSuggestionPopup> m_dataPointListPopup;
   std::unique_ptr<Wt::WStringListModel> m_dataPointListModel;
-  QMap<std::string,  std::vector< Wt::WString > > m_importedDataPointMappedByGroup;
+  QMap<std::string,  std::vector< Wt::WString > > m_dataPointsListByGroup;
+  QMap<QString,  std::vector< Wt::WString > > m_dataPointsListBySource;
 
   Wt::WImage m_newServiceViewBtn;
   Wt::WImage m_openServiceViewBtn;
@@ -123,7 +123,6 @@ private:
   void addEvents(void);
   void buildTree(void);
   void bindFormWidgets(void);
-
 
   void configureTreeComponent(void);
   void enableContextMenus(void);
@@ -152,7 +151,8 @@ private:
   void handleOpenViewButton(void);
   void handleOpenFile(const std::string& path, const std::string& option);
   void handleImportNativeConfigButton(void);
-  void handleDataPointSourceSelected(int index);
+  void handleDataPointSourceChanged(int index);
+  void handleDataPointGroupChanged(int index);
 
   void importNativeConfig(const std::string& srcId, const std::string& groupFilter);
   std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);

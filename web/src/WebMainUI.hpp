@@ -217,7 +217,6 @@ private:
   void startDashbaordUpdate(void);
   void hideAdminSettingsMenu(void);
   void showConditionalUiWidgets(void);
-  void showMessageClass(const std::string& msg, std::string statusCssClass);
   void setupSettingsPage(void);
   void configureDialogWidget(void);
   void setupMainUI(void);
