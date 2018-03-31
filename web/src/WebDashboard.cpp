@@ -85,15 +85,20 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
 
 void WebDashboard::updateMsgConsole(const NodeT& _node)
 {
-  if (! m_showOnlyTroubles || (m_showOnlyTroubles && _node.sev != ngrt4n::Normal))
+  if (! m_showOnlyTroubles) {
     m_msgConsole.updateNodeMsg(_node);
+    return ;
+  }
+
+  if (_node.sev != ngrt4n::Normal) {
+    m_msgConsole.updateNodeMsg(_node);
+  }
 }
 
 void WebDashboard::updateChart(void)
 {
-  qint32 statCount;
   CheckStatusCountT statsData;
-  extractStatsData(statsData, statCount);
+  qint32 statCount = extractStatsData(statsData);
   m_chart.updateStatsData(statsData, statCount);
   m_chart.repaint();
 }
@@ -207,11 +212,11 @@ Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
 }
 
 
-void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble)
+void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* dbSession)
 {
   m_showOnlyTroubles = showOnlyTrouble;
   setDisabled(true);
   m_msgConsole.clearAll();
-  runMonitor();
+  updateAllNodesStatus(dbSession);
   setDisabled(false);
 }

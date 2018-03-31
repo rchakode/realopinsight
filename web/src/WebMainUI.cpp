@@ -406,7 +406,7 @@ void WebMainUI::handleRefresh(void)
   int currentView = 1;
   for (auto& dashboard : m_dashboardMap) {
     dashboard->initSettings(& m_dataSourceSettingsForm);
-    dashboard->runMonitor();
+    dashboard->updateAllNodesStatus(m_dbSession);
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
     NodeT rootService = dashboard->rootNode();
@@ -559,7 +559,8 @@ void WebMainUI::handleNewViewSelected(void)
 void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
 {
   if (m_displayOnlyTroubleEventsBox && m_currentDashboard) {
-    m_currentDashboard->handleShowOnlyTroubleEvents(m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked);
+    auto showOnlyTrouble = m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked;
+    m_currentDashboard->handleShowOnlyTroubleEvents(showOnlyTrouble, m_dbSession);
   }
 }
 

@@ -84,49 +84,30 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
   setColumnWidth(4, width - (55 * em.toPixels() + 90)); /*size of the header image*/
 }
 
-void WebMsgConsole::updateNodeMsgs(const NodeListT& _cnodes)
-{
-  for(NodeListT::ConstIterator node=_cnodes.begin(), end=_cnodes.end();
-      node != end; ++node)
-  {
-    int index = findServiceRow(node->id.toStdString());
-    if (index < 0) {
-      addMsg(*node);
-    } else {
-      m_model->item(index, 0)->setText(ngrt4n::humanTimeText(node->check.last_state_change));
-      ngrt4n::updateSeverityItem(m_model->item(index, 1), node->sev);
-      m_model->item(index, 2)->setText(node->check.host);
-      m_model->item(index, 3)->setText(node->name.toStdString()); //optional
-      m_model->item(index, 4)->setText(node->actual_msg.toStdString());
-    }
-  }
-}
+
 
 void WebMsgConsole::updateNodeMsg(const NodeT& _node)
 {
   int index = findServiceRow(_node.id.toStdString());
   if (index < 0) {
-    addMsg(_node);
+    int row = m_model->rowCount();
+    m_model->setItem(row, 0, createDateTimeItem(_node.check.last_state_change, row));
+    m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(_node));
+    m_model->setItem(row, 2, createItem(_node.check.host, row));
+    m_model->setItem(row, 3, createItem(_node.name.toStdString(), row));
+    m_model->setItem(row, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), row));
+    m_model->setItem(row, 5, createItem(_node.id.toStdString(), row));
   } else {
     m_model->item(index, 0)->setText(ngrt4n::humanTimeText(_node.check.last_state_change));
-    ngrt4n::updateSeverityItem(m_model->item(index, 1), _node.sev);
     m_model->item(index, 2)->setText(_node.check.host);
     m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
     m_model->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
+
+    ngrt4n::updateSeverityItem(m_model->item(index, 1), _node.sev);
   }
   sortByColumn(1, Wt::DescendingOrder);
 }
 
-void WebMsgConsole::addMsg(const NodeT&  _node)
-{
-  int row = m_model->rowCount();
-  m_model->setItem(row, 0, createDateTimeItem(_node.check.last_state_change, row));
-  m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(_node));
-  m_model->setItem(row, 2, createItem(_node.check.host, row));
-  m_model->setItem(row, 3, createItem(_node.name.toStdString(), row));
-  m_model->setItem(row, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), row));
-  m_model->setItem(row, 5, createItem(_node.id.toStdString(), row));
-}
 
 Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
 {

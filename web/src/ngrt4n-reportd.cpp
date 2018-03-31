@@ -73,7 +73,7 @@ void runCollector(int period)
         continue;
       }
       collector.initSettings(&preferences);
-      collector.runMonitor();
+      collector.updateAllNodesStatus();
       QosDataT qosData = collector.qosInfo();
       qosData.timestamp = now;
       qosDataList.push_back(qosData);

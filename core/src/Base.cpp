@@ -251,7 +251,8 @@ QString NodeT::toString(void) const
                                                          QString::fromStdString(check.alarm_msg),
                                                          actual_msg));
   } else {
-    result.append(QObject::tr("\nChild Statuses: %1").arg(actual_msg));
+    result.append(QObject::tr("\nAlarm Message: %1").arg(actual_msg));
   }
+
   return result;
 }

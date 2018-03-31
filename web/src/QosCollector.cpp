@@ -33,14 +33,14 @@ QosCollector::QosCollector(const QString& descriptionFile)
 
 void QosCollector::updateChart(void)
 {
-  qint32 statCount;
   CheckStatusCountT statsData;
-  extractStatsData(statsData, statCount);
+  int statCount = extractStatsData(statsData);
   m_chartBase.updateStatsData(statsData, statCount);
 
+  NodeT rootSrv = rootNode();
   m_qosInfo.timestamp = time(NULL);
-  m_qosInfo.view_name  = rootNode().name.toStdString();
-  m_qosInfo.status    = rootNode().sev;
+  m_qosInfo.view_name = rootSrv.name.toStdString();
+  m_qosInfo.status    = rootSrv.sev;
   m_qosInfo.normal    = m_chartBase.statusRatio(ngrt4n::Normal);
   m_qosInfo.minor     = m_chartBase.statusRatio(ngrt4n::Minor);
   m_qosInfo.major     = m_chartBase.statusRatio(ngrt4n::Major);

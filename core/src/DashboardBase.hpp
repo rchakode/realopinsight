@@ -25,12 +25,13 @@
 #ifndef SVNAVIGATOR_HPP
 #define SVNAVIGATOR_HPP
 
-#include <QString>
 #include "Base.hpp"
 #include "Parser.hpp"
 #include "BaseSettings.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
+#include "dbo/DbSession.hpp"
+#include <QString>
 
 class QScriptValueIterator;
 class QSystemTrayIcon;
@@ -56,17 +57,16 @@ public:
   NodeT rootNode(void);
   bool lastErrorState() const {return m_lastErrorState;}
   QString lastErrorMsg(void) const {return m_lastErrorMsg;}
-  void extractStatsData(CheckStatusCountT& statsData, qint32& count);
+  int extractStatsData(CheckStatusCountT& statsData);
 
 public Q_SLOTS:
-  void runMonitor();
+  void updateAllNodesStatus(DbSession* dbSession);
   void runMonitor(SourceT& src);
   void runDataSourceUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
-  ngrt4n::AggregatedSeverityT computeNodeSeverity(const QString& _node);
+  ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* dbSession);
   void checkStandaloneSourceType(SourceT& src);
-  void handleSourceSettingsChanged(QList<qint8> ids);
   void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
   virtual void initialize(BaseSettings* preferencePtr);
   qint32 userRole(void) const {return m_userRole;}
@@ -87,7 +87,7 @@ Q_SIGNALS:
   void updateFinished(void);
 
 protected:
-  void computeStatusInfo(NodeT& _node, const SourceT& src);
+  void updateNodeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   virtual void updateDashboard(const NodeT& _node);
   virtual void buildMap(void) = 0;

@@ -413,9 +413,6 @@ void WebEditor::removeServiceByTreeNodeIndex(const Wt::WModelIndex& index)
     return ;
   }
 
-  // FIXME: This approach currently raises segfault, even if it seems more efficient
-  // m_tree.dropParentChildDependency(ninfoIt->parent, ninfoIt->id);
-
   // find all the descendant nodes
   auto descendants = findDescendantNodes(nodeId);
 

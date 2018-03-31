@@ -66,12 +66,11 @@ class Parser : public QObject
     int m_parsingMode;
     int m_graphLayout;
 
-    void buildDotContentAndCheckDependencies(void);
+    void fixParentChildDependenciesAndBuildDotContent(void);
     void saveCoordinatesFile(void);
     static QString espacedNodeLabel(const QString& rawLabel);
     void insertITServiceNode(NodeT& node);
     void insertBusinessServiceNode(NodeT& node);
-    void insertExternalServiceNode(NodeT& node);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

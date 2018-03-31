@@ -98,7 +98,7 @@ public:
   virtual void initialize(BaseSettings* preferencePtr);
   std::string tooltip(void) {return m_chart.toStdString();}
   void triggerResizeComponents(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
-  void handleShowOnlyTroubleEvents(bool showOnlyTrouble);
+  void handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* dbSession);
   Wt::WVBoxLayout* eventFeedLayout(void) {return &m_eventFeedLayout;}
   void handleDashboardSelected(std::string viewName) {Q_EMIT dashboardSelected(viewName);}
 

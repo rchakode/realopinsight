@@ -599,7 +599,7 @@ int DbSession::addQosDataList(const QosDataList& qosDataList)
 
 int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
 {
-  int retValue = -1;
+  int count = 0;
   dbo::Transaction transaction(*this);
   try {
     DboQosDataCollectionT dbEntries;
@@ -618,15 +618,16 @@ int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewI
     qosDataMap.clear();
     for (auto& entry : dbEntries) {
       qosDataMap[entry->view->name].push_back(entry->data());
+      ++count;
     }
 
-    retValue = 0;
   } catch (const dbo::Exception& ex) {
+    count = -1;
     m_lastError = "Failed to fetch QoS entries, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  return retValue;
+  return count;
 }
 
 

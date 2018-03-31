@@ -50,7 +50,7 @@ Parser::~Parser()
     fileHandler.remove(m_plainFile);
   }
   if (fileHandler.exists(m_dotFile) && m_lastErrorMsg.isEmpty()) {
-    //FIXME: fileHandler.remove(m_dotFile);
+    fileHandler.remove(m_dotFile);
   }
   fileHandler.close();
 }
@@ -59,7 +59,7 @@ int Parser::process(void)
 {
   int rc = parse();
   if (rc == 0) {
-    buildDotContentAndCheckDependencies();
+    fixParentChildDependenciesAndBuildDotContent();
     saveCoordinatesFile();
     rc = computeCoordinates();
   }
@@ -130,13 +130,11 @@ int Parser::parse(void)
 
     switch(node.type) {
       case NodeType::BusinessService:
+      case NodeType::ExternalService:
         insertBusinessServiceNode(node);
         break;
       case NodeType::ITService:
         insertITServiceNode(node);
-        break;
-      case NodeType::ExternalService:
-        insertExternalServiceNode(node);
         break;
       default:
         break;
@@ -154,28 +152,38 @@ QString Parser::espacedNodeLabel(const QString& rawLabel)
 }
 
 
-void Parser::buildDotContentAndCheckDependencies(void)
+void Parser::fixParentChildDependenciesAndBuildDotContent(void)
 {
   m_dotContent.append("\n");
-  for (NodeListT::ConstIterator bpnode = m_cdata->bpnodes.begin(),end = m_cdata->bpnodes.end(); bpnode != end; ++bpnode) {
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(bpnode->id, espacedNodeLabel(bpnode->name)));
-    if (! bpnode->child_nodes.isEmpty()) {
-      QStringList children = bpnode->child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-      Q_FOREACH(const QString& childId, children) {
-        NodeListIteratorT childIt;
-        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childIt)) {
-          childIt->parent = bpnode->id;
-          m_dotContent.append(QString("\t%1--%2\n").arg(bpnode->id, childIt->id));
+
+  for (const auto& bpnode:  m_cdata->bpnodes) {
+
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(bpnode.id, espacedNodeLabel(bpnode.name)));
+
+    if (bpnode.type == NodeType::ExternalService) {
+      continue;
+    }
+
+    if (! bpnode.child_nodes.isEmpty()) {
+      QStringList children = bpnode.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
+
+      for(const auto& childId: children) {
+        NodeListIteratorT childNodeIt;
+        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childNodeIt)) {
+          childNodeIt->parent = bpnode.id;
+          m_dotContent.append(QString("\t%1--%2\n").arg(bpnode.id, childNodeIt->id));
         } else {
-          qDebug()<< QObject::tr("Failed to found child dependency for node '%1' => %2").arg(bpnode->id, childId);
+          qDebug()<< QObject::tr("Failed to found child dependency for node '%1' => %2").arg(bpnode.id, childId);
         }
       }
+
     }
+
   }
 
   // Set IT service nodes' labels
-  for (NodeListT::ConstIterator node = m_cdata->cnodes.begin(), end = m_cdata->cnodes.end(); node != end; ++node) {
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(node->id, espacedNodeLabel(node->name)));
+  for (const auto& cnode: m_cdata->cnodes) {
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(cnode.id, espacedNodeLabel(cnode.name)));
   }
 
 }
@@ -317,45 +325,6 @@ void Parser::insertBusinessServiceNode(NodeT& node)
   m_cdata->bpnodes.insert(node.id, node);
 }
 
-
-void Parser::insertExternalServiceNode(NodeT& node)
-{
-  if (m_parsingMode == ParsingModeEditor) {
-    m_cdata->bpnodes.insert(node.id, node);
-    return; // in edition mode, just add the service in the map and return
-  }
-
-  QString baseDir = QFileInfo(m_descriptionFile).dir().absolutePath();
-  QString path = QString("%1/%2.ms.ngrt4n.xml").arg(baseDir).arg(node.child_nodes);
-
-  CoreDataT cdata;
-  Parser parser(path, &cdata, Parser::ParsingModeExternalService, m_graphLayout);
-
-  int rc = parser.parse();
-
-  if (rc == 0) {
-    m_lastErrorMsg = parser.lastErrorMsg();
-    return;
-  }
-
-  NodeListT::Iterator innerRootNodeIt = cdata.bpnodes.find(ngrt4n::ROOT_ID);
-
-  if (innerRootNodeIt != cdata.bpnodes.end()) {
-    // update default id for root node
-    innerRootNodeIt->id = node.id;
-    innerRootNodeIt->visibility = ngrt4n::Visible|ngrt4n::Expanded;
-    NodeT innerRootNode = *innerRootNodeIt; // backup the node content
-    cdata.bpnodes.remove(ngrt4n::ROOT_ID);  // Point to innerRootNodeIt, but its key is ngrt4n::ROOT_ID.
-    // We remove it to avoid duplication when joining the two hashs
-    cdata.bpnodes.insert(innerRootNode.id, innerRootNode); // now reinsert the map with its current id
-    m_cdata->bpnodes.unite(cdata.bpnodes);
-    m_cdata->cnodes.unite(cdata.cnodes);
-    m_cdata->hosts.unite(cdata.hosts);
-    m_cdata->sources.unite(cdata.sources);
-  } else {
-    qDebug() << QObject::tr("Invalid graph after parsing external description file: %1").arg(path);
-  }
-}
 
 
 

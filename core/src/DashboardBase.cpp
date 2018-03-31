@@ -107,7 +107,7 @@ void DashboardBase::initialize(BaseSettings* preferencePtr)
   }
 }
 
-void DashboardBase::runMonitor()
+void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
 {
   Q_EMIT updateInprogress();
   resetStatData();
@@ -122,9 +122,12 @@ void DashboardBase::runMonitor()
       Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
-  computeNodeSeverity(rootNode().id);
+  computeBpNodeStatus(ngrt4n::ROOT_ID, dbSession);
+
   updateChart();
+
   ++m_updateCounter;
+
   Q_EMIT updateFinished();
 }
 
@@ -200,32 +203,34 @@ void DashboardBase::updateDashboard(const NodeT& _node)
 
 void DashboardBase::updateCNodesWithCheck(const CheckT& check, const SourceT& src)
 {
-  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end(); cnode!=end; ++cnode) {
-    if (cnode->child_nodes.toLower() == ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower()) {
-      cnode->check = check;
-      computeStatusInfo(*cnode, src);
-      updateDashboard(*cnode);
-      cnode->monitored = true;
+  for (auto& cnode: m_cdata.cnodes) {
+    if (cnode.child_nodes.toLower() != ngrt4n::realCheckId(src.id, QString::fromStdString(check.id)).toLower()) {
+      continue;
     }
+    cnode.check = check;
+    updateNodeStatusInfo(cnode, src);
+    updateDashboard(cnode);
+    cnode.monitored = true;
   }
 }
 
 void DashboardBase::updateCNodesWithChecks(const ChecksT& checks, const SourceT& src)
 {
-  for (ChecksT::const_iterator check=checks.begin(), end = checks.end(); check!=end; ++check) {
-    updateCNodesWithCheck(*check, src);
+  for (const auto& check: checks) {
+    updateCNodesWithCheck(check, src);
   }
 }
 
-void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
+void DashboardBase::updateNodeStatusInfo(NodeT& _node, const SourceT& src)
 {
   QRegExp regexp;
   _node.sev = ngrt4n::severityFromProbeStatus(src.mon_type, _node.check.status);
   _node.sev_prop = StatusAggregator::propagate(_node.sev, _node.sev_prule);
   _node.actual_msg = QString::fromStdString(_node.check.alarm_msg);
   
-  if (_node.check.host == "-")
+  if (_node.check.host == "-") {
     return;
+  }
   
   if (m_cdata.monitor == MonitorT::Zabbix) {
     regexp.setPattern(ngrt4n::TAG_ZABBIX_HOSTNAME.c_str());
@@ -266,47 +271,82 @@ void DashboardBase::computeStatusInfo(NodeT& _node, const SourceT& src)
   }
 }
 
-ngrt4n::AggregatedSeverityT DashboardBase::computeNodeSeverity(const QString& _nodeId)
+ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _nodeId, DbSession* dbSession)
 {
-  ngrt4n::AggregatedSeverityT result;
-  
+  ngrt4n::AggregatedSeverityT status2Propagate;
+
   NodeListT::iterator node;
   if (! ngrt4n::findNode(&m_cdata, _nodeId, node)) {
-    result.sev = ngrt4n::Unknown;
-    result.weight = ngrt4n::WEIGHT_UNIT;
-    return result;
+    status2Propagate.sev = ngrt4n::Unknown;
+    status2Propagate.weight = ngrt4n::WEIGHT_UNIT;
+    return status2Propagate;
   }
   
-  result.weight = node->weight;
+  status2Propagate.weight = node->weight;
   
   if (node->child_nodes.isEmpty()) {
-    result.sev = ngrt4n::Unknown;
-    return result;
+    status2Propagate.sev = ngrt4n::Unknown;
+    return status2Propagate;
   }
   
+  // if IT service handle it directly
   if (node->type == NodeType::ITService) {
-    result.sev = node->sev_prop;
-    return result;
+    status2Propagate.sev = node->sev_prop;
+    return status2Propagate;
   }
-  
+
+  // if external service handle it through last status fetched from database
+  if (node->type == NodeType::ExternalService) {
+
+    constexpr long intervalDurationSec = 10 * 60;
+    long toDate = std::time(0);
+    long fromDate = toDate - intervalDurationSec;
+    QosDataListMapT qosMap;
+
+    node->check.host = "-";
+    node->check.host_groups = "-";
+    node->check.check_command = "-";
+    node->check.last_state_change = std::to_string(toDate);
+
+    auto externalServiceName = node->child_nodes.toStdString();
+    int rc = dbSession->listQosData(qosMap, externalServiceName, fromDate, toDate);
+
+    if (rc > 0) {
+      node->sev = qosMap[externalServiceName].back().status;
+    } else {
+      node->sev = ngrt4n::Unknown;
+      status2Propagate.sev = ngrt4n::Unknown;
+      node->actual_msg = QObject::tr("No status found in the last %1 minute(s) for external service: %2")
+                         .arg(intervalDurationSec / 60)
+                         .arg(node->child_nodes);
+    }
+
+    status2Propagate.sev = StatusAggregator::propagate(node->sev, node->sev_prule);
+    updateDashboard(*node);
+
+    return status2Propagate;
+  }
+
+
   StatusAggregator severityAggregator;
   
-  Q_FOREACH(const QString& childId, node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
-    result = computeNodeSeverity(childId);
-    severityAggregator.addSeverity(result.sev, result.weight);
+  for (const auto childId: node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+    status2Propagate = computeBpNodeStatus(childId, dbSession);
+    severityAggregator.addSeverity(status2Propagate.sev, status2Propagate.weight);
   }
   
   node->sev = severityAggregator.aggregate(node->sev_crule, node->thresholdLimits);
   node->sev_prop = severityAggregator.propagate(node->sev, node->sev_prule);
-  
-  result.sev = node->sev_prop;
-  result.weight = node->weight;
   node->actual_msg = severityAggregator.toDetailsString();
+  
+  status2Propagate.sev = node->sev_prop;
+  status2Propagate.weight = node->weight;
+
   QString tooltip = node->toString();
   updateMap(*node, tooltip);
   updateTree(*node, tooltip);
   
-  return result;
+  return status2Propagate;
 }
 
 QStringList DashboardBase::getAuthInfo(int srcId)
@@ -324,12 +364,14 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   if (! msg.isEmpty()) {
     Q_EMIT updateStatusBar(msg);
   }
+
   for (NodeListIteratorT cnode = m_cdata.cnodes.begin(); cnode != m_cdata.cnodes.end(); ++cnode) {
+
     StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
     
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
-    computeStatusInfo(*cnode, src);
+    updateNodeStatusInfo(*cnode, src);
     cnode->monitored = true;
     updateDashboard(*cnode);
   }
@@ -371,23 +413,6 @@ void DashboardBase::checkStandaloneSourceType(SourceT& src)
   }
 }
 
-void DashboardBase::handleSourceSettingsChanged(QList<qint8> ids)
-{
-  if (! ids.isEmpty()) {
-    Q_FOREACH (const qint8& id, ids) {
-      SourceT newsrc;
-      m_baseSettings->loadSource(id, newsrc);
-      checkStandaloneSourceType(newsrc);
-      SourceListT::Iterator olddata = m_sources.find(id);
-      if (olddata != m_sources.end()) {
-        m_sources.erase(olddata);
-      }
-      m_sources.insert(id, newsrc);
-    }
-    runMonitor();
-    Q_EMIT updateSourceUrl();
-  }
-}
 
 void DashboardBase::computeFirstSrcIndex(void)
 {
@@ -410,7 +435,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
       ngrt4n::setCheckOnError(ngrt4n::Unset,
                               tr("Undefined service (%1)").arg(cnode->child_nodes),
                               cnode->check);
-      computeStatusInfo(*cnode, src);
+      updateNodeStatusInfo(*cnode, src);
       updateDashboard(*cnode);
     }
     cnode->monitored = false;
@@ -432,28 +457,28 @@ NodeT DashboardBase::rootNode(void)
 
 
 
-void DashboardBase::extractStatsData(CheckStatusCountT& statsData, qint32& count)
+int DashboardBase::extractStatsData(CheckStatusCountT& statsData)
 {
-  count = m_cdata.cnodes.size();
-  for (NodeListT::ConstIterator node = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end();
-       node != end; ++ node) {
-    switch (node->sev) {
-    case ngrt4n::Normal:
-      ++statsData[ngrt4n::Normal];
-      break;
-    case ngrt4n::Minor:
-      ++statsData[ngrt4n::Minor];
-      break;
-    case ngrt4n::Major:
-      ++statsData[ngrt4n::Major];
-      break;
-    case ngrt4n::Critical:
-      ++statsData[ngrt4n::Critical];
-      break;
-    case ngrt4n::Unknown:
-    default:
-      ++statsData[ngrt4n::Unknown];
-      break;
+  for (const auto& node : m_cdata.cnodes) {
+    switch (node.sev) {
+      case ngrt4n::Normal:
+        ++statsData[ngrt4n::Normal];
+        break;
+      case ngrt4n::Minor:
+        ++statsData[ngrt4n::Minor];
+        break;
+      case ngrt4n::Major:
+        ++statsData[ngrt4n::Major];
+        break;
+      case ngrt4n::Critical:
+        ++statsData[ngrt4n::Critical];
+        break;
+      case ngrt4n::Unknown:
+      default:
+        ++statsData[ngrt4n::Unknown];
+        break;
     }
   }
+
+  return m_cdata.cnodes.size();
 }
