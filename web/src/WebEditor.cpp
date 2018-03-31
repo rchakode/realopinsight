@@ -614,6 +614,8 @@ void WebEditor::handleNodeTypeChanged(void)
 
   // backup node info before processing that implies to remove it and thus invalidate its iterator
   NodeT ninfo = *ninfoIt;
+  ninfo.child_nodes.clear();
+
   switch (type) {
     case NodeType::ITService:
       if (m_cdata.bpnodes.remove(ninfo.id) > 0) {
@@ -627,7 +629,8 @@ void WebEditor::handleNodeTypeChanged(void)
     case NodeType::BusinessService:
     default:
       if (ninfo.type == NodeType::ExternalService || ninfo.type == NodeType::BusinessService) {
-        break; // do nothing as in this case the node should be already on the right list
+        m_cdata.bpnodes[nodeId].child_nodes.clear(); // typically for external service child_nodes is not empty
+        break;
       }
 
       if (m_cdata.cnodes.remove(ninfo.id) > 0) {

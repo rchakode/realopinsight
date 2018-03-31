@@ -173,7 +173,7 @@ void Parser::fixParentChildDependenciesAndBuildDotContent(void)
           childNodeIt->parent = bpnode.id;
           m_dotContent.append(QString("\t%1--%2\n").arg(bpnode.id, childNodeIt->id));
         } else {
-          qDebug() << QObject::tr("Failed to found child dependency for node '%1' => %2").arg(bpnode.id, childId);
+          qDebug() << QObject::tr("Failed to find parent-child dependency'%1' => %2").arg(bpnode.id, childId);
         }
       }
 
