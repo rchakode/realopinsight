@@ -99,9 +99,8 @@ void ViewAclManagement::filter(const std::string& username)
   if (! username.empty()) {
     m_assignedViewModel->clear();
     m_nonAssignedViewModel->clear();
-    m_dbSession->updateUserViewList();
-    UserViewsT userViews = m_dbSession->userViewList();
-    for (auto view: m_dbSession->viewList()) {
+    UserViewsT userViews = m_dbSession->updateUserViewList();
+    for (auto view: m_dbSession->listViews()) {
       if (userViews.find(username+":"+view.name) != userViews.end()) {
         addView(m_assignedViewModel, view);
       } else {
@@ -153,28 +152,25 @@ void ViewAclManagement::resetModelData(void)
   m_assignedViewModel->clear();
   m_nonAssignedViewModel->clear();
 
-  m_dbSession->updateUserList();
-  m_dbSession->updateViewList();
-
   int count = 0;
   m_userListModel->insertRows(count, 1);
   m_userListModel->setData(count, 0, Wt::WString("-- Select user --"));
   ++count;
 
-  for (const auto& user: m_dbSession->userList()) {
+  for (const auto& user: m_dbSession->listUsers()) {
     m_userListModel->insertRows(count, 1);
     m_userListModel->setData(count, 0, user.username);
     ++count;
   }
 
-  for (auto view: m_dbSession->viewList()) {
+  auto vlist = m_dbSession->listViews();
+  for (auto view: vlist) {
     addView(m_nonAssignedViewModel, view);
   }
 
   disableButtons();
-  enableButtonIfApplicable(m_nonAssignedViewModel,
-                           m_deleteViewButton,
-                           &ViewAclManagement::deleteViews);
+
+  enableButtonIfApplicable(m_nonAssignedViewModel, m_deleteViewButton, &ViewAclManagement::deleteViews);
 }
 
 
@@ -276,10 +272,10 @@ void ViewAclManagement::removeViewItemInModel(Wt::WStandardItemModel* model, con
 void ViewAclManagement::addViewItemInModel(Wt::WStandardItemModel* model, const std::string& viewName)
 {
   DbViewsT::const_iterator vit;
-  vit = std::find_if(m_dbSession->viewList().begin(),
-                     m_dbSession->viewList().end(),
+  vit = std::find_if(m_dbSession->listViews().begin(),
+                     m_dbSession->listViews().end(),
                      [=](DboView v){return v.name == viewName;});
-  if (vit !=m_dbSession->viewList().end()) {
+  if (vit !=m_dbSession->listViews().end()) {
     addView(model, *vit);
   }
 }

@@ -90,7 +90,7 @@ void WebEditor::configureTreeComponent()
 
 void  WebEditor::handleOpenViewButton(void)
 {
-  m_openViewDialog.updateContentWithViewList(m_dbSession->viewList());
+  m_openViewDialog.updateContentWithViewList(m_dbSession->listViews());
   m_openViewDialog.show();
 }
 
@@ -573,7 +573,7 @@ void WebEditor::refreshDynamicContents(void)
   m_typeExternalServiceNameField.clear();
 
   m_typeExternalServiceNameField.addItem(Q_TR("Please select an external service"));
-  for (const auto& v: m_dbSession->viewList()) {
+  for (const auto& v: m_dbSession->listViews()) {
     m_typeExternalServiceNameField.addItem(v.name);
   }
 }

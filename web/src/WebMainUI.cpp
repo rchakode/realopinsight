@@ -608,7 +608,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 
 void WebMainUI::selectItem4Preview(void)
 {
-  m_previewSelectorDialog.updateContentWithViewList(m_dbSession->viewList());
+  m_previewSelectorDialog.updateContentWithViewList(m_dbSession->listViews());
   m_previewSelectorDialog.show();
 }
 
@@ -947,12 +947,12 @@ void WebMainUI::initOperatorDashboard(void)
 {
   bindExecutiveViewWidgets();
 
-  m_dbSession->updateViewListByAssignedUser(m_dbSession->loggedUser().username);
+  auto vlist = m_dbSession->listViewListByAssignedUser(m_dbSession->loggedUser().username);
 
   // Build view thumbnails
   int thumbIndex = 0;
   int thumbPerRow = m_dbSession->dashboardTilesPerRow();
-  for (const auto& view : m_dbSession->viewList()) {
+  for (const auto& view : vlist) {
     WebDashboard* dashboardItem = loadView(view.path);
     if (dashboardItem) {
       Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(),
@@ -1000,7 +1000,7 @@ void WebMainUI::clearThumbnailTemplate(Wt::WTemplate* tpl)
 void WebMainUI::showConditionalUiWidgets(void)
 {
   if (m_dbSession->isCompleteUserDashboard()) {
-    m_biDashlet.initialize(m_dbSession->viewList());
+    m_biDashlet.initialize(m_dbSession->listViews());
     m_operatorHomeTpl.bindString("bi-report-title", Q_TR("Reports"));
     m_operatorHomeTpl.bindWidget("bi-report-dashlet", &m_biDashlet);
   } else {

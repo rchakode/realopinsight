@@ -52,18 +52,18 @@ void runCollector(int period)
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
   Notificator notificator(&dbSession);
   while(1) {
-    try {
-      dbSession.updateUserList();
-    } catch(const std::exception& ex) {
-      std::cerr << ex.what() <<"\n";
-    }
-
     QosDataList qosDataList;
     NodeListT rootNodes;
     qosDataList.clear();
     rootNodes.clear();
-    long now = time(NULL);
-    for (const auto& view: dbSession.viewList()) {
+    DbViewsT vlist;
+    try {
+      vlist = dbSession.listViews();
+    } catch(const std::exception& ex) {
+      std::cerr << ex.what() <<"\n";
+    }
+
+    for (const auto& view: vlist) {
       // initialize a collector for the current view.
       // skip the view if the initialization failed
       QosCollector collector(view.path.c_str());
@@ -75,7 +75,7 @@ void runCollector(int period)
       collector.initSettings(&settings);
       collector.updateAllNodesStatus(&dbSession);
       QosDataT qosData = collector.qosInfo();
-      qosData.timestamp = now;
+      qosData.timestamp = time(NULL); // now
       qosDataList.push_back(qosData);
       rootNodes[qosData.view_name.c_str()] = collector.rootNode();
       try {
@@ -87,8 +87,9 @@ void runCollector(int period)
     }
     // now handle notifications if applicable
     if (settings.getNotificationType() != WebBaseSettings::NoNotification) {
-      for (const auto qosEntry : qosDataList)
+      for (const auto qosEntry : qosDataList) {
         notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);
+      }
     }
     wait_for_interval(period);
   }

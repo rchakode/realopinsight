@@ -36,9 +36,9 @@ namespace Wt {
     namespace backend {
       class Sqlite3Exception : public Exception
       {
-        public:
-          Sqlite3Exception(const std::string& msg)
-            : Exception(msg) { }
+      public:
+        Sqlite3Exception(const std::string& msg)
+          : Exception(msg) { }
       };
     }
   }
@@ -50,29 +50,25 @@ DbSession::DbSession(int dbType, const std::string& db)
   m_passAuthService = new Wt::Auth::PasswordService(m_basicAuthService);
 
   switch (dbType) {
-  case PostgresqlDb:
-    m_dboSqlConncetion = new Wt::Dbo::backend::Postgres(db);
-    m_dboSqlConncetion->setProperty("show-queries", "false");
-    setConnection(*m_dboSqlConncetion);
-    break;
+    case PostgresqlDb:
+      m_dboSqlConncetion = new Wt::Dbo::backend::Postgres(db);
+      m_dboSqlConncetion->setProperty("show-queries", "false");
+      setConnection(*m_dboSqlConncetion);
+      break;
 
-    // Sqlite3 is the default database
-  case Sqlite3Db:
-  default:
-    m_dboSqlConncetion = new Wt::Dbo::backend::Sqlite3(db);
-    m_dboSqlConncetion->setProperty("show-queries", "false");
-    setConnection(*m_dboSqlConncetion);
-    break;
+      // Sqlite3 is the default database
+    case Sqlite3Db:
+    default:
+      m_dboSqlConncetion = new Wt::Dbo::backend::Sqlite3(db);
+      m_dboSqlConncetion->setProperty("show-queries", "false");
+      setConnection(*m_dboSqlConncetion);
+      break;
   }
 
   // do this before doing anything to avoid unauthorized access
   configureAuth();
 
   setupDbMapping();
-  if (WebBaseSettings().dbInitializationState() != DbInitialized && initDb() == 0) {
-    updateUserList();
-    updateViewList();
-  }
 }
 
 DbSession::~DbSession()
@@ -97,14 +93,14 @@ void DbSession::setupDbMapping(void)
 
 int DbSession::addUser(const DboUserT& userInfo)
 {
-  int retValue = -1;
+  int rc = -1;
   dbo::Transaction transaction(*this);
   try {
     DboUserCollectionT users = find<DboUser>().where("name=?").bind(userInfo.username);
     if (users.size() > 0) {
       m_lastError = "Failed: a user with the same username already exist.";
       CORE_LOG("error", m_lastError);
-      retValue = 1;
+      rc = 1;
     } else {
       Wt::Auth::User dbuser = m_dboUserDb->registerNew();
       dbo::ptr<AuthInfo> info = m_dboUserDb->find(dbuser);
@@ -114,20 +110,19 @@ int DbSession::addUser(const DboUserT& userInfo)
       userTmpPtr->setData(userInfo);
       info.modify()->setUser( add(userTmpPtr) );
       dbuser.addIdentity(Wt::Auth::Identity::LoginName, userInfo.username);
-      retValue = 0;
+      rc = 0;
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the user.";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateUserList();
-  return retValue;
+  return rc;
 }
 
 int DbSession::updateUser(const DboUserT& userInfo)
 {
-  int retValue = -1;
+  int rc = -1;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(userInfo.username);
@@ -140,62 +135,59 @@ int DbSession::updateUser(const DboUserT& userInfo)
     userPtr.modify()->dashboardDisplayMode = userInfo.dashboardDisplayMode;
     userPtr.modify()->dashboardTilesPerRow = userInfo.dashboardTilesPerRow;
     authInfo.modify()->setEmail(userInfo.email);
-    retValue = 0;
+    rc = 0;
     transaction.commit();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to update user";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateUserList();
-  return retValue;
+  return rc;
 }
 
 int DbSession::updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newpass)
 {
-  int retValue = -1;
+  int rc = -1;
   dbo::Transaction transaction(*this);
   try {
     Wt::Auth::User dbuser = m_dboUserDb->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
     switch (m_passAuthService->verifyPassword(dbuser, currentPass)) {
-    case Wt::Auth::PasswordValid:
-      m_passAuthService->updatePassword(dbuser, newpass);
-      retValue = 0;
-      break;
-    case Wt::Auth::PasswordInvalid:
-      m_lastError = "Your current password doesn't match";
-      break;
-    case Wt::Auth::LoginThrottling:
-      m_lastError = "The account has been blocked. Retry later or contact your administrator";
-      break;
-    default:m_lastError = "Unknown error concerning your current password";
-      break;
+      case Wt::Auth::PasswordValid:
+        m_passAuthService->updatePassword(dbuser, newpass);
+        rc = 0;
+        break;
+      case Wt::Auth::PasswordInvalid:
+        m_lastError = "Your current password doesn't match";
+        break;
+      case Wt::Auth::LoginThrottling:
+        m_lastError = "The account has been blocked. Retry later or contact your administrator";
+        break;
+      default:m_lastError = "Unknown error concerning your current password";
+        break;
     }
   } catch (const dbo::Exception& ex) {
-    retValue = -1;
+    rc = -1;
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateUserList();
-  return retValue;
+  return rc;
 }
 
 
 int DbSession::deleteUser(const std::string& username)
 {
-  int retValue = -1;
+  int rc = -1;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(username);
     usr.remove();
-    retValue = 0;
+    rc = 0;
   } catch (const dbo::Exception& ex) {
-    retValue = 1;
+    rc = 1;
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateUserList();
-  return retValue;
+  return rc;
 }
 
 
@@ -212,18 +204,16 @@ int DbSession::deleteAuthSystemUsers(int authSystem)
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateUserList();
   return retValue;
 }
 
 
 bool DbSession::findUser(const std::string& username, DboUserT& user)
 {
-  DbUsersT::const_iterator it = std::find_if(m_userList.cbegin(),
-                                             m_userList.cend(),
-                                             [&username](const DboUser& u){return u.username == username;});
+  auto ulist = listUsers();
+  DbUsersT::const_iterator it = std::find_if(ulist.cbegin(), ulist.cend(), [&username](const DboUser& u){return u.username == username;});
   bool found = false;
-  if (it != m_userList.end()) {
+  if (it != ulist.end()) {
     found = true;
     user = it->data();
   }
@@ -277,58 +267,66 @@ void DbSession::setLoggedUser(void)
   transaction.commit();
 }
 
-void DbSession::updateUserList(void)
+DbUsersT DbSession::listUsers(void)
 {
+  DbUsersT ulist;
   dbo::Transaction transaction(*this);
   try {
-    m_userList.clear();
     DboUserCollectionT users = find<DboUser>();
     for (auto &user : users) {
-      m_userList.push_back(*user);
+      ulist.push_back(*user);
     }
   } catch (const dbo::Exception& ex) {
+    ulist.clear();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
+  return ulist;
 }
 
-void DbSession::updateViewList(void)
+DbViewsT DbSession::listViews(void)
 {
+  DbViewsT vlist;
   dbo::Transaction transaction(*this);
   try {
-    m_viewList.clear();
     DboViewCollectionT views = find<DboView>();
     for (auto& view : views) {
-      m_viewList.push_back(*view);
+      vlist.push_back(*view);
     }
   } catch (const dbo::Exception& ex) {
+    vlist.clear();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
+
+  return vlist;
 }
 
-void DbSession::updateViewListByAssignedUser(const std::string& uname)
+DbViewsT DbSession::listViewListByAssignedUser(const std::string& uname)
 {
+  DbViewsT vlist;
   dbo::Transaction transaction(*this);
   try {
-    m_viewList.clear();
     dbo::ptr<DboUser> userDboPtr = find<DboUser>().where("name=?").bind(uname);
     for (auto& view : userDboPtr.modify()->views) {
-      m_viewList.push_back(*view);
+      vlist.push_back(*view);
     }
   } catch (const dbo::Exception& ex) {
+    vlist.clear();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
+
+  return vlist;
 }
+
 
 bool DbSession::findView(const std::string& vname, DboView& view)
 {
-  DbViewsT::const_iterator it = std::find_if(m_viewList.cbegin(),
-                                             m_viewList.cend(),
-                                             [&vname](const DboView& v){return v.name == vname;});
+  auto vlist = listViews();
+  DbViewsT::const_iterator it = std::find_if(vlist.cbegin(), vlist.cend(), [&vname](const DboView& v){return v.name == vname;});
   bool found = false;
-  if (it != m_viewList.end()) {
+  if (it != vlist.end()) {
     found = true;
     view = *it;
   }
@@ -384,7 +382,6 @@ int DbSession::addView(const DboView& vInfo)
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateViewList();
   return rc;
 }
 
@@ -410,11 +407,11 @@ int DbSession::updateViewWithPath(const DboView& vinfo, const std::string& vpath
 
 int DbSession::deleteViewWithName(const std::string& vname)
 {
-  int retValue = -1;
+  int rc = -1;
   dbo::Transaction transaction(*this);
   try {
     execute("DELETE FROM view WHERE name = ?;").bind(vname);
-    retValue = 0;
+    rc = 0;
   } catch (const Wt::Dbo::backend::Sqlite3Exception& ex) {
     m_lastError = ex.what();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
@@ -423,23 +420,24 @@ int DbSession::deleteViewWithName(const std::string& vname)
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  updateViewList();
-  return retValue;
+  return rc;
 }
 
 
 
-void DbSession::updateUserViewList(void)
+UserViewsT DbSession::updateUserViewList(void)
 {
-  m_userViewList.clear();
+  UserViewsT userViewList;
   dbo::Transaction transaction(*this);
   DboUserCollectionT users = find<DboUser>();
   for (auto& user : users) {
     for (const auto& view: user->views) {
-      m_userViewList.insert(user->username+":"+view->name);
+      userViewList.insert(user->username+":"+view->name);
     }
   }
   transaction.commit();
+
+  return userViewList;
 }
 
 
@@ -540,10 +538,10 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
   dbo::Transaction transaction(*this);
   try {
     DboLoginSessionCollectionT sessions = find<DboLoginSession>()
-        .where("username=? AND session_id=? AND status = ?")
-        .bind(session.username)
-        .bind(session.sessionId)
-        .bind(DboLoginSession::ExpiredCookie);
+                                          .where("username=? AND session_id=? AND status = ?")
+                                          .bind(session.username)
+                                          .bind(session.sessionId)
+                                          .bind(DboLoginSession::ExpiredCookie);
     retValue = sessions.size()? DboLoginSession::ActiveCookie : DboLoginSession::InvalidSession;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Error checking the session, please check the log file";
@@ -605,14 +603,14 @@ int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewI
     DboQosDataCollectionT dbEntries;
     if (viewId.empty()) {
       dbEntries = find<DboQosData>()
-          .where("timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(fromDate).bind(toDate);
+                  .where("timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(fromDate).bind(toDate);
     } else {
       dbEntries = find<DboQosData>()
-          .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
-          .orderBy("timestamp")
-          .bind(viewId).bind(fromDate).bind(toDate);
+                  .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
+                  .orderBy("timestamp")
+                  .bind(viewId).bind(fromDate).bind(toDate);
     }
 
     qosDataMap.clear();
@@ -639,12 +637,12 @@ int DbSession::getLastQosData(QosDataT& qosData, const std::string& viewId)
     DboQosDataCollectionT queryResults;
     if (viewId.empty()) {
       queryResults = find<DboQosData>()
-          .orderBy("timestamp DESC")
-          .limit(1);
+                     .orderBy("timestamp DESC")
+                     .limit(1);
     } else {
       queryResults = find<DboQosData>()
-          .orderBy("timestamp DESC")
-          .limit(1);
+                     .orderBy("timestamp DESC")
+                     .limit(1);
     }
 
     if (queryResults.size() == 1) {
@@ -704,9 +702,9 @@ int DbSession::updateNotificationAckStatusForUser(const std::string& userId, con
       for (auto& dboView : dboViews) {
         std::string realViewId = viewId.empty()? dboView->name : viewId;
         dbo::ptr<DboNotification> notifDbEntry = find<DboNotification>()
-            .where("view_name = ?").bind(realViewId)
-            .orderBy("timestamp DESC")
-            .limit(1);
+                                                 .where("view_name = ?").bind(realViewId)
+                                                 .orderBy("timestamp DESC")
+                                                 .limit(1);
         DboNotification* notifDbPtr = new DboNotification();
         notifDbPtr->ack_user    = dboUser;
         notifDbPtr->ack_status  = newAckStatus;
@@ -739,9 +737,9 @@ int DbSession::updateNotificationAckStatusForView(const std::string& userId, con
     } else {
       long lastChange = time(NULL);
       dbo::ptr<DboNotification> notifDbEntry = find<DboNotification>()
-          .where("view_name = ?").bind(viewId)
-          .orderBy("timestamp DESC")
-          .limit(1);
+                                               .where("view_name = ?").bind(viewId)
+                                               .orderBy("timestamp DESC")
+                                               .limit(1);
       DboNotification* notifDbPtr = new DboNotification();
       notifDbPtr->ack_user    = dboUser;
       notifDbPtr->ack_status  = newAckStatus;
@@ -769,9 +767,9 @@ void DbSession::getLastNotificationInfo(NotificationT& lastNotifInfo, const std:
     if (! viewId.empty()) {
       dbo::ptr<DboNotification>
           dbNotifEntry = find<DboNotification>()
-          .where("view_name = ?").bind(viewId)
-          .orderBy("timestamp DESC")
-          .limit(1);
+                         .where("view_name = ?").bind(viewId)
+                         .orderBy("timestamp DESC")
+                         .limit(1);
       if (dbNotifEntry) {
         lastNotifInfo = dbNotifEntry->data();
       }

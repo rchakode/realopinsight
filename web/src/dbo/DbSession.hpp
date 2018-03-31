@@ -82,8 +82,7 @@ public:
   int deleteAuthSystemUsers(int authSystem);
   bool findUser(const std::string& username, DboUserT& user);
   int updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
-  void updateUserList(void);
-  DbUsersT& userList(void) {return m_userList;}
+  DbUsersT listUsers(void);
 
   int addView(const DboView& vinfo);
   int updateViewWithPath(const DboView& vinfo, const std::string& vpath);
@@ -97,14 +96,10 @@ public:
   int listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
   int getLastQosData(QosDataT& qosData, const std::string& viewId);
 
-  void updateViewList(void);
-  void updateViewListByAssignedUser(const std::string& uname);
-  DbViewsT& viewList(void) {return m_viewList;}
-  int viewCount(void) const {return m_viewList.size();}
+  DbViewsT listViews(void);
+  DbViewsT listViewListByAssignedUser(const std::string& uname);
+  UserViewsT updateUserViewList(void);
   bool findView(const std::string& vname, DboView& view);
-
-  void updateUserViewList(void);
-  UserViewsT& userViewList(void) {return m_userViewList;}
 
   int addSession(const DboLoginSession& session);
   int checkUserCookie(const DboLoginSession& session);
@@ -117,13 +112,8 @@ public:
 
 private:
   dbo::SqlConnection* m_dboSqlConncetion;
-
-
   UserDatabase* m_dboUserDb;
   DboUser m_loggedUser;
-  DbUsersT m_userList;
-  DbViewsT m_viewList;
-  UserViewsT m_userViewList;
   std::string m_lastError;
   Wt::Auth::Login m_loginObj;
   Wt::Auth::AuthService m_basicAuthService;

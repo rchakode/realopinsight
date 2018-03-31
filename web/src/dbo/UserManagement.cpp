@@ -441,8 +441,7 @@ DbUserManager::~DbUserManager(void)
 void DbUserManager::updateDbUsers(void)
 {
   m_usersListContainer->clear();
-  m_dbSession->updateUserList();
-  for (auto user: m_dbSession->userList()) {
+  for (auto user: m_dbSession->listUsers()) {
     m_usersListContainer->addWidget( createUserPanel(user.data()) );
   }
 }
