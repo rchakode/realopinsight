@@ -377,16 +377,16 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   }
 }
 
-void DashboardBase::initSettings(BaseSettings* preferencePtr)
+void DashboardBase::initSettings(BaseSettings* settings)
 {
   m_sources.clear();
   SourceT src;
   for (auto id = m_cdata.sources.begin(), end = m_cdata.sources.end(); id != end; ++id) {
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
-      if (preferencePtr->isSetSource(srcinfo.second)) {
+      if (settings->isSetSource(srcinfo.second)) {
         
-        if (preferencePtr->loadSource(*id, src)) {
+        if (settings->loadSource(*id, src)) {
           checkStandaloneSourceType(src);
           m_sources.insert(srcinfo.second, src);
         } else {

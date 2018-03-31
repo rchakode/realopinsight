@@ -196,19 +196,12 @@ webd {
   LIBS += -lwthttp
 }
 
-web-fcgi {
-  SOURCES += web/src/ngrt4n-web.cpp
-  DEFINES *= REALOPINSIGHT_WEB_FASTCGI
-  TARGET = realopinsight.fcgi
-  LIBS += -lwtfcgi
-}
-
-web-reportd {
+reportd {
   SOURCES += web/src/ngrt4n-reportd.cpp
   TARGET = realopinsight-reportd
 }
 
-web-foundation-unittests {
+foundation-unittests {
   QT += testlib
   TARGET = web-foundation-unittests
   HEADERS += web/src/web_foundation_unittests.hpp

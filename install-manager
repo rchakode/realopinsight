@@ -104,7 +104,7 @@ install_wt()
                   libboost-date-time1.54-dev \
                   libboost-random1.54-dev \
                   libldap2-dev \
-                  libfcgi libfcgi-dev
+                  postgresql-server-dev-9.5 
                   > /dev/null
 				  
   echo "DEBUG : Downloading wt..."
@@ -152,11 +152,6 @@ check_prerequisites()
   echo "done"
 }
 
-install_default(){
-  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=gui-base CONFIG+=manager ${dflag}
-  make -Bj${NCPU} 1>>install.log
-  make install 1>>install.log
-}
 
 build_standalone_binary() {
   echo "DEBUG : Building RealOpInsight Ultimate http server..."
@@ -164,15 +159,10 @@ build_standalone_binary() {
   make -j${NCPU} 1>>install.log
 }
 
-build_fcgi_binary() {
-  echo "DEBUG : Building RealOpInsight for FastCGI..."
-  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-fcgi ${dflag}
-  make -j${NCPU} 1>>install.log
-}
 
 install_reportd() {
   echo "DEBUG : Building QoS Data collector..."
-  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=web-reportd ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=reportd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
@@ -197,7 +187,6 @@ install_ultimate() {
   lrelease $QT_PROJECT_FILE
 
   build_standalone_binary
-  #build_fcgi_binary
   install_reportd
 
   echo "DEBUG : Installing setting files..."

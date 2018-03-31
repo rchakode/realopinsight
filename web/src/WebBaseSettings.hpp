@@ -55,6 +55,7 @@ public:
   std::string getDbName(void) const { return m_settingFactory->keyValue(SettingFactory::DB_NAME).toStdString();}
   std::string getDbUser(void) const { return m_settingFactory->keyValue(SettingFactory::DB_USER).toStdString();}
   std::string getDbPassword(void) const { return m_settingFactory->keyValue(SettingFactory::DB_PASSWORD).toStdString();}
+  std::string getDbConnectionString(void) const;
 
   std::string getLdapServerUri(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SERVER_URI).toStdString();}
   std::string getLdapBindUserDn(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_BIND_USER_DN).toStdString();}

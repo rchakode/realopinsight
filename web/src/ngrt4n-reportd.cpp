@@ -48,8 +48,8 @@ void runCollector(int period)
 {
   ngrt4n::initReportdLogger();
 
-  DbSession dbSession;
-  WebBaseSettings preferences;
+  WebBaseSettings settings;
+  DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
   Notificator notificator(&dbSession);
   while(1) {
     try {
@@ -67,13 +67,13 @@ void runCollector(int period)
       // initialize a collector for the current view.
       // skip the view if the initialization failed
       QosCollector collector(view.path.c_str());
-      collector.initialize(&preferences);
+      collector.initialize(&settings);
       if (collector.lastErrorState()) {
         REPORTD_LOG("error", collector.lastErrorMsg());
         continue;
       }
-      collector.initSettings(&preferences);
-      collector.updateAllNodesStatus();
+      collector.initSettings(&settings);
+      collector.updateAllNodesStatus(&dbSession);
       QosDataT qosData = collector.qosInfo();
       qosData.timestamp = now;
       qosDataList.push_back(qosData);
@@ -86,7 +86,7 @@ void runCollector(int period)
       }
     }
     // now handle notifications if applicable
-    if (preferences.getNotificationType() != WebBaseSettings::NoNotification) {
+    if (settings.getNotificationType() != WebBaseSettings::NoNotification) {
       for (const auto qosEntry : qosDataList)
         notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);
     }
@@ -98,7 +98,7 @@ void runCollector(int period)
 
 int main(int argc, char **argv)
 {
-  RealOpInsightQApp qtApp(argc, argv);
+  RoiQApp qtApp(argc, argv);
 
   int period = 5;
   bool ok;
@@ -119,7 +119,8 @@ int main(int argc, char **argv)
 
   period *= 60;
 
-  REPORTD_LOG("notice", QObject::tr("Reporting collector started. Interval: %1 second(s)").arg(QString::number(period)));
+  REPORTD_LOG("notice", QObject::tr("Reporting collector started"));
+  REPORTD_LOG("notice", QObject::tr(" => Interval: %1 second(s)").arg(QString::number(period)));
   runCollector(period); // convert period in seconds
 
   return qtApp.exec();

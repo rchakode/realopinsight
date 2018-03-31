@@ -46,7 +46,7 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void initSettings(BaseSettings* preferencePtr);
+  void initSettings(BaseSettings* settings);
   qint64 updateCounter(void) const {return m_updateCounter;}
   QString config(void) const {return m_descriptionFile;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}

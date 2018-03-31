@@ -96,7 +96,7 @@ void AuthManager::createLoggedInView(void)
     bindWidget("main-ui", m_mainUI = new WebMainUI(this));
     bindEmpty("update-banner");
   } catch (const std::bad_alloc& ) {
-    bindString("main-ui", "ERROR: You are running low on memory, please upgrade your system !");
+    bindString("main-ui", "You are likely running low on memory, please upgrade your system !");
   }
 
   // create the logout button

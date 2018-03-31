@@ -32,7 +32,7 @@
 #include "Applications.hpp"
 
 
-Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
+Wt::WApplication* createRoiApplication(const Wt::WEnvironment& env)
 {
   return new WebApp(env);
 }
@@ -41,14 +41,14 @@ Wt::WApplication* createRealOpInsightWApplication(const Wt::WEnvironment& env)
 
 int main(int argc, char **argv)
 {
-  RealOpInsightQApp qtApp (argc, argv);
+  RoiQApp qtApp (argc, argv);
   Q_INIT_RESOURCE(ngrt4n);
 
   try {
     std::string configurationFile = "/opt/realopinsight/etc/wt_config.xml";
     Wt::WServer server(argv[0], configurationFile);
     server.setServerConfiguration(argc, argv);
-    server.addEntryPoint(Wt::Application, &createRealOpInsightWApplication, "", "favicon.ico");
+    server.addEntryPoint(Wt::Application, &createRoiApplication, "", "favicon.ico");
 
     if (server.start()) {
       Wt::WServer::waitForShutdown();

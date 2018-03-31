@@ -33,12 +33,12 @@
 #include "AuthManager.hpp"
 
 
-class RealOpInsightQApp : public QCoreApplication
+class RoiQApp : public QCoreApplication
 {
   public:
-    RealOpInsightQApp(int& argc, char ** argv)
+    RoiQApp(int& argc, char ** argv)
       : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
-    virtual ~RealOpInsightQApp() { ngrt4n::freeCoreLogger(); }
+    virtual ~RoiQApp() { ngrt4n::freeCoreLogger(); }
 
     virtual bool notify(QObject* receiver, QEvent* event) {
       try {
@@ -62,14 +62,8 @@ class WebApp : public Wt::WQApplication
   protected:
     virtual void create()
     {
-#ifdef REALOPINSIGHT_WEB_FASTCGI
-      m_dirroot = "";
-      m_docroot = "";
-#else
       m_dirroot = "/";
       m_docroot = docRoot() +  m_dirroot;
-#endif
-
       setTwoPhaseRenderingThreshold(0);
       useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
       useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
@@ -77,28 +71,24 @@ class WebApp : public Wt::WQApplication
       setTheme(&m_theme);
       requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
 
-#ifdef ENABLE_ANALYTICS
-      require(m_dirroot+"resources/js/ga.js");
-#endif
-
       WebBaseSettings settings;
-      int dbType = settings.getDbType();
-      std::string db = "";
-      if (dbType == PostgresqlDb) {
-        CORE_LOG("info", Q_TR("Using PostgreSQL database"));
-        db = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
-            .arg(settings.getDbServerAddr())
-            .arg(settings.getDbServerPort())
-            .arg(settings.getDbName())
-            .arg(settings.getDbUser())
-            .arg(settings.getDbPassword())
-            .toUTF8();
-      } else { // use Sqlite3 as default database
-        CORE_LOG("info", Q_TR("Using Sqlite3 database"));
-        db = ngrt4n::sqliteDbPath();
-      }
+//      int dbType = settings.getDbType();
+//      std::string db = "";
+//      if (dbType == PostgresqlDb) {
+//        CORE_LOG("info", Q_TR("Using PostgreSQL database"));
+//        db = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
+//            .arg(settings.getDbServerAddr())
+//            .arg(settings.getDbServerPort())
+//            .arg(settings.getDbName())
+//            .arg(settings.getDbUser())
+//            .arg(settings.getDbPassword())
+//            .toUTF8();
+//      } else { // use Sqlite3 as default database
+//        CORE_LOG("info", Q_TR("Using Sqlite3 database"));
+//        db = ngrt4n::sqliteDbPath();
+//      }
 
-      m_dbSession = new DbSession(dbType, db);
+      m_dbSession = new DbSession(settings.getDbType(), settings.getDbConnectionString());
 
       root()->setId("wrapper");
       root()->addWidget(new AuthManager(m_dbSession));

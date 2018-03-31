@@ -73,3 +73,23 @@ int WebBaseSettings::activeSourceIds(QVector<std::string>& result)
   }
   return result.size();
 }
+
+std::string WebBaseSettings::getDbConnectionString(void) const
+{
+  std::string connectionString = "";
+  if (getDbType() == PostgresqlDb) {
+    CORE_LOG("info", Q_TR("Using PostgreSQL database"));
+    connectionString = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
+        .arg(getDbServerAddr())
+        .arg(getDbServerPort())
+        .arg(getDbName())
+        .arg(getDbUser())
+        .arg(getDbPassword())
+        .toUTF8();
+  } else { // use Sqlite3 as default database
+    CORE_LOG("info", Q_TR("Using Sqlite3 database"));
+    connectionString = ngrt4n::sqliteDbPath();
+  }
+
+  return connectionString;
+}
