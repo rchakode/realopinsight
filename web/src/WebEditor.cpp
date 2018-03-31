@@ -604,8 +604,41 @@ void WebEditor::handleNodeTypeChanged(void)
     if (! findDescendantNodes(nodeId).empty()) {
       m_typeField.setCurrentIndex(ninfoIt->type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
+      return ;
     }
   }
+
+  if (type == ninfoIt->type) {
+    return ;
+  }
+
+  // backup node info before processing that implies to remove it and thus invalidate its iterator
+  NodeT ninfo = *ninfoIt;
+  switch (type) {
+    case NodeType::ITService:
+      if (m_cdata.bpnodes.remove(ninfo.id) > 0) {
+        m_cdata.cnodes.insert(ninfo.id, ninfo);
+      } else {
+        m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in parent list"));
+      }
+      break;
+
+    case NodeType::ExternalService:
+    case NodeType::BusinessService:
+    default:
+      if (ninfo.type == NodeType::ExternalService || ninfo.type == NodeType::BusinessService) {
+        break; // do nothing as in this case the node should be already on the right list
+      }
+
+      if (m_cdata.cnodes.remove(ninfo.id) > 0) {
+        m_cdata.bpnodes.insert(ninfo.id, ninfo);
+      } else {
+        m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in child list"));
+      }
+      break;
+  }
+
+  updateNodeDataFromEditor(ninfoIt->id);
 }
 
 
