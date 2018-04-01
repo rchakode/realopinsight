@@ -35,75 +35,64 @@
 
 class RoiQApp : public QCoreApplication
 {
-  public:
-    RoiQApp(int& argc, char ** argv)
-      : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
-    virtual ~RoiQApp() { ngrt4n::freeCoreLogger(); }
+public:
+  RoiQApp(int& argc, char ** argv)
+    : QCoreApplication(argc, argv) { ngrt4n::initCoreLogger(); }
+  virtual ~RoiQApp() { ngrt4n::freeCoreLogger(); }
 
-    virtual bool notify(QObject* receiver, QEvent* event) {
-      try {
-        if (event) return QCoreApplication::notify(receiver, event);
-      } catch(std::exception& ex) {
-        CORE_LOG("fatal", ex.what());
-      }
-      return false;
+  virtual bool notify(QObject* receiver, QEvent* event) {
+    try {
+      if (event) return QCoreApplication::notify(receiver, event);
+    } catch(std::exception& ex) {
+      CORE_LOG("fatal", ex.what());
     }
+    return false;
+  }
 };
 
 class WebApp : public Wt::WQApplication
 {
-  public:
-    WebApp(const Wt::WEnvironment& env)
-      : WQApplication(env, true)
-    {
-      m_theme.setVersion(Wt::WBootstrapTheme::Version3);
-    }
+public:
+  WebApp(const Wt::WEnvironment& env)
+    : WQApplication(env, true)
+  {
+    m_theme.setVersion(Wt::WBootstrapTheme::Version3);
+  }
 
-  protected:
-    virtual void create()
-    {
-      m_dirroot = "/";
-      m_docroot = docRoot() +  m_dirroot;
-      setTwoPhaseRenderingThreshold(0);
-      useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
-      useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
-      messageResourceBundle().use(m_docroot+"resources/i18n/messages");
-      setTheme(&m_theme);
-      requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
+protected:
+  virtual void create()
+  {
+    m_dirroot = "/";
+    m_docroot = docRoot() +  m_dirroot;
+    setTwoPhaseRenderingThreshold(0);
+    useStyleSheet(m_dirroot+"resources/css/ngrt4n.css");
+    useStyleSheet(m_dirroot+"resources/css/font-awesome.min.css");
+    messageResourceBundle().use(m_docroot+"resources/i18n/messages");
+    setTheme(&m_theme);
+    requireJQuery(m_dirroot+"resources/js/jquery-1.10.2.min.js");
 
-      WebBaseSettings settings;
-//      int dbType = settings.getDbType();
-//      std::string db = "";
-//      if (dbType == PostgresqlDb) {
-//        CORE_LOG("info", Q_TR("Using PostgreSQL database"));
-//        db = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
-//            .arg(settings.getDbServerAddr())
-//            .arg(settings.getDbServerPort())
-//            .arg(settings.getDbName())
-//            .arg(settings.getDbUser())
-//            .arg(settings.getDbPassword())
-//            .toUTF8();
-//      } else { // use Sqlite3 as default database
-//        CORE_LOG("info", Q_TR("Using Sqlite3 database"));
-//        db = ngrt4n::sqliteDbPath();
-//      }
+    root()->setId("wrapper");
 
-      m_dbSession = new DbSession(settings.getDbType(), settings.getDbConnectionString());
+    WebBaseSettings settings;
+    m_dbSession = new DbSession(settings.getDbType(), settings.getDbConnectionString());
 
-      root()->setId("wrapper");
+    if (m_dbSession->isConnected()) {
       root()->addWidget(new AuthManager(m_dbSession));
+    } else {
+      root()->addWidget(new Wt::WLabel(Q_TR("Failed to connect to database, please check logs for more details")));
     }
+  }
 
-    virtual void destroy()
-    {
-      delete m_dbSession;
-    }
+  virtual void destroy()
+  {
+    delete m_dbSession;
+  }
 
-  private:
-    Wt::WBootstrapTheme m_theme;
-    DbSession* m_dbSession;
-    std::string m_dirroot;
-    std::string m_docroot;
+private:
+  Wt::WBootstrapTheme m_theme;
+  DbSession* m_dbSession;
+  std::string m_dirroot;
+  std::string m_docroot;
 };
 
 

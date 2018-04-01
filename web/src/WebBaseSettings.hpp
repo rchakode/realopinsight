@@ -46,9 +46,6 @@ public:
   };
 
   WebBaseSettings(void);
-  int dbInitializationState(void) { return keyValue(SettingFactory::GLOBAL_DB_STATE_KEY, QString::number(DbNotInitialized)).toInt();}
-  void updateDbInitializationState(int state) {setKeyValue(SettingFactory::GLOBAL_DB_STATE_KEY, QString::number(state)); sync();}
-  
   int getDbType(void) const { return m_settingFactory->keyValue(SettingFactory::DB_TYPE).toInt();}
   std::string getDbServerAddr(void) const { return m_settingFactory->keyValue(SettingFactory::DB_SERVER_ADDR).toStdString();}
   int getDbServerPort(void) const { return m_settingFactory->keyValue(SettingFactory::DB_SERVER_PORT).toInt();}

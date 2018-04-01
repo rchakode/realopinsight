@@ -201,6 +201,11 @@ reportd {
   TARGET = realopinsight-reportd
 }
 
+setupdb {
+  SOURCES += web/src/ngrt4n-setupdb.cpp
+  TARGET = realopinsight-setupdb
+}
+
 foundation-unittests {
   QT += testlib
   TARGET = web-foundation-unittests

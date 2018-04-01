@@ -72,7 +72,7 @@ private:
   void addEvent(void);
   void bindFormWidgets(void);
   void unbindFormWidgets(void);
-  void saveSettings(void);
+  void applySettings(void);
   void updateFieldEnabledState(void);
   void handleLdapUseSslChanged(void);
 };

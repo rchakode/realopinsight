@@ -29,7 +29,12 @@ int main(int argc, char **argv)
   WebBaseSettings settings;
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
 
-  dbSession.initDb();
+  int rc = -1;
+  if (! dbSession.isConnected() || dbSession.initDb() != 0) {
+    std::cerr << Q_TR("Database initialization failed. Please check the core log for more details");
+  } else {
+    rc = 0;
+  }
 
-  return 0;
+  return rc;
 }

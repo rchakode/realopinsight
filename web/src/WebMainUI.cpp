@@ -812,7 +812,7 @@ void WebMainUI::setupSettingsPage(void)
 
   // Database settings menu
   m_adminStackedContents.addWidget(&m_databaseSettingsForm);
-  link = new Wt::WAnchor("#", Q_TR("Database"));
+  link = new Wt::WAnchor("#", Q_TR("Database Backend"));
   m_settingsMainPageTpl.bindWidget("menu-database-settings", link);
   m_menuLinks.insert(MenuDatabaseSettings, link);
   link->clicked().connect(this, &WebMainUI::handleDatabaseSettings);

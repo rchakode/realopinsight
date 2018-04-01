@@ -58,7 +58,7 @@ WebDatabaseSettings::~WebDatabaseSettings(void)
 
 void WebDatabaseSettings::addEvent(void)
 {
-  m_saveSettingsBtn.clicked().connect(this, &WebDatabaseSettings::saveSettings);
+  m_saveSettingsBtn.clicked().connect(this, &WebDatabaseSettings::applySettings);
   m_dbTypeBox.changed().connect(this, &WebDatabaseSettings::updateFieldEnabledState);
 }
 
@@ -71,6 +71,7 @@ void WebDatabaseSettings::bindFormWidgets(void)
   bindWidget("database-server-addr", &m_dbServerAddrField);
   bindWidget("database-server-port", &m_dbServerPortField);
   bindWidget("database-name", &m_dbNameField);
+  m_dbEmptyState.setChecked(true);
   bindWidget("database-empty-state", &m_dbEmptyState);
   bindWidget("database-user", &m_dbUserField);
   bindWidget("database-password", &m_dbPasswordField);
@@ -101,15 +102,9 @@ void WebDatabaseSettings::createFormWidgets(void)
 }
 
 
-void WebDatabaseSettings::saveSettings(void)
+void WebDatabaseSettings::applySettings(void)
 {
   m_settingFactory->setEntry(SettingFactory::DB_TYPE, QString::number(m_dbTypeBox.currentIndex()));
-
-  if (m_dbEmptyState.checkState() == Wt::Checked) {
-    updateDbInitializationState(DbNotInitialized);
-  } else {
-    updateDbInitializationState(DbInitialized);
-  }
 
   // save PostgreSQL settings if applicable
   if (m_dbTypeBox.currentIndex() == PostgresqlDb) {
@@ -120,7 +115,16 @@ void WebDatabaseSettings::saveSettings(void)
     m_settingFactory->setEntry(SettingFactory::DB_NAME, m_dbNameField.text().toUTF8().c_str());
   }
 
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved. Please *disconnect* and *reconnect* to have the changes take effect"));
+  // initialize the database if needed
+  if (m_dbEmptyState.checkState() == Wt::Checked) {
+    DbSession dbSession(getDbType(), getDbConnectionString());
+    if (dbSession.isConnected() && dbSession.initDb() == 0) {
+      m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Changes applied: Please *disconnect* and *reconnect* to have the changes take effect"));
+    } else {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Failed to initialize the database. Check logs for more details"));
+    }
+  }
+
   CORE_LOG("info", Q_TR("Database settings updated"));
 }
 

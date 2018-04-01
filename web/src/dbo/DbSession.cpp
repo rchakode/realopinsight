@@ -45,30 +45,38 @@ namespace Wt {
 }
 
 DbSession::DbSession(int dbType, const std::string& db)
+  : m_isConnected(false)
 {
   m_dboUserDb = new UserDatabase(*this);
   m_passAuthService = new Wt::Auth::PasswordService(m_basicAuthService);
 
-  switch (dbType) {
-    case PostgresqlDb:
-      m_dboSqlConncetion = new Wt::Dbo::backend::Postgres(db);
-      m_dboSqlConncetion->setProperty("show-queries", "false");
-      setConnection(*m_dboSqlConncetion);
-      break;
+  try {
+    switch (dbType) {
+      case PostgresqlDb:
+        m_dboSqlConncetion = new Wt::Dbo::backend::Postgres(db);
+        m_dboSqlConncetion->setProperty("show-queries", "false");
+        setConnection(*m_dboSqlConncetion);
+        break;
 
-      // Sqlite3 is the default database
-    case Sqlite3Db:
-    default:
-      m_dboSqlConncetion = new Wt::Dbo::backend::Sqlite3(db);
-      m_dboSqlConncetion->setProperty("show-queries", "false");
-      setConnection(*m_dboSqlConncetion);
-      break;
+        // Sqlite3 is the default database
+      case Sqlite3Db:
+      default:
+        m_dboSqlConncetion = new Wt::Dbo::backend::Sqlite3(db);
+        m_dboSqlConncetion->setProperty("show-queries", "false");
+        setConnection(*m_dboSqlConncetion);
+        break;
+    }
+
+    // do this before doing anything to avoid unauthorized access
+    configureAuth();
+    setupDbMapping();
+
+    m_isConnected = true;
+
+  } catch (const std::exception& ex) {
+    m_lastError = QObject::tr("Connection to database failed: %1").arg(ex.what()).toStdString();
+    CORE_LOG("fatal", m_lastError);
   }
-
-  // do this before doing anything to avoid unauthorized access
-  configureAuth();
-
-  setupDbMapping();
 }
 
 DbSession::~DbSession()
@@ -347,11 +355,10 @@ int DbSession::initDb(void)
     adm.role = DboUser::AdmRole;
     adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
     addUser(adm);
-    WebBaseSettings().updateDbInitializationState(DbInitialized);
     CORE_LOG("info", Q_TR("Database initialized"));
     rc = 0;
   } catch (dbo::Exception& ex) {
-    CORE_LOG("error", QObject::tr("%1: Failed initializing the database. %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    CORE_LOG("error", QObject::tr("%1: Failed initializing the database: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   return rc;

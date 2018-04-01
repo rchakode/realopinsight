@@ -43,6 +43,7 @@ namespace {
   typedef Wt::WPainter::Image GImage;
   const double THUMBNAIL_WIDTH = 120;
   const double THUMBNAIL_HEIGHT = 60;
+  const double ICON_SIDE = 40.0;
 }
 
 WebMap::WebMap(void)
@@ -106,30 +107,25 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 
 
 
-void WebMap::layoutSizeChanged(int width, int height )
+void WebMap::layoutSizeChanged(int width, int height)
 {
-  //TODO
+  //TODO layoutSizeChanged(int width, int height)
+  //qDebug()<<m_cdata->map_width * m_scaleX << m_cdata->map_height * m_scaleY << width << height << m_cdata->map_width << m_cdata->map_height;
 }
 
 void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this call paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX, m_cdata->map_height * m_scaleY);
+  qDebug()<<m_cdata->map_width * m_scaleX << m_cdata->map_height * m_scaleY  << m_cdata->map_width << m_cdata->map_height;
   updateThumbnail();
 }
 
-/**
- * @brief WebMap::drawNode
- * Set node position, set pen, then draw image, nav-icon and text.
- * The order is important !
- * @param node
- * @param drawIcon
- */
+
 void WebMap::drawNode(const NodeT& node, bool drawIcon)
 {
   if (node.visibility & ngrt4n::Visible) {
 
-    const double ICON_SIDE = 40.0;
     const double COLOR_BORDER_SIZE = 5.0;
     const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
     const double MAX_LABEL_LENGTH = 15;
@@ -203,11 +199,12 @@ void WebMap::createNodeLink(const NodeT& node, const Wt::WPointF& pos)
 {
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX,
                                           pos.y() * m_scaleY,
-                                          40 * m_scaleX,
-                                          40 * m_scaleY);
+                                          ICON_SIDE * m_scaleX,
+                                          ICON_SIDE * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(node.toString().toStdString()));
   addArea(area);
 }
+
 
 void WebMap::createExpIconLink(const NodeT& _node, const Wt::WPointF& expIconPos)
 {

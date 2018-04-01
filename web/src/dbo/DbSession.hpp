@@ -58,9 +58,12 @@ class DbSession : public dbo::Session
 public:
   DbSession(int dbType, const std::string& db);
   ~DbSession();
+
+  bool isConnected() const {return m_isConnected;}
+  std::string lastError(void) const {return m_lastError;}
+
   void setupDbMapping(void);
   int initDb(void);
-  std::string lastError(void) const {return m_lastError;}
   Wt::Auth::AbstractUserDatabase& users() const {return *m_dboUserDb;}
   Wt::Auth::AuthService& auth();
   Wt::Auth::PasswordService* passwordAuthentificator(void);
@@ -111,6 +114,7 @@ public:
   int listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
 
 private:
+  bool m_isConnected;
   dbo::SqlConnection* m_dboSqlConncetion;
   UserDatabase* m_dboUserDb;
   DboUser m_loggedUser;

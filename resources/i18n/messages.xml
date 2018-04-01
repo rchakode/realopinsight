@@ -678,30 +678,34 @@
           <label class="control-label">Database Type&nbsp;</label>
           <span>${database-type}</span>
          </div>
-          <div id="database-settings">
-             <div class="col-sm-12 form-group">
-               <label class="control-label">Server Address&nbsp;</label>
-               <span>${database-server-addr}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">Server Port&nbsp;</label>
-               <span>${database-server-port}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">Database Name&nbsp;</label>
-               <span>${database-name}</span>
-               <span>Empty database (if yes, will be initialized)</span>
-               <span>${database-empty-state}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">Username&nbsp;</label>
-               <span>${database-user}</span>
-             </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">Password&nbsp;</label>
-               <span>${database-password}</span>
-             </div>
-          </div>
+
+         <div class="col-sm-12 form-group">
+           <label class="control-label">Database Name&nbsp;</label>
+           <span>${database-name}</span>
+           <span>Empty database (if checked, will be initialized)</span>
+           <span>${database-empty-state}</span>
+         </div>
+
+         <div class="col-sm-12 form-group">
+           <label class="control-label">Server Address&nbsp;</label>
+           <span>${database-server-addr}</span>
+         </div>
+
+
+         <div class="col-sm-12 form-group">
+           <label class="control-label">Server Port&nbsp;</label>
+           <span>${database-server-port}</span>
+         </div>
+
+         <div class="col-sm-12 form-group">
+           <label class="control-label">Username&nbsp;</label>
+           <span>${database-user}</span>
+         </div>
+
+         <div class="col-sm-12 form-group">
+           <label class="control-label">Password&nbsp;</label>
+           <span>${database-password}</span>
+         </div>
       </fieldset>
     </div>
 
