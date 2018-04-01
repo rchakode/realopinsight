@@ -29,6 +29,7 @@
 #include <Wt/WBootstrapTheme>
 #include <Wt/WContainerWidget>
 #include <Wt/WEnvironment>
+#include <Wt/WLabel>
 #include "WebUtils.hpp"
 #include "AuthManager.hpp"
 

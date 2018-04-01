@@ -353,10 +353,13 @@ int DbSession::initDb(void)
     adm.firstname = "Default";
     adm.lastname = "Administrator";
     adm.role = DboUser::AdmRole;
-    adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();;
-    addUser(adm);
-    CORE_LOG("info", Q_TR("Database initialized"));
-    rc = 0;
+    adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();
+
+    rc = addUser(adm);
+    if (rc == 0) {
+      CORE_LOG("info", Q_TR("Database initialized"));
+    }
+
   } catch (dbo::Exception& ex) {
     CORE_LOG("error", QObject::tr("%1: Failed initializing the database: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
