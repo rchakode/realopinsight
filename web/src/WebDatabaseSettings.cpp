@@ -71,10 +71,12 @@ void WebDatabaseSettings::bindFormWidgets(void)
   bindWidget("database-server-addr", &m_dbServerAddrField);
   bindWidget("database-server-port", &m_dbServerPortField);
   bindWidget("database-name", &m_dbNameField);
-  m_dbEmptyState.setChecked(true);
   bindWidget("database-empty-state", &m_dbEmptyState);
   bindWidget("database-user", &m_dbUserField);
   bindWidget("database-password", &m_dbPasswordField);
+
+  // Initialize fields when applicable
+  m_dbEmptyState.setChecked(true);
 }
 
 
@@ -123,6 +125,8 @@ void WebDatabaseSettings::applySettings(void)
     } else {
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Failed to initialize the database. Check logs for more details"));
     }
+  } else {
+    m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Database settings saved"));
   }
 
   CORE_LOG("info", Q_TR("Database settings updated"));
