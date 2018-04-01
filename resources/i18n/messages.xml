@@ -57,12 +57,12 @@
             <div class="accordion-body collapse in">
               <div class="accordion-inner">
                <ul class="nav">
-                <li> ${menu-monitoring-settings}</li>
-                <li id="menu-auth-settings"> ${menu-auth-settings}</li>
-                <li id="menu-notification-settings"> ${menu-notification-settings}</li>
-                <li id="menu-database-settings"> ${menu-database-settings}</li>
-                <li> ${menu-my-account}</li>
-                <li><a href="#"> ${menu-change-password}</a></li>
+                <li>${menu-monitoring-settings}</li>
+                <li id="menu-auth-settings">${menu-auth-settings}</li>
+                <li id="menu-notification-settings">${menu-notification-settings}</li>
+                <li id="menu-database-settings">${menu-database-settings}</li>
+                <li id="menu-my-account"> ${menu-my-account}</li>
+                <li id="menu-change-password">${menu-change-password}</li>
               </ul>
               </div>
             </div>
@@ -690,7 +690,7 @@
              <div class="col-sm-12 form-group">
                <label class="control-label">Database Name&nbsp;</label>
                <span>${database-name}</span>
-               <span>Empty database (to be initialized) ?</span>
+               <span>Empty database (if yes, will be initialized)</span>
                <span>${database-empty-state}</span>
              </div>
              <div class="col-sm-12 form-group">
