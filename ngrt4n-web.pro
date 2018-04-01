@@ -27,7 +27,7 @@ TEMPLATE = app
 
 REALOPINSIGHT_CORE_VERSION=3.4.0
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
-PACKAGE_VERSION=2018b1
+PACKAGE_VERSION=2018r1-beta1
 
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
@@ -53,7 +53,7 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 CODECFORSRC = UTF-8
 CODECFORTR  = UTF-8
 
-INCLUDEPATH += $(WT_ROOT)/include \
+INCLUDEPATH += $(WT_HOME)/include \
                web/src
 
 
@@ -175,7 +175,7 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebInputSelector.cpp
 
 
-LIBS += -L"$(WT_ROOT)/lib" \
+LIBS += -L"$(WT_HOME)/lib" \
         -lwt \
         -lwtdbo \
         -lwtdbosqlite3 \

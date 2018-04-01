@@ -66,102 +66,62 @@ prompt_copyright()
   done
 }
 
-install_wt()
-{
-  if [ ! -e /etc/lsb-release ]; then
-    echo "ERROR: Distribution not supported"
-	exit 1
-  fi
-  
-  . /etc/lsb-release
-  
-  echo "DEBUG : Distribution $DISTRIB_ID"
-  
-  echo "DEBUG : Installing Wt dependencies..."
-  apt-get install -y g++ \
-                  make \
-                  cmake  \
-                  graphviz \
-                  libzmq1 libzmq-dev \
-                  libqt4-dev libqt4-webkit \
-                  libsqlite-dev \
-                  libssl-dev \
-                  libgraphicsmagick++1-dev \
-                  libpango1.0-dev \
-                  libboost-program-options1.54 \
-                  libboost-system1.54 \
-                  libboost-thread1.54 \
-                  libboost-regex1.54 \
-                  libboost-signals1.54  \
-                  libboost-filesystem1.54 \
-                  libboost-date-time1.54 \
-                  libboost-program-options1.54-dev \
-                  libboost-system1.54-dev \
-                  libboost-thread1.54-dev \
-                  libboost-regex1.54-dev \
-                  libboost-signals1.54-dev \
-                  libboost-filesystem1.54-dev \
-                  libboost-date-time1.54-dev \
-                  libboost-random1.54-dev \
-                  libldap2-dev \
-                  postgresql-server-dev-9.5 
-                  > /dev/null
-				  
-  echo "DEBUG : Downloading wt..."
-  wget http://prdownloads.sourceforge.net/witty/wt-${WT_VERSION}.tar.gz
-  
-  echo "DEBUG : Untar archive and move to build dir..."
-  tar zxf ${WT_SRC_DIR}/wt-${WT_VERSION}.tar.gz && cd wt-${WT_VERSION}
-  mkdir build && cd build
-  
-  echo "DEBUG : Run cmake"
-  cmake ..  -DWEBUSER=${WWW_USER} \
-            -DWEBGROUP=${WWW_GROUP} \
-            -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick
-			
-  echo "DEBUG : Building..."
-  make > /dev/null
-  
-  echo "DEBUG : Installing..."
-  make install
-  
-  echo "DEBUG : Updating ld..."
-  ldconfig 
-  
-  echo "DEBUG : Move to base directory"
-  cd ${BASE_BUILD_DIR}   
-}
-
 
 check_prerequisites()
 {
-  echo -n "DEBUG : Checking qmake => ${QMAKE:=`which qmake`}... "
-  [ -z $QMAKE ] && echo "ERROR : qmake not found." && exit 1
+  echo -n "[DEBUG] Checking if is QT_HOME set... "
+  [ -z $QT_HOME ] && echo "[ERROR] QT_HOME environment variable not set." && exit 1
+  echo "done"
+  
+  
+  QMAKE=${QT_HOME}/gcc_64/bin/qmake
+  echo -n "[DEBUG] Checking qmake at ${QMAKE}... "
+  [ ! -e $QMAKE ] && echo "[ERROR] qmake not found." && exit 1
+  echo "done"
+  
+  QLRELEASE=${QT_HOME}/bin/lrelease
+  echo -n "[DEBUG] Checking lrelease at ${QRELEASE}... "
+  [ ! -e $QLRELEASE ] && echo "[ERROR] lrelease not found." && exit 1
+  echo "done" 
+  
+  echo -n "[DEBUG] Checking if WT_HOME is set... "
+  [ -z $WT_HOME ] && echo "[ERROR] WT_HOME environment variable is not set." && exit 1
+  echo "done"
+  
+  WT_DBO_SQLITE=${WT_HOME}/include/Wt/Dbo/backend/Sqlite3
+  echo -n "[DEBUG] Checking Wt include files from $WT_HOME... "
+  [ ! -e $WT_DBO_SQLITE ] && echo -en "[ERROR] $WT_DBO_SQLITE not found.\n => $WT_HOME does not seem to be a Wt installation base directory." && exit 1
+  echo "done"   
+ 
+  echo -n "[DEBUG] Checking make => ${MAKE:=`which make`}... "
+  [ -z $MAKE ] && echo "[ERROR] make not found." && exit 1
   echo "done"
  
-  echo -n "DEBUG : Checking make => ${MAKE:=`which make`}... "
-  [ -z $MAKE ] && echo "ERROR : make not found." && exit 1
+  echo -n "[DEBUG] Checking C++ compiler => ${CXX:=`which g++`}... "
+  [ -z $CXX ] && echo "[ERROR] g++ not found." && exit 1
   echo "done"
  
-  echo -n "DEBUG : Checking C++ compiler => ${CXX:=`which g++`}... "
-  [ -z $CXX ] && echo "ERROR : g++ not found." && exit 1
-  echo "done"
- 
-  echo -n "DEBUG : Checking Graphviz => ${DOT:=`which dot`}... "
-  [ -z $DOT ] && echo "ERROR : dot not found." && exit 1
+  echo -n "[DEBUG] Checking Graphviz => ${DOT:=`which dot`}... "
+  [ -z $DOT ] && echo "[ERROR] dot not found." && exit 1
   echo "done"
 }
 
 
-build_standalone_binary() {
-  echo "DEBUG : Building RealOpInsight Ultimate http server..."
+build_web_server_binary() {
+  echo "[DEBUG] Building RealOpInsight Ultimate http server..."
   ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
+build_dbsetup_binary() {
+  echo "[DEBUG] Building RealOpInsight Ultimate http server..."
+  ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=setupdb ${dflag}
+  make -j${NCPU} 1>>install.log
+}
 
-install_reportd() {
-  echo "DEBUG : Building QoS Data collector..."
+
+build_reportd_binary() {
+  echo "[DEBUG] Building QoS Data collector..."
   ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=reportd ${dflag}
   make -j${NCPU} 1>>install.log
 }
@@ -170,26 +130,27 @@ install_ultimate() {
   echo "==>Installing RealOpInsight Ultimate..."
 
   if [ `id -u` -ne 0 ]; then 
-    echo "ERROR : root privileges are required"
+    echo "[ERROR] root privileges are required"
     exit 1	
   fi
 
   # create $REALOPINSIGHT_USER user if not exist
   id $REALOPINSIGHT_USER || useradd $REALOPINSIGHT_USER
   
-  #echo "DEBUG : Installing Wt and other dependencies..."
+  #echo "[DEBUG] Installing Wt and other dependencies..."
   #install_wt
   
   # check dependencies
   check_prerequisites
     
-  echo "DEBUG : Generating locale file"
-  lrelease $QT_PROJECT_FILE
+  echo "[DEBUG] Generating locale file"
+  ${QLRELEASE} $QT_PROJECT_FILE
 
-  build_standalone_binary
-  install_reportd
+  build_web_server_binary
+  build_dbsetup_binary
+  build_reportd_binary
 
-  echo "DEBUG : Installing setting files..."
+  echo "[DEBUG] Installing setting files..."
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/bin
   install -d ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
@@ -202,11 +163,15 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
 
 
-  echo "DEBUG : Installing binaries and init.d scripts..."
+  echo "[DEBUG] Installing binaries and init.d scripts..."
+  
   install -m 755 realopinsight-server ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  install -m 755 realopinsight-setupdb ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+  
   install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-server
   install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
+  
   update-rc.d realopinsight-server defaults
   update-rc.d realopinsight-reportd defaults
 
@@ -222,31 +187,27 @@ install_ultimate() {
         resources \
         ${REALOPINSIGHT_WWW}/
   
-  echo "DEBUG : Settings permissions for installation directory..."
+  echo "[DEBUG] Settings permissions for installation directory..."
   chmod 644 ${REALOPINSIGHT_WWW}/favicon.ico
   chown -R $REALOPINSIGHT_USER:$REALOPINSIGHT_GROUP ${REALOPINSIGHT_INSTALL_PREFIX}/
 
   
-  echo "DEBUG : Starting services..."
+  echo "[DEBUG] Starting services..."
   service realopinsight-server restart
   service realopinsight-reportd restart
-
-  echo "==>Installation completed"
 }
+
 
 NCPU=1
 mflag=
 dflag=
-MODULE=
-while getopts m:d:n:h name ; do
+while getopts d:n:h name ; do
   case $name in
     d) dflag=1
        install_prefix="$OPTARG"
     ;;
     n) NCPU=$OPTARG
     ;;
-    m) MODULE=$OPTARG
-    ;;	
     h) usage;
        exit 0
     ;;
@@ -277,12 +238,9 @@ if [ `id -u` -ne 0 ]; then
   echo "WARNING: You must have read/write permissions on the target directory ($INSTALL_PREFIX)"
 fi 
 
-case ${MODULE} in
-  ultimate) install_${MODULE}
-    ;;
-     
-  *)echo "Unknown module : ${MODULE}" ; 
-     exit 2;;
-esac 
+
+install_ultimate
+
+echo "==>Installation completed"
 
 exit 0
