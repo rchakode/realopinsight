@@ -46,7 +46,7 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void initSettings(BaseSettings* settings);
+  void initSettings(BaseSettings* p_settings);
   qint64 updateCounter(void) const {return m_updateCounter;}
   QString config(void) const {return m_descriptionFile;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
@@ -65,10 +65,9 @@ public Q_SLOTS:
   void runDataSourceUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   void prepareUpdate(const SourceT& src);
-  ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* dbSession);
+  ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   void checkStandaloneSourceType(SourceT& src);
-  void handleErrorOccurred(QString msg) {m_lastErrorMsg  = msg;}
-  virtual void initialize(BaseSettings* preferencePtr);
+  virtual void initialize(BaseSettings* p_settings);
   qint32 userRole(void) const {return m_userRole;}
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
   void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
@@ -81,7 +80,6 @@ Q_SIGNALS:
   void settingsLoaded(void);
   void updateSourceUrl(void);
   void timerIntervalChanged(qint32 interval);
-  void errorOccurred(QString msg);
   void dashboardLinkSelected(void);
   void updateInprogress(void);
   void updateFinished(void);
@@ -113,10 +111,9 @@ protected:
   int m_firstSrcIndex;
   bool m_lastErrorState;
   QString m_lastErrorMsg;
-  BaseSettings* m_baseSettings;
 
 protected:
-  void resetInterval(void);
+  void resetInterval(BaseSettings* p_settings);
   void updateCNodesWithCheck(const CheckT & check, const SourceT& src);
   void updateCNodesWithChecks(const ChecksT& checks, const SourceT& src);
   QStringList getAuthInfo(int srcId);

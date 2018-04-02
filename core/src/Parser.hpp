@@ -47,12 +47,6 @@ class Parser : public QObject
     QString dotFile(void) const { return m_dotFile; }
     QString lastErrorMsg(void) const {return m_lastErrorMsg;}
 
-  public Q_SLOTS :
-    void handleErrorOccurred(QString msg) { Q_EMIT errorOccurred(msg);}
-
-  Q_SIGNALS:
-    void errorOccurred(QString msg);
-
 
   private:
     static const QString m_dotHeader;

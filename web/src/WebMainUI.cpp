@@ -154,7 +154,9 @@ void WebMainUI::unbindExecutiveViewWidgets(void)
 void WebMainUI::unbindDashboardWidgets(void)
 {
   for (auto dashboardItem : m_dashboardMap) {
-    if (m_eventFeedLayout) m_eventFeedLayout->removeItem(dashboardItem->eventFeedLayout());
+    if (m_eventFeedLayout) {
+      m_eventFeedLayout->removeItem(dashboardItem->eventFeedLayout());
+    }
     m_dashboardStackedContents.removeWidget(dashboardItem);
   }
 }
@@ -649,33 +651,38 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     dashboardItem = new WebDashboard(path.c_str());
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
-    } else {
-      // the inner layout is explicitely removed when the object is destroyed
-      if (m_eventFeedLayout) m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
-
-      dashboardItem->initialize(& m_dataSourceSettingsForm);
-      if (dashboardItem->lastErrorState()) {
-        showMessage(ngrt4n::OperationFailed, dashboardItem->lastErrorMsg().toStdString());
-        delete dashboardItem, dashboardItem = NULL;
-      } else {
-        QString platformName = dashboardItem->rootNode().name;
-        DashboardMapT::Iterator result = m_dashboardMap.find(platformName);
-        if (result != m_dashboardMap.end()) {
-          showMessage(ngrt4n::OperationFailed,
-                      tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
-          delete dashboardItem, dashboardItem = NULL;
-        } else {
-          m_dashboardMap.insert(platformName, dashboardItem);
-          m_dashboardStackedContents.addWidget(dashboardItem);
-          m_selectViewBox->addItem(platformName.toStdString());
-        }
-      }
+      return NULL;
     }
+
+    dashboardItem->initialize(& m_dataSourceSettingsForm);
+    if (dashboardItem->lastErrorState()) {
+      showMessage(ngrt4n::OperationFailed, dashboardItem->lastErrorMsg().toStdString());
+      delete dashboardItem;
+      return NULL;
+    }
+
+    QString platformName = dashboardItem->rootNode().name;
+    DashboardMapT::Iterator result = m_dashboardMap.find(platformName);
+    if (result != m_dashboardMap.end()) {
+      showMessage(ngrt4n::OperationFailed, tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
+      delete dashboardItem;
+      return NULL;
+    }
+
+    m_dashboardMap.insert(platformName, dashboardItem);
+    m_dashboardStackedContents.addWidget(dashboardItem);
+    m_selectViewBox->addItem(platformName.toStdString());
+
+    // the inner layout is explicitely removed when the object is destroyed
+    if (m_eventFeedLayout) {
+      m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
+    }
+
   } catch (const std::bad_alloc&) {
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     CORE_LOG("error", errorMsg);
-    delete dashboardItem, dashboardItem = NULL;
     showMessage(ngrt4n::OperationFailed, errorMsg);
+    return NULL;
   }
 
   return dashboardItem;
@@ -954,20 +961,22 @@ void WebMainUI::initOperatorDashboard(void)
   int thumbPerRow = m_dbSession->dashboardTilesPerRow();
   for (const auto& view : vlist) {
     WebDashboard* dashboardItem = loadView(view.path);
-    if (dashboardItem) {
-      Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(),
-                                                         dashboardItem->thumbnailProblemDetailBar(),
-                                                         dashboardItem->thumbnail());
-      int rowIndex = thumbIndex / thumbPerRow;
-      int colIndex = thumbIndex % thumbPerRow;
-      m_thumbsLayout->addWidget(thumbWidget, rowIndex, colIndex); // take the ownership of the widget
-      m_thumbsWidgets.insert(view.name, thumbWidget);
-
-      QObject::connect(dashboardItem, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
-      thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, view.name));
-
-      ++thumbIndex;
+    if (! dashboardItem) {
+      continue;
     }
+
+    Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(),
+                                                       dashboardItem->thumbnailProblemDetailBar(),
+                                                       dashboardItem->thumbnail());
+    int rowIndex = thumbIndex / thumbPerRow;
+    int colIndex = thumbIndex % thumbPerRow;
+    m_thumbsLayout->addWidget(thumbWidget, rowIndex, colIndex); // take the ownership of the widget
+    m_thumbsWidgets.insert(view.name, thumbWidget);
+
+    QObject::connect(dashboardItem, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
+    thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, view.name));
+
+    ++thumbIndex;
   }
 
   showConditionalUiWidgets();

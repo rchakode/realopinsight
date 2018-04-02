@@ -59,15 +59,14 @@ WebDashboard::~WebDashboard()
   unbindWidgets();
 }
 
-void WebDashboard::initialize(BaseSettings* preferencePtr)
+void WebDashboard::initialize(BaseSettings* p_settings)
 {
-  DashboardBase::initialize(preferencePtr);
+  DashboardBase::initialize(p_settings);
   if (! DashboardBase::lastErrorState()) {
     m_thumbnailTitleBar.setText( rootNode().name.toStdString() );
     m_thumbnailProblemDetailsBar.setText("");
   } else {
     CORE_LOG("error", m_lastErrorMsg.toStdString());
-    Q_EMIT errorOccurred(m_lastErrorMsg);
   }
 }
 

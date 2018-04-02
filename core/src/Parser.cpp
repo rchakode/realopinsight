@@ -77,9 +77,8 @@ int Parser::parse(void)
 
 
   QFile file(m_descriptionFile);
-  if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
+  if (! file.open(QIODevice::ReadOnly|QIODevice::Text)) {
     m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_descriptionFile);
-    Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
     return -1;
   }
@@ -87,7 +86,6 @@ int Parser::parse(void)
   if (!xmlDoc.setContent(&file)) {
     file.close();
     m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_descriptionFile);
-    Q_EMIT errorOccurred(m_lastErrorMsg);
     return -1;
   }
 
@@ -193,9 +191,8 @@ void Parser::saveCoordinatesFile(void)
   m_dotFile = QDir::tempPath()%"/realopinsight-gen-"%QTime().currentTime().toString("hhmmsszzz")%".dot";
   m_plainFile = m_dotFile % ".plain";
   QFile file(m_dotFile);
-  if (!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
+  if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
     m_lastErrorMsg = QObject::tr("Unable into write the file %1").arg(m_dotFile);
-    Q_EMIT errorOccurred(m_lastErrorMsg);
     file.close();
     exit(1);
   }
@@ -223,7 +220,6 @@ int Parser::computeCoordinates(void)
   process.waitForFinished(60000);
   if (exitCode != 0) {
     m_lastErrorMsg = QObject::tr("The graph engine exited on error (code: %1, file: %2").arg(QString::number(exitCode), m_dotFile);
-    Q_EMIT errorOccurred(m_lastErrorMsg);
     return -1;
   }
 

@@ -87,23 +87,26 @@ DashboardBase::~DashboardBase()
 {
 }
 
-void DashboardBase::initialize(BaseSettings* preferencePtr)
+void DashboardBase::initialize(BaseSettings* p_settings)
 {
-  m_baseSettings = preferencePtr;
   m_lastErrorState = false;
-  if (! m_descriptionFile.isEmpty()) {
-    Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, m_baseSettings->getGraphLayout());
-    connect(&parser, SIGNAL(errorOccurred(QString)), this, SLOT(handleErrorOccurred(QString)));
 
-    int rc = parser.process();
-    if (rc != 0) {
-      m_lastErrorState = true;
-      m_lastErrorMsg = parser.lastErrorMsg();
-    } else {
-      buildTree();
-      buildMap();
-      initSettings(m_baseSettings);
-    }
+  if (m_descriptionFile.isEmpty()) {
+    m_lastErrorState = true;
+    m_lastErrorMsg = QObject::tr("Empty description file");
+    return ;
+  }
+
+  Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, p_settings->getGraphLayout());
+
+  int rc = parser.process();
+  if (rc != 0) {
+    m_lastErrorState = true;
+    m_lastErrorMsg = parser.lastErrorMsg();
+  } else {
+    buildTree();
+    buildMap();
+    initSettings(p_settings);
   }
 }
 
@@ -118,8 +121,6 @@ void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
       runMonitor(*src);
-    } else {
-      Q_EMIT errorOccurred(tr("The default source is not yet set"));
     }
   }
   computeBpNodeStatus(ngrt4n::ROOT_ID, dbSession);
@@ -271,7 +272,7 @@ void DashboardBase::updateNodeStatusInfo(NodeT& _node, const SourceT& src)
   }
 }
 
-ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _nodeId, DbSession* dbSession)
+ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _nodeId, DbSession* p_dbSession)
 {
   ngrt4n::AggregatedSeverityT status2Propagate;
 
@@ -309,7 +310,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
     node->check.last_state_change = std::to_string(toDate);
 
     auto externalServiceName = node->child_nodes.toStdString();
-    int rc = dbSession->listQosData(qosMap, externalServiceName, fromDate, toDate);
+    int rc = p_dbSession->listQosData(qosMap, externalServiceName, fromDate, toDate);
 
     if (rc > 0) {
       node->sev = qosMap[externalServiceName].back().status;
@@ -331,7 +332,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
   StatusAggregator severityAggregator;
   
   for (const auto childId: node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
-    status2Propagate = computeBpNodeStatus(childId, dbSession);
+    status2Propagate = computeBpNodeStatus(childId, p_dbSession);
     severityAggregator.addSeverity(status2Propagate.sev, status2Propagate.weight);
   }
   
@@ -377,16 +378,16 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   }
 }
 
-void DashboardBase::initSettings(BaseSettings* settings)
+void DashboardBase::initSettings(BaseSettings* p_settings)
 {
   m_sources.clear();
   SourceT src;
   for (auto id = m_cdata.sources.begin(), end = m_cdata.sources.end(); id != end; ++id) {
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
-      if (settings->isSetSource(srcinfo.second)) {
+      if (p_settings->isSetSource(srcinfo.second)) {
         
-        if (settings->loadSource(*id, src)) {
+        if (p_settings->loadSource(*id, src)) {
           checkStandaloneSourceType(src);
           m_sources.insert(srcinfo.second, src);
         } else {
@@ -397,11 +398,9 @@ void DashboardBase::initSettings(BaseSettings* settings)
         src.id = *id;
         updateDashboardOnError(src, tr("%1 is not set").arg(*id));
       }
-    } else {
-      Q_EMIT errorOccurred(tr("Cannot handle source (%1)").arg(*id));
     }
   }
-  resetInterval();
+  resetInterval(p_settings);
   computeFirstSrcIndex();
   Q_EMIT settingsLoaded();
 }
@@ -442,9 +441,9 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
   }
 }
 
-void DashboardBase::resetInterval()
+void DashboardBase::resetInterval(BaseSettings* p_settings)
 {
-  m_interval = 1000 * m_baseSettings->updateInterval();
+  m_interval = 1000 * p_settings->updateInterval();
   timerIntervalChanged(m_interval);
 }
 

@@ -154,7 +154,7 @@
     <!-- Event Feeds Pane -->
     <div id="ngrt4n-side-pane" class="col-sm-4">
     <div class="ngrt4n-content">
-    <legend>Open Event Feeds</legend>
+    <legend>Open Events</legend>
      ${event-feeds}
     </div>
     </div>
