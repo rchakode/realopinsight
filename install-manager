@@ -74,7 +74,7 @@ check_prerequisites()
   echo "done"
   
   
-  QMAKE=${QT_HOME}/gcc_64/bin/qmake
+  QMAKE=${QT_HOME}/bin/qmake
   echo -n "[DEBUG] Checking qmake at ${QMAKE}... "
   [ ! -e $QMAKE ] && echo "[ERROR] qmake not found." && exit 1
   echo "done"
