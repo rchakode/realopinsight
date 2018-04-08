@@ -141,6 +141,7 @@ void WebDatabaseSettings::updateFieldEnabledState(void)
   m_dbNameField.setEnabled(enable);
   m_dbUserField.setEnabled(enable);
   m_dbPasswordField.setEnabled(enable);
+  m_dbEmptyState.setEnabled(enable);
 }
 
 

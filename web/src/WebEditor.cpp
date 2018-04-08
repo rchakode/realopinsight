@@ -234,6 +234,7 @@ void WebEditor::bindFormWidgets(void)
   m_dataPointItemsLayout->addWidget(&m_dataPointField, 3);
   m_dataPointItemsContainer.setDisabled(true);
 
+  m_dataPointField.blurred().connect(this, &WebEditor::handleDataPointChanged);
   m_dataPointSourceField.activated().connect(this, &WebEditor::handleDataPointSourceChanged);
   m_dataPointGroupField.activated().connect(this, &WebEditor::handleDataPointGroupChanged);
 
@@ -244,7 +245,7 @@ void WebEditor::bindFormWidgets(void)
   dataPointSuggestionOptions.listSeparator = ',';
   dataPointSuggestionOptions.whitespace = " \\n";
   dataPointSuggestionOptions.wordSeparators = "-., \":\\n;";
-  dataPointSuggestionOptions.appendReplacedText = ", ";
+  dataPointSuggestionOptions.appendReplacedText = "";
 
   m_dataPointListPopup.reset(new Wt::WSuggestionPopup(
                                Wt::WSuggestionPopup::generateMatcherJS(dataPointSuggestionOptions),
@@ -332,7 +333,7 @@ void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
 void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
 {
   if (event.modifiers() != Wt::ShiftModifier) {
-    return ;
+    return;
   }
 
   switch (event.key()) {
@@ -341,6 +342,18 @@ void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
       break;
     case Wt::Key_X:
       removeServiceByTreeNodeIndex(m_selectedTreeItemIndex);
+      break;
+    case Wt::Key_S:
+      handleSaveViewButton();
+      break;
+    case Wt::Key_N:
+      handleNewViewButton();
+      break;
+    case Wt::Key_O:
+      handleOpenViewButton();
+      break;
+    case Wt::Key_I:
+      handleImportNativeConfigButton();
       break;
     default:
       break;
@@ -585,13 +598,33 @@ void WebEditor::handleNodeLabelChanged(void)
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 }
 
+void WebEditor::handleDataPointChanged(void)
+{
+  if (m_dataPointField.isEnabled()) {
+    auto dataPoint = m_dataPointField.text().toUTF8();
+    int slashIndex = dataPoint.find("/");
+    m_nameField.setText(dataPoint.substr(slashIndex + 1) + "("  + dataPoint.substr(0, slashIndex) + ")");
+  }
+}
+
 
 void WebEditor::handleNodeTypeChanged(void)
 {
   const int type = m_typeField.currentIndex();
 
-  m_typeExternalServiceNameField.setHidden(type != NodeType::ExternalService);
-  m_dataPointItemsContainer.setDisabled(type != NodeType::ITService);
+  bool isItService = (type == NodeType::ITService);
+  bool isExternalService = (type == NodeType::ExternalService);
+
+
+  m_nameField.setDisabled(isItService);
+  m_dataPointItemsContainer.setDisabled(! isItService);
+
+  m_typeExternalServiceNameField.setHidden(! isExternalService);
+
+  if (isItService) {
+    m_nameField.setText("");
+    m_nameField.setPlaceholderText(Q_TR("Value automatically computed from data point field"));
+  }
 
   QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
   NodeListT::ConstIterator ninfoIt;
@@ -717,12 +750,19 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
 
 void WebEditor::fixParentChildrenDependencies(void)
 {
-  for (const auto& srv_it: m_cdata.bpnodes) {
-    setParentChildDependency(srv_it.id, srv_it.parent);
+  // First clear all existing children for bpnodes
+  for (auto& node: m_cdata.bpnodes) {
+    node.child_nodes.clear();
   }
 
-  for (const auto& srv_it: m_cdata.cnodes) {
-    setParentChildDependency(srv_it.id, srv_it.parent);
+  // build dependencies for bpnodes
+  for (const auto& node: m_cdata.bpnodes) {
+    setParentChildDependency(node.id, node.parent);
+  }
+
+  // build dependencies for cnodes
+  for (const auto& node: m_cdata.cnodes) {
+    setParentChildDependency(node.id, node.parent);
   }
 }
 

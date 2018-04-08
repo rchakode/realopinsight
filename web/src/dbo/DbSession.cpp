@@ -357,7 +357,7 @@ int DbSession::initDb(void)
 
     rc = addUser(adm);
     if (rc == 0) {
-      CORE_LOG("info", Q_TR("Database initialized"));
+      CORE_LOG("info", Q_TR("Database initialized successfully"));
     }
 
   } catch (dbo::Exception& ex) {

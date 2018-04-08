@@ -402,9 +402,9 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
   const auto MONITOR_NAME = MonitorT::toString(srcInfo.mon_type);
 
   ChecksT checks;
-  auto importResult = importMonitorItemAsDataPoints(srcInfo, filter, checks);
-  if (importResult.first != 0) {
-    return std::make_pair(-1, QObject::tr("%1: %2").arg(MONITOR_NAME, importResult.second));
+  auto importOut = importMonitorItemAsDataPoints(srcInfo, filter, checks);
+  if (importOut.first != 0) {
+    return std::make_pair(-1, QObject::tr("%1: %2").arg(MONITOR_NAME, importOut.second));
   }
 
   // handle results
@@ -429,7 +429,9 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
     hostNode.parent = rootService.id;
     hostNode.name = hostNode.description = QString::fromStdString(check->host);
     hostNode.id = "";
+
     Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
+
     QString checkId = QString::fromStdString(check->id);
     triggerNode.id = ngrt4n::generateId();
     triggerNode.parent = hostNode.id;

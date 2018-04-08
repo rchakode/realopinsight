@@ -128,7 +128,7 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
 
     const double COLOR_BORDER_SIZE = 5.0;
     const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
-    const double MAX_LABEL_LENGTH = 15;
+    const double MAX_LABEL_LENGTH = 20;
 
     double base_x = node.pos_x + m_cdata->min_x;
     double base_y = node.pos_y + m_cdata->min_y;

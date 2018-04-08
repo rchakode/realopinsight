@@ -106,7 +106,7 @@
           <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
           <p>Use RealOpInsight Editor to easily design service dependencies and rules that govern your business.
           </p>
-          <p><a href="http://docs.realopinsight.com/latest/01_workstation/editor-manual.html"
+          <p><a href="http://docs.realopinsight.com/latest/02_ultimate/editor_manual.html"
           class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
           </p>
        </div>
@@ -376,7 +376,7 @@
     ${software} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
     <br />Version ${version}
     - <a href="http://docs.realopinsight.com/">Help</a>
-    - <a href="http://legal.realopinsight.com/" target="_blank">Terms &amp; Conditions</a>
+    - <a href="https://github.com/RealOpInsightLabs/realopinsight-ultimate/blob/master/LICENSE" target="_blank">Terms &amp; Conditions</a>
 </message>
 
 <message id="view-assignment-tpl">
