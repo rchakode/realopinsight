@@ -103,7 +103,6 @@ int Parser::parse(void)
     node.parent.clear();
     node.monitored = false;
     node.id = service.attribute("id").trimmed();
-    node.type = service.attribute("type").toInt();
     node.sev = node.sev_prop = ngrt4n::Unknown;
     node.sev_crule = service.attribute("statusCalcRule").toInt();
     node.sev_prule = service.attribute("statusPropRule").toInt();
@@ -126,15 +125,18 @@ int Parser::parse(void)
       node.icon = ngrt4n::DEFAULT_ICON;
     }
 
+    node.type = service.attribute("type").toInt();
     switch(node.type) {
+      case NodeType::ITService:
+        insertITServiceNode(node);
+        break;
       case NodeType::BusinessService:
       case NodeType::ExternalService:
         insertBusinessServiceNode(node);
         break;
-      case NodeType::ITService:
-        insertITServiceNode(node);
-        break;
       default:
+        node.type = NodeType::BusinessService;
+        insertBusinessServiceNode(node);
         break;
     }
   }
@@ -143,11 +145,18 @@ int Parser::parse(void)
 }
 
 
-QString Parser::espacedNodeLabel(const QString& rawLabel)
+QString Parser::escapeLabel(const QString& label)
 {
-  QString label = rawLabel;
-  return label.replace("'", " ").replace("-", " ").replace("\"", " ").replace(' ', '#');
+  QString rwLabel = label;
+  return rwLabel.replace("'", " ").replace("-", " ").replace("\"", " ").replace(' ', '#');
 }
+
+QString Parser::escapeId(const QString& id)
+{
+  QString rwId = id;
+  return rwId.replace("'", " ").replace("-", "_").replace("\"", "_").replace(' ', '_').replace('#', '_');
+}
+
 
 
 void Parser::fixParentChildDependenciesAndBuildDotContent(void)
@@ -155,8 +164,9 @@ void Parser::fixParentChildDependenciesAndBuildDotContent(void)
   m_dotContent.append("\n");
 
   for (const auto& bpnode:  m_cdata->bpnodes) {
+    auto graphParentId = escapeId(bpnode.id);
 
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(bpnode.id, espacedNodeLabel(bpnode.name)));
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(graphParentId, escapeLabel(bpnode.name)));
 
     if (bpnode.type == NodeType::ExternalService) {
       continue;
@@ -164,24 +174,24 @@ void Parser::fixParentChildDependenciesAndBuildDotContent(void)
 
     if (! bpnode.child_nodes.isEmpty()) {
       QStringList children = bpnode.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-
       for(const auto& childId: children) {
-        NodeListIteratorT childNodeIt;
-        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childNodeIt)) {
-          childNodeIt->parent = bpnode.id;
-          m_dotContent.append(QString("\t%1--%2\n").arg(bpnode.id, childNodeIt->id));
+        NodeListIteratorT childIt;
+        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childIt)) {
+          childIt->parent = bpnode.id;
+          auto graphChildId = escapeId(childIt->id);
+          m_dotContent.append(QString("\t%1--%2\n").arg(graphParentId, graphChildId));
         } else {
           qDebug() << QObject::tr("Failed to find parent-child dependency'%1' => %2").arg(bpnode.id, childId);
         }
       }
 
     }
-
   }
 
   // Set IT service nodes' labels
   for (const auto& cnode: m_cdata->cnodes) {
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(cnode.id, espacedNodeLabel(cnode.name)));
+    auto graphId = escapeId(cnode.id);
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(graphId, escapeLabel(cnode.name)));
   }
 
 }

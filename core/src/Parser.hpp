@@ -62,7 +62,8 @@ class Parser : public QObject
 
     void fixParentChildDependenciesAndBuildDotContent(void);
     void saveCoordinatesFile(void);
-    static QString espacedNodeLabel(const QString& rawLabel);
+    static QString escapeLabel(const QString& label);
+    static QString escapeId(const QString& id);
     void insertITServiceNode(NodeT& node);
     void insertBusinessServiceNode(NodeT& node);
 };
