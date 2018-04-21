@@ -588,6 +588,8 @@
       <span id="new-service-view">${new-service-view}</span>
       <span id="open-service-view">${open-service-view}</span>
       <span id="import-native-config">${import-native-config}</span>
+      <span id="import-zabbix-it-service">${import-zabbix-it-service}</span>
+      <span id="import-nabios-bpi">${import-nabios-bpi}</span>
     </div>
     </fieldset>
 

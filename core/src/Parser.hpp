@@ -46,6 +46,8 @@ class Parser : public QObject
     QString dotContent(void) const {return m_dotContent;}
     QString dotFile(void) const { return m_dotFile; }
     QString lastErrorMsg(void) const {return m_lastErrorMsg;}
+    static QString escapeLabel(const QString& label);
+    static QString escapeId(const QString& id);
 
 
   private:
@@ -62,8 +64,6 @@ class Parser : public QObject
 
     void fixParentChildDependenciesAndBuildDotContent(void);
     void saveCoordinatesFile(void);
-    static QString escapeLabel(const QString& label);
-    static QString escapeId(const QString& id);
     void insertITServiceNode(NodeT& node);
     void insertBusinessServiceNode(NodeT& node);
 };

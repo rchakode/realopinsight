@@ -46,6 +46,7 @@
 #include <QMap>
 #include <Wt/WSuggestionPopup>
 #include <Wt/WStringListModel>
+#include <Wt/WFileUpload>
 
 
 class WebEditor : public Wt::WContainerWidget
@@ -106,10 +107,14 @@ private:
   Wt::WImage m_newServiceViewBtn;
   Wt::WImage m_openServiceViewBtn;
   Wt::WImage m_saveCurrentViewBtn;
-  Wt::WImage m_importNativeConfigBtn;
+  Wt::WImage m_importMonitoringConfigBtn;
+  Wt::WImage m_importZabbixItServicesBtn;
+  Wt::WImage m_importNagiosBpiBtn;
 
   InputSelector m_openViewDialog;
-  InputSelector m_importNativeConfigDialog;
+  InputSelector m_importMonitoringConfigDialog;
+  InputSelector m_importZabbixItServicesDialog;
+  InputSelector m_importNagiosBpiDialog;
 
   Wt::WPopupMenu m_editionContextMenu;
   Wt::WMenuItem* m_menuAddSubService;
@@ -151,13 +156,27 @@ private:
   void handleSaveViewButton(void);
   void handleOpenViewButton(void);
   void handleOpenFile(const std::string& path, const std::string& option);
-  void handleImportNativeConfigButton(void);
+  void handleImportMonitoringConfigButton(void);
+  void handleImportZabbixItServiceButton(void);
+  void handleImportNagiosBpiButton(void);
   void handleDataPointSourceChanged(int index);
   void handleDataPointGroupChanged(int index);
 
-  void importNativeConfig(const std::string& srcId, const std::string& groupFilter);
+  void importMonitoringConfig(const std::string& srcId, const std::string& groupFilter);
+  void importZabbixITServices(const QString& srcId);
+  void importNagiosBpi(const std::string& sourceId, const std::string& bpiConfigPath);
+  void importZabbixITServices(const std::string& srcId);
+
   std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);
 
+  void attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root);
+  int extractNagiosBpiGroupMembers(const QString& parentServiceId,
+                                    const QString& sourceId,
+                                    const QString& bpiGroupMembersChain,
+                                    NodeListT& bpnodes,
+                                    NodeListT& cnodes,
+                                    QString& childrenIds,
+                                    bool& hasCluster);
 };
 
 

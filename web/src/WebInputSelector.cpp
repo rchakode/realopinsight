@@ -2,6 +2,7 @@
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
 
+
 ListSelector::ListSelector(void)
 {
   setMargin(10, Wt::Right);
@@ -57,28 +58,37 @@ void ListSelector::handleSelectionChanged(void)
   int index = currentIndex();
   Wt::WStandardItemModel* dataModel = static_cast<Wt::WStandardItemModel*>(this->model());
   if (index > 0) {
+    m_selectedItem = currentText().toUTF8();
     m_selectedItemData = boost::any_cast<std::string>(dataModel->item(index, 0)->data());
   }
 }
 
 
-
 InputSelector::InputSelector():
+  m_selectorType(SourceOnly),
   m_mainLayout(new Wt::WVBoxLayout())
 {
   setWindowTitle(Q_TR("Input Selector"));
 
   m_okBtn.setText(Q_TR("Apply"));
   m_okBtn.setStyleClass("btn btn-info");
-  m_okBtn.clicked().connect(this, &InputSelector::handleAccept);
+  m_okBtn.clicked().connect(this, &InputSelector::handleApply);
+
+  m_textFilterSelector.setPlaceholderText(Q_TR("Set a group filter (optional)"));
+
+  m_fileFilterSelector.setFileTextSize(4 * 1024); // 4MB => see also max-request-size wt config file);
+  m_fileFilterSelector.changed().connect(&m_fileFilterSelector, &Wt::WFileUpload::upload);
+  m_fileFilterSelector.uploaded().connect(this, &InputSelector::handleFileUploaded);
+  //m_fileFilterSelector.fileTooLarge().connect(this, [=](){});
 
   Wt::WDialog::contents()->addWidget(&m_container);
 
   m_container.setMargin(10, Wt::All);
   m_container.setLayout(m_mainLayout);
 
-  m_mainLayout->addWidget(&m_listSelector);
-  m_mainLayout->addWidget(&m_optionField);
+  m_mainLayout->addWidget(&m_itemListSelector);
+  m_mainLayout->addWidget(&m_textFilterSelector);
+  m_mainLayout->addWidget(&m_fileFilterSelector);
   m_mainLayout->addWidget(&m_okBtn);
 }
 
@@ -87,29 +97,70 @@ InputSelector::InputSelector():
 InputSelector::~InputSelector()
 {
   m_mainLayout->removeWidget(&m_okBtn);
-  m_mainLayout->removeWidget(&m_optionField);
-  m_mainLayout->removeWidget(&m_listSelector);
+  m_mainLayout->removeWidget(&m_textFilterSelector);
+  m_mainLayout->removeWidget(&m_itemListSelector);
+  m_mainLayout->removeWidget(&m_fileFilterSelector);
   m_container.clear();
   Wt::WDialog::contents()->removeWidget(&m_container);
 }
 
 void InputSelector::updateContentWithViewList(const DbViewsT& vlist)
 {
-  m_listSelector.updateContentWithViewList(vlist);
-  m_optionField.setHidden(true);
+  m_itemListSelector.updateContentWithViewList(vlist);
+  m_textFilterSelector.setHidden(true);
+  m_fileFilterSelector.setHidden(true);
 }
 
 
-void InputSelector::updateContentWithSourceList(const QList<QString>& sids)
+void InputSelector::updateContentWithSourceList(const QList<QString>& sids, int filterType)
 {
-  m_listSelector.updateContentWithSourceList(sids);
-  m_optionField.setHidden(false);
-  m_optionField.setPlaceholderText(Q_TR("Set hostgroup to filter on (optional)"));
+  m_itemListSelector.updateContentWithSourceList(sids);
+
+  m_selectorType = filterType;
+
+  switch (m_selectorType) {
+    case SourceOnly:
+      m_textFilterSelector.setHidden(true);
+      m_fileFilterSelector.setHidden(true);
+      break;
+    case SourceWithTextFilter:
+      m_fileFilterSelector.setHidden(true);
+      m_textFilterSelector.setHidden(false);
+      break;
+    case SourceWithFileFilter:
+      m_textFilterSelector.setHidden(true);
+      m_fileFilterSelector.setHidden(false);
+      break;
+    default:
+      break;
+  }
 }
 
 
-void InputSelector::handleAccept(void)
+void InputSelector::handleFileUploaded(void)
+{
+ // m_fileFilterSelector.setDisabled(true);
+}
+
+
+void InputSelector::handleApply(void)
 {
   Wt::WDialog::accept();
-  m_dataSelectionTriggered.emit(m_listSelector.selectedItemData(), m_optionField.text().toUTF8());
+
+  m_itemTriggered.emit(m_itemListSelector.selectedItem());
+
+  switch (m_selectorType) {
+    case SourceOnly:
+      m_itemTriggered.emit(m_itemListSelector.selectedItem());
+      break;
+    case SourceWithTextFilter:
+      m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_textFilterSelector.text().toUTF8());
+      break;
+    case SourceWithFileFilter:
+      m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_fileFilterSelector.spoolFileName());
+      break;
+    default:
+      break;
+  }
 }
+

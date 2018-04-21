@@ -361,35 +361,41 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& fi
 }
 
 
-int
+std::pair<int, QString>
 ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   m_sourceInfo = srcInfo;
   cdata.clear();
   cdata.monitor = MonitorT::Auto;
 
-  if (! checkLogin())
-    return -1;
+  if (! checkLogin()) {
+    return std::make_pair(-1, m_lastError);
+  }
 
   QStringList params(QString::number(GetITServices));
-  if (postRequest(GetITServices, params) != 0)
-    return -1;
+  if (postRequest(GetITServices, params) != 0) {
+    return std::make_pair(-1, m_lastError);
+  }
 
-  if (! checkBackendSuccessfulResult())
-    return -1;
+  if (! checkBackendSuccessfulResult()) {
+    return std::make_pair(-1, m_lastError);
+  }
 
   ZabbixParentChildsDependenciesMapT parentChildsDependencies;
   ZabbixChildParentDependenciesMapT childParentDependencies;
   ZabbixServiceTriggerDependenciesMapT serviceTriggerDependencies;
 
-  if (processZabbixITServiceData(cdata, parentChildsDependencies, childParentDependencies, serviceTriggerDependencies))
-    return -1;
+  if (processZabbixITServiceData(cdata, parentChildsDependencies, childParentDependencies, serviceTriggerDependencies)) {
+    return std::make_pair(-1, m_lastError);
+  }
 
-  if (setBusinessServiceDependencies(cdata.bpnodes, parentChildsDependencies) != 0)
-    return -1;
+  if (setBusinessServiceDependencies(cdata.bpnodes, parentChildsDependencies) != 0) {
+    return std::make_pair(-1, m_lastError);
+  }
 
-  if (setITServiceDataPoint(cdata.cnodes, serviceTriggerDependencies) != 0)
-    return -1;
+  if (setITServiceDataPoint(cdata.cnodes, serviceTriggerDependencies) != 0) {
+    return std::make_pair(-1, m_lastError);
+  }
 
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;
@@ -398,7 +404,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   rootService.child_nodes = extractTopParentServices(cdata.bpnodes, childParentDependencies);
   cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
 
-  return 0;
+  return std::make_pair(-1, m_lastError);
 }
 
 QString ZbxHelper::extractTopParentServices(const NodeListT& bpnodes, const ZabbixChildParentDependenciesMapT& childParentDependencies)

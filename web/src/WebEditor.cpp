@@ -28,6 +28,8 @@
 #include "utilsCore.hpp"
 #include "Parser.hpp"
 #include "WebBaseSettings.hpp"
+#include "WebInputSelector.hpp"
+#include "ZbxHelper.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -150,7 +152,7 @@ void WebEditor::bindFormWidgets(void)
   m_newServiceViewBtn.setImageLink(Wt::WLink("images/built-in/new.png"));
   m_newServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("new-service-view", &m_newServiceViewBtn);
-
+  // bind signal
   m_newServiceViewBtn.clicked().connect(this, &WebEditor::handleNewViewButton);
 
   // open service button
@@ -158,26 +160,45 @@ void WebEditor::bindFormWidgets(void)
   m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
   m_openServiceViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
-
+  // connect signals
   m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenViewButton);
-  m_openViewDialog.dataSelectionTriggered().connect(this, &WebEditor::handleOpenFile);
+  m_openViewDialog.dataTriggered().connect(this, &WebEditor::handleOpenFile);
 
   // save service button
   m_saveCurrentViewBtn.setToolTip(Q_TR("Save changes"));
   m_saveCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/save.png"));
   m_saveCurrentViewBtn.setStyleClass("btn");
   m_fieldEditionPane.bindWidget("save-current-view", &m_saveCurrentViewBtn);
-
+  // connect signals
   m_saveCurrentViewBtn.clicked().connect(this, &WebEditor::handleSaveViewButton);
 
-  // import native button
-  m_importNativeConfigBtn.setToolTip(Q_TR("Import of native monitoring settings as service tree"));
-  m_importNativeConfigBtn.setImageLink(Wt::WLink("images/built-in/import.png"));
-  m_importNativeConfigBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("import-native-config", &m_importNativeConfigBtn);
+  // import native monitoring data button
+  m_importMonitoringConfigBtn.setToolTip(Q_TR("Import of monitoring data as group-based tree"));
+  m_importMonitoringConfigBtn.setImageLink(Wt::WLink("images/built-in/import-monitoring-data.png"));
+  m_importMonitoringConfigBtn.setStyleClass("btn");
+  m_fieldEditionPane.bindWidget("import-native-config", &m_importMonitoringConfigBtn);
+  // connect signal
+  m_importMonitoringConfigBtn.clicked().connect(this, &WebEditor::handleImportMonitoringConfigButton);
+  m_importMonitoringConfigDialog.dataTriggered().connect(this, &WebEditor::importMonitoringConfig);
 
-  m_importNativeConfigBtn.clicked().connect(this, &WebEditor::handleImportNativeConfigButton);
-  m_importNativeConfigDialog.dataSelectionTriggered().connect(this, &WebEditor::importNativeConfig);
+  // import Zabbix IT Services
+  m_importZabbixItServicesBtn.setToolTip(Q_TR("Import Zabbix IT services"));
+  m_importZabbixItServicesBtn.setImageLink(Wt::WLink("images/built-in/import-zabbix_32x32.png"));
+  m_importZabbixItServicesBtn.setStyleClass("btn");
+  m_fieldEditionPane.bindWidget("import-zabbix-it-service", &m_importZabbixItServicesBtn);
+  // connect signal
+  m_importZabbixItServicesBtn.clicked().connect(this, &WebEditor::handleImportZabbixItServiceButton);
+  m_importZabbixItServicesDialog.itemTriggered().connect(this, &WebEditor::importZabbixITServices);
+
+
+  // import Nagios BPI button
+  m_importNagiosBpiBtn.setToolTip(Q_TR("Import Nagios BPI"));
+  m_importNagiosBpiBtn.setImageLink(Wt::WLink("images/built-in/import-nagios_32x32.png"));
+  m_importNagiosBpiBtn.setStyleClass("btn");
+  m_fieldEditionPane.bindWidget("import-nabios-bpi", &m_importNagiosBpiBtn);
+  // connect signal
+  m_importNagiosBpiBtn.clicked().connect(this, &WebEditor::handleImportNagiosBpiButton);
+  m_importNagiosBpiDialog.dataTriggered().connect(this, &WebEditor::importNagiosBpi);
 
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);
@@ -353,7 +374,7 @@ void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
       handleOpenViewButton();
       break;
     case Wt::Key_I:
-      handleImportNativeConfigButton();
+      handleImportMonitoringConfigButton();
       break;
     default:
       break;
@@ -577,9 +598,8 @@ void WebEditor::refreshDynamicContents(void)
 {
   m_dataPointSourceField.clear();
 
-  WebBaseSettings settings;
   m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
-  for (const auto& sinfo: settings.fetchSourceList(MonitorT::Auto)) {
+  for (const auto& sinfo: WebBaseSettings().fetchSourceList(MonitorT::Auto)) {
     m_dataPointSourceField.addItem(sinfo.id.toStdString());
   }
 
@@ -783,27 +803,46 @@ void WebEditor::setParentChildDependency(const QString& childId, const QString& 
 
 
 
-void WebEditor::handleImportNativeConfigButton(void)
+void WebEditor::handleImportMonitoringConfigButton(void)
 {
   WebBaseSettings settings;
   auto sources = settings.fetchSourceList(MonitorT::Auto);
+  m_importMonitoringConfigDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithTextFilter);
+  m_importMonitoringConfigDialog.show();
+}
 
-  m_importNativeConfigDialog.updateContentWithSourceList(sources.keys());
-  m_importNativeConfigDialog.show();
+
+void WebEditor::handleImportZabbixItServiceButton(void)
+{
+  WebBaseSettings settings;
+  auto sources = settings.fetchSourceList(MonitorT::Zabbix);
+  m_importZabbixItServicesDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceOnly);
+  m_importZabbixItServicesDialog.show();
+}
+
+void WebEditor::handleImportNagiosBpiButton(void)
+{
+  WebBaseSettings settings;
+  auto sources = settings.fetchSourceList(MonitorT::Nagios);
+  m_importNagiosBpiDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithFileFilter);
+  m_importNagiosBpiDialog.show();
 }
 
 
 
-void WebEditor::importNativeConfig(const std::string& srcId, const std::string& groupFilter)
+
+void WebEditor::importMonitoringConfig(const std::string& srcId, const std::string& groupFilter)
 {
   WebBaseSettings settings;
 
+  if (srcId.empty()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No source selected"));
+    return ;
+  }
+
   auto q_srcId = QString::fromStdString(srcId);
-
   auto sources = settings.fetchSourceList(MonitorT::Auto);
-
   auto src = sources.constFind(q_srcId);
-
   if (src == sources.cend()) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No source with id: %1").arg(q_srcId).toStdString());
     return ;
@@ -897,4 +936,290 @@ void WebEditor::handleDataPointGroupChanged(int index)
   m_dataPointListModel->setStringList(m_dataPointsListByGroup[group]);
 
   m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for '%1' group").arg(group.c_str()).toStdString());
+}
+
+
+void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpiConfigPath)
+{
+  QString sourceId(srcId.c_str());
+  QString bpiConfigFile(bpiConfigPath.c_str());
+
+  if (sourceId.isEmpty()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No source selected"));
+    return;
+  }
+
+  if (bpiConfigFile.isEmpty()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No file selected"));
+    return;
+  }
+
+  QFile file(bpiConfigFile);
+  if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Cannot open file: %1").arg(bpiConfigFile).toStdString());
+    return;
+  }
+
+  bool parsingFailed = false;
+  QString line;
+  int lineIndex = 0;
+  QTextStream streamReader(&file);
+  NodeT rootSrv;
+  rootSrv.id = ngrt4n::ROOT_ID;
+  rootSrv.name = QObject::tr("Nagios BPI Services");
+
+  m_cdata.clear();
+  while (line = streamReader.readLine(), ! line.isNull()) {
+
+    ++lineIndex;
+
+    line = line.trimmed();
+    if ( line.startsWith("#")
+         || line.isEmpty()
+         || ! line.startsWith("define")) continue;
+
+    if (! line.endsWith("{")) {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Group definition must end with '{' at line %1").arg(lineIndex).toStdString());
+      parsingFailed = true;
+      break;
+    }
+
+    QStringList fields = line.mid(0, line.size() - 1).trimmed().split(" ");
+    if (fields.size() != 2) {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad group definition at line  %1").arg(lineIndex).toStdString());
+      parsingFailed = true;
+      break;
+    }
+
+    QString groudId = fields[1];
+
+    NodeListT::Iterator currentGroupSrv = m_cdata.bpnodes.find(groudId);
+    if (currentGroupSrv == m_cdata.bpnodes.end()) {
+      NodeT groupSrv;
+
+      groupSrv.id = ngrt4n::generateId();
+      groupSrv.name = groudId;
+      groupSrv.type = NodeType::BusinessService;
+      groupSrv.parent = "";
+      groupSrv.sev_prule = PropRules::Unchanged;
+      groupSrv.sev_crule = CalcRules::Worst;
+      groupSrv.weight = ngrt4n::WEIGHT_UNIT;
+      groupSrv.icon = ngrt4n::DEFAULT_ICON;
+
+      currentGroupSrv = m_cdata.bpnodes.insert(groudId, groupSrv);
+    }
+
+    currentGroupSrv->sev_crule = CalcRules::Worst;
+
+    // now parse group config
+    int groupMembersCount = 0;
+    float warningThreshold  = 0;
+    float criticalThreshold = 0;
+    while (line = streamReader.readLine(), ! line.isNull()) {
+
+      ++lineIndex;
+
+      line = line.trimmed();
+
+      if (line.isEmpty()) continue;
+      if (line == "}") break;
+
+      fields = line.split("=");
+      if (fields.size() != 2) {
+        m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad group attribute definition at line %1").arg(lineIndex).toStdString());
+        parsingFailed = true;
+        break;
+      }
+
+      if (fields[0] == "title") {
+        currentGroupSrv->name = fields[1];
+      } else if (fields[0] == "desc") {
+        currentGroupSrv->description = fields[1];
+      } else if (fields[0] == "members") {
+        bool hasCluster = false;
+        QString members = fields[1];
+        groupMembersCount = extractNagiosBpiGroupMembers(currentGroupSrv->id,
+                                                         sourceId,
+                                                         members,
+                                                         m_cdata.bpnodes,
+                                                         m_cdata.cnodes,
+                                                         currentGroupSrv->child_nodes,
+                                                         hasCluster);
+        if (groupMembersCount < 0) {
+          parsingFailed = true;
+          break;
+        } else {
+          currentGroupSrv->sev_crule = hasCluster ? CalcRules::Average : CalcRules::Worst;
+        }
+
+      } else if (fields[0] == "warning_threshold") {
+        warningThreshold = fields[1].toFloat();
+      } else if (fields[0] == "critical_threshold") {
+        criticalThreshold = fields[1].toFloat();
+      } else if (fields[0] == "priority") {
+        /// not applicable
+      }
+    }
+
+
+    if (parsingFailed) {
+      break;
+    } else {
+      if (groupMembersCount > 0) {
+        if (warningThreshold > 0 || criticalThreshold > 0) {
+          currentGroupSrv->sev_crule = CalcRules::WeightedAverageWithThresholds;
+        }
+        ThresholdT threshold;
+        if (warningThreshold > 0.0) {
+          threshold.weight = warningThreshold / groupMembersCount;
+          threshold.sev_in = ngrt4n::Major;
+          threshold.sev_out = ngrt4n::Major;
+          currentGroupSrv->thresholdLimits.push_back(threshold);
+        }
+        if (warningThreshold > 0.0 ) {
+          threshold.weight = criticalThreshold / groupMembersCount;
+          threshold.sev_in = ngrt4n::Critical;
+          threshold.sev_out = ngrt4n::Critical;
+          currentGroupSrv->thresholdLimits.push_back(threshold);
+        }
+      }
+    }
+  }
+
+  if (parsingFailed) {
+    m_cdata.clear();
+  } else {
+    attachOrphanedNodesToRoot(m_cdata.bpnodes, rootSrv);
+    attachOrphanedNodesToRoot(m_cdata.cnodes, rootSrv);
+    m_cdata.bpnodes.insert(rootSrv.id, rootSrv);
+  }
+  file.close();
+  // save the result and open the file ?
+
+
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Importation completed"));
+}
+
+
+
+void WebEditor::attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root)
+{
+  for (NodeListT::Iterator node = nodes.begin(); node != nodes.end(); ++node) {
+    if (node->parent.isEmpty()) {
+      node->parent = root.id;
+      if (! root.child_nodes.isEmpty())
+        root.child_nodes.append(ngrt4n::CHILD_Q_SEP);
+      root.child_nodes.append(node->id);
+    }
+  }
+}
+
+
+int WebEditor::extractNagiosBpiGroupMembers(const QString& parentServiceId,
+                                            const QString& sourceId,
+                                            const QString& bpiGroupMembersChain,
+                                            NodeListT& bpnodes,
+                                            NodeListT& cnodes,
+                                            QString& childrenIds,
+                                            bool& hasCluster)
+{
+  int childCount = 0;
+  hasCluster = false;
+  QStringList members = bpiGroupMembersChain.split(",");
+  if (members.isEmpty()) {
+    return 0;
+  }
+
+  Q_FOREACH(const QString& member, members) {
+
+    if (member.isEmpty()) {
+      continue;
+    }
+
+    bool isClusterMember = member.endsWith(";&");
+    bool isEssentialMember = member.endsWith(";|");
+    bool isGroupMember = member.startsWith("$");
+    int start = isGroupMember ? 1 : 0;
+    int count = (isClusterMember || isEssentialMember) ? member.size() - (start + 2) : member.size() - start;
+    if (isClusterMember) hasCluster = true;
+
+    QString memberLabel = member.mid(start, count);
+    QString memberId = ngrt4n::generateId();;
+    QString currentChildId = "";
+
+    if (isGroupMember) {
+      NodeListT::Iterator currentMemberSrvIt = bpnodes.find(memberId);
+
+      if (currentMemberSrvIt != bpnodes.end()) {
+        currentMemberSrvIt->parent = parentServiceId;
+      } else {
+        NodeT memberSrv;
+
+        memberSrv.id = memberId;
+        memberSrv.name = memberLabel;
+        memberSrv.type = NodeType::BusinessService;
+        memberSrv.parent = parentServiceId;
+        memberSrv.sev_prule = PropRules::Unchanged;
+        memberSrv.sev_crule = CalcRules::Worst;
+        memberSrv.weight = ngrt4n::WEIGHT_UNIT;
+        memberSrv.icon = ngrt4n::DEFAULT_ICON;
+
+        currentMemberSrvIt = bpnodes.insert(memberId, memberSrv);
+      }
+
+      currentMemberSrvIt->weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
+      currentChildId = memberId.trimmed();
+
+    } else {
+      QStringList fields = memberId.split(";");
+
+      if (fields.size() == 2) {
+        currentChildId = ngrt4n::generateId();
+
+        NodeT cnode;
+        cnode.id = currentChildId;
+        cnode.name = QString("%1 on %2").arg(fields[1], fields[0]);
+        cnode.type = NodeType::ITService;
+        cnode.parent = parentServiceId;
+        cnode.sev_prule = PropRules::Unchanged;
+        cnode.sev_crule = CalcRules::Worst;
+        cnode.weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;
+        cnode.child_nodes = QString("%1:%2/%3").arg(sourceId, fields[0].trimmed(), fields[1].trimmed());
+        cnode.icon = ngrt4n::DEFAULT_ICON;
+
+        cnodes.insert(cnode.id, cnode);
+      } else {
+        m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Bad service entry %1").arg(memberId).toStdString());
+        childCount = -1;
+        break;
+      }
+    }
+
+    if (childrenIds.isEmpty()) {
+      childrenIds = currentChildId;
+    } else {
+      childrenIds += QString::fromStdString(ngrt4n::CHILD_SEP) + currentChildId;
+    }
+    ++childCount;
+  }
+
+  return childCount;
+}
+
+
+void WebEditor::importZabbixITServices(const std::string& srcId)
+{
+  if (srcId.empty()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No source selected"));
+    return;
+  }
+
+  auto allZbxSources = WebBaseSettings().fetchSourceList(MonitorT::Zabbix);
+  auto importStatus = ZbxHelper().loadITServices(allZbxSources[srcId.c_str()], m_cdata);
+  if (importStatus.first != 0) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Importation failed: %1").arg(importStatus.second).toStdString());
+    return ;
+  }
+  //FIXME: save and open the import result ?
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Importation completed"));
 }

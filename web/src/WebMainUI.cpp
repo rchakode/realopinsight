@@ -619,10 +619,10 @@ void WebMainUI::setupUploadForm(void)
 {
   m_fileUploader = new Wt::WFileUpload();
   m_fileUploader->setFileTextSize(MAX_FILE_UPLOAD);
-  m_fileUploader->setProgressBar(new Wt::WProgressBar()); // take the ownership of the progressbar
+  m_fileUploader->setProgressBar(new Wt::WProgressBar()); // takes the ownership of the progressbar
   m_fileUploader->setMargin(10, Wt::Right);
 
-  m_uploadFormTitle.setText(Q_TR("<p>Select a description file</p>"));
+  m_uploadFormTitle.setText(Q_TR("<p>Select a service file</p>"));
   m_uploadFormTitle.setTextFormat(Wt::XHTMLText);
 
   m_uploadSubmitButton.setText(Q_TR("Upload"));
@@ -1052,7 +1052,7 @@ void WebMainUI::configureDialogWidget(void)
   m_previewSelectorDialog.titleBar()->setStyleClass("titlebar");
 
   // bind dialog events
-  m_previewSelectorDialog.dataSelectionTriggered().connect(this, &WebMainUI::handlePreviewFile);
+  m_previewSelectorDialog.dataTriggered().connect(this, &WebMainUI::handlePreviewFile);
 }
 
 

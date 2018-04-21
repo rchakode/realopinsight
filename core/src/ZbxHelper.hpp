@@ -59,9 +59,8 @@ public:
   int parseReply(QNetworkReply* reply);
   bool checkBackendSuccessfulResult(void);
   int openSession(void);
-  int loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& filterValue,
-                 ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
-  int loadITServices(const SourceT& srcInfo, CoreDataT& cdata);
+  int loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& filterValue, ngrt4n::RequestFilterT filterType = ngrt4n::HostFilter);
+  std::pair<int,QString> loadITServices(const SourceT& srcInfo, CoreDataT& cdata);
 
 
 public Q_SLOTS:

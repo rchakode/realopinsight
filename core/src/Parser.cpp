@@ -148,7 +148,7 @@ int Parser::parse(void)
 QString Parser::escapeLabel(const QString& label)
 {
   QString rwLabel = label;
-  return rwLabel.replace("'", " ").replace("-", " ").replace("\"", " ").replace(' ', '#');
+  return rwLabel.replace("'", " ").replace("-", " ").replace("\"", " ").replace(' ', '#').replace(';', '_').replace('&', '_').replace('$', '_');
 }
 
 QString Parser::escapeId(const QString& id)
