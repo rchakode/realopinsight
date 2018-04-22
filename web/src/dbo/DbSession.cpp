@@ -106,7 +106,7 @@ int DbSession::addUser(const DboUserT& userInfo)
   try {
     DboUserCollectionT users = find<DboUser>().where("name=?").bind(userInfo.username);
     if (users.size() > 0) {
-      m_lastError = "Failed: a user with the same username already exist.";
+      m_lastError = "a user with the same username already exist.";
       CORE_LOG("error", m_lastError);
       rc = 1;
     } else {
@@ -361,7 +361,7 @@ int DbSession::initDb(void)
     }
 
   } catch (dbo::Exception& ex) {
-    CORE_LOG("error", QObject::tr("%1: Failed initializing the database: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    CORE_LOG("error", QObject::tr("%1: failed initializing the database: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
 
   return rc;
@@ -375,7 +375,7 @@ int DbSession::addView(const DboView& vInfo)
   try {
     DboViewCollectionT views = find<DboView>().where("name=?").bind(vInfo.name);
     if (views.size() > 0) {
-      m_lastError = QObject::tr("Failed: a view with name '%1' already exists").arg(vInfo.name.c_str()).toStdString();
+      m_lastError = QObject::tr("a view with name '%1' already exists").arg(vInfo.name.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
       rc = 1;
     } else {
