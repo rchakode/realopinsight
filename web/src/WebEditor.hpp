@@ -138,7 +138,7 @@ private:
   void fillInEditorFromNodeInfo(const NodeT& ninfo);
   void updateNodeDataFromEditor(const QString& nodeId);
 
-  void fixParentChildrenDependencies(void);
+  void fixParentChildrenDependencies(CoreDataT& cdata);
   void setParentChildDependency(const QString& childId, const QString& parentId);
   void removeNodeFromCdata(const NodeT& ninfo);
 
@@ -170,9 +170,9 @@ private:
   std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);
 
   void attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root);
-  int extractNagiosBpiGroupMembers(const QString& parentServiceId,
+  std::pair<int, std::string> extractNagiosBpiGroupMembers(const QString& parentServiceId,
                                     const QString& sourceId,
-                                    const QString& bpiGroupMembersChain,
+                                    const QString& groupMembers,
                                     NodeListT& bpnodes,
                                     NodeListT& cnodes,
                                     QString& childrenIds,

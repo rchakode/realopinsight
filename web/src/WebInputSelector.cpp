@@ -65,7 +65,7 @@ void ListSelector::handleSelectionChanged(void)
 
 
 InputSelector::InputSelector():
-  m_selectorType(SourceOnly),
+  m_selectorType(SelectMainItemWithData),
   m_mainLayout(new Wt::WVBoxLayout())
 {
   setWindowTitle(Q_TR("Input Selector"));
@@ -119,7 +119,7 @@ void InputSelector::updateContentWithSourceList(const QList<QString>& sids, int 
   m_selectorType = filterType;
 
   switch (m_selectorType) {
-    case SourceOnly:
+    case SelectMainItemWithData:
       m_textFilterSelector.setHidden(true);
       m_fileFilterSelector.setHidden(true);
       break;
@@ -150,8 +150,9 @@ void InputSelector::handleApply(void)
   m_itemTriggered.emit(m_itemListSelector.selectedItem());
 
   switch (m_selectorType) {
-    case SourceOnly:
+    case SelectMainItemWithData:
       m_itemTriggered.emit(m_itemListSelector.selectedItem());
+      m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_textFilterSelector.text().toUTF8());
       break;
     case SourceWithTextFilter:
       m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_textFilterSelector.text().toUTF8());

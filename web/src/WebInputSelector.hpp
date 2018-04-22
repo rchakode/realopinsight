@@ -29,7 +29,7 @@ class InputSelector: public Wt::WDialog
 {
 public:
   enum SelectorType {
-    SourceOnly = 0, // default
+    SelectMainItemWithData = 0, // default
     SourceWithTextFilter = 1,
     SourceWithFileFilter = 2
   };
