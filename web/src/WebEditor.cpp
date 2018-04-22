@@ -198,7 +198,7 @@ void WebEditor::bindFormWidgets(void)
   m_fieldEditionPane.bindWidget("import-nabios-bpi", &m_importNagiosBpiBtn);
   // connect signal
   m_importNagiosBpiBtn.clicked().connect(this, &WebEditor::handleImportNagiosBpiButton);
-  m_importNagiosBpiDialog.dataTriggered().connect(this, &WebEditor::importNagiosBpi);
+  m_importNagiosBpiDialog.fileUploaded().connect(this, &WebEditor::importNagiosBpi);
 
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);
@@ -375,6 +375,12 @@ void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
       break;
     case Wt::Key_I:
       handleImportMonitoringConfigButton();
+      break;
+    case Wt::Key_Z:
+      handleImportZabbixItServiceButton();
+      break;
+    case Wt::Key_G:
+      handleImportNagiosBpiButton();
       break;
     default:
       break;
@@ -725,7 +731,6 @@ void WebEditor::handleSaveViewButton(void)
 
 std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, const QString& destPath)
 {
-
   auto rootService = cdata.bpnodes.constFind(ngrt4n::ROOT_ID);
 
   if (rootService == cdata.bpnodes.cend()) {
@@ -745,9 +750,7 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
 
   // save view in database if it's the 1st time
   if (m_currentFilePath.empty()) {
-
     int rc = m_dbSession->addView(vinfo);
-
     if (rc != 0) {
       CORE_LOG("error", m_dbSession->lastError());
       return std::make_pair(rc,  m_dbSession->lastError().c_str());
@@ -757,7 +760,6 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
   }
 
   int rc = m_dbSession->updateViewWithPath(vinfo, destPath.toStdString());
-
   if (rc != 0) {
     CORE_LOG("error", m_dbSession->lastError());
     return std::make_pair(rc, m_dbSession->lastError().c_str());
@@ -816,7 +818,7 @@ void WebEditor::handleImportZabbixItServiceButton(void)
 {
   WebBaseSettings settings;
   auto sources = settings.fetchSourceList(MonitorT::Zabbix);
-  m_importZabbixItServicesDialog.updateContentWithSourceList(sources.keys(), InputSelector::SelectMainItemWithData);
+  m_importZabbixItServicesDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceOnly);
   m_importZabbixItServicesDialog.show();
 }
 
@@ -854,6 +856,8 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return  ;
   }
+
+  m_currentFilePath.clear();
 
   auto destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
   auto saveStatus = saveContentToFile(cdata, destPath);
@@ -985,7 +989,7 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
     QStringList fields = line.mid(0, line.size() - 1).trimmed().split(" ");
     if (fields.size() != 2) {
       parsingFailed = true;
-      parsingErrorMsg = QObject::tr("Bad group definition at line  %1").arg(lineIndex).toStdString();
+      parsingErrorMsg = QObject::tr("Bad group definition at line %1").arg(lineIndex).toStdString();
       break;
     }
 
@@ -1105,6 +1109,8 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
   }
 
   handleOpenFile(destPath.toStdString(), "");
+
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, "Completed");
 }
 
 
@@ -1240,4 +1246,6 @@ void WebEditor::importZabbixITServices(const std::string& srcId)
   }
 
   handleOpenFile(destPath.toStdString(), "");
+
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, "Completed");
 }

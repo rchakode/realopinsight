@@ -29,7 +29,7 @@ class InputSelector: public Wt::WDialog
 {
 public:
   enum SelectorType {
-    SelectMainItemWithData = 0, // default
+    SourceOnly = 0, // default
     SourceWithTextFilter = 1,
     SourceWithFileFilter = 2
   };
@@ -38,23 +38,29 @@ public:
   ~InputSelector();
   Wt::Signal<std::string, std::string>& dataTriggered(void) {return m_dataTriggered;}
   Wt::Signal<std::string>& itemTriggered(void) {return m_itemTriggered;}
+  Wt::Signal<std::string, std::string>& fileUploaded(void) {return m_fileUploaded;}
+
   void updateContentWithViewList(const DbViewsT& vlist);
   void updateContentWithSourceList(const QList<QString>& slist, int filterType);
 
 private:
-  Wt::Signal<std::string, std::string> m_dataTriggered;
   Wt::Signal<std::string> m_itemTriggered;
+  Wt::Signal<std::string, std::string> m_dataTriggered;
+  Wt::Signal<std::string, std::string> m_fileUploaded;
 
   int m_selectorType;
   Wt::WContainerWidget m_container;
   Wt::WVBoxLayout* m_mainLayout;
   ListSelector m_itemListSelector;
   Wt::WLineEdit m_textFilterSelector;
-  Wt::WFileUpload m_fileFilterSelector;
+  Wt::WContainerWidget m_fileFilterContainer;
+  Wt::WFileUpload* m_fileFilterSelector;
   Wt::WPushButton m_okBtn;
 
   void handleApply(void);
   void handleFileUploaded(void);
+
+  Wt::WFileUpload* createFileSelector(void);
 };
 
 

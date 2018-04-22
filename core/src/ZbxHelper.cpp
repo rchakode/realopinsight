@@ -369,16 +369,16 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   cdata.monitor = MonitorT::Auto;
 
   if (! checkLogin()) {
-    return std::make_pair(-1, m_lastError);
+    return std::make_pair(-1, QObject::tr("login failed: %s").arg(m_lastError));
   }
 
   QStringList params(QString::number(GetITServices));
   if (postRequest(GetITServices, params) != 0) {
-    return std::make_pair(-1, m_lastError);
+    return std::make_pair(-1, QObject::tr("failed to post request: %s").arg(m_lastError));
   }
 
   if (! checkBackendSuccessfulResult()) {
-    return std::make_pair(-1, m_lastError);
+    return std::make_pair(-1, QObject::tr("failed to parse backend request: %s").arg(m_lastError));
   }
 
   ZabbixParentChildsDependenciesMapT parentChildsDependencies;
@@ -386,15 +386,15 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   ZabbixServiceTriggerDependenciesMapT serviceTriggerDependencies;
 
   if (processZabbixITServiceData(cdata, parentChildsDependencies, childParentDependencies, serviceTriggerDependencies)) {
-    return std::make_pair(-1, m_lastError);
+    return std::make_pair(-1, QObject::tr("failed to process output: %s").arg(m_lastError));
   }
 
   if (setBusinessServiceDependencies(cdata.bpnodes, parentChildsDependencies) != 0) {
-    return std::make_pair(-1, m_lastError);
+    return std::make_pair(-1, QObject::tr("failed to build dependencies for bpnodes: %s").arg(m_lastError));
   }
 
   if (setITServiceDataPoint(cdata.cnodes, serviceTriggerDependencies) != 0) {
-    return std::make_pair(-1, m_lastError);
+    return std::make_pair(-1, QObject::tr("failed to build dependencies for cnodes: %s").arg(m_lastError));
   }
 
   NodeT rootService;
@@ -404,7 +404,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   rootService.child_nodes = extractTopParentServices(cdata.bpnodes, childParentDependencies);
   cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
 
-  return std::make_pair(-1, m_lastError);
+  return std::make_pair(0, "");
 }
 
 QString ZbxHelper::extractTopParentServices(const NodeListT& bpnodes, const ZabbixChildParentDependenciesMapT& childParentDependencies)

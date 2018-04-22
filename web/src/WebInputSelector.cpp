@@ -65,7 +65,7 @@ void ListSelector::handleSelectionChanged(void)
 
 
 InputSelector::InputSelector():
-  m_selectorType(SelectMainItemWithData),
+  m_selectorType(SourceOnly),
   m_mainLayout(new Wt::WVBoxLayout())
 {
   setWindowTitle(Q_TR("Input Selector"));
@@ -76,19 +76,16 @@ InputSelector::InputSelector():
 
   m_textFilterSelector.setPlaceholderText(Q_TR("Set a group filter (optional)"));
 
-  m_fileFilterSelector.setFileTextSize(4 * 1024); // 4MB => see also max-request-size wt config file);
-  m_fileFilterSelector.changed().connect(&m_fileFilterSelector, &Wt::WFileUpload::upload);
-  m_fileFilterSelector.uploaded().connect(this, &InputSelector::handleFileUploaded);
-  //m_fileFilterSelector.fileTooLarge().connect(this, [=](){});
+  m_fileFilterContainer.addWidget(m_fileFilterSelector = createFileSelector()); // take ownership on the widget
 
   Wt::WDialog::contents()->addWidget(&m_container);
 
+
   m_container.setMargin(10, Wt::All);
   m_container.setLayout(m_mainLayout);
-
   m_mainLayout->addWidget(&m_itemListSelector);
   m_mainLayout->addWidget(&m_textFilterSelector);
-  m_mainLayout->addWidget(&m_fileFilterSelector);
+  m_mainLayout->addWidget(&m_fileFilterContainer);
   m_mainLayout->addWidget(&m_okBtn);
 }
 
@@ -99,16 +96,27 @@ InputSelector::~InputSelector()
   m_mainLayout->removeWidget(&m_okBtn);
   m_mainLayout->removeWidget(&m_textFilterSelector);
   m_mainLayout->removeWidget(&m_itemListSelector);
-  m_mainLayout->removeWidget(&m_fileFilterSelector);
+  m_mainLayout->removeWidget(&m_fileFilterContainer);
   m_container.clear();
   Wt::WDialog::contents()->removeWidget(&m_container);
 }
+
+
+Wt::WFileUpload* InputSelector::createFileSelector(void)
+{
+  auto fileFilterSelector = new Wt::WFileUpload(); // take ownership on the widget
+  fileFilterSelector->setFileTextSize(4 * 1024); // 4MB => see also max-request-size wt config file);
+  fileFilterSelector->changed().connect(fileFilterSelector, &Wt::WFileUpload::upload);
+  fileFilterSelector->uploaded().connect(this, &InputSelector::handleFileUploaded);
+  return fileFilterSelector;
+}
+
 
 void InputSelector::updateContentWithViewList(const DbViewsT& vlist)
 {
   m_itemListSelector.updateContentWithViewList(vlist);
   m_textFilterSelector.setHidden(true);
-  m_fileFilterSelector.setHidden(true);
+  m_fileFilterSelector->setHidden(true);
 }
 
 
@@ -119,17 +127,17 @@ void InputSelector::updateContentWithSourceList(const QList<QString>& sids, int 
   m_selectorType = filterType;
 
   switch (m_selectorType) {
-    case SelectMainItemWithData:
+    case SourceOnly:
       m_textFilterSelector.setHidden(true);
-      m_fileFilterSelector.setHidden(true);
+      m_fileFilterSelector->setHidden(true);
       break;
     case SourceWithTextFilter:
-      m_fileFilterSelector.setHidden(true);
+      m_fileFilterSelector->setHidden(true);
       m_textFilterSelector.setHidden(false);
       break;
     case SourceWithFileFilter:
       m_textFilterSelector.setHidden(true);
-      m_fileFilterSelector.setHidden(false);
+      m_fileFilterSelector->setHidden(false);
       break;
     default:
       break;
@@ -139,29 +147,21 @@ void InputSelector::updateContentWithSourceList(const QList<QString>& sids, int 
 
 void InputSelector::handleFileUploaded(void)
 {
- // m_fileFilterSelector.setDisabled(true);
+  //TODO
 }
 
 
 void InputSelector::handleApply(void)
 {
   Wt::WDialog::accept();
-
   m_itemTriggered.emit(m_itemListSelector.selectedItem());
+  m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_textFilterSelector.text().toUTF8());
+  m_fileUploaded.emit(m_itemListSelector.selectedItem(), m_fileFilterSelector->spoolFileName());
 
-  switch (m_selectorType) {
-    case SelectMainItemWithData:
-      m_itemTriggered.emit(m_itemListSelector.selectedItem());
-      m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_textFilterSelector.text().toUTF8());
-      break;
-    case SourceWithTextFilter:
-      m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_textFilterSelector.text().toUTF8());
-      break;
-    case SourceWithFileFilter:
-      m_dataTriggered.emit(m_itemListSelector.selectedItemData(), m_fileFilterSelector.spoolFileName());
-      break;
-    default:
-      break;
-  }
+  // New the file uploader
+  m_fileFilterContainer.removeWidget(m_fileFilterSelector);
+  auto oldFileFilter = m_fileFilterSelector;
+  m_fileFilterContainer.addWidget(m_fileFilterSelector = createFileSelector()); // take ownership on the widget
+  delete oldFileFilter;
 }
 
