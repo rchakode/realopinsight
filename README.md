@@ -1,9 +1,6 @@
 RealOpInsight Ultimate is a web-based business service monitoring tool allowing advanced aggregation and correlation of monitoring events on top of existing systems, including Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and more.
-RealOpInsight Workstation is released under the terms of GPLv3 License. See the LICENSE file.
 
-
-RealOpInsight Workstation is released under the terms of GPLv3 License.
-Prior to the installation, you may need to read and agree the license offer.
+RealOpInsight is released under the terms of GPLv3 License. See the LICENSE file.
  
 
 INSTALLATION
