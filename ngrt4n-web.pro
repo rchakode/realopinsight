@@ -117,7 +117,9 @@ HEADERS += \
     web/src/WebBaseSettings.hpp \
     web/src/WebAuthSettings.hpp \ \
     web/src/WebEditor.hpp \
-    web/src/WebInputSelector.hpp
+    web/src/WebInputSelector.hpp \
+    core/src/K8sHelper.hpp \
+    core/src/TestK8sHelper.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -172,7 +174,9 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebAuthSettings.cpp \
     web/src/WebDataSourceSettings.cpp \
     web/src/WebEditor.cpp \
-    web/src/WebInputSelector.cpp
+    web/src/WebInputSelector.cpp \
+    core/src/K8sHelper.cpp \
+    core/src/TestK8sHelper.cpp
 
 
 LIBS += -L"$(WT_HOME)/lib" \
@@ -206,11 +210,18 @@ setupdb {
   TARGET = realopinsight-setupdb
 }
 
-foundation-unittests {
+unittests-web {
   QT += testlib
-  TARGET = web-foundation-unittests
+  TARGET = unittests-web
   HEADERS += web/src/web_foundation_unittests.hpp
   SOURCES += web/src/web_foundation_unittests.cpp
+}
+
+unittests-core {
+  QT += testlib
+  TARGET = unittests-core
+  HEADERS +=
+  SOURCES +=
 }
 
 TARGET.files = $${TARGET}

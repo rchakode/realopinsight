@@ -43,6 +43,7 @@ namespace ngrt4n
   const QString PLUS = "plus";
   const QString MINUS = "minus";
   const QString DEFAULT_ICON = "Business Process";
+  const QString CONTAINER_ICON = "Container";
   const double SCALIN_FACTOR = 1.1;
   const double SCALOUT_FACTOR = 1/SCALIN_FACTOR;
   const qint32 CHART_WIDTH=200;
@@ -64,6 +65,10 @@ namespace ngrt4n
         .arg(QUuid::createUuid().toString().replace("{", "").replace("}", "").replace("-",""))
         .arg(QString::number(++i));
   }
+
+
+  inline QString md5hash(const QString& str)
+  { return QString(QCryptographicHash::hash((str.toUtf8()), QCryptographicHash::Md5).toHex()); }
 
   inline QString sourceId(const qint32& idx)
   { return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));}

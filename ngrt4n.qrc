@@ -70,5 +70,6 @@
         <file>images/built-in/save.png</file>
         <file>images/built-in/rename.png</file>
         <file>images/built-in/new.png</file>
+        <file>images/docker-container.png</file>
     </qresource>
 </RCC>

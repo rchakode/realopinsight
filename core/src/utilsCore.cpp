@@ -369,6 +369,7 @@ IconMapT ngrt4n::nodeIcons() {
   icons["Zabbix Basic Logo"] = "images/zabbix-logo-z.png";
   icons["Zenoss Basic Logo"] = "images/zenoss-logo-o.png";
   icons["Hierarchy"] = "images/hierarchy.png";
+  icons[CONTAINER_ICON] = "images/docker-container.png";
   return icons;
 }
 
