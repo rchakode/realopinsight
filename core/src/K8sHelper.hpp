@@ -41,8 +41,12 @@ public:
                                                    NodeListT& bpnodes);
   std::pair<QString, bool> parseNamespacedPods(const QByteArray& data,
                                                const QString& macthNamespace,
-                                               CoreDataT& cdata);
+                                               const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
+                                               NodeListT& bpnodes,
+                                               NodeListT& cnodes);
   std::pair<int, QString> parseStateData(const QJsonObject& state);
+  std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
+                                               const QMap<QString, QVariant>& podLabels);
 };
 
 #endif // K8SHELPER_H

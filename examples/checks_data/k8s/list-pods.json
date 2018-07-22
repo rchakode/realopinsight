@@ -17,6 +17,7 @@
         "creationTimestamp": "2018-07-05T15:06:10Z",
         "labels": {
           "app": "application1",
+          "stage": "prod",
           "pod-template-hash": "3681808946",
           "version": "v1"
         },

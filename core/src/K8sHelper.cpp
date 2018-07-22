@@ -114,7 +114,9 @@ std::pair<QString, bool> K8sHelper::parseNamespacedServices(const QByteArray& da
 
 std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& data,
                                                         const QString& macthNamespace,
-                                                        CoreDataT& cdata)
+                                                        const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
+                                                        NodeListT& bpnodes,
+                                                        NodeListT& cnodes)
 {
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(data, &parserError);
@@ -126,8 +128,8 @@ std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& data,
 
   QJsonObject jsonData = jdoc.object();
   QJsonArray items = jsonData["items"].toArray();
-  for (auto item: items) {
 
+  for (auto item: items) {
     NodeT podNode;
     podNode.type = NodeType::BusinessService;
     podNode.sev_prule = PropRules::Unchanged;
@@ -143,24 +145,32 @@ std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& data,
     if (k8sNamespace != macthNamespace) {
       continue;
     }
-    k8sNamespaces.insert(k8sNamespace);
 
+    // check if pod selector match any service
+    auto&& podLabels =  metaData["labels"].toObject().toVariantMap();
+    auto serviceMatch = findMatchingService(serviceSelectorInfos, podLabels);
+    if (! serviceMatch.second) {
+      continue;
+    }
+
+    // start processing pod matching a service selector
+    k8sNamespaces.insert(k8sNamespace);
+    auto&& serviceFqdn = QString("%1.%2").arg(serviceMatch.first, k8sNamespace);
     auto&& podName = metaData["name"].toString();
     auto&& podUid = metaData["uid"].toString();
     auto&& podCreationTime = metaData["creationTimestamp"].toString();
-    auto&& k8sAppLabel = metaData["labels"].toObject()["app"].toString();
-    auto&& k8sPodFqdn = QString("%1.%2").arg(podName, k8sNamespace);
-    auto&& k8sAppFqdn = QString("%1.%2").arg(k8sAppLabel, k8sNamespace);
+    auto&& podFqdn = QString("%1.%2").arg(podName, k8sNamespace);
 
     podNode.name = podName;
-    podNode.id = ngrt4n::md5hash(k8sPodFqdn);
+    podNode.id = ngrt4n::md5hash(podFqdn);
     podNode.description = QString("uid: %1, creationTimestamp: %2").arg(std::move(podUid), std::move(podCreationTime));
-    podNode.parent = ngrt4n::md5hash(k8sAppFqdn);
-    cdata.bpnodes.insert(podNode.id, podNode);
+    podNode.parent = ngrt4n::md5hash(serviceFqdn); // match what is set for node in method parseNamespacedServices
+
+    // add pod node as business process service
+    bpnodes.insert(podNode.id, podNode);
 
     auto&& containerStatuses = podData["status"].toObject()["containerStatuses"].toArray();
     for (auto containerStatus: containerStatuses) {
-
       NodeT containerNode;
       containerNode.parent =  podNode.id ;
       containerNode.type = NodeType::ITService;
@@ -175,33 +185,30 @@ std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& data,
       auto&& stateData = parseStateData(containerStatusData["state"].toObject());
 
       containerNode.name = containerName;
-      containerNode.child_nodes = QString("%1/%2").arg(k8sAppFqdn, containerName);
-      containerNode.id = ngrt4n::md5hash(QString("%1/%2").arg(k8sPodFqdn, containerId));
+      containerNode.child_nodes = QString("%1/%2").arg(serviceFqdn, containerName); //FIXME: is it correct ?
+      containerNode.id = ngrt4n::md5hash(QString("%1/%2").arg(podFqdn, containerId));
       containerNode.sev = stateData.first;
       containerNode.description = stateData.second;
-      cdata.cnodes.insert(containerNode.id, containerNode);
+      containerNode.check.host = containerNode.name.toStdString();
+      containerNode.check.host_groups = k8sNamespace.toStdString();
+      containerNode.check.status = stateData.first;
+      containerNode.check.id = QString("%1/%2").arg(serviceFqdn, containerName).toStdString(); //FIXME: is it correct ?
+      containerNode.check.last_state_change = "-1"; // FIXME set current time ?
+
+      // add container node as IT service
+      cnodes.insert(containerNode.id, containerNode);
     }
   }
 
   // if data match the given namespace
   if (k8sNamespaces.size() == 1) {
-    NodeT pnode;
-    pnode.id =ngrt4n::ROOT_ID;
-    pnode.parent = "";
-    pnode.name = *k8sNamespaces.begin();
-    pnode.type = NodeType::BusinessService;
-    pnode.sev_prule = PropRules::Unchanged;
-    pnode.sev_crule = CalcRules::Worst;
-    pnode.weight = ngrt4n::WEIGHT_UNIT;
-    pnode.icon = ngrt4n::DEFAULT_ICON;
-    pnode.description = "";
-    cdata.bpnodes.insert(pnode.id, pnode);
-
-    return std::make_pair("", true);
+    return std::make_pair("success", true);
   }
 
-  cdata.clear();
-  return std::make_pair(QObject::tr("invalid namespaced data match for namespace %1").arg(macthNamespace), false);
+  // otherwise means invalid data
+  bpnodes.clear();
+  cnodes.clear();
+  return std::make_pair(QObject::tr("invalid pod data matching namespace %1").arg(macthNamespace), false);
 }
 
 
@@ -226,3 +233,31 @@ std::pair<int, QString> K8sHelper::parseStateData(const QJsonObject& state)
   return std::make_pair(ngrt4n::Unknown, stateString);
 }
 
+
+std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
+                                                        const QMap<QString, QVariant>& podLabels)
+{
+  QString outMatchedService = "";
+  bool outSelectorMatched = false;
+
+  auto&& podLabelsTags = QSet<QString>::fromList(podLabels.keys());
+  for (auto&& curSelectorInfo: serviceSelectorInfos.toStdMap()) {
+    auto&& selectorTags = curSelectorInfo.second.keys();
+    if (podLabelsTags.contains(QSet<QString>::fromList(selectorTags))) {
+      bool matched = true;
+      for (auto&& curTag: selectorTags) {
+        if (curSelectorInfo.second[curTag] != podLabels[curTag]) {
+          matched = false;
+          break;
+        }
+      }
+      if (matched) {
+        outSelectorMatched = true;
+        outMatchedService = curSelectorInfo.first;
+        qDebug() << outMatchedService << curSelectorInfo.second;
+        break;
+      }
+    }
+  }
+  return std::make_pair(outMatchedService, outSelectorMatched);
+}
