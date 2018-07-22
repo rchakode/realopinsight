@@ -1,0 +1,1934 @@
+{
+  "kind": "PodList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/api/v1/namespaces/project1/pods",
+    "resourceVersion": "11309757"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "application1-7bd5d4df8b-5fkzr",
+        "generateName": "application1-7bd5d4df8b-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application1-7bd5d4df8b-5fkzr",
+        "uid": "f35f4f6a-8064-11e8-9fba-029f19108a54",
+        "resourceVersion": "10490391",
+        "creationTimestamp": "2018-07-05T15:06:10Z",
+        "labels": {
+          "app": "application1",
+          "pod-template-hash": "3681808946",
+          "version": "v1"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application1-7bd5d4df8b",
+            "uid": "f35c24a7-8064-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application1",
+            "image": "docker.io/services/project1/broker/application:0.0.2-e1bcbae",
+            "command": [
+              "/usr/bin/Broker"
+            ],
+            "args": [
+              "server",
+              "--debug"
+            ],
+            "ports": [
+              {
+                "containerPort": 5555,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application1",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-release"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T15:06:23Z"
+          },
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T15:06:25Z"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T15:06:10Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.25",
+        "startTime": "2018-07-05T15:06:10Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-05T15:06:22Z",
+                "finishedAt": "2018-07-05T15:06:22Z",
+                "containerID": "docker://f1e710d766492f52344aa7256a319c5b674a5c7c46989e0ad7631776507c7161"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://f1e710d766492f52344aa7256a319c5b674a5c7c46989e0ad7631776507c7161"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "application1",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T15:06:24Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "docker.io/services/project1/broker/application:0.0.2-e1bcbae",
+            "imageID": "docker-pullable://docker.io/services/project1/broker/application@sha256:d4170ea4ed3a54e1ff0f52685c2f309ac622bdceddf59e78cd36fda93a2d065b",
+            "containerID": "docker://3b48b058a95cb16bd0637a71c169f963d772d8b190515e1d89bae34f629c1615"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T15:06:24Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://2835c34f1b501f249e3b1e7caa0bd52c7dc1a3020891660890ee21800bb1cf42"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application2-7f545698c-l6ms8",
+        "generateName": "application2-7f545698c-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application2-7f545698c-l6ms8",
+        "uid": "3a9d46f9-8065-11e8-9fba-029f19108a54",
+        "resourceVersion": "10490697",
+        "creationTimestamp": "2018-07-05T15:08:09Z",
+        "labels": {
+          "app": "application2",
+          "pod-template-hash": "391012547"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application2-7f545698c",
+            "uid": "3a9a3c89-8065-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application2",
+            "image": "docker.io/services/project1/broker/onem2m:0.0.4-159f751",
+            "command": [
+              "/usr/bin/Broker"
+            ],
+            "args": [
+              "server",
+              "--debug"
+            ],
+            "ports": [
+              {
+                "containerPort": 5555,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application2",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-release"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T15:08:22Z"
+          },
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T15:08:24Z"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T15:08:09Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.26",
+        "startTime": "2018-07-05T15:08:09Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-05T15:08:21Z",
+                "finishedAt": "2018-07-05T15:08:21Z",
+                "containerID": "docker://a06e88282550d41ad8506db7ddf70e406fc6262bde09e9389ead9094c577c237"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://a06e88282550d41ad8506db7ddf70e406fc6262bde09e9389ead9094c577c237"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "application2",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T15:08:23Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "docker.io/services/project1/broker/onem2m:0.0.4-159f751",
+            "imageID": "docker-pullable://docker.io/services/project1/broker/onem2m@sha256:31359bff8ef2241855d79285c1de619aecc68bb4cc5ad5a24b89e62c6f0b7f15",
+            "containerID": "docker://0b918cab5d9c3166b0c50a09d079297cfe141a6874e2a03563a17df8323d1471"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T15:08:23Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://59d7bec74624113502ed18825859df79fe467a062b2c3838e9622033c615c269"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application3-55f8449545-ld4px",
+        "generateName": "application3-55f8449545-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application3-55f8449545-ld4px",
+        "uid": "9634580f-835c-11e8-9fba-029f19108a54",
+        "resourceVersion": "11309638",
+        "creationTimestamp": "2018-07-09T09:43:51Z",
+        "labels": {
+          "app": "application3",
+          "pod-template-hash": "1194005101",
+          "version": "v1"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application3-55f8449545",
+            "uid": "8723e4f6-8358-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application3",
+            "image": "docker.io/services/project1/carsharing/manager:0.0.1-a700b84",
+            "command": [
+              "/usr/bin/application3"
+            ],
+            "args": [
+              "server"
+            ],
+            "ports": [
+              {
+                "containerPort": 5555,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application3",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-release"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-09T09:44:04Z"
+          },
+          {
+            "type": "Ready",
+            "status": "False",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-09T12:17:56Z",
+            "reason": "ContainersNotReady",
+            "message": "containers with unready status: [application3]"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-09T09:43:51Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.29",
+        "startTime": "2018-07-09T09:43:51Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-09T09:44:03Z",
+                "finishedAt": "2018-07-09T09:44:03Z",
+                "containerID": "docker://0be7847207153351e96f6109b1878343e3d95424e42ee72561b4880c0af96f6e"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://0be7847207153351e96f6109b1878343e3d95424e42ee72561b4880c0af96f6e"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "application3",
+            "state": {
+              "waiting": {
+                "reason": "CrashLoopBackOff",
+                "message": "Back-off 5m0s restarting failed container=application3 pod=application3-55f8449545-ld4px_project1(9634580f-835c-11e8-9fba-029f19108a54)"
+              }
+            },
+            "lastState": {
+              "terminated": {
+                "exitCode": 1,
+                "reason": "Error",
+                "startedAt": "2018-07-09T12:28:19Z",
+                "finishedAt": "2018-07-09T12:28:19Z",
+                "containerID": "docker://028a95c6c5d5030214767931d0d8a81c4d09205672c48930fbd59fcda66d9b77"
+              }
+            },
+            "ready": false,
+            "restartCount": 37,
+            "image": "docker.io/services/project1/carsharing/manager:0.0.1-a700b84",
+            "imageID": "docker-pullable://docker.io/services/project1/carsharing/manager@sha256:6509e19d05c9a983d40f1007f4dfcc8fa28caf52640a0bf58cec0f014ce2f461",
+            "containerID": "docker://028a95c6c5d5030214767931d0d8a81c4d09205672c48930fbd59fcda66d9b77"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-09T09:44:05Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://d09e0a6e963508502abe75bcdca63816b44f8e500690638b2989b2c1719763b3"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application4-6dc494b7fd-q6crs",
+        "generateName": "application4-6dc494b7fd-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application4-6dc494b7fd-q6crs",
+        "uid": "a931fcb1-836c-11e8-9fba-029f19108a54",
+        "resourceVersion": "11309595",
+        "creationTimestamp": "2018-07-09T11:38:55Z",
+        "labels": {
+          "app": "application4",
+          "pod-template-hash": "2870506398",
+          "version": "v1"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application4-6dc494b7fd",
+            "uid": "299b10a7-8358-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application4",
+            "image": "docker.io/services/project1/application4:latest",
+            "command": [
+              "/usr/bin/application4"
+            ],
+            "args": [
+              "consumer"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application4",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-dev"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-09T11:39:07Z"
+          },
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-09T12:28:17Z"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-09T11:38:55Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.31",
+        "startTime": "2018-07-09T11:38:55Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-09T11:39:07Z",
+                "finishedAt": "2018-07-09T11:39:07Z",
+                "containerID": "docker://981cbcf80f023870a65d360dc17a9771a2c5bf45525079060d6b517868701652"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://981cbcf80f023870a65d360dc17a9771a2c5bf45525079060d6b517868701652"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-09T11:39:08Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://d2aa7c6d6483dd2e3f1cd37a78b51336143a97bd2b3df02f7364c24e579de539"
+          },
+          {
+            "name": "application4",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-09T12:28:16Z"
+              }
+            },
+            "lastState": {
+              "terminated": {
+                "exitCode": 2,
+                "reason": "Error",
+                "startedAt": "2018-07-09T12:27:09Z",
+                "finishedAt": "2018-07-09T12:28:01Z",
+                "containerID": "docker://75a2dfc777fe5869061ba1f6c158651accfec1d7db2f446c0bb7f88550417bc4"
+              }
+            },
+            "ready": true,
+            "restartCount": 4,
+            "image": "docker.io/services/project1/application4:latest",
+            "imageID": "docker-pullable://docker.io/services/project1/application4@sha256:07fc2a0a8a1a6137e7c7a786a96611884d8f7283fd346343942fb540655a0fbe",
+            "containerID": "docker://57096edec77d286137631351f8c9036fdeeb74d098476e34df2afddb53fe012a"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application5-5dccb9d65b-6qw76",
+        "generateName": "application5-5dccb9d65b-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application5-5dccb9d65b-6qw76",
+        "uid": "fa389543-8055-11e8-9fba-029f19108a54",
+        "resourceVersion": "10474661",
+        "creationTimestamp": "2018-07-05T13:18:59Z",
+        "labels": {
+          "app": "application5",
+          "pod-template-hash": "1877658216",
+          "version": "v1"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application5-5dccb9d65b",
+            "uid": "fa358b74-8055-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application5",
+            "image": "docker.io/services/project1/parkingdataconsolidator:1.0.1-8ab11af",
+            "command": [
+              "/usr/bin/application5"
+            ],
+            "args": [
+              "consumer"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application5",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+           "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-release"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T13:19:13Z"
+          },
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T13:19:15Z"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T13:18:59Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.18",
+        "startTime": "2018-07-05T13:18:59Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-05T13:19:12Z",
+                "finishedAt": "2018-07-05T13:19:12Z",
+                "containerID": "docker://a57bca0c128bb877517d1109a54f9f36fb0f2e105a77bd71b25083cc51f25937"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://a57bca0c128bb877517d1109a54f9f36fb0f2e105a77bd71b25083cc51f25937"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T13:19:15Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://d0a2b75471f7e66e16bbcb3a984051116208fcd1f0faf5179bdb11bc082c5f0d"
+          },
+          {
+            "name": "application5",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T13:19:14Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "docker.io/services/project1/parkingdataconsolidator:1.0.1-8ab11af",
+            "imageID": "docker-pullable://docker.io/services/project1/parkingdataconsolidator@sha256:d944a213be0c05fc682d59cb31a5cbd78bccc223bf530a6c15aec9444b0b2dae",
+            "containerID": "docker://61464050fdcdec1cb064a4927da0b656806f705b427c952fb6b2f5514360b45d"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application6-598b8947f4-ngn9s",
+        "generateName": "application6-598b8947f4-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application6-598b8947f4-ngn9s",
+        "uid": "b72333e6-8060-11e8-9fba-029f19108a54",
+        "resourceVersion": "10486148",
+        "creationTimestamp": "2018-07-05T14:35:51Z",
+        "labels": {
+          "app": "application6",
+          "pod-template-hash": "1546450390",
+          "version": "v1"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application6-598b8947f4",
+            "uid": "b71afbd1-8060-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application6",
+            "image": "docker.io/services/project1/parkingdatamanager:0.0.2-d2746b3",
+            "command": [
+              "/usr/bin/application6"
+            ],
+            "args": [
+              "manager"
+            ],
+           "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application6",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+           "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-release"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T14:36:03Z"
+          },
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T14:36:05Z"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T14:35:51Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.24",
+        "startTime": "2018-07-05T14:35:51Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-05T14:36:03Z",
+                "finishedAt": "2018-07-05T14:36:03Z",
+                "containerID": "docker://3fce7169a517896b6145ce7349e9bf40c4ecc6a63ef03d48691fc07cd95ac509"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://3fce7169a517896b6145ce7349e9bf40c4ecc6a63ef03d48691fc07cd95ac509"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T14:36:05Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://3d2eb6e26e1d141cd7c1ef8e1b7c926e4200f0709ff7353a2a1e0ad96b73da7e"
+          },
+          {
+            "name": "application6",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T14:36:05Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "docker.io/services/project1/parkingdatamanager:0.0.2-d2746b3",
+            "imageID": "docker-pullable://docker.io/services/project1/parkingdatamanager@sha256:08d1db9fdd30fe87f9150212b0829eb6d071939221d7cb31cefc5a94ce2138d1",
+            "containerID": "docker://cfa51939f7a45c3e387207d3889ada577ea41aa7253ed0247885168a597b9737"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application7-6894c9dd86-k6jdw",
+        "generateName": "application7-6894c9dd86-",
+        "namespace": "project1",
+        "selfLink": "/api/v1/namespaces/project1/pods/application7-6894c9dd86-k6jdw",
+        "uid": "8f5d5b04-8058-11e8-9fba-029f19108a54",
+        "resourceVersion": "10477409",
+        "creationTimestamp": "2018-07-05T13:37:28Z",
+        "labels": {
+          "app": "application7",
+          "pod-template-hash": "2450758842",
+          "version": "v1"
+        },
+        "annotations": {
+          "sidecar.servicemesh.io/status": "{\"version\":\"93803d884c0ba2dd1681a31f1003b7c9164c1d95b81de6af350db0a27575dd0e\",\"initContainers\":[\"servicemesh-init\"],\"containers\":[\"servicemesh-proxy\"],\"volumes\":[\"servicemesh-envoy\",\"servicemesh-certs\"]}"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "extensions/v1beta1",
+            "kind": "ReplicaSet",
+            "name": "application7-6894c9dd86",
+            "uid": "8f5750ac-8058-11e8-9fba-029f19108a54",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-4vg2t",
+            "secret": {
+              "secretName": "default-token-4vg2t",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "servicemesh-envoy",
+            "emptyDir": {
+              "medium": "Memory"
+            }
+          },
+          {
+            "name": "servicemesh-certs",
+            "secret": {
+              "secretName": "servicemesh.default",
+              "defaultMode": 420,
+              "optional": true
+            }
+          }
+        ],
+        "initContainers": [
+          {
+            "name": "servicemesh-init",
+            "image": "docker.io/servicemesh/proxy_init:0.7.1",
+            "args": [
+              "-p",
+              "15001",
+              "-u",
+              "1337"
+            ],
+            "resources": {
+              
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "Always",
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "NET_ADMIN"
+                ]
+              }
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "application7",
+            "image": "docker.io/services/project1/vehicledataconsolidator:1.0.1-617acfe",
+            "command": [
+              "/usr/bin/application7"
+            ],
+            "args": [
+              "consumer"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-4vg2t",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          },
+          {
+            "name": "servicemesh-proxy",
+            "image": "docker.io/servicemesh/proxy:0.7.1",
+            "args": [
+              "proxy",
+              "sidecar",
+              "--configPath",
+              "/etc/servicemesh/proxy",
+              "--binaryPath",
+              "/usr/local/bin/envoy",
+              "--serviceCluster",
+              "application7",
+              "--drainDuration",
+              "45s",
+              "--parentShutdownDuration",
+              "1m0s",
+              "--discoveryAddress",
+              "servicemesh-pilot.servicemesh-system:8080",
+              "--discoveryRefreshDelay",
+              "1s",
+              "--zipkinAddress",
+              "zipkin.servicemesh-system:9411",
+              "--connectTimeout",
+              "10s",
+              "--statsdUdpAddress",
+              "servicemesh-mixer.servicemesh-system:9125",
+              "--proxyAdminPort",
+              "15000",
+              "--controlPlaneAuthPolicy",
+              "NONE"
+            ],
+            "resources": {
+              
+            },
+            "volumeMounts": [
+              {
+                "name": "servicemesh-envoy",
+                "mountPath": "/etc/servicemesh/proxy"
+              },
+              {
+                "name": "servicemesh-certs",
+                "readOnly": true,
+                "mountPath": "/etc/certs/"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "privileged": false,
+              "runAsUser": 1337,
+              "readOnlyRootFilesystem": true
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "ip-10-20-102-107.eu-central-1.compute.internal",
+        "securityContext": {
+          
+        },
+        "imagePullSecrets": [
+          {
+            "name": "regsecret-release"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Initialized",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T13:37:41Z"
+          },
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T13:37:43Z"
+          },
+          {
+            "type": "PodScheduled",
+            "status": "True",
+            "lastProbeTime": null,
+            "lastTransitionTime": "2018-07-05T13:37:28Z"
+          }
+        ],
+        "hostIP": "10.20.102.107",
+        "podIP": "100.96.7.19",
+        "startTime": "2018-07-05T13:37:28Z",
+        "initContainerStatuses": [
+          {
+            "name": "servicemesh-init",
+            "state": {
+              "terminated": {
+                "exitCode": 0,
+                "reason": "Completed",
+                "startedAt": "2018-07-05T13:37:40Z",
+                "finishedAt": "2018-07-05T13:37:40Z",
+                "containerID": "docker://7babb8c8c555e12307d0506d59bbce629e2d659124d34437fde74410b60be479"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy_init:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy_init@sha256:b86f246170274ef869623eff65dc82b3de8fed39174436bc7f8e0892e239ffd7",
+            "containerID": "docker://7babb8c8c555e12307d0506d59bbce629e2d659124d34437fde74410b60be479"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "name": "servicemesh-proxy",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T13:37:42Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "servicemesh/proxy:0.7.1",
+            "imageID": "docker-pullable://servicemesh/proxy@sha256:07e4d40d46944c8bf06d7f35637339d217d82908e53a9b73e37888d4452c3a88",
+            "containerID": "docker://82bf3a86cb3eff6f07e58cabb9414a5a028fce3cd91a32647613a7920eb66f32"
+          },
+          {
+            "name": "application7",
+            "state": {
+              "running": {
+                "startedAt": "2018-07-05T13:37:42Z"
+              }
+            },
+            "lastState": {
+              
+            },
+            "ready": true,
+            "restartCount": 0,
+            "image": "docker.io/services/project1/vehicledataconsolidator:1.0.1-617acfe",
+            "imageID": "docker-pullable://docker.io/services/project1/vehicledataconsolidator@sha256:7ad0e6bba0e3b666c3ce1ff970c8c887ece5b630a107c3ce0cc91c50d4aa0c57",
+            "containerID": "docker://bfc80e83168ccb151c110490a7053e08ba4047975380e90f5075370063d93a3f"
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    }
+  ]
+}
