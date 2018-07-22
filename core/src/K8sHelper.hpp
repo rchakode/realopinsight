@@ -35,8 +35,14 @@ class K8sHelper : public QNetworkAccessManager
 public:
   K8sHelper();
   std::pair<QStringList, bool> parseNamespaces(const QByteArray& data);
-  std::pair<QString, bool> parsePods(const QByteArray& data, CoreDataT& cdata);
-  std::pair<int, QString> parseState(const QJsonObject& state);
+  std::pair<QString, bool> parseNamespacedServices(const QByteArray& data,
+                                                   const QString& macthNamespace,
+                                                   QMap<QString, QMap<QString, QString>>& selectorMaps,
+                                                   NodeListT& bpnodes);
+  std::pair<QString, bool> parseNamespacedPods(const QByteArray& data,
+                                               const QString& macthNamespace,
+                                               CoreDataT& cdata);
+  std::pair<int, QString> parseStateData(const QJsonObject& state);
 };
 
 #endif // K8SHELPER_H

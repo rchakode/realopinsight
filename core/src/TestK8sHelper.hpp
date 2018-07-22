@@ -37,7 +37,8 @@ public:
 private Q_SLOTS:
   void initTestCase(void);
   void test_parseNamespaces(void);
-  void test_parsePods(void);
+  void test_parseNamespacedServices(void);
+  void test_parseNamespacedPods(void);
 
 private:
   QString m_TEST_DATA_DIR;

@@ -51,8 +51,37 @@ void TestK8sHelper::test_parseNamespaces(void)
   QCOMPARE(out.first.size(), 8);
 }
 
+void TestK8sHelper::test_parseNamespacedServices(void)
+{
+  QFile nsFile(m_TEST_DATA_DIR + "./list-services.json");
 
-void TestK8sHelper::test_parsePods(void)
+  QVERIFY(nsFile.open(QIODevice::ReadOnly));
+
+  K8sHelper k8s;
+  NodeListT bpnodes;
+  QMap<QString, QMap<QString, QString>> selectorMaps;
+  auto&& out = k8s.parseNamespacedServices(nsFile.readAll(), "project1", selectorMaps, bpnodes);
+
+  for(auto&& sm: selectorMaps.toStdMap()) {
+    if (sm.first == "application1") {
+      QCOMPARE(sm.second.size(), 2);
+      QCOMPARE(sm.second.keys().size(), 2);
+      QCOMPARE(QSet<QString>::fromList(sm.second.keys()).contains(QSet<QString>::fromList(QStringList(std::initializer_list<QString>{"stage", "app"}))), true);
+    } else {
+      QCOMPARE(sm.second.size(), 1);
+      QCOMPARE(sm.second.keys().size(), 1);
+      QCOMPARE(QSet<QString>::fromList(sm.second.keys()).contains(QSet<QString>::fromList(QStringList(std::initializer_list<QString>{"app"}))), true);
+    }
+    QCOMPARE(sm.second["app"], sm.first);
+  }
+
+  QCOMPARE(out.second, true);
+  QCOMPARE(selectorMaps.size(), 7);
+}
+
+
+
+void TestK8sHelper::test_parseNamespacedPods(void)
 {
   QFile nsFile(m_TEST_DATA_DIR + "./list-pods.json");
 
@@ -60,20 +89,7 @@ void TestK8sHelper::test_parsePods(void)
 
   K8sHelper k8s;
   CoreDataT cdata;
-  auto&& out = k8s.parsePods(nsFile.readAll(), cdata);
-
-  // add root node
-  NodeT pnode;
-  pnode.name = "namespace"; // namespace as level ?
-  pnode.id = ngrt4n::ROOT_ID;
-  pnode.parent = "";
-  pnode.type = NodeType::BusinessService;
-  pnode.sev_prule = PropRules::Unchanged;
-  pnode.sev_crule = CalcRules::Worst;
-  pnode.weight = ngrt4n::WEIGHT_UNIT;
-  pnode.icon = ngrt4n::DEFAULT_ICON;
-  pnode.description = "";
-  cdata.bpnodes.insert(pnode.id, pnode);
+  auto&& out = k8s.parseNamespacedPods(nsFile.readAll(), "project1", cdata);
 
   ngrt4n::saveDataAsDescriptionFile("/tmp/real.xml", cdata);
 
