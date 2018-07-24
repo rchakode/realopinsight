@@ -29,8 +29,7 @@
 #include <QJsonArray>
 #include <utility>
 
-K8sHelper::K8sHelper(const QString& proxyUrl):
-  m_proxyUrl(proxyUrl)
+K8sHelper::K8sHelper(void)
 {
 
 }
@@ -263,43 +262,48 @@ std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap
 }
 
 
-std::pair<QStringList, bool> K8sHelper::httpGetNamespaces(void)
+std::pair<QString, bool> K8sHelper::retrieveAndProcessingK8sData(const SourceT& sinfo)
 {
   //prepare http request
   QNetworkRequest networkRequest;
   networkRequest.setRawHeader("Accept", "application/json");
-  networkRequest.setUrl(QUrl(m_proxyUrl));
+  networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces").arg(sinfo.mon_url)) );
 
- // make request
+  // make request and conncet to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(networkRequest);
-  //TODO setSslReplyErrorHandlingOptions(reply);
-
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
+
+  // set ssl options
+  QSslConfiguration sslConfig;
+  if (sinfo.verify_ssl_peer != 0) {
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+  } else {
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    reply->ignoreSslErrors();
+  }
+  reply->setSslConfiguration(sslConfig);
 
   // wait synchronously before continuing
   m_eventLoop.exec();
 
   if (! reply) {
-    return std::make_pair(QStringList{QObject::tr("Unexpected NULL QNetworkReply")},
-                          false);
+    return std::make_pair(QObject::tr("Unexpected NULL QNetworkReply"), false);
   }
 
   reply->deleteLater();
 
   if (reply->error() != QNetworkReply::NoError) {
-    return std::make_pair(QStringList{QObject::tr("Network call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString())},
-                          false);
+    return std::make_pair(QObject::tr("HTTP call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString()), false);
   }
 
-  return parseNamespaces(reply->readAll());
-}
+  auto outNamespacesParsing = parseNamespaces(reply->readAll());
+  if (! outNamespacesParsing.second || outNamespacesParsing.first.size() == 0) {
+    return std::make_pair(QObject::tr("Get namespaces returned error or empty list at %1").arg(networkRequest.url().toString()), false);
+  }
 
-//void K8sHelper::setSslReplyErrorHandlingOptions(QNetworkReply* reply)
-//{
-//  reply->setSslConfiguration(m_sslConfig);
-//  if (m_sslConfig.peerVerifyMode() == QSslSocket::VerifyNone) {
-//    reply->ignoreSslErrors();
-//  }
-//}
+
+
+  return std::make_pair("", true);
+}
 

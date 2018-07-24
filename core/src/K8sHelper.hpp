@@ -36,9 +36,8 @@ class K8sHelper : public QNetworkAccessManager
   Q_OBJECT
 
 public:
-  K8sHelper(const QString& proxyUrl);
-  std::pair<QStringList, bool> httpGetNamespaces(void);
-  void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+  K8sHelper(void);
+  std::pair<QString, bool> retrieveAndProcessingK8sData(const SourceT& sinfo);
 
   std::pair<int, QString> parseStateData(const QJsonObject& state);
   std::pair<QStringList, bool> parseNamespaces(const QByteArray& data);
@@ -59,7 +58,6 @@ public Q_SLOTS:
 
 private:
   QEventLoop m_eventLoop;
-  QString m_proxyUrl;
 };
 
 #endif // K8SHELPER_H

@@ -39,7 +39,7 @@ private Q_SLOTS:
   void test_parseNamespaces(void);
   void test_parseNamespacedServices(void);
   void test_parseNamespacedPods(void);
-  void test_httpGetNamespaces(void);
+  void test_httpDataRetrieving(void);
 
 private:
   QString m_TEST_DATA_DIR;
