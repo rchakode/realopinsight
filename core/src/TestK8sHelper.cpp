@@ -37,6 +37,7 @@ TestK8sHelper::TestK8sHelper()
 void TestK8sHelper::initTestCase(void)
 {
   m_TEST_DATA_DIR = QProcessEnvironment::systemEnvironment().value("TEST_DATA_DIR");
+  m_PROXY_URL = "http://172.18.0.1:8001";
 }
 
 void TestK8sHelper::test_parseNamespaces(void)
@@ -45,7 +46,7 @@ void TestK8sHelper::test_parseNamespaces(void)
 
   QVERIFY(nsesDataFile.open(QIODevice::ReadOnly));
 
-  K8sHelper k8s;
+  K8sHelper k8s(m_PROXY_URL);
   auto&& out = k8s.parseNamespaces(nsesDataFile.readAll());
   QCOMPARE(out.second, true);
   QCOMPARE(out.first.size(), 8);
@@ -57,7 +58,7 @@ void TestK8sHelper::test_parseNamespacedServices(void)
 
   QVERIFY(servicesDataFile.open(QIODevice::ReadOnly));
 
-  K8sHelper k8s;
+  K8sHelper k8s(m_PROXY_URL);
   NodeListT bpnodes;
   QMap<QString, QMap<QString, QString>> serviceSelectorInfos;
   auto&& out = k8s.parseNamespacedServices(servicesDataFile.readAll(), "project1", serviceSelectorInfos, bpnodes);
@@ -88,7 +89,7 @@ void TestK8sHelper::test_parseNamespacedPods(void)
 
   QVERIFY(servicesDataFile.open(QIODevice::ReadOnly));
 
-  K8sHelper k8s;
+  K8sHelper k8s(m_PROXY_URL);
   NodeListT serviceBpnodes;
   QMap<QString, QMap<QString, QString>> serviceSelectorInfos;
   auto&& outServices = k8s.parseNamespacedServices(servicesDataFile.readAll(), "project1", serviceSelectorInfos, serviceBpnodes);
@@ -119,5 +120,13 @@ void TestK8sHelper::test_parseNamespacedPods(void)
 }
 
 
+void TestK8sHelper::test_httpGetNamespaces(void)
+{
+  K8sHelper k8s(m_PROXY_URL);
+  auto&& out = k8s.httpGetNamespaces();
+  qDebug() << out.first;
+  QCOMPARE(out.second, true);
+  QCOMPARE(out.first.size(), 8);
+}
 
 QTEST_MAIN(TestK8sHelper)

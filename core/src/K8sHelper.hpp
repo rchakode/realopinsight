@@ -28,25 +28,38 @@
 #include <QStringList>
 #include <QString>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 
 class K8sHelper : public QNetworkAccessManager
 {
+  Q_OBJECT
+
 public:
-  K8sHelper();
-  std::pair<QStringList, bool> parseNamespaces(const QByteArray& data);
-  std::pair<QString, bool> parseNamespacedServices(const QByteArray& data,
-                                                   const QString& macthNamespace,
-                                                   QMap<QString, QMap<QString, QString>>& selectorMaps,
-                                                   NodeListT& bpnodes);
-  std::pair<QString, bool> parseNamespacedPods(const QByteArray& data,
-                                               const QString& macthNamespace,
-                                               const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
-                                               NodeListT& bpnodes,
-                                               NodeListT& cnodes);
+  K8sHelper(const QString& proxyUrl);
+  std::pair<QStringList, bool> httpGetNamespaces(void);
+  void setSslReplyErrorHandlingOptions(QNetworkReply* reply);
+
   std::pair<int, QString> parseStateData(const QJsonObject& state);
+  std::pair<QStringList, bool> parseNamespaces(const QByteArray& data);
+  std::pair<QString, bool> parseNamespacedServices(const QByteArray& in_data,
+                                                   const QString& in_macthNamespace,
+                                                   QMap<QString, QMap<QString, QString>>& out_selectorMaps,
+                                                   NodeListT& out_bpnodes);
+  std::pair<QString, bool> parseNamespacedPods(const QByteArray& in_data,
+                                               const QString& in_sacthNamespace,
+                                               const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
+                                               NodeListT& out_bpnodes,
+                                               NodeListT& out_cnodes);
   std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
                                                const QMap<QString, QVariant>& podLabels);
+
+public Q_SLOTS:
+  void exitEventLoop(const QNetworkReply::NetworkError& code) { m_eventLoop.exit(code);}
+
+private:
+  QEventLoop m_eventLoop;
+  QString m_proxyUrl;
 };
 
 #endif // K8SHELPER_H

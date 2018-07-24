@@ -39,9 +39,11 @@ private Q_SLOTS:
   void test_parseNamespaces(void);
   void test_parseNamespacedServices(void);
   void test_parseNamespacedPods(void);
+  void test_httpGetNamespaces(void);
 
 private:
   QString m_TEST_DATA_DIR;
+  QString m_PROXY_URL;
 };
 
 #endif // TESTK8SHELPER_H
