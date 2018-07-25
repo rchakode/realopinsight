@@ -48,7 +48,6 @@
 
 namespace {
   const IconMapT ICONS = ngrt4n::nodeIcons();
-  const QString CHILD_SEPERATOR(ngrt4n::CHILD_SEP.c_str());
 }
 
 const QMap<int, std::string> WebEditor::MENU_LABELS = {
@@ -97,7 +96,7 @@ void  WebEditor::handleOpenViewButton(void)
 }
 
 
-void  WebEditor::handleOpenFile(const std::string& path, const std::string& option)
+void  WebEditor::handleOpenFile(const std::string& path, const std::string&)
 {
   Parser parser(path.c_str(), &m_cdata, Parser::ParsingModeEditor, ngrt4n::DotLayout);
 
@@ -628,7 +627,7 @@ void WebEditor::handleDataPointChanged(void)
 {
   if (m_dataPointField.isEnabled()) {
     auto dataPoint = m_dataPointField.text().toUTF8();
-    int slashIndex = dataPoint.find("/");
+    size_t slashIndex = dataPoint.find("/");
     m_nameField.setText(dataPoint.substr(slashIndex + 1) + "("  + dataPoint.substr(0, slashIndex) + ")");
   }
 }
@@ -715,7 +714,7 @@ void WebEditor::handleSaveViewButton(void)
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 
-  fixParentChildrenDependencies(m_cdata);
+  ngrt4n::fixParentChildrenDependencies(m_cdata);
 
   auto saveStatus = saveContentToFile(m_cdata, destPath.c_str());
 
@@ -766,41 +765,6 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
   }
 
   return std::make_pair(0, "");
-}
-
-
-
-void WebEditor::fixParentChildrenDependencies(CoreDataT& cdata)
-{
-  // First clear all existing children for bpnodes
-  for (auto& node: cdata.bpnodes) {
-    node.child_nodes.clear();
-  }
-
-  // build dependencies for bpnodes
-  for (const auto& node: cdata.bpnodes) {
-    setParentChildDependency(node.id, node.parent);
-  }
-
-  // build dependencies for cnodes
-  for (const auto& node: cdata.cnodes) {
-    setParentChildDependency(node.id, node.parent);
-  }
-}
-
-
-void WebEditor::setParentChildDependency(const QString& childId, const QString& parentId)
-{
-  auto parent_it = m_cdata.bpnodes.find(parentId);
-  if (parent_it == m_cdata.bpnodes.end()) {
-    return ;
-  }
-
-  if (parent_it->child_nodes.isEmpty()) {
-    parent_it->child_nodes = childId;
-  } else {
-    parent_it->child_nodes += (CHILD_SEPERATOR % childId);
-  }
 }
 
 
@@ -930,7 +894,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
 }
 
 
-void WebEditor::handleDataPointGroupChanged(int index)
+void WebEditor::handleDataPointGroupChanged(int)
 {
   std::string group = m_dataPointGroupField.currentText().toUTF8();
   m_dataPointListModel->setStringList(m_dataPointsListByGroup[group]);
@@ -971,7 +935,7 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
   rootSrv.type = NodeType::BusinessService;
 
   CoreDataT cdata;
-  while (line = streamReader.readLine(), ! line.isNull()) {
+  while (static_cast<void>(line = streamReader.readLine()), ! line.isNull()) {
 
     ++lineIndex;
 
@@ -1013,9 +977,9 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
 
     // now parse group config
     std::pair<int, std::string> groupMembersExtractResult;
-    float warningThreshold  = 0;
-    float criticalThreshold = 0;
-    while (line = streamReader.readLine(), ! line.isNull()) {
+    double warningThreshold  = 0;
+    double criticalThreshold = 0;
+    while (static_cast<void>(line = streamReader.readLine()), ! line.isNull()) {
 
       ++lineIndex;
 
@@ -1054,9 +1018,9 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
         }
 
       } else if (fields[0] == "warning_threshold") {
-        warningThreshold = fields[1].toFloat();
+        warningThreshold = fields[1].toDouble();
       } else if (fields[0] == "critical_threshold") {
-        criticalThreshold = fields[1].toFloat();
+        criticalThreshold = fields[1].toDouble();
       } else if (fields[0] == "priority") {
         /// not applicable
       }

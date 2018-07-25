@@ -133,6 +133,10 @@ namespace ngrt4n
 
   QString generateNodeXml(const NodeT & node);
 
+  void fixParentChildrenDependencies(CoreDataT& cdata);
+
+  void setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes);
+
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP

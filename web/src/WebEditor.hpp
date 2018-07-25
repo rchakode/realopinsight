@@ -138,8 +138,6 @@ private:
   void fillInEditorFromNodeInfo(const NodeT& ninfo);
   void updateNodeDataFromEditor(const QString& nodeId);
 
-  void fixParentChildrenDependencies(CoreDataT& cdata);
-  void setParentChildDependency(const QString& childId, const QString& parentId);
   void removeNodeFromCdata(const NodeT& ninfo);
 
   QList<NodeT> findDescendantNodes(const QString& nodeId);

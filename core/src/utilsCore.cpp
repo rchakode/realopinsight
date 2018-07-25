@@ -598,3 +598,36 @@ QString ngrt4n::generateNodeXml(const NodeT& node)
   return xml;
 }
 
+
+void ngrt4n::fixParentChildrenDependencies(CoreDataT& cdata)
+{
+  // First clear all existing children for bpnodes
+  for (auto& node: cdata.bpnodes) {
+    node.child_nodes.clear();
+  }
+
+  // build dependencies for bpnodes
+  for (const auto& node: cdata.bpnodes) {
+    setParentChildDependency(node.id, node.parent, cdata.bpnodes);
+  }
+
+  // build dependencies for cnodes
+  for (const auto& node: cdata.cnodes) {
+    setParentChildDependency(node.id, node.parent, cdata.bpnodes);
+  }
+}
+
+
+void ngrt4n::setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes)
+{
+  auto parent_it = pnodes.find(parentId);
+  if (parent_it == pnodes.end()) {
+    return ;
+  }
+
+  if (parent_it->child_nodes.isEmpty()) {
+    parent_it->child_nodes = childId;
+  } else {
+    parent_it->child_nodes += (QString(ngrt4n::CHILD_SEP.c_str()) % childId);
+  }
+}

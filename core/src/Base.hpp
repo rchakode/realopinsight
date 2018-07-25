@@ -183,6 +183,14 @@ namespace ngrt4n {
     NeatoLayout = 2
   };
 
+  enum ReturnCodeT {
+    RcSuccess = 0,
+    RccRpcError = 1,
+    RcUnexpectedFailure = 2,
+    RcParseError = 3,
+    RcFailed = 255
+  };
+
   const std::string AdmUser   = "ngrt4n_adm";
   const std::string OpUser    = "ngrt4n_op";
   const std::string CHILD_SEP = ",";
@@ -357,6 +365,8 @@ struct SourceT {
     qint8 verify_ssl_peer;
     QString icon;
 };
+
+
 
 class ScaleFactors {
   public:
